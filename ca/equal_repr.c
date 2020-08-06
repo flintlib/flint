@@ -15,31 +15,23 @@ int
 ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     slong field_index;
-    ca_field_type_t type;
 
     /* by assumption: cached field objects are unique */
     if (x->field != y->field)
         return 0;
 
     field_index = x->field & ~CA_SPECIAL;
-    type = ctx->fields[field_index].type;
 
-    if (type == CA_FIELD_TYPE_QQ)
+    if (field_index == CA_FIELD_ID_QQ)
     {
         return fmpq_equal(CA_FMPQ(x), CA_FMPQ(y));
     }
-    else if (type == CA_FIELD_TYPE_NF)
+    else if (CA_FIELD_IS_NF(ctx->fields + field_index))
     {
         return nf_elem_equal(CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(ctx->fields + field_index));
     }
-    else if (type == CA_FIELD_TYPE_FUNC)
-    {
-        return fmpz_mpoly_q_equal(CA_MPOLY_Q(x), CA_MPOLY_Q(y), ctx->mctx + 0);
-    }
-    else if (type == CA_FIELD_TYPE_MULTI)
+    else
     {
         return fmpz_mpoly_q_equal(CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(ctx->fields + field_index, ctx));
     }
-
-    flint_abort();
 }

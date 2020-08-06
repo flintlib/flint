@@ -61,21 +61,23 @@ fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol,
 }
 
 void
-ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx)
+ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx)
 {
-    K->data.multi.ext[i] = x_index;
+    CA_FIELD_GET_EXT(K, i) = (ca_ext_ptr) x;
+    CA_FIELD_HASH(K) = CA_FIELD_HASH(K) * 100003 + CA_EXT_HASH(x);
 
-    if (ctx->fields[x_index].type == CA_FIELD_TYPE_NF)
+    /* note: not when K is single nf */
+    if (CA_EXT_IS_QQBAR(x))
     {
-        if (K->data.multi.ideal_len == 0)
-            K->data.multi.ideal = flint_malloc(sizeof(fmpz_mpoly_struct));
+        if (CA_FIELD_IDEAL_LENGTH(K) == 0)
+            CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
         else
-            K->data.multi.ideal = flint_realloc(K->data.multi.ideal, (K->data.multi.ideal_len + 1) * sizeof(fmpz_mpoly_struct));
+            CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
 
-        fmpz_mpoly_init(K->data.multi.ideal + K->data.multi.ideal_len, CA_FIELD_MCTX(K, ctx));
-        fmpz_mpoly_set_gen_fmpz_poly(K->data.multi.ideal + K->data.multi.ideal_len, i, QQBAR_POLY(CA_FIELD_NF_QQBAR(ctx->fields + x_index)), CA_FIELD_MCTX(K, ctx));
+        fmpz_mpoly_init(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), CA_FIELD_MCTX(K, ctx));
+        fmpz_mpoly_set_gen_fmpz_poly(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), i, QQBAR_POLY(CA_EXT_QQBAR(x)), CA_FIELD_MCTX(K, ctx));
 
-        K->data.multi.ideal_len++;
+        CA_FIELD_IDEAL_LENGTH(K)++;
     }
 }
 

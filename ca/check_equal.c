@@ -53,7 +53,7 @@ ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
         return T_TRUE;
 
     /* same algebraic number field ==> sufficient to compare representation */
-    if (x->field == y->field && ctx->fields[x->field].type == CA_FIELD_TYPE_NF)
+    if (x->field == y->field && CA_FIELD_IS_NF(ctx->fields + x->field))
         return T_FALSE;
 
     res = T_UNKNOWN;

@@ -10,100 +10,53 @@
 */
 
 #include "ca.h"
-
-void
-ca_field_print_gen(const ca_field_t K, const ca_ctx_t ctx)
-{
-    if (K->type == CA_FIELD_TYPE_NF)
-    {
-        if (qqbar_is_i(&K->data.nf.x))
-            flint_printf("I");
-        else
-            qqbar_printnd(&K->data.nf.x, 10);
-    }
-    else if (K->type == CA_FIELD_TYPE_FUNC)
-    {
-        flint_printf("%s", calcium_func_name(K->data.func.func));
-        if (K->data.func.args_len != 0)
-        {
-            slong i;
-            flint_printf("(");
-            for (i = 0; i < K->data.func.args_len; i++)
-            {
-                ca_print(K->data.func.args + i, ctx);
-                if (i < K->data.func.args_len - 1)
-                    flint_printf(", ");
-            }
-            flint_printf(")");
-        }
-    }
-}
+#include "ca_ext.h"
 
 void
 ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
 {
-    slong i, len;
+    slong i, len, ideal_len;
 
     flint_printf("QQ");
 
-    if (K->type == CA_FIELD_TYPE_QQ)
+    len = CA_FIELD_LENGTH(K);
+
+    if (len == 0)
         return;
 
-    if (K->type == CA_FIELD_TYPE_NF)
+    flint_printf("(");
+    for (i = 0; i < len; i++)
     {
-        flint_printf("(x) where {x = Algebraic number ");
-        ca_field_print_gen(K, ctx);
-        flint_printf("}");
-        return;
+        flint_printf("x%wd", i + 1);
+        if (i < len - 1)
+            flint_printf(", ");
     }
-
-    if (K->type == CA_FIELD_TYPE_FUNC)
+    flint_printf(") where {");
+    for (i = 0; i < len; i++)
     {
-        flint_printf("(x) where {x = ");
-        ca_field_print_gen(K, ctx);
-        flint_printf("}");
+        flint_printf("x%wd = ", i + 1);
+
+        ca_ext_print(CA_FIELD_GET_EXT(K, i), ctx);
+
+        flint_printf("");
+
+        if (i < len - 1)
+            flint_printf(", ");
     }
+    flint_printf("}");
 
-    if (K->type == CA_FIELD_TYPE_MULTI)
+    ideal_len = CA_FIELD_IDEAL_LENGTH(K);
+
+    if (ideal_len > 0)
     {
-        len = K->data.multi.len;
-
-        flint_printf("(");
-        for (i = 0; i < len; i++)
+        flint_printf(" with ideal {");
+        for (i = 0; i < ideal_len; i++)
         {
-            flint_printf("x%wd", i + 1);
-            if (i < len - 1)
-                flint_printf(", ");
-        }
-        flint_printf(") where {");
-        for (i = 0; i < len; i++)
-        {
-            flint_printf("x%wd = ", i + 1);
-
-            ca_field_print_gen(ctx->fields + K->data.multi.ext[i], ctx);
-
-            flint_printf("");
-
-            if (i < len - 1)
+            fmpz_mpoly_print_pretty(CA_FIELD_IDEAL_POLY(K, i), NULL, CA_FIELD_MCTX(K, ctx));
+            if (i < ideal_len - 1)
                 flint_printf(", ");
         }
         flint_printf("}");
-
-        if (K->data.multi.ideal_len > 0)
-        {
-            /* todo: could use cached mctx in ctx... */
-            fmpz_mpoly_ctx_t mctx;
-            fmpz_mpoly_ctx_init(mctx, K->data.multi.len, CA_MPOLY_ORD);
-
-            flint_printf(" with ideal {");
-            for (i = 0; i < K->data.multi.ideal_len; i++)
-            {
-                fmpz_mpoly_print_pretty(K->data.multi.ideal + i, NULL, mctx);
-                if (i < K->data.multi.ideal_len - 1)
-                    flint_printf(", ");
-            }
-            flint_printf("}");
-        }
     }
 }
 

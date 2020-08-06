@@ -27,7 +27,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
     }
     else
     {
-        if (CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_NF)
+        if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
         {
             const fmpz * num;
             const fmpz * den;
@@ -56,7 +56,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 
             return 1;
         }
-        else if (CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_MULTI)
+        else
         {
             slong i, len, deg_limit, bits_limit;
             qqbar_ptr xs;
@@ -66,11 +66,11 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
             deg_limit = ctx->options[CA_OPT_QQBAR_DEG_LIMIT];
             bits_limit = 10 * ctx->options[CA_OPT_PREC_LIMIT]; /* xxx */
 
-            len = CA_FIELD(x, ctx)->data.multi.len;
+            len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
 
             for (i = 0; i < len; i++)
             {
-                if (CA_FIELD_MULTI_GEN(x, i, ctx)->type != CA_FIELD_TYPE_NF)
+                if (!CA_EXT_IS_QQBAR(CA_FIELD_GET_EXT(CA_FIELD(x, ctx), i)))
                     return 0;
             }
 
@@ -79,7 +79,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
             qqbar_init(y);
 
             for (i = 0; i < len; i++)
-                xs[i] = *CA_FIELD_NF_QQBAR(CA_FIELD_MULTI_GEN(x, i, ctx));
+                xs[i] = *CA_EXT_QQBAR(CA_FIELD_GET_EXT(CA_FIELD(x, ctx), i));
 
             if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
             {
@@ -98,11 +98,6 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 
             return success;
         }
-        else
-        {
-            /* ... */
-            return 0;
-        }
     }
 }
 
@@ -118,7 +113,7 @@ ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx)
         fmpq_set(res, CA_FMPQ(x));
         return 1;
     }
-    else if (CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_NF)
+    else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
     {
         if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
         {
@@ -199,7 +194,7 @@ ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
 
         return 0;
     }
-    else if (CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_NF)
+    else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
     {
         if (nf_elem_is_integer(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
         {

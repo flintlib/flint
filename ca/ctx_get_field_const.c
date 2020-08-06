@@ -18,8 +18,9 @@ _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func)
 
     for (i = 0; i < ctx->fields_len; i++)
     {
-        /* todo: check length? (if symbols for constants are ever overloaded to take parameters...) */
-        if (((ctx->fields + i)->type == CA_FIELD_TYPE_FUNC) && ((ctx->fields + i)->data.func.func == func))
+        /* todo: also check len == 0? */
+        if (CA_FIELD_LENGTH(ctx->fields + i) == 1 &&
+            CA_EXT_HEAD(CA_FIELD_GET_EXT(ctx->fields + i, 0)) == func)
         {
             break;
         }
@@ -34,7 +35,7 @@ _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func)
         }
 
         ctx->fields_len = i + 1;
-        ca_field_init_const(ctx->fields + i, func);
+        ca_field_init_const(ctx->fields + i, func, ctx);
     }
 
     return i;

@@ -16,7 +16,6 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
 {
     ulong field_special;
     slong field;
-    ca_field_type_t type;
 
     field_special = res->field;
     field = field_special & ~CA_SPECIAL;
@@ -24,9 +23,7 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
     if (field == 0)
         return;
 
-    type = ctx->fields[field].type;
-
-    if (type == CA_FIELD_TYPE_NF)
+    if (CA_FIELD_IS_NF(ctx->fields + field))
     {
         /* demote to rational number */
         if (nf_elem_is_rational(CA_NF_ELEM(res), CA_FIELD_NF(ctx->fields + field)))
@@ -58,13 +55,15 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
             fmpq_clear(t);
         }
     }
-    else if (type == CA_FIELD_TYPE_FUNC)
+    else
     {
-        if (fmpz_mpoly_q_is_fmpq(CA_MPOLY_Q(res), ctx->mctx + 0))
+        /* todo: demote to smaller field (in particular, single generator) */
+
+        if (fmpz_mpoly_q_is_fmpq(CA_MPOLY_Q(res), CA_FIELD_MCTX(ctx->fields + field, ctx)))
         {
             fmpq_t t;
             fmpq_init(t);
-            if (!fmpz_mpoly_q_is_zero(CA_MPOLY_Q(res), ctx->mctx + 0))
+            if (!fmpz_mpoly_q_is_zero(CA_MPOLY_Q(res), CA_FIELD_MCTX(ctx->fields + field, ctx)))
             {
                 fmpz_swap(fmpq_numref(t), fmpz_mpoly_q_numref(CA_MPOLY_Q(res))->coeffs);
                 fmpz_swap(fmpq_denref(t), fmpz_mpoly_q_denref(CA_MPOLY_Q(res))->coeffs);
@@ -73,8 +72,14 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
             fmpq_swap(CA_FMPQ(res), t);
             fmpq_clear(t);
         }
-        else if (0)
-        {
+    }
+
+    res->field = res->field | (field_special & CA_SPECIAL);  /* set special flags */
+}
+
+
+
+#if 0
             /* todo: deflation? */
 
             /* Sqrt(x): simplify to an element wrt x if all exponents are even */
@@ -131,26 +136,6 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
                 fmpz_clear(den_shift);
                 fmpz_clear(den_stride);
             }
-        }
-    }
-    else if (type == CA_FIELD_TYPE_MULTI)
-    {
-        /* todo: demote to smaller field (in particular, single generator) */
+#endif
 
-        if (fmpz_mpoly_q_is_fmpq(CA_MPOLY_Q(res), CA_FIELD_MCTX(ctx->fields + field, ctx)))
-        {
-            fmpq_t t;
-            fmpq_init(t);
-            if (!fmpz_mpoly_q_is_zero(CA_MPOLY_Q(res), CA_FIELD_MCTX(ctx->fields + field, ctx)))
-            {
-                fmpz_swap(fmpq_numref(t), fmpz_mpoly_q_numref(CA_MPOLY_Q(res))->coeffs);
-                fmpz_swap(fmpq_denref(t), fmpz_mpoly_q_denref(CA_MPOLY_Q(res))->coeffs);
-            }
-            _ca_make_fmpq(res, ctx);
-            fmpq_swap(CA_FMPQ(res), t);
-            fmpq_clear(t);
-        }
-    }
 
-    res->field = res->field | (field_special & CA_SPECIAL);  /* set special flags */
-}

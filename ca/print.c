@@ -69,19 +69,23 @@ ca_print(const ca_t x, const ca_ctx_t ctx)
     {
         fmpq_print(CA_FMPQ(x));
     }
-    else if (ctx->fields[field].type == CA_FIELD_TYPE_NF)
+    else if (CA_FIELD_IS_NF(ctx->fields + field))
     {
         nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field), "x");
     }
-    else if (ctx->fields[field].type == CA_FIELD_TYPE_FUNC)
-    {
-        const char * xx = "x";
-
-        fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), &xx, ctx->mctx + 0);
-    }
     else
     {
-        fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(ctx->fields + field, ctx));
+        /* todo: use depth to select different characters */
+        if (CA_FIELD_LENGTH(ctx->fields + field))
+        {
+            const char * xx = "x";
+
+            fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), &xx, CA_FIELD_MCTX(ctx->fields + field, ctx));
+        }
+        else
+        {
+            fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(ctx->fields + field, ctx));
+        }
     }
 
     flint_printf("  in  ");

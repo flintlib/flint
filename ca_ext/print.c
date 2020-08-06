@@ -12,7 +12,7 @@
 #include "ca_ext.h"
 
 void
-ca_ext_print(const ca_ext_t x, ca_ctx_t ctx)
+ca_ext_print(const ca_ext_t x, const ca_ctx_t ctx)
 {
     if (x->head == CA_QQBar)
     {

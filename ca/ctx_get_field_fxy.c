@@ -18,9 +18,11 @@ _ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const ca_t x, const 
 
     for (i = 0; i < ctx->fields_len; i++)
     {
-        if (((ctx->fields + i)->type == CA_FIELD_TYPE_FUNC) && ((ctx->fields + i)->data.func.func == func) && ((ctx->fields + i)->data.func.args_len == 2) &&
-            ca_equal_repr(x, (ctx->fields + i)->data.func.args, ctx) &&
-            ca_equal_repr(y, (ctx->fields + i)->data.func.args + 1, ctx))
+        if (CA_FIELD_LENGTH(ctx->fields + i) == 1 &&
+            CA_EXT_HEAD(CA_FIELD_GET_EXT(ctx->fields + i, 0)) == func &&
+            CA_EXT_FUNC_NARGS(CA_FIELD_GET_EXT(ctx->fields + i, 0)) == 2 &&
+            ca_equal_repr(x, CA_EXT_FUNC_ARGS(CA_FIELD_GET_EXT(ctx->fields + i, 0)), ctx) &&
+            ca_equal_repr(y, CA_EXT_FUNC_ARGS(CA_FIELD_GET_EXT(ctx->fields + i, 0)) + 1, ctx))
         {
             break;
         }

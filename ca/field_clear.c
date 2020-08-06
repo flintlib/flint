@@ -14,40 +14,27 @@
 void
 ca_field_clear(ca_field_t K, ca_ctx_t ctx)
 {
-    slong i;
+    slong i, length, ideal_length;
 
-    if (K->type == CA_FIELD_TYPE_QQ)
+    length = CA_FIELD_LENGTH(K);
+
+    if (length == 0)
         return;
 
-    if (K->type == CA_FIELD_TYPE_NF)
+    if (CA_FIELD_IS_NF(K))
+        return;
+
+    ideal_length = CA_FIELD_IDEAL_LENGTH(K);
+
+    if (length != 0)
+        flint_free(CA_FIELD_EXT(K));
+
+    if (ideal_length != 0)
     {
-        qqbar_clear(&K->data.nf.x);
-        nf_clear(&K->data.nf.nf);
-    }
+        for (i = 0; i < ideal_length; i++)
+            fmpz_mpoly_clear(CA_FIELD_IDEAL_POLY(K, i), CA_FIELD_MCTX(K, ctx));
 
-    if (K->type == CA_FIELD_TYPE_FUNC)
-    {
-        if (K->data.func.args != NULL)
-            ca_vec_clear(K->data.func.args, K->data.func.args_len, ctx);
-
-        acb_clear(&K->data.func.enclosure);
-    }
-
-    if (K->type == CA_FIELD_TYPE_MULTI)
-    {
-        flint_free(K->data.multi.ext);
-
-        if (K->data.multi.ideal_len != 0)
-        {
-            /* todo: retrieve cached mctx from ctx! */
-            fmpz_mpoly_ctx_t mctx;
-            fmpz_mpoly_ctx_init(mctx, K->data.multi.len, CA_MPOLY_ORD);
-
-            for (i = 0; i < K->data.multi.ideal_len; i++)
-                fmpz_mpoly_clear(K->data.multi.ideal + i, mctx);
-        }
-
-        flint_free(K->data.multi.ideal);
+        flint_free(CA_FIELD_IDEAL(K));
     }
 }
 

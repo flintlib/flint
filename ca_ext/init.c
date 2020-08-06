@@ -69,6 +69,27 @@ ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t ctx)
     nf_init(CA_EXT_QQBAR_NF(res), t);
 
     res->hash = hash_qqbar(CA_EXT_QQBAR(res));
+    res->depth = 0;
+}
+
+slong ca_depth(const ca_t x, ca_ctx_t ctx);
+
+static void _ca_ext_init_func(ca_ext_t res, ca_ctx_t ctx)
+{
+    slong i, d;
+
+    CA_EXT_FUNC_PREC(res) = 0;
+    acb_init(CA_EXT_FUNC_ENCLOSURE(res));
+    acb_indeterminate(CA_EXT_FUNC_ENCLOSURE(res));
+
+    res->hash = hash_func(CA_EXT_HEAD(res), CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
+    res->depth = 0;
+
+    for (i = 0; i < CA_EXT_FUNC_NARGS(res); i++)
+    {
+        d = ca_depth(CA_EXT_FUNC_ARGS(res) + i, ctx);
+        res->depth = FLINT_MAX(res->depth, d + 1);
+    }
 }
 
 void
@@ -79,11 +100,7 @@ ca_ext_init_const(ca_ext_t res, calcium_func_code func, ca_ctx_t ctx)
     CA_EXT_FUNC_NARGS(res) = 0;
     CA_EXT_FUNC_ARGS(res) = NULL;
 
-    CA_EXT_FUNC_PREC(res) = 0;
-    acb_init(CA_EXT_FUNC_ENCLOSURE(res));
-    acb_indeterminate(CA_EXT_FUNC_ENCLOSURE(res));
-
-    res->hash = hash_func(CA_EXT_HEAD(res), CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
+    _ca_ext_init_func(res, ctx);
 }
 
 void
@@ -96,11 +113,7 @@ ca_ext_init_fx(ca_ext_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
     CA_EXT_FUNC_ARGS(res) = ca_vec_init(1, ctx);
     ca_set(CA_EXT_FUNC_ARGS(res), x, ctx);
 
-    CA_EXT_FUNC_PREC(res) = 0;
-    acb_init(CA_EXT_FUNC_ENCLOSURE(res));
-    acb_indeterminate(CA_EXT_FUNC_ENCLOSURE(res));
-
-    res->hash = hash_func(CA_EXT_HEAD(res), CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
+    _ca_ext_init_func(res, ctx);
 }
 
 void
@@ -114,11 +127,7 @@ ca_ext_init_fxy(ca_ext_t res, calcium_func_code func, const ca_t x, const ca_t y
     ca_set(CA_EXT_FUNC_ARGS(res), x, ctx);
     ca_set(CA_EXT_FUNC_ARGS(res) + 1, y, ctx);
 
-    CA_EXT_FUNC_PREC(res) = 0;
-    acb_init(CA_EXT_FUNC_ENCLOSURE(res));
-    acb_indeterminate(CA_EXT_FUNC_ENCLOSURE(res));
-
-    res->hash = hash_func(CA_EXT_HEAD(res), CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
+    _ca_ext_init_func(res, ctx);
 }
 
 void
@@ -130,10 +139,6 @@ ca_ext_init_fxn(ca_ext_t res, calcium_func_code func, ca_srcptr x, slong nargs, 
     CA_EXT_FUNC_ARGS(res) = ca_vec_init(nargs, ctx);
     ca_vec_set(CA_EXT_FUNC_ARGS(res), x, nargs, ctx);
 
-    CA_EXT_FUNC_PREC(res) = 0;
-    acb_init(CA_EXT_FUNC_ENCLOSURE(res));
-    acb_indeterminate(CA_EXT_FUNC_ENCLOSURE(res));
-
-    res->hash = hash_func(CA_EXT_HEAD(res), CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
+    _ca_ext_init_func(res, ctx);
 }
 

@@ -17,7 +17,7 @@ The content of a :type:`ca_ext_t` can be one of the following:
 * (Not implemented): a user-defined constant or function defined by suppling
   a function pointer for Arb numerical evaluation to specified precision.
 
-The :type:`ca_ext_t` object is a heavy-weight object, not just meant to act
+The :type:`ca_ext_t` structure is heavy-weight object, not just meant to act
 as a node in a symbolic expression. It will cache various data to support
 repeated computation with this particular number, including its numerical
 enclosure and number field data in the case of algebraic numbers.
@@ -161,7 +161,7 @@ Structure
 Input and output
 -------------------------------------------------------------------------------
 
-.. function:: void ca_ext_print(const ca_ext_t x, ca_ctx_t ctx)
+.. function:: void ca_ext_print(const ca_ext_t x, const ca_ctx_t ctx)
 
     Prints a description of *x* to standard output.
 

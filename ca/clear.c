@@ -23,12 +23,11 @@ ca_clear(ca_t x, ca_ctx_t ctx)
         fmpz_clear(CA_FMPQ_NUMREF(x));
         fmpz_clear(CA_FMPQ_DENREF(x));
     }
-    else if (ctx->fields[index].type == CA_FIELD_TYPE_NF)
+    else if (CA_FIELD_IS_NF(ctx->fields + index))
     {
         nf_elem_clear(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + index));
     }
-    else if (ctx->fields[index].type == CA_FIELD_TYPE_MULTI ||
-             ctx->fields[index].type == CA_FIELD_TYPE_FUNC)
+    else
     {
         fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + index, ctx));
         flint_free(x->elem.mpoly_q);

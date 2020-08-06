@@ -51,6 +51,35 @@ _fmpz_factor_square_root(fmpz_t A, fmpz_t B, const fmpz_t n, slong smooth_bound)
     fmpz_clear(t);
 }
 
+slong ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x)
+{
+    slong i;
+
+    for (i = 0; i < ctx->fields_len; i++)
+    {
+        if (CA_FIELD_IS_NF(ctx->fields + i))
+        {
+            if (qqbar_equal(x, CA_FIELD_NF_QQBAR(ctx->fields + i)))
+                return i;
+        }
+    }
+
+    i = ctx->fields_len;
+
+    if (i >= ctx->fields_alloc)
+    {
+        ctx->fields = (ca_field_struct *) flint_realloc(ctx->fields, sizeof(ca_field_struct) * 2 * ctx->fields_alloc);
+        ctx->fields_alloc = 2 * ctx->fields_alloc;
+    }
+
+    ctx->fields_len = i + 1;
+    ca_field_init_nf(ctx->fields + i, x, ctx);
+
+    return i;
+}
+
+#if 0
+
 /* Find if sqrt(A) is cached; otherwise create new field */
 /* Todo: fast search table */
 slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
@@ -109,32 +138,22 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
     return i;
 }
 
-slong ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x)
+#else
+
+/* todo: optimize! */
+slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 {
-    slong i;
-
-    for (i = 0; i < ctx->fields_len; i++)
-    {
-        if (ctx->fields[i].type == CA_FIELD_TYPE_NF)
-        {
-            if (qqbar_equal(x, CA_FIELD_NF_QQBAR(ctx->fields + i)))
-                return i;
-        }
-    }
-
-    i = ctx->fields_len;
-
-    if (i >= ctx->fields_alloc)
-    {
-        ctx->fields = (ca_field_struct *) flint_realloc(ctx->fields, sizeof(ca_field_struct) * 2 * ctx->fields_alloc);
-        ctx->fields_alloc = 2 * ctx->fields_alloc;
-    }
-
-    ctx->fields_len = i + 1;
-    ca_field_init_nf(ctx->fields + i, x);
-
-    return i;
+    slong res;
+    qqbar_t x;
+    qqbar_init(x);
+    qqbar_set_fmpz(x, A);
+    qqbar_sqrt(x, x);
+    res = ca_ctx_get_field_qqbar(ctx, x);
+    qqbar_clear(x);
+    return res;
 }
+
+#endif
 
 void
 ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)

@@ -11,10 +11,11 @@
 
 #include "ca.h"
 
+/* todo: move, rename */
 static truth_t
-ca_field_is_algebraic(const ca_field_t K, ca_ctx_t ctx)
+ca_ext_is_algebraic(const ca_ext_t x, ca_ctx_t ctx)
 {
-    if (K->type == CA_FIELD_TYPE_NF)
+    if (CA_EXT_IS_QQBAR(x))
         return T_TRUE;
 
     return T_UNKNOWN;
@@ -31,28 +32,26 @@ ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ ||
-        ctx->fields[x->field].type == CA_FIELD_TYPE_NF)
+    if (x->field == CA_FIELD_ID_QQ || CA_FIELD_IS_NF(ctx->fields + x->field))
+    {
         return T_TRUE;
-
-    if (ctx->fields[x->field].type == CA_FIELD_TYPE_MULTI)
+    }
+    else
     {
         slong len, i;
 
-        len = ctx->fields[x->field].data.multi.len;
+        len = CA_FIELD_LENGTH(ctx->fields + x->field);
 
         /* todo: handle simple transcendental numbers, e.g. Q(i,pi) */
         /* need to verify that some the generator is used in the poly */
         /* for Q(a,b,pi) we don't know, because a, b could cancel out pi */
         for (i = 0; len; i++)
         {
-            if (ca_field_is_algebraic(ctx->fields + ctx->fields[x->field].data.multi.ext[i], ctx) != T_TRUE)
+            if (ca_ext_is_algebraic(CA_FIELD_GET_EXT(ctx->fields + x->field, i), ctx) != T_TRUE)
                 return T_UNKNOWN;
         }
 
         return T_TRUE;
     }
-
-    return T_UNKNOWN;
 }
 

@@ -107,11 +107,12 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     deg_limit = ctx->options[CA_OPT_QQBAR_DEG_LIMIT];
     bits_limit = 10 * ctx->options[CA_OPT_PREC_LIMIT]; /* xxx */
 
-    len = ctx->fields[x->field].data.multi.len;
+    len = CA_FIELD_LENGTH(ctx->fields + x->field);
 
     for (i = 0; i < len; i++)
     {
-        if (ctx->fields[ctx->fields[x->field].data.multi.ext[i]].type != CA_FIELD_TYPE_NF)
+        /* todo: could allow symbolic functions that allow evaluation to qqbar */
+        if (!CA_EXT_IS_QQBAR(CA_FIELD_GET_EXT(ctx->fields + x->field, i)))
             return T_UNKNOWN;
     }
 
@@ -120,7 +121,7 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     qqbar_init(y);
 
     for (i = 0; i < len; i++)
-        xs[i] = *CA_FIELD_NF_QQBAR(ctx->fields + ctx->fields[x->field].data.multi.ext[i]);
+        xs[i] = *CA_EXT_QQBAR(CA_FIELD_GET_EXT(ctx->fields + x->field, i));
 
     if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(ctx->fields + x->field, ctx)))
     {
@@ -168,7 +169,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if ((ctx->fields + x->field)->type == CA_FIELD_TYPE_NF)
+    if (CA_FIELD_IS_NF(ctx->fields + x->field))
     {
         if (nf_elem_is_zero(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + x->field)))
             return T_TRUE;
@@ -196,7 +197,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
         /* try qqbar computation */
         /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
-        if (prec == 64 && (ctx->fields + x->field)->type == CA_FIELD_TYPE_MULTI)
+        if (prec == 64)
         {
             res = _ca_check_is_zero_qqbar(x, ctx);
         }

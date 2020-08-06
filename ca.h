@@ -102,6 +102,7 @@ typedef struct
 {
     calcium_func_code head;   /* f = F_Pi, F_Exp, ... */
     ulong hash;
+    slong depth;
     union {
         ca_ext_qqbar qqbar;
         ca_ext_func_data func_data;
@@ -114,6 +115,9 @@ typedef const ca_ext_struct * ca_ext_srcptr;
 
 #define CA_EXT_HEAD(x) ((x)->head)
 #define CA_EXT_HASH(x) ((x)->hash)
+#define CA_EXT_DEPTH(x) ((x)->depth)
+
+#define CA_EXT_IS_QQBAR(x) ((x)->head == CA_QQBar)
 
 #define CA_EXT_QQBAR(_x) (&((_x)->data.qqbar.x))
 #define CA_EXT_QQBAR_NF(_x) ((_x)->data.qqbar.nf)
@@ -123,76 +127,48 @@ typedef const ca_ext_struct * ca_ext_srcptr;
 #define CA_EXT_FUNC_ENCLOSURE(x) (&((x)->data.func_data.enclosure))
 #define CA_EXT_FUNC_PREC(x) ((x)->data.func_data.prec)
 
+typedef struct
+{
+    ca_ext_struct ** items;
+    slong length;
+    slong alloc;
+
+    slong hash_size;
+    slong * hash_table;
+}
+ca_ext_cache_struct;
+
+typedef ca_ext_cache_struct ca_ext_cache_t[1];
+
 /* Field object **************************************************************/
 
-typedef enum
-{
-    /* The rational field QQ.
-       Field elements are represented as fmpq_t */
-    CA_FIELD_TYPE_QQ,
-
-    /* Algebraic number field QQ(a), a = qqbar_t.
-       Field elements are represented as nf_elem_t. */
-    CA_FIELD_TYPE_NF,
-
-    /* Transcendental(?) number field QQ(x) with generating element
-       x = func(c1,...,cn) where func is a symbolic function, c_i are ca_t.
-       Field elements are represented as fmpz_mpoly_q_t (could be fmpz_poly_q_t ...). */
-    CA_FIELD_TYPE_FUNC,
-
-    /* Generic multivariate field QQ(x1,...,xn), x1,...,xn defined by
-       reference to other fields of univariate type;
-       field elements are represented as fmpz_mpoly_q_t. */
-    CA_FIELD_TYPE_MULTI
-}
-ca_field_type_t;
-
 typedef struct
 {
-    qqbar_struct x;     /* qqbar_t element */
-    nf_struct nf;       /* antic number field for fast arithmetic */
-}
-ca_field_description_nf;
-
-typedef struct
-{
-    ulong func;             /* f = F_Pi, F_Exp, ... */
-    ca_struct * args;       /* Function arguments x1, ..., xn. */
-    slong args_len;         /* Number of function arguments n. */
-    acb_struct enclosure;   /* Numerical enclosure of f(x1,...,xn) */
-}
-ca_field_description_func;
-
-typedef struct
-{
-    slong len;                  /* Number of generators */
-    slong * ext;                /* Indices to generators in the context object */
-    fmpz_mpoly_struct * ideal;  /* Algebraic relations for reduction */
-    slong ideal_len;            /* Number of relations for reduction */
-}
-ca_field_description_multi;
-
-typedef union
-{
-    ca_field_description_nf nf;
-    ca_field_description_func func;
-    ca_field_description_multi multi;
-}
-ca_field_description_struct;
-
-typedef struct
-{
-    ca_field_type_t type;
-    ca_field_description_struct data;
+    slong length;                /* Number of generators              */
+    ca_ext_struct ** ext;        /* Generators                        */
+    fmpz_mpoly_struct * ideal;   /* Algebraic relations for reduction */
+    slong ideal_length;          /* Number of relations for reduction */
+    ulong hash;
 }
 ca_field_struct;
 
 typedef ca_field_struct ca_field_t[1];
 
-#define CA_FIELD_NF(K) (&((K)->data.nf.nf))
-#define CA_FIELD_NF_QQBAR(K) (&((K)->data.nf.x))
+#define CA_FIELD_LENGTH(K) ((K)->length)
+#define CA_FIELD_EXT(K) ((K)->ext)
+#define CA_FIELD_GET_EXT(K, i) ((K)->ext[i])
+#define CA_FIELD_HASH(K) ((K)->hash)
 
-#define CA_FIELD_MCTX(K, ctx) (&((ctx)->mctx[(K)->data.multi.len - 1]))
+#define CA_FIELD_IS_NF(K) ((K)->ideal_length == -1)
+
+#define CA_FIELD_NF(K) (((K)->ext[0]->data.qqbar.nf))
+#define CA_FIELD_NF_QQBAR(K) (&((K)->ext[0]->data.qqbar.x))
+
+#define CA_FIELD_IDEAL(K) ((K)->ideal)
+#define CA_FIELD_IDEAL_POLY(K, i) (((K)->ideal) + (i))
+#define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal_length)
+
+#define CA_FIELD_MCTX(K, ctx) (&((ctx)->mctx[CA_FIELD_LENGTH(K) - 1]))
 
 /* Context object ************************************************************/
 
@@ -211,6 +187,8 @@ enum
 
 typedef struct
 {
+    ca_ext_cache_struct ext_cache;    /* Cached extension objects */
+
     ca_field_struct * fields;     /* Cached extension fields */
     slong fields_len;
     slong fields_alloc;
@@ -224,6 +202,8 @@ ca_ctx_struct;
 
 typedef ca_ctx_struct ca_ctx_t[1];
 
+#define CA_CTX_EXT_CACHE(ctx) (&((ctx)->ext_cache))
+
 /* Context management */
 
 void ca_ctx_init(ca_ctx_t ctx);
@@ -233,15 +213,16 @@ void ca_ctx_print(const ca_ctx_t ctx);
 /* Field methods */
 
 /* todo: all take ctx; update and check docs */
-void ca_field_init_qq(ca_field_t K);
-void ca_field_init_nf(ca_field_t K, const qqbar_t x);
-void ca_field_init_const(ca_field_t K, calcium_func_code func);
+void ca_field_init_qq(ca_field_t K, ca_ctx_t ctx);
+void ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx);
+void ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx);
 void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx);
 void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx);
 void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx);
 void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
 
-void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx);
+void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx);
+
 void ca_field_print(const ca_field_t K, const ca_ctx_t ctx);
 int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 

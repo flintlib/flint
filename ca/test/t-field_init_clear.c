@@ -30,9 +30,8 @@ int main()
         qqbar_i(t);
 
         ca_ctx_init(ctx);
-        ca_field_init_nf(I, t);
-        ca_field_init_const(Pi, CA_Pi);
-
+        ca_field_init_nf(I, t, ctx);
+        ca_field_init_const(Pi, CA_Pi, ctx);
         ca_field_init_multi(K, 2, ctx);
 
 /*

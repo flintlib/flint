@@ -15,7 +15,6 @@ void
 ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     slong field_index;
-    ca_field_type_t type;
     ulong xfield;
 
     xfield = x->field;
@@ -37,24 +36,14 @@ ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
     }
 
     field_index = xfield & ~CA_SPECIAL;
-    type = ctx->fields[field_index].type;
-
     _ca_make_field_element(res, field_index, ctx);
     res->field = xfield;  /* set special flags */
 
-    if (type == CA_FIELD_TYPE_QQ)
-    {
-        fmpq_neg(CA_FMPQ(res), CA_FMPQ(x));
-    }
-    else if (type == CA_FIELD_TYPE_NF)
+    if (CA_FIELD_IS_NF(ctx->fields + field_index))
     {
         nf_elem_neg(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field_index));
     }
-    else if (type == CA_FIELD_TYPE_FUNC)
-    {
-        fmpz_mpoly_q_neg(CA_MPOLY_Q(res), CA_MPOLY_Q(x), ctx->mctx + 0);
-    }
-    else if (type == CA_FIELD_TYPE_MULTI)
+    else
     {
         fmpz_mpoly_q_neg(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + field_index, ctx));
     }

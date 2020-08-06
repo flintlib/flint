@@ -11,11 +11,11 @@
 
 #include "ca.h"
 
+/* todo: recycle storage when compatible */
 void
 _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
 {
     slong old_index;
-    ca_field_type_t old_type, new_type;
 
     old_index = x->field & ~CA_SPECIAL;
 
@@ -31,28 +31,18 @@ _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
         flint_abort();
     }
 
-    old_type = ctx->fields[old_index].type;
-    new_type = ctx->fields[new_index].type;
-
-    /* todo: recycle storage when compatible */
-    old_type = old_type;
     ca_clear(x, ctx);
 
-    if (new_type == CA_FIELD_TYPE_QQ)
+    if (new_index == CA_FIELD_ID_QQ)
     {
         *CA_FMPQ_NUMREF(x) = 0;
         *CA_FMPQ_DENREF(x) = 1;
     }
-    else if (new_type == CA_FIELD_TYPE_NF)
+    else if (CA_FIELD_IS_NF(ctx->fields + new_index))
     {
         nf_elem_init(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + new_index));
     }
-    else if (new_type == CA_FIELD_TYPE_FUNC)
-    {
-        x->elem.mpoly_q = (fmpz_mpoly_q_struct *) flint_malloc(sizeof(fmpz_mpoly_q_struct));
-        fmpz_mpoly_q_init(CA_MPOLY_Q(x), ctx->mctx + 0);
-    }
-    else if (new_type == CA_FIELD_TYPE_MULTI)
+    else
     {
         x->elem.mpoly_q = (fmpz_mpoly_q_struct *) flint_malloc(sizeof(fmpz_mpoly_q_struct));
         fmpz_mpoly_q_init(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + new_index, ctx));

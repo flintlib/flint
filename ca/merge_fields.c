@@ -10,9 +10,10 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
 
 static int
-_slong_vec_equal(const slong * a, const slong * b, slong len)
+_ext_vec_equal(ca_ext_struct ** a, ca_ext_struct ** b, slong len)
 {
     slong i;
 
@@ -64,10 +65,10 @@ void
 ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     slong xfield, yfield, field;
-    slong *xfields, *yfields, *fields;
+    ca_ext_struct ** ext;
     slong *xgen_map, *ygen_map;
-    slong xlen, ylen, fields_len;
-    slong fields_alloc;
+    slong xlen, ylen, ext_len;
+    slong ext_alloc;
     slong ix, iy, i;
     int cmp;
 
@@ -89,37 +90,19 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     /* todo: handle rationals */
     /* (will usually be special-cased, but should be supported here for completeness) */
-    if (ctx->fields[xfield].type == CA_FIELD_TYPE_QQ ||
-        ctx->fields[yfield].type == CA_FIELD_TYPE_QQ)
+    if (CA_FIELD_LENGTH(ctx->fields + xfield) == 0 ||
+        CA_FIELD_LENGTH(ctx->fields + yfield) == 0)
+    {
+        flint_printf("QQ in merge_fields\n");
         flint_abort();
-
-    fields_alloc = 0;
-
-    if (ctx->fields[xfield].type == CA_FIELD_TYPE_NF || ctx->fields[xfield].type == CA_FIELD_TYPE_FUNC)
-    {
-        xfields = &xfield;
-        xlen = 1;
-    }
-    else
-    {
-        xfields = ctx->fields[xfield].data.multi.ext;
-        xlen = ctx->fields[xfield].data.multi.len;
     }
 
-    if (ctx->fields[yfield].type == CA_FIELD_TYPE_NF || ctx->fields[yfield].type == CA_FIELD_TYPE_FUNC)
-    {
-        yfields = &yfield;
-        ylen = 1;
-    }
-    else
-    {
-        yfields = ctx->fields[yfield].data.multi.ext;
-        ylen = ctx->fields[yfield].data.multi.len;
-    }
+    xlen = CA_FIELD_LENGTH(ctx->fields + xfield);
+    ylen = CA_FIELD_LENGTH(ctx->fields + yfield);
 
-    fields_alloc = xlen + ylen;
-    fields = flint_malloc(fields_alloc * sizeof(slong));
-    fields_len = 0;
+    ext_alloc = xlen + ylen;
+    ext = flint_malloc(ext_alloc * sizeof(ca_ext_struct *));
+    ext_len = 0;
 
     xgen_map = flint_malloc(xlen * sizeof(slong));
     ygen_map = flint_malloc(ylen * sizeof(slong));
@@ -135,45 +118,45 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
     {
         if (ix < xlen && iy < ylen)
         {
-            cmp = ca_field_cmp(ctx->fields + xfields[ix], ctx->fields + yfields[iy], ctx);
+            cmp = ca_ext_cmp_repr(CA_FIELD_GET_EXT(ctx->fields + xfield, ix), CA_FIELD_GET_EXT(ctx->fields + yfield, iy), ctx);
             cmp = -cmp;  /* more complex first, for elimination order */
 
             if (cmp == 0)
             {
-                fields[fields_len] = xfields[ix];
-                xgen_map[ix] = fields_len;
-                ygen_map[iy] = fields_len;
+                ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + xfield, ix);
+                xgen_map[ix] = ext_len;
+                ygen_map[iy] = ext_len;
                 ix++;
                 iy++;
             }
             else if (cmp == -1)
             {
-                fields[fields_len] = xfields[ix];
-                xgen_map[ix] = fields_len;
+                ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + xfield, ix);
+                xgen_map[ix] = ext_len;
                 ix++;
             }
             else
             {
-                fields[fields_len] = yfields[iy];
-                ygen_map[iy] = fields_len;
+                ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + yfield, iy);
+                ygen_map[iy] = ext_len;
                 iy++;
             }
 
-            fields_len++;
+            ext_len++;
         }
         else if (ix < xlen)
         {
-            fields[fields_len] = xfields[ix];
-            xgen_map[ix] = fields_len;
+            ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + xfield, ix);
+            xgen_map[ix] = ext_len;
             ix++;
-            fields_len++;
+            ext_len++;
         }
         else
         {
-            fields[fields_len] = yfields[iy];
-            ygen_map[iy] = fields_len;
+            ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + yfield, iy);
+            ygen_map[iy] = ext_len;
             iy++;
-            fields_len++;
+            ext_len++;
         }
     }
 
@@ -190,15 +173,12 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
     field = -1;
     for (i = 0; i < ctx->fields_len; i++)
     {
-        if (ctx->fields[i].type == CA_FIELD_TYPE_MULTI)
+        if (CA_FIELD_LENGTH(ctx->fields + i) == ext_len)
         {
-            if (ctx->fields[i].data.multi.len == fields_len)
+            if (_ext_vec_equal(ext, CA_FIELD_EXT(ctx->fields + i), ext_len))
             {
-                if (_slong_vec_equal(fields, ctx->fields[i].data.multi.ext, fields_len))
-                {
-                    field = i;
-                    break;
-                }
+                field = i;
+                break;
             }
         }
     }
@@ -214,16 +194,17 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
         }
 
         ctx->fields_len = field + 1;
-        ca_field_init_multi(ctx->fields + field, fields_len, ctx);
+        ca_field_init_multi(ctx->fields + field, ext_len, ctx);
 
-        for (i = 0; i < fields_len; i++)
+        for (i = 0; i < ext_len; i++)
         {
-            ca_field_set_ext(ctx->fields + field, i, fields[i], ctx);
+            ca_field_set_ext(ctx->fields + field, i, ext[i], ctx);
         }
 
         /* Find log relations. Todo: this needs to be done before building
            the final field, because we may be introducing extra elements
            (pi, i). */
+#if 0
         if (0)
         {
             slong * logs;
@@ -317,38 +298,33 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
             flint_free(logs);
         }
+#endif
 
         /* add relative extensions to ideal */
-        for (i = 0; i < fields_len; i++)
+        for (i = 0; i < ext_len; i++)
         {
-            if ((ctx->fields + fields[i])->type == CA_FIELD_TYPE_FUNC &&
-                (ctx->fields + fields[i])->data.func.func == CA_Sqrt)
+            if (CA_EXT_HEAD(ext[i]) == CA_Sqrt)
             {
                 /* sqrt(t); check if t can be expressed in the present field */
                 ca_srcptr t;
                 slong tfield, tlen;
-                slong * tfields;
+                ca_ext_struct ** text;
                 slong * tgen_map;
                 slong j, k;
                 int success;
 
-                t = (ctx->fields + fields[i])->data.func.args;
+                t = CA_EXT_FUNC_ARGS(ext[i]);
                 tfield = t->field;
 
                 if (tfield == CA_FIELD_ID_QQ)
                 {
-                    tfields = NULL;
+                    text = NULL;
                     tlen = 0;
-                }
-                else if (ctx->fields[tfield].type == CA_FIELD_TYPE_NF || ctx->fields[tfield].type == CA_FIELD_TYPE_FUNC)
-                {
-                    tfields = &tfield;
-                    tlen = 1;
                 }
                 else
                 {
-                    tfields = ctx->fields[tfield].data.multi.ext;
-                    tlen = ctx->fields[tfield].data.multi.len;
+                    text = CA_FIELD_EXT(ctx->fields + tfield);
+                    tlen = 1;
                 }
 
                 success = 1;
@@ -356,15 +332,15 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
                 for (j = 0; j < tlen; j++)
                 {
-                    for (k = 0; k < fields_len; k++)
+                    for (k = 0; k < ext_len; k++)
                     {
-                        if (tfields[j] == fields[k])
+                        if (text[j] == ext[k])
                         {
                             tgen_map[j] = k;
                             break;
                         }
 
-                        if (k == fields_len - 1)
+                        if (k == ext_len - 1)
                             success = 0;
                     }
                 }
@@ -383,7 +359,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
                         fmpz_mpoly_set_fmpz(p, CA_FMPQ_NUMREF(t), CA_FIELD_MCTX(ctx->fields + field, ctx));
                         fmpz_mpoly_set_fmpz(q, CA_FMPQ_DENREF(t), CA_FIELD_MCTX(ctx->fields + field, ctx));
                     }
-                    else if (ctx->fields[tfield].type == CA_FIELD_TYPE_NF)
+                    else if (CA_FIELD_IS_NF(ctx->fields + tfield))
                     {
                         fmpz_poly_t pol;
                         fmpz_t den;
@@ -392,19 +368,6 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
                         fmpz_mpoly_set_gen_fmpz_poly(p, tgen_map[0], pol, CA_FIELD_MCTX(ctx->fields + field, ctx));
                         fmpz_mpoly_set_fmpz(q, den, CA_FIELD_MCTX(ctx->fields + field, ctx));
-                    }
-                    else if (ctx->fields[tfield].type == CA_FIELD_TYPE_FUNC)
-                    {
-                        fmpz_mpoly_compose_fmpz_mpoly_gen(p,
-                                                  fmpz_mpoly_q_numref(CA_MPOLY_Q(t)),
-                                                    tgen_map,
-                                                    ctx->mctx + 0,
-                                                    CA_FIELD_MCTX(ctx->fields + field, ctx));
-                        fmpz_mpoly_compose_fmpz_mpoly_gen(q,
-                                                  fmpz_mpoly_q_denref(CA_MPOLY_Q(t)),
-                                                    tgen_map,
-                                                    ctx->mctx + 0,
-                                                    CA_FIELD_MCTX(ctx->fields + field, ctx));
                     }
                     else
                     {
@@ -434,17 +397,18 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     fmpz_mpoly_sub(u2, u2, p, CA_FIELD_MCTX(ctx->fields + field, ctx));
 
                     /* todo: some kind of ideal fit_length method... */
-                    if ((ctx->fields + field)->data.multi.ideal_len == 0)
-                        (ctx->fields + field)->data.multi.ideal = flint_malloc(sizeof(fmpz_mpoly_struct));
+                    if (CA_FIELD_IDEAL_LENGTH(ctx->fields + field) == 0)
+                        CA_FIELD_IDEAL(ctx->fields + field) = flint_malloc(sizeof(fmpz_mpoly_struct));
                     else
-                        (ctx->fields + field)->data.multi.ideal = flint_realloc((ctx->fields + field)->data.multi.ideal,
-                            ((ctx->fields + field)->data.multi.ideal_len + 1) * sizeof(fmpz_mpoly_struct));
+                        CA_FIELD_IDEAL(ctx->fields + field) = flint_realloc(CA_FIELD_IDEAL(ctx->fields + field),
+                            (CA_FIELD_IDEAL_LENGTH(ctx->fields + field) + 1) * sizeof(fmpz_mpoly_struct));
 
-                    fmpz_mpoly_init((ctx->fields + field)->data.multi.ideal + (ctx->fields + field)->data.multi.ideal_len, CA_FIELD_MCTX(ctx->fields + field, ctx));
-                    fmpz_mpoly_set((ctx->fields + field)->data.multi.ideal + (ctx->fields + field)->data.multi.ideal_len,
+                    /* todo: avoid a copy */
+                    fmpz_mpoly_init(CA_FIELD_IDEAL_POLY(ctx->fields + field, CA_FIELD_IDEAL_LENGTH(ctx->fields + field)), CA_FIELD_MCTX(ctx->fields + field, ctx));
+                    fmpz_mpoly_set(CA_FIELD_IDEAL_POLY(ctx->fields + field, CA_FIELD_IDEAL_LENGTH(ctx->fields + field)),
                         u2, CA_FIELD_MCTX(ctx->fields + field, ctx));
 
-                    (ctx->fields + field)->data.multi.ideal_len++;
+                    CA_FIELD_IDEAL_LENGTH(ctx->fields + field)++;
 
                     fmpz_mpoly_clear(p, CA_FIELD_MCTX(ctx->fields + field, ctx));
                     fmpz_mpoly_clear(q, CA_FIELD_MCTX(ctx->fields + field, ctx));
@@ -471,7 +435,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
         /* todo: allow aliasing */
         _ca_make_field_element(resx, field, ctx);
 
-        if (ctx->fields[xfield].type == CA_FIELD_TYPE_NF)
+        if (CA_FIELD_IS_NF(ctx->fields + xfield))
         {
             fmpz_poly_t pol;
             fmpz_t den;
@@ -480,20 +444,6 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
             fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_q_numref(CA_MPOLY_Q(resx)), xgen_map[0], pol, CA_FIELD_MCTX(ctx->fields + field, ctx));
             fmpz_mpoly_set_fmpz(fmpz_mpoly_q_denref(CA_MPOLY_Q(resx)), den, CA_FIELD_MCTX(ctx->fields + field, ctx));
-        }
-        else if (ctx->fields[xfield].type == CA_FIELD_TYPE_FUNC)
-        {
-            fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_q_numref(CA_MPOLY_Q(resx)),
-                                              fmpz_mpoly_q_numref(CA_MPOLY_Q(x)),
-                                                xgen_map,
-                                                ctx->mctx + 0,
-                                                CA_FIELD_MCTX(ctx->fields + field, ctx));
-
-            fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_q_denref(CA_MPOLY_Q(resx)),
-                                              fmpz_mpoly_q_denref(CA_MPOLY_Q(x)),
-                                                xgen_map,
-                                                ctx->mctx + 0,
-                                                CA_FIELD_MCTX(ctx->fields + field, ctx));
         }
         else
         {
@@ -521,7 +471,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
         /* todo: allow aliasing */
         _ca_make_field_element(resy, field, ctx);
 
-        if (ctx->fields[yfield].type == CA_FIELD_TYPE_NF)
+        if (CA_FIELD_IS_NF(ctx->fields + yfield))
         {
             fmpz_poly_t pol;
             fmpz_t den;
@@ -530,20 +480,6 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
             fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_q_numref(CA_MPOLY_Q(resy)), ygen_map[0], pol, CA_FIELD_MCTX(ctx->fields + field, ctx));
             fmpz_mpoly_set_fmpz(fmpz_mpoly_q_denref(CA_MPOLY_Q(resy)), den, CA_FIELD_MCTX(ctx->fields + field, ctx));
-        }
-        else if (ctx->fields[yfield].type == CA_FIELD_TYPE_FUNC)
-        {
-            fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_q_numref(CA_MPOLY_Q(resy)),
-                                              fmpz_mpoly_q_numref(CA_MPOLY_Q(y)),
-                                                ygen_map,
-                                                ctx->mctx + 0,
-                                                CA_FIELD_MCTX(ctx->fields + field, ctx));
-
-            fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_q_denref(CA_MPOLY_Q(resy)),
-                                              fmpz_mpoly_q_denref(CA_MPOLY_Q(y)),
-                                                ygen_map,
-                                                ctx->mctx + 0,
-                                                CA_FIELD_MCTX(ctx->fields + field, ctx));
         }
         else
         {
@@ -561,7 +497,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
         }
     }
 
-    flint_free(fields);
+    flint_free(ext);
     flint_free(xgen_map);
     flint_free(ygen_map);
 }

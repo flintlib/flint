@@ -112,7 +112,16 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
         return;
     }
 
-    if (CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_MULTI || CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_FUNC)
+    /* todo: factoring in number fields */
+    if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
+    {
+        ca_t e;
+        ca_init(e, ctx);
+        ca_one(e, ctx);
+        ca_factor_insert(res, x, e, ctx);
+        ca_clear(e, ctx);
+    }
+
     {
         if (flags & (CA_FACTOR_POLY_CONTENT | CA_FACTOR_POLY_SQF | CA_FACTOR_POLY_FULL))
         {
@@ -120,10 +129,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
             ca_t b, e;
             fmpq_t content;
 
-            if (CA_FIELD(x, ctx)->type == CA_FIELD_TYPE_MULTI)
-                mctx = CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx);
-            else
-                mctx = ctx->mctx + 0;
+            mctx = CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx);
 
             fmpq_init(content);
             ca_init(b, ctx);
@@ -200,7 +206,6 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
             ca_clear(e, ctx);
 
             fmpq_clear(content);
-            return;
         }
         else
         {
@@ -210,15 +215,6 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
             ca_factor_insert(res, x, e, ctx);
             ca_clear(e, ctx);
         }
-    }
-
-    /* todo */
-    {
-        ca_t e;
-        ca_init(e, ctx);
-        ca_one(e, ctx);
-        ca_factor_insert(res, x, e, ctx);
-        ca_clear(e, ctx);
     }
 }
 

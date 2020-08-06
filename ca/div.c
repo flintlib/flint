@@ -16,7 +16,6 @@ ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
 {
     ulong xfield;
     slong zfield;
-    ca_field_type_t type;
 
     xfield = x->field;
 
@@ -60,25 +59,15 @@ ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
     }
 
     zfield = xfield;
-    type = ctx->fields[zfield].type;
     _ca_make_field_element(res, zfield, ctx);
 
-    if (type == CA_FIELD_TYPE_NF)
+    if (CA_FIELD_IS_NF(ctx->fields + zfield))
     {
         nf_elem_scalar_div_fmpq(CA_NF_ELEM(res), CA_NF_ELEM(x), y, CA_FIELD_NF(ctx->fields + zfield));
     }
-    else if (type == CA_FIELD_TYPE_FUNC)
-    {
-        fmpz_mpoly_q_div_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(x), y, ctx->mctx + 0);
-    }
-    else if (type == CA_FIELD_TYPE_MULTI)
-    {
-        fmpz_mpoly_q_div_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(x), y, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
-    }
     else
     {
-        flint_printf("ca_div_fmpq: unknown field type\n");
-        flint_abort();
+        fmpz_mpoly_q_div_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(x), y, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
     }
 }
 
@@ -154,7 +143,6 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     ulong xfield, yfield;
     slong zfield;
-    ca_field_type_t type;
     truth_t x_is_zero, y_is_zero;
 
     xfield = x->field;
@@ -228,18 +216,13 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
     {
         zfield = xfield;
 
-        type = ctx->fields[zfield].type;
         _ca_make_field_element(res, zfield, ctx);
 
-        if (type == CA_FIELD_TYPE_NF)
+        if (CA_FIELD_IS_NF(ctx->fields + zfield))
         {
             nf_elem_div(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(ctx->fields + zfield));
         }
-        else if (type == CA_FIELD_TYPE_FUNC)
-        {
-            fmpz_mpoly_q_div(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), ctx->mctx + 0);
-        }
-        else if (type == CA_FIELD_TYPE_MULTI)
+        else
         {
             slong i, n;
 
@@ -247,7 +230,7 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
             /* todo: improve, deduplicate this code */
 
-            n = ctx->fields[zfield].data.multi.ideal_len;
+            n = CA_FIELD_IDEAL_LENGTH(ctx->fields + zfield);
 
             if (n != 0)
             {
@@ -257,7 +240,7 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
                 I = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
                 for (i = 0; i < n; i++)
-                    I[i] = &ctx->fields[zfield].data.multi.ideal[i];
+                    I[i] = CA_FIELD_IDEAL_POLY(ctx->fields + zfield, i);
 
                 Q = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
                 for (i = 0; i < n; i++)
@@ -286,11 +269,6 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
                 fmpq_clear(scale);
             }
-        }
-        else
-        {
-            flint_printf("ca_div: unknown field type\n");
-            flint_abort();
         }
 
         ca_condense_field(res, ctx);

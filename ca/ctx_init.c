@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
 
 #define CA_NVARS_DEFAULT 8
 
@@ -24,17 +25,19 @@ ca_ctx_init(ca_ctx_t ctx)
         fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, CA_MPOLY_ORD);
     ctx->mctx_len = CA_NVARS_DEFAULT;
 
+    ca_ext_cache_init(CA_CTX_EXT_CACHE(ctx), ctx);
+
     /* Always create QQ, QQ(i) */
 
     ctx->fields = (ca_field_struct *) flint_malloc(2 * sizeof(ca_field_struct));
     ctx->fields_len = 2;
     ctx->fields_alloc = 2;
 
-    ca_field_init_qq(ctx->fields);
+    ca_field_init_qq(ctx->fields, ctx);
 
     qqbar_init(onei);
     qqbar_i(onei);
-    ca_field_init_nf(ctx->fields + 1, onei);
+    ca_field_init_nf(ctx->fields + 1, onei, ctx);
     qqbar_clear(onei);
 
     ctx->options = flint_calloc(CA_OPT_NUM_OPTIONS, sizeof(slong));

@@ -64,7 +64,7 @@ int
 ca_ext_cmp_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx)
 {
     calcium_func_code head1, head2;
-    slong i, t, len1, len2, depth1, depth2;
+    slong i, len1, len2, depth1, depth2;
 
     head1 = CA_EXT_HEAD(x);
     head2 = CA_EXT_HEAD(y);
@@ -85,28 +85,16 @@ ca_ext_cmp_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx)
 
     /* Depth comparison: this is a hack to sort f(x) before x, so that
        lex ordering can give an elimination order. */
-    depth1 = -1;
-    depth2 = -1;
-
-    len1 = CA_EXT_FUNC_NARGS(x);
-    len2 = CA_EXT_FUNC_NARGS(y);
-
-    for (i = 0; i < len1; i++)
-    {
-        t = ca_depth(CA_EXT_FUNC_ARGS(x) + i, ctx);
-        depth1 = FLINT_MAX(depth1, t);
-    }
-
-    for (i = 0; i < len2; i++)
-    {
-        t = ca_depth(CA_EXT_FUNC_ARGS(y) + i, ctx);
-        depth2 = FLINT_MAX(depth2, t);
-    }
+    depth1 = CA_EXT_DEPTH(x);
+    depth2 = CA_EXT_DEPTH(y);
 
     if (depth1 < depth2)
         return -1;
     if (depth1 > depth2)
         return 1;
+
+    len1 = CA_EXT_FUNC_NARGS(x);
+    len2 = CA_EXT_FUNC_NARGS(y);
 
     if (head1 != head2)
         return (head1 < head2) ? -1 : 1;
