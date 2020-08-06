@@ -54,6 +54,7 @@ TEMPLATE(T, poly_factor_equal_deg_prob) (TEMPLATE(T, poly_t) factor,
     if (factor->length != 1)
     {
         TEMPLATE(T, poly_clear) (a, ctx);
+        fmpz_clear(q);
         return 1;
     }
 
