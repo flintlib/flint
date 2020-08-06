@@ -313,19 +313,23 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
                 slong j, k;
                 int success;
 
+                if (CA_EXT_FUNC_NARGS(ext[i]) != 1)
+                    flint_abort();
+
+/*
+                flint_printf("CREATE IDEAL FOR [%wd/%wd]:\n    ", i, ext_len);
+                ca_ext_print(ext[i], ctx); printf("\n\n");
+*/
+
                 t = CA_EXT_FUNC_ARGS(ext[i]);
                 tfield = t->field;
 
+                tlen = CA_FIELD_LENGTH(ctx->fields + tfield);
+
                 if (tfield == CA_FIELD_ID_QQ)
-                {
                     text = NULL;
-                    tlen = 0;
-                }
                 else
-                {
                     text = CA_FIELD_EXT(ctx->fields + tfield);
-                    tlen = 1;
-                }
 
                 success = 1;
                 tgen_map = flint_malloc(tlen * sizeof(slong));
@@ -344,6 +348,12 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
                             success = 0;
                     }
                 }
+
+/*
+                flint_printf("tgen_map:\n");
+                for (j = 0; j < tlen; j++)
+                    printf("   %ld\n", tgen_map[j]);
+*/
 
                 if (success)
                 {

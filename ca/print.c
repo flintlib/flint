@@ -75,10 +75,10 @@ ca_print(const ca_t x, const ca_ctx_t ctx)
     }
     else
     {
-        /* todo: use depth to select different characters */
-        if (CA_FIELD_LENGTH(ctx->fields + field))
+        /* todo: could use depth to select different characters */
+        if (CA_FIELD_LENGTH(ctx->fields + field) == 1)
         {
-            const char * xx = "x";
+            const char * xx = "x1";
 
             fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), &xx, CA_FIELD_MCTX(ctx->fields + field, ctx));
         }

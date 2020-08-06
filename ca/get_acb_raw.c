@@ -60,8 +60,7 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
         if (CA_FIELD_NF(ctx->fields + field_index)->flag & NF_LINEAR)
             flint_abort();
 
-        qqbar_cache_enclosure(CA_FIELD_NF_QQBAR(ctx->fields + field_index), prec);
-        qqbar_get_acb(res, CA_FIELD_NF_QQBAR(ctx->fields + field_index), prec);
+        ca_ext_get_acb_raw(res, CA_FIELD_GET_EXT(ctx->fields + field_index, 0), prec, ctx);
 
         if (CA_FIELD_NF(ctx->fields + field_index)->flag & NF_QUADRATIC)
         {

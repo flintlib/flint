@@ -120,6 +120,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
         ca_one(e, ctx);
         ca_factor_insert(res, x, e, ctx);
         ca_clear(e, ctx);
+        return;
     }
 
     {
