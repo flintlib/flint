@@ -136,7 +136,12 @@ ca_ext_init_fxn(ca_ext_t res, calcium_func_code func, ca_srcptr x, slong nargs, 
     res->head = func;
 
     CA_EXT_FUNC_NARGS(res) = nargs;
-    CA_EXT_FUNC_ARGS(res) = ca_vec_init(nargs, ctx);
+
+    if (nargs == 0)
+        CA_EXT_FUNC_ARGS(res) = NULL;
+    else
+        CA_EXT_FUNC_ARGS(res) = ca_vec_init(nargs, ctx);
+
     ca_vec_set(CA_EXT_FUNC_ARGS(res), x, nargs, ctx);
 
     _ca_ext_init_func(res, ctx);

@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
 
 void
 ca_ctx_clear(ca_ctx_t ctx)
@@ -17,6 +18,8 @@ ca_ctx_clear(ca_ctx_t ctx)
     slong i;
 
     CA_INFO(ctx, ("%wd fields cached at time of destruction\n", ctx->fields_len));
+
+    ca_ext_cache_clear(CA_CTX_EXT_CACHE(ctx), ctx);
 
     for (i = 0; i < ctx->fields_len; i++)
         ca_field_clear(ctx->fields + i, ctx);

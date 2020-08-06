@@ -21,15 +21,14 @@ ca_field_clear(ca_field_t K, ca_ctx_t ctx)
     if (length == 0)
         return;
 
+    flint_free(CA_FIELD_EXT(K));
+
     if (CA_FIELD_IS_NF(K))
         return;
 
     ideal_length = CA_FIELD_IDEAL_LENGTH(K);
 
-    if (length != 0)
-        flint_free(CA_FIELD_EXT(K));
-
-    if (ideal_length != 0)
+    if (ideal_length > 0)
     {
         for (i = 0; i < ideal_length; i++)
             fmpz_mpoly_clear(CA_FIELD_IDEAL_POLY(K, i), CA_FIELD_MCTX(K, ctx));

@@ -39,7 +39,11 @@ ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
     _ca_make_field_element(res, field_index, ctx);
     res->field = xfield;  /* set special flags */
 
-    if (CA_FIELD_IS_NF(ctx->fields + field_index))
+    if (field_index == CA_FIELD_ID_QQ)
+    {
+        fmpq_neg(CA_FMPQ(res), CA_FMPQ(x));
+    }
+    else if (CA_FIELD_IS_NF(ctx->fields + field_index))
     {
         nf_elem_neg(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field_index));
     }
