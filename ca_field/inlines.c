@@ -9,26 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#define CA_FIELD_INLINES_C
 #include "ca_ext.h"
-#include "ca_field.h"
-
-void
-ca_ctx_clear(ca_ctx_t ctx)
-{
-    slong i;
-
-    CA_INFO(ctx, ("%wd fields cached at time of destruction\n", ctx->fields_len));
-
-    ca_ext_cache_clear(CA_CTX_EXT_CACHE(ctx), ctx);
-
-    for (i = 0; i < ctx->fields_len; i++)
-        ca_field_clear(ctx->fields + i, ctx);
-
-    flint_free(ctx->fields);
-
-    flint_free(ctx->mctx);
-
-    flint_free(ctx->options);
-}
 

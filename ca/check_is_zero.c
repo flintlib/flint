@@ -112,7 +112,7 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     for (i = 0; i < len; i++)
     {
         /* todo: could allow symbolic functions that allow evaluation to qqbar */
-        if (!CA_EXT_IS_QQBAR(CA_FIELD_GET_EXT(ctx->fields + x->field, i)))
+        if (!CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(ctx->fields + x->field, i)))
             return T_UNKNOWN;
     }
 
@@ -121,7 +121,7 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     qqbar_init(y);
 
     for (i = 0; i < len; i++)
-        xs[i] = *CA_EXT_QQBAR(CA_FIELD_GET_EXT(ctx->fields + x->field, i));
+        xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(ctx->fields + x->field, i));
 
     if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(ctx->fields + x->field, ctx)))
     {

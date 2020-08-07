@@ -10,6 +10,8 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
+#include "ca_field.h"
 
 #define FACTOR_SMOOTH_BOUND 32
 

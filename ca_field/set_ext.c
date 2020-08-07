@@ -10,6 +10,8 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
+#include "ca_field.h"
 
 /* todo: put in the right place, fix, test */
 void
@@ -63,7 +65,7 @@ fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol,
 void
 ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx)
 {
-    CA_FIELD_GET_EXT(K, i) = (ca_ext_ptr) x;
+    CA_FIELD_EXT_ELEM(K, i) = (ca_ext_ptr) x;
     CA_FIELD_HASH(K) = CA_FIELD_HASH(K) * 100003 + CA_EXT_HASH(x);
 
     /* note: not when K is single nf */

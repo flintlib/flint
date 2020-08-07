@@ -47,7 +47,7 @@ ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
         /* for Q(a,b,pi) we don't know, because a, b could cancel out pi */
         for (i = 0; len; i++)
         {
-            if (ca_ext_is_algebraic(CA_FIELD_GET_EXT(ctx->fields + x->field, i), ctx) != T_TRUE)
+            if (ca_ext_is_algebraic(CA_FIELD_EXT_ELEM(ctx->fields + x->field, i), ctx) != T_TRUE)
                 return T_UNKNOWN;
         }
 

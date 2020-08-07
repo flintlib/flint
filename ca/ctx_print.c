@@ -10,6 +10,8 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
+#include "ca_field.h"
 
 void
 ca_ctx_print(const ca_ctx_t ctx)

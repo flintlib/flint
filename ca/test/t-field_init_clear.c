@@ -10,6 +10,8 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
+#include "ca_field.h"
 
 int main()
 {

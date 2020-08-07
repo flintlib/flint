@@ -60,7 +60,7 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
         if (CA_FIELD_NF(ctx->fields + field_index)->flag & NF_LINEAR)
             flint_abort();
 
-        ca_ext_get_acb_raw(res, CA_FIELD_GET_EXT(ctx->fields + field_index, 0), prec, ctx);
+        ca_ext_get_acb_raw(res, CA_FIELD_EXT_ELEM(ctx->fields + field_index, 0), prec, ctx);
 
         if (CA_FIELD_NF(ctx->fields + field_index)->flag & NF_QUADRATIC)
         {
@@ -82,7 +82,7 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
 
         if (n == 1)
         {
-            ca_ext_get_acb_raw(res, CA_FIELD_GET_EXT(ctx->fields + field_index, 0), prec, ctx);
+            ca_ext_get_acb_raw(res, CA_FIELD_EXT_ELEM(ctx->fields + field_index, 0), prec, ctx);
             fmpz_mpoly_q_evaluate_acb(res, CA_MPOLY_Q(x), res, prec, ctx->mctx + 0);
         }
         else
@@ -90,7 +90,7 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
             v = _acb_vec_init(n);
 
             for (i = 0; i < n; i++)
-                ca_ext_get_acb_raw(v + i, CA_FIELD_GET_EXT(ctx->fields + field_index, i), prec, ctx);
+                ca_ext_get_acb_raw(v + i, CA_FIELD_EXT_ELEM(ctx->fields + field_index, i), prec, ctx);
 
             fmpz_mpoly_q_evaluate_acb(res, CA_MPOLY_Q(x), v, prec, CA_FIELD_MCTX(ctx->fields + field_index, ctx));
 

@@ -10,6 +10,8 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
+#include "ca_field.h"
 
 slong
 _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func)
@@ -20,7 +22,7 @@ _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func)
     {
         /* todo: also check len == 0? */
         if (CA_FIELD_LENGTH(ctx->fields + i) == 1 &&
-            CA_EXT_HEAD(CA_FIELD_GET_EXT(ctx->fields + i, 0)) == func)
+            CA_EXT_HEAD(CA_FIELD_EXT_ELEM(ctx->fields + i, 0)) == func)
         {
             break;
         }

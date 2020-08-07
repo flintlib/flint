@@ -240,7 +240,7 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
                 I = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
                 for (i = 0; i < n; i++)
-                    I[i] = CA_FIELD_IDEAL_POLY(ctx->fields + zfield, i);
+                    I[i] = CA_FIELD_IDEAL_ELEM(ctx->fields + zfield, i);
 
                 Q = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
                 for (i = 0; i < n; i++)

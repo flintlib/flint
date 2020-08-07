@@ -11,6 +11,7 @@
 
 #include "ca.h"
 #include "ca_ext.h"
+#include "ca_field.h"
 
 void
 ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
@@ -35,7 +36,7 @@ ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx)
 
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
-    CA_FIELD_GET_EXT(K, 0) = ext;
+    CA_FIELD_EXT_ELEM(K, 0) = ext;
     CA_FIELD_IDEAL(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = -1;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
@@ -54,7 +55,7 @@ ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
 
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
-    CA_FIELD_GET_EXT(K, 0) = ext;
+    CA_FIELD_EXT_ELEM(K, 0) = ext;
     CA_FIELD_IDEAL(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
@@ -72,7 +73,7 @@ void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx
 
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
-    CA_FIELD_GET_EXT(K, 0) = ext;
+    CA_FIELD_EXT_ELEM(K, 0) = ext;
     CA_FIELD_IDEAL(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
@@ -90,7 +91,7 @@ void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const
 
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
-    CA_FIELD_GET_EXT(K, 0) = ext;
+    CA_FIELD_EXT_ELEM(K, 0) = ext;
     CA_FIELD_IDEAL(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);

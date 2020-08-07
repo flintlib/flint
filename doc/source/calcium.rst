@@ -50,6 +50,62 @@ This library uses two kinds of predicate functions:
     etc. depending on whether the unknown case should be included
     or excluded.
 
+Flint, Arb and Antic types
+-------------------------------------------------------------------------------
+
+The following types from Flint, Arb and Antic are used throughout Calcium.
+Although not included automatically by ``calcium.h``, we document them
+here for convenience.
+
+.. type:: slong
+
+    Signed full-word integer (64 bits on a 64-bit system).
+
+.. type:: ulong
+
+    Unsigned full-word integer (64 bits on a 64-bit system).
+
+.. type:: fmpz_t
+
+    Flint integer.
+
+.. type:: fmpq_t
+
+    Flint rational number.
+
+.. type:: fmpz_poly_t
+
+    Flint dense univariate polynomial over the integers.
+
+.. type:: fmpq_poly_t
+
+    Flint dense univariate polynomial over the rational numbers.
+
+.. type:: fmpz_mpoly_t
+
+    Flint sparse multivariate integer polynomial.
+
+.. type:: fmpz_mpoly_ctx_t
+
+    Context for Flint sparse multivariate integer polynomial (defining the
+    number of variables and monomial order).
+
+.. type:: arb_t
+
+    Arb real number.
+
+.. type:: acb_t
+
+    Arb complex number.
+
+.. type:: nf_t
+
+    Antic number field.
+
+.. type:: nf_elem_t
+
+    Antic number field element.
+
 
 .. raw:: latex
 

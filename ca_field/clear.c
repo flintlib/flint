@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#include "ca_field.h"
 
 void
 ca_field_clear(ca_field_t K, ca_ctx_t ctx)
@@ -31,7 +31,7 @@ ca_field_clear(ca_field_t K, ca_ctx_t ctx)
     if (ideal_length > 0)
     {
         for (i = 0; i < ideal_length; i++)
-            fmpz_mpoly_clear(CA_FIELD_IDEAL_POLY(K, i), CA_FIELD_MCTX(K, ctx));
+            fmpz_mpoly_clear(CA_FIELD_IDEAL_ELEM(K, i), CA_FIELD_MCTX(K, ctx));
 
         flint_free(CA_FIELD_IDEAL(K));
     }

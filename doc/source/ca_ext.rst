@@ -52,6 +52,14 @@ For all types, a *type_t* is defined as an array of length one of type
     (in the case of a :type:`qqbar_t`, the enclosure internal to that
     structure is used).
 
+.. type:: ca_ext_ptr
+
+   Alias for ``ca_ext_struct *``.
+
+.. type:: ca_ext_srcptr
+
+   Alias for ``const ca_ext_struct *``.
+
 .. macro:: CA_EXT_HEAD(x)
 
     Accesses the head (a :type:`calcium_func_code`) of *x*.

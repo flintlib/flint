@@ -11,6 +11,7 @@
 
 #include "ca.h"
 #include "ca_ext.h"
+#include "ca_field.h"
 
 static int
 _fmpz_poly_compare_abslex(const fmpz * a, const fmpz * b, slong len)
@@ -175,7 +176,7 @@ ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
 
         for (i = 0; i < CA_FIELD_LENGTH(K); i++)
         {
-            depth_i = ca_ext_depth(CA_FIELD_GET_EXT(K, i), ctx);
+            depth_i = ca_ext_depth(CA_FIELD_EXT_ELEM(K, i), ctx);
             depth = FLINT_MAX(depth, depth_i);
         }
 
@@ -199,7 +200,7 @@ ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
 
     for (i = 0; i < len1; i++)
     {
-        int c = ca_ext_cmp_repr(CA_FIELD_GET_EXT(K1, i), CA_FIELD_GET_EXT(K2, i), ctx);
+        int c = ca_ext_cmp_repr(CA_FIELD_EXT_ELEM(K1, i), CA_FIELD_EXT_ELEM(K2, i), ctx);
 
         if (c != 0)
             return c;

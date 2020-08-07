@@ -26,6 +26,7 @@ Module documentation
    calcium.rst
    ca.rst
    ca_ext.rst
+   ca_field.rst
    fmpz_mpoly_q.rst
    qqbar.rst
 

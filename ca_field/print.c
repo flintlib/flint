@@ -11,6 +11,7 @@
 
 #include "ca.h"
 #include "ca_ext.h"
+#include "ca_field.h"
 
 void
 ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
@@ -36,7 +37,7 @@ ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
     {
         flint_printf("x%wd = ", i + 1);
 
-        ca_ext_print(CA_FIELD_GET_EXT(K, i), ctx);
+        ca_ext_print(CA_FIELD_EXT_ELEM(K, i), ctx);
 
         flint_printf("");
 
@@ -52,7 +53,7 @@ ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
         flint_printf(" with ideal {");
         for (i = 0; i < ideal_len; i++)
         {
-            fmpz_mpoly_print_pretty(CA_FIELD_IDEAL_POLY(K, i), NULL, CA_FIELD_MCTX(K, ctx));
+            fmpz_mpoly_print_pretty(CA_FIELD_IDEAL_ELEM(K, i), NULL, CA_FIELD_MCTX(K, ctx));
             if (i < ideal_len - 1)
                 flint_printf(", ");
         }

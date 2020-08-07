@@ -631,12 +631,9 @@ Powers and roots
     Handling of special values is not yet implemented.
 
 .. function:: void ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
-
-.. function:: void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
-
-.. function:: void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
-
-.. function:: void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
+              void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     Sets *res* to the principal square root of *x*.
 
@@ -945,71 +942,6 @@ Internal representation
 
     Changes the internal representation of *x* to that of an element of
     the trivial field `\mathbb{Q}`. This may destroy the value of *x*.
-
-Extension field objects
--------------------------------------------------------------------------------
-
-The following methods are intended for internal use.
-The user should normally only manipulate :type:`ca_t` instances,
-leaving the construction of field objects to the context object.
-
-.. type:: ca_field_struct
-
-.. type:: ca_field_t
-
-    Represents a formal field.
-
-.. function:: void ca_field_init_qq(ca_field_t K)
-
-    Initializes *K* to represent the trivial field `\mathbb{Q}`.
-
-.. function:: void ca_field_init_nf(ca_field_t K, const qqbar_t x)
-
-    Initializes *K* to represent the algebraic number field `\mathbb{Q}(x)`.
-
-.. function:: void ca_field_init_const(ca_field_t K, ulong func)
-
-    Initializes *K* to represent the field
-    `\mathbb{Q}(x)` where *x* is a builtin constant defined by
-    *func* (example: *func* = *CA_Pi* for `x = \pi`).
-
-.. function:: void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
-
-    Initializes *K* to represent the field
-    `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin
-    univariate function *func* (example: *func* = *CA_Exp* for `e^x`).
-
-.. function:: void ca_field_init_multi(ca_field_t K, slong len)
-
-    Initializes *K* to represent a multivariate field
-    `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
-    extension numbers. The extension numbers must subsequently be
-    assigned one by one using :func:`ca_field_set_ext`.
-
-.. function:: void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx)
-
-    Sets the extension number at position *i* (here indexed from 0) of *K*
-    to the generator of the field with index *x_index* in *ctx*.
-    (It is assumed that the generating field is a univariate field.)
-
-    This only inserts a shallow reference: the field at index *x_index* must
-    be kept alive until *K* has been cleared.
-
-.. function:: void ca_field_clear(ca_field_t K)
-
-    Clears the field *K*.
-
-.. function:: void ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
-
-    Prints a description of the field *K* to standard output.
-
-.. function:: int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
-
-    Compares the field objects *K1* and *K2* in a canonical sort order,
-    returning -1, 0 or 1. This only performs a lexicographic comparison
-    of the representations of *K1* and *K2*; the return value does not say
-    anything meaningful about the relative structures of *K1* and *K2*
-    as mathematical fields.
 
 
 .. raw:: latex

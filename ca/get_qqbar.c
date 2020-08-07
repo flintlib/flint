@@ -70,7 +70,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 
             for (i = 0; i < len; i++)
             {
-                if (!CA_EXT_IS_QQBAR(CA_FIELD_GET_EXT(CA_FIELD(x, ctx), i)))
+                if (!CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)))
                     return 0;
             }
 
@@ -79,7 +79,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
             qqbar_init(y);
 
             for (i = 0; i < len; i++)
-                xs[i] = *CA_EXT_QQBAR(CA_FIELD_GET_EXT(CA_FIELD(x, ctx), i));
+                xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
 
             if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
             {

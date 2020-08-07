@@ -156,7 +156,7 @@ typedef ca_field_struct ca_field_t[1];
 
 #define CA_FIELD_LENGTH(K) ((K)->length)
 #define CA_FIELD_EXT(K) ((K)->ext)
-#define CA_FIELD_GET_EXT(K, i) ((K)->ext[i])
+#define CA_FIELD_EXT_ELEM(K, i) ((K)->ext[i])
 #define CA_FIELD_HASH(K) ((K)->hash)
 
 #define CA_FIELD_IS_NF(K) ((K)->ideal_length == -1)
@@ -165,7 +165,7 @@ typedef ca_field_struct ca_field_t[1];
 #define CA_FIELD_NF_QQBAR(K) (&((K)->ext[0]->data.qqbar.x))
 
 #define CA_FIELD_IDEAL(K) ((K)->ideal)
-#define CA_FIELD_IDEAL_POLY(K, i) (((K)->ideal) + (i))
+#define CA_FIELD_IDEAL_ELEM(K, i) (((K)->ideal) + (i))
 #define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal_length)
 
 #define CA_FIELD_MCTX(K, ctx) (&((ctx)->mctx[CA_FIELD_LENGTH(K) - 1]))
@@ -209,22 +209,6 @@ typedef ca_ctx_struct ca_ctx_t[1];
 void ca_ctx_init(ca_ctx_t ctx);
 void ca_ctx_clear(ca_ctx_t ctx);
 void ca_ctx_print(const ca_ctx_t ctx);
-
-/* Field methods */
-
-/* todo: all take ctx; update and check docs */
-void ca_field_init_qq(ca_field_t K, ca_ctx_t ctx);
-void ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx);
-void ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx);
-void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx);
-void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx);
-void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx);
-void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
-
-void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx);
-
-void ca_field_print(const ca_field_t K, const ca_ctx_t ctx);
-int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 
 slong _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func);
 slong _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x);

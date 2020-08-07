@@ -11,6 +11,8 @@
 
 #include "ca.h"
 #include "ca_ext.h"
+#include "ca_field.h"
+
 
 static int
 _ext_vec_equal(ca_ext_struct ** a, ca_ext_struct ** b, slong len)
@@ -118,12 +120,12 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
     {
         if (ix < xlen && iy < ylen)
         {
-            cmp = ca_ext_cmp_repr(CA_FIELD_GET_EXT(ctx->fields + xfield, ix), CA_FIELD_GET_EXT(ctx->fields + yfield, iy), ctx);
+            cmp = ca_ext_cmp_repr(CA_FIELD_EXT_ELEM(ctx->fields + xfield, ix), CA_FIELD_EXT_ELEM(ctx->fields + yfield, iy), ctx);
             cmp = -cmp;  /* more complex first, for elimination order */
 
             if (cmp == 0)
             {
-                ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + xfield, ix);
+                ext[ext_len] = CA_FIELD_EXT_ELEM(ctx->fields + xfield, ix);
                 xgen_map[ix] = ext_len;
                 ygen_map[iy] = ext_len;
                 ix++;
@@ -131,13 +133,13 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
             }
             else if (cmp == -1)
             {
-                ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + xfield, ix);
+                ext[ext_len] = CA_FIELD_EXT_ELEM(ctx->fields + xfield, ix);
                 xgen_map[ix] = ext_len;
                 ix++;
             }
             else
             {
-                ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + yfield, iy);
+                ext[ext_len] = CA_FIELD_EXT_ELEM(ctx->fields + yfield, iy);
                 ygen_map[iy] = ext_len;
                 iy++;
             }
@@ -146,14 +148,14 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
         }
         else if (ix < xlen)
         {
-            ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + xfield, ix);
+            ext[ext_len] = CA_FIELD_EXT_ELEM(ctx->fields + xfield, ix);
             xgen_map[ix] = ext_len;
             ix++;
             ext_len++;
         }
         else
         {
-            ext[ext_len] = CA_FIELD_GET_EXT(ctx->fields + yfield, iy);
+            ext[ext_len] = CA_FIELD_EXT_ELEM(ctx->fields + yfield, iy);
             ygen_map[iy] = ext_len;
             iy++;
             ext_len++;
@@ -414,8 +416,8 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
                             (CA_FIELD_IDEAL_LENGTH(ctx->fields + field) + 1) * sizeof(fmpz_mpoly_struct));
 
                     /* todo: avoid a copy */
-                    fmpz_mpoly_init(CA_FIELD_IDEAL_POLY(ctx->fields + field, CA_FIELD_IDEAL_LENGTH(ctx->fields + field)), CA_FIELD_MCTX(ctx->fields + field, ctx));
-                    fmpz_mpoly_set(CA_FIELD_IDEAL_POLY(ctx->fields + field, CA_FIELD_IDEAL_LENGTH(ctx->fields + field)),
+                    fmpz_mpoly_init(CA_FIELD_IDEAL_ELEM(ctx->fields + field, CA_FIELD_IDEAL_LENGTH(ctx->fields + field)), CA_FIELD_MCTX(ctx->fields + field, ctx));
+                    fmpz_mpoly_set(CA_FIELD_IDEAL_ELEM(ctx->fields + field, CA_FIELD_IDEAL_LENGTH(ctx->fields + field)),
                         u2, CA_FIELD_MCTX(ctx->fields + field, ctx));
 
                     CA_FIELD_IDEAL_LENGTH(ctx->fields + field)++;
