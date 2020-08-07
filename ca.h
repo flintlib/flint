@@ -78,7 +78,6 @@ typedef const ca_struct * ca_srcptr;
 #define CA_FIELD_IS_QQ_I(x, ctx) ((x)->field == CA_FIELD_ID_QQ_I)
 
 #define CA_FIELD(x, ctx) ((ctx)->fields + (x)->field)
-#define CA_FIELD_MULTI_GEN(x, i, ctx) ((ctx)->fields + CA_FIELD(x, ctx)->data.multi.ext[i])
 
 /* Extension object **********************************************************/
 
@@ -153,6 +152,8 @@ typedef struct
 ca_field_struct;
 
 typedef ca_field_struct ca_field_t[1];
+typedef ca_field_struct * ca_field_ptr;
+typedef const ca_field_struct * ca_field_srcptr;
 
 #define CA_FIELD_LENGTH(K) ((K)->length)
 #define CA_FIELD_EXT(K) ((K)->ext)
@@ -169,6 +170,19 @@ typedef ca_field_struct ca_field_t[1];
 #define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal_length)
 
 #define CA_FIELD_MCTX(K, ctx) (&((ctx)->mctx[CA_FIELD_LENGTH(K) - 1]))
+
+typedef struct
+{
+    ca_field_struct ** items;
+    slong length;
+    slong alloc;
+
+    slong hash_size;
+    slong * hash_table;
+}
+ca_field_cache_struct;
+
+typedef ca_field_cache_struct ca_field_cache_t[1];
 
 /* Context object ************************************************************/
 

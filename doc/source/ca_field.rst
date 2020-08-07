@@ -24,6 +24,14 @@ For all types, a *type_t* is defined as an array of length one of type
 
     Represents a formal field.
 
+.. type:: ca_field_ptr
+
+   Alias for ``ca_field_struct *``.
+
+.. type:: ca_field_srcptr
+
+   Alias for ``const ca_field_struct *``.
+
 .. macro:: CA_FIELD_LENGTH(K)
 
     Accesses the number of extension elements *n* of *K*. This is 0 if
@@ -128,6 +136,14 @@ Input and output
 .. function:: void ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
 
     Prints a description of the field *K* to standard output.
+
+Ideal
+-------------------------------------------------------------------------------
+
+.. function:: void ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
+
+    Given *K* with assigned extension elements,
+    builds the reduction ideal in-place.
 
 Structure operations
 -------------------------------------------------------------------------------

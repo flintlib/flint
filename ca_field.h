@@ -44,6 +44,11 @@ void ca_field_print(const ca_field_t K, const ca_ctx_t ctx);
 
 int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 
+void ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx);
+
+void ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx);
+void ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx);
+ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_t ** x, slong length, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

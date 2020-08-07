@@ -67,19 +67,5 @@ ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx)
 {
     CA_FIELD_EXT_ELEM(K, i) = (ca_ext_ptr) x;
     CA_FIELD_HASH(K) = CA_FIELD_HASH(K) * 100003 + CA_EXT_HASH(x);
-
-    /* note: not when K is single nf */
-    if (CA_EXT_IS_QQBAR(x))
-    {
-        if (CA_FIELD_IDEAL_LENGTH(K) == 0)
-            CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
-        else
-            CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
-
-        fmpz_mpoly_init(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), CA_FIELD_MCTX(K, ctx));
-        fmpz_mpoly_set_gen_fmpz_poly(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), i, QQBAR_POLY(CA_EXT_QQBAR(x)), CA_FIELD_MCTX(K, ctx));
-
-        CA_FIELD_IDEAL_LENGTH(K)++;
-    }
 }
 
