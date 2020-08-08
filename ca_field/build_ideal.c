@@ -17,104 +17,6 @@ void _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_el
 void fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol, const fmpz_mpoly_ctx_t ctx);
 
 
-        /* Find log relations. Todo: this needs to be done before building
-           the final field, because we may be introducing extra elements
-           (pi, i). */
-#if 0
-        if (0)
-        {
-            slong * logs;
-            slong num_logs;
-
-            num_logs = 0;
-            logs = flint_malloc(sizeof(slong) * fields_len);
-
-            /* todo: find linear combinations of logarithms */
-            for (i = 0; i < fields_len; i++)
-            {
-                if ((ctx->fields + fields[i])->type == CA_FIELD_TYPE_FUNC &&
-                    (ctx->fields + fields[i])->data.func.func == CA_Log)
-                {
-                    logs[num_logs] = i;
-                    num_logs++;
-                }
-            }
-
-            if (num_logs >= 2)
-            {
-                acb_ptr z;
-                slong j;
-                fmpz * rel;
-
-                z = _acb_vec_init(num_logs + 1);
-                rel = _fmpz_vec_init(num_logs + 1);
-                /* todo: pi * i */
-
-                for (j = 0; j < num_logs; j++)
-                {
-                    ca_get_acb(z + j, (ctx->fields + fields[logs[j]])->data.func.args, 256, ctx);
-                    acb_log(z + j, z + j, 256);
-                }
-
-                if (_qqbar_acb_lindep(rel, z, num_logs, 1, 256))
-                {
-                    ca_t prod, upow;
-
-                    ca_init(prod, ctx);
-                    ca_init(upow, ctx);
-
-                    ca_one(prod, ctx);
-
-                    for (j = 0; j < num_logs; j++)
-                    {
-                        if (!fmpz_is_zero(rel + j))
-                        {
-                            ca_pow_fmpz(upow, (ctx->fields + fields[logs[j]])->data.func.args, rel + j, ctx);
-
-/*
-                            ca_print((ctx->fields + fields[logs[j]])->data.func.args, ctx); printf(" ^ "); fmpz_print(rel + j); printf(" = "); ca_print(upow, ctx); printf("\n");
-*/
-
-                            ca_mul(prod, prod, upow, ctx);
-                        }
-                    }
-
-                    if (ca_check_is_one(prod, ctx) == T_TRUE)
-                    {
-                        printf("proved log relation!\n");
-
-/*
-                        for (j = 0; j < num_logs; j++)
-                        {
-                            acb_printn(z + j, 10, 0); printf("   ");
-                        }
-                        printf("\n");
-*/
-
-                        for (j = 0; j < num_logs; j++)
-                        {
-                            if (!fmpz_is_zero(rel + j) || 1)
-                            {
-                                fmpz_print(rel + j);
-                                flint_printf(" * log(");
-                                ca_print((ctx->fields + fields[logs[j]])->data.func.args, ctx);
-                                flint_printf(")    ");
-                            }
-                        }
-                        flint_printf("\n");
-                    }
-
-                    ca_clear(prod, ctx);
-                    ca_clear(upow, ctx);
-                }
-
-                _acb_vec_clear(z, num_logs + 1);
-                _fmpz_vec_clear(rel, num_logs + 1);
-            }
-
-            flint_free(logs);
-        }
-#endif
 
 void
 ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
@@ -126,6 +28,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     if (len <= 1)
         return;
 
+    /* Find direct algebraic relations. */
     for (i = 0; i < len; i++)
     {
         ca_ext_struct * x = CA_FIELD_EXT_ELEM(K, i);
@@ -249,5 +152,154 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
             flint_free(tgen_map);
         }
+    }
+
+    /* Find log relations. */
+    if (len >= 2)
+    {
+        slong * logs;
+        slong num_logs;
+        slong prec;
+
+        num_logs = 0;
+        logs = flint_malloc(sizeof(slong) * len);
+
+        for (i = 0; i < len; i++)
+        {
+            if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, i)) == CA_Log)
+            {
+                logs[num_logs] = i;
+                num_logs++;
+            }
+        }
+
+        if (num_logs >= 2)
+        {
+            acb_ptr z;
+            acb_t t;
+            mag_t tm;
+            slong j;
+            fmpz * rel;
+
+            /* todo: dynamic precision determined by context */
+            prec = 128;
+
+            z = _acb_vec_init(num_logs + 1);
+            rel = _fmpz_vec_init(num_logs + 1);
+            acb_init(t);
+            mag_init(tm);
+
+            /* todo: pi * i */
+
+            for (j = 0; j < num_logs; j++)
+            {
+                /* todo: take advantage of cached enclosure */
+                ca_get_acb(z + j, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, logs[j])), prec, ctx);
+                acb_log(z + j, z + j, prec);
+            }
+
+            if (_qqbar_acb_lindep(rel, z, num_logs, 1, prec))
+            {
+                ca_t prod, upow;
+
+                /*  a^m * b^n = 1 => m*log(a) + n*log(b) = 2 pi i k   */
+                /* Verify that (m*log(a) + n*log(b)) / (2 pi i) contains unique integer. */
+                /* It is enough to show that |... + ...| < 2^1. */
+                acb_zero(t);
+                for (j = 0; j < num_logs; j++)
+                    if (!fmpz_is_zero(rel + j))
+                        acb_addmul_fmpz(t, z + j, rel + j, prec);
+                acb_get_mag(tm, t);
+
+                if (mag_cmp_2exp_si(tm, 1) < 0)
+                {
+                    ca_init(prod, ctx);
+                    ca_init(upow, ctx);
+
+                    /* Check product of arguments to log. */
+                    ca_one(prod, ctx);
+                    for (j = 0; j < num_logs; j++)
+                    {
+                        if (!fmpz_is_zero(rel + j))
+                        {
+                            ca_pow_fmpz(upow, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, logs[j])), rel + j, ctx);
+                            ca_mul(prod, prod, upow, ctx);
+                        }
+                    }
+
+                    if (ca_check_is_one(prod, ctx) == T_TRUE)
+                    {
+    /*
+                        printf("proved log relation!\n");
+                        for (j = 0; j < num_logs; j++)
+                        {
+                            fmpz_print(rel + j); printf(" ");
+                            acb_printn(z + j, 10, 0); printf("   ");
+                        }
+                        printf("\n");
+
+                        for (j = 0; j < num_logs; j++)
+                        {
+                            if (!fmpz_is_zero(rel + j) || 1)
+                            {
+                                fmpz_print(rel + j);
+                                flint_printf(" * log(");
+                                ca_print(CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, logs[j])), ctx);
+                                flint_printf(")    ");
+                            }
+                        }
+                        flint_printf("\n");
+*/
+
+                        /* todo: some kind of ideal fit_length method... */
+                        if (CA_FIELD_IDEAL_LENGTH(K) == 0)
+                            CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
+                        else
+                            CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
+
+                        fmpz_mpoly_init(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)), CA_FIELD_MCTX(K, ctx));
+
+                        {
+                            ulong * exp;
+
+                            exp = flint_malloc(sizeof(ulong) * len);
+
+                            for (j = 0; j < num_logs; j++)
+                            {
+                                slong k;
+
+                                if (fmpz_is_zero(rel + j))
+                                    continue;
+
+                                for (k = 0; k < len; k++)
+                                    exp[k] = 0;
+
+                                exp[j] = 1;
+
+                                fmpz_mpoly_set_coeff_fmpz_ui(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)),
+                                    rel + j,
+                                    exp,
+                                    CA_FIELD_MCTX(K, ctx));
+                            }
+
+                            flint_free(exp);
+                        }
+
+                        CA_FIELD_IDEAL_LENGTH(K)++;
+
+                    }
+
+                    ca_clear(prod, ctx);
+                    ca_clear(upow, ctx);
+                }
+            }
+
+            _acb_vec_clear(z, num_logs + 1);
+            _fmpz_vec_clear(rel, num_logs + 1);
+            acb_clear(t);
+            mag_clear(tm);
+        }
+
+        flint_free(logs);
     }
 }
