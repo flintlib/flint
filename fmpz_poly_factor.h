@@ -58,8 +58,8 @@ FLINT_DLL void fmpz_poly_factor_concat(fmpz_poly_factor_t res,
 
 FLINT_DLL void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
 
-FLINT_DLL void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
-	const fmpz_poly_factor_t lifted_fac, 
+FLINT_DLL void fmpz_poly_factor_zassenhaus_recombination(
+            fmpz_poly_factor_t final_fac, const fmpz_poly_factor_t lifted_fac,
                                const fmpz_poly_t F, const fmpz_t P, slong exp);
     
 FLINT_DLL void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, 
@@ -91,6 +91,71 @@ FLINT_DLL void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G);
 
 FLINT_DLL void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i);
 FLINT_DLL void fmpz_poly_factor_get_fmpz(fmpz_t z, const fmpz_poly_factor_t F);
+
+/* zassenhaus ****************************************************************/
+
+FLINT_DLL void zassenhaus_subset_first(slong * s, slong r, slong m);
+
+FLINT_DLL int zassenhaus_subset_next(slong * s, slong r);
+
+FLINT_DLL slong zassenhaus_subset_next_disjoint(slong * s, slong r);
+
+typedef struct {
+    slong deg;
+    unsigned char * pos_degs;   /* possible degrees: entries are 0 or 1*/
+    slong new_length;
+    slong new_total;
+    slong * new_degs;
+    slong alloc;
+} zassenhaus_prune_struct;
+
+typedef zassenhaus_prune_struct zassenhaus_prune_t[1];
+
+FMPZ_POLY_FACTOR_INLINE
+void zassenhaus_prune_init(zassenhaus_prune_t Z)
+{
+    Z->deg = 0;
+    Z->pos_degs = NULL;
+    Z->new_length = 0;
+    Z->new_total = 0;
+    Z->new_degs = NULL;
+    Z->alloc = 0;
+}
+
+FLINT_DLL void zassenhaus_prune_clear(zassenhaus_prune_t Z);
+
+FLINT_DLL void zassenhaus_prune_set_degree(zassenhaus_prune_t Z, slong d);
+
+FMPZ_POLY_FACTOR_INLINE
+void zassenhaus_prune_start_add_factors(zassenhaus_prune_t Z)
+{
+    Z->new_length = 0;
+    Z->new_total = 0;
+}
+
+FLINT_DLL void zassenhaus_prune_add_factor(zassenhaus_prune_t Z,
+                                                         slong deg, slong exp);
+
+FLINT_DLL void zassenhaus_prune_end_add_factors(zassenhaus_prune_t Z);
+
+FLINT_DLL int zassenhaus_prune_must_be_irreducible(const zassenhaus_prune_t Z);
+
+FMPZ_POLY_FACTOR_INLINE
+int zassenhaus_prune_degree_is_possible(const zassenhaus_prune_t Z, slong d)
+{
+    if (d <= 0)
+        return d == 0;
+
+    if (d >= Z->deg)
+        return d == Z->deg;
+
+    return Z->pos_degs[d];
+}
+
+FLINT_DLL void fmpz_poly_factor_zassenhaus_recombination_with_prune(
+            fmpz_poly_factor_t final_fac, const fmpz_poly_factor_t lifted_fac,
+                                const fmpz_poly_t F, const fmpz_t P, slong exp,
+                                                   const zassenhaus_prune_t Z);
 
 #ifdef __cplusplus
 }
