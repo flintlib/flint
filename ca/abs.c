@@ -21,7 +21,7 @@ ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx)
         else
             ca_set(res, x, ctx);
     }
-    else if (CA_FIELD_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         if (fmpz_sgn(fmpq_numref(CA_FMPQ(x))) >= 0)
             ca_set(res, x, ctx);

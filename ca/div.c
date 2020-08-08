@@ -16,6 +16,7 @@ ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
 {
     ulong xfield;
     slong zfield;
+    ca_field_srcptr res_field;
 
     xfield = x->field;
 
@@ -60,10 +61,11 @@ ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
 
     zfield = xfield;
     _ca_make_field_element(res, zfield, ctx);
+    res_field = CA_FIELD(res, ctx);
 
-    if (CA_FIELD_IS_NF(ctx->fields + zfield))
+    if (CA_FIELD_IS_NF(res_field))
     {
-        nf_elem_scalar_div_fmpq(CA_NF_ELEM(res), CA_NF_ELEM(x), y, CA_FIELD_NF(ctx->fields + zfield));
+        nf_elem_scalar_div_fmpq(CA_NF_ELEM(res), CA_NF_ELEM(x), y, CA_FIELD_NF(res_field));
     }
     else
     {
@@ -144,6 +146,7 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
     ulong xfield, yfield;
     slong zfield;
     truth_t x_is_zero, y_is_zero;
+    ca_field_srcptr res_field;
 
     xfield = x->field;
     yfield = y->field;
@@ -217,20 +220,21 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         zfield = xfield;
 
         _ca_make_field_element(res, zfield, ctx);
+        res_field = CA_FIELD(res, ctx);
 
-        if (CA_FIELD_IS_NF(ctx->fields + zfield))
+        if (CA_FIELD_IS_NF(res_field))
         {
-            nf_elem_div(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(ctx->fields + zfield));
+            nf_elem_div(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(res_field));
         }
         else
         {
             slong i, n;
 
-            fmpz_mpoly_q_div(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+            fmpz_mpoly_q_div(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(res_field, ctx));
 
             /* todo: improve, deduplicate this code */
 
-            n = CA_FIELD_IDEAL_LENGTH(ctx->fields + zfield);
+            n = CA_FIELD_IDEAL_LENGTH(res_field);
 
             if (n != 0)
             {
@@ -240,27 +244,27 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
                 I = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
                 for (i = 0; i < n; i++)
-                    I[i] = CA_FIELD_IDEAL_ELEM(ctx->fields + zfield, i);
+                    I[i] = CA_FIELD_IDEAL_ELEM(res_field, i);
 
                 Q = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
                 for (i = 0; i < n; i++)
                 {
                     Q[i] = flint_malloc(sizeof(fmpz_mpoly_struct));
-                    fmpz_mpoly_init(Q[i], CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                    fmpz_mpoly_init(Q[i], CA_FIELD_MCTX(res_field, ctx));
                 }
 
                 fmpq_init(scale);
 
-                fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
-                fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(res_field, ctx));
+                fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(res_field, ctx));
 
                 fmpq_canonicalise(scale);
-                fmpz_mpoly_q_canonicalise(CA_MPOLY_Q(res), CA_FIELD_MCTX(ctx->fields + zfield, ctx));
-                fmpz_mpoly_q_mul_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(res), scale, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                fmpz_mpoly_q_canonicalise(CA_MPOLY_Q(res), CA_FIELD_MCTX(res_field, ctx));
+                fmpz_mpoly_q_mul_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(res), scale, CA_FIELD_MCTX(res_field, ctx));
 
                 for (i = 0; i < n; i++)
                 {
-                    fmpz_mpoly_clear(Q[i], CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                    fmpz_mpoly_clear(Q[i], CA_FIELD_MCTX(res_field, ctx));
                     flint_free(Q[i]);
                 }
 

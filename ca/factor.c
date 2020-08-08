@@ -106,7 +106,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
     ca_factor_one(res, ctx);
 
-    if (CA_FIELD_IS_QQ(x, ctx))
+    if (CA_IS_QQ(x, ctx))
     {
         _ca_factor_fmpq(res, CA_FMPQ(x), flags, ctx);
         return;

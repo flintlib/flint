@@ -45,7 +45,7 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
         for (i = 0; i < fac->length; i++)
         {
-            if (CA_FIELD_IS_QQ(fac->exp + i, ctx) && fmpz_is_one(CA_FMPQ_DENREF(fac->exp + i)))
+            if (CA_IS_QQ(fac->exp + i, ctx) && fmpz_is_one(CA_FMPQ_DENREF(fac->exp + i)))
             {
                 if (!fmpz_is_zero(CA_FMPQ_DENREF(fac->exp + i)))
                 {

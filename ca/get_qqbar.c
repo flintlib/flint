@@ -20,7 +20,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
     {
         return 0;
     }
-    else if (CA_FIELD_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         qqbar_set_fmpq(res, CA_FMPQ(x));
         return 1;
@@ -108,7 +108,7 @@ ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx)
     {
         return 0;
     }
-    else if (CA_FIELD_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         fmpq_set(res, CA_FMPQ(x));
         return 1;
@@ -184,7 +184,7 @@ ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
     {
         return 0;
     }
-    else if (CA_FIELD_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         if (fmpz_is_one(fmpq_denref(CA_FMPQ(x))))
         {

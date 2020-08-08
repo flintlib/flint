@@ -16,7 +16,7 @@
 void
 ca_print(const ca_t x, const ca_ctx_t ctx)
 {
-    slong field;
+    ca_field_srcptr xfield;
 
     if (CA_IS_SPECIAL(x))
     {
@@ -38,14 +38,14 @@ ca_print(const ca_t x, const ca_ctx_t ctx)
             sgn->field = x->field & ~CA_SPECIAL;
             sgn->elem = x->elem;
 
-            if (CA_FIELD_IS_QQ(sgn, ctx))
+            if (CA_IS_QQ(sgn, ctx))
             {
                 if (fmpq_sgn(CA_FMPQ(sgn)) > 0)
                     flint_printf("+Infinity");
                 else
                     flint_printf("-Infinity");
             }
-            else if (CA_FIELD_IS_QQ_I(sgn, ctx))
+            else if (CA_IS_QQ_I(sgn, ctx))
             {
                 if (fmpz_sgn(QNF_ELEM_NUMREF(CA_NF_ELEM(sgn)) + 1) > 0)
                     flint_printf("+I * Infinity");
@@ -62,35 +62,33 @@ ca_print(const ca_t x, const ca_ctx_t ctx)
 
         return;
     }
-    else
-    {
-        field = x->field;
-    }
 
-    if (field == CA_FIELD_ID_QQ)
+    xfield = CA_FIELD(x, ctx);
+
+    if (CA_FIELD_IS_QQ(xfield))
     {
         fmpq_print(CA_FMPQ(x));
     }
-    else if (CA_FIELD_IS_NF(ctx->fields + field))
+    else if (CA_FIELD_IS_NF(xfield))
     {
-        nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field), "x");
+        nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(xfield), "x");
     }
     else
     {
         /* todo: could use depth to select different characters */
-        if (CA_FIELD_LENGTH(ctx->fields + field) == 1)
+        if (CA_FIELD_LENGTH(xfield) == 1)
         {
             const char * xx = "x1";
 
-            fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), &xx, CA_FIELD_MCTX(ctx->fields + field, ctx));
+            fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), &xx, CA_FIELD_MCTX(xfield, ctx));
         }
         else
         {
-            fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(ctx->fields + field, ctx));
+            fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(xfield, ctx));
         }
     }
 
     flint_printf("  in  ");
-    ca_field_print(ctx->fields + field, ctx);
+    ca_field_print(xfield, ctx);
 }
 

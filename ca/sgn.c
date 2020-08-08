@@ -31,7 +31,7 @@ ca_sgn(ca_t res, const ca_t x, ca_ctx_t ctx)
         }
         return;
     }
-    else if (CA_FIELD_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         ca_set_si(res, fmpz_sgn(fmpq_numref(CA_FMPQ(x))), ctx);
     }

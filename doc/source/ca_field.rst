@@ -12,6 +12,18 @@ The user does not normally need to create :type:`ca_field_t` objects
 manually: a :type:`ca_ctx_t` context object manages a cache of
 fields automatically.
 
+Internally, three types of field representation are used:
+
+* The trivial field `\mathbb{Q}`.
+
+* An Antic number field `\mathbb{Q}(a)` where *a* is defined by a :type:`qqbar_t`
+
+* A generic field `\mathbb{Q}(a_1,\ldots,a_n)` where `n \ge 1`,
+  and `a_1` is not defined by a :type:`qqbar_t` if `n = 1`.
+
+The field type mainly affects the internal storage of the field
+elements; the distinction is mostly transparent to the external interface.
+
 Type and macros
 -------------------------------------------------------------------------------
 
@@ -50,10 +62,18 @@ For all types, a *type_t* is defined as an array of length one of type
 
     Accesses the hash value of *K*.
 
+.. macro:: CA_FIELD_IS_QQ(K)
+
+    Returns whether *K* is the trivial field `\mathbb{Q}`.
+
 .. macro:: CA_FIELD_IS_NF(K)
 
     Returns whether *K* represents an Antic number field
     `K = \mathbb{Q}(a)` where *a* is represented by a :type:`qqbar_t`.
+
+.. macro:: CA_FIELD_IS_GENERIC(K)
+
+    Returns whether *K* represents a generic field.
 
 .. macro:: CA_FIELD_NF(K)
 

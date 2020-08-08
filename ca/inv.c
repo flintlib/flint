@@ -17,6 +17,7 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
     truth_t is_zero;
     slong field_index;
     ulong xfield;
+    ca_field_srcptr res_field;
 
     xfield = x->field;
 
@@ -59,18 +60,19 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
     field_index = xfield;
 
     _ca_make_field_element(res, field_index, ctx);
+    res_field = CA_FIELD(res, ctx);
 
-    if (CA_FIELD_IS_QQ(x, ctx))
+    if (CA_FIELD_IS_QQ(res_field))
     {
         fmpq_inv(CA_FMPQ(res), CA_FMPQ(x));
     }
-    else if (CA_FIELD_IS_NF(ctx->fields + field_index))
+    else if (CA_FIELD_IS_NF(res_field))
     {
-        nf_elem_inv(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field_index));
+        nf_elem_inv(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(res_field));
     }
     else
     {
-        fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + field_index, ctx));
+        fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(res_field, ctx));
     }
 }
 

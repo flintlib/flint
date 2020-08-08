@@ -18,24 +18,26 @@ ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
     {
         ulong xfield;
         slong field_index;
+        ca_field_srcptr res_field;
 
         xfield = x->field;
         field_index = xfield & ~CA_SPECIAL;
 
         _ca_make_field_element(res, field_index, ctx);
+        res_field = CA_FIELD(res, ctx);
         res->field = xfield;  /* set special flags */
 
         if (field_index == CA_FIELD_ID_QQ)
         {
             fmpq_set(CA_FMPQ(res), CA_FMPQ(x));
         }
-        else if (CA_FIELD_IS_NF(ctx->fields + field_index))
+        else if (CA_FIELD_IS_NF(res_field))
         {
-            nf_elem_set(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field_index));
+            nf_elem_set(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(res_field));
         }
         else
         {
-            fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + field_index, ctx));
+            fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(res_field, ctx));
         }
     }
 }

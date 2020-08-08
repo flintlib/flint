@@ -15,21 +15,23 @@ void
 ca_clear(ca_t x, ca_ctx_t ctx)
 {
     slong index;
+    ca_field_srcptr field;
 
     index = x->field & ~CA_SPECIAL;
+    field = ctx->fields + index;
 
     if (index == CA_FIELD_ID_QQ)
     {
         fmpz_clear(CA_FMPQ_NUMREF(x));
         fmpz_clear(CA_FMPQ_DENREF(x));
     }
-    else if (CA_FIELD_IS_NF(ctx->fields + index))
+    else if (CA_FIELD_IS_NF(field))
     {
-        nf_elem_clear(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + index));
+        nf_elem_clear(CA_NF_ELEM(x), CA_FIELD_NF(field));
     }
     else
     {
-        fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + index, ctx));
+        fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
         flint_free(x->elem.mpoly_q);
     }
 }

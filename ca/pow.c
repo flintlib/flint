@@ -28,7 +28,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
     {
         if (xzero == T_TRUE)
         {
-            if (CA_FIELD_IS_QQ(y, ctx))
+            if (CA_IS_QQ(y, ctx))
             {
                 if (fmpq_is_zero(CA_FMPQ(y)))
                 {
@@ -52,7 +52,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
     }
     else
     {
-        if (CA_FIELD_IS_QQ(y, ctx))
+        if (CA_IS_QQ(y, ctx))
         {
             if (fmpz_is_one(CA_FMPQ_DENREF(y)))
             {
@@ -87,7 +87,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     return;
                 }
 
-                if (CA_FIELD_IS_QQ(x, ctx) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
+                if (CA_IS_QQ(x, ctx) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
                 {
                     slong xbits1, xbits2;
 

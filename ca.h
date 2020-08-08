@@ -74,8 +74,8 @@ typedef const ca_struct * ca_srcptr;
 #define CA_FIELD_ID_QQ       0
 #define CA_FIELD_ID_QQ_I     1
 
-#define CA_FIELD_IS_QQ(x, ctx) ((x)->field == CA_FIELD_ID_QQ)
-#define CA_FIELD_IS_QQ_I(x, ctx) ((x)->field == CA_FIELD_ID_QQ_I)
+#define CA_IS_QQ(x, ctx) ((x)->field == CA_FIELD_ID_QQ)
+#define CA_IS_QQ_I(x, ctx) ((x)->field == CA_FIELD_ID_QQ_I)
 
 #define CA_FIELD(x, ctx) ((ctx)->fields + (x)->field)
 
@@ -160,7 +160,9 @@ typedef const ca_field_struct * ca_field_srcptr;
 #define CA_FIELD_EXT_ELEM(K, i) ((K)->ext[i])
 #define CA_FIELD_HASH(K) ((K)->hash)
 
+#define CA_FIELD_IS_QQ(K) ((K)->length == 0)
 #define CA_FIELD_IS_NF(K) ((K)->ideal_length == -1)
+#define CA_FIELD_IS_GENERIC(K) (!CA_FIELD_IS_QQ(K) && !CA_FIELD_IS_NF(K))
 
 #define CA_FIELD_NF(K) (((K)->ext[0]->data.qqbar.nf))
 #define CA_FIELD_NF_QQBAR(K) (&((K)->ext[0]->data.qqbar.x))

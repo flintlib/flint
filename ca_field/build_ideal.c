@@ -98,7 +98,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 fmpz_mpoly_init(q, CA_FIELD_MCTX(K, ctx));
                 fmpz_mpoly_init(u2, CA_FIELD_MCTX(K, ctx));
 
-                if (L_len == 0)  /* todo: use CA_FIELD_IS_QQ when renamed */
+                if (L_len == 0)  /* todo: use CA_IS_QQ when renamed */
                 {
                     fmpz_mpoly_set_fmpz(p, CA_FMPQ_NUMREF(t), CA_FIELD_MCTX(K, ctx));
                     fmpz_mpoly_set_fmpz(q, CA_FMPQ_DENREF(t), CA_FIELD_MCTX(K, ctx));
