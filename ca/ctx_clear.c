@@ -16,19 +16,13 @@
 void
 ca_ctx_clear(ca_ctx_t ctx)
 {
-    slong i;
-
-    CA_INFO(ctx, ("%wd fields cached at time of destruction\n", ctx->fields_len));
+    CA_INFO(ctx, ("%wd extension numbers cached at time of destruction\n", CA_CTX_EXT_CACHE(ctx)->length));
+    CA_INFO(ctx, ("%wd fields cached at time of destruction\n", CA_CTX_FIELD_CACHE(ctx)->length));
 
     ca_ext_cache_clear(CA_CTX_EXT_CACHE(ctx), ctx);
-
-    for (i = 0; i < ctx->fields_len; i++)
-        ca_field_clear(ctx->fields + i, ctx);
-
-    flint_free(ctx->fields);
+    ca_field_cache_clear(CA_CTX_FIELD_CACHE(ctx), ctx);
 
     flint_free(ctx->mctx);
-
     flint_free(ctx->options);
 }
 

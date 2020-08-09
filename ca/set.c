@@ -16,28 +16,37 @@ ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (res != x)
     {
-        ulong xfield;
-        slong field_index;
-        ca_field_srcptr res_field;
+        ulong field_flags;
+        ca_field_srcptr field;
 
-        xfield = x->field;
-        field_index = xfield & ~CA_SPECIAL;
+        field_flags = x->field;
+        field = (ca_field_srcptr) (x->field & ~CA_SPECIAL);
 
-        _ca_make_field_element(res, field_index, ctx);
-        res_field = CA_FIELD(res, ctx);
-        res->field = xfield;  /* set special flags */
-
-        if (field_index == CA_FIELD_ID_QQ)
+        /* for Undefined, Unknown, UnsignedInfinity */
+        if (field == NULL)
         {
-            fmpq_set(CA_FMPQ(res), CA_FMPQ(x));
+            ca_clear(res, ctx);
+            res->field = field_flags;
+            return;
         }
-        else if (CA_FIELD_IS_NF(res_field))
+
+        _ca_make_field_element(res, field, ctx);
+        res->field = field_flags;  /* set special flags */
+
+        if (field != NULL)
         {
-            nf_elem_set(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(res_field));
-        }
-        else
-        {
-            fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(res_field, ctx));
+            if (CA_FIELD_IS_QQ(field))
+            {
+                fmpq_set(CA_FMPQ(res), CA_FMPQ(x));
+            }
+            else if (CA_FIELD_IS_NF(field))
+            {
+                nf_elem_set(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(field));
+            }
+            else
+            {
+                fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
+            }
         }
     }
 }

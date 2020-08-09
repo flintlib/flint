@@ -13,32 +13,18 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-slong
+ca_field_ptr
 _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func)
 {
-    slong i;
+    ca_ext_t ext;
+    ca_ext_struct * ext_ptr[1];
+    ca_field_ptr field;
 
-    for (i = 0; i < ctx->fields_len; i++)
-    {
-        /* todo: also check len == 0? */
-        if (CA_FIELD_LENGTH(ctx->fields + i) == 1 &&
-            CA_EXT_HEAD(CA_FIELD_EXT_ELEM(ctx->fields + i, 0)) == func)
-        {
-            break;
-        }
-    }
+    /* todo: shallow copy */
+    ca_ext_init_const(ext, func, ctx);
+    ext_ptr[0] = ca_ext_cache_insert(CA_CTX_EXT_CACHE(ctx), ext, ctx);
+    field = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext_ptr, 1, ctx);
 
-    if (i >= ctx->fields_len)
-    {
-        if (i >= ctx->fields_alloc)
-        {
-            ctx->fields = (ca_field_struct *) flint_realloc(ctx->fields, sizeof(ca_field_struct) * 2 * ctx->fields_alloc);
-            ctx->fields_alloc = 2 * ctx->fields_alloc;
-        }
-
-        ctx->fields_len = i + 1;
-        ca_field_init_const(ctx->fields + i, func, ctx);
-    }
-
-    return i;
+    ca_ext_clear(ext, ctx);
+    return field;
 }

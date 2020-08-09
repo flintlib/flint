@@ -30,7 +30,7 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
         return;
     }
 
-    if (x->field == CA_FIELD_ID_QQ_I)
+    if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n, *d;
 

@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca_field.h"
 
 truth_t
 ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx)
@@ -19,10 +20,10 @@ ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx)
         if (ca_is_unknown(x, ctx))
             return T_UNKNOWN;
 
-        if (x->field & CA_SIGNED_INF)
+        if (CA_IS_SIGNED_INF(x))
         {
             ca_t t;
-            t->field = x->field & ~CA_SIGNED_INF;
+            t->field = x->field & ~CA_INF;
             t->elem = x->elem;
             return ca_check_is_i(t, ctx);
         }

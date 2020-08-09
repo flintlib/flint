@@ -16,7 +16,7 @@ ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
     {
-        if ((x->field & CA_SIGNED_INF) || (x->field & CA_UNSIGNED_INF))
+        if (CA_IS_INF(x))
             ca_pos_inf(res, ctx);
         else
             ca_set(res, x, ctx);

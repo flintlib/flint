@@ -107,12 +107,12 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     deg_limit = ctx->options[CA_OPT_QQBAR_DEG_LIMIT];
     bits_limit = 10 * ctx->options[CA_OPT_PREC_LIMIT]; /* xxx */
 
-    len = CA_FIELD_LENGTH(ctx->fields + x->field);
+    len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
 
     for (i = 0; i < len; i++)
     {
         /* todo: could allow symbolic functions that allow evaluation to qqbar */
-        if (!CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(ctx->fields + x->field, i)))
+        if (!CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)))
             return T_UNKNOWN;
     }
 
@@ -121,9 +121,9 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     qqbar_init(y);
 
     for (i = 0; i < len; i++)
-        xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(ctx->fields + x->field, i));
+        xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
 
-    if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(ctx->fields + x->field, ctx)))
+    if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
     {
         res = qqbar_is_zero(y) ? T_TRUE : T_FALSE;
     }
@@ -149,7 +149,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         if (fmpq_is_zero(CA_FMPQ(x)))
             return T_TRUE;
@@ -157,7 +157,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
             return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ_I)
+    if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n;
 
@@ -169,9 +169,9 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if (CA_FIELD_IS_NF(ctx->fields + x->field))
+    if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
     {
-        if (nf_elem_is_zero(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + x->field)))
+        if (nf_elem_is_zero(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
             return T_TRUE;
         else
             return T_FALSE;

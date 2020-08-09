@@ -14,13 +14,10 @@
 void
 ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
-    slong field_index;
-    ulong xfield;
-    ca_field_srcptr res_field;
+    ca_field_srcptr field;
+    ulong field_flags;
 
-    xfield = x->field;
-
-    if (xfield == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         _ca_make_fmpq(res, ctx);
         fmpq_neg(CA_FMPQ(res), CA_FMPQ(x));
@@ -29,29 +26,29 @@ ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x))
     {
-        if ((xfield & CA_UNKNOWN) || (xfield & CA_UNDEFINED) || (xfield & CA_UNSIGNED_INF))
+        if (CA_IS_UNKNOWN(x) || CA_IS_UNDEFINED(x) || CA_IS_UNSIGNED_INF(x))
         {
             ca_set(res, x, ctx);
             return;
         }
     }
 
-    field_index = xfield & ~CA_SPECIAL;
-    _ca_make_field_element(res, field_index, ctx);
-    res_field = CA_FIELD(res, ctx);
-    res->field = xfield;  /* set special flags */
+    field_flags = x->field;
+    _ca_make_field_element(res, (ca_field_ptr) (field_flags & ~CA_SPECIAL), ctx);
+    field = CA_FIELD(res, ctx);
+    res->field = field_flags;  /* set special flags */
 
-    if (field_index == CA_FIELD_ID_QQ)
+    if (field == ctx->field_qq)
     {
         fmpq_neg(CA_FMPQ(res), CA_FMPQ(x));
     }
-    else if (CA_FIELD_IS_NF(res_field))
+    else if (CA_FIELD_IS_NF(field))
     {
-        nf_elem_neg(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(res_field));
+        nf_elem_neg(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(field));
     }
     else
     {
-        fmpz_mpoly_q_neg(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(res_field, ctx));
+        fmpz_mpoly_q_neg(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
     }
 }
 

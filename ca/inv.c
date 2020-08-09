@@ -15,13 +15,9 @@ void
 ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     truth_t is_zero;
-    slong field_index;
-    ulong xfield;
-    ca_field_srcptr res_field;
+    ca_field_srcptr field;
 
-    xfield = x->field;
-
-    if (xfield == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         if (fmpq_is_zero(CA_FMPQ(x)))
         {
@@ -37,7 +33,7 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x))
     {
-        if ((xfield & CA_SIGNED_INF) || (xfield & CA_UNSIGNED_INF))
+        if (CA_IS_INF(x))
             ca_zero(res, ctx);
         else
             ca_set(res, x, ctx);
@@ -57,22 +53,20 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
         return;
     }
 
-    field_index = xfield;
+    field = CA_FIELD(x, ctx);
+    _ca_make_field_element(res, field, ctx);
 
-    _ca_make_field_element(res, field_index, ctx);
-    res_field = CA_FIELD(res, ctx);
-
-    if (CA_FIELD_IS_QQ(res_field))
+    if (CA_FIELD_IS_QQ(field))  /* todo: should not happen? */
     {
         fmpq_inv(CA_FMPQ(res), CA_FMPQ(x));
     }
-    else if (CA_FIELD_IS_NF(res_field))
+    else if (CA_FIELD_IS_NF(field))
     {
-        nf_elem_inv(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(res_field));
+        nf_elem_inv(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(field));
     }
     else
     {
-        fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(res_field, ctx));
+        fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
     }
 }
 

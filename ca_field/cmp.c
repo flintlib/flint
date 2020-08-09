@@ -117,7 +117,7 @@ _fmpz_mpoly_q_cmp(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, fmpz_mpoly_ctx
 int
 ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
-    slong xfield, yfield, field_index;
+    ca_field_srcptr xfield, yfield;
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
@@ -125,25 +125,23 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
         flint_abort();
     }
 
-    xfield = x->field;
-    yfield = y->field;
+    xfield = CA_FIELD(x, ctx);
+    yfield = CA_FIELD(y, ctx);
 
     if (xfield != yfield)
-        return ca_field_cmp(ctx->fields + xfield, ctx->fields + yfield, ctx);
+        return ca_field_cmp(xfield, yfield, ctx);
 
-    field_index = xfield;
-
-    if (field_index == CA_FIELD_ID_QQ)
+    if (CA_FIELD_IS_QQ(xfield))
     {
         return fmpq_cmp(CA_FMPQ(x), CA_FMPQ(y));
     }
-    else if (CA_FIELD_IS_NF(ctx->fields + field_index))
+    else if (CA_FIELD_IS_NF(xfield))
     {
-        return _nf_elem_cmp(CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(ctx->fields + field_index));
+        return _nf_elem_cmp(CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(xfield));
     }
     else
     {
-        return _fmpz_mpoly_q_cmp(CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(ctx->fields + field_index, ctx));
+        return _fmpz_mpoly_q_cmp(CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(xfield, ctx));
     }
 }
 
@@ -156,7 +154,7 @@ ca_depth(const ca_t x, ca_ctx_t ctx)
     if (CA_IS_SPECIAL(x))
         flint_abort();
 
-    return ca_field_depth(ctx->fields + x->field, ctx);
+    return ca_field_depth(CA_FIELD(x, ctx), ctx);
 }
 
 static slong
@@ -208,4 +206,3 @@ ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
 
     return 0;
 }
-

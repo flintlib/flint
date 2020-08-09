@@ -20,17 +20,17 @@ ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
     truth_t x_alg, y_alg;
     slong prec;
 
-    if (x->field == CA_FIELD_ID_QQ && y->field == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx) && CA_IS_QQ(y, ctx))
     {
         return fmpq_equal(CA_FMPQ(x), CA_FMPQ(y)) ? T_TRUE : T_FALSE;
     }
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
-        if ((x->field & CA_UNKNOWN) || (y->field & CA_UNKNOWN))
+        if (CA_IS_UNKNOWN(x) || CA_IS_UNKNOWN(y))
             return T_UNKNOWN;
 
-        if ((x->field & CA_SIGNED_INF) && (y->field & CA_SIGNED_INF))
+        if (CA_IS_SIGNED_INF(x) && CA_IS_SIGNED_INF(y))
         {
             ca_t xsign, ysign;
 
@@ -53,7 +53,7 @@ ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
         return T_TRUE;
 
     /* same algebraic number field ==> sufficient to compare representation */
-    if (x->field == y->field && CA_FIELD_IS_NF(ctx->fields + x->field))
+    if (x->field == y->field && CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
         return T_FALSE;
 
     res = T_UNKNOWN;
@@ -104,4 +104,3 @@ ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     return res;
 }
-

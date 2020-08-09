@@ -22,12 +22,12 @@ ca_check_is_real(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         return T_TRUE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ_I)
+    if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n;
 

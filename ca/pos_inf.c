@@ -15,6 +15,6 @@ void
 ca_pos_inf(ca_t x, ca_ctx_t ctx)
 {
     ca_one(x, ctx);
-    x->field |= CA_SIGNED_INF;
+    x->field |= CA_INF;
 }
 

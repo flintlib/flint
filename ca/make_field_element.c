@@ -13,41 +13,40 @@
 
 /* todo: recycle storage when compatible */
 void
-_ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
+_ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx)
 {
-    slong old_index;
+    ca_field_srcptr old_field;
 
-    old_index = x->field & ~CA_SPECIAL;
-
-    if (old_index == new_index)
+    if (field == NULL)
     {
-        x->field = old_index;  /* unset special status */
-        return;
+        flint_printf("NULL in _ca_make_field_element\n");
+        flint_abort();
     }
 
-    if (new_index < 0 || new_index >= ctx->fields_len)
+    old_field = (ca_field_srcptr) (x->field & ~CA_SPECIAL);
+
+    if (old_field == field)
     {
-        flint_printf("_ca_make_field_element: field index out of range\n");
-        flint_abort();
+        x->field = (ulong) field;  /* unset special status */
+        return;
     }
 
     ca_clear(x, ctx);
 
-    if (new_index == CA_FIELD_ID_QQ)
+    if (field == ctx->field_qq)
     {
         *CA_FMPQ_NUMREF(x) = 0;
         *CA_FMPQ_DENREF(x) = 1;
     }
-    else if (CA_FIELD_IS_NF(ctx->fields + new_index))
+    else if (CA_FIELD_IS_NF(field))
     {
-        nf_elem_init(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + new_index));
+        nf_elem_init(CA_NF_ELEM(x), CA_FIELD_NF(field));
     }
     else
     {
         x->elem.mpoly_q = (fmpz_mpoly_q_struct *) flint_malloc(sizeof(fmpz_mpoly_q_struct));
-        fmpz_mpoly_q_init(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + new_index, ctx));
+        fmpz_mpoly_q_init(CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
     }
 
-    x->field = new_index;
+    x->field = (ulong) field;
 }
-

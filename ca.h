@@ -51,6 +51,7 @@ typedef struct
 }
 ca_struct;
 
+
 typedef ca_struct ca_t[1];
 typedef ca_struct * ca_ptr;
 typedef const ca_struct * ca_srcptr;
@@ -61,23 +62,32 @@ typedef const ca_struct * ca_srcptr;
 #define CA_FMPQ_NUMREF(x)  (fmpq_numref(CA_FMPQ(x)))
 #define CA_FMPQ_DENREF(x)  (fmpq_denref(CA_FMPQ(x)))
 
-/* Bits added to the top of field_id to encode nonnumbers */
-#define CA_UNKNOWN        (UWORD(1) << (FLINT_BITS - 1))
-#define CA_UNDEFINED      (UWORD(1) << (FLINT_BITS - 2))
-#define CA_UNSIGNED_INF   (UWORD(1) << (FLINT_BITS - 3))
-#define CA_SIGNED_INF     (UWORD(1) << (FLINT_BITS - 4))
-#define CA_SPECIAL        (CA_UNKNOWN | CA_UNDEFINED | CA_UNSIGNED_INF | CA_SIGNED_INF)
+#define CA_FIELD(x, ctx)     ((ca_field_ptr) ((x)->field))
+#define CA_FIELD_ULONG(x)    ((x)->field)
 
-#define CA_IS_SPECIAL(x)  ((x)->field & CA_SPECIAL)
+/* We always allocate QQ and QQ(i) */
+#define CA_IS_QQ(x, ctx) (CA_FIELD(x, ctx) == (ctx)->field_qq)
+#define CA_IS_QQ_I(x, ctx) (CA_FIELD(x, ctx) == (ctx)->field_qq_i)
 
-/* We always allocate QQ and QQ(i), with field index 0 and 1 */
-#define CA_FIELD_ID_QQ       0
-#define CA_FIELD_ID_QQ_I     1
+/* Use the low two bits of the field pointer to encode special values. */
+/* The field pointer with the mask removed is NULL for
+   Unknown/Undefined/Uinf, and a normal field pointer for signed
+   infinity (encoding the sign). */
+#define CA_UNKNOWN        UWORD(1)
+#define CA_UNDEFINED      UWORD(2)
+#define CA_INF            UWORD(3)
+#define CA_SPECIAL        (CA_UNKNOWN | CA_UNDEFINED | CA_INF)
 
-#define CA_IS_QQ(x, ctx) ((x)->field == CA_FIELD_ID_QQ)
-#define CA_IS_QQ_I(x, ctx) ((x)->field == CA_FIELD_ID_QQ_I)
+#define CA_IS_SPECIAL(x)       (CA_FIELD_ULONG(x) & CA_SPECIAL)
+#define CA_IS_UNKNOWN(x)       (CA_FIELD_ULONG(x) == CA_UNKNOWN)
+#define CA_IS_UNDEFINED(x)     (CA_FIELD_ULONG(x) == CA_UNDEFINED)
+#define CA_IS_INF(x)           ((CA_FIELD_ULONG(x) & CA_SPECIAL) == CA_INF)
+#define CA_IS_UNSIGNED_INF(x)  (CA_FIELD_ULONG(x) == CA_INF)
+#define CA_IS_SIGNED_INF(x)    (CA_IS_INF(x) && !CA_IS_UNSIGNED_INF(x))
 
-#define CA_FIELD(x, ctx) ((ctx)->fields + (x)->field)
+#define CA_FIELD_UNSPECIAL(x, ctx) ((ca_field_ptr) (CA_FIELD_ULONG(x) & ~CA_SPECIAL))
+
+
 
 /* Extension object **********************************************************/
 
@@ -203,15 +213,12 @@ enum
 
 typedef struct
 {
-    ca_ext_cache_struct ext_cache;    /* Cached extension objects */
-
-    ca_field_struct * fields;     /* Cached extension fields */
-    slong fields_len;
-    slong fields_alloc;
-
-    fmpz_mpoly_ctx_struct * mctx;  /* Cached contexts for multivariate polys */
+    ca_ext_cache_struct ext_cache;              /* Cached extension objects */
+    ca_field_cache_struct field_cache;          /* Cached extension fields  */
+    ca_field_struct * field_qq;                 /* Quick access to QQ      */
+    ca_field_struct * field_qq_i;               /* Quick access to QQ(i)   */
+    fmpz_mpoly_ctx_struct * mctx;               /* Cached contexts for multivariate polys */
     slong mctx_len;
-
     slong * options;
 }
 ca_ctx_struct;
@@ -219,6 +226,9 @@ ca_ctx_struct;
 typedef ca_ctx_struct ca_ctx_t[1];
 
 #define CA_CTX_EXT_CACHE(ctx) (&((ctx)->ext_cache))
+#define CA_CTX_FIELD_CACHE(ctx) (&((ctx)->field_cache))
+
+#define CA_CTX_FIELD_WITH_INDEX(ctx, i) ((&((ctx)->field_cache))->items[i])
 
 /* Context management */
 
@@ -226,16 +236,16 @@ void ca_ctx_init(ca_ctx_t ctx);
 void ca_ctx_clear(ca_ctx_t ctx);
 void ca_ctx_print(const ca_ctx_t ctx);
 
-slong _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func);
-slong _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x);
-slong _ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const ca_t x, const ca_t y);
+ca_field_ptr _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func);
+ca_field_ptr _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x);
+ca_field_ptr _ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const ca_t x, const ca_t y);
 
 /* Numbers */
 
 void ca_init(ca_t x, ca_ctx_t ctx);
 void ca_clear(ca_t x, ca_ctx_t ctx);
 void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx);
-void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
+void _ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx);
 
 ca_ptr ca_vec_init(slong n, ca_ctx_t ctx);
 void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx);
@@ -246,22 +256,24 @@ void ca_vec_set(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx);
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
 {
-    if (x->field != CA_FIELD_ID_QQ)
-        _ca_make_field_element(x, CA_FIELD_ID_QQ, ctx);
+    if (!CA_IS_QQ(x, ctx))
+        _ca_make_field_element(x, ctx->field_qq, ctx);
 }
 
 CA_INLINE void
 _ca_function_fx(ca_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
 {
-    _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, func, x), ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, ctx->mctx + 0);
+    ca_field_srcptr field = _ca_ctx_get_field_fx(ctx, func, x);
+    _ca_make_field_element(res, field, ctx);
+    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_FIELD_MCTX(field, ctx));
 }
 
 CA_INLINE void
 _ca_function_fxy(ca_t res, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
-    _ca_make_field_element(res, _ca_ctx_get_field_fxy(ctx, func, x, y), ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, ctx->mctx + 0);
+    ca_field_srcptr field = _ca_ctx_get_field_fxy(ctx, func, x, y);
+    _ca_make_field_element(res, field, ctx);
+    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_FIELD_MCTX(field, ctx));
 }
 
 void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx);
@@ -308,7 +320,7 @@ void ca_randtest_special(ca_t res, flint_rand_t state, slong depth, slong bits, 
 
 CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
 {
-    return x->field == CA_UNKNOWN;
+    return CA_IS_UNKNOWN(x);
 }
 
 /* Value predicates and comparisons */
@@ -349,6 +361,9 @@ void ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t 
 void ca_condense_field(ca_t res, ca_ctx_t ctx);
 
 /* Arithmetic */
+
+/* todo: document */
+void _ca_mpoly_q_reduce_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx);
 
 void ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx);
 

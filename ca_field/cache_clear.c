@@ -9,11 +9,19 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#include "ca_field.h"
 
 void
-ca_pos_i_inf(ca_t x, ca_ctx_t ctx)
+ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx)
 {
-    ca_i(x, ctx);
-    x->field |= CA_INF;
+    slong i;
+
+    for (i = 0; i < cache->length; i++)
+        ca_field_clear(cache->items[i], ctx);
+
+    for (i = 0; i < cache->alloc; i++)
+        flint_free(cache->items[i]);
+
+    flint_free(cache->items);
+    flint_free(cache->hash_table);
 }

@@ -20,6 +20,8 @@ ca_ctx_init(ca_ctx_t ctx)
 {
     slong i;
     qqbar_t onei;
+    ca_ext_t ext;
+    ca_ext_struct * ext_ptr[1];
 
     ctx->mctx = flint_malloc(CA_NVARS_DEFAULT * sizeof(fmpz_mpoly_ctx_struct));
     for (i = 0; i < CA_NVARS_DEFAULT; i++)
@@ -27,19 +29,19 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->mctx_len = CA_NVARS_DEFAULT;
 
     ca_ext_cache_init(CA_CTX_EXT_CACHE(ctx), ctx);
+    ca_field_cache_init(CA_CTX_FIELD_CACHE(ctx), ctx);
 
-    /* Always create QQ, QQ(i) */
+    /* Always create QQ */
+    ctx->field_qq = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), NULL, 0, ctx);
 
-    ctx->fields = (ca_field_struct *) flint_malloc(2 * sizeof(ca_field_struct));
-    ctx->fields_len = 2;
-    ctx->fields_alloc = 2;
-
-    ca_field_init_qq(ctx->fields, ctx);
-
+    /* Always create QQ(i) */
     qqbar_init(onei);
     qqbar_i(onei);
-    ca_field_init_nf(ctx->fields + 1, onei, ctx);
+    ca_ext_init_qqbar(ext, onei, ctx);
+    ext_ptr[0] = ca_ext_cache_insert(CA_CTX_EXT_CACHE(ctx), ext, ctx);
+    ctx->field_qq_i = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext_ptr, 1, ctx);
     qqbar_clear(onei);
+    ca_ext_clear(ext, ctx);
 
     ctx->options = flint_calloc(CA_OPT_NUM_OPTIONS, sizeof(slong));
 
@@ -48,4 +50,3 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->options[CA_OPT_LOW_PREC] = 64;
     ctx->options[CA_OPT_SMOOTH_LIMIT] = 32;
 }
-

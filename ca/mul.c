@@ -14,15 +14,11 @@
 void
 ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
 {
-    ulong xfield;
-    slong zfield;
-    ca_field_srcptr res_field;
-
-    xfield = x->field;
+    ca_field_srcptr field;
 
     if (CA_IS_SPECIAL(x))
     {
-        if (xfield & CA_SIGNED_INF)
+        if (CA_IS_SIGNED_INF(x))
         {
             if (fmpq_is_zero(y))
                 ca_undefined(res, ctx);
@@ -31,7 +27,7 @@ ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
             else
                 ca_neg(res, x, ctx);
         }
-        else if (xfield & CA_UNSIGNED_INF)
+        else if (CA_IS_UNSIGNED_INF(x))
         {
             if (fmpq_is_zero(y))
                 ca_undefined(res, ctx);
@@ -52,24 +48,24 @@ ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
         return;
     }
 
-    if (xfield == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         _ca_make_fmpq(res, ctx);
         fmpq_mul(CA_FMPQ(res), CA_FMPQ(x), y);
-        return;
-    }
-
-    zfield = xfield;
-    _ca_make_field_element(res, zfield, ctx);
-    res_field = CA_FIELD(res, ctx);
-
-    if (CA_FIELD_IS_NF(res_field))
-    {
-        nf_elem_scalar_mul_fmpq(CA_NF_ELEM(res), CA_NF_ELEM(x), y, CA_FIELD_NF(res_field));
     }
     else
     {
-        fmpz_mpoly_q_mul_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(x), y, CA_FIELD_MCTX(res_field, ctx));
+        field = CA_FIELD(x, ctx);
+        _ca_make_field_element(res, field, ctx);
+
+        if (CA_FIELD_IS_NF(field))
+        {
+            nf_elem_scalar_mul_fmpq(CA_NF_ELEM(res), CA_NF_ELEM(x), y, CA_FIELD_NF(field));
+        }
+        else
+        {
+            fmpz_mpoly_q_mul_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(x), y, CA_FIELD_MCTX(field, ctx));
+        }
     }
 }
 
@@ -103,21 +99,19 @@ ca_mul_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx)
 void
 ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
-    ulong xfield, yfield;
-    slong zfield;
-    ca_field_srcptr res_field;
+    ca_field_srcptr xfield, yfield, zfield;
 
-    xfield = x->field;
-    yfield = y->field;
+    xfield = CA_FIELD(x, ctx);
+    yfield = CA_FIELD(y, ctx);
 
-    if (xfield == CA_FIELD_ID_QQ && yfield == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx) && (xfield == yfield))
     {
         _ca_make_fmpq(res, ctx);
         fmpq_mul(CA_FMPQ(res), CA_FMPQ(x), CA_FMPQ(y));
         return;
     }
 
-    if (yfield == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(y, ctx))
     {
         if (res == y)
         {
@@ -134,7 +128,7 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         return;
     }
 
-    if (xfield == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         if (res == x)
         {
@@ -153,31 +147,31 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
-        if ((xfield & CA_UNDEFINED) || (yfield & CA_UNDEFINED))
+        if (CA_IS_UNDEFINED(x) || CA_IS_UNDEFINED(y))
         {
             ca_undefined(res, ctx);
             return;
         }
 
-        if ((xfield & CA_UNKNOWN) || (yfield & CA_UNKNOWN))
+        if (CA_IS_UNKNOWN(x) || CA_IS_UNKNOWN(y))
         {
             ca_unknown(res, ctx);
             return;
         }
 
-        if ((xfield & CA_UNSIGNED_INF) && ((yfield & CA_UNSIGNED_INF) || (yfield & CA_SIGNED_INF)))
+        if (CA_IS_UNSIGNED_INF(x) && CA_IS_INF(y))
         {
             ca_uinf(res, ctx);
             return;
         }
 
-        if ((yfield & CA_UNSIGNED_INF) && ((xfield & CA_UNSIGNED_INF) || (xfield & CA_SIGNED_INF)))
+        if (CA_IS_UNSIGNED_INF(y) && CA_IS_INF(x))
         {
             ca_uinf(res, ctx);
             return;
         }
 
-        if ((xfield & CA_UNSIGNED_INF) && !CA_IS_SPECIAL(y))
+        if (CA_IS_UNSIGNED_INF(x) && !CA_IS_SPECIAL(y))
         {
             truth_t zero = ca_check_is_zero(y, ctx);
 
@@ -190,7 +184,7 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
             return;
         }
 
-        if ((yfield & CA_UNSIGNED_INF) && !CA_IS_SPECIAL(x))
+        if (CA_IS_UNSIGNED_INF(y) && !CA_IS_SPECIAL(x))
         {
             truth_t zero = ca_check_is_zero(x, ctx);
 
@@ -203,7 +197,7 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
             return;
         }
 
-        if ((xfield & CA_SIGNED_INF) || (yfield & CA_SIGNED_INF))
+        if (CA_IS_SIGNED_INF(x) || CA_IS_SIGNED_INF(y))
         {
             ca_t t, u;
             truth_t xzero, yzero;
@@ -230,7 +224,7 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
             ca_mul(res, t, u, ctx);
             if (ca_check_is_number(res, ctx) == T_TRUE)
-                res->field |= CA_SIGNED_INF;
+                res->field |= CA_INF;
 
             ca_clear(t, ctx);
             ca_clear(u, ctx);
@@ -245,61 +239,16 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
     if (xfield == yfield)
     {
         zfield = xfield;
-
         _ca_make_field_element(res, zfield, ctx);
-        res_field = CA_FIELD(res, ctx);
 
-        if (CA_FIELD_IS_NF(res_field))
+        if (CA_FIELD_IS_NF(zfield))
         {
-            nf_elem_mul(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(res_field));
+            nf_elem_mul(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(zfield));
         }
         else
         {
-            slong i, n;
-
-            fmpz_mpoly_q_mul(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(res_field, ctx));
-
-            /* todo: improve, deduplicate this code */
-
-            n = CA_FIELD_IDEAL_LENGTH(res_field);
-
-            if (n != 0)
-            {
-                fmpz_mpoly_struct ** I;
-                fmpz_mpoly_struct ** Q;
-                fmpq_t scale;
-
-                I = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
-                for (i = 0; i < n; i++)
-                    I[i] = CA_FIELD_IDEAL_ELEM(res_field, i);
-
-                Q = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
-                for (i = 0; i < n; i++)
-                {
-                    Q[i] = flint_malloc(sizeof(fmpz_mpoly_struct));
-                    fmpz_mpoly_init(Q[i], CA_FIELD_MCTX(res_field, ctx));
-                }
-
-                fmpq_init(scale);
-
-                fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(res_field, ctx));
-                fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(res_field, ctx));
-
-                fmpq_canonicalise(scale);
-                fmpz_mpoly_q_canonicalise(CA_MPOLY_Q(res), CA_FIELD_MCTX(res_field, ctx));
-                fmpz_mpoly_q_mul_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(res), scale, CA_FIELD_MCTX(res_field, ctx));
-
-                for (i = 0; i < n; i++)
-                {
-                    fmpz_mpoly_clear(Q[i], CA_FIELD_MCTX(res_field, ctx));
-                    flint_free(Q[i]);
-                }
-
-                flint_free(Q);
-                flint_free(I);
-
-                fmpq_clear(scale);
-            }
+            fmpz_mpoly_q_mul(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(zfield, ctx));
+            _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), zfield, ctx);
         }
 
         ca_condense_field(res, ctx);
@@ -314,26 +263,8 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         ca_init(u, ctx);
 
         ca_merge_fields(t, u, x, y, ctx);
-
-/*
-        printf("merged\n");
-        ca_print(t, ctx); printf("\n");
-        ca_print(u, ctx); printf("\n\n");
-*/
-
         ca_mul(res, t, u, ctx);
-
-/*
-        printf("added\n");
-        ca_print(res, ctx); printf("\n");
-*/
-
         ca_condense_field(res, ctx);
-
-/*
-        printf("condensed\n");
-        ca_print(res, ctx); printf("\n");
-*/
 
         ca_clear(t, ctx);
         ca_clear(u, ctx);

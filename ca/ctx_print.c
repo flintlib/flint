@@ -18,11 +18,11 @@ ca_ctx_print(const ca_ctx_t ctx)
 {
     slong i;
 
-    flint_printf("Calcium context with %wd cached fields:\n", ctx->fields_len);
-    for (i = 0; i < ctx->fields_len; i++)
+    flint_printf("Calcium context with %wd cached fields:\n", CA_CTX_FIELD_CACHE(ctx)->length);
+    for (i = 0; i < CA_CTX_FIELD_CACHE(ctx)->length; i++)
     {
         flint_printf("%wd   ", i);
-        ca_field_print(ctx->fields + i, ctx);
+        ca_field_print(CA_CTX_FIELD_CACHE(ctx)->items[i], ctx);
         flint_printf("\n");
     }
     flint_printf("\n");

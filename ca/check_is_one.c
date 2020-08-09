@@ -21,14 +21,14 @@ ca_check_is_one(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
-    else if (x->field == CA_FIELD_ID_QQ)
+    else if (CA_IS_QQ(x, ctx))
     {
         if (fmpq_is_one(CA_FMPQ(x)))
             return T_TRUE;
         else
             return T_FALSE;
     }
-    else if (x->field == CA_FIELD_ID_QQ_I)
+    else if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n, *d;
 

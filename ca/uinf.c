@@ -15,6 +15,5 @@ void
 ca_uinf(ca_t x, ca_ctx_t ctx)
 {
     ca_zero(x, ctx);
-    x->field = CA_UNSIGNED_INF;
+    x->field = CA_INF;
 }
-

@@ -22,7 +22,7 @@ ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ)
+    if (CA_IS_QQ(x, ctx))
     {
         if (fmpq_is_zero(CA_FMPQ(x)))
             return T_TRUE;
@@ -30,7 +30,7 @@ ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
             return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ_I)
+    if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n;
 

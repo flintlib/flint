@@ -151,4 +151,3 @@ ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx)
     ca_pow(res, x, t, ctx);
     ca_clear(t, ctx);
 }
-

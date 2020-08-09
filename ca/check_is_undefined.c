@@ -19,7 +19,7 @@ ca_check_is_undefined(const ca_t x, ca_ctx_t ctx)
         if (ca_is_unknown(x, ctx))
             return T_UNKNOWN;
 
-        if (x->field & CA_UNDEFINED)
+        if (CA_IS_UNDEFINED(x))
             return T_TRUE;
 
         return T_FALSE;

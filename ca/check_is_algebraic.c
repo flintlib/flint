@@ -24,6 +24,8 @@ ca_ext_is_algebraic(const ca_ext_t x, ca_ctx_t ctx)
 truth_t
 ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
 {
+    ca_field_srcptr field;
+
     if (CA_IS_SPECIAL(x))
     {
         if (ca_is_unknown(x, ctx))
@@ -32,7 +34,9 @@ ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    if (x->field == CA_FIELD_ID_QQ || CA_FIELD_IS_NF(ctx->fields + x->field))
+    field = CA_FIELD(x, ctx);
+
+    if (CA_IS_QQ(x, ctx) || CA_FIELD_IS_NF(field))
     {
         return T_TRUE;
     }
@@ -40,14 +44,14 @@ ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
     {
         slong len, i;
 
-        len = CA_FIELD_LENGTH(ctx->fields + x->field);
+        len = CA_FIELD_LENGTH(field);
 
         /* todo: handle simple transcendental numbers, e.g. Q(i,pi) */
         /* need to verify that some the generator is used in the poly */
         /* for Q(a,b,pi) we don't know, because a, b could cancel out pi */
         for (i = 0; len; i++)
         {
-            if (ca_ext_is_algebraic(CA_FIELD_EXT_ELEM(ctx->fields + x->field, i), ctx) != T_TRUE)
+            if (ca_ext_is_algebraic(CA_FIELD_EXT_ELEM(field, i), ctx) != T_TRUE)
                 return T_UNKNOWN;
         }
 

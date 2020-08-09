@@ -14,17 +14,15 @@
 int
 ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
-    slong field_index;
-    ca_field_srcptr field;
+    ca_field_ptr field;
 
     /* by assumption: cached field objects are unique */
     if (x->field != y->field)
         return 0;
 
-    field_index = x->field & ~CA_SPECIAL;
-    field = ctx->fields + field_index;
+    field = CA_FIELD_UNSPECIAL(x, ctx);
 
-    if (field_index == CA_FIELD_ID_QQ)
+    if (CA_FIELD_IS_QQ(field))
     {
         return fmpq_equal(CA_FMPQ(x), CA_FMPQ(y));
     }

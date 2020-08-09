@@ -9,11 +9,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#include "ca_field.h"
+
+#define INITIAL_HASH_SIZE 16
 
 void
-ca_pos_i_inf(ca_t x, ca_ctx_t ctx)
+ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx)
 {
-    ca_i(x, ctx);
-    x->field |= CA_INF;
+    slong i;
+
+    cache->items = NULL;
+    cache->length = 0;
+    cache->alloc = 0;
+
+    cache->hash_size = INITIAL_HASH_SIZE;
+    cache->hash_table = flint_malloc(sizeof(slong) * INITIAL_HASH_SIZE);
+    for (i = 0; i < INITIAL_HASH_SIZE; i++)
+        cache->hash_table[i] = -1;
 }

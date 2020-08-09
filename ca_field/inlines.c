@@ -10,5 +10,5 @@
 */
 
 #define CA_FIELD_INLINES_C
-#include "ca_ext.h"
+#include "ca_field.h"
 

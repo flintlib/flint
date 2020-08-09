@@ -20,19 +20,19 @@ ca_print(const ca_t x, const ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x))
     {
-        if (x->field & CA_UNDEFINED)
+        if (CA_IS_UNDEFINED(x))
         {
             flint_printf("Undefined");
         }
-        else if (x->field & CA_UNKNOWN)
+        else if (CA_IS_UNKNOWN(x))
         {
             flint_printf("Unknown");
         }
-        else if (x->field & CA_UNSIGNED_INF)
+        else if (CA_IS_UNSIGNED_INF(x))
         {
             flint_printf("UnsignedInfinity");
         }
-        else  if (x->field & CA_SIGNED_INF)
+        else  if (CA_IS_SIGNED_INF(x))
         {
             ca_t sgn;
             sgn->field = x->field & ~CA_SPECIAL;

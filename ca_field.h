@@ -29,6 +29,8 @@ extern "C" {
 
 /* note: types and macros are defined in ca.h since they are needed there */
 
+#define CA_FIELD_HASH_C UWORD(100003)
+
 /* todo: all take ctx; update and check docs */
 void ca_field_init_qq(ca_field_t K, ca_ctx_t ctx);
 void ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx);
@@ -48,7 +50,7 @@ void ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx);
 
 void ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx);
 void ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx);
-ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_t ** x, slong length, ca_ctx_t ctx);
+ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_struct ** x, slong length, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

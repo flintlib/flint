@@ -46,16 +46,16 @@ For all types, a *type_t* is defined as an array of length one of type
 
 .. macro:: CA_FIELD_LENGTH(K)
 
-    Accesses the number of extension elements *n* of *K*. This is 0 if
+    Accesses the number *n* of extension numbers of *K*. This is 0 if
     `K = \mathbb{Q}`.
 
 .. macro:: CA_FIELD_EXT(K)
 
-    Accesses the array of extension elements as a :type:`ca_ext_ptr`.
+    Accesses the array of extension numbers as a :type:`ca_ext_ptr`.
 
 .. macro:: CA_FIELD_EXT_ELEM(K, i)
 
-    Accesses the extension element at position *i* (indexed from zero)
+    Accesses the extension number at position *i* (indexed from zero)
     as a :type:`ca_ext_t`.
 
 .. macro:: CA_FIELD_HASH(K)
@@ -148,7 +148,7 @@ Memory management
 .. function:: void ca_field_clear(ca_field_t K, ca_ctx_t ctx)
 
     Clears the field *K*. This does not clear the individual extension
-    elements, which are only held as references.
+    numbers, which are only held as references.
 
 Input and output
 -------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ Ideal
 
 .. function:: void ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
-    Given *K* with assigned extension elements,
+    Given *K* with assigned extension numbers,
     builds the reduction ideal in-place.
 
 Structure operations
@@ -175,6 +175,38 @@ Structure operations
     of the representations of *K1* and *K2*; the return value does not say
     anything meaningful about the relative structures of *K1* and *K2*
     as mathematical fields.
+
+Cache
+-------------------------------------------------------------------------------
+
+.. type:: ca_field_cache_struct
+
+.. type:: ca_field_cache_t
+
+    Represents a set of distinct :type:`ca_field_t` instances.
+    This object contains an array of pointers to individual heap-allocated
+    :type:`ca_field_struct` objects as well as a hash table for quick
+    lookup.
+
+.. function:: void ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx)
+
+    Initializes *cache* for use.
+
+.. function:: void ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx)
+
+    Clears *cache*, freeing the memory allocated internally.
+    This does not clear the individual extension
+    numbers, which are only held as references.
+
+.. function:: ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_struct ** x, slong len, ca_ctx_t ctx)
+
+    Adds the field defined by the length-*len* list of extension numbers *x*
+    to *cache* without duplication. If such a field already exists in *cache*,
+    a pointer to that instance is returned. Otherwise, a field with
+    extension numbers *x* is inserted into *cache* and a pointer to that
+    new instance is returned. Upon insertion of a new field, the
+    reduction ideal is constructed via :func:`ca_field_build_ideal`.
+
 
 
 .. raw:: latex

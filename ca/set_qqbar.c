@@ -53,31 +53,20 @@ _fmpz_factor_square_root(fmpz_t A, fmpz_t B, const fmpz_t n, slong smooth_bound)
     fmpz_clear(t);
 }
 
-slong ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x)
+/* fixme: this is slow!!! */
+ca_field_ptr ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x)
 {
-    slong i;
+    ca_ext_t ext;
+    ca_ext_struct * ext_ptr[1];
+    ca_field_ptr field;
 
-    for (i = 0; i < ctx->fields_len; i++)
-    {
-        if (CA_FIELD_IS_NF(ctx->fields + i))
-        {
-            if (qqbar_equal(x, CA_FIELD_NF_QQBAR(ctx->fields + i)))
-                return i;
-        }
-    }
+    /* todo: shallow copy */
+    ca_ext_init_qqbar(ext, x, ctx);
+    ext_ptr[0] = ca_ext_cache_insert(CA_CTX_EXT_CACHE(ctx), ext, ctx);
+    field = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext_ptr, 1, ctx);
 
-    i = ctx->fields_len;
-
-    if (i >= ctx->fields_alloc)
-    {
-        ctx->fields = (ca_field_struct *) flint_realloc(ctx->fields, sizeof(ca_field_struct) * 2 * ctx->fields_alloc);
-        ctx->fields_alloc = 2 * ctx->fields_alloc;
-    }
-
-    ctx->fields_len = i + 1;
-    ca_field_init_nf(ctx->fields + i, x, ctx);
-
-    return i;
+    ca_ext_clear(ext, ctx);
+    return field;
 }
 
 #if 0
@@ -143,9 +132,9 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 #else
 
 /* todo: optimize! */
-slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
+ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 {
-    slong res;
+    ca_field_srcptr res;
     qqbar_t x;
     qqbar_init(x);
     qqbar_set_fmpz(x, A);
@@ -193,7 +182,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
         {
             fmpz_sqrt(D, D);
 
-            _ca_make_field_element(res, CA_FIELD_ID_QQ_I, ctx);
+            _ca_make_field_element(res, ctx->field_qq_i, ctx);
 
             res_num = QNF_ELEM_NUMREF(CA_NF_ELEM(res));
             res_den = QNF_ELEM_DENREF(CA_NF_ELEM(res));
@@ -220,7 +209,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
         else
         {
             fmpz_t A, B;
-            slong field_id;
+            ca_field_srcptr field;
 
             fmpz_neg(D, D);
 
@@ -235,9 +224,8 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
             if (fmpz_sgn(D) < 0)
                 fmpz_neg(A, A);
 
-            field_id = ca_ctx_get_quadratic_field(ctx, A);
-
-            _ca_make_field_element(res, field_id, ctx);
+            field = ca_ctx_get_quadratic_field(ctx, A);
+            _ca_make_field_element(res, field, ctx);
 
             res_num = QNF_ELEM_NUMREF(CA_NF_ELEM(res));
             res_den = QNF_ELEM_DENREF(CA_NF_ELEM(res));
@@ -321,10 +309,9 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
     }
     else
     {
-        slong field;
+        ca_field_srcptr field;
         field = ca_ctx_get_field_qqbar(ctx, x);
         _ca_make_field_element(res, field, ctx);
-        nf_elem_gen(CA_NF_ELEM(res), CA_FIELD_NF(ctx->fields + field));
+        nf_elem_gen(CA_NF_ELEM(res), CA_FIELD_NF(field));
     }
 }
-

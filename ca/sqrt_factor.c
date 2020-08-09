@@ -16,12 +16,12 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
     {
-        if (x->field & CA_SIGNED_INF)
+        if (CA_IS_SIGNED_INF(x))
         {
             ca_sgn(res, x, ctx);
             ca_sqrt_factor(res, res, flags, ctx);
             if (!ca_is_unknown(res, ctx))
-                res->field |= CA_SIGNED_INF;
+                res->field |= CA_INF;
         }
         else
         {
