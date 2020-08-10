@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca_field.h"
 
 /* todo: recycle storage when compatible */
 void

@@ -39,13 +39,13 @@ int main()
         ca_init(f, ctx);
 
         /* log(x * y * z) - log(x) - log(y) - log(z) */
-        /* no test implemented yet; just verifying that the code runs */
+        /* testing for positive x and y here -- need better test code for complex numbers */
 
         ca_randtest(x, state, 5, 5, ctx);
         ca_randtest(y, state, 5, 5, ctx);
         ca_randtest(z, state, 5, 5, ctx);
+
         ca_abs(x, x, ctx);
-        ca_abs(y, y, ctx);
         ca_abs(y, y, ctx);
 
         ca_mul(a, x, y, ctx);
@@ -74,7 +74,7 @@ int main()
 
         if (equal == T_FALSE || zero == T_FALSE)
         {
-            flint_printf("FAIL (og(x * y * z) - log(x) - log(y) - log(z) != 0)\n\n");
+            flint_printf("FAIL (log(x * y * z) - log(x) - log(y) - log(z) != 0)\n\n");
             flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
             flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
             flint_printf("z = "); ca_print(z, ctx); flint_printf(" ~= "); ca_printn(z, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");

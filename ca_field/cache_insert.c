@@ -137,13 +137,18 @@ ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_struct ** 
         /* not found, so insert */
         if (cache->hash_table[loc] == -1)
         {
-            ca_field_init_set_ext(cache->items[cache->length], x, length, ctx);
-            ca_field_build_ideal(cache->items[cache->length], ctx);
+            ca_field_ptr res;
 
+            ca_field_init_set_ext(cache->items[cache->length], x, length, ctx);
             cache->hash_table[loc] = cache->length;
             cache->length++;
 
-            return cache->items[cache->length - 1];
+            /* save pointer; build_ideal can resize the cache */
+            res = cache->items[cache->length - 1];
+
+            ca_field_build_ideal(res, ctx);
+
+            return res;
         }
 
         /* found */
