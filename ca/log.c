@@ -48,6 +48,6 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
     }
 
     _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Log, x), ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, ctx->mctx + 0);
+    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
 }
 

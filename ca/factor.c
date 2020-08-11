@@ -176,7 +176,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
                 {
                     ca_set_fmpz(e, mfac->exp + i, ctx);
                     ca_neg(e, e, ctx);
-                    _ca_make_field_element(b, x->field, ctx);
+                    _ca_make_field_element(b, CA_FIELD(x, ctx), ctx);
                     fmpz_mpoly_swap(fmpz_mpoly_q_numref(CA_MPOLY_Q(b)), mfac->poly + i, mctx);
                     fmpz_mpoly_one(fmpz_mpoly_q_denref(CA_MPOLY_Q(b)), mctx);
                     ca_factor_insert(res, b, e, ctx);

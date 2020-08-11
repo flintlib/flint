@@ -23,9 +23,12 @@ ca_ctx_init(ca_ctx_t ctx)
     ca_ext_t ext;
     ca_ext_struct * ext_ptr[1];
 
-    ctx->mctx = flint_malloc(CA_NVARS_DEFAULT * sizeof(fmpz_mpoly_ctx_struct));
+    ctx->mctx = flint_malloc(CA_NVARS_DEFAULT * sizeof(fmpz_mpoly_ctx_struct *));
     for (i = 0; i < CA_NVARS_DEFAULT; i++)
-        fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, CA_MPOLY_ORD);
+    {
+        ctx->mctx[i] = flint_malloc(sizeof(fmpz_mpoly_ctx_struct));
+        fmpz_mpoly_ctx_init(ctx->mctx[i], i + 1, CA_MPOLY_ORD);
+    }
     ctx->mctx_len = CA_NVARS_DEFAULT;
 
     ca_ext_cache_init(CA_CTX_EXT_CACHE(ctx), ctx);

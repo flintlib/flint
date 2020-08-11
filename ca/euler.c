@@ -15,6 +15,6 @@ void
 ca_euler(ca_t res, ca_ctx_t ctx)
 {
     _ca_make_field_element(res, _ca_ctx_get_field_const(ctx, CA_Euler), ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, ctx->mctx + 0);
+    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
 }
 

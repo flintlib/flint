@@ -181,7 +181,8 @@ typedef const ca_field_struct * ca_field_srcptr;
 #define CA_FIELD_IDEAL_ELEM(K, i) (((K)->ideal) + (i))
 #define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal_length)
 
-#define CA_FIELD_MCTX(K, ctx) (&((ctx)->mctx[CA_FIELD_LENGTH(K) - 1]))
+#define CA_MCTX_1(ctx) ((ctx)->mctx[0])
+#define CA_FIELD_MCTX(K, ctx) ((ctx)->mctx[CA_FIELD_LENGTH(K) - 1])
 
 typedef struct
 {
@@ -217,7 +218,7 @@ typedef struct
     ca_field_cache_struct field_cache;          /* Cached extension fields  */
     ca_field_struct * field_qq;                 /* Quick access to QQ      */
     ca_field_struct * field_qq_i;               /* Quick access to QQ(i)   */
-    fmpz_mpoly_ctx_struct * mctx;               /* Cached contexts for multivariate polys */
+    fmpz_mpoly_ctx_struct ** mctx;              /* Cached contexts for multivariate polys */
     slong mctx_len;
     slong * options;
 }
@@ -462,4 +463,3 @@ void ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
 #endif
 
 #endif
-

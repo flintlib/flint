@@ -109,10 +109,12 @@ ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
     while (ctx->mctx_len < len)
     {
         slong i;
-        ctx->mctx = flint_realloc(ctx->mctx, 2 * ctx->mctx_len * sizeof(fmpz_mpoly_ctx_struct));
+        ctx->mctx = flint_realloc(ctx->mctx, 2 * ctx->mctx_len * sizeof(fmpz_mpoly_ctx_struct *));
         for (i = ctx->mctx_len; i < 2 * ctx->mctx_len; i++)
-            fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, CA_MPOLY_ORD);
+        {
+            ctx->mctx[i] = flint_malloc(sizeof(fmpz_mpoly_ctx_struct));
+            fmpz_mpoly_ctx_init(ctx->mctx[i], i + 1, CA_MPOLY_ORD);
+        }
         ctx->mctx_len *= 2;
     }
 }
-
