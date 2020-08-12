@@ -18,7 +18,7 @@ v 1.0.2 -- 10-Dec-07
 
 v 1.0.3 -- 16-Dec-07
 
-   * Fixed a bug in the polynomial memory managment code which caused a segfault
+   * Fixed a bug in the polynomial memory management code which caused a segfault
    * Fixed a bug in the pseudo division code which caused a block overrun
     
 v 1.0.4 -- 04-Jan-08
@@ -895,7 +895,7 @@ fmpz_poly
   * added scalar mul_2exp, fdiv_2exp, tdiv_2exp
   * made randtest produce sparse output
   * added fmpz_poly_equal_fmpz
-  * improved performance by always using basecase multiplicatio
+  * improved performance by always using basecase multiplication
     when one polynomial is short
   * improved algorithm selection for fmpz_poly_gcd
   * fixed several bugs in gcd_modular
@@ -1234,6 +1234,6 @@ v 2.6.2 -- 31 Jul 2020
 v 2.6.3 -- 12 Aug 2020
 
  * Fix a bug in generator of finite field in characteristic 2
- * Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeagbly
+ * Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
  * Fix some old license headers
 

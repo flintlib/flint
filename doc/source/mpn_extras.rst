@@ -121,7 +121,7 @@ Division
     quotient (which will either be 0 or 1), storing the remainder in-place 
     in ``a, n`` and the rest of the quotient in ``q, m - n``.
     We require the most significant bit of ``b, n`` to be 1.
-    dinv must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
+    ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
     ``flint_mpn_preinv1``. We also require ``m >= n >= 2``.
 
 .. function:: void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm)

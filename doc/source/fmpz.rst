@@ -425,11 +425,11 @@ Input and output
     Reads a multiprecision integer from the stream ``file``.  The
     format is raw binary format write by :func:`fmpz_out_raw`. 
     
-    In case of success, return a posivitive number, indicating number of bytes read.
+    In case of success, return a positive number, indicating number of bytes read.
     In case of failure 0.
 
     This function calls the ``mpz_inp_raw`` function in library gmp. So that it 
-    can read the raw data writen by ``mpz_inp_raw`` directly.
+    can read the raw data written by ``mpz_inp_raw`` directly.
     
 .. function:: int fmpz_print(fmpz_t x)
 
@@ -462,9 +462,9 @@ Input and output
 .. function:: size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
-    The value is writen in raw binary format. The integer is written in 
+    The value is written in raw binary format. The integer is written in 
     portable format, with 4 bytes of size information, and that many bytes
-    of linbs. Both the size and the limbs are written in decreasing 
+    of limbs. Both the size and the limbs are written in decreasing 
     significance order (i.e., in big-endian).
 
     The output can be read with ``fmpz_inp_raw``.

@@ -6,7 +6,7 @@
 Contributors
 -------------------------------------------------------------------------------
 
-FLINT has only been possible due to an extroadinary number of high quality
+FLINT has only been possible due to an extraordinary number of high quality
 contributions from a vast array of people.
 
 A complete list of contributors is available on the FLINT website at:

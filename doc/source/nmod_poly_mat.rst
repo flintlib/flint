@@ -342,7 +342,7 @@ Determinant and rank
 .. function:: void nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
 
     Sets ``det`` to the determinant of the square matrix ``A``.
-    The determinant is computed by determing a bound `n` for its length,
+    The determinant is computed by determining a bound `n` for its length,
     evaluating the matrix at `n` distinct points, computing the determinant
     of each coefficient matrix, and forming the interpolating polynomial.
 

@@ -29,7 +29,7 @@
     work therefore we randomly generate 2 or 3-subset of all the factor base prime
     as the factor of `A _0`.
     Otherwise, if we have to select `s` factor for `A _0`, we generate `s - 1`-
-    subset from odd indices of the possble range of factor and then search last 
+    subset from odd indices of the possible range of factor and then search last 
     factor using binary search from the even indices of possible range of factor
     such that value of `A _0` is close to it's optimal value.
 
@@ -101,7 +101,7 @@
 
 .. function:: hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 
-    Retrun the pointer to the location of 'prime' is hash table if it exist, else
+    Return the pointer to the location of 'prime' is hash table if it exist, else
     create and entry for it in hash table and return pointer to that.
 
 .. function:: void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
