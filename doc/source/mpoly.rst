@@ -5,7 +5,7 @@
 
     An array of type ``ulong *`` or ``fmpz **`` is used to communicate
     exponent vectors. These exponent vectors must have length equal to the
-    number of variables in the polynmial ring.
+    number of variables in the polynomial ring.
     The element of this exponent vector at index `0`
     corresponds to the most significant variable in the monomial ordering.
     For example, if the polynomial is `7*x^2*y+8*y*z+9` and the variables are
@@ -61,7 +61,7 @@ Orderings
     output, corresponding to the given ordering.
 
 
-Monomial arithemtic
+Monomial arithmetic
 --------------------------------------------------------------------------------
 
 
@@ -128,7 +128,7 @@ Monomial comparison
 
 .. function:: void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits, const mpoly_ctx_t mctx)
 
-    Get the mask ``(cmpmask, N)`` for comparisions.
+    Get the mask ``(cmpmask, N)`` for comparisons.
     ``bits`` should be set to the number of bits in the exponents
     to be compared. Any function that compares monomials should use this
     comparison mask.

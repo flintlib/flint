@@ -287,7 +287,7 @@ Visual Studio or on the command line. It is run with a single input
 parameter which is the last two digits of the Visual Studio version
 selected for building FLINT2 (the default is 19 if no input is given).
 
-Ths creates a build directory in the Flint root directory, for 
+This creates a build directory in the Flint root directory, for 
 example:
 
    ``flint\build.vs19``

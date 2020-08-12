@@ -121,7 +121,7 @@ Factorisation
 
 .. function:: void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const *degs)
 
-    Factorises a monic non-constant squarefree polymnomial ``poly``
+    Factorises a monic non-constant squarefree polynomial ``poly``
     of degree n into factors `f[d]` such that for `1 \leq d \leq n`
     `f[d]` is the product of the monic irreducible factors of ``poly``
     of degree `d`. Factors `f[d]` are stored in ``res``, and the degree `d`

@@ -240,7 +240,7 @@ Discrete Logarithms via Pohlig-Hellman
 
 .. function:: void nmod_discrete_log_pohlig_hellman_init(nmod_discrete_log_pohlig_hellman_t L)
 
-    Initialize ``L``. Upon initilization ``L`` is not ready for computation.
+    Initialize ``L``. Upon initialization ``L`` is not ready for computation.
 
 .. function:: void nmod_discrete_log_pohlig_hellman_clear(nmod_discrete_log_pohlig_hellman_t L)
 
@@ -257,5 +257,5 @@ Discrete Logarithms via Pohlig-Hellman
 
 .. function:: ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
 
-    Return the logarithm of ``y`` with repect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
+    Return the logarithm of ``y`` with respect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
     The function is undefined if the logarithm does not exist.

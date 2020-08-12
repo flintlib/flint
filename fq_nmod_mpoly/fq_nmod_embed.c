@@ -18,7 +18,7 @@
     We would like to extend this small field to a "large" field F_q^n
     presented as F_p[phi]/g(phi) where g is a polynomial over F_p of degree m*n
 
-    F_q^n is then ismorphic to F_p[theta][x]/(f(theta), h(theta, x)) for
+    F_q^n is then isomorphic to F_p[theta][x]/(f(theta), h(theta, x)) for
     some h of degree n in x.
 
     we compute h and values
@@ -54,7 +54,7 @@ theta #: $^14+2*$^10+2*$^6+2*$^4+$^2+1
 */
 
 
-/* the polynmial h is printed with variable x */
+/* the polynomial h is printed with variable x */
 /*
 static void _embed_print(const fq_nmod_embed_t emb)
 {
@@ -248,7 +248,7 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
 /*
 flint_printf("**** emb[%wd]:\n",k); _embed_print(emb + k);
 */
-        /* the set of h's sould be the factorization of bigctx->modulus */
+        /* the set of h's should be the factorization of bigctx->modulus */
         FLINT_ASSERT(fq_nmod_poly_is_irreducible(cur->h, smallctx));
         FLINT_ASSERT(fq_nmod_poly_divides(poly, poly, cur->h, smallctx));
     }

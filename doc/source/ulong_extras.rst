@@ -315,7 +315,7 @@ Greatest common divisor
     Returns the greatest common divisor `g` of `x` and `y`. No assumptions
     are made about the values `x` and `y`.
 
-    The algorithm is a slight embelishment of the Euclidean algorithm
+    The algorithm is a slight embellishment of the Euclidean algorithm
     which uses some branches to avoid most divisions.
 
     One wishes to compute the quotient and remainder of `u_3 / v_3` without 
@@ -1107,7 +1107,7 @@ Factorisation
     of SQUFOF. Simply set ``iters`` to `` WORD(0)`` for maximum 
     persistence.
 
-    The version of SQUFOF imlemented here is as described by Gower 
+    The version of SQUFOF implemented here is as described by Gower 
     and Wagstaff [GowWag2008]_.
 
 
@@ -1229,7 +1229,7 @@ Factorisation
     Pollard Rho algorithm (with Brent modification) for integer factorization. 
     Assumes that the `n` is not prime. `factor` is set as the factor if found. 
     It is not assured that the factor found will be prime. Does not compute the complete 
-    factorization, just one factor. Returns 1 if factorization is successfull 
+    factorization, just one factor. Returns 1 if factorization is successful 
     (non trivial factor is found), else returns 0. Assumes `n` is normalized,
     (shifted by normbits bits), and takes as input a precomputed inverse of `n` as 
     computed by :func:`n_preinvert_limb`. `ai` and `xi` should also be shifted
@@ -1240,12 +1240,12 @@ Factorisation
     cycle.
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
-    suggested by Richard Brent in the paper, availible at
+    suggested by Richard Brent in the paper, available at
     http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 .. function:: int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, mp_limb_t max_tries, mp_limb_t max_iters)
 
-    Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to 
+    Pollard Rho algorithm, modified as suggested by Richard Brent. Makes a call to 
     :func:`n_factor_pollard_brent_single`. The input parameters ai and xi for
     :func:`n_factor_pollard_brent_single` are selected at random. 
 

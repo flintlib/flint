@@ -256,7 +256,7 @@ Radix 2 transforms
     are then equal to what they would have been if the inverse transform of
     the right hand side of the input array had been computed with full data
     from the start. The function ``ifft_truncate1`` is then called on the
-    entire right half of the input array with this auxilliary data filled in.
+    entire right half of the input array with this auxiliary data filled in.
     Finally a single layer of the IFFT is completed on all the coefficients
     up to ``trunc`` being careful to note that this involves doubling the
     coefficients from ``trunc - n`` up to ``n``.

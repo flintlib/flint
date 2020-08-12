@@ -143,11 +143,11 @@ Factorisation
 
 .. function:: void fq_nmod_poly_factor_distinct_deg(fq_nmod_poly_factor_t res, const fq_nmod_poly_t poly, slong * const *degs, const fq_nmod_ctx_t ctx)
 
-    Factorises a monic non-constant squarefree polymnomial ``poly``
+    Factorises a monic non-constant squarefree polynomial ``poly``
     of degree n into factors `f[d]` such that for `1 \leq d \leq n`
     `f[d]` is the product of the monic irreducible factors of
     ``poly`` of degree `d`. Factors are stored in ``res``,
-    assotiated powers of irreducible polynomials are stored in
+    associated powers of irreducible polynomials are stored in
     ``degs`` in the same order as factors.
 
     Requires that ``degs`` have enough space for irreducible polynomials'
@@ -162,7 +162,7 @@ Factorisation
     Factorises a non-constant polynomial ``f`` into monic
     irreducible factors choosing the best algorithm for given modulo
     and degree. The output ``lead`` is set to the leading coefficient of `f`
-    upon return. Choice of algorithm is based on heuristic measurments.
+    upon return. Choice of algorithm is based on heuristic measurements.
 
 .. function:: void fq_nmod_poly_factor_cantor_zassenhaus(fq_nmod_poly_factor_t res, const fq_nmod_poly_t f, const fq_nmod_ctx_t ctx)
 
