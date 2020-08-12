@@ -57,13 +57,14 @@
 static __inline__
 void flint_mpz_set_si(mpz_ptr r, slong s)
 {
-#if __GNU_MP_RELEASE >= 60200
+   /* GMP 6.2 lazily performs allocation, deal with that if necessary
+      (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
       r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
-#endif
+
    if (s < 0) {
       r->_mp_size = -1;
       r->_mp_d[0] = -s;
@@ -76,13 +77,14 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
 static __inline__
 void flint_mpz_set_ui(mpz_ptr r, ulong u)
 {
-#if __GNU_MP_RELEASE >= 60200
+   /* GMP 6.2 lazily performs allocation, deal with that if necessary
+      (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
       r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
-#endif
+
    r->_mp_d[0] = u; 
    r->_mp_size = u != 0;
 }
