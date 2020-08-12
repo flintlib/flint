@@ -1231,3 +1231,9 @@ v 2.6.2 -- 31 Jul 2020
  * Fix for choice of generator in an fq finite field of degree one
  * Fix an incorrectly written test
 
+v 2.6.3 -- 12 Aug 2020
+
+ * Fix a bug in generator of finite field in characteristic 2
+ * Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeagbly
+ * Fix some old license headers
+
