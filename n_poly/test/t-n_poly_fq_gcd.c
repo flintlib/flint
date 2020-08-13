@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "n_poly.h"
-#include "profiler.h"
-
 
 int
 main(void)
