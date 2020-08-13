@@ -521,14 +521,14 @@ Special functions
 
 .. function:: void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 
-    Computes the Teichmuller lift of the `p`-adic unit ``op``, 
+    Computes the Teichm\"uller lift of the `p`-adic unit ``op``, 
     assuming that `N \geq 1`.
 
     Supports aliasing between ``rop`` and ``op``.
 
 .. function:: void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Computes the Teichmuller lift of the `p`-adic unit ``op``.
+    Computes the Teichm\"uller lift of the `p`-adic unit ``op``.
 
     If ``op`` is a `p`-adic integer divisible by `p`, sets ``rop`` 
     to zero, which satisfies `t^p - t = 0`, although it is clearly not 

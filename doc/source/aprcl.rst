@@ -151,7 +151,7 @@ Memory management
 
     Sets `f` to zero.
 
-Comparision
+Comparison
 ................................................................................
 
 .. function:: slong unity_zp_is_unity(const unity_zp f)

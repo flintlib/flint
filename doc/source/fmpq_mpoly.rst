@@ -262,7 +262,7 @@ Container operations
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
     The mutating functions here are not guaranteed to leave the polynomial in reduced form (see :func:`fmpq_mpoly_is_canonical` for a definition of reduced).
     This means that even if nonzero terms with distinct exponents have been constructed in the correct order, a call to :func:`fmpq_mpoly_reduce` is necessary to ensure that the polynomial is in canonical form.
-    As with the ``fmpz_mpoly`` module, a call to :func:`fmpq_mpoly_sort_terms` followed by a call to :func:`fmpq_mpoly_combine_like_terms` should leave the polynomial in canoncial form.
+    As with the ``fmpz_mpoly`` module, a call to :func:`fmpq_mpoly_sort_terms` followed by a call to :func:`fmpq_mpoly_combine_like_terms` should leave the polynomial in canonical form.
 
 .. function:: fmpq * fmpq_mpoly_content_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 

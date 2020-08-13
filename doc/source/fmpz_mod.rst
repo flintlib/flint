@@ -86,7 +86,7 @@ Discrete Logarithms via Pohlig-Hellman
 
 .. function:: void fmpz_mod_discrete_log_pohlig_hellman_init(fmpz_mod_discrete_log_pohlig_hellman_t L)
 
-    Initialize ``L``. Upon initilization ``L`` is not ready for computation.
+    Initialize ``L``. Upon initialization ``L`` is not ready for computation.
 
 .. function:: void fmpz_mod_discrete_log_pohlig_hellman_clear(fmpz_mod_discrete_log_pohlig_hellman_t L)
 
@@ -103,7 +103,7 @@ Discrete Logarithms via Pohlig-Hellman
 
 .. function:: void fmpz_mod_discrete_log_pohlig_hellman_run(fmpz_t x, const fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t y)
 
-    Set ``x`` to the logarithm of ``y`` with repect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
+    Set ``x`` to the logarithm of ``y`` with respect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
     The function is undefined if the logarithm does not exist.
 
 
