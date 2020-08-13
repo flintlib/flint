@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,32 +9,32 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
+#include "fq_zech_mpoly.h"
 
-int fq_nmod_mpoly_repack_bits(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
-                              flint_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx)
+int fq_zech_mpoly_repack_bits(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+                              flint_bitcnt_t Abits, const fq_zech_mpoly_ctx_t ctx)
 {
     slong i;
     int success;
-    fq_nmod_mpoly_t T;
+    fq_zech_mpoly_t T;
 
     Abits = mpoly_fix_bits(Abits, ctx->minfo);
 
     if (B->bits == Abits || B->length == 0)
     {
-        fq_nmod_mpoly_set(A, B, ctx);
+        fq_zech_mpoly_set(A, B, ctx);
         return 1;
     }
     
     /* must use B->alloc because we are going to swap coeff in aliasing case */
-    fq_nmod_mpoly_init3(T, B->alloc, Abits, ctx);
+    fq_zech_mpoly_init3(T, B->alloc, Abits, ctx);
     success = mpoly_repack_monomials(T->exps, Abits, B->exps, B->bits,
                                                         B->length, ctx->minfo);
     if (success)
     {
         if (A == B)
         {
-            fq_nmod_struct * temp = A->coeffs;
+            fq_zech_struct * temp = A->coeffs;
             A->coeffs = T->coeffs;
             T->coeffs = temp;
         }
@@ -42,22 +42,22 @@ int fq_nmod_mpoly_repack_bits(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
         {
             for (i = 0; i < B->length; i++)
             {
-                fq_nmod_set(T->coeffs + i, B->coeffs + i, ctx->fqctx);
+                fq_zech_set(T->coeffs + i, B->coeffs + i, ctx->fqctx);
             }
         }
-        _fq_nmod_mpoly_set_length(T, B->length, ctx);
-        fq_nmod_mpoly_swap(A, T, ctx);
+        _fq_zech_mpoly_set_length(T, B->length, ctx);
+        fq_zech_mpoly_swap(A, T, ctx);
     }
 
-    fq_nmod_mpoly_clear(T, ctx);
+    fq_zech_mpoly_clear(T, ctx);
 
     return success;
 }
 
-int fq_nmod_mpoly_repack_bits_inplace(
-    fq_nmod_mpoly_t A,
+int fq_zech_mpoly_repack_bits_inplace(
+    fq_zech_mpoly_t A,
     flint_bitcnt_t Abits,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_zech_mpoly_ctx_t ctx)
 {
     int success;
     ulong * texps;
