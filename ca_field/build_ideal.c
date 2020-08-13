@@ -158,8 +158,10 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     if (len >= 2)
     {
         slong * logs;
-        slong num_logs;
+        slong num_logs, num_logs_with_pi_i;
         slong prec;
+        int have_pi, have_i, have_pi_i;
+        slong index_pi, index_i;
 
         num_logs = 0;
         logs = flint_malloc(sizeof(slong) * len);
@@ -173,7 +175,32 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             }
         }
 
-        if (num_logs >= 2)
+        have_i = have_pi = 0;
+        index_i = index_pi = -1;
+        for (i = 0; i < len; i++)
+        {
+            if (CA_FIELD_EXT_ELEM(K, i) == CA_FIELD_EXT_ELEM(ctx->field_qq_i, 0))
+            {
+                index_i = i;
+                have_i = 1;
+                break;
+            }
+        }
+
+        for (i = 0; i < len; i++)
+        {
+            if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, i)) == CA_Pi)
+            {
+                index_pi = i;
+                have_pi = 1;
+                break;
+            }
+        }
+
+        have_pi_i = have_pi && have_i;
+        num_logs_with_pi_i = num_logs + have_pi_i;
+
+        if (num_logs_with_pi_i >= 2)
         {
             acb_ptr z;
             acb_t t;
@@ -184,12 +211,10 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             /* todo: dynamic precision determined by context */
             prec = 128;
 
-            z = _acb_vec_init(num_logs + 1);
-            rel = _fmpz_vec_init(num_logs + 1);
+            z = _acb_vec_init(num_logs_with_pi_i);
+            rel = _fmpz_vec_init(num_logs_with_pi_i);
             acb_init(t);
             mag_init(tm);
-
-            /* todo: pi * i */
 
             for (j = 0; j < num_logs; j++)
             {
@@ -198,7 +223,15 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 acb_log(z + j, z + j, prec);
             }
 
-            if (_qqbar_acb_lindep(rel, z, num_logs, 1, prec))
+            /* Add 2 pi i as another logarithm */
+            if (have_pi_i)
+            {
+                acb_const_pi(z + num_logs, prec);
+                acb_mul_onei(z + num_logs, z + num_logs);
+                acb_mul_2exp_si(z + num_logs, z + num_logs, 1);
+            }
+
+            if (_qqbar_acb_lindep(rel, z, num_logs_with_pi_i, 1, prec))
             {
                 ca_t prod, upow;
 
@@ -206,7 +239,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 /* Verify that (m*log(a) + n*log(b)) / (2 pi i) contains unique integer. */
                 /* It is enough to show that |... + ...| < 2^1. */
                 acb_zero(t);
-                for (j = 0; j < num_logs; j++)
+                for (j = 0; j < num_logs_with_pi_i; j++)
                     if (!fmpz_is_zero(rel + j))
                         acb_addmul_fmpz(t, z + j, rel + j, prec);
                 acb_get_mag(tm, t);
@@ -264,7 +297,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
                             exp = flint_malloc(sizeof(ulong) * len);
 
-                            for (j = 0; j < num_logs; j++)
+                            for (j = 0; j < num_logs_with_pi_i; j++)
                             {
                                 slong k;
 
@@ -274,7 +307,17 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                                 for (k = 0; k < len; k++)
                                     exp[k] = 0;
 
-                                exp[j] = 1;
+                                /* 2 pi i */
+                                if (j == num_logs)
+                                {
+                                    exp[index_i] = 1;
+                                    exp[index_pi] = 1;
+                                    fmpz_mul_2exp(rel + j, rel + j, 1);
+                                }
+                                else
+                                {
+                                    exp[logs[j]] = 1;
+                                }
 
                                 fmpz_mpoly_set_coeff_fmpz_ui(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)),
                                     rel + j,
@@ -286,7 +329,6 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                         }
 
                         CA_FIELD_IDEAL_LENGTH(K)++;
-
                     }
 
                     ca_clear(prod, ctx);
@@ -294,8 +336,8 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 }
             }
 
-            _acb_vec_clear(z, num_logs + 1);
-            _fmpz_vec_clear(rel, num_logs + 1);
+            _acb_vec_clear(z, num_logs_with_pi_i);
+            _fmpz_vec_clear(rel, num_logs_with_pi_i);
             acb_clear(t);
             mag_clear(tm);
         }

@@ -1,4 +1,4 @@
-.. ca:
+.. _ca:
 
 **ca.h** -- exact real and complex numbers
 ===============================================================================
@@ -17,23 +17,18 @@ where the symbols `a_k` denote fixed algebraic or transcendental numbers
 called *extension numbers*.
 For example, `e^{-2 \pi} - 3 i` may be represented as
 `(1 - 3 a_2^2 a_1) / a_2^2` in the field `\mathbb{Q}(a_1,a_2)` with
-`a_1 = i, a_2 = e^{\pi}`. Extension numbers `a_k` can have the following
-form:
+`a_1 = i, a_2 = e^{\pi}`.
+Extension numbers and fields are documented
+in the following separate modules:
 
-* Algebraic numbers represented
-  in canonical form by :type:`qqbar_t` instances (example: `i`).
-* Symbolic constants (example: `\pi`),
-  or symbolic functions applied to :type:`ca_t` arguments
-  (example: `e^{\pi} = \exp(x)`, where `x = 1 \cdot \pi`
-  is a :type:`ca_t` representing an element of `\mathbb{Q}(\pi)`).
-  Constants and functions use the same internal representation;
-  a constant is just a function with zero-length argument list.
-* (Not implemented): user-defined constants and functions defined by suppling
-  function pointers for Arb numerical evaluation to specified precision.
+* :ref:`ca-ext`
 
-The user does not need to construct formal fields explicitly:
-operations on Calcium numbers generate and cache fields automatically as needed
-to express the results.
+* :ref:`ca-field`
+
+The user does not need to construct extension numbers or formal
+extension fields explicitly: each :type:`ca_t` contains an internal
+pointer to its formal field, and operations on Calcium numbers generate
+and cache fields automatically as needed to express the results.
 
 This representation is not canonical (in general). A given complex number
 can be represented in different ways depending on
@@ -62,7 +57,7 @@ Extension numbers are always sorted `a_1 \succ a_2 \succ \ldots \succ a_n`
 where `\succ` denotes a structural ordering (see :func:`ca_cmp_repr`).
 If the reduction ideal is triangular and the multivariate polynomial
 arithmetic uses lexicographic ordering, reduction by *I*
-eliminates elements `a_i` with higher complexity in the sense of `\succ`.
+eliminates numbers `a_i` with higher complexity in the sense of `\succ`.
 
 The reduction ideal is an imperfect computational crutch: it is not guaranteed
 to capture *all* algebraic relations, and reduction is not guaranteed

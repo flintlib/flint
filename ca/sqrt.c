@@ -33,7 +33,6 @@ _ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
     ca_init(tmp, ctx);
 
     _ca_function_fx(y, CA_Sqrt, x, ctx);
-
     ca_merge_fields(tmp, res, x, y, ctx);
 
     ca_clear(y, ctx);

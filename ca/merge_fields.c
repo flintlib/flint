@@ -77,6 +77,12 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
         return;
     }
 
+    if (x == resx || y == resy)
+    {
+        flint_printf("ca_merge_fields: aliasing not implemented!\n");
+        flint_abort();
+    }
+
     xlen = CA_FIELD_LENGTH(xfield);
     ylen = CA_FIELD_LENGTH(yfield);
 

@@ -10,8 +10,62 @@
 */
 
 #include "ca.h"
+#include "ca_ext.h"
 
 int fmpz_mpoly_evaluate_qqbar(qqbar_t res, const fmpz_mpoly_t pol, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
+
+int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx);
+int ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx);
+
+
+int
+ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx)
+{
+    if (CA_EXT_IS_QQBAR(x))
+        return 1;
+
+    if (CA_EXT_HEAD(x) == CA_Sqrt)
+        return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx);
+
+    if (CA_EXT_HEAD(x) == CA_Pow)
+        return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx) &&
+               CA_IS_QQ(CA_EXT_FUNC_ARGS(x) + 1, ctx);
+
+    return 0;
+}
+
+int
+ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+    {
+        return 0;
+    }
+    else if (CA_IS_QQ(x, ctx))
+    {
+        return 1;
+    }
+    else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
+    {
+        return 1;
+    }
+    else
+    {
+        slong len, i;
+
+        len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
+
+        /* todo: exclude extension numbers that are not actually used */
+        for (i = 0; i < len; i++)
+        {
+            if (!ca_ext_can_evaluate_qqbar(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i), ctx))
+                return 0;
+        }
+
+        return 1;
+    }
+}
+
 
 int
 ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
@@ -62,24 +116,76 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
             qqbar_ptr xs;
             qqbar_t y;
             int success;
+            int * init_mask;
+
+            if (!ca_can_evaluate_qqbar(x, ctx))
+                return 0;
 
             deg_limit = ctx->options[CA_OPT_QQBAR_DEG_LIMIT];
             bits_limit = 10 * ctx->options[CA_OPT_PREC_LIMIT]; /* xxx */
 
             len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
 
-            for (i = 0; i < len; i++)
-            {
-                if (!CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)))
-                    return 0;
-            }
-
             success = 0;
             xs = (qqbar_struct *) flint_malloc(sizeof(qqbar_struct) * len);
+            init_mask = (int *) flint_calloc(sizeof(int), len);
             qqbar_init(y);
 
+            /* todo: allow non-qqbar extension elements to cache a qqbar value */
             for (i = 0; i < len; i++)
-                xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
+            {
+                if (CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)))
+                {
+                    xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Sqrt)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    /* todo: maybe do a x2 bounds check */
+                    qqbar_sqrt(xs + i, xs + i);
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Pow)
+                {
+                    ca_srcptr base, exp;
+
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    base = CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
+                    exp = CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) + 1;
+
+                    if (!CA_IS_QQ(exp, ctx))
+                        goto cleanup;
+
+                    if (!ca_get_qqbar(xs + i, base, ctx))
+                        goto cleanup;
+
+                    /* todo: better condition on the exponent numerator */
+                    if (fmpz_bits(fmpq_denref(CA_FMPQ(exp))) > 20 ||
+                        fmpz_bits(fmpq_numref(CA_FMPQ(exp))) > 20 ||
+                        *fmpq_denref(CA_FMPQ(exp)) * qqbar_degree(xs + i) > ctx->options[CA_OPT_QQBAR_DEG_LIMIT] ||
+                        (qqbar_height_bits(xs + i) + 1) * fmpz_bits(fmpq_numref(CA_FMPQ(exp))) > ctx->options[CA_OPT_PREC_LIMIT])
+                        goto cleanup;
+
+                    qqbar_root_ui(xs + i, xs + i, *fmpq_denref(CA_FMPQ(exp)));
+                    if (*fmpq_numref(CA_FMPQ(exp)) >= 0)
+                    {
+                        qqbar_pow_ui(xs + i, xs + i, *fmpq_numref(CA_FMPQ(exp)));
+                    }
+                    else
+                    {
+                        qqbar_inv(xs + i, xs + i);
+                        qqbar_pow_ui(xs + i, xs + i, -*fmpq_numref(CA_FMPQ(exp)));
+                    }
+
+                    goto cleanup;
+                }
+            }
 
             if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
             {
@@ -93,6 +199,14 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
                 }
             }
 
+cleanup:
+            for (i = 0; i < len; i++)
+            {
+                if (init_mask[i])
+                    qqbar_clear(xs + i);
+            }
+
+            flint_free(init_mask);
             flint_free(xs);
             qqbar_clear(y);
 

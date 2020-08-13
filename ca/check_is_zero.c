@@ -99,38 +99,16 @@ cleanup:
 truth_t
 _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
 {
-    slong i, len, deg_limit, bits_limit;
-    qqbar_ptr xs;
-    qqbar_t y;
+    qqbar_t t;
     truth_t res;
+    qqbar_init(t);
 
-    deg_limit = ctx->options[CA_OPT_QQBAR_DEG_LIMIT];
-    bits_limit = 10 * ctx->options[CA_OPT_PREC_LIMIT]; /* xxx */
+    if (ca_get_qqbar(t, x, ctx))
+        res = qqbar_is_zero(t) ? T_TRUE : T_FALSE;
+    else
+        res = T_UNKNOWN;
 
-    len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
-
-    for (i = 0; i < len; i++)
-    {
-        /* todo: could allow symbolic functions that allow evaluation to qqbar */
-        if (!CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)))
-            return T_UNKNOWN;
-    }
-
-    res = T_UNKNOWN;
-    xs = (qqbar_struct *) flint_malloc(sizeof(qqbar_struct) * len);
-    qqbar_init(y);
-
-    for (i = 0; i < len; i++)
-        xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
-
-    if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
-    {
-        res = qqbar_is_zero(y) ? T_TRUE : T_FALSE;
-    }
-
-    flint_free(xs);
-    qqbar_clear(y);
-
+    qqbar_clear(t);
     return res;
 }
 
