@@ -1105,7 +1105,7 @@ v 2.5.0 -- 07 Aug 2015
 
   * LLL (rational, Nguyen-Stehle, from Gram matrix, with_removal, Storjohann/ULLL)
   * Hermite normal form (naive, xgcd, Domich-Kannan-Trotter, Kannan-Bachem, Pernet-Stein)
-  * Smith normal form (diagonal, Kannen-Bachem, Iliopoulos)
+  * Smith normal form (diagonal, Kannan-Bachem, Iliopoulos)
   * Paterson-Stockmeyer algorithm
   * modular resultant
   * hgcd resultant

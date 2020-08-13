@@ -505,7 +505,7 @@ Scalar absolute value, multiplication and division
 
 .. function:: void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k)
 
-    Scale ``(pol, len)`` to `p(2^k X)` inplace and divide by the
+    Scale ``(pol, len)`` to `p(2^k X)` in-place and divide by the
     2-content (so that the gcd of coefficients is odd). If ``k``
     is negative the polynomial is multiplied by `2^{kd}`.
 

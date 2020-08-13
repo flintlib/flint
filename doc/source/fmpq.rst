@@ -189,7 +189,7 @@ Conversion
     Sets the value of ``dest`` to the value represented in the string
     ``s`` in base ``base``.
 
-    Returns 0 if no error occurrs. Otherwise returns -1 and ``dest`` is
+    Returns 0 if no error occurs. Otherwise returns -1 and ``dest`` is
     set to zero.
 
 .. function:: void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t p, const mpz_t q)

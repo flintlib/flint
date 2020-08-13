@@ -17,7 +17,7 @@
 #include "mpn_extras.h"
 
 /* 
-   Divide (arrayg, limbsg) by the positive value gc inplace and
+   Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
 */
 mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)

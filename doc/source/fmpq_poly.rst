@@ -130,7 +130,7 @@ Accessing the numerator and denominator
 .. function:: void fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
 
     Sets ``res`` to the numerator of ``poly``, e.g. the primitive part
-    as an ``fmpz_poly_t`` if it is in cannoical form .
+    as an ``fmpz_poly_t`` if it is in canonical form .
 
 .. function:: void fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
 

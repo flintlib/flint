@@ -1272,12 +1272,12 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
 .. function:: void fmpz_multi_crt_init(fmpz_multi_crt_t CRT)
 
-    Initialize ``CRT`` for chinese remaindering.
+    Initialize ``CRT`` for Chinese remaindering.
 
 .. function:: int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT, const fmpz * moduli, slong len)
               int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
 
-    Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
+    Configure ``CRT`` for repeated Chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future
     calls to :func:`fmpz_crt_precomp` will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.

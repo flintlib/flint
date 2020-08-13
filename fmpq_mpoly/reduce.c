@@ -41,7 +41,7 @@ void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     if (fmpz_is_zero(g))
     {
-        /* bail if A->zpoly has only zeros stored (A->zpoly not canoncial) */
+        /* bail if A->zpoly has only zeros stored (A->zpoly not canonical) */
         fmpq_one(A->content);
     }
     else if (fmpz_is_pm1(g))

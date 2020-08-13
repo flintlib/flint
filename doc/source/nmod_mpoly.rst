@@ -430,7 +430,7 @@ Evaluation
     Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
     Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
     Return `1` for success and `0` for failure.
-    The main method attemps to perform the calculation using matrices and chooses heuristically between the ``geobucket`` and ``horner`` methods if needed.
+    The main method attempts to perform the calculation using matrices and chooses heuristically between the ``geobucket`` and ``horner`` methods if needed.
 
 .. function:: void nmod_mpoly_compose_nmod_mpoly_gen(nmod_mpoly_t A, const nmod_mpoly_t B, const slong * c, const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
 
@@ -548,7 +548,7 @@ The greatest common divisor functions assume that the modulus is prime.
 
 .. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
-    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zipple's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zippel's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
 
 
 Univariate Functions

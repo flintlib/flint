@@ -485,7 +485,7 @@ Evaluation
     The length of the array ``C`` is the number of variables in ``ctxB``.
     Neither ``A`` nor ``B`` is allowed to alias any other polynomial.
     Return `1` for success and `0` for failure.
-    The main method attemps to perform the calculation using matrices and chooses heuristically between the ``geobucket`` and ``horner`` methods if needed.
+    The main method attempts to perform the calculation using matrices and chooses heuristically between the ``geobucket`` and ``horner`` methods if needed.
 
 .. function:: void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A, const fmpz_mpoly_t B, const slong * c, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 
@@ -794,7 +794,7 @@ Internal Functions
     Set ``scale``, ``q`` and ``r`` so that
     ``scale*poly2 = q*poly3 + r`` and no monomial in ``r`` is divisible
     by the leading monomial of ``poly3``, where ``scale`` is positive
-    and as small as possible. This function throws an execption if
+    and as small as possible. This function throws an exception if
     ``poly3`` is zero or if an exponent overflow occurs.
 
 
