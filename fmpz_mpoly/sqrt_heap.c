@@ -64,10 +64,10 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
            FLINT_ABS(bits2) <= 2*(FLINT_BITS - 3);
 
     /* alloc array of heap nodes which can be chained together */
-    next_loc = len2 + 3;   /* something bigger than heap can ever be */
-    heap = (mpoly_heap1_s *) TMP_ALLOC((next_loc - 1)*sizeof(mpoly_heap1_s));
-    chain = (mpoly_heap_t *) TMP_ALLOC((next_loc - 2)*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*(next_loc - 2)*sizeof(mpoly_heap_t *));
+    next_loc = len2 + 4;   /* something bigger than heap can ever be */
+    heap = (mpoly_heap1_s *) TMP_ALLOC((next_loc - 2)*sizeof(mpoly_heap1_s));
+    chain = (mpoly_heap_t *) TMP_ALLOC((next_loc - 3)*sizeof(mpoly_heap_t));
+    store = store_base = (slong *) TMP_ALLOC(2*(next_loc - 3)*sizeof(mpoly_heap_t *));
 
     /* mask with high bit set in each field of exponent vector */
     mask = 0;
@@ -402,29 +402,29 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
     fmpz_init(r);
     fmpz_init(temp);
 
-   /* if intermediate computations a - c_i*c_j likely fit in three words */
-   bits2 = _fmpz_vec_max_bits(poly2, len2);
-   /* add 1 for sign, 1 for subtraction and 1 for multiplication by 2 */
-   small = FLINT_ABS(bits2) + FLINT_BIT_COUNT(len2) + 3 <= 2*FLINT_BITS && 
+    /* if intermediate computations a - c_i*c_j likely fit in three words */
+    bits2 = _fmpz_vec_max_bits(poly2, len2);
+    /* add 1 for sign, 1 for subtraction and 1 for multiplication by 2 */
+    small = FLINT_ABS(bits2) + FLINT_BIT_COUNT(len2) + 3 <= 2*FLINT_BITS && 
            FLINT_ABS(bits2) <= 2*(FLINT_BITS - 3);
 
     /* alloc array of heap nodes which can be chained together */
-    next_loc = len2 + 3;   /* something bigger than heap can ever be */
-    heap = (mpoly_heap_s *) TMP_ALLOC((next_loc - 1)*sizeof(mpoly_heap_s));
-    chain = (mpoly_heap_t *) TMP_ALLOC((next_loc - 2)*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*(next_loc - 2)*sizeof(mpoly_heap_t *));
+    next_loc = len2 + 4;   /* something bigger than heap can ever be */
+    heap = (mpoly_heap_s *) TMP_ALLOC((next_loc - 2)*sizeof(mpoly_heap_s));
+    chain = (mpoly_heap_t *) TMP_ALLOC((next_loc - 3)*sizeof(mpoly_heap_t));
+    store = store_base = (slong *) TMP_ALLOC(2*(next_loc - 3)*sizeof(mpoly_heap_t *));
 
     /* array of exponent vectors, each of "N" words */
-    exps = (ulong *) TMP_ALLOC((next_loc - 2)*N*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC((next_loc - 3)*N*sizeof(ulong));
     /* list of pointers to available exponent vectors */
-    exp_list = (ulong **) TMP_ALLOC((next_loc - 2)*sizeof(ulong *));
+    exp_list = (ulong **) TMP_ALLOC((next_loc - 3)*sizeof(ulong *));
     /* space to save copy of current exponent vector */
     exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     /* final exponent */
     exp3 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     /* set up list of available exponent vectors */
     exp_next = 0;
-    for (i = 0; i < next_loc - 2; i++)
+    for (i = 0; i < next_loc - 3; i++)
         exp_list[i] = exps + i*N;
 
     /* mask with high bit set in each word of each field of exponent vector */
