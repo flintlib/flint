@@ -88,7 +88,7 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
     }
 
     if (fmpz_sgn(poly2 + 0) < 0)/* not a perfect square coeff */
-        goto cleanup; 
+        goto not_sqrt; 
 
     _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
    
@@ -112,7 +112,7 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
         invert_limb(lc_i, lc_n);
 
         _fmpz_demote(q_coeff + 0);
-        q_coeff[q_len] = lc_abs;            
+        q_coeff[0] = lc_abs;            
     } 
 
     if (!mpoly_monomial_halves1(q_exp + 0, exp2[0], mask))
@@ -472,7 +472,7 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
         invert_limb(lc_i, lc_n);
 
         _fmpz_demote(q_coeff + 0);
-        q_coeff[q_len] = lc_abs;            
+        q_coeff[0] = lc_abs;            
     }
     
     if (bits <= FLINT_BITS)
