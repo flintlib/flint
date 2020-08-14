@@ -254,6 +254,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                         ca_init(upow, ctx);
 
                         /* Check product of arguments to log. */
+                        /* Todo: separate positive/negative exponents, thus avoiding inverses? */
                         ca_one(prod, ctx);
                         for (j = 0; j < num_logs; j++)
                         {

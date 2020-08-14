@@ -11,6 +11,34 @@
 
 #include "ca.h"
 
+slong
+nf_elem_bits(const nf_elem_t x, nf_t nf)
+{
+    slong b, c;
+
+    if (nf->flag & NF_LINEAR)
+    {
+        flint_abort();
+    }
+    else if (nf->flag & NF_QUADRATIC)
+    {
+        b = fmpz_bits(QNF_ELEM_NUMREF(x));
+        c = fmpz_bits(QNF_ELEM_NUMREF(x) + 1);
+        b = FLINT_MAX(b, c);
+        c = fmpz_bits(QNF_ELEM_DENREF(x));
+        b = FLINT_MAX(b, c);
+        return b;
+    }
+    else
+    {
+        b = _fmpz_vec_max_bits(NF_ELEM_NUMREF(x), NF_ELEM(x)->length);
+        b = FLINT_ABS(b);
+        c = fmpz_bits(NF_ELEM_DENREF(x));
+        b = FLINT_MAX(b, c);
+        return b;
+    }
+}
+
 void
 ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
@@ -95,13 +123,37 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     xbits2 = fmpz_bits(CA_FMPQ_DENREF(x));
                     xbits1 = FLINT_MAX(xbits1, xbits2);
 
-                    if (xbits1 * (double) *CA_FMPQ_NUMREF(y) < ctx->options[CA_OPT_PREC_LIMIT])
+                    if (xbits1 * (double) FLINT_ABS(*CA_FMPQ_NUMREF(y)) < ctx->options[CA_OPT_PREC_LIMIT])
                     {
                         fmpq_t t;
                         fmpq_init(t);
                         fmpq_pow_si(t, CA_FMPQ(x), *CA_FMPQ_NUMREF(y));
                         ca_set_fmpq(res, t, ctx);
                         fmpq_clear(t);
+                        return;
+                    }
+                }
+
+                if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
+                {
+                    slong xbits1;
+
+                    xbits1 = nf_elem_bits(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx)));
+
+                    if (xbits1 * (double) FLINT_ABS(*CA_FMPQ_NUMREF(y)) < ctx->options[CA_OPT_PREC_LIMIT])
+                    {
+                        ca_t t;
+                        ca_init(t, ctx);
+
+                        if (fmpq_sgn(CA_FMPQ(y)) > 0)
+                            ca_set(t, x, ctx);
+                        else
+                            ca_inv(t, x, ctx);
+
+                        nf_elem_pow(CA_NF_ELEM(t), CA_NF_ELEM(t), FLINT_ABS(*CA_FMPQ_NUMREF(y)), CA_FIELD_NF(CA_FIELD(t, ctx)));
+                        ca_swap(res, t, ctx);
+
+                        ca_clear(t, ctx);
                         return;
                     }
                 }
