@@ -913,6 +913,16 @@ fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
                 const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
                                         slong len, const fmpz_mpoly_ctx_t ctx);
 
+/* Square root ***************************************************************/
+
+FLINT_DLL slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
+           ulong ** expq, slong * allocq, const fmpz * poly2,
+                                    const ulong * exp2, slong len2, 
+                        slong bits, slong N, const ulong * cmpmask, int check);
+	
+FLINT_DLL int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
+                                        const fmpz_mpoly_ctx_t ctx, int check);
+
 /* GCD ***********************************************************************/
 
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,

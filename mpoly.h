@@ -543,8 +543,29 @@ int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_halves(ulong * exp_ptr, const ulong * exp2,
+		                                           slong N, ulong mask)
+{
+   slong i;
+   ulong bw;
+
+   bw = mpn_rshift(exp_ptr, exp2, N, 1);
+
+   if (bw != 0)
+      return 0;
+
+   for (i = 0; i < N; i++)
+   {
+      if ((exp_ptr[i] & mask) != 0)
+         return 0;
+   }
+
+   return 1;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
-                                 const ulong * exp3, slong N, flint_bitcnt_t bits)
+                               const ulong * exp3, slong N, flint_bitcnt_t bits)
 {
     slong i;
 
@@ -558,6 +579,28 @@ int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
     } while (i < N);
 
     return 1;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_halves_mp(ulong * exp_ptr, const ulong * exp2,
+		                                  slong N, flint_bitcnt_t bits)
+{
+   slong i;
+   ulong bw;
+
+   bw = mpn_rshift(exp_ptr, exp2, N, 1);
+
+   if (bw != 0)
+      return 0;
+
+   i = bits/FLINT_BITS - 1;
+   do {
+      if ((slong)(exp_ptr[i]) < 0)
+         return 0;
+      i += bits/FLINT_BITS;
+   } while (i < N);
+
+   return 1;
 }
 
 MPOLY_INLINE
@@ -600,6 +643,20 @@ int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2,
    (*exp_ptr) = exp2 - exp3;
 
    if (((exp2 - exp3) & mask) != 0)
+      return 0;
+
+   return 1;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_halves1(ulong * exp_ptr, const ulong exp2, ulong mask)
+{
+   if (exp2 & 1)
+      return 0;
+
+   (*exp_ptr) = exp2 >> 1;
+
+   if (((exp2 >> 1) & mask) != 0)
       return 0;
 
    return 1;
