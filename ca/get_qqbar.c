@@ -182,8 +182,6 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
                         qqbar_inv(xs + i, xs + i);
                         qqbar_pow_ui(xs + i, xs + i, -*fmpq_numref(CA_FMPQ(exp)));
                     }
-
-                    goto cleanup;
                 }
             }
 

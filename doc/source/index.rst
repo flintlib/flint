@@ -17,6 +17,14 @@ and `Arb <http://arblib.org/>`_.
 
 Source code: https://github.com/fredrik-johansson/calcium
 
+Example programs
+---------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   examples.rst
+
 Module documentation
 ---------------------------
 
