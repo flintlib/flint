@@ -109,10 +109,7 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
 
         count_leading_zeros(lc_norm, lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
-
-        _fmpz_demote(q_coeff + 0);
-        q_coeff[0] = lc_abs;            
+        invert_limb(lc_i, lc_n);           
     } 
 
     if (!mpoly_monomial_halves1(q_exp + 0, exp2[0], mask))
@@ -469,10 +466,7 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
 
         count_leading_zeros(lc_norm, lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
-
-        _fmpz_demote(q_coeff + 0);
-        q_coeff[0] = lc_abs;            
+        invert_limb(lc_i, lc_n);          
     }
     
     if (bits <= FLINT_BITS)
