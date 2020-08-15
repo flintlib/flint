@@ -11,7 +11,7 @@ Types, macros and constants
     A struct for holding a factored rational polynomial. There is a
     single constant and a product of bases to corresponding exponents.
 
-.. type:: fmpq_mpoly_ctx_t
+.. type:: fmpq_mpoly_factor_t
 
     An array of length 1 of ``fmpq_mpoly_factor_struct``.
 
