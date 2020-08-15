@@ -127,13 +127,6 @@ typedef n_poly_stack_struct n_poly_stack_t[1];
         B = __t_m_p_;           \
     } while (0)
 
-#define MAC(h, m, l, a, b)                          \
-{                                                   \
-    mp_limb_t p1, p0;                               \
-    umul_ppmm(p1, p0, a, b);                        \
-    add_sssaaaaaa(h, m, l, h, m, l, 0, p1, p0);     \
-}
-
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
 
 N_POLY_INLINE

@@ -28,6 +28,8 @@ int fq_zech_bpoly_hlift2(
     FLINT_ASSERT(fq_zech_bpoly_is_canonical(A, ctx));
     FLINT_ASSERT(fq_zech_bpoly_is_canonical(B0, ctx));
     FLINT_ASSERT(fq_zech_bpoly_is_canonical(B1, ctx));
+    if (A->length < 1 || B0->length < 1 || B1->length < 1)
+        return -1;
 
     fq_zech_poly_init(c, ctx);
     fq_zech_poly_init(s, ctx);
@@ -171,12 +173,16 @@ int fq_zech_bpoly_hlift(
     fq_zech_t malpha;
 
     FLINT_ASSERT(r > 2);
+
     FLINT_ASSERT(fq_zech_bpoly_is_canonical(A, ctx));
+    if (A->length < 1)
+        return -1;
 
     for (i = 0; i < r; i++)
     {
-        FLINT_ASSERT(B[i].length > 0);
         FLINT_ASSERT(fq_zech_bpoly_is_canonical(B + i, ctx));
+        if (B[i].length < 1)
+            return -1;
     }
 
     U = FLINT_ARRAY_ALLOC(r, fq_zech_bpoly_struct);

@@ -27,6 +27,12 @@ int n_bpoly_mod_hlift2(
     FLINT_ASSERT(n_bpoly_mod_is_canonical(A, mod));
     FLINT_ASSERT(n_bpoly_mod_is_canonical(B0, mod));
     FLINT_ASSERT(n_bpoly_mod_is_canonical(B1, mod));
+    if (A->length < 1 || B0->length < 1 || B1->length < 1)
+        return -1;
+
+    FLINT_ASSERT(n_bpoly_mod_is_canonical(A, mod));
+    FLINT_ASSERT(n_bpoly_mod_is_canonical(B0, mod));
+    FLINT_ASSERT(n_bpoly_mod_is_canonical(B1, mod));
 
     n_poly_init(c);
     n_poly_init(s);
@@ -37,12 +43,6 @@ int n_bpoly_mod_hlift2(
     n_bpoly_mod_taylor_shift_var0(A, alpha, mod);
     n_bpoly_mod_taylor_shift_var0(B0, alpha, mod);
     n_bpoly_mod_taylor_shift_var0(B1, alpha, mod);
-
-    if (A->length <= 0 || B0->length <= 0 || B1->length <= 0)
-    {
-        success = -1;
-        goto cleanup;
-    }
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
     FLINT_ASSERT(n_poly_degree(A->coeffs + 0) == n_poly_degree(B0->coeffs + 0) +
@@ -161,12 +161,16 @@ int n_bpoly_mod_hlift(
     n_bpoly_struct * U;
 
     FLINT_ASSERT(r > 2);
+
     FLINT_ASSERT(n_bpoly_mod_is_canonical(A, mod));
+    if (A->length < 1)
+        return -1;
 
     for (i = 0; i < r; i++)
     {
-        FLINT_ASSERT(B[i].length > 0);
         FLINT_ASSERT(n_bpoly_mod_is_canonical(B + i, mod));
+        if (B[i].length < 1)
+            return -1;
     }
 
     U = (n_bpoly_struct *) flint_malloc(r*sizeof(n_bpoly_struct));

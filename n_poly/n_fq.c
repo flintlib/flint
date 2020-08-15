@@ -12,6 +12,12 @@
 #include "n_poly.h"
 #include "nmod_vec.h"
 
+#define MAC(h, m, l, a, b)                          \
+{                                                   \
+    mp_limb_t p1, p0;                               \
+    umul_ppmm(p1, p0, a, b);                        \
+    add_sssaaaaaa(h, m, l, h, m, l, 0, p1, p0);     \
+}
 
 void n_fq_print_pretty(
     const mp_limb_t * a,
