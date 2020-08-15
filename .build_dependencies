@@ -5,8 +5,8 @@ cd yasm
 git checkout v1.3.0
 ./autogen.sh
 ./configure ABI=$ABI --prefix=${LOCAL}
-${MAKE} > /dev/null 2>&1
-${MAKE} install > /dev/null 2>&1
+${MAKE}
+${MAKE} install
 cd ..
 
 wget http://mpir.org/mpir-3.0.0.tar.bz2
@@ -15,16 +15,16 @@ mkdir -p local
 
 cd mpir-3.0.0
 ./configure ABI=$ABI --enable-gmpcompat --prefix=${LOCAL} --with-yasm=${LOCAL}/bin/yasm
-${MAKE} > /dev/null 2>&1
-${MAKE} install > /dev/null 2>&1
+${MAKE}
+${MAKE} install
 cd ..
 
 wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
 tar -xf mpfr-4.0.0.tar.bz2
 cd mpfr-4.0.0
 ./configure ABI=$ABI --with-gmp=${LOCAL} --prefix=${LOCAL}
-${MAKE} > /dev/null 2>&1
-${MAKE} install > /dev/null 2>&1
+${MAKE}
+${MAKE} install
 cd ..
 
 echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
