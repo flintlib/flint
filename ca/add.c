@@ -297,3 +297,37 @@ ca_sub_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx)
     ca_sub_fmpz(res, x, t, ctx);
     fmpz_clear(t);
 }
+
+void
+ca_fmpq_sub(ca_t res, const fmpq_t x, const ca_t y, ca_ctx_t ctx)
+{
+    ca_sub_fmpq(res, y, x, ctx);
+    ca_neg(res, res, ctx);
+}
+
+void
+ca_fmpz_sub(ca_t res, const fmpz_t x, const ca_t y, ca_ctx_t ctx)
+{
+    fmpq_t t;
+    *fmpq_numref(t) = *x;
+    *fmpq_denref(t) = 1;
+    ca_fmpq_sub(res, t, y, ctx);
+}
+
+void
+ca_ui_sub(ca_t res, ulong x, const ca_t y, ca_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_ui(t, x);
+    ca_fmpz_sub(res, t, y, ctx);
+    fmpz_clear(t);
+}
+
+void
+ca_si_sub(ca_t res, slong x, const ca_t y, ca_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, x);
+    ca_fmpz_sub(res, t, y, ctx);
+    fmpz_clear(t);
+}

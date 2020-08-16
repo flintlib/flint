@@ -378,6 +378,10 @@ void ca_sub_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
 void ca_sub_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
 void ca_sub_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_sub_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
+void ca_fmpq_sub(ca_t res, const fmpq_t x, const ca_t y, ca_ctx_t ctx);
+void ca_fmpz_sub(ca_t res, const fmpz_t x, const ca_t y, ca_ctx_t ctx);
+void ca_ui_sub(ca_t res, ulong x, const ca_t y, ca_ctx_t ctx);
+void ca_si_sub(ca_t res, slong x, const ca_t y, ca_ctx_t ctx);
 void ca_sub(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 void ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
