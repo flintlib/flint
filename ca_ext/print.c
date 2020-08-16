@@ -19,7 +19,10 @@ ca_ext_print(const ca_ext_t x, const ca_ctx_t ctx)
         if (qqbar_is_i(CA_EXT_QQBAR(x)))
             flint_printf("I");
         else
-            qqbar_print(CA_EXT_QQBAR(x));
+        {
+            flint_printf("Algebraic [deg %wd] ", qqbar_degree(CA_EXT_QQBAR(x)));
+            qqbar_printn(CA_EXT_QQBAR(x), 10);
+        }
     }
     else
     {
