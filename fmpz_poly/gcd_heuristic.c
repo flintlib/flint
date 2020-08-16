@@ -137,7 +137,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       Determine how many bits (pack_bits) to pack into. The bound 
       bound_bits ensures that if G | A and G | B with G primitive 
       then G is the gcd of A and B. The bound is taken from 
-      http://arxiv.org/abs/cs/0206032v1
+      https://arxiv.org/abs/cs/0206032v1
    */
    bits1 = FLINT_ABS(_fmpz_vec_max_bits(A, len1));
    bits2 = FLINT_ABS(_fmpz_vec_max_bits(B, len2));

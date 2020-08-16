@@ -35,7 +35,7 @@ int main(void)
     /*
         Using the primes from
         mpz_aprcl implementation readme.txt file
-        link : http://sourceforge.net/projects/mpzaprcl/
+        link : https://sourceforge.net/projects/mpzaprcl/
     */
 
     flint_printf("Primality test profiling for numbers from 350 to 2000 digits\n");

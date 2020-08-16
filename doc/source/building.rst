@@ -227,7 +227,7 @@ Visual Studio 2015 Community (or higher version) and:
 - an installed version of Python 3
 
 - an installed version of Python Tools for Visual Studio
-  ([http://pytools.codeplex.com/](http://pytools.codeplex.com/))
+  <https://github.com/Microsoft/PTVS>
 
 Obtain FLINT2 by cloning it using GIT from Brian Gladman's repository:
 

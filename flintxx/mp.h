@@ -111,7 +111,7 @@ struct enable_if_v<false, U> { };
 // The meaning of T is reversed for disable_if.
 // See e.g. [0] or the tests for how to use this.
 // 
-// [0] http://www.boost.org/doc/libs/1_53_0/libs/utility/enable_if.html
+// [0] https://www.boost.org/doc/libs/1_53_0/libs/utility/enable_if.html
 //
 template<class T, class U = void>
 struct enable_if : public enable_if_v<T::val, U> { };

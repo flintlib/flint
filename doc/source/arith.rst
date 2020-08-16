@@ -303,7 +303,7 @@ Bernoulli numbers and polynomials
     say `n < 1000`. The common denominator is calculated directly
     as the primorial of `n + 1`.
 
-    %[1] http://en.wikipedia.org/w/index.php?
+    %[1] https://en.wikipedia.org/w/index.php?
     %    title=Bernoulli_number&oldid=405938876
 
 .. function:: void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
@@ -474,7 +474,7 @@ Cyclotomic polynomials
     coefficient in the binomial expansion of `(x+1)^d`.
 
     When `n` is an odd prime, we use a direct formula for the coefficients
-    (http://mathworld.wolfram.com/TrigonometryAngles.html ).
+    (https://mathworld.wolfram.com/TrigonometryAngles.html ).
 
 .. function:: void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
 
