@@ -416,6 +416,13 @@ void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
 void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx);
 
+CA_INLINE void
+ca_sqrt_ui(ca_t res, ulong n, ca_ctx_t ctx)
+{
+    ca_set_ui(res, n, ctx);
+    ca_sqrt(res, res, ctx);
+}
+
 /* Complex parts */
 
 void ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx);

@@ -55,6 +55,50 @@ Sample output::
     cpu/wall(s): 0.03 0.029
     virt/peak/res/peak(MB): 35.57 35.57 8.80 8.80
 
+sdpoly.c
+-------------------------------------------------------------------------------
+
+This program computes the coefficients of the Swinnerton-Dyer polynomial
+
+.. math ::
+
+    S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3} \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})
+
+where `p_n` denotes the `n`-th prime number and all combinations
+of signs are taken. This polynomial has degree `2^n`.
+The polynomial is expanded from its roots
+using naive polynomial multiplication over :type:`ca_t` coefficients.
+There are far more efficient ways to construct this polynomial;
+this program simply illustrates that arithmetic in
+multivariate number fields works smoothly.
+
+Sample output::
+
+    > build/examples/sdpoly 3
+    576  in  QQ
+    0  in  QQ
+    -960  in  QQ
+    0  in  QQ
+    352  in  QQ
+    0  in  QQ
+    -40  in  QQ
+    0  in  QQ
+    1  in  QQ
+
+    cpu/wall(s): 0.002 0.002
+    virt/peak/res/peak(MB): 35.07 35.11 5.40 5.40
+
+A big benchmark problem (output truncated)::
+
+    > build/examples/sdpoly 10
+    43567450015...212890625  in  QQ
+    ...
+    0  in  QQ
+    1  in  QQ
+
+    cpu/wall(s): 9.296 9.307
+    virt/peak/res/peak(MB): 38.95 38.95 10.01 10.01
+
 
 .. raw:: latex
 

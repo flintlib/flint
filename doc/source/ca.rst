@@ -660,6 +660,11 @@ Powers and roots
     may still perform other simplifications. It may in particular attempt to
     simplify `\sqrt{x}` to a single element in `\overline{\mathbb{Q}}`.
 
+.. function:: void ca_sqrt_ui(ca_t res, ulong n, ca_ctx_t ctx)
+
+    Sets *res* to the principal square root of *n*.
+
+
 Complex parts
 -------------------------------------------------------------------------------
 
