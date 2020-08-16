@@ -122,12 +122,10 @@ Properties
     polynomial has leading coefficient 1.
 
 .. function:: int qqbar_is_zero(const qqbar_t x)
+              int qqbar_is_one(const qqbar_t x)
+              int qqbar_is_neg_one(const qqbar_t x)
 
-    Returns whether *x* is the number 0.
-
-.. function:: int qqbar_is_one(const qqbar_t x)
-
-    Returns whether *x* is the number 1.
+    Returns whether *x* is the number `0`, `1`, `-1`.
 
 .. function:: int qqbar_is_i(const qqbar_t x)
               int qqbar_is_neg_i(const qqbar_t x)
@@ -478,6 +476,25 @@ Polynomial evaluation
     automatically reduce *poly* if its degree is greater or equal
     to that of the minimal polynomial of *x*. In the generic case, evaluation
     simply uses Horner's rule.
+
+.. function:: int qqbar_evaluate_fmpz_mpoly_iter(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
+              int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
+              int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to the value of *poly* evaluated at the algebraic numbers
+    given in the vector *x*. The number of variables is defined by
+    the context object *ctx*.
+
+    The parameters *deg_limit* and *bits_limit*
+    define evaluation limits: if any temporary result exceeds these limits
+    (not necessarily the final value, in case of cancellation), the
+    evaluation is aborted and 0 (failure) is returned. If evaluation
+    succeeds, 1 is returned.
+
+    The *iter* version iterates over all terms in succession and computes
+    the powers that appear. The *horner* version uses a multivariate
+    implementation of the Horner scheme. The default algorithm currently
+    uses the Horner scheme.
 
 Polynomial roots
 -------------------------------------------------------------------------------

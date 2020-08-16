@@ -12,11 +12,8 @@
 #include "ca.h"
 #include "ca_ext.h"
 
-int fmpz_mpoly_evaluate_qqbar(qqbar_t res, const fmpz_mpoly_t pol, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
-
 int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx);
 int ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx);
-
 
 int
 ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx)
@@ -185,9 +182,9 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
                 }
             }
 
-            if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
+            if (qqbar_evaluate_fmpz_mpoly(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
             {
-                if (fmpz_mpoly_evaluate_qqbar(res, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
+                if (qqbar_evaluate_fmpz_mpoly(res, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx)))
                 {
                     if (qqbar_binop_within_limits(y, res, deg_limit, bits_limit))
                     {

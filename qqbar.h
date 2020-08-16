@@ -26,6 +26,7 @@ extern "C" {
 #include "flint/fmpq_poly.h"
 #include "flint/fmpz_mat.h"
 #include "flint/fmpq_mat.h"
+#include "flint/fmpz_mpoly.h"
 #include "acb.h"
 
 #include "calcium.h"
@@ -337,6 +338,10 @@ void qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpq_poly_t poly, const qqbar_t
 void _qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz * poly, slong len, const qqbar_t x);
 
 void qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz_poly_t poly, const qqbar_t x);
+
+int qqbar_evaluate_fmpz_mpoly_iter(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
+int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
+int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
 
 #define QQBAR_ROOTS_IRREDUCIBLE 1
 
