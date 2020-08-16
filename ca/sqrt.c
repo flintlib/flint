@@ -59,13 +59,19 @@ ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
     else
     {
         qqbar_t t;
+        slong deg;
+
         qqbar_init(t);
 
         if (ca_get_qqbar(t, x, ctx))
         {
+            deg = qqbar_degree(t);
+
             qqbar_sqrt(t, t);
 
-            if (qqbar_within_limits(t, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], 0))
+            /* use? qqbar_within_limits(t, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], 0) */
+
+            if (qqbar_degree(t) <= FLINT_MAX(2, deg))
                 ca_set_qqbar(res, t, ctx);
             else
                 _ca_sqrt_nofactor(res, x, ctx);
