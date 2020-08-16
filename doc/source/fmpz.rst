@@ -1360,7 +1360,7 @@ Primality testing
 
     Next we compute `N/B` and find the next pseudosquare `L_p` above
     this value, using a static table as per
-    http://oeis.org/A002189/b002189.txt.
+    https://oeis.org/A002189/b002189.txt.
 
     As noted in the text, if `p` is prime then Step 3 will pass. This
     test rejects many composites, and so by this time we suspect

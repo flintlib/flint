@@ -76,7 +76,7 @@ static const mp_limb_t mul_factor[] = {
 
 /* function to get a good approximation of the cube root */
 /* Algorithm for this approximation is mentioned in this article */
-/* http://en.wikipedia.org/wiki/Fast_inverse_square_root */
+/* https://en.wikipedia.org/wiki/Fast_inverse_square_root */
 /* Intead of the inverse square root, we calculate the nth root */
 
 mp_limb_t

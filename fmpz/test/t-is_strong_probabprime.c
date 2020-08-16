@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-/* Composite strong pseudoprimes from http://oeis.org/A014233 */
+/* Composite strong pseudoprimes from https://oeis.org/A014233 */
 static const char * composites[] = {
     "2047",
     "1373653",

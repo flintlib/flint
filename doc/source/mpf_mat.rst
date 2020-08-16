@@ -126,7 +126,7 @@ Gram-Schmidt Orthogonalisation and QR Decomposition
     ``B``) that spans the same subspace of `R^m` as `S`.
 
     This uses an algorithm of Schwarz-Rutishauser. See pp. 9 of
-    http://www.inf.ethz.ch/personal/gander/papers/qrneu.pdf
+    https://people.inf.ethz.ch/gander/papers/qrneu.pdf
     
 .. function:: void mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
 
@@ -135,4 +135,4 @@ Gram-Schmidt Orthogonalisation and QR Decomposition
     an upper triangular matrix and ``Q`` is an orthogonal matrix.)
 
     This uses an algorithm of Schwarz-Rutishauser. See pp. 9 of
-    http://www.inf.ethz.ch/personal/gander/papers/qrneu.pdf
+    https://people.inf.ethz.ch/gander/papers/qrneu.pdf

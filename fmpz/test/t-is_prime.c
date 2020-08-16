@@ -18,7 +18,7 @@
 #include "fmpz.h"
 
 /* Composite strong pseudoprimes from
-   http://oeis.org/A014233 and https://doi.org/10.1090/mcom/3134 */
+   https://oeis.org/A014233 and https://doi.org/10.1090/mcom/3134 */
 static const char * composites[] = {
     "2047",
     "1373653",

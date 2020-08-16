@@ -1,5 +1,5 @@
 # Try to find the MPFR library
-# See http://www.mpfr.org/
+# See https://www.mpfr.org/
 #
 # This module supports requiring a minimum version, e.g. you can do
 #   find_package(MPFR 2.3.0)

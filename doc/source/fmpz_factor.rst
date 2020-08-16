@@ -177,7 +177,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent. It can be found in the paper available at
-    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
+    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
 
 
 Elliptic curve (ECM) method

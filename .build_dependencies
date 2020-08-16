@@ -19,7 +19,7 @@ ${MAKE} > /dev/null 2>&1
 ${MAKE} install > /dev/null 2>&1
 cd ..
 
-wget http://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
+wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
 tar -xf mpfr-4.0.0.tar.bz2
 cd mpfr-4.0.0
 ./configure ABI=$ABI --with-gmp=${LOCAL} --prefix=${LOCAL}
