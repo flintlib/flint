@@ -922,7 +922,6 @@ int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 
 #if DEBUG
         printf("overflow\n");
-        abort();
 #endif
 
         exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
