@@ -68,6 +68,12 @@ int fq_nmod_mpoly_repack_bits_inplace(
         return 1;
     }
 
+    if (A->alloc < 1)
+    {
+        A->bits = Abits;
+        return 1;
+    }
+
     texps = (ulong *) flint_malloc(A->alloc*N*sizeof(ulong));
     success = mpoly_repack_monomials(texps, Abits,
                                       A->exps, A->bits, A->length, ctx->minfo);
