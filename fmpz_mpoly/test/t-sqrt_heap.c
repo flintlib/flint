@@ -42,12 +42,12 @@ main(void)
         sqr = fmpz_mpoly_sqrt_heap(q, p, ctx, 1);
         fmpz_mpoly_assert_canonical(q, ctx);
 
-	if (!sqr)
-	{
-	    printf("FAIL\n");
+	    if (!sqr)
+	    {
+	        printf("FAIL\n");
             flint_printf("Check example1: sqr\n");
-	    abort();
-	}
+	        abort();
+	    }
 
         fmpz_mpoly_mul(g, q, q, ctx);
 
@@ -101,7 +101,7 @@ main(void)
             fmpz_mpoly_mul(g, f, f, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
 
-	    sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
+   	        sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
             fmpz_mpoly_assert_canonical(h, ctx);
 
             if (!sqr)
@@ -120,6 +120,26 @@ main(void)
                 flint_printf("Check sqrt(f^2)^2 = f^2\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
+
+            sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 0);
+            fmpz_mpoly_assert_canonical(h, ctx);
+
+            if (!sqr)
+            {
+                printf("FAIL\n");
+                flint_printf("Check sqrt(f^2) returns 1: nocheck\n");
+                flint_abort();
+            }
+
+            fmpz_mpoly_mul(k, h, h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+
+            if (!fmpz_mpoly_equal(g, k, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check sqrt(f^2)^2 = f^2\ni = %wd, j = %wd: nocheck\n", i ,j);
+                flint_abort();
+            }
         }
 
         fmpz_mpoly_clear(f, ctx);
@@ -132,7 +152,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g, h;
+        fmpz_mpoly_t f, g, h, k;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
         flint_bitcnt_t coeff_bits;
@@ -143,6 +163,7 @@ main(void)
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
+        fmpz_mpoly_init(k, ctx);
 
         len = n_randint(state, 100);
         len1 = n_randint(state, 100);
@@ -161,6 +182,8 @@ main(void)
 
             fmpz_mpoly_mul(g, f, f, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
+            fmpz_mpoly_set(k, g, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
 
             sqr1 = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
             fmpz_mpoly_assert_canonical(h, ctx);
@@ -174,11 +197,22 @@ main(void)
                 flint_printf("Check aliasing\n");
                 flint_abort();
             }
+
+            sqr2 = fmpz_mpoly_sqrt_heap(k, k, ctx, 0);
+            fmpz_mpoly_assert_canonical(k, ctx);
+
+            if (sqr1 != sqr2 || !fmpz_mpoly_equal(k, h, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check aliasing: nocheck\n");
+                flint_abort();
+            }
         }
 
         fmpz_mpoly_clear(f, ctx);
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
