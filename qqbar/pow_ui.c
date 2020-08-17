@@ -13,6 +13,65 @@
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 
+void
+_qqbar_sqr_undeflatable(qqbar_t res, const qqbar_t x)
+{
+    fmpz_poly_t A, B;
+    acb_t z, t, w;
+    slong i, prec, d;
+    int pure_real, pure_imag;
+
+    fmpz_poly_init(A);
+    fmpz_poly_init(B);
+    acb_init(z);
+    acb_init(t);
+    acb_init(w);
+
+    d = fmpz_poly_degree(QQBAR_POLY(x));
+    for (i = 0; i <= d; i++)
+    {
+        if (i % 2 == 0)
+            fmpz_poly_set_coeff_fmpz(A, i / 2, QQBAR_POLY(x)->coeffs + i);
+        else
+            fmpz_poly_set_coeff_fmpz(B, i / 2, QQBAR_POLY(x)->coeffs + i);
+    }
+
+    fmpz_poly_sqr(A, A);
+    fmpz_poly_sqr(B, B);
+    fmpz_poly_shift_left(B, B, 1);
+    fmpz_poly_sub(A, A, B);
+    if (fmpz_sgn(A->coeffs + A->length - 1) < 0)
+        fmpz_poly_neg(A, A);
+
+    acb_set(z, QQBAR_ENCLOSURE(x));
+    pure_real = (qqbar_sgn_im(x) == 0);
+    pure_imag = (qqbar_sgn_re(x) == 0);
+
+    for (prec = QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
+    {
+        _qqbar_enclosure_raw(z, QQBAR_POLY(x), z, prec);
+        if (pure_real)
+            arb_zero(acb_imagref(z));
+        if (pure_imag)
+            arb_zero(acb_realref(z));
+
+        acb_sqr(w, z, prec);
+
+        if (_qqbar_validate_uniqueness(t, A, w, 2 * prec))
+        {
+            fmpz_poly_set(QQBAR_POLY(res), A);
+            acb_set(QQBAR_ENCLOSURE(res), t);
+            break;
+        }
+    }
+
+    fmpz_poly_clear(A);
+    fmpz_poly_clear(B);
+    acb_clear(z);
+    acb_clear(t);
+    acb_clear(w);
+}
+
 /* todo: use number field arithmetic, other optimisations ... */
 void
 qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
@@ -87,7 +146,11 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
 
         if (n == 2)
         {
+#if 1
+            _qqbar_sqr_undeflatable(res, x);
+#else
             qqbar_binary_op(res, x, x, 2);
+#endif
             return;
         }
 
@@ -96,9 +159,9 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
         {
 #if 0
             qqbar_pow_ui(res, x, n / 2);
-            qqbar_binary_op(res, res, res, 2);
+            qqbar_pow_ui(res, res, 2);
 #else
-            qqbar_binary_op(res, x, x, 2);
+            qqbar_pow_ui(res, x, 2);
             qqbar_pow_ui(res, res, n / 2);
 #endif
         }
