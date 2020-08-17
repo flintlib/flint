@@ -42,12 +42,12 @@ main(void)
         sqr = fmpz_mpoly_sqrt_heap(q, p, ctx, 1);
         fmpz_mpoly_assert_canonical(q, ctx);
 
-	    if (!sqr)
-	    {
-	        printf("FAIL\n");
+	     if (!sqr)
+	     {
+	         printf("FAIL\n");
             flint_printf("Check example1: sqr\n");
-	        abort();
-	    }
+	         abort();
+	     }
 
         fmpz_mpoly_mul(g, q, q, ctx);
 
