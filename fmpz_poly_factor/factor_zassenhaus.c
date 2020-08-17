@@ -97,13 +97,16 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     flint_printf("|f = "), fmpz_poly_print(f), flint_printf("\n");
     #endif
 
-    if (lenF == 2)
+    if (lenF < 5)
     {
-        fmpz_poly_factor_insert(final_fac, f, exp);
-    }
-    else if (lenF == 3)
-    {
-        _fmpz_poly_factor_quadratic(final_fac, f, exp);
+        if (lenF < 3)
+            fmpz_poly_factor_insert(final_fac, f, exp);
+        else if (lenF == 3)
+            _fmpz_poly_factor_quadratic(final_fac, f, exp);
+        else
+            _fmpz_poly_factor_cubic(final_fac, f, exp);
+
+        return;
     }
     else
     {
