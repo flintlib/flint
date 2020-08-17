@@ -72,7 +72,7 @@ main(void)
         fmpz_mpoly_t f, g, h, k;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
-        flint_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits, coeff_bits1;
         int sqr;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
@@ -89,11 +89,11 @@ main(void)
         exp_bits1 = n_randint(state, 200) + 1;
 
         coeff_bits = n_randint(state, 200);
-        coeff_bits = n_randint(state, 200);
+        coeff_bits1 = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits1, exp_bits1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
@@ -101,7 +101,7 @@ main(void)
             fmpz_mpoly_mul(g, f, f, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
 
-   	        sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
+   	      sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
             fmpz_mpoly_assert_canonical(h, ctx);
 
             if (!sqr)
@@ -132,7 +132,7 @@ main(void)
             }
 
             fmpz_mpoly_mul(k, h, h, ctx);
-            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
 
             if (!fmpz_mpoly_equal(g, k, ctx))
             {
@@ -148,6 +148,81 @@ main(void)
         fmpz_mpoly_clear(k, ctx);
     }
 
+    /* Check sqrt(f^2*(x^2+x)) returns 0 */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, h, k, x;
+        slong len, len1, nvars;
+        flint_bitcnt_t exp_bits, exp_bits1;
+        flint_bitcnt_t coeff_bits, coeff_bits1;
+        int sqr;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(h, ctx);
+        fmpz_mpoly_init(k, ctx);
+        fmpz_mpoly_init(x, ctx);
+
+        len = n_randint(state, 100);
+        len1 = n_randint(state, 100) + 1;
+
+        exp_bits =  n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+
+        coeff_bits = n_randint(state, 200);
+        coeff_bits1 = n_randint(state, 200) + 1;
+
+        nvars = fmpz_mpoly_ctx_nvars(ctx);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+               fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits1, exp_bits1, ctx);
+             } while (fmpz_mpoly_is_zero(f, ctx));
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
+
+            fmpz_mpoly_mul(g, f, f, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+
+            fmpz_mpoly_gen(x, n_randint(state, nvars), ctx);
+            fmpz_mpoly_mul(k, x, x, ctx);
+            fmpz_mpoly_add(k, k, x, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+
+            fmpz_mpoly_mul(g, g, k, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+
+   	      sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
+
+            fmpz_mpoly_assert_canonical(h, ctx);
+
+            if (sqr)
+            {
+                printf("FAIL\n");
+                flint_printf("Check nonsquare returns 0\n");
+                flint_abort();
+            }
+
+            if (!fmpz_mpoly_is_zero(h, ctx))
+            {
+               printf("FAIL\n");
+               flint_printf("Nonsquare returns 0 sqrt\n");
+               flint_abort();
+            }
+        }
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_clear(x, ctx);
+    }
+
     /* Check aliasing of square root with input */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -155,7 +230,7 @@ main(void)
         fmpz_mpoly_t f, g, h, k;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
-        flint_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits, coeff_bits1;
         int sqr1, sqr2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
@@ -172,11 +247,11 @@ main(void)
         exp_bits1 = n_randint(state, 200) + 1;
 
         coeff_bits = n_randint(state, 200);
-        coeff_bits = n_randint(state, 200);
+        coeff_bits1 = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits1, exp_bits1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 

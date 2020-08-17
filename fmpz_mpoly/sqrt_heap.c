@@ -17,6 +17,8 @@
 #include "fmpz_mpoly.h"
 #include "longlong.h"
 
+#define DEBUG 0
+
 /*
    Set polyq to the square root of poly2 and return the length of the square
    root if it exists or zero otherwise. This version of the function assumes
@@ -33,9 +35,11 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
                                slong len2, slong bits, ulong maskhi, int check)
 {
     slong i, j, q_len;
-    slong next_loc, heap_len = 1;
+    slong next_loc, heap_len = 1, heap_alloc;
     mpoly_heap1_s * heap;
-    mpoly_heap_t * chain;
+    mpoly_heap_t * chain_nodes[64];
+    mpoly_heap_t ** chain;
+    slong exp_alloc;
     slong * store, * store_base;
     mpoly_heap_t * x;
     fmpz * q_coeff = *polyq;
@@ -49,9 +53,10 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
     ulong lc_norm = 0; /* number of bits to shift sqrt(lc) to normalise */
     ulong lc_n = 0; /* sqrt of lc normalised */
     ulong lc_i = 0; /* precomputed inverse of sqrt(lc) */
-    TMP_INIT;
 
-    TMP_START;
+#if DEBUG
+    printf("Small case\n");
+#endif
 
     fmpz_init(acc_lg);
     fmpz_init(r);
@@ -64,10 +69,17 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
            FLINT_ABS(bits2) <= 2*(FLINT_BITS - 3);
 
     /* alloc array of heap nodes which can be chained together */
-    next_loc = len2 + 4;   /* something bigger than heap can ever be */
-    heap = (mpoly_heap1_s *) TMP_ALLOC((next_loc - 2)*sizeof(mpoly_heap1_s));
-    chain = (mpoly_heap_t *) TMP_ALLOC((next_loc - 3)*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*(next_loc - 3)*sizeof(mpoly_heap_t *));
+    next_loc = 2*n_sqrt(len2) + 4;   /* something bigger than heap can ever be */
+    heap_alloc = next_loc - 3;
+    heap = (mpoly_heap1_s *) flint_malloc((heap_alloc + 1)*sizeof(mpoly_heap1_s));
+    chain_nodes[0] = (mpoly_heap_t *) flint_malloc(heap_alloc*sizeof(mpoly_heap_t));
+    chain = (mpoly_heap_t **) flint_malloc(heap_alloc*sizeof(mpoly_heap_t*));
+    store = store_base = (slong *) flint_malloc(2*heap_alloc*sizeof(mpoly_heap_t *));
+    
+    for (i = 0; i < heap_alloc; i++)
+       chain[i] = chain_nodes[0] + i;
+
+    exp_alloc = 1;
 
     /* mask with high bit set in each field of exponent vector */
     mask = 0;
@@ -79,7 +91,10 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
     /* insert (-1, 1, exp2[1]) into heap */
     if (len2 > 1)
     {
-       x = chain + 0;
+#if DEBUG
+       printf("insert (-1, 1)\n");
+#endif
+       x = chain[0];
        x->i = -WORD(1);
        x->j = 1;
        x->next = NULL;
@@ -144,6 +159,9 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
                 do
                 {
+#if DEBUG
+                    flint_printf("pop1 (%wd, %wd)\n", x->i, x->j);
+#endif
                     *store++ = x->i;
                     *store++ = x->j;
                 } while ((x = x->next) != NULL);
@@ -159,6 +177,9 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
                 do
                 {
+#if DEBUG
+                    flint_printf("pop2 (%wd, %wd)\n", x->i, x->j);
+#endif
                     *store++ = x->i;
                     *store++ = x->j;
 
@@ -187,6 +208,9 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
 
                 do
                 {
+#if DEBUG
+                    flint_printf("pop3 (%wd, %wd)\n", x->i, x->j);
+#endif
                     *store++ = x->i;
                     *store++ = x->j;
 
@@ -214,12 +238,15 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
                 /* take next input term */
                 if (j + 1 < len2)
                 {
-                    x = chain + 0;
+                    x = chain[0];
                     x->i = i;
                     x->j = j + 1;
                     x->next = NULL;
                     if (check || !mpoly_monomial_gt1(exp3, exp2[x->j], maskhi))
                     {
+#if DEBUG
+                        flint_printf("insert1 (%wd, %wd)\n", x->i, x->j);
+#endif
                         _mpoly_heap_insert1(heap, exp2[x->j], x,
                                                  &next_loc, &heap_len, maskhi);
                     }
@@ -229,13 +256,16 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
                 /* should we go right */
                 if (j < i)
                 {
-                    x = chain + i;
+                    x = chain[i];
                     x->i = i;
                     x->j = j + 1;
                     x->next = NULL;
 
                     if (check || !mpoly_monomial_gt1(exp3, q_exp[x->i] + q_exp[x->j], maskhi))
                     {
+#if DEBUG
+                        flint_printf("insert2 (%wd, %wd)\n", x->i, x->j);
+#endif
                         _mpoly_heap_insert1(heap, q_exp[x->i] + q_exp[x->j], x,
                                                  &next_loc, &heap_len, maskhi);
                     }
@@ -256,6 +286,9 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
             
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
+
+            if (!lt_divides)
+                goto not_sqrt;
 
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
@@ -298,23 +331,48 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
             if (fmpz_is_zero(acc_lg))
                 continue;
 
+            if (!lt_divides)
+                goto not_sqrt;
+
 large_lt_divides:
 
             fmpz_fdiv_qr(q_coeff + q_len, r, acc_lg, q_coeff + 0);
-            
+
             if (!fmpz_is_zero(r))
+            {
+                q_len++;
                 goto not_sqrt;
+            }
+        }
+
+        if (q_len >= heap_alloc)
+        {
+            heap_alloc *= 2;
+            heap = (mpoly_heap1_s *) flint_realloc(heap, (heap_alloc + 1)*sizeof(mpoly_heap1_s));
+            chain_nodes[exp_alloc] = (mpoly_heap_t *) flint_malloc((heap_alloc/2)*sizeof(mpoly_heap_t));
+            chain = (mpoly_heap_t **) flint_realloc(chain, heap_alloc*sizeof(mpoly_heap_t*));
+            store = store_base = (slong *) flint_realloc(store_base, 2*heap_alloc*sizeof(mpoly_heap_t *));
+            for (i = 0; i < heap_alloc/2; i++)
+                chain[i + heap_alloc/2] = chain_nodes[exp_alloc] + i;
+            exp_alloc++;
         }
 
         /* put (q_len, 1) in heap */
         i = q_len;
-        x = chain + i;
+        x = chain[i];
         x->i = i;
         x->j = 1;
         x->next = NULL;
 
-        _mpoly_heap_insert1(heap, q_exp[i] + q_exp[1], x,
+        if (check || !mpoly_monomial_gt1(exp3, q_exp[i] + q_exp[1], maskhi))
+        {
+#if DEBUG
+           flint_printf("insert3 (%wd, %wd)\n", x->i, x->j);
+#endif
+
+           _mpoly_heap_insert1(heap, q_exp[i] + q_exp[1], x,
                                                  &next_loc, &heap_len, maskhi);
+        }
 
         q_len++;
     }
@@ -331,7 +389,11 @@ cleanup:
     (*polyq) = q_coeff;
     (*expq) = q_exp;
 
-    TMP_END;
+    flint_free(heap);
+    flint_free(chain);
+    flint_free(store_base);
+    for (i = 0; i < exp_alloc; i++)
+        flint_free(chain_nodes[i]);
 
     /* return sqrt poly length, or zero if not a square root */
     return q_len;
@@ -357,14 +419,17 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
 {
     slong i, j, q_len;
     slong next_loc;
-    slong heap_len = 1;
+    slong heap_len = 1, heap_alloc;
+    int exp_alloc;
     mpoly_heap_s * heap;
-    mpoly_heap_t * chain;
+    mpoly_heap_t * chain_nodes[64];
+    mpoly_heap_t ** chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
     fmpz * q_coeff = *polyq;
     ulong * q_exp = *expq;
-    ulong * exp, * exps, * exp3;
+    ulong * exp, * exp3;
+    ulong * exps[64];
     ulong ** exp_list;
     slong exp_next;
     ulong mask;
@@ -376,11 +441,16 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
     ulong lc_norm = 0; /* number of bits to shift sqrt(lc) to normalise */
     ulong lc_n = 0; /* sqrt of lc normalised */
     ulong lc_i = 0; /* precomputed inverse of sqrt(lc) */
+
     TMP_INIT;
 
     if (N == 1)
         return _fmpz_mpoly_sqrt_heap1(polyq, expq, allocq,
                         poly2, exp2, len2, bits, cmpmask[0], check);
+
+#if DEBUG
+    printf("Large case\n");
+#endif
 
     TMP_START;
 
@@ -395,23 +465,29 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
            FLINT_ABS(bits2) <= 2*(FLINT_BITS - 3);
 
     /* alloc array of heap nodes which can be chained together */
-    next_loc = len2 + 4;   /* something bigger than heap can ever be */
-    heap = (mpoly_heap_s *) TMP_ALLOC((next_loc - 2)*sizeof(mpoly_heap_s));
-    chain = (mpoly_heap_t *) TMP_ALLOC((next_loc - 3)*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*(next_loc - 3)*sizeof(mpoly_heap_t *));
+    next_loc = 2*sqrt(len2) + 4;   /* something bigger than heap can ever be */
+    heap_alloc = next_loc - 3;
+    heap = (mpoly_heap_s *) flint_malloc((heap_alloc + 1)*sizeof(mpoly_heap_s));
+    chain_nodes[0] = (mpoly_heap_t *) flint_malloc(heap_alloc*sizeof(mpoly_heap_t));
+    chain = (mpoly_heap_t **) flint_malloc(heap_alloc*sizeof(mpoly_heap_t*));
+    store = store_base = (slong *) flint_malloc(2*heap_alloc*sizeof(mpoly_heap_t *));
+
+    for (i = 0; i < heap_alloc; i++)
+       chain[i] = chain_nodes[0] + i;
 
     /* array of exponent vectors, each of "N" words */
-    exps = (ulong *) TMP_ALLOC((next_loc - 3)*N*sizeof(ulong));
+    exps[0] = (ulong *) flint_malloc(heap_alloc*N*sizeof(ulong));
+    exp_alloc = 1;
     /* list of pointers to available exponent vectors */
-    exp_list = (ulong **) TMP_ALLOC((next_loc - 3)*sizeof(ulong *));
+    exp_list = (ulong **) flint_malloc(heap_alloc*sizeof(ulong *));
     /* space to save copy of current exponent vector */
     exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     /* final exponent */
     exp3 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     /* set up list of available exponent vectors */
     exp_next = 0;
-    for (i = 0; i < next_loc - 3; i++)
-        exp_list[i] = exps + i*N;
+    for (i = 0; i < heap_alloc; i++)
+        exp_list[i] = exps[0] + i*N;
 
     /* mask with high bit set in each word of each field of exponent vector */
     mask = 0;
@@ -423,7 +499,10 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
     /* insert (-1, 1, exp2[0]) into heap */
     if (len2 > 1)
     {
-        x = chain + 0;
+#if DEBUG
+       printf("insert (-1, 1)\n");
+#endif
+        x = chain[0];
         x->i = -WORD(1);
         x->j = 1;
         x->next = NULL;
@@ -515,6 +594,9 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
                 do
                 {
+#if DEBUG
+                    flint_printf("pop1 (%wd, %wd)\n", x->i, x->j);
+#endif
                     *store++ = x->i;
                     *store++ = x->j;
                 } while ((x = x->next) != NULL);
@@ -531,6 +613,9 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
                 do
                 {
+#if DEBUG
+                    flint_printf("pop2 (%wd, %wd)\n", x->i, x->j);
+#endif
                     *store++ = x->i;
                     *store++ = x->j;
 
@@ -559,6 +644,9 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
                 do
                 {
+#if DEBUG
+                    flint_printf("pop2 (%wd, %wd)\n", x->i, x->j);
+#endif
                     *store++ = x->i;
                     *store++ = x->j;
 
@@ -586,12 +674,15 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                 /* take next input term */
                 if (j + 1 < len2)
                 {
-                    x = chain + 0;
+                    x = chain[0];
                     x->i = i;
                     x->j = j + 1;
                     x->next = NULL;
                     if (check || !mpoly_monomial_gt(exp3 + 0, exp2 + x->j*N, N, cmpmask))
                     {
+#if DEBUG
+                        flint_printf("insert1 (%wd, %wd)\n", x->i, x->j);
+#endif
                         mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -602,7 +693,7 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                 /* should we go right */
                 if (j < i)
                 {
-                    x = chain + i;
+                    x = chain[i];
                     x->i = i;
                     x->j = j + 1;
                     x->next = NULL;
@@ -615,6 +706,9 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                                                                  q_exp + x->j*N, N);
                     if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
                     {
+#if DEBUG
+                        flint_printf("insert2 (%wd, %wd)\n", x->i, x->j);
+#endif
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
                     }
@@ -635,6 +729,9 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
             
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
+
+            if (!lt_divides)
+                goto not_sqrt;
 
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
@@ -677,17 +774,40 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
             if (fmpz_is_zero(acc_lg))
                 continue;
 
+            if (!lt_divides)
+                goto not_sqrt;
+
 large_lt_divides:
 
             fmpz_fdiv_qr(q_coeff + q_len, r, acc_lg, q_coeff + 0);
 
             if (!fmpz_is_zero(r))
+            {
+                q_len++;
                 goto not_sqrt;
+            }
+        }
+
+        if (q_len >= heap_alloc)
+        {
+            heap_alloc *= 2;
+            heap = (mpoly_heap_s *) flint_realloc(heap, (heap_alloc + 1)*sizeof(mpoly_heap_s));
+            chain_nodes[exp_alloc] = (mpoly_heap_t *) flint_malloc((heap_alloc/2)*sizeof(mpoly_heap_t));
+            chain = (mpoly_heap_t **) flint_realloc(chain, heap_alloc*sizeof(mpoly_heap_t*));
+            store = store_base = (slong *) flint_realloc(store_base, 2*heap_alloc*sizeof(mpoly_heap_t *));
+            exps[exp_alloc] = (ulong *) flint_malloc((heap_alloc/2)*N*sizeof(ulong));
+            exp_list = (ulong **) flint_realloc(exp_list, heap_alloc*sizeof(ulong *));
+            for (i = 0; i < heap_alloc/2; i++)
+            {
+               chain[i + heap_alloc/2] = chain_nodes[exp_alloc] + i;
+               exp_list[i + heap_alloc/2] = exps[exp_alloc] + i*N;
+            }
+            exp_alloc++;
         }
 
         /* put (q_len, 1) in heap */
         i = q_len;
-        x = chain + i;
+        x = chain[i];
         x->i = i;
         x->j = 1;
         x->next = NULL;
@@ -699,8 +819,14 @@ large_lt_divides:
                 mpoly_monomial_add_mp(exp_list[exp_next], q_exp + x->i*N,
                                                          q_exp + x->j*N, N);
         
-        exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+        if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
+        {
+#if DEBUG
+            flint_printf("insert3 (%wd, %wd)\n", x->i, x->j);
+#endif           
+           exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
+        }
 
         q_len++;
     }
@@ -716,6 +842,16 @@ cleanup:
 
     (*polyq) = q_coeff;
     (*expq) = q_exp;
+
+    flint_free(heap);
+    flint_free(chain);
+    flint_free(store_base);
+    flint_free(exp_list);
+    for (i = 0; i < exp_alloc; i++)
+    {
+        flint_free(exps[i]);
+        flint_free(chain_nodes[i]);
+    }
 
     TMP_END;
 
@@ -761,15 +897,6 @@ int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
     cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
-    /* ensure input exponents packed to same size as output exponents */
-    if (exp_bits > poly2->bits)
-    {
-        free2 = 1;
-        exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                    poly2->length, ctx->minfo);
-    }
-
     /* take care of aliasing */
     if (q == poly2)
     {
@@ -792,6 +919,11 @@ int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
     {
         ulong * old_exp2 = exp2;
         slong old_exp_bits = exp_bits;
+
+#if DEBUG
+        printf("overflow\n");
+        abort();
+#endif
 
         exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
@@ -829,3 +961,5 @@ int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 
     return lenq != 0;
 }
+
+#undef DEBUG
