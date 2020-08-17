@@ -6,9 +6,6 @@ addons:
     packages:
       - texinfo
       - cmake
-      - libgmp-dev
-      - libmpfr-dev
-      - libntl-dev
 
 env:
   MAKE="make -j"
@@ -25,6 +22,7 @@ compiler:
 
 install:
   - export LOCAL=$(pwd)/local
+  - export LDFLAGS="-Wl,-rpath,$LOCAL/lib"
   - ./.build_dependencies
   - ./configure --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
   - ${MAKE}
@@ -34,7 +32,7 @@ install:
        echo "Running cmake build";
        mkdir build;
        cd build;
-       cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release ..;
+       cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL ..;
        ${MAKE};
        ldd lib/libflint.so;
        cd ..;
