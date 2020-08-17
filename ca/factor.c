@@ -11,7 +11,8 @@
 
 #include "ca.h"
 
-#if __FLINT_RELEASE >= 20700
+/* #if __FLINT_RELEASE >= 20700 */
+#if 1
 #define HAVE_MPOLY_FAC 1
 #else
 #define HAVE_MPOLY_FAC 0
@@ -95,6 +96,15 @@ _ca_factor_fmpq(ca_factor_t res, const fmpq_t x, ulong flags, ca_ctx_t ctx)
     }
 }
 
+static int
+_ca_fmpz_mpoly_factor(fmpz_mpoly_factor_t fac, const fmpz_mpoly_t poly, int full, const fmpz_mpoly_ctx_t ctx)
+{
+    if (full)
+        return fmpz_mpoly_factor(fac, poly, ctx);
+    else
+        return fmpz_mpoly_factor_squarefree(fac, poly, ctx);
+}
+
 void
 ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 {
@@ -146,13 +156,13 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
                 full = (flags & CA_FACTOR_POLY_FULL) ? 1 : 0;
                 fmpz_mpoly_factor_init(mfac, mctx);
 
-                if (!fmpz_mpoly_factor(mfac, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), full, mctx))
+                if (!_ca_fmpz_mpoly_factor(mfac, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), full, mctx))
                 {
                     flint_printf("ca_factor: unable to factor numerator\n");
                     flint_abort();
                 }
 
-                for (i = 0; i < mfac->length; i++)
+                for (i = 0; i < mfac->num; i++)
                 {
                     ca_set_fmpz(e, mfac->exp + i, ctx);
                     _ca_make_field_element(b, CA_FIELD(x, ctx), ctx);
@@ -161,18 +171,18 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
                     ca_factor_insert(res, b, e, ctx);
                 }
 
-                fmpz_set(fmpq_numref(content), mfac->content);
+                fmpz_set(fmpq_numref(content), mfac->constant);
 
                 fmpz_mpoly_factor_clear(mfac, mctx);
                 fmpz_mpoly_factor_init(mfac, mctx);
 
-                if (!fmpz_mpoly_factor(mfac, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), full, mctx))
+                if (!_ca_fmpz_mpoly_factor(mfac, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), full, mctx))
                 {
                     flint_printf("ca_factor: unable to factor denominator\n");
                     flint_abort();
                 }
 
-                for (i = 0; i < mfac->length; i++)
+                for (i = 0; i < mfac->num; i++)
                 {
                     ca_set_fmpz(e, mfac->exp + i, ctx);
                     ca_neg(e, e, ctx);
@@ -182,7 +192,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
                     ca_factor_insert(res, b, e, ctx);
                 }
 
-                fmpz_set(fmpq_denref(content), mfac->content);
+                fmpz_set(fmpq_denref(content), mfac->constant);
 
                 fmpz_mpoly_factor_clear(mfac, mctx);
             }
