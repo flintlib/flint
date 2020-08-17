@@ -425,11 +425,11 @@ Input and output
     Reads a multiprecision integer from the stream ``file``.  The
     format is raw binary format write by :func:`fmpz_out_raw`. 
     
-    In case of success, return a posivitive number, indicating number of bytes read.
+    In case of success, return a positive number, indicating number of bytes read.
     In case of failure 0.
 
     This function calls the ``mpz_inp_raw`` function in library gmp. So that it 
-    can read the raw data writen by ``mpz_inp_raw`` directly.
+    can read the raw data written by ``mpz_inp_raw`` directly.
     
 .. function:: int fmpz_print(fmpz_t x)
 
@@ -462,9 +462,9 @@ Input and output
 .. function:: size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
-    The value is writen in raw binary format. The integer is written in 
+    The value is written in raw binary format. The integer is written in 
     portable format, with 4 bytes of size information, and that many bytes
-    of linbs. Both the size and the limbs are written in decreasing 
+    of limbs. Both the size and the limbs are written in decreasing 
     significance order (i.e., in big-endian).
 
     The output can be read with ``fmpz_inp_raw``.
@@ -1272,12 +1272,12 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
 .. function:: void fmpz_multi_crt_init(fmpz_multi_crt_t CRT)
 
-    Initialize ``CRT`` for chinese remaindering.
+    Initialize ``CRT`` for Chinese remaindering.
 
 .. function:: int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT, const fmpz * moduli, slong len)
               int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
 
-    Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
+    Configure ``CRT`` for repeated Chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future
     calls to :func:`fmpz_crt_precomp` will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
@@ -1360,7 +1360,7 @@ Primality testing
 
     Next we compute `N/B` and find the next pseudosquare `L_p` above
     this value, using a static table as per
-    http://oeis.org/A002189/b002189.txt.
+    https://oeis.org/A002189/b002189.txt.
 
     As noted in the text, if `p` is prime then Step 3 will pass. This
     test rejects many composites, and so by this time we suspect

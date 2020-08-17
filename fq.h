@@ -8,7 +8,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FQ_H
@@ -40,6 +40,7 @@ typedef struct
     fmpz p;
 
     int sparse_modulus;
+    int is_conway; /* whether field was initialized with the Flint Conway tables  (assures primitivity) */
 
     fmpz *a;
     slong *j;
@@ -206,38 +207,52 @@ FQ_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 
 /* Basic arithmetic **********************************************************/
 
-FLINT_DLL void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_add(fq_t rop, const fq_t op1,
+		                           const fq_t op2, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_sub(fq_t rop, const fq_t op1,
+		                           const fq_t op2, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul(fq_t rop, const fq_t op1,
+		                           const fq_t op2, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul_fmpz(fq_t rop, const fq_t op,
+		                           const fmpz_t x, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_div(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_div(fq_t rop, const fq_t op1,
+		                           const fq_t op2, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_gcdinv(fq_t rop, fq_t inv,
+		                            const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
              const fq_ctx_t ctx);
 
-FLINT_DLL void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
+FLINT_DLL void fq_pow(fq_t rop, const fq_t op1,
+		                           const fmpz_t e, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
+FLINT_DLL void fq_pow_ui(fq_t rop, const fq_t op,
+		                            const ulong e, const fq_ctx_t ctx);
+
+/* Roots *********************************************************************/
+
+FLINT_DLL int fq_sqrt(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+
+FLINT_DLL int fq_is_square(const fq_t op, const fq_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
@@ -318,6 +333,7 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
         fmpz_neg(rop->coeffs, rop->coeffs);
         fmpz_mul(rop->coeffs, rop->coeffs, ctx->modulus->coeffs);
         fmpz_mod(rop->coeffs, rop->coeffs, fq_ctx_prime(ctx));
+	_fmpz_poly_set_length(rop, !fmpz_is_zero(rop->coeffs));
     }
     else
     {
@@ -326,6 +342,16 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
         fmpz_poly_set_coeff_ui(rop, 1, 1);
     }
 }
+
+FLINT_DLL void fq_get_fmpz_poly(fmpz_poly_t a, const fq_t b, const fq_ctx_t ctx);
+
+FLINT_DLL void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx);
+
+FLINT_DLL void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b,
+                                                           const fq_ctx_t ctx);
+
+FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b,
+                                                           const fq_ctx_t ctx);
 
 /* Output ********************************************************************/
 

@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 *******************************************************************************
@@ -255,7 +255,7 @@ void Fmpz_target::setbit(ulong)
 bool Fmpz_expr::tstbit(ulong) const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Comparision
+    Comparison
 
     Relational operators \code{<=}, \code{>}
     etc are overloaded, where \code{e1} and \code{e2} can be any
@@ -2275,7 +2275,7 @@ Fmpz_poly_mat_expr::binary operation(??) const
 
 Fmpz_poly_mat_expr::three operation(??) const
 
-    The following threeary functions are made available as member functions:
+    The following ternary functions are made available as member functions:
     \code{mullow}, \code{pow_trunc}.
 
 Fmpz_mat_expr Fmpz_poly_mat_expr::operator()(Fmpz_expr) const

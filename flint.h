@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FLINT_H
@@ -56,8 +56,8 @@
 
 #define __FLINT_VERSION 2
 #define __FLINT_VERSION_MINOR 6
-#define __FLINT_VERSION_PATCHLEVEL 0
-#define FLINT_VERSION "2.6.0"
+#define __FLINT_VERSION_PATCHLEVEL 3
+#define FLINT_VERSION "2.6.3"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -311,6 +311,7 @@ typedef __mpfr_struct flint_mpfr;
 FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 #endif
 
+/* Beware when using the unsigned return value in signed arithmetic */
 static __inline__
 mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {

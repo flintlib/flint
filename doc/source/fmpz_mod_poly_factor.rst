@@ -154,7 +154,7 @@ Factorisation
 
     Factorises a non-constant polynomial ``f`` into monic irreducible
     factors choosing the best algorithm for given modulo and degree.
-    Choice is based on heuristic measurments.
+    Choice is based on heuristic measurements.
 
 .. function:: void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t f)
 

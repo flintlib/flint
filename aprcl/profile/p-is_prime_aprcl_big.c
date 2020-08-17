@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -35,7 +35,7 @@ int main(void)
     /*
         Using the primes from
         mpz_aprcl implementation readme.txt file
-        link : http://sourceforge.net/projects/mpzaprcl/
+        link : https://sourceforge.net/projects/mpzaprcl/
     */
 
     flint_printf("Primality test profiling for numbers from 350 to 2000 digits\n");

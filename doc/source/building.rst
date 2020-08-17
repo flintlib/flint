@@ -227,7 +227,7 @@ Visual Studio 2015 Community (or higher version) and:
 - an installed version of Python 3
 
 - an installed version of Python Tools for Visual Studio
-  http://pytools.codeplex.com/
+  <https://github.com/Microsoft/PTVS>
 
 Obtain FLINT2 by cloning it using GIT from Brian Gladman's repository:
 
@@ -287,7 +287,7 @@ Visual Studio or on the command line. It is run with a single input
 parameter which is the last two digits of the Visual Studio version
 selected for building FLINT2 (the default is 19 if no input is given).
 
-Ths creates a build directory in the Flint root directory, for 
+This creates a build directory in the Flint root directory, for 
 example:
 
    ``flint\build.vs19``

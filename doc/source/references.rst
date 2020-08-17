@@ -34,9 +34,9 @@ References
 
 .. [GraMol2010] Torbjorn Granlund and Niels Moller : Improved Division by Invariant Integers https://gmplib.org/~tege/division-paper.pdf
 
-.. [GowWag2008] Jason Gower and Sam Wagstaff : "Square form factoring" Math. Comp. 77, 2008, pp 551-588, http://www.ams.org/mcom/2008-77-261/S0025-5718-07-02010-8/home.html
+.. [GowWag2008] Jason Gower and Sam Wagstaff : "Square form factoring" Math. Comp. 77, 2008, pp 551-588, https://doi.org/10.1090/S0025-5718-07-02010-8
 
-.. [HanZim2004] Guillaume Hanrot and Paul Zimmermann : Newton Iteration Revisited (2004) http://www.loria.fr/~zimmerma/papers/fastnewton.ps.gz
+.. [HanZim2004] Guillaume Hanrot and Paul Zimmermann : Newton Iteration Revisited (2004) https://www.loria.fr/~zimmerma/papers/fastnewton.ps.gz
 
 .. [Har2012] Hart, William B.. (2012) A one line factoring algorithm. Journal of the Australian Mathematical Society, Volume 92 (Number 1). pp. 61-69.
 

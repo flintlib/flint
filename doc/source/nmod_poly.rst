@@ -2612,12 +2612,12 @@ Chinese Remaindering
 
 .. function:: void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t CRT)
 
-    Initialize ``CRT`` for chinese remaindering.
+    Initialize ``CRT`` for Chinese remaindering.
 
 .. function:: int nmod_poly_multi_crt_precompute(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * moduli, slong len)
               int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
 
-    Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
+    Configure ``CRT`` for repeated Chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future calls to :func:`nmod_poly_multi_crt_precomp` will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) all of the moduli have positive degree and are pairwise relatively prime.
 

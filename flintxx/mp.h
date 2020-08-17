@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef CXX_MP_H
@@ -111,7 +111,7 @@ struct enable_if_v<false, U> { };
 // The meaning of T is reversed for disable_if.
 // See e.g. [0] or the tests for how to use this.
 // 
-// [0] http://www.boost.org/doc/libs/1_53_0/libs/utility/enable_if.html
+// [0] https://www.boost.org/doc/libs/1_53_0/libs/utility/enable_if.html
 //
 template<class T, class U = void>
 struct enable_if : public enable_if_v<T::val, U> { };

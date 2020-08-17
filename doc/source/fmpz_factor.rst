@@ -156,7 +156,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     value `y`, to start polynomial evaluation and `a`, the constant of the polynomial
     used. It is not assured that the factor found will be prime. Does not compute 
     the complete factorization, just one factor. Returns the number of limbs of 
-    factor if factorization is successfull (non trivial factor is found), else returns 0. 
+    factor if factorization is successful (non trivial factor is found), else returns 0. 
 
     ``max_iters`` is the number of iterations tried in process of finding the cycle. 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
@@ -168,7 +168,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     not prime. ``factor`` is set as the factor if found. It is not assured that the 
     factor found will be prime. Does not compute the complete factorization, 
     just one factor. Returns the number of limbs of factor if factorization is 
-    successfull (non trivial factor is found), else returns 0. 
+    successful (non trivial factor is found), else returns 0. 
 
     ``max_iters`` is the number of iterations tried in process of finding the cycle. 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
@@ -176,8 +176,8 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     maximum of ``max_tries`` times. 
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
-    suggested by Richard Brent. It can be found in the paper availible at
-    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
+    suggested by Richard Brent. It can be found in the paper available at
+    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
 
 
 Elliptic curve (ECM) method

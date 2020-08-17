@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -75,4 +75,6 @@ fq_ctx_init_modulus(fq_ctx_t ctx, fmpz_mod_poly_t modulus, const char *var)
     fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
     fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
     fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length);
+
+    ctx->is_conway = 0;
 }

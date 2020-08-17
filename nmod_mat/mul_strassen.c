@@ -8,7 +8,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -67,7 +67,7 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     /*
         See Jean-Guillaume Dumas, Clement Pernet, Wei Zhou; "Memory
         efficient scheduling of Strassen-Winograd's matrix multiplication
-        algorithm"; http://arxiv.org/pdf/0707.2347v3 for reference on the
+        algorithm"; https://arxiv.org/pdf/0707.2347v3 for reference on the
         used operation scheduling.
     */
 

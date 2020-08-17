@@ -6,12 +6,12 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 /* This is an implementation of the pollard rho algorithm, with a more efficient
    cycle finding algorithm, as proposed by Richard Brent. Details can be found 
-   in the paper http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode 
+   in the paper https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode 
    is available on page 182 of the same paper */
 
 #include <gmp.h>

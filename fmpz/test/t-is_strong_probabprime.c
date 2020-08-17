@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-/* Composite strong pseudoprimes from http://oeis.org/A014233 */
+/* Composite strong pseudoprimes from https://oeis.org/A014233 */
 static const char * composites[] = {
     "2047",
     "1373653",

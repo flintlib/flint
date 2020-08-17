@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mod.h"
@@ -15,29 +15,6 @@
 #include "fmpz_mod_mpoly.h"
 
 #define LOW_HALF_MASK ((-UWORD(1)) >> (FLINT_BITS - FLINT_BITS/2))
-
-/*
-    When interpolating a polynomial f we need degree bounds on f in each
-    variable and substitution degrees in each variable, these are not
-    necessarily the same. We also need to calculate discrete logs.
-*/
-void mpoly_bma_interpolate_ctx_init(
-    mpoly_bma_interpolate_ctx_t Ictx,
-    slong nvars)
-{
-    Ictx->degbounds = (slong *) flint_malloc(nvars*sizeof(slong));
-    Ictx->subdegs   = (ulong *) flint_malloc(nvars*sizeof(ulong));
-    fmpz_mod_discrete_log_pohlig_hellman_init(Ictx->dlogenv);
-    nmod_discrete_log_pohlig_hellman_init(Ictx->dlogenv_sp);
-}
-
-void mpoly_bma_interpolate_ctx_clear(mpoly_bma_interpolate_ctx_t Ictx)
-{
-    flint_free(Ictx->degbounds);
-    flint_free(Ictx->subdegs);
-    fmpz_mod_discrete_log_pohlig_hellman_clear(Ictx->dlogenv);
-    nmod_discrete_log_pohlig_hellman_clear(Ictx->dlogenv_sp);
-}
 
 /*
     If I was formed from evaluations at
@@ -3198,7 +3175,7 @@ pick_bma_prime:
             case random_check_point_not_found:
                 /* hmmm */
             case random_check_good:
-                NULL;
+                break;
         }
     }
     else
@@ -3381,7 +3358,7 @@ pick_bma_prime:
             case random_check_point_not_found:
                 /* hmmm */
             case random_check_good:
-                NULL;
+                break;
         }
     }
 
@@ -3531,7 +3508,7 @@ next_zip_image:
                a singular Vandermonde matrix. Assumed form is not nec wrong. */
             goto pick_zip_prime;
         case nmod_zip_find_coeffs_good:
-            NULL;
+            break;
     }
 
     FLINT_ASSERT(Hbits == H->bits);

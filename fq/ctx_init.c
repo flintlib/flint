@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -23,8 +23,10 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
     if (_fq_ctx_init_conway(ctx, p, d, var))
     {
-        return;
-    }
+        ctx->is_conway = 1;
+	return;
+    } else
+	ctx->is_conway = 0;
 
     flint_randinit(state);
 

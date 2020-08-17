@@ -257,12 +257,20 @@ Roots
 --------------------------------------------------------------------------------
 
 
+.. function:: int fq_sqrt(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
+
+    Sets ``rop`` to the square root of ``op1`` if it is a square, and return
+    `1`, otherwise return `0`.
+
 .. function:: void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 
     Sets ``rop`` to a `p^{th}` root root of ``op1``.  Currently,
     this computes the root by raising ``op1`` to `p^{d-1}` where
     `d` is the degree of the extension.
 
+.. function:: int fq_is_square(const fq_t op, const fq_ctx_t ctx)
+
+    Return ``1`` if ``op`` is a square.
 
 Output
 --------------------------------------------------------------------------------
@@ -372,14 +380,27 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: void fq_get_fmpz_poly(fmpz_poly_t a, const fq_t b, const fq_ctx_t ctx)
+
+.. function:: void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b, const fq_ctx_t ctx)
+
+    Set ``a`` to a representative of ``b`` in ``ctx``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+
+.. function:: void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx)
+
+.. function:: void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx)
+
+    Set ``a`` to the element in ``ctx`` with representative ``b``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+
 .. function:: void fq_get_fmpz_mod_mat(fmpz_mod_mat_t col, const fq_t a, const fq_ctx_t ctx)
 
     Convert ``a`` to a column vector of length ``degree(ctx)``.
 
 .. function:: void fq_set_fmpz_mod_mat(fq_t a, const fmpz_mod_mat_t col, const fq_ctx_t ctx)
 
-    Convert a column vector ``col`` of length ``degree(ctx)`` to
-    an element of ``ctx``.
+    Convert a column vector ``col`` of length ``degree(ctx)`` to an element of ``ctx``.
 
 
 Comparison

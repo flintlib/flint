@@ -1,16 +1,25 @@
 #! /bin/sh
 
-wget http://mpir.org/mpir-2.7.2.tar.bz2
-tar -xf mpir-2.7.2.tar.bz2
-mkdir -p local
-
-cd mpir-2.7.2
-./configure ABI=$ABI --enable-gmpcompat --prefix=${LOCAL}
+git clone https://github.com/yasm/yasm
+cd yasm
+git checkout v1.3.0
+./autogen.sh
+./configure ABI=$ABI --prefix=${LOCAL}
 ${MAKE} > /dev/null 2>&1
 ${MAKE} install > /dev/null 2>&1
 cd ..
 
-wget http://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
+wget http://mpir.org/mpir-3.0.0.tar.bz2
+tar -xf mpir-3.0.0.tar.bz2
+mkdir -p local
+
+cd mpir-3.0.0
+./configure ABI=$ABI --enable-gmpcompat --prefix=${LOCAL} --with-yasm=${LOCAL}/bin/yasm
+${MAKE} > /dev/null 2>&1
+${MAKE} install > /dev/null 2>&1
+cd ..
+
+wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
 tar -xf mpfr-4.0.0.tar.bz2
 cd mpfr-4.0.0
 ./configure ABI=$ABI --with-gmp=${LOCAL} --prefix=${LOCAL}

@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 *******************************************************************************
@@ -198,7 +198,7 @@ FLINT_DEFINE_GET(name, totype, fromtype, eval)
 
     Same as \code{FLINT_DEFINE_GET2(name, totype, fromtype, fromtype, eval)}.
 
-FLINT_DEFINE_GET_COND(name, totye, cond, eval)
+FLINT_DEFINE_GET_COND(name, totype, cond, eval)
 
     Specialise a getter called \code{name}, which takes an argument \code{from}
     of type \code{T:cond} It returns \code{totype} by
@@ -284,14 +284,14 @@ FLINT_DEFINE_CBINARY_EXPR_COND2(name, rettype, cond1, cond2, eval)
     \code{T:cond1} and \code{U:cond2}.
 
 FLINT_DEFINE_THREEARY_EXPR_COND3(name, rettype, cond1, cond2, cond3, eval)
-FLINT_DEFINE_FOURARY_EXPR_COND4(name, retttype, cond1 ... cond4, eval)
+FLINT_DEFINE_FOURARY_EXPR_COND4(name, rettype, cond1 ... cond4, eval)
 FLINT_DEFINE_FIVEARY_EXPR_COND5(name, rettype, cond1 ... cond5, eval)
 FLINT_DEFINE_SIXARY_EXPR_COND6(name, rettype, cond1 ... cond6, eval)
 FLINT_DEFINE_SEVENARY_EXPR_COND7(name, rettype, cond1 ... cond7, eval)
 
     Specialise higher order rules, similarly to the above.
 
-FLINT_DEFINE_THREEARY_EXPR(name, retttype, T1, T2, T3, eval)
+FLINT_DEFINE_THREEARY_EXPR(name, rettype, T1, T2, T3, eval)
 
     Specialise a threeary expression rule unconditionally.
 

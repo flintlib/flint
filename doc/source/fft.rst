@@ -68,7 +68,7 @@ Arithmetic modulo a generalised Fermat number
 
 .. function:: void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
 
-    Adds the signed limb ``c`` to the generalised fermat number ``r``
+    Adds the signed limb ``c`` to the generalised F number ``r``
     modulo ``B^limbs + 1``. The compiler should be able to inline
     this for the case that there is no overflow from the first limb.
 
@@ -256,7 +256,7 @@ Radix 2 transforms
     are then equal to what they would have been if the inverse transform of
     the right hand side of the input array had been computed with full data
     from the start. The function ``ifft_truncate1`` is then called on the
-    entire right half of the input array with this auxilliary data filled in.
+    entire right half of the input array with this auxiliary data filled in.
     Finally a single layer of the IFFT is completed on all the coefficients
     up to ``trunc`` being careful to note that this involves doubling the
     coefficients from ``trunc - n`` up to ``n``.

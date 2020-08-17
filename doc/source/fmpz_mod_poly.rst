@@ -275,7 +275,7 @@ Getting and setting coefficients
 .. function:: void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
 
     Sets `x` to the coefficient of `X^n` in the polynomial,
-    assumng `n \geq 0`.
+    assuming `n \geq 0`.
 
 .. function:: void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n, const mpz_t x)
 
@@ -285,7 +285,7 @@ Getting and setting coefficients
 .. function:: void fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly, slong n)
 
     Sets `x` to the coefficient of `X^n` in the polynomial,
-    assumng `n \geq 0`.
+    assuming `n \geq 0`.
 
 
 Shifting
@@ -1385,7 +1385,7 @@ Resultant
 
     Assumes that ``len1 >= len2 > 0``.
 
-    Asumes that the modulus is prime.
+    Assumes that the modulus is prime.
 
 .. function:: void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 
@@ -1441,7 +1441,7 @@ Resultant
 
     Assumes that ``lenA >= lenB > 0``.
 
-    Asumes that the modulus is prime.
+    Assumes that the modulus is prime.
 
 .. function:: void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 
@@ -1467,7 +1467,7 @@ Resultant
 
     Assumes that ``len1 >= len2 > 0``.
 
-    Asumes that the modulus is prime.
+    Assumes that the modulus is prime.
 
 .. function:: void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 

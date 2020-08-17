@@ -18,7 +18,7 @@ v 1.0.2 -- 10-Dec-07
 
 v 1.0.3 -- 16-Dec-07
 
-   * Fixed a bug in the polynomial memory managment code which caused a segfault
+   * Fixed a bug in the polynomial memory management code which caused a segfault
    * Fixed a bug in the pseudo division code which caused a block overrun
     
 v 1.0.4 -- 04-Jan-08
@@ -895,7 +895,7 @@ fmpz_poly
   * added scalar mul_2exp, fdiv_2exp, tdiv_2exp
   * made randtest produce sparse output
   * added fmpz_poly_equal_fmpz
-  * improved performance by always using basecase multiplicatio
+  * improved performance by always using basecase multiplication
     when one polynomial is short
   * improved algorithm selection for fmpz_poly_gcd
   * fixed several bugs in gcd_modular
@@ -1105,7 +1105,7 @@ v 2.5.0 -- 07 Aug 2015
 
   * LLL (rational, Nguyen-Stehle, from Gram matrix, with_removal, Storjohann/ULLL)
   * Hermite normal form (naive, xgcd, Domich-Kannan-Trotter, Kannan-Bachem, Pernet-Stein)
-  * Smith normal form (diagonal, Kannen-Bachem, Iliopoulos)
+  * Smith normal form (diagonal, Kannan-Bachem, Iliopoulos)
   * Paterson-Stockmeyer algorithm
   * modular resultant
   * hgcd resultant
@@ -1220,4 +1220,20 @@ v 2.6.0 -- 5 Jun 2020
   * GMP 6.2 support
   * MPIR 3.0.0 support
   * many small speedups and additional convenience functions added
+
+v 2.6.1 -- 23 Jul 2020
+
+ * Fix issues on Debian major architectures
+ * Fix numerous reported bugs (mpoly, fq_poly, mpn_mul_1, mod 2 code, etc.)
+
+v 2.6.2 -- 31 Jul 2020
+
+ * Fix for choice of generator in an fq finite field of degree one
+ * Fix an incorrectly written test
+
+v 2.6.3 -- 12 Aug 2020
+
+ * Fix a bug in generator of finite field in characteristic 2
+ * Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
+ * Fix some old license headers
 

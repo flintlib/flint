@@ -252,12 +252,19 @@ Roots
 --------------------------------------------------------------------------------
 
 
+.. function:: void fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)                                                
+    Sets ``rop`` to the square root of ``op1`` if it is a square, and return
+    `1`, otherwise return `0`.
+
 .. function:: void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to a `p^{th}` root root of ``op1``.  Currently,
     this computes the root by raising ``op1`` to `p^{d-1}` where
     `d` is the degree of the extension.
 
+.. function:: int fq_nmod_is_square(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Return ``1`` if ``op`` is a square.
 
 Output
 --------------------------------------------------------------------------------
@@ -365,14 +372,23 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
+
+    Set ``a`` to a representative of ``b`` in ``ctx``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+
+.. function:: void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx);
+
+    Set ``a`` to the element in ``ctx`` with representative ``b``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+
 .. function:: void fq_nmod_get_nmod_mat(nmod_mat_t col, const fq_nmod_t a, const fq_nmod_ctx_t ctx)
 
     Convert ``a`` to a column vector of length ``degree(ctx)``.
 
 .. function:: void fq_nmod_set_nmod_mat(fq_nmod_t a, const nmod_mat_t col, const fq_nmod_ctx_t ctx)
 
-    Convert a column vector ``col`` of length ``degree(ctx)`` to
-    an element of ``ctx``.
+    Convert a column vector ``col`` of length ``degree(ctx)`` to an element of ``ctx``.
 
 
 Comparison
@@ -399,6 +415,10 @@ Comparison
 
     Returns whether ``op`` is an invertible element.  If it is not,
     then ``f`` is set of a factor of the modulus.
+
+.. function:: int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if ``a`` is after (resp. before, same as) ``b`` in some arbitrary but fixed total ordering of the elements.
 
 
 Special functions

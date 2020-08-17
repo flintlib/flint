@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gmp.h"
@@ -866,7 +866,7 @@ static void _hgcd_step(
         a/b = [[q1 1][1 0]] * ... * [[qn 1][1 0]](a'/b')
 
     The qi are written to s, and M is multiplied on the right. This is an
-    inplace operation, so (M, xa/xb) is the input ball M^-1(a/(b+1), (a+1)/b)
+    in-place operation, so (M, xa/xb) is the input ball M^-1(a/(b+1), (a+1)/b)
     and output ball M^-1(a'/(b'+1), (a'+1)/b').
 */
 void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)

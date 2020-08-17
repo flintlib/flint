@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_mpoly.h"
@@ -159,9 +159,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             nmod_mpoly_mul(a, a, g, ctx);
@@ -205,9 +205,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             nmod_mpoly_mul(a, a, g, ctx);

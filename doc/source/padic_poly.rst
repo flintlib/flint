@@ -503,7 +503,7 @@ Input and output
     Prints a simple representation of the polynomial ``poly`` 
     to the stream ``file``.
 
-    A non-zero polynomial is represented by the number of coeffients, 
+    A non-zero polynomial is represented by the number of coefficients, 
     two spaces, followed by a list of the coefficients, which are printed 
     in a way depending on the print mode,
 

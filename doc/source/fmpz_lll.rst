@@ -270,7 +270,7 @@ These programs implement ideas from the paper [Villard2007]_.
     function is mainly intended to be used for testing purposes. It will not
     always work, but if it does the result is guaranteed.
 
-    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
+    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 
@@ -280,7 +280,7 @@ These programs implement ideas from the paper [Villard2007]_.
     ``prec`` bits. The function is mainly intended to be used for testing
     purposes. It will not always work, but if it does the result is guaranteed.
 
-    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
+    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 
@@ -304,7 +304,7 @@ These programs implement ideas from the paper [Villard2007]_.
     testing purposes. It will not always work, but if it does the result is
     guaranteed.
 
-    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
+    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
@@ -316,7 +316,7 @@ These programs implement ideas from the paper [Villard2007]_.
     intended to be used for testing purposes. It will not always work, but if
     it does the result is guaranteed.
 
-    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
+    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 

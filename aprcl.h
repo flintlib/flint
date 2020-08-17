@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef APRCL_H
@@ -154,7 +154,7 @@ FLINT_DLL void unity_zp_swap(unity_zp f, unity_zp g);
 
 FLINT_DLL void unity_zp_set_zero(unity_zp f);
 
-/* Comparision */
+/* Comparison */
 FLINT_DLL slong unity_zp_is_unity(unity_zp f);
 
 FLINT_DLL int unity_zp_equal(unity_zp f, unity_zp g);
@@ -259,7 +259,7 @@ FLINT_DLL void unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow);
 FLINT_DLL void unity_zp_pow_sliding_fmpz(unity_zp f,
         unity_zp g, const fmpz_t pow);
 
-/* Cyclotimic reduction */
+/* Cyclotomic reduction */
 FLINT_DLL void _unity_zp_reduce_cyclotomic_divmod(unity_zp f);
 
 FLINT_DLL void _unity_zp_reduce_cyclotomic(unity_zp f);
@@ -298,7 +298,7 @@ FLINT_DLL void unity_zpq_copy(unity_zpq f, const unity_zpq g);
 
 FLINT_DLL void unity_zpq_swap(unity_zpq f, unity_zpq g);
 
-/* Comparision */
+/* Comparison */
 FLINT_DLL int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
 FLINT_DLL slong unity_zpq_p_unity(const unity_zpq f);

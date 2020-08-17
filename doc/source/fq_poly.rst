@@ -330,14 +330,14 @@ Scalar multiplication and division
 
 .. function:: void _fq_poly_scalar_submul_fq(fq_struct *rop, const fq_struct *op, slong len, const fq_t x, const fq_ctx_t ctx)
 
-    Substracts from ``(rop,len)`` the product of ``(op,len)`` by the
+    Subtracts from ``(rop,len)`` the product of ``(op,len)`` by the
     scalar ``x``, in the context defined by ``ctx``.
     In particular, assumes the same length for ``op`` and
     ``rop``.
 
 .. function:: void fq_poly_scalar_submul_fq(fq_poly_t rop, const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
 
-    Substracts from ``rop`` the product of ``op`` by the
+    Subtracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
 .. function:: void _fq_poly_scalar_div_fq(fq_struct *rop, const fq_struct *op, slong len, const fq_t x, const fq_ctx_t ctx)

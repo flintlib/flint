@@ -7,7 +7,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifdef T
@@ -28,6 +28,36 @@ TEMPLATE(T, mat_rref) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     slong *P;
     TEMPLATE(T, struct) * e;
     TEMPLATE(T, mat_t) U, V;
+
+    if (TEMPLATE(T, mat_is_zero)(A, ctx))
+        return 0;
+
+    if (A->r == 1)
+    {
+        TEMPLATE(T, struct) * c;
+        slong i, j;
+        slong r = 0;
+
+        for (i = 0; i < A->c; i++)
+        {
+            c = TEMPLATE(T, mat_entry)(A, 0, i);
+            if (!TEMPLATE(T, is_zero)(c, ctx))
+            {
+                r = 1;
+                if (TEMPLATE(T, is_one)(c, ctx))
+                    break;
+
+                TEMPLATE(T, inv)(c, c, ctx);
+                for (j = i + 1;j < A->c; j++)
+                {
+                    TEMPLATE(T, mul)(TEMPLATE(T, mat_entry)(A, 0, j), TEMPLATE(T, mat_entry)(A, 0, j), c, ctx);
+                }
+                TEMPLATE(T, one)(c, ctx);
+                break;
+            }
+        }
+        return r;
+    }
 
     n = A->c;
 

@@ -7,7 +7,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef MPOLY_H
@@ -332,6 +332,7 @@ void mpoly_monomial_msub_mp(ulong * exp1, const ulong * exp2, ulong scalar,
     slong i;
     for (i = 0; i < N; i++)
         exp1[i] = exp2[i];
+    FLINT_ASSERT(N > 0);
     mpn_submul_1(exp1, exp3, N, scalar);
 }
 
@@ -345,7 +346,10 @@ void mpoly_monomial_msub_ui_array(ulong * exp1, const ulong * exp2,
         exp1[i] = exp2[i];
     FLINT_ASSERT(scalar_limbs <= N);
     for (i = 0; i < scalar_limbs; i++)
+    {
+        FLINT_ASSERT(N > i);
         mpn_submul_1(exp1 + i, exp3, N - i, scalar[i]);
+    }
 }
 
 MPOLY_INLINE
@@ -392,8 +396,20 @@ ulong mpoly_overflow_mask_sp(flint_bitcnt_t bits)
 }
 
 MPOLY_INLINE
+ulong mpoly_monomial_max1(ulong exp2, ulong exp3,
+                                               flint_bitcnt_t bits, ulong mask)
+{
+    ulong s, m, exp1;
+    s = mask + exp2 - exp3;
+    m = mask & s;
+    m = m - (m >> (bits - 1));
+    exp1 = exp3 + (s & m);
+    return exp1;
+}
+
+MPOLY_INLINE
 void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                               slong bits, slong N, ulong mask)
+                                      flint_bitcnt_t bits, slong N, ulong mask)
 {
     ulong i, s, m;
     for (i = 0; i < N; i++)
@@ -406,8 +422,20 @@ void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
 }
 
 MPOLY_INLINE
+ulong mpoly_monomial_min1(ulong exp2, ulong exp3,
+                                               flint_bitcnt_t bits, ulong mask)
+{
+    ulong s, m, exp1;
+    s = mask + exp2 - exp3;
+    m = mask & s;
+    m = m - (m >> (bits - 1));
+    exp1 = exp2 - (s & m);
+    return exp1;
+}
+
+MPOLY_INLINE
 void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                               slong bits, slong N, ulong mask)
+                                      flint_bitcnt_t bits, slong N, ulong mask)
 {
     ulong i, s, m;
     for (i = 0; i < N; i++)
@@ -421,7 +449,7 @@ void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
 
 MPOLY_INLINE
 void mpoly_monomial_max_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                                     flint_bitcnt_t bits, slong N)
+                                                  flint_bitcnt_t bits, slong N)
 {
     slong i, j;
     for (i = 0; i < N; i += bits/FLINT_BITS)
@@ -626,6 +654,7 @@ void mpoly_monomial_mul_ui(ulong * exp2, const ulong * exp3, slong N, ulong c)
 MPOLY_INLINE
 void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c)
 {
+    FLINT_ASSERT(N > 0);
     mpn_mul_1(exp2, exp3, N, c);
 }
 
@@ -921,6 +950,10 @@ FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
 
 FLINT_DLL void mpoly_get_ovfmask(ulong * ovfmask, slong N, flint_bitcnt_t bits,
                                                        const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_monomials_cmp(const ulong * Aexps, flint_bitcnt_t Abits,
+                                  const ulong * Bexps, flint_bitcnt_t Bbits,
+                                         slong length, const mpoly_ctx_t mctx);
 
 FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                        const mpoly_ctx_t mctx);

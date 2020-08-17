@@ -101,7 +101,7 @@ Dot product and norm
     
 .. function:: void _mpf_vec_norm(mpf_t res, mpf * vec, slong len)
 
-    Sets ``res`` to the sqaure of the Euclidean norm of 
+    Sets ``res`` to the square of the Euclidean norm of 
     ``(vec, len)``.
 
 .. function:: int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec)
@@ -113,6 +113,6 @@ Dot product and norm
 
 .. function:: void _mpf_vec_norm2(mpf_t res, mpf * vec, slong len, flint_bitcnt_t prec)
 
-    Sets ``res`` to the sqaure of the Euclidean norm of 
+    Sets ``res`` to the square of the Euclidean norm of 
     ``(vec, len)``. The temporary variable used has its precision
     set to be at least ``prec`` bits.

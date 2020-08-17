@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fq_nmod_mpoly.h"
@@ -144,9 +144,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bits(t, state, 1, exp_bits, ctx);
-            } while (t->length != 1);
+            fq_nmod_mpoly_randtest_bits(t, state, 1, exp_bits, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bits(a, state, len1, exp_bits1, ctx);
             fq_nmod_mpoly_randtest_bits(b, state, len2, exp_bits2, ctx);
             fq_nmod_mpoly_mul(a, a, t, ctx);
@@ -189,12 +189,13 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bits(t1, state, 1, exp_bits1, ctx);
-            } while (t1->length != 1);
-            do {
-                fq_nmod_mpoly_randtest_bits(t2, state, 1, exp_bits2, ctx);
-            } while (t2->length != 1);
+            fq_nmod_mpoly_randtest_bits(t1, state, 1, exp_bits1, ctx);
+            fq_nmod_mpoly_randtest_bits(t2, state, 1, exp_bits2, ctx);
+            if (t1->length != 1 || t2->length != 1)
+            {
+                flint_printf("FAIL:\ncheck random monomial generation\n");
+                flint_abort();
+            }
             fq_nmod_mpoly_randtest_bits(a, state, len1, exp_bits, ctx);
             fq_nmod_mpoly_mul(b, a, t1, ctx);
             fq_nmod_mpoly_mul(t2, a, t2, ctx);
@@ -234,9 +235,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
-            } while (t->length == 0);
+            fq_nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             fq_nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
 
@@ -279,9 +280,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
-            } while (t->length == 0);
+            fq_nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             fq_nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             fq_nmod_mpoly_mul(a, a, t, ctx);
@@ -352,9 +353,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
-            } while (t->length == 0);
+            fq_nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             fq_nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             fq_nmod_mpoly_mul(a, a, t, ctx);
@@ -431,9 +432,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
-            } while (t->length == 0);
+            fq_nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bounds(a, state, len2, degbounds2, ctx);
             fq_nmod_mpoly_randtest_bounds(b, state, len3, degbounds3, ctx);
             fq_nmod_mpoly_mul(a, a, t, ctx);
@@ -486,9 +487,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
-            } while (t->length == 0);
+            fq_nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bounds(a, state, len2, degbounds2, ctx);
             fq_nmod_mpoly_randtest_bounds(b, state, len3, degbounds3, ctx);
 
@@ -571,9 +572,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
-            } while (t->length == 0);
+            fq_nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
+            if (fq_nmod_mpoly_is_zero(t, ctx))
+                fq_nmod_mpoly_one(t, ctx);
             fq_nmod_mpoly_randtest_bounds(a, state, len2, degbounds2, ctx);
             fq_nmod_mpoly_randtest_bounds(b, state, len3, degbounds3, ctx);
             fq_nmod_mpoly_mul(a, a, t, ctx);

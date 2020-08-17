@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -48,6 +48,7 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
                 /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
                 m = FLINT_MAX(len1 - 1, start);
 
+                FLINT_ASSERT(len2 - 1 + len1 - m > 0);
                 mpn_mul_1(res + m, poly2 + m - len1 + 1, len2 - 1 + len1 - m,
                           poly1[len1 - 1]);
 

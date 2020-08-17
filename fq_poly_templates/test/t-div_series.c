@@ -8,7 +8,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifdef T
@@ -25,7 +25,7 @@ main(void)
     fflush(stdout);
 
     /* Check A*B^{-1} * B is congruent A mod t^n */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, d;
@@ -37,6 +37,9 @@ main(void)
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
+
+        TEMPLATE(T, poly_randtest) (c, state, n_randint(state, 80) + 2, ctx);
+        TEMPLATE(T, poly_randtest) (d, state, n_randint(state, 80) + 2, ctx);
 
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 80) + 1, ctx);
         TEMPLATE(T, poly_randtest_not_zero) (b, state,

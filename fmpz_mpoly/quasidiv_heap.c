@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mpoly.h"
@@ -800,7 +800,6 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
     int free2 = 0, free3 = 0;
     fmpz_mpoly_t temp1;
     fmpz_mpoly_struct * tq;
-    TMP_INIT;
 
     /* check divisor is nonzero */
     if (poly3->length == 0)
@@ -815,10 +814,9 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
         return;
     }
 
-    TMP_START;
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -874,6 +872,7 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
       exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
       N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+      cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
       mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
@@ -913,5 +912,5 @@ cleanup3:
    if (free3)
       flint_free(exp3);
 
-    TMP_END;
+   flint_free(cmpmask);
 }

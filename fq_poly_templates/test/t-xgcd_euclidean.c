@@ -7,7 +7,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifdef T
@@ -82,7 +82,7 @@ main(void)
     /* Special case, arguments share a factor ******************************* */
 
     /* Compare with result from GCD and check correctness */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, f, g, s, t, v, w;
@@ -98,9 +98,11 @@ main(void)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (v, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (s, state, n_randint(state, 10), ctx);
+        TEMPLATE(T, poly_randtest) (t, state, n_randint(state, 10), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 10), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 10), ctx);
+        TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 5), ctx);
         TEMPLATE(T, poly_mul) (a, a, f, ctx);
         TEMPLATE(T, poly_mul) (b, b, f, ctx);
 

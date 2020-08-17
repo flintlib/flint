@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -87,9 +87,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bound(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(l, state, len, exp_bits, ctx);
@@ -184,9 +184,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bounds(f, state, len1, exp_bound1, ctx);
-            do {
-                nmod_mpoly_randtest_bounds(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bounds(g, state, len2, exp_bound2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bounds(q, state, len, exp_bound, ctx);
             nmod_mpoly_randtest_bounds(r, state, len, exp_bound, ctx);
             nmod_mpoly_randtest_bounds(k, state, len, exp_bound, ctx);

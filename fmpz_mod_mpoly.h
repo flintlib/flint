@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FMPZ_MOD_MPOLY_H
@@ -302,12 +302,23 @@ FLINT_DLL int fmpz_mod_bma_mpoly_get_fmpz_mpolyu(fmpz_mpolyu_t A,
     const fmpz_mpoly_ctx_t ctx, const fmpz_t alphashift, const fmpz_mod_bma_mpoly_t L,
            const mpoly_bma_interpolate_ctx_t Ictx, const fmpz_mod_ctx_t fpctx);
 
+FMPZ_MOD_MPOLY_INLINE
+void mpoly_bma_interpolate_ctx_init(mpoly_bma_interpolate_ctx_t I, slong nvars)
+{
+    I->degbounds = (slong *) flint_malloc(nvars*sizeof(slong));
+    I->subdegs   = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    fmpz_mod_discrete_log_pohlig_hellman_init(I->dlogenv);
+    nmod_discrete_log_pohlig_hellman_init(I->dlogenv_sp);
+}
 
-
-FLINT_DLL void mpoly_bma_interpolate_ctx_init(mpoly_bma_interpolate_ctx_t Ictx,
-                                                                  slong nvars);
-
-FLINT_DLL void mpoly_bma_interpolate_ctx_clear(mpoly_bma_interpolate_ctx_t Ictx);
+FMPZ_MOD_MPOLY_INLINE
+void mpoly_bma_interpolate_ctx_clear(mpoly_bma_interpolate_ctx_t I)
+{
+    flint_free(I->degbounds);
+    flint_free(I->subdegs);
+    fmpz_mod_discrete_log_pohlig_hellman_clear(I->dlogenv);
+    nmod_discrete_log_pohlig_hellman_clear(I->dlogenv_sp);
+}
 
 FLINT_DLL int nmod_mpoly_bma_get_fmpz_mpoly(fmpz_mpoly_t A,
      const fmpz_mpoly_ctx_t ctx, ulong alphashift, nmod_berlekamp_massey_t I,

@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -37,6 +37,7 @@ void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R,
 
         if (FLINT_BITS + 2 <= 2 * mod.norm)
         {
+            FLINT_ASSERT(lenB > 1);
             mpn_mul_1(R, B, lenB - 1, Q[0]);
             if (lenB > 2) 
                 mpn_addmul_1(R + 1, B, lenB - 2, Q[1]);

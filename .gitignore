@@ -25,6 +25,7 @@ libflint*
 *.pyc
 /build.vc14/build_tests/arith/test/*.obj
 dll/*
+local/
 lib/*
 build.vc14/flint-tests*.sln
 build.vc14/dll_flint/x64

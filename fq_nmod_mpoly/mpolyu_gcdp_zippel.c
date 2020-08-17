@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_mpoly.h"
@@ -1019,8 +1019,7 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(
             fq_nmod_poly_mul(modulus, modulus, tempmod, ctx->fqctx);
         }
 
-outer_continue:
-        NULL;
+outer_continue:;
     }
 
     success = 0;
@@ -1365,13 +1364,11 @@ FLINT_ASSERT(0);
                 goto outer_continue;
             }
 
-inner_continue:
-            NULL;
+inner_continue:;
         }
         FLINT_ASSERT(0 && "not reachable");
 
-outer_continue:
-        NULL;
+outer_continue:;
     }
     FLINT_ASSERT(0 && "not reachable");
 

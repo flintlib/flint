@@ -8,7 +8,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <gmp.h>
@@ -76,7 +76,7 @@ static const mp_limb_t mul_factor[] = {
 
 /* function to get a good approximation of the cube root */
 /* Algorithm for this approximation is mentioned in this article */
-/* http://en.wikipedia.org/wiki/Fast_inverse_square_root */
+/* https://en.wikipedia.org/wiki/Fast_inverse_square_root */
 /* Intead of the inverse square root, we calculate the nth root */
 
 mp_limb_t

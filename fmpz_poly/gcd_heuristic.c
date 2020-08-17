@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <gmp.h>
@@ -17,7 +17,7 @@
 #include "mpn_extras.h"
 
 /* 
-   Divide (arrayg, limbsg) by the positive value gc inplace and
+   Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
 */
 mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
@@ -137,7 +137,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       Determine how many bits (pack_bits) to pack into. The bound 
       bound_bits ensures that if G | A and G | B with G primitive 
       then G is the gcd of A and B. The bound is taken from 
-      http://arxiv.org/abs/cs/0206032v1
+      https://arxiv.org/abs/cs/0206032v1
    */
    bits1 = FLINT_ABS(_fmpz_vec_max_bits(A, len1));
    bits2 = FLINT_ABS(_fmpz_vec_max_bits(B, len2));

@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -33,6 +33,7 @@ fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
     fq_nmod_ctx_init_conway(fq_nmod_ctx, p, d, var);
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
+    ctx->is_conway = 1;
 }
 
 int
@@ -48,8 +49,10 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
     if (!result)
     {
         flint_free(fq_nmod_ctx);
+	ctx->is_conway = 0;
         return result;
-    }
+    } else
+        ctx->is_conway = 1;
     
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
@@ -78,6 +81,7 @@ fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
 
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
+    ctx->is_conway = 0;
 }
 
 void

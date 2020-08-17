@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mod.h"
@@ -1085,7 +1085,7 @@ get_next_index:
             w->zip_find_coeffs_non_invertible = 1; /* safe - only goes from 0 to 1 */
             break;
         default:
-            NULL;
+            break;
     }
 
     goto get_next_index;
@@ -2156,7 +2156,7 @@ pick_bma_prime:
             success = 1;
             goto cleanup;
         case bma_loop_good:
-            NULL;
+            break;
     }
 
     /* Hmodulus was supposed to be set by bma_loop */

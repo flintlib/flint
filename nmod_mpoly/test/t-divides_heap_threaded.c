@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -99,9 +99,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
@@ -158,9 +158,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
@@ -215,9 +215,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
@@ -274,9 +274,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(p, state, len3, exp_bound3, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
@@ -336,9 +336,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(p, state, len3, exp_bound3, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
@@ -397,9 +397,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(p, state, len3, exp_bound3, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);

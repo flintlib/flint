@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -32,6 +32,7 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
    for (i = m - 1; i >= n; i--)
    {
       flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);
+      FLINT_ASSERT(n > 0);
       a[i] -= mpn_submul_1(a + i - n, b, n, q[i - n]);
 
       if (mpn_cmp(a + i - n, b, n) >= 0 || a[i] != 0)

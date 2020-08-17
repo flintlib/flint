@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mpoly.h"
@@ -678,7 +678,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -755,7 +755,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 
         exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+        cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
@@ -807,6 +807,8 @@ cleanup3:
         if (free3[i])
             flint_free(exp3[i]);
     }
+
+    flint_free(cmpmask);
 
     TMP_END;
 }
