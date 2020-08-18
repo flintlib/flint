@@ -68,7 +68,7 @@ Arithmetic modulo a generalised Fermat number
 
 .. function:: void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
 
-    Adds the signed limb ``c`` to the generalised F number ``r``
+    Adds the signed limb ``c`` to the generalised Fermat number ``r``
     modulo ``B^limbs + 1``. The compiler should be able to inline
     this for the case that there is no overflow from the first limb.
 
