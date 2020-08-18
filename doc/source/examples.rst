@@ -14,6 +14,28 @@ Running::
 
 will compile the programs and place the binaries in ``build/examples``.
 
+elementary.c
+-------------------------------------------------------------------------------
+
+This program evaluates several elementary expressions.
+The Calcium output is printed on the right.
+In these simple cases, Calcium's automatic evaluation should produce
+a maximally simplified result (e.g. ``p/q  in  QQ`` if the
+value is a rational number `p/q`).
+
+Sample output::
+
+    > build/examples/elementary 
+    1:  exp(pi*i) + 1                                = 0  in  QQ
+    2:  log(-1)/(pi*i)                               = 1  in  QQ
+    3:  log(-i)/(pi*i)                               = -1/2  in  QQ
+    4:  log(1/10^123)/log(100)                       = -123/2  in  QQ
+    5:  log(1+sqrt(2)) / log(3+2*sqrt(2))            = 1/2  in  QQ
+    6:  sqrt(2)*sqrt(3) - sqrt(6)                    = 0  in  QQ
+    7:  exp(1+sqrt(2))*exp(1-sqrt(2))/(exp(1)^2)     = 1  in  QQ
+
+    cpu/wall(s): 0.007 0.007
+
 machin.c
 -------------------------------------------------------------------------------
 

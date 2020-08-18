@@ -25,132 +25,138 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
     len = CA_FIELD_LENGTH(K);
 
-    if (len <= 1)
+    if (len <= 0)
+        return;
+
+    if (len == 1 && CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(K, 0)))
         return;
 
     /* Find direct algebraic relations. */
-    for (i = 0; i < len; i++)
+    if (len >= 2)
     {
-        ca_ext_struct * x = CA_FIELD_EXT_ELEM(K, i);
-
-        /* Absolute annihilating polynomial for number field */
-        if (CA_EXT_IS_QQBAR(x))
+        for (i = 0; i < len; i++)
         {
-            if (CA_FIELD_IDEAL_LENGTH(K) == 0)
-                CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
-            else
-                CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
+            ca_ext_struct * x = CA_FIELD_EXT_ELEM(K, i);
 
-            fmpz_mpoly_init(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), CA_FIELD_MCTX(K, ctx));
-            fmpz_mpoly_set_gen_fmpz_poly(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), i, QQBAR_POLY(CA_EXT_QQBAR(x)), CA_FIELD_MCTX(K, ctx));
-
-            CA_FIELD_IDEAL_LENGTH(K)++;
-            continue;
-        }
-
-        /* x = sqrt(t) -> x^2 - t = 0 */
-        /* A relation will only be added if t can be expressed in the
-           present field. */
-        if (CA_EXT_HEAD(x) == CA_Sqrt)
-        {
-            ca_srcptr t;
-            ca_field_struct * L;   /* Field of t */
-            slong L_len;
-            slong * tgen_map;
-            slong j, k;
-            int success;
-
-            if (CA_EXT_FUNC_NARGS(x) != 1)
-                flint_abort();
-
-            t = CA_EXT_FUNC_ARGS(x);
-
-            if (CA_IS_SPECIAL(t))
-                flint_abort();
-
-            L = CA_FIELD(t, ctx);
-            L_len = CA_FIELD_LENGTH(L);
-
-            success = 1;
-            tgen_map = flint_malloc(L_len * sizeof(slong));
-
-            for (j = 0; j < L_len; j++)
+            /* Absolute annihilating polynomial for number field */
+            if (CA_EXT_IS_QQBAR(x))
             {
-                for (k = 0; k < len; k++)
-                {
-                    if (CA_FIELD_EXT_ELEM(L, j) == CA_FIELD_EXT_ELEM(K, k))
-                    {
-                        tgen_map[j] = k;
-                        break;
-                    }
-
-                    if (k == len - 1)
-                        success = 0;
-                }
-            }
-
-            if (success)
-            {
-                /* u^2 - p/q  -->  q u^2 - p */
-                fmpz_mpoly_t p, q, u2;
-
-                fmpz_mpoly_init(p, CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_init(q, CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_init(u2, CA_FIELD_MCTX(K, ctx));
-
-                if (L_len == 0)  /* todo: use CA_IS_QQ when renamed */
-                {
-                    fmpz_mpoly_set_fmpz(p, CA_FMPQ_NUMREF(t), CA_FIELD_MCTX(K, ctx));
-                    fmpz_mpoly_set_fmpz(q, CA_FMPQ_DENREF(t), CA_FIELD_MCTX(K, ctx));
-                }
-                else if (CA_FIELD_IS_NF(L))
-                {
-                    fmpz_poly_t pol;
-                    fmpz_t den;
-
-                    _nf_elem_get_fmpz_poly_den_shallow(pol, den, CA_NF_ELEM(t), CA_FIELD_NF(L));
-
-                    fmpz_mpoly_set_gen_fmpz_poly(p, tgen_map[0], pol, CA_FIELD_MCTX(K, ctx));
-                    fmpz_mpoly_set_fmpz(q, den, CA_FIELD_MCTX(K, ctx));
-                }
-                else
-                {
-                    fmpz_mpoly_compose_fmpz_mpoly_gen(p,
-                                              fmpz_mpoly_q_numref(CA_MPOLY_Q(t)),
-                                                tgen_map,
-                                                CA_FIELD_MCTX(L, ctx),
-                                                CA_FIELD_MCTX(K, ctx));
-                    fmpz_mpoly_compose_fmpz_mpoly_gen(q,
-                                              fmpz_mpoly_q_denref(CA_MPOLY_Q(t)),
-                                                tgen_map,
-                                                CA_FIELD_MCTX(L, ctx),
-                                                CA_FIELD_MCTX(K, ctx));
-                }
-
-                fmpz_mpoly_gen(u2, i, CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_pow_ui(u2, u2, 2, CA_FIELD_MCTX(K, ctx));
-
-                fmpz_mpoly_mul(u2, u2, q, CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_sub(u2, u2, p, CA_FIELD_MCTX(K, ctx));
-
-                /* todo: some kind of ideal fit_length method... */
                 if (CA_FIELD_IDEAL_LENGTH(K) == 0)
                     CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
                 else
                     CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
 
-                /* todo: avoid a copy */
-                fmpz_mpoly_init(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)), CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_set(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)), u2, CA_FIELD_MCTX(K, ctx));
+                fmpz_mpoly_init(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), CA_FIELD_MCTX(K, ctx));
+                fmpz_mpoly_set_gen_fmpz_poly(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K), i, QQBAR_POLY(CA_EXT_QQBAR(x)), CA_FIELD_MCTX(K, ctx));
 
                 CA_FIELD_IDEAL_LENGTH(K)++;
-
-                fmpz_mpoly_clear(p, CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_clear(q, CA_FIELD_MCTX(K, ctx));
-                fmpz_mpoly_clear(u2, CA_FIELD_MCTX(K, ctx));
+                continue;
             }
 
-            flint_free(tgen_map);
+            /* x = sqrt(t) -> x^2 - t = 0 */
+            /* A relation will only be added if t can be expressed in the
+               present field. */
+            if (CA_EXT_HEAD(x) == CA_Sqrt)
+            {
+                ca_srcptr t;
+                ca_field_struct * L;   /* Field of t */
+                slong L_len;
+                slong * tgen_map;
+                slong j, k;
+                int success;
+
+                if (CA_EXT_FUNC_NARGS(x) != 1)
+                    flint_abort();
+
+                t = CA_EXT_FUNC_ARGS(x);
+
+                if (CA_IS_SPECIAL(t))
+                    flint_abort();
+
+                L = CA_FIELD(t, ctx);
+                L_len = CA_FIELD_LENGTH(L);
+
+                success = 1;
+                tgen_map = flint_malloc(L_len * sizeof(slong));
+
+                for (j = 0; j < L_len; j++)
+                {
+                    for (k = 0; k < len; k++)
+                    {
+                        if (CA_FIELD_EXT_ELEM(L, j) == CA_FIELD_EXT_ELEM(K, k))
+                        {
+                            tgen_map[j] = k;
+                            break;
+                        }
+
+                        if (k == len - 1)
+                            success = 0;
+                    }
+                }
+
+                if (success)
+                {
+                    /* u^2 - p/q  -->  q u^2 - p */
+                    fmpz_mpoly_t p, q, u2;
+
+                    fmpz_mpoly_init(p, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_init(q, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_init(u2, CA_FIELD_MCTX(K, ctx));
+
+                    if (L_len == 0)  /* todo: use CA_IS_QQ when renamed */
+                    {
+                        fmpz_mpoly_set_fmpz(p, CA_FMPQ_NUMREF(t), CA_FIELD_MCTX(K, ctx));
+                        fmpz_mpoly_set_fmpz(q, CA_FMPQ_DENREF(t), CA_FIELD_MCTX(K, ctx));
+                    }
+                    else if (CA_FIELD_IS_NF(L))
+                    {
+                        fmpz_poly_t pol;
+                        fmpz_t den;
+
+                        _nf_elem_get_fmpz_poly_den_shallow(pol, den, CA_NF_ELEM(t), CA_FIELD_NF(L));
+
+                        fmpz_mpoly_set_gen_fmpz_poly(p, tgen_map[0], pol, CA_FIELD_MCTX(K, ctx));
+                        fmpz_mpoly_set_fmpz(q, den, CA_FIELD_MCTX(K, ctx));
+                    }
+                    else
+                    {
+                        fmpz_mpoly_compose_fmpz_mpoly_gen(p,
+                                                  fmpz_mpoly_q_numref(CA_MPOLY_Q(t)),
+                                                    tgen_map,
+                                                    CA_FIELD_MCTX(L, ctx),
+                                                    CA_FIELD_MCTX(K, ctx));
+                        fmpz_mpoly_compose_fmpz_mpoly_gen(q,
+                                                  fmpz_mpoly_q_denref(CA_MPOLY_Q(t)),
+                                                    tgen_map,
+                                                    CA_FIELD_MCTX(L, ctx),
+                                                    CA_FIELD_MCTX(K, ctx));
+                    }
+
+                    fmpz_mpoly_gen(u2, i, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_pow_ui(u2, u2, 2, CA_FIELD_MCTX(K, ctx));
+
+                    fmpz_mpoly_mul(u2, u2, q, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_sub(u2, u2, p, CA_FIELD_MCTX(K, ctx));
+
+                    /* todo: some kind of ideal fit_length method... */
+                    if (CA_FIELD_IDEAL_LENGTH(K) == 0)
+                        CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
+                    else
+                        CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
+
+                    /* todo: avoid a copy */
+                    fmpz_mpoly_init(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)), CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_set(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)), u2, CA_FIELD_MCTX(K, ctx));
+
+                    CA_FIELD_IDEAL_LENGTH(K)++;
+
+                    fmpz_mpoly_clear(p, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_clear(q, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_clear(u2, CA_FIELD_MCTX(K, ctx));
+                }
+
+                flint_free(tgen_map);
+            }
         }
     }
 
@@ -369,7 +375,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
     /* Find relations involving exponentials, powers and roots. */
     /* Todo: involve algebraic numbers (including roots of unity) */
-    if (len >= 2)
+    if (len >= 1)
     {
         slong * powers;
         slong num_powers;
@@ -395,9 +401,14 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 powers[num_powers] = i;
                 num_powers++;
             }
+            else if (CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(K, i)))
+            {
+                powers[num_powers] = i;
+                num_powers++;
+            }
         }
 
-        if (num_powers + 1 >= 2)
+        if (num_powers >= 1)
         {
             acb_ptr z;
             fmpz * rel;
@@ -433,6 +444,11 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 {
                     ca_get_acb(z + i, CA_EXT_FUNC_ARGS(ext), prec, ctx);
                 }
+                else if (CA_EXT_IS_QQBAR(ext))
+                {
+                    qqbar_get_acb(z + i, CA_EXT_QQBAR(ext), prec);
+                    acb_log(z + i, z + i, prec);
+                }
                 else
                 {
                     flint_abort();
@@ -447,15 +463,38 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
             /* todo: verify that logs are not evaluated at zero... */
 
-            while (num_powers + 1 >= 2)
+            while (num_powers >= 1)
             {
                 found_relation = 0;
+
+/*
+                for (i = 0; i < num_powers + 1; i++)
+                {
+                    acb_printn(z + i, 30, 0); printf("\n");
+                }
+*/
 
                 if (_qqbar_acb_lindep(rel, z, num_powers + 1, 1, prec) && FLINT_ABS(_fmpz_vec_max_bits(rel, num_powers + 1)) <= 10)
                 {
                     ca_t t, u;
                     ca_init(t, ctx);
                     ca_init(u, ctx);
+
+/*
+                    flint_printf("Candidate: ");
+                    for (i = 0; i < num_powers + 1; i++)
+                    {
+                        fmpz_print(rel + i); printf(" * ");
+
+                        if (i == num_powers)
+                            printf("Pi*I  ");
+                        else
+                        {
+                            ca_ext_print(CA_FIELD_EXT_ELEM(K, powers[i]), ctx); flint_printf("  ");
+                        }
+                    }
+                    flint_printf("\n\n");
+*/
 
                     for (i = 0; i < num_powers; i++)
                     {
@@ -477,6 +516,11 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                             {
                                 ca_set(u, CA_EXT_FUNC_ARGS(ext), ctx);
                             }
+                            else if (CA_EXT_IS_QQBAR(ext))
+                            {
+                                ca_set_qqbar(u, CA_EXT_QQBAR(ext), ctx);
+                                ca_log(u, u, ctx);
+                            }
                             else
                             {
                                 flint_abort();
@@ -493,6 +537,10 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                         ca_mul_fmpz(u, u, rel + num_powers, ctx);
                         ca_add(t, t, u, ctx);
                     }
+
+/*
+                    printf("prove: "); ca_print(t, ctx); printf("\n");
+*/
 
                     if (ca_check_is_zero(t, ctx) == T_TRUE)
                     {

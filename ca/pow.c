@@ -161,6 +161,9 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         }
 
         _ca_function_fxy(res, CA_Pow, x, y, ctx);
+        /* todo: detect simple values instead of creating extension element in the first place */
+        _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
+        ca_condense_field(res, ctx);
     }
 }
 
