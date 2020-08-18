@@ -20,30 +20,30 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 
     fac->num = 0;
 
-    if (lenG == 0)
+    if (lenG <= 1)
     {
-        fmpz_set_ui(&fac->c, 0);
-        return;
-    }
-    if (lenG == 1)
-    {
-        fmpz_set(&fac->c, G->coeffs);
+        if (lenG < 1)
+            fmpz_zero(&fac->c);
+        else
+            fmpz_set(&fac->c, G->coeffs + 0);
         return;
     }
 
     fmpz_poly_init(g);
 
-    if (lenG <= 3)
+    if (lenG < 5)
     {
         fmpz_poly_content(&fac->c, G);
         if (fmpz_sgn(fmpz_poly_lead(G)) < 0)
             fmpz_neg(&fac->c, &fac->c);
         fmpz_poly_scalar_divexact_fmpz(g, G, &fac->c);
 
-        if (lenG == 2)
+        if (lenG < 3)
             fmpz_poly_factor_insert(fac, g, 1);
-        else
+        else if (lenG == 3)
             _fmpz_poly_factor_quadratic(fac, g, 1);
+        else
+            _fmpz_poly_factor_cubic(fac, g, 1);
     }
     else
     {
