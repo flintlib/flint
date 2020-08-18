@@ -235,6 +235,8 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
             while (num_logs_with_pi_i >= 2)
             {
+                found_relation = 0;
+
                 if (_qqbar_acb_lindep(rel, z, num_logs_with_pi_i, 1, prec))
                 {
                     ca_t prod, upow;
@@ -363,5 +365,224 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
         }
 
         flint_free(logs);
+    }
+
+    /* Find relations involving exponentials, powers and roots. */
+    /* Todo: involve algebraic numbers (including roots of unity) */
+    if (len >= 2)
+    {
+        slong * powers;
+        slong num_powers;
+        slong prec;
+
+        num_powers = 0;
+        powers = flint_malloc(sizeof(slong) * len);
+
+        for (i = 0; i < len; i++)
+        {
+            if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, i)) == CA_Sqrt)
+            {
+                powers[num_powers] = i;
+                num_powers++;
+            }
+            else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, i)) == CA_Pow)
+            {
+                powers[num_powers] = i;
+                num_powers++;
+            }
+            else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, i)) == CA_Exp)
+            {
+                powers[num_powers] = i;
+                num_powers++;
+            }
+        }
+
+        if (num_powers + 1 >= 2)
+        {
+            acb_ptr z;
+            fmpz * rel;
+            slong alloc, j;
+            int found_relation = 0;
+
+            /* todo: dynamic precision determined by context */
+            prec = 128;
+
+            alloc = num_powers + 1;
+
+            z = _acb_vec_init(alloc);
+            rel = _fmpz_vec_init(alloc);
+
+            for (i = 0; i < num_powers; i++)
+            {
+                ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
+
+                if (CA_EXT_HEAD(ext) == CA_Sqrt)
+                {
+                    ca_get_acb(z + i, CA_EXT_FUNC_ARGS(ext), prec, ctx);
+                    acb_log(z + i, z + i, prec);
+                    acb_mul_2exp_si(z + i, z + i, -1);
+                }
+                else if (CA_EXT_HEAD(ext) == CA_Pow)
+                {
+                    ca_get_acb(z + i, CA_EXT_FUNC_ARGS(ext), prec, ctx);
+                    acb_log(z + i, z + i, prec);
+                    ca_get_acb(z + i + 1, CA_EXT_FUNC_ARGS(ext) + 1, prec, ctx);   /* xxx */
+                    acb_mul(z + i, z + i, z + i + 1, prec);
+                }
+                else if (CA_EXT_HEAD(ext) == CA_Exp)
+                {
+                    ca_get_acb(z + i, CA_EXT_FUNC_ARGS(ext), prec, ctx);
+                }
+                else
+                {
+                    flint_abort();
+                }
+            }
+
+            /* todo: exp(pi i) = -1 --- look for other roots of unity! */
+            /* todo: what else to include -- log(2), log(3), log(5) ? */
+
+            acb_const_pi(z + num_powers, prec);
+            acb_mul_onei(z + num_powers, z + num_powers);
+
+            /* todo: verify that logs are not evaluated at zero... */
+
+            while (num_powers + 1 >= 2)
+            {
+                found_relation = 0;
+
+                if (_qqbar_acb_lindep(rel, z, num_powers + 1, 1, prec) && FLINT_ABS(_fmpz_vec_max_bits(rel, num_powers + 1)) <= 10)
+                {
+                    ca_t t, u;
+                    ca_init(t, ctx);
+                    ca_init(u, ctx);
+
+                    for (i = 0; i < num_powers; i++)
+                    {
+                        if (!fmpz_is_zero(rel + i))
+                        {
+                            ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
+
+                            if (CA_EXT_HEAD(ext) == CA_Sqrt)
+                            {
+                                ca_log(u, CA_EXT_FUNC_ARGS(ext), ctx);
+                                ca_div_ui(u, u, 2, ctx);
+                            }
+                            else if (CA_EXT_HEAD(ext) == CA_Pow)
+                            {
+                                ca_log(u, CA_EXT_FUNC_ARGS(ext), ctx);
+                                ca_mul(u, u, CA_EXT_FUNC_ARGS(ext) + 1, ctx);
+                            }
+                            else if (CA_EXT_HEAD(ext) == CA_Exp)
+                            {
+                                ca_set(u, CA_EXT_FUNC_ARGS(ext), ctx);
+                            }
+                            else
+                            {
+                                flint_abort();
+                            }
+
+                            ca_mul_fmpz(u, u, rel + i, ctx);
+                            ca_add(t, t, u, ctx);
+                        }
+                    }
+
+                    if (!fmpz_is_zero(rel + num_powers))
+                    {
+                        ca_pi_i(u, ctx);
+                        ca_mul_fmpz(u, u, rel + num_powers, ctx);
+                        ca_add(t, t, u, ctx);
+                    }
+
+                    if (ca_check_is_zero(t, ctx) == T_TRUE)
+                    {
+                        found_relation = 1;
+
+/*
+                        flint_printf("Found: ");
+                        for (i = 0; i < num_powers + 1; i++)
+                        {
+                            fmpz_print(rel + i); printf(" * ");
+
+                            if (i == num_powers)
+                                printf("Pi*I  ");
+                            else
+                            {
+                                ca_ext_print(CA_FIELD_EXT_ELEM(K, powers[i]), ctx); flint_printf("  ");
+                            }
+                        }
+                        flint_printf("\n\n");
+*/
+
+                        /* todo: some kind of ideal fit_length method... */
+                        if (CA_FIELD_IDEAL_LENGTH(K) == 0)
+                            CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
+                        else
+                            CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (CA_FIELD_IDEAL_LENGTH(K) + 1) * sizeof(fmpz_mpoly_struct));
+
+                        fmpz_mpoly_init(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)), CA_FIELD_MCTX(K, ctx));
+
+                        /* x^a y^b +/- z^d w^e = 0 */
+
+                        {
+                            ulong * exp1;
+                            ulong * exp2;
+                            int neg;
+
+                            exp1 = flint_calloc(len, sizeof(ulong));
+                            exp2 = flint_calloc(len, sizeof(ulong));
+
+                            neg = fmpz_is_odd(rel + num_powers);
+
+                            for (j = 0; j < num_powers; j++)
+                            {
+                                if (fmpz_is_zero(rel + j))
+                                    continue;
+
+                                if (fmpz_sgn(rel + j) > 0)
+                                    exp1[powers[j]] = rel[j];
+                                else
+                                    exp2[powers[j]] = -rel[j];
+                            }
+
+                            /* todo: normalise sign? */
+                            fmpz_mpoly_set_coeff_si_ui(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)),
+                                1,
+                                exp1,
+                                CA_FIELD_MCTX(K, ctx));
+
+                            fmpz_mpoly_set_coeff_si_ui(CA_FIELD_IDEAL_ELEM(K, CA_FIELD_IDEAL_LENGTH(K)),
+                                neg ? 1 : -1,
+                                exp2,
+                                CA_FIELD_MCTX(K, ctx));
+
+                            flint_free(exp1);
+                            flint_free(exp2);
+                        }
+
+                        CA_FIELD_IDEAL_LENGTH(K)++;
+                    }
+
+                    ca_clear(t, ctx);
+                    ca_clear(u, ctx);
+                }
+
+                if (!found_relation)
+                    break;
+
+                for (j = 0; j < num_powers - 1; j++)
+                    powers[j] = powers[j + 1];
+
+                for (j = 0; j < num_powers; j++)
+                    acb_swap(z + j, z + j + 1);
+
+                num_powers--;
+            }
+
+            _acb_vec_clear(z, alloc);
+            _fmpz_vec_clear(rel, alloc);
+        }
+
+        flint_free(powers);
     }
 }
