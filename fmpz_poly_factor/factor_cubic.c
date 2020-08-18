@@ -582,7 +582,6 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
 
     /* 2*sqrt(a) is bound on absolute value of roots */
     prec = fmpz_bits(a)/2 + 3;
-    prec = (prec + FLINT_BITS - 1)/FLINT_BITS * FLINT_BITS;
 
     fmpz_mul_si(ta, a, -3);
     fmpz_mul_si(tb, b, -1);
@@ -643,8 +642,8 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
             goto cleanup;
         }
 
-        cubic_prec = binary_cubic_lift(r, s, inv, ta, tb, 2*beta - 3*alpha,
-                                 prec > FLINT_BITS ? prec + FLINT_BITS : prec);
+        cubic_prec = binary_cubic_lift(r, s, inv, ta, tb, 2*beta - 3*alpha, prec);
+
         fmpz_mul_2exp(x + 0, r, beta - alpha);
         fmpz_neg(x + 0, x + 0);
         _fmpz_map_from_ZZ2(x + 0, prec);
@@ -681,10 +680,21 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
 
         /*
             The root with valuation beta - alpha is irrational. We have already
-            found it, so factor it out and find the roots of the remaining
-            quadratic with the quadratic formula. The sqrt in this formula
-            unpredictably loses precision, so we might need to calculate the
-            root with valuation beta - alpha to higher precision.
+            found it as -2^(beta-alpha)*r so factor it out and find the roots
+            of the remaining quadratic with the quadratic formula:
+
+            2^(beta-alpha-1)*r +- 2^(alpha/2)*sqrt(2^(2*beta-3*alpha-2)*r^2 - s)
+
+            r and s are calculated to precision O(2^cubic_prec), where
+            cubic_prec >= prec. This formula might lose precision in the
+            relatively common cases
+
+                (1) alpha = 0, or
+                (2) alpha > 0 and 2*beta-3*alpha-2 = 0
+
+            Since binary_cubic_lift_continue doubles cubic_prec, and binary_sqrt
+            outputs a sqrt_prec with sqrt_prec >= cubic_prec/2 - 1, at most
+            two jumps to try_again are required.
         */
 
 try_again:
