@@ -19,22 +19,37 @@ elementary.c
 
 This program evaluates several elementary expressions.
 The Calcium output is printed on the right.
-In these simple cases, Calcium's automatic evaluation should produce
-a maximally simplified result (e.g. ``p/q  in  QQ`` if the
-value is a rational number `p/q`).
+There are two sets of examples. For the first set,
+Calcium's arithmetic should produce
+a simplified result automatically (e.g. ``p/q  in  QQ`` if the
+value is a rational number `p/q`). This result is printed
+on the right-hand side.
+For the second set, the automatic evaluation is not yet sufficient
+to fully simplify the result, but :func:`ca_check_is_zero` or
+:func:`ca_check_equal` is able to prove or disprove the identity
+(giving ``T_TRUE`` or ``T_FALSE``).
 
 Sample output::
 
     > build/examples/elementary 
-    1:  exp(pi*i) + 1                                = 0  in  QQ
-    2:  log(-1)/(pi*i)                               = 1  in  QQ
-    3:  log(-i)/(pi*i)                               = -1/2  in  QQ
-    4:  log(1/10^123)/log(100)                       = -123/2  in  QQ
-    5:  log(1+sqrt(2)) / log(3+2*sqrt(2))            = 1/2  in  QQ
-    6:  sqrt(2)*sqrt(3) - sqrt(6)                    = 0  in  QQ
-    7:  exp(1+sqrt(2))*exp(1-sqrt(2))/(exp(1)^2)     = 1  in  QQ
+    Automatic simplification:
+    exp(pi*i) + 1                                        = 0  in  QQ
+    log(-1)/(pi*i)                                       = 1  in  QQ
+    log(-i)/(pi*i)                                       = -1/2  in  QQ
+    log(1/10^123)/log(100)                               = -123/2  in  QQ
+    log(1+sqrt(2)) / log(3+2*sqrt(2))                    = 1/2  in  QQ
+    sqrt(2)*sqrt(3) - sqrt(6)                            = 0  in  QQ
+    exp(1+sqrt(2))*exp(1-sqrt(2))/(exp(1)^2)             = 1  in  QQ
+    i^i - exp(-pi/2)                                     = 0  in  QQ
 
-    cpu/wall(s): 0.007 0.007
+    With ca_check_is_zero() / ca_check_equal():
+    sqrt(5 + 2*sqrt(6)) - sqrt(2) - sqrt(3)              = 0 ? T_TRUE
+    sqrt(i) - (1+i)/sqrt(2)                              = 0 ? T_TRUE
+    exp(pi*sqrt(163)) - (640320^3 + 744)                 = 0 ? T_FALSE
+
+    cpu/wall(s): 0.014 0.014
+    virt/peak/res/peak(MB): 36.16 36.16 8.93 8.93
+
 
 machin.c
 -------------------------------------------------------------------------------
