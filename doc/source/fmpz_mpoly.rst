@@ -603,6 +603,27 @@ Greatest Common Divisor
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Zippel's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
 
 
+Square Root
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx, int check)
+
+    If `poly2` is a perfect square return `1` and set `q` to the square root
+    with positive leading coefficient. Otherwise return `0` and set `q` to the
+    zero polynomial. If `check = 0` the polynomial is assumed to be a perfect
+    square. This can be significantly faster, but it will not detect
+    non-squares with any reliability, and in the event of being passed a
+    non-square the result is meaningless.
+
+.. function:: int fmpz_mpoly_sqrt(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    If `poly2` is a perfect square return `1` and set `q` to the square root
+    with positive leading coefficient. Otherwise return `0` and set `q` to zero.
+
+.. function:: int fmpz_mpoly_is_square(const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Return `1` if `poly2` is a perfect square, otherwise return `0`. 
+
 Univariate Functions
 --------------------------------------------------------------------------------
 
