@@ -5,6 +5,17 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+#define START(expr) flint_printf("["); flint_printf(expr)
+#define OUT \
+    flint_printf("]   =   "); \
+    ca_print(x, ctx); flint_printf("\n\n");
+#define OUT2 \
+    flint_printf("]   =\n"); \
+    ca_print(x, ctx); flint_printf("\n"); \
+    flint_printf("          Is zero?   "); truth_print(ca_check_is_zero(x, ctx)); \
+    flint_printf("\n\n");
+
+
 int main(int argc, char *argv[])
 {
     ca_ctx_t ctx;
@@ -17,32 +28,27 @@ int main(int argc, char *argv[])
     ca_init(y, ctx);
     ca_init(z, ctx);
 
-    flint_printf("Automatic simplification:\n");
-
-    flint_printf("exp(pi*i) + 1                                        = ");
+    START("Exp(Pi*I) + 1");
     ca_pi_i(x, ctx);
     ca_exp(x, x, ctx);
     ca_add_ui(x, x, 1, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("log(-1)/(pi*i)                                       = ");
+    START("Log(-1) / (Pi*I)");
     ca_set_si(x, -1, ctx);
     ca_log(x, x, ctx);
     ca_pi_i(y, ctx);
     ca_div(x, x, y, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("log(-i)/(pi*i)                                       = ");
+    START("Log(-I) / (Pi*I)");
     ca_neg_i(x, ctx);
     ca_log(x, x, ctx);
     ca_pi_i(y, ctx);
     ca_div(x, x, y, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("log(1/10^123)/log(100)                               = ");
+    START("Log(1 / 10^123) / Log(100)");
     ca_set_ui(x, 10, ctx);
     ca_pow_ui(x, x, 123, ctx);
     ca_inv(x, x, ctx);
@@ -50,10 +56,9 @@ int main(int argc, char *argv[])
     ca_set_ui(y, 100, ctx);
     ca_log(y, y, ctx);
     ca_div(x, x, y, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("log(1+sqrt(2)) / log(3+2*sqrt(2))                    = ");
+    START("Log(1 + Sqrt(2)) / Log(3 + 2*Sqrt(2))");
     ca_sqrt_ui(x, 2, ctx);
     ca_add_ui(x, x, 1, ctx);
     ca_log(x, x, ctx);
@@ -62,19 +67,17 @@ int main(int argc, char *argv[])
     ca_add_ui(y, y, 3, ctx);
     ca_log(y, y, ctx);
     ca_div(x, x, y, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("sqrt(2)*sqrt(3) - sqrt(6)                            = ");
+    START("Sqrt(2)*Sqrt(3) - Sqrt(6)");
     ca_sqrt_ui(x, 2, ctx);
     ca_sqrt_ui(y, 3, ctx);
     ca_sqrt_ui(z, 6, ctx);
     ca_mul(x, x, y, ctx);
     ca_sub(x, x, z, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("exp(1+sqrt(2))*exp(1-sqrt(2))/(exp(1)^2)             = ");
+    START("Exp(1+Sqrt(2)) * Exp(1-Sqrt(2)) / (Exp(1)^2)");
     ca_sqrt_ui(x, 2, ctx);
     ca_add_ui(x, x, 1, ctx);
     ca_exp(x, x, ctx);
@@ -86,10 +89,9 @@ int main(int argc, char *argv[])
     ca_pow_ui(z, z, 2, ctx);
     ca_mul(x, x, y, ctx);
     ca_div(x, x, z, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("i^i - exp(-pi/2)                                     = ");
+    START("I^I - Exp(-Pi/2)");
     ca_i(x, ctx);
     ca_pow(x, x, x, ctx);
     ca_pi(y, ctx);
@@ -97,14 +99,18 @@ int main(int argc, char *argv[])
     ca_neg(y, y, ctx);
     ca_exp(y, y, ctx);
     ca_sub(x, x, y, ctx);
-    ca_print(x, ctx);
-    flint_printf("\n");
+    OUT
 
-    flint_printf("\n");
+    START("Exp(Sqrt(3))^2 - Exp(Sqrt(12))");
+    ca_sqrt_ui(x, 3, ctx);
+    ca_exp(x, x, ctx);
+    ca_pow_ui(x, x, 2, ctx);
+    ca_sqrt_ui(y, 12, ctx);
+    ca_exp(y, y, ctx);
+    ca_sub(x, x, y, ctx);
+    OUT
 
-    flint_printf("With ca_check_is_zero() / ca_check_equal():\n");
-
-    flint_printf("sqrt(5 + 2*sqrt(6)) - sqrt(2) - sqrt(3)              = 0 ? ");
+    START("Sqrt(5 + 2*Sqrt(6)) - Sqrt(2) - Sqrt(3)");
     ca_sqrt_ui(x, 6, ctx);
     ca_mul_ui(x, x, 2, ctx);
     ca_add_ui(x, x, 5, ctx);
@@ -113,10 +119,9 @@ int main(int argc, char *argv[])
     ca_sub(x, x, y, ctx);
     ca_sqrt_ui(y, 3, ctx);
     ca_sub(x, x, y, ctx);
-    truth_print(ca_check_is_zero(x, ctx));
-    flint_printf("\n");
+    OUT2
 
-    flint_printf("sqrt(i) - (1+i)/sqrt(2)                              = 0 ? ");
+    START("Sqrt(I) - (1+I)/Sqrt(2)");
     ca_i(x, ctx);
     ca_sqrt(x, x, ctx);
     ca_i(y, ctx);
@@ -124,10 +129,9 @@ int main(int argc, char *argv[])
     ca_sqrt_ui(z, 2, ctx);
     ca_div(y, y, z, ctx);
     ca_sub(x, x, y, ctx);
-    truth_print(ca_check_is_zero(x, ctx));
-    flint_printf("\n");
+    OUT2
 
-    flint_printf("exp(pi*sqrt(163)) - (640320^3 + 744)                 = 0 ? ");
+    START("Exp(Pi*Sqrt(163)) - (640320^3 + 744)");
     ca_pi(x, ctx);
     ca_sqrt_ui(y, 163, ctx);
     ca_mul(x, x, y, ctx);
@@ -136,16 +140,13 @@ int main(int argc, char *argv[])
     ca_pow_ui(y, y, 3, ctx);
     ca_add_ui(y, y, 744, ctx);
     ca_sub(x, x, y, ctx);
-    truth_print(ca_check_is_zero(x, ctx));
-    flint_printf("\n");
-
+    OUT2
 
     ca_clear(x, ctx);
     ca_clear(y, ctx);
     ca_clear(z, ctx);
     ca_ctx_clear(ctx);
 
-    flint_printf("\n");
     TIMEIT_ONCE_STOP
     SHOW_MEMORY_USAGE
 

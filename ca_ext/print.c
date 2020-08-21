@@ -16,12 +16,23 @@ ca_ext_print(const ca_ext_t x, const ca_ctx_t ctx)
 {
     if (x->head == CA_QQBar)
     {
+        flint_printf("Algebraic ");
+
         if (qqbar_is_i(CA_EXT_QQBAR(x)))
             flint_printf("I");
         else
         {
+/*
             flint_printf("Algebraic [deg %wd] ", qqbar_degree(CA_EXT_QQBAR(x)));
             qqbar_printn(CA_EXT_QQBAR(x), 10);
+*/
+
+            qqbar_printn(CA_EXT_QQBAR(x), 8);
+/*
+            flint_printf(" (");
+            fmpz_poly_print_pretty(QQBAR_POLY(CA_EXT_QQBAR(x)), "a");
+            flint_printf("=0)");
+*/
         }
     }
     else

@@ -71,7 +71,7 @@ ca_print(const ca_t x, const ca_ctx_t ctx)
     }
     else if (CA_FIELD_IS_NF(xfield))
     {
-        nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(xfield), "x");
+        nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(xfield), "x1");
     }
     else
     {

@@ -18,36 +18,49 @@ elementary.c
 -------------------------------------------------------------------------------
 
 This program evaluates several elementary expressions.
-The Calcium output is printed on the right.
-There are two sets of examples. For the first set,
+For some inputs,
 Calcium's arithmetic should produce
 a simplified result automatically (e.g. ``p/q  in  QQ`` if the
-value is a rational number `p/q`). This result is printed
-on the right-hand side.
-For the second set, the automatic evaluation is not yet sufficient
-to fully simplify the result, but :func:`ca_check_is_zero` or
-:func:`ca_check_equal` is able to prove or disprove the identity
-(giving ``T_TRUE`` or ``T_FALSE``).
+value is a rational number `p/q`).
+Some inputs do not yet automatically simplify as much
+as one might hope. 
+Calcium may still able to prove that such a number is zero or nonzero;
+the output of :func:`ca_check_is_zero` is then ``T_TRUE`` or ``T_FALSE``.
 
 Sample output::
 
     > build/examples/elementary 
-    Automatic simplification:
-    exp(pi*i) + 1                                        = 0  in  QQ
-    log(-1)/(pi*i)                                       = 1  in  QQ
-    log(-i)/(pi*i)                                       = -1/2  in  QQ
-    log(1/10^123)/log(100)                               = -123/2  in  QQ
-    log(1+sqrt(2)) / log(3+2*sqrt(2))                    = 1/2  in  QQ
-    sqrt(2)*sqrt(3) - sqrt(6)                            = 0  in  QQ
-    exp(1+sqrt(2))*exp(1-sqrt(2))/(exp(1)^2)             = 1  in  QQ
-    i^i - exp(-pi/2)                                     = 0  in  QQ
+    [Exp(Pi*I) + 1]   =   0  in  QQ
 
-    With ca_check_is_zero() / ca_check_equal():
-    sqrt(5 + 2*sqrt(6)) - sqrt(2) - sqrt(3)              = 0 ? T_TRUE
-    sqrt(i) - (1+i)/sqrt(2)                              = 0 ? T_TRUE
-    exp(pi*sqrt(163)) - (640320^3 + 744)                 = 0 ? T_FALSE
+    [Log(-1) / (Pi*I)]   =   1  in  QQ
 
-    cpu/wall(s): 0.014 0.014
+    [Log(-I) / (Pi*I)]   =   -1/2  in  QQ
+
+    [Log(1 / 10^123) / Log(100)]   =   -123/2  in  QQ
+
+    [Log(1 + Sqrt(2)) / Log(3 + 2*Sqrt(2))]   =   1/2  in  QQ
+
+    [Sqrt(2)*Sqrt(3) - Sqrt(6)]   =   0  in  QQ
+
+    [Exp(1+Sqrt(2)) * Exp(1-Sqrt(2)) / (Exp(1)^2)]   =   1  in  QQ
+
+    [I^I - Exp(-Pi/2)]   =   0  in  QQ
+
+    [Exp(Sqrt(3))^2 - Exp(Sqrt(12))]   =   0  in  QQ
+
+    [Sqrt(5 + 2*Sqrt(6)) - Sqrt(2) - Sqrt(3)]   =
+    (x1-x3-x4)/(1)  in  QQ(x1, x2, x3, x4) where {x1 = Sqrt(2*x1+5  in  QQ(x1) where {x1 = Algebraic 2.4494897}), x2 = Algebraic 2.4494897, x3 = Algebraic 1.7320508, x4 = Algebraic 1.4142136} with ideal {x1^2-2*x2-5, x2^2-6, x3^2-3, x4^2-2, x2-x3*x4}
+              Is zero?   T_TRUE
+
+    [Sqrt(I) - (1+I)/Sqrt(2)]   =
+    (2*x1-x2*x3-x2)/(2)  in  QQ(x1, x2, x3) where {x1 = Sqrt(1*x1+0  in  QQ(x1) where {x1 = Algebraic I}), x2 = Algebraic 1.4142136, x3 = Algebraic I} with ideal {x1^2-x3, x2^2-2, x3^2+1}
+              Is zero?   T_TRUE
+
+    [Exp(Pi*Sqrt(163)) - (640320^3 + 744)]   =
+    (x1-262537412640768744)/(1)  in  QQ(x1) where {x1 = Exp((x1*x2)/(1)  in  QQ(x1, x2) where {x1 = Pi, x2 = Algebraic 12.767145} with ideal {x2^2-163})}
+              Is zero?   T_FALSE
+
+    cpu/wall(s): 0.014 0.013
     virt/peak/res/peak(MB): 36.16 36.16 8.93 8.93
 
 
@@ -72,22 +85,22 @@ so the example program evaluates them using logarithms.
 Sample output::
 
     > build/examples/machin 
-    [(1)*atan(1/1) - pi/4]   =   0  in  QQ
-    [(1)*atan(1/2) + (1)*atan(1/3) - pi/4]   =   0  in  QQ
-    [(2)*atan(1/2) + (-1)*atan(1/7) - pi/4]   =   0  in  QQ
-    [(2)*atan(1/3) + (1)*atan(1/7) - pi/4]   =   0  in  QQ
-    [(4)*atan(1/5) + (-1)*atan(1/239) - pi/4]   =   0  in  QQ
-    [(1)*atan(1/2) + (1)*atan(1/5) + (1)*atan(1/8) - pi/4]   =   0  in  QQ
-    [(1)*atan(1/3) + (1)*atan(1/4) + (1)*atan(1/7) + (1)*atan(1/13) - pi/4]   =   0  in  QQ
-    [(12)*atan(1/49) + (32)*atan(1/57) + (-5)*atan(1/239) + (12)*atan(1/110443) - pi/4]   =   0  in  QQ
+    [(1)*Atan(1/1) - Pi/4]   =   0  in  QQ
+    [(1)*Atan(1/2) + (1)*Atan(1/3) - Pi/4]   =   0  in  QQ
+    [(2)*Atan(1/2) + (-1)*Atan(1/7) - Pi/4]   =   0  in  QQ
+    [(2)*Atan(1/3) + (1)*Atan(1/7) - Pi/4]   =   0  in  QQ
+    [(4)*Atan(1/5) + (-1)*Atan(1/239) - Pi/4]   =   0  in  QQ
+    [(1)*Atan(1/2) + (1)*Atan(1/5) + (1)*Atan(1/8) - Pi/4]   =   0  in  QQ
+    [(1)*Atan(1/3) + (1)*Atan(1/4) + (1)*Atan(1/7) + (1)*Atan(1/13) - Pi/4]   =   0  in  QQ
+    [(12)*Atan(1/49) + (32)*Atan(1/57) + (-5)*Atan(1/239) + (12)*Atan(1/110443) - Pi/4]   =   0  in  QQ
 
-    [(14)*atanh(1/31) + (10)*atanh(1/49) + (6)*atanh(1/161) - log(2)]   =   0  in  QQ
-    [(22)*atanh(1/31) + (16)*atanh(1/49) + (10)*atanh(1/161) - log(3)]   =   0  in  QQ
-    [(32)*atanh(1/31) + (24)*atanh(1/49) + (14)*atanh(1/161) - log(5)]   =   0  in  QQ
-    [(144)*atanh(1/251) + (54)*atanh(1/449) + (-38)*atanh(1/4801) + (62)*atanh(1/8749) - log(2)]   =   0  in  QQ
-    [(228)*atanh(1/251) + (86)*atanh(1/449) + (-60)*atanh(1/4801) + (98)*atanh(1/8749) - log(3)]   =   0  in  QQ
-    [(334)*atanh(1/251) + (126)*atanh(1/449) + (-88)*atanh(1/4801) + (144)*atanh(1/8749) - log(5)]   =   0  in  QQ
-    [(404)*atanh(1/251) + (152)*atanh(1/449) + (-106)*atanh(1/4801) + (174)*atanh(1/8749) - log(7)]   =   0  in  QQ
+    [(14)*Atanh(1/31) + (10)*Atanh(1/49) + (6)*Atanh(1/161) - Log(2)]   =   0  in  QQ
+    [(22)*Atanh(1/31) + (16)*Atanh(1/49) + (10)*Atanh(1/161) - Log(3)]   =   0  in  QQ
+    [(32)*Atanh(1/31) + (24)*Atanh(1/49) + (14)*Atanh(1/161) - Log(5)]   =   0  in  QQ
+    [(144)*Atanh(1/251) + (54)*Atanh(1/449) + (-38)*Atanh(1/4801) + (62)*Atanh(1/8749) - Log(2)]   =   0  in  QQ
+    [(228)*Atanh(1/251) + (86)*Atanh(1/449) + (-60)*Atanh(1/4801) + (98)*Atanh(1/8749) - Log(3)]   =   0  in  QQ
+    [(334)*Atanh(1/251) + (126)*Atanh(1/449) + (-88)*Atanh(1/4801) + (144)*Atanh(1/8749) - Log(5)]   =   0  in  QQ
+    [(404)*Atanh(1/251) + (152)*Atanh(1/449) + (-106)*Atanh(1/4801) + (174)*Atanh(1/8749) - Log(7)]   =   0  in  QQ
 
     cpu/wall(s): 0.03 0.029
     virt/peak/res/peak(MB): 35.57 35.57 8.80 8.80
