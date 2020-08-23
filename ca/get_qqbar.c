@@ -24,6 +24,9 @@ ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx)
     if (CA_EXT_HEAD(x) == CA_Sqrt)
         return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx);
 
+    if (CA_EXT_HEAD(x) == CA_Abs)
+        return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx);
+
     if (CA_EXT_HEAD(x) == CA_Pow)
         return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx) &&
                CA_IS_QQ(CA_EXT_FUNC_ARGS(x) + 1, ctx);
@@ -135,6 +138,10 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
                 {
                     xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
                 }
+                else if (CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)->data.func_data.qqbar != NULL)
+                {
+                    xs[i] = *(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)->data.func_data.qqbar);
+                }
                 else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Sqrt)
                 {
                     qqbar_init(xs + i);
@@ -145,6 +152,23 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 
                     /* todo: maybe do a x2 bounds check */
                     qqbar_sqrt(xs + i, xs + i);
+
+                    /* todo: avoid copy here... */
+                    CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)->data.func_data.qqbar = flint_malloc(sizeof(qqbar_struct));
+                    qqbar_init(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)->data.func_data.qqbar);
+                    qqbar_set(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)->data.func_data.qqbar, xs + i);
+
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Abs)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    /* todo: bounds check */
+                    qqbar_abs(xs + i, xs + i);
                 }
                 else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Pow)
                 {

@@ -156,6 +156,8 @@ qqbar_evaluate_fmpz_mpoly_horner(qqbar_t A, const fmpz_mpoly_t B, qqbar_srcptr C
         return 1;
     }
 
+    /* flint_printf("========================== HORNER %wd ==========================\n", Blen); */
+
     FLINT_ASSERT(Blen > 0);
 
     TMP_START;

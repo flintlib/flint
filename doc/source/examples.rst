@@ -122,6 +122,9 @@ There are far more efficient ways to construct this polynomial;
 this program simply illustrates that arithmetic in
 multivariate number fields works smoothly.
 
+The program prints the coefficients from `S_n`, from the constant
+term to the coefficient of `x^{2^n}`.
+
 Sample output::
 
     > build/examples/sdpoly 3
@@ -148,6 +151,65 @@ A big benchmark problem (output truncated)::
 
     cpu/wall(s): 9.296 9.307
     virt/peak/res/peak(MB): 38.95 38.95 10.01 10.01
+
+huge_expr.c
+-------------------------------------------------------------------------------
+
+This program proves equality of two complicated algebraic numbers.
+More precisely, the program verifies
+that `N = -(1 - |M|^2)^2` where *N* and *M* are given by huge symbolic
+expressions involving nested square roots (about 7000
+operations in total).
+
+By default, the program runs the computation using :type:`qqbar_t` arithmetic.
+This takes half a minute::
+
+    > build/examples/huge_expr 
+    Evaluating N...
+    cpu/wall(s): 18.279 18.279
+    Evaluating M...
+    cpu/wall(s): 6.049 6.051
+    Evaluating E = -(1-|M|^2)^2...
+    cpu/wall(s): 0.595 0.595
+    N ~ -0.16190853053311203695842869991458578203473645660641
+    E ~ -0.16190853053311203695842869991458578203473645660641
+    Testing E = N...
+    cpu/wall(s): 0 0
+
+    Equal = T_TRUE
+
+    Total: cpu/wall(s): 24.927 24.93
+    virt/peak/res/peak(MB): 56.61 68.64 28.73 40.70
+
+To run the computation using :type:`ca_t` arithmetic instead, one
+may pass the ``-ca`` flag. This currently takes much longer::
+
+    > build/examples/huge_expr -ca
+    Evaluating N...
+    cpu/wall(s): 2.116 2.116
+    Evaluating M...
+    cpu/wall(s): 0.068 0.068
+    Evaluating E = -(1-|M|^2)^2...
+    cpu/wall(s): 0.043 0.043
+    N ~ -0.16190853053311203695842869991458578203473645660641
+    E ~ -0.16190853053311203695842869991458578203473645660641
+    Testing E = N...
+    cpu/wall(s): 176.235 176.242
+
+    Equal = T_TRUE
+
+    Total: cpu/wall(s): 178.465 178.472
+    virt/peak/res/peak(MB): 55.92 67.88 29.80 41.76
+
+This should be possible to improve significantly;
+we keep this program as a benchmark for future optimizations
+to the :type:`ca_t` type.
+
+This simplification problem was posted in a help request for Sage
+(https://ask.sagemath.org/question/52653/equality-of-algebraic-numbers-given-by-huge-symbolic-expressions/).
+The C code has been generated from the symbolic expressions
+using a Python script.
+
 
 
 .. raw:: latex

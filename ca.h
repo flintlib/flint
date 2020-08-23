@@ -104,6 +104,7 @@ typedef struct
     slong nargs;            /* Number of function arguments n. */
     acb_struct enclosure;   /* Cached numerical enclosure of f(x1,...,xn) */
     slong prec;             /* Working precision of cached enclosure */
+    qqbar_struct * qqbar;   /* Cached qqbar */
 }
 ca_ext_func_data;
 

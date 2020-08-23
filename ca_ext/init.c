@@ -90,6 +90,8 @@ static void _ca_ext_init_func(ca_ext_t res, ca_ctx_t ctx)
         d = ca_depth(CA_EXT_FUNC_ARGS(res) + i, ctx);
         res->depth = FLINT_MAX(res->depth, d + 1);
     }
+
+    res->data.func_data.qqbar = NULL;
 }
 
 void

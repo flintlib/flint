@@ -115,6 +115,16 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     return;
                 }
 
+                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 3))
+                {
+                    ca_t t;
+                    ca_init(t, ctx);
+                    ca_mul(t, x, x, ctx);
+                    ca_mul(res, t, x, ctx);
+                    ca_clear(t, ctx);
+                    return;
+                }
+
                 if (CA_IS_QQ(x, ctx) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
                 {
                     slong xbits1, xbits2;
@@ -156,6 +166,23 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                         ca_clear(t, ctx);
                         return;
                     }
+                }
+            }
+            else if (fmpz_equal_ui(CA_FMPQ_DENREF(y), 2))
+            {
+                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 1))
+                {
+                    ca_sqrt(res, x, ctx);
+                    return;
+                }
+                else if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 3))
+                {
+                    ca_t t;
+                    ca_init(t, ctx);
+                    ca_sqrt(t, x, ctx);
+                    ca_mul(res, t, x, ctx);
+                    ca_clear(t, ctx);
+                    return;
                 }
             }
         }

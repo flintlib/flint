@@ -398,6 +398,7 @@ Arithmetic
     except that *c* must be nonzero. Division by zero calls *flint_abort*.
 
 .. function:: void qqbar_sqrt(qqbar_t res, const qqbar_t x)
+              void qqbar_sqrt_ui(qqbar_t res, ulong x)
 
     Sets *res* to the principal square root of *x*.
 

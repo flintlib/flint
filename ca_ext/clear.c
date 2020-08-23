@@ -26,6 +26,12 @@ ca_ext_clear(ca_ext_t res, ca_ctx_t ctx)
             ca_vec_clear(CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
 
         acb_clear(CA_EXT_FUNC_ENCLOSURE(res));
+
+        if (res->data.func_data.qqbar != NULL)
+        {
+            qqbar_clear(res->data.func_data.qqbar);
+            flint_free(res->data.func_data.qqbar);
+        }
     }
 }
 

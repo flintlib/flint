@@ -88,9 +88,27 @@ ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
     /* we may want to do this selectively; in some cases cancellation in
        computing x-y will be helpful; in other cases, subtracting the
        terms will make life more difficult */
-    if (x_alg == T_TRUE && y_alg == T_TRUE)
+    if (0 && x_alg == T_TRUE && y_alg == T_TRUE)
     {
-        /* ... */
+        /* ...
+        qqbar_t a, b;
+        qqbar_init(a);
+        qqbar_init(b);
+
+        if (ca_get_qqbar(a, x, ctx))
+        {
+            if (ca_get_qqbar(b, y, ctx))
+            {
+                int eq = qqbar_equal(a, b);
+                qqbar_clear(a);
+                qqbar_clear(b);
+                return eq ? T_TRUE : T_FALSE;
+            }
+        }
+
+        qqbar_clear(a);
+        qqbar_clear(b);
+        */
     }
 
     if (res == T_UNKNOWN)

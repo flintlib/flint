@@ -307,6 +307,13 @@ qqbar_sqrt(qqbar_t res, const qqbar_t x)
 }
 
 QQBAR_INLINE void
+qqbar_sqrt_ui(qqbar_t res, ulong x)
+{
+    qqbar_set_ui(res, x);
+    qqbar_sqrt(res, res);
+}
+
+QQBAR_INLINE void
 qqbar_rsqrt(qqbar_t res, const qqbar_t x)
 {
     qqbar_sqrt(res, x);
