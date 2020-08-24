@@ -206,7 +206,7 @@ we keep this program as a benchmark for future optimizations
 to the :type:`ca_t` type.
 
 This simplification problem was posted in a help request for Sage
-(https://ask.sagemath.org/question/52653/equality-of-algebraic-numbers-given-by-huge-symbolic-expressions/).
+(https://ask.sagemath.org/question/52653).
 The C code has been generated from the symbolic expressions
 using a Python script.
 
