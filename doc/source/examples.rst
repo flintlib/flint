@@ -79,12 +79,13 @@ Sample output::
     virt/peak/res/peak(MB): 36.14 36.14 5.81 5.81
 
 This illustrates exact arithmetic in algebraic number fields.
-The program also illustrates another feature of Calcium arithmetic:
-the use of evaluation limits. For example, trying
+The program also illustrates another aspect of Calcium arithmetic:
+evaluation limits. For example, trying
 to compute the index `n = 10^6`
-Fibonacci number hits an evaluation limit, so the value is kept
-in unexpanded form (in this case, the program has been made to output a
-decimal approximation obtained from this unexpanded form)::
+Fibonacci number hits an evaluation limit, so the value is
+not expanded to an explicit integer (in this case, the program has
+been made to output a decimal approximation
+obtained from this unexpanded form)::
 
     > build/examples/binet 1000000
     (x1*x3-x2*x3)/(5)  in  QQ(x1, x2, x3) where {x1 = Pow((1*x1+1)/2  in  QQ(x1) where {x1 = Algebraic 2.2360680}, 1000000  in  QQ), x2 = Pow((-1*x1+1)/2  in  QQ(x1) where {x1 = Algebraic 2.2360680}, 1000000  in  QQ), x3 = Algebraic 2.2360680} with ideal {x3^2-5}
