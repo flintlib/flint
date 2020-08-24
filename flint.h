@@ -301,6 +301,27 @@ typedef __mpfr_struct flint_mpfr;
         y = __txxx; \
     } while (0)
 
+#define SLONG_SWAP(A, B)    \
+    do {                    \
+        slong __t_m_p_ = A; \
+        A = B;              \
+        B = __t_m_p_;       \
+    } while (0)
+
+#define ULONG_SWAP(A, B)    \
+    do {                    \
+        ulong __t_m_p_ = A; \
+        A = B;              \
+        B = __t_m_p_;       \
+    } while (0)
+
+#define MP_LIMB_SWAP(A, B)      \
+    do {                        \
+        mp_limb_t __t_m_p_ = A; \
+        A = B;                  \
+        B = __t_m_p_;           \
+    } while (0)
+
 #define r_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
 
@@ -353,6 +374,9 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)
+
+/* common usage of flint_malloc */
+#define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
 
 /* temporary allocation */
 #define TMP_INIT \

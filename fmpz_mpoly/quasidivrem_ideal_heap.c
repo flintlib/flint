@@ -69,7 +69,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
     rs = (fmpz *) flint_calloc(rs_alloc, sizeof(fmpz));
 
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
-    hinds = (slong **) TMP_ALLOC(len*sizeof(mpoly_heap_t *));
+    hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
 
     len3 = 0;
     for (w = 0; w < len; w++)
@@ -83,7 +83,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
 
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
-    store = store_base = (slong *) TMP_ALLOC(3*len3*sizeof(mpoly_nheap_t *));
+    store = store_base = (slong *) TMP_ALLOC(3*len3*sizeof(slong));
 
     mask = 0;
     for (i = 0; i < FLINT_BITS/bits; i++)
@@ -360,7 +360,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
     rs = (fmpz *) flint_calloc(rs_alloc, sizeof(fmpz));
 
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
-    hinds = (slong **) TMP_ALLOC(len*sizeof(mpoly_heap_t *));
+    hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     len3 = 0;
     for (w = 0; w < len; w++)
     {
@@ -373,7 +373,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
 
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap_s));
-    store = store_base = (slong *) TMP_ALLOC(3*len3*sizeof(mpoly_nheap_t *));
+    store = store_base = (slong *) TMP_ALLOC(3*len3*sizeof(slong));
 
     exps = (ulong *) TMP_ALLOC(len3*N*sizeof(ulong));
     exp_list = (ulong **) TMP_ALLOC(len3*sizeof(ulong *));

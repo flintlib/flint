@@ -226,8 +226,8 @@ void nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(
 
     TMP_START;
 
-    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(fmpz));
-    Bexps = (ulong *) TMP_ALLOC(n*sizeof(fmpz));
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(ulong));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
     nmod_mpolyu_zero(A, uctx);
 

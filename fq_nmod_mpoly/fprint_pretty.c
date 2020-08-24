@@ -47,7 +47,7 @@ int fq_nmod_mpoly_fprint_pretty(FILE * file, const fq_nmod_mpoly_t A,
         }
     }
 
-    exponents = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(ulong));
+    exponents = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
     for (i = 0; i < ctx->minfo->nvars; i++)
         fmpz_init(exponents + i);
    

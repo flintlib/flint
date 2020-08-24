@@ -74,7 +74,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(mpoly_heap_t *));
+    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
     /* space for flagged heap indicies */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
@@ -403,7 +403,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap_s));
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(mpoly_heap_t *));
+    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
     /* array of exponent vectors, each of "N" words */
     exps = (ulong *) TMP_ALLOC(len3*N*sizeof(ulong));

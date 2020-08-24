@@ -265,7 +265,7 @@ void fmpz_mpolyu_inner_degrees_si(
 
     TMP_START;
 
-    t = TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
+    t = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     
     fmpz_mpoly_degrees_si(degs, A->coeffs + 0, ctx);
 

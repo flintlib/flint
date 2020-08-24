@@ -72,7 +72,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(mpoly_heap_t *));
+    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
     /* space for flagged heap indicies */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));

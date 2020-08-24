@@ -123,38 +123,6 @@ typedef n_poly_bpoly_stack_struct n_poly_bpoly_stack_t[1];
 
 /*****************************************************************************/
 
-#define SLONG_SWAP(A, B)    \
-    do {                    \
-        slong __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
-
-#define ULONG_SWAP(A, B)    \
-    do {                    \
-        ulong __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
-
-#define MP_LIMB_SWAP(A, B)      \
-    do {                        \
-        mp_limb_t __t_m_p_ = A; \
-        A = B;                  \
-        B = __t_m_p_;           \
-    } while (0)
-
-#define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
-
-N_POLY_INLINE
-int z_add_checked(slong * a, slong b, slong c)
-{
-	ulong ahi, alo;
-	add_ssaaaa(ahi, alo, 0, b, 0, c);
-	*a = alo;
-	return FLINT_SIGN_EXT(alo) != ahi;
-}
-
 N_POLY_INLINE
 mp_limb_t nmod_addmul(mp_limb_t a, mp_limb_t b, mp_limb_t c, nmod_t mod)
 {

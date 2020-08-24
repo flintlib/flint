@@ -205,7 +205,7 @@ void fq_nmod_mpoly_to_fq_nmod_mpolyd_perm_deflate(fq_nmod_mpolyd_t A, slong m,
     fq_nmod_mpolyd_set_nvars(A, m);
 
     TMP_START;
-    Bexp = (ulong *) TMP_ALLOC(n*sizeof(slong));
+    Bexp = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
     degb_prod = WORD(1);
     for (k = 0; k < m; k++)
