@@ -2326,31 +2326,42 @@ next_zip_image:
         goto cleanup;
     }
 
-#if 0
     if (w->which_check == 1)
     {
         fmpz_mpolyu_divexact_mpoly(Abar, w->H, 1, Hcontent, ctx);
-        if (!fmpz_mpolyuu_divides_threaded_pool(G, A, Abar, 2, ctx, handles, num_handles) ||
-            !fmpz_mpolyuu_divides_threaded_pool(Bbar, B, G, 2, ctx, handles, num_handles))
+        if (num_handles > 0)
         {
-            goto pick_zip_prime;
+            success = fmpz_mpolyuu_divides_threaded_pool(
+                                     G, A, Abar, 2, ctx, handles, num_handles);
+            success = success && fmpz_mpolyuu_divides_threaded_pool(
+                                     Bbar, B, G, 2, ctx, handles, num_handles);
+        }
+        else
+        {
+            success = fmpz_mpolyuu_divides(G, A, Abar, 2, ctx) &&
+                      fmpz_mpolyuu_divides(Bbar, B, G, 2, ctx);
         }
     }
     else if (w->which_check == 2)
     {
         fmpz_mpolyu_divexact_mpoly(Bbar, w->H, 1, Hcontent, ctx);
-        if (!fmpz_mpolyuu_divides_threaded_pool(G, B, Bbar, 2, ctx, handles, num_handles) ||
-            !fmpz_mpolyuu_divides_threaded_pool(Abar, A, G, 2, ctx, handles, num_handles))
+        if (num_handles > 0)
         {
-            goto pick_zip_prime;
+            success = fmpz_mpolyuu_divides_threaded_pool(
+                                     G, B, Bbar, 2, ctx, handles, num_handles);
+            success = success && fmpz_mpolyuu_divides_threaded_pool(
+                                     Abar, A, G, 2, ctx, handles, num_handles);
+        }
+        else
+        {
+            success = fmpz_mpolyuu_divides(G, B, Bbar, 2, ctx) &&
+                      fmpz_mpolyuu_divides(Abar, A, G, 2, ctx);
         }
     }
     else
     {
         FLINT_ASSERT(w->which_check == 0);
-
         fmpz_mpolyu_divexact_mpoly(G, w->H, 1, Hcontent, ctx);
-
         if (num_handles > 0)
         {
             /*
@@ -2398,53 +2409,22 @@ next_zip_image:
                 divide_arg->num_handles = num_handles - (m + 1);
                 thread_pool_wake(global_thread_pool, handles[m], 0,
                                                    _divide_worker, divide_arg);
-                success = fmpz_mpolyuu_divides_threaded_pool(w->Abar, A, G, 2,
+                success = fmpz_mpolyuu_divides_threaded_pool(Abar, A, G, 2,
                                                           ctx, handles + 0, m);
                 thread_pool_wait(global_thread_pool, handles[m]);
             }
 
-            if (!success || !divide_arg->success)
-                goto pick_zip_prime;
+            success = success && divide_arg->success;
         }
         else
         {
-            if (!fmpz_mpolyuu_divides(Abar, A, G, 2, ctx) ||
-                !fmpz_mpolyuu_divides(Bbar, B, G, 2, ctx))
-            {
-                goto pick_zip_prime;
-            }
+            success = fmpz_mpolyuu_divides(Abar, A, G, 2, ctx) &&
+                      fmpz_mpolyuu_divides(Bbar, B, G, 2, ctx);
         }
     }
-#else
-    if (w->which_check == 1)
-    {
-        fmpz_mpolyu_divexact_mpoly(Abar, w->H, 1, Hcontent, ctx);
-        if (!fmpz_mpolyuu_divides(G, A, Abar, 2, ctx) ||
-            !fmpz_mpolyuu_divides(Bbar, B, G, 2, ctx))
-        {
-            goto pick_zip_prime;
-        }
-    }
-    else if (w->which_check == 2)
-    {
-        fmpz_mpolyu_divexact_mpoly(Bbar, w->H, 1, Hcontent, ctx);
-        if (!fmpz_mpolyuu_divides(G, B, Bbar, 2, ctx) ||
-            !fmpz_mpolyuu_divides(Abar, A, G, 2, ctx))
-        {
-            goto pick_zip_prime;
-        }
-    }
-    else
-    {
-        FLINT_ASSERT(w->which_check == 0);
-        fmpz_mpolyu_divexact_mpoly(G, w->H, 1, Hcontent, ctx);
-        if (!fmpz_mpolyuu_divides(Abar, A, G, 2, ctx) ||
-            !fmpz_mpolyuu_divides(Bbar, B, G, 2, ctx))
-        {
-            goto pick_zip_prime;
-        }
-    }
-#endif
+
+    if (!success)
+        goto pick_zip_prime;
 
     success = 1;
 
