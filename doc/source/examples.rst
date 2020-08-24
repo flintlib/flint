@@ -63,6 +63,49 @@ Sample output::
     cpu/wall(s): 0.014 0.013
     virt/peak/res/peak(MB): 36.16 36.16 8.93 8.93
 
+binet.c
+-------------------------------------------------------------------------------
+
+This program computes the *n*-th Fibonacci number using Binet's formula
+`F_n = (\varphi^n - (1-\varphi)^n)/\sqrt{5}` where
+`\varphi = \tfrac{1}{2} (1+\sqrt{5})`. The program takes *n* as input.
+
+Sample output::
+
+    > build/examples/binet 250
+    7896325826131730509282738943634332893686268675876375  in  QQ
+
+    cpu/wall(s): 0.002 0.001
+    virt/peak/res/peak(MB): 36.14 36.14 5.81 5.81
+
+This illustrates exact arithmetic in algebraic number fields.
+The program also illustrates another feature of Calcium arithmetic:
+the use of evaluation limits. For example, trying
+to compute the index `n = 10^6`
+Fibonacci number hits an evaluation limit, so the value is kept
+in unexpanded form (in this case, the program has been made to output a
+decimal approximation obtained from this unexpanded form)::
+
+    > build/examples/binet 1000000
+    (x1*x3-x2*x3)/(5)  in  QQ(x1, x2, x3) where {x1 = Pow((1*x1+1)/2  in  QQ(x1) where {x1 = Algebraic 2.2360680}, 1000000  in  QQ), x2 = Pow((-1*x1+1)/2  in  QQ(x1) where {x1 = Algebraic 2.2360680}, 1000000  in  QQ), x3 = Algebraic 2.2360680} with ideal {x3^2-5}
+    1.9532821287077577316320149475962563324435429965919e+208987
+
+    cpu/wall(s): 0.006 0.005
+    virt/peak/res/peak(MB): 36.14 36.14 9.05 9.05
+
+Calling the program with ``-limit B n`` raises the bit evaluation
+limit to *B*. Setting this large enough allows `F_{10^6}` to expand
+to an integer (the following output has been truncated to avoid
+reproducing all 208988 digits)::
+
+    > build/examples/binet -limit 10000000 1000000
+    1953282128...8242546875
+
+    cpu/wall(s): 0.229 0.242
+    virt/peak/res/peak(MB): 36.79 37.29 7.13 7.13
+
+The exact mechanisms and interfaces for evaluation limits are still a
+work in progress.
 
 machin.c
 -------------------------------------------------------------------------------
