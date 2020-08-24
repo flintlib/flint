@@ -585,7 +585,7 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 10) + 1;
+        len = n_randint(state, 20) + 1;
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20);
 
@@ -637,7 +637,7 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 10) + 1;
+        len = n_randint(state, 20) + 1;
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20);
 
@@ -706,7 +706,7 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 10) + 1;
+        len = n_randint(state, 20) + 1;
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20);
 

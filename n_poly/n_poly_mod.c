@@ -907,3 +907,26 @@ void n_poly_mod_eval2_pow(
     *vm = nmod_sub(p0, q0, ctx);
 }
 
+mp_limb_t n_poly_mod_eval_step2(
+    n_poly_t Acur,
+    const n_poly_t Ainc,
+    nmod_t mod)
+{
+    slong i, Alen = Acur->length;
+    mp_limb_t * cur = Acur->coeffs;
+    const mp_limb_t * inc = Ainc->coeffs;
+    ulong t0, t1, t2, p0, p1;
+
+    FLINT_ASSERT(2*Alen == Ainc->length);
+
+    t2 = t1 = t0 = 0;
+    for (i = 0; i < Alen; i++)
+    {
+        umul_ppmm(p1, p0, cur[i], inc[2*i + 0]);
+        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, p1, p0);
+        cur[i] = nmod_mul(cur[i], inc[2*i + 1], mod);
+    }
+    NMOD_RED3(t0, t2, t1, t0, mod);
+    return t0;
+}
+

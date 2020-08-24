@@ -104,6 +104,23 @@ typedef struct
 typedef n_poly_stack_struct n_poly_stack_t[1];
 
 
+typedef struct
+{
+    n_bpoly_struct ** array;
+    slong alloc;
+    slong top;
+} n_bpoly_stack_struct;
+
+typedef n_bpoly_stack_struct n_bpoly_stack_t[1];
+
+
+typedef struct {
+    n_poly_stack_t poly_stack;
+    n_bpoly_stack_t bpoly_stack;
+} n_poly_bpoly_stack_struct;
+
+typedef n_poly_bpoly_stack_struct n_poly_bpoly_stack_t[1];
+
 /*****************************************************************************/
 
 #define SLONG_SWAP(A, B)    \
@@ -408,8 +425,17 @@ void _n_poly_mod_scalar_mul_nmod(n_poly_t A, const n_poly_t B, mp_limb_t c,
     A->length = B->length;
 }
 
+N_POLY_INLINE
+void _n_poly_mod_scalar_mul_nmod_inplace(n_poly_t A, mp_limb_t c, nmod_t mod)
+{
+    _nmod_vec_scalar_mul_nmod(A->coeffs, A->coeffs, A->length, c, mod);
+}
+
 FLINT_DLL void n_poly_mod_scalar_mul_ui(n_poly_t A, const n_poly_t B,
                                                       mp_limb_t c, nmod_t ctx);
+
+FLINT_DLL mp_limb_t n_poly_mod_eval_step2(n_poly_t Acur, const n_poly_t Ainc,
+                                                                   nmod_t mod);
 
 N_POLY_INLINE
 mp_limb_t n_poly_mod_evaluate_nmod(const n_poly_t A, mp_limb_t c, nmod_t mod)
@@ -1180,6 +1206,25 @@ FLINT_DLL void n_bpoly_set_poly_var0(n_bpoly_t A, const n_poly_t B);
 
 FLINT_DLL int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod);
 
+N_POLY_INLINE
+ulong n_bpoly_bidegree(const n_bpoly_t A)
+{
+    ulong x, y;
+    FLINT_ASSERT(A->length > 0);
+    x = A->length - 1;
+    y = A->coeffs[x].length - 1;
+    return (x << (FLINT_BITS/2)) + y;
+}
+
+FLINT_DLL void n_bpoly_scalar_mul_nmod(n_bpoly_t A, mp_limb_t c, nmod_t ctx);
+
+FLINT_DLL void n_bpoly_mod_content_last(n_poly_t g, const n_bpoly_t A, nmod_t ctx);
+
+FLINT_DLL void n_bpoly_mod_divexact_last(n_bpoly_t A, const n_poly_t b, nmod_t ctx);
+
+FLINT_DLL void n_bpoly_mod_mul_last(n_bpoly_t A, const n_poly_t b, nmod_t ctx);
+
+
 FLINT_DLL void n_bpoly_mod_taylor_shift_var1(n_bpoly_t A, const n_bpoly_t B,
                                                       mp_limb_t c, nmod_t ctx);
 
@@ -1205,6 +1250,20 @@ FLINT_DLL void n_bpoly_mod_mul_series(n_bpoly_t A, const n_bpoly_t B,
 
 FLINT_DLL void n_bpoly_mod_divrem_series(n_bpoly_t Q, n_bpoly_t R,
                 const n_bpoly_t A, const n_bpoly_t B, slong order, nmod_t ctx);
+
+FLINT_DLL void n_bpoly_mod_interp_reduce_2sm_poly(n_poly_t Ap, n_poly_t Am,
+                             const n_bpoly_t A, n_poly_t alphapow, nmod_t mod);
+
+FLINT_DLL void n_bpoly_mod_interp_lift_2sm_poly(slong * deg1, n_bpoly_t T,
+              const n_poly_t A, const n_poly_t B, mp_limb_t alpha, nmod_t mod);
+
+FLINT_DLL int n_bpoly_mod_interp_crt_2sm_poly(slong * deg1, n_bpoly_t F,
+                 n_bpoly_t T, n_poly_t A, n_poly_t B, const n_poly_t modulus,
+                                                n_poly_t alphapow, nmod_t mod);
+
+FLINT_DLL int n_bpoly_mod_gcd_brown_smprime(n_bpoly_t G, n_bpoly_t Abar,
+                                    n_bpoly_t Bbar, n_bpoly_t A, n_bpoly_t B,
+                                          nmod_t ctx, n_poly_bpoly_stack_t Sp);
 
 /*****************************************************************************/
 
@@ -1408,6 +1467,47 @@ slong n_poly_stack_size(const n_poly_stack_t S)
 
 /*****************************************************************************/
 
+FLINT_DLL void n_bpoly_stack_init(n_bpoly_stack_t S);
+
+FLINT_DLL void n_bpoly_stack_clear(n_bpoly_stack_t S);
+
+FLINT_DLL n_bpoly_struct ** n_bpoly_stack_fit_request(n_bpoly_stack_t S, slong k);
+
+N_POLY_INLINE
+n_bpoly_struct ** n_bpoly_stack_request(n_bpoly_stack_t S, slong k)
+{
+    n_bpoly_struct ** bpoly_top;
+    bpoly_top = n_bpoly_stack_fit_request(S, k);
+    S->top += k;
+    return bpoly_top;
+}
+
+N_POLY_INLINE
+n_bpoly_struct * n_bpoly_stack_take_top(n_bpoly_stack_t S)
+{
+    /* assume the request for 1 has already been fitted */
+    n_bpoly_struct ** bpoly_top;
+    FLINT_ASSERT(S->top + 1 <= S->alloc);
+    bpoly_top = S->array + S->top;
+    S->top += 1;
+    return bpoly_top[0];
+}
+
+N_POLY_INLINE
+void n_bpoly_stack_give_back(n_bpoly_stack_t S, slong k)
+{
+    FLINT_ASSERT(S->top >= k);
+    S->top -= k;
+}
+
+N_POLY_INLINE
+slong n_bpoly_stack_size(const n_bpoly_stack_t S)
+{
+    return S->top;
+}
+
+/*****************************************************************************/
+
 typedef struct {
     ulong key;
     slong up;
@@ -1435,7 +1535,6 @@ FLINT_DLL void * mpoly_rbtree_ui_lookup(
     int * its_new,
     ulong rcx,
     slong dsize);
-
 
 
 #ifdef __cplusplus
