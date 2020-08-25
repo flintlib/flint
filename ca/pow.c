@@ -40,6 +40,58 @@ nf_elem_bits(const nf_elem_t x, nf_t nf)
 }
 
 void
+_ca_pow_binexp(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
+{
+    if (n == 0)
+    {
+        ca_one(res, ctx);
+    }
+    else if (n == 1)
+    {
+        ca_set(res, x, ctx);
+    }
+    else if (n == 2)
+    {
+        ca_mul(res, x, x, ctx);
+    }
+    else if (n < 0)
+    {
+        ca_inv(res, x, ctx);
+        _ca_pow_binexp(res, res, -n, ctx);
+    }
+    else
+    {
+        /* todo: is left-to-right or right-to-left better? */
+        if (n % 2 == 0)
+        {
+#if 0
+            _ca_pow_binexp(res, x, n / 2, ctx);
+            _ca_pow_binexp(res, res, 2, ctx);
+#else
+            _ca_pow_binexp(res, x, 2, ctx);
+            _ca_pow_binexp(res, res, n / 2, ctx);
+#endif
+        }
+        else
+        {
+            if (res == x)
+            {
+                ca_t t;
+                ca_init(t, ctx);
+                _ca_pow_binexp(t, x, n - 1, ctx);
+                ca_mul(res, t, x, ctx);
+                ca_clear(t, ctx);
+            }
+            else
+            {
+                _ca_pow_binexp(res, x, n - 1, ctx);
+                ca_mul(res, res, x, ctx);
+            }
+        }
+    }
+}
+
+void
 ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     truth_t xzero;
@@ -115,16 +167,6 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     return;
                 }
 
-                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 3))
-                {
-                    ca_t t;
-                    ca_init(t, ctx);
-                    ca_mul(t, x, x, ctx);
-                    ca_mul(res, t, x, ctx);
-                    ca_clear(t, ctx);
-                    return;
-                }
-
                 if (CA_IS_QQ(x, ctx) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
                 {
                     slong xbits1, xbits2;
@@ -167,6 +209,13 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                         return;
                     }
                 }
+
+                /* todo: evaluation limits */
+                if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -20) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), 20) <= 0)
+                {
+                    _ca_pow_binexp(res, x, *CA_FMPQ_NUMREF(y), ctx);
+                    return;
+                }
             }
             else if (fmpz_equal_ui(CA_FMPQ_DENREF(y), 2))
             {
@@ -182,6 +231,12 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     ca_sqrt(t, x, ctx);
                     ca_mul(res, t, x, ctx);
                     ca_clear(t, ctx);
+                    return;
+                }  /* todo: evaluation limits */
+                else if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -10) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), 10) <= 0)
+                {
+                    ca_sqrt(res, x, ctx);
+                    _ca_pow_binexp(res, res, *CA_FMPQ_NUMREF(y), ctx);
                     return;
                 }
             }

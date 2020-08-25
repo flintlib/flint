@@ -48,6 +48,8 @@ Sample output::
 
     [Exp(Sqrt(3))^2 - Exp(Sqrt(12))]   =   0  in  QQ
 
+    [2*Log(Pi*I) - 4*Log(Sqrt(Pi)) - Pi*I]   =   0  in  QQ
+
     [Sqrt(5 + 2*Sqrt(6)) - Sqrt(2) - Sqrt(3)]   =
     (x1-x3-x4)/(1)  in  QQ(x1, x2, x3, x4) where {x1 = Sqrt(2*x1+5  in  QQ(x1) where {x1 = Algebraic 2.4494897}), x2 = Algebraic 2.4494897, x3 = Algebraic 1.7320508, x4 = Algebraic 1.4142136} with ideal {x1^2-2*x2-5, x2^2-6, x3^2-3, x4^2-2, x2-x3*x4}
               Is zero?   T_TRUE
@@ -146,7 +148,7 @@ Sample output::
     [(334)*Atanh(1/251) + (126)*Atanh(1/449) + (-88)*Atanh(1/4801) + (144)*Atanh(1/8749) - Log(5)]   =   0  in  QQ
     [(404)*Atanh(1/251) + (152)*Atanh(1/449) + (-106)*Atanh(1/4801) + (174)*Atanh(1/8749) - Log(7)]   =   0  in  QQ
 
-    cpu/wall(s): 0.03 0.029
+    cpu/wall(s): 0.016 0.016
     virt/peak/res/peak(MB): 35.57 35.57 8.80 8.80
 
 swinnerton_dyer_poly.c

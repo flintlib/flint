@@ -262,6 +262,16 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 {
                     ca_t prod, upow;
 
+                /*
+                    printf("possible log relation!\n");
+                    for (j = 0; j < num_logs; j++)
+                    {
+                        fmpz_print(rel + j); printf(" ");
+                        acb_printn(z + j, 10, 0); printf("   ");
+                    }
+                    printf("\n");
+                */
+
                     /*  a^m * b^n = 1 => m*log(a) + n*log(b) = 2 pi i k   */
                     /* Verify that (m*log(a) + n*log(b)) / (2 pi i) contains unique integer. */
                     /* It is enough to show that |... + ...| < 2^1. */
@@ -287,6 +297,8 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                                 ca_mul(prod, prod, upow, ctx);
                             }
                         }
+
+                        /* printf("product: "); ca_print(prod, ctx); printf("\n\n"); */
 
                         if (ca_check_is_one(prod, ctx) == T_TRUE)
                         {

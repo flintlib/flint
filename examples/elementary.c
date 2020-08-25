@@ -110,6 +110,19 @@ int main(int argc, char *argv[])
     ca_sub(x, x, y, ctx);
     OUT
 
+    START("2*Log(Pi*I) - 4*Log(Sqrt(Pi)) - Pi*I");
+    ca_pi_i(x, ctx);
+    ca_log(x, x, ctx);
+    ca_mul_ui(x, x, 2, ctx);
+    ca_pi(y, ctx);
+    ca_sqrt(y, y, ctx);
+    ca_log(y, y, ctx);
+    ca_mul_ui(y, y, 4, ctx);
+    ca_sub(x, x, y, ctx);
+    ca_pi_i(y, ctx);
+    ca_sub(x, x, y, ctx);
+    OUT
+
     START("Sqrt(5 + 2*Sqrt(6)) - Sqrt(2) - Sqrt(3)");
     ca_sqrt_ui(x, 6, ctx);
     ca_mul_ui(x, x, 2, ctx);
