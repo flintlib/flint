@@ -149,7 +149,7 @@ Sample output::
     cpu/wall(s): 0.03 0.029
     virt/peak/res/peak(MB): 35.57 35.57 8.80 8.80
 
-sdpoly.c
+swinnerton_dyer_poly.c
 -------------------------------------------------------------------------------
 
 This program computes the coefficients of the Swinnerton-Dyer polynomial
@@ -171,7 +171,7 @@ term to the coefficient of `x^{2^n}`.
 
 Sample output::
 
-    > build/examples/sdpoly 3
+    > build/examples/swinnerton_dyer_poly 3
     576  in  QQ
     0  in  QQ
     -960  in  QQ
@@ -187,7 +187,7 @@ Sample output::
 
 A big benchmark problem (output truncated)::
 
-    > build/examples/sdpoly 10
+    > build/examples/swinnerton_dyer_poly 10
     43567450015...212890625  in  QQ
     ...
     0  in  QQ
