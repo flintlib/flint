@@ -101,7 +101,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly
         entries += FLINT_BIT_COUNT(degrees[i]);
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
     powers = (fq_nmod_poly_struct *) TMP_ALLOC(entries*
                                                   sizeof(fq_nmod_poly_struct));
 
@@ -310,7 +310,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly
         entries += bitcounts[i];
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
     powers = (fq_nmod_poly_struct *) TMP_ALLOC(entries*
                                                   sizeof(fq_nmod_poly_struct));
 

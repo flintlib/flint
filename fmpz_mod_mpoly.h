@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2019-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -30,6 +30,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mpoly.h"
 #include "mpoly.h"
+#include "n_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -269,8 +270,10 @@ FLINT_DLL void nmod_bma_mpoly_zero(nmod_bma_mpoly_t L);
 
 FLINT_DLL int nmod_bma_mpoly_reduce(nmod_bma_mpoly_t L);
 
-FLINT_DLL void nmod_bma_mpoly_add_point(nmod_bma_mpoly_t L,
-                          const nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx_sp);
+FLINT_DLL void nmod_bma_mpoly_add_point(
+    nmod_bma_mpoly_t L,
+    const n_bpoly_t A,
+    const nmod_mpoly_ctx_t ctx_sp);
 
 FLINT_DLL int nmod_bma_mpoly_get_fmpz_mpolyu(fmpz_mpolyu_t A,
       const fmpz_mpoly_ctx_t ctx, ulong alphashift, const nmod_bma_mpoly_t L,
@@ -340,40 +343,6 @@ FLINT_DLL void fmpz_mod_mpoly_bma_interpolate_alpha_powers(fmpz * out,
 
 /* skel */
 
-FLINT_DLL void nmod_mpoly_red_skel(nmod_mpolyc_t Ared, const fmpz_mpoly_t A,
-                                                      const nmodf_ctx_t fpctx);
-
-FLINT_DLL void nmod_mpolyu_red_skel(nmod_mpolycu_t Ared, const fmpz_mpolyu_t A,
-                                                      const nmodf_ctx_t fpctx);
-
-FLINT_DLL void nmod_mpoly_copy_skel(nmod_mpolyc_t M, const nmod_mpolyc_t S);
-
-FLINT_DLL void nmod_mpolyu_copy_skel(nmod_mpolycu_t M, const nmod_mpolycu_t S);
-
-FLINT_DLL void nmod_mpoly_pow_skel(nmod_mpolyc_t M, const nmod_mpolyc_t S,
-                                          ulong k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpolyu_pow_skel(nmod_mpolycu_t M, const nmod_mpolycu_t S,
-                                          ulong k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_skel(nmod_mpolyc_t S,
-                     const nmod_mpoly_ctx_t ctx_sp, const fmpz_mpoly_t A,
-                          const mp_limb_t * alpha, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpolyu_set_skel(nmod_mpolycu_t S,
-                        const nmod_mpoly_ctx_t ctx_sp, const fmpz_mpolyu_t A,
-                          const mp_limb_t * alpha, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL mp_limb_t nmod_mpoly_use_skel_mul(const nmod_mpolyc_t Ared,
-                                nmod_mpolyc_t Acur, const nmod_mpolyc_t Ainc,
-                                                 const nmodf_ctx_t fpctx);
-
-FLINT_DLL void nmod_mpolyuu_use_skel_mul(nmod_mpolyn_t E,
-        const fmpz_mpolyu_t A, const nmod_mpolycu_t Ared, nmod_mpolycu_t Acur,
-                     const nmod_mpolycu_t Ainc, const nmod_mpoly_ctx_t ctx_sp);
-
-
-
 FLINT_DLL void fmpz_mod_mpoly_red_skel(fmpz_mpolyc_t Ared, const fmpz_mpoly_t A,
                                                       const fmpz_mod_ctx_t fpctx);
 
@@ -416,13 +385,32 @@ FLINT_DLL void fmpz_mpoly_eval_fmpz_mod(fmpz_t eval,
                         const fmpz_mod_ctx_t fpctx, const fmpz_mpoly_t A,
                                const fmpz * alpha, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpolyuu_eval_nmod(nmod_mpolyn_t E,
-                 const nmod_mpoly_ctx_t ctx_sp, const fmpz_mpolyu_t A,
-                          const mp_limb_t * alpha, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpolyuu_eval_nmod(
+    n_bpoly_t E,
+    const nmod_mpoly_ctx_t ctx_sp,
+    const fmpz_mpolyu_t A,
+    const mp_limb_t * alpha,
+    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyuu_eval_fmpz_mod(fmpz_mod_mpolyn_t E,
                  const fmpz_mod_mpoly_ctx_t ctx_mp, const fmpz_mpolyu_t A,
                                const fmpz * alpha, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _mpoly_monomial_evals_nmod(
+    mp_limb_t * E,
+    const ulong * Aexps,
+    flint_bitcnt_t Abits,
+    slong Alen,
+    const mp_limb_t * alpha,
+    slong vstart,
+    const mpoly_ctx_t mctx,
+    nmod_t fctx);
+
+FLINT_DLL void nmod_mpolyuu_eval_step2(
+    n_bpoly_t E,
+    n_bpoly_t Acur,
+    const n_polyun_t Ainc,
+    const nmod_mpoly_ctx_t ctx_sp);
 
 
 #ifdef __cplusplus

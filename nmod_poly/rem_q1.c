@@ -20,32 +20,55 @@ void _nmod_poly_rem_q1(mp_ptr R,
                        mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
                        nmod_t mod)
 {
-    const mp_limb_t invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
+    slong i;
+    mp_limb_t invL, t, q0, q1, t1, t0, s1, s0;
 
-    if (lenB > 1)
+    FLINT_ASSERT(lenA == lenB + 1);
+    invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
+
+    if (lenB < 2)
+        return;
+
+    q1 = n_mulmod2_preinv(A[lenA-1], invL, mod.n, mod.ninv);
+    t  = n_mulmod2_preinv(q1, B[lenB-2], mod.n, mod.ninv);
+    t  = n_submod(t, A[lenA-2], mod.n);
+    q0 = n_mulmod2_preinv(t, invL, mod.n, mod.ninv);
+    q1 = nmod_neg(q1, mod);
+
+    /* R = A + (q1*x + q0)*B */
+    t = A[0];
+    NMOD_ADDMUL(t, q0, B[0], mod);
+    R[0] = t;
+
+    if (mod.norm >= (FLINT_BITS + 1)/2 + 1)
     {
-        mp_limb_t t, q0, q1;
-
-        q1 = n_mulmod2_preinv(A[lenA-1], invL, mod.n, mod.ninv);
-        t  = n_mulmod2_preinv(q1, B[lenB-2], mod.n, mod.ninv);
-        t  = n_submod(A[lenA-2], t, mod.n);
-        q0 = n_mulmod2_preinv(t, invL, mod.n, mod.ninv);
-
-        if (FLINT_BITS + 2 <= 2 * mod.norm)
+        for (i = 1; i < lenB - 1; i++)
         {
-            mpn_mul_1(R, B, lenB - 1, q0);
-            if (lenB > 2)
-                mpn_addmul_1(R + 1, B, lenB - 2, q1);
-            _nmod_vec_reduce(R, R, lenB - 1, mod);
+            NMOD_RED2(R[i], 0, A[i] + q1*B[i - 1] + q0*B[i], mod);
         }
-        else
+    }
+    else if (mod.norm != 0)
+    {
+        for (i = 1; i < lenB - 1; i++)
         {
-            _nmod_vec_scalar_mul_nmod(R, B, lenB - 1, q0, mod);
-            if (lenB > 2)
-                _nmod_vec_scalar_addmul_nmod(R + 1, B, lenB - 2, q1, mod);
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            add_ssaaaa(t1, t0, t1, t0, s1, s0);
+            t1 = FLINT_MIN(t1, t1 - mod.n);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2(R[i], t1, t0, mod);
         }
-
-        _nmod_vec_sub(R, A, R, lenB - 1, mod);
+    }
+    else
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            t = A[i];
+            NMOD_ADDMUL(t, q1, B[i - 1], mod);
+            NMOD_ADDMUL(t, q0, B[i], mod);
+            R[i] = t;
+        }
     }
 }
 

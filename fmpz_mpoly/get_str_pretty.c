@@ -53,7 +53,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * coeffs, const ulong * exps, slong len,
     for (i = 0; i < len; i++)
         bound += fmpz_sizeinbase(coeffs + i, 10) + 1;
 
-    exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
+    exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
     for (i = 0; i < mctx->nvars; i++)
         fmpz_init(exponents + i);
     mpoly_degrees_ffmpz((fmpz *) exponents, exps, len, bits, mctx);

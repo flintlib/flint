@@ -135,7 +135,10 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 NMOD_VEC_INLINE
 mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
-    return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
+    mp_limb_t res, hi, lo;
+    umul_ppmm(hi, lo, a, b);
+    NMOD_RED2(res, hi, lo, mod);
+    return res;
 }
 
 NMOD_VEC_INLINE

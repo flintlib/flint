@@ -143,7 +143,7 @@ int _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
         entries += FLINT_BIT_COUNT(degrees[i]);
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
     powers = (nmod_poly_struct *) TMP_ALLOC(entries*sizeof(nmod_poly_struct));
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
@@ -349,7 +349,7 @@ int _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
         entries += bitcounts[i];
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
     powers = (nmod_poly_struct *) TMP_ALLOC(entries*sizeof(nmod_poly_struct));
 
     N = mpoly_words_per_exp(bits, ctx->minfo);

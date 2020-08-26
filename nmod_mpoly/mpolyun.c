@@ -691,8 +691,8 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
     Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     texp = (ulong *) TMP_ALLOC(NA*sizeof(ulong));
 
-    offs   = (slong *) TMP_ALLOC(m*sizeof(ulong));
-    shifts = (slong *) TMP_ALLOC(m*sizeof(ulong));
+    offs   = (slong *) TMP_ALLOC(m*sizeof(slong));
+    shifts = (slong *) TMP_ALLOC(m*sizeof(slong));
     for (k = 0; k < m; k++)
     {
         mpoly_gen_offset_shift_sp(offs + k, shifts + k, k, A->bits, uctx->minfo);
@@ -749,8 +749,8 @@ void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(
     TMP_START;
     Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
-    offs   = (slong *) TMP_ALLOC(m*sizeof(ulong));
-    shifts = (slong *) TMP_ALLOC(m*sizeof(ulong));
+    offs   = (slong *) TMP_ALLOC(m*sizeof(slong));
+    shifts = (slong *) TMP_ALLOC(m*sizeof(slong));
     for (k = 0; k < m; k++)
     {
         mpoly_gen_offset_shift_sp(offs + k, shifts + k, k, A->bits, nctx->minfo);
@@ -994,7 +994,7 @@ void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, nmod_mpoly_t B,
     TMP_START;
 
     N = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
-    oneexp = TMP_ALLOC(N*sizeof(ulong));
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mask = (-UWORD(1)) >> (FLINT_BITS - B->bits);
     mpoly_gen_monomial_offset_shift_sp(oneexp, &offset, &shift, var,
                                                           B->bits, ctx->minfo);
@@ -1075,7 +1075,7 @@ void nmod_mpoly_cvtfrom_mpolyn(nmod_mpoly_t A, nmod_mpolyn_t B,
     TMP_START;
 
     N = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
-    oneexp = TMP_ALLOC(N*sizeof(ulong));
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_gen_monomial_sp(oneexp, var, B->bits, ctx->minfo);
 
     nmod_mpoly_fit_length(A, B->length, ctx);

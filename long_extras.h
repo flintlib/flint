@@ -40,6 +40,19 @@ LONG_EXTRAS_INLINE int z_mul_checked(slong * a, slong b, slong c)
 	return FLINT_SIGN_EXT(alo) != ahi;
 }
 
+LONG_EXTRAS_INLINE int z_add_checked(slong * a, slong b, slong c)
+{
+/*
+	ulong ahi, alo;
+	add_ssaaaa(ahi, alo, 0, b, 0, c);
+	*a = alo;
+	return FLINT_SIGN_EXT(alo) != ahi;
+*/
+    int of = (b > 0 && c > WORD_MAX - b) || (b < 0 && c < WORD_MIN - b);
+    *a = b + c;
+    return of;
+}
+
 /* Randomisation  ************************************************************/
 
 FLINT_DLL mp_limb_signed_t z_randtest(flint_rand_t state);
