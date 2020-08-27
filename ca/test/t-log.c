@@ -21,6 +21,53 @@ int main()
 
     flint_randinit(state);
 
+    /* check numerical evaluation */
+    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    {
+        ca_ctx_t ctx;
+        ca_t x, y;
+        acb_t ax, ay, logax;
+        slong prec;
+
+        ca_ctx_init(ctx);
+        ca_init(x, ctx);
+        ca_init(y, ctx);
+
+        acb_init(ax);
+        acb_init(ay);
+        acb_init(logax);
+
+        prec = 10 + n_randint(state, 100);
+        ca_randtest(x, state, 5, 5, ctx);
+        if (n_randint(state, 2))
+            ca_exp(x, x, ctx);
+
+        ca_log(y, x, ctx);
+
+        ca_get_acb(ax, x, prec, ctx);
+        ca_get_acb(ay, y, prec, ctx);
+        acb_log(logax, ax, prec);
+
+        if (!acb_overlaps(logax, ay))
+        {
+            flint_printf("FAIL (overlap)\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("ax = "); acb_printn(ax, 30, ARB_STR_NO_RADIUS); flint_printf("\n\n");
+            flint_printf("ay = "); acb_printn(ay, 30, ARB_STR_NO_RADIUS); flint_printf("\n\n");
+            flint_printf("logax = "); acb_printn(logax, 30, ARB_STR_NO_RADIUS); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        acb_clear(ax);
+        acb_clear(ay);
+        acb_clear(logax);
+
+        ca_clear(x, ctx);
+        ca_clear(y, ctx);
+        ca_ctx_clear(ctx);
+    }
+
     for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;

@@ -361,6 +361,7 @@ int ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 void ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx);
 void ca_condense_field(ca_t res, ca_ctx_t ctx);
+ca_ext_ptr ca_is_gen_as_ext(const ca_t x, ca_ctx_t ctx);
 
 /* Arithmetic */
 
@@ -428,6 +429,10 @@ ca_sqrt_ui(ca_t res, ulong n, ca_ctx_t ctx)
 
 void ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_sgn(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_re(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_im(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_floor(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_ceil(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 /* Elementary functions */
 

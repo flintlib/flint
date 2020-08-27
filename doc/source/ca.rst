@@ -489,6 +489,13 @@ Field structure operations
     This function is applied automatically in most operations
     (arithmetic operations, etc.).
 
+.. function:: ca_ext_ptr ca_is_gen_as_ext(const ca_t x, ca_ctx_t ctx)
+
+    If *x* is a generator of its formal field, `x = a_k \in \mathbb{Q}(a_1,\ldots,a_n)`,
+    returns a pointer to the extension number defining `a_k`. If *x* is
+    not a generator, returns *NULL*.
+
+
 Arithmetic
 -------------------------------------------------------------------------------
 
@@ -708,6 +715,31 @@ Complex parts
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\operatorname{sgn}(x))`.
 
+.. function:: void ca_re(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the real part of *x*. The result is *Undefined* if *x*
+    is any infinity (including a real infinity).
+
+.. function:: void ca_im(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the imaginary part of *x*. The result is *Undefined* if *x*
+    is any infinity (including an imaginary infinity).
+
+.. function:: void ca_floor(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the floor function of *x*. The result is *Undefined* if *x*
+    is any infinity (including a real infinity).
+    For complex numbers, this is presently defined to take the floor of the
+    real part.
+
+.. function:: void ca_ceil(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the ceil function of *x*. The result is *Undefined* if *x*
+    is any infinity (including a real infinity).
+    For complex numbers, this is presently defined to take the ceiling of the
+    real part.
+
+
 Elementary functions
 -------------------------------------------------------------------------------
 
@@ -729,9 +761,14 @@ Elementary functions
 
     * Both *Undefined* and *Unknown* map to themselves.
 
+    The following symbolic simplifications are performed automatically:
+
+    * `e^0 = 1`
+
+    * `e^{\log(z)} = z`
+
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(e^x)`.
-    Presently, no simplifications are performed apart from `e^0 = 1`.
 
 .. function:: void ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
 
@@ -745,9 +782,14 @@ Elementary functions
 
     * Both *Undefined* and *Unknown* map to themselves.
 
+    The following symbolic simplifications are performed automatically:
+
+    * `\log(1) = 0`
+
+    * `\log\left(e^z\right) = z + 2 \pi i k`
+
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\log(x))`.
-    Presently, no simplifications are performed apart from `\log(1) = 0`.
 
 Numerical evaluation
 -------------------------------------------------------------------------------

@@ -42,6 +42,12 @@ todo: use cached enclosure
     arb_zero(acb_imagref(res)); \
     break;
 
+#define ACB_UNARY_REAL_REAL(f) \
+    ca_get_acb_raw(res, CA_EXT_FUNC_ARGS(x), prec, ctx); \
+    f(acb_realref(res), acb_realref(res), prec); \
+    arb_zero(acb_imagref(res)); \
+    break;
+
 #define ACB_BINARY(f) \
     { \
         acb_t _t; \
@@ -76,6 +82,8 @@ ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx)
         /* CA_Cbrt,  not implemented */
         /* CA_Root,  not implemented */
         /* Complex parts */
+        case CA_Floor: ACB_UNARY_REAL_REAL(arb_floor)
+        case CA_Ceil: ACB_UNARY_REAL_REAL(arb_ceil)
         case CA_Abs:  ACB_UNARY_REAL(acb_abs)
         case CA_Sign: ACB_UNARY(acb_sgn)
         case CA_Re:   ACB_UNARY_REAL_NOPREC(acb_get_real)

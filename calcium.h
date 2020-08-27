@@ -63,6 +63,8 @@ typedef enum
     CA_Cbrt,
     CA_Root,
     /* Complex parts */
+    CA_Floor,
+    CA_Ceil,
     CA_Abs,
     CA_Sign,
     CA_Re,

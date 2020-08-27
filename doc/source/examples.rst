@@ -168,7 +168,7 @@ There are far more efficient ways to construct this polynomial;
 this program simply illustrates that arithmetic in
 multivariate number fields works smoothly.
 
-The program prints the coefficients from `S_n`, from the constant
+The program prints the coefficients of `S_n`, from the constant
 term to the coefficient of `x^{2^n}`.
 
 Sample output::

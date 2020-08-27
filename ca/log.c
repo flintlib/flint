@@ -11,10 +11,54 @@
 
 #include "ca.h"
 
+/* log(exp(z)) -- http://fungrim.org/entry/a3a253/ */
+void
+ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
+{
+    ca_t t, pi;
+
+    if (CA_IS_SPECIAL(z))
+        flint_abort();
+
+    ca_init(t, ctx);
+    ca_init(pi, ctx);
+
+    ca_pi(pi, ctx);
+
+    ca_im(t, z, ctx);
+    ca_div(t, t, pi, ctx);
+    ca_sub_ui(t, t, 1, ctx);
+    ca_div_ui(t, t, 2, ctx);
+
+    ca_ceil(t, t, ctx);
+
+    if (ca_check_is_zero(t, ctx) == T_TRUE)
+    {
+        ca_set(res, z, ctx);
+    }
+    else
+    {
+        ca_t pi_i;
+
+        ca_init(pi_i, ctx);
+        ca_pi_i(pi_i, ctx);
+
+        ca_mul(t, t, pi_i, ctx);
+        ca_mul_ui(t, t, 2, ctx);
+
+        ca_sub(res, z, t, ctx);
+        ca_clear(pi_i, ctx);
+    }
+
+    ca_clear(t, ctx);
+    ca_clear(pi, ctx);
+}
+
 void
 ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     truth_t is_zero;
+    ca_ext_ptr ext;
 
     if (CA_IS_SPECIAL(x))
     {
@@ -44,6 +88,15 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
     if (ca_check_is_one(x, ctx) == T_TRUE)
     {
         ca_zero(res, ctx);
+        return;
+    }
+
+    ext = ca_is_gen_as_ext(x, ctx);
+
+    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Exp)
+    {
+        /* log(exp(z)) */
+        ca_log_exp(res, CA_EXT_FUNC_ARGS(ext), ctx);
         return;
     }
 

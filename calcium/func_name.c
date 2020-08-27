@@ -26,6 +26,8 @@ const char * calcium_func_name(calcium_func_code func)
         case CA_Cbrt: return "Cbrt";
         case CA_Root: return "Root";
         /* Complex parts */
+        case CA_Floor: return "Floor";
+        case CA_Ceil: return "Ceil";
         case CA_Abs: return "Abs";
         case CA_Sign: return "Sign";
         case CA_Re: return "Re";

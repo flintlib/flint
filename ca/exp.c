@@ -14,6 +14,8 @@
 void
 ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
+    ca_ext_ptr ext;
+
     if (CA_IS_SPECIAL(x))
     {
         /* todo: complex signed infinity -> 0, undefined, uinf */
@@ -26,6 +28,15 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
             ca_undefined(res, ctx);
         else
             ca_unknown(res, ctx);
+        return;
+    }
+
+    ext = ca_is_gen_as_ext(x, ctx);
+
+    /* exp(log(z)) = z */
+    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Log)
+    {
+        ca_set(res, CA_EXT_FUNC_ARGS(ext), ctx);
         return;
     }
 
