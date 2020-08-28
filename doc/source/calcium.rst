@@ -106,6 +106,19 @@ here for convenience.
 
     Antic number field element.
 
+Flint, Arb and Antic extras
+-------------------------------------------------------------------------------
+
+Here we collect various utility methods for Flint, Arb and Antic
+types that are missing in those libraries. Some of these functions
+may be migrated upstream in the future.
+
+.. function:: ulong calcium_fmpz_hash(const fmpz_t x)
+
+    Hash function for integers. The algorithm may change;
+    presently, this simply extracts the low word (with sign).
+
+
 
 .. raw:: latex
 

@@ -11,11 +11,6 @@
 
 #include "ca_ext.h"
 
-static ulong ca_repr_hash(const ca_t x, ca_ctx_t ctx)
-{
-    return 1;
-}
-
 static ulong hash_qqbar(const qqbar_t x)
 {
     ulong s;
@@ -28,7 +23,7 @@ static ulong hash_qqbar(const qqbar_t x)
     s = 1234567;
 
     for (i = 0; i < len; i++)
-        s = fmpz_fdiv_ui(c + i, 1000000007) * 1000003 + s;
+        s = calcium_fmpz_hash(c + i) * 1000003 + s;
 
     /* todo: add in some bits describing the enclosure, e.g.
        a floor value or just the signs */
@@ -44,7 +39,7 @@ static ulong hash_func(calcium_func_code func, ca_srcptr args, slong nargs, ca_c
     s = func;
 
     for (i = 0; i < nargs; i++)
-        s = ca_repr_hash(args + i, ctx) * 1000003 + s;
+        s = ca_hash_repr(args + i, ctx) * 1000003 + s;
 
     return s;
 }

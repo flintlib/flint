@@ -379,6 +379,10 @@ for predicates is 0 for false and 1 for true.
     of the representations of *x* and *y*; the return value does not say
     anything meaningful about the numbers represented by *x* and *y*.
 
+.. function:: ulong ca_hash_repr(const ca_t x, ca_ctx_t ctx)
+
+    Hashes the representation of *x*.
+
 Value predicates
 -------------------------------------------------------------------------------
 

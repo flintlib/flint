@@ -356,6 +356,7 @@ truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 int ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx);
 int ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx);
+ulong ca_hash_repr(const ca_t x, ca_ctx_t ctx);
 
 /* Field structure operations */
 
