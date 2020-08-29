@@ -128,6 +128,14 @@ _qqbar_acb_lindep(fmpz * rel, acb_srcptr vec, slong len, int check, slong prec)
         found = !_fmpz_vec_is_zero(rel, len);
     }
 
+/*
+    if (found)
+    {
+        flint_printf("REL:\n");
+        fmpz_mat_print_pretty(A); flint_printf("\n\n");
+    }
+*/
+
     fmpz_mat_clear(A);
     fmpz_clear(scale_exp);
     acb_clear(z2);

@@ -965,6 +965,10 @@ The values of the array at the following indices can be changed by the user
 
     Size in bits for factors in smooth integer factorization. Default value: 32.
 
+.. macro:: CA_OPT_LLL_PREC
+
+    Precision to use to find integer relations using LLL. Default value: 128.
+
 Internal representation
 -------------------------------------------------------------------------------
 

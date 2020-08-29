@@ -229,9 +229,9 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             slong j, alloc;
             fmpz * rel;
             int found_relation = 0;
+            slong which_removed = 0;
 
-            /* todo: dynamic precision determined by context */
-            prec = 128;
+            prec = ctx->options[CA_OPT_LLL_PREC];
 
             alloc = num_logs_with_pi_i;
             z = _acb_vec_init(alloc);
@@ -334,12 +334,17 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
                                 fmpz_mpoly_init(poly, CA_FIELD_MCTX(K, ctx));
 
+                                which_removed = -1;
+
                                 for (j = 0; j < num_logs_with_pi_i; j++)
                                 {
                                     slong k;
 
                                     if (fmpz_is_zero(rel + j))
                                         continue;
+
+                                    if (which_removed == -1)
+                                        which_removed = j;
 
                                     for (k = 0; k < len; k++)
                                         exp[k] = 0;
@@ -376,10 +381,10 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 if (!found_relation)
                     break;
 
-                for (j = 0; j < num_logs - 1; j++)
+                for (j = which_removed; j < num_logs - 1; j++)
                     logs[j] = logs[j + 1];
 
-                for (j = 0; j < num_logs_with_pi_i - 1; j++)
+                for (j = which_removed; j < num_logs_with_pi_i - 1; j++)
                     acb_swap(z + j, z + j + 1);
 
                 num_logs--;
@@ -436,9 +441,9 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             fmpz * rel;
             slong alloc, j;
             int found_relation = 0;
+            slong which_removed = 0;
 
-            /* todo: dynamic precision determined by context */
-            prec = 128;
+            prec = ctx->options[CA_OPT_LLL_PREC];
 
             alloc = num_powers + 1;
 
@@ -592,6 +597,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                             ulong * exp2;
                             int neg;
 
+                            which_removed = -1;
 
                             fmpz_mpoly_init(poly, CA_FIELD_MCTX(K, ctx));
 
@@ -604,6 +610,9 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                             {
                                 if (fmpz_is_zero(rel + j))
                                     continue;
+
+                                if (which_removed == -1)
+                                    which_removed = j;
 
                                 if (fmpz_sgn(rel + j) > 0)
                                     exp1[powers[j]] = rel[j];
@@ -636,10 +645,10 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 if (!found_relation)
                     break;
 
-                for (j = 0; j < num_powers - 1; j++)
+                for (j = which_removed; j < num_powers - 1; j++)
                     powers[j] = powers[j + 1];
 
-                for (j = 0; j < num_powers; j++)
+                for (j = which_removed; j < num_powers; j++)
                     acb_swap(z + j, z + j + 1);
 
                 num_powers--;
