@@ -21,7 +21,7 @@ slong thread_pool_request(thread_pool_t T, thread_pool_handle * out,
     if (requested <= 0)
         return 0;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&T->mutex);
 #endif
 
@@ -41,7 +41,7 @@ slong thread_pool_request(thread_pool_t T, thread_pool_handle * out,
         }
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&T->mutex);
 #endif
 

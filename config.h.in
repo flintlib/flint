@@ -294,7 +294,7 @@
    (like Motorola and SPARC, unlike Intel and VAX). */
 #cmakedefine WORDS_BIGENDIAN
 
-#cmakedefine HAVE_PTHREAD 1
+#cmakedefine FLINT_USES_PTHREAD 1
 
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */

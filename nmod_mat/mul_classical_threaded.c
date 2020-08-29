@@ -62,7 +62,7 @@ typedef struct
     mp_ptr * D;
     mp_ptr tmp;
     nmod_t mod;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
     int op;
@@ -88,7 +88,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
     
     while (1)
     {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(arg.mutex);
 #endif
         i = *arg.i;
@@ -100,7 +100,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
             j = 0;
         }
         *arg.j = j + block;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
        pthread_mutex_unlock(arg.mutex);
 #endif
 
@@ -138,7 +138,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
     slong i, j, block;
     slong shared_i = 0, shared_j = 0;
     nmod_mat_transpose_arg_t * args;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
 
@@ -171,13 +171,13 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
         args[i].D       = D;
         args[i].tmp     = tmp;
         args[i].mod     = mod;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 	args[i].mutex   = &mutex;
 #endif
 	args[i].op      = op;
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
 
@@ -194,7 +194,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
         thread_pool_wait(global_thread_pool, threads[i]);
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&mutex);
 #endif
 
@@ -218,7 +218,7 @@ typedef struct
     mp_ptr tmp;
     nmod_t mod;
     mp_limb_t mask;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
     int pack;
@@ -250,7 +250,7 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
     
     while (1)
     {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(arg.mutex);
 #endif
         i = *arg.i;
@@ -262,7 +262,7 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
             j = 0;
         }
         *arg.j = j + block;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(arg.mutex);
 #endif
 
@@ -327,7 +327,7 @@ _nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
     mp_ptr tmp;
     slong shared_i = 0, shared_j = 0;
     nmod_mat_packed_arg_t * args;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
 
@@ -381,7 +381,7 @@ _nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
         args[i].tmp       = tmp;
         args[i].mod       = mod;
         args[i].mask      = mask;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 	args[i].mutex     = &mutex;
 #endif
 	args[i].pack      = pack;
@@ -389,7 +389,7 @@ _nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
         args[i].op        = op;
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
 
@@ -406,7 +406,7 @@ _nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
         thread_pool_wait(global_thread_pool, threads[i]);
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&mutex);
 #endif
 

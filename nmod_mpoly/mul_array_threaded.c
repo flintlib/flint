@@ -31,7 +31,7 @@ _chunk_struct;
 
 typedef struct
 {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     volatile int idx;
@@ -87,12 +87,12 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
     for (j = 0; j < 3*base->array_size; j++)
         coeff_array[j] = 0;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&base->mutex);
 #endif
     Pi = base->idx;
     base->idx = Pi + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&base->mutex);
 #endif
 
@@ -193,12 +193,12 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                     base->array_size, Pl - Pi - 1, base->ctx);
         }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(&base->mutex);
 #endif
 	Pi = base->idx;
         base->idx = Pi + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(&base->mutex);
 #endif
     }
@@ -299,7 +299,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
     args = (_worker_arg_struct *) TMP_ALLOC(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&base->mutex, NULL);
 #endif
     for (i = 0; i < num_handles; i++)
@@ -317,7 +317,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
     {
         thread_pool_wait(global_thread_pool, handles[i]);
     }
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&base->mutex);
 #endif
 
@@ -480,12 +480,12 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
     for (j = 0; j < 3*base->array_size; j++)
         coeff_array[j] = 0;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&base->mutex);
 #endif
     Pi = base->idx;
     base->idx = Pi + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&base->mutex);
 #endif
 
@@ -576,12 +576,12 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
                        coeff_array, Pl - Pi - 1, base->nvars, base->degb, base->ctx);
         }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 	pthread_mutex_lock(&base->mutex);
 #endif
         Pi = base->idx;
         base->idx = Pi + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(&base->mutex);
 #endif
     }
@@ -686,7 +686,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_DEG(
     args = (_worker_arg_struct *) TMP_ALLOC(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&base->mutex, NULL);
 #endif
     for (i = 0; i < num_handles; i++)
@@ -705,7 +705,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_DEG(
     {
         thread_pool_wait(global_thread_pool, handles[i]);
     }
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&base->mutex);
 #endif
 

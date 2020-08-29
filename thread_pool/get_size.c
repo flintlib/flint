@@ -15,11 +15,11 @@
 slong thread_pool_get_size(thread_pool_t T)
 {
     slong ret;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&T->mutex);
 #endif
     ret = T->length;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&T->mutex);
 #endif
     return ret;

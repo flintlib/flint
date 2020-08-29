@@ -653,7 +653,7 @@ static slong _nmod_mpolyn_crt(
 typedef struct
 {
     volatile int idx;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     const nmod_mpoly_ctx_struct * ctx;
@@ -696,12 +696,12 @@ static void _joinworker(void * varg)
     while (1)
     {
         /* get exponent of either G, Abar, or Bbar to start working on */
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(&base->mutex);
 #endif
         i = base->idx;
         base->idx = i + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(&base->mutex);
 #endif
 
@@ -1034,7 +1034,7 @@ compute_split:
     joinbase->Abar = Abar;
     joinbase->Bbar = Bbar;
     joinbase->ctx = ctx;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&joinbase->mutex, NULL);
 #endif
 
@@ -1147,7 +1147,7 @@ compute_split:
     FLINT_ASSERT(nmod_mpolyn_is_canonical(Abar, ctx));
     FLINT_ASSERT(nmod_mpolyn_is_canonical(Bbar, ctx));
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&joinbase->mutex);
 #endif
 

@@ -17,7 +17,7 @@
 #include <windows.h> /* GetSytemInfo */
 #endif
 
-#if defined(_MSC_VER) && HAVE_PTHREAD
+#if defined(_MSC_VER) && FLINT_USES_PTHREAD
 #include <atomic.h>
 #endif
 
@@ -83,7 +83,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 
         /* set free count to zero and determine if this is the main thread */
         ((fmpz_block_header_s *) ptr)->count = 0;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         ((fmpz_block_header_s *) ptr)->thread = pthread_self();
 #endif
         /* how many __mpz_structs worth are dedicated to header, per page */
@@ -133,7 +133,7 @@ void _fmpz_clear_mpz(fmpz f)
     header_ptr = (fmpz_block_header_s *) header_ptr->address;
 
     /* clean up if this is left over from another thread */
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     if (header_ptr->count != 0 || !pthread_equal(header_ptr->thread, pthread_self()))
 #else
     if (header_ptr->count != 0)
@@ -143,9 +143,9 @@ void _fmpz_clear_mpz(fmpz f)
 
         mpz_clear(ptr);
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && HAVE_PTHREAD
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && FLINT_USES_PTHREAD
        new_count = __atomic_add_fetch(&(header_ptr->count), 1, __ATOMIC_SEQ_CST);
-#elif defined(_MSC_VER) && HAVE_PTHREAD
+#elif defined(_MSC_VER) && FLINT_USES_PTHREAD
        new_count = atomic_add_fetch(&(header_ptr->count), 1);
 #else
        new_count = ++header_ptr->count;
@@ -184,9 +184,9 @@ void _fmpz_cleanup_mpz_content(void)
 
        ptr = (fmpz_block_header_s *) ptr->address;
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && HAVE_PTHREAD
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && FLINT_USES_PTHREAD
        new_count = __atomic_add_fetch(&(ptr->count), 1, __ATOMIC_SEQ_CST);
-#elif defined(_MSC_VER) && HAVE_PTHREAD
+#elif defined(_MSC_VER) && FLINT_USES_PTHREAD
        new_count = atomic_add_fetch(&(ptr->count), 1);
 #else /* may be a very small leak with pthreads */
        new_count = ++ptr->count;

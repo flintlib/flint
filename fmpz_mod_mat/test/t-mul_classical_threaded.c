@@ -22,7 +22,7 @@
 int
 main(void)
 {
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     slong i, max_threads = 5;
 #endif
     FLINT_TEST_INIT(state);
@@ -30,7 +30,7 @@ main(void)
     flint_printf("mul_classical_threaded....");
     fflush(stdout);
 
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_mat_t A, B, C, D;

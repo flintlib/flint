@@ -16,12 +16,12 @@ void thread_pool_give_back(thread_pool_t T, thread_pool_handle i)
 {
     thread_pool_entry_struct * D;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&T->mutex);
 #endif
     D = T->tdata;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&D[i].mutex);
 #endif
 
@@ -31,7 +31,7 @@ void thread_pool_give_back(thread_pool_t T, thread_pool_handle i)
 
     D[i].available = 1;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&D[i].mutex);
 
     pthread_mutex_unlock(&T->mutex);

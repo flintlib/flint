@@ -680,7 +680,7 @@ rm -f build/test-fenv.h
 
 #pthread configuration
 
-CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
+CONFIG_PTHREAD="#define FLINT_USES_PTHREAD ${PTHREAD}"
 
 #cpu_set_t configuration
 

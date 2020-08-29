@@ -22,7 +22,7 @@ typedef struct
     mp_size_t output_limbs;
     mp_srcptr limbs;
     mp_limb_t ** poly;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
 }
@@ -42,12 +42,12 @@ _split_limbs_worker(void * arg_ptr)
 
     while (1)
     {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(arg.mutex);
 #endif
 	i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, num);
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(arg.mutex);
 #endif
 
@@ -69,14 +69,14 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
 {
     mp_size_t i, shared_i = 0, skip, length = (total_limbs - 1)/coeff_limbs + 1;
     mp_size_t num = total_limbs/coeff_limbs;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     slong num_threads;
     thread_pool_handle * threads;
     split_limbs_arg_t * args;
     
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
 
@@ -94,7 +94,7 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
        args[i].output_limbs = output_limbs;
        args[i].limbs = limbs;
        args[i].poly = poly;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
        args[i].mutex = &mutex;       
 #endif
     }
@@ -112,7 +112,7 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
 
     flint_free(args);
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&mutex);
 #endif
 
@@ -138,7 +138,7 @@ typedef struct
     flint_bitcnt_t top_bits;
     mp_limb_t mask;
     mp_limb_t ** poly;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
 }
@@ -161,12 +161,12 @@ _split_bits_worker(void * arg_ptr)
 
     while (1)
     {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(arg.mutex);
 #endif
 	i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, length - 1);
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(arg.mutex);
 #endif
 
@@ -214,7 +214,7 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
     mp_srcptr limb_ptr;
     mp_limb_t mask;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     slong num_threads;
@@ -229,7 +229,7 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     shift_bits = WORD(0);
     limb_ptr = limbs;                      
     
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
 
@@ -249,7 +249,7 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
        args[i].top_bits = top_bits;
        args[i].mask = mask;
        args[i].poly = poly;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
        args[i].mutex = &mutex;       
 #endif
     }
@@ -267,7 +267,7 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
 
     flint_free(args);
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&mutex);
 #endif
 

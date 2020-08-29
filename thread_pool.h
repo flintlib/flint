@@ -22,7 +22,7 @@
 
 #include "flint.h"
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 #include <pthread.h>
 #endif
 
@@ -32,7 +32,7 @@
 
 typedef struct
 {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_t pth;
     pthread_mutex_t mutex;
     pthread_cond_t sleep1;
@@ -51,10 +51,10 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
-#if HAVE_CPU_SET_T && HAVE_PTHREAD
+#if HAVE_CPU_SET_T && FLINT_USES_PTHREAD
     cpu_set_t original_affinity;
 #endif
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     thread_pool_entry_struct * tdata;
