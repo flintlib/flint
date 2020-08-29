@@ -44,7 +44,7 @@
 #include "gc.h"
 #endif
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 #include <assert.h>
 #endif
 
@@ -267,7 +267,7 @@ void flint_rand_free(flint_rand_s * state)
  */
 typedef __mpfr_struct flint_mpfr;
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 #define FLINT_ASSERT(param) assert(param)
 #else
 #define FLINT_ASSERT(param)
@@ -390,7 +390,7 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 #define TMP_START \
    __tmp_root = NULL
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 #define TMP_ALLOC(size) \
    (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \

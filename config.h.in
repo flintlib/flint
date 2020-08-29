@@ -285,7 +285,7 @@
 #cmakedefine STDC_HEADERS		1
 
 /* ./configure --enable-assert option, to enable some ASSERT()s */
-#cmakedefine WANT_ASSERT
+#cmakedefine FLINT_WANT_ASSERT
 
 /* Define if you cpu_set_t in sched.h */
 #cmakedefine01 FLINT_USES_CPUSET

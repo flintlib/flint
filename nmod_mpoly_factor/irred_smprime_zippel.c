@@ -320,7 +320,7 @@ cleanup:
     nmod_mpoly_clear(m, ctx);
     nmod_mpoly_clear(mpow, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         nmod_mpoly_t prod;

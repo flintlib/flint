@@ -541,7 +541,7 @@ static slong _nmod_mpolyn_crt(
     if (exp_right)
         _find_edge(stop, count, exp_right, B, N);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (k = 0; k < count; k++)
     {
         FLINT_ASSERT(0 <= start[k]);
@@ -835,7 +835,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     _joinbase_t joinbase;
     nmod_poly_t t1;
     nmod_mpolyn_t T1, T2;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpolyn_t Aorg, Borg;
 #endif
 
@@ -847,7 +847,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     FLINT_ASSERT(bits == A->bits);
     FLINT_ASSERT(bits == B->bits);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpolyn_init(Aorg, A->bits, ctx);
     nmod_mpolyn_init(Borg, B->bits, ctx);
     nmod_mpolyn_set(Aorg, A, ctx);
@@ -1260,7 +1260,7 @@ cleanup_split:
 
 cleanup:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         success =            nmod_mpolyn_divides(T1, Aorg, G, ctx);

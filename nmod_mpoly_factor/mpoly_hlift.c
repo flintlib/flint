@@ -61,7 +61,7 @@ static int _hlift_quartic2(
 
     nmod_mpoly_divrem(Aq, t, A, xalpha, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_one(t2, ctx);
     for (i = 0; i < r; i++)
         nmod_mpoly_mul(t2, t2, betas + i, ctx);
@@ -195,7 +195,7 @@ static int _hlift_quartic(
 
     nmod_mpoly_divrem(Aq, t, A, xalpha, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_one(t2, ctx);
     for (i = 0; i < r; i++)
         nmod_mpoly_mul(t2, t2, betas + i, ctx);

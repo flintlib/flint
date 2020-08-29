@@ -53,7 +53,7 @@ void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(
         fq_nmod_poly_set_coeff(A, k, coeff + i, ctx->fqctx);
     }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (i = 0; i < len; i++)
     {
         slong v;

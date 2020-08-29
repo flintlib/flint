@@ -780,7 +780,7 @@ void _fmpz_mpoly_mul_heap_threaded(
 
     /* we should have managed to keep coefficients past length demoted */
     FLINT_ASSERT(Alen <= Aalloc);
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (i = Alen; i < Aalloc; i++)
     {
         FLINT_ASSERT(!COEFF_IS_MPZ(*(Acoeff + i)));

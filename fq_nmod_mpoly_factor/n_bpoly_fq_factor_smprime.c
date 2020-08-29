@@ -392,7 +392,7 @@ static void _hensel_lift_fac(
 
     for (i = 0; i < c->length; i++)
     {
-    #if WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j, d = fq_nmod_ctx_degree(ctx);
             for (j = 0; j < p0; j++)
@@ -425,7 +425,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong j, d = fq_nmod_ctx_degree(ctx);
         n_bpoly_fq_mul(t1, G, H, ctx);
@@ -484,7 +484,7 @@ static void _hensel_lift_inv(
 
     for (i = 0; i < c->length; i++)
     {
-    #if WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j, d = fq_nmod_ctx_degree(ctx);
             for (j = 0; j < p0; j++)
@@ -517,7 +517,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_fq_mul(t1, G, A, ctx);
     n_bpoly_fq_mul(t2, H, B, ctx);
     n_bpoly_fq_add(c, t1, t2, ctx);

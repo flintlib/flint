@@ -378,7 +378,7 @@ static slong _fmpz_mpoly_crt(
     if (exp_right)
         _find_edge(stop, count, exp_right, B, N);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (k = 0; k < count; k++)
     {
         FLINT_ASSERT(0 <= start[k]);

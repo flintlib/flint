@@ -143,7 +143,7 @@ void _fmpz_mpoly_to_fmpz_poly_deflate(
         fmpz_poly_set_coeff_fmpz(A, k, coeff + i);
     }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (i = 0; i < len; i++)
     {
         slong v;

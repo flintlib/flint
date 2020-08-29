@@ -12,7 +12,7 @@
 #include "fq_zech_mpoly_factor.h"
 
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 static void fq_zech_polyu_get_fq_zech_polyun(
     fq_zech_polyu_t A,
     const fq_zech_polyun_t B,
@@ -508,7 +508,7 @@ choose_prime:
 
 cleanup:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         fq_zech_polyu_t T1, T2, T3;

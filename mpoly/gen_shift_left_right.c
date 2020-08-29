@@ -24,14 +24,14 @@ void _mpoly_gen_shift_right(ulong * Aexp, flint_bitcnt_t Abits, slong Alength,
 {
     slong i, N;
     ulong *one;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     ulong mask;
 #endif
     TMP_INIT;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     mask = 0;
     for (i = 0; i < FLINT_BITS/Abits; i++)
         mask = (mask << Abits) + (UWORD(1) << (Abits - 1));
@@ -100,14 +100,14 @@ void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits, slong Alength,
 {
     slong i, N;
     ulong *one;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     ulong mask;
 #endif
     TMP_INIT;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     mask = 0;
     for (i = 0; i < FLINT_BITS/Abits; i++)
         mask = (mask << Abits) + (UWORD(1) << (Abits - 1));

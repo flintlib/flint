@@ -601,7 +601,7 @@ static int _irreducible_factors(
     fmpz_mpolyv_t Lf;
     fmpz_mpoly_ctx_struct *  Lctx;
     flint_rand_t state;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_t Aorg;
 
     fmpz_mpoly_init(Aorg, Actx);
@@ -716,7 +716,7 @@ cleanup_more:
 
 cleanup_less:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mpoly_t prod;

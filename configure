@@ -759,7 +759,7 @@ echo "$CONFIG_PTHREAD" >> flint-config.h
 echo "$CONFIG_GC" >> flint-config.h
 echo "$CONFIG_CPU_SET_T" >> flint-config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> flint-config.h
-echo "#define WANT_ASSERT $ASSERT" >> flint-config.h
+echo "#define FLINT_WANT_ASSERT $ASSERT" >> flint-config.h
 if [ "$FLINT_DLL" = "1" ]; then
    echo "#ifdef FLINT_USE_DLL" >> flint-config.h
    echo "#define FLINT_DLL __declspec(dllimport)" >> flint-config.h

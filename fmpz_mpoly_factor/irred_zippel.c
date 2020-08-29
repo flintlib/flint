@@ -895,7 +895,7 @@ next_alpha:
             fmpz_set_ui(alpha + i, 1 + (l & (mask - 1)));
     }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_degrees_si(tdegs, A, ctx);
     for (i = 0; i < n + 1; i++)
         FLINT_ASSERT(degs[i] == tdegs[i]);

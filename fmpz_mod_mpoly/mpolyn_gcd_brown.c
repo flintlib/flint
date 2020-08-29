@@ -30,7 +30,7 @@ int fmpz_mod_mpolyn_gcd_brown_bivar(
     fmpz_mod_poly_t modulus, modulus2;
     slong N, off, shift;
     flint_bitcnt_t bits = A->bits;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_t leadA, leadB;
 #endif
 
@@ -44,7 +44,7 @@ int fmpz_mod_mpolyn_gcd_brown_bivar(
     fmpz_init(temp);
     fmpz_init(gammaeval);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_init(leadA, ctx->ffinfo);
     fmpz_mod_poly_init(leadB, ctx->ffinfo);
     fmpz_mod_poly_set(leadA, fmpz_mod_mpolyn_leadcoeff_poly(A, ctx), ctx->ffinfo);
@@ -208,7 +208,7 @@ successful_put_content:
 
 cleanup:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         FLINT_ASSERT(fmpz_is_one(fmpz_mod_mpolyn_leadcoeff_last_ref(G, ctx)));

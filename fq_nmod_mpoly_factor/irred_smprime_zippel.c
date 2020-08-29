@@ -297,7 +297,7 @@ int fq_nmod_zip_find_coeffs_new_fq_nmod(
             _n_fq_add(V0, V0, p0, ctx);
         }
         /* roots[i] should be a root of master */
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
         _n_fq_mul(p0, r, T, ctx, tmp);
         _n_fq_add(p0, p0, master + d*0, ctx);
         FLINT_ASSERT(_n_fq_is_zero(p0, d));
@@ -935,7 +935,7 @@ int fq_nmod_mpoly_hlift_zippel(
     FLINT_ASSERT(r > 1);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_nmod_mpoly_t T;
         slong j, * check_degs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
@@ -1421,7 +1421,7 @@ cleanup:
     fq_nmod_mpoly_clear(m, ctx);
     fq_nmod_mpoly_clear(mpow, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

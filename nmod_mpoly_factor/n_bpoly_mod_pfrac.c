@@ -162,7 +162,7 @@ choose_prime:
 
 cleanup:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_bpoly_t T1, T2, T3;
@@ -402,7 +402,7 @@ choose_prime:
 
 cleanup:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_bpoly_t T1, T2, T3;

@@ -420,7 +420,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, G, H, ctx);
     n_bpoly_mod_sub(c, f, t1, ctx);
     for (i = 0; i < c->length; i++)
@@ -493,7 +493,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, G, A, ctx);
     n_bpoly_mod_mul(t2, H, B, ctx);
     n_bpoly_mod_add(c, t1, t2, ctx);
