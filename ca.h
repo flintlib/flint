@@ -409,6 +409,12 @@ void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 /* Powers and roots */
 
+CA_INLINE void
+ca_sqr(ca_t res, const ca_t x, ca_ctx_t ctx)
+{
+    ca_mul(res, x, x, ctx);
+}
+
 void ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
 void ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
 void ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
@@ -476,6 +482,23 @@ void ca_factor_insert(ca_factor_t fac, const ca_t base, const ca_t exp, ca_ctx_t
 void ca_factor_get_ca(ca_t res, const ca_factor_t fac, ca_ctx_t ctx);
 
 void ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
+
+/* Test helpers */
+
+#define CA_TEST_PROPERTY(f, s, x, ctx, expected) \
+     do { \
+        truth_t t; \
+        t = f(x, ctx); \
+        if (t != expected) \
+        { \
+            flint_printf("FAIL\n"); \
+            flint_printf("%s\n\n", s); \
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n"); \
+            flint_printf("got = "); truth_print(t); flint_printf("\n\n"); \
+            flint_printf("expected = "); truth_print(expected); flint_printf("\n\n"); \
+            flint_abort(); \
+        } \
+     } while (0) \
 
 #ifdef __cplusplus
 }

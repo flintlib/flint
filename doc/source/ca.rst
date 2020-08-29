@@ -636,6 +636,10 @@ Arithmetic
 Powers and roots
 -------------------------------------------------------------------------------
 
+.. function:: void ca_sqr(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the square of *x*.
+
 .. function:: void ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
               void ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
               void ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx)

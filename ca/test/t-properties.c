@@ -11,21 +11,6 @@
 
 #include "ca.h"
 
-#define CA_TEST_PROPERTY(f, s, x, ctx, expected) \
-     do { \
-        truth_t t; \
-        t = f(x, ctx); \
-        if (t != expected) \
-        { \
-            flint_printf("FAIL\n"); \
-            flint_printf("%s\n\n", s); \
-            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n"); \
-            flint_printf("got = "); truth_print(t); flint_printf("\n\n"); \
-            flint_printf("expected = "); truth_print(expected); flint_printf("\n\n"); \
-            flint_abort(); \
-        } \
-     } while (0) \
-
 int main()
 {
     flint_rand_t state;
