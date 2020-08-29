@@ -72,7 +72,7 @@ void thread_pool_init(thread_pool_t T, slong size)
 #endif
     T->length = size;
 
-#if HAVE_CPU_SET_T && FLINT_USES_PTHREAD
+#if FLINT_USES_CPUSET && FLINT_USES_PTHREAD
     if (0 != pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t),
                                                         &T->original_affinity))
     {

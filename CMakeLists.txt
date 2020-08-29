@@ -167,7 +167,7 @@ check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
 check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
 
-check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" HAVE_CPU_SET_T)
+check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" FLINT_USES_CPUSET)
 
 set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
 

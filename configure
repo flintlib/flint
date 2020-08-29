@@ -684,7 +684,7 @@ CONFIG_PTHREAD="#define FLINT_USES_PTHREAD ${PTHREAD}"
 
 #cpu_set_t configuration
 
-CONFIG_CPU_SET_T="#define HAVE_CPU_SET_T 0"
+CONFIG_CPU_SET_T="#define FLINT_USES_CPUSET 0"
 
 mkdir -p build
 MSG="Testing cpu_set_t..."
@@ -698,7 +698,7 @@ if [ $? -eq 0 ]; then
     rm -f build/test-cpu_set_t
     printf "%s\n" "yes"
     echo "yes" >> config.log
-    CONFIG_CPU_SET_T="#define HAVE_CPU_SET_T 1"
+    CONFIG_CPU_SET_T="#define FLINT_USES_CPUSET 1"
 else
     printf "%s\n" "no"
     echo "no" >> config.log
