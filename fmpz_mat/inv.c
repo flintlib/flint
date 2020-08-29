@@ -43,8 +43,8 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     }
     else if (dim == 1)
     {
-        fmpz_set(den, A->entries);
-        fmpz_one(B->entries);
+        fmpz_set(den, fmpz_mat_entry(A, 0, 0));
+        fmpz_one(fmpz_mat_entry(B, 0, 0));
         return !fmpz_is_zero(den);
     }
     else if (dim == 2)

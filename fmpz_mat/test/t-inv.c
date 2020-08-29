@@ -31,6 +31,26 @@ main(void)
     flint_printf("inv....");
     fflush(stdout);    
 
+    {
+        fmpz_t d;
+        fmpz_mat_t A, B, C;
+
+        fmpz_mat_init(A, 1, 1);
+        fmpz_one(fmpz_mat_entry(A, 0, 0));
+
+        fmpz_mat_window_init(B, A, 0, 0, 1, 1);
+
+        fmpz_mat_init(C, 1, 1);
+        fmpz_init(d);
+
+        fmpz_mat_inv(C, d, B);
+
+        fmpz_clear(d);
+        fmpz_mat_clear(C);
+        fmpz_mat_window_clear(B);
+        fmpz_mat_clear(A);
+    }
+
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 10);
