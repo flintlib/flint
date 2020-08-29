@@ -145,7 +145,7 @@ endif
 
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR)
-	mkdir -p $(DESTDIR)$(PREFIX)/include
+	mkdir -p $(DESTDIR)$(PREFIX)/include/calcium
 	$(AT)if [ "$(CALCIUM_SHARED)" -eq "1" ]; then \
 		cp $(CALCIUM_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 		cp -a $(shell ls $(CALCIUM_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
@@ -153,9 +153,9 @@ install: library
 	$(AT)if [ "$(CALCIUM_STATIC)" -eq "1" ]; then \
 		cp libcalcium.a $(DESTDIR)$(PREFIX)/$(LIBDIR); \
 	fi
-	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include
+	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/calcium
 	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
-		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include; \
+		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/calcium; \
 	fi
 
 build:
