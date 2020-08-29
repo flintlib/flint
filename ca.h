@@ -305,6 +305,7 @@ void ca_pos_i_inf(ca_t x, ca_ctx_t ctx);
 void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
 
 void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx);
+int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx);
 int ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx);

@@ -20,16 +20,12 @@ ca_im(ca_t res, const ca_t x, ca_ctx_t ctx)
             ca_unknown(res, ctx);
         else
             ca_undefined(res, ctx);
-        return;
     }
-
-    if (CA_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         ca_zero(res, ctx);
-        return;
     }
-
-    if (CA_IS_QQ_I(x, ctx))
+    else if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n, *d;
         fmpq_t t;
@@ -41,9 +37,22 @@ ca_im(ca_t res, const ca_t x, ca_ctx_t ctx)
         fmpq_set_fmpz_frac(t, n + 1, d);
         ca_set_fmpq(res, t, ctx);
         fmpq_clear(t);
-        return;
     }
-
-    _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Im, x), ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
+    else if (ca_check_is_real(x, ctx) == T_TRUE)   /* todo: avoid duplicate computations with is_real/is_imaginary */
+    {
+        ca_zero(res, ctx);
+    }
+    else if (ca_check_is_imaginary(x, ctx) == T_TRUE)
+    {
+        ca_t t;
+        ca_init(t, ctx);
+        ca_neg_i(t, ctx);
+        ca_mul(res, x, t, ctx);
+        ca_clear(t, ctx);
+    }
+    else
+    {
+        _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Im, x), ctx);
+        fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
+    }
 }

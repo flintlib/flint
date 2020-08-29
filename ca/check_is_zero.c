@@ -86,6 +86,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         if (!acb_contains_zero(v))
         {
             res = T_FALSE;
+            break;
         }
 
         /* try qqbar computation */

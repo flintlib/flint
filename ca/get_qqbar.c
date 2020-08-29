@@ -12,61 +12,6 @@
 #include "ca.h"
 #include "ca_ext.h"
 
-int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx);
-int ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx);
-
-int
-ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx)
-{
-    if (CA_EXT_IS_QQBAR(x))
-        return 1;
-
-    if (CA_EXT_HEAD(x) == CA_Sqrt)
-        return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx);
-
-    if (CA_EXT_HEAD(x) == CA_Abs)
-        return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx);
-
-    if (CA_EXT_HEAD(x) == CA_Pow)
-        return ca_can_evaluate_qqbar(CA_EXT_FUNC_ARGS(x), ctx) &&
-               CA_IS_QQ(CA_EXT_FUNC_ARGS(x) + 1, ctx);
-
-    return 0;
-}
-
-int
-ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx)
-{
-    if (CA_IS_SPECIAL(x))
-    {
-        return 0;
-    }
-    else if (CA_IS_QQ(x, ctx))
-    {
-        return 1;
-    }
-    else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
-    {
-        return 1;
-    }
-    else
-    {
-        slong len, i;
-
-        len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
-
-        /* todo: exclude extension numbers that are not actually used */
-        for (i = 0; i < len; i++)
-        {
-            if (!ca_ext_can_evaluate_qqbar(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i), ctx))
-                return 0;
-        }
-
-        return 1;
-    }
-}
-
-
 int
 ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 {
@@ -169,6 +114,81 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 
                     /* todo: bounds check */
                     qqbar_abs(xs + i, xs + i);
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Sign)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    /* todo: bounds check */
+                    qqbar_sgn(xs + i, xs + i);
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Re)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    /* todo: bounds check */
+                    qqbar_re(xs + i, xs + i);
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Im)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    /* todo: bounds check */
+                    qqbar_im(xs + i, xs + i);
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Conjugate)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    qqbar_conj(xs + i, xs + i);
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Floor)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    {
+                        fmpz_t t;
+                        fmpz_init(t);
+                        qqbar_floor(t, xs + i);
+                        qqbar_set_fmpz(xs + i, t);
+                        fmpz_clear(t);
+                    }
+                }
+                else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Ceil)
+                {
+                    qqbar_init(xs + i);
+                    init_mask[i] = 1;
+
+                    if (!ca_get_qqbar(xs + i, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)), ctx))
+                        goto cleanup;
+
+                    {
+                        fmpz_t t;
+                        fmpz_init(t);
+                        qqbar_ceil(t, xs + i);
+                        qqbar_set_fmpz(xs + i, t);
+                        fmpz_clear(t);
+                    }
                 }
                 else if (CA_EXT_HEAD(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)) == CA_Pow)
                 {

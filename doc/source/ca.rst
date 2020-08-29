@@ -322,6 +322,11 @@ Conversion of algebraic numbers
     has been implemented for the functions appearing in the construction
     of *x*.
 
+.. function:: int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx)
+
+    Checks if :func:`ca_get_qqbar` has a chance to succeed. In effect,
+    this checks if all extension numbers are manifestly algebraic
+    numbers (without doing any evaluation).
 
 Random generation
 -------------------------------------------------------------------------------
@@ -738,7 +743,7 @@ Complex parts
 
 .. function:: void ca_ceil(ca_t res, const ca_t x, ca_ctx_t ctx)
 
-    Sets *res* to the ceil function of *x*. The result is *Undefined* if *x*
+    Sets *res* to the ceiling function of *x*. The result is *Undefined* if *x*
     is any infinity (including a real infinity).
     For complex numbers, this is presently defined to take the ceiling of the
     real part.

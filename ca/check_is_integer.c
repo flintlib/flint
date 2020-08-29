@@ -11,6 +11,7 @@
 
 #include "ca.h"
 
+/* todo: fast check in number field */
 truth_t
 ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
 {
@@ -28,26 +29,50 @@ ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
         else
             return T_FALSE;
     }
-    else if (CA_IS_QQ_I(x, ctx))
+    else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
     {
-        const fmpz *n, *d;
-
-        n = QNF_ELEM_NUMREF(CA_NF_ELEM(x));
-        d = QNF_ELEM_DENREF(CA_NF_ELEM(x));
-
-        if (fmpz_is_one(d) && fmpz_is_zero(n + 1))
-            return T_TRUE;
-
-        return T_FALSE;
+        return nf_elem_is_integer(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))) ? T_TRUE : T_FALSE;
     }
     else
     {
-        /*
-        slong prec;
-        ...
-        */
+        acb_t t;
+        truth_t res;
+        slong prec, prec_limit;
 
-        return T_UNKNOWN;
+        res = T_UNKNOWN;
+
+        acb_init(t);
+
+        prec_limit = ctx->options[CA_OPT_PREC_LIMIT];
+        prec_limit = FLINT_MAX(prec_limit, 64);
+
+        for (prec = 64; (prec <= prec_limit) && (res == T_UNKNOWN); prec *= 2)
+        {
+            ca_get_acb_raw(t, x, prec, ctx);
+
+            if (!acb_contains_int(t))
+            {
+                res = T_FALSE;
+                break;
+            }
+
+            /* try qqbar computation */
+            /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
+            if (prec == 64)
+            {
+                qqbar_t a;
+                qqbar_init(a);
+
+                if (ca_get_qqbar(a, x, ctx))
+                    res = qqbar_is_integer(a) ? T_TRUE : T_FALSE;
+
+                qqbar_clear(a);
+            }
+        }
+
+        acb_clear(t);
+
+        return res;
     }
 }
 

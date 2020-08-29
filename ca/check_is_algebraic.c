@@ -11,11 +11,16 @@
 
 #include "ca.h"
 
+int ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx);
+
 /* todo: move, rename */
 static truth_t
 ca_ext_is_algebraic(const ca_ext_t x, ca_ctx_t ctx)
 {
     if (CA_EXT_IS_QQBAR(x))
+        return T_TRUE;
+
+    if (ca_ext_can_evaluate_qqbar(x, ctx))
         return T_TRUE;
 
     return T_UNKNOWN;
@@ -47,9 +52,9 @@ ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
         len = CA_FIELD_LENGTH(field);
 
         /* todo: handle simple transcendental numbers, e.g. Q(i,pi) */
-        /* need to verify that some the generator is used in the poly */
+        /* need to verify that some generator is used in the poly */
         /* for Q(a,b,pi) we don't know, because a, b could cancel out pi */
-        for (i = 0; len; i++)
+        for (i = 0; i < len; i++)
         {
             if (ca_ext_is_algebraic(CA_FIELD_EXT_ELEM(field, i), ctx) != T_TRUE)
                 return T_UNKNOWN;

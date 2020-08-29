@@ -21,16 +21,14 @@ ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
-
-    if (CA_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         if (fmpq_is_zero(CA_FMPQ(x)))
             return T_TRUE;
         else
             return T_FALSE;
     }
-
-    if (CA_IS_QQ_I(x, ctx))
+    else if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n;
 
@@ -41,7 +39,51 @@ ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
+    else
+    {
+        acb_t t;
+        truth_t res;
+        slong prec, prec_limit;
 
-    return T_UNKNOWN;
+        res = T_UNKNOWN;
+
+        acb_init(t);
+
+        prec_limit = ctx->options[CA_OPT_PREC_LIMIT];
+        prec_limit = FLINT_MAX(prec_limit, 64);
+
+        for (prec = 64; (prec <= prec_limit) && (res == T_UNKNOWN); prec *= 2)
+        {
+            ca_get_acb_raw(t, x, prec, ctx);
+
+            if (arb_is_zero(acb_realref(t)))
+            {
+                res = T_TRUE;
+                break;
+            }
+
+            if (!arb_contains_zero(acb_realref(t)))
+            {
+                res = T_FALSE;
+                break;
+            }
+
+            /* try qqbar computation */
+            /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
+            if (prec == 64)
+            {
+                qqbar_t a;
+                qqbar_init(a);
+
+                if (ca_get_qqbar(a, x, ctx))
+                    res = (qqbar_sgn_re(a) == 0) ? T_TRUE : T_FALSE;
+
+                qqbar_clear(a);
+            }
+        }
+
+        acb_clear(t);
+
+        return res;
+    }
 }
-

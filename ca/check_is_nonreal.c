@@ -21,13 +21,11 @@ ca_check_is_nonreal(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
-
-    if (CA_IS_QQ(x, ctx))
+    else if (CA_IS_QQ(x, ctx))
     {
         return T_FALSE;
     }
-
-    if (CA_IS_QQ_I(x, ctx))
+    else if (CA_IS_QQ_I(x, ctx))
     {
         const fmpz *n;
 
@@ -38,7 +36,14 @@ ca_check_is_nonreal(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
+    else
+    {
+        truth_t res = ca_check_is_real(x, ctx);
 
-    return T_UNKNOWN;
+        if (res == T_TRUE)
+            return T_FALSE;
+        if (res == T_FALSE)
+            return T_TRUE;
+        return T_UNKNOWN;
+    }
 }
-
