@@ -308,7 +308,7 @@ if [ "$WANT_BLAS" = "1" ]; then
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${BLAS_LIB_DIR}"
    EXTRA_LIBS="${EXTRA_LIBS} openblas"
 fi
-CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
+CONFIG_BLAS="#define FLINT_USES_BLAS ${WANT_BLAS}"
 
 if [ "$WANT_GC" = "1" ]; then
    if [ -d "${GC_DIR}" ]; then
@@ -323,7 +323,7 @@ if [ "$WANT_GC" = "1" ]; then
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${GC_LIB_DIR}"
    EXTRA_LIBS="${EXTRA_LIBS} gc"
 fi
-CONFIG_GC="#define HAVE_GC ${WANT_GC}"
+CONFIG_GC="#define FLINT_USES_GC ${WANT_GC}"
 
 # defaults for CC, CXX and AR
 
@@ -558,7 +558,7 @@ $CC build/test-popcnt.c -o ./build/test-popcnt > /dev/null 2>&1
 if [ $? -eq 0 ]; then
    printf "%s\n" "yes"
    echo "yes" >> config.log
-   CONFIG_POPCNT_INTRINSICS="#define POPCNT_INTRINSICS"
+   CONFIG_POPCNT_INTRINSICS="#define FLINT_USES_POPCNT"
 
    if [ "$MACHINE" = "x86_64" ]; then
       MSG="Testing native popcount..."
@@ -627,7 +627,7 @@ fi
 
 #test support for thread-local storage
 
-CONFIG_TLS="#define HAVE_TLS 0"
+CONFIG_TLS="#define FLINT_USES_TLS 0"
 
 if [ "$TLS" = "1" ]; then
    mkdir -p build
@@ -642,7 +642,7 @@ if [ "$TLS" = "1" ]; then
       if [ $? -eq 0 ]; then
          printf "%s\n" "yes"
 	 echo "yes" >> config.log
-         CONFIG_TLS="#define HAVE_TLS 1"
+         CONFIG_TLS="#define FLINT_USES_TLS 1"
       else
          printf "%s\n" "no"
 	 echo "no" >> config.log
@@ -658,7 +658,7 @@ fi
 
 #fenv configuration
 
-CONFIG_FENV="#define HAVE_FENV 0"
+CONFIG_FENV="#define FLINT_USES_FENV 0"
 
 mkdir -p build
 MSG="Testing fenv..."
@@ -671,7 +671,7 @@ echo "#endif" >> build/test-fenv.h
 if ($CC -E build/test-fenv.h > /dev/null 2>&1) then
     printf "%s\n" "yes"
     echo "yes" >> config.log
-    CONFIG_FENV="#define HAVE_FENV 1"
+    CONFIG_FENV="#define FLINT_USES_FENV 1"
 else
     printf "%s\n" "no"
     echo "no" >> config.log

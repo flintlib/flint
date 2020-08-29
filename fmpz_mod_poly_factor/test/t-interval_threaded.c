@@ -31,7 +31,7 @@
 int
 main(void)
 {
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
     fmpz_mod_ctx_t ctx;
 #endif
@@ -40,7 +40,7 @@ main(void)
     flint_printf("interval_threaded....");
     fflush(stdout);
 
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 

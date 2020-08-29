@@ -24,7 +24,7 @@
 int
 main(void)
 {
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int iter;
 #endif
     FLINT_TEST_INIT(state);
@@ -32,7 +32,7 @@ main(void)
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
 
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly1, poly, q, r, product;

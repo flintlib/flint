@@ -169,7 +169,7 @@ check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
 
 check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" FLINT_USES_CPUSET)
 
-set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
+set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
 
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)

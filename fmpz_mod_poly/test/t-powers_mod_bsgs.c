@@ -20,7 +20,7 @@
 int
 main(void)
 {
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i, result, max_threads = 5;
     fmpz_mod_ctx_t ctx;
 #endif
@@ -29,7 +29,7 @@ main(void)
     flint_printf("powers_mod_bsgs....");
     fflush(stdout);
 
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 

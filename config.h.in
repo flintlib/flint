@@ -105,9 +105,9 @@
 #cmakedefine HAVE_STD__LOCALE 1
 
 /* Define if the compiler supports and should use thread-local storage */
-#cmakedefine HAVE_TLS 1
+#cmakedefine FLINT_USES_TLS 1
 
-/* Define if the library should be thread-safe, no matter whether HAVE_TLS is used */
+/* Define if the library should be thread-safe, no matter whether FLINT_USES_TLS is used */
 #cmakedefine FLINT_REENTRANT 1
 
 /* Define if you have the `localeconv' function. */

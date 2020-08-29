@@ -40,7 +40,7 @@
 #define FLINT_INLINE static __inline__
 #endif
 
-#if HAVE_GC
+#if FLINT_USES_GC
 #include "gc.h"
 #endif
 
@@ -156,7 +156,7 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 
 #define flint_bitcnt_t ulong
 
-#if HAVE_TLS
+#if FLINT_USES_TLS
 #if __STDC_VERSION__ >= 201112L
 #define FLINT_TLS_PREFIX _Thread_local
 #elif defined(_MSC_VER)
@@ -247,7 +247,7 @@ void flint_rand_free(flint_rand_s * state)
     flint_free(state);
 }
 
-#if HAVE_GC
+#if FLINT_USES_GC
 #define FLINT_GC_INIT() GC_init()
 #else
 #define FLINT_GC_INIT()

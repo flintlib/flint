@@ -17,7 +17,7 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
 #include <pthread.h>
 
 static pthread_once_t _factor_trial_initialised = PTHREAD_ONCE_INIT;
@@ -27,7 +27,7 @@ pthread_mutex_t _factor_trial_lock;
 FLINT_TLS_PREFIX mp_ptr _factor_trial_tree[16 - (FLINT_BITS/32)];
 FLINT_TLS_PREFIX int _factor_trial_tree_initialised = 0;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
 void _tree_mutex_init(void)
 {
     pthread_mutex_init(&_factor_trial_lock, NULL);
@@ -50,7 +50,7 @@ _factor_trial_tree_init(void)
     slong i, j, k, m, n;
     const mp_limb_t * primes;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_once(&_factor_trial_initialised, _tree_mutex_init);
     pthread_mutex_lock(&_factor_trial_lock);
 #endif
@@ -110,7 +110,7 @@ _factor_trial_tree_init(void)
         _factor_trial_tree_initialised = 1;
     }
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_unlock(&_factor_trial_lock);
 #endif
 }

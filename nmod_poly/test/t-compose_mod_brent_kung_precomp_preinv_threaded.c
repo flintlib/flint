@@ -32,7 +32,7 @@
 int
 main(void)
 {
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
 #endif
     FLINT_TEST_INIT(state);
@@ -40,7 +40,7 @@ main(void)
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
-#if FLINT_USES_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     /* check precomputation */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {

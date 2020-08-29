@@ -10,14 +10,14 @@
 */
 
 #include "fmpz_lll.h"
-#if HAVE_FENV
+#if FLINT_USES_FENV
 #include <fenv.h>
 #endif
 
 int
 fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 {
-#if HAVE_FENV
+#if FLINT_USES_FENV
     if (fl->rt == Z_BASIS)
     {
         /* NOTE: this algorithm should *not* be changed */
