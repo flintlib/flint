@@ -35,11 +35,25 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
 
         d = qqbar_degree(x);
 
-        /* todo: fast handling of roots of rational numbers */
-
         if (FLINT_BIT_COUNT(n) + FLINT_BIT_COUNT(d) > 30)
         {
             flint_printf("qqbar_root_ui: ludicrously high degree %wd * %wu", d, n);
+            return;
+        }
+
+        /* handle principal roots of positive rational numbers */
+        /* todo: could also handle conjugates of such roots */
+        /* todo: also specialize roots of unity, etc. */
+        if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, d - 1) &&
+            fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
+            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))))
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(x));
+            fmpz_set(fmpq_denref(t), QQBAR_COEFFS(x) + d);
+            qqbar_fmpq_root_ui(res, t, d * n);
+            fmpq_clear(t);
             return;
         }
 

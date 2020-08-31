@@ -16,7 +16,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("sgn....");
+    flint_printf("csgn....");
     fflush(stdout);
 
     flint_randinit(state);

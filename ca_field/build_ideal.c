@@ -47,6 +47,32 @@ _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_c
     CA_FIELD_IDEAL_LENGTH(K)++;
 }
 
+int ext_as_pow_pq(slong *p, slong *q, const ca_ext_t x, ca_ctx_t ctx)
+{
+    if (CA_EXT_HEAD(x) == CA_Sqrt)
+    {
+        *p = 1;
+        *q = 2;
+        return 1;
+    }
+
+    if (CA_EXT_HEAD(x) == CA_Pow && CA_IS_QQ(CA_EXT_FUNC_ARGS(x) + 1, ctx))
+    {
+        fmpz pp, qq;
+
+        pp = *CA_FMPQ_NUMREF(CA_EXT_FUNC_ARGS(x) + 1);
+        qq = *CA_FMPQ_DENREF(CA_EXT_FUNC_ARGS(x) + 1);
+
+        if (fmpz_bits(&pp) <= 6 && fmpz_bits(&qq) <= 6)
+        {
+            *p = fmpz_get_si(&pp);
+            *q = fmpz_get_si(&qq);
+            return 1;
+        }
+    }
+
+    return 0;
+}
 
 void
 ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
@@ -66,6 +92,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     {
         for (i = 0; i < len; i++)
         {
+            slong a, b;
             ca_ext_struct * x = CA_FIELD_EXT_ELEM(K, i);
 
             /* Absolute annihilating polynomial for number field */
@@ -79,9 +106,11 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             }
 
             /* x = sqrt(t) -> x^2 - t = 0 */
+            /* x = t^(a/b) -> x^b - t^a = 0 */
             /* A relation will only be added if t can be expressed in the
                present field. */
-            if (CA_EXT_HEAD(x) == CA_Sqrt)
+            /* todo: relax a > 0 */
+            if (ext_as_pow_pq(&a, &b, x, ctx) && a > 0)
             {
                 ca_srcptr t;
                 ca_field_struct * L;   /* Field of t */
@@ -89,9 +118,6 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 slong * tgen_map;
                 slong j, k;
                 int success;
-
-                if (CA_EXT_FUNC_NARGS(x) != 1)
-                    flint_abort();
 
                 t = CA_EXT_FUNC_ARGS(x);
 
@@ -122,6 +148,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 if (success)
                 {
                     /* u^2 - p/q  -->  q u^2 - p */
+                    /* u^b - (p/q)^a  -->  q^a u^b - p^a */
                     fmpz_mpoly_t p, q, u2;
 
                     fmpz_mpoly_init(p, CA_FIELD_MCTX(K, ctx));
@@ -158,9 +185,16 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                     }
 
                     fmpz_mpoly_gen(u2, i, CA_FIELD_MCTX(K, ctx));
-                    fmpz_mpoly_pow_ui(u2, u2, 2, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_pow_ui(u2, u2, b, CA_FIELD_MCTX(K, ctx));
+
+                    if (a != 1)
+                        fmpz_mpoly_pow_ui(q, q, a, CA_FIELD_MCTX(K, ctx));
 
                     fmpz_mpoly_mul(u2, u2, q, CA_FIELD_MCTX(K, ctx));
+
+                    if (a != 1)
+                        fmpz_mpoly_pow_ui(p, p, a, CA_FIELD_MCTX(K, ctx));
+
                     fmpz_mpoly_sub(u2, u2, p, CA_FIELD_MCTX(K, ctx));
 
                     _ca_field_ideal_insert_clear_mpoly(K, u2, CA_FIELD_MCTX(K, ctx), ctx);

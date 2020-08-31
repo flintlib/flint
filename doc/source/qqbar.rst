@@ -397,6 +397,9 @@ Arithmetic
     a single operation. There are no restrictions on *a*, *b* and *c*
     except that *c* must be nonzero. Division by zero calls *flint_abort*.
 
+Powers and roots
+-------------------------------------------------------------------------------
+
 .. function:: void qqbar_sqrt(qqbar_t res, const qqbar_t x)
               void qqbar_sqrt_ui(qqbar_t res, ulong x)
 
@@ -412,9 +415,16 @@ Arithmetic
     Sets *res* to *x* raised to the *n*-th power.
 
 .. function:: void qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
+              void qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong n)
 
     Sets *res* to the principal *n*-th root of *x*. The order *n*
     must be positive.
+
+.. function:: void qqbar_fmpq_pow_si_ui(qqbar_t res, const fmpq_t x, slong m, ulong n)
+
+    Sets *res* to the principal branch of `x^{m/n}`. The order *n*
+    must be positive. Division by zero calls *flint_abort*.
+
 
 Numerical enclosures
 -------------------------------------------------------------------------------

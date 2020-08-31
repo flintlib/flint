@@ -320,6 +320,9 @@ qqbar_rsqrt(qqbar_t res, const qqbar_t x)
     qqbar_inv(res, res);
 }
 
+void qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong b);
+void qqbar_fmpq_pow_si_ui(qqbar_t res, const fmpq_t x, slong a, ulong b);
+
 /* Numerical enclosure */
 
 void qqbar_cache_enclosure(qqbar_t res, slong prec);
