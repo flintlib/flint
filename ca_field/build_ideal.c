@@ -109,8 +109,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             /* x = t^(a/b) -> x^b - t^a = 0 */
             /* A relation will only be added if t can be expressed in the
                present field. */
-            /* todo: relax a > 0 */
-            if (ext_as_pow_pq(&a, &b, x, ctx) && a > 0)
+            if (ext_as_pow_pq(&a, &b, x, ctx))
             {
                 ca_srcptr t;
                 ca_field_struct * L;   /* Field of t */
@@ -186,6 +185,12 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
                     fmpz_mpoly_gen(u2, i, CA_FIELD_MCTX(K, ctx));
                     fmpz_mpoly_pow_ui(u2, u2, b, CA_FIELD_MCTX(K, ctx));
+
+                    if (a < 0)
+                    {
+                        fmpz_mpoly_swap(p, q, CA_FIELD_MCTX(K, ctx));
+                        a = -a;
+                    }
 
                     if (a != 1)
                         fmpz_mpoly_pow_ui(q, q, a, CA_FIELD_MCTX(K, ctx));
