@@ -17,7 +17,7 @@ unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
     unity_zpq value;
     fmpz_t power, rem;
 
-    unity_zpq_init(value, f->q, f->p, f->n);
+    unity_zpq_init(value, f->q, f->p, fmpz_mod_ctx_modulus(f->ctx));
     fmpz_init_set(power, pow);
     fmpz_init(rem);
 
@@ -33,7 +33,7 @@ unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
         if (fmpz_is_zero(rem) == 0)
         {
             unity_zpq temp;
-            unity_zpq_init(temp, f->q, f->p, f->n);
+            unity_zpq_init(temp, f->q, f->p, fmpz_mod_ctx_modulus(f->ctx));
 
             unity_zpq_mul(temp, f, value);
             unity_zpq_swap(f, temp);
@@ -41,7 +41,7 @@ unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
             unity_zpq_clear(temp);
         }
 
-        unity_zpq_init(temp_pow, f->q, f->p, f->n);
+        unity_zpq_init(temp_pow, f->q, f->p, fmpz_mod_ctx_modulus(f->ctx));
         unity_zpq_mul(temp_pow, value, value);
         unity_zpq_swap(value, temp_pow);
         fmpz_fdiv_q_2exp(power, power, 1);

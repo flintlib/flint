@@ -33,8 +33,7 @@ int main(void)
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
-        while (fmpz_equal_ui(n, 0) != 0)
-            fmpz_randtest_unsigned(n, state, 200);
+        fmpz_add_ui(n, n, 1);
 
         unity_zp_init(f, p, 1, n);
         unity_zp_clear(f);

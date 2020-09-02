@@ -29,6 +29,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 

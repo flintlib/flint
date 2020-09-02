@@ -21,7 +21,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     unity_zp *g_powers;
 
     fmpz_init(digit);
-    unity_zp_init(temp, f->p, f->exp, f->n);
+    unity_zp_init(temp, f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
 
     /* g_sqr = g * g */
     unity_zp_sqr(temp, g);
@@ -39,17 +39,17 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     g_powers = (unity_zp*) flint_malloc(sizeof(unity_zp) * (pow2k + 1));
 
     /* sets g_powers[0] = 1 */
-    unity_zp_init(g_powers[0], f->p, f->exp, f->n);
+    unity_zp_init(g_powers[0], f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
     unity_zp_coeff_set_ui(g_powers[0], 0, 1);
 
     /* sets g_powers[1] = g */
-    unity_zp_init(g_powers[1], f->p, f->exp, f->n);
+    unity_zp_init(g_powers[1], f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
     unity_zp_copy(g_powers[1], g);
 
     /* sets g_powers[i] = g^2 * g_powers[i - 1] */
     for (i = 2; i <= pow2k; i++)
     {
-        unity_zp_init(g_powers[i], f->p, f->exp, f->n);
+        unity_zp_init(g_powers[i], f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
         unity_zp_mul(g_powers[i], g_powers[i - 1], temp);
     }
 

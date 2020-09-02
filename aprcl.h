@@ -42,7 +42,7 @@ typedef struct
     fmpz_mod_poly_t *polys;
     ulong p;
     ulong q;
-    fmpz_t n;
+    fmpz_mod_ctx_t ctx;
 } _unity_zpq;
 
 typedef _unity_zpq unity_zpq[1];
@@ -53,7 +53,7 @@ typedef struct
     fmpz_mod_poly_t poly;
     ulong p;
     ulong exp;
-    fmpz_t n;
+    fmpz_mod_ctx_t ctx;
 } _unity_zp;
 
 typedef _unity_zp unity_zp[1];

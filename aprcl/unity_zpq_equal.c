@@ -22,7 +22,7 @@ unity_zpq_equal(const unity_zpq f, const unity_zpq g)
     if (f->q != g->q)
         return 0;
 
-    if (!fmpz_equal(f->n, g->n))
+    if (!fmpz_equal(fmpz_mod_ctx_modulus(f->ctx), fmpz_mod_ctx_modulus(g->ctx)))
         return 0;
 
     for (i = 0; i < f->p; i++)

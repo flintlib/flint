@@ -19,7 +19,7 @@ unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
     f->p = p;
     f->q = q;
 
-    fmpz_init_set(f->n, n);
+    fmpz_mod_ctx_init(f->ctx, n);
     f->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
 
     for (i = 0; i < p; i++)
