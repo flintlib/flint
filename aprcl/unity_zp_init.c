@@ -17,13 +17,13 @@ unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n)
     f->p = p;
     f->exp = exp;
     fmpz_mod_ctx_init(f->ctx, n);
-    fmpz_mod_poly_init(f->poly, n);
+    fmpz_mod_poly_init(f->poly, f->ctx);
 }
 
 void
 unity_zp_clear(unity_zp f)
 {
+    fmpz_mod_poly_clear(f->poly, f->ctx);
     fmpz_mod_ctx_clear(f->ctx);
-    fmpz_mod_poly_clear(f->poly);
 }
 

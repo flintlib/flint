@@ -206,17 +206,18 @@ void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
 }
 
 void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A, 
-                                                       const fmpz_mod_poly_t B)
+                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
     if (A->length == 0 || B->length == 0) 
     {
-       fmpz_set_ui(res, 0);
-    } else if (A->length < B->length)
+       fmpz_zero(res);
+    }
+    else if (A->length < B->length)
     {
-        fmpz_mod_poly_resultant_hgcd(res, B, A);
+        fmpz_mod_poly_resultant_hgcd(res, B, A, ctx);
 
         if (((A->length | B->length) & 1) == 0)
-           fmpz_negmod(res, res, &A->p);
+           fmpz_negmod(res, res, fmpz_mod_ctx_modulus(ctx));
     }
     else /* lenA >= lenB >= 0 */
     {
@@ -224,7 +225,7 @@ void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
         
         /* lenA >= lenB >= 1 */
         _fmpz_mod_poly_resultant_hgcd(res, A->coeffs, lenA,
-                                               B->coeffs, lenB, &A->p);
+                                   B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));
     }
 }
 

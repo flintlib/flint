@@ -26,7 +26,7 @@ unity_zpq_equal(const unity_zpq f, const unity_zpq g)
         return 0;
 
     for (i = 0; i < f->p; i++)
-        if (!fmpz_mod_poly_equal(f->polys[i], g->polys[i]))
+        if (!fmpz_mod_poly_equal(f->polys[i], g->polys[i], g->ctx))
             return 0;
 
     return 1;

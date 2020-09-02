@@ -24,7 +24,7 @@ unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
 
     for (i = 0; i < p; i++)
     {
-        fmpz_mod_poly_init(f->polys[i], n);
+        fmpz_mod_poly_init(f->polys[i], f->ctx);
     }
 }
 

@@ -60,9 +60,9 @@ _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const 
     _fmpz_vec_clear(t, 2 * lenh - 3);
 }
 
-void
-fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
-                         const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3)
+void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
+                     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
+                         const fmpz_mod_poly_t poly3, const fmpz_mod_ctx_t ctx)
 {
     fmpz_t inv3;
     slong len1 = poly1->length;
@@ -81,23 +81,23 @@ fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly
 
     if (len1 == 0 || len3 == 1)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
         return;
     }
 
     if (len1 == 1)
     {
-        fmpz_mod_poly_set(res, poly1);
+        fmpz_mod_poly_set(res, poly1, ctx);
         return;
     }
 
     if (res == poly3 || res == poly1)
     {
         fmpz_mod_poly_t tmp;
-        fmpz_mod_poly_init(tmp, &res->p);
-        fmpz_mod_poly_compose_mod_horner(tmp, poly1, poly2, poly3);
-        fmpz_mod_poly_swap(tmp, res);
-        fmpz_mod_poly_clear(tmp);
+        fmpz_mod_poly_init(tmp, ctx);
+        fmpz_mod_poly_compose_mod_horner(tmp, poly1, poly2, poly3, ctx);
+        fmpz_mod_poly_swap(tmp, res, ctx);
+        fmpz_mod_poly_clear(tmp, ctx);
         return;
     }
 
@@ -113,13 +113,13 @@ fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly
         fmpz_init(inv3);
         fmpz_invmod(inv3, poly3->coeffs + len, &res->p);
         _fmpz_mod_poly_rem(ptr2, poly2->coeffs, len2,
-                           poly3->coeffs, len3, inv3, &res->p);
+                         poly3->coeffs, len3, inv3, fmpz_mod_ctx_modulus(ctx));
         fmpz_clear(inv3);
     }
 
-    fmpz_mod_poly_fit_length(res, len);
-    _fmpz_mod_poly_compose_mod_horner(res->coeffs,
-        poly1->coeffs, len1, ptr2, poly3->coeffs, len3, &res->p);
+    fmpz_mod_poly_fit_length(res, len, ctx);
+    _fmpz_mod_poly_compose_mod_horner(res->coeffs, poly1->coeffs, len1,
+                         ptr2, poly3->coeffs, len3, fmpz_mod_ctx_modulus(ctx));
     _fmpz_mod_poly_set_length(res, len);
     _fmpz_mod_poly_normalise(res);
 

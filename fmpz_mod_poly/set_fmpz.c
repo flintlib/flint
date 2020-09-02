@@ -14,10 +14,11 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t poly, const fmpz_t c)
+void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t poly, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_poly_fit_length(poly, 1);
-    fmpz_mod(poly->coeffs, c, &(poly->p));
+    fmpz_mod_poly_fit_length(poly, 1, ctx);
+    fmpz_mod(poly->coeffs, c, fmpz_mod_ctx_modulus(ctx));
     _fmpz_mod_poly_set_length(poly, 1);
     _fmpz_mod_poly_normalise(poly);
 }

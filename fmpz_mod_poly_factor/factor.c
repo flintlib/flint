@@ -14,13 +14,13 @@
 
 void
 fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
-                     const fmpz_mod_poly_t f)
+                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 {
-    slong n = fmpz_mod_poly_degree(f);
-    flint_bitcnt_t bits = fmpz_bits(&f->p);
+    slong n = fmpz_mod_poly_degree(f, ctx);
+    flint_bitcnt_t bits = fmpz_bits(fmpz_mod_ctx_modulus(ctx));
 
     if (5 * bits + n > 75)
-        fmpz_mod_poly_factor_kaltofen_shoup(res, f);
+        fmpz_mod_poly_factor_kaltofen_shoup(res, f, ctx);
     else
-        fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
+        fmpz_mod_poly_factor_cantor_zassenhaus(res, f, ctx);
 }

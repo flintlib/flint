@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_clear(fmpz_mod_poly_t poly)
+void fmpz_mod_poly_clear(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
     slong i;
 

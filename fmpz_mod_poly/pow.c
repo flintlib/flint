@@ -98,7 +98,8 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
     _fmpz_vec_clear(v, alloc);
 }
 
-void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
+void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong len = op->length;
     slong rlen;
@@ -106,20 +107,20 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
     if ((len < 2) || (e < UWORD(3)))
     {
         if (e == UWORD(0))
-            fmpz_mod_poly_set_ui(rop, 1);
+            fmpz_mod_poly_set_ui(rop, 1, ctx);
         else if (len == 0)
-            fmpz_mod_poly_zero(rop);
+            fmpz_mod_poly_zero(rop, ctx);
         else if (len == 1)
         {
-            fmpz_mod_poly_fit_length(rop, 1);
-            fmpz_powm_ui(rop->coeffs, op->coeffs, e, &(rop->p));
+            fmpz_mod_poly_fit_length(rop, 1, ctx);
+            fmpz_powm_ui(rop->coeffs, op->coeffs, e, fmpz_mod_ctx_modulus(ctx));
             _fmpz_mod_poly_set_length(rop, 1);
             _fmpz_mod_poly_normalise(rop);
         }
         else if (e == UWORD(1))
-            fmpz_mod_poly_set(rop, op);
+            fmpz_mod_poly_set(rop, op, ctx);
         else  /* e == UWORD(2) */
-            fmpz_mod_poly_sqr(rop, op);
+            fmpz_mod_poly_sqr(rop, op, ctx);
         return;
     }
 
@@ -127,15 +128,15 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
 
     if (rop != op)
     {
-        fmpz_mod_poly_fit_length(rop, rlen);
-        _fmpz_mod_poly_pow(rop->coeffs, op->coeffs, len, e, &(rop->p));
+        fmpz_mod_poly_fit_length(rop, rlen, ctx);
+        _fmpz_mod_poly_pow(rop->coeffs, op->coeffs, len, e, fmpz_mod_ctx_modulus(ctx));
         _fmpz_mod_poly_set_length(rop, rlen);
     }
     else
     {
         fmpz *t = _fmpz_vec_init(rlen);
 
-        _fmpz_mod_poly_pow(t, op->coeffs, len, e, &(rop->p));
+        _fmpz_mod_poly_pow(t, op->coeffs, len, e, fmpz_mod_ctx_modulus(ctx));
 
         _fmpz_vec_clear(rop->coeffs, rop->alloc);
         rop->coeffs = t;

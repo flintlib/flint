@@ -18,7 +18,7 @@ unity_zpq_clear(unity_zpq f)
 
     for (i = 0; i < f->p; i++)
     {
-        fmpz_mod_poly_clear(f->polys[i]);
+        fmpz_mod_poly_clear(f->polys[i], f->ctx);
     }
 
     f->p = 0;

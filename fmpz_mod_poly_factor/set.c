@@ -15,28 +15,28 @@
 
 void
 fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
-                         const fmpz_mod_poly_factor_t fac)
+                    const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
 {
     if (res != fac)
     {
         if (fac->num == 0)
         {
-            fmpz_mod_poly_factor_clear(res);
-            fmpz_mod_poly_factor_init(res);
+            fmpz_mod_poly_factor_clear(res, ctx);
+            fmpz_mod_poly_factor_init(res, ctx);
         }
         else
         {
             slong i;
 
-            fmpz_mod_poly_factor_fit_length(res, fac->num);
+            fmpz_mod_poly_factor_fit_length(res, fac->num, ctx);
             for (i = 0; i < fac->num; i++)
             {
-                fmpz_mod_poly_set(res->poly + i, fac->poly + i);
+                fmpz_mod_poly_set(res->poly + i, fac->poly + i, ctx);
                 res->exp[i] = fac->exp[i];
             }
             for (; i < res->num; i++)
             {
-                fmpz_mod_poly_zero(res->poly + i);
+                fmpz_mod_poly_zero(res->poly + i, ctx);
                 res->exp[i] = 0;
             }
             res->num = fac->num;

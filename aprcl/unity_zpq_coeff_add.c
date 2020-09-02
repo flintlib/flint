@@ -14,9 +14,9 @@
 void
 unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x)
 {
-    if (i >= fmpz_mod_poly_length(f->polys[j]))
+    if (i >= fmpz_mod_poly_length(f->polys[j], f->ctx))
     {
-        fmpz_mod_poly_set_coeff_fmpz(f->polys[j], i, x);
+        fmpz_mod_poly_set_coeff_fmpz(f->polys[j], i, x, f->ctx);
         return;
     }
 
@@ -29,9 +29,9 @@ unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x)
 void
 unity_zpq_coeff_add_ui(unity_zpq f, slong i, slong j, ulong x)
 {
-    if (i >= fmpz_mod_poly_length(f->polys[j]))
+    if (i >= fmpz_mod_poly_length(f->polys[j], f->ctx))
     {
-        fmpz_mod_poly_set_coeff_ui(f->polys[j], i, x);
+        fmpz_mod_poly_set_coeff_ui(f->polys[j], i, x, f->ctx);
         return;
     }
 

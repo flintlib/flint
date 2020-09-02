@@ -16,7 +16,7 @@ unity_zp_coeff_inc(unity_zp f, ulong ind)
 {
     if (ind >= f->poly->length)
     {
-        fmpz_mod_poly_set_coeff_ui(f->poly, ind, 1);
+        fmpz_mod_poly_set_coeff_ui(f->poly, ind, 1, f->ctx);
         return;
     }
 
@@ -30,7 +30,7 @@ unity_zp_coeff_dec(unity_zp f, ulong ind)
 {
     if (ind >= f->poly->length)
     {
-        fmpz_mod_poly_set_coeff_si(f->poly, ind, -1);
+        fmpz_mod_poly_set_coeff_si(f->poly, ind, -1, f->ctx);
         return;
     }
 

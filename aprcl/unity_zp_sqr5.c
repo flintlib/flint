@@ -31,10 +31,10 @@ unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t)
     */
 
     /* set xi */
-    fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1);
-    fmpz_mod_poly_get_coeff_fmpz(t[2], g->poly, 2);
-    fmpz_mod_poly_get_coeff_fmpz(t[3], g->poly, 3);
+    fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[2], g->poly, 2, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[3], g->poly, 3, g->ctx);
 
     fmpz_sub(t[4], t[0], t[2]);             /*  m1 = x0 - x2    */
     fmpz_add(t[5], t[0], t[2]);             /*  m2 = x0 + x2    */

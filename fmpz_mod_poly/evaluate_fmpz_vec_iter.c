@@ -26,10 +26,9 @@ _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len,
         _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, mod);
 }
 
-void
-fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
-        const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly,
+                           const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, poly->coeffs,
-                                        poly->length, xs, n, &(poly->p));
+                               poly->length, xs, n, fmpz_mod_ctx_modulus(ctx));
 }

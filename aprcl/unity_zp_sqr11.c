@@ -44,7 +44,7 @@ unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
 
     /* set xi */
     for (i = 0; i < 10; i++)
-        fmpz_mod_poly_get_coeff_fmpz(t[30 + i], g->poly, i);
+        fmpz_mod_poly_get_coeff_fmpz(t[30 + i], g->poly, i, g->ctx);
 
     fmpz_set(t[0], t[30]);                  /*  set a0 = x0     */
     fmpz_set(t[1], t[31]);                  /*  set a1 = x1     */

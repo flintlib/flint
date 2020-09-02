@@ -16,9 +16,14 @@ unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h)
 {
     ulong i;
 
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(g->ctx)));
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(h->ctx)));
+
     for (i = 0; i < f->p; i++)
     {
-        fmpz_mod_poly_add(f->polys[i], g->polys[i], h->polys[i]);
+        fmpz_mod_poly_add(f->polys[i], g->polys[i], h->polys[i], f->ctx);
     }
 }
 

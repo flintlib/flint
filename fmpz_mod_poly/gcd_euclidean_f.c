@@ -96,13 +96,13 @@ cleanup:
     return lenG;
 }
 
-void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
-                                   const fmpz_mod_poly_t A,
-                                   const fmpz_mod_poly_t B)
+void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
+                            const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     if (A->length < B->length)
     {
-        fmpz_mod_poly_gcd_euclidean_f(f, G, B, A);
+        fmpz_mod_poly_gcd_euclidean_f(f, G, B, A, ctx);
     }
     else /* lenA >= lenB >= 0 */
     {
@@ -112,18 +112,18 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {
-            fmpz_mod_poly_zero(G);
+            fmpz_mod_poly_zero(G, ctx);
             fmpz_one(f);
         }
         else if (lenB == 0) /* lenA > lenB = 0 */
         {
             fmpz_t invA;
             fmpz_init(invA);
-            fmpz_gcdinv(f, invA, A->coeffs + lenA - 1, &B->p);
+            fmpz_gcdinv(f, invA, A->coeffs + lenA - 1, fmpz_mod_ctx_modulus(ctx));
             if (fmpz_is_one(f))
-                fmpz_mod_poly_scalar_mul_fmpz(G, A, invA);
+                fmpz_mod_poly_scalar_mul_fmpz(G, A, invA, ctx);
             else
-                fmpz_mod_poly_zero(G);
+                fmpz_mod_poly_zero(G, ctx);
             fmpz_clear(invA);
         }
         else /* lenA >= lenB >= 1 */
@@ -134,12 +134,12 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
             }
             else
             {
-                fmpz_mod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+                fmpz_mod_poly_fit_length(G, FLINT_MIN(lenA, lenB), ctx);
                 g = G->coeffs;
             }
 
             lenG = _fmpz_mod_poly_gcd_euclidean_f(f, g, A->coeffs, lenA,
-                                                    B->coeffs, lenB, &(B->p));
+                                   B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));
 
             if (fmpz_is_one(f))
             {
@@ -154,7 +154,7 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
                 if (lenG == 1)
                     fmpz_one(G->coeffs);
                 else
-                    fmpz_mod_poly_make_monic(G, G);
+                    fmpz_mod_poly_make_monic(G, G, ctx);
             }
             else  /* Factor found, ensure G is normalised */
             {

@@ -21,7 +21,7 @@
 
 void
 _fmpz_mod_poly_reduce_matrix_mod_poly(fmpz_mat_t A, const fmpz_mat_t B,
-                                   const fmpz_mod_poly_t f)
+                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 {
     fmpz * tmp1, *tmp2;
     slong n = f->length - 1;
@@ -29,7 +29,7 @@ _fmpz_mod_poly_reduce_matrix_mod_poly(fmpz_mat_t A, const fmpz_mat_t B,
 
     fmpz_t invf;
     fmpz_init(invf);
-    fmpz_invmod(invf, f->coeffs + n, &f->p);
+    fmpz_invmod(invf, f->coeffs + n, fmpz_mod_ctx_modulus(ctx));
 
     fmpz_mat_init(A, m, n);
 
@@ -41,7 +41,7 @@ _fmpz_mod_poly_reduce_matrix_mod_poly(fmpz_mat_t A, const fmpz_mat_t B,
     for (i= 1; i < m; i++)
     {
         _fmpz_mod_poly_divrem(tmp1, tmp2, B->rows[i], B->c, f->coeffs,
-                                                       f->length, invf, &f->p);
+                                   f->length, invf, fmpz_mod_ctx_modulus(ctx));
         _fmpz_vec_set(A->rows[i], tmp2, n);
     }
 
@@ -67,7 +67,8 @@ _fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz * poly1,
 
 void
 fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
-                    const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly2inv)
+                  const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly2inv,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong len1 = poly1->length;
     slong len2 = poly2->length;
@@ -105,17 +106,18 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
     {
         _fmpz_vec_set(ptr, poly1->coeffs, len1);
         _fmpz_vec_zero(ptr + len1, vec_len - len1);
-    } else
+    }
+    else
     {
         fmpz_init(inv2);
-        fmpz_invmod(inv2, poly2->coeffs + len, &poly1->p);
+        fmpz_invmod(inv2, poly2->coeffs + len, fmpz_mod_ctx_modulus(ctx));
         _fmpz_mod_poly_rem(ptr, poly1->coeffs, len1,
-                                 poly2->coeffs, len2, inv2, &poly1->p);
+                         poly2->coeffs, len2, inv2, fmpz_mod_ctx_modulus(ctx));
         fmpz_clear(inv2);
     }
 
     _fmpz_mod_poly_precompute_matrix (A, ptr, poly2->coeffs, len2,
-                                 poly2inv->coeffs, poly2inv->length, &poly1->p);
+                poly2inv->coeffs, poly2inv->length, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_vec_clear(ptr, vec_len);
 }
@@ -186,10 +188,10 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
     fmpz_mat_clear(C);
 }
 
-void
-fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
-                    const fmpz_mod_poly_t poly1, const fmpz_mat_t A,
-                    const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv)
+void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
+                  const fmpz_mod_poly_t poly1, const fmpz_mat_t A,
+                  const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong len1 = poly1->length;
     slong len3 = poly3->length;
@@ -212,14 +214,14 @@ fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
 
     if (len1 == 0 || len3 == 1)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
 
         return;
     }
 
     if (len1 == 1)
     {
-        fmpz_mod_poly_set(res, poly1);
+        fmpz_mod_poly_set(res, poly1, ctx);
 
         return;
     }
@@ -228,21 +230,21 @@ fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
     {
         fmpz_mod_poly_t tmp;
 
-        fmpz_mod_poly_init(tmp, &res->p);
+        fmpz_mod_poly_init(tmp, ctx);
 
         fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(tmp, poly1, A,
-                                                    poly3, poly3inv);
-        fmpz_mod_poly_swap(tmp, res);
-        fmpz_mod_poly_clear(tmp);
+                                                         poly3, poly3inv, ctx);
+        fmpz_mod_poly_swap(tmp, res, ctx);
+        fmpz_mod_poly_clear(tmp, ctx);
 
         return;
     }
 
-    fmpz_mod_poly_fit_length(res, len);
+    fmpz_mod_poly_fit_length(res, len, ctx);
 
     _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(res->coeffs,
              poly1->coeffs, len1, A, poly3->coeffs, len3,
-             poly3inv->coeffs, poly3inv->length, &res->p);
+             poly3inv->coeffs, poly3inv->length, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, len);
     _fmpz_mod_poly_normalise(res);

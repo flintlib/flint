@@ -65,7 +65,7 @@ _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
 void
 fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
                            const fmpz_mod_poly_t poly, const fmpz_t e,
-                           const fmpz_mod_poly_t f)
+                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 {
     fmpz * q;
     slong len = poly->length;
@@ -81,7 +81,7 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
     if (lenf == 1)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
         return;
     }
 
@@ -94,12 +94,12 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
     if (len >= lenf)
     {
         fmpz_mod_poly_t t, r;
-        fmpz_mod_poly_init(t, &res->p);
-        fmpz_mod_poly_init(r, &res->p);
-        fmpz_mod_poly_divrem(t, r, poly, f);
-        fmpz_mod_poly_powmod_fmpz_binexp(res, r, e, f);
-        fmpz_mod_poly_clear(t);
-        fmpz_mod_poly_clear(r);
+        fmpz_mod_poly_init(t, ctx);
+        fmpz_mod_poly_init(r, ctx);
+        fmpz_mod_poly_divrem(t, r, poly, f, ctx);
+        fmpz_mod_poly_powmod_fmpz_binexp(res, r, e, f, ctx);
+        fmpz_mod_poly_clear(t, ctx);
+        fmpz_mod_poly_clear(r, ctx);
         return;
     }
 
@@ -111,23 +111,25 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
         {
             if (exp == UWORD(0))
             {
-                fmpz_mod_poly_fit_length(res, 1);
+                fmpz_mod_poly_fit_length(res, 1, ctx);
                 fmpz_one(res->coeffs);
                 _fmpz_mod_poly_set_length(res, 1);
             }
             else if (exp == UWORD(1))
             {
-                fmpz_mod_poly_set(res, poly);
+                fmpz_mod_poly_set(res, poly, ctx);
             }
             else
-                fmpz_mod_poly_mulmod(res, poly, poly, f);
+            {
+                fmpz_mod_poly_mulmod(res, poly, poly, f, ctx);
+            }
             return;
         }
     }
 
     if (len == 0)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
         return;
     }
 
@@ -137,23 +139,26 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
         _fmpz_vec_set(q, poly->coeffs, len);
         _fmpz_vec_zero(q + len, trunc - len);
         qcopy = 1;
-    } else
+    }
+    else
+    {
         q = poly->coeffs;
+    }
 
     if ((res == poly && !qcopy) || (res == f))
     {
         fmpz_mod_poly_t t;
-        fmpz_mod_poly_init2(t, &poly->p, 2 * lenf - 3);
+        fmpz_mod_poly_init2(t, 2*lenf - 3, ctx);
         _fmpz_mod_poly_powmod_fmpz_binexp(t->coeffs,
-            q, e, f->coeffs, lenf, &poly->p);
-        fmpz_mod_poly_swap(res, t);
-        fmpz_mod_poly_clear(t);
+                             q, e, f->coeffs, lenf, fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_poly_swap(res, t, ctx);
+        fmpz_mod_poly_clear(t, ctx);
     }
     else
     {
-        fmpz_mod_poly_fit_length(res, 2 * lenf - 3);
+        fmpz_mod_poly_fit_length(res, 2*lenf - 3, ctx);
         _fmpz_mod_poly_powmod_fmpz_binexp(res->coeffs,
-            q, e, f->coeffs, lenf, &poly->p);
+                             q, e, f->coeffs, lenf, fmpz_mod_ctx_modulus(ctx));
     }
 
     if (qcopy)

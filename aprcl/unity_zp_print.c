@@ -15,7 +15,7 @@ void
 unity_zp_print(const unity_zp f)
 {
     flint_printf("p = %wu; exp = %wu\n", f->p, f->exp);
-    fmpz_mod_poly_print(f->poly);
+    fmpz_mod_poly_print(f->poly, f->ctx);
     flint_printf("\n");
 }
 

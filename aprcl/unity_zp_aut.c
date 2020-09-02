@@ -33,7 +33,7 @@ unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
         ulong ind = n_mulmod2_preinv(x, i, p_pow, p_pow_preinv);
 
         /* set f[ind] = g[i] */
-        fmpz_mod_poly_get_coeff_fmpz(coeff, g->poly, i);
+        fmpz_mod_poly_get_coeff_fmpz(coeff, g->poly, i, g->ctx);
         unity_zp_coeff_add_fmpz(f, ind, coeff);
     }
 

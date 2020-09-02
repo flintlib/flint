@@ -18,12 +18,12 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac)
+fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < fac->alloc; i++)
-        fmpz_mod_poly_clear(fac->poly + i);
+        fmpz_mod_poly_clear(fac->poly + i, ctx);
 
     flint_free(fac->poly);
     flint_free(fac->exp);

@@ -37,7 +37,7 @@ typedef fmpz_poly_struct fq_struct;
 
 typedef struct
 {
-    fmpz p;
+    fmpz_mod_ctx_t ctxp;
 
     int sparse_modulus;
     int is_conway; /* whether field was initialized with the Flint Conway tables  (assures primitivity) */
@@ -55,15 +55,17 @@ fq_ctx_struct;
 
 typedef fq_ctx_struct fq_ctx_t[1];
 
-FLINT_DLL void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d,
+                                                              const char *var);
 
-FLINT_DLL int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d,
+                                                              const char *var);
 
-FLINT_DLL void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d,
+                                                              const char *var);
 
-FLINT_DLL void fq_ctx_init_modulus(fq_ctx_t ctx,
-                         fmpz_mod_poly_t modulus,
-                         const char *var);
+FLINT_DLL void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,
+                                   const fmpz_mod_ctx_t ctxp, const char *var);
 
 FLINT_DLL void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
 
@@ -81,12 +83,14 @@ FQ_INLINE slong fq_ctx_degree(const fq_ctx_t ctx)
     return ctx->modulus->length - 1;
 }
 
-#define fq_ctx_prime(ctx)  (&((ctx)->p))
+FQ_INLINE const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+{
+    return fmpz_mod_ctx_modulus(ctx->ctxp);
+}
 
 FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
 {
-    fmpz_set(f, fq_ctx_prime(ctx));
-    fmpz_pow_ui(f, f, fq_ctx_degree(ctx));
+    fmpz_pow_ui(f, fq_ctx_prime(ctx), fq_ctx_degree(ctx));
 }
 
 FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
@@ -109,7 +113,7 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = fmpz_mod_poly_fprint_pretty(file, ctx->modulus, "X");
+    r = fmpz_mod_poly_fprint_pretty(file, ctx->modulus, "X", ctx->ctxp);
     if (r <= 0)
         return r;
 

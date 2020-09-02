@@ -93,8 +93,8 @@ _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
 }
 
 void
-fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
-                         const fmpz_mod_poly_t poly, ulong e, slong trunc)
+fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                ulong e, slong trunc, const fmpz_mod_ctx_t ctx)
 {
     const slong len = poly->length;
     fmpz * q;
@@ -103,27 +103,29 @@ fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
     if (len < 2 || e < UWORD(3) || trunc == 0)
     {
         if (len == 0 || trunc == 0)
-            fmpz_mod_poly_zero(res);
+        {
+            fmpz_mod_poly_zero(res, ctx);
+        }
         else if (len == 1)
         {
-            fmpz_mod_poly_fit_length(res, 1);
+            fmpz_mod_poly_fit_length(res, 1, ctx);
             fmpz_powm_ui(res->coeffs, poly->coeffs, e, &res->p);
             _fmpz_mod_poly_set_length(res, 1);
             _fmpz_mod_poly_normalise(res);
         }
         else if (e == UWORD(0))
         {
-            fmpz_mod_poly_set_coeff_ui(res, 0, UWORD(1));
+            fmpz_mod_poly_set_coeff_ui(res, 0, UWORD(1), ctx);
             _fmpz_mod_poly_set_length(res, 1);
             _fmpz_mod_poly_normalise(res);
         }
         else if (e == UWORD(1))
         {
-            fmpz_mod_poly_set(res, poly);
-            fmpz_mod_poly_truncate(res, trunc);
+            fmpz_mod_poly_set(res, poly, ctx);
+            fmpz_mod_poly_truncate(res, trunc, ctx);
         }
         else  /* e == UWORD(2) */
-            fmpz_mod_poly_mullow(res, poly, poly, trunc);
+            fmpz_mod_poly_mullow(res, poly, poly, trunc, ctx);
 
         return;
     }
@@ -139,16 +141,18 @@ fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
 
     if (res != poly || qcopy)
     {
-        fmpz_mod_poly_fit_length(res, trunc);
-        _fmpz_mod_poly_pow_trunc_binexp(res->coeffs, q, e, trunc, &poly->p);
+        fmpz_mod_poly_fit_length(res, trunc, ctx);
+        _fmpz_mod_poly_pow_trunc_binexp(res->coeffs, q, e, trunc,
+                                                    fmpz_mod_ctx_modulus(ctx));
     }
     else
     {
         fmpz_mod_poly_t t;
-        fmpz_mod_poly_init2(t, &poly->p, trunc);
-        _fmpz_mod_poly_pow_trunc_binexp(t->coeffs, q, e, trunc, &poly->p);
-        fmpz_mod_poly_swap(res, t);
-        fmpz_mod_poly_clear(t);
+        fmpz_mod_poly_init2(t, trunc, ctx);
+        _fmpz_mod_poly_pow_trunc_binexp(t->coeffs, q, e, trunc,
+                                                    fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_poly_swap(res, t, ctx);
+        fmpz_mod_poly_clear(t, ctx);
     }
 
     if (qcopy)
