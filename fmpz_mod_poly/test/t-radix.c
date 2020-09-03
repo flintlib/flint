@@ -19,7 +19,8 @@
 #include "ulong_extras.h"
 
 static int _check(fmpz_mod_poly_struct **B, 
-                  const fmpz_mod_poly_t F, const fmpz_mod_poly_t R)
+                  const fmpz_mod_poly_t F, const fmpz_mod_poly_t R,
+                                            const fmpz_mod_ctx_t ctx)
 {
     const slong lenF = F->length;
     const slong lenR = R->length;
@@ -30,27 +31,28 @@ static int _check(fmpz_mod_poly_struct **B,
 
     fmpz_mod_poly_t S;
 
-    fmpz_mod_poly_init(S, &(R->p));
-    fmpz_mod_poly_set(S, B[N]);
+    fmpz_mod_poly_init(S, ctx);
+    fmpz_mod_poly_set(S, B[N], ctx);
     for (i = N; i > 0; i--)
     {
-        fmpz_mod_poly_mul(S, S, R);
-        fmpz_mod_poly_add(S, S, B[i - 1]);
+        fmpz_mod_poly_mul(S, S, R, ctx);
+        fmpz_mod_poly_add(S, S, B[i - 1], ctx);
     }
-    result = fmpz_mod_poly_equal(F, S);
-    fmpz_mod_poly_clear(S);
+    result = fmpz_mod_poly_equal(F, S, ctx);
+    fmpz_mod_poly_clear(S, ctx);
     return result;
 }
 
 int main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("radix....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -63,26 +65,27 @@ int main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_init(r, p);
-        fmpz_mod_poly_randtest(f, state, n_randint(state, 500));
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_init(r, ctx);
+        fmpz_mod_poly_randtest(f, state, n_randint(state, 500), ctx);
         do
-            fmpz_mod_poly_randtest_not_zero(r, state, n_randint(state, 20) + 2);
+            fmpz_mod_poly_randtest_not_zero(r, state, n_randint(state, 20) + 2, ctx);
         while (r->length < 2);
 
-        N = FLINT_MAX(0, fmpz_mod_poly_degree(f) / fmpz_mod_poly_degree(r));
+        N = FLINT_MAX(0, fmpz_mod_poly_degree(f, ctx) / fmpz_mod_poly_degree(r, ctx));
         b = flint_malloc((N + 1) * sizeof(fmpz_mod_poly_struct *));
         for (j = 0; j <= N; j++)
         {
             b[j] = flint_malloc(sizeof(fmpz_mod_poly_struct));
-            fmpz_mod_poly_init(b[j], p);
+            fmpz_mod_poly_init(b[j], ctx);
         }
 
         /* Ensure that lead(r) is a unit mod p */
         {
             fmpz_t d;
-            fmpz *leadR = fmpz_mod_poly_lead(r);
+            fmpz *leadR = fmpz_mod_poly_lead(r, ctx);
 
             fmpz_init(d);
             fmpz_gcd(d, p, leadR);
@@ -94,38 +97,39 @@ int main(void)
             fmpz_clear(d);
         }
 
-        fmpz_mod_poly_radix_init(D, r, f->length - 1 + n_randint(state, 50));
+        fmpz_mod_poly_radix_init(D, r, f->length - 1 + n_randint(state, 50), ctx);
 
-        fmpz_mod_poly_radix(b, f, D);
+        fmpz_mod_poly_radix(b, f, D, ctx);
 
-        result = _check(b, f, r);
+        result = _check(b, f, r, ctx);
         if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("result = %d\n", result);
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
-            flint_printf("f = "), fmpz_mod_poly_print(f), flint_printf("\n\n");
-            flint_printf("r = "), fmpz_mod_poly_print(r), flint_printf("\n\n");
+            flint_printf("f = "), fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("r = "), fmpz_mod_poly_print(r, ctx), flint_printf("\n\n");
             flint_printf("N = %wd\n\n", N);
             for (j = 0; j <= N; j++)
             {
-                flint_printf("b[%wd] = ", j), fmpz_mod_poly_print(b[j]), flint_printf("\n\n");
+                flint_printf("b[%wd] = ", j), fmpz_mod_poly_print(b[j], ctx), flint_printf("\n\n");
             }
             abort();
         }
 
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(r);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(r, ctx);
         fmpz_mod_poly_radix_clear(D);
         for (j = 0; j <= N; j++)
         {
-            fmpz_mod_poly_clear(b[j]);
+            fmpz_mod_poly_clear(b[j], ctx);
             flint_free(b[j]);
         }
         flint_free(b);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

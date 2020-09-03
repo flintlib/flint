@@ -21,10 +21,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_hgcd....");
     fflush(stdout);
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Generic case, most likely co-prime arguments ******************************/
 
@@ -36,29 +39,30 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 300));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 300));
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 300), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 300), ctx);
 
-        fmpz_mod_poly_gcd_hgcd(c, a, b);
-        fmpz_mod_poly_gcd_hgcd(a, a, b);
+        fmpz_mod_poly_gcd_hgcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd_hgcd(a, a, b, ctx);
 
-        result = (fmpz_mod_poly_equal(a, c));
+        result = (fmpz_mod_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
         fmpz_clear(p);
     }
 
@@ -70,29 +74,30 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 300));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 300));
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 300), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 300), ctx);
 
-        fmpz_mod_poly_gcd_hgcd(c, a, b);
-        fmpz_mod_poly_gcd_hgcd(b, a, b);
+        fmpz_mod_poly_gcd_hgcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd_hgcd(b, a, b, ctx);
 
-        result = (fmpz_mod_poly_equal(b, c));
+        result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
         fmpz_clear(p);
     }
 
@@ -107,31 +112,32 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(d, p);
-        fmpz_mod_poly_init(g, p);
-        fmpz_mod_poly_init(h, p);
-        fmpz_mod_poly_init(s, p);
-        fmpz_mod_poly_init(t, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 300));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 300));
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(d, ctx);
+        fmpz_mod_poly_init(g, ctx);
+        fmpz_mod_poly_init(h, ctx);
+        fmpz_mod_poly_init(s, ctx);
+        fmpz_mod_poly_init(t, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 300), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 300), ctx);
 
-        fmpz_mod_poly_gcd_hgcd(g, a, b);
+        fmpz_mod_poly_gcd_hgcd(g, a, b, ctx);
 
-        if (fmpz_mod_poly_is_zero(g))
+        if (fmpz_mod_poly_is_zero(g, ctx))
         {
             result = 1;
         }
         else
         {
-            fmpz_mod_poly_divrem_basecase(c, s, a, g);
-            fmpz_mod_poly_divrem_basecase(d, t, b, g);
-            fmpz_mod_poly_gcd_hgcd(h, c, d);
+            fmpz_mod_poly_divrem_basecase(c, s, a, g, ctx);
+            fmpz_mod_poly_divrem_basecase(d, t, b, g, ctx);
+            fmpz_mod_poly_gcd_hgcd(h, c, d, ctx);
 
-            result = (fmpz_mod_poly_is_zero(s) && fmpz_mod_poly_is_zero(t) 
+            result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx) 
                       && (h->length == 1) && (fmpz_is_one(h->coeffs)));
         }
 
@@ -139,25 +145,25 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
-            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
-            flint_printf("d = "), fmpz_mod_poly_print(d), flint_printf("\n\n");
-            flint_printf("g = "), fmpz_mod_poly_print(g), flint_printf("\n\n");
-            flint_printf("h = "), fmpz_mod_poly_print(h), flint_printf("\n\n");
-            flint_printf("s = "), fmpz_mod_poly_print(s), flint_printf("\n\n");
-            flint_printf("t = "), fmpz_mod_poly_print(t), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
+            flint_printf("d = "), fmpz_mod_poly_print(d, ctx), flint_printf("\n\n");
+            flint_printf("g = "), fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
+            flint_printf("h = "), fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
+            flint_printf("s = "), fmpz_mod_poly_print(s, ctx), flint_printf("\n\n");
+            flint_printf("t = "), fmpz_mod_poly_print(t, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(d);
-        fmpz_mod_poly_clear(g);
-        fmpz_mod_poly_clear(h);
-        fmpz_mod_poly_clear(s);
-        fmpz_mod_poly_clear(t);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(d, ctx);
+        fmpz_mod_poly_clear(g, ctx);
+        fmpz_mod_poly_clear(h, ctx);
+        fmpz_mod_poly_clear(s, ctx);
+        fmpz_mod_poly_clear(t, ctx);
         fmpz_clear(p);
     }
 
@@ -171,34 +177,35 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 200));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 200));
-        fmpz_mod_poly_randtest(f, state, n_randint(state, 20));
-        fmpz_mod_poly_mul(a, a, f);
-        fmpz_mod_poly_mul(b, b, f);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 200), ctx);
+        fmpz_mod_poly_randtest(f, state, n_randint(state, 20), ctx);
+        fmpz_mod_poly_mul(a, a, f, ctx);
+        fmpz_mod_poly_mul(b, b, f, ctx);
 
-        fmpz_mod_poly_gcd_hgcd(c, a, b);
-        fmpz_mod_poly_gcd_hgcd(a, a, b);
+        fmpz_mod_poly_gcd_hgcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd_hgcd(a, a, b, ctx);
 
-        result = (fmpz_mod_poly_equal(a, c));
+        result = (fmpz_mod_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_clear(p);
     }
 
@@ -210,34 +217,35 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 200));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 200));
-        fmpz_mod_poly_randtest(f, state, n_randint(state, 20));
-        fmpz_mod_poly_mul(a, a, f);
-        fmpz_mod_poly_mul(b, b, f);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 200), ctx);
+        fmpz_mod_poly_randtest(f, state, n_randint(state, 20), ctx);
+        fmpz_mod_poly_mul(a, a, f, ctx);
+        fmpz_mod_poly_mul(b, b, f, ctx);
 
-        fmpz_mod_poly_gcd_hgcd(c, a, b);
-        fmpz_mod_poly_gcd_hgcd(b, a, b);
+        fmpz_mod_poly_gcd_hgcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd_hgcd(b, a, b, ctx);
 
-        result = (fmpz_mod_poly_equal(b, c));
+        result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_clear(p);
     }
 
@@ -252,35 +260,36 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(d, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_init(g, p);
-        fmpz_mod_poly_init(h, p);
-        fmpz_mod_poly_init(s, p);
-        fmpz_mod_poly_init(t, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 200));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 200));
-        fmpz_mod_poly_randtest(f, state, n_randint(state, 20));
-        fmpz_mod_poly_mul(a, a, f);
-        fmpz_mod_poly_mul(b, b, f);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(d, ctx);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_init(g, ctx);
+        fmpz_mod_poly_init(h, ctx);
+        fmpz_mod_poly_init(s, ctx);
+        fmpz_mod_poly_init(t, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 200), ctx);
+        fmpz_mod_poly_randtest(f, state, n_randint(state, 20), ctx);
+        fmpz_mod_poly_mul(a, a, f, ctx);
+        fmpz_mod_poly_mul(b, b, f, ctx);
 
-        fmpz_mod_poly_gcd_euclidean(g, a, b);
+        fmpz_mod_poly_gcd_euclidean(g, a, b, ctx);
 
-        if (fmpz_mod_poly_is_zero(g))
+        if (fmpz_mod_poly_is_zero(g, ctx))
         {
             result = 1;
         }
         else
         {
-            fmpz_mod_poly_divrem_basecase(c, s, a, g);
-            fmpz_mod_poly_divrem_basecase(d, t, b, g);
-            fmpz_mod_poly_gcd_hgcd(h, c, d);
+            fmpz_mod_poly_divrem_basecase(c, s, a, g, ctx);
+            fmpz_mod_poly_divrem_basecase(d, t, b, g, ctx);
+            fmpz_mod_poly_gcd_hgcd(h, c, d, ctx);
 
-            result = (fmpz_mod_poly_is_zero(s) && fmpz_mod_poly_is_zero(t) 
+            result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx) 
                       && (h->length == 1) && (fmpz_is_one(h->coeffs)));
         }
 
@@ -288,29 +297,30 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
-            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
-            flint_printf("d = "), fmpz_mod_poly_print(d), flint_printf("\n\n");
-            flint_printf("g = "), fmpz_mod_poly_print(g), flint_printf("\n\n");
-            flint_printf("h = "), fmpz_mod_poly_print(h), flint_printf("\n\n");
-            flint_printf("s = "), fmpz_mod_poly_print(s), flint_printf("\n\n");
-            flint_printf("t = "), fmpz_mod_poly_print(t), flint_printf("\n\n");
-            abort();
+            flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
+            flint_printf("d = "), fmpz_mod_poly_print(d, ctx), flint_printf("\n\n");
+            flint_printf("g = "), fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
+            flint_printf("h = "), fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
+            flint_printf("s = "), fmpz_mod_poly_print(s, ctx), flint_printf("\n\n");
+            flint_printf("t = "), fmpz_mod_poly_print(t, ctx), flint_printf("\n\n");
+            flint_abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(d);
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(g);
-        fmpz_mod_poly_clear(h);
-        fmpz_mod_poly_clear(s);
-        fmpz_mod_poly_clear(t);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(d, ctx);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(g, ctx);
+        fmpz_mod_poly_clear(h, ctx);
+        fmpz_mod_poly_clear(s, ctx);
+        fmpz_mod_poly_clear(t, ctx);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

@@ -22,12 +22,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("mullow....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Compare with truncated product of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -39,33 +40,35 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
         trunc = n_randint(state, 50);
-        fmpz_mod_poly_randtest(b, state, trunc);
-        fmpz_mod_poly_randtest(c, state, trunc);
+        fmpz_mod_poly_randtest(b, state, trunc, ctx);
+        fmpz_mod_poly_randtest(c, state, trunc, ctx);
 
-        fmpz_mod_poly_mullow(a, b, c, trunc);
-        fmpz_mod_poly_mul(b, b, c);
-        fmpz_mod_poly_truncate(b, trunc);
+        fmpz_mod_poly_mullow(a, b, c, trunc, ctx);
+        fmpz_mod_poly_mul(b, b, c, ctx);
+        fmpz_mod_poly_truncate(b, trunc, ctx);
 
-        result = (fmpz_mod_poly_equal(a, b));
+        result = (fmpz_mod_poly_equal(a, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

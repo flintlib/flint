@@ -22,12 +22,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("zero....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -37,23 +38,25 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 100));
-        fmpz_mod_poly_zero(a);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
+        fmpz_mod_poly_zero(a, ctx);
 
-        result = (fmpz_mod_poly_is_zero(a));
+        result = (fmpz_mod_poly_is_zero(a, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
-            abort();
+            flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_abort();
         }
 
-        fmpz_mod_poly_clear(a);
+        fmpz_mod_poly_clear(a, ctx);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

@@ -20,12 +20,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("get/set_fmpz_poly....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -36,32 +37,34 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
         fmpz_poly_init(c);
 
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 100));
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
 
-        fmpz_mod_poly_get_fmpz_poly(c, a);
-        fmpz_mod_poly_set_fmpz_poly(b, c);
+        fmpz_mod_poly_get_fmpz_poly(c, a, ctx);
+        fmpz_mod_poly_set_fmpz_poly(b, c, ctx);
 
-        result = fmpz_mod_poly_equal(a, b);
+        result = fmpz_mod_poly_equal(a, b, ctx);
         if (!result)
         {
             flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n");
             flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n");
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
         fmpz_poly_clear(c);
 
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
