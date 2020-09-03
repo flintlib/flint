@@ -150,6 +150,57 @@ int main()
         qqbar_clear(b);
     }
 
+    /* Check roots of rational numbers, which are special-cased. */
+    for (iter = 0; iter < 100; iter++)
+    {
+        qqbar_t x, y, z, a, b;
+
+        qqbar_init(x);
+        qqbar_init(y);
+        qqbar_init(z);
+        qqbar_init(a);
+        qqbar_init(b);
+
+        do {
+            qqbar_randtest(x, state, 1, 10);
+        } while (qqbar_is_zero(x));
+        qqbar_pow_ui(x, x, 1 + n_randint(state, 3));
+        qqbar_abs(x, x);
+        qqbar_root_ui(x, x, 1 + n_randint(state, 10));
+
+        do {
+            qqbar_randtest(y, state, 1, 10);
+        } while (qqbar_is_zero(y));
+        qqbar_pow_ui(y, y, 1 + n_randint(state, 3));
+        qqbar_abs(y, y);
+        qqbar_root_ui(y, y, 1 + n_randint(state, 10));
+
+        qqbar_randtest(z, state, 2, 10);
+
+        /* check z / (x / y) = (z / x) * y */
+        qqbar_div(a, x, y);
+        qqbar_div(a, z, a);
+        qqbar_div(b, z, x);
+        qqbar_mul(b, b, y);
+
+        if (!qqbar_equal(a, b))
+        {
+            flint_printf("FAIL!\n");
+            flint_printf("x = "); qqbar_print(x); flint_printf("\n\n");
+            flint_printf("y = "); qqbar_print(y); flint_printf("\n\n");
+            flint_printf("z = "); qqbar_print(z); flint_printf("\n\n");
+            flint_printf("a = "); qqbar_print(a); flint_printf("\n\n");
+            flint_printf("b = "); qqbar_print(b); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        qqbar_clear(x);
+        qqbar_clear(y);
+        qqbar_clear(z);
+        qqbar_clear(a);
+        qqbar_clear(b);
+    }
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

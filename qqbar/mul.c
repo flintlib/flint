@@ -73,6 +73,42 @@ qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y)
         /* This may detect exact square roots and other special cases. */
         qqbar_pow_ui(res, x, 2);
     }
+    else if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, qqbar_degree(x) - 1) &&
+             _fmpz_vec_is_zero(QQBAR_COEFFS(y) + 1, qqbar_degree(y) - 1) &&
+            fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
+            fmpz_sgn(QQBAR_COEFFS(y)) < 0 &&
+            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))) &&
+            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(y))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(y))))
+    {
+        /* (p/q)^(1/d) * (r/s)^(1/e) */
+
+        fmpq_t t, u;
+        ulong d, e, f, g;
+
+        d = qqbar_degree(x);
+        e = qqbar_degree(y);
+        g = n_gcd(d, e);
+        f = (d / g) * e;
+
+        fmpq_init(t);
+        fmpq_init(u);
+
+        fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(x));
+        fmpz_set(fmpq_denref(t), QQBAR_COEFFS(x) + d);
+        fmpz_neg(fmpq_numref(u), QQBAR_COEFFS(y));
+        fmpz_set(fmpq_denref(u), QQBAR_COEFFS(y) + e);
+
+        fmpq_pow_si(t, t, e / g);
+        fmpq_pow_si(u, u, d / g);
+        fmpq_mul(t, t, u);
+
+        /* todo: recycle the existing enclosures instead of computing
+           a numerical f-th root from scratch */
+        qqbar_fmpq_root_ui(res, t, f);
+
+        fmpq_clear(t);
+        fmpq_clear(u);
+    }
     else
     {
         qqbar_binary_op(res, x, y, 2);

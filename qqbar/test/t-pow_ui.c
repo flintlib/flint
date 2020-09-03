@@ -33,7 +33,19 @@ int main()
         qqbar_init(xmxn);
         qqbar_init(xmn);
 
-        qqbar_randtest(x, state, 4, 10);
+        if (n_randint(state, 2))
+        {
+            qqbar_randtest(x, state, 4, 10);
+        }
+        else
+        {
+            /* check powers of rationals which are special-cased */
+            qqbar_randtest(x, state, 1, 10);
+            qqbar_pow_ui(x, x, 1 + n_randint(state, 3));
+            qqbar_abs(x, x);
+            qqbar_root_ui(x, x, 1 + n_randint(state, 10));
+        }
+
         m = n_randint(state, 7);
         n = n_randint(state, 7);
 
@@ -76,7 +88,19 @@ int main()
         qqbar_init(yn);
         qqbar_init(xnyn);
 
-        qqbar_randtest(x, state, 4, 10);
+        if (n_randint(state, 2))
+        {
+            qqbar_randtest(x, state, 4, 10);
+        }
+        else
+        {
+            /* check powers of rationals which are special-cased */
+            qqbar_randtest(x, state, 1, 10);
+            qqbar_pow_ui(x, x, 1 + n_randint(state, 3));
+            qqbar_abs(x, x);
+            qqbar_root_ui(x, x, 1 + n_randint(state, 10));
+        }
+
         qqbar_randtest(y, state, 4, 10);
         n = n_randint(state, 7);
 

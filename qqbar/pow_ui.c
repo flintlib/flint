@@ -99,6 +99,7 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
     {
         /* Fast detection of perfect powers */
         ulong f;
+
         f = arb_fmpz_poly_deflation(QQBAR_POLY(x));
 
         if (f % n == 0)
@@ -141,6 +142,21 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
             acb_clear(z);
             acb_clear(t);
             acb_clear(w);
+            return;
+        }
+
+        /* fast path for principal roots of positive rational numbers */
+        if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, qqbar_degree(x) - 1) &&
+            fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
+            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))))
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(x));
+            fmpz_set(fmpq_denref(t), QQBAR_COEFFS(x) + qqbar_degree(x));
+            fmpq_pow_si(t, t, n);
+            qqbar_fmpq_root_ui(res, t, qqbar_degree(x));
+            fmpq_clear(t);
             return;
         }
 
