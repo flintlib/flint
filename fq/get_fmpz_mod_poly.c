@@ -15,9 +15,9 @@ void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b, const fq_ctx_t ctx)
 {
     slong i, len = b->length;
 
-    fmpz_set(&a->p, &ctx->p);
+    fmpz_set(&a->p, fq_ctx_prime(ctx));
 
-    fmpz_mod_poly_fit_length(a, len);
+    fmpz_mod_poly_fit_length(a, len, ctx->ctxp);
 
     for (i = 0; i < len; i++)
         fmpz_set(a->coeffs + i, b->coeffs + i);

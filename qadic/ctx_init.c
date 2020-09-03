@@ -30,7 +30,7 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     flint_rand_t state;
     fmpz_mod_poly_t poly;
     slong i, j;
-    
+    fmpz_mod_ctx_t ctxp;
 
     if (fmpz_cmp_ui(p, 109987) <= 0)
     {  
@@ -87,9 +87,10 @@ void qadic_ctx_init(qadic_ctx_t ctx,
 
     flint_randinit(state);
 
-    fmpz_mod_poly_init2(poly, p, d + 1);
+    fmpz_mod_ctx_init(ctxp, p);
+    fmpz_mod_poly_init2(poly, d + 1, ctxp);
     
-    fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1);
+    fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1, ctxp);
     
     flint_randclear(state);
 
@@ -127,6 +128,7 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     ctx->var = flint_malloc(strlen(var) + 1);
     strcpy(ctx->var, var);
 
-    fmpz_mod_poly_clear(poly);
+    fmpz_mod_poly_clear(poly, ctxp);
+    fmpz_mod_ctx_clear(ctxp);
 }
 

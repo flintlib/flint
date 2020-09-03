@@ -233,13 +233,13 @@ static void _fmpz_mpolyuu_eval_fmpz_mod_from_coeffs(
 
         if (E->length > 0 && (E->exps[E->length - 1] >> (FLINT_BITS/2)) == xexp)
         {
-            fmpz_mod_poly_set_coeff_fmpz(E->coeffs + E->length - 1, yexp, coeffs + i);
+            fmpz_mod_poly_set_coeff_fmpz(E->coeffs + E->length - 1, yexp, coeffs + i, ctx_mp->ffinfo);
         }
         else
         {
             fmpz_mod_mpolyn_fit_length(E, E->length + 1, ctx_mp);
-            fmpz_mod_poly_zero(E->coeffs + E->length);
-            fmpz_mod_poly_set_coeff_fmpz(E->coeffs + E->length, yexp, coeffs + i);
+            fmpz_mod_poly_zero(E->coeffs + E->length, ctx_mp->ffinfo);
+            fmpz_mod_poly_set_coeff_fmpz(E->coeffs + E->length, yexp, coeffs + i, ctx_mp->ffinfo);
             E->exps[E->length] = xexp << (FLINT_BITS/2);
             E->length++;
         }
@@ -917,7 +917,7 @@ next_index:
 
     if (i < GLlen)
     {
-        if (!w->Gchanged && fmpz_mod_berlekamp_massey_reduce(GLcoeffs + i))
+        if (!w->Gchanged && fmpz_mod_berlekamp_massey_reduce(GLcoeffs + i, w->ctx_mp->ffinfo))
             w->Gchanged = 1;
         goto next_index;
     }
@@ -925,7 +925,7 @@ next_index:
     i -= GLlen;
     if (i < AbarLlen)
     {
-        if (!w->Abarchanged && fmpz_mod_berlekamp_massey_reduce(AbarLcoeffs + i))
+        if (!w->Abarchanged && fmpz_mod_berlekamp_massey_reduce(AbarLcoeffs + i, w->ctx_mp->ffinfo))
             w->Abarchanged = 1;
         goto next_index;
     }
@@ -933,7 +933,7 @@ next_index:
     i -= AbarLlen;
     if (i < BbarLlen)
     {
-        if (!w->Bbarchanged && fmpz_mod_berlekamp_massey_reduce(BbarLcoeffs + i))
+        if (!w->Bbarchanged && fmpz_mod_berlekamp_massey_reduce(BbarLcoeffs + i, w->ctx_mp->ffinfo))
             w->Bbarchanged = 1;
         goto next_index;
     }
@@ -2526,9 +2526,9 @@ cleanup:
     if (w->evals_mp_alloc > 0)
         flint_free(w->evals_mp);
 
-    fmpz_mod_bma_mpoly_clear(w->GLambda_mp);
-    fmpz_mod_bma_mpoly_clear(w->AbarLambda_mp);
-    fmpz_mod_bma_mpoly_clear(w->BbarLambda_mp);
+    fmpz_mod_bma_mpoly_clear(w->GLambda_mp, w->ctx_mp->ffinfo);
+    fmpz_mod_bma_mpoly_clear(w->AbarLambda_mp, w->ctx_mp->ffinfo);
+    fmpz_mod_bma_mpoly_clear(w->BbarLambda_mp, w->ctx_mp->ffinfo);
     fmpz_mod_mpoly_ctx_clear(w->ctx_mp);
 
     /* misc */

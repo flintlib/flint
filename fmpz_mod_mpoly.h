@@ -286,17 +286,13 @@ FLINT_DLL void fmpz_mod_bma_mpoly_init(fmpz_mod_bma_mpoly_t A);
 FLINT_DLL void fmpz_mod_bma_mpoly_reset_prime(fmpz_mod_bma_mpoly_t A,
                                                    const fmpz_mod_ctx_t fpctx);
 
-FLINT_DLL void fmpz_mod_bma_mpoly_clear(fmpz_mod_bma_mpoly_t A);
-
-FLINT_DLL void fmpz_mod_bma_mpoly_print(fmpz_mod_bma_mpoly_t A,
-                                       const mpoly_bma_interpolate_ctx_t Ictx);
+FLINT_DLL void fmpz_mod_bma_mpoly_clear(fmpz_mod_bma_mpoly_t A,
+                                                   const fmpz_mod_ctx_t fpctx);
 
 FLINT_DLL void fmpz_mod_bma_mpoly_fit_length(fmpz_mod_bma_mpoly_t A,
                                      slong length, const fmpz_mod_ctx_t fpctx);
 
 FLINT_DLL void fmpz_mod_bma_mpoly_zero(fmpz_mod_bma_mpoly_t L);
-
-FLINT_DLL int fmpz_mod_bma_mpoly_reduce(fmpz_mod_bma_mpoly_t L);
 
 FLINT_DLL void fmpz_mod_bma_mpoly_add_point(fmpz_mod_bma_mpoly_t L,
                   const fmpz_mod_mpolyn_t A, const fmpz_mod_mpoly_ctx_t ctx_mp);
