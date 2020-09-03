@@ -11,10 +11,6 @@
 
 #include "ca_ext.h"
 
-/*
-todo: use cached enclosure
-*/
-
 #define ARB_CONST(f) \
     f(acb_realref(res), prec); \
     arb_zero(acb_imagref(res)); \
@@ -62,15 +58,21 @@ todo: use cached enclosure
 void
 ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx)
 {
-    /* todo: verify nargs for functions... */
+    if (CA_EXT_HEAD(x) == CA_QQBar)
+    {
+        qqbar_cache_enclosure(CA_EXT_QQBAR(x), prec);
+        qqbar_get_acb(res, CA_EXT_QQBAR(x), prec);
+        return;
+    }
+
+    if (prec <= CA_EXT_FUNC_PREC(x))
+    {
+        acb_set(res, CA_EXT_FUNC_ENCLOSURE(x));
+        return;
+    }
 
     switch (CA_EXT_HEAD(x))
     {
-        case CA_QQBar:
-            qqbar_cache_enclosure(CA_EXT_QQBAR(x), prec);
-            qqbar_get_acb(res, CA_EXT_QQBAR(x), prec);
-            break;
-
         /* Arithmetic */
         case CA_Neg: ACB_UNARY_NOPREC(acb_neg)
         case CA_Add: ACB_BINARY(acb_add)
@@ -120,5 +122,8 @@ ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx)
             flint_printf("ca_ext_get_acb_raw: unknown function\n");
             flint_abort();
     }
+
+    acb_set(CA_EXT_FUNC_ENCLOSURE(x), res);
+    CA_EXT_FUNC_PREC(x) = prec;
 }
 
