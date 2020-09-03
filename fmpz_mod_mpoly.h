@@ -283,9 +283,6 @@ FLINT_DLL int nmod_bma_mpoly_get_fmpz_mpolyu(fmpz_mpolyu_t A,
 
 FLINT_DLL void fmpz_mod_bma_mpoly_init(fmpz_mod_bma_mpoly_t A);
 
-FLINT_DLL void fmpz_mod_bma_mpoly_reset_prime(fmpz_mod_bma_mpoly_t A,
-                                                   const fmpz_mod_ctx_t fpctx);
-
 FLINT_DLL void fmpz_mod_bma_mpoly_clear(fmpz_mod_bma_mpoly_t A,
                                                    const fmpz_mod_ctx_t fpctx);
 

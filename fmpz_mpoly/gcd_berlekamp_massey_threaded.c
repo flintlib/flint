@@ -1543,9 +1543,6 @@ static bma_loop_ret_t _bma_loop_mp(
     /* unfortunate fmpz_mod_poly's store their own ctx */
     _base_args_set_mod_mp(w, args);
 
-    fmpz_mod_bma_mpoly_reset_prime(w->GLambda_mp, w->ctx_mp->ffinfo);
-    fmpz_mod_bma_mpoly_reset_prime(w->AbarLambda_mp, w->ctx_mp->ffinfo);
-    fmpz_mod_bma_mpoly_reset_prime(w->BbarLambda_mp, w->ctx_mp->ffinfo);
     fmpz_mod_bma_mpoly_zero(w->GLambda_mp);
     fmpz_mod_bma_mpoly_zero(w->AbarLambda_mp);
     fmpz_mod_bma_mpoly_zero(w->BbarLambda_mp);
