@@ -5,11 +5,13 @@ Bibliography
 
 (In the PDF edition, this section is empty. See the bibliography listing at the end of the document.)
 
-All referenced works: [BBK2014]_, [BF2020]_, [Boe2020]_, [Car2004]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Fie2007]_, [GCL1992]_, [Har2010]_, [Har2015]_, [Har2018]_, [Joh2017]_, [JR1999]_, [Mos1971]_, [RF1994]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [Ste2002]_, [Ste2010]_, [Str1997]_, [Str2012]_, [vdH1995]_, [vdH2006]_, [vHP2012]_, [Zip1985]_.
+All referenced works: [BBK2014]_, [BF2020]_, [BFSS2006]_, [Boe2020]_, [Car2004]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Fie2007]_, [GCL1992]_, [Har2010]_, [Har2015]_, [Har2018]_, [Joh2017]_, [JR1999]_, [Mos1971]_, [RF1994]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [Ste2002]_, [Ste2010]_, [Str1997]_, [Str2012]_, [vdH1995]_, [vdH2006]_, [vHP2012]_, [Zip1985]_.
 
 .. [BBK2014] \D. H. Bailey, J. M. Borwein and A. D. Kaiser. "Automated simplification of large symbolic expressions". Journal of Symbolic Computation Volume 60, January 2014, Pages 120-136. https://doi.org/10.1016/j.jsc.2013.09.001
 
 .. [BF2020] \F. Beukers and J. Forsgård. "Gamma-evaluations of hypergeometric series". Preprint, 2020. https://arxiv.org/abs/2004.08117
+
+.. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
 
 .. [Boe2020] \H. Boehm. "Towards an API for the real numbers". PLDI 2020: Proceedings of the 41st ACM SIGPLAN Conference on Programming Language Design and Implementation, June 2020, Pages 562-576. https://doi.org/10.1145/3385412.3386037
 
