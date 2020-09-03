@@ -28,15 +28,16 @@ main(void)
         fq_ctx_t ctx;
         fq_poly_t a, b, g, s, t, t1, t2;
         fq_t f;
+        fmpz_mod_ctx_t ctxp;
 
-        fmpz_init_set_ui(p, 2 + n_randint(state, 200));
-        fmpz_mod_poly_init(h, p);
+        fmpz_mod_ctx_init_ui(ctxp, 2 + n_randint(state, 200));
+        fmpz_mod_poly_init(h, ctxp);
 
-        fmpz_mod_poly_set_coeff_ui(h, 2, 1);
-        fmpz_mod_poly_set_coeff_ui(h, 1, 1);
-        fmpz_mod_poly_set_coeff_ui(h, 0, 1);
+        fmpz_mod_poly_set_coeff_ui(h, 2, 1, ctxp);
+        fmpz_mod_poly_set_coeff_ui(h, 1, 1, ctxp);
+        fmpz_mod_poly_set_coeff_ui(h, 0, 1, ctxp);
 
-        fq_ctx_init_modulus(ctx, h, "t");
+        fq_ctx_init_modulus(ctx, h, ctxp, "t");
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(g, ctx);
@@ -60,7 +61,7 @@ main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("p: "); fmpz_print(p); flint_printf("\n");
-                    flint_printf("h: "); fmpz_mod_poly_print_pretty(h, "t"); flint_printf("\n");
+                    flint_printf("h: "); fmpz_mod_poly_print_pretty(h, "t", ctxp); flint_printf("\n");
                     flint_printf("f: "); fq_print_pretty(f, ctx); flint_printf("\n");
                     flint_printf("a: "); fq_poly_print_pretty(a, "x", ctx); flint_printf("\n");
                     flint_printf("b: "); fq_poly_print_pretty(b, "x", ctx); flint_printf("\n");
@@ -73,7 +74,8 @@ main(void)
             }
         }
 
-        fmpz_mod_poly_clear(h);
+        fmpz_mod_poly_clear(h, ctxp);
+        fmpz_mod_ctx_clear(ctxp);
 
         fq_poly_clear(a, ctx);
         fq_poly_clear(b, ctx);

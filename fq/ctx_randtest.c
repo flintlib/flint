@@ -16,7 +16,6 @@
 void
 fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 {
-    fmpz_mod_ctx_t ctxp;
     fmpz_mod_poly_t modulus;
     fmpz_t p, x;
     slong d;
@@ -30,6 +29,8 @@ fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
     /* Test non-monic modulus */
     if (n_randint(state, 2))
     {
+        fmpz_mod_ctx_t ctxp;
+        fmpz_mod_ctx_init(ctxp, p);
         fmpz_init_set(x, p);
         fmpz_sub_ui(x, x, 1);
         fmpz_mod_poly_init(modulus, ctxp);

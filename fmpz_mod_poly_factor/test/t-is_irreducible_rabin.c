@@ -22,11 +22,13 @@ int
 main(void)
 {
     int iter;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("is_irreducible_rabin....");
     fflush(stdout);
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
@@ -36,18 +38,19 @@ main(void)
         int i, num;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, modulus);
 
-        fmpz_mod_poly_init(poly1, modulus);
-        fmpz_mod_poly_init(poly2, modulus);
+        fmpz_mod_poly_init(poly1, ctx);
+        fmpz_mod_poly_init(poly2, ctx);
 
         length = n_randint(state, 10) + 2;
         do
         {
-            fmpz_mod_poly_randtest(poly1, state, length);
-            if (!fmpz_mod_poly_is_zero(poly1))
-                fmpz_mod_poly_make_monic(poly1, poly1);
+            fmpz_mod_poly_randtest(poly1, state, length, ctx);
+            if (!fmpz_mod_poly_is_zero(poly1, ctx))
+                fmpz_mod_poly_make_monic(poly1, poly1, ctx);
         }
-        while ((!fmpz_mod_poly_is_irreducible_rabin(poly1)) || (poly1->length < 2));
+        while ((!fmpz_mod_poly_is_irreducible_rabin(poly1, ctx)) || (poly1->length < 2));
 
         num = n_randint(state, 5) + 1;
 
@@ -55,29 +58,30 @@ main(void)
         {
             do
             {
-                fmpz_mod_poly_randtest(poly2, state, length);
-                if (!fmpz_mod_poly_is_zero(poly1))
-                    fmpz_mod_poly_make_monic(poly2, poly2);
+                fmpz_mod_poly_randtest(poly2, state, length, ctx);
+                if (!fmpz_mod_poly_is_zero(poly1, ctx))
+                    fmpz_mod_poly_make_monic(poly2, poly2, ctx);
             }
-            while ((!fmpz_mod_poly_is_irreducible_rabin(poly2)) || (poly2->length < 2));
+            while ((!fmpz_mod_poly_is_irreducible_rabin(poly2, ctx)) || (poly2->length < 2));
 
-            fmpz_mod_poly_mul(poly1, poly1, poly2);
+            fmpz_mod_poly_mul(poly1, poly1, poly2, ctx);
         }
 
-        if (fmpz_mod_poly_is_irreducible_rabin(poly1))
+        if (fmpz_mod_poly_is_irreducible_rabin(poly1, ctx))
         {
             flint_printf("Error: reducible polynomial declared irreducible!\n");
             flint_printf("poly:\n");
-            fmpz_mod_poly_print(poly1);
+            fmpz_mod_poly_print(poly1, ctx);
             flint_printf("\n");
             abort();
         }
 
         fmpz_clear(modulus);
-        fmpz_mod_poly_clear(poly1);
-        fmpz_mod_poly_clear(poly2);
+        fmpz_mod_poly_clear(poly1, ctx);
+        fmpz_mod_poly_clear(poly2, ctx);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

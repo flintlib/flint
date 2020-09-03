@@ -23,16 +23,17 @@ void test_poly(
     fmpz_mod_poly_factor_t roots,
     const fmpz_mod_poly_t f,
     int want_mult,
-    const fmpz_factor_t n)
+    const fmpz_factor_t n,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i, multiplicity;
     fmpz_mod_poly_t q, qt, r;
 
-    fmpz_mod_poly_init(q, &f->p);
-    fmpz_mod_poly_init(qt, &f->p);
-    fmpz_mod_poly_init(r, &f->p);
+    fmpz_mod_poly_init(q, ctx);
+    fmpz_mod_poly_init(qt, ctx);
+    fmpz_mod_poly_init(r, ctx);
 
-    if (!fmpz_mod_poly_roots_factored(roots, f, want_mult, n))
+    if (!fmpz_mod_poly_roots_factored(roots, f, want_mult, n, ctx))
     {
         flint_printf("FAILED:\ncheck roots could be computed\n");
         flint_abort();
@@ -40,7 +41,7 @@ void test_poly(
 
     for (i = 0; i < roots->num; i++)
     {
-        if (fmpz_mod_poly_degree(roots->poly + i) != 1)
+        if (fmpz_mod_poly_degree(roots->poly + i, ctx) != 1)
         {
             flint_printf("FAILED:\ncheck root is linear\n");
             flint_abort();
@@ -52,19 +53,20 @@ void test_poly(
             flint_abort();
         }
 
-        fmpz_mod_poly_set(q, f);
+        fmpz_mod_poly_set(q, f, ctx);
 
         multiplicity = 0;
-        while (fmpz_mod_poly_divrem(qt, r, q, roots->poly + i), fmpz_mod_poly_is_zero(r))
+        while (fmpz_mod_poly_divrem(qt, r, q, roots->poly + i, ctx),
+               fmpz_mod_poly_is_zero(r, ctx))
         {
-            fmpz_mod_poly_swap(q, qt);
+            fmpz_mod_poly_swap(q, qt, ctx);
             multiplicity++;
         }
 
         if (multiplicity <= 0)
         {
             flint_printf("FAILED:\ncheck root is a root\n");
-            fmpz_mod_poly_print_pretty(roots->poly + i, "x"); printf("\n");
+            fmpz_mod_poly_print_pretty(roots->poly + i, "x", ctx); printf("\n");
             flint_abort();
         }
 
@@ -86,13 +88,13 @@ void test_poly(
         {
             int found = 0;
 
-            fmpz_mod_poly_evaluate_fmpz(e, f, k);
+            fmpz_mod_poly_evaluate_fmpz(e, f, k, ctx);
             if (!fmpz_is_zero(e))
                 continue;
 
             for (i = 0; i < roots->num; i++)
             {
-                fmpz_mod_poly_evaluate_fmpz(e, roots->poly + i, k);
+                fmpz_mod_poly_evaluate_fmpz(e, roots->poly + i, k, ctx);
                 if (fmpz_is_zero(e))
                 {
                     if (found)
@@ -115,9 +117,9 @@ void test_poly(
         fmpz_clear(e);
     }
 
-    fmpz_mod_poly_clear(q);
-    fmpz_mod_poly_clear(qt);
-    fmpz_mod_poly_clear(r);
+    fmpz_mod_poly_clear(q, ctx);
+    fmpz_mod_poly_clear(qt, ctx);
+    fmpz_mod_poly_clear(r, ctx);
 }
 
 
@@ -125,10 +127,13 @@ int
 main(void)
 {
     slong i, j, k, l;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("roots_factored....");
     fflush(stdout);
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     {
         fmpz_t p, p2;
@@ -139,14 +144,16 @@ main(void)
         fmpz_init_set_ui(p, UWORD_MAX_PRIME);
         fmpz_init(p2);
         fmpz_pow_ui(p2, p, 2);
-        fmpz_mod_poly_init(f, p2);
-        fmpz_mod_poly_factor_init(r);
+        fmpz_mod_ctx_set_modulus(ctx, p2);
+
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_factor_init(r, ctx);
         fmpz_factor_init(n);
         _fmpz_factor_append(n, p, 2);
 
-        fmpz_mod_poly_set_coeff_fmpz(f, 1, p);
+        fmpz_mod_poly_set_coeff_fmpz(f, 1, p, ctx);
 
-        if (fmpz_mod_poly_roots_factored(r, f, 0, n))
+        if (fmpz_mod_poly_roots_factored(r, f, 0, n, ctx))
         {
             flint_printf("FAILED:\ncheck non example with too many roots\n");
             flint_abort();
@@ -154,8 +161,8 @@ main(void)
 
         fmpz_factor_clear(n);
 
-        fmpz_mod_poly_factor_clear(r);
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_factor_clear(r, ctx);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_clear(p);
         fmpz_clear(p2);
     }
@@ -174,26 +181,27 @@ main(void)
         fmpz_init_set(p2q, q);
         fmpz_mul(p2q, p2q, p);
         fmpz_mul(p2q, p2q, p);
+        fmpz_mod_ctx_set_modulus(ctx, p2q);
 
-        fmpz_mod_poly_init(f, p2q);
-        fmpz_mod_poly_factor_init(r);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_factor_init(r, ctx);
         fmpz_factor_init(n);
         _fmpz_factor_append(n, p, 2);
         _fmpz_factor_append(n, q, 1);
 
-        fmpz_mod_poly_set_coeff_fmpz(f, 0, one);
-        fmpz_mod_poly_set_coeff_fmpz(f, 1, q);
-        fmpz_mod_poly_scalar_mul_fmpz(f, f, p);
+        fmpz_mod_poly_set_coeff_fmpz(f, 0, one, ctx);
+        fmpz_mod_poly_set_coeff_fmpz(f, 1, q, ctx);
+        fmpz_mod_poly_scalar_mul_fmpz(f, f, p, ctx);
 
-        if ((!fmpz_mod_poly_roots_factored(r, f, 0, n)) || (r->num != 0))
+        if ((!fmpz_mod_poly_roots_factored(r, f, 0, n, ctx)) || (r->num != 0))
         {
             flint_printf("FAILED:\ncheck example with no roots\n");
             flint_abort();
         }
 
         fmpz_factor_clear(n);
-        fmpz_mod_poly_factor_clear(r);
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_factor_clear(r, ctx);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_clear(p);
         fmpz_clear(q);
         fmpz_clear(p2q);
@@ -224,41 +232,44 @@ main(void)
         fmpz_factor_init(n);
         fmpz_factor(n, p);
 
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_factor_init(r);
+        fmpz_mod_ctx_set_modulus(ctx, p);
+
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_factor_init(r, ctx);
 
         for (j = 0; j < 4; j++)
         {
             slong m = 80/fmpz_bits(p);
 
             do {
-                fmpz_mod_poly_randtest(f, state, n_randint(state, 6 + m) + 1);
-            } while (fmpz_mod_poly_is_zero(f));
+                fmpz_mod_poly_randtest(f, state, n_randint(state, 6 + m) + 1, ctx);
+            } while (fmpz_mod_poly_is_zero(f, ctx));
 
             for (k = 0; k < m; k++)
             {
                 fmpz_mod_poly_t ff;
-                fmpz_mod_poly_init(ff, p);
-                fmpz_mod_poly_fit_length(ff, 2);
+                fmpz_mod_poly_init(ff, ctx);
+                fmpz_mod_poly_fit_length(ff, 2, ctx);
                 fmpz_one(ff->coeffs + 1);
                 fmpz_randm(ff->coeffs + 0, state, p);
                 ff->length = 2;
                 for (l = n_randint(state, m); l > 0; l--)
-                    fmpz_mod_poly_mul(f, f, ff);
-                fmpz_mod_poly_clear(ff);
+                    fmpz_mod_poly_mul(f, f, ff, ctx);
+                fmpz_mod_poly_clear(ff, ctx);
             }
 
-            test_poly(r, f, 0, n);
+            test_poly(r, f, 0, n, ctx);
             if (r->num < 1000)
-                test_poly(r, f, 1, n);
+                test_poly(r, f, 1, n, ctx);
         }
 
-        fmpz_mod_poly_factor_clear(r);
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_factor_clear(r, ctx);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_factor_clear(n);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

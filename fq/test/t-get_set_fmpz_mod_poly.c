@@ -29,17 +29,17 @@ main(void)
         fq_ctx_randtest(ctx, state);
         fq_init(x, ctx);
         fq_init(y, ctx);
-        fmpz_mod_poly_init(z, fq_ctx_prime(ctx)); /* modulus don't care */
-        fmpz_mod_poly_init(t, fq_ctx_prime(ctx));
+        fmpz_mod_poly_init(z, ctx->ctxp);
+        fmpz_mod_poly_init(t, ctx->ctxp);
 
         for (j = 0; j < 100; j++)
         {
             fq_rand(x, state, ctx);
             fq_rand(y, state, ctx);
             fq_get_fmpz_mod_poly(z, x, ctx);
-            fmpz_mod_poly_randtest(t, state, 20);
-            fmpz_mod_poly_mul(t, t, ctx->modulus);
-            fmpz_mod_poly_add(z, z, t);
+            fmpz_mod_poly_randtest(t, state, 20, ctx->ctxp);
+            fmpz_mod_poly_mul(t, t, ctx->modulus, ctx->ctxp);
+            fmpz_mod_poly_add(z, z, t, ctx->ctxp);
             fq_set_fmpz_mod_poly(y, z, ctx);
 
             if (!fq_equal(y, x, ctx))
@@ -50,8 +50,8 @@ main(void)
             }
         }
 
-        fmpz_mod_poly_clear(t);
-        fmpz_mod_poly_clear(z);
+        fmpz_mod_poly_clear(t, ctx->ctxp);
+        fmpz_mod_poly_clear(z, ctx->ctxp);
         fq_clear(y, ctx);
         fq_clear(x, ctx);
         fq_ctx_clear(ctx);

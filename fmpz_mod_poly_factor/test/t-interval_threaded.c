@@ -33,6 +33,7 @@ main(void)
 {
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int i;
+    fmpz_mod_ctx_t ctx;
 #endif
     FLINT_TEST_INIT(state);
     
@@ -40,6 +41,9 @@ main(void)
     fflush(stdout);
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
+
     /* no aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -68,46 +72,47 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(cinv, p);
-        fmpz_mod_poly_init(d, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(cinv, ctx);
+        fmpz_mod_poly_init(d, ctx);
 
         for (j = 0; j < l; j++)
-            fmpz_mod_poly_init(tmp + j, p);
+            fmpz_mod_poly_init(tmp + j, ctx);
 
         for (j = 0; j < num_threads + 1; j++)
-            fmpz_mod_poly_init(e + j, p);
+            fmpz_mod_poly_init(e + j, ctx);
 
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1);
+        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1, ctx);
 
         do
         {
-            fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1);
+            fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
         } while (c->length < 3);
 
-        fmpz_mod_poly_rem(a, a, c);
+        fmpz_mod_poly_rem(a, a, c, ctx);
 
         for (j = 0; j < l; j++)
-            fmpz_mod_poly_randtest_not_zero(tmp + j, state, n_randint(state, 20) + 1);
+            fmpz_mod_poly_randtest_not_zero(tmp + j, state, n_randint(state, 20) + 1, ctx);
 
-        fmpz_mod_poly_reverse(cinv, c, c->length);
-        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length);
+        fmpz_mod_poly_reverse(cinv, c, c->length, ctx);
+        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length, ctx);
 
-        fmpz_mod_poly_set_ui(b, 1);
+        fmpz_mod_poly_set_ui(b, 1, ctx);
 
         for (j = l - 1; j >= 0; j--)
         {
-            fmpz_mod_poly_rem(d, tmp + j, c);
-            fmpz_mod_poly_sub(d, a, d);
-            fmpz_mod_poly_mulmod_preinv(b, d, b, c, cinv);
+            fmpz_mod_poly_rem(d, tmp + j, c, ctx);
+            fmpz_mod_poly_sub(d, a, d, ctx);
+            fmpz_mod_poly_mulmod_preinv(b, d, b, c, cinv, ctx);
         }
 
         for (j = 0; j < num_threads + 1; j++)
         {
-            fmpz_mod_poly_fit_length(e + j, c->length - 1);
+            fmpz_mod_poly_fit_length(e + j, c->length - 1, ctx);
             _fmpz_mod_poly_set_length(e + j, c->length - 1);
             _fmpz_vec_zero(e[j].coeffs, c->length - 1);
          
@@ -118,6 +123,7 @@ main(void)
             args1[j].vinv = cinv;
             args1[j].m = l;
             args1[j].tmp = _fmpz_vec_init(c->length - 1);
+            args1[j].ctx = ctx;
         }
 
         for (j = 0; j < num_threads; j++)
@@ -137,13 +143,13 @@ main(void)
 
         for (j = 0; j < num_threads + 1; j++)
         {
-            if (!fmpz_mod_poly_equal(b, e + j))
+            if (!fmpz_mod_poly_equal(b, e + j, ctx))
             {
                 flint_printf("j: %wd\n", j);
                 flint_printf("FAIL (interval_poly):\n");
-                flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
-                flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
-                flint_printf("e[j]:\n"); fmpz_mod_poly_print(e + j); flint_printf("\n");
+                flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx); flint_printf("\n");
+                flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx); flint_printf("\n");
+                flint_printf("e[j]:\n"); fmpz_mod_poly_print(e + j, ctx); flint_printf("\n");
                 abort();
             }
         }
@@ -152,23 +158,24 @@ main(void)
 
         fmpz_clear(p);
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(cinv);
-        fmpz_mod_poly_clear(d);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(cinv, ctx);
+        fmpz_mod_poly_clear(d, ctx);
 
         for (j = 0; j < num_threads + 1; j++)
-            fmpz_mod_poly_clear(e + j);
+            fmpz_mod_poly_clear(e + j, ctx);
 
         for (j = 0; j < l; j++)
-            fmpz_mod_poly_clear(tmp + j);
+            fmpz_mod_poly_clear(tmp + j, ctx);
 
         flint_free(e);
         flint_free(tmp);
         flint_free(args1);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
