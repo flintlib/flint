@@ -2674,13 +2674,6 @@ pick_bma_prime:
         fmpz_mod_bma_mpoly_zero(AbarLambda_mp);
         fmpz_mod_bma_mpoly_zero(BbarLambda_mp);
 
-        /* unfortunate fmpz_mod_poly's store their own ctx :( */
-        fmpz_mod_mpolyn_set_modulus(Aeval_mp, ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(Beval_mp, ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(Geval_mp, ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(Abareval_mp, ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(Bbareval_mp, ctx_mp->ffinfo);
-
         FLINT_ASSERT(fmpz_is_one(sshift_mp));
         fmpz_mod_mpoly_bma_interpolate_alpha_powers(alphas_mp, sshift_mp,
                                                     Ictx, ctx, ctx_mp->ffinfo);

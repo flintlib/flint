@@ -49,7 +49,6 @@ typedef struct
     fmpz * coeffs;
     slong alloc;
     slong length;
-    fmpz p;
 } fmpz_mod_poly_struct;
 
 typedef fmpz_mod_poly_struct fmpz_mod_poly_t[1];
@@ -105,8 +104,13 @@ fmpz_mod_poly_compose_mod_precomp_preinv_arg_t;
 
 /*  Initialisation and memory management *************************************/
 
-FLINT_DLL void fmpz_mod_poly_init(fmpz_mod_poly_t poly,
-                                                     const fmpz_mod_ctx_t ctx);
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+{
+    poly->coeffs = NULL;
+    poly->alloc  = 0;
+    poly->length = 0;
+}
 
 FLINT_DLL void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
                                                      const fmpz_mod_ctx_t ctx);
@@ -199,8 +203,6 @@ FLINT_DLL void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
 
 /*  Attributes ***************************************************************/
 
-#define fmpz_mod_poly_modulus(poly)  (&((poly)->p))
-
 FMPZ_MOD_POLY_INLINE 
 slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
@@ -266,7 +268,7 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_one(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
-   if (fmpz_is_one(&poly->p))
+   if (fmpz_is_one(fmpz_mod_ctx_modulus(ctx)))
    {
       _fmpz_mod_poly_set_length(poly, 0);
    } else

@@ -77,14 +77,14 @@ void test_poly(
         }
     }
 
-    if (fmpz_cmp_si(&f->p, 1000) < 0)
+    if (fmpz_cmp_si(fmpz_mod_ctx_modulus(ctx), 1000) < 0)
     {
         fmpz_t e, k;
 
         fmpz_init(e);
         fmpz_init(k);
 
-        for (fmpz_zero(k); fmpz_cmp(k, &f->p) < 0; fmpz_add_ui(k, k, 1))
+        for (fmpz_zero(k); fmpz_cmp(k, fmpz_mod_ctx_modulus(ctx)) < 0; fmpz_add_ui(k, k, 1))
         {
             int found = 0;
 

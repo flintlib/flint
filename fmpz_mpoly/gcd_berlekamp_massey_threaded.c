@@ -246,19 +246,6 @@ static void _fmpz_mpolyuu_eval_fmpz_mod_from_coeffs(
     }
 }
 
-int fmpz_mod_mpolyn_mod_matches(const fmpz_mod_mpolyn_t A, const fmpz_mod_ctx_t fpctx)
-{
-    slong j;
-
-    for (j = 0; j < A->alloc; j++)
-    {
-        if (!fmpz_equal(&A->coeffs[j].p, fmpz_mod_ctx_modulus(fpctx)))
-            return 0;
-    }
-
-    return 1;
-}
-
 /*
     Set the mod member of all relevent poly's. This function could be a
     nop if the poly's did not store their own ctx.
@@ -274,23 +261,7 @@ void _base_args_set_mod_mp(
     _base_struct * w,
     _eval_mp_worker_arg_struct * args)
 {
-    slong i;
-
-    for (i = 0; i < w->num_threads; i++)
-    {
-        fmpz_mod_mpolyn_set_modulus(args[i].Aeval_mp, w->ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(args[i].Beval_mp, w->ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(args[i].Geval_mp, w->ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(args[i].Abareval_mp, w->ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(args[i].Bbareval_mp, w->ctx_mp->ffinfo);
-    }
-
-    for (i = 0; i < w->evals_mp_alloc; i++)
-    {
-        fmpz_mod_mpolyn_set_modulus(w->evals_mp[i].nGeval_mp, w->ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(w->evals_mp[i].nAbareval_mp, w->ctx_mp->ffinfo);
-        fmpz_mod_mpolyn_set_modulus(w->evals_mp[i].nBbareval_mp, w->ctx_mp->ffinfo);
-    }
+    return;
 }
 
 /* Set w->num_images and fit the length of w->evals */
@@ -654,12 +625,6 @@ static void _eval_mp_worker(void * varg)
     FLINT_ASSERT(i < w->num_threads);
     FLINT_ASSERT(w->num_images_mp >= w->num_threads);
     FLINT_ASSERT(0 == w->num_images_mp % w->num_threads);
-
-    FLINT_ASSERT(fmpz_mod_mpolyn_mod_matches(arg->Aeval_mp, w->ctx_mp->ffinfo));
-    FLINT_ASSERT(fmpz_mod_mpolyn_mod_matches(arg->Beval_mp, w->ctx_mp->ffinfo));
-    FLINT_ASSERT(fmpz_mod_mpolyn_mod_matches(arg->Geval_mp, w->ctx_mp->ffinfo));
-    FLINT_ASSERT(fmpz_mod_mpolyn_mod_matches(arg->Abareval_mp, w->ctx_mp->ffinfo));
-    FLINT_ASSERT(fmpz_mod_mpolyn_mod_matches(arg->Bbareval_mp, w->ctx_mp->ffinfo));
 
     if (arg->cur_is_uninited)
     {

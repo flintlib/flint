@@ -180,12 +180,6 @@ FLINT_DLL void fmpz_mod_mpolyn_mul_poly(fmpz_mod_mpolyn_t A,
 FLINT_DLL void fmpz_mod_mpolyun_mul_last(fmpz_mod_mpolyun_t A, fmpz_mod_poly_t b,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mpolyn_set_modulus(fmpz_mod_mpolyn_t A,
-                                                   const fmpz_mod_ctx_t fpctx);
-
-FLINT_DLL void fmpz_mod_mpolyun_set_modulus(fmpz_mod_mpolyun_t A,
-                                                   const fmpz_mod_ctx_t fpctx);
-
 FLINT_DLL void fmpz_mod_mpolyn_scalar_mul_fmpz_mod(fmpz_mod_mpolyn_t A,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
 

@@ -53,7 +53,7 @@ main(void)
         fmpz_mod_poly_resultant(y, g, f, ctx);
 
         if ((fmpz_mod_poly_degree(f, ctx) * fmpz_mod_poly_degree(g, ctx)) % 2)
-           fmpz_negmod(y, y, &f->p);
+           fmpz_mod_neg(y, y, ctx);
 
         result = (fmpz_equal(x, y));
         if (!result)

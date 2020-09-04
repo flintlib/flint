@@ -15,14 +15,6 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
-{
-    poly->coeffs = NULL;
-    poly->alloc  = 0;
-    poly->length = 0;
-    fmpz_init(&(poly->p));
-    fmpz_set(&(poly->p), fmpz_mod_ctx_modulus(ctx));
-}
 
 void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
                                                       const fmpz_mod_ctx_t ctx)
@@ -34,7 +26,5 @@ void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
 
     poly->alloc = alloc;
     poly->length = 0;
-    fmpz_init(&(poly->p));
-    fmpz_set(&(poly->p), fmpz_mod_ctx_modulus(ctx));
 }
 

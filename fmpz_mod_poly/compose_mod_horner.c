@@ -111,7 +111,7 @@ void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
     else
     {
         fmpz_init(inv3);
-        fmpz_invmod(inv3, poly3->coeffs + len, &res->p);
+        fmpz_invmod(inv3, poly3->coeffs + len, fmpz_mod_ctx_modulus(ctx));
         _fmpz_mod_poly_rem(ptr2, poly2->coeffs, len2,
                          poly3->coeffs, len3, inv3, fmpz_mod_ctx_modulus(ctx));
         fmpz_clear(inv3);

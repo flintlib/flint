@@ -109,7 +109,7 @@ fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
         else if (len == 1)
         {
             fmpz_mod_poly_fit_length(res, 1, ctx);
-            fmpz_powm_ui(res->coeffs, poly->coeffs, e, &res->p);
+            fmpz_powm_ui(res->coeffs, poly->coeffs, e, fmpz_mod_ctx_modulus(ctx));
             _fmpz_mod_poly_set_length(res, 1);
             _fmpz_mod_poly_normalise(res);
         }

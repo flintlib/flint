@@ -658,9 +658,7 @@ int bpoly_info_disolve(bpoly_info_t I)
         for (i = 0; i < I->r; i++)
         {
             fmpz_mod_poly_mul(s1, s, I->d1 + i, I->ctxp);
-            fmpz_set(&s2->p, I->p);
             fmpz_mod_poly_rem(s2, s1, I->Bitilde1 + i, I->ctxp);
-            fmpz_set(&s2->p, I->pk);
             fmpz_mod_poly_scalar_mul_fmpz(s2, s2, pj, I->ctxpk);
             fmpz_mod_poly_add(I->d + i, I->d + i, s2, I->ctxpk);
         }

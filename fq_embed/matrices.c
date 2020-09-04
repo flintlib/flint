@@ -12,22 +12,6 @@
 #include "fq_embed.h"
 #include "fq_poly.h"
 
-#ifdef T
-#undef T
-#endif
-#ifdef B
-#undef B
-#endif
-
-#define T fq
-#define CAP_T FQ
-#define B fmpz_mod
-
-
-#ifdef T
-#ifdef B
-
-#include "templates.h"
 
 void fq_embed_mono_to_dual_matrix(fmpz_mod_mat_t res, const fq_ctx_t ctx)
 {
@@ -63,8 +47,8 @@ void fq_embed_dual_to_mono_matrix(fmpz_mod_mat_t res, const fq_ctx_t ctx)
 
     fq_init(d_ctx, ctx);
     fq_init(d_ctx_inv, ctx);
-    fmpz_mod_mat_init(mul_mat, n, n, fmpz_mod_poly_modulus(modulus));
-    fmpz_mod_mat_init(tmp, n, n, fmpz_mod_poly_modulus(modulus));
+    fmpz_mod_mat_init(mul_mat, n, n, fq_ctx_prime(ctx));
+    fmpz_mod_mat_init(tmp, n, n, fq_ctx_prime(ctx));
 
     fmpz_mod_mat_zero(tmp);
     for (i = 0; i < n; i++)
@@ -216,11 +200,3 @@ void fq_embed_matrices(fmpz_mod_mat_t embed,
     fmpz_mod_poly_clear(gen_minpoly_cp, ctxp);
 }
 
-
-#endif
-#endif
-
-
-#undef B
-#undef CAP_T
-#undef T

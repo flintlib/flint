@@ -11,23 +11,6 @@
 
 #include "fq_embed.h"
 
-
-#ifdef T
-#undef T
-#endif
-#ifdef B
-#undef B
-#endif
-
-#define T fq
-#define CAP_T FQ
-#define B fmpz_mod
-
-#ifdef T
-#ifdef B
-
-#include "templates.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,106 +27,103 @@ main(void)
     /* Check that isomorphism to self gives identity matrices */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, t) gen;
-        const TEMPLATE(B, poly_struct) *modulus;
-        TEMPLATE(B, mat_t) embed, project, one;
+        fq_ctx_t ctx;
+        fq_t gen;
+        const fmpz_mod_poly_struct *modulus;
+        fmpz_mod_mat_t embed, project, one;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        d = TEMPLATE(T, ctx_degree)(ctx);
-        modulus = TEMPLATE(T, ctx_modulus)(ctx);
+        fq_ctx_randtest(ctx, state);
+        d = fq_ctx_degree(ctx);
+        modulus = fq_ctx_modulus(ctx);
 
-        TEMPLATE(T, init)(gen, ctx);
-        TEMPLATE(T, gen)(gen, ctx);
-        TEMPLATE(T, pow)(gen, gen, TEMPLATE(T, ctx_prime)(ctx), ctx);
+        fq_init(gen, ctx);
+        fq_gen(gen, ctx);
+        fq_pow(gen, gen, fq_ctx_prime(ctx), ctx);
 
-        TEMPLATE(B, mat_init)(embed, d, d, TEMPLATE(B, poly_modulus)(modulus));
-        TEMPLATE(B, mat_init)(project, d, d, TEMPLATE(B, poly_modulus)(modulus));
-        TEMPLATE(B, mat_init)(one, d, d, TEMPLATE(B, poly_modulus)(modulus));
+        fmpz_mod_mat_init(embed, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(project, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(one, d, d, fq_ctx_prime(ctx));
 
-        TEMPLATE(T, embed_matrices)(embed, project, gen, ctx, gen, ctx, modulus);
-        TEMPLATE(B, mat_one)(one);
+        fq_embed_matrices(embed, project, gen, ctx, gen, ctx, modulus);
+        fmpz_mod_mat_one(one);
         
-        if (!TEMPLATE(B, mat_equal)(embed, one) || !TEMPLATE(B, mat_equal)(project, one)) {
+        if (!fmpz_mod_mat_equal(embed, one) || !fmpz_mod_mat_equal(project, one)) {
             flint_printf("FAIL:\n\n");
-            flint_printf("CTX\n"), TEMPLATE(T, ctx_print)(ctx), flint_printf("\n");
-            flint_printf("x^p: "), TEMPLATE(T, print_pretty)(gen, ctx), flint_printf("\n");
+            flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");
+            flint_printf("x^p: "), fq_print_pretty(gen, ctx), flint_printf("\n");
             flint_printf("Embed\n"),
-                TEMPLATE(B, mat_print_pretty)(embed), flint_printf("\nProject\n"),
-                TEMPLATE(B, mat_print_pretty)(project), flint_printf("\n");
+                fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
+                fmpz_mod_mat_print_pretty(project), flint_printf("\n");
             abort();
         }
 
-        TEMPLATE(B, mat_clear)(embed);
-        TEMPLATE(B, mat_clear)(project);
-        TEMPLATE(B, mat_clear)(one);
-        TEMPLATE(T, clear)(gen, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        fmpz_mod_mat_clear(embed);
+        fmpz_mod_mat_clear(project);
+        fmpz_mod_mat_clear(one);
+        fq_clear(gen, ctx);
+        fq_ctx_clear(ctx);
     }
 
     /* Check random emebedding (degrees 1..5) */
     for (j = 1; j < 6; j++) {
         for (i = 0; i < (6 - j) * flint_test_multiplier(); i++)
         {
-            TEMPLATE(T, ctx_t) ctx1, ctx2;
-            TEMPLATE(T, t) gen1, gen2;
-            TEMPLATE(B, poly_t) minpoly;
-            const TEMPLATE(B, poly_struct) *modulus;
-            TEMPLATE(B, poly_t) modulus2;
-            TEMPLATE(B, mat_t) embed, project, comp, one;
+            fq_ctx_t ctx1, ctx2;
+            fq_t gen1, gen2;
+            fmpz_mod_poly_t minpoly;
+            fmpz_mod_poly_t modulus2;
+            fmpz_mod_mat_t embed, project, comp, one;
             slong m, n;
 
-            while (TEMPLATE(T, ctx_randtest)(ctx1, state),
-                   m = TEMPLATE(T, ctx_degree)(ctx1),
+            while (fq_ctx_randtest(ctx1, state),
+                   m = fq_ctx_degree(ctx1),
                    m == 1)
             {
-                TEMPLATE(T, ctx_clear)(ctx1);
+                fq_ctx_clear(ctx1);
             }
 
             n = m*j;
 
-            modulus = TEMPLATE(T, ctx_modulus)(ctx1);
+            fmpz_mod_poly_init(modulus2, ctx1->ctxp);
+            fmpz_mod_poly_randtest_monic_irreducible(modulus2, state, n+1, ctx1->ctxp);
+            fq_ctx_init_modulus(ctx2, modulus2, ctx1->ctxp, "X");
 
-            TEMPLATE(B, poly_init)(modulus2, ctx1->ctxp);
-            TEMPLATE(B, poly_randtest_monic_irreducible)(modulus2, state, n+1, ctx1->ctxp);
-            TEMPLATE(T, ctx_init_modulus)(ctx2, modulus2, ctx1->ctxp, "X");
+            fq_init(gen1, ctx1);
+            fq_init(gen2, ctx2);
+            fmpz_mod_poly_init(minpoly, ctx1->ctxp);
+            fq_embed_gens(gen1, gen2, minpoly, ctx1, ctx2);
 
-            TEMPLATE(T, init)(gen1, ctx1);
-            TEMPLATE(T, init)(gen2, ctx2);
-            TEMPLATE(B, poly_init)(minpoly, ctx1->ctxp);
-            TEMPLATE(T, embed_gens)(gen1, gen2, minpoly, ctx1, ctx2);
+            fmpz_mod_mat_init(embed, n, m, fq_ctx_prime(ctx1));
+            fmpz_mod_mat_init(project, m, n, fq_ctx_prime(ctx1));
+            fmpz_mod_mat_init(comp, m, m, fq_ctx_prime(ctx1));
+            fmpz_mod_mat_init(one, m, m, fq_ctx_prime(ctx1));
 
-            TEMPLATE(B, mat_init)(embed, n, m, TEMPLATE(B, poly_modulus)(modulus));
-            TEMPLATE(B, mat_init)(project, m, n, TEMPLATE(B, poly_modulus)(modulus));
-            TEMPLATE(B, mat_init)(comp, m, m, TEMPLATE(B, poly_modulus)(modulus));
-            TEMPLATE(B, mat_init)(one, m, m, TEMPLATE(B, poly_modulus)(modulus));
+            fq_embed_matrices(embed, project, gen1, ctx1, gen2, ctx2, minpoly);
 
-            TEMPLATE(T, embed_matrices)(embed, project, gen1, ctx1, gen2, ctx2, minpoly);
-
-            TEMPLATE(B, mat_mul)(comp, project, embed);
-            TEMPLATE(B, mat_one)(one);
-            if (!TEMPLATE(B, mat_equal)(comp, one)) {
+            fmpz_mod_mat_mul(comp, project, embed);
+            fmpz_mod_mat_one(one);
+            if (!fmpz_mod_mat_equal(comp, one)) {
                 flint_printf("FAIL:\n\n");
-                flint_printf("CTX 1\n"), TEMPLATE(T, ctx_print)(ctx1), flint_printf("\n");
-                flint_printf("CTX 2\n"), TEMPLATE(T, ctx_print)(ctx2), flint_printf("\n");
+                flint_printf("CTX 1\n"), fq_ctx_print(ctx1), flint_printf("\n");
+                flint_printf("CTX 2\n"), fq_ctx_print(ctx2), flint_printf("\n");
                 flint_printf("Embed\n"),
-                    TEMPLATE(B, mat_print_pretty)(embed), flint_printf("\nProject\n"),
-                    TEMPLATE(B, mat_print_pretty)(project), flint_printf("\nComposition\n"),
-                    TEMPLATE(B, mat_print_pretty)(comp), flint_printf("\n");
+                    fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
+                    fmpz_mod_mat_print_pretty(project), flint_printf("\nComposition\n"),
+                    fmpz_mod_mat_print_pretty(comp), flint_printf("\n");
                 abort();
             }
 
-            TEMPLATE(B, mat_clear)(embed);
-            TEMPLATE(B, mat_clear)(project);
-            TEMPLATE(B, mat_clear)(comp);
-            TEMPLATE(B, mat_clear)(one);
-            TEMPLATE(B, poly_clear)(minpoly, ctx1->ctxp);
-            TEMPLATE(B, poly_clear)(modulus2, ctx1->ctxp);
-            TEMPLATE(T, clear)(gen1, ctx1);
-            TEMPLATE(T, ctx_clear)(ctx1);
-            TEMPLATE(T, clear)(gen2, ctx2);
-            TEMPLATE(T, ctx_clear)(ctx2);
+            fmpz_mod_mat_clear(embed);
+            fmpz_mod_mat_clear(project);
+            fmpz_mod_mat_clear(comp);
+            fmpz_mod_mat_clear(one);
+            fmpz_mod_poly_clear(minpoly, ctx1->ctxp);
+            fmpz_mod_poly_clear(modulus2, ctx1->ctxp);
+            fq_clear(gen1, ctx1);
+            fq_ctx_clear(ctx1);
+            fq_clear(gen2, ctx2);
+            fq_ctx_clear(ctx2);
         }
     }
 
@@ -152,10 +132,3 @@ main(void)
     return EXIT_SUCCESS;
 }
 
-
-#endif
-#endif
-
-#undef B
-#undef CAP_T
-#undef T

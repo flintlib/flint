@@ -126,7 +126,7 @@ void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A,
             }
 
             lenG = _fmpz_mod_poly_gcd_hgcd(g, A->coeffs, lenA,
-                                               B->coeffs, lenB, &A->p);
+                                   B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));
 
             if (G == A || G == B)
             {

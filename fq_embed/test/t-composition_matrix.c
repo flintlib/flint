@@ -11,18 +11,81 @@
 
 #include "fq_embed.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 
-#ifdef T
-#undef T
-#endif
-#ifdef B
-#undef B
-#endif
+#include "ulong_extras.h"
+#include "long_extras.h"
 
-#define T fq
-#define CAP_T FQ
-#define B fmpz_mod
-#include "fq_embed_templates/test/t-composition_matrix.c"
-#undef B
-#undef CAP_T
-#undef T
+int
+main(void)
+{
+    int i;
+    
+    FLINT_TEST_INIT(state);
+
+    flint_printf("composition_matrix... ");
+    fflush(stdout);
+
+    /* Check that Mat(a^p) = Mat(x^p) * Mat(a) for random a */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fq_ctx_t ctx;
+        fq_t frob, a;
+        fmpz_mod_mat_t mat_frob, mat_a, mat_aq, res;
+        slong d;
+
+        while (fq_ctx_randtest(ctx, state),
+               d = fq_ctx_degree(ctx),
+               d == 1)
+        {
+            fq_ctx_clear(ctx);
+        }
+
+        fq_init(frob, ctx);
+        fq_init(a, ctx);
+        fmpz_mod_mat_init(mat_frob, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(mat_a, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(mat_aq, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(res, d, d, fq_ctx_prime(ctx));
+
+        fq_gen(frob, ctx);
+        fq_pow(frob, frob, fq_ctx_prime(ctx), ctx);
+        fq_embed_composition_matrix(mat_frob, frob, ctx);
+
+        fq_randtest(a, state, ctx);
+        fq_embed_composition_matrix(mat_a, a, ctx);
+        
+        fmpz_mod_mat_mul(res, mat_frob, mat_a);
+
+        fq_pow(a, a, fq_ctx_prime(ctx), ctx);
+        fq_embed_composition_matrix(mat_aq, a, ctx);
+
+        if (!fmpz_mod_mat_equal(res, mat_aq))
+        {
+            flint_printf("FAIL:\n\n");
+            flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");
+            flint_printf("x^q: "), fq_print_pretty(frob, ctx), flint_printf("\n");
+            flint_printf("M(x^q)*M(a) = M(a^q)\n"),
+                fmpz_mod_mat_print_pretty(mat_frob), flint_printf("\n"),
+                fmpz_mod_mat_print_pretty(mat_a), flint_printf("\n"),
+                fmpz_mod_mat_print_pretty(mat_aq), flint_printf("\n"),
+                fmpz_mod_mat_print_pretty(res), flint_printf("\n");
+            
+            abort();
+        }
+
+        fmpz_mod_mat_clear(mat_frob);
+        fmpz_mod_mat_clear(mat_a);
+        fmpz_mod_mat_clear(mat_aq);
+        fmpz_mod_mat_clear(res);
+        fq_clear(frob, ctx);
+        fq_clear(a, ctx);
+        fq_ctx_clear(ctx);
+    }
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return EXIT_SUCCESS;
+}
+

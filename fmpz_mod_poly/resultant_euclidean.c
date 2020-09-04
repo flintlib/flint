@@ -135,7 +135,7 @@ void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f,
                                    f->coeffs, len1, fmpz_mod_ctx_modulus(ctx));
 
             if (((len1 | len2) & WORD(1)) == WORD(0))
-                fmpz_negmod(r, r, &f->p);
+                fmpz_mod_neg(r, r, ctx);
         }
     }
 }

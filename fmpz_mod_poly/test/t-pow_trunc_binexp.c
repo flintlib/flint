@@ -58,8 +58,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a->length = %wd, p = %wu, exp = %wd, trunc = %wd\n",
-                a->length, a->p, e, trunc);
+            flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n",
+                a->length, e, trunc);
             flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
@@ -100,8 +100,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a->length = %wd, p = %wu, exp = %wd, trunc = %wd\n",
-                a->length, a->p, e, trunc);
+            flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n",
+                a->length, e, trunc);
             flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");

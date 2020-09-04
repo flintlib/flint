@@ -167,25 +167,6 @@ void fmpz_mod_mpolyun_clear(
         flint_free(A->exps);
 }
 
-
-void fmpz_mod_mpolyn_set_modulus(fmpz_mod_mpolyn_t A, const fmpz_mod_ctx_t fpctx)
-{
-    slong i;
-    for (i = 0; i < A->alloc; i++)
-    {
-        fmpz_set(&(A->coeffs + i)->p, fmpz_mod_ctx_modulus(fpctx));
-    }
-}
-
-void fmpz_mod_mpolyun_set_modulus(fmpz_mod_mpolyun_t A, const fmpz_mod_ctx_t fpctx)
-{
-    slong i;
-    for (i = 0; i < A->alloc; i++)
-    {
-        fmpz_mod_mpolyn_set_modulus(A->coeffs + i, fpctx);
-    }
-}
-
 /*
     get the leading coeff in x_0,...,x_var
     A is in R[x_0, ... x_(var-1)][x_var]

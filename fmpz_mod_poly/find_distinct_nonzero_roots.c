@@ -106,7 +106,7 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
         goto cleanup1;
     }
 
-    if (fmpz_cmp_ui(&P->p, 2) <= 0)
+    if (fmpz_cmp_ui(fmpz_mod_ctx_modulus(ctx), 2) <= 0)
     {
         success = 0;
         goto cleanup1;

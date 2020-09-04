@@ -127,7 +127,7 @@ void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
    fmpz_t d;
 
    fmpz_init(d);
-   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, &poly->p) >= 0)
+   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, fmpz_mod_ctx_modulus(ctx)) >= 0)
       fmpz_mod(d, c, fmpz_mod_ctx_modulus(ctx));
    else
       fmpz_set(d, c);
@@ -155,7 +155,7 @@ void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
 
    fmpz_init(d);
    if (fmpz_sgn(c) < 0 || fmpz_cmp(c, fmpz_mod_ctx_modulus(ctx)) >= 0)
-      fmpz_mod(d, c, &poly->p);
+      fmpz_mod(d, c, fmpz_mod_ctx_modulus(ctx));
    else
       fmpz_set(d, c);
 
