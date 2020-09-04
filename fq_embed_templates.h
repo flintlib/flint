@@ -35,13 +35,6 @@ FLINT_DLL void _TEMPLATE(T, embed_gens_allombert)(TEMPLATE(T, t) gen_sub,
                                                   const TEMPLATE(T, ctx_t) sup_ctx);
 
 /* Convert to-from column vectors */
-FLINT_DLL void TEMPLATE4(T, get, B, mat)(TEMPLATE(B, mat_t) col,
-                                         const TEMPLATE(T, t) a,
-                                         const TEMPLATE(T, ctx_t) ctx);
-FLINT_DLL void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
-                                         const TEMPLATE(B, mat_t) col,
-                                         const TEMPLATE(T, ctx_t) ctx);
-
 FLINT_DLL void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
                                            TEMPLATE(B, mat_t) project,
                                            const TEMPLATE(T, t) gen_sub,

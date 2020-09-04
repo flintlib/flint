@@ -720,9 +720,6 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
     TMP_END;
 }
 
-void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, nmod_mpoly_t B,
-                                         slong var, const nmod_mpoly_ctx_t ctx);
-
 void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(
     nmod_mpolyn_t A,
     const nmod_mpoly_ctx_t nctx,

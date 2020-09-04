@@ -209,11 +209,6 @@ FLINT_DLL void n_bpoly_fq_set_coeff_fq_nmod(
     const fq_nmod_t c,
     const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void n_bpoly_fq_set_fq_nmod_poly_var0(
-    n_bpoly_t A,
-    const fq_nmod_poly_t B,
-    const fq_nmod_ctx_t ctx);
-
 FLINT_DLL void n_bpoly_fq_set_fq_nmod_poly_var1(
     n_bpoly_t A,
     const fq_nmod_poly_t B,
@@ -278,17 +273,6 @@ FLINT_DLL void n_bpoly_fq_set(
 FLINT_DLL void n_bpoly_fq_make_primitive(
     n_poly_t g,
     n_bpoly_t A,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_bpoly_fq_taylor_shift_var1_fq_nmod(
-    n_bpoly_t A,
-    const n_bpoly_t B,
-    const fq_nmod_t c_,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_bpoly_fq_taylor_shift_var0_fq_nmod(
-    n_bpoly_t A,
-    const fq_nmod_t alpha,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_get_n_bpoly_fq(

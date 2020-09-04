@@ -231,15 +231,9 @@ FLINT_DLL void fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_div(fq_t rop, const fq_t op1,
-		                           const fq_t op2, const fq_ctx_t ctx);
-
 FLINT_DLL void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
-
-FLINT_DLL void fq_gcdinv(fq_t rop, fq_t inv,
-		                            const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
              const fq_ctx_t ctx);
@@ -285,8 +279,6 @@ FQ_INLINE int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_one(op);
 }
-
-FLINT_DLL int fq_is_invertible(const fq_t op, const fq_ctx_t ctx);
 
 /* Assignments and conversions ***********************************************/
 

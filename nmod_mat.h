@@ -66,7 +66,6 @@ mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
 }
 
 /* See inlines.c */
-FLINT_DLL void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
 
 NMOD_MAT_INLINE
 slong nmod_mat_nrows(const nmod_mat_t mat)

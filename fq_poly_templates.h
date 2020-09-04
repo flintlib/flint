@@ -303,11 +303,6 @@ FLINT_DLL void TEMPLATE3(T, poly_scalar_mul, T)(TEMPLATE(T, poly_t) rop,
                                  const TEMPLATE(T, t) x,
                                  const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void _TEMPLATE3(T, poly_scalar_addmul, T)(TEMPLATE(T, struct) *rop,
-                                     const TEMPLATE(T, struct) *op, slong len,
-                                     const TEMPLATE(T, t) x,
-                                     const TEMPLATE(T, ctx_t) ctx);
-
 FLINT_DLL void _TEMPLATE3(T, poly_scalar_div, T)(TEMPLATE(T, struct) *rop,
                                   const TEMPLATE(T, struct) *op, slong len,
                                   const TEMPLATE(T, t) x,

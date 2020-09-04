@@ -26,9 +26,6 @@ typedef struct
 }
 worker_t;
 
-void _fmpz_poly_taylor_shift_divconquer(fmpz * poly,
-                                                    const fmpz_t c, slong len);
-
 static void
 _fmpz_poly_taylor_shift_divconquer_worker(void * arg_ptr)
 {

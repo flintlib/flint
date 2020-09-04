@@ -1530,14 +1530,6 @@ FLINT_DLL void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1,
                           const fmpz_t d, ulong exp2,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
-FLINT_DLL void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp,
-             const ulong * Aexp,
-             slong l1, slong Alen, const ulong * mults, slong num, slong Abits);
-
-FLINT_DLL void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp,
-             const ulong * Aexp,
-             slong l1, slong Alen, ulong deg, slong num, slong Abits);
-
 FLINT_DLL slong fmpz_mpoly_append_array_sm1_LEX(fmpz_mpoly_t P,
                         slong Plen, ulong * coeff_array,
                   const ulong * mults, slong num, slong array_size, slong top);
