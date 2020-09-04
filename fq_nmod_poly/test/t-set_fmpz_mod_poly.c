@@ -12,19 +12,6 @@
 #include "fq_nmod_poly.h"
 #include "fmpz_mod_poly.h"
 
-
-
-#ifdef T
-#undef T
-#endif
-
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-
-#ifdef T
-
-#include "templates.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,17 +31,18 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong len;
-        TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, t) r, s;
-        TEMPLATE(T, poly_t) a;
+        fq_nmod_ctx_t ctx;
+        fq_nmod_t r, s;
+        fq_nmod_poly_t a;
         fmpz_mod_poly_t b;
         fmpz_t p;
         fmpz_mod_ctx_t ctxp;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        TEMPLATE(T, init)(r, ctx); TEMPLATE(T, init)(s, ctx);
-        TEMPLATE(T, poly_init)(a, ctx);
+        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_init(r, ctx);
+        fq_nmod_init(s, ctx);
+        fq_nmod_poly_init(a, ctx);
         fmpz_mod_ctx_init(ctxp, fq_nmod_ctx_prime(ctx));
         fmpz_mod_poly_init(b, ctxp);
         fmpz_init(p);
@@ -62,30 +50,29 @@ main(void)
         fmpz_mod_poly_randtest(b, state, len, ctxp);
         fmpz_randtest(p, state, 10);
         
-        TEMPLATE(T, poly_set_fmpz_mod_poly)(a, b, ctx);
-        TEMPLATE(T, set_fmpz)(r, p, ctx);
-        TEMPLATE3(T, poly_evaluate, T)(r, a, r, ctx);
+        fq_nmod_poly_set_fmpz_mod_poly(a, b, ctx);
+        fq_nmod_set_fmpz(r, p, ctx);
+        fq_nmod_poly_evaluate_fq_nmod(r, a, r, ctx);
         fmpz_mod_poly_evaluate_fmpz(p, b, p, ctxp);
-        TEMPLATE(T, set_fmpz)(s, p, ctx);
+        fq_nmod_set_fmpz(s, p, ctx);
 
-        result = TEMPLATE(T, equal)(r, s, ctx);
+        result = fq_nmod_equal(r, s, ctx);
         if (!result)
         {
             flint_printf("FAIL:\n\n");
-            flint_printf("CTX\n"), TEMPLATE(T, ctx_print(ctx)),
-                flint_printf("\n");
-            flint_printf("b = "), fmpz_mod_poly_print_pretty(b, "X", ctxp),
-                flint_printf("\n");
-            flint_printf("p = "), fmpz_print(p),
-                flint_printf("\n");
-            abort();
+            flint_printf("CTX\n"); fq_nmod_ctx_print(ctx);
+            flint_printf("\nb = "); fmpz_mod_poly_print_pretty(b, "X", ctxp);
+            flint_printf("\np = "); fmpz_print(p); flint_printf("\n");
+            flint_abort();
         }
 
-        TEMPLATE(T, clear)(r, ctx); TEMPLATE(T, clear)(s, ctx);
+        fq_nmod_clear(r, ctx);
+        fq_nmod_clear(s, ctx);
         fmpz_mod_poly_clear(b, ctxp);
         fmpz_mod_ctx_clear(ctxp);
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        fmpz_clear(p);
+        fq_nmod_poly_clear(a, ctx);
+        fq_nmod_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -93,7 +80,3 @@ main(void)
     return EXIT_SUCCESS;
 }
 
-#endif
-
-#undef CAP_T
-#undef T
