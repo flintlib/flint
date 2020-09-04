@@ -47,7 +47,7 @@ void test_poly(
             flint_abort();
         }
 
-        if (!fmpz_is_one(roots->poly[i].coeffs + 1) != 0)
+        if (!fmpz_is_one(roots->poly[i].coeffs + 1))
         {
             flint_printf("FAILED:\ncheck root is monic\n");
             flint_abort();
