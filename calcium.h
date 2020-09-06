@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include "flint/flint.h"
 #include "flint/fmpz.h"
+#include "acb.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,46 @@ extern "C" {
 const char * calcium_version(void);
 
 double calcium_test_multiplier(void);
+
+/* Input and output */
+
+typedef struct
+{
+    FILE * fp;
+    char * s;
+    slong len;
+    slong alloc;
+}
+calcium_stream_struct;
+
+typedef calcium_stream_struct calcium_stream_t[1];
+
+CALCIUM_INLINE
+void calcium_stream_init_file(calcium_stream_t out, FILE * fp)
+{
+    out->fp = fp;
+    out->s = NULL;
+}
+
+CALCIUM_INLINE
+void calcium_stream_init_str(calcium_stream_t out)
+{
+    out->fp = NULL;
+    out->s = NULL;
+    out->len = 0;
+    out->alloc = 0;
+}
+
+void calcium_write(calcium_stream_t out, const char * s);
+void calcium_write_si(calcium_stream_t out, slong x);
+void calcium_write_acb(calcium_stream_t out, const acb_t z, slong digits, ulong flags);
+
+CALCIUM_INLINE
+void calcium_write_free(calcium_stream_t out, char * s)
+{
+    calcium_write(out, s);
+    flint_free(s);
+}
 
 /* Triple-valued logic */
 

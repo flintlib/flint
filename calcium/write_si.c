@@ -11,10 +11,17 @@
 
 #include "calcium.h"
 
-const char * __calcium_version_string = "0.0.0";
-
-const char * calcium_version(void)
+void
+calcium_write_si(calcium_stream_t out, slong x)
 {
-    return __calcium_version_string;
+    if (out->fp != NULL)
+    {
+        flint_fprintf(out->fp, "%wd", x);
+    }
+    else
+    {
+        char tmp[22];
+        flint_sprintf(tmp, "%wd", x);
+        calcium_write(out, tmp);
+    }
 }
-

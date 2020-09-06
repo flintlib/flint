@@ -14,10 +14,24 @@
 void
 fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
-    flint_printf("(");
-    fmpz_mpoly_print_pretty(fmpz_mpoly_q_numref(f), x, ctx);
-    flint_printf(")/(");
-    fmpz_mpoly_print_pretty(fmpz_mpoly_q_denref(f), x, ctx);
-    flint_printf(")");
+    if (fmpz_mpoly_is_one(fmpz_mpoly_q_denref(f), ctx))
+    {
+        fmpz_mpoly_print_pretty(fmpz_mpoly_q_numref(f), x, ctx);
+    }
+    else if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(f), ctx))
+    {
+        flint_printf("(");
+        fmpz_mpoly_print_pretty(fmpz_mpoly_q_numref(f), x, ctx);
+        flint_printf(")/");
+        fmpz_mpoly_print_pretty(fmpz_mpoly_q_denref(f), x, ctx);
+    }
+    else
+    {
+        flint_printf("(");
+        fmpz_mpoly_print_pretty(fmpz_mpoly_q_numref(f), x, ctx);
+        flint_printf(")/(");
+        fmpz_mpoly_print_pretty(fmpz_mpoly_q_denref(f), x, ctx);
+        flint_printf(")");
+    }
 }
 

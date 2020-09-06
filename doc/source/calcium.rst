@@ -118,6 +118,46 @@ may be migrated upstream in the future.
     Hash function for integers. The algorithm may change;
     presently, this simply extracts the low word (with sign).
 
+Input and output
+-------------------------------------------------------------------------------
+
+.. type:: calcium_stream_struct
+
+.. type:: calcium_stream_t
+
+    A stream object which can hold either a file pointer or a
+    string (with automatic resizing).
+
+.. function:: void calcium_stream_init_file(calcium_stream_t out, FILE * fp)
+
+    Initializes the stream *out* for writing to the file *fp*.
+    The file can be *stdout*, *stderr*, or any file opened for writing
+    by the user.
+
+.. function:: void calcium_stream_init_str(calcium_stream_t out)
+
+    Initializes the stream *out* for writing to a string in memory.
+    When finished, the user should free the string (the *s* member
+    of *out* with ``flint_free()``).
+
+.. function:: void calcium_write(calcium_stream_t out, const char * s)
+
+    Writes the string *s* to *out*.
+
+.. function:: void calcium_write_free(calcium_stream_t out, char * s)
+
+    Writes *s* to *out* and then frees *s* by calling ``flint_free()``.
+
+.. function:: void calcium_write_si(calcium_stream_t out, slong x)
+
+    Writes the integer *x* to *out*.
+
+.. function:: void calcium_write_acb(calcium_stream_t out, const acb_t z, slong digits, ulong flags)
+
+    Writes the Arb complex number *z* to *out*, showing *digits*
+    digits and with the display style specified by *flags*
+    (``ARB_STR_NO_RADIUS``, etc.).
+
 
 
 .. raw:: latex
