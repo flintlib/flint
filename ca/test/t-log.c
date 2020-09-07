@@ -51,8 +51,8 @@ int main()
         if (!acb_overlaps(logax, ay))
         {
             flint_printf("FAIL (overlap)\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
             flint_printf("ax = "); acb_printn(ax, 30, ARB_STR_NO_RADIUS); flint_printf("\n\n");
             flint_printf("ay = "); acb_printn(ay, 30, ARB_STR_NO_RADIUS); flint_printf("\n\n");
             flint_printf("logax = "); acb_printn(logax, 30, ARB_STR_NO_RADIUS); flint_printf("\n\n");
@@ -122,15 +122,15 @@ int main()
         if (equal == T_FALSE || zero == T_FALSE)
         {
             flint_printf("FAIL (log(x * y * z) - log(x) - log(y) - log(z) != 0)\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("z = "); ca_print(z, ctx); flint_printf(" ~= "); ca_printn(z, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("a = "); ca_print(a, ctx); flint_printf(" ~= "); ca_printn(a, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("b = "); ca_print(b, ctx); flint_printf(" ~= "); ca_printn(b, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("c = "); ca_print(c, ctx); flint_printf(" ~= "); ca_printn(c, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("d = "); ca_print(d, ctx); flint_printf(" ~= "); ca_printn(d, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("e = "); ca_print(e, ctx); flint_printf(" ~= "); ca_printn(e, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("f = "); ca_print(f, ctx); flint_printf(" ~= "); ca_printn(f, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
+            flint_printf("z = "); ca_print(z, ctx); flint_printf("\n\n");
+            flint_printf("a = "); ca_print(a, ctx); flint_printf("\n\n");
+            flint_printf("b = "); ca_print(b, ctx); flint_printf("\n\n");
+            flint_printf("c = "); ca_print(c, ctx); flint_printf("\n\n");
+            flint_printf("d = "); ca_print(d, ctx); flint_printf("\n\n");
+            flint_printf("e = "); ca_print(e, ctx); flint_printf("\n\n");
+            flint_printf("f = "); ca_print(f, ctx); flint_printf("\n\n");
             flint_abort();
         }
 

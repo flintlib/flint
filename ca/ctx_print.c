@@ -14,7 +14,7 @@
 #include "ca_field.h"
 
 void
-ca_ctx_print(const ca_ctx_t ctx)
+ca_ctx_print(ca_ctx_t ctx)
 {
     slong i;
 

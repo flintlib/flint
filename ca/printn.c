@@ -12,11 +12,11 @@
 #include "ca.h"
 
 void
-ca_printn(const ca_t x, slong n, ulong flags, ca_ctx_t ctx)
+ca_printn(const ca_t x, slong n, ca_ctx_t ctx)
 {
-    acb_t t;
-    acb_init(t);
-    ca_get_acb(t, x, n * 3.33 + 64, ctx);
-    acb_printn(t, n, flags);
-    acb_clear(t);
+    ulong save_flags;
+    save_flags = ctx->options[CA_OPT_PRINT_FLAGS];
+    ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_N | (CA_PRINT_DIGITS * n);
+    ca_print(x, ctx);
+    ctx->options[CA_OPT_PRINT_FLAGS] = save_flags;
 }

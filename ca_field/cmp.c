@@ -114,6 +114,13 @@ _fmpz_mpoly_q_cmp(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, fmpz_mpoly_ctx
     return _fmpz_mpoly_cmp2(fmpz_mpoly_q_numref(x), fmpz_mpoly_q_numref(y), ctx);
 }
 
+static __inline__ slong si_sign(slong x)
+{
+    if (x != 0)
+        x = (x > 0) ? 1 : -1;
+    return x;
+}
+
 int
 ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
@@ -133,15 +140,15 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (CA_FIELD_IS_QQ(xfield))
     {
-        return fmpq_cmp(CA_FMPQ(x), CA_FMPQ(y));
+        return si_sign(fmpq_cmp(CA_FMPQ(x), CA_FMPQ(y)));
     }
     else if (CA_FIELD_IS_NF(xfield))
     {
-        return _nf_elem_cmp(CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(xfield));
+        return si_sign(_nf_elem_cmp(CA_NF_ELEM(x), CA_NF_ELEM(y), CA_FIELD_NF(xfield)));
     }
     else
     {
-        return _fmpz_mpoly_q_cmp(CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(xfield, ctx));
+        return si_sign(_fmpz_mpoly_q_cmp(CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(xfield, ctx)));
     }
 }
 

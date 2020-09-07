@@ -14,7 +14,7 @@
 #include "ca_field.h"
 
 void
-ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
+ca_field_print(const ca_field_t K, ca_ctx_t ctx)
 {
     slong i, len, ideal_len;
 

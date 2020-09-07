@@ -81,7 +81,7 @@ CA_EXT_INLINE ulong ca_ext_hash(const ca_ext_t x, ca_ctx_t ctx)
 int ca_ext_equal_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx);
 int ca_ext_cmp_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx);
 
-void ca_ext_print(const ca_ext_t x, const ca_ctx_t ctx);
+void ca_ext_print(const ca_ext_t x, ca_ctx_t ctx);
 
 void ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx);
 

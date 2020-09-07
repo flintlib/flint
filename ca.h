@@ -206,6 +206,7 @@ typedef ca_field_cache_struct ca_field_cache_t[1];
 enum
 {
     CA_OPT_VERBOSE,
+    CA_OPT_PRINT_FLAGS,
     CA_OPT_PREC_LIMIT,
     CA_OPT_QQBAR_DEG_LIMIT,
     CA_OPT_LOW_PREC,
@@ -237,7 +238,7 @@ typedef ca_ctx_struct ca_ctx_t[1];
 
 void ca_ctx_init(ca_ctx_t ctx);
 void ca_ctx_clear(ca_ctx_t ctx);
-void ca_ctx_print(const ca_ctx_t ctx);
+void ca_ctx_print(ca_ctx_t ctx);
 
 ca_field_ptr _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func);
 ca_field_ptr _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x);
@@ -311,8 +312,19 @@ int ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx);
 
-void ca_print(const ca_t x, const ca_ctx_t ctx);
-void ca_printn(const ca_t x, slong n, ulong flags, ca_ctx_t ctx);
+/* Printing */
+
+#define CA_PRINT_N         UWORD(1)
+#define CA_PRINT_REPR      UWORD(2)
+#define CA_PRINT_FIELD     UWORD(4)
+#define CA_PRINT_DIGITS    UWORD(16)
+#define CA_PRINT_DEFAULT   (CA_PRINT_N | CA_PRINT_REPR)
+#define CA_PRINT_DEBUG     (CA_PRINT_N | CA_PRINT_REPR | CA_PRINT_FIELD)
+
+void ca_print(const ca_t x, ca_ctx_t ctx);
+void ca_fprint(FILE * fp, const ca_t x, ca_ctx_t ctx);
+void ca_printn(const ca_t x, slong n, ca_ctx_t ctx);
+char * ca_get_str(const ca_t x, ca_ctx_t ctx);
 
 /* Random generation */
 

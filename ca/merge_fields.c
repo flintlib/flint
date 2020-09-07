@@ -115,7 +115,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
                 ix++;
                 iy++;
             }
-            else if (cmp == -1)
+            else if (cmp < 0)
             {
                 ext[ext_len] = CA_FIELD_EXT_ELEM(xfield, ix);
                 xgen_map[ix] = ext_len;

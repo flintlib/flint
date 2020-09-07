@@ -24,7 +24,7 @@ _fmpz_poly_compare_abslex(const fmpz * a, const fmpz * b, slong len)
             c = fmpz_cmpabs(a + i, b + i);
 
             if (c != 0)
-                return c;
+                return (c > 0) ? 1 : -1;
 
             return fmpz_sgn(a + i);
         }

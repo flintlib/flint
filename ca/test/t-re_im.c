@@ -49,10 +49,10 @@ int main()
         if (equal == T_FALSE)
         {
             flint_printf("FAIL (re(x) + im(x)*i != x)\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("rex = "); ca_print(rex, ctx); flint_printf(" ~= "); ca_printn(rex, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("imx = "); ca_print(imx, ctx); flint_printf(" ~= "); ca_printn(imx, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("rex = "); ca_print(rex, ctx); flint_printf("\n\n");
+            flint_printf("imx = "); ca_print(imx, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
             flint_abort();
         }
 
@@ -71,11 +71,11 @@ int main()
         if (equal == T_FALSE)
         {
             flint_printf("FAIL (sqrt(re(x)^2 + im(x)^2) != abs(x))\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("rex = "); ca_print(rex, ctx); flint_printf(" ~= "); ca_printn(rex, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("imx = "); ca_print(imx, ctx); flint_printf(" ~= "); ca_printn(imx, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("absx = "); ca_print(absx, ctx); flint_printf(" ~= "); ca_printn(absx, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("rex = "); ca_print(rex, ctx); flint_printf("\n\n");
+            flint_printf("imx = "); ca_print(imx, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
+            flint_printf("absx = "); ca_print(absx, ctx); flint_printf("\n\n");
             flint_abort();
         }
 

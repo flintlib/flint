@@ -5,14 +5,14 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-#define START(expr) flint_printf("["); flint_printf(expr)
+#define START(expr) flint_printf(">>> "); flint_printf(expr)
 #define OUT \
-    flint_printf("]   =   "); \
+    flint_printf("\n"); \
     ca_print(x, ctx); flint_printf("\n\n");
 #define OUT2 \
-    flint_printf("]   =\n"); \
+    flint_printf("\n"); \
     ca_print(x, ctx); flint_printf("\n"); \
-    flint_printf("          Is zero?   "); truth_print(ca_check_is_zero(x, ctx)); \
+    flint_printf(">>> Is zero?\n"); truth_print(ca_check_is_zero(x, ctx)); \
     flint_printf("\n\n");
 
 
@@ -153,8 +153,9 @@ int main(int argc, char *argv[])
     ca_pow_ui(y, y, 3, ctx);
     ca_add_ui(y, y, 744, ctx);
     ca_sub(x, x, y, ctx);
-    OUT2
+    OUT
 
+    flint_printf("\n");
     ca_clear(x, ctx);
     ca_clear(y, ctx);
     ca_clear(z, ctx);

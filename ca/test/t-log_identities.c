@@ -163,7 +163,7 @@ int main()
                     flint_printf("%wd %wd   ", c, q);
                 }
                 flint_printf("\n\n");
-                flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+                flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
                 flint_abort();
             }
         }
@@ -198,7 +198,7 @@ int main()
                     flint_printf("%wd %wd   ", c, q);
                 }
                 flint_printf("\n\n");
-                flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+                flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
                 flint_abort();
             }
         }

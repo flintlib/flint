@@ -54,9 +54,9 @@ int main()
         if (equal == T_FALSE)
         {
             flint_printf("FAIL (sqrt(x)^2 != x)\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("z = "); ca_print(z, ctx); flint_printf(" ~= "); ca_printn(z, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
+            flint_printf("z = "); ca_print(z, ctx); flint_printf("\n\n");
             flint_abort();
         }
 
@@ -67,9 +67,9 @@ int main()
         if (equal == T_FALSE)
         {
             flint_printf("FAIL: sqrt(x) != sqrt_inert(x)\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("z = "); ca_print(z, ctx); flint_printf(" ~= "); ca_printn(z, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
+            flint_printf("z = "); ca_print(z, ctx); flint_printf("\n\n");
             flint_abort();
         }
 

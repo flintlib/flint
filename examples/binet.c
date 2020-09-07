@@ -45,11 +45,6 @@ int main(int argc, char *argv[])
 
     ca_print(t, ctx);
     flint_printf("\n");
-    if (!CA_IS_QQ(t, ctx))
-    {
-        ca_printn(t, 50, ARB_STR_NO_RADIUS, ctx);
-        flint_printf("\n");
-    }
 
     ca_clear(sqrt5, ctx);
     ca_clear(phi, ctx);

@@ -166,6 +166,11 @@ Context objects
     This function should only be called after all :type:`ca_t` instances
     referring to this context have been cleared.
 
+.. function:: void ca_ctx_print(const ca_ctx_t ctx)
+
+    Prints a description of the context *ctx* to standard output.
+    This will give a complete listing of the cached fields in *ctx*.
+
 Memory management for numbers
 -------------------------------------------------------------------------------
 
@@ -192,25 +197,108 @@ Memory management for numbers
     Clears an array of *n* initialized :type:`ca_struct` entries.
     This also frees the array *v*.
 
-Input and output
+Printing
 -------------------------------------------------------------------------------
 
-.. function:: void ca_ctx_print(const ca_ctx_t ctx)
+The style of printed output is controlled by
+``ctx->options[CA_OPT_PRINT_FLAGS]`` which can be set to any
+combination of the following flags:
 
-    Prints a description of the context *ctx* to standard output.
-    This will give a complete listing of the cached fields in *ctx*.
+.. macro:: CA_PRINT_N
+
+    Print a decimal approximation of the number.
+    The approximation is guaranteed to be correctly rounded to within
+    one unit in the last place.
+
+    If combined with ``CA_PRINT_REPR``, numbers appearing
+    within the symbolic representation will also be printed with
+    decimal approximations.
+
+.. macro:: CA_PRINT_DIGITS
+
+    Multiplied by a positive integer, specifies the number of
+    decimal digits to show with ``CA_PRINT_N``. If not given,
+    the default precision is six digits.
+
+.. macro:: CA_PRINT_REPR
+
+    Print the symbolic representation of the number (including
+    its recursive elements). If used together with ``CA_PRINT_N``,
+    field elements will print as ``decimal {symbolic}`` while
+    extension numbers will print as ``decimal [symbolic]``.
+
+    All extension numbers appearing in the field defining ``x``
+    and in the inner constructions of those extension numbers
+    will be given local labels ``a``, ``b``, etc. for this printing.
+
+.. macro:: CA_PRINT_FIELD
+
+    For each field element, explicitly print its formal field
+    along with its reduction ideal if present, e.g. ``QQ`` or
+    ``QQ(a,b,c) / <a-b, c^2+1>``.
+
+.. macro:: CA_PRINT_DEFAULT
+
+    The default print style. Equivalent to ``CA_PRINT_N | CA_PRINT_REPR``.
+
+.. macro:: CA_PRINT_DEBUG
+
+    Verbose print style for debugging. Equivalent to ``CA_PRINT_N | CA_PRINT_REPR | CA_PRINT_FIELD``.
+
+As a special case, small integers are always printed
+as simple literals.
+
+As illustration, here are the numbers
+`-7`, `2/3`, `(\sqrt{3}+5)/2` and `\sqrt{2} (\log(\pi) + \pi i)`
+printed in various styles::
+
+    # CA_PRINT_DEFAULT
+    -7
+    0.666667 {2/3}
+    3.36603 {(a+5)/2 where a = 1.73205 [a^2-3=0]}
+    1.61889 + 4.44288*I {a*c+b*c*d where a = 1.14473 [Log(3.14159 {b})], b = 3.14159 [Pi], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+
+    # CA_PRINT_N
+    -7
+    0.666667
+    3.36603
+    1.61889 + 4.44288*I
+
+    # CA_PRINT_N | (CA_PRINT_DIGITS * 20)
+    -7
+    0.66666666666666666667
+    3.3660254037844386468
+    1.6188925298220266685 + 4.4428829381583662470*I
+
+    # CA_PRINT_REPR
+    -7
+    2/3
+    (a+5)/2 where a = [a^2-3=0]
+    a*c+b*c*d where a = Log(b), b = Pi, c = [c^2-2=0], d = [d^2+1=0]
+
+    # CA_PRINT_DEBUG
+    -7
+    0.666667 {2/3  in  QQ}
+    3.36603 {(a+5)/2  in  QQ(a)/<a^2-3> where a = 1.73205 [a^2-3=0]}
+    1.61889 + 4.44288*I {a*c+b*c*d  in  QQ(a,b,c,d)/<c^2-2, d^2+1> where a = 1.14473 [Log(3.14159 {b  in  QQ(b)})], b = 3.14159 [Pi], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
 
 .. function:: void ca_print(const ca_t x, const ca_ctx_t ctx)
 
-    Prints a symbolic description of *x* to standard output.
+    Prints *x* to standard output.
 
-.. function:: void ca_printn(const ca_t x, slong n, ulong flags, const ca_ctx_t ctx)
+.. function:: void ca_fprint(FILE * fp, const ca_t x, const ca_ctx_t ctx)
+
+    Prints *x* to the file *fp*.
+
+.. function:: char * ca_get_str(const ca_t x, const ca_ctx_t ctx)
+
+    Prints *x* to a string which is returned.
+    The user should free this string by calling ``flint_free``.
+
+.. function:: void ca_printn(const ca_t x, slong n, const ca_ctx_t ctx)
 
     Prints an *n*-digit numerical representation of *x* to standard output.
-    This is equivalent to calling :func:`ca_get_acb` followed by
-    *acb_printn*; the *flags* are forwarded. In particular, *flags*
-    may be set to some combination of ``ARB_STR_NO_RADIUS``,
-    ``ARB_STR_MORE``, ``ARB_STR_CONDENSE`` (multiplied by some integer).
+
 
 Assignment and specific values
 -------------------------------------------------------------------------------

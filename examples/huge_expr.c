@@ -7192,8 +7192,8 @@ void main_ca()
     ca_neg(E, E, ctx);
     TIMEIT_ONCE_STOP
 
-    flint_printf("N ~ "); ca_printn(N, 50, ARB_STR_NO_RADIUS, ctx); flint_printf("\n");
-    flint_printf("E ~ "); ca_printn(E, 50, ARB_STR_NO_RADIUS, ctx); flint_printf("\n");
+    flint_printf("N ~ "); ca_printn(N, 50, ctx); flint_printf("\n");
+    flint_printf("E ~ "); ca_printn(E, 50, ctx); flint_printf("\n");
 
     ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 10000;
 

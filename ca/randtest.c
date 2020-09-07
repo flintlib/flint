@@ -50,6 +50,10 @@ ca_randtest(ca_t res, flint_rand_t state, slong len, slong bits, ca_ctx_t ctx)
             case 3:
                 ca_pi_i(res, ctx);
                 break;
+            case 4:
+                ca_set_si(res, -6 + (slong) n_randint(state, 13), ctx);
+                ca_sqrt(res, res, ctx);
+                break;
             default:
                 ca_randtest_rational(res, state, bits, ctx);
                 break;

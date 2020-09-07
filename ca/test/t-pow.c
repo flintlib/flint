@@ -58,14 +58,14 @@ int main()
         if (equal == T_FALSE)
         {
             flint_printf("FAIL x^a * x^b = x^(a+b)\n\n");
-            flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("a = "); ca_print(a, ctx); flint_printf(" ~= "); ca_printn(a, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("b = "); ca_print(b, ctx); flint_printf(" ~= "); ca_printn(b, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("xa = "); ca_print(xa, ctx); flint_printf(" ~= "); ca_printn(xa, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("xb = "); ca_print(xb, ctx); flint_printf(" ~= "); ca_printn(xb, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("xaxb = "); ca_print(xaxb, ctx); flint_printf(" ~= "); ca_printn(xaxb, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("ab = "); ca_print(ab, ctx); flint_printf(" ~= "); ca_printn(ab, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
-            flint_printf("xab = "); ca_print(xab, ctx); flint_printf(" ~= "); ca_printn(xab, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("a = "); ca_print(a, ctx); flint_printf("\n\n");
+            flint_printf("b = "); ca_print(b, ctx); flint_printf("\n\n");
+            flint_printf("xa = "); ca_print(xa, ctx); flint_printf("\n\n");
+            flint_printf("xb = "); ca_print(xb, ctx); flint_printf("\n\n");
+            flint_printf("xaxb = "); ca_print(xaxb, ctx); flint_printf("\n\n");
+            flint_printf("ab = "); ca_print(ab, ctx); flint_printf("\n\n");
+            flint_printf("xab = "); ca_print(xab, ctx); flint_printf("\n\n");
             flint_abort();
         }
 
