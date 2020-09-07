@@ -20,6 +20,14 @@ Source code: https://github.com/fredrik-johansson/calcium
 This documentation is available in HTML format at http://fredrikj.net/calcium/
 and in PDF format at http://fredrikj.net/calcium/calcium.pdf.
 
+General information
+---------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   setup.rst
+
 Example programs
 ---------------------------
 
