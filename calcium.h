@@ -31,6 +31,14 @@ extern "C" {
 
 const char * calcium_version(void);
 
+#define __CALCIUM_VERSION 0
+#define __CALCIUM_VERSION_MINOR 1
+#define __CALCIUM_VERSION_PATCHLEVEL 0
+#define CALCIUM_VERSION "0.1.0"
+#define __CALCIUM_RELEASE (__CALCIUM_VERSION * 10000 + \
+                         __CALCIUM_VERSION_MINOR * 100 + \
+                         __CALCIUM_VERSION_PATCHLEVEL)
+
 double calcium_test_multiplier(void);
 
 /* Input and output */

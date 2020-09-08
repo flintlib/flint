@@ -20,12 +20,14 @@ and `Arb <http://arblib.org/>`_.
 
 This documentation is available in HTML format at http://fredrikj.net/calcium/
 and in PDF format at http://fredrikj.net/calcium/calcium.pdf.
+This edition of the documentation was updated
+|today| and describes Calcium |version|.
 
 General information
 ---------------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    introduction.rst
    setup.rst
@@ -59,6 +61,15 @@ Credits and references
    :maxdepth: 2
 
    bibliography.rst
+
+Version history
+======================
+
+.. toctree::
+   :maxdepth: 1
+
+   history.rst
+
 
 .. only:: html
 

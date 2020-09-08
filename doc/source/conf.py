@@ -29,6 +29,13 @@ version = u''
 # The full version, including alpha/beta/rc tags
 release = u''
 
+for _line in open("../../calcium.h").readlines():
+    if _line.startswith("#define CALCIUM_VERSION"):
+        _i1 = _line.find('"')
+        _i2 = _line.find('"', _i1 + 1)
+        version = _line[_i1+1:_i2]
+        release = version
+
 
 # -- General configuration ---------------------------------------------------
 
