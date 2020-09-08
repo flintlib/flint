@@ -45,19 +45,29 @@ int main()
         ca_field_cache_t cache;
         ca_field_struct *K, *K2;
         qqbar_t x;
+        ca_t v;
         slong i, j, steps, len, ext_len;
 
         ca_ctx_init(ctx);
         qqbar_init(x);
+        ca_init(v, ctx);
 
-        ext_len = 1 + n_randint(state, 100);
+        ext_len = 1 + n_randint(state, 10);
         steps = n_randint(state, 100);
 
         all_ext = flint_malloc(sizeof(ca_ext_struct) * ext_len);
         for (j = 0; j < ext_len; j++)
         {
-            qqbar_set_ui(x, j);
-            ca_ext_init_qqbar(all_ext + j, x, ctx);
+            if (n_randint(state, 10) != 0)
+            {
+                ca_set_ui(v, j + 2, ctx);
+                ca_ext_init_fx(all_ext + j, CA_RiemannZeta, v, ctx);
+            }
+            else
+            {
+                qqbar_set_ui(x, j);
+                ca_ext_init_qqbar(all_ext + j, x, ctx);
+            }
         }
 
         ca_field_cache_init(cache, ctx);
@@ -95,6 +105,7 @@ int main()
         flint_free(all_ext);
 
         ca_field_cache_clear(cache, ctx);
+        ca_clear(v, ctx);
         ca_ctx_clear(ctx);
         qqbar_clear(x);
     }
