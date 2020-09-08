@@ -25,11 +25,13 @@ int
 main(void)
 {
     int iter;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("factor_squarefree....");
     fflush(stdout);
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
     {
@@ -41,28 +43,29 @@ main(void)
         slong length, i, j, num;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, modulus);
 
-        fmpz_mod_poly_init(pol1, modulus);
-        fmpz_mod_poly_init(poly, modulus);
-        fmpz_mod_poly_init(quot, modulus);
-        fmpz_mod_poly_init(rem, modulus);
+        fmpz_mod_poly_init(pol1, ctx);
+        fmpz_mod_poly_init(poly, ctx);
+        fmpz_mod_poly_init(quot, ctx);
+        fmpz_mod_poly_init(rem, ctx);
 
-        fmpz_mod_poly_zero(pol1);
-        fmpz_mod_poly_set_coeff_ui(pol1, 0, 1);
+        fmpz_mod_poly_zero(pol1, ctx);
+        fmpz_mod_poly_set_coeff_ui(pol1, 0, 1, ctx);
 
         length = n_randint(state, 7) + 2;
 
         do
         {
-            fmpz_mod_poly_randtest(poly, state, length);
-            fmpz_mod_poly_make_monic(poly, poly);
+            fmpz_mod_poly_randtest(poly, state, length, ctx);
+            fmpz_mod_poly_make_monic(poly, poly, ctx);
         }
-        while ((!fmpz_mod_poly_is_irreducible(poly)) || (poly->length < 2));
+        while ((!fmpz_mod_poly_is_irreducible(poly, ctx)) || (poly->length < 2));
         exp[0] = n_randprime(state, 5, 0);
 
         prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
-            fmpz_mod_poly_mul(pol1, pol1, poly);
+            fmpz_mod_poly_mul(pol1, pol1, poly, ctx);
 
         num = n_randint(state, 5) + 1;
         for (i = 1; i < num; i++)
@@ -70,14 +73,14 @@ main(void)
             do
             {
                 length = n_randint(state, 7) + 2;
-                fmpz_mod_poly_randtest(poly, state, length);
+                fmpz_mod_poly_randtest(poly, state, length, ctx);
                 if (poly->length)
                 {
-                    fmpz_mod_poly_make_monic(poly, poly);
-                    fmpz_mod_poly_divrem(quot, rem, pol1, poly);
+                    fmpz_mod_poly_make_monic(poly, poly, ctx);
+                    fmpz_mod_poly_divrem(quot, rem, pol1, poly, ctx);
                 }
             }
-            while ((!fmpz_mod_poly_is_irreducible(poly)) ||
+            while ((!fmpz_mod_poly_is_irreducible(poly, ctx)) ||
                    (poly->length < 2) || (rem->length == 0));
 
             do
@@ -86,11 +89,11 @@ main(void)
 
             prod1 *= exp[i];
             for (j = 0; j < exp[i]; j++)
-                fmpz_mod_poly_mul(pol1, pol1, poly);
+                fmpz_mod_poly_mul(pol1, pol1, poly, ctx);
         }
 
-        fmpz_mod_poly_factor_init(res);
-        fmpz_mod_poly_factor_squarefree(res, pol1);
+        fmpz_mod_poly_factor_init(res, ctx);
+        fmpz_mod_poly_factor_squarefree(res, pol1, ctx);
 
         result &= (res->num == num);
         if (result)
@@ -116,13 +119,14 @@ main(void)
         }
 
         fmpz_clear(modulus);
-        fmpz_mod_poly_clear(quot);
-        fmpz_mod_poly_clear(rem);
-        fmpz_mod_poly_clear(pol1);
-        fmpz_mod_poly_clear(poly);
-        fmpz_mod_poly_factor_clear(res);
+        fmpz_mod_poly_clear(quot, ctx);
+        fmpz_mod_poly_clear(rem, ctx);
+        fmpz_mod_poly_clear(pol1, ctx);
+        fmpz_mod_poly_clear(poly, ctx);
+        fmpz_mod_poly_factor_clear(res, ctx);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

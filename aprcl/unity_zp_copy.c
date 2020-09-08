@@ -14,6 +14,9 @@
 void
 unity_zp_copy(unity_zp f, const unity_zp g)
 {
-    fmpz_mod_poly_set(f->poly, g->poly);
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(g->ctx)));
+
+    fmpz_mod_poly_set(f->poly, g->poly, f->ctx);
 }
 

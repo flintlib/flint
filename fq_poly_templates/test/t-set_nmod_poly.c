@@ -42,7 +42,7 @@ main(void)
         TEMPLATE(T, ctx_randtest)(ctx, state);
         TEMPLATE(T, init)(r, ctx); TEMPLATE(T, init)(s, ctx);
         TEMPLATE(T, poly_init)(a, ctx);
-        nmod_poly_init(b, ctx->p);
+        nmod_poly_init(b, fmpz_get_ui(TEMPLATE(T, ctx_prime)(ctx)));
 
         nmod_poly_randtest(b, state, len);
         p = n_randint(state, 10);

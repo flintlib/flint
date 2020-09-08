@@ -17,7 +17,8 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp)
+fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong i;
 

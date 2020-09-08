@@ -49,8 +49,10 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
     return r;
 }
 
-int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly)
+int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly,
+                                                      const fmpz_mod_ctx_t ctx)
 {
-    return _fmpz_mod_poly_fprint(file, poly->coeffs, poly->length, &(poly->p));
+   return _fmpz_mod_poly_fprint(file, poly->coeffs, poly->length,
+                                                    fmpz_mod_ctx_modulus(ctx));
 }
 

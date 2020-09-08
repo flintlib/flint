@@ -48,7 +48,9 @@ _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz
     return res;
 }
 
-int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f)
+int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f,
+                                                      const fmpz_mod_ctx_t ctx)
 {
-    return _fmpz_mod_poly_is_squarefree_f(fac, f->coeffs, f->length, &f->p);
+        return _fmpz_mod_poly_is_squarefree_f(fac, f->coeffs, f->length,
+                                                    fmpz_mod_ctx_modulus(ctx));
 }

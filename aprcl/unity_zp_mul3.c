@@ -32,12 +32,12 @@ unity_zp_mul3(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     */
 
     /* set xi */
-    fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1);
+    fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1, g->ctx);
 
     /* set yi */
-    fmpz_mod_poly_get_coeff_fmpz(t[2], h->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[3], h->poly, 1);
+    fmpz_mod_poly_get_coeff_fmpz(t[2], h->poly, 0, h->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[3], h->poly, 1, h->ctx);
 
     fmpz_mul(t[6], t[0], t[2]);             /*  d1 = x0 * y0    */
     fmpz_mul(t[7], t[1], t[3]);             /*  d2 = x1 * y1    */
@@ -76,20 +76,20 @@ unity_zp_mul9(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     */
 
     /* set xi */
-    fmpz_mod_poly_get_coeff_fmpz(t[20], g->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[21], g->poly, 1);
-    fmpz_mod_poly_get_coeff_fmpz(t[22], g->poly, 2);
-    fmpz_mod_poly_get_coeff_fmpz(t[23], g->poly, 3);
-    fmpz_mod_poly_get_coeff_fmpz(t[24], g->poly, 4);
-    fmpz_mod_poly_get_coeff_fmpz(t[25], g->poly, 5);
+    fmpz_mod_poly_get_coeff_fmpz(t[20], g->poly, 0, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[21], g->poly, 1, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[22], g->poly, 2, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[23], g->poly, 3, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[24], g->poly, 4, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[25], g->poly, 5, g->ctx);
 
     /* set yi */
-    fmpz_mod_poly_get_coeff_fmpz(t[26], h->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[27], h->poly, 1);
-    fmpz_mod_poly_get_coeff_fmpz(t[28], h->poly, 2);
-    fmpz_mod_poly_get_coeff_fmpz(t[29], h->poly, 3);
-    fmpz_mod_poly_get_coeff_fmpz(t[30], h->poly, 4);
-    fmpz_mod_poly_get_coeff_fmpz(t[31], h->poly, 5);
+    fmpz_mod_poly_get_coeff_fmpz(t[26], h->poly, 0, h->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[27], h->poly, 1, h->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[28], h->poly, 2, h->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[29], h->poly, 3, h->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[30], h->poly, 4, h->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[31], h->poly, 5, h->ctx);
 
     fmpz_set(t[0], t[20]);                  /*  set a0 = x0     */
     fmpz_set(t[1], t[21]);                  /*  set a1 = x1     */

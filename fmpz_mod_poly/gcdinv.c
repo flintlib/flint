@@ -44,7 +44,8 @@ slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
 }
 
 void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
-                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong lenA = A->length, lenB = B->length;
 
@@ -57,20 +58,21 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     {
         fmpz_mod_poly_t T;
 
-        fmpz_mod_poly_init(T, &A->p);
-        fmpz_mod_poly_rem(T, A, B);
-        fmpz_mod_poly_gcdinv(G, S, T, B);
-        fmpz_mod_poly_clear(T);
+        fmpz_mod_poly_init(T, ctx);
+        fmpz_mod_poly_rem(T, A, B, ctx);
+        fmpz_mod_poly_gcdinv(G, S, T, B, ctx);
+        fmpz_mod_poly_clear(T, ctx);
         return;
     }
 
     if (lenA == 0)
     {
-        fmpz_mod_poly_zero(G);
-        fmpz_mod_poly_zero(S);
+        fmpz_mod_poly_zero(G, ctx);
+        fmpz_mod_poly_zero(S, ctx);
     } 
     else
     {
+        const fmpz * p = fmpz_mod_ctx_modulus(ctx);
         fmpz *g, *s;
         slong lenG;
 
@@ -80,7 +82,7 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         }
         else
         {
-            fmpz_mod_poly_fit_length(G, lenA);
+            fmpz_mod_poly_fit_length(G, lenA, ctx);
             g = G->coeffs;
         }
         if (S == A || S == B)
@@ -89,12 +91,11 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         }
         else
         {
-            fmpz_mod_poly_fit_length(S, lenB - 1);
+            fmpz_mod_poly_fit_length(S, lenB - 1, ctx);
             s = S->coeffs;
         }
 
-        lenG = _fmpz_mod_poly_gcdinv(g, s, 
-                A->coeffs, lenA, B->coeffs, lenB, &A->p);
+        lenG = _fmpz_mod_poly_gcdinv(g, s, A->coeffs, lenA, B->coeffs, lenB, p);
 
         if (G == A || G == B)
         {
@@ -113,14 +114,14 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         _fmpz_mod_poly_set_length(S, lenB - lenG);
         _fmpz_mod_poly_normalise(S);
 
-        if (!fmpz_is_one(fmpz_mod_poly_lead(G)))
+        if (!fmpz_is_one(fmpz_mod_poly_lead(G, ctx)))
         {
             fmpz_t inv;
 
             fmpz_init(inv);
-            fmpz_invmod(inv, fmpz_mod_poly_lead(G), &A->p);
-            fmpz_mod_poly_scalar_mul_fmpz(G, G, inv);
-            fmpz_mod_poly_scalar_mul_fmpz(S, S, inv);
+            fmpz_invmod(inv, fmpz_mod_poly_lead(G, ctx), p);
+            fmpz_mod_poly_scalar_mul_fmpz(G, G, inv, ctx);
+            fmpz_mod_poly_scalar_mul_fmpz(S, S, inv, ctx);
             fmpz_clear(inv);
         }
     }

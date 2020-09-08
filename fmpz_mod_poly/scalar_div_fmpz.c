@@ -43,26 +43,27 @@ void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
     fmpz_clear(g);
 }
 
-void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res, 
-                                   const fmpz_mod_poly_t poly, const fmpz_t x)
+void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res,
+          const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx)
 {
 
     if (fmpz_is_zero(x))
     {
-        if (fmpz_is_one(fmpz_mod_poly_modulus(poly)))
+        if (fmpz_is_one(fmpz_mod_ctx_modulus(ctx)))
         {
-            fmpz_mod_poly_set(res, poly);
+            fmpz_mod_poly_set(res, poly, ctx);
             return;
-        } else
+        }
+        else
         {
             flint_printf("Exception (fmpz_mod_poly_scalar_div_fmpz). Division by zero.\n");
             flint_abort();
         }
     }
 
-    fmpz_mod_poly_fit_length(res, poly->length);
-    _fmpz_mod_poly_scalar_div_fmpz(res->coeffs, 
-                                   poly->coeffs, poly->length, x, &(poly->p));
+    fmpz_mod_poly_fit_length(res, poly->length, ctx);
+    _fmpz_mod_poly_scalar_div_fmpz(res->coeffs, poly->coeffs, poly->length,
+                                                 x, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, poly->length);
     _fmpz_mod_poly_normalise(res);

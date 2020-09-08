@@ -34,7 +34,8 @@ int main(void)
         p = n_randprime(state, 2 + n_randint(state, 16), 0);
         q = n_randprime(state, 2 + n_randint(state, 16), 0);
 
-        fmpz_randtest_not_zero(n, state, 200);
+        fmpz_randtest_unsigned(n, state, 200);
+        fmpz_add_ui(n, n, 1);
 
         unity_zpq_init(f, q, p, n);
         unity_zpq_clear(f);

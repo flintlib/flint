@@ -218,6 +218,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_stru
                                                 const fmpz_mod_poly_t g,
                                                 const fmpz_mod_poly_t poly,
                                                 const fmpz_mod_poly_t polyinv,
+                                               const fmpz_mod_ctx_t ctx,
                                             thread_pool_handle * threads,
                                             slong num_threads)
 {                                            
@@ -230,20 +231,20 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_stru
     if (len2 == 1)
     {
         for (i = 0; i < n; i++)
-            fmpz_mod_poly_zero(res + i);
+            fmpz_mod_poly_zero(res + i, ctx);
     }
 
     if (len2 == 2)
     {
         for (i = 0; i < n; i++)
-            fmpz_mod_poly_set(res + i, polys + i);
+            fmpz_mod_poly_set(res + i, polys + i, ctx);
 
         return;
     }
 
     for (i = 0; i < n; i++)
     {
-        fmpz_mod_poly_fit_length(res + i, len2 - 1);
+        fmpz_mod_poly_fit_length(res + i, len2 - 1, ctx);
         _fmpz_mod_poly_set_length(res + i, len2 - 1);
     }
 
@@ -253,7 +254,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_stru
                                                      poly->coeffs, len2,
                                                      polyinv->coeffs,
                                                      polyinv->length,
-                                                     &poly->p,
+                                                     fmpz_mod_ctx_modulus(ctx),
                                                      threads,
                                                      num_threads);
 
@@ -267,7 +268,8 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
                                             slong len1, slong n,
                                             const fmpz_mod_poly_t g,
                                             const fmpz_mod_poly_t poly,
-                                            const fmpz_mod_poly_t polyinv)
+                                            const fmpz_mod_poly_t polyinv,
+                                            const fmpz_mod_ctx_t ctx)
 {
     slong i, len2 = poly->length;
     thread_pool_handle * threads;
@@ -299,7 +301,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
     if (len2 == 1)
     {
         for (i = 0; i < n; i++)
-            fmpz_mod_poly_zero(res + i);
+            fmpz_mod_poly_zero(res + i, ctx);
 
         return;
     }
@@ -307,14 +309,14 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
     if (len2 == 2)
     {
         for (i = 0; i < n; i++)
-            fmpz_mod_poly_set(res + i, polys + i);
+            fmpz_mod_poly_set(res + i, polys + i, ctx);
 
         return;
     }
 
     for (i = 0; i < n; i++)
     {
-        fmpz_mod_poly_fit_length(res + i, len2 - 1);
+        fmpz_mod_poly_fit_length(res + i, len2 - 1, ctx);
         _fmpz_mod_poly_set_length(res + i, len2 - 1);
     }
 
@@ -326,7 +328,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
                                                           poly->coeffs, len2,
                                                           polyinv->coeffs,
                                                           polyinv->length,
-                                                          &poly->p,
+                                                          fmpz_mod_ctx_modulus(ctx),
                                                           threads,
                                                           num_threads);
 

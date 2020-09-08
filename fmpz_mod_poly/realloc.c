@@ -11,7 +11,8 @@
 
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc)
+void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {
@@ -27,7 +28,7 @@ void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc)
 
     if (poly->alloc)            /* Realloc */
     {
-        fmpz_mod_poly_truncate(poly, alloc);
+        fmpz_mod_poly_truncate(poly, alloc, ctx);
 
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)

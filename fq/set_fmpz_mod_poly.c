@@ -15,7 +15,7 @@ void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx)
 {
     slong i, len = b->length;
 
-    FLINT_ASSERT(fmpz_equal(&b->p, &ctx->p));
+    FLINT_ASSERT(fmpz_equal(&b->p, fq_ctx_prime(ctx)));
 
     if (len <= 2*(ctx->modulus->length - 1))
     {
@@ -31,11 +31,11 @@ void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx)
     else
     {
         fmpz_mod_poly_t q, r;
-        fmpz_mod_poly_init(q, fq_ctx_prime(ctx));
-        fmpz_mod_poly_init(r, fq_ctx_prime(ctx));
-        fmpz_mod_poly_divrem(q, r, b, fq_ctx_modulus(ctx));
-        fmpz_mod_poly_get_fmpz_poly(a, r);
-        fmpz_mod_poly_clear(q);
-        fmpz_mod_poly_clear(r);
+        fmpz_mod_poly_init(q, ctx->ctxp);
+        fmpz_mod_poly_init(r, ctx->ctxp);
+        fmpz_mod_poly_divrem(q, r, b, fq_ctx_modulus(ctx), ctx->ctxp);
+        fmpz_mod_poly_get_fmpz_poly(a, r, ctx->ctxp);
+        fmpz_mod_poly_clear(q, ctx->ctxp);
+        fmpz_mod_poly_clear(r, ctx->ctxp);
     }
 }

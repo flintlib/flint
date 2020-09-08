@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,16 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod.h"
 
-void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
+void fmpz_mod_ctx_set_modulus_ui(fmpz_mod_ctx_t ctx, ulong n)
 {
-    slong i;
-
-    for (i = poly->length - 1; (i >= 0) && !poly->coeffs[i]; i--) ;
-    poly->length = i + 1;
+    fmpz_mod_ctx_clear(ctx);
+    fmpz_mod_ctx_init_ui(ctx, n);
 }
-

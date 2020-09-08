@@ -17,48 +17,48 @@
 
 void
 fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
-                                       const fmpz_mod_poly_t f)
+                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_t h, v, g, x;
     slong i, j, num;
 
-    fmpz_mod_poly_init(h, &f->p);
-    fmpz_mod_poly_init(g, &f->p);
-    fmpz_mod_poly_init(v, &f->p);
-    fmpz_mod_poly_init(x, &f->p);
+    fmpz_mod_poly_init(h, ctx);
+    fmpz_mod_poly_init(g, ctx);
+    fmpz_mod_poly_init(v, ctx);
+    fmpz_mod_poly_init(x, ctx);
 
-    fmpz_mod_poly_set_coeff_ui(h, 1, 1);
-    fmpz_mod_poly_set_coeff_ui(x, 1, 1);
+    fmpz_mod_poly_set_coeff_ui(h, 1, 1, ctx);
+    fmpz_mod_poly_set_coeff_ui(x, 1, 1, ctx);
 
-    fmpz_mod_poly_make_monic(v, f);
+    fmpz_mod_poly_make_monic(v, f, ctx);
 
     i = 0;
     do
     {
         i++;
-        fmpz_mod_poly_powmod_fmpz_binexp(h, h, &f->p, v);
+        fmpz_mod_poly_powmod_fmpz_binexp(h, h, fmpz_mod_ctx_modulus(ctx), v, ctx);
 
-        fmpz_mod_poly_sub(h, h, x);
-        fmpz_mod_poly_gcd(g, h, v);
-        fmpz_mod_poly_add(h, h, x);
+        fmpz_mod_poly_sub(h, h, x, ctx);
+        fmpz_mod_poly_gcd(g, h, v, ctx);
+        fmpz_mod_poly_add(h, h, x, ctx);
 
         if (g->length != 1)
         {
-            fmpz_mod_poly_make_monic(g, g);
+            fmpz_mod_poly_make_monic(g, g, ctx);
             num = res->num;
 
-            fmpz_mod_poly_factor_equal_deg(res, g, i);
+            fmpz_mod_poly_factor_equal_deg(res, g, i, ctx);
             for (j = num; j < res->num; j++)
-                res->exp[j] = fmpz_mod_poly_remove(v, res->poly + j);
+                res->exp[j] = fmpz_mod_poly_remove(v, res->poly + j, ctx);
         }
     }
     while (v->length >= 2 * i + 3);
 
     if (v->length > 1)
-        fmpz_mod_poly_factor_insert(res, v, 1);
+        fmpz_mod_poly_factor_insert(res, v, 1, ctx);
 
-    fmpz_mod_poly_clear(g);
-    fmpz_mod_poly_clear(h);
-    fmpz_mod_poly_clear(v);
-    fmpz_mod_poly_clear(x);
+    fmpz_mod_poly_clear(g, ctx);
+    fmpz_mod_poly_clear(h, ctx);
+    fmpz_mod_poly_clear(v, ctx);
+    fmpz_mod_poly_clear(x, ctx);
 }

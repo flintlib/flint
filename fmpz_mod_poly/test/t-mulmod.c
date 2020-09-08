@@ -23,12 +23,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("mulmod....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check aliasing of res and a */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -38,34 +39,35 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_init(res, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_init(res, ctx);
 
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
-        fmpz_mod_poly_mulmod(res, a, b, f);
-        fmpz_mod_poly_mulmod(a, a, b, f);
+        fmpz_mod_poly_mulmod(res, a, b, f, ctx);
+        fmpz_mod_poly_mulmod(a, a, b, f, ctx);
 
-        result = (fmpz_mod_poly_equal(res, a));
+        result = (fmpz_mod_poly_equal(res, a, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b:\n"); fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
-            flint_printf("res:\n"); fmpz_mod_poly_print(res), flint_printf("\n\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(res);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(res, ctx);
         fmpz_clear(p);
     }
 
@@ -77,34 +79,35 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_init(res, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_init(res, ctx);
 
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
-        fmpz_mod_poly_mulmod(res, a, b, f);
-        fmpz_mod_poly_mulmod(b, a, b, f);
+        fmpz_mod_poly_mulmod(res, a, b, f, ctx);
+        fmpz_mod_poly_mulmod(b, a, b, f, ctx);
 
-        result = (fmpz_mod_poly_equal(res, b));
+        result = (fmpz_mod_poly_equal(res, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b:\n"); fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
-            flint_printf("res:\n"); fmpz_mod_poly_print(res), flint_printf("\n\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(res);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(res, ctx);
         fmpz_clear(p);
     }
 
@@ -116,34 +119,35 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_init(res, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_init(res, ctx);
 
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
-        fmpz_mod_poly_mulmod(res, a, b, f);
-        fmpz_mod_poly_mulmod(f, a, b, f);
+        fmpz_mod_poly_mulmod(res, a, b, f, ctx);
+        fmpz_mod_poly_mulmod(f, a, b, f, ctx);
 
-        result = (fmpz_mod_poly_equal(res, f));
+        result = (fmpz_mod_poly_equal(res, f, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b:\n"); fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
-            flint_printf("res:\n"); fmpz_mod_poly_print(res), flint_printf("\n\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(res);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(res, ctx);
         fmpz_clear(p);
     }
 
@@ -155,43 +159,45 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(f, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(f, ctx);
 
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 50));
-        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 50), ctx);
+        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
-        fmpz_mod_poly_init(res1, p);
-        fmpz_mod_poly_init(res2, p);
-        fmpz_mod_poly_init(t, p);
-        fmpz_mod_poly_mulmod(res1, a, b, f);
-        fmpz_mod_poly_mul(res2, a, b);
-        fmpz_mod_poly_divrem(t, res2, res2, f);
+        fmpz_mod_poly_init(res1, ctx);
+        fmpz_mod_poly_init(res2, ctx);
+        fmpz_mod_poly_init(t, ctx);
+        fmpz_mod_poly_mulmod(res1, a, b, f, ctx);
+        fmpz_mod_poly_mul(res2, a, b, ctx);
+        fmpz_mod_poly_divrem(t, res2, res2, f, ctx);
 
-        result = (fmpz_mod_poly_equal(res1, res2));
+        result = (fmpz_mod_poly_equal(res1, res2, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b:\n"); fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
-            flint_printf("res1:\n"); fmpz_mod_poly_print(res1), flint_printf("\n\n");
-            flint_printf("res2:\n"); fmpz_mod_poly_print(res2), flint_printf("\n\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("res1:\n"); fmpz_mod_poly_print(res1, ctx), flint_printf("\n\n");
+            flint_printf("res2:\n"); fmpz_mod_poly_print(res2, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(res1);
-        fmpz_mod_poly_clear(res2);
-        fmpz_mod_poly_clear(t);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(res1, ctx);
+        fmpz_mod_poly_clear(res2, ctx);
+        fmpz_mod_poly_clear(t, ctx);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

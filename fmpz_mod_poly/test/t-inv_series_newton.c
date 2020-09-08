@@ -22,12 +22,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("inv_series_newton....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -39,13 +40,14 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(one, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(one, ctx);
 
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1);
+        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, ctx);
         {
             fmpz_t d;
 
@@ -59,26 +61,26 @@ main(void)
             fmpz_clear(d);
         }
 
-        fmpz_mod_poly_set_ui(one, 1);
+        fmpz_mod_poly_set_ui(one, 1, ctx);
 
-        fmpz_mod_poly_inv_series_newton(b, a, n);
-        fmpz_mod_poly_mullow(c, a, b, n);
+        fmpz_mod_poly_inv_series_newton(b, a, n, ctx);
+        fmpz_mod_poly_mullow(c, a, b, n, ctx);
 
-        result = (fmpz_mod_poly_equal(c, one));
+        result = (fmpz_mod_poly_equal(c, one, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
-            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
-            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(one);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(one, ctx);
         fmpz_clear(p);
     }
 

@@ -14,7 +14,8 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
+void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     if (i < 0)
         i = 0;

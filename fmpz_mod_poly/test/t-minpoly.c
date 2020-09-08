@@ -22,10 +22,11 @@
 #include "ulong_extras.h"
 
 /* checks that poly actually annihilates the given sequence. */
-int check(const fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+int check(const fmpz_mod_poly_t poly, const fmpz* seq, slong len,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     fmpz_t sum, temp;
-    slong d = fmpz_mod_poly_degree(poly);
+    slong d = fmpz_mod_poly_degree(poly, ctx);
     int i, j;
 
     if (d < 0) return 0;
@@ -38,11 +39,11 @@ int check(const fmpz_mod_poly_t poly, const fmpz* seq, slong len)
         fmpz_zero(sum);
         for (j=0; j<d; ++j)
         {
-            fmpz_mod_poly_get_coeff_fmpz(temp, poly, j);
+            fmpz_mod_poly_get_coeff_fmpz(temp, poly, j, ctx);
             fmpz_addmul(sum, temp, seq+(i+j));
         }
         fmpz_add(sum, sum, seq+(i+d));
-        fmpz_mod(sum, sum, &poly->p);
+        fmpz_mod(sum, sum, fmpz_mod_ctx_modulus(ctx));
         if (!fmpz_is_zero(sum)) 
         {
             fmpz_clear(sum);
@@ -59,10 +60,13 @@ int check(const fmpz_mod_poly_t poly, const fmpz* seq, slong len)
 int main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("minpoly....");
     fflush(stdout);
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* test random sequences */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -75,37 +79,38 @@ int main(void)
 
         fmpz_init(p);
         fmpz_randprime(p, state, 100, 0);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
         len = n_randtest(state) % UWORD(100);
         seq = _fmpz_vec_init(len);
         for (j=0; j<len; ++j) fmpz_randtest_mod(seq+j, state, p);
 
-        fmpz_mod_poly_init(poly1, p);
-        fmpz_mod_poly_init(poly2, p);
+        fmpz_mod_poly_init(poly1, ctx);
+        fmpz_mod_poly_init(poly2, ctx);
 
-        fmpz_mod_poly_minpoly_bm(poly1, seq, len);
-        fmpz_mod_poly_minpoly_hgcd(poly2, seq, len);
+        fmpz_mod_poly_minpoly_bm(poly1, seq, len, ctx);
+        fmpz_mod_poly_minpoly_hgcd(poly2, seq, len, ctx);
 
-        if (!check(poly1, seq, len) 
-            || fmpz_mod_poly_degree(poly1) > fmpz_mod_poly_degree(poly2))
+        if (!check(poly1, seq, len, ctx) 
+            || fmpz_mod_poly_degree(poly1, ctx) > fmpz_mod_poly_degree(poly2, ctx))
         {
             flint_printf("FAIL 1:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
-            fmpz_mod_poly_print(poly1); flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(poly1, ctx); flint_printf("\n\n");
+            flint_abort();
         }
 
-        if (!check(poly2, seq, len) 
-            || fmpz_mod_poly_degree(poly2) > fmpz_mod_poly_degree(poly1))
+        if (!check(poly2, seq, len, ctx) 
+            || fmpz_mod_poly_degree(poly2, ctx) > fmpz_mod_poly_degree(poly1, ctx))
         {
             flint_printf("FAIL 2:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
-            fmpz_mod_poly_print(poly2); flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(poly2, ctx); flint_printf("\n\n");
+            flint_abort();
         }
 
-        fmpz_mod_poly_clear(poly1);
-        fmpz_mod_poly_clear(poly2);
+        fmpz_mod_poly_clear(poly1, ctx);
+        fmpz_mod_poly_clear(poly2, ctx);
         fmpz_clear(p);
         _fmpz_vec_clear(seq, len);
     }
@@ -122,16 +127,17 @@ int main(void)
         fmpz_init(p);
         fmpz_init(temp);
         fmpz_randprime(p, state, 100, 0);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
         len = n_randtest(state) % UWORD(200) + 2;
         seq = _fmpz_vec_init(len);
 
-        fmpz_mod_poly_init(poly1, p);
-        fmpz_mod_poly_init(poly2, p);
-        fmpz_mod_poly_init(gen, p);
-        fmpz_mod_poly_init(rem, p);
-        fmpz_mod_poly_randtest_monic(gen, state, n_randint(state, len/2)+2);
-        d = fmpz_mod_poly_degree(gen);
+        fmpz_mod_poly_init(poly1, ctx);
+        fmpz_mod_poly_init(poly2, ctx);
+        fmpz_mod_poly_init(gen, ctx);
+        fmpz_mod_poly_init(rem, ctx);
+        fmpz_mod_poly_randtest_monic(gen, state, n_randint(state, len/2)+2, ctx);
+        d = fmpz_mod_poly_degree(gen, ctx);
         FLINT_ASSERT (d > 0);
 
         for (j=0; j<d; ++j) fmpz_randtest_mod(seq+j, state, p);
@@ -141,60 +147,61 @@ int main(void)
             fmpz_zero(seq+j);
             for (k=0; k<d; ++k)
             {
-                fmpz_mod_poly_get_coeff_fmpz(temp, gen, k);
+                fmpz_mod_poly_get_coeff_fmpz(temp, gen, k, ctx);
                 fmpz_submul(seq+j, temp, seq + (j-d+k));
             }
             fmpz_mod(seq+j, seq+j, p);
         }
-        FLINT_ASSERT(check(gen, seq, len));
+        FLINT_ASSERT(check(gen, seq, len, ctx));
 
-        fmpz_mod_poly_minpoly_bm(poly1, seq, len);
+        fmpz_mod_poly_minpoly_bm(poly1, seq, len, ctx);
 
-        if (!check(poly1, seq, len))
+        if (!check(poly1, seq, len, ctx))
         {
             flint_printf("FAIL 3:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
-            fmpz_mod_poly_print(poly1); flint_printf("\n\n");
-            fmpz_mod_poly_print(gen);  flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(poly1, ctx); flint_printf("\n\n");
+            fmpz_mod_poly_print(gen, ctx);  flint_printf("\n\n");
+            flint_abort();
         }
 
-        result = fmpz_mod_poly_degree(poly1) <= fmpz_mod_poly_degree(gen);
-        if (result && fmpz_mod_poly_degree(gen) <= len/2)
+        result = fmpz_mod_poly_degree(poly1, ctx) <= fmpz_mod_poly_degree(gen, ctx);
+        if (result && fmpz_mod_poly_degree(gen, ctx) <= len/2)
         {
-            fmpz_mod_poly_rem(rem, gen, poly1);
-            result = fmpz_mod_poly_is_zero(rem);
+            fmpz_mod_poly_rem(rem, gen, poly1, ctx);
+            result = fmpz_mod_poly_is_zero(rem, ctx);
         }
 
         if (!result)
         {
             flint_printf("FAIL 4:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
-            fmpz_mod_poly_print(poly1); flint_printf("\n\n");
-            fmpz_mod_poly_print(gen);  flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(poly1, ctx); flint_printf("\n\n");
+            fmpz_mod_poly_print(gen, ctx);  flint_printf("\n\n");
+            flint_abort();
         }
 
-        fmpz_mod_poly_minpoly_hgcd(poly2, seq, len);
+        fmpz_mod_poly_minpoly_hgcd(poly2, seq, len, ctx);
 
-        if (!fmpz_mod_poly_equal(poly1, poly2))
+        if (!fmpz_mod_poly_equal(poly1, poly2, ctx))
         {
             flint_printf("FAIL 5:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
-            fmpz_mod_poly_print(poly2); flint_printf("\n\n");
-            fmpz_mod_poly_print(gen);  flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(poly2, ctx); flint_printf("\n\n");
+            fmpz_mod_poly_print(gen, ctx);  flint_printf("\n\n");
+            flint_abort();
         }
 
         _fmpz_vec_clear(seq, len);
         fmpz_clear(p);
         fmpz_clear(temp);
-        fmpz_mod_poly_clear(poly1);
-        fmpz_mod_poly_clear(poly2);
-        fmpz_mod_poly_clear(gen);
-        fmpz_mod_poly_clear(rem);
+        fmpz_mod_poly_clear(poly1, ctx);
+        fmpz_mod_poly_clear(poly2, ctx);
+        fmpz_mod_poly_clear(gen, ctx);
+        fmpz_mod_poly_clear(rem, ctx);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

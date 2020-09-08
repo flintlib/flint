@@ -17,7 +17,7 @@ unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     slong i;
     unity_zp temp;
 
-    unity_zp_init(temp, f->p, f->exp, f->n);
+    unity_zp_init(temp, f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
 
     unity_zp_set_zero(f);
     unity_zp_coeff_set_ui(f, 0, 1);

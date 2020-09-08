@@ -87,17 +87,6 @@ FLINT_DLL void TEMPLATE(T, embed_mono_to_dual_matrix)(TEMPLATE(B, mat_t) res,
 FLINT_DLL void TEMPLATE(T, embed_dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
                                                 const TEMPLATE(T, ctx_t) ctx);
 
-FQ_EMBED_TEMPLATES_INLINE
-void TEMPLATE(T, modulus_pow_series_inv)(TEMPLATE(B, poly_t) res,
-                                         const TEMPLATE(T, ctx_t) ctx,
-                                         slong trunc)
-{
-    TEMPLATE(B, poly_reverse)(res, 
-                              TEMPLATE(T, ctx_modulus)(ctx), 
-                              TEMPLATE(T, ctx_degree)(ctx) + 1);
-    TEMPLATE(B, poly_inv_series)(res, res, trunc);
-}
-
 #ifdef __cplusplus
 }
 #endif

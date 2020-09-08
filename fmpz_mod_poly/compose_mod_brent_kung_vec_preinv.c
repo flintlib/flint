@@ -106,13 +106,15 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
     fmpz_mat_clear(C);
 }
 
-void
-fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
-                                                const fmpz_mod_poly_struct *
-                                                polys, slong len1, slong n,
-                                                const fmpz_mod_poly_t g,
-                                                const fmpz_mod_poly_t poly,
-                                                const fmpz_mod_poly_t polyinv)
+void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(
+    fmpz_mod_poly_struct * res,
+    const fmpz_mod_poly_struct * polys,
+    slong len1,
+    slong n,
+    const fmpz_mod_poly_t g,
+    const fmpz_mod_poly_t poly,
+    const fmpz_mod_poly_t polyinv,
+    const fmpz_mod_ctx_t ctx)
 {
     slong len2 = poly->length;
     slong len3, i;
@@ -144,7 +146,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
     if (len2 == 1)
     {
         for (i = 0; i < n; i++)
-            fmpz_mod_poly_zero(res + i);
+            fmpz_mod_poly_zero(res + i, ctx);
 
         return;
     }
@@ -152,15 +154,15 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
     if (len2 == 2)
     {
         for (i = 0; i < n; i++)
-            fmpz_mod_poly_set(res + i, polys + i);
+            fmpz_mod_poly_set(res + i, polys + i, ctx);
 
         return;
     }
 
     for (i = 0; i < n; i++)
     {
-        fmpz_mod_poly_fit_length(res + i, len2 - 1);
-	_fmpz_mod_poly_set_length(res + i, len2 - 1);
+        fmpz_mod_poly_fit_length(res + i, len2 - 1, ctx);
+	    _fmpz_mod_poly_set_length(res + i, len2 - 1);
     }
 
     _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(res, polys, len1, n,
@@ -168,7 +170,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                                                      poly->coeffs, len2,
                                                      polyinv->coeffs,
                                                      polyinv->length,
-                                                     &poly->p);
+                                                     fmpz_mod_ctx_modulus(ctx));
 
     for (i = 0; i < n; i++)
         _fmpz_mod_poly_normalise(res + i);

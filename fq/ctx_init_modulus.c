@@ -15,25 +15,18 @@
 #include "fq.h"
 #include "fq_poly.h"
 
-void
-fq_ctx_init_modulus(fq_ctx_t ctx, fmpz_mod_poly_t modulus, const char *var)
+void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,
+                                    const fmpz_mod_ctx_t ctxp, const char *var)
 {
     slong nz;
     int i, j;
-    fmpz* p;
+    const fmpz * p = fmpz_mod_ctx_modulus(ctxp);
     fmpz_t inv;
-
-    p = &(modulus->p);
 
     /* Count number of nonzero coefficients */
     nz = 0;
     for (i = 0; i < modulus->length; i++)
-    {
-        if (!fmpz_is_zero(modulus->coeffs + i))
-        {
-            nz += 1;
-        }
-    }
+        nz += !fmpz_is_zero(modulus->coeffs + i);
 
     ctx->len = nz;
     ctx->a = _fmpz_vec_init(ctx->len);
@@ -62,19 +55,19 @@ fq_ctx_init_modulus(fq_ctx_t ctx, fmpz_mod_poly_t modulus, const char *var)
     else
         ctx->sparse_modulus = 0;
 
-    fmpz_init_set(fq_ctx_prime(ctx), p);
+    fmpz_mod_ctx_init(ctx->ctxp, p);
 
     ctx->var = flint_malloc(strlen(var) + 1);
     strcpy(ctx->var, var);
 
     /* Set the modulus */
-    fmpz_mod_poly_init(ctx->modulus, fq_ctx_prime(ctx));
-    fmpz_mod_poly_set(ctx->modulus, modulus);
+    fmpz_mod_poly_init(ctx->modulus, ctx->ctxp);
+    fmpz_mod_poly_set(ctx->modulus, modulus, ctx->ctxp);
 
     /* Precompute the inverse of the modulus */
-    fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
-    fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
-    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length);
+    fmpz_mod_poly_init(ctx->inv, ctx->ctxp);
+    fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length, ctx->ctxp);
+    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length, ctx->ctxp);
 
     ctx->is_conway = 0;
 }

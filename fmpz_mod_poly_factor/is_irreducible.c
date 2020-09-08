@@ -18,11 +18,11 @@
 #include "ulong_extras.h"
 
 int
-fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
+fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 {
-    if (fmpz_mod_poly_length(f) > 2)
+    if (fmpz_mod_poly_length(f, ctx) > 2)
     {
-        return fmpz_mod_poly_is_irreducible_ddf(f);
+        return fmpz_mod_poly_is_irreducible_ddf(f, ctx);
     }
 
     return 1;

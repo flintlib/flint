@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_poly.h"
+#include "fmpz_mod.h"
 
-
-
-#ifdef T
-#undef T
-#endif
-
-#define T fq_zech
-#define CAP_T FQ_ZECH
-#include "fq_poly_templates/test/t-set_nmod_poly.c"
-#undef CAP_T
-#undef T
+void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n)
+{
+    fmpz_t n_;
+    fmpz_init_set_ui(n_, n);
+    fmpz_mod_ctx_init(ctx, n_);
+    fmpz_clear(n_);
+}

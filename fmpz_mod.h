@@ -62,6 +62,8 @@ typedef fmpz_mod_ctx_struct fmpz_mod_ctx_t[1];
 
 FLINT_DLL void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n);
 
+FLINT_DLL void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n);
+
 FLINT_DLL void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
@@ -70,6 +72,8 @@ FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
 }
 
 FLINT_DLL void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n);
+
+FLINT_DLL void fmpz_mod_ctx_set_modulus_ui(fmpz_mod_ctx_t ctx, ulong n);
 
 FLINT_DLL int fmpz_mod_is_canonical(const fmpz_t a,  const fmpz_mod_ctx_t ctx);
 

@@ -16,11 +16,11 @@ unity_zp_sqr(unity_zp f, const unity_zp g)
 {
     if (g->poly->length == 0)
     {
-        fmpz_mod_poly_zero(f->poly);
+        fmpz_mod_poly_zero(f->poly, f->ctx);
         return;
     }
 
-    fmpz_mod_poly_fit_length(f->poly, g->poly->length * 2 - 1);
+    fmpz_mod_poly_fit_length(f->poly, g->poly->length * 2 - 1, f->ctx);
 
     _fmpz_poly_sqr(f->poly->coeffs, g->poly->coeffs, g->poly->length);
     _fmpz_mod_poly_set_length(f->poly, 2 * g->poly->length - 1);

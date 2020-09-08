@@ -46,11 +46,11 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 
     /* set xi */
     for (i = 0; i < 10; i++)
-        fmpz_mod_poly_get_coeff_fmpz(t[40 + i], g->poly, i);
+        fmpz_mod_poly_get_coeff_fmpz(t[40 + i], g->poly, i, g->ctx);
 
     /* set yi */
     for (i = 0; i < 10; i++)
-        fmpz_mod_poly_get_coeff_fmpz(t[50 + i], h->poly, i);
+        fmpz_mod_poly_get_coeff_fmpz(t[50 + i], h->poly, i, h->ctx);
 
     /* set ai = xi + x{i + 5} and bi = yi + y{i + 5} */
     for (i = 0; i < 5; i++)
@@ -72,8 +72,8 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     /* set ai = xi and bi = yi */
     for (i = 0; i < 5; i++)
     {
-        fmpz_mod_poly_get_coeff_fmpz(t[i], g->poly, i);
-        fmpz_mod_poly_get_coeff_fmpz(t[5 + i], h->poly, i);
+        fmpz_mod_poly_get_coeff_fmpz(t[i], g->poly, i, g->ctx);
+        fmpz_mod_poly_get_coeff_fmpz(t[5 + i], h->poly, i, h->ctx);
     }
 
     /* 
@@ -89,8 +89,8 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     /* set ai = x{i + 5} and bi = y{i + 5} */ 
     for (i = 0; i < 5; i++)
     {
-        fmpz_mod_poly_get_coeff_fmpz(t[i], g->poly, 5 + i);
-        fmpz_mod_poly_get_coeff_fmpz(t[5 + i], h->poly, 5 + i);
+        fmpz_mod_poly_get_coeff_fmpz(t[i], g->poly, 5 + i, g->ctx);
+        fmpz_mod_poly_get_coeff_fmpz(t[5 + i], h->poly, 5 + i, h->ctx);
     }
 
     /* 

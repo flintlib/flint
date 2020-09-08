@@ -16,7 +16,10 @@ unity_zpq_scalar_mul_fmpz(unity_zpq f, const unity_zpq g, const fmpz_t s)
 {
     slong i;
 
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(g->ctx)));
+
     for (i = 0; i < f->p; i++)
-        fmpz_mod_poly_scalar_mul_fmpz(f->polys[i], g->polys[i], s);
+        fmpz_mod_poly_scalar_mul_fmpz(f->polys[i], g->polys[i], s, f->ctx);
 }
 

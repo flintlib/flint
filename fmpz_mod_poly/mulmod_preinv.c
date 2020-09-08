@@ -53,7 +53,7 @@ void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
 void
 fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                          const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f,
-                         const fmpz_mod_poly_t finv)
+                        const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)
 {
     slong len1, len2, lenf;
     fmpz * fcoeffs;
@@ -76,7 +76,7 @@ fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
         return;
     }
 
@@ -90,10 +90,10 @@ fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         else
             fcoeffs = f->coeffs;
 
-        fmpz_mod_poly_fit_length(res, len1 + len2 - 1);
+        fmpz_mod_poly_fit_length(res, len1 + len2 - 1, ctx);
         _fmpz_mod_poly_mulmod_preinv(res->coeffs, poly1->coeffs, len1,
                               poly2->coeffs, len2, fcoeffs, lenf,
-                              finv->coeffs, finv->length, &res->p);
+                        finv->coeffs, finv->length, fmpz_mod_ctx_modulus(ctx));
         if (f == res)
             _fmpz_vec_clear(fcoeffs, lenf);
 
@@ -102,6 +102,6 @@ fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     }
     else
     {
-        fmpz_mod_poly_mul(res, poly1, poly2);
+        fmpz_mod_poly_mul(res, poly1, poly2, ctx);
     }
 }

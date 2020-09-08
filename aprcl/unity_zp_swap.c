@@ -14,6 +14,9 @@
 void
 unity_zp_swap(unity_zp f, unity_zp g)
 {
-    fmpz_mod_poly_swap(f->poly, g->poly);
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(g->ctx)));
+
+    fmpz_mod_poly_swap(f->poly, g->poly, f->ctx);
 }
 

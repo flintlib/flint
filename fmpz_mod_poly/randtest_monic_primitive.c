@@ -15,20 +15,20 @@
 
 void
 fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,
-                                       flint_rand_t state, slong len)
+                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
-    fq_ctx_t ctx;
+    fq_ctx_t fqctx;
     fq_t X;
     int primitive = 0;
     
     while (!primitive)
     {
-        fmpz_mod_poly_randtest_monic_irreducible(f, state, len);
-        fq_ctx_init_modulus(ctx, f, "X");
-        fq_init(X, ctx);
-        fq_gen(X, ctx);
-        primitive = fq_is_primitive(X, ctx);
-        fq_clear(X, ctx);
-        fq_ctx_clear(ctx);
+        fmpz_mod_poly_randtest_monic_irreducible(f, state, len, ctx);
+        fq_ctx_init_modulus(fqctx, f, ctx, "X");
+        fq_init(X, fqctx);
+        fq_gen(X, fqctx);
+        primitive = fq_is_primitive(X, fqctx);
+        fq_clear(X, fqctx);
+        fq_ctx_clear(fqctx);
     }
 }

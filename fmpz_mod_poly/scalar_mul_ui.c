@@ -23,11 +23,11 @@ void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len,
 }
 
 void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, 
-                                   const fmpz_mod_poly_t poly, ulong x)
+                const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_poly_fit_length(res, poly->length);
+    fmpz_mod_poly_fit_length(res, poly->length, ctx);
     _fmpz_mod_poly_scalar_mul_ui(res->coeffs, 
-                                   poly->coeffs, poly->length, x, &(poly->p));
+                     poly->coeffs, poly->length, x, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, poly->length);
     _fmpz_mod_poly_normalise(res);

@@ -17,7 +17,7 @@ _unity_zpq_mul_unity_p(unity_zpq f)
     slong i;
 
     for (i = f->p - 1; i > 0; i--)
-        fmpz_mod_poly_swap(f->polys[i], f->polys[i - 1]);
+        fmpz_mod_poly_swap(f->polys[i], f->polys[i - 1], f->ctx);
 }
 
 /*

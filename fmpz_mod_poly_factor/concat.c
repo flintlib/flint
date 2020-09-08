@@ -19,10 +19,10 @@
 
 void
 fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
-                            const fmpz_mod_poly_factor_t fac)
+                    const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < fac->num; i++)
-        fmpz_mod_poly_factor_insert(res, fac->poly + i, fac->exp[i]);
+        fmpz_mod_poly_factor_insert(res, fac->poly + i, fac->exp[i], ctx);
 }

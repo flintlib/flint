@@ -36,22 +36,22 @@ _fmpz_mod_poly_shift_left(fmpz * res, const fmpz * poly, slong len, slong n)
         fmpz_zero(res + i);
 }
 
-void
-fmpz_mod_poly_shift_left(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
+void fmpz_mod_poly_shift_left(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                             slong n, const fmpz_mod_ctx_t ctx)
 {
     if (n == 0)
     {
-        fmpz_mod_poly_set(res, poly);
+        fmpz_mod_poly_set(res, poly, ctx);
         return;
     }
 
     if (poly->length == 0)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
         return;
     }
 
-    fmpz_mod_poly_fit_length(res, poly->length + n);
+    fmpz_mod_poly_fit_length(res, poly->length + n, ctx);
     _fmpz_mod_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
     _fmpz_mod_poly_set_length(res, poly->length + n);
 }

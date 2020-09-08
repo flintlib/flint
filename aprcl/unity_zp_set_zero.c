@@ -14,6 +14,6 @@
 void
 unity_zp_set_zero(unity_zp f)
 {
-    fmpz_mod_poly_zero(f->poly);
+    fmpz_mod_poly_zero(f->poly, f->ctx);
 }
 
