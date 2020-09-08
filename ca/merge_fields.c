@@ -95,6 +95,14 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
 /*
     printf("merge fields of len %ld and len %ld\n", xlen, ylen);
+    for (ix = 0; ix < xlen; ix++)
+    {
+        printf("x: "); ca_ext_print(CA_FIELD_EXT_ELEM(xfield, ix), ctx); printf("\n");
+    }
+    for (iy = 0; iy < ylen; iy++)
+    {
+        printf("y: "); ca_ext_print(CA_FIELD_EXT_ELEM(yfield, iy), ctx); printf("\n");
+    }
 */
 
     /* merge field lists */
@@ -109,6 +117,9 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
             if (cmp == 0)
             {
+                if (CA_FIELD_EXT_ELEM(xfield, ix) != CA_FIELD_EXT_ELEM(yfield, iy))
+                    flint_abort();
+
                 ext[ext_len] = CA_FIELD_EXT_ELEM(xfield, ix);
                 xgen_map[ix] = ext_len;
                 ygen_map[iy] = ext_len;
@@ -145,6 +156,10 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
             ext_len++;
         }
     }
+
+/*
+    printf("merged length %ld\n", ext_len);
+*/
 
     field = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext, ext_len, ctx);
 

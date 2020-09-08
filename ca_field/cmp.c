@@ -57,7 +57,11 @@ _nf_elem_cmp(const nf_elem_t x, const nf_elem_t y, const nf_t nf)
         if (NF_ELEM(x)->length != NF_ELEM(y)->length)
             return (NF_ELEM(x)->length < NF_ELEM(y)->length) ? -1 : 1;
 
-        return _fmpz_poly_compare_abslex(NF_ELEM(x)->coeffs, NF_ELEM(y)->coeffs, NF_ELEM(x)->length);
+        c = _fmpz_poly_compare_abslex(NF_ELEM(x)->coeffs, NF_ELEM(y)->coeffs, NF_ELEM(x)->length);
+        if (c != 0)
+            return c;
+
+        return fmpz_cmp(NF_ELEM_DENREF(x), NF_ELEM_DENREF(y));
     }
 }
 
