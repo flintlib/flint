@@ -522,10 +522,6 @@ representing an unknown outcome.
     Tests if *x* is an imaginary number. Warning: this returns ``T_FALSE`` if
     *x* is an infinity with imaginary sign.
 
-.. function:: truth_t ca_check_is_nonreal(const ca_t x, ca_ctx_t ctx)
-
-    Tests if *x* is a nonreal complex number.
-
 .. function:: truth_t ca_check_is_undefined(const ca_t x, ca_ctx_t ctx)
 
     Tests if *x* is the special value *Undefined*.
@@ -1050,7 +1046,8 @@ Superficial options (printing) can be changed at any time.
 
 .. macro:: CA_OPT_PREC_LIMIT
 
-    Maximum precision to use internally for numerical evaluation with Arb.
+    Maximum precision to use internally for numerical evaluation with Arb,
+    and in some cases for the magntiude of exact coefficients.
     This parameter affects the possibility to prove inequalities
     and find simplifications between related extension numbers.
     This is not a strict limit; some calculations may use higher precision
@@ -1076,6 +1073,13 @@ Superficial options (printing) can be changed at any time.
 .. macro:: CA_OPT_LLL_PREC
 
     Precision to use to find integer relations using LLL. Default value: 128.
+
+.. macro:: CA_OPT_POW_LIMIT
+
+    Largest exponent to expand powers automatically. This only applies
+    in multivariate and transcendental fields: in number fields,
+    ``CA_OPT_PREC_LIMIT`` applies instead. Default value: 20.
+
 
 Internal representation
 -------------------------------------------------------------------------------

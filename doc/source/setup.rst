@@ -3,7 +3,7 @@
 Setup
 ===============================================================================
 
-Dependencies
+Installation
 -------------------------------------------------------------------------------
 
 Calcium has the following dependencies:
@@ -14,10 +14,8 @@ Calcium has the following dependencies:
 * Arb (http://arblib.org) version 2.18.1 or later.
 * Antic (https://github.com/wbhart/antic/) - use a git checkout.
 
-Standalone installation
--------------------------------------------------------------------------------
-
-To compile, test and install Calcium from source, run the following
+To compile, test and install Calcium from source assuming that
+all dependencies have been installed, run the following
 commands in the source directory::
 
     ./configure <options>
@@ -46,9 +44,9 @@ to verify that all unit tests pass.
 
 By default, the unit tests run a large number of iterations to improve
 the chances of detecting subtle problems.
-The whole test suite will take several minutes on a single core
+The test suite will take several minutes on a single core
 (``make -jN check`` if you have more cores to spare).
-If you are in a hurry, you can adjust the number of test iterations via
+You can adjust the number of test iterations via
 the ``CALCIUM_TEST_MULTIPLIER`` environment variable. For example, the following
 will only run 10% of the default iterations::
 

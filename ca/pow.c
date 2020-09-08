@@ -211,7 +211,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                 }
 
                 /* todo: evaluation limits */
-                if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -20) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), 20) <= 0)
+                if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -ctx->options[CA_OPT_POW_LIMIT]) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), ctx->options[CA_OPT_POW_LIMIT]) <= 0)
                 {
                     _ca_pow_binexp(res, x, *CA_FMPQ_NUMREF(y), ctx);
                     return;
@@ -233,7 +233,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                     ca_clear(t, ctx);
                     return;
                 }  /* todo: evaluation limits */
-                else if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -10) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), 10) <= 0)
+                else if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -ctx->options[CA_OPT_POW_LIMIT] / 2) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), ctx->options[CA_OPT_POW_LIMIT] / 2) <= 0)
                 {
                     ca_sqrt(res, x, ctx);
                     _ca_pow_binexp(res, res, *CA_FMPQ_NUMREF(y), ctx);

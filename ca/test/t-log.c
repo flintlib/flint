@@ -95,14 +95,29 @@ int main()
         ca_abs(x, x, ctx);
         ca_abs(y, y, ctx);
 
+        /* Test a bug */
+        if (iter == 0)
+        {
+            ca_sqrt_ui(x, 2, ctx);
+            ca_div_ui(x, x, 3, ctx);
+            ca_sqrt(x, x, ctx);
+
+            ca_set_ui(y, 1, ctx);
+            ca_div_ui(y, y, 2, ctx);
+            ca_one(z, ctx);
+        }
+
+        /* a = log(x*y*z) */
         ca_mul(a, x, y, ctx);
         ca_mul(a, a, z, ctx);
         ca_log(a, a, ctx);
 
+        /* b = log(x), c = log(y), d = log(z) */
         ca_log(b, x, ctx);
         ca_log(c, y, ctx);
         ca_log(d, z, ctx);
 
+        /* e = log(x) + log(y) + log(c) */
         ca_add(e, b, c, ctx);
         ca_add(e, e, d, ctx);
 

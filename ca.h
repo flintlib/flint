@@ -212,6 +212,7 @@ enum
     CA_OPT_LOW_PREC,
     CA_OPT_SMOOTH_LIMIT,
     CA_OPT_LLL_PREC,
+    CA_OPT_POW_LIMIT,
     CA_OPT_NUM_OPTIONS
 };
 
@@ -352,7 +353,6 @@ truth_t ca_check_is_rational(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_integer(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_real(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx);
-truth_t ca_check_is_nonreal(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_undefined(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_infinity(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_uinf(const ca_t x, ca_ctx_t ctx);

@@ -37,6 +37,9 @@ int main()
         ca_init(ab, ctx);
         ca_init(xab, ctx);
 
+        /* otherwise this will be too slow */
+        ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 60;
+
         /* x^a * x^b = x^(a+b) */
 
         do {

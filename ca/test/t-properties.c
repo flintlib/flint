@@ -40,7 +40,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_TRUE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -62,7 +61,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -84,7 +82,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -106,7 +103,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_TRUE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -128,7 +124,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_TRUE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -156,7 +151,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -178,7 +172,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_UNKNOWN);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_UNKNOWN);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_UNKNOWN);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_UNKNOWN);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_UNKNOWN);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_UNKNOWN);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_UNKNOWN);
@@ -200,7 +193,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -222,7 +214,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_TRUE);
@@ -244,7 +235,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -266,7 +256,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -288,7 +277,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -310,7 +298,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_undefined, "is_undefined", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_infinity, "is_infinity", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_uinf, "is_uinf", x, ctx, T_FALSE);
@@ -332,7 +319,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
 
         ca_pi_i(x, ctx);
         CA_TEST_PROPERTY(ca_check_is_number, "is_number", x, ctx, T_TRUE);
@@ -346,7 +332,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_TRUE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_TRUE);
 
         ca_set_si(x, -400, ctx);
         ca_exp(x, x, ctx);
@@ -362,7 +347,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_FALSE);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
 
         ca_set_si(x, -1000000, ctx);
         ca_exp(x, x, ctx);
@@ -378,7 +362,6 @@ int main()
         CA_TEST_PROPERTY(ca_check_is_integer, "is_integer", x, ctx, T_UNKNOWN);
         CA_TEST_PROPERTY(ca_check_is_real, "is_real", x, ctx, T_TRUE);
         CA_TEST_PROPERTY(ca_check_is_imaginary, "is_imaginary", x, ctx, T_FALSE);
-        CA_TEST_PROPERTY(ca_check_is_nonreal, "is_nonreal", x, ctx, T_FALSE);
 
         ca_clear(x, ctx);
         ca_clear(y, ctx);

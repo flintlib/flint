@@ -14,12 +14,9 @@ Calcium is free software (LGPL). It depends on
 `Flint <http://flintlib.org/>`_, `Antic <https://github.com/wbhart/antic/>`_
 and `Arb <http://arblib.org/>`_.
 
-Source code: https://github.com/fredrik-johansson/calcium
-
-Bug reports and feature requests: https://github.com/fredrik-johansson/calcium/issues
-
-You are also welcome to discuss Calcium on the
-`flint-devel <https://groups.google.com/d/forum/flint-devel>`_ mailing list.
+* Source code: https://github.com/fredrik-johansson/calcium
+* Bug reports and feature requests: https://github.com/fredrik-johansson/calcium/issues
+* Mailing list: `flint-devel <https://groups.google.com/d/forum/flint-devel>`_
 
 This documentation is available in HTML format at http://fredrikj.net/calcium/
 and in PDF format at http://fredrikj.net/calcium/calcium.pdf.

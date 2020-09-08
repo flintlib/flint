@@ -6,17 +6,21 @@ Introduction
 Exact numbers in Calcium
 -----------------------------------------------------------------------
 
-The basic idea to represent real or complex numbers exactly
-is to use symbolic expressions.
+To represent real or complex numbers exactly,
+the basic idea is to use symbolic expressions.
 A symbolic representation of a number can be used
 for lazy numerical evaluation (the number can be evaluated
 to any number of wanted digits on demand).
 More importantly, the symbolic representation makes
-it possible to decide exact predicates such as `x = y`,
+it possible to evaluate predicates requiring exact
+comparisons such as `x = y`,
 at least if the expressions are not too complicated.
 
-Calcium takes an algebraic approach to representing numbers
-symbolically. A real or complex number is represented
+Algebraic structures
+.......................................................................
+
+Calcium takes an algebraic approach to symbolic expressions.
+A real or complex number is represented
 by an element of a formal field
 
 .. math ::
@@ -41,7 +45,8 @@ are accounted for. The relations may involve algebraic numbers
 (for example: `e^{-\pi} \cdot e^{\pi} = 1`),
 or combinations thereof.
 As an important special case, Calcium can be used for
-arithmetic in embedded algebraic number fields
+arithmetic in algebraic number fields (embedded explicitly in
+`\mathbb{C}`)
 
 .. math ::
 
@@ -50,27 +55,32 @@ arithmetic in embedded algebraic number fields
 with excellent performance thanks to internal use of the Antic library.
 
 Calcium constructs all fields and finds algebraic relations
-automatically so that, from the perspective of the users,
+automatically so that, from the perspective of the user,
 numbers mostly just behave like mathematical numbers.
 
 It will not always work perfectly: although
 Calcium by design should never give a mathematically erroneous
 answer, it may be unable to simplify a result as much as expected
-and it may be unable to answer a predicate.
+and it may be unable to decide a predicate
+(in which case it can return "Unknown").
 Equality is at least decidable over the algebraic numbers
 `\overline{\mathbb{Q}}` (for practical
 degrees and bit sizes of the numbers!), and in certain
 cases involving transcendentals.
 We hope to improve Calcium's capabilities gradually
 through enhancements to its built-in algorithms
-as well as customization options.
+and through customization options.
 
-For further details, see the documentation of the
+Usage details
+.......................................................................
+
+To understand how Calcium works more concretely, see
+:ref:`examples` and the documentation for the
 main Calcium number type (:type:`ca_t`):
 
 * :ref:`ca`
 
-More information about implementation details for
+Implementation details for
 extension numbers and formal fields
 can be found in the documentation of the corresponding modules:
 

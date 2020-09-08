@@ -53,5 +53,6 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->options[CA_OPT_LOW_PREC] = 64;
     ctx->options[CA_OPT_SMOOTH_LIMIT] = 32;
     ctx->options[CA_OPT_LLL_PREC] = 128;
+    ctx->options[CA_OPT_POW_LIMIT] = 20;
     ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEFAULT;
 }
