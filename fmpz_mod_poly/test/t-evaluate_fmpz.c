@@ -22,12 +22,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("evaluate_fmpz....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -38,27 +39,28 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_randm(a, state, p);
-        fmpz_mod_poly_init(f, p);
-        fmpz_mod_poly_randtest(f, state, n_randint(state, 100));
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_randtest(f, state, n_randint(state, 100), ctx);
 
-        fmpz_mod_poly_evaluate_fmpz(b, f, a);
-        fmpz_mod_poly_evaluate_fmpz(a, f, a);
+        fmpz_mod_poly_evaluate_fmpz(b, f, a, ctx);
+        fmpz_mod_poly_evaluate_fmpz(a, f, a, ctx);
 
         result = (fmpz_equal(a, b));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(f), flint_printf("\n\n");
+            fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             fmpz_print(a), flint_printf("\n\n");
             fmpz_print(b), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(p);
@@ -74,17 +76,18 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(c);
-        fmpz_mod_poly_init(f, p);
+        fmpz_mod_poly_init(f, ctx);
         fmpz_poly_init(g);
         fmpz_randm(a, state, p);
-        fmpz_mod_poly_randtest(f, state, n_randint(state, 100));
-        fmpz_mod_poly_get_fmpz_poly(g, f);
+        fmpz_mod_poly_randtest(f, state, n_randint(state, 100), ctx);
+        fmpz_mod_poly_get_fmpz_poly(g, f, ctx);
 
-        fmpz_mod_poly_evaluate_fmpz(b, f, a);
+        fmpz_mod_poly_evaluate_fmpz(b, f, a, ctx);
         fmpz_poly_evaluate_fmpz(c, g, a);
         fmpz_mod(c, c, p);
 
@@ -92,7 +95,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL (cmp with fmpz_poly):\n");
-            fmpz_mod_poly_print(f), flint_printf("\n\n");
+            fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             fmpz_poly_print(g), flint_printf("\n\n");
             fmpz_print(a), flint_printf("\n\n");
             fmpz_print(b), flint_printf("\n\n");
@@ -104,10 +107,11 @@ main(void)
         fmpz_clear(b);
         fmpz_clear(c);
         fmpz_clear(p);
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_clear(f, ctx);
         fmpz_poly_clear(g);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

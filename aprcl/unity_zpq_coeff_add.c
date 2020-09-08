@@ -14,28 +14,30 @@
 void
 unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x)
 {
-    if (i >= fmpz_mod_poly_length(f->polys[j]))
+    if (i >= fmpz_mod_poly_length(f->polys[j], f->ctx))
     {
-        fmpz_mod_poly_set_coeff_fmpz(f->polys[j], i, x);
+        fmpz_mod_poly_set_coeff_fmpz(f->polys[j], i, x, f->ctx);
         return;
     }
 
     fmpz_add(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, x);           
-    if (fmpz_cmp(f->polys[j]->coeffs + i, f->n) >= 0)
-        fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, f->n);
+    if (fmpz_cmp(f->polys[j]->coeffs + i, fmpz_mod_ctx_modulus(f->ctx)) >= 0)
+        fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i,
+                                                 fmpz_mod_ctx_modulus(f->ctx));
 }
 
 void
 unity_zpq_coeff_add_ui(unity_zpq f, slong i, slong j, ulong x)
 {
-    if (i >= fmpz_mod_poly_length(f->polys[j]))
+    if (i >= fmpz_mod_poly_length(f->polys[j], f->ctx))
     {
-        fmpz_mod_poly_set_coeff_ui(f->polys[j], i, x);
+        fmpz_mod_poly_set_coeff_ui(f->polys[j], i, x, f->ctx);
         return;
     }
 
     fmpz_add_ui(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, x);          
-    if (fmpz_cmp(f->polys[j]->coeffs + i, f->n) >= 0)
-        fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, f->n);
+    if (fmpz_cmp(f->polys[j]->coeffs + i, fmpz_mod_ctx_modulus(f->ctx)) >= 0)
+        fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i,
+                                                 fmpz_mod_ctx_modulus(f->ctx));
 }
 

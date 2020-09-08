@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
+#include "fq_nmod_poly.h"
 
 
 
@@ -17,8 +17,8 @@
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
+#define T fq_nmod
+#define CAP_T FQ_NMOD
 #include "fq_poly_templates/test/t-set_nmod_poly.c"
 #undef CAP_T
 #undef T

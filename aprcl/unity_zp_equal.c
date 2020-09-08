@@ -21,9 +21,6 @@ unity_zp_equal(unity_zp f, unity_zp g)
     _unity_zp_reduce_cyclotomic(f);
     _unity_zp_reduce_cyclotomic(g);
 
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
-
-    return 1;
+    return fmpz_mod_poly_equal(f->poly, g->poly, f->ctx);
 }
 

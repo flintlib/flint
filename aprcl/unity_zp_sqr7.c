@@ -32,12 +32,12 @@ unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t)
     */
 
     /* set xi */
-    fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1);
-    fmpz_mod_poly_get_coeff_fmpz(t[2], g->poly, 2);
-    fmpz_mod_poly_get_coeff_fmpz(t[3], g->poly, 3);
-    fmpz_mod_poly_get_coeff_fmpz(t[4], g->poly, 4);
-    fmpz_mod_poly_get_coeff_fmpz(t[5], g->poly, 5);
+    fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[2], g->poly, 2, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[3], g->poly, 3, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[4], g->poly, 4, g->ctx);
+    fmpz_mod_poly_get_coeff_fmpz(t[5], g->poly, 5, g->ctx);
 
     fmpz_sub(t[6], t[0], t[1]);             /*  m1 = x0 - x1    */
     fmpz_sub(t[7], t[1], t[2]);             /*  m2 = x1 - x2    */

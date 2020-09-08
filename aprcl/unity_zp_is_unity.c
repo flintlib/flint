@@ -19,7 +19,7 @@ unity_zp_is_unity(unity_zp f)
     unity_zp unity;
 
     p_pow = n_pow(f->p, f->exp);
-    unity_zp_init(unity, f->p, f->exp, f->n);
+    unity_zp_init(unity, f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
 
     /* if the power was not found returns -1 */
     result = -1;

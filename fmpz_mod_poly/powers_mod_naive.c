@@ -71,66 +71,68 @@ _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f,
 }
 
 void
-fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f,
-               slong n, const fmpz_mod_poly_t g)
+fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
+                  const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
     fmpz_mod_poly_t ginv;
     fmpz ** res_arr;
     
-    if (fmpz_mod_poly_length(g) == 0)
+    if (fmpz_mod_poly_length(g, ctx) == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_powers_mod_naive). Divide by zero.\n");
         flint_abort();
     }
 
-    if (fmpz_mod_poly_length(f) == 0 || fmpz_mod_poly_length(g) == 1)
+    if (fmpz_mod_poly_length(f, ctx) == 0 || fmpz_mod_poly_length(g, ctx) == 1)
     {
         if (n > 0)
-           fmpz_mod_poly_one(res + 0);
+           fmpz_mod_poly_one(res + 0, ctx);
 
         for (i = 1; i < n; i++)
-           fmpz_mod_poly_zero(res + i);
+           fmpz_mod_poly_zero(res + i, ctx);
 
         return;
     }
 
-    if (fmpz_mod_poly_length(f) >= fmpz_mod_poly_length(g))
+    if (fmpz_mod_poly_length(f, ctx) >= fmpz_mod_poly_length(g, ctx))
     {
         fmpz_mod_poly_t q, r;
 
-        fmpz_mod_poly_init(q, &f->p);
-        fmpz_mod_poly_init(r, &f->p);
+        fmpz_mod_poly_init(q, ctx);
+        fmpz_mod_poly_init(r, ctx);
 
-        fmpz_mod_poly_divrem(q, r, f, g);
-        fmpz_mod_poly_powers_mod_naive(res, r, n, g);
+        fmpz_mod_poly_divrem(q, r, f, g, ctx);
+        fmpz_mod_poly_powers_mod_naive(res, r, n, g, ctx);
 
-        fmpz_mod_poly_clear(q);
-        fmpz_mod_poly_clear(r);
+        fmpz_mod_poly_clear(q, ctx);
+        fmpz_mod_poly_clear(r, ctx);
 
         return;
     }
 
     res_arr = (fmpz **) flint_malloc(n*sizeof(fmpz *));
-    fmpz_mod_poly_init(ginv, &g->p);
+    fmpz_mod_poly_init(ginv, ctx);
 
     for (i = 0; i < n; i++)
     {
-       fmpz_mod_poly_fit_length(res + i, fmpz_mod_poly_length(g) - 1);
+       fmpz_mod_poly_fit_length(res + i, fmpz_mod_poly_length(g, ctx) - 1, ctx);
        res_arr[i] = res[i].coeffs;
-       _fmpz_mod_poly_set_length(res + i, fmpz_mod_poly_length(g) - 1);
+       _fmpz_mod_poly_set_length(res + i, fmpz_mod_poly_length(g, ctx) - 1);
     }
 
-    fmpz_mod_poly_reverse(ginv, g, fmpz_mod_poly_length(g));
-    fmpz_mod_poly_inv_series(ginv, ginv, fmpz_mod_poly_length(g));
+    fmpz_mod_poly_reverse(ginv, g, fmpz_mod_poly_length(g, ctx), ctx);
+    fmpz_mod_poly_inv_series(ginv, ginv, fmpz_mod_poly_length(g, ctx), ctx);
 
     _fmpz_mod_poly_powers_mod_preinv_naive(res_arr, f->coeffs, f->length, n,
-                 g->coeffs, g->length, ginv->coeffs, ginv->length, &g->p);
+                             g->coeffs, g->length, ginv->coeffs, ginv->length,
+                                                    fmpz_mod_ctx_modulus(ctx));
 
     for (i = 0; i < n; i++)
        _fmpz_mod_poly_normalise(res + i);
     
-    fmpz_mod_poly_clear(ginv);
+    fmpz_mod_poly_clear(ginv, ctx);
     flint_free(res_arr);
 }

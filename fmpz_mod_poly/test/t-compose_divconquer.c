@@ -22,12 +22,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("compose_divconquer....");
     fflush(stdout);
 
-    
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -38,29 +39,30 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 80));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 30));
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 80), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 30), ctx);
 
-        fmpz_mod_poly_compose_divconquer(c, a, b);
-        fmpz_mod_poly_compose_divconquer(a, a, b);
+        fmpz_mod_poly_compose_divconquer(c, a, b, ctx);
+        fmpz_mod_poly_compose_divconquer(a, a, b, ctx);
 
-        result = (fmpz_mod_poly_equal(a, c));
+        result = (fmpz_mod_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
         fmpz_clear(p);
     }
 
@@ -73,29 +75,30 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 80));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 30));
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 80), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 30), ctx);
 
-        fmpz_mod_poly_compose_divconquer(c, a, b);
-        fmpz_mod_poly_compose_divconquer(b, a, b);
+        fmpz_mod_poly_compose_divconquer(c, a, b, ctx);
+        fmpz_mod_poly_compose_divconquer(b, a, b, ctx);
 
-        result = (fmpz_mod_poly_equal(b, c));
+        result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
         fmpz_clear(p);
     }
 
@@ -109,45 +112,47 @@ main(void)
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(d, p);
-        fmpz_mod_poly_randtest(a, state, n_randint(state, 80));
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 30));
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(d, ctx);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 80), ctx);
+        fmpz_mod_poly_randtest(b, state, n_randint(state, 30), ctx);
 
         fmpz_poly_init(A);
         fmpz_poly_init(B);
         fmpz_poly_init(C);
-        fmpz_mod_poly_get_fmpz_poly(A, a);
-        fmpz_mod_poly_get_fmpz_poly(B, b);
+        fmpz_mod_poly_get_fmpz_poly(A, a, ctx);
+        fmpz_mod_poly_get_fmpz_poly(B, b, ctx);
 
-        fmpz_mod_poly_compose_divconquer(c, a, b);
+        fmpz_mod_poly_compose_divconquer(c, a, b, ctx);
         fmpz_poly_compose(C, A, B);
-        fmpz_mod_poly_set_fmpz_poly(d, C);
+        fmpz_mod_poly_set_fmpz_poly(d, C, ctx);
 
-        result = (fmpz_mod_poly_equal(c, d));
+        result = (fmpz_mod_poly_equal(c, d, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(a), flint_printf("\n\n");
-            fmpz_mod_poly_print(b), flint_printf("\n\n");
-            fmpz_mod_poly_print(c), flint_printf("\n\n");
-            fmpz_mod_poly_print(d), flint_printf("\n\n");
+            fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(d, ctx), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(d);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(d, ctx);
         fmpz_poly_clear(A);
         fmpz_poly_clear(B);
         fmpz_poly_clear(C);
         fmpz_clear(p);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

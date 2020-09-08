@@ -91,10 +91,10 @@ _aprcl_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 
     /* initialization */
     r = n_pow(j->p, j->exp);            /* r = p^k */
-    unity_zp_init(j0, j->p, j->exp, j->n);
-    unity_zp_init(jv, j->p, j->exp, j->n);
-    unity_zp_init(temp, j->p, j->exp, j->n);
-    unity_zp_init(aut, j->p, j->exp, j->n);
+    unity_zp_init(j0, j->p, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(jv, j->p, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(temp, j->p, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(aut, j->p, j->exp, fmpz_mod_ctx_modulus(j->ctx));
 
     unity_zp_coeff_set_ui(j0, 0, 1);    /* j0 = 1 */
     unity_zp_coeff_set_ui(jv, 0, 1);    /* jv = 1 */
@@ -218,9 +218,9 @@ _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong
     unity_zp j0, jv, j_pow;
 
     /* initialization */
-    unity_zp_init(j_pow, 2, 2, j->n);
-    unity_zp_init(j0, 2, 2, j->n);
-    unity_zp_init(jv, 2, 2, j->n);
+    unity_zp_init(j_pow, 2, 2, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(j0, 2, 2, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(jv, 2, 2, fmpz_mod_ctx_modulus(j->ctx));
 
     /* set j0 = q * j^2 */
     unity_zp_mul(j_pow, j, j);
@@ -280,11 +280,11 @@ _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
 
     /* initialization */
     r = n_pow(j->p, j->exp);
-    unity_zp_init(temp, 2, j->exp, j->n);
-    unity_zp_init(j_j0, 2, j->exp, j->n);
-    unity_zp_init(aut, 2, j->exp, j->n);
-    unity_zp_init(j0, 2, j->exp, j->n);
-    unity_zp_init(jv, 2, j->exp, j->n);
+    unity_zp_init(temp, 2, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(j_j0, 2, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(aut, 2, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(j0, 2, j->exp, fmpz_mod_ctx_modulus(j->ctx));
+    unity_zp_init(jv, 2, j->exp, fmpz_mod_ctx_modulus(j->ctx));
 
     unity_zp_coeff_set_ui(j0, 0, 1);    /* j0 = 1 */
     unity_zp_coeff_set_ui(jv, 0, 1);    /* jv = 1 */

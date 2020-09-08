@@ -22,29 +22,30 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong c)
+void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                             slong c, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
    fmpz_init(d);
    fmpz_set_si(d, c);
 
-   if (fmpz_size(&poly->p) > 1)
+   if (fmpz_size(fmpz_mod_ctx_modulus(ctx)) > 1)
    {
       if (c < 0)
-         fmpz_add(d, d, &poly->p);
+         fmpz_add(d, d, fmpz_mod_ctx_modulus(ctx));
    } else
-      fmpz_mod(d, d, &poly->p);
+      fmpz_mod(d, d, fmpz_mod_ctx_modulus(ctx));
       
    if (poly->length == 0)
-      fmpz_mod_poly_set_fmpz(res, d);
+      fmpz_mod_poly_set_fmpz(res, d, ctx);
    else
    {
-      fmpz_mod_poly_set(res, poly);
+      fmpz_mod_poly_set(res, poly, ctx);
 
       fmpz_add(res->coeffs + 0, res->coeffs + 0, d);
-      if (fmpz_cmp(res->coeffs + 0, &poly->p) >= 0)
-         fmpz_sub(res->coeffs + 0, res->coeffs + 0, &poly->p);
+      if (fmpz_cmp(res->coeffs + 0, fmpz_mod_ctx_modulus(ctx)) >= 0)
+         fmpz_sub(res->coeffs + 0, res->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
 
       _fmpz_mod_poly_normalise(res);
    }
@@ -52,34 +53,35 @@ void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong
    fmpz_clear(d);
 }
 
-void fmpz_mod_poly_sub_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong c)
+void fmpz_mod_poly_sub_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                             slong c, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
    fmpz_init(d);
    fmpz_set_si(d, c);
 
-   if (fmpz_size(&poly->p) > 1)
+   if (fmpz_size(fmpz_mod_ctx_modulus(ctx)) > 1)
    {
       if (c < 0)
-         fmpz_add(d, d, &poly->p);
+         fmpz_add(d, d, fmpz_mod_ctx_modulus(ctx));
    } else
-      fmpz_mod(d, d, &poly->p);
+      fmpz_mod(d, d, fmpz_mod_ctx_modulus(ctx));
       
    if (poly->length == 0)
    {
-      fmpz_sub(d, &poly->p, d);
-      if (fmpz_cmp(d, &poly->p) == 0)
+      fmpz_sub(d, fmpz_mod_ctx_modulus(ctx), d);
+      if (fmpz_cmp(d, fmpz_mod_ctx_modulus(ctx)) == 0)
          fmpz_zero(d);
-      fmpz_mod_poly_set_fmpz(res, d);
+      fmpz_mod_poly_set_fmpz(res, d, ctx);
    }
    else
    {
-      fmpz_mod_poly_set(res, poly);
+      fmpz_mod_poly_set(res, poly, ctx);
 
       fmpz_sub(res->coeffs + 0, res->coeffs + 0, d);
       if (fmpz_sgn(res->coeffs + 0) < 0)
-         fmpz_add(res->coeffs + 0, res->coeffs + 0, &poly->p);
+         fmpz_add(res->coeffs + 0, res->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
 
       _fmpz_mod_poly_normalise(res);
    }
@@ -87,30 +89,31 @@ void fmpz_mod_poly_sub_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong
    fmpz_clear(d);
 }
 
-void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c, const fmpz_mod_poly_t poly)
+void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c,
+                          const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
    fmpz_init(d);
    fmpz_set_si(d, c);
 
-   if (fmpz_size(&poly->p) > 1)
+   if (fmpz_size(fmpz_mod_ctx_modulus(ctx)) > 1)
    {
       if (c < 0)
-         fmpz_add(d, d, &poly->p);
+         fmpz_add(d, d, fmpz_mod_ctx_modulus(ctx));
    } else
-      fmpz_mod(d, d, &poly->p);
+      fmpz_mod(d, d, fmpz_mod_ctx_modulus(ctx));
       
 
    if (poly->length == 0)
-      fmpz_mod_poly_set_fmpz(res, d);
+      fmpz_mod_poly_set_fmpz(res, d, ctx);
    else
    {
-      fmpz_mod_poly_neg(res, poly);
+      fmpz_mod_poly_neg(res, poly, ctx);
 
       fmpz_add(res->coeffs + 0, res->coeffs + 0, d);
-      if (fmpz_cmp(res->coeffs + 0, &poly->p) >= 0)
-         fmpz_sub(res->coeffs + 0, res->coeffs + 0, &poly->p);
+      if (fmpz_cmp(res->coeffs + 0, fmpz_mod_ctx_modulus(ctx)) >= 0)
+         fmpz_sub(res->coeffs + 0, res->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
 
       _fmpz_mod_poly_normalise(res);
    }
@@ -118,25 +121,26 @@ void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c, const fmpz_mod_poly_t po
    fmpz_clear(d);
 }
 
-void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmpz_t c)
+void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                            fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
    fmpz_init(d);
-   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, &poly->p) >= 0)
-      fmpz_mod(d, c, &poly->p);
+   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, fmpz_mod_ctx_modulus(ctx)) >= 0)
+      fmpz_mod(d, c, fmpz_mod_ctx_modulus(ctx));
    else
       fmpz_set(d, c);
 
    if (poly->length == 0)
-      fmpz_mod_poly_set_fmpz(res, d);
+      fmpz_mod_poly_set_fmpz(res, d, ctx);
    else
    {
-      fmpz_mod_poly_set(res, poly);
+      fmpz_mod_poly_set(res, poly, ctx);
 
       fmpz_add(res->coeffs + 0, res->coeffs + 0, d);
-      if (fmpz_cmp(res->coeffs + 0, &poly->p) >= 0)
-         fmpz_sub(res->coeffs + 0, res->coeffs + 0, &poly->p);
+      if (fmpz_cmp(res->coeffs + 0, fmpz_mod_ctx_modulus(ctx)) >= 0)
+         fmpz_sub(res->coeffs + 0, res->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
 
       _fmpz_mod_poly_normalise(res);
    }
@@ -144,29 +148,30 @@ void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmp
    fmpz_clear(d);
 }
 
-void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmpz_t c)
+void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                            fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
    fmpz_init(d);
-   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, &poly->p) >= 0)
-      fmpz_mod(d, c, &poly->p);
+   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, fmpz_mod_ctx_modulus(ctx)) >= 0)
+      fmpz_mod(d, c, fmpz_mod_ctx_modulus(ctx));
    else
       fmpz_set(d, c);
 
    if (poly->length == 0)
    {
-      fmpz_sub(d, &poly->p, d);
-      if (fmpz_cmp(d, &poly->p) == 0)
+      fmpz_sub(d, fmpz_mod_ctx_modulus(ctx), d);
+      if (fmpz_cmp(d, fmpz_mod_ctx_modulus(ctx)) == 0)
          fmpz_zero(d);
-      fmpz_mod_poly_set_fmpz(res, d);
+      fmpz_mod_poly_set_fmpz(res, d, ctx);
    } else
    {
-      fmpz_mod_poly_set(res, poly);
+      fmpz_mod_poly_set(res, poly, ctx);
 
       fmpz_sub(res->coeffs + 0, res->coeffs + 0, d);
       if (fmpz_sgn(res->coeffs + 0) < 0)
-         fmpz_add(res->coeffs + 0, res->coeffs + 0, &poly->p);
+         fmpz_add(res->coeffs + 0, res->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
 
       _fmpz_mod_poly_normalise(res);
    }
@@ -174,26 +179,27 @@ void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmp
    fmpz_clear(d);
 }
 
-void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, fmpz_t c, const fmpz_mod_poly_t poly)
+void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, fmpz_t c,
+                          const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
    fmpz_init(d);
-   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, &poly->p) >= 0)
-      fmpz_mod(d, c, &poly->p);
+   if (fmpz_sgn(c) < 0 || fmpz_cmp(c, fmpz_mod_ctx_modulus(ctx)) >= 0)
+      fmpz_mod(d, c, fmpz_mod_ctx_modulus(ctx));
    else
       fmpz_set(d, c);
 
 
    if (poly->length == 0)
-      fmpz_mod_poly_set_fmpz(res, d);
+      fmpz_mod_poly_set_fmpz(res, d, ctx);
    else
    {
-      fmpz_mod_poly_neg(res, poly);
+      fmpz_mod_poly_neg(res, poly, ctx);
 
       fmpz_add(res->coeffs + 0, res->coeffs + 0, d);
-      if (fmpz_cmp(res->coeffs + 0, &poly->p) >= 0)
-         fmpz_sub(res->coeffs + 0, res->coeffs + 0, &poly->p);
+      if (fmpz_cmp(res->coeffs + 0, fmpz_mod_ctx_modulus(ctx)) >= 0)
+         fmpz_sub(res->coeffs + 0, res->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
 
       _fmpz_mod_poly_normalise(res);
    }

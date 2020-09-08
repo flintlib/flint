@@ -20,8 +20,9 @@
 #include "ulong_extras.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z, fmpz_mod_poly_factor_t fac, slong i)
+void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z,
+                 fmpz_mod_poly_factor_t fac, slong i, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_poly_set(z, fac->poly + i);
+    fmpz_mod_poly_set(z, fac->poly + i, ctx);
 }
 

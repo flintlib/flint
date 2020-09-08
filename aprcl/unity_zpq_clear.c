@@ -18,12 +18,12 @@ unity_zpq_clear(unity_zpq f)
 
     for (i = 0; i < f->p; i++)
     {
-        fmpz_mod_poly_clear(f->polys[i]);
+        fmpz_mod_poly_clear(f->polys[i], f->ctx);
     }
 
     f->p = 0;
     f->q = 0;
 
-    fmpz_clear(f->n);
+    fmpz_mod_ctx_clear(f->ctx);
     flint_free(f->polys);
 }

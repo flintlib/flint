@@ -158,7 +158,7 @@ int _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
         entries += FLINT_BIT_COUNT(degrees[i]);
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
     powers = (fmpz_poly_struct *) TMP_ALLOC(entries*sizeof(fmpz_poly_struct));
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
@@ -365,7 +365,7 @@ int _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
         entries += bitcounts[i];
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
     powers = (fmpz_poly_struct *) TMP_ALLOC(entries*sizeof(fmpz_poly_struct));
 
     N = mpoly_words_per_exp(bits, ctx->minfo);

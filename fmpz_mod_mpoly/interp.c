@@ -37,12 +37,12 @@ void fmpz_mod_mpolyn_intp_reduce_sm_poly(
     Aexp = A->exps;
     Alen = A->length;
     Ai = 0;
-    fmpz_mod_poly_zero(E);
+    fmpz_mod_poly_zero(E, ctx->ffinfo);
     for (Ai = 0; Ai < Alen; Ai++)
     {
-        fmpz_mod_poly_evaluate_fmpz(v, Acoeff + Ai, alpha);
+        fmpz_mod_poly_evaluate_fmpz(v, Acoeff + Ai, alpha, ctx->ffinfo);
         k = (Aexp + N*Ai)[off] >> shift;
-        fmpz_mod_poly_set_coeff_fmpz(E, k, v);
+        fmpz_mod_poly_set_coeff_fmpz(E, k, v, ctx->ffinfo);
     }
 
     fmpz_clear(v);
@@ -58,7 +58,7 @@ void fmpz_mod_mpolyn_intp_lift_sm_poly(
     const fmpz_mod_mpoly_ctx_t ctx)
 {
     slong Bi;
-    slong Blen = fmpz_mod_poly_length(B);
+    slong Blen = fmpz_mod_poly_length(B, ctx->ffinfo);
     fmpz * Bcoeff = B->coeffs;
     fmpz_mod_poly_struct * Acoeff;
     ulong * Aexp;
@@ -79,7 +79,7 @@ void fmpz_mod_mpolyn_intp_lift_sm_poly(
         {
             FLINT_ASSERT(Ai < A->alloc);
 
-            fmpz_mod_poly_set_fmpz(Acoeff + Ai, Bcoeff + Bi);
+            fmpz_mod_poly_set_fmpz(Acoeff + Ai, Bcoeff + Bi, ctx->ffinfo);
             mpoly_monomial_zero(Aexp + N*Ai, N);
             (Aexp + N*Ai)[off] = Bi << shift;
             Ai++;
@@ -122,11 +122,11 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
     mpoly_gen_offset_shift_sp(&off, &shift, 0, F->bits, ctx->minfo);
 
     Fi = 0;
-    Ai = fmpz_mod_poly_degree(A);
+    Ai = fmpz_mod_poly_degree(A, ctx->ffinfo);
 
     fmpz_init(u);
     fmpz_init(v);
-    fmpz_mod_poly_init(tp, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(tp, ctx->ffinfo);
 
     fmpz_mod_mpolyn_fit_length(T, Flen + Ai + 1, ctx);
     Tcoeff = T->coeffs;
@@ -139,8 +139,9 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
 
         if (Fi < Flen)
         {
-            FLINT_ASSERT(!fmpz_mod_poly_is_zero(Fcoeff + Fi));
-            FLINT_ASSERT(fmpz_mod_poly_degree(Fcoeff + Fi) < fmpz_mod_poly_degree(modulus));
+            FLINT_ASSERT(!fmpz_mod_poly_is_zero(Fcoeff + Fi, ctx->ffinfo));
+            FLINT_ASSERT(fmpz_mod_poly_degree(Fcoeff + Fi, ctx->ffinfo) <
+                                   fmpz_mod_poly_degree(modulus, ctx->ffinfo));
         }
 
         if (Ai >= 0)
@@ -153,17 +154,17 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
         if (Fi < Flen && Ai >= 0 && ((Fexp + N*Fi)[off]>>shift) == Ai)
         {
             /* F term ok, A term ok */
-            fmpz_mod_poly_evaluate_fmpz(u, Fcoeff + Fi, alpha);
+            fmpz_mod_poly_evaluate_fmpz(u, Fcoeff + Fi, alpha, ctx->ffinfo);
             fmpz_mod_sub(v, Acoeff + Ai, u, ctx->ffinfo);
             if (!fmpz_is_zero(v))
             {
                 changed = 1;
-                fmpz_mod_poly_scalar_mul_fmpz(tp, modulus, v);
-                fmpz_mod_poly_add(Tcoeff + Ti, Fcoeff + Fi, tp);
+                fmpz_mod_poly_scalar_mul_fmpz(tp, modulus, v, ctx->ffinfo);
+                fmpz_mod_poly_add(Tcoeff + Ti, Fcoeff + Fi, tp, ctx->ffinfo);
             }
             else
             {
-                fmpz_mod_poly_set(Tcoeff + Ti, Fcoeff + Fi);
+                fmpz_mod_poly_set(Tcoeff + Ti, Fcoeff + Fi, ctx->ffinfo);
             }
 
             (Texp + N*Ti)[off] = Ai << shift;
@@ -175,16 +176,16 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
         else if (Fi < Flen && (Ai < 0 || ((Fexp + N*Fi)[off]>>shift) > Ai))
         {
             /* F term ok, A term missing */
-            fmpz_mod_poly_evaluate_fmpz(v, Fcoeff + Fi, alpha);
+            fmpz_mod_poly_evaluate_fmpz(v, Fcoeff + Fi, alpha, ctx->ffinfo);
             if (!fmpz_is_zero(v))
             {
                 changed = 1;
-                fmpz_mod_poly_scalar_mul_fmpz(tp, modulus, v);
-                fmpz_mod_poly_sub(Tcoeff + Ti, Fcoeff + Fi, tp);
+                fmpz_mod_poly_scalar_mul_fmpz(tp, modulus, v, ctx->ffinfo);
+                fmpz_mod_poly_sub(Tcoeff + Ti, Fcoeff + Fi, tp, ctx->ffinfo);
             }
             else
             {
-                fmpz_mod_poly_set(Tcoeff + Ti, Fcoeff + Fi);                
+                fmpz_mod_poly_set(Tcoeff + Ti, Fcoeff + Fi, ctx->ffinfo);                
             }
 
             (Texp + N*Ti)[off] = (Fexp + N*Fi)[off];
@@ -194,7 +195,7 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
         {
             /* F term missing, A term ok */
             changed = 1;
-            fmpz_mod_poly_scalar_mul_fmpz(Tcoeff + Ti, modulus, Acoeff + Ai);
+            fmpz_mod_poly_scalar_mul_fmpz(Tcoeff + Ti, modulus, Acoeff + Ai, ctx->ffinfo);
 
             (Texp + N*Ti)[off] = Ai << shift;
             do {
@@ -206,8 +207,8 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
             FLINT_ASSERT(0);
         }
 
-        FLINT_ASSERT(!fmpz_mod_poly_is_zero(Tcoeff + Ti));
-        lastdeg = FLINT_MAX(lastdeg, fmpz_mod_poly_degree(Tcoeff + Ti));
+        FLINT_ASSERT(!fmpz_mod_poly_is_zero(Tcoeff + Ti, ctx->ffinfo));
+        lastdeg = FLINT_MAX(lastdeg, fmpz_mod_poly_degree(Tcoeff + Ti, ctx->ffinfo));
 
         Ti++;
     }
@@ -215,7 +216,7 @@ int fmpz_mod_mpolyn_intp_crt_sm_poly(
 
     fmpz_clear(u);
     fmpz_clear(v);
-    fmpz_mod_poly_clear(tp);
+    fmpz_mod_poly_clear(tp, ctx->ffinfo);
 
     if (changed)
     {

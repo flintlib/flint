@@ -16,9 +16,9 @@
 void
 fq_ctx_clear(fq_ctx_t ctx)
 {
-    fmpz_mod_poly_clear(ctx->modulus);
-    fmpz_mod_poly_clear(ctx->inv);
-    fmpz_clear(fq_ctx_prime(ctx));
+    fmpz_mod_poly_clear(ctx->modulus, ctx->ctxp);
+    fmpz_mod_poly_clear(ctx->inv, ctx->ctxp);
+    fmpz_mod_ctx_clear(ctx->ctxp);
     flint_free(ctx->var);
     _fmpz_vec_clear(ctx->a, ctx->len);
     flint_free(ctx->j);

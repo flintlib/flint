@@ -18,29 +18,31 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void
-fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
-    fmpz_mod_poly_fit_length(f, len);
+    fmpz_mod_poly_fit_length(f, len, ctx);
 
     for (i = 0; i < len; i++)
-        fmpz_randm(f->coeffs + i, state, &(f->p));
+        fmpz_randm(f->coeffs + i, state, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(f, len);
     _fmpz_mod_poly_normalise(f);
 }
 
-void
-fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state,
+                                           slong len, const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
-    fmpz_mod_poly_fit_length(f, len);
+    FLINT_ASSERT(len > 0);
+
+    fmpz_mod_poly_fit_length(f, len, ctx);
 
     for (i = 0; i < len - 1; i++)
-        fmpz_randm(f->coeffs + i, state, &(f->p));
+        fmpz_randm(f->coeffs + i, state, fmpz_mod_ctx_modulus(ctx));
 
     fmpz_one(f->coeffs + len - 1);
 
@@ -49,23 +51,22 @@ fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len)
 
 static void
 fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_t state,
-                                                      slong len, slong nonzero)
+                            slong len, slong nonzero, const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
-    fmpz_mod_poly_fit_length(poly, len);
+    fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
-    fmpz_randm(poly->coeffs + 0, state, &(poly->p));
+    fmpz_randm(poly->coeffs + 0, state, fmpz_mod_ctx_modulus(ctx));
     for (i = 1; i < nonzero; i++)
        fmpz_randm(poly->coeffs + n_randint(state, len - 1) + 1,
-                                                            state, &(poly->p));
+                                             state, fmpz_mod_ctx_modulus(ctx));
     fmpz_set_ui(poly->coeffs + len - 1, 1);
     _fmpz_mod_poly_set_length(poly, len);
 }
 
-void
-fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
-                                   flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_t state,
+                                           slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -73,14 +74,14 @@ fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
         flint_abort();
     }
 
-    fmpz_mod_poly_randtest(f, state, len);
-    while (fmpz_mod_poly_is_zero(f) || !fmpz_mod_poly_is_irreducible(f))
-        fmpz_mod_poly_randtest(f, state, len);
+    do {
+        fmpz_mod_poly_randtest(f, state, len, ctx);
+    } while (fmpz_mod_poly_is_zero(f, ctx) ||
+             !fmpz_mod_poly_is_irreducible(f, ctx));
 }
 
-void
-fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
-                                         flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
+                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -88,14 +89,14 @@ fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
         flint_abort();
     }
 
-    fmpz_mod_poly_randtest_monic(f, state, len);
-    while (fmpz_mod_poly_is_zero(f) || !fmpz_mod_poly_is_irreducible(f))
-        fmpz_mod_poly_randtest_monic(f, state, len);
+    do {
+        fmpz_mod_poly_randtest_monic(f, state, len, ctx);
+    } while (fmpz_mod_poly_is_zero(f, ctx) ||
+             !fmpz_mod_poly_is_irreducible(f, ctx));
 }
 
-void
-fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
-                                flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
+                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -103,117 +104,121 @@ fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
         flint_abort();
     }
 
-    fmpz_mod_poly_randtest(f, state, len);
-    while (fmpz_mod_poly_is_zero(f))
-        fmpz_mod_poly_randtest(f, state, len);
+    do {
+        fmpz_mod_poly_randtest(f, state, len, ctx);
+    } while (fmpz_mod_poly_is_zero(f, ctx));
 }
 
 static void
 fmpz_mod_poly_randtest_monic_irreducible_sparse(fmpz_mod_poly_t poly,
-                                              flint_rand_t state, slong len)
+                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     slong i = 3, attempts;
 
     while (i <= len/2)
     {
         attempts = 0;
-        while (i == len/2 || attempts < 2*len) {
-            fmpz_mod_poly_randtest_monic_sparse(poly, state, len, i);
-            if (!fmpz_mod_poly_is_zero(poly) && fmpz_mod_poly_is_irreducible(poly))
+        while (i == len/2 || attempts < 2*len)
+        {
+            fmpz_mod_poly_randtest_monic_sparse(poly, state, len, i, ctx);
+            if (!fmpz_mod_poly_is_zero(poly, ctx) &&
+                fmpz_mod_poly_is_irreducible(poly, ctx))
+            {
                return;
+            }
             attempts++;
         }
         i++;
     }
 }
 
-void
-fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly,
+                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     ulong k;
-    fmpz_mod_poly_fit_length(poly, len);
+    fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
-    fmpz_randm(poly->coeffs, state, &(poly->p));
+    fmpz_randm(poly->coeffs, state, fmpz_mod_ctx_modulus(ctx));
     k = (n_randtest(state) % (len - 2)) + 1;
-    fmpz_randm(poly->coeffs + k, state, &(poly->p));
+    fmpz_randm(poly->coeffs + k, state, fmpz_mod_ctx_modulus(ctx));
     fmpz_one(poly->coeffs + len - 1);
     _fmpz_mod_poly_set_length(poly, len);
 }
 
-void
-fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly,
+                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_poly_fit_length(poly, len);
+    fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
-    fmpz_randm(poly->coeffs, state, &(poly->p));
-    fmpz_randm(poly->coeffs + 1, state, &(poly->p));
-    fmpz_randm(poly->coeffs + 2, state, &(poly->p));
-    fmpz_randm(poly->coeffs + 3, state, &(poly->p));
+    fmpz_randm(poly->coeffs, state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randm(poly->coeffs + 1, state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randm(poly->coeffs + 2, state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randm(poly->coeffs + 3, state, fmpz_mod_ctx_modulus(ctx));
     fmpz_one(poly->coeffs + len - 1);
     _fmpz_mod_poly_set_length(poly, len);
 }
 
-int
-fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t poly, flint_rand_t state,
-                                             slong len, slong max_attempts)
+int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t poly,
+                           flint_rand_t state, slong len, slong max_attempts,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong i = 0;
 
     while (max_attempts == 0 || i < max_attempts)
     {
-        fmpz_mod_poly_randtest_trinomial(poly, state, len);
-        if (!fmpz_mod_poly_is_zero(poly) && fmpz_mod_poly_is_irreducible(poly))
+        fmpz_mod_poly_randtest_trinomial(poly, state, len, ctx);
+        if (!fmpz_mod_poly_is_zero(poly, ctx) &&
+            fmpz_mod_poly_is_irreducible(poly, ctx))
         {
             return 1;
         }
         i++;
-        
     }
     return 0;
 }
 
-int
-fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly, flint_rand_t state,
-                                             slong len, slong max_attempts)
+int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly,
+                           flint_rand_t state, slong len, slong max_attempts,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong i = 0;
 
     while (max_attempts == 0 || i < max_attempts)
     {
-        fmpz_mod_poly_randtest_pentomial(poly, state, len);
-        if (!fmpz_mod_poly_is_zero(poly) && fmpz_mod_poly_is_irreducible(poly))
+        fmpz_mod_poly_randtest_pentomial(poly, state, len, ctx);
+        if (!fmpz_mod_poly_is_zero(poly, ctx) &&
+            fmpz_mod_poly_is_irreducible(poly, ctx))
         {
             return 1;
         }
         i++;
-        
     }
     return 0;
 }
 
-void
-fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
+                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len < 3)
     {
-        fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);
+        fmpz_mod_poly_randtest_monic_irreducible(poly, state, len, ctx);
         return;
     }
 
     /* Try trinomials */
-    if (fmpz_mod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len))
+    if (fmpz_mod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len, ctx))
         return;
 
     if (len < 5)
     {
-        fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);
+        fmpz_mod_poly_randtest_monic_irreducible(poly, state, len, ctx);
         return;
     }
 
     /* Try pentomials */
-    if (fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len))
+    if (fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len, ctx))
         return;
 
     /* Random monic sparse */
-    fmpz_mod_poly_randtest_monic_irreducible_sparse(poly, state, len);
+    fmpz_mod_poly_randtest_monic_irreducible_sparse(poly, state, len, ctx);
 }

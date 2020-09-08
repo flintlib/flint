@@ -16,8 +16,8 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void
-fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
+void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     if (fmpz_is_zero(x))
     {
@@ -25,9 +25,10 @@ fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
           return;
 
        fmpz_zero(poly->coeffs + n);
-    } else
+    }
+    else
     {
-        fmpz_mod_poly_fit_length(poly, n + 1);
+        fmpz_mod_poly_fit_length(poly, n + 1, ctx);
 
         if (n + 1 > poly->length)
         {
@@ -35,7 +36,7 @@ fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
             poly->length = n + 1;
         }
 
-        fmpz_mod(poly->coeffs + n, x, &(poly->p));
+        fmpz_mod(poly->coeffs + n, x, fmpz_mod_ctx_modulus(ctx));
     }
 
     if (n == poly->length - 1) 

@@ -215,8 +215,8 @@ void fq_nmod_mpoly_to_mpolyu_perm_deflate(
 
     FLINT_ASSERT(fq_nmod_mpoly_is_canonical(B, ctx));
 
-    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(fmpz));
-    Bexps = (ulong *) TMP_ALLOC(n*sizeof(fmpz));
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(ulong));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
     fq_nmod_mpolyu_zero(A, uctx);
 

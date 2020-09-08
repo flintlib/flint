@@ -21,10 +21,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("discriminant....");
     fflush(stdout);
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check disc(fg) == disc(f) * disc(g) * res(f, g)^2 */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -40,47 +43,45 @@ main(void)
         fmpz_init(r);
 
         fmpz_set_ui(n, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, n);
 
-        fmpz_mod_poly_init(f, n);
-        fmpz_mod_poly_init(g, n);
-        fmpz_mod_poly_init(h, n);
+        fmpz_mod_poly_init(f, ctx);
+        fmpz_mod_poly_init(g, ctx);
+        fmpz_mod_poly_init(h, ctx);
         
         do {
-           fmpz_mod_poly_randtest(f, state, n_randint(state, 200));
+           fmpz_mod_poly_randtest(f, state, n_randint(state, 200), ctx);
         } while (f->length < 2);
         do {
-           fmpz_mod_poly_randtest(g, state, n_randint(state, 200));
+           fmpz_mod_poly_randtest(g, state, n_randint(state, 200), ctx);
         } while (g->length < 2);
 
-        fmpz_mod_poly_discriminant(y, f);
-        fmpz_mod_poly_discriminant(z, g);
-        fmpz_mul(y, y, z);
-        fmpz_mod(y, y, n);
-        fmpz_mod_poly_resultant(r, f, g);
-        fmpz_mul(r, r, r);
-        fmpz_mod(r, r, n);
-        fmpz_mul(y, y, r);
-        fmpz_mod(y, y, n);
-        fmpz_mod_poly_mul(h, f, g);
-        fmpz_mod_poly_discriminant(x, h);
+        fmpz_mod_poly_discriminant(y, f, ctx);
+        fmpz_mod_poly_discriminant(z, g, ctx);
+        fmpz_mod_mul(y, y, z, ctx);
+        fmpz_mod_poly_resultant(r, f, g, ctx);
+        fmpz_mod_mul(r, r, r, ctx);
+        fmpz_mod_mul(y, y, r, ctx);
+        fmpz_mod_poly_mul(h, f, g, ctx);
+        fmpz_mod_poly_discriminant(x, h, ctx);
 
         result = (fmpz_equal(x, y));
         if (!result)
         {
             flint_printf("FAIL (disc(fg) == res(f, g)^2 * disc(f) * disc(g):\n");
-            fmpz_mod_poly_print(f), flint_printf("\n\n");
-            fmpz_mod_poly_print(g), flint_printf("\n\n");
-            fmpz_mod_poly_print(h), flint_printf("\n\n");
+            fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
             flint_printf("x = "); fmpz_print(x); printf("\n");
             flint_printf("y = "); fmpz_print(y); printf("\n");
             flint_printf("z = "); fmpz_print(z); printf("\n");
             flint_printf("n = "); fmpz_print(n); printf("\n");
-            abort();
+            flint_abort();
         }
         
-        fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_clear(g);
-        fmpz_mod_poly_clear(h);
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_poly_clear(g, ctx);
+        fmpz_mod_poly_clear(h, ctx);
 
         fmpz_clear(n);
         fmpz_clear(x);
@@ -100,30 +101,32 @@ main(void)
         fmpz_init(n);
 
         fmpz_set_ui(n, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, n);
 
-        fmpz_mod_poly_init(f, n);
+        fmpz_mod_poly_init(f, ctx);
         
-        fmpz_mod_poly_randtest(f, state, 1);
+        fmpz_mod_poly_randtest(f, state, 1, ctx);
         
-        fmpz_mod_poly_discriminant(y, f);
+        fmpz_mod_poly_discriminant(y, f, ctx);
         
         result = fmpz_is_zero(y);
         if (!result)
         {
             flint_printf("FAIL disc(f) == 0 for len f < 2:\n");
-            fmpz_mod_poly_print(f), flint_printf("\n\n");
+            fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("y = "); fmpz_print(y); printf("\n");
-            abort();
+            flint_abort();
         }
         
         fmpz_clear(n);
         fmpz_clear(y);
 
-        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_clear(f, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
     
+    fmpz_mod_ctx_clear(ctx);
     flint_printf("PASS\n");
     return 0;
 }

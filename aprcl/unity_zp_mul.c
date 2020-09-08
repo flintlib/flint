@@ -16,16 +16,21 @@ unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 {
     slong glen, hlen;
 
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(g->ctx)));
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(h->ctx)));
+
     glen = g->poly->length;
     hlen = h->poly->length;
 
     if (glen == 0 || hlen == 0)
     {
-        fmpz_mod_poly_zero(f->poly);
+        fmpz_mod_poly_zero(f->poly, f->ctx);
         return;
     }
 
-    fmpz_mod_poly_fit_length(f->poly, glen + hlen - 1);
+    fmpz_mod_poly_fit_length(f->poly, glen + hlen - 1, f->ctx);
 
     if (glen >= hlen)
         _fmpz_poly_mul(f->poly->coeffs, g->poly->coeffs, glen, h->poly->coeffs, hlen);

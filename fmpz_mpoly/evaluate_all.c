@@ -302,8 +302,8 @@ int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
         entries += varibits;
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (fmpz *) TMP_ALLOC(entries*sizeof(fmpq));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
+    powers = (fmpz *) TMP_ALLOC(entries*sizeof(fmpz));
 
     N = mpoly_words_per_exp(Abits, ctx->minfo);
 

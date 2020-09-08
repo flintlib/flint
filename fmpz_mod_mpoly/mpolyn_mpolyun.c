@@ -29,7 +29,7 @@ void fmpz_mod_mpolyn_clear(
 {
     slong i;
     for (i = 0; i < A->alloc; i++)
-        fmpz_mod_poly_clear(A->coeffs + i);
+        fmpz_mod_poly_clear(A->coeffs + i, ctx->ffinfo);
     if (A->coeffs)
         flint_free(A->coeffs);
     if (A->exps)
@@ -82,7 +82,7 @@ void fmpz_mod_mpolyn_print_pretty(
         }
 
         printf("(");
-        fmpz_mod_poly_print_pretty(coeff + i, "v");
+        fmpz_mod_poly_print_pretty(coeff + i, "v", ctx->ffinfo);
         printf(")");
 
         mpoly_get_monomial_ffmpz(exponents, exp + N*i, bits, ctx->minfo);
@@ -133,7 +133,7 @@ void fmpz_mod_mpolyn_fit_length(
 
         for (i = old_alloc; i < new_alloc; i++)
         {
-            fmpz_mod_poly_init(A->coeffs + i, fmpz_mod_ctx_modulus(ctx->ffinfo));
+            fmpz_mod_poly_init(A->coeffs + i, ctx->ffinfo);
         }
         A->alloc = new_alloc;
     }
@@ -165,25 +165,6 @@ void fmpz_mod_mpolyun_clear(
         flint_free(A->coeffs);
     if (A->exps)
         flint_free(A->exps);
-}
-
-
-void fmpz_mod_mpolyn_set_modulus(fmpz_mod_mpolyn_t A, const fmpz_mod_ctx_t fpctx)
-{
-    slong i;
-    for (i = 0; i < A->alloc; i++)
-    {
-        fmpz_set(&(A->coeffs + i)->p, fmpz_mod_ctx_modulus(fpctx));
-    }
-}
-
-void fmpz_mod_mpolyun_set_modulus(fmpz_mod_mpolyun_t A, const fmpz_mod_ctx_t fpctx)
-{
-    slong i;
-    for (i = 0; i < A->alloc; i++)
-    {
-        fmpz_mod_mpolyn_set_modulus(A->coeffs + i, fpctx);
-    }
 }
 
 /*
@@ -300,18 +281,18 @@ void fmpz_mod_mpolyn_content_poly(
     slong i;
     fmpz_mod_poly_t t;
 
-    fmpz_mod_poly_init(t, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(t, ctx->ffinfo);
 
-    fmpz_mod_poly_zero(a);
+    fmpz_mod_poly_zero(a, ctx->ffinfo);
     for (i = 0; i < B->length; i++)
     {
-        fmpz_mod_poly_gcd(t, a, B->coeffs + i);
-        fmpz_mod_poly_swap(t, a);
-        if (fmpz_mod_poly_degree(a) == 0)
+        fmpz_mod_poly_gcd(t, a, B->coeffs + i, ctx->ffinfo);
+        fmpz_mod_poly_swap(t, a, ctx->ffinfo);
+        if (fmpz_mod_poly_degree(a, ctx->ffinfo) == 0)
             break;
     }
 
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(t, ctx->ffinfo);
 }
 
 void fmpz_mod_mpolyun_content_last(
@@ -322,21 +303,21 @@ void fmpz_mod_mpolyun_content_last(
     slong i, j;
     fmpz_mod_poly_t t;
 
-    fmpz_mod_poly_init(t, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(t, ctx->ffinfo);
 
-    fmpz_mod_poly_zero(a);
+    fmpz_mod_poly_zero(a, ctx->ffinfo);
     for (i = 0; i < B->length; i++)
     {
         for (j = 0; j < (B->coeffs + i)->length; j++)
         {
-            fmpz_mod_poly_gcd(t, a, (B->coeffs + i)->coeffs + j);
-            fmpz_mod_poly_swap(t, a);
-            if (fmpz_mod_poly_degree(a) == 0)
+            fmpz_mod_poly_gcd(t, a, (B->coeffs + i)->coeffs + j, ctx->ffinfo);
+            fmpz_mod_poly_swap(t, a, ctx->ffinfo);
+            if (fmpz_mod_poly_degree(a, ctx->ffinfo) == 0)
                 break;
         }
     }
 
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(t, ctx->ffinfo);
 }
 
 
@@ -348,19 +329,19 @@ void fmpz_mod_mpolyn_divexact_poly(
     slong i;
     fmpz_mod_poly_t r, t;
 
-    fmpz_mod_poly_init(r, fmpz_mod_ctx_modulus(ctx->ffinfo));
-    fmpz_mod_poly_init(t, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(r, ctx->ffinfo);
+    fmpz_mod_poly_init(t, ctx->ffinfo);
 
     for (i = 0; i < A->length; i++)
     {
-        fmpz_mod_poly_divrem(t, r, A->coeffs + i, b);
-        FLINT_ASSERT(fmpz_mod_poly_is_zero(r));
-        FLINT_ASSERT(!fmpz_mod_poly_is_zero(t));
-        fmpz_mod_poly_swap(t, A->coeffs + i);
+        fmpz_mod_poly_divrem(t, r, A->coeffs + i, b, ctx->ffinfo);
+        FLINT_ASSERT(fmpz_mod_poly_is_zero(r, ctx->ffinfo));
+        FLINT_ASSERT(!fmpz_mod_poly_is_zero(t, ctx->ffinfo));
+        fmpz_mod_poly_swap(t, A->coeffs + i, ctx->ffinfo);
     }
 
-    fmpz_mod_poly_clear(r);
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(r, ctx->ffinfo);
+    fmpz_mod_poly_clear(t, ctx->ffinfo);
 }
 
 void fmpz_mod_mpolyun_divexact_last(
@@ -371,22 +352,22 @@ void fmpz_mod_mpolyun_divexact_last(
     slong i, j;
     fmpz_mod_poly_t r, t;
 
-    fmpz_mod_poly_init(r, fmpz_mod_ctx_modulus(ctx->ffinfo));
-    fmpz_mod_poly_init(t, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(r, ctx->ffinfo);
+    fmpz_mod_poly_init(t, ctx->ffinfo);
 
     for (i = 0; i < A->length; i++)
     {
         fmpz_mod_poly_struct * Ac = (A->coeffs + i)->coeffs;
         for (j = 0; j < (A->coeffs + i)->length; j++)
         {
-            fmpz_mod_poly_divrem(t, r, Ac + j, b);
-            FLINT_ASSERT(fmpz_mod_poly_is_zero(r));
-            FLINT_ASSERT(!fmpz_mod_poly_is_zero(t));
-            fmpz_mod_poly_swap(t, Ac + j);
+            fmpz_mod_poly_divrem(t, r, Ac + j, b, ctx->ffinfo);
+            FLINT_ASSERT(fmpz_mod_poly_is_zero(r, ctx->ffinfo));
+            FLINT_ASSERT(!fmpz_mod_poly_is_zero(t, ctx->ffinfo));
+            fmpz_mod_poly_swap(t, Ac + j, ctx->ffinfo);
         }
     }
-    fmpz_mod_poly_clear(r);
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(r, ctx->ffinfo);
+    fmpz_mod_poly_clear(t, ctx->ffinfo);
 }
 
 
@@ -398,15 +379,15 @@ void fmpz_mod_mpolyn_mul_poly(
     slong i;
     fmpz_mod_poly_t t;
 
-    fmpz_mod_poly_init(t, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(t, ctx->ffinfo);
 
     for (i = 0; i < A->length; i++)
     {
-        fmpz_mod_poly_mul(t, A->coeffs + i, b);
-        fmpz_mod_poly_swap(t, A->coeffs + i);
+        fmpz_mod_poly_mul(t, A->coeffs + i, b, ctx->ffinfo);
+        fmpz_mod_poly_swap(t, A->coeffs + i, ctx->ffinfo);
     }
 
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(t, ctx->ffinfo);
 }
 
 void fmpz_mod_mpolyun_mul_last(
@@ -417,18 +398,18 @@ void fmpz_mod_mpolyun_mul_last(
     slong i, j;
     fmpz_mod_poly_t t;
 
-    fmpz_mod_poly_init(t, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_poly_init(t, ctx->ffinfo);
 
     for (i = 0; i < A->length; i++)
     {
         for (j = 0; j < (A->coeffs + i)->length; j++)
         {
-            fmpz_mod_poly_mul(t, (A->coeffs + i)->coeffs + j, b);
-            fmpz_mod_poly_swap(t, (A->coeffs + i)->coeffs + j);
+            fmpz_mod_poly_mul(t, (A->coeffs + i)->coeffs + j, b, ctx->ffinfo);
+            fmpz_mod_poly_swap(t, (A->coeffs + i)->coeffs + j, ctx->ffinfo);
         }
     }
 
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(t, ctx->ffinfo);
 }
 
 
@@ -442,7 +423,7 @@ slong fmpz_mod_mpolyn_lastdeg(
 
     for (i = 0; i < A->length; i++)
     {
-        slong newdeg = fmpz_mod_poly_degree(A->coeffs + i);
+        slong newdeg = fmpz_mod_poly_degree(A->coeffs + i, ctx->ffinfo);
         deg = FLINT_MAX(deg, newdeg);
     }
 
@@ -461,7 +442,7 @@ slong fmpz_mod_mpolyun_lastdeg(
     {
         for (j = 0; j < (A->coeffs + i)->length; j++)
         {
-            slong newdeg = fmpz_mod_poly_degree((A->coeffs + i)->coeffs + j);
+            slong newdeg = fmpz_mod_poly_degree((A->coeffs + i)->coeffs + j, ctx->ffinfo);
             deg = FLINT_MAX(deg, newdeg);
         }
     }
@@ -484,7 +465,7 @@ void fmpz_mod_mpolyn_one(
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    fmpz_mod_poly_set_ui(Acoeff + 0, 1);
+    fmpz_mod_poly_set_ui(Acoeff + 0, 1, ctx->ffinfo);
     mpoly_monomial_zero(Aexp + N*0, N);
 
     A->length = 1;
@@ -512,7 +493,7 @@ void fmpz_mod_mpolyn_scalar_mul_fmpz_mod(
     slong i;
     for (i = 0; i < A->length; i++)
     {
-        fmpz_mod_poly_scalar_mul_fmpz(A->coeffs + i, A->coeffs + i, c);
+        fmpz_mod_poly_scalar_mul_fmpz(A->coeffs + i, A->coeffs + i, c, ctx->ffinfo);
     }
 }
 
@@ -549,7 +530,7 @@ int fmpz_mod_mpolyn_equal(
         {
             return 0;
         }
-        if (!fmpz_mod_poly_equal(A->coeffs + i, B->coeffs + i))
+        if (!fmpz_mod_poly_equal(A->coeffs + i, B->coeffs + i, ctx->ffinfo))
         {
             return 0;
         }

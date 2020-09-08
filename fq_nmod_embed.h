@@ -25,6 +25,18 @@
 #define T fq_nmod
 #define B nmod
 #include "fq_embed_templates.h"
+
+FQ_EMBED_TEMPLATES_INLINE
+void TEMPLATE(T, modulus_pow_series_inv)(TEMPLATE(B, poly_t) res,
+                                         const TEMPLATE(T, ctx_t) ctx,
+                                         slong trunc)
+{
+    TEMPLATE(B, poly_reverse)(res, 
+                              TEMPLATE(T, ctx_modulus)(ctx), 
+                              TEMPLATE(T, ctx_degree)(ctx) + 1);
+    TEMPLATE(B, poly_inv_series)(res, res, trunc);
+}
+
 #undef B
 #undef T
 

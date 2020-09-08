@@ -29,16 +29,19 @@ fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
     /* Test non-monic modulus */
     if (n_randint(state, 2))
     {
+        fmpz_mod_ctx_t ctxp;
+        fmpz_mod_ctx_init(ctxp, p);
         fmpz_init_set(x, p);
         fmpz_sub_ui(x, x, 1);
-        fmpz_mod_poly_init(modulus, p);
-        fmpz_mod_poly_set(modulus, ctx->modulus);
+        fmpz_mod_poly_init(modulus, ctxp);
+        fmpz_mod_poly_set(modulus, ctx->modulus, ctxp);
         fmpz_randm(x, state, x);
         fmpz_add_ui(x, x, 1);
-        fmpz_mod_poly_scalar_mul_fmpz(modulus, modulus, x);
+        fmpz_mod_poly_scalar_mul_fmpz(modulus, modulus, x, ctxp);
         fq_ctx_clear(ctx);
-        fq_ctx_init_modulus(ctx, modulus, "a");
-        fmpz_mod_poly_clear(modulus);
+        fq_ctx_init_modulus(ctx, modulus, ctxp, "a");
+        fmpz_mod_poly_clear(modulus, ctxp);
+        fmpz_mod_ctx_clear(ctxp);
         fmpz_clear(x);
     }
 }

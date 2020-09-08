@@ -568,87 +568,38 @@ cleanup:
 }
 
 
-/******************* Test if B divides A or A divides B **********************/
 static int _try_divides(
     fmpz_mpoly_t G,
-    const fmpz_mpoly_t A, int try_a,
-    const fmpz_mpoly_t B, int try_b,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t BB,
     const fmpz_mpoly_ctx_t ctx,
     const thread_pool_handle * handles,
     slong num_handles)
 {
-    int success;
-    fmpz_t cA, cB, cG;
-    fmpz_mpoly_t Q;
-    fmpz_mpoly_t AA, BB;
-    slong AA_alloc, BB_alloc;
+    int success = 0;
+    fmpz_mpoly_t Q, B, M;
 
-    *AA = *A;
-    *BB = *B;
-    fmpz_init(cA);
-    fmpz_init(cB);
-    fmpz_init(cG);
     fmpz_mpoly_init(Q, ctx);
+    fmpz_mpoly_init(B, ctx);
+    fmpz_mpoly_init(M, ctx);
 
-    _fmpz_vec_content(cA, A->coeffs, A->length);
-    _fmpz_vec_content(cB, B->coeffs, B->length);
-    fmpz_gcd(cG, cA, cB);
+    /* BB = M*B */
+    fmpz_mpoly_term_content(M, BB, ctx);
+    fmpz_mpoly_divides(B, BB, M, ctx);
 
-    AA_alloc = 0;
-    if (!fmpz_is_one(cA))
-    {
-        AA_alloc = A->length;
-        AA->coeffs = _fmpz_vec_init(A->length);
-        _fmpz_vec_scalar_divexact_fmpz(AA->coeffs, A->coeffs, A->length, cA);
-        FLINT_ASSERT(AA_alloc > 0);
-    }
-
-    BB_alloc = 0;
-    if (!fmpz_is_one(cB))
-    {
-        BB_alloc = B->length;
-        BB->coeffs = _fmpz_vec_init(B->length);
-        _fmpz_vec_scalar_divexact_fmpz(BB->coeffs, B->coeffs, B->length, cB);
-        FLINT_ASSERT(BB_alloc > 0);
-    }
-
-    fmpz_divexact(cA, cA, cG);
-    fmpz_divexact(cB, cB, cG);
-
-    if (try_b &&
-        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded_pool(Q, AA, BB,
+    if ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded_pool(Q, A, B,
                                                      ctx, handles, num_handles)
-                           : fmpz_mpoly_divides_monagan_pearce(Q, AA, BB, ctx)))
+                          : fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx))
     {
-        fmpz_mpoly_scalar_divexact_fmpz(G, B, cB, ctx);
+        /* gcd(Q*B, M*B) */
+        _try_monomial_gcd(G, A->bits, Q, M, ctx);
+        fmpz_mpoly_mul(G, G, B, ctx);
         success = 1;
-        goto cleanup;
     }
-
-    if (try_a &&
-        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded_pool(Q, BB, AA,
-                                                     ctx, handles, num_handles)
-                           : fmpz_mpoly_divides_monagan_pearce(Q, BB, AA, ctx)))
-    {
-        fmpz_mpoly_scalar_divexact_fmpz(G, A, cA, ctx);
-        success = 1;
-        goto cleanup;
-    }
-
-    success = 0;
-
-cleanup:
-
-    if (AA_alloc > 0)
-        _fmpz_vec_clear(AA->coeffs, AA_alloc);
-
-    if (BB_alloc > 0)
-        _fmpz_vec_clear(BB->coeffs, BB_alloc);
 
     fmpz_mpoly_clear(Q, ctx);
-    fmpz_clear(cA);
-    fmpz_clear(cB);
-    fmpz_clear(cG);
+    fmpz_mpoly_clear(B, ctx);
+    fmpz_mpoly_clear(M, ctx);
 
     return success;
 }
@@ -914,8 +865,14 @@ static int _try_bma(
     FLINT_ASSERT(Ac->bits == wbits);
     FLINT_ASSERT(Bc->bits == wbits);
 
-    _fmpz_mpoly_gcd_threaded_pool(Gamma, wbits, Auu->coeffs + 0, Buu->coeffs + 0,
-                                                   uctx, handles, num_handles);
+    if (fmpz_mpolyu_equal_upto_unit(Auu, Buu, uctx))
+    {
+        fmpz_mpolyu_swap(Guu, Auu, uctx);
+        goto done;
+    }
+
+    success = _fmpz_mpoly_gcd_threaded_pool(Gamma, wbits, Auu->coeffs + 0,
+                                 Buu->coeffs + 0, uctx, handles, num_handles);
     if (!success)
         goto cleanup;
 
@@ -926,6 +883,7 @@ static int _try_bma(
                                                         Auu, Buu, Gamma, uctx);
     if (!success)
         goto cleanup;
+done:
 
     success = _fmpz_mpoly_gcd_threaded_pool(Gc, wbits, Ac, Bc, uctx, handles, num_handles);
     if (!success)
@@ -1308,34 +1266,27 @@ calculate_trivial_gcd:
         int gcd_is_trivial = 1;
         int try_a = I->Gdeflate_deg_bounds_are_nice;
         int try_b = I->Gdeflate_deg_bounds_are_nice;
+
         for (j = 0; j < nvars; j++)
         {
             if (I->Gdeflate_deg_bound[j] != 0)
-            {
                 gcd_is_trivial = 0;
-            }
 
-            if (I->Adeflate_deg[j] != I->Gdeflate_deg_bound[j]
-                || I->Amin_exp[j] > I->Bmin_exp[j])
-            {
+            if (I->Adeflate_deg[j] != I->Gdeflate_deg_bound[j])
                 try_a = 0;
-            }
 
-            if (I->Bdeflate_deg[j] != I->Gdeflate_deg_bound[j]
-                || I->Bmin_exp[j] > I->Amin_exp[j])
-            {
+            if (I->Bdeflate_deg[j] != I->Gdeflate_deg_bound[j])
                 try_b = 0;
-            }
         }
 
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if ((try_a || try_b) &&
-            _try_divides(G, A, try_a, B, try_b, ctx, handles, num_handles))
-        {
+        if (try_a && _try_divides(G, B, A, ctx, handles, num_handles))
             goto successful;
-        }
+
+        if (try_b && _try_divides(G, A, B, ctx, handles, num_handles))
+            goto successful;
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);

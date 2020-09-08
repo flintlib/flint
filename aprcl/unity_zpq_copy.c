@@ -18,7 +18,7 @@ unity_zpq_copy(unity_zpq f, const unity_zpq g)
 
     for (i = 0; i < f->p; i++)
     {
-        fmpz_mod_poly_set(f->polys[i], g->polys[i]);
+        fmpz_mod_poly_set(f->polys[i], g->polys[i], g->ctx);
     }
 }
 

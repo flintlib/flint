@@ -37,18 +37,20 @@ void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len,
 	}
 }
 
-void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong len = poly->length;
 
     if (len < 2)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod_poly_zero(res, ctx);
     }
     else
     {
-        fmpz_mod_poly_fit_length(res, len - 1);
-        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len, &(res->p));
+        fmpz_mod_poly_fit_length(res, len - 1, ctx);
+        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len,
+                                                    fmpz_mod_ctx_modulus(ctx));
         _fmpz_mod_poly_set_length(res, len - 1);
         _fmpz_mod_poly_normalise(res);
     }

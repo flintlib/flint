@@ -39,7 +39,7 @@ main(void)
             fq_rand(y, state, ctx);
             fq_get_fmpz_poly(z, x, ctx);
             fmpz_poly_randtest(t1, state, 20, 200);
-            fmpz_mod_poly_get_fmpz_poly(t2, ctx->modulus);
+            fmpz_mod_poly_get_fmpz_poly(t2, ctx->modulus, ctx->ctxp);
             fmpz_poly_mul(t1, t1, t2);
             fmpz_poly_add(z, z, t1);
             fq_set_fmpz_poly(y, z, ctx);

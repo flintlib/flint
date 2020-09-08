@@ -16,7 +16,10 @@ unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s)
 {
     slong i;
 
+    FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
+                            fmpz_mod_ctx_modulus(g->ctx)));
+
     for (i = 0; i < f->p; i++)
-        fmpz_mod_poly_scalar_mul_ui(f->polys[i], g->polys[i], s);
+        fmpz_mod_poly_scalar_mul_ui(f->polys[i], g->polys[i], s, f->ctx);
 }
 

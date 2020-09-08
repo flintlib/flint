@@ -15,13 +15,14 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong len)
+fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong len,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     if (len > fac->alloc)
     {
         /* At least double number of allocated coeffs */
         if (len < 2 * fac->alloc)
             len = 2 * fac->alloc;
-        fmpz_mod_poly_factor_realloc(fac, len);
+        fmpz_mod_poly_factor_realloc(fac, len, ctx);
     }
 }

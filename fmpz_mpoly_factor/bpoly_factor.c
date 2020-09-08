@@ -18,30 +18,25 @@ typedef struct
     fmpz_mod_poly_struct * coeffs;
     slong alloc;
     slong length;
-    fmpz_t modulus;
 } fmpz_mod_bpoly_struct;
 
 typedef fmpz_mod_bpoly_struct fmpz_mod_bpoly_t[1];
 
 
-void fmpz_mod_bpoly_init(fmpz_mod_bpoly_t A, const fmpz_t modulus)
+void fmpz_mod_bpoly_init(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->alloc = 0;
     A->length = 0;
-    fmpz_init_set(A->modulus, modulus);
 }
 
-void fmpz_mod_bpoly_clear(fmpz_mod_bpoly_t A)
+void fmpz_mod_bpoly_clear(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_clear(A->modulus);
-    if (A->coeffs)
-    {
-        slong i;
-        for (i = 0; i < A->alloc; i++)
-            fmpz_mod_poly_clear(A->coeffs + i);
+    slong i;
+    for (i = 0; i < A->alloc; i++)
+        fmpz_mod_poly_clear(A->coeffs + i, ctx);
+    if (A->alloc > 0)
         flint_free(A->coeffs);
-    }
 }
 
 void fmpz_mod_bpoly_swap(fmpz_mod_bpoly_t A, fmpz_mod_bpoly_t B)
@@ -51,7 +46,11 @@ void fmpz_mod_bpoly_swap(fmpz_mod_bpoly_t A, fmpz_mod_bpoly_t B)
     *B = t;
 }
 
-void fmpz_mod_bpoly_print_pretty(fmpz_mod_bpoly_t A, const char * xvar, const char * yvar)
+void fmpz_mod_bpoly_print_pretty(
+    fmpz_mod_bpoly_t A,
+    const char * xvar,
+    const char * yvar,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
     int first;
@@ -59,7 +58,7 @@ void fmpz_mod_bpoly_print_pretty(fmpz_mod_bpoly_t A, const char * xvar, const ch
     first = 1;
     for (i = A->length - 1; i >= 0; i--)
     {
-        if (fmpz_mod_poly_is_zero(A->coeffs + i))
+        if (fmpz_mod_poly_is_zero(A->coeffs + i, ctx))
             continue;
 
         if (!first)
@@ -68,7 +67,7 @@ void fmpz_mod_bpoly_print_pretty(fmpz_mod_bpoly_t A, const char * xvar, const ch
         first = 0;
 
         flint_printf("(");
-        fmpz_mod_poly_print_pretty(A->coeffs + i, yvar);
+        fmpz_mod_poly_print_pretty(A->coeffs + i, yvar, ctx);
         flint_printf(")*%s^%wd", xvar, i);
     }
 
@@ -76,7 +75,10 @@ void fmpz_mod_bpoly_print_pretty(fmpz_mod_bpoly_t A, const char * xvar, const ch
         flint_printf("0");
 }
 
-void fmpz_mod_bpoly_fit_length(fmpz_mod_bpoly_t A, slong len)
+void fmpz_mod_bpoly_fit_length(
+    fmpz_mod_bpoly_t A,
+    slong len,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
@@ -92,7 +94,7 @@ void fmpz_mod_bpoly_fit_length(fmpz_mod_bpoly_t A, slong len)
         A->coeffs = (fmpz_mod_poly_struct *) flint_realloc(A->coeffs, len * sizeof(fmpz_mod_poly_struct));
 
     for (i = A->alloc; i < len; i++)
-        fmpz_mod_poly_init(A->coeffs + i, A->modulus);
+        fmpz_mod_poly_init(A->coeffs + i, ctx);
 
     A->alloc = len;
 }
@@ -121,69 +123,91 @@ void fmpz_tpoly_print(fmpz_tpoly_t A, const char * xvar, const char * yvar, cons
 
 
 
-void fmpz_mod_bpoly_set_fmpz_bpoly(fmpz_mod_bpoly_t A, const fmpz_bpoly_t B)
+void fmpz_mod_bpoly_set_fmpz_bpoly(
+    fmpz_mod_bpoly_t A,
+    const fmpz_bpoly_t B,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
-    fmpz_mod_bpoly_fit_length(A, B->length);
+    fmpz_mod_bpoly_fit_length(A, B->length, ctx);
     for (i = 0; i < B->length; i++)
     {
-        fmpz_mod_poly_set_fmpz_poly(A->coeffs + i, B->coeffs + i);
-        if (!fmpz_mod_poly_is_zero(A->coeffs + i))
+        fmpz_mod_poly_set_fmpz_poly(A->coeffs + i, B->coeffs + i, ctx);
+        if (!fmpz_mod_poly_is_zero(A->coeffs + i, ctx))
             A->length = i + 1;
     }
 }
 
-void fmpz_mod_bpoly_set_polyx(fmpz_mod_bpoly_t A, const fmpz_mod_poly_t B)
+void fmpz_mod_bpoly_set_polyx(
+    fmpz_mod_bpoly_t A,
+    const fmpz_mod_poly_t B,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
-    fmpz_mod_bpoly_fit_length(A, B->length);
+    fmpz_mod_bpoly_fit_length(A, B->length, ctx);
     A->length = 0;
     for (i = 0; i < B->length; i++)
     {
-        fmpz_mod_poly_set_fmpz(A->coeffs + i, B->coeffs + i);
-        if (!fmpz_mod_poly_is_zero(A->coeffs + i))
+        fmpz_mod_poly_set_fmpz(A->coeffs + i, B->coeffs + i, ctx);
+        if (!fmpz_mod_poly_is_zero(A->coeffs + i, ctx))
             A->length = i + 1;
     }    
 }
 
-void fmpz_mod_bpoly_set_polyy(fmpz_mod_bpoly_t A, const fmpz_mod_poly_t B)
+void fmpz_mod_bpoly_set_polyy(
+    fmpz_mod_bpoly_t A,
+    const fmpz_mod_poly_t B,
+    const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_bpoly_fit_length(A, 1);
-    fmpz_mod_poly_set(A->coeffs + 0, B);
-    A->length = !fmpz_mod_poly_is_zero(A->coeffs + 0);
+    fmpz_mod_bpoly_fit_length(A, 1, ctx);
+    fmpz_mod_poly_set(A->coeffs + 0, B, ctx);
+    A->length = !fmpz_mod_poly_is_zero(A->coeffs + 0, ctx);
 }
 
 
-void fmpz_mod_bpoly_get_coeff(fmpz_t c, const fmpz_mod_bpoly_t A, slong xi, slong yi)
+void fmpz_mod_bpoly_get_coeff(
+    fmpz_t c,
+    const fmpz_mod_bpoly_t A,
+    slong xi,
+    slong yi,
+    const fmpz_mod_ctx_t ctx)
 {
     if (xi >= A->length)
         fmpz_zero(c);
 
-    fmpz_mod_poly_get_coeff_fmpz(c, A->coeffs + xi, yi);
+    fmpz_mod_poly_get_coeff_fmpz(c, A->coeffs + xi, yi, ctx);
 }
 
-void fmpz_mod_bpoly_make_monic(fmpz_mod_bpoly_t A, slong order)
+void fmpz_mod_bpoly_make_monic(
+    fmpz_mod_bpoly_t A,
+    slong order,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
     fmpz_mod_poly_t t, lcinv;
 
     FLINT_ASSERT(A->length > 0);
 
-    fmpz_mod_poly_init(t, A->modulus);
-    fmpz_mod_poly_init(lcinv, A->modulus);
-    fmpz_mod_poly_inv_series(lcinv, A->coeffs + A->length - 1, order);
+    fmpz_mod_poly_init(t, ctx);
+    fmpz_mod_poly_init(lcinv, ctx);
+    fmpz_mod_poly_inv_series(lcinv, A->coeffs + A->length - 1, order, ctx);
 
     for (i = 0; i < A->length; i++)
     {
-        fmpz_mod_poly_mullow(t, A->coeffs + i, lcinv, order);
-        fmpz_mod_poly_swap(A->coeffs + i, t);
+        fmpz_mod_poly_mullow(t, A->coeffs + i, lcinv, order, ctx);
+        fmpz_mod_poly_swap(A->coeffs + i, t, ctx);
     }
 
-    fmpz_mod_poly_clear(t);
-    fmpz_mod_poly_clear(lcinv);
+    fmpz_mod_poly_clear(t, ctx);
+    fmpz_mod_poly_clear(lcinv, ctx);
 }
 
-void fmpz_mod_bpoly_mul(fmpz_mod_bpoly_t A, const fmpz_mod_bpoly_t B, const fmpz_mod_bpoly_t C, slong order)
+void fmpz_mod_bpoly_mul(
+    fmpz_mod_bpoly_t A,
+    const fmpz_mod_bpoly_t B,
+    const fmpz_mod_bpoly_t C,
+    slong order,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i, j;
     fmpz_mod_poly_t t;
@@ -191,27 +215,31 @@ void fmpz_mod_bpoly_mul(fmpz_mod_bpoly_t A, const fmpz_mod_bpoly_t B, const fmpz
     FLINT_ASSERT(A != B);
     FLINT_ASSERT(A != C);
 
-    fmpz_mod_poly_init(t, B->modulus);
+    fmpz_mod_poly_init(t, ctx);
 
-    fmpz_mod_bpoly_fit_length(A, B->length + C->length - 1);
+    fmpz_mod_bpoly_fit_length(A, B->length + C->length - 1, ctx);
     for (i = 0; i < B->length + C->length - 1; i++)
-        fmpz_mod_poly_zero(A->coeffs + i);
+        fmpz_mod_poly_zero(A->coeffs + i, ctx);
 
     for (i = 0; i < B->length; i++)
     {
         for (j = 0; j < C->length; j++)
         {
-            fmpz_mod_poly_mullow(t, B->coeffs + i, C->coeffs + j, order);
-            fmpz_mod_poly_add(A->coeffs + i + j, A->coeffs + i + j, t);
+            fmpz_mod_poly_mullow(t, B->coeffs + i, C->coeffs + j, order, ctx);
+            fmpz_mod_poly_add(A->coeffs + i + j, A->coeffs + i + j, t, ctx);
         }
     }
 
     A->length = B->length + C->length - 1;
 
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(t, ctx);
 }
 
-void fmpz_mod_bpoly_add_poly_shift(fmpz_mod_bpoly_t A, const fmpz_mod_poly_t B, slong yshift)
+void fmpz_mod_bpoly_add_poly_shift(
+    fmpz_mod_bpoly_t A,
+    const fmpz_mod_poly_t B,
+    slong yshift,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
     fmpz_t c;
@@ -222,43 +250,48 @@ void fmpz_mod_bpoly_add_poly_shift(fmpz_mod_bpoly_t A, const fmpz_mod_poly_t B, 
 
     for (i = 0; i < B->length; i++)
     {
-        fmpz_mod_poly_get_coeff_fmpz(c, A->coeffs + i, yshift);
+        fmpz_mod_poly_get_coeff_fmpz(c, A->coeffs + i, yshift, ctx);
         FLINT_ASSERT(fmpz_is_zero(c));
-        fmpz_mod_poly_set_coeff_fmpz(A->coeffs + i, yshift, B->coeffs + i);
+        fmpz_mod_poly_set_coeff_fmpz(A->coeffs + i, yshift, B->coeffs + i, ctx);
     }
 
     fmpz_clear(c);
 }
 
-void fmpz_mod_bpoly_sub(fmpz_mod_bpoly_t A, const fmpz_mod_bpoly_t B, const fmpz_mod_bpoly_t C)
+void fmpz_mod_bpoly_sub(
+    fmpz_mod_bpoly_t A,
+    const fmpz_mod_bpoly_t B,
+    const fmpz_mod_bpoly_t C,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
+    slong Alen = FLINT_MAX(B->length, C->length);
 
     FLINT_ASSERT(A != B);
     FLINT_ASSERT(A != C);
 
-    fmpz_mod_bpoly_fit_length(A, FLINT_MAX(B->length, C->length));
+    fmpz_mod_bpoly_fit_length(A, Alen, ctx);
 
-    for (i = 0; i < FLINT_MAX(B->length, C->length) - 1; i++)
+    for (i = 0; i < Alen - 1; i++)
     {
         if (i < B->length)
         {
             if (i < C->length)
             {
-                fmpz_mod_poly_sub(A->coeffs + i, B->coeffs + i, C->coeffs + i);
+                fmpz_mod_poly_sub(A->coeffs + i, B->coeffs + i, C->coeffs + i, ctx);
             }
             else
             {
-                fmpz_mod_poly_set(A->coeffs + i, B->coeffs + i);
+                fmpz_mod_poly_set(A->coeffs + i, B->coeffs + i, ctx);
             }
         }
         else
         {
             FLINT_ASSERT(i < C->length);
-            fmpz_mod_poly_neg(A->coeffs + i, C->coeffs + i);
+            fmpz_mod_poly_neg(A->coeffs + i, C->coeffs + i, ctx);
         }
 
-        if (!fmpz_mod_poly_is_zero(A->coeffs + i))
+        if (!fmpz_mod_poly_is_zero(A->coeffs + i, ctx))
             A->length = i + 1;
     }
 }
@@ -305,21 +338,26 @@ void fmpz_bpoly_make_primitive(fmpz_poly_t g, fmpz_bpoly_t A)
     fmpz_poly_clear(q);
 }
 
-void fmpz_mod_bpoly_set_coeff(fmpz_mod_bpoly_t A, slong xi, slong yi, const fmpz_t c)
+void fmpz_mod_bpoly_set_coeff(
+    fmpz_mod_bpoly_t A,
+    slong xi,
+    slong yi,
+    const fmpz_t c,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
     if (xi >= A->length)
     {
-        fmpz_mod_bpoly_fit_length(A, xi + 1);
+        fmpz_mod_bpoly_fit_length(A, xi + 1, ctx);
         for (i = A->length; i <= xi; i++)
-            fmpz_mod_poly_zero(A->coeffs + i);
+            fmpz_mod_poly_zero(A->coeffs + i, ctx);
         A->length = xi + 1;
     }
 
-    fmpz_mod_poly_set_coeff_fmpz(A->coeffs + xi, yi, c);
+    fmpz_mod_poly_set_coeff_fmpz(A->coeffs + xi, yi, c, ctx);
 
-    while (A->length > 0 && fmpz_poly_is_zero(A->coeffs + A->length - 1))
+    while (A->length > 0 && fmpz_mod_poly_is_zero(A->coeffs + A->length - 1, ctx))
         A->length--;
 }
 
@@ -386,7 +424,10 @@ cleanup:
     return divides;
 }
 
-void fmpz_bpoly_set_fmpz_mod_bpoly(fmpz_bpoly_t A, const fmpz_mod_bpoly_t B)
+void fmpz_bpoly_set_fmpz_mod_bpoly(
+    fmpz_bpoly_t A,
+    const fmpz_mod_bpoly_t B,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
@@ -397,7 +438,9 @@ void fmpz_bpoly_set_fmpz_mod_bpoly(fmpz_bpoly_t A, const fmpz_mod_bpoly_t B)
     {
         fmpz_poly_fit_length(A->coeffs + i, (B->coeffs + i)->length);
         (A->coeffs + i)->length = (B->coeffs + i)->length;
-        _fmpz_vec_scalar_smod_fmpz((A->coeffs + i)->coeffs, (B->coeffs + i)->coeffs, (B->coeffs + i)->length, B->modulus);
+        _fmpz_vec_scalar_smod_fmpz((A->coeffs + i)->coeffs,
+                         (B->coeffs + i)->coeffs, (B->coeffs + i)->length,
+                                                    fmpz_mod_ctx_modulus(ctx));
     }
 }
 
@@ -431,6 +474,8 @@ typedef struct {
     slong lifting_prec;
     fmpz_t p;
     fmpz_t pk;
+    fmpz_mod_ctx_t ctxp;
+    fmpz_mod_ctx_t ctxpk;
     fmpz_mod_bpoly_t Btilde;                /* mod p^k */
     fmpz_mod_bpoly_struct * newBitilde;     /* mod p^k */
     fmpz_mod_poly_struct * P;               /* mod p^k */
@@ -457,23 +502,26 @@ void bpoly_info_init(bpoly_info_t I, slong r, const fmpz_t p, ulong k)
     fmpz_init(I->pk);
     fmpz_pow_ui(I->pk, p, k);
 
-    fmpz_mod_bpoly_init(I->Btilde, I->pk);
+    fmpz_mod_ctx_init(I->ctxp, I->p);
+    fmpz_mod_ctx_init(I->ctxpk, I->pk);
 
-    I->newBitilde = (fmpz_mod_bpoly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_bpoly_struct));
-    I->P          = (fmpz_mod_poly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_poly_struct));
-    I->d          = (fmpz_mod_poly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_poly_struct));
-    I->Bitilde    = (fmpz_mod_poly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_poly_struct));
-    I->d1         = (fmpz_mod_poly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_poly_struct));
-    I->Bitilde1   = (fmpz_mod_poly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_poly_struct));
+    fmpz_mod_bpoly_init(I->Btilde, I->ctxpk);
+
+    I->newBitilde = FLINT_ARRAY_ALLOC(I->r, fmpz_mod_bpoly_struct);
+    I->P          = FLINT_ARRAY_ALLOC(I->r, fmpz_mod_poly_struct);
+    I->d          = FLINT_ARRAY_ALLOC(I->r, fmpz_mod_poly_struct);
+    I->Bitilde    = FLINT_ARRAY_ALLOC(I->r, fmpz_mod_poly_struct);
+    I->d1         = FLINT_ARRAY_ALLOC(I->r, fmpz_mod_poly_struct);
+    I->Bitilde1   = FLINT_ARRAY_ALLOC(I->r, fmpz_mod_poly_struct);
 
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_bpoly_init(I->newBitilde + i, I->pk);
-        fmpz_mod_poly_init(I->P + i, I->pk);
-        fmpz_mod_poly_init(I->d + i, I->pk);
-        fmpz_mod_poly_init(I->Bitilde + i, I->pk);
-        fmpz_mod_poly_init(I->d1 + i, I->p);
-        fmpz_mod_poly_init(I->Bitilde1 + i, I->p);
+        fmpz_mod_bpoly_init(I->newBitilde + i, I->ctxpk);
+        fmpz_mod_poly_init(I->P + i, I->ctxpk);
+        fmpz_mod_poly_init(I->d + i, I->ctxpk);
+        fmpz_mod_poly_init(I->Bitilde + i, I->ctxpk);
+        fmpz_mod_poly_init(I->d1 + i, I->ctxp);
+        fmpz_mod_poly_init(I->Bitilde1 + i, I->ctxp);
     }
 }
 
@@ -484,16 +532,16 @@ void bpoly_info_clear(bpoly_info_t I)
     fmpz_clear(I->p);
     fmpz_clear(I->pk);
 
-    fmpz_mod_bpoly_clear(I->Btilde);
+    fmpz_mod_bpoly_clear(I->Btilde, I->ctxpk);
 
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_bpoly_clear(I->newBitilde + i);
-        fmpz_mod_poly_clear(I->P + i);
-        fmpz_mod_poly_clear(I->d + i);
-        fmpz_mod_poly_clear(I->Bitilde + i);
-        fmpz_mod_poly_clear(I->d1 + i);
-        fmpz_mod_poly_clear(I->Bitilde1 + i);
+        fmpz_mod_bpoly_clear(I->newBitilde + i, I->ctxpk);
+        fmpz_mod_poly_clear(I->P + i, I->ctxpk);
+        fmpz_mod_poly_clear(I->d + i, I->ctxpk);
+        fmpz_mod_poly_clear(I->Bitilde + i, I->ctxpk);
+        fmpz_mod_poly_clear(I->d1 + i, I->ctxp);
+        fmpz_mod_poly_clear(I->Bitilde1 + i, I->ctxp);
     }
 
     flint_free(I->newBitilde);
@@ -502,51 +550,58 @@ void bpoly_info_clear(bpoly_info_t I)
     flint_free(I->Bitilde);
     flint_free(I->d1);
     flint_free(I->Bitilde1);
+
+    fmpz_mod_ctx_clear(I->ctxp);
+    fmpz_mod_ctx_clear(I->ctxpk);
 }
 
 /*
     set out[i] so that
     1/(f[0]*f[1]*...*f[n-1]) = out[0]/f[0] + ... + out[n-1]/f[n-1]
 */
-int partial_fraction_coeffs(fmpz_mod_poly_struct * out, const fmpz_mod_poly_struct * f, const fmpz_t p, slong n)
+int partial_fraction_coeffs(
+    fmpz_mod_poly_struct * out,
+    const fmpz_mod_poly_struct * f,
+    slong n,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i;
     fmpz_mod_poly_t num, den, a, b, g, t;
 
     FLINT_ASSERT(n > 1);
 
-    fmpz_mod_poly_init(num, p);
-    fmpz_mod_poly_init(den, p);
-    fmpz_mod_poly_init(a, p);
-    fmpz_mod_poly_init(b, p);
-    fmpz_mod_poly_init(g, p);
-    fmpz_mod_poly_init(t, p);
+    fmpz_mod_poly_init(num, ctx);
+    fmpz_mod_poly_init(den, ctx);
+    fmpz_mod_poly_init(a, ctx);
+    fmpz_mod_poly_init(b, ctx);
+    fmpz_mod_poly_init(g, ctx);
+    fmpz_mod_poly_init(t, ctx);
 
-    fmpz_mod_poly_set_ui(num, 1);
-    fmpz_mod_poly_mul(den, f + 0, f + 1);
+    fmpz_mod_poly_set_ui(num, 1, ctx);
+    fmpz_mod_poly_mul(den, f + 0, f + 1, ctx);
     for (i = 2; i < n; i++)
-        fmpz_mod_poly_mul(den, den, f + i);
+        fmpz_mod_poly_mul(den, den, f + i, ctx);
 
     for (i = 0; i < n; i++)
     {
-        fmpz_mod_poly_divrem(den, t, den, f + i);
-        FLINT_ASSERT(fmpz_mod_poly_is_zero(t));
-        fmpz_mod_poly_xgcd(g, a, b, f + i, den);
-        if (fmpz_mod_poly_degree(g) != 0)
+        fmpz_mod_poly_divrem(den, t, den, f + i, ctx);
+        FLINT_ASSERT(fmpz_mod_poly_is_zero(t, ctx));
+        fmpz_mod_poly_xgcd(g, a, b, f + i, den, ctx);
+        if (fmpz_mod_poly_degree(g, ctx) != 0)
             return 0;
         FLINT_ASSERT(fmpz_is_one(g->coeffs + 0));
-        fmpz_mod_poly_mul(t, b, num);
-        fmpz_mod_poly_rem(out + i, t, f + i);
-        fmpz_mod_poly_mul(t, a, num);
-        fmpz_mod_poly_rem(num, t, den);
+        fmpz_mod_poly_mul(t, b, num, ctx);
+        fmpz_mod_poly_rem(out + i, t, f + i, ctx);
+        fmpz_mod_poly_mul(t, a, num, ctx);
+        fmpz_mod_poly_rem(num, t, den, ctx);
     }
 
-    fmpz_mod_poly_clear(num);
-    fmpz_mod_poly_clear(den);
-    fmpz_mod_poly_clear(a);
-    fmpz_mod_poly_clear(b);
-    fmpz_mod_poly_clear(g);
-    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(num, ctx);
+    fmpz_mod_poly_clear(den, ctx);
+    fmpz_mod_poly_clear(a, ctx);
+    fmpz_mod_poly_clear(b, ctx);
+    fmpz_mod_poly_clear(g, ctx);
+    fmpz_mod_poly_clear(t, ctx);
     return 1;
 }
 
@@ -557,76 +612,74 @@ int bpoly_info_disolve(bpoly_info_t I)
     fmpz_t pj, t1;
     fmpz_mod_poly_t error, t, s, s1, s2;
 
-    if (!partial_fraction_coeffs(I->d1, I->Bitilde1, I->p, I->r))
+    if (!partial_fraction_coeffs(I->d1, I->Bitilde1, I->r, I->ctxp))
         return 0;
 
     fmpz_init(pj);
     fmpz_init(t1);
-    fmpz_mod_poly_init(error, I->pk);
-    fmpz_mod_poly_init(t, I->pk);
-    fmpz_mod_poly_init(s, I->p);
-    fmpz_mod_poly_init(s1, I->p);
-    fmpz_mod_poly_init(s2, I->pk);
+    fmpz_mod_poly_init(error, I->ctxpk);
+    fmpz_mod_poly_init(t, I->ctxpk);
+    fmpz_mod_poly_init(s, I->ctxp);
+    fmpz_mod_poly_init(s1, I->ctxp);
+    fmpz_mod_poly_init(s2, I->ctxpk);
 
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_poly_set_ui(I->P + i, 1);
+        fmpz_mod_poly_set_ui(I->P + i, 1, I->ctxpk);
         for (j = 0; j < I->r; j++)
         {
             if (i == j)
                 continue;
-            fmpz_mod_poly_mul(I->P + i, I->P + i, I->Bitilde + j);
+            fmpz_mod_poly_mul(I->P + i, I->P + i, I->Bitilde + j, I->ctxpk);
         }
     }
 
-    fmpz_mod_poly_set_ui(error, 1);
+    fmpz_mod_poly_set_ui(error, 1, I->ctxpk);
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_poly_set(I->d + i, I->d1 + i); /* slight abuse because moduli are different */
-        fmpz_mod_poly_mul(t, I->d + i, I->P + i);
-        fmpz_mod_poly_sub(error, error, t);
+        fmpz_mod_poly_set(I->d + i, I->d1 + i, I->ctxpk); /* slight abuse because moduli are different */
+        fmpz_mod_poly_mul(t, I->d + i, I->P + i, I->ctxpk);
+        fmpz_mod_poly_sub(error, error, t, I->ctxpk);
     }
 
     fmpz_one(pj);
     for (j = 1; j < I->k; j++)
     {
         fmpz_mul(pj, pj, I->p);
-        fmpz_mod_poly_zero(s);
+        fmpz_mod_poly_zero(s, I->ctxp);
         for (i = error->length - 1; i >= 0; i--)
         {
             FLINT_ASSERT(fmpz_divisible(error->coeffs + i, pj));
             fmpz_divexact(t1, error->coeffs + i, pj);
             fmpz_mod(t1, t1, I->p);
-            fmpz_mod_poly_set_coeff_fmpz(s, i, t1);
+            fmpz_mod_poly_set_coeff_fmpz(s, i, t1, I->ctxp);
         }
 
         for (i = 0; i < I->r; i++)
         {
-            fmpz_mod_poly_mul(s1, s, I->d1 + i);
-            fmpz_set(&s2->p, I->p);
-            fmpz_mod_poly_rem(s2, s1, I->Bitilde1 + i);
-            fmpz_set(&s2->p, I->pk);
-            fmpz_mod_poly_scalar_mul_fmpz(s2, s2, pj);
-            fmpz_mod_poly_add(I->d + i, I->d + i, s2);
+            fmpz_mod_poly_mul(s1, s, I->d1 + i, I->ctxp);
+            fmpz_mod_poly_rem(s2, s1, I->Bitilde1 + i, I->ctxp);
+            fmpz_mod_poly_scalar_mul_fmpz(s2, s2, pj, I->ctxpk);
+            fmpz_mod_poly_add(I->d + i, I->d + i, s2, I->ctxpk);
         }
 
-        fmpz_mod_poly_set_ui(error, 1);
+        fmpz_mod_poly_set_ui(error, 1, I->ctxpk);
         for (i = 0; i < I->r; i++)
         {
-            fmpz_mod_poly_mul(t, I->d + i, I->P + i);
-            fmpz_mod_poly_sub(error, error, t);
+            fmpz_mod_poly_mul(t, I->d + i, I->P + i, I->ctxpk);
+            fmpz_mod_poly_sub(error, error, t, I->ctxpk);
         }
     }
 
-    FLINT_ASSERT(fmpz_mod_poly_is_zero(error));
+    FLINT_ASSERT(fmpz_mod_poly_is_zero(error, I->ctxpk));
 
     fmpz_clear(pj);
     fmpz_clear(t1);
-    fmpz_mod_poly_clear(error);
-    fmpz_mod_poly_clear(t);
-    fmpz_mod_poly_clear(s);
-    fmpz_mod_poly_clear(s1);
-    fmpz_mod_poly_clear(s2);
+    fmpz_mod_poly_clear(error, I->ctxpk);
+    fmpz_mod_poly_clear(t, I->ctxpk);
+    fmpz_mod_poly_clear(s, I->ctxp);
+    fmpz_mod_poly_clear(s1, I->ctxp);
+    fmpz_mod_poly_clear(s2, I->ctxpk);
 
     return 1;
 }
@@ -639,33 +692,33 @@ static void _bivar_lift_quintic(bpoly_info_t I)
     fmpz_mod_bpoly_t tp, tp1, error;
     fmpz_mod_poly_t ss, tt;
 
-    fmpz_mod_poly_init(ss, I->pk);
-    fmpz_mod_poly_init(tt, I->pk);
-    fmpz_mod_bpoly_init(tp, I->pk);
-    fmpz_mod_bpoly_init(tp1, I->pk);
-    fmpz_mod_bpoly_init(error, I->pk);
+    fmpz_mod_poly_init(ss, I->ctxpk);
+    fmpz_mod_poly_init(tt, I->ctxpk);
+    fmpz_mod_bpoly_init(tp, I->ctxpk);
+    fmpz_mod_bpoly_init(tp1, I->ctxpk);
+    fmpz_mod_bpoly_init(error, I->ctxpk);
 
-    fmpz_mod_bpoly_mul(tp, I->newBitilde + 0, I->newBitilde + 1, I->lifting_prec);
+    fmpz_mod_bpoly_mul(tp, I->newBitilde + 0, I->newBitilde + 1, I->lifting_prec, I->ctxpk);
     for (i = 2; i < I->r; i++)
     {
-        fmpz_mod_bpoly_mul(tp1, tp, I->newBitilde + i, I->lifting_prec);
+        fmpz_mod_bpoly_mul(tp1, tp, I->newBitilde + i, I->lifting_prec, I->ctxpk);
         fmpz_mod_bpoly_swap(tp1, tp);
     }
-    fmpz_mod_bpoly_sub(error, I->Btilde, tp);
+    fmpz_mod_bpoly_sub(error, I->Btilde, tp, I->ctxpk);
 
     for (j = 1; j < I->lifting_prec; j++)
     {
-        fmpz_mod_poly_zero(ss);
+        fmpz_mod_poly_zero(ss, I->ctxpk);
         for (i = error->length - 1; i >= 0; i--)
         {
             fmpz_t ct;
             fmpz_init(ct);
 
-            fmpz_mod_bpoly_get_coeff(ct, error, i, j);
-            fmpz_mod_poly_set_coeff_fmpz(ss, i, ct);
+            fmpz_mod_bpoly_get_coeff(ct, error, i, j, I->ctxpk);
+            fmpz_mod_poly_set_coeff_fmpz(ss, i, ct, I->ctxpk);
             for (k = 0; k < j; k++)
             {
-                fmpz_mod_bpoly_get_coeff(ct, error, i, k);
+                fmpz_mod_bpoly_get_coeff(ct, error, i, k, I->ctxpk);
                 FLINT_ASSERT(fmpz_is_zero(ct));
             }
 
@@ -674,30 +727,31 @@ static void _bivar_lift_quintic(bpoly_info_t I)
 
         for (i = 0; i < I->r; i++)
         {
-            fmpz_mod_poly_mul(tt, ss, I->d + i);
-            fmpz_mod_poly_rem(tt, tt, I->Bitilde + i);
-            fmpz_mod_bpoly_add_poly_shift(I->newBitilde + i, tt, j);
+            fmpz_mod_poly_mul(tt, ss, I->d + i, I->ctxpk);
+            fmpz_mod_poly_rem(tt, tt, I->Bitilde + i, I->ctxpk);
+            fmpz_mod_bpoly_add_poly_shift(I->newBitilde + i, tt, j, I->ctxpk);
         }
 
-        fmpz_mod_bpoly_mul(tp, I->newBitilde + 0, I->newBitilde + 1, I->lifting_prec);
+        fmpz_mod_bpoly_mul(tp, I->newBitilde + 0, I->newBitilde + 1, I->lifting_prec, I->ctxpk);
         for (i = 2; i < I->r; i++)
         {
-            fmpz_mod_bpoly_mul(tp1, tp, I->newBitilde + i, I->lifting_prec);
+            fmpz_mod_bpoly_mul(tp1, tp, I->newBitilde + i, I->lifting_prec, I->ctxpk);
             fmpz_mod_bpoly_swap(tp1, tp);
         }
-        fmpz_mod_bpoly_sub(error, I->Btilde, tp);
+        fmpz_mod_bpoly_sub(error, I->Btilde, tp, I->ctxpk);
     }
 
-    fmpz_mod_poly_clear(ss);
-    fmpz_mod_poly_clear(tt);
-    fmpz_mod_bpoly_clear(tp);
-    fmpz_mod_bpoly_clear(tp1);
-    fmpz_mod_bpoly_clear(error);
+    fmpz_mod_poly_clear(ss, I->ctxpk);
+    fmpz_mod_poly_clear(tt, I->ctxpk);
+    fmpz_mod_bpoly_clear(tp, I->ctxpk);
+    fmpz_mod_bpoly_clear(tp1, I->ctxpk);
+    fmpz_mod_bpoly_clear(error, I->ctxpk);
 }
 
 void fmpz_mod_bpoly_reverse_vars(
     fmpz_mod_bpoly_t A,
-    const fmpz_mod_bpoly_t B)
+    const fmpz_mod_bpoly_t B,
+    const fmpz_mod_ctx_t ctx)
 {
     slong i, j;
     fmpz_mod_bpoly_zero(A);
@@ -708,7 +762,7 @@ void fmpz_mod_bpoly_reverse_vars(
         {
             if (!fmpz_is_zero(Bi->coeffs + j))
             {
-                fmpz_mod_bpoly_set_coeff(A, j, i, Bi->coeffs + j);
+                fmpz_mod_bpoly_set_coeff(A, j, i, Bi->coeffs + j, ctx);
             }
         }
     }
@@ -723,50 +777,48 @@ static void _bivar_lift_quartic2(bpoly_info_t I)
 
     FLINT_ASSERT(I->r == 2);
 
-    fmpz_mod_poly_init(t, I->pk);
-    fmpz_mod_poly_init(t1, I->pk);
-    fmpz_mod_bpoly_init(btilde, I->pk);
-    fmpz_mod_bpoly_reverse_vars(btilde, I->Btilde);
+    fmpz_mod_poly_init(t, I->ctxpk);
+    fmpz_mod_poly_init(t1, I->ctxpk);
+    fmpz_mod_bpoly_init(btilde, I->ctxpk);
+    fmpz_mod_bpoly_reverse_vars(btilde, I->Btilde, I->ctxpk);
     for (k = 0; k < I->r; k++)
     {
-        fmpz_mod_bpoly_init(newbitilde + k, I->pk);
-        fmpz_mod_bpoly_reverse_vars(newbitilde + k, I->newBitilde + k);
-        fmpz_mod_bpoly_fit_length(newbitilde + k, I->lifting_prec);
+        fmpz_mod_bpoly_init(newbitilde + k, I->ctxpk);
+        fmpz_mod_bpoly_reverse_vars(newbitilde + k, I->newBitilde + k, I->ctxpk);
+        fmpz_mod_bpoly_fit_length(newbitilde + k, I->lifting_prec, I->ctxpk);
         FLINT_ASSERT((newbitilde + k)->length == 1);
     }
 
     for (j = 1; j < I->lifting_prec; j++)
     {
         if (j < btilde->length)
-            fmpz_mod_poly_set(t, btilde->coeffs + j);
+            fmpz_mod_poly_set(t, btilde->coeffs + j, I->ctxpk);
         else
-            fmpz_mod_poly_zero(t);
+            fmpz_mod_poly_zero(t, I->ctxpk);
 
         for (i = 1; i < j; i++)
         {
-            fmpz_mod_poly_mul(t1, newbitilde[0].coeffs + i, newbitilde[1].coeffs + j - i);
-            fmpz_mod_poly_sub(t, t, t1);
+            fmpz_mod_poly_mul(t1, newbitilde[0].coeffs + i, newbitilde[1].coeffs + j - i, I->ctxpk);
+            fmpz_mod_poly_sub(t, t, t1, I->ctxpk);
         }
 
         for (k = 0; k < I->r; k++)
         {
-            fmpz_mod_poly_mul(t1, t, I->d + k);
-            fmpz_mod_poly_rem(newbitilde[k].coeffs + j, t1, I->Bitilde + k);
-            if (!fmpz_mod_poly_is_zero(newbitilde[k].coeffs + j))
+            fmpz_mod_poly_mul(t1, t, I->d + k, I->ctxpk);
+            fmpz_mod_poly_rem(newbitilde[k].coeffs + j, t1, I->Bitilde + k, I->ctxpk);
+            if (!fmpz_mod_poly_is_zero(newbitilde[k].coeffs + j, I->ctxpk))
                 newbitilde[k].length = j + 1;
         }
     }
 
     for (k = 0; k < I->r; k++)
-        fmpz_mod_bpoly_reverse_vars(I->newBitilde + k, newbitilde + k);
+        fmpz_mod_bpoly_reverse_vars(I->newBitilde + k, newbitilde + k, I->ctxpk);
 
-    fmpz_mod_poly_clear(t);
-    fmpz_mod_poly_clear(t1);
-    fmpz_mod_bpoly_clear(btilde);
+    fmpz_mod_poly_clear(t, I->ctxpk);
+    fmpz_mod_poly_clear(t1, I->ctxpk);
+    fmpz_mod_bpoly_clear(btilde, I->ctxpk);
     for (k = 0; k < I->r; k++)
-    {
-        fmpz_mod_bpoly_clear(newbitilde + k);
-    }
+        fmpz_mod_bpoly_clear(newbitilde + k, I->ctxpk);
 }
 
 static void _bivar_lift_quartic(bpoly_info_t I)
@@ -781,97 +833,97 @@ static void _bivar_lift_quartic(bpoly_info_t I)
     newbitilde = (fmpz_mod_bpoly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_bpoly_struct));
     U = (fmpz_mod_bpoly_struct *) flint_malloc(I->r*sizeof(fmpz_mod_bpoly_struct));
 
-    fmpz_mod_poly_init(t, I->pk);
-    fmpz_mod_poly_init(t1, I->pk);
-    fmpz_mod_bpoly_init(btilde, I->pk);
-    fmpz_mod_bpoly_reverse_vars(btilde, I->Btilde);
+    fmpz_mod_poly_init(t, I->ctxpk);
+    fmpz_mod_poly_init(t1, I->ctxpk);
+    fmpz_mod_bpoly_init(btilde, I->ctxpk);
+    fmpz_mod_bpoly_reverse_vars(btilde, I->Btilde, I->ctxpk);
     for (k = 0; k < I->r; k++)
     {
-        fmpz_mod_bpoly_init(U + k, I->pk);
-        fmpz_mod_bpoly_fit_length(U + k, I->lifting_prec);
+        fmpz_mod_bpoly_init(U + k, I->ctxpk);
+        fmpz_mod_bpoly_fit_length(U + k, I->lifting_prec, I->ctxpk);
         for (i = 0; i < I->lifting_prec; i++)
         {
-            fmpz_mod_poly_zero(U[k].coeffs + i);
+            fmpz_mod_poly_zero(U[k].coeffs + i, I->ctxpk);
         }
 
-        fmpz_mod_bpoly_init(newbitilde + k, I->pk);
-        fmpz_mod_bpoly_reverse_vars(newbitilde + k, I->newBitilde + k);
-        fmpz_mod_bpoly_fit_length(newbitilde + k, I->lifting_prec);
+        fmpz_mod_bpoly_init(newbitilde + k, I->ctxpk);
+        fmpz_mod_bpoly_reverse_vars(newbitilde + k, I->newBitilde + k, I->ctxpk);
+        fmpz_mod_bpoly_fit_length(newbitilde + k, I->lifting_prec, I->ctxpk);
         FLINT_ASSERT(newbitilde[k].length == 1);
         for (i = 1; i < I->lifting_prec; i++)
         {
-            fmpz_mod_poly_zero(newbitilde[k].coeffs + i);
+            fmpz_mod_poly_zero(newbitilde[k].coeffs + i, I->ctxpk);
         }
     }
 
     k = I->r - 2;
-    fmpz_mod_poly_mul(U[k].coeffs + 0, newbitilde[k].coeffs + 0, newbitilde[k + 1].coeffs + 0);
+    fmpz_mod_poly_mul(U[k].coeffs + 0, newbitilde[k].coeffs + 0, newbitilde[k + 1].coeffs + 0, I->ctxpk);
     for (k--; k >= 1; k--)
-        fmpz_mod_poly_mul(U[k].coeffs + 0, newbitilde[k].coeffs + 0, U[k + 1].coeffs + 0);
+        fmpz_mod_poly_mul(U[k].coeffs + 0, newbitilde[k].coeffs + 0, U[k + 1].coeffs + 0, I->ctxpk);
 
     for (j = 1; j < I->lifting_prec; j++)
     {
         k = I->r - 2;
-        fmpz_mod_poly_zero(U[k].coeffs + j);
+        fmpz_mod_poly_zero(U[k].coeffs + j, I->ctxpk);
         for (i = 0; i <= j; i++)
         {
-            fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + i, newbitilde[k + 1].coeffs + j - i);
-            fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t1);
+            fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + i, newbitilde[k + 1].coeffs + j - i, I->ctxpk);
+            fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t1, I->ctxpk);
         }
         for (k--; k >= 1; k--)
         {
-            fmpz_mod_poly_zero(U[k].coeffs + j);
+            fmpz_mod_poly_zero(U[k].coeffs + j, I->ctxpk);
             for (i = 0; i <= j; i++)
             {
-                fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + i, U[k + 1].coeffs + j - i);
-                fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t1);
+                fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + i, U[k + 1].coeffs + j - i, I->ctxpk);
+                fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t1, I->ctxpk);
             }
         }
 
         if (j < btilde->length)
-            fmpz_mod_poly_set(t, btilde->coeffs + j);
+            fmpz_mod_poly_set(t, btilde->coeffs + j, I->ctxpk);
         else
-            fmpz_mod_poly_zero(t);
+            fmpz_mod_poly_zero(t, I->ctxpk);
 
         for (i = 0; i <= j; i++)
         {
-            fmpz_mod_poly_mul(t1, newbitilde[0].coeffs + i, U[1].coeffs + j - i);
-            fmpz_mod_poly_sub(t, t, t1);
+            fmpz_mod_poly_mul(t1, newbitilde[0].coeffs + i, U[1].coeffs + j - i, I->ctxpk);
+            fmpz_mod_poly_sub(t, t, t1, I->ctxpk);
         }
 
         for (k = 0; k < I->r; k++)
         {
-            fmpz_mod_poly_mul(t1, t, I->d + k);
-            fmpz_mod_poly_rem(newbitilde[k].coeffs + j, t1, I->Bitilde + k);
-            if (!fmpz_mod_poly_is_zero(newbitilde[k].coeffs + j))
+            fmpz_mod_poly_mul(t1, t, I->d + k, I->ctxpk);
+            fmpz_mod_poly_rem(newbitilde[k].coeffs + j, t1, I->Bitilde + k, I->ctxpk);
+            if (!fmpz_mod_poly_is_zero(newbitilde[k].coeffs + j, I->ctxpk))
                 newbitilde[k].length = j + 1;
         }
 
         k = I->r - 2;
-        fmpz_mod_poly_mul(t, newbitilde[k].coeffs + 0, newbitilde[k + 1].coeffs + j);
-        fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + j, newbitilde[k + 1].coeffs + 0);
-        fmpz_mod_poly_add(t, t, t1);
-        fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t);
+        fmpz_mod_poly_mul(t, newbitilde[k].coeffs + 0, newbitilde[k + 1].coeffs + j, I->ctxpk);
+        fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + j, newbitilde[k + 1].coeffs + 0, I->ctxpk);
+        fmpz_mod_poly_add(t, t, t1, I->ctxpk);
+        fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t, I->ctxpk);
         for (k--; k >= 1; k--)
         {
-            fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + 0, t);
-            fmpz_mod_poly_swap(t, t1);
-            fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + j, U[k + 1].coeffs + 0);
-            fmpz_mod_poly_add(t, t, t1);
-            fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t);
+            fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + 0, t, I->ctxpk);
+            fmpz_mod_poly_swap(t, t1, I->ctxpk);
+            fmpz_mod_poly_mul(t1, newbitilde[k].coeffs + j, U[k + 1].coeffs + 0, I->ctxpk);
+            fmpz_mod_poly_add(t, t, t1, I->ctxpk);
+            fmpz_mod_poly_add(U[k].coeffs + j, U[k].coeffs + j, t, I->ctxpk);
         }
     }
 
     for (k = 0; k < I->r; k++)
-        fmpz_mod_bpoly_reverse_vars(I->newBitilde + k, newbitilde + k);
+        fmpz_mod_bpoly_reverse_vars(I->newBitilde + k, newbitilde + k, I->ctxpk);
 
-    fmpz_mod_poly_clear(t);
-    fmpz_mod_poly_clear(t1);
-    fmpz_mod_bpoly_clear(btilde);
+    fmpz_mod_poly_clear(t, I->ctxpk);
+    fmpz_mod_poly_clear(t1, I->ctxpk);
+    fmpz_mod_bpoly_clear(btilde, I->ctxpk);
     for (k = 0; k < I->r; k++)
     {
-        fmpz_mod_bpoly_clear(U + k);
-        fmpz_mod_bpoly_clear(newbitilde + k);
+        fmpz_mod_bpoly_clear(U + k, I->ctxpk);
+        fmpz_mod_bpoly_clear(newbitilde + k, I->ctxpk);
     }
 
     flint_free(newbitilde);
@@ -896,14 +948,14 @@ static void _recombine_naive(
     fmpz_bpoly_init(Q);
     fmpz_bpoly_init(R);
     fmpz_bpoly_init(trymez);
-    fmpz_mod_bpoly_init(tryme, I->pk);
-    fmpz_mod_bpoly_init(trymet, I->pk);
-    fmpz_mod_poly_init(leadB, I->pk);
+    fmpz_mod_bpoly_init(tryme, I->ctxpk);
+    fmpz_mod_bpoly_init(trymet, I->ctxpk);
+    fmpz_mod_poly_init(leadB, I->ctxpk);
 
     F->length = 0;
 
     FLINT_ASSERT(B->length > 0);
-    fmpz_mod_poly_set_fmpz_poly(leadB, B->coeffs + B->length - 1);
+    fmpz_mod_poly_set_fmpz_poly(leadB, B->coeffs + B->length - 1, I->ctxpk);
 
     len = I->r;
     subset = (slong *) flint_malloc(len * sizeof(slong));
@@ -915,17 +967,17 @@ static void _recombine_naive(
         zassenhaus_subset_first(subset, len, k);
         while (1)
         {
-            fmpz_mod_bpoly_set_polyy(tryme, leadB);
+            fmpz_mod_bpoly_set_polyy(tryme, leadB, I->ctxpk);
             for (i = 0; i < len; i++)
             {
                 if (subset[i] >= 0)
                 {
-                    fmpz_mod_bpoly_mul(trymet, tryme,
-                                   I->newBitilde + subset[i], I->lifting_prec);
+                    fmpz_mod_bpoly_mul(trymet, tryme, I->newBitilde + subset[i],
+                                                    I->lifting_prec, I->ctxpk);
                     fmpz_mod_bpoly_swap(trymet, tryme);
                 }
             }
-            fmpz_bpoly_set_fmpz_mod_bpoly(trymez, tryme);
+            fmpz_bpoly_set_fmpz_mod_bpoly(trymez, tryme, I->ctxpk);
             fmpz_bpoly_make_primitive(g, trymez);
 
             if (fmpz_bpoly_divides(Q, B, trymez))
@@ -938,7 +990,7 @@ static void _recombine_naive(
                 F->length++;
                 fmpz_bpoly_swap(B, Q);
                 FLINT_ASSERT(B->length > 0);
-                fmpz_mod_poly_set_fmpz_poly(leadB, B->coeffs + B->length - 1);
+                fmpz_mod_poly_set_fmpz_poly(leadB, B->coeffs + B->length - 1, I->ctxpk);
 
                 len -= k;
                 if (!zassenhaus_subset_next_disjoint(subset, len + k))
@@ -971,9 +1023,9 @@ static void _recombine_naive(
     fmpz_bpoly_clear(Q);
     fmpz_bpoly_clear(R);
     fmpz_bpoly_clear(trymez);
-    fmpz_mod_bpoly_clear(tryme);
-    fmpz_mod_bpoly_clear(trymet);
-    fmpz_mod_poly_clear(leadB);
+    fmpz_mod_bpoly_clear(tryme, I->ctxpk);
+    fmpz_mod_bpoly_clear(trymet, I->ctxpk);
+    fmpz_mod_poly_clear(leadB, I->ctxpk);
 
     flint_free(subset);
 }
@@ -1072,15 +1124,15 @@ next_prime:
     bpoly_info_init(I, Bevalfac->num, p, k);
     I->lifting_prec = Blengthy + (B->coeffs + B->length - 1)->length;
 
-    fmpz_mod_bpoly_set_fmpz_bpoly(I->Btilde, B);
-    fmpz_mod_bpoly_make_monic(I->Btilde, I->lifting_prec);
+    fmpz_mod_bpoly_set_fmpz_bpoly(I->Btilde, B, I->ctxpk);
+    fmpz_mod_bpoly_make_monic(I->Btilde, I->lifting_prec, I->ctxpk);
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalfac->p + i);
-        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i);
-        fmpz_mod_poly_set_fmpz_poly(I->Bitilde + i, Bevalfac->p + i);
-        fmpz_mod_poly_make_monic(I->Bitilde + i, I->Bitilde + i);
-        fmpz_mod_bpoly_set_polyx(I->newBitilde + i, I->Bitilde + i);
+        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalfac->p + i, I->ctxpk);
+        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i, I->ctxpk);
+        fmpz_mod_poly_set_fmpz_poly(I->Bitilde + i, Bevalfac->p + i, I->ctxpk);
+        fmpz_mod_poly_make_monic(I->Bitilde + i, I->Bitilde + i, I->ctxpk);
+        fmpz_mod_bpoly_set_polyx(I->newBitilde + i, I->Bitilde + i, I->ctxpk);
     }
 
     FLINT_ASSERT(I->r > 1);

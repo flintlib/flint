@@ -19,13 +19,14 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
+fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < fac->num; i++)
     {
-        fmpz_mod_poly_print(fac->poly + i);
+        fmpz_mod_poly_print(fac->poly + i, ctx);
         flint_printf(" ^ %wd\n", fac->exp[i]);
     }
 }

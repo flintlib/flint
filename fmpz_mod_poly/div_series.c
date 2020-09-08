@@ -106,7 +106,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
 }
 
 void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
-                                         const fmpz_mod_poly_t B, slong n)
+                    const fmpz_mod_poly_t B, slong n, const fmpz_mod_ctx_t ctx)
 {
     slong Alen = FLINT_MIN(A->length, n);
     slong Blen = FLINT_MIN(B->length, n);
@@ -119,22 +119,24 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
 
     if (Alen == 0)
     {
-        fmpz_mod_poly_zero(Q);
+        fmpz_mod_poly_zero(Q, ctx);
         return;
     }
 
     if (Q == A || Q == B)
     {
         fmpz_mod_poly_t t;
-        fmpz_mod_poly_init2(t, &A->p, n);
-        _fmpz_mod_poly_div_series(t->coeffs, A->coeffs, Alen, B->coeffs, Blen, &A->p, n);
-        fmpz_mod_poly_swap(Q, t);
-        fmpz_mod_poly_clear(t);
+        fmpz_mod_poly_init2(t, n, ctx);
+        _fmpz_mod_poly_div_series(t->coeffs, A->coeffs, Alen,
+                                B->coeffs, Blen, fmpz_mod_ctx_modulus(ctx), n);
+        fmpz_mod_poly_swap(Q, t, ctx);
+        fmpz_mod_poly_clear(t, ctx);
     }
     else
     {
-        fmpz_mod_poly_fit_length(Q, n);
-        _fmpz_mod_poly_div_series(Q->coeffs, A->coeffs, Alen, B->coeffs, Blen, &A->p, n);
+        fmpz_mod_poly_fit_length(Q, n, ctx);
+        _fmpz_mod_poly_div_series(Q->coeffs, A->coeffs, Alen,
+                                B->coeffs, Blen, fmpz_mod_ctx_modulus(ctx), n);
     }
 
     _fmpz_mod_poly_set_length(Q, n);

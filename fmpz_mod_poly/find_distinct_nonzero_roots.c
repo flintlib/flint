@@ -21,37 +21,41 @@ void _fmpz_mod_poly_split_rabin(
     const fmpz_t halfp,
     fmpz_mod_poly_t t,
     fmpz_mod_poly_t t2,
-    flint_rand_t randstate)
+    flint_rand_t randstate,
+    const fmpz_mod_ctx_t ctx)
 {
-    FLINT_ASSERT(fmpz_mod_poly_degree(f) > 1);
+    FLINT_ASSERT(fmpz_mod_poly_degree(f, ctx) > 1);
 
-    fmpz_mod_poly_reverse(t, f, f->length);
-    fmpz_mod_poly_inv_series_newton(t2, t, t->length);
+    fmpz_mod_poly_reverse(t, f, f->length, ctx);
+    fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
 
 try_again:
 
     /* a = random linear */
-    fmpz_mod_poly_fit_length(a, 2);
+    fmpz_mod_poly_fit_length(a, 2, ctx);
     fmpz_one(a->coeffs + 1);
-    fmpz_randm(a->coeffs + 0, randstate, &f->p);
+    fmpz_randm(a->coeffs + 0, randstate, fmpz_mod_ctx_modulus(ctx));
     a->length = 2;
 
-    fmpz_mod_poly_powmod_fmpz_binexp_preinv(t, a, halfp, f, t2);
-    fmpz_mod_poly_zero(a);
-    fmpz_mod_poly_set_coeff_ui(a, 0, 1);
-    fmpz_mod_poly_sub(t, t, a);
-    fmpz_mod_poly_gcd(a, t, f);
+    fmpz_mod_poly_powmod_fmpz_binexp_preinv(t, a, halfp, f, t2, ctx);
+    fmpz_mod_poly_zero(a, ctx);
+    fmpz_mod_poly_set_coeff_ui(a, 0, 1, ctx);
+    fmpz_mod_poly_sub(t, t, a, ctx);
+    fmpz_mod_poly_gcd(a, t, f, ctx);
 
-    FLINT_ASSERT(!fmpz_mod_poly_is_zero(a));
+    FLINT_ASSERT(!fmpz_mod_poly_is_zero(a, ctx));
 
-    if (0 >= fmpz_mod_poly_degree(a) || fmpz_mod_poly_degree(a) >= fmpz_mod_poly_degree(f))
+    if (0 >= fmpz_mod_poly_degree(a, ctx) ||
+        fmpz_mod_poly_degree(a, ctx) >= fmpz_mod_poly_degree(f, ctx))
+    {
         goto try_again;
+    }
 
-    fmpz_mod_poly_div_basecase(b, f, a);
+    fmpz_mod_poly_div_basecase(b, f, a, ctx);
 
     /* ensure deg a >= deg b */
-    if (fmpz_mod_poly_degree(a) < fmpz_mod_poly_degree(b))
-        fmpz_mod_poly_swap(a, b);
+    if (fmpz_mod_poly_degree(a, ctx) < fmpz_mod_poly_degree(b, ctx))
+        fmpz_mod_poly_swap(a, b, ctx);
 
     return;
 }
@@ -64,7 +68,8 @@ try_again:
 */
 int fmpz_mod_poly_find_distinct_nonzero_roots(
     fmpz * roots,
-    const fmpz_mod_poly_t P)
+    const fmpz_mod_poly_t P,
+    const fmpz_mod_ctx_t ctx)
 {
     fmpz_t a0, a1;
     int success;
@@ -74,12 +79,10 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
     fmpz_mod_poly_t f, t, t2;
     fmpz_mod_poly_struct stack[FLINT_BITS + 1];
     flint_rand_t randstate;
-    slong d = fmpz_mod_poly_degree(P);
-    fmpz_mod_ctx_t fpctx;
+    slong d = fmpz_mod_poly_degree(P, ctx);
 
     FLINT_ASSERT(d >= 0);
 
-    fmpz_mod_ctx_init(fpctx, &P->p);
     fmpz_init(a0);
     fmpz_init(a1);
     fmpz_init(halfp);
@@ -88,22 +91,22 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
     {
         if (d == 1)
         {
-            fmpz_mod_poly_get_coeff_fmpz(a0, P, 0);
-            fmpz_mod_poly_get_coeff_fmpz(a1, P, 1);
+            fmpz_mod_poly_get_coeff_fmpz(a0, P, 0, ctx);
+            fmpz_mod_poly_get_coeff_fmpz(a1, P, 1, ctx);
             if (fmpz_is_zero(a0))
             {
                 success = 0;
                 goto cleanup1;
             }
-            fmpz_mod_inv(a1, a1, fpctx);
-            fmpz_mod_neg(a1, a1, fpctx);
-            fmpz_mod_mul(roots + 0, a0, a1, fpctx);
+            fmpz_mod_inv(a1, a1, ctx);
+            fmpz_mod_neg(a1, a1, ctx);
+            fmpz_mod_mul(roots + 0, a0, a1, ctx);
         }
         success = 1;
         goto cleanup1;
     }
 
-    if (fmpz_equal_ui(&P->p, 2))
+    if (fmpz_cmp_ui(fmpz_mod_ctx_modulus(ctx), 2) <= 0)
     {
         success = 0;
         goto cleanup1;
@@ -116,70 +119,71 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
     }
 
     flint_randinit(randstate);
-    fmpz_mod_poly_init(t, &P->p);
-    fmpz_mod_poly_init(t2, &P->p);
-    fmpz_mod_poly_init(f, &P->p);
+    fmpz_mod_poly_init(t, ctx);
+    fmpz_mod_poly_init(t2, ctx);
+    fmpz_mod_poly_init(f, ctx);
     for (i = 0; i <= FLINT_BITS; i++)
-        fmpz_mod_poly_init(stack + i, &P->p);
+        fmpz_mod_poly_init(stack + i, ctx);
 
     roots_idx = 0;
 
-    fmpz_mod_poly_make_monic(f, P);
-    fmpz_mod_poly_reverse(t, f, f->length);
-    fmpz_mod_poly_inv_series_newton(t2, t, t->length);
+    fmpz_mod_poly_make_monic(f, P, ctx);
+    fmpz_mod_poly_reverse(t, f, f->length, ctx);
+    fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
 
 
     a = stack + 0;
-    fmpz_mod_poly_zero(a);
-    fmpz_mod_poly_set_coeff_ui(a, 1, 1);
-    fmpz_sub_ui(halfp, &P->p, 1);
+    fmpz_mod_poly_zero(a, ctx);
+    fmpz_mod_poly_set_coeff_ui(a, 1, 1, ctx);
+    fmpz_sub_ui(halfp, fmpz_mod_ctx_modulus(ctx), 1);
     fmpz_divexact_ui(halfp, halfp, 2);
-    fmpz_mod_poly_powmod_fmpz_binexp(t, a, halfp, f);
-    fmpz_mod_poly_zero(a);
-    fmpz_mod_poly_set_coeff_ui(a, 0, 1);
-    fmpz_mod_poly_sub(t, t, a);
-    fmpz_mod_poly_gcd(a, t, f);
+    fmpz_mod_poly_powmod_fmpz_binexp(t, a, halfp, f, ctx);
+    fmpz_mod_poly_zero(a, ctx);
+    fmpz_mod_poly_set_coeff_ui(a, 0, 1, ctx);
+    fmpz_mod_poly_sub(t, t, a, ctx);
+    fmpz_mod_poly_gcd(a, t, f, ctx);
 
     b = stack + 1;
-    fmpz_mod_poly_zero(b);
-    fmpz_mod_poly_set_coeff_ui(b, 0, 2);
-    fmpz_mod_poly_add(t, t, b);
-    fmpz_mod_poly_gcd(b, t, f);
+    fmpz_mod_poly_zero(b, ctx);
+    fmpz_mod_poly_set_coeff_ui(b, 0, 2, ctx);
+    fmpz_mod_poly_add(t, t, b, ctx);
+    fmpz_mod_poly_gcd(b, t, f, ctx);
 
-    if (fmpz_mod_poly_degree(b) + fmpz_mod_poly_degree(a) != d)
+    if (fmpz_mod_poly_degree(b, ctx) + fmpz_mod_poly_degree(a, ctx) != d)
     {
         success = 0;
         goto cleanup;
     }
     /* deg a >= deg b */
-    if (fmpz_mod_poly_degree(a) < fmpz_mod_poly_degree(b))
+    if (fmpz_mod_poly_degree(a, ctx) < fmpz_mod_poly_degree(b, ctx))
     {
-        fmpz_mod_poly_swap(a, b);
+        fmpz_mod_poly_swap(a, b, ctx);
     }
 
-    sp = fmpz_mod_poly_degree(b) > 0 ? 2 : 1;
+    sp = fmpz_mod_poly_degree(b, ctx) > 0 ? 2 : 1;
     while (sp > 0)
     {
         FLINT_ASSERT(sp < FLINT_BITS);
         sp--;
-        fmpz_mod_poly_swap(f, stack + sp);
+        fmpz_mod_poly_swap(f, stack + sp, ctx);
 
-        FLINT_ASSERT(fmpz_mod_poly_degree(f) > 0);
-        if (fmpz_mod_poly_degree(f) == 1)
+        FLINT_ASSERT(fmpz_mod_poly_degree(f, ctx) > 0);
+        if (fmpz_mod_poly_degree(f, ctx) == 1)
         {
-            fmpz_mod_poly_get_coeff_fmpz(a0, f, 0);
-            fmpz_mod_poly_get_coeff_fmpz(a1, f, 1);
+            fmpz_mod_poly_get_coeff_fmpz(a0, f, 0, ctx);
+            fmpz_mod_poly_get_coeff_fmpz(a1, f, 1, ctx);
             FLINT_ASSERT(!fmpz_is_zero(a0));
             FLINT_ASSERT(fmpz_is_one(a1));
-            fmpz_mod_neg(roots + roots_idx, a0, fpctx);
+            fmpz_mod_neg(roots + roots_idx, a0, ctx);
             roots_idx++;
         }
         else
         {
             _fmpz_mod_poly_split_rabin(stack + sp + 0, stack + sp + 1, f,
-                                                      halfp, t, t2, randstate);
+                                                 halfp, t, t2, randstate, ctx);
 
-            FLINT_ASSERT(FLINT_BIT_COUNT(fmpz_mod_poly_degree(stack + sp + 1))
+            FLINT_ASSERT(
+                FLINT_BIT_COUNT(fmpz_mod_poly_degree(stack + sp + 1, ctx))
                                                        <= FLINT_BITS - sp - 1);
             sp += 2;
         }
@@ -190,17 +194,16 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
 cleanup:
 
     flint_randclear(randstate);
-    fmpz_mod_poly_clear(t);
-    fmpz_mod_poly_clear(t2);
-    fmpz_mod_poly_clear(f);
+    fmpz_mod_poly_clear(t, ctx);
+    fmpz_mod_poly_clear(t2, ctx);
+    fmpz_mod_poly_clear(f, ctx);
     for (i = 0; i <= FLINT_BITS; i++)
-        fmpz_mod_poly_clear(stack + i);
+        fmpz_mod_poly_clear(stack + i, ctx);
 
     FLINT_ASSERT((!success) || roots_idx == d);
 
 cleanup1:
 
-    fmpz_mod_ctx_clear(fpctx);
     fmpz_clear(a0);
     fmpz_clear(a1);
     fmpz_clear(halfp);

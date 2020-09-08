@@ -35,6 +35,7 @@ main(void)
 {
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int i;
+    fmpz_mod_ctx_t ctx;
 #endif
     FLINT_TEST_INIT(state);
     
@@ -42,14 +43,17 @@ main(void)
     fflush(stdout);
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+
+    fmpz_mod_ctx_init_ui(ctx, 2);
+
     /* check precomputation */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv;
-	fmpz_mod_poly_struct * tmp;
+        fmpz_mod_poly_struct * tmp;
         fmpz_t p;
         fmpz_mat_t B;
-	fmpz_mat_struct * C;
+        fmpz_mat_struct * C;
         slong j, num_threads;
         fmpz_mod_poly_matrix_precompute_arg_t * args1;
         thread_pool_handle * threads;
@@ -64,27 +68,28 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(cinv, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(cinv, ctx);
 
         for (j = 0; j < num_threads + 1; j++)
-            fmpz_mod_poly_init(tmp + j, p);
+            fmpz_mod_poly_init(tmp + j, ctx);
 
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1);
-        fmpz_mod_poly_randtest_not_zero(b, state, n_randint(state, 20) + 1);
+        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1, ctx);
+        fmpz_mod_poly_randtest_not_zero(b, state, n_randint(state, 20) + 1, ctx);
         do
         {
-            fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1);
+            fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
         } while (c->length < 2);
 
-        fmpz_mod_poly_reverse(cinv, c, c->length);
-        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length);
+        fmpz_mod_poly_reverse(cinv, c, c->length, ctx);
+        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length, ctx);
 
         fmpz_mat_init(B, n_sqrt(c->length - 1) + 1, c->length - 1);
-        fmpz_mod_poly_precompute_matrix(B, b, c, cinv);
+        fmpz_mod_poly_precompute_matrix(B, b, c, cinv, ctx);
 
         args1 = (fmpz_mod_poly_matrix_precompute_arg_t *)
                flint_malloc(sizeof(fmpz_mod_poly_matrix_precompute_arg_t)
@@ -96,12 +101,12 @@ main(void)
         {
             fmpz_mat_init(C + j, n_sqrt(c->length - 1) + 1, c->length - 1);
             
-	    fmpz_mod_poly_set(tmp + j, b);
-            fmpz_mod_poly_rem(tmp + j, tmp + j, c);
+    	    fmpz_mod_poly_set(tmp + j, b, ctx);
+            fmpz_mod_poly_rem(tmp + j, tmp + j, c, ctx);
             
-	    if (tmp[j].length < c->length - 1)
+            if (tmp[j].length < c->length - 1)
             {
-                fmpz_mod_poly_fit_length(tmp + j, c->length - 1);
+                fmpz_mod_poly_fit_length(tmp + j, c->length - 1, ctx);
                 _fmpz_vec_zero(tmp[j].coeffs + tmp[j].length,
                                                     c->length - 1 - b->length);
             }
@@ -110,6 +115,7 @@ main(void)
             args1[j].poly1    = tmp + j;
             args1[j].poly2    = c;
             args1[j].poly2inv = cinv;
+            args1[j].ctx      = ctx;
         }
 
         for (j = 1; j < num_threads + 1; j++)
@@ -130,9 +136,9 @@ main(void)
                 flint_printf("FAIL (precomputation):\n");
                 flint_printf("B:\n"); fmpz_mat_print(B); flint_printf("\n");
                 flint_printf("C[j]:\n"); fmpz_mat_print(C + j); flint_printf("\n");
-                flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
-                flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
-                flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+                flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx); flint_printf("\n");
+                flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx); flint_printf("\n");
+                flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx); flint_printf("\n");
                 abort();
             }
         }
@@ -140,15 +146,15 @@ main(void)
         flint_give_back_threads(threads, num_threads);
 
         fmpz_clear(p);
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mat_clear     (B);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(cinv);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mat_clear(B);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(cinv, ctx);
 
         for (j = 0; j < num_threads + 1; j++)
         {
-            fmpz_mod_poly_clear(tmp + j);
+            fmpz_mod_poly_clear(tmp + j, ctx);
             fmpz_mat_clear(C + j);
         }
 
@@ -178,31 +184,32 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_set_modulus(ctx, p);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-        fmpz_mod_poly_init(cinv, p);
-        fmpz_mod_poly_init(d, p);
+        fmpz_mod_poly_init(a, ctx);
+        fmpz_mod_poly_init(b, ctx);
+        fmpz_mod_poly_init(c, ctx);
+        fmpz_mod_poly_init(cinv, ctx);
+        fmpz_mod_poly_init(d, ctx);
 
         for (j = 0; j < num_threads + 1; j++)
-            fmpz_mod_poly_init(res + j, p);
+            fmpz_mod_poly_init(res + j, ctx);
 
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1);
-        fmpz_mod_poly_randtest_not_zero(b, state, n_randint(state, 20) + 1);
+        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1, ctx);
+        fmpz_mod_poly_randtest_not_zero(b, state, n_randint(state, 20) + 1, ctx);
         do
         {
-            fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1);
+            fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
         } while (c->length < 2);
 
-        fmpz_mod_poly_reverse(cinv, c, c->length);
-        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length);
+        fmpz_mod_poly_reverse(cinv, c, c->length, ctx);
+        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length, ctx);
 
         fmpz_mat_init(B, n_sqrt(c->length - 1) + 1, c->length - 1);
-        fmpz_mod_poly_precompute_matrix(B, b, c, cinv);
+        fmpz_mod_poly_precompute_matrix(B, b, c, cinv, ctx);
 
-        fmpz_mod_poly_rem(a, a, c);
-        fmpz_mod_poly_compose_mod(d, a, b, c);
+        fmpz_mod_poly_rem(a, a, c, ctx);
+        fmpz_mod_poly_compose_mod(d, a, b, c, ctx);
 
         args1 = (fmpz_mod_poly_compose_mod_precomp_preinv_arg_t *)
                    flint_malloc((num_threads + 1)*
@@ -210,7 +217,7 @@ main(void)
 
         for (j = 0; j < num_threads + 1; j++)
         {
-            fmpz_mod_poly_fit_length(res + j, c->length - 1);
+            fmpz_mod_poly_fit_length(res + j, c->length - 1, ctx);
             _fmpz_mod_poly_set_length(res + j, c->length - 1);
 
             args1[j].A        = B;
@@ -218,6 +225,7 @@ main(void)
             args1[j].poly1    = a;
             args1[j].poly3    = c;
             args1[j].poly3inv = cinv;
+            args1[j].ctx      = ctx;
         }
         
         for (j = 1; j < num_threads + 1; j++)
@@ -236,14 +244,14 @@ main(void)
 
         for (j = 0; j < num_threads + 1; j++)
         {
-            if (!fmpz_mod_poly_equal(d, res + j))
+            if (!fmpz_mod_poly_equal(d, res + j, ctx))
             {
                 flint_printf("FAIL (composition):\n");
-                flint_printf("res[j]:\n"); fmpz_mod_poly_print(res + j); flint_printf("\n");
-                flint_printf("d:\n"); fmpz_mod_poly_print(d); flint_printf("\n");
-                flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
-                flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
-                flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+                flint_printf("res[j]:\n"); fmpz_mod_poly_print(res + j, ctx); flint_printf("\n");
+                flint_printf("d:\n"); fmpz_mod_poly_print(d, ctx); flint_printf("\n");
+                flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx); flint_printf("\n");
+                flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx); flint_printf("\n");
+                flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx); flint_printf("\n");
                 abort();
             }
         }
@@ -251,20 +259,21 @@ main(void)
         flint_give_back_threads(threads, num_threads);
 
         fmpz_clear(p);
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(b);
-        fmpz_mat_clear     (B);
-        fmpz_mod_poly_clear(c);
-        fmpz_mod_poly_clear(cinv);
-        fmpz_mod_poly_clear(d);
+        fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_poly_clear(b, ctx);
+        fmpz_mat_clear(B);
+        fmpz_mod_poly_clear(c, ctx);
+        fmpz_mod_poly_clear(cinv, ctx);
+        fmpz_mod_poly_clear(d, ctx);
 
         for (j = 0; j < num_threads + 1; j++)
-            fmpz_mod_poly_clear(res + j);
+            fmpz_mod_poly_clear(res + j, ctx);
 
         flint_free(res);
         flint_free(args1);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

@@ -30,15 +30,15 @@ void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1,
     }
 }
 
-void fmpz_mod_poly_sub(fmpz_mod_poly_t res, 
-                       const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+void fmpz_mod_poly_sub(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                         const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
 {
     slong max = FLINT_MAX(poly1->length, poly2->length);
 
-    fmpz_mod_poly_fit_length(res, max);
+    fmpz_mod_poly_fit_length(res, max, ctx);
 
     _fmpz_mod_poly_sub(res->coeffs, poly1->coeffs, poly1->length, 
-                                    poly2->coeffs, poly2->length, &(res->p));
+                       poly2->coeffs, poly2->length, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, max);
     _fmpz_mod_poly_normalise(res);

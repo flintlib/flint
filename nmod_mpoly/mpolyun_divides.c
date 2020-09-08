@@ -55,7 +55,7 @@ int nmod_mpolyn_divides(
     next_loc = B->length + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));
     chain = (mpoly_heap_t *) TMP_ALLOC(B->length*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*B->length*sizeof(mpoly_heap_t *));
+    store = store_base = (slong *) TMP_ALLOC(2*B->length*sizeof(slong));
 
     /* array of exponent vectors, each of "N" words */
     exps = (ulong *) TMP_ALLOC(B->length*N*sizeof(ulong));
@@ -275,7 +275,7 @@ int _nmod_mpolyn_divides(
     next_loc = B->length + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));
     chain = (mpoly_heap_t *) TMP_ALLOC(B->length*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*B->length*sizeof(mpoly_heap_t *));
+    store = store_base = (slong *) TMP_ALLOC(2*B->length*sizeof(slong));
 
     /* array of exponent vectors, each of "N" words */
     exps = (ulong *) TMP_ALLOC(B->length*N*sizeof(ulong));

@@ -35,7 +35,7 @@ unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
         ulong g_ind = n_mulmod2_preinv(x, i, p_pow2, p_pow_preinv);
 
         /* set g_coeff to g[g_ind] */
-        fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind);
+        fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind, g->ctx);
 
         /* set f[i] = g[x * i mod p^k] */
         unity_zp_coeff_set_fmpz(f, i, g_coeff);
@@ -58,10 +58,10 @@ unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
             ulong f_ind = i - j * p_pow1;
 
             /* set g_coeff = g[x * i mod p^k] */
-            fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind);
+            fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind, g->ctx);
 
             /* set f_coeff = f[i - j * p^{k - 1}] */
-            fmpz_mod_poly_get_coeff_fmpz(f_coeff, f->poly, f_ind);
+            fmpz_mod_poly_get_coeff_fmpz(f_coeff, f->poly, f_ind, f->ctx);
 
             /* set f_coeff = f[i - j * p^{k - 1}] - g[x * i mod p^k] */
             fmpz_sub(f_coeff, f_coeff, g_coeff);
