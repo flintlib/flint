@@ -75,9 +75,9 @@ Here is an example program to get started using Calcium:
         ca_ctx_init(ctx);
         ca_init(x, ctx);
 
-        ca_pi(x, ctx);
-        ca_sub_ui(x, x, 3, ctx);
-        ca_pow_ui(x, x, 2, ctx);
+        ca_pi(x, ctx);               /* x = pi */
+        ca_sub_ui(x, x, 3, ctx);     /* x = x - 3 */
+        ca_pow_ui(x, x, 2, ctx);     /* x = x^2 */
         ca_print(x, ctx); printf("\n");
         printf("Computed with calcium-%s\n", calcium_version());
 

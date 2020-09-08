@@ -197,11 +197,14 @@ Memory management for numbers
     Clears an array of *n* initialized :type:`ca_struct` entries.
     This also frees the array *v*.
 
+.. _ca-printing:
+
 Printing
 -------------------------------------------------------------------------------
 
 The style of printed output is controlled by
-``ctx->options[CA_OPT_PRINT_FLAGS]`` which can be set to any
+``ctx->options[CA_OPT_PRINT_FLAGS]``
+(see :ref:`context-options`) which can be set to any
 combination of the following flags:
 
 .. macro:: CA_PRINT_N
@@ -213,6 +216,11 @@ combination of the following flags:
     If combined with ``CA_PRINT_REPR``, numbers appearing
     within the symbolic representation will also be printed with
     decimal approximations.
+
+    Warning: printing a decimal approximation requires a computation,
+    which can be expensive. It can also mutate
+    cached data (numerical enclosures of extension numbers), affecting
+    subsequent computations.
 
 .. macro:: CA_PRINT_DIGITS
 
@@ -1014,7 +1022,7 @@ the preceding flag, so it is unnecessary to pass more than one flag.
     Perform a complete integer factorization into prime numbers.
     This is prohibitively slow for general integers exceeding 70-80 digits.
 
-    
+.. _context-options:
 
 Context options
 -------------------------------------------------------------------------------
@@ -1024,9 +1032,21 @@ values controlling simplification behavior and various other settings.
 The values of the array at the following indices can be changed by the user
 (example: ``ctx->options[CA_OPT_PREC_LIMIT] = 65536``).
 
+It is recommended to set options controlling evaluation only at the time
+when a context object is created. Changing such options later should
+normally be harmless, but since the update will not apply
+retroactively to objects that have already been computed and cached,
+one might not see the expected behavior.
+Superficial options (printing) can be changed at any time.
+
 .. macro:: CA_OPT_VERBOSE
 
     Whether to print debug information. Default value: 0.
+
+.. macro:: CA_OPT_PRINT_FLAGS
+
+    Printing style. See :ref:`ca-printing` for details.
+    Default value: ``CA_PRINT_DEFAULT``.
 
 .. macro:: CA_OPT_PREC_LIMIT
 

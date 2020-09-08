@@ -15,9 +15,11 @@ Arithmetic in this representation is expensive: an arithmetic operation
 on numbers of degrees *m* and *n* involves computing and then factoring an
 annihilating polynomial of degree *mn* and potentially also performing
 numerical root-finding. For doing repeated arithmetic, it is generally
-far more efficient to work in a fixed number field.
-The :type:`qqbar_t` type may be used to represent the
-embedding of a number field in `\mathbb{R}` or `\mathbb{C}` in such a setting.
+more efficient to work with the :type:`ca_t` type in a fixed
+number field.
+The :type:`qqbar_t` type is used internally by the :type:`ca_t` type
+to represent the embedding of number fields in `\mathbb{R}` or
+`\mathbb{C}` and to decide predicates for algebraic numbers.
 
 
 Types and macros
