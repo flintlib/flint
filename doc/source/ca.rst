@@ -872,6 +872,10 @@ Elementary functions
 
     * `e^{\log(z)} = z`
 
+    * `e^{(p/q) \log(z)} = z^{p/q}` (for rational `p/q`)
+
+    * `e^{(p/q) \pi i}` = algebraic root of unity (for small rational `p/q`)
+
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(e^x)`.
 

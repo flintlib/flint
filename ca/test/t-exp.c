@@ -43,6 +43,23 @@ int main()
         ca_randtest(y, state, 5, 5, ctx);
         ca_randtest(z, state, 5, 5, ctx);
 
+        if (n_randint(state, 4) == 0)
+        {
+            if (n_randint(state, 2))
+            {
+                do {
+                    ca_randtest(a, state, 5, 5, ctx);
+                    ca_log(a, a, ctx);
+                } while (ca_check_is_number(a, ctx) != T_TRUE);
+                ca_mul(x, x, a, ctx);
+            }
+            else
+            {
+                ca_pi_i(a, ctx);
+                ca_mul(x, x, a, ctx);
+            }
+        }
+
         ca_exp(a, x, ctx);
         ca_exp(b, y, ctx);
         ca_exp(c, z, ctx);
