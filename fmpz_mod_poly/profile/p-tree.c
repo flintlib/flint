@@ -27,6 +27,7 @@ main(void)
     fmpz * roots;
     fmpz_poly_struct ** tree;
     fmpz_t N;
+    fmpz_mod_ctx_t ctx;
     timeit_t t;
     char N_str[201] = "29799904256775982671863388319999573561548825027149399972531599612392671227006866151136667908641695103422986028076864929902803267437351318167549013218980573566942647077444419419003164546362008247462049";
     
@@ -37,13 +38,14 @@ main(void)
 
     fmpz_init(N);
     fmpz_set_str(N, N_str, 10);
+    fmpz_mod_ctx_init(ctx, N);
 
     roots = _fmpz_vec_init(len);
     
     for (i = 0; i < len; i++)
        fmpz_randm(roots + i, state, N);
 
-    fmpz_mod_poly_init(f, N);
+    fmpz_mod_poly_init(f, ctx);
     
     /*
         Time tree 
@@ -62,11 +64,12 @@ main(void)
 
     flint_printf("len = %wd, time = %wdms\n", len, ((slong) t->cpu)/10);
         
-    fmpz_mod_poly_clear(f);
+    fmpz_mod_poly_clear(f, ctx);
     
     _fmpz_vec_clear(roots, len);
 
     fmpz_clear(N);
+    fmpz_mod_ctx_clear(ctx);
     
     flint_randclear(state);
 }
