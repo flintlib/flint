@@ -161,7 +161,8 @@ void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
 }
 
 
-void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op)
+void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong len = op->length;
 
@@ -183,20 +184,21 @@ void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op)
     }
 }
 
-void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op)
+void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong len = deg(op) + 1;
 
     if (len == 0)
     {
-        fmpz_mod_poly_zero(rop);
+        fmpz_mod_poly_zero(rop, ctx);
     }
     else
     {
         slong i;
         const ZZ_p *ap; 
 
-        fmpz_mod_poly_fit_length(rop, len);
+        fmpz_mod_poly_fit_length(rop, len, ctx);
         _fmpz_mod_poly_set_length(rop, len);
 
         for (i = 0, ap = op.rep.elts(); i < len; i++, ap++)
@@ -206,7 +208,8 @@ void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op)
     }
 }
 
-void fmpz_mod_poly_get_zz_pX(zz_pX& rop, const fmpz_mod_poly_t op)
+void fmpz_mod_poly_get_zz_pX(zz_pX& rop, const fmpz_mod_poly_t op,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong len = op->length;
 
@@ -228,20 +231,21 @@ void fmpz_mod_poly_get_zz_pX(zz_pX& rop, const fmpz_mod_poly_t op)
     }
 }
 
-void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op)
+void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op,
+                                                      const fmpz_mod_ctx_t ctx)
 {
     const slong len = deg(op) + 1;
 
     if (len == 0)
     {
-        fmpz_mod_poly_zero(rop);
+        fmpz_mod_poly_zero(rop, ctx);
     }
     else
     {
         slong i;
         const zz_p *ap; 
 
-        fmpz_mod_poly_fit_length(rop, len);
+        fmpz_mod_poly_fit_length(rop, len, ctx);
         _fmpz_mod_poly_set_length(rop, len);
 
         for (i = 0, ap = op.rep.elts(); i < len; i++, ap++)

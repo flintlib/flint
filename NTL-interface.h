@@ -87,12 +87,12 @@ FLINT_DLL     void fmpz_poly_set_ZZX(fmpz_poly_t rop, const NTL_NNS ZZX& op);
 /*
   Converts an fmpz_mod_poly_t to an NTL ZZ_pX.
 */
-FLINT_DLL void fmpz_mod_poly_get_ZZ_pX(NTL_NNS ZZ_pX& rop, const fmpz_mod_poly_t op);
+FLINT_DLL void fmpz_mod_poly_get_ZZ_pX(NTL_NNS ZZ_pX& rop, const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
 /*
   Converts an NTL ZZ_pX to an fmpz_poly_t.
 */
-FLINT_DLL void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const NTL_NNS ZZ_pX& op);
+FLINT_DLL void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const NTL_NNS ZZ_pX& op, const fmpz_mod_ctx_t ctx);
 
 /*
   Converts an fq_t to an NTL ZZ_pE.
@@ -118,12 +118,12 @@ FLINT_DLL void fq_poly_set_ZZ_pEX(fq_poly_t rop, const NTL_NNS ZZ_pEX& op, const
 /*
   Converts an fmpz_mod_poly_t to an NTL zz_pX.
 */
-FLINT_DLL void fmpz_mod_poly_get_zz_pX(NTL_NNS zz_pX& rop, const fmpz_mod_poly_t op);
+FLINT_DLL void fmpz_mod_poly_get_zz_pX(NTL_NNS zz_pX& rop, const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
 /*
   Converts an NTL zz_pX to an fmpz_poly_t.
 */
-FLINT_DLL void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const NTL_NNS zz_pX& op);
+FLINT_DLL void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const NTL_NNS zz_pX& op, const fmpz_mod_ctx_t ctx);
 
 /*
   Converts an fq_t to an NTL zz_pE.

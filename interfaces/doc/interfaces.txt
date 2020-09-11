@@ -56,13 +56,13 @@ void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
 
     Converts an NTL \code{ZZX} to an \code{fmpz_poly_t}.
 
-void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op)
+void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx)
 
     Converts an \code{fmpz_mod_poly_t} to an NTL
     \code{ZZ_pX}. Requires that \code{ZZ_p::init()} has already been
     called.
 
-void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op)
+void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op, const fmpz_mod_ctx_t ctx)
 
     Converts an NTL \code{ZZ_pX} to an \code{fmpz_mod_poly_t}.
 
