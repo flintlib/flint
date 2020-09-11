@@ -69,6 +69,14 @@ void fmpz_bpoly_realloc(fmpz_bpoly_t A, slong len)
     A->alloc = len;
 }
 
+slong fmpz_bpoly_degree1(const fmpz_bpoly_t A)
+{
+    slong i, len = 0;
+    for (i = 0; i < A->length; i++)
+        len = FLINT_MAX(len, A->coeffs[i].length);
+    return len - 1;    
+}
+
 void fmpz_bpoly_set_coeff(fmpz_bpoly_t A, slong xi, slong yi, const fmpz_t c)
 {
     slong i;

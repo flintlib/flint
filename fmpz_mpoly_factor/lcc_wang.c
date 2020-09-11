@@ -112,9 +112,13 @@ int fmpz_mpoly_factor_lcc_wang(
     for (j = 0; j < r; j++)
     {
         FLINT_ASSERT(Auf[j].length > 0);
-        fmpz_gcd(R, Auf[j].coeffs + Auf[j].length - 1, dtilde + j);
-        FLINT_ASSERT(fmpz_divisible(Auf[j].coeffs + Auf[j].length - 1, R));
-        fmpz_divexact(Q, Auf[j].coeffs + Auf[j].length - 1, R);
+        fmpz_gcd(T + 0, Auf[j].coeffs + Auf[j].length - 1, dtilde + j);
+        fmpz_fdiv_qr(Q, R, Auf[j].coeffs + Auf[j].length - 1, T + 0);
+        if (!fmpz_is_zero(R))
+        {
+            success = 0;
+            goto cleanup;
+        }
         fmpz_mpoly_scalar_mul_fmpz(lc_divs + j, lc_divs + j, Q, ctx);
     }
 
@@ -142,3 +146,4 @@ cleanup:
 
     return success;
 }
+

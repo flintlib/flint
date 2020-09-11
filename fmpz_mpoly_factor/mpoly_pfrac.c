@@ -119,34 +119,30 @@ int fmpz_mpoly_pfrac_init(
     I->r = r;
     I->w = w;
 
-    I->dbetas = (fmpq_poly_struct *) flint_malloc(r*sizeof(fmpq_poly_struct));
-    I->inv_prod_dbetas = (fmpq_poly_struct *) flint_malloc(
-                                                   r*sizeof(fmpq_poly_struct));
-    I->prod_mbetas = (fmpz_mpoly_struct *) flint_malloc(
-                                          (w + 1)*r*sizeof(fmpz_mpoly_struct));
-    I->prod_mbetas_coeffs = (fmpz_mpolyv_struct *) flint_malloc(
-                                         (w + 1)*r*sizeof(fmpz_mpolyv_struct));
-    I->mbetas = (fmpz_mpoly_struct *) flint_malloc(
-                                          (w + 1)*r*sizeof(fmpz_mpoly_struct));
-    I->deltas = (fmpz_mpoly_struct *) flint_malloc(
-                                          (w + 1)*r*sizeof(fmpz_mpoly_struct));
     fmpq_poly_init(I->dtq);
     fmpq_poly_init(I->S);
     fmpq_poly_init(I->R);
-    I->xalpha = (fmpz_mpoly_struct *) flint_malloc(
-                                            (w + 1)*sizeof(fmpz_mpoly_struct));
-    I->q = (fmpz_mpoly_struct *) flint_malloc(
-                                            (w + 1)*sizeof(fmpz_mpoly_struct));
-    I->qt = (fmpz_mpoly_struct *) flint_malloc(
-                                            (w + 1)*sizeof(fmpz_mpoly_struct));
-    I->newt = (fmpz_mpoly_struct *) flint_malloc(
-                                            (w + 1)*sizeof(fmpz_mpoly_struct));
-    I->delta_coeffs = (fmpz_mpolyv_struct *) flint_malloc(
-                                         (w + 1)*r*sizeof(fmpz_mpolyv_struct));
+
+    I->dbetas = FLINT_ARRAY_ALLOC(r, fmpq_poly_struct);
+    I->inv_prod_dbetas = FLINT_ARRAY_ALLOC(r, fmpq_poly_struct);
+    I->prod_mbetas = FLINT_ARRAY_ALLOC((w + 1)*r, fmpz_mpoly_struct);
+    I->prod_mbetas_coeffs = FLINT_ARRAY_ALLOC((w + 1)*r, fmpz_mpolyv_struct);
+    I->mbetas = FLINT_ARRAY_ALLOC((w + 1)*r, fmpz_mpoly_struct);
+    I->deltas = FLINT_ARRAY_ALLOC((w + 1)*r, fmpz_mpoly_struct);
+    I->xalpha = FLINT_ARRAY_ALLOC(w + 1, fmpz_mpoly_struct);
+    I->q = FLINT_ARRAY_ALLOC(w + 1, fmpz_mpoly_struct);
+    I->U = FLINT_ARRAY_ALLOC(w + 1, fmpz_mpoly_univar_struct);
+    I->G = FLINT_ARRAY_ALLOC(w + 1, fmpz_mpoly_geobucket_struct);
+    I->qt = FLINT_ARRAY_ALLOC(w + 1, fmpz_mpoly_struct);
+    I->newt = FLINT_ARRAY_ALLOC(w + 1, fmpz_mpoly_struct);
+    I->delta_coeffs = FLINT_ARRAY_ALLOC((w + 1)*r, fmpz_mpolyv_struct);
+
     for (i = 0; i <= w; i++)
     {
         fmpz_mpoly_init(I->xalpha + i, ctx);
         fmpz_mpoly_init(I->q + i, ctx);
+        fmpz_mpoly_univar_init(I->U + i, ctx);
+        fmpz_mpoly_geobucket_init(I->G + i, ctx);
         fmpz_mpoly_init(I->qt + i, ctx);
         fmpz_mpoly_init(I->newt + i, ctx);
         for (j = 0; j < r; j++)
@@ -262,6 +258,8 @@ void fmpz_mpoly_pfrac_clear(
     {
         fmpz_mpoly_clear(I->xalpha + i, ctx);
         fmpz_mpoly_clear(I->q + i, ctx);
+        fmpz_mpoly_univar_clear(I->U + i, ctx);
+        fmpz_mpoly_geobucket_clear(I->G + i, ctx);
         fmpz_mpoly_clear(I->qt + i, ctx);
         fmpz_mpoly_clear(I->newt + i, ctx);
         for (j = 0; j < I->r; j++)
@@ -269,6 +267,8 @@ void fmpz_mpoly_pfrac_clear(
     }
     flint_free(I->xalpha);
     flint_free(I->q);
+    flint_free(I->U);
+    flint_free(I->G);
     flint_free(I->qt);
     flint_free(I->newt);
     flint_free(I->delta_coeffs);
@@ -302,14 +302,16 @@ int fmpz_mpoly_pfrac(
     fmpz_mpoly_pfrac_t I,
     const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, j, k;
-    int success;
+    int success, use_U;
+    slong i, j, k, Ui;
     fmpz_mpoly_struct * deltas = I->deltas + l*I->r;
     fmpz_mpoly_struct * newdeltas = I->deltas + (l - 1)*I->r;
     fmpz_mpoly_struct * q = I->q + l;
     fmpz_mpoly_struct * qt = I->qt + l;
     fmpz_mpoly_struct * newt = I->newt + l;
     fmpz_mpolyv_struct * delta_coeffs = I->delta_coeffs + l*I->r;
+    fmpz_mpoly_geobucket_struct * G = I->G + l;
+    fmpz_mpoly_univar_struct * U = I->U + l;
 
     if (!fmpz_mpoly_repack_bits_inplace(t, I->bits, ctx))
         return -1;
@@ -332,10 +334,38 @@ int fmpz_mpoly_pfrac(
     for (i = 0; i < I->r; i++)
         delta_coeffs[i].length = 0;
 
+    use_U = I->xalpha[l].length == 1;
+    if (use_U)
+    {
+        fmpz_mpoly_to_univar(U, t, l, ctx);
+        Ui = U->length - 1;
+    }
+    else
+    {
+        Ui = -1;
+    }
+
     for (k = 0; k <= degs[l]; k++)
     {
-        fmpz_mpoly_divrem(q, newt, t, I->xalpha + l, ctx);
-        fmpz_mpoly_swap(t, q, ctx);
+        if (use_U)
+        {
+            if (Ui >= 0 && fmpz_equal_si(U->exps + Ui, k))
+            {
+                fmpz_mpoly_geobucket_set(G, U->coeffs + Ui, ctx);
+                Ui--;
+            }
+            else
+            {
+                G->length = 0;
+            }
+        }
+        else
+        {
+            fmpz_mpoly_divrem(q, newt, t, I->xalpha + l, ctx);
+            fmpz_mpoly_swap(t, q, ctx);
+            fmpz_mpoly_geobucket_set(G, newt, ctx);
+        }
+
         for (j = 0; j < k; j++)
         for (i = 0; i < I->r; i++)
         {
@@ -346,10 +376,10 @@ int fmpz_mpoly_pfrac(
 
             fmpz_mpoly_mul(qt, delta_coeffs[i].coeffs + j,
                         I->prod_mbetas_coeffs[l*I->r + i].coeffs + k - j, ctx);
-            fmpz_mpoly_sub(q, newt, qt, ctx);
-            fmpz_mpoly_swap(newt, q, ctx);
+            fmpz_mpoly_geobucket_sub(G, qt, ctx);
         }
 
+        fmpz_mpoly_geobucket_empty(newt, G, ctx);
         success = fmpz_mpoly_pfrac(l - 1, newt, degs, I, ctx);
         if (success < 1)
             return success;
@@ -371,3 +401,4 @@ int fmpz_mpoly_pfrac(
 
     return 1;
 }
+

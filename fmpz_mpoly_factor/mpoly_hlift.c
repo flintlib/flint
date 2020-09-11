@@ -21,9 +21,11 @@ static int _hlift_quartic2(
     const slong * degs,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
-    slong i, j;
+    int success, use_Au;
+    slong i, j, Aui;
     fmpz_mpoly_t Aq, t, t2, t3, xalpha;
+    fmpz_mpoly_univar_t Au;
+    fmpz_mpoly_geobucket_t G;
     fmpz_mpoly_struct * betas, * deltas;
     fmpz_mpoly_pfrac_t I;
     fmpz_mpolyv_struct B[2];
@@ -38,6 +40,8 @@ static int _hlift_quartic2(
     fmpz_mpoly_init(t3, ctx);
     fmpz_mpoly_init(xalpha, ctx);
     fmpz_mpoly_init(Aq, ctx);
+    fmpz_mpoly_univar_init(Au, ctx);
+    fmpz_mpoly_geobucket_init(G, ctx);
 
     fmpz_mpoly_gen(xalpha, m, ctx);
     fmpz_mpoly_sub_fmpz(xalpha, xalpha, alpha + m - 1, ctx);
@@ -60,30 +64,69 @@ static int _hlift_quartic2(
 
     deltas = I->deltas + (m - 1)*I->r;
 
-    fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
-    fmpz_mpoly_swap(Aq, t2, ctx);
+    use_Au = fmpz_is_zero(alpha + m - 1);
+    if (use_Au)
+    {
+        fmpz_mpoly_to_univar(Au, A, m, ctx);
+        Aui = Au->length - 1;
 
 #if WANT_ASSERT
-    fmpz_mpoly_one(t2, ctx);
-    for (i = 0; i < r; i++)
-        fmpz_mpoly_mul(t2, t2, betas + i, ctx);
-    FLINT_ASSERT(fmpz_mpoly_equal(t, t2, ctx));
+        fmpz_mpoly_one(t2, ctx);
+        for (i = 0; i < r; i++)
+            fmpz_mpoly_mul(t2, t2, betas + i, ctx);
+        FLINT_ASSERT(fmpz_mpoly_equal(Au->coeffs + Aui, t2, ctx));
 #endif
+
+        FLINT_ASSERT(fmpz_equal_si(Au->exps + Aui, 0));
+        Aui--;
+    }
+    else
+    {
+        fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
+        fmpz_mpoly_swap(Aq, t2, ctx);
+
+#if WANT_ASSERT
+        fmpz_mpoly_one(t2, ctx);
+        for (i = 0; i < r; i++)
+            fmpz_mpoly_mul(t2, t2, betas + i, ctx);
+        FLINT_ASSERT(fmpz_mpoly_equal(t, t2, ctx));
+#endif
+
+        Aui = -1; /* silence warning */
+    }
 
     for (j = 1; j <= degs[m]; j++)
     {
-        fmpz_mpoly_divrem(t2, t, Aq, xalpha, ctx);
-        fmpz_mpoly_swap(Aq, t2, ctx);
+        if (use_Au)
+        {
+            if (Aui >= 0 && fmpz_equal_si(Au->exps + Aui, j))
+            {
+                fmpz_mpoly_geobucket_set(G, Au->coeffs + Aui, ctx);
+                Aui--;
+            }
+            else
+            {
+                G->length = 0;
+            }
+        }
+        else
+        {
+            fmpz_mpoly_divrem(t2, t, Aq, xalpha, ctx);
+            fmpz_mpoly_swap(Aq, t2, ctx);
+            fmpz_mpoly_geobucket_set(G, t, ctx);
+        }
 
         for (i = 0; i <= j; i++)
         {
-            fmpz_mpoly_mul(t2, B[0].coeffs + i, B[1].coeffs + j - i, ctx);
-            fmpz_mpoly_sub(t3, t, t2, ctx);
-            fmpz_mpoly_swap(t, t3, ctx);
+            fmpz_mpoly_mul(t, B[0].coeffs + i, B[1].coeffs + j - i, ctx);
+            fmpz_mpoly_geobucket_sub(G, t, ctx);
         }
+        fmpz_mpoly_geobucket_empty(t, G, ctx);
 
+        if (fmpz_mpoly_is_zero(t, ctx))
+            continue;
         success = fmpz_mpoly_pfrac(m - 1, t, degs, I, ctx);
-        if (success <= 0)
+        if (success < 1)
         {
             success = 0;
             goto cleanup;
@@ -127,6 +170,8 @@ cleanup:
     fmpz_mpoly_clear(t3, ctx);
     fmpz_mpoly_clear(xalpha, ctx);
     fmpz_mpoly_clear(Aq, ctx);
+    fmpz_mpoly_univar_clear(Au, ctx);
+    fmpz_mpoly_geobucket_clear(G, ctx);
 
     return success;
 }
@@ -140,12 +185,13 @@ static int _hlift_quartic(
     const slong * degs,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
-    slong i, j, k;
-    fmpz_mpoly_t t, t1, t2, t3, xalpha;
+    int success, use_Au;
+    slong i, j, k, Aui;
+    fmpz_mpoly_t Aq, t, t1, t2, t3, xalpha;
+    fmpz_mpoly_univar_t Au;
+    fmpz_mpoly_geobucket_t G;
     fmpz_mpoly_struct * betas, * deltas;
     fmpz_mpoly_pfrac_t I;
-    fmpz_mpolyv_t Av;
     fmpz_mpolyv_struct * B, * U;
     slong tdeg;
     flint_bitcnt_t bits = A->bits;
@@ -160,16 +206,13 @@ static int _hlift_quartic(
     fmpz_mpoly_init(t2, ctx);
     fmpz_mpoly_init(t3, ctx);
     fmpz_mpoly_init(xalpha, ctx);
+    fmpz_mpoly_init(Aq, ctx);
+    fmpz_mpoly_univar_init(Au, ctx);
+    fmpz_mpoly_geobucket_init(G, ctx);
 
     fmpz_mpoly_gen(xalpha, m, ctx);
     fmpz_mpoly_sub_fmpz(xalpha, xalpha, alpha + m - 1, ctx);
     fmpz_mpoly_repack_bits_inplace(xalpha, bits, ctx);
-
-    fmpz_mpolyv_init(Av, ctx);
-    fmpz_mpoly_to_mpolyv(Av, A, xalpha, ctx);
-    fmpz_mpolyv_fit_length(Av, degs[m] + 1, ctx);
-    for (j = Av->length; j <= degs[m]; j++)
-        fmpz_mpoly_zero(Av->coeffs + j, ctx);
 
     for (k = 0; k < r; k++)
     {
@@ -186,7 +229,7 @@ static int _hlift_quartic(
             fmpz_mpoly_zero(B[k].coeffs + j, ctx);
     }
 
-    betas  = (fmpz_mpoly_struct *) flint_malloc(r*sizeof(fmpz_mpoly_struct));
+    betas = (fmpz_mpoly_struct *) flint_malloc(r*sizeof(fmpz_mpoly_struct));
     for (i = 0; i < r; i++)
         betas[i] = B[i].coeffs[0];
 
@@ -198,43 +241,89 @@ static int _hlift_quartic(
     for (k--; k >= 1; k--)
         fmpz_mpoly_mul(U[k].coeffs + 0, B[k].coeffs + 0, U[k + 1].coeffs + 0, ctx);
 
+    use_Au = fmpz_is_zero(alpha + m - 1);
+    if (use_Au)
+    {
+        fmpz_mpoly_to_univar(Au, A, m, ctx);
+        Aui = Au->length - 1;
+
+#if WANT_ASSERT
+        fmpz_mpoly_one(t2, ctx);
+        for (i = 0; i < r; i++)
+            fmpz_mpoly_mul(t2, t2, betas + i, ctx);
+        FLINT_ASSERT(fmpz_mpoly_equal(Au->coeffs + Aui, t2, ctx));
+#endif
+
+        FLINT_ASSERT(fmpz_equal_si(Au->exps + Aui, 0));
+        Aui--;
+    }
+    else
+    {
+        fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
+        fmpz_mpoly_swap(Aq, t2, ctx);
+
+#if WANT_ASSERT
+        fmpz_mpoly_one(t2, ctx);
+        for (i = 0; i < r; i++)
+            fmpz_mpoly_mul(t2, t2, betas + i, ctx);
+        FLINT_ASSERT(fmpz_mpoly_equal(t, t2, ctx));
+#endif
+        Aui = -1; /* silence warning */
+    }
+
     for (j = 1; j <= degs[m]; j++)
     {
         k = r - 2;
-        fmpz_mpoly_zero(U[k].coeffs + j, ctx);
+
+        G->length = 0;
         for (i = 0; i <= j; i++)
         {
             fmpz_mpoly_mul(t1, B[k].coeffs + i, B[k + 1].coeffs + j - i, ctx);
-            fmpz_mpoly_add(U[k].coeffs + j, U[k].coeffs + j, t1, ctx);
-
+            fmpz_mpoly_geobucket_add(G, t1, ctx);
         }
+        fmpz_mpoly_geobucket_empty(U[k].coeffs + j, G, ctx);
+
         for (k--; k >= 1; k--)
         {
-            fmpz_mpoly_zero(U[k].coeffs + j, ctx);
+            G->length = 0;
             for (i = 0; i <= j; i++)
             {
                 fmpz_mpoly_mul(t1, B[k].coeffs + i, U[k + 1].coeffs + j - i, ctx);
-                fmpz_mpoly_add(U[k].coeffs + j, U[k].coeffs + j, t1, ctx);
+                fmpz_mpoly_geobucket_add(G, t1, ctx);
             }
+            fmpz_mpoly_geobucket_empty(U[k].coeffs + j, G, ctx);
         }
 
-        if (j < Av->length)
-            fmpz_mpoly_set(t, Av->coeffs + j, ctx);
+        if (use_Au)
+        {
+            if (Aui >= 0 && fmpz_equal_si(Au->exps + Aui, j))
+            {
+                fmpz_mpoly_geobucket_set(G, Au->coeffs + Aui, ctx);
+                Aui--;
+            }
+            else
+            {
+                G->length = 0;
+            }
+        }
         else
-            fmpz_mpoly_zero(t, ctx);
+        {
+            fmpz_mpoly_divrem(t2, t, Aq, xalpha, ctx);
+            fmpz_mpoly_swap(Aq, t2, ctx);
+            fmpz_mpoly_geobucket_set(G, t, ctx);
+        }
 
         for (i = 0; i <= j; i++)
         {
-            fmpz_mpoly_mul(t2, B[0].coeffs + i, U[1].coeffs + j - i, ctx);
-            fmpz_mpoly_sub(t3, t, t2, ctx);
-            fmpz_mpoly_swap(t, t3, ctx);
+            fmpz_mpoly_mul(t, B[0].coeffs + i, U[1].coeffs + j - i, ctx);
+            fmpz_mpoly_geobucket_sub(G, t, ctx);
         }
+        fmpz_mpoly_geobucket_empty(t, G, ctx);
 
         if (fmpz_mpoly_is_zero(t, ctx))
             continue;
-
         success = fmpz_mpoly_pfrac(m - 1, t, degs, I, ctx);
-        if (success <= 0)
+        if (success < 1)
         {
             success = 0;
             goto cleanup;
@@ -270,7 +359,6 @@ static int _hlift_quartic(
             fmpz_mpoly_add(t, t, t1, ctx);
             fmpz_mpoly_add(U[k].coeffs + j, U[k].coeffs + j, t, ctx);
         }
-
     }
 
     success = 1;
@@ -281,7 +369,6 @@ cleanup:
 
     flint_free(betas);
 
-    fmpz_mpolyv_clear(Av, ctx);
     for (i = 0; i < r; i++)
     {
         if (success)
@@ -297,6 +384,9 @@ cleanup:
     fmpz_mpoly_clear(t2, ctx);
     fmpz_mpoly_clear(t3, ctx);
     fmpz_mpoly_clear(xalpha, ctx);
+    fmpz_mpoly_clear(Aq, ctx);
+    fmpz_mpoly_univar_clear(Au, ctx);
+    fmpz_mpoly_geobucket_clear(G, ctx);
 
     return success;
 }
@@ -422,3 +512,4 @@ int fmpz_mpoly_hlift(
     else
         return _hlift_quintic(m, f, r, alpha, A, degs, ctx);
 }
+

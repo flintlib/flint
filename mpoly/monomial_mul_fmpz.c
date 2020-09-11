@@ -10,7 +10,7 @@
 
 
 void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
-                                                            slong N, fmpz_t c)
+                                                       slong N, const fmpz_t c)
 {
     FLINT_ASSERT(fmpz_sgn(c) >= 0);
 

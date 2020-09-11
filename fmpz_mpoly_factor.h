@@ -292,6 +292,8 @@ typedef struct {
     fmpz_mpoly_struct * deltas;
     fmpz_mpoly_struct * xalpha;
     fmpz_mpoly_struct * q;
+    fmpz_mpoly_univar_struct * U;
+    fmpz_mpoly_geobucket_struct * G;
     fmpz_mpoly_struct * qt;
     fmpz_mpoly_struct * newt;
     fmpz_mpolyv_struct * delta_coeffs;
@@ -362,10 +364,24 @@ FLINT_DLL void fmpz_bpoly_print_pretty(fmpz_bpoly_t A,
                                          const char * var0, const char * var1);
 
 FMPZ_MPOLY_FACTOR_INLINE
+fmpz_poly_struct * fmpz_bpoly_lead(fmpz_bpoly_t A)
+{
+    return A->coeffs + A->length - 1;
+}
+
+FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_bpoly_zero(fmpz_bpoly_t A)
 {
     A->length = 0;
 }
+
+FMPZ_MPOLY_FACTOR_INLINE
+slong fmpz_bpoly_degree0(const fmpz_bpoly_t A)
+{
+    return A->length - 1;
+}
+
+FLINT_DLL slong fmpz_bpoly_degree1(const fmpz_bpoly_t A);
 
 FLINT_DLL void fmpz_bpoly_set_coeff(fmpz_bpoly_t A, slong exp0, slong exp1,
                                                                const fmpz_t c);
@@ -416,6 +432,13 @@ FLINT_DLL void fmpz_tpoly_clear(fmpz_tpoly_t A);
 
 FLINT_DLL void fmpz_bpoly_factor(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t B);
 
+FLINT_DLL int fmpz_bpoly_factor_ordered(
+    fmpz_poly_t c,
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t B,
+    const fmpz_t alpha,
+    const fmpz_poly_factor_t Bevalf);
+
 /*****************************************************************************/
 
 FMPZ_MPOLY_FACTOR_INLINE
@@ -435,14 +458,17 @@ FLINT_DLL int fmpz_mpoly_factor_irred_zassenhaus(fmpz_mpolyv_t fac,
        const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx, zassenhaus_prune_t Z);
 
 FLINT_DLL int fmpz_mpoly_factor_irred_wang(fmpz_mpolyv_t fac,
-                    const fmpz_mpoly_t A, const fmpz_mpoly_factor_t lcAfac,
-                        const fmpz_mpoly_t lcA, const fmpz_mpoly_ctx_t ctx,
+                      const fmpz_mpoly_t A, const fmpz_mpoly_factor_t lcAfac,
+          int lcAfac_irred, const fmpz_mpoly_t lcA, const fmpz_mpoly_ctx_t ctx,
                     flint_rand_t state, zassenhaus_prune_t Z, int allow_shift);
 
 FLINT_DLL int fmpz_mpoly_factor_irred_zippel(fmpz_mpolyv_t fac,
                     const fmpz_mpoly_t A, const fmpz_mpoly_factor_t lcAfac,
-                         const fmpz_mpoly_t lcA, const fmpz_mpoly_ctx_t ctx,
+          int lcAfac_irred, const fmpz_mpoly_t lcA, const fmpz_mpoly_ctx_t ctx,
                                      flint_rand_t state, zassenhaus_prune_t Z);
+
+FLINT_DLL int fmpz_mpoly_factor_irred(fmpz_mpoly_factor_t f,
+                                const fmpz_mpoly_ctx_t ctx, unsigned int algo);
 
 FLINT_DLL int fmpz_mpoly_factor_zassenhaus(fmpz_mpoly_factor_t f,
                              const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
@@ -461,6 +487,32 @@ FLINT_DLL int _fmpz_mpoly_evaluate_rest_fmpz(fmpz * E,
 
 FLINT_DLL void _fmpz_mpoly_eval_rest_to_poly(fmpz_poly_t E,
         const fmpz_mpoly_t A, const fmpz * alphas, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_factor_lcc_kaltofen_step(
+    fmpz_mpoly_struct * divs,   /* length r */
+    slong r,
+    fmpz_mpoly_factor_t Af, /* squarefree factorization of A */
+    const fmpz_poly_struct * Au,
+    slong v,                      /* minor bivar var*/
+    const fmpz * alphas,
+    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_factor_lcc_kaltofen(
+    fmpz_mpoly_struct * divs,
+    const fmpz_mpoly_factor_t lcAf_,
+    const fmpz_mpoly_t A,
+    slong r,
+    const fmpz * alpha,
+    slong * degs,
+    const fmpz_poly_factor_t uf,
+    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_evaluate_rest_except_one(
+    fmpz_poly_t e,
+    const fmpz_mpoly_t A,
+    const fmpz * alphas,
+    slong v,
+    const fmpz_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

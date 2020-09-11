@@ -1157,3 +1157,148 @@ cleanup:
     fmpz_clear(alpha);
     fmpz_clear(p);
 }
+
+
+
+/*
+    return 1: ok
+           0: lift failed
+          -1: not primitive
+*/
+int fmpz_bpoly_factor_ordered(
+    fmpz_poly_t c,
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t B,
+    const fmpz_t alpha,
+    const fmpz_poly_factor_t Bevalf)
+{
+    int success;
+    slong i;
+    slong Blengthx, Blengthy;
+    flint_bitcnt_t Bbits;
+    ulong pkbits;
+    ulong k;
+    fmpz_t p, malpha;
+    bpoly_info_t I;
+    fmpz_bpoly_t Q, trymez;
+    fmpz_mod_bpoly_t tryme, trymet;
+    fmpz_mod_poly_t Blead;
+    fmpz_poly_t g;
+
+    k = 1;
+    fmpz_init_set_ui(p, UWORD(1) << (FLINT_BITS - 1));
+    bpoly_info_init(I, 2, p, k);
+
+    fmpz_poly_init(g);
+    fmpz_bpoly_init(Q);
+    fmpz_bpoly_init(trymez);
+    fmpz_mod_bpoly_init(tryme, I->ctxpk);
+    fmpz_mod_bpoly_init(trymet, I->ctxpk);
+    fmpz_mod_poly_init(Blead, I->ctxpk);
+
+    Blengthx = B->length;
+    FLINT_ASSERT(Blengthx > 1);
+
+    fmpz_init(malpha);
+
+    fmpz_bpoly_make_primitive(c, B);
+    if (fmpz_poly_degree(c) > 0)
+    {
+        success = -1;
+        goto cleanup;
+    }
+
+    fmpz_neg(malpha, alpha);
+    fmpz_bpoly_taylor_shift(B, alpha);
+
+    Blengthy = 0;
+    Bbits = 0;
+    for (i = 0; i < B->length; i++)
+    {
+        slong this_bits;
+        Blengthy = FLINT_MAX(Blengthy, B->coeffs[i].length);
+        this_bits = _fmpz_vec_max_bits(B->coeffs[i].coeffs, B->coeffs[i].length);
+        Bbits = FLINT_MAX(Bbits, FLINT_ABS(this_bits));
+    }
+
+    pkbits = (FLINT_BIT_COUNT(Blengthx*Blengthy) + 1)/2;
+    pkbits += Blengthx + Blengthy + Bbits - 3;
+
+next_prime:
+
+    fmpz_nextprime(p, p, 1);
+
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT((B->coeffs + B->length - 1)->length > 0);
+    FLINT_ASSERT(!fmpz_is_zero((B->coeffs + B->length - 1)->coeffs + 0));
+
+    if (fmpz_divisible((B->coeffs + B->length - 1)->coeffs + 0, p))
+        goto next_prime;
+
+    k = (pkbits + fmpz_bits(p))/fmpz_bits(p);
+
+    bpoly_info_clear(I);
+    bpoly_info_init(I, Bevalf->num, p, k);
+    I->lifting_prec = Blengthy + (B->coeffs + B->length - 1)->length;
+
+    fmpz_mod_bpoly_set_fmpz_bpoly(I->Btilde, B, I->ctxpk);
+    fmpz_mod_bpoly_make_monic(I->Btilde, I->lifting_prec, I->ctxpk);
+    for (i = 0; i < I->r; i++)
+    {
+        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalf->p + i, I->ctxpk);
+        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i, I->ctxpk);
+        fmpz_mod_poly_set_fmpz_poly(I->Bitilde + i, Bevalf->p + i, I->ctxpk);
+        fmpz_mod_poly_make_monic(I->Bitilde + i, I->Bitilde + i, I->ctxpk);
+        fmpz_mod_bpoly_set_polyx(I->newBitilde + i, I->Bitilde + i, I->ctxpk);
+    }
+
+    FLINT_ASSERT(I->r > 1);
+
+    if (!bpoly_info_disolve(I))
+        goto next_prime;
+
+    if (I->r == 2)
+        _bivar_lift_quartic2(I);
+    else if (I->r < 20)
+        _bivar_lift_quartic(I);
+    else
+        _bivar_lift_quintic(I);
+
+    fmpz_tpoly_fit_length(F, I->r);
+    F->length = 0;
+    for (i = 0; i < I->r; i++)
+    {
+        fmpz_mod_poly_set_fmpz_poly(Blead, B->coeffs + B->length - 1, I->ctxpk);
+        fmpz_mod_bpoly_set_polyy(tryme, Blead, I->ctxpk);
+        fmpz_mod_bpoly_mul(trymet, tryme, I->newBitilde + i, I->lifting_prec, I->ctxpk);
+        fmpz_mod_bpoly_swap(trymet, tryme);
+        fmpz_bpoly_set_fmpz_mod_bpoly(trymez, tryme, I->ctxpk);
+        fmpz_bpoly_make_primitive(g, trymez);
+        if (!fmpz_bpoly_divides(Q, B, trymez))
+        {
+            success = 0;
+            goto cleanup;
+        }
+        fmpz_bpoly_swap(B, Q);
+        fmpz_bpoly_taylor_shift(trymez, malpha);
+        fmpz_bpoly_swap(F->coeffs + F->length, trymez);
+        F->length++;
+    }
+
+    success = 1;
+
+cleanup:
+
+    fmpz_poly_clear(g);
+    fmpz_bpoly_clear(Q);
+    fmpz_bpoly_clear(trymez);
+    fmpz_mod_bpoly_clear(tryme, I->ctxpk);
+    fmpz_mod_bpoly_clear(trymet, I->ctxpk);
+    fmpz_mod_poly_clear(Blead, I->ctxpk);
+
+    bpoly_info_clear(I);
+    fmpz_clear(malpha);
+    fmpz_clear(p);
+
+    return success;
+}

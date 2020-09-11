@@ -49,12 +49,6 @@ int n_bpoly_mod_pfrac2(
     B1_deg1 = n_bpoly_degree1(B1);
     B2_deg1 = n_bpoly_degree1(B2);
 
-    if (B1_deg1 < 1 || B2_deg1 < 1)
-    {
-        success = -2;
-        goto cleanup;
-    }
-
     bound = A_deg1;
     bound = FLINT_MAX(bound, C1_deg1_bound + B2_deg1);
     bound = FLINT_MAX(bound, B1_deg1 + C2_deg1_bound);
@@ -270,19 +264,12 @@ int n_bpoly_mod_pfrac(
     n_bpoly_init(T);
 
     A_deg1 = n_bpoly_degree1(A);
+    B_deg1_total = 0;
     for (i = 0; i < r; i++)
     {
         B_deg1[i] = n_bpoly_degree1(B + i);
-        if (B_deg1[i] < 1)
-        {
-            success = -2;
-            goto cleanup;
-        }
-    }
-
-    B_deg1_total = B_deg1[0];
-    for (i = 1; i < r; i++)
         B_deg1_total += B_deg1[i];
+    }
 
     bound = A_deg1;
     for (i = 0; i < r; i++)
