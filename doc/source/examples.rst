@@ -303,6 +303,91 @@ Sample output::
 (The output shows the minimal polynomial of the algebraic number result;
 for example `[-6508, 3465]` means `6508/3465`.)
 
+
+dft.c
+-------------------------------------------------------------------------------
+
+This program demonstrates the
+discrete Fourier transform (DFT) in exact arithmetic.
+For the input vector `\textbf{x} = (x_n)_{n=0}^{N-1}`, it verifies
+the identity
+
+.. math ::
+
+    \textbf{x} - \operatorname{DFT}^{-1}(\operatorname{DFT}(\textbf{x})) = 0
+
+where
+
+.. math ::
+
+    \operatorname{DFT}(\textbf{x})_n = \sum_{k=0}^{N-1} \omega^{-kn} x_k, \quad
+    \operatorname{DFT}^{-1}(\textbf{x})_n = \frac{1}{N} \sum_{k=0}^{N-1} \omega^{kn} x_k,
+    \quad \omega = e^{2 \pi i / N}.
+
+The program computes the DFT by naive `O(N^2)` summation (not using FFT).
+It uses repeated multiplication of `\omega`
+to precompute an array of roots of unity
+`1,\omega,\omega^2,\ldots,\omega^{2N-1}`
+for use in both the DFT and the inverse DFT.
+
+Usage::
+
+    build/examples/dft [-verbose] [-input i] [-limit B] [-timing T] N
+
+The required parameter ``N`` selects the length of the vector.
+
+The optional flag ``-verbose`` chooses whether to print the arrays.
+
+The optional parameter ``-timing T`` selects a timing method (default = 0).
+
+* 0: run the computation once and time it
+* 1: run the computation repeatedly if needed to get an accurate timing, creating a new context object for each iteration so that fields are not cached
+* 2: run the computation once, then run the computation at least one more time (repeatedly if needed to get an accurate timing), recycling the same context object to measure the performance with cached fields
+
+The optional parameter ``-input i`` selects an input sequence (default = 0).
+
+* 0: `x_n = n+2`
+* 1: `x_n = \sqrt{n+2}`
+* 2: `x_n = \log(n+2)`
+* 3: `x_n = e^{2 \pi i / (n+2)}`
+
+The optional parameter ``-limit B`` sets the internal degree limit for algebraic numbers.
+
+Sample output::
+
+    > build/examples/dft 4 -input 1 -verbose
+    DFT benchmark, length N = 4
+
+    [x] =
+    1.41421 {a where a = 1.41421 [a^2-2=0]}
+    1.73205 {a where a = 1.73205 [a^2-3=0]}
+    2
+    2.23607 {a where a = 2.23607 [a^2-5=0]}
+
+    DFT([x]) =
+    7.38233 {a+b+c+2 where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0]}
+    -0.585786 + 0.504017*I {a*d-b*d+c-2 where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+    -0.553905 {-a-b+c+2 where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0]}
+    -0.585786 - 0.504017*I {-a*d+b*d+c-2 where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+
+    IDFT(DFT([x])) =
+    1.41421 {c where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+    1.73205 {b where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+    2
+    2.23607 {a where a = 2.23607 [a^2-5=0], b = 1.73205 [b^2-3=0], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+
+    [x] - IDFT(DFT([x])) =
+    0       (= 0   T_TRUE)
+    0       (= 0   T_TRUE)
+    0       (= 0   T_TRUE)
+    0       (= 0   T_TRUE)
+
+    cpu/wall(s): 0.009 0.009
+    virt/peak/res/peak(MB): 36.28 36.28 9.14 9.14
+
+
+
+
 .. raw:: latex
 
     \newpage

@@ -148,7 +148,7 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
         fmpq_init(t);
         if (ca_as_fmpq_pi_i(t, x, ctx))
         {
-            if (fmpz_cmp_ui(fmpq_denref(t), 12) <= 0)
+            if (fmpz_cmp_ui(fmpq_denref(t), ctx->options[CA_OPT_QQBAR_DEG_LIMIT]) <= 0)
             {
                 slong p, q;
                 qqbar_t a;
