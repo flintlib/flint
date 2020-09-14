@@ -135,9 +135,6 @@ FLINT_DLL void fmpz_mod_poly_factor_distinct_deg_threaded(
                     fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly,
                                slong * const * degs, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
-                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
-
 FLINT_DLL void fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 

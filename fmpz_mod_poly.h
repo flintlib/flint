@@ -404,9 +404,6 @@ FLINT_DLL void fmpz_mod_poly_add_series(fmpz_mod_poly_t res,
                    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                                             slong n, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1, 
-                                const fmpz *poly2, slong len2, const fmpz_t p);
-
 FLINT_DLL void fmpz_mod_poly_sub(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                         const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx);
 
@@ -416,9 +413,6 @@ FLINT_DLL void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len,
 FLINT_DLL void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, 
                    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                                             slong n, const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len,
-                                                               const fmpz_t p);
 
 FLINT_DLL void fmpz_mod_poly_neg(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
@@ -709,23 +703,6 @@ void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
     fmpz_mod_poly_divrem_f(f, Q, R, A, B, ctx);
     fmpz_mod_poly_clear(Q, ctx);
 }
-
-FLINT_DLL void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
-                                         const fmpz* B, slong lenB, const fmpz* Binv,
-                                         slong lenBinv, const fmpz_t p);
-
-FLINT_DLL void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q,
-                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
-                          const fmpz_mod_poly_t Binv,const fmpz_mod_ctx_t ctx);
-
-
-FLINT_DLL void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
-                                            slong lenA, const fmpz* B, slong lenB,
-                                            const fmpz* Binv, slong lenBinv, const fmpz_t p);
-
-FLINT_DLL void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q,
-           fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
-                         const fmpz_mod_poly_t Binv, const fmpz_mod_ctx_t ctx);
 
 /*  Power series inversion ***************************************************/
 
