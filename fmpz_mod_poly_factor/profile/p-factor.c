@@ -36,18 +36,17 @@ int main(void)
     fmpz_mod_poly_t f, g;
     fmpz_mod_poly_factor_t res;
     fmpz_t p;
+    fmpz_mod_ctx_t ctx;
     mpz_t pz, curr;
     int i, j, k, n, num;
     double t, T1, T2, T3;
-
     const slong degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
     const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
-
-    
 
     mpz_init(pz);
     mpz_init(curr);
     fmpz_init(p);
+    fmpz_mod_ctx_init_ui(ctx, 2);
 
     flint_printf("Random polynomials\n");
     flint_mpz_set_ui(pz, 2);
@@ -55,6 +54,7 @@ int main(void)
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
+        fmpz_mod_ctx_set_modulus(ctx, p);
         flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
@@ -69,31 +69,31 @@ int main(void)
             T3 = 0;
             for (k = 0; k < iter_count[j]; k++)
             {
-                fmpz_mod_poly_init(f, p);
-                fmpz_mod_poly_randtest_not_zero(f, state, n);
+                fmpz_mod_poly_init(f, ctx);
+                fmpz_mod_poly_randtest_not_zero(f, state, n, ctx);
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_cantor_zassenhaus(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T1 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_berlekamp(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_berlekamp(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T2 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_kaltofen_shoup(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_kaltofen_shoup(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T3 += t;
 
-                fmpz_mod_poly_clear(f);
+                fmpz_mod_poly_clear(f, ctx);
             }
 
             flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
@@ -116,6 +116,7 @@ int main(void)
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
+        fmpz_mod_ctx_set_modulus(ctx, p);
         flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
@@ -130,31 +131,31 @@ int main(void)
             T3 = 0;
             for (k = 0; k < iter_count[j]; k++)
             {
-                fmpz_mod_poly_init(f, p);
-                fmpz_mod_poly_randtest_not_zero(f, state, n);
+                fmpz_mod_poly_init(f, ctx);
+                fmpz_mod_poly_randtest_not_zero(f, state, n, ctx);
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_cantor_zassenhaus(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T1 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T2 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_kaltofen_shoup(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_kaltofen_shoup(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T3 += t;
 
-                fmpz_mod_poly_clear(f);
+                fmpz_mod_poly_clear(f, ctx);
             }
 
             flint_printf("CZ: %.2lf F: %.2lf KS: %.2lf\n", T1, T2, T3);
@@ -174,6 +175,7 @@ int main(void)
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
+        fmpz_mod_ctx_set_modulus(ctx, p);
         flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
@@ -188,31 +190,31 @@ int main(void)
             T3 = 0;
             for (k = 0; k < iter_count[j]; k++)
             {
-                fmpz_mod_poly_init(f, p);
-                fmpz_mod_poly_randtest_irreducible(f, state, n);
+                fmpz_mod_poly_init(f, ctx);
+                fmpz_mod_poly_randtest_irreducible(f, state, n, ctx);
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_cantor_zassenhaus(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T1 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_berlekamp(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_berlekamp(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T2 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_kaltofen_shoup(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_kaltofen_shoup(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T3 += t;
 
-                fmpz_mod_poly_clear(f);
+                fmpz_mod_poly_clear(f, ctx);
             }
 
             flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
@@ -232,6 +234,7 @@ int main(void)
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
+        fmpz_mod_ctx_set_modulus(ctx, p);
         flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
@@ -246,35 +249,35 @@ int main(void)
             T3 = 0;
             for (k = 0; k < iter_count[j]; k++)
             {
-                fmpz_mod_poly_init(f, p);
-                fmpz_mod_poly_init(g, p);
-                fmpz_mod_poly_randtest_irreducible(f, state, n);
-                fmpz_mod_poly_randtest_irreducible(g, state, n);
-                fmpz_mod_poly_mul(f, f, g);
+                fmpz_mod_poly_init(f, ctx);
+                fmpz_mod_poly_init(g, ctx);
+                fmpz_mod_poly_randtest_irreducible(f, state, n, ctx);
+                fmpz_mod_poly_randtest_irreducible(g, state, n, ctx);
+                fmpz_mod_poly_mul(f, f, g, ctx);
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_cantor_zassenhaus(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T1 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_berlekamp(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_berlekamp(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T2 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_kaltofen_shoup(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_kaltofen_shoup(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T3 += t;
 
-                fmpz_mod_poly_clear(f);
-                fmpz_mod_poly_clear(g);
+                fmpz_mod_poly_clear(f, ctx);
+                fmpz_mod_poly_clear(g, ctx);
             }
 
             flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
@@ -294,6 +297,7 @@ int main(void)
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
+        fmpz_mod_ctx_set_modulus(ctx, p);
         flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
@@ -308,38 +312,38 @@ int main(void)
             T3 = 0;
             for (k = 0; k < iter_count[j]; k++)
             {
-                fmpz_mod_poly_init(f, p);
-                fmpz_mod_poly_init(g, p);
-                fmpz_mod_poly_randtest_irreducible(f, state, n);
+                fmpz_mod_poly_init(f, ctx);
+                fmpz_mod_poly_init(g, ctx);
+                fmpz_mod_poly_randtest_irreducible(f, state, n, ctx);
                 for (num = 1; num < 8; num++)
                 {
-                    fmpz_mod_poly_randtest_irreducible(g, state, n);
-                    fmpz_mod_poly_mul(f, f, g);
+                    fmpz_mod_poly_randtest_irreducible(g, state, n, ctx);
+                    fmpz_mod_poly_mul(f, f, g, ctx);
                 }
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_cantor_zassenhaus(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T1 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_berlekamp(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_berlekamp(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T2 += t;
 
                 t = clock();
-                fmpz_mod_poly_factor_init(res);
-                fmpz_mod_poly_factor_kaltofen_shoup(res, f);
-                fmpz_mod_poly_factor_clear(res);
+                fmpz_mod_poly_factor_init(res, ctx);
+                fmpz_mod_poly_factor_kaltofen_shoup(res, f, ctx);
+                fmpz_mod_poly_factor_clear(res, ctx);
                 t = (clock() - t) / CLOCKS_PER_SEC;
                 T3 += t;
 
-                fmpz_mod_poly_clear(f);
-                fmpz_mod_poly_clear(g);
+                fmpz_mod_poly_clear(f, ctx);
+                fmpz_mod_poly_clear(g, ctx);
             }
 
             flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
@@ -356,6 +360,7 @@ int main(void)
     mpz_clear(pz);
     mpz_clear(curr);
     fmpz_clear(p);
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
     return EXIT_SUCCESS;

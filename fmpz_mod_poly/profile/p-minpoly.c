@@ -30,7 +30,7 @@
     /* warm-up */ \
     for (i=0, curseq=seqs; i<NUMEX; ++i, curseq += len) \
     { \
-        ALG(polys+i, curseq, len); \
+        ALG(polys+i, curseq, len, primes+i); \
     } \
     \
     loops = 1; \
@@ -39,7 +39,7 @@
         \
         for (i=0, curseq=seqs; i<NUMEX; ++i, curseq += len) \
         { \
-            for (j=0; j<loops; ++j) ALG(polys+i, curseq, len); \
+            for (j=0; j<loops; ++j) ALG(polys+i, curseq, len, primes+i); \
         } \
         \
         timeit_stop(timer); \
@@ -50,13 +50,14 @@
     /* cool-down */ \
     for (i=0, curseq=seqs; i<NUMEX; ++i, curseq += len) \
     { \
-        ALG(polys+i, curseq, len); \
+        ALG(polys+i, curseq, len, primes+i); \
     } \
     \
     (TIMEVAR) = ((double)timer->cpu) / (NUMEX * loops); \
 } while(0)
 
-void time_algs(double* times, flint_rand_t state, const fmpz* primes, slong len)
+void time_algs(double* times, flint_rand_t state,
+                                 const fmpz_mod_ctx_struct * primes, slong len)
 {
     fmpz_mod_poly_struct polys[NUMEX];
     fmpz *seqs, *curseq, *gen;
@@ -69,18 +70,18 @@ void time_algs(double* times, flint_rand_t state, const fmpz* primes, slong len)
     /* initialize polys and sequences */
     for (i=0, curseq = seqs; i<NUMEX; ++i, curseq += len)
     {
-        fmpz_mod_poly_init2(polys+i, primes+i, len+1);
+        fmpz_mod_poly_init2(polys+i, len+1, primes+i);
 
         for (j=0; j < genlen; ++j) 
         {
-            fmpz_randm(gen + j, state, primes+i);
-            fmpz_randm(curseq + j, state, primes+i);
+            fmpz_randm(gen + j, state, fmpz_mod_ctx_modulus(primes+i));
+            fmpz_randm(curseq + j, state, fmpz_mod_ctx_modulus(primes+i));
         }
 
         for (; j < len; ++j)
         {
             _fmpz_vec_dot(curseq+j, curseq+(j-genlen), gen, genlen);
-            fmpz_mod(curseq+j, curseq+j, primes+i);
+            fmpz_mod(curseq+j, curseq+j, fmpz_mod_ctx_modulus(primes+i));
         }
     }
 
@@ -91,23 +92,30 @@ void time_algs(double* times, flint_rand_t state, const fmpz* primes, slong len)
     TIME_INNER(fmpz_mod_poly_minpoly_hgcd, times[1]);
 
     _fmpz_vec_clear(seqs, len*NUMEX);
-    for (i=0; i<NUMEX; ++i) fmpz_mod_poly_clear(polys+i);
+    for (i=0; i<NUMEX; ++i) fmpz_mod_poly_clear(polys+i, primes+i);
 }
     
 int main(void)
 {
     flint_bitcnt_t bits;
-    fmpz primes[NUMEX];
+    fmpz_t p;
+    fmpz_mod_ctx_struct primes[NUMEX];
     double times[2];
     slong i, len, len2, lower, upper;
     
     FLINT_TEST_INIT(state);
 
-    for (i=0; i<NUMEX; ++i) fmpz_init(primes+i);
+    fmpz_init(p);
+    for (i=0; i<NUMEX; ++i)
+        fmpz_mod_ctx_init_ui(primes+i, 2);
 
     for (bits = BITSLOW; bits < BITSHIGH; bits += BITSINC)
     {
-        for (i=0; i<NUMEX; ++i) fmpz_randprime(primes+i, state, bits, 0);
+        for (i=0; i<NUMEX; ++i)
+        {
+            fmpz_randprime(p, state, bits, 0);
+            fmpz_mod_ctx_set_modulus(primes+i, p);
+        }
 
         lower = -1;
         len = 2;
@@ -143,7 +151,9 @@ int main(void)
         fflush(stdout);
     }
 
-    for (i=0; i<NUMEX; ++i) fmpz_clear(primes+i);
+    fmpz_clear(p);
+    for (i=0; i<NUMEX; ++i)
+        fmpz_mod_ctx_clear(primes+i);
 
     FLINT_TEST_CLEANUP(state);
 

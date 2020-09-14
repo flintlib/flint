@@ -40,7 +40,7 @@
  */
 
 #define lenlo    1
-#define lenhi    10000
+#define lenhi    2000
 #define lenr     1.2
 #define bitslo   16
 #define bitshi   640
@@ -76,10 +76,12 @@ main(void)
     double T[rows][cols][nalgs];
     fmpz_mod_poly_t f, g, h;
     fmpz_t p;
+    fmpz_mod_ctx_t ctx;
     
     FLINT_TEST_INIT(state);
     
     fmpz_init(p);
+    fmpz_mod_ctx_init_ui(ctx, 2);
     
     for (len = lenlo, j = 0; len <= lenhi; len = ceil((double)len*lenr), j++)
     {
@@ -96,9 +98,10 @@ main(void)
                fmpz_randbits(p, state, bits);
             } while (!fmpz_is_probabprime(p));
 
-            fmpz_mod_poly_init2(f, p, len);
-            fmpz_mod_poly_init2(g, p, len);
-            fmpz_mod_poly_init2(h, p, len);
+            fmpz_mod_ctx_set_modulus(ctx, p);
+            fmpz_mod_poly_init2(f, len, ctx);
+            fmpz_mod_poly_init2(g, len, ctx);
+            fmpz_mod_poly_init2(h, len, ctx);
     
             for (n = 0; n < ncases; n++)
             {
@@ -127,12 +130,12 @@ main(void)
 
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
-                    fmpz_mod_poly_gcd_euclidean(h, f, g);
+                    fmpz_mod_poly_gcd_euclidean(h, f, g, ctx);
                 timeit_stop(t[0]);
                 
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
-                    fmpz_mod_poly_gcd_hgcd(h, f, g);
+                    fmpz_mod_poly_gcd_hgcd(h, f, g, ctx);
                 timeit_stop(t[1]);
 
                 for (c = 0; c < nalgs; c++)
@@ -155,9 +158,9 @@ main(void)
             else 
                 X[i][j] = 1;
 
-            fmpz_mod_poly_clear(f);
-            fmpz_mod_poly_clear(g);
-            fmpz_mod_poly_clear(h);
+            fmpz_mod_poly_clear(f, ctx);
+            fmpz_mod_poly_clear(g, ctx);
+            fmpz_mod_poly_clear(h, ctx);
         }
         {
            slong sum = 0, c;
@@ -166,7 +169,9 @@ main(void)
            flint_printf("len = %d, time = %wdms\n", len, sum), fflush(stdout);
         }
     }
+
     fmpz_clear(p);
+    fmpz_mod_ctx_clear(ctx);
     
     maxcols = j;
     maxrows = i;
