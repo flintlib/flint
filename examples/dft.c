@@ -17,6 +17,8 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
     w = ca_vec_init(2 * N, ctx);
     ca_init(t, ctx);
 
+    /* ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEBUG; */
+
     if (qqbar_limit != 0)
         ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = qqbar_limit;
 
@@ -39,12 +41,27 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
             ca_set_ui(x + i, i + 2, ctx);
             ca_log(x + i, x + i, ctx);
         }
-        else
+        else if (input == 3)
         {
             ca_pi_i(x + i, ctx);
-            ca_mul_ui(x, x, 2, ctx);
+            ca_mul_ui(x + i, x + i, 2, ctx);
             ca_div_ui(x + i, x + i, i + 2, ctx);
             ca_exp(x + i, x + i, ctx);
+        }
+        else if (input == 4)
+        {
+            ca_pi(x + i, ctx);
+            ca_mul_ui(x + i, x + i, i + 2, ctx);
+            ca_add_ui(x + i, x + i, 1, ctx);
+            ca_inv(x + i, x + i, ctx);
+        }
+        else if (input == 5)
+        {
+            ca_pi(x + i, ctx);
+            ca_sqrt_ui(w, i + 2, ctx);
+            ca_mul(x + i, x + i, w, ctx);
+            ca_add_ui(x + i, x + i, 1, ctx);
+            ca_inv(x + i, x + i, ctx);
         }
 
         if (verbose)
@@ -159,9 +176,9 @@ int main(int argc, char *argv[])
 {
     ca_ctx_t ctx;
     int verbose, input, timing;
-    slong i, N, qqbar_limit;
+    slong i, Nmin, Nmax, N, qqbar_limit;
 
-    N = 2;
+    Nmin = Nmax = 2;
     verbose = 0;
     input = 0;
     timing = 0;
@@ -196,38 +213,44 @@ int main(int argc, char *argv[])
         }
         else
         {
-            N = atol(argv[i]);
-            if (N < 0 || N > 100000)
-                flint_abort();
+            Nmin = Nmax = atol(argv[i]);
+            if (Nmin < 0)
+            {
+                Nmin = 0;
+                Nmax = -Nmax;
+            }
         }
     }
 
-    printf("DFT benchmark, length N = %ld\n\n", N);
+    for (N = Nmin; N <= Nmax; N++)
+    {
+        printf("DFT benchmark, length N = %ld\n\n", N);
 
-    if (timing == 0)
-    {
-        TIMEIT_ONCE_START
-        ca_ctx_init(ctx);
-        benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
-        ca_ctx_clear(ctx);
-        TIMEIT_ONCE_STOP
-    }
-    else if (timing == 1)
-    {
-        TIMEIT_START
-        ca_ctx_init(ctx);
-        benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
-        ca_ctx_clear(ctx);
-        TIMEIT_STOP
-    }
-    else
-    {
-        ca_ctx_init(ctx);
-        benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
-        TIMEIT_START
-        benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
-        TIMEIT_STOP
-        ca_ctx_clear(ctx);
+        if (timing == 0)
+        {
+            TIMEIT_ONCE_START
+            ca_ctx_init(ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            ca_ctx_clear(ctx);
+            TIMEIT_ONCE_STOP
+        }
+        else if (timing == 1)
+        {
+            TIMEIT_START
+            ca_ctx_init(ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            ca_ctx_clear(ctx);
+            TIMEIT_STOP
+        }
+        else
+        {
+            ca_ctx_init(ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            TIMEIT_START
+            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            TIMEIT_STOP
+            ca_ctx_clear(ctx);
+        }
     }
 
     SHOW_MEMORY_USAGE
