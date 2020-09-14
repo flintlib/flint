@@ -38,12 +38,52 @@ _ca_mpoly_q_reduce_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx
 
         fmpq_init(scale);
 
-        fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, fmpz_mpoly_q_numref(res), fmpz_mpoly_q_numref(res), I, n, CA_FIELD_MCTX(field, ctx));
-        fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, fmpz_mpoly_q_denref(res), fmpz_mpoly_q_denref(res), I, n, CA_FIELD_MCTX(field, ctx));
+        if (0)
+        {
+            fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, fmpz_mpoly_q_numref(res), fmpz_mpoly_q_numref(res), I, n, CA_FIELD_MCTX(field, ctx));
+            fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, fmpz_mpoly_q_denref(res), fmpz_mpoly_q_denref(res), I, n, CA_FIELD_MCTX(field, ctx));
 
-        fmpq_canonicalise(scale);
-        fmpz_mpoly_q_canonicalise(res, CA_FIELD_MCTX(field, ctx));
-        fmpz_mpoly_q_mul_fmpq(res, res, scale, CA_FIELD_MCTX(field, ctx));
+            fmpq_canonicalise(scale);
+            fmpz_mpoly_q_canonicalise(res, CA_FIELD_MCTX(field, ctx));
+            fmpz_mpoly_q_mul_fmpq(res, res, scale, CA_FIELD_MCTX(field, ctx));
+        }
+        else
+        {
+            fmpz_mpoly_t T;
+            int changed = 0;
+
+            fmpz_mpoly_init(T, CA_FIELD_MCTX(field, ctx));
+
+            fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, T, fmpz_mpoly_q_numref(res), I, n, CA_FIELD_MCTX(field, ctx));
+            changed = !fmpz_mpoly_equal(T, fmpz_mpoly_q_numref(res), CA_FIELD_MCTX(field, ctx));
+            fmpz_mpoly_swap(T, fmpz_mpoly_q_numref(res), CA_FIELD_MCTX(field, ctx));
+
+/* todo: special case const den */
+            fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, T, fmpz_mpoly_q_denref(res), I, n, CA_FIELD_MCTX(field, ctx));
+            changed = changed || !fmpz_mpoly_equal(T, fmpz_mpoly_q_denref(res), CA_FIELD_MCTX(field, ctx));
+            fmpz_mpoly_swap(T, fmpz_mpoly_q_denref(res), CA_FIELD_MCTX(field, ctx));
+
+            if (changed)
+            {
+                fmpz_mpoly_q_canonicalise(res, CA_FIELD_MCTX(field, ctx));
+            }
+
+            if (!fmpq_is_one(scale))
+            {
+                fmpq_canonicalise(scale);
+                fmpz_mpoly_q_mul_fmpq(res, res, scale, CA_FIELD_MCTX(field, ctx));
+            }
+
+#if 0
+            if (!fmpz_mpoly_q_is_canonical(res, CA_FIELD_MCTX(field, ctx)))
+            {
+                flint_printf("not canonical!\n");
+                flint_abort();
+            }
+#endif
+
+            fmpz_mpoly_clear(T, CA_FIELD_MCTX(field, ctx));
+        }
 
         for (i = 0; i < n; i++)
         {
