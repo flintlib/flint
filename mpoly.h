@@ -716,7 +716,7 @@ void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c
 }
 
 FLINT_DLL void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
-                                                            slong N, fmpz_t c);
+                                                      slong N, const fmpz_t c);
 
 MPOLY_INLINE
 int mpoly_monomial_is_zero(const ulong * exp, slong N)
@@ -1180,6 +1180,9 @@ FLINT_DLL void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
 FLINT_DLL void mpoly_total_degree_fmpz_ref(fmpz_t totdeg, const ulong * exps,
                                 slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
+                   ulong * Bexp, flint_bitcnt_t Bbits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,
                 slong * t1, slong * t2, slong *t3,
@@ -1230,14 +1233,17 @@ FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, flint_bitcnt_t Abits,
 FLINT_DLL void _mpoly_gen_shift_right(ulong * Aexp, flint_bitcnt_t Abits,
                slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
 
+FLINT_DLL void _mpoly_gen_shift_right_fmpz(ulong * Aexp, flint_bitcnt_t Abits,
+        slong Alength, slong var, const fmpz_t amount, const mpoly_ctx_t mctx);
+
 FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits,
                slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
 
-FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
-                      ulong * Bexp, flint_bitcnt_t Bbits, const mpoly_ctx_t mctx);
-
 FLINT_DLL void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abits,
                slong Alength, const ulong * user_exps, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong _mpoly_compress_exps(slong * V, slong * D, slong * deg,
+                                                  slong * S, slong n, slong l);
 
 FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
                                     const ulong * Aexps, flint_bitcnt_t Abits,
@@ -1554,3 +1560,4 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
 #endif
 
 #endif
+

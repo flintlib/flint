@@ -16,19 +16,20 @@ int fmpz_mpoly_factor_irred_wang(
     fmpz_mpolyv_t fac,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_factor_t lcAfac,
+    int lcAfac_irred,
     const fmpz_mpoly_t lcA,
     const fmpz_mpoly_ctx_t ctx,
     flint_rand_t state,
     zassenhaus_prune_t zas,
     int allow_shift)
 {
-    int success;
+    int success, kfails = 0;
     const slong n = ctx->minfo->nvars - 1;
     slong i, j, k, r;
     fmpz * alpha;
     slong alpha_modulus, alpha_count;
     fmpz_mpoly_struct * Aevals;
-    slong * degs, * degeval;
+    slong * degs, * tdegs;
     fmpz_mpolyv_t tfac;
     fmpz_mpoly_t t, Acopy;
     fmpz_mpoly_struct * newA;
@@ -55,8 +56,8 @@ int fmpz_mpoly_factor_irred_wang(
     fmpz_poly_factor_init(Aufac);
     fmpz_poly_init(Au);
 
-    degs    = (slong *) flint_malloc((n + 1)*sizeof(slong));
-    degeval = (slong *) flint_malloc((n + 1)*sizeof(slong));
+    degs  = (slong *) flint_malloc(2*(n + 1)*sizeof(slong));
+    tdegs = degs + (n + 1);
     alpha = _fmpz_vec_init(n);
     Aevals    = (fmpz_mpoly_struct *) flint_malloc(n*sizeof(fmpz_mpoly_struct));
     for (i = 0; i < n; i++)
@@ -98,17 +99,21 @@ next_alpha:
 
 got_alpha:
 
-    /* TODO quick check if lcc is going to fail */
+#if WANT_ASSERT
+    fmpz_mpoly_degrees_si(tdegs, A, ctx);
+    for (i = 0; i < n + 1; i++)
+        FLINT_ASSERT(degs[i] == tdegs[i]);
+#endif
 
     /* ensure degrees do not drop under evaluation */
     for (i = n - 1; i >= 0; i--)
     {
         fmpz_mpoly_evaluate_one_fmpz(Aevals + i,
                        i == n - 1 ? A : Aevals + i + 1, i + 1, alpha + i, ctx);
-        fmpz_mpoly_degrees_si(degeval, Aevals + i, ctx);
+        fmpz_mpoly_degrees_si(tdegs, Aevals + i, ctx);
         for (j = 0; j <= i; j++)
         {
-            if (degeval[j] != degs[j])
+            if (tdegs[j] != degs[j])
                 goto next_alpha;
         }
     }
@@ -146,10 +151,17 @@ got_alpha:
     lc_divs->length = r;
     if (lcAfac->num > 0)
     {
-        success = fmpz_mpoly_factor_lcc_wang(lc_divs->coeffs, lcAfac,
+        success = 0;
+        if (lcAfac_irred)
+            success = fmpz_mpoly_factor_lcc_wang(lc_divs->coeffs, lcAfac,
                                            &Aufac->c, Aufac->p, r, alpha, ctx);
         if (!success)
-            goto next_alpha;
+        {
+            success = fmpz_mpoly_factor_lcc_kaltofen(lc_divs->coeffs, lcAfac,
+                                                A, r, alpha, degs, Aufac, ctx);
+            if (success < 0 || (success == 0 && ++kfails < 4))
+                goto next_alpha;
+        }
     }
     else
     {
@@ -163,11 +175,13 @@ got_alpha:
 
     FLINT_ASSERT(r > 1);
     success = fmpz_mpoly_divides(m, lcA, lc_divs->coeffs + 0, ctx);
-    FLINT_ASSERT(success);
+    if (!success)
+        goto next_alpha;
     for (i = 1; i < r; i++)
     {
         success = fmpz_mpoly_divides(m, m, lc_divs->coeffs + i, ctx);
-        FLINT_ASSERT(success);
+        if (!success)
+            goto next_alpha;
     }
 
     fmpz_mpoly_pow_ui(mpow, m, r - 1, ctx);
@@ -187,7 +201,7 @@ got_alpha:
         goto cleanup;
     }
 
-    fmpz_mpoly_degrees_si(degs, newA, ctx);
+    fmpz_mpoly_degrees_si(tdegs, newA, ctx);
 
     fmpz_mpoly_set(t, mpow, ctx);
     for (i = n - 1; i >= 0; i--)
@@ -219,6 +233,7 @@ got_alpha:
         FLINT_ASSERT(fmpz_mpoly_is_fmpz(new_lcs->coeffs + 0*r + i, ctx));
         FLINT_ASSERT(fmpz_mpoly_length(new_lcs->coeffs + 0*r + i, ctx) == 1);
         FLINT_ASSERT(fmpz_divisible(new_lcs->coeffs[i].coeffs + 0, Aufac->p[i].coeffs + Aufac->p[i].length - 1));
+
         fmpz_divexact(q, new_lcs->coeffs[i].coeffs + 0,
                                   Aufac->p[i].coeffs + Aufac->p[i].length - 1);
         _fmpz_mpoly_set_fmpz_poly(fac->coeffs + i, newA->bits,
@@ -237,7 +252,7 @@ got_alpha:
         }
 
         success = fmpz_mpoly_hlift(k, tfac->coeffs, r, alpha,
-                                         k < n ? Aevals + k : newA, degs, ctx);
+                                      k < n ? Aevals + k : newA, tdegs, ctx);
         if (!success)
             goto next_alpha;
 
@@ -293,8 +308,7 @@ cleanup:
         fmpz_mpoly_clear(Aevals + i, ctx);
     flint_free(Aevals);
 
-    flint_free(degs);
-    flint_free(degeval);
+    flint_free(degs); /* and tdegs */
     fmpz_mpolyv_clear(tfac, ctx);
     fmpz_mpoly_clear(t, ctx);
 
@@ -319,3 +333,4 @@ cleanup:
 
     return success;
 }
+

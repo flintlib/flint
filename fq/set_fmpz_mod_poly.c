@@ -15,8 +15,6 @@ void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx)
 {
     slong i, len = b->length;
 
-    FLINT_ASSERT(fmpz_equal(&b->p, fq_ctx_prime(ctx)));
-
     if (len <= 2*(ctx->modulus->length - 1))
     {
         fmpz_poly_fit_length(a, len);

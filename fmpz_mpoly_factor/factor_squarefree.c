@@ -33,13 +33,14 @@ static void _fmpz_mpoly_factor_mul_mpoly_fmpz(
     }
 }
 
+
 int fmpz_mpoly_factor_squarefree(
     fmpz_mpoly_factor_t f,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
     int success;
-    slong i, j, v;
+    slong j, v;
     fmpz_mpoly_t c;
     fmpz_mpoly_univar_t u;
     fmpz_mpoly_factor_t g;
@@ -86,31 +87,41 @@ int fmpz_mpoly_factor_squarefree(
             FLINT_ASSERT(fmpz_is_one(f->exp + j));
 
             fmpz_mpoly_to_univar(u, f->poly + j, v, ctx);
-            FLINT_ASSERT(u->length > 0);
+
+            fmpz_add(var_powers + v, var_powers + v, u->exps + u->length - 1);
+            _mpoly_gen_shift_right_fmpz(f->poly[j].exps, f->poly[j].bits,
+                    f->poly[j].length, v, u->exps + u->length - 1, ctx->minfo);
+
+            if (u->length < 2)
+            {
+                FLINT_ASSERT(u->length == 1);
+                fmpz_mpoly_factor_fit_length(g, g->num + 1, ctx);
+                fmpz_swap(g->exp + g->num, f->exp + j);
+                fmpz_mpoly_swap(g->poly + g->num, f->poly + j, ctx);
+                g->num++;
+                continue;
+            }
 
             success = _fmpz_mpoly_vec_content_mpoly(c, u->coeffs, u->length, ctx);
             if (!success)
                 goto cleanup;
 
-            fmpz_add(var_powers + v, var_powers + v, u->exps + u->length - 1);
-            for (i = 0; i < u->length; i++)
+            if (fmpz_mpoly_is_fmpz(c, ctx))
             {
-                fmpz_sub(u->exps + i, u->exps + i, u->exps + u->length - 1);
-                success = fmpz_mpoly_divides(u->coeffs + i, u->coeffs + i, c, ctx);
-                FLINT_ASSERT(success);
-            }
-
-            fmpz_one(k);
-            _fmpz_mpoly_factor_mul_mpoly_fmpz(g, c, k, ctx);
-
-            if (u->length > 1)
-            {
-                fmpz_mpoly_from_univar_bits(c, A->bits, u, v, ctx);
-                fmpz_mpoly_factor_append_ui(g, c, 1, ctx);
+                fmpz_mpoly_factor_fit_length(g, g->num + 1, ctx);
+                fmpz_swap(g->exp + g->num, f->exp + j);
+                fmpz_mpoly_swap(g->poly + g->num, f->poly + j, ctx);
+                g->num++;
             }
             else
             {
-                FLINT_ASSERT(fmpz_mpoly_is_one(u->coeffs + 0, ctx));
+                fmpz_mpoly_factor_fit_length(g, g->num + 2, ctx);
+                success = fmpz_mpoly_divides(g->poly + g->num, f->poly + j, c, ctx);
+                FLINT_ASSERT(success);
+                fmpz_mpoly_swap(g->poly + g->num + 1, c, ctx);
+                fmpz_one(g->exp + g->num);
+                fmpz_one(g->exp + g->num + 1);
+                g->num += 2;
             }
         }
 
@@ -201,3 +212,4 @@ cleanup:
 
     return success;
 }
+
