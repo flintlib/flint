@@ -86,9 +86,6 @@ FLINT_DLL void fmpz_mod_mpoly_ctx_clear(fmpz_mod_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mod_mpolyn_init(fmpz_mod_mpolyn_t A, flint_bitcnt_t bits,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mpolyn_fit_length(fmpz_mod_mpolyn_t A,
-                                 slong length, const fmpz_mod_mpoly_ctx_t ctx);
-
 FMPZ_MOD_MPOLY_INLINE void fmpz_mod_mpolyn_swap(fmpz_mod_mpolyn_t A,
                            fmpz_mod_mpolyn_t B, const fmpz_mod_mpoly_ctx_t ctx)
 {
@@ -116,11 +113,6 @@ FMPZ_MOD_MPOLY_INLINE fmpz_mod_poly_struct * fmpz_mod_mpolyn_leadcoeff_poly(
     return A->coeffs + 0;
 }
 
-
-FLINT_DLL void fmpz_mod_mpolyn_divexact_poly(
-    fmpz_mod_mpolyn_t A,
-    const fmpz_mod_poly_t b,
-    const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpolyn_fit_length(fmpz_mod_mpolyn_t A,
                                  slong length, const fmpz_mod_mpoly_ctx_t ctx);

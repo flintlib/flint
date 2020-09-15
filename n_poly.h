@@ -462,9 +462,6 @@ FLINT_DLL void n_poly_mod_addmul_linear(n_poly_t A, const n_poly_t B,
 FLINT_DLL void n_poly_mod_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
                               const n_poly_t P, n_poly_t alphapow, nmod_t mod);
 
-FLINT_DLL mp_limb_t n_poly_mod_div_root(n_poly_t Q, 
-                                    const n_poly_t A, mp_limb_t c, nmod_t ctx);
-
 N_POLY_INLINE
 void _n_poly_mod_mul(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
 {
@@ -587,8 +584,6 @@ FLINT_DLL void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A,
                                     const n_poly_t B, slong order, nmod_t ctx);
 
 /*****************************************************************************/
-
-FLINT_DLL void n_fq_print_pretty(const mp_limb_t * a, const fq_nmod_ctx_t ctx);
 
 N_POLY_INLINE
 int _n_fq_is_zero(const mp_limb_t * a, slong d)
@@ -867,11 +862,6 @@ FLINT_DLL void n_poly_fq_set(
     const n_poly_t B,
     const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void n_poly_fq_set_n_fq(
-    n_poly_t A,
-    const mp_limb_t * c,
-    const fq_nmod_ctx_t ctx);
-
 FLINT_DLL void n_poly_fq_randtest(
     n_poly_t A,
     flint_rand_t state,
@@ -1014,11 +1004,6 @@ FLINT_DLL void n_poly_fq_pow(
     n_poly_t A,
     const n_poly_t B,
     ulong e,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL ulong n_poly_fq_remove(
-    n_poly_t f,
-    const n_poly_t g,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void n_poly_fq_divrem_divconquer_(
@@ -1250,11 +1235,6 @@ FLINT_DLL void n_bpoly_fq_set_fq_nmod_poly_var0(
 FLINT_DLL void n_bpoly_fq_set_n_poly_fq_var0(
     n_bpoly_t A,
     const n_poly_t B,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_bpoly_fq_set_fq_nmod_poly_var1(
-    n_bpoly_t A,
-    const fq_nmod_poly_t B,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void n_bpoly_fq_set_n_poly_fq_var1(

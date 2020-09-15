@@ -975,11 +975,6 @@ FLINT_DLL void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
                   const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void
-nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
-    const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len,
-                                                   const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL slong
 _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq, 
        ulong ** polyr, ulong ** expr, slong * allocr, const ulong * poly2,
@@ -1286,9 +1281,6 @@ FLINT_DLL void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b,
 
 
 /* GCD ***********************************************************************/
-
-FLINT_DLL void nmod_mpoly_term_content(nmod_mpoly_t poly1,
-                         const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_gcd_prs(nmod_mpoly_t poly1, nmod_mpoly_t poly2,
                                nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);

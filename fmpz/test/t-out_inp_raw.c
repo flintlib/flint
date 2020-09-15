@@ -28,13 +28,6 @@
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 
-/*
-    The function fdopen is declared in stdio.h.  It is POSIX.1 compliant, 
-    but not ANSI compliant.  The following line enables compilation with 
-    the "-ansi" flag.
- */
-extern FILE * fdopen(int fildes, const char *mode);
-
 int main(void)
 {
     int i, j, n = 10000, result;
