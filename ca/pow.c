@@ -203,6 +203,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                             ca_inv(t, x, ctx);
 
                         nf_elem_pow(CA_NF_ELEM(t), CA_NF_ELEM(t), FLINT_ABS(*CA_FMPQ_NUMREF(y)), CA_FIELD_NF(CA_FIELD(t, ctx)));
+                        ca_condense_field(t, ctx);
                         ca_swap(res, t, ctx);
 
                         ca_clear(t, ctx);
