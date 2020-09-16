@@ -24,10 +24,10 @@ qqbar_log_pi_i(slong * p, ulong * q, const qqbar_t x)
             *q /= 2;
         else
             *p *= 2;
-    }
 
-    while (*p > (slong) *q)
-        *p -= 2 * (slong) (*q);
+        while (*p > (slong) *q)
+            *p -= 2 * (slong) (*q);
+    }
 
     return ok;
 }
