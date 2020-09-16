@@ -15,6 +15,19 @@
     flint_printf(">>> Is zero?\n"); truth_print(ca_check_is_zero(x, ctx)); \
     flint_printf("\n\n");
 
+void
+ca_set_qqi_si(ca_t res, slong a, slong b, slong c, slong d, ca_ctx_t ctx)
+{
+    ca_t t;
+    ca_init(t, ctx);
+    ca_set_si(t, a, ctx);
+    ca_div_si(t, t, b, ctx);
+    ca_i(res, ctx);
+    ca_mul_si(res, res, c, ctx);
+    ca_div_si(res, res, d, ctx);
+    ca_add(res, res, t, ctx);
+    ca_clear(t, ctx);
+}
 
 int main(int argc, char *argv[])
 {
@@ -120,6 +133,66 @@ int main(int argc, char *argv[])
     ca_mul_ui(y, y, 4, ctx);
     ca_sub(x, x, y, ctx);
     ca_pi_i(y, ctx);
+    ca_sub(x, x, y, ctx);
+    OUT
+
+    /* Example 1 in [BBK2014] */
+    START("-I*Pi/8*Log(2/3-2*I/3)^2 + I*Pi/8*Log(2/3+2*I/3)^2 + Pi^2/12*Log(-1-I) + Pi^2/12*Log(-1+I) + Pi^2/12*Log(1/3-I/3) + Pi^2/12*Log(1/3+I/3) - Pi^2/48*Log(18)");
+    ca_zero(x, ctx);
+    ca_set_qqi_si(y, 2, 3, -2, 3, ctx);
+    ca_log(y, y, ctx);
+    ca_sqr(y, y, ctx);
+    ca_pi_i(z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, -8, ctx);
+    ca_add(x, x, y, ctx);
+
+    ca_set_qqi_si(y, 2, 3, 2, 3, ctx);
+    ca_log(y, y, ctx);
+    ca_sqr(y, y, ctx);
+    ca_pi_i(z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, 8, ctx);
+    ca_add(x, x, y, ctx);
+
+    ca_set_qqi_si(y, -1, 1, -1, 1, ctx);
+    ca_log(y, y, ctx);
+    ca_pi(z, ctx);
+    ca_sqr(z, z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, 12, ctx);
+    ca_add(x, x, y, ctx);
+
+    ca_set_qqi_si(y, -1, 1, 1, 1, ctx);
+    ca_log(y, y, ctx);
+    ca_pi(z, ctx);
+    ca_sqr(z, z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, 12, ctx);
+    ca_add(x, x, y, ctx);
+
+    ca_set_qqi_si(y, 1, 3, -1, 3, ctx);
+    ca_log(y, y, ctx);
+    ca_pi(z, ctx);
+    ca_sqr(z, z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, 12, ctx);
+    ca_add(x, x, y, ctx);
+
+    ca_set_qqi_si(y, 1, 3, 1, 3, ctx);
+    ca_log(y, y, ctx);
+    ca_pi(z, ctx);
+    ca_sqr(z, z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, 12, ctx);
+    ca_add(x, x, y, ctx);
+
+    ca_set_ui(y, 18, ctx);
+    ca_log(y, y, ctx);
+    ca_pi(z, ctx);
+    ca_sqr(z, z, ctx);
+    ca_mul(y, y, z, ctx);
+    ca_div_si(y, y, -48, ctx);
     ca_sub(x, x, y, ctx);
     OUT
 
