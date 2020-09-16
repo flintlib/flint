@@ -897,6 +897,10 @@ Elementary functions
 
     * `\log\left(e^z\right) = z + 2 \pi i k`
 
+    * `\log\left(\sqrt{z}\right) = \tfrac{1}{2} \log(z) + 2 \pi i k`
+
+    * `\log\left(z^a\right) = a \log(z) + 2 \pi i k`
+
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\log(x))`.
 

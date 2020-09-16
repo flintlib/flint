@@ -39,8 +39,11 @@ int main()
 
         prec = 10 + n_randint(state, 100);
         ca_randtest(x, state, 5, 5, ctx);
+        ca_randtest(y, state, 5, 5, ctx);
         if (n_randint(state, 2))
             ca_exp(x, x, ctx);
+        if (n_randint(state, 2))
+            ca_pow(x, x, y, ctx);
 
         ca_log(y, x, ctx);
 

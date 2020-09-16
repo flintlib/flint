@@ -54,6 +54,54 @@ ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
     ca_clear(pi, ctx);
 }
 
+/* log(z^a), assuming z != 0 */
+void
+ca_log_pow(ca_t res, const ca_t z, const ca_t a, ca_ctx_t ctx)
+{
+    ca_t t, u, pi;
+
+    if (CA_IS_SPECIAL(z))
+        flint_abort();
+
+    ca_init(t, ctx);
+    ca_init(u, ctx);
+    ca_init(pi, ctx);
+
+    ca_log(u, z, ctx);
+    ca_mul(u, u, a, ctx);
+
+    ca_pi(pi, ctx);
+
+    ca_im(t, u, ctx);
+    ca_div(t, t, pi, ctx);
+    ca_sub_ui(t, t, 1, ctx);
+    ca_div_ui(t, t, 2, ctx);
+
+    ca_ceil(t, t, ctx);
+
+    if (ca_check_is_zero(u, ctx) == T_TRUE)
+    {
+        ca_set(res, u, ctx);
+    }
+    else
+    {
+        ca_t pi_i;
+
+        ca_init(pi_i, ctx);
+        ca_pi_i(pi_i, ctx);
+
+        ca_mul(t, t, pi_i, ctx);
+        ca_mul_ui(t, t, 2, ctx);
+
+        ca_sub(res, u, t, ctx);
+        ca_clear(pi_i, ctx);
+    }
+
+    ca_clear(t, ctx);
+    ca_clear(u, ctx);
+    ca_clear(pi, ctx);
+}
+
 void
 ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
@@ -97,6 +145,28 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
     {
         /* log(exp(z)) */
         ca_log_exp(res, CA_EXT_FUNC_ARGS(ext), ctx);
+        return;
+    }
+
+    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Pow)
+    {
+        /* log(z^a) */
+        if (ca_check_is_zero(CA_EXT_FUNC_ARGS(ext), ctx) == T_FALSE)
+        {
+            ca_log_pow(res, CA_EXT_FUNC_ARGS(ext), CA_EXT_FUNC_ARGS(ext) + 1, ctx);
+            return;
+        }
+    }
+
+    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Sqrt)
+    {
+        /* log(sqrt(z)) */
+        ca_t h;
+        ca_init(h, ctx);
+        ca_one(h, ctx);
+        ca_div_ui(h, h, 2, ctx);
+        ca_log_pow(res, CA_EXT_FUNC_ARGS(ext), h, ctx);
+        ca_clear(h, ctx);
         return;
     }
 
