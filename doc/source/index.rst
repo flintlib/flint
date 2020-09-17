@@ -27,35 +27,69 @@ General information
 ---------------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    introduction.rst
    setup.rst
-
-Example programs
----------------------------
-
-.. toctree::
-   :maxdepth: 2
-
    examples.rst
 
-Module documentation
----------------------------
+
+General modules
+----------------------
 
 .. toctree::
    :maxdepth: 2
 
    calcium.rst
+
+Numbers
+----------------------
+
+.. toctree::
+   :maxdepth: 2
+
    ca.rst
+
+Matrices and polynomials
+------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   ca_mat.rst
+
+Field and extension number constructions
+----------------------------------------
+
+These modules are used internally by the :type:`ca_t` type
+to construct towers of algebraic and transcendental number fields.
+The user does not normally need to use these modules directly
+outside of advanced applications requiring inspection of the
+symbolic representations of number.
+
+.. toctree::
+   :maxdepth: 2
+
    ca_ext.rst
    ca_field.rst
+
+Basic algebraic structures
+--------------------------------------------
+
+The following modules implement useful exact structures
+independently of the :type:`ca_t` type. They are used
+internally in Calcium, but the interfaces are stable and
+use in appropriate external applications is encouraged.
+
+.. toctree::
+   :maxdepth: 2
+
    fmpz_mpoly_q.rst
    qqbar.rst
 
 
 Credits and references
-======================
+----------------------
 
 .. toctree::
    :maxdepth: 2
@@ -63,7 +97,7 @@ Credits and references
    bibliography.rst
 
 Version history
-======================
+----------------------
 
 .. toctree::
    :maxdepth: 1
@@ -74,7 +108,7 @@ Version history
 .. only:: html
 
     Indices and tables
-    ==================
+    ----------------------
 
     * :ref:`genindex`
 
