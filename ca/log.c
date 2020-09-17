@@ -60,7 +60,7 @@ ca_log_pow(ca_t res, const ca_t z, const ca_t a, ca_ctx_t ctx)
 {
     ca_t t, u, pi;
 
-    if (CA_IS_SPECIAL(z))
+    if (CA_IS_SPECIAL(z) || CA_IS_SPECIAL(a))
         flint_abort();
 
     ca_init(t, ctx);
@@ -79,7 +79,7 @@ ca_log_pow(ca_t res, const ca_t z, const ca_t a, ca_ctx_t ctx)
 
     ca_ceil(t, t, ctx);
 
-    if (ca_check_is_zero(u, ctx) == T_TRUE)
+    if (ca_check_is_zero(t, ctx) == T_TRUE)
     {
         ca_set(res, u, ctx);
     }
@@ -141,6 +141,22 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     ext = ca_is_gen_as_ext(x, ctx);
 
+    /* Fast detection of roots of unity. Todo: also detect roots
+       of unity when in a number field, and in other situations. */
+    if (ext != NULL && CA_EXT_HEAD(ext) == CA_QQBar)
+    {
+        slong p;
+        ulong q;
+
+        if (qqbar_log_pi_i(&p, &q, CA_EXT_QQBAR(ext)))
+        {
+            ca_pi_i(res, ctx);
+            ca_mul_si(res, res, p, ctx);
+            ca_div_ui(res, res, q, ctx);
+            return;
+        }
+    }
+
     if (ext != NULL && CA_EXT_HEAD(ext) == CA_Exp)
     {
         /* log(exp(z)) */
@@ -173,4 +189,3 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
     _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Log, x), ctx);
     fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
 }
-
