@@ -65,7 +65,7 @@ These modules are used internally by the :type:`ca_t` type
 to construct towers of algebraic and transcendental number fields.
 The user does not normally need to use these modules directly
 outside of advanced applications requiring inspection of the
-symbolic representations of number.
+symbolic representations of numbers.
 
 .. toctree::
    :maxdepth: 2
