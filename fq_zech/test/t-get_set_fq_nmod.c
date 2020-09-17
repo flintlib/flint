@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -20,27 +21,24 @@ int
 main(void)
 {
     int i, j, result;
-    fq_zech_ctx_t ctx;
     FLINT_TEST_INIT(state);
     
     flint_printf("get_fq_nmod/set_fq_nmod... ");
     fflush(stdout);
 
-    for (j = 0; j < 10; j++)
+    for (i = 0; i < 100*flint_test_multiplier(); i++)
     {
+        fq_zech_ctx_t ctx;
+        fq_zech_t a, b;
+        fq_nmod_t c;
+
         fq_zech_ctx_randtest(ctx, state);
+        fq_zech_init(a, ctx);
+        fq_zech_init(b, ctx);
+        fq_nmod_init(c, ctx->fq_nmod_ctx);
 
-        /* Check aliasing: a = -a */
-        for (i = 0; i < 200; i++)
+        for (j = 0; j < 20; j++)
         {
-            fq_zech_t a, b;
-            fq_nmod_t c;
-
-            fq_zech_init(a, ctx);
-            fq_zech_init(b, ctx);
-            fq_nmod_init(c, ctx->fq_nmod_ctx);
-
-            
             fq_zech_randtest(a, state, ctx);
             fq_zech_get_fq_nmod(c, a, ctx);
             fq_zech_set_fq_nmod(b, c, ctx);
@@ -55,14 +53,13 @@ main(void)
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_nmod_print_pretty(c, ctx->fq_nmod_ctx), flint_printf("\n");
                 flint_printf("table = %wd\n", ctx->eval_table[a->value]);
-                abort();
+                flint_abort();
             }
-
-            fq_zech_clear(a, ctx);
-            fq_zech_clear(b, ctx);
-            fq_nmod_clear(c, ctx->fq_nmod_ctx);
         }
 
+        fq_zech_clear(a, ctx);
+        fq_zech_clear(b, ctx);
+        fq_nmod_clear(c, ctx->fq_nmod_ctx);
         fq_zech_ctx_clear(ctx);
     }
 
