@@ -830,6 +830,10 @@ Complex parts
     Sets *res* to the imaginary part of *x*. The result is *Undefined* if *x*
     is any infinity (including an imaginary infinity).
 
+.. function:: void ca_conjugate(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the complex conjugate of *x*.
+
 .. function:: void ca_floor(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     Sets *res* to the floor function of *x*. The result is *Undefined* if *x*

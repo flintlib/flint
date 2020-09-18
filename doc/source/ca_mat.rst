@@ -102,3 +102,89 @@ Input and output
     Prints a decimal representation of *mat* with precision specified by *digits*.
     The entries are comma-separated with square brackets and comma separation
     for the rows.
+
+Special matrices
+-------------------------------------------------------------------------------
+
+.. function:: void ca_mat_zero(ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets all entries in *mat* to zero.
+
+.. function:: void ca_mat_one(ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets the entries on the main diagonal of *mat* to one, and
+    all other entries to zero.
+
+.. function:: void ca_mat_ones(ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets all entries in *mat* to one.
+
+.. function:: void ca_mat_pascal(ca_mat_t mat, int triangular, ca_ctx_t ctx)
+
+    Sets *mat* to a Pascal matrix, whose entries are binomial coefficients.
+    If *triangular* is 0, constructs a full symmetric matrix
+    with the rows of Pascal's triangle as successive antidiagonals.
+    If *triangular* is 1, constructs the upper triangular matrix with
+    the rows of Pascal's triangle as columns, and if *triangular* is -1,
+    constructs the lower triangular matrix with the rows of Pascal's
+    triangle as rows.
+
+.. function:: void ca_mat_stirling(ca_mat_t mat, int kind, ca_ctx_t ctx)
+
+    Sets *mat* to a Stirling matrix, whose entries are Stirling numbers.
+    If *kind* is 0, the entries are set to the unsigned Stirling numbers
+    of the first kind. If *kind* is 1, the entries are set to the signed
+    Stirling numbers of the first kind. If *kind* is 2, the entries are
+    set to the Stirling numbers of the second kind.
+
+.. function:: void ca_mat_hilbert(ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets *mat* to the Hilbert matrix, which has entries `A_{i,j} = 1/(i+j+1)`.
+
+Comparisons and properties
+-------------------------------------------------------------------------------
+
+.. function:: truth_t ca_mat_check_equal(const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+
+    Compares *A* and *B* for equality.
+
+Conjugate and transpose
+-------------------------------------------------------------------------------
+
+.. function:: void ca_mat_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *res* to the transpose of *A*.
+
+.. function:: void ca_mat_conjugate(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *res* to the entrywise complex conjugate of *A*.
+
+.. function:: void ca_mat_conjugate_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *res* to the conjugate transpose (Hermitian transpose) of *A*.
+
+Arithmetic
+-------------------------------------------------------------------------------
+
+.. function:: void ca_mat_neg(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *res* to the negation of *A*.
+
+.. function:: void ca_mat_add(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+
+    Sets *res* to the sum of *A* and *B*.
+
+.. function:: void ca_mat_sub(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+
+    Sets *res* to the difference of *A* and *B*.
+
+.. function:: void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+
+    Sets *res* to the matrix product of *A* and *B*.
+
+Trace
+-------------------------------------------------------------------------------
+
+.. function:: void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets *trace* to the sum of the entries on the main diagonal of *mat*.

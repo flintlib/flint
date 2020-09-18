@@ -80,6 +80,20 @@ ca_mat_window_clear(ca_mat_t window, ca_ctx_t ctx)
     flint_free(window->rows);
 }
 
+/* Shape */
+
+CA_MAT_INLINE int
+ca_mat_is_empty(const ca_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
+
+CA_MAT_INLINE int
+ca_mat_is_square(const ca_mat_t mat)
+{
+    return (mat->r == mat->c);
+}
+
 /* Conversions */
 
 void ca_mat_set(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
@@ -95,6 +109,36 @@ void ca_mat_randtest_rational(ca_mat_t mat, flint_rand_t state, slong bits, ca_c
 
 void ca_mat_print(const ca_mat_t mat, ca_ctx_t ctx);
 void ca_mat_printn(const ca_mat_t mat, slong digits, ca_ctx_t ctx);
+
+/* Special matrices */
+
+void ca_mat_zero(ca_mat_t mat, ca_ctx_t ctx);
+void ca_mat_one(ca_mat_t mat, ca_ctx_t ctx);
+void ca_mat_ones(ca_mat_t mat, ca_ctx_t ctx);
+void ca_mat_pascal(ca_mat_t mat, int triangular, ca_ctx_t ctx);
+void ca_mat_stirling(ca_mat_t mat, int kind, ca_ctx_t ctx);
+void ca_mat_hilbert(ca_mat_t mat, ca_ctx_t ctx);
+
+/* Comparisons and properties */
+
+truth_t ca_mat_check_equal(const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+
+/* Conjugate and transpose */
+
+void ca_mat_transpose(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_conjugate(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_conjugate_transpose(ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+
+/* Arithmetic */
+
+void ca_mat_neg(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
+void ca_mat_add(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+void ca_mat_sub(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+
+/* Trace */
+
+void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);
 
 
 #ifdef __cplusplus
