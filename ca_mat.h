@@ -28,6 +28,7 @@
 #include "antic/nf.h"
 #include "antic/nf_elem.h"
 #include "ca.h"
+#include "ca_poly.h"
 
 #ifdef __cplusplus
 extern "C" {

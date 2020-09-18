@@ -110,3 +110,7 @@ The output of the example program should be something like the following::
     0.0200485 {a^2-6*a+9 where a = 3.14159 [Pi]}
     Computed with calcium-0.0.0
 
+
+.. raw:: latex
+
+    \newpage

@@ -56,6 +56,7 @@ Matrices and polynomials
 .. toctree::
    :maxdepth: 2
 
+   ca_poly.rst
    ca_mat.rst
 
 Field and extension number constructions

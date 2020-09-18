@@ -18,3 +18,8 @@ https://github.com/fredrik-johansson/calcium/releases
 * qqbar module (algebraic numbers represented by minimal polynomials)
 * Example programs
 
+
+.. raw:: latex
+
+    \newpage
+

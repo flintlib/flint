@@ -3,7 +3,8 @@
 **ca_mat.h** -- matrices over the real and complex numbers
 ===============================================================================
 
-An :type:`ca_mat_t` represents a dense matrix over the real numbers,
+An :type:`ca_mat_t` represents a dense matrix over the real or
+complex numbers,
 implemented as an array of entries of type :type:`ca_struct`.
 The dimension (number of rows and columns) of a matrix is fixed at
 initialization, and the user must ensure that inputs and outputs to
@@ -17,9 +18,9 @@ Types, macros and constants
 
 .. type:: ca_mat_t
 
-    Contains a pointer to a flat array of the entries (entries), an array of
-    pointers to the start of each row (rows), and the number of rows (r)
-    and columns (c).
+    Contains a pointer to a flat array of the entries (*entries*), an array of
+    pointers to the start of each row (*rows*), and the number of rows (*r*)
+    and columns (*c*).
 
     A *ca_mat_t* is defined as an array of length one of type
     *ca_mat_struct*, permitting a *ca_mat_t* to
