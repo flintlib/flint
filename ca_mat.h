@@ -141,6 +141,10 @@ void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
 void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);
 
+/* Characteristic polynomial */
+
+void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx);
+int ca_mat_companion(ca_mat_t A, const ca_poly_t poly, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

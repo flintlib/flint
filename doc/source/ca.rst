@@ -725,6 +725,23 @@ Arithmetic
     In any other case involving special values, or if the specific case cannot
     be distinguished, the result is *Unknown*.
 
+.. function:: void ca_dot(ca_t res, const ca_t initial, int subtract, ca_srcptr x, slong xstep, ca_srcptr y, slong ystep, slong len, ca_ctx_t ctx)
+
+    Computes the dot product of the vectors *x* and *y*, setting
+    *res* to `s + (-1)^{subtract} \sum_{i=0}^{len-1} x_i y_i`.
+
+    The initial term *s* is optional and can be
+    omitted by passing *NULL* (equivalently, `s = 0`).
+    The parameter *subtract* must be 0 or 1.
+    The length *len* is allowed to be negative, which is equivalent
+    to a length of zero.
+    The parameters *xstep* or *ystep* specify a step length for
+    traversing subsequences of the vectors *x* and *y*; either can be
+    negative to step in the reverse direction starting from
+    the initial pointer.
+    Aliasing is allowed between *res* and *s* but not between
+    *res* and the entries of *x* and *y*.
+
 Powers and roots
 -------------------------------------------------------------------------------
 

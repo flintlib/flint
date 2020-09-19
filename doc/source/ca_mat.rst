@@ -189,3 +189,25 @@ Trace
 .. function:: void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
 
     Sets *trace* to the sum of the entries on the main diagonal of *mat*.
+
+Characteristic polynomial and companion matrix
+-------------------------------------------------------------------------------
+
+.. function:: void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
+
+.. function:: void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets *poly* to the characteristic polynomial of *mat* which must be
+    a square matrix. If the matrix has *n* rows, the underscore method
+    requires space for `n + 1` output coefficients.
+    Employs a division-free algorithm using `O(n^4)` operations.
+
+.. function:: int ca_mat_companion(ca_mat_t mat, const ca_poly_t poly, ca_ctx_t ctx)
+
+    Sets *mat* to the companion matrix of *poly*.
+    This function verifies that the leading coefficient of *poly*
+    is provably nonzero and that the output matrix has the right size,
+    returning 1 on success.
+    It returns 0 if the leading coefficient of *poly* cannot be
+    proved nonzero or if the size of the output matrix does not match.
+

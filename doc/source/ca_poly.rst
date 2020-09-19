@@ -3,7 +3,7 @@
 **ca_poly.h** -- dense univariate polynomials over the real and complex numbers
 ===============================================================================
 
-An :type:`ca_poly_t` represents a dense univariate
+An :type:`ca_poly_t` represents a univariate
 polynomial over the real or complex numbers,
 implemented as an array of coefficients of type :type:`ca_struct`.
 
@@ -16,12 +16,15 @@ management and handles degenerate cases.
 
 Warnings:
 
-* A polynomial is always normalised by removing leading zero coefficients.
+* A polynomial is always normalised by removing zero coefficients
+  at the top.
   Coefficients will not be removed when Calcium is unable to prove
   that they are zero. The represented degree can therefore be larger
   than the degree of the mathematical polynomial.
   When the correct degree is needed, it is important to verify
   the leading coefficient.
+  (Of course, this will never be an issue with polynomials
+  that are explicitly monic, for example.)
 
 * The special values *Undefined*, unsigned infinity and signed infinity
   supported by the scalar :type:`ca_t` type
@@ -70,7 +73,20 @@ Memory management
 
 .. function:: void _ca_poly_normalise(ca_poly_t poly, ca_ctx_t ctx)
 
-    Strips any trailing coefficients which are identical to zero.
+    Strips any top coefficients which can be proved identical to zero.
+
+Random generation
+-------------------------------------------------------------------------------
+
+.. function:: void ca_poly_randtest(ca_poly_t poly, flint_rand_t state, slong len, slong depth, slong bits, ca_ctx_t ctx)
+
+    Sets *poly* to a random polynomial of length up to *len* and with entries having complexity up to
+    *depth* and *bits* (see :func:`ca_randtest`).
+
+.. function:: void ca_poly_randtest_rational(ca_poly_t poly, flint_rand_t state, slong len, slong bits, ca_ctx_t ctx)
+
+    Sets *poly* to a random rational polynomial of length up to *len* and with entries up to *bits* bits in size.
+
 
 Input and output
 -------------------------------------------------------------------------------

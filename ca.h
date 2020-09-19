@@ -257,6 +257,8 @@ void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx);
 
 /* todo: document */
 void ca_vec_set(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx);
+void ca_vec_zero(ca_ptr res, slong len, ca_ctx_t ctx);
+void ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
 
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
@@ -419,6 +421,9 @@ void ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
 void ca_div_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_div_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
 void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+void ca_dot(ca_t res, const ca_t initial, int subtract,
+    ca_srcptr x, slong xstep, ca_srcptr y, slong ystep, slong len, ca_ctx_t ctx);
 
 /* Powers and roots */
 
