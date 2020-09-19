@@ -142,6 +142,22 @@ Special matrices
 
     Sets *mat* to the Hilbert matrix, which has entries `A_{i,j} = 1/(i+j+1)`.
 
+.. function:: void ca_mat_dft(ca_mat_t mat, int type, ca_ctx_t ctx)
+
+    Sets *mat* to the DFT (discrete Fourier transform) matrix of order *n*
+    where *n* is the smallest dimension of *mat* (if *mat* is not square,
+    the matrix is extended periodically along the larger dimension).
+    The *type* parameter selects between four different versions
+    of the DFT matrix (in which `\omega = e^{2\pi i/n}`):
+
+    * Type 0 -- entries `A_{j,k} = \omega^{-jk}`
+    * Type 1 -- entries `A_{j,k} = \omega^{jk} / n`
+    * Type 2 -- entries `A_{j,k} = \omega^{-jk} / \sqrt{n}`
+    * Type 3 -- entries `A_{j,k} = \omega^{jk} / \sqrt{n}`
+
+    The type 0 and 1 matrices are inverse pairs, and similarly for the
+    type 2 and 3 matrices.
+
 Comparisons and properties
 -------------------------------------------------------------------------------
 

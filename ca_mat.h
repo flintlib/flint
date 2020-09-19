@@ -119,6 +119,7 @@ void ca_mat_ones(ca_mat_t mat, ca_ctx_t ctx);
 void ca_mat_pascal(ca_mat_t mat, int triangular, ca_ctx_t ctx);
 void ca_mat_stirling(ca_mat_t mat, int kind, ca_ctx_t ctx);
 void ca_mat_hilbert(ca_mat_t mat, ca_ctx_t ctx);
+void ca_mat_dft(ca_mat_t res, int type, ca_ctx_t ctx);
 
 /* Comparisons and properties */
 
