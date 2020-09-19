@@ -26,6 +26,18 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     k = A->c;
     n = B->c;
 
+
+#if HAVE_BLAS
+
+    if (FLINT_BITS == 64 && k > 20 && m > 20 && n > 20 &&
+        FLINT_BIT_COUNT(k) + 2*FLINT_BIT_COUNT(n) < 53 + 5)
+    {
+        if (nmod_mat_mul_blas(C, A, B))
+            return;
+    }
+
+#endif
+
     if (C == A || C == B)
     {
         nmod_mat_t T;

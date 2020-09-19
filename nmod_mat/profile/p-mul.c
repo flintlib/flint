@@ -63,6 +63,10 @@ int main(void)
     double min_classical, min_strassen, max;
     mat_mul_t params;
     slong dim;
+    slong i, k, m, n;
+    nmod_mat_t A, B, C;
+    flint_rand_t state;
+    timeit_t timer1, timer2;
 
     flint_printf("nmod_mat_mul:\n");
 
@@ -81,6 +85,47 @@ int main(void)
         flint_printf("dim = %wd, classical %.2f us strassen %.2f us\n", 
             dim, min_classical, min_strassen);
     }
+
+    flint_randinit(state);
+
+    for (k = 5; k < 600; k += 2 + k/4)
+    {
+        flint_printf("k = %wd:\n", k);
+
+        for (m = 5; m < 600; m += 2 + m/4)
+        {
+            flint_printf("m =%04wd: ", m);
+
+            for (n = 5; n < 600; n += 2 + n/4)
+            {
+                slong reps = 5 + 4000000/k/m/n;
+                nmod_mat_init(A, m, k, 40000);
+                nmod_mat_init(B, k, n, 40000);
+                nmod_mat_init(C, m, n, 40000);
+                nmod_mat_randfull(A, state);
+                nmod_mat_randfull(B, state);
+                nmod_mat_randfull(C, state);
+                timeit_start(timer1);
+                for (i = reps; i >= 0; i--)
+                    nmod_mat_mul(C, A, B);
+                timeit_stop(timer1);
+                timeit_start(timer2);
+                for (i = reps; i >= 0; i--)
+                    nmod_mat_mul_classical(C, A, B);
+                timeit_stop(timer2);
+                flint_printf(" %0.3f", (double)timer1->wall/(double)FLINT_MAX(1, timer2->wall));
+                nmod_mat_clear(A);
+                nmod_mat_clear(B);
+                nmod_mat_clear(C);
+            }
+
+            flint_printf("\n");
+        }
+
+        flint_printf("\n");
+    }
+
+    flint_randclear(state);
 
     return 0;
 }
