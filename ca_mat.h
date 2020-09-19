@@ -124,6 +124,8 @@ void ca_mat_dft(ca_mat_t res, int type, ca_ctx_t ctx);
 /* Comparisons and properties */
 
 truth_t ca_mat_check_equal(const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+truth_t ca_mat_check_is_zero(const ca_mat_t A, ca_ctx_t ctx);
+truth_t ca_mat_check_is_one(const ca_mat_t A, ca_ctx_t ctx);
 
 /* Conjugate and transpose */
 

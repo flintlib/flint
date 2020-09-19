@@ -165,6 +165,14 @@ Comparisons and properties
 
     Compares *A* and *B* for equality.
 
+.. function:: truth_t ca_mat_check_is_zero(const ca_mat_t A, ca_ctx_t ctx)
+
+    Tests if *A* is the zero matrix.
+
+.. function:: truth_t ca_mat_check_is_one(const ca_mat_t A, ca_ctx_t ctx)
+
+    Tests if *A* has ones on the main diagonal and zeros elsewhere.
+
 Conjugate and transpose
 -------------------------------------------------------------------------------
 
