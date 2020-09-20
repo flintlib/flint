@@ -466,6 +466,12 @@ void ca_ceil(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_log(ca_t res, const ca_t x, ca_ctx_t ctx);
 
+/* Special functions */
+
+void ca_erf(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_erfc(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_erfi(ca_t res, const ca_t x, ca_ctx_t ctx);
+
 /* Numerical evaluation */
 
 void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);

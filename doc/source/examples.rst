@@ -59,6 +59,9 @@ Sample output::
     >>> 2*Log(Pi*I) - 4*Log(Sqrt(Pi)) - Pi*I
     0
 
+    >>> -I*Pi/8*Log(2/3-2*I/3)^2 + I*Pi/8*Log(2/3+2*I/3)^2 + Pi^2/12*Log(-1-I) + Pi^2/12*Log(-1+I) + Pi^2/12*Log(1/3-I/3) + Pi^2/12*Log(1/3+I/3) - Pi^2/48*Log(18)
+    0
+
     >>> Sqrt(5 + 2*Sqrt(6)) - Sqrt(2) - Sqrt(3)
     0e-1126 {a-c-d where a = 3.14626 [Sqrt(9.89898 {2*b+5})], b = 2.44949 [b^2-6=0], c = 1.73205 [c^2-3=0], d = 1.41421 [d^2-2=0]}
     >>> Is zero?
@@ -72,9 +75,12 @@ Sample output::
     >>> Exp(Pi*Sqrt(163)) - (640320^3 + 744)
     -7.49927e-13 {a-262537412640768744 where a = 2.62537e+17 [Exp(40.1092 {b*c})], b = 3.14159 [Pi], c = 12.7671 [c^2-163=0]}
 
+    >>> Erf(2*Log(Sqrt(1/2-Sqrt(2)/4))+Log(4)) - Erf(Log(2-Sqrt(2)))
+    0
 
-    cpu/wall(s): 0.015 0.015
-    virt/peak/res/peak(MB): 36.32 36.32 9.15 9.15
+
+    cpu/wall(s): 0.022 0.022
+    virt/peak/res/peak(MB): 36.45 36.47 9.37 9.37
 
 
 binet.c

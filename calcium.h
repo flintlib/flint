@@ -145,6 +145,9 @@ typedef enum
     CA_Gamma,
     CA_LogGamma,
     CA_Psi,
+    CA_Erf,
+    CA_Erfc,
+    CA_Erfi,
     CA_RiemannZeta,
     CA_HurwitzZeta,
     CA_FUNC_CODE_LENGTH

@@ -228,6 +228,27 @@ int main(int argc, char *argv[])
     ca_sub(x, x, y, ctx);
     OUT
 
+    /* Taken (slightly tweaked) from: https://reference.wolfram.com/language/ref/PossibleZeroQ.html */
+    START("Erf(2*Log(Sqrt(1/2-Sqrt(2)/4))+Log(4)) - Erf(Log(2-Sqrt(2)))");
+    ca_sqrt_ui(x, 2, ctx);
+    ca_div_ui(x, x, 4, ctx);
+    ca_one(y, ctx);
+    ca_div_ui(y, y, 2, ctx);
+    ca_sub(x, y, x, ctx);
+    ca_sqrt(x, x, ctx);
+    ca_log(x, x, ctx);
+    ca_mul_ui(x, x, 2, ctx);
+    ca_set_ui(y, 4, ctx);
+    ca_log(y, y, ctx);
+    ca_add(x, y, x, ctx);
+    ca_erf(x, x, ctx);
+    ca_sqrt_ui(y, 2, ctx);
+    ca_ui_sub(y, 2, y, ctx);
+    ca_log(y, y, ctx);
+    ca_erf(y, y, ctx);
+    ca_sub(x, x, y, ctx);
+    OUT
+
     flint_printf("\n");
     ca_clear(x, ctx);
     ca_clear(y, ctx);

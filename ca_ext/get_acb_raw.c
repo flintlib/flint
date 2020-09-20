@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_hypgeom.h"
 #include "ca_ext.h"
 
 #define ARB_CONST(f) \
@@ -116,6 +117,9 @@ ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx)
         case CA_Gamma:        ACB_UNARY(acb_gamma)
         case CA_LogGamma:     ACB_UNARY(acb_lgamma)
         case CA_Psi:          ACB_UNARY(acb_digamma)
+        case CA_Erf:          ACB_UNARY(acb_hypgeom_erf)
+        case CA_Erfc:         ACB_UNARY(acb_hypgeom_erfc)
+        case CA_Erfi:         ACB_UNARY(acb_hypgeom_erfi)
         case CA_RiemannZeta:  ACB_UNARY(acb_zeta)
         case CA_HurwitzZeta:  ACB_BINARY(acb_hurwitz_zeta)
         default:

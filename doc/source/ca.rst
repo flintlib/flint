@@ -925,6 +925,22 @@ Elementary functions
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\log(x))`.
 
+Special functions
+-------------------------------------------------------------------------------
+
+.. function:: void ca_erf(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the error function of *x*.
+
+.. function:: void ca_erfc(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the complementary error function of *x*.
+
+.. function:: void ca_erfi(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the imaginary error function of *x*.
+
+
 Numerical evaluation
 -------------------------------------------------------------------------------
 

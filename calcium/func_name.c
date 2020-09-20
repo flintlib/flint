@@ -58,6 +58,9 @@ const char * calcium_func_name(calcium_func_code func)
         case CA_Gamma: return "Gamma";
         case CA_LogGamma: return "LogGamma";
         case CA_Psi: return "Psi";
+        case CA_Erf: return "Erf";
+        case CA_Erfc: return "Erfc";
+        case CA_Erfi: return "Erfi";
         case CA_RiemannZeta: return "RiemannZeta";
         case CA_HurwitzZeta: return "HurwitzZeta";
         default: return "<unknown function>";
