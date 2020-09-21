@@ -133,6 +133,79 @@ int main()
         ca_ctx_clear(ctx);
     }
 
+    {
+        ca_ctx_t ctx;
+        ca_t x, y;
+
+        ca_ctx_init(ctx);
+        ca_init(x, ctx);
+        ca_init(y, ctx);
+
+        /* Erf(2*Log(Sqrt(1/2-Sqrt(2)/4))+Log(4)) - Erf(Log(2-Sqrt(2))) */
+        ca_sqrt_ui(x, 2, ctx);
+        ca_div_ui(x, x, 4, ctx);
+        ca_one(y, ctx);
+        ca_div_ui(y, y, 2, ctx);
+        ca_sub(x, y, x, ctx);
+        ca_sqrt(x, x, ctx);
+        ca_log(x, x, ctx);
+        ca_mul_ui(x, x, 2, ctx);
+        ca_set_ui(y, 4, ctx);
+        ca_log(y, y, ctx);
+        ca_add(x, y, x, ctx);
+        ca_erf(x, x, ctx);
+        ca_sqrt_ui(y, 2, ctx);
+        ca_ui_sub(y, 2, y, ctx);
+        ca_log(y, y, ctx);
+        ca_erf(y, y, ctx);
+        ca_sub(x, x, y, ctx);
+
+        if (ca_check_is_zero(x, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL (example 1)\n");
+            flint_printf("x = "); ca_print(x, ctx); printf("\n\n");
+            flint_abort();
+        }
+
+        /* Erf(Sqrt(2))^2 + Erfi(Sqrt(-2))^2 */
+        ca_sqrt_ui(x, 2, ctx);
+        ca_erf(x, x, ctx);
+        ca_pow_ui(x, x, 2, ctx);
+        ca_set_si(y, -2, ctx);
+        ca_sqrt(y, y, ctx);
+        ca_erfi(y, y, ctx);
+        ca_pow_ui(y, y, 2, ctx);
+        ca_add(x, x, y, ctx);
+
+        if (ca_check_is_zero(x, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL (example 2)\n");
+            flint_printf("x = "); ca_print(x, ctx); printf("\n\n");
+            flint_abort();
+        }
+
+        /* Erf(Sqrt(2))^4 - Erfi(Sqrt(-2))^4 */
+        ca_sqrt_ui(x, 2, ctx);
+        ca_erf(x, x, ctx);
+        ca_pow_ui(x, x, 4, ctx);
+        ca_set_si(y, -2, ctx);
+        ca_sqrt(y, y, ctx);
+        ca_erfi(y, y, ctx);
+        ca_pow_ui(y, y, 4, ctx);
+        ca_sub(x, x, y, ctx);
+
+        if (ca_check_is_zero(x, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL (example 3)\n");
+            flint_printf("x = "); ca_print(x, ctx); printf("\n\n");
+            flint_abort();
+        }
+
+        ca_clear(x, ctx);
+        ca_clear(y, ctx);
+        ca_ctx_clear(ctx);
+    }
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
