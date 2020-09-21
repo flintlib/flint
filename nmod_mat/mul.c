@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2020 William Hart
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -29,8 +30,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
 #if HAVE_BLAS
 
-    if (FLINT_BITS == 64 && k > 20 && m > 20 && n > 20 &&
-        FLINT_BIT_COUNT(k) + 2*FLINT_BIT_COUNT(n) < 53 + 5)
+    if (FLINT_BITS == 64 && k > 20 && m > 20 && n > 20)
     {
         if (nmod_mat_mul_blas(C, A, B))
             return;
