@@ -165,6 +165,16 @@ Ideal
     Given *K* with assigned extension numbers,
     builds the reduction ideal in-place.
 
+.. function:: void ca_field_build_ideal_erf(ca_field_t K, ca_ctx_t ctx)
+
+    Builds relations for error functions present among the extension
+    numbers in *K*. This heuristic adds relations that are consequences
+    of the functional equations
+    `\operatorname{erf}(x) = -\operatorname{erf}(-x)`,
+    `\operatorname{erfc}(x) = 1-\operatorname{erf}(x)`,
+    `\operatorname{erfi}(x) = -i\operatorname{erf}(ix)`.
+
+
 Structure operations
 -------------------------------------------------------------------------------
 

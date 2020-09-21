@@ -42,11 +42,12 @@ void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
 
 void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx);
 
-void ca_field_print(const ca_field_t K, ca_ctx_t ctx);
+    void ca_field_print(const ca_field_t K, ca_ctx_t ctx);
 
 int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 
 void ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx);
+void ca_field_build_ideal_erf(ca_field_t K, ca_ctx_t ctx);
 
 void ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx);
 void ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx);

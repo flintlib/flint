@@ -85,12 +85,18 @@ int main()
             default: ca_erfi(y, y, ctx); break;
         }
 
+        if (n_randint(state, 2))
+            ca_sqr(x, x, ctx);
+
         switch (n_randint(state, 4))
         {
             case 0: ca_neg(x, x, ctx); break;
             case 1: ca_i(s, ctx); ca_mul(x, x, s, ctx); break;
             case 2: ca_neg_i(s, ctx); ca_mul(x, x, s, ctx); break;
         }
+
+        if (n_randint(state, 2))
+            ca_sqr(y, y, ctx);
 
         switch (n_randint(state, 4))
         {
