@@ -53,16 +53,16 @@ main(void)
     flint_printf("mul....");
     fflush(stdout);
 
-    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2500 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
         mp_limb_t mod;
 
         slong m, k, n;
 
-        m = n_randint(state, 100);
-        k = n_randint(state, 100);
-        n = n_randint(state, 100);
+        m = n_randint(state, 75);
+        k = n_randint(state, 75);
+        n = n_randint(state, 75);
 
         /* We want to generate matrices with many entries close to half
            or full limbs with high probability, to stress overflow handling */

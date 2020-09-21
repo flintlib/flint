@@ -29,6 +29,13 @@ static void _lift_vec(double * a, ulong * b, slong len, ulong n)
         a[i] = (int)(b[i] - (n & FLINT_SIGN_EXT(n/2 - b[i])));
 }
 
+static void _lift_vec_sp(float * a, ulong * b, slong len, ulong n)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        a[i] = (int)(b[i] - (n & FLINT_SIGN_EXT(n/2 - b[i])));
+}
+
 static void _lift_vec_crt(double * a, ulong * b, slong len, nmod_t ctx)
 {
     slong i;
@@ -39,6 +46,7 @@ static void _lift_vec_crt(double * a, ulong * b, slong len, nmod_t ctx)
         a[i] = (int)(bn - (ctx.n & FLINT_SIGN_EXT(ctx.n/2 - bn)));
     }
 }
+
 
 static int _nmod_mat_mul_blas_crt(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -170,6 +178,52 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C, const nmod_mat_t A, const nmod_m
     return 1;
 }
 
+
+static int _nmod_mat_mul_blas_sp(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+{
+    slong i, j;
+    slong m = A->r;
+    slong k = A->c;
+    slong n = B->c;
+    float * dC, * dA, * dB;
+    ulong shift;
+    nmod_t ctx = C->mod;
+
+    dA = flint_malloc(m*k*sizeof(float));
+    dB = flint_malloc(k*n*sizeof(float));
+    dC = flint_calloc(m*n, sizeof(float));
+
+    for (i = 0; i < m; i++)
+        _lift_vec_sp(dA + i*k, A->rows[i], k, ctx.n);
+
+    for (i = 0; i < k; i++)
+        _lift_vec_sp(dB + i*n, B->rows[i], n, ctx.n);
+
+    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
+                                                1.0, dA, k, dB, n, 0.0, dC, n);
+
+    /*
+        the shift for negative a must satisfy
+            ctx.n divides shift, and
+            2^24 <= shift <= 2^64
+    */
+    shift = ((UWORD(1)<<30)/ctx.n)*ctx.n;
+    for (i = 0; i < m; i++)
+    for (j = 0; j < n; j++)
+    {
+        slong a = (slong) dC[i*n + j];
+        mp_limb_t b = (a < 0) ? a + shift : a;
+        NMOD_RED(C->rows[i][j], b, ctx);
+    }
+
+    flint_free(dA);
+    flint_free(dB);
+    flint_free(dC);
+
+    return 1;
+}
+
+
 int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
     slong i, j;
@@ -199,6 +253,9 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     umul_ppmm(hi, lo, lo, k);
     if (hi != 0 || lo >= (UWORD(1) << 53))
         return _nmod_mat_mul_blas_crt(C, A, B);
+
+    if (lo < UWORD(1) << 24)
+        return _nmod_mat_mul_blas_sp(C, A, B);
 
     dA = flint_malloc(m*k*sizeof(double));
     dB = flint_malloc(k*n*sizeof(double));
