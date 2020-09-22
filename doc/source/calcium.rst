@@ -90,6 +90,14 @@ here for convenience.
     Context for Flint sparse multivariate integer polynomial (defining the
     number of variables and monomial order).
 
+.. type:: fmpz_mat_t
+
+    Flint dense matrix over the integers.
+
+.. type:: fmpq_mat_t
+
+    Flint dense matrix over the rational numbers.
+
 .. type:: arb_t
 
     Arb real number.

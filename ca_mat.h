@@ -144,8 +144,45 @@ void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
 void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);
 
+/* Gaussian elimination and LU decomposition */
+
+truth_t ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx);
+
+CA_MAT_INLINE void
+_ca_mat_swap_rows(ca_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s)
+    {
+        ca_ptr u;
+        slong t;
+
+        if (perm != NULL)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+        u = mat->rows[s];
+        mat->rows[s] = mat->rows[r];
+        mat->rows[r] = u;
+    }
+}
+
+truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx);
+truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx);
+
+/* Determinant */
+
+void ca_mat_det_berkowitz(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
+int ca_mat_det_lu(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
+int ca_mat_det_bareiss(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_det_cofactor(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_det(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
+
 /* Characteristic polynomial */
 
+void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx);
 void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx);
 int ca_mat_companion(ca_mat_t A, const ca_poly_t poly, ca_ctx_t ctx);
 

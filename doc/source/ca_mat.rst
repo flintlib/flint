@@ -203,7 +203,7 @@ Arithmetic
 
     Sets *res* to the difference of *A* and *B*.
 
-.. function:: void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+.. function:: void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 
     Sets *res* to the matrix product of *A* and *B*.
 
@@ -213,6 +213,88 @@ Trace
 .. function:: void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
 
     Sets *trace* to the sum of the entries on the main diagonal of *mat*.
+
+
+Gaussian elimination and LU factorization
+-------------------------------------------------------------------------------
+
+.. function:: truth_t ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
+
+    Attempts to find a nonzero entry in *mat* with column index *column*
+    and row index between *start_row* (inclusive) and *end_row* (exclusive).
+
+    If the return value is ``T_TRUE``, such an element exists,
+    and *pivot_row* is set to the row index.
+    If the return value is ``T_FALSE``, no such element exists
+    (all entries in this part of the column are zero).
+    If the return value is ``T_UNKNOWN``, it is unknown whether such
+    an element exists (zero certification failed).
+
+.. function:: truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
+
+    Given a square matrix *A*, attempts to prove invertibility of *A* and
+    compute a LU decomposition `PLU = A`
+    using Gaussian elimination with partial pivoting.
+    The input and output matrices can be the same, performing the
+    decomposition in-place.
+    Entry `i` in the permutation vector *P* is set to the row index in
+    the input matrix corresponding to row `i` in the output matrix.
+
+    * If *A* can be proved to be invertible/nonsingular, returns ``T_TRUE`` and sets *P* and *LU* to a LU decomposition `A = PLU`.
+
+    * If *A* can be proved to be singular, returns ``T_FALSE``.
+
+    * If *A* cannot be proved to be either singular or nonsingular, returns ``T_UNKNOWN``.
+
+    When the return value is ``T_FALSE`` or ``T_UNKNOWN``, the values of
+    *P* and *LU* are arbitrary.
+
+.. function:: truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+
+    Similar to :func:`ca_mat_nonsingular_lu`, but computes a fraction-free
+    LU decomposition using the Bareiss algorithm.
+    The denominator is written to *det*.
+    Note that despite being "fraction-free", this algorithm may
+    introduce fractions due to incomplete symbolic simplifications.
+
+
+Determinant
+-------------------------------------------------------------------------------
+
+.. function:: void ca_mat_det_berkowitz(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+              int ca_mat_det_lu(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+              int ca_mat_det_bareiss(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+              void ca_mat_det_cofactor(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+              void ca_mat_det(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *det* to the determinant of the square matrix *A*.
+    Various algorithms are available:
+
+    * The *berkowitz* version uses the division-free Berkowitz algorithm
+      performing `O(n^4)` operations. Since no zero tests are required, it
+      is guaranteed to succeed.
+
+    * The *cofactor* version performs cofactor expansion. This is currently
+      only supported for matrices up to size 4.
+
+    * The *lu* and *bareiss* versions use rational LU decomposition
+      and fraction-free LU decomposition (Bareiss algorithm) respectively,
+      requiring `O(n^3)` operations. These algorithms can fail if zero
+      certification fails (see :func:`ca_mat_nonsingular_lu`); they
+      return 1 for success and 0 for failure.
+      Note that the Bareiss algorithm, despite being "fraction-free",
+      may introduce fractions due to incomplete symbolic simplifications.
+
+    The default function chooses an algorithm automatically.
+    It will, in addition, recognize trivially rational and integer
+    matrices and evaluate those determinants using
+    :type:`fmpq_mat_t` or :type:`fmpz_mat_t`.
+
+    The various algorithms can produce different symbolic
+    forms of the same determinant. Which algorithm performs better
+    depends strongly and sometimes
+    unpredictably on the structure of the matrix and the fields of
+
 
 Characteristic polynomial and companion matrix
 -------------------------------------------------------------------------------
@@ -224,7 +306,8 @@ Characteristic polynomial and companion matrix
     Sets *poly* to the characteristic polynomial of *mat* which must be
     a square matrix. If the matrix has *n* rows, the underscore method
     requires space for `n + 1` output coefficients.
-    Employs a division-free algorithm using `O(n^4)` operations.
+    Employs the division-free Berkowitz algorithm using
+    `O(n^4)` operations.
 
 .. function:: int ca_mat_companion(ca_mat_t mat, const ca_poly_t poly, ca_ctx_t ctx)
 
