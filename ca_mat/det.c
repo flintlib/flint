@@ -37,6 +37,34 @@ _ca_mat_fmpq_is_fmpz(const ca_mat_t A, ca_ctx_t ctx)
     return 1;
 }
 
+
+ca_field_ptr
+_ca_mat_same_field(const ca_mat_t A, ca_ctx_t ctx)
+{
+    ca_field_ptr K;
+
+    slong i, j;
+
+    K = NULL;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+    {
+        for (j = 0; j < ca_mat_ncols(A); j++)
+        {
+            if (CA_IS_QQ(ca_mat_entry(A, i, j), ctx))
+                continue;
+
+            if (K == NULL)
+                K = CA_FIELD(ca_mat_entry(A, i, j), ctx);
+            else if (K != CA_FIELD(ca_mat_entry(A, i, j), ctx))
+                return NULL;
+        }
+    }
+
+    return K;
+}
+
+
 void
 ca_mat_det(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
 {
@@ -101,7 +129,15 @@ ca_mat_det(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
     }
     else
     {
+        ca_field_ptr K;
+
+        K = _ca_mat_same_field(A, ctx);
+
         /* todo: algorithm selection */
-        ca_mat_det_berkowitz(res, A, ctx);
+
+        if (K != NULL && CA_FIELD_IS_NF(K))
+            ca_mat_det_lu(res, A, ctx);
+        else
+            ca_mat_det_berkowitz(res, A, ctx);
     }
 }
