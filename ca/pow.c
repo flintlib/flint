@@ -291,8 +291,11 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                 }  /* todo: evaluation limits */
                 else if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -ctx->options[CA_OPT_POW_LIMIT] / 2) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), ctx->options[CA_OPT_POW_LIMIT] / 2) <= 0)
                 {
-                    ca_sqrt(res, x, ctx);
-                    _ca_pow_binexp(res, res, *CA_FMPQ_NUMREF(y), ctx);
+                    ca_t t;
+                    ca_init(t, ctx);
+                    ca_sqrt(t, x, ctx);
+                    _ca_pow_binexp(res, t, *CA_FMPQ_NUMREF(y), ctx);
+                    ca_clear(t, ctx);
                     return;
                 }
             }
