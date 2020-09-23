@@ -233,7 +233,7 @@ int nmod_mpolyn_interp_crt_2sm_poly(
     Texp = T->exps;
     Toff = 0;
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     u = nmod_poly_evaluate_nmod(modulus, alpha);
     u = nmod_mul(u, alpha, ctx->ffinfo->mod);
     u = nmod_mul(u, 2, ctx->ffinfo->mod);
@@ -898,7 +898,7 @@ int nmod_mpolyn_interp_crt_2sm_mpolyn(
     int texp_set, cmp;
     mp_limb_t alpha = nmod_poly_get_coeff_ui(alphapow, 1);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     u = nmod_poly_evaluate_nmod(modulus, alpha);
     u = nmod_mul(u, alpha, ctx->ffinfo->mod);
     u = nmod_mul(u, 2, ctx->ffinfo->mod);

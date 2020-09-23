@@ -24,7 +24,7 @@ int flint_get_num_threads()
 
 void flint_set_num_threads(int num_threads)
 {
-#if !HAVE_PTHREAD
+#if !FLINT_USES_PTHREAD
     num_threads = 1;
 #endif
     _flint_num_workers = num_threads - 1;
@@ -52,7 +52,7 @@ int flint_set_num_workers(int num_workers)
 {
     int old_num_workers;
 
-#if !HAVE_PTHREAD
+#if !FLINT_USES_PTHREAD
     num_workers = 0;
 #endif
 

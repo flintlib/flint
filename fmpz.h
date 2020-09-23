@@ -31,7 +31,7 @@
 #include "nmod_vec.h"
 #include "fmpz-conversions.h"
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 #include <pthread.h>
 #endif
 
@@ -59,7 +59,7 @@ typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 typedef struct
 {
    int count;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
    pthread_t thread;
 #endif
    void * address;

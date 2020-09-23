@@ -43,7 +43,7 @@ static int _try_lift(
     nmod_mpoly_init(newq, ctx);
     nmod_mpoly_univar_init(u, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         nmod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -108,7 +108,7 @@ cleanup:
     nmod_mpoly_clear(newq, ctx);
     nmod_mpoly_univar_clear(u, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         nmod_mpoly_init(t, ctx);
@@ -234,7 +234,7 @@ next_alpha:
         nmod_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         nmod_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #if WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         nmod_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             nmod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -283,7 +283,7 @@ next_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #if WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             nmod_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -374,7 +374,7 @@ cleanup:
     n_bpoly_clear(B);
     n_tpoly_clear(F);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         nmod_mpoly_init(t, ctx);

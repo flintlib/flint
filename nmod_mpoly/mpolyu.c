@@ -146,7 +146,7 @@ nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
 typedef struct
 {
     volatile slong index;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     slong length;
@@ -165,12 +165,12 @@ static void _worker_sort(void * varg)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&arg->mutex);
 #endif
     i = arg->index;
     arg->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&arg->mutex);
 #endif
 
@@ -257,7 +257,7 @@ void nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(
     {
         _sort_arg_t arg;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 	pthread_mutex_init(&arg->mutex, NULL);
 #endif
 	arg->index = 0;
@@ -275,7 +275,7 @@ void nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(
             thread_pool_wait(global_thread_pool, handles[i]);
         }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_destroy(&arg->mutex);
 #endif
     }

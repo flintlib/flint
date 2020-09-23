@@ -298,7 +298,7 @@ cleanup:
     fq_nmod_mpoly_clear(m, ctx);
     fq_nmod_mpoly_clear(mpow, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

@@ -80,7 +80,7 @@ static int _irreducible_factors(
     flint_bitcnt_t Lbits, Abits;
     int perm_is_id;
     flint_rand_t state;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_t Aorg;
 
     fq_nmod_mpoly_init(Aorg, ctx);
@@ -354,7 +354,7 @@ cleanup:
     flint_randclear(state);
     flint_free(Adegs);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

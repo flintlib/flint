@@ -567,7 +567,7 @@ int _fq_nmod_mpoly_gcd_cofactors(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_t T, Asave, Bsave;
 
     fq_nmod_mpoly_init(T, ctx);
@@ -896,7 +896,7 @@ cleanup:
                                          G->length, G->coeffs + 0, ctx->fqctx);
         }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fq_nmod_mpoly_mul(T, G, Abar, ctx);
         FLINT_ASSERT(fq_nmod_mpoly_equal(T, Asave, ctx));
         fq_nmod_mpoly_mul(T, G, Bbar, ctx);
@@ -904,7 +904,7 @@ cleanup:
 #endif
     }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_clear(T, ctx);
     fq_nmod_mpoly_clear(Asave, ctx);
     fq_nmod_mpoly_clear(Bsave, ctx);

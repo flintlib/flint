@@ -51,7 +51,7 @@ static void nmod_mpoly_factor_mul_mpoly_ui(
 }
 
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 /*
     return: 0 no
             1 yes

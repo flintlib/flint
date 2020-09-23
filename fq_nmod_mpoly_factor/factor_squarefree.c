@@ -33,7 +33,7 @@ static void fq_nmod_mpoly_factor_mul_mpoly_ui(
 	}
 }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 /*
     return: 0 no
             1 yes
@@ -103,7 +103,7 @@ static int fq_nmod_mpoly_factor_mul_pairwise_prime(
 	fq_nmod_mpoly_t T1, T2;
 	fq_nmod_mpoly_t g;
 	fmpz_t t;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     int ae_ok = 1;
 	fq_nmod_mpoly_t ae, be, ce;
 #endif
@@ -118,7 +118,7 @@ static int fq_nmod_mpoly_factor_mul_pairwise_prime(
 		return success;
 	}
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 	fq_nmod_mpoly_init(ae, ctx);
 	fq_nmod_mpoly_init(be, ctx);
 	fq_nmod_mpoly_init(ce, ctx);
@@ -188,7 +188,7 @@ cleanup:
     FLINT_ASSERT(!success || fq_nmod_mpoly_factor_is_pairwise_prime(a, ctx) != 0);
     FLINT_ASSERT(!(ae_ok && success) || fq_nmod_mpoly_factor_matches(ae, a, ctx));
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
 	fq_nmod_mpoly_clear(ae, ctx);
 	fq_nmod_mpoly_clear(be, ctx);
 	fq_nmod_mpoly_clear(ce, ctx);

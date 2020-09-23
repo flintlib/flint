@@ -13,7 +13,7 @@
 
 int thread_pool_restore_affinity(thread_pool_t T)
 {
-#if HAVE_CPU_SET_T && HAVE_PTHREAD
+#if FLINT_USES_CPUSET && FLINT_USES_PTHREAD
     slong i;
     int errorno;
     thread_pool_entry_struct * D;

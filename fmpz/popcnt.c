@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-#ifdef POPCNT_INTRINSICS
+#ifdef FLINT_USES_POPCNT
 static __inline__ flint_bitcnt_t shortCount(slong val)
 {
 #if defined(_WIN64) || defined(__mips64)

@@ -541,7 +541,7 @@ static slong _nmod_mpolyn_crt(
     if (exp_right)
         _find_edge(stop, count, exp_right, B, N);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (k = 0; k < count; k++)
     {
         FLINT_ASSERT(0 <= start[k]);
@@ -653,7 +653,7 @@ static slong _nmod_mpolyn_crt(
 typedef struct
 {
     volatile int idx;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     const nmod_mpoly_ctx_struct * ctx;
@@ -696,12 +696,12 @@ static void _joinworker(void * varg)
     while (1)
     {
         /* get exponent of either G, Abar, or Bbar to start working on */
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(&base->mutex);
 #endif
         i = base->idx;
         base->idx = i + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(&base->mutex);
 #endif
 
@@ -835,7 +835,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     _joinbase_t joinbase;
     nmod_poly_t t1;
     nmod_mpolyn_t T1, T2;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpolyn_t Aorg, Borg;
 #endif
 
@@ -847,7 +847,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     FLINT_ASSERT(bits == A->bits);
     FLINT_ASSERT(bits == B->bits);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpolyn_init(Aorg, A->bits, ctx);
     nmod_mpolyn_init(Borg, B->bits, ctx);
     nmod_mpolyn_set(Aorg, A, ctx);
@@ -1034,7 +1034,7 @@ compute_split:
     joinbase->Abar = Abar;
     joinbase->Bbar = Bbar;
     joinbase->ctx = ctx;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&joinbase->mutex, NULL);
 #endif
 
@@ -1147,7 +1147,7 @@ compute_split:
     FLINT_ASSERT(nmod_mpolyn_is_canonical(Abar, ctx));
     FLINT_ASSERT(nmod_mpolyn_is_canonical(Bbar, ctx));
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&joinbase->mutex);
 #endif
 
@@ -1260,7 +1260,7 @@ cleanup_split:
 
 cleanup:
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         success =            nmod_mpolyn_divides(T1, Aorg, G, ctx);

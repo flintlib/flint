@@ -198,7 +198,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong)
                + (qs_inf->num_handles > 0 ? 64 : 0))*(qs_inf->num_handles + 1));
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
     
@@ -438,7 +438,7 @@ cleanup:
     flint_printf("\nCleanup\n");
 #endif
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&qs_inf->mutex);
 #endif
 

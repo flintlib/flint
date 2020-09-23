@@ -24,7 +24,7 @@
 
 int main(void)
 {
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int iter;
     fmpz_mod_ctx_t ctx;
 #endif
@@ -33,7 +33,7 @@ int main(void)
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
 
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 

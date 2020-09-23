@@ -52,7 +52,7 @@ int n_bpoly_fq_hlift2(
     n_bpoly_fq_taylor_shift_var0_fq_nmod(B0, alpha, ctx);
     n_bpoly_fq_taylor_shift_var0_fq_nmod(B1, alpha, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -218,7 +218,7 @@ int n_bpoly_fq_hlift(
         n_bpoly_fq_taylor_shift_var0_fq_nmod(B + i, alpha, ctx);
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);

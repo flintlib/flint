@@ -14,7 +14,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 #include <pthread.h>
 
 static pthread_once_t fmpz_initialised = PTHREAD_ONCE_INIT;
@@ -35,7 +35,7 @@ ulong mpz_alloc = 0;
 ulong mpz_free_num = 0;
 ulong mpz_free_alloc = 0;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 void fmpz_lock_init()
 {
    pthread_mutex_init(&fmpz_lock, NULL);
@@ -46,7 +46,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 {
     __mpz_struct * z = NULL;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_once(&fmpz_initialised, fmpz_lock_init);
     pthread_mutex_lock(&fmpz_lock);
 #endif
@@ -67,7 +67,7 @@ __mpz_struct * _fmpz_new_mpz(void)
         mpz_init(z);
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&fmpz_lock);
 #endif
 
@@ -81,7 +81,7 @@ void _fmpz_clear_mpz(fmpz f)
     if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
         mpz_realloc2(ptr, 1);
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&fmpz_lock);
 #endif
 
@@ -93,7 +93,7 @@ void _fmpz_clear_mpz(fmpz f)
 
     mpz_free_arr[mpz_free_num++] = ptr;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&fmpz_lock);
 #endif
 }
@@ -114,7 +114,7 @@ void _fmpz_cleanup_mpz_content(void)
 
 void _fmpz_cleanup(void)
 {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&fmpz_lock);
 #endif
 
@@ -122,7 +122,7 @@ void _fmpz_cleanup(void)
     flint_free(mpz_free_arr);
     mpz_free_arr = NULL;
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&fmpz_lock);
 #endif
 }

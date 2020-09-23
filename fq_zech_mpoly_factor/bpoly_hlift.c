@@ -45,7 +45,7 @@ int fq_zech_bpoly_hlift2(
     fq_zech_bpoly_taylor_shift_var0(B0, alpha, ctx);
     fq_zech_bpoly_taylor_shift_var0(B1, alpha, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_zech_poly_t T;
         fq_zech_poly_init(T, ctx);
@@ -218,7 +218,7 @@ int fq_zech_bpoly_hlift(
         fq_zech_bpoly_taylor_shift_var0(B + i, alpha, ctx);
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_zech_poly_t T;
         fq_zech_poly_init(T, ctx);

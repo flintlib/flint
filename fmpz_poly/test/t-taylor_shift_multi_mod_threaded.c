@@ -20,7 +20,7 @@
 int
 main(void)
 {
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
 #endif
     FLINT_TEST_INIT(state);
@@ -28,7 +28,7 @@ main(void)
     flint_printf("taylor_shift_multi_mod....");
     fflush(stdout);
 
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)

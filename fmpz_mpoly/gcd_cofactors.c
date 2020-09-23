@@ -257,7 +257,7 @@ static int _try_missing_var(
     fmpz_mpoly_init(tBbar, ctx);
     fmpz_mpoly_univar_init(Ax, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_to_univar(Ax, B, var, ctx);
     FLINT_ASSERT(Ax->length == 1);
 #endif
@@ -834,7 +834,7 @@ int _fmpz_mpoly_gcd_cofactors_threaded_pool(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_t T, Asave, Bsave;
 
     fmpz_mpoly_init(T, ctx);
@@ -1177,7 +1177,7 @@ cleanup:
             fmpz_mpoly_neg(Bbar, Bbar, ctx);
         }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fmpz_mpoly_mul(T, G, Abar, ctx);
         FLINT_ASSERT(fmpz_mpoly_equal(T, Asave, ctx));
         fmpz_mpoly_mul(T, G, Bbar, ctx);
@@ -1185,7 +1185,7 @@ cleanup:
 #endif
     }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_clear(T, ctx);
     fmpz_mpoly_clear(Asave, ctx);
     fmpz_mpoly_clear(Bsave, ctx);

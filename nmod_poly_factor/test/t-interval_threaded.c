@@ -30,7 +30,7 @@
 int
 main(void)
 {
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int iter;
 #endif
     FLINT_TEST_INIT(state);
@@ -38,7 +38,7 @@ main(void)
     flint_printf("interval_threaded....");
     fflush(stdout);
 
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     for (iter = 0; iter < 20*flint_test_multiplier(); iter++)
     {
         nmod_poly_t a, b, c, cinv, d;

@@ -16,13 +16,13 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#if HAVE_CPU_SET_T
+#if FLINT_USES_CPUSET
 #include <sched.h>
 #endif
 
 #include "flint.h"
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
 #include <pthread.h>
 #endif
 
@@ -32,7 +32,7 @@
 
 typedef struct
 {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_t pth;
     pthread_mutex_t mutex;
     pthread_cond_t sleep1;
@@ -51,10 +51,10 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
-#if HAVE_CPU_SET_T && HAVE_PTHREAD
+#if FLINT_USES_CPUSET && FLINT_USES_PTHREAD
     cpu_set_t original_affinity;
 #endif
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
     thread_pool_entry_struct * tdata;

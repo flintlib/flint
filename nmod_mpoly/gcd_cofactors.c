@@ -230,7 +230,7 @@ static int _try_missing_var(
     nmod_mpoly_init(tBbar, ctx);
     nmod_mpoly_univar_init(Ax, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_to_univar(Ax, B, var, ctx);
     FLINT_ASSERT(Ax->length == 1);
 #endif
@@ -618,7 +618,7 @@ int _nmod_mpoly_gcd_cofactors_threaded_pool(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_t T, Asave, Bsave;
 
     nmod_mpoly_init(T, ctx);
@@ -947,7 +947,7 @@ cleanup:
                    nmod_inv(G->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
         }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
         nmod_mpoly_mul(T, G, Abar, ctx);
         FLINT_ASSERT(nmod_mpoly_equal(T, Asave, ctx));
         nmod_mpoly_mul(T, G, Bbar, ctx);
@@ -955,7 +955,7 @@ cleanup:
 #endif
     }
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_clear(T, ctx);
     nmod_mpoly_clear(Asave, ctx);
     nmod_mpoly_clear(Bsave, ctx);

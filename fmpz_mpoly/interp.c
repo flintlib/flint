@@ -136,7 +136,7 @@ int fmpz_mpoly_interp_mcrt_p(
     const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N;
 #endif
     int changed = 0;
@@ -145,7 +145,7 @@ int fmpz_mpoly_interp_mcrt_p(
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     fmpz_init(t);

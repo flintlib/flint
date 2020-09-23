@@ -33,7 +33,7 @@
 int
 main(void)
 {
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
     fmpz_mod_ctx_t ctx;
 #endif
@@ -42,7 +42,7 @@ main(void)
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 

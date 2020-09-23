@@ -385,7 +385,7 @@ static void _hensel_lift_fac(
 
     for (i = 0; i < c->length; i++)
     {
-    #if WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j;
             for (j = 0; j < p0; j++)
@@ -418,7 +418,7 @@ static void _hensel_lift_fac(
     fq_zech_bpoly_swap(G, t1, ctx);
     fq_zech_bpoly_swap(H, t2, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong j;
         fq_zech_bpoly_mul(t1, G, H, ctx);
@@ -477,7 +477,7 @@ static void _hensel_lift_inv(
 
     for (i = 0; i < c->length; i++)
     {
-    #if WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j;
             for (j = 0; j < p0; j++)
@@ -510,7 +510,7 @@ static void _hensel_lift_inv(
     fq_zech_bpoly_swap(t1, B, ctx);
     fq_zech_bpoly_swap(t2, A, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_zech_bpoly_mul(t1, G, A, ctx);
     fq_zech_bpoly_mul(t2, H, B, ctx);
     fq_zech_bpoly_add(c, t1, t2, ctx);

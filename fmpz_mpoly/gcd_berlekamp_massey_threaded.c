@@ -51,7 +51,7 @@ typedef struct
     volatile int zip_find_coeffs_no_match, zip_find_coeffs_non_invertible;
     volatile int Gchanged, Abarchanged, Bbarchanged, Hchanged, failed;
     int which_check;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
 
@@ -351,12 +351,12 @@ static void _worker_skel_sp(void * varg_)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -396,12 +396,12 @@ static void _worker_skel_mp(void * varg_)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -701,12 +701,12 @@ static void _worker_check_eval_sp(void * varg)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -757,12 +757,12 @@ static void _worker_check_eval_mp(void * varg)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -817,12 +817,12 @@ static void _worker_reduce_sp(void * varg)
 
 next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -871,12 +871,12 @@ static void _worker_reduce_mp(void * varg)
 
 next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -940,12 +940,12 @@ static void _worker_get_mpoly_sp(void * varg)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -1000,12 +1000,12 @@ static void _worker_get_mpoly_mp(void * varg)
 
 next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -1043,12 +1043,12 @@ static void _worker_find_zip_coeffs(void * varg)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -1094,12 +1094,12 @@ static void _worker_crt_zip_coeffs(void * varg)
 
 get_next_index:
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_lock(&w->mutex);
 #endif
     i = w->index;
     w->index++;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&w->mutex);
 #endif
 
@@ -1893,7 +1893,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded_pool(
 
     mpoly_bma_interpolate_ctx_init(w->Ictx, ctx->minfo->nvars);
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&w->mutex, NULL);
 #endif
 
@@ -2398,7 +2398,7 @@ cleanup:
     flint_free(w->Adegs);
     flint_free(w->Bdegs);
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&w->mutex);
 #endif
 

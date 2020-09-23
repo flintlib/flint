@@ -295,7 +295,7 @@ cleanup:
     fq_zech_mpoly_clear(m, ctx);
     fq_zech_mpoly_clear(mpow, ctx);
 
-#if WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_zech_mpoly_t prod;

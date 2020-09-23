@@ -17,7 +17,7 @@
 #include "flint.h"
 #include "thread_pool.h"
 
-#if HAVE_GC
+#if FLINT_USES_GC
 #include "gc.h"
 #endif
 
@@ -31,7 +31,7 @@ static void  *(*__flint_callocate_func) (size_t, size_t) = _flint_calloc;
 static void  *(*__flint_reallocate_func) (void *, size_t) = _flint_realloc;
 static void  (*__flint_free_func) (void *) = _flint_free;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
 #include <pthread.h>
 
 static pthread_once_t register_initialised = PTHREAD_ONCE_INIT;
@@ -58,7 +58,7 @@ void __flint_set_memory_functions(void *(*alloc_func) (size_t),
                              void *(*realloc_func) (void *, size_t),
                              void (*free_func) (void *))
 {  
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_once(&alloc_func_init, __flint_set_memory_functions_init);
     pthread_mutex_lock(&alloc_func_lock);
 #endif
@@ -68,7 +68,7 @@ void __flint_set_memory_functions(void *(*alloc_func) (size_t),
   __flint_reallocate_func = realloc_func;
   __flint_free_func = free_func;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_unlock(&alloc_func_lock);
 #endif
 }
@@ -77,7 +77,7 @@ void * _flint_malloc(size_t size)
 {
    void * ptr;
 
-#if HAVE_GC
+#if FLINT_USES_GC
    ptr = GC_malloc(size);
 #else
    ptr = malloc(size);
@@ -100,7 +100,7 @@ void * _flint_realloc(void * ptr, size_t size)
 {
     void * ptr2;
 
-#if HAVE_GC
+#if FLINT_USES_GC
     ptr2 = GC_realloc(ptr, size);
 #else
     ptr2 = realloc(ptr, size);
@@ -129,7 +129,7 @@ void * _flint_calloc(size_t num, size_t size)
 {
    void * ptr;
 
-#if HAVE_GC
+#if FLINT_USES_GC
     ptr = GC_malloc(num*size);
 #else
     ptr = calloc(num, size);
@@ -152,7 +152,7 @@ FLINT_WARN_UNUSED void * flint_calloc(size_t num, size_t size)
 
 void _flint_free(void * ptr)
 {
-#if !HAVE_GC
+#if !FLINT_USES_GC
     free(ptr);
 #endif
 }
@@ -167,7 +167,7 @@ FLINT_TLS_PREFIX size_t flint_num_cleanup_functions = 0;
 
 FLINT_TLS_PREFIX flint_cleanup_function_t * flint_cleanup_functions = NULL;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
 void register_init()
 {
    pthread_mutex_init(&register_lock, NULL);
@@ -176,7 +176,7 @@ void register_init()
 
 void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 {
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_once(&register_initialised, register_init);
     pthread_mutex_lock(&register_lock);
 #endif
@@ -188,7 +188,7 @@ void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 
     flint_num_cleanup_functions++;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_unlock(&register_lock);
 #endif
 }
@@ -199,7 +199,7 @@ void _flint_cleanup()
 {
     size_t i;
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_lock(&register_lock);
 #endif
 
@@ -213,7 +213,7 @@ void _flint_cleanup()
     mpfr_free_cache();
     _fmpz_cleanup();
     
-#if FLINT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_unlock(&register_lock);
 #endif
 
@@ -221,7 +221,7 @@ void _flint_cleanup()
 
 void flint_cleanup()
 {
-#if !FLINT_REENTRANT || HAVE_TLS
+#if !FLINT_REENTRANT || FLINT_USES_TLS
    _flint_cleanup();
 #endif
 }

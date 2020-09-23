@@ -35,7 +35,7 @@ typedef struct
     slong len;
     slong leninv;
     slong len2;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
 }
@@ -57,12 +57,12 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 
     while (1)
     {
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_lock(arg.mutex);
 #endif
 	j = *arg.j;
         *arg.j = j + 1;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         pthread_mutex_unlock(arg.mutex);
 #endif
 
@@ -109,7 +109,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
     slong i, j, n, m, k, len2 = l, len1, shared_j = 0;
     fmpz * h;
     compose_vec_arg_t * args;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
 
@@ -173,12 +173,12 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
         args[i].leninv  = leninv;
         args[i].p       = p;
         args[i].len2    = len2;
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
         args[i].mutex   = &mutex;
 #endif
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
 
@@ -195,7 +195,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
         thread_pool_wait(global_thread_pool, threads[i]);
     }
 
-#if HAVE_PTHREAD
+#if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&mutex);
 #endif
 
