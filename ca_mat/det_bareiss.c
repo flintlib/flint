@@ -17,7 +17,7 @@ ca_mat_det_bareiss(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
     truth_t invertible;
     slong * P;
     ca_mat_t T;
-    slong i, n;
+    slong n;
 
     n = ca_mat_nrows(A);
     P = _perm_init(n);

@@ -331,6 +331,12 @@ Assignment and specific values
     representation of this number as an element of the trivial field
     `\mathbb{Q}`.
 
+.. function:: void ca_set_d(ca_t res, double x, ca_ctx_t ctx)
+              void ca_set_d_d(ca_t res, double x, double y, ca_ctx_t ctx)
+
+    Sets *res* to the value of *x*, or the complex value `x + yi`.
+    NaN is interpreted as *Unknown* (not *Undefined*).
+
 .. function:: void ca_i(ca_t res, ca_ctx_t ctx)
               void ca_neg_i(ca_t res, ca_ctx_t ctx)
 

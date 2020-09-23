@@ -17,7 +17,6 @@ truth_t
 ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx)
 {
     ca_t e, t;
-    ca_ptr * a;
     slong i, j, k, m, n, r, row, col;
     truth_t result;
 
@@ -31,8 +30,6 @@ ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_c
     n = arb_mat_ncols(A);
 
     ca_mat_set(LU, A, ctx);
-
-    a = LU->rows;
 
     row = col = 0;
     for (i = 0; i < m; i++)

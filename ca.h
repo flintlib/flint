@@ -294,6 +294,8 @@ void ca_set_si(ca_t x, slong v, ca_ctx_t ctx);
 void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx);
 void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx);
 void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx);
+void ca_set_d(ca_t res, double x, ca_ctx_t ctx);
+void ca_set_d_d(ca_t res, double x, double y, ca_ctx_t ctx);
 
 void ca_i(ca_t x, ca_ctx_t ctx);
 void ca_neg_i(ca_t x, ca_ctx_t ctx);
