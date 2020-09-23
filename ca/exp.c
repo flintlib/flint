@@ -142,7 +142,7 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
         return;
     }
 
-    /* more generally, exp(p/q*pi*i) -> root of unity */
+    /* exp(p/q*pi*i) -> root of unity */
     {
         fmpq_t t;
         fmpq_init(t);
@@ -186,9 +186,89 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
         fmpq_clear(t);
     }
 
+    /* exp((p1/q1)*log(z1) + ... + S) = z1^(p1/q1) * ... * exp(S) */
+    {
+        if (CA_FIELD_IS_GENERIC(CA_FIELD(x, ctx)))
+        {
+            fmpz_mpoly_ctx_struct * mctx;
+            fmpz_mpoly_q_struct * rat;
+            ca_field_ptr K;
+            slong i, j, numer_len, field_len, ok, have_log, log_index;
+            ulong * exp;
+
+            K = CA_FIELD(x, ctx);
+            field_len = CA_FIELD_LENGTH(K);
+            mctx = CA_FIELD_MCTX(K, ctx);
+            rat = CA_MPOLY_Q(x);
+            exp = flint_malloc(field_len * sizeof(ulong));
+
+            /* todo: handle more complex cases (partial fraction decomposition?) */
+            if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(rat), mctx))
+            {
+                numer_len = fmpz_mpoly_length(fmpz_mpoly_q_numref(rat), mctx);
+
+                for (i = 0; i < numer_len; i++)
+                {
+                    if (fmpz_mpoly_term_exp_fits_ui(fmpz_mpoly_q_numref(rat), i, mctx))
+                    {
+                        fmpz_mpoly_get_term_exp_ui(exp, fmpz_mpoly_q_numref(rat), i, mctx);
+
+                        ok = 1;
+                        have_log = 0;
+                        log_index = 0;
+                        for (j = 0; j < field_len; j++)
+                        {
+                            if (exp[j] == 1 && CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, j)) == CA_Log)
+                            {
+                                have_log = 1;
+                                log_index = j;
+                                continue;
+                            }
+
+                            if (exp[j] != 0 && (have_log || exp[j] > 1 || CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, j)) != CA_Log))
+                            {
+                                ok = 0;
+                                break;
+                            }
+                        }
+
+                        if (ok && have_log)
+                        {
+                            ca_t x_deflated, power;
+
+                            ca_init(x_deflated, ctx);
+                            ca_init(power, ctx);
+
+                            _ca_make_field_element(x_deflated, K, ctx);
+                            fmpz_mpoly_get_term(fmpz_mpoly_q_numref(CA_MPOLY_Q(x_deflated)), fmpz_mpoly_q_numref(rat), i, mctx);
+                            fmpz_mpoly_sub(fmpz_mpoly_q_numref(CA_MPOLY_Q(x_deflated)), fmpz_mpoly_q_numref(rat), fmpz_mpoly_q_numref(CA_MPOLY_Q(x_deflated)), mctx);
+                            fmpz_mpoly_set(fmpz_mpoly_q_denref(CA_MPOLY_Q(x_deflated)), fmpz_mpoly_q_denref(rat), mctx);
+                            fmpz_mpoly_q_canonicalise(CA_MPOLY_Q(x_deflated), mctx);
+
+                            ca_set_fmpz(power, fmpz_mpoly_q_numref(rat)->coeffs + i, ctx);
+                            ca_div_fmpz(power, power, fmpz_mpoly_q_denref(rat)->coeffs, ctx);
+
+                            ca_pow(power, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, log_index)), power, ctx);
+                            ca_exp(x_deflated, x_deflated, ctx);
+                            ca_mul(res, power, x_deflated, ctx);
+
+                            ca_clear(x_deflated, ctx);
+                            ca_clear(power, ctx);
+
+                            flint_free(exp);
+
+                            return;
+                        }
+                    }
+                }
+            }
+
+            flint_free(exp);
+        }
+    }
+
     _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Exp, x), ctx);
     fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
-    /* todo: detect simple values instead of creating extension element in the first place */
     _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
     ca_condense_field(res, ctx);
 }
