@@ -218,17 +218,17 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
                         log_index = 0;
                         for (j = 0; j < field_len; j++)
                         {
+                            if (exp[j] != 0 && (have_log || exp[j] > 1 || CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, j)) != CA_Log))
+                            {
+                                ok = 0;
+                                break;
+                            }
+
                             if (exp[j] == 1 && CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, j)) == CA_Log)
                             {
                                 have_log = 1;
                                 log_index = j;
                                 continue;
-                            }
-
-                            if (exp[j] != 0 && (have_log || exp[j] > 1 || CA_EXT_HEAD(CA_FIELD_EXT_ELEM(K, j)) != CA_Log))
-                            {
-                                ok = 0;
-                                break;
                             }
                         }
 
