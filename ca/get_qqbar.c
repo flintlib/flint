@@ -325,6 +325,10 @@ ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx)
             fmpz_set(fmpq_denref(res), QQBAR_COEFFS(t) + 1);
             success = 1;
         }
+        else
+        {
+            success = 0;
+        }
         qqbar_clear(t);
         return success;
     }
@@ -392,6 +396,10 @@ ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
         {
             fmpz_neg(res, QQBAR_COEFFS(t));
             success = 1;
+        }
+        else
+        {
+            success = 0;
         }
         qqbar_clear(t);
         return success;

@@ -307,13 +307,8 @@ printed in various styles::
 
     Prints an *n*-digit numerical representation of *x* to standard output.
 
-
-Assignment and specific values
+Special values
 -------------------------------------------------------------------------------
-
-.. function:: void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
-
-    Sets *res* to a copy of *x*.
 
 .. function:: void ca_zero(ca_t res, ca_ctx_t ctx)
               void ca_one(ca_t res, ca_ctx_t ctx)
@@ -321,21 +316,6 @@ Assignment and specific values
 
     Sets *res* to the integer 0, 1 or -1. This creates a canonical representation
     of this number as an element of the trivial field `\mathbb{Q}`.
-
-.. function:: void ca_set_si(ca_t res, slong v, ca_ctx_t ctx)
-              void ca_set_ui(ca_t res, ulong v, ca_ctx_t ctx)
-              void ca_set_fmpz(ca_t res, const fmpz_t v, ca_ctx_t ctx)
-              void ca_set_fmpq(ca_t res, const fmpq_t v, ca_ctx_t ctx)
-
-    Sets *res* to the integer or rational number *v*. This creates a canonical
-    representation of this number as an element of the trivial field
-    `\mathbb{Q}`.
-
-.. function:: void ca_set_d(ca_t res, double x, ca_ctx_t ctx)
-              void ca_set_d_d(ca_t res, double x, double y, ca_ctx_t ctx)
-
-    Sets *res* to the value of *x*, or the complex value `x + yi`.
-    NaN is interpreted as *Unknown* (not *Undefined*).
 
 .. function:: void ca_i(ca_t res, ca_ctx_t ctx)
               void ca_neg_i(ca_t res, ca_ctx_t ctx)
@@ -379,6 +359,29 @@ Assignment and specific values
               void ca_neg_i_inf(ca_t res, ca_ctx_t ctx)
 
     Sets *res* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
+
+Assignment and conversion
+-------------------------------------------------------------------------------
+
+.. function:: void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to a copy of *x*.
+
+
+.. function:: void ca_set_si(ca_t res, slong v, ca_ctx_t ctx)
+              void ca_set_ui(ca_t res, ulong v, ca_ctx_t ctx)
+              void ca_set_fmpz(ca_t res, const fmpz_t v, ca_ctx_t ctx)
+              void ca_set_fmpq(ca_t res, const fmpq_t v, ca_ctx_t ctx)
+
+    Sets *res* to the integer or rational number *v*. This creates a canonical
+    representation of this number as an element of the trivial field
+    `\mathbb{Q}`.
+
+.. function:: void ca_set_d(ca_t res, double x, ca_ctx_t ctx)
+              void ca_set_d_d(ca_t res, double x, double y, ca_ctx_t ctx)
+
+    Sets *res* to the value of *x*, or the complex value `x + yi`.
+    NaN is interpreted as *Unknown* (not *Undefined*).
 
 Conversion of algebraic numbers
 -------------------------------------------------------------------------------
@@ -933,6 +936,10 @@ Elementary functions
 
 Special functions
 -------------------------------------------------------------------------------
+
+.. function:: void ca_gamma(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the gamma function of *x*.
 
 .. function:: void ca_erf(ca_t res, const ca_t x, ca_ctx_t ctx)
 

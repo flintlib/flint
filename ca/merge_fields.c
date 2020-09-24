@@ -70,7 +70,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
     xfield = CA_FIELD(x, ctx);
     yfield = CA_FIELD(y, ctx);
 
-    if (xfield == yfield)
+    if (xfield == yfield || CA_FIELD_IS_QQ(xfield) || CA_FIELD_IS_QQ(yfield))
     {
         ca_set(resx, x, ctx);
         ca_set(resy, y, ctx);

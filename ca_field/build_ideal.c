@@ -993,4 +993,5 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     ca_field_build_ideal_logs(K, ctx);
     ca_field_build_ideal_multiplicative(K, ctx);
     ca_field_build_ideal_erf(K, ctx);
+    ca_field_build_ideal_gamma(K, ctx);
 }

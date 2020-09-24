@@ -475,6 +475,8 @@ void ca_erf(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_erfc(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_erfi(ca_t res, const ca_t x, ca_ctx_t ctx);
 
+void ca_gamma(ca_t res, const ca_t x, ca_ctx_t ctx);
+
 /* Numerical evaluation */
 
 void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);

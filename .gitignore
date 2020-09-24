@@ -8,3 +8,4 @@ doc/build/*
 *.deps/
 *.libs/
 *.dirstamp
+*__pycache__*

@@ -390,6 +390,12 @@ class ca:
         libcalcium.ca_erfi(res, self, self._ctx)
         return res
 
+    def gamma(self):
+        res = ca()
+        libcalcium.ca_gamma(res, self, self._ctx)
+        return res
+
+
 def re(x):
     return ca(x).re()
 
@@ -432,6 +438,12 @@ def erfc(x):
 def erfi(x):
     return ca(x).erfi()
 
+def gamma(x):
+    return ca(x).gamma()
+
+def fac(x):
+    return (ca(x)+1).gamma()
+
 def cos(x):
     ix = ca(x)*i
     y = exp(ix)
@@ -464,6 +476,7 @@ def tanh(x):
 #    def __del__(self):
 #        libflint.flint_free(self)
 
+libcalcium.ca_set_si.argtypes = ca, ctypes.c_long, ca_ctx
 libcalcium.ca_set_d.argtypes = ca, ctypes.c_double, ca_ctx
 libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 
@@ -488,6 +501,7 @@ def test_power_identities():
 
 def test_log():
     assert log(1+pi) - log(pi) - log(1+1/pi) == 0
+    assert log(log(-log(log(exp(exp(-exp(exp(3)))))))) == 3
 
 def test_exp():
     assert exp(pi*i) + 1 == 0
@@ -506,6 +520,31 @@ def test_gudermannian():
     assert sin(gd(1)) == tanh(1)
     assert tan(gd(1)) == sinh(1)
     assert sin(gd(sqrt(2))) == tanh(sqrt(2))
+
+def test_gamma():
+    assert gamma(1) == 1
+    assert gamma(0.5) == sqrt(pi)
+    assert 1/gamma(0) == 0
+    assert gamma(sqrt(2)*sqrt(3)) == gamma(sqrt(6))
+    #assert gamma(pi+1)/gamma(pi) == pi
+    assert gamma(pi)/gamma(pi-1) == pi-1
+
+
+def test_xfail():
+    # Test some simplifications that are known not to work yet.
+    # When a case starts working, we will get a test failure so we can
+    # catch it and add it to the working tests
+    def gd(x):
+        return 2*atan(exp(x))-pi/2
+
+    def expect_error(f):
+        try:
+            f()
+        except ValueError:
+            return
+        raise AssertionError
+
+    expect_error(lambda: tan(gd(1)/2) - tanh(ca(1)/2) == 0)
 
 if __name__ == "__main__":
     from time import time
