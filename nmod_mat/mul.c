@@ -27,6 +27,12 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     k = A->c;
     n = B->c;
 
+    /*
+        Tuning this needs a bit of work: Currently with k = m = n = 1024 and
+        flint_num_threads = 8 and 64 bit mod.n, nmod_mat_mul_classical_threaded
+        beats nmod_mat_mul_blas (but not by much).
+    */
+
 #if FLINT_USES_BLAS
     if (FLINT_BITS == 64 && k > 30 && m > 30 && n > 30)
     {
