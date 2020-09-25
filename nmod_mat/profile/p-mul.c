@@ -72,7 +72,7 @@ int main(void)
 
     params.modulus = 40000;
 
-    for (dim = 2; dim <= 512/1000; dim = (slong) ((double) dim * 1.1) + 1)
+    for (dim = 2; dim <= 512; dim = (slong) ((double) dim * 1.1) + 1)
     {
         params.dim = dim;
 

@@ -88,7 +88,7 @@ main(void)
 
         if (!nmod_mat_mul_blas(C, A, B))
         {
-#if FLINT_USES_BLAS
+#if FLINT_USES_BLAS && FLINT_BITS == 64
             flint_printf("FAIL: blas should have worked\n");
             flint_abort();
 #endif
