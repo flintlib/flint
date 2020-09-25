@@ -158,7 +158,6 @@ static int _nmod_mat_mul_blas_sp(nmod_mat_t C,
     nmod_t ctx = C->mod;
     slong num_workers;
     thread_pool_handle * handles;
-    int prev_blas_num_threads = openblas_get_num_threads();
     void * tmp;
 
     dA = flint_malloc(m*k*sizeof(float));
@@ -197,12 +196,8 @@ static int _nmod_mat_mul_blas_sp(nmod_mat_t C,
             thread_pool_wait(global_thread_pool, handles[i]);
     }
 
-    openblas_set_num_threads(num_workers + 1);
-
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
                                                 1.0, dA, k, dB, n, 0.0, dC, n);
-
-    openblas_set_num_threads(prev_blas_num_threads);
 
     /* convert output */
 
@@ -407,7 +402,6 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C,
     void * tmp;
     slong num_workers;
     thread_pool_handle * handles;
-    int prev_blas_num_threads = openblas_get_num_threads();
 
     fmpz_init_set_ui(maxentry, k);
     fmpz_mul_ui(maxentry, maxentry, ctx.n - 1);
@@ -449,7 +443,6 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C,
     dC = flint_calloc(crtnum*m*n, sizeof(double));
 
     num_workers = flint_request_threads(&handles, INT_MAX);
-    openblas_set_num_threads(num_workers + 1);
 
     tmp = flint_malloc((num_workers + 1)*FLINT_MAX(
                                        sizeof(_lift_crt_worker_arg_struct),
@@ -484,8 +477,6 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C,
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
                                        1.0, dA, k, dB, n, 0.0, dC + pi*m*n, n);
     }
-
-    openblas_set_num_threads(prev_blas_num_threads);
 
     {
         _reduce_crt_worker_arg_struct * args = (_reduce_crt_worker_arg_struct *) tmp;
@@ -613,7 +604,6 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     double * dC, * dA, * dB;
     ulong hi, lo, shift;
     nmod_t ctx = C->mod;
-    int prev_blas_num_threads;
     slong num_workers;
     thread_pool_handle * handles;
     void * tmp;
@@ -636,8 +626,6 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     if (lo < MAX_BLAS_SP_INT)
         return _nmod_mat_mul_blas_sp(C, A, B);
-
-    prev_blas_num_threads = openblas_get_num_threads();
 
     dA = flint_malloc(m*k*sizeof(double));
     dB = flint_malloc(k*n*sizeof(double));
@@ -675,12 +663,8 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             thread_pool_wait(global_thread_pool, handles[i]);
     }
 
-    openblas_set_num_threads(num_workers + 1);
-
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
                                                 1.0, dA, k, dB, n, 0.0, dC, n);
-
-    openblas_set_num_threads(prev_blas_num_threads);
 
     /* convert output */
 
