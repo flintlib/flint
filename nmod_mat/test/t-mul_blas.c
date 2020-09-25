@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -88,7 +88,7 @@ main(void)
 
         if (!nmod_mat_mul_blas(C, A, B))
         {
-#if HAVE_BLAS
+#if FLINT_USES_BLAS
             flint_printf("FAIL: blas should have worked\n");
             flint_abort();
 #endif

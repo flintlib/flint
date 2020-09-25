@@ -27,15 +27,12 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     k = A->c;
     n = B->c;
 
-
-#if HAVE_BLAS
-
-    if (FLINT_BITS == 64 && k > 20 && m > 20 && n > 20)
+#if FLINT_USES_BLAS
+    if (FLINT_BITS == 64 && k > 30 && m > 30 && n > 30)
     {
         if (nmod_mat_mul_blas(C, A, B))
             return;
     }
-
 #endif
 
     if (C == A || C == B)
@@ -54,7 +51,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         cutoff = 200;
 
     if (flint_get_num_threads() > 1)
-	nmod_mat_mul_classical_threaded(C, A, B);
+	    nmod_mat_mul_classical_threaded(C, A, B);
     else if (m < cutoff || n < cutoff || k < cutoff)
         nmod_mat_mul_classical(C, A, B);
     else

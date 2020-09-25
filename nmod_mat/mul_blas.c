@@ -10,7 +10,7 @@
 #include "nmod_mat.h"
 #include "thread_support.h"
 
-#if HAVE_BLAS && FLINT_BITS == 64
+#if FLINT_USES_BLAS && FLINT_BITS == 64
 
 #include "cblas.h"
 

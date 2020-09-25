@@ -92,7 +92,7 @@ int main(void)
 
     for (i = 7; i < FLINT_BITS; i += 4)
     {
-        k = m = n = 2*1024;
+        k = m = n = 1*1024;
         nmod_mat_init(A, m, k, 2*(UWORD(1) << i) - 1);
         nmod_mat_init(B, k, n, 2*(UWORD(1) << i) - 1);
         nmod_mat_init(C, m, n, 2*(UWORD(1) << i) - 1);
