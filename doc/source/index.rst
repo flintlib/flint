@@ -87,6 +87,7 @@ use in appropriate external applications is encouraged.
 
    fmpz_mpoly_q.rst
    qqbar.rst
+   utils_flint.rst
 
 
 Credits and references
