@@ -1138,6 +1138,29 @@ Superficial options (printing) can be changed at any time.
     in multivariate and transcendental fields: in number fields,
     ``CA_OPT_PREC_LIMIT`` applies instead. Default value: 20.
 
+.. macro:: CA_OPT_USE_GROEBNER
+
+    Boolean flag for whether to use Gröbner basis computation.
+    This flag and the following limits affect the ability to
+    prove multivariate identities.
+    Default value: 1.
+
+.. macro:: CA_OPT_GROEBNER_LENGTH_LIMIT
+
+    Maximum length of ideal basis allowed in Buchberger's algorithm.
+    Default value: 100.
+
+.. macro:: CA_OPT_GROEBNER_POLY_LENGTH_LIMIT
+
+    Maximum length of polynomials allowed in Buchberger's algorithm.
+    Default value: 1000.
+
+.. macro:: CA_OPT_GROEBNER_POLY_BITS_LIMIT
+
+    Maximum coefficient size in bits of polynomials allowed in
+    Buchberger's algorithm.
+    Default value: 10000.
+
 
 Internal representation
 -------------------------------------------------------------------------------

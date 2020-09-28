@@ -142,6 +142,17 @@ Ideals and Gröbner bases
     Sets *G* to a Gröbner basis for *F*, computed using
     a naive implementation of Buchberger's algorithm.
 
+.. function:: int fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, const fmpz_mpoly_ctx_t ctx)
+
+    As :func:`fmpz_mpoly_buchberger_naive`, but halts if during the
+    execution of Buchberger's algorithm the length of the
+    ideal basis set exceeds *ideal_len_limit*, the length of any
+    polynomial exceeds *poly_bits_limit*, or the size of the
+    coefficients of any polynomial exceeds *poly_bits_limit*.
+    Returns 1 for success and 0 for failure. On failure, *G* is
+    a valid basis for *F* but it might not be a Gröbner basis.
+
+
 .. raw:: latex
 
     \newpage

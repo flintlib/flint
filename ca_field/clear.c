@@ -14,7 +14,7 @@
 void
 ca_field_clear(ca_field_t K, ca_ctx_t ctx)
 {
-    slong i, length, ideal_length;
+    slong length;
 
     length = CA_FIELD_LENGTH(K);
 
@@ -26,14 +26,6 @@ ca_field_clear(ca_field_t K, ca_ctx_t ctx)
     if (CA_FIELD_IS_NF(K))
         return;
 
-    ideal_length = CA_FIELD_IDEAL_LENGTH(K);
-
-    if (ideal_length > 0)
-    {
-        for (i = 0; i < ideal_length; i++)
-            fmpz_mpoly_clear(CA_FIELD_IDEAL_ELEM(K, i), CA_FIELD_MCTX(K, ctx));
-
-        flint_free(CA_FIELD_IDEAL(K));
-    }
+    fmpz_mpoly_vec_clear(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
 }
 

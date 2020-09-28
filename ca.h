@@ -25,6 +25,7 @@
 #include "calcium.h"
 #include "qqbar.h"
 #include "fmpz_mpoly_q.h"
+#include "utils_flint.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -156,8 +157,7 @@ typedef struct
 {
     slong length;                /* Number of generators              */
     ca_ext_struct ** ext;        /* Generators                        */
-    fmpz_mpoly_struct * ideal;   /* Algebraic relations for reduction */
-    slong ideal_length;          /* Number of relations for reduction */
+    fmpz_mpoly_vec_struct ideal; /* Algebraic relations for reduction */
     ulong hash;
 }
 ca_field_struct;
@@ -172,15 +172,17 @@ typedef const ca_field_struct * ca_field_srcptr;
 #define CA_FIELD_HASH(K) ((K)->hash)
 
 #define CA_FIELD_IS_QQ(K) ((K)->length == 0)
-#define CA_FIELD_IS_NF(K) ((K)->ideal_length == -1)
+#define CA_FIELD_IS_NF(K) ((K)->ideal.length == -1)
 #define CA_FIELD_IS_GENERIC(K) (!CA_FIELD_IS_QQ(K) && !CA_FIELD_IS_NF(K))
 
 #define CA_FIELD_NF(K) (((K)->ext[0]->data.qqbar.nf))
 #define CA_FIELD_NF_QQBAR(K) (&((K)->ext[0]->data.qqbar.x))
 
-#define CA_FIELD_IDEAL(K) ((K)->ideal)
-#define CA_FIELD_IDEAL_ELEM(K, i) (((K)->ideal) + (i))
-#define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal_length)
+#define CA_FIELD_IDEAL(K) (&((K)->ideal))
+#define CA_FIELD_IDEAL_ELEM(K, i) fmpz_mpoly_vec_entry(CA_FIELD_IDEAL(K), i)
+#define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal.length)
+#define CA_FIELD_IDEAL_ALLOC(K) ((K)->ideal.alloc)
+#define CA_FIELD_IDEAL_P(K) ((K)->ideal.p)
 
 #define CA_MCTX_1(ctx) ((ctx)->mctx[0])
 #define CA_FIELD_MCTX(K, ctx) ((ctx)->mctx[CA_FIELD_LENGTH(K) - 1])
@@ -213,6 +215,10 @@ enum
     CA_OPT_SMOOTH_LIMIT,
     CA_OPT_LLL_PREC,
     CA_OPT_POW_LIMIT,
+    CA_OPT_USE_GROEBNER,
+    CA_OPT_GROEBNER_LENGTH_LIMIT,
+    CA_OPT_GROEBNER_POLY_LENGTH_LIMIT,
+    CA_OPT_GROEBNER_POLY_BITS_LIMIT,
     CA_OPT_NUM_OPTIONS
 };
 

@@ -520,6 +520,7 @@ def test_gudermannian():
     assert sin(gd(1)) == tanh(1)
     assert tan(gd(1)) == sinh(1)
     assert sin(gd(sqrt(2))) == tanh(sqrt(2))
+    assert tan(gd(1)/2) - tanh(ca(1)/2) == 0
 
 def test_gamma():
     assert gamma(1) == 1
@@ -544,7 +545,7 @@ def test_xfail():
             return
         raise AssertionError
 
-    expect_error(lambda: tan(gd(1)/2) - tanh(ca(1)/2) == 0)
+    # expect_error(lambda: tan(gd(1)/2) - tanh(ca(1)/2) == 0)
 
 if __name__ == "__main__":
     from time import time

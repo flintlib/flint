@@ -99,7 +99,7 @@ int main()
         ca_init(xab, ctx);
 
         /* otherwise this will be too slow */
-        ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 60;
+        ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 40;
 
         /* x^a * x^b = x^(a+b) */
 
@@ -149,4 +149,3 @@ int main()
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
-

@@ -182,8 +182,6 @@ void fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t
 void
 _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
 {
-    slong i, len;
-
     if (poly->length == 0)
     {
         flint_printf("ERROR: inserting the zero polynomial into ideal\n");
@@ -193,24 +191,9 @@ _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_c
     if (fmpz_sgn(poly->coeffs) < 0)
         fmpz_mpoly_neg(poly, poly, mctx);
 
-    len = CA_FIELD_IDEAL_LENGTH(K);
-
-    for (i = 0; i < len; i++)
-    {
-        if (fmpz_mpoly_equal(CA_FIELD_IDEAL_ELEM(K, i), poly, mctx))
-        {
-            fmpz_mpoly_clear(poly, mctx);
-            return;
-        }
-    }
-
-    if (len == 0)
-        CA_FIELD_IDEAL(K) = flint_malloc(sizeof(fmpz_mpoly_struct));
-    else
-        CA_FIELD_IDEAL(K) = flint_realloc(CA_FIELD_IDEAL(K), (len + 1) * sizeof(fmpz_mpoly_struct));
-
-    *(CA_FIELD_IDEAL(K) + CA_FIELD_IDEAL_LENGTH(K)) = *poly;
-    CA_FIELD_IDEAL_LENGTH(K)++;
+    /* todo: move!!! */
+    fmpz_mpoly_vec_insert_unique(CA_FIELD_IDEAL(K), poly, mctx);
+    fmpz_mpoly_clear(poly, mctx);
 }
 
 int ext_as_pow_pq(slong *p, slong *q, const ca_ext_t x, ca_ctx_t ctx)
@@ -994,4 +977,43 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     ca_field_build_ideal_multiplicative(K, ctx);
     ca_field_build_ideal_erf(K, ctx);
     ca_field_build_ideal_gamma(K, ctx);
+
+    if (ctx->options[CA_OPT_USE_GROEBNER])
+    {
+        slong i;
+        int want_groebner;
+
+        want_groebner = 1;
+        for (i = 0; i < CA_FIELD_IDEAL_LENGTH(K); i++)
+        {
+            if (fmpz_mpoly_total_degree_si(CA_FIELD_IDEAL_ELEM(K, i), CA_FIELD_MCTX(K, ctx)) > ctx->options[CA_OPT_QQBAR_DEG_LIMIT])
+            {
+                want_groebner = 0;
+                break;
+            }
+        }
+
+        if (want_groebner)
+        {
+            if (ctx->options[CA_OPT_VERBOSE])
+            {
+                flint_printf("F = "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n");
+            }
+
+            if (!fmpz_mpoly_buchberger_naive_with_limits(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K),
+                ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT],
+                ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT],
+                ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT],
+                CA_FIELD_MCTX(K, ctx)))
+            {
+                if (ctx->options[CA_OPT_VERBOSE])
+                    flint_printf("INFO: Failed to compute a Groebner basis\n"); 
+            }
+
+            if (ctx->options[CA_OPT_VERBOSE])
+            {
+                flint_printf("G = "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n");
+            }
+        }
+    }
 }

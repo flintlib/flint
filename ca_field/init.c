@@ -18,8 +18,9 @@ ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
 {
     CA_FIELD_LENGTH(K) = 0;
     CA_FIELD_EXT(K) = NULL;
-    CA_FIELD_IDEAL(K) = NULL;
+    CA_FIELD_IDEAL_P(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
+    CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = 0;
 }
 
@@ -37,8 +38,9 @@ ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx)
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
     CA_FIELD_EXT_ELEM(K, 0) = ext;
-    CA_FIELD_IDEAL(K) = NULL;
+    CA_FIELD_IDEAL_P(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = -1;
+    CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
 }
 
@@ -56,8 +58,9 @@ ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
     CA_FIELD_EXT_ELEM(K, 0) = ext;
-    CA_FIELD_IDEAL(K) = NULL;
+    CA_FIELD_IDEAL_P(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
+    CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
 }
 
@@ -74,8 +77,9 @@ void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
     CA_FIELD_EXT_ELEM(K, 0) = ext;
-    CA_FIELD_IDEAL(K) = NULL;
+    CA_FIELD_IDEAL_P(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
+    CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
 }
 
@@ -92,8 +96,9 @@ void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const
     CA_FIELD_LENGTH(K) = 1;
     CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
     CA_FIELD_EXT_ELEM(K, 0) = ext;
-    CA_FIELD_IDEAL(K) = NULL;
+    CA_FIELD_IDEAL_P(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
+    CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
 }
 
@@ -102,8 +107,9 @@ ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
 {
     CA_FIELD_LENGTH(K) = len;
     CA_FIELD_EXT(K) = flint_malloc(len * sizeof(ca_ext_ptr));
-    CA_FIELD_IDEAL(K) = NULL;
+    CA_FIELD_IDEAL_P(K) = NULL;
     CA_FIELD_IDEAL_LENGTH(K) = 0;
+    CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = 0;
 
     while (ctx->mctx_len < len)

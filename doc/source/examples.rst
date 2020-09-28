@@ -247,22 +247,22 @@ may pass the ``-ca`` flag. This currently takes much longer::
 
     > build/examples/huge_expr -ca
     Evaluating N...
-    cpu/wall(s): 0.212 0.212
+    cpu/wall(s): 0.178 0.178
     Evaluating M...
-    cpu/wall(s): 0.028 0.028
+    cpu/wall(s): 0.027 0.027
     Evaluating E = -(1-|M|^2)^2...
-    cpu/wall(s): 0.017 0.016
+    cpu/wall(s): 0.011 0.011
     N ~ -0.16190853053311203695842869991458578203473645660641
     E ~ -0.16190853053311203695842869991458578203473645660641
     Testing E = N...
-    cpu/wall(s): 460.911 460.962
+    cpu/wall(s): 104.387 104.395
 
     Equal = T_TRUE
 
-    Total: cpu/wall(s): 461.169 461.221
-    virt/peak/res/peak(MB): 48.07 62.36 21.82 36.16
+    Total: cpu/wall(s): 104.604 104.613
+    virt/peak/res/peak(MB): 51.26 63.32 24.69 36.81
 
-This should be possible to improve significantly;
+This should be possible to improve;
 we keep this program as a benchmark for future optimizations
 to the :type:`ca_t` type.
 

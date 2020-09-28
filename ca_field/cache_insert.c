@@ -57,8 +57,9 @@ ca_field_init_set_ext(ca_field_t K, ca_ext_struct ** ext, slong len, ca_ctx_t ct
         CA_FIELD_LENGTH(K) = 1;
         CA_FIELD_EXT(K) = flint_malloc(sizeof(ca_ext_ptr));
         CA_FIELD_EXT_ELEM(K, 0) = ext[0];
-        CA_FIELD_IDEAL(K) = NULL;
+        CA_FIELD_IDEAL_P(K) = NULL;
         CA_FIELD_IDEAL_LENGTH(K) = -1;
+        CA_FIELD_IDEAL_ALLOC(K) = 0;
         CA_FIELD_HASH(K) = CA_EXT_HASH(ext[0]);
     }
     else

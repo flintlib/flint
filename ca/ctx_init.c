@@ -54,5 +54,9 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->options[CA_OPT_SMOOTH_LIMIT] = 32;
     ctx->options[CA_OPT_LLL_PREC] = 128;
     ctx->options[CA_OPT_POW_LIMIT] = 20;
+    ctx->options[CA_OPT_USE_GROEBNER] = 1;
+    ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT] = 100;
+    ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT] = 1000;
+    ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT] = 10000;
     ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEFAULT;
 }
