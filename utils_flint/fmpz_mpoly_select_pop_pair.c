@@ -23,61 +23,76 @@ fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const fmpz_m
 
     if (len > 1)
     {
-        slong i, j;
+        slong i, j, a, b;
+        ulong * exp;
         ulong * tmp;
         ulong * lcm;
         ulong * best_lcm;
+        ulong l, total;
         int best;
 
+        exp = flint_malloc(sizeof(ulong) * G->length * nvars);
         lcm = flint_malloc(sizeof(ulong) * (nvars + 1));
         tmp = flint_malloc(sizeof(ulong) * (nvars + 1));
         best_lcm = flint_malloc(sizeof(ulong) * (nvars + 1));
 
+        for (i = 0; i <= nvars; i++)
+            best_lcm[i] = UWORD_MAX;
+
+        for (i = 0; i < G->length; i++)
+            fmpz_mpoly_get_term_exp_ui(exp + i * nvars, G->p + i, 0, ctx);
+
         for (i = 0; i < len; i++)
         {
-            fmpz_mpoly_get_term_exp_ui(lcm, G->p + pairs->pairs[i].a, 0, ctx);
-            fmpz_mpoly_get_term_exp_ui(tmp, G->p + pairs->pairs[i].b, 0, ctx);
+            a = pairs->pairs[i].a;
+            b = pairs->pairs[i].b;
+            total = 0;
+            best = 1;
 
-            lcm[nvars] = 0;
-
-            for (j = 0; j < nvars; j++)
+            if (ctx->minfo->ord == ORD_LEX)
             {
-                lcm[j] = FLINT_MAX(lcm[j], tmp[j]);
-                lcm[nvars] += lcm[j];  /* total degree */
+                for (j = 0; j < nvars; j++)
+                {
+                    l = FLINT_MAX(exp[a * nvars + j], exp[b * nvars + j]);
+
+                    if (l > best_lcm[j])
+                    {
+                        best = 0;
+                        break;
+                    }
+
+                    lcm[j] = l;
+                    total += l;  /* total degree */
+                }
+            }
+            else  /* todo: correct order */
+            {
+                for (j = 0; j < nvars; j++)
+                {
+                    l = FLINT_MAX(exp[a * nvars + j], exp[b * nvars + j]);
+                    total += l;  /* total degree */
+
+                    if (total >= best_lcm[j])
+                    {
+                        best = 0;
+                        break;
+                    }
+
+                    lcm[j] = l;
+                }
             }
 
-            if (i == 0)
+            if (best)
             {
-                for (j = 0; j < nvars + 1; j++)
+                for (j = 0; j < nvars; j++)
                     best_lcm[j] = lcm[j];
-            }
-            else
-            {
-                /* todo: support all orderings */
-                best = 1;
 
-                if (ctx->minfo->ord == ORD_LEX)
-                {
-                    for (j = 0; j < nvars && best; j++)
-                        if (lcm[j] > best_lcm[j])
-                            best = 0;
-                }
-                else
-                {
-                    for (j = 0; j < nvars + 1 && best; j++)
-                        if (lcm[j] > best_lcm[j])
-                            best = 0;
-                }
-
-                if (best)
-                {
-                    for (j = 0; j < nvars + 1; j++)
-                        best_lcm[j] = lcm[j];
-                    choice = i;
-                }
+                best_lcm[nvars] = total;
+                choice = i;
             }
         }
 
+        flint_free(exp);
         flint_free(tmp);
         flint_free(lcm);
         flint_free(best_lcm);
