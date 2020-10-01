@@ -75,8 +75,8 @@ General methods for multivariate polynomials
 Ideals and Gröbner bases
 -------------------------------------------------------------------------------
 
-The following methods deal with ideals over `\mathbb{Q}[X_1,\ldots,X_n]`,
-in which we use primitive integer polynomials
+The following methods deal with ideals in `\mathbb{Q}[X_1,\ldots,X_n]`.
+We use primitive integer polynomials as normalised generators
 in place of monic rational polynomials.
 
 .. function:: void fmpz_mpoly_spoly(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx)
@@ -92,7 +92,7 @@ in place of monic rational polynomials.
 .. function:: int fmpz_mpoly_vec_is_groebner(const fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
 
     If *F* is *NULL*, checks if *G* is a Gröbner basis. If *F* is not *NULL*,
-    checks if *G* is a Gröbner basis for *I*.
+    checks if *G* is a Gröbner basis for *F*.
 
 .. function:: int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
 
