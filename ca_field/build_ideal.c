@@ -1000,11 +1000,15 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 flint_printf("F = "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n");
             }
 
-            if (!fmpz_mpoly_buchberger_naive_with_limits(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K),
+            if (fmpz_mpoly_buchberger_naive_with_limits(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K),
                 ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT],
                 ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT],
                 ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT],
                 CA_FIELD_MCTX(K, ctx)))
+            {
+                fmpz_mpoly_groebner_to_reduced(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
+            }
+            else
             {
                 if (ctx->options[CA_OPT_VERBOSE])
                     flint_printf("INFO: Failed to compute a Groebner basis\n"); 

@@ -146,25 +146,7 @@ fmpz_mpoly_vec_insert_unique(fmpz_mpoly_vec_t vec, const fmpz_mpoly_t f, const f
     return vec->length - 1;
 }
 
-UTILS_FLINT_INLINE void
-fmpz_mpoly_vec_set_length(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i;
-
-    if (len > vec->length)
-    {
-        fmpz_mpoly_vec_fit_length(vec, len, ctx);
-        for (i = vec->length; i < len; i++)
-            fmpz_mpoly_zero(vec->p + i, ctx);
-    }
-    else if (len < vec->length)
-    {
-        for (i = len; i < vec->length; i++)
-           fmpz_mpoly_zero(vec->p + i, ctx); 
-    }
-
-    vec->length = len;
-}
+void fmpz_mpoly_vec_set_length(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx);
 
 UTILS_FLINT_INLINE void
 fmpz_mpoly_vec_randtest_not_zero(fmpz_mpoly_vec_t vec, flint_rand_t state, slong len, slong poly_len, slong bits, ulong exp_bound, fmpz_mpoly_ctx_t ctx)
@@ -262,6 +244,9 @@ pair_t fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const
 void fmpz_mpoly_buchberger_naive(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
 int fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F,
     slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_groebner_to_reduced(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t Gin, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

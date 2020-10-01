@@ -25,7 +25,7 @@ int main()
     for (iter = 0; iter < 10000 * calcium_test_multiplier(); iter++)
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_vec_t F, G;
+        fmpz_mpoly_vec_t F, G, H;
         slong nvars;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
@@ -33,6 +33,7 @@ int main()
 
         fmpz_mpoly_vec_init(F, ctx);
         fmpz_mpoly_vec_init(G, ctx);
+        fmpz_mpoly_vec_init(H, ctx);
 
         /*
         flint_printf("iter %ld   %ld  %d\n\n", iter, nvars, ctx->minfo->ord);
@@ -61,8 +62,21 @@ int main()
             flint_abort();
         }
 
+        fmpz_mpoly_groebner_to_reduced(H, G, ctx);
+
+        if (!fmpz_mpoly_vec_is_groebner(H, F, ctx) || !fmpz_mpoly_vec_is_autoreduced(H, ctx))
+        {
+            flint_printf("FAIL (reduced GB)\n\n");
+            mpoly_ordering_print(ctx->minfo->ord); printf("\n");
+            flint_printf("F = "); fmpz_mpoly_vec_print(F, ctx); flint_printf("\n");
+            flint_printf("G = "); fmpz_mpoly_vec_print(G, ctx); flint_printf("\n");
+            flint_printf("H = "); fmpz_mpoly_vec_print(H, ctx); flint_printf("\n");
+            flint_abort();
+        }
+
         fmpz_mpoly_vec_clear(F, ctx);
         fmpz_mpoly_vec_clear(G, ctx);
+        fmpz_mpoly_vec_clear(H, ctx);
 
         fmpz_mpoly_ctx_clear(ctx);
     }

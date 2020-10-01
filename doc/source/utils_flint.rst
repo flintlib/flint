@@ -3,20 +3,14 @@
 **utils_flint.h** -- extra methods for Flint types
 ===============================================================================
 
-Multivariate polynomials
+General methods for multivariate polynomials
 -------------------------------------------------------------------------------
-
-General methods
-........................................................................
 
 .. function:: void fmpz_mpoly_primitive_part(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_ctx_t ctx)
 
     Sets *res* to the primitive part of *f*, obtained by dividing
     out the content of all coefficients and normalizing the leading
     coefficient to be positive. The zero polynomial is unchanged.
-
-Vectors of multivariate polynomials
-........................................................................
 
 .. type:: fmpz_mpoly_vec_struct
 
@@ -78,8 +72,60 @@ Vectors of multivariate polynomials
     to their primitive parts, without duplication. The zero polynomial
     is skipped if present. The output order is arbitrary.
 
+Ideals and Gröbner bases
+-------------------------------------------------------------------------------
+
+The following methods deal with ideals over `\mathbb{Q}[X_1,\ldots,X_n]`,
+in which we use primitive integer polynomials
+in place of monic rational polynomials.
+
+.. function:: void fmpz_mpoly_spoly(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to the *S*-polynomial of *f* and *g*, scaled to
+    an integer polynomial by computing the LCM of the leading coefficients.
+
+.. function:: void fmpz_mpoly_reduction_primitive_part(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to the primitive part of the reduction (remainder of multivariate
+    quasidivision with remainder) with respect to the polynomials *vec*.
+
+.. function:: int fmpz_mpoly_vec_is_groebner(const fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
+
+    If *F* is *NULL*, checks if *G* is a Gröbner basis. If *F* is not *NULL*,
+    checks if *G* is a Gröbner basis for *I*.
+
+.. function:: int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
+
+    Checks whether the set *F* is autoreduced (or inter-reduced).
+
+.. function:: void fmpz_mpoly_groebner_to_reduced(fmpz_mpoly_vec_t H, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx);
+
+    Given a Gröbner basis *G*, sets *H* to the reduced Gröbner basis
+    of the same ideal, which is unique up to the ordering of the polynomials.
+
+.. function:: pair_t fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx)
+
+    Given a vector *pairs* of indices `(i, j)` into *G*, selects one pair
+    for elimination in Buchberger's algorithm. The pair is removed
+    from *pairs* and returned.
+
+.. function:: void fmpz_mpoly_buchberger_naive(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *G* to a Gröbner basis for *F*, computed using
+    a naive implementation of Buchberger's algorithm.
+
+.. function:: int fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, const fmpz_mpoly_ctx_t ctx)
+
+    As :func:`fmpz_mpoly_buchberger_naive`, but halts if during the
+    execution of Buchberger's algorithm the length of the
+    ideal basis set exceeds *ideal_len_limit*, the length of any
+    polynomial exceeds *poly_len_limit*, or the size of the
+    coefficients of any polynomial exceeds *poly_bits_limit*.
+    Returns 1 for success and 0 for failure. On failure, *G* is
+    a valid basis for *F* but it might not be a Gröbner basis.
+
 Index pairs
-........................................................................
+-------------------------------------------------------------------------------
 
 .. type:: pair_t
 
@@ -112,46 +158,6 @@ Index pairs
     Inserts `(i, j)` without duplication into *vec*. If this pair
     already exists, *vec* is unchanged. If this pair does not exist
     in *vec*, it is appended.
-
-Ideals and Gröbner bases
-........................................................................
-
-.. function:: void fmpz_mpoly_spoly(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx)
-
-    Sets *res* to the *S*-polynomial of *f* and *g*, scaled to
-    an integer polynomial by computing the LCM of the leading coefficients.
-
-.. function:: void fmpz_mpoly_reduction_primitive_part(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
-
-    Sets *res* to the primitive part of the reduction (remainder of multivariate
-    quasidivision with remainder) with respect to the polynomials *vec*.
-
-.. function:: int fmpz_mpoly_vec_is_groebner(const fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
-
-    If *F* is *NULL*, checks if *G* is a Gröbner basis. If *F* is not *NULL*,
-    checks if *G* is a Gröbner basis for *I*.
-
-.. function:: pair_t fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx)
-
-    Given a vector *pairs* of indices `(i, j)` into *G*, selects one pair
-    for elimination in Buchberger's algorithm. The pair is removed
-    from *pairs* and returned.
-
-.. function:: void fmpz_mpoly_buchberger_naive(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
-
-    Sets *G* to a Gröbner basis for *F*, computed using
-    a naive implementation of Buchberger's algorithm.
-
-.. function:: int fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, const fmpz_mpoly_ctx_t ctx)
-
-    As :func:`fmpz_mpoly_buchberger_naive`, but halts if during the
-    execution of Buchberger's algorithm the length of the
-    ideal basis set exceeds *ideal_len_limit*, the length of any
-    polynomial exceeds *poly_bits_limit*, or the size of the
-    coefficients of any polynomial exceeds *poly_bits_limit*.
-    Returns 1 for success and 0 for failure. On failure, *G* is
-    a valid basis for *F* but it might not be a Gröbner basis.
-
 
 .. raw:: latex
 
