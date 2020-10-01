@@ -62,7 +62,7 @@ int main()
             flint_abort();
         }
 
-        fmpz_mpoly_groebner_to_reduced(H, G, ctx);
+        fmpz_mpoly_vec_autoreduction_groebner(H, G, ctx);
 
         if (!fmpz_mpoly_vec_is_groebner(H, F, ctx) || !fmpz_mpoly_vec_is_autoreduced(H, ctx))
         {

@@ -96,12 +96,18 @@ in place of monic rational polynomials.
 
 .. function:: int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
 
-    Checks whether the set *F* is autoreduced (or inter-reduced).
+    Checks whether the vector *F* is autoreduced (or inter-reduced).
 
-.. function:: void fmpz_mpoly_groebner_to_reduced(fmpz_mpoly_vec_t H, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx);
+.. function:: void fmpz_mpoly_vec_autoreduction(fmpz_mpoly_vec_t H, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
 
-    Given a Gröbner basis *G*, sets *H* to the reduced Gröbner basis
-    of the same ideal, which is unique up to the ordering of the polynomials.
+    Sets *H* to the autoreduction (inter-reduction) of *F*.
+
+.. function:: void fmpz_mpoly_vec_autoreduction_groebner(fmpz_mpoly_vec_t H, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *H* to the autoreduction (inter-reduction) of *G*.
+    Assumes that *G* is a Gröbner basis.
+    This produces a reduced Gröbner basis, which is unique
+    (up to the sort order of the entries in the vector).
 
 .. function:: pair_t fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx)
 

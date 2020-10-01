@@ -1000,13 +1000,25 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 flint_printf("F = "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n");
             }
 
+            /* Consider autoreduction as a preprocessing step. This is not necessarily a win,
+               because the vector is usually nearly autoreduced by construction. */
+            if (0)
+            {
+                slong before, after;
+                before = CA_FIELD_IDEAL_LENGTH(K);
+                fmpz_mpoly_vec_autoreduction(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
+                after = CA_FIELD_IDEAL_LENGTH(K);
+                if (before > 4)
+                    flint_printf("before, after: %wd %wd\n", before, after);
+            }
+
             if (fmpz_mpoly_buchberger_naive_with_limits(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K),
                 ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT],
                 ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT],
                 ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT],
                 CA_FIELD_MCTX(K, ctx)))
             {
-                fmpz_mpoly_groebner_to_reduced(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
+                fmpz_mpoly_vec_autoreduction_groebner(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
             }
             else
             {
