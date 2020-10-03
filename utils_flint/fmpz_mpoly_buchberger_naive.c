@@ -28,6 +28,30 @@ within_limits(const fmpz_mpoly_t poly, slong poly_len_limit, slong poly_bits_lim
     return 1;
 }
 
+static int
+fmpz_mpoly_disjoint_lt(const fmpz_mpoly_t f, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx)
+{
+    int result;
+    slong i, nvars;
+    ulong * exp1, * exp2;
+
+    nvars = ctx->minfo->nvars;
+    exp1 = flint_malloc(2 * nvars * sizeof(ulong));
+    exp2 = exp1 + nvars;
+
+    fmpz_mpoly_get_term_exp_ui(exp1, f, 0, ctx);
+    fmpz_mpoly_get_term_exp_ui(exp2, g, 0, ctx);
+
+    result = 1;
+    for (i = 0; i < nvars && result; i++)
+        if (exp1[i] && exp2[i])
+            result = 0;
+
+    flint_free(exp1);
+
+    return result;
+}
+
 int
 fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F,
     slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, const fmpz_mpoly_ctx_t ctx)
@@ -55,7 +79,8 @@ fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec
 
     for (i = 0; i < G->length; i++)
         for (j = i + 1; j < G->length; j++)
-            pairs_append(B, i, j);
+            if (!fmpz_mpoly_disjoint_lt(fmpz_mpoly_vec_entry(G, i), fmpz_mpoly_vec_entry(G, j), ctx))
+                pairs_append(B, i, j);
 
     success = 1;
     while (B->length != 0)
@@ -79,7 +104,8 @@ fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec
             fmpz_mpoly_vec_append(G, h, ctx);
 
             for (i = 0; i < index_h; i++)
-                pairs_append(B, i, index_h);
+                if (!fmpz_mpoly_disjoint_lt(fmpz_mpoly_vec_entry(G, i), fmpz_mpoly_vec_entry(G, index_h), ctx))
+                    pairs_append(B, i, index_h);
         }
     }
 
@@ -92,39 +118,5 @@ fmpz_mpoly_buchberger_naive_with_limits(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec
 void
 fmpz_mpoly_buchberger_naive(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
 {
-    pairs_t B;
-    fmpz_mpoly_t h;
-    slong i, j, index_h;
-    pair_t pair;
-
-    fmpz_mpoly_vec_set_primitive_unique(G, F, ctx);
-
-    if (G->length <= 1)
-        return;
-
-    pairs_init(B);
-    fmpz_mpoly_init(h, ctx);
-
-    for (i = 0; i < G->length; i++)
-        for (j = i + 1; j < G->length; j++)
-            pairs_append(B, i, j);
-
-    while (B->length != 0)
-    {
-        pair = fmpz_mpoly_select_pop_pair(B, G, ctx);
-        fmpz_mpoly_spoly(h, fmpz_mpoly_vec_entry(G, pair.a), fmpz_mpoly_vec_entry(G, pair.b), ctx);
-        fmpz_mpoly_reduction_primitive_part(h, h, G, ctx);
-
-        if (!fmpz_mpoly_is_zero(h, ctx))
-        {
-            index_h = G->length;
-            fmpz_mpoly_vec_append(G, h, ctx);
-
-            for (i = 0; i < index_h; i++)
-                pairs_append(B, i, index_h);
-        }
-    }
-
-    fmpz_mpoly_clear(h, ctx);
-    pairs_clear(B);
+    fmpz_mpoly_buchberger_naive_with_limits(G, F, WORD_MAX, WORD_MAX, WORD_MAX, ctx);
 }
