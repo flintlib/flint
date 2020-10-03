@@ -14,6 +14,25 @@
 #include "ca_field.h"
 
 void
+_ca_ctx_init_mctx(ca_ctx_t ctx, slong len)
+{
+    while (ctx->mctx_len < len)
+    {
+        slong i, alloc;
+        alloc = FLINT_MAX(1, 2 * ctx->mctx_len);
+        ctx->mctx = flint_realloc(ctx->mctx, alloc * sizeof(fmpz_mpoly_ctx_struct *));
+
+        for (i = ctx->mctx_len; i < alloc; i++)
+        {
+            ctx->mctx[i] = flint_malloc(sizeof(fmpz_mpoly_ctx_struct));
+            fmpz_mpoly_ctx_init(ctx->mctx[i], i + 1, ctx->options[CA_OPT_MPOLY_ORD]);
+        }
+        ctx->mctx_len = alloc;
+    }
+}
+
+
+void
 ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
 {
     CA_FIELD_LENGTH(K) = 0;
@@ -62,6 +81,8 @@ ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
     CA_FIELD_IDEAL_LENGTH(K) = 0;
     CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
+
+    _ca_ctx_init_mctx(ctx, 1);
 }
 
 void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
@@ -81,6 +102,8 @@ void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx
     CA_FIELD_IDEAL_LENGTH(K) = 0;
     CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
+
+    _ca_ctx_init_mctx(ctx, 1);
 }
 
 void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
@@ -100,6 +123,8 @@ void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const
     CA_FIELD_IDEAL_LENGTH(K) = 0;
     CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
+
+    _ca_ctx_init_mctx(ctx, 2);
 }
 
 void
@@ -112,15 +137,5 @@ ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
     CA_FIELD_IDEAL_ALLOC(K) = 0;
     CA_FIELD_HASH(K) = 0;
 
-    while (ctx->mctx_len < len)
-    {
-        slong i;
-        ctx->mctx = flint_realloc(ctx->mctx, 2 * ctx->mctx_len * sizeof(fmpz_mpoly_ctx_struct *));
-        for (i = ctx->mctx_len; i < 2 * ctx->mctx_len; i++)
-        {
-            ctx->mctx[i] = flint_malloc(sizeof(fmpz_mpoly_ctx_struct));
-            fmpz_mpoly_ctx_init(ctx->mctx[i], i + 1, CA_MPOLY_ORD);
-        }
-        ctx->mctx_len *= 2;
-    }
+    _ca_ctx_init_mctx(ctx, len);
 }

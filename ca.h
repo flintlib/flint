@@ -202,13 +202,11 @@ typedef ca_field_cache_struct ca_field_cache_t[1];
 
 /* Context object ************************************************************/
 
-/* Could also be configurable. */
-#define CA_MPOLY_ORD ORD_LEX
-
 enum
 {
     CA_OPT_VERBOSE,
     CA_OPT_PRINT_FLAGS,
+    CA_OPT_MPOLY_ORD,
     CA_OPT_PREC_LIMIT,
     CA_OPT_QQBAR_DEG_LIMIT,
     CA_OPT_LOW_PREC,

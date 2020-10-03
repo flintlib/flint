@@ -13,23 +13,30 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-#define CA_NVARS_DEFAULT 8
-
 void
 ca_ctx_init(ca_ctx_t ctx)
 {
-    slong i;
     qqbar_t onei;
     ca_ext_t ext;
     ca_ext_struct * ext_ptr[1];
 
-    ctx->mctx = flint_malloc(CA_NVARS_DEFAULT * sizeof(fmpz_mpoly_ctx_struct *));
-    for (i = 0; i < CA_NVARS_DEFAULT; i++)
-    {
-        ctx->mctx[i] = flint_malloc(sizeof(fmpz_mpoly_ctx_struct));
-        fmpz_mpoly_ctx_init(ctx->mctx[i], i + 1, CA_MPOLY_ORD);
-    }
-    ctx->mctx_len = CA_NVARS_DEFAULT;
+    ctx->options = flint_calloc(CA_OPT_NUM_OPTIONS, sizeof(slong));
+
+    ctx->options[CA_OPT_PREC_LIMIT] = 4096;
+    ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 120;
+    ctx->options[CA_OPT_LOW_PREC] = 64;
+    ctx->options[CA_OPT_SMOOTH_LIMIT] = 32;
+    ctx->options[CA_OPT_LLL_PREC] = 128;
+    ctx->options[CA_OPT_POW_LIMIT] = 20;
+    ctx->options[CA_OPT_USE_GROEBNER] = 1;
+    ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT] = 100;
+    ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT] = 1000;
+    ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT] = 10000;
+    ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEFAULT;
+    ctx->options[CA_OPT_MPOLY_ORD] = ORD_LEX;
+
+    ctx->mctx = NULL;
+    ctx->mctx_len = 0;
 
     ca_ext_cache_init(CA_CTX_EXT_CACHE(ctx), ctx);
     ca_field_cache_init(CA_CTX_FIELD_CACHE(ctx), ctx);
@@ -45,18 +52,4 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->field_qq_i = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext_ptr, 1, ctx);
     qqbar_clear(onei);
     ca_ext_clear(ext, ctx);
-
-    ctx->options = flint_calloc(CA_OPT_NUM_OPTIONS, sizeof(slong));
-
-    ctx->options[CA_OPT_PREC_LIMIT] = 4096;
-    ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 120;
-    ctx->options[CA_OPT_LOW_PREC] = 64;
-    ctx->options[CA_OPT_SMOOTH_LIMIT] = 32;
-    ctx->options[CA_OPT_LLL_PREC] = 128;
-    ctx->options[CA_OPT_POW_LIMIT] = 20;
-    ctx->options[CA_OPT_USE_GROEBNER] = 1;
-    ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT] = 100;
-    ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT] = 1000;
-    ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT] = 10000;
-    ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEFAULT;
 }

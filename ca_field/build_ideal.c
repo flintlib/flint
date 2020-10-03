@@ -833,6 +833,13 @@ ca_field_build_ideal_multiplicative(ca_field_t K, ca_ctx_t ctx)
     flint_free(powers);
 }
 
+/* todo: move to utils */
+void
+fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
+        slong c,
+        slong x_var, slong x_exp,
+        const fmpz_mpoly_ctx_t ctx);
+
 void
 ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 {
@@ -849,6 +856,46 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     /* Find direct algebraic relations. */
     if (len >= 2)
     {
+        for (i = 0; 0 && i < len; i++)
+        {
+            ca_ext_struct * x = CA_FIELD_EXT_ELEM(K, i);
+
+            /* If all conjugates of an algebraic number are present,
+               add Vieta's formulas. */
+            if (CA_EXT_IS_QQBAR(x))
+            {
+                slong deg, j, num_conjugates;
+
+                deg = qqbar_degree(CA_EXT_QQBAR(x));
+                num_conjugates = 0;
+
+                for (j = i + 1; j < len; j++)
+                {
+                    ca_ext_struct * y = CA_FIELD_EXT_ELEM(K, j);
+
+                    if (CA_EXT_IS_QQBAR(y) && fmpz_poly_equal(QQBAR_POLY(CA_EXT_QQBAR(x)), QQBAR_POLY(CA_EXT_QQBAR(y))))
+                        num_conjugates++;
+                    else
+                        break;
+                }
+
+                if (num_conjugates + 1 == deg)
+                {
+                    fmpz_mpoly_t r;
+                    /* an * (x1 + x2 + ... + xn) + a[n-1] = 0 */
+
+                    fmpz_mpoly_init(r, CA_FIELD_MCTX(K, ctx));
+                    for (j = 0; j < deg; j++)
+                        fmpz_mpoly_set_coeff_si_x(r, 1, i + j, 1, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_scalar_mul_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg, CA_FIELD_MCTX(K, ctx));
+                    fmpz_mpoly_add_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg - 1, CA_FIELD_MCTX(K, ctx));
+                    _ca_field_ideal_insert_clear_mpoly(K, r, CA_FIELD_MCTX(K, ctx), ctx);
+                }
+
+                i += num_conjugates;
+            }
+        }
+
         for (i = 0; i < len; i++)
         {
             slong a, b;

@@ -1102,6 +1102,13 @@ Superficial options (printing) can be changed at any time.
     Printing style. See :ref:`ca-printing` for details.
     Default value: ``CA_PRINT_DEFAULT``.
 
+.. macro:: CA_OPT_MPOLY_ORD
+
+    Monomial ordering to use for multivariate polynomials. Possible
+    values are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
+    Default value: ``ORD_LEX``.
+    This option must be set before doing any computations.
+
 .. macro:: CA_OPT_PREC_LIMIT
 
     Maximum precision to use internally for numerical evaluation with Arb,
