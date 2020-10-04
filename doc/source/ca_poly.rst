@@ -3,7 +3,7 @@
 **ca_poly.h** -- dense univariate polynomials over the real and complex numbers
 ===============================================================================
 
-An :type:`ca_poly_t` represents a univariate
+A :type:`ca_poly_t` represents a univariate
 polynomial over the real or complex numbers,
 implemented as an array of coefficients of type :type:`ca_struct`.
 

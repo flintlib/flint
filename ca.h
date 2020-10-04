@@ -256,15 +256,6 @@ void ca_clear(ca_t x, ca_ctx_t ctx);
 void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx);
 void _ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx);
 
-ca_ptr ca_vec_init(slong n, ca_ctx_t ctx);
-void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx);
-
-/* todo: document */
-void ca_vec_set(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx);
-void ca_vec_zero(ca_ptr res, slong len, ca_ctx_t ctx);
-void ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
-void ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
-
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
 {

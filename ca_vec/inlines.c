@@ -9,13 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#define CA_VEC_INLINES_C
+#include "ca_vec.h"
 
-void
-ca_vec_zero(ca_ptr res, slong len, ca_ctx_t ctx)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        ca_zero(res + i, ctx);
-}

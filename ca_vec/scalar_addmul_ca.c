@@ -9,16 +9,22 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#include "ca_vec.h"
 
-ca_ptr
-ca_vec_init(slong n, ca_ctx_t ctx)
+void
+_ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx)
 {
     slong i;
-    ca_ptr v = (ca_ptr) flint_malloc(sizeof(ca_struct) * n);
+    ca_t t;
 
-    for (i = 0; i < n; i++)
-        ca_init(v + i, ctx);
-
-    return v;
+    if (len > 0)
+    {
+        ca_init(t, ctx);
+        for (i = 0; i < len; i++)
+        {
+            ca_mul(t, vec + i, c, ctx);
+            ca_add(res + i, res + i, t, ctx);
+        }
+        ca_clear(t, ctx);
+    }
 }

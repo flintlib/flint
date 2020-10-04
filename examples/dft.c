@@ -2,6 +2,7 @@
 
 #include "flint/profiler.h"
 #include "ca.h"
+#include "ca_vec.h"
 
 void
 benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
@@ -11,10 +12,10 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
     slong i, k, n;
     truth_t is_zero;
 
-    x = ca_vec_init(N, ctx);
-    X = ca_vec_init(N, ctx);
-    y = ca_vec_init(N, ctx);
-    w = ca_vec_init(2 * N, ctx);
+    x = _ca_vec_init(N, ctx);
+    X = _ca_vec_init(N, ctx);
+    y = _ca_vec_init(N, ctx);
+    w = _ca_vec_init(2 * N, ctx);
     ca_init(t, ctx);
 
     /* ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEBUG; */
@@ -160,10 +161,10 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
     if (verbose)
         printf("\n");
 
-    ca_vec_clear(x, N, ctx);
-    ca_vec_clear(X, N, ctx);
-    ca_vec_clear(y, N, ctx);
-    ca_vec_clear(w, 2 * N, ctx);
+    _ca_vec_clear(x, N, ctx);
+    _ca_vec_clear(X, N, ctx);
+    _ca_vec_clear(y, N, ctx);
+    _ca_vec_clear(w, 2 * N, ctx);
     ca_clear(t, ctx);
 }
 

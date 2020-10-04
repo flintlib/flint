@@ -9,13 +9,22 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#include "ca_vec.h"
 
 void
-ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx)
+_ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx)
 {
     slong i;
+    for (i = 0; i < n; i++)
+        ca_clear(v + i, ctx);
+    flint_free(v);
+}
 
-    for (i = 0; i < len; i++)
-        ca_mul(res + i, src + i, c, ctx);
+void
+ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx)
+{
+    if (vec->coeffs != NULL)
+    {
+        _ca_vec_clear(vec->coeffs, vec->alloc, ctx);
+    }
 }

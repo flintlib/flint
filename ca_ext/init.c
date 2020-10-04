@@ -10,6 +10,7 @@
 */
 
 #include "ca_ext.h"
+#include "ca_vec.h"
 
 static ulong hash_qqbar(const qqbar_t x)
 {
@@ -107,7 +108,7 @@ ca_ext_init_fx(ca_ext_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
     res->hash = 0;
 
     CA_EXT_FUNC_NARGS(res) = 1;
-    CA_EXT_FUNC_ARGS(res) = ca_vec_init(1, ctx);
+    CA_EXT_FUNC_ARGS(res) = _ca_vec_init(1, ctx);
     ca_set(CA_EXT_FUNC_ARGS(res), x, ctx);
 
     _ca_ext_init_func(res, ctx);
@@ -120,7 +121,7 @@ ca_ext_init_fxy(ca_ext_t res, calcium_func_code func, const ca_t x, const ca_t y
     res->hash = 0;
 
     CA_EXT_FUNC_NARGS(res) = 2;
-    CA_EXT_FUNC_ARGS(res) = ca_vec_init(2, ctx);
+    CA_EXT_FUNC_ARGS(res) = _ca_vec_init(2, ctx);
     ca_set(CA_EXT_FUNC_ARGS(res), x, ctx);
     ca_set(CA_EXT_FUNC_ARGS(res) + 1, y, ctx);
 
@@ -137,9 +138,9 @@ ca_ext_init_fxn(ca_ext_t res, calcium_func_code func, ca_srcptr x, slong nargs, 
     if (nargs == 0)
         CA_EXT_FUNC_ARGS(res) = NULL;
     else
-        CA_EXT_FUNC_ARGS(res) = ca_vec_init(nargs, ctx);
+        CA_EXT_FUNC_ARGS(res) = _ca_vec_init(nargs, ctx);
 
-    ca_vec_set(CA_EXT_FUNC_ARGS(res), x, nargs, ctx);
+    _ca_vec_set(CA_EXT_FUNC_ARGS(res), x, nargs, ctx);
 
     _ca_ext_init_func(res, ctx);
 }

@@ -3,7 +3,7 @@
 **ca_mat.h** -- matrices over the real and complex numbers
 ===============================================================================
 
-An :type:`ca_mat_t` represents a dense matrix over the real or
+A :type:`ca_mat_t` represents a dense matrix over the real or
 complex numbers,
 implemented as an array of entries of type :type:`ca_struct`.
 The dimension (number of rows and columns) of a matrix is fixed at

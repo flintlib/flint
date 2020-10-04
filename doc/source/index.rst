@@ -49,6 +49,7 @@ Numbers
    :maxdepth: 2
 
    ca.rst
+   ca_vec.rst
 
 Matrices and polynomials
 ------------------------

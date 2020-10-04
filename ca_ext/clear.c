@@ -10,6 +10,7 @@
 */
 
 #include "ca_ext.h"
+#include "ca_vec.h"
 
 void
 ca_ext_clear(ca_ext_t res, ca_ctx_t ctx)
@@ -23,7 +24,7 @@ ca_ext_clear(ca_ext_t res, ca_ctx_t ctx)
     else
     {
         if (CA_EXT_FUNC_NARGS(res) != 0)
-            ca_vec_clear(CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
+            _ca_vec_clear(CA_EXT_FUNC_ARGS(res), CA_EXT_FUNC_NARGS(res), ctx);
 
         acb_clear(CA_EXT_FUNC_ENCLOSURE(res));
 

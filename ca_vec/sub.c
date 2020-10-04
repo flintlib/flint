@@ -9,13 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
+#include "ca_vec.h"
 
 void
-ca_vec_set(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx)
+_ca_vec_sub(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < len; i++)
-        ca_set(res + i, src + i, ctx);
+        ca_sub(res + i, vec1 + i, vec2 + i, ctx);
 }

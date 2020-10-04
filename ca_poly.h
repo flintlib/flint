@@ -27,6 +27,7 @@
 #include "antic/nf.h"
 #include "antic/nf_elem.h"
 #include "ca.h"
+#include "ca_vec.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,16 +35,8 @@ extern "C" {
 
 /* Polynomial object */
 
-typedef struct
-{
-    ca_ptr coeffs;
-    slong length;
-    slong alloc;
-}
-ca_poly_struct;
-
+typedef ca_vec_struct ca_poly_struct;
 typedef ca_poly_struct ca_poly_t[1];
-
 
 /* Memory management */
 
@@ -91,7 +84,7 @@ CA_POLY_INLINE void
 ca_poly_mul_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
 {
     ca_poly_fit_length(res, poly->length, ctx);
-    ca_vec_scalar_mul_ca(res->coeffs, poly->coeffs, poly->length, c, ctx);
+    _ca_vec_scalar_mul_ca(res->coeffs, poly->coeffs, poly->length, c, ctx);
     _ca_poly_set_length(res, poly->length, ctx);
     _ca_poly_normalise(res, ctx);
 }

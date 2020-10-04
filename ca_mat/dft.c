@@ -24,7 +24,7 @@ ca_mat_dft(ca_mat_t res, int type, ca_ctx_t ctx)
     if (n == 0)
         return;
 
-    w = ca_vec_init(2 * n, ctx);
+    w = _ca_vec_init(2 * n, ctx);
 
     for (i = 0; i < 2 * n; i++)
     {
@@ -55,7 +55,7 @@ ca_mat_dft(ca_mat_t res, int type, ca_ctx_t ctx)
         }
     }
 
-    ca_vec_clear(w, 2 * n, ctx);
+    _ca_vec_clear(w, 2 * n, ctx);
 
     if (type == 1)
     {

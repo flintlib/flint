@@ -9,15 +9,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
 #include "ca_vec.h"
 
 void
-ca_factor_clear(ca_factor_t fac, ca_ctx_t ctx)
+_ca_vec_set(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx)
 {
-    if (fac->alloc != 0)
+    slong i;
+
+    for (i = 0; i < len; i++)
+        ca_set(res + i, src + i, ctx);
+}
+
+void
+ca_vec_set(ca_vec_t res, const ca_vec_t src, ca_ctx_t ctx)
+{
+    if (res != src)
     {
-        _ca_vec_clear(fac->base, fac->alloc, ctx);
-        _ca_vec_clear(fac->exp, fac->alloc, ctx);
+        ca_vec_set_length(res, ca_vec_length(src, ctx), ctx);
+        _ca_vec_set(ca_vec_entry(res, 0), ca_vec_entry(src, 0), ca_vec_length(res, ctx), ctx);
     }
 }

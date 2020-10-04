@@ -15,12 +15,12 @@ void
 ca_mat_det_berkowitz(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
 {
     ca_ptr t;
-    t = ca_vec_init(ca_mat_nrows(A) + 1, ctx);
+    t = _ca_vec_init(ca_mat_nrows(A) + 1, ctx);
 
     _ca_mat_charpoly(t, A, ctx);
     ca_swap(res, t, ctx);
     if (ca_mat_nrows(A) % 2)
         ca_neg(res, res, ctx);
 
-    ca_vec_clear(t, ca_mat_nrows(A) + 1, ctx);
+    _ca_vec_clear(t, ca_mat_nrows(A) + 1, ctx);
 }

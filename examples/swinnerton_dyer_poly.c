@@ -2,8 +2,7 @@
 
 #include "flint/profiler.h"
 #include "ca.h"
-#include "ca_ext.h"
-#include "ca_field.h"
+#include "ca_vec.h"
 
 void
 _ca_poly_mullow(ca_ptr res, ca_srcptr x, slong xlen,
@@ -42,10 +41,10 @@ swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)
     ca_init(one, ctx);
     ca_one(one, ctx);
 
-    square_roots = ca_vec_init(n, ctx);
+    square_roots = _ca_vec_init(n, ctx);
     tmp1 = flint_malloc((N/2 + 1) * sizeof(ca_struct));
     tmp2 = flint_malloc((N/2 + 1) * sizeof(ca_struct));
-    tmp3 = ca_vec_init(N, ctx);
+    tmp3 = _ca_vec_init(N, ctx);
 
     for (i = 0; i < n; i++)
         ca_sqrt_ui(square_roots + i, n_nth_prime(i + 1), ctx);
@@ -82,15 +81,15 @@ swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)
 
             _ca_poly_mullow(tmp3, tmp1, stride + 1, tmp2, stride + 1,
                 FLINT_MIN(2 * stride, trunc), ctx);
-            ca_vec_set(T + j, tmp3, FLINT_MIN(2 * stride, trunc), ctx);
+            _ca_vec_set(T + j, tmp3, FLINT_MIN(2 * stride, trunc), ctx);
         }
     }
 
     ca_one(T + N, ctx);
-    ca_vec_clear(square_roots, n, ctx);
+    _ca_vec_clear(square_roots, n, ctx);
     flint_free(tmp1);
     flint_free(tmp2);
-    ca_vec_clear(tmp3, UWORD(1) << n, ctx);
+    _ca_vec_clear(tmp3, UWORD(1) << n, ctx);
     ca_clear(one, ctx);
 }
 
@@ -113,7 +112,7 @@ int main(int argc, char *argv[])
 
     TIMEIT_ONCE_START
     ca_ctx_init(ctx);
-    poly = ca_vec_init(N + 1, ctx);
+    poly = _ca_vec_init(N + 1, ctx);
     swinnerton_dyer_poly(poly, n, N + 1, ctx);
 
     for (i = 0; i <= N; i++)
@@ -122,7 +121,7 @@ int main(int argc, char *argv[])
         flint_printf("\n");
     }
 
-    ca_vec_clear(poly, N + 1, ctx);
+    _ca_vec_clear(poly, N + 1, ctx);
     ca_ctx_clear(ctx);
 
     flint_printf("\n");

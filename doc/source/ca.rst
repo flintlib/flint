@@ -187,15 +187,6 @@ Memory management for numbers
 
     Efficiently swaps the variables *x* and *y*.
 
-.. function:: ca_ptr ca_vec_init(slong n, ca_ctx_t ctx)
-
-    Returns a pointer to a heap-allocated array of *n* initialized
-    :type:`ca_struct` entries.
-
-.. function:: void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx)
-
-    Clears an array of *n* initialized :type:`ca_struct` entries.
-    This also frees the array *v*.
 
 .. _ca-printing:
 

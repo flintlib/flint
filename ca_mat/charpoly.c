@@ -30,10 +30,10 @@ _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
         slong i, k, t;
         ca_ptr a, A, s;
 
-        a = ca_vec_init(n * n, ctx);
+        a = _ca_vec_init(n * n, ctx);
         A = a + (n - 1) * n;
 
-        ca_vec_zero(cp, n + 1, ctx);
+        _ca_vec_zero(cp, n + 1, ctx);
         ca_neg(cp + 0, ca_mat_entry(mat, 0, 0), ctx);
 
         for (t = 1; t < n; t++)
@@ -71,7 +71,7 @@ _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
 
         ca_one(cp + 0, ctx);
         _ca_poly_reverse(cp, cp, n + 1, n + 1, ctx);
-        ca_vec_clear(a, n * n, ctx);
+        _ca_vec_clear(a, n * n, ctx);
     }
 }
 

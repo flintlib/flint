@@ -54,7 +54,7 @@ ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
         {
             ca_mul(e, a[j] + col, d, ctx);
             ca_neg(e, e, ctx);
-            ca_vec_scalar_addmul_ca(a[j] + col, a[row] + col, n - col, e, ctx);
+            _ca_vec_scalar_addmul_ca(a[j] + col, a[row] + col, n - col, e, ctx);
             ca_zero(a[j] + col, ctx);
             ca_neg(a[j] + row, e, ctx);
         }
