@@ -32,6 +32,7 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->options[CA_OPT_GROEBNER_LENGTH_LIMIT] = 100;
     ctx->options[CA_OPT_GROEBNER_POLY_LENGTH_LIMIT] = 1000;
     ctx->options[CA_OPT_GROEBNER_POLY_BITS_LIMIT] = 10000;
+    ctx->options[CA_OPT_VIETA_LIMIT] = 6;
     ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEFAULT;
     ctx->options[CA_OPT_MPOLY_ORD] = ORD_LEX;
 

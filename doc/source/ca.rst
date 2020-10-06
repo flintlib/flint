@@ -1159,6 +1159,15 @@ Superficial options (printing) can be changed at any time.
     Buchberger's algorithm.
     Default value: 10000.
 
+.. macro:: CA_OPT_VIETA_LIMIT
+
+    Maximum degree *n* of algebraic numbers for which to add Vieta's
+    formulas to the reduction ideal.
+    This must be set relatively low
+    since the number of terms in Vieta's formulas is `O(2^n)`
+    and the resulting Gröbner basis computations can be expensive.
+    Default value: 6.
+
 
 Internal representation
 -------------------------------------------------------------------------------

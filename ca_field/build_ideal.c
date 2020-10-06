@@ -856,17 +856,20 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     /* Find direct algebraic relations. */
     if (len >= 2)
     {
-        for (i = 0; 0 && i < len; i++)
+        slong deg, vieta_limit;
+
+        vieta_limit = ctx->options[CA_OPT_VIETA_LIMIT];
+
+        for (i = 0; vieta_limit > 0 && i < len; i++)
         {
             ca_ext_struct * x = CA_FIELD_EXT_ELEM(K, i);
 
             /* If all conjugates of an algebraic number are present,
                add Vieta's formulas. */
-            if (CA_EXT_IS_QQBAR(x))
+            if (CA_EXT_IS_QQBAR(x) && ((deg = qqbar_degree(CA_EXT_QQBAR(x))) <= vieta_limit))
             {
-                slong deg, j, num_conjugates;
+                slong j, num_conjugates;
 
-                deg = qqbar_degree(CA_EXT_QQBAR(x));
                 num_conjugates = 0;
 
                 for (j = i + 1; j < len; j++)
@@ -882,14 +885,39 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 if (num_conjugates + 1 == deg)
                 {
                     fmpz_mpoly_t r;
-                    /* an * (x1 + x2 + ... + xn) + a[n-1] = 0 */
+                    slong k;
+                    slong * vars;
+                    ulong binom;
+                    /* an * (x1 + x2 + ... + xn) + a[n-1] = 0, etc. */
+                    /* todo: remove coefficient GCD */
 
-                    fmpz_mpoly_init(r, CA_FIELD_MCTX(K, ctx));
-                    for (j = 0; j < deg; j++)
-                        fmpz_mpoly_set_coeff_si_x(r, 1, i + j, 1, CA_FIELD_MCTX(K, ctx));
-                    fmpz_mpoly_scalar_mul_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg, CA_FIELD_MCTX(K, ctx));
-                    fmpz_mpoly_add_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg - 1, CA_FIELD_MCTX(K, ctx));
-                    _ca_field_ideal_insert_clear_mpoly(K, r, CA_FIELD_MCTX(K, ctx), ctx);
+                    vars = flint_malloc(deg * sizeof(slong));
+                    for (k = 0; k < deg; k++)
+                        vars[k] = i + k;
+
+                    binom = 1;
+                    for (k = 1; k <= deg; k++)
+                    {
+                        binom = binom * (deg - k + 1) / k;
+                        /*  alternative way to define a cutoff:
+                        if (binom > (ulong) vieta_limit)
+                            break;
+                        */
+
+                        fmpz_mpoly_init(r, CA_FIELD_MCTX(K, ctx));
+                        fmpz_mpoly_symmetric_gens(r, k, vars, deg, CA_FIELD_MCTX(K, ctx));
+
+                        /* todo: cancel gcd between coefficients */
+                        fmpz_mpoly_scalar_mul_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg, CA_FIELD_MCTX(K, ctx));
+                        if (k % 2 == 1)
+                            fmpz_mpoly_add_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg - k, CA_FIELD_MCTX(K, ctx));
+                        else
+                            fmpz_mpoly_sub_fmpz(r, r, QQBAR_COEFFS(CA_EXT_QQBAR(x)) + deg - k, CA_FIELD_MCTX(K, ctx));
+
+                        _ca_field_ideal_insert_clear_mpoly(K, r, CA_FIELD_MCTX(K, ctx), ctx);
+                    }
+
+                    flint_free(vars);
                 }
 
                 i += num_conjugates;

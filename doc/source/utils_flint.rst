@@ -12,6 +12,18 @@ General methods for multivariate polynomials
     out the content of all coefficients and normalizing the leading
     coefficient to be positive. The zero polynomial is unchanged.
 
+.. function:: void fmpz_mpoly_symmetric_gens(fmpz_mpoly_t res, ulong k, slong * vars, slong n, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_symmetric(fmpz_mpoly_t res, ulong k, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to the elementary symmetric polynomial
+    `e_k(X_1,\ldots,X_n)`.
+
+    The *gens* version takes `X_1,\ldots,X_n` to be the subset of
+    generators given by *vars* and *n*.
+    The indices in *vars* start from zero.
+    Currently, the indices in *vars* must be distinct.
+
 .. type:: fmpz_mpoly_vec_struct
 
 .. type:: fmpz_mpoly_vec_t

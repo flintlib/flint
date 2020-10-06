@@ -48,7 +48,7 @@ ca_fmms(ca_t x, ca_t tmp, const ca_t a, const ca_t b, const ca_t c, const ca_t d
 }
 
 static void
-ca_addmul(ca_t x, ca_t tmp, const ca_t a, const ca_t b, ca_ctx_t ctx)
+_ca_addmul(ca_t x, ca_t tmp, const ca_t a, const ca_t b, ca_ctx_t ctx)
 {
     ca_mul(tmp, a, b, ctx);
     ca_add(x, x, tmp, ctx);
@@ -71,23 +71,23 @@ _ca_mat_det_cofactor_4x4(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
 
     ca_fmms(a, t, E(0,1), E(1,3), E(0,3), E(1,1), ctx);
     ca_fmms(b, t, E(2,2), E(3,0), E(2,0), E(3,2), ctx);
-    ca_addmul(det, t, a, b, ctx);
+    _ca_addmul(det, t, a, b, ctx);
 
     ca_fmms(a, t, E(0,2), E(1,1), E(0,1), E(1,2), ctx);
     ca_fmms(b, t, E(2,3), E(3,0), E(2,0), E(3,3), ctx);
-    ca_addmul(det, t, a, b, ctx);
+    _ca_addmul(det, t, a, b, ctx);
 
     ca_fmms(a, t, E(0,3), E(1,0), E(0,0), E(1,3), ctx);
     ca_fmms(b, t, E(2,2), E(3,1), E(2,1), E(3,2), ctx);
-    ca_addmul(det, t, a, b, ctx);
+    _ca_addmul(det, t, a, b, ctx);
 
     ca_fmms(a, t, E(0,0), E(1,2), E(0,2), E(1,0), ctx);
     ca_fmms(b, t, E(2,3), E(3,1), E(2,1), E(3,3), ctx);
-    ca_addmul(det, t, a, b, ctx);
+    _ca_addmul(det, t, a, b, ctx);
 
     ca_fmms(a, t, E(0,1), E(1,0), E(0,0), E(1,1), ctx);
     ca_fmms(b, t, E(2,3), E(3,2), E(2,2), E(3,3), ctx);
-    ca_addmul(det, t, a, b, ctx);
+    _ca_addmul(det, t, a, b, ctx);
 
     ca_clear(a, ctx);
     ca_clear(b, ctx);
