@@ -6,44 +6,38 @@ Introduction
 Exact numbers in Calcium
 -----------------------------------------------------------------------
 
-To represent real or complex numbers exactly,
-the basic idea is to use symbolic expressions.
-A symbolic representation of a number can be used
-for lazy numerical evaluation (the number can be evaluated
-to any number of wanted digits on demand).
-More importantly, the symbolic representation makes
-it possible to evaluate predicates requiring exact
-comparisons such as `x = y`,
-at least if the expressions are not too complicated.
-
-Algebraic structures
-.......................................................................
-
-Calcium takes an algebraic approach to symbolic expressions.
-A real or complex number is represented
-by an element of a formal field
+The core idea behind Calcium is to represent real and complex
+numbers as elements of extension fields
 
 .. math ::
 
     \mathbb{Q}(a_1, \ldots, a_n)
 
-where the extension numbers `a_k` are described by symbolic
-expressions (which may depend on other numbers recursively).
-Arithmetic in the formal field captures arithmetic
-relations such as `x + y - x = y` and `(x^2-1) / (x+1) = (x-1)`.
-This helps avoid expression swell and enables equality testing.
-More generally, the formal field may have the form
-(using a slight abuse of notation)
+of the rational numbers, where the extension numbers `a_k` are
+described by symbolic expressions (which may depend on other fields
+recursively).
+The system constructs such fields automatically as needed
+to represent the results of computations.
+Such a field is isomorphic to a formal field
 
 .. math ::
 
-    \mathbb{Q}(a_1, \ldots, a_n) / \langle f_1(a_1,\ldots,a_n), \ldots, f_r(a_1,\ldots,a_n) \rangle
+    \mathbb{Q}(a_1,\ldots,a_n) \;\; \cong \;\; K_{\text{formal}} := \operatorname{Frac}(\mathbb{Q}[X_1,\ldots,X_n] / I)
 
-in which algebraic relations among the extension numbers
-are accounted for. The relations may involve algebraic numbers
+where *I* is the ideal of algebraic relations of the
+extension numbers.
+The relations may involve algebraic numbers
 (for example: `i^2 + 1 = 0`), transcendental numbers
 (for example: `e^{-\pi} \cdot e^{\pi} = 1`),
 or combinations thereof.
+
+Computation in the formal field depends (in general) on
+multivariate polynomial arithmetic together with
+use of a Gröbner basis for the ideal.
+The map from the formal field to the true complex field
+is maintained using arbitrary-precision ball arithmetic where
+necessary.
+
 As an important special case, Calcium can be used for
 arithmetic in algebraic number fields (embedded explicitly in
 `\mathbb{C}`)
@@ -53,10 +47,6 @@ arithmetic in algebraic number fields (embedded explicitly in
     \mathbb{Q}[a] / \langle f(a) \rangle
 
 with excellent performance thanks to internal use of the Antic library.
-
-Calcium constructs all fields and finds algebraic relations
-automatically so that, from the perspective of the user,
-numbers mostly just behave like mathematical numbers.
 
 It will not always work perfectly: although
 Calcium by design should never give a mathematically erroneous
