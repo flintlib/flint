@@ -18,13 +18,13 @@ described by symbolic expressions (which may depend on other fields
 recursively).
 The system constructs such fields automatically as needed
 to represent the results of computations.
-Such a field is isomorphic to a formal field
+Any extension field is isomorphic to a formal field
 
 .. math ::
 
     \mathbb{Q}(a_1,\ldots,a_n) \;\; \cong \;\; K_{\text{formal}} := \operatorname{Frac}(\mathbb{Q}[X_1,\ldots,X_n] / I)
 
-where *I* is the ideal of algebraic relations of the
+where *I* is the ideal of algebraic relations among the
 extension numbers.
 The relations may involve algebraic numbers
 (for example: `i^2 + 1 = 0`), transcendental numbers
@@ -44,7 +44,7 @@ arithmetic in algebraic number fields (embedded explicitly in
 
 .. math ::
 
-    \mathbb{Q}[a] / \langle f(a) \rangle
+    \mathbb{Q}(a) \cong \mathbb{Q}[X] / \langle f(X) \rangle
 
 with excellent performance thanks to internal use of the Antic library.
 
