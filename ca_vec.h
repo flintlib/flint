@@ -82,6 +82,11 @@ void ca_vec_set(ca_vec_t res, const ca_vec_t src, ca_ctx_t ctx);
 void _ca_vec_zero(ca_ptr res, slong len, ca_ctx_t ctx);
 void ca_vec_zero(ca_vec_t res, slong len, ca_ctx_t ctx);
 
+/* Input and output */
+
+void ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx);
+void ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx);
+
 /* Arithmetic */
 
 void _ca_vec_neg(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx);

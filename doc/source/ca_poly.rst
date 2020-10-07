@@ -164,6 +164,35 @@ Arithmetic
 
     Sets *res* to the product of *poly1* and *poly2* truncated to length *n*.
 
+Roots and factorization
+-------------------------------------------------------------------------------
+
+.. function:: void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx)
+
+.. function:: void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx)
+
+    Sets *poly* to the monic polynomial with the *n* roots
+    given in the vector *roots*. That is, sets *poly* to
+    `(x-r_0)(x-r_1)\cdots(x-r_{n-1})`.
+
+.. function:: int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ulong flags, ca_ctx_t ctx)
+
+.. function:: int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ulong flags, ca_ctx_t ctx)
+
+    Attempts to compute all complex roots of the given polynomial *poly*.
+    On success, returns 1 and sets *roots* to the vector of roots.
+    On failure, returns 0 and leaves the values in *roots* arbitrary.
+
+    The roots are returned in arbitrary order, but repeated according
+    to their multiplicity.
+
+    Failure will occur if the leading coefficient of *poly* cannot
+    be proved to be nonzero, if determining the correct multiplicities
+    fails, or if the builtin algorithms do not have a means to
+    represent the roots symbolically.
+    The *flags* input is reserved for future use.
+
+
 
 .. raw:: latex
 

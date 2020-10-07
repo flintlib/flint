@@ -96,6 +96,18 @@ Special vectors
 
     Sets *res* to the length *len* zero vector.
 
+Input and output
+-------------------------------------------------------------------------------
+
+.. function:: void ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx)
+
+    Prints *vec* to standard output. The coefficients are printed on separate lines.
+
+.. function:: void ca_vec_printn(const ca_vec_t poly, slong digits, ca_ctx_t ctx)
+
+    Prints a decimal representation of *vec* with precision specified by *digits*.
+    The coefficients are comma-separated and the whole list is enclosed in square brackets.
+
 Arithmetic
 -------------------------------------------------------------------------------
 
