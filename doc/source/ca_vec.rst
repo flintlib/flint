@@ -99,6 +99,12 @@ Special vectors
 Arithmetic
 -------------------------------------------------------------------------------
 
+.. function:: void _ca_vec_neg(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx)
+
+.. function:: void ca_vec_neg(ca_vec_t res, const ca_vec_t src, ca_ctx_t ctx)
+
+    Sets *res* to the negation of *src*.
+
 .. function:: void _ca_vec_add(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t ctx)
 
 .. function:: void _ca_vec_sub(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t ctx)

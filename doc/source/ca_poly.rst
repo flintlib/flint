@@ -129,6 +129,42 @@ Input and output
     Prints a decimal representation of *poly* with precision specified by *digits*.
     The coefficients are comma-separated and the whole list is enclosed in square brackets.
 
+Arithmetic
+-------------------------------------------------------------------------------
+
+.. function:: void ca_poly_neg(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx)
+
+    Sets *res* to the negation of *src*.
+
+.. function:: void _ca_poly_add(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
+
+.. function:: void ca_poly_add(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+
+    Sets *res* to the sum of *poly1* and *poly2*.
+
+.. function:: void _ca_poly_sub(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
+
+.. function:: void ca_poly_sub(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+
+    Sets *res* to the difference of *poly1* and *poly2*.
+
+.. function:: void _ca_poly_mul(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
+
+.. function:: void ca_poly_mul(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+
+    Sets *res* to the product of *poly1* and *poly2*.
+
+.. function:: void ca_poly_mul_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
+
+    Sets *res* to *poly1* multiplied by the scalar *c*.
+
+.. function:: void _ca_poly_mullow(ca_ptr C, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, slong n, ca_ctx_t ctx)
+
+.. function:: void ca_poly_mullow(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, slong n, ca_ctx_t ctx)
+
+    Sets *res* to the product of *poly1* and *poly2* truncated to length *n*.
+
+
 .. raw:: latex
 
     \newpage
