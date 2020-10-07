@@ -318,3 +318,15 @@ Characteristic polynomial and companion matrix
     It returns 0 if the leading coefficient of *poly* cannot be
     proved nonzero or if the size of the output matrix does not match.
 
+
+Eigenvalues and eigenvectors
+-------------------------------------------------------------------------------
+
+.. function:: int ca_mat_eigenvalues(ca_vec_t lambda, ca_mat_t mat, ca_ctx_t ctx)
+
+    Attempts to compute all complex eigenvalues of the given matrix *mat*.
+    On success, returns 1 and sets *lambda* to the vector of eigenvalues.
+    On failure, returns 0 and leaves the values in *lambda* arbitrary.
+
+    The eigenvalues are returned in arbitrary order, but repeated according
+    to their multiplicity.
