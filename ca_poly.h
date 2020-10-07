@@ -55,6 +55,36 @@ ca_poly_swap(ca_poly_t poly1, ca_poly_t poly2, ca_ctx_t ctx)
     *poly2 = t;
 }
 
+/* Assignment and simple values */
+
+void ca_poly_set_ca(ca_poly_t poly, const ca_t x, ca_ctx_t ctx);
+void ca_poly_set_si(ca_poly_t poly, slong x, ca_ctx_t ctx);
+
+CA_POLY_INLINE void
+ca_poly_zero(ca_poly_t poly, ca_ctx_t ctx)
+{
+    _ca_poly_set_length(poly, 0, ctx);
+}
+
+CA_POLY_INLINE void
+ca_poly_x(ca_poly_t poly, ca_ctx_t ctx)
+{
+    ca_poly_fit_length(poly, 2, ctx);
+    ca_zero(poly->coeffs, ctx);
+    ca_one(poly->coeffs + 1, ctx);
+    _ca_poly_set_length(poly, 2, ctx);
+}
+
+CA_POLY_INLINE void
+ca_poly_one(ca_poly_t poly, ca_ctx_t ctx)
+{
+    ca_poly_set_si(poly, 1, ctx);
+}
+
+void ca_poly_set(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx);
+void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx);
+void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx);
+
 /* Random generation */
 
 void ca_poly_randtest(ca_poly_t poly, flint_rand_t state, slong len, slong depth, slong bits, ca_ctx_t ctx);

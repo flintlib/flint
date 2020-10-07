@@ -75,6 +75,35 @@ Memory management
 
     Strips any top coefficients which can be proved identical to zero.
 
+Assignment and simple values
+-------------------------------------------------------------------------------
+
+.. function:: void ca_poly_zero(ca_poly_t poly, ca_ctx_t ctx)
+
+    Sets *poly* to the zero polynomial.
+
+.. function:: void ca_poly_one(ca_poly_t poly, ca_ctx_t ctx)
+
+    Sets *poly* to the constant polynomial 1.
+
+.. function:: void ca_poly_x(ca_poly_t poly, ca_ctx_t ctx)
+
+    Sets *poly* to the monomial *x*.
+
+.. function:: void ca_poly_set_ca(ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
+
+.. function:: void ca_poly_set_si(ca_poly_t poly, slong c, ca_ctx_t ctx)
+
+    Sets *poly* to the constant polynomial *c*.
+
+.. function:: void ca_poly_set(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx)
+
+.. function:: void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx)
+
+.. function:: void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx)
+
+    Sets *poly* the polynomial *src*.
+
 Random generation
 -------------------------------------------------------------------------------
 
