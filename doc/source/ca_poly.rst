@@ -175,9 +175,9 @@ Roots and factorization
     given in the vector *roots*. That is, sets *poly* to
     `(x-r_0)(x-r_1)\cdots(x-r_{n-1})`.
 
-.. function:: int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ulong flags, ca_ctx_t ctx)
+.. function:: int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
 
-.. function:: int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ulong flags, ca_ctx_t ctx)
+.. function:: int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx)
 
     Attempts to compute all complex roots of the given polynomial *poly*.
     On success, returns 1 and sets *roots* to the vector of roots.
@@ -190,7 +190,6 @@ Roots and factorization
     be proved to be nonzero, if determining the correct multiplicities
     fails, or if the builtin algorithms do not have a means to
     represent the roots symbolically.
-    The *flags* input is reserved for future use.
 
 
 

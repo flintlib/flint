@@ -32,7 +32,7 @@ _ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
 }
 
 int
-_ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ulong flags, ca_ctx_t ctx)
+_ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
 {
     slong deg;
     truth_t leading_zero;
@@ -136,14 +136,14 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ulong flags, ca_ctx_t ct
 }
 
 int
-ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ulong flags, ca_ctx_t ctx)
+ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx)
 {
     if (poly->length == 0)
         return 0;
 
     ca_vec_set_length(roots, poly->length - 1, ctx);
 
-    if (_ca_poly_roots(roots->coeffs, poly->coeffs, poly->length, 0, ctx))
+    if (_ca_poly_roots(roots->coeffs, poly->coeffs, poly->length, ctx))
         return 1;
 
     return 0;

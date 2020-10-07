@@ -35,7 +35,7 @@ int main()
 
         ca_poly_randtest(A, state, 5, 2, 10, ctx);
 
-        if (ca_poly_roots(R, A, 0, ctx))
+        if (ca_poly_roots(R, A, ctx))
         {
             ca_poly_set_roots(B, R, ctx);
 

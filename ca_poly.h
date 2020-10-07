@@ -137,8 +137,8 @@ void ca_poly_mullow(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2,
 void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx);
 void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx);
 
-int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ulong flags, ca_ctx_t ctx);
-int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ulong flags, ca_ctx_t ctx);
+int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx);
+int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }
