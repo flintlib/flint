@@ -1,7 +1,46 @@
 """
-Simple ctypes wrapper around Calcium mainly intended for test code.
+Calcium includes a simple Python interface implemented using ``ctypes``.
 
-Currently leaks memory, doesn't support multiple context objects...
+Introduction
+------------------------------------------------------------------------
+
+Setup and usage
+..................
+
+Make sure the Calcium library and its dependencies are built
+and in the path of the system's dynamic library loader.
+Then make sure that ``<calcium_source_dir>/pycalcium`` is in the
+Python path, for example by adding it to ``PYTHONPATH``,
+adding it to ``sys.path``,
+or simply starting Python inside the ``pycalcium`` directory.
+
+Import the module and run perform a calculation:
+
+    >>> import calcium
+    >>> calcium.ca(1) / 3
+    0.333333 {1/3}
+    >>> calcium.exp(calcium.pi * calcium.i / 2)
+    1.00000*I {a where a = I [a^2+1=0]}
+
+If you don't mind polluting the global namespace, import everything:
+
+    >>> from calcium import *
+    >>> exp(pi*i/2) + ca(1)/3
+    0.333333 + 1.00000*I {(3*a+1)/3 where a = I [a^2+1=0]}
+
+Current limitations
+.....................
+
+* Does not support creating new context objects or modifying
+  the settings of a context object.
+* Leaks memory (for example, when printing).
+* Because ``ctypes`` is used, this is not as efficient as a
+  Cython wrapper. This interface should be used for testing
+  and not for absolute performance.
+* Does not wrap various functions.
+
+API documentation
+------------------------------------------------------------------------
 
 """
 
@@ -27,11 +66,7 @@ class _fmpz_struct(ctypes.Structure):
 
 
 class ca_struct(ctypes.Structure):
-    _fields_ = [('head', ctypes.c_ulong),
-                ('data0', ctypes.c_ulong),
-                ('data1', ctypes.c_ulong),
-                ('data2', ctypes.c_ulong),
-                ('data3', ctypes.c_ulong)]
+    _fields_ = [('data', ctypes.c_long * 5)]
 
 
 class ca_ctx_struct(ctypes.Structure):
@@ -66,6 +101,11 @@ ctx_default = ca_ctx()
 
 
 class ca:
+    """
+    Simple class!
+
+    """
+
     def __init__(self, val=0):
         self._ctx_python = ctx_default
         self._ctx = self._ctx_python._ref

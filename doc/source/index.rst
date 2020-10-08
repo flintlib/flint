@@ -31,8 +31,8 @@ General information
 
    introduction.rst
    setup.rst
+   pycalcium.rst
    examples.rst
-
 
 General modules
 ----------------------
