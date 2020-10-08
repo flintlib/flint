@@ -31,6 +31,159 @@ _ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
     return 1;
 }
 
+void
+_ca_poly_roots_quadratic(ca_t r1, ca_t r2, const ca_t a, const ca_t b, const ca_t c, ca_ctx_t ctx)
+{
+    ca_t d, t;
+
+    ca_init(d, ctx);
+    ca_init(t, ctx);
+
+    ca_mul(t, a, c, ctx);
+    ca_mul_ui(t, t, 4, ctx);
+    ca_sqr(d, b, ctx);
+    ca_sub(d, d, t, ctx);
+    ca_sqrt(d, d, ctx);
+
+    ca_inv(t, a, ctx);
+    ca_div_ui(t, t, 2, ctx);
+
+    ca_sub(r1, d, b, ctx);
+    ca_add(r2, b, d, ctx);
+    ca_neg(r2, r2, ctx);
+    ca_mul(r1, r1, t, ctx);
+    ca_mul(r2, r2, t, ctx);
+
+    ca_clear(d, ctx);
+    ca_clear(t, ctx);
+}
+
+/* exp(2 pi i * (1 / 3)) */
+/* todo: make this faster to construct */
+void
+ca_omega(ca_t res, ca_ctx_t ctx)
+{
+    ca_pi_i(res, ctx);
+    ca_mul_ui(res, res, 2, ctx);
+    ca_div_ui(res, res, 3, ctx);
+    ca_exp(res, res, ctx);
+}
+
+/* Solves a cubic equation using the cubic formula.
+   Assumes (does not check) that a is invertible. */
+int
+_ca_poly_roots_cubic(ca_t r1, ca_t r2, ca_t r3, const ca_t a, const ca_t b, const ca_t c, const ca_t d, ca_ctx_t ctx)
+{
+    ca_t D0, D1, C, w1, w2, t;
+    int success;
+
+    ca_init(D0, ctx);
+    ca_init(D1, ctx);
+    ca_init(C, ctx);
+    ca_init(w1, ctx);
+    ca_init(w2, ctx);
+    ca_init(t, ctx);
+
+    /* D0 = b^2 - 3*a*c */
+    ca_sqr(D0, b, ctx);
+    ca_mul(t, a, c, ctx);
+    ca_mul_ui(t, t, 3, ctx);
+    ca_sub(D0, D0, t, ctx);
+
+    /* D1 = b*(2*b^2 - 9*a*c) + 27*a^2*d */
+    ca_sqr(D1, b, ctx);
+    ca_mul_ui(D1, D1, 2, ctx);
+    ca_mul(t, a, c, ctx);
+    ca_mul_ui(t, t, 9, ctx);
+    ca_sub(D1, D1, t, ctx);
+    ca_mul(D1, D1, b, ctx);
+    ca_sqr(t, a, ctx);
+    ca_mul(t, t, d, ctx);
+    ca_mul_ui(t, t, 27, ctx);
+    ca_add(D1, D1, t, ctx);
+
+    ca_sqr(C, D1, ctx);
+    ca_sqr(t, D0, ctx);
+    ca_mul(t, t, D0, ctx);
+    ca_mul_ui(t, t, 4, ctx);
+    ca_sub(C, C, t, ctx);
+    ca_sqrt(C, C, ctx);
+
+    /* C = (D1 + sqrt(D1^2 - 4*D0^3)) / 2  or
+           (D1 - sqrt(D1^2 - 4*D0^3)) / 2,
+            whichever is nonzero */
+    success = 1;
+    ca_add(t, D1, C, ctx);
+    if (ca_check_is_zero(t, ctx) == T_FALSE)
+    {
+        ca_swap(C, t, ctx);
+    }
+    else if (ca_check_is_zero(t, ctx) != T_FALSE)
+    {
+        ca_sub(t, D1, C, ctx);
+        if (ca_check_is_zero(t, ctx) == T_FALSE)
+            ca_swap(C, t, ctx);
+        else
+            success = 0;
+    }
+
+    if (success)
+    {
+        ca_div_ui(C, C, 2, ctx);
+
+        /* C = C^(1/3) */
+        ca_set_ui(t, 1, ctx);
+        ca_div_ui(t, t, 3, ctx);
+        ca_pow(C, C, t, ctx);
+
+        /* w1 = exp(2 pi i * (1 / 3)) */
+        /* w2 = exp(2 pi i * (2 / 3)) = w1^2 */
+        ca_omega(w1, ctx);
+        ca_sqr(w2, w1, ctx);
+
+        /* r1 = (b + C + D0 / C) / (-3*a) */
+        /* r2 = (b + w1*C + w2 * D0 / C) / (-3*a) */
+        /* r3 = (b + w2*C + w1 * D0 / C) / (-3*a) */
+
+        ca_div(r1, D0, C, ctx);
+        ca_mul(r2, r1, w2, ctx);
+        ca_mul(r3, r1, w1, ctx);
+
+        ca_add(r1, r1, C, ctx);
+        ca_mul(t, w1, C, ctx);
+        ca_add(r2, r2, t, ctx);
+        ca_mul(t, w2, C, ctx);
+        ca_add(r3, r3, t, ctx);
+
+        ca_add(r1, r1, b, ctx);
+        ca_add(r2, r2, b, ctx);
+        ca_add(r3, r3, b, ctx);
+
+        ca_mul_si(t, a, -3, ctx);
+        ca_inv(t, t, ctx);
+
+        ca_mul(r1, r1, t, ctx);
+        ca_mul(r2, r2, t, ctx);
+        ca_mul(r3, r3, t, ctx);
+    }
+    else
+    {
+        ca_unknown(r1, ctx);
+        ca_unknown(r2, ctx);
+        ca_unknown(r3, ctx);
+    }
+
+    ca_clear(D0, ctx);
+    ca_clear(D1, ctx);
+    ca_clear(C, ctx);
+    ca_clear(w1, ctx);
+    ca_clear(w2, ctx);
+    ca_clear(t, ctx);
+
+    return success;
+}
+
+
 int
 _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
 {
@@ -47,6 +200,15 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
     if (leading_zero != T_FALSE)
         return 0;
 
+    while (deg > 1 && ca_check_is_zero(poly, ctx) == T_TRUE)
+    {
+        ca_zero(roots, ctx);
+        roots++;
+        poly++;
+        len--;
+        deg--;
+    }
+
     if (deg == 0)
         return 1;
 
@@ -54,38 +216,6 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
     {
         ca_div(roots, poly, poly + 1, ctx);
         ca_neg(roots, roots, ctx);
-        return 1;
-    }
-
-    if (deg == 2)
-    {
-        ca_srcptr a, b, c;
-        ca_t d, t;
-
-        a = poly + 2;
-        b = poly + 1;
-        c = poly + 0;
-
-        ca_init(d, ctx);
-        ca_init(t, ctx);
-
-        ca_mul(t, a, c, ctx);
-        ca_mul_ui(t, t, 4, ctx);
-        ca_sqr(d, b, ctx);
-        ca_sub(d, d, t, ctx);
-        ca_sqrt(d, d, ctx);
-
-        ca_inv(t, a, ctx);
-        ca_div_ui(t, t, 2, ctx);
-
-        ca_sub(roots, d, b, ctx);
-        ca_add(roots + 1, b, d, ctx);
-        ca_neg(roots + 1, roots + 1, ctx);
-        ca_mul(roots, roots, t, ctx);
-        ca_mul(roots + 1, roots + 1, t, ctx);
-
-        ca_clear(d, ctx);
-        ca_clear(t, ctx);
         return 1;
     }
 
@@ -130,6 +260,18 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
         qqbar_vec_clear(r, len - 1);
 
         return 1;
+    }
+
+    if (deg == 2)
+    {
+        _ca_poly_roots_quadratic(roots, roots + 1, poly + 2, poly + 1, poly + 0, ctx);
+        return 1;
+    }
+
+    if (deg == 3)
+    {
+        return _ca_poly_roots_cubic(roots, roots + 1, roots + 2,
+            poly + 3, poly + 2, poly + 1, poly + 0, ctx);
     }
 
     return 0;

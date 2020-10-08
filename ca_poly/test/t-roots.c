@@ -50,6 +50,17 @@ int main()
                 flint_printf("B = "); ca_poly_print(B, ctx); flint_printf("\n");
                 flint_abort();
             }
+
+            if (0)
+            {
+                printf("=================================================================\n\n");
+                printf("EQUAL: "); truth_print(ca_poly_check_equal(A, B, ctx)); printf("\n\n");
+                flint_printf("A = "); ca_poly_print(A, ctx); flint_printf("\n\n");
+                flint_printf("R = "); ca_vec_print(R, ctx); flint_printf("\n\n");
+                ca_poly_sub(B, A, B, ctx);
+                flint_printf("B = "); ca_poly_print(B, ctx); flint_printf("\n\n");
+            }
+
         }
 
         ca_vec_clear(R, ctx);
