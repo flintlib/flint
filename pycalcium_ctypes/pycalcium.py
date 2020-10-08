@@ -7,6 +7,7 @@ Currently leaks memory, doesn't support multiple context objects...
 
 import ctypes
 import ctypes.util
+import sys
 
 libcalcium_path = ctypes.util.find_library('calcium')
 libcalcium = ctypes.CDLL(libcalcium_path)
@@ -20,6 +21,10 @@ libflint = ctypes.CDLL(libflint_path)
 T_TRUE = 0
 T_FALSE = 1
 T_UNKNOWN = 2
+
+class _fmpz_struct(ctypes.Structure):
+    _fields_ = [('val', ctypes.c_long)]
+
 
 class ca_struct(ctypes.Structure):
     _fields_ = [('head', ctypes.c_ulong),
@@ -70,8 +75,16 @@ class ca:
         if val is not 0:
             typ = type(val)
             if typ is int:
-                # xxx
-                libcalcium.ca_set_si(self, val, self._ctx)
+                b = sys.maxsize
+                if -b <= val <= b:
+                    libcalcium.ca_set_si(self, val, self._ctx)
+                else:
+                    n = _fmpz_struct()
+                    nref = ctypes.byref(n)
+                    libflint.fmpz_init(nref)
+                    libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
+                    libcalcium.ca_set_fmpz(self, nref, self._ctx)
+                    libflint.fmpz_clear(nref)
             elif typ is ca:
                 libcalcium.ca_set(self, val, self._ctx)
             elif typ is float:
@@ -482,6 +495,9 @@ libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
 libcalcium.ca_get_str.restype = ctypes.c_char_p
+
+libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
+
 
 i = j = I = ca.i()
 pi = ca.pi()
