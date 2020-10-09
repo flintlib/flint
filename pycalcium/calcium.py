@@ -42,6 +42,9 @@ Current limitations
 API documentation
 ------------------------------------------------------------------------
 
+Functions are available both as regular functions and as methods
+on the ``ca`` class.
+
 """
 
 import ctypes
@@ -66,15 +69,21 @@ class _fmpz_struct(ctypes.Structure):
 
 
 class ca_struct(ctypes.Structure):
+    """Low-level wrapper for ca_struct, for internal use by ctypes."""
     _fields_ = [('data', ctypes.c_long * 5)]
 
 
 class ca_ctx_struct(ctypes.Structure):
+    """Low-level wrapper for ca_ctx_struct, for internal use by ctypes."""
     # todo: use the real size
     _fields_ = [('content', ctypes.c_ulong * 64)]
 
 
 class ca_ctx:
+    """
+    Python class wrapping the ca_ctx_t context object.
+    Currently only supports a global instance.
+    """
 
     def __init__(self):
         self._data = ca_ctx_struct()
@@ -102,7 +111,34 @@ ctx_default = ca_ctx()
 
 class ca:
     """
-    Simple class!
+    Python class wrapping the ca_t type as a number object.
+
+    Examples::
+
+        >>> ca(1)
+        1
+        >>> ca()
+        0
+        >>> ca(0)
+        0
+        >>> ca(-5)
+        -5
+        >>> ca(2.25)
+        2.25000 {9/4}
+        >>> ca(1) / 3
+        0.333333 {1/3}
+        >>> (-1) ** ca(0.5)
+        1.00000*I {a where a = I [a^2+1=0]}
+        >>> ca(1-2j)
+        1.00000 - 2.00000*I {-2*a+1 where a = I [a^2+1=0]}
+        >>> ca(0.1)           # be careful with float input!
+        0.100000 {3602879701896397/36028797018963968}
+        >>> ca(float("inf"))
+        +Infinity
+        >>> ca(float("nan"))
+        Unknown
+        >>> 3 < pi < ca(22)/7
+        True
 
     """
 
@@ -138,19 +174,197 @@ class ca:
         libcalcium.ca_clear(self, self._ctx)
 
     @staticmethod
+    def inf():
+        """
+        The special value positive infinity.
+
+        Examples::
+
+            >>> inf == ca.inf()    # alias for the method
+            True
+            >>> inf
+            +Infinity
+            >>> -inf
+            -Infinity
+            >>> abs(-inf)
+            +Infinity
+            >>> inf + inf
+            +Infinity
+            >>> (-inf) + (-inf)
+            -Infinity
+            >>> -inf * inf
+            -Infinity
+            >>> inf / inf
+            Undefined
+            >>> 1 / inf
+            0
+            >>> re(inf)
+            Undefined
+            >>> im(inf)
+            Undefined
+            >>> sign(inf)
+            1
+            >>> sign((1+i)*inf) == (1+i)/sqrt(2)
+            True
+
+        """
+        res = ca()
+        libcalcium.ca_pos_inf(res, res._ctx)
+        return res
+
+    @staticmethod
+    def uinf():
+        """
+        The special value unsigned infinity.
+
+        Examples::
+
+            >>> uinf == ca.uinf()    # alias for the method
+            True
+            >>> uinf
+            UnsignedInfinity
+            >>> abs(uinf)
+            +Infinity
+            >>> -3 * uinf
+            UnsignedInfinity
+            >>> 1/uinf
+            0
+            >>> sign(uinf)
+            Undefined
+            >>> uinf * uinf
+            UnsignedInfinity
+            >>> uinf / uinf
+            Undefined
+            >>> uinf + uinf
+            Undefined
+            >>> re(uinf)
+            Undefined
+            >>> im(uinf)
+            Undefined
+
+        """
+        res = ca()
+        libcalcium.ca_uinf(res, res._ctx)
+        return res
+
+    @staticmethod
+    def undefined():
+        """
+        The special value undefined.
+
+        Examples::
+
+            >>> undefined == ca.undefined()    # alias for the method
+            True
+            >>> undefined
+            Undefined
+            >>> undefined == undefined
+            True
+            >>> undefined * 0
+            Undefined
+
+        """
+        res = ca()
+        libcalcium.ca_undefined(res, res._ctx)
+        return res
+
+    @staticmethod
+    def unknown():
+        """
+        The special meta-value unknown.
+        This meta-value is not comparable.
+
+        Examples::
+
+            >>> unknown == unknown
+            Traceback (most recent call last):
+              ...
+            ValueError: unable to decide predicate: equal
+            >>> unknown == 0
+            Traceback (most recent call last):
+              ...
+            ValueError: unable to decide predicate: equal
+            >>> unknown == undefined
+            Traceback (most recent call last):
+              ...
+            ValueError: unable to decide predicate: equal
+            >>> unknown + unknown
+            Unknown
+            >>> unknown + 3
+            Unknown
+            >>> unknown + undefined
+            Undefined
+
+        """
+        res = ca()
+        libcalcium.ca_unknown(res, res._ctx)
+        return res
+
+    @staticmethod
     def pi():
+        """
+        The constant pi.
+
+        Examples::
+
+            >>> pi == ca.pi()    # alias for the method
+            True
+            >>> pi
+            3.14159 {a where a = 3.14159 [Pi]}
+            >>> sin(pi/6)
+            0.500000 {1/2}
+            >>> (pi - 3) ** 3
+            0.00283872 {a^3-9*a^2+27*a-27 where a = 3.14159 [Pi]}
+
+        """
         res = ca()
         libcalcium.ca_pi(res, res._ctx)
         return res
 
     @staticmethod
     def euler():
+        """
+        Euler's constant (gamma).
+
+        Examples::
+
+            >>> euler == ca.euler()    # alias for the method
+            True
+            >>> euler
+            0.577216 {a where a = 0.577216 [Euler]}
+            >>> exp(euler)
+            1.78107 {a where a = 1.78107 [Exp(0.577216 {b})], b = 0.577216 [Euler]}
+
+        """
         res = ca()
         libcalcium.ca_euler(res, res._ctx)
         return res
 
     @staticmethod
     def i():
+        """
+        The imaginary unit.
+
+            >>> i == ca.i()    # alias for the method
+            True
+            >>> i == I == j    # extra aliases for convenience
+            True
+            >>> i
+            1.00000*I {a where a = I [a^2+1=0]}
+            >>> i**2
+            -1
+            >>> i**3
+            -1.00000*I {-a where a = I [a^2+1=0]}
+            >>> abs(i)
+            1
+            >>> sign(i)
+            1.00000*I {a where a = I [a^2+1=0]}
+            >>> abs(sqrt(1+i) / sqrt(1-i))
+            1
+            >>> re(i), im(i)
+            (0, 1)
+
+        """
         res = ca()
         libcalcium.ca_i(res, res._ctx)
         return res
@@ -173,6 +387,11 @@ class ca:
         return self.__repr__()
 
     def __bool__(self):
+        """
+
+        Does it work?
+
+        """
         t = libcalcium.ca_check_is_zero(self, self._ctx)
         if t == T_TRUE:
             return False
@@ -419,6 +638,43 @@ class ca:
         return res
 
     def log(self):
+        """
+        Natural logarithm.
+
+        Examples::
+
+            >>> log(2) == ca(2).log()    # alias for the method
+            True
+            >>> log(1)
+            0
+            >>> log(exp(2))
+            2
+            >>> log(2)
+            0.693147 {a where a = 0.693147 [Log(2)]}
+            >>> log(4) == 2*log(2)
+            True
+            >>> log(1+sqrt(2)) / log(3+2*sqrt(2))
+            0.500000 {1/2}
+            >>> log(ca(10)**(10**30)) / log(10)
+            1.00000e+30 {1000000000000000000000000000000}
+            >>> log(-1)
+            3.14159*I {a where a = 3.14159*I [Log(-1)]}
+            >>> log(i)
+            1.57080*I {(a*b)/2 where a = 3.14159 [Pi], b = I [b^2+1=0]}
+            >>> log(0)
+            -Infinity
+            >>> log(inf)
+            +Infinity
+            >>> log(-inf)
+            +Infinity
+            >>> log(uinf)
+            +Infinity
+            >>> log(undefined)
+            Undefined
+            >>> log(unknown)
+            Unknown
+
+        """
         res = ca()
         libcalcium.ca_log(res, self, self._ctx)
         return res
@@ -544,6 +800,11 @@ pi = ca.pi()
 euler = ca.euler()
 e = E = ca(1).exp()
 
+inf = ca.inf()
+uinf = ca.uinf()
+undefined = ca.undefined()
+unknown = ca.unknown()
+
 
 def test_floor_ceil():
     assert floor(sqrt(2)) == 1
@@ -615,4 +876,7 @@ if __name__ == "__main__":
             t2 = time()
             print("PASS", end="     ")
             print("%.2f" % (t2-t1))
+    print("----------------------------------------------------------")
+    import doctest
+    doctest.testmod(verbose=True)
     print("----------------------------------------------------------")

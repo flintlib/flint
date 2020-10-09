@@ -7,6 +7,9 @@ Python interface (pycalcium)
   :members:
   :inherited-members:
   :undoc-members:
+  :special-members: __init__ , __bool__
+  :member-order: bysource
+
 
 
 .. raw:: latex

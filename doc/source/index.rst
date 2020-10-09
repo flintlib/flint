@@ -31,7 +31,6 @@ General information
 
    introduction.rst
    setup.rst
-   pycalcium.rst
    examples.rst
 
 General modules
@@ -90,6 +89,14 @@ use in appropriate external applications is encouraged.
    qqbar.rst
    utils_flint.rst
 
+
+Python interface
+----------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   pycalcium.rst
 
 Credits and references
 ----------------------
