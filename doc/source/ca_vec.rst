@@ -134,6 +134,11 @@ Arithmetic
     Adds *src* multiplied by *c* to the vector *res*, all vectors having
     length *len*.
 
+.. function:: void _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx)
+
+    Subtracts *src* multiplied by *c* from the vector *res*, all vectors having
+    length *len*.
+
 
 .. raw:: latex
 
