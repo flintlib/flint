@@ -345,6 +345,8 @@ class ca:
         """
         The imaginary unit.
 
+        Examples::
+
             >>> i == ca.i()    # alias for the method
             True
             >>> i == I == j    # extra aliases for convenience
@@ -599,16 +601,51 @@ class ca:
         return res
 
     def re(self):
+        """
+        Real part.
+
+        Examples::
+
+            >>> re(2+3j) == ca(2+3j).re()
+            True
+            >>> re(2+3*i)
+            2
+
+        """
         res = ca()
         libcalcium.ca_re(res, self, self._ctx)
         return res
 
     def im(self):
+        """
+        Imaginary part.
+
+        Examples::
+
+            >>> im(2+3j) == ca(2+3j).im()    # alias for the method
+            True
+            >>> im(2+3*i)
+            3
+
+        """
         res = ca()
         libcalcium.ca_im(res, self, self._ctx)
         return res
 
     def conj(self):
+        """
+        Complex conjugate.
+
+        Examples::
+
+            >>> conj(1j) == conjugate(1j) == ca(1j).conj() == ca(1j).conjugate()    # alias for the method
+            True
+            >>> conj(2+i)
+            2.00000 - 1.00000*I {-a+2 where a = I [a^2+1=0]}
+            >>> conj(pi)
+            3.14159 {a where a = 3.14159 [Pi]}
+
+        """
         res = ca()
         libcalcium.ca_conjugate(res, self, self._ctx)
         return res
@@ -616,16 +653,59 @@ class ca:
     conjugate = conj
 
     def floor(self):
+        """
+        Floor function.
+
+        Examples::
+
+            >>> floor(3) == ca(3).floor()    # alias for the method
+            True
+            >>> floor(pi)
+            3
+            >>> floor(-pi)
+            -4
+
+        """
         res = ca()
         libcalcium.ca_floor(res, self, self._ctx)
         return res
 
     def ceil(self):
+        """
+        Ceiling function.
+
+        Examples::
+
+            >>> ceil(3) == ca(3).ceil()    # alias for the method
+            True
+            >>> ceil(pi)
+            4
+            >>> ceil(-pi)
+            -3
+
+        """
         res = ca()
         libcalcium.ca_ceil(res, self, self._ctx)
         return res
 
     def sgn(self):
+        """
+        Sign function.
+
+        Examples::
+
+            >>> sgn(2) == sign(2) == ca(2).sgn()    # aliases for the method
+            True
+            >>> sign(0)
+            0
+            >>> sign(sqrt(2))
+            1
+            >>> sign(-sqrt(2))
+            -1
+            >>> sign(-sqrt(-2))
+            -1.00000*I {-a where a = I [a^2+1=0]}
+
+        """
         res = ca()
         libcalcium.ca_sgn(res, self, self._ctx)
         return res
@@ -633,6 +713,33 @@ class ca:
     sign = sgn
 
     def sqrt(self):
+        """
+        Principal square root.
+
+        Examples::
+
+            >>> sqrt(2) == ca(2).sqrt()    # alias for the method
+            True
+            >>> sqrt(0)
+            0
+            >>> sqrt(1)
+            1
+            >>> sqrt(2)
+            1.41421 {a where a = 1.41421 [a^2-2=0]}
+            >>> sqrt(-1)
+            1.00000*I {a where a = I [a^2+1=0]}
+            >>> sqrt(inf)
+            +Infinity
+            >>> sqrt(-inf)
+            +I * Infinity
+            >>> sqrt(uinf)
+            UnsignedInfinity
+            >>> sqrt(undefined)
+            Undefined
+            >>> sqrt(unknown)
+            Unknown
+
+        """
         res = ca()
         libcalcium.ca_sqrt(res, self, self._ctx)
         return res
@@ -680,26 +787,135 @@ class ca:
         return res
 
     def exp(self):
+        """
+        Exponential function.
+
+        Examples::
+
+            >>> exp(0)
+            1
+            >>> exp(1)
+            2.71828 {a where a = 2.71828 [Exp(1)]}
+            >>> exp(-1)
+            0.367879 {a where a = 0.367879 [Exp(-1)]}
+            >>> exp(-1) * exp(1)
+            1
+            >>> exp(7*pi*i/2)
+            -1.00000*I {-a where a = I [a^2+1=0]}
+            >>> exp(inf)
+            +Infinity
+            >>> exp(-inf)
+            0
+            >>> exp(uinf)
+            Undefined
+            >>> exp(undefined)
+            Undefined
+            >>> exp(unknown)
+            Unknown
+
+        """
         res = ca()
         libcalcium.ca_exp(res, self, self._ctx)
         return res
 
     def erf(self):
+        """
+        Error function.
+
+        Examples::
+
+            >>> erf(0)
+            0
+            >>> erf(1)
+            0.842701 {a where a = 0.842701 [Erf(1)]}
+            >>> erf(inf)
+            1
+            >>> erf(-inf)
+            -1
+            >>> erf(i*inf)
+            +I * Infinity
+            >>> erf(-i*inf)
+            -I * Infinity
+            >>> erf(uinf)
+            Undefined
+
+        """
         res = ca()
         libcalcium.ca_erf(res, self, self._ctx)
         return res
 
     def erfc(self):
+        """
+        Complementary error function.
+
+        Examples::
+
+            >>> erfc(inf)
+            0
+            >>> erfc(-inf)
+            2
+            >>> erfc(1000)
+            1.86004e-434298 {a where a = 1.86004e-434298 [Erfc(1000)]}
+            >>> erfc(i*inf)
+            -I * Infinity
+            >>> erfc(-i*inf)
+            +I * Infinity
+            >>> erfc(sqrt(2)) + erf(sqrt(2))
+            1
+            >>> erfc(uinf)
+            Undefined
+
+        """
         res = ca()
         libcalcium.ca_erfc(res, self, self._ctx)
         return res
 
     def erfi(self):
+        """
+        Imaginary error function.
+
+        Examples::
+
+            >>> erfi(0)
+            0
+            >>> erfi(1)
+            1.65043 {a where a = 1.65043 [Erfi(1)]}
+            >>> erfi(inf)
+            +Infinity
+            >>> erfi(-inf)
+            -Infinity
+            >>> erfi(i*inf)
+            1.00000*I {a where a = I [a^2+1=0]}
+            >>> erfi(-i*inf)
+            -1.00000*I {-a where a = I [a^2+1=0]}
+            >>> erf(2)**2 + erfi(i*2)**2
+            0
+
+        """
         res = ca()
         libcalcium.ca_erfi(res, self, self._ctx)
         return res
 
     def gamma(self):
+        """
+        Gamma function.
+
+        Examples::
+
+            >>> [gamma(n) for n in range(1,11)]
+            [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880]
+            >>> gamma(0)
+            UnsignedInfinity
+            >>> 1 / gamma(0)
+            0
+            >>> gamma(0.5)
+            1.77245 {a where a = 1.77245 [Sqrt(3.14159 {b})], b = 3.14159 [Pi]}
+            >>> gamma(0.5)**2 == pi
+            True
+            >>> pi * gamma(pi) / gamma(pi+1)
+            1
+
+        """
         res = ca()
         libcalcium.ca_gamma(res, self, self._ctx)
         return res
@@ -751,33 +967,136 @@ def gamma(x):
     return ca(x).gamma()
 
 def fac(x):
+    """
+    Alias for gamma(x+1).
+
+    Examples::
+
+        >>> fac(10)
+        3.62880e+6 {3628800}
+
+    """
     return (ca(x)+1).gamma()
 
 def cos(x):
+    """
+    The cosine function is not yet implemented in Calcium.
+    This placeholder function evaluates the cosine function
+    using complex exponentials.
+
+    Examples::
+
+        >>> cos(0)
+        1
+        >>> cos(pi)
+        -1
+        >>> cos(pi/2)
+        0
+        >>> cos(pi/3)
+        0.500000 {1/2}
+        >>> cos(pi/6)**2
+        0.750000 {3/4}
+        >>> cos(1)**2 + sin(1)**2
+        1
+
+    """
     ix = ca(x)*i
     y = exp(ix)
     return (y + 1/y)/2
 
 def sin(x):
+    """
+    The sine function is not yet implemented in Calcium.
+    This placeholder function evaluates the sine function
+    using complex exponentials.
+
+    Examples::
+
+        >>> sin(0)
+        0
+        >>> sin(pi)
+        0
+        >>> sin(pi/2)
+        1
+        >>> sin(pi/6)
+        0.500000 {1/2}
+        >>> sin(sqrt(2))**2 + cos(sqrt(2))**2
+        1
+        >>> sin(3 + pi) + sin(3)
+        0
+
+    """
     ix = ca(x)*i
     y = exp(ix)
     return (y - 1/y)/(2*i)
 
 def tan(x):
+    """
+    The tangent function is not yet implemented in Calcium.
+    This placeholder function evaluates the tangent function
+    using complex exponentials.
+
+    """
     return sin(x)/cos(x)
 
 def atan(x):
+    """
+    The inverse tangent function is not yet implemented in Calcium.
+    This placeholder function evaluates the inverse tangent function
+    using complex logarithms.
+
+    Examples::
+
+        >>> atan(0)
+        0
+        >>> 4 * atan(1) == pi
+        True
+
+    """
     return (-i/2)*log((i-x)/(i+x))
 
 def cosh(x):
+    """
+    The hyperbolic cosine function is not yet implemented in Calcium.
+    This placeholder function evaluates the hyperbolic cosine function
+    using exponentials.
+
+    Examples::
+
+        >>> cosh(1)
+        1.54308 {(a^2+1)/(2*a) where a = 2.71828 [Exp(1)]}
+
+    """
     y = exp(x)
     return (y + 1/y)/2
 
 def sinh(x):
+    """
+    The hyperbolic sine function is not yet implemented in Calcium.
+    This placeholder function evaluates the hyperbolic sine function
+    using exponentials.
+
+    Examples::
+
+        >>> sinh(1)
+        1.17520 {(a^2-1)/(2*a) where a = 2.71828 [Exp(1)]}
+
+    """
     y = exp(x)
     return (y - 1/y)/2
 
 def tanh(x):
+    """
+    The hyperbolic tangent function is not yet implemented in Calcium.
+    This placeholder function evaluates the hyperbolic tangent function
+    using exponentials.
+
+    Examples::
+
+        >>> tanh(1)
+        0.761594 {(a^2-1)/(a^2+1) where a = 2.71828 [Exp(1)]}
+
+    """
     return sinh(x)/cosh(x)
 
 

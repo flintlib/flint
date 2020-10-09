@@ -24,7 +24,7 @@ ca_erfc(ca_t res, const ca_t x, ca_ctx_t ctx)
             ca_set_ui(res, 2, ctx);
         else if (ca_check_is_pos_i_inf(x, ctx) == T_TRUE)
             ca_neg_i_inf(res, ctx);
-        else if (ca_check_is_neg_inf(x, ctx) == T_TRUE)
+        else if (ca_check_is_neg_i_inf(x, ctx) == T_TRUE)
             ca_pos_i_inf(res, ctx);
         else if (ca_check_is_undefined(x, ctx) == T_TRUE || ca_check_is_uinf(x, ctx) == T_TRUE)
             ca_undefined(res, ctx);
