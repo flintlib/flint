@@ -93,6 +93,9 @@ void ca_poly_randtest_rational(ca_poly_t poly, flint_rand_t state, slong len, sl
 /* Basic operations */
 
 /* todo: document */
+int ca_poly_make_monic(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+
+/* todo: document */
 void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx);
 
 /* Input and output */
@@ -106,6 +109,18 @@ void ca_poly_printn(const ca_poly_t poly, slong digits, ca_ctx_t ctx);
 truth_t _ca_poly_check_equal(ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx);
 truth_t ca_poly_check_equal(const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx);
 
+/* todo: document, improve */
+CA_POLY_INLINE truth_t
+ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx)
+{
+    truth_t res;
+    ca_poly_t t;
+    ca_poly_init(t, ctx);
+    ca_poly_one(t, ctx);
+    res = ca_poly_check_equal(poly, t, ctx);
+    ca_poly_clear(t, ctx);
+    return res;
+}
 
 /* Arithmetic */
 
@@ -137,6 +152,14 @@ int ca_poly_divrem_basecase(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const c
 
 void _ca_poly_divrem(ca_ptr Q, ca_ptr R, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, const ca_t invB, ca_ctx_t ctx);
 int ca_poly_divrem(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
+
+/* Greatest common divisor */
+
+slong _ca_poly_gcd_euclidean(ca_ptr G, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
+int ca_poly_gcd_euclidean(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
+
+slong _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
+int ca_poly_gcd(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
 
 /* Roots and factorization */
 
