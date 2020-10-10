@@ -38,6 +38,18 @@ extern "C" {
 typedef ca_vec_struct ca_poly_struct;
 typedef ca_poly_struct ca_poly_t[1];
 
+/* Vectors of polynomials */
+
+typedef struct
+{
+    ca_poly_struct * coeffs;
+    slong length;
+    slong alloc;
+}
+ca_poly_vec_struct;
+
+typedef ca_poly_vec_struct ca_poly_vec_t[1];
+
 /* Memory management */
 
 void ca_poly_init(ca_poly_t poly, ca_ctx_t ctx);
@@ -161,7 +173,22 @@ int ca_poly_gcd_euclidean(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_
 slong _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
 int ca_poly_gcd(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
 
+/* Vectors of polynomials */
+
+ca_poly_struct * _ca_poly_vec_init(slong len, ca_ctx_t ctx);
+void ca_poly_vec_init(ca_poly_vec_t res, slong len, ca_ctx_t ctx);
+
+void _ca_poly_vec_fit_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx);
+void ca_poly_vec_set_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx);
+
+void _ca_poly_vec_clear(ca_poly_struct * v, slong len, ca_ctx_t ctx);
+void ca_poly_vec_clear(ca_poly_vec_t vec, ca_ctx_t ctx);
+
+void ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t f, ca_ctx_t ctx);
+
 /* Roots and factorization */
+
+int ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx);
 
 void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx);
 void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx);

@@ -182,6 +182,15 @@ Arithmetic
 Roots and factorization
 -------------------------------------------------------------------------------
 
+.. function:: int ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx);
+
+    Computes the squarefree factorization of *F*, giving a product
+    `F = c f_1 f_2^2 \ldots f_n^n` where all `f_i` with `f_i \ne 1`
+    are squarefree and pairwise coprime. The nontrivial factors
+    `f_i` are written to *fac* and the corresponding exponents
+    are written to *exp*. This algorithm can fail if GCD computation
+    fails internally. Returns 1 on success and 0 on failure.
+
 .. function:: void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx)
 
 .. function:: void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx)
