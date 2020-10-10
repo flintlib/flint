@@ -16,7 +16,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("gcd...");
+    flint_printf("gcd_euclidean...");
     fflush(stdout);
 
     flint_randinit(state);
@@ -42,7 +42,7 @@ int main()
             do {
                 ca_poly_randtest_rational(A, state, 4, 10, ctx);
                 ca_poly_randtest_rational(B, state, 4, 10, ctx);
-                success = ca_poly_gcd(G, A, B, ctx);
+                success = ca_poly_gcd_euclidean(G, A, B, ctx);
             }
             while (!success || ca_poly_check_is_one(G, ctx) != T_TRUE);
 
@@ -53,7 +53,7 @@ int main()
             do {
                 ca_poly_randtest(A, state, 3, 2, 10, ctx);
                 ca_poly_randtest(B, state, 3, 2, 10, ctx);
-                success = ca_poly_gcd(G, A, B, ctx);
+                success = ca_poly_gcd_euclidean(G, A, B, ctx);
             }
             while (!success || ca_poly_check_is_one(G, ctx) != T_TRUE);
 
@@ -67,14 +67,14 @@ int main()
         {
             case 0:
                 ca_poly_set(G, AC, ctx);
-                success = ca_poly_gcd(G, G, BC, ctx);
+                success = ca_poly_gcd_euclidean(G, G, BC, ctx);
                 break;
             case 1:
                 ca_poly_set(G, BC, ctx);
-                success = ca_poly_gcd(G, AC, G, ctx);
+                success = ca_poly_gcd_euclidean(G, AC, G, ctx);
                 break;
             default:
-                success = ca_poly_gcd(G, AC, BC, ctx);
+                success = ca_poly_gcd_euclidean(G, AC, BC, ctx);
                 break;
         }
 
@@ -96,7 +96,7 @@ int main()
 
         ca_poly_randtest(A, state, 3, 2, 10, ctx);
 
-        success = ca_poly_gcd(G, A, A, ctx);
+        success = ca_poly_gcd_euclidean(G, A, A, ctx);
 
         if (success)
         {
@@ -111,24 +111,6 @@ int main()
 
                 flint_abort();
             }
-        }
-
-        /* compare with gcd_euclidean */
-        ca_poly_randtest(A, state, 3, 0, 5, ctx);
-        ca_poly_randtest_rational(B, state, 3, 5, ctx);
-        ca_poly_randtest_rational(C, state, 3, 5, ctx);
-        ca_poly_mul(A, A, C, ctx);
-        ca_poly_mul(B, B, C, ctx);
-
-        if (ca_poly_gcd(G, A, B, ctx) && ca_poly_gcd_euclidean(C, A, B, ctx)
-            && ca_poly_check_equal(G, C, ctx) == T_FALSE)
-        {
-            flint_printf("FAIL (2)\n\n");
-            flint_printf("A = "); ca_poly_print(A, ctx); flint_printf("\n");
-            flint_printf("B = "); ca_poly_print(B, ctx); flint_printf("\n");
-            flint_printf("G = "); ca_poly_print(G, ctx); flint_printf("\n");
-            flint_printf("C = "); ca_poly_print(C, ctx); flint_printf("\n");
-            flint_abort();
         }
 
         ca_poly_clear(A, ctx);

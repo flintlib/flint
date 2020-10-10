@@ -91,16 +91,13 @@ Assignment and simple values
     Sets *poly* to the monomial *x*.
 
 .. function:: void ca_poly_set_ca(ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
-
-.. function:: void ca_poly_set_si(ca_poly_t poly, slong c, ca_ctx_t ctx)
+              void ca_poly_set_si(ca_poly_t poly, slong c, ca_ctx_t ctx)
 
     Sets *poly* to the constant polynomial *c*.
 
 .. function:: void ca_poly_set(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx)
-
-.. function:: void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx)
-
-.. function:: void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx)
+              void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx)
+              void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx)
 
     Sets *poly* the polynomial *src*.
 
@@ -137,20 +134,17 @@ Arithmetic
     Sets *res* to the negation of *src*.
 
 .. function:: void _ca_poly_add(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
-
-.. function:: void ca_poly_add(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+              void ca_poly_add(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
 
     Sets *res* to the sum of *poly1* and *poly2*.
 
 .. function:: void _ca_poly_sub(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
-
-.. function:: void ca_poly_sub(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+              void ca_poly_sub(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
 
     Sets *res* to the difference of *poly1* and *poly2*.
 
 .. function:: void _ca_poly_mul(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
-
-.. function:: void ca_poly_mul(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+              void ca_poly_mul(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
 
     Sets *res* to the product of *poly1* and *poly2*.
 
@@ -159,18 +153,14 @@ Arithmetic
     Sets *res* to *poly1* multiplied by the scalar *c*.
 
 .. function:: void _ca_poly_mullow(ca_ptr C, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, slong n, ca_ctx_t ctx)
-
-.. function:: void ca_poly_mullow(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, slong n, ca_ctx_t ctx)
+              void ca_poly_mullow(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, slong n, ca_ctx_t ctx)
 
     Sets *res* to the product of *poly1* and *poly2* truncated to length *n*.
 
 .. function:: void _ca_poly_divrem_basecase(ca_ptr Q, ca_ptr R, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, const ca_t invB, ca_ctx_t ctx)
-
-.. function:: int ca_poly_divrem_basecase(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
-
-.. function:: void _ca_poly_divrem(ca_ptr Q, ca_ptr R, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, const ca_t invB, ca_ctx_t ctx)
-
-.. function:: int ca_poly_divrem(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
+              int ca_poly_divrem_basecase(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
+              void _ca_poly_divrem(ca_ptr Q, ca_ptr R, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, const ca_t invB, ca_ctx_t ctx)
+              int ca_poly_divrem(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
 
     If the leading coefficient of *B* can be proved invertible, sets *Q* and *R*
     to the quotient and remainder of polynomial division of *A* by *B*
@@ -178,6 +168,29 @@ Arithmetic
     invertible, returns 0.
     The underscore method takes a precomputed inverse of the leading coefficient of *B*.
 
+Greatest common divisor
+-------------------------------------------------------------------------------
+
+.. function:: slong _ca_poly_gcd_euclidean(ca_ptr res, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx)
+              int ca_poly_gcd_euclidean(ca_poly_t res, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
+              slong _ca_poly_gcd(ca_ptr res, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx)
+              int ca_poly_gcd(ca_poly_t res, const ca_poly_t A, const ca_poly_t g, ca_ctx_t ctx)
+
+    Sets *res* to the GCD of *f* and *g* and returns 1 on success.
+    On failure, returns 0 leaving the value of *res* arbitrary.
+    The computation can fail if testing a leading coefficient
+    for zero fails in the execution of the GCD algorithm.
+    The output is normalized to be monic if it is not the zero polynomial.
+
+    The underscore methods assume `\text{lenA} \ge \text{lenB} \ge 1`, and that
+    both *A* and *B* have nonzero leading coefficient.
+    They return the length of the GCD, or 0 if the computation fails.
+
+    The *euclidean* version implements the standard Euclidean algorithm.
+    The default version first checks for rational polynomials or
+    attempts to certify numerically that the polynomials are coprime
+    and otherwise falls back to an automatic choice
+    of algorithm (currently only the Euclidean algorithm).
 
 Roots and factorization
 -------------------------------------------------------------------------------
@@ -192,16 +205,14 @@ Roots and factorization
     fails internally. Returns 1 on success and 0 on failure.
 
 .. function:: void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx)
-
-.. function:: void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx)
+              void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx)
 
     Sets *poly* to the monic polynomial with the *n* roots
     given in the vector *roots*. That is, sets *poly* to
     `(x-r_0)(x-r_1)\cdots(x-r_{n-1})`.
 
 .. function:: int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
-
-.. function:: int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx)
+              int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx)
 
     Attempts to compute all complex roots of the given polynomial *poly*.
     On success, returns 1 and sets *roots* to the vector of roots.

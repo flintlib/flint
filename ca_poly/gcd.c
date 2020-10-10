@@ -12,7 +12,131 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_mat.h"
 #include "ca_poly.h"
+
+/* todo: move */
+int _ca_vec_is_fmpq_vec(ca_srcptr vec, slong len, ca_ctx_t ctx);
+int _ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx);
+
+void
+_ca_vec_fmpq_vec_get_fmpz_vec_den(fmpz * c, fmpz_t den, ca_srcptr vec, slong len, ca_ctx_t ctx)
+{
+    slong i;
+
+    fmpz_one(den);
+
+    if (_ca_vec_fmpq_vec_is_fmpz_vec(vec, len, ctx))
+    {
+        for (i = 0; i < len; i++)
+            fmpz_set(c + i, CA_FMPQ_NUMREF(vec + i));
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            fmpz_lcm(den, den, CA_FMPQ_DENREF(vec + i));
+
+        for (i = 0; i < len; i++)
+        {
+            fmpz_divexact(c + i, den, CA_FMPQ_DENREF(vec + i));
+            fmpz_mul(c + i, c + i, CA_FMPQ_NUMREF(vec + i));
+        }
+    }
+}
+
+
+int
+_ca_poly_check_coprime_numerical(ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx)
+{
+    acb_t D;
+    slong degA, degB, i, j;
+    slong prec;
+    int result;
+    acb_ptr TA, TB;
+
+    degA = lenA - 1;
+    degB = lenB - 1;
+
+    TA = _acb_vec_init(lenA);
+    TB = _acb_vec_init(lenA);
+    acb_init(D);
+
+    prec = ctx->options[CA_OPT_LOW_PREC];
+
+    for (i = 0; i <= degA; i++)
+        ca_get_acb(TA + i, A + i, prec, ctx);
+    for (i = 0; i <= degB; i++)
+        ca_get_acb(TB + i, B + i, prec, ctx);
+
+    if (_acb_vec_is_real(TA, lenA) && _acb_vec_is_real(TB, lenB))
+    {
+        arb_mat_t R;
+        arb_mat_init(R, degA + degB, degA + degB);
+
+        for (i = 0; i < degB; i++)
+        {
+            for (j = 0; j <= degA; j++)
+            {
+                if (i == 0)
+                    arb_swap(acb_mat_entry(R, 0, j), acb_realref(TA + j));
+                else
+                    arb_set(arb_mat_entry(R, i, i + j), arb_mat_entry(R, 0, j));
+            }
+        }
+
+        for (i = 0; i < degA; i++)
+        {
+            for (j = 0; j <= degB; j++)
+            {
+                if (i == 0)
+                    arb_swap(arb_mat_entry(R, degB, j), acb_realref(TB + j));
+                else
+                    arb_set(acb_mat_entry(R, degB + i, i + j), arb_mat_entry(R, degB, j));
+            }
+        }
+
+        arb_mat_det(acb_realref(D), R, prec);
+        arb_mat_clear(R);
+    }
+    else
+    {
+        acb_mat_t C;
+        acb_mat_init(C, degA + degB, degA + degB);
+
+        for (i = 0; i < degB; i++)
+        {
+            for (j = 0; j <= degA; j++)
+            {
+                if (i == 0)
+                    acb_swap(acb_mat_entry(C, 0, j), TA + j);
+                else
+                    acb_set(acb_mat_entry(C, i, i + j), acb_mat_entry(C, 0, j));
+            }
+        }
+
+        for (i = 0; i < degA; i++)
+        {
+            for (j = 0; j <= degB; j++)
+            {
+                if (i == 0)
+                    acb_swap(acb_mat_entry(C, degB, j), TB + j);
+                else
+                    acb_set(acb_mat_entry(C, degB + i, i + j), acb_mat_entry(C, degB, j));
+            }
+        }
+
+        acb_mat_det(D, C, prec);
+        acb_mat_clear(C);
+    }
+
+    result = !acb_contains_zero(D);
+
+    _acb_vec_clear(TA, lenA);
+    _acb_vec_clear(TB, lenB);
+    acb_clear(D);
+
+    return result;
+}
 
 /* assumes lenA >= lenB >= 1, and both A and B have nonzero leading
    coefficient */
@@ -20,6 +144,41 @@ slong
 _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA,
                                 ca_srcptr B, slong lenB, ca_ctx_t ctx)
 {
+    if (_ca_vec_is_fmpq_vec(A, lenA, ctx) && _ca_vec_is_fmpq_vec(B, lenB, ctx))
+    {
+        fmpz * zA, * zB, *zG;
+        fmpz_t den;
+        slong i;
+
+        fmpz_init(den);
+        zA = _fmpz_vec_init(lenA);
+        zB = _fmpz_vec_init(lenB);
+        zG = _fmpz_vec_init(lenA);
+
+        _ca_vec_fmpq_vec_get_fmpz_vec_den(zA, den, A, lenA, ctx);
+        _ca_vec_fmpq_vec_get_fmpz_vec_den(zB, den, B, lenB, ctx);
+
+        _fmpz_poly_gcd(zG, zA, lenA, zB, lenB);
+
+        while (lenA > 1 && fmpz_is_zero(zG + lenA - 1))
+            lenA--;
+
+        for (i = 0; i < lenA; i++)
+            ca_set_fmpz(G + i, zG + i, ctx);
+
+        _fmpz_vec_clear(zA, lenA);
+        _fmpz_vec_clear(zB, lenB);
+        _fmpz_vec_clear(zG, lenA);
+
+        return lenA;
+    }
+
+    if (_ca_poly_check_coprime_numerical(A, lenA, B, lenB, ctx))
+    {
+        ca_one(G, ctx);
+        return 1;
+    }
+
     return _ca_poly_gcd_euclidean(G, A, lenA, B, lenB, ctx);
 }
 
