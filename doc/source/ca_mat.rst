@@ -322,11 +322,14 @@ Characteristic polynomial and companion matrix
 Eigenvalues and eigenvectors
 -------------------------------------------------------------------------------
 
-.. function:: int ca_mat_eigenvalues(ca_vec_t lambda, ca_mat_t mat, ca_ctx_t ctx)
+.. function:: int ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, ca_mat_t mat, ca_ctx_t ctx)
 
     Attempts to compute all complex eigenvalues of the given matrix *mat*.
-    On success, returns 1 and sets *lambda* to the vector of eigenvalues.
-    On failure, returns 0 and leaves the values in *lambda* arbitrary.
+    On success, returns 1 and sets *lambda* to the distinct eigenvalues
+    with corresponding multiplicities in *exp*.
+    The eigenvalues are returned in arbitrary order.
+    On failure, returns 0 and leaves the values in *lambda* and *exp*
+    arbitrary.
 
-    The eigenvalues are returned in arbitrary order, but repeated according
-    to their multiplicity.
+    This function effectively computes the characteristic polynomial
+    and then calls :type:`ca_poly_roots`.

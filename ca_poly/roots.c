@@ -258,15 +258,47 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
 }
 
 int
-ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx)
+ca_poly_roots(ca_vec_t roots, ulong * exp, const ca_poly_t poly, ca_ctx_t ctx)
 {
+    ca_poly_vec_t fac;
+    ca_t c;
+    slong i, j, num_roots, factor_deg;
+    int success;
+    ulong * fac_exp;
+
     if (poly->length == 0)
         return 0;
 
-    ca_vec_set_length(roots, poly->length - 1, ctx);
+    ca_poly_vec_init(fac, 0, ctx);
+    ca_init(c, ctx);
+    fac_exp = flint_malloc(sizeof(ulong) * poly->length);
+    success = ca_poly_factor_squarefree(c, fac, fac_exp, poly, ctx);
 
-    if (_ca_poly_roots(roots->coeffs, poly->coeffs, poly->length, ctx))
-        return 1;
+    if (success)
+    {
+        num_roots = 0;
+        for (i = 0; i < fac->length; i++)
+            num_roots += (fac->coeffs + i)->length - 1;
 
-    return 0;
+        ca_vec_set_length(roots, num_roots, ctx);
+
+        num_roots = 0;
+        for (i = 0; success && i < fac->length; i++)
+        {
+            factor_deg = (fac->coeffs + i)->length - 1;
+
+            success = _ca_poly_roots(roots->coeffs + num_roots, (fac->coeffs + i)->coeffs, (fac->coeffs + i)->length, ctx);
+
+            for (j = 0; j < factor_deg; j++)
+                exp[num_roots + j] = fac_exp[i];
+
+            num_roots += factor_deg;
+        }
+    }
+
+    ca_poly_vec_clear(fac, ctx);
+    ca_clear(c, ctx);
+    flint_free(fac_exp);
+
+    return success;
 }

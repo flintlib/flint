@@ -220,7 +220,7 @@ Derivative and integral
 -------------------------------------------------------------------------------
 
 .. function:: void _ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx)
-              void ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+              void ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx)
 
     Sets *res* to the derivative of *poly*. The underscore method needs one less
     coefficient than *len* for the output array.
@@ -258,7 +258,7 @@ Greatest common divisor
 Roots and factorization
 -------------------------------------------------------------------------------
 
-.. function:: int ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx);
+.. function:: int ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx)
 
     Computes the squarefree factorization of *F*, giving a product
     `F = c f_1 f_2^2 \ldots f_n^n` where all `f_i` with `f_i \ne 1`
@@ -267,27 +267,32 @@ Roots and factorization
     are written to *exp*. This algorithm can fail if GCD computation
     fails internally. Returns 1 on success and 0 on failure.
 
-.. function:: void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx)
-              void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx)
+.. function:: void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, const ulong * exp, slong n, ca_ctx_t ctx)
+              void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, const ulong * exp, ca_ctx_t ctx)
 
     Sets *poly* to the monic polynomial with the *n* roots
-    given in the vector *roots*. That is, sets *poly* to
-    `(x-r_0)(x-r_1)\cdots(x-r_{n-1})`.
+    given in the vector *roots*, with multiplicities given
+    in the vector *exp*. In other words, this constructs
+    the polynomial
+    `(x-r_0)^{e_0} (x-r_1)^{e_1} \cdots (x-r_{n-1})^{e_{n-1}}`.
+    Uses binary splitting.
 
 .. function:: int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
-              int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx)
+              int ca_poly_roots(ca_vec_t roots, ulong * exp, const ca_poly_t poly, ca_ctx_t ctx)
 
     Attempts to compute all complex roots of the given polynomial *poly*.
-    On success, returns 1 and sets *roots* to the vector of roots.
+    On success, returns 1 and sets *roots* to a vector containing all
+    the distinct roots with corresponding multiplicities in *exp*.
     On failure, returns 0 and leaves the values in *roots* arbitrary.
-
-    The roots are returned in arbitrary order, but repeated according
-    to their multiplicity.
+    The roots are returned in arbitrary order.
 
     Failure will occur if the leading coefficient of *poly* cannot
     be proved to be nonzero, if determining the correct multiplicities
     fails, or if the builtin algorithms do not have a means to
     represent the roots symbolically.
+
+    The underscore method assumes that the polynomial is squarefree.
+    The non-underscore method performs a squarefree factorization.
 
 Vectors of polynomials
 --------------------------------------------------------------------------------

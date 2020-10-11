@@ -188,11 +188,12 @@ void ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t f, ca_ctx_t ctx);
 
 int ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx);
 
-void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, slong n, ca_ctx_t ctx);
-void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, ca_ctx_t ctx);
+void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, const ulong * exp, slong len, ca_ctx_t ctx);
+void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, const ulong * exp, ca_ctx_t ctx);
 
 int _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx);
-int ca_poly_roots(ca_vec_t roots, const ca_poly_t poly, ca_ctx_t ctx);
+int ca_poly_roots(ca_vec_t roots, ulong * exp, const ca_poly_t poly, ca_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }
