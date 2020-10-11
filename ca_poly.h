@@ -134,6 +134,14 @@ ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx)
     return res;
 }
 
+/* Integral and derivative */
+
+void _ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx);
+void ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+
+void _ca_poly_integral(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx);
+void ca_poly_integral(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+
 /* Arithmetic */
 
 void ca_poly_neg(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx);

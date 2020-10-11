@@ -31,32 +31,6 @@ ca_poly_is_proper(const ca_poly_t poly, ca_ctx_t ctx)
     return 1;
 }
 
-void
-_ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx)
-{
-    slong i;
-
-    for (i = 1; i < len; i++)
-        ca_mul_ui(res + (i - 1), poly + i, i, ctx);
-}
-
-void
-ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx)
-{
-    slong len = poly->length;
-
-    if (len < 2)
-    {
-        ca_poly_zero(res, ctx);
-    }
-    else
-    {
-        ca_poly_fit_length(res, len - 1, ctx);
-        _ca_poly_derivative(res->coeffs, poly->coeffs, len, ctx);
-        _ca_poly_set_length(res, len - 1, ctx);
-    }
-}
-
 int
 ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx)
 {

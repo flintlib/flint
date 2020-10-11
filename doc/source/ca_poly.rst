@@ -170,6 +170,21 @@ Arithmetic
     invertible, returns 0.
     The underscore method takes a precomputed inverse of the leading coefficient of *B*.
 
+Derivative and integral
+-------------------------------------------------------------------------------
+
+.. function:: void _ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx)
+              void ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+
+    Sets *res* to the derivative of *poly*. The underscore method needs one less
+    coefficient than *len* for the output array.
+
+.. function:: void _ca_poly_integral(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx)
+              void ca_poly_integral(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx)
+
+    Sets *res* to the integral of *poly*. The underscore method needs one more
+    coefficient than *len* for the output array.
+
 Greatest common divisor
 -------------------------------------------------------------------------------
 
