@@ -139,6 +139,23 @@ Arithmetic
     Subtracts *src* multiplied by *c* from the vector *res*, all vectors having
     length *len*.
 
+Internal representation
+---------------------------------------------------------------------------------
+
+.. function:: int _ca_vec_is_fmpq_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
+
+    Checks if all elements of *vec* are structurally rational numbers.
+
+.. function:: int _ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
+
+    Assuming that all elements of *vec* are structurally rational numbers,
+    checks if all elements are integers.
+
+.. function:: void _ca_vec_fmpq_vec_get_fmpz_vec_den(fmpz * c, fmpz_t den, ca_srcptr vec, slong len, ca_ctx_t ctx)
+
+    Assuming that all elements of *vec* are structurally rational numbers,
+    converts them to a vector of integers *c* on a common denominator
+    *den*.
 
 .. raw:: latex
 

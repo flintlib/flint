@@ -176,7 +176,7 @@ Greatest common divisor
               slong _ca_poly_gcd(ca_ptr res, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx)
               int ca_poly_gcd(ca_poly_t res, const ca_poly_t A, const ca_poly_t g, ca_ctx_t ctx)
 
-    Sets *res* to the GCD of *f* and *g* and returns 1 on success.
+    Sets *res* to the GCD of *A* and *B* and returns 1 on success.
     On failure, returns 0 leaving the value of *res* arbitrary.
     The computation can fail if testing a leading coefficient
     for zero fails in the execution of the GCD algorithm.

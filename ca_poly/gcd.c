@@ -15,36 +15,6 @@
 #include "acb_mat.h"
 #include "ca_poly.h"
 
-/* todo: move */
-int _ca_vec_is_fmpq_vec(ca_srcptr vec, slong len, ca_ctx_t ctx);
-int _ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx);
-
-void
-_ca_vec_fmpq_vec_get_fmpz_vec_den(fmpz * c, fmpz_t den, ca_srcptr vec, slong len, ca_ctx_t ctx)
-{
-    slong i;
-
-    fmpz_one(den);
-
-    if (_ca_vec_fmpq_vec_is_fmpz_vec(vec, len, ctx))
-    {
-        for (i = 0; i < len; i++)
-            fmpz_set(c + i, CA_FMPQ_NUMREF(vec + i));
-    }
-    else
-    {
-        for (i = 0; i < len; i++)
-            fmpz_lcm(den, den, CA_FMPQ_DENREF(vec + i));
-
-        for (i = 0; i < len; i++)
-        {
-            fmpz_divexact(c + i, den, CA_FMPQ_DENREF(vec + i));
-            fmpz_mul(c + i, c + i, CA_FMPQ_NUMREF(vec + i));
-        }
-    }
-}
-
-
 int
 _ca_poly_check_coprime_numerical(ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx)
 {

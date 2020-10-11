@@ -11,26 +11,6 @@
 
 #include "ca_poly.h"
 
-int
-_ca_vec_is_fmpq_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        if (!CA_IS_QQ(vec + i, ctx))
-                return 0;
-    return 1;
-}
-
-int
-_ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        if (!fmpz_is_one(CA_FMPQ_DENREF(vec + i)))
-                return 0;
-    return 1;
-}
-
 void
 _ca_poly_roots_quadratic(ca_t r1, ca_t r2, const ca_t a, const ca_t b, const ca_t c, ca_ctx_t ctx)
 {
