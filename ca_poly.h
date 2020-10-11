@@ -102,14 +102,6 @@ void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx);
 void ca_poly_randtest(ca_poly_t poly, flint_rand_t state, slong len, slong depth, slong bits, ca_ctx_t ctx);
 void ca_poly_randtest_rational(ca_poly_t poly, flint_rand_t state, slong len, slong bits, ca_ctx_t ctx);
 
-/* Basic operations */
-
-/* todo: document */
-int ca_poly_make_monic(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
-
-/* todo: document */
-void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx);
-
 /* Input and output */
 
 void ca_poly_print(const ca_poly_t poly, ca_ctx_t ctx);
@@ -118,25 +110,16 @@ void ca_poly_printn(const ca_poly_t poly, slong digits, ca_ctx_t ctx);
 /* Degree and leading coefficient */
 
 int ca_poly_is_proper(const ca_poly_t poly, ca_ctx_t ctx);
+int ca_poly_make_monic(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx);
 
 /* Comparisons */
 
-/* todo: document */
 truth_t _ca_poly_check_equal(ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx);
 truth_t ca_poly_check_equal(const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx);
 
-/* todo: document, improve */
-CA_POLY_INLINE truth_t
-ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx)
-{
-    truth_t res;
-    ca_poly_t t;
-    ca_poly_init(t, ctx);
-    ca_poly_one(t, ctx);
-    res = ca_poly_check_equal(poly, t, ctx);
-    ca_poly_clear(t, ctx);
-    return res;
-}
+truth_t ca_poly_check_is_zero(const ca_poly_t poly, ca_ctx_t ctx);
+truth_t ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Arithmetic */
 

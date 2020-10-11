@@ -142,6 +142,35 @@ Degree and leading coefficient
     It returns 1 when *poly* is precisely the zero polynomial (which
     does not have a leading coefficient).
 
+.. function:: int ca_poly_make_monic(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx)
+
+    Makes *poly* monic by dividing by the leading coefficient if possible
+    and returns 1. Returns 0 if the leading coefficient cannot be
+    certified to be nonzero, or if *poly* is the zero polynomial.
+
+.. function:: void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
+
+    Sets *res* to the reversal of *poly* considered as a polynomial
+    of length *n*, zero-padding if needed. Assumes that *len*
+    is positive and less than or equal to *n*.
+
+Comparisons
+-------------------------------------------------------------------------------
+
+.. function:: truth_t _ca_poly_check_equal(ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx)
+              truth_t ca_poly_check_equal(const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx)
+
+    Checks if *poly1* and *poly2* represent the same polynomial.
+    The underscore method assumes that *len1* is at least as
+    large as *len2*.
+
+.. function:: truth_t ca_poly_check_is_zero(const ca_poly_t poly, ca_ctx_t ctx)
+
+    Checks if *poly* is the zero polynomial.
+
+.. function:: truth_t ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx)
+
+    Checks if *poly* is the constant polynomial 1.
 
 Arithmetic
 -------------------------------------------------------------------------------
@@ -260,6 +289,36 @@ Roots and factorization
     fails, or if the builtin algorithms do not have a means to
     represent the roots symbolically.
 
+Vectors of polynomials
+--------------------------------------------------------------------------------
+
+.. type:: ca_poly_vec_struct
+
+.. type:: ca_poly_vec_t
+
+    Represents a vector of polynomials.
+
+.. function:: ca_poly_struct * _ca_poly_vec_init(slong len, ca_ctx_t ctx)
+              void ca_poly_vec_init(ca_poly_vec_t res, slong len, ca_ctx_t ctx)
+
+    Initializes a vector with *len* polynomials.
+
+.. function:: void _ca_poly_vec_fit_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx)
+
+    Allocates space for *len* polynomials in *vec*.
+
+.. function:: void ca_poly_vec_set_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx)
+
+    Resizes *vec* to length *len*, zero-extending if needed.
+
+.. function:: void _ca_poly_vec_clear(ca_poly_struct * vec, slong len, ca_ctx_t ctx)
+              void ca_poly_vec_clear(ca_poly_vec_t vec, ca_ctx_t ctx)
+
+    Clears the vector *vec*.
+
+.. function:: void ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t poly, ca_ctx_t ctx)
+
+    Appends *poly* to the end of the vector *vec*.
 
 
 .. raw:: latex
