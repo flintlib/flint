@@ -115,6 +115,10 @@ void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t c
 void ca_poly_print(const ca_poly_t poly, ca_ctx_t ctx);
 void ca_poly_printn(const ca_poly_t poly, slong digits, ca_ctx_t ctx);
 
+/* Degree and leading coefficient */
+
+int ca_poly_is_proper(const ca_poly_t poly, ca_ctx_t ctx);
+
 /* Comparisons */
 
 /* todo: document */
@@ -133,14 +137,6 @@ ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx)
     ca_poly_clear(t, ctx);
     return res;
 }
-
-/* Integral and derivative */
-
-void _ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx);
-void ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
-
-void _ca_poly_integral(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx);
-void ca_poly_integral(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Arithmetic */
 
@@ -175,6 +171,14 @@ int ca_poly_divrem(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t 
 
 int ca_poly_div(ca_poly_t Q, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
 int ca_poly_rem(ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
+
+/* Integral and derivative */
+
+void _ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx);
+void ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+
+void _ca_poly_integral(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx);
+void ca_poly_integral(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Greatest common divisor */
 

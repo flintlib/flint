@@ -11,26 +11,6 @@
 
 #include "ca_poly.h"
 
-/* todo: move out functions */
-
-int
-ca_poly_is_proper(const ca_poly_t poly, ca_ctx_t ctx)
-{
-    slong i, len;
-
-    len = poly->length;
-
-    for (i = 0; i < len; i++)
-        if (CA_IS_SPECIAL(poly->coeffs + i))
-            return 0;
-
-    if (len >= 1)
-        if (ca_check_is_zero(poly->coeffs + len - 1, ctx) != T_FALSE)
-            return 0;
-
-    return 1;
-}
-
 int
 ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx)
 {

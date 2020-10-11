@@ -4,7 +4,8 @@
 ===============================================================================
 
 A :type:`ca_poly_t` represents a univariate
-polynomial over the real or complex numbers,
+polynomial over the real or complex numbers (an element of `\mathbb{R}[X]`
+or `\mathbb{C}[X]`),
 implemented as an array of coefficients of type :type:`ca_struct`.
 
 Most functions are provided in two versions: an underscore method which
@@ -34,6 +35,10 @@ Warnings:
   likewise normally not generate such coefficients.
   *Unknown* can still appear as a coefficient representing a
   number that is inaccessible for computation.
+
+A polynomial with numerical coefficients and with a nonzero
+leading coefficient is called *proper*. The function
+:func:`ca_poly_is_proper` can be used to check for violations.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -113,7 +118,6 @@ Random generation
 
     Sets *poly* to a random rational polynomial of length up to *len* and with entries up to *bits* bits in size.
 
-
 Input and output
 -------------------------------------------------------------------------------
 
@@ -125,6 +129,19 @@ Input and output
 
     Prints a decimal representation of *poly* with precision specified by *digits*.
     The coefficients are comma-separated and the whole list is enclosed in square brackets.
+
+Degree and leading coefficient
+-------------------------------------------------------------------------------
+
+.. function:: int ca_poly_is_proper(const ca_poly_t poly, ca_ctx_t ctx)
+
+    Checks that *poly* represents an element of `\mathbb{C}[X]` with
+    well-defined degree. This returns 1 if the leading coefficient
+    of *poly* is nonzero and all coefficients of *poly* are
+    numbers (not special values). It returns 0 otherwise.
+    It returns 1 when *poly* is precisely the zero polynomial (which
+    does not have a leading coefficient).
+
 
 Arithmetic
 -------------------------------------------------------------------------------
