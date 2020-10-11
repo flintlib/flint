@@ -102,3 +102,25 @@ ca_poly_divrem(ca_poly_t Q, ca_poly_t R,
 
     return 1;
 }
+
+int
+ca_poly_div(ca_poly_t Q, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
+{
+    ca_poly_t R;
+    int success;
+    ca_poly_init(R, ctx);
+    success = ca_poly_divrem(Q, R, A, B, ctx);
+    ca_poly_clear(R, ctx);
+    return success;
+}
+
+int
+ca_poly_rem(ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
+{
+    ca_poly_t Q;
+    int success;
+    ca_poly_init(Q, ctx);
+    success = ca_poly_divrem(Q, R, A, B, ctx);
+    ca_poly_clear(Q, ctx);
+    return success;
+}

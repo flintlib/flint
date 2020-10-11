@@ -58,17 +58,6 @@ ca_poly_derivative(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx)
 }
 
 int
-ca_poly_div(ca_poly_t Q, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
-{
-    ca_poly_t R;
-    int success;
-    ca_poly_init(R, ctx);
-    success = ca_poly_divrem(Q, R, A, B, ctx);
-    ca_poly_clear(R, ctx);
-    return success;
-}
-
-int
 ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx)
 {
     ca_poly_t f, d, t1;
