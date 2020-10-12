@@ -943,6 +943,10 @@ class ca_mat:
         ca_mat of size 2 x 5
         [0, 1, 2, 3, 4]
         [5, 6, 7, 8, 9]
+        >>> ca_mat([[1,-2],[2,1]]) * ca_mat([[1,pi],[1,2]])
+        ca_mat of size 2 x 2
+        [-1, -0.858407 {a-4 where a = 3.14159 [Pi]}]
+        [ 3, 8.28319 {2*a+2 where a = 3.14159 [Pi]}]
 
     """
 
@@ -1080,6 +1084,115 @@ class ca_mat:
         x = ca(x)
         libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
 
+    def det(self):
+        """
+        The determinant of this matrix.
+
+        Examples::
+
+            >>> ca_mat([[1,1-i*pi],[1+i*pi,1]]).det()
+            -9.86960 {-a^2 where a = 3.14159 [Pi], b = I [b^2+1=0]}
+
+        """
+        nrows = self.nrows()
+        ncols = self.ncols()
+        if nrows != ncols:
+            raise ValueError("a square matrix is required")
+        res = ca()
+        libcalcium.ca_mat_det(res, self, self._ctx)
+        return res
+
+    def __add__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_mat(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        m = self.nrows()
+        n = self.ncols()
+        if m != other.nrows() or n != other.ncols():
+            raise ValueError("incompatible matrix shapes")
+        res = ca_mat(m, n)
+        libcalcium.ca_mat_add(res, self, other, self._ctx)
+        return res
+
+    def __sub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_mat(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        m = self.nrows()
+        n = self.ncols()
+        if m != other.nrows() or n != other.ncols():
+            raise ValueError("incompatible matrix shapes")
+        res = ca_mat(m, n)
+        libcalcium.ca_mat_sub(res, self, other, self._ctx)
+        return res
+
+    def __mul__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca(other)
+                if self._ctx_python is not self._ctx_python:
+                    raise ValueError("different context objects!")
+                m = self.nrows()
+                n = self.ncols()
+                res = ca_mat(m, n)
+                libcalcium.ca_mat_mul_ca(res, self, other, self._ctx)
+                return res
+            except TypeError:
+                pass
+            try:
+                other = ca_mat(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        m = self.nrows()
+        n = self.ncols()
+        k = other.ncols()
+        if n != other.nrows():
+            raise ValueError("incompatible matrix shapes")
+        res = ca_mat(m, k)
+        libcalcium.ca_mat_mul(res, self, other, self._ctx)
+        return res
+
+    def __rmul__(self, other):
+        try:
+            other = ca(other)
+            if self._ctx_python is not self._ctx_python:
+                raise ValueError("different context objects!")
+            m = self.nrows()
+            n = self.ncols()
+            res = ca_mat(m, n)
+            libcalcium.ca_mat_mul_ca(res, self, other, self._ctx)
+            return res
+        except TypeError:
+            pass
+        return NotImplemented
+
+    def __truediv__(self, other):
+        try:
+            other = ca(other)
+            if self._ctx_python is not self._ctx_python:
+                raise ValueError("different context objects!")
+            m = self.nrows()
+            n = self.ncols()
+            res = ca_mat(m, n)
+            libcalcium.ca_mat_div_ca(res, self, other, self._ctx)
+            return res
+        except TypeError:
+            pass
+        return NotImplemented
+
+
+
+# todo: in functions, don't create copies of the input
 
 def re(x):
     return ca(x).re()

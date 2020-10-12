@@ -141,6 +141,86 @@ void ca_mat_add(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t
 void ca_mat_sub(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
 void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
+CA_MAT_INLINE void
+ca_mat_mul_si(ca_mat_t B, const ca_mat_t A, slong c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_mul_si(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_mul_fmpz(ca_mat_t B, const ca_mat_t A, const fmpz_t c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_mul_fmpz(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_mul_fmpq(ca_mat_t B, const ca_mat_t A, const fmpq_t c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_mul_fmpq(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_mul_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_mul(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_div_si(ca_mat_t B, const ca_mat_t A, slong c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_div_si(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_div_fmpz(ca_mat_t B, const ca_mat_t A, const fmpz_t c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_div_fmpz(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_div_fmpq(ca_mat_t B, const ca_mat_t A, const fmpq_t c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_div_fmpq(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
+CA_MAT_INLINE void
+ca_mat_div_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+        for (j = 0; j < ca_mat_ncols(A); j++)
+            ca_div(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
+}
+
 /* Trace */
 
 void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);
