@@ -261,12 +261,11 @@ int ca_mat_det_bareiss(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 void ca_mat_det_cofactor(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 void ca_mat_det(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 
-/* Characteristic and minimal polynomial */
+/* Characteristic polynomial */
 
 void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx);
 void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx);
 int ca_mat_companion(ca_mat_t A, const ca_poly_t poly, ca_ctx_t ctx);
-int ca_mat_minpoly(ca_poly_t res, const ca_mat_t mat, ca_ctx_t ctx);
 
 /* Eigenvalues and eigenvectors */
 
