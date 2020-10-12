@@ -311,7 +311,7 @@ Determinant
     unpredictably on the structure of the matrix and the fields of
 
 
-Characteristic polynomial and companion matrix
+Characteristic and minimal polynomial
 -------------------------------------------------------------------------------
 
 .. function:: void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
@@ -323,6 +323,14 @@ Characteristic polynomial and companion matrix
     requires space for `n + 1` output coefficients.
     Employs the division-free Berkowitz algorithm using
     `O(n^4)` operations.
+
+.. function:: int ca_mat_minpoly(ca_poly_t res, const ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets *res* to the minimal polynomial of *mat*. In the generic case,
+    this function computes the characteristic polynomial and then
+    extracts the squarefree part using :func:`ca_poly_squarefree_part`.
+    This can fail if computing the squarefree part fails.
+    Returns 1 on success and 0 on failure.
 
 .. function:: int ca_mat_companion(ca_mat_t mat, const ca_poly_t poly, ca_ctx_t ctx)
 

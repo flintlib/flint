@@ -187,6 +187,7 @@ void ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t f, ca_ctx_t ctx);
 /* Roots and factorization */
 
 int ca_poly_factor_squarefree(ca_t c, ca_poly_vec_t fac, ulong * exp, const ca_poly_t F, ca_ctx_t ctx);
+int ca_poly_squarefree_part(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
 
 void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, const ulong * exp, slong len, ca_ctx_t ctx);
 void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, const ulong * exp, ca_ctx_t ctx);

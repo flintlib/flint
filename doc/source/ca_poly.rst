@@ -267,6 +267,12 @@ Roots and factorization
     are written to *exp*. This algorithm can fail if GCD computation
     fails internally. Returns 1 on success and 0 on failure.
 
+.. function:: int ca_poly_squarefree_part(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx)
+
+    Sets *res* to the squarefree part of *poly*, normalized to be monic.
+    This algorithm can fail if GCD computation fails internally.
+    Returns 1 on success and 0 on failure.
+
 .. function:: void _ca_poly_set_roots(ca_ptr poly, ca_srcptr roots, const ulong * exp, slong n, ca_ctx_t ctx)
               void ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, const ulong * exp, ca_ctx_t ctx)
 
