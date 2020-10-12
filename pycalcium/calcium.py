@@ -72,11 +72,17 @@ class ca_struct(ctypes.Structure):
     """Low-level wrapper for ca_struct, for internal use by ctypes."""
     _fields_ = [('data', ctypes.c_long * 5)]
 
-
 class ca_ctx_struct(ctypes.Structure):
     """Low-level wrapper for ca_ctx_struct, for internal use by ctypes."""
     # todo: use the real size
     _fields_ = [('content', ctypes.c_ulong * 64)]
+
+class ca_mat_struct(ctypes.Structure):
+    """Low-level wrapper for ca_mat_struct, for internal use by ctypes."""
+    _fields_ = [('entries', ctypes.c_void_p),
+                ('r', ctypes.c_long),
+                ('c', ctypes.c_long),
+                ('rows', ctypes.c_void_p)]
 
 
 class ca_ctx:
@@ -111,7 +117,7 @@ ctx_default = ca_ctx()
 
 class ca:
     """
-    Python class wrapping the ca_t type as a number object.
+    Python class wrapping the ca_t type for numbers.
 
     Examples::
 
@@ -172,6 +178,14 @@ class ca:
 
     def __del__(self):
         libcalcium.ca_clear(self, self._ctx)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
 
     @staticmethod
     def inf():
@@ -370,14 +384,6 @@ class ca:
         res = ca()
         libcalcium.ca_i(res, res._ctx)
         return res
-
-    @property
-    def _as_parameter_(self):
-        return self._ref
-
-    @staticmethod
-    def from_param(arg):
-        return arg
 
     def __repr__(self):
         s = libcalcium.ca_get_str(self, self._ctx)
@@ -919,6 +925,160 @@ class ca:
         res = ca()
         libcalcium.ca_gamma(res, self, self._ctx)
         return res
+
+class ca_mat:
+    """
+    Python class wrapping the ca_mat_t type for matrices.
+
+        >>> ca_mat(2,3)
+        ca_mat of size 2 x 3
+        [0, 0, 0]
+        [0, 0, 0]
+        >>> ca_mat([[1,2],[3,4],[5,6]])
+        ca_mat of size 3 x 2
+        [1, 2]
+        [3, 4]
+        [5, 6]
+        >>> ca_mat(2, 5, range(10))
+        ca_mat of size 2 x 5
+        [0, 1, 2, 3, 4]
+        [5, 6, 7, 8, 9]
+
+    """
+
+    def __init__(self, *args):
+        self._ctx_python = ctx_default
+        self._ctx = self._ctx_python._ref
+        self._data = ca_mat_struct()
+        self._ref = ctypes.byref(self._data)
+
+        if len(args) == 1:
+            val = args[0]
+            if isinstance(val, ca_mat):
+                m = val.nrows()
+                n = val.ncols()
+                libcalcium.ca_mat_init(self, m, n, self._ctx)
+                libcalcium.ca_mat_set(self, val, self._ctx)
+            elif isinstance(val, (list, tuple)):
+                m = len(val)
+                n = 0
+                if m != 0:
+                    if not isinstance(val[0], (list, tuple)):
+                        raise TypeError("single input to ca_mat must be a list of lists")
+                    n = len(val[0])
+                    for i in range(1, m):
+                        if len(val[i]) != n:
+                            raise ValueError("input rows have different lengths")
+                libcalcium.ca_mat_init(self, m, n, self._ctx)
+                for i in range(m):
+                    row = val[i]
+                    for j in range(n):
+                        x = ca(row[j])
+                        libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
+            else:
+                raise TypeError("cannot create ca_mat from input of type %s" % type(val))
+        elif len(args) == 2:
+            m, n = args
+            assert m >= 0
+            assert n >= 0
+            libcalcium.ca_mat_init(self, m, n, self._ctx)
+        elif len(args) == 3:
+            m, n, entries = args
+            assert m >= 0
+            assert n >= 0
+            libcalcium.ca_mat_init(self, m, n, self._ctx)
+            entries = list(entries)
+            if len(entries) != m*n:
+                raise ValueError("list of entries has the wrong length")
+            for i in range(m):
+                for j in range(n):
+                    x = ca(entries[i*n + j])
+                    libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
+        else:
+            raise ValueError("ca_mat: expected 1-3 arguments")
+
+    def __del__(self):
+        libcalcium.ca_mat_clear(self, self._ctx)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
+
+    def nrows(self):
+        return self._data.r
+
+    def ncols(self):
+        return self._data.c
+
+    def entries(self):
+        m = self.nrows()
+        n = self.ncols()
+        L = [None] * (m * n)
+        for i in range(m):
+            for j in range(n):
+                L[i*n + j] = self[i, j]
+        return L
+
+    def __iter__(self):
+        m = self.nrows()
+        n = self.ncols()
+        for i in range(m):
+            for j in range(n):
+                yield self[i, j]
+
+    def table(self):
+        m = self.nrows()
+        n = self.ncols()
+        L = self.entries()
+        return [L[i*n : (i+1)*n] for i in range(m)]
+
+    # supports mpmath conversions
+    tolist = table
+
+    def __repr__(self):
+        s = "ca_mat of size %i x %i\n" % (self.nrows(), self.ncols())
+        nrows = self.nrows()
+        ncols = self.ncols()
+
+        def matrix_to_str(tab):
+            if len(tab) == 0 or len(tab[0]) == 0:
+                return "[]"
+            tab = [[str(c) for c in row] for row in tab]
+            widths = []
+            for i in range(len(tab[0])):
+                w = max([len(row[i]) for row in tab])
+                widths.append(w)
+            for i in range(len(tab)):
+                tab[i] = [s.rjust(widths[j]) for j, s in enumerate(tab[i])]
+                tab[i] = "[" + (", ".join(tab[i])) + "]"
+            return "\n".join(tab)
+
+        return s + matrix_to_str(self.table())
+
+    __str__ = __repr__
+
+    def __getitem__(self, ij):
+        i, j = ij
+        nrows = self.nrows()
+        ncols = self.ncols()
+        assert 0 <= i < nrows
+        assert 0 <= j < ncols
+        x = ca()
+        libcalcium.ca_set(x, libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), self._ctx)
+        return x
+
+    def __setitem__(self, ij, x):
+        i, j = ij
+        nrows = self.nrows()
+        ncols = self.ncols()
+        assert 0 <= i < nrows
+        assert 0 <= j < ncols
+        x = ca(x)
+        libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
 
 
 def re(x):
