@@ -1190,6 +1190,16 @@ class ca_mat:
             pass
         return NotImplemented
 
+    def __pow__(self, other):
+        m = self.nrows()
+        n = self.ncols()
+        assert m == n
+        e = int(other)
+        assert 0 <= e <= sys.maxsize
+        res = ca_mat(m, m)
+        libcalcium.ca_mat_pow_ui_binexp(res, self, e, self._ctx)
+        return res
+
 
 
 # todo: in functions, don't create copies of the input

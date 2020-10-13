@@ -221,6 +221,14 @@ ca_mat_div_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
             ca_div(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), c, ctx);
 }
 
+CA_MAT_INLINE void
+ca_mat_sqr(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+{
+    ca_mat_mul(res, A, A, ctx);
+}
+
+void ca_mat_pow_ui_binexp(ca_mat_t B, const ca_mat_t A, ulong exp, ca_ctx_t ctx);
+
 /* Trace */
 
 void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);

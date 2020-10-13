@@ -221,6 +221,18 @@ Arithmetic
 
     Sets *B* to *A* divided by the scalar *c*.
 
+Powers
+-------------------------------------------------------------------------------
+
+.. function:: void ca_mat_sqr(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *B* to the square of *A*.
+
+.. function:: void ca_mat_pow_ui_binexp(ca_mat_t B, const ca_mat_t A, ulong exp, ca_ctx_t ctx)
+
+    Sets *B* to *A* raised to the power *exp*, evaluated using
+    binary exponentiation.
+
 
 Trace
 -------------------------------------------------------------------------------
