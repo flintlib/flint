@@ -67,6 +67,8 @@ T_UNKNOWN = 2
 class _fmpz_struct(ctypes.Structure):
     _fields_ = [('val', ctypes.c_long)]
 
+# ctypes.cast(x, ctypes.POINTER(ctypes.c_ulong))
+# ctypes.POINTER(ctypes.c_ulong)
 
 class ca_struct(ctypes.Structure):
     """Low-level wrapper for ca_struct, for internal use by ctypes."""
@@ -84,6 +86,17 @@ class ca_mat_struct(ctypes.Structure):
                 ('c', ctypes.c_long),
                 ('rows', ctypes.c_void_p)]
 
+class ca_vec_struct(ctypes.Structure):
+    """Low-level wrapper for ca_vec_struct, for internal use by ctypes."""
+    _fields_ = [('entries', ctypes.c_void_p),
+                ('length', ctypes.c_long),
+                ('alloc', ctypes.c_long)]
+
+class ca_poly_struct(ctypes.Structure):
+    """Low-level wrapper for ca_poly_struct, for internal use by ctypes."""
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('length', ctypes.c_long),
+                ('alloc', ctypes.c_long)]
 
 class ca_ctx:
     """
@@ -1200,7 +1213,65 @@ class ca_mat:
         libcalcium.ca_mat_pow_ui_binexp(res, self, e, self._ctx)
         return res
 
+    def eigenvalues(self):
+        """
+        Eigenvalues of this matrix.
+        Returns a list of (value, multiplicity) pairs.
 
+            >>> ca_mat(4, 4, range(16)).eigenvalues()
+            [(-2.46425 {-a+15 where a = 17.4642 [a^2-305=0]}, 1), (32.4642 {a+15 where a = 17.4642 [a^2-305=0]}, 1), (0, 2)]
+            >>> ca_mat([[1,pi],[-pi,1]]).eigenvalues()[0]
+            (1.00000 + 3.14159*I {(a+2)/2 where a = 6.28319*I [Sqrt(-39.4784 {-4*b^2})], b = 3.14159 [Pi]}, 1)
+
+        """
+        m = self.nrows()
+        n = self.ncols()
+        assert m == n
+        lamda = ca_vec()
+        exp = ctypes.cast(libflint.flint_malloc(ctypes.sizeof(ctypes.c_ulong) * n), ctypes.POINTER(ctypes.c_ulong))
+        success = libcalcium.ca_mat_eigenvalues(lamda, exp, self, self._ctx)
+        if not success:
+            libflint.flint_free(exp)
+            raise ValueError("failed to compute eigenvalues")
+        else:
+            res = [(lamda[i], exp[i]) for i in range(len(lamda))]
+            libflint.flint_free(exp)
+            return res
+
+class ca_vec:
+    """
+    Python class wrapping the ca_vec_t type for vectors.
+    """
+
+    def __init__(self, n=0):
+        self._ctx_python = ctx_default
+        self._ctx = self._ctx_python._ref
+        self._data = ca_vec_struct()
+        self._ref = ctypes.byref(self._data)
+        n = int(n)
+        assert n >= 0
+        libcalcium.ca_vec_init(self, n, self._ctx)
+
+    def __del__(self):
+        libcalcium.ca_vec_clear(self, self._ctx)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
+
+    def __len__(self):
+        return self._data.length
+
+    def __getitem__(self, i):
+        n = len(self)
+        assert 0 <= i < n
+        x = ca()
+        libcalcium.ca_set(x, libcalcium.ca_vec_entry_ptr(self, i, self._ctx), self._ctx)
+        return x
 
 # todo: in functions, don't create copies of the input
 

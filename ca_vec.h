@@ -46,6 +46,12 @@ typedef ca_vec_struct ca_vec_t[1];
 
 #define ca_vec_entry(vec, i) ((vec)->entries + (i))
 
+CA_VEC_INLINE ca_ptr
+ca_vec_entry_ptr(ca_vec_t vec, slong i)
+{
+    return ca_vec_entry(vec, i);
+}
+
 /* Memory management */
 
 ca_ptr _ca_vec_init(slong len, ca_ctx_t ctx);

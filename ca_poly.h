@@ -45,6 +45,13 @@ ca_poly_struct;
 
 typedef ca_poly_struct ca_poly_t[1];
 
+/* todo: return NULL when out of bounds? */
+CA_POLY_INLINE ca_ptr
+ca_poly_coeff_ptr(ca_poly_t poly, slong i)
+{
+    return poly->coeffs + i;
+}
+
 /* Vectors of polynomials */
 
 typedef struct
