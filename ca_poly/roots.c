@@ -278,16 +278,16 @@ ca_poly_roots(ca_vec_t roots, ulong * exp, const ca_poly_t poly, ca_ctx_t ctx)
     {
         num_roots = 0;
         for (i = 0; i < fac->length; i++)
-            num_roots += (fac->coeffs + i)->length - 1;
+            num_roots += (fac->entries + i)->length - 1;
 
         ca_vec_set_length(roots, num_roots, ctx);
 
         num_roots = 0;
         for (i = 0; success && i < fac->length; i++)
         {
-            factor_deg = (fac->coeffs + i)->length - 1;
+            factor_deg = (fac->entries + i)->length - 1;
 
-            success = _ca_poly_roots(roots->coeffs + num_roots, (fac->coeffs + i)->coeffs, (fac->coeffs + i)->length, ctx);
+            success = _ca_poly_roots(roots->entries + num_roots, (fac->entries + i)->coeffs, (fac->entries + i)->length, ctx);
 
             for (j = 0; j < factor_deg; j++)
                 exp[num_roots + j] = fac_exp[i];

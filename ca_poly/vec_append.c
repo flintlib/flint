@@ -15,6 +15,6 @@ void
 ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t f, ca_ctx_t ctx)
 {
     _ca_poly_vec_fit_length(vec, vec->length + 1, ctx);
-    ca_poly_set(vec->coeffs + vec->length, f, ctx);
+    ca_poly_set(vec->entries + vec->length, f, ctx);
     vec->length++;
 }

@@ -36,7 +36,7 @@ extern "C" {
 
 typedef struct
 {
-    ca_ptr coeffs;
+    ca_ptr entries;
     slong length;
     slong alloc;
 }
@@ -44,7 +44,7 @@ ca_vec_struct;
 
 typedef ca_vec_struct ca_vec_t[1];
 
-#define ca_vec_entry(vec, i) ((vec)->coeffs + (i))
+#define ca_vec_entry(vec, i) ((vec)->entries + (i))
 
 /* Memory management */
 

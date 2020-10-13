@@ -23,8 +23,8 @@ _ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx)
 void
 ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx)
 {
-    if (vec->coeffs != NULL)
+    if (vec->entries != NULL)
     {
-        _ca_vec_clear(vec->coeffs, vec->alloc, ctx);
+        _ca_vec_clear(vec->entries, vec->alloc, ctx);
     }
 }

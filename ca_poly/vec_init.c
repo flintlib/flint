@@ -28,13 +28,13 @@ ca_poly_vec_init(ca_poly_vec_t res, slong len, ca_ctx_t ctx)
 {
     if (len == 0)
     {
-        res->coeffs = NULL;
+        res->entries = NULL;
         res->length = 0;
         res->alloc = 0;
     }
     else
     {
-        res->coeffs = _ca_poly_vec_init(len, ctx);
+        res->entries = _ca_poly_vec_init(len, ctx);
         res->length = len;
         res->alloc = len;
     }

@@ -47,7 +47,7 @@ int main()
             {
                 ca_poly_one(C, ctx);
                 for (i = 0; i < F->length; i++)
-                        ca_poly_mul(C, C, F->coeffs + i, ctx);
+                        ca_poly_mul(C, C, F->entries + i, ctx);
 
                 if (ca_poly_check_equal(B, C, ctx) == T_FALSE)
                 {

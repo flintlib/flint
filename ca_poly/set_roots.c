@@ -90,6 +90,6 @@ ca_poly_set_roots(ca_poly_t poly, ca_vec_t roots, const ulong * exp, ca_ctx_t ct
         deg += exp[i];
 
     ca_poly_fit_length(poly, deg + 1, ctx);
-    _ca_poly_set_roots(poly->coeffs, roots->coeffs, exp, len, ctx);
+    _ca_poly_set_roots(poly->coeffs, roots->entries, exp, len, ctx);
     _ca_poly_set_length(poly, deg + 1, ctx);
 }

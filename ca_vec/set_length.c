@@ -21,7 +21,7 @@ _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx)
         if (len < 2 * vec->alloc)
             len = 2 * vec->alloc;
 
-        vec->coeffs = flint_realloc(vec->coeffs, len * sizeof(ca_struct));
+        vec->entries = flint_realloc(vec->entries, len * sizeof(ca_struct));
 
         for (i = vec->alloc; i < len; i++)
             ca_init(ca_vec_entry(vec, i), ctx);

@@ -21,10 +21,10 @@ _ca_poly_vec_fit_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx)
         if (len < 2 * vec->alloc)
             len = 2 * vec->alloc;
 
-        vec->coeffs = flint_realloc(vec->coeffs, len * sizeof(ca_poly_struct));
+        vec->entries = flint_realloc(vec->entries, len * sizeof(ca_poly_struct));
 
         for (i = vec->alloc; i < len; i++)
-            ca_poly_init(vec->coeffs + i, ctx);
+            ca_poly_init(vec->entries + i, ctx);
 
         vec->alloc = len;
     }
@@ -38,14 +38,14 @@ ca_poly_vec_set_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx)
     if (vec->length > len)
     {
         for (i = len; i < vec->length; i++)
-            ca_poly_zero(vec->coeffs + i, ctx);
+            ca_poly_zero(vec->entries + i, ctx);
     }
     else if (vec->length < len)
     {
         _ca_poly_vec_fit_length(vec, len, ctx);
 
         for (i = vec->length; i < len; i++)
-            ca_poly_zero(vec->coeffs + i, ctx);
+            ca_poly_zero(vec->entries + i, ctx);
     }
 
     vec->length = len;

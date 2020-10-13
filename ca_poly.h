@@ -35,14 +35,21 @@ extern "C" {
 
 /* Polynomial object */
 
-typedef ca_vec_struct ca_poly_struct;
+typedef struct
+{
+    ca_struct * coeffs;
+    slong length;
+    slong alloc;
+}
+ca_poly_struct;
+
 typedef ca_poly_struct ca_poly_t[1];
 
 /* Vectors of polynomials */
 
 typedef struct
 {
-    ca_poly_struct * coeffs;
+    ca_poly_struct * entries;
     slong length;
     slong alloc;
 }

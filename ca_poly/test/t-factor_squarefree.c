@@ -85,7 +85,7 @@ int main()
             ca_poly_one(Q, ctx);
             for (i = 0; i < F->length; i++)
                 for (j = 0; j < exp[i]; j++)
-                    ca_poly_mul(Q, Q, F->coeffs + i, ctx);
+                    ca_poly_mul(Q, Q, F->entries + i, ctx);
 
             ca_poly_mul_ca(Q, Q, c, ctx);
 
@@ -108,7 +108,7 @@ int main()
                 for (i = 0; i < F->length; i++)
                 {
                     flint_printf("Multiplicity %wu: ", exp[i]);
-                    ca_poly_print(F->coeffs + i, ctx);
+                    ca_poly_print(F->entries + i, ctx);
                 }
 
                 flint_abort();

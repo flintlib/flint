@@ -23,7 +23,7 @@ ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx)
     for (i = 0; i < len; i++)
     {
         flint_printf("    ");
-        ca_print(vec->coeffs + i, ctx);
+        ca_print(vec->entries + i, ctx);
         flint_printf("\n");
     }
 
@@ -41,7 +41,7 @@ ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx)
 
     for (i = 0; i < len; i++)
     {
-        ca_printn(vec->coeffs + i, digits, ctx);
+        ca_printn(vec->entries + i, digits, ctx);
         if (i < len - 1)
             flint_printf(", ");
     }
