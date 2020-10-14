@@ -98,6 +98,12 @@ class ca_poly_struct(ctypes.Structure):
                 ('length', ctypes.c_long),
                 ('alloc', ctypes.c_long)]
 
+class ca_poly_vec_struct(ctypes.Structure):
+    """Low-level wrapper for ca_poly_vec_struct, for internal use by ctypes."""
+    _fields_ = [('entries', ctypes.POINTER(ca_poly_struct)),
+                ('length', ctypes.c_long),
+                ('alloc', ctypes.c_long)]
+
 class ca_ctx:
     """
     Python class wrapping the ca_ctx_t context object.
@@ -943,6 +949,8 @@ class ca_mat:
     """
     Python class wrapping the ca_mat_t type for matrices.
 
+    Examples::
+
         >>> ca_mat(2,3)
         ca_mat of size 2 x 3
         [0, 0, 0]
@@ -960,6 +968,25 @@ class ca_mat:
         ca_mat of size 2 x 2
         [-1, -0.858407 {a-4 where a = 3.14159 [Pi]}]
         [ 3, 8.28319 {2*a+2 where a = 3.14159 [Pi]}]
+
+    A nontrivial calculation::
+
+        >>> H = ca_mat([[ca(1)/(i+j+1) for i in range(5)] for j in range(5)])
+        >>> H
+        ca_mat of size 5 x 5
+        [             1, 0.500000 {1/2}, 0.333333 {1/3}, 0.250000 {1/4}, 0.200000 {1/5}]
+        [0.500000 {1/2}, 0.333333 {1/3}, 0.250000 {1/4}, 0.200000 {1/5}, 0.166667 {1/6}]
+        [0.333333 {1/3}, 0.250000 {1/4}, 0.200000 {1/5}, 0.166667 {1/6}, 0.142857 {1/7}]
+        [0.250000 {1/4}, 0.200000 {1/5}, 0.166667 {1/6}, 0.142857 {1/7}, 0.125000 {1/8}]
+        [0.200000 {1/5}, 0.166667 {1/6}, 0.142857 {1/7}, 0.125000 {1/8}, 0.111111 {1/9}]
+        >>> H.trace()
+        1.78730 {563/315}
+        >>> sum(c*multiplicity for (c, multiplicity) in H.eigenvalues())
+        1.78730 {563/315}
+        >>> H.det()
+        3.74930e-12 {1/266716800000}
+        >>> prod(c**multiplicity for (c, multiplicity) in H.eigenvalues())
+        3.74930e-12 {1/266716800000}
 
     """
 
@@ -1024,6 +1051,50 @@ class ca_mat:
     @staticmethod
     def from_param(arg):
         return arg
+
+    def __eq__(self, other):
+        """
+        Examples::
+
+            >>> ca_mat([[1,1],[0,1]]) ** 2 == ca_mat([[1,2],[0,1]])
+            True
+
+        """
+        if type(self) is not type(other):
+            try:
+                other = ca_mat(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = libcalcium.ca_mat_check_equal(self, other, self._ctx)
+        if res == T_TRUE:
+            return True
+        if res == T_FALSE:
+            return False
+        raise ValueError("unable to decide equality")
+
+    def __ne__(self, other):
+        """
+        Examples::
+
+            >>> ca_mat([[1,1],[0,1]]) ** 2 != ca_mat([[1,3],[0,1]])
+            True
+
+        """
+        if type(self) is not type(other):
+            try:
+                other = ca_mat(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = libcalcium.ca_mat_check_equal(self, other, self._ctx)
+        if res == T_TRUE:
+            return False
+        if res == T_FALSE:
+            return True
+        raise ValueError("unable to decide equality")
 
     def nrows(self):
         return self._data.r
@@ -1097,6 +1168,25 @@ class ca_mat:
         x = ca(x)
         libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
 
+    def trace(self):
+        """
+        The trace of this matrix.
+
+        Examples::
+
+            >>> ca_mat([[1,2],[3,pi]]).trace()
+            4.14159 {a+1 where a = 3.14159 [Pi]}
+
+        """
+        nrows = self.nrows()
+        ncols = self.ncols()
+        if nrows != ncols:
+            raise ValueError("a square matrix is required")
+        res = ca()
+        libcalcium.ca_mat_trace(res, self, self._ctx)
+        return res
+
+
     def det(self):
         """
         The determinant of this matrix.
@@ -1113,6 +1203,16 @@ class ca_mat:
             raise ValueError("a square matrix is required")
         res = ca()
         libcalcium.ca_mat_det(res, self, self._ctx)
+        return res
+
+    def __neg__(self):
+        res = ca_mat(self.nrows(), self.ncols())
+        libcalcium.ca_mat_neg(res, self, self._ctx)
+        return res
+
+    def __pos__(self):
+        res = ca_mat(self.nrows(), self.ncols())
+        libcalcium.ca_mat_set(res, self, self._ctx)
         return res
 
     def __add__(self, other):
@@ -1213,6 +1313,64 @@ class ca_mat:
         libcalcium.ca_mat_pow_ui_binexp(res, self, e, self._ctx)
         return res
 
+    def conjugate(self):
+        """
+        Entrywise complex conjugate.
+
+            >>> ca_mat([[5,1-i]]).conjugate()
+            ca_mat of size 1 x 2
+            [5, 1.00000 + 1.00000*I {a+1 where a = I [a^2+1=0]}]
+        """
+        res = ca_mat(self.nrows(), self.ncols())
+        libcalcium.ca_mat_conjugate(res, self, self._ctx)
+        return res
+
+    conj = conjugate
+
+    def transpose(self):
+        """
+        Matrix transpose.
+
+            >>> ca_mat([[5,1-i]]).transpose()
+            ca_mat of size 2 x 1
+            [                                               5]
+            [1.00000 - 1.00000*I {-a+1 where a = I [a^2+1=0]}]
+
+        """
+        res = ca_mat(self.ncols(), self.nrows())
+        libcalcium.ca_mat_transpose(res, self, self._ctx)
+        return res
+
+    def conjugate_transpose(self):
+        """
+        Conjugate matrix transpose.
+
+            >>> ca_mat([[5,1-i]]).conjugate_transpose()
+            ca_mat of size 2 x 1
+            [                                              5]
+            [1.00000 + 1.00000*I {a+1 where a = I [a^2+1=0]}]
+
+        """
+        res = ca_mat(self.ncols(), self.nrows())
+        libcalcium.ca_mat_conjugate_transpose(res, self, self._ctx)
+        return res
+
+    def charpoly(self):
+        """
+        Characteristic polynomial of this matrix.
+
+            >>> ca_mat([[5,pi],[1,-1]]).charpoly()
+            ca_poly of length 3
+            [-8.14159 {-a-5 where a = 3.14159 [Pi]}, -4, 1]
+
+        """
+        m = self.nrows()
+        n = self.ncols()
+        assert m == n
+        res = ca_poly()
+        libcalcium.ca_mat_charpoly(res, self, self._ctx)
+        return res
+
     def eigenvalues(self):
         """
         Eigenvalues of this matrix.
@@ -1273,6 +1431,39 @@ class ca_vec:
         libcalcium.ca_set(x, libcalcium.ca_vec_entry_ptr(self, i, self._ctx), self._ctx)
         return x
 
+class ca_poly_vec:
+
+    def __init__(self, n=0):
+        self._ctx_python = ctx_default
+        self._ctx = self._ctx_python._ref
+        self._data = ca_poly_vec_struct()
+        self._ref = ctypes.byref(self._data)
+        n = int(n)
+        assert n >= 0
+        libcalcium.ca_poly_vec_init(self, n, self._ctx)
+
+    def __del__(self):
+        libcalcium.ca_poly_vec_clear(self, self._ctx)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
+
+    def __len__(self):
+        return self._data.length
+
+    def __getitem__(self, i):
+        n = len(self)
+        assert 0 <= i < n
+        x = ca_poly()
+        libcalcium.ca_poly_set(x, ctypes.byref(self._data.entries[i]), self._ctx)
+        return x
+
+
 class ca_poly:
     """
     Python class wrapping the ca_poly_t type for polynomials.
@@ -1304,6 +1495,50 @@ class ca_poly:
     def from_param(arg):
         return arg
 
+    def __eq__(self, other):
+        """
+        Examples::
+
+            >>> ca_poly([1,1]) ** 2 == ca_poly([1,2,1])
+            True
+
+        """
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = libcalcium.ca_poly_check_equal(self, other, self._ctx)
+        if res == T_TRUE:
+            return True
+        if res == T_FALSE:
+            return False
+        raise ValueError("unable to decide equality")
+
+    def __ne__(self, other):
+        """
+        Examples::
+
+            >>> ca_poly([1,1]) ** 2 != ca_poly([1,3,1])
+            True
+
+        """
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = libcalcium.ca_poly_check_equal(self, other, self._ctx)
+        if res == T_TRUE:
+            return False
+        if res == T_FALSE:
+            return True
+        raise ValueError("unable to decide equality")
+
     def __len__(self):
         return self._data.length
 
@@ -1321,6 +1556,16 @@ class ca_poly:
         x = ca()
         libcalcium.ca_set(x, libcalcium.ca_poly_coeff_ptr(self, i, self._ctx), self._ctx)
         return x
+
+    def __neg__(self):
+        res = ca_poly()
+        libcalcium.ca_poly_neg(res, self, self._ctx)
+        return res
+
+    def __pos__(self):
+        res = ca_poly()
+        libcalcium.ca_poly_set(res, self, self._ctx)
+        return res
 
     def __add__(self, other):
         if type(self) is not type(other):
@@ -1433,6 +1678,168 @@ class ca_poly:
         libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
         return res
 
+    def gcd(self, other):
+        """
+        Polynomial GCD.
+
+        Examples::
+
+            >>> x = ca_poly([0,1]); (x+1).gcd(x-1)
+            ca_poly of length 1
+            [1]
+            >>> x = ca_poly([0,1]); (x**2 + pi**2).gcd(x+i*pi)
+            ca_poly of length 2
+            [3.14159*I {a*b where a = 3.14159 [Pi], b = I [b^2+1=0]}, 1]
+
+        """
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        if not libcalcium.ca_poly_gcd(res, self, other, self._ctx):
+            raise ValueError("failed polynomial gcd")
+        return res
+
+    def roots(self):
+        """
+        Roots of this polynomial.
+        Returns a list of (root, multiplicity) pairs.
+
+            >>> ca_poly([2,11,20,12]).roots()
+            [(-0.666667 {-2/3}, 1), (-0.500000 {-1/2}, 2)]
+
+        """
+        n = len(self)
+        roots = ca_vec()
+        exp = ctypes.cast(libflint.flint_malloc(ctypes.sizeof(ctypes.c_ulong) * n), ctypes.POINTER(ctypes.c_ulong))
+        success = libcalcium.ca_poly_roots(roots, exp, self, self._ctx)
+        if not success:
+            libflint.flint_free(exp)
+            raise ValueError("failed to compute roots")
+        else:
+            res = [(roots[i], exp[i]) for i in range(len(roots))]
+            libflint.flint_free(exp)
+            return res
+
+    def factor_squarefree(self):
+        """
+        Squarefree factorization of this polynomial
+        Returns (lc, L) where L is a list of (factor, multiplicity) pairs.
+
+            >>> ca_poly([9,6,7,-28,12]).factor_squarefree()
+            (12, [(ca_poly of length 3
+            [0.333333 {1/3}, 0.666667 {2/3}, 1], 1), (ca_poly of length 2
+            [-1.50000 {-3/2}, 1], 2)])
+
+        """
+        n = len(self)
+        lc = ca()
+        fac = ca_poly_vec()
+        exp = ctypes.cast(libflint.flint_malloc(ctypes.sizeof(ctypes.c_ulong) * n), ctypes.POINTER(ctypes.c_ulong))
+        success = libcalcium.ca_poly_factor_squarefree(lc, fac, exp, self, self._ctx)
+        if not success:
+            libflint.flint_free(exp)
+            raise ValueError("failed to compute factors")
+        else:
+            res = [(fac[i], exp[i]) for i in range(len(fac))]
+            libflint.flint_free(exp)
+            return lc, res
+
+    def squarefree_part(self):
+        """
+        Squarefree part of this polynomial.
+
+            >>> ca_poly([9,6,7,-28,12]).squarefree_part()
+            ca_poly of length 4
+            [-0.500000 {-1/2}, -0.666667 {-2/3}, -0.833333 {-5/6}, 1]
+        """
+        res = ca_poly()
+        if not libcalcium.ca_poly_squarefree_part(res, self, self._ctx):
+            raise ValueError("failed to compute squarefree part")
+        return res
+
+    def integral(self):
+        """
+        Integral of this polynomial.
+
+            >>> ca_poly([1,1,1,1]).integral()
+            ca_poly of length 5
+            [0, 1, 0.500000 {1/2}, 0.333333 {1/3}, 0.250000 {1/4}]
+        """
+        res = ca_poly()
+        libcalcium.ca_poly_integral(res, self, self._ctx)
+        return res
+
+    def derivative(self):
+        """
+        Derivative of this polynomial.
+
+            >>> ca_poly([1,1,1,1]).derivative()
+            ca_poly of length 3
+            [1, 2, 3]
+        """
+        res = ca_poly()
+        libcalcium.ca_poly_derivative(res, self, self._ctx)
+        return res
+
+    def monic(self):
+        """
+        Make this polynomial monic.
+
+            >>> ca_poly([1,2,3]).monic()
+            ca_poly of length 3
+            [0.333333 {1/3}, 0.666667 {2/3}, 1]
+            >>> ca_poly().monic()
+            Traceback (most recent call last):
+              ...
+            ValueError: failed to make monic
+        """
+        res = ca_poly()
+        if not libcalcium.ca_poly_make_monic(res, self, self._ctx):
+            raise ValueError("failed to make monic")
+        return res
+
+    def is_proper(self):
+        """
+        Checks if this polynomial definitely has finite coefficients
+        and that the leading coefficient is provably nonzero.
+
+            >>> ca_poly([]).is_proper()
+            True
+            >>> ca_poly([1,2,3]).is_proper()
+            True
+            >>> ca_poly([1,2,1-exp(ca(2)**-10000)]).is_proper()
+            False
+            >>> ca_poly([inf]).is_proper()
+            False
+
+        """
+        res = ca_poly()
+        if libcalcium.ca_poly_is_proper(self, self._ctx):
+            return True
+        return False
+
+    def degree(self):
+        """
+        Degree of this polynomial.
+
+            >>> ca_poly([1,2,3]).degree()
+            2
+            >>> ca_poly().degree()
+            -1
+            >>> ca_poly([1,2,1-exp(ca(2)**-10000)]).degree()
+            Traceback (most recent call last):
+              ...
+            ValueError: unable to determine degree
+
+        """
+        if self.is_proper():
+            return len(self) - 1
+        raise ValueError("unable to determine degree")
 
 
 
@@ -1641,6 +2048,11 @@ uinf = ca.uinf()
 undefined = ca.undefined()
 unknown = ca.unknown()
 
+def prod(s):
+    res = ca(1)
+    for x in s:
+        res *= x
+    return res
 
 def test_floor_ceil():
     assert floor(sqrt(2)) == 1
