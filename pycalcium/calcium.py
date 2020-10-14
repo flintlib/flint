@@ -1273,6 +1273,169 @@ class ca_vec:
         libcalcium.ca_set(x, libcalcium.ca_vec_entry_ptr(self, i, self._ctx), self._ctx)
         return x
 
+class ca_poly:
+    """
+    Python class wrapping the ca_poly_t type for polynomials.
+    """
+
+    def __init__(self, val=0):
+        self._ctx_python = ctx_default
+        self._ctx = self._ctx_python._ref
+        self._data = ca_poly_struct()
+        self._ref = ctypes.byref(self._data)
+        libcalcium.ca_poly_init(self, self._ctx)
+        if val:
+            try:
+                val = [ca(c) for c in val]
+                for i in range(len(val)):
+                    libcalcium.ca_poly_set_coeff_ca(self, i, val[i], self._ctx)
+            except TypeError:
+                val = ca(val)
+                libcalcium.ca_poly_set_ca(self, val, self._ctx)
+
+    def __del__(self):
+        libcalcium.ca_poly_clear(self, self._ctx)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
+
+    def __len__(self):
+        return self._data.length
+
+    def __repr__(self):
+        n = len(self)
+        s = "ca_poly of length %i\n" % n
+        s += str([self[i] for i in range(n)])
+        return s
+
+    __str__ = __repr__
+
+    def __getitem__(self, i):
+        n = len(self)
+        assert 0 <= i < n
+        x = ca()
+        libcalcium.ca_set(x, libcalcium.ca_poly_coeff_ptr(self, i, self._ctx), self._ctx)
+        return x
+
+    def __add__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        libcalcium.ca_poly_add(res, self, other, self._ctx)
+        return res
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        libcalcium.ca_poly_sub(res, self, other, self._ctx)
+        return res
+
+    def __rsub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        libcalcium.ca_poly_sub(res, other, self, self._ctx)
+        return res
+
+    def __mul__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        libcalcium.ca_poly_mul(res, self, other, self._ctx)
+        return res
+
+    __rmul__ = __mul__
+
+    def __truediv__(self, other):
+        try:
+            other = ca(other)
+            if self._ctx_python is not self._ctx_python:
+                raise ValueError("different context objects!")
+            res = ca_poly()
+            libcalcium.ca_poly_div_ca(res, self, other, self._ctx)
+            return res
+        except TypeError:
+            pass
+        return NotImplemented
+
+    def __floordiv__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        if not libcalcium.ca_poly_div(res, self, other, self._ctx):
+            raise ValueError("failed polynomial division: unable to prove leading coefficient nonzero")
+        return res
+
+    def __mod__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        if not libcalcium.ca_poly_rem(res, self, other, self._ctx):
+            raise ValueError("failed polynomial division: unable to prove leading coefficient nonzero")
+        return res
+
+    def __divmod__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = ca_poly(other)
+            except TypeError:
+                return NotImplemented
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res1 = ca_poly()
+        res2 = ca_poly()
+        if not libcalcium.ca_poly_divrem(res1, res2, self, other, self._ctx):
+            raise ValueError("failed polynomial division: unable to prove leading coefficient nonzero")
+        return res1, res2
+
+    def __pow__(self, other):
+        e = int(other)
+        assert e >= 0 and e * len(self) <= sys.maxsize
+        res = ca_poly()
+        libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
+        return res
+
+
+
+
 # todo: in functions, don't create copies of the input
 
 def re(x):

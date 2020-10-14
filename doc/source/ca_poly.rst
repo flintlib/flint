@@ -216,6 +216,16 @@ Arithmetic
     invertible, returns 0.
     The underscore method takes a precomputed inverse of the leading coefficient of *B*.
 
+.. function:: void _ca_poly_pow_ui_trunc(ca_ptr res, ca_srcptr f, slong flen, ulong exp, slong len, ca_ctx_t ctx)
+              void ca_poly_pow_ui_trunc(ca_poly_t res, const ca_poly_t poly, ulong exp, slong len, ca_ctx_t ctx)
+
+    Sets *res* to *poly* raised to the power *exp*, truncated to length *len*.
+
+.. function:: void _ca_poly_pow_ui(ca_ptr res, ca_srcptr f, slong flen, ulong exp, ca_ctx_t ctx)
+              void ca_poly_pow_ui(ca_poly_t res, const ca_poly_t poly, ulong exp, ca_ctx_t ctx)
+
+    Sets *res* to *poly* raised to the power *exp*.
+
 Derivative and integral
 -------------------------------------------------------------------------------
 

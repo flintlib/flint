@@ -111,6 +111,9 @@ void ca_poly_set(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx);
 void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx);
 void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx);
 
+/* todo: document */
+void ca_poly_set_coeff_ca(ca_poly_t poly, slong n, const ca_t x, ca_ctx_t ctx);
+
 /* Random generation */
 
 void ca_poly_randtest(ca_poly_t poly, flint_rand_t state, slong len, slong depth, slong bits, ca_ctx_t ctx);
@@ -148,11 +151,22 @@ void ca_poly_sub(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca
 void _ca_poly_mul(ca_ptr C, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
 void ca_poly_mul(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx);
 
+/* todo: document */
 CA_POLY_INLINE void
 ca_poly_mul_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
 {
     ca_poly_fit_length(res, poly->length, ctx);
     _ca_vec_scalar_mul_ca(res->coeffs, poly->coeffs, poly->length, c, ctx);
+    _ca_poly_set_length(res, poly->length, ctx);
+    _ca_poly_normalise(res, ctx);
+}
+
+/* todo: document */
+CA_POLY_INLINE void
+ca_poly_div_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
+{
+    ca_poly_fit_length(res, poly->length, ctx);
+    _ca_vec_scalar_div_ca(res->coeffs, poly->coeffs, poly->length, c, ctx);
     _ca_poly_set_length(res, poly->length, ctx);
     _ca_poly_normalise(res, ctx);
 }
@@ -168,6 +182,13 @@ int ca_poly_divrem(ca_poly_t Q, ca_poly_t R, const ca_poly_t A, const ca_poly_t 
 
 int ca_poly_div(ca_poly_t Q, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
 int ca_poly_rem(ca_poly_t R, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
+
+void _ca_poly_pow_ui_trunc(ca_ptr res, ca_srcptr f, slong flen, ulong exp, slong len, ca_ctx_t ctx);
+void ca_poly_pow_ui_trunc(ca_poly_t res, const ca_poly_t poly, ulong exp, slong len, ca_ctx_t ctx);
+
+void _ca_poly_pow_ui(ca_ptr res, ca_srcptr f, slong flen, ulong exp, ca_ctx_t ctx);
+void ca_poly_pow_ui(ca_poly_t res, const ca_poly_t poly, ulong exp, ca_ctx_t ctx);
+
 
 /* Integral and derivative */
 

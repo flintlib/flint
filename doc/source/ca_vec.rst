@@ -129,6 +129,11 @@ Arithmetic
     Sets *res* to *src* multiplied by *c*, all vectors having
     length *len*.
 
+.. function:: void _ca_vec_scalar_div_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx)
+
+    Sets *res* to *src* divided by *c*, all vectors having
+    length *len*.
+
 .. function:: void _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx)
 
     Adds *src* multiplied by *c* to the vector *res*, all vectors having
