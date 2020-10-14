@@ -414,11 +414,6 @@ class ca:
         return self.__repr__()
 
     def __bool__(self):
-        """
-
-        Does it work?
-
-        """
         t = libcalcium.ca_check_is_zero(self, self._ctx)
         if t == T_TRUE:
             return False
@@ -1052,6 +1047,14 @@ class ca_mat:
     def from_param(arg):
         return arg
 
+    def __bool__(self):
+        t = libcalcium.ca_mat_check_is_zero(self, self._ctx)
+        if t == T_TRUE:
+            return False
+        if t == T_FALSE:
+            return True
+        raise ValueError("unable to decide predicate: is_zero")
+
     def __eq__(self, other):
         """
         Examples::
@@ -1475,7 +1478,10 @@ class ca_poly:
         self._data = ca_poly_struct()
         self._ref = ctypes.byref(self._data)
         libcalcium.ca_poly_init(self, self._ctx)
-        if val:
+        # todo: check conext objects
+        if type(val) is ca_poly:
+            libcalcium.ca_poly_set(self, val, self._ctx)
+        elif val:
             try:
                 val = [ca(c) for c in val]
                 for i in range(len(val)):
@@ -1494,6 +1500,14 @@ class ca_poly:
     @staticmethod
     def from_param(arg):
         return arg
+
+    def __bool__(self):
+        t = libcalcium.ca_poly_check_is_zero(self, self._ctx)
+        if t == T_TRUE:
+            return False
+        if t == T_FALSE:
+            return True
+        raise ValueError("unable to decide predicate: is_zero")
 
     def __eq__(self, other):
         """
@@ -1676,6 +1690,33 @@ class ca_poly:
         assert e >= 0 and e * len(self) <= sys.maxsize
         res = ca_poly()
         libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
+        return res
+
+    def __call__(self, other):
+        """
+        Evaluation or composition.
+
+            >>> ca_poly([1,2,3])(pi)
+            36.8920 {3*a^2+2*a+1 where a = 3.14159 [Pi]}
+            >>> ca_poly([1,2,3])(ca_poly([3,2,1]))
+            ca_poly of length 5
+            [34, 40, 32, 12, 3]
+
+        """
+        try:
+            other = ca(other)
+            if self._ctx_python is not self._ctx_python:
+                raise ValueError("different context objects!")
+            res = ca()
+            libcalcium.ca_poly_evaluate(res, self, other, self._ctx)
+            return res
+        except TypeError:
+            pass
+        other = ca_poly(other)
+        if self._ctx_python is not self._ctx_python:
+            raise ValueError("different context objects!")
+        res = ca_poly()
+        libcalcium.ca_poly_compose(res, self, other, self._ctx)
         return res
 
     def gcd(self, other):
