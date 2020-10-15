@@ -1443,6 +1443,37 @@ class ca_mat:
             return int(r[0])
         raise ValueError("failed to compute rank")
 
+    def inv(self):
+        """
+        Matrix inverse.
+
+            >>> ca_mat([[1,1],[0,1/pi]]).inv()
+            ca_mat of size 2 x 2
+            [1, -3.14159 {-a where a = 3.14159 [Pi]}]
+            [0,   3.14159 {a where a = 3.14159 [Pi]}]
+            >>> ca_mat([[1, 1], [2, 2]]).inv()
+            Traceback (most recent call last):
+              ...
+            ZeroDivisionError: singular matrix
+            >>> ca_mat([[1, 0], [0, 1-exp(ca(2)**-10000)]]).inv()
+            Traceback (most recent call last):
+              ...
+            ValueError: failed to compute inverse
+
+        """
+        n = self.nrows()
+        m = self.ncols()
+        if n != m:
+            raise ValueError("matrix must be square")
+        res = ca_mat(self.nrows(), self.ncols())
+        invertible = libcalcium.ca_mat_inv(res, self, self._ctx)
+        if invertible == T_TRUE:
+            return res
+        if invertible == T_FALSE:
+            raise ZeroDivisionError("singular matrix")
+        raise ValueError("failed to compute inverse")
+
+
 class ca_vec:
     """
     Python class wrapping the ca_vec_t type for vectors.
