@@ -144,10 +144,6 @@ int main()
                 }
             }
         }
-        else
-        {
-            printf("fulf\n");
-        }
 
         ca_mat_clear(A, ctx);
         ca_mat_clear(B, ctx);

@@ -15,7 +15,7 @@ Python path, for example by adding it to ``PYTHONPATH``,
 adding it to ``sys.path``,
 or simply starting Python inside the ``pycalcium`` directory.
 
-Import the module and run perform a calculation:
+Import the module and run a calculation:
 
     >>> import pyca
     >>> pyca.ca(1) / 3

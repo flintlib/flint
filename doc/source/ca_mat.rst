@@ -370,6 +370,15 @@ Inverse
     Returns ``T_FALSE`` if *A* is singular, and ``T_UNKNOWN`` if the
     rank of *A* cannot be determined.
 
+Rank
+-------------------------------------------------------------------------------
+
+.. function:: int ca_mat_rank(slong * rank, const ca_mat_t A, ca_ctx_t ctx)
+
+    Computes the rank of the matrix *A*. If successful, returns 1 and
+    writes the rank to ``rank``. If unsuccessful, returns 0.
+
+
 Determinant
 -------------------------------------------------------------------------------
 

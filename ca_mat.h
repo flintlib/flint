@@ -283,6 +283,10 @@ void ca_mat_solve_triu(ca_mat_t X, const ca_mat_t U, const ca_mat_t B, int unit,
 
 void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * perm, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
+/* Rank */
+
+int ca_mat_rank(slong * rank, const ca_mat_t A, ca_ctx_t ctx);
+
 /* Determinant */
 
 void ca_mat_det_berkowitz(ca_t det, const ca_mat_t A, ca_ctx_t ctx);

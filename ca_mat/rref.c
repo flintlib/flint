@@ -18,7 +18,6 @@ ca_mat_rref(slong * res_rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
     slong *pivots;
     slong *nonpivots;
     slong *P;
-    ca_struct * e;
     ca_mat_t U, V;
     int success;
 
