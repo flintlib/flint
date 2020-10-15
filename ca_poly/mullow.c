@@ -32,37 +32,59 @@ _ca_poly_mullow(ca_ptr res,
     }
     else if (poly1 == poly2 && len1 == len2)
     {
-        slong i, start, stop;
-        ca_t t;
-
-        ca_init(t, ctx);
-
-        ca_sqr(res, poly1, ctx);
-        ca_mul(res + 1, poly1, poly1 + 1, ctx);
-        ca_mul_ui(res + 1, res + 1, 2, ctx);
-
-        for (i = 2; i < FLINT_MIN(n, 2 * len1 - 3); i++)
+        /* todo: tune thresholds */
+        if (len1 >= 4 && _ca_vec_is_fmpq_vec(poly1, len1, ctx))
         {
-            start = FLINT_MAX(0, i - len1 + 1);
-            stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
+            fmpz *z1, *z3;
+            fmpz_t den1;
 
-            ca_dot(res + i, NULL, 0, poly1 + start, 1,
-                poly1 + i - start, -1, stop - start + 1, ctx);
-            ca_mul_ui(res + i, res + i, 2, ctx);
-            if (i % 2 == 0 && i / 2 < len1)
-                _ca_addmul(res + i, t, poly1 + i / 2, poly1 + i / 2, ctx);
+            fmpz_init(den1);
+            z1 = _fmpz_vec_init(len1 + n);
+            z3 = z1 + len1;
+
+            _ca_vec_fmpq_vec_get_fmpz_vec_den(z1, den1, poly1, len1, ctx);
+
+            fmpz_mul(den1, den1, den1);
+            _fmpz_poly_sqrlow(z3, z1, len1, n);
+            _ca_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n, ctx);
+
+            _fmpz_vec_clear(z1, len1 + n);
+            fmpz_clear(den1);
         }
-
-        if (len1 > 2 && n >= 2 * len1 - 2)
+        else
         {
-            ca_mul(res + 2 * len1 - 3, poly1 + len1 - 1, poly1 + len1 - 2, ctx);
-            ca_mul_ui(res + 2 * len1 - 3, res + 2 * len1 - 3, 2, ctx);
+            slong i, start, stop;
+            ca_t t;
+
+            ca_init(t, ctx);
+
+            ca_sqr(res, poly1, ctx);
+            ca_mul(res + 1, poly1, poly1 + 1, ctx);
+            ca_mul_ui(res + 1, res + 1, 2, ctx);
+
+            for (i = 2; i < FLINT_MIN(n, 2 * len1 - 3); i++)
+            {
+                start = FLINT_MAX(0, i - len1 + 1);
+                stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
+
+                ca_dot(res + i, NULL, 0, poly1 + start, 1,
+                    poly1 + i - start, -1, stop - start + 1, ctx);
+                ca_mul_ui(res + i, res + i, 2, ctx);
+                if (i % 2 == 0 && i / 2 < len1)
+                    _ca_addmul(res + i, t, poly1 + i / 2, poly1 + i / 2, ctx);
+            }
+
+            if (len1 > 2 && n >= 2 * len1 - 2)
+            {
+                ca_mul(res + 2 * len1 - 3, poly1 + len1 - 1, poly1 + len1 - 2, ctx);
+                ca_mul_ui(res + 2 * len1 - 3, res + 2 * len1 - 3, 2, ctx);
+            }
+
+            if (n >= 2 * len1 - 1)
+                ca_sqr(res + 2 * len1 - 2, poly1 + len1 - 1, ctx);
+
+            ca_clear(t, ctx);
         }
-
-        if (n >= 2 * len1 - 1)
-            ca_sqr(res + 2 * len1 - 2, poly1 + len1 - 1, ctx);
-
-        ca_clear(t, ctx);
     }
     else if (len1 == 1)
     {
@@ -74,17 +96,47 @@ _ca_poly_mullow(ca_ptr res,
     }
     else
     {
-        slong i, top1, top2;
-
-        ca_mul(res, poly1, poly2, ctx);
-
-        for (i = 1; i < n; i++)
+        /* todo: tune thresholds */
+        if (len1 >= 4 && len2 >= 4 && _ca_vec_is_fmpq_vec(poly1, len1, ctx) && _ca_vec_is_fmpq_vec(poly2, len2, ctx))
         {
-            top1 = FLINT_MIN(len1 - 1, i);
-            top2 = FLINT_MIN(len2 - 1, i);
+            fmpz *z1, *z2, *z3;
+            fmpz_t den1, den2;
 
-            ca_dot(res + i, NULL, 0, poly1 + i - top2, 1,
-                poly2 + top2, -1, top1 + top2 - i + 1, ctx);
+            fmpz_init(den1);
+            fmpz_init(den2);
+            z1 = _fmpz_vec_init(len1 + len2 + n);
+            z2 = z1 + len1;
+            z3 = z2 + len2;
+
+            _ca_vec_fmpq_vec_get_fmpz_vec_den(z1, den1, poly1, len1, ctx);
+            _ca_vec_fmpq_vec_get_fmpz_vec_den(z2, den2, poly2, len2, ctx);
+
+            fmpz_mul(den1, den1, den2);
+            if (len1 >= len2)
+                _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
+            else
+                _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+
+            _ca_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n, ctx);
+
+            _fmpz_vec_clear(z1, len1 + len2 + n);
+            fmpz_clear(den1);
+            fmpz_clear(den2);
+        }
+        else
+        {
+            slong i, top1, top2;
+
+            ca_mul(res, poly1, poly2, ctx);
+
+            for (i = 1; i < n; i++)
+            {
+                top1 = FLINT_MIN(len1 - 1, i);
+                top2 = FLINT_MIN(len2 - 1, i);
+
+                ca_dot(res + i, NULL, 0, poly1 + i - top2, 1,
+                    poly2 + top2, -1, top1 + top2 - i + 1, ctx);
+            }
         }
     }
 }

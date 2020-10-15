@@ -152,6 +152,26 @@ _ca_vec_fmpq_vec_get_fmpz_vec_den(fmpz * c, fmpz_t den, ca_srcptr vec, slong len
     }
 }
 
+CA_VEC_INLINE void
+_ca_vec_set_fmpz_vec_div_fmpz(ca_ptr res, const fmpz * v, const fmpz_t den, slong len, ca_ctx_t ctx)
+{
+    slong i;
+
+    if (fmpz_is_one(den))
+    {
+        for (i = 0; i < len; i++)
+            ca_set_fmpz(res + i, v + i, ctx);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+        {
+            ca_set_fmpz(res + i, v + i, ctx);       /* todo: optimize */
+            ca_div_fmpz(res + i, res + i, den, ctx);
+        }
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif

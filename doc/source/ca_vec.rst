@@ -162,6 +162,11 @@ Internal representation
     converts them to a vector of integers *c* on a common denominator
     *den*.
 
+.. function:: void _ca_vec_set_fmpz_vec_div_fmpz(ca_ptr res, const fmpz * v, const fmpz_t den, slong len, ca_ctx_t ctx)
+
+    Sets *res* to the rational vector given by numerators *v*
+    and the common denominator *den*.
+
 .. raw:: latex
 
     \newpage
