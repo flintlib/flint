@@ -22,8 +22,8 @@ ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
     if (ca_mat_is_empty(A))
         return T_TRUE;
 
-    m = arb_mat_nrows(A);
-    n = arb_mat_ncols(A);
+    m = ca_mat_nrows(A);
+    n = ca_mat_ncols(A);
 
     ca_mat_set(LU, A, ctx);
 

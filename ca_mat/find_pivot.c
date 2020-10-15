@@ -40,7 +40,7 @@ ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong 
 
     for (i = start_row; i < end_row; i++)
     {
-        is_zero = ca_check_is_zero_fast(arb_mat_entry(mat, i, column), ctx);
+        is_zero = ca_check_is_zero_fast(ca_mat_entry(mat, i, column), ctx);
 
         if (is_zero != T_TRUE)
         {
@@ -72,7 +72,7 @@ ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong 
 
     for (i = start_row; i < end_row; i++)
     {
-        is_zero = ca_check_is_zero(arb_mat_entry(mat, i, column), ctx);
+        is_zero = ca_check_is_zero(ca_mat_entry(mat, i, column), ctx);
 
         if (is_zero == T_FALSE)
         {

@@ -242,7 +242,7 @@ Trace
     Sets *trace* to the sum of the entries on the main diagonal of *mat*.
 
 
-Gaussian elimination and LU factorization
+Gaussian elimination and solving
 -------------------------------------------------------------------------------
 
 .. function:: truth_t ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
@@ -267,13 +267,11 @@ Gaussian elimination and LU factorization
     Entry `i` in the permutation vector *P* is set to the row index in
     the input matrix corresponding to row `i` in the output matrix.
 
-    * If *A* can be proved to be invertible/nonsingular, returns ``T_TRUE`` and sets *P* and *LU* to a LU decomposition `A = PLU`.
-
-    * If *A* can be proved to be singular, returns ``T_FALSE``.
-
-    * If *A* cannot be proved to be either singular or nonsingular, returns ``T_UNKNOWN``.
-
-    When the return value is ``T_FALSE`` or ``T_UNKNOWN``, the values of
+    If *A* can be proved to be invertible/nonsingular, returns ``T_TRUE`` and sets *P* and *LU* to a LU decomposition `A = PLU`.
+    If *A* can be proved to be singular, returns ``T_FALSE``.
+    If *A* cannot be proved to be either singular or nonsingular, returns ``T_UNKNOWN``.
+    When the return value is ``T_FALSE`` or ``T_UNKNOWN``, the
+    LU factorization is not completed and the values of
     *P* and *LU* are arbitrary.
 
 .. function:: truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
@@ -283,6 +281,38 @@ Gaussian elimination and LU factorization
     The denominator is written to *det*.
     Note that despite being "fraction-free", this algorithm may
     introduce fractions due to incomplete symbolic simplifications.
+
+.. function:: truth_t ca_mat_nonsingular_solve_lu(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+              truth_t ca_mat_nonsingular_solve(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+
+    Determines if the square matrix *A* is nonsingular, and if successful,
+    solves `AX = B` and returns ``T_TRUE``.
+    Returns ``T_FALSE`` if *A* is singular, and ``T_UNKNOWN`` if the
+    rank of *A* cannot be determined.
+
+.. function:: void ca_mat_solve_tril_classical(ca_mat_t X, const ca_mat_t L, const ca_mat_t B, int unit, ca_ctx_t ctx)
+              void ca_mat_solve_tril_recursive(ca_mat_t X, const ca_mat_t L, const ca_mat_t B, int unit, ca_ctx_t ctx)
+              void ca_mat_solve_tril(ca_mat_t X, const ca_mat_t L, const ca_mat_t B, int unit, ca_ctx_t ctx)
+              void ca_mat_solve_triu_classical(ca_mat_t X, const ca_mat_t U, const ca_mat_t B, int unit, ca_ctx_t ctx)
+              void ca_mat_solve_triu_recursive(ca_mat_t X, const ca_mat_t U, const ca_mat_t B, int unit, ca_ctx_t ctx)
+              void ca_mat_solve_triu(ca_mat_t X, const ca_mat_t U, const ca_mat_t B, int unit, ca_ctx_t ctx)
+
+    Solves the lower triangular system `LX = B` or the upper triangular system
+    `UX = B`, respectively. It is assumed (not checked) that the diagonal
+    entries are nonzero. If *unit* is set, the main diagonal of *L* or *U*
+    is taken to consist of all ones, and in that case the actual entries on
+    the diagonal are not read at all and can contain other data.
+
+    The *classical* versions perform the computations iteratively while the
+    *recursive* versions perform the computations in a block recursive
+    way to benefit from fast matrix multiplication. The default versions
+    choose an algorithm automatically.
+
+.. function:: void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * perm, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+
+    Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`.
+    The matrices `X` and `B` are allowed to be aliased with each other,
+    but `X` is not allowed to be aliased with `LU`.
 
 
 Determinant

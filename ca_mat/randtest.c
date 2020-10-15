@@ -23,7 +23,7 @@ ca_mat_randtest(ca_mat_t mat, flint_rand_t state, slong length, slong bits, ca_c
             if (n_randint(state, 100) < density)
                 ca_randtest(ca_mat_entry(mat, i, j), state, length, bits, ctx);
             else
-                ca_zero(arb_mat_entry(mat, i, j), ctx);
+                ca_zero(ca_mat_entry(mat, i, j), ctx);
 }
 
 void
@@ -38,5 +38,5 @@ ca_mat_randtest_rational(ca_mat_t mat, flint_rand_t state, slong bits, ca_ctx_t 
             if (n_randint(state, 100) < density)
                 ca_randtest_rational(ca_mat_entry(mat, i, j), state, bits, ctx);
             else
-                ca_zero(arb_mat_entry(mat, i, j), ctx);
+                ca_zero(ca_mat_entry(mat, i, j), ctx);
 }

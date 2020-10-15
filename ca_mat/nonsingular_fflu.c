@@ -26,8 +26,8 @@ ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_c
         return T_TRUE;
     }
 
-    m = arb_mat_nrows(A);
-    n = arb_mat_ncols(A);
+    m = ca_mat_nrows(A);
+    n = ca_mat_ncols(A);
 
     ca_mat_set(LU, A, ctx);
 

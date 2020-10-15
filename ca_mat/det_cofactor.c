@@ -18,21 +18,21 @@ _ca_mat_det_cofactor_3x3(ca_t t, const ca_mat_t A, ca_ctx_t ctx)
     ca_init(a, ctx);
     ca_init(u, ctx);
 
-    ca_mul   (a, arb_mat_entry(A, 1, 0), arb_mat_entry(A, 2, 1), ctx);
-    ca_mul   (u, arb_mat_entry(A, 1, 1), arb_mat_entry(A, 2, 0), ctx);
+    ca_mul   (a, ca_mat_entry(A, 1, 0), ca_mat_entry(A, 2, 1), ctx);
+    ca_mul   (u, ca_mat_entry(A, 1, 1), ca_mat_entry(A, 2, 0), ctx);
     ca_sub   (a, a, u, ctx);
-    ca_mul   (t, a, arb_mat_entry(A, 0, 2), ctx);
+    ca_mul   (t, a, ca_mat_entry(A, 0, 2), ctx);
 
-    ca_mul   (a, arb_mat_entry(A, 1, 2), arb_mat_entry(A, 2, 0), ctx);
-    ca_mul   (u, arb_mat_entry(A, 1, 0), arb_mat_entry(A, 2, 2), ctx);
+    ca_mul   (a, ca_mat_entry(A, 1, 2), ca_mat_entry(A, 2, 0), ctx);
+    ca_mul   (u, ca_mat_entry(A, 1, 0), ca_mat_entry(A, 2, 2), ctx);
     ca_sub   (a, a, u, ctx);
-    ca_mul   (u, a, arb_mat_entry(A, 0, 1), ctx);
+    ca_mul   (u, a, ca_mat_entry(A, 0, 1), ctx);
     ca_add   (t, t, u, ctx);
 
-    ca_mul   (a, arb_mat_entry(A, 1, 1), arb_mat_entry(A, 2, 2), ctx);
-    ca_mul   (u, arb_mat_entry(A, 1, 2), arb_mat_entry(A, 2, 1), ctx);
+    ca_mul   (a, ca_mat_entry(A, 1, 1), ca_mat_entry(A, 2, 2), ctx);
+    ca_mul   (u, ca_mat_entry(A, 1, 2), ca_mat_entry(A, 2, 1), ctx);
     ca_sub   (a, a, u, ctx);
-    ca_mul   (u, a, arb_mat_entry(A, 0, 0), ctx);
+    ca_mul   (u, a, ca_mat_entry(A, 0, 0), ctx);
     ca_add   (t, t, u, ctx);
 
     ca_clear(a, ctx);
