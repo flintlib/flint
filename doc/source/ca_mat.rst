@@ -314,6 +314,15 @@ Gaussian elimination and solving
     The matrices `X` and `B` are allowed to be aliased with each other,
     but `X` is not allowed to be aliased with `LU`.
 
+Inverse
+-------------------------------------------------------------------------------
+
+.. function:: truth_t ca_mat_inv(ca_mat_t X, const ca_mat_t A, ca_ctx_t ctx)
+
+    Determines if the square matrix *A* is nonsingular, and if successful,
+    sets `X = A^{-1}` and returns ``T_TRUE``.
+    Returns ``T_FALSE`` if *A* is singular, and ``T_UNKNOWN`` if the
+    rank of *A* cannot be determined.
 
 Determinant
 -------------------------------------------------------------------------------
