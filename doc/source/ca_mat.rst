@@ -90,6 +90,12 @@ Random generation
 
     Sets *mat* to a random rational matrix with entries up to *bits* bits in size.
 
+.. function:: void ca_mat_randops(ca_mat_t mat, flint_rand_t state, slong count, ca_ctx_t ctx)
+
+    Randomizes *mat* in-place by performing elementary row or column operations.
+    More precisely, at most count random additions or subtractions of distinct
+    rows and columns will be performed. This leaves the rank (and for square matrices,
+    the determinant) unchanged.
 
 Input and output
 -------------------------------------------------------------------------------
@@ -257,6 +263,39 @@ Gaussian elimination and solving
     If the return value is ``T_UNKNOWN``, it is unknown whether such
     an element exists (zero certification failed).
 
+.. function:: int ca_mat_lu_classical(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
+              int ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
+              int ca_mat_lu(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
+
+    Computes a generalized LU decomposition `LU = PA` of a given
+    matrix *A*, writing the rank of *A* to *rank*.
+
+    If *A* is a nonsingular square matrix, *LU* will be set to
+    a unit diagonal lower triangular matrix *L* and an upper
+    triangular matrix *U* (the diagonal of *L* will not be stored
+    explicitly).
+
+    If *A* is an arbitrary matrix of rank *r*, *U* will be in row
+    echelon form having *r* nonzero rows, and *L* will be lower
+    triangular but truncated to *r* columns, having implicit ones on
+    the *r* first entries of the main diagonal. All other entries will
+    be zero.
+
+    If a nonzero value for ``rank_check`` is passed, the function
+    will abandon the output matrix in an undefined state and set
+    the rank to 0 if *A* is detected to be rank-deficient.
+
+    The algorithm can fail if it fails to certify that a pivot
+    element is zero or nonzero, in which case the correct rank
+    cannot be determined.
+    The return value is 1 on success and 0 on failure. On failure,
+    the data in the output variables
+    ``rank``, ``P`` and ``LU`` will be meaningless.
+
+    The *classical* version uses iterative Gaussian elimination.
+    The *recursive* version uses a block recursive algorithm
+    to take advantage of fast matrix multiplication.
+
 .. function:: truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
 
     Given a square matrix *A*, attempts to prove invertibility of *A* and
@@ -308,7 +347,7 @@ Gaussian elimination and solving
     way to benefit from fast matrix multiplication. The default versions
     choose an algorithm automatically.
 
-.. function:: void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * perm, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+.. function:: void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 
     Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`.
     The matrices `X` and `B` are allowed to be aliased with each other,

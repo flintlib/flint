@@ -106,6 +106,7 @@ void ca_mat_set_fmpq_mat(ca_mat_t dest, const fmpq_mat_t src, ca_ctx_t ctx);
 
 void ca_mat_randtest(ca_mat_t mat, flint_rand_t state, slong len, slong bits, ca_ctx_t ctx);
 void ca_mat_randtest_rational(ca_mat_t mat, flint_rand_t state, slong bits, ca_ctx_t ctx);
+void ca_mat_randops(ca_mat_t mat, flint_rand_t state, slong count, ca_ctx_t ctx);
 
 /* I/O */
 
@@ -257,6 +258,10 @@ _ca_mat_swap_rows(ca_mat_t mat, slong * perm, slong r, slong s)
         mat->rows[r] = u;
     }
 }
+
+int ca_mat_lu_classical(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx);
+int ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx);
+int ca_mat_lu(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx);
 
 truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx);
 truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx);
