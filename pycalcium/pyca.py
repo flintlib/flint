@@ -1,5 +1,6 @@
 """
-Calcium includes a simple Python interface implemented using ``ctypes``.
+Calcium includes a simple Python interface (``pycalcium``, or
+``pyca`` for short) implemented using ``ctypes``.
 
 Introduction
 ------------------------------------------------------------------------
@@ -16,15 +17,15 @@ or simply starting Python inside the ``pycalcium`` directory.
 
 Import the module and run perform a calculation:
 
-    >>> import calcium
-    >>> calcium.ca(1) / 3
+    >>> import pyca
+    >>> pyca.ca(1) / 3
     0.333333 {1/3}
-    >>> calcium.exp(calcium.pi * calcium.i / 2)
+    >>> pyca.exp(pyca.pi * pyca.i / 2)
     1.00000*I {a where a = I [a^2+1=0]}
 
 If you don't mind polluting the global namespace, import everything:
 
-    >>> from calcium import *
+    >>> from pyca import *
     >>> exp(pi*i/2) + ca(1)/3
     0.333333 + 1.00000*I {(3*a+1)/3 where a = I [a^2+1=0]}
 

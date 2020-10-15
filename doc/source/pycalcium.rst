@@ -1,9 +1,9 @@
 .. _pycalcium:
 
-Python interface (pycalcium)
+Python interface (pycalcium / pyca)
 ===============================================================================
 
-.. automodule:: calcium
+.. automodule:: pyca
   :members:
   :inherited-members:
   :undoc-members:

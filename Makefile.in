@@ -125,7 +125,7 @@ tests: library $(TESTS)
 
 check: library
 ifndef MOD
-	python3 pycalcium/calcium.py
+	python3 pycalcium/pyca.py
 	$(AT)$(MAKE) $(TESTS)
 	$(AT)$(foreach prog, $(TESTS), $(prog) || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
