@@ -296,6 +296,13 @@ Gaussian elimination and solving
     The *recursive* version uses a block recursive algorithm
     to take advantage of fast matrix multiplication.
 
+.. function:: int ca_mat_rref(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
+
+    Computes the reduced row echelon form (RREF) of a given matrix.
+    On success, sets *R* to the RREF of *A*, writes the rank to
+    *rank*, and returns 1. On failure to certify the correct rank,
+    returns 0, leaving the data in ``rank`` and ``R`` meaningless.
+
 .. function:: truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
 
     Given a square matrix *A*, attempts to prove invertibility of *A* and
