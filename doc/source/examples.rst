@@ -275,40 +275,42 @@ using a Python script.
 hilbert_matrix.c
 -------------------------------------------------------------------------------
 
-This program constructs the *n*-th Hilbert matrix (the rational matrix
-with entries `(1/(i+j-1))`), computes its eigenvalues as exact
-algebraic numbers, and then computes the trace as the sum of
-the eigenvalues as well as the determinant as the product
-of the eigenvalues.
-The computations are done using :type:`qqbar_t` arithmetic since
-the :type:`ca_t` type does not yet support the needed operations.
+This program constructs the Hilbert matrix
+`H_n = (1/(i+j-1))_{i=1,j=1}^n`, computes its
+eigenvalues `\lambda_1, \ldots, \lambda_n`,
+as exact algebraic numbers, and verifies
+the exact trace and determinant formulas
+
+.. math ::
+
+    \lambda_1 + \lambda_2 + \ldots + \lambda_n = \operatorname{tr}(H_n), \quad
+    \lambda_1 \lambda_2 \cdots \lambda_n = \operatorname{det}(H_n).
 
 Sample output::
 
     > build/examples/hilbert_matrix 6
     Trace:
-    0/6: degree 6
-    1/6: degree 15
-    2/6: degree 20
-    3/6: degree 15
-    4/6: degree 6
-    5/6: degree 1
-    deg 1 [-6508, 3465] [1.8782106782106782106782106782106782107 +/- 3.01e-38]
-    Determinant:
-    0/6: degree 6
-    1/6: degree 15
-    2/6: degree 20
-    3/6: degree 15
-    4/6: degree 6
-    5/6: degree 1
-    deg 1 [-1, 186313420339200000] [5.3672998873586877327888303539166891142e-18 +/- 5.14e-56]
+    1.87821 {6508/3465}
+    1.87821 {6508/3465}
+    Equal: T_TRUE
 
-    cpu/wall(s): 0.535 0.534
-    virt/peak/res/peak(MB): 37.72 38.07 10.12 10.61
+    Det:
+    5.36730e-18 {1/186313420339200000}
+    5.36730e-18 {1/186313420339200000}
+    Equal: T_TRUE
 
-(The output shows the minimal polynomial of the algebraic number result;
-for example `[-6508, 3465]` means `6508/3465`.)
 
+    cpu/wall(s): 0.07 0.069
+    virt/peak/res/peak(MB): 36.56 36.66 9.69 9.69
+
+The program accepts the following optional arguments:
+
+* With ``-vieta``, force use of Vieta's formula internally (by default, Calcium
+  uses Vieta's formulas when working with algebraic conjugates,
+  but only up to some bound on the degree).
+* With ``-novieta``, force Calcium not to use Vieta's formulas internally.
+* With ``-qqbar``, do a similar computation using :type:`qqbar_t`
+  arithmetic.
 
 dft.c
 -------------------------------------------------------------------------------
