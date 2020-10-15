@@ -1400,6 +1400,49 @@ class ca_mat:
             libflint.flint_free(exp)
             return res
 
+    def rref(self):
+        """
+        Reduced row echelon form.
+
+            >>> ca_mat([[1,2,3],[4,5,6],[7,8,9]]).rref()
+            ca_mat of size 3 x 3
+            [1, 0, -1]
+            [0, 1,  2]
+            [0, 0,  0]
+            >>> ca_mat([[1,pi,2,pi],[1/pi,3,1/(pi+1),4],[1,1,1,1]]).rref()
+            ca_mat of size 3 x 4
+            [1, 0, 0, 0.401081 {(a^3-a^2-2*a)/(3*a^2+3*a-2) where a = 3.14159 [Pi]}]
+            [0, 1, 0,  1.35134 {(4*a^2+4*a-2)/(3*a^2+3*a-2) where a = 3.14159 [Pi]}]
+            [0, 0, 1,     -0.752416 {(-a^3+a)/(3*a^2+3*a-2) where a = 3.14159 [Pi]}]
+            >>> ca_mat([[1, 0, 0], [0, 1-exp(ca(2)**-10000), 0]]).rref()
+            Traceback (most recent call last):
+              ...
+            ValueError: failed to compute rref
+
+        """
+        res = ca_mat(self.nrows(), self.ncols())
+        rank = (ctypes.c_long * 1)()
+        if libcalcium.ca_mat_rref(rank, res, self, self._ctx):
+            return res
+        raise ValueError("failed to compute rref")
+
+    def rank(self):
+        """
+        Rank of this matrix.
+
+            >>> ca_mat([[1,2,3],[4,5,6],[7,8,9]]).rank()
+            2
+            >>> ca_mat([[1, 0, 0], [0, 1-exp(ca(2)**-10000), 0]]).rank()
+            Traceback (most recent call last):
+              ...
+            ValueError: failed to compute rank
+
+        """
+        r = (ctypes.c_long * 1)()
+        if libcalcium.ca_mat_rank(r, self, self._ctx):
+            return int(r[0])
+        raise ValueError("failed to compute rank")
+
 class ca_vec:
     """
     Python class wrapping the ca_vec_t type for vectors.
