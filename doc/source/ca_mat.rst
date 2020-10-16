@@ -298,14 +298,7 @@ Gaussian elimination and LU decomposition
 
 .. function:: truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
 
-    Given a square matrix *A*, attempts to prove invertibility of *A* and
-    compute a LU decomposition `PLU = A`
-    using Gaussian elimination with partial pivoting.
-    The input and output matrices can be the same, performing the
-    decomposition in-place.
-    Entry `i` in the permutation vector *P* is set to the row index in
-    the input matrix corresponding to row `i` in the output matrix.
-
+    Wrapper for :func:`ca_mat_lu`.
     If *A* can be proved to be invertible/nonsingular, returns ``T_TRUE`` and sets *P* and *LU* to a LU decomposition `A = PLU`.
     If *A* can be proved to be singular, returns ``T_FALSE``.
     If *A* cannot be proved to be either singular or nonsingular, returns ``T_UNKNOWN``.
@@ -315,6 +308,7 @@ Gaussian elimination and LU decomposition
 
 .. function:: truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx)
 
+    Wrapper for :func:`ca_mat_fflu`.
     Similar to :func:`ca_mat_nonsingular_lu`, but computes a fraction-free
     LU decomposition using the Bareiss algorithm.
     The denominator is written to *den*.
@@ -331,7 +325,8 @@ Solving and inverse
     Returns ``T_FALSE`` if *A* is singular, and ``T_UNKNOWN`` if the
     rank of *A* cannot be determined.
 
-.. function:: truth_t ca_mat_nonsingular_solve_lu(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+.. function:: truth_t ca_mat_nonsingular_solve_fflu(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+              truth_t ca_mat_nonsingular_solve_lu(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
               truth_t ca_mat_nonsingular_solve(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 
     Determines if the square matrix *A* is nonsingular, and if successful,
@@ -357,9 +352,11 @@ Solving and inverse
     way to benefit from fast matrix multiplication. The default versions
     choose an algorithm automatically.
 
-.. function:: void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t LU, const ca_mat_t B, ca_ctx_t ctx)
+.. function:: void ca_mat_solve_fflu_precomp(ca_mat_t X, const slong * perm, const ca_mat_t A, const ca_t den, const ca_mat_t B, ca_ctx_t ctx);
+              void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t LU, const ca_mat_t B, ca_ctx_t ctx)
 
-    Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`.
+    Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`
+    or fraction-free LU decomposition with denominator *den*.
     The matrices `X` and `B` are allowed to be aliased with each other,
     but `X` is not allowed to be aliased with `LU`.
 
