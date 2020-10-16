@@ -9,12 +9,12 @@ in the git repository https://github.com/fredrik-johansson/calcium
 Old releases of the code can be accessed from
 https://github.com/fredrik-johansson/calcium/releases
 
-Future - version 0.2-git
+2020-10-16 - version 0.2
 -------------------------------------------------------------------------------
 
-* Simplification and basic arithmetic
+* Basic arithmetic and expression simplification
 
-  * Compute Gröbner bases for reduction ideals,  making simplification much more robust.
+  * Use Gröbner basis for reduction ideals,  making simplification much more robust.
   * Compute all linear relations with LLL simultaneously instead of piecemeal.
   * Make monomial ordering configurable (default is lex as before).
   * Use Vieta's formulas to simplify expressions involving conjugate algebraic numbers.
@@ -31,15 +31,33 @@ Future - version 0.2-git
 
 * New ca_mat module for matrices
 
-  * TODO: matrix functions.
+  * Mostly using naive basecase algorithms.
+  * Matrix arithmetic, basic manipulation.
+  * Construction of special matrices (Hilbert, Pascal, Stirling, DFT).
+  * LU factorization.
+  * Fraction-free LU decomposition.
+  * Nonsingular solving and inverse.
+  * Reduced row echelon form.
+  * Rank.
+  * Trace and determinant.
+  * Characteristic polynomial.
+  * Computation of eigenvalues with multiplicities.
 
 * New ca_poly module for polynomials
 
-  * TODO: polynomial functions.
+  * Mostly using naive basecase algorithms.
+  * Polynomial arithmetic, basic manipulation.
+  * Polynomial division.
+  * Evaluation and composition.
+  * Derivative and integral.
+  * GCD (Euclidean algorithm).
+  * Squarefree factorization.
+  * Computation of roots with multiplicities.
+  * Construction from given roots.
 
 * New ca_vec module for vectors.
 
-  * TODO: vector functions
+  * Memory management and basic scalar operations.
 
 * Bug fixes
 
@@ -55,7 +73,9 @@ Future - version 0.2-git
 
 * New utils_flint module for Flint utilities
 
-  * TODO: utility methods.
+  * Vectors of multivariate polynomials.
+  * Construction of elementary symmetric polynomials.
+  * Gröbner basis computation (naive Buchberger algorithm).
 
 * Documentation and presentation
 
@@ -63,7 +83,7 @@ Future - version 0.2-git
   * DFT example program.
 
 
-2012-09-08 - version 0.1
+2020-09-08 - version 0.1
 -------------------------------------------------------------------------------
 
 * Initial test release.
