@@ -119,15 +119,15 @@ ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int 
     }
 
 cleanup2:
+    ca_mat_window_clear(A00, ctx);
     ca_mat_window_clear(A10, ctx);
+    ca_mat_window_clear(A01, ctx);
     ca_mat_window_clear(A11, ctx);
-    ca_mat_window_clear(A0, ctx);
-    ca_mat_window_clear(A1, ctx);
 
 cleanup1:
     flint_free(P1);
-    ca_mat_window_clear(A00, ctx);
-    ca_mat_window_clear(A01, ctx);
+    ca_mat_window_clear(A0, ctx);
+    ca_mat_window_clear(A1, ctx);
 
     *rank = r1 + r2;
 
