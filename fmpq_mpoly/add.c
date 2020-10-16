@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,37 +12,33 @@
 #include "fmpq_mpoly.h"
 
 
-/* return 1 if quotient is exact */
-void fmpq_mpoly_add(fmpq_mpoly_t poly1,
-                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                                    const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_add(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                              const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_t temp2, temp3;
-    fmpz_t n2d3, d2n3, d2d3, one;
+    fmpz_t t1, t2;
+    slong easy_length = B->zpoly->length + C->zpoly->length;
 
-    fmpz_init(n2d3);
-    fmpz_init(d2n3);
-    fmpz_init(d2d3);
-    fmpz_init_set_ui(one, 1);
-    fmpz_mpoly_init(temp2, ctx->zctx);
-    fmpz_mpoly_init(temp3, ctx->zctx);
+    if (fmpq_mpoly_is_zero(B, ctx))
+    {
+        fmpq_mpoly_set(A, C, ctx);
+        return;
+    }
 
-    fmpz_mul(n2d3, fmpq_numref(poly2->content), fmpq_denref(poly3->content));
-    fmpz_mul(d2n3, fmpq_denref(poly2->content), fmpq_numref(poly3->content));
-    fmpz_mul(d2d3, fmpq_denref(poly2->content), fmpq_denref(poly3->content));
+    if (fmpq_mpoly_is_zero(C, ctx))
+    {
+        fmpq_mpoly_set(A, B, ctx);
+        return;
+    }
 
-    fmpz_mpoly_scalar_mul_fmpz(temp2, poly2->zpoly, n2d3, ctx->zctx);
-    fmpz_mpoly_scalar_mul_fmpz(temp3, poly3->zpoly, d2n3, ctx->zctx);
+    fmpz_init(t1);
+    fmpz_init(t2);
 
-    fmpz_mpoly_add(poly1->zpoly, temp2, temp3, ctx->zctx);
-    fmpq_set_fmpz_frac(poly1->content, one, d2d3);
+    fmpq_gcd_cofactors(A->content, t1, t2, B->content, C->content);
 
-    fmpz_mpoly_clear(temp3, ctx->zctx);
-    fmpz_mpoly_clear(temp2, ctx->zctx);
-    fmpz_clear(one);
-    fmpz_clear(d2d3);
-    fmpz_clear(d2n3);
-    fmpz_clear(n2d3);
+    fmpz_mpoly_scalar_fmma(A->zpoly, B->zpoly, t1, C->zpoly, t2, ctx->zctx);
 
-    fmpq_mpoly_reduce(poly1, ctx);
+    fmpz_clear(t1);
+    fmpz_clear(t2);
+
+    fmpq_mpoly_reduce_easy(A, easy_length, ctx);
 }

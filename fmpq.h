@@ -345,6 +345,16 @@ fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               fmpq_denref(op1), fmpq_numref(op2), fmpq_denref(op2));
 }
 
+FLINT_DLL void _fmpq_gcd_cofactors(fmpz_t ng, fmpz_t dg, fmpz_t A, fmpz_t B,
+           const fmpz_t na, const fmpz_t da, const fmpz_t nb, const fmpz_t db);
+
+FMPQ_INLINE void
+fmpq_gcd_cofactors(fmpq_t g, fmpz_t A, fmpz_t B, const fmpq_t a, const fmpq_t b)
+{
+    _fmpq_gcd_cofactors(fmpq_numref(g), fmpq_denref(g), A, B,
+               fmpq_numref(a), fmpq_denref(a), fmpq_numref(b), fmpq_denref(b));
+}
+
 FLINT_DLL int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t m);
 
 FLINT_DLL int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);

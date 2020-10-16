@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -164,7 +164,7 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check f + g = g + f\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check f - g = -g + f\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -288,56 +288,8 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    /* Check aliasing first arg */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
-    {
-        fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t f, g, h;
-        slong len1, len2;
-        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
-
-        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
-
-        fmpq_mpoly_init(f, ctx);
-        fmpq_mpoly_init(g, ctx);
-        fmpq_mpoly_init(h, ctx);
-
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
-
-        exp_bits1 = n_randint(state, 200) + 2;
-        exp_bits2 = n_randint(state, 200) + 2;
-
-        coeff_bits = n_randint(state, 200);
-
-        for (j = 0; j < 4; j++)
-        {
-            fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_set(h, f, ctx);
-
-            fmpq_mpoly_add(f, f, g, ctx);
-            fmpq_mpoly_assert_canonical(f, ctx);
-            fmpq_mpoly_sub(f, f, g, ctx);
-            fmpq_mpoly_assert_canonical(f, ctx);
-            result = fmpq_mpoly_equal(f, h, ctx);
-
-            if (!result)
-            {
-                printf("FAIL\n");
-                flint_printf("Check aliasing first arg\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-        }
-
-        fmpq_mpoly_clear(f, ctx);
-        fmpq_mpoly_clear(g, ctx);
-        fmpq_mpoly_clear(h, ctx);
-        fmpq_mpoly_ctx_clear(ctx);
-    }
-
-    /* Check aliasing second arg */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    /* Check aliasing */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h;
@@ -372,7 +324,8 @@ main(void)
                 fmpq_mpoly_assert_canonical(h, ctx);
                 fmpq_mpoly_add(f, g, f, ctx);
                 fmpq_mpoly_assert_canonical(f, ctx);
-            } else
+            }
+            else
             {
                 fmpq_mpoly_sub(h, g, f, ctx);
                 fmpq_mpoly_assert_canonical(h, ctx);
@@ -385,6 +338,60 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing second arg\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+
+            fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
+
+            if ((j % 2) == 0)
+            {
+                fmpq_mpoly_add(h, g, f, ctx);
+                fmpq_mpoly_assert_canonical(h, ctx);
+                fmpq_mpoly_add(g, g, f, ctx);
+                fmpq_mpoly_assert_canonical(f, ctx);
+            }
+            else
+            {
+                fmpq_mpoly_sub(h, g, f, ctx);
+                fmpq_mpoly_assert_canonical(h, ctx);
+                fmpq_mpoly_sub(g, g, f, ctx);
+                fmpq_mpoly_assert_canonical(f, ctx);
+            }
+            result = fmpq_mpoly_equal(g, h, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check aliasing first arg\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+
+            fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
+
+            if ((j % 2) == 0)
+            {
+                fmpq_mpoly_add(h, f, f, ctx);
+                fmpq_mpoly_assert_canonical(h, ctx);
+                fmpq_mpoly_add(f, f, f, ctx);
+                fmpq_mpoly_assert_canonical(f, ctx);
+            }
+            else
+            {
+                fmpq_mpoly_sub(h, f, f, ctx);
+                fmpq_mpoly_assert_canonical(h, ctx);
+                fmpq_mpoly_sub(f, f, f, ctx);
+                fmpq_mpoly_assert_canonical(f, ctx);
+            }
+            result = fmpq_mpoly_equal(f, h, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check aliasing both args\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -400,4 +407,3 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-

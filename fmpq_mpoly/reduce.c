@@ -19,7 +19,7 @@ void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_t g;
 
-    if (A->zpoly->length == 0)
+    if (A->zpoly->length < 1)
     {
         fmpq_zero(A->content);
         return;
@@ -34,10 +34,9 @@ void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     fmpz_init(g);
     _fmpz_vec_content(g, A->zpoly->coeffs, A->zpoly->length);
+
     if (fmpz_sgn(A->zpoly->coeffs + 0) < 0)
-    {
         fmpz_neg(g, g);
-    }
 
     if (fmpz_is_zero(g))
     {

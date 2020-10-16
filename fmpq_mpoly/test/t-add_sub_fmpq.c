@@ -17,7 +17,7 @@
 int
 main(void)
 {
-    int i, j, result;
+    slong i, j;
     FLINT_TEST_INIT(state);
 
     flint_printf("add/sub_fmpq....");
@@ -55,12 +55,27 @@ main(void)
             fmpq_mpoly_sub_fmpq(h, g, c, ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
 
-            result = fmpq_mpoly_equal(f, h, ctx);
-
-            if (!result)
+            if (!fmpq_mpoly_equal(f, h, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check (f + a) - a = f, i = %wd, j = %wd\n", i ,j);
+                flint_printf("FAIL: Check (f + a) - a = f\n");
+                flint_abort();
+            }
+
+            fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+            fmpq_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpq_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
+
+            fmpq_randtest(c, state, n_randint(state, 200) + 1);
+
+            fmpq_mpoly_sub_fmpq(g, f, c, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
+
+            fmpq_mpoly_add_fmpq(h, g, c, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
+
+            if (!fmpq_mpoly_equal(f, h, ctx))
+            {
+                flint_printf("FAIL: Check (f - a) + a = f\n");
                 flint_abort();
             }
         }
@@ -102,12 +117,9 @@ main(void)
             fmpq_mpoly_sub_fmpq(f, f, c, ctx);
             fmpq_mpoly_assert_canonical(f, ctx);
 
-            result = fmpq_mpoly_equal(f, g, ctx);
-
-            if (!result)
+            if (!fmpq_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check aliasing\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("FAIL: check aliasing\n");
                 flint_abort();
             }
         }

@@ -486,6 +486,12 @@ Arithmetic
     Set ``res`` to the gcd of ``op1`` and ``op2``. See the low
     level function ``_fmpq_gcd`` for our definition of gcd.
 
+.. function:: void _fmpq_gcd_cofactors(fmpz_t gnum, fmpz_t gden, fmpz_t abar, fmpz_t bbar, const fmpz_t anum, const fmpz_t aden, const fmpz_t bnum, const fmpz_t bden);
+              void fmpq_gcd_cofactors(fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b)
+
+    Set `g` to `\operatorname{gcd}(a,b)` as per :func:`fmpq_gcd` and also compute `\overline{a} = a/g` and `\overline{b} = a/b`.
+    Unlike :func:`fmpq_gcd`, this function requires canonical inputs.
+
 .. function:: void _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
 
     Sets ``(rnum, rden)`` to the sum of ``(p1, q1)`` and ``(p2, q2)``.
