@@ -236,7 +236,7 @@ void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);
 
 /* Gaussian elimination, solving and inverse */
 
-truth_t ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx);
+truth_t ca_mat_find_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx);
 
 CA_MAT_INLINE void
 _ca_mat_swap_rows(ca_mat_t mat, slong * perm, slong r, slong s)

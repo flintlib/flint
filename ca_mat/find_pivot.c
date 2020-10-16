@@ -24,8 +24,23 @@ ca_check_is_zero_fast(const ca_t x, ca_ctx_t ctx)
     }
 }
 
+static truth_t ca_check_is_zero_and_simplify(ca_t x, ca_ctx_t ctx)
+{
+    truth_t res = ca_check_is_zero_fast(x, ctx);
+
+    if (res == T_UNKNOWN)
+    {
+        res = ca_check_is_zero(x, ctx);
+
+        if (res == T_TRUE)
+            ca_zero(x, ctx);
+    }
+
+    return res;
+}
+
 truth_t
-ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
+ca_mat_find_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
 {
     slong best_row, i;
     truth_t is_zero;
@@ -53,7 +68,7 @@ ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong 
 
     if (best_row != -1)
     {
-        is_zero = ca_check_is_zero(ca_mat_entry(mat, best_row, column), ctx);
+        is_zero = ca_check_is_zero_and_simplify(ca_mat_entry(mat, best_row, column), ctx);
 
         if (is_zero == T_FALSE)
         {
@@ -72,7 +87,7 @@ ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong 
 
     for (i = start_row; i < end_row; i++)
     {
-        is_zero = ca_check_is_zero(ca_mat_entry(mat, i, column), ctx);
+        is_zero = ca_check_is_zero_and_simplify(ca_mat_entry(mat, i, column), ctx);
 
         if (is_zero == T_FALSE)
         {

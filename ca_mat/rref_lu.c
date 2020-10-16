@@ -64,13 +64,29 @@ ca_mat_rref_lu(slong * res_rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
 
     for (i = j = k = 0; i < rank; i++)
     {
-        /* todo: can this fail? */
-        while (ca_check_is_zero(ca_mat_entry(R, i, j), ctx) == T_TRUE)
+        while (1)
         {
-            nonpivots[k] = j;
-            k++;
-            j++;
+            /* Todo: this should not be T_UNKNOWN. Should we save
+               the pivot data in the lu algorithm? */
+            truth_t is_zero = ca_check_is_zero(ca_mat_entry(R, i, j), ctx);
+
+            if (is_zero == T_FALSE)
+            {
+                break;
+            }
+            else if (is_zero == T_TRUE)
+            {
+                nonpivots[k] = j;
+                k++;
+                j++;
+            }
+            else
+            {
+                success = 0;
+                goto cleanup1;
+            }
         }
+
         pivots[i] = j;
         j++;
     }
@@ -108,6 +124,7 @@ ca_mat_rref_lu(slong * res_rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
         for (j = 0; j < rank; j++)
             ca_set(ca_mat_entry(R, j, nonpivots[i]), ca_mat_entry(V, j, i), ctx);
 
+cleanup1:
     ca_mat_clear(U, ctx);
     ca_mat_clear(V, ctx);
 

@@ -243,7 +243,7 @@ Powers
 Gaussian elimination and LU decomposition
 -------------------------------------------------------------------------------
 
-.. function:: truth_t ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
+.. function:: truth_t ca_mat_find_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
 
     Attempts to find a nonzero entry in *mat* with column index *column*
     and row index between *start_row* (inclusive) and *end_row* (exclusive).
@@ -255,11 +255,14 @@ Gaussian elimination and LU decomposition
     If the return value is ``T_UNKNOWN``, it is unknown whether such
     an element exists (zero certification failed).
 
+    This function is destructive: any elements that are nontrivially
+    zero but can be certified zero will be overwritten by exact zeros.
+
 .. function:: int ca_mat_lu_classical(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
               int ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
               int ca_mat_lu(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
 
-    Computes a generalized LU decomposition `LU = PA` of a given
+    Computes a generalized LU decomposition `A = PLU` of a given
     matrix *A*, writing the rank of *A* to *rank*.
 
     If *A* is a nonsingular square matrix, *LU* will be set to
@@ -422,15 +425,13 @@ Determinant and trace
     The various algorithms can produce different symbolic
     forms of the same determinant. Which algorithm performs better
     depends strongly and sometimes
-    unpredictably on the structure of the matrix and the fields of
-
+    unpredictably on the structure of the matrix.
 
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
 .. function:: void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
-
-.. function:: void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
+              void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
 
     Sets *poly* to the characteristic polynomial of *mat* which must be
     a square matrix. If the matrix has *n* rows, the underscore method
