@@ -6,8 +6,18 @@ Calcium
     .. image:: _static/ca2.svg
         :align: center
 
-**Calcium** (pronounced "kalkium") is a C library for exact computation
-with real and complex numbers (both algebraic and transcendental).
+**Calcium** (pronounced "kalkium") is a C library for
+exact computation
+with real and complex numbers.
+It is capable of rigorously deciding the truth of any
+constant relation involving algebraic
+numbers and many relations involving transcendental numbers, for example
+
+.. math ::
+
+    \frac{\log(\sqrt{2}+\sqrt{3})}{\log(5+2\sqrt{6})} = \frac{1}{2}, \quad
+    i^{\,i} = \exp\left(\frac{\pi}{ \left({\left(\sqrt{-2}\right)}^{\sqrt{2}}\right)^{\sqrt{2}}}\right), \quad
+    10^{-30} < \frac{640320^3 + 744}{e^{\pi \sqrt{163}}} - 1 < 10^{-29}.
 
 Calcium is free software (LGPL). It depends on
 `GMP <https://gmplib.org/>`_, `MPFR <https://mpfr.org/>`_,
