@@ -399,6 +399,11 @@ Gaussian content
     The content of a zero vector, including the case when the length is zero, 
     is defined to be zero.
 
+.. function:: void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len)
+
+    Sets ``res`` to the non-negative content of ``res`` and the entries in ``vec``.
+    This is useful for calculating the common content of several vectors.
+
 .. function:: void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len)
 
     Sets ``res`` to the nonnegative least common multiple of the entries
