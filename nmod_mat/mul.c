@@ -18,26 +18,56 @@
 #include "nmod_vec.h"
 #include "thread_support.h"
 
+#if FLINT_USES_BLAS
+#include "cblas.h"
+#endif
+
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    slong m, k, n, cutoff;
-
-    m = A->r;
-    k = A->c;
-    n = B->c;
-
-    /*
-        Tuning this needs a bit of work: Currently with k = m = n = 1024 and
-        flint_num_threads = 8 and 64 bit mod.n, nmod_mat_mul_classical_threaded
-        beats nmod_mat_mul_blas (but not by much).
-    */
+    slong m = A->r;
+    slong k = A->c;
+    slong n = B->c;
+    slong min_dim = FLINT_MIN(FLINT_MIN(m, k), n);
+    slong cutoff;
+    slong flint_num_threads = flint_get_num_threads();
 
 #if FLINT_USES_BLAS
-    if (FLINT_BITS == 64 && k > 30 && m > 30 && n > 30)
+    if (FLINT_BITS == 64 && min_dim > 100)
     {
-        if (nmod_mat_mul_blas(C, A, B))
-            return;
+        flint_bitcnt_t bits = FLINT_BIT_COUNT(A->mod.n);
+        /* is nmod_mat_mul_blas definitely going to avoid the slow crt */
+        int no_crt = FLINT_BIT_COUNT(k) + 2*bits < 53 + 5;
+
+        if (flint_num_threads > 1)
+        {
+            if (flint_num_threads <= openblas_get_num_threads())
+            {
+                /*
+                    tuning is based on several assumptions:
+                    (1) nmod_mat_mul_blas (with crt) only beats
+                        nmod_mat_mul_classical on square multiplications
+                        on large enough dimension
+                    (2) if nmod_mat_mul_blas beats nmod_mat_mul_classical on
+                        square multiplications of size d, then it beats it on
+                        rectangular muliplications as long as all dimensions
+                        are >= d.
+                */
+
+                bits = FLINT_MAX(bits, 32);
+                cutoff = 100 + 5*flint_num_threads*bits/2;
+                if (no_crt || min_dim > cutoff)
+                {
+                    if (nmod_mat_mul_blas(C, A, B))
+                        return;
+                }
+            }
+        }
+        else if (no_crt || min_dim > 450)
+        {
+            if (nmod_mat_mul_blas(C, A, B))
+                return;
+        }
     }
 #endif
 
@@ -56,9 +86,9 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     else
         cutoff = 200;
 
-    if (flint_get_num_threads() > 1)
+    if (flint_num_threads > 1)
 	    nmod_mat_mul_classical_threaded(C, A, B);
-    else if (m < cutoff || n < cutoff || k < cutoff)
+    else if (min_dim < cutoff)
         nmod_mat_mul_classical(C, A, B);
     else
         nmod_mat_mul_strassen(C, A, B);

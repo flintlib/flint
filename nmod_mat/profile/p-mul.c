@@ -1,6 +1,7 @@
 /*
     Copyright 2009 William Hart
     Copyright 2010 Fredrik Johansson
+    Copyright 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -16,10 +17,14 @@
 #include "flint.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
+#include "thread_support.h"
+#include "cblas.h"
 
 typedef struct
 {
-    ulong dim;
+    slong dim_m;
+    slong dim_n;
+    slong dim_k;
     mp_limb_t modulus;
     int algorithm;
 } mat_mul_t;
@@ -27,15 +32,19 @@ typedef struct
 void sample(void * arg, ulong count)
 {
     mat_mul_t * params = (mat_mul_t *) arg;
-    mp_limb_t n = params->modulus;
-    ulong i, dim = params->dim;
     int algorithm = params->algorithm;
-
     nmod_mat_t A, B, C;
+    ulong i;
+    flint_rand_t state;
 
-    nmod_mat_init(A, dim, dim, n);
-    nmod_mat_init(B, dim, dim, n);
-    nmod_mat_init(C, dim, dim, n);
+    flint_randinit(state);
+
+    nmod_mat_init(A, params->dim_m, params->dim_k, params->modulus);
+    nmod_mat_init(B, params->dim_k, params->dim_n, params->modulus);
+    nmod_mat_init(C, params->dim_m, params->dim_n, params->modulus);
+    nmod_mat_randfull(A, state);
+    nmod_mat_randfull(B, state);
+    nmod_mat_randfull(C, state);
 
     prof_start();
 
@@ -45,70 +54,95 @@ void sample(void * arg, ulong count)
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
             nmod_mat_mul_classical(C, A, B);
+    else if (algorithm == 2)
+        for (i = 0; i < count; i++)
+            nmod_mat_mul_classical_threaded(C, A, B);
+    else if (algorithm == 3)
+        for (i = 0; i < count; i++)
+            nmod_mat_mul_blas(C, A, B);
     else
         for (i = 0; i < count; i++)
             nmod_mat_mul_strassen(C, A, B);
 
     prof_stop();
 
-    if (C->entries[0] == WORD(5893479483)) abort();
-
     nmod_mat_clear(A);
     nmod_mat_clear(B);
     nmod_mat_clear(C);
+
+    flint_randclear(state);
 }
 
 int main(void)
 {
-    double min_classical, min_strassen, max;
+    double max;
     mat_mul_t params;
-    slong dim;
-    slong i, k, m, n;
-    nmod_mat_t A, B, C;
-    flint_rand_t state;
-    timeit_t timer;
+    slong dim, i, flint_num, blas_num;
 
     flint_printf("nmod_mat_mul:\n");
 
-    params.modulus = 40000;
-
-    for (dim = 2; dim <= 512; dim = (slong) ((double) dim * 1.1) + 1)
+    for (dim = 2; dim <= 100; dim += dim/4 + 1)
     {
-        params.dim = dim;
+        double min_classical, min_strassen;
+
+        params.dim_m = dim;
+        params.dim_n = dim;
+        params.dim_k = dim;
+        params.modulus = 40000;
 
         params.algorithm = 1;
         prof_repeat(&min_classical, &max, sample, &params);
 
-        params.algorithm = 2;
+        params.algorithm = 4;
         prof_repeat(&min_strassen, &max, sample, &params);
 
         flint_printf("dim = %wd, classical %.2f us strassen %.2f us\n", 
-            dim, min_classical, min_strassen);
+                                             dim, min_classical, min_strassen);
     }
 
-    flint_randinit(state);
-
-    flint_set_num_threads(8);
-
-    for (i = 7; i < FLINT_BITS; i += 4)
+    /* output floating point ratios time(mul_blas)/time(mul_blas) */
+    for (dim = 200; dim <= 1200; dim += 200)
     {
-        k = m = n = 1*1024;
-        nmod_mat_init(A, m, k, 2*(UWORD(1) << i) - 1);
-        nmod_mat_init(B, k, n, 2*(UWORD(1) << i) - 1);
-        nmod_mat_init(C, m, n, 2*(UWORD(1) << i) - 1);
-        nmod_mat_randfull(A, state);
-        nmod_mat_randfull(B, state);
-        nmod_mat_randfull(C, state);
-        timeit_start(timer);
-        nmod_mat_mul(C, A, B);
-        timeit_stop(timer);
-        flint_printf("bits %wd: %05wd\n", i+1, timer->wall);
-        nmod_mat_clear(A);
-        nmod_mat_clear(B);
-        nmod_mat_clear(C);
-    }
+        flint_printf("dimension %wd\n", dim);
 
-    flint_randclear(state);
+        for (flint_num = 2; flint_num <= 8; flint_num += 1)
+        {
+            flint_set_num_threads(flint_num);
+
+            for (blas_num = flint_num; blas_num <= flint_num; blas_num *= 2)
+            {
+                double min_old, min_new, min_ratio = 100;
+
+                openblas_set_num_threads(blas_num);
+
+                flint_printf("[flint %wd, blas %wd]: (", flint_num, blas_num);
+
+                for (i = 7; i < FLINT_BITS; i += 8)
+                {
+                    params.dim_m = dim;
+                    params.dim_n = dim;
+                    params.dim_k = dim;
+                    params.modulus = 2*(UWORD(1) << i) - 1;
+
+                    params.algorithm = 2;
+                    prof_repeat(&min_old, &max, sample, &params);
+
+                    params.algorithm = 0;
+                    prof_repeat(&min_new, &max, sample, &params);
+
+                    min_ratio = FLINT_MIN(min_ratio, min_old/min_new);
+                    flint_printf(" %.2f ", min_old/min_new);
+                    fflush(stdout);
+                }
+
+                flint_printf(") min %0.2f\n", min_ratio);
+
+                /* assume that blas gets faster with more threads */
+                if (min_ratio > 1)
+                    break;
+            }
+        }
+    }
 
     return 0;
 }
