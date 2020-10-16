@@ -111,7 +111,6 @@ void ca_poly_set(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx);
 void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx);
 void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx);
 
-/* todo: document */
 void ca_poly_set_coeff_ca(ca_poly_t poly, slong n, const ca_t x, ca_ctx_t ctx);
 
 /* Random generation */
@@ -151,7 +150,6 @@ void ca_poly_sub(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca
 void _ca_poly_mul(ca_ptr C, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
 void ca_poly_mul(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx);
 
-/* todo: document */
 CA_POLY_INLINE void
 ca_poly_mul_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
 {
@@ -161,7 +159,6 @@ ca_poly_mul_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
     _ca_poly_normalise(res, ctx);
 }
 
-/* todo: document */
 CA_POLY_INLINE void
 ca_poly_div_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
 {
