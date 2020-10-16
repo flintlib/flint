@@ -11,76 +11,26 @@
 
 #include "ca_mat.h"
 
-#define E(i,j) ca_mat_entry(LU, i, j)
-
 truth_t
 ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx)
 {
-    ca_t e, t;
-    slong i, j, k, m, n, r, row, col;
-    truth_t result;
-
     if (ca_mat_is_empty(A))
     {
         ca_one(den, ctx);
         return T_TRUE;
     }
-
-    m = ca_mat_nrows(A);
-    n = ca_mat_ncols(A);
-
-    ca_mat_set(LU, A, ctx);
-
-    row = col = 0;
-    for (i = 0; i < m; i++)
-        P[i] = i;
-
-    ca_init(e, ctx);
-    ca_init(t, ctx);
-
-    result = T_TRUE;
-
-    ca_one(den, ctx);
-
-    while (row < m && col < n)
+    else
     {
-        result = ca_mat_find_pivot(&r, LU, row, m, col, ctx);
+        int success;
+        slong rank;
+        success = ca_mat_fflu(&rank, P, LU, den, A, 1, ctx);
 
-        if (result != T_TRUE)
-            break;
+        if (success == 0)
+            return T_UNKNOWN;
 
-        if (r != row)
-            _ca_mat_swap_rows(LU, P, row, r);
+        if (rank == 0)
+            return T_FALSE;
 
-        ca_inv(e, den, ctx);
-
-        for (j = row + 1; j < m; j++)
-        {
-            for (k = col + 1; k < n; k++)
-            {
-                ca_mul(E(j, k), E(j, k), E(row, col), ctx);
-                ca_mul(t, E(j, col), E(row, k), ctx);
-                ca_sub(E(j, k), E(j, k), t, ctx);
-                if (row > 0)
-                    ca_mul(E(j, k), E(j, k), e, ctx);
-            }
-        }
-
-        ca_set(den, E(row, col), ctx);
-
-        row++;
-        col++;
+        return T_TRUE;
     }
-
-    if (result == T_FALSE)
-        ca_zero(den, ctx);
-    else if (result == T_UNKNOWN)
-        ca_unknown(den, ctx);
-
-    ca_clear(e, ctx);
-    ca_clear(t, ctx);
-
-    return result;
 }
-
-#undef E

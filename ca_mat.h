@@ -263,7 +263,11 @@ int ca_mat_lu_classical(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, 
 int ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx);
 int ca_mat_lu(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx);
 
-int ca_mat_rref(slong * res_rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx);
+int ca_mat_fflu(slong * rank, slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, int rank_check, ca_ctx_t ctx);
+
+int ca_mat_rref_fflu(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx);
+int ca_mat_rref_lu(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx);
+int ca_mat_rref(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx);
 
 truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx);
 truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx);

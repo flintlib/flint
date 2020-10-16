@@ -240,15 +240,7 @@ Powers
     binary exponentiation.
 
 
-Trace
--------------------------------------------------------------------------------
-
-.. function:: void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
-
-    Sets *trace* to the sum of the entries on the main diagonal of *mat*.
-
-
-Gaussian elimination and solving
+Gaussian elimination and LU decomposition
 -------------------------------------------------------------------------------
 
 .. function:: truth_t ca_mat_find_pivot(slong * pivot_row, const ca_mat_t mat, slong start_row, slong end_row, slong column, ca_ctx_t ctx)
@@ -296,12 +288,13 @@ Gaussian elimination and solving
     The *recursive* version uses a block recursive algorithm
     to take advantage of fast matrix multiplication.
 
-.. function:: int ca_mat_rref(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
-
-    Computes the reduced row echelon form (RREF) of a given matrix.
-    On success, sets *R* to the RREF of *A*, writes the rank to
-    *rank*, and returns 1. On failure to certify the correct rank,
-    returns 0, leaving the data in ``rank`` and ``R`` meaningless.
+.. function:: int ca_mat_fflu(slong * rank, slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
+    
+    Similar to :func:`ca_mat_lu`, but computes a fraction-free
+    LU decomposition using the Bareiss algorithm.
+    The denominator is written to *den*.
+    Note that despite being "fraction-free", this algorithm may
+    introduce fractions due to incomplete symbolic simplifications.
 
 .. function:: truth_t ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
 
@@ -320,13 +313,23 @@ Gaussian elimination and solving
     LU factorization is not completed and the values of
     *P* and *LU* are arbitrary.
 
-.. function:: truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+.. function:: truth_t ca_mat_nonsingular_fflu(slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, ca_ctx_t ctx)
 
     Similar to :func:`ca_mat_nonsingular_lu`, but computes a fraction-free
     LU decomposition using the Bareiss algorithm.
-    The denominator is written to *det*.
+    The denominator is written to *den*.
     Note that despite being "fraction-free", this algorithm may
     introduce fractions due to incomplete symbolic simplifications.
+
+Solving and inverse
+-------------------------------------------------------------------------------
+
+.. function:: truth_t ca_mat_inv(ca_mat_t X, const ca_mat_t A, ca_ctx_t ctx)
+
+    Determines if the square matrix *A* is nonsingular, and if successful,
+    sets `X = A^{-1}` and returns ``T_TRUE``.
+    Returns ``T_FALSE`` if *A* is singular, and ``T_UNKNOWN`` if the
+    rank of *A* cannot be determined.
 
 .. function:: truth_t ca_mat_nonsingular_solve_lu(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
               truth_t ca_mat_nonsingular_solve(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
@@ -354,23 +357,13 @@ Gaussian elimination and solving
     way to benefit from fast matrix multiplication. The default versions
     choose an algorithm automatically.
 
-.. function:: void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+.. function:: void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t LU, const ca_mat_t B, ca_ctx_t ctx)
 
     Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`.
     The matrices `X` and `B` are allowed to be aliased with each other,
     but `X` is not allowed to be aliased with `LU`.
 
-Inverse
--------------------------------------------------------------------------------
-
-.. function:: truth_t ca_mat_inv(ca_mat_t X, const ca_mat_t A, ca_ctx_t ctx)
-
-    Determines if the square matrix *A* is nonsingular, and if successful,
-    sets `X = A^{-1}` and returns ``T_TRUE``.
-    Returns ``T_FALSE`` if *A* is singular, and ``T_UNKNOWN`` if the
-    rank of *A* cannot be determined.
-
-Rank
+Rank and echelon form
 -------------------------------------------------------------------------------
 
 .. function:: int ca_mat_rank(slong * rank, const ca_mat_t A, ca_ctx_t ctx)
@@ -378,9 +371,27 @@ Rank
     Computes the rank of the matrix *A*. If successful, returns 1 and
     writes the rank to ``rank``. If unsuccessful, returns 0.
 
+.. function:: int ca_mat_rref_fflu(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
+              int ca_mat_rref_lu(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
+              int ca_mat_rref(slong * rank, ca_mat_t R, const ca_mat_t A, ca_ctx_t ctx)
 
-Determinant
+    Computes the reduced row echelon form (rref) of a given matrix.
+    On success, sets *R* to the rref of *A*, writes the rank to
+    *rank*, and returns 1. On failure to certify the correct rank,
+    returns 0, leaving the data in *rank* and *R* meaningless.
+
+    The *fflu* version computes a fraction-free LU decomposition and
+    then converts the output ro rref form. The *lu* version computes a
+    regular LU decomposition and then converts the output to rref form.
+    The default version uses an automatic algorithm choice and may
+    implement additional methods for special cases.
+
+Determinant and trace
 -------------------------------------------------------------------------------
+
+.. function:: void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
+
+    Sets *trace* to the sum of the entries on the main diagonal of *mat*.
 
 .. function:: void ca_mat_det_berkowitz(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
               int ca_mat_det_lu(ca_t det, const ca_mat_t A, ca_ctx_t ctx)
