@@ -33,41 +33,39 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     slong flint_num_threads = flint_get_num_threads();
 
 #if FLINT_USES_BLAS
+    /*
+        tuning is based on several assumptions:
+        (1) blas_num_threads >= flint_num_threads.
+        (2) nmod_mat_mul_blas (with crt) only beats
+            nmod_mat_mul_classical on square multiplications
+            of large enough dimension
+        (3) if nmod_mat_mul_blas beats nmod_mat_mul_classical on
+            square multiplications of size d, then it beats it on
+            rectangular muliplications as long as all dimensions are >= d
+    */
     if (FLINT_BITS == 64 && min_dim > 100)
     {
         flint_bitcnt_t bits = FLINT_BIT_COUNT(A->mod.n);
-        /* is nmod_mat_mul_blas definitely going to avoid the slow crt */
-        int no_crt = FLINT_BIT_COUNT(k) + 2*bits < 53 + 5;
 
-        if (flint_num_threads > 1)
+        if (FLINT_BIT_COUNT(k) + 2*bits < 53 + 5)
         {
-            if (flint_num_threads <= openblas_get_num_threads())
-            {
-                /*
-                    tuning is based on several assumptions:
-                    (1) nmod_mat_mul_blas (with crt) only beats
-                        nmod_mat_mul_classical on square multiplications
-                        on large enough dimension
-                    (2) if nmod_mat_mul_blas beats nmod_mat_mul_classical on
-                        square multiplications of size d, then it beats it on
-                        rectangular muliplications as long as all dimensions
-                        are >= d.
-                */
+            /* mul_blas definitely avoids the slow crt */
+            cutoff = 100;
+        }
+        else if (flint_num_threads > 1)
+        {
+            /* mul_blas with crt is competing against mul_classical_threaded */
+            bits = FLINT_MAX(bits, 32);
+            cutoff = 100 + 5*flint_num_threads*bits/2;
+        }
+        else
+        {
+            /* mul_blas with crt is competing against mul_strassen */
+            cutoff = 450;
+        }
 
-                bits = FLINT_MAX(bits, 32);
-                cutoff = 100 + 5*flint_num_threads*bits/2;
-                if (no_crt || min_dim > cutoff)
-                {
-                    if (nmod_mat_mul_blas(C, A, B))
-                        return;
-                }
-            }
-        }
-        else if (no_crt || min_dim > 450)
-        {
-            if (nmod_mat_mul_blas(C, A, B))
-                return;
-        }
+        if (min_dim > cutoff && nmod_mat_mul_blas(C, A, B))
+            return;
     }
 #endif
 
