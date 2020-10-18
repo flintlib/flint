@@ -140,7 +140,11 @@ void ca_mat_conjugate_transpose(ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx
 void ca_mat_neg(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
 void ca_mat_add(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
 void ca_mat_sub(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+
 void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+
+void ca_mat_mul_classical(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+void ca_mat_mul_same_nf(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_field_t K, ca_ctx_t ctx);
 
 CA_MAT_INLINE void
 ca_mat_mul_si(ca_mat_t B, const ca_mat_t A, slong c, ca_ctx_t ctx)
@@ -310,6 +314,12 @@ int ca_mat_companion(ca_mat_t A, const ca_poly_t poly, ca_ctx_t ctx);
 /* Eigenvalues and eigenvectors */
 
 int ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, ca_mat_t mat, ca_ctx_t ctx);
+
+/* Internal representation */
+
+/* todo: document, make consistent */
+ca_field_ptr _ca_mat_same_field(const ca_mat_t A, ca_ctx_t ctx);
+ca_field_ptr _ca_mat_same_field2(const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

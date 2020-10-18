@@ -209,9 +209,17 @@ Arithmetic
 
     Sets *res* to the difference of *A* and *B*.
 
-.. function:: void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+
+.. function:: void ca_mat_mul_classical(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+              void ca_mat_mul_same_nf(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_field_t K, ca_ctx_t ctx)
+              void ca_mat_mul(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 
     Sets *res* to the matrix product of *A* and *B*.
+    The *classical* version uses classical multiplication.
+    The *same_nf* version assumes (not checked) that both *A* and *B*
+    have coefficients in the same simple algebraic number field *K*
+    or in `\mathbb{Q}`.
+    The default version chooses an algorithm automatically.
 
 .. function:: void ca_mat_mul_si(ca_mat_t B, const ca_mat_t A, slong c, ca_ctx_t ctx)
               void ca_mat_mul_fmpz(ca_mat_t B, const ca_mat_t A, const fmpz_t c, ca_ctx_t ctx)

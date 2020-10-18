@@ -41,11 +41,56 @@ ca_fmpq_mat_is_fmpz_mat(const ca_mat_t A, ca_ctx_t ctx)
     return 1;
 }
 
+ca_field_ptr
+_ca_mat_same_field2(const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
+{
+    ca_field_ptr K;
+    ca_field_ptr QQ;
+
+    slong i, j;
+
+    QQ = ctx->field_qq;
+    K = QQ;
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+    {
+        for (j = 0; j < ca_mat_ncols(A); j++)
+        {
+            if (CA_IS_QQ(ca_mat_entry(A, i, j), ctx))
+                continue;
+
+            if (K == QQ)
+                K = CA_FIELD(ca_mat_entry(A, i, j), ctx);
+            else if (K != CA_FIELD(ca_mat_entry(A, i, j), ctx))
+                return NULL;
+        }
+    }
+
+    if (B != NULL)
+    {
+        for (i = 0; i < ca_mat_nrows(B); i++)
+        {
+            for (j = 0; j < ca_mat_ncols(B); j++)
+            {
+                if (CA_IS_QQ(ca_mat_entry(B, i, j), ctx))
+                    continue;
+
+                if (K == QQ)
+                    K = CA_FIELD(ca_mat_entry(B, i, j), ctx);
+                else if (K != CA_FIELD(ca_mat_entry(B, i, j), ctx))
+                    return NULL;
+            }
+        }
+    }
+
+    return K;
+}
+
 void
 ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 {
-    slong ar, ac, br, bc, i, j, k;
-    ca_t t;
+    slong ar, ac, br, bc, i, j;
+    ca_field_ptr K;
 
     ar = ca_mat_nrows(A);
     ac = ca_mat_ncols(A);
@@ -206,23 +251,18 @@ ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
         return;
     }
 
-    ca_init(t, ctx);
-
-    for (i = 0; i < ar; i++)
+    /* Multiply over number field */
+    /* Todo: probably needs some tuning for degree and bit size */
+    if (br >= 4 && ar >= 3 && bc >= 3)
     {
-        for (j = 0; j < bc; j++)
-        {
-            ca_mul(ca_mat_entry(C, i, j),
-                      ca_mat_entry(A, i, 0),
-                      ca_mat_entry(B, 0, j), ctx);
+        K = _ca_mat_same_field2(A, B, ctx);
 
-            for (k = 1; k < br; k++)
-            {
-                ca_mul(t, ca_mat_entry(A, i, k), ca_mat_entry(B, k, j), ctx);
-                ca_add(ca_mat_entry(C, i, j), ca_mat_entry(C, i, j), t, ctx);
-            }
+        if (K != NULL && CA_FIELD_IS_NF(K))
+        {
+            ca_mat_mul_same_nf(C, A, B, K, ctx);
+            return;
         }
     }
 
-    ca_clear(t, ctx);
+    ca_mat_mul_classical(C, A, B, ctx);
 }
