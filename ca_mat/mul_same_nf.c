@@ -49,13 +49,10 @@ _nf_elem_get_fmpz_poly_lcm(fmpz_poly_t pol, fmpz_t t, const nf_elem_t a, const f
     }
 }
 
-static void
-get_mat_rowwise(fmpz_poly_mat_t Aclear, fmpz * Aden, const ca_mat_t A, ca_field_t K, ca_ctx_t ctx)
+static int
+get_lcm_rowwise(fmpz * Aden, const ca_mat_t A, ca_field_t K, slong bits_limit, ca_ctx_t ctx)
 {
     slong i, j;
-    fmpz_t t;
-
-    fmpz_init(t);
 
     for (i = 0; i < ca_mat_nrows(A); i++)
     {
@@ -67,8 +64,49 @@ get_mat_rowwise(fmpz_poly_mat_t Aclear, fmpz * Aden, const ca_mat_t A, ca_field_
                 fmpz_lcm(Aden + i, Aden + i, CA_FMPQ_DENREF(ca_mat_entry(A, i, j)));
             else
                 fmpz_lcm(Aden + i, Aden + i, _nf_denref(CA_NF_ELEM(ca_mat_entry(A, i, j)), CA_FIELD_NF(K)));
-        }
 
+            if (fmpz_bits(Aden + i) > bits_limit)
+                return 0;
+        }
+    }
+
+    return 1;
+}
+
+static int
+get_lcm_colwise(fmpz * Aden, const ca_mat_t A, ca_field_t K, slong bits_limit, ca_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < ca_mat_ncols(A); i++)
+    {
+        fmpz_one(Aden + i);
+
+        for (j = 0; j < ca_mat_nrows(A); j++)
+        {
+            if (CA_IS_QQ(ca_mat_entry(A, j, i), ctx))
+                fmpz_lcm(Aden + i, Aden + i, CA_FMPQ_DENREF(ca_mat_entry(A, j, i)));
+            else
+                fmpz_lcm(Aden + i, Aden + i, _nf_denref(CA_NF_ELEM(ca_mat_entry(A, j, i)), CA_FIELD_NF(K)));
+
+            if (fmpz_bits(Aden + i) > bits_limit)
+                return 0;
+        }
+    }
+
+    return 1;
+}
+
+static void
+get_mat_rowwise(fmpz_poly_mat_t Aclear, const ca_mat_t A, const fmpz * Aden, ca_field_t K, ca_ctx_t ctx)
+{
+    slong i, j;
+    fmpz_t t;
+
+    fmpz_init(t);
+
+    for (i = 0; i < ca_mat_nrows(A); i++)
+    {
         for (j = 0; j < ca_mat_ncols(A); j++)
         {
             if (CA_IS_QQ(ca_mat_entry(A, i, j), ctx))
@@ -88,7 +126,7 @@ get_mat_rowwise(fmpz_poly_mat_t Aclear, fmpz * Aden, const ca_mat_t A, ca_field_
 }
 
 static void
-get_mat_colwise(fmpz_poly_mat_t Aclear, fmpz * Aden, const ca_mat_t A, ca_field_t K, ca_ctx_t ctx)
+get_mat_colwise(fmpz_poly_mat_t Aclear, const ca_mat_t A, const fmpz * Aden, ca_field_t K, ca_ctx_t ctx)
 {
     slong i, j;
     fmpz_t t;
@@ -97,16 +135,6 @@ get_mat_colwise(fmpz_poly_mat_t Aclear, fmpz * Aden, const ca_mat_t A, ca_field_
 
     for (i = 0; i < ca_mat_ncols(A); i++)
     {
-        fmpz_one(Aden + i);
-
-        for (j = 0; j < ca_mat_nrows(A); j++)
-        {
-            if (CA_IS_QQ(ca_mat_entry(A, j, i), ctx))
-                fmpz_lcm(Aden + i, Aden + i, CA_FMPQ_DENREF(ca_mat_entry(A, j, i)));
-            else
-                fmpz_lcm(Aden + i, Aden + i, _nf_denref(CA_NF_ELEM(ca_mat_entry(A, j, i)), CA_FIELD_NF(K)));
-        }
-
         for (j = 0; j < ca_mat_nrows(A); j++)
         {
             if (CA_IS_QQ(ca_mat_entry(A, j, i), ctx))
@@ -203,14 +231,23 @@ ca_mat_mul_same_nf(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_field_t K,
 
     Aden = _fmpz_vec_init(Ar);
     Bden = _fmpz_vec_init(Bc);
+
+    if (!get_lcm_rowwise(Aden, A, K, 1000, ctx) || !get_lcm_colwise(Bden, B, K, 1000, ctx))
+    {
+        _fmpz_vec_clear(Aden, Ar);
+        _fmpz_vec_clear(Bden, Bc);
+        ca_mat_mul_classical(C, A, B, ctx);
+        return;
+    }
+
     fmpz_init(den);
 
     fmpz_poly_mat_init(ZA, Ar, Ac);
     fmpz_poly_mat_init(ZB, Br, Bc);
     fmpz_poly_mat_init(ZC, Ar, Bc);
 
-    get_mat_rowwise(ZA, Aden, A, K, ctx);
-    get_mat_colwise(ZB, Bden, B, K, ctx);
+    get_mat_rowwise(ZA, A, Aden, K, ctx);
+    get_mat_colwise(ZB, B, Bden, K, ctx);
 
     fmpz_poly_mat_mul(ZC, ZA, ZB);
 
