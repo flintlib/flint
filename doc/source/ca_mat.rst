@@ -363,7 +363,7 @@ Solving and inverse
     way to benefit from fast matrix multiplication. The default versions
     choose an algorithm automatically.
 
-.. function:: void ca_mat_solve_fflu_precomp(ca_mat_t X, const slong * perm, const ca_mat_t A, const ca_t den, const ca_mat_t B, ca_ctx_t ctx);
+.. function:: void ca_mat_solve_fflu_precomp(ca_mat_t X, const slong * perm, const ca_mat_t A, const ca_t den, const ca_mat_t B, ca_ctx_t ctx)
               void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t LU, const ca_mat_t B, ca_ctx_t ctx)
 
     Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`

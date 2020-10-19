@@ -106,11 +106,11 @@ in place of monic rational polynomials.
     If *F* is *NULL*, checks if *G* is a Gröbner basis. If *F* is not *NULL*,
     checks if *G* is a Gröbner basis for *F*.
 
-.. function:: int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
+.. function:: int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
 
     Checks whether the vector *F* is autoreduced (or inter-reduced).
 
-.. function:: void fmpz_mpoly_vec_autoreduction(fmpz_mpoly_vec_t H, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
+.. function:: void fmpz_mpoly_vec_autoreduction(fmpz_mpoly_vec_t H, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
 
     Sets *H* to the autoreduction (inter-reduction) of *F*.
 
