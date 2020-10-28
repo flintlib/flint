@@ -309,6 +309,10 @@ Matrix multiplication
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
     multiplication (the Strassen-Winograd variant).
 
+.. function:: int nmod_mat_mul_blas(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Tries to set `C = AB` using BLAS and returns `1` for success and `0` for failure. Dimensions must be compatible for matrix multiplication.
+
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but
