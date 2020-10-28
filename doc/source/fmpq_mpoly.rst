@@ -396,22 +396,22 @@ Addition/Subtraction
               void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` plus ``c``.
+    Set `A` to `B` plus `c`.
 
 .. function:: void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_sub_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_sub_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` minus ``c``.
+    Set `A` to `B` minus `c`.
 
 .. function:: void fmpq_mpoly_add(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` plus ``C``.
+    Set `A` to `B` plus `C`.
 
 .. function:: void fmpq_mpoly_sub(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` minus ``C``.
+    Set `A` to `B` minus `C`.
 
 
 Scalar operations
@@ -420,26 +420,26 @@ Scalar operations
 
 .. function:: void fmpq_mpoly_neg(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
     
-    Set ``A`` to `-```B``.
+    Set `A` to `-B`.
 
 .. function:: void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times `c`.
+    Set `A` to `B` times `c`.
 
 .. function:: void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` divided by `c`.
+    Set `A` to `B` divided by `c`.
 
 .. function:: void fmpq_mpoly_make_monic(fmpq_mpoly_t A, fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` divided by the leading coefficient of ``B``.
-    This throws if ``B`` is zero.
+    Set `A` to `B` divided by the leading coefficient of `B`.
+    This throws if `B` is zero.
 
     All of these functions run quickly if ``A`` and ``B`` are aliased.
 
@@ -450,11 +450,11 @@ Differentiation/Integration
 
 .. function:: void fmpq_mpoly_derivative(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to the derivative of ``B`` with respect to the  variable of index ``var``.
+    Set `A` to the derivative of `B` with respect to the variable of index ``var``.
 
 .. function:: void fmpq_mpoly_integral(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to the integral with the fewest number of terms of ``B`` with respect to the variable of index ``var``.
+    Set `A` to the integral with the fewest number of terms of `B` with respect to the variable of index ``var``.
 
 
 Evaluation
@@ -498,7 +498,7 @@ Multiplication
 
 .. function:: void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times ``C``.
+    Set `A` to `B` times `C`.
 
 
 Powering
@@ -508,12 +508,12 @@ Powering
 
 .. function:: int fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` raised to the `k`-th power.
+    Set `A` to `B` raised to the `k`-th power.
     Return `1` for success and `0` for failure.
 
 .. function:: int fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong k, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` raised to the `k`-th power.
+    Set `A` to `B` raised to the `k`-th power.
     Return `1` for success and `0` for failure.
 
 
