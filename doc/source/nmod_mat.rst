@@ -271,7 +271,7 @@ Matrix multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     Aliasing is allowed. This function automatically chooses between classical
@@ -282,7 +282,7 @@ Matrix multiplication
    Sets ``D = A*B op C`` where ``op`` is ``+1`` for addition, ``-1`` for
    subtraction and ``0`` to ignore ``C``.
 
-.. function:: void nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     `C` is not allowed to be aliased with `A` or `B`. Uses classical
@@ -303,13 +303,13 @@ Matrix multiplication
 
     Multithreaded version of ``nmod_mat_mul_classical``.
 
-.. function:: void nmod_mat_mul_strassen(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
     multiplication (the Strassen-Winograd variant).
 
-.. function:: int nmod_mat_mul_blas(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Tries to set `C = AB` using BLAS and returns `1` for success and `0` for failure. Dimensions must be compatible for matrix multiplication.
 
