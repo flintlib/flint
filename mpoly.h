@@ -1335,8 +1335,6 @@ void mpoly_zipinfo_init(mpoly_zipinfo_t zinfo, slong nvars);
 
 void mpoly_zipinfo_clear(mpoly_zipinfo_t zinfo);
 
-void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len);
-
 /* Heap **********************************************************************/
 
 #define HEAP_LEFT(i) (2*(i))

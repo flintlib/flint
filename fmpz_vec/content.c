@@ -20,5 +20,10 @@ _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len)
 {
     fmpz_zero(res);
     while (len--)
+    {
         fmpz_gcd(res, res, vec + len);
+
+        if (fmpz_is_one(res))
+            return;
+    }
 }

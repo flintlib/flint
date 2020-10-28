@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,9 +11,12 @@
 
 #include "fmpq_mpoly.h"
 
+
 void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                     const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 {
+    fmpz_t t1, t2;
+    slong easy_length = B->zpoly->length + 1;
 
     if (fmpq_is_zero(c))
     {
@@ -25,73 +28,46 @@ void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B,
         fmpq_mpoly_set_fmpq(A, c, ctx);
         return;
     }
-    else
-    {
-        /*
-            if B->content != 0 and c != 0,
-                compute num/den = c / B->content
-                A->content = B->content / den
-                A->zpoly = den * B->zpoly + num
-        */
-        fmpq_t t;
-        slong Blen = B->zpoly->length;
 
-        fmpq_init(t);
-        fmpq_div(t, c, B->content);
-        if (!fmpz_is_one(fmpq_denref(t)))
-        {
-            fmpq_div_fmpz(A->content, B->content, fmpq_denref(t));
-            fmpz_mpoly_scalar_mul_fmpz(A->zpoly, B->zpoly,
-                                                    fmpq_denref(t), ctx->zctx);
-            fmpz_mpoly_add_fmpz(A->zpoly, A->zpoly, fmpq_numref(t), ctx->zctx);
-        }
-        else
-        {
-            fmpq_set(A->content, B->content);
-            fmpz_mpoly_add_fmpz(A->zpoly, B->zpoly, fmpq_numref(t), ctx->zctx);
-        }
-        /*
-            optimization: since gcd(num, den) = 1 and B->zpoly is primitive,
-                we do not need to reduce if the addition added a term
-        */
-        if (A->zpoly->length <= Blen)
-        {
-            fmpq_mpoly_reduce(A, ctx);
-        }
-        fmpq_clear(t);
-        return;
-    }
+    fmpz_init(t1);
+    fmpz_init(t2);
+
+    fmpq_gcd_cofactors(A->content, t1, t2, B->content, c);
+
+    fmpz_mpoly_scalar_mul_fmpz(A->zpoly, B->zpoly, t1, ctx->zctx);
+    fmpz_mpoly_add_fmpz(A->zpoly, A->zpoly, t2, ctx->zctx);
+
+    fmpz_clear(t1);
+    fmpz_clear(t2);
+
+    fmpq_mpoly_reduce_easy(A, easy_length, ctx);
 }
 
 void fmpq_mpoly_add_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                     const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_t t;
-    fmpq_init(t);
-    fmpz_set(fmpq_numref(t), c);
-    fmpz_one(fmpq_denref(t));
+    *fmpq_numref(t) = *c;
+    *fmpq_denref(t) = 1;
     fmpq_mpoly_add_fmpq(A, B, t, ctx);
-    fmpq_clear(t);
 }
 
 void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                            ulong c, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_t t;
-    fmpq_init(t);
-    fmpz_set_ui(fmpq_numref(t), c);
-    fmpz_one(fmpq_denref(t));
+    fmpz_init_set_ui(fmpq_numref(t), c);
+    *fmpq_denref(t) = 1;
     fmpq_mpoly_add_fmpq(A, B, t, ctx);
-    fmpq_clear(t);
+    fmpz_clear(fmpq_numref(t));
 }
 
 void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                            slong c, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_t t;
-    fmpq_init(t);
-    fmpz_set_si(fmpq_numref(t), c);
-    fmpz_one(fmpq_denref(t));
+    fmpz_init_set_si(fmpq_numref(t), c);
+    *fmpq_denref(t) = 1;
     fmpq_mpoly_add_fmpq(A, B, t, ctx);
-    fmpq_clear(t);
+    fmpz_clear(fmpq_numref(t));
 }

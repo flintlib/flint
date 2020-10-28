@@ -69,20 +69,6 @@ void fmpz_mpoly_geobucket_empty(fmpz_mpoly_t p, fmpz_mpoly_geobucket_t B,
     B->length = 0;
 }
 
-void fmpz_mpoly_geobucket_print(fmpz_mpoly_geobucket_t B, const char ** x,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i;
-    printf("{");
-    for (i = 0; i < B->length; i++)
-    {
-        fmpz_mpoly_print_pretty(B->polys + i, x, ctx);
-        if (i + 1 < B->length)
-            printf(", ");
-    }
-    printf("}");
-}
-
 /* ceiling(log_4(x)) - 1 */
 slong fmpz_mpoly_geobucket_clog4(slong x)
 {

@@ -28,9 +28,12 @@ void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         fmpz_mpoly_fit_length(A, B->length, ctx);
         fmpz_mpoly_fit_bits(A, B->bits, ctx);
         A->bits = B->bits;
-        mpn_copyi(A->exps, B->exps, N*B->length);
+        mpoly_copy_monomials(A->exps, B->exps, B->length, N);
     }
-    _fmpz_vec_scalar_mul_fmpz(A->coeffs, B->coeffs, B->length, c);
+
+    if ((A != B) || !fmpz_is_one(c))
+        _fmpz_vec_scalar_mul_fmpz(A->coeffs, B->coeffs, B->length, c);
+
     _fmpz_mpoly_set_length(A, B->length, ctx);
 }
 
