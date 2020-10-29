@@ -101,11 +101,15 @@ new_one:
     {
         /* remove gen(0) ... gen(num_vars-1) from the answer */
         ulong * gexps;
+        ulong mask;
+
         nmod_mpoly_repack_bits_inplace(g, A->bits, ctx);
         gexps = g->exps;
+
+        mask = (shift > 0) ? ((-UWORD(1)) >> (FLINT_BITS - shift)) : 0;
         for (i = 0; i < g->length; i++)
         {
-            (gexps + N*i)[off] &= ((-UWORD(1)) >> (FLINT_BITS - shift));
+            (gexps + N*i)[off] &= mask;
             for (j = off + 1; j < N; j++)
                 (gexps + N*i)[j] = 0;
         }

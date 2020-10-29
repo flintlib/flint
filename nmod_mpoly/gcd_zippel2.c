@@ -731,6 +731,9 @@ int nmod_mpolyl_gcd_zippel_smprime(
     }
 #endif
 
+    FLINT_ASSERT(gammadegs[0] == 0);
+    FLINT_ASSERT(gammadegs[1] == 0);
+
     if (ctx->ffinfo->mod.n < 7)
         return 0;
 
@@ -1755,6 +1758,9 @@ int nmod_mpolyl_gcd_zippel_lgprime(
         flint_free(tmp_degs);
     }
 #endif
+
+    FLINT_ASSERT(gammadegs[0] == 0);
+    FLINT_ASSERT(gammadegs[1] == 0);
 
     flint_randinit(state);
 

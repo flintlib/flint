@@ -24,6 +24,7 @@ void nmod_mpolyl_lead_coeff(
 {
     slong i, j, off, shift;
     ulong old_shift, new_shift;
+    ulong mask;
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     ulong * Aexps = A->exps;
     ulong * cexps;
@@ -57,13 +58,14 @@ void nmod_mpolyl_lead_coeff(
 
     _nmod_vec_set(c->coeffs, A->coeffs, c->length);
 
+    mask = (shift > 0) ? ((-UWORD(1)) >> (FLINT_BITS - shift)) : 0;
     for (i = 0; i < c->length; i++)
     {
         for (j = 0; j < off; j++)
             (cexps + N*i)[j] = (Aexps + N*i)[j];
 
-        (cexps + N*i)[off] = ((-UWORD(1)) >> (FLINT_BITS - shift)) & 
-                                                            (Aexps + N*i)[off];
+        (cexps + N*i)[off] = mask & (Aexps + N*i)[off];
+
         for (j = off + 1; j < N; j++)
             (cexps + N*i)[j] = 0;
     }

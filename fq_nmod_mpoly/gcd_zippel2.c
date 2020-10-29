@@ -804,6 +804,9 @@ int fq_nmod_mpolyl_gcd_zippel_smprime(
     }
 #endif
 
+    FLINT_ASSERT(gammadegs[0] == 0);
+    FLINT_ASSERT(gammadegs[1] == 0);
+
     fq_nmod_init(start_alpha, ctx->fqctx);
     c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
 
@@ -1648,6 +1651,9 @@ int fq_nmod_mpolyl_gcd_zippel_lgprime(
         flint_free(tmp_degs);
     }
 #endif
+
+    FLINT_ASSERT(gammadegs[0] == 0);
+    FLINT_ASSERT(gammadegs[1] == 0);
 
     n_fq_polyun_init(HG);
     n_fq_polyun_init(HAbar);
