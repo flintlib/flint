@@ -330,6 +330,10 @@ Randomisation
 
     Generates a high quality random element of `\mathbf{F}_q`.
 
+.. function:: void fq_nmod_rand_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+
+    Generates a high quality non-zero random element of `\mathbf{F}_q`.
+
 
 Assignments and conversions
 --------------------------------------------------------------------------------

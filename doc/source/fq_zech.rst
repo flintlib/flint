@@ -351,6 +351,10 @@ Randomisation
 
     Generates a high quality random element of `\mathbf{F}_q`.
 
+.. function:: void fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_t state, const fq_zech_ctx_t ctx)
+
+    Generates a high quality non-zero random element of `\mathbf{F}_q`.
+
 
 Assignments and conversions
 --------------------------------------------------------------------------------
