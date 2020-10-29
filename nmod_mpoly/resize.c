@@ -11,9 +11,10 @@
 
 #include "nmod_mpoly.h"
 
-
-void nmod_mpoly_resize(nmod_mpoly_t A, slong new_length,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_resize(
+    nmod_mpoly_t A,
+    slong new_length,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong old_length = A->length;
     slong N;
@@ -24,12 +25,12 @@ void nmod_mpoly_resize(nmod_mpoly_t A, slong new_length,
 
     if (new_length > old_length)
     {
-        if (new_length > A->alloc)
-            nmod_mpoly_realloc(A, FLINT_MAX(new_length, 2*A->alloc), ctx);
+        nmod_mpoly_fit_length(A, new_length, ctx);
 
         /* must zero out the new coeffs/exps past the old end */
+        N = mpoly_words_per_exp(A->bits, ctx->minfo);
         flint_mpn_zero(A->exps + N*old_length, N*(new_length - old_length));
-        flint_mpn_zero(A->coeffs + old_length, new_length - old_length);
+        _nmod_vec_zero(A->coeffs + old_length, new_length - old_length);
     }
 
     A->length = new_length;

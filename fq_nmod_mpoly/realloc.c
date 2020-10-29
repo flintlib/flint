@@ -11,10 +11,13 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_realloc(fq_nmod_mpoly_t A,
-                                    slong alloc, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_realloc(
+    fq_nmod_mpoly_t A,
+    slong alloc,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong i, N;
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     if (alloc == 0)             /* Clear up, reinitialise */
     {
@@ -23,28 +26,9 @@ void fq_nmod_mpoly_realloc(fq_nmod_mpoly_t A,
         return;
     }
 
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    A->exps_alloc = N*alloc;
+    A->exps = (ulong *) flint_realloc(A->exps, A->exps_alloc*sizeof(ulong));
 
-    for (i = alloc; i < A->alloc; i++)
-        fq_nmod_clear(A->coeffs + i, ctx->fqctx);
-
-
-    if (A->alloc != 0)            /* Realloc */
-    {
-        A->exps = (ulong *) flint_realloc(A->exps, alloc*N*sizeof(ulong));
-        A->coeffs = (fq_nmod_struct *)
-                        flint_realloc(A->coeffs, alloc*sizeof(fq_nmod_struct));
-    }
-    else                        /* Nothing allocated already so do it now */
-    {
-        A->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
-        A->coeffs = (fq_nmod_struct *)
-                                    flint_malloc(alloc*sizeof(fq_nmod_struct));
-
-    }
-
-    for (i = A->alloc; i < alloc; i++)
-        fq_nmod_init(A->coeffs + i, ctx->fqctx);
-
-    A->alloc = alloc;
+    A->coeffs_alloc = d*alloc;
+    A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, A->coeffs_alloc*sizeof(ulong));
 }

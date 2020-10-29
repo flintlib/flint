@@ -174,8 +174,7 @@ int fmpz_mpoly_factor_squarefree(
         fmpz_one(k);
         _fmpz_mpoly_factor_mul_mpoly_fmpz(f, f->poly + j, k, ctx);
 
-continue_outer:
-        (void) NULL;
+continue_outer:;
     }
 
     fmpz_mpoly_factor_swap(f, g, ctx);

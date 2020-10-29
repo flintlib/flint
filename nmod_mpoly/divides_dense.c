@@ -57,10 +57,8 @@ int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
     N = mpoly_words_per_exp(bits, ctx->minfo);
 
     /* we are going to push back terms manually */
+    nmod_mpoly_fit_length_reset_bits(A, 0, bits, ctx);
     Alen = 0;
-    nmod_mpoly_zero(A, ctx);
-    nmod_mpoly_fit_bits(A, bits, ctx);
-    A->bits = bits;
 
     /* find exponent vector for all variables */
     pexps = (ulong *) TMP_ALLOC(N*nvars*sizeof(ulong));
@@ -97,7 +95,8 @@ int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
             if (outrange)
                 goto failed_out_range;
 
-            _nmod_mpoly_fit_length(&A->coeffs, &A->exps, &A->alloc, Alen + 1, N);
+            _nmod_mpoly_fit_length(&A->coeffs, &A->coeffs_alloc,
+                                   &A->exps, &A->exps_alloc, N, Alen + 1);
             A->coeffs[Alen] = B->coeffs[off];
             mpoly_monomial_set(A->exps + N*Alen, pcurexp, N);
             topmask |= (A->exps + N*Alen)[N - 1];
@@ -187,8 +186,11 @@ int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
         {
             nmod_mpoly_set(Q, A, ctx);
             return 1;
-        } else
-            flint_throw(FLINT_DIVZERO, "Divide by zero in nmod_mpoly_divides_dense");
+        }
+        else
+        {
+            flint_throw(FLINT_DIVZERO, "nmod_mpoly_divides_dense: divide by zero");
+        }
     }
 
     if (A->length == 0)

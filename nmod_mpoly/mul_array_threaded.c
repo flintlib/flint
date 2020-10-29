@@ -253,8 +253,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
     perm = (slong *) TMP_ALLOC(Pl*sizeof(slong));
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        nmod_mpoly_init2((Pchunks + Pi)->poly, 8, ctx);
-        nmod_mpoly_fit_bits((Pchunks + Pi)->poly, P->bits, ctx);
+        nmod_mpoly_init3((Pchunks + Pi)->poly, 8, P->bits, ctx);
         (Pchunks + Pi)->work = 0;
         perm[Pi] = Pi;
         for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
@@ -325,8 +324,8 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
     Plen = 0;
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        _nmod_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,
-                                                Plen + (Pchunks + Pi)->len, 1);
+        _nmod_mpoly_fit_length(&P->coeffs, &P->coeffs_alloc,
+                      &P->exps, &P->exps_alloc, 1, Plen + (Pchunks + Pi)->len);
 
         FLINT_ASSERT((Pchunks + Pi)->poly->coeffs != NULL);
         FLINT_ASSERT((Pchunks + Pi)->poly->exps != NULL);
@@ -427,9 +426,7 @@ int _nmod_mpoly_mul_array_threaded_pool_LEX(
     }
     else
     {
-        nmod_mpoly_fit_length(A, B->length + C->length - 1, ctx);
-        nmod_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        nmod_mpoly_fit_length_reset_bits(A, B->length + C->length - 1, exp_bits, ctx);
         _nmod_mpoly_mul_array_chunked_threaded_LEX(A, C, B, mults, ctx,
                                                          handles, num_handles);
     }
@@ -639,8 +636,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_DEG(
     perm = (slong *) TMP_ALLOC(Pl*sizeof(slong));
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        nmod_mpoly_init2((Pchunks + Pi)->poly, 8, ctx);
-        nmod_mpoly_fit_bits((Pchunks + Pi)->poly, P->bits, ctx);
+        nmod_mpoly_init3((Pchunks + Pi)->poly, 8, P->bits, ctx);
         (Pchunks + Pi)->work = 0;
         perm[Pi] = Pi;
         for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
@@ -713,8 +709,8 @@ void _nmod_mpoly_mul_array_chunked_threaded_DEG(
     Plen = 0;
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        _nmod_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,
-                                                Plen + (Pchunks + Pi)->len, 1);
+        _nmod_mpoly_fit_length(&P->coeffs, &P->coeffs_alloc,
+                      &P->exps, &P->exps_alloc, 1, Plen + (Pchunks + Pi)->len);
 
         FLINT_ASSERT((Pchunks + Pi)->poly->coeffs != NULL);
         FLINT_ASSERT((Pchunks + Pi)->poly->exps != NULL);
@@ -803,9 +799,7 @@ int _nmod_mpoly_mul_array_threaded_pool_DEG(
     }
     else
     {
-        nmod_mpoly_fit_length(A, B->length + C->length - 1, ctx);
-        nmod_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        nmod_mpoly_fit_length_reset_bits(A, B->length + C->length - 1, exp_bits, ctx);
         _nmod_mpoly_mul_array_chunked_threaded_DEG(A, C, B, deg, ctx,
                                                          handles, num_handles);
     }

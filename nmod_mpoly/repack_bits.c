@@ -12,11 +12,13 @@
 #include "nmod_mpoly.h"
 
 
-int nmod_mpoly_repack_bits(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                 flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx)
+int nmod_mpoly_repack_bits(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx)
 {
     int success;
-    nmod_mpoly_t T;
 
     Abits = mpoly_fix_bits(Abits, ctx->minfo);
 
@@ -25,28 +27,23 @@ int nmod_mpoly_repack_bits(nmod_mpoly_t A, const nmod_mpoly_t B,
         nmod_mpoly_set(A, B, ctx);
         return 1;
     }
-    
-    /* must use B->alloc because we are going to swap coeff in aliasing case */
-    nmod_mpoly_init3(T, B->alloc, Abits, ctx);
-    success = mpoly_repack_monomials(T->exps, Abits, B->exps, B->bits,
+
+    if (A == B)
+        return nmod_mpoly_repack_bits_inplace(A, Abits, ctx);
+
+    nmod_mpoly_fit_length_reset_bits(A, B->length, Abits, ctx);
+
+    success = mpoly_repack_monomials(A->exps, Abits, B->exps, B->bits,
                                                         B->length, ctx->minfo);
     if (success)
     {
-        if (A == B)
-        {
-            mp_limb_t * temp = A->coeffs;
-            A->coeffs = T->coeffs;
-            T->coeffs = temp;
-        }
-        else
-        {
-            _nmod_vec_set(T->coeffs, B->coeffs, B->length);
-        }
-        _nmod_mpoly_set_length(T, B->length, ctx);
-        nmod_mpoly_swap(A, T, ctx);
+        _nmod_vec_set(A->coeffs, B->coeffs, B->length);
+        A->length = B->length;
     }
-
-    nmod_mpoly_clear(T, ctx);
+    else
+    {
+        A->length = 0;
+    }
 
     return success;
 }
@@ -59,6 +56,7 @@ int nmod_mpoly_repack_bits_inplace(
 {
     int success;
     ulong * texps;
+    slong talloc;
     slong N = mpoly_words_per_exp(Abits, ctx->minfo);
 
     if (A->bits == Abits)
@@ -66,23 +64,29 @@ int nmod_mpoly_repack_bits_inplace(
         return 1;
     }
 
-    if (A->alloc < 1)
+    if (A->length < 1)
     {
         A->bits = Abits;
         return 1;
     }
 
-    texps = (ulong *) flint_malloc(A->alloc*N*sizeof(ulong));
+    N = mpoly_words_per_exp(Abits, ctx->minfo);
+    talloc = N*A->length;
+    texps = FLINT_ARRAY_ALLOC(talloc, ulong);
     success = mpoly_repack_monomials(texps, Abits,
                                       A->exps, A->bits, A->length, ctx->minfo);
+    A->bits = Abits;
     if (success)
     {
-        ulong * t = A->exps;
+        flint_free(A->exps);
         A->exps = texps;
-        texps = t;
-        A->bits = Abits;
+        A->exps_alloc = talloc;
     }
-    flint_free(texps);
+    else
+    {
+        flint_free(texps);
+        A->length = 0;
+    }
     return success;
 }
 

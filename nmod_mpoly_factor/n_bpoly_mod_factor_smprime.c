@@ -89,7 +89,7 @@ static void _lattice(
     {
         n_bpoly_mod_divrem_series(Q, R, f, g[i], lift_order, ctx);
         FLINT_ASSERT(R->length == 0);
-        n_bpoly_mod_derivative(R, g[i], ctx);
+        n_bpoly_mod_derivative_gen0(R, g[i], ctx);
         n_bpoly_mod_mul_series(ld + i, Q, R, lift_order, ctx);
     }
 
@@ -217,7 +217,7 @@ static int _zassenhaus(
                 continue;
             }
 
-            n_bpoly_set_poly_var1(t1, leadf);
+            n_bpoly_set_poly_gen1(t1, leadf);
             for (i = 0; i < len; i++)
             {
                 if (subset[i] >= 0)
@@ -230,7 +230,7 @@ static int _zassenhaus(
             n_bpoly_mod_make_primitive(g, t1, ctx);
             if (n_bpoly_mod_divides(Q, f, t1, ctx))
             {
-                n_bpoly_mod_taylor_shift_var1(t1, t1, malpha, ctx);
+                n_bpoly_mod_taylor_shift_gen1(t1, t1, malpha, ctx);
                 n_tpoly_fit_length(F, F->length + 1);
                 n_bpoly_swap(F->coeffs + F->length, t1);
                 F->length++;
@@ -254,7 +254,7 @@ static int _zassenhaus(
     if (f->length > 1)
     {
         n_tpoly_fit_length(F, F->length + 1);
-        n_bpoly_mod_taylor_shift_var1(F->coeffs + F->length, f, malpha, ctx);
+        n_bpoly_mod_taylor_shift_gen1(F->coeffs + F->length, f, malpha, ctx);
         F->length++;
     }
     else
@@ -356,8 +356,8 @@ static void _hensel_build_tree(
 
     for (j = 0; j < 2*r - 2; j++)
     {
-        n_bpoly_set_poly_var0(v + j, V + j);
-        n_bpoly_set_poly_var0(w + j, W + j);
+        n_bpoly_set_poly_gen0(v + j, V + j);
+        n_bpoly_set_poly_gen0(w + j, W + j);
     }
 
     n_poly_clear(d);
@@ -657,7 +657,7 @@ got_alpha:
         for (i = 0; i < r; i++)
         {
             n_poly_mock(mock, local_fac->p + i);
-            n_bpoly_set_poly_var0(F->coeffs + i, mock);
+            n_bpoly_set_poly_gen0(F->coeffs + i, mock);
         }
         success = 1;
         goto cleanup;
@@ -666,7 +666,7 @@ got_alpha:
     /* precision for constructing true factors */
     final_order = Bleny;
 
-    n_bpoly_mod_taylor_shift_var1(B, B, alpha, ctx);
+    n_bpoly_mod_taylor_shift_gen1(B, B, alpha, ctx);
 
     nmod_mat_clear(N);
     nmod_mat_init(N, r, r, ctx.n);

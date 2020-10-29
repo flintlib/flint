@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -15,6 +15,12 @@
 void nmod_mpoly_geobucket_init(nmod_mpoly_geobucket_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
+    slong i;
+    for (i = 0; i < FLINT_BITS/2; i++)
+    {
+        nmod_mpoly_init(B->polys + i, ctx);
+        nmod_mpoly_init(B->temps + i, ctx);
+    }
     B->length = 0;
 }
 
@@ -22,8 +28,11 @@ void nmod_mpoly_geobucket_clear(nmod_mpoly_geobucket_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    for (i = 0; i < B->length; i++)
+    for (i = 0; i < FLINT_BITS/2; i++)
+    {
         nmod_mpoly_clear(B->polys + i, ctx);
+        nmod_mpoly_clear(B->temps + i, ctx);
+    }
 }
 
 /* empty out bucket B into polynomial p */
@@ -31,41 +40,27 @@ void nmod_mpoly_geobucket_empty(nmod_mpoly_t p, nmod_mpoly_geobucket_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    nmod_mpoly_zero(p, ctx);
-    for (i = 0; i < B->length; i++)
+
+    if (B->length < 2)
     {
-        nmod_mpoly_add(p, p, B->polys + i, ctx);
-        nmod_mpoly_clear(B->polys + i, ctx);
+        if (B->length < 1)
+            nmod_mpoly_zero(p, ctx);
+        else
+            nmod_mpoly_set(p, B->polys + 0, ctx);
     }
+    else if (B->length == 2)
+    {
+        nmod_mpoly_add(p, B->polys + 1, B->polys + 0, ctx);
+    }
+    else
+    {
+        nmod_mpoly_add(B->temps + 1, B->polys + 1, B->polys + 0, ctx);
+        for (i = 2; i < B->length - 1; i++)
+            nmod_mpoly_add(B->temps + i, B->polys + i, B->temps + i - 1, ctx);
+        nmod_mpoly_add(p, B->polys + i, B->temps + i - 1, ctx);
+    }
+
     B->length = 0;
-}
-
-void nmod_mpoly_geobucket_print(nmod_mpoly_geobucket_t B, const char ** x,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    printf("{");
-    for (i = 0; i < B->length; i++)
-    {
-        nmod_mpoly_print_pretty(B->polys + i, x, ctx);
-        if (i + 1 < B->length)
-            printf(", ");
-    }
-    printf("}");
-}
-
-/* ceiling(log_4(x)) - 1 */
-slong nmod_mpoly_geobucket_clog4(slong x)
-{
-    if (x <= 4)
-        return 0;
-    /*
-        FLINT_BIT_COUNT returns unsigned int.
-        Signed division is not defined.
-        Do the calculation with unsigned ints and then convert to slong.
-    */
-    x = (FLINT_BIT_COUNT(x - 1) - (unsigned int) 1)/((unsigned int) 2);
-    return x;
 }
 
 void nmod_mpoly_geobucket_fit_length(nmod_mpoly_geobucket_t B, slong len,
@@ -73,10 +68,7 @@ void nmod_mpoly_geobucket_fit_length(nmod_mpoly_geobucket_t B, slong len,
 {
     slong j;
     for (j = B->length; j < len; j++)
-    {
-        nmod_mpoly_init(B->polys + j, ctx);
         nmod_mpoly_zero(B->polys + j, ctx);
-    }
     B->length = j;
 }
 
@@ -84,11 +76,10 @@ void nmod_mpoly_geobucket_fit_length(nmod_mpoly_geobucket_t B, slong len,
 void nmod_mpoly_geobucket_set(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
-    nmod_mpoly_geobucket_clear(B, ctx);
-    i = nmod_mpoly_geobucket_clog4(p->length);
+    slong i = mpoly_geobucket_clog4(p->length);
+    B->length = 0;
     nmod_mpoly_geobucket_fit_length(B, i + 1, ctx);
-    nmod_mpoly_set(B->polys + i, p, ctx);
+    nmod_mpoly_swap(B->polys + i, p, ctx);
     B->length = i + 1;
 }
 
@@ -96,29 +87,37 @@ void nmod_mpoly_geobucket_set(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
 void _nmod_mpoly_geobucket_fix(nmod_mpoly_geobucket_t B, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    while (nmod_mpoly_geobucket_clog4((B->polys + i)->length) > i)
+    while (mpoly_geobucket_clog4((B->polys + i)->length) > i)
     {
         FLINT_ASSERT(i + 1 <= B->length);
         if (i + 1 == B->length)
         {
-            nmod_mpoly_init(B->polys + i + 1, ctx);
-            nmod_mpoly_zero(B->polys + i + 1, ctx);
             B->length = i + 2;
+            nmod_mpoly_set(B->polys + i + 1, B->polys + i, ctx);
         }
-        nmod_mpoly_add(B->polys + i + 1, B->polys + i + 1, B->polys + i, ctx);
+        else
+        {
+            nmod_mpoly_add(B->temps + i + 1, B->polys + i + 1, B->polys + i, ctx);
+            nmod_mpoly_swap(B->polys + i + 1, B->temps + i + 1, ctx);
+        }
         nmod_mpoly_zero(B->polys + i, ctx);
         i++;
     }
 }
 
-/* add polynomial p to buckect B */
+/* add polynomial p to bucket B */
 void nmod_mpoly_geobucket_add(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    i = nmod_mpoly_geobucket_clog4(p->length);
+
+    if (nmod_mpoly_is_zero(p, ctx))
+        return;
+
+    i = mpoly_geobucket_clog4(p->length);
     nmod_mpoly_geobucket_fit_length(B, i + 1, ctx);
-    nmod_mpoly_add(B->polys + i, B->polys + i, p, ctx);
+    nmod_mpoly_add(B->temps + i, B->polys + i, p, ctx);
+    nmod_mpoly_swap(B->polys + i, B->temps + i, ctx);
     _nmod_mpoly_geobucket_fix(B, i, ctx);
 }
 
@@ -127,20 +126,20 @@ void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    i = nmod_mpoly_geobucket_clog4(p->length);
+
+    if (nmod_mpoly_is_zero(p, ctx))
+        return;
+
+    i = mpoly_geobucket_clog4(p->length);
     nmod_mpoly_geobucket_fit_length(B, i + 1, ctx);
-    nmod_mpoly_sub(B->polys + i, B->polys + i, p, ctx);
+    nmod_mpoly_sub(B->temps + i, B->polys + i, p, ctx);
+    nmod_mpoly_swap(B->polys + i, B->temps + i, ctx);
     _nmod_mpoly_geobucket_fix(B, i, ctx);
 }
 
 void nmod_mpoly_geobucket_set_ui(nmod_mpoly_geobucket_t B, ulong c,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
-    if (B->length == 0)
-        nmod_mpoly_init(B->polys + 0, ctx);
-    for (i = 1; i < B->length; i++)
-        nmod_mpoly_clear(B->polys + i, ctx);
     B->length = 1;
     nmod_mpoly_set_ui(B->polys + 0, c, ctx);
 }
@@ -148,11 +147,6 @@ void nmod_mpoly_geobucket_set_ui(nmod_mpoly_geobucket_t B, ulong c,
 void nmod_mpoly_geobucket_gen(nmod_mpoly_geobucket_t B, slong var,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
-    if (B->length == 0)
-        nmod_mpoly_init(B->polys + 0, ctx);
-    for (i = 1; i < B->length; i++)
-        nmod_mpoly_clear(B->polys + i, ctx);
     B->length = 1;
     nmod_mpoly_gen(B->polys + 0, var, ctx);
 }
@@ -163,7 +157,6 @@ void nmod_mpoly_geobucket_add_inplace(nmod_mpoly_geobucket_t B1,
     slong i;
     for (i = 0; i < B2->length; i++)
         nmod_mpoly_geobucket_add(B1, B2->polys + i, ctx);
-
 }
 
 void nmod_mpoly_geobucket_sub_inplace(nmod_mpoly_geobucket_t B1,

@@ -11,25 +11,24 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_get_term_monomial(fq_nmod_mpoly_t M, const fq_nmod_mpoly_t A,
-                                        slong i, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_get_term_monomial(
+    fq_nmod_mpoly_t M,
+    const fq_nmod_mpoly_t A,
+    slong i,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong N;
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     flint_bitcnt_t bits = A->bits;
+    slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
-    if ((ulong) i >= (ulong) A->length)
+    if (i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR,
-                      "Index out of range in fq_nmod_mpoly_get_term_monomial");
+        flint_throw(FLINT_ERROR, "fq_nmod_mpoly_get_term_monomial: index out of range");
     }
 
-    fq_nmod_mpoly_fit_length(M, WORD(1), ctx);
-    fq_nmod_mpoly_fit_bits(M, bits, ctx);
-    M->bits = bits;
-
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    fq_nmod_mpoly_fit_length_reset_bits(M, 1, bits, ctx);
 
     mpoly_monomial_set(M->exps + N*0, A->exps + N*i, N);
-    fq_nmod_one(M->coeffs + 0, ctx->fqctx);
+    _n_fq_one(M->coeffs + d*0, d);
     _fq_nmod_mpoly_set_length(M, 1, ctx);
 }

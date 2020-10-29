@@ -1329,9 +1329,7 @@ int nmod_mpolyun_interp_crt_sm_mpolyu(
     Fexp = F->exps;
     Aexp = A->exps;   
 
-    nmod_mpoly_init(zero, ctx);
-    nmod_mpoly_fit_bits(zero, A->bits, ctx);
-    zero->bits = A->bits;
+    nmod_mpoly_init3(zero, 0, A->bits, ctx);
 
     i = j = k = 0;
     while (i < Flen || j < Alen)

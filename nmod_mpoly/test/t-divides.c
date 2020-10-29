@@ -18,9 +18,6 @@ main(void)
 {
     int i, j, result, ret, max_threads = 5, tmul = 25;
     FLINT_TEST_INIT(state);
-#ifdef _WIN32
-    tmul = 1;
-#endif
 
     flint_printf("divides....");
     fflush(stdout);

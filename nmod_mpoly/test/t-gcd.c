@@ -16,30 +16,27 @@
 void gcd_check(nmod_mpoly_t g, nmod_mpoly_t a, nmod_mpoly_t b,
                      nmod_mpoly_ctx_t ctx, slong i, slong j, const char * name)
 {
-    int res;
     nmod_mpoly_t ca, cb, cg;
 
     nmod_mpoly_init(ca, ctx);
     nmod_mpoly_init(cb, ctx);
     nmod_mpoly_init(cg, ctx);
 
-    res = nmod_mpoly_gcd(g, a, b, ctx);
-    nmod_mpoly_assert_canonical(g, ctx);
-
-    if (!res)
+    if (!nmod_mpoly_gcd(g, a, b, ctx))
     {
-        flint_printf("Check gcd can be computed\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
+
+    nmod_mpoly_assert_canonical(g, ctx);
 
     if (nmod_mpoly_is_zero(g, ctx))
     {
         if (!nmod_mpoly_is_zero(a, ctx) || !nmod_mpoly_is_zero(b, ctx))
         {
-            printf("FAIL\n");
-            flint_printf("Check zero gcd only results from zero inputs\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_printf("FAIL: check zero gcd\n");
+            flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
             flint_abort();
         }
         goto cleanup;
@@ -47,65 +44,56 @@ void gcd_check(nmod_mpoly_t g, nmod_mpoly_t a, nmod_mpoly_t b,
 
     if (g->coeffs[0] != UWORD(1))
     {
-        printf("FAIL\n");
-        flint_printf("Check gcd leading coefficient is one\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check gcd is monic\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
-    if ((i + j % 11) == 0)
+    if (((i + j) % 7) == 0)
     {
         nmod_mpoly_set(cg, b, ctx);
         nmod_mpoly_gcd(cg, cg, a, ctx);
         if (!nmod_mpoly_equal(cg, g, ctx))
         {
-            printf("FAIL\n");
-            flint_printf("Check aliasing 1\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_printf("FAIL: check aliasing 1\n");
+            flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
             flint_abort();
         }
     }
 
-    if ((i + j % 9) == 0)
+    if (((i + j) % 9) == 0)
     {
         nmod_mpoly_set(cg, b, ctx);
         nmod_mpoly_gcd(cg, a, cg, ctx);
         if (!nmod_mpoly_equal(cg, g, ctx))
         {
-            printf("FAIL\n");
-            flint_printf("Check aliasing 2\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_printf("FAIL: check aliasing 2\n");
+            flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
             flint_abort();
         }
     }
 
-    res = 1;
-    res = res && nmod_mpoly_divides(ca, a, g, ctx);
-    res = res && nmod_mpoly_divides(cb, b, g, ctx);
-    if (!res)
+    if (!nmod_mpoly_divides(ca, a, g, ctx) ||
+        !nmod_mpoly_divides(cb, b, g, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check divisibility\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check divisibility\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
-    res = nmod_mpoly_gcd(cg, ca, cb, ctx);
+    if (!nmod_mpoly_gcd(cg, ca, cb, ctx))
+    {
+        flint_printf("FAIL: check cofactor gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
     nmod_mpoly_assert_canonical(cg, ctx);
-
-    if (!res)
-    {
-        printf("FAIL\n");
-        flint_printf("Check gcd of cofactors can be computed\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
-        flint_abort();
-    }
 
     if (!nmod_mpoly_is_one(cg, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check gcd of cofactors is one\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check cofactor gcd is one\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -120,14 +108,35 @@ int
 main(void)
 {
     const slong max_threads = 5;
-    slong i, j, k, tmul = 10;
+    slong i, j, k, tmul = 5;
     FLINT_TEST_INIT(state);
-#ifdef _WIN32
-    tmul = 1;
-#endif
 
     flint_printf("gcd....");
     fflush(stdout);
+
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b;
+        const char * vars[] = {"t" ,"x", "y", "z"};
+
+        nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, 536870909);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(g, ctx);
+
+        nmod_mpoly_set_str_pretty(g, "x + y + z + t", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "x^2 + y^2 + z^2 + t^2", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "x^3 + y^3 + z^3 + t^3", vars, ctx);
+        nmod_mpoly_mul(a, a, g, ctx);
+        nmod_mpoly_mul(b, b, g, ctx);
+
+        gcd_check(g, a, b, ctx, 0, 0, "sparse example");
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     {
         nmod_mpoly_ctx_t ctx;
@@ -354,9 +363,9 @@ main(void)
         nmod_mpoly_init(t1, ctx);
         nmod_mpoly_init(t2, ctx);
 
-        len = n_randint(state, 5);
-        len1 = n_randint(state, 5);
-        len2 = n_randint(state, 5);
+        len = n_randint(state, 50);
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
 
         exp_bound = n_randint(state, 100) + 2;
         exp_bound1 = n_randint(state, 100) + 2;
@@ -403,7 +412,7 @@ main(void)
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
 
-        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 7, modulus);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
@@ -413,7 +422,7 @@ main(void)
         len1 = n_randint(state, 30);
         len2 = n_randint(state, 30);
 
-        degbound = 30/(2*ctx->minfo->nvars - 1);
+        degbound = 40/(2*ctx->minfo->nvars - 1);
 
         for (j = 0; j < 4; j++)
         {
@@ -454,7 +463,7 @@ main(void)
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
 
-        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 7, modulus);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
@@ -464,7 +473,7 @@ main(void)
         len1 = n_randint(state, 30);
         len2 = n_randint(state, 30);
 
-        degbound = 30/(2*ctx->minfo->nvars - 1);
+        degbound = 40/(2*ctx->minfo->nvars - 1);
 
         for (j = 0; j < 4; j++)
         {
@@ -520,7 +529,7 @@ main(void)
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
 
-        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 7, modulus);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
@@ -530,7 +539,7 @@ main(void)
         len1 = n_randint(state, 30);
         len2 = n_randint(state, 30);
 
-        degbound = 30/(2*ctx->minfo->nvars - 1);
+        degbound = 40/(2*ctx->minfo->nvars - 1);
 
         stride_bits = n_randint(state, 100) + 2;
         shift_bits = n_randint(state, 100) + 2;

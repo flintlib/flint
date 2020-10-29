@@ -13,7 +13,7 @@
 #include "fq_nmod_mpoly_factor.h"
 
 
-void n_bpoly_fq_eval_sm_to_lg(
+void n_fq_bpoly_eval_sm_to_lg(
     fq_nmod_poly_t E,
     const n_bpoly_t B,
     const bad_fq_nmod_embed_t emb)
@@ -27,7 +27,7 @@ void n_bpoly_fq_eval_sm_to_lg(
 }
 
 
-void n_bpoly_fq_set_n_poly_fq_var0_lg_to_sm(
+void n_fq_bpoly_set_n_fq_poly_gen0_lg_to_sm(
     n_bpoly_t A,
     const n_poly_t E,
     const bad_fq_nmod_embed_t emb)
@@ -41,7 +41,7 @@ void n_bpoly_fq_set_n_poly_fq_var0_lg_to_sm(
     n_bpoly_normalise(A);
 }
 
-void n_bpoly_fq_make_monic_mod_poly(
+void n_fq_bpoly_make_monic_mod_poly(
     n_bpoly_t A,
     const n_bpoly_t B,
     const n_poly_t m,
@@ -52,18 +52,18 @@ void n_bpoly_fq_make_monic_mod_poly(
 
     FLINT_ASSERT(A != B);
     FLINT_ASSERT(B->length > 0);
-    FLINT_ASSERT(n_bpoly_fq_is_canonical(B, ctx));
+    FLINT_ASSERT(n_fq_bpoly_is_canonical(B, ctx));
 
     n_poly_init(lcinv);
     n_poly_init(g);
     n_poly_init(t);
 
-    n_poly_fq_xgcd(g, lcinv, t, B->coeffs + B->length - 1, m, ctx);
-    FLINT_ASSERT(n_poly_fq_is_one(g, ctx));
+    n_fq_poly_xgcd(g, lcinv, t, B->coeffs + B->length - 1, m, ctx);
+    FLINT_ASSERT(n_fq_poly_is_one(g, ctx));
 
     n_bpoly_fit_length(A, B->length);
     for (i = 0; i < B->length; i++)
-        n_poly_fq_mulmod(A->coeffs + i, B->coeffs + i, lcinv, m, ctx);
+        n_fq_poly_mulmod(A->coeffs + i, B->coeffs + i, lcinv, m, ctx);
 
     A->length = B->length;
     n_bpoly_normalise(A);
@@ -74,7 +74,7 @@ void n_bpoly_fq_make_monic_mod_poly(
 }
 
 /* multiplication in (Fq[y]/m(y))[x], inputs need not be reduced */
-void n_bpoly_fq_mul_mod_poly(
+void n_fq_bpoly_mul_mod_poly(
     n_bpoly_t A,
     const n_bpoly_t B,
     const n_bpoly_t C,
@@ -96,9 +96,9 @@ void n_bpoly_fq_mul_mod_poly(
     for (i = 0; i < B->length; i++)
     for (j = 0; j < C->length; j++)
     {
-        n_poly_fq_mul(t, B->coeffs + i, C->coeffs + j, ctx);
-        n_poly_fq_add(A->coeffs + i + j, A->coeffs + i + j, t, ctx);
-        n_poly_fq_rem(A->coeffs + i + j, A->coeffs + i + j, m, ctx);
+        n_fq_poly_mul(t, B->coeffs + i, C->coeffs + j, ctx);
+        n_fq_poly_add(A->coeffs + i + j, A->coeffs + i + j, t, ctx);
+        n_fq_poly_rem(A->coeffs + i + j, A->coeffs + i + j, m, ctx);
     }
 
     A->length = B->length + C->length - 1;
@@ -108,7 +108,7 @@ void n_bpoly_fq_mul_mod_poly(
 }
 
 /* division in (Fq[y]/m(y))[x], inputs need not be reduced */
-void n_bpoly_fq_divrem_mod_poly(
+void n_fq_bpoly_divrem_mod_poly(
     n_bpoly_t Q,
     n_bpoly_t R,
     const n_bpoly_t A,
@@ -129,21 +129,21 @@ void n_bpoly_fq_divrem_mod_poly(
     n_poly_init(t);
     n_poly_init(Binv);
 
-    n_bpoly_fq_set(R, A, ctx);
+    n_fq_bpoly_set(R, A, ctx);
 
     Q->length = 0;
 
-    n_poly_fq_xgcd(q, Binv, t, B->coeffs + B->length - 1, m, ctx);
-    FLINT_ASSERT(n_poly_fq_is_one(q, ctx));
+    n_fq_poly_xgcd(q, Binv, t, B->coeffs + B->length - 1, m, ctx);
+    FLINT_ASSERT(n_fq_poly_is_one(q, ctx));
 
     while (R->length >= B->length)
     {
-        n_poly_fq_mulmod(q, R->coeffs + R->length - 1, Binv, m, ctx);
+        n_fq_poly_mulmod(q, R->coeffs + R->length - 1, Binv, m, ctx);
 
         for (i = 0; i < B->length; i++)
         {
-            n_poly_fq_mulmod(t, B->coeffs + i, q, m, ctx);
-            n_poly_fq_sub(R->coeffs + i + R->length - B->length,
+            n_fq_poly_mulmod(t, B->coeffs + i, q, m, ctx);
+            n_fq_poly_sub(R->coeffs + i + R->length - B->length,
                              R->coeffs + i + R->length - B->length, t, ctx);
         }
 
@@ -158,7 +158,7 @@ void n_bpoly_fq_divrem_mod_poly(
             Q->length = qoff + 1;
         }
 
-        n_poly_fq_set(Q->coeffs + qoff, q, ctx);
+        n_fq_poly_set(Q->coeffs + qoff, q, ctx);
 
         FLINT_ASSERT(n_poly_is_zero(R->coeffs + R->length - 1));
         n_bpoly_normalise(R);
@@ -201,10 +201,10 @@ static void _lattice(
 
     for (i = 0; i < r; i++)
     {
-        n_bpoly_fq_divrem_mod_poly(Q, R, f, g[i], lift_alpha_pow, ctx);
+        n_fq_bpoly_divrem_mod_poly(Q, R, f, g[i], lift_alpha_pow, ctx);
         FLINT_ASSERT(R->length == 0);
-        n_bpoly_fq_derivative(R, g[i], ctx);
-        n_bpoly_fq_mul_mod_poly(ld + i, Q, R, lift_alpha_pow, ctx);
+        n_fq_bpoly_derivative_gen0(R, g[i], ctx);
+        n_fq_bpoly_mul_mod_poly(ld + i, Q, R, lift_alpha_pow, ctx);
     }
 
     for (k = 0; k + 1 < f->length; k++)
@@ -300,13 +300,13 @@ static int _zassenhaus(
 
     for (i = 0; i < d; i++)
     {
-        n_bpoly_fq_one(loc_fac + i, ctx);
+        n_fq_bpoly_one(loc_fac + i, ctx);
         for (j = 0; j < r; j++)
         {
             if (nmod_mat_entry(N, i, j) == 0)
                 continue;
             FLINT_ASSERT(nmod_mat_entry(N, i, j) == 1);
-            n_bpoly_fq_mul_mod_poly(t1, loc_fac + i, loc_fac_org[j],
+            n_fq_bpoly_mul_mod_poly(t1, loc_fac + i, loc_fac_org[j],
                                                          final_alpha_pow, ctx);
             n_bpoly_swap(t1, loc_fac + i);
         }
@@ -327,19 +327,19 @@ static int _zassenhaus(
         while (1)
         {
             FLINT_ASSERT(f->length > 0);
-            n_bpoly_fq_set_n_poly_fq_var1(t1, f->coeffs + f->length - 1, ctx);
+            n_fq_bpoly_set_n_fq_poly_gen1(t1, f->coeffs + f->length - 1, ctx);
             for (i = 0; i < len; i++)
             {
                 if (subset[i] >= 0)
                 {
-                    n_bpoly_fq_mul_mod_poly(t2, t1, loc_fac + subset[i],
+                    n_fq_bpoly_mul_mod_poly(t2, t1, loc_fac + subset[i],
                                                          final_alpha_pow, ctx);
                     n_bpoly_swap(t1, t2);
                 }
             }
 
-            n_bpoly_fq_make_primitive(g, t1, ctx);
-            if (n_bpoly_fq_divides(Q, f, t1, ctx))
+            n_fq_bpoly_make_primitive(g, t1, ctx);
+            if (n_fq_bpoly_divides(Q, f, t1, ctx))
             {
                 n_tpoly_fit_length(F, F->length + 1);
                 n_bpoly_swap(F->coeffs + F->length, t1);
@@ -361,13 +361,13 @@ static int _zassenhaus(
     if (f->length > 1)
     {
         n_tpoly_fit_length(F, F->length + 1);
-        n_bpoly_fq_set(F->coeffs + F->length, f, ctx);
+        n_fq_bpoly_set(F->coeffs + F->length, f, ctx);
         F->length++;
     }
     else
     {
         FLINT_ASSERT(f->length == 1);
-        FLINT_ASSERT(n_poly_fq_is_one(f->coeffs + 0, ctx));
+        FLINT_ASSERT(n_fq_poly_is_one(f->coeffs + 0, ctx));
     }
 
     success = 1;
@@ -414,7 +414,7 @@ static void _hensel_build_tree(
 
     for (i = 0; i < r; i++)
     {
-        n_poly_fq_set_fq_nmod_poly(V + i, local_facs + i, emb->lgctx);
+        n_fq_poly_set_fq_nmod_poly(V + i, local_facs + i, emb->lgctx);
         link[i] = -i - 1;
     }
 
@@ -448,20 +448,20 @@ static void _hensel_build_tree(
         n_poly_swap(V + j + 1, V + minp);
         SLONG_SWAP(link[j + 1], link[minp]);
 
-        n_poly_fq_mul(V + i, V + j, V + j + 1, emb->lgctx);
+        n_fq_poly_mul(V + i, V + j, V + j + 1, emb->lgctx);
         link[i] = j;
     }
 
     for (j = 0; j < 2*r - 2; j += 2)
     {
-        n_poly_fq_xgcd(d, W + j, W + j + 1, V + j, V + j + 1, emb->lgctx);
-        FLINT_ASSERT(n_poly_fq_is_one(d, emb->lgctx));
+        n_fq_poly_xgcd(d, W + j, W + j + 1, V + j, V + j + 1, emb->lgctx);
+        FLINT_ASSERT(n_fq_poly_is_one(d, emb->lgctx));
     }
 
     for (j = 0; j < 2*r - 2; j++)
     {
-        n_bpoly_fq_set_n_poly_fq_var0_lg_to_sm(v + j, V + j, emb);
-        n_bpoly_fq_set_n_poly_fq_var0_lg_to_sm(w + j, W + j, emb);
+        n_fq_bpoly_set_n_fq_poly_gen0_lg_to_sm(v + j, V + j, emb);
+        n_fq_bpoly_set_n_fq_poly_gen0_lg_to_sm(w + j, W + j, emb);
     }
 
     n_poly_clear(d);
@@ -499,47 +499,47 @@ static void _hensel_lift_fac(
     n_poly_init(tr);
 
 #if FLINT_WANT_ASSERT
-    n_bpoly_fq_mul(t1, g, a, ctx);
-    n_bpoly_fq_mul(t2, h, b, ctx);
-    n_bpoly_fq_add(c, t1, t2, ctx);
+    n_fq_bpoly_mul(t1, g, a, ctx);
+    n_fq_bpoly_mul(t2, h, b, ctx);
+    n_fq_bpoly_add(c, t1, t2, ctx);
     FLINT_ASSERT(c->length > 0);
     for (i = 0; i < c->length; i++)
-        n_poly_fq_neg(c->coeffs + i, c->coeffs + i, ctx);
-    n_poly_fq_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
+        n_fq_poly_neg(c->coeffs + i, c->coeffs + i, ctx);
+    n_fq_poly_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
     n_bpoly_normalise(c);
     for (i = 0; i < c->length; i++)
     {
-        n_poly_fq_divrem(tq, tr, c->coeffs + i, p0, ctx);
-        FLINT_ASSERT(n_poly_fq_is_canonical(tr, ctx));
+        n_fq_poly_divrem(tq, tr, c->coeffs + i, p0, ctx);
+        FLINT_ASSERT(n_fq_poly_is_canonical(tr, ctx));
         FLINT_ASSERT(n_poly_is_zero(tr));
     }
 #endif
 
-    n_bpoly_fq_mul(t1, g, h, ctx);
-    n_bpoly_fq_sub(c, f, t1, ctx);
+    n_fq_bpoly_mul(t1, g, h, ctx);
+    n_fq_bpoly_sub(c, f, t1, ctx);
     for (i = 0; i < c->length; i++)
     {
-        n_poly_fq_divrem(tq, tr, c->coeffs + i, p0, ctx);
-        FLINT_ASSERT(n_poly_fq_is_canonical(tr, ctx));
+        n_fq_poly_divrem(tq, tr, c->coeffs + i, p0, ctx);
+        FLINT_ASSERT(n_fq_poly_is_canonical(tr, ctx));
         FLINT_ASSERT(n_poly_is_zero(tr));
-        n_poly_fq_divrem(tr, c->coeffs + i, tq, p1, ctx);
+        n_fq_poly_divrem(tr, c->coeffs + i, tq, p1, ctx);
     }
 
-    n_bpoly_fq_mul_mod_poly(t1, c, b, p1, ctx);
-    n_bpoly_fq_divrem_mod_poly(q, r, t1, g, p1, ctx);
+    n_fq_bpoly_mul_mod_poly(t1, c, b, p1, ctx);
+    n_fq_bpoly_divrem_mod_poly(q, r, t1, g, p1, ctx);
     for (i = 0; i < r->length; i++)
-        n_poly_fq_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
+        n_fq_poly_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
     for (i = 0; i < g->length; i++)
-        n_poly_fq_divrem(tq, g->coeffs + i, g->coeffs + i, p0, ctx);
-    n_bpoly_fq_add(t1, r, g, ctx);
+        n_fq_poly_divrem(tq, g->coeffs + i, g->coeffs + i, p0, ctx);
+    n_fq_bpoly_add(t1, r, g, ctx);
 
-    n_bpoly_fq_mul_mod_poly(t2, c, a, p1, ctx);
-    n_bpoly_fq_divrem_mod_poly(q, r, t2, h, p1, ctx);
+    n_fq_bpoly_mul_mod_poly(t2, c, a, p1, ctx);
+    n_fq_bpoly_divrem_mod_poly(q, r, t2, h, p1, ctx);
     for (i = 0; i < r->length; i++)
-        n_poly_fq_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
+        n_fq_poly_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
     for (i = 0; i < h->length; i++)
-        n_poly_fq_divrem(tq, h->coeffs + i, h->coeffs + i, p0, ctx);
-    n_bpoly_fq_add(t2, r, h, ctx);
+        n_fq_poly_divrem(tq, h->coeffs + i, h->coeffs + i, p0, ctx);
+    n_fq_bpoly_add(t2, r, h, ctx);
 
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
@@ -548,12 +548,12 @@ static void _hensel_lift_fac(
     {
         n_poly_t p01;
         n_poly_init(p01);
-        n_poly_fq_mul(p01, p0, p1, ctx);
-        n_bpoly_fq_mul(t1, G, H, ctx);
-        n_bpoly_fq_sub(c, f, t1, ctx);
+        n_fq_poly_mul(p01, p0, p1, ctx);
+        n_fq_bpoly_mul(t1, G, H, ctx);
+        n_fq_bpoly_sub(c, f, t1, ctx);
         for (i = 0; i < c->length; i++)        
         {
-            n_poly_fq_divrem(tq, tr, c->coeffs + i, p01, ctx);
+            n_fq_poly_divrem(tq, tr, c->coeffs + i, p01, ctx);
             FLINT_ASSERT(n_poly_is_zero(tr));
         }
         n_poly_clear(p01);
@@ -594,55 +594,55 @@ static void _hensel_lift_inv(
 
 #if FLINT_WANT_ASSERT
     {
-        n_bpoly_fq_mul(t1, G, A, ctx);
-        n_bpoly_fq_mul(t2, H, B, ctx);
-        n_bpoly_fq_add(c, t1, t2, ctx);
+        n_fq_bpoly_mul(t1, G, A, ctx);
+        n_fq_bpoly_mul(t2, H, B, ctx);
+        n_fq_bpoly_add(c, t1, t2, ctx);
         FLINT_ASSERT(c->length > 0);
         for (i = 0; i < c->length; i++)
-            n_poly_fq_neg(c->coeffs + i, c->coeffs + i, ctx);
-        n_poly_fq_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
+            n_fq_poly_neg(c->coeffs + i, c->coeffs + i, ctx);
+        n_fq_poly_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
         n_bpoly_normalise(c);
         for (i = 0; i < c->length; i++)
         {
-            n_poly_fq_divrem(tq, tr, c->coeffs + i, p0, ctx);
+            n_fq_poly_divrem(tq, tr, c->coeffs + i, p0, ctx);
             FLINT_ASSERT(n_poly_is_zero(tr));
         }
     }
 #endif
 
     for (i = 0; i < b->length; i++)
-        n_poly_fq_divrem(tq, b->coeffs + i, b->coeffs + i, p0, ctx);
+        n_fq_poly_divrem(tq, b->coeffs + i, b->coeffs + i, p0, ctx);
     for (i = 0; i < a->length; i++)
-        n_poly_fq_divrem(tq, a->coeffs + i, a->coeffs + i, p0, ctx);
+        n_fq_poly_divrem(tq, a->coeffs + i, a->coeffs + i, p0, ctx);
 
-    n_bpoly_fq_mul(t1, G, a, ctx);
-    n_bpoly_fq_mul(t2, H, b, ctx);
-    n_bpoly_fq_add(c, t1, t2, ctx);
+    n_fq_bpoly_mul(t1, G, a, ctx);
+    n_fq_bpoly_mul(t2, H, b, ctx);
+    n_fq_bpoly_add(c, t1, t2, ctx);
 
     FLINT_ASSERT(c->length > 0);
     for (i = 0; i < c->length; i++)
-        n_poly_fq_neg(c->coeffs + i, c->coeffs + i, ctx);
-    n_poly_fq_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
+        n_fq_poly_neg(c->coeffs + i, c->coeffs + i, ctx);
+    n_fq_poly_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
     n_bpoly_normalise(c);
 
     for (i = 0; i < c->length; i++)
     {
-        n_poly_fq_divrem(tq, tr, c->coeffs + i, p0, ctx);
+        n_fq_poly_divrem(tq, tr, c->coeffs + i, p0, ctx);
         FLINT_ASSERT(n_poly_is_zero(tr));
-        n_poly_fq_divrem(tr, c->coeffs + i, tq, p1, ctx);
+        n_fq_poly_divrem(tr, c->coeffs + i, tq, p1, ctx);
     }
 
-    n_bpoly_fq_mul_mod_poly(t1, c, b, p1, ctx);
-    n_bpoly_fq_divrem_mod_poly(q, r, t1, G, p1, ctx);
+    n_fq_bpoly_mul_mod_poly(t1, c, b, p1, ctx);
+    n_fq_bpoly_divrem_mod_poly(q, r, t1, G, p1, ctx);
     for (i = 0; i < r->length; i++)
-        n_poly_fq_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
-    n_bpoly_fq_add(t1, r, b, ctx);
+        n_fq_poly_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
+    n_fq_bpoly_add(t1, r, b, ctx);
 
-    n_bpoly_fq_mul_mod_poly(t2, c, a, p1, ctx);
-    n_bpoly_fq_divrem_mod_poly(q, r, t2, H, p1, ctx);
+    n_fq_bpoly_mul_mod_poly(t2, c, a, p1, ctx);
+    n_fq_bpoly_divrem_mod_poly(q, r, t2, H, p1, ctx);
     for (i = 0; i < r->length; i++)
-        n_poly_fq_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
-    n_bpoly_fq_add(t2, r, a, ctx);
+        n_fq_poly_mul(r->coeffs + i, r->coeffs + i, p0, ctx);
+    n_fq_bpoly_add(t2, r, a, ctx);
 
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
@@ -651,18 +651,18 @@ static void _hensel_lift_inv(
     {
         n_poly_t p01;
         n_poly_init(p01);
-        n_poly_fq_mul(p01, p0, p1, ctx);
-        n_bpoly_fq_mul(t1, G, A, ctx);
-        n_bpoly_fq_mul(t2, H, B, ctx);
-        n_bpoly_fq_add(c, t1, t2, ctx);
+        n_fq_poly_mul(p01, p0, p1, ctx);
+        n_fq_bpoly_mul(t1, G, A, ctx);
+        n_fq_bpoly_mul(t2, H, B, ctx);
+        n_fq_bpoly_add(c, t1, t2, ctx);
         FLINT_ASSERT(c->length > 0);
         for (i = 0; i < c->length; i++)
-            n_poly_fq_neg(c->coeffs + i, c->coeffs + i, ctx);
-        n_poly_fq_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
+            n_fq_poly_neg(c->coeffs + i, c->coeffs + i, ctx);
+        n_fq_poly_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
         n_bpoly_normalise(c);
         for (i = 0; i < c->length; i++)        
         {
-            n_poly_fq_divrem(tq, tr, c->coeffs + i, p01, ctx);
+            n_fq_poly_divrem(tq, tr, c->coeffs + i, p01, ctx);
             FLINT_ASSERT(n_poly_is_zero(tr));
         }
         n_poly_clear(p01);
@@ -708,7 +708,7 @@ static void _hensel_lift_tree(
 }
 
 
-int n_bpoly_fq_factor_lgprime(
+int n_fq_bpoly_factor_lgprime(
     n_poly_t c,
     n_tpoly_t F,
     n_bpoly_t B,
@@ -765,10 +765,10 @@ int n_bpoly_fq_factor_lgprime(
 
     /* init done */
 
-    n_poly_fq_set_fq_nmod_poly(alpha, cur_emb->h, ctx);
+    n_fq_poly_set_fq_nmod_poly(alpha, cur_emb->h, ctx);
     edeg = cur_emb->h->length - 1;
 
-    n_bpoly_fq_make_primitive(c, B, ctx);
+    n_fq_bpoly_make_primitive(c, B, ctx);
 
     /* deg_y(B) + 1 */
     Bleny = 0;
@@ -791,12 +791,12 @@ next_alpha:
         goto cleanup;
     }
 
-    n_poly_fq_set_fq_nmod_poly(alpha, cur_emb->h, ctx);
+    n_fq_poly_set_fq_nmod_poly(alpha, cur_emb->h, ctx);
     edeg = cur_emb->h->length - 1;
 
 got_alpha:
 
-    n_bpoly_fq_eval_sm_to_lg(Beval, B, cur_emb);
+    n_fq_bpoly_eval_sm_to_lg(Beval, B, cur_emb);
 
     /* if killed leading coeff, get new alpha */
     if (Beval->length != Blenx)
@@ -832,7 +832,7 @@ got_alpha:
 
     /* precision for constructing true factors */
     final_pow = (Bleny + edeg - 1)/edeg;
-    n_poly_fq_pow(final_alpha_pow, alpha, final_pow, ctx);
+    n_fq_poly_pow(final_alpha_pow, alpha, final_pow, ctx);
 
     nmod_mat_clear(N);
     nmod_mat_init(N, r, r, ctx->mod.n);
@@ -847,9 +847,9 @@ got_alpha:
     w = tmp->coeffs + (2*r - 2);
 
     curr_lift_pow = final_pow + r;
-    n_poly_fq_pow(curr_alpha_pow, alpha, curr_lift_pow, ctx);
+    n_fq_poly_pow(curr_alpha_pow, alpha, curr_lift_pow, ctx);
 
-    n_bpoly_fq_make_monic_mod_poly(monicB, B, curr_alpha_pow, ctx);
+    n_fq_bpoly_make_monic_mod_poly(monicB, B, curr_alpha_pow, ctx);
 
     _hensel_build_tree(link, v, w, local_fac->poly, r, cur_emb);
     for (i = 0; i < 2*r - 2; i++)
@@ -862,14 +862,14 @@ got_alpha:
 
     for (i--; i > 0; i--)
     {
-        n_poly_fq_pow(prev_alpha_pow, alpha, e[i+1], ctx);
-        n_poly_fq_pow(p1, alpha, e[i]-e[i+1], ctx);
+        n_fq_poly_pow(prev_alpha_pow, alpha, e[i+1], ctx);
+        n_fq_poly_pow(p1, alpha, e[i]-e[i+1], ctx);
         _hensel_lift_tree(0, link, v, w, monicB, 2*r-4, prev_alpha_pow, p1, ctx);
     }
 
     prev_lift_pow = e[1];
-    n_poly_fq_pow(prev_alpha_pow, alpha, prev_lift_pow, ctx);
-    n_poly_fq_pow(p1, alpha, curr_lift_pow - prev_lift_pow, ctx);
+    n_fq_poly_pow(prev_alpha_pow, alpha, prev_lift_pow, ctx);
+    n_fq_poly_pow(p1, alpha, curr_lift_pow - prev_lift_pow, ctx);
     _hensel_lift_tree(1, link, v, w, monicB, 2*r-4, prev_alpha_pow, p1, ctx);
 
     zas_limit = 1;
@@ -893,13 +893,13 @@ more:
     next_lift_pow = curr_lift_pow + r;
     next_lift_pow = FLINT_MIN(next_lift_pow, 2*curr_lift_pow);
 
-    n_poly_fq_pow(p1, alpha, curr_lift_pow - prev_lift_pow, ctx);
+    n_fq_poly_pow(p1, alpha, curr_lift_pow - prev_lift_pow, ctx);
     _hensel_lift_tree(-1, link, v, w, monicB, 2*r-4, prev_alpha_pow, p1, ctx);
 
-    n_poly_fq_pow(p1, alpha, next_lift_pow - curr_lift_pow, ctx);
+    n_fq_poly_pow(p1, alpha, next_lift_pow - curr_lift_pow, ctx);
 
-    n_poly_fq_mul(next_alpha_pow, next_alpha_pow, p1, ctx);
-    n_bpoly_fq_make_monic_mod_poly(monicB, B, next_alpha_pow, ctx);
+    n_fq_poly_mul(next_alpha_pow, next_alpha_pow, p1, ctx);
+    n_fq_bpoly_make_monic_mod_poly(monicB, B, next_alpha_pow, ctx);
 
     _hensel_lift_tree(0, link, v, w, monicB, 2*r-4, curr_alpha_pow, p1, ctx);
 

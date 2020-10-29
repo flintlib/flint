@@ -84,6 +84,19 @@ void n_polyu2n_print_pretty(
         flint_printf("0");
 }
 
+void n_polyun_set(n_polyun_t A, const n_polyun_t B)
+{
+    slong i;
+    n_polyun_fit_length(A, B->length);
+    for (i = 0; i < B->length; i++)
+    {
+        A->terms[i].exp = B->terms[i].exp;
+        n_poly_set(A->terms[i].coeff, B->terms[i].coeff);
+    }
+    A->length = B->length;
+}
+
+
 void n_polyu3n_print_pretty(
     const n_polyun_t A,
     const char * var0,

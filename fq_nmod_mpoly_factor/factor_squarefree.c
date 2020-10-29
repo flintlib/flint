@@ -43,6 +43,7 @@ static int fq_nmod_mpoly_factor_is_pairwise_prime(
 	const fq_nmod_mpoly_factor_t f, 
 	const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
 	int result;
 	slong i, j;
 	fq_nmod_mpoly_t g;
@@ -55,8 +56,8 @@ static int fq_nmod_mpoly_factor_is_pairwise_prime(
 		/* make sure factors are monic */
 		if (f->poly[i].length < 1 ||
             f->poly[j].length < 1 ||
-            !fq_nmod_is_one(f->poly[i].coeffs + 0, ctx->fqctx) ||
-            !fq_nmod_is_one(f->poly[j].coeffs + 0, ctx->fqctx))
+            !_n_fq_is_one(f->poly[i].coeffs + d*0, d) ||
+            !_n_fq_is_one(f->poly[j].coeffs + d*0, d))
 		{
 			result = 0;
 			goto cleanup;
@@ -267,11 +268,14 @@ static int _squarefree_factors(
 
 	if (fq_nmod_mpoly_is_fq_nmod(C, ctx))
 	{
-        FLINT_ASSERT(C->length == 1);
+        FLINT_ASSERT(fq_nmod_mpoly_is_one(C, ctx));
+/*
         fq_nmod_mul(f->constant, f->constant, C->coeffs + 0, ctx->fqctx);
+*/
 	}
 	else
 	{
+        slong d = fq_nmod_ctx_degree(ctx->fqctx);
         slong mk_mod_deg;
 
 		fq_nmod_mpoly_deflation(shift, stride, C, ctx);
@@ -283,7 +287,6 @@ static int _squarefree_factors(
 		}
 
         k = fmpz_remove(gr, g, p);
-
         FLINT_ASSERT(k > 0);
 		fmpz_pow_ui(pk, p, k);
 
@@ -304,8 +307,8 @@ static int _squarefree_factors(
         {
             for (j = 0; j < mk_mod_deg; j++)
             {
-                fq_nmod_pow(C->coeffs + i, C->coeffs + i,
-                                    fq_nmod_ctx_prime(ctx->fqctx), ctx->fqctx);
+                n_fq_pow_ui(C->coeffs + d*i, C->coeffs + d*i,
+                                    fq_nmod_ctx_mod(ctx->fqctx).n, ctx->fqctx);
             }
         }
 
@@ -314,8 +317,8 @@ static int _squarefree_factors(
 			goto cleanup;
 
         /* p^k power of factors */
-	    fq_nmod_pow(Cf->constant, Cf->constant, pk, ctx->fqctx);
 	    _fmpz_vec_scalar_mul_fmpz(Cf->exp, Cf->exp, Cf->num, pk);
+        FLINT_ASSERT(fq_nmod_is_one(Cf->constant, ctx->fqctx));
 
         /* f = f * Cf */
 		fq_nmod_mpoly_factor_mul_pairwise_prime(f, f, Cf, ctx);
@@ -363,7 +366,7 @@ int fq_nmod_mpoly_factor_squarefree(
     }
 
     FLINT_ASSERT(A->length > 0);
-    fq_nmod_set(f->constant, A->coeffs + 0, ctx->fqctx);
+    n_fq_get_fq_nmod(f->constant, A->coeffs + 0, ctx->fqctx);
 	fq_nmod_mpoly_factor_fit_length(f, 1, ctx);
 	fq_nmod_mpoly_make_monic(f->poly + 0, A, ctx);
 	fmpz_one(f->exp + 0);

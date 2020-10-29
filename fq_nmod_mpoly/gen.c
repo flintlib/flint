@@ -11,23 +11,22 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_gen(fq_nmod_mpoly_t A, slong var,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_gen(
+    fq_nmod_mpoly_t A,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     flint_bitcnt_t bits;
 
     bits = mpoly_gen_bits_required(var, ctx->minfo);
     bits = mpoly_fix_bits(bits, ctx->minfo);
+    fq_nmod_mpoly_fit_length_reset_bits(A, 1, bits, ctx);
 
-    fq_nmod_mpoly_fit_length(A, 1, ctx);
-    fq_nmod_mpoly_fit_bits(A, bits, ctx);
-    A->bits = bits;
-
-    fq_nmod_one(A->coeffs + 0, ctx->fqctx);
+    _n_fq_one(A->coeffs, fq_nmod_ctx_degree(ctx->fqctx));
     if (bits <= FLINT_BITS)
         mpoly_gen_monomial_sp(A->exps, var, bits, ctx->minfo);
     else
         mpoly_gen_monomial_offset_mp(A->exps, var, bits, ctx->minfo);
 
-    A->length = WORD(1);
+    _fq_nmod_mpoly_set_length(A, 1, ctx);
 }

@@ -244,9 +244,6 @@ main(void)
     const slong max_threads = 5;
     slong i, j, k, tmul = 3;
     FLINT_TEST_INIT(state);
-#ifdef _WIN32
-    tmul = 1;
-#endif
 
     flint_printf("gcd_cofactors....");
     fflush(stdout);

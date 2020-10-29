@@ -11,17 +11,22 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_inflate(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
-        const fmpz * shift, const fmpz * stride, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_inflate(
+    fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_t B,
+    const fmpz * shift,
+    const fmpz * stride,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     int have_zero_stride;
-    slong i, j;
-    slong Abits;
+    slong j;
+    flint_bitcnt_t Abits;
     slong nvars = ctx->minfo->nvars;
     fmpz * exps;
     TMP_INIT;
 
-    if (B->length == 0)
+    if (fq_nmod_mpoly_is_zero(B, ctx))
     {
         fq_nmod_mpoly_zero(A, ctx);
         return;
@@ -51,20 +56,19 @@ void fq_nmod_mpoly_inflate(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
     if (A == B)
     {
         slong NA = mpoly_words_per_exp(Abits, ctx->minfo);
-        ulong * texps = flint_malloc(NA*A->alloc*sizeof(ulong));
+        slong exps_alloc = NA*B->length;
+        ulong * texps = flint_malloc(exps_alloc*sizeof(ulong));
         mpoly_monomials_inflate(texps, Abits, B->exps, B->bits, B->length,
                                                     shift, stride, ctx->minfo);
         flint_free(A->exps);
         A->exps = texps;
         A->bits = Abits;
+        A->exps_alloc = exps_alloc;
     }
     else
     {
-        fq_nmod_mpoly_fit_length(A, B->length, ctx);
-        fq_nmod_mpoly_fit_bits(A, Abits, ctx);
-        A->bits = Abits;
-        for (i = 0; i < B->length; i++)
-            fq_nmod_set(A->coeffs + i, B->coeffs + i, ctx->fqctx);
+        fq_nmod_mpoly_fit_length_reset_bits(A, B->length, Abits, ctx);
+        _nmod_vec_set(A->coeffs, B->coeffs, d*B->length);
         mpoly_monomials_inflate(A->exps, Abits, B->exps, B->bits, B->length,
                                                     shift, stride, ctx->minfo);
         _fq_nmod_mpoly_set_length(A, B->length, ctx);

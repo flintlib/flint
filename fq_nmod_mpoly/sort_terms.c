@@ -18,8 +18,14 @@
     and assuming exponent vectors fit into one word
     and assuming that all bit positions that need to be sorted are in totalmask
 */
-void _fq_nmod_mpoly_radix_sort1(fq_nmod_mpoly_t A, slong left, slong right,
-                               flint_bitcnt_t pos, ulong cmpmask, ulong totalmask)
+void _fq_nmod_mpoly_radix_sort1(
+    fq_nmod_mpoly_t A,
+    slong left,
+    slong right,
+    flint_bitcnt_t pos,
+    ulong cmpmask,
+    ulong totalmask,
+    slong d)
 {
     ulong mask = UWORD(1) << pos;
     ulong cmp = cmpmask & mask;
@@ -37,11 +43,11 @@ void _fq_nmod_mpoly_radix_sort1(fq_nmod_mpoly_t A, slong left, slong right,
     /* return if there is no information to sort on this bit */
     if ((totalmask & mask) == WORD(0))
     {
-        --pos;
-        if ((slong)(pos) >= 0)
-        {
-            _fq_nmod_mpoly_radix_sort1(A, left,  right, pos, cmpmask, totalmask);
-        }
+        if (pos < 1)
+            return;
+
+        pos--;
+        _fq_nmod_mpoly_radix_sort1(A, left, right, pos, cmpmask, totalmask, d);
         return;
     }
 
@@ -59,18 +65,18 @@ void _fq_nmod_mpoly_radix_sort1(fq_nmod_mpoly_t A, slong left, slong right,
     {
         if (((A->exps + 1*cur)[0] & mask) != cmp)
         {
-            fq_nmod_swap(A->coeffs + cur, A->coeffs + mid, NULL);
+            _n_fq_swap(A->coeffs + d*cur, A->coeffs + d*mid, d);
             mpoly_monomial_swap(A->exps + 1*cur, A->exps + 1*mid, 1);
             mid++;
         }
     }
 
-    --pos;
-    if ((slong)(pos) >= 0)
-    {
-        _fq_nmod_mpoly_radix_sort1(A, left,  mid, pos, cmpmask, totalmask);
-        _fq_nmod_mpoly_radix_sort1(A, mid, right, pos, cmpmask, totalmask);
-    }
+    if (pos < 1)
+        return;
+
+    pos--;
+    _fq_nmod_mpoly_radix_sort1(A, left,  mid, pos, cmpmask, totalmask, d);
+    _fq_nmod_mpoly_radix_sort1(A, mid, right, pos, cmpmask, totalmask, d);
 }
 
 
@@ -82,8 +88,14 @@ void _fq_nmod_mpoly_radix_sort1(fq_nmod_mpoly_t A, slong left, slong right,
             Might turn into iterative version
             Low priority
 */
-void _fq_nmod_mpoly_radix_sort(fq_nmod_mpoly_t A, slong left, slong right,
-                                     flint_bitcnt_t pos, slong N, ulong * cmpmask)
+void _fq_nmod_mpoly_radix_sort(
+    fq_nmod_mpoly_t A,
+    slong left,
+    slong right,
+    flint_bitcnt_t pos,
+    slong N,
+    ulong * cmpmask,
+    slong d)
 {
     ulong off = pos/FLINT_BITS;
     ulong bit = pos%FLINT_BITS;
@@ -112,18 +124,18 @@ void _fq_nmod_mpoly_radix_sort(fq_nmod_mpoly_t A, slong left, slong right,
     {
         if (((A->exps + N*check)[off] & mask) != cmp)
         {
-            fq_nmod_swap(A->coeffs + check, A->coeffs + mid, NULL);
+            _n_fq_swap(A->coeffs + d*check, A->coeffs + d*mid, d);
             mpoly_monomial_swap(A->exps + N*check, A->exps + N*mid, N);
             mid++;
         }
     }
 
-    --pos;
-    if ((slong)(pos) >= 0)
-    {
-        _fq_nmod_mpoly_radix_sort(A, left,  mid, pos, N, cmpmask);
-        _fq_nmod_mpoly_radix_sort(A, mid, right, pos, N, cmpmask);
-    }
+    if (pos < 1)
+        return;
+
+    pos--;
+    _fq_nmod_mpoly_radix_sort(A, left,  mid, pos, N, cmpmask, d);
+    _fq_nmod_mpoly_radix_sort(A, mid, right, pos, N, cmpmask, d);
 }
 
 
@@ -133,6 +145,7 @@ void _fq_nmod_mpoly_radix_sort(fq_nmod_mpoly_t A, slong left, slong right,
 */
 void fq_nmod_mpoly_sort_terms(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d;
     slong i, msb, N;
     ulong himask, * ptempexp;
     TMP_INIT;
@@ -158,16 +171,18 @@ void fq_nmod_mpoly_sort_terms(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
         msb = -WORD(1);
     }
 
+    d = fq_nmod_ctx_degree(ctx->fqctx);
+
     if (N == 1)
     {
         if (msb >= 0)
         {
-            _fq_nmod_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], himask);
+            _fq_nmod_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], himask, d);
         }
     }
     else
     {
-        _fq_nmod_mpoly_radix_sort(A, 0, A->length, (N - 1)*FLINT_BITS + msb, N, ptempexp);
+        _fq_nmod_mpoly_radix_sort(A, 0, A->length, (N - 1)*FLINT_BITS + msb, N, ptempexp, d);
     }
 
     TMP_END;

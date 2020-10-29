@@ -12,6 +12,25 @@
 #include "n_poly.h"
 
 
+int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod)
+{
+    slong i;
+
+    if (A->length < 1)
+        return A->length == 0;
+
+    for (i = 0; i < A->length; i++)
+    {
+        if (!n_poly_mod_is_canonical(A->coeffs + i, mod))
+            return 0;
+        if (i + 1 == A->length && n_poly_is_zero(A->coeffs + i))
+            return 0;
+    }
+
+    return 1;
+}
+
+
 void n_bpoly_scalar_mul_nmod(n_bpoly_t A, mp_limb_t c, nmod_t ctx)
 {
     slong i;
@@ -36,7 +55,7 @@ void n_bpoly_mod_content_last(n_poly_t g, const n_bpoly_t A, nmod_t ctx)
     for (i = 0; i < A->length; i++)
     {
         n_poly_mod_gcd(g, g, A->coeffs + i, ctx);
-        if (n_poly_is_one(g))
+        if (n_poly_degree(g) == 0)
             break;
     }
 }
@@ -82,7 +101,7 @@ void n_bpoly_mod_mul_last(n_bpoly_t A, const n_poly_t b, nmod_t ctx)
 
     for (i = 0; i < A->length; i++)
     {
-        if (A->coeffs[i].length < 1)
+        if (n_poly_is_zero(A->coeffs + i))
             continue;
 
         n_poly_mod_mul(t, A->coeffs + i, b, ctx);
@@ -90,3 +109,26 @@ void n_bpoly_mod_mul_last(n_bpoly_t A, const n_poly_t b, nmod_t ctx)
     }
 }
 
+void n_bpoly_mod_derivative_gen0(
+    n_bpoly_t A,
+    const n_bpoly_t B,
+    nmod_t ctx)
+{
+    slong i;
+
+    FLINT_ASSERT(A != B);
+
+    if (B->length < 2)
+    {
+        n_bpoly_zero(A);
+        return;
+    }
+
+    n_bpoly_fit_length(A, B->length - 1);
+
+    for (i = 1; i < B->length; i++)
+        n_poly_mod_scalar_mul_ui(A->coeffs + i - 1, B->coeffs + i, i, ctx);
+
+    A->length = B->length - 1;
+    n_bpoly_normalise(A);
+}

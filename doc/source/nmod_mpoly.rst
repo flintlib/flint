@@ -541,14 +541,10 @@ The greatest common divisor functions assume that the modulus is prime.
     Do the operation of :func:`nmod_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
 .. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
-              int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+              int nmod_mpoly_gcd_hensel(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+              int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
-    Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
-    The first version always uses one thread.
-
-.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
-
-    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zippel's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
 
 
 Univariate Functions

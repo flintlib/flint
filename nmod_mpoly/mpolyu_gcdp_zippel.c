@@ -528,7 +528,7 @@ pick_evaluation_point:
     nullity = nmod_mat_nullspace(Msol, MF);
     FLINT_ASSERT(nullity == 1);
 
-    nmod_mpolyu_set(G, f, ctx);
+    nmod_mpolyu_setform(G, f, ctx);
 
     for (i = 0; i < f->length; i++)
     {

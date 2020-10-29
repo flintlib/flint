@@ -40,7 +40,7 @@ void nmod_mpoly_convert_perm(
     NA = mpoly_words_per_exp(Abits, Actx->minfo);
     NB = mpoly_words_per_exp(B->bits, Bctx->minfo);
 
-    nmod_mpoly_fit_length_set_bits(A, B->length, Abits, Actx);
+    nmod_mpoly_fit_length_reset_bits(A, B->length, Abits, Actx);
     A->length = B->length;
     for (i = 0; i < B->length; i++)
     {        

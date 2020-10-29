@@ -222,7 +222,7 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
     for (i = 0; i < Blen; i++)
         Alen += (B->coeffs[i].length > 0);
 
-    nmod_mpoly_fit_length_set_bits(A, Alen, Abits, ctx);
+    nmod_mpoly_fit_length_reset_bits(A, Alen, Abits, ctx);
 
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)
@@ -231,7 +231,7 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
         if (c == 0)
             continue;
 
-        FLINT_ASSERT(Alen < A->alloc);
+        FLINT_ASSERT(Alen < A->coeffs_alloc);
         A->coeffs[Alen] = c;
         if (Abits <= FLINT_BITS)
             mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);

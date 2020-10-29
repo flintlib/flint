@@ -16,10 +16,10 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_geobucket(fq_nmod_mpoly_t A,
                const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C,
                const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
 {
+    slong d = fq_nmod_ctx_degree(ctxAC->fqctx);
     int success = 1;
     slong i, j;
     slong Blen = B->length;
-    const fq_nmod_struct * Bcoeff = B->coeffs;
     const ulong * Bexp = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
@@ -35,7 +35,7 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_geobucket(fq_nmod_mpoly_t A,
 
     for (i = 0; success && i < Blen; i++)
     {
-        fq_nmod_mpoly_set_fq_nmod(U, Bcoeff + i, ctxAC);
+        fq_nmod_mpoly_set_n_fq(U, B->coeffs + d*i, ctxAC);
         mpoly_get_monomial_ffmpz(e, Bexp + BN*i, Bbits, ctxB->minfo);
         for (j = 0; j < ctxB->minfo->nvars; j++)
         {

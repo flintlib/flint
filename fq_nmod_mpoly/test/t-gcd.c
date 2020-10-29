@@ -61,7 +61,7 @@ void gcd_check(
         goto cleanup;
     }
 
-    if (!fq_nmod_is_one(g->coeffs + 0, ctx->fqctx))
+    if (!fq_nmod_mpoly_is_monic(g, ctx))
     {
         printf("FAIL\n");
         flint_printf("Check gcd leading coefficient is one\n"
@@ -109,7 +109,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, k, tmul = 5;
+    slong i, j, k, tmul = 7;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -213,6 +213,58 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
+    /* one input divides the other */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fq_nmod_t c;
+        fq_nmod_mpoly_ctx_t ctx;
+        fq_nmod_mpoly_t a, b, g, t1, t2;
+        slong len, len1, len2;
+        mp_limb_t exp_bound, exp_bound1, exp_bound2;
+
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 10, FLINT_BITS, 5);
+        fq_nmod_init(c, ctx->fqctx);
+        fq_nmod_mpoly_init(g, ctx);
+        fq_nmod_mpoly_init(a, ctx);
+        fq_nmod_mpoly_init(b, ctx);
+        fq_nmod_mpoly_init(t1, ctx);
+        fq_nmod_mpoly_init(t2, ctx);
+
+        len = n_randint(state, 5);
+        len1 = n_randint(state, 5);
+        len2 = n_randint(state, 5);
+
+        exp_bound = n_randint(state, 100) + 2;
+        exp_bound1 = n_randint(state, 100) + 2;
+        exp_bound2 = n_randint(state, 100) + 2;
+
+        for (j = 0; j < 4; j++)
+        {
+            fq_nmod_mpoly_randtest_bound(t1, state, len1, exp_bound1, ctx);
+            fq_nmod_mpoly_randtest_bound(t2, state, len2, exp_bound2, ctx);
+            fq_nmod_mpoly_mul(b, t1, t2, ctx);
+            fq_nmod_randtest_not_zero(c, state, ctx->fqctx);
+            fq_nmod_mpoly_scalar_mul_fq_nmod(a, t2, c, ctx);
+            fq_nmod_randtest_not_zero(c, state, ctx->fqctx);
+            fq_nmod_mpoly_scalar_mul_fq_nmod(b, b, c, ctx);
+
+            fq_nmod_mpoly_randtest_bound(g, state, len, exp_bound, ctx);
+
+            if ((j%2) == 0)
+                fq_nmod_mpoly_swap(a, b, ctx);
+
+            gcd_check(g, a, b, t2, ctx, i, j, "one input divides the other");
+        }
+
+        fq_nmod_clear(c, ctx->fqctx);
+        fq_nmod_mpoly_clear(g, ctx);
+        fq_nmod_mpoly_clear(a, ctx);
+        fq_nmod_mpoly_clear(b, ctx);
+        fq_nmod_mpoly_clear(t1, ctx);
+        fq_nmod_mpoly_clear(t2, ctx);
+        fq_nmod_mpoly_ctx_clear(ctx);
+    }
+
     /* sparse inputs */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -221,7 +273,7 @@ main(void)
         slong len, len1, len2;
         slong degbound;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 5, FLINT_BITS, 4);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 7, FLINT_BITS, 4);
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);
         fq_nmod_mpoly_init(b, ctx);
@@ -266,7 +318,7 @@ main(void)
         slong len, len1, len2;
         slong degbound;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 5, FLINT_BITS, 4);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 7, FLINT_BITS, 4);
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);
         fq_nmod_mpoly_init(b, ctx);
@@ -326,7 +378,7 @@ main(void)
         slong len, len1, len2;
         slong degbound;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 5, FLINT_BITS, 4);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 7, FLINT_BITS, 4);
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);
         fq_nmod_mpoly_init(b, ctx);
@@ -377,6 +429,7 @@ main(void)
                 if (fmpz_cmp(shifts1 + k, shifts2 + k) > 0)
                     fmpz_set(shifts1 + k, shifts2 + k);
             }
+
             fq_nmod_mpoly_inflate(t, t, shifts1, strides, ctx);
 
             gcd_check(g, a, b, t, ctx, i, j, "sparse input with inflation");

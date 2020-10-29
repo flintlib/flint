@@ -152,7 +152,7 @@ int fq_nmod_mpoly_factor_irred_smprime_zassenhaus(
 
     FLINT_ASSERT(n > 1);
     FLINT_ASSERT(A->length > 1);
-    FLINT_ASSERT(fq_nmod_is_one(A->coeffs + 0, ctx->fqctx));
+    FLINT_ASSERT(_n_fq_is_one(A->coeffs, fq_nmod_ctx_degree(ctx->fqctx)));
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
     subset = (slong*) flint_malloc(4*sizeof(slong));
@@ -227,8 +227,8 @@ got_alpha:
         fq_nmod_mpoly_make_monic(Aevals + i, Aevals + i, ctx);
     }
 
-    fq_nmod_mpoly_get_n_bpoly_fq(B, Aevals + 1, 0, 1, ctx);
-    success = n_bpoly_fq_factor_smprime(c, F, B, 1, ctx->fqctx);
+    fq_nmod_mpoly_get_n_fq_bpoly(B, Aevals + 1, 0, 1, ctx);
+    success = n_fq_bpoly_factor_smprime(c, F, B, 1, ctx->fqctx);
     if (!success)
         goto next_alpha;
 
@@ -238,7 +238,7 @@ got_alpha:
     pfac->length = F->length;
     for (i = 0; i < F->length; i++)
     {
-        fq_nmod_mpoly_set_n_bpoly_fq(pfac->coeffs + i, A->bits,
+        fq_nmod_mpoly_set_n_fq_bpoly(pfac->coeffs + i, A->bits,
                                                      F->coeffs + i, 0, 1, ctx);
         fq_nmod_mpoly_make_monic(pfac->coeffs + i, pfac->coeffs + i, ctx);
     }

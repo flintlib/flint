@@ -12,9 +12,13 @@
 #include "fq_nmod_mpoly.h"
 
 
-void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(fq_nmod_t ev, const fq_nmod_mpoly_t A,
-                  fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(
+    fq_nmod_t ev,
+    const fq_nmod_mpoly_t A,
+    fq_nmod_struct * const * vals,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     ulong l;
     slong i, j, k, N, nvars = ctx->minfo->nvars;
     slong shift, off;
@@ -22,7 +26,7 @@ void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(fq_nmod_t ev, const fq_nmod_mpoly_t 
     slong * offs;
     slong entries, k_len;
     slong Alen;
-    const fq_nmod_struct * Acoeff;
+    const mp_limb_t * Acoeff;
     ulong * Aexp;
     flint_bitcnt_t bits;
     fq_nmod_struct * powers;
@@ -90,7 +94,7 @@ void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(fq_nmod_t ev, const fq_nmod_mpoly_t 
     fq_nmod_zero(ev, ctx->fqctx);
     for (i = 0; i < Alen; i++)
     {
-        fq_nmod_set(t, Acoeff + i, ctx->fqctx);
+        n_fq_get_fq_nmod(t, Acoeff + d*i, ctx->fqctx);
         for (k = 0; k < k_len; k++)
         {
             if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
@@ -109,9 +113,13 @@ void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(fq_nmod_t ev, const fq_nmod_mpoly_t 
     fq_nmod_clear(t, ctx->fqctx);
 }
 
-void _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(fq_nmod_t ev, const fq_nmod_mpoly_t A,
-                  fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(
+    fq_nmod_t ev,
+    const fq_nmod_mpoly_t A,
+    fq_nmod_struct * const * vals,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     ulong l;
     slong i, j, k, N, nvars = ctx->minfo->nvars;
     slong off;
@@ -119,7 +127,7 @@ void _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(fq_nmod_t ev, const fq_nmod_mpoly_t 
     slong * offs;
     slong entries, k_len;
     slong Alen;
-    fq_nmod_struct * Acoeff;
+    mp_limb_t * Acoeff;
     ulong * Aexp;
     flint_bitcnt_t bits;
     fq_nmod_struct * powers;
@@ -190,7 +198,7 @@ void _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(fq_nmod_t ev, const fq_nmod_mpoly_t 
     fq_nmod_zero(ev, ctx->fqctx);
     for (i = 0; i < Alen; i++)
     {
-        fq_nmod_set(t, Acoeff + i, ctx->fqctx);
+        n_fq_get_fq_nmod(t, Acoeff + d*i, ctx->fqctx);
         for (k = 0; k < k_len; k++)
         {
             if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))

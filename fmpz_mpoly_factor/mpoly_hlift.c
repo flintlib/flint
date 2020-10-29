@@ -26,7 +26,7 @@ static int _hlift_quartic2(
     fmpz_mpoly_t Aq, t, t2, t3, xalpha;
     fmpz_mpoly_univar_t Au;
     fmpz_mpoly_geobucket_t G;
-    fmpz_mpoly_struct * betas, * deltas;
+    fmpz_mpoly_struct betas[2], * deltas;
     fmpz_mpoly_pfrac_t I;
     fmpz_mpolyv_struct B[2];
     slong tdeg;
@@ -47,7 +47,6 @@ static int _hlift_quartic2(
     fmpz_mpoly_sub_fmpz(xalpha, xalpha, alpha + m - 1, ctx);
     fmpz_mpoly_repack_bits_inplace(xalpha, bits, ctx);
 
-    betas  = (fmpz_mpoly_struct * ) flint_malloc(r*sizeof(fmpz_mpoly_struct));
     for (i = 0; i < r; i++)
     {
         fmpz_mpolyv_init(B + i, ctx);
@@ -56,12 +55,13 @@ static int _hlift_quartic2(
         fmpz_mpolyv_fit_length(B + i, degs[m] + 1, ctx);
         for (j = B[i].length; j <= degs[m]; j++)
             fmpz_mpoly_zero(B[i].coeffs + j, ctx);
-        betas[i] = B[i].coeffs[0];
     }
 
-    success = fmpz_mpoly_pfrac_init(I, A->bits, r, m - 1, betas, alpha, ctx);
-    FLINT_ASSERT(success == 1);
+    for (i = 0; i < r; i++)
+        betas[i] = B[i].coeffs[0];
 
+    success = fmpz_mpoly_pfrac_init(I, bits, r, m - 1, betas, alpha, ctx);
+    FLINT_ASSERT(success == 1);
     deltas = I->deltas + (m - 1)*I->r;
 
     use_Au = fmpz_is_zero(alpha + m - 1);
@@ -125,6 +125,7 @@ static int _hlift_quartic2(
 
         if (fmpz_mpoly_is_zero(t, ctx))
             continue;
+
         success = fmpz_mpoly_pfrac(m - 1, t, degs, I, ctx);
         if (success < 1)
         {
@@ -156,8 +157,6 @@ cleanup:
 
     fmpz_mpoly_pfrac_clear(I, ctx);
 
-    flint_free(betas);
-
     for (i = 0; i < r; i++)
     {
         if (success)
@@ -175,6 +174,7 @@ cleanup:
 
     return success;
 }
+
 
 static int _hlift_quartic(
     slong m,
@@ -198,8 +198,8 @@ static int _hlift_quartic(
 
     FLINT_ASSERT(r > 2);
 
-    B = (fmpz_mpolyv_struct *) flint_malloc(r*sizeof(fmpz_mpolyv_struct));
-    U = (fmpz_mpolyv_struct *) flint_malloc(r*sizeof(fmpz_mpolyv_struct));
+    B = FLINT_ARRAY_ALLOC(2*r, fmpz_mpolyv_struct);
+    U = B + r;
 
     fmpz_mpoly_init(t, ctx);
     fmpz_mpoly_init(t1, ctx);
@@ -229,11 +229,12 @@ static int _hlift_quartic(
             fmpz_mpoly_zero(B[k].coeffs + j, ctx);
     }
 
-    betas = (fmpz_mpoly_struct *) flint_malloc(r*sizeof(fmpz_mpoly_struct));
+    betas = FLINT_ARRAY_ALLOC(r, fmpz_mpoly_struct);
     for (i = 0; i < r; i++)
         betas[i] = B[i].coeffs[0];
 
-    fmpz_mpoly_pfrac_init(I, A->bits, r, m - 1, betas, alpha, ctx);
+    success = fmpz_mpoly_pfrac_init(I, A->bits, r, m - 1, betas, alpha, ctx);
+    FLINT_ASSERT(success);
     deltas = I->deltas + (m - 1)*I->r;
 
     k = r - 2;
@@ -322,6 +323,7 @@ static int _hlift_quartic(
 
         if (fmpz_mpoly_is_zero(t, ctx))
             continue;
+
         success = fmpz_mpoly_pfrac(m - 1, t, degs, I, ctx);
         if (success < 1)
         {
@@ -378,7 +380,7 @@ cleanup:
     }
 
     flint_free(B);
-    flint_free(U);
+
     fmpz_mpoly_clear(t, ctx);
     fmpz_mpoly_clear(t1, ctx);
     fmpz_mpoly_clear(t2, ctx);

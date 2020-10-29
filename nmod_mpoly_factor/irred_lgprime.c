@@ -19,23 +19,20 @@ static void _fq_nmod_mpoly_set_nmod_mpoly(
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t Bctx)
 {
-    slong i, N;
+    slong d = fq_nmod_ctx_degree(Actx->fqctx);
+    slong N = mpoly_words_per_exp(B->bits, Bctx->minfo);
+    slong i;
 
     FLINT_ASSERT(Actx->minfo->ord == Bctx->minfo->ord);
     FLINT_ASSERT(Actx->minfo->nvars == Bctx->minfo->nvars);
 
-    fq_nmod_mpoly_fit_bits(A, B->bits, Actx);
-    A->bits = B->bits;
-
-    N = mpoly_words_per_exp(B->bits, Bctx->minfo);
-
-    fq_nmod_mpoly_fit_length(A, B->length, Actx);
+    fq_nmod_mpoly_fit_length_reset_bits(A, B->length, B->bits, Actx);
     A->length = B->length;
 
     mpoly_copy_monomials(A->exps, B->exps, B->length, N);
 
     for (i = 0; i < B->length; i++)
-        fq_nmod_set_ui(A->coeffs + i, B->coeffs[i], Actx->fqctx);
+        _n_fq_set_nmod(A->coeffs + d*i, B->coeffs[i], d);
 }
 
 
@@ -45,13 +42,13 @@ static void _frob_combine(
     const nmod_mpoly_ctx_t ctx,
     const fq_nmod_mpoly_ctx_t ectx)
 {
-    slong i, j;
+    slong d = fq_nmod_ctx_degree(ectx->fqctx);
+    slong i, j, N;
     fq_nmod_mpolyv_t tfac;
     fq_nmod_mpoly_t t;
     nmod_mpoly_struct * s;
-    slong k = fq_nmod_ctx_degree(ectx->fqctx);
 
-    FLINT_ASSERT(k > 1);
+    FLINT_ASSERT(d > 1);
 
     fq_nmod_mpoly_init(t, ectx);
     fq_nmod_mpolyv_init(tfac, ectx);
@@ -66,11 +63,11 @@ static void _frob_combine(
         fq_nmod_mpoly_set(tfac->coeffs + 0, t, ectx);
         tfac->length = 1;
 
-        for (i = 1; i < k; i++)
+        for (i = 1; i < d; i++)
         {
             for (j = 0; j < t->length; j++)
             {
-                fq_nmod_pow_ui(t->coeffs + j, t->coeffs + j,
+                n_fq_pow_ui(t->coeffs + d*j, t->coeffs + d*j,
                                      ectx->fqctx->modulus->mod.n, ectx->fqctx);
             }
 
@@ -98,18 +95,21 @@ static void _frob_combine(
         s = Af->coeffs + Af->length;
         Af->length++;
 
-        nmod_mpoly_fit_length_set_bits(s, t->length, t->bits, ctx);
+        nmod_mpoly_fit_length_reset_bits(s, t->length, t->bits, ctx);
         s->length = t->length;
-        mpoly_copy_monomials(s->exps, t->exps,
-                         mpoly_words_per_exp(t->bits, ectx->minfo), t->length);
+        N = mpoly_words_per_exp(t->bits, ectx->minfo);
+        mpoly_copy_monomials(s->exps, t->exps, t->length, N);
         for (i = 0; i < t->length; i++)
         {
-            if (t->coeffs[i].length != 1)
+            for (j = 1; j < d; j++)
             {
-                flint_printf("fatal error in _frob_combine");
-                flint_abort();
+                if ((t->coeffs + d*i)[j] != 0)
+                {
+                    flint_printf("fatal error in _frob_combine");
+                    flint_abort();
+                }
             }
-            s->coeffs[i] = t->coeffs[i].coeffs[0];
+            s->coeffs[i] = (t->coeffs + d*i)[0];
         }
     }
 

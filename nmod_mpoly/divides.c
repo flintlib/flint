@@ -165,16 +165,17 @@ int nmod_mpoly_divides(
         if (A->length == 0 || nmod_mpoly_ctx_modulus(ctx) == 1)
         {
             nmod_mpoly_set(Q, A, ctx);
-	    return 1;
-	} else
-	    flint_throw(FLINT_DIVZERO, "Exception in nmod_mpoly_divides_threaded: "
-                                                   "Cannot divide by zero.\n");
+	        return 1;
+	    }
+        else
+        {
+    	    flint_throw(FLINT_DIVZERO, "nmod_mpoly_divides: divide by zero.");
+        }
     }
 
     if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))
     {
-        flint_throw(FLINT_IMPINV, "Exception in nmod_mpoly_divides_threaded: "
-                                       "Cannot invert leading coefficient.\n");
+        flint_throw(FLINT_IMPINV, "nmod_mpoly_divides: leading coefficient is not invertible.");
     }
 
     thread_limit = A->length/1024;

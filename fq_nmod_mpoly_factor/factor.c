@@ -20,6 +20,7 @@ void fq_nmod_mpoly_convert_perm(
     const fq_nmod_mpoly_ctx_t Bctx,
     const slong * perm)
 {
+    slong d = fq_nmod_ctx_degree(Actx->fqctx);
     slong n = Bctx->minfo->nvars;
     slong m = Actx->minfo->nvars;
     slong i, k, l;
@@ -39,11 +40,11 @@ void fq_nmod_mpoly_convert_perm(
     NA = mpoly_words_per_exp(Abits, Actx->minfo);
     NB = mpoly_words_per_exp(B->bits, Bctx->minfo);
 
-    fq_nmod_mpoly_fit_length_set_bits(A, B->length, Abits, Actx);
+    fq_nmod_mpoly_fit_length_reset_bits(A, B->length, Abits, Actx);
     A->length = B->length;
     for (i = 0; i < B->length; i++)
     {        
-	    fq_nmod_set(A->coeffs + i, B->coeffs + i, Bctx->fqctx);
+	    _n_fq_set(A->coeffs + d*i, B->coeffs + d*i, d);
 	    mpoly_get_monomial_ui(Bexps, B->exps + NB*i, B->bits, Bctx->minfo);
 	    for (k = 0; k < m; k++)
 	    {
@@ -245,12 +246,12 @@ static int _irreducible_factors(
         n_bpoly_init(Ab);
         n_tpoly_init(Abf);
 
-        fq_nmod_mpoly_get_n_bpoly_fq(Ab, A, perm[0], perm[1], ctx);
-        success = n_bpoly_fq_factor_smprime(c, Abf, Ab, 1, ctx->fqctx);
+        fq_nmod_mpoly_get_n_fq_bpoly(Ab, A, perm[0], perm[1], ctx);
+        success = n_fq_bpoly_factor_smprime(c, Abf, Ab, 1, ctx->fqctx);
         if (!success)
         {
-            fq_nmod_mpoly_get_n_bpoly_fq(Ab, A, perm[0], perm[1], ctx);
-            n_bpoly_fq_factor_lgprime(c, Abf, Ab, ctx->fqctx, state);
+            fq_nmod_mpoly_get_n_fq_bpoly(Ab, A, perm[0], perm[1], ctx);
+            n_fq_bpoly_factor_lgprime(c, Abf, Ab, ctx->fqctx, state);
         }
         FLINT_ASSERT(n_poly_degree(c) == 0);
 
@@ -258,7 +259,7 @@ static int _irreducible_factors(
         Af->length = Abf->length;
         for (i = 0; i < Abf->length; i++)
         {
-            fq_nmod_mpoly_set_n_bpoly_fq(Af->coeffs + i, Abits,
+            fq_nmod_mpoly_set_n_fq_bpoly(Af->coeffs + i, Abits,
                                        Abf->coeffs + i, perm[0], perm[1], ctx);
             fq_nmod_mpoly_make_monic(Af->coeffs + i, Af->coeffs + i, ctx);
         }

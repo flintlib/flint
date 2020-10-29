@@ -160,38 +160,30 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     if (poly1 == poly2 || poly1 == poly3)
     {
         nmod_mpoly_t temp;
-
-        nmod_mpoly_init2(temp, poly2->length + poly3->length, ctx);
-        nmod_mpoly_fit_bits(temp, max_bits, ctx);
-        temp->bits = max_bits;
-
+        nmod_mpoly_init3(temp, poly2->length + poly3->length, max_bits, ctx);
         len1 = _nmod_mpoly_sub(temp->coeffs, temp->exps, 
-                    poly2->coeffs, exp2, poly2->length,
-                    poly3->coeffs, exp3, poly3->length,
-                                    N, cmpmask, ctx->ffinfo);
-
+                                    poly2->coeffs, exp2, poly2->length,
+                                    poly3->coeffs, exp3, poly3->length,
+                                                      N, cmpmask, ctx->ffinfo);
         nmod_mpoly_swap(temp, poly1, ctx);
-
         nmod_mpoly_clear(temp, ctx);
-    } else
+    }
+    else
     {
-        nmod_mpoly_fit_length(poly1, poly2->length + poly3->length, ctx);
-        nmod_mpoly_fit_bits(poly1, max_bits, ctx);
-        poly1->bits = max_bits;
-
+        nmod_mpoly_fit_length_reset_bits(poly1, poly2->length + poly3->length, max_bits, ctx);
         len1 = _nmod_mpoly_sub(poly1->coeffs, poly1->exps, 
-                       poly2->coeffs, exp2, poly2->length,
-                       poly3->coeffs, exp3, poly3->length,
-                                    N, cmpmask, ctx->ffinfo);
+                                    poly2->coeffs, exp2, poly2->length,
+                                    poly3->coeffs, exp3, poly3->length,
+                                                      N, cmpmask, ctx->ffinfo);
     }
       
+    _nmod_mpoly_set_length(poly1, len1, ctx);
+
     if (free2)
         flint_free(exp2);
 
     if (free3)
         flint_free(exp3);
-
-    _nmod_mpoly_set_length(poly1, len1, ctx);
 
     TMP_END;
 }

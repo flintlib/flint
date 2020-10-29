@@ -64,7 +64,7 @@ void n_bpoly_mod_make_monic_mod(n_bpoly_t A, n_poly_t mk, nmod_t mod)
 }
 
 
-void n_bpoly_set_fq_nmod_poly_var0(
+void n_bpoly_set_fq_nmod_poly_gen0(
     n_bpoly_t A,
     const fq_nmod_poly_t B,
     const fq_nmod_ctx_t ectx)
@@ -259,7 +259,7 @@ static int _zassenhaus(
                 continue;
             }
 
-            n_bpoly_set_poly_var1(t1, leadf);
+            n_bpoly_set_poly_gen1(t1, leadf);
             for (i = 0; i < len; i++)
             {
                 if (subset[i] >= 0)
@@ -397,8 +397,8 @@ static void _hensel_build_tree(
 
     for (j = 0; j < 2*r - 2; j++)
     {
-        n_bpoly_set_fq_nmod_poly_var0(v + j, V + j, ctx);
-        n_bpoly_set_fq_nmod_poly_var0(w + j, W + j, ctx);
+        n_bpoly_set_fq_nmod_poly_gen0(v + j, V + j, ctx);
+        n_bpoly_set_fq_nmod_poly_gen0(w + j, W + j, ctx);
     }
 
     fq_nmod_poly_clear(d, ctx);
@@ -656,7 +656,7 @@ static void _lattice(
     {
         n_bpoly_mod_divrem_mod_poly(Q, R, f, g[i], lift_alpha_pow, ctx);
         FLINT_ASSERT(R->length == 0);
-        n_bpoly_mod_derivative(R, g[i], ctx);
+        n_bpoly_mod_derivative_gen0(R, g[i], ctx);
         n_bpoly_mod_mul_mod_poly(ld + i, Q, R, lift_alpha_pow, ctx);
     }
 

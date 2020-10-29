@@ -11,32 +11,19 @@
 
 #include "fq_nmod_mpoly.h"
 
-void _fq_nmod_mpoly_neg(fq_nmod_struct * Acoeff, ulong * Aexp,
-                  const fq_nmod_struct * Bcoeff, const ulong * Bexp, slong Blen,
-                                            slong N, const fq_nmod_ctx_t fqctx)
+void fq_nmod_mpoly_neg(
+    fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_t B,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong i;
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
 
-    for (i = 0; i < Blen; i++)
-        fq_nmod_neg(Acoeff + i, Bcoeff + i, fqctx);
-
-    if (Aexp != Bexp)
+    if (A != B)
     {
-        mpoly_copy_monomials(Aexp, Bexp, Blen, N);
+        fq_nmod_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
+        mpoly_copy_monomials(A->exps, B->exps, B->length, N);
     }
-}
-
-void fq_nmod_mpoly_neg(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    slong N;
-
-    fq_nmod_mpoly_fit_length(A, B->length, ctx);
-    fq_nmod_mpoly_fit_bits(A, B->bits, ctx);
-    A->bits = B->bits;
-
-    N = mpoly_words_per_exp(B->bits, ctx->minfo);
-    _fq_nmod_mpoly_neg(A->coeffs, A->exps, B->coeffs, B->exps, B->length,
-                                                                N, ctx->fqctx);
+    _nmod_vec_neg(A->coeffs, B->coeffs, d*B->length, fq_nmod_ctx_mod(ctx->fqctx));
     _fq_nmod_mpoly_set_length(A, B->length, ctx);
 }

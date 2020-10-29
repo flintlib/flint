@@ -11,11 +11,10 @@
 
 #include "nmod_mpoly.h"
 
-/*
-    emplaceterm assumes that c is valid modulo ctx->ffinfo->mod.n
-*/
-void _nmod_mpoly_push_exp_ui(nmod_mpoly_t A,
-                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_push_exp_ui(
+    nmod_mpoly_t A,
+    const ulong * exp,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N;
     slong old_length = A->length;
@@ -23,23 +22,22 @@ void _nmod_mpoly_push_exp_ui(nmod_mpoly_t A,
 
     exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-    nmod_mpoly_fit_bits(A, exp_bits, ctx);
+    nmod_mpoly_fit_length_fit_bits(A, old_length + 1, exp_bits, ctx);
 
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-
-    nmod_mpoly_fit_length(A, old_length + 1, ctx);
     A->length = old_length + 1;
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
     mpoly_set_monomial_ui(A->exps + N*old_length, exp, A->bits, ctx->minfo);
 }
 
 
-void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c,
-                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_push_term_ui_ui(
+    nmod_mpoly_t A,
+    ulong c,
+    const ulong * exp,
+    const nmod_mpoly_ctx_t ctx)
 {
     _nmod_mpoly_push_exp_ui(A, exp, ctx);
     if (c >= ctx->ffinfo->mod.n)
-    {
         NMOD_RED(c, c, ctx->ffinfo->mod);
-    }
     A->coeffs[A->length - 1] = c;   
 }

@@ -40,6 +40,7 @@ int nmod_mpoly_pfrac_init(
     I->deltas = FLINT_ARRAY_ALLOC((w + 1)*r, nmod_mpoly_struct);
     I->xalpha = FLINT_ARRAY_ALLOC(w + 1, nmod_mpoly_struct);
     I->q = FLINT_ARRAY_ALLOC(w + 1, nmod_mpoly_struct);
+    I->G = FLINT_ARRAY_ALLOC(w + 1, nmod_mpoly_geobucket_struct);
     I->qt = FLINT_ARRAY_ALLOC(w + 1, nmod_mpoly_struct);
     I->newt = FLINT_ARRAY_ALLOC(w + 1, nmod_mpoly_struct);
     I->delta_coeffs = FLINT_ARRAY_ALLOC((w + 1)*r, nmod_mpolyv_struct);
@@ -48,6 +49,7 @@ int nmod_mpoly_pfrac_init(
     {
         nmod_mpoly_init(I->xalpha + i, ctx);
         nmod_mpoly_init(I->q + i, ctx);
+        nmod_mpoly_geobucket_init(I->G + i, ctx);
         nmod_mpoly_init(I->qt + i, ctx);
         nmod_mpoly_init(I->newt + i, ctx);
         for (j = 0; j < r; j++)
@@ -186,6 +188,7 @@ void nmod_mpoly_pfrac_clear(
     {
         nmod_mpoly_clear(I->xalpha + i, ctx);
         nmod_mpoly_clear(I->q + i, ctx);
+        nmod_mpoly_geobucket_clear(I->G + i, ctx);
         nmod_mpoly_clear(I->qt + i, ctx);
         nmod_mpoly_clear(I->newt + i, ctx);
         for (j = 0; j < I->r; j++)
@@ -194,6 +197,7 @@ void nmod_mpoly_pfrac_clear(
 
     flint_free(I->xalpha);
     flint_free(I->q);
+    flint_free(I->G);
     flint_free(I->qt);
     flint_free(I->newt);
     flint_free(I->delta_coeffs);
@@ -238,14 +242,15 @@ int nmod_mpoly_pfrac(
     nmod_mpoly_pfrac_t I,
     const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j, k;
     int success;
+    slong i, j, k;
     nmod_mpoly_struct * deltas = I->deltas + l*I->r;
     nmod_mpoly_struct * newdeltas = I->deltas + (l - 1)*I->r;
     nmod_mpoly_struct * q = I->q + l;
     nmod_mpoly_struct * qt = I->qt + l;
     nmod_mpoly_struct * newt = I->newt + l;
     nmod_mpolyv_struct * delta_coeffs = I->delta_coeffs + l*I->r;
+    nmod_mpoly_geobucket_struct * G = I->G + l;
 
     FLINT_ASSERT(l >= 0);
 
@@ -270,6 +275,8 @@ int nmod_mpoly_pfrac(
     {
         nmod_mpoly_divrem(q, newt, t, I->xalpha + l, ctx);
         nmod_mpoly_swap(t, q, ctx);
+        nmod_mpoly_geobucket_set(G, newt, ctx);
+
         for (j = 0; j < k; j++)
         for (i = 0; i < I->r; i++)
         {
@@ -280,9 +287,13 @@ int nmod_mpoly_pfrac(
 
             nmod_mpoly_mul(qt, delta_coeffs[i].coeffs + j,
                         I->prod_mbetas_coeffs[l*I->r + i].coeffs + k - j, ctx);
-            nmod_mpoly_sub(q, newt, qt, ctx);
-            nmod_mpoly_swap(newt, q, ctx);
+            nmod_mpoly_geobucket_sub(G, qt, ctx);
         }
+
+        nmod_mpoly_geobucket_empty(newt, G, ctx);
+
+        if (nmod_mpoly_is_zero(newt, ctx))
+            continue;
 
         success = nmod_mpoly_pfrac(l - 1, newt, degs, I, ctx);
         if (success < 1)

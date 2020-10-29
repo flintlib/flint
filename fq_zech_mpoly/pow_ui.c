@@ -62,7 +62,7 @@ int fq_zech_mpoly_pow_ui(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
     exp_bits = FLINT_MAX(MPOLY_MIN_BITS, exp_bits + 1);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    fq_zech_mpoly_fit_length_set_bits(A, 1, exp_bits, ctx);
+    fq_zech_mpoly_fit_length_reset_bits(A, 1, exp_bits, ctx);
     
     fq_zech_pow_ui(A->coeffs + 0, B->coeffs + 0, k, ctx->fqctx);
     mpoly_pack_vec_fmpz(A->exps + 0, maxBfields, exp_bits, ctx->minfo->nfields, 1);

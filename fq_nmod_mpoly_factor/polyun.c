@@ -28,7 +28,7 @@ void n_polyu2n_fq_print_pretty(
             printf(" + ");
         first = 0;
         flint_printf("(");
-        n_poly_fq_print_pretty(A->terms[i].coeff, varlast, ctx);
+        n_fq_poly_print_pretty(A->terms[i].coeff, varlast, ctx);
         flint_printf(")*%s^%wu*%s^%wu",
             var0, extract_exp(A->terms[i].exp, 1, 2),
             var1, extract_exp(A->terms[i].exp, 0, 2));
@@ -55,7 +55,7 @@ void n_polyu3n_fq_print_pretty(
             printf(" + ");
         first = 0;
         flint_printf("(");
-        n_poly_fq_print_pretty(A->terms[i].coeff, varlast, ctx);
+        n_fq_poly_print_pretty(A->terms[i].coeff, varlast, ctx);
         flint_printf(")*%s^%wu*%s^%wu*%s^%wu",
             var0, extract_exp(A->terms[i].exp, 2, 3),
             var1, extract_exp(A->terms[i].exp, 1, 3),
@@ -75,7 +75,7 @@ int n_polyun_fq_is_canonical(
         return 0;
     for (i = 0; i < A->length; i++)
     {
-        if (!n_poly_fq_is_canonical(A->terms[i].coeff, ctx))
+        if (!n_fq_poly_is_canonical(A->terms[i].coeff, ctx))
             return 0;
         if (n_poly_is_zero(A->terms[i].coeff))
             return 0;

@@ -15,13 +15,13 @@
 void nmod_mpoly_setform(nmod_mpoly_t A, nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
+    flint_bitcnt_t bits = B->bits;
+    slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
-    nmod_mpoly_set(A, B, ctx);
-    for (i = 0; i < A->length; i++)
-    {
-        A->coeffs[i] = UWORD(0);
-    }
+    nmod_mpoly_fit_length_reset_bits(A, B->length, bits, ctx);
+    mpoly_copy_monomials(A->exps, B->exps, B->length, N);
+    _nmod_vec_zero(A->coeffs, B->length);
+    A->length = B->length;
 }
 
 void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,

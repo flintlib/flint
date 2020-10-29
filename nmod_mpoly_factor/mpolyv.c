@@ -48,16 +48,8 @@ void nmod_mpolyv_fit_length(
     if (length <= old_alloc)
         return;
 
-    if (old_alloc > 0)
-    {
-        A->coeffs = (nmod_mpoly_struct *) flint_realloc(A->coeffs,
+    A->coeffs = (nmod_mpoly_struct *) flint_realloc(A->coeffs,
                                           new_alloc*sizeof(nmod_mpoly_struct));
-    }
-    else
-    {
-        A->coeffs = (nmod_mpoly_struct *) flint_malloc(
-                                          new_alloc*sizeof(nmod_mpoly_struct));
-    }
 
     for (i = old_alloc; i < new_alloc; i++)
         nmod_mpoly_init(A->coeffs + i, ctx);
@@ -140,14 +132,39 @@ int _nmod_mpoly_vec_content_mpoly(
     slong Alen,
     const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
+    slong i, j1, j2;
 
-    nmod_mpoly_zero(g, ctx);
+    if (Alen <= 1)
+    {
+        if (Alen == 1)
+            nmod_mpoly_make_monic(g, A + 0, ctx);
+        else
+            nmod_mpoly_zero(g, ctx);
+        return 1;
+    }
+
+    j1 = 0;
+    j2 = 1;
+    for (i = 2; i < Alen; i++)
+    {
+        if (A[i].length < A[j1].length)
+            j1 = i;
+        else if (A[i].length < A[j2].length)
+            j2 = i;
+    }
+
+    FLINT_ASSERT(j1 != j2);
+
+    if (!nmod_mpoly_gcd(g, A + j1, A + j2, ctx))
+        return 0;
 
     for (i = 0; i < Alen; i++)
     {
-		if (!nmod_mpoly_gcd(g, g, A + i, ctx))
-			return 0;
+        if (i == j1 || i == j2)
+            continue;
+
+        if (!nmod_mpoly_gcd(g, g, A + i, ctx))
+            return 0;
     }
 
     return 1;

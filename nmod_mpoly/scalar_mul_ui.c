@@ -14,26 +14,27 @@
 /*
     c is assumed to be invertible and reduced mod n
 */
-void nmod_mpoly_scalar_mul_nmod_invertible(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                       mp_limb_t c, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_scalar_mul_nmod_invertible(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    mp_limb_t c,
+    const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(c != 0);
     FLINT_ASSERT(c < ctx->ffinfo->mod.n);
-    FLINT_ASSERT(n_gcd(c, ctx->ffinfo->mod.n) == UWORD(1));
+    FLINT_ASSERT(n_gcd(c, ctx->ffinfo->mod.n) == 1);
 
     if (A == B)
     {
-        if (c == UWORD(1))
+        if (c == 1)
             return;
     }
     else
     {
         slong N;
 
-        nmod_mpoly_fit_length(A, B->length, ctx);
-        nmod_mpoly_fit_bits(A, B->bits, ctx);
+        nmod_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
         A->length = B->length;
-        A->bits = B->bits;
 
         N = mpoly_words_per_exp(B->bits, ctx->minfo);
         flint_mpn_copyi(A->exps, B->exps, N*B->length);
@@ -43,6 +44,7 @@ void nmod_mpoly_scalar_mul_nmod_invertible(nmod_mpoly_t A, const nmod_mpoly_t B,
             return;
         }
     }
+
     _nmod_vec_scalar_mul_nmod(A->coeffs, B->coeffs, B->length,
                                                           c, ctx->ffinfo->mod);
 }
@@ -51,8 +53,11 @@ void nmod_mpoly_scalar_mul_nmod_invertible(nmod_mpoly_t A, const nmod_mpoly_t B,
 /*
     c is assumed to be reduced mod n
 */
-void nmod_mpoly_scalar_mul_nmod_general(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                       mp_limb_t c, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_scalar_mul_nmod_general(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    mp_limb_t c,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i, N;
     slong Alen, Blen;
@@ -63,9 +68,7 @@ void nmod_mpoly_scalar_mul_nmod_general(nmod_mpoly_t A, const nmod_mpoly_t B,
 
     N = mpoly_words_per_exp(B->bits, ctx->minfo);
 
-    nmod_mpoly_fit_length(A, B->length, ctx);
-    nmod_mpoly_fit_bits(A, B->bits, ctx);
-    A->bits = B->bits;
+    nmod_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
 
     Aexp = A->exps;
     Bexp = B->exps;
@@ -89,17 +92,15 @@ void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
     if (c >= ctx->ffinfo->mod.n)
-    {
         NMOD_RED(c, c, ctx->ffinfo->mod);
-    }
 
-    if (c == UWORD(0) || B->length == 0)
+    if (c == 0 || nmod_mpoly_is_zero(B, ctx))
     {
         nmod_mpoly_zero(A, ctx);
         return;
     }
 
-    if (n_gcd(c, ctx->ffinfo->mod.n) == UWORD(1))
+    if (n_gcd(c, ctx->ffinfo->mod.n) == 1)
         nmod_mpoly_scalar_mul_nmod_invertible(A, B, c, ctx);
     else
         nmod_mpoly_scalar_mul_nmod_general(A, B, c, ctx);

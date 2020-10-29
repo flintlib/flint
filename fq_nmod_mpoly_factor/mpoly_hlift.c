@@ -24,10 +24,10 @@ static int _hlift_quartic2(
     int success;
     slong i, j;
     fq_nmod_mpoly_t Aq, t, t2, t3, xalpha;
-    fq_nmod_mpoly_struct * deltas;
+    fq_nmod_mpoly_geobucket_t G;
+    fq_nmod_mpoly_struct betas[2], * deltas;
     fq_nmod_mpoly_pfrac_t I;
     fq_nmod_mpolyv_struct B[2];
-    fq_nmod_mpoly_struct betas[2];
     slong tdeg;
     flint_bitcnt_t bits = A->bits;
 
@@ -39,6 +39,7 @@ static int _hlift_quartic2(
     fq_nmod_mpoly_init(t3, ctx);
     fq_nmod_mpoly_init(xalpha, ctx);
     fq_nmod_mpoly_init(Aq, ctx);
+    fq_nmod_mpoly_geobucket_init(G, ctx);
 
     fq_nmod_mpoly_gen(xalpha, m, ctx);
     fq_nmod_mpoly_sub_fq_nmod(xalpha, xalpha, alpha + m - 1, ctx);
@@ -52,8 +53,10 @@ static int _hlift_quartic2(
         fq_nmod_mpolyv_fit_length(B + i, degs[m] + 1, ctx);
         for (j = B[i].length; j <= degs[m]; j++)
             fq_nmod_mpoly_zero(B[i].coeffs + j, ctx);
-        betas[i] = B[i].coeffs[0];
     }
+
+    for (i = 0; i < r; i++)
+        betas[i] = B[i].coeffs[0];
 
     success = fq_nmod_mpoly_pfrac_init(I, bits, r, m - 1, betas, alpha, ctx);
     FLINT_ASSERT(success == 1);
@@ -72,13 +75,14 @@ static int _hlift_quartic2(
     {
         fq_nmod_mpoly_divrem(t2, t, Aq, xalpha, ctx);
         fq_nmod_mpoly_swap(Aq, t2, ctx);
+        fq_nmod_mpoly_geobucket_set(G, t, ctx);
 
         for (i = 0; i <= j; i++)
         {
-            fq_nmod_mpoly_mul(t2, B[0].coeffs + i, B[1].coeffs + j - i, ctx);
-            fq_nmod_mpoly_sub(t3, t, t2, ctx);
-            fq_nmod_mpoly_swap(t, t3, ctx);
+            fq_nmod_mpoly_mul(t, B[0].coeffs + i, B[1].coeffs + j - i, ctx);
+            fq_nmod_mpoly_geobucket_sub(G, t, ctx);
         }
+        fq_nmod_mpoly_geobucket_empty(t, G, ctx);
 
         if (fq_nmod_mpoly_is_zero(t, ctx))
             continue;
@@ -126,6 +130,7 @@ cleanup:
     fq_nmod_mpoly_clear(t3, ctx);
     fq_nmod_mpoly_clear(xalpha, ctx);
     fq_nmod_mpoly_clear(Aq, ctx);
+    fq_nmod_mpoly_geobucket_clear(G, ctx);
 
     return success;
 }

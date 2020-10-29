@@ -4,7 +4,7 @@
 ================================================================================================
 
     The exponents follow the ``mpoly`` interface.
-    A coefficient may be referenced as a ``fq_nmod_struct *``.
+    No references to the coefficients are available.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -255,10 +255,6 @@ Container operations
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
 
-.. function:: fq_nmod_struct * fq_nmod_mpoly_term_coeff_ref(fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
-
-    Return a reference to the coefficient of index `i` of ``A``.
-
 .. function:: int fq_nmod_mpoly_is_canonical(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
@@ -490,6 +486,16 @@ Greatest Common Divisor
 
     Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
+
+.. function:: int fq_nmod_mpoly_gcd_cofactors(fq_nmod_mpoly_t G, fq_nmod_mpoly_t Abar, fq_nmod_mpoly_t Bbar, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+
+    Do the operation of :func:`fq_nmod_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
+
+.. function:: int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+              int fq_nmod_mpoly_gcd_hensel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+              int fq_nmod_mpoly_gcd_zippel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
 
 
 Univariate Functions

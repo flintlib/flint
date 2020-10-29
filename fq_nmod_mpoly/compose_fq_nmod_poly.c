@@ -47,6 +47,7 @@ static void _rbnode_clear_sp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
 int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
                 fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     int success = 1;
     int new;
     slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
@@ -54,7 +55,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly
     ulong mask;
     slong entries, k_len;
     slong Blen;
-    const fq_nmod_struct * Bcoeff;
+    const mp_limb_t * Bcoeff;
     ulong * Bexp;
     slong * degrees;
     slong * offs;
@@ -151,8 +152,9 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly
             fq_nmod_poly_zero(node->data, ctx->fqctx);
         }
 
-        fq_nmod_poly_zero(t, ctx->fqctx);
-        fq_nmod_poly_set_coeff(t, 0, Bcoeff + i, ctx->fqctx);
+        fq_nmod_poly_fit_length(t, 1, ctx->fqctx);
+        n_fq_get_fq_nmod(t->coeffs + 0, Bcoeff + d*i, ctx->fqctx);
+        t->length = 1;
         for (k = 0; k < k_len; k++)
         {
             if ((Bexp[N*i + offs[k]] & masks[k]) != WORD(0))
@@ -246,6 +248,7 @@ static int _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
 int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
                 fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     int success = 1;
     int new;
     ulong l;
@@ -254,7 +257,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly
     slong main_var, main_off, off;
     slong entries, k_len;
     slong Blen;
-    const fq_nmod_struct * Bcoeff;
+    const mp_limb_t * Bcoeff;
     ulong * Bexp;
     fmpz * degrees;
     slong * offs;
@@ -358,8 +361,9 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly
             fq_nmod_poly_zero(node->data, ctx->fqctx);
         }
 
-        fq_nmod_poly_zero(t, ctx->fqctx);
-        fq_nmod_poly_set_coeff(t, 0, Bcoeff + i, ctx->fqctx);
+        fq_nmod_poly_fit_length(t, 1, ctx->fqctx);
+        n_fq_get_fq_nmod(t->coeffs + 0, Bcoeff + d*i, ctx->fqctx);
+        t->length = 1;
         for (k = 0; k < k_len; k++)
         {
             if ((Bexp[N*i + offs[k]] & masks[k]) != WORD(0))
@@ -414,4 +418,3 @@ int fq_nmod_mpoly_compose_fq_nmod_poly(fq_nmod_poly_t A,
         return _fq_nmod_mpoly_compose_fq_nmod_poly_mp(A, B, C, ctx);
     }
 }
-

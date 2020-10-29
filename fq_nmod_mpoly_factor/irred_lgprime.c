@@ -12,7 +12,6 @@
 #include "nmod_mpoly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
 
-
 void bad_n_fq_embed_sm_to_lg(
     mp_limb_t * out_,            /* element of lgctx */
     const n_poly_t in_,  /* poly over smctx */
@@ -24,7 +23,7 @@ void bad_n_fq_embed_sm_to_lg(
     fq_nmod_init(out, emb->lgctx);
     fq_nmod_poly_init(in, emb->smctx);
 
-    n_poly_fq_get_fq_nmod_poly(in, in_, emb->smctx);
+    n_fq_poly_get_fq_nmod_poly(in, in_, emb->smctx);
     bad_fq_nmod_embed_sm_to_lg(out, in , emb);
     n_fq_set_fq_nmod(out_, out, emb->lgctx);
 
@@ -41,7 +40,7 @@ void bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(
 
     fq_nmod_poly_init(in, emb->smctx);
 
-    n_poly_fq_get_fq_nmod_poly(in, in_, emb->smctx);
+    n_fq_poly_get_fq_nmod_poly(in, in_, emb->smctx);
     bad_fq_nmod_embed_sm_to_lg(out, in , emb);
 
     fq_nmod_poly_clear(in, emb->smctx);
@@ -60,11 +59,39 @@ void bad_n_fq_embed_lg_to_sm(
 
     n_fq_get_fq_nmod(in, in_, emb->lgctx);
     bad_fq_nmod_embed_lg_to_sm(out, in, emb);
-    n_poly_fq_set_fq_nmod_poly(out_, out, emb->smctx);
+    n_fq_poly_set_fq_nmod_poly(out_, out, emb->smctx);
 
     fq_nmod_clear(in, emb->lgctx);
     fq_nmod_poly_clear(out, emb->smctx);
 }
+
+void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(
+    n_poly_t out_,  /* poly over smctx */
+    const fq_nmod_t in,  /* element of lgctx */
+    const bad_fq_nmod_embed_t emb)
+{
+    fq_nmod_poly_t out;
+
+    fq_nmod_poly_init(out, emb->smctx);
+
+    bad_fq_nmod_embed_lg_to_sm(out, in, emb);
+    n_fq_poly_set_fq_nmod_poly(out_, out, emb->smctx);
+
+    fq_nmod_poly_clear(out, emb->smctx);
+}
+
+void bad_n_fq_embed_sm_elem_to_lg(
+    mp_limb_t * out,
+    const mp_limb_t * in,
+    const bad_fq_nmod_embed_t emb)
+{
+    n_fq_poly_t t;
+    n_fq_poly_init(t);
+    n_fq_poly_set_n_fq(t, in, emb->smctx);
+    bad_n_fq_embed_sm_to_lg(out, t, emb);
+    n_fq_poly_clear(t);    
+}
+
 
 
 static void _map_sm_to_lg(
@@ -74,24 +101,26 @@ static void _map_sm_to_lg(
     const fq_nmod_mpoly_ctx_t ctx,
     const bad_fq_nmod_embed_t emb)
 {
+    slong smd = fq_nmod_ctx_degree(ctx->fqctx);
+    slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
+    slong N = mpoly_words_per_exp(A->bits, ectx->minfo);
+    n_poly_t t;
     slong i;
-    fq_nmod_poly_t t;
 
     FLINT_ASSERT(eA != A);
 
-    fq_nmod_poly_init(t, emb->smctx);
+    n_poly_init(t);
 
-    fq_nmod_mpoly_fit_length_set_bits(eA, A->length, A->bits, ectx);
-    mpoly_copy_monomials(eA->exps, A->exps,
-                         mpoly_words_per_exp(A->bits, ectx->minfo), A->length);
+    fq_nmod_mpoly_fit_length_reset_bits(eA, A->length, A->bits, ectx);
+    mpoly_copy_monomials(eA->exps, A->exps, N, A->length);
     for (i = 0; i < A->length; i++)
     {
-        fq_nmod_poly_set_fq_nmod(t, A->coeffs + i, emb->smctx);
-        bad_fq_nmod_embed_sm_to_lg(eA->coeffs + i, t, emb);
+        n_fq_poly_set_n_fq(t, A->coeffs + smd*i, emb->smctx);
+        bad_n_fq_embed_sm_to_lg(eA->coeffs + lgd*i, t, emb);
     }
     eA->length = A->length;
 
-    fq_nmod_poly_clear(t, emb->smctx);
+    n_poly_clear(t);
 }
 
 static void _frob_combine(
@@ -101,12 +130,14 @@ static void _frob_combine(
     const fq_nmod_mpoly_ctx_t ectx,
     const bad_fq_nmod_embed_t emb)
 {
+    slong smd = fq_nmod_ctx_degree(ctx->fqctx);
+    slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
     slong i, j;
     fq_nmod_mpolyv_t tfac;
     fq_nmod_mpoly_t t;
     fq_nmod_mpoly_struct * s;
-    fq_nmod_poly_t c;
-    slong k = fq_nmod_ctx_degree(ectx->fqctx)/fq_nmod_ctx_degree(ctx->fqctx);
+    n_poly_t c;
+    slong k = lgd/smd;
     fmpz_t q;
 
     FLINT_ASSERT(k > 1);
@@ -114,7 +145,7 @@ static void _frob_combine(
     fmpz_init(q);
     fq_nmod_mpoly_init(t, ectx);
     fq_nmod_mpolyv_init(tfac, ectx);
-    fq_nmod_poly_init(c, ctx->fqctx);
+    n_poly_init(c);
 
     fmpz_pow_ui(q, fq_nmod_ctx_prime(ctx->fqctx), fq_nmod_ctx_degree(ctx->fqctx));
 
@@ -131,7 +162,7 @@ static void _frob_combine(
         for (i = 1; i < k; i++)
         {
             for (j = 0; j < t->length; j++)
-                fq_nmod_pow(t->coeffs + j, t->coeffs + j, q, ectx->fqctx);
+                n_fq_pow_fmpz(t->coeffs + lgd*j, t->coeffs + lgd*j, q, ectx->fqctx);
 
             for (j = 0; j < eAf->length; j++)
             {
@@ -157,23 +188,23 @@ static void _frob_combine(
         s = Af->coeffs + Af->length;
         Af->length++;
 
-        fq_nmod_mpoly_fit_length_set_bits(s, t->length, t->bits, ctx);
+        fq_nmod_mpoly_fit_length_reset_bits(s, t->length, t->bits, ctx);
         s->length = t->length;
         mpoly_copy_monomials(s->exps, t->exps,
                          mpoly_words_per_exp(t->bits, ectx->minfo), t->length);
         for (i = 0; i < t->length; i++)
         {
-            bad_fq_nmod_embed_lg_to_sm(c, t->coeffs + i, emb);
+            bad_n_fq_embed_lg_to_sm(c, t->coeffs + lgd*i, emb);
             if (c->length != 1)
             {
                 flint_printf("fatal error in _frob_combine");
                 flint_abort();
             }
-            fq_nmod_swap(s->coeffs + i, c->coeffs + 0, ctx->fqctx);
+            _n_fq_set(s->coeffs + smd*i, c->coeffs + smd*0, smd);
         }
     }
 
-    fq_nmod_poly_clear(c, ctx->fqctx);
+    n_poly_clear(c);
     fq_nmod_mpolyv_clear(tfac, ectx);
     fq_nmod_mpoly_clear(t, ectx);
     fmpz_clear(q);
@@ -255,7 +286,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_wang(
     slong i;
 
     FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(fq_nmod_is_one(A->coeffs + 0, ctx->fqctx));
+    FLINT_ASSERT(_n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx)));
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, state);
@@ -335,7 +366,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_zippel(
     slong i;
 
     FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(fq_nmod_is_one(A->coeffs + 0, ctx->fqctx));
+    FLINT_ASSERT(_n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx)));
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, state);

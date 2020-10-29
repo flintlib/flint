@@ -33,7 +33,7 @@ void check_omega(slong lower, slong upper, const fq_nmod_mpoly_t p, const fq_nmo
 
     for (i = 0; i < g->num; i++)
     {
-        if (g->poly[i].length < 1 || !fq_nmod_is_one(g->poly[i].coeffs + 0, ctx->fqctx))
+        if (!fq_nmod_mpoly_is_monic(g->poly + i, ctx))
         {
             flint_printf("FAIL:\nfactorization is not unit normal\n");
             flint_abort();

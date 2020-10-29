@@ -17,10 +17,7 @@ int
 main(void)
 {
     slong i, j, v;
-    int tmul = 5;
-#ifdef _WIN32
-    tmul = 1;
-#endif
+    int tmul = 20;
     FLINT_TEST_INIT(state);
 
     flint_printf("evaluate....");
@@ -30,7 +27,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
-        nmod_mpoly_t f;
+        nmod_mpoly_t f, g;
         mp_limb_t fe;
         mp_limb_t * vals;
         slong * perm;
@@ -44,8 +41,9 @@ main(void)
         nvars = ctx->minfo->nvars;
 
         nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
 
-        len = n_randint(state, 100);
+        len = n_randint(state, 50);
         exp_bits = n_randint(state, 200) + 1;
 
         perm = (slong *) flint_malloc(nvars*sizeof(slong));
@@ -73,8 +71,16 @@ main(void)
 
             for (v = 0; v < nvars; v++)
             {
+                nmod_mpoly_evaluate_one_ui(g, f, perm[v], vals[perm[v]], ctx);
+                nmod_mpoly_assert_canonical(g, ctx);
                 nmod_mpoly_evaluate_one_ui(f, f, perm[v], vals[perm[v]], ctx);
                 nmod_mpoly_assert_canonical(f, ctx);
+                if (!nmod_mpoly_equal(f, g, ctx))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Check evalone aliasing\ni: %wd  j: %wd\n", i, j);
+                    flint_abort();
+                }
             }
             if (!nmod_mpoly_equal_ui(f, fe, ctx))
             {
@@ -87,6 +93,7 @@ main(void)
         flint_free(vals);
 
         nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
         nmod_mpoly_ctx_clear(ctx);
 
         flint_free(perm);
@@ -113,8 +120,8 @@ main(void)
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(fg, ctx);
 
-        len1 = n_randint(state, 500);
-        len2 = n_randint(state, 500);
+        len1 = n_randint(state, 100);
+        len2 = n_randint(state, 100);
         exp_bits1 = n_randint(state, 200) + 1;
         exp_bits2 = n_randint(state, 200) + 1;
 
@@ -170,8 +177,8 @@ main(void)
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(fg, ctx);
 
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20);
         exp_bits1 = n_randint(state, 200) + 1;
         exp_bits2 = n_randint(state, 200) + 1;
 

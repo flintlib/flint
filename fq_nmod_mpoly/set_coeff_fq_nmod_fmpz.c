@@ -11,9 +11,13 @@
 
 #include "fq_nmod_mpoly.h"
 
-void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
-            const fq_nmod_t c, const fmpz * exp, const fq_nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(
+    fq_nmod_mpoly_t A,
+    const fq_nmod_t c,
+    const fmpz * exp,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     flint_bitcnt_t exp_bits;
     slong i, N, index;
     ulong * cmpmask;
@@ -25,59 +29,61 @@ void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-    fq_nmod_mpoly_fit_bits(poly, exp_bits, ctx);
+    fq_nmod_mpoly_fit_length_fit_bits(A, A->length, exp_bits, ctx);
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, poly->bits, ctx->minfo);
+    mpoly_get_cmpmask(cmpmask, N, A->bits, ctx->minfo);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    mpoly_set_monomial_ffmpz(packed_exp, exp, poly->bits, ctx->minfo);
-    exists = mpoly_monomial_exists(&index, poly->exps,
-                                  packed_exp, poly->length, N, cmpmask);
+    mpoly_set_monomial_ffmpz(packed_exp, exp, A->bits, ctx->minfo);
+    exists = mpoly_monomial_exists(&index, A->exps,
+                                  packed_exp, A->length, N, cmpmask);
 
     if (!exists)
     {
         if (!fq_nmod_is_zero(c, ctx->fqctx))
         {       
             /* make new term only if coeff is nonzero*/
-            fq_nmod_mpoly_fit_length(poly, poly->length + 1, ctx);
+            fq_nmod_mpoly_fit_length(A, A->length + 1, ctx);
 
-            for (i = poly->length; i >= index + 1; i--)
+            for (i = A->length; i >= index + 1; i--)
             {
-                fq_nmod_set(poly->coeffs + i, poly->coeffs + i - 1, ctx->fqctx);
-                mpoly_monomial_set(poly->exps + N*i, poly->exps + N*(i - 1), N);
+                _n_fq_set(A->coeffs + d*i, A->coeffs + d*(i - 1), d);
+                mpoly_monomial_set(A->exps + N*i, A->exps + N*(i - 1), N);
             }
 
-            fq_nmod_set(poly->coeffs + index, c, ctx->fqctx);
-            mpoly_monomial_set(poly->exps + N*index, packed_exp, N);
+            n_fq_set_fq_nmod(A->coeffs + d*index, c, ctx->fqctx);
+            mpoly_monomial_set(A->exps + N*index, packed_exp, N);
 
-            poly->length++; /* safe because length is increasing */
+        _fq_nmod_mpoly_set_length(A, A->length + 1, ctx);
         }
     }
     else if (fq_nmod_is_zero(c, ctx->fqctx)) /* zero coeff, remove term */
     {
-        for (i = index; i < poly->length - 1; i++)
+        for (i = index; i < A->length - 1; i++)
         {
-            fq_nmod_set(poly->coeffs + i, poly->coeffs + i + 1, ctx->fqctx);
-            mpoly_monomial_set(poly->exps + N*i, poly->exps + N*(i + 1), N);
+            _n_fq_set(A->coeffs + d*i, A->coeffs + d*(i + 1), d);
+            mpoly_monomial_set(A->exps + N*i, A->exps + N*(i + 1), N);
         }
 
-        _fq_nmod_mpoly_set_length(poly, poly->length - 1, ctx);
-
+        _fq_nmod_mpoly_set_length(A, A->length - 1, ctx);
     }
     else /* term with that monomial exists, coeff is nonzero */
     {
-        fq_nmod_set(poly->coeffs + index, c, ctx->fqctx);  
+        n_fq_set_fq_nmod(A->coeffs + d*index, c, ctx->fqctx);  
     }
 
     TMP_END; 
 }
 
 
-void fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
-          const fq_nmod_t c, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(
+    fq_nmod_mpoly_t A,
+    const fq_nmod_t c,
+    fmpz * const * exp,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->minfo->nvars;
     fmpz * newexp;
@@ -91,7 +97,7 @@ void fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
         fmpz_set(newexp + i, exp[i]);
     }
 
-    _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(poly, c, newexp, ctx);
+    _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(A, c, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);

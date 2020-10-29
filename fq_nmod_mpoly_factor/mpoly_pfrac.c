@@ -32,43 +32,24 @@ int fq_nmod_mpoly_pfrac_init(
     I->r = r;
     I->w = w;
 
-    I->dbetas = (fq_nmod_poly_struct *) flint_malloc(
-                                                r*sizeof(fq_nmod_poly_struct));
-
-    I->inv_prod_dbetas = (fq_nmod_poly_struct *) flint_malloc(
-                                               r* sizeof(fq_nmod_poly_struct));
-
-    I->prod_mbetas = (fq_nmod_mpoly_struct *) flint_malloc(
-                                       (w + 1)*r*sizeof(fq_nmod_mpoly_struct));
-
-    I->prod_mbetas_coeffs = (fq_nmod_mpolyv_struct *) flint_malloc(
-                                      (w + 1)*r*sizeof(fq_nmod_mpolyv_struct));
-
-    I->mbetas = (fq_nmod_mpoly_struct *) flint_malloc(
-                                       (w + 1)*r*sizeof(fq_nmod_mpoly_struct));
-
-    I->deltas = (fq_nmod_mpoly_struct *) flint_malloc(
-                                       (w + 1)*r*sizeof(fq_nmod_mpoly_struct));
-
-    I->xalpha = (fq_nmod_mpoly_struct *) flint_malloc(
-                                         (w + 1)*sizeof(fq_nmod_mpoly_struct));
-
-    I->q = (fq_nmod_mpoly_struct *) flint_malloc(
-                                         (w + 1)*sizeof(fq_nmod_mpoly_struct));
-
-    I->qt = (fq_nmod_mpoly_struct *) flint_malloc(
-                                         (w + 1)*sizeof(fq_nmod_mpoly_struct));
-
-    I->newt = (fq_nmod_mpoly_struct *) flint_malloc(
-                                         (w + 1)*sizeof(fq_nmod_mpoly_struct));
-
-    I->delta_coeffs = (fq_nmod_mpolyv_struct *) flint_malloc(
-                                      (w + 1)*r*sizeof(fq_nmod_mpolyv_struct));
+    I->dbetas = FLINT_ARRAY_ALLOC(r, fq_nmod_poly_struct);
+    I->inv_prod_dbetas = FLINT_ARRAY_ALLOC(r, fq_nmod_poly_struct);
+    I->prod_mbetas = FLINT_ARRAY_ALLOC((w + 1)*r, fq_nmod_mpoly_struct);
+    I->prod_mbetas_coeffs = FLINT_ARRAY_ALLOC((w + 1)*r, fq_nmod_mpolyv_struct);
+    I->mbetas = FLINT_ARRAY_ALLOC((w + 1)*r, fq_nmod_mpoly_struct);
+    I->deltas = FLINT_ARRAY_ALLOC((w + 1)*r, fq_nmod_mpoly_struct);
+    I->xalpha = FLINT_ARRAY_ALLOC(w + 1, fq_nmod_mpoly_struct);
+    I->q = FLINT_ARRAY_ALLOC(w + 1, fq_nmod_mpoly_struct);
+    I->G = FLINT_ARRAY_ALLOC(w + 1, fq_nmod_mpoly_geobucket_struct);
+    I->qt = FLINT_ARRAY_ALLOC(w + 1, fq_nmod_mpoly_struct);
+    I->newt = FLINT_ARRAY_ALLOC(w + 1, fq_nmod_mpoly_struct);
+    I->delta_coeffs = FLINT_ARRAY_ALLOC((w + 1)*r, fq_nmod_mpolyv_struct);
 
     for (i = 0; i <= w; i++)
     {
         fq_nmod_mpoly_init(I->xalpha + i, ctx);
         fq_nmod_mpoly_init(I->q + i, ctx);
+        fq_nmod_mpoly_geobucket_init(I->G + i, ctx);
         fq_nmod_mpoly_init(I->qt + i, ctx);
         fq_nmod_mpoly_init(I->newt + i, ctx);
         for (j = 0; j < r; j++)
@@ -174,10 +155,8 @@ int fq_nmod_mpoly_pfrac_init(
     fq_nmod_poly_clear(S, ctx->fqctx);
     fq_nmod_poly_clear(pq, ctx->fqctx);
 
-    I->dbetas_mvar = (fq_nmod_mpoly_struct *) flint_malloc(
-                                               r*sizeof(fq_nmod_mpoly_struct));
-    I->inv_prod_dbetas_mvar = (fq_nmod_mpoly_struct *) flint_malloc(
-                                               r*sizeof(fq_nmod_mpoly_struct));
+    I->dbetas_mvar = FLINT_ARRAY_ALLOC(r, fq_nmod_mpoly_struct);
+    I->inv_prod_dbetas_mvar = FLINT_ARRAY_ALLOC(r, fq_nmod_mpoly_struct);
     for (j = 0; j < r; j++)
     {
         fq_nmod_mpoly_init(I->dbetas_mvar + j, ctx);
@@ -200,7 +179,9 @@ int fq_nmod_mpoly_pfrac_init(
 }
 
 
-void fq_nmod_mpoly_pfrac_clear(fq_nmod_mpoly_pfrac_t I, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_pfrac_clear(
+    fq_nmod_mpoly_pfrac_t I,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
 
@@ -208,6 +189,7 @@ void fq_nmod_mpoly_pfrac_clear(fq_nmod_mpoly_pfrac_t I, const fq_nmod_mpoly_ctx_
     {
         fq_nmod_mpoly_clear(I->xalpha + i, ctx);
         fq_nmod_mpoly_clear(I->q + i, ctx);
+        fq_nmod_mpoly_geobucket_clear(I->G + i, ctx);
         fq_nmod_mpoly_clear(I->qt + i, ctx);
         fq_nmod_mpoly_clear(I->newt + i, ctx);
         for (j = 0; j < I->r; j++)
@@ -216,6 +198,7 @@ void fq_nmod_mpoly_pfrac_clear(fq_nmod_mpoly_pfrac_t I, const fq_nmod_mpoly_ctx_
 
     flint_free(I->xalpha);
     flint_free(I->q);
+    flint_free(I->G);
     flint_free(I->qt);
     flint_free(I->newt);
     flint_free(I->delta_coeffs);
@@ -268,6 +251,7 @@ int fq_nmod_mpoly_pfrac(
     fq_nmod_mpoly_struct * qt = I->qt + l;
     fq_nmod_mpoly_struct * newt = I->newt + l;
     fq_nmod_mpolyv_struct * delta_coeffs = I->delta_coeffs + l*I->r;
+    fq_nmod_mpoly_geobucket_struct * G = I->G + l;
 
     FLINT_ASSERT(l >= 0);
 
@@ -292,6 +276,8 @@ int fq_nmod_mpoly_pfrac(
     {
         fq_nmod_mpoly_divrem(q, newt, t, I->xalpha + l, ctx);
         fq_nmod_mpoly_swap(t, q, ctx);
+        fq_nmod_mpoly_geobucket_set(G, newt, ctx);
+
         for (j = 0; j < k; j++)
         for (i = 0; i < I->r; i++)
         {
@@ -302,9 +288,13 @@ int fq_nmod_mpoly_pfrac(
 
             fq_nmod_mpoly_mul(qt, delta_coeffs[i].coeffs + j,
                         I->prod_mbetas_coeffs[l*I->r + i].coeffs + k - j, ctx);
-            fq_nmod_mpoly_sub(q, newt, qt, ctx);
-            fq_nmod_mpoly_swap(newt, q, ctx);
+            fq_nmod_mpoly_geobucket_sub(G, qt, ctx);
         }
+
+        fq_nmod_mpoly_geobucket_empty(newt, G, ctx);
+
+        if (fq_nmod_mpoly_is_zero(newt, ctx))
+            continue;
 
         success = fq_nmod_mpoly_pfrac(l - 1, newt, degs, I, ctx);
         if (success < 1)

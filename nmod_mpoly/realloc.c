@@ -11,42 +11,23 @@
 
 #include "nmod_mpoly.h"
 
-void _nmod_mpoly_realloc(mp_limb_t ** coeff, ulong ** exp,
-                                             slong * alloc, slong len, slong N)
+void nmod_mpoly_realloc(
+    nmod_mpoly_t A,
+    slong alloc,
+    const nmod_mpoly_ctx_t ctx)
 {
-    (* coeff) = (mp_limb_t *) flint_realloc(* coeff, len*sizeof(mp_limb_t));
-    (* exp) = (ulong *) flint_realloc(* exp, len*N*sizeof(ulong));    
-    (* alloc) = len;
-}
-
-void nmod_mpoly_realloc(nmod_mpoly_t poly,
-                                       slong alloc, const nmod_mpoly_ctx_t ctx)
-{
-    slong N;
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     if (alloc == 0)             /* Clear up, reinitialise */
     {
-        nmod_mpoly_clear(poly, ctx);
-        nmod_mpoly_init(poly, ctx);
+        nmod_mpoly_clear(A, ctx);
+        nmod_mpoly_init(A, ctx);
         return;
     }
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    A->exps_alloc = N*alloc;
+    A->exps = (ulong *) flint_realloc(A->exps, A->exps_alloc*sizeof(ulong));
 
-    if (poly->alloc != 0)            /* Realloc */
-    {
-        nmod_mpoly_truncate(poly, alloc, ctx);
-
-        poly->coeffs = (mp_limb_t *) flint_realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
-        poly->exps   = (ulong *) flint_realloc(poly->exps, alloc*N*sizeof(ulong));
-
-    }
-    else                        /* Nothing allocated already so do it now */
-    {
-        poly->coeffs = (mp_limb_t *) flint_malloc(alloc*sizeof(mp_limb_t));
-        poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
-    }
-
-    poly->alloc = alloc;
+    A->coeffs_alloc = alloc;
+    A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, A->coeffs_alloc*sizeof(ulong));
 }
-

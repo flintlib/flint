@@ -14,10 +14,12 @@
 int fq_nmod_mpoly_is_gen(const fq_nmod_mpoly_t A,
                                       slong var, const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+
     if (A->length != 1)
         return 0;
 
-    if (!fq_nmod_is_one(A->coeffs + 0, ctx->fqctx))
+    if (!_n_fq_is_one(A->coeffs + d*0, d))
         return 0;
 
     return mpoly_is_gen(A->exps, var, A->bits, ctx->minfo);

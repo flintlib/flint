@@ -17,16 +17,13 @@ void nmod_mpoly_gen(nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 
     bits = mpoly_gen_bits_required(var, ctx->minfo);
     bits = mpoly_fix_bits(bits, ctx->minfo);
+    nmod_mpoly_fit_length_reset_bits(A, 1, bits, ctx);
 
-    nmod_mpoly_fit_length(A, WORD(1), ctx);
-    nmod_mpoly_fit_bits(A, bits, ctx);
-    A->bits = bits;
-
-    A->coeffs[0] = UWORD(1);
+    A->coeffs[0] = 1;
     if (bits <= FLINT_BITS)
         mpoly_gen_monomial_sp(A->exps, var, bits, ctx->minfo);
     else
         mpoly_gen_monomial_offset_mp(A->exps, var, bits, ctx->minfo);
 
-    _nmod_mpoly_set_length(A, WORD(1), ctx);
+    _nmod_mpoly_set_length(A, 1, ctx);
 }
