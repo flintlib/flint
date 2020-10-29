@@ -19,7 +19,7 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("n_poly_fq_divrem....");
+    flint_printf("n_fq_poly_divrem....");
     fflush(stdout);
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
@@ -45,34 +45,27 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            n_poly_fq_randtest(a, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(b, state, n_randint(state, 15), ctx);
-            n_poly_fq_randtest(c, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(d, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(e, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(f, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(a, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(b, state, n_randint(state, 15), ctx);
+            n_fq_poly_randtest(c, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(d, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(e, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(f, state, n_randint(state, 20), ctx);
 
             if (n_poly_is_zero(b))
-                n_poly_fq_one(b, ctx);
+                n_fq_poly_one(b, ctx);
 
-            n_poly_fq_get_fq_nmod_poly(A, a, ctx);
-            n_poly_fq_get_fq_nmod_poly(B, b, ctx);
+            n_fq_poly_get_fq_nmod_poly(A, a, ctx);
+            n_fq_poly_get_fq_nmod_poly(B, b, ctx);
             fq_nmod_poly_divrem(Q, R, A, B, ctx);
-            n_poly_fq_set_fq_nmod_poly(q, Q, ctx);
-            n_poly_fq_set_fq_nmod_poly(r, R, ctx);
+            n_fq_poly_set_fq_nmod_poly(q, Q, ctx);
+            n_fq_poly_set_fq_nmod_poly(r, R, ctx);
 
-            n_poly_fq_divrem(c, d, a, b, ctx);
-            n_poly_fq_divrem(c, d, a, b, ctx);
-            if (!n_poly_fq_equal(c, q, ctx) ||
-                !n_poly_fq_equal(d, r, ctx))
+            n_fq_poly_divrem(c, d, a, b, ctx);
+            n_fq_poly_divrem(c, d, a, b, ctx);
+            if (!n_fq_poly_equal(c, q, ctx) ||
+                !n_fq_poly_equal(d, r, ctx))
             {
-flint_printf("\n");
-flint_printf("q: "); n_poly_fq_print_pretty(q, "x", ctx); flint_printf("\n");
-flint_printf("r: "); n_poly_fq_print_pretty(r, "x", ctx); flint_printf("\n");
-flint_printf("\n");
-flint_printf("c: "); n_poly_fq_print_pretty(c, "x", ctx); flint_printf("\n");
-flint_printf("d: "); n_poly_fq_print_pretty(d, "x", ctx); flint_printf("\n");
-
                 flint_printf("FAIL\n i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }

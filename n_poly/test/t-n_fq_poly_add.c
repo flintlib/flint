@@ -41,24 +41,24 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            n_poly_fq_randtest(a, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(b, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(c, state, n_randint(state, 20), ctx);
-            n_poly_fq_randtest(d, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(a, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(b, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(c, state, n_randint(state, 20), ctx);
+            n_fq_poly_randtest(d, state, n_randint(state, 20), ctx);
 
-            n_poly_fq_get_fq_nmod_poly(B, b, ctx);
-            n_poly_fq_get_fq_nmod_poly(C, c, ctx);
+            n_fq_poly_get_fq_nmod_poly(B, b, ctx);
+            n_fq_poly_get_fq_nmod_poly(C, c, ctx);
             fq_nmod_poly_add(A, B, C, ctx);
-            n_poly_fq_set_fq_nmod_poly(a, A, ctx);
+            n_fq_poly_set_fq_nmod_poly(a, A, ctx);
 
-            n_poly_fq_add(d, b, c, ctx);
-            n_poly_fq_set(e, b, ctx);
-            n_poly_fq_add(b, b, c, ctx);
-            n_poly_fq_add(c, e, c, ctx);
+            n_fq_poly_add(d, b, c, ctx);
+            n_fq_poly_set(e, b, ctx);
+            n_fq_poly_add(b, b, c, ctx);
+            n_fq_poly_add(c, e, c, ctx);
 
-            if (!n_poly_fq_equal(a, d, ctx) ||
-                !n_poly_fq_equal(a, b, ctx) ||
-                !n_poly_fq_equal(a, c, ctx))
+            if (!n_fq_poly_equal(a, d, ctx) ||
+                !n_fq_poly_equal(a, b, ctx) ||
+                !n_fq_poly_equal(a, c, ctx))
             {
                 flint_printf("FAIL\n i = %wd, j = %wd\n", i, j);
                 flint_abort();
