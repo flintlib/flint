@@ -25,7 +25,8 @@
 #include <gmp.h>
 #define ulong mp_limb_t
 
-#include "nmod_mpoly.h"
+#include "nmod_poly.h"
+#include "fq_nmod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -1546,6 +1547,11 @@ FLINT_DLL void n_fq_bpoly_set_n_fq_poly_gen1(
 FLINT_DLL void n_fq_bpoly_derivative_gen0(
     n_bpoly_t A,
     const n_bpoly_t B,
+    const fq_nmod_ctx_t ctx);
+
+FLINT_DLL void n_fq_bpoly_scalar_mul_n_fq(
+    n_fq_bpoly_t A,
+    const mp_limb_t * c,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void n_fq_bpoly_taylor_shift_gen1_fq_nmod(

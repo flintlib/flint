@@ -36,6 +36,7 @@
 #include "mpoly.h"
 #include "fq_nmod_poly.h"
 #include "thread_pool.h"
+#include "n_poly.h"
 
 
 #ifdef __cplusplus
@@ -1289,31 +1290,6 @@ FLINT_DLL void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b,
                                                        const nmodf_ctx_t fctx);
 
 
-/* GCD ***********************************************************************/
-
-FLINT_DLL void nmod_mpoly_term_content(nmod_mpoly_t poly1,
-                         const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_gcd_prs(nmod_mpoly_t poly1, nmod_mpoly_t poly2,
-                               nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_gcd_is_unit(const nmod_mpoly_t a, const nmod_mpoly_t b,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_resultant(nmod_mpoly_t poly1,
-                const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
-                                        slong var, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_discriminant(nmod_mpoly_t poly1,
-              const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpolyd_ctx_set_for_gcd(nmod_mpolyd_ctx_t dctx,
-                            const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
-                                                       const nmodf_ctx_t fctx);
-
 /* mpolyu ********************************************************************/
 
 FLINT_DLL void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
@@ -1605,8 +1581,14 @@ NMOD_MPOLY_INLINE nmod_poly_struct * nmod_mpolyun_leadcoeff_poly(
 }
 
 
-/*****************************************************************************/
+/* GCD ***********************************************************************/
 
+FLINT_DLL int mpoly_gcd_get_use_first(slong rGdeg, slong Adeg, slong Bdeg,
+                                                               slong gammadeg);
+
+FLINT_DLL int nmod_mpoly_gcd_get_use_new(slong rGdeg, slong Adeg, slong Bdeg,
+             slong gammadeg, slong degxAB, slong degyAB, slong numABgamma,
+             const n_polyun_t G, const n_polyun_t Abar, const n_polyun_t Bbar);
 
 FLINT_DLL void nmod_mpolyu_setform_mpolyun(nmod_mpolyu_t A, nmod_mpolyun_t B,
                                                    const nmod_mpoly_ctx_t ctx);
@@ -1705,6 +1687,15 @@ FLINT_DLL int nmod_mpolyl_gcd_hensel_medprime(
     const nmod_mpoly_t smB,
     const nmod_mpoly_ctx_t smctx);
 
+FLINT_DLL void _nmod_mpoly_monomial_evals_cache(n_poly_t E,
+                    const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
+                    const mp_limb_t * betas, slong start, slong stop,
+                                          const mpoly_ctx_t mctx, nmod_t mod);
+
+FLINT_DLL void _nmod_mpoly_monomial_evals2_cache(n_polyun_t E,
+          const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
+          const mp_limb_t * betas, slong m, const mpoly_ctx_t ctx, nmod_t mod);
+
 /* interp ********************************************************************/
 
 FLINT_DLL void _nmod_poly_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
@@ -1722,6 +1713,13 @@ FLINT_DLL int nmod_mpolyn_interp_crt_2sm_poly(slong * lastdeg_,
                      nmod_mpolyn_t F, nmod_mpolyn_t T, const nmod_poly_t A,
                              const nmod_poly_t B, const nmod_poly_t modulus,
                             nmod_poly_t alphapow,  const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_interp_lift_sm_bpoly(nmod_mpolyn_t F,
+                                      n_bpoly_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyn_interp_crt_sm_bpoly(slong * lastdeg,
+            nmod_mpolyn_t F, nmod_mpolyn_t T, n_bpoly_t A, n_poly_t modulus,
+                                n_poly_t alphapow, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpolyn_interp_reduce_2sm_mpolyn(nmod_mpolyn_t E,
                             nmod_mpolyn_t F, nmod_mpolyn_t A, slong var,

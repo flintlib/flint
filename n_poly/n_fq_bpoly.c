@@ -251,3 +251,27 @@ void n_fq_bpoly_derivative_gen0(
     A->length = Blen - 1;
     n_bpoly_normalise(A);
 }
+
+
+void n_fq_bpoly_scalar_mul_n_fq(
+    n_fq_bpoly_t A,
+    const mp_limb_t * c,
+    const fq_nmod_ctx_t ctx)
+{
+    slong d = fq_nmod_ctx_degree(ctx);
+    slong i;
+
+    if (_n_fq_is_zero(c, d))
+    {
+        A->length = 0;
+        return;
+    }
+
+    if (_n_fq_is_one(c, d))
+    {
+        return;
+    }
+
+    for (i = 0; i < A->length; i++)
+        n_fq_poly_scalar_mul_n_fq(A->coeffs + i, A->coeffs + i, c, ctx);
+}

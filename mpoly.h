@@ -39,11 +39,6 @@
  extern "C" {
 #endif
 
-/* TODO move this to fmpz_vec */
-void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len);
-
-
-
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
