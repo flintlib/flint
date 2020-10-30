@@ -1132,10 +1132,15 @@ cleanup:
 
 /*
     x = gen(0), y = gen(1).
-    A is supposed to be squarefree wrt x.
+    A is supposed to be separable wrt x.
     Put the content of A wrt x in c, and the factors in F.
     Return 1 for success, i.e. a good evaluation point y = alpha was found.
     If allow_shift is false, only y = 0 is tried.
+
+    TODO:
+        (1) compute better CLD bounds
+        (2) start with a lower initial precision
+        (3) restart the lifting when nrows(N) decreases
 */
 int n_bpoly_mod_factor_smprime(
     n_poly_t c,     /* poly in gen(1) */
