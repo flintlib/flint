@@ -12,9 +12,9 @@
 #include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
 
-int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
 
-void n_fq_bpoly_content_last(
+/* g is in Fq[gen(1)] */
+static void n_fq_bpoly_content_var0(
     n_fq_poly_t g,
     const n_fq_bpoly_t A,
     const fq_nmod_ctx_t ctx)
@@ -30,7 +30,10 @@ void n_fq_bpoly_content_last(
     }
 }
 
-void n_fq_bpoly_divexact_last(n_fq_bpoly_t A, const n_fq_poly_t b, const fq_nmod_ctx_t ctx)
+static void n_fq_bpoly_divexact_poly_var1(
+    n_fq_bpoly_t A,
+    const n_fq_poly_t b, /* in Fq[gen(1)] */
+    const fq_nmod_ctx_t ctx)
 {
     slong i;
     n_fq_poly_t t, r;
@@ -624,10 +627,10 @@ choose_prime:
 
 successful:
 
-    n_fq_bpoly_content_last(r, G, ctx);
-    n_fq_bpoly_divexact_last(G, r, ctx);
-    n_fq_bpoly_divexact_last(Abar, G->coeffs + G->length - 1, ctx);
-    n_fq_bpoly_divexact_last(Bbar, G->coeffs + G->length - 1, ctx);
+    n_fq_bpoly_content_var0(r, G, ctx);
+    n_fq_bpoly_divexact_poly_var1(G, r, ctx);
+    n_fq_bpoly_divexact_poly_var1(Abar, G->coeffs + G->length - 1, ctx);
+    n_fq_bpoly_divexact_poly_var1(Bbar, G->coeffs + G->length - 1, ctx);
 
 successful_put_content:
 
@@ -828,10 +831,10 @@ int n_fq_bpoly_gcd_brown_smprime(
     gamma   = n_poly_stack_take_top(Sp->poly_stack);
     r       = n_poly_stack_take_top(Sp->poly_stack);
 
-    n_fq_bpoly_content_last(cA, A, ctx);
-    n_fq_bpoly_content_last(cB, B, ctx);
-    n_fq_bpoly_divexact_last(A, cA, ctx);
-    n_fq_bpoly_divexact_last(B, cB, ctx);
+    n_fq_bpoly_content_var0(cA, A, ctx);
+    n_fq_bpoly_content_var0(cB, B, ctx);
+    n_fq_bpoly_divexact_poly_var1(A, cA, ctx);
+    n_fq_bpoly_divexact_poly_var1(B, cB, ctx);
 
     n_fq_poly_gcd(cG, cA, cB, ctx);
     n_fq_poly_divrem(cAbar, r, cA, cG, ctx);
@@ -1019,10 +1022,10 @@ choose_prime:
 
 successful:
 
-    n_fq_bpoly_content_last(modulus, G, ctx);
-    n_fq_bpoly_divexact_last(G, modulus, ctx);
-    n_fq_bpoly_divexact_last(Abar, G->coeffs + G->length - 1, ctx);
-    n_fq_bpoly_divexact_last(Bbar, G->coeffs + G->length - 1, ctx);
+    n_fq_bpoly_content_var0(modulus, G, ctx);
+    n_fq_bpoly_divexact_poly_var1(G, modulus, ctx);
+    n_fq_bpoly_divexact_poly_var1(Abar, G->coeffs + G->length - 1, ctx);
+    n_fq_bpoly_divexact_poly_var1(Bbar, G->coeffs + G->length - 1, ctx);
 
 successful_put_content:
 

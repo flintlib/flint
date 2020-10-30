@@ -1555,3 +1555,43 @@ int nmod_mpolyun_interp_crt_sm_mpolyu(
     return changed;    
 }
 
+
+/*
+    F = F + modulus*(A - F(alpha))
+    monomials assumed to match
+*/
+int nmod_mpolyn_interp_mcrt_sm_mpoly(
+    slong * lastdeg_,
+    nmod_mpolyn_t F,
+    const nmod_mpoly_t A,
+    const n_poly_t modulus,
+    n_poly_t alphapow,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong lastdeg = -1;
+    int changed = 0;
+    slong i;
+    mp_limb_t v;
+    mp_limb_t * Acoeff = A->coeffs;
+    slong Flen = F->length;
+
+    FLINT_ASSERT(Flen == A->length);
+
+    for (i = 0; i < Flen; i++)
+    {
+        /* F term ok, A term ok */
+        v = n_poly_mod_eval_pow((n_poly_struct*)(F->coeffs + i), alphapow, ctx->ffinfo->mod);
+        v = nmod_sub(Acoeff[i], v, ctx->ffinfo->mod);
+        if (v != 0)
+        {
+            changed = 1;
+            n_poly_mod_scalar_addmul_nmod((n_poly_struct*)(F->coeffs + i),
+                (n_poly_struct*)(F->coeffs + i), modulus, v, ctx->ffinfo->mod);
+        }
+        lastdeg = FLINT_MAX(lastdeg, n_poly_degree((n_poly_struct*)(F->coeffs + i)));
+    }
+
+    *lastdeg_ = lastdeg;
+    return changed;
+}
+

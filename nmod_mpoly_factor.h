@@ -417,9 +417,6 @@ FLINT_DLL int n_polyu3_mod_hlift(slong r, n_polyun_struct * BB,  n_polyu_t A,
                       n_polyu_struct * B, mp_limb_t beta, slong degree_inner,
                                                         const nmodf_ctx_t ctx);
 
-FLINT_DLL int n_polyu2_add_zip_must_match(n_polyun_t Z, const n_bpoly_t A,
-                                                             slong cur_length);
-
 FLINT_DLL int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
             const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
                                const nmod_mpoly_ctx_t ctx, flint_rand_t state);

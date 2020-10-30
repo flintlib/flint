@@ -158,27 +158,6 @@ void n_fq_bpoly_get_coeff_fq_nmod(
         n_fq_poly_get_coeff_fq_nmod(c, A->coeffs + e0, e1, ctx);
 }
 
-void n_fq_bpoly_set_coeff_fq_nmod(
-    n_fq_bpoly_t A,
-    slong xi,
-    slong yi,
-    const fq_nmod_t c,
-    const fq_nmod_ctx_t ctx)
-{
-    slong i;
-
-    if (xi >= A->length)
-    {
-        n_bpoly_fit_length(A, xi + 1);
-        for (i = A->length; i <= xi; i++)
-            n_poly_zero(A->coeffs + i);
-        A->length = xi + 1;
-    }
-
-    n_fq_poly_set_coeff_fq_nmod(A->coeffs + xi, yi, c, ctx);
-    n_bpoly_normalise(A);
-}
-
 
 void n_fq_bpoly_set_fq_nmod_poly_gen0(
     n_fq_bpoly_t A,
@@ -206,16 +185,6 @@ void n_fq_bpoly_set_n_fq_poly_gen0(
         n_fq_poly_set_n_fq(A->coeffs + i, B->coeffs + d*i, ctx);
     A->length = B->length;
     n_bpoly_normalise(A);
-}
-
-void n_fq_bpoly_set_fq_nmod_poly_gen1(
-    n_fq_bpoly_t A,
-    const fq_nmod_poly_t B,
-    const fq_nmod_ctx_t ctx)
-{
-    n_bpoly_fit_length(A, 1);
-	n_fq_poly_set_fq_nmod_poly(A->coeffs + 0, B, ctx);
-	A->length = !n_poly_is_zero(A->coeffs + 0);
 }
 
 void n_fq_bpoly_set_n_fq_poly_gen1(

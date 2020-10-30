@@ -111,10 +111,6 @@ void _nmod_mpoly_addmul_array1_ulong3(ulong * poly1,
 ****************************************************/
 
 
-void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp, const ulong * Aexp,
-             slong l1, slong Alen, const ulong * mults, slong num, slong Abits);
-
-
 #define LEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, reduce_coeff)     \
 slong fxn_name(nmod_mpoly_t P, slong Plen, coeff_decl,                         \
              const ulong * mults, slong num, slong array_size, slong top,      \
@@ -413,10 +409,6 @@ cleanup:
 /****************************************************
     DEGLEX and DEGREVLEX
 ****************************************************/
-
-void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp, const ulong * Aexp,
-             slong l1, slong Alen, ulong deg, slong num, slong Abits);
-
 
 
 #define DEGLEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, reduce_coeff)  \

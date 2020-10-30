@@ -213,54 +213,6 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
 }
 
 
-int n_polyu2_add_zip_must_match(
-    n_polyun_t Z,
-    const n_bpoly_t A,
-    slong cur_length)
-{
-    slong i, Ai, ai;
-    n_polyun_term_struct * Zt = Z->terms;
-    const n_poly_struct * Acoeffs = A->coeffs;
-
-    Ai = A->length - 1;
-    ai = (Ai < 0) ? 0 : n_poly_degree(A->coeffs + Ai);
-
-    for (i = 0; i < Z->length; i++)
-    {
-        if (Ai >= 0 && Zt[i].exp == pack_exp2(Ai, ai))
-        {
-            /* Z present, A present */
-            Zt[i].coeff->coeffs[cur_length] = Acoeffs[Ai].coeffs[ai];
-            Zt[i].coeff->length = cur_length + 1;
-            do {
-                ai--;
-            } while (ai >= 0 && Acoeffs[Ai].coeffs[ai] == 0);
-            if (ai < 0)
-            {
-                do {
-                    Ai--;
-                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
-                if (Ai >= 0)
-                    ai = n_poly_degree(Acoeffs + Ai);
-            }
-        }
-        else if (Ai < 0 || Zt[i].exp > pack_exp2(Ai, ai))
-        {
-            /* Z present, A missing */
-            Zt[i].coeff->coeffs[cur_length] = 0;
-            Zt[i].coeff->length = cur_length + 1;
-        }
-        else
-        {
-            /* Z missing, A present */
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-
 static int _fmpz_mpoly_modpk_update_zip(
     fmpz_t pk,
     fmpz_mpoly_t A,
@@ -637,7 +589,7 @@ next_zip_image:
 
     for (i = 0; i < r; i++)
     {
-        success = n_polyu2_add_zip_must_match(Z + i, Ceval + i, cur_zip_image);
+        success = n_polyu2n_add_zip_must_match(Z + i, Ceval + i, cur_zip_image);
         if (!success)
         {
             success = 0;

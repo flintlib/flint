@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
 
 
 slong mpoly_degree_si(const ulong * exps,

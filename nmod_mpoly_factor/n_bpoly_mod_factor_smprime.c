@@ -15,9 +15,7 @@
 #define FLINT_TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC(n*sizeof(T))
 
 
-/********************* crap that goes elsewhere ******************************/
-
-void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)
+static void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)
 {
     slong i, j;
     n_bpoly_zero(a);
@@ -31,7 +29,7 @@ void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)
     }
 }
 
-void n_bpoly_mod_make_monic_series(
+static void n_bpoly_mod_make_monic_series(
     n_bpoly_t A,
     const n_bpoly_t B,
     slong order,
@@ -55,8 +53,6 @@ void n_bpoly_mod_make_monic_series(
     n_bpoly_normalise(A);
 
     n_poly_clear(lcinv);
-
-    
 }
 
 
@@ -88,50 +84,6 @@ static void n_bpoly_mod_eval(
 
     n_poly_clear(alphapow);
 }
-
-
-void nmod_eval_interp_to_coeffs_poly(
-    n_poly_t a,
-    const n_poly_t v,
-    nmod_eval_interp_t E,
-    nmod_t ctx);
-
-void nmod_eval_interp_from_coeffs_poly(
-    n_poly_t v,
-    const n_poly_t a,
-    nmod_eval_interp_t E,
-    nmod_t ctx);
-
-void nmod_evals_zero(n_poly_t a);
-
-void nmod_evals_add_inplace(
-    n_poly_t a,
-    n_poly_t b,
-    slong len,
-    nmod_t ctx);
-
-void nmod_evals_mul(
-    n_poly_t a,
-    n_poly_t b,
-    n_poly_t c,
-    slong len,
-    nmod_t ctx);
-
-void nmod_evals_addmul(
-    n_poly_t a,
-    n_poly_t b,
-    n_poly_t c,
-    slong len,
-    nmod_t ctx);
-
-void nmod_evals_fmma(
-    n_poly_t a,
-    n_poly_t b,
-    n_poly_t c,
-    n_poly_t d,
-    n_poly_t e,
-    slong len,
-    nmod_t ctx);
 
 
 /****************** lifting **************************************************/

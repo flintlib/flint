@@ -16,7 +16,7 @@
 
 #define n_fq_bpoly_swap n_bpoly_swap
 
-void n_fq_bpoly_eval_gen1(
+static void n_fq_bpoly_eval_gen1(
     fq_nmod_poly_t E,
     const n_bpoly_t A,
     const fq_nmod_t alpha,
@@ -41,7 +41,7 @@ void n_fq_bpoly_eval_gen1(
     fq_nmod_poly_clear(s, ctx);
 }
 
-void n_fq_bpoly_make_monic_series(
+static void n_fq_bpoly_make_monic_series(
     n_bpoly_t A,
     const n_bpoly_t B,
     slong order,
@@ -69,7 +69,7 @@ void n_fq_bpoly_make_monic_series(
 
 
 
-void n_fq_bpoly_reverse_gens(
+static void n_fq_bpoly_reverse_gens(
     n_fq_bpoly_t a,
     const n_fq_bpoly_t b,
     const fq_nmod_ctx_t ctx)
@@ -85,50 +85,6 @@ void n_fq_bpoly_reverse_gens(
         }
     }
 }
-
-
-void nmod_eval_interp_to_coeffs_n_fq_poly(
-    n_fq_poly_t a,
-    const n_fq_poly_t v,
-    nmod_eval_interp_t E,
-    const fq_nmod_ctx_t ctx);
-
-void nmod_eval_interp_from_coeffs_n_fq_poly(
-    n_fq_poly_t v,
-    const n_fq_poly_t a,
-    nmod_eval_interp_t E,
-    const fq_nmod_ctx_t ctx);
-
-void n_fq_evals_zero(n_fq_poly_t a);
-
-void n_fq_evals_add_inplace(
-    n_fq_poly_t a,
-    n_fq_poly_t b,
-    slong len,
-    const fq_nmod_ctx_t ctx);
-
-void n_fq_evals_mul(
-    n_fq_poly_t a,
-    n_fq_poly_t b,
-    n_fq_poly_t c,
-    slong len,
-    const fq_nmod_ctx_t ctx);
-
-void n_fq_evals_addmul(
-    n_fq_poly_t a,
-    n_fq_poly_t b,
-    n_fq_poly_t c,
-    slong len,
-    const fq_nmod_ctx_t ctx);
-
-void n_fq_evals_fmma(
-    n_fq_poly_t a,
-    n_fq_poly_t b,
-    n_fq_poly_t c,
-    n_fq_poly_t d,
-    n_fq_poly_t e,
-    slong len,
-    const fq_nmod_ctx_t ctx);
 
 
 /****************** lifting **************************************************/
@@ -589,10 +545,7 @@ static void n_fq_bpoly_lift_start(
         n_fq_poly_divrem_(t, g1, A->coeffs + 0, B[k].coeffs + 0, ctx, L->St);
         n_fq_poly_xgcd(g1, s + k, g2, t, B[k].coeffs + 0, ctx);
         if (!n_fq_poly_is_one(g1, ctx))
-        {
-            flint_printf("oops");
-            flint_abort();
-        }
+            flint_throw(FLINT_IMPINV, "n_fq_bpoly_mod_lift_start: bad inverse");
 
         /* set up mul (mod B[k].coeffs[0]) */
 /*

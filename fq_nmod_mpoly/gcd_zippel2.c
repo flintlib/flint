@@ -348,17 +348,64 @@ static void fq_nmod_mpoly_monomial_evals(
 }
 
 
-
-int qzip_solvel(
+int n_fq_polyun_zip_solve(
     fq_nmod_mpoly_t A,
     n_fq_polyun_t Z,
     n_fq_polyun_t H,
     n_fq_polyun_t M,
-    const fq_nmod_mpoly_ctx_t ctx);
+    const fq_nmod_mpoly_ctx_t ctx)
+{
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    int success;
+    slong Ai, i, n;
+    n_poly_t t;
+
+    n_poly_init(t);
+
+    FLINT_ASSERT(Z->length == H->length);
+    FLINT_ASSERT(Z->length == M->length);
+
+    /* A has the right length, but possibly from a smaller ctx */
+    if (A->length*d > A->coeffs_alloc)
+    {
+        slong new_alloc = FLINT_MAX(A->coeffs_alloc + A->coeffs_alloc/2, A->length*d);
+        A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, new_alloc*sizeof(mp_limb_t));
+        A->coeffs_alloc = new_alloc;
+    }
+
+    Ai = 0;
+    for (i = 0; i < H->length; i++)
+    {
+        n = H->terms[i].coeff->length;
+        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
+        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
+        FLINT_ASSERT(Ai + n <= A->length);
+
+        n_poly_fit_length(t, d*n);
+
+        success = _n_fq_zip_vand_solve(A->coeffs + d*Ai,
+                         H->terms[i].coeff->coeffs, n,
+                         Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
+                         M->terms[i].coeff->coeffs, t->coeffs, ctx->fqctx);
+        if (success < 1)
+        {
+            n_poly_clear(t);
+            return success;
+        }
+
+        Ai += n;
+        FLINT_ASSERT(Ai <= A->length);
+    }
+
+    FLINT_ASSERT(Ai == A->length);
+
+    n_poly_clear(t);
+    return 1;
+}
 
 
 
-static int qzip_solvelp(
+static int n_fq_polyun_zip_solvep(
     fq_nmod_mpoly_t A,
     n_fq_polyun_t Z,
     n_fq_polyun_t H,
@@ -414,238 +461,7 @@ static int qzip_solvelp(
 }
 
 
-
-
-
-void fq_nmod_mpolyn_interp_lift_sm_bpoly(
-    fq_nmod_mpolyn_t F,
-    n_fq_bpoly_t A,
-    const fq_nmod_mpoly_ctx_t ctx);
-
-int fq_nmod_mpolyn_interp_crt_sm_bpoly(
-    slong * lastdeg,
-    fq_nmod_mpolyn_t F,
-    fq_nmod_mpolyn_t T,
-    const n_fq_bpoly_t A,
-    const n_fq_poly_t modulus,
-    n_fq_poly_t alphapow,
-    const fq_nmod_mpoly_ctx_t ctx);
-
-
-void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
-
-
-static void fq_nmod_mpolyn_interp_lift_lg_bpoly(
-    slong * lastdeg_,
-    fq_nmod_mpolyn_t F,
-    const fq_nmod_mpoly_ctx_t smctx,
-    n_fq_bpoly_t A,
-    const fq_nmod_mpoly_ctx_t lgctx,
-    const bad_fq_nmod_embed_t emb)
-{
-    slong lgd = fq_nmod_ctx_degree(lgctx->fqctx);
-    slong N = mpoly_words_per_exp_sp(F->bits, smctx->minfo);
-    slong i, j, Fi;
-    slong lastdeg = -WORD(1);
-    slong off0, shift0, off1, shift1;
-
-    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, smctx->minfo);
-    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, smctx->minfo);
-
-    Fi = 0;
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        n_fq_poly_struct * Ai = A->coeffs + i;
-        for (j = Ai->length - 1; j >= 0; j--)
-        {
-            if (_n_fq_is_zero(Ai->coeffs + lgd*j, lgd))
-                continue;
-
-            fq_nmod_mpolyn_fit_length(F, Fi + 1, smctx);
-            mpoly_monomial_zero(F->exps + N*Fi, N);
-            (F->exps + N*Fi)[off0] += (i << shift0);
-            (F->exps + N*Fi)[off1] += (j << shift1);
-            bad_n_fq_embed_lg_to_sm(F->coeffs + Fi, Ai->coeffs + lgd*j, emb);
-            lastdeg = FLINT_MAX(lastdeg, n_fq_poly_degree(F->coeffs + Fi));
-
-            Fi++;
-        }
-    }
-
-    F->length = Fi;
-
-    *lastdeg_ = lastdeg;
-}
-
-
-int fq_nmod_mpolyn_interp_crt_lg_bpoly(
-    slong * lastdeg,
-    fq_nmod_mpolyn_t F,
-    fq_nmod_mpolyn_t T,
-    n_fq_poly_t modulus,
-    const fq_nmod_mpoly_ctx_t smctx,
-    n_fq_bpoly_t A,
-    const fq_nmod_mpoly_ctx_t lgctx,
-    const bad_fq_nmod_embed_t emb)
-{
-    slong lgd = fq_nmod_ctx_degree(lgctx->fqctx);
-    int changed = 0;
-    slong N = mpoly_words_per_exp(T->bits, smctx->minfo);
-    slong off0, shift0, off1, shift1;
-    n_fq_poly_struct * Acoeffs = A->coeffs;
-    slong Fi, Ti, Ai, ai;
-    slong Flen = F->length;
-    ulong * Fexps = F->exps;
-    n_fq_poly_struct * Fcoeffs = F->coeffs;
-    ulong * Texps = T->exps;
-    n_fq_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
-    mp_limb_t * v = u + lgd;
-    mp_limb_t * inv_m_eval = v + lgd;
-    n_fq_poly_t u_sm;
-    ulong Fexpi, mask;
-
-    mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
-    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, smctx->minfo);
-    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, smctx->minfo);
-
-    n_fq_poly_init(u_sm);
-
-    bad_n_fq_embed_sm_to_lg(u, modulus, emb);
-    n_fq_inv(inv_m_eval, u, lgctx->fqctx);
-
-    FLINT_ASSERT(fq_nmod_mpolyn_is_canonical(F, smctx));
-    FLINT_ASSERT(n_fq_bpoly_is_canonical(A, lgctx->fqctx));
-
-    FLINT_ASSERT(T->bits == F->bits);
-
-    *lastdeg = -1;
-
-    Ti = Fi = 0;
-    Ai = A->length - 1;
-    ai = (Ai < 0) ? 0 : n_fq_poly_degree(Acoeffs + Ai);
-
-    while (Fi < Flen || Ai >= 0)
-    {
-        if (Ti >= T->alloc)
-        {
-            slong extra = FLINT_MAX(Flen - Fi, Ai);
-            fq_nmod_mpolyn_fit_length(T, Ti + extra + 1, smctx);
-            Tcoeffs = T->coeffs;
-            Texps = T->exps;
-        }
-
-        if (Fi < Flen)
-        {
-            Fexpi = pack_exp2(((Fexps + N*Fi)[off0]>>shift0)&mask,
-                              ((Fexps + N*Fi)[off1]>>shift1)&mask);
-        }
-        else
-        {
-            Fexpi = 0;
-        }
-
-        if (Fi < Flen && Ai >= 0 && Fexpi == pack_exp2(Ai, ai))
-        {
-            /* F term ok, A term ok */
-            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
-
-            bad_n_fq_embed_sm_to_lg(u, Fcoeffs + Fi, emb);
-            n_fq_sub(v, Acoeffs[Ai].coeffs + lgd*ai, u, lgctx->fqctx);
-            if (!_n_fq_is_zero(v, lgd))
-            {
-                changed = 1;
-                n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
-                bad_n_fq_embed_lg_to_sm(u_sm, u, emb);
-                n_fq_poly_mul(Tcoeffs + Ti, modulus, u_sm, smctx->fqctx);
-                n_fq_poly_add(Tcoeffs + Ti, Tcoeffs + Ti, Fcoeffs + Fi, smctx->fqctx);
-            }
-            else
-            {
-                n_fq_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, smctx->fqctx);
-            }
-
-            Fi++;
-            do {
-                ai--;
-            } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + lgd*ai, lgd));
-            if (ai < 0)
-            {
-                do {
-                    Ai--;
-                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
-                if (Ai >= 0)
-                    ai = n_fq_poly_degree(Acoeffs + Ai);
-            }
-        }
-        else if (Fi < Flen && (Ai < 0 || Fexpi > pack_exp2(Ai, ai)))
-        {
-            /* F term ok, Aterm missing */
-            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
-
-            bad_n_fq_embed_sm_to_lg(v, Fcoeffs + Fi, emb);
-            if (!_n_fq_is_zero(v, lgd))
-            {
-                changed = 1;
-                n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
-                bad_n_fq_embed_lg_to_sm(u_sm, u, emb);
-                n_fq_poly_mul(Tcoeffs + Ti, modulus, u_sm, smctx->fqctx);
-                n_fq_poly_sub(Tcoeffs + Ti, Fcoeffs + Fi, Tcoeffs + Ti, smctx->fqctx);
-            }
-            else
-            {
-                n_fq_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, smctx->fqctx);
-            }
-
-            Fi++;
-        }
-        else
-        {
-            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fexpi < pack_exp2(Ai, ai)));
-
-            /* F term missing, A term ok */
-            mpoly_monomial_zero(Texps + N*Ti, N);
-            (Texps + N*Ti)[off0] += (Ai << shift0);
-            (Texps + N*Ti)[off1] += (ai << shift1);
-
-            changed = 1;
-            n_fq_mul(u, Acoeffs[Ai].coeffs + lgd*ai, inv_m_eval, lgctx->fqctx);
-            bad_n_fq_embed_lg_to_sm(u_sm, u, emb);
-            n_fq_poly_mul(Tcoeffs + Ti, modulus, u_sm, smctx->fqctx);
-
-            do {
-                ai--;
-            } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + lgd*ai, lgd));
-            if (ai < 0)
-            {
-                do {
-                    Ai--;
-                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
-                if (Ai >= 0)
-                    ai = n_fq_poly_degree(Acoeffs + Ai);
-            }
-        }
-
-        FLINT_ASSERT(!n_fq_poly_is_zero(Tcoeffs + Ti));
-        *lastdeg = FLINT_MAX(*lastdeg, n_fq_poly_degree(Tcoeffs + Ti));
-        Ti++;
-    }
-
-    T->length = Ti;
-
-    if (changed)
-        fq_nmod_mpolyn_swap(T, F);
-
-    FLINT_ASSERT(fq_nmod_mpolyn_is_canonical(F, smctx));
-
-    n_fq_poly_clear(u_sm);
-    flint_free(u);
-
-    return changed;
-}
-
-
-void qzip_start(
+void n_fq_polyun_zip_start(
     n_fq_polyun_t Z,
     n_fq_polyun_t H,
     slong req_images,
@@ -664,7 +480,7 @@ void qzip_start(
 }
 
 
-int n_fq_polyu2_add_zip_must_match(
+int n_fq_polyu2n_add_zip_must_match(
     n_fq_polyun_t Z,
     const n_fq_bpoly_t A,
     slong cur_length,
@@ -1238,9 +1054,9 @@ choose_main:
                 n_fq_poly_set(gammaeh_cur, gammaeh_inc, ctx->fqctx);
             }
 
-            qzip_start(ZG, HG, req_zip_images, ctx->fqctx);
-            qzip_start(ZAbar, HAbar, req_zip_images, ctx->fqctx);
-            qzip_start(ZBbar, HBbar, req_zip_images, ctx->fqctx);
+            n_fq_polyun_zip_start(ZG, HG, req_zip_images, ctx->fqctx);
+            n_fq_polyun_zip_start(ZAbar, HAbar, req_zip_images, ctx->fqctx);
+            n_fq_polyun_zip_start(ZBbar, HBbar, req_zip_images, ctx->fqctx);
             for (cur_zip_image = 0; cur_zip_image < req_zip_images; cur_zip_image++)
             {
                 if (betas_in_fp)
@@ -1280,30 +1096,30 @@ choose_main:
                 }
 
                 n_fq_bpoly_scalar_mul_n_fq(Gev, c, ctx->fqctx);
-                if ((use & USE_G) && !n_fq_polyu2_add_zip_must_match(ZG, Gev, cur_zip_image, ctx->fqctx))
+                if ((use & USE_G) && !n_fq_polyu2n_add_zip_must_match(ZG, Gev, cur_zip_image, ctx->fqctx))
                     goto choose_main;
-                if ((use & USE_ABAR) && !n_fq_polyu2_add_zip_must_match(ZAbar, Abarev, cur_zip_image, ctx->fqctx))
+                if ((use & USE_ABAR) && !n_fq_polyu2n_add_zip_must_match(ZAbar, Abarev, cur_zip_image, ctx->fqctx))
                     goto choose_main;
-                if ((use & USE_BBAR) && !n_fq_polyu2_add_zip_must_match(ZBbar, Bbarev, cur_zip_image, ctx->fqctx))
+                if ((use & USE_BBAR) && !n_fq_polyu2n_add_zip_must_match(ZBbar, Bbarev, cur_zip_image, ctx->fqctx))
                     goto choose_main;
             }
 
             if (betas_in_fp)
             {
-                if ((use & USE_G) && qzip_solvelp(G, ZG, HG, MG, ctx) < 1)
+                if ((use & USE_G) && n_fq_polyun_zip_solvep(G, ZG, HG, MG, ctx) < 1)
                     goto choose_main;
-                if ((use & USE_ABAR) && qzip_solvelp(Abar, ZAbar, HAbar, MAbar, ctx) < 1)
+                if ((use & USE_ABAR) && n_fq_polyun_zip_solvep(Abar, ZAbar, HAbar, MAbar, ctx) < 1)
                     goto choose_main;
-                if ((use & USE_BBAR) && qzip_solvelp(Bbar, ZBbar, HBbar, MBbar, ctx) < 1)
+                if ((use & USE_BBAR) && n_fq_polyun_zip_solvep(Bbar, ZBbar, HBbar, MBbar, ctx) < 1)
                     goto choose_main;
             }
             else
             {
-                if ((use & USE_G) && qzip_solvel(G, ZG, HG, MG, ctx) < 1)
+                if ((use & USE_G) && n_fq_polyun_zip_solve(G, ZG, HG, MG, ctx) < 1)
                     goto choose_main;
-                if ((use & USE_ABAR) && qzip_solvel(Abar, ZAbar, HAbar, MAbar, ctx) < 1)
+                if ((use & USE_ABAR) && n_fq_polyun_zip_solve(Abar, ZAbar, HAbar, MAbar, ctx) < 1)
                     goto choose_main;
-                if ((use & USE_BBAR) && qzip_solvel(Bbar, ZBbar, HBbar, MBbar, ctx) < 1)
+                if ((use & USE_BBAR) && n_fq_polyun_zip_solve(Bbar, ZBbar, HBbar, MBbar, ctx) < 1)
                     goto choose_main;
             }
 
@@ -2169,9 +1985,9 @@ got_alpha_m:
             n_fq_polyun_set(Beh_cur, Beh_inc, lgctx->fqctx);
             n_fq_poly_set(gammaeh_cur, gammaeh_inc, lgctx->fqctx);
 
-            qzip_start(ZG, HG, req_zip_images, lgctx->fqctx);
-            qzip_start(ZAbar, HAbar, req_zip_images, lgctx->fqctx);
-            qzip_start(ZBbar, HBbar, req_zip_images, lgctx->fqctx);
+            n_fq_polyun_zip_start(ZG, HG, req_zip_images, lgctx->fqctx);
+            n_fq_polyun_zip_start(ZAbar, HAbar, req_zip_images, lgctx->fqctx);
+            n_fq_polyun_zip_start(ZBbar, HBbar, req_zip_images, lgctx->fqctx);
             for (cur_zip_image = 0; cur_zip_image < req_zip_images; cur_zip_image++)
             {
                 n_fq_bpoly_eval_step_sep(Aev, Aeh_cur, Aeh_inc, Aevals + m, lgctx->fqctx);
@@ -2203,19 +2019,19 @@ got_alpha_m:
 
                 n_fq_bpoly_scalar_mul_n_fq(Gev, tmp->coeffs, lgctx->fqctx);
 
-                if ((use & USE_G) && !n_fq_polyu2_add_zip_must_match(ZG, Gev, cur_zip_image, lgctx->fqctx))
+                if ((use & USE_G) && !n_fq_polyu2n_add_zip_must_match(ZG, Gev, cur_zip_image, lgctx->fqctx))
                     goto choose_main;
-                if ((use & USE_ABAR) && !n_fq_polyu2_add_zip_must_match(ZAbar, Abarev, cur_zip_image, lgctx->fqctx))
+                if ((use & USE_ABAR) && !n_fq_polyu2n_add_zip_must_match(ZAbar, Abarev, cur_zip_image, lgctx->fqctx))
                     goto choose_main;
-                if ((use & USE_BBAR) && !n_fq_polyu2_add_zip_must_match(ZBbar, Bbarev, cur_zip_image, lgctx->fqctx))
+                if ((use & USE_BBAR) && !n_fq_polyu2n_add_zip_must_match(ZBbar, Bbarev, cur_zip_image, lgctx->fqctx))
                     goto choose_main;
             }
 
-            if ((use & USE_G) && qzip_solvel(G, ZG, HG, MG, lgctx) < 1)
+            if ((use & USE_G) && n_fq_polyun_zip_solve(G, ZG, HG, MG, lgctx) < 1)
                 goto choose_main;
-            if ((use & USE_ABAR) && qzip_solvel(Abar, ZAbar, HAbar, MAbar, lgctx) < 1)
+            if ((use & USE_ABAR) && n_fq_polyun_zip_solve(Abar, ZAbar, HAbar, MAbar, lgctx) < 1)
                 goto choose_main;
-            if ((use & USE_BBAR) && qzip_solvel(Bbar, ZBbar, HBbar, MBbar, lgctx) < 1)
+            if ((use & USE_BBAR) && n_fq_polyun_zip_solve(Bbar, ZBbar, HBbar, MBbar, lgctx) < 1)
                 goto choose_main;
 
             FLINT_ASSERT(n_fq_poly_degree(modulus) > 0);
@@ -2378,9 +2194,9 @@ got_alpha_m:
             n_fq_polyun_set(Beh_cur, Beh_inc, lgctx->fqctx);
             n_fq_poly_set(gammaeh_cur, gammaeh_inc, lgctx->fqctx);
 
-            qzip_start(ZG, HG, req_zip_images, lgctx->fqctx);
-            qzip_start(ZAbar, HAbar, req_zip_images, lgctx->fqctx);
-            qzip_start(ZBbar, HBbar, req_zip_images, lgctx->fqctx);
+            n_fq_polyun_zip_start(ZG, HG, req_zip_images, lgctx->fqctx);
+            n_fq_polyun_zip_start(ZAbar, HAbar, req_zip_images, lgctx->fqctx);
+            n_fq_polyun_zip_start(ZBbar, HBbar, req_zip_images, lgctx->fqctx);
             for (cur_zip_image = 0; cur_zip_image < req_zip_images; cur_zip_image++)
             {
                 n_fq_bpoly_eval_step_sep(Aev, Aeh_cur, Aeh_inc, Aevals + m, lgctx->fqctx);
@@ -2412,18 +2228,18 @@ got_alpha_m:
 
                 n_fq_bpoly_scalar_mul_n_fq(Gev, tmp->coeffs, lgctx->fqctx);
 
-                if ((use & USE_G) && !n_fq_polyu2_add_zip_must_match(ZG, Gev, cur_zip_image, lgctx->fqctx))
+                if ((use & USE_G) && !n_fq_polyu2n_add_zip_must_match(ZG, Gev, cur_zip_image, lgctx->fqctx))
                     goto choose_main;
-                if ((use & USE_ABAR) && !n_fq_polyu2_add_zip_must_match(ZAbar, Abarev, cur_zip_image, lgctx->fqctx))
+                if ((use & USE_ABAR) && !n_fq_polyu2n_add_zip_must_match(ZAbar, Abarev, cur_zip_image, lgctx->fqctx))
                     goto choose_main;
-                if ((use & USE_BBAR) && !n_fq_polyu2_add_zip_must_match(ZBbar, Bbarev, cur_zip_image, lgctx->fqctx))
+                if ((use & USE_BBAR) && !n_fq_polyu2n_add_zip_must_match(ZBbar, Bbarev, cur_zip_image, lgctx->fqctx))
                     goto choose_main;
             }
-            if ((use & USE_G) && qzip_solvel(G, ZG, HG, MG, lgctx) < 1)
+            if ((use & USE_G) && n_fq_polyun_zip_solve(G, ZG, HG, MG, lgctx) < 1)
                 goto choose_main;
-            if ((use & USE_ABAR) && qzip_solvel(Abar, ZAbar, HAbar, MAbar, lgctx) < 1)
+            if ((use & USE_ABAR) && n_fq_polyun_zip_solve(Abar, ZAbar, HAbar, MAbar, lgctx) < 1)
                 goto choose_main;
-            if ((use & USE_BBAR) && qzip_solvel(Bbar, ZBbar, HBbar, MBbar, lgctx) < 1)
+            if ((use & USE_BBAR) && n_fq_polyun_zip_solve(Bbar, ZBbar, HBbar, MBbar, lgctx) < 1)
                 goto choose_main;
 
             FLINT_ASSERT(n_fq_poly_degree(modulus) > 0);

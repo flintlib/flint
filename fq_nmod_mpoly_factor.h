@@ -166,47 +166,6 @@ FLINT_DLL void _fq_nmod_mpoly_set_lead0(
 
 /*****************************************************************************/
 
-FLINT_DLL void n_fq_bpoly_print_pretty(const n_bpoly_t A,
-                const char * gen0, const char * gen1, const fq_nmod_ctx_t ctx);
-
-FLINT_DLL int n_fq_bpoly_is_canonical(const n_bpoly_t A, const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void fq_nmod_bpoly_one(n_bpoly_t A, const fq_nmod_ctx_t ctx);
-
-FLINT_DLL int n_fq_bpoly_equal(
-    const n_bpoly_t A,
-    const n_bpoly_t B,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_set_coeff_n_fq(
-    n_bpoly_t A,
-    slong xi,
-    slong yi,
-    const mp_limb_t *c,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_set_coeff_fq_nmod(
-    n_bpoly_t A,
-    slong xi,
-    slong yi,
-    const fq_nmod_t c,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_set_fq_nmod_poly_gen0(
-    n_bpoly_t A,
-    const fq_nmod_poly_t B,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_set_fq_nmod_poly_gen1(
-    n_bpoly_t A,
-    const fq_nmod_poly_t B,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_make_monic(
-    n_bpoly_t A,
-    slong order,
-    const fq_nmod_ctx_t ctx);
-
 FLINT_DLL void n_fq_bpoly_mul(
     n_bpoly_t A,
     const n_bpoly_t B,
@@ -225,8 +184,6 @@ FLINT_DLL void n_fq_bpoly_add(
     const n_bpoly_t B,
     const n_bpoly_t C,
     const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_one(n_bpoly_t A, const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void n_fq_bpoly_sub(
     n_bpoly_t A,
@@ -248,25 +205,9 @@ FLINT_DLL int n_fq_bpoly_divides(
     const n_bpoly_t B,
     const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void n_fq_bpoly_set(
-    n_bpoly_t A,
-    const n_bpoly_t B,
-    const fq_nmod_ctx_t ctx);
-
 FLINT_DLL void n_fq_bpoly_make_primitive(
     n_poly_t g,
     n_bpoly_t A,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_taylor_shift_gen1_fq_nmod(
-    n_bpoly_t A,
-    const n_bpoly_t B,
-    const fq_nmod_t c_,
-    const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void n_fq_bpoly_taylor_shift_gen0_fq_nmod(
-    n_bpoly_t A,
-    const fq_nmod_t alpha,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_get_n_fq_bpoly(

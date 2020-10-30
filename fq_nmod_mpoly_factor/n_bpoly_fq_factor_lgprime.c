@@ -13,7 +13,7 @@
 #include "fq_nmod_mpoly_factor.h"
 
 
-void n_fq_bpoly_eval_sm_to_lg(
+static void n_fq_bpoly_eval_sm_to_lg(
     fq_nmod_poly_t E,
     const n_bpoly_t B,
     const bad_fq_nmod_embed_t emb)
@@ -27,7 +27,7 @@ void n_fq_bpoly_eval_sm_to_lg(
 }
 
 
-void n_fq_bpoly_set_n_fq_poly_gen0_lg_to_sm(
+static void n_fq_bpoly_set_n_fq_poly_gen0_lg_to_sm(
     n_bpoly_t A,
     const n_poly_t E,
     const bad_fq_nmod_embed_t emb)
@@ -41,7 +41,7 @@ void n_fq_bpoly_set_n_fq_poly_gen0_lg_to_sm(
     n_bpoly_normalise(A);
 }
 
-void n_fq_bpoly_make_monic_mod_poly(
+static void n_fq_bpoly_make_monic_mod_poly(
     n_bpoly_t A,
     const n_bpoly_t B,
     const n_poly_t m,
@@ -74,7 +74,7 @@ void n_fq_bpoly_make_monic_mod_poly(
 }
 
 /* multiplication in (Fq[y]/m(y))[x], inputs need not be reduced */
-void n_fq_bpoly_mul_mod_poly(
+static void n_fq_bpoly_mul_mod_poly(
     n_bpoly_t A,
     const n_bpoly_t B,
     const n_bpoly_t C,
@@ -108,7 +108,7 @@ void n_fq_bpoly_mul_mod_poly(
 }
 
 /* division in (Fq[y]/m(y))[x], inputs need not be reduced */
-void n_fq_bpoly_divrem_mod_poly(
+static void n_fq_bpoly_divrem_mod_poly(
     n_bpoly_t Q,
     n_bpoly_t R,
     const n_bpoly_t A,

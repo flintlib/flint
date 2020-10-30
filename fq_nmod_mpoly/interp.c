@@ -11,6 +11,7 @@
 
 #include "fq_nmod_mpoly.h"
 
+
 /*
     interp_reduce: map from Fp[x] to Fp[x]/poly(x)
     interp_lift:   map from Fp[x]/poly(x) to Fp[x]
@@ -20,6 +21,21 @@
     ..._sm:    poly(x) is x - alpha
     ..._lg:    poly(x) is modulus of finite field
 */
+
+static void _n_poly_mul_n_fq(
+    n_poly_t a,
+    const n_poly_t b,
+    const mp_limb_t * c,
+    const fq_nmod_ctx_t ctx)
+{
+    slong d = fq_nmod_ctx_degree(ctx);
+    n_poly_t C;
+    C->coeffs = (mp_limb_t *) c;
+    C->length = d;
+    C->alloc = d;
+    _n_poly_normalise(C);
+    n_poly_mod_mul(a, b, C, ctx->mod);
+}
 
 /****************** bivar - image in F_q *************************************/
 
@@ -260,6 +276,207 @@ int nmod_mpolyn_interp_crt_lg_poly(
     *lastdeg_ = lastdeg;
     return changed;
 }
+
+void nmod_mpolyn_interp_lift_lg_bpoly(
+    slong * lastdeg_,
+    nmod_mpolyn_t F,
+    const nmod_mpoly_ctx_t smctx,
+    n_fq_bpoly_t A,
+    const fq_nmod_mpoly_ctx_t lgctx)
+{
+    slong lgd = fq_nmod_ctx_degree(lgctx->fqctx);
+    slong N = mpoly_words_per_exp_sp(F->bits, smctx->minfo);
+    slong i, j, Fi;
+    slong lastdeg = -WORD(1);
+    slong off0, shift0, off1, shift1;
+
+    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, smctx->minfo);
+    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, smctx->minfo);
+
+    Fi = 0;
+    for (i = A->length - 1; i >= 0; i--)
+    {
+        n_fq_poly_struct * Ai = A->coeffs + i;
+        for (j = Ai->length - 1; j >= 0; j--)
+        {
+            if (_n_fq_is_zero(Ai->coeffs + lgd*j, lgd))
+                continue;
+
+            nmod_mpolyn_fit_length(F, Fi + 1, smctx);
+            mpoly_monomial_zero(F->exps + N*Fi, N);
+            (F->exps + N*Fi)[off0] += (i << shift0);
+            (F->exps + N*Fi)[off1] += (j << shift1);
+            n_fq_get_fq_nmod(F->coeffs + Fi, Ai->coeffs + lgd*j, lgctx->fqctx);
+            lastdeg = FLINT_MAX(lastdeg, nmod_poly_degree(F->coeffs + Fi));
+
+            Fi++;
+        }
+    }
+
+    F->length = Fi;
+
+    *lastdeg_ = lastdeg;
+}
+
+int nmod_mpolyn_interp_crt_lg_bpoly(
+    slong * lastdeg,
+    nmod_mpolyn_t F,
+    nmod_mpolyn_t T,
+    n_fq_poly_t modulus,
+    const nmod_mpoly_ctx_t smctx,
+    n_fq_bpoly_t A,
+    const fq_nmod_mpoly_ctx_t lgctx)
+{
+    slong lgd = fq_nmod_ctx_degree(lgctx->fqctx);
+    int changed = 0;
+    slong N = mpoly_words_per_exp(T->bits, smctx->minfo);
+    slong off0, shift0, off1, shift1;
+    n_fq_poly_struct * Acoeffs = A->coeffs;
+    slong Fi, Ti, Ai, ai;
+    slong Flen = F->length;
+    ulong * Fexps = F->exps;
+    nmod_poly_struct * Fcoeffs = F->coeffs;
+    ulong * Texps = T->exps;
+    nmod_poly_struct * Tcoeffs = T->coeffs;
+    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
+    mp_limb_t * v = u + lgd;
+    mp_limb_t * inv_m_eval = v + lgd;
+    ulong Fexpi, mask;
+
+    mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
+    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, smctx->minfo);
+    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, smctx->minfo);
+
+    _n_fq_set_n_poly(u, modulus->coeffs, modulus->length, lgctx->fqctx);
+
+    n_fq_inv(inv_m_eval, u, lgctx->fqctx);
+
+    FLINT_ASSERT(nmod_mpolyn_is_canonical(F, smctx));
+    FLINT_ASSERT(n_fq_bpoly_is_canonical(A, lgctx->fqctx));
+
+    FLINT_ASSERT(T->bits == F->bits);
+
+    *lastdeg = -1;
+
+    Ti = Fi = 0;
+    Ai = A->length - 1;
+    ai = (Ai < 0) ? 0 : n_fq_poly_degree(Acoeffs + Ai);
+
+    while (Fi < Flen || Ai >= 0)
+    {
+        if (Ti >= T->alloc)
+        {
+            slong extra = FLINT_MAX(Flen - Fi, Ai);
+            nmod_mpolyn_fit_length(T, Ti + extra + 1, smctx);
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
+        }
+
+        if (Fi < Flen)
+        {
+            Fexpi = pack_exp2(((Fexps + N*Fi)[off0]>>shift0)&mask,
+                              ((Fexps + N*Fi)[off1]>>shift1)&mask);
+        }
+        else
+        {
+            Fexpi = 0;
+        }
+
+        if (Fi < Flen && Ai >= 0 && Fexpi == pack_exp2(Ai, ai))
+        {
+            /* F term ok, A term ok */
+            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
+
+            _n_fq_set_n_poly(u, Fcoeffs[Fi].coeffs, Fcoeffs[Fi].length, lgctx->fqctx);
+            n_fq_sub(v, Acoeffs[Ai].coeffs + lgd*ai, u, lgctx->fqctx);
+            if (!_n_fq_is_zero(v, lgd))
+            {
+                changed = 1;
+                n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
+                _n_poly_mul_n_fq((n_poly_struct*)(Tcoeffs + Ti), modulus, u, lgctx->fqctx);
+                n_poly_mod_add((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), smctx->ffinfo->mod);
+            }
+            else
+            {
+                n_poly_set((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi));
+            }
+
+            Fi++;
+            do {
+                ai--;
+            } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + lgd*ai, lgd));
+            if (ai < 0)
+            {
+                do {
+                    Ai--;
+                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
+                if (Ai >= 0)
+                    ai = n_fq_poly_degree(Acoeffs + Ai);
+            }
+        }
+        else if (Fi < Flen && (Ai < 0 || Fexpi > pack_exp2(Ai, ai)))
+        {
+            /* F term ok, Aterm missing */
+            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
+
+            _n_fq_set_n_poly(v, Fcoeffs[Fi].coeffs, Fcoeffs[Fi].length, lgctx->fqctx);
+            if (!_n_fq_is_zero(v, lgd))
+            {
+                changed = 1;
+                n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
+                _n_poly_mul_n_fq((n_poly_struct*)(Tcoeffs + Ti), modulus, u, lgctx->fqctx);
+                n_poly_mod_sub((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), (n_poly_struct*)(Tcoeffs + Ti), smctx->ffinfo->mod);
+            }
+            else
+            {
+                n_poly_set((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi));
+            }
+
+            Fi++;
+        }
+        else
+        {
+            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fexpi < pack_exp2(Ai, ai)));
+
+            /* F term missing, A term ok */
+            mpoly_monomial_zero(Texps + N*Ti, N);
+            (Texps + N*Ti)[off0] += (Ai << shift0);
+            (Texps + N*Ti)[off1] += (ai << shift1);
+
+            changed = 1;
+            n_fq_mul(u, Acoeffs[Ai].coeffs + lgd*ai, inv_m_eval, lgctx->fqctx);
+            _n_poly_mul_n_fq((n_poly_struct*)(Tcoeffs + Ti), modulus, u, lgctx->fqctx);
+
+            do {
+                ai--;
+            } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + lgd*ai, lgd));
+            if (ai < 0)
+            {
+                do {
+                    Ai--;
+                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
+                if (Ai >= 0)
+                    ai = n_fq_poly_degree(Acoeffs + Ai);
+            }
+        }
+
+        FLINT_ASSERT(!n_poly_is_zero((n_poly_struct*)(Tcoeffs + Ti)));
+        *lastdeg = FLINT_MAX(*lastdeg, n_poly_degree((n_poly_struct*)(Tcoeffs + Ti)));
+        Ti++;
+    }
+
+    T->length = Ti;
+
+    if (changed)
+        nmod_mpolyn_swap(T, F);
+
+    FLINT_ASSERT(nmod_mpolyn_is_canonical(F, smctx));
+
+    flint_free(u);
+
+    return changed;
+}
+
 
 
 /*********************** multivar - image in F_q *****************************/
@@ -702,7 +919,7 @@ void nmod_mpolyun_interp_lift_lg_mpolyu(
     F = F + modulus*((A - F(alpha))/(modulus(alpha)))
     no assumptions about matching monomials
 */
-int nmod_mpolyn_interp_crt_lg_mpoly(
+static int nmod_mpolyn_interp_crt_lg_mpoly(
     slong * lastdeg,
     nmod_mpolyn_t F,
     nmod_mpolyn_t T,
@@ -936,6 +1153,61 @@ int nmod_mpolyun_interp_crt_lg_mpolyu(
     fq_nmod_mpoly_clear(zero, ffctx);
     return changed;
 }
+
+int nmod_mpolyn_interp_mcrt_lg_mpoly(
+    slong * lastdeg_,
+    nmod_mpolyn_t H,
+    const nmod_mpoly_ctx_t smctx,
+    const n_poly_t m,
+    const mp_limb_t * inv_m_eval,
+    fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_ctx_t lgctx)
+{
+    slong lastdeg = *lastdeg_;
+    slong i, lgd = fq_nmod_ctx_degree(lgctx->fqctx);
+#if FLINT_WANT_ASSERT
+    slong N = mpoly_words_per_exp(A->bits, smctx->minfo);
+#endif
+    int changed = 0;
+    mp_limb_t * u = FLINT_ARRAY_ALLOC(lgd, mp_limb_t);
+    n_poly_t w;
+
+    n_poly_init(w);
+
+    FLINT_ASSERT(H->length == A->length);
+    FLINT_ASSERT(H->bits == A->bits);
+
+    for (i = 0; i < A->length; i++)
+    {
+        FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
+        _n_fq_set_n_poly(u, H->coeffs[i].coeffs, H->coeffs[i].length, lgctx->fqctx);
+        n_fq_sub(u, A->coeffs + lgd*i, u, lgctx->fqctx);
+        if (!_n_fq_is_zero(u, lgd))
+        {
+            changed = 1;
+            n_fq_mul(u, u, inv_m_eval, lgctx->fqctx);
+            _n_poly_mul_n_fq(w, m, u, lgctx->fqctx);
+            {
+                nmod_poly_t wmock;
+                nmod_poly_mock(wmock, w, smctx->ffinfo->mod);
+                nmod_poly_add(H->coeffs + i, H->coeffs + i, wmock);
+            }
+        }
+
+        lastdeg = FLINT_MAX(lastdeg, nmod_poly_degree(H->coeffs + i));
+
+        FLINT_ASSERT(nmod_poly_degree(H->coeffs + i) < n_poly_degree(m)
+                                     + nmod_poly_degree(lgctx->fqctx->modulus));
+    }
+
+    *lastdeg_ = lastdeg;
+
+    flint_free(u);
+    n_poly_clear(w);
+    
+    return changed;
+}
+
 
 
 /*
@@ -2043,12 +2315,13 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
 }
 
 
-void nmod_mpolyn_interp_lift_lg_bpoly(
+void fq_nmod_mpolyn_interp_lift_lg_bpoly(
     slong * lastdeg_,
-    nmod_mpolyn_t F,
-    const nmod_mpoly_ctx_t smctx,
+    fq_nmod_mpolyn_t F,
+    const fq_nmod_mpoly_ctx_t smctx,
     n_fq_bpoly_t A,
-    const fq_nmod_mpoly_ctx_t lgctx)
+    const fq_nmod_mpoly_ctx_t lgctx,
+    const bad_fq_nmod_embed_t emb)
 {
     slong lgd = fq_nmod_ctx_degree(lgctx->fqctx);
     slong N = mpoly_words_per_exp_sp(F->bits, smctx->minfo);
@@ -2068,12 +2341,12 @@ void nmod_mpolyn_interp_lift_lg_bpoly(
             if (_n_fq_is_zero(Ai->coeffs + lgd*j, lgd))
                 continue;
 
-            nmod_mpolyn_fit_length(F, Fi + 1, smctx);
+            fq_nmod_mpolyn_fit_length(F, Fi + 1, smctx);
             mpoly_monomial_zero(F->exps + N*Fi, N);
             (F->exps + N*Fi)[off0] += (i << shift0);
             (F->exps + N*Fi)[off1] += (j << shift1);
-            n_fq_get_fq_nmod(F->coeffs + Fi, Ai->coeffs + lgd*j, lgctx->fqctx);
-            lastdeg = FLINT_MAX(lastdeg, nmod_poly_degree(F->coeffs + Fi));
+            bad_n_fq_embed_lg_to_sm(F->coeffs + Fi, Ai->coeffs + lgd*j, emb);
+            lastdeg = FLINT_MAX(lastdeg, n_fq_poly_degree(F->coeffs + Fi));
 
             Fi++;
         }
@@ -2082,6 +2355,172 @@ void nmod_mpolyn_interp_lift_lg_bpoly(
     F->length = Fi;
 
     *lastdeg_ = lastdeg;
+}
+
+int fq_nmod_mpolyn_interp_crt_lg_bpoly(
+    slong * lastdeg,
+    fq_nmod_mpolyn_t F,
+    fq_nmod_mpolyn_t T,
+    n_fq_poly_t modulus,
+    const fq_nmod_mpoly_ctx_t smctx,
+    n_fq_bpoly_t A,
+    const fq_nmod_mpoly_ctx_t lgctx,
+    const bad_fq_nmod_embed_t emb)
+{
+    slong lgd = fq_nmod_ctx_degree(lgctx->fqctx);
+    int changed = 0;
+    slong N = mpoly_words_per_exp(T->bits, smctx->minfo);
+    slong off0, shift0, off1, shift1;
+    n_fq_poly_struct * Acoeffs = A->coeffs;
+    slong Fi, Ti, Ai, ai;
+    slong Flen = F->length;
+    ulong * Fexps = F->exps;
+    n_fq_poly_struct * Fcoeffs = F->coeffs;
+    ulong * Texps = T->exps;
+    n_fq_poly_struct * Tcoeffs = T->coeffs;
+    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
+    mp_limb_t * v = u + lgd;
+    mp_limb_t * inv_m_eval = v + lgd;
+    n_fq_poly_t u_sm;
+    ulong Fexpi, mask;
+
+    mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
+    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, smctx->minfo);
+    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, smctx->minfo);
+
+    n_fq_poly_init(u_sm);
+
+    bad_n_fq_embed_sm_to_lg(u, modulus, emb);
+    n_fq_inv(inv_m_eval, u, lgctx->fqctx);
+
+    FLINT_ASSERT(fq_nmod_mpolyn_is_canonical(F, smctx));
+    FLINT_ASSERT(n_fq_bpoly_is_canonical(A, lgctx->fqctx));
+
+    FLINT_ASSERT(T->bits == F->bits);
+
+    *lastdeg = -1;
+
+    Ti = Fi = 0;
+    Ai = A->length - 1;
+    ai = (Ai < 0) ? 0 : n_fq_poly_degree(Acoeffs + Ai);
+
+    while (Fi < Flen || Ai >= 0)
+    {
+        if (Ti >= T->alloc)
+        {
+            slong extra = FLINT_MAX(Flen - Fi, Ai);
+            fq_nmod_mpolyn_fit_length(T, Ti + extra + 1, smctx);
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
+        }
+
+        if (Fi < Flen)
+        {
+            Fexpi = pack_exp2(((Fexps + N*Fi)[off0]>>shift0)&mask,
+                              ((Fexps + N*Fi)[off1]>>shift1)&mask);
+        }
+        else
+        {
+            Fexpi = 0;
+        }
+
+        if (Fi < Flen && Ai >= 0 && Fexpi == pack_exp2(Ai, ai))
+        {
+            /* F term ok, A term ok */
+            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
+
+            bad_n_fq_embed_sm_to_lg(u, Fcoeffs + Fi, emb);
+            n_fq_sub(v, Acoeffs[Ai].coeffs + lgd*ai, u, lgctx->fqctx);
+            if (!_n_fq_is_zero(v, lgd))
+            {
+                changed = 1;
+                n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
+                bad_n_fq_embed_lg_to_sm(u_sm, u, emb);
+                n_fq_poly_mul(Tcoeffs + Ti, modulus, u_sm, smctx->fqctx);
+                n_fq_poly_add(Tcoeffs + Ti, Tcoeffs + Ti, Fcoeffs + Fi, smctx->fqctx);
+            }
+            else
+            {
+                n_fq_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, smctx->fqctx);
+            }
+
+            Fi++;
+            do {
+                ai--;
+            } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + lgd*ai, lgd));
+            if (ai < 0)
+            {
+                do {
+                    Ai--;
+                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
+                if (Ai >= 0)
+                    ai = n_fq_poly_degree(Acoeffs + Ai);
+            }
+        }
+        else if (Fi < Flen && (Ai < 0 || Fexpi > pack_exp2(Ai, ai)))
+        {
+            /* F term ok, Aterm missing */
+            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
+
+            bad_n_fq_embed_sm_to_lg(v, Fcoeffs + Fi, emb);
+            if (!_n_fq_is_zero(v, lgd))
+            {
+                changed = 1;
+                n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
+                bad_n_fq_embed_lg_to_sm(u_sm, u, emb);
+                n_fq_poly_mul(Tcoeffs + Ti, modulus, u_sm, smctx->fqctx);
+                n_fq_poly_sub(Tcoeffs + Ti, Fcoeffs + Fi, Tcoeffs + Ti, smctx->fqctx);
+            }
+            else
+            {
+                n_fq_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, smctx->fqctx);
+            }
+
+            Fi++;
+        }
+        else
+        {
+            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fexpi < pack_exp2(Ai, ai)));
+
+            /* F term missing, A term ok */
+            mpoly_monomial_zero(Texps + N*Ti, N);
+            (Texps + N*Ti)[off0] += (Ai << shift0);
+            (Texps + N*Ti)[off1] += (ai << shift1);
+
+            changed = 1;
+            n_fq_mul(u, Acoeffs[Ai].coeffs + lgd*ai, inv_m_eval, lgctx->fqctx);
+            bad_n_fq_embed_lg_to_sm(u_sm, u, emb);
+            n_fq_poly_mul(Tcoeffs + Ti, modulus, u_sm, smctx->fqctx);
+
+            do {
+                ai--;
+            } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + lgd*ai, lgd));
+            if (ai < 0)
+            {
+                do {
+                    Ai--;
+                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
+                if (Ai >= 0)
+                    ai = n_fq_poly_degree(Acoeffs + Ai);
+            }
+        }
+
+        FLINT_ASSERT(!n_fq_poly_is_zero(Tcoeffs + Ti));
+        *lastdeg = FLINT_MAX(*lastdeg, n_fq_poly_degree(Tcoeffs + Ti));
+        Ti++;
+    }
+
+    T->length = Ti;
+
+    if (changed)
+        fq_nmod_mpolyn_swap(T, F);
+
+    FLINT_ASSERT(fq_nmod_mpolyn_is_canonical(F, smctx));
+
+    n_fq_poly_clear(u_sm);
+    flint_free(u);
+
+    return changed;
 }
 
 /*****************************************************************************/

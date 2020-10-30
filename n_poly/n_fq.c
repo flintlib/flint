@@ -132,6 +132,28 @@ void n_fq_set_fq_nmod(
         a[i] = i < b->length ? b->coeffs[i] : 0;
 }
 
+void _n_fq_set_n_poly(
+    mp_limb_t * a,
+    const mp_limb_t * bcoeffs, slong blen,
+    const fq_nmod_ctx_t ctx)
+{
+    slong d = fq_nmod_ctx_degree(ctx);
+
+    if (blen > d)
+    {
+        _nmod_poly_rem(a, bcoeffs, blen, ctx->modulus->coeffs, d + 1, ctx->mod);
+    }
+    else
+    {
+        slong i;
+        for (i = 0; i < blen; i++)
+            a[i] = bcoeffs[i];
+        for (; i < d; i++)
+            a[i] = 0;
+    }
+}
+
+
 void n_fq_gen(
     mp_limb_t * a,
     const fq_nmod_ctx_t ctx)

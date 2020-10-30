@@ -439,10 +439,6 @@ void _nmod_mpoly_fit_length(
     }
 }
 
-
-FLINT_DLL void nmod_mpoly_fit_length(nmod_mpoly_t A, slong len, 
-                                                   const nmod_mpoly_ctx_t ctx);
-
 NMOD_MPOLY_INLINE
 void _nmod_mpoly_set_length(nmod_mpoly_t A, slong newlen, 
                                                     const nmod_mpoly_ctx_t ctx)
@@ -1696,6 +1692,9 @@ FLINT_DLL void _nmod_mpoly_monomial_evals2_cache(n_polyun_t E,
           const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
           const mp_limb_t * betas, slong m, const mpoly_ctx_t ctx, nmod_t mod);
 
+FLINT_DLL int n_polyu2n_add_zip_must_match(n_polyun_t Z, const n_bpoly_t A,
+                                                             slong cur_length);
+
 /* interp ********************************************************************/
 
 FLINT_DLL void _nmod_poly_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
@@ -1743,6 +1742,10 @@ FLINT_DLL void nmod_mpolyun_interp_lift_sm_mpolyu(nmod_mpolyun_t A,
 FLINT_DLL int nmod_mpolyun_interp_crt_sm_mpolyu(slong * lastdeg,
              nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
              nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyn_interp_mcrt_sm_mpoly(slong * lastdeg_, 
+                nmod_mpolyn_t F, const nmod_mpoly_t A, const n_poly_t modulus,
+                                n_poly_t alphapow, const nmod_mpoly_ctx_t ctx);
 
 /* geobuckets ****************************************************************/
 

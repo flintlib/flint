@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     }
 
     print_banner();
-    for (i = 15; i < 30; i++)
+    for (i = 15; i < 25; i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t a, b, t, m;

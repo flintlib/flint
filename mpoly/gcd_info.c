@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018, 2019 Daniel Schultz
+    Copyright (C) 2018-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
-#include "ulong_extras.h"
+#include "mpoly.h"
 
 
 void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
 
 
 void mpoly_monomials_deflate(ulong * Aexps, flint_bitcnt_t Abits,
