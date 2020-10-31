@@ -1646,7 +1646,7 @@ got_alpha_m:
         fq_nmod_mpolyn_interp_lift_lg_bpoly(&lastdeg, Abarn, smctx, Abarev, lgctx, cur_emb);
         fq_nmod_mpolyn_interp_lift_lg_bpoly(&lastdeg, Bbarn, smctx, Bbarev, lgctx, cur_emb);
 
-        n_fq_poly_set_fq_nmod_poly(modulus, cur_emb->h, smctx->fqctx);
+        n_fq_poly_set(modulus, cur_emb->h_as_n_fq_poly, smctx->fqctx);
 
         while (1)
         {
@@ -1756,13 +1756,8 @@ got_alpha_m:
                 goto choose_main;
             }
 
-            {
-            n_fq_poly_t h_;
-            n_fq_poly_init(h_);
-            n_fq_poly_set_fq_nmod_poly(h_, cur_emb->h, smctx->fqctx);
-            n_fq_poly_mul(modulus, modulus, h_, smctx->fqctx);
-            n_fq_poly_clear(h_);
-            }
+            n_fq_poly_mul_(modulus, modulus, cur_emb->h_as_n_fq_poly,
+                                                 smctx->fqctx, St->poly_stack);
         }
 
         success = 1;
@@ -2125,7 +2120,7 @@ got_alpha_m:
         else
             use = 0;
 
-        n_fq_poly_set_fq_nmod_poly(modulus, cur_emb->h, smctx->fqctx);
+        n_fq_poly_set(modulus, cur_emb->h_as_n_fq_poly, smctx->fqctx);
 
         while (1)
         {
@@ -2311,13 +2306,8 @@ got_alpha_m:
                 goto choose_main;
             }
 
-            {
-            n_fq_poly_t h_;
-            n_fq_poly_init(h_);
-            n_fq_poly_set_fq_nmod_poly(h_, cur_emb->h, smctx->fqctx);
-            n_fq_poly_mul(modulus, modulus, h_, smctx->fqctx);
-            n_fq_poly_clear(h_);
-            }
+            n_fq_poly_mul_(modulus, modulus, cur_emb->h_as_n_fq_poly,
+                                                 smctx->fqctx, St->poly_stack);
         }
     }
 

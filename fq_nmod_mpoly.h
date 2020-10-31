@@ -143,9 +143,12 @@ typedef struct bad_fq_nmod_embed
     const fq_nmod_ctx_struct * smctx; /* modulus is f */
     fq_nmod_poly_t phi_sm;      /* phi as an element of F_p[theta][x] */
     fq_nmod_poly_t h;
+    n_fq_poly_t h_as_n_fq_poly;
     const fq_nmod_ctx_struct * lgctx; /* modulus is g */
     fq_nmod_t theta_lg;         /* theta as an element of F_p[phi]/g(phi) */
     fq_nmod_t x_lg;             /* x as an element of F_p[phi]/g(phi) */
+    nmod_mat_t lg_to_sm_mat;
+    nmod_mat_t sm_to_lg_mat;
 } bad_fq_nmod_embed_struct;
 
 typedef bad_fq_nmod_embed_struct bad_fq_nmod_embed_t[1];
@@ -153,47 +156,29 @@ typedef bad_fq_nmod_embed_struct bad_fq_nmod_embed_t[1];
 
 FLINT_DLL void bad_fq_nmod_embed_clear(bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_fq_nmod_embed_array_clear(bad_fq_nmod_embed_struct * emb, slong m);
+FLINT_DLL void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
+                     const fq_nmod_ctx_t bigctx, const fq_nmod_ctx_t smallctx);
 
-FLINT_DLL void bad_fq_nmod_embed_array_init(
-    bad_fq_nmod_embed_struct * emb,
-    const fq_nmod_ctx_t bigctx, /* F_p[phi]/g(phi) */
-    const fq_nmod_ctx_t smallctx);
+FLINT_DLL void bad_fq_nmod_embed_sm_to_lg(fq_nmod_t out,
+                       const fq_nmod_poly_t in, const bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_fq_nmod_embed_sm_to_lg(
-    fq_nmod_t out,            /* element of lgctx */
-    const fq_nmod_poly_t in,  /* poly over smctx */
-    const bad_fq_nmod_embed_t emb);
+FLINT_DLL void bad_fq_nmod_embed_lg_to_sm(fq_nmod_poly_t out,
+                            const fq_nmod_t in, const bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_fq_nmod_embed_lg_to_sm(
-    fq_nmod_poly_t out,  /* poly over smctx */
-    const fq_nmod_t in,  /* element of lgctx */
-    const bad_fq_nmod_embed_t emb);
+FLINT_DLL void bad_n_fq_embed_sm_to_lg(mp_limb_t * out_, const n_poly_t in_,
+                                                const bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_n_fq_embed_sm_to_lg(
-    mp_limb_t * out_,            /* element of lgctx */
-    const n_poly_t in_,  /* poly over smctx */
-    const bad_fq_nmod_embed_t emb);
+FLINT_DLL void bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(fq_nmod_t out,
+                            const n_poly_t in_, const bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(
-    fq_nmod_t out,            /* element of lgctx */
-    const n_poly_t in_,  /* poly over smctx */
-    const bad_fq_nmod_embed_t emb);
+FLINT_DLL void bad_n_fq_embed_lg_to_sm(n_poly_t out_, const mp_limb_t * in_,
+                                                const bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_n_fq_embed_lg_to_sm(
-    n_poly_t out_,  /* poly over smctx */
-    const mp_limb_t * in_,  /* element of lgctx */
-    const bad_fq_nmod_embed_t emb);
+FLINT_DLL void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(n_poly_t out_,
+                            const fq_nmod_t in, const bad_fq_nmod_embed_t emb);
 
-FLINT_DLL void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(
-    n_poly_t out_,  /* poly over smctx */
-    const fq_nmod_t in,  /* element of lgctx */
-    const bad_fq_nmod_embed_t emb);
-
-FLINT_DLL void bad_n_fq_embed_sm_elem_to_lg(
-    mp_limb_t * out,
-    const mp_limb_t * in,
-    const bad_fq_nmod_embed_t emb);
+FLINT_DLL void bad_n_fq_embed_sm_elem_to_lg(mp_limb_t * out,
+                          const mp_limb_t * in, const bad_fq_nmod_embed_t emb);
 
 
 typedef struct bad_fq_nmod_mpoly_embed_chooser
