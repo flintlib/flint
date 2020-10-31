@@ -127,8 +127,55 @@ void print_banner()
 
 int main(int argc, char *argv[])
 {
-    slong i;
+    slong i, j, k;
     const char * vars[] = {"x", "y", "z", "t" ,"u", "v", "w", "s", "p"};
+
+    for (k = 0; k < 2; k++)
+    {
+        print_banner();
+        for (i = 3; i <= 11; i++)
+        {
+            nmod_mpoly_ctx_t ctx;
+            nmod_mpoly_t g, a, b, t;
+
+            nmod_mpoly_ctx_init(ctx, i, ORD_DEGREVLEX, k == 0 ? 43051 : 3);
+            nmod_mpoly_init(a, ctx);
+            nmod_mpoly_init(b, ctx);
+            nmod_mpoly_init(g, ctx);
+            nmod_mpoly_init(t, ctx);
+
+            nmod_mpoly_one(g, ctx);
+            nmod_mpoly_one(a, ctx);
+            nmod_mpoly_one(b, ctx);
+            for (j = 0; j < i; j++)
+            {
+                nmod_mpoly_gen(t, j, ctx);
+                nmod_mpoly_add_ui(t, t, 1, ctx);
+                nmod_mpoly_mul(g, g, t, ctx);
+                nmod_mpoly_gen(t, j, ctx);
+                nmod_mpoly_sub_ui(t, t, 2, ctx);
+                nmod_mpoly_mul(a, a, t, ctx);
+                nmod_mpoly_gen(t, j, ctx);
+                nmod_mpoly_add_ui(t, t, 2, ctx);
+                nmod_mpoly_mul(b, b, t, ctx);
+            }
+            nmod_mpoly_sub_ui(g, g, 2, ctx);
+            nmod_mpoly_add_ui(a, a, 2, ctx);
+            nmod_mpoly_sub_ui(b, b, 2, ctx);
+
+            nmod_mpoly_mul(a, a, g, ctx);
+            nmod_mpoly_mul(b, b, g, ctx);
+            nmod_mpoly_make_monic(g, g, ctx);
+
+            profile_gcd(g, a, b, ctx, MPOLY_GCD_USE_BROWN | MPOLY_GCD_USE_HENSEL);
+
+            nmod_mpoly_clear(a, ctx);
+            nmod_mpoly_clear(b, ctx);
+            nmod_mpoly_clear(g, ctx);
+            nmod_mpoly_clear(t, ctx);
+            nmod_mpoly_ctx_clear(ctx);
+        }
+    }
 
     print_banner();
     for (i = 50; i < 100; i += 4)
@@ -330,7 +377,9 @@ int main(int argc, char *argv[])
         nmod_mpoly_ctx_clear(ctx);
     }
 
-flint_printf("--------------------\ntotal time: %wd\n", total_super);
+    flint_printf("--------------------\n");
+    flint_printf("total time: %wd\n", total_super);
+    flint_printf("    record: 19050\n");
 
     flint_cleanup_master();
     return 0;

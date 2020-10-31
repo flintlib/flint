@@ -1964,9 +1964,9 @@ skip_monomial_cofactors:
         {
             slong k = I->brown_perm[1];
             slong d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            int is_small = d < ctx->ffinfo->mod.n/2;
+            int deg_is_small = d < ctx->ffinfo->mod.n/2;
 
-            if (I->Adensity + I->Bdensity > (is_small ? 0.05 : 0.2))
+            if (I->Adensity + I->Bdensity > (deg_is_small ? 0.05 : 0.2))
             {
                 success = _try_brown(G, Abar, Bbar, A, B, I, ctx) ||
                           _try_hensel(G, Abar, Bbar, A, B, I, ctx);
@@ -2007,7 +2007,7 @@ skip_monomial_cofactors:
     else
     {
         slong k, d;
-        double hensel_cutoff = 0.05;
+        int deg_is_small = 1;
         double density = I->Adensity + I->Bdensity;
 
         /*
@@ -2021,21 +2021,21 @@ skip_monomial_cofactors:
         mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
         mpoly_gcd_info_measure_zippel2(I, A->length, B->length, ctx->minfo);
 
-        for (j = 0; j < I->mvars; j++)
+        for (j = 1; j < I->mvars; j++)
         {
             k = I->brown_perm[j];
             d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
             if (d > ctx->ffinfo->mod.n/2)
-            {
-                hensel_cutoff *= 0.25;
-                break;
-            }
+                deg_is_small = 0;
         }
 
         if (density > 0.08)
         {
+            if (!deg_is_small && _try_hensel(G, Abar, Bbar, A, B, I, ctx))
+                goto successful;
+
             if (_try_brown(G, Abar, Bbar, A, B, I, ctx))
-                goto successful;                
+                goto successful;
         }
 
         if (I->Adeflate_tdeg > 0 && I->Bdeflate_tdeg > 0)
@@ -2051,7 +2051,7 @@ skip_monomial_cofactors:
             fmpz_clear(x);
         }
 
-        if (density > hensel_cutoff)
+        if (density > (deg_is_small ? 0.05 : 0.001))
         {
             if (_try_hensel(G, Abar, Bbar, A, B, I, ctx))
                 goto successful;                

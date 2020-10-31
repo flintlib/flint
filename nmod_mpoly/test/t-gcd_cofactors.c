@@ -456,11 +456,6 @@ main(void)
             nmod_mpoly_randtest_bits(t2, state, 1, exp_bits2, ctx);
             if (t1->length != 1 || t2->length != 1)
             {
-flint_printf("exp_bits1: %wu\n", exp_bits1);
-flint_printf("exp_bits2: %wu\n", exp_bits2);
-flint_printf("t1: "); nmod_mpoly_print_pretty(t1, NULL, ctx); flint_printf("\n");
-flint_printf("t2: "); nmod_mpoly_print_pretty(t2, NULL, ctx); flint_printf("\n");
-
                 flint_printf("FAIL:\ncheck random monomial generation\n");
                 flint_abort();
             }

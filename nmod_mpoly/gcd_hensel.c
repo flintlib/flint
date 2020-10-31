@@ -127,14 +127,29 @@ got_alpha:
     Bdegx = nmod_mpoly_degree_si(B, 0, ctx);
 	for (i = n - 1; i >= 0; i--)
 	{
+        int tries_remaining = 1;
+
+    try_again:
+
 		nmod_mpoly_evaluate_one_ui(Aevals + i, i == n - 1 ? A :
                                         Aevals + i + 1, i + 1, alphas[i], ctx);
 		nmod_mpoly_evaluate_one_ui(Bevals + i, i == n - 1 ? B :
                                         Bevals + i + 1, i + 1, alphas[i], ctx);
+
 		if (Adegx != nmod_mpoly_degree_si(Aevals + i, 0, ctx) ||
             Bdegx != nmod_mpoly_degree_si(Bevals + i, 0, ctx))
         {
-    		goto next_alpha;
+            /* try once to correct this alpha[i] */
+            if (--tries_remaining < 0)
+                goto next_alpha;
+
+            if (--alphas_tries_remaining < 0)
+            {
+	            success = 0;
+                goto cleanup;
+            }
+
+            goto try_again;
         }
 	}
 
