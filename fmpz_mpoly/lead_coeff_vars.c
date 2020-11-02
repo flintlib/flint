@@ -51,9 +51,7 @@ void fmpz_mpolyl_lead_coeff(
                 break;
     }
 
-    fmpz_mpoly_fit_length(c, i, ctx);
-    fmpz_mpoly_fit_bits(c, A->bits, ctx);
-    c->bits = A->bits;
+    fmpz_mpoly_fit_length_reset_bits(c, i, A->bits, ctx);
 
     c->length = i;
     cexps = c->exps;

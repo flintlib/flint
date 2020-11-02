@@ -850,9 +850,7 @@ void _fmpz_mpoly_mul_heap_threaded_pool_maxfields(
     if (A == B || A == C)
     {
         fmpz_mpoly_t T;
-        fmpz_mpoly_init(T, ctx);
-        fmpz_mpoly_fit_bits(T, exp_bits, ctx);
-        T->bits = exp_bits;
+        fmpz_mpoly_init3(T, 0, exp_bits, ctx);
 
         /* algorithm more efficient if smaller poly first */
         if (B->length >= C->length)
@@ -873,8 +871,7 @@ void _fmpz_mpoly_mul_heap_threaded_pool_maxfields(
     }
     else
     {
-        fmpz_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        fmpz_mpoly_fit_length_reset_bits(A, A->length, exp_bits, ctx);
 
         /* algorithm more efficient if smaller poly first */
         if (B->length > C->length)

@@ -302,9 +302,7 @@ void fmpz_mpoly_scalar_fmma(
         mpoly_repack_monomials(Dexps, Abits, D->exps, D->bits, D->length, ctx->minfo);
     }
 
-    fmpz_mpoly_fit_length(A, B->length + D->length, ctx);
-    fmpz_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
+    fmpz_mpoly_fit_length_reset_bits(A, B->length + D->length, Abits, ctx);
 
     len = _fmpz_mpoly_scalar_fmma(A->coeffs, A->exps,
                                    B->coeffs, Bexps, B->length, c,

@@ -172,6 +172,9 @@ FLINT_DLL void _fmpz_mpoly_fit_length(fmpz ** Acoeff,
 FLINT_DLL void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_fit_length_reset_bits(fmpz_mpoly_t A, slong len,
+                              flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE

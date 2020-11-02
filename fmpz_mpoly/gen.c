@@ -19,9 +19,7 @@ void fmpz_mpoly_gen(fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
     bits = mpoly_gen_bits_required(var, ctx->minfo);
     bits = mpoly_fix_bits(bits, ctx->minfo);
 
-    fmpz_mpoly_fit_length(A, WORD(1), ctx);
-    fmpz_mpoly_fit_bits(A, bits, ctx);
-    A->bits = bits;
+    fmpz_mpoly_fit_length_reset_bits(A, 1, bits, ctx);
 
     fmpz_one(A->coeffs);
     if (bits <= FLINT_BITS)

@@ -104,17 +104,16 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, 100) + 2;
-        exp_bits1 = n_randint(state, 100) + 2;
-        exp_bits2 = n_randint(state, 100) + 2;
-
         coeff_bits = n_randint(state, 200);
-
-        fmpz_mpoly_randtest_bits(k1, state, len, coeff_bits, exp_bits, ctx);
-        fmpz_mpoly_randtest_bits(k2, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 2; j++)
         {
+            exp_bits = n_randint(state, 100) + 2;
+            exp_bits1 = n_randint(state, 100) + 2;
+            exp_bits2 = n_randint(state, 100) + 2;
+
+            fmpz_mpoly_randtest_bits(k1, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(k2, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_randtest_bits(h, state, len2, coeff_bits, exp_bits2, ctx);

@@ -280,8 +280,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(
     perm = (slong *) TMP_ALLOC(Pl*sizeof(slong));
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        fmpz_mpoly_init2((Pchunks + Pi)->poly, 8, ctx);
-        fmpz_mpoly_fit_bits((Pchunks + Pi)->poly, P->bits, ctx);
+        fmpz_mpoly_init3((Pchunks + Pi)->poly, 8, P->bits, ctx);
         (Pchunks + Pi)->work = 0;
         perm[Pi] = Pi;
         for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
@@ -447,9 +446,7 @@ int _fmpz_mpoly_mul_array_threaded_pool_LEX(
     if (A == B || A == C)
     {
         fmpz_mpoly_t T;
-        fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
-        fmpz_mpoly_fit_bits(T, exp_bits, ctx);
-        T->bits = exp_bits;
+        fmpz_mpoly_init3(T, B->length + C->length, exp_bits, ctx);
         _fmpz_mpoly_mul_array_chunked_threaded_LEX(T, C, B, mults, ctx,
                                                          handles, num_handles);
         fmpz_mpoly_swap(T, A, ctx);
@@ -457,9 +454,7 @@ int _fmpz_mpoly_mul_array_threaded_pool_LEX(
     }
     else
     {
-        fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
-        fmpz_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        fmpz_mpoly_fit_length_reset_bits(A, B->length + C->length, exp_bits, ctx);
         _fmpz_mpoly_mul_array_chunked_threaded_LEX(A, C, B, mults, ctx,
                                                          handles, num_handles);
     }
@@ -701,8 +696,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(
     perm = (slong *) TMP_ALLOC(Pl*sizeof(slong));
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        fmpz_mpoly_init2((Pchunks + Pi)->poly, 8, ctx);
-        fmpz_mpoly_fit_bits((Pchunks + Pi)->poly, P->bits, ctx);
+        fmpz_mpoly_init3((Pchunks + Pi)->poly, 8, P->bits, ctx);
         (Pchunks + Pi)->work = 0;
         perm[Pi] = Pi;
         for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
@@ -860,9 +854,7 @@ int _fmpz_mpoly_mul_array_threaded_pool_DEG(
     if (A == B || A == C)
     {
         fmpz_mpoly_t T;
-        fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
-        fmpz_mpoly_fit_bits(T, exp_bits, ctx);
-        T->bits = exp_bits;
+        fmpz_mpoly_init3(T, B->length + C->length, exp_bits, ctx);
         _fmpz_mpoly_mul_array_chunked_threaded_DEG(T, C, B, deg, ctx,
                                                          handles, num_handles);
         fmpz_mpoly_swap(T, A, ctx);
@@ -870,9 +862,7 @@ int _fmpz_mpoly_mul_array_threaded_pool_DEG(
     }
     else
     {
-        fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
-        fmpz_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        fmpz_mpoly_fit_length_reset_bits(A, B->length + C->length, exp_bits, ctx);
         _fmpz_mpoly_mul_array_chunked_threaded_DEG(A, C, B, deg, ctx,
                                                          handles, num_handles);
     }
