@@ -552,6 +552,11 @@ Greatest Common Divisor
     Set ``M`` to the GCD of the terms of ``A``.
     If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
 
+.. function:: int fmpq_mpoly_content_vars(fmpq_mpoly_t g, const fmpq_mpoly_t A, slong * vars, slong vars_length, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``g`` to the GCD of the cofficients of ``A`` when viewed as a polynomial in the variables ``vars``.
+    Return ``1`` for success and ``0`` for failure. Upon succcess, ``g`` will be independent of the variables ``vars``.
+
 .. function:: int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
               int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
 

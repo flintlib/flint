@@ -481,6 +481,15 @@ Division
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
+.. function:: void fq_nmod_mpoly_term_content(fq_nmod_mpoly_t M, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the GCD of the terms of ``A``.
+    If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
+
+.. function:: int fq_nmod_mpoly_content_vars(fq_nmod_mpoly_t g, const fq_nmod_mpoly_t A, slong * vars, slong vars_length, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``g`` to the GCD of the cofficients of ``A`` when viewed as a polynomial in the variables ``vars``.
+    Return ``1`` for success and ``0`` for failure. Upon succcess, ``g`` will be independent of the variables ``vars``.
 
 .. function:: int fq_nmod_mpoly_gcd(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
 

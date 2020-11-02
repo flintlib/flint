@@ -286,8 +286,8 @@ next_alphabetas:
     {
         for (i = 0; i < r; i++)
         {
-            if (fac->coeffs[i].bits > FLINT_BITS)
-                nmod_mpoly_repack_bits_inplace(fac->coeffs + i, newA->bits, ctx);
+            /* hlift should not have returned any large bits */
+            FLINT_ASSERT(fac->coeffs[i].bits <= FLINT_BITS);
 
             if (!nmod_mpolyl_content(t, fac->coeffs + i, 1, ctx))
             {

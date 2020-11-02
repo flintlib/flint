@@ -949,6 +949,9 @@ int fmpz_mpoly_is_square(const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpoly_content_vars(fmpz_mpoly_t g, const fmpz_mpoly_t A,
+                  slong * vars, slong vars_length, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
@@ -993,42 +996,6 @@ FLINT_DLL int fmpz_mpoly_gcd_brown_threaded(fmpz_mpoly_t G,
 
 FLINT_DLL int fmpz_mpoly_gcd_berlekamp_massey_threaded(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
-
-/******************************************************************************
-
-   Internal functions (guaranteed to change without notice)
-
-******************************************************************************/
-
-FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
-                         const fmpz_mpoly_t B, slong var, const ulong * Bshift,
-                            const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
-       flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
-                            const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
-
-typedef struct _fmpz_mpoly_stripe_struct
-{
-    char * big_mem;
-    slong big_mem_alloc;
-    slong N;
-    flint_bitcnt_t bits;
-    const ulong * cmpmask;
-    slong * startidx;
-    slong * endidx;
-    ulong * emin;
-    ulong * emax;
-    flint_bitcnt_t coeff_bits;
-    int upperclosed;
-    int flint_small;
-} fmpz_mpoly_stripe_struct;
-
-typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
-
 
 /* Univariates ***************************************************************/
 
@@ -1102,6 +1069,48 @@ void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c,
     FLINT_ASSERT((ulong)i < (ulong)A->length);
     fmpz_mpoly_swap(c, A->coeffs + i, ctx);
 }
+
+/******************************************************************************
+
+   Internal functions (guaranteed to change without notice)
+
+******************************************************************************/
+
+FLINT_DLL void fmpz_mpolyl_lead_coeff(fmpz_mpoly_t c, const fmpz_mpoly_t A,
+                                   slong num_vars, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpolyl_content(fmpz_mpoly_t g, const fmpz_mpoly_t A,
+                                   slong num_vars, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
+                         const fmpz_mpoly_t B, slong var, const ulong * Bshift,
+                            const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
+       flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
+                            const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
+
+typedef struct _fmpz_mpoly_stripe_struct
+{
+    char * big_mem;
+    slong big_mem_alloc;
+    slong N;
+    flint_bitcnt_t bits;
+    const ulong * cmpmask;
+    slong * startidx;
+    slong * endidx;
+    ulong * emin;
+    ulong * emax;
+    flint_bitcnt_t coeff_bits;
+    int upperclosed;
+    int flint_small;
+} fmpz_mpoly_stripe_struct;
+
+typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
+
 
 /* mpolyd ********************************************************************/
 

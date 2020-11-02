@@ -32,7 +32,6 @@ static int _try_lift(
     slong i;
     slong * newdeg;
     nmod_mpoly_t lcq, lcp, t, newq;
-    nmod_mpoly_univar_t u;
 
     FLINT_ASSERT(pfac->length > 1);
 
@@ -41,7 +40,6 @@ static int _try_lift(
     nmod_mpoly_init(lcp, ctx);
     nmod_mpoly_init(t, ctx);
     nmod_mpoly_init(newq, ctx);
-    nmod_mpoly_univar_init(u, ctx);
 
 #if FLINT_WANT_ASSERT
     nmod_mpoly_one(t, ctx);
@@ -84,15 +82,16 @@ static int _try_lift(
 
     for (i = 0; i < qfac->length; i++)
     {
-        nmod_mpoly_to_univar(u, qfac->coeffs + i, 0, ctx);
-        success = _nmod_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-        if (!success)
+        /* hlift should not have returned any large bits */
+        FLINT_ASSERT(qfac->coeffs[i].bits <= FLINT_BITS);
+
+        if (!nmod_mpolyl_content(t, qfac->coeffs + i, 1, ctx))
         {
             success = -1;
             goto cleanup;
         }
-        success = nmod_mpoly_divides(qfac->coeffs + i,
-                                     qfac->coeffs + i, t, ctx);
+
+        success = nmod_mpoly_divides(qfac->coeffs + i, qfac->coeffs + i, t, ctx);
         FLINT_ASSERT(success);
         nmod_mpoly_make_monic(qfac->coeffs + i, qfac->coeffs + i, ctx);
     }
@@ -106,7 +105,6 @@ cleanup:
     nmod_mpoly_clear(lcp, ctx);
     nmod_mpoly_clear(t, ctx);
     nmod_mpoly_clear(newq, ctx);
-    nmod_mpoly_univar_clear(u, ctx);
 
 #if FLINT_WANT_ASSERT
     if (success > 0)
@@ -183,8 +181,9 @@ next_alpha:
     /* ensure degrees do not drop under evaluation */
 	for (i = n - 1; i >= 0; i--)
 	{
-		nmod_mpoly_evaluate_one_ui(Aevals + i,
-                        i == n - 1 ? A : Aevals + i + 1, i + 1, alpha[i], ctx);
+		nmod_mpoly_evaluate_one_ui(Aevals + i, i == n - 1 ? A :
+                                         Aevals + i + 1, i + 1, alpha[i], ctx);
+        nmod_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
 		nmod_mpoly_degrees_si(degeval, Aevals + i, ctx);
 		for (j = 0; j <= i; j++)
 			if (degeval[j] != deg[j])
@@ -193,21 +192,22 @@ next_alpha:
 
     /* make sure univar is squarefree */
 	nmod_mpoly_derivative(t, Aevals + 0, 0, ctx);
-	nmod_mpoly_gcd(t, t, Aevals + 0, ctx);
-	if (!nmod_mpoly_is_one(t, ctx))
+	success = nmod_mpoly_gcd(t, t, Aevals + 0, ctx);
+    if (!success)
+        goto cleanup;
+    if (!nmod_mpoly_is_one(t, ctx))
 		goto next_alpha;
 
     /* make evaluations primitive */
     for (i = n - 1; i > 0; i--)
     {
-        if (Aevals[i].bits > FLINT_BITS)
-            nmod_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
         success = nmod_mpolyl_content(t, Aevals + i, 1, ctx);
         if (!success)
             goto cleanup;
         success = nmod_mpoly_divides(Aevals + i, Aevals + i, t, ctx);
         FLINT_ASSERT(success);
         nmod_mpoly_make_monic(Aevals + i, Aevals + i, ctx);
+        nmod_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
     }
 
     nmod_mpoly_get_bpoly(B, Aevals + 1, 0, 1, ctx);

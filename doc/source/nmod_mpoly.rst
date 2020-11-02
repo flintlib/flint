@@ -531,6 +531,11 @@ The greatest common divisor functions assume that the modulus is prime.
     Set ``M`` to the GCD of the terms of ``A``.
     If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
 
+.. function:: int nmod_mpoly_content_vars(nmod_mpoly_t g, const nmod_mpoly_t A, slong * vars, slong vars_length, const nmod_mpoly_ctx_t ctx)
+
+    Set ``g`` to the GCD of the cofficients of ``A`` when viewed as a polynomial in the variables ``vars``.
+    Return ``1`` for success and ``0`` for failure. Upon succcess, ``g`` will be independent of the variables ``vars``.
+
 .. function:: int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
     Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.

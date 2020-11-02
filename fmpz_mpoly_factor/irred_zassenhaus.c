@@ -32,7 +32,6 @@ static int _try_lift(
     slong i;
     slong * newdeg;
     fmpz_mpoly_t lcq, lcp, t, newq;
-    fmpz_mpoly_univar_t u;
 
     FLINT_ASSERT(pfac->length > 1);
 
@@ -41,7 +40,6 @@ static int _try_lift(
     fmpz_mpoly_init(lcp, ctx);
     fmpz_mpoly_init(t, ctx);
     fmpz_mpoly_init(newq, ctx);
-    fmpz_mpoly_univar_init(u, ctx);
 
 #if FLINT_WANT_ASSERT
     fmpz_mpoly_one(t, ctx);
@@ -84,15 +82,16 @@ static int _try_lift(
 
     for (i = 0; i < qfac->length; i++)
     {
-        fmpz_mpoly_to_univar(u, qfac->coeffs + i, 0, ctx);
-        success = _fmpz_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-        if (!success)
+        /* hlift should not have returned any large bits */
+        FLINT_ASSERT(qfac->coeffs[i].bits <= FLINT_BITS);
+
+        if (!fmpz_mpolyl_content(t, qfac->coeffs + i, 1, ctx))
         {
             success = -1;
             goto cleanup;
         }
-        success = fmpz_mpoly_divides(qfac->coeffs + i,
-                                     qfac->coeffs + i, t, ctx);
+
+        success = fmpz_mpoly_divides(qfac->coeffs + i, qfac->coeffs + i, t, ctx);
         FLINT_ASSERT(success);
         fmpz_mpoly_unit_normalize(qfac->coeffs + i, ctx);
     }
@@ -106,7 +105,6 @@ cleanup:
     fmpz_mpoly_clear(lcp, ctx);
     fmpz_mpoly_clear(t, ctx);
     fmpz_mpoly_clear(newq, ctx);
-    fmpz_mpoly_univar_clear(u, ctx);
 
 #if FLINT_WANT_ASSERT
     if (success > 0)
@@ -140,7 +138,6 @@ int fmpz_mpoly_factor_irred_zassenhaus(
     slong * deg, * degeval;
     fmpz_mpolyv_t qfac, pfac, tfac, dfac;
     fmpz_mpoly_t t, p, q;
-    fmpz_mpoly_univar_t u;
     fmpz_poly_t c;
     fmpz_bpoly_t B;
     fmpz_tpoly_t F;
@@ -165,7 +162,6 @@ int fmpz_mpoly_factor_irred_zassenhaus(
     fmpz_mpoly_init(t, ctx);
     fmpz_mpoly_init(p, ctx);
     fmpz_mpoly_init(q, ctx);
-    fmpz_mpoly_univar_init(u, ctx);
     fmpz_poly_init(c);
     fmpz_bpoly_init(B);
     fmpz_tpoly_init(F);
@@ -189,8 +185,9 @@ got_alpha:
     /* ensure degrees do not drop under evaluation */
     for (i = n - 1; i >= 0; i--)
     {
-        fmpz_mpoly_evaluate_one_fmpz(Aevals + i,
-                       i == n - 1 ? A : Aevals + i + 1, i + 1, alpha + i, ctx);
+        fmpz_mpoly_evaluate_one_fmpz(Aevals + i, i == n - 1 ? A :
+                                        Aevals + i + 1, i + 1, alpha + i, ctx);
+        fmpz_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
         fmpz_mpoly_degrees_si(degeval, Aevals + i, ctx);
         for (j = 0; j <= i; j++)
         {
@@ -204,20 +201,22 @@ got_alpha:
 
     /* make sure univar is squarefree */
     fmpz_mpoly_derivative(t, Aevals + 0, 0, ctx);
-    fmpz_mpoly_gcd(t, t, Aevals + 0, ctx);
+    success = fmpz_mpoly_gcd(t, t, Aevals + 0, ctx);
+    if (!success)
+        goto cleanup;
     if (!fmpz_mpoly_is_fmpz(t, ctx))
         goto next_alpha;
 
     /* make evaluations primitive */
     for (i = n - 1; i > 0; i--)
     {
-        fmpz_mpoly_to_univar(u, Aevals + i, 0, ctx);
-        success = _fmpz_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
+        success = fmpz_mpolyl_content(t, Aevals + i, 1, ctx);
         if (!success)
             goto cleanup;
         success = fmpz_mpoly_divides(Aevals + i, Aevals + i, t, ctx);
         FLINT_ASSERT(success);
         fmpz_mpoly_unit_normalize(Aevals + i, ctx);
+        fmpz_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
     }
 
     fmpz_mpoly_get_bpoly(B, Aevals + 1, 0, 1, ctx);
@@ -377,7 +376,6 @@ cleanup:
     fmpz_mpoly_clear(t, ctx);
     fmpz_mpoly_clear(p, ctx);
     fmpz_mpoly_clear(q, ctx);
-    fmpz_mpoly_univar_clear(u, ctx);
     fmpz_poly_clear(c);
     fmpz_bpoly_clear(B);
     fmpz_tpoly_clear(F);

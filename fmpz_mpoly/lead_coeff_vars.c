@@ -9,17 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fmpz_mpoly.h"
 
 /*
     leading coefficient wrt gen(0), ..., gen(num_vars-1)
     c will be returned with c->bits == A->bits
 */
-void nmod_mpolyl_lead_coeff(
-    nmod_mpoly_t c,
-    const nmod_mpoly_t A,
+void fmpz_mpolyl_lead_coeff(
+    fmpz_mpoly_t c,
+    const fmpz_mpoly_t A,
     slong num_vars,
-    const nmod_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, off, shift;
     ulong old_shift, new_shift;
@@ -51,11 +51,14 @@ void nmod_mpolyl_lead_coeff(
                 break;
     }
 
-    nmod_mpoly_fit_length_reset_bits(c, i, A->bits, ctx);
+    fmpz_mpoly_fit_length(c, i, ctx);
+    fmpz_mpoly_fit_bits(c, A->bits, ctx);
+    c->bits = A->bits;
+
     c->length = i;
     cexps = c->exps;
 
-    _nmod_vec_set(c->coeffs, A->coeffs, c->length);
+    _fmpz_vec_set(c->coeffs, A->coeffs, c->length);
 
     mask = (shift > 0) ? ((-UWORD(1)) >> (FLINT_BITS - shift)) : 0;
     for (i = 0; i < c->length; i++)
