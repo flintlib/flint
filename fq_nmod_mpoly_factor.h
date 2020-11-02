@@ -338,29 +338,20 @@ FLINT_DLL void fq_nmod_mpolyv_print_pretty(const fq_nmod_mpolyv_t poly,
 FLINT_DLL void fq_nmod_mpolyv_fit_length(fq_nmod_mpolyv_t A, slong length,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyv_set_coeff(
-    fq_nmod_mpolyv_t A,
-    slong i,
-    fq_nmod_mpoly_t c,
-    const fq_nmod_mpoly_ctx_t ctx);
+FLINT_DLL void fq_nmod_mpolyv_set_coeff(fq_nmod_mpolyv_t A, slong i,
+                             fq_nmod_mpoly_t c, const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpoly_to_mpolyv(
-    fq_nmod_mpolyv_t A,
-    const fq_nmod_mpoly_t B,
-    const fq_nmod_mpoly_t xalpha,
-    const fq_nmod_mpoly_ctx_t ctx);
+FLINT_DLL void fq_nmod_mpoly_to_mpolyv(fq_nmod_mpolyv_t A,
+                       const fq_nmod_mpoly_t B, const fq_nmod_mpoly_t xalpha,
+                                                const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpoly_from_mpolyv(
-    fq_nmod_mpoly_t A,
-    const fq_nmod_mpolyv_t B,
-    const fq_nmod_mpoly_t xalpha,
-    const fq_nmod_mpoly_ctx_t ctx);
+FLINT_DLL void fq_nmod_mpoly_from_mpolyv(fq_nmod_mpoly_t A,
+                 flint_bitcnt_t Abits, const fq_nmod_mpolyv_t B,
+                 const fq_nmod_mpoly_t xalpha, const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fq_nmod_mpoly_vec_content_mpoly(
-    fq_nmod_mpoly_t g,
-    const fq_nmod_mpoly_struct * A,
-    slong Alen,
-    const fq_nmod_mpoly_ctx_t ctx);
+FLINT_DLL int _fq_nmod_mpoly_vec_content_mpoly(fq_nmod_mpoly_t g,
+                                  const fq_nmod_mpoly_struct * A, slong Alen,
+                                                const fq_nmod_mpoly_ctx_t ctx);
 
 /*****************************************************************************/
 

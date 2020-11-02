@@ -312,7 +312,8 @@ int nmod_mpoly_pfrac(
     }
 
     for (i = 0; i < I->r; i++)
-        nmod_mpoly_from_mpolyv(deltas + i, delta_coeffs + i, I->xalpha + l, ctx);
+        nmod_mpoly_from_mpolyv(deltas + i, I->bits,
+                                         delta_coeffs + i, I->xalpha + l, ctx);
 
     return 1;
 }

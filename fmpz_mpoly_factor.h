@@ -271,8 +271,9 @@ FLINT_DLL void fmpz_mpoly_to_mpolyv(fmpz_mpolyv_t A, const fmpz_mpoly_t B,
                         const fmpz_mpoly_t xalpha, const fmpz_mpoly_ctx_t ctx);
 
 
-FLINT_DLL void fmpz_mpoly_from_mpolyv(fmpz_mpoly_t A, const fmpz_mpolyv_t B,
-                        const fmpz_mpoly_t xalpha, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_from_mpolyv(fmpz_mpoly_t A, flint_bitcnt_t Abits,
+                            const fmpz_mpolyv_t B, const fmpz_mpoly_t xalpha,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_vec_content_mpoly(fmpz_mpoly_t g,
           const fmpz_mpoly_struct * A, slong Alen, const fmpz_mpoly_ctx_t ctx);

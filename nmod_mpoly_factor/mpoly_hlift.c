@@ -120,7 +120,7 @@ cleanup:
     for (i = 0; i < r; i++)
     {
         if (success)
-            nmod_mpoly_from_mpolyv(f + i, B + i, xalpha, ctx);
+            nmod_mpoly_from_mpolyv(f + i, bits, B + i, xalpha, ctx);
         nmod_mpolyv_clear(B + i, ctx);
     }
 
@@ -296,7 +296,7 @@ cleanup:
     for (i = 0; i < r; i++)
     {
         if (success)
-            nmod_mpoly_from_mpolyv(f + i, B + i, xalpha, ctx);
+            nmod_mpoly_from_mpolyv(f + i, bits, B + i, xalpha, ctx);
         nmod_mpolyv_clear(B + i, ctx);
         nmod_mpolyv_clear(U + i, ctx);
     }
@@ -407,7 +407,12 @@ cleanup:
     nmod_mpoly_clear(q, ctx);
 
     for (i = 0; i < r; i++)
+    {
+        if (success)
+            nmod_mpoly_repack_bits_inplace(f + i, bits, ctx);
+
         nmod_mpoly_clear(betas + i, ctx);
+    }
 
     flint_free(betas);
 

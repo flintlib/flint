@@ -115,6 +115,7 @@ void fmpz_mpoly_to_mpolyv(
 
 void fmpz_mpoly_from_mpolyv(
     fmpz_mpoly_t A,
+    flint_bitcnt_t Abits,
     const fmpz_mpolyv_t B,
     const fmpz_mpoly_t xalpha,
     const fmpz_mpoly_ctx_t ctx)
@@ -132,6 +133,8 @@ void fmpz_mpoly_from_mpolyv(
     }
 
     fmpz_mpoly_clear(T, ctx);
+
+    fmpz_mpoly_repack_bits_inplace(A, Abits, ctx);
 }
 
 

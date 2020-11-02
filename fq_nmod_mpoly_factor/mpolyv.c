@@ -117,6 +117,7 @@ void fq_nmod_mpoly_to_mpolyv(
 
 void fq_nmod_mpoly_from_mpolyv(
     fq_nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
     const fq_nmod_mpolyv_t B,
     const fq_nmod_mpoly_t xalpha,
     const fq_nmod_mpoly_ctx_t ctx)
@@ -134,6 +135,8 @@ void fq_nmod_mpoly_from_mpolyv(
     }
 
     fq_nmod_mpoly_clear(T, ctx);
+
+    fq_nmod_mpoly_repack_bits_inplace(A, Abits, ctx);
 }
 
 

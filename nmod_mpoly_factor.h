@@ -288,8 +288,9 @@ FLINT_DLL void nmod_mpolyv_set_coeff(nmod_mpolyv_t A, slong i,
 FLINT_DLL void nmod_mpoly_to_mpolyv(nmod_mpolyv_t A, const nmod_mpoly_t B,
                         const nmod_mpoly_t xalpha, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_from_mpolyv(nmod_mpoly_t A, const nmod_mpolyv_t B,
-                        const nmod_mpoly_t xalpha, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_from_mpolyv(nmod_mpoly_t A, flint_bitcnt_t Abits,
+                            const nmod_mpolyv_t B, const nmod_mpoly_t xalpha,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int _nmod_mpoly_vec_content_mpoly(nmod_mpoly_t g,
           const nmod_mpoly_struct * A, slong Alen, const nmod_mpoly_ctx_t ctx);
