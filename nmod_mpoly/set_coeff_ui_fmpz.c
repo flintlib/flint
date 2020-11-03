@@ -11,8 +11,11 @@
 
 #include "nmod_mpoly.h"
 
-void _nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
-                         ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_set_coeff_ui_fmpz(
+    nmod_mpoly_t A,
+    ulong c,
+    const fmpz * exp,
+    const nmod_mpoly_ctx_t ctx)
 {
     flint_bitcnt_t exp_bits;
     slong i, N, index;
@@ -24,13 +27,11 @@ void _nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
     TMP_START;
 
     if (c >= ctx->ffinfo->mod.n)
-    {
         NMOD_RED(c, c, ctx->ffinfo->mod);
-    }
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-    nmod_mpoly_fit_bits(A, exp_bits, ctx);
+    nmod_mpoly_fit_length_fit_bits(A, A->length, exp_bits, ctx);
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -79,8 +80,11 @@ void _nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
 }
 
 
-void nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
-                       ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_set_coeff_ui_fmpz(
+    nmod_mpoly_t A,
+    ulong c,
+    fmpz * const * exp,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->minfo->nvars;
     fmpz * newexp;

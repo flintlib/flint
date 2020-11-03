@@ -12,37 +12,13 @@
 #include "nmod_mpoly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 
-
-static void _fq_zech_mpoly_set_nmod_mpoly(
-    fq_zech_mpoly_t A,
-    const fq_zech_mpoly_ctx_t Actx,
-    const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t Bctx)
-{
-    slong i, N;
-
-    FLINT_ASSERT(Actx->minfo->ord == Bctx->minfo->ord);
-    FLINT_ASSERT(Actx->minfo->nvars == Bctx->minfo->nvars);
-
-    fq_zech_mpoly_fit_length_set_bits(A, B->length, B->bits, Actx);
-    A->length = B->length;
-
-    N = mpoly_words_per_exp(B->bits, Bctx->minfo);
-
-    mpoly_copy_monomials(A->exps, B->exps, B->length, N);
-
-    for (i = 0; i < B->length; i++)
-        fq_zech_set_ui(A->coeffs + i, B->coeffs[i], Actx->fqctx);
-}
-
-
 static void _frob_combine(
     nmod_mpolyv_t Af,
     fq_zech_mpolyv_t eAf,
     const nmod_mpoly_ctx_t ctx,
     const fq_zech_mpoly_ctx_t ectx)
 {
-    slong i, j;
+    slong i, j, N;
     fq_zech_mpolyv_t tfac;
     fq_zech_mpoly_t t;
     nmod_mpoly_struct * s;
@@ -95,10 +71,10 @@ static void _frob_combine(
         s = Af->coeffs + Af->length;
         Af->length++;
 
-        nmod_mpoly_fit_length_set_bits(s, t->length, t->bits, ctx);
+        nmod_mpoly_fit_length_reset_bits(s, t->length, t->bits, ctx);
         s->length = t->length;
-        mpoly_copy_monomials(s->exps, t->exps,
-                         mpoly_words_per_exp(t->bits, ectx->minfo), t->length);
+        N = mpoly_words_per_exp(t->bits, ectx->minfo);
+        mpoly_copy_monomials(s->exps, t->exps, t->length, N);
         for (i = 0; i < t->length; i++)
         {
             nmod_poly_t asdf;

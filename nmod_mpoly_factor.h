@@ -82,12 +82,6 @@ FLINT_DLL int nmod_mpoly_get_nmod_poly(
     slong var,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_fit_length_set_bits(
-    nmod_mpoly_t A,
-    slong len,
-    flint_bitcnt_t bits,
-    const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void _nmod_mpoly_set_nmod_poly(
     nmod_mpoly_t A,
     flint_bitcnt_t Abits,
@@ -294,8 +288,9 @@ FLINT_DLL void nmod_mpolyv_set_coeff(nmod_mpolyv_t A, slong i,
 FLINT_DLL void nmod_mpoly_to_mpolyv(nmod_mpolyv_t A, const nmod_mpoly_t B,
                         const nmod_mpoly_t xalpha, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_from_mpolyv(nmod_mpoly_t A, const nmod_mpolyv_t B,
-                        const nmod_mpoly_t xalpha, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_from_mpolyv(nmod_mpoly_t A, flint_bitcnt_t Abits,
+                            const nmod_mpolyv_t B, const nmod_mpoly_t xalpha,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int _nmod_mpoly_vec_content_mpoly(nmod_mpoly_t g,
           const nmod_mpoly_struct * A, slong Alen, const nmod_mpoly_ctx_t ctx);
@@ -374,6 +369,7 @@ typedef struct {
     nmod_mpoly_struct * deltas;
     nmod_mpoly_struct * xalpha;
     nmod_mpoly_struct * q;
+    nmod_mpoly_geobucket_struct * G;
     nmod_mpoly_struct * qt;
     nmod_mpoly_struct * newt;
     nmod_mpolyv_struct * delta_coeffs;
@@ -403,24 +399,24 @@ FLINT_DLL int n_bpoly_mod_pfrac(slong r, n_bpoly_struct * C,
             slong * C_deg1_bound, n_bpoly_t A, n_bpoly_struct * B, nmod_t mod);
 
 FLINT_DLL int n_bpoly_mod_hlift2(n_bpoly_t A, n_bpoly_t B0, n_bpoly_t B1,
-                              mp_limb_t alpha, slong degree_inner, nmod_t mod);
+                              mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                                                      n_poly_bpoly_stack_t St);
+
+FLINT_DLL int n_bpoly_mod_hlift2_cubic(n_bpoly_t A, n_bpoly_t B0, n_bpoly_t B1,
+                               mp_limb_t alpha, slong degree_inner, nmod_t ctx,
+                                nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_bpoly_mod_hlift(slong r, n_bpoly_t A, n_bpoly_struct * B,
-                              mp_limb_t alpha, slong degree_inner, nmod_t mod);
+                              mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                                                      n_poly_bpoly_stack_t St);
+
+FLINT_DLL int n_bpoly_mod_hlift_cubic(slong r, n_bpoly_t A, n_bpoly_struct * B,
+                               mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                                nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_polyu3_mod_hlift(slong r, n_polyun_struct * BB,  n_polyu_t A,
                       n_polyu_struct * B, mp_limb_t beta, slong degree_inner,
                                                         const nmodf_ctx_t ctx);
-
-FLINT_DLL int nmod_zip_find_coeffs_new(mp_limb_t * coeffs,
-     const mp_limb_t * monomials, slong mlength, const mp_limb_t * evals,
-     slong elength, const mp_limb_t * master, mp_limb_t * scratch, nmod_t ctx);
-
-FLINT_DLL void _nmod_mpoly_monomial_evals(mp_limb_t * E, const ulong * Aexps,
-    flint_bitcnt_t Abits, slong Alen, const mp_limb_t * alpha, slong vstart,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL mp_limb_t n_poly_mod_eval_step(n_poly_t A, nmod_t ctx);
 
 FLINT_DLL int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
             const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,

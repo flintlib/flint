@@ -11,43 +11,39 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_init(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_init3(
+    fq_nmod_mpoly_t A,
+    slong alloc,
+    flint_bitcnt_t bits,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    flint_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
-
-    A->coeffs = NULL;
-    A->exps = NULL;
-    A->alloc = 0;
-    A->length = 0;
-    A->bits = bits;
-}
-
-void fq_nmod_mpoly_init3(fq_nmod_mpoly_t A, slong alloc, flint_bitcnt_t bits,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
-    if (alloc != 0)
+    if (alloc > 0)
     {
-        slong i;
-        A->coeffs = (fq_nmod_struct *) flint_malloc(alloc*sizeof(fq_nmod_struct));
-        A->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
-        for (i = 0; i < alloc; i++)
-            fq_nmod_init(A->coeffs + i, ctx->fqctx);
+        A->coeffs_alloc = d*alloc;
+        A->coeffs = FLINT_ARRAY_ALLOC(A->coeffs_alloc, mp_limb_t);
+        A->exps_alloc = N*alloc;
+        A->exps = FLINT_ARRAY_ALLOC(A->exps_alloc, ulong);
     }
     else
     {
         A->coeffs = NULL;
         A->exps = NULL;
+        A->coeffs_alloc = 0;
+        A->exps_alloc = 0;
     }
-    A->alloc = alloc;
     A->length = 0;
     A->bits = bits;
 }
 
-void fq_nmod_mpoly_init2(fq_nmod_mpoly_t A, slong alloc,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_init2(
+    fq_nmod_mpoly_t A,
+    slong alloc,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     flint_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
     fq_nmod_mpoly_init3(A, alloc, bits, ctx);
 }
+

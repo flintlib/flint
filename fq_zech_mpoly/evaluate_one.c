@@ -19,52 +19,75 @@ static void _fq_zech_mpoly_evaluate_one_fq_zech_sp(
     const fq_zech_t val,
     const fq_zech_mpoly_ctx_t ctx)
 {
-    slong i;
-    slong main_shift, main_off;
-    ulong main_exp;
+    slong i, N, off, shift;
+    ulong * cmpmask, * one;
     slong Blen = B->length;
-    fq_zech_struct * Bcoeffs = B->coeffs;
-    ulong * Bexps = B->exps;
+    const fq_zech_struct * Bcoeffs = B->coeffs;
+    const ulong * Bexps = B->exps;
     flint_bitcnt_t bits = B->bits;
-    ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    slong N = mpoly_words_per_exp(bits, ctx->minfo);
-    ulong * one;
+    slong Alen;
     fq_zech_struct * Acoeffs;
     ulong * Aexps;
+    ulong mask, k;
+    int need_sort = 0, cmp;
     fq_zech_t pp;
     TMP_INIT;
 
-    FLINT_ASSERT(A != B);
-    FLINT_ASSERT(bits <= FLINT_BITS);
-    FLINT_ASSERT(Blen > 0);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
 
     TMP_START;
 
     fq_zech_init(pp, ctx->fqctx);
 
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_monomial_offset_shift_sp(one, &main_off, &main_shift,
-                                                        var, bits, ctx->minfo);
-
-    fq_zech_mpoly_fit_length_set_bits(A, B->length, bits, ctx);
+    fq_zech_mpoly_fit_length_reset_bits(A, Blen, bits, ctx);
     Acoeffs = A->coeffs;
     Aexps = A->exps;
+
+    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_monomial_offset_shift_sp(one, &off, &shift, var, bits, ctx->minfo);
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+
+    Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        main_exp = (Bexps[N*i + main_off] >> main_shift) & mask;
-        fq_zech_pow_ui(pp, val, main_exp, ctx->fqctx);
-        fq_zech_mul(Acoeffs + i, Bcoeffs + i, pp, ctx->fqctx);
-        mpoly_monomial_msub(Aexps + N*i, Bexps + N*i, main_exp, one, N);
+        k = (Bexps[N*i + off] >> shift) & mask;
+        fq_zech_pow_ui(pp, val, k, ctx->fqctx);
+        fq_zech_mul(Acoeffs + Alen, Bcoeffs + i, pp, ctx->fqctx);
+        if (fq_zech_is_zero(Acoeffs + Alen, ctx->fqctx))
+            continue;
+
+        mpoly_monomial_msub(Aexps + N*Alen, Bexps + N*i, k, one, N);
+        if (Alen < 1)
+        {
+            Alen = 1;
+            continue;
+        }
+        cmp = mpoly_monomial_cmp(Aexps + N*(Alen - 1), Aexps + N*Alen, N, cmpmask);
+        if (cmp != 0)
+        {
+            need_sort |= (cmp < 0);
+            Alen++;
+            continue;
+        }
+        fq_zech_add(Acoeffs + Alen - 1, Acoeffs + Alen - 1, Acoeffs + Alen, ctx->fqctx);
+        Alen -= fq_zech_is_zero(Acoeffs + Alen - 1, ctx->fqctx);
     }
+    A->length = Alen;
 
-    A->length = Blen;
-
-    fq_zech_mpoly_sort_terms(A, ctx);
-    fq_zech_mpoly_combine_like_terms(A, ctx);
+    fq_zech_clear(pp, ctx->fqctx);
 
     TMP_END;
 
-    return;
+    if (need_sort)
+    {
+        fq_zech_mpoly_sort_terms(A, ctx);
+        fq_zech_mpoly_combine_like_terms(A, ctx);
+    }
+
+    FLINT_ASSERT(fq_zech_mpoly_is_canonical(A, ctx));
 }
 
 
@@ -76,9 +99,81 @@ static void _fq_zech_mpoly_evaluate_one_fq_zech_mp(
     const fq_zech_t val,
     const fq_zech_mpoly_ctx_t ctx)
 {
-    flint_printf("_fq_zech_mpoly_evaluate_one_fq_zech_mp not implemented\n");
-    flint_abort();
+    slong i, N, off;
+    ulong * cmpmask, * one, * tmp;
+    slong Blen = B->length;
+    const fq_zech_struct * Bcoeffs = B->coeffs;
+    const ulong * Bexps = B->exps;
+    flint_bitcnt_t bits = B->bits;
+    slong Alen;
+    fq_zech_struct * Acoeffs;
+    ulong * Aexps;
+    fmpz_t k;
+    int need_sort = 0, cmp;
+    fq_zech_t pp;
+    TMP_INIT;
+
+    FLINT_ASSERT(B->bits > FLINT_BITS);
+    FLINT_ASSERT((B->bits % FLINT_BITS) == 0);
+
+    TMP_START;
+
+    fmpz_init(k);
+    fq_zech_init(pp, ctx->fqctx);
+
+    fq_zech_mpoly_fit_length_reset_bits(A, Blen, bits, ctx);
+    Acoeffs = A->coeffs;
+    Aexps = A->exps;
+
+    N = mpoly_words_per_exp_mp(bits, ctx->minfo);
+    one = (ulong *) TMP_ALLOC(3*N*sizeof(ulong));
+    cmpmask = one + N;
+    tmp = cmpmask + N;
+    off = mpoly_gen_monomial_offset_mp(one, var, bits, ctx->minfo);
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+
+    Alen = 0;
+    for (i = 0; i < Blen; i++)
+    {
+        fmpz_set_ui_array(k, Bexps + N*i + off, bits/FLINT_BITS);
+        fq_zech_pow(pp, val, k, ctx->fqctx);
+        fq_zech_mul(Acoeffs + Alen, Bcoeffs + i, pp, ctx->fqctx);
+        if (fq_zech_is_zero(Acoeffs + Alen, ctx->fqctx))
+            continue;
+
+        mpoly_monomial_mul_fmpz(tmp, one, N, k);
+        mpoly_monomial_sub_mp(Aexps + N*Alen, Bexps + N*i, tmp, N);
+        if (Alen < 1)
+        {
+            Alen = 1;
+            continue;
+        }
+        cmp = mpoly_monomial_cmp(Aexps + N*(Alen - 1), Aexps + N*Alen, N, cmpmask);
+        if (cmp != 0)
+        {
+            need_sort |= (cmp < 0);
+            Alen++;
+            continue;
+        }
+        fq_zech_add(Acoeffs + Alen - 1, Acoeffs + Alen - 1, Acoeffs + Alen, ctx->fqctx);
+        Alen -= fq_zech_is_zero(Acoeffs + Alen - 1, ctx->fqctx);
+    }
+    A->length = Alen;
+
+    fq_zech_clear(pp, ctx->fqctx);
+    fmpz_clear(k);
+
+    TMP_END;
+
+    if (need_sort)
+    {
+        fq_zech_mpoly_sort_terms(A, ctx);
+        fq_zech_mpoly_combine_like_terms(A, ctx);
+    }
+
+    FLINT_ASSERT(fq_zech_mpoly_is_canonical(A, ctx));
 }
+
 
 void fq_zech_mpoly_evaluate_one_fq_zech(
     fq_zech_mpoly_t A,
@@ -87,31 +182,15 @@ void fq_zech_mpoly_evaluate_one_fq_zech(
     const fq_zech_t val,
     const fq_zech_mpoly_ctx_t ctx)
 {
-    if (B->length == 0)
+    if (fq_zech_mpoly_is_zero(B, ctx))
     {
         fq_zech_mpoly_zero(A, ctx);
         return;
     }
 
-    if (A == B)
-    {
-        fq_zech_mpoly_t T;
-        fq_zech_mpoly_init(T, ctx);
-        fq_zech_mpoly_evaluate_one_fq_zech(T, B, var, val, ctx);
-        fq_zech_mpoly_swap(A, T, ctx);
-        fq_zech_mpoly_clear(T, ctx);
-        return;
-    }
-
     if (B->bits <= FLINT_BITS)
-    {
         _fq_zech_mpoly_evaluate_one_fq_zech_sp(A, B, var, val, ctx);
-    }
     else
-    {
         _fq_zech_mpoly_evaluate_one_fq_zech_mp(A, B, var, val, ctx);
-    }
-
-    fq_zech_mpoly_assert_canonical(A, ctx);
 }
 

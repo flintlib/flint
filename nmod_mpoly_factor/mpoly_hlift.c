@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly_factor.h"
 
-
 static int _hlift_quartic2(
     slong m,
     nmod_mpoly_struct * f,
@@ -24,7 +23,8 @@ static int _hlift_quartic2(
     int success;
     slong i, j;
     nmod_mpoly_t Aq, t, t2, t3, xalpha;
-    nmod_mpoly_struct * betas, * deltas;
+    nmod_mpoly_geobucket_t G;
+    nmod_mpoly_struct betas[2], * deltas;
     nmod_mpoly_pfrac_t I;
     nmod_mpolyv_struct B[2];
     slong tdeg;
@@ -38,12 +38,12 @@ static int _hlift_quartic2(
     nmod_mpoly_init(t3, ctx);
     nmod_mpoly_init(xalpha, ctx);
     nmod_mpoly_init(Aq, ctx);
+    nmod_mpoly_geobucket_init(G, ctx);
 
     nmod_mpoly_gen(xalpha, m, ctx);
     nmod_mpoly_sub_ui(xalpha, xalpha, alpha[m - 1], ctx);
     nmod_mpoly_repack_bits_inplace(xalpha, bits, ctx);
 
-    betas = FLINT_ARRAY_ALLOC(r, nmod_mpoly_struct);
     for (i = 0; i < r; i++)
     {
         nmod_mpolyv_init(B + i, ctx);
@@ -52,8 +52,10 @@ static int _hlift_quartic2(
         nmod_mpolyv_fit_length(B + i, degs[m] + 1, ctx);
         for (j = B[i].length; j <= degs[m]; j++)
             nmod_mpoly_zero(B[i].coeffs + j, ctx);
-        betas[i] = B[i].coeffs[0];
     }
+
+    for (i = 0; i < r; i++)
+        betas[i] = B[i].coeffs[0];
 
     success = nmod_mpoly_pfrac_init(I, bits, r, m - 1, betas, alpha, ctx);
     FLINT_ASSERT(success == 1);
@@ -72,13 +74,14 @@ static int _hlift_quartic2(
     {
         nmod_mpoly_divrem(t2, t, Aq, xalpha, ctx);
         nmod_mpoly_swap(Aq, t2, ctx);
+        nmod_mpoly_geobucket_set(G, t, ctx);
 
         for (i = 0; i <= j; i++)
         {
-            nmod_mpoly_mul(t2, B[0].coeffs + i, B[1].coeffs + j - i, ctx);
-            nmod_mpoly_sub(t3, t, t2, ctx);
-            nmod_mpoly_swap(t, t3, ctx);
+            nmod_mpoly_mul(t, B[0].coeffs + i, B[1].coeffs + j - i, ctx);
+            nmod_mpoly_geobucket_sub(G, t, ctx);
         }
+        nmod_mpoly_geobucket_empty(t, G, ctx);
 
         if (nmod_mpoly_is_zero(t, ctx))
             continue;
@@ -114,12 +117,10 @@ cleanup:
 
     nmod_mpoly_pfrac_clear(I, ctx);
 
-    flint_free(betas);
-
     for (i = 0; i < r; i++)
     {
         if (success)
-            nmod_mpoly_from_mpolyv(f + i, B + i, xalpha, ctx);
+            nmod_mpoly_from_mpolyv(f + i, bits, B + i, xalpha, ctx);
         nmod_mpolyv_clear(B + i, ctx);
     }
 
@@ -128,6 +129,7 @@ cleanup:
     nmod_mpoly_clear(t3, ctx);
     nmod_mpoly_clear(xalpha, ctx);
     nmod_mpoly_clear(Aq, ctx);
+    nmod_mpoly_geobucket_clear(G, ctx);
 
     return success;
 }
@@ -145,6 +147,7 @@ static int _hlift_quartic(
     int success;
     slong i, j, k;
     nmod_mpoly_t Aq, t, t1, t2, t3, xalpha;
+    nmod_mpoly_geobucket_t G;
     nmod_mpoly_struct * betas, * deltas;
     nmod_mpoly_pfrac_t I;
     nmod_mpolyv_struct * B, * U;
@@ -153,7 +156,6 @@ static int _hlift_quartic(
 
     FLINT_ASSERT(r > 2);
 
-    betas = FLINT_ARRAY_ALLOC(r, nmod_mpoly_struct);
     B = FLINT_ARRAY_ALLOC(2*r, nmod_mpolyv_struct);
     U = B + r;
 
@@ -163,6 +165,7 @@ static int _hlift_quartic(
     nmod_mpoly_init(t3, ctx);
     nmod_mpoly_init(xalpha, ctx);
     nmod_mpoly_init(Aq, ctx);
+    nmod_mpoly_geobucket_init(G, ctx);
 
     nmod_mpoly_gen(xalpha, m, ctx);
     nmod_mpoly_sub_ui(xalpha, xalpha, alpha[m - 1], ctx);
@@ -181,8 +184,11 @@ static int _hlift_quartic(
         nmod_mpolyv_fit_length(B + k, degs[m] + 1, ctx);
         for (j = B[k].length; j <= degs[m]; j++)
             nmod_mpoly_zero(B[k].coeffs + j, ctx);
-        betas[k] = B[k].coeffs[0];
     }
+
+    betas = FLINT_ARRAY_ALLOC(r, nmod_mpoly_struct);
+    for (i = 0; i < r; i++)
+        betas[i] = B[i].coeffs[0];
 
     success = nmod_mpoly_pfrac_init(I, bits, r, m - 1, betas, alpha, ctx);
     FLINT_ASSERT(success == 1);
@@ -193,7 +199,8 @@ static int _hlift_quartic(
     for (k--; k >= 1; k--)
         nmod_mpoly_mul(U[k].coeffs + 0, B[k].coeffs + 0, U[k + 1].coeffs + 0, ctx);
 
-    nmod_mpoly_divrem(Aq, t, A, xalpha, ctx);
+    nmod_mpoly_divrem(t2, t, A, xalpha, ctx);
+    nmod_mpoly_swap(Aq, t2, ctx);
 
 #if FLINT_WANT_ASSERT
     nmod_mpoly_one(t2, ctx);
@@ -205,30 +212,36 @@ static int _hlift_quartic(
     for (j = 1; j <= degs[m]; j++)
     {
         k = r - 2;
-        nmod_mpoly_zero(U[k].coeffs + j, ctx);
+
+        G->length = 0;
         for (i = 0; i <= j; i++)
         {
             nmod_mpoly_mul(t1, B[k].coeffs + i, B[k + 1].coeffs + j - i, ctx);
-            nmod_mpoly_add(U[k].coeffs + j, U[k].coeffs + j, t1, ctx);
+            nmod_mpoly_geobucket_add(G, t1, ctx);
         }
+        nmod_mpoly_geobucket_empty(U[k].coeffs + j, G, ctx);
+
         for (k--; k >= 1; k--)
         {
-            nmod_mpoly_zero(U[k].coeffs + j, ctx);
+            G->length = 0;
             for (i = 0; i <= j; i++)
             {
                 nmod_mpoly_mul(t1, B[k].coeffs + i, U[k + 1].coeffs + j - i, ctx);
-                nmod_mpoly_add(U[k].coeffs + j, U[k].coeffs + j, t1, ctx);
+                nmod_mpoly_geobucket_add(G, t1, ctx);
             }
+            nmod_mpoly_geobucket_empty(U[k].coeffs + j, G, ctx);
         }
 
         nmod_mpoly_divrem(t2, t, Aq, xalpha, ctx);
         nmod_mpoly_swap(Aq, t2, ctx);
+        nmod_mpoly_geobucket_set(G, t, ctx);
+
         for (i = 0; i <= j; i++)
         {
-            nmod_mpoly_mul(t2, B[0].coeffs + i, U[1].coeffs + j - i, ctx);
-            nmod_mpoly_sub(t3, t, t2, ctx);
-            nmod_mpoly_swap(t, t3, ctx);
+            nmod_mpoly_mul(t, B[0].coeffs + i, U[1].coeffs + j - i, ctx);
+            nmod_mpoly_geobucket_sub(G, t, ctx);
         }
+        nmod_mpoly_geobucket_empty(t, G, ctx);
 
         if (nmod_mpoly_is_zero(t, ctx))
             continue;
@@ -283,10 +296,11 @@ cleanup:
     for (i = 0; i < r; i++)
     {
         if (success)
-            nmod_mpoly_from_mpolyv(f + i, B + i, xalpha, ctx);
+            nmod_mpoly_from_mpolyv(f + i, bits, B + i, xalpha, ctx);
         nmod_mpolyv_clear(B + i, ctx);
         nmod_mpolyv_clear(U + i, ctx);
     }
+
     flint_free(B);
 
     nmod_mpoly_clear(t, ctx);
@@ -295,6 +309,7 @@ cleanup:
     nmod_mpoly_clear(t3, ctx);
     nmod_mpoly_clear(xalpha, ctx);
     nmod_mpoly_clear(Aq, ctx);
+    nmod_mpoly_geobucket_clear(G, ctx);
 
     return success;
 }
@@ -392,7 +407,12 @@ cleanup:
     nmod_mpoly_clear(q, ctx);
 
     for (i = 0; i < r; i++)
+    {
+        if (success)
+            nmod_mpoly_repack_bits_inplace(f + i, bits, ctx);
+
         nmod_mpoly_clear(betas + i, ctx);
+    }
 
     flint_free(betas);
 

@@ -11,6 +11,87 @@
 
 #include "fq_nmod_mpoly.h"
 
+void gcd_check(
+    fq_nmod_mpoly_t g,
+    fq_nmod_mpoly_t a,
+    fq_nmod_mpoly_t b,
+    fq_nmod_mpoly_t t,
+    fq_nmod_mpoly_ctx_t ctx,
+    slong i,
+    slong j,
+    const char * name)
+{
+    fq_nmod_mpoly_t ca, cb, cg;
+
+    fq_nmod_mpoly_init(ca, ctx);
+    fq_nmod_mpoly_init(cb, ctx);
+    fq_nmod_mpoly_init(cg, ctx);
+
+    if (!fq_nmod_mpoly_gcd_zippel(g, a, b, ctx))
+    {
+        flint_printf("FAIL: check gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fq_nmod_mpoly_assert_canonical(g, ctx);
+
+    if (fq_nmod_mpoly_is_zero(g, ctx))
+    {
+        if (!fq_nmod_mpoly_is_zero(a, ctx) || !fq_nmod_mpoly_is_zero(b, ctx))
+        {
+            flint_printf("FAIL: check zero gcd\n");
+            flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
+        goto cleanup;
+    }
+
+    if (!fq_nmod_mpoly_is_monic(g, ctx))
+    {
+        flint_printf("FAIL: check gcd is monic\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!fq_nmod_mpoly_is_zero(t, ctx) && !fq_nmod_mpoly_divides(cg, g, t, ctx))
+    {
+        flint_printf("FAIL: check gcd divisor\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!fq_nmod_mpoly_divides(ca, a, g, ctx) ||
+        !fq_nmod_mpoly_divides(cb, b, g, ctx))
+    {
+        flint_printf("FAIL: check divisibility\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!fq_nmod_mpoly_gcd_zippel(cg, ca, cb, ctx))
+    {
+        flint_printf("FAIL: check cofactor gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fq_nmod_mpoly_assert_canonical(cg, ctx);
+
+    if (!fq_nmod_mpoly_is_one(cg, ctx))
+    {
+        flint_printf("FAIL: check gcd of cofactors is one\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+cleanup:
+
+    fq_nmod_mpoly_clear(ca, ctx);
+    fq_nmod_mpoly_clear(cb, ctx);
+    fq_nmod_mpoly_clear(cg, ctx);
+}
+
 int
 main(void)
 {
@@ -27,14 +108,13 @@ main(void)
         slong len, len1, len2;
         ulong degbound;
         ulong * degbounds, * degbounds1, * degbounds2;
-        int res;
         flint_bitcnt_t pbits;
         slong deg;
 
         pbits = 1 + n_randint(state, FLINT_BITS);
         pbits = 1 + n_randint(state, pbits);
-        deg = 1 + n_randint(state, 4);
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 10, pbits, deg);
+        deg = 2 + n_randint(state, 4);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 5, pbits, deg);
 
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);
@@ -44,9 +124,9 @@ main(void)
         fq_nmod_mpoly_init(cg, ctx);
         fq_nmod_mpoly_init(t, ctx);
 
-        len = n_randint(state, 10) + 1;
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
+        len = n_randint(state, 30) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
         degbound = 50/(2*ctx->minfo->nvars - 1);
         degbounds = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
@@ -72,59 +152,7 @@ main(void)
 
             fq_nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            res = fq_nmod_mpoly_gcd_zippel(g, a, b, ctx);
-
-            if (!res)
-            {
-                continue;
-                printf("FAIL\n");
-                flint_printf("Check that gcd could be computed\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-            fq_nmod_mpoly_assert_canonical(g, ctx);
-
-            if (fq_nmod_mpoly_is_zero(g, ctx))
-            {
-                if (!fq_nmod_mpoly_is_zero(a, ctx) || !fq_nmod_mpoly_is_zero(b, ctx))
-                {
-                    printf("FAIL\n");
-                    flint_printf("Check zero gcd only results from zero inputs\ni = %wd, j = %wd\n", i ,j);
-                    flint_abort();
-                }
-                continue;
-            }
-
-            if (!fq_nmod_is_one(g->coeffs + 0, ctx->fqctx))
-            {
-                printf("FAIL\n");
-                flint_printf("Check gcd is monic\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-
-            res = 1;
-            res = res && fq_nmod_mpoly_divides(ca, a, g, ctx);
-            res = res && fq_nmod_mpoly_divides(cb, b, g, ctx);
-            if (!res)
-            {
-                printf("FAIL\n");
-                flint_printf("Check divisibility\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-
-            res = fq_nmod_mpoly_gcd_zippel(cg, ca, cb, ctx);
-            if (!res)
-            {
-                printf("FAIL\n");
-                flint_printf("Check that cofactor gcd could be computed\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-
-            if (!fq_nmod_mpoly_is_one(cg, ctx))
-            {
-                printf("FAIL\n");
-                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);                
-                flint_abort();
-            }
+            gcd_check(g, a, b, t, ctx, i, j, "random");
         }
 
         flint_free(degbounds);
@@ -141,7 +169,7 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
 
     return 0;

@@ -28,3 +28,17 @@ fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     _fmpz_poly_set_length(rop, d);
     _fmpz_poly_normalise(rop);
 }
+
+void fq_rand_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+{
+    int tries = 3;
+
+    do {
+        fq_rand(rop, state, ctx);
+        if (!fq_is_zero(rop, ctx))
+            return;
+    } while (--tries >= 0);
+
+    fq_one(rop, ctx);
+}
+

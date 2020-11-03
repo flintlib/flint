@@ -145,7 +145,8 @@ int nmod_mpolyu_gcdm_zippel_bivar(
             }
         }
 
-        fq_nmod_inv(t, fq_nmod_mpolyu_leadcoeff(Geval, ffctx), ffctx->fqctx);
+        n_fq_get_fq_nmod(t, fq_nmod_mpolyu_leadcoeff(Geval, ffctx), ffctx->fqctx);
+        fq_nmod_inv(t, t, ffctx->fqctx);
         fq_nmod_mul(t, t, geval, ffctx->fqctx);
         fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, t, ffctx);
 
@@ -361,7 +362,8 @@ choose_prime_outer:
         goto finished;
     }
 
-    fq_nmod_inv(t, fq_nmod_mpolyu_leadcoeff(Gff, ffctx), ffctx->fqctx);
+    n_fq_get_fq_nmod(t, fq_nmod_mpolyu_leadcoeff(Gff, ffctx), ffctx->fqctx);
+    fq_nmod_inv(t, t, ffctx->fqctx);
     fq_nmod_mul(t, t, gammaff, ffctx->fqctx);
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
@@ -379,6 +381,8 @@ choose_prime_inner:
         success = 0;
         goto finished;
     }
+
+    /* Gform need not be reinited because only its exponents are used */
 
     fq_nmod_mpolyu_clear(Aff, ffctx);
     fq_nmod_mpolyu_clear(Bff, ffctx);
@@ -426,10 +430,12 @@ choose_prime_inner:
             break;
     }
 
-    if (fq_nmod_is_zero(fq_nmod_mpolyu_leadcoeff(Gff, ffctx), ffctx->fqctx))
+    n_fq_get_fq_nmod(t, fq_nmod_mpolyu_leadcoeff(Gff, ffctx), ffctx->fqctx);
+
+    if (fq_nmod_is_zero(t, ffctx->fqctx))
         goto choose_prime_inner;
 
-    fq_nmod_inv(t, fq_nmod_mpolyu_leadcoeff(Gff, ffctx), ffctx->fqctx);
+    fq_nmod_inv(t, t, ffctx->fqctx);
     fq_nmod_mul(t, t, gammaff, ffctx->fqctx);
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
@@ -492,156 +498,16 @@ finished:
 }
 
 
-int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
-                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+/* should find its way back here in interesting cases */
+int nmod_mpoly_gcd_zippel(
+    nmod_mpoly_t G,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
-    flint_bitcnt_t wbits;
-    flint_rand_t randstate;
-    int success = 0;
-    mpoly_zipinfo_t zinfo;
-    nmod_mpoly_ctx_t uctx;
-    nmod_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
-    nmod_mpoly_t Ac, Bc, Gc;
-    ulong * shift, * stride;
-    ulong amin, bmin;
+    if (nmod_mpoly_is_zero(A, ctx) || nmod_mpoly_is_zero(B, ctx))
+        return nmod_mpoly_gcd(G, A, B, ctx);
 
-    if (nmod_mpoly_is_zero(A, ctx))
-    {
-        if (nmod_mpoly_is_zero(B, ctx))
-        {
-            nmod_mpoly_zero(G, ctx);
-        }
-        else
-        {
-            nmod_mpoly_make_monic(G, B, ctx);
-        }
-        return 1;
-    }
-
-    if (nmod_mpoly_is_zero(B, ctx))
-    {
-        nmod_mpoly_make_monic(G, A, ctx);
-        return 1;
-    }
-
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
-        return 0;
-
-    shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-    stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-    for (i = 0; i < ctx->minfo->nvars; i++)
-    {
-        shift[i] = 0;
-        stride[i] = 1;
-    }
-
-    if (ctx->minfo->nvars == 1)
-    {
-        nmod_poly_t a, b, g;
-        nmod_poly_init_mod(a, ctx->ffinfo->mod);
-        nmod_poly_init_mod(b, ctx->ffinfo->mod);
-        nmod_poly_init_mod(g, ctx->ffinfo->mod);
-        _nmod_mpoly_to_nmod_poly_deflate(a, A, 0, shift, stride, ctx);
-        _nmod_mpoly_to_nmod_poly_deflate(b, B, 0, shift, stride, ctx);
-        nmod_poly_gcd(g, a, b);
-        _nmod_mpoly_from_nmod_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
-        nmod_poly_clear(g);
-
-        success = 1;
-        goto cleanup1;
-    }
-
-    FLINT_ASSERT(A->bits <= FLINT_BITS);
-    FLINT_ASSERT(B->bits <= FLINT_BITS);
-    FLINT_ASSERT(!nmod_mpoly_is_zero(A, ctx));
-    FLINT_ASSERT(!nmod_mpoly_is_zero(B, ctx));
-    FLINT_ASSERT(ctx->minfo->nvars > WORD(1));
-
-    flint_randinit(randstate);
-
-    mpoly_zipinfo_init(zinfo, ctx->minfo->nvars);
-    nmod_mpoly_degrees_si(zinfo->Adegs, A, ctx);
-    nmod_mpoly_degrees_si(zinfo->Bdegs, B, ctx);
-    for (i = 0; i < ctx->minfo->nvars; i++)
-        zinfo->perm[i] = i;
-
-    wbits = FLINT_MAX(A->bits, B->bits);
-
-    nmod_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX, ctx->ffinfo->mod.n);
-
-    nmod_mpolyu_init(Au, wbits, uctx);
-    nmod_mpolyu_init(Bu, wbits, uctx);
-    nmod_mpolyu_init(Gu, wbits, uctx);
-    nmod_mpolyu_init(Abaru, wbits, uctx);
-    nmod_mpolyu_init(Bbaru, wbits, uctx);
-    nmod_mpoly_init3(Ac, 0, wbits, uctx);
-    nmod_mpoly_init3(Bc, 0, wbits, uctx);
-    nmod_mpoly_init3(Gc, 0, wbits, uctx);
-
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx, zinfo->perm,
-                                                       shift, stride, NULL, 0);
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx, zinfo->perm,
-                                                       shift, stride, NULL, 0);
-
-    FLINT_ASSERT(Au->length > 0);
-    FLINT_ASSERT(Bu->length > 0);
-    amin = Au->exps[Au->length - 1];
-    bmin = Bu->exps[Bu->length - 1];
-    nmod_mpolyu_shift_right(Au, amin);
-    nmod_mpolyu_shift_right(Bu, bmin);
-
-    success = nmod_mpolyu_content_mpoly_threaded_pool(Ac, Au, uctx, NULL, 0);
-    success = success &&
-              nmod_mpolyu_content_mpoly_threaded_pool(Bc, Bu, uctx, NULL, 0);
-    if (!success)
-        goto cleanup;
-
-    nmod_mpolyu_divexact_mpoly_inplace(Au, Ac, uctx);
-    nmod_mpolyu_divexact_mpoly_inplace(Bu, Bc, uctx);
-
-    /* after removing content, degree bounds in zinfo are still valid bounds */
-    success = nmod_mpolyu_gcdm_zippel(Gu, Abaru, Bbaru, Au, Bu,
-                                                       uctx, zinfo, randstate);
-    if (!success)
-        goto cleanup;
-
-    success = _nmod_mpoly_gcd_threaded_pool(Gc, wbits, Ac, Bc, uctx, NULL, 0);
-    if (!success)
-        goto cleanup;
-
-    nmod_mpolyu_mul_mpoly_inplace(Gu, Gc, uctx);
-    nmod_mpolyu_shift_left(Gu, FLINT_MIN(amin, bmin));
-
-    nmod_mpoly_from_mpolyu_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
-                                         Gu, uctx, zinfo->perm, shift, stride);
-    success = 1;
-
-    nmod_mpoly_make_monic(G, G, ctx);
-
-cleanup:
-
-    nmod_mpolyu_clear(Au, uctx);
-    nmod_mpolyu_clear(Bu, uctx);
-    nmod_mpolyu_clear(Gu, uctx);
-    nmod_mpolyu_clear(Abaru, uctx);
-    nmod_mpolyu_clear(Bbaru, uctx);
-    nmod_mpoly_clear(Ac, uctx);
-    nmod_mpoly_clear(Bc, uctx);
-    nmod_mpoly_clear(Gc, uctx);
-
-    nmod_mpoly_ctx_clear(uctx);
-
-    mpoly_zipinfo_clear(zinfo);
-
-    flint_randclear(randstate);
-
-cleanup1:
-
-    flint_free(shift);
-    flint_free(stride);
-
-    return success;
+    return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ZIPPEL);
 }
+

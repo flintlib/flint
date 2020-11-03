@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "mpoly.h"
 
 
 void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N)

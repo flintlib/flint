@@ -23,19 +23,23 @@ void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(
     const ulong * Bstride,
     const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     ulong mask;
     slong i, shift, off, N;
     slong len = B->length;
-    fq_nmod_struct * coeff = B->coeffs;
+    mp_limb_t * coeff = B->coeffs;
     ulong * exp = B->exps;
     ulong var_shift, var_stride;
     flint_bitcnt_t bits = B->bits;
+    fq_nmod_t cc;
 
     FLINT_ASSERT(len > 0);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
     N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
+
+    fq_nmod_init(cc, ctx->fqctx);
 
     fq_nmod_poly_zero(A, ctx->fqctx);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -50,8 +54,11 @@ void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(
         {
             k /= var_stride;
         }
-        fq_nmod_poly_set_coeff(A, k, coeff + i, ctx->fqctx);
+        n_fq_get_fq_nmod(cc, coeff + d*i, ctx->fqctx);
+        fq_nmod_poly_set_coeff(A, k, cc, ctx->fqctx);
     }
+
+    fq_nmod_clear(cc, ctx->fqctx);
 
 #if FLINT_WANT_ASSERT
     for (i = 0; i < len; i++)
@@ -82,53 +89,36 @@ void _fq_nmod_mpoly_from_fq_nmod_poly_inflate(
     const ulong * Astride,
     const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong N;
-    slong k;
-    slong Alen;
-    fq_nmod_struct * Acoeff;
-    ulong * Aexp;
-    slong Aalloc;
-    ulong * shiftexp;
-    ulong * strideexp;
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    slong N = mpoly_words_per_exp_sp(Abits, ctx->minfo);
+    slong k, Alen;
+    ulong * shiftexp, * strideexp;
     slong Bdeg = fq_nmod_poly_degree(B, ctx->fqctx);
     TMP_INIT;
 
     TMP_START;
 
-    FLINT_ASSERT(Abits <= FLINT_BITS);
-    FLINT_ASSERT(!fq_nmod_poly_is_zero(B, ctx->fqctx));
-
     /* must have at least space for the highest exponent of var */
+    FLINT_ASSERT(Bdeg >= 0);
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Ashift[var] + Bdeg*Astride[var]) <= Abits);
-
-    N = mpoly_words_per_exp_sp(Abits, ctx->minfo);
+    
     strideexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     shiftexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_set_monomial_ui(shiftexp, Ashift, Abits, ctx->minfo);
     mpoly_gen_monomial_sp(strideexp, var, Abits, ctx->minfo);
     mpoly_monomial_mul_ui(strideexp, strideexp, N, Astride[var]);
 
-    fq_nmod_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
-
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    Aalloc = A->alloc;
+    fq_nmod_mpoly_fit_length_reset_bits(A, Bdeg + 1, Abits, ctx);
     Alen = 0;
     for (k = Bdeg; k >= 0; k--)
     {
-        _fq_nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N, ctx->fqctx);
-        fq_nmod_poly_get_coeff(Acoeff + Alen, B, k, ctx->fqctx);
-        if (!fq_nmod_is_zero(Acoeff + Alen, ctx->fqctx))
+        n_fq_set_fq_nmod(A->coeffs + d*Alen, B->coeffs + k, ctx->fqctx);
+        if (!_n_fq_is_zero(A->coeffs + d*Alen, d))
         {
-            mpoly_monomial_madd(Aexp + N*Alen, shiftexp, k, strideexp, N);
+            mpoly_monomial_madd(A->exps + N*Alen, shiftexp, k, strideexp, N);
             Alen++;
         }
     }
-
-    A->coeffs = Acoeff;
-    A->exps = Aexp;
-    A->alloc = Aalloc;
     _fq_nmod_mpoly_set_length(A, Alen, ctx);
 
     TMP_END;

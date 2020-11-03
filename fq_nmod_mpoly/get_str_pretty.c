@@ -15,11 +15,15 @@
 
 #define ALLOC_PER_VAR ((FLINT_BITS+4)/3)
 
-char *
-_fq_nmod_mpoly_get_str_pretty(const fq_nmod_struct * coeff, const ulong * exp,
-                                  slong len, const char ** x_in, slong bits,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+char * _fq_nmod_mpoly_get_str_pretty(
+    const mp_limb_t * coeff,
+    const ulong * exp,
+    slong len,
+    const char ** x_in,
+    slong bits,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     char * str, ** x = (char **) x_in, *xtmp;
     slong i, j, N, bound, off;
     fmpz * exponents;
@@ -55,7 +59,7 @@ _fq_nmod_mpoly_get_str_pretty(const fq_nmod_struct * coeff, const ulong * exp,
     bound = 1;
     for (i = 0; i < len; i++)
     {
-        coeffstrs[i] = fq_nmod_get_str_pretty(coeff + i, ctx->fqctx);
+        coeffstrs[i] = n_fq_get_str_pretty(coeff + d*i, ctx->fqctx);
         bound += 5 + strlen(coeffstrs[i]);
     }
 
@@ -79,7 +83,7 @@ _fq_nmod_mpoly_get_str_pretty(const fq_nmod_struct * coeff, const ulong * exp,
             str[off++] = ' ';
         }
 
-        first = fq_nmod_is_one(coeff + i, ctx->fqctx);
+        first = _n_fq_is_one(coeff + d*i, d);
         if (!first)
         {
             off += flint_sprintf(str + off, "(%s)", coeffstrs[i]);
@@ -123,15 +127,11 @@ _fq_nmod_mpoly_get_str_pretty(const fq_nmod_struct * coeff, const ulong * exp,
     }
 
     for (i = 0; i < len; i++)
-    {
         flint_free(coeffstrs[i]);
-    }
     flint_free(coeffstrs);
 
     for (i = 0; i < ctx->minfo->nvars; i++)
-    {
         fmpz_clear(exponents + i);
-    }
 
     TMP_END;
     return str;

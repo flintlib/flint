@@ -32,7 +32,6 @@ static int _try_lift(
     slong i;
     slong * newdeg;
     fq_nmod_mpoly_t lcq, lcp, t, newq;
-    fq_nmod_mpoly_univar_t u;
 
     FLINT_ASSERT(pfac->length > 1);
 
@@ -41,7 +40,6 @@ static int _try_lift(
     fq_nmod_mpoly_init(lcp, ctx);
     fq_nmod_mpoly_init(t, ctx);
     fq_nmod_mpoly_init(newq, ctx);
-    fq_nmod_mpoly_univar_init(u, ctx);
 
 #if FLINT_WANT_ASSERT
     fq_nmod_mpoly_one(t, ctx);
@@ -84,15 +82,16 @@ static int _try_lift(
 
     for (i = 0; i < qfac->length; i++)
     {
-        fq_nmod_mpoly_to_univar(u, qfac->coeffs + i, 0, ctx);
-        success = _fq_nmod_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-        if (!success)
+        /* hlift should not have returned any large bits */
+        FLINT_ASSERT(qfac->coeffs[i].bits <= FLINT_BITS);
+
+        if (!fq_nmod_mpolyl_content(t, qfac->coeffs + i, 1, ctx))
         {
             success = -1;
             goto cleanup;
         }
-        success = fq_nmod_mpoly_divides(qfac->coeffs + i,
-                                        qfac->coeffs + i, t, ctx);
+
+        success = fq_nmod_mpoly_divides(qfac->coeffs + i, qfac->coeffs + i, t, ctx);
         FLINT_ASSERT(success);
         fq_nmod_mpoly_make_monic(qfac->coeffs + i, qfac->coeffs + i, ctx);
     }
@@ -106,7 +105,6 @@ cleanup:
     fq_nmod_mpoly_clear(lcp, ctx);
     fq_nmod_mpoly_clear(t, ctx);
     fq_nmod_mpoly_clear(newq, ctx);
-    fq_nmod_mpoly_univar_clear(u, ctx);
 
 #if FLINT_WANT_ASSERT
     if (success > 0)
@@ -145,14 +143,13 @@ int fq_nmod_mpoly_factor_irred_smprime_zassenhaus(
     slong * deg, * degeval;
     fq_nmod_mpolyv_t qfac, pfac, tfac, dfac;
     fq_nmod_mpoly_t t, p, q;
-    fq_nmod_mpoly_univar_t u;
     n_poly_t c;
     n_bpoly_t B;
     n_tpoly_t F;
 
     FLINT_ASSERT(n > 1);
     FLINT_ASSERT(A->length > 1);
-    FLINT_ASSERT(fq_nmod_is_one(A->coeffs + 0, ctx->fqctx));
+    FLINT_ASSERT(_n_fq_is_one(A->coeffs, fq_nmod_ctx_degree(ctx->fqctx)));
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
     subset = (slong*) flint_malloc(4*sizeof(slong));
@@ -174,7 +171,6 @@ int fq_nmod_mpoly_factor_irred_smprime_zassenhaus(
 	fq_nmod_mpoly_init(t, ctx);
 	fq_nmod_mpoly_init(p, ctx);
 	fq_nmod_mpoly_init(q, ctx);
-	fq_nmod_mpoly_univar_init(u, ctx);
     n_poly_init(c);
     n_bpoly_init(B);
     n_tpoly_init(F);
@@ -199,8 +195,9 @@ got_alpha:
 	/* ensure degrees do not drop under evalutaion */
     for (i = n - 1; i >= 0; i--)
     {
-    	fq_nmod_mpoly_evaluate_one_fq_nmod(Aevals + i,
-                       i == n - 1 ? A : Aevals + i + 1, i + 1, alpha + i, ctx);
+    	fq_nmod_mpoly_evaluate_one_fq_nmod(Aevals + i, i == n - 1 ? A :
+                                        Aevals + i + 1, i + 1, alpha + i, ctx);
+        fq_nmod_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
     	fq_nmod_mpoly_degrees_si(degeval, Aevals + i, ctx);
 	    for (j = 0; j <= i; j++)
         {
@@ -211,24 +208,26 @@ got_alpha:
 
     /* make sure univar is squarefree */
 	fq_nmod_mpoly_derivative(t, Aevals + 0, 0, ctx);
-	fq_nmod_mpoly_gcd(t, t, Aevals + 0, ctx);
-	if (!fq_nmod_mpoly_is_one(t, ctx))
+	success = fq_nmod_mpoly_gcd(t, t, Aevals + 0, ctx);
+    if (!success)
+        goto cleanup;
+    if (!fq_nmod_mpoly_is_one(t, ctx))
 		goto next_alpha;
 
     /* make evaluations primitive */
     for (i = n - 1; i > 0; i--)
     {
-        fq_nmod_mpoly_to_univar(u, Aevals + i, 0, ctx);
-        success = _fq_nmod_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
+        success = fq_nmod_mpolyl_content(t, Aevals + i, 1, ctx);
         if (!success)
             goto cleanup;
         success = fq_nmod_mpoly_divides(Aevals + i, Aevals + i, t, ctx);
         FLINT_ASSERT(success);
         fq_nmod_mpoly_make_monic(Aevals + i, Aevals + i, ctx);
+        fq_nmod_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
     }
 
-    fq_nmod_mpoly_get_n_bpoly_fq(B, Aevals + 1, 0, 1, ctx);
-    success = n_bpoly_fq_factor_smprime(c, F, B, 1, ctx->fqctx);
+    fq_nmod_mpoly_get_n_fq_bpoly(B, Aevals + 1, 0, 1, ctx);
+    success = n_fq_bpoly_factor_smprime(c, F, B, 1, ctx->fqctx);
     if (!success)
         goto next_alpha;
 
@@ -238,7 +237,7 @@ got_alpha:
     pfac->length = F->length;
     for (i = 0; i < F->length; i++)
     {
-        fq_nmod_mpoly_set_n_bpoly_fq(pfac->coeffs + i, A->bits,
+        fq_nmod_mpoly_set_n_fq_bpoly(pfac->coeffs + i, A->bits,
                                                      F->coeffs + i, 0, 1, ctx);
         fq_nmod_mpoly_make_monic(pfac->coeffs + i, pfac->coeffs + i, ctx);
     }
@@ -391,7 +390,6 @@ cleanup:
     fq_nmod_mpoly_clear(t, ctx);
     fq_nmod_mpoly_clear(p, ctx);
     fq_nmod_mpoly_clear(q, ctx);
-    fq_nmod_mpoly_univar_clear(u, ctx);
     n_poly_clear(c);
     n_bpoly_clear(B);
     n_tpoly_clear(F);

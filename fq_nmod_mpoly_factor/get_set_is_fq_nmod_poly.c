@@ -28,17 +28,25 @@ int fq_nmod_mpoly_get_fq_nmod_poly(
     slong var,
     const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong Blen = B->length;
-    const fq_nmod_struct * Bcoeffs = B->coeffs;
+    const mp_limb_t * Bcoeffs = B->coeffs;
     const ulong * Bexps = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong i, N = mpoly_words_per_exp(Bbits, ctx->minfo);
     ulong k;
+    int success;
+    fq_nmod_t t;
+
+    fq_nmod_init(t, ctx->fqctx);
 
     fq_nmod_poly_zero(A, ctx->fqctx);
 
     if (B->length < 1)
-        return 1;
+    {
+        success = 1;
+        goto cleanup;
+    }
 
     if (Bbits <= FLINT_BITS)
     {
@@ -50,9 +58,12 @@ int fq_nmod_mpoly_get_fq_nmod_poly(
         for (i = 0; i < Blen; i++)
         {
             k = (Bexps[N*i + off] >> shift) & mask;
-            fq_nmod_poly_set_coeff(A, k, Bcoeffs + i, ctx->fqctx);
+            n_fq_get_fq_nmod(t, Bcoeffs + d*i, ctx->fqctx);
+            fq_nmod_poly_set_coeff(A, k, t, ctx->fqctx);
         }
-        return 1;
+
+        success = 1;
+        goto cleanup;
     }
     else
     {
@@ -69,51 +80,25 @@ int fq_nmod_mpoly_get_fq_nmod_poly(
                 check |= Bexps[N*i + off + j];
 
             if (check != 0 || (slong) k < 0)
-                return 0;
+            {
+                success = 0;
+                goto cleanup;
+            }
 
-            fq_nmod_poly_set_coeff(A, k, Bcoeffs + i, ctx->fqctx);
+            n_fq_get_fq_nmod(t, Bcoeffs + d*i, ctx->fqctx);
+            fq_nmod_poly_set_coeff(A, k, t, ctx->fqctx);
         }
-        return 1;
+
+        success = 1;
+        goto cleanup;
     }
+
+cleanup:
+
+    fq_nmod_clear(t, ctx->fqctx);
+    return success;
 }
 
-void fq_nmod_mpoly_fit_length_set_bits(
-    fq_nmod_mpoly_t A,
-    slong len,
-    flint_bitcnt_t bits,
-    const fq_nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    slong N = mpoly_words_per_exp(bits, ctx->minfo);
-    slong new_alloc;
-
-    FLINT_ASSERT(len >= 0);
-
-    if (A->alloc < len)
-    {
-        new_alloc = FLINT_MAX(len, 2*A->alloc);
-        if (A->alloc > 0)
-        {
-            A->coeffs = (fq_nmod_struct *) flint_realloc(A->coeffs, new_alloc*sizeof(fq_nmod_struct));
-            A->exps = (ulong *) flint_realloc(A->exps, new_alloc*N*sizeof(ulong));
-        }
-        else
-        {
-            A->coeffs = (fq_nmod_struct *) flint_malloc(new_alloc*sizeof(fq_nmod_struct));
-            A->exps   = (ulong *) flint_malloc(new_alloc*N*sizeof(ulong));
-        }
-        for (i = A->alloc; i < new_alloc; i++)
-            fq_nmod_init(A->coeffs + i, ctx->fqctx);
-        A->alloc = new_alloc;
-    }
-    else if (A->bits < bits)
-    {
-        if (A->alloc > 0)
-            A->exps = (ulong *) flint_realloc(A->exps, A->alloc*N*sizeof(ulong));
-    }
-
-    A->bits = bits;
-}
 
 void _fq_nmod_mpoly_set_fq_nmod_poly(
     fq_nmod_mpoly_t A,
@@ -123,6 +108,7 @@ void _fq_nmod_mpoly_set_fq_nmod_poly(
     slong var,
     const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong N = mpoly_words_per_exp(Abits, ctx->minfo);
     slong i, Alen;
     ulong * genexp;
@@ -140,7 +126,7 @@ void _fq_nmod_mpoly_set_fq_nmod_poly(
     for (i = 0; i < Blen; i++)
         Alen += !fq_nmod_is_zero(Bcoeffs + i, ctx->fqctx);
 
-    fq_nmod_mpoly_fit_length_set_bits(A, Alen, Abits, ctx);
+    fq_nmod_mpoly_fit_length_reset_bits(A, Alen, Abits, ctx);
 
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)
@@ -148,8 +134,9 @@ void _fq_nmod_mpoly_set_fq_nmod_poly(
         if (fq_nmod_is_zero(Bcoeffs + i, ctx->fqctx))
             continue;
 
-        FLINT_ASSERT(Alen < A->alloc);
-        fq_nmod_set(A->coeffs + Alen, Bcoeffs + i, ctx->fqctx);
+        FLINT_ASSERT(d*Alen < A->coeffs_alloc);
+        FLINT_ASSERT(N*Alen < A->exps_alloc);
+        n_fq_set_fq_nmod(A->coeffs + d*Alen, Bcoeffs + i, ctx->fqctx);
         if (Abits <= FLINT_BITS)
             mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);
         else

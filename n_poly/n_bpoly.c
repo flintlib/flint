@@ -70,7 +70,7 @@ void n_bpoly_print_pretty(
     first = 1;
     for (i = A->length - 1; i >= 0; i--)
     {
-        if (n_poly_is_zero(A->coeffs + i))
+        if (i < A->length - 1 && n_poly_is_zero(A->coeffs + i))
             continue;
 
         if (!first)
@@ -159,7 +159,7 @@ void n_bpoly_set_coeff(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
         A->length--;
 }
 
-void n_bpoly_set_poly_var1(n_bpoly_t A, const n_poly_t B)
+void n_bpoly_set_poly_gen1(n_bpoly_t A, const n_poly_t B)
 {
     n_bpoly_fit_length(A, 1);
 	n_poly_set(A->coeffs + 0, B);
@@ -167,7 +167,7 @@ void n_bpoly_set_poly_var1(n_bpoly_t A, const n_poly_t B)
 }
 
 
-void n_bpoly_set_poly_var0(n_bpoly_t A, const n_poly_t B)
+void n_bpoly_set_poly_gen0(n_bpoly_t A, const n_poly_t B)
 {
     slong i;
     n_bpoly_fit_length(A, B->length);

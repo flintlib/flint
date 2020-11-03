@@ -11,27 +11,26 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_set_ui(
+    fq_nmod_mpoly_t A,
+    ulong c,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong N;
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    if (c >= fq_nmod_ctx_mod(ctx->fqctx).n)
+        NMOD_RED(c, c, fq_nmod_ctx_mod(ctx->fqctx));
 
-    if (c >= ctx->fqctx->modulus->mod.n)
-    {
-        NMOD_RED(c, c, ctx->fqctx->modulus->mod);
-    }
-
-    if (c == UWORD(0))
+    if (c == 0)
     {
         fq_nmod_mpoly_zero(A, ctx);
         return;
     }
 
     fq_nmod_mpoly_fit_length(A, 1, ctx);
-    fq_nmod_set_ui(A->coeffs + 0, c, ctx->fqctx);
-    FLINT_ASSERT(!fq_nmod_is_zero(A->coeffs, ctx->fqctx));
+    _n_fq_zero(A->coeffs + d*0, d);
+    A->coeffs[0] = c;
     mpoly_monomial_zero(A->exps, N);
     _fq_nmod_mpoly_set_length(A, 1, ctx);
 }

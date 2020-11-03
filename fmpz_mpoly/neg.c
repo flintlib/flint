@@ -20,9 +20,7 @@ void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     if (A != B)
     {
         N = mpoly_words_per_exp(B->bits, ctx->minfo);
-        fmpz_mpoly_fit_length(A, B->length, ctx);
-        fmpz_mpoly_fit_bits(A, B->bits, ctx);
-        A->bits = B->bits;
+        fmpz_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
         mpn_copyi(A->exps, B->exps, N*B->length);
     }
     _fmpz_vec_neg(A->coeffs, B->coeffs, B->length);

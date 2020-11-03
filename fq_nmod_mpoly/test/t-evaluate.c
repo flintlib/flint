@@ -17,20 +17,17 @@ int
 main(void)
 {
     slong i, j, v;
-    int tmul = 5;
-#ifdef _WIN32
-    tmul = 1;
-#endif
+    slong tmul = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("evaluate....");
     fflush(stdout);
 
     /* Check repeated evalone matches evalall */
-    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    for (i = 0; i < 2*tmul * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
-        fq_nmod_mpoly_t f;
+        fq_nmod_mpoly_t f, g;
         fq_nmod_t fe;
         fq_nmod_struct ** vals;
         slong * perm;
@@ -41,10 +38,11 @@ main(void)
         nvars = ctx->minfo->nvars;
 
         fq_nmod_mpoly_init(f, ctx);
+        fq_nmod_mpoly_init(g, ctx);
         fq_nmod_init(fe, ctx->fqctx);
 
         len = n_randint(state, 50);
-        exp_bits = n_randint(state, 80) + 1;
+        exp_bits = n_randint(state, 200) + 1;
 
         perm = (slong *) flint_malloc(nvars*sizeof(slong));
         vals = (fq_nmod_struct **) flint_malloc(nvars*sizeof(fq_nmod_struct *));
@@ -73,12 +71,20 @@ main(void)
 
             for (v = 0; v < nvars; v++)
             {
+                fq_nmod_mpoly_evaluate_one_fq_nmod(g, f, perm[v], vals[perm[v]], ctx);
+                fq_nmod_mpoly_assert_canonical(g, ctx);
                 fq_nmod_mpoly_evaluate_one_fq_nmod(f, f, perm[v], vals[perm[v]], ctx);
                 fq_nmod_mpoly_assert_canonical(f, ctx);
+                if (!fq_nmod_mpoly_equal(f, g, ctx))
+                {
+                    flint_printf("FAIL\n");
+                    flint_printf("Check evalone aliasing\ni: %wd  j: %wd\n", i, j);
+                    flint_abort();
+                }
             }
             if (!fq_nmod_mpoly_equal_fq_nmod(f, fe, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
@@ -93,6 +99,7 @@ main(void)
 
         fq_nmod_clear(fe, ctx->fqctx);
         fq_nmod_mpoly_clear(f, ctx);
+        fq_nmod_mpoly_clear(g, ctx);
         fq_nmod_mpoly_ctx_clear(ctx);
 
         flint_free(perm);
@@ -145,7 +152,7 @@ main(void)
             fq_nmod_add(te, fe, ge, ctx->fqctx);
             if (!fq_nmod_equal(fge, te, ctx->fqctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check add commutes with evalall\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
@@ -215,7 +222,7 @@ main(void)
             fq_nmod_mul(te, fe, ge, ctx->fqctx);
             if (!fq_nmod_equal(fge, te, ctx->fqctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check add commutes with evalall\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }

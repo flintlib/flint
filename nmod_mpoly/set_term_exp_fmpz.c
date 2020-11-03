@@ -17,14 +17,14 @@ void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i,
     slong N;
     flint_bitcnt_t exp_bits;
 
-    if ((ulong) i >= (ulong) A->length)
+    if (i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in nmod_mpoly_set_term_exp_fmpz");
+        flint_throw(FLINT_ERROR, "nmod_mpoly_set_term_exp_fmpz: index out of range");
     }
 
     exp_bits = mpoly_exp_bits_required_pfmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-    nmod_mpoly_fit_bits(A, exp_bits, ctx);
+    nmod_mpoly_fit_length_fit_bits(A, A->length, exp_bits, ctx);
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
     mpoly_set_monomial_pfmpz(A->exps + N*i, exp, A->bits, ctx->minfo);

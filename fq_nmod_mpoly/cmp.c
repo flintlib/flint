@@ -11,19 +11,22 @@
 
 #include "fq_nmod_mpoly.h"
 
-int fq_nmod_mpoly_cmp(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpoly_cmp(
+    const fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_t B,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    int cmp;
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i;
     slong length = A->length;
-    fq_nmod_struct * Acoeffs = A->coeffs;
-    fq_nmod_struct * Bcoeffs = B->coeffs;
+    const mp_limb_t * Acoeffs = A->coeffs;
+    const mp_limb_t * Bcoeffs = B->coeffs;
+    int cmp;
 
     if (A->length != B->length)
         return A->length < B->length ? -1 : 1;
 
-    if (length <= 0)
+    if (length < 1)
         return 0;
 
     cmp = mpoly_monomials_cmp(A->exps, A->bits, B->exps, B->bits,
@@ -31,11 +34,10 @@ int fq_nmod_mpoly_cmp(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
     if (cmp != 0)
         return cmp;
 
-    for (i = 0; i < length; i++)
+    for (i = 0; i < d*length; i++)
     {
-        cmp = fq_nmod_cmp(Acoeffs + i, Bcoeffs + i, ctx->fqctx);
-        if (cmp != 0)
-            return cmp;
+        if (Acoeffs[i] != Bcoeffs[i])
+            return Acoeffs[i] < Bcoeffs[i] ? -1 : 1;
     }
 
     return 0;

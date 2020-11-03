@@ -42,7 +42,7 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly(fq_nmod_mpoly_t A,
         }
         else
         {
-            if (!fq_nmod_is_one(C[i]->coeffs + 0, ctxAC->fqctx))
+            if (!_n_fq_is_one(C[i]->coeffs, fq_nmod_ctx_degree(ctxAC->fqctx)))
                 goto matrix_no_good;
 
             mpoly_compose_mat_fill_column(M, C[i]->exps, C[i]->bits, i,

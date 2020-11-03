@@ -11,8 +11,9 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_univar_init(fq_nmod_mpoly_univar_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_univar_init(
+    fq_nmod_mpoly_univar_t A,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -156,21 +157,25 @@ static void _mpoly_rbnode_clear_mp(
 }
 
 /* the coefficients of A should be constructed with the same bits as B */
-void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
-                                      slong var, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_to_univar(
+    fq_nmod_mpoly_univar_t A,
+    const fq_nmod_mpoly_t B,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     flint_bitcnt_t bits = B->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     slong shift, off;
     slong Blen = B->length;
-    const fq_nmod_struct * Bcoeff = B->coeffs;
+    const mp_limb_t * Bcoeffs = B->coeffs;
     const ulong * Bexp = B->exps;
     slong i;
     int new;
     ulong * one;
     mpoly_rbtree_t tree;
     mpoly_rbnode_struct * node;
-    fq_nmod_mpoly_struct * d;
+    fq_nmod_mpoly_struct * t;
 #define LUT_limit (48)
     fq_nmod_mpoly_struct LUT[LUT_limit];
     TMP_INIT;
@@ -201,26 +206,26 @@ void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
             ulong k = (Bexp[N*i + off] >> shift) & mask;
             if (k < LUT_limit)
             {
-                d = LUT + k;
+                t = LUT + k;
             }
             else
             {
                 node = mpoly_rbtree_get(&new, tree, k);
                 if (new)
                 {
-                    d = flint_malloc(sizeof(fq_nmod_mpoly_struct));
-                    fq_nmod_mpoly_init3(d, 4, bits, ctx);
-                    node->data = d;
+                    t = flint_malloc(sizeof(fq_nmod_mpoly_struct));
+                    fq_nmod_mpoly_init3(t, 4, bits, ctx);
+                    node->data = t;
                 }
                 else
                 {
-                    d = node->data;
+                    t = node->data;
                 }
             }
-            fq_nmod_mpoly_fit_length(d, d->length + 1, ctx);
-            fq_nmod_set(d->coeffs + d->length, Bcoeff + i, ctx->fqctx);
-            mpoly_monomial_msub(d->exps + N*d->length, Bexp + N*i, k, one, N);
-            d->length++;
+            fq_nmod_mpoly_fit_length(t, t->length + 1, ctx);
+            _n_fq_set(t->coeffs + d*t->length, Bcoeffs + d*i, d);
+            mpoly_monomial_msub(t->exps + N*t->length, Bexp + N*i, k, one, N);
+            t->length++;
         }
 
         /* clear out tree to A */
@@ -231,15 +236,15 @@ void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
 
         for (i = LUT_limit - 1; i >= 0; i--)
         {
-            d = LUT + i;
-            if (d->length > 0)
+            t = LUT + i;
+            if (t->length > 0)
             {
                 FLINT_ASSERT(A->length < A->alloc);
                 fmpz_set_si(A->exps + A->length, i);
-                fq_nmod_mpoly_swap(A->coeffs + A->length, d, ctx);
+                fq_nmod_mpoly_swap(A->coeffs + A->length, t, ctx);
                 A->length++;
             }
-            fq_nmod_mpoly_clear(d, ctx);
+            fq_nmod_mpoly_clear(t, ctx);
         }
     }
     else
@@ -257,19 +262,19 @@ void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
             node = mpoly_rbtree_get_fmpz(&new, tree, k);
             if (new)
             {
-                d = flint_malloc(sizeof(fq_nmod_mpoly_struct));
-                fq_nmod_mpoly_init3(d, 4, bits, ctx);
-                node->data = d;
+                t = flint_malloc(sizeof(fq_nmod_mpoly_struct));
+                fq_nmod_mpoly_init3(t, 4, bits, ctx);
+                node->data = t;
             }
             else
             {
-                d = node->data;
+                t = node->data;
             }
-            fq_nmod_mpoly_fit_length(d, d->length + 1, ctx);
-            fq_nmod_set(d->coeffs + d->length, Bcoeff + i, ctx->fqctx);
-            mpoly_monomial_msub_ui_array(d->exps + N*d->length, Bexp + N*i,
+            fq_nmod_mpoly_fit_length(t, t->length + 1, ctx);
+            _n_fq_set(t->coeffs + d*t->length, Bcoeffs + d*i, d);
+            mpoly_monomial_msub_ui_array(t->exps + N*t->length, Bexp + N*i,
                                     Bexp + N*i + off, bits/FLINT_BITS, one, N);
-            d->length++;
+            t->length++;
         }
 
         /* clear out tree to A */
@@ -290,9 +295,14 @@ void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
     The assertion x->next == NULL would need to be replaced by a loop.
     Other asserts would need to be removed as well.
 */
-void fq_nmod_mpoly_from_univar_bits(fq_nmod_mpoly_t A, flint_bitcnt_t Abits,
-      const fq_nmod_mpoly_univar_t B, slong var, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_from_univar_bits(
+    fq_nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const fq_nmod_mpoly_univar_t B,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong N = mpoly_words_per_exp(Abits, ctx->minfo);
     slong i;
     slong next_loc, heap_len = 1;
@@ -308,8 +318,7 @@ void fq_nmod_mpoly_from_univar_bits(fq_nmod_mpoly_t A, flint_bitcnt_t Abits,
 
     if (B->length == 0)
     {
-        fq_nmod_mpoly_fit_bits(A, Abits, ctx);
-        A->bits = Abits;
+        fq_nmod_mpoly_fit_length_reset_bits(A, 0, Abits, ctx);
         A->length = 0;
         return;
     }
@@ -339,9 +348,7 @@ void fq_nmod_mpoly_from_univar_bits(fq_nmod_mpoly_t A, flint_bitcnt_t Abits,
         }
     }
 
-    fq_nmod_mpoly_fit_length(A, total_len, ctx);
-    fq_nmod_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
+    fq_nmod_mpoly_fit_length_reset_bits(A, total_len, Abits, ctx);
 
     next_loc = B->length + 2;
     heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));
@@ -370,11 +377,9 @@ void fq_nmod_mpoly_from_univar_bits(fq_nmod_mpoly_t A, flint_bitcnt_t Abits,
 
         while (heap_len > 1)
         {
-            FLINT_ASSERT(Alen < A->alloc);
             mpoly_monomial_set(A->exps + N*Alen, heap[1].exp, N);
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            fq_nmod_set(A->coeffs + Alen, (B->coeffs + x->i)->coeffs + x->j,
-                                                                   ctx->fqctx);
+            _n_fq_set(A->coeffs + d*Alen, (B->coeffs + x->i)->coeffs + d*x->j, d);
             Alen++;
 
             FLINT_ASSERT(x->next == NULL);
@@ -409,11 +414,9 @@ void fq_nmod_mpoly_from_univar_bits(fq_nmod_mpoly_t A, flint_bitcnt_t Abits,
 
         while (heap_len > 1)
         {
-            FLINT_ASSERT(Alen < A->alloc);
             mpoly_monomial_set(A->exps + N*Alen, heap[1].exp, N);
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            fq_nmod_set(A->coeffs + Alen, (B->coeffs + x->i)->coeffs + x->j,
-                                                                   ctx->fqctx);
+            _n_fq_set(A->coeffs + d*Alen, (B->coeffs + x->i)->coeffs + d*x->j, d);
             Alen++;
 
             FLINT_ASSERT(x->next == NULL);

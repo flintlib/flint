@@ -13,9 +13,13 @@
 #include <string.h>
 #include "fq_nmod_mpoly.h"
 
-int fq_nmod_mpoly_fprint_pretty(FILE * file, const fq_nmod_mpoly_t A,
-                             const char ** x_in, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpoly_fprint_pretty(
+    FILE * file,
+    const fq_nmod_mpoly_t A,
+    const char ** x_in,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong len = A->length;
     ulong * exp = A->exps;
     slong bits = A->bits;
@@ -61,7 +65,7 @@ int fq_nmod_mpoly_fprint_pretty(FILE * file, const fq_nmod_mpoly_t A,
 
         r = flint_fprintf(file, "(");
         CHECK_r
-        r = fq_nmod_fprint_pretty(file, A->coeffs + i, ctx->fqctx);
+        r = n_fq_fprint_pretty(file, A->coeffs + d*i, ctx->fqctx);
         CHECK_r
         r = flint_fprintf(file, ")");
         CHECK_r

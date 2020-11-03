@@ -284,9 +284,7 @@ void fmpz_mpoly_add(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         mpoly_repack_monomials(Cexps, Abits, C->exps, C->bits, C->length, ctx->minfo);
     }
 
-    fmpz_mpoly_fit_length(A, B->length + C->length, ctx);
-    fmpz_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
+    fmpz_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
 
     Alen = _fmpz_mpoly_add(A->coeffs, A->exps,
                                   B->coeffs, Bexps, B->length,

@@ -313,6 +313,8 @@ int fmpz_mpoly_pfrac(
     fmpz_mpoly_geobucket_struct * G = I->G + l;
     fmpz_mpoly_univar_struct * U = I->U + l;
 
+    FLINT_ASSERT(l >= 0);
+
     if (!fmpz_mpoly_repack_bits_inplace(t, I->bits, ctx))
         return -1;
 
@@ -336,14 +338,8 @@ int fmpz_mpoly_pfrac(
 
     use_U = I->xalpha[l].length == 1;
     if (use_U)
-    {
         fmpz_mpoly_to_univar(U, t, l, ctx);
-        Ui = U->length - 1;
-    }
-    else
-    {
-        Ui = -1;
-    }
+    Ui = U->length - 1;
 
     for (k = 0; k <= degs[l]; k++)
     {
@@ -380,6 +376,10 @@ int fmpz_mpoly_pfrac(
         }
 
         fmpz_mpoly_geobucket_empty(newt, G, ctx);
+
+        if (fmpz_mpoly_is_zero(newt, ctx))
+            continue;
+
         success = fmpz_mpoly_pfrac(l - 1, newt, degs, I, ctx);
         if (success < 1)
             return success;
@@ -397,7 +397,8 @@ int fmpz_mpoly_pfrac(
     }
 
     for (i = 0; i < I->r; i++)
-        fmpz_mpoly_from_mpolyv(deltas + i, delta_coeffs + i, I->xalpha + l, ctx);
+        fmpz_mpoly_from_mpolyv(deltas + i, I->bits,
+                                         delta_coeffs + i, I->xalpha + l, ctx);
 
     return 1;
 }

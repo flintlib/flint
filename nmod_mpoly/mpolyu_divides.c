@@ -12,8 +12,7 @@
 #include "nmod_mpoly.h"
 
 /* A = D - B*C */
-slong _nmod_mpoly_mulsub1(
-                mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
                  const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
@@ -28,9 +27,8 @@ slong _nmod_mpoly_mulsub1(
     mpoly_heap_t * x;
     slong Di;
     slong Alen;
-    slong Aalloc = *A_alloc;
-    mp_limb_t * Acoeff = *A_coeff;
-    ulong * Aexp = *A_exp;
+    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Aexp = A->exps;
     ulong exp;
     slong * hind;
     mp_limb_t acc0, acc1, acc2, pp1, pp0;
@@ -67,14 +65,16 @@ slong _nmod_mpoly_mulsub1(
 
         while (Di < Dlen && mpoly_monomial_gt1(Dexp[Di], exp, maskhi))
         {
-            _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1);
+            _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                                   &Aexp, &A->exps_alloc, 1, Alen + 1);
             Aexp[Alen] = Dexp[Di];
             Acoeff[Alen] = Dcoeff[Di];
             Alen++;
             Di++;
         }
 
-        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1);
+        _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                               &Aexp, &A->exps_alloc, 1, Alen + 1);
 
         Aexp[Alen] = exp;
 
@@ -152,23 +152,26 @@ slong _nmod_mpoly_mulsub1(
     }
 
     FLINT_ASSERT(Di <= Dlen);
-    _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, 1);
-    _nmod_vec_set(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
-    mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);
-    Alen += Dlen - Di;
+    if (Di < Dlen)
+    {
+        _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                               &Aexp, &A->exps_alloc, 1, Alen + Dlen - Di);
+        _nmod_vec_set(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+        mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);
+        Alen += Dlen - Di;
+    }
 
-    *A_coeff = Acoeff;
-    *A_exp = Aexp;
-    *A_alloc = Aalloc;
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->length = Alen;
 
     TMP_END;
 
     return Alen;
 }
 
-/* A = D - B*C, D may be modified if saveD == 0 */
-slong _nmod_mpoly_mulsub(
-              mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+/* A = D - B*C */
+void _nmod_mpoly_mulsub(nmod_mpoly_t A,
                  const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
@@ -184,9 +187,8 @@ slong _nmod_mpoly_mulsub(
     mpoly_heap_t * x;
     slong Di;
     slong Alen;
-    slong Aalloc = *A_alloc;
-    mp_limb_t * Acoeff = *A_coeff;
-    ulong * Aexp = *A_exp;
+    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Aexp = A->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
@@ -199,10 +201,9 @@ slong _nmod_mpoly_mulsub(
 
     if (N == 1)
     {
-        return _nmod_mpoly_mulsub1(A_coeff, A_exp, A_alloc,
-                                    Dcoeff, Dexp, Dlen,
-                                    Bcoeff, Bexp, Blen,
-                                    Ccoeff, Cexp, Clen, cmpmask[0], fctx);
+        _nmod_mpoly_mulsub1(A, Dcoeff, Dexp, Dlen,
+                     Bcoeff, Bexp, Blen, Ccoeff, Cexp, Clen, cmpmask[0], fctx);
+        return;
     }
 
     TMP_START;
@@ -248,14 +249,16 @@ slong _nmod_mpoly_mulsub(
 
         while (Di < Dlen && mpoly_monomial_gt(Dexp + N*Di, exp, N, cmpmask))
         {
-            _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
+            _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                                   &Aexp, &A->exps_alloc, N, Alen + 1);
             mpoly_monomial_set(Aexp + N*Alen, Dexp + N*Di, N);
             Acoeff[Alen] = Dcoeff[Di];
             Alen++;
             Di++;
         }
 
-        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
+        _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                               &Aexp, &A->exps_alloc, N, Alen + 1);
 
         mpoly_monomial_set(Aexp + N*Alen, exp, N);
 
@@ -350,18 +353,20 @@ slong _nmod_mpoly_mulsub(
     }
 
     FLINT_ASSERT(Di <= Dlen);
-    _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, N);
-    _nmod_vec_set(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
-    mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
-    Alen += Dlen - Di;
+    if (Di < Dlen)
+    {
+        _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                               &Aexp, &A->exps_alloc, N, Alen + Dlen - Di);
+        _nmod_vec_set(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+        mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
+        Alen += Dlen - Di;
+    }
 
-    *A_coeff = Acoeff;
-    *A_exp = Aexp;
-    *A_alloc = Aalloc;
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->length = Alen;
 
     TMP_END;
-
-    return Alen;
 }
 
 
@@ -482,11 +487,9 @@ int nmod_mpolyuu_divides(
                 {
                     b = Bcoeff + x->i;
                     q = Q->coeffs + x->j;
-                    S->length = _nmod_mpoly_mulsub(
-                                    &S->coeffs, &S->exps, &S->alloc,
-                                    T->coeffs, T->exps, T->length,
-                                    b->coeffs, b->exps, b->length,
-                                    q->coeffs, q->exps, q->length,
+                    _nmod_mpoly_mulsub(S, T->coeffs, T->exps, T->length,
+                                          b->coeffs, b->exps, b->length,
+                                          q->coeffs, q->exps, q->length,
                                                 bits, N, cmpmask, ctx->ffinfo);
                 }
                 nmod_mpoly_swap(S, T, ctx);
@@ -560,12 +563,10 @@ int nmod_mpolyuu_divides(
         q = Q->coeffs + Q->length;
         FLINT_ASSERT(q->bits == bits);
         b = Bcoeff + 0;
-        q->length = _nmod_mpoly_divides_monagan_pearce(
-                            &q->coeffs, &q->exps, &q->alloc,
-                            T->coeffs, T->exps, T->length,
-                            b->coeffs, b->exps, b->length,
-                                              bits, N, cmpmask, ctx->ffinfo);
-        if (q->length == 0)
+        if (!_nmod_mpoly_divides_monagan_pearce(q,
+                                            T->coeffs, T->exps, T->length,
+                                            b->coeffs, b->exps, b->length,
+                                               bits, N, cmpmask, ctx->ffinfo))
         {
             goto not_exact_division;
         }

@@ -16,7 +16,9 @@ void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
                          const slong * vars, const ulong * exps, slong length,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j, N;
+    flint_bitcnt_t bits = A->bits;
+    slong N = mpoly_words_per_exp(bits, ctx->minfo);
+    slong i, j;
     slong offset, shift;
     slong maxoffset, minoffset;
     ulong * uexp;
@@ -24,7 +26,6 @@ void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
     slong nvars = ctx->minfo->nvars;
     mp_limb_t * Ccoeff;
     ulong * Cexp;
-    slong Calloc;
     slong Clen;
     TMP_INIT;
 
@@ -42,37 +43,31 @@ void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
 
     uexp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     for (i = 0; i < nvars; i++)
-    {
         uexp[i] = 0;
-    }
     for (i = 0; i < length; i++)
-    {
         uexp[vars[i]] = exps[i];
-    }
 
-    if (A->bits < mpoly_exp_bits_required_ui(uexp, ctx->minfo))
+    if (bits < mpoly_exp_bits_required_ui(uexp, ctx->minfo))
     {
         nmod_mpoly_zero(C, ctx);
         goto cleanup;
     }
 
-    nmod_mpoly_fit_bits(C, A->bits, ctx);
-    C->bits = A->bits;
+    nmod_mpoly_fit_length_reset_bits(C, 4, bits, ctx);
 
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
     tmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     texp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_monomial_zero(tmask, N);
-    mpoly_set_monomial_ui(texp, uexp, A->bits, ctx->minfo);
+    mpoly_set_monomial_ui(texp, uexp, bits, ctx->minfo);
 
-    if (A->bits <= FLINT_BITS)
+    if (bits <= FLINT_BITS)
     {
-        ulong mask = (-UWORD(1)) >> (FLINT_BITS - A->bits);
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         maxoffset = 0;
         minoffset = N;
         for (i = 0; i < length; i++)
         {
-            mpoly_gen_offset_shift_sp(&offset, &shift, vars[i], A->bits, ctx->minfo);
+            mpoly_gen_offset_shift_sp(&offset, &shift, vars[i], bits, ctx->minfo);
             tmask[offset] |= mask << shift;
             maxoffset = FLINT_MAX(maxoffset, offset);
             minoffset = FLINT_MIN(minoffset, offset);
@@ -81,7 +76,6 @@ void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
 
         Ccoeff = C->coeffs;
         Cexp = C->exps;
-        Calloc = C->alloc;
         Clen = 0;
         for (i = 0; i < A->length; i++)
         {
@@ -90,7 +84,8 @@ void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
                 if ((((A->exps + N*i)[j] ^ texp[j]) & tmask[j]) != UWORD(0))
                     goto continue_outer_sp;
             }
-            _nmod_mpoly_fit_length(&Ccoeff, &Cexp, &Calloc, Clen + 1, N);
+            _nmod_mpoly_fit_length(&Ccoeff, &C->coeffs_alloc,
+                                   &Cexp, &C->exps_alloc, N, Clen + 1);
             mpoly_monomial_sub(Cexp + N*Clen, A->exps + N*i, texp, N);
             Ccoeff[Clen] = A->coeffs[i];
             Clen++;
@@ -99,7 +94,6 @@ continue_outer_sp:;
 
         C->coeffs = Ccoeff;
         C->exps = Cexp;
-        C->alloc = Calloc;
         _nmod_mpoly_set_length(C, Clen, ctx);
     }
     else
@@ -119,7 +113,6 @@ continue_outer_sp:;
 
         Ccoeff = C->coeffs;
         Cexp = C->exps;
-        Calloc = C->alloc;
         Clen = 0;
         for (i = 0; i < A->length; i++)
         {
@@ -128,7 +121,8 @@ continue_outer_sp:;
                 if ((((A->exps + N*i)[j] ^ texp[j]) & tmask[j]) != UWORD(0))
                     goto continue_outer_mp;
             }
-            _nmod_mpoly_fit_length(&Ccoeff, &Cexp, &Calloc, Clen + 1, N);
+            _nmod_mpoly_fit_length(&Ccoeff, &C->coeffs_alloc,
+                                   &Cexp, &C->exps_alloc, N, Clen + 1);
             mpoly_monomial_sub_mp(Cexp + N*Clen, A->exps + N*i, texp, N);
             Ccoeff[Clen] = A->coeffs[i];
             Clen++;
@@ -137,7 +131,6 @@ continue_outer_mp:;
 
         C->coeffs = Ccoeff;
         C->exps = Cexp;
-        C->alloc = Calloc;
         _nmod_mpoly_set_length(C, Clen, ctx);
     }
 

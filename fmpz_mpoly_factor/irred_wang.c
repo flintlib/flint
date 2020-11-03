@@ -272,23 +272,21 @@ got_alpha:
     }
     else
     {
-        fmpz_mpoly_univar_t u;
-        fmpz_mpoly_univar_init(u, ctx);
         for (i = 0; i < r; i++)
         {
-            fmpz_mpoly_to_univar(u, fac->coeffs + i, 0, ctx);
-            success = _fmpz_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-            if (!success)
+            /* hlift should not have returned any large bits */
+            FLINT_ASSERT(fac->coeffs[i].bits <= FLINT_BITS);
+
+            if (!fmpz_mpolyl_content(t, fac->coeffs + i, 1, ctx))
             {
-                fmpz_mpoly_univar_clear(u, ctx);
+                success = -1;
                 goto cleanup;
             }
-            success = fmpz_mpoly_divides(fac->coeffs + i,
-                                         fac->coeffs + i, t, ctx);
+
+            success = fmpz_mpoly_divides(fac->coeffs + i, fac->coeffs + i, t, ctx);
             FLINT_ASSERT(success);
             fmpz_mpoly_unit_normalize(fac->coeffs + i, ctx);
         }
-        fmpz_mpoly_univar_clear(u, ctx);
     }
 
     success = 1;

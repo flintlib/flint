@@ -290,8 +290,12 @@ void nmod_mpoly_to_univar(nmod_mpoly_univar_t A, const nmod_mpoly_t B,
     The assertion x->next == NULL would need to be replaced by a loop.
     Other asserts would need to be removed as well.
 */
-void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
-            const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_from_univar_bits(
+    nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_univar_t B,
+    slong var,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(Abits, ctx->minfo);
     slong i;
@@ -308,8 +312,7 @@ void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
 
     if (B->length == 0)
     {
-        nmod_mpoly_fit_bits(A, Abits, ctx);
-        A->bits = Abits;
+        nmod_mpoly_fit_length_reset_bits(A, 0, Abits, ctx);
         A->length = 0;
         return;
     }
@@ -339,9 +342,7 @@ void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
         }
     }
 
-    nmod_mpoly_fit_length(A, total_len, ctx);
-    nmod_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
+    nmod_mpoly_fit_length_reset_bits(A, total_len, Abits, ctx);
 
     next_loc = B->length + 2;
     heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));
@@ -370,7 +371,7 @@ void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
 
         while (heap_len > 1)
         {
-            FLINT_ASSERT(Alen < A->alloc);
+            FLINT_ASSERT(Alen < A->coeffs_alloc);
             mpoly_monomial_set(A->exps + N*Alen, heap[1].exp, N);
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             A->coeffs[Alen] = (B->coeffs + x->i)->coeffs[x->j];
@@ -408,7 +409,7 @@ void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
 
         while (heap_len > 1)
         {
-            FLINT_ASSERT(Alen < A->alloc);
+            FLINT_ASSERT(Alen < A->coeffs_alloc);
             mpoly_monomial_set(A->exps + N*Alen, heap[1].exp, N);
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             A->coeffs[Alen] = (B->coeffs + x->i)->coeffs[x->j];

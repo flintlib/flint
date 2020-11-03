@@ -102,7 +102,7 @@ void _fq_zech_mpoly_set_fq_zech_poly(
     for (i = 0; i < Blen; i++)
         Alen += !fq_zech_is_zero(Bcoeffs + i, ctx->fqctx);
 
-    fq_zech_mpoly_fit_length_set_bits(A, Alen, Abits, ctx);
+    fq_zech_mpoly_fit_length_reset_bits(A, Alen, Abits, ctx);
 
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)

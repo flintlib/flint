@@ -55,8 +55,11 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            fq_nmod_mpoly_assert_canonical(f, ctx);
             fq_nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            fq_nmod_mpoly_assert_canonical(g, ctx);
             fq_nmod_mpoly_randtest_bits(h, state, len2, exp_bits2, ctx);
+            fq_nmod_mpoly_assert_canonical(h, ctx);
 
             fq_nmod_mpoly_add(t1, g, h, ctx);
             fq_nmod_mpoly_assert_canonical(t1, ctx);

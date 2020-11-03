@@ -136,8 +136,8 @@ slong fxn_name(nmod_mpoly_t P, slong Plen, coeff_decl,                         \
                     exp += (d % mults[j]) << (P->bits*j);                      \
                     d = d / mults[j];                                          \
                 }                                                              \
-                _nmod_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,        \
-                                                                 Plen + 1, 1); \
+                _nmod_mpoly_fit_length(&P->coeffs, &P->coeffs_alloc,           \
+                                       &P->exps, &P->exps_alloc, 1, Plen + 1); \
                 P->exps[Plen] = exp;                                           \
                 P->coeffs[Plen] = coeff;                                       \
                 Plen++;                                                        \
@@ -391,9 +391,7 @@ int _nmod_mpoly_mul_array_LEX(
     }
     else
     {
-        nmod_mpoly_fit_length(A, B->length + C->length - 1, ctx);
-        nmod_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        nmod_mpoly_fit_length_reset_bits(A, B->length + C->length - 1, exp_bits, ctx);
         _nmod_mpoly_mul_array_chunked_LEX(A, C, B, mults, ctx);
     }
     success = 1;
@@ -457,8 +455,8 @@ slong fxn_name(nmod_mpoly_t P, slong Plen, coeff_decl,                         \
             reduce_coeff                                                       \
             if (coeff != UWORD(0))                                             \
             {                                                                  \
-                _nmod_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,        \
-                                                                 Plen + 1, 1); \
+                _nmod_mpoly_fit_length(&P->coeffs, &P->coeffs_alloc,           \
+                                       &P->exps, &P->exps_alloc, 1, Plen + 1); \
                 P->exps[Plen] = exp;                                           \
                 P->coeffs[Plen] = coeff;                                       \
                 Plen++;                                                        \
@@ -574,8 +572,8 @@ slong fxn_name(nmod_mpoly_t P, slong Plen, coeff_decl,                         \
             reduce_coeff                                                       \
             if (coeff != UWORD(0))                                             \
             {                                                                  \
-                _nmod_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,        \
-                                                                 Plen + 1, 1); \
+                _nmod_mpoly_fit_length(&P->coeffs, &P->coeffs_alloc,           \
+                                       &P->exps, &P->exps_alloc, 1, Plen + 1); \
                 P->exps[Plen] = exp;                                           \
                 P->coeffs[Plen] = coeff;                                       \
                 Plen++;                                                        \
@@ -850,9 +848,7 @@ int _nmod_mpoly_mul_array_DEG(
     }
     else
     {
-        nmod_mpoly_fit_length(A, B->length + C->length - 1, ctx);
-        nmod_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        nmod_mpoly_fit_length_reset_bits(A, B->length + C->length - 1, exp_bits, ctx);
         _nmod_mpoly_mul_array_chunked_DEG(A, C, B, deg, ctx);
     }
     success = 1;

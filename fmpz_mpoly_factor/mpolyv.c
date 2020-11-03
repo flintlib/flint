@@ -115,6 +115,7 @@ void fmpz_mpoly_to_mpolyv(
 
 void fmpz_mpoly_from_mpolyv(
     fmpz_mpoly_t A,
+    flint_bitcnt_t Abits,
     const fmpz_mpolyv_t B,
     const fmpz_mpoly_t xalpha,
     const fmpz_mpoly_ctx_t ctx)
@@ -132,6 +133,8 @@ void fmpz_mpoly_from_mpolyv(
     }
 
     fmpz_mpoly_clear(T, ctx);
+
+    fmpz_mpoly_repack_bits_inplace(A, Abits, ctx);
 }
 
 
@@ -141,17 +144,48 @@ int _fmpz_mpoly_vec_content_mpoly(
     slong Alen,
     const fmpz_mpoly_ctx_t ctx)
 {
-    slong i;
-    int success;
+    slong i, j1, j2;
 
-    fmpz_mpoly_zero(g, ctx);
+    if (Alen <= 1)
+    {
+        if (Alen == 1)
+        {
+            if (fmpz_sgn(A[0].coeffs + 0) < 0)
+                fmpz_mpoly_neg(g, A + 0, ctx);
+            else
+                fmpz_mpoly_set(g, A + 0, ctx);
+        }
+        else
+        {
+            fmpz_mpoly_zero(g, ctx);
+        }
+        return 1;
+    }
+
+    j1 = 0;
+    j2 = 1;
+    for (i = 2; i < Alen; i++)
+    {
+        if (A[i].length < A[j1].length)
+            j1 = i;
+        else if (A[i].length < A[j2].length)
+            j2 = i;
+    }
+
+    FLINT_ASSERT(j1 != j2);
+
+    if (!fmpz_mpoly_gcd(g, A + j1, A + j2, ctx))
+        return 0;
 
     for (i = 0; i < Alen; i++)
     {
-        success = fmpz_mpoly_gcd(g, g, A + i, ctx);
-        if (!success)
+        if (i == j1 || i == j2)
+            continue;
+
+        if (!fmpz_mpoly_gcd(g, g, A + i, ctx))
             return 0;
     }
 
     return 1;
 }
+

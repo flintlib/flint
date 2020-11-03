@@ -11,16 +11,15 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_set_fq_nmod_gen(fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_set_fq_nmod_gen(
+    fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong N, Alen;
-
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     fq_nmod_mpoly_fit_length(A, 1, ctx);
-    fq_nmod_gen(A->coeffs + 0, ctx->fqctx);
+    n_fq_gen(A->coeffs + 0, ctx->fqctx);
     mpoly_monomial_zero(A->exps, N);
-    Alen = !fq_nmod_is_zero(A->coeffs + 0, ctx->fqctx);
-    _fq_nmod_mpoly_set_length(A, Alen, ctx);
+    _fq_nmod_mpoly_set_length(A, !_n_fq_is_zero(A->coeffs + 0, d), ctx);
 }

@@ -17,7 +17,7 @@ void fq_zech_mpoly_set_ui(fq_zech_mpoly_t A, ulong c,
     slong N;
     flint_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
 
-    fq_zech_mpoly_fit_length_set_bits(A, 1, bits, ctx);
+    fq_zech_mpoly_fit_length_reset_bits(A, 1, bits, ctx);
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
     fq_zech_set_ui(A->coeffs + 0, c, ctx->fqctx);
     mpoly_monomial_zero(A->exps, N);

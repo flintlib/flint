@@ -56,13 +56,6 @@ main(void)
                 flint_printf("check get and set match\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
-
-            if (!fq_nmod_equal(fq_nmod_mpoly_term_coeff_ref(f, index, ctx), d, ctx->fqctx))
-            {
-                printf("FAIL\n");
-                flint_printf("check reference match\ni = %wd, j = %wd\n", i, j);
-                flint_abort();
-            }
         }
 
         fq_nmod_mpoly_clear(f, ctx);

@@ -594,7 +594,7 @@ int n_polyu3_mod_hlift2(
     slong degree_inner, /* required degree in x */
     const nmodf_ctx_t ctx)
 {
-    int success;
+    int success, Eok;
     n_polyun_t T;
     n_bpoly_t Ap, Am, B0p, B0m, B1p, B1m;
     n_poly_t modulus, alphapow, t1, t2;
@@ -602,6 +602,8 @@ int n_polyu3_mod_hlift2(
     slong ldegBB0, ldegBB1;
     slong Adegy, Adegz, Adegx;
     slong bad_primes_left;
+    n_poly_bpoly_stack_t St;
+    nmod_eval_interp_t E;
 
     FLINT_ASSERT(n_polyu_mod_is_canonical(A, ctx->mod));
     FLINT_ASSERT(n_polyu_mod_is_canonical(B0, ctx->mod));
@@ -618,6 +620,11 @@ int n_polyu3_mod_hlift2(
     n_poly_init(alphapow);
     n_poly_init(t1);
     n_poly_init(t2);
+    n_poly_stack_init(St->poly_stack);
+    n_bpoly_stack_init(St->bpoly_stack);
+    nmod_eval_interp_init(E);
+
+    Eok = nmod_eval_interp_set_degree_modulus(E, degree_inner, ctx->mod);
 
     n_polyu3_degrees(&Adegy, &Adegx, &Adegz, A);
 
@@ -658,16 +665,18 @@ choose_prime:
     n_polyu3_mod_interp_reduce_2sm_bpoly(B0p, B0m, B0, alphapow, ctx->mod);
     n_polyu3_mod_interp_reduce_2sm_bpoly(B1p, B1m, B1, alphapow, ctx->mod);
 
-    success = n_bpoly_mod_hlift2(Ap, B0p, B1p, beta, degree_inner, ctx->mod);
-    if (success <= 0)
+    success = Eok ? n_bpoly_mod_hlift2_cubic(Ap, B0p, B1p, beta, degree_inner, ctx->mod, E, St) :
+                    n_bpoly_mod_hlift2(Ap, B0p, B1p, beta, degree_inner, ctx->mod, St);
+    if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
             goto cleanup;
         goto choose_prime;
     }
 
-    success = n_bpoly_mod_hlift2(Am, B0m, B1m, beta, degree_inner, ctx->mod);
-    if (success <= 0)
+    success = Eok ? n_bpoly_mod_hlift2_cubic(Am, B0m, B1m, beta, degree_inner, ctx->mod, E, St) :
+                    n_bpoly_mod_hlift2(Am, B0m, B1m, beta, degree_inner, ctx->mod, St);
+    if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
             goto cleanup;
@@ -740,6 +749,9 @@ cleanup:
     n_poly_clear(alphapow);
     n_poly_clear(t1);
     n_poly_clear(t2);
+    n_poly_stack_clear(St->poly_stack);
+    n_bpoly_stack_clear(St->bpoly_stack);
+    nmod_eval_interp_clear(E);
 
     return success;
 }
@@ -755,7 +767,7 @@ int n_polyu3_mod_hlift(
     slong degree_inner, /* required degree in x */
     const nmodf_ctx_t ctx)
 {
-    int success;
+    int success, Eok;
     slong i, j;
     n_polyun_t T;
     n_bpoly_struct * Bp, * Bm;
@@ -765,6 +777,8 @@ int n_polyu3_mod_hlift(
     slong * BBdegZ;
     slong AdegY, AdegX, AdegZ;
     slong bad_primes_left;
+    n_poly_bpoly_stack_t St;
+    nmod_eval_interp_t E;
 
     if (r < 3)
         return n_polyu3_mod_hlift2(BB + 0, BB + 1, A, B + 0, B + 1,
@@ -789,6 +803,11 @@ int n_polyu3_mod_hlift(
     n_poly_init(alphapow);
     n_poly_init(t1);
     n_poly_init(t2);
+    n_poly_stack_init(St->poly_stack);
+    n_bpoly_stack_init(St->bpoly_stack);
+    nmod_eval_interp_init(E);
+
+    Eok = nmod_eval_interp_set_degree_modulus(E, degree_inner, ctx->mod);
 
     n_polyu3_degrees(&AdegY, &AdegX, &AdegZ, A);
     if (AdegX != degree_inner)
@@ -831,7 +850,8 @@ choose_prime:
                                                     B + i, alphapow, ctx->mod);
     }
 
-    success = n_bpoly_mod_hlift(r, Ap, Bp, beta, degree_inner, ctx->mod);
+    success = Eok ? n_bpoly_mod_hlift_cubic(r, Ap, Bp, beta, degree_inner, ctx->mod, E, St) :
+                    n_bpoly_mod_hlift(r, Ap, Bp, beta, degree_inner, ctx->mod, St);
     if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
@@ -839,8 +859,9 @@ choose_prime:
         goto choose_prime;
     }
 
-    success = n_bpoly_mod_hlift(r, Am, Bm, beta, degree_inner, ctx->mod);
-    if (success <= 0)
+    success = Eok ? n_bpoly_mod_hlift_cubic(r, Am, Bm, beta, degree_inner, ctx->mod, E, St) :
+                    n_bpoly_mod_hlift(r, Am, Bm, beta, degree_inner, ctx->mod, St);
+    if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
             goto cleanup;
@@ -934,6 +955,9 @@ cleanup:
     n_poly_clear(alphapow);
     n_poly_clear(t1);
     n_poly_clear(t2);
+    n_poly_stack_clear(St->poly_stack);
+    n_bpoly_stack_clear(St->bpoly_stack);
+    nmod_eval_interp_clear(E);
 
     return success;
 }

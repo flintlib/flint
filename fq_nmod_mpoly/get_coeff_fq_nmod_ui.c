@@ -23,7 +23,8 @@ void fq_nmod_mpoly_get_coeff_fq_nmod_ui(fq_nmod_t c, const fq_nmod_mpoly_t A,
     }
     else
     {
+        slong d = fq_nmod_ctx_degree(ctx->fqctx);
         FLINT_ASSERT(index < A->length);
-        fq_nmod_set(c, A->coeffs + index, ctx->fqctx);
+        n_fq_get_fq_nmod(c, A->coeffs + d*index, ctx->fqctx);
     }
 }

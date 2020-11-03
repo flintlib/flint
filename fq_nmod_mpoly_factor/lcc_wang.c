@@ -67,17 +67,17 @@ int fq_nmod_mpoly_factor_lcc_wang(
 
         mask = (-UWORD(1)) >> (FLINT_BITS - P->bits);
         N = mpoly_words_per_exp_sp(P->bits, ctx->minfo);
-        _fq_nmod_mpoly_eval_rest_n_poly_fq(T, starts, ends, stops, es,
+        _fq_nmod_mpoly_eval_rest_n_fq_poly(T, starts, ends, stops, es,
                                       P->coeffs, P->exps, P->length, 1, alpha,
                                   offsets, shifts, N, mask, n + 1, ctx->fqctx);
 
-        n_poly_fq_set(lcAfaceval + j, T + 0, ctx->fqctx);
+        n_fq_poly_set(lcAfaceval + j, T + 0, ctx->fqctx);
     }
 
-    n_poly_fq_set(d + 0, Auc, ctx->fqctx);
+    n_fq_poly_set(d + 0, Auc, ctx->fqctx);
     for (i = 0; i < lcAfac->num; i++)
     {
-        n_poly_fq_make_monic(Q, lcAfaceval + i, ctx->fqctx);
+        n_fq_poly_make_monic(Q, lcAfaceval + i, ctx->fqctx);
         if (n_poly_degree(Q) < 1)
         {
             success = 0;
@@ -85,11 +85,11 @@ int fq_nmod_mpoly_factor_lcc_wang(
         }
         for (j = i; j >= 0; j--)
         {
-            n_poly_fq_set(R, d + j, ctx->fqctx);
+            n_fq_poly_set(R, d + j, ctx->fqctx);
             while (n_poly_degree(R) > 0)
             {
-                n_poly_fq_gcd(R, R, Q, ctx->fqctx);
-                n_poly_fq_divrem(Q, T + 0, Q, R, ctx->fqctx);
+                n_fq_poly_gcd(R, R, Q, ctx->fqctx);
+                n_fq_poly_divrem(Q, T + 0, Q, R, ctx->fqctx);
                 FLINT_ASSERT(n_poly_is_zero(T + 0));
                 if (n_poly_degree(Q) < 1)
                 {
@@ -98,19 +98,19 @@ int fq_nmod_mpoly_factor_lcc_wang(
                 }
             }
         }
-        n_poly_fq_set(d + i + 1, Q, ctx->fqctx);
+        n_fq_poly_set(d + i + 1, Q, ctx->fqctx);
     }
 
     for (j = 0; j < r; j++)
     {
         fq_nmod_mpoly_one(lc_divs + j, ctx);
-        n_poly_fq_mul(R, Auf[j].coeffs + Auf[j].length - 1, Auc, ctx->fqctx);
+        n_fq_poly_mul(R, Auf[j].coeffs + Auf[j].length - 1, Auc, ctx->fqctx);
         for (i = lcAfac->num - 1; i >= 0; i--)
         {
-            n_poly_fq_make_monic(Q, lcAfaceval + i, ctx->fqctx);
+            n_fq_poly_make_monic(Q, lcAfaceval + i, ctx->fqctx);
             if (n_poly_degree(Q) < 1)
                 continue;
-            k = n_poly_fq_remove(R, Q, ctx->fqctx);
+            k = n_fq_poly_remove(R, Q, ctx->fqctx);
             fq_nmod_mpoly_pow_ui(t, lcAfac->poly + i, k, ctx);
             fq_nmod_mpoly_mul(lc_divs + j, lc_divs + j, t, ctx);
         }

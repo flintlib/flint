@@ -93,9 +93,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
     if (B->length == 1)
     {
         /* powering a monomial */
-        nmod_mpoly_fit_length(A, WORD(1), ctx);
-        nmod_mpoly_fit_bits(A, exp_bits, ctx);
-        A->bits = exp_bits;
+        nmod_mpoly_fit_length_reset_bits(A, 1, exp_bits, ctx);
 
         if (exp_bits <= FLINT_BITS)
             mpoly_monomial_mul_ui(A->exps, Bexp, N, k);
@@ -103,7 +101,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
             mpoly_monomial_mul_ui_mp(A->exps, Bexp, N, k);
 
         A->coeffs[0] = nmod_pow_ui(B->coeffs[0], k, ctx->ffinfo->mod);
-        _nmod_mpoly_set_length(A, WORD(A->coeffs[0] != 0), ctx);
+        _nmod_mpoly_set_length(A, A->coeffs[0] != 0, ctx);
     }
     else
     {
@@ -133,9 +131,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                 Tlen = _fmpz_mpoly_pow_fps(&T->coeffs, &T->exps, &T->alloc,
                            Bcoeffs_fmpz, Bexp, B->length, k, exp_bits, N, cmpmask);
 
-                nmod_mpoly_fit_length(A, Tlen, ctx);
-                nmod_mpoly_fit_bits(A, exp_bits, ctx);
-                A->bits = exp_bits;
+                nmod_mpoly_fit_length_reset_bits(A, Tlen, exp_bits, ctx);
 
                 Alen = 0;
                 for (i = 0; i < Tlen; i++)
@@ -151,7 +147,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         else
         {
             ulong ne;
-            slong Slen, Ulen;
+            slong Slen;
             nmod_mpoly_t S, R, U;
 
             nmod_mpoly_init3(S, B->length, exp_bits, ctx);
@@ -186,12 +182,10 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                         if (kmodn == 2)
                         {
                             /* R *= S */
-                            Ulen = _nmod_mpoly_mul_johnson(
-                                            &U->coeffs, &U->exps, &U->alloc,
+                            _nmod_mpoly_mul_johnson(U,
                                              R->coeffs, R->exps, R->length,
                                              S->coeffs, S->exps, S->length,
                                            exp_bits,  N, cmpmask, ctx->ffinfo);
-                            _nmod_mpoly_set_length(U, Ulen, ctx);
                             nmod_mpoly_swap(R, U, ctx);
                         }
                     }
@@ -222,12 +216,10 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                     }
                     else
                     {
-                        Ulen = _nmod_mpoly_mul_johnson(
-                                            &U->coeffs, &U->exps, &U->alloc,
+                        _nmod_mpoly_mul_johnson(U,
                                              R->coeffs, R->exps, R->length,
                                              S->coeffs, S->exps, S->length,
                                            exp_bits,  N, cmpmask, ctx->ffinfo);
-                        _nmod_mpoly_set_length(U, Ulen, ctx);
                         nmod_mpoly_swap(R, U, ctx);
                     }
                 }

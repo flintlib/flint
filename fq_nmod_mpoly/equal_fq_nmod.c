@@ -11,8 +11,10 @@
 
 #include "fq_nmod_mpoly.h"
 
-int fq_nmod_mpoly_equal_fq_nmod(const fq_nmod_mpoly_t A,
-                              const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpoly_equal_fq_nmod(
+    const fq_nmod_mpoly_t A,
+    const fq_nmod_t c,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     slong N;
 
@@ -27,5 +29,5 @@ int fq_nmod_mpoly_equal_fq_nmod(const fq_nmod_mpoly_t A,
     if (!mpoly_monomial_is_zero(A->exps + N*0, N))
         return 0;
 
-    return fq_nmod_equal(A->coeffs + 0, c, ctx->fqctx);
+    return n_fq_equal_fq_nmod(A->coeffs, c, ctx->fqctx);
 }

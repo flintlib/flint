@@ -20,23 +20,15 @@ void nmod_mpoly_reverse(nmod_mpoly_t A,
 
     if (A != B)
     {
-        nmod_mpoly_fit_length(A, Blen, ctx);
-        nmod_mpoly_fit_bits(A, B->bits, ctx);
-        A->bits = B->bits;
-        A->length = B->length;
+        nmod_mpoly_fit_length_reset_bits(A, Blen, B->bits, ctx);
+        A->length = Blen;
         for (i = 0; i < Blen; i++)
-        {
             A->coeffs[i] = B->coeffs[Blen - i - 1];
-        }
     }
     else
     {
         for (i = 0; i < Blen/2; i++)
-        {
-            mp_limb_t t = A->coeffs[i];
-            A->coeffs[i] = A->coeffs[Blen - i - 1];
-            A->coeffs[Blen - i - 1] = t;
-        }
+            MP_LIMB_SWAP(A->coeffs[i], A->coeffs[Blen - i - 1]);
     }
 
     mpoly_reverse(A->exps, B->exps, Blen, N);

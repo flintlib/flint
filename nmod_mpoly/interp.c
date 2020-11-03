@@ -347,6 +347,178 @@ int nmod_mpolyn_interp_crt_2sm_poly(
 }
 
 
+void nmod_mpolyn_interp_lift_sm_bpoly(
+    nmod_mpolyn_t F,
+    n_bpoly_t A,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong N = mpoly_words_per_exp_sp(F->bits, ctx->minfo);
+    slong i, j, Fi;
+    slong off0, shift0, off1, shift1;
+
+    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, ctx->minfo);
+
+    Fi = 0;
+    for (i = A->length - 1; i >= 0; i--)
+    {
+        n_poly_struct * Ai = A->coeffs + i;
+        for (j = Ai->length - 1; j >= 0; j--)
+        {
+            if (Ai->coeffs[j] == 0)
+                continue;
+
+            nmod_mpolyn_fit_length(F, Fi + 1, ctx);
+            mpoly_monomial_zero(F->exps + N*Fi, N);
+            (F->exps + N*Fi)[off0] += (i << shift0);
+            (F->exps + N*Fi)[off1] += (j << shift1);
+            n_poly_set_ui((n_poly_struct *)(F->coeffs + Fi), Ai->coeffs[j]);
+            Fi++;
+        }
+    }
+
+    F->length = Fi;
+}
+
+int nmod_mpolyn_interp_crt_sm_bpoly(
+    slong * lastdeg,
+    nmod_mpolyn_t F,
+    nmod_mpolyn_t T,
+    n_bpoly_t A,
+    n_poly_t modulus,
+    n_poly_t alphapow,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int changed = 0;
+    int nlimbs = _nmod_vec_dot_bound_limbs(modulus->length, ctx->ffinfo->mod);
+    slong N = mpoly_words_per_exp(F->bits, ctx->minfo);
+    slong off0, shift0, off1, shift1;
+    n_poly_struct * Acoeffs = A->coeffs;
+    slong Fi, Ti, Ai, ai;
+    slong Flen = F->length;
+    ulong * Fexps = F->exps;
+    nmod_poly_struct * Fcoeffs = F->coeffs;
+    ulong * Texps = T->exps;
+    nmod_poly_struct * Tcoeffs = T->coeffs;
+    mp_limb_t v;
+    ulong Fexpi, mask;
+
+    mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
+    mpoly_gen_offset_shift_sp(&off0, &shift0, 0, F->bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off1, &shift1, 1, F->bits, ctx->minfo);
+
+    FLINT_ASSERT(T->bits == F->bits);
+
+    *lastdeg = -1;
+
+    Ti = Fi = 0;
+    Ai = A->length - 1;
+    ai = (Ai < 0) ? 0 : n_poly_degree(Acoeffs + Ai);
+
+    while (Fi < Flen || Ai >= 0)
+    {
+        if (Ti >= T->alloc)
+        {
+            slong extra = Flen - Fi;
+            extra = FLINT_MAX(extra, Ai);
+            nmod_mpolyn_fit_length(T, Ti + extra + 1, ctx);
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
+        }
+
+        if (Fi < Flen)
+            Fexpi = pack_exp2(((Fexps + N*Fi)[off0]>>shift0)&mask,
+                              ((Fexps + N*Fi)[off1]>>shift1)&mask);
+        else
+            Fexpi = 0;
+
+        if (Fi < Flen && Ai >= 0 && Fexpi == pack_exp2(Ai, ai))
+        {
+            /* F term ok, A term ok */
+            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
+
+            v = _n_poly_eval_pow((n_poly_struct *)(Fcoeffs + Fi), alphapow, nlimbs, ctx->ffinfo->mod);
+            v = nmod_sub(Acoeffs[Ai].coeffs[ai], v, ctx->ffinfo->mod);
+            if (v != 0)
+            {
+                changed = 1;
+                n_poly_mod_scalar_addmul_nmod((n_poly_struct*)(Tcoeffs + Ti),(n_poly_struct *)(Fcoeffs + Fi), modulus, v, ctx->ffinfo->mod);
+            }
+            else
+            {
+                n_poly_set((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi));
+            }
+
+            Fi++;
+            do {
+                ai--;
+            } while (ai >= 0 && Acoeffs[Ai].coeffs[ai] == 0);
+            if (ai < 0)
+            {
+                do {
+                    Ai--;
+                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
+                if (Ai >= 0)
+                    ai = n_poly_degree(Acoeffs + Ai);
+            }
+        }
+        else if (Ai >= 0 && (Fi >= Flen || Fexpi < pack_exp2(Ai, ai)))
+        {
+            /* F term missing, A term ok */
+
+            mpoly_monomial_zero(Texps + N*Ti, N);
+            (Texps + N*Ti)[off0] += (Ai << shift0);
+            (Texps + N*Ti)[off1] += (ai << shift1);
+
+            changed = 1;
+            _n_poly_mod_scalar_mul_nmod((n_poly_struct*)(Tcoeffs + Ti), modulus, Acoeffs[Ai].coeffs[ai], ctx->ffinfo->mod);
+
+            do {
+                ai--;
+            } while (ai >= 0 && Acoeffs[Ai].coeffs[ai] == 0);
+            if (ai < 0)
+            {
+                do {
+                    Ai--;
+                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
+                if (Ai >= 0)
+                    ai = n_poly_degree(Acoeffs + Ai);
+            }
+        }
+        else
+        {
+            FLINT_ASSERT(Fi < Flen && (Ai < 0 || Fexpi > pack_exp2(Ai, ai)));
+            /* F term ok, Aterm missing */
+            mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
+
+            v = _n_poly_eval_pow((n_poly_struct *)(Fcoeffs + Fi), alphapow, nlimbs, ctx->ffinfo->mod);
+            if (v != 0)
+            {
+                changed = 1;
+                v = nmod_neg(v, ctx->ffinfo->mod);
+                n_poly_mod_scalar_addmul_nmod((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), modulus, v, ctx->ffinfo->mod);
+            }
+            else
+            {
+                nmod_poly_set(Tcoeffs + Ti, Fcoeffs + Fi);
+            }
+
+            Fi++;
+        }
+
+        FLINT_ASSERT(!n_poly_is_zero((n_poly_struct *)(Tcoeffs + Ti)));
+        *lastdeg = FLINT_MAX(*lastdeg, n_poly_degree((n_poly_struct*)(Tcoeffs + Ti)));
+        Ti++;
+    }
+
+    T->length = Ti;
+
+    if (changed)
+        nmod_mpolyn_swap(T, F);
+
+    return changed;
+}
+
 /*****************************************************************************/
 
 /*
@@ -1329,9 +1501,7 @@ int nmod_mpolyun_interp_crt_sm_mpolyu(
     Fexp = F->exps;
     Aexp = A->exps;   
 
-    nmod_mpoly_init(zero, ctx);
-    nmod_mpoly_fit_bits(zero, A->bits, ctx);
-    zero->bits = A->bits;
+    nmod_mpoly_init3(zero, 0, A->bits, ctx);
 
     i = j = k = 0;
     while (i < Flen || j < Alen)
@@ -1383,5 +1553,45 @@ int nmod_mpolyun_interp_crt_sm_mpolyu(
     nmod_mpolyn_clear(S, ctx);
     nmod_mpoly_clear(zero, ctx);
     return changed;    
+}
+
+
+/*
+    F = F + modulus*(A - F(alpha))
+    monomials assumed to match
+*/
+int nmod_mpolyn_interp_mcrt_sm_mpoly(
+    slong * lastdeg_,
+    nmod_mpolyn_t F,
+    const nmod_mpoly_t A,
+    const n_poly_t modulus,
+    n_poly_t alphapow,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong lastdeg = -1;
+    int changed = 0;
+    slong i;
+    mp_limb_t v;
+    mp_limb_t * Acoeff = A->coeffs;
+    slong Flen = F->length;
+
+    FLINT_ASSERT(Flen == A->length);
+
+    for (i = 0; i < Flen; i++)
+    {
+        /* F term ok, A term ok */
+        v = n_poly_mod_eval_pow((n_poly_struct*)(F->coeffs + i), alphapow, ctx->ffinfo->mod);
+        v = nmod_sub(Acoeff[i], v, ctx->ffinfo->mod);
+        if (v != 0)
+        {
+            changed = 1;
+            n_poly_mod_scalar_addmul_nmod((n_poly_struct*)(F->coeffs + i),
+                (n_poly_struct*)(F->coeffs + i), modulus, v, ctx->ffinfo->mod);
+        }
+        lastdeg = FLINT_MAX(lastdeg, n_poly_degree((n_poly_struct*)(F->coeffs + i)));
+    }
+
+    *lastdeg_ = lastdeg;
+    return changed;
 }
 

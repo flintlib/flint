@@ -11,37 +11,19 @@
 
 #include "nmod_mpoly.h"
 
-void _nmod_mpoly_set(mp_limb_t * coeff1, ulong * exps1,
-                     const mp_limb_t * coeff2, const ulong * exps2, slong len2,
-                                               slong N, const nmodf_ctx_t fctx)
+void nmod_mpoly_set(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
+    slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
 
-    if (coeff1 != coeff2)
-    {
-        for (i = 0; i < len2; i++)
-            coeff1[i] = coeff2[i];
-    }
+    if (A == B)
+        return;
 
-    if (exps1 != exps2)
-    {
-        for (i = 0; i < len2; i++)
-            mpoly_monomial_set(exps1 + N*i, exps2 + N*i, N);
-    }
-}
+    nmod_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
 
-void nmod_mpoly_set(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    slong N;
-    N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
-
-    nmod_mpoly_fit_length(poly1, poly2->length, ctx);
-    nmod_mpoly_fit_bits(poly1, poly2->bits, ctx);
-
-    _nmod_mpoly_set(poly1->coeffs, poly1->exps,
-                   poly2->coeffs, poly2->exps, poly2->length, N, ctx->ffinfo);
-
-    _nmod_mpoly_set_length(poly1, poly2->length, ctx);
-    poly1->bits = poly2->bits;
+    _nmod_vec_set(A->coeffs, B->coeffs, B->length);
+    mpoly_copy_monomials(A->exps, B->exps, B->length, N);
+    _nmod_mpoly_set_length(A, B->length, ctx);
 }

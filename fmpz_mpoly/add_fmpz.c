@@ -32,9 +32,7 @@ void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         {
             if (A != B)
             {
-                fmpz_mpoly_fit_length(A, B->length, ctx);
-                fmpz_mpoly_fit_bits(A, B->bits, ctx);
-                A->bits = B->bits;
+                fmpz_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
 
                 for (i = 0; i < Blen - 1; i++)
                     fmpz_set(A->coeffs + i, B->coeffs + i);

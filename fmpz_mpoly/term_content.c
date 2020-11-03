@@ -43,9 +43,7 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
         fmpz_init(min_degs + i);
     mpoly_get_monomial_ffmpz_unpacked_ffmpz(min_degs, minAfields, ctx->minfo);
 
-    fmpz_mpoly_fit_length(M, 1, ctx);
-    fmpz_mpoly_fit_bits(M, Abits, ctx);
-    M->bits = Abits;
+    fmpz_mpoly_fit_length_reset_bits(M, 1, Abits, ctx);
     mpoly_set_monomial_ffmpz(M->exps, min_degs, Abits, ctx->minfo);
 
     fmpz_init(g);

@@ -11,26 +11,34 @@
 
 #include "fq_nmod_mpoly.h"
 
-slong _fq_nmod_mpoly_derivative(fq_nmod_struct * Acoeff,       ulong * Aexp,
-                 const fq_nmod_struct * Bcoeff, const ulong * Bexp, slong Blen,
-          flint_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
-                                                     const fq_nmod_ctx_t fqctx)
+static slong _fq_nmod_mpoly_derivative(
+    mp_limb_t * Acoeff,
+    ulong * Aexp,
+    const mp_limb_t * Bcoeff,
+    const ulong * Bexp,
+    slong Blen,
+    flint_bitcnt_t bits,
+    slong N,
+    slong offset,
+    slong shift,
+    ulong * oneexp,
+    const fq_nmod_ctx_t fqctx)
 {
+    slong d = fq_nmod_ctx_degree(fqctx);
+    nmod_t mod = fq_nmod_ctx_mod(fqctx);
+    ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     slong i, Alen;
 
     /* x^c -> c*x^(c-1) */
     Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        mp_limb_t cr;
-        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         ulong c = (Bexp[N*i + offset] >> shift) & mask;
         if (c == 0)
             continue;
-        NMOD_RED(cr, c, fqctx->modulus->mod);
-        if (cr == 0)
+        _n_fq_mul_ui(Acoeff + d*Alen, Bcoeff + d*i, c, d, mod);
+        if (_n_fq_is_zero(Acoeff + d*Alen, d))
             continue;
-        fq_nmod_mul_ui(Acoeff + Alen, Bcoeff + i, cr, fqctx);
         mpoly_monomial_sub(Aexp + N*Alen, Bexp + N*i, oneexp, N);
         Alen++;
     }
@@ -39,11 +47,20 @@ slong _fq_nmod_mpoly_derivative(fq_nmod_struct * Acoeff,       ulong * Aexp,
 }
 
 
-slong _fq_nmod_mpoly_derivative_mp(fq_nmod_struct * Acoeff,       ulong * Aexp,
-                 const fq_nmod_struct * Bcoeff, const ulong * Bexp, slong Blen,
-          flint_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
-                                                     const fq_nmod_ctx_t fqctx)
+static slong _fq_nmod_mpoly_derivative_mp(
+    mp_limb_t * Acoeff,
+    ulong * Aexp,
+    const mp_limb_t * Bcoeff,
+    const ulong * Bexp,
+    slong Blen,
+    flint_bitcnt_t bits,
+    slong N,
+    slong offset,
+    ulong * oneexp,
+    const fq_nmod_ctx_t fqctx)
 {
+    slong d = fq_nmod_ctx_degree(fqctx);
+    nmod_t mod = fq_nmod_ctx_mod(fqctx);
     slong i, Alen;
     fmpz_t c;
     fmpz_init(c);
@@ -52,14 +69,12 @@ slong _fq_nmod_mpoly_derivative_mp(fq_nmod_struct * Acoeff,       ulong * Aexp,
     Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        mp_limb_t cr;
         fmpz_set_ui_array(c, Bexp + N*i + offset, bits/FLINT_BITS);
         if (fmpz_is_zero(c))
             continue;
-        cr = fmpz_fdiv_ui(c, fqctx->modulus->mod.n);
-        if (cr == 0)
+        _n_fq_mul_ui(Acoeff + d*Alen, Bcoeff + d*i, fmpz_fdiv_ui(c, mod.n), d, mod);
+        if (_n_fq_is_zero(Acoeff + d*Alen, d))
             continue;
-        fq_nmod_mul_ui(Acoeff + Alen, Bcoeff + i, cr, fqctx);
         mpoly_monomial_sub_mp(Aexp + N*Alen, Bexp + N*i, oneexp, N);
         Alen++;
     }
@@ -70,8 +85,11 @@ slong _fq_nmod_mpoly_derivative_mp(fq_nmod_struct * Acoeff,       ulong * Aexp,
 }
 
 
-void fq_nmod_mpoly_derivative(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
-                                      slong var, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_derivative(
+    fq_nmod_mpoly_t poly1,
+    const fq_nmod_mpoly_t poly2,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     slong bits, N, offset, shift;
     ulong * oneexp;
@@ -81,9 +99,7 @@ void fq_nmod_mpoly_derivative(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2
     TMP_START;
     bits = poly2->bits;
 
-    fq_nmod_mpoly_fit_length(poly1, poly2->length, ctx);
-    fq_nmod_mpoly_fit_bits(poly1, bits, ctx);
-    poly1->bits = bits;
+    fq_nmod_mpoly_fit_length_reset_bits(poly1, poly2->length, bits, ctx);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
     oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));

@@ -674,6 +674,72 @@ void n_poly_mod_xgcd(
     }
 }
 
+
+void n_poly_reverse(n_poly_t output, const n_poly_t input, slong m)
+{
+    n_poly_fit_length(output, m);
+    _nmod_poly_reverse(output->coeffs, input->coeffs, input->length, m);
+    output->length = m;
+    _n_poly_normalise(output);
+}
+
+
+void n_poly_mod_mulmod_preinv(
+    n_poly_t res,
+    const n_poly_t poly1,
+    const n_poly_t poly2,
+    const n_poly_t f,
+    const n_poly_t finv,
+    nmod_t ctx)
+{
+    slong len1, len2, lenf;
+    mp_ptr fcoeffs;
+
+    lenf = f->length;
+    len1 = poly1->length;
+    len2 = poly2->length;
+
+    if (lenf <= len1 || lenf <= len2)
+    {
+        flint_printf("n_poly_mod_mulmod_preinv: Input is larger than modulus.");
+        flint_abort();
+    }
+
+    if (lenf == 1 || len1 == 0 || len2 == 0)
+    {
+        n_poly_zero(res);
+        return;
+    }
+
+    if (len1 + len2 > lenf)
+    {
+        if (f == res)
+        {
+            fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
+            _nmod_vec_set(fcoeffs, f->coeffs, lenf);
+        }
+        else
+        {
+            fcoeffs = f->coeffs;
+        }
+
+        n_poly_fit_length(res, lenf - 1);
+        _nmod_poly_mulmod_preinv(res->coeffs, poly1->coeffs, len1,
+                                       poly2->coeffs, len2,
+                                       fcoeffs, lenf,
+                                       finv->coeffs, finv->length, ctx);
+        if (f == res)
+            flint_free(fcoeffs);
+
+        res->length = lenf - 1;
+        _n_poly_normalise(res);
+    }
+    else
+    {
+        n_poly_mod_mul(res, poly1, poly2, ctx);
+    }
+}
+
 void n_poly_mod_inv_series(n_poly_t Qinv, const n_poly_t Q, slong n, nmod_t ctx)
 {
     slong Qlen = Q->length;
@@ -682,8 +748,7 @@ void n_poly_mod_inv_series(n_poly_t Qinv, const n_poly_t Q, slong n, nmod_t ctx)
 
     if (Qlen == 0)
     {
-        flint_printf("Exception (nmod_poly_inv_series_newton). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "n_poly_mod_inv_series_newton: Division by zero.");
     }
 
     if (Qinv != Q)
@@ -694,7 +759,7 @@ void n_poly_mod_inv_series(n_poly_t Qinv, const n_poly_t Q, slong n, nmod_t ctx)
     else
     {
         n_poly_t t;
-        n_poly_init(t);
+        n_poly_init2(t, n);
         _nmod_poly_inv_series_newton(t->coeffs, Q->coeffs, Qlen, n, ctx);
         n_poly_swap(Qinv, t);
         n_poly_clear(t);
@@ -826,6 +891,78 @@ void n_poly_mod_addmul_linear(
     _n_poly_normalise(A);
 }
 
+/* A = B + C*d0 */
+void n_poly_mod_scalar_addmul_nmod(
+    n_poly_t A,
+    const n_poly_t B,
+    const n_poly_t C,
+    mp_limb_t d0,
+    nmod_t ctx)
+{
+    slong i;
+    mp_limb_t t0, t1;
+    mp_limb_t * Acoeffs, * Bcoeffs, * Ccoeffs;
+    slong Blen = B->length;
+    slong Clen = C->length;
+    slong Alen = FLINT_MAX(B->length, C->length);
+
+    n_poly_fit_length(A, Alen);
+    Acoeffs = A->coeffs;
+    Bcoeffs = B->coeffs;
+    Ccoeffs = C->coeffs;
+
+    if (ctx.norm >= (FLINT_BITS + 1)/2)
+    {
+        for (i = 0; i + 2 <= FLINT_MIN(Blen, Clen); i += 2)
+        {
+            NMOD_RED2(t0, 0, Bcoeffs[i + 0] + d0*Ccoeffs[i + 0], ctx);
+            NMOD_RED2(t1, 0, Bcoeffs[i + 1] + d0*Ccoeffs[i + 1], ctx);
+            Acoeffs[i + 0] = t0;
+            Acoeffs[i + 1] = t1;
+        }
+        for ( ; i < FLINT_MIN(Blen, Clen); i++)
+        {
+            NMOD_RED2(Acoeffs[i], 0, Bcoeffs[i] + d0*Ccoeffs[i], ctx);
+        }
+
+        for ( ; i + 2 <= Clen; i += 2)
+        {
+            NMOD_RED2(t0, 0, d0*Ccoeffs[i + 0], ctx);
+            NMOD_RED2(t1, 0, d0*Ccoeffs[i + 1], ctx);
+            Acoeffs[i + 0] = t0;
+            Acoeffs[i + 1] = t1;
+        }
+        for ( ; i < Clen; i++)
+        {
+            NMOD_RED2(Acoeffs[i], 0, d0*Ccoeffs[i], ctx);
+        }
+    }
+    else
+    {
+        for (i = 0; i < FLINT_MIN(Blen, Clen); i++)
+        {
+            t0 = Bcoeffs[i];
+            NMOD_ADDMUL(t0, d0, Ccoeffs[i], ctx);
+            Acoeffs[i] = t0;
+        }
+
+        while (i < Clen)
+        {
+            Acoeffs[i] = nmod_mul(d0, Ccoeffs[i], ctx);
+            i++;
+        }
+    }
+
+    while (i < Blen)
+    {
+        Acoeffs[i] = Bcoeffs[i];
+        i++;
+    }
+
+    A->length = Alen;
+    _n_poly_normalise(A);
+}
+
 
 ulong n_poly_mod_remove(n_poly_t f, const n_poly_t p, nmod_t ctx)
 {
@@ -851,6 +988,36 @@ ulong n_poly_mod_remove(n_poly_t f, const n_poly_t p, nmod_t ctx)
     n_poly_clear(r);
 
     return i;
+}
+
+mp_limb_t _n_poly_eval_pow(n_poly_t P, n_poly_t alphapow, int nlimbs, nmod_t ctx)
+{
+    mp_limb_t * Pcoeffs = P->coeffs;
+    slong Plen = P->length;
+    mp_limb_t * alpha_powers = alphapow->coeffs;
+    mp_limb_t res;
+    slong k;
+
+    if (Plen > alphapow->length)
+    {
+        slong oldlength = alphapow->length;
+        FLINT_ASSERT(2 <= oldlength);
+        n_poly_fit_length(alphapow, Plen);
+        alphapow->length = Plen;
+        alpha_powers = alphapow->coeffs;
+        for (k = oldlength; k < Plen; k++)
+            alpha_powers[k] = nmod_mul(alpha_powers[k - 1], alpha_powers[1], ctx);
+    }
+
+    NMOD_VEC_DOT(res, k, Plen, Pcoeffs[k], alpha_powers[k], ctx, nlimbs);
+
+    return res;
+}
+
+mp_limb_t n_poly_mod_eval_pow(n_poly_t P, n_poly_t alphapow, nmod_t ctx)
+{
+    int nlimbs = _nmod_vec_dot_bound_limbs(P->length, ctx);
+    return _n_poly_eval_pow(P, alphapow, nlimbs, ctx);
 }
 
 void n_poly_mod_eval2_pow(

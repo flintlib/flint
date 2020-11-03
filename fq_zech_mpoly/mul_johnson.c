@@ -170,8 +170,11 @@ slong _fq_zech_mpoly_mul_johnson(
     return len1;
 }
 
-void fq_zech_mpoly_mul_johnson(fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly2,
-                          const fq_zech_mpoly_t poly3, const fq_zech_mpoly_ctx_t ctx)
+void fq_zech_mpoly_mul_johnson(
+    fq_zech_mpoly_t poly1,
+    const fq_zech_mpoly_t poly2,
+    const fq_zech_mpoly_t poly3,
+    const fq_zech_mpoly_ctx_t ctx)
 {
     slong i, N, len1 = 0;
     flint_bitcnt_t exp_bits;
@@ -241,7 +244,7 @@ void fq_zech_mpoly_mul_johnson(fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly
         fq_zech_mpoly_t temp;
 
         fq_zech_mpoly_init(temp, ctx);
-        fq_zech_mpoly_fit_length_set_bits(temp,
+        fq_zech_mpoly_fit_length_reset_bits(temp,
                                 poly2->length + poly3->length, exp_bits, ctx);
 
         if (poly2->length >= poly3->length)
@@ -264,7 +267,7 @@ void fq_zech_mpoly_mul_johnson(fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly
     }
     else
     {
-        fq_zech_mpoly_fit_length_set_bits(poly1, poly2->length + poly3->length, exp_bits, ctx);
+        fq_zech_mpoly_fit_length_reset_bits(poly1, poly2->length + poly3->length, exp_bits, ctx);
 
         if (poly2->length > poly3->length)
         {

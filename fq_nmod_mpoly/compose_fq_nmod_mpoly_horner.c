@@ -75,8 +75,8 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_horner(fq_nmod_mpoly_t A,
                const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C,
                const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
 {
-    int success = 1;
-    int ret;
+    int ret, success = 1;
+    slong d = fq_nmod_ctx_degree(ctxB->fqctx);
     slong nvars = ctxB->minfo->nvars;
     slong i, j, k, cur, next, f, r, f_prev, r_prev, v;
     slong sp, rp;
@@ -88,7 +88,7 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_horner(fq_nmod_mpoly_t A,
     ulong * counts;
     slong Blen = B->length;
     slong * Blist;
-    const fq_nmod_struct * Bcoeff = B->coeffs;
+    const mp_limb_t * Bcoeffs = B->coeffs;
     ulong * Bexp = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
@@ -196,13 +196,13 @@ HornerForm:
         {
             success = 0;
         }
-        fq_nmod_mpoly_scalar_mul_fq_nmod(regs + rp, regs + rp, Bcoeff + f, ctxAC);
+        fq_nmod_mpoly_scalar_mul_n_fq(regs + rp, regs + rp, Bcoeffs + d*f, ctxAC);
 
         if (Blist[f] != -WORD(1)) /* if f has a second term */
         {
             /* this term should be a scalar */
             FLINT_ASSERT(fmpz_is_zero(Buexp + nvars*Blist[f] + v));
-            fq_nmod_mpoly_add_fq_nmod(regs + rp, regs + rp,  Bcoeff + Blist[f], ctxAC);
+            fq_nmod_mpoly_add_n_fq(regs + rp, regs + rp, Bcoeffs + d*Blist[f], ctxAC);
         }
 
         rtypes[rp] = -WORD(1);
@@ -325,7 +325,7 @@ HornerForm2:
             {
                 success = 0;
             }
-            fq_nmod_mpoly_add_fq_nmod(regs + rp - 1, regs + rp - 1, Bcoeff + rtypes[rp], ctxAC);
+            fq_nmod_mpoly_add_n_fq(regs + rp - 1, regs + rp - 1, Bcoeffs + d*rtypes[rp], ctxAC);
         }
         else if (rtypes[rp - 1] != -WORD(1) && rtypes[rp] == -WORD(1))
         {
@@ -335,7 +335,7 @@ HornerForm2:
             {
                 success = 0;
             }
-            fq_nmod_mpoly_scalar_mul_fq_nmod(temp, temp, Bcoeff + rtypes[rp - 1], ctxAC);
+            fq_nmod_mpoly_scalar_mul_n_fq(temp, temp, Bcoeffs + d*rtypes[rp - 1], ctxAC);
             fq_nmod_mpoly_add(regs + rp - 1, temp, regs + rp, ctxAC);
         }
         else
@@ -384,13 +384,9 @@ HornerFormReturn:
     FLINT_ASSERT(sp == -WORD(1));
 
     if (rtypes[rp] == -WORD(1))
-    {
         fq_nmod_mpoly_swap(A, regs + rp, ctxAC);
-    }
     else
-    {
-        fq_nmod_mpoly_set_fq_nmod(A, Bcoeff + rtypes[rp], ctxAC);
-    }
+        fq_nmod_mpoly_set_n_fq(A, Bcoeffs + d*rtypes[rp], ctxAC);
 
 cleanup:
 

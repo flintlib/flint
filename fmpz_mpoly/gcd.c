@@ -568,6 +568,7 @@ cleanup:
 }
 
 
+/************************ See if B divides A ********************************/
 static int _try_divides(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -626,7 +627,7 @@ static int _try_zippel(
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
 
-    if (!I->can_use_zippel)
+    if (!(I->can_use & MPOLY_GCD_USE_ZIPPEL))
         return 0;
 
     FLINT_ASSERT(m >= WORD(2));
@@ -771,7 +772,7 @@ static int _try_bma(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    if (!I->can_use_bma)
+    if (!(I->can_use & MPOLY_GCD_USE_ZIPPEL2))
         return 0;
 
     FLINT_ASSERT(m >= WORD(3));
@@ -782,7 +783,7 @@ static int _try_bma(
     max_minor_degree = 0;
     for (i = 2; i < m; i++)
     {
-        k = I->bma_perm[i];
+        k = I->zippel2_perm[i];
         max_minor_degree = FLINT_MAX(max_minor_degree, I->Adeflate_deg[k]);
         max_minor_degree = FLINT_MAX(max_minor_degree, I->Bdeflate_deg[k]);
     }
@@ -816,7 +817,7 @@ static int _try_bma(
         arg->P = B;
         arg->Puu = Buu;
         arg->Pcontent = Bc;
-        arg->perm = I->bma_perm;
+        arg->perm = I->zippel2_perm;
         arg->shift = I->Bmin_exp;
         arg->stride = I->Gstride;
         arg->maxexps = I->Bmax_exp;
@@ -826,7 +827,7 @@ static int _try_bma(
         thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertuu, arg);
 
         fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uctx, A, ctx,
-                          I->bma_perm, I->Amin_exp, I->Gstride, I->Amax_exp,
+                        I->zippel2_perm, I->Amin_exp, I->Gstride, I->Amax_exp,
                                                                handles + 0, s);
         success = fmpz_mpolyu_content_mpoly_threaded_pool(Ac, Auu,
                                                          uctx, handles + 0, s);
@@ -844,9 +845,9 @@ static int _try_bma(
     else
     {
         fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uctx, A, ctx,
-                   I->bma_perm, I->Amin_exp, I->Gstride, I->Amax_exp, NULL, 0);
+               I->zippel2_perm, I->Amin_exp, I->Gstride, I->Amax_exp, NULL, 0);
         fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Buu, uctx, B, ctx,
-                   I->bma_perm, I->Bmin_exp, I->Gstride, I->Bmax_exp, NULL, 0);
+               I->zippel2_perm, I->Bmin_exp, I->Gstride, I->Bmax_exp, NULL, 0);
 
         success = fmpz_mpolyu_content_mpoly_threaded_pool(Ac, Auu, uctx, NULL, 0);
         success = success &&
@@ -892,7 +893,7 @@ done:
     fmpz_mpolyu_mul_mpoly_inplace(Guu, Gc, uctx);
 
     fmpz_mpoly_from_mpolyuu_perm_inflate(G, I->Gbits, ctx, Guu, uctx,
-                                         I->bma_perm, I->Gmin_exp, I->Gstride);
+                                     I->zippel2_perm, I->Gmin_exp, I->Gstride);
     success = 1;
 
 cleanup:
@@ -953,7 +954,7 @@ static int _try_brown(
     fmpz_mpoly_ctx_t lctx;
     fmpz_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
 
-    if (!I->can_use_brown)
+    if (!(I->can_use & MPOLY_GCD_USE_BROWN))
         return 0;
 
     FLINT_ASSERT(m >= 2);
@@ -1012,10 +1013,10 @@ static int _try_brown(
     FLINT_ASSERT(Al->length > 1);
     FLINT_ASSERT(Bl->length > 1);
 
-    success = (num_handles > 0)
-           ? fmpz_mpolyl_gcd_brown_threaded_pool(Gl, Abarl, Bbarl, Al, Bl, lctx, I,
-                                                         handles, num_handles)
-           : fmpz_mpolyl_gcd_brown(Gl, Abarl, Bbarl, Al, Bl, lctx, I);
+    success = (num_handles > 0) ?
+                fmpz_mpolyl_gcd_brown_threaded_pool(Gl, Abarl, Bbarl, Al, Bl,
+                                               lctx, I, handles, num_handles) :
+                fmpz_mpolyl_gcd_brown(Gl, Abarl, Bbarl, Al, Bl, lctx, I);
 
     if (!success)
         goto cleanup;
@@ -1292,17 +1293,18 @@ calculate_trivial_gcd:
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
     mpoly_gcd_info_measure_bma(I, A->length, B->length, ctx->minfo);
 
-    if (I->mvars == 2)
+    if (I->mvars < 3)
     {
         /* TODO: bivariate heuristic here */
 
         if (_try_brown(G, A, B, I, ctx, handles, num_handles))
             goto successful;
     }
-    else if (I->can_use_brown && I->can_use_bma
-            && I->bma_time_est < I->brown_time_est
-            && (I->mvars*(I->Adensity + I->Bdensity) < 1
-                || I->bma_time_est < 0.01*I->brown_time_est))
+    else if ((I->can_use & MPOLY_GCD_USE_BROWN) &&
+             (I->can_use & MPOLY_GCD_USE_ZIPPEL2) &&
+             I->zippel2_time < I->brown_time &&
+             (I->mvars*(I->Adensity + I->Bdensity) < 1 ||
+              I->zippel2_time < 0.01*I->brown_time))
     {
         if (_try_bma(G, A, B, I, ctx, handles, num_handles))
             goto successful;

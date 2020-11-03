@@ -4,7 +4,7 @@
 ================================================================================================
 
     The exponents follow the ``mpoly`` interface.
-    A coefficient may be referenced as a ``fq_nmod_struct *``.
+    No references to the coefficients are available.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -255,10 +255,6 @@ Container operations
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
 
-.. function:: fq_nmod_struct * fq_nmod_mpoly_term_coeff_ref(fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
-
-    Return a reference to the coefficient of index `i` of ``A``.
-
 .. function:: int fq_nmod_mpoly_is_canonical(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
@@ -485,11 +481,30 @@ Division
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
+.. function:: void fq_nmod_mpoly_term_content(fq_nmod_mpoly_t M, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the GCD of the terms of ``A``.
+    If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
+
+.. function:: int fq_nmod_mpoly_content_vars(fq_nmod_mpoly_t g, const fq_nmod_mpoly_t A, slong * vars, slong vars_length, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``g`` to the GCD of the cofficients of ``A`` when viewed as a polynomial in the variables ``vars``.
+    Return ``1`` for success and ``0`` for failure. Upon succcess, ``g`` will be independent of the variables ``vars``.
 
 .. function:: int fq_nmod_mpoly_gcd(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
 
     Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
+
+.. function:: int fq_nmod_mpoly_gcd_cofactors(fq_nmod_mpoly_t G, fq_nmod_mpoly_t Abar, fq_nmod_mpoly_t Bbar, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+
+    Do the operation of :func:`fq_nmod_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
+
+.. function:: int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+              int fq_nmod_mpoly_gcd_hensel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+              int fq_nmod_mpoly_gcd_zippel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
 
 
 Univariate Functions

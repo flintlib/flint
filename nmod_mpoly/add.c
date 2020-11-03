@@ -11,48 +11,52 @@
 
 #include "nmod_mpoly.h"
 
-slong _nmod_mpoly_add1(mp_limb_t * coeff1,       ulong * exp1,
-                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                                          ulong maskhi, const nmodf_ctx_t fctx)
+slong _nmod_mpoly_add1(
+    mp_limb_t * Acoeffs, ulong * Aexps,
+    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
+    ulong maskhi,
+    const nmodf_ctx_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
-    while (i < len2 && j < len3)
+    while (i < Blen && j < Clen)
     {
-        if ((exp2[i]^maskhi) > (exp3[j]^maskhi))
+        if ((Bexps[i]^maskhi) > (Cexps[j]^maskhi))
         {
-            exp1[k] = exp2[i];
-            coeff1[k] = coeff2[i];
+            Aexps[k] = Bexps[i];
+            Acoeffs[k] = Bcoeffs[i];
             i++;
-        } else if ((exp2[i]^maskhi) == (exp3[j]^maskhi))
+        }
+        else if ((Bexps[i]^maskhi) == (Cexps[j]^maskhi))
         {
-            exp1[k] = exp2[i];
-            coeff1[k] = nmod_add(coeff2[i], coeff3[j], fctx->mod);
-            k -= (coeff1[k] == 0);
+            Aexps[k] = Bexps[i];
+            Acoeffs[k] = nmod_add(Bcoeffs[i], Ccoeffs[j], fctx->mod);
+            k -= (Acoeffs[k] == 0);
             i++;
             j++;
-        } else
+        }
+        else
         {
-            coeff1[k] = coeff3[j];
-            exp1[k] = exp3[j];
+            Acoeffs[k] = Ccoeffs[j];
+            Aexps[k] = Cexps[j];
             j++;         
         }
         k++;
     }
 
-    while (i < len2)
+    while (i < Blen)
     {
-        exp1[k] = exp2[i];
-        coeff1[k] = coeff2[i];
+        Aexps[k] = Bexps[i];
+        Acoeffs[k] = Bcoeffs[i];
         i++;
         k++;
     }
 
-    while (j < len3)
+    while (j < Clen)
     {
-        exp1[k] = exp3[j];
-        coeff1[k] = coeff3[j];
+        Aexps[k] = Cexps[j];
+        Acoeffs[k] = Ccoeffs[j];
         j++;
         k++;
     }
@@ -60,54 +64,56 @@ slong _nmod_mpoly_add1(mp_limb_t * coeff1,       ulong * exp1,
     return k;
 }
 
-slong _nmod_mpoly_add(mp_limb_t * coeff1,       ulong * exp1,
-                const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-                const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
+                const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+                const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
                    slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
     if (N == 1)
-        return _nmod_mpoly_add1(coeff1, exp1, coeff2, exp2, len2,
-                                         coeff3, exp3, len3, cmpmask[0], fctx);
+        return _nmod_mpoly_add1(Acoeffs, Aexps, Bcoeffs, Bexps, Blen,
+                                       Ccoeffs, Cexps, Clen, cmpmask[0], fctx);
 
-    while (i < len2 && j < len3)
+    while (i < Blen && j < Clen)
     {
-        int cmp = mpoly_monomial_cmp(exp2 + i*N, exp3 + j*N, N, cmpmask);
+        int cmp = mpoly_monomial_cmp(Bexps + i*N, Cexps + j*N, N, cmpmask);
 
         if (cmp > 0)
         {
-            mpoly_monomial_set(exp1 + k*N, exp2 + i*N, N);
-            coeff1[k] = coeff2[i];
+            mpoly_monomial_set(Aexps + k*N, Bexps + i*N, N);
+            Acoeffs[k] = Bcoeffs[i];
             i++;
-        } else if (cmp == 0)
+        }
+        else if (cmp == 0)
         {
-            mpoly_monomial_set(exp1 + k*N, exp2 + i*N, N);
-            coeff1[k] = nmod_add(coeff2[i], coeff3[j], fctx->mod);
-            k -= (coeff1[k] == 0);
+            mpoly_monomial_set(Aexps + k*N, Bexps + i*N, N);
+            Acoeffs[k] = nmod_add(Bcoeffs[i], Ccoeffs[j], fctx->mod);
+            k -= (Acoeffs[k] == 0);
             i++;
             j++;
-        } else
+        }
+        else
         {
-            coeff1[k] = coeff3[j];
-            mpoly_monomial_set(exp1 + k*N, exp3 + j*N, N);
+            Acoeffs[k] = Ccoeffs[j];
+            mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
             j++;         
         }
         k++;
     }
 
-    while (i < len2)
+    while (i < Blen)
     {
-        mpoly_monomial_set(exp1 + k*N, exp2 + i*N, N);
-        coeff1[k] = coeff2[i];
+        mpoly_monomial_set(Aexps + k*N, Bexps + i*N, N);
+        Acoeffs[k] = Bcoeffs[i];
         i++;
         k++;
     }
 
-    while (j < len3)
+    while (j < Clen)
     {
-        mpoly_monomial_set(exp1 + k*N, exp3 + j*N, N);
-        coeff1[k] = coeff3[j];
+        mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
+        Acoeffs[k] = Ccoeffs[j];
         j++;
         k++;
     }
@@ -115,83 +121,73 @@ slong _nmod_mpoly_add(mp_limb_t * coeff1,       ulong * exp1,
     return k;
 }
 
-void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
+                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 {
-    slong len1 = 0, max_bits, N;
-    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
+    slong Abits, N;
+    ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
-    int free2 = 0, free3 = 0;
+    int freeBexps = 0, freeCexps = 0;
     TMP_INIT;
 
-    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
-    N = mpoly_words_per_exp(max_bits, ctx->minfo);
-
-    if (poly2->length == 0)
+    if (B->length == 0)
     {
-        nmod_mpoly_set(poly1, poly3, ctx);
+        nmod_mpoly_set(A, C, ctx);
         return;
-    } else if (poly3->length == 0)
+    }
+    else if (C->length == 0)
     {
-        nmod_mpoly_set(poly1, poly2, ctx);
+        nmod_mpoly_set(A, B, ctx);
         return;
     }
 
     TMP_START;
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, max_bits, ctx->minfo);
+    Abits = FLINT_MAX(B->bits, C->bits);
+    N = mpoly_words_per_exp(Abits, ctx->minfo);
+    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
 
-    if (max_bits > poly2->bits)
+    if (Abits != B->bits)
     {
-        free2 = 1;
-        exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(exp2, max_bits, poly2->exps, poly2->bits,
-                                                    poly2->length, ctx->minfo);
+        freeBexps = 1;
+        Bexps = (ulong *) flint_malloc(N*B->length*sizeof(ulong));
+        mpoly_repack_monomials(Bexps, Abits, B->exps, B->bits,
+                                                    B->length, ctx->minfo);
     }
 
-    if (max_bits > poly3->bits)
+    if (Abits != C->bits)
     {
-        free3 = 1;
-        exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-        mpoly_repack_monomials(exp3, max_bits, poly3->exps, poly3->bits,
-                                                    poly3->length, ctx->minfo);
+        freeCexps = 1;
+        Cexps = (ulong *) flint_malloc(N*C->length*sizeof(ulong));
+        mpoly_repack_monomials(Cexps, Abits, C->exps, C->bits,
+                                                    C->length, ctx->minfo);
     }
 
-    if (poly1 == poly2 || poly1 == poly3)
+    if (A == B || A == C)
     {
-        nmod_mpoly_t temp;
-
-        nmod_mpoly_init2(temp, poly2->length + poly3->length, ctx);
-        nmod_mpoly_fit_bits(temp, max_bits, ctx);
-        temp->bits = max_bits;
-
-        len1 = _nmod_mpoly_add(temp->coeffs, temp->exps, 
-                    poly2->coeffs, exp2, poly2->length,
-                    poly3->coeffs, exp3, poly3->length,
-                                    N, cmpmask, ctx->ffinfo);
-
-        nmod_mpoly_swap(temp, poly1, ctx);
-
-        nmod_mpoly_clear(temp, ctx);
-    } else
-    {
-        nmod_mpoly_fit_length(poly1, poly2->length + poly3->length, ctx);
-        nmod_mpoly_fit_bits(poly1, max_bits, ctx);
-        poly1->bits = max_bits;
-
-        len1 = _nmod_mpoly_add(poly1->coeffs, poly1->exps, 
-                       poly2->coeffs, exp2, poly2->length,
-                       poly3->coeffs, exp3, poly3->length,
-                                    N, cmpmask, ctx->ffinfo);
+        nmod_mpoly_t T;
+        nmod_mpoly_init3(T, B->length + C->length, Abits, ctx);
+        T->length = _nmod_mpoly_add(T->coeffs, T->exps, 
+                                    B->coeffs, Bexps, B->length,
+                                    C->coeffs, Cexps, C->length,
+                                                      N, cmpmask, ctx->ffinfo);
+        nmod_mpoly_swap(A, T, ctx);
+        nmod_mpoly_clear(T, ctx);
     }
-      
-    if (free2)
-        flint_free(exp2);
+    else
+    {
+        nmod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
+        A->length = _nmod_mpoly_add(A->coeffs, A->exps, 
+                                    B->coeffs, Bexps, B->length,
+                                    C->coeffs, Cexps, C->length,
+                                                      N, cmpmask, ctx->ffinfo);
+    }
 
-    if (free3)
-        flint_free(exp3);
+    if (freeBexps)
+        flint_free(Bexps);
 
-    _nmod_mpoly_set_length(poly1, len1, ctx);
+    if (freeCexps)
+        flint_free(Cexps);
 
     TMP_END;
 }

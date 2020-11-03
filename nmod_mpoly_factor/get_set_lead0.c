@@ -17,12 +17,7 @@ void _nmod_mpoly_get_lead0(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    slong dummyvars[] = {0};
-    ulong dummydegs[] = {0};
-
-    dummyvars[0] = 0;
-    dummydegs[0] = nmod_mpoly_degree_si(A, 0, ctx);
-    nmod_mpoly_get_coeff_vars_ui(c, A, dummyvars, dummydegs, 1, ctx);
+    nmod_mpolyl_lead_coeff(c, A, 1, ctx);
 }
 
 void _nmod_mpoly_set_lead0(

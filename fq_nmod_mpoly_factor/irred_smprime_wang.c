@@ -40,7 +40,7 @@ int fq_nmod_mpoly_factor_irred_smprime_wang(
 
     FLINT_ASSERT(n > 1);
     FLINT_ASSERT(A->length > 1);
-    FLINT_ASSERT(fq_nmod_is_one(A->coeffs + 0, ctx->fqctx));
+    FLINT_ASSERT(_n_fq_is_one(A->coeffs + d*0, d));
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
     fq_nmod_mpoly_init(Acopy, ctx);
@@ -123,11 +123,12 @@ next_alphabetas:
         for (j = d; j < d*alphabetas_length; j++)
             alphabetas[i].coeffs[j] = n_urandint(state, ctx->fqctx->mod.n);
         alphabetas[i].length = alphabetas_length;
-        _n_poly_fq_normalise(alphabetas + i, d);
+        _n_fq_poly_normalise(alphabetas + i, d);
     }
 
-    _fq_nmod_mpoly_eval_rest_to_n_bpoly_fq(Ab, A, alphabetas, ctx);
-    success = n_bpoly_fq_factor_smprime(Abfc, Abfp, Ab, 0, ctx->fqctx);
+    _fq_nmod_mpoly_eval_rest_to_n_fq_bpoly(Ab, A, alphabetas, ctx);
+
+    success = n_fq_bpoly_factor_smprime(Abfc, Abfp, Ab, 0, ctx->fqctx);
     if (!success)
     {
         FLINT_ASSERT(0 && "this should not happen");
@@ -214,16 +215,20 @@ next_alphabetas:
     fac->length = r;
     for (i = 0; i < r; i++)
     {
-        fq_nmod_t q;
+        fq_nmod_t q, qt;
         fq_nmod_init(q, ctx->fqctx);
+        fq_nmod_init(qt, ctx->fqctx);
         FLINT_ASSERT(fq_nmod_mpoly_is_fq_nmod(new_lcs->coeffs + 0*r + i, ctx));
         FLINT_ASSERT(fq_nmod_mpoly_length(new_lcs->coeffs + 0*r + i, ctx) == 1);
-        _fq_nmod_mpoly_set_n_bpoly_fq_var1_zero(fac->coeffs + i, newA->bits, Abfp->coeffs + i, 0, ctx);
+        _fq_nmod_mpoly_set_n_fq_bpoly_gen1_zero(fac->coeffs + i, newA->bits, Abfp->coeffs + i, 0, ctx);
         FLINT_ASSERT(fac->coeffs[i].length > 0);
-        fq_nmod_inv(q, fac->coeffs[i].coeffs + 0, ctx->fqctx);
-        fq_nmod_mul(q, q, new_lcs->coeffs[0*r + i].coeffs + 0, ctx->fqctx);
+        n_fq_get_fq_nmod(qt, fac->coeffs[i].coeffs + d*0, ctx->fqctx);
+        fq_nmod_inv(q, qt, ctx->fqctx);
+        n_fq_get_fq_nmod(qt, new_lcs->coeffs[0*r + i].coeffs + 0, ctx->fqctx);
+        fq_nmod_mul(q, q, qt, ctx->fqctx);
         fq_nmod_mpoly_scalar_mul_fq_nmod(fac->coeffs + i, fac->coeffs + i, q, ctx);
         fq_nmod_clear(q, ctx->fqctx);
+        fq_nmod_clear(qt, ctx->fqctx);
     }
 
     fq_nmod_mpolyv_fit_length(tfac, r, ctx);
@@ -238,7 +243,6 @@ next_alphabetas:
 
         success = fq_nmod_mpoly_hlift(k, tfac->coeffs, r, alpha,
                                          k < n ? Aevals + k : newA, degs, ctx);
-
         if (!success)
             goto next_alphabetas;
 
@@ -247,22 +251,20 @@ next_alphabetas:
 
     if (!fq_nmod_mpoly_is_fq_nmod(m, ctx))
     {
-        fq_nmod_mpoly_univar_t u;
-        fq_nmod_mpoly_univar_init(u, ctx);
         for (i = 0; i < r; i++)
         {
-            fq_nmod_mpoly_to_univar(u, fac->coeffs + i, 0, ctx);
-            success = _fq_nmod_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-            if (!success)
+            /* hlift should not have returned any large bits */
+            FLINT_ASSERT(fac->coeffs[i].bits <= FLINT_BITS);
+
+            if (!fq_nmod_mpolyl_content(t, fac->coeffs + i, 1, ctx))
             {
-                fq_nmod_mpoly_univar_clear(u, ctx);
+                success = -1;
                 goto cleanup;
             }
-            success = fq_nmod_mpoly_divides(fac->coeffs + i,
-                                            fac->coeffs + i, t, ctx);
+
+            success = fq_nmod_mpoly_divides(fac->coeffs + i, fac->coeffs + i, t, ctx);
             FLINT_ASSERT(success);
         }
-        fq_nmod_mpoly_univar_clear(u, ctx);
     }
 
     for (i = 0; i < r; i++)

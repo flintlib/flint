@@ -25,7 +25,6 @@ void gcd_check(
     slong j,
     const char * name)
 {
-    int res;
     fq_nmod_mpoly_t ca, cb, cg, u, v, w;
 
     fq_nmod_mpoly_init(ca, ctx);
@@ -35,35 +34,31 @@ void gcd_check(
     fq_nmod_mpoly_init(v, ctx);
     fq_nmod_mpoly_init(w, ctx);
 
-    res = fq_nmod_mpoly_gcd_cofactors(g, abar, bbar, a, b, ctx);
     fq_nmod_mpoly_assert_canonical(g, ctx);
     fq_nmod_mpoly_assert_canonical(abar, ctx);
     fq_nmod_mpoly_assert_canonical(bbar, ctx);
 
-    if (!res)
+    if (!fq_nmod_mpoly_gcd_cofactors(g, abar, bbar, a, b, ctx))
     {
-        flint_printf("Check gcd can be computed\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
-    if (!fq_nmod_mpoly_is_zero(gdiv, ctx))
+    if (!fq_nmod_mpoly_is_zero(gdiv, ctx) &&
+        !fq_nmod_mpoly_divides(ca, g, gdiv, ctx))
     {
-        if (!fq_nmod_mpoly_divides(ca, g, gdiv, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check divisor of gcd\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
-            flint_abort();
-        }
+        flint_printf("FAIL: check divisor of gcd\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
     }
 
     fq_nmod_mpoly_mul(ca, g, abar, ctx);
     fq_nmod_mpoly_mul(cb, g, bbar, ctx);
     if (!fq_nmod_mpoly_equal(ca, a, ctx) || !fq_nmod_mpoly_equal(cb, b, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check cofactors i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check cofactors\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -71,19 +66,17 @@ void gcd_check(
     {
         if (!fq_nmod_mpoly_is_zero(a, ctx) || !fq_nmod_mpoly_is_zero(b, ctx))
         {
-            printf("FAIL\n");
-            flint_printf("Check zero gcd only results from zero inputs\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_printf("FAIL: check zero gcd\n");
+            flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
             flint_abort();
         }
         goto cleanup;
     }
 
-    if (!fq_nmod_is_one(g->coeffs + 0, ctx->fqctx))
+    if (!fq_nmod_mpoly_is_monic(g, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check gcd is monic\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check gcd is monic\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -189,43 +182,39 @@ void gcd_check(
         flint_abort();
     }
 
-    res = fq_nmod_mpoly_gcd_cofactors(cg, ca, cb, abar, bbar, ctx);
-    fq_nmod_mpoly_assert_canonical(cg, ctx);
-
-    if (!res)
+    if (!fq_nmod_mpoly_gcd_cofactors(cg, ca, cb, abar, bbar, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check gcd of cofactors can be computed\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check cofactor gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
+
+    fq_nmod_mpoly_assert_canonical(cg, ctx);
 
     if (!fq_nmod_mpoly_is_one(cg, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check gcd of cofactors is one\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check gcd of cofactors is one\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
     if (!fq_nmod_mpoly_equal(ca, abar, ctx) || !fq_nmod_mpoly_equal(cb, bbar, ctx))
     {
-        printf("FAIL\n");
-        flint_printf("Check cofactors of cofactors\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL: check cofactors of cofactors\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
-    res = fq_nmod_mpoly_gcd_cofactors(cg, abar, bbar, abar, bbar, ctx);
+    if (!fq_nmod_mpoly_gcd_cofactors(cg, abar, bbar, abar, bbar, ctx) ||
+        !fq_nmod_mpoly_equal(ca, abar, ctx) ||
+        !fq_nmod_mpoly_equal(cb, bbar, ctx))
+    {
+        flint_printf("FAIL: check cofactors of cofactors with aliasing\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
     fq_nmod_mpoly_assert_canonical(cg, ctx);
-
-    if (!fq_nmod_mpoly_equal(ca, abar, ctx) || !fq_nmod_mpoly_equal(cb, bbar, ctx))
-    {
-        printf("FAIL\n");
-        flint_printf("Check cofactors of cofactors with aliasing\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
-        flint_abort();
-    }
 
 cleanup:
 

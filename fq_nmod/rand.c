@@ -26,3 +26,17 @@ void fq_nmod_rand(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
     _nmod_poly_normalise(rop);
 }
 
+
+void fq_nmod_rand_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+{
+    int tries = 3;
+
+    do {
+        fq_nmod_rand(rop, state, ctx);
+        if (!fq_nmod_is_zero(rop, ctx))
+            return;
+    } while (--tries >= 0);
+
+    fq_nmod_one(rop, ctx);
+}
+

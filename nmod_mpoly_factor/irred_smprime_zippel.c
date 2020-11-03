@@ -46,7 +46,7 @@ int nmod_mpoly_factor_irred_smprime_zippel(
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
-    if (ctx->ffinfo->mod.n < 5 || ctx->ffinfo->mod.n < A->length)
+    if (ctx->ffinfo->mod.n < 7)
         return 0;
 
     nmod_mpoly_init(Acopy, ctx);
@@ -79,6 +79,17 @@ int nmod_mpoly_factor_irred_smprime_zippel(
     alphas_tries_remaining = 10;
 	nmod_mpoly_degrees_si(degs, A, ctx);
 
+    k = 0;
+    for (i = 0; i <= n; i++)
+    {
+        k += degs[i];
+        if (ctx->ffinfo->mod.n < (ulong) k)
+        {
+            success = 0;
+            goto cleanup;
+        }
+    }
+
 next_alpha:
 
     if (--alphas_tries_remaining < 0)
@@ -103,7 +114,11 @@ next_alpha:
 
     /* make sure univar is squarefree */
 	nmod_mpoly_derivative(t, Aevals + 0, 0, ctx);
-	nmod_mpoly_gcd(t, t, Aevals + 0, ctx);
+	if (!nmod_mpoly_gcd(t, t, Aevals + 0, ctx))
+    {
+        success = -1;
+        goto cleanup;
+    }
 	if (!nmod_mpoly_is_one(t, ctx))
 		goto next_alpha;
 
@@ -269,23 +284,20 @@ next_alphabetas:
 
     if (!nmod_mpoly_is_ui(m, ctx))
     {
-        nmod_mpoly_univar_t u;
-        nmod_mpoly_univar_init(u, ctx);
         for (i = 0; i < r; i++)
         {
-            nmod_mpoly_to_univar(u, fac->coeffs + i, 0, ctx);
-            success = _nmod_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-            if (!success)
+            /* hlift should not have returned any large bits */
+            FLINT_ASSERT(fac->coeffs[i].bits <= FLINT_BITS);
+
+            if (!nmod_mpolyl_content(t, fac->coeffs + i, 1, ctx))
             {
-                nmod_mpoly_univar_clear(u, ctx);
                 success = -1;
                 goto cleanup;
             }
-            success = nmod_mpoly_divides(fac->coeffs + i,
-                                         fac->coeffs + i, t, ctx);
+
+            success = nmod_mpoly_divides(fac->coeffs + i, fac->coeffs + i, t, ctx);
             FLINT_ASSERT(success);
         }
-        nmod_mpoly_univar_clear(u, ctx);
     }
 
     for (i = 0; i < r; i++)

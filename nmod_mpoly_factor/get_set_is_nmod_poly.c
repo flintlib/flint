@@ -128,41 +128,6 @@ int nmod_mpoly_get_n_poly(
     }
 }
 
-void nmod_mpoly_fit_length_set_bits(
-    nmod_mpoly_t A,
-    slong len,
-    flint_bitcnt_t bits,
-    const nmod_mpoly_ctx_t ctx)
-{
-    slong N = mpoly_words_per_exp(bits, ctx->minfo);
-    slong new_alloc;
-
-    FLINT_ASSERT(len >= 0);
-
-    if (A->alloc < len)
-    {
-        new_alloc = FLINT_MAX(len, 2*A->alloc);
-        if (A->alloc > 0)
-        {
-            A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, new_alloc*sizeof(mp_limb_t));
-            A->exps = (ulong *) flint_realloc(A->exps, new_alloc*N*sizeof(ulong));
-        }
-        else
-        {
-            A->coeffs = (mp_limb_t *) flint_calloc(new_alloc, sizeof(mp_limb_t));
-            A->exps   = (ulong *) flint_malloc(new_alloc*N*sizeof(ulong));
-        }
-        A->alloc = new_alloc;
-    }
-    else if (A->bits < bits)
-    {
-        if (A->alloc > 0)
-            A->exps = (ulong *) flint_realloc(A->exps, A->alloc*N*sizeof(ulong));
-    }
-
-    A->bits = bits;
-}
-
 void _nmod_mpoly_set_nmod_poly(
     nmod_mpoly_t A,
     flint_bitcnt_t Abits,
@@ -188,7 +153,7 @@ void _nmod_mpoly_set_nmod_poly(
     for (i = 0; i < Blen; i++)
         Alen += (Bcoeffs[i] != 0);
 
-    nmod_mpoly_fit_length_set_bits(A, Alen, Abits, ctx);
+    nmod_mpoly_fit_length_reset_bits(A, Alen, Abits, ctx);
 
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)
@@ -196,7 +161,7 @@ void _nmod_mpoly_set_nmod_poly(
         if (Bcoeffs[i] == 0)
             continue;
 
-        FLINT_ASSERT(Alen < A->alloc);
+        FLINT_ASSERT(Alen < A->coeffs_alloc);
         A->coeffs[Alen] = Bcoeffs[i];
         if (Abits <= FLINT_BITS)
             mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);

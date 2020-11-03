@@ -102,7 +102,11 @@ next_alpha:
 
     /* make sure univar is squarefree */
 	nmod_mpoly_derivative(t, Aevals + 0, 0, ctx);
-	nmod_mpoly_gcd(t, t, Aevals + 0, ctx);
+	if (!nmod_mpoly_gcd(t, t, Aevals + 0, ctx))
+    {
+        success = -1;
+        goto cleanup;
+    }
 	if (!nmod_mpoly_is_one(t, ctx))
 		goto next_alpha;
 
@@ -197,6 +201,7 @@ next_alphabetas:
         nmod_mpoly_evaluate_one_ui(t, mpow, i + 1, alpha[i], ctx);
         nmod_mpoly_swap(t, mpow, ctx);
         nmod_mpoly_mul(Aevals + i, Aevals + i, mpow, ctx);
+        nmod_mpoly_repack_bits_inplace(Aevals + i, newA->bits, ctx);
     }
 
     nmod_mpolyv_fit_length(new_lcs, (n + 1)*r, ctx);
@@ -242,7 +247,6 @@ next_alphabetas:
 
         success = nmod_mpoly_hlift(k, tfac->coeffs, r, alpha,
                                          k < n ? Aevals + k : newA, degs, ctx);
-
         if (!success)
             goto next_alphabetas;
 
@@ -251,26 +255,28 @@ next_alphabetas:
 
     if (!nmod_mpoly_is_ui(m, ctx))
     {
-        nmod_mpoly_univar_t u;
-        nmod_mpoly_univar_init(u, ctx);
         for (i = 0; i < r; i++)
         {
-            nmod_mpoly_to_univar(u, fac->coeffs + i, 0, ctx);
-            success = _nmod_mpoly_vec_content_mpoly(t, u->coeffs, u->length, ctx);
-            if (!success)
+            /* hlift should not have returned any large bits */
+            FLINT_ASSERT(fac->coeffs[i].bits <= FLINT_BITS);
+
+            if (!nmod_mpolyl_content(t, fac->coeffs + i, 1, ctx))
             {
-                nmod_mpoly_univar_clear(u, ctx);
+                success = -1;
                 goto cleanup;
             }
-            success = nmod_mpoly_divides(fac->coeffs + i,
-                                         fac->coeffs + i, t, ctx);
+
+            success = nmod_mpoly_divides(fac->coeffs + i, fac->coeffs + i, t, ctx);
             FLINT_ASSERT(success);
         }
-        nmod_mpoly_univar_clear(u, ctx);
     }
 
     for (i = 0; i < r; i++)
+    {
+        /* hlift should not have returned any large bits */
+        FLINT_ASSERT(fac->coeffs[i].bits <= FLINT_BITS);
         nmod_mpoly_make_monic(fac->coeffs + i, fac->coeffs + i, ctx);
+    }
 
     success = 1;
 

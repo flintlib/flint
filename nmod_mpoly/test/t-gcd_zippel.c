@@ -11,6 +11,87 @@
 
 #include "nmod_mpoly.h"
 
+void gcd_check(
+    nmod_mpoly_t g,
+    nmod_mpoly_t a,
+    nmod_mpoly_t b,
+    nmod_mpoly_t t,
+    nmod_mpoly_ctx_t ctx,
+    slong i,
+    slong j,
+    const char * name)
+{
+    nmod_mpoly_t ca, cb, cg;
+
+    nmod_mpoly_init(ca, ctx);
+    nmod_mpoly_init(cb, ctx);
+    nmod_mpoly_init(cg, ctx);
+
+    if (!nmod_mpoly_gcd_zippel(g, a, b, ctx))
+    {
+        flint_printf("FAIL: check gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    nmod_mpoly_assert_canonical(g, ctx);
+
+    if (nmod_mpoly_is_zero(g, ctx))
+    {
+        if (!nmod_mpoly_is_zero(a, ctx) || !nmod_mpoly_is_zero(b, ctx))
+        {
+            flint_printf("FAIL: check zero gcd\n");
+            flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
+        goto cleanup;
+    }
+
+    if (g->coeffs[0] != UWORD(1))
+    {
+        flint_printf("FAIL: check gcd is monic\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!nmod_mpoly_is_zero(t, ctx) && !nmod_mpoly_divides(cg, g, t, ctx))
+    {
+        flint_printf("FAIL: check gcd divisor\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!nmod_mpoly_divides(ca, a, g, ctx) ||
+        !nmod_mpoly_divides(cb, b, g, ctx))
+    {
+        flint_printf("FAIL: check divisibility\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!nmod_mpoly_gcd_zippel(cg, ca, cb, ctx))
+    {
+        flint_printf("FAIL: check cofactor gcd can be computed\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    nmod_mpoly_assert_canonical(cg, ctx);
+
+    if (!nmod_mpoly_is_one(cg, ctx))
+    {
+        flint_printf("FAIL: check gcd of cofactors is one\n");
+        flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+cleanup:
+
+    nmod_mpoly_clear(ca, ctx);
+    nmod_mpoly_clear(cb, ctx);
+    nmod_mpoly_clear(cg, ctx);
+}
+
 int
 main(void)
 {
@@ -28,7 +109,6 @@ main(void)
         ulong degbound;
         ulong * degbounds, * degbounds1, * degbounds2;
         mp_limb_t modulus;
-        int res;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -49,14 +129,14 @@ main(void)
         len2 = n_randint(state, 16);
 
         degbound = 100/(2*ctx->minfo->nvars - 1);
-        degbounds = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-        degbounds1 = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-        degbounds2 = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        degbounds = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        degbounds1 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        degbounds2 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            degbounds[j] = n_randint(state, degbound + UWORD(1)) + UWORD(1);
-            degbounds1[j] = n_randint(state, degbound + UWORD(1)) + UWORD(1);
-            degbounds2[j] = n_randint(state, degbound + UWORD(1)) + UWORD(1);
+            degbounds[j] = n_randint(state, degbound + 1) + 1;
+            degbounds1[j] = n_randint(state, degbound + 1) + 1;
+            degbounds2[j] = n_randint(state, degbound + 1) + 1;
         }
 
         for (j = 0; j < 4; j++)
@@ -67,62 +147,12 @@ main(void)
             nmod_mpoly_randtest_bounds(a, state, len1, degbounds1, ctx);
             nmod_mpoly_randtest_bounds(b, state, len2, degbounds2, ctx);
 
-            nmod_mpoly_mul_johnson(a, a, t, ctx);
-            nmod_mpoly_mul_johnson(b, b, t, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
 
             nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            res = nmod_mpoly_gcd_zippel(g, a, b, ctx);
-            if (!res)
-            {
-                printf("FAIL\n");
-                flint_printf("Check that gcd could be computed\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-            nmod_mpoly_assert_canonical(g, ctx);
-
-            if (nmod_mpoly_is_zero(g, ctx))
-            {
-                if (!nmod_mpoly_is_zero(a, ctx) || !nmod_mpoly_is_zero(b, ctx))
-                {
-                    printf("FAIL\n");
-                    flint_printf("Check zero gcd only results from zero inputs\ni = %wd, j = %wd\n", i ,j);
-                    flint_abort();
-                }
-                continue;
-            }
-
-            if (g->coeffs[0] != UWORD(1))
-            {
-                printf("FAIL\n");
-                flint_printf("Check gcd is monic\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-
-            res = 1;
-            res = res && nmod_mpoly_divides_monagan_pearce(ca, a, g, ctx);
-            res = res && nmod_mpoly_divides_monagan_pearce(cb, b, g, ctx);
-            if (!res)
-            {
-                printf("FAIL\n");
-                flint_printf("Check divisibility\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-
-            res = nmod_mpoly_gcd_zippel(cg, ca, cb, ctx);
-            if (!res)
-            {
-                printf("FAIL\n");
-                flint_printf("Check that cofactor gcd could be computed\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
-
-            if (!nmod_mpoly_equal_ui(cg, UWORD(1), ctx))
-            {
-                printf("FAIL\n");
-                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);                
-                flint_abort();
-            }
+            gcd_check(g, a, b, t, ctx, i, j, "random");
         }
 
         flint_free(degbounds);
@@ -139,9 +169,8 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
 
     return 0;
 }
-

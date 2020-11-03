@@ -203,6 +203,9 @@ FLINT_DLL void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_t state,
 FLINT_DLL void fq_zech_rand(fq_zech_t rop, flint_rand_t state,
                                                       const fq_zech_ctx_t ctx);
 
+FLINT_DLL void fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_t state,
+                                                      const fq_zech_ctx_t ctx);
+
 /* Comparison ****************************************************************/
 
 FQ_ZECH_INLINE int

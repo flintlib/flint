@@ -87,7 +87,6 @@ void _nmod_mpoly_from_nmod_poly_inflate(
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
-    slong Aalloc;
     ulong * shiftexp;
     ulong * strideexp;
     slong Bdeg = nmod_poly_degree(B);
@@ -108,27 +107,24 @@ void _nmod_mpoly_from_nmod_poly_inflate(
     mpoly_gen_monomial_sp(strideexp, var, Abits, ctx->minfo);
     mpoly_monomial_mul_ui(strideexp, strideexp, N, Astride[var]);
 
-    nmod_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
+    nmod_mpoly_fit_length_reset_bits(A, 0, Abits, ctx);
 
     Acoeff = A->coeffs;
     Aexp = A->exps;
-    Aalloc = A->alloc;
     Alen = 0;
     for (k = Bdeg; k >= 0; k--)
     {
-        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
+        _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
+                               &Aexp, &A->exps_alloc, N, Alen + 1);
         Acoeff[Alen] = nmod_poly_get_coeff_ui(B, k);
-        if (Acoeff[Alen] != UWORD(0))
-        {
-            mpoly_monomial_madd(Aexp + N*Alen, shiftexp, k, strideexp, N);
-            Alen++;
-        }
+        if (Acoeff[Alen] == 0)
+            continue;
+        mpoly_monomial_madd(Aexp + N*Alen, shiftexp, k, strideexp, N);
+        Alen++;
     }
 
     A->coeffs = Acoeff;
     A->exps = Aexp;
-    A->alloc = Aalloc;
     _nmod_mpoly_set_length(A, Alen, ctx);
 
     TMP_END;

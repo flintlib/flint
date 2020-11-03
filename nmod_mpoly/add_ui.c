@@ -14,69 +14,53 @@
 void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    slong i, N;
+    slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
     slong Blen = B->length;
-    const nmodf_ctx_struct * fctx = ctx->ffinfo;
 
-    if (Blen == 0)
+    if (c >= ctx->ffinfo->mod.n)
+        NMOD_RED(c, c, ctx->ffinfo->mod);
+
+    if (c == 0)
+    {
+        nmod_mpoly_set(A, B, ctx);
+        return;
+    }
+
+    if (Blen < 1)
     {
         nmod_mpoly_set_ui(A, c, ctx);
         return;
     }
 
-    if (c >= ctx->ffinfo->mod.n)
+    if (mpoly_monomial_is_zero(B->exps + (Blen - 1)*N, N))
     {
-        NMOD_RED(c, c, ctx->ffinfo->mod);
-    }
-    if (c != 0)
-    {
-        N = mpoly_words_per_exp(B->bits, ctx->minfo);
-
-        if (mpoly_monomial_is_zero(B->exps + (Blen - 1)*N, N))
+        if (A != B)
         {
-            if (A != B)
-            {
-                nmod_mpoly_fit_length(A, B->length, ctx);
-                nmod_mpoly_fit_bits(A, B->bits, ctx);
-                A->bits = B->bits;
+            nmod_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
+            _nmod_vec_set(A->coeffs, B->coeffs, Blen - 1);
+            mpoly_copy_monomials(A->exps, B->exps, Blen, N);
+            _nmod_mpoly_set_length(A, B->length, ctx);
+        }
 
-                for (i = 0; i < Blen - 1; i++)
-                    A->coeffs[i] = B->coeffs[i];
-
-                for (i = 0; i < Blen; i++)
-                    mpoly_monomial_set(A->exps + i*N, B->exps + i*N, N);
-
-                _nmod_mpoly_set_length(A, B->length, ctx);
-            }
-
-            A->coeffs[Blen - 1] = nmod_add(B->coeffs[Blen - 1], c, fctx->mod);
-            if (A->coeffs[Blen - 1] == 0)
-                _nmod_mpoly_set_length(A, Blen - 1, ctx);
+        A->coeffs[Blen - 1] = nmod_add(B->coeffs[Blen - 1], c, ctx->ffinfo->mod);
+        if (A->coeffs[Blen - 1] == 0)
+            _nmod_mpoly_set_length(A, Blen - 1, ctx);
+    }
+    else
+    {
+        if (A != B)
+        {
+            nmod_mpoly_fit_length_reset_bits(A, Blen + 1, B->bits, ctx);
+            _nmod_vec_set(A->coeffs, B->coeffs, Blen);
+            mpoly_copy_monomials(A->exps, B->exps, Blen, N);
         }
         else
         {
             nmod_mpoly_fit_length(A, Blen + 1, ctx);
-
-            if (A != B)
-            {
-                nmod_mpoly_fit_bits(A, B->bits, ctx);
-                A->bits = B->bits;
-
-                for (i = 0; i < Blen; i++)
-                    A->coeffs[i] = B->coeffs[i];
-
-                for (i = 0; i < Blen; i++)
-                    mpoly_monomial_set(A->exps + i*N, B->exps + i*N, N);
-            }
-
-            mpoly_monomial_zero(A->exps + Blen*N, N);
-
-            A->coeffs[Blen] = c;
-            _nmod_mpoly_set_length(A, Blen + 1, ctx);
         }
-    }
-    else if (A != B)
-    {
-        nmod_mpoly_set(A, B, ctx);
+
+        mpoly_monomial_zero(A->exps + N*Blen, N);
+        A->coeffs[Blen] = c;
+        _nmod_mpoly_set_length(A, Blen + 1, ctx);
     }
 }

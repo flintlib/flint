@@ -12,10 +12,14 @@
 #include "fq_nmod_mpoly.h"
 
 /* essentially exps(A) = M*exps(B) */
-void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
-                            const fq_nmod_mpoly_t B, const fmpz_mat_t M,
-               const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
+void _fq_nmod_mpoly_compose_mat(
+    fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_t B,
+    const fmpz_mat_t M,
+    const fq_nmod_mpoly_ctx_t ctxB,
+    const fq_nmod_mpoly_ctx_t ctxAC)
 {
+    slong d = fq_nmod_ctx_degree(ctxAC->fqctx);
     slong i;
     fmpz * u, * v;
     flint_bitcnt_t vbits;
@@ -23,7 +27,7 @@ void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
     const ulong * Bexp = B->exps;
-    const fq_nmod_struct * Bcoeffs = B->coeffs;
+    const mp_limb_t * Bcoeffs = B->coeffs;
     slong AN;
 
     FLINT_ASSERT(A != B);
@@ -34,10 +38,8 @@ void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
     u = _fmpz_vec_init(ctxB->minfo->nfields);
     v = _fmpz_vec_init(ctxAC->minfo->nfields + 1);
 
-    fq_nmod_mpoly_fit_length(A, Blen, ctxAC);
+    fq_nmod_mpoly_fit_length_reset_bits(A, Blen, MPOLY_MIN_BITS, ctxAC);
     A->length = 0;
-    fq_nmod_mpoly_fit_bits(A, MPOLY_MIN_BITS, ctxAC);
-    A->bits = MPOLY_MIN_BITS;
     for (i = 0; i < Blen; i++)
     {
         mpoly_unpack_vec_fmpz(u, Bexp + BN*i, Bbits, ctxB->minfo->nfields, 1);
@@ -46,8 +48,9 @@ void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
             continue;
         vbits = _fmpz_vec_max_bits(v, ctxAC->minfo->nfields);
         FLINT_ASSERT(vbits >= 0);
-        fq_nmod_mpoly_fit_bits(A, mpoly_fix_bits(vbits + 1, ctxAC->minfo), ctxAC);
-        fq_nmod_set(A->coeffs + A->length, Bcoeffs + i, ctxAC->fqctx);
+        vbits = mpoly_fix_bits(vbits + 1, ctxAC->minfo);
+        fq_nmod_mpoly_fit_length_fit_bits(A, A->length + 1, vbits, ctxAC);
+        _n_fq_set(A->coeffs + d*A->length, Bcoeffs + d*i, d);
         AN = mpoly_words_per_exp(A->bits, ctxAC->minfo);
         mpoly_pack_vec_fmpz(A->exps + AN*A->length, v, A->bits, ctxAC->minfo->nfields, 1);
         A->length++;

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016-2017 William Hart
-    Copyright (C) 2017-2019 Daniel Schultz
+    Copyright (C) 2017-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -38,7 +38,6 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-
 
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
@@ -960,6 +959,46 @@ void mpoly_max_degrees_tight(slong * max_exp,
 }
 
 
+/* ceiling(log_4(x)) - 1 */
+MPOLY_INLINE slong mpoly_geobucket_clog4(slong x)
+{
+    if (x <= 4)
+        return 0;
+    /*
+        FLINT_BIT_COUNT returns unsigned int.
+        Signed division is not defined.
+        Do the calculation with unsigned ints and then convert to slong.
+    */
+    return (slong)((FLINT_BIT_COUNT(x - 1) - UWORD(1))/(UWORD(2)));
+}
+
+/* single-limb packings ******************************************************/
+
+MPOLY_INLINE
+ulong pack_exp2(ulong e0, ulong e1)
+{
+    return (e0 << (1*(FLINT_BITS/2))) +
+           (e1 << (0*(FLINT_BITS/2)));
+}
+
+MPOLY_INLINE
+ulong pack_exp3(ulong e0, ulong e1, ulong e2)
+{
+    return (e0 << (2*(FLINT_BITS/3))) +
+           (e1 << (1*(FLINT_BITS/3))) +
+           (e2 << (0*(FLINT_BITS/3)));
+}
+
+MPOLY_INLINE
+ulong extract_exp(ulong e, int idx, int nvars)
+{
+    return (e >> (idx*(FLINT_BITS/nvars))) &
+            ((-UWORD(1)) >> (FLINT_BITS - FLINT_BITS/nvars));
+}
+
+FLINT_DLL ulong _mpoly_bidegree(const ulong * Aexps, flint_bitcnt_t Abits,
+                                                       const mpoly_ctx_t mctx);
+
 /* generators ****************************************************************/
 
 FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var,
@@ -1124,6 +1163,8 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
 
+FLINT_DLL slong mpoly_monomial_index1_nomask(ulong * Aexps, slong Alen, ulong e);
+
 FLINT_DLL slong mpoly_monomial_index_ui(const ulong * Aexp, flint_bitcnt_t Abits,
                      slong Alength, const ulong * exp, const mpoly_ctx_t mctx);
 
@@ -1242,15 +1283,16 @@ FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits,
 FLINT_DLL void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abits,
                slong Alength, const ulong * user_exps, const mpoly_ctx_t mctx);
 
-FLINT_DLL slong _mpoly_compress_exps(slong * V, slong * D, slong * deg,
-                                                  slong * S, slong n, slong l);
+FLINT_DLL void mpoly_monomials_shift_right_ffmpz(ulong * Aexps, flint_bitcnt_t Abits,
+                slong Alength, const fmpz * user_exps, const mpoly_ctx_t mctx);
 
-FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
-                                    const ulong * Aexps, flint_bitcnt_t Abits,
-                                    const ulong * Bexps, flint_bitcnt_t Bbits,
-                                        slong length,  const mpoly_ctx_t mctx);
+/* gcd ***********************************************************************/
 
-/* info related to gcd calculation *******************************************/
+#define MPOLY_GCD_USE_HENSEL  1
+#define MPOLY_GCD_USE_BROWN   2
+#define MPOLY_GCD_USE_ZIPPEL  4
+#define MPOLY_GCD_USE_ZIPPEL2 8
+#define MPOLY_GCD_USE_ALL     15
 
 typedef struct
 {
@@ -1278,13 +1320,15 @@ typedef struct
     flint_bitcnt_t Gbits, Abarbits, Bbarbits;
 
     slong mvars;
+    slong Adeflate_tdeg;
+    slong Bdeflate_tdeg;
 
     double Adensity;
     double Bdensity;
 
-    double brown_time_est, bma_time_est, zippel_time_est;
-    slong * brown_perm, * bma_perm, * zippel_perm;
-    int can_use_brown, can_use_bma, can_use_zippel;
+    double hensel_time, brown_time, zippel_time, zippel2_time;
+    slong * hensel_perm, * brown_perm, * zippel_perm, * zippel2_perm;
+    unsigned int can_use;
     int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
 
     char * data;
@@ -1313,6 +1357,9 @@ FLINT_DLL void mpoly_gcd_info_set_perm(mpoly_gcd_info_t I,
 FLINT_DLL slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t I,
                                                        slong var, slong bound);
 
+FLINT_DLL void mpoly_gcd_info_measure_hensel(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t I,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
@@ -1320,6 +1367,9 @@ FLINT_DLL void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t I,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gcd_info_measure_zippel2(mpoly_gcd_info_t I,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 typedef struct
@@ -1334,6 +1384,20 @@ typedef mpoly_zipinfo_struct mpoly_zipinfo_t[1];
 void mpoly_zipinfo_init(mpoly_zipinfo_t zinfo, slong nvars);
 
 void mpoly_zipinfo_clear(mpoly_zipinfo_t zinfo);
+
+FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
+                                    const ulong * Aexps, flint_bitcnt_t Abits,
+                                    const ulong * Bexps, flint_bitcnt_t Bbits,
+                                        slong length,  const mpoly_ctx_t mctx);
+
+/* factoring ****************************************************************/
+
+#define MPOLY_FACTOR_USE_ZAS 1
+#define MPOLY_FACTOR_USE_WANG 2
+#define MPOLY_FACTOR_USE_ZIP 4
+
+FLINT_DLL slong _mpoly_compress_exps(slong * V, slong * D, slong * deg,
+                                                  slong * S, slong n, slong l);
 
 /* Heap **********************************************************************/
 

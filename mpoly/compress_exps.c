@@ -86,7 +86,7 @@ again:
 
     best_loc_i = -1;
     best_loc_j = -1;
-
+    best_min = 0;
     for (i = 0; i < n; i++)
     {
         slong this_best_j, this_best_min = WORD_MAX, this_best_deg;

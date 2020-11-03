@@ -142,6 +142,13 @@ mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
 }
 
 NMOD_VEC_INLINE
+mp_limb_t nmod_addmul(mp_limb_t a, mp_limb_t b, mp_limb_t c, nmod_t mod)
+{
+    NMOD_ADDMUL(a, b, c, mod);
+    return a;
+}
+
+NMOD_VEC_INLINE
 mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
 {
     return n_invmod(a, mod.n);

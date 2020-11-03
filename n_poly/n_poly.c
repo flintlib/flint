@@ -45,6 +45,8 @@ void n_poly_print_pretty(const n_poly_t A, const char * x)
 
     for (i = A->length - 1; i >= 0; i--)
     {
+        if (i < A->length - 1 && A->coeffs[i] == 0)
+            continue;
         if (!first)
             flint_printf(" + ");
         first = 0;

@@ -11,69 +11,27 @@
 
 #include "fq_nmod_mpoly.h"
 
-int _fq_nmod_mpoly_equal(const fq_nmod_struct * coeff1, const ulong * exp1,
-                         const fq_nmod_struct * coeff2, const ulong * exp2,
-                             slong len, slong N, const fq_nmod_mpoly_ctx_t ctx)
+
+int fq_nmod_mpoly_equal(
+    const fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_t B,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i;
 
-    if (coeff1 != coeff2)
-    {
-        for (i = 0; i < len; i++)
-            if (!fq_nmod_equal(coeff1 + i, coeff2 + i, ctx->fqctx))
-                return 0;
-    }
-
-    if (exp1 != exp2)
-    {
-        for (i = 0; i < len; i++)
-            if (!mpoly_monomial_equal(exp1 + N*i, exp2 + N*i, N))
-                return 0;
-    }
-
-    return 1;
-}
-
-int fq_nmod_mpoly_equal(const fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
-    slong max_bits, N;
-    int r, free1 = 0, free2 = 0;
-
-    if (poly1 == poly2)
+    if (A == B)
         return 1;
 
-    if (poly1->length != poly2->length)
+    if (A->length != B->length)
         return 0;
 
-    max_bits = FLINT_MAX(poly1->bits, poly2->bits);
-    N = mpoly_words_per_exp(max_bits, ctx->minfo);
-
-    if (max_bits > poly1->bits)
+    for (i = 0; i < d*A->length; i++)
     {
-        free1 = 1;
-        ptr1 = (ulong *) flint_malloc(N*poly1->length*sizeof(ulong));
-        mpoly_repack_monomials(ptr1, max_bits, poly1->exps, poly1->bits,
-                                                    poly1->length, ctx->minfo);
+        if (A->coeffs[i] != B->coeffs[i])
+            return 0;
     }
 
-    if (max_bits > poly2->bits)
-    {
-        free2 = 1;
-        ptr2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(ptr2, max_bits, poly2->exps, poly2->bits,
-                                                    poly2->length, ctx->minfo);
-    }
-
-    r = _fq_nmod_mpoly_equal(poly1->coeffs, ptr1,
-                                   poly2->coeffs, ptr2, poly2->length, N, ctx);
-
-    if (free1)
-        flint_free(ptr1);
-
-    if (free2)
-        flint_free(ptr2);
-
-    return r;
+    return 0 == mpoly_monomials_cmp(A->exps, A->bits, B->exps, B->bits,
+                                                        A->length, ctx->minfo);
 }
