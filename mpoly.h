@@ -1399,6 +1399,12 @@ FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
 FLINT_DLL slong _mpoly_compress_exps(slong * V, slong * D, slong * deg,
                                                   slong * S, slong n, slong l);
 
+FLINT_DLL int mpoly_test_irreducible(ulong * Aexps, flint_bitcnt_t Abits,
+                                            slong Alen, const mpoly_ctx_t ctx);
+
+FLINT_DLL int _mpoly_test_irreducible(slong * Aexps, slong stride, slong Alen,
+                            slong nvars, flint_rand_t state, slong tries_left);
+
 /* Heap **********************************************************************/
 
 #define HEAP_LEFT(i) (2*(i))
