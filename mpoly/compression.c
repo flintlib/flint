@@ -253,3 +253,49 @@ done:
     return m;
 }
 
+
+void mpoly_compression_clear(mpoly_compression_t M)
+{
+    flint_free(M->umat);
+    flint_free(M->deltas);
+    flint_free(M->degs);
+    flint_free(M->exps);
+}
+
+
+void mpoly_compression_init(
+    mpoly_compression_t M,
+    const ulong * Aexps,
+    flint_bitcnt_t Abits,
+    slong Alen,
+    const mpoly_ctx_t mctx)
+{
+    int same;
+    slong i, j;
+    slong N = mpoly_words_per_exp_sp(Abits, mctx);
+    slong nvars = mctx->nvars;
+
+    M->nvars = nvars;
+    M->umat = FLINT_ARRAY_ALLOC(nvars*nvars, slong);
+    M->deltas = FLINT_ARRAY_ALLOC(nvars, slong);
+    M->degs = FLINT_ARRAY_ALLOC(nvars, slong);
+    M->exps = FLINT_ARRAY_ALLOC(Alen*nvars, slong);
+    M->exps_alloc = Alen*nvars;
+    for (i = 0; i < Alen; i++)
+        mpoly_get_monomial_ui_sp((ulong *)M->exps + nvars*i, Aexps + N*i, Abits, mctx);
+
+    M->mvars = _mpoly_compress_exps(M->umat, M->deltas, M->degs, M->exps, nvars, Alen);
+
+    FLINT_ASSERT(M->mvars > 0);
+
+    same = (M->mvars == nvars) && (mctx->ord == ORD_LEX);
+    if (same)
+    {
+        for (i = 0; i < nvars; i++)
+        for (j = 0; j < nvars; j++)
+            same &= (M->umat[i*nvars + j] == (i == j));
+    }
+
+    M->is_trivial = same;
+}
+

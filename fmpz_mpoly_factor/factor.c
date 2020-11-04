@@ -14,178 +14,6 @@
 #include "fmpz_mod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 
-#define USE_ZAS 1
-#define USE_WANG 2
-#define USE_ZIP 4
-
-
-typedef struct {
-    fmpz_mpoly_ctx_t ctx;
-    slong nvars;
-    slong exps_alloc;
-    slong * exps;
-    slong * umat;
-    slong * deltas;
-    slong * degs;
-    int is_id;
-} fmpz_mpoly_perm_struct;
-
-typedef fmpz_mpoly_perm_struct fmpz_mpoly_perm_t[1];
-
-
-static void fmpz_mpoly_perm_clear(
-    fmpz_mpoly_perm_t P,
-    fmpz_mpoly_t L)
-{
-    flint_free(P->umat);
-    flint_free(P->deltas);
-    flint_free(P->degs);
-    flint_free(P->exps);
-
-    fmpz_mpoly_clear(L, P->ctx);    
-    fmpz_mpoly_ctx_clear(P->ctx);
-}
-
-
-static void fmpz_mpoly_perm_init(
-    fmpz_mpoly_perm_t P,
-    fmpz_mpoly_t L,
-    fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t Actx)
-{
-    int same;
-    slong i, j, max_deg;
-    flint_bitcnt_t Lbits, Abits = A->bits;
-    slong LN, AN = mpoly_words_per_exp_sp(Abits, Actx->minfo);
-    slong Alen = A->length;
-    slong mvars, nvars = Actx->minfo->nvars;
-
-    P->nvars = nvars;
-    P->umat = FLINT_ARRAY_ALLOC(nvars*nvars, slong);
-    P->deltas = FLINT_ARRAY_ALLOC(nvars, slong);
-    P->degs = FLINT_ARRAY_ALLOC(nvars, slong);
-    P->exps = FLINT_ARRAY_ALLOC(Alen*nvars, slong);
-    P->exps_alloc = Alen*nvars;
-    for (i = 0; i < Alen; i++)
-        mpoly_get_monomial_ui_sp((ulong *)P->exps + nvars*i,
-                                           A->exps + AN*i, Abits, Actx->minfo);
-    mvars = _mpoly_compress_exps(P->umat, P->deltas, P->degs, P->exps, nvars, Alen);
-
-    FLINT_ASSERT(mvars > 0);
-
-    fmpz_mpoly_ctx_init(P->ctx, mvars, ORD_LEX);
-    fmpz_mpoly_init(L, P->ctx);
-
-    same = (mvars == nvars) && (Actx->minfo->ord == ORD_LEX);
-    if (same)
-    {
-        for (i = 0; i < nvars; i++)
-        {
-            same = same && (P->deltas[i] == 0);
-            for (j = 0; j < nvars; j++)
-                same = same && (P->umat[i*nvars + j] == (i == j));
-        }
-    }
-
-    P->is_id = same;
-    if (same)
-    {
-        fmpz_mpoly_swap(L, A, Actx);
-        return;
-    }
-
-    max_deg = P->degs[0];
-    for (i = 1; i < mvars; i++)
-        max_deg = FLINT_MAX(max_deg, P->degs[i]);
-    Lbits = mpoly_fix_bits(1 + FLINT_BIT_COUNT(max_deg), P->ctx->minfo);
-
-    fmpz_mpoly_fit_length_set_bits(L, Alen, Lbits, P->ctx);
-
-    LN = mpoly_words_per_exp(Lbits, P->ctx->minfo);
-
-    L->length = Alen;
-    for (i = 0; i < Alen; i++)
-    {
-        fmpz_swap(L->coeffs + i, A->coeffs + i);
-        mpoly_set_monomial_ui(L->exps + LN*i,
-                             (ulong *)P->exps + nvars*i, Lbits, P->ctx->minfo);
-    }
-
-    fmpz_mpoly_sort_terms(L, P->ctx);
-    fmpz_mpoly_unit_normalize(L, P->ctx);
-}
-
-
-static void _slong_array_fit_length(slong ** array, slong * alloc, slong len)
-{
-    if (len <= *alloc)
-        return;
-    len = FLINT_MAX(len, *alloc + *alloc/2 + 1);
-    *array = flint_realloc(*array, len*sizeof(slong));
-    *alloc = len;
-}
-
-
-static void fmpz_mpoly_perm_expand_fmpz_mpoly(
-    fmpz_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const fmpz_mpoly_ctx_t Actx,
-    fmpz_mpoly_t B,
-    fmpz_mpoly_perm_t P)
-{
-    slong i, k, l;
-    slong nvars = Actx->minfo->nvars;
-    slong NA = mpoly_words_per_exp(Abits, Actx->minfo);
-    slong mvars = P->ctx->minfo->nvars;
-    flint_bitcnt_t Bbits = B->bits;
-    slong NB = mpoly_words_per_exp(Bbits, P->ctx->minfo);
-    slong * mins, * texps;
-    TMP_INIT;
-
-    FLINT_ASSERT(fmpz_mpoly_degrees_fit_si(B, P->ctx));
-
-    if (P->is_id)
-    {
-        fmpz_mpoly_swap(A, B, Actx);
-        return;
-    }
-
-    TMP_START;
-    texps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    mins = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    for (k = 0; k < nvars; k++)
-        mins[k] = WORD_MAX;
-
-    _slong_array_fit_length(&P->exps, &P->exps_alloc, B->length*nvars);
-    fmpz_mpoly_fit_length_set_bits(A, B->length, Abits, Actx);
-    _fmpz_mpoly_set_length(A, B->length, Actx);
-    for (i = 0; i < B->length; i++)
-    {
-        fmpz_swap(A->coeffs + i, B->coeffs + i);
-        mpoly_get_monomial_ui((ulong *)texps, B->exps + NB*i, Bbits, P->ctx->minfo);
-        for (k = 0; k < nvars; k++)
-        {
-            slong tot = P->deltas[k];
-            for (l = 0; l < mvars; l++)
-                tot += P->umat[k*nvars + l]*texps[l];
-            P->exps[i*nvars + k] = tot;
-            mins[k] = FLINT_MIN(mins[k], tot);
-        }
-    }
-
-    for (i = 0; i < B->length; i++)
-    {
-        for (k = 0; k < nvars; k++)
-            P->exps[i*nvars + k] -= mins[k];
-        mpoly_set_monomial_ui(A->exps + NA*i, (ulong *)P->exps + i*nvars,
-                                                           Abits, Actx->minfo);
-    }
-
-    TMP_END;
-
-    fmpz_mpoly_sort_terms(A, Actx);
-    fmpz_mpoly_unit_normalize(A, Actx);
-}
 
 /* A has degree 2 wrt gen(0) */
 static void _apply_quadratic(
@@ -270,16 +98,16 @@ cleanup:
 
 
 /* A is squarefree and primitive wrt gen(0) */
-static int _apply_algo(
+static int _factor_irred_compressed(
     fmpz_mpolyv_t Af,
     fmpz_mpoly_t A,
-    const slong * Adegs,
     const fmpz_mpoly_ctx_t ctx,
     flint_rand_t state,
     unsigned int algo)
 {
     int success;
     slong i;
+    slong * Adegs;
     flint_bitcnt_t Abits;
     fmpz_poly_t u;
     fmpz_poly_factor_t uf;
@@ -292,8 +120,11 @@ static int _apply_algo(
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
     FLINT_ASSERT(fmpz_mpoly_is_canonical(A, ctx));
 
-    if (A->bits > FLINT_BITS && !fmpz_mpoly_repack_bits_inplace(A, FLINT_BITS, ctx))
+    if (A->bits > FLINT_BITS &&
+        !fmpz_mpoly_repack_bits_inplace(A, FLINT_BITS, ctx))
+    {
         return 0;
+    }
 
     Abits = A->bits;
 
@@ -303,6 +134,9 @@ static int _apply_algo(
     fmpz_mpoly_init(lcA, ctx);
     fmpz_mpoly_factor_init(lcAf, ctx);
     zassenhaus_prune_init(Z);
+    Adegs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
+
+    fmpz_mpoly_degrees_si(Adegs, A, ctx);
 
     /* init done */
 
@@ -445,7 +279,7 @@ done_alpha:
 
         success = 0;
 
-        if (algo & (USE_WANG | USE_ZIP))
+        if (algo & (MPOLY_FACTOR_USE_WANG | MPOLY_FACTOR_USE_ZIP))
         {
             _fmpz_mpoly_get_lead0(lcA, A, ctx);
 
@@ -457,12 +291,12 @@ done_alpha:
 
                 irr_fac = irr_fac && fmpz_mpoly_factor_irred(lcAf, ctx, algo);
 
-                if (!(algo & USE_ZIP))
+                if (!(algo & MPOLY_FACTOR_USE_ZIP))
                 {
                     success = fmpz_mpoly_factor_irred_wang(Af, A,
                                          lcAf, irr_fac, lcA, ctx, state, Z, 1);
                 }
-                else if (!(algo & USE_WANG))
+                else if (!(algo & MPOLY_FACTOR_USE_WANG))
                 {
                     success = fmpz_mpoly_factor_irred_zippel(Af, A,
                                             lcAf, irr_fac, lcA, ctx, state, Z);
@@ -497,7 +331,7 @@ done_alpha:
             }
         }
 
-        if (algo & USE_ZAS)
+        if (algo & MPOLY_FACTOR_USE_ZAS)
         {
             if (success == 0)
                 success = fmpz_mpoly_factor_irred_zassenhaus(Af, A, ctx, Z);
@@ -513,6 +347,7 @@ cleanup:
     fmpz_mpoly_clear(lcA, ctx);
     fmpz_mpoly_factor_clear(lcAf, ctx);
     zassenhaus_prune_clear(Z);
+    flint_free(Adegs);
 
     FLINT_ASSERT(success == 0 || success == 1);
     return success;
@@ -520,7 +355,7 @@ cleanup:
 
 
 /* replace f by a content factorization, f is already squarefree */
-int _refine_content_factors(
+static int _refine_content_factors(
     fmpz_mpolyv_t f,
     fmpz_mpolyv_t g,        /* temp */
     flint_bitcnt_t bits,
@@ -587,7 +422,8 @@ int _refine_content_factors(
 
     return 1 for success, 0 for failure
 */
-static int _irreducible_factors(
+
+static int _factor_irred(
     fmpz_mpolyv_t Af,
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t Actx,
@@ -596,11 +432,8 @@ static int _irreducible_factors(
     int success;
     slong i, j;
     flint_bitcnt_t Abits;
-    fmpz_mpoly_perm_t P;
-    fmpz_mpoly_t L;
-    fmpz_mpolyv_t Lf;
-    fmpz_mpoly_ctx_struct *  Lctx;
     flint_rand_t state;
+    mpoly_compression_t M;
 #if FLINT_WANT_ASSERT
     fmpz_mpoly_t Aorg;
 
@@ -637,20 +470,29 @@ static int _irreducible_factors(
     Abits = A->bits;
 
     flint_randinit(state);
-    fmpz_mpoly_perm_init(P, L, A, Actx);
-    Lctx = P->ctx;
-    fmpz_mpolyv_init(Lf, Lctx);
+    mpoly_compression_init(M, A->exps, A->bits, A->length, Actx->minfo);
 
-    if (!P->is_id)
+    if (M->is_trivial)
     {
+        success = _factor_irred_compressed(Af, A, Actx, state, algo);
+    }
+    else
+    {
+        fmpz_mpoly_ctx_t Lctx;
+        fmpz_mpoly_t L;
         fmpz_mpoly_univar_t U;
         fmpz_mpoly_t t;
-        fmpz_mpolyv_t tf, sf;
+        fmpz_mpolyv_t Lf, tf, sf;
 
+        fmpz_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX);
+        fmpz_mpoly_init(L, Lctx);
+        fmpz_mpolyv_init(Lf, Lctx);
         fmpz_mpoly_init(t, Lctx);
         fmpz_mpoly_univar_init(U, Lctx);
         fmpz_mpolyv_init(tf, Lctx);
         fmpz_mpolyv_init(sf, Lctx);
+
+        fmpz_mpoly_compression_do(L, Lctx, A->coeffs, A->length, M);
 
         fmpz_mpoly_to_univar(U, L, 0, Lctx);
         success = _fmpz_mpoly_vec_content_mpoly(t, U->coeffs, U->length, Lctx);
@@ -675,7 +517,7 @@ static int _irreducible_factors(
             Lf->length = 0;
             for (i = 0; i < sf->length; i++)
             {
-                success = _irreducible_factors(tf, sf->coeffs + i, Lctx, algo);
+                success = _factor_irred(tf, sf->coeffs + i, Lctx, algo);
                 if (!success)
                     goto cleanup_more;
 
@@ -686,33 +528,34 @@ static int _irreducible_factors(
         }
         else
         {
-            success = _apply_algo(Lf, L, P->degs, Lctx, state, algo);
+            success = _factor_irred_compressed(Lf, L, Lctx, state, algo);
         }
 
-cleanup_more:
+    cleanup_more:
 
         fmpz_mpoly_clear(t, Lctx);
         fmpz_mpoly_univar_clear(U, Lctx);
         fmpz_mpolyv_clear(tf, Lctx);
         fmpz_mpolyv_clear(sf, Lctx);
-    }
-    else
-    {
-        success = _apply_algo(Lf, L, P->degs, Lctx, state, algo);
+
+        if (success)
+        {
+            fmpz_mpolyv_fit_length(Af, Lf->length, Actx);
+            Af->length = Lf->length;
+            for (i = 0; i < Lf->length; i++)
+            {
+                fmpz_mpoly_compression_undo(Af->coeffs + i, Abits, Actx,
+                                                      Lf->coeffs + i, Lctx, M);
+            }
+        }
+
+        fmpz_mpoly_clear(L, Lctx);
+        fmpz_mpolyv_clear(Lf, Lctx);
+        fmpz_mpoly_ctx_clear(Lctx);
     }
 
-    if (success)
-    {
-        fmpz_mpolyv_fit_length(Af, Lf->length, Actx);
-        Af->length = Lf->length;
-        for (i = 0; i < Lf->length; i++)
-            fmpz_mpoly_perm_expand_fmpz_mpoly(Af->coeffs + i, Abits, Actx,
-                                                            Lf->coeffs + i, P);
-    }
-
+    mpoly_compression_clear(M);
     flint_randclear(state);
-    fmpz_mpolyv_clear(Lf, Lctx);
-    fmpz_mpoly_perm_clear(P, L);
 
 cleanup_less:
 
@@ -735,7 +578,11 @@ cleanup_less:
 }
 
 
-/* assume f is a square free factorization, replace it by an irreducible one */
+/*
+    for each factor A in f, assume A satifies _factor_irred requirements:
+        A is primitive w.r.t to any variable appearing in A.
+        A is square free with positive lead coeff.
+*/
 int fmpz_mpoly_factor_irred(
     fmpz_mpoly_factor_t f,
     const fmpz_mpoly_ctx_t ctx,
@@ -753,7 +600,7 @@ int fmpz_mpoly_factor_irred(
     g->num = 0;
     for (j = 0; j < f->num; j++)
     {
-        success = _irreducible_factors(t, f->poly + j, ctx, algo);
+        success = _factor_irred(t, f->poly + j, ctx, algo);
         if (!success)
             goto cleanup;
 
@@ -778,16 +625,29 @@ cleanup:
 }
 
 
+/*
+    no assumptions on A,
+    returned factors are irreducible
+*/
+static int _factor(
+    fmpz_mpoly_factor_t f,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_ctx_t ctx,
+    unsigned int algo)
+{
+    int success;
+    success = fmpz_mpoly_factor_squarefree(f, A, ctx) &&
+              fmpz_mpoly_factor_irred(f, ctx, algo);
+    FLINT_ASSERT(!success || fmpz_mpoly_factor_matches(A, f, ctx));
+    return success;
+}
+
 int fmpz_mpoly_factor(
     fmpz_mpoly_factor_t f,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
-    success = fmpz_mpoly_factor_squarefree(f, A, ctx) &&
-              fmpz_mpoly_factor_irred(f, ctx, USE_ZAS | USE_WANG | USE_ZIP);
-    FLINT_ASSERT(!success || fmpz_mpoly_factor_matches(A, f, ctx));
-    return success;
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ALL);
 }
 
 
@@ -796,11 +656,7 @@ int fmpz_mpoly_factor_zassenhaus(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
-    success = fmpz_mpoly_factor_squarefree(f, A, ctx) &&
-              fmpz_mpoly_factor_irred(f, ctx, USE_ZAS);
-    FLINT_ASSERT(!success || fmpz_mpoly_factor_matches(A, f, ctx));
-    return success;
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZAS);
 }
 
 
@@ -809,11 +665,7 @@ int fmpz_mpoly_factor_wang(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
-    success = fmpz_mpoly_factor_squarefree(f, A, ctx) &&
-              fmpz_mpoly_factor_irred(f, ctx, USE_WANG);
-    FLINT_ASSERT(!success || fmpz_mpoly_factor_matches(A, f, ctx));
-    return success;
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_WANG);
 }
 
 
@@ -822,10 +674,6 @@ int fmpz_mpoly_factor_zippel(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
-    success = fmpz_mpoly_factor_squarefree(f, A, ctx) &&
-              fmpz_mpoly_factor_irred(f, ctx, USE_ZIP);
-    FLINT_ASSERT(!success || fmpz_mpoly_factor_matches(A, f, ctx));
-    return success;
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
 
