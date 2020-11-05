@@ -1513,6 +1513,28 @@ class ca_mat:
             raise ZeroDivisionError("singular matrix")
         raise ValueError("failed to prove matrix singular or nonsingular")
 
+    def right_kernel(self, echelon=False):
+        """
+        Returns a basis of the right kernel (nullspace) of *self*.
+
+            >>> A = ca_mat([[3,4,6],[5,6,7]])
+            >>> X = A.right_kernel()
+            >>> X
+            ca_mat of size 3 x 1
+            [              4]
+            [-4.50000 {-9/2}]
+            [              1]
+            >>> A * X
+            ca_mat of size 2 x 1
+            [0]
+            [0]
+
+        """
+        res = ca_mat(0, 0)
+        if libcalcium.ca_mat_right_kernel(res, self, self._ctx):
+            return res
+        raise ValueError("failed to compute right kernel")
+
 
 class ca_vec:
     """

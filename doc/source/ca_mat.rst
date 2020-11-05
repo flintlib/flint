@@ -394,6 +394,14 @@ Rank and echelon form
     The default version uses an automatic algorithm choice and may
     implement additional methods for special cases.
 
+.. function:: int ca_mat_right_kernel(ca_mat_t X, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *X* to a basis of the right kernel (nullspace) of *A*.
+    The output matrix *X* will be resized in-place to have a number
+    of columns equal to the nullity of *A*.
+    Returns 1 on success. On failure, returns 0 and leaves the data
+    in *X* meaningless.
+
 Determinant and trace
 -------------------------------------------------------------------------------
 
