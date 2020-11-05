@@ -468,7 +468,7 @@ Characteristic polynomial
 Eigenvalues and eigenvectors
 -------------------------------------------------------------------------------
 
-.. function:: int ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, ca_mat_t mat, ca_ctx_t ctx)
+.. function:: int ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, const ca_mat_t mat, ca_ctx_t ctx)
 
     Attempts to compute all complex eigenvalues of the given matrix *mat*.
     On success, returns 1 and sets *lambda* to the distinct eigenvalues
@@ -479,3 +479,13 @@ Eigenvalues and eigenvectors
 
     This function effectively computes the characteristic polynomial
     and then calls :type:`ca_poly_roots`.
+
+.. function:: truth_t ca_mat_diagonalization(ca_mat_t D, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx)
+
+    Matrix diagonalization: attempts to compute a diagonal matrix *D*
+    and an invertible matrix *P* such that `A = PDP^{-1}`.
+    Returns ``T_TRUE`` if *A* is diagonalizable and the computation
+    succeeds, ``T_FALSE`` if *A* is provably not diagonalizable,
+    and ``T_UNKNOWN`` if it is unknown whether *A* is diagonalizable.
+    If the return value is not ``T_TRUE``, the values in *D* and *P*
+    are arbitrary.

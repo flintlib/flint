@@ -1513,7 +1513,7 @@ class ca_mat:
             raise ZeroDivisionError("singular matrix")
         raise ValueError("failed to prove matrix singular or nonsingular")
 
-    def right_kernel(self, echelon=False):
+    def right_kernel(self):
         """
         Returns a basis of the right kernel (nullspace) of *self*.
 
@@ -1534,6 +1534,55 @@ class ca_mat:
         if libcalcium.ca_mat_right_kernel(res, self, self._ctx):
             return res
         raise ValueError("failed to compute right kernel")
+
+    def diagonalization(self):
+        """
+        Matrix diagonalization: given a square matrix *self*,
+        returns a diagonal matrix *D* and an invertible matrix *P*
+        such that *self* equals `PDP^{-1}`.
+        Raises *ValueError* if *self* is not diagonalizable.
+
+            >>> A = ca_mat([[1,2],[3,4]])
+            >>> D, P = A.diagonalization()
+            >>> D
+            ca_mat of size 2 x 2
+            [-0.372281 {(-a+5)/2 where a = 5.74456 [a^2-33=0]},                                              0]
+            [                                                0, 5.37228 {(a+5)/2 where a = 5.74456 [a^2-33=0]}]
+            >>> P * D * P.inv()
+            ca_mat of size 2 x 2
+            [1, 2]
+            [3, 4]
+
+        A diagonalizable matrix without distinct eigenvalues::
+
+            >>> A = ca_mat([[-1,3,-1],[-3,5,-1],[-3,3,1]])
+            >>> D, P = A.diagonalization()
+            >>> D
+            ca_mat of size 3 x 3
+            [1, 0, 0]
+            [0, 2, 0]
+            [0, 0, 2]
+            >>> P
+            ca_mat of size 3 x 3
+            [1, 1, -0.333333 {-1/3}]
+            [1, 1,                0]
+            [1, 0,                1]
+            >>> P * D * P.inv() == A
+            True
+
+        """
+        n = self.nrows()
+        m = self.ncols()
+        if n != m:
+            raise ValueError("non-square matrix is not diagonalizable")
+        D = ca_mat(n, n)
+        P = ca_mat(n, n)
+        res = libcalcium.ca_mat_diagonalization(D, P, self, self._ctx)
+        if res == T_FALSE:
+            raise ValueError("matrix is not diagonalizable")
+        if res == T_UNKNOWN:
+            raise NotImplementedError("unable to determine if matrix is diagonalizable")
+        return D, P
 
 
 class ca_vec:

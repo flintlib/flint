@@ -315,7 +315,11 @@ int ca_mat_companion(ca_mat_t A, const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Eigenvalues and eigenvectors */
 
-int ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, ca_mat_t mat, ca_ctx_t ctx);
+int ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, const ca_mat_t mat, ca_ctx_t ctx);
+
+/* Diagonalization */
+
+truth_t ca_mat_diagonalization(ca_mat_t D, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx);
 
 /* Internal representation */
 
