@@ -1409,25 +1409,26 @@ FLINT_DLL int _mpoly_test_irreducible(slong * Aexps, slong stride, slong Alen,
 typedef struct {
     slong mvars;
     slong nvars;
-    slong exps_alloc;
     slong * exps;
+    slong exps_alloc;
+    slong * rest;
+    slong rest_alloc;
     slong * umat;
     slong * deltas;
     slong * degs;
     int is_trivial;
+    int is_perm;
+    int is_irred;
 } mpoly_compression_struct;
 
 typedef mpoly_compression_struct mpoly_compression_t[1];
 
+void mpoly_compression_init(mpoly_compression_t M);
 
 void mpoly_compression_clear(mpoly_compression_t M);
 
-void mpoly_compression_init(
-    mpoly_compression_t M,
-    const ulong * Aexps,
-    flint_bitcnt_t Abits,
-    slong Alen,
-    const mpoly_ctx_t mctx);
+void mpoly_compression_set(mpoly_compression_t M, const ulong * Aexps,
+                     flint_bitcnt_t Abits, slong Alen, const mpoly_ctx_t mctx);
 
 MPOLY_INLINE
 void _slong_array_fit_length(slong ** array, slong * alloc, slong len)

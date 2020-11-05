@@ -108,6 +108,25 @@ main(void)
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_factor_init(f, ctx);
 
+        fmpz_mpoly_set_str_pretty(a, "(w^2+y^3+z^4+1)*(w^2+y^3+z^4+2)", vars, ctx);
+
+        check_omega(2, 2, a, ctx);
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_factor_clear(f, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a;
+        fmpz_mpoly_factor_t f;
+        const char * vars[] = {"x", "y", "z", "w"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_factor_init(f, ctx);
+
         fmpz_mpoly_set_str_pretty(a,
             "((x^2+y^2+z^2+2+w)*(x+1)*(y+2)*(z+3+w^3)+x*y*z*w)"
             "*((x^2+y^2+z^2+3+w)*(x^2+1)*(y^2+2)*(z^2+3+w^3)+x*y*z+ w)"

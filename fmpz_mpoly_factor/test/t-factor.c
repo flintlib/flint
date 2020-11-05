@@ -81,6 +81,31 @@ main(void)
     flint_printf("factor....");
     fflush(stdout);
 
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f;
+
+        fmpz_mpoly_ctx_init(ctx, 8, ORD_LEX);
+        fmpz_mpoly_init(f, ctx);
+
+        fmpz_mpoly_set_str_pretty(f,
+                "x1^809*x2^75*x3^384*x4^324*x5^74*x6^788*x7^83*x8^414+"
+                "x1^805*x2^343*x3^595*x4^246*x5^32*x6^90*x7^473*x8^591+"
+                "x1^718*x2^108*x3^680*x4^368*x5^358*x8^276+"
+                "x1^683*x2^533*x4^649*x5^619*x6^136*x7^223*x8^610+"
+                "x2^617*x3^777*x4^799*x5^443*x6^545*x7^166*x8^216+"
+                "x1^485*x2^646*x3^424*x4^265*x5^416*x6^400*x7^278+"
+                "x1^336*x2^149*x3^361*x4^691*x5^629*x6^282*x7^530*x8^259+"
+                "x1^266*x3^258*x5^422*x6^637*x7^244*x8^236+"
+                "x1^74*x2^812*x3^162*x4^417*x5^71*x6^188*x7^258*x8^637+"
+                "x1^37*x2^604*x3^94*x4^474*x6^853*x7^521*x8^250", NULL, ctx);
+
+        check_omega(1, 1, f, ctx);
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         slong lower;

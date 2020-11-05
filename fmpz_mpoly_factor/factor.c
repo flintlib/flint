@@ -102,7 +102,6 @@ static int _factor_irred_compressed(
     fmpz_mpolyv_t Af,
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx,
-    flint_rand_t state,
     unsigned int algo)
 {
     int success;
@@ -114,6 +113,7 @@ static int _factor_irred_compressed(
     fmpz_mpoly_t lcA;
     fmpz_mpoly_factor_t lcAf;
     zassenhaus_prune_t Z;
+    flint_rand_t state;
 
     FLINT_ASSERT(A->length > 1 || fmpz_sgn(A->coeffs + 0) > 0);
     FLINT_ASSERT(fmpz_mpoly_degrees_fit_si(A, ctx));
@@ -334,7 +334,9 @@ done_alpha:
         if (algo & MPOLY_FACTOR_USE_ZAS)
         {
             if (success == 0)
+            {
                 success = fmpz_mpoly_factor_irred_zassenhaus(Af, A, ctx, Z);
+            }
         }
 
         success = (success > 0);
@@ -342,6 +344,7 @@ done_alpha:
 
 cleanup:
 
+    flint_randclear(state);
     fmpz_poly_clear(u);
     fmpz_poly_factor_clear(uf);
     fmpz_mpoly_clear(lcA, ctx);
@@ -432,7 +435,6 @@ static int _factor_irred(
     int success;
     slong i, j;
     flint_bitcnt_t Abits;
-    flint_rand_t state;
     mpoly_compression_t M;
 #if FLINT_WANT_ASSERT
     fmpz_mpoly_t Aorg;
@@ -469,12 +471,19 @@ static int _factor_irred(
 
     Abits = A->bits;
 
-    flint_randinit(state);
-    mpoly_compression_init(M, A->exps, A->bits, A->length, Actx->minfo);
+    mpoly_compression_init(M);
+    mpoly_compression_set(M, A->exps, A->bits, A->length, Actx->minfo);
 
     if (M->is_trivial)
     {
-        success = _factor_irred_compressed(Af, A, Actx, state, algo);
+        success = _factor_irred_compressed(Af, A, Actx, algo);
+    }
+    else if (M->is_irred)
+    {
+        fmpz_mpolyv_fit_length(Af, 1, Actx);
+        Af->length = 1;
+        fmpz_mpoly_swap(Af->coeffs + 0, A, Actx);
+        success = 1;
     }
     else
     {
@@ -528,7 +537,7 @@ static int _factor_irred(
         }
         else
         {
-            success = _factor_irred_compressed(Lf, L, Lctx, state, algo);
+            success = _factor_irred_compressed(Lf, L, Lctx, algo);
         }
 
     cleanup_more:
@@ -555,7 +564,6 @@ static int _factor_irred(
     }
 
     mpoly_compression_clear(M);
-    flint_randclear(state);
 
 cleanup_less:
 
@@ -626,6 +634,54 @@ cleanup:
 
 
 /*
+    append factor(f)^e to g
+    assumping f is compressed and content free
+*/
+int _compressed_content_to_irred(
+    fmpz_mpoly_factor_t g,
+    fmpz_mpoly_t f,
+    const fmpz_t e,
+    const fmpz_mpoly_ctx_t ctx,
+    unsigned int algo)
+{
+    int success;
+    slong j, k;
+    fmpz_mpoly_factor_t h;
+    fmpz_mpolyv_t v;
+
+    fmpz_mpoly_factor_init(h, ctx);
+    fmpz_mpolyv_init(v, ctx);
+
+    success = _fmpz_mpoly_factor_squarefree(h, f, e, ctx);
+    if (!success)
+        goto cleanup;
+
+    for (j = 0; j < h->num; j++)
+    {
+        success = h->num > 1 ? _factor_irred(v, h->poly + j, ctx, algo) :
+                           _factor_irred_compressed(v, h->poly + j, ctx, algo);
+        if (!success)
+            goto cleanup;
+
+        fmpz_mpoly_factor_fit_length(g, g->num + v->length, ctx);
+        for (k = 0; k < v->length; k++)
+        {
+            fmpz_set(g->exp + g->num, h->exp + j);
+            fmpz_mpoly_swap(g->poly + g->num, v->coeffs + k, ctx);
+            g->num++;
+        }
+    }
+
+cleanup:
+
+    fmpz_mpoly_factor_clear(h, ctx);
+    fmpz_mpolyv_clear(v, ctx);
+
+    return success;
+}
+
+
+/*
     no assumptions on A,
     returned factors are irreducible
 */
@@ -636,8 +692,108 @@ static int _factor(
     unsigned int algo)
 {
     int success;
-    success = fmpz_mpoly_factor_squarefree(f, A, ctx) &&
-              fmpz_mpoly_factor_irred(f, ctx, algo);
+    slong i, j;
+    flint_bitcnt_t bits;
+    fmpz_mpoly_factor_t g;
+    mpoly_compression_t M;
+
+    if (!fmpz_mpoly_factor_content(f, A, ctx))
+        return 0;
+
+    fmpz_mpoly_factor_init(g, ctx);
+    mpoly_compression_init(M);
+
+    /* write into g */
+    fmpz_swap(g->constant, f->constant);
+    g->num = 0;
+    for (i = 0; i < f->num; i++)
+    {
+        if (f->poly[i].length < 2)
+        {
+            fmpz_mpoly_factor_fit_length(g, g->num + 1, ctx);
+            fmpz_mpoly_swap(g->poly + g->num, f->poly + i, ctx);
+            fmpz_swap(g->exp + g->num, f->exp + i);
+            g->num++;
+            continue;
+        }
+
+        if (f->poly[i].bits > FLINT_BITS &&
+            !fmpz_mpoly_repack_bits_inplace(f->poly + i, FLINT_BITS, ctx))
+        {
+            success = 0;
+            goto cleanup;
+        }
+
+        bits = f->poly[i].bits;
+
+        mpoly_compression_set(M, f->poly[i].exps, bits, f->poly[i].length, ctx->minfo);
+        if (M->is_irred)
+        {
+            fmpz_mpoly_factor_fit_length(g, g->num + 1, ctx);
+            fmpz_mpoly_swap(g->poly + g->num, f->poly + i, ctx);
+            fmpz_swap(g->exp + g->num, f->exp + i);
+            g->num++;
+        }
+        else if (M->is_trivial)
+        {
+            success = _compressed_content_to_irred(g, f->poly + i, f->exp + i, ctx, algo);
+            if (!success)
+                goto cleanup;
+        }
+        else
+        {
+            fmpz_mpoly_ctx_t Lctx;
+            fmpz_mpoly_t L;
+            fmpz_mpoly_factor_t h;
+
+            /* compression may have messed up the content factorization */
+            fmpz_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX);
+            fmpz_mpoly_init(L, Lctx);
+            fmpz_mpoly_factor_init(h, Lctx);
+
+            fmpz_mpoly_compression_do(L, Lctx, f->poly[i].coeffs,
+                                               f->poly[i].length, M);
+            if (M->is_perm)
+            {
+                success = _compressed_content_to_irred(h, L, f->exp + i, Lctx, algo);
+                fmpz_one(f->exp + i);
+            }
+            else
+            {
+                success = fmpz_mpoly_factor_squarefree(h, L, Lctx) &&
+                          fmpz_mpoly_factor_irred(h, Lctx, algo);
+            }
+
+            if (success)
+            {
+                FLINT_ASSERT(fmpz_is_one(h->constant));
+                fmpz_mpoly_factor_fit_length(g, g->num + h->num, ctx);
+                for (j = 0; j < h->num; j++)
+                {
+                    fmpz_mul(g->exp + g->num, f->exp + i, h->exp + j);
+                    fmpz_mpoly_compression_undo(g->poly + g->num, bits, ctx,
+                                                         h->poly + j, Lctx, M);
+                    g->num++;
+                }
+            }
+
+            fmpz_mpoly_factor_clear(h, Lctx);
+            fmpz_mpoly_clear(L, Lctx);
+            fmpz_mpoly_ctx_clear(Lctx);
+
+            if (!success)
+                goto cleanup;
+        }
+    }
+
+    fmpz_mpoly_factor_swap(f, g, ctx);
+    success = 1;
+
+cleanup:
+
+    fmpz_mpoly_factor_clear(g, ctx);
+    mpoly_compression_clear(M);
+
     FLINT_ASSERT(!success || fmpz_mpoly_factor_matches(A, f, ctx));
     return success;
 }
