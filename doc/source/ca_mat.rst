@@ -489,3 +489,28 @@ Eigenvalues and eigenvectors
     and ``T_UNKNOWN`` if it is unknown whether *A* is diagonalizable.
     If the return value is not ``T_TRUE``, the values in *D* and *P*
     are arbitrary.
+
+Jordan canonical form
+-------------------------------------------------------------------------------
+
+.. function:: int ca_mat_jordan_blocks(ca_vec_t lambda, slong * num_blocks, slong * block_lambda, slong * block_size, const ca_mat_t A, ca_ctx_t ctx)
+
+    Computes the blocks of the Jordan canonical form of *A*.
+    On success, returns 1 and sets *lambda* to the unique eigenvalues
+    of *A*, sets *num_blocks* to the number of Jordan blocks,
+    entry *i* of *block_lambda* to the index of the eigenvalue
+    in Jordan block *i*, and entry *i* of *block_size* to the size
+    of Jordan block *i*. On failure, returns 0, leaving arbitrary
+    values in the output variables.
+    The user should allocate space in *block_lambda* and *block_size*
+    for up to *n* entries where *n* is the size of the matrix.
+
+    The Jordan form is unique up to the ordering of blocks, which
+    is arbitrary.
+
+.. function:: void ca_mat_set_jordan_blocks(ca_mat_t mat, const ca_vec_t lambda, slong num_blocks, slong * block_lambda, slong * block_size, ca_ctx_t ctx)
+
+    Sets *mat* to the concatenation of the Jordan blocks
+    given in *lambda*, *num_blocks*, *block_lambda* and *block_size*.
+    See :func:`ca_mat_jordan_blocks` for an explanation of these
+    variables.
