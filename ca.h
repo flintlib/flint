@@ -353,6 +353,7 @@ truth_t ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_rational(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_integer(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_real(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_negative_real(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_undefined(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_infinity(const ca_t x, ca_ctx_t ctx);

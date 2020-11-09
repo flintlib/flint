@@ -517,6 +517,11 @@ representing an unknown outcome.
     Tests if *x* is a real number. Warning: this returns ``T_FALSE`` if *x* is an
     infinity with real sign.
 
+.. function:: truth_t ca_check_is_negative_real(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is a negative real number. Warning: this returns ``T_FALSE``
+    if *x* is negative infinity.
+
 .. function:: truth_t ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
 
     Tests if *x* is an imaginary number. Warning: this returns ``T_FALSE`` if
@@ -921,6 +926,8 @@ Elementary functions
     * `\log\left(\sqrt{z}\right) = \tfrac{1}{2} \log(z) + 2 \pi i k`
 
     * `\log\left(z^a\right) = a \log(z) + 2 \pi i k`
+
+    * `\log(x) = \log(-x) + \pi i` for negative real *x*
 
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\log(x))`.

@@ -78,7 +78,20 @@ ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
         }
         else
         {
-            _ca_sqrt_nofactor(res, x, ctx);
+            if (ca_check_is_negative_real(x, ctx) == T_TRUE)
+            {
+                ca_t i;
+                ca_init(i, ctx);
+                ca_i(i, ctx);
+                ca_neg(res, x, ctx);
+                _ca_sqrt_nofactor(res, res, ctx);
+                ca_mul(res, res, i, ctx);
+                ca_clear(i, ctx);
+            }
+            else
+            {
+                _ca_sqrt_nofactor(res, x, ctx);
+            }
         }
 
         qqbar_clear(t);

@@ -164,6 +164,18 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
         return;
     }
 
+    if (ca_check_is_negative_real(x, ctx) == T_TRUE)
+    {
+        ca_t pi_i;
+        ca_init(pi_i, ctx);
+        ca_pi_i(pi_i, ctx);
+        ca_neg(res, x, ctx);
+        ca_log(res, res, ctx);
+        ca_add(res, res, pi_i, ctx);
+        ca_clear(pi_i, ctx);
+        return;
+    }
+
     if (ext != NULL && CA_EXT_HEAD(ext) == CA_Pow)
     {
         /* log(z^a) */
