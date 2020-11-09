@@ -88,6 +88,10 @@ ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
 void
 ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
+#if 0
     ca_sqrt_nofactor(res, x, ctx);
+#else
+    ca_sqrt_factor(res, x, CA_FACTOR_POLY_SQF | CA_FACTOR_ZZ_SMOOTH, ctx);
+#endif
 }
 
