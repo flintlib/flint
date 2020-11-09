@@ -514,3 +514,27 @@ Jordan canonical form
     given in *lambda*, *num_blocks*, *block_lambda* and *block_size*.
     See :func:`ca_mat_jordan_blocks` for an explanation of these
     variables.
+
+.. function:: int ca_mat_jordan_transformation(ca_mat_t mat, const ca_vec_t lambda, slong num_blocks, slong * block_lambda, slong * block_size, const ca_mat_t A, ca_ctx_t ctx)
+
+    Given the precomputed Jordan block decomposition
+    (*lambda*, *num_blocks*, *block_lambda*, *block_size*) of the
+    square matrix *A*, computes the corresponding transformation
+    matrix *P* such that `A = P J P^{-1}`.
+    On success, writes *P* to *mat* and returns 1. On failure,
+    returns 0, leaving the value of *mat* arbitrary.
+
+.. function:: int ca_mat_jordan_form(ca_mat_t J, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx)
+
+    Computes the Jordan decomposition `A = P J P^{-1}` of the given
+    square matrix *A*. The user can pass *NULL* for the output
+    variable *P*, in which case only *J* is computed.
+    On success, returns 1. On failure, returns 0, leaving the values
+    of *J* and *P* arbitrary.
+
+    This function is a convenience wrapper around
+    :func:`ca_mat_jordan_blocks`, :func:`ca_mat_set_jordan_blocks` and
+    :func:`ca_mat_jordan_transformation`. For computations with
+    the Jordan decomposition, it is often better to use those
+    methods directly since they give direct access to the
+    spectrum and block structure.

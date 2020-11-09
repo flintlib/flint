@@ -12,31 +12,15 @@
 #include "ca_mat.h"
 
 truth_t
-ca_mat_diagonalization(ca_mat_t D, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx)
+ca_mat_diagonalization_precomp(ca_mat_t D, ca_mat_t P, const ca_mat_t A, const ca_vec_t eigenvalues, const ulong * am, ca_ctx_t ctx)
 {
     int success;
     truth_t result;
-    ca_vec_t eigenvalues;
     ca_mat_t AIe, b;
-    ulong * am;
     slong i, j, k, n;
     slong nullity, added;
 
-    if (!ca_mat_is_square(A))
-        return T_FALSE;
-
     n = ca_mat_nrows(A);
-
-    ca_vec_init(eigenvalues, 0, ctx);
-    am = flint_malloc(sizeof(slong) * n);
-
-    success = ca_mat_eigenvalues(eigenvalues, am, A, ctx);
-    if (!success)
-    {
-        ca_vec_clear(eigenvalues, ctx);
-        flint_free(am);
-        return T_UNKNOWN;
-    }
 
     ca_mat_init(AIe, n, n, ctx);
     ca_mat_init(b, 0, 0, ctx);
@@ -80,6 +64,35 @@ ca_mat_diagonalization(ca_mat_t D, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx)
 
     ca_mat_clear(AIe, ctx);
     ca_mat_clear(b, ctx);
+
+    return result;
+}
+
+truth_t
+ca_mat_diagonalization(ca_mat_t D, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx)
+{
+    truth_t result;
+    ca_vec_t eigenvalues;
+    ulong * am;
+    slong n;
+
+    if (!ca_mat_is_square(A))
+        return T_FALSE;
+
+    n = ca_mat_nrows(A);
+
+    am = flint_malloc(sizeof(ulong) * n);
+    ca_vec_init(eigenvalues, 0, ctx);
+
+    if (ca_mat_eigenvalues(eigenvalues, am, A, ctx))
+    {
+        result = ca_mat_diagonalization_precomp(D, P, A, eigenvalues, am, ctx);
+    }
+    else
+    {
+        result = T_UNKNOWN;
+    }
+
     ca_vec_clear(eigenvalues, ctx);
     flint_free(am);
 
