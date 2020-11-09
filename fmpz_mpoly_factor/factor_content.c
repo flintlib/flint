@@ -11,9 +11,7 @@
 
 #include "fmpz_mpoly_factor.h"
 
-/*
-    return factors that are primitive wrt each variable
-*/
+/* return factors that are primitive wrt each variable */
 int fmpz_mpoly_factor_content(
     fmpz_mpoly_factor_t f,
     const fmpz_mpoly_t A,
@@ -57,6 +55,7 @@ int fmpz_mpoly_factor_content(
             FLINT_ASSERT(fmpz_is_one(f->exp + j));
 
             fmpz_mpoly_to_univar(u, f->poly + j, v, ctx);
+            FLINT_ASSERT(u->length > 0);
 
             fmpz_add(var_powers + v, var_powers + v, u->exps + u->length - 1);
             _mpoly_gen_shift_right_fmpz(f->poly[j].exps, f->poly[j].bits,

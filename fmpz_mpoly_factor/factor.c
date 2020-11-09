@@ -421,11 +421,10 @@ static int _refine_content_factors(
 
 /*
     A is primitive w.r.t to any variable appearing in A.
-    A is square free with positive lead coeff.
+    A is squarefree with positive lead coeff.
 
     return 1 for success, 0 for failure
 */
-
 static int _factor_irred(
     fmpz_mpolyv_t Af,
     fmpz_mpoly_t A,
@@ -589,7 +588,9 @@ cleanup_less:
 /*
     for each factor A in f, assume A satifies _factor_irred requirements:
         A is primitive w.r.t to any variable appearing in A.
-        A is square free with positive lead coeff.
+        A is squarefree with positive lead coeff.
+
+    Replace f by and irreducible factorization.
 */
 int fmpz_mpoly_factor_irred(
     fmpz_mpoly_factor_t f,
@@ -637,7 +638,7 @@ cleanup:
     append factor(f)^e to g
     assumping f is compressed and content free
 */
-int _compressed_content_to_irred(
+static int _compressed_content_to_irred(
     fmpz_mpoly_factor_t g,
     fmpz_mpoly_t f,
     const fmpz_t e,
@@ -787,6 +788,7 @@ static int _factor(
     }
 
     fmpz_mpoly_factor_swap(f, g, ctx);
+
     success = 1;
 
 cleanup:

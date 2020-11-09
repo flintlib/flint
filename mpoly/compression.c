@@ -288,6 +288,9 @@ void mpoly_compression_set(
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong nvars = mctx->nvars;
     ulong * Mexps;
+    int overflowed;
+    slong sum_deg, tries;
+    flint_rand_t state;
 
     M->nvars = nvars;
 
@@ -333,34 +336,26 @@ void mpoly_compression_set(
     if (one_total != M->nvars)
         M->is_perm = 0;
 
-    M->is_irred = 0;
+    flint_randinit(state);
 
+    sum_deg = 1;
+    overflowed = 0;
+    for (j = 0; j < M->mvars; j++)
     {
-        int overflowed;
-        slong sum_deg, tries;
-        flint_rand_t state;
-
-        flint_randinit(state);
-
-        sum_deg = 1;
-        overflowed = 0;
-        for (j = 0; j < M->mvars; j++)
+        if (z_add_checked(&sum_deg, sum_deg, M->degs[j]))
         {
-            if (z_add_checked(&sum_deg, sum_deg, M->degs[j]))
-            {
-                overflowed = 1;
-                break;
-            }
+            overflowed = 1;
+            break;
         }
-
-        tries = 12;
-        if (!overflowed)
-            tries -= Alen/sum_deg/2;
-
-        M->is_irred = _mpoly_test_irreducible(M->exps, nvars, Alen,
-                                                       M->mvars, state, tries);
-
-        flint_randclear(state);
     }
+
+    tries = 12;
+    if (!overflowed)
+        tries -= Alen/sum_deg/2;
+
+    M->is_irred = _mpoly_test_irreducible(M->exps, nvars, Alen,
+                                                   M->mvars, state, tries);
+
+    flint_randclear(state);
 }
 

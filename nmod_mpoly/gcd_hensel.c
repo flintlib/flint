@@ -45,14 +45,14 @@ int nmod_mpolyl_gcd_hensel_smprime(
     const slong n = ctx->minfo->nvars - 1;
     slong i, k;
     flint_bitcnt_t bits = A->bits;
-    mp_limb_t * alphas;
+    mp_limb_t * alphas, * prev_alphas;
     mp_limb_t q, mu1, mu2;
     nmod_mpoly_struct * Aevals, * Bevals, * Hevals;
     nmod_mpoly_struct * H; /* points to A, B, or Hevals + n */
     nmod_mpoly_struct * Glcs, * Hlcs;
     nmod_mpoly_struct Hfac[2], Htfac[2];
     slong * Hdegs;
-    slong Adegx, Bdegx, gdegx;
+    slong Adegx, Bdegx, gdegx, prev_gdegx;
     nmod_mpoly_t t1, t2, g, abar, bbar, hbar;
     flint_rand_t state;
 
@@ -78,7 +78,8 @@ int nmod_mpolyl_gcd_hensel_smprime(
         nmod_mpoly_init(Hevals + i, ctx);
     }
 
-	alphas = FLINT_ARRAY_ALLOC(n, mp_limb_t);
+	alphas = FLINT_ARRAY_ALLOC(2*n, mp_limb_t);
+    prev_alphas = alphas + n;
     Aevals = FLINT_ARRAY_ALLOC(2*(n + 1), nmod_mpoly_struct);
     Bevals = Aevals + (n + 1);
 	for (i = 0; i < n; i++)
@@ -103,11 +104,7 @@ int nmod_mpolyl_gcd_hensel_smprime(
 
     alphas_tries_remaining = 10;
 
-    /* try all zeros first */
-    for (i = 0; i < n; i++)
-        alphas[i] = 0;
-
-    goto got_alpha;
+    prev_gdegx = -1;
 
 next_alpha:
 
@@ -119,8 +116,6 @@ next_alpha:
 
     for (i = 0; i < n; i++)
         alphas[i] = n_urandint(state, ctx->ffinfo->mod.n);
-
-got_alpha:
 
     /* ensure deg_X do not drop under evaluation */
     Adegx = nmod_mpoly_degree_si(A, 0, ctx);
@@ -153,6 +148,16 @@ got_alpha:
         }
 	}
 
+    if (prev_gdegx >= 0)
+    {
+        int same = 1;
+        for (i = 0; i < n; i++)
+            same &= (alphas[i] == prev_alphas[i]);
+
+        if (same)
+            goto next_alpha;
+    }
+
     /* univariate gcd */
     success = nmod_mpoly_gcd_cofactors(g, abar, bbar,
                                        Aevals + 0, Bevals + 0, ctx) &&
@@ -163,6 +168,15 @@ got_alpha:
 
     gdegx = nmod_mpoly_degree_si(g, 0, ctx);
 
+    if (prev_gdegx < 0)
+    {
+        prev_gdegx = gdegx;
+        for (i = 0; i < n; i++)
+            prev_alphas[i] = alphas[i];
+
+        goto next_alpha;
+    }
+
     if (gdegx == 0)
     {
         nmod_mpoly_set(Abar, A, ctx);
@@ -171,7 +185,15 @@ got_alpha:
         success = 1;
         goto cleanup;
     }
-    else if (gdegx == Adegx)
+
+    if (gdegx < prev_gdegx)
+    {
+        prev_gdegx = gdegx;
+        prev_gdegx = -1;
+        goto next_alpha;
+    }
+
+    if (gdegx == Adegx)
     {
         if (nmod_mpoly_divides(Bbar, B, A, ctx))
         {
@@ -867,8 +889,6 @@ cleanup:
         FLINT_ASSERT(Abar->length > 0);
         FLINT_ASSERT(Bbar->length > 0);
     }
-
-FLINT_ASSERT(success);
 
 	return success;
 }

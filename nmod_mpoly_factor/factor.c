@@ -13,73 +13,136 @@
 #include "fq_nmod_mpoly_factor.h"
 
 
-void nmod_mpoly_convert_perm(
+static void _deflate(
     nmod_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const nmod_mpoly_ctx_t Actx,
-    const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t Bctx,
-    const slong * perm)
+    const ulong * strides,
+    const slong * perm,
+    const nmod_mpoly_ctx_t ctx)
 {
-    slong n = Bctx->minfo->nvars;
-    slong m = Actx->minfo->nvars;
-    slong i, k, l;
-    slong NA, NB;
-    ulong * Aexps;
-    ulong * Bexps;
+    slong i, j;
+    slong nvars = ctx->minfo->nvars;
+    flint_bitcnt_t bits = A->bits;
+    slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    ulong * texps, * sexps;
     TMP_INIT;
 
-    FLINT_ASSERT(B->length > 0);
-    FLINT_ASSERT(Abits <= FLINT_BITS);
-    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    for (j = 0; j < nvars; j++)
+    {
+        if (strides[j] != 1 || perm[j] != j)
+            goto do_it;
+    }
+
+    return;
+
+do_it:
+
     TMP_START;
 
-    Aexps = (ulong *) TMP_ALLOC(m*sizeof(ulong));
-    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    texps = (ulong *) TMP_ALLOC(2*nvars*sizeof(ulong));
+    sexps = texps + nvars;
 
-    NA = mpoly_words_per_exp(Abits, Actx->minfo);
-    NB = mpoly_words_per_exp(B->bits, Bctx->minfo);
+    for (i = 0; i < A->length; i++)
+    {
+        mpoly_get_monomial_ui(texps, A->exps + N*i, bits, ctx->minfo);
 
-    nmod_mpoly_fit_length_reset_bits(A, B->length, Abits, Actx);
-    A->length = B->length;
-    for (i = 0; i < B->length; i++)
-    {        
-	    A->coeffs[i] = B->coeffs[i];
-	    mpoly_get_monomial_ui(Bexps, B->exps + NB*i, B->bits, Bctx->minfo);
-	    for (k = 0; k < m; k++)
-	    {
-	        l = perm[k];
-	        Aexps[k] = l < 0 ? 0 : Bexps[l];
-	    }
-	    mpoly_set_monomial_ui(A->exps + NA*i, Aexps, Abits, Actx->minfo);
-     }  
+        for (j = 0; j < nvars; j++)
+        {
+            FLINT_ASSERT(0 == texps[j] % strides[j]);
+            texps[j] = texps[j]/strides[j];
+        }
+
+        for (j = 0; j < nvars; j++)
+            sexps[j] = texps[perm[j]];
+
+        mpoly_set_monomial_ui(A->exps + N*i, sexps, bits, ctx->minfo);
+    }
+
     TMP_END;
-    nmod_mpoly_sort_terms(A, Actx);
+
+    nmod_mpoly_sort_terms(A, ctx);
+    nmod_mpoly_make_monic(A, A, ctx);
+
+    return;
 }
 
-#define USE_ZAS 1
-#define USE_WANG 2
-#define USE_ZIP 4
+
+static void _inflate(
+    nmod_mpoly_t A,
+    flint_bitcnt_t bits,
+    const ulong * strides,
+    const slong * perm,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i, j;
+    slong nvars = ctx->minfo->nvars;
+    slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    ulong * texps, * sexps;
+    TMP_INIT;
+
+    for (j = 0; j < nvars; j++)
+    {
+        if (strides[j] != 1 || perm[j] != j)
+            goto do_it;
+    }
+
+    return;
+
+do_it:
+
+    nmod_mpoly_repack_bits_inplace(A, bits, ctx);
+
+    TMP_START;
+
+    texps = (ulong *) TMP_ALLOC(2*nvars*sizeof(ulong));
+    sexps = texps + nvars;
+
+    for (i = 0; i < A->length; i++)
+    {
+        mpoly_get_monomial_ui(sexps, A->exps + N*i, bits, ctx->minfo);
+
+        for (j = 0; j < nvars; j++)
+            texps[perm[j]] = sexps[j];
+
+        for (j = 0; j < nvars; j++)
+            texps[j] = texps[j]*strides[j];
+
+        mpoly_set_monomial_ui(A->exps + N*i, texps, bits, ctx->minfo);
+    }
+
+    TMP_END;
+
+    nmod_mpoly_sort_terms(A, ctx);
+    nmod_mpoly_make_monic(A, A, ctx);
+
+    return;
+}
+
 
 /*
-    A is primitive w.r.t to any variable appearing in A.
-    A is squarefree and monic.
+    The property "sep" used here is that of the returned factors of
+    _nmod_mpoly_factor_separable with sep = 1, namely:
+        (1) monic
+        (2) primitive wrt each variable
+        (3) for all i, derivative(A, gen(i)) = 0, or
+                       gcd(A, derivative(A, gen(i))) = 1
+        (4) there is at least one i for which derivative(A, gen(i)) != 0
+
+    Input A is sep and compressed.
 
     return 1 for success, 0 for failure
 */
-static int _irreducible_factors(
+static int _factor_irred_compressed(
     nmod_mpolyv_t Af,
     nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx,
     unsigned int algo)
 {
     int success;
-    slong i, t, nzdvar, mvars;
+    slong i, j;
     slong nvars = ctx->minfo->nvars;
-    slong * Adegs, * perm, * iperm;
-    nmod_mpoly_t G, Abar, Bbar, nzdpoly;
-    flint_bitcnt_t Lbits, Abits;
-    int perm_is_id;
+    slong * perm;
+    ulong * strides, * texps;
+    flint_bitcnt_t Abits;
     flint_rand_t state;
 #if FLINT_WANT_ASSERT
     nmod_mpoly_t Aorg;
@@ -88,126 +151,73 @@ static int _irreducible_factors(
     nmod_mpoly_set(Aorg, A, ctx);
 #endif
 
-    nmod_mpoly_init(G, ctx);
-    nmod_mpoly_init(Abar, ctx);
-    nmod_mpoly_init(Bbar, ctx);
-    nmod_mpoly_init(nzdpoly, ctx);
-    flint_randinit(state);
-    Adegs = (slong *) flint_malloc(3*nvars*sizeof(slong));
-    perm = Adegs + nvars;
-    iperm = perm + nvars;
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(A->coeffs[0] == 1);
+    FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
     if (A->length < 2)
     {
         FLINT_ASSERT(A->length == 1);
         FLINT_ASSERT(!nmod_mpoly_is_ui(A, ctx));
         nmod_mpolyv_fit_length(Af, 1, ctx);
-        Af->length = 1;
         nmod_mpoly_swap(Af->coeffs + 0, A, ctx);
-        success = 1;
-        goto cleanup;
-    }
-
-    if (!nmod_mpoly_degrees_fit_si(A, ctx))
-    {
-        success = 0;
-        goto cleanup;
+        Af->length = 1;
+        return 1;
     }
 
     if (A->bits > FLINT_BITS &&
         !nmod_mpoly_repack_bits_inplace(A, FLINT_BITS, ctx))
     {
-        success = 0;
-        goto cleanup;
+        return 0;
     }
-
-    nmod_mpoly_degrees_si(Adegs, A, ctx);
 
     Abits = A->bits;
 
-    mvars = 0;
-    Lbits = 0;
-    nzdvar = -1;
+    flint_randinit(state);
+
+    strides = FLINT_ARRAY_ALLOC(2*nvars, ulong);
+    texps = strides + nvars;
+
+    perm = FLINT_ARRAY_ALLOC(nvars, slong);
+
+    /* fill perm with id, and fill in strides */
+    {
+        ulong ppowt, ppow = ctx->ffinfo->mod.n;
+        slong N = mpoly_words_per_exp_sp(Abits, ctx->minfo);
+
+        while (!n_mul_checked(&ppowt, ppow, ctx->ffinfo->mod.n))
+            ppow = ppowt;
+
+        for (j = 0; j < nvars; j++)
+        {
+            strides[j] = ppow;
+            perm[j] = j;
+        }
+
+        for (i = 0; i < A->length; i++)
+        {
+	        mpoly_get_monomial_ui(texps, A->exps + N*i, Abits, ctx->minfo);
+            for (j = 0; j < nvars; j++)
+                strides[j] = n_gcd(strides[j], texps[j]);
+        }
+    }
+
+    /* find permutation with gcd(A, derivative(A, gen(perm[i]))) = 1 */
     for (i = 0; i < nvars; i++)
     {
-		iperm[i] = -1;
-        if (Adegs[i] > 0)
+        if (strides[i] == 1)
         {
-            flint_bitcnt_t this_bits = FLINT_BIT_COUNT(Adegs[i]);
-            Lbits = FLINT_MAX(Lbits, this_bits);
-            perm[mvars] = i;
-            mvars++;
-
-            if (nzdvar < 0)
-            {
-                nmod_mpoly_derivative(nzdpoly, A, i, ctx);
-                if (!nmod_mpoly_is_zero(nzdpoly, ctx))
-                {
-                    nzdvar = i;
-                    t = perm[mvars - 1];
-                    perm[mvars - 1] = perm[0];
-                    perm[0] = t;
-                }
-            }
+            SLONG_SWAP(perm[0], perm[i]);
+            break;
         }
     }
 
-    FLINT_ASSERT(nzdvar >= 0);
-    FLINT_ASSERT(perm[0] == nzdvar);
-    FLINT_ASSERT(!nmod_mpoly_is_zero(nzdpoly, ctx));
-
-    /*
-        Check for annoying things like (x^2+y)(x^p+y). The squarefree
-        requirement should already have ruled out (x^2+y)(x^p+y^p).
-    */
-    if (!nmod_mpoly_gcd_cofactors(G, Abar, Bbar, A, nzdpoly, ctx))
-    {
-        success = 0;
-        goto cleanup;
-    }
-    if (!nmod_mpoly_is_one(G, ctx))
-    {
-        nmod_mpolyv_t Gf;
-        nmod_mpolyv_init(Gf, ctx);
-        success = _irreducible_factors(Af, Abar, ctx, algo);
-        success = success && _irreducible_factors(Gf, G, ctx, algo);
-        if (success)
-        {
-            nmod_mpolyv_fit_length(Af, Af->length + Gf->length, ctx);
-            for (i = 0; i < Gf->length; i++)
-            {
-                nmod_mpoly_swap(Af->coeffs + Af->length, Gf->coeffs + i, ctx);
-                Af->length++;
-            }
-        }
-        nmod_mpolyv_clear(Gf, ctx);
-        goto cleanup;
-    }
-
-	/* A is separable wrt gen(perm[0]) now */
-
-    if (Lbits > FLINT_BITS - 10)
-    {
-        success = 0;
-        goto cleanup;
-    }
-
-    /* TODO nice permutation */
-
-    /* invert perm */
-    perm_is_id = (mvars == nvars);
-    for (i = 0; i < mvars; i++)
-    {
-        perm_is_id = perm_is_id && (perm[i] == i);
-        iperm[perm[i]] = i;
-    }
-
-    if (mvars < 2)
+    if (nvars < 2)
     {
         nmod_poly_t Au;
         nmod_poly_factor_t Auf;
 
-        FLINT_ASSERT(mvars == 1);
+        FLINT_ASSERT(nvars == 1);
 
         nmod_poly_init_mod(Au, ctx->ffinfo->mod);
         nmod_poly_factor_init(Auf);
@@ -231,7 +241,7 @@ static int _irreducible_factors(
 
         success = 1;
     }
-    else if (mvars == 2)
+    else if (nvars == 2)
     {
         n_poly_t c;
         n_bpoly_t Ab;
@@ -268,97 +278,86 @@ static int _irreducible_factors(
     }
     else
     {
-		nmod_mpoly_ctx_t Lctx;
-		nmod_mpoly_t L, lcL;
-		nmod_mpolyv_t Lf;
-        nmod_mpoly_factor_t lcLf;
+		nmod_mpoly_t lcA;
+        nmod_mpoly_factor_t lcAf;
 
-		nmod_mpoly_ctx_init(Lctx, mvars, ORD_LEX, ctx->ffinfo->mod.n);
-		nmod_mpoly_init(L, Lctx);
-        nmod_mpoly_init(lcL, Lctx);
-		nmod_mpolyv_init(Lf, Lctx);
-        nmod_mpoly_factor_init(lcLf, Lctx);
+        nmod_mpoly_init(lcA, ctx);
+        nmod_mpoly_factor_init(lcAf, ctx);
 
-        Lbits = mpoly_fix_bits(Lbits + 1, Lctx->minfo);
+        _deflate(A, strides, perm, ctx);
 
-		nmod_mpoly_convert_perm(L, Lbits, Lctx, A, ctx, perm);
-        nmod_mpoly_make_monic(L, L, ctx);
+        #if FLINT_WANT_ASSERT
+        {
+            nmod_mpoly_t g;
+            nmod_mpoly_init(g, ctx);
+            nmod_mpoly_derivative(g, A, 0, ctx);
+            FLINT_ASSERT(nmod_mpoly_gcd(g, g, A, ctx));
+            FLINT_ASSERT(nmod_mpoly_is_one(g, ctx));
+            nmod_mpoly_clear(g, ctx);
+        }
+        #endif
 
         success = 0;
 
-        if (algo & (USE_WANG | USE_ZIP))
+        if (algo & (MPOLY_FACTOR_USE_WANG | MPOLY_FACTOR_USE_ZIP))
         {
-            _nmod_mpoly_get_lead0(lcL, L, Lctx);
-            if (nmod_mpoly_factor(lcLf, lcL, Lctx))
+            _nmod_mpoly_get_lead0(lcA, A, ctx);
+            if (nmod_mpoly_factor(lcAf, lcA, ctx))
             {
-                if (algo & USE_ZIP)
+                if (algo & MPOLY_FACTOR_USE_ZIP)
                 {
                     success = nmod_mpoly_factor_irred_smprime_zippel(
-                                                Lf, L, lcLf, lcL, Lctx, state);
+                                                 Af, A, lcAf, lcA, ctx, state);
                     if (success == 0)
                         success = nmod_mpoly_factor_irred_medprime_zippel(
-                                                Lf, L, lcLf, lcL, Lctx, state);
+                                                 Af, A, lcAf, lcA, ctx, state);
                     if (success == 0)
                         success = nmod_mpoly_factor_irred_lgprime_zippel(
-                                                Lf, L, lcLf, lcL, Lctx, state);
+                                                 Af, A, lcAf, lcA, ctx, state);
                 }
 
-                if (algo & USE_WANG)
+                if (algo & MPOLY_FACTOR_USE_WANG)
                 {
                     if (success == 0)
                         success = nmod_mpoly_factor_irred_smprime_wang(
-                                                Lf, L, lcLf, lcL, Lctx, state);
+                                                 Af, A, lcAf, lcA, ctx, state);
                     if (success == 0)
                         success = nmod_mpoly_factor_irred_medprime_wang(
-                                                Lf, L, lcLf, lcL, Lctx, state);
+                                                 Af, A, lcAf, lcA, ctx, state);
                     if (success == 0)
                         success = nmod_mpoly_factor_irred_lgprime_wang(
-                                                Lf, L, lcLf, lcL, Lctx, state);
+                                                 Af, A, lcAf, lcA, ctx, state);
                 }
             }
         }
 
-        if (algo & USE_ZAS)
+        if (algo & MPOLY_FACTOR_USE_ZAS)
         {
             if (success == 0)
     		    success = nmod_mpoly_factor_irred_smprime_zassenhaus(
-                                                           Lf, L, Lctx, state);
+                                                            Af, A, ctx, state);
             if (success == 0)
         		success = nmod_mpoly_factor_irred_medprime_zassenhaus(
-                                                           Lf, L, Lctx, state);
+                                                            Af, A, ctx, state);
             if (success == 0)
         		success = nmod_mpoly_factor_irred_lgprime_zassenhaus(
-                                                           Lf, L, Lctx, state);
+                                                            Af, A, ctx, state);
         }
 
         success = (success > 0);
 		if (success)
         {
-            nmod_mpolyv_fit_length(Af, Lf->length, ctx);
-            Af->length = Lf->length;
-		    for (i = 0; i < Lf->length; i++)
-		    {
-                nmod_mpoly_convert_perm(Af->coeffs + i, Abits, ctx,
-                                                  Lf->coeffs + i, Lctx, iperm);
-                nmod_mpoly_make_monic(Af->coeffs + i, Af->coeffs + i, ctx);
-		    }
+		    for (i = 0; i < Af->length; i++)
+                _inflate(Af->coeffs + i, Abits, strides, perm, ctx);
         }
 
-	    nmod_mpoly_clear(L, Lctx);
-	    nmod_mpoly_clear(lcL, Lctx);
-	    nmod_mpolyv_clear(Lf, Lctx);
-        nmod_mpoly_factor_clear(lcLf, Lctx);
-	    nmod_mpoly_ctx_clear(Lctx);
+	    nmod_mpoly_clear(lcA, ctx);
+        nmod_mpoly_factor_clear(lcAf, ctx);
     }
 
-cleanup:
-
-    nmod_mpoly_clear(G, ctx);
-    nmod_mpoly_clear(Abar, ctx);
-    nmod_mpoly_clear(Bbar, ctx);
-    nmod_mpoly_clear(nzdpoly, ctx);
     flint_randclear(state);
-    flint_free(Adegs);
+    flint_free(strides);
+    flint_free(perm);
 
 #if FLINT_WANT_ASSERT
     if (success)
@@ -368,6 +367,7 @@ cleanup:
         nmod_mpoly_one(prod, ctx);
         for (i = 0; i < Af->length; i++)
             nmod_mpoly_mul(prod, prod, Af->coeffs + i, ctx);
+
         FLINT_ASSERT(nmod_mpoly_equal(prod, Aorg, ctx));
         nmod_mpoly_clear(prod, ctx);
         nmod_mpoly_clear(Aorg, ctx);
@@ -379,9 +379,249 @@ cleanup:
 }
 
 
-static int nmod_mpoly_factor_algo(
+/*
+    f is already squarefree
+    make the factors in f have the sep property
+*/
+static int _refine_sep(
+    nmod_mpolyv_t f,
+    const nmod_mpoly_ctx_t ctx,
+    nmod_mpolyv_t g)    /* temp */
+{
+    int success;
+    slong v, i;
+    nmod_mpoly_struct * t;
+    nmod_mpoly_univar_t u;
+
+    nmod_mpoly_univar_init(u, ctx);
+
+    /* first make primitive */
+    for (v = 0; v < ctx->minfo->nvars; v++)
+    {
+        g->length = 0;
+        for (i = 0; i < f->length; i++)
+        {
+            nmod_mpoly_to_univar(u, f->coeffs + i, v, ctx);
+            FLINT_ASSERT(u->length > 0);
+            FLINT_ASSERT(fmpz_is_zero(u->exps + u->length - 1));
+
+            nmod_mpolyv_fit_length(g, g->length + 2, ctx);
+            success = _nmod_mpoly_vec_content_mpoly(g->coeffs + g->length,
+                                                    u->coeffs, u->length, ctx);
+            if (!success)
+                goto cleanup;
+
+            if (nmod_mpoly_is_ui(g->coeffs + g->length, ctx))
+            {
+                nmod_mpoly_swap(g->coeffs + g->length, f->coeffs + i, ctx);
+                g->length++;
+            }
+            else
+            {
+                success = nmod_mpoly_divides(g->coeffs + g->length + 1,
+                                    f->coeffs + i, g->coeffs + g->length, ctx);
+                FLINT_ASSERT(success);
+
+                if (nmod_mpoly_is_ui(g->coeffs + g->length + 1, ctx))
+                    g->length += 1;
+                else
+                    g->length += 2;
+            }
+        }
+
+        nmod_mpolyv_swap(f, g, ctx);
+    }
+
+    /* now make separable/derivative zero wrt each variable */
+    nmod_mpolyv_fit_length(g, 1, ctx);
+    t = g->coeffs + 0;
+    for (v = 0; v < ctx->minfo->nvars; v++)
+    {
+        i = 0;
+        while (i < f->length)
+        {
+            nmod_mpoly_derivative(t, f->coeffs + i, v, ctx);
+            if (nmod_mpoly_is_zero(t, ctx))
+            {
+                /* f[i] has zero derivative */
+                i++;
+                continue;
+            }
+
+            nmod_mpolyv_fit_length(f, f->length + 1, ctx);
+
+            success = nmod_mpoly_gcd_cofactors(f->coeffs + f->length,
+                                      f->coeffs + i, t, f->coeffs + i, t, ctx);
+            if (!success)
+                goto cleanup;
+
+            if (nmod_mpoly_is_ui(f->coeffs + f->length, ctx))
+            {
+                /* f[i] is comprime with its derivative */
+                i++;
+            }
+            else
+            {
+                /* f[i] and f[end] at least got smaller */
+                f->length++;
+            }
+        }
+    }
+
+    success = 1;
+
+cleanup:
+
+    nmod_mpoly_univar_clear(u, ctx);
+
+    return 1;
+}
+
+
+/*
+    A is sep.
+
+    return 1 for success, 0 for failure
+*/
+static int _factor_irred(
+    nmod_mpolyv_t Af,
+    nmod_mpoly_t A,
+    const nmod_mpoly_ctx_t Actx,
+    unsigned int algo)
+{
+    int success;
+    slong i, j;
+    flint_bitcnt_t Abits;
+    mpoly_compression_t M;
+#if FLINT_WANT_ASSERT
+    nmod_mpoly_t Aorg;
+
+    nmod_mpoly_init(Aorg, Actx);
+    nmod_mpoly_set(Aorg, A, Actx);
+#endif
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(A->coeffs[0] == 1);
+
+    if (A->length < 2)
+    {
+        FLINT_ASSERT(A->length == 1);
+        FLINT_ASSERT(!nmod_mpoly_is_ui(A, Actx));
+        nmod_mpolyv_fit_length(Af, 1, Actx);
+        Af->length = 1;
+        nmod_mpoly_swap(Af->coeffs + 0, A, Actx);
+        success = 1;
+        goto cleanup_less;
+    }
+
+    if (A->bits > FLINT_BITS &&
+        !nmod_mpoly_repack_bits_inplace(A, FLINT_BITS, Actx))
+    {
+        success = 0;
+        goto cleanup_less;
+    }
+
+    Abits = A->bits;
+
+    mpoly_compression_init(M);
+    mpoly_compression_set(M, A->exps, A->bits, A->length, Actx->minfo);
+
+    if (M->is_irred)
+    {
+        nmod_mpolyv_fit_length(Af, 1, Actx);
+        Af->length = 1;
+        nmod_mpoly_swap(Af->coeffs + 0, A, Actx);
+        success = 1;
+    }
+    else if (M->is_trivial)
+    {
+        success = _factor_irred_compressed(Af, A, Actx, algo);
+    }
+    else
+    {
+        nmod_mpoly_ctx_t Lctx;
+        nmod_mpolyv_t Lf, Lft, Lfs;
+
+        nmod_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX, Actx->ffinfo->mod.n);
+        nmod_mpolyv_init(Lf, Lctx);
+        nmod_mpolyv_init(Lft, Lctx);
+        nmod_mpolyv_init(Lfs, Lctx);
+
+        nmod_mpolyv_fit_length(Lft, 1, Lctx);
+        Lft->length = 1;
+        nmod_mpoly_compression_do(Lft->coeffs + 0, Lctx, A->coeffs, A->length, M);
+
+        _refine_sep(Lft, Lctx, Lf);
+
+        if (Lft->length == 1)
+        {
+            success = _factor_irred_compressed(Lf, Lft->coeffs + 0, Lctx, algo);
+        }
+        else
+        {
+            success = 1;
+            Lf->length = 0;
+            for (i = 0; i < Lft->length; i++)
+            {
+                success = _factor_irred(Lfs, Lft->coeffs + i, Lctx, algo);
+                if (!success)
+                    break;
+
+                nmod_mpolyv_fit_length(Lf, Lf->length + Lfs->length, Lctx);
+                for (j = 0; j < Lfs->length; j++)
+                {
+                    nmod_mpoly_swap(Lf->coeffs + Lf->length, Lfs->coeffs + j, Lctx);
+                    Lf->length++;
+                }
+            }
+        }
+
+        if (success)
+        {
+            nmod_mpolyv_fit_length(Af, Lf->length, Actx);
+            Af->length = Lf->length;
+            for (i = 0; i < Lf->length; i++)
+            {
+                nmod_mpoly_compression_undo(Af->coeffs + i, Abits, Actx,
+                                                      Lf->coeffs + i, Lctx, M);
+            }
+        }
+
+        nmod_mpolyv_clear(Lf, Lctx);
+        nmod_mpolyv_clear(Lft, Lctx);
+        nmod_mpolyv_clear(Lfs, Lctx);
+        nmod_mpoly_ctx_clear(Lctx);
+    }
+
+    mpoly_compression_clear(M);
+
+cleanup_less:
+
+#if FLINT_WANT_ASSERT
+    if (success)
+    {
+        nmod_mpoly_t prod;
+        nmod_mpoly_init(prod, Actx);
+        nmod_mpoly_one(prod, Actx);
+        for (i = 0; i < Af->length; i++)
+            nmod_mpoly_mul(prod, prod, Af->coeffs + i, Actx);
+        FLINT_ASSERT(nmod_mpoly_equal(prod, Aorg, Actx));
+        nmod_mpoly_clear(prod, Actx);
+        nmod_mpoly_clear(Aorg, Actx);
+    }
+#endif
+
+    FLINT_ASSERT(success == 0 || success == 1);
+    return success;
+}
+
+
+/*
+    Assume each factor in f is sep.
+    Replace f by and irreducible factorization.
+*/
+int nmod_mpoly_factor_irred(
     nmod_mpoly_factor_t f,
-    const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx,
     unsigned int algo)
 {
@@ -393,15 +633,11 @@ static int nmod_mpoly_factor_algo(
     nmod_mpolyv_init(t, ctx);
     nmod_mpoly_factor_init(g, ctx);
 
-    success = nmod_mpoly_factor_squarefree(f, A, ctx);
-    if (!success)
-        goto cleanup;
-
     g->constant = f->constant;
     g->num = 0;
     for (j = 0; j < f->num; j++)
     {
-        success = _irreducible_factors(t, f->poly + j, ctx, algo);
+        success = _factor_irred(t, f->poly + j, ctx, algo);
         if (!success)
             goto cleanup;
 
@@ -413,7 +649,6 @@ static int nmod_mpoly_factor_algo(
             g->num++;
         }
     }
-
     nmod_mpoly_factor_swap(f, g, ctx);
 
     success = 1;
@@ -423,11 +658,171 @@ cleanup:
     nmod_mpolyv_clear(t, ctx);
     nmod_mpoly_factor_clear(g, ctx);
 
-    FLINT_ASSERT(!success || nmod_mpoly_factor_matches(A, f, ctx));
+    return success;
+}
+
+
+/*
+    append factor(f)^e to g
+    assumping f is compressed and content free
+*/
+static int _compressed_content_to_irred(
+    nmod_mpoly_factor_t g,
+    nmod_mpoly_t f,
+    const fmpz_t e,
+    const nmod_mpoly_ctx_t ctx,
+    unsigned int algo)
+{
+    int success;
+    slong j, k;
+    nmod_mpoly_factor_t h;
+    nmod_mpolyv_t v;
+
+    nmod_mpoly_factor_init(h, ctx);
+    nmod_mpolyv_init(v, ctx);
+
+    success = _nmod_mpoly_factor_separable(h, f, ctx, 1);
+    if (!success)
+        goto cleanup;
+
+    for (j = 0; j < h->num; j++)
+    {
+        success = h->num > 1 ? _factor_irred(v, h->poly + j, ctx, algo) :
+                           _factor_irred_compressed(v, h->poly + j, ctx, algo);
+        if (!success)
+            goto cleanup;
+
+        nmod_mpoly_factor_fit_length(g, g->num + v->length, ctx);
+        for (k = 0; k < v->length; k++)
+        {
+            fmpz_mul(g->exp + g->num, h->exp + j, e);
+            nmod_mpoly_swap(g->poly + g->num, v->coeffs + k, ctx);
+            g->num++;
+        }
+    }
+
+cleanup:
+
+    nmod_mpoly_factor_clear(h, ctx);
+    nmod_mpolyv_clear(v, ctx);
 
     return success;
 }
 
+
+static int _factor(
+    nmod_mpoly_factor_t f,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_ctx_t ctx,
+    unsigned int algo)
+{
+    int success;
+    slong i, j;
+    flint_bitcnt_t bits;
+    nmod_mpoly_factor_t g;
+    mpoly_compression_t M;
+
+    if (!nmod_mpoly_factor_content(f, A, ctx))
+        return 0;
+
+    nmod_mpoly_factor_init(g, ctx);
+    mpoly_compression_init(M);
+
+    /* write into g */
+    g->constant = f->constant;
+    g->num = 0;
+    for (i = 0; i < f->num; i++)
+    {
+        if (f->poly[i].length < 2)
+        {
+            nmod_mpoly_factor_fit_length(g, g->num + 1, ctx);
+            nmod_mpoly_swap(g->poly + g->num, f->poly + i, ctx);
+            fmpz_swap(g->exp + g->num, f->exp + i);
+            g->num++;
+            continue;
+        }
+
+        if (f->poly[i].bits > FLINT_BITS &&
+            !nmod_mpoly_repack_bits_inplace(f->poly + i, FLINT_BITS, ctx))
+        {
+            success = 0;
+            goto cleanup;
+        }
+
+        bits = f->poly[i].bits;
+
+        mpoly_compression_set(M, f->poly[i].exps, bits, f->poly[i].length, ctx->minfo);
+        if (M->is_irred)
+        {
+            nmod_mpoly_factor_fit_length(g, g->num + 1, ctx);
+            nmod_mpoly_swap(g->poly + g->num, f->poly + i, ctx);
+            fmpz_swap(g->exp + g->num, f->exp + i);
+            g->num++;
+        }
+        else if (M->is_trivial)
+        {
+            success = _compressed_content_to_irred(g, f->poly + i, f->exp + i, ctx, algo);
+            if (!success)
+                goto cleanup;
+        }
+        else
+        {
+            nmod_mpoly_ctx_t Lctx;
+            nmod_mpoly_t L;
+            nmod_mpoly_factor_t h;
+
+            /* compression may have messed up the content factorization */
+            nmod_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX, ctx->ffinfo->mod.n);
+            nmod_mpoly_init(L, Lctx);
+            nmod_mpoly_factor_init(h, Lctx);
+
+            nmod_mpoly_compression_do(L, Lctx, f->poly[i].coeffs,
+                                               f->poly[i].length, M);
+            if (M->is_perm)
+            {
+                success = _compressed_content_to_irred(h, L, f->exp + i, Lctx, algo);
+                fmpz_one(f->exp + i);
+            }
+            else
+            {
+                success = nmod_mpoly_factor_separable(h, L, Lctx, 1) &&
+                          nmod_mpoly_factor_irred(h, Lctx, algo);
+            }
+
+            if (success)
+            {
+                FLINT_ASSERT(h->constant == 1);
+                nmod_mpoly_factor_fit_length(g, g->num + h->num, ctx);
+                for (j = 0; j < h->num; j++)
+                {
+                    fmpz_mul(g->exp + g->num, f->exp + i, h->exp + j);
+                    nmod_mpoly_compression_undo(g->poly + g->num, bits, ctx,
+                                                         h->poly + j, Lctx, M);
+                    g->num++;
+                }
+            }
+
+            nmod_mpoly_factor_clear(h, Lctx);
+            nmod_mpoly_clear(L, Lctx);
+            nmod_mpoly_ctx_clear(Lctx);
+
+            if (!success)
+                goto cleanup;
+        }
+    }
+
+    nmod_mpoly_factor_swap(f, g, ctx);
+
+    success = 1;
+
+cleanup:
+
+    nmod_mpoly_factor_clear(g, ctx);
+    mpoly_compression_clear(M);
+
+    FLINT_ASSERT(!success || nmod_mpoly_factor_matches(A, f, ctx));
+    return success;
+}
 
 
 int nmod_mpoly_factor(
@@ -435,7 +830,7 @@ int nmod_mpoly_factor(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return nmod_mpoly_factor_algo(f, A, ctx, USE_ZAS | USE_WANG | USE_ZIP);
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ALL);
 }
 
 
@@ -444,7 +839,7 @@ int nmod_mpoly_factor_zassenhaus(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return nmod_mpoly_factor_algo(f, A, ctx, USE_ZAS);
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZAS);
 }
 
 
@@ -453,7 +848,7 @@ int nmod_mpoly_factor_wang(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return nmod_mpoly_factor_algo(f, A, ctx, USE_WANG);
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_WANG);
 }
 
 
@@ -462,6 +857,6 @@ int nmod_mpoly_factor_zippel(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return nmod_mpoly_factor_algo(f, A, ctx, USE_ZIP);
+    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
 
