@@ -307,6 +307,8 @@ int ca_mat_det_bareiss(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 void ca_mat_det_cofactor(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 void ca_mat_det(ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 
+void ca_mat_adjugate_cofactor(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx);
+
 /* Characteristic polynomial */
 
 void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx);

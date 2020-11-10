@@ -11,7 +11,6 @@
 
 #include "ca_mat.h"
 
-/* todo: adjugate formula for small n */
 truth_t
 ca_mat_inv(ca_mat_t X, const ca_mat_t A, ca_ctx_t ctx)
 {
@@ -23,6 +22,25 @@ ca_mat_inv(ca_mat_t X, const ca_mat_t A, ca_ctx_t ctx)
 
     if (n == 0)
         return T_TRUE;
+
+    if (n <= 4)
+    {
+        ca_t det;
+        ca_init(det, ctx);
+        ca_mat_adjugate_cofactor(X, det, A, ctx);
+
+        success = ca_check_is_zero(det, ctx);
+        if (success == T_FALSE)
+        {
+            ca_mat_div_ca(X, X, det, ctx);
+            success = T_TRUE;
+        }
+        else if (success == T_TRUE)
+            success = T_FALSE;
+
+        ca_clear(det, ctx);
+        return success;
+    }
 
     ca_mat_init(T, n, n, ctx);
     ca_mat_one(T, ctx);

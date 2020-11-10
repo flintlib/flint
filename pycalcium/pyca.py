@@ -1660,6 +1660,42 @@ class ca_mat:
             return res
         raise NotImplementedError("unable to compute matrix exponential")
 
+    def jordan_form(self, transform=False):
+        """
+        Jordan decomposiion: given a square matrix *self*,
+        returns a block diagonal matrix *J* composed of Jordan blocks
+        and optionally an invertible matrix *P* such that *self* equals
+        `PJP^{-1}`.
+
+            >>> A = ca_mat([[20,77,59,40], [0,-2,-3,-2], [-10,-35,-23,-15], [2,7,3,1]])
+            >>> J, P = A.jordan_form(transform=True)
+            >>> P * J * P.inv()
+            ca_mat of size 4 x 4
+            [ 20,  77,  59,  40]
+            [  0,  -2,  -3,  -2]
+            [-10, -35, -23, -15]
+            [  2,   7,   3,   1]
+            >>> A = ca_mat([[log(2), log(3)], [log(4), log(5)]])
+            >>> J, P = A.jordan_form(transform=True)
+            >>> J[0,0]
+            2.46769 {(a+b+e)/2 where a = 2.63279 [Sqrt(6.93159 {b^2-2*b*e+8*d*e+e^2})], b = 1.60944 [Log(5)], c = 1.38629 [Log(4)], d = 1.09861 [Log(3)], e = 0.693147 [Log(2)]}
+            >>> P * J * P.inv() == A
+            True
+
+        """
+        n = self.nrows()
+        m = self.ncols()
+        if n != m:
+            raise ValueError("non-square matrix")
+        J = ca_mat(n, n)
+        if transform:
+            P = ca_mat(n, n)
+            if libcalcium.ca_mat_jordan_form(J, P, self, self._ctx):
+                return J, P
+        else:
+            if libcalcium.ca_mat_jordan_form(J, None, self, self._ctx):
+                return J
+        raise NotImplementedError("unable to compute Jordan decomposition")
 
 class ca_vec:
     """

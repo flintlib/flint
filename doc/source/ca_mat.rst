@@ -443,6 +443,11 @@ Determinant and trace
     depends strongly and sometimes
     unpredictably on the structure of the matrix.
 
+.. function:: void ca_mat_adjugate_cofactor(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *adj* to the adjuate matrix of *A* and *det* to the determinant
+    of *A*, both computed simultaneously using cofactor expansion.
+
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
