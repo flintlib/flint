@@ -442,7 +442,8 @@ static int _factor_irred(
     fmpz_mpoly_set(Aorg, A, Actx);
 #endif
 
-    FLINT_ASSERT(A->length == 0 || fmpz_sgn(A->coeffs + 0) > 0);
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(fmpz_sgn(A->coeffs + 0) > 0);
 
     if (A->length < 2)
     {
@@ -452,12 +453,6 @@ static int _factor_irred(
         Af->length = 1;
         fmpz_mpoly_swap(Af->coeffs + 0, A, Actx);
         success = 1;
-        goto cleanup_less;
-    }
-
-    if (!fmpz_mpoly_degrees_fit_si(A, Actx))
-    {
-        success = 0;
         goto cleanup_less;
     }
 
@@ -473,16 +468,16 @@ static int _factor_irred(
     mpoly_compression_init(M);
     mpoly_compression_set(M, A->exps, A->bits, A->length, Actx->minfo);
 
-    if (M->is_trivial)
-    {
-        success = _factor_irred_compressed(Af, A, Actx, algo);
-    }
-    else if (M->is_irred)
+    if (M->is_irred)
     {
         fmpz_mpolyv_fit_length(Af, 1, Actx);
         Af->length = 1;
         fmpz_mpoly_swap(Af->coeffs + 0, A, Actx);
         success = 1;
+    }
+    else if (M->is_trivial)
+    {
+        success = _factor_irred_compressed(Af, A, Actx, algo);
     }
     else
     {

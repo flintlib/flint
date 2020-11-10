@@ -44,15 +44,18 @@ void mpoly_remove_var_powers(
 
     mpoly_set_monomial_ffmpz(minexp, var_powers, Abits, mctx);
 
-    if (Abits <= FLINT_BITS)
+    if (!mpoly_monomial_is_zero(minexp, N))
     {
-        for (i = 0; i < Alen; i++)
-            mpoly_monomial_sub(Aexps + N*i, Aexps + N*i, minexp, N);
-    }
-    else
-    {
-        for (i = 0; i < Alen; i++)
-            mpoly_monomial_sub_mp(Aexps + N*i, Aexps + N*i, minexp, N);
+        if (Abits <= FLINT_BITS)
+        {
+            for (i = 0; i < Alen; i++)
+                mpoly_monomial_sub(Aexps + N*i, Aexps + N*i, minexp, N);
+        }
+        else
+        {
+            for (i = 0; i < Alen; i++)
+                mpoly_monomial_sub_mp(Aexps + N*i, Aexps + N*i, minexp, N);
+        }
     }
 
     TMP_END;

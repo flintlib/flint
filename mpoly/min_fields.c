@@ -15,7 +15,7 @@
 
 /* unpack the field-wise minimum of poly_exps into min_fields */
 void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
-                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmin, mask;
@@ -33,9 +33,13 @@ void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
     TMP_START;
 
     pmin = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_monomial_set(pmin, poly_exps + N*0, N);
-    for (i = 1; i < len; i++)
-        mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
+    mpoly_monomial_set(pmin, poly_exps + N*(len - 1), N);
+
+    if (!mpoly_monomial_is_zero(pmin, N))
+    {
+        for (i = 0; i < len - 1; i++)
+            mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
+    }
 
     mpoly_unpack_vec_ui(min_fields, pmin, bits, mctx->nfields, 1);
 
@@ -44,7 +48,7 @@ void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
 
 
 void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
-                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmin, mask;
@@ -56,21 +60,24 @@ void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
 
     N = mpoly_words_per_exp(bits, mctx);
     pmin = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_monomial_set(pmin, poly_exps + N*0, N);
+    mpoly_monomial_set(pmin, poly_exps + N*(len - 1), N);
 
-    if (bits <= FLINT_BITS)
+    if (!mpoly_monomial_is_zero(pmin, N))
     {
-        mask = 0;
-        for (i = 0; i < FLINT_BITS/bits; i++)
-            mask = (mask << bits) + (UWORD(1) << (bits - 1));
+        if (bits <= FLINT_BITS)
+        {
+            mask = 0;
+            for (i = 0; i < FLINT_BITS/bits; i++)
+                mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-        for (i = 1; i < len; i++)
-            mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
-    }
-    else
-    {
-        for (i = 1; i < len; i++)
-            mpoly_monomial_min_mp(pmin, pmin, poly_exps + N*i, bits, N);
+            for (i = 0; i < len - 1; i++)
+                mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
+        }
+        else
+        {
+            for (i = 0; i < len - 1; i++)
+                mpoly_monomial_min_mp(pmin, pmin, poly_exps + N*i, bits, N);
+        }
     }
 
     mpoly_unpack_vec_fmpz(min_fields, pmin, bits, mctx->nfields, 1);
