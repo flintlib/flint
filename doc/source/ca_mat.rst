@@ -538,3 +538,30 @@ Jordan canonical form
     the Jordan decomposition, it is often better to use those
     methods directly since they give direct access to the
     spectrum and block structure.
+
+Matrix functions
+-------------------------------------------------------------------------------
+
+.. function:: int ca_mat_exp(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+
+    Matrix exponential: given a square matrix *A*, sets *res* to
+    `e^A` and returns 1 on success. If unsuccessful, returns 0,
+    leaving the values in *res* arbitrary.
+
+    This function uses Jordan decomposition. The matrix exponential
+    always exists, but computation can fail if computing the Jordan
+    decomposition fails.
+
+.. function:: truth_t ca_mat_log(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+
+    Matrix logarithm: given a square matrix *A*, sets *res* to a
+    logarithm `\log(A)` and returns ``T_TRUE`` on success.
+    If *A* can be proved to have no logarithm, returns ``T_FALSE``.
+    If the existence of a logarithm cannot be proved, returns
+    ``T_UNKNOWN``.
+
+    This function uses the Jordan decomposition, and the branch of
+    the matrix logarithm is defined by taking the principal values
+    of the logarithms of all eigenvalues. The matrix exponential always
+    exists, but computation can fail if computing the Jordan
+    decomposition fails.

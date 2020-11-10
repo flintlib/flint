@@ -139,6 +139,23 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
         return;
     }
 
+    /* log(i) and log(-i) */
+    if (CA_IS_QQ_I(x, ctx))
+    {
+        if (ca_check_is_i(x, ctx) == T_TRUE)
+        {
+            ca_pi_i(res, ctx);
+            ca_div_si(res, res, 2, ctx);
+            return;
+        }
+        else if (ca_check_is_neg_i(x, ctx) == T_TRUE)
+        {
+            ca_pi_i(res, ctx);
+            ca_div_si(res, res, -2, ctx);
+            return;
+        }
+    }
+
     ext = ca_is_gen_as_ext(x, ctx);
 
     /* Fast detection of roots of unity. Todo: also detect roots

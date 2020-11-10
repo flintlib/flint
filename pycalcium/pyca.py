@@ -1584,6 +1584,82 @@ class ca_mat:
             raise NotImplementedError("unable to determine if matrix is diagonalizable")
         return D, P
 
+    def log(self):
+        """
+        Matrix logarithm.
+
+            >>> ca_mat([[4,2],[2,4]]).log().det() == log(2)*(log(2)+log(3))
+            True
+            >>> ca_mat([[1,1],[0,1]]).log()
+            ca_mat of size 2 x 2
+            [0, 1]
+            [0, 0]
+            >>> ca_mat([[0,1],[0,0]]).log()
+            Traceback (most recent call last):
+              ...
+            ZeroDivisionError: singular matrix
+            >>> ca_mat([[0,0,1],[0,1,0],[1,0,0]]).log() / (pi*I)
+            ca_mat of size 3 x 3
+            [  0.500000 {1/2}, 0, -0.500000 {-1/2}]
+            [               0, 0,                0]
+            [-0.500000 {-1/2}, 0,   0.500000 {1/2}]
+            >>> ca_mat([[0,0,1],[0,1,0],[1,0,0]]).log().exp()
+            ca_mat of size 3 x 3
+            [0, 0, 1]
+            [0, 1, 0]
+            [1, 0, 0]
+
+        """
+        n = self.nrows()
+        m = self.ncols()
+        if n != m:
+            raise ValueError("matrix must be square")
+        res = ca_mat(n, m)
+        invertible = libcalcium.ca_mat_log(res, self, self._ctx)
+        if invertible == T_TRUE:
+            return res
+        if invertible == T_FALSE:
+            raise ZeroDivisionError("singular matrix")
+        raise NotImplementedError("unable to compute matrix logarithm")
+
+    def exp(self):
+        """
+        Matrix exponential.
+
+            >>> ca_mat([[1,2],[0,3]]).exp()
+            ca_mat of size 2 x 2
+            [2.71828 {a where a = 2.71828 [Exp(1)]}, 17.3673 {b^3-b where a = 20.0855 [Exp(3)], b = 2.71828 [Exp(1)]}]
+            [                                     0,                           20.0855 {a where a = 20.0855 [Exp(3)]}]
+            >>> ca_mat([[1,2],[3,4]]).exp()[0,0]
+            51.9690 {(-a*c+11*a+b*c+11*b)/22 where a = 215.354 [Exp(5.37228 {(c+5)/2})], b = 0.689160 [Exp(-0.372281 {(-c+5)/2})], c = 5.74456 [c^2-33=0]}
+            >>> ca_mat([[0,0,1],[1,0,0],[0,1,0]]).exp().det()
+            1
+            >>> ca_mat([[0,1,0,0,0],[0,0,2,0,0],[0,0,0,3,0],[0,0,0,0,4],[0,0,0,0,0]]).exp()
+            ca_mat of size 5 x 5
+            [1, 1, 1, 1, 1]
+            [0, 1, 2, 3, 4]
+            [0, 0, 1, 3, 6]
+            [0, 0, 0, 1, 4]
+            [0, 0, 0, 0, 1]
+
+        This example currently fails (due to failure to compute
+        the exact Jordan decomposition internally):
+
+            >>> ca_mat([[0,0,1],[0,2,0],[-1,0,0]]).log().exp()
+            Traceback (most recent call last):
+              ...
+            NotImplementedError: unable to compute matrix exponential
+
+        """
+        n = self.nrows()
+        m = self.ncols()
+        if n != m:
+            raise ValueError("matrix must be square")
+        res = ca_mat(n, m)
+        if libcalcium.ca_mat_exp(res, self, self._ctx):
+            return res
+        raise NotImplementedError("unable to compute matrix exponential")
+
 
 class ca_vec:
     """
