@@ -197,16 +197,15 @@ cleanup:
 }
 
 
-
 /*
-    a has zero derivative wrt gen(0), ..., gen(var - 1)
+    a has zero derivative wrt gen(i) for all i for which vars_left[i] = 0
     gcd(a, derivative(a, gen(var))) = 1
 
     sep = false: just tack on a
     sep = true: make sure either
                 1. derivative(a, gen(var)) = 0, or
                 2. gcd(a, derivative(a, gen(i))) = 1
-            holds for the other factors for i > var
+            holds for the other factors for all i for which vars_left[i] != 0
 */
 static int _append_factor_sep(
     nmod_mpoly_factor_t f,
@@ -277,9 +276,9 @@ static int _append_factor_sep(
 
 
 int _nmod_mpoly_factor_separable(
-	nmod_mpoly_factor_t f,
-	const nmod_mpoly_t A,
-	const nmod_mpoly_ctx_t ctx,
+    nmod_mpoly_factor_t f,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_ctx_t ctx,
     int sep)
 {
 	int success;

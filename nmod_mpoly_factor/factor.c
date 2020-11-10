@@ -618,7 +618,7 @@ cleanup_less:
 
 /*
     Assume each factor in f is sep.
-    Replace f by and irreducible factorization.
+    Replace f by an irreducible factorization.
 */
 int nmod_mpoly_factor_irred(
     nmod_mpoly_factor_t f,
@@ -664,7 +664,7 @@ cleanup:
 
 /*
     append factor(f)^e to g
-    assumping f is compressed and content free
+    assuming f is compressed and content free
 */
 static int _compressed_content_to_irred(
     nmod_mpoly_factor_t g,
