@@ -11,6 +11,78 @@
 
 #include "nmod_mpoly_factor.h"
 
+/*
+    either give a non-trivial split a = f*g
+    or establish that a is primitive wrt all variables
+
+    return:
+        1: split a = f*g
+        0: a is primitve wrt all variables (f & g undefined)
+       -1: failed
+*/
+static int _split(
+    nmod_mpoly_t f,
+    nmod_mpoly_t g,
+    nmod_mpoly_t a, fmpz_t a_vars_left,
+    const nmod_mpoly_ctx_t ctx,
+    nmod_mpoly_univar_struct * u,   /* temp */
+    slong * vars)
+{
+    slong i, j, v;
+    slong nvars = ctx->minfo->nvars;
+    slong mvars = 0;
+
+    for (v = 0; v < nvars; v++)
+    {
+        if (!fmpz_tstbit(a_vars_left, v))
+            continue;
+
+        nmod_mpoly_to_univar(u + v, a, v, ctx);
+        vars[mvars] = v;
+        mvars++;
+    }
+
+    if (mvars < 1)
+        return 0;
+
+    /* sort vars by decreasing length */
+    for (i = 1; i < mvars; i++)
+        for (j = i; j > 0 && u[vars[j]].length > u[vars[j - 1]].length; j--)
+            SLONG_SWAP(vars[j], vars[j - 1]);
+
+    for (i = 0; i < mvars; i++)
+    {
+        v = vars[i];
+
+        FLINT_ASSERT(fmpz_tstbit(a_vars_left, v));
+        fmpz_clrbit(a_vars_left, v);
+
+        if (u[v].length < 2)
+        {
+            FLINT_ASSERT(u[v].length == 1);
+            FLINT_ASSERT(fmpz_is_zero(u[v].exps + 0));
+            continue;
+        }
+
+        if (!_nmod_mpoly_vec_content_mpoly(g, u[v].coeffs, u[v].length, ctx))
+            return -1;
+
+        if (g->length < 2)
+        {
+            FLINT_ASSERT(nmod_mpoly_is_one(g, ctx));
+            continue;
+        }
+
+        nmod_mpoly_divides(f, a, g, ctx);
+        FLINT_ASSERT(f->length > 1);
+
+        return 1;
+    }
+
+    return 0;
+}
+
+
 /* return factors that are primitive wrt each variable */
 int nmod_mpoly_factor_content(
     nmod_mpoly_factor_t f,
@@ -19,12 +91,10 @@ int nmod_mpoly_factor_content(
 {
     int success;
     slong nvars = ctx->minfo->nvars;
-    slong i, j, k, v;
-    nmod_mpoly_t c;
-    nmod_mpoly_univar_t u;
-    nmod_mpoly_factor_t g;
-    fmpz * pows;
-    slong * perm;
+    slong v;
+    nmod_mpoly_univar_struct * u;
+    nmod_mpoly_factor_t g; /* exponents are bitsets */
+    slong * vars;
 
     f->num = 0;
     if (nmod_mpoly_is_ui(A, ctx))
@@ -33,92 +103,76 @@ int nmod_mpoly_factor_content(
         return 1;
     }
 
+    vars = FLINT_ARRAY_ALLOC(nvars, slong);
+    nmod_mpoly_factor_init(g, ctx);
+    u = FLINT_ARRAY_ALLOC(nvars, nmod_mpoly_univar_struct);
+    for (v = 0; v < nvars; v++)
+        nmod_mpoly_univar_init(u + v, ctx);
+
+    /* remove leading coefficient */
     FLINT_ASSERT(A->length > 0);
 	f->constant = A->coeffs[0];
-	nmod_mpoly_factor_fit_length(f, 1, ctx);
-	nmod_mpoly_make_monic(f->poly + 0, A, ctx);
-	fmpz_one(f->exp + 0);
-	f->num = 1;
+	nmod_mpoly_factor_fit_length(g, nvars, ctx);
+	nmod_mpoly_make_monic(g->poly + 0, A, ctx);
 
-    nmod_mpoly_factor_init(g, ctx);
-    nmod_mpoly_univar_init(u, ctx);
-    nmod_mpoly_init(c, ctx);
-    pows = _fmpz_vec_init(nvars);
-
-    perm = FLINT_ARRAY_ALLOC(nvars, slong);
-    for (k = nvars - 1; k >= 0; k--)
-        perm[k] = k;
-
-    mpoly_degrees_ffmpz(pows, A->exps, A->length, A->bits, ctx->minfo);
-
-    for (i = 1; i < nvars; i++)
-        for (j = i; j > 0 && fmpz_cmp(pows + perm[j], pows + perm[j-1]) < 0; j--)
-            SLONG_SWAP(perm[j], perm[j - 1]);
-
-    _fmpz_vec_zero(pows, nvars);
-
-    for (k = ctx->minfo->nvars - 1; k >= 0; k--)
-    {
-        v = perm[k];
-
-        g->constant = f->constant;
-        g->num = 0;
-        for (j = 0; j < f->num; j++)
-        {
-            FLINT_ASSERT(fmpz_is_one(f->exp + j));
-
-            nmod_mpoly_to_univar(u, f->poly + j, v, ctx);
-            FLINT_ASSERT(u->length > 0);
-
-            fmpz_add(pows + v, pows + v, u->exps + u->length - 1);
-            _mpoly_gen_shift_right_fmpz(f->poly[j].exps, f->poly[j].bits,
-                    f->poly[j].length, v, u->exps + u->length - 1, ctx->minfo);
-
-            if (u->length < 2)
-            {
-                FLINT_ASSERT(u->length == 1);
-                nmod_mpoly_factor_fit_length(g, g->num + 1, ctx);
-                fmpz_swap(g->exp + g->num, f->exp + j);
-                nmod_mpoly_swap(g->poly + g->num, f->poly + j, ctx);
-                g->num += !nmod_mpoly_is_ui(g->poly + g->num, ctx);
-                continue;
-            }
-
-            success = _nmod_mpoly_vec_content_mpoly(c, u->coeffs, u->length, ctx);
-            if (!success)
-                goto cleanup;
-
-            if (nmod_mpoly_is_ui(c, ctx))
-            {
-                nmod_mpoly_factor_fit_length(g, g->num + 1, ctx);
-                fmpz_swap(g->exp + g->num, f->exp + j);
-                nmod_mpoly_swap(g->poly + g->num, f->poly + j, ctx);
-                g->num++;
-            }
-            else
-            {
-                nmod_mpoly_factor_fit_length(g, g->num + 2, ctx);
-                success = nmod_mpoly_divides(g->poly + g->num, f->poly + j, c, ctx);
-                FLINT_ASSERT(success);
-                nmod_mpoly_swap(g->poly + g->num + 1, c, ctx);
-                fmpz_one(g->exp + g->num);
-                fmpz_one(g->exp + g->num + 1);
-                g->num += 2;
-            }
-        }
-
-        nmod_mpoly_factor_swap(f, g, ctx);
-    }
-
+    /* remove monomial divisors */
+    mpoly_remove_var_powers(g->exp, g->poly[0].exps, g->poly[0].bits,
+                                                g->poly[0].length, ctx->minfo);
     for (v = 0; v < nvars; v++)
     {
-        if (fmpz_is_zero(pows + v))
+        if (fmpz_is_zero(g->exp + v))
             continue;
 
         nmod_mpoly_factor_fit_length(f, f->num + 1, ctx);
         nmod_mpoly_gen(f->poly + f->num, v, ctx);
-        fmpz_swap(f->exp + f->num, pows + v);
+        fmpz_swap(f->exp + f->num, g->exp + v);
         f->num++;
+    }
+
+    /* done if g->poly[0] is constant */
+    if (g->poly[0].length == 1)
+    {
+        success = 1;
+        goto cleanup;
+    }
+
+    /* g has length one and no variable has been checked yet */
+    fmpz_one(g->exp + 0);
+    fmpz_mul_2exp(g->exp + 0, g->exp + 0, nvars);
+    fmpz_sub_ui(g->exp + 0, g->exp + 0, 1);
+	g->num = 1;
+
+    while (g->num > 0)
+    {
+        slong t = g->num - 1;
+
+        nmod_mpoly_factor_fit_length(g, t + 3, ctx);
+        success = _split(g->poly + t + 2, g->poly + t + 1, g->poly + t,
+                                                     g->exp + t, ctx, u, vars);
+        if (success < 0)
+        {
+            success = 0;
+            goto cleanup;
+        }
+        else if (success == 0)
+        {
+            FLINT_ASSERT(!nmod_mpoly_is_ui(g->poly + t, ctx));
+
+            nmod_mpoly_factor_fit_length(f, f->num + 1, ctx);
+            nmod_mpoly_swap(f->poly + f->num, g->poly + t, ctx);
+            fmpz_one(f->exp + f->num);
+            f->num++;
+            g->num = t;
+        }
+        else
+        {
+            FLINT_ASSERT(!nmod_mpoly_is_ui(g->poly + t + 1, ctx));
+            FLINT_ASSERT(!nmod_mpoly_is_ui(g->poly + t + 2, ctx));
+
+            nmod_mpoly_swap(g->poly + t, g->poly + t + 2, ctx);
+            fmpz_set(g->exp + t + 1, g->exp + t);
+            g->num = t + 2;
+        }
     }
 
     success = 1;
@@ -126,10 +180,10 @@ int nmod_mpoly_factor_content(
 cleanup:
 
     nmod_mpoly_factor_clear(g, ctx);
-    nmod_mpoly_univar_clear(u, ctx);
-    nmod_mpoly_clear(c, ctx);
-    _fmpz_vec_clear(pows, nvars);
-    flint_free(perm);
+    for (v = 0; v < nvars; v++)
+        nmod_mpoly_univar_clear(u + v, ctx);
+    flint_free(u);
+    flint_free(vars);
 
     FLINT_ASSERT(!success || nmod_mpoly_factor_matches(A, f, ctx));
 

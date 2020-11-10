@@ -1397,6 +1397,9 @@ FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
 #define MPOLY_FACTOR_USE_ZIP  4
 #define MPOLY_FACTOR_USE_ALL  7
 
+FLINT_DLL void mpoly_remove_var_powers(fmpz * var_powers, ulong * Aexps,
+                     flint_bitcnt_t Abits, slong Alen, const mpoly_ctx_t mctx);
+
 FLINT_DLL slong _mpoly_compress_exps(slong * V, slong * D, slong * deg,
                                                   slong * S, slong n, slong l);
 
