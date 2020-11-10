@@ -562,6 +562,4 @@ Matrix functions
 
     This function uses the Jordan decomposition, and the branch of
     the matrix logarithm is defined by taking the principal values
-    of the logarithms of all eigenvalues. The matrix exponential always
-    exists, but computation can fail if computing the Jordan
-    decomposition fails.
+    of the logarithms of all eigenvalues.
