@@ -700,7 +700,7 @@ cleanup:
     return success;
 }
 
-static int _factor(
+int fq_nmod_mpoly_factor_algo(
     fq_nmod_mpoly_factor_t f,
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx,
@@ -820,7 +820,7 @@ int fq_nmod_mpoly_factor(
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ALL);
+    return fq_nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ALL);
 }
 
 
@@ -829,7 +829,7 @@ int fq_nmod_mpoly_factor_zassenhaus(
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZAS);
+    return fq_nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZAS);
 }
 
 
@@ -838,7 +838,7 @@ int fq_nmod_mpoly_factor_wang(
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_WANG);
+    return fq_nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_WANG);
 }
 
 
@@ -847,6 +847,6 @@ int fq_nmod_mpoly_factor_zippel(
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
+    return fq_nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
 

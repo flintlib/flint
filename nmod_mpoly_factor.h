@@ -441,6 +441,9 @@ FLINT_DLL int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
             const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
                                const nmod_mpoly_ctx_t ctx, flint_rand_t state);
 
+FLINT_DLL int nmod_mpoly_factor_algo(nmod_mpoly_factor_t f,
+          const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, unsigned int algo);
+
 FLINT_DLL int nmod_mpoly_factor_zassenhaus(nmod_mpoly_factor_t f,
                              const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 

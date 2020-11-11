@@ -710,7 +710,7 @@ cleanup:
 }
 
 
-static int _factor(
+int nmod_mpoly_factor_algo(
     nmod_mpoly_factor_t f,
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx,
@@ -830,7 +830,7 @@ int nmod_mpoly_factor(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ALL);
+    return nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ALL);
 }
 
 
@@ -839,7 +839,7 @@ int nmod_mpoly_factor_zassenhaus(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZAS);
+    return nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZAS);
 }
 
 
@@ -848,7 +848,7 @@ int nmod_mpoly_factor_wang(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_WANG);
+    return nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_WANG);
 }
 
 
@@ -857,6 +857,6 @@ int nmod_mpoly_factor_zippel(
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx)
 {
-    return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
+    return nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
 

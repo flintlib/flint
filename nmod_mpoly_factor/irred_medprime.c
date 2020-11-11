@@ -160,6 +160,51 @@ cleanup:
     return success;
 }
 
+/* the methods in the extended context want an irreducible factorization */
+static int _map_fac(
+    fq_zech_mpoly_factor_t eAfac,
+    const fq_zech_mpoly_ctx_t ectx,
+    const nmod_mpoly_factor_t Afac,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int success;
+    slong i, j;
+    fq_zech_mpoly_t t;
+    fq_zech_mpoly_factor_t tfac;
+
+    fq_zech_mpoly_init(t, ectx);
+    fq_zech_mpoly_factor_init(tfac, ectx);
+
+    fq_zech_set_ui(eAfac->constant, Afac->constant, ectx->fqctx);
+    eAfac->num = 0;
+    for (i = 0; i < Afac->num; i++)
+    {
+        _fq_zech_mpoly_set_nmod_mpoly(t, ectx, Afac->poly + i, ctx);
+        success = fq_zech_mpoly_factor(tfac, t, ectx);
+        if (!success)
+            goto cleanup;
+
+        FLINT_ASSERT(fq_zech_is_one(tfac->constant, ectx->fqctx));
+
+        fq_zech_mpoly_factor_fit_length(eAfac, eAfac->num + tfac->num, ectx);
+        for (j = 0; j < tfac->num; j++)
+        {
+            fq_zech_mpoly_swap(eAfac->poly + eAfac->num, tfac->poly + j, ectx);
+            fmpz_mul(eAfac->exp + eAfac->num, tfac->exp + j, Afac->exp + i);
+            eAfac->num++;
+        }
+    }
+
+    success = 1;
+
+cleanup:
+
+    fq_zech_mpoly_clear(t, ectx);
+    fq_zech_mpoly_factor_clear(tfac, ectx);
+
+    return success;
+}
+
 
 int nmod_mpoly_factor_irred_medprime_wang(
     nmod_mpolyv_t Af,
@@ -170,7 +215,6 @@ int nmod_mpoly_factor_irred_medprime_wang(
     flint_rand_t state)
 {
     int success;
-    slong i;
     const slong n = ctx->minfo->nvars - 1;
     fq_zech_mpoly_factor_t elcAfac;
     fq_zech_mpolyv_t eAf;
@@ -212,13 +256,7 @@ have_prime:
 
     _fq_zech_mpoly_set_nmod_mpoly(eA, ectx, A, ctx);
     _fq_zech_mpoly_set_nmod_mpoly(elcA, ectx, lcA, ctx);
-    fq_zech_set_ui(elcAfac->constant, lcAfac->constant, ectx->fqctx);
-    for (i = 0; i < lcAfac->num; i++)
-    {
-        fmpz_set(elcAfac->exp + i, lcAfac->exp + i);
-        _fq_zech_mpoly_set_nmod_mpoly(elcAfac->poly + i, ectx, lcAfac->poly + i, ctx);
-    }
-
+    _map_fac(elcAfac, ectx, lcAfac, ctx);
     success = fq_zech_mpoly_factor_irred_smprime_wang(eAf, eA, elcAfac, elcA, ectx, state);
     if (success == 0)
         goto choose_prime;
@@ -249,7 +287,6 @@ int nmod_mpoly_factor_irred_medprime_zippel(
     flint_rand_t state)
 {
     int success;
-    slong i;
     const slong n = ctx->minfo->nvars - 1;
     fq_zech_mpoly_factor_t elcAfac;
     fq_zech_mpolyv_t eAf;
@@ -291,13 +328,7 @@ have_prime:
 
     _fq_zech_mpoly_set_nmod_mpoly(eA, ectx, A, ctx);
     _fq_zech_mpoly_set_nmod_mpoly(elcA, ectx, lcA, ctx);
-    fq_zech_set_ui(elcAfac->constant, lcAfac->constant, ectx->fqctx);
-    for (i = 0; i < lcAfac->num; i++)
-    {
-        fmpz_set(elcAfac->exp + i, lcAfac->exp + i);
-        _fq_zech_mpoly_set_nmod_mpoly(elcAfac->poly + i, ectx, lcAfac->poly + i, ctx);
-    }
-
+    _map_fac(elcAfac, ectx, lcAfac, ctx);
     success = fq_zech_mpoly_factor_irred_smprime_zippel(eAf, eA, elcAfac, elcA, ectx, state);
     if (success == 0)
         goto choose_prime;
@@ -318,3 +349,4 @@ cleanup:
 
     return success;
 }
+

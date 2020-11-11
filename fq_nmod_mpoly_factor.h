@@ -531,6 +531,9 @@ FLINT_DLL int n_fq_polyu3_hlift(
     const fq_nmod_ctx_t ctx,
     n_poly_bpoly_stack_t St);
 
+FLINT_DLL int fq_nmod_mpoly_factor_algo(fq_nmod_mpoly_factor_t f,
+    const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx, unsigned int algo);
+
 FLINT_DLL int fq_nmod_mpoly_factor_wang(fq_nmod_mpoly_factor_t f,
                        const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 

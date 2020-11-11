@@ -180,6 +180,8 @@ FLINT_DLL void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(n_poly_t out_,
 FLINT_DLL void bad_n_fq_embed_sm_elem_to_lg(mp_limb_t * out,
                           const mp_limb_t * in, const bad_fq_nmod_embed_t emb);
 
+FLINT_DLL void bad_fq_nmod_embed_sm_elem_to_lg(fq_nmod_t out,
+                            const fq_nmod_t in, const bad_fq_nmod_embed_t emb);
 
 typedef struct bad_fq_nmod_mpoly_embed_chooser
 {

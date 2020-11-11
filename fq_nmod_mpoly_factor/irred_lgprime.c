@@ -13,33 +13,25 @@
 #include "fq_nmod_mpoly_factor.h"
 
 
-static void _map_sm_to_lg(
+static void _map_poly(
     fq_nmod_mpoly_t eA,
-    const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ectx,
+    const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx,
     const bad_fq_nmod_embed_t emb)
 {
     slong smd = fq_nmod_ctx_degree(ctx->fqctx);
     slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
     slong N = mpoly_words_per_exp(A->bits, ectx->minfo);
-    n_poly_t t;
     slong i;
 
     FLINT_ASSERT(eA != A);
 
-    n_poly_init(t);
-
     fq_nmod_mpoly_fit_length_reset_bits(eA, A->length, A->bits, ectx);
-    mpoly_copy_monomials(eA->exps, A->exps, N, A->length);
+    mpoly_copy_monomials(eA->exps, A->exps, A->length, N);
     for (i = 0; i < A->length; i++)
-    {
-        n_fq_poly_set_n_fq(t, A->coeffs + smd*i, emb->smctx);
-        bad_n_fq_embed_sm_to_lg(eA->coeffs + lgd*i, t, emb);
-    }
+        bad_n_fq_embed_sm_elem_to_lg(eA->coeffs + lgd*i, A->coeffs + smd*i, emb);
     eA->length = A->length;
-
-    n_poly_clear(t);
 }
 
 static void _frob_combine(
@@ -166,8 +158,7 @@ choose_prime:
 
 have_prime:
 
-    _map_sm_to_lg(eA, A, ectx, ctx, cur_emb);
-
+    _map_poly(eA, ectx, A, ctx, cur_emb);
     success = fq_nmod_mpoly_factor_irred_smprime_zassenhaus(eAf, eA, ectx, state);
     if (success == 0)
         goto choose_prime;
@@ -187,6 +178,54 @@ cleanup:
     return success;
 }
 
+
+/* the methods in the extended context want an irreducible factorization */
+static int _map_fac(
+    fq_nmod_mpoly_factor_t eAfac,
+    const fq_nmod_mpoly_ctx_t ectx,
+    const fq_nmod_mpoly_factor_t Afac,
+    const fq_nmod_mpoly_ctx_t ctx,
+    const bad_fq_nmod_embed_t emb)
+{
+    int success;
+    slong i, j;
+    fq_nmod_mpoly_t t;
+    fq_nmod_mpoly_factor_t tfac;
+
+    fq_nmod_mpoly_init(t, ectx);
+    fq_nmod_mpoly_factor_init(tfac, ectx);
+
+    bad_fq_nmod_embed_sm_elem_to_lg(eAfac->constant, Afac->constant, emb);
+    eAfac->num = 0;
+    for (i = 0; i < Afac->num; i++)
+    {
+        _map_poly(t, ectx, Afac->poly + i, ctx, emb);
+        success = fq_nmod_mpoly_factor(tfac, t, ectx);
+        if (!success)
+            goto cleanup;
+
+        FLINT_ASSERT(fq_nmod_is_one(tfac->constant, ectx->fqctx));
+
+        fq_nmod_mpoly_factor_fit_length(eAfac, eAfac->num + tfac->num, ectx);
+        for (j = 0; j < tfac->num; j++)
+        {
+            fq_nmod_mpoly_swap(eAfac->poly + eAfac->num, tfac->poly + j, ectx);
+            fmpz_mul(eAfac->exp + eAfac->num, tfac->exp + j, Afac->exp + i);
+            eAfac->num++;
+        }
+    }
+
+    success = 1;
+
+cleanup:
+
+    fq_nmod_mpoly_clear(t, ectx);
+    fq_nmod_mpoly_factor_clear(tfac, ectx);
+
+    return success;
+}
+
+
 int fq_nmod_mpoly_factor_irred_lgprime_wang(
     fq_nmod_mpolyv_t Af,
     const fq_nmod_mpoly_t A,
@@ -202,7 +241,6 @@ int fq_nmod_mpoly_factor_irred_lgprime_wang(
     bad_fq_nmod_mpoly_embed_chooser_t embc;
     bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
-    slong i;
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(_n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx)));
@@ -214,8 +252,6 @@ int fq_nmod_mpoly_factor_irred_lgprime_wang(
     fq_nmod_mpolyv_init(eAf, ectx);
     fq_nmod_mpoly_init(elcA, ectx);
     fq_nmod_mpoly_factor_init(elcAfac, ectx);
-    fq_nmod_mpoly_factor_fit_length(elcAfac, lcAfac->num, ectx);
-    elcAfac->num = lcAfac->num;
 
     goto have_prime;
 
@@ -230,21 +266,9 @@ choose_prime:
 
 have_prime:
 
-    _map_sm_to_lg(eA, A, ectx, ctx, cur_emb);
-    _map_sm_to_lg(elcA, lcA, ectx, ctx, cur_emb);
-    {
-    fq_nmod_poly_t tt;
-    fq_nmod_poly_init(tt, ctx->fqctx);
-    fq_nmod_poly_set_fq_nmod(tt, lcAfac->constant, ctx->fqctx);
-    bad_fq_nmod_embed_sm_to_lg(elcAfac->constant, tt, cur_emb);
-    fq_nmod_poly_clear(tt, ctx->fqctx);
-    }
-    for (i = 0; i < lcAfac->num; i++)
-    {
-        fmpz_set(elcAfac->exp + i, lcAfac->exp + i);
-        _map_sm_to_lg(elcAfac->poly + i, lcAfac->poly + i, ectx, ctx, cur_emb);
-    }
-
+    _map_poly(eA, ectx, A, ctx, cur_emb);
+    _map_poly(elcA, ectx, lcA, ctx, cur_emb);
+    _map_fac(elcAfac, ectx, lcAfac, ctx, cur_emb);
     success = fq_nmod_mpoly_factor_irred_smprime_wang(eAf, eA, elcAfac, elcA, ectx, state);
     if (success == 0)
         goto choose_prime;
@@ -282,7 +306,6 @@ int fq_nmod_mpoly_factor_irred_lgprime_zippel(
     bad_fq_nmod_mpoly_embed_chooser_t embc;
     bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
-    slong i;
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(_n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx)));
@@ -294,8 +317,6 @@ int fq_nmod_mpoly_factor_irred_lgprime_zippel(
     fq_nmod_mpolyv_init(eAf, ectx);
     fq_nmod_mpoly_init(elcA, ectx);
     fq_nmod_mpoly_factor_init(elcAfac, ectx);
-    fq_nmod_mpoly_factor_fit_length(elcAfac, lcAfac->num, ectx);
-    elcAfac->num = lcAfac->num;
 
     goto have_prime;
 
@@ -310,21 +331,9 @@ choose_prime:
 
 have_prime:
 
-    _map_sm_to_lg(eA, A, ectx, ctx, cur_emb);
-    _map_sm_to_lg(elcA, lcA, ectx, ctx, cur_emb);
-    {
-    fq_nmod_poly_t tt;
-    fq_nmod_poly_init(tt, ctx->fqctx);
-    fq_nmod_poly_set_fq_nmod(tt, lcAfac->constant, ctx->fqctx);
-    bad_fq_nmod_embed_sm_to_lg(elcAfac->constant, tt, cur_emb);
-    fq_nmod_poly_clear(tt, ctx->fqctx);
-    }
-    for (i = 0; i < lcAfac->num; i++)
-    {
-        fmpz_set(elcAfac->exp + i, lcAfac->exp + i);
-        _map_sm_to_lg(elcAfac->poly + i, lcAfac->poly + i, ectx, ctx, cur_emb);
-    }
-
+    _map_poly(eA, ectx, A, ctx, cur_emb);
+    _map_poly(elcA, ectx, lcA, ctx, cur_emb);
+    _map_fac(elcAfac, ectx, lcAfac, ctx, cur_emb);
     success = fq_nmod_mpoly_factor_irred_smprime_zippel(eAf, eA, elcAfac, elcA, ectx, state);
     if (success == 0)
         goto choose_prime;
