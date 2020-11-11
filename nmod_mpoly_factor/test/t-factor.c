@@ -86,18 +86,25 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a;
-        const char * vars[] = {"x", "y"};
+        const char * vars[] = {"x", "y", "z"};
 
-        nmod_mpoly_ctx_init(ctx, 2, ORD_LEX, 2);
+        nmod_mpoly_ctx_init(ctx, 3, ORD_LEX, 2);
         nmod_mpoly_init(a, ctx);
 
+        /* test irreducibility test */
         nmod_mpoly_set_str_pretty(a,
                 "x^4120+x^4118*y^2+x^3708*y^400+x^3706*y^402+x^2781*y^1300+"
                 "x^2779*y^1302+x^1339*y^2700+x^927*y^3100+y^4000+x^7172*y^4167+"
                 "x^8349*y^4432+x^8347*y^4434+x^6760*y^4567+x^5833*y^5467+"
                 "x^5568*y^7132+x^11401*y^8599", vars, ctx);
-
         check_omega(2, 2, a, ctx);
+
+        /* test frobenius recombination */
+        nmod_mpoly_set_str_pretty(a, "(1+x^2+y+x*y+y^2+z+x*z+y*z+z^2)*"
+                "(1+x+x^2+x^3+y^2+x*y^2+y^3+y*z+x*y*z+z^2+x*z^2+y*z^2+z^3)*"
+                "(1+x+x^4+x^5+y^3+x^2*y^3+y^5+y*z+x*y*z+x^2*y*z+x^3*y*z+y^3*z+"
+                "x*y^3*z+y*z^2+x^2*y*z^2+z^3+x^2*z^3+y^2*z^3+z^5)", vars, ctx);
+        check_omega(3, 3, a, ctx);
 
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_ctx_clear(ctx);

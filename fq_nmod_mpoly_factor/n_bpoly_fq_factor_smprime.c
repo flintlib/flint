@@ -1249,7 +1249,7 @@ got_alpha:
                                          local_fac->exp[i]);
     zassenhaus_prune_end_add_factors(zas);
 
-    /* if multiple factors, get new alpha */
+    /* check for irreducibility */
     if ((r < 2 && local_fac->exp[0] == 1) ||
          zassenhaus_prune_must_be_irreducible(zas))
     {
