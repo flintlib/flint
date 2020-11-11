@@ -1237,7 +1237,7 @@ static int _try_hensel(
     fq_nmod_mpoly_ctx_t lctx;
     fq_nmod_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
     fq_nmod_mpoly_t Ac, Bc, Gc, Abarc, Bbarc;
-    slong max_degree;
+    slong max_deg;
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
@@ -1251,15 +1251,15 @@ static int _try_hensel(
 
     fq_nmod_mpoly_ctx_init(lctx, m, ORD_LEX, ctx->fqctx);
 
-    max_degree = 0;
+    max_deg = 0;
     for (i = 0; i < m; i++)
     {
         k = I->hensel_perm[i];
-        max_degree = FLINT_MAX(max_degree, I->Adeflate_deg[k]);
-        max_degree = FLINT_MAX(max_degree, I->Bdeflate_deg[k]);
+        max_deg = FLINT_MAX(max_deg, I->Adeflate_deg[k]);
+        max_deg = FLINT_MAX(max_deg, I->Bdeflate_deg[k]);
     }
 
-    wbits = 1 + FLINT_BIT_COUNT(max_degree);
+    wbits = 1 + FLINT_BIT_COUNT(max_deg);
     wbits = mpoly_fix_bits(wbits, lctx->minfo);
     FLINT_ASSERT(wbits <= FLINT_BITS);
 
@@ -1299,7 +1299,9 @@ static int _try_hensel(
 
     fq_nmod_mpoly_repack_bits_inplace(Al, wbits, lctx);
     fq_nmod_mpoly_repack_bits_inplace(Bl, wbits, lctx);
-    success = fq_nmod_mpolyl_gcd_hensel_smprime(Gl, Abarl, Bbarl, Al, Bl, lctx);
+
+    max_deg = I->Gdeflate_deg_bound[I->hensel_perm[0]];
+    success = fq_nmod_mpolyl_gcd_hensel_smprime(Gl, max_deg, Abarl, Bbarl, Al, Bl, lctx);
     if (!success)
         goto cleanup;
 

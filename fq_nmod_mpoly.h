@@ -895,7 +895,7 @@ FLINT_DLL int fq_nmod_mpolyl_gcd_zippel_lgprime(
     const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int fq_nmod_mpolyl_gcd_hensel_smprime(
-    fq_nmod_mpoly_t G,
+    fq_nmod_mpoly_t G, slong Gdeg,
     fq_nmod_mpoly_t Abar,
     fq_nmod_mpoly_t Bbar,
     const fq_nmod_mpoly_t A,

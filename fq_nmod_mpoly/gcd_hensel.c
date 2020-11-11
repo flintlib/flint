@@ -34,7 +34,7 @@
     remove content from the lift of g to get G and divide to get Abar and Bbar
 */
 int fq_nmod_mpolyl_gcd_hensel_smprime(
-    fq_nmod_mpoly_t G,
+    fq_nmod_mpoly_t G, slong Gdeg,
     fq_nmod_mpoly_t Abar,
     fq_nmod_mpoly_t Bbar,
     const fq_nmod_mpoly_t A,
@@ -166,7 +166,19 @@ got_alpha:
         success = 1;
         goto cleanup;
     }
-    else if (gdegx == Adegx)
+    else if (gdegx > Gdeg)
+    {
+        goto next_alpha;
+    }
+    else if (gdegx < Gdeg)
+    {
+        Gdeg = gdegx;
+        goto next_alpha;
+    }
+
+    /* the degbound gdegx (== Gdeg) has at least two witnesses now */
+
+    if (gdegx == Adegx)
     {
         if (fq_nmod_mpoly_divides(Bbar, B, A, ctx))
         {

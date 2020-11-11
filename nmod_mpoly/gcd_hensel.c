@@ -34,7 +34,7 @@
     remove content from the lift of g to get G and divide to get Abar and Bbar
 */
 int nmod_mpolyl_gcd_hensel_smprime(
-    nmod_mpoly_t G,
+    nmod_mpoly_t G, slong Gdeg, /* upperbound on deg_X(G) */
     nmod_mpoly_t Abar,
     nmod_mpoly_t Bbar,
     const nmod_mpoly_t A,
@@ -52,7 +52,7 @@ int nmod_mpolyl_gcd_hensel_smprime(
     nmod_mpoly_struct * Glcs, * Hlcs;
     nmod_mpoly_struct Hfac[2], Htfac[2];
     slong * Hdegs;
-    slong Adegx, Bdegx, gdegx, prev_gdegx;
+    slong Adegx, Bdegx, gdegx;
     nmod_mpoly_t t1, t2, g, abar, bbar, hbar;
     flint_rand_t state;
 
@@ -104,7 +104,14 @@ int nmod_mpolyl_gcd_hensel_smprime(
 
     alphas_tries_remaining = 10;
 
-    prev_gdegx = -1;
+    /* try all zeros first */
+    for (i = 0; i < n; i++)
+    {
+        prev_alphas[i] = ctx->ffinfo->mod.n; /* no previous at this point */
+        alphas[i] = 0;
+    }
+
+    goto got_alpha;
 
 next_alpha:
 
@@ -115,48 +122,29 @@ next_alpha:
 	}
 
     for (i = 0; i < n; i++)
-        alphas[i] = n_urandint(state, ctx->ffinfo->mod.n);
+    {
+        do {
+            alphas[i] = n_urandint(state, ctx->ffinfo->mod.n);
+        } while (alphas[i] == prev_alphas[i]);
+    }
+
+got_alpha:
 
     /* ensure deg_X do not drop under evaluation */
     Adegx = nmod_mpoly_degree_si(A, 0, ctx);
     Bdegx = nmod_mpoly_degree_si(B, 0, ctx);
-	for (i = n - 1; i >= 0; i--)
-	{
-        int tries_remaining = 1;
-
-    try_again:
-
-		nmod_mpoly_evaluate_one_ui(Aevals + i, i == n - 1 ? A :
+    for (i = n - 1; i >= 0; i--)
+    {
+        nmod_mpoly_evaluate_one_ui(Aevals + i, i == n - 1 ? A :
                                         Aevals + i + 1, i + 1, alphas[i], ctx);
-		nmod_mpoly_evaluate_one_ui(Bevals + i, i == n - 1 ? B :
+        nmod_mpoly_evaluate_one_ui(Bevals + i, i == n - 1 ? B :
                                         Bevals + i + 1, i + 1, alphas[i], ctx);
-
-		if (Adegx != nmod_mpoly_degree_si(Aevals + i, 0, ctx) ||
+        if (Adegx != nmod_mpoly_degree_si(Aevals + i, 0, ctx) ||
             Bdegx != nmod_mpoly_degree_si(Bevals + i, 0, ctx))
         {
-            /* try once to correct this alpha[i] */
-            if (--tries_remaining < 0)
-                goto next_alpha;
-
-            if (--alphas_tries_remaining < 0)
-            {
-	            success = 0;
-                goto cleanup;
-            }
-
-            goto try_again;
+            goto next_alpha;
         }
 	}
-
-    if (prev_gdegx >= 0)
-    {
-        int same = 1;
-        for (i = 0; i < n; i++)
-            same &= (alphas[i] == prev_alphas[i]);
-
-        if (same)
-            goto next_alpha;
-    }
 
     /* univariate gcd */
     success = nmod_mpoly_gcd_cofactors(g, abar, bbar,
@@ -168,30 +156,29 @@ next_alpha:
 
     gdegx = nmod_mpoly_degree_si(g, 0, ctx);
 
-    if (prev_gdegx < 0)
-    {
-        prev_gdegx = gdegx;
-        for (i = 0; i < n; i++)
-            prev_alphas[i] = alphas[i];
-
-        goto next_alpha;
-    }
-
     if (gdegx == 0)
     {
+        /* G is trivial */
         nmod_mpoly_set(Abar, A, ctx);
         nmod_mpoly_set(Bbar, B, ctx);
         nmod_mpoly_one(G, ctx);
         success = 1;
         goto cleanup;
     }
-
-    if (gdegx < prev_gdegx)
+    else if (gdegx > Gdeg)
     {
-        prev_gdegx = gdegx;
-        prev_gdegx = -1;
         goto next_alpha;
     }
+    else if (gdegx < Gdeg)
+    {
+        Gdeg = gdegx;
+        for (i = 0; i < n; i++)
+            prev_alphas[i] = alphas[i];
+
+        goto next_alpha;
+    }
+
+    /* the degbound gdegx (== Gdeg) has at least two witnesses now */
 
     if (gdegx == Adegx)
     {
@@ -450,7 +437,7 @@ cleanup:
 
 
 int nmod_mpolyl_gcd_hensel_medprime(
-    nmod_mpoly_t G,
+    nmod_mpoly_t G, slong Gdeg, /* upperbound on deg_X(G) */
     nmod_mpoly_t Abar,
     nmod_mpoly_t Bbar,
     const nmod_mpoly_t smA,
@@ -601,13 +588,26 @@ next_alpha:
 
     if (gdegx == 0)
     {
+        /* G is trivial */
         nmod_mpoly_set(Abar, smA, smctx);
         nmod_mpoly_set(Bbar, smB, smctx);
         nmod_mpoly_one(G, smctx);
         success = 1;
         goto cleanup;
     }
-    else if (gdegx == Adegx)
+    else if (gdegx > Gdeg)
+    {
+        goto next_alpha;
+    }
+    else if (gdegx < Gdeg)
+    {
+        Gdeg = gdegx;
+        goto next_alpha;
+    }
+
+    /* the degbound gdegx (== Gdeg) has at least two witnesses now */
+
+    if (gdegx == Adegx)
     {
         if (nmod_mpoly_divides(Bbar, smB, smA, smctx))
         {
