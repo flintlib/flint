@@ -78,6 +78,11 @@ Conversions
 
     Sets *dest* to *src*. The operands must have identical dimensions.
 
+.. function:: void ca_mat_set_ca(ca_mat_t mat, const ca_t c, ca_ctx_t ctx)
+
+    Sets *mat* to the matrix with the scalar *c* on the main diagonal
+    and zeros elsewhere.
+
 Random generation
 -------------------------------------------------------------------------------
 
@@ -234,6 +239,17 @@ Arithmetic
               void ca_mat_div_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
 
     Sets *B* to *A* divided by the scalar *c*.
+
+.. function:: void ca_mat_add_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
+              void ca_mat_sub_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
+
+    Sets *B* to *A* plus or minus the scalar *c* (interpreted as a diagonal matrix).
+
+.. function:: void ca_mat_addmul_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
+              void ca_mat_submul_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx)
+
+    Sets the matrix *B* to *B* plus (or minus) the matrix *A* multiplied by the scalar *c*.
+
 
 Powers
 -------------------------------------------------------------------------------

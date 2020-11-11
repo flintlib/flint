@@ -101,6 +101,7 @@ ca_mat_is_square(const ca_mat_t mat)
 void ca_mat_set(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
 void ca_mat_set_fmpz_mat(ca_mat_t dest, const fmpz_mat_t src, ca_ctx_t ctx);
 void ca_mat_set_fmpq_mat(ca_mat_t dest, const fmpq_mat_t src, ca_ctx_t ctx);
+void ca_mat_set_ca(ca_mat_t y, const ca_t x, ca_ctx_t ctx);
 
 /* Random generation */
 
@@ -136,6 +137,11 @@ void ca_mat_conjugate(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
 void ca_mat_conjugate_transpose(ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
 
 /* Arithmetic */
+
+void ca_mat_add_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
+void ca_mat_sub_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
+void ca_mat_addmul_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
+void ca_mat_submul_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
 
 void ca_mat_neg(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
 void ca_mat_add(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);

@@ -154,9 +154,11 @@ Degree and leading coefficient
 
 .. function:: void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
 
+.. function:: void ca_poly_reverse(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx)
+
     Sets *res* to the reversal of *poly* considered as a polynomial
-    of length *n*, zero-padding if needed. Assumes that *len*
-    is positive and less than or equal to *n*.
+    of length *n*, zero-padding if needed. The underscore method
+    assumes that *len* is positive and less than or equal to *n*.
 
 Comparisons
 -------------------------------------------------------------------------------
@@ -178,6 +180,18 @@ Comparisons
 
 Arithmetic
 -------------------------------------------------------------------------------
+
+.. function:: void _ca_poly_shift_left(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
+              void ca_poly_shift_left(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx)
+
+    Sets *res* to *poly* shifted *n* coefficients to the left; that is,
+    multiplied by `x^n`.
+
+.. function:: void _ca_poly_shift_right(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
+              void ca_poly_shift_right(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx)
+
+    Sets *res* to *poly* shifted *n* coefficients to the right; that is,
+    divided by `x^n`.
 
 .. function:: void ca_poly_neg(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx)
 

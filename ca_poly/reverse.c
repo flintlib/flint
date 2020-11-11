@@ -39,3 +39,20 @@ _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
             ca_set(res + (n - len) + i, poly + (len - 1) - i, ctx);
     }
 }
+
+void
+ca_poly_reverse(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx)
+{
+    slong len = FLINT_MIN(n, poly->length);
+
+    if (len == 0)
+    {
+        ca_poly_zero(res, ctx);
+        return;
+    }
+
+    ca_poly_fit_length(res, n, ctx);
+    _ca_poly_reverse(res->coeffs, poly->coeffs, len, n, ctx);
+    _ca_poly_set_length(res, n, ctx);
+    _ca_poly_normalise(res, ctx);
+}

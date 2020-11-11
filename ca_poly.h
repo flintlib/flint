@@ -127,7 +127,9 @@ void ca_poly_printn(const ca_poly_t poly, slong digits, ca_ctx_t ctx);
 
 int ca_poly_is_proper(const ca_poly_t poly, ca_ctx_t ctx);
 int ca_poly_make_monic(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
+
 void _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx);
+void ca_poly_reverse(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx);
 
 /* Comparisons */
 
@@ -138,6 +140,12 @@ truth_t ca_poly_check_is_zero(const ca_poly_t poly, ca_ctx_t ctx);
 truth_t ca_poly_check_is_one(const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Arithmetic */
+
+void _ca_poly_shift_left(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx);
+void ca_poly_shift_left(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx);
+
+void _ca_poly_shift_right(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx);
+void ca_poly_shift_right(ca_poly_t res, const ca_poly_t poly, slong n, ca_ctx_t ctx);
 
 void ca_poly_neg(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx);
 
