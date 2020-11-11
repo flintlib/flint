@@ -240,6 +240,11 @@ ca_mat_sqr(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
 
 void ca_mat_pow_ui_binexp(ca_mat_t B, const ca_mat_t A, ulong exp, ca_ctx_t ctx);
 
+/* Polynomial evaluation */
+
+void _ca_mat_ca_poly_evaluate(ca_mat_t y, ca_srcptr poly, slong len, const ca_mat_t x, ca_ctx_t ctx);
+void ca_mat_ca_poly_evaluate(ca_mat_t res, const ca_poly_t f, const ca_mat_t a, ca_ctx_t ctx);
+
 /* Trace */
 
 void ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx);

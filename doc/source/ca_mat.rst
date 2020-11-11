@@ -264,6 +264,15 @@ Powers
     binary exponentiation.
 
 
+Polynomial evaluation
+-------------------------------------------------------------------------------
+
+.. function:: void _ca_mat_ca_poly_evaluate(ca_mat_t res, ca_srcptr poly, slong len, const ca_mat_t A, ca_ctx_t ctx)
+              void ca_mat_ca_poly_evaluate(ca_mat_t res, const ca_poly_t poly, const ca_mat_t A, ca_ctx_t ctx)
+
+    Sets *res* to `f(A)` where *f* is the polynomial given by *poly*
+    and *A* is a square matrix. Uses the Paterson-Stockmeyer algorithm.
+
 Gaussian elimination and LU decomposition
 -------------------------------------------------------------------------------
 
