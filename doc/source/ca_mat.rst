@@ -469,9 +469,15 @@ Determinant and trace
     unpredictably on the structure of the matrix.
 
 .. function:: void ca_mat_adjugate_cofactor(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+              void ca_mat_adjugate_charpoly(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
+              void ca_mat_adjugate(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
 
     Sets *adj* to the adjuate matrix of *A* and *det* to the determinant
-    of *A*, both computed simultaneously using cofactor expansion.
+    of *A*, both computed simultaneously.
+    The *cofactor* version uses cofactor expansion.
+    The *charpoly* version computes and
+    evaluates the characteristic polynomial.
+    The default version uses an automatic algorithm choice.
 
 Characteristic polynomial
 -------------------------------------------------------------------------------
