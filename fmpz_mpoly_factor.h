@@ -524,20 +524,13 @@ FLINT_DLL int fmpz_mpoly_evaluate_rest_except_one(
 
 /****************************************************************************/
 
-void fmpz_mpoly_compression_do(
-    fmpz_mpoly_t L,
-    const fmpz_mpoly_ctx_t Lctx,
-    fmpz * Acoeffs,
-    slong Alen,
-    mpoly_compression_t M);
+FLINT_DLL void fmpz_mpoly_compression_do(fmpz_mpoly_t L,
+                     const fmpz_mpoly_ctx_t Lctx, fmpz * Acoeffs, slong Alen,
+                                                        mpoly_compression_t M);
 
-void fmpz_mpoly_compression_undo(
-    fmpz_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const fmpz_mpoly_ctx_t Actx,
-    fmpz_mpoly_t L,
-    const fmpz_mpoly_ctx_t Lctx,
-    mpoly_compression_t M);
+FLINT_DLL void fmpz_mpoly_compression_undo(fmpz_mpoly_t A, flint_bitcnt_t Abits,
+    const fmpz_mpoly_ctx_t Actx, fmpz_mpoly_t L, const fmpz_mpoly_ctx_t Lctx,
+                                                        mpoly_compression_t M);
 
 #ifdef __cplusplus
 }
