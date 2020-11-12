@@ -201,7 +201,7 @@ static int _factor_irred_compressed(
     }
     else
     {
-        int zero_ok, trying_zero, image_count, sqrfree;
+        int zero_ok, trying_zero, image_count, sqrfree, irr_fac;
         ulong alpha_modulus;
         double density;
         fmpz * alpha;
@@ -247,7 +247,8 @@ got_alpha:
         {
             if (uf->exp[i] != 1)
                 sqrfree = 0;
-            zassenhaus_prune_add_factor(Z, fmpz_poly_degree(uf->p + i), uf->exp[i]);
+            zassenhaus_prune_add_factor(Z, fmpz_poly_degree(uf->p + i),
+                                           uf->exp[i]);
         }
         zassenhaus_prune_end_add_factors(Z);
 
@@ -279,64 +280,54 @@ done_alpha:
 
         success = 0;
 
-        if (algo & (MPOLY_FACTOR_USE_WANG | MPOLY_FACTOR_USE_ZIP))
+        if (!(algo & (MPOLY_FACTOR_USE_WANG | MPOLY_FACTOR_USE_ZIP)))
+            goto try_zassenhaus;
+
+        _fmpz_mpoly_get_lead0(lcA, A, ctx);
+        if (!fmpz_mpoly_factor_squarefree(lcAf, lcA, ctx))
+            goto try_zassenhaus;
+
+        irr_fac = 1;
+        for (i = 0; i < lcAf->num; i++)
+            irr_fac = irr_fac && lcAf->poly[i].length < 4;
+
+        irr_fac = irr_fac && fmpz_mpoly_factor_irred(lcAf, ctx, algo);
+
+        if (!(algo & MPOLY_FACTOR_USE_ZIP))
         {
-            _fmpz_mpoly_get_lead0(lcA, A, ctx);
-
-            if (fmpz_mpoly_factor_squarefree(lcAf, lcA, ctx))
-            {
-                int irr_fac = 1;
-                for (i = 0; i < lcAf->num; i++)
-                    irr_fac = irr_fac && lcAf->poly[i].length < 4;
-
-                irr_fac = irr_fac && fmpz_mpoly_factor_irred(lcAf, ctx, algo);
-
-                if (!(algo & MPOLY_FACTOR_USE_ZIP))
-                {
-                    success = fmpz_mpoly_factor_irred_wang(Af, A,
+            success = fmpz_mpoly_factor_irred_wang(Af, A,
                                          lcAf, irr_fac, lcA, ctx, state, Z, 1);
-                }
-                else if (!(algo & MPOLY_FACTOR_USE_WANG))
-                {
-                    success = fmpz_mpoly_factor_irred_zippel(Af, A,
-                                            lcAf, irr_fac, lcA, ctx, state, Z);
-                    FLINT_ASSERT(success);
-                }
-                else
-                {
-                    if (density > 0.002 && zero_ok)
-                    {
-                        success = fmpz_mpoly_factor_irred_wang(Af, A,
-                                         lcAf, irr_fac, lcA, ctx, state, Z, 0);
-                    }
-
-                    if (success == 0 && density > 0.04)
-                    {
-                        success = fmpz_mpoly_factor_irred_wang(Af, A,
-                                         lcAf, irr_fac, lcA, ctx, state, Z, 1);
-                    }
-
-                    if (success == 0)
-                    {
-                        success = fmpz_mpoly_factor_irred_zippel(Af, A,
-                                            lcAf, irr_fac, lcA, ctx, state, Z);
-                    }
-
-                    if (success == 0)
-                    {
-                        success = fmpz_mpoly_factor_irred_wang(Af, A,
-                                         lcAf, irr_fac, lcA, ctx, state, Z, 1);
-                    }
-                }
-            }
         }
+        else if (!(algo & MPOLY_FACTOR_USE_WANG))
+        {
+            success = fmpz_mpoly_factor_irred_zippel(Af, A,
+                                            lcAf, irr_fac, lcA, ctx, state, Z);
+        }
+        else
+        {
+            if (density > 0.002 && zero_ok)
+                success = fmpz_mpoly_factor_irred_wang(Af, A,
+                                         lcAf, irr_fac, lcA, ctx, state, Z, 0);
+
+            if (success == 0 && density > 0.04)
+                success = fmpz_mpoly_factor_irred_wang(Af, A,
+                                         lcAf, irr_fac, lcA, ctx, state, Z, 1);
+
+            if (success == 0)
+                success = fmpz_mpoly_factor_irred_zippel(Af, A,
+                                            lcAf, irr_fac, lcA, ctx, state, Z);
+
+            if (success == 0)
+                success = fmpz_mpoly_factor_irred_wang(Af, A,
+                                         lcAf, irr_fac, lcA, ctx, state, Z, 1);
+        }
+
+    try_zassenhaus:
 
         if (algo & MPOLY_FACTOR_USE_ZAS)
         {
             if (success == 0)
-            {
                 success = fmpz_mpoly_factor_irred_zassenhaus(Af, A, ctx, Z);
-            }
         }
 
         success = (success > 0);

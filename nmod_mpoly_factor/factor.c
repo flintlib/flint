@@ -11,10 +11,12 @@
 
 #include "nmod_mpoly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
+#include "long_extras.h"
 
 
-static void _deflate(
+static slong _deflate(
     nmod_mpoly_t A,
+    slong tot_deg,
     const ulong * strides,
     const slong * perm,
     const nmod_mpoly_ctx_t ctx)
@@ -32,7 +34,7 @@ static void _deflate(
             goto do_it;
     }
 
-    return;
+    return tot_deg;
 
 do_it:
 
@@ -41,8 +43,11 @@ do_it:
     texps = (ulong *) TMP_ALLOC(2*nvars*sizeof(ulong));
     sexps = texps + nvars;
 
+    tot_deg = 1;
     for (i = 0; i < A->length; i++)
     {
+        slong this_deg = 0;
+
         mpoly_get_monomial_ui(texps, A->exps + N*i, bits, ctx->minfo);
 
         for (j = 0; j < nvars; j++)
@@ -52,7 +57,12 @@ do_it:
         }
 
         for (j = 0; j < nvars; j++)
+        {
             sexps[j] = texps[perm[j]];
+            this_deg += sexps[j];
+        }
+
+        tot_deg = FLINT_MAX(tot_deg, this_deg);
 
         mpoly_set_monomial_ui(A->exps + N*i, sexps, bits, ctx->minfo);
     }
@@ -62,7 +72,7 @@ do_it:
     nmod_mpoly_sort_terms(A, ctx);
     nmod_mpoly_make_monic(A, A, ctx);
 
-    return;
+    return tot_deg;
 }
 
 
@@ -138,7 +148,7 @@ static int _factor_irred_compressed(
     unsigned int algo)
 {
     int success;
-    slong i, j;
+    slong i, j, tot_deg;
     slong nvars = ctx->minfo->nvars;
     slong * perm;
     ulong * strides, * texps;
@@ -194,15 +204,26 @@ static int _factor_irred_compressed(
             perm[j] = j;
         }
 
+        tot_deg = 1;
         for (i = 0; i < A->length; i++)
         {
+            slong this_deg = 0;
 	        mpoly_get_monomial_ui(texps, A->exps + N*i, Abits, ctx->minfo);
             for (j = 0; j < nvars; j++)
+            {
+                if (z_add_checked(&this_deg, this_deg, texps[j]))
+                {
+                    success = 0;
+                    goto cleanup;
+                }
                 strides[j] = n_gcd(strides[j], texps[j]);
+            }
+
+            tot_deg = FLINT_MAX(tot_deg, this_deg);
         }
     }
 
-    /* find permutation with gcd(A, derivative(A, gen(perm[i]))) = 1 */
+    /* find permutation with gcd(A, derivative(A, gen(perm[0]))) = 1 */
     for (i = 0; i < nvars; i++)
     {
         if (strides[i] == 1)
@@ -284,7 +305,7 @@ static int _factor_irred_compressed(
         nmod_mpoly_init(lcA, ctx);
         nmod_mpoly_factor_init(lcAf, ctx);
 
-        _deflate(A, strides, perm, ctx);
+        tot_deg = _deflate(A, tot_deg, strides, perm, ctx);
 
         #if FLINT_WANT_ASSERT
         {
@@ -299,37 +320,99 @@ static int _factor_irred_compressed(
 
         success = 0;
 
-        if (algo & (MPOLY_FACTOR_USE_WANG | MPOLY_FACTOR_USE_ZIP))
+        if (!(algo & (MPOLY_FACTOR_USE_WANG | MPOLY_FACTOR_USE_ZIP)))
+            goto try_zassenhaus;
+
+        /* TODO lcc_kaltofen */
+        _nmod_mpoly_get_lead0(lcA, A, ctx);
+        if (!nmod_mpoly_factor(lcAf, lcA, ctx))
+            goto try_zassenhaus;
+
+        if (!(algo & MPOLY_FACTOR_USE_ZIP))
         {
-            _nmod_mpoly_get_lead0(lcA, A, ctx);
-            if (nmod_mpoly_factor(lcAf, lcA, ctx))
+            if (success == 0)
+                success = nmod_mpoly_factor_irred_smprime_wang(
+                                                Af, A, lcAf, lcA, ctx, state);
+            if (success == 0)
+                success = nmod_mpoly_factor_irred_medprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
+            if (success == 0)
+                success = nmod_mpoly_factor_irred_lgprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
+        }
+        else if (!(algo & MPOLY_FACTOR_USE_WANG))
+        {
+            if (success == 0)
+                success = nmod_mpoly_factor_irred_smprime_zippel(
+                                                 Af, A, lcAf, lcA, ctx, state);
+            if (success == 0)
+                success = nmod_mpoly_factor_irred_medprime_zippel(
+                                                 Af, A, lcAf, lcA, ctx, state);
+            if (success == 0)
+                success = nmod_mpoly_factor_irred_lgprime_zippel(
+                                                 Af, A, lcAf, lcA, ctx, state);
+        }
+        else
+        {
+            double tdensity;
+            fmpz_t x;
+            fmpz_init(x);
+            fmpz_bin_uiui(x, (ulong)tot_deg + nvars, nvars);
+            tdensity = A->length/fmpz_get_d(x);
+            fmpz_clear(x);
+
+            if (tdensity > 0.005)
             {
-                if (algo & MPOLY_FACTOR_USE_ZIP)
-                {
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_smprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_medprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
+                if (success == 0)
                     success = nmod_mpoly_factor_irred_smprime_zippel(
                                                  Af, A, lcAf, lcA, ctx, state);
-                    if (success == 0)
-                        success = nmod_mpoly_factor_irred_medprime_zippel(
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_medprime_zippel(
                                                  Af, A, lcAf, lcA, ctx, state);
-                    if (success == 0)
-                        success = nmod_mpoly_factor_irred_lgprime_zippel(
+            }
+            else
+            {
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_smprime_zippel(
                                                  Af, A, lcAf, lcA, ctx, state);
-                }
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_medprime_zippel(
+                                                 Af, A, lcAf, lcA, ctx, state);
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_smprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_medprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
+            }
 
-                if (algo & MPOLY_FACTOR_USE_WANG)
-                {
-                    if (success == 0)
-                        success = nmod_mpoly_factor_irred_smprime_wang(
+            if (tdensity > 0.001)
+            {
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_lgprime_wang(
                                                  Af, A, lcAf, lcA, ctx, state);
-                    if (success == 0)
-                        success = nmod_mpoly_factor_irred_medprime_wang(
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_lgprime_zippel(
                                                  Af, A, lcAf, lcA, ctx, state);
-                    if (success == 0)
-                        success = nmod_mpoly_factor_irred_lgprime_wang(
+            }
+            else
+            {
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_lgprime_zippel(
                                                  Af, A, lcAf, lcA, ctx, state);
-                }
+                if (success == 0)
+                    success = nmod_mpoly_factor_irred_lgprime_wang(
+                                                 Af, A, lcAf, lcA, ctx, state);
             }
         }
+
+    try_zassenhaus:
 
         if (algo & MPOLY_FACTOR_USE_ZAS)
         {
@@ -354,6 +437,8 @@ static int _factor_irred_compressed(
 	    nmod_mpoly_clear(lcA, ctx);
         nmod_mpoly_factor_clear(lcAf, ctx);
     }
+
+cleanup:
 
     flint_randclear(state);
     flint_free(strides);

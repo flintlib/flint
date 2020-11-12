@@ -19,11 +19,13 @@ slong check_omega(slong om, const nmod_mpoly_t p, const char ** vars, const nmod
 {
     slong i;
     nmod_mpoly_factor_t g;
+    nmod_mpoly_t q;
     fmpz_t omega;
     timeit_t timer;
 
     fmpz_init(omega);
     nmod_mpoly_factor_init(g, ctx);
+    nmod_mpoly_init(q, ctx);
 
     timeit_start(timer);
     nmod_mpoly_factor(g, p, ctx);
@@ -36,9 +38,17 @@ slong check_omega(slong om, const nmod_mpoly_t p, const char ** vars, const nmod
     if (fmpz_cmp_si(omega, om) < 0)
     {
         flint_printf("factorization has wrong number of factors\n");
-        flint_abort();        
+        flint_abort();
     }
 
+    if (!nmod_mpoly_factor_expand(q, g, ctx) ||
+        !nmod_mpoly_equal(q, p, ctx))
+    {
+        flint_printf("factorization does not match\n");
+        flint_abort();
+    }
+
+    nmod_mpoly_clear(q, ctx);
     nmod_mpoly_factor_clear(g, ctx);
     fmpz_clear(omega);
 
@@ -48,7 +58,7 @@ slong check_omega(slong om, const nmod_mpoly_t p, const char ** vars, const nmod
 
 int main(int argc, char *argv[])
 {
-    slong i, time, total_time;
+    slong i, k, time, total_time;
 
     flint_printf("\n------ bivariate powers ------\n");
     total_time = 0;
@@ -1158,7 +1168,7 @@ int main(int argc, char *argv[])
         flint_printf("%wd\n", time);
         total_time += time;
 
-        flint_printf("#42: ");
+        flint_printf("#42: "); fflush(stdout);
         nmod_mpoly_set_str_pretty(a, "x^4120 + x^4118*y^2 + x^3708*y^400 + x^3706*y^402 + x^2781*y^1300 + x^2779*y^1302 + x^1339*y^2700 + x^927*y^3100 + y^4000 + x^7172*y^4167 + x^8349*y^4432 + x^8347*y^4434 + x^6760*y^4567 + x^5833*y^5467 + x^5568*y^7132 + x^11401*y^8599", vars, ctx);
         time = check_omega(2, a, vars, ctx);
         flint_printf("%wd\n", time);
@@ -1168,6 +1178,45 @@ int main(int argc, char *argv[])
         nmod_mpoly_ctx_clear(ctx);
     }
     flint_printf("total_time: %wd\n", total_time);
+
+    for (k = 0; k <= 4; k++)
+    {
+        mp_limb_t ps[] = {2, 3, 11, 257, 43051};
+
+        flint_printf("\n------ 4 variables, characteristic %wu ------\n", ps[k]);
+        total_time = 0;
+        {
+            nmod_mpoly_ctx_t ctx;
+            nmod_mpoly_t a, b, c;
+            const char * vars[] = {"x","y","z","t"};
+
+            nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, ps[k]);
+            nmod_mpoly_init(a, ctx);
+            nmod_mpoly_init(b, ctx);
+            nmod_mpoly_init(c, ctx);
+
+            for (i = 1; i <= 20; i++)
+            {
+                nmod_mpoly_set_str_pretty(a, "1+x+y+z+t", vars, ctx);
+                nmod_mpoly_pow_ui(c, a, i, ctx);
+                nmod_mpoly_set_str_pretty(a, "x", vars, ctx);
+                nmod_mpoly_add(a, a, c, ctx);
+                nmod_mpoly_set_str_pretty(b, "y", vars, ctx);
+                nmod_mpoly_add(b, b, c, ctx);
+                nmod_mpoly_mul(c, a, b, ctx);
+                flint_printf("#%wd: ", i); fflush(stdout);
+                time = check_omega(2, c, vars, ctx);
+                flint_printf("%wd\n", time);
+                total_time += time;
+            }
+
+            nmod_mpoly_clear(a, ctx);
+            nmod_mpoly_clear(b, ctx);
+            nmod_mpoly_clear(c, ctx);
+            nmod_mpoly_ctx_clear(ctx);
+        }
+        flint_printf("total_time: %wd\n", total_time);
+    }
 
     flint_cleanup_master();
     return 0;
