@@ -1439,8 +1439,8 @@ void _slong_array_fit_length(slong ** array, slong * alloc, slong len)
     if (len <= *alloc)
         return;
     len = FLINT_MAX(len, *alloc + *alloc/4 + 1);
-    *array = flint_realloc(*array, len*sizeof(slong));
     *alloc = len;
+    *array = (slong *) flint_realloc(*array, len*sizeof(slong));
 }
 
 
