@@ -26,10 +26,8 @@ int main()
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_vec_t F, G;
-        slong nvars;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
-        nvars = ctx->minfo->nvars;
 
         fmpz_mpoly_vec_init(F, ctx);
         fmpz_mpoly_vec_init(G, ctx);
