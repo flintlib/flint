@@ -20,15 +20,17 @@ _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
     }
     else
     {
+/*
         ca_field_ptr K;
 
         K = _ca_mat_same_field(mat, ctx);
 
-        if (K != NULL && CA_FIELD_IS_NF(K))
+        if (0 && K != NULL && CA_FIELD_IS_NF(K))
         {
             if (_ca_mat_charpoly_danilevsky(cp, mat, ctx))
                 return;
         }
+*/
 
         _ca_mat_charpoly_berkowitz(cp, mat, ctx);
     }

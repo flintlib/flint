@@ -499,10 +499,7 @@ Characteristic polynomial
     The *danilevsky* version only performs `O(n^3)` operations, but
     performs divisions and needs to check for zero which can fail.
     This version returns 1 on success and 0 on failure.
-
     The default version chooses an algorithm automatically.
-    It currently chooses the Danilevsky algorithm over number fields
-    and the Berkowitz algorithm otherwise.
 
 .. function:: int ca_mat_companion(ca_mat_t mat, const ca_poly_t poly, ca_ctx_t ctx)
 
