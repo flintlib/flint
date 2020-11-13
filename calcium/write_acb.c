@@ -44,8 +44,12 @@ static char * arb_get_str2(const arb_t x, slong digits, ulong flags)
                     }
                 }
 
-                fmpz_set_str(e, s + i + 1, 10);
+                if (s[i + 1] == '+')
+                    fmpz_set_str(e, s + i + 2, 10);
+                else
+                    fmpz_set_str(e, s + i + 1, 10);
                 fmpz_add_ui(e, e, 1);
+
                 s[0] = '0';
                 s[1] = 'e';
                 if (fmpz_sgn(e) < 0)
@@ -54,7 +58,7 @@ static char * arb_get_str2(const arb_t x, slong digits, ulong flags)
                 }
                 else
                 {
-                    s[3] = '-';
+                    s[2] = '+';
                     fmpz_get_str(s + 3, 10, e);
                 }
                 break;
