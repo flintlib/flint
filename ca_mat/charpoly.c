@@ -14,64 +14,23 @@
 void
 _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
 {
-    const slong n = mat->r;
-
-    if (n == 0)
+    if (ca_mat_nrows(mat) <= 2)
     {
-        ca_one(cp, ctx);
-    }
-    else if (n == 1)
-    {
-        ca_neg(cp + 0, ca_mat_entry(mat, 0, 0), ctx);
-        ca_one(cp + 1, ctx);
+        _ca_mat_charpoly_berkowitz(cp, mat, ctx);
     }
     else
     {
-        slong i, k, t;
-        ca_ptr a, A, s;
+        ca_field_ptr K;
 
-        a = _ca_vec_init(n * n, ctx);
-        A = a + (n - 1) * n;
+        K = _ca_mat_same_field(mat, ctx);
 
-        _ca_vec_zero(cp, n + 1, ctx);
-        ca_neg(cp + 0, ca_mat_entry(mat, 0, 0), ctx);
-
-        for (t = 1; t < n; t++)
+        if (K != NULL && CA_FIELD_IS_NF(K))
         {
-            for (i = 0; i <= t; i++)
-            {
-                ca_set(a + 0 * n + i, ca_mat_entry(mat, i, t), ctx);
-            }
-
-            ca_set(A + 0, ca_mat_entry(mat, t, t), ctx);
-
-            for (k = 1; k < t; k++)
-            {
-                for (i = 0; i <= t; i++)
-                {
-                    s = a + k * n + i;
-                    ca_dot(s, NULL, 0, mat->rows[i], 1, a + (k - 1) * n, 1, t + 1, ctx);
-                }
-
-                ca_set(A + k, a + k * n + t, ctx);
-            }
-
-            ca_dot(A + t, NULL, 0, mat->rows[t], 1, a + (t - 1) * n, 1, t + 1, ctx);
-
-            for (k = 0; k <= t; k++)
-            {
-                ca_dot(cp + k, cp + k, 1, A, 1, cp + k - 1, -1, k, ctx);
-                ca_sub(cp + k, cp + k, A + k, ctx);
-            }
+            if (_ca_mat_charpoly_danilevsky(cp, mat, ctx))
+                return;
         }
 
-        /* Shift all coefficients up by one */
-        for (i = n; i > 0; i--)
-            ca_swap(cp + i, cp + (i - 1), ctx);
-
-        ca_one(cp + 0, ctx);
-        _ca_poly_reverse(cp, cp, n + 1, n + 1, ctx);
-        _ca_vec_clear(a, n * n, ctx);
+        _ca_mat_charpoly_berkowitz(cp, mat, ctx);
     }
 }
 

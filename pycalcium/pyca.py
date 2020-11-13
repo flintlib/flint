@@ -1473,7 +1473,7 @@ class ca_mat:
             raise ZeroDivisionError("singular matrix")
         raise ValueError("failed to prove matrix singular or nonsingular")
 
-    def solve(self, other):
+    def solve(self, other, algorithm=None):
         """
         Solve linear system (with a nonsingular matrix).
 
@@ -1506,7 +1506,16 @@ class ca_mat:
         if n != other.nrows():
             raise ValueError("incompatible matrix shapes")
         res = ca_mat(n, c)
-        invertible = libcalcium.ca_mat_nonsingular_solve(res, self, other, self._ctx)
+        if algorithm is None:
+            invertible = libcalcium.ca_mat_nonsingular_solve(res, self, other, self._ctx)
+        elif algorithm == "lu":
+            invertible = libcalcium.ca_mat_nonsingular_solve_lu(res, self, other, self._ctx)
+        elif algorithm == "fflu":
+            invertible = libcalcium.ca_mat_nonsingular_solve_fflu(res, self, other, self._ctx)
+        elif algorithm == "adjugate":
+            invertible = libcalcium.ca_mat_nonsingular_solve_adjugate(res, self, other, self._ctx)
+        else:
+            raise ValueError("unknown algorithm")
         if invertible == T_TRUE:
             return res
         if invertible == T_FALSE:

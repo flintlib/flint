@@ -483,14 +483,26 @@ Determinant and trace
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
-.. function:: void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
+.. function:: void _ca_mat_charpoly_berkowitz(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
+              void ca_mat_charpoly_berkowitz(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
+              int _ca_mat_charpoly_danilevsky(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
+              int ca_mat_charpoly_danilevsky(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
+              void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)
               void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
 
     Sets *poly* to the characteristic polynomial of *mat* which must be
     a square matrix. If the matrix has *n* rows, the underscore method
     requires space for `n + 1` output coefficients.
-    Employs the division-free Berkowitz algorithm using
-    `O(n^4)` operations.
+
+    The *berkowitz* version uses a division-free algorithm
+    requiring `O(n^4)` operations.
+    The *danilevsky* version only performs `O(n^3)` operations, but
+    performs divisions and needs to check for zero which can fail.
+    This version returns 1 on success and 0 on failure.
+
+    The default version chooses an algorithm automatically.
+    It currently chooses the Danilevsky algorithm over number fields
+    and the Berkowitz algorithm otherwise.
 
 .. function:: int ca_mat_companion(ca_mat_t mat, const ca_poly_t poly, ca_ctx_t ctx)
 

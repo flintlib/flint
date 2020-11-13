@@ -57,6 +57,10 @@ Memory management
 
     Clears the vector *vec*.
 
+.. function:: void _ca_vec_swap(ca_ptr vec1, ca_srcptr vec2, slong len, ca_ctx_t ctx)
+
+    Swaps the entries in *vec1* and *vec2* efficiently.
+
 .. function:: void ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 
     Swaps the vectors *vec1* and *vec2* efficiently.

@@ -60,6 +60,8 @@ void ca_vec_init(ca_vec_t vec, slong len, ca_ctx_t ctx);
 void _ca_vec_clear(ca_ptr v, slong len, ca_ctx_t ctx);
 void ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx);
 
+void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
+
 CA_VEC_INLINE void
 ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 {
