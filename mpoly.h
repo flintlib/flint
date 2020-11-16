@@ -1426,12 +1426,14 @@ typedef struct {
 
 typedef mpoly_compression_struct mpoly_compression_t[1];
 
-void mpoly_compression_init(mpoly_compression_t M);
+FLINT_DLL void mpoly_compression_init(mpoly_compression_t M);
 
-void mpoly_compression_clear(mpoly_compression_t M);
+FLINT_DLL void mpoly_compression_clear(mpoly_compression_t M);
 
-void mpoly_compression_set(mpoly_compression_t M, const ulong * Aexps,
+FLINT_DLL void mpoly_compression_set(mpoly_compression_t M, const ulong * Aexps,
                      flint_bitcnt_t Abits, slong Alen, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_bivar_cld_bounds(slong * l, slong n);
 
 MPOLY_INLINE
 void _slong_array_fit_length(slong ** array, slong * alloc, slong len)
@@ -1442,7 +1444,6 @@ void _slong_array_fit_length(slong ** array, slong * alloc, slong len)
     *alloc = len;
     *array = (slong *) flint_realloc(*array, len*sizeof(slong));
 }
-
 
 /* Heap **********************************************************************/
 

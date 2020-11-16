@@ -42,11 +42,8 @@ static int point2d_cmp(const point2d * p, const point2d * q)
 */
 static int _is_ccw(point2d O, point2d A, point2d B)
 {
-    slong t1, t2, t3, t4;
-    smul_ppmm(t1, t2, A.y - O.y, B.x - O.x);
-    smul_ppmm(t3, t4, A.x - O.x, B.y - O.y);
-    sub_ddmmss(t1, t2, t1, t2, t3, t4);
-    return t1 < 0;
+    return z_mat22_det_is_negative(A.y - O.y, A.x - O.x,
+                                   B.y - O.y, B.x - O.x);
 }
 
 

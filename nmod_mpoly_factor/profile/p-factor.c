@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         nmod_mpoly_init(b, ctx);
         nmod_mpoly_init(c, ctx);
 
-        for (i = 1; i <= 50; i++)
+        for (i = 1; i <= 100; i++)
         {
             nmod_mpoly_set_str_pretty(a, "x+1", vars, ctx);
             nmod_mpoly_set_str_pretty(b, "y+2", vars, ctx);
