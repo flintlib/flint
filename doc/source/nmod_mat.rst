@@ -77,6 +77,9 @@ Basic properties and manipulation
 
     Returns the number of columns in ``mat``.
 
+.. function:: void nmod_mat_zero(nmod_mat_t mat)
+
+    Sets the matrix ``mat`` to the zero matrix.
 
 Window
 --------------------------------------------------------------------------------
