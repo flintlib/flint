@@ -193,6 +193,9 @@ FLINT_DLL void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
 FLINT_DLL void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
+FLINT_DLL void nmod_mat_mul_tril_classical(nmod_mat_t C, const nmod_mat_t A,
+                                                            const nmod_mat_t B);
+
 /* Exponent */
 
 FLINT_DLL void _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow);
@@ -325,6 +328,11 @@ FLINT_DLL slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
 FLINT_DLL int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
 FLINT_DLL int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
+
+/* Solving */
+
+FLINT_DLL int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A,
+                                                            const nmod_mat_t B);
 
 /* Reduced row echelon form */
 

@@ -476,6 +476,16 @@ Nonsingular square solving
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `X` to undefined values.
 
+.. function:: int nmod_mat_can_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+
+    Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
+    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
+    should have the same moduli.
+
+    Returns `1` if a solution exists; otherwise returns `0` and sets the
+    elements of `X` to zero. If more than one solution exists, one of the
+    valid solutions is given.
+
 .. function:: int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
     Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
