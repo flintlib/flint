@@ -79,7 +79,11 @@ Basic properties and manipulation
 
 .. function:: void nmod_mat_zero(nmod_mat_t mat)
 
-    Sets the matrix ``mat`` to the zero matrix.
+    Sets all entries of the matrix ``mat`` to zero.
+
+.. function:: int nmod_mat_is_zero(nmod_mat_t mat)
+
+    Returns `1` if all entries of the matrix ``mat`` are zero.
 
 Window
 --------------------------------------------------------------------------------
