@@ -78,7 +78,7 @@ main(void)
         nmod_mat_clear(AX);
     }
 
-    /* test random solvable ystems */
+    /* test random solvable systems */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 20);
