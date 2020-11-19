@@ -832,6 +832,10 @@ FLINT_DLL int _ff_poly_pow_fmpz_is_not_feasible(slong length, const fmpz_t e);
 
 FLINT_DLL int _ff_poly_pow_ui_is_not_feasible(slong length, ulong e);
 
+FLINT_DLL mp_limb_t _nmod_mpoly_eval_all_ui(const mp_limb_t * Acoeffs,
+                 const ulong * Aexps, slong Alen, flint_bitcnt_t Abits,
+                 const mp_limb_t * alphas, const mpoly_ctx_t mctx, nmod_t mod);
+
 FLINT_DLL ulong nmod_mpoly_evaluate_all_ui(const nmod_mpoly_t A,
                                const ulong * vals, const nmod_mpoly_ctx_t ctx);
 
