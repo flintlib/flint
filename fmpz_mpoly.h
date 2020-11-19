@@ -921,11 +921,10 @@ fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 
 /* Square root ***************************************************************/
 
-FLINT_DLL slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
-           ulong ** expq, slong * allocq, const fmpz * poly2,
-                                    const ulong * exp2, slong len2, 
-                        slong bits, slong N, const ulong * cmpmask, int check);
-	
+FLINT_DLL slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq, ulong ** expq,
+           slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2,
+                       flint_bitcnt_t bits, const mpoly_ctx_t mctx, int check);
+
 FLINT_DLL int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
                                         const fmpz_mpoly_ctx_t ctx, int check);
 
@@ -1654,6 +1653,16 @@ void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     ulong p[2], p2;
     smul_ppmm(p[1], p[0], d1, d2);
     p2 = FLINT_SIGN_EXT(p[1]);
+    sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
+}
+
+FMPZ_MPOLY_INLINE
+void _fmpz_mpoly_submul2_uiuiui_fmpz(ulong * c, slong d1, slong d2)
+{
+    ulong p[2], p2;
+    smul_ppmm(p[1], p[0], d1, d2);
+    p2 = FLINT_SIGN_EXT(p[1]);
+    sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 

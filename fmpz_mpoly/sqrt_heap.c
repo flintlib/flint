@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016, 2020 William Hart
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -17,6 +17,85 @@
 #include "fmpz_mpoly.h"
 #include "longlong.h"
 
+
+/* try to prove that A is not a square */
+static int _is_definitely_not_square(
+    int count,
+    mp_limb_t * p,
+    flint_rand_t state,
+    const fmpz * Acoeffs,
+    const ulong * Aexps,
+    slong Alen,
+    flint_bitcnt_t Abits,
+    const mpoly_ctx_t mctx)
+{
+    int success = 0;
+    slong i, N = mpoly_words_per_exp(Abits, mctx);
+    ulong mask = Abits <= FLINT_BITS ? mpoly_overflow_mask_sp(Abits) : 0;
+    mp_limb_t eval, * alphas;
+    nmod_t mod;
+    ulong * t;
+    TMP_INIT;
+
+    FLINT_ASSERT(Alen > 0);
+
+    TMP_START;
+    t = (ulong *) TMP_ALLOC(FLINT_MAX(Alen, N)*sizeof(ulong));
+
+    if (count == 1)
+    {
+        /* check for odd degrees & check total degree too in degree orderings */
+        mpoly_monomial_set(t, Aexps + N*0, N);
+        if (Abits <= FLINT_BITS)
+        {
+            for (i = 1; i < Alen; i++)
+                mpoly_monomial_max(t, t, Aexps + N*i, Abits, N, mask);
+
+            success = !mpoly_monomial_halves(t, t, N, mask);
+        }
+        else
+        {
+            for (i = 1; i < Alen; i++)
+                mpoly_monomial_max_mp(t, t, Aexps + N*i, Abits, N);
+
+            success = !mpoly_monomial_halves_mp(t, t, N, Abits);
+        }
+
+        if (success)
+            goto cleanup;
+    }
+
+    /* try at most 3*count evaluations */
+    count *= 3;
+
+    alphas = (mp_limb_t *) TMP_ALLOC(mctx->nvars*sizeof(mp_limb_t));
+
+next_p:
+
+    if (*p >= UWORD_MAX_PRIME)
+        *p = UWORD(1) << (FLINT_BITS - 2);
+    *p = n_nextprime(*p, 1);
+    nmod_init(&mod, *p);
+
+    for (i = 0; i < mctx->nvars; i++)
+        alphas[i] = n_urandint(state, mod.n);
+
+    _fmpz_vec_get_nmod_vec(t, Acoeffs, Alen, mod);
+    eval = _nmod_mpoly_eval_all_ui(t, Aexps, Alen, Abits, alphas, mctx, mod);
+
+    success = n_jacobi_unsigned(eval, mod.n) < 0;
+
+    if (!success && --count >= 0)
+        goto next_p;
+
+cleanup:
+
+    TMP_END;
+
+    return success;
+}
+
+
 #define DEBUG 0
 
 /*
@@ -25,14 +104,15 @@
    the exponent vectors all fit in a single word. The exponent vectors are
    assumed to have fields with the given number of bits. Assumes input poly
    is nonzero. Implements "Heap based multivariate square root" by William
-   Hart. The word "maxhi" is set to a mask for the degree field of the
-   exponent vector (in the case of a degree ordering) to facilitate the
-   reverse ordering in degrevlex. Square root is from left to right with a
+   Hart. Square root is from left to right with a
    heap with largest exponent at the head. Output poly is written in order.
 */
-slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
-                slong * allocq, const fmpz * poly2, const ulong * exp2,
-                               slong len2, slong bits, ulong maskhi, int check)
+slong _fmpz_mpoly_sqrt_heap1(
+    fmpz ** polyq, ulong ** expq, slong * allocq,
+    const fmpz * poly2, const ulong * exp2, slong len2,
+    flint_bitcnt_t bits,
+    const mpoly_ctx_t mctx,
+    int check)
 {
     slong i, j, q_len;
     slong next_loc, heap_len = 1, heap_alloc;
@@ -45,6 +125,7 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
     fmpz * q_coeff = *polyq;
     ulong * q_exp = *expq;
     ulong mask, exp, exp3 = 0;
+    ulong maskhi;
     fmpz_t r, acc_lg, temp;
     ulong acc_sm[3]; /* three word accumulation for small coefficients */
     int lt_divides, small;
@@ -53,10 +134,18 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
     ulong lc_norm = 0; /* number of bits to shift sqrt(lc) to normalise */
     ulong lc_n = 0; /* sqrt of lc normalised */
     ulong lc_i = 0; /* precomputed inverse of sqrt(lc) */
+    flint_rand_t heuristic_state;
+    mp_limb_t heuristic_p = UWORD(1) << (FLINT_BITS - 2);
+    int heuristic_count = 0;
 
 #if DEBUG
     printf("Small case\n");
 #endif
+
+    FLINT_ASSERT(mpoly_words_per_exp(bits, mctx) == 1);
+    mpoly_get_cmpmask(&maskhi, 1, bits, mctx);
+
+    flint_randinit(heuristic_state);
 
     fmpz_init(acc_lg);
     fmpz_init(r);
@@ -81,10 +170,7 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
 
     exp_alloc = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     q_len = 0;
    
@@ -131,8 +217,10 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
         goto not_sqrt; /* exponent is not square */
 
     /* optimisation, compute final exponent */
-    if (!check)
     {
+        if (!fmpz_is_square(poly2 + len2 - 1))
+            goto not_sqrt;
+
         if (!mpoly_monomial_halves1(&exp3, exp2[len2 - 1], mask))
             goto not_sqrt; /* exponent is not square */
 
@@ -143,8 +231,16 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
     {
         exp = heap[1].exp;
 
+        /*
+            All input fields are < 2^(bits - 1). If poly2 is a square, all
+            output fields of q are < 2^(bits - 2). Since the heap only contains
+                (1) exp2[j], or
+                (2) q_exp[i] + q_exp[j],
+            if something in the heap does overflow, a bad q_exp must have been
+            generated, possibly from bad input.
+        */
         if (mpoly_monomial_overflows1(exp, mask))
-            goto exp_overflow;
+            goto not_sqrt;
 
         _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
 
@@ -188,11 +284,8 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
                     else if (x->i == x->j)
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
                     else
-                    {
-                        /* TODO: write function that performs this operation */
-                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
-                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
-                    }
+                        _fmpz_mpoly_submul2_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
+
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
         }
@@ -216,12 +309,12 @@ slong _fmpz_mpoly_sqrt_heap1(fmpz ** polyq, ulong ** expq,
 
                     if (x->i == -WORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
+                    else if (x->i == x->j)
+                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
                     else
                     {
-                        fmpz_mul(temp, q_coeff + x->i, q_coeff + x->j);
-                        if (x->i != x->j)
-                            fmpz_mul_2exp(temp, temp, 1);
-                        fmpz_sub(acc_lg, acc_lg, temp);
+                        fmpz_add(temp, q_coeff + x->j, q_coeff + x->j);
+                        fmpz_submul(acc_lg, q_coeff + x->i, temp);
                     }
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
@@ -347,6 +440,15 @@ large_lt_divides:
 
         if (q_len >= heap_alloc)
         {
+            /* run some tests if the square root is getting long */
+            if (q_len > len2 && _is_definitely_not_square(
+                            ++heuristic_count, &heuristic_p, heuristic_state,
+                                                poly2, exp2, len2, bits, mctx))
+            {
+                q_len++; /* for demotion */
+                goto not_sqrt;
+            }
+
             heap_alloc *= 2;
             heap = (mpoly_heap1_s *) flint_realloc(heap, (heap_alloc + 1)*sizeof(mpoly_heap1_s));
             chain_nodes[exp_alloc] = (mpoly_heap_t *) flint_malloc((heap_alloc/2)*sizeof(mpoly_heap_t));
@@ -382,6 +484,8 @@ large_lt_divides:
 
 cleanup:
 
+    flint_randclear(heuristic_state);
+
     fmpz_clear(acc_lg);
     fmpz_clear(r);
     fmpz_clear(temp);
@@ -403,20 +507,18 @@ not_sqrt:
         _fmpz_demote(q_coeff + i);
     q_len = 0;
     goto cleanup;
-
-exp_overflow:
-    for (i = 0; i < q_len; i++)
-        _fmpz_demote(q_coeff + i);
-    q_len = -WORD(1);
-    goto cleanup;
 }
 
 
-slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
-           ulong ** expq, slong * allocq, const fmpz * poly2,
-   const ulong * exp2, slong len2, 
-                   slong bits, slong N, const ulong * cmpmask, int check)
+slong _fmpz_mpoly_sqrt_heap(
+    fmpz ** polyq, ulong ** expq, slong * allocq,
+    const fmpz * poly2, const ulong * exp2, slong len2,
+    flint_bitcnt_t bits,
+    const mpoly_ctx_t mctx,
+    int check)
 {
+    slong N = mpoly_words_per_exp(bits, mctx);
+    ulong * cmpmask;
     slong i, j, q_len;
     slong next_loc;
     slong heap_len = 1, heap_alloc;
@@ -441,18 +543,26 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
     ulong lc_norm = 0; /* number of bits to shift sqrt(lc) to normalise */
     ulong lc_n = 0; /* sqrt of lc normalised */
     ulong lc_i = 0; /* precomputed inverse of sqrt(lc) */
+    flint_rand_t heuristic_state;
+    mp_limb_t heuristic_p = UWORD(1) << (FLINT_BITS - 2);
+    int heuristic_count = 0;
 
     TMP_INIT;
 
     if (N == 1)
         return _fmpz_mpoly_sqrt_heap1(polyq, expq, allocq,
-                        poly2, exp2, len2, bits, cmpmask[0], check);
+                                        poly2, exp2, len2, bits, mctx, check);
 
 #if DEBUG
     printf("Large case\n");
 #endif
 
     TMP_START;
+
+    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, bits, mctx);
+
+    flint_randinit(heuristic_state);
 
     fmpz_init(acc_lg);
     fmpz_init(r);
@@ -489,10 +599,7 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
     for (i = 0; i < heap_alloc; i++)
         exp_list[i] = exps[0] + i*N;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = (bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(bits) : 0;
 
     q_len = 0;
    
@@ -545,9 +652,11 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
     if (!halves)
         goto not_sqrt; /* exponent is not square */
 
-    /* optimisation, compute final exponent */
-    if (!check)
+    /* optimisation, compute final term */
     {
+        if (!fmpz_is_square(poly2 + len2 - 1))
+            goto not_sqrt;
+
         if (bits <= FLINT_BITS)
             halves = mpoly_monomial_halves(exp3, exp2 + (len2 - 1)*N, N, mask);
         else
@@ -564,25 +673,34 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
 
     while (heap_len > 1)
     {
+        _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
+
         mpoly_monomial_set(exp, heap[1].exp, N);
 
+        /*
+            All input fields are < 2^(bits - 1). If poly2 is a square, all
+            output fields of q are < 2^(bits - 2). Since the heap only contains
+                (1) exp2[j], or
+                (2) q_exp[i] + q_exp[j],
+            if something in the heap does overflow, a bad q_exp must have been
+            generated, possibly from bad input.
+        */
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
-                goto exp_overflow;
+                goto not_sqrt;
+
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N,
+                                                      exp, q_exp + 0, N, mask);
         }
         else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto exp_overflow;
+                goto not_sqrt;
+
+            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N,
+                                                      exp, q_exp + 0, N, bits);
         }
-
-        _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
-
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, q_exp + 0, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, q_exp + 0, N, bits);
 
         /* take nodes from heap with exponent matching exp */
 
@@ -624,11 +742,8 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
                     else if (x->i == x->j)
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
                     else
-                    {
-                        /* TODO: write function that performs this operation */
-                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
-                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
-                    }
+                        _fmpz_mpoly_submul2_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
+
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
         }
@@ -652,12 +767,12 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
 
                     if (x->i == -WORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
+                    else if (x->i == x->j)
+                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
                     else
                     {
-                        fmpz_mul(temp, q_coeff + x->i, q_coeff + x->j);
-                        if (x->i != x->j)
-                            fmpz_mul_2exp(temp, temp, 1);
-                        fmpz_sub(acc_lg, acc_lg, temp);
+                        fmpz_add(temp, q_coeff + x->j, q_coeff + x->j);
+                        fmpz_submul(acc_lg, q_coeff + x->i, temp);
                     }
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -790,6 +905,15 @@ large_lt_divides:
 
         if (q_len >= heap_alloc)
         {
+            /* run some tests if the square root is getting long */
+            if (q_len > len2 && _is_definitely_not_square(
+                            ++heuristic_count, &heuristic_p, heuristic_state,
+                                                poly2, exp2, len2, bits, mctx))
+            {
+                q_len++; /* for demotion */
+                goto not_sqrt;
+            }
+
             heap_alloc *= 2;
             heap = (mpoly_heap_s *) flint_realloc(heap, (heap_alloc + 1)*sizeof(mpoly_heap_s));
             chain_nodes[exp_alloc] = (mpoly_heap_t *) flint_malloc((heap_alloc/2)*sizeof(mpoly_heap_t));
@@ -813,10 +937,10 @@ large_lt_divides:
         x->next = NULL;
 
         if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], q_exp + x->i*N,
+            mpoly_monomial_add(exp_list[exp_next], q_exp + x->i*N,
                                                       q_exp + x->j*N, N);
         else
-                mpoly_monomial_add_mp(exp_list[exp_next], q_exp + x->i*N,
+            mpoly_monomial_add_mp(exp_list[exp_next], q_exp + x->i*N,
                                                          q_exp + x->j*N, N);
         
         if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
@@ -824,7 +948,7 @@ large_lt_divides:
 #if DEBUG
             flint_printf("insert3 (%wd, %wd)\n", x->i, x->j);
 #endif           
-           exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
 
@@ -835,6 +959,8 @@ large_lt_divides:
     fmpz_fdiv_q_2exp(q_coeff + 0, q_coeff + 0, 1);
 
 cleanup:
+
+    flint_randclear(heuristic_state);
 
     fmpz_clear(acc_lg);
     fmpz_clear(r);
@@ -863,87 +989,42 @@ not_sqrt:
         _fmpz_demote(q_coeff + i);
     q_len = 0;
     goto cleanup;
-
-exp_overflow:
-    for (i = 0; i < q_len; i++)
-        _fmpz_demote(q_coeff + i);
-    q_len = -WORD(1);
-    goto cleanup;
-
 }
 
 int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
                           const fmpz_mpoly_ctx_t ctx, int check)
 {
-    slong exp_bits, N, lenq = 0;
+    slong lenq, lenq_est;
+    flint_bitcnt_t exp_bits;
     ulong * exp2 = poly2->exps;
-    ulong * cmpmask;
-    int free2 = 0;
     fmpz_mpoly_t temp1;
     fmpz_mpoly_struct * tq;
 
-    /* input zero, write out sqrt */
     if (poly2->length == 0)
     {
         fmpz_mpoly_zero(q, ctx);
-
         return 1;
     }
 
     /* maximum bits in sqrt exps and input is max for poly2 */
     exp_bits = poly2->bits;
-
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    lenq_est = n_sqrt(poly2->length);
 
     /* take care of aliasing */
     if (q == poly2)
     {
-        fmpz_mpoly_init2(temp1, n_sqrt(poly2->length), ctx);
-        fmpz_mpoly_fit_bits(temp1, exp_bits, ctx);
-        temp1->bits = exp_bits;
+        fmpz_mpoly_init3(temp1, lenq_est, exp_bits, ctx);
         tq = temp1;
-    } else
+    }
+    else
     {
-        fmpz_mpoly_fit_length(q, n_sqrt(poly2->length), ctx);
-        fmpz_mpoly_fit_bits(q, exp_bits, ctx);
-        q->bits = exp_bits;
+        fmpz_mpoly_fit_length_reset_bits(q, lenq_est, exp_bits, ctx);
         tq = q;
     }
 
-    /* do sqrt, check for overflow */
-    while ((lenq = _fmpz_mpoly_sqrt_heap(&tq->coeffs, &tq->exps,
-                         &tq->alloc, poly2->coeffs, exp2, poly2->length, 
-                                      exp_bits, N, cmpmask, check)) == -WORD(1))
-    {
-        ulong * old_exp2 = exp2;
-        slong old_exp_bits = exp_bits;
-
-#if DEBUG
-        printf("overflow\n");
-#endif
-
-        exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
-
-        N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
-        mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
-
-        exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
-                                                    poly2->length, ctx->minfo);
-
-        if (free2)
-            flint_free(old_exp2);
-
-
-        free2 = 1; 
-
-        fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
-        tq->bits = exp_bits;
-    }
-
+    lenq = _fmpz_mpoly_sqrt_heap(&tq->coeffs, &tq->exps, &tq->alloc,
+                                 poly2->coeffs, exp2, poly2->length,
+                                      exp_bits, ctx->minfo, check);
     /* take care of aliasing */
     if (q == poly2)
     {
@@ -952,11 +1033,6 @@ int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
     } 
 
     _fmpz_mpoly_set_length(q, lenq, ctx);
-
-    if (free2)
-      flint_free(exp2);
-
-    flint_free(cmpmask);
 
     return lenq != 0;
 }
