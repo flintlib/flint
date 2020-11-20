@@ -441,7 +441,7 @@ Triangular solving
     solving of smaller systems.
 
 
-Nonsingular square solving
+Solving
 --------------------------------------------------------------------------------
 
 
@@ -451,6 +451,18 @@ Nonsingular square solving
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `X` to undefined values.
+
+    The matrix `A` must be square.
+
+.. function:: int fq_nmod_mat_can_solve(fq_nmod_mat_t X, fq_nmod_mat_t A, fq_nmod_mat_t B, const fq_nmod_ctx_t ctx)
+
+    Solves the matrix-matrix equation `AX = B` over `Fq`.
+
+    Returns `1` if a solution exists; otherwise returns `0` and sets the
+    elements of `X` to zero. If more than one solution exists, one of the
+    valid solutions is given.
+
+    There are no restrictions on the shape of `A` and it may be singular.
 
 
 Transforms

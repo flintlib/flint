@@ -407,6 +407,27 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
 
+Solving
+--------------------------------------------------------------------------------
+
+.. function:: int fq_zech_mat_solve(fq_zech_mat_t X, const fq_zech_mat_t A, const fq_zech_mat_t B, const fq_zech_ctx_t ctx)
+
+    Solves the matrix-matrix equation `AX = B`.
+
+    Returns `1` if `A` has full rank; otherwise returns `0` and sets the
+    elements of `X` to undefined values.
+
+    The matrix `A` must be square.
+
+.. function:: int fq_zech_mat_can_solve(fq_zech_mat_t X, fq_zech_mat_t A, fq_zech_mat_t B, const fq_zech_ctx_t ctx)
+
+    Solves the matrix-matrix equation `AX = B` over `Fq`.
+
+    Returns `1` if a solution exists; otherwise returns `0` and sets the
+    elements of `X` to zero. If more than one solution exists, one of the
+    valid solutions is given.
+
+    There are no restrictions on the shape of `A` and it may be singular.
 
 Transforms
 --------------------------------------------------------------------------------

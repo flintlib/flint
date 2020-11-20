@@ -476,6 +476,8 @@ Nonsingular square solving
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `X` to undefined values.
 
+    The matrix `A` must be square.
+
 .. function:: int nmod_mat_can_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
@@ -485,6 +487,8 @@ Nonsingular square solving
     Returns `1` if a solution exists; otherwise returns `0` and sets the
     elements of `X` to zero. If more than one solution exists, one of the
     valid solutions is given.
+
+    There are no restrictions on the shape of `A` and it may be singular.
 
 .. function:: int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
