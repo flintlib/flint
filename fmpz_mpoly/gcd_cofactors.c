@@ -1119,7 +1119,7 @@ calculate_trivial_gcd:
     else if ((I->can_use & MPOLY_GCD_USE_BROWN) &&
              (I->can_use & MPOLY_GCD_USE_ZIPPEL2) &&
              I->zippel2_time < I->brown_time &&
-             (I->mvars*(I->Adensity + I->Bdensity) < 1 ||
+             (I->mvars*(I->Adensity + I->Bdensity) < 2 ||
               I->zippel2_time < 0.01*I->brown_time))
     {
         if (_try_bma(G, Abar, Bbar, A, B, I, ctx, handles, num_handles))

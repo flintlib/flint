@@ -147,11 +147,14 @@ FLINT_DLL int fmpz_mpoly_factor_cmp(const fmpz_mpoly_factor_t f,
 FLINT_DLL void fmpz_mpoly_factor_print_pretty(const fmpz_mpoly_factor_t f,
                                const char ** vars, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpoly_factor_content(fmpz_mpoly_factor_t f,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL int fmpz_mpoly_factor_squarefree(fmpz_mpoly_factor_t f,
                              const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_factor(fmpz_mpoly_factor_t f, const fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mpoly_factor(fmpz_mpoly_factor_t f,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpoly_factor_swap(fmpz_mpoly_factor_t f, fmpz_mpoly_factor_t g,
@@ -450,6 +453,10 @@ void fmpz_mpoly_unit_normalize(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
         fmpz_mpoly_neg(A, A, ctx);
 }
 
+FLINT_DLL int _fmpz_mpoly_factor_squarefree(fmpz_mpoly_factor_t f,
+                   fmpz_mpoly_t A, const fmpz_t e, const fmpz_mpoly_ctx_t ctx);
+
+
 FLINT_DLL int fmpz_mpoly_factor_lcc_wang(fmpz_mpoly_struct * lc_divs,
                         const fmpz_mpoly_factor_t lcAfac, const fmpz_t Auc,
                     const fmpz_poly_struct * Auf, slong r, const fmpz * alpha,
@@ -514,6 +521,16 @@ FLINT_DLL int fmpz_mpoly_evaluate_rest_except_one(
     const fmpz * alphas,
     slong v,
     const fmpz_mpoly_ctx_t ctx);
+
+/****************************************************************************/
+
+FLINT_DLL void fmpz_mpoly_compression_do(fmpz_mpoly_t L,
+                     const fmpz_mpoly_ctx_t Lctx, fmpz * Acoeffs, slong Alen,
+                                                        mpoly_compression_t M);
+
+FLINT_DLL void fmpz_mpoly_compression_undo(fmpz_mpoly_t A, flint_bitcnt_t Abits,
+    const fmpz_mpoly_ctx_t Actx, fmpz_mpoly_t L, const fmpz_mpoly_ctx_t Lctx,
+                                                        mpoly_compression_t M);
 
 #ifdef __cplusplus
 }

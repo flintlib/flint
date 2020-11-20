@@ -127,6 +127,25 @@ FLINT_DLL void n_cleanup_primes(void);
 FLINT_DLL const ulong * n_primes_arr_readonly(ulong n);
 FLINT_DLL const double * n_prime_inverses_arr_readonly(ulong n);
 
+/* Checked arithmetic ********************************************************/
+
+ULONG_EXTRAS_INLINE int n_mul_checked(ulong * a, ulong b, ulong c)
+{
+	ulong ahi, alo;
+	umul_ppmm(ahi, alo, b, c);
+	*a = alo;
+	return 0 != ahi;
+}
+
+ULONG_EXTRAS_INLINE int n_add_checked(ulong * a, ulong b, ulong c)
+{
+    int of = b + c < b;
+    *a = b + c;
+    return of;
+}
+
+/*****************************************************************************/
+
 FLINT_DLL ulong n_randlimb(flint_rand_t state);
 
 FLINT_DLL ulong n_randint(flint_rand_t state, ulong limit);

@@ -1668,7 +1668,7 @@ FLINT_DLL int nmod_mpolyl_gcd_zippel_lgprime(
     const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyl_gcd_hensel_smprime(
-    nmod_mpoly_t G,
+    nmod_mpoly_t G, slong Gdeg,
     nmod_mpoly_t Abar,
     nmod_mpoly_t Bbar,
     const nmod_mpoly_t A,
@@ -1676,7 +1676,7 @@ FLINT_DLL int nmod_mpolyl_gcd_hensel_smprime(
     const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyl_gcd_hensel_medprime(
-    nmod_mpoly_t G,
+    nmod_mpoly_t G, slong Gdeg,
     nmod_mpoly_t Abar,
     nmod_mpoly_t Bbar,
     const nmod_mpoly_t smA,

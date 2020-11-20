@@ -451,7 +451,7 @@ cleanup:
 }
 
 
-
+/* call to improve on the (valid) results of smprime */
 static void _set_estimates_medprime(
     mpoly_gcd_info_t I,
     const nmod_mpoly_t A,
@@ -500,6 +500,9 @@ static void _set_estimates_medprime(
     I->Gdeflate_deg_bounds_are_nice = 1;
     for (j = 0; j < nvars; j++)
     {
+        FLINT_ASSERT(I->Gdeflate_deg_bound[j] <= I->Adeflate_deg[j]);
+        FLINT_ASSERT(I->Gdeflate_deg_bound[j] <= I->Bdeflate_deg[j]);
+
         if (I->Adeflate_deg[j] > ignore_limit ||
             I->Bdeflate_deg[j] > ignore_limit)
         {
@@ -519,13 +522,6 @@ try_again:
     if (tries_left < 0)
     {
         I->Gdeflate_deg_bounds_are_nice = 0;
-        for (j = 0; j < nvars; j++)
-        {
-            I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Adeflate_deg[j],
-                                                 I->Bdeflate_deg[j]);
-            I->Gterm_count_est[j] = 1 + I->Gdeflate_deg_bound[j]/2;
-        }
-
         goto cleanup;
     }
 
@@ -542,13 +538,7 @@ try_again:
 
     for (j = 0; j < nvars; j++)
     {
-        if (ignore[j])
-        {
-            I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Adeflate_deg[j],
-                                                 I->Bdeflate_deg[j]);
-            I->Gterm_count_est[j] = 1 + I->Gdeflate_deg_bound[j]/2;
-        }
-        else
+        if (!ignore[j])
         {
             if (I->Adeflate_deg[j] != fq_zech_poly_degree(Aevals + j, medctx) ||
                 I->Bdeflate_deg[j] != fq_zech_poly_degree(Bevals + j, medctx))
@@ -559,7 +549,8 @@ try_again:
             fq_zech_poly_gcd(Geval, Aevals + j, Bevals + j, medctx);
 
             I->Gterm_count_est[j] = 0;
-            I->Gdeflate_deg_bound[j] = fq_zech_poly_degree(Geval, medctx);
+            I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Gdeflate_deg_bound[j],
+                                           fq_zech_poly_degree(Geval, medctx));
             for (i = I->Gdeflate_deg_bound[j]; i >= 0; i--)
                 I->Gterm_count_est[j] += !fq_zech_is_zero(Geval->coeffs + i, medctx);
         }
@@ -588,8 +579,7 @@ cleanup:
     return;
 }
 
-
-
+/* call to improve on the (valid) results of smprime/medprime */
 static void _set_estimates_lgprime(
     mpoly_gcd_info_t I,
     const nmod_mpoly_t A,
@@ -632,6 +622,9 @@ static void _set_estimates_lgprime(
     I->Gdeflate_deg_bounds_are_nice = 1;
     for (j = 0; j < nvars; j++)
     {
+        FLINT_ASSERT(I->Gdeflate_deg_bound[j] <= I->Adeflate_deg[j]);
+        FLINT_ASSERT(I->Gdeflate_deg_bound[j] <= I->Bdeflate_deg[j]);
+
         if (I->Adeflate_deg[j] > ignore_limit ||
             I->Bdeflate_deg[j] > ignore_limit)
         {
@@ -649,13 +642,6 @@ try_again:
     if (++try_count > 10)
     {
         I->Gdeflate_deg_bounds_are_nice = 0;
-        for (j = 0; j < nvars; j++)
-        {
-            I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Adeflate_deg[j],
-                                                 I->Bdeflate_deg[j]);
-            I->Gterm_count_est[j] = 1 + I->Gdeflate_deg_bound[j]/2;
-        }
-
         goto cleanup;
     }
 
@@ -669,13 +655,7 @@ try_again:
 
     for (j = 0; j < nvars; j++)
     {
-        if (ignore[j])
-        {
-            I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Adeflate_deg[j],
-                                                 I->Bdeflate_deg[j]);
-            I->Gterm_count_est[j] = 1 + I->Gdeflate_deg_bound[j]/2;
-        }
-        else
+        if (!ignore[j])
         {
             if (I->Adeflate_deg[j] != n_fq_poly_degree(Aevals + j) ||
                 I->Bdeflate_deg[j] != n_fq_poly_degree(Bevals + j))
@@ -688,7 +668,8 @@ try_again:
             n_fq_poly_gcd(Geval, Aevals + j, Bevals + j, lgctx->fqctx);
 
             I->Gterm_count_est[j] = 0;
-            I->Gdeflate_deg_bound[j] = n_fq_poly_degree(Geval);
+            I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Gdeflate_deg_bound[j],
+                                                      n_fq_poly_degree(Geval));
             for (i = I->Gdeflate_deg_bound[j]; i >= 0; i--)
                 I->Gterm_count_est[j] += !_n_fq_is_zero(Geval->coeffs + d*i, d);
         }
@@ -1451,7 +1432,7 @@ static int _try_hensel(
     nmod_mpoly_ctx_t lctx;
     nmod_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
     nmod_mpoly_t Ac, Bc, Gc, Abarc, Bbarc;
-    slong max_degree;
+    slong max_deg;
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
@@ -1465,15 +1446,15 @@ static int _try_hensel(
 
     nmod_mpoly_ctx_init(lctx, m, ORD_LEX, ctx->ffinfo->mod.n);
 
-    max_degree = 0;
+    max_deg = 0;
     for (i = 0; i < m; i++)
     {
-        k = I->zippel2_perm[i];
-        max_degree = FLINT_MAX(max_degree, I->Adeflate_deg[k]);
-        max_degree = FLINT_MAX(max_degree, I->Bdeflate_deg[k]);
+        k = I->hensel_perm[i];
+        max_deg = FLINT_MAX(max_deg, I->Adeflate_deg[k]);
+        max_deg = FLINT_MAX(max_deg, I->Bdeflate_deg[k]);
     }
 
-    wbits = 1 + FLINT_BIT_COUNT(max_degree);
+    wbits = 1 + FLINT_BIT_COUNT(max_deg);
     wbits = mpoly_fix_bits(wbits, lctx->minfo);
     FLINT_ASSERT(wbits <= FLINT_BITS);
 
@@ -1514,10 +1495,11 @@ static int _try_hensel(
     nmod_mpoly_repack_bits_inplace(Al, wbits, lctx);
     nmod_mpoly_repack_bits_inplace(Bl, wbits, lctx);
 
-    success = nmod_mpolyl_gcd_hensel_smprime(Gl, Abarl, Bbarl, Al, Bl, lctx);
+    max_deg = I->Gdeflate_deg_bound[I->hensel_perm[0]];
+    success = nmod_mpolyl_gcd_hensel_smprime(Gl, max_deg, Abarl, Bbarl, Al, Bl, lctx);
     if (!success)
     {
-        success = nmod_mpolyl_gcd_hensel_medprime(Gl, Abarl, Bbarl, Al, Bl, lctx);
+        success = nmod_mpolyl_gcd_hensel_medprime(Gl, max_deg, Abarl, Bbarl, Al, Bl, lctx);
         if (!success)
             goto cleanup;
     }
@@ -1900,18 +1882,19 @@ skip_monomial_cofactors:
         and there are at least two in the latter case
     */
 
+    mpoly_gcd_info_set_perm(I, A->length, B->length, ctx->minfo);
+
     /* _set_estimates will probably calculate the correct total degrees */
     I->Adeflate_tdeg = I->Bdeflate_tdeg = -1;
 
     _set_estimates(I, A, B, ctx);
 
-    if (!I->Gdeflate_deg_bounds_are_nice)
+    j = FLINT_MAX(0, 8 - I->mvars);
+    if (!I->Gdeflate_deg_bounds_are_nice || ctx->ffinfo->mod.n < j)
         _set_estimates_medprime(I, A, B, ctx);
 
     if (!I->Gdeflate_deg_bounds_are_nice)
         _set_estimates_lgprime(I, A, B, ctx);
-
-    mpoly_gcd_info_set_perm(I, A->length, B->length, ctx->minfo);
 
     /* everything in I is valid now */
 

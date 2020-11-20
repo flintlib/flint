@@ -511,7 +511,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
     req_zip_images = 1;
     for (i = 0; i < r; i++)
     {
-        if (Bp[i].bits >= FLINT_BITS)
+        if (Bp[i].bits > FLINT_BITS)
         {
             success = 0;
             goto cleanup;
@@ -556,7 +556,7 @@ next_power:
         goto cleanup;
     }
 
-    if (k > L || e->bits >= FLINT_BITS)
+    if (k > L || e->bits > FLINT_BITS)
     {
         success = 0;
         goto cleanup;

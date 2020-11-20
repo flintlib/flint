@@ -1392,12 +1392,58 @@ FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
 
 /* factoring ****************************************************************/
 
-#define MPOLY_FACTOR_USE_ZAS 1
+#define MPOLY_FACTOR_USE_ZAS  1
 #define MPOLY_FACTOR_USE_WANG 2
-#define MPOLY_FACTOR_USE_ZIP 4
+#define MPOLY_FACTOR_USE_ZIP  4
+#define MPOLY_FACTOR_USE_ALL  7
+
+FLINT_DLL void mpoly_remove_var_powers(fmpz * var_powers, ulong * Aexps,
+                     flint_bitcnt_t Abits, slong Alen, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong _mpoly_compress_exps(slong * V, slong * D, slong * deg,
                                                   slong * S, slong n, slong l);
+
+FLINT_DLL int mpoly_test_irreducible(ulong * Aexps, flint_bitcnt_t Abits,
+                                            slong Alen, const mpoly_ctx_t ctx);
+
+FLINT_DLL int _mpoly_test_irreducible(slong * Aexps, slong stride, slong Alen,
+                            slong nvars, flint_rand_t state, slong tries_left);
+
+typedef struct {
+    slong mvars;
+    slong nvars;
+    slong * exps;
+    slong exps_alloc;
+    slong * rest;
+    slong rest_alloc;
+    slong * umat;
+    slong * deltas;
+    slong * degs;
+    int is_trivial;
+    int is_perm;
+    int is_irred;
+} mpoly_compression_struct;
+
+typedef mpoly_compression_struct mpoly_compression_t[1];
+
+FLINT_DLL void mpoly_compression_init(mpoly_compression_t M);
+
+FLINT_DLL void mpoly_compression_clear(mpoly_compression_t M);
+
+FLINT_DLL void mpoly_compression_set(mpoly_compression_t M, const ulong * Aexps,
+                     flint_bitcnt_t Abits, slong Alen, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_bivar_cld_bounds(slong * l, slong n);
+
+MPOLY_INLINE
+void _slong_array_fit_length(slong ** array, slong * alloc, slong len)
+{
+    if (len <= *alloc)
+        return;
+    len = FLINT_MAX(len, *alloc + *alloc/4 + 1);
+    *alloc = len;
+    *array = (slong *) flint_realloc(*array, len*sizeof(slong));
+}
 
 /* Heap **********************************************************************/
 

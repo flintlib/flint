@@ -591,7 +591,7 @@ FLINT_DLL void fq_zech_mpoly_univar_divexact_mpoly(
 
 /*****************************************************************************/
 
-int fq_zech_mpoly_factor_lcc_wang(
+FLINT_DLL int fq_zech_mpoly_factor_lcc_wang(
     fq_zech_mpoly_struct * lc_divs,
     const fq_zech_mpoly_factor_t lcAfac,
     const fq_zech_poly_t Auc,
@@ -723,6 +723,18 @@ FLINT_DLL int fq_zech_polyu3_hlift(
     const fq_zech_t beta,
     slong degree_inner, /* required degree in x */
     const fq_zech_ctx_t ctx);
+
+FLINT_DLL int fq_zech_mpoly_factor_algo(fq_zech_mpoly_factor_t f,
+    const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx, unsigned int algo);
+
+FLINT_DLL int fq_zech_mpoly_factor_zassenhaus(fq_zech_mpoly_factor_t f,
+                       const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
+
+FLINT_DLL int fq_zech_mpoly_factor_wang(fq_zech_mpoly_factor_t f,
+                       const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
+
+FLINT_DLL int fq_zech_mpoly_factor_zippel(fq_zech_mpoly_factor_t f,
+                       const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_zech_poly_product_roots_fq_zech(
     fq_zech_poly_t master,

@@ -253,3 +253,109 @@ done:
     return m;
 }
 
+
+void mpoly_compression_init(mpoly_compression_t M)
+{
+    M->mvars = 0;
+    M->nvars = 0;
+    M->exps = NULL;
+    M->exps_alloc = 0;
+    M->rest = NULL;
+    M->rest_alloc = 0;
+    M->umat = NULL;
+    M->deltas = NULL;
+    M->degs = NULL;
+    M->is_trivial = 0;
+    M->is_perm = 0;
+    M->is_irred = 0;
+}
+
+void mpoly_compression_clear(mpoly_compression_t M)
+{
+    flint_free(M->exps);
+    flint_free(M->rest);
+}
+
+
+void mpoly_compression_set(
+    mpoly_compression_t M,
+    const ulong * Aexps,
+    flint_bitcnt_t Abits,
+    slong Alen,
+    const mpoly_ctx_t mctx)
+{
+    slong i, j, one_total;
+    slong N = mpoly_words_per_exp_sp(Abits, mctx);
+    slong nvars = mctx->nvars;
+    ulong * Mexps;
+    int overflowed;
+    slong sum_deg, tries;
+    flint_rand_t state;
+
+    M->nvars = nvars;
+
+    _slong_array_fit_length(&M->rest, &M->rest_alloc, (nvars + 2)*nvars);
+    M->umat = M->rest;
+    M->deltas = M->umat + nvars*nvars;
+    M->degs = M->deltas + nvars;
+
+    _slong_array_fit_length(&M->exps, &M->exps_alloc, Alen*nvars);
+    Mexps = (ulong *) M->exps;
+
+    for (i = 0; i < Alen; i++)
+        mpoly_get_monomial_ui_sp(Mexps + nvars*i, Aexps + N*i, Abits, mctx);
+
+    M->mvars = _mpoly_compress_exps(M->umat, M->deltas, M->degs, M->exps, nvars, Alen);
+
+    FLINT_ASSERT(M->mvars > 0);
+
+    M->is_trivial = (M->mvars == nvars) && (mctx->ord == ORD_LEX);
+    M->is_perm = 1;
+    one_total = 0;
+    for (i = 0; i < nvars; i++)
+    for (j = 0; j < nvars; j++)
+    {
+        if (M->umat[i*nvars + j] == 1)
+        {
+            one_total++;
+            if (i != j)
+                M->is_trivial = 0;
+        }
+        else if (M->umat[i*nvars + j] == 0)
+        {
+            if (i == j)
+                M->is_trivial = 0;
+        }
+        else
+        {
+            M->is_trivial = 0;
+            M->is_perm = 0;
+        }
+    }
+
+    if (one_total != M->nvars)
+        M->is_perm = 0;
+
+    flint_randinit(state);
+
+    sum_deg = 1;
+    overflowed = 0;
+    for (j = 0; j < M->mvars; j++)
+    {
+        if (z_add_checked(&sum_deg, sum_deg, M->degs[j]))
+        {
+            overflowed = 1;
+            break;
+        }
+    }
+
+    tries = 12;
+    if (!overflowed)
+        tries -= Alen/sum_deg/2;
+
+    M->is_irred = _mpoly_test_irreducible(M->exps, nvars, Alen,
+                                                   M->mvars, state, tries);
+
+    flint_randclear(state);
+}
+
