@@ -355,8 +355,15 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
 
 /* Nonsingular solving *******************************************************/
 
-FLINT_DLL int TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t A),
-                           const TEMPLATE(T, mat_t) C, const TEMPLATE(T, ctx_t) ctx);
+FLINT_DLL int TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X,
+               const TEMPLATE(T, mat_t A), const TEMPLATE(T, mat_t) C,
+                                                 const TEMPLATE(T, ctx_t) ctx);
+
+/* Solving *******************************************************************/
+
+FLINT_DLL int TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X,
+                const TEMPLATE(T, mat_t) A, const TEMPLATE(T, mat_t) B,
+                                                 const TEMPLATE(T, ctx_t) ctx);
 
 /* Transforms ****************************************************************/
 
