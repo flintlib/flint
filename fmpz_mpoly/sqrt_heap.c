@@ -293,7 +293,9 @@ slong _fmpz_mpoly_sqrt_heap1(
         {
             /* general coeff arithmetic */
 
+            /* total is always acc_lg + 2*temp */
             fmpz_zero(acc_lg);
+            fmpz_zero(temp);
 
             do
             {
@@ -308,16 +310,22 @@ slong _fmpz_mpoly_sqrt_heap1(
                     *store++ = x->j;
 
                     if (x->i == -WORD(1))
-                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
-                    else if (x->i == x->j)
-                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
-                    else
                     {
-                        fmpz_add(temp, q_coeff + x->j, q_coeff + x->j);
-                        fmpz_submul(acc_lg, q_coeff + x->i, temp);
+                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
+                        /* move to temp, where all the cancelation is */
+                        fmpz_tdiv_q_2exp(r, acc_lg, 1);
+                        fmpz_tdiv_r_2exp(acc_lg, acc_lg, 1);
+                        fmpz_add(temp, temp, r);
                     }
+                    else if (x->i != x->j)
+                        fmpz_submul(temp, q_coeff + x->i, q_coeff + x->j);
+                    else
+                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
+
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
+
+            fmpz_addmul_ui(acc_lg, temp, 2);
         }
 
         /* process nodes taken from the heap */
@@ -752,6 +760,7 @@ slong _fmpz_mpoly_sqrt_heap(
             /* general coeff arithmetic */
 
             fmpz_zero(acc_lg);
+            fmpz_zero(temp);
 
             do
             {
@@ -766,16 +775,21 @@ slong _fmpz_mpoly_sqrt_heap(
                     *store++ = x->j;
 
                     if (x->i == -WORD(1))
-                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
-                    else if (x->i == x->j)
-                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
-                    else
                     {
-                        fmpz_add(temp, q_coeff + x->j, q_coeff + x->j);
-                        fmpz_submul(acc_lg, q_coeff + x->i, temp);
+                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
+                        fmpz_tdiv_q_2exp(r, acc_lg, 1);
+                        fmpz_tdiv_r_2exp(acc_lg, acc_lg, 1);
+                        fmpz_add(temp, temp, r);
                     }
+                    else if (x->i != x->j)
+                        fmpz_submul(temp, q_coeff + x->i, q_coeff + x->j);
+                    else
+                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
+
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+
+            fmpz_addmul_ui(acc_lg, temp, 2);
         }
 
         /* process nodes taken from the heap */
