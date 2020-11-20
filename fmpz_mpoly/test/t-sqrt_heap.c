@@ -158,6 +158,7 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check sqrt(f^2*(x^2+x)) returns 0 */
@@ -202,7 +203,6 @@ main(void)
             fmpz_mpoly_assert_canonical(g, ctx);
 
             fmpz_mpoly_gen(x, n_randint(state, nvars), ctx);
-
             fmpz_mpoly_mul(k, x, x, ctx);
             fmpz_mpoly_add(k, k, x, ctx);
             fmpz_mpoly_assert_canonical(k, ctx);
@@ -233,6 +233,7 @@ main(void)
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(k, ctx);
         fmpz_mpoly_clear(x, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check sqrt(random) */
@@ -273,7 +274,7 @@ main(void)
                 if (!fmpz_mpoly_equal(g, f, ctx))
                 {
                     flint_printf("FAIL\n");
-                    flint_printf("Check sqrt(f)^2 = f\n");
+                    flint_printf("Check sqrt(random)\n");
                     flint_abort();
                 }
             }
@@ -287,6 +288,7 @@ main(void)
 
         fmpz_mpoly_clear(f, ctx);
         fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing of square root with input */
@@ -354,6 +356,7 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

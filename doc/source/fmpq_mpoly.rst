@@ -568,6 +568,19 @@ Greatest Common Divisor
     Do the operation of :func:`fmpq_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
 
+Square Root
+--------------------------------------------------------------------------------
+
+.. function:: int fmpq_mpoly_sqrt(fmpq_mpoly_t Q, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    If `A` is a perfect square return `1` and set `Q` to the square root
+    with positive leading coefficient. Otherwise return `0` and set `Q` to zero.
+
+.. function:: int fmpq_mpoly_is_square(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return `1` if `A` is a perfect square, otherwise return `0`.
+
+
 Univariate Functions
 --------------------------------------------------------------------------------
 
