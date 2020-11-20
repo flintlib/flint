@@ -326,6 +326,11 @@ FLINT_DLL slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 FLINT_DLL int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
 FLINT_DLL int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 
+/* Solving */
+
+FLINT_DLL int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A,
+                                                            const nmod_mat_t B);
+
 /* Reduced row echelon form */
 
 FLINT_DLL slong nmod_mat_rref(nmod_mat_t A);
