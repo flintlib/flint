@@ -596,6 +596,11 @@ FLINT_DLL void fq_zech_mpoly_evaluate_one_fq_zech(fq_zech_mpoly_t A,
                     const fq_zech_mpoly_t B, slong var, const fq_zech_t val,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
+FLINT_DLL void _fq_zech_mpoly_eval_all_fq_zech(fq_zech_t eval,
+               const fq_zech_struct * Acoeffs, const ulong * Aexps, slong Alen,
+                    flint_bitcnt_t Abits, fq_zech_struct * const * alphas,
+                            const mpoly_ctx_t mctx, const fq_zech_ctx_t fqctx);
+
 FLINT_DLL void fq_zech_mpoly_evaluate_all_fq_zech(fq_zech_t ev, const fq_zech_mpoly_t A,
                  fq_zech_struct * const * vals, const fq_zech_mpoly_ctx_t ctx);
 

@@ -990,6 +990,28 @@ nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
     const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len,
                                                    const nmod_mpoly_ctx_t ctx);
 
+/* Square root ***************************************************************/
+
+FLINT_DLL int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_sqrt(nmod_mpoly_t Q, const nmod_mpoly_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    return nmod_mpoly_sqrt_heap(Q, A, ctx);
+}
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_is_square(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+    int res;
+    nmod_mpoly_t Q;
+    nmod_mpoly_init(Q, ctx);
+    res = nmod_mpoly_sqrt_heap(Q, A, ctx);
+    nmod_mpoly_clear(Q, ctx);
+    return res;
+}
 
 /* GCD ***********************************************************************/
 

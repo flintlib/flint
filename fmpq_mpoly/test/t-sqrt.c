@@ -26,7 +26,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t f, g, h, k;
+        fmpq_mpoly_t f, g, h;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
         flint_bitcnt_t coeff_bits, coeff_bits1;
@@ -37,7 +37,6 @@ main(void)
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);
         fmpq_mpoly_init(h, ctx);
-        fmpq_mpoly_init(k, ctx);
 
         len = n_randint(state, 100);
         len1 = n_randint(state, 100);
@@ -53,7 +52,6 @@ main(void)
             fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits1, exp_bits1, ctx);
             fmpq_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
             fmpq_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
-            fmpq_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpq_mpoly_mul(g, f, f, ctx);
             fmpq_mpoly_assert_canonical(g, ctx);
@@ -79,7 +77,6 @@ main(void)
         fmpq_mpoly_clear(f, ctx);
         fmpq_mpoly_clear(g, ctx);
         fmpq_mpoly_clear(h, ctx);
-        fmpq_mpoly_clear(k, ctx);
         fmpq_mpoly_ctx_clear(ctx);
     }
 

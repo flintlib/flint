@@ -19,7 +19,7 @@
 
 
 /* try to prove that A is not a square */
-static int _is_definitely_not_square(
+static int _is_proved_not_square(
     int count,
     mp_limb_t * p,
     flint_rand_t state,
@@ -31,7 +31,6 @@ static int _is_definitely_not_square(
 {
     int success = 0;
     slong i, N = mpoly_words_per_exp(Abits, mctx);
-    ulong mask = Abits <= FLINT_BITS ? mpoly_overflow_mask_sp(Abits) : 0;
     mp_limb_t eval, * alphas;
     nmod_t mod;
     ulong * t;
@@ -44,23 +43,7 @@ static int _is_definitely_not_square(
 
     if (count == 1)
     {
-        /* check for odd degrees & check total degree too in degree orderings */
-        mpoly_monomial_set(t, Aexps + N*0, N);
-        if (Abits <= FLINT_BITS)
-        {
-            for (i = 1; i < Alen; i++)
-                mpoly_monomial_max(t, t, Aexps + N*i, Abits, N, mask);
-
-            success = !mpoly_monomial_halves(t, t, N, mask);
-        }
-        else
-        {
-            for (i = 1; i < Alen; i++)
-                mpoly_monomial_max_mp(t, t, Aexps + N*i, Abits, N);
-
-            success = !mpoly_monomial_halves_mp(t, t, N, Abits);
-        }
-
+        success = mpoly_is_proved_not_square(Aexps, Alen, Abits, N, t);
         if (success)
             goto cleanup;
     }
@@ -449,7 +432,7 @@ large_lt_divides:
         if (q_len >= heap_alloc)
         {
             /* run some tests if the square root is getting long */
-            if (q_len > len2 && _is_definitely_not_square(
+            if (q_len > len2 && _is_proved_not_square(
                             ++heuristic_count, &heuristic_p, heuristic_state,
                                                 poly2, exp2, len2, bits, mctx))
             {
@@ -920,7 +903,7 @@ large_lt_divides:
         if (q_len >= heap_alloc)
         {
             /* run some tests if the square root is getting long */
-            if (q_len > len2 && _is_definitely_not_square(
+            if (q_len > len2 && _is_proved_not_square(
                             ++heuristic_count, &heuristic_p, heuristic_state,
                                                 poly2, exp2, len2, bits, mctx))
             {
