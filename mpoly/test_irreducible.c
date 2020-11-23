@@ -800,7 +800,7 @@ int _mpoly_test_irreducible(
         return _test_indecomposable2(Aexps + 0*stride, Aexps + 1*stride, nvars);
 
     if (Alen == 3)
-        return _test_indecomposable3(Aexps + 0*nvars, Aexps + 1*stride,
+        return _test_indecomposable3(Aexps + 0*stride, Aexps + 1*stride,
                                                       Aexps + 2*stride, nvars);
     if (tries_left <= 0)
         return 0;
@@ -858,25 +858,35 @@ again:
 
         for (i = 0; i < Alen; i++)
         {
-            slong hix, lox, hiy, loy, phix, plox, phiy, ploy;
-            hix = lox = hiy = loy = 0;
+            ulong x2, x1, x0, y2, y1, y0, p2, p1, p0;
+            x2 = x1 = x0 = y2 = y1 = y0 = 0;
             for (j = 0; j < nvars; j++)
             {
-                smul_ppmm(phix, plox, Aexps[i*stride + j], rowx[j]);
-                smul_ppmm(phiy, ploy, Aexps[i*stride + j], rowy[j]);
-                add_ssaaaa(hix, lox, hix, lox, phix, plox);
-                add_ssaaaa(hiy, loy, hiy, loy, phiy, ploy);
+                smul_ppmm(p1, p0, Aexps[i*stride + j], rowx[j]);
+                p2 = FLINT_SIGN_EXT(p1);
+                add_sssaaaaaa(x2, x1, x0, x2, x1, x0, p2, p1, p0);
+
+                smul_ppmm(p1, p0, Aexps[i*stride + j], rowy[j]);
+                p2 = FLINT_SIGN_EXT(p1);
+                add_sssaaaaaa(y2, y1, y0, y2, y1, y0, p2, p1, p0);
             }
 
-            if (hix != FLINT_SIGN_EXT(lox) || hiy != FLINT_SIGN_EXT(loy) ||
-                FLINT_MIN(lox, loy) <= -WORD(1) << (FLINT_BITS - 3) ||
-                FLINT_MAX(lox, loy) >= WORD(1) << (FLINT_BITS - 3))
+            if (x2 != FLINT_SIGN_EXT(x0) || x1 != FLINT_SIGN_EXT(x0) ||
+                y2 != FLINT_SIGN_EXT(y0) || y1 != FLINT_SIGN_EXT(y0))
             {
                 goto again;
             }
 
-            points[i].x = lox;
-            points[i].y = loy;
+            points[i].x = x0;
+            points[i].y = y0;
+
+            if (points[i].x <= -WORD(1) << (FLINT_BITS - 3) ||
+                points[i].y <= -WORD(1) << (FLINT_BITS - 3) ||
+                points[i].x >= WORD(1) << (FLINT_BITS - 3) ||
+                points[i].y >= WORD(1) << (FLINT_BITS - 3))
+            {
+                goto again;
+            }
         }
     }
 

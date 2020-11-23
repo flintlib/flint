@@ -52,11 +52,11 @@ LONG_EXTRAS_INLINE int z_add_checked(slong * a, slong b, slong c)
 LONG_EXTRAS_INLINE
 int z_mat22_det_is_negative(slong m11, slong m12, slong m21, slong m22)
 {
-    slong t1, t2, t3, t4;
+    ulong t1, t2, t3, t4;
     smul_ppmm(t1, t2, m11, m22);
     smul_ppmm(t3, t4, m12, m21);
     sub_ddmmss(t1, t2, t1, t2, t3, t4);
-    return t1 < 0;
+    return FLINT_SIGN_EXT(t1) != 0;
 }
 
 /* Randomisation  ************************************************************/
