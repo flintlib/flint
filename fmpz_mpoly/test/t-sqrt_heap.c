@@ -77,7 +77,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* Check sqrt(f^2)^2 = f^2 */
+    /* Check sqrt(f^2) = +-f */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -113,7 +113,10 @@ main(void)
             fmpz_mpoly_mul(g, f, f, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
 
-   	        sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
+            if (f->length > 0 && fmpz_sgn(f->coeffs + 0) < 0)
+                fmpz_mpoly_neg(f, f, ctx);
+
+            sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 1);
             fmpz_mpoly_assert_canonical(h, ctx);
 
             if (!sqr)
@@ -123,18 +126,15 @@ main(void)
                 flint_abort();
             }
 
-            fmpz_mpoly_mul(k, h, h, ctx);
-            fmpz_mpoly_assert_canonical(h, ctx);
-
-            if (!fmpz_mpoly_equal(g, k, ctx))
+            if (!fmpz_mpoly_equal(h, f, ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check sqrt(f^2)^2 = f^2\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check sqrt(f^2) = +-f\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
 
-            sqr = fmpz_mpoly_sqrt_heap(h, g, ctx, 0);
-            fmpz_mpoly_assert_canonical(h, ctx);
+            sqr = fmpz_mpoly_sqrt_heap(k, g, ctx, 0);
+            fmpz_mpoly_assert_canonical(k, ctx);
 
             if (!sqr)
             {
@@ -143,13 +143,10 @@ main(void)
                 flint_abort();
             }
 
-            fmpz_mpoly_mul(k, h, h, ctx);
-            fmpz_mpoly_assert_canonical(k, ctx);
-
-            if (!fmpz_mpoly_equal(g, k, ctx))
+            if (!fmpz_mpoly_equal(k, f, ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check sqrt(f^2)^2 = f^2\ni = %wd, j = %wd: nocheck\n", i ,j);
+                flint_printf("Check sqrt(f)^2 = +-f\ni = %wd, j = %wd: nocheck\n", i ,j);
                 flint_abort();
             }
         }

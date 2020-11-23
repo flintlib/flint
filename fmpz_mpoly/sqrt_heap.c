@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "longlong.h"
-
+#include "mpn_extras.h"
 
 /* try to prove that A is not a square */
 static int _is_proved_not_square(
@@ -79,25 +79,26 @@ cleanup:
 }
 
 
-#define DEBUG 0
-
 /*
-   Set polyq to the square root of poly2 and return the length of the square
+   Set polyq to the square root of A and return the length of the square
    root if it exists or zero otherwise. This version of the function assumes
    the exponent vectors all fit in a single word. The exponent vectors are
    assumed to have fields with the given number of bits. Assumes input poly
    is nonzero. Implements "Heap based multivariate square root" by William
    Hart. Square root is from left to right with a
    heap with largest exponent at the head. Output poly is written in order.
+   A never explictly goes into the heap and is only scanned once.
+   TODO: copy this strategy for the "small" case (i.e. no fmpz arithmetic)
+         to the other fmpz mpoly mul/div functions.
 */
 slong _fmpz_mpoly_sqrt_heap1(
     fmpz ** polyq, ulong ** expq, slong * allocq,
-    const fmpz * poly2, const ulong * exp2, slong len2,
+    const fmpz * Acoeffs, const ulong * Aexps, slong Alen,
     flint_bitcnt_t bits,
     const mpoly_ctx_t mctx,
     int check)
 {
-    slong i, j, q_len;
+    slong i, j, Qlen, Ai;
     slong next_loc, heap_len = 1, heap_alloc;
     mpoly_heap1_s * heap;
     mpoly_heap_t * chain_nodes[64];
@@ -105,43 +106,35 @@ slong _fmpz_mpoly_sqrt_heap1(
     slong exp_alloc;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    fmpz * q_coeff = *polyq;
-    ulong * q_exp = *expq;
+    fmpz * Qcoeffs = *polyq;
+    ulong * Qexps = *expq;
     ulong mask, exp, exp3 = 0;
     ulong maskhi;
-    fmpz_t r, acc_lg, temp;
-    ulong acc_sm[3]; /* three word accumulation for small coefficients */
-    int lt_divides, small;
-    slong bits2;
-    ulong lc_abs = 0; /* sqrt of lc (positive sign) */
-    ulong lc_norm = 0; /* number of bits to shift sqrt(lc) to normalise */
-    ulong lc_n = 0; /* sqrt of lc normalised */
-    ulong lc_i = 0; /* precomputed inverse of sqrt(lc) */
+    mpz_t r, acc, acc2;
+    mpz_srcptr acc_lg;
+    mpz_ptr t;
+    ulong acc_sm[3], acc_sm2[3], pp[3];
+    int lt_divides, q_rest_small;
     flint_rand_t heuristic_state;
     mp_limb_t heuristic_p = UWORD(1) << (FLINT_BITS - 2);
     int heuristic_count = 0;
-
-#if DEBUG
-    printf("Small case\n");
-#endif
+    ulong lc_abs = 0; /* 2*sqrt(lc) if it fits in ulong, otherwise 0 */
+    ulong lc_norm = 0;
+    ulong lc_n = 0;
+    ulong lc_i = 0;
+    mpz_ptr lc_lg = NULL; /* 2*sqrt(lc) if it is large */
 
     FLINT_ASSERT(mpoly_words_per_exp(bits, mctx) == 1);
     mpoly_get_cmpmask(&maskhi, 1, bits, mctx);
 
     flint_randinit(heuristic_state);
 
-    fmpz_init(acc_lg);
-    fmpz_init(r);
-    fmpz_init(temp);
-
-   /* if intermediate computations a - c_i*c_j likely fit in three words */
-   bits2 = _fmpz_vec_max_bits(poly2, len2);
-   /* add 1 for sign, 1 for subtraction and 1 for multiplication by 2 */
-   small = FLINT_ABS(bits2) + FLINT_BIT_COUNT(len2) + 3 <= 2*FLINT_BITS && 
-           FLINT_ABS(bits2) <= 2*(FLINT_BITS - 3);
+    mpz_init(r);
+    mpz_init(acc);
+    mpz_init(acc2);
 
     /* alloc array of heap nodes which can be chained together */
-    next_loc = 2*n_sqrt(len2) + 4;   /* something bigger than heap can ever be */
+    next_loc = 2*n_sqrt(Alen) + 4;   /* something bigger than heap can ever be */
     heap_alloc = next_loc - 3;
     heap = (mpoly_heap1_s *) flint_malloc((heap_alloc + 1)*sizeof(mpoly_heap1_s));
     chain_nodes[0] = (mpoly_heap_t *) flint_malloc(heap_alloc*sizeof(mpoly_heap_t));
@@ -155,160 +148,217 @@ slong _fmpz_mpoly_sqrt_heap1(
 
     mask = mpoly_overflow_mask_sp(bits);
 
-    q_len = 0;
+    Qlen = 0;
    
-    /* insert (-1, 1, exp2[1]) into heap */
-    if (len2 > 1)
-    {
-#if DEBUG
-       printf("insert (-1, 1)\n");
-#endif
-       x = chain[0];
-       x->i = -WORD(1);
-       x->j = 1;
-       x->next = NULL;
-       HEAP_ASSIGN(heap[1], exp2[1], x);
-       heap_len++;
-    }
+    /* "insert" (-1, 1, Aexps[1]) into "heap" */
+    Ai = 1;
 
-    if (fmpz_sgn(poly2 + 0) < 0)/* not a perfect square coeff */
+    /* compute first term */
+    if (!fmpz_is_square(Acoeffs + 0))
         goto not_sqrt; 
 
-    _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
+    _fmpz_mpoly_fit_length(&Qcoeffs, &Qexps, allocq, Qlen + 1, 1);
    
-    fmpz_sqrtrem(q_coeff + 0, r, poly2 + 0);
+    fmpz_sqrt(Qcoeffs + 0, Acoeffs + 0);
 
-    q_len++;
-       
-    if (!fmpz_is_zero(r))
-       goto not_sqrt;
+    Qlen++;
 
     /* multiply by 2, we revert this at the end */
-    fmpz_mul_2exp(q_coeff + 0, q_coeff + 0, 1);
+    fmpz_mul_2exp(Qcoeffs + 0, Qcoeffs + 0, 1);
 
-    /* precompute leading coefficient info */
-    if (small)
+    /* q_rest_small means Qcoeffs[1] ... Qcoeffs[Qlen-1] are small */
+    q_rest_small = 1;
+
+    if (fmpz_abs_fits_ui(Qcoeffs + 0))
     {
-        lc_abs = q_coeff[0];
-
+        lc_abs = fmpz_get_ui(Qcoeffs + 0);
         count_leading_zeros(lc_norm, lc_abs);
         lc_n = lc_abs << lc_norm;
         invert_limb(lc_i, lc_n);           
-    } 
+    }
+    else
+    {
+        lc_lg = COEFF_TO_PTR(Qcoeffs[0]);
+    }
 
-    if (!mpoly_monomial_halves1(q_exp + 0, exp2[0], mask))
+    if (!mpoly_monomial_halves1(Qexps + 0, Aexps[0], mask))
         goto not_sqrt; /* exponent is not square */
 
     /* optimisation, compute final exponent */
     {
-        if (!fmpz_is_square(poly2 + len2 - 1))
+        if (!fmpz_is_square(Acoeffs + Alen - 1))
             goto not_sqrt;
 
-        if (!mpoly_monomial_halves1(&exp3, exp2[len2 - 1], mask))
+        if (!mpoly_monomial_halves1(&exp3, Aexps[Alen - 1], mask))
             goto not_sqrt; /* exponent is not square */
 
-        exp3 += q_exp[0]; /* overflow not possible */
+        exp3 += Qexps[0]; /* overflow not possible */
     }
 
-    while (heap_len > 1)
+    while (heap_len > 1 || Ai < Alen)
     {
-        exp = heap[1].exp;
+        _fmpz_mpoly_fit_length(&Qcoeffs, &Qexps, allocq, Qlen + 1, 1);
 
-        /*
-            All input fields are < 2^(bits - 1). If poly2 is a square, all
-            output fields of q are < 2^(bits - 2). Since the heap only contains
-                (1) exp2[j], or
-                (2) q_exp[i] + q_exp[j],
-            if something in the heap does overflow, a bad q_exp must have been
-            generated, possibly from bad input.
-        */
-        if (mpoly_monomial_overflows1(exp, mask))
-            goto not_sqrt;
+        if (heap_len > 1 && Ai < Alen && Aexps[Ai] == heap[1].exp)
+        {
+            /* take from both A and heap */
+            exp = Aexps[Ai];
+            acc_lg = _fmpz_mpoly_get_mpz_signed_uiuiui(acc_sm, Acoeffs[Ai], acc);
+            Ai++;
+        }
+        else if (heap_len > 1 && (Ai >= Alen ||
+                           mpoly_monomial_gt1(heap[1].exp, Aexps[Ai], maskhi)))
+        {
+            /* take only from heap */
+            exp = heap[1].exp;
+            mpz_set_ui(acc, 0);
+            acc_lg = acc;
+            acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;
 
-        _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
+            if (mpoly_monomial_overflows1(exp, mask))
+                goto not_sqrt;
+        }
+        else
+        {
+            FLINT_ASSERT(Ai < Alen);
 
-        lt_divides = mpoly_monomial_divides1(q_exp + q_len, exp, q_exp[0], mask);
+            /* take only from A */
+            exp = Aexps[Ai];
+            acc_lg = _fmpz_mpoly_get_mpz_signed_uiuiui(acc_sm, Acoeffs[Ai], acc);
+            Ai++;
+
+            if (!check && mpoly_monomial_gt1(exp3, exp, maskhi))
+                break;
+
+            lt_divides = mpoly_monomial_divides1(Qexps + Qlen, exp, Qexps[0], mask);
+
+            goto skip_heap;
+        }
+
+        lt_divides = mpoly_monomial_divides1(Qexps + Qlen, exp, Qexps[0], mask);
 
         /* take nodes from heap with exponent matching exp */
 
         if (!lt_divides && !check)
         {
-            do
-            {
+            do {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-                do
-                {
-#if DEBUG
-                    flint_printf("pop1 (%wd, %wd)\n", x->i, x->j);
-#endif
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
+
+            mpz_set_ui(acc, 0);
+            acc_lg = acc;
         }
-        else if (small)
+        else if (q_rest_small)
         {
-            /* optimization: small coeff arithmetic, acc_sm used below */
+            /* optimization: small coeff arithmetic */
 
-            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
-            do
-            {
+            acc_sm2[2] = acc_sm2[1] = acc_sm2[0] = 0;
+            do {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-                do
-                {
-#if DEBUG
-                    flint_printf("pop2 (%wd, %wd)\n", x->i, x->j);
-#endif
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
-                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
-                    else if (x->i == x->j)
-                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
-                    else
-                        _fmpz_mpoly_submul2_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
+                    smul_ppmm(pp[1], pp[0], Qcoeffs[x->i], Qcoeffs[x->j]);
+                    pp[2] = FLINT_SIGN_EXT(pp[1]);
 
+                    if (x->i != x->j)
+                        sub_dddmmmsss(acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                      acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                      pp[2], pp[1], pp[0]);
+                    else
+                        sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
+                                      acc_sm[2], acc_sm[1], acc_sm[0],
+                                      pp[2], pp[1], pp[0]);
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
+
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+
+            if (mpz_sgn(acc_lg) != 0)
+            {
+                flint_mpz_add_signed_uiuiui(acc, acc_lg,
+                                              acc_sm[2], acc_sm[1], acc_sm[0]);
+                acc_lg = acc;
+                acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;
+            }
         }
         else
         {
-            /* general coeff arithmetic */
+            acc_sm2[2] = acc_sm2[1] = acc_sm2[0] = 0;
 
-            /* total is always acc_lg + 2*temp */
-            fmpz_zero(acc_lg);
-            fmpz_zero(temp);
+            /* total is always acc + acc_sm + 2*(acc2 + acc_sm2) */
+            mpz_tdiv_q_2exp(acc2, acc_lg, 1);
+            mpz_tdiv_r_2exp(acc, acc_lg, 1);
 
-            do
-            {
+            do {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do {
+                    fmpz Qi, Qj;
 
-                do
-                {
-#if DEBUG
-                    flint_printf("pop3 (%wd, %wd)\n", x->i, x->j);
-#endif
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    Qi = Qcoeffs[x->i];
+                    Qj = Qcoeffs[x->j];
+                    t = (x->i != x->j) ? acc2 : acc;
+
+                    if (!COEFF_IS_MPZ(Qi) && !COEFF_IS_MPZ(Qj))
                     {
-                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
-                        /* move to temp, where all the cancelation is */
-                        fmpz_tdiv_q_2exp(r, acc_lg, 1);
-                        fmpz_tdiv_r_2exp(acc_lg, acc_lg, 1);
-                        fmpz_add(temp, temp, r);
+                        smul_ppmm(pp[1], pp[0], Qi, Qj);
+                        pp[2] = FLINT_SIGN_EXT(pp[1]);
+
+                        if (x->i != x->j)
+                            sub_dddmmmsss(acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                          acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                          pp[2], pp[1], pp[0]);
+                        else
+                            sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
+                                          acc_sm[2], acc_sm[1], acc_sm[0],
+                                          pp[2], pp[1], pp[0]);
                     }
-                    else if (x->i != x->j)
-                        fmpz_submul(temp, q_coeff + x->i, q_coeff + x->j);
+                    else if (!COEFF_IS_MPZ(Qi) && COEFF_IS_MPZ(Qj))
+                    {
+                        if (Qi < WORD(0))
+                            flint_mpz_addmul_ui(t, COEFF_TO_PTR(Qj), -Qi);
+                        else
+                            flint_mpz_submul_ui(t, COEFF_TO_PTR(Qj), Qi);
+                    }
+                    else if (COEFF_IS_MPZ(Qi) && !COEFF_IS_MPZ(Qj))
+                    {
+                        if (Qj < WORD(0))
+                            flint_mpz_addmul_ui(t, COEFF_TO_PTR(Qi), -Qj);
+                        else
+                            flint_mpz_submul_ui(t, COEFF_TO_PTR(Qi), Qj);
+                    }
                     else
-                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
+                    {
+                        mpz_submul(t, COEFF_TO_PTR(Qi), COEFF_TO_PTR(Qj));
+                    }
 
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
 
-            fmpz_addmul_ui(acc_lg, temp, 2);
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+
+            flint_mpz_add_signed_uiuiui(acc, acc, acc_sm[2], acc_sm[1], acc_sm[0]);
+            mpz_addmul_ui(acc, acc2, 2);
+            acc_lg = acc;
+            acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;
         }
 
         /* process nodes taken from the heap */
@@ -317,51 +367,29 @@ slong _fmpz_mpoly_sqrt_heap1(
             j = *--store;
             i = *--store;
 
-            if (i == -WORD(1))
+            /* should we go right */
+            if (j < i)
             {
-                /* take next input term */
-                if (j + 1 < len2)
-                {
-                    x = chain[0];
-                    x->i = i;
-                    x->j = j + 1;
-                    x->next = NULL;
-                    if (check || !mpoly_monomial_gt1(exp3, exp2[x->j], maskhi))
-                    {
-#if DEBUG
-                        flint_printf("insert1 (%wd, %wd)\n", x->i, x->j);
-#endif
-                        _mpoly_heap_insert1(heap, exp2[x->j], x,
-                                                 &next_loc, &heap_len, maskhi);
-                    }
-                }
-            } else
-            {
-                /* should we go right */
-                if (j < i)
-                {
-                    x = chain[i];
-                    x->i = i;
-                    x->j = j + 1;
-                    x->next = NULL;
+                x = chain[i];
+                x->i = i;
+                x->j = j + 1;
+                x->next = NULL;
 
-                    if (check || !mpoly_monomial_gt1(exp3, q_exp[x->i] + q_exp[x->j], maskhi))
-                    {
-#if DEBUG
-                        flint_printf("insert2 (%wd, %wd)\n", x->i, x->j);
-#endif
-                        _mpoly_heap_insert1(heap, q_exp[x->i] + q_exp[x->j], x,
-                                                 &next_loc, &heap_len, maskhi);
-                    }
+                if (check || !mpoly_monomial_gt1(exp3, Qexps[x->i] + Qexps[x->j], maskhi))
+                {
+                    _mpoly_heap_insert1(heap, Qexps[x->i] + Qexps[x->j], x,
+                                             &next_loc, &heap_len, maskhi);
                 }
             }
         }
+
+    skip_heap:
 
         /* try to divide accumulated term by leading term */
         if (!check && !lt_divides)
             continue;
 
-        if (small)
+        if (mpz_sgn(acc_lg) == 0)
         {
             ulong d0, d1, ds = acc_sm[2];
 
@@ -377,8 +405,7 @@ slong _fmpz_mpoly_sqrt_heap1(
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
-                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
-                nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
+                nhi = MPN_LEFT_SHIFT_HI(d1, d0, lc_norm);
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
 
@@ -390,53 +417,62 @@ slong _fmpz_mpoly_sqrt_heap1(
 
                 if (qq <= COEFF_MAX)
                 {
-                    _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = qq;
+                    _fmpz_demote(Qcoeffs + Qlen);
+                    Qcoeffs[Qlen] = qq;
                     if (ds != 0)
-                        q_coeff[q_len] = -q_coeff[q_len];
+                        Qcoeffs[Qlen] = -Qcoeffs[Qlen];
                 }
                 else
                 {
-                    small = 0;
-                    fmpz_set_ui(q_coeff + q_len, qq);
-                    if (ds != 0)
-                        fmpz_neg(q_coeff + q_len, q_coeff + q_len);
+                    q_rest_small = 0;
+                    if (ds == 0)
+                        fmpz_set_ui(Qcoeffs + Qlen, qq);
+                    else
+                        fmpz_neg_ui(Qcoeffs + Qlen, qq);
                 }
             }
             else
             {
-                small = 0;
-                fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+                flint_mpz_add_signed_uiuiui(acc, acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
         }
         else
         {
-            if (fmpz_is_zero(acc_lg))
+            flint_mpz_add_signed_uiuiui(acc, acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+
+            if (mpz_sgn(acc) == 0)
                 continue;
 
             if (!lt_divides)
                 goto not_sqrt;
 
-large_lt_divides:
+        large_lt_divides:
 
-            fmpz_fdiv_qr(q_coeff + q_len, r, acc_lg, q_coeff + 0);
+            t = _fmpz_promote(Qcoeffs + Qlen);
+            if (lc_abs > 0)
+                flint_mpz_fdiv_qr_ui(t, r, acc, lc_abs);
+            else
+                mpz_fdiv_qr(t, r, acc, lc_lg);
 
-            if (!fmpz_is_zero(r))
+            _fmpz_demote_val(Qcoeffs + Qlen);
+            q_rest_small = q_rest_small && !COEFF_IS_MPZ(Qcoeffs[Qlen]);
+
+            if (mpz_sgn(r) != 0)
             {
-                q_len++;
+                Qlen++;
                 goto not_sqrt;
             }
         }
 
-        if (q_len >= heap_alloc)
+        if (Qlen >= heap_alloc)
         {
             /* run some tests if the square root is getting long */
-            if (q_len > len2 && _is_proved_not_square(
+            if (Qlen > Alen && _is_proved_not_square(
                             ++heuristic_count, &heuristic_p, heuristic_state,
-                                                poly2, exp2, len2, bits, mctx))
+                                                Acoeffs, Aexps, Alen, bits, mctx))
             {
-                q_len++; /* for demotion */
+                Qlen++; /* for demotion */
                 goto not_sqrt;
             }
 
@@ -450,39 +486,35 @@ large_lt_divides:
             exp_alloc++;
         }
 
-        /* put (q_len, 1) in heap */
-        i = q_len;
+        /* put (Qlen, 1) in heap */
+        i = Qlen;
         x = chain[i];
         x->i = i;
         x->j = 1;
         x->next = NULL;
 
-        if (check || !mpoly_monomial_gt1(exp3, q_exp[i] + q_exp[1], maskhi))
+        if (check || !mpoly_monomial_gt1(exp3, Qexps[i] + Qexps[1], maskhi))
         {
-#if DEBUG
-           flint_printf("insert3 (%wd, %wd)\n", x->i, x->j);
-#endif
-
-           _mpoly_heap_insert1(heap, q_exp[i] + q_exp[1], x,
+           _mpoly_heap_insert1(heap, Qexps[i] + Qexps[1], x,
                                                  &next_loc, &heap_len, maskhi);
         }
 
-        q_len++;
+        Qlen++;
     }
 
     /* divide extra factor of 2 back out of leading coefficient */
-    fmpz_fdiv_q_2exp(q_coeff + 0, q_coeff + 0, 1);
+    fmpz_fdiv_q_2exp(Qcoeffs + 0, Qcoeffs + 0, 1);
 
 cleanup:
 
     flint_randclear(heuristic_state);
 
-    fmpz_clear(acc_lg);
-    fmpz_clear(r);
-    fmpz_clear(temp);
+    mpz_clear(r);
+    mpz_clear(acc);
+    mpz_clear(acc2);
 
-    (*polyq) = q_coeff;
-    (*expq) = q_exp;
+    (*polyq) = Qcoeffs;
+    (*expq) = Qexps;
 
     flint_free(heap);
     flint_free(chain);
@@ -491,26 +523,26 @@ cleanup:
         flint_free(chain_nodes[i]);
 
     /* return sqrt poly length, or zero if not a square root */
-    return q_len;
+    return Qlen;
 
 not_sqrt:
-    for (i = 0; i < q_len; i++)
-        _fmpz_demote(q_coeff + i);
-    q_len = 0;
+    for (i = 0; i < Qlen; i++)
+        _fmpz_demote(Qcoeffs + i);
+    Qlen = 0;
     goto cleanup;
 }
 
 
 slong _fmpz_mpoly_sqrt_heap(
     fmpz ** polyq, ulong ** expq, slong * allocq,
-    const fmpz * poly2, const ulong * exp2, slong len2,
+    const fmpz * Acoeffs, const ulong * Aexps, slong Alen,
     flint_bitcnt_t bits,
     const mpoly_ctx_t mctx,
     int check)
 {
     slong N = mpoly_words_per_exp(bits, mctx);
     ulong * cmpmask;
-    slong i, j, q_len;
+    slong i, j, Qlen, Ai;
     slong next_loc;
     slong heap_len = 1, heap_alloc;
     int exp_alloc;
@@ -519,34 +551,31 @@ slong _fmpz_mpoly_sqrt_heap(
     mpoly_heap_t ** chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    fmpz * q_coeff = *polyq;
-    ulong * q_exp = *expq;
+    fmpz * Qcoeffs = *polyq;
+    ulong * Qexps = *expq;
     ulong * exp, * exp3;
     ulong * exps[64];
     ulong ** exp_list;
     slong exp_next;
     ulong mask;
-    fmpz_t r, acc_lg, temp;
-    ulong acc_sm[3];
-    int lt_divides, small, halves;
-    slong bits2;
-    ulong lc_abs = 0; /* sqrt of lc (positive sign) */
-    ulong lc_norm = 0; /* number of bits to shift sqrt(lc) to normalise */
-    ulong lc_n = 0; /* sqrt of lc normalised */
-    ulong lc_i = 0; /* precomputed inverse of sqrt(lc) */
+    mpz_t r, acc, acc2;
+    mpz_srcptr acc_lg;
+    mpz_ptr t;
+    ulong acc_sm[3], acc_sm2[3], pp[3];
+    int halves, use_heap, lt_divides, q_rest_small;
     flint_rand_t heuristic_state;
     mp_limb_t heuristic_p = UWORD(1) << (FLINT_BITS - 2);
     int heuristic_count = 0;
-
+    ulong lc_abs = 0; /* 2*sqrt(lc) if it fits in ulong, otherwise 0 */
+    ulong lc_norm = 0;
+    ulong lc_n = 0;
+    ulong lc_i = 0;
+    mpz_ptr lc_lg = NULL; /* 2*sqrt(lc) if it is large */
     TMP_INIT;
 
     if (N == 1)
         return _fmpz_mpoly_sqrt_heap1(polyq, expq, allocq,
-                                        poly2, exp2, len2, bits, mctx, check);
-
-#if DEBUG
-    printf("Large case\n");
-#endif
+                                        Acoeffs, Aexps, Alen, bits, mctx, check);
 
     TMP_START;
 
@@ -555,18 +584,12 @@ slong _fmpz_mpoly_sqrt_heap(
 
     flint_randinit(heuristic_state);
 
-    fmpz_init(acc_lg);
-    fmpz_init(r);
-    fmpz_init(temp);
-
-    /* if intermediate computations a - c_i*c_j likely fit in three words */
-    bits2 = _fmpz_vec_max_bits(poly2, len2);
-    /* add 1 for sign, 1 for subtraction and 1 for multiplication by 2 */
-    small = FLINT_ABS(bits2) + FLINT_BIT_COUNT(len2) + 3 <= 2*FLINT_BITS && 
-           FLINT_ABS(bits2) <= 2*(FLINT_BITS - 3);
+    mpz_init(r);
+    mpz_init(acc);
+    mpz_init(acc2);
 
     /* alloc array of heap nodes which can be chained together */
-    next_loc = 2*sqrt(len2) + 4;   /* something bigger than heap can ever be */
+    next_loc = 2*sqrt(Alen) + 4;   /* something bigger than heap can ever be */
     heap_alloc = next_loc - 3;
     heap = (mpoly_heap_s *) flint_malloc((heap_alloc + 1)*sizeof(mpoly_heap_s));
     chain_nodes[0] = (mpoly_heap_t *) flint_malloc(heap_alloc*sizeof(mpoly_heap_t));
@@ -592,187 +615,242 @@ slong _fmpz_mpoly_sqrt_heap(
 
     mask = (bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(bits) : 0;
 
-    q_len = 0;
+    Qlen = 0;
    
-    /* insert (-1, 1, exp2[0]) into heap */
-    if (len2 > 1)
-    {
-#if DEBUG
-       printf("insert (-1, 1)\n");
-#endif
-        x = chain[0];
-        x->i = -WORD(1);
-        x->j = 1;
-        x->next = NULL;
-        heap[1].next = x;
-        heap[1].exp = exp_list[exp_next++];
-        mpoly_monomial_set(heap[1].exp, exp2 + N, N);
-        heap_len++;
-    }
+    /* "insert" (-1, 1, Aexps[0]) into "heap" */
+    Ai = 1;
 
-    if (fmpz_sgn(poly2 + 0) < 0)/* not a perfect square coeff */
+    /* compute first term */
+    if (!fmpz_is_square(Acoeffs + 0))
         goto not_sqrt; 
 
-    _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
+    _fmpz_mpoly_fit_length(&Qcoeffs, &Qexps, allocq, Qlen + 1, 1);
 
-    fmpz_sqrtrem(q_coeff + 0, r, poly2 + 0);
-
-    q_len++;
-
-    if (!fmpz_is_zero(r))
-        goto not_sqrt;
+    fmpz_sqrt(Qcoeffs + 0, Acoeffs + 0);
+    Qlen++;
 
     /* multiply by 2, we revert this at the end */
-    fmpz_mul_2exp(q_coeff + 0, q_coeff + 0, 1);
+    fmpz_mul_2exp(Qcoeffs + 0, Qcoeffs + 0, 1);
 
-    /* precompute leading coefficient info */
-    if (small)
+    /* q_rest_small means Qcoeffs[1] ... Qcoeffs[Qlen-1] are small */
+    q_rest_small = 1;
+
+    if (fmpz_abs_fits_ui(Qcoeffs + 0))
     {
-        lc_abs = q_coeff[0];
-
+        lc_abs = fmpz_get_ui(Qcoeffs + 0);
         count_leading_zeros(lc_norm, lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);          
+        invert_limb(lc_i, lc_n);           
+    }
+    else
+    {
+        lc_lg = COEFF_TO_PTR(Qcoeffs[0]);
     }
     
     if (bits <= FLINT_BITS)
-        halves = mpoly_monomial_halves(q_exp + 0, exp2 + 0, N, mask);
+        halves = mpoly_monomial_halves(Qexps + 0, Aexps + 0, N, mask);
     else
-        halves = mpoly_monomial_halves_mp(q_exp + 0, exp2 + 0, N, bits);
+        halves = mpoly_monomial_halves_mp(Qexps + 0, Aexps + 0, N, bits);
 
     if (!halves)
         goto not_sqrt; /* exponent is not square */
 
     /* optimisation, compute final term */
     {
-        if (!fmpz_is_square(poly2 + len2 - 1))
+        if (!fmpz_is_square(Acoeffs + Alen - 1))
             goto not_sqrt;
 
         if (bits <= FLINT_BITS)
-            halves = mpoly_monomial_halves(exp3, exp2 + (len2 - 1)*N, N, mask);
+            halves = mpoly_monomial_halves(exp3, Aexps + (Alen - 1)*N, N, mask);
         else
-            halves = mpoly_monomial_halves_mp(exp3, exp2 + (len2 - 1)*N, N, bits);
+            halves = mpoly_monomial_halves_mp(exp3, Aexps + (Alen - 1)*N, N, bits);
 
         if (!halves)
             goto not_sqrt; /* exponent is not square */
 
         if (bits <= FLINT_BITS)
-            mpoly_monomial_add(exp3, exp3, q_exp + 0, N);
+            mpoly_monomial_add(exp3, exp3, Qexps + 0, N);
         else
-            mpoly_monomial_add_mp(exp3, exp3, q_exp + 0, N);
+            mpoly_monomial_add_mp(exp3, exp3, Qexps + 0, N);
     }
 
-    while (heap_len > 1)
+    while (heap_len > 1 || Ai < Alen)
     {
-        _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
+        _fmpz_mpoly_fit_length(&Qcoeffs, &Qexps, allocq, Qlen + 1, N);
 
-        mpoly_monomial_set(exp, heap[1].exp, N);
-
-        /*
-            All input fields are < 2^(bits - 1). If poly2 is a square, all
-            output fields of q are < 2^(bits - 2). Since the heap only contains
-                (1) exp2[j], or
-                (2) q_exp[i] + q_exp[j],
-            if something in the heap does overflow, a bad q_exp must have been
-            generated, possibly from bad input.
-        */
-        if (bits <= FLINT_BITS)
+        if (heap_len > 1 && Ai < Alen &&
+                            mpoly_monomial_equal(Aexps + N*Ai, heap[1].exp, N))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
+            /* take from both A and heap */
+            mpoly_monomial_set(exp, Aexps + N*Ai, N);
+            acc_lg = _fmpz_mpoly_get_mpz_signed_uiuiui(acc_sm, Acoeffs[Ai], acc);
+            Ai++;
+            use_heap = 1;
+        }
+        else if (heap_len > 1 && (Ai >= Alen ||
+                     mpoly_monomial_lt(Aexps + N*Ai, heap[1].exp, N, cmpmask)))
+        {
+            /* take only from heap */
+            mpoly_monomial_set(exp, heap[1].exp, N);
+            mpz_set_ui(acc, 0);
+            acc_lg = acc;
+            acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;
+
+            if (bits <= FLINT_BITS ? mpoly_monomial_overflows(exp, N, mask)
+                                   : mpoly_monomial_overflows_mp(exp, N, bits))
                 goto not_sqrt;
 
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N,
-                                                      exp, q_exp + 0, N, mask);
+            use_heap = 1;
         }
         else
         {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto not_sqrt;
+            FLINT_ASSERT(Ai < Alen);
 
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N,
-                                                      exp, q_exp + 0, N, bits);
+            /* take only from A */
+            mpoly_monomial_set(exp, Aexps + N*Ai, N);
+            acc_lg = _fmpz_mpoly_get_mpz_signed_uiuiui(acc_sm, Acoeffs[Ai], acc);
+            Ai++;
+
+            if (!check && mpoly_monomial_gt(exp3, exp, N, cmpmask))
+                break;
+
+            use_heap = 0;
         }
+
+        if (bits <= FLINT_BITS)
+            lt_divides = mpoly_monomial_divides(Qexps + N*Qlen,
+                                                      exp, Qexps + 0, N, mask);
+        else
+            lt_divides = mpoly_monomial_divides_mp(Qexps + N*Qlen,
+                                                      exp, Qexps + 0, N, bits);
+
+        if (!use_heap)
+            goto skip_heap;
 
         /* take nodes from heap with exponent matching exp */
 
         if (!lt_divides && !check)
         {
-            do
-            {
+            do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-                do
-                {
-#if DEBUG
-                    flint_printf("pop1 (%wd, %wd)\n", x->i, x->j);
-#endif
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+
+            mpz_set_ui(acc, 0);
+            acc_lg = acc;
         }
-        else if (small)
+        else if (q_rest_small)
         {
-            /* optimization: small coeff arithmetic, acc_sm used below */
+            /* optimization: small coeff arithmetic */
 
-            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
-            do
-            {
+            acc_sm2[2] = acc_sm2[1] = acc_sm2[0] = 0;
+            do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-                do
-                {
-#if DEBUG
-                    flint_printf("pop2 (%wd, %wd)\n", x->i, x->j);
-#endif
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
-                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
-                    else if (x->i == x->j)
-                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
-                    else
-                        _fmpz_mpoly_submul2_uiuiui_fmpz(acc_sm, q_coeff[x->i], q_coeff[x->j]);
+                    smul_ppmm(pp[1], pp[0], Qcoeffs[x->i], Qcoeffs[x->j]);
+                    pp[2] = FLINT_SIGN_EXT(pp[1]);
 
+                    if (x->i != x->j)
+                        sub_dddmmmsss(acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                      acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                      pp[2], pp[1], pp[0]);
+                    else
+                        sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
+                                      acc_sm[2], acc_sm[1], acc_sm[0],
+                                      pp[2], pp[1], pp[0]);
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+
+            if (mpz_sgn(acc_lg) != 0)
+            {
+                flint_mpz_add_signed_uiuiui(acc, acc_lg,
+                                              acc_sm[2], acc_sm[1], acc_sm[0]);
+                acc_lg = acc;
+                acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;
+            }
         }
         else
         {
-            /* general coeff arithmetic */
+            acc_sm2[2] = acc_sm2[1] = acc_sm2[0] = 0;
 
-            fmpz_zero(acc_lg);
-            fmpz_zero(temp);
+            /* total is always acc + acc_sm + 2*(acc2 + acc_sm2) */
+            mpz_tdiv_q_2exp(acc2, acc_lg, 1);
+            mpz_tdiv_r_2exp(acc, acc_lg, 1);
 
-            do
-            {
+            do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-                do
-                {
-#if DEBUG
-                    flint_printf("pop2 (%wd, %wd)\n", x->i, x->j);
-#endif
+                do {
+                    fmpz Qi, Qj;
+
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
-                    {
-                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
-                        fmpz_tdiv_q_2exp(r, acc_lg, 1);
-                        fmpz_tdiv_r_2exp(acc_lg, acc_lg, 1);
-                        fmpz_add(temp, temp, r);
-                    }
-                    else if (x->i != x->j)
-                        fmpz_submul(temp, q_coeff + x->i, q_coeff + x->j);
-                    else
-                        fmpz_submul(acc_lg, q_coeff + x->i, q_coeff + x->i);
+                    Qi = Qcoeffs[x->i];
+                    Qj = Qcoeffs[x->j];
+                    t = (x->i != x->j) ? acc2 : acc;
 
+                    if (!COEFF_IS_MPZ(Qi) && !COEFF_IS_MPZ(Qj))
+                    {
+                        smul_ppmm(pp[1], pp[0], Qi, Qj);
+                        pp[2] = FLINT_SIGN_EXT(pp[1]);
+
+                        if (x->i != x->j)
+                            sub_dddmmmsss(acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                          acc_sm2[2], acc_sm2[1], acc_sm2[0],
+                                          pp[2], pp[1], pp[0]);
+                        else
+                            sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
+                                          acc_sm[2], acc_sm[1], acc_sm[0],
+                                          pp[2], pp[1], pp[0]);
+                    }
+                    else if (!COEFF_IS_MPZ(Qi) && COEFF_IS_MPZ(Qj))
+                    {
+                        if (Qi < WORD(0))
+                            flint_mpz_addmul_ui(t, COEFF_TO_PTR(Qj), -Qi);
+                        else
+                            flint_mpz_submul_ui(t, COEFF_TO_PTR(Qj), Qi);
+                    }
+                    else if (COEFF_IS_MPZ(Qi) && !COEFF_IS_MPZ(Qj))
+                    {
+                        if (Qj < WORD(0))
+                            flint_mpz_addmul_ui(t, COEFF_TO_PTR(Qi), -Qj);
+                        else
+                            flint_mpz_submul_ui(t, COEFF_TO_PTR(Qi), Qj);
+                    }
+                    else
+                    {
+                        mpz_submul(t, COEFF_TO_PTR(Qi), COEFF_TO_PTR(Qj));
+                    }
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-            fmpz_addmul_ui(acc_lg, temp, 2);
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+            add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm[2], acc_sm[1], acc_sm[0],
+                          acc_sm2[2], acc_sm2[1], acc_sm2[0]);
+
+            flint_mpz_add_signed_uiuiui(acc, acc, acc_sm[2], acc_sm[1], acc_sm[0]);
+            mpz_addmul_ui(acc, acc2, 2);
+            acc_lg = acc;
+            acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;
         }
 
         /* process nodes taken from the heap */
@@ -781,58 +859,35 @@ slong _fmpz_mpoly_sqrt_heap(
             j = *--store;
             i = *--store;
 
-            if (i == -WORD(1))
+            /* should we go right */
+            if (j < i)
             {
-                /* take next input term */
-                if (j + 1 < len2)
-                {
-                    x = chain[0];
-                    x->i = i;
-                    x->j = j + 1;
-                    x->next = NULL;
-                    if (check || !mpoly_monomial_gt(exp3 + 0, exp2 + x->j*N, N, cmpmask))
-                    {
-#if DEBUG
-                        flint_printf("insert1 (%wd, %wd)\n", x->i, x->j);
-#endif
-                        mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                        exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
-                                             &next_loc, &heap_len, N, cmpmask);
-                    }
-                }
-            } else
-            {
-                /* should we go right */
-                if (j < i)
-                {
-                    x = chain[i];
-                    x->i = i;
-                    x->j = j + 1;
-                    x->next = NULL;
+                x = chain[i];
+                x->i = i;
+                x->j = j + 1;
+                x->next = NULL;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], q_exp + x->i*N,
-                                                              q_exp + x->j*N, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], q_exp + x->i*N,
-                                                                 q_exp + x->j*N, N);
-                    if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
-                    {
-#if DEBUG
-                        flint_printf("insert2 (%wd, %wd)\n", x->i, x->j);
-#endif
-                        exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
-                                             &next_loc, &heap_len, N, cmpmask);
-                    }
+                if (bits <= FLINT_BITS)
+                    mpoly_monomial_add(exp_list[exp_next], Qexps + x->i*N,
+                                                          Qexps + x->j*N, N);
+                else
+                    mpoly_monomial_add_mp(exp_list[exp_next], Qexps + x->i*N,
+                                                             Qexps + x->j*N, N);
+                if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
+                {
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                         &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
+
+    skip_heap:
 
         /* try to divide accumulated term by leading term */
         if (!check && !lt_divides)
             continue;
 
-        if (small)
+        if (mpz_sgn(acc_lg) == 0)
         {
             ulong d0, d1, ds = acc_sm[2];
 
@@ -848,8 +903,7 @@ slong _fmpz_mpoly_sqrt_heap(
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
-                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
-                nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
+                nhi = MPN_LEFT_SHIFT_HI(d1, d0, lc_norm);
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
 
@@ -861,53 +915,62 @@ slong _fmpz_mpoly_sqrt_heap(
 
                 if (qq <= COEFF_MAX)
                 {
-                    _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = qq;
+                    _fmpz_demote(Qcoeffs + Qlen);
+                    Qcoeffs[Qlen] = qq;
                     if (ds != 0)
-                        q_coeff[q_len] = -q_coeff[q_len];
+                        Qcoeffs[Qlen] = -Qcoeffs[Qlen];
                 }
                 else
                 {
-                    small = 0;
-                    fmpz_set_ui(q_coeff + q_len, qq);
-                    if (ds != 0)
-                        fmpz_neg(q_coeff + q_len, q_coeff + q_len);
-                }                    
+                    q_rest_small = 0;
+                    if (ds == 0)
+                        fmpz_set_ui(Qcoeffs + Qlen, qq);
+                    else
+                        fmpz_neg_ui(Qcoeffs + Qlen, qq);
+                }
             }
             else
             {
-                small = 0;
-                fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+                flint_mpz_add_signed_uiuiui(acc, acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
         }
         else
         {
-            if (fmpz_is_zero(acc_lg))
+            flint_mpz_add_signed_uiuiui(acc, acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+
+            if (mpz_sgn(acc) == 0)
                 continue;
 
             if (!lt_divides)
                 goto not_sqrt;
 
-large_lt_divides:
+        large_lt_divides:
 
-            fmpz_fdiv_qr(q_coeff + q_len, r, acc_lg, q_coeff + 0);
+            t = _fmpz_promote(Qcoeffs + Qlen);
+            if (lc_abs > 0)
+                flint_mpz_fdiv_qr_ui(t, r, acc, lc_abs);
+            else
+                mpz_fdiv_qr(t, r, acc, lc_lg);
 
-            if (!fmpz_is_zero(r))
+            _fmpz_demote_val(Qcoeffs + Qlen);
+            q_rest_small = q_rest_small && !COEFF_IS_MPZ(Qcoeffs[Qlen]);
+
+            if (mpz_sgn(r) != 0)
             {
-                q_len++;
+                Qlen++;
                 goto not_sqrt;
             }
         }
 
-        if (q_len >= heap_alloc)
+        if (Qlen >= heap_alloc)
         {
             /* run some tests if the square root is getting long */
-            if (q_len > len2 && _is_proved_not_square(
+            if (Qlen > Alen && _is_proved_not_square(
                             ++heuristic_count, &heuristic_p, heuristic_state,
-                                                poly2, exp2, len2, bits, mctx))
+                                                Acoeffs, Aexps, Alen, bits, mctx))
             {
-                q_len++; /* for demotion */
+                Qlen++; /* for demotion */
                 goto not_sqrt;
             }
 
@@ -926,45 +989,42 @@ large_lt_divides:
             exp_alloc++;
         }
 
-        /* put (q_len, 1) in heap */
-        i = q_len;
+        /* put (Qlen, 1) in heap */
+        i = Qlen;
         x = chain[i];
         x->i = i;
         x->j = 1;
         x->next = NULL;
 
         if (bits <= FLINT_BITS)
-            mpoly_monomial_add(exp_list[exp_next], q_exp + x->i*N,
-                                                      q_exp + x->j*N, N);
+            mpoly_monomial_add(exp_list[exp_next], Qexps + x->i*N,
+                                                      Qexps + x->j*N, N);
         else
-            mpoly_monomial_add_mp(exp_list[exp_next], q_exp + x->i*N,
-                                                         q_exp + x->j*N, N);
+            mpoly_monomial_add_mp(exp_list[exp_next], Qexps + x->i*N,
+                                                         Qexps + x->j*N, N);
         
         if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
         {
-#if DEBUG
-            flint_printf("insert3 (%wd, %wd)\n", x->i, x->j);
-#endif           
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
 
-        q_len++;
+        Qlen++;
     }
 
     /* divide extra factor of 2 back out of leading coefficient */
-    fmpz_fdiv_q_2exp(q_coeff + 0, q_coeff + 0, 1);
+    fmpz_fdiv_q_2exp(Qcoeffs + 0, Qcoeffs + 0, 1);
 
 cleanup:
 
     flint_randclear(heuristic_state);
 
-    fmpz_clear(acc_lg);
-    fmpz_clear(r);
-    fmpz_clear(temp);
+    mpz_clear(r);
+    mpz_clear(acc);
+    mpz_clear(acc2);
 
-    (*polyq) = q_coeff;
-    (*expq) = q_exp;
+    (*polyq) = Qcoeffs;
+    (*expq) = Qexps;
 
     flint_free(heap);
     flint_free(chain);
@@ -979,59 +1039,56 @@ cleanup:
     TMP_END;
 
     /* return sqrt poly length, or zero if not a square root */
-    return q_len;
+    return Qlen;
 
 not_sqrt:
-    for (i = 0; i < q_len; i++)
-        _fmpz_demote(q_coeff + i);
-    q_len = 0;
+    for (i = 0; i < Qlen; i++)
+        _fmpz_demote(Qcoeffs + i);
+    Qlen = 0;
     goto cleanup;
 }
 
-int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
+int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t Q, const fmpz_mpoly_t A, 
                           const fmpz_mpoly_ctx_t ctx, int check)
 {
     slong lenq, lenq_est;
     flint_bitcnt_t exp_bits;
-    ulong * exp2 = poly2->exps;
-    fmpz_mpoly_t temp1;
-    fmpz_mpoly_struct * tq;
+    fmpz_mpoly_t T;
+    fmpz_mpoly_struct * q;
 
-    if (poly2->length == 0)
+    if (fmpz_mpoly_is_zero(A, ctx))
     {
-        fmpz_mpoly_zero(q, ctx);
+        fmpz_mpoly_zero(Q, ctx);
         return 1;
     }
 
-    /* maximum bits in sqrt exps and input is max for poly2 */
-    exp_bits = poly2->bits;
-    lenq_est = n_sqrt(poly2->length);
+    /* square root fits in A->bits if it exists */
+    exp_bits = A->bits;
 
-    /* take care of aliasing */
-    if (q == poly2)
+    /* rought lower estimate on length of square root */
+    lenq_est = n_sqrt(A->length);
+
+    if (Q == A)
     {
-        fmpz_mpoly_init3(temp1, lenq_est, exp_bits, ctx);
-        tq = temp1;
+        fmpz_mpoly_init3(T, lenq_est, exp_bits, ctx);
+        q = T;
     }
     else
     {
-        fmpz_mpoly_fit_length_reset_bits(q, lenq_est, exp_bits, ctx);
-        tq = q;
+        fmpz_mpoly_fit_length_reset_bits(Q, lenq_est, exp_bits, ctx);
+        q = Q;
     }
 
-    lenq = _fmpz_mpoly_sqrt_heap(&tq->coeffs, &tq->exps, &tq->alloc,
-                                 poly2->coeffs, exp2, poly2->length,
+    lenq = _fmpz_mpoly_sqrt_heap(&q->coeffs, &q->exps, &q->alloc,
+                                 A->coeffs, A->exps, A->length,
                                       exp_bits, ctx->minfo, check);
-    /* take care of aliasing */
-    if (q == poly2)
+    if (Q == A)
     {
-        fmpz_mpoly_swap(temp1, q, ctx);
-        fmpz_mpoly_clear(temp1, ctx);
+        fmpz_mpoly_swap(Q, T, ctx);
+        fmpz_mpoly_clear(T, ctx);
     } 
 
-    _fmpz_mpoly_set_length(q, lenq, ctx);
+    _fmpz_mpoly_set_length(Q, lenq, ctx);
 
     return lenq != 0;
 }
-
-#undef DEBUG

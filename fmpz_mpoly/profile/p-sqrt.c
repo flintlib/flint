@@ -29,14 +29,16 @@ int main(void)
     fmpz_mpoly_init(h, ctx);
     fmpz_mpoly_init(k, ctx);
 
-    fmpz_mpoly_set_str_pretty(f, "(1+x+y+2*z^2+3*t^3+5*u^5)^2", vars, ctx);
+    fmpz_mpoly_set_str_pretty(f, "(1+x+y+2*z^2+3*t^3+5*u^5)", vars, ctx);
 
     printf("Timing sqrt(p^2) where p = (1+x+y+2z^2+3t^3+5u^5)^n\n\n");
     printf("LEX ordering\n\n");
 
     for (n = 1; n <= 20; n++)
     {
-        fmpz_mpoly_pow_ui(g, f, n, ctx);
+        fmpz_mpoly_pow_ui(k, f, n, ctx);
+
+        fmpz_mpoly_pow_ui(g, f, 2*n, ctx);
 
         iters = iter_list[n];
 
@@ -47,21 +49,36 @@ int main(void)
 
         timeit_stop(timer);
 
-        fmpz_mpoly_mul(k, h, h, ctx);
-
-        if (!fmpz_mpoly_equal(k, g, ctx))
+        if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("ERROR\n");
             abort();
         }
 
-        flint_printf("n = %wd: %.10lf s\n", n, (((double)timer->wall)/iters)/1000);
+        flint_printf("n = %wd: %.10lf s", n, (((double)timer->wall)/iters)/1000);
+        fflush(stdout);
+
+        timeit_start(timer);
+
+        for (j = 0; j < iters; j++)
+            fmpz_mpoly_sqrt_heap(h, g, ctx, 0);
+
+        timeit_stop(timer);
+
+        if (!fmpz_mpoly_equal(h, k, ctx))
+        {
+            printf("ERROR\n");
+            abort();
+        }
+
+        flint_printf("  unchecked %.10lf s\n", n, (((double)timer->wall)/iters)/1000);
     }
 
     fmpz_mpoly_clear(k, ctx);
     fmpz_mpoly_clear(h, ctx);
     fmpz_mpoly_clear(g, ctx);
     fmpz_mpoly_clear(f, ctx);
+    fmpz_mpoly_ctx_clear(ctx);
 
     fmpz_mpoly_ctx_init(ctx, 5, ORD_DEGREVLEX);
 
@@ -70,14 +87,16 @@ int main(void)
     fmpz_mpoly_init(h, ctx);
     fmpz_mpoly_init(k, ctx);
 
-    fmpz_mpoly_set_str_pretty(f, "(1+x+y+2*z^2+3*t^3+5*u^5)^2", vars, ctx);
+    fmpz_mpoly_set_str_pretty(f, "(1+x+y+2*z^2+3*t^3+5*u^5)", vars, ctx);
 
     printf("Timing sqrt(p^2) where p = (1+x+y+2z^2+3t^3+5u^5)^n\n\n");
     printf("DEGREVLEX ordering:\n\n");
 
     for (n = 1; n <= 20; n++)
     {
-        fmpz_mpoly_pow_ui(g, f, n, ctx);
+        fmpz_mpoly_pow_ui(k, f, n, ctx);
+
+        fmpz_mpoly_pow_ui(g, f, 2*n, ctx);
 
         iters = iter_list[n];
 
@@ -88,21 +107,36 @@ int main(void)
 
         timeit_stop(timer);
 
-        fmpz_mpoly_mul(k, h, h, ctx);
-
-        if (!fmpz_mpoly_equal(k, g, ctx))
+        if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("ERROR\n");
             abort();
         }
 
-        flint_printf("n = %wd: %.10lf s\n", n, (((double)timer->wall)/iters)/1000);
+        flint_printf("n = %wd: %.10lf s", n, (((double)timer->wall)/iters)/1000);
+        fflush(stdout);
+
+        timeit_start(timer);
+
+        for (j = 0; j < iters; j++)
+            fmpz_mpoly_sqrt_heap(h, g, ctx, 0);
+
+        timeit_stop(timer);
+
+        if (!fmpz_mpoly_equal(h, k, ctx))
+        {
+            printf("ERROR\n");
+            abort();
+        }
+
+        flint_printf("  unchecked %.10lf s\n", n, (((double)timer->wall)/iters)/1000);
     }
 
     fmpz_mpoly_clear(k, ctx);
     fmpz_mpoly_clear(h, ctx);
     fmpz_mpoly_clear(g, ctx);
     fmpz_mpoly_clear(f, ctx);
+    fmpz_mpoly_ctx_clear(ctx);
 
     return 0;
 }
