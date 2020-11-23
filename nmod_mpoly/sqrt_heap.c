@@ -436,7 +436,7 @@ static int _nmod_mpoly_sqrt_heap(
     /* compute first term */
     Qlen = 0;
     _nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc,
-                           &Qexps, &Q->exps_alloc, 1, Qlen + 1);
+                           &Qexps, &Q->exps_alloc, N, Qlen + 1);
 
     Qcoeffs[0] = n_sqrtmod(Acoeffs[0], mod.n);
     if (Qcoeffs[0] == 0)
