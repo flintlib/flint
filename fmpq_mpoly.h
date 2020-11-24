@@ -727,6 +727,19 @@ FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
     const fmpq_mpoly_t poly2, fmpq_mpoly_struct * const * poly3, slong len,
                                                    const fmpq_mpoly_ctx_t ctx);
 
+/* Square root ***************************************************************/
+
+FLINT_DLL int fmpq_mpoly_sqrt(fmpq_mpoly_t Q, const fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_is_square(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return fmpz_is_square(fmpq_numref(A->content)) &&
+           fmpz_is_square(fmpq_denref(A->content)) &&
+           fmpz_mpoly_is_square(A->zpoly, ctx->zctx);
+}
+
 /* GCD ***********************************************************************/
 
 FMPQ_MPOLY_INLINE

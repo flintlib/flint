@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "thread_pool.h"
 #include "nmod_mpoly.h"
+#include "long_extras.h"
 
 
 /*
@@ -428,7 +429,7 @@ static void _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
     S->bits = base->bits;
     S->cmpmask = base->cmpmask;
     S->ctx = base->ctx;
-    S->mod = base->ctx->ffinfo->mod;
+    S->mod = base->ctx->mod;
 
     S->big_mem_alloc = 0;
     if (N == 1)
@@ -600,18 +601,16 @@ void _nmod_mpoly_mul_heap_threaded(
     slong num_handles)
 {
     slong i;
-    slong BClen, hi;
     _base_t base;
     _div_struct * divs;
     _worker_arg_struct * args;
-    slong Alen;
+    slong BClen, Alen;
 
     /* bail if product of lengths overflows a word */
-    umul_ppmm(hi, BClen, Blen, Clen);
-    if (hi != 0 || BClen < 0)
+    if (z_mul_checked(&BClen, Blen, Clen))
     {
         _nmod_mpoly_mul_johnson(A, Bcoeff, Bexp, Blen,
-                            Ccoeff, Cexp, Clen, bits, N, cmpmask, ctx->ffinfo);
+                               Ccoeff, Cexp, Clen, bits, N, cmpmask, ctx->mod);
         return;
     }
 

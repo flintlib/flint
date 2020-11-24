@@ -69,7 +69,7 @@ int nmod_mpoly_get_nmod_poly(
     slong var,
     const nmod_mpoly_ctx_t ctx)
 {
-    A->mod = ctx->ffinfo->mod;
+    A->mod = ctx->mod;
     return nmod_mpoly_get_n_poly((n_poly_struct *) A, B, var, ctx);
 }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018,2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,211 +11,96 @@
 
 #include "nmod_mpoly.h"
 
-
-ulong _nmod_mpoly_evaluate_all_ui_sp(const nmod_mpoly_t A,
-                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
+mp_limb_t _nmod_mpoly_eval_all_ui(
+    const mp_limb_t * Acoeffs,
+    const ulong * Aexps,
+    slong Alen,
+    flint_bitcnt_t Abits,
+    const mp_limb_t * alphas,
+    const mpoly_ctx_t mctx,
+    nmod_t mod)
 {
-    ulong l;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
-    slong shift, off;
-    ulong * ormask, * masks;
-    slong * offs;
-    slong entries, k_len;
-    slong Alen;
-    const mp_limb_t * Acoeff;
-    ulong * Aexp;
-    flint_bitcnt_t bits;
-    mp_limb_t * powers;
-    mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
+    slong i, j;
+    slong nvars = mctx->nvars;
+    ulong mask = (Abits <= FLINT_BITS) ? (-UWORD(1)) >> (FLINT_BITS - Abits) : 0;
+    slong N = mpoly_words_per_exp(Abits, mctx);
+    ulong varexp_sp;
+    fmpz_t varexp_mp;
+    slong * offsets, * shifts;
+    n_poly_struct * caches;
+    mp_limb_t eval, t;
     TMP_INIT;
-
-    Alen = A->length;
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    bits = A->bits;
-
-    FLINT_ASSERT(Alen != 0);
-    FLINT_ASSERT(bits <= FLINT_BITS);
 
     TMP_START;
 
-    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    fmpz_init(varexp_mp);
 
-    /* get a mask of present exponent bits */
-    ormask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    for (j = 0; j < N; j++)
+    caches = (n_poly_struct *) TMP_ALLOC(3*nvars*sizeof(n_poly_struct));
+    offsets = (slong *) TMP_ALLOC(2*nvars*sizeof(slong));
+    shifts = offsets + nvars;
+    for (j = 0; j < nvars; j++)
     {
-        ormask[j] = 0;
+        if (Abits <= FLINT_BITS)
+            mpoly_gen_offset_shift_sp(offsets + j, shifts + j, j, Abits, mctx);
+        else
+            offsets[j] = mpoly_gen_offset_mp(j, Abits, mctx);
+
+        n_poly_init(caches + 3*j + 0);
+        n_poly_init(caches + 3*j + 1);
+        n_poly_init(caches + 3*j + 2);
+
+        t = alphas[j];
+        if (t >= mod.n)
+            NMOD_RED(t, t, mod);
+
+        nmod_pow_cache_start(t, caches + 3*j + 0, caches + 3*j + 1,
+                                                          caches + 3*j + 2);
     }
+
+    eval = 0;
     for (i = 0; i < Alen; i++)
     {
-        for (j = 0; j < N; j++)
+        t = Acoeffs[i];
+        if (Abits <= FLINT_BITS)
         {
-            ormask[j] |= Aexp[N*i + j];
-        }
-    }
-
-    /* quick upper bound on number of masks needed */
-    entries = N*FLINT_BITS;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
-    powers = (mp_limb_t *) TMP_ALLOC(entries*sizeof(mp_limb_t));
-
-    /* store bit masks for needed powers of two of the variables */
-    k = 0;
-    for (i = 0; i < nvars; i++)
-    {
-        FLINT_ASSERT(k < entries);
-        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        NMOD_RED(t, vals[i], ctx->ffinfo->mod);
-        for (l = 0; l < bits; l++)
-        {
-            masks[k] = UWORD(1) << (shift + l);
-            if ((masks[k] & ormask[off]) != UWORD(0))
+            for (j = 0; j < nvars; j++)
             {
-                offs[k] = off;
-                powers[k] = t;
-                k++;
-            }
-            t = nmod_mul(t, t, ctx->ffinfo->mod);
-        }
-    }
-    k_len = k;
-    FLINT_ASSERT(k_len <= entries);
-
-    /* accumulate the final answer */
-    acc0 = acc1 = acc2 = 0;    
-    for (i = 0; i < Alen; i++)
-    {
-        t = UWORD(1);
-        for (k = 0; k < k_len; k++)
-        {
-            if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
-            {
-                t = nmod_mul(t, powers[k], ctx->ffinfo->mod);
+                varexp_sp = ((Aexps + N*i)[offsets[j]]>>shifts[j])&mask;
+                t = nmod_pow_cache_mulpow_ui(t, varexp_sp, caches + 3*j + 0,
+                                      caches + 3*j + 1, caches + 3*j + 2, mod);
             }
         }
-        umul_ppmm(pp1, pp0, Acoeff[i], t);
-        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
+        else
+        {
+            for (j = 0; j < nvars; j++)
+            {
+                fmpz_set_ui_array(varexp_mp, Aexps + N*i + offsets[j], Abits/FLINT_BITS);
+                t = nmod_pow_cache_mulpow_fmpz(t, varexp_mp, caches + 3*j + 0,
+                                      caches + 3*j + 1, caches + 3*j + 2, mod);
+            }
+        }
+
+        eval = nmod_add(eval, t, mod);
     }
-    NMOD_RED3(r, acc2, acc1, acc0, ctx->ffinfo->mod);
+
+    fmpz_clear(varexp_mp);
+
+    for (j = 0; j < 3*nvars; j++)
+        n_poly_clear(caches + j);
 
     TMP_END;
-    return r;
-}
 
-
-
-ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
-                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
-{
-    ulong l;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
-    slong off;
-    ulong * ormask, * masks;
-    slong * offs;
-    slong entries, k_len;
-    slong Alen;
-    const mp_limb_t * Acoeff;
-    ulong * Aexp;
-    flint_bitcnt_t bits;
-    mp_limb_t * powers;
-    mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
-    TMP_INIT;
-
-    Alen = A->length;
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    bits = A->bits;
-
-    FLINT_ASSERT(Alen != 0);
-    FLINT_ASSERT(bits > FLINT_BITS);
-
-    TMP_START;
-
-    N = mpoly_words_per_exp_mp(bits, ctx->minfo);
-
-    /* get a mask of present exponent bits */
-    ormask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    for (j = 0; j < N; j++)
-    {
-        ormask[j] = 0;
-    }
-    for (i = 0; i < Alen; i++)
-    {
-        for (j = 0; j < N; j++)
-        {
-            ormask[j] |= Aexp[N*i + j];
-        }
-    }
-
-    /* quick upper bound on number of masks needed */
-    entries = N*FLINT_BITS;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
-    powers = (mp_limb_t *) TMP_ALLOC(entries*sizeof(mp_limb_t));
-
-    /* store bit masks for needed powers of two of the variables */
-    k = 0;
-    for (i = 0; i < nvars; i++)
-    {
-        FLINT_ASSERT(k < entries);
-        
-        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
-        NMOD_RED(t, vals[i], ctx->ffinfo->mod);
-        for (l = 0; l < bits; l++)
-        {
-            ulong l1 = l/FLINT_BITS;
-            ulong l2 = l%FLINT_BITS;
-            masks[k] = UWORD(1) << l2;
-            if ((masks[k] & ormask[off + l1]) != UWORD(0))
-            {
-                offs[k] = off + l1;
-                powers[k] = t;
-                k++;
-            }
-            t = nmod_mul(t, t, ctx->ffinfo->mod);
-        }
-    }
-    k_len = k;
-    FLINT_ASSERT(k_len <= entries);
-
-    /* accumulate the final answer */
-    acc0 = acc1 = acc2 = 0;    
-    for (i = 0; i < Alen; i++)
-    {
-        t = UWORD(1);
-        for (k = 0; k < k_len; k++)
-        {
-            if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
-            {
-                t = nmod_mul(t, powers[k], ctx->ffinfo->mod);
-            }
-        }
-        umul_ppmm(pp1, pp0, Acoeff[i], t);
-        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
-    }
-    NMOD_RED3(r, acc2, acc1, acc0, ctx->ffinfo->mod);
-
-    TMP_END;
-    return r;
+    return eval;
 }
 
 
 ulong nmod_mpoly_evaluate_all_ui(const nmod_mpoly_t A,
                                 const ulong * vals, const nmod_mpoly_ctx_t ctx)
 {
-    if (A->length == 0)
-    {
+    if (nmod_mpoly_is_zero(A, ctx))
         return 0;
-    }
-    else if (A->bits <= FLINT_BITS)
-    {
-        return _nmod_mpoly_evaluate_all_ui_sp(A, vals, ctx);
-    }
-    else
-    {
-        return _nmod_mpoly_evaluate_all_ui_mp(A, vals, ctx);
-    }
+
+    return _nmod_mpoly_eval_all_ui(A->coeffs, A->exps, A->length, A->bits,
+                                                   vals, ctx->minfo, ctx->mod);
 }
 

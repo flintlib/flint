@@ -144,11 +144,11 @@ static void _splitworker(void * varg)
 
         /* the unfortunate nmod poly's store their own context :( */
         nmod_poly_stack_set_ctx(Sp, arg->pctx);
-        nmod_mpolyn_set_mod(arg->Ap, arg->pctx->ffinfo->mod);
-        nmod_mpolyn_set_mod(arg->Bp, arg->pctx->ffinfo->mod);
-        nmod_mpolyn_set_mod(arg->Gp, arg->pctx->ffinfo->mod);
-        nmod_mpolyn_set_mod(arg->Abarp, arg->pctx->ffinfo->mod);
-        nmod_mpolyn_set_mod(arg->Bbarp, arg->pctx->ffinfo->mod);
+        nmod_mpolyn_set_mod(arg->Ap, arg->pctx->mod);
+        nmod_mpolyn_set_mod(arg->Bp, arg->pctx->mod);
+        nmod_mpolyn_set_mod(arg->Gp, arg->pctx->mod);
+        nmod_mpolyn_set_mod(arg->Abarp, arg->pctx->mod);
+        nmod_mpolyn_set_mod(arg->Bbarp, arg->pctx->mod);
 
         /* reduce to Fp and calculate an image gcd */
         if (arg->num_handles > 0)

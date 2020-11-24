@@ -21,8 +21,8 @@ static void nmod_mpoly_factor_mul_mpoly_fmpz(
 	if (nmod_mpoly_is_ui(a, ctx))
 	{
 		ulong t = nmod_mpoly_get_ui(a, ctx);
-		t = nmod_pow_fmpz(t, e, ctx->ffinfo->mod);
-		fac->constant = nmod_mul(fac->constant, t, ctx->ffinfo->mod);
+		t = nmod_pow_fmpz(t, e, ctx->mod);
+		fac->constant = nmod_mul(fac->constant, t, ctx->mod);
 		return;
 	}
 	else
@@ -126,7 +126,7 @@ static int nmod_mpoly_factor_mul_pairwise_prime(
 	for (j = 0; j < c->num; j++)
 		nmod_mpoly_init(g + i*c->num + j, ctx);
 
-	a->constant = nmod_mul(b->constant, c->constant, ctx->ffinfo->mod);
+	a->constant = nmod_mul(b->constant, c->constant, ctx->mod);
 	a->num = 0;
 
 	for (i = 0; i < b->num; i++)
@@ -300,7 +300,7 @@ int _nmod_mpoly_factor_separable(
     nmod_mpoly_init(W, ctx);
     nmod_mpoly_init(G, ctx);
 
-	fmpz_init_set_ui(p, ctx->ffinfo->mod.n);
+	fmpz_init_set_ui(p, ctx->mod.n);
 	fmpz_init(pk);
 	fmpz_init(g);
 	fmpz_init(gr);
@@ -341,7 +341,7 @@ int _nmod_mpoly_factor_separable(
         if (!success)
             goto cleanup;
 
-        for (k = 1; k + 1 < ctx->ffinfo->mod.n &&
+        for (k = 1; k + 1 < ctx->mod.n &&
                             !(nmod_mpoly_derivative(G, W, var, ctx),
                               nmod_mpoly_sub(U, V, G, ctx),
                               nmod_mpoly_is_zero(U, ctx)); k++)

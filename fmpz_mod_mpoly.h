@@ -242,15 +242,14 @@ typedef mpoly_bma_interpolate_ctx_struct mpoly_bma_interpolate_ctx_t[1];
 
 FLINT_DLL void nmod_bma_mpoly_init(nmod_bma_mpoly_t A);
 
-FLINT_DLL void nmod_bma_mpoly_reset_prime(nmod_bma_mpoly_t A,
-                                                      const nmodf_ctx_t fpctx);
+FLINT_DLL void nmod_bma_mpoly_reset_prime(nmod_bma_mpoly_t A, nmod_t fpctx);
 
 FLINT_DLL void nmod_bma_mpoly_clear(nmod_bma_mpoly_t A);
 
 FLINT_DLL void nmod_bma_mpoly_print(const nmod_bma_mpoly_t A);
 
 FLINT_DLL void nmod_bma_mpoly_fit_length(nmod_bma_mpoly_t A, slong length,
-                                                      const nmodf_ctx_t fpctx);
+                                                                 nmod_t fpctx);
 
 FLINT_DLL void nmod_bma_mpoly_zero(nmod_bma_mpoly_t L);
 
@@ -263,7 +262,7 @@ FLINT_DLL void nmod_bma_mpoly_add_point(
 
 FLINT_DLL int nmod_bma_mpoly_get_fmpz_mpolyu(fmpz_mpolyu_t A,
       const fmpz_mpoly_ctx_t ctx, ulong alphashift, const nmod_bma_mpoly_t L,
-              const mpoly_bma_interpolate_ctx_t Ictx, const nmodf_ctx_t fpctx);
+                         const mpoly_bma_interpolate_ctx_t Ictx, nmod_t fpctx);
 
 
 
@@ -304,7 +303,7 @@ void mpoly_bma_interpolate_ctx_clear(mpoly_bma_interpolate_ctx_t I)
 
 FLINT_DLL int nmod_mpoly_bma_get_fmpz_mpoly(fmpz_mpoly_t A,
      const fmpz_mpoly_ctx_t ctx, ulong alphashift, nmod_berlekamp_massey_t I,
-              const mpoly_bma_interpolate_ctx_t Ictx, const nmodf_ctx_t fpctx);
+                         const mpoly_bma_interpolate_ctx_t Ictx, nmod_t fpctx);
 
 FLINT_DLL int fmpz_mod_bma_get_fmpz_mpoly(fmpz_mpoly_t A,
      const fmpz_mpoly_ctx_t ctx, const fmpz_t alphashift, fmpz_mod_berlekamp_massey_t I,
@@ -313,7 +312,7 @@ FLINT_DLL int fmpz_mod_bma_get_fmpz_mpoly(fmpz_mpoly_t A,
 
 FLINT_DLL void nmod_mpoly_bma_interpolate_alpha_powers(mp_limb_t * out,
                             ulong w, const mpoly_bma_interpolate_ctx_t Ictx,
-                          const fmpz_mpoly_ctx_t ctx, const nmodf_ctx_t fpctx);
+                                     const fmpz_mpoly_ctx_t ctx, nmod_t fpctx);
 
 
 FLINT_DLL void fmpz_mod_mpoly_bma_interpolate_alpha_powers(fmpz * out,
@@ -357,7 +356,7 @@ FLINT_DLL void fmpz_mod_mpolyuu_use_skel_mul(fmpz_mod_mpolyn_t E,
 
 /* eval */
 
-FLINT_DLL mp_limb_t fmpz_mpoly_eval_nmod(const nmodf_ctx_t fpctx,
+FLINT_DLL mp_limb_t fmpz_mpoly_eval_nmod(nmod_t fpctx,
     const fmpz_mpoly_t A, const mp_limb_t * alpha, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_eval_fmpz_mod(fmpz_t eval,

@@ -17,8 +17,8 @@ void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
     slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
     slong Blen = B->length;
 
-    if (c >= ctx->ffinfo->mod.n)
-        NMOD_RED(c, c, ctx->ffinfo->mod);
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
 
     if (c == 0)
     {
@@ -42,7 +42,7 @@ void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
             _nmod_mpoly_set_length(A, B->length, ctx);
         }
 
-        A->coeffs[Blen - 1] = nmod_add(B->coeffs[Blen - 1], c, ctx->ffinfo->mod);
+        A->coeffs[Blen - 1] = nmod_add(B->coeffs[Blen - 1], c, ctx->mod);
         if (A->coeffs[Blen - 1] == 0)
             _nmod_mpoly_set_length(A, Blen - 1, ctx);
     }

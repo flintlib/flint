@@ -592,7 +592,7 @@ int n_polyu3_mod_hlift2(
     n_polyu_t B1,
     mp_limb_t beta,
     slong degree_inner, /* required degree in x */
-    const nmodf_ctx_t ctx)
+    nmod_t ctx)
 {
     int success, Eok;
     n_polyun_t T;
@@ -605,9 +605,9 @@ int n_polyu3_mod_hlift2(
     n_poly_bpoly_stack_t St;
     nmod_eval_interp_t E;
 
-    FLINT_ASSERT(n_polyu_mod_is_canonical(A, ctx->mod));
-    FLINT_ASSERT(n_polyu_mod_is_canonical(B0, ctx->mod));
-    FLINT_ASSERT(n_polyu_mod_is_canonical(B1, ctx->mod));
+    FLINT_ASSERT(n_polyu_mod_is_canonical(A, ctx));
+    FLINT_ASSERT(n_polyu_mod_is_canonical(B0, ctx));
+    FLINT_ASSERT(n_polyu_mod_is_canonical(B1, ctx));
 
     n_polyun_init(T);
     n_bpoly_init(Ap);
@@ -624,7 +624,7 @@ int n_polyu3_mod_hlift2(
     n_bpoly_stack_init(St->bpoly_stack);
     nmod_eval_interp_init(E);
 
-    Eok = nmod_eval_interp_set_degree_modulus(E, degree_inner, ctx->mod);
+    Eok = nmod_eval_interp_set_degree_modulus(E, degree_inner, ctx);
 
     n_polyu3_degrees(&Adegy, &Adegx, &Adegz, A);
 
@@ -637,9 +637,9 @@ int n_polyu3_mod_hlift2(
     n_poly_fit_length(alphapow, FLINT_MAX(WORD(3), Adegz + 2));
     n_poly_one(modulus);
 
-    FLINT_ASSERT((ctx->mod.n & UWORD(1)) == UWORD(1));
+    FLINT_ASSERT((ctx.n & UWORD(1)) == UWORD(1));
 
-    alpha = (ctx->mod.n - UWORD(1))/UWORD(2);
+    alpha = (ctx.n - UWORD(1))/UWORD(2);
 
     bad_primes_left = FLINT_MAX(5, Adegz);
 
@@ -655,18 +655,18 @@ choose_prime:
 
     alpha--;
 
-    FLINT_ASSERT(0 < alpha && alpha <= ctx->mod.n/2);
+    FLINT_ASSERT(0 < alpha && alpha <= ctx.n/2);
     FLINT_ASSERT(alphapow->alloc >= 2);
     alphapow->length = 2;
     alphapow->coeffs[0] = 1;
     alphapow->coeffs[1] = alpha;
 
-    n_polyu3_mod_interp_reduce_2sm_bpoly(Ap, Am, A, alphapow, ctx->mod);
-    n_polyu3_mod_interp_reduce_2sm_bpoly(B0p, B0m, B0, alphapow, ctx->mod);
-    n_polyu3_mod_interp_reduce_2sm_bpoly(B1p, B1m, B1, alphapow, ctx->mod);
+    n_polyu3_mod_interp_reduce_2sm_bpoly(Ap, Am, A, alphapow, ctx);
+    n_polyu3_mod_interp_reduce_2sm_bpoly(B0p, B0m, B0, alphapow, ctx);
+    n_polyu3_mod_interp_reduce_2sm_bpoly(B1p, B1m, B1, alphapow, ctx);
 
-    success = Eok ? n_bpoly_mod_hlift2_cubic(Ap, B0p, B1p, beta, degree_inner, ctx->mod, E, St) :
-                    n_bpoly_mod_hlift2(Ap, B0p, B1p, beta, degree_inner, ctx->mod, St);
+    success = Eok ? n_bpoly_mod_hlift2_cubic(Ap, B0p, B1p, beta, degree_inner, ctx, E, St) :
+                    n_bpoly_mod_hlift2(Ap, B0p, B1p, beta, degree_inner, ctx, St);
     if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
@@ -674,8 +674,8 @@ choose_prime:
         goto choose_prime;
     }
 
-    success = Eok ? n_bpoly_mod_hlift2_cubic(Am, B0m, B1m, beta, degree_inner, ctx->mod, E, St) :
-                    n_bpoly_mod_hlift2(Am, B0m, B1m, beta, degree_inner, ctx->mod, St);
+    success = Eok ? n_bpoly_mod_hlift2_cubic(Am, B0m, B1m, beta, degree_inner, ctx, E, St) :
+                    n_bpoly_mod_hlift2(Am, B0m, B1m, beta, degree_inner, ctx, St);
     if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
@@ -685,26 +685,26 @@ choose_prime:
 
     if (n_poly_degree(modulus) > 0)
     {
-        c = n_poly_mod_evaluate_nmod(modulus, alpha, ctx->mod);
+        c = n_poly_mod_evaluate_nmod(modulus, alpha, ctx);
         FLINT_ASSERT(c == n_poly_mod_evaluate_nmod(modulus,
-                                                ctx->mod.n - alpha, ctx->mod));
-        c = nmod_mul(c, alpha, ctx->mod);
-        c = nmod_add(c, c, ctx->mod);
-        c = n_invmod(c, ctx->mod.n);
-        _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, ctx->mod);
+                                                ctx.n - alpha, ctx));
+        c = nmod_mul(c, alpha, ctx);
+        c = nmod_add(c, c, ctx);
+        c = n_invmod(c, ctx.n);
+        _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, ctx);
         n_polyu3n_mod_interp_crt_2sm_bpoly(&ldegBB0, BB0, T, B0p, B0m,
-                                                  modulus, alphapow, ctx->mod);
+                                                  modulus, alphapow, ctx);
         n_polyu3n_mod_interp_crt_2sm_bpoly(&ldegBB1, BB1, T, B1p, B1m,
-                                                  modulus, alphapow, ctx->mod);
+                                                  modulus, alphapow, ctx);
     }
     else
     {
-        n_polyu3n_mod_interp_lift_2sm_bpoly(&ldegBB0, BB0, B0p, B0m, alpha, ctx->mod);
-        n_polyu3n_mod_interp_lift_2sm_bpoly(&ldegBB1, BB1, B1p, B1m, alpha, ctx->mod);
+        n_polyu3n_mod_interp_lift_2sm_bpoly(&ldegBB0, BB0, B0p, B0m, alpha, ctx);
+        n_polyu3n_mod_interp_lift_2sm_bpoly(&ldegBB1, BB1, B1p, B1m, alpha, ctx);
     }
 
-    c = ctx->mod.n - nmod_mul(alpha, alpha, ctx->mod);
-    n_poly_mod_shift_left_scalar_addmul(modulus, 2, c, ctx->mod);
+    c = ctx.n - nmod_mul(alpha, alpha, ctx);
+    n_poly_mod_shift_left_scalar_addmul(modulus, 2, c, ctx);
 
     if (ldegBB0 + ldegBB1 > Adegz)
     {
@@ -730,7 +730,7 @@ cleanup:
         n_polyu_init(T3);
         n_polyu_get_n_polyun(T2, BB0);
         n_polyu_get_n_polyun(T3, BB1);
-        n_polyu_mod_mul(T1, T2, T3, ctx->mod);
+        n_polyu_mod_mul(T1, T2, T3, ctx);
         FLINT_ASSERT(n_polyu_equal(A, T1));
         n_polyu_clear(T1);
         n_polyu_clear(T2);
@@ -765,7 +765,7 @@ int n_polyu3_mod_hlift(
     n_polyu_struct * B,
     mp_limb_t beta,
     slong degree_inner, /* required degree in x */
-    const nmodf_ctx_t ctx)
+    nmod_t ctx)
 {
     int success, Eok;
     slong i, j;
@@ -784,9 +784,9 @@ int n_polyu3_mod_hlift(
         return n_polyu3_mod_hlift2(BB + 0, BB + 1, A, B + 0, B + 1,
                                                       beta, degree_inner, ctx);
 
-    FLINT_ASSERT(n_polyu_mod_is_canonical(A, ctx->mod));
+    FLINT_ASSERT(n_polyu_mod_is_canonical(A, ctx));
     for (i = 0; i < r; i++)
-        FLINT_ASSERT(n_polyu_mod_is_canonical(B + i, ctx->mod));
+        FLINT_ASSERT(n_polyu_mod_is_canonical(B + i, ctx));
 
     BBdegZ = (slong *) flint_malloc(r*sizeof(slong));
     Bp = (n_bpoly_struct *) flint_malloc(r*sizeof(n_bpoly_struct));
@@ -807,7 +807,7 @@ int n_polyu3_mod_hlift(
     n_bpoly_stack_init(St->bpoly_stack);
     nmod_eval_interp_init(E);
 
-    Eok = nmod_eval_interp_set_degree_modulus(E, degree_inner, ctx->mod);
+    Eok = nmod_eval_interp_set_degree_modulus(E, degree_inner, ctx);
 
     n_polyu3_degrees(&AdegY, &AdegX, &AdegZ, A);
     if (AdegX != degree_inner)
@@ -819,9 +819,9 @@ int n_polyu3_mod_hlift(
     n_poly_fit_length(alphapow, FLINT_MAX(WORD(3), AdegZ + 2));
     n_poly_one(modulus);
 
-    FLINT_ASSERT((ctx->mod.n & UWORD(1)) == UWORD(1));
+    FLINT_ASSERT((ctx.n & UWORD(1)) == UWORD(1));
 
-    alpha = (ctx->mod.n - UWORD(1))/UWORD(2);
+    alpha = (ctx.n - UWORD(1))/UWORD(2);
 
     bad_primes_left = FLINT_MAX(5, AdegZ);
 
@@ -836,22 +836,22 @@ choose_prime:
     }
     alpha--;
 
-    FLINT_ASSERT(0 < alpha && alpha <= ctx->mod.n/2);
+    FLINT_ASSERT(0 < alpha && alpha <= ctx.n/2);
     FLINT_ASSERT(alphapow->alloc >= 2);
     alphapow->length = 2;
     alphapow->coeffs[0] = 1;
     alphapow->coeffs[1] = alpha;
 
-    n_polyu3_mod_interp_reduce_2sm_bpoly(Ap, Am, A, alphapow, ctx->mod);
+    n_polyu3_mod_interp_reduce_2sm_bpoly(Ap, Am, A, alphapow, ctx);
 
     for (i = 0; i < r; i++)
     {
         n_polyu3_mod_interp_reduce_2sm_bpoly(Bp + i, Bm + i,
-                                                    B + i, alphapow, ctx->mod);
+                                                    B + i, alphapow, ctx);
     }
 
-    success = Eok ? n_bpoly_mod_hlift_cubic(r, Ap, Bp, beta, degree_inner, ctx->mod, E, St) :
-                    n_bpoly_mod_hlift(r, Ap, Bp, beta, degree_inner, ctx->mod, St);
+    success = Eok ? n_bpoly_mod_hlift_cubic(r, Ap, Bp, beta, degree_inner, ctx, E, St) :
+                    n_bpoly_mod_hlift(r, Ap, Bp, beta, degree_inner, ctx, St);
     if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
@@ -859,8 +859,8 @@ choose_prime:
         goto choose_prime;
     }
 
-    success = Eok ? n_bpoly_mod_hlift_cubic(r, Am, Bm, beta, degree_inner, ctx->mod, E, St) :
-                    n_bpoly_mod_hlift(r, Am, Bm, beta, degree_inner, ctx->mod, St);
+    success = Eok ? n_bpoly_mod_hlift_cubic(r, Am, Bm, beta, degree_inner, ctx, E, St) :
+                    n_bpoly_mod_hlift(r, Am, Bm, beta, degree_inner, ctx, St);
     if (success < 1)
     {
         if (success == 0 || --bad_primes_left < 0)
@@ -870,17 +870,17 @@ choose_prime:
 
     if (n_poly_degree(modulus) > 0)
     {
-        c = n_poly_mod_evaluate_nmod(modulus, alpha, ctx->mod);
+        c = n_poly_mod_evaluate_nmod(modulus, alpha, ctx);
         FLINT_ASSERT(c == n_poly_mod_evaluate_nmod(modulus,
-                                                ctx->mod.n - alpha, ctx->mod));
-        c = nmod_mul(c, alpha, ctx->mod);
-        c = nmod_add(c, c, ctx->mod);
-        c = nmod_inv(c, ctx->mod);
-        _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, ctx->mod);
+                                                ctx.n - alpha, ctx));
+        c = nmod_mul(c, alpha, ctx);
+        c = nmod_add(c, c, ctx);
+        c = nmod_inv(c, ctx);
+        _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, ctx);
         for (i = 0; i < r; i++)
         {
             n_polyu3n_mod_interp_crt_2sm_bpoly(BBdegZ + i, BB + i, T,
-                                  Bp + i, Bm + i, modulus, alphapow, ctx->mod);
+                                  Bp + i, Bm + i, modulus, alphapow, ctx);
         }
     }
     else
@@ -888,12 +888,12 @@ choose_prime:
         for (i = 0; i < r; i++)
         {
             n_polyu3n_mod_interp_lift_2sm_bpoly(BBdegZ + i, BB + i,
-                                               Bp + i, Bm + i, alpha, ctx->mod);
+                                               Bp + i, Bm + i, alpha, ctx);
         }
     }
 
-    c = ctx->mod.n - nmod_mul(alpha, alpha, ctx->mod);
-    n_poly_mod_shift_left_scalar_addmul(modulus, 2, c, ctx->mod);
+    c = ctx.n - nmod_mul(alpha, alpha, ctx);
+    n_poly_mod_shift_left_scalar_addmul(modulus, 2, c, ctx);
 
     j = BBdegZ[0];
     for (i = 1; i < r; i++)
@@ -923,11 +923,11 @@ cleanup:
         n_polyu_init(T3);
         n_polyu_get_n_polyun(T2, BB + 0);
         n_polyu_get_n_polyun(T3, BB + 1);
-        n_polyu_mod_mul(T1, T2, T3, ctx->mod);
+        n_polyu_mod_mul(T1, T2, T3, ctx);
         for (i = 2; i < r; i++)
         {
             n_polyu_get_n_polyun(T3, BB + i);
-            n_polyu_mod_mul(T2, T1, T3, ctx->mod);
+            n_polyu_mod_mul(T2, T1, T3, ctx);
             n_polyu_swap(T2, T1);
         }
         FLINT_ASSERT(n_polyu_equal(A, T1));

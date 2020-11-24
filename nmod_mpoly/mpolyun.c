@@ -254,7 +254,7 @@ void nmod_mpolyn_one(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
 
 void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
 {
-    FLINT_ASSERT(ctx->ffinfo->mod.n > 1);
+    FLINT_ASSERT(ctx->mod.n > 1);
     nmod_mpolyun_fit_length(A, 1, ctx);
     nmod_mpolyn_one(A->coeffs + 0, ctx);
     A->exps[0] = 0;
@@ -326,7 +326,7 @@ void nmod_mpolyn_mul_last(
     if (nmod_poly_is_one(b))
         return;
 
-    nmod_poly_init_mod(t, ctx->ffinfo->mod);
+    nmod_poly_init_mod(t, ctx->mod);
 
     for (i = 0; i < A->length; i++)
     {
@@ -356,7 +356,7 @@ void nmod_mpolyun_mul_last(
     if (nmod_poly_is_one(b))
         return;
 
-    nmod_poly_init_mod(t, ctx->ffinfo->mod);
+    nmod_poly_init_mod(t, ctx->mod);
 
     for (i = 0; i < A->length; i++)
     {
@@ -1171,7 +1171,7 @@ void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
     if (nmod_poly_is_one(b))
         return;
 
-    nmod_poly_init_mod(r, ctx->ffinfo->mod);
+    nmod_poly_init_mod(r, ctx->mod);
 
     for (i = 0; i < A->length; i++)
     {
@@ -1195,7 +1195,7 @@ void nmod_mpolyn_divexact_last(nmod_mpolyn_t A, nmod_poly_t b,
     if (nmod_poly_is_one(b))
         return;
 
-    nmod_poly_init_mod(r, ctx->ffinfo->mod);
+    nmod_poly_init_mod(r, ctx->mod);
 
     for (i = 0; i < A->length; i++)
     {

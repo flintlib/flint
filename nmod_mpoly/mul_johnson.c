@@ -17,7 +17,7 @@ slong _nmod_mpoly_mul_johnson1(
     const mp_limb_t * coeff2, const ulong * exp2, slong len2,
     const mp_limb_t * coeff3, const ulong * exp3, slong len3,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i, j;
     slong next_loc;
@@ -86,7 +86,7 @@ slong _nmod_mpoly_mul_johnson1(
             }
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx);
         len1 += (p1[len1] != 0);
       
         while (Q_len > 0)
@@ -146,7 +146,7 @@ slong _nmod_mpoly_mul_johnson(
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i, j;
     slong next_loc;
@@ -236,7 +236,7 @@ slong _nmod_mpoly_mul_johnson(
             }
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx);
         len1 += (p1[len1] != 0);
 
         while (Q_len > 0)
@@ -359,12 +359,12 @@ void _nmod_mpoly_mul_johnson_maxfields(
     if (B->length > C->length)
     {
         _nmod_mpoly_mul_johnson(a, C->coeffs, Cexps, C->length,
-                  B->coeffs, Bexps, B->length, Abits, N, cmpmask, ctx->ffinfo);
+                     B->coeffs, Bexps, B->length, Abits, N, cmpmask, ctx->mod);
     }
     else
     {
         _nmod_mpoly_mul_johnson(a, B->coeffs, Bexps, B->length,
-                  C->coeffs, Cexps, C->length, Abits, N, cmpmask, ctx->ffinfo);
+                     C->coeffs, Cexps, C->length, Abits, N, cmpmask, ctx->mod);
     }
 
     if (A == B || A == C)

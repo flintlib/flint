@@ -12,228 +12,100 @@
 #include "fq_nmod_mpoly.h"
 
 
-void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(
-    fq_nmod_t ev,
-    const fq_nmod_mpoly_t A,
-    fq_nmod_struct * const * vals,
-    const fq_nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_eval_all_fq_nmod(
+    fq_nmod_t eval,
+    const mp_limb_t * Acoeffs,
+    const ulong * Aexps,
+    slong Alen,
+    flint_bitcnt_t Abits,
+    fq_nmod_struct * const * alphas,
+    const mpoly_ctx_t mctx,
+    const fq_nmod_ctx_t fqctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx->fqctx);
-    ulong l;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
-    slong shift, off;
-    ulong * ormask, * masks;
-    slong * offs;
-    slong entries, k_len;
-    slong Alen;
-    const mp_limb_t * Acoeff;
-    ulong * Aexp;
-    flint_bitcnt_t bits;
-    fq_nmod_struct * powers;
-    fq_nmod_t t;
+    slong d = fq_nmod_ctx_degree(fqctx);
+    slong i, j;
+    slong nvars = mctx->nvars;
+    ulong mask = (Abits <= FLINT_BITS) ? (-UWORD(1)) >> (FLINT_BITS - Abits) : 0;
+    slong N = mpoly_words_per_exp(Abits, mctx);
+    ulong varexp_sp;
+    fmpz_t varexp_mp;
+    slong * offsets, * shifts;
+    n_poly_struct * caches;
+    mp_limb_t * t;
     TMP_INIT;
-
-    fq_nmod_init(t, ctx->fqctx);
-
-    Alen = A->length;
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    bits = A->bits;
-
-    FLINT_ASSERT(Alen != 0);
-    FLINT_ASSERT(bits <= FLINT_BITS);
 
     TMP_START;
 
-    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    fmpz_init(varexp_mp);
 
-    /* get a mask of present exponent bits */
-    ormask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    for (j = 0; j < N; j++)
+    t = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    caches = (n_poly_struct *) TMP_ALLOC(3*nvars*sizeof(n_poly_struct));
+    offsets = (slong *) TMP_ALLOC(2*nvars*sizeof(slong));
+    shifts = offsets + nvars;
+    for (j = 0; j < nvars; j++)
     {
-        ormask[j] = 0;
+        if (Abits <= FLINT_BITS)
+            mpoly_gen_offset_shift_sp(offsets + j, shifts + j, j, Abits, mctx);
+        else
+            offsets[j] = mpoly_gen_offset_mp(j, Abits, mctx);
+
+        n_poly_init(caches + 3*j + 0);
+        n_poly_init(caches + 3*j + 1);
+        n_poly_init(caches + 3*j + 2);
+
+        n_fq_pow_cache_start_fq_nmod(alphas[j], caches + 3*j + 0,
+                                    caches + 3*j + 1, caches + 3*j + 2, fqctx);
     }
+
+    nmod_poly_fit_length(eval, d);
+    _n_fq_zero(eval->coeffs, d);
     for (i = 0; i < Alen; i++)
     {
-        for (j = 0; j < N; j++)
+        _n_fq_set(t, Acoeffs + d*i, d);
+        if (Abits <= FLINT_BITS)
         {
-            ormask[j] |= Aexp[N*i + j];
-        }
-    }
-
-    /* quick upper bound on number of masks needed */
-    entries = N*FLINT_BITS;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
-    powers = (fq_nmod_struct *) TMP_ALLOC(entries*sizeof(fq_nmod_struct));
-
-    /* store bit masks for needed powers of two of the variables */
-    k = 0;
-    for (i = 0; i < nvars; i++)
-    {
-        FLINT_ASSERT(k < entries);
-        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        fq_nmod_set(t, vals[i], ctx->fqctx);
-        for (l = 0; l < bits; l++)
-        {
-            masks[k] = UWORD(1) << (shift + l);
-            if ((masks[k] & ormask[off]) != UWORD(0))
+            for (j = 0; j < nvars; j++)
             {
-                offs[k] = off;
-                fq_nmod_init(powers + k, ctx->fqctx);
-                fq_nmod_set(powers + k, t, ctx->fqctx);
-                k++;
-            }
-            fq_nmod_mul(t, t, t, ctx->fqctx);
-        }
-    }
-    k_len = k;
-    FLINT_ASSERT(k_len <= entries);
-
-    /* accumulate the final answer */
-    fq_nmod_zero(ev, ctx->fqctx);
-    for (i = 0; i < Alen; i++)
-    {
-        n_fq_get_fq_nmod(t, Acoeff + d*i, ctx->fqctx);
-        for (k = 0; k < k_len; k++)
-        {
-            if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
-            {
-                fq_nmod_mul(t, t, powers + k, ctx->fqctx);
+                varexp_sp = ((Aexps + N*i)[offsets[j]]>>shifts[j])&mask;
+                n_fq_pow_cache_mulpow_ui(t, t, varexp_sp, caches + 3*j + 0,
+                                    caches + 3*j + 1, caches + 3*j + 2, fqctx);
             }
         }
-        fq_nmod_add(ev, ev, t, ctx->fqctx);
+        else
+        {
+            for (j = 0; j < nvars; j++)
+            {
+                fmpz_set_ui_array(varexp_mp, Aexps + N*i + offsets[j], Abits/FLINT_BITS);
+                n_fq_pow_cache_mulpow_fmpz(t, t, varexp_mp, caches + 3*j + 0,
+                                    caches + 3*j + 1, caches + 3*j + 2, fqctx);
+            }
+        }
+
+        _n_fq_add(eval->coeffs, eval->coeffs, t, d, fqctx->mod);
     }
 
-    for (i = 0; i < k_len; i++)
-        fq_nmod_clear(powers + i, ctx->fqctx);
+    _nmod_poly_set_length(eval, d);
+    _nmod_poly_normalise(eval);
+
+    fmpz_clear(varexp_mp);
+
+    for (j = 0; j < 3*nvars; j++)
+        n_poly_clear(caches + j);
 
     TMP_END;
-
-    fq_nmod_clear(t, ctx->fqctx);
-}
-
-void _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(
-    fq_nmod_t ev,
-    const fq_nmod_mpoly_t A,
-    fq_nmod_struct * const * vals,
-    const fq_nmod_mpoly_ctx_t ctx)
-{
-    slong d = fq_nmod_ctx_degree(ctx->fqctx);
-    ulong l;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
-    slong off;
-    ulong * ormask, * masks;
-    slong * offs;
-    slong entries, k_len;
-    slong Alen;
-    mp_limb_t * Acoeff;
-    ulong * Aexp;
-    flint_bitcnt_t bits;
-    fq_nmod_struct * powers;
-    fq_nmod_t t;
-    TMP_INIT;
-
-    fq_nmod_init(t, ctx->fqctx);
-
-    Alen = A->length;
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    bits = A->bits;
-
-    FLINT_ASSERT(Alen != 0);
-    FLINT_ASSERT(bits > FLINT_BITS);
-
-    TMP_START;
-
-    N = mpoly_words_per_exp_mp(bits, ctx->minfo);
-
-    /* get a mask of present exponent bits */
-    ormask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    for (j = 0; j < N; j++)
-    {
-        ormask[j] = 0;
-    }
-    for (i = 0; i < Alen; i++)
-    {
-        for (j = 0; j < N; j++)
-        {
-            ormask[j] |= Aexp[N*i + j];
-        }
-    }
-
-    /* quick upper bound on number of masks needed */
-    entries = N*FLINT_BITS;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
-    powers = (fq_nmod_struct *) TMP_ALLOC(entries*sizeof(fq_nmod_struct));
-
-    /* store bit masks for needed powers of two of the variables */
-    k = 0;
-    for (i = 0; i < nvars; i++)
-    {
-        FLINT_ASSERT(k < entries);
-        
-        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
-        fq_nmod_set(t, vals[i], ctx->fqctx);
-        for (l = 0; l < bits; l++)
-        {
-            ulong l1 = l/FLINT_BITS;
-            ulong l2 = l%FLINT_BITS;
-            masks[k] = UWORD(1) << l2;
-            if ((masks[k] & ormask[off + l1]) != UWORD(0))
-            {
-                offs[k] = off + l1;
-                fq_nmod_init(powers + k, ctx->fqctx);
-                fq_nmod_set(powers + k, t, ctx->fqctx);
-                k++;
-            }
-            fq_nmod_mul(t, t, t, ctx->fqctx);
-        }
-    }
-    k_len = k;
-    FLINT_ASSERT(k_len <= entries);
-
-    /* accumulate the final answer */
-    fq_nmod_zero(ev, ctx->fqctx);
-    for (i = 0; i < Alen; i++)
-    {
-        n_fq_get_fq_nmod(t, Acoeff + d*i, ctx->fqctx);
-        for (k = 0; k < k_len; k++)
-        {
-            if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
-            {
-                fq_nmod_mul(t, t, powers + k, ctx->fqctx);
-            }
-        }
-        fq_nmod_add(ev, ev, t, ctx->fqctx);
-    }
-
-    for (i = 0; i < k_len; i++)
-        fq_nmod_clear(powers + i, ctx->fqctx);
-
-    TMP_END;
-
-    fq_nmod_clear(t, ctx->fqctx);
 }
 
 
 void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A,
                   fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
 {
-    if (A->length == 0)
+    if (fq_nmod_mpoly_is_zero(A, ctx))
     {
         fq_nmod_zero(ev, ctx->fqctx);
         return;
     }
 
-    if (A->bits <= FLINT_BITS)
-    {
-        _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(ev, A, vals, ctx);
-    }
-    else
-    {
-        _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(ev, A, vals, ctx);
-    }
+    _fq_nmod_mpoly_eval_all_fq_nmod(ev, A->coeffs, A->exps, A->length, A->bits,
+                                                 vals, ctx->minfo, ctx->fqctx);
 }
 

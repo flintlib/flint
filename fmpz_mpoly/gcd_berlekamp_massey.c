@@ -105,7 +105,7 @@ int nmod_mpoly_bma_get_fmpz_mpoly(
     ulong alphashift,
     nmod_berlekamp_massey_t I,
     const mpoly_bma_interpolate_ctx_t Ictx,
-    const nmodf_ctx_t fpctx)
+    nmod_t fpctx)
 {
     slong i, j, t, N;
     int success;
@@ -164,24 +164,24 @@ int nmod_mpoly_bma_get_fmpz_mpoly(
         r = roots[i];
         for (j = t; j > 0; j--)
         {
-            T = nmod_add(nmod_mul(r, T, fpctx->mod), I->V1->coeffs[j], fpctx->mod);
-            S = nmod_add(nmod_mul(r, S, fpctx->mod), T, fpctx->mod);
+            T = nmod_add(nmod_mul(r, T, fpctx), I->V1->coeffs[j], fpctx);
+            S = nmod_add(nmod_mul(r, S, fpctx), T, fpctx);
             umul_ppmm(p1, p0, values[j - 1], T);
             add_sssaaaaaa(V2, V1, V0, V2, V1, V0, WORD(0), p1, p0);
         }
         /* roots[i] should be a root of master */
-        FLINT_ASSERT(nmod_add(nmod_mul(r, T, fpctx->mod), I->V1->coeffs[0], fpctx->mod) == 0);
-        NMOD_RED3(V, V2, V1, V0, fpctx->mod);
-        S = nmod_mul(S, nmod_pow_ui(r, alphashift, fpctx->mod), fpctx->mod);
-        V0 = nmod_mul(V, nmod_inv(S, fpctx->mod), fpctx->mod);
+        FLINT_ASSERT(nmod_add(nmod_mul(r, T, fpctx), I->V1->coeffs[0], fpctx) == 0);
+        NMOD_RED3(V, V2, V1, V0, fpctx);
+        S = nmod_mul(S, nmod_pow_ui(r, alphashift, fpctx), fpctx);
+        V0 = nmod_mul(V, nmod_inv(S, fpctx), fpctx);
         if (V0 == 0)
         {
             /* hmmm */
             continue;
         }
 
-        if (fpctx->mod.n - V0 < V0)
-            fmpz_neg_ui(Acoeff + Alen, fpctx->mod.n - V0);
+        if (fpctx.n - V0 < V0)
+            fmpz_neg_ui(Acoeff + Alen, fpctx.n - V0);
         else
             fmpz_set_ui(Acoeff + Alen, V0);
 
@@ -329,13 +329,13 @@ void nmod_mpoly_bma_interpolate_alpha_powers(
     ulong w,
     const mpoly_bma_interpolate_ctx_t Ictx,
     const fmpz_mpoly_ctx_t ctx,
-    const nmodf_ctx_t fpctx)
+    nmod_t fpctx)
 {
     slong j = ctx->minfo->nvars - 1;
-    out[j] = nmod_pow_ui(Ictx->dlogenv_sp->alpha, w, fpctx->mod);
+    out[j] = nmod_pow_ui(Ictx->dlogenv_sp->alpha, w, fpctx);
     for (; j > 0; j--)
     {
-        out[j - 1] = nmod_pow_ui(out[j], Ictx->subdegs[j], fpctx->mod);
+        out[j - 1] = nmod_pow_ui(out[j], Ictx->subdegs[j], fpctx);
     }
 }
 
@@ -748,12 +748,12 @@ void nmod_bma_mpoly_init(nmod_bma_mpoly_t A)
 
 void nmod_bma_mpoly_reset_prime(
     nmod_bma_mpoly_t A,
-    const nmodf_ctx_t fpctx)
+    nmod_t fpctx)
 {
     slong i;
     for (i = 0; i < A->alloc; i++)
     {
-        nmod_berlekamp_massey_set_prime(A->coeffs + i, fpctx->mod.n);
+        nmod_berlekamp_massey_set_prime(A->coeffs + i, fpctx.n);
     }
 }
 
@@ -790,7 +790,7 @@ void nmod_bma_mpoly_print(const nmod_bma_mpoly_t A)
 void nmod_bma_mpoly_fit_length(
     nmod_bma_mpoly_t A,
     slong length,
-    const nmodf_ctx_t fpctx)
+    nmod_t fpctx)
 {
     slong i;
     slong old_alloc = A->alloc;
@@ -813,7 +813,7 @@ void nmod_bma_mpoly_fit_length(
 
         for (i = old_alloc; i < new_alloc; i++)
         {
-            nmod_berlekamp_massey_init(A->coeffs + i, fpctx->mod.n);
+            nmod_berlekamp_massey_init(A->coeffs + i, fpctx.n);
         }
         A->alloc = new_alloc;
     }
@@ -862,7 +862,7 @@ void nmod_bma_mpoly_add_point(
         for (Ai = 0; Ai < Alen; Ai++)
         for (ai = n_poly_degree(Acoeffs + Ai); ai >= 0; ai--)
             tot += (0 != Acoeffs[Ai].coeffs[ai]);
-        nmod_bma_mpoly_fit_length(L, tot, ctx_sp->ffinfo);
+        nmod_bma_mpoly_fit_length(L, tot, ctx_sp->mod);
     }
 
     Lcoeff = L->coeffs;
@@ -910,7 +910,7 @@ add_same_exp:
                 ulong texp;
                 nmod_berlekamp_massey_struct tcoeff;
 
-                nmod_bma_mpoly_fit_length(L, Llen + 1, ctx_sp->ffinfo);
+                nmod_bma_mpoly_fit_length(L, Llen + 1, ctx_sp->mod);
                 Lcoeff = L->coeffs;
                 Lexp = L->exps;
 
@@ -1008,7 +1008,7 @@ int nmod_bma_mpoly_get_fmpz_mpolyu(
     ulong alphashift,
     const nmod_bma_mpoly_t L,
     const mpoly_bma_interpolate_ctx_t Ictx,
-    const nmodf_ctx_t fpctx)
+    nmod_t fpctx)
 {
     int success;
     slong i;
@@ -1407,7 +1407,7 @@ void fmpz_mpolyuu_eval_nmod(
     E->length = 0;
     for (i = 0; i < A->length; i++)
     {
-        eval = fmpz_mpoly_eval_nmod(ctx_sp->ffinfo, A->coeffs + i, alpha, ctx);
+        eval = fmpz_mpoly_eval_nmod(ctx_sp->mod, A->coeffs + i, alpha, ctx);
         if (eval == 0)
             continue;
 
@@ -1466,7 +1466,7 @@ void fmpz_mpolyuu_eval_fmpz_mod(
 
 
 mp_limb_t fmpz_mpoly_eval_nmod(
-    const nmodf_ctx_t fpctx,
+    nmod_t fpctx,
     const fmpz_mpoly_t A,
     const mp_limb_t * alpha,
     const fmpz_mpoly_ctx_t ctx)
@@ -1520,7 +1520,7 @@ mp_limb_t fmpz_mpoly_eval_nmod(
             {
                 LUTlen++;
             }
-            xpoweval = nmod_mul(xpoweval, xpoweval, fpctx->mod);
+            xpoweval = nmod_mul(xpoweval, xpoweval, fpctx);
         }
     }
     FLINT_ASSERT(LUTlen < N*FLINT_BITS);
@@ -1528,23 +1528,21 @@ mp_limb_t fmpz_mpoly_eval_nmod(
     eval = 0;
     for (i = 0; i < A->length; i++)
     {
-        xpoweval = fmpz_fdiv_ui(A->coeffs + i, fpctx->mod.n);
+        xpoweval = fmpz_fdiv_ui(A->coeffs + i, fpctx.n);
         for (j = 0; j < LUTlen; j++)
         {
             if (((Aexp + N*i)[LUToffset[j]] & LUTmask[j]) != 0)
             {
-                xpoweval = nmod_mul(xpoweval, LUTvalue[j], fpctx->mod);
+                xpoweval = nmod_mul(xpoweval, LUTvalue[j], fpctx);
             }
         }
-        eval = nmod_add(eval, xpoweval, fpctx->mod);
+        eval = nmod_add(eval, xpoweval, fpctx);
     }
 
     TMP_END;
 
     return eval;
 }
-
-
 
 
 
@@ -1729,7 +1727,7 @@ void nmod_zip_mpolyu_set_skel(
         T->length = A->coeffs[i].length;
         _mpoly_monomial_evals_nmod(T->coeffs, A->coeffs[i].exps,
                         A->coeffs[i].bits, A->coeffs[i].length, alpha, 0,
-                                              ctx->minfo, ctx_sp->ffinfo->mod);
+                                                      ctx->minfo, ctx_sp->mod);
         Z->exps[i] = A->exps[i];
         FLINT_ASSERT(Zc->mlength == T->length);
         for (j = 0; j < Zc->mlength; j++)
@@ -1776,7 +1774,7 @@ void nmod_mpolyuu_eval_step2(
     for (i = 0; i < Alen; i++)
     {
         eval = n_poly_mod_eval_step2(Acur->coeffs + i, Aterms[i].coeff,
-                                                          ctx_sp->ffinfo->mod);
+                                                                  ctx_sp->mod);
         if (eval == 0)
         {
             continue;
@@ -1788,7 +1786,7 @@ void nmod_mpolyuu_eval_step2(
         n_bpoly_set_coeff(E, xexp, yexp, eval);
     }
 
-    FLINT_ASSERT(n_bpoly_mod_is_canonical(E, ctx_sp->ffinfo->mod));
+    FLINT_ASSERT(n_bpoly_mod_is_canonical(E, ctx_sp->mod));
 }
 
 
@@ -1818,7 +1816,7 @@ void n_bpoly_set_mpolyn2(
         n_poly_set_nmod_poly(A->coeffs + x, B->coeffs + i);
     }
 
-    FLINT_ASSERT(n_bpoly_mod_is_canonical(A, ctx_sp->ffinfo->mod));
+    FLINT_ASSERT(n_bpoly_mod_is_canonical(A, ctx_sp->mod));
 }
 
 
@@ -1826,7 +1824,7 @@ nmod_zip_find_coeffs_ret_t nmod_zip_find_coeffs(
     nmod_zip_t Z,
     nmod_poly_t master,
     slong pointcount,
-    const nmodf_ctx_t ffinfo)
+    nmod_t fpctx)
 {
     slong i, j;
     mp_limb_t V, V0, V1, V2, T, S, r, p0, p1;
@@ -1843,26 +1841,26 @@ nmod_zip_find_coeffs_ret_t nmod_zip_find_coeffs(
         r = Z->monomials[i];
         for (j = Z->mlength; j > 0; j--)
         {
-            T = nmod_add(nmod_mul(r, T, ffinfo->mod), master->coeffs[j], ffinfo->mod);
-            S = nmod_add(nmod_mul(r, S, ffinfo->mod), T, ffinfo->mod);
+            T = nmod_add(nmod_mul(r, T, fpctx), master->coeffs[j], fpctx);
+            S = nmod_add(nmod_mul(r, S, fpctx), T, fpctx);
             umul_ppmm(p1, p0, Z->evals[j - 1], T);
             add_sssaaaaaa(V2, V1, V0, V2, V1, V0, WORD(0), p1, p0);
         }
         /* roots[i] should be a root of master */
-        FLINT_ASSERT(nmod_add(nmod_mul(r, T, ffinfo->mod), master->coeffs[0], ffinfo->mod) == 0);
-        NMOD_RED3(V, V2, V1, V0, ffinfo->mod);
-        S = nmod_mul(S, r, ffinfo->mod); /* shift is one */
+        FLINT_ASSERT(nmod_add(nmod_mul(r, T, fpctx), master->coeffs[0], fpctx) == 0);
+        NMOD_RED3(V, V2, V1, V0, fpctx);
+        S = nmod_mul(S, r, fpctx); /* shift is one */
         if (S == 0)
         {
             return nmod_zip_find_coeffs_non_invertible;
         }
-        Z->coeffs[i] = nmod_mul(V, nmod_inv(S, ffinfo->mod), ffinfo->mod);
+        Z->coeffs[i] = nmod_mul(V, nmod_inv(S, fpctx), fpctx);
     }
 
     /* use the coefficients of master as temp work space */
     for (i = 0; i < Z->mlength; i++)
     {
-        master->coeffs[i] = nmod_pow_ui(Z->monomials[i], Z->mlength, ffinfo->mod);
+        master->coeffs[i] = nmod_pow_ui(Z->monomials[i], Z->mlength, fpctx);
     }
 
     /* check that the remaining points match */
@@ -1871,11 +1869,11 @@ nmod_zip_find_coeffs_ret_t nmod_zip_find_coeffs(
         V0 = V1 = V2 = S = 0;
         for (j = 0; j < Z->mlength; j++)
         {
-            master->coeffs[j] = nmod_mul(master->coeffs[j], Z->monomials[j], ffinfo->mod);
+            master->coeffs[j] = nmod_mul(master->coeffs[j], Z->monomials[j], fpctx);
             umul_ppmm(p1, p0, Z->coeffs[j], master->coeffs[j]);
             add_sssaaaaaa(V2, V1, V0, V2, V1, V0, WORD(0), p1, p0);
         }
-        NMOD_RED3(V, V2, V1, V0, ffinfo->mod);
+        NMOD_RED3(V, V2, V1, V0, fpctx);
         if (V != Z->evals[i])
         {
             return nmod_zip_find_coeffs_no_match;
@@ -1893,11 +1891,11 @@ nmod_zip_find_coeffs_ret_t nmod_mpolyu_zip_find_coeffs(
     nmod_zip_find_coeffs_ret_t ret;
     nmod_poly_t T;
 
-    nmod_poly_init_mod(T, ctx_sp->ffinfo->mod);
+    nmod_poly_init_mod(T, ctx_sp->mod);
 
     for (i = 0; i < Z->length; i++)
     {
-        ret = nmod_zip_find_coeffs(Z->coeffs + i, T, Z->pointcount, ctx_sp->ffinfo);
+        ret = nmod_zip_find_coeffs(Z->coeffs + i, T, Z->pointcount, ctx_sp->mod);
         if (ret != nmod_zip_find_coeffs_good)
         {
             goto cleanup;
@@ -1918,7 +1916,7 @@ int fmpz_mpolyu_addinterp_zip(
     fmpz_mpolyu_t H,
     const fmpz_t Hmodulus,
     const nmod_zip_mpolyu_t Z,
-    const nmodf_ctx_t ffinfo)
+    nmod_t fpctx)
 {
     int changed = 0;
     slong i, j;
@@ -1935,7 +1933,7 @@ int fmpz_mpolyu_addinterp_zip(
         FLINT_ASSERT(Hc->length == Zc->mlength);
         for (j = 0; j < Hc->length; j++)
         {
-            fmpz_CRT_ui(t, Hc->coeffs + j, Hmodulus, Zc->coeffs[j], ffinfo->mod.n, 1);
+            fmpz_CRT_ui(t, Hc->coeffs + j, Hmodulus, Zc->coeffs[j], fpctx.n, 1);
             changed |= !fmpz_equal(t, Hc->coeffs + j);
             fmpz_swap(t, Hc->coeffs + j);
         }
@@ -2044,7 +2042,7 @@ int static _random_check_sp(
     for (point_try_count = 0; point_try_count < 10; point_try_count++)
     {
         for (i = 0; i < ctx->minfo->nvars; i++)
-            alphas_sp[i] = n_urandint(randstate, ctx_sp->ffinfo->mod.n);
+            alphas_sp[i] = n_urandint(randstate, ctx_sp->mod.n);
         fmpz_mpolyuu_eval_nmod(Aeval_sp, ctx_sp, A, alphas_sp, ctx);
         fmpz_mpolyuu_eval_nmod(Beval_sp, ctx_sp, B, alphas_sp, ctx);
 
@@ -2055,16 +2053,15 @@ int static _random_check_sp(
             continue;
         }
 
-        Gammaeval_sp = fmpz_mpoly_eval_nmod(ctx_sp->ffinfo, Gamma,
-                                                           alphas_sp, ctx);
+        Gammaeval_sp = fmpz_mpoly_eval_nmod(ctx_sp->mod, Gamma, alphas_sp, ctx);
         FLINT_ASSERT(Gammaeval_sp != 0);
 
         success = n_bpoly_mod_gcd_brown_smprime(Geval_sp, Abareval_sp,
-                     Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp->ffinfo->mod, Sp);
+                             Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp->mod, Sp);
         if (!success)
             continue;
 
-        n_bpoly_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp->ffinfo->mod);
+        n_bpoly_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp->mod);
 
         FLINT_ASSERT(Geval_sp->length > 0);
         *GevaldegXY = n_bpoly_bidegree(Geval_sp);
@@ -2192,11 +2189,11 @@ static void nmod_mpoly_get_eval_helper(
 
     p = Acur->coeffs;
     _mpoly_monomial_evals_nmod(p, A->exps, A->bits, Alen, alphas, 0,
-                                              ctx->minfo, ctx_sp->ffinfo->mod);
+                                                      ctx->minfo, ctx_sp->mod);
     q = Ainc->coeffs;
     for (j = 0; j < Alen; j++)
     {
-        q[2*j + 0] = fmpz_fdiv_ui(Acoeffs + j, ctx_sp->ffinfo->mod.n);
+        q[2*j + 0] = fmpz_fdiv_ui(Acoeffs + j, ctx_sp->mod.n);
         q[2*j + 1] = p[j];
     }
 }
@@ -2376,8 +2373,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
         {
             continue;
         }
-        success = n_bpoly_mod_gcd_brown_smprime(Geval_sp,
-                  Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp->ffinfo->mod, Sp);
+        success = n_bpoly_mod_gcd_brown_smprime(Geval_sp, Abareval_sp,
+                             Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp->mod, Sp);
         if (success)
         {
             FLINT_ASSERT(Geval_sp->length > 0);
@@ -2485,16 +2482,16 @@ pick_bma_prime:
         nmod_mpoly_ctx_set_modulus(ctx_sp, p_sp);
         nmod_discrete_log_pohlig_hellman_precompute_prime(Ictx->dlogenv_sp, p_sp);
 
-        nmod_bma_mpoly_reset_prime(GLambda_sp, ctx_sp->ffinfo);
-        nmod_bma_mpoly_reset_prime(AbarLambda_sp, ctx_sp->ffinfo);
-        nmod_bma_mpoly_reset_prime(BbarLambda_sp, ctx_sp->ffinfo);
+        nmod_bma_mpoly_reset_prime(GLambda_sp, ctx_sp->mod);
+        nmod_bma_mpoly_reset_prime(AbarLambda_sp, ctx_sp->mod);
+        nmod_bma_mpoly_reset_prime(BbarLambda_sp, ctx_sp->mod);
         nmod_bma_mpoly_zero(GLambda_sp);
         nmod_bma_mpoly_zero(AbarLambda_sp);
         nmod_bma_mpoly_zero(BbarLambda_sp);
 
         FLINT_ASSERT(sshift_sp == 1);
         nmod_mpoly_bma_interpolate_alpha_powers(alphas_sp, sshift_sp,
-                                                    Ictx, ctx, ctx_sp->ffinfo);
+                                                       Ictx, ctx, ctx_sp->mod);
 
         nmod_mpoly_get_eval_helper(Gammacur_sp, Gammainc_sp, ctx_sp, Gamma, alphas_sp, ctx);
         nmod_mpolyu_get_eval_helper(Acur_sp, Ainc_sp, ctx_sp, A, alphas_sp, ctx);
@@ -2514,7 +2511,7 @@ pick_bma_prime:
         if (image_count_sp >= p_sp - 1)
             goto pick_bma_prime;
 
-        Gammaeval_sp = n_poly_mod_eval_step2(Gammacur_sp, Gammainc_sp, ctx_sp->ffinfo->mod);
+        Gammaeval_sp = n_poly_mod_eval_step2(Gammacur_sp, Gammainc_sp, ctx_sp->mod);
         nmod_mpolyuu_eval_step2(Aeval_sp, Acur_sp, Ainc_sp, ctx_sp);
         nmod_mpolyuu_eval_step2(Beval_sp, Bcur_sp, Binc_sp, ctx_sp);
 
@@ -2533,7 +2530,7 @@ pick_bma_prime:
         FLINT_ASSERT(Gammaeval_sp != 0);
 
         success = n_bpoly_mod_gcd_brown_smprime(Geval_sp, Abareval_sp,
-                     Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp->ffinfo->mod, Sp);
+                             Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp->mod, Sp);
         if (!success)
         {
             sshift_sp += GLambda_sp->pointcount + 1;
@@ -2545,7 +2542,7 @@ pick_bma_prime:
 
         FLINT_ASSERT(Geval_sp->length > 0);
         GevaldegXY = n_bpoly_bidegree(Geval_sp);
-        n_bpoly_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp->ffinfo->mod);
+        n_bpoly_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp->mod);
 
         if (GdegboundXY < GevaldegXY)
         {
@@ -2596,7 +2593,7 @@ pick_bma_prime:
         if (GLambda_sp->pointcount/2 >= Gamma->length &&
             !nmod_bma_mpoly_reduce(GLambda_sp) &&
             nmod_bma_mpoly_get_fmpz_mpolyu(H, ctx, sshift_sp,
-                                           GLambda_sp, Ictx, ctx_sp->ffinfo) &&
+                                           GLambda_sp, Ictx, ctx_sp->mod) &&
             H->length > 0 && H->coeffs[0].length == Gamma->length)
         {
             which_check = 0;
@@ -2606,7 +2603,7 @@ pick_bma_prime:
         if (AbarLambda_sp->pointcount/2 >= A->coeffs[0].length &&
             !nmod_bma_mpoly_reduce(AbarLambda_sp) &&
             nmod_bma_mpoly_get_fmpz_mpolyu(H, ctx, sshift_sp,
-                                        AbarLambda_sp, Ictx, ctx_sp->ffinfo) &&
+                                           AbarLambda_sp, Ictx, ctx_sp->mod) &&
             H->length > 0 && H->coeffs[0].length == A->coeffs[0].length)
         {
             which_check = 1;
@@ -2616,7 +2613,7 @@ pick_bma_prime:
         if (BbarLambda_sp->pointcount/2 >= B->coeffs[0].length &&
             !nmod_bma_mpoly_reduce(BbarLambda_sp) &&
             nmod_bma_mpoly_get_fmpz_mpolyu(H, ctx, sshift_sp,
-                                        BbarLambda_sp, Ictx, ctx_sp->ffinfo) &&
+                                           BbarLambda_sp, Ictx, ctx_sp->mod) &&
             H->length > 0 && H->coeffs[0].length == B->coeffs[0].length)
         {
             which_check = 2;
@@ -2900,7 +2897,7 @@ pick_zip_prime:
 
 next_zip_image:
 
-    Gammaeval_sp = n_poly_mod_eval_step2(Gammacur_sp, Gammainc_sp, ctx_sp->ffinfo->mod);
+    Gammaeval_sp = n_poly_mod_eval_step2(Gammacur_sp, Gammainc_sp, ctx_sp->mod);
     nmod_mpolyuu_eval_step2(Aeval_sp, Acur_sp, Ainc_sp, ctx_sp);
     nmod_mpolyuu_eval_step2(Beval_sp, Bcur_sp, Binc_sp, ctx_sp);
 
@@ -2915,7 +2912,7 @@ next_zip_image:
     FLINT_ASSERT(Gammaeval_sp != 0);
 
     success = n_bpoly_mod_gcd_brown_smprime(Geval_sp, Abareval_sp, Bbareval_sp,
-                                  Aeval_sp, Beval_sp, ctx_sp->ffinfo->mod, Sp);
+                                  Aeval_sp, Beval_sp, ctx_sp->mod, Sp);
     if (!success)
         goto pick_zip_prime;
 
@@ -2940,7 +2937,7 @@ next_zip_image:
         goto pick_bma_prime;
     }
 
-    n_bpoly_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp->ffinfo->mod);
+    n_bpoly_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp->mod);
 
     success = nmod_zip_mpolyuu_add_point(newZ,
                             which_check == 1 ? Abareval_sp :
@@ -2964,8 +2961,8 @@ next_zip_image:
     }
 
     FLINT_ASSERT(bits == H->bits);
-    changed = fmpz_mpolyu_addinterp_zip(H, Hmodulus, newZ, ctx_sp->ffinfo);
-    fmpz_mul_ui(Hmodulus, Hmodulus, ctx_sp->ffinfo->mod.n);
+    changed = fmpz_mpolyu_addinterp_zip(H, Hmodulus, newZ, ctx_sp->mod);
+    fmpz_mul_ui(Hmodulus, Hmodulus, ctx_sp->mod.n);
 
     if (changed)
     {

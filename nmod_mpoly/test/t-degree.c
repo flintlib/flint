@@ -127,7 +127,7 @@ main(void)
             else
             {
                 fmpz_add(gdeg, gdeg, fdeg);
-                if (nmod_mpoly_ctx_modulus_is_prime(ctx))
+                if (n_is_prime(nmod_mpoly_ctx_modulus(ctx)))
                 {
                     ok = fmpz_equal(hdeg, gdeg);
                 }

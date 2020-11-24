@@ -21,8 +21,8 @@ void nmod_mpoly_scalar_mul_nmod_invertible(
     const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(c != 0);
-    FLINT_ASSERT(c < ctx->ffinfo->mod.n);
-    FLINT_ASSERT(n_gcd(c, ctx->ffinfo->mod.n) == 1);
+    FLINT_ASSERT(c < ctx->mod.n);
+    FLINT_ASSERT(n_gcd(c, ctx->mod.n) == 1);
 
     if (A == B)
     {
@@ -45,8 +45,7 @@ void nmod_mpoly_scalar_mul_nmod_invertible(
         }
     }
 
-    _nmod_vec_scalar_mul_nmod(A->coeffs, B->coeffs, B->length,
-                                                          c, ctx->ffinfo->mod);
+    _nmod_vec_scalar_mul_nmod(A->coeffs, B->coeffs, B->length, c, ctx->mod);
 }
 
 
@@ -64,7 +63,7 @@ void nmod_mpoly_scalar_mul_nmod_general(
     ulong * Aexp, * Bexp;
     mp_limb_t * Acoeff, * Bcoeff;
 
-    FLINT_ASSERT(c < ctx->ffinfo->mod.n);
+    FLINT_ASSERT(c < ctx->mod.n);
 
     N = mpoly_words_per_exp(B->bits, ctx->minfo);
 
@@ -80,7 +79,7 @@ void nmod_mpoly_scalar_mul_nmod_general(
     for (i = 0; i < Blen; i++)
     {
         mpoly_monomial_set(Aexp + N*Alen, Bexp + N*i, N);
-        Acoeff[Alen] = nmod_mul(Bcoeff[i], c, ctx->ffinfo->mod);
+        Acoeff[Alen] = nmod_mul(Bcoeff[i], c, ctx->mod);
         Alen += (Acoeff[Alen] != UWORD(0));
     }
 
@@ -91,8 +90,8 @@ void nmod_mpoly_scalar_mul_nmod_general(
 void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    if (c >= ctx->ffinfo->mod.n)
-        NMOD_RED(c, c, ctx->ffinfo->mod);
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
 
     if (c == 0 || nmod_mpoly_is_zero(B, ctx))
     {
@@ -100,7 +99,7 @@ void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         return;
     }
 
-    if (n_gcd(c, ctx->ffinfo->mod.n) == 1)
+    if (n_gcd(c, ctx->mod.n) == 1)
         nmod_mpoly_scalar_mul_nmod_invertible(A, B, c, ctx);
     else
         nmod_mpoly_scalar_mul_nmod_general(A, B, c, ctx);

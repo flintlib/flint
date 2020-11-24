@@ -31,8 +31,7 @@ void nmod_mpoly_combine_like_terms(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
         if (out >= WORD(0) &&
                      mpoly_monomial_equal(A->exps + N*out, A->exps + N*in, N))
         {
-            A->coeffs[out] = nmod_add(A->coeffs[out], A->coeffs[in],
-                                                             ctx->ffinfo->mod);
+            A->coeffs[out] = nmod_add(A->coeffs[out], A->coeffs[in], ctx->mod);
         }
         else
         {

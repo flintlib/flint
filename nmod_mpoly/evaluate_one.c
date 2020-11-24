@@ -61,7 +61,7 @@ void _nmod_mpoly_evaluate_one_ui_sp(
     {
         k = (Bexps[N*i + off] >> shift) & mask;
         Acoeffs[Alen] = nmod_pow_cache_mulpow_ui(Bcoeffs[i], k, cache[0],
-                                         cache[1], cache[2], ctx->ffinfo->mod);
+                                                 cache[1], cache[2], ctx->mod);
         if (Acoeffs[Alen] == 0)
             continue;
 
@@ -78,7 +78,7 @@ void _nmod_mpoly_evaluate_one_ui_sp(
             Alen++;
             continue;
         }
-        Acoeffs[Alen - 1] = nmod_add(Acoeffs[Alen - 1], Acoeffs[Alen], ctx->ffinfo->mod);
+        Acoeffs[Alen - 1] = nmod_add(Acoeffs[Alen - 1], Acoeffs[Alen], ctx->mod);
         Alen -= (Acoeffs[Alen - 1] == 0);
     }
     A->length = Alen;
@@ -148,7 +148,7 @@ static void _nmod_mpoly_evaluate_one_ui_mp(
     {
         fmpz_set_ui_array(k, Bexps + N*i + off, bits/FLINT_BITS);
         Acoeffs[Alen] = nmod_pow_cache_mulpow_fmpz(Bcoeffs[i], k, cache[0],
-                                         cache[1], cache[2], ctx->ffinfo->mod);
+                                                 cache[1], cache[2], ctx->mod);
         if (Acoeffs[Alen] == 0)
             continue;
 
@@ -166,7 +166,7 @@ static void _nmod_mpoly_evaluate_one_ui_mp(
             Alen++;
             continue;
         }
-        Acoeffs[Alen - 1] = nmod_add(Acoeffs[Alen - 1], Acoeffs[Alen], ctx->ffinfo->mod);
+        Acoeffs[Alen - 1] = nmod_add(Acoeffs[Alen - 1], Acoeffs[Alen], ctx->mod);
         Alen -= (Acoeffs[Alen - 1] == 0);
     }
     A->length = Alen;
@@ -197,8 +197,8 @@ void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         return;
     }
 
-    if (val >= ctx->ffinfo->mod.n)
-        NMOD_RED(val, val, ctx->ffinfo->mod);
+    if (val >= ctx->mod.n)
+        NMOD_RED(val, val, ctx->mod);
 
     n_poly_stack_init(St);
 

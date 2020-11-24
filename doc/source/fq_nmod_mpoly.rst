@@ -507,6 +507,19 @@ Greatest Common Divisor
     Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
 
 
+Square Root
+--------------------------------------------------------------------------------
+
+.. function:: int fq_nmod_mpoly_sqrt(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    If `A` is a perfect square return `1` and set `Q` to the square root
+    with positive leading coefficient. Otherwise return `0` and set `Q` to zero.
+
+.. function:: int fq_nmod_mpoly_is_square(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Return `1` if `A` is a perfect square, otherwise return `0`.
+
+
 Univariate Functions
 --------------------------------------------------------------------------------
 

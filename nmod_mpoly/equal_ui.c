@@ -16,10 +16,8 @@ int nmod_mpoly_equal_ui(const nmod_mpoly_t A,
 {
     slong N;
 
-    if (c >= ctx->ffinfo->mod.n)
-    {
-        NMOD_RED(c, c, ctx->ffinfo->mod);
-    }
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
 
     if (c == 0)
         return A->length == 0;

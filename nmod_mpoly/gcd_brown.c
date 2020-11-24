@@ -58,21 +58,21 @@ static void _splitworker_bivar(void * varg)
 
     FLINT_ASSERT(base->var == 1);
 
-    nmod_poly_init(r, ctx->ffinfo->mod.n);
-    nmod_poly_init(modulus2, ctx->ffinfo->mod.n);
-    nmod_poly_init(alphapow, ctx->ffinfo->mod.n);
+    nmod_poly_init_mod(r, ctx->mod);
+    nmod_poly_init_mod(modulus2, ctx->mod);
+    nmod_poly_init_mod(alphapow, ctx->mod);
     nmod_poly_fit_length(alphapow, FLINT_MAX(WORD(3), base->bound + 1));
 
-    nmod_poly_init(Aevalp, ctx->ffinfo->mod.n);
-    nmod_poly_init(Bevalp, ctx->ffinfo->mod.n);
-    nmod_poly_init(Gevalp, ctx->ffinfo->mod.n);
-    nmod_poly_init(Abarevalp, ctx->ffinfo->mod.n);
-    nmod_poly_init(Bbarevalp, ctx->ffinfo->mod.n);
-    nmod_poly_init(Aevalm, ctx->ffinfo->mod.n);
-    nmod_poly_init(Bevalm, ctx->ffinfo->mod.n);
-    nmod_poly_init(Gevalm, ctx->ffinfo->mod.n);
-    nmod_poly_init(Abarevalm, ctx->ffinfo->mod.n);
-    nmod_poly_init(Bbarevalm, ctx->ffinfo->mod.n);
+    nmod_poly_init_mod(Aevalp, ctx->mod);
+    nmod_poly_init_mod(Bevalp, ctx->mod);
+    nmod_poly_init_mod(Gevalp, ctx->mod);
+    nmod_poly_init_mod(Abarevalp, ctx->mod);
+    nmod_poly_init_mod(Bbarevalp, ctx->mod);
+    nmod_poly_init_mod(Aevalm, ctx->mod);
+    nmod_poly_init_mod(Bevalm, ctx->mod);
+    nmod_poly_init_mod(Gevalm, ctx->mod);
+    nmod_poly_init_mod(Abarevalm, ctx->mod);
+    nmod_poly_init_mod(Bbarevalm, ctx->mod);
     nmod_mpolyn_init(T, base->A->bits, ctx);
 
     alpha = arg->alpha;
@@ -90,7 +90,7 @@ static void _splitworker_bivar(void * varg)
         }
         alpha -= base->num_threads;
 
-        FLINT_ASSERT(0 < alpha && alpha <= ctx->ffinfo->mod.n/2);
+        FLINT_ASSERT(0 < alpha && alpha <= ctx->mod.n/2);
         FLINT_ASSERT(alphapow->alloc >= 2);
         alphapow->length = 2;
         alphapow->coeffs[0] = 1;
@@ -98,7 +98,7 @@ static void _splitworker_bivar(void * varg)
 
         /* make sure evaluation point does not kill both lc(A) and lc(B) */
         _nmod_poly_eval2_pow(&gammaevalp, &gammaevalm,
-                                           base->gamma, alphapow, ctx->ffinfo);
+                                           base->gamma, alphapow, ctx->mod);
         if (gammaevalp == 0 || gammaevalm == 0)
         {
             continue;
@@ -202,10 +202,10 @@ static void _splitworker_bivar(void * varg)
         {
             temp = nmod_poly_evaluate_nmod(arg->modulus, alpha);
             FLINT_ASSERT(temp == nmod_poly_evaluate_nmod(arg->modulus,
-                                                  ctx->ffinfo->mod.n - alpha));
-            temp = nmod_mul(temp, alpha, ctx->ffinfo->mod);
-            temp = nmod_add(temp, temp, ctx->ffinfo->mod);
-            temp = n_invmod(temp, ctx->ffinfo->mod.n);
+                                                          ctx->mod.n - alpha));
+            temp = nmod_mul(temp, alpha, ctx->mod);
+            temp = nmod_add(temp, temp, ctx->mod);
+            temp = n_invmod(temp, ctx->mod.n);
             nmod_poly_scalar_mul_nmod(arg->modulus, arg->modulus, temp);
             if (!gstab)
             {
@@ -227,7 +227,7 @@ static void _splitworker_bivar(void * varg)
                                              Bbarevalp, Bbarevalm, alpha, ctx);
             gstab = astab = bstab = 0;
         }
-        temp = nmod_mul(alpha, alpha, ctx->ffinfo->mod);
+        temp = nmod_mul(alpha, alpha, ctx->mod);
         nmod_poly_scalar_mul_nmod(modulus2, arg->modulus, temp);
         nmod_poly_shift_left(arg->modulus, arg->modulus, 2);
         nmod_poly_sub(arg->modulus, arg->modulus, modulus2);
@@ -276,8 +276,8 @@ static void _splitworker(void * varg)
 
     mpoly_gen_offset_shift_sp(&offset, &shift, var - 1, bits, ctx->minfo);
 
-    nmod_poly_init(modulus2, ctx->ffinfo->mod.n);
-    nmod_poly_init(alphapow, ctx->ffinfo->mod.n);
+    nmod_poly_init(modulus2, ctx->mod.n);
+    nmod_poly_init(alphapow, ctx->mod.n);
     nmod_poly_fit_length(alphapow, FLINT_MAX(WORD(3), base->bound + 1));
 
     nmod_mpolyn_init(Aevalp, bits, ctx);
@@ -304,7 +304,7 @@ static void _splitworker(void * varg)
         }
         alpha -= base->num_threads;
 
-        FLINT_ASSERT(0 < alpha && alpha <= ctx->ffinfo->mod.n/2);
+        FLINT_ASSERT(0 < alpha && alpha <= ctx->mod.n/2);
         FLINT_ASSERT(alphapow->alloc >= 2);
         alphapow->length = 2;
         alphapow->coeffs[0] = 1;
@@ -312,7 +312,7 @@ static void _splitworker(void * varg)
 
         /* make sure evaluation point does not kill both lc(A) and lc(B) */
         _nmod_poly_eval2_pow(&gammaevalp, &gammaevalm,
-                                           base->gamma, alphapow, ctx->ffinfo);
+                                              base->gamma, alphapow, ctx->mod);
         if (gammaevalp == 0 || gammaevalm == 0)
         {
             continue;
@@ -392,20 +392,20 @@ static void _splitworker(void * varg)
 
         /* update interpolants */
         temp = nmod_mpolyn_leadcoeff(Gevalp, ctx);
-        temp = n_invmod(temp, ctx->ffinfo->mod.n);
-        temp = nmod_mul(gammaevalp, temp, ctx->ffinfo->mod);
+        temp = n_invmod(temp, ctx->mod.n);
+        temp = nmod_mul(gammaevalp, temp, ctx->mod);
         nmod_mpolyn_scalar_mul_nmod(Gevalp, temp, ctx);
         temp = nmod_mpolyn_leadcoeff(Gevalm, ctx);
-        temp = n_invmod(temp, ctx->ffinfo->mod.n);
-        temp = nmod_mul(gammaevalm, temp, ctx->ffinfo->mod);
+        temp = n_invmod(temp, ctx->mod.n);
+        temp = nmod_mul(gammaevalm, temp, ctx->mod);
         nmod_mpolyn_scalar_mul_nmod(Gevalm, temp, ctx);
         if (nmod_poly_degree(arg->modulus) > 0)
         {
             temp = nmod_poly_evaluate_nmod(arg->modulus, alpha);
-            FLINT_ASSERT(temp == nmod_poly_evaluate_nmod(arg->modulus, ctx->ffinfo->mod.n - alpha));
-            temp = nmod_mul(temp, alpha, ctx->ffinfo->mod);
-            temp = nmod_add(temp, temp, ctx->ffinfo->mod);
-            temp = n_invmod(temp, ctx->ffinfo->mod.n);
+            FLINT_ASSERT(temp == nmod_poly_evaluate_nmod(arg->modulus, ctx->mod.n - alpha));
+            temp = nmod_mul(temp, alpha, ctx->mod);
+            temp = nmod_add(temp, temp, ctx->mod);
+            temp = n_invmod(temp, ctx->mod.n);
             nmod_poly_scalar_mul_nmod(arg->modulus, arg->modulus, temp);
             nmod_mpolyn_interp_crt_2sm_mpolyn(&ldeg, arg->G, T,
                              Gevalp, Gevalm, var, arg->modulus, alphapow, ctx);
@@ -423,7 +423,7 @@ static void _splitworker(void * varg)
             nmod_mpolyn_interp_lift_2sm_mpolyn(&ldeg, arg->Bbar,
                                         Bbarevalp, Bbarevalm, var, alpha, ctx);
         }
-        temp = nmod_mul(alpha, alpha, ctx->ffinfo->mod);
+        temp = nmod_mul(alpha, alpha, ctx->mod);
         nmod_poly_scalar_mul_nmod(modulus2, arg->modulus, temp);
         nmod_poly_shift_left(arg->modulus, arg->modulus, 2);
         nmod_poly_sub(arg->modulus, arg->modulus, modulus2);
@@ -580,7 +580,7 @@ static slong _nmod_mpolyn_crt(
     }
 #endif
 
-    nmod_poly_init_mod(zero, ctx->ffinfo->mod);
+    nmod_poly_init_mod(zero, ctx->mod);
 
     Ai = 0;
     lastdegree = -WORD(1);
@@ -691,7 +691,7 @@ static void _joinworker(void * varg)
                                base->num_threads * sizeof(nmod_poly_struct *));
     output = (nmod_poly_struct *) TMP_ALLOC(ls*sizeof(nmod_poly_struct));
     for (i = 0; i < ls; i++)
-        nmod_poly_init_mod(output + i, base->ctx->ffinfo->mod);
+        nmod_poly_init_mod(output + i, base->ctx->mod);
 
     while (1)
     {
@@ -856,26 +856,26 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
 
     mpoly_gen_offset_shift_sp(&offset, &shift, 0, G->bits, ctx->minfo);
 
-    nmod_poly_init_mod(t1, ctx->ffinfo->mod);
+    nmod_poly_init_mod(t1, ctx->mod);
     nmod_mpolyn_init(T1, bits, ctx);
     nmod_mpolyn_init(T2, bits, ctx);
 
-    nmod_poly_init(cA, ctx->ffinfo->mod.n);
-    nmod_poly_init(cB, ctx->ffinfo->mod.n);
+    nmod_poly_init(cA, ctx->mod.n);
+    nmod_poly_init(cB, ctx->mod.n);
     nmod_mpolyn_content_last(cA, A, ctx);
     nmod_mpolyn_content_last(cB, B, ctx);
     nmod_mpolyn_divexact_last(A, cA, ctx);
     nmod_mpolyn_divexact_last(B, cB, ctx);
 
-    nmod_poly_init(cG, ctx->ffinfo->mod.n);
+    nmod_poly_init(cG, ctx->mod.n);
     nmod_poly_gcd(cG, cA, cB);
 
-    nmod_poly_init(cAbar, ctx->ffinfo->mod.n);
-    nmod_poly_init(cBbar, ctx->ffinfo->mod.n);
+    nmod_poly_init(cAbar, ctx->mod.n);
+    nmod_poly_init(cBbar, ctx->mod.n);
     nmod_poly_div(cAbar, cA, cG);
     nmod_poly_div(cBbar, cB, cG);
 
-    nmod_poly_init(gamma, ctx->ffinfo->mod.n);
+    nmod_poly_init(gamma, ctx->mod.n);
     nmod_poly_gcd(gamma, nmod_mpolyn_leadcoeff_poly(A, ctx),
                          nmod_mpolyn_leadcoeff_poly(B, ctx));
 
@@ -918,8 +918,8 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
         }
     }
 
-    alpha = (ctx->ffinfo->mod.n - UWORD(1))/UWORD(2);
-    if ((ctx->ffinfo->mod.n & UWORD(1)) == UWORD(0))
+    alpha = (ctx->mod.n - UWORD(1))/UWORD(2);
+    if ((ctx->mod.n & UWORD(1)) == UWORD(0))
     {
         success = 0;
         goto cleanup;
@@ -941,7 +941,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
         nmod_mpolyn_init(splitargs[i].G, bits, ctx);
         nmod_mpolyn_init(splitargs[i].Abar, bits, ctx);
         nmod_mpolyn_init(splitargs[i].Bbar, bits, ctx);
-        nmod_poly_init(splitargs[i].modulus, ctx->ffinfo->mod.n);
+        nmod_poly_init(splitargs[i].modulus, ctx->mod.n);
     }
     splitbase->num_threads = num_threads;
     splitbase->A = A;
@@ -1178,7 +1178,7 @@ successful_fix_lc:
             temp = nmod_mpolyn_leadcoeff(G, ctx);
             nmod_mpolyn_scalar_mul_nmod(Abar, temp, ctx);
             nmod_mpolyn_scalar_mul_nmod(Bbar, temp, ctx);
-            temp = n_invmod(temp, ctx->ffinfo->mod.n);
+            temp = n_invmod(temp, ctx->mod.n);
             nmod_mpolyn_scalar_mul_nmod(G, temp, ctx);
             goto successful_put_content;
         }

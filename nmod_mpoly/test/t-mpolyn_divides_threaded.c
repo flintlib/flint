@@ -47,7 +47,7 @@ void _divides_check(
     nmod_mpoly_init(Q, ctx);
     nmod_mpoly_init(Qcheck, ctx);
 
-    nmod_mpoly_ctx_init(nctx, ctx->minfo->nvars, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_mpoly_ctx_init(nctx, ctx->minfo->nvars, ORD_LEX, ctx->mod.n);
 
     ABbits = FLINT_MAX(A->bits, B->bits);
 

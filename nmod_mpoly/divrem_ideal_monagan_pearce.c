@@ -87,7 +87,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
     /* precompute leading coeff info */
     lc_minus_inv = (mp_limb_t *) TMP_ALLOC(Blen*sizeof(mp_limb_t));
     for (w = 0; w < Blen; w++)
-        lc_minus_inv[w] = ctx->ffinfo->mod.n - nmod_inv(Bs[w]->coeffs[0], ctx->ffinfo->mod);
+        lc_minus_inv[w] = ctx->mod.n - nmod_inv(Bs[w]->coeffs[0], ctx->mod);
 
     while (heap_len > 1)
     {
@@ -111,7 +111,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                           WORD(0), WORD(0), ctx->ffinfo->mod.n - Acoeffs[x->j]);
+                           WORD(0), WORD(0), ctx->mod.n - Acoeffs[x->j]);
                 } else
                 {
                     umul_ppmm(pp1, pp0, Bs[x->p]->coeffs[x->i], Q[x->p]->coeffs[x->j]);
@@ -121,7 +121,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        NMOD_RED3(acc0, acc2, acc1, acc0, ctx->ffinfo->mod);
+        NMOD_RED3(acc0, acc2, acc1, acc0, ctx->mod);
 
         while (store > store_base)
         {
@@ -181,7 +181,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
             if (mpoly_monomial_divides1(&texp, exp, Bexps[w][0], mask))
             {
                 nmod_mpoly_fit_length(Q[w], q_len[w] + 1, ctx);
-                Q[w]->coeffs[q_len[w]] = nmod_mul(acc0, lc_minus_inv[w], ctx->ffinfo->mod);
+                Q[w]->coeffs[q_len[w]] = nmod_mul(acc0, lc_minus_inv[w], ctx->mod);
                 Q[w]->exps[q_len[w]] = texp;
                 if (s[w] > 1)
                 {
@@ -204,7 +204,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
         /* if get here, no leading terms divided */
         _nmod_mpoly_fit_length(&r_coeff, &R->coeffs_alloc,
                                &r_exp, &R->exps_alloc, 1, r_len + 1);
-        r_coeff[r_len] = ctx->ffinfo->mod.n - acc0;
+        r_coeff[r_len] = ctx->mod.n - acc0;
         r_exp[r_len] = exp;
         r_len++;
 
@@ -329,10 +329,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
     /* precompute leading coeff info */
     lc_minus_inv = (mp_limb_t *) TMP_ALLOC(Blen*sizeof(mp_limb_t));
     for (w = 0; w < Blen; w++)
-    {
-        lc_minus_inv[w] = ctx->ffinfo->mod.n
-                             - nmod_inv(Bs[w]->coeffs[0], ctx->ffinfo->mod);
-    }
+        lc_minus_inv[w] = ctx->mod.n - nmod_inv(Bs[w]->coeffs[0], ctx->mod);
 
     while (heap_len > 1)
     {
@@ -362,7 +359,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                         UWORD(0), UWORD(0), ctx->ffinfo->mod.n - Acoeffs[x->j]);
+                         UWORD(0), UWORD(0), ctx->mod.n - Acoeffs[x->j]);
                 }
                 else
                 {
@@ -374,7 +371,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        NMOD_RED3(acc0, acc2, acc1, acc0, ctx->ffinfo->mod);
+        NMOD_RED3(acc0, acc2, acc1, acc0, ctx->mod);
 
         while (store > store_base)
         {
@@ -455,7 +452,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
             if (divides)
             {
                 nmod_mpoly_fit_length(Q[w], q_len[w] + 1, ctx);
-                Q[w]->coeffs[q_len[w]] = nmod_mul(acc0, lc_minus_inv[w], ctx->ffinfo->mod);
+                Q[w]->coeffs[q_len[w]] = nmod_mul(acc0, lc_minus_inv[w], ctx->mod);
                 mpoly_monomial_set(Q[w]->exps + N*q_len[w], texp, N);
                 if (s[w] > 1)
                 {
@@ -480,7 +477,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
         /* if get here, no leading terms divided */
         _nmod_mpoly_fit_length(&r_coeff, &R->coeffs_alloc,
                                &r_exp, &R->exps_alloc, N, r_len + 1);
-        r_coeff[r_len] = ctx->ffinfo->mod.n - acc0;
+        r_coeff[r_len] = ctx->mod.n - acc0;
         mpoly_monomial_set(r_exp + r_len*N, exp, N);
         r_len++;
 

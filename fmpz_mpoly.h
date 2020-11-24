@@ -921,11 +921,10 @@ fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 
 /* Square root ***************************************************************/
 
-FLINT_DLL slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq,
-           ulong ** expq, slong * allocq, const fmpz * poly2,
-                                    const ulong * exp2, slong len2, 
-                        slong bits, slong N, const ulong * cmpmask, int check);
-	
+FLINT_DLL slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq, ulong ** expq,
+           slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2,
+                       flint_bitcnt_t bits, const mpoly_ctx_t mctx, int check);
+
 FLINT_DLL int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
                                         const fmpz_mpoly_ctx_t ctx, int check);
 
@@ -1474,13 +1473,13 @@ typedef enum {
 } nmod_zip_find_coeffs_ret_t;
 
 FLINT_DLL nmod_zip_find_coeffs_ret_t nmod_zip_find_coeffs(nmod_zip_t Z,
-               nmod_poly_t master, slong pointcount, const nmodf_ctx_t ffinfo);
+                            nmod_poly_t master, slong pointcount, nmod_t fctx);
 
 FLINT_DLL nmod_zip_find_coeffs_ret_t nmod_mpolyu_zip_find_coeffs(
                            nmod_zip_mpolyu_t Z, const nmod_mpoly_ctx_t ctx_sp);
 
 FLINT_DLL int fmpz_mpolyu_addinterp_zip(fmpz_mpolyu_t H, const fmpz_t Hmodulus,
-                          const nmod_zip_mpolyu_t Z, const nmodf_ctx_t ffinfo);
+                                       const nmod_zip_mpolyu_t Z, nmod_t fctx);
 
 FLINT_DLL int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, flint_bitcnt_t Abits,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -1664,6 +1663,33 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     smul_ppmm(p[1], p[0], d1, d2);
     p2 = FLINT_SIGN_EXT(p[1]);
     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
+}
+
+
+FLINT_DLL mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x,
+                                                                    mpz_ptr t);
+
+FMPZ_MPOLY_INLINE
+void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
+                                                 ulong c2, ulong c1, ulong c0)
+{
+    ulong cs, d[3];
+    mpz_t c;
+
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+
+    cs = FLINT_SIGN_EXT(c2);
+
+    sub_dddmmmsss(d[2], d[1], d[0], cs^c2, cs^c1, cs^c0, cs, cs, cs);
+
+    c->_mp_size = d[2] != 0 ? 3 :
+                  d[1] != 0 ? 2 :
+                  d[0] != 0;
+    if (cs != 0)
+        c->_mp_size = -c->_mp_size;
+
+    mpz_add(a, b, c);
 }
 
 

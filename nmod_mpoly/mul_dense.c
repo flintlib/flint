@@ -83,24 +83,18 @@ int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
     Au->alloc  = Ad->coeff_alloc;
     Au->coeffs = Ad->coeffs;
     Au->length = nmod_mpolyd_length(Ad);
-    Au->mod.n    = ctx->ffinfo->mod.n;
-    Au->mod.ninv = ctx->ffinfo->mod.ninv;
-    Au->mod.norm = ctx->ffinfo->mod.norm;
+    Au->mod    = ctx->mod;
 
     Bu->alloc  = Bd->coeff_alloc;
     Bu->coeffs = Bd->coeffs;
     Bu->length = nmod_mpolyd_length(Bd);
-    Bu->mod.n    = ctx->ffinfo->mod.n;
-    Bu->mod.ninv = ctx->ffinfo->mod.ninv;
-    Bu->mod.norm = ctx->ffinfo->mod.norm;
+    Bu->mod    = ctx->mod;
 
     /* manually move P to Pu */
     Pu->alloc  = Pd->coeff_alloc;
     Pu->coeffs = Pd->coeffs;
     Pu->length = 0;
-    Pu->mod.n    = ctx->ffinfo->mod.n;
-    Pu->mod.ninv = ctx->ffinfo->mod.ninv;
-    Pu->mod.norm = ctx->ffinfo->mod.norm;
+    Pu->mod    = ctx->mod;
 
     nmod_poly_mul(Pu, Au, Bu);
 

@@ -434,8 +434,7 @@ FLINT_DLL int n_bpoly_mod_hlift_cubic(slong r, n_bpoly_t A, n_bpoly_struct * B,
                                 nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_polyu3_mod_hlift(slong r, n_polyun_struct * BB,  n_polyu_t A,
-                      n_polyu_struct * B, mp_limb_t beta, slong degree_inner,
-                                                        const nmodf_ctx_t ctx);
+           n_polyu_struct * B, mp_limb_t beta, slong degree_inner, nmod_t ctx);
 
 FLINT_DLL int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
             const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,

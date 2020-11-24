@@ -14,14 +14,14 @@
 void nmod_mpoly_set_term_coeff_ui(nmod_mpoly_t A, slong i, ulong c,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    if ((ulong) i >= (ulong) A->length)
+    if (i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in nmod_mpoly_set_term_coeff_ui");
+        flint_throw(FLINT_ERROR, "nmod_mpoly_set_term_coeff_ui: index out of range.");
     }
 
-    if (c >= ctx->ffinfo->mod.n)
+    if (c >= ctx->mod.n)
     {
-        NMOD_RED(c, c, ctx->ffinfo->mod);
+        NMOD_RED(c, c, ctx->mod);
     }
 
     A->coeffs[i] = c;

@@ -314,7 +314,7 @@ static int n_polyun_zip_solve(
         success = _nmod_zip_vand_solve(Acoeffs + Ai,
                          H->terms[i].coeff->coeffs, n,
                          Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                         M->terms[i].coeff->coeffs, t->coeffs, ctx->ffinfo->mod);
+                         M->terms[i].coeff->coeffs, t->coeffs, ctx->mod);
         if (success < 1)
         {
             n_poly_clear(t);
@@ -477,8 +477,7 @@ mp_limb_t n_poly_mod_eval_step_sep(
 {
     FLINT_ASSERT(A->length == cur->length);
     FLINT_ASSERT(A->length == inc->length);
-    return _nmod_zip_eval_step(cur->coeffs, inc->coeffs, A->coeffs,
-                                                  A->length, ctx->ffinfo->mod);
+    return _nmod_zip_eval_step(cur->coeffs, inc->coeffs, A->coeffs, A->length, ctx->mod);
 }
 
 static void n_fq_poly_eval_step_sep(
@@ -490,8 +489,7 @@ static void n_fq_poly_eval_step_sep(
 {
     FLINT_ASSERT(A->length == cur->length);
     FLINT_ASSERT(A->length == inc->length);
-    _n_fq_zip_eval_step(res, cur->coeffs, inc->coeffs, A->coeffs,
-                                                               A->length, ctx);
+    _n_fq_zip_eval_step(res, cur->coeffs, inc->coeffs, A->coeffs, A->length, ctx);
 }
 
 void static n_bpoly_mod_eval_step_sep(
@@ -514,7 +512,7 @@ void static n_bpoly_mod_eval_step_sep(
 
         c = _nmod_zip_eval_step(cur->terms[i].coeff->coeffs,
                                   inc->terms[i].coeff->coeffs,
-                                  A->coeffs + Ai, this_len, ctx->ffinfo->mod);
+                                  A->coeffs + Ai, this_len, ctx->mod);
         Ai += this_len;
 
         e0 = extract_exp(cur->terms[i].exp, 1, 2);
@@ -539,7 +537,7 @@ static void nmod_mpoly_monomial_evals(
     const nmod_mpoly_ctx_t ctx)
 {
     _nmod_mpoly_monomial_evals_cache(E, A->exps, A->bits, A->length,
-                             betas, start, stop, ctx->minfo, ctx->ffinfo->mod);
+                                     betas, start, stop, ctx->minfo, ctx->mod);
 }
 
 static void fq_nmod_mpoly_monomial_evals(
@@ -562,7 +560,7 @@ static void nmod_mpoly_monomial_evals2(
     const nmod_mpoly_ctx_t ctx)
 {
     _nmod_mpoly_monomial_evals2_cache(E, A->exps, A->bits, A->length, betas, m,
-                                                 ctx->minfo, ctx->ffinfo->mod);
+                                                         ctx->minfo, ctx->mod);
 }
 
 static void fq_nmod_mpoly_monomial_evals2(
@@ -617,7 +615,6 @@ int nmod_mpolyl_gcd_zippel_smprime(
     const nmod_mpoly_ctx_t ctx)
 {
     int success, use, alpha_tries_left;
-    nmod_t mod = ctx->ffinfo->mod;
     slong i, m;
     slong nvars = ctx->minfo->nvars;
     flint_bitcnt_t bits = A->bits;
@@ -676,7 +673,7 @@ int nmod_mpolyl_gcd_zippel_smprime(
     FLINT_ASSERT(gammadegs[0] == 0);
     FLINT_ASSERT(gammadegs[1] == 0);
 
-    if (ctx->ffinfo->mod.n < 7)
+    if (ctx->mod.n < 7)
         return 0;
 
     n_polyun_init(HG);
@@ -752,7 +749,7 @@ choose_alphas:
     }
 
     for (i = 2; i < nvars; i++)
-        alphas[i] = n_urandint(state, ctx->ffinfo->mod.n - 2) + 1;
+        alphas[i] = n_urandint(state, ctx->mod.n - 2) + 1;
 
     for (i = nvars - 1; i >= 2; i--)
     {
@@ -780,7 +777,7 @@ choose_alphas:
     nmod_mpoly_get_bpoly(Aev, Aevals + m, 0, 1, ctx);
     nmod_mpoly_get_bpoly(Bev, Bevals + m, 0, 1, ctx);
 
-    success = n_bpoly_mod_gcd_brown_smprime(Gev, Abarev, Bbarev, Aev, Bev, mod, St);
+    success = n_bpoly_mod_gcd_brown_smprime(Gev, Abarev, Bbarev, Aev, Bev, ctx->mod, St);
     if (!success)
         goto cleanup;
 
@@ -795,22 +792,22 @@ choose_alphas:
     }
 
     gammaev = nmod_mpoly_get_ui(gammaevals + m, ctx);
-    n_bpoly_scalar_mul_nmod(Gev, gammaev, mod);
+    n_bpoly_scalar_mul_nmod(Gev, gammaev, ctx->mod);
 
     nmod_mpolyn_interp_lift_sm_bpoly(Gn, Gev, ctx);
     nmod_mpolyn_interp_lift_sm_bpoly(Abarn, Abarev, ctx);
     nmod_mpolyn_interp_lift_sm_bpoly(Bbarn, Bbarev, ctx);
 
     n_poly_one(modulus);
-    c = nmod_neg(alphas[m], mod);
-    n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, mod);
+    c = nmod_neg(alphas[m], ctx->mod);
+    n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, ctx->mod);
 
     start_alpha = alphas[m];
     while (1)
     {
     choose_alpha_2:
 
-        alphas[m] = (alphas[m] < 2) ? mod.n - 1 : alphas[m] - 1;
+        alphas[m] = (alphas[m] < 2) ? ctx->mod.n - 1 : alphas[m] - 1;
         if (alphas[m] == start_alpha)
             goto choose_alphas;
 
@@ -835,7 +832,7 @@ choose_alphas:
         nmod_mpoly_get_bpoly(Aev, Aevals + m, 0, 1, ctx);
         nmod_mpoly_get_bpoly(Bev, Bevals + m, 0, 1, ctx);
 
-        success = n_bpoly_mod_gcd_brown_smprime(Gev, Abarev, Bbarev, Aev, Bev, mod, St);
+        success = n_bpoly_mod_gcd_brown_smprime(Gev, Abarev, Bbarev, Aev, Bev, ctx->mod, St);
         if (!success)
             goto cleanup;
 
@@ -851,11 +848,11 @@ choose_alphas:
         }
 
         gammaev = nmod_mpoly_get_ui(gammaevals + m, ctx);
-        n_bpoly_scalar_mul_nmod(Gev, gammaev, mod);
+        n_bpoly_scalar_mul_nmod(Gev, gammaev, ctx->mod);
 
-        c = n_poly_mod_eval_pow(modulus, alphapow, mod);
-        c = nmod_inv(c, mod);
-        _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, mod);
+        c = n_poly_mod_eval_pow(modulus, alphapow, ctx->mod);
+        c = nmod_inv(c, ctx->mod);
+        _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, ctx->mod);
 
         if ((use & USE_G) && !nmod_mpolyn_interp_crt_sm_bpoly(
                                 &lastdeg, Gn, Tn, Gev, modulus, alphapow, ctx))
@@ -971,8 +968,8 @@ choose_alphas:
             goto choose_alphas;
         }
 
-        c = nmod_neg(alphas[m], mod);
-        n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, mod);
+        c = nmod_neg(alphas[m], ctx->mod);
+        n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, ctx->mod);
     }
 
     for (m = 3; m < nvars; m++)
@@ -988,8 +985,8 @@ choose_alphas:
             use = 0;
 
         n_poly_one(modulus);
-        c = nmod_neg(alphas[m], mod);
-        n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, mod);
+        c = nmod_neg(alphas[m], ctx->mod);
+        n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, ctx->mod);
 
         start_alpha = alphas[m];
 
@@ -997,7 +994,7 @@ choose_alphas:
 
         /* only beta[2], beta[1], ..., beta[m - 1] will be used */
         for (i = 2; i < ctx->minfo->nvars; i++)
-            betas[i] = n_urandint(state, ctx->ffinfo->mod.n - 3) + 2;
+            betas[i] = n_urandint(state, ctx->mod.n - 3) + 2;
 
         nmod_mpoly_monomial_evals2(HG, G, betas + 2, m, ctx);
         nmod_mpoly_monomial_evals2(HAbar, Abar, betas + 2, m, ctx);
@@ -1015,17 +1012,17 @@ choose_alphas:
         req_zip_images = 1;
         if (use & USE_G)
         {
-            this_length = n_polyun_product_roots(MG, HG, ctx->ffinfo->mod);
+            this_length = n_polyun_product_roots(MG, HG, ctx->mod);
             req_zip_images = FLINT_MAX(req_zip_images, this_length);
         }
         if (use & USE_ABAR)
         {
-            this_length = n_polyun_product_roots(MAbar, HAbar, ctx->ffinfo->mod);
+            this_length = n_polyun_product_roots(MAbar, HAbar, ctx->mod);
             req_zip_images = FLINT_MAX(req_zip_images, this_length);
         }
         if (use & USE_BBAR)
         {
-            this_length = n_polyun_product_roots(MBbar, HBbar, ctx->ffinfo->mod);
+            this_length = n_polyun_product_roots(MBbar, HBbar, ctx->mod);
             req_zip_images = FLINT_MAX(req_zip_images, this_length);
         }
 
@@ -1033,7 +1030,7 @@ choose_alphas:
         {
         choose_alpha_m:
 
-            alphas[m] = (alphas[m] < 2) ? mod.n - 1 : alphas[m] - 1;
+            alphas[m] = (alphas[m] < 2) ? ctx->mod.n - 1 : alphas[m] - 1;
             if (alphas[m] == start_alpha)
                 goto choose_alphas;
 
@@ -1078,7 +1075,7 @@ choose_alphas:
                     goto choose_betas;
 
                 success = n_bpoly_mod_gcd_brown_smprime(Gev, Abarev, Bbarev,
-                                                            Aev, Bev, mod, St);        
+                                                            Aev, Bev, ctx->mod, St);        
                 if (!success)
                     goto cleanup;
 
@@ -1093,7 +1090,7 @@ choose_alphas:
                     goto choose_alphas;
                 }
 
-                n_bpoly_scalar_mul_nmod(Gev, gammaev, mod);
+                n_bpoly_scalar_mul_nmod(Gev, gammaev, ctx->mod);
                 if ((use & USE_G) && !n_polyu2n_add_zip_must_match(ZG, Gev, cur_zip_image))
                     goto choose_alphas;
                 if ((use & USE_ABAR) && !n_polyu2n_add_zip_must_match(ZAbar, Abarev, cur_zip_image))
@@ -1110,9 +1107,9 @@ choose_alphas:
                 goto choose_alphas;
 
             FLINT_ASSERT(n_poly_degree(modulus) > 0);
-            c = n_poly_mod_eval_pow(modulus, alphapow, mod);
-            c = nmod_inv(c, mod);
-            _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, mod);
+            c = n_poly_mod_eval_pow(modulus, alphapow, ctx->mod);
+            c = nmod_inv(c, ctx->mod);
+            _n_poly_mod_scalar_mul_nmod(modulus, modulus, c, ctx->mod);
 
             if ((use & USE_G) && !nmod_mpolyn_interp_mcrt_sm_mpoly(
                                       &lastdeg, Gn, G, modulus, alphapow, ctx))
@@ -1232,8 +1229,8 @@ choose_alphas:
                 goto choose_alphas;
             }
 
-            c = nmod_neg(alphas[m], mod);
-            n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, mod);
+            c = nmod_neg(alphas[m], ctx->mod);
+            n_poly_mod_shift_left_scalar_addmul(modulus, 1, c, ctx->mod);
         }
     }
 
@@ -1386,9 +1383,9 @@ int nmod_mpolyl_gcd_zippel_lgprime(
 
     flint_randinit(state);
 
-    lgd = WORD(20)/(FLINT_BIT_COUNT(smctx->ffinfo->mod.n));
+    lgd = WORD(20)/(FLINT_BIT_COUNT(smctx->mod.n));
     lgd = FLINT_MAX(WORD(2), lgd);
-    fq_nmod_mpoly_ctx_init_deg(lgctx, nvars, ORD_LEX, smctx->ffinfo->mod.n, lgd);
+    fq_nmod_mpoly_ctx_init_deg(lgctx, nvars, ORD_LEX, smctx->mod.n, lgd);
     n_poly_init2(tmp, lgd);
     n_poly_init2(alphapow, 2*lgd);
 
@@ -1676,7 +1673,7 @@ got_alpha_last:
             {
                 n_poly_t h_mock;
                 n_poly_mock(h_mock, lgctx->fqctx->modulus);
-                n_poly_mod_mul(modulus, modulus, h_mock, smctx->ffinfo->mod);
+                n_poly_mod_mul(modulus, modulus, h_mock, smctx->mod);
             }
         }
 
@@ -2226,7 +2223,7 @@ got_alpha_last:
             {
                 n_poly_t h_mock;
                 n_poly_mock(h_mock, lgctx->fqctx->modulus);
-                n_poly_mod_mul(modulus, modulus, h_mock, smctx->ffinfo->mod);
+                n_poly_mod_mul(modulus, modulus, h_mock, smctx->mod);
             }
         }
     }

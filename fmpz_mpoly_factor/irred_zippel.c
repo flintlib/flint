@@ -82,7 +82,7 @@ static void nmod_mpoly_get_eval_helper2(
             {
                 ulong ei = (Aexps[N*(start + j) + off[k]] >> shift[k]) & mask;
                 meval = nmod_pow_cache_mulpow_ui(meval, ei, caches + 3*k + 0,
-                               caches + 3*k + 1, caches + 3*k + 2, ctx->ffinfo->mod);
+                                 caches + 3*k + 1, caches + 3*k + 2, ctx->mod);
             }
 
             /* set cur = monomial eval */
@@ -175,7 +175,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
             {
                 ulong ei = (Bexps[N*(start + j) + off[k]] >> shift[k]) & mask;
                 meval = nmod_pow_cache_mulpow_ui(meval, ei, caches + 3*k + 0,
-                               caches + 3*k + 1, caches + 3*k + 2, ctx->ffinfo->mod);
+                               caches + 3*k + 1, caches + 3*k + 2, ctx->mod);
             }
 
             /* set cur = monomial eval */
@@ -197,7 +197,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
             zip_length = FLINT_MAX(zip_length, n);
             Hterms[Hi].coeff->length = n;
             flint_mpn_copyi(Hterms[Hi].coeff->coeffs, p, n);
-            n_poly_mod_product_roots_nmod_vec(Mterms[Hi].coeff, p, n, ctx->ffinfo->mod);
+            n_poly_mod_product_roots_nmod_vec(Mterms[Hi].coeff, p, n, ctx->mod);
             Hi++;
         }
     }
@@ -267,7 +267,7 @@ static int _fmpz_mpoly_modpk_update_zip(
         success = _nmod_zip_vand_solve(c->coeffs,
                       H->terms[i].coeff->coeffs, n,
                       Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                      M->terms[i].coeff->coeffs, t->coeffs, ctxp->ffinfo->mod);
+                      M->terms[i].coeff->coeffs, t->coeffs, ctxp->mod);
         if (success < 1)
         {
             n_poly_clear(t);
@@ -279,8 +279,8 @@ static int _fmpz_mpoly_modpk_update_zip(
 
         for (j = 0; j < n; j++)
         {
-            if (ctxp->ffinfo->mod.n - ccoeffs[j] < ccoeffs[j])
-                fmpz_submul_ui(A->coeffs + Ai + j, pk, ctxp->ffinfo->mod.n - ccoeffs[j]);
+            if (ctxp->mod.n - ccoeffs[j] < ccoeffs[j])
+                fmpz_submul_ui(A->coeffs + Ai + j, pk, ctxp->mod.n - ccoeffs[j]);
             else
                 fmpz_addmul_ui(A->coeffs + Ai + j, pk, ccoeffs[j]);
         }
@@ -311,7 +311,7 @@ static void _nmod_mpoly_set_fmpz_mpoly(
     Ap_len = 0;
     for (i = 0; i < A->length; i++)
     {
-        Ap->coeffs[Ap_len] = fmpz_fdiv_ui(A->coeffs + i, ctxp->ffinfo->mod.n);
+        Ap->coeffs[Ap_len] = fmpz_fdiv_ui(A->coeffs + i, ctxp->mod.n);
         if (Ap->coeffs[Ap_len] == 0)
             continue;
         mpoly_monomial_set(Ap->exps + N*Ap_len, A->exps + N*i, N);
@@ -340,7 +340,7 @@ static void _fmpz_mpoly_modpk_taylor_coeff(
     {
         FLINT_ASSERT(fmpz_divisible(E->coeffs + i, pk)); /* TODO !!! */
         fmpz_divexact(t, E->coeffs + i, pk);
-        T->coeffs[Tlen] = fmpz_fdiv_ui(t, ctxp->ffinfo->mod.n);
+        T->coeffs[Tlen] = fmpz_fdiv_ui(t, ctxp->mod.n);
         if (T->coeffs[Tlen] == 0)
             continue;
         mpoly_monomial_set(T->exps + N*Tlen, E->exps + N*i, N);
@@ -371,7 +371,7 @@ static void _fmpz_mpoly_set_nmod_mpoly_smod(
     A->length = Ap->length;
 
     mpoly_copy_monomials(A->exps, Ap->exps, Ap->length, N);
-    _fmpz_vec_set_nmod_vec(A->coeffs, Ap->coeffs, Ap->length, ctxp->ffinfo->mod);
+    _fmpz_vec_set_nmod_vec(A->coeffs, Ap->coeffs, Ap->length, ctxp->mod);
 }
 
 
@@ -463,7 +463,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
     fmpz_mpoly_t e, t1, t2;
 
     FLINT_ASSERT(r > 1);
-    FLINT_ASSERT(ctxp->ffinfo->mod.n > 3);
+    FLINT_ASSERT(ctxp->mod.n > 3);
 
     fmpz_init(pk);
 
@@ -503,7 +503,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
     /* choose betas */
     for (i = 2; i < n; i++)
     {
-        mp_limb_t bb = n_urandint(state, ctxp->ffinfo->mod.n - 3) + 2;
+        mp_limb_t bb = n_urandint(state, ctxp->mod.n - 3) + 2;
         nmod_pow_cache_start(bb, beta_caches + 3*i + 0,
                                  beta_caches + 3*i + 1, beta_caches + 3*i + 2);
     }
@@ -540,7 +540,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
 
 next_power:
 
-    fmpz_mul_ui(pk, pk, ctxp->ffinfo->mod.n);
+    fmpz_mul_ui(pk, pk, ctxp->mod.n);
 
     fmpz_mpoly_mul(t1, B + 0, B + 1, ctx);
     for (i = 2; i < r; i++)
@@ -565,7 +565,7 @@ next_power:
     _fmpz_mpoly_modpk_taylor_coeff(pk, Tp, ctxp, e, ctx);
     nmod_mpoly_get_eval_helper2(Teh, Tp, beta_caches, ctxp);
 
-    if (fmpz_cmp_ui(pk, ctxp->ffinfo->mod.n) > 0)
+    if (fmpz_cmp_ui(pk, ctxp->mod.n) > 0)
     {
         for (i = 0; i < r; i++)
             n_polyun_eval_reset(Beh + i);
@@ -575,12 +575,11 @@ next_power:
 
 next_zip_image:
 
-    n_bpoly_mod_eval_step(Teval, Teh, Tp, ctxp->ffinfo->mod);
+    n_bpoly_mod_eval_step(Teval, Teh, Tp, ctxp->mod);
     for (i = 0; i < r; i++)
-        n_bpoly_mod_eval_step(Beval + i, Beh + i, Bp + i, ctxp->ffinfo->mod);
+        n_bpoly_mod_eval_step(Beval + i, Beh + i, Bp + i, ctxp->mod);
 
-    success = n_bpoly_mod_pfrac(r, Ceval, Cdegs1, Teval, Beval,
-                                                            ctxp->ffinfo->mod);
+    success = n_bpoly_mod_pfrac(r, Ceval, Cdegs1, Teval, Beval, ctxp->mod);
     if (success < 1)
     {
         success = 0;
@@ -738,7 +737,7 @@ int fmpz_mpoly_factor_irred_zippel(
     nmod_mpolyv_init(tfacp, ctxp);
     nmod_mpolyv_init(Aevalp, ctxp);
     nmod_mpolyv_init(Alcp, ctxp);
-    nmod_poly_init_mod(Aup, ctxp->ffinfo->mod);
+    nmod_poly_init_mod(Aup, ctxp->mod);
 
     /* init done */
 
@@ -963,7 +962,7 @@ next_zip_prime:
             goto next_zip_prime;
     }
 
-    Aup->mod = ctxp->ffinfo->mod;
+    Aup->mod = ctxp->mod;
     nmod_poly_set_fmpz_poly(Aup, Au);
     if (Aup->length != Au->length || !nmod_poly_is_squarefree(Aup))
         goto next_zip_prime;
@@ -986,7 +985,7 @@ next_zip_prime:
 
     for (i = 0; i < n; i++)
     {
-        alphap[i] = fmpz_fdiv_ui(alpha + i, ctxp->ffinfo->mod.n);
+        alphap[i] = fmpz_fdiv_ui(alpha + i, ctxp->mod.n);
         if (alphap[i] == 0)
             goto next_zip_prime;
     }
@@ -1026,7 +1025,7 @@ next_zip_prime:
                                                    Alc->coeffs + n*r + i, ctx);
     }
 
-    L = fmpz_clog_ui(facBound, ctxp->ffinfo->mod.n);
+    L = fmpz_clog_ui(facBound, ctxp->mod.n);
     success = fmpz_mfactor_lift_prime_power_zippel(r, fac->coeffs, state,
                                      facp->coeffs, newA, alphap, ctx, ctxp, L);
 

@@ -63,9 +63,9 @@ main(void)
 
             nmod_mpoly_scalar_mul_ui(g, f, a, ctx);
             nmod_mpoly_scalar_mul_ui(h, g, b, ctx);
-            NMOD_RED(a, a, ctx->ffinfo->mod);
-            NMOD_RED(b, b, ctx->ffinfo->mod);
-            c = nmod_mul(a, b, ctx->ffinfo->mod);
+            NMOD_RED(a, a, ctx->mod);
+            NMOD_RED(b, b, ctx->mod);
+            c = nmod_mul(a, b, ctx->mod);
             nmod_mpoly_scalar_mul_ui(k, f, c, ctx);
             result = nmod_mpoly_equal(h, k, ctx);
 
@@ -143,11 +143,11 @@ main(void)
 
             nmod_mpoly_scalar_mul_ui(g, f, a, ctx);
 
-            NMOD_RED(a, a, ctx->ffinfo->mod);
-            if (n_gcd(a, ctx->ffinfo->mod.n) != UWORD(1))
+            NMOD_RED(a, a, ctx->mod);
+            if (n_gcd(a, ctx->mod.n) != UWORD(1))
                 continue;
 
-            b = nmod_inv(a, ctx->ffinfo->mod);
+            b = nmod_inv(a, ctx->mod);
             nmod_mpoly_scalar_mul_ui(h, g, b, ctx);
             result = nmod_mpoly_equal(h, f, ctx);
 

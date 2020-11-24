@@ -774,8 +774,7 @@ void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
     {
         for (j = 0; j < (A->coeffs + i)->length; j++)
         {
-            (A->coeffs + i)->coeffs[j] = nmod_mul((A->coeffs + i)->coeffs[j],
-                                                         c, ctx->ffinfo->mod);
+            A->coeffs[i].coeffs[j] = nmod_mul(A->coeffs[i].coeffs[j], c, ctx->mod);
         }
     }
 }
@@ -981,7 +980,7 @@ void nmod_mpolyu_divexact_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
         {
             nmod_mpoly_struct * Ai = A->coeffs + i;
             _nmod_vec_scalar_mul_nmod(Ai->coeffs, Ai->coeffs, Ai->length,
-                   nmod_inv(c->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
+                                   nmod_inv(c->coeffs[0], ctx->mod), ctx->mod);
         }
 
         return;
@@ -999,7 +998,7 @@ void nmod_mpolyu_divexact_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
         FLINT_ASSERT(A->coeffs[i].bits == bits);
         _nmod_mpoly_divides_monagan_pearce(t, A->coeffs[i].coeffs,
                    A->coeffs[i].exps, A->coeffs[i].length, c->coeffs, c->exps,
-                                     c->length, bits, N, cmpmask, ctx->ffinfo);
+                                        c->length, bits, N, cmpmask, ctx->mod);
         nmod_mpoly_swap(A->coeffs + i, t, ctx);
         FLINT_ASSERT(A->coeffs[i].length > 0);
     }
@@ -1043,7 +1042,7 @@ void nmod_mpolyu_mul_mpoly(
                                      B->coeffs[i].length + c->length + 1, ctx);
         _nmod_mpoly_mul_johnson(A->coeffs + i, B->coeffs[i].coeffs,
                        B->coeffs[i].exps, B->coeffs[i].length, c->coeffs,
-                            c->exps, c->length, bits, N, cmpmask, ctx->ffinfo);
+                               c->exps, c->length, bits, N, cmpmask, ctx->mod);
         FLINT_ASSERT(A->coeffs[i].length > 0);
         A->exps[i] = B->exps[i];
     }
@@ -1074,7 +1073,7 @@ void nmod_mpolyu_mul_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
         {
             nmod_mpoly_struct * Ai = A->coeffs + i;
             _nmod_vec_scalar_mul_nmod(Ai->coeffs, Ai->coeffs, Ai->length,
-                                               c->coeffs[0], ctx->ffinfo->mod);
+                                                       c->coeffs[0], ctx->mod);
         }
 
         return;
@@ -1094,7 +1093,7 @@ void nmod_mpolyu_mul_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
         FLINT_ASSERT(A->coeffs[i].bits == bits);
         _nmod_mpoly_mul_johnson(t, A->coeffs[i].coeffs,
                    A->coeffs[i].exps, A->coeffs[i].length, c->coeffs, c->exps,
-                                     c->length, bits, N, cmpmask, ctx->ffinfo);
+                                        c->length, bits, N, cmpmask, ctx->mod);
         nmod_mpoly_swap(A->coeffs + i, t, ctx);
         FLINT_ASSERT(A->coeffs[i].length > 0);
     }

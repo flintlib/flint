@@ -703,6 +703,11 @@ FLINT_DLL void fq_nmod_mpoly_evaluate_one_fq_nmod(fq_nmod_mpoly_t A,
                     const fq_nmod_mpoly_t B, slong var, const fq_nmod_t val,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void _fq_nmod_mpoly_eval_all_fq_nmod(fq_nmod_t ev,
+                  const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
+                       flint_bitcnt_t Abits, fq_nmod_struct * const * alphas,
+                            const mpoly_ctx_t mctx, const fq_nmod_ctx_t fqctx);
+
 FLINT_DLL void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A,
                  fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx);
 
@@ -804,6 +809,30 @@ FLINT_DLL int _fq_nmod_mpoly_divides_monagan_pearce(fq_nmod_mpoly_t A,
              const mp_limb_t * coeff3, const ulong * exp3, slong len3,
   flint_bitcnt_t bits, slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx);
 
+
+/* Square root ***************************************************************/
+
+FLINT_DLL int fq_nmod_mpoly_sqrt_heap(fq_nmod_mpoly_t Q,
+                       const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
+
+FQ_NMOD_MPOLY_INLINE
+int fq_nmod_mpoly_sqrt(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    return fq_nmod_mpoly_sqrt_heap(Q, A, ctx);
+}
+
+FQ_NMOD_MPOLY_INLINE
+int fq_nmod_mpoly_is_square(const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    int res;
+    fq_nmod_mpoly_t Q;
+    fq_nmod_mpoly_init(Q, ctx);
+    res = fq_nmod_mpoly_sqrt_heap(Q, A, ctx);
+    fq_nmod_mpoly_clear(Q, ctx);
+    return res;
+}
 
 /* GCD ***********************************************************************/
 

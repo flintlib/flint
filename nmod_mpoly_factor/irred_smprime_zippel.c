@@ -46,7 +46,7 @@ int nmod_mpoly_factor_irred_smprime_zippel(
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
-    if (ctx->ffinfo->mod.n < 7)
+    if (ctx->mod.n < 7)
         return 0;
 
     nmod_mpoly_init(Acopy, ctx);
@@ -83,7 +83,7 @@ int nmod_mpoly_factor_irred_smprime_zippel(
     for (i = 0; i <= n; i++)
     {
         k += degs[i];
-        if (ctx->ffinfo->mod.n < (ulong) k)
+        if (ctx->mod.n < (ulong) k)
         {
             success = 0;
             goto cleanup;
@@ -99,7 +99,7 @@ next_alpha:
 	}
 
     for (i = 0; i < n; i++)
-        alpha[i] = n_urandint(state, ctx->ffinfo->mod.n - 1) + 1;
+        alpha[i] = n_urandint(state, ctx->mod.n - 1) + 1;
 
     /* ensure degrees do not drop under evaluation */
 	for (i = n - 1; i >= 0; i--)
@@ -141,13 +141,13 @@ next_alphabetas:
         n_poly_fit_length(alphabetas + i, alphabetas_length);
         alphabetas[i].coeffs[0] = alpha[i];
         for (j = 1; j < alphabetas_length; j++)
-            alphabetas[i].coeffs[j] = n_urandint(state, ctx->ffinfo->mod.n);
+            alphabetas[i].coeffs[j] = n_urandint(state, ctx->mod.n);
         alphabetas[i].length = alphabetas_length;
         _n_poly_normalise(alphabetas + i);
     }
 
     _nmod_mpoly_eval_rest_to_n_bpoly(Ab, A, alphabetas, ctx);
-    success = n_bpoly_mod_factor_smprime(Abfc, Abfp, Ab, 0, ctx->ffinfo->mod);
+    success = n_bpoly_mod_factor_smprime(Abfc, Abfp, Ab, 0, ctx->mod);
     if (!success)
     {
         FLINT_ASSERT(0 && "this should not happen");
@@ -249,8 +249,8 @@ next_alphabetas:
         _nmod_mpoly_set_n_bpoly_var1_zero(fac->coeffs + i, newA->bits,
                                                      Abfp->coeffs + i, 0, ctx);
         FLINT_ASSERT(fac->coeffs[i].length > 0);
-        q = nmod_inv(fac->coeffs[i].coeffs[0], ctx->ffinfo->mod);
-        q = nmod_mul(q, new_lcs->coeffs[0*r + i].coeffs[0], ctx->ffinfo->mod);
+        q = nmod_inv(fac->coeffs[i].coeffs[0], ctx->mod);
+        q = nmod_mul(q, new_lcs->coeffs[0*r + i].coeffs[0], ctx->mod);
         nmod_mpoly_scalar_mul_nmod_invertible(fac->coeffs + i,
                                                       fac->coeffs + i, q, ctx);
     }

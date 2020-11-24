@@ -28,7 +28,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
 
     if (k == 0)
     {
-        nmod_mpoly_set_ui(A, ctx->ffinfo->mod.n > 1, ctx);
+        nmod_mpoly_set_ui(A, ctx->mod.n > 1, ctx);
         return 1;
     }
 
@@ -100,7 +100,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         else
             mpoly_monomial_mul_ui_mp(A->exps, Bexp, N, k);
 
-        A->coeffs[0] = nmod_pow_ui(B->coeffs[0], k, ctx->ffinfo->mod);
+        A->coeffs[0] = nmod_pow_ui(B->coeffs[0], k, ctx->mod);
         _nmod_mpoly_set_length(A, A->coeffs[0] != 0, ctx);
     }
     else
@@ -115,9 +115,9 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         T->bits = exp_bits;
 
         Bcoeffs_fmpz = _fmpz_vec_init(B->length);
-        _fmpz_vec_set_nmod_vec(Bcoeffs_fmpz, B->coeffs, B->length, ctx->ffinfo->mod);
+        _fmpz_vec_set_nmod_vec(Bcoeffs_fmpz, B->coeffs, B->length, ctx->mod);
 
-        if (ctx->ffinfo->mod.n > 99999 || !n_is_prime(ctx->ffinfo->mod.n))
+        if (ctx->mod.n > 99999 || !n_is_prime(ctx->mod.n))
         {
             slong Alen, Tlen;
             ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
@@ -136,7 +136,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                 Alen = 0;
                 for (i = 0; i < Tlen; i++)
                 {
-                    A->coeffs[Alen] = fmpz_fdiv_ui(T->coeffs + i, ctx->ffinfo->mod.n);
+                    A->coeffs[Alen] = fmpz_fdiv_ui(T->coeffs + i, ctx->mod.n);
                     mpoly_monomial_set(A->exps + N*Alen, T->exps + N*i, N);
                     Alen += (A->coeffs[Alen] != UWORD(0));
                 }
@@ -160,7 +160,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
             while (k > 0)
             {
                 ulong kmodn;
-                NMOD_RED(kmodn, k, ctx->ffinfo->mod);
+                NMOD_RED(kmodn, k, ctx->mod);
 
                 if (kmodn > 0)
                 {
@@ -185,7 +185,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                             _nmod_mpoly_mul_johnson(U,
                                              R->coeffs, R->exps, R->length,
                                              S->coeffs, S->exps, S->length,
-                                           exp_bits,  N, cmpmask, ctx->ffinfo);
+                                              exp_bits,  N, cmpmask, ctx->mod);
                             nmod_mpoly_swap(R, U, ctx);
                         }
                     }
@@ -200,8 +200,7 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                         Slen = 0;
                         for (i = 0; i < Tlen; i++)
                         {
-                            S->coeffs[Slen] = fmpz_fdiv_ui(T->coeffs + i,
-                                                           ctx->ffinfo->mod.n);
+                            S->coeffs[Slen] = fmpz_fdiv_ui(T->coeffs + i, ctx->mod.n);
                             mpoly_monomial_mul_ui_mp(S->exps + N*Slen,
                                                      T->exps + N*i, N, ne);
                             Slen += (S->coeffs[Slen] != UWORD(0));
@@ -219,13 +218,13 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                         _nmod_mpoly_mul_johnson(U,
                                              R->coeffs, R->exps, R->length,
                                              S->coeffs, S->exps, S->length,
-                                           exp_bits,  N, cmpmask, ctx->ffinfo);
+                                              exp_bits,  N, cmpmask, ctx->mod);
                         nmod_mpoly_swap(R, U, ctx);
                     }
                 }
 
-                k = k/ctx->ffinfo->mod.n;
-                ne = ne * ctx->ffinfo->mod.n;
+                k = k/ctx->mod.n;
+                ne = ne * ctx->mod.n;
             }
 
             nmod_mpoly_swap(A, R, ctx);

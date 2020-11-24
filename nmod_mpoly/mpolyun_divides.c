@@ -48,8 +48,8 @@ int nmod_mpolyn_divides(
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
-    nmod_poly_init_mod(r, ctx->ffinfo->mod);
-    nmod_poly_init_mod(acc, ctx->ffinfo->mod);
+    nmod_poly_init_mod(r, ctx->mod);
+    nmod_poly_init_mod(acc, ctx->mod);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = B->length + 4;   /* something bigger than heap can ever be */
@@ -268,8 +268,8 @@ int _nmod_mpolyn_divides(
 
     TMP_START;
 
-    nmod_poly_init_mod(r, ctx->ffinfo->mod);
-    nmod_poly_init_mod(acc, ctx->ffinfo->mod);
+    nmod_poly_init_mod(r, ctx->mod);
+    nmod_poly_init_mod(acc, ctx->mod);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = B->length + 4;   /* something bigger than heap can ever be */
@@ -564,7 +564,7 @@ void _nmod_mpolyn_mulsub(
 
     TMP_START;
 
-    nmod_poly_init_mod(t, ctx->ffinfo->mod);
+    nmod_poly_init_mod(t, ctx->mod);
 
     next_loc = B->length + 4; /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));

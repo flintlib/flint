@@ -17,12 +17,10 @@ void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (c >= ctx->ffinfo->mod.n)
-    {
-        NMOD_RED(c, c, ctx->ffinfo->mod);
-    }
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
 
-    if (c == UWORD(0))
+    if (c == 0)
     {
         _nmod_mpoly_set_length(A, 0, ctx);
         return;

@@ -192,10 +192,10 @@ static int _factor_irred_compressed(
 
     /* fill perm with id, and fill in strides */
     {
-        ulong ppowt, ppow = ctx->ffinfo->mod.n;
+        ulong ppowt, ppow = ctx->mod.n;
         slong N = mpoly_words_per_exp_sp(Abits, ctx->minfo);
 
-        while (!n_mul_checked(&ppowt, ppow, ctx->ffinfo->mod.n))
+        while (!n_mul_checked(&ppowt, ppow, ctx->mod.n))
             ppow = ppowt;
 
         for (j = 0; j < nvars; j++)
@@ -240,7 +240,7 @@ static int _factor_irred_compressed(
 
         FLINT_ASSERT(nvars == 1);
 
-        nmod_poly_init_mod(Au, ctx->ffinfo->mod);
+        nmod_poly_init_mod(Au, ctx->mod);
         nmod_poly_factor_init(Auf);
 
         FLINT_ASSERT(nmod_mpoly_is_nmod_poly(A, perm[0], ctx));
@@ -273,11 +273,11 @@ static int _factor_irred_compressed(
         n_tpoly_init(Abf);
 
         nmod_mpoly_get_bpoly(Ab, A, perm[0], perm[1], ctx);
-        success = n_bpoly_mod_factor_smprime(c, Abf, Ab, 1, ctx->ffinfo->mod);
+        success = n_bpoly_mod_factor_smprime(c, Abf, Ab, 1, ctx->mod);
         if (!success)
         {
             nmod_mpoly_get_bpoly(Ab, A, perm[0], perm[1], ctx);
-            n_bpoly_mod_factor_lgprime(c, Abf, Ab, ctx->ffinfo->mod);
+            n_bpoly_mod_factor_lgprime(c, Abf, Ab, ctx->mod);
         }
 
         FLINT_ASSERT(n_poly_degree(c) == 0);
@@ -627,7 +627,7 @@ static int _factor_irred(
         nmod_mpoly_ctx_t Lctx;
         nmod_mpolyv_t Lf, Lft, Lfs;
 
-        nmod_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX, Actx->ffinfo->mod.n);
+        nmod_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX, Actx->mod.n);
         nmod_mpolyv_init(Lf, Lctx);
         nmod_mpolyv_init(Lft, Lctx);
         nmod_mpolyv_init(Lfs, Lctx);
@@ -857,7 +857,7 @@ int nmod_mpoly_factor_algo(
             nmod_mpoly_factor_t h;
 
             /* compression may have messed up the content factorization */
-            nmod_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX, ctx->ffinfo->mod.n);
+            nmod_mpoly_ctx_init(Lctx, M->mvars, ORD_LEX, ctx->mod.n);
             nmod_mpoly_init(L, Lctx);
             nmod_mpoly_factor_init(h, Lctx);
 

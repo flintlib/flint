@@ -67,7 +67,7 @@ int nmod_mpoly_factor_lcc_wang(
         N = mpoly_words_per_exp_sp(P->bits, ctx->minfo);
         _nmod_mpoly_evaluate_rest_n_poly(T, starts, ends, stops, es,
                                       P->coeffs, P->exps, P->length, 1, alpha,
-                            offsets, shifts, N, mask, n + 1, ctx->ffinfo->mod);
+                                    offsets, shifts, N, mask, n + 1, ctx->mod);
 
         n_poly_set(lcAfaceval + j, T + 0);
     }
@@ -75,7 +75,7 @@ int nmod_mpoly_factor_lcc_wang(
     n_poly_set(d + 0, Auc);
     for (i = 0; i < lcAfac->num; i++)
     {
-        n_poly_mod_make_monic(Q, lcAfaceval + i, ctx->ffinfo->mod);
+        n_poly_mod_make_monic(Q, lcAfaceval + i, ctx->mod);
         if (n_poly_degree(Q) < 1)
         {
             success = 0;
@@ -86,8 +86,8 @@ int nmod_mpoly_factor_lcc_wang(
             n_poly_set(R, d + j);
             while (n_poly_degree(R) > 0)
             {
-                n_poly_mod_gcd(R, R, Q, ctx->ffinfo->mod);
-                n_poly_mod_div(Q, Q, R, ctx->ffinfo->mod);
+                n_poly_mod_gcd(R, R, Q, ctx->mod);
+                n_poly_mod_div(Q, Q, R, ctx->mod);
                 if (n_poly_degree(Q) < 1)
                 {
                     success = 0;
@@ -101,13 +101,13 @@ int nmod_mpoly_factor_lcc_wang(
     for (j = 0; j < r; j++)
     {
         nmod_mpoly_one(lc_divs + j, ctx);
-        n_poly_mod_mul(R, Auf[j].coeffs + Auf[j].length - 1, Auc, ctx->ffinfo->mod);
+        n_poly_mod_mul(R, Auf[j].coeffs + Auf[j].length - 1, Auc, ctx->mod);
         for (i = lcAfac->num - 1; i >= 0; i--)
         {
-            n_poly_mod_make_monic(Q, lcAfaceval + i, ctx->ffinfo->mod);
+            n_poly_mod_make_monic(Q, lcAfaceval + i, ctx->mod);
             if (n_poly_degree(Q) < 1)
                 continue;
-            k = n_poly_mod_remove(R, Q, ctx->ffinfo->mod);
+            k = n_poly_mod_remove(R, Q, ctx->mod);
             nmod_mpoly_pow_ui(t, lcAfac->poly + i, k, ctx);
             nmod_mpoly_mul(lc_divs + j, lc_divs + j, t, ctx);
         }

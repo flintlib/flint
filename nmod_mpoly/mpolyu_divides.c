@@ -16,7 +16,7 @@ slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
                  const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
-                                         ulong maskhi, const nmodf_ctx_t fctx)
+                                         ulong maskhi, nmod_t fctx)
 {
     slong i, j;
     slong next_loc;
@@ -99,7 +99,7 @@ slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
             }
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        NMOD_RED3(pp0, acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(pp0, acc2, acc1, acc0, fctx);
 
         pp1 = 0;
         if (Di < Dlen && Dexp[Di] == exp)
@@ -108,7 +108,7 @@ slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
             Di++;
         }
 
-        Acoeff[Alen] = nmod_sub(pp1, pp0, fctx->mod);
+        Acoeff[Alen] = nmod_sub(pp1, pp0, fctx);
 
         Alen += Acoeff[Alen] != 0;
 
@@ -175,8 +175,7 @@ void _nmod_mpoly_mulsub(nmod_mpoly_t A,
                  const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
-                         flint_bitcnt_t bits, slong N, const ulong * cmpmask,
-                                                        const nmodf_ctx_t fctx)
+              flint_bitcnt_t bits, slong N, const ulong * cmpmask, nmod_t fctx)
 {
     slong i, j;
     slong next_loc;
@@ -284,7 +283,7 @@ void _nmod_mpoly_mulsub(nmod_mpoly_t A,
             }
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        NMOD_RED3(pp0, acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(pp0, acc2, acc1, acc0, fctx);
 
         pp1 = 0;
         if (Di < Dlen && mpoly_monomial_equal(Dexp + N*Di, exp, N))
@@ -293,7 +292,7 @@ void _nmod_mpoly_mulsub(nmod_mpoly_t A,
             Di++;
         }
 
-        Acoeff[Alen] = nmod_sub(pp1, pp0, fctx->mod);
+        Acoeff[Alen] = nmod_sub(pp1, pp0, fctx);
 
         Alen += Acoeff[Alen] != 0;
 
@@ -481,7 +480,7 @@ int nmod_mpolyuu_divides(
                                     S->coeffs, S->exps,
                                     T->coeffs, T->exps, T->length,
                                     a->coeffs, a->exps, a->length,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
                 }
                 else
                 {
@@ -490,7 +489,7 @@ int nmod_mpolyuu_divides(
                     _nmod_mpoly_mulsub(S, T->coeffs, T->exps, T->length,
                                           b->coeffs, b->exps, b->length,
                                           q->coeffs, q->exps, q->length,
-                                                bits, N, cmpmask, ctx->ffinfo);
+                                                bits, N, cmpmask, ctx->mod);
                 }
                 nmod_mpoly_swap(S, T, ctx);
 
@@ -566,7 +565,7 @@ int nmod_mpolyuu_divides(
         if (!_nmod_mpoly_divides_monagan_pearce(q,
                                             T->coeffs, T->exps, T->length,
                                             b->coeffs, b->exps, b->length,
-                                               bits, N, cmpmask, ctx->ffinfo))
+                                               bits, N, cmpmask, ctx->mod))
         {
             goto not_exact_division;
         }

@@ -29,7 +29,7 @@ int nmod_mpoly_is_canonical(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
         if (A->coeffs[i] == UWORD(0))
             return 0;
 
-        if (A->coeffs[i] >= ctx->ffinfo->mod.n)
+        if (A->coeffs[i] >= ctx->mod.n)
             return 0;
     }
 
@@ -55,7 +55,7 @@ nmod_mpoly_assert_canonical(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
         if (A->coeffs[i] == UWORD(0))
             flint_throw(FLINT_ERROR, "Polynomial has a zero coefficient");
 
-        if (A->coeffs[i] >= ctx->ffinfo->mod.n)
+        if (A->coeffs[i] >= ctx->mod.n)
             flint_throw(FLINT_ERROR, "Polynomial coefficient is out of range");
     }
 }

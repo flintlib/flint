@@ -15,5 +15,5 @@ void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars,
                                        const ordering_t ord, mp_limb_t modulus)
 {
     mpoly_ctx_init(ctx->minfo, nvars, ord);
-    nmodf_ctx_init(ctx->ffinfo, modulus);
+    nmod_init(&ctx->mod, modulus);
 }

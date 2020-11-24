@@ -14,5 +14,4 @@
 void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx)
 {
     mpoly_ctx_clear(ctx->minfo);
-    nmodf_ctx_clear(ctx->ffinfo);
 }

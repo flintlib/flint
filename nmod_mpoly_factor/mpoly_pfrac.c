@@ -140,10 +140,9 @@ int nmod_mpoly_pfrac_init(
         {
             if (k == j)
                 continue;
-            n_poly_mod_mul(pq, pq, I->dbetas + k, ctx->ffinfo->mod);
+            n_poly_mod_mul(pq, pq, I->dbetas + k, ctx->mod);
         }
-        n_poly_mod_xgcd(G, S, I->inv_prod_dbetas + j,
-                                          I->dbetas + j, pq, ctx->ffinfo->mod);
+        n_poly_mod_xgcd(G, S, I->inv_prod_dbetas + j, I->dbetas + j, pq, ctx->mod);
         if (!n_poly_is_one(G))
         {
             success = 0;

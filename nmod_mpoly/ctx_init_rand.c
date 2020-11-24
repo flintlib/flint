@@ -15,5 +15,5 @@ void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state,
                                             slong max_nvars, mp_limb_t modulus)
 {
     mpoly_ctx_init_rand(ctx->minfo, state, max_nvars);
-    nmodf_ctx_init(ctx->ffinfo, modulus);
+    nmod_init(&ctx->mod, modulus);
 }
