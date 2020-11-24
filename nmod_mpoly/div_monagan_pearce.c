@@ -17,7 +17,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
     const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i, j, q_len, s;
     slong next_loc, heap_len = 2;
@@ -64,7 +64,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
     HEAP_ASSIGN(heap[1], Aexps[0], x);
 
     /* precompute leading cofficient info */
-    lc_minus_inv = fctx->mod.n - nmod_inv(Bcoeffs[0], fctx->mod);
+    lc_minus_inv = fctx.n - nmod_inv(Bcoeffs[0], fctx);
 
     while (heap_len > 1)
     {
@@ -110,7 +110,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
 
                     if (x->i == -WORD(1))
                     {
-                        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx->mod.n - Acoeffs[x->j]);
+                        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);
                     }
                     else
                     {
@@ -121,7 +121,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
 
-            NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
+            NMOD_RED3(acc0, acc2, acc1, acc0, fctx);
         }
 
         /* process nodes taken from the heap */
@@ -184,7 +184,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
         if (acc0 == 0)
             continue;
 
-        Qcoeffs[q_len] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
+        Qcoeffs[q_len] = nmod_mul(acc0, lc_minus_inv, fctx);
 
         /* put newly generated quotient term back into the heap if neccesary */
         if (s > 1)
@@ -233,7 +233,7 @@ static int _nmod_mpoly_div_monagan_pearce(
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i, j, q_len, s;
     slong next_loc;
@@ -303,7 +303,7 @@ static int _nmod_mpoly_div_monagan_pearce(
     mpoly_monomial_set(heap[1].exp, Aexps, N);
 
     /* precompute leading cofficient info */
-    lc_minus_inv = fctx->mod.n - nmod_inv(Bcoeffs[0], fctx->mod);
+    lc_minus_inv = fctx.n - nmod_inv(Bcoeffs[0], fctx);
    
     while (heap_len > 1)
     {
@@ -369,7 +369,7 @@ static int _nmod_mpoly_div_monagan_pearce(
                     if (x->i == -WORD(1))
                     {
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                                     WORD(0), WORD(0), fctx->mod.n - Acoeffs[x->j]);
+                                     WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);
                     } else
                     {
                         umul_ppmm(pp1, pp0, Bcoeffs[x->i], Qcoeffs[x->j]);
@@ -379,7 +379,7 @@ static int _nmod_mpoly_div_monagan_pearce(
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
         }
 
-        NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(acc0, acc2, acc1, acc0, fctx);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -459,7 +459,7 @@ static int _nmod_mpoly_div_monagan_pearce(
         if (!lt_divides)
             continue;
 
-        Qcoeffs[q_len] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
+        Qcoeffs[q_len] = nmod_mul(acc0, lc_minus_inv, fctx);
 
         /* put newly generated quotient term back into the heap if neccesary */
         if (s > 1)
@@ -569,7 +569,7 @@ void nmod_mpoly_div_monagan_pearce(
         nmod_mpoly_fit_length_reset_bits(q, A->length/B->length + 1, Qbits, ctx);
 
         if (_nmod_mpoly_div_monagan_pearce(q, A->coeffs, Aexps, A->length,
-                  B->coeffs, Bexps, B->length, Qbits, N, cmpmask, ctx->ffinfo))
+                     B->coeffs, Bexps, B->length, Qbits, N, cmpmask, ctx->mod))
         {
             break;
         }

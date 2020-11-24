@@ -42,7 +42,7 @@ void fmpz_mpoly_interp_reduce_p(
     for (i = 0; i < A->length; i++)
     {
         mpoly_monomial_set(Ap->exps + N*k, A->exps + N*i, N);
-        Ap->coeffs[k] = fmpz_fdiv_ui(A->coeffs + i, ctxp->ffinfo->mod.n);
+        Ap->coeffs[k] = fmpz_fdiv_ui(A->coeffs + i, ctxp->mod.n);
         k += (Ap->coeffs[k] != UWORD(0));
     }
     Ap->length = k;
@@ -94,7 +94,7 @@ void fmpz_mpoly_interp_lift_p(
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
     for (i = 0; i < Ap->length*N; i++)
          A->exps[i] = Ap->exps[i];
-    _fmpz_vec_set_nmod_vec(A->coeffs, Ap->coeffs, Ap->length, ctxp->ffinfo->mod);
+    _fmpz_vec_set_nmod_vec(A->coeffs, Ap->coeffs, Ap->length, ctxp->mod);
     A->length = Ap->length;
 }
 
@@ -152,7 +152,7 @@ int fmpz_mpoly_interp_mcrt_p(
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
-        fmpz_CRT_ui(t, H->coeffs + i, m, A->coeffs[i], ctxp->ffinfo->mod.n, 1);
+        fmpz_CRT_ui(t, H->coeffs + i, m, A->coeffs[i], ctxp->mod.n, 1);
         *coeffbits = FLINT_MAX(*coeffbits, fmpz_bits(t));
         changed |= !fmpz_equal(t, H->coeffs + i);
         fmpz_swap(t, H->coeffs + i);
@@ -226,22 +226,24 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
     Ei = 0;
     for (Ai = 0; Ai < Alen; Ai++)
     {
-        v = fmpz_fdiv_ui(Acoeff + Ai, pctx->ffinfo->mod.n);
+        v = fmpz_fdiv_ui(Acoeff + Ai, pctx->mod.n);
         k = ((Aexp + N*Ai)[offset] >> shift) & mask;
         if (v == 0)
         {
             continue;
         }
 
-        if (Ei > 0 && mpoly_monomial_equal_extra(Eexp + N*(Ei - 1), Aexp + N*Ai, N, offset, -(k << shift)))
+        if (Ei > 0 && mpoly_monomial_equal_extra(Eexp + N*(Ei - 1),
+                                        Aexp + N*Ai, N, offset, -(k << shift)))
         {
             /* append to previous */
-            FLINT_ASSERT((Ecoeff + Ei - 1)->mod.n == pctx->ffinfo->mod.n);
+            FLINT_ASSERT((Ecoeff + Ei - 1)->mod.n == pctx->mod.n);
             nmod_poly_set_coeff_ui(Ecoeff + Ei - 1, k, v);
         }
         else
         {
-            FLINT_ASSERT(Ei == 0 || mpoly_monomial_gt_nomask_extra(Eexp + N*(Ei - 1), Aexp + N*Ai, N, offset, -(k << shift)));
+            FLINT_ASSERT(Ei == 0 || mpoly_monomial_gt_nomask_extra(
+                    Eexp + N*(Ei - 1), Aexp + N*Ai, N, offset, -(k << shift)));
 
             /* create new */
             if (Ei >= E->alloc)
@@ -251,7 +253,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
                 Eexp = E->exps;
             }
 
-            FLINT_ASSERT((Ecoeff + Ei)->mod.n == pctx->ffinfo->mod.n);
+            FLINT_ASSERT((Ecoeff + Ei)->mod.n == pctx->mod.n);
 
             mpoly_monomial_set_extra(Eexp + N*Ei, Aexp + N*Ai, N, offset, -(k << shift));
             nmod_poly_zero(Ecoeff + Ei);
@@ -309,7 +311,7 @@ void fmpz_mpoly_interp_lift_p_mpolyn(
             if ((Bcoeff + Bi)->coeffs[vi] != 0)
             {
                 mpoly_monomial_set_extra(Aexp + N*Ai, Bexp + N*Bi, N, offset, vi << shift);
-                fmpz_set_ui_smod(Acoeff + Ai, (Bcoeff + Bi)->coeffs[vi], pctx->ffinfo->mod.n);
+                fmpz_set_ui_smod(Acoeff + Ai, (Bcoeff + Bi)->coeffs[vi], pctx->mod.n);
                 Ai++;
             }
         }
@@ -385,10 +387,12 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
             Texp = T->exps;
         }
 
-        if (Fi < Flen && Ai < Alen && mpoly_monomial_equal_extra(Fexp + N*Fi, Aexp + N*Ai, N, offset, vi << shift))
+        if (Fi < Flen && Ai < Alen && mpoly_monomial_equal_extra(Fexp + N*Fi,
+                                          Aexp + N*Ai, N, offset, vi << shift))
         {
             /* F term ok, A term ok */
-            fmpz_CRT_ui(Tcoeff + Ti, Fcoeff + Fi, modulus, (Acoeff + Ai)->coeffs[vi], pctx->ffinfo->mod.n, 1);
+            fmpz_CRT_ui(Tcoeff + Ti, Fcoeff + Fi, modulus,
+                                    (Acoeff + Ai)->coeffs[vi], pctx->mod.n, 1);
             changed |= !fmpz_equal(Tcoeff + Ti, Fcoeff + Fi);
             mpoly_monomial_set(Texp + N*Ti, Fexp + N*Fi, N);
 
@@ -405,10 +409,11 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
                 }
             }
         }
-        else if (Fi < Flen && (Ai >= Alen || mpoly_monomial_gt_nomask_extra(Fexp + N*Fi, Aexp + N*Ai, N, offset, vi << shift)))
+        else if (Fi < Flen && (Ai >= Alen || mpoly_monomial_gt_nomask_extra(
+                            Fexp + N*Fi, Aexp + N*Ai, N, offset, vi << shift)))
         {
             /* F term ok, A term missing */
-            fmpz_CRT_ui(Tcoeff + Ti, Fcoeff + Fi, modulus, 0, pctx->ffinfo->mod.n, 1);
+            fmpz_CRT_ui(Tcoeff + Ti, Fcoeff + Fi, modulus, 0, pctx->mod.n, 1);
             changed |= !fmpz_equal(Tcoeff + Ti, Fcoeff + Fi);
 
             mpoly_monomial_set(Texp + N*Ti, Fexp + N*Fi, N);
@@ -417,10 +422,13 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
         }
         else
         {
-            FLINT_ASSERT(Ai < Alen && (Fi >= Flen || mpoly_monomial_lt_nomask_extra(Fexp + N*Fi, Aexp + N*Ai, N, offset, vi << shift)));
+            FLINT_ASSERT(Ai < Alen && (Fi >= Flen ||
+                     mpoly_monomial_lt_nomask_extra(Fexp + N*Fi, Aexp + N*Ai,
+                                                     N, offset, vi << shift)));
 
             /* F term missing, A term ok */
-            fmpz_CRT_ui(Tcoeff + Ti, zero, modulus, (Acoeff + Ai)->coeffs[vi], pctx->ffinfo->mod.n, 1);            
+            fmpz_CRT_ui(Tcoeff + Ti, zero, modulus, (Acoeff + Ai)->coeffs[vi],
+                                                               pctx->mod.n, 1);            
             FLINT_ASSERT(!fmpz_is_zero(Tcoeff + Ti));
             changed = 1;
             mpoly_monomial_set_extra(Texp + N*Ti, Aexp + N*Ai, N, offset, vi << shift);

@@ -26,8 +26,8 @@ void _nmod_mpoly_set_coeff_ui_fmpz(
 
     TMP_START;
 
-    if (c >= ctx->ffinfo->mod.n)
-        NMOD_RED(c, c, ctx->ffinfo->mod);
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);

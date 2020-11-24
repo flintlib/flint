@@ -114,8 +114,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
             }
         }
 
-        umul_ppmm(t1, t0, base->ctx->ffinfo->mod.n - 1,
-                          base->ctx->ffinfo->mod.n - 1);
+        umul_ppmm(t1, t0, base->ctx->mod.n - 1, base->ctx->mod.n - 1);
         umul_ppmm(t2, t1, t1, len);
         umul_ppmm(u1, u0, t0, len);
         add_sssaaaaaa(t2, t1, t0,  t2, t1, UWORD(0),  UWORD(0), u1, u0);
@@ -504,8 +503,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
             }
         }
 
-        umul_ppmm(t1, t0, base->ctx->ffinfo->mod.n - 1,
-                          base->ctx->ffinfo->mod.n - 1);
+        umul_ppmm(t1, t0, base->ctx->mod.n - 1, base->ctx->mod.n - 1);
         umul_ppmm(t2, t1, t1, len);
         umul_ppmm(u1, u0, t0, len);
         add_sssaaaaaa(t2, t1, t0,  t2, t1, UWORD(0),  UWORD(0), u1, u0);

@@ -1473,13 +1473,13 @@ typedef enum {
 } nmod_zip_find_coeffs_ret_t;
 
 FLINT_DLL nmod_zip_find_coeffs_ret_t nmod_zip_find_coeffs(nmod_zip_t Z,
-               nmod_poly_t master, slong pointcount, const nmodf_ctx_t ffinfo);
+                            nmod_poly_t master, slong pointcount, nmod_t fctx);
 
 FLINT_DLL nmod_zip_find_coeffs_ret_t nmod_mpolyu_zip_find_coeffs(
                            nmod_zip_mpolyu_t Z, const nmod_mpoly_ctx_t ctx_sp);
 
 FLINT_DLL int fmpz_mpolyu_addinterp_zip(fmpz_mpolyu_t H, const fmpz_t Hmodulus,
-                          const nmod_zip_mpolyu_t Z, const nmodf_ctx_t ffinfo);
+                                       const nmod_zip_mpolyu_t Z, nmod_t fctx);
 
 FLINT_DLL int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, flint_bitcnt_t Abits,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -1653,16 +1653,6 @@ void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     ulong p[2], p2;
     smul_ppmm(p[1], p[0], d1, d2);
     p2 = FLINT_SIGN_EXT(p[1]);
-    sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
-}
-
-FMPZ_MPOLY_INLINE
-void _fmpz_mpoly_submul2_uiuiui_fmpz(ulong * c, slong d1, slong d2)
-{
-    ulong p[2], p2;
-    smul_ppmm(p[1], p[0], d1, d2);
-    p2 = FLINT_SIGN_EXT(p[1]);
-    sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 

@@ -74,7 +74,7 @@ main(void)
         exp_bits1 = n_randint(state, 7) + 2;
         exp_bits2 = n_randint(state, 7) + 2;
 
-        if (n_is_prime(ctx->ffinfo->mod.n)) {
+        if (n_is_prime(nmod_mpoly_ctx_modulus(ctx))) {
             pow_bound = 60000/(len1+1)/(FLINT_BIT_COUNT(modulus)+10);
         } else {
             pow_bound = 400/(len1+1);

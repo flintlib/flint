@@ -16,10 +16,9 @@
 #include "flint.h"
 #include "nmod_mpoly.h"
 
-int
-_nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * exp,
-                        slong len, const char ** x_in,  slong bits,
-                                const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
+static int _nmod_mpoly_fprint_pretty(FILE * file,
+                       const mp_limb_t * coeff, const ulong * exp, slong len,
+                       const char ** x_in,  slong bits, const mpoly_ctx_t mctx)
 {
     slong i, j, N;
     fmpz * exponents;
@@ -119,5 +118,5 @@ nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t A,
                                    const char ** x, const nmod_mpoly_ctx_t ctx)
 {
    return _nmod_mpoly_fprint_pretty(file, A->coeffs, A->exps,
-                               A->length, x, A->bits, ctx->minfo, ctx->ffinfo);
+                                            A->length, x, A->bits, ctx->minfo);
 }

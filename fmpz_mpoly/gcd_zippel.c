@@ -12,13 +12,6 @@
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 
-
-void nmod_mpoly_ctx_change_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus)
-{
-    nmodf_ctx_clear(ctx->ffinfo);
-    nmodf_ctx_init(ctx->ffinfo, modulus);
-}
-
 /*
     Find a bound on the bits of the coefficients of gcd(A,B).
     If this overflows a flint_bitcnt_t, the max flint_bitcnt_t is returned.
@@ -182,8 +175,8 @@ choose_prime_outer:
     degbound = Gp->exps[0];
 
     t = nmod_mpolyu_leadcoeff(Gp, ctxp);
-    t = nmod_inv(t, ctxp->ffinfo->mod);
-    t = nmod_mul(t, gammap, ctxp->ffinfo->mod);
+    t = nmod_inv(t, ctxp->mod);
+    t = nmod_mul(t, gammap, ctxp->mod);
     nmod_mpolyu_scalar_mul_nmod(Gp, t, ctxp);
 
     if (Gp->length == 1 && Gp->exps[0] == 0)
@@ -247,8 +240,8 @@ choose_prime_inner:
         goto choose_prime_inner;
 
     t = nmod_mpolyu_leadcoeff(Gp, ctxp);
-    t = nmod_inv(t, ctxp->ffinfo->mod);
-    t = nmod_mul(t, gammap, ctxp->ffinfo->mod);
+    t = nmod_inv(t, ctxp->mod);
+    t = nmod_mul(t, gammap, ctxp->mod);
     nmod_mpolyu_scalar_mul_nmod(Gp, t, ctxp);
 
     changed = fmpz_mpolyu_interp_mcrt_p(&coeffbits, H, ctx, modulus, Gp, ctxp);

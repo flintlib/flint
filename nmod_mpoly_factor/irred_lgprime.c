@@ -140,7 +140,7 @@ int nmod_mpoly_factor_irred_lgprime_zassenhaus(
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
     edeg = 2;
-    fq_nmod_mpoly_ctx_init_deg(ectx, ctx->minfo->nvars, ORD_LEX, ctx->ffinfo->mod.n, edeg);
+    fq_nmod_mpoly_ctx_init_deg(ectx, ctx->minfo->nvars, ORD_LEX, ctx->mod.n, edeg);
     fq_nmod_mpoly_init(eA, ectx);
     fq_nmod_mpolyv_init(eAf, ectx);
 
@@ -240,10 +240,10 @@ int nmod_mpoly_factor_irred_lgprime_wang(
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    edeg = 1 + n_clog(A->length + 1, ctx->ffinfo->mod.n)/2;
+    edeg = 1 + n_clog(A->length + 1, ctx->mod.n)/2;
     edeg = FLINT_MAX(2, edeg);
 
-    fq_nmod_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->ffinfo->mod.n, edeg);
+    fq_nmod_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->mod.n, edeg);
     fq_nmod_mpoly_init(eA, ectx);
     fq_nmod_mpolyv_init(eAf, ectx);
     fq_nmod_mpoly_init(elcA, ectx);
@@ -304,9 +304,9 @@ int nmod_mpoly_factor_irred_lgprime_zippel(
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    edeg = 1 + n_clog(A->length + 1, ctx->ffinfo->mod.n);
+    edeg = 1 + n_clog(A->length + 1, ctx->mod.n);
     edeg = FLINT_MAX(2, edeg);
-    fq_nmod_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->ffinfo->mod.n, edeg);
+    fq_nmod_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->mod.n, edeg);
     fq_nmod_mpoly_init(eA, ectx);
     fq_nmod_mpolyv_init(eAf, ectx);
     fq_nmod_mpoly_init(elcA, ectx);

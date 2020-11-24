@@ -376,9 +376,9 @@ main(void)
             nmod_mpoly_randtest_bound(t1, state, len1, exp_bound1, ctx);
             nmod_mpoly_randtest_bound(t2, state, len2, exp_bound2, ctx);
             nmod_mpoly_mul(b, t1, t2, ctx);
-            c = n_randint(state, ctx->ffinfo->mod.n);
+            c = n_randint(state, ctx->mod.n);
             nmod_mpoly_scalar_mul_ui(a, t2, c, ctx);
-            c = n_randint(state, ctx->ffinfo->mod.n);
+            c = n_randint(state, ctx->mod.n);
             nmod_mpoly_scalar_mul_ui(b, b, c, ctx);
 
             nmod_mpoly_randtest_bound(g, state, len, exp_bound, ctx);

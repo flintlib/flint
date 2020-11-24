@@ -81,10 +81,10 @@ static void nmod_mpoly_evals(
             add_ssaaaa(hi, lo, hi, lo, 0, varexps[j]);
 
             t = nmod_pow_cache_mulpow_ui(meval, varexps[j], caches + 3*j + 0,
-                         caches + 3*j + 1, caches + 3*j + 2, ctx->ffinfo->mod);
+                             caches + 3*j + 1, caches + 3*j + 2, ctx->mod);
 
             FLINT_ASSERT(t == nmod_mul(meval, nmod_pow_ui(alpha[j], varexps[j],
-                                         ctx->ffinfo->mod), ctx->ffinfo->mod));
+                                                         ctx->mod), ctx->mod));
             meval = t;
         }
 
@@ -109,13 +109,12 @@ static void nmod_mpoly_evals(
             }
 
             t = nmod_pow_cache_mulpow_neg_ui(meval, varexp, caches + 3*j + 0,
-                         caches + 3*j + 1, caches + 3*j + 2, ctx->ffinfo->mod);
+                                 caches + 3*j + 1, caches + 3*j + 2, ctx->mod);
 
             FLINT_ASSERT(t == nmod_mul(meval, nmod_pow_ui(nmod_inv(alpha[j],
-              ctx->ffinfo->mod), varexp, ctx->ffinfo->mod), ctx->ffinfo->mod));
+                                      ctx->mod), varexp, ctx->mod), ctx->mod));
 
-            out[j].coeffs[varexp] = nmod_add(out[j].coeffs[varexp], t,
-                                                             ctx->ffinfo->mod);
+            out[j].coeffs[varexp] = nmod_add(out[j].coeffs[varexp], t, ctx->mod);
         }
     }
 
@@ -399,7 +398,7 @@ try_again:
     }
 
     for (j = 0; j < nvars; j++)
-        alpha[j] = n_urandint(state, ctx->ffinfo->mod.n - 1) + 1;
+        alpha[j] = n_urandint(state, ctx->mod.n - 1) + 1;
 
     nmod_mpoly_evals(&I->Adeflate_tdeg, Aevals, ignore, A,
                              I->Amin_exp, I->Amax_exp, I->Gstride, alpha, ctx);
@@ -422,7 +421,7 @@ try_again:
                 goto try_again;
             }
 
-            n_poly_mod_gcd(Geval, Aevals + j, Bevals + j, ctx->ffinfo->mod);
+            n_poly_mod_gcd(Geval, Aevals + j, Bevals + j, ctx->mod);
 
             I->Gterm_count_est[j] = 0;
             I->Gdeflate_deg_bound[j] = n_poly_degree(Geval);
@@ -468,7 +467,7 @@ static void _set_estimates_medprime(
     slong ignore_limit;
     int * ignore;
     fq_zech_ctx_t medctx;
-    slong d, max_degree = n_flog(1000000, smctx->ffinfo->mod.n);
+    slong d, max_degree = n_flog(1000000, smctx->mod.n);
     fmpz_t P;
 
     if (max_degree < 2)
@@ -476,10 +475,10 @@ static void _set_estimates_medprime(
 
     flint_randinit(state);
 
-    fmpz_init_set_ui(P, smctx->ffinfo->mod.n);
+    fmpz_init_set_ui(P, smctx->mod.n);
     fq_zech_ctx_init(medctx, P, 1, "#");
 
-    d = n_clog(500, smctx->ffinfo->mod.n);
+    d = n_clog(500, smctx->mod.n);
     d = FLINT_MAX(d, 1);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
@@ -600,9 +599,9 @@ static void _set_estimates_lgprime(
 
     flint_randinit(state);
 
-    d = WORD(20)/(FLINT_BIT_COUNT(smctx->ffinfo->mod.n));
+    d = WORD(20)/(FLINT_BIT_COUNT(smctx->mod.n));
     d = FLINT_MAX(WORD(2), d);
-    fq_nmod_mpoly_ctx_init_deg(lgctx, nvars, ORD_LEX, smctx->ffinfo->mod.n, d);
+    fq_nmod_mpoly_ctx_init_deg(lgctx, nvars, ORD_LEX, smctx->mod.n, d);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
     alpha = FLINT_ARRAY_ALLOC(nvars, fq_nmod_struct);
@@ -860,8 +859,8 @@ static int _try_monomial_cofactors(
 
     for (i = A->length - 1; i > 0; i--)
     {
-        success = (nmod_mul(a0, B->coeffs[i], ctx->ffinfo->mod) ==
-                   nmod_mul(b0, A->coeffs[i], ctx->ffinfo->mod));
+        success = (nmod_mul(a0, B->coeffs[i], ctx->mod) ==
+                   nmod_mul(b0, A->coeffs[i], ctx->mod));
         if (!success)
             goto cleanup;
     }
@@ -886,14 +885,14 @@ static int _try_monomial_cofactors(
     nmod_mpoly_init3(T, A->length, Gbits, ctx);
     NG = mpoly_words_per_exp(Gbits, ctx->minfo);
     NA = mpoly_words_per_exp(A->bits, ctx->minfo);
-    a0inv = nmod_inv(a0, ctx->ffinfo->mod);
+    a0inv = nmod_inv(a0, ctx->mod);
     T->length = A->length;
     for (i = 0; i < A->length; i++)
     {
         mpoly_get_monomial_ffmpz(Texps, A->exps + NA*i, A->bits, ctx->minfo);
         _fmpz_vec_sub(Texps, Texps, Abarexps, nvars);
         mpoly_set_monomial_ffmpz(T->exps + NG*i, Texps, Gbits, ctx->minfo);
-        T->coeffs[i] = nmod_mul(A->coeffs[i], a0inv, ctx->ffinfo->mod);
+        T->coeffs[i] = nmod_mul(A->coeffs[i], a0inv, ctx->mod);
     }
     nmod_mpoly_swap(G, T, ctx);
     nmod_mpoly_clear(T, ctx);
@@ -946,10 +945,10 @@ int _do_univar(
 {
     nmod_poly_t a, b, g, t;
 
-    nmod_poly_init_mod(a, ctx->ffinfo->mod);
-    nmod_poly_init_mod(b, ctx->ffinfo->mod);
-    nmod_poly_init_mod(g, ctx->ffinfo->mod);
-    nmod_poly_init_mod(t, ctx->ffinfo->mod);
+    nmod_poly_init_mod(a, ctx->mod);
+    nmod_poly_init_mod(b, ctx->mod);
+    nmod_poly_init_mod(g, ctx->mod);
+    nmod_poly_init_mod(t, ctx->mod);
 
     _nmod_mpoly_to_nmod_poly_deflate(a, A, v_in_both, I->Amin_exp, I->Gstride, ctx);
     _nmod_mpoly_to_nmod_poly_deflate(b, B, v_in_both, I->Bmin_exp, I->Gstride, ctx);
@@ -1137,7 +1136,7 @@ static int _try_zippel(
     mpoly_zipinfo_init(zinfo, m);
 
     /* uctx is context for Z[y_1,...,y_{m-1}]*/
-    nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->mod.n);
 
     /* fill in a valid zinfo->perm and degrees */
     for (i = 0; i < m; i++)
@@ -1280,7 +1279,7 @@ static int _try_zippel2(
     Gl_degs   = tmp + 3*m;
     Gamma_degs = tmp + 4*m;
 
-    nmod_mpoly_ctx_init(lctx, m, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_mpoly_ctx_init(lctx, m, ORD_LEX, ctx->mod.n);
 
     max_degree = 0;
     for (i = 0; i < m; i++)
@@ -1444,7 +1443,7 @@ static int _try_hensel(
 
     FLINT_ASSERT(m >= WORD(2));
 
-    nmod_mpoly_ctx_init(lctx, m, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_mpoly_ctx_init(lctx, m, ORD_LEX, ctx->mod.n);
 
     max_deg = 0;
     for (i = 0; i < m; i++)
@@ -1596,7 +1595,7 @@ static int _try_brown(
 
     wbits = FLINT_MAX(A->bits, B->bits);
 
-    nmod_mpoly_ctx_init(nctx, m, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_mpoly_ctx_init(nctx, m, ORD_LEX, ctx->mod.n);
     nmod_poly_stack_init(Sp, wbits, nctx);
     nmod_mpolyn_init(An, wbits, nctx);
     nmod_mpolyn_init(Bn, wbits, nctx);
@@ -1890,7 +1889,7 @@ skip_monomial_cofactors:
     _set_estimates(I, A, B, ctx);
 
     j = FLINT_MAX(0, 8 - I->mvars);
-    if (!I->Gdeflate_deg_bounds_are_nice || ctx->ffinfo->mod.n < j)
+    if (!I->Gdeflate_deg_bounds_are_nice || ctx->mod.n < j)
         _set_estimates_medprime(I, A, B, ctx);
 
     if (!I->Gdeflate_deg_bounds_are_nice)
@@ -1947,7 +1946,7 @@ skip_monomial_cofactors:
         {
             slong k = I->brown_perm[1];
             slong d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            int deg_is_small = d < ctx->ffinfo->mod.n/2;
+            int deg_is_small = d < ctx->mod.n/2;
 
             if (I->Adensity + I->Bdensity > (deg_is_small ? 0.05 : 0.2))
             {
@@ -2008,7 +2007,7 @@ skip_monomial_cofactors:
         {
             k = I->brown_perm[j];
             d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            if (d > ctx->ffinfo->mod.n/2)
+            if (d > ctx->mod.n/2)
                 deg_is_small = 0;
         }
 
@@ -2081,13 +2080,13 @@ cleanup:
         {
             if (Abar != NULL)
                 _nmod_vec_scalar_mul_nmod(Abar->coeffs, Abar->coeffs,
-                                 Abar->length, G->coeffs[0], ctx->ffinfo->mod);
+                                         Abar->length, G->coeffs[0], ctx->mod);
             if (Bbar != NULL)
                 _nmod_vec_scalar_mul_nmod(Bbar->coeffs, Bbar->coeffs,
-                                 Bbar->length, G->coeffs[0], ctx->ffinfo->mod);
+                                         Bbar->length, G->coeffs[0], ctx->mod);
 
             _nmod_vec_scalar_mul_nmod(G->coeffs, G->coeffs, G->length,
-                   nmod_inv(G->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
+                                   nmod_inv(G->coeffs[0], ctx->mod), ctx->mod);
         }
 
         FLINT_ASSERT(nmod_mpoly_divides(T, Asave, G, ctx));
@@ -2220,14 +2219,14 @@ could_not_repack:
     {
         if (Abar != NULL)
             _nmod_vec_scalar_mul_nmod(Abar->coeffs, Abar->coeffs,
-                                 Abar->length, G->coeffs[0], ctx->ffinfo->mod);
+                                         Abar->length, G->coeffs[0], ctx->mod);
 
         if (Bbar != NULL)
             _nmod_vec_scalar_mul_nmod(Bbar->coeffs, Bbar->coeffs,
-                                 Bbar->length, G->coeffs[0], ctx->ffinfo->mod);
+                                         Bbar->length, G->coeffs[0], ctx->mod);
 
         _nmod_vec_scalar_mul_nmod(G->coeffs, G->coeffs, G->length,
-                   nmod_inv(G->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
+                                   nmod_inv(G->coeffs[0], ctx->mod), ctx->mod);
     }
 
 deflate_cleanup:

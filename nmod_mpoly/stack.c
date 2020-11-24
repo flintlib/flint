@@ -73,17 +73,17 @@ void nmod_poly_stack_set_ctx(nmod_poly_stack_t S, const nmod_mpoly_ctx_t ctx)
 
     for (i = 0; i < S->poly_alloc; i++)
     {
-        nmod_poly_set_mod(S->poly_array[i], S->ctx->ffinfo->mod);
+        nmod_poly_set_mod(S->poly_array[i], S->ctx->mod);
     }
 
     for (i = 0; i < S->mpolyun_alloc; i++)
     {
-        nmod_mpolyun_set_mod(S->mpolyun_array[i], S->ctx->ffinfo->mod);
+        nmod_mpolyun_set_mod(S->mpolyun_array[i], S->ctx->mod);
     }
 
     for (i = 0; i < S->mpolyn_alloc; i++)
     {
-        nmod_mpolyn_set_mod(S->mpolyn_array[i], S->ctx->ffinfo->mod);
+        nmod_mpolyn_set_mod(S->mpolyn_array[i], S->ctx->mod);
     }
 }
 
@@ -113,7 +113,7 @@ nmod_poly_struct ** nmod_poly_stack_fit_request_poly(nmod_poly_stack_t S, slong 
         {
             S->poly_array[i] = (nmod_poly_struct *) flint_malloc(
                                                      sizeof(nmod_poly_struct));
-            nmod_poly_init_mod(S->poly_array[i], S->ctx->ffinfo->mod);
+            nmod_poly_init_mod(S->poly_array[i], S->ctx->mod);
         }
         S->poly_alloc = newalloc;
     }

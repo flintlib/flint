@@ -17,7 +17,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
     const mp_limb_t * coeff3, const ulong * exp3, slong len3,
     slong bits,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     int lt_divides;
     slong i, j, q_len, s;
@@ -65,7 +65,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
     /* precompute leading cofficient info */
-    lc_minus_inv = fctx->mod.n - nmod_inv(coeff3[0], fctx->mod);
+    lc_minus_inv = fctx.n - nmod_inv(coeff3[0], fctx);
 
     while (heap_len > 1)
     {
@@ -93,7 +93,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                                 WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
+                                 WORD(0), WORD(0), fctx.n - coeff2[x->j]);
                 } else
                 {
                     umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
@@ -102,7 +102,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        NMOD_RED3(q_coeff[q_len], acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(q_coeff[q_len], acc2, acc1, acc0, fctx);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -157,7 +157,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
             }
         }
 
-        q_coeff[q_len] = nmod_mul(q_coeff[q_len], lc_minus_inv, fctx->mod);
+        q_coeff[q_len] = nmod_mul(q_coeff[q_len], lc_minus_inv, fctx);
 
         if (q_coeff[q_len] == 0)
         {
@@ -210,7 +210,7 @@ int _nmod_mpoly_divides_monagan_pearce(
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     int lt_divides;
     slong i, j, q_len, s;
@@ -276,7 +276,7 @@ int _nmod_mpoly_divides_monagan_pearce(
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
     /* precompute leading cofficient info */
-    lc_minus_inv = fctx->mod.n - nmod_inv(coeff3[0], fctx->mod);
+    lc_minus_inv = fctx.n - nmod_inv(coeff3[0], fctx);
 
     while (heap_len > 1)
     {
@@ -315,7 +315,7 @@ int _nmod_mpoly_divides_monagan_pearce(
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                                 WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
+                                 WORD(0), WORD(0), fctx.n - coeff2[x->j]);
                 } else
                 {
                     umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
@@ -324,7 +324,7 @@ int _nmod_mpoly_divides_monagan_pearce(
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        NMOD_RED3(q_coeff[q_len], acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(q_coeff[q_len], acc2, acc1, acc0, fctx);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -398,7 +398,7 @@ int _nmod_mpoly_divides_monagan_pearce(
             }
         }
 
-        q_coeff[q_len] = nmod_mul(q_coeff[q_len], lc_minus_inv, fctx->mod);
+        q_coeff[q_len] = nmod_mul(q_coeff[q_len], lc_minus_inv, fctx);
 
         if (q_coeff[q_len] == 0)
         {
@@ -592,7 +592,7 @@ int nmod_mpoly_divides_monagan_pearce(
         divides = _nmod_mpoly_divides_monagan_pearce(temp,
                                       A->coeffs, exp2, A->length,
                                       B->coeffs, exp3, B->length,
-                                            Qbits, N, cmpmask, ctx->ffinfo);
+                                            Qbits, N, cmpmask, ctx->mod);
         nmod_mpoly_swap(temp, Q, ctx);
         nmod_mpoly_clear(temp, ctx);
     }
@@ -603,7 +603,7 @@ int nmod_mpoly_divides_monagan_pearce(
         divides = _nmod_mpoly_divides_monagan_pearce(Q,
                                     A->coeffs, exp2, A->length,
                                     B->coeffs, exp3, B->length,
-                                            Qbits, N, cmpmask, ctx->ffinfo);
+                                            Qbits, N, cmpmask, ctx->mod);
     }
 
 cleanup:

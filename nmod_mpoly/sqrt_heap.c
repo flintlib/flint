@@ -655,7 +655,7 @@ int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
     int success;
     slong lenq_est;
 
-    if ((ctx->ffinfo->mod.n % 2) == 0)
+    if ((ctx->mod.n % 2) == 0)
     {
         flint_bitcnt_t bits = A->bits;
         mp_limb_t * Aexps = A->exps;
@@ -663,9 +663,9 @@ int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
         slong i, N = mpoly_words_per_exp(bits, ctx->minfo);
         ulong mask = (bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(bits) : 0;
 
-        if (ctx->ffinfo->mod.n != 2)
-            flint_throw(FLINT_IMPINV, "Cannot compute sqrt modulo %wd*%wd\n",
-                                                      2, ctx->ffinfo->mod.n/2);
+        if (ctx->mod.n != 2)
+            flint_throw(FLINT_IMPINV, "nmod_mpoly_sqrt_heap: "
+                        "cannot compute sqrt modulo %wd*%wd", 2, ctx->mod.n/2);
 
         if (Q != A)
         {
@@ -702,7 +702,7 @@ int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
         nmod_mpoly_t T;
         nmod_mpoly_init3(T, lenq_est, A->bits, ctx);
         success = _nmod_mpoly_sqrt_heap(T, A->coeffs, A->exps, A->length,
-                                        A->bits, ctx->minfo, ctx->ffinfo->mod);
+                                                A->bits, ctx->minfo, ctx->mod);
         nmod_mpoly_swap(Q, T, ctx);
         nmod_mpoly_clear(T, ctx);
     }
@@ -710,7 +710,7 @@ int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
     {
         nmod_mpoly_fit_length_reset_bits(Q, lenq_est, A->bits, ctx);
         success = _nmod_mpoly_sqrt_heap(Q, A->coeffs, A->exps, A->length,
-                                        A->bits, ctx->minfo, ctx->ffinfo->mod);
+                                                A->bits, ctx->minfo, ctx->mod);
     }
 
     return success;

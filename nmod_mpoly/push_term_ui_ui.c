@@ -37,7 +37,7 @@ void nmod_mpoly_push_term_ui_ui(
     const nmod_mpoly_ctx_t ctx)
 {
     _nmod_mpoly_push_exp_ui(A, exp, ctx);
-    if (c >= ctx->ffinfo->mod.n)
-        NMOD_RED(c, c, ctx->ffinfo->mod);
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
     A->coeffs[A->length - 1] = c;   
 }

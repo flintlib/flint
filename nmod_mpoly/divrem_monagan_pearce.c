@@ -18,16 +18,15 @@ static int _nmod_mpoly_divrem_monagan_pearce1_binomial(
     const mp_limb_t * Bcoeffs, const ulong * Bexps,
     flint_bitcnt_t bits,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t mod)
 {
-    nmod_t mod = fctx->mod;
     mp_limb_t * Qcoeffs = Q->coeffs;
     mp_limb_t * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     ulong lexp, mask = mpoly_overflow_mask_sp(bits);
     mp_limb_t lcoeff;
-    mp_limb_t lc_inv = nmod_inv(Bcoeffs[0], fctx->mod);
+    mp_limb_t lc_inv = nmod_inv(Bcoeffs[0], mod);
     mp_limb_t mBcoeff1 = mod.n - Bcoeffs[1];
     slong Qlen = 0;
     slong Rlen = 0;
@@ -142,7 +141,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i, j, Qlen, Rlen, s;
     slong next_loc, heap_len = 2;
@@ -193,7 +192,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     HEAP_ASSIGN(heap[1], Aexps[0], x);
 
     /* precompute leading cofficient info */
-    lc_minus_inv = fctx->mod.n - nmod_inv(Bcoeffs[0], fctx->mod);
+    lc_minus_inv = fctx.n - nmod_inv(Bcoeffs[0], fctx);
 
     while (heap_len > 1)
     {
@@ -220,18 +219,19 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
 
                 if (x->i == -WORD(1))
                 {
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx->mod.n - Acoeffs[x->j]);
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
+                                 UWORD(0), UWORD(0), fctx.n - Acoeffs[x->j]);
                 }
                 else
                 {
                     umul_ppmm(pp1, pp0, Bcoeffs[x->i], Qcoeffs[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, UWORD(0), pp1, pp0);
                 }
 
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(acc0, acc2, acc1, acc0, fctx);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -294,13 +294,13 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
         {
             _nmod_mpoly_fit_length(&Rcoeffs, &R->coeffs_alloc,
                                    &Rexps, &R->exps_alloc, 1, Rlen + 1);
-            Rcoeffs[Rlen] = fctx->mod.n - acc0;
+            Rcoeffs[Rlen] = fctx.n - acc0;
             Rexps[Rlen] = exp;
             Rlen++;
             continue;
         }
 
-        Qcoeffs[Qlen] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
+        Qcoeffs[Qlen] = nmod_mul(acc0, lc_minus_inv, fctx);
 
         /* put newly generated quotient term back into the heap if neccesary */
         if (s > 1)
@@ -355,7 +355,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     slong bits,
     slong N,
     const ulong * cmpmask,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i, j, Qlen, Rlen, s;
     slong next_loc;
@@ -432,7 +432,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     mpoly_monomial_set(heap[1].exp, Aexps, N);
 
     /* precompute leading cofficient info */
-    lc_minus_inv = fctx->mod.n - nmod_inv(Bcoeffs[0], fctx->mod);
+    lc_minus_inv = fctx.n - nmod_inv(Bcoeffs[0], fctx);
    
     while (heap_len > 1)
     {
@@ -469,7 +469,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                               UWORD(0), UWORD(0), fctx->mod.n - Acoeffs[x->j]);
+                                   UWORD(0), UWORD(0), fctx.n - Acoeffs[x->j]);
                 }
                 else
                 {
@@ -480,7 +480,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
+        NMOD_RED3(acc0, acc2, acc1, acc0, fctx);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -548,13 +548,13 @@ static int _nmod_mpoly_divrem_monagan_pearce(
         {
             _nmod_mpoly_fit_length(&Rcoeffs, &R->coeffs_alloc,
                                    &Rexps, &R->exps_alloc, N, Rlen + 1);
-            Rcoeffs[Rlen] = fctx->mod.n - acc0;
+            Rcoeffs[Rlen] = fctx.n - acc0;
             mpoly_monomial_set(Rexps + Rlen*N, exp, N);
             Rlen++;
             continue;
         }
 
-        Qcoeffs[Qlen] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
+        Qcoeffs[Qlen] = nmod_mul(acc0, lc_minus_inv, fctx);
 
         /* put newly generated quotient term back into the heap if neccesary */
         if (s > 1)
@@ -689,7 +689,7 @@ void nmod_mpoly_divrem_monagan_pearce(
 
         if (_nmod_mpoly_divrem_monagan_pearce(q, r,
                      A->coeffs, Aexps, A->length, B->coeffs, Bexps, B->length,
-                                              QRbits, N, cmpmask, ctx->ffinfo))
+                                                 QRbits, N, cmpmask, ctx->mod))
         {
             break;
         }

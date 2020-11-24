@@ -274,26 +274,20 @@ int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
     Au->alloc  = Ad->coeff_alloc;
     Au->coeffs = Ad->coeffs;
     Au->length = nmod_mpolyd_length(Ad);
-    Au->mod.n    = ctx->ffinfo->mod.n;
-    Au->mod.ninv = ctx->ffinfo->mod.ninv;
-    Au->mod.norm = ctx->ffinfo->mod.norm;
+    Au->mod    = ctx->mod;
 
     Bu->alloc  = Bd->coeff_alloc;
     Bu->coeffs = Bd->coeffs;
     Bu->length = nmod_mpolyd_length(Bd);
-    Bu->mod.n    = ctx->ffinfo->mod.n;
-    Bu->mod.ninv = ctx->ffinfo->mod.ninv;
-    Bu->mod.norm = ctx->ffinfo->mod.norm;
+    Bu->mod    = ctx->mod;
 
     /* manually move Qd to Qu */
     Qu->alloc  = Qd->coeff_alloc;
     Qu->coeffs = Qd->coeffs;
     Qu->length = 0;
-    Qu->mod.n    = ctx->ffinfo->mod.n;
-    Qu->mod.ninv = ctx->ffinfo->mod.ninv;
-    Qu->mod.norm = ctx->ffinfo->mod.norm;
+    Qu->mod    = ctx->mod;
 
-    nmod_poly_init(Ru, ctx->ffinfo->mod.n);
+    nmod_poly_init_mod(Ru, ctx->mod);
     nmod_poly_divrem(Qu, Ru, Au, Bu);
     if (!nmod_poly_is_zero(Ru))
     {

@@ -423,32 +423,3 @@ slong nmod_mpolyd_length(const nmod_mpolyd_t A)
     return i;
 }
 
-slong nmod_mpolyd_last_degree(const nmod_mpolyd_t A, const nmodf_ctx_t fctx)
-{
-    slong i, j, Plen, degree;
-    slong degb_prod, degb_last=0;
-
-    degb_prod = WORD(1);
-    for (j = 0; j < A->nvars; j++) {
-        degb_last = A->deg_bounds[j];
-        degb_prod *= degb_last;
-    }
-
-    degree = -1;
-    for (i = 0; i < degb_prod; i += degb_last)
-    {
-        mp_limb_t * P = A->coeffs + i;
-        Plen = degb_last;
-        while (P[Plen-1] == 0)
-        {
-            Plen --;
-            if (Plen == 0)
-                break;
-        }
-        degree = FLINT_MAX(degree, Plen - 1);
-        if (degree + 1 == degb_last)
-            return degree;
-    }
-    return degree;
-}
-

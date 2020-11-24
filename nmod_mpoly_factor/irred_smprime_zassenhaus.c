@@ -176,7 +176,7 @@ next_alpha:
 	}
 
     for (i = 0; i < n; i++)
-        alpha[i] = n_urandint(state, ctx->ffinfo->mod.n - 1) + 1;
+        alpha[i] = n_urandint(state, ctx->mod.n - 1) + 1;
 
     /* ensure degrees do not drop under evaluation */
 	for (i = n - 1; i >= 0; i--)
@@ -211,7 +211,7 @@ next_alpha:
     }
 
     nmod_mpoly_get_bpoly(B, Aevals + 1, 0, 1, ctx);
-    success = n_bpoly_mod_factor_smprime(c, F, B, 1, ctx->ffinfo->mod);
+    success = n_bpoly_mod_factor_smprime(c, F, B, 1, ctx->mod);
     if (!success)
         goto next_alpha;
 

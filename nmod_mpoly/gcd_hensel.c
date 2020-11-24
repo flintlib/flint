@@ -107,7 +107,7 @@ int nmod_mpolyl_gcd_hensel_smprime(
     /* try all zeros first */
     for (i = 0; i < n; i++)
     {
-        prev_alphas[i] = ctx->ffinfo->mod.n; /* no previous at this point */
+        prev_alphas[i] = ctx->mod.n; /* no previous at this point */
         alphas[i] = 0;
     }
 
@@ -124,7 +124,7 @@ next_alpha:
     for (i = 0; i < n; i++)
     {
         do {
-            alphas[i] = n_urandint(state, ctx->ffinfo->mod.n);
+            alphas[i] = n_urandint(state, ctx->mod.n);
         } while (alphas[i] == prev_alphas[i]);
     }
 
@@ -261,7 +261,7 @@ got_alpha:
         }
 
         mu1 = 1;
-        mu2 = n_urandint(state, ctx->ffinfo->mod.n - 1) + 1;
+        mu2 = n_urandint(state, ctx->mod.n - 1) + 1;
         nmod_mpoly_scalar_addmul_ui(hbar, abar, bbar, mu2, ctx);
 
         /* make sure the linear combo did not drop degree */
@@ -331,12 +331,12 @@ got_alpha:
     FLINT_ASSERT(nmod_mpoly_is_ui(Glcs + 0, ctx) && Glcs[0].length == 1);
     FLINT_ASSERT(nmod_mpoly_is_ui(Hlcs + 0, ctx) && Hlcs[0].length == 1);
 
-    q = nmod_inv(g->coeffs[0], ctx->ffinfo->mod);
-    q = nmod_mul(q, Glcs[0].coeffs[0], ctx->ffinfo->mod);
+    q = nmod_inv(g->coeffs[0], ctx->mod);
+    q = nmod_mul(q, Glcs[0].coeffs[0], ctx->mod);
     nmod_mpoly_scalar_mul_nmod_invertible(Hfac + 0, g, q, ctx);
 
-    q = nmod_inv(hbar->coeffs[0], ctx->ffinfo->mod);
-    q = nmod_mul(q, Hlcs[0].coeffs[0], ctx->ffinfo->mod);
+    q = nmod_inv(hbar->coeffs[0], ctx->mod);
+    q = nmod_mul(q, Hlcs[0].coeffs[0], ctx->mod);
     nmod_mpoly_scalar_mul_nmod_invertible(Hfac + 1, hbar, q, ctx);
 
     for (k = 1; k <= n; k++)
@@ -462,7 +462,7 @@ int nmod_mpolyl_gcd_hensel_medprime(
     nmod_mpoly_t t;
     flint_rand_t state;
     fq_zech_mpoly_ctx_t ctx;
-    slong edeg, max_degree = n_flog(1000000, smctx->ffinfo->mod.n);
+    slong edeg, max_degree = n_flog(1000000, smctx->mod.n);
 
     if (max_degree < 2)
         return 0;
@@ -475,11 +475,10 @@ int nmod_mpolyl_gcd_hensel_medprime(
     FLINT_ASSERT(smB->bits == bits);
     FLINT_ASSERT(smctx->minfo->ord == ORD_LEX);
 
-    edeg = 1 + n_clog(500, smctx->ffinfo->mod.n);
+    edeg = 1 + n_clog(500, smctx->mod.n);
     edeg = FLINT_MAX(2, edeg);
     edeg = FLINT_MIN(edeg, max_degree);
-    fq_zech_mpoly_ctx_init_deg(ctx, smctx->minfo->nvars, ORD_LEX,
-                                                   smctx->ffinfo->mod.n, edeg);
+    fq_zech_mpoly_ctx_init_deg(ctx, smctx->minfo->nvars, ORD_LEX, smctx->mod.n, edeg);
 
     fq_zech_init(q, ctx->fqctx);
     fq_zech_init(mu1, ctx->fqctx);

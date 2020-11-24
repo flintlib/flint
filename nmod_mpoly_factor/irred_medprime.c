@@ -44,7 +44,7 @@ static void _frob_combine(
             for (j = 0; j < t->length; j++)
             {
                 fq_zech_pow_ui(t->coeffs + j, t->coeffs + j,
-                                              ctx->ffinfo->mod.n, ectx->fqctx);
+                                              ctx->mod.n, ectx->fqctx);
             }
 
             for (j = 0; j < eAf->length; j++)
@@ -78,7 +78,7 @@ static void _frob_combine(
         for (i = 0; i < t->length; i++)
         {
             nmod_poly_t asdf;
-            nmod_poly_init_mod(asdf, ctx->ffinfo->mod);
+            nmod_poly_init_mod(asdf, ctx->mod);
             fq_zech_get_nmod_poly(asdf, t->coeffs + i, ectx->fqctx);
             if (asdf->length != 1)
             {
@@ -110,18 +110,18 @@ int nmod_mpoly_factor_irred_medprime_zassenhaus(
     fq_zech_mpolyv_t eAf;
     fq_zech_mpoly_t eA;
     fq_zech_mpoly_ctx_t ectx;
-    slong edeg, max_degree = n_flog(1000000, ctx->ffinfo->mod.n);
+    slong edeg, max_degree = n_flog(1000000, ctx->mod.n);
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    edeg = 1 + n_clog(A->length + 1, ctx->ffinfo->mod.n)/2;
+    edeg = 1 + n_clog(A->length + 1, ctx->mod.n)/2;
     edeg = FLINT_MAX(2, edeg);
     if (edeg > max_degree)
         return 0;
 
-    fq_zech_mpoly_ctx_init_deg(ectx, ctx->minfo->nvars, ORD_LEX, ctx->ffinfo->mod.n, edeg);
+    fq_zech_mpoly_ctx_init_deg(ectx, ctx->minfo->nvars, ORD_LEX, ctx->mod.n, edeg);
     fq_zech_mpoly_init(eA, ectx);
     fq_zech_mpolyv_init(eAf, ectx);
 
@@ -220,18 +220,18 @@ int nmod_mpoly_factor_irred_medprime_wang(
     fq_zech_mpolyv_t eAf;
     fq_zech_mpoly_t eA, elcA;
     fq_zech_mpoly_ctx_t ectx;
-    slong edeg, max_degree = n_flog(1000000, ctx->ffinfo->mod.n);
+    slong edeg, max_degree = n_flog(1000000, ctx->mod.n);
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    edeg = 1 + n_clog(A->length + 1, ctx->ffinfo->mod.n)/2;
+    edeg = 1 + n_clog(A->length + 1, ctx->mod.n)/2;
     edeg = FLINT_MAX(2, edeg);
     if (edeg > max_degree)
         return 0;
 
-    fq_zech_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->ffinfo->mod.n, edeg);
+    fq_zech_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->mod.n, edeg);
 
     fq_zech_mpoly_init(eA, ectx);
     fq_zech_mpolyv_init(eAf, ectx);
@@ -292,18 +292,18 @@ int nmod_mpoly_factor_irred_medprime_zippel(
     fq_zech_mpolyv_t eAf;
     fq_zech_mpoly_t eA, elcA;
     fq_zech_mpoly_ctx_t ectx;
-    slong edeg, max_degree = n_flog(1000000, ctx->ffinfo->mod.n);
+    slong edeg, max_degree = n_flog(1000000, ctx->mod.n);
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(A->coeffs[0] == 1);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    edeg = 1 + n_clog(A->length + 1, ctx->ffinfo->mod.n);
+    edeg = 1 + n_clog(A->length + 1, ctx->mod.n);
     edeg = FLINT_MAX(2, edeg);
     if (edeg > max_degree)
         return 0;
 
-    fq_zech_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->ffinfo->mod.n, edeg);
+    fq_zech_mpoly_ctx_init_deg(ectx, n + 1, ORD_LEX, ctx->mod.n, edeg);
 
     fq_zech_mpoly_init(eA, ectx);
     fq_zech_mpolyv_init(eAf, ectx);

@@ -141,7 +141,7 @@ main(void)
             ge = nmod_mpoly_evaluate_all_ui(g, vals, ctx);
             fge = nmod_mpoly_evaluate_all_ui(fg, vals, ctx);
 
-            if (fge != nmod_add(fe, ge, ctx->ffinfo->mod))
+            if (fge != nmod_add(fe, ge, ctx->mod))
             {
                 printf("FAIL\n");
                 flint_printf("Check add commutes with evalall\ni: %wd  j: %wd\n", i, j);
@@ -198,7 +198,7 @@ main(void)
             ge = nmod_mpoly_evaluate_all_ui(g, vals, ctx);
             fge = nmod_mpoly_evaluate_all_ui(fg, vals, ctx);
 
-            if (fge != nmod_add(fe, ge, ctx->ffinfo->mod))
+            if (fge != nmod_add(fe, ge, ctx->mod))
             {
                 printf("FAIL\n");
                 flint_printf("Check mul commutes with evalall\ni: %wd  j: %wd\n", i, j);

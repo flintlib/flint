@@ -332,12 +332,12 @@ static void nmod_mpoly_get_eval_helper_pow(
 
     p = Acur->coeffs;
     _mpoly_monomial_evals_nmod(p, A->exps, A->bits, Alen, alphas, 0,
-                                              ctx->minfo, ctx_sp->ffinfo->mod);
+                                                      ctx->minfo, ctx_sp->mod);
     q = Ainc->coeffs;
     for (j = 0; j < Alen; j++)
     {
-        q[2*j + 0] = fmpz_fdiv_ui(Acoeffs + j, ctx_sp->ffinfo->mod.n);
-        q[2*j + 1] = nmod_pow_ui(p[j], pow, ctx_sp->ffinfo->mod);
+        q[2*j + 0] = fmpz_fdiv_ui(Acoeffs + j, ctx_sp->mod.n);
+        q[2*j + 1] = nmod_pow_ui(p[j], pow, ctx_sp->mod);
     }
 }
 
@@ -568,9 +568,9 @@ static void _worker_eval_sp(void * varg)
 
     if (arg->cur_is_uninited)
     {
-        n_poly_mod_scalar_pow(arg->Gammacur_sp, w->Gammaone_sp, i + 1, w->ctx_sp->ffinfo->mod);
-        n_bpoly_mod_scalar_pow(arg->Acur_sp, w->Aone_sp, i + 1, w->ctx_sp->ffinfo->mod);
-        n_bpoly_mod_scalar_pow(arg->Bcur_sp, w->Bone_sp, i + 1, w->ctx_sp->ffinfo->mod);
+        n_poly_mod_scalar_pow(arg->Gammacur_sp, w->Gammaone_sp, i + 1, w->ctx_sp->mod);
+        n_bpoly_mod_scalar_pow(arg->Acur_sp, w->Aone_sp, i + 1, w->ctx_sp->mod);
+        n_bpoly_mod_scalar_pow(arg->Bcur_sp, w->Bone_sp, i + 1, w->ctx_sp->mod);
     }
     arg->cur_is_uninited = 0;
 
@@ -578,7 +578,7 @@ static void _worker_eval_sp(void * varg)
     {
         _eval_sp_ret_struct * ret;
 
-        Gammaeval_sp = n_poly_mod_eval_step2(arg->Gammacur_sp, w->Gammainc_sp, w->ctx_sp->ffinfo->mod);
+        Gammaeval_sp = n_poly_mod_eval_step2(arg->Gammacur_sp, w->Gammainc_sp, w->ctx_sp->mod);
         nmod_mpolyuu_eval_step2(arg->Aeval_sp, arg->Acur_sp, w->Ainc_sp, w->ctx_sp);
         nmod_mpolyuu_eval_step2(arg->Beval_sp, arg->Bcur_sp, w->Binc_sp, w->ctx_sp);
 
@@ -598,13 +598,13 @@ static void _worker_eval_sp(void * varg)
 
         ret->success = n_bpoly_mod_gcd_brown_smprime(arg->Geval_sp,
                              arg->Abareval_sp, arg->Bbareval_sp,
-                          arg->Aeval_sp, arg->Beval_sp, w->ctx_sp->ffinfo->mod, arg->Sp_sp);
+                     arg->Aeval_sp, arg->Beval_sp, w->ctx_sp->mod, arg->Sp_sp);
         if (!ret->success)
             continue;
 
         ret->GevaldegXY = n_bpoly_bidegree(arg->Geval_sp);
         ret->success = 1;
-        n_bpoly_scalar_mul_nmod(arg->Geval_sp, Gammaeval_sp, w->ctx_sp->ffinfo->mod);
+        n_bpoly_scalar_mul_nmod(arg->Geval_sp, Gammaeval_sp, w->ctx_sp->mod);
         n_bpoly_swap(ret->nGeval_sp, arg->Geval_sp);
         n_bpoly_swap(ret->nAbareval_sp, arg->Abareval_sp);
         n_bpoly_swap(ret->nBbareval_sp, arg->Bbareval_sp);
@@ -715,7 +715,7 @@ get_next_index:
 
     if (i < Alength)
     {
-        Aevals[i] = fmpz_mpoly_eval_nmod(w->ctx_sp->ffinfo,
+        Aevals[i] = fmpz_mpoly_eval_nmod(w->ctx_sp->mod,
                                   Acoeffs + i, w->alphas_sp, w->ctx);
     }
     else
@@ -723,13 +723,13 @@ get_next_index:
         i -= Alength;
         if (i < Blength)
         {
-            Bevals[i] = fmpz_mpoly_eval_nmod(w->ctx_sp->ffinfo,
+            Bevals[i] = fmpz_mpoly_eval_nmod(w->ctx_sp->mod,
                                   Bcoeffs + i, w->alphas_sp, w->ctx);
         }
         else
         {
             i -= Blength;
-            Hevals[i] = fmpz_mpoly_eval_nmod(w->ctx_sp->ffinfo,
+            Hevals[i] = fmpz_mpoly_eval_nmod(w->ctx_sp->mod,
                                   Hcoeffs + i, w->alphas_sp, w->ctx);
         }
     }
@@ -956,7 +956,7 @@ get_next_index:
     if (!w->failed)
     {
         if (!nmod_mpoly_bma_get_fmpz_mpoly(Hcoeffs + i, w->ctx,
-                     w->alphashift, Lcoeffs + i, w->Ictx, w->ctx_sp->ffinfo) ||
+                        w->alphashift, Lcoeffs + i, w->Ictx, w->ctx_sp->mod) ||
             w->H->coeffs[i].length == 0)
         {
             w->failed = 1;
@@ -1039,7 +1039,7 @@ static void _worker_find_zip_coeffs(void * varg)
     slong i;
     nmod_poly_t T;
 
-    nmod_poly_init_mod(T, w->ctx_sp->ffinfo->mod);
+    nmod_poly_init_mod(T, w->ctx_sp->mod);
 
 get_next_index:
 
@@ -1056,7 +1056,7 @@ get_next_index:
         goto cleanup;
 
     switch (nmod_zip_find_coeffs(w->Z->coeffs + i, T,
-                                    w->Z->pointcount, w->ctx_sp->ffinfo))
+                                             w->Z->pointcount, w->ctx_sp->mod))
     {
         case nmod_zip_find_coeffs_no_match:
             w->zip_find_coeffs_no_match = 1; /* safe - only goes from 0 to 1 */
@@ -1113,7 +1113,7 @@ get_next_index:
     for (j = 0; j < Hc->length; j++)
     {
         fmpz_CRT_ui(t, Hc->coeffs + j, w->Hmodulus, Zc->coeffs[j],
-                                               w->ctx_sp->ffinfo->mod.n, 1);
+                                                          w->ctx_sp->mod.n, 1);
         changed |= !fmpz_equal(t, Hc->coeffs + j);
         fmpz_swap(t, Hc->coeffs + j);
     }
@@ -1190,9 +1190,9 @@ static bma_loop_ret_t _bma_loop_sp(
     /* unfortunate nmod_poly's store their own ctx */
     _base_args_set_mod_sp(w, args);
 
-    nmod_bma_mpoly_reset_prime(w->GLambda_sp, w->ctx_sp->ffinfo);
-    nmod_bma_mpoly_reset_prime(w->AbarLambda_sp, w->ctx_sp->ffinfo);
-    nmod_bma_mpoly_reset_prime(w->BbarLambda_sp, w->ctx_sp->ffinfo);
+    nmod_bma_mpoly_reset_prime(w->GLambda_sp, w->ctx_sp->mod);
+    nmod_bma_mpoly_reset_prime(w->AbarLambda_sp, w->ctx_sp->mod);
+    nmod_bma_mpoly_reset_prime(w->BbarLambda_sp, w->ctx_sp->mod);
     nmod_bma_mpoly_zero(w->GLambda_sp);
     nmod_bma_mpoly_zero(w->AbarLambda_sp);
     nmod_bma_mpoly_zero(w->BbarLambda_sp);
@@ -1202,7 +1202,7 @@ static bma_loop_ret_t _bma_loop_sp(
             and the alpha chosen as a generator of F_p*.
     */
     nmod_mpoly_bma_interpolate_alpha_powers(w->alphas_sp,
-                                        1, w->Ictx, w->ctx, w->ctx_sp->ffinfo);
+                                           1, w->Ictx, w->ctx, w->ctx_sp->mod);
 
     /* set skeletons for evaluation */
     _set_skels_sp(w, args, handles);
@@ -1396,8 +1396,7 @@ next_bma_image_sp:
         int success;
 
         for (i = 0; i < w->ctx->minfo->nvars; i++)
-            w->alphas_sp[i] = n_urandint(w->randstate,
-                                                 w->ctx_sp->ffinfo->mod.n);
+            w->alphas_sp[i] = n_urandint(w->randstate, w->ctx_sp->mod.n);
 
         /* fill in {A|B|H}evals[i] with the evaluation of {A|B|H}->coeffs + i */
         Aevals = w->coeff_evals_sp->coeffs + 0;
@@ -1408,7 +1407,7 @@ next_bma_image_sp:
             thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                                         _worker_check_eval_sp, w);
 
-        Gammaeval_sp = fmpz_mpoly_eval_nmod(w->ctx_sp->ffinfo, w->Gamma,
+        Gammaeval_sp = fmpz_mpoly_eval_nmod(w->ctx_sp->mod, w->Gamma,
                                                          w->alphas_sp, w->ctx);
         _worker_check_eval_sp(w);
         for (i = 1; i < w->num_threads; i++)
@@ -1432,11 +1431,11 @@ next_bma_image_sp:
 
         success = n_bpoly_mod_gcd_brown_smprime(args->Geval_sp,
                        args->Abareval_sp, args->Bbareval_sp, args->Aeval_sp,
-                          args->Beval_sp, w->ctx_sp->ffinfo->mod, args->Sp_sp);
+                                  args->Beval_sp, w->ctx_sp->mod, args->Sp_sp);
         if (!success)
             continue;
 
-        n_bpoly_scalar_mul_nmod(args->Geval_sp, Gammaeval_sp, w->ctx_sp->ffinfo->mod);
+        n_bpoly_scalar_mul_nmod(args->Geval_sp, Gammaeval_sp, w->ctx_sp->mod);
         GevaldegXY = n_bpoly_bidegree(args->Geval_sp);
 
         if (w->GdegboundXY < GevaldegXY)
@@ -2025,7 +2024,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded_pool(
 
         success = n_bpoly_mod_gcd_brown_smprime(arg->Geval_sp,
                                      arg->Abareval_sp, arg->Bbareval_sp,
-                          arg->Aeval_sp, arg->Beval_sp, w->ctx_sp->ffinfo->mod, arg->Sp_sp);
+                     arg->Aeval_sp, arg->Beval_sp, w->ctx_sp->mod, arg->Sp_sp);
         if (success)
         {
             w->GdegboundXY = n_bpoly_bidegree(arg->Geval_sp);
@@ -2271,7 +2270,7 @@ next_zip_image:
     for (i = 1; i < w->num_threads; i++)
         thread_pool_wait(global_thread_pool, handles[i - 1]);
 
-    fmpz_mul_ui(w->Hmodulus, w->Hmodulus, w->ctx_sp->ffinfo->mod.n);
+    fmpz_mul_ui(w->Hmodulus, w->Hmodulus, w->ctx_sp->mod.n);
 
     if (w->Hchanged)
     {

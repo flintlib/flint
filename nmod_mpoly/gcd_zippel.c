@@ -51,7 +51,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     FLINT_ASSERT(An->exps[A->length - 1] == 0);
     FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
 
-    nmod_poly_init_mod(gamma, ctx->ffinfo->mod);
+    nmod_poly_init_mod(gamma, ctx->mod);
     nmod_poly_gcd(gamma, nmod_mpolyun_leadcoeff_poly(An, ctx),
                          nmod_mpolyun_leadcoeff_poly(Bn, ctx));
 
@@ -60,17 +60,16 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
     bound = 1 + nmod_poly_degree(gamma) + FLINT_MIN(Alastdeg, Blastdeg);
 
-    nmod_poly_init_mod(hc, ctx->ffinfo->mod);
-    nmod_poly_init_mod(modulus, ctx->ffinfo->mod);
+    nmod_poly_init_mod(hc, ctx->mod);
+    nmod_poly_init_mod(modulus, ctx->mod);
     nmod_poly_one(modulus);
     nmod_mpolyun_init(H, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    deg = WORD(20)/(FLINT_BIT_COUNT(ctx->ffinfo->mod.n));
+    deg = WORD(20)/(FLINT_BIT_COUNT(ctx->mod.n));
     deg = FLINT_MAX(WORD(2), deg);
 
-    fq_nmod_mpoly_ctx_init_deg(ffctx, ctx->minfo->nvars, ORD_LEX,
-                                                      ctx->ffinfo->mod.n, deg);
+    fq_nmod_mpoly_ctx_init_deg(ffctx, ctx->minfo->nvars, ORD_LEX, ctx->mod.n, deg);
 
     fq_nmod_mpolyu_init(Aeval, A->bits, ffctx);
     fq_nmod_mpolyu_init(Beval, A->bits, ffctx);
@@ -256,8 +255,8 @@ int nmod_mpolyu_gcdm_zippel(
 
     FLINT_ASSERT(ctx->minfo->nvars > 1);
 
-    nmod_poly_init(hc, ctx->ffinfo->mod.n);
-    nmod_poly_init(modulus, ctx->ffinfo->mod.n);
+    nmod_poly_init(hc, ctx->mod.n);
+    nmod_poly_init(modulus, ctx->mod.n);
 
     nmod_mpolyun_init(An, A->bits, ctx);
     nmod_mpolyun_init(Bn, A->bits, ctx);
@@ -271,7 +270,7 @@ int nmod_mpolyu_gcdm_zippel(
     FLINT_ASSERT(An->exps[A->length - 1] == 0);
     FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
 
-    nmod_poly_init_mod(gamma, ctx->ffinfo->mod);
+    nmod_poly_init_mod(gamma, ctx->mod);
     nmod_poly_gcd(gamma, nmod_mpolyun_leadcoeff_poly(An, ctx),
                          nmod_mpolyun_leadcoeff_poly(Bn, ctx));
 
@@ -288,11 +287,10 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyun_init(Hn, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    deg = WORD(20)/(FLINT_BIT_COUNT(ctx->ffinfo->mod.n));
+    deg = WORD(20)/(FLINT_BIT_COUNT(ctx->mod.n));
     deg = FLINT_MAX(WORD(2), deg);
 
-    fq_nmod_mpoly_ctx_init_deg(ffctx, ctx->minfo->nvars, ORD_LEX,
-                                                      ctx->ffinfo->mod.n, deg);
+    fq_nmod_mpoly_ctx_init_deg(ffctx, ctx->minfo->nvars, ORD_LEX, ctx->mod.n, deg);
 
     fq_nmod_mpolyu_init(Aff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Bff, A->bits, ffctx);

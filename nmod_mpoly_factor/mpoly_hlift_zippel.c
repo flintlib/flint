@@ -101,14 +101,14 @@ static int nmod_mpoly_from_zip(
 
         if (M->terms[Hi].coeff->length < 1)
             n_poly_mod_product_roots_nmod_vec(M->terms[Hi].coeff,
-                                     Hc->coeffs, Hc->length, ctx->ffinfo->mod);
+                                             Hc->coeffs, Hc->length, ctx->mod);
 
         n_poly_fit_length(M->terms[Hlen].coeff, Hc->length);
 
         success = _nmod_zip_vand_solve(Bcoeffs + Bi, Hc->coeffs,
                     Hc->length, Zt[Zi].coeff->coeffs, Zt[Zi].coeff->length,
                     M->terms[Hi].coeff->coeffs, M->terms[Hlen].coeff->coeffs,
-                                                             ctx->ffinfo->mod);
+                                                                     ctx->mod);
         if (success < 1)
             return success;
 
@@ -250,7 +250,7 @@ static void nmod_mpoly_set_eval_helper3(
             {
                 ulong ei = (Aexps[N*Ai + off[k]] >> shift[k]) & mask;
                 meval = nmod_pow_cache_mulpow_ui(meval, ei, caches + 3*k + 0,
-                               caches + 3*k + 1, caches + 3*k + 2, ctx->ffinfo->mod);
+                                 caches + 3*k + 1, caches + 3*k + 2, ctx->mod);
             }
 
             /* set cur = monomial eval */
@@ -390,7 +390,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
             {
                 ulong ei = (Bexps[N*Bi + off[k]] >> shift[k]) & mask;
                 meval = nmod_pow_cache_mulpow_ui(meval, ei, caches + 3*k + 0,
-                               caches + 3*k + 1, caches + 3*k + 2, ctx->ffinfo->mod);
+                                 caches + 3*k + 1, caches + 3*k + 2, ctx->mod);
             }
 
             /* set cur = monomial eval */
@@ -672,10 +672,10 @@ int nmod_mpoly_hlift_zippel(
 choose_betas:
 
     /* only beta[2], beta[3], ..., beta[m - 1] will be used */
-    FLINT_ASSERT(ctx->ffinfo->mod.n > 3);
+    FLINT_ASSERT(ctx->mod.n > 3);
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
-        beta[i] = n_urandint(state, ctx->ffinfo->mod.n - 3) + 2;
+        beta[i] = n_urandint(state, ctx->mod.n - 3) + 2;
         nmod_pow_cache_start(beta[i], caches + 3*i + 0,
                                       caches + 3*i + 1, caches + 3*i + 2);
     }
@@ -697,12 +697,12 @@ choose_betas:
 
 next_zip_image:
 
-    n_polyu_mod_eval_step(Aeval, Aeh, ctx->ffinfo->mod);
+    n_polyu_mod_eval_step(Aeval, Aeh, ctx->mod);
     for (i = 0; i < r; i++)
-        n_polyu_mod_eval_step(Beval + i, Beh + i, ctx->ffinfo->mod);
+        n_polyu_mod_eval_step(Beval + i, Beh + i, ctx->mod);
 
     success = n_polyu3_mod_hlift(r, BBeval, Aeval, Beval,
-                                             alpha[m - 1], degs0, ctx->ffinfo);
+                                             alpha[m - 1], degs0, ctx->mod);
     if (success < 1)
     {
         if (--zip_fails_remaining >= 0)

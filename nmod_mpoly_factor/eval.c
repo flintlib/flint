@@ -171,7 +171,7 @@ next:
     _nmod_mpoly_evaluate_rest_n_poly(realE, starts, ends, stops, es,
                     A->coeffs + start, A->exps + N*start, stop - start, 1,
                                         alphabetas, offsets, shifts, N, mask,
-                                          ctx->minfo->nvars, ctx->ffinfo->mod);
+                                          ctx->minfo->nvars, ctx->mod);
     n_poly_set(E->coeffs + e, realE + 0);
 
     if (stop < A->length)

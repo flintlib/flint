@@ -1628,7 +1628,7 @@ static void worker_loop(void * varg)
     S->cmpmask = H->cmpmask;
     S->big_mem_alloc = 0;
     S->big_mem = NULL;
-    S->mod = H->ctx->ffinfo->mod;
+    S->mod = H->ctx->mod;
     S->lc_minus_inv = S->mod.n - H->lc_inv;
 
     stripe_fit_length(S, Blen);
@@ -1774,7 +1774,7 @@ int _nmod_mpoly_divides_heap_threaded_pool(
         already have been checked for invertibility.
     */
     divides_heap_base_init(H);
-    qcoeff = n_gcdinv(&H->lc_inv, B->coeffs[0], ctx->ffinfo->mod.n);
+    qcoeff = n_gcdinv(&H->lc_inv, B->coeffs[0], ctx->mod.n);
     FLINT_ASSERT(qcoeff == 1); /* gcd should be one */
     H->polyA->coeffs = A->coeffs;
     H->polyA->exps = Aexp;
@@ -1827,7 +1827,7 @@ int _nmod_mpoly_divides_heap_threaded_pool(
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     mpoly_monomial_sub_mp(qexps + N*0, Aexp + N*0, Bexp + N*0, N);
-    qcoeff = nmod_mul(H->lc_inv, A->coeffs[0], ctx->ffinfo->mod);
+    qcoeff = nmod_mul(H->lc_inv, A->coeffs[0], ctx->mod);
 
     nmod_mpoly_ts_init(H->polyQ, &qcoeff, qexps, 1, H->bits, H->N);
 
@@ -1852,7 +1852,7 @@ int _nmod_mpoly_divides_heap_threaded_pool(
             H->failed = 1;
             break;
         }
-        qcoeff = nmod_mul(H->lc_inv, A->coeffs[k], ctx->ffinfo->mod);
+        qcoeff = nmod_mul(H->lc_inv, A->coeffs[k], ctx->mod);
         nmod_mpoly_ts_append(H->polyQ, &qcoeff, qexps, 1, H->N);
         k++;
     }
@@ -1958,7 +1958,7 @@ int nmod_mpoly_divides_heap_threaded(
         return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
     }
 
-    if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))
+    if (1 != n_gcd(B->coeffs[0], ctx->mod.n))
     {
         flint_throw(FLINT_IMPINV, "nmod_mpoly_divides_heap_threaded: Cannot invert leading coefficient");
     }

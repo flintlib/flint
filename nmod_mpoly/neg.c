@@ -22,5 +22,5 @@ void nmod_mpoly_neg(nmod_mpoly_t A, const nmod_mpoly_t B,
         _nmod_mpoly_set_length(A, B->length, ctx);
     }
 
-    _nmod_vec_neg(A->coeffs, B->coeffs, B->length, ctx->ffinfo->mod);
+    _nmod_vec_neg(A->coeffs, B->coeffs, B->length, ctx->mod);
 }

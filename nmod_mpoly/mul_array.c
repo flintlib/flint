@@ -164,7 +164,7 @@ LEX_UNPACK_MACRO(
 ,
     coeff_array[off] != UWORD(0)
 ,
-    NMOD_RED(coeff, coeff_array[off], ctx->ffinfo->mod);
+    NMOD_RED(coeff, coeff_array[off], ctx->mod);
     coeff_array[off] = 0;
 )
 
@@ -173,7 +173,7 @@ LEX_UNPACK_MACRO(
 ,
     (coeff_array[2*off + 0] || coeff_array[2*off + 1]) != UWORD(0)
 ,
-    NMOD2_RED2(coeff, coeff_array[2*off + 1], coeff_array[2*off + 0], ctx->ffinfo->mod);
+    NMOD2_RED2(coeff, coeff_array[2*off + 1], coeff_array[2*off + 0], ctx->mod);
     coeff_array[2*off + 0] = coeff_array[2*off + 1] = 0;
 )
 
@@ -182,7 +182,7 @@ LEX_UNPACK_MACRO(
 ,
     (coeff_array[3*off + 0] || coeff_array[3*off + 1] || coeff_array[3*off + 2]) != UWORD(0)
 ,
-    NMOD_RED3(coeff, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0], ctx->ffinfo->mod);
+    NMOD_RED3(coeff, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0], ctx->mod);
     coeff_array[3*off + 0] = coeff_array[3*off + 1] = coeff_array[3*off + 2] = UWORD(0);
 )
 
@@ -244,7 +244,7 @@ void _nmod_mpoly_mul_array_chunked_LEX(
                 }
             }
 
-            umul_ppmm(t1, t0, ctx->ffinfo->mod.n - 1, ctx->ffinfo->mod.n - 1);
+            umul_ppmm(t1, t0, ctx->mod.n - 1, ctx->mod.n - 1);
             umul_ppmm(t2, t1, t1, len);
             umul_ppmm(u1, u0, t0, len);
             add_sssaaaaaa(t2, t1, t0,  t2, t1, UWORD(0),  UWORD(0), u1, u0);
@@ -510,7 +510,7 @@ DEGLEX_UNPACK_MACRO(
 ,
     coeff_array[off] != UWORD(0)
 ,
-    NMOD_RED(coeff, coeff_array[off], ctx->ffinfo->mod);
+    NMOD_RED(coeff, coeff_array[off], ctx->mod);
     coeff_array[off] = 0;
 )
 
@@ -519,7 +519,7 @@ DEGLEX_UNPACK_MACRO(
 ,
     (coeff_array[2*off + 0] || coeff_array[2*off + 1]) != UWORD(0)
 ,
-    NMOD2_RED2(coeff, coeff_array[2*off + 1], coeff_array[2*off + 0], ctx->ffinfo->mod);
+    NMOD2_RED2(coeff, coeff_array[2*off + 1], coeff_array[2*off + 0], ctx->mod);
     coeff_array[2*off + 0] = coeff_array[2*off + 1] = 0;
 )
 
@@ -528,7 +528,7 @@ DEGLEX_UNPACK_MACRO(
 ,
     (coeff_array[3*off + 0] || coeff_array[3*off + 1] || coeff_array[3*off + 2]) != UWORD(0)
 ,
-    NMOD_RED3(coeff, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0], ctx->ffinfo->mod);
+    NMOD_RED3(coeff, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0], ctx->mod);
     coeff_array[3*off + 0] = coeff_array[3*off + 1] = coeff_array[3*off + 2] = 0;
 )
 
@@ -621,7 +621,7 @@ DEGREVLEX_UNPACK_MACRO(
 ,
     coeff_array[off] != WORD(0)
 ,
-    NMOD_RED(coeff, coeff_array[off], ctx->ffinfo->mod);
+    NMOD_RED(coeff, coeff_array[off], ctx->mod);
     coeff_array[off] = 0;
 )
 
@@ -630,7 +630,7 @@ DEGREVLEX_UNPACK_MACRO(
 ,
     (coeff_array[2*off + 0] || coeff_array[2*off + 1]) != WORD(0)
 ,
-    NMOD2_RED2(coeff, coeff_array[2*off + 1], coeff_array[2*off + 0], ctx->ffinfo->mod);
+    NMOD2_RED2(coeff, coeff_array[2*off + 1], coeff_array[2*off + 0], ctx->mod);
     coeff_array[2*off + 0] = coeff_array[2*off + 1] = 0;
 )
 
@@ -639,7 +639,7 @@ DEGREVLEX_UNPACK_MACRO(
 ,
     (coeff_array[3*off + 0] || coeff_array[3*off + 1] || coeff_array[3*off + 2]) != WORD(0)
 ,
-    NMOD_RED3(coeff, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0], ctx->ffinfo->mod);
+    NMOD_RED3(coeff, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0], ctx->mod);
     coeff_array[3*off + 0] = coeff_array[3*off + 1] = coeff_array[3*off + 2] = 0;
 )
 
@@ -715,7 +715,7 @@ void _nmod_mpoly_mul_array_chunked_DEG(
                 }
             }
 
-            umul_ppmm(t1, t0, ctx->ffinfo->mod.n - 1, ctx->ffinfo->mod.n - 1);
+            umul_ppmm(t1, t0, ctx->mod.n - 1, ctx->mod.n - 1);
             umul_ppmm(t2, t1, t1, len);
             umul_ppmm(u1, u0, t0, len);
             add_sssaaaaaa(t2, t1, t0,  t2, t1, UWORD(0),  UWORD(0), u1, u0);

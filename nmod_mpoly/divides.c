@@ -173,7 +173,7 @@ int nmod_mpoly_divides(
         }
     }
 
-    if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))
+    if (1 != n_gcd(B->coeffs[0], ctx->mod.n))
     {
         flint_throw(FLINT_IMPINV, "nmod_mpoly_divides: leading coefficient is not invertible.");
     }

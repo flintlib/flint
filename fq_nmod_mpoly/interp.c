@@ -174,7 +174,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
 
     Aexp = fq_nmod_poly_degree(A, fqctx);
 
-    nmod_poly_init(tp, ctx->ffinfo->mod.n);
+    nmod_poly_init(tp, ctx->mod.n);
 
     nmod_mpolyn_fit_length(T, Flen + Aexp + 1, ctx);
     Tcoeffs = T->coeffs;
@@ -394,7 +394,7 @@ int nmod_mpolyn_interp_crt_lg_bpoly(
                 changed = 1;
                 n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
                 _n_poly_mul_n_fq((n_poly_struct*)(Tcoeffs + Ti), modulus, u, lgctx->fqctx);
-                n_poly_mod_add((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), smctx->ffinfo->mod);
+                n_poly_mod_add((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), smctx->mod);
             }
             else
             {
@@ -425,7 +425,7 @@ int nmod_mpolyn_interp_crt_lg_bpoly(
                 changed = 1;
                 n_fq_mul(u, v, inv_m_eval, lgctx->fqctx);
                 _n_poly_mul_n_fq((n_poly_struct*)(Tcoeffs + Ti), modulus, u, lgctx->fqctx);
-                n_poly_mod_sub((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), (n_poly_struct*)(Tcoeffs + Ti), smctx->ffinfo->mod);
+                n_poly_mod_sub((n_poly_struct*)(Tcoeffs + Ti), (n_poly_struct*)(Fcoeffs + Fi), (n_poly_struct*)(Tcoeffs + Ti), smctx->mod);
             }
             else
             {
@@ -655,7 +655,7 @@ int nmod_mpolyn_interp_crt_lg_mpolyn(
     fq_nmod_init(at, ectx->fqctx);
     fq_nmod_init(u, ectx->fqctx);
     fq_nmod_init(v, ectx->fqctx);
-    nmod_poly_init(w, ctx->ffinfo->mod.n);
+    nmod_poly_init(w, ctx->mod.n);
 
     FLINT_ASSERT(var > 0);
     FLINT_ASSERT(T->bits == A->bits);
@@ -1189,7 +1189,7 @@ int nmod_mpolyn_interp_mcrt_lg_mpoly(
             _n_poly_mul_n_fq(w, m, u, lgctx->fqctx);
             {
                 nmod_poly_t wmock;
-                nmod_poly_mock(wmock, w, smctx->ffinfo->mod);
+                nmod_poly_mock(wmock, w, smctx->mod);
                 nmod_poly_add(H->coeffs + i, H->coeffs + i, wmock);
             }
         }

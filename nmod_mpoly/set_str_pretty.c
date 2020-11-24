@@ -155,7 +155,7 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t A, const char * s, slong sn,
                 goto failed;
             _nmod_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
             nmod_mpoly_geobucket_init(estack[ei], ctx);
-            fmpz_mod_ui(c, c, ctx->ffinfo->mod.n);
+            fmpz_mod_ui(c, c, ctx->mod.n);
             nmod_mpoly_geobucket_set_ui(estack[ei++], fmpz_get_ui(c), ctx);
             expecting = 2;
 

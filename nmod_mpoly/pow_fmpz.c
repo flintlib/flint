@@ -53,7 +53,7 @@ int nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
     nmod_mpoly_fit_length_reset_bits(A, 1, exp_bits, ctx);
     
-    A->coeffs[0] = nmod_pow_fmpz(B->coeffs[0], k, ctx->ffinfo->mod);
+    A->coeffs[0] = nmod_pow_fmpz(B->coeffs[0], k, ctx->mod);
     mpoly_pack_vec_fmpz(A->exps + 0, maxBfields, exp_bits, ctx->minfo->nfields, 1);
     _nmod_mpoly_set_length(A, A->coeffs[0] != 0, ctx);
 

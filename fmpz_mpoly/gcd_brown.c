@@ -163,11 +163,11 @@ choose_prime:
     nmod_mpoly_ctx_set_modulus(pctx, p);
     /* the unfortunate nmod poly's store their own context :( */
     nmod_poly_stack_set_ctx(Sp, pctx);
-    nmod_mpolyn_set_mod(Ap, pctx->ffinfo->mod);
-    nmod_mpolyn_set_mod(Bp, pctx->ffinfo->mod);
-    nmod_mpolyn_set_mod(Gp, pctx->ffinfo->mod);
-    nmod_mpolyn_set_mod(Abarp, pctx->ffinfo->mod);
-    nmod_mpolyn_set_mod(Bbarp, pctx->ffinfo->mod);
+    nmod_mpolyn_set_mod(Ap, pctx->mod);
+    nmod_mpolyn_set_mod(Bp, pctx->mod);
+    nmod_mpolyn_set_mod(Gp, pctx->mod);
+    nmod_mpolyn_set_mod(Abarp, pctx->mod);
+    nmod_mpolyn_set_mod(Bbarp, pctx->mod);
 
     /* reduction should kill neither A nor B */
     fmpz_mpoly_interp_reduce_p_mpolyn(Ap, pctx, A, ctx);

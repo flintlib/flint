@@ -17,7 +17,7 @@ slong _nmod_mpoly_scalar_addmul_ui1(
     const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
     mp_limb_t d,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -33,7 +33,7 @@ slong _nmod_mpoly_scalar_addmul_ui1(
         else if ((Bexps[i]^maskhi) == (Cexps[j]^maskhi))
         {
             Aexps[k] = Bexps[i];
-            Acoeffs[k] = nmod_addmul(Bcoeffs[i], Ccoeffs[j], d, fctx->mod);
+            Acoeffs[k] = nmod_addmul(Bcoeffs[i], Ccoeffs[j], d, fctx);
             k += (Acoeffs[k] != 0);
             i++;
             j++;
@@ -41,7 +41,7 @@ slong _nmod_mpoly_scalar_addmul_ui1(
         else
         {
             Aexps[k] = Cexps[j];
-            Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx->mod);
+            Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx);
             k += (Acoeffs[k] != 0);
             j++;         
         }
@@ -58,7 +58,7 @@ slong _nmod_mpoly_scalar_addmul_ui1(
     while (j < Clen)
     {
         Aexps[k] = Cexps[j];
-        Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx->mod);
+        Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx);
         k += (Acoeffs[k] != 0);
         j++;
     }
@@ -73,7 +73,7 @@ static slong _nmod_mpoly_scalar_addmul_ui(
     mp_limb_t d,
     slong N,
     const ulong * cmpmask,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -98,7 +98,7 @@ static slong _nmod_mpoly_scalar_addmul_ui(
         else if (cmp == 0)
         {
             mpoly_monomial_set(Aexps + k*N, Bexps + i*N, N);
-            Acoeffs[k] = nmod_addmul(Bcoeffs[i], Ccoeffs[j], d, fctx->mod);
+            Acoeffs[k] = nmod_addmul(Bcoeffs[i], Ccoeffs[j], d, fctx);
             k += (Acoeffs[k] != 0);
             i++;
             j++;
@@ -106,7 +106,7 @@ static slong _nmod_mpoly_scalar_addmul_ui(
         else
         {
             mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
-            Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx->mod);
+            Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx);
             k += (Acoeffs[k] != 0);
             j++;         
         }
@@ -123,7 +123,7 @@ static slong _nmod_mpoly_scalar_addmul_ui(
     while (j < Clen)
     {
         mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
-        Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx->mod);
+        Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx);
         k += (Acoeffs[k] != 0);
         j++;
     }
@@ -144,8 +144,8 @@ void nmod_mpoly_scalar_addmul_ui(
     int freeBexps = 0, freeCexps = 0;
     TMP_INIT;
 
-    if (d >= ctx->ffinfo->mod.n)
-        NMOD_RED(d, d, ctx->ffinfo->mod);
+    if (d >= ctx->mod.n)
+        NMOD_RED(d, d, ctx->mod);
 
     if (B->length == 0)
     {
@@ -187,7 +187,7 @@ void nmod_mpoly_scalar_addmul_ui(
         T->length = _nmod_mpoly_scalar_addmul_ui(T->coeffs, T->exps, 
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length, d,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
         nmod_mpoly_swap(A, T, ctx);
         nmod_mpoly_clear(T, ctx);
     }
@@ -197,7 +197,7 @@ void nmod_mpoly_scalar_addmul_ui(
         A->length = _nmod_mpoly_scalar_addmul_ui(A->coeffs, A->exps, 
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length, d,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
     }
 
     if (freeBexps)

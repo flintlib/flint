@@ -35,9 +35,9 @@ int nmod_mpoly_gcd_cofactors(
         if (G->coeffs[0] != 1)
         {
             _nmod_vec_scalar_mul_nmod(Bbar->coeffs, Bbar->coeffs,
-                                 Bbar->length, G->coeffs[0], ctx->ffinfo->mod);
+                                         Bbar->length, G->coeffs[0], ctx->mod);
             _nmod_vec_scalar_mul_nmod(G->coeffs, G->coeffs, G->length,
-                   nmod_inv(G->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
+                                   nmod_inv(G->coeffs[0], ctx->mod), ctx->mod);
         }
         return 1;
     }
@@ -50,9 +50,9 @@ int nmod_mpoly_gcd_cofactors(
         if (G->coeffs[0] != 1)
         {
             _nmod_vec_scalar_mul_nmod(Abar->coeffs, Abar->coeffs,
-                                 Abar->length, G->coeffs[0], ctx->ffinfo->mod);
+                                         Abar->length, G->coeffs[0], ctx->mod);
             _nmod_vec_scalar_mul_nmod(G->coeffs, G->coeffs, G->length,
-                   nmod_inv(G->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
+                                   nmod_inv(G->coeffs[0], ctx->mod), ctx->mod);
         }
         return 1;
     }

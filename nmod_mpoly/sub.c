@@ -14,7 +14,7 @@
 slong _nmod_mpoly_sub1(mp_limb_t * coeff1,       ulong * exp1,
                  const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                  const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                                          ulong maskhi, const nmodf_ctx_t fctx)
+                                          ulong maskhi, nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -28,14 +28,14 @@ slong _nmod_mpoly_sub1(mp_limb_t * coeff1,       ulong * exp1,
         } else if ((exp2[i]^maskhi) == (exp3[j]^maskhi))
         {
             exp1[k] = exp2[i];
-            coeff1[k] = nmod_sub(coeff2[i], coeff3[j], fctx->mod);
+            coeff1[k] = nmod_sub(coeff2[i], coeff3[j], fctx);
             k -= (coeff1[k] == 0);
             i++;
             j++;
         } else
         {
             exp1[k] = exp3[j];
-            coeff1[k] = nmod_neg(coeff3[j], fctx->mod);
+            coeff1[k] = nmod_neg(coeff3[j], fctx);
             j++;         
         }
         k++;
@@ -52,7 +52,7 @@ slong _nmod_mpoly_sub1(mp_limb_t * coeff1,       ulong * exp1,
     while (j < len3)
     {
         exp1[k] = exp3[j];
-        coeff1[k] = nmod_neg(coeff3[j], fctx->mod);
+        coeff1[k] = nmod_neg(coeff3[j], fctx);
         j++;
         k++;
     }
@@ -63,7 +63,7 @@ slong _nmod_mpoly_sub1(mp_limb_t * coeff1,       ulong * exp1,
 slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
                 const ulong * coeff2, const ulong * exp2, slong len2,
                 const ulong * coeff3, const ulong * exp3, slong len3,
-                   slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
+                   slong N, const ulong * cmpmask, nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -83,14 +83,14 @@ slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
         } else if (cmp == 0)
         {
             mpoly_monomial_set(exp1 + k*N, exp2 + i*N, N);
-            coeff1[k] = nmod_sub(coeff2[i], coeff3[j], fctx->mod);
+            coeff1[k] = nmod_sub(coeff2[i], coeff3[j], fctx);
             k -= (coeff1[k] == 0);
             i++;
             j++;
         } else
         {
             mpoly_monomial_set(exp1 + k*N, exp3 + j*N, N);
-            coeff1[k] = nmod_neg(coeff3[j], fctx->mod);
+            coeff1[k] = nmod_neg(coeff3[j], fctx);
             j++;
         }
         k++;
@@ -107,7 +107,7 @@ slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
     while (j < len3)
     {
         mpoly_monomial_set(exp1 + k*N, exp3 + j*N, N);
-        coeff1[k] = nmod_neg(coeff3[j], fctx->mod);
+        coeff1[k] = nmod_neg(coeff3[j], fctx);
         j++;
         k++;
     }
@@ -164,7 +164,7 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         len1 = _nmod_mpoly_sub(temp->coeffs, temp->exps, 
                                     poly2->coeffs, exp2, poly2->length,
                                     poly3->coeffs, exp3, poly3->length,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
         nmod_mpoly_swap(temp, poly1, ctx);
         nmod_mpoly_clear(temp, ctx);
     }
@@ -174,7 +174,7 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         len1 = _nmod_mpoly_sub(poly1->coeffs, poly1->exps, 
                                     poly2->coeffs, exp2, poly2->length,
                                     poly3->coeffs, exp3, poly3->length,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
     }
       
     _nmod_mpoly_set_length(poly1, len1, ctx);

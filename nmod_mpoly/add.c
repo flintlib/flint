@@ -16,7 +16,7 @@ slong _nmod_mpoly_add1(
     const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
     const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
     ulong maskhi,
-    const nmodf_ctx_t fctx)
+    nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -31,7 +31,7 @@ slong _nmod_mpoly_add1(
         else if ((Bexps[i]^maskhi) == (Cexps[j]^maskhi))
         {
             Aexps[k] = Bexps[i];
-            Acoeffs[k] = nmod_add(Bcoeffs[i], Ccoeffs[j], fctx->mod);
+            Acoeffs[k] = nmod_add(Bcoeffs[i], Ccoeffs[j], fctx);
             k -= (Acoeffs[k] == 0);
             i++;
             j++;
@@ -67,7 +67,7 @@ slong _nmod_mpoly_add1(
 slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
                 const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
                 const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
-                   slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
+                   slong N, const ulong * cmpmask, nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -88,7 +88,7 @@ slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
         else if (cmp == 0)
         {
             mpoly_monomial_set(Aexps + k*N, Bexps + i*N, N);
-            Acoeffs[k] = nmod_add(Bcoeffs[i], Ccoeffs[j], fctx->mod);
+            Acoeffs[k] = nmod_add(Bcoeffs[i], Ccoeffs[j], fctx);
             k -= (Acoeffs[k] == 0);
             i++;
             j++;
@@ -170,7 +170,7 @@ void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
         T->length = _nmod_mpoly_add(T->coeffs, T->exps, 
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
         nmod_mpoly_swap(A, T, ctx);
         nmod_mpoly_clear(T, ctx);
     }
@@ -180,7 +180,7 @@ void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
         A->length = _nmod_mpoly_add(A->coeffs, A->exps, 
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length,
-                                                      N, cmpmask, ctx->ffinfo);
+                                                      N, cmpmask, ctx->mod);
     }
 
     if (freeBexps)

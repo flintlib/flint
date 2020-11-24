@@ -42,7 +42,7 @@ void nmod_mpolyn_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
     slong i;
     for (i = 0; i < A->alloc; i++) {
         nmod_poly_clear(A->coeffs + i);
-        nmod_poly_init(A->coeffs + i, ctx->ffinfo->mod.n);
+        nmod_poly_init(A->coeffs + i, ctx->mod.n);
     }
     A->length = 0;
 }
@@ -144,7 +144,7 @@ void nmod_mpolyn_fit_length(nmod_mpolyn_t A, slong length, const nmod_mpoly_ctx_
 
         for (i = old_alloc; i < new_alloc; i++)
         {
-            nmod_poly_init(A->coeffs + i, ctx->ffinfo->mod.n);
+            nmod_poly_init_mod(A->coeffs + i, ctx->mod);
         }
         A->alloc = new_alloc;
     }
@@ -158,7 +158,7 @@ void nmod_mpolyn_set_length(nmod_mpolyn_t A, slong newlen, const nmod_mpoly_ctx_
         for (i = newlen; i < A->length; i++)
         {
             nmod_poly_clear(A->coeffs + i);
-            nmod_poly_init(A->coeffs + i, ctx->ffinfo->mod.n);
+            nmod_poly_init_mod(A->coeffs + i, ctx->mod);
         }
     }
     A->length = newlen;
@@ -247,7 +247,7 @@ void nmod_mpolyn_set(nmod_mpolyn_t A, const nmod_mpolyn_t B, const nmod_mpoly_ct
     for (i = Blen; i < A->length; i++)
     {
         nmod_poly_clear(Acoeff + i);
-        nmod_poly_init(Acoeff + i, ctx->ffinfo->mod.n);
+        nmod_poly_init_mod(Acoeff + i, ctx->mod);
     }
     A->length = Blen;
 }
@@ -290,7 +290,7 @@ void nmod_mpolyn_mul_poly(
     for (i = Blen; i < A->length; i++)
     {
         nmod_poly_clear(Acoeff + i);
-        nmod_poly_init(Acoeff + i, ctx->ffinfo->mod.n);
+        nmod_poly_init_mod(Acoeff + i, ctx->mod);
     }
     A->length = Blen;
 }
