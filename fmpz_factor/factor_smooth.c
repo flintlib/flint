@@ -57,7 +57,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     slong found;
     slong trial_stop;
     slong * idx;
-    slong i, b, bits2;
+    slong i, b, bits2, istride;
     const mp_limb_t * primes;
     int ret = 0;
 
@@ -204,8 +204,10 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                 bits = FLINT_MIN(bits, 100);
                 bits2 = (bits + 1)/2;
 
-                /* tuning is in increments of 2 bits, start with 16 bits */
-                for (i = 9 + (bits2 % 3); i <= bits2; i += 3)
+                /* tuning is in increments of 2 bits */
+                istride = 3;
+                /* start with 18-22 bits, advance by 6 bits at a time */
+                for (i = 9 + (bits2 % 3); i <= bits2; i += istride)
                 {
                     found = fmpz_factor_ecm(f, ecm_tuning[i][2],
                             ecm_tuning[i][1], ecm_tuning[i][1]*100, state, n2);
@@ -235,7 +237,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                             break;
                         }
 
-                        i--; /* redo with the same parameters if factor found */
+                        i -= istride; /* redo with the same parameters if factor found */
                     }
                 }    
 
