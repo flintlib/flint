@@ -21,7 +21,7 @@ void check(fmpz_t n)
 {
     fmpz_factor_t factor;
     fmpz_t m;
-    slong i;
+    slong i, j;
 
     fmpz_factor_init(factor);
     fmpz_init(m);
@@ -66,6 +66,25 @@ void check(fmpz_t n)
         }
     }
 
+    for (i = 0; i < factor->num; i++)
+        for (j = i + 1; j < factor->num; j++)
+        {
+            if (!fmpz_cmp(factor->p + i, factor->p + j))
+            {
+                flint_printf("ERROR: duplicated prime factors, the form is not canonical!\n");
+
+                flint_printf("input: ");
+                fmpz_print(n);
+                flint_printf("\n");
+
+                flint_printf("computed factors: ");
+                fmpz_factor_print(factor);
+                flint_printf("\n");
+
+                abort();
+            }
+        }
+
     fmpz_clear(m);
     fmpz_factor_clear(factor);
 }
@@ -86,7 +105,7 @@ void randprime(fmpz_t p, flint_rand_t state, slong bits)
 
 int main(void)
 {
-    int i, j;
+    int i, j, k;
     fmpz_t x, y, z, n;
     fmpz_factor_t factors;
     mpz_t y1;
@@ -292,6 +311,54 @@ int main(void)
           abort();
        }
        fmpz_factor_clear(factors);
+    }
+
+    for (i = 0; i < 5; i++) /* Test random p1*p2*p3^2 */
+    {
+       randprime(x, state, 40);
+       randprime(y, state, 40);
+       randprime(z, state, 40);
+      
+       fmpz_mul(n, x, y);
+       fmpz_mul(n, n, z);
+       fmpz_mul(n, n, z);
+
+       fmpz_factor_init(factors);
+
+       fmpz_factor(factors, n);
+
+       if (factors->num != 3)
+       {
+          flint_printf("FAIL:\n");
+          flint_printf("%ld factors found\n", factors->num);
+          abort();
+       }
+       fmpz_factor_clear(factors);
+    }
+
+    for (i = 0; i < 15; i++) /* p1^e1 * p2^e2 * p3^e3 * p4^e4, e1, .., e4 in [1, .., 5] */
+    {
+        fmpz_set_ui(n, 1);
+        for (j = 0; j < 4; j++)
+        {
+            slong exp;
+            randprime(x, state, 20 + n_randint(state, 30));
+            exp = n_randint(state, 5) + 1;
+            for (k = 0; k < exp; k++)
+                fmpz_mul(n, n, x);
+        }
+
+        fmpz_factor_init(factors);
+
+        fmpz_factor(factors, n);
+
+        if (factors->num != 4)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("%ld factors found\n", factors->num);
+            abort();
+        }
+        fmpz_factor_clear(factors);
     }
 
     fmpz_clear(n);
