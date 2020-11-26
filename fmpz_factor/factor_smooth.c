@@ -46,6 +46,24 @@ int _is_prime(const fmpz_t n, int proved)
     	return fmpz_is_probabprime(n);
 }
 
+void remove_found_factors(fmpz_factor_t factor, fmpz_t n, fmpz_t f)
+{
+    slong i;
+    fmpz_factor_t fac;
+
+    fmpz_tdiv_q(n, n, f);
+
+    fmpz_factor_init(fac);
+    fmpz_factor_no_trial(fac, f);
+
+    for (i = 0; i < fac->num; i++)
+        fac->exp[i] += fmpz_remove(n, n, fac->p + i);
+
+    _fmpz_factor_concat(factor, fac, 1);
+
+    fmpz_factor_clear(fac);
+}
+
 int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 		                                        slong bits, int proved)
 {
@@ -214,9 +232,15 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
                     if (found != 0)
                     {
-                        fmpz_tdiv_q(n2, n2, f);
+                        /* make sure all prime divisors in factor are removed from n2 */
+                        remove_found_factors(factor, n2, f);
 
-                        fmpz_factor_no_trial(factor, f);
+                        if (fmpz_is_one(n2))
+                        {
+                            ret = 1;
+
+                            break;
+                        }
 
                         /* if what remains is below the bound, just factor it */
                         if (fmpz_sizeinbase(n2, 2) < bits)
