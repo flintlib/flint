@@ -69,20 +69,20 @@ void check(fmpz_t n)
     for (i = 0; i < factor->num; i++)
         for (j = i + 1; j < factor->num; j++)
         {
-                if (!fmpz_cmp(factor->p + i, factor->p + j))
-                {
-                    flint_printf("ERROR: duplicated prime factors, the form is not canonical!\n");
+            if (!fmpz_cmp(factor->p + i, factor->p + j))
+            {
+                flint_printf("ERROR: duplicated prime factors, the form is not canonical!\n");
 
-                    flint_printf("input: ");
-                    fmpz_print(n);
-                    flint_printf("\n");
+                flint_printf("input: ");
+                fmpz_print(n);
+                flint_printf("\n");
 
-                    flint_printf("computed factors: ");
-                    fmpz_factor_print(factor);
-                    flint_printf("\n");
+                flint_printf("computed factors: ");
+                fmpz_factor_print(factor);
+                flint_printf("\n");
 
-                    abort();
-                }
+                abort();
+            }
         }
 
     fmpz_clear(m);
@@ -336,7 +336,7 @@ int main(void)
        fmpz_factor_clear(factors);
     }
 
-    for (i = 0; i < 15; i++) /* p1^e1 * p2^e2 * p3^e3 * p4^e4, e1, ..,e4 in [1, .., 5] */
+    for (i = 0; i < 15; i++) /* p1^e1 * p2^e2 * p3^e3 * p4^e4, e1, .., e4 in [1, .., 5] */
     {
         fmpz_set_ui(n, 1);
         for (j = 0; j < 4; j++)
