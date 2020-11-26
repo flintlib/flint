@@ -54,7 +54,7 @@ void _test_root(
 int
 main(void)
 {
-    slong i, j, tmul = 10;
+    slong i, j, tmul = 20;
     FLINT_TEST_INIT(state);
 
     flint_printf("quadratic_root....");
@@ -69,10 +69,11 @@ main(void)
         flint_bitcnt_t exp_bits, exp_bits1;
         mp_limb_t modulus;
 
-        modulus = n_randint(state, (i % 2 == 0) ? 1 : FLINT_BITS - 1) + 1;
+        modulus = n_randint(state, FLINT_BITS) + 1;
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
-        modulus = 2;
+        if (i % 2)
+            modulus = 2;
 
         nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
 
@@ -81,14 +82,13 @@ main(void)
         nmod_mpoly_init(b, ctx);
         nmod_mpoly_init(x, ctx);
 
-        len = n_randint(state, 6);
-        len1 = n_randint(state, 6) + 1;
-
-        exp_bits =  n_randint(state, 10) + 1;
-        exp_bits1 = n_randint(state, 10) + 1;
-
-        for (j = 0; j < 4; j++)
+        for (j = 0; j < 5; j++)
         {
+            len = n_randint(state, 100);
+            len1 = n_randint(state, 100) + 1;
+            exp_bits =  n_randint(state, 100) + 1;
+            exp_bits1 = n_randint(state, 100) + 1;
+
             nmod_mpoly_randtest_bits(a, state, len1, exp_bits1, ctx);
             nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
 
@@ -97,6 +97,16 @@ main(void)
             nmod_mpoly_neg(b, b, ctx);
 
             _test_root(x, a, b, ctx, 1);
+
+            len = n_randint(state, 50);
+            len1 = n_randint(state, 50) + 1;
+            exp_bits =  n_randint(state, 20) + 1;
+            exp_bits1 = n_randint(state, 20) + 1;
+
+            nmod_mpoly_randtest_bits(a, state, len1, 10, ctx);
+            nmod_mpoly_randtest_bits(b, state, len, 10, ctx);
+
+            _test_root(x, a, b, ctx, 0);
         }
 
         nmod_mpoly_clear(f, ctx);

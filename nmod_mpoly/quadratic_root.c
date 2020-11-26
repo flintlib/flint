@@ -52,7 +52,7 @@ static int _nmod_mpoly_quadratic_root_heap(
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Alen + 4;   /* something bigger than heap can ever be */
-    heap = (mpoly_heap_s *) TMP_ALLOC((Alen + 2)*sizeof(mpoly_heap_s));
+    heap = (mpoly_heap_s *) TMP_ALLOC((Alen + 3)*sizeof(mpoly_heap_s));
     chain = (mpoly_heap_t *) TMP_ALLOC((Alen + 2)*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*(Alen + 2)*sizeof(slong));
 
@@ -90,6 +90,7 @@ static int _nmod_mpoly_quadratic_root_heap(
         _nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc,
                                &Qexps, &Q->exps_alloc, N, Qlen + 1);
 
+        /* exp can overflow, but divisibility & halving check their answers */
         mpoly_monomial_set(exp, heap[1].exp, N);
 
         acc = 0;
@@ -115,6 +116,7 @@ static int _nmod_mpoly_quadratic_root_heap(
                     x = chain + Alen;
                     x->i = i;
                     x->j = j + 1;
+
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], Bexps + N*x->j, N);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -130,6 +132,7 @@ static int _nmod_mpoly_quadratic_root_heap(
                     x = chain + Alen + 1;
                     x->i = i;
                     x->j = j + 1;
+
                     x->next = NULL;
                     mpoly_monomial_add_mp(exp_list[exp_next], Qexps + N*x->j,
                                                             Qexps + N*x->j, N);
@@ -154,6 +157,7 @@ static int _nmod_mpoly_quadratic_root_heap(
                     x = chain + i;
                     x->i = i;
                     x->j = j + 1;
+
                     x->next = NULL;
                     mpoly_monomial_add_mp(exp_list[exp_next], Aexps + N*x->i,
                                                             Qexps + N*x->j, N);
@@ -174,6 +178,14 @@ static int _nmod_mpoly_quadratic_root_heap(
 
         if ((acc % 2) == 0)
             continue;
+
+        /*
+            mcmp > 0: The last written Qexp is > lm(A)
+            mcmp = 0:                          = lm(A)
+            mcmp < 0:                          < lm(A)
+
+            must find an m such that m^2 + lt(A)*m = acc*exp
+        */
 
         if (mcmp <= 0)
         {
@@ -234,17 +246,54 @@ static int _nmod_mpoly_quadratic_root_heap(
         }
         else
         {
-            if (!mpoly_monomial_divides_mp(Qexps + Qlen*N, exp, Aexps + N*0, N, mask))
+            if (!mpoly_monomial_divides_mp(Qexps + Qlen*N, exp, Aexps + N*0, N, bits))
                 goto no_solution;
         }
+
+        if (!mpoly_monomial_lt(Qexps + N*Qlen, Aexps + N*0, N, cmpmask))
+            goto no_solution;
 
         Qcoeffs[Qlen] = 1;
         goto mfound;
 
     mfound:
 
+        /*
+            verify heap consistency
+            (i >= 0, j) should be in the heap iff i >= As
+            (-2, j) should be in the heap iff Qs = 0
+        */
         FLINT_ASSERT(Qs == 0 || Qs == 1);
-        if ((mcmp > 0) < Qs)
+        FLINT_ASSERT(As <= Alen);
+    #if FLINT_WANT_ASSERT
+        {
+            slong Asleft = Alen, Qsleft = 1;
+            for (i = 1; i < heap_len; i++)
+            {
+                mpoly_heap_t * x = (mpoly_heap_t *) heap[i].next;
+                do {
+                    if (x->i == -UWORD(1))
+                    {
+                        continue;
+                    }
+                    else if (x->i == -UWORD(2))
+                    {
+                        Qsleft--;
+                    }
+                    else
+                    {
+                        FLINT_ASSERT(x->i >= As);
+                        Asleft--;
+                    }
+                } while ((x = x->next) != NULL);
+            }
+            FLINT_ASSERT(Asleft == As);
+            FLINT_ASSERT(Qsleft == Qs);
+        }
+    #endif
+
+        FLINT_ASSERT(mcmp < 0 || Qs == 1);
+        if ((mcmp >= 0) < Qs)
         {
             /* the new Q^2 term did not not cancel exp */
             x = chain + Alen + 1;
@@ -260,9 +309,8 @@ static int _nmod_mpoly_quadratic_root_heap(
             FLINT_ASSERT(exp_next <= Alen + 2);
             FLINT_ASSERT(heap_len - 1 <= Alen + 2);
         }
-        Qs = (mcmp > 0);
+        Qs = FLINT_MIN(Qs, (mcmp >= 0));
 
-        FLINT_ASSERT(As <= Alen);
         for (i = (mcmp <= 0); i < As; i++)
         {
             /* the new Q*A[i] term did not not cancel exp */
@@ -279,7 +327,7 @@ static int _nmod_mpoly_quadratic_root_heap(
             FLINT_ASSERT(exp_next <= Alen + 2);
             FLINT_ASSERT(heap_len - 1 <= Alen + 2);
         }
-        As = (mcmp <= 0);
+        As = FLINT_MIN(As, (mcmp <= 0));
 
         Qlen++;
     }
@@ -400,8 +448,6 @@ int nmod_mpoly_quadratic_root(
         flint_free(Bexps);
 
     TMP_END;
-
-FLINT_ASSERT(success);
 
     return success;
 }
