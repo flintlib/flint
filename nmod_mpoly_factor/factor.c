@@ -128,6 +128,95 @@ do_it:
 }
 
 
+/* A has degree 2 wrt gen(0) */
+static int _apply_quadratic(
+    nmod_mpolyv_t Af,
+    nmod_mpoly_t A,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int success;
+    slong i, shift, off, N;
+    flint_bitcnt_t bits = A->bits;
+    ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    nmod_mpoly_t a_mock, b_mock, c_mock;
+    nmod_mpoly_t t0, t1, t2, t3;
+
+    FLINT_ASSERT(A->length > 1 || A->coeffs[0] != 0);
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
+
+    nmod_mpoly_init(t0, ctx);
+    nmod_mpoly_init(t1, ctx);
+    nmod_mpoly_init(t2, ctx);
+    nmod_mpoly_init(t3, ctx);
+
+    mpoly_gen_offset_shift_sp(&off, &shift, 0, bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+
+    i = 0;
+    a_mock->exps = A->exps + N*i;
+    a_mock->coeffs = A->coeffs + i;
+    a_mock->bits = bits;
+    while (i < A->length && (mask & (A->exps[N*i + off] >> shift)) == 2)
+        i++;
+    a_mock->length = i;
+    a_mock->coeffs_alloc = a_mock->length;
+    a_mock->exps_alloc = N*a_mock->length;
+
+    b_mock->exps = A->exps + N*i;
+    b_mock->coeffs = A->coeffs + i;
+    b_mock->bits = bits;
+    while (i < A->length && (mask & (A->exps[N*i + off] >> shift)) == 1)
+        i++;
+    b_mock->length = i - a_mock->length;
+    b_mock->coeffs_alloc = b_mock->length;
+    b_mock->exps_alloc = N*b_mock->length;
+
+    c_mock->exps = A->exps + N*i;
+    c_mock->coeffs = A->coeffs + i;
+    c_mock->bits = bits;
+    c_mock->length = A->length - i;
+    c_mock->coeffs_alloc = c_mock->length;
+    c_mock->exps_alloc = N*c_mock->length;
+
+    FLINT_ASSERT(a_mock->length > 0);
+    FLINT_ASSERT(c_mock->length > 0);
+
+    nmod_mpoly_mul(t1, a_mock, c_mock, ctx);
+    nmod_mpoly_neg(t1, t1, ctx);
+    if (!nmod_mpoly_quadratic_root(t2, b_mock, t1, ctx))
+    {
+        nmod_mpolyv_fit_length(Af, 1, ctx);
+        Af->length = 1;
+        nmod_mpoly_swap(Af->coeffs + 0, A, ctx);
+        success = 1;
+        goto cleanup;
+    }
+    nmod_mpoly_neg(t2, t2, ctx);
+
+    success = nmod_mpoly_gcd_cofactors(t0, t1, t2, a_mock, t2, ctx);
+    if (!success)
+        goto cleanup;
+
+    nmod_mpoly_divides(t3, c_mock, t2, ctx);
+
+    nmod_mpolyv_fit_length(Af, 2, ctx);
+    Af->length = 2;
+    nmod_mpoly_add(Af->coeffs + 0, t1, t2, ctx);
+    nmod_mpoly_add(Af->coeffs + 1, t0, t3, ctx);
+
+    success = 1;
+
+cleanup:
+
+    nmod_mpoly_clear(t0, ctx);
+    nmod_mpoly_clear(t1, ctx);
+    nmod_mpoly_clear(t2, ctx);
+    nmod_mpoly_clear(t3, ctx);
+
+    return success;
+}
+
 /*
     The property "sep" used here is that of the returned factors of
     _nmod_mpoly_factor_separable with sep = 1, namely:
@@ -299,7 +388,8 @@ static int _factor_irred_compressed(
     }
     else
     {
-		nmod_mpoly_t lcA;
+        slong Adeg0;
+        nmod_mpoly_t lcA;
         nmod_mpoly_factor_t lcAf;
 
         nmod_mpoly_init(lcA, ctx);
@@ -317,6 +407,21 @@ static int _factor_irred_compressed(
             nmod_mpoly_clear(g, ctx);
         }
         #endif
+
+        Adeg0 = nmod_mpoly_degree_si(A, 0, ctx);
+        if (Adeg0 == 1)
+        {
+            nmod_mpolyv_fit_length(Af, 1, ctx);
+            Af->length = 1;
+            nmod_mpoly_swap(Af->coeffs + 0, A, ctx);
+            success = 1;
+            goto cleanup_inflate;
+        }
+        else if (Adeg0 == 2)
+        {
+            success = _apply_quadratic(Af, A, ctx);
+            goto cleanup_inflate;
+        }
 
         success = 0;
 
@@ -426,6 +531,8 @@ static int _factor_irred_compressed(
         		success = nmod_mpoly_factor_irred_lgprime_zassenhaus(
                                                             Af, A, ctx, state);
         }
+
+    cleanup_inflate:
 
         success = (success > 0);
 		if (success)
