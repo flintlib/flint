@@ -559,13 +559,15 @@ The square root functions assume that the modulus is prime for correct operation
 
 .. function:: int nmod_mpoly_sqrt(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
-    If `A` is a perfect square return `1` and set `Q` to the square root
-    with positive leading coefficient. Otherwise return `0` and set `Q` to zero.
+    If `Q^2=A` has a solution, set `Q` to a solution and return `1`, otherwise return `0` and set `Q` to zero.
 
 .. function:: int nmod_mpoly_is_square(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Return `1` if `A` is a perfect square, otherwise return `0`.
 
+.. function:: int nmod_mpoly_quadratic_root(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    If `Q^2+AQ=B` has a solution, set `Q` to a solution and return `1`, otherwise return `0`.
 
 Univariate Functions
 --------------------------------------------------------------------------------
