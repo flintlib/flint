@@ -478,6 +478,17 @@ Nonsingular square solving
 
     The matrix `A` must be square.
 
+.. function:: int nmod_mat_can_solve_inner(slong * rank, slong * perm, slong * pivots, nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
+
+    As for `nmod_mat_can_solve()` except that if `rank` is not `NULL` the
+    value it points to will be set to the rank of `A`. If `perm` is not `NULL`
+    then it must be a valid initialised permutation whose length is the number
+    of rows of `A`. After the function call it will be set to the row
+    permutation given by LU decomposition of `A`. If `pivots` is not `NULL`
+    then it must an initialised vector. Only the first `*rank` of these will be
+    set by the function call. They are set to the columns of the pivots chosen
+    by the LU decomposition of `A`.
+
 .. function:: int nmod_mat_can_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
