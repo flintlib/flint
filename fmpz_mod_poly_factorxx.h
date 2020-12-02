@@ -20,15 +20,26 @@ class fmpz_mod_poly_factorxx
 {
 private:
     fmpz_mod_poly_factor_t inner;
+    fmpz_modxx_ctx_srcref ctx;
 
 public:
-    fmpz_mod_poly_factorxx() {fmpz_mod_poly_factor_init(inner);}
-    ~fmpz_mod_poly_factorxx() {fmpz_mod_poly_factor_clear(inner);}
+
+    fmpz_mod_poly_factorxx(fmpz_modxx_ctx_srcref c)
+        : ctx(c)
+    {
+        fmpz_mod_poly_factor_init(inner, ctx._ctx());
+    }
+
+    ~fmpz_mod_poly_factorxx()
+    {
+        fmpz_mod_poly_factor_clear(inner, ctx._ctx());
+    }
 
     fmpz_mod_poly_factorxx(const fmpz_mod_poly_factorxx& o)
+        : ctx(o.ctx)
     {
-        fmpz_mod_poly_factor_init(inner);
-        fmpz_mod_poly_factor_set(inner, o.inner);
+        fmpz_mod_poly_factor_init(inner, ctx._ctx());
+        fmpz_mod_poly_factor_set(inner, o.inner, ctx._ctx());
     }
 
     bool operator==(const fmpz_mod_poly_factorxx& o)
@@ -43,40 +54,43 @@ public:
 
     fmpz_mod_poly_factorxx& operator=(const fmpz_mod_poly_factorxx& o)
     {
-        fmpz_mod_poly_factor_set(inner, o.inner);
+        fmpz_mod_poly_factor_set(inner, o.inner, ctx._ctx());
         return *this;
     }
 
     slong size() const {return inner->num;}
     slong exp(slong i) const {return inner->exp[i];}
     slong& exp(slong i) {return inner->exp[i];}
-    fmpz_mod_polyxx_srcref p(slong i) const
-        {return fmpz_mod_polyxx_srcref::make(inner->poly + i);}
-    fmpz_mod_polyxx_ref p(slong i) {return fmpz_mod_polyxx_ref::make(inner->poly + i);}
+    fmpz_mod_polyxx p(slong i) const
+    {
+        fmpz_mod_polyxx p(ctx);
+        fmpz_mod_poly_set(p._poly(), inner->poly + i, ctx._ctx());
+        return p;
+    }
 
     fmpz_mod_poly_factor_t& _data() {return inner;}
     const fmpz_mod_poly_factor_t& _data() const {return inner;}
 
-    void realloc(slong a) {fmpz_mod_poly_factor_realloc(inner, a);}
-    void fit_length(slong a) {fmpz_mod_poly_factor_fit_length(inner, a);}
+    void realloc(slong a) {fmpz_mod_poly_factor_realloc(inner, a, ctx._ctx());}
+    void fit_length(slong a) {fmpz_mod_poly_factor_fit_length(inner, a, ctx._ctx());}
 
-    void print() const {fmpz_mod_poly_factor_print(inner);}
+    void print() const {fmpz_mod_poly_factor_print(inner, ctx._ctx());}
 
     template<class Fmpz_mod_poly>
     void insert(const Fmpz_mod_poly& p, slong e,
             typename mp::enable_if<traits::is_fmpz_mod_polyxx<Fmpz_mod_poly> >::type* = 0)
-        {fmpz_mod_poly_factor_insert(_data(), p.evaluate()._poly(), e);}
+        {fmpz_mod_poly_factor_insert(_data(), p.evaluate()._poly(), e, ctx._ctx());}
 
     void concat(const fmpz_mod_poly_factorxx& o)
-        {fmpz_mod_poly_factor_concat(_data(), o._data());}
+        {fmpz_mod_poly_factor_concat(_data(), o._data(), ctx._ctx());}
 
-    void pow(slong exp) {fmpz_mod_poly_factor_pow(_data(), exp);}
+    void pow(slong exp) {fmpz_mod_poly_factor_pow(_data(), exp, ctx._ctx());}
 
 #define FMPZ_MOD_POLY_FACTORXX_DEFINE_SET_FACTOR(name) \
     template<class Fmpz_mod_poly> \
     void set_##name(const Fmpz_mod_poly& p, \
             typename mp::enable_if<traits::is_fmpz_mod_polyxx<Fmpz_mod_poly> >::type* = 0) \
-        {fmpz_mod_poly_##name(_data(), p.evaluate()._poly());}
+        {fmpz_mod_poly_##name(_data(), p.evaluate()._poly(), ctx._ctx());}
 
     FMPZ_MOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor)
     FMPZ_MOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_squarefree)
@@ -95,7 +109,7 @@ public:
     void set_factor_equal_deg(const Fmpz_mod_poly& p, slong d,
             typename mp::enable_if<traits::is_fmpz_mod_polyxx<Fmpz_mod_poly> >::type* = 0)
     {
-        fmpz_mod_poly_factor_equal_deg(_data(), p.evaluate()._poly(), d);
+        fmpz_mod_poly_factor_equal_deg(_data(), p.evaluate()._poly(), d, ctx._ctx());
     }
 
     template<class Fmpz_mod_poly>
@@ -103,7 +117,7 @@ public:
             typename mp::enable_if<traits::is_fmpz_mod_polyxx<Fmpz_mod_poly> >::type* = 0)
     {
         slong* dgs = &degs.front();
-        fmpz_mod_poly_factor_distinct_deg(_data(), p.evaluate()._poly(), &dgs);
+        fmpz_mod_poly_factor_distinct_deg(_data(), p.evaluate()._poly(), &dgs, ctx._ctx());
     }
 };
 
@@ -112,7 +126,7 @@ template<class Fmpz_mod_poly> \
 fmpz_mod_poly_factorxx name(const Fmpz_mod_poly& p, \
         typename mp::enable_if<traits::is_fmpz_mod_polyxx<Fmpz_mod_poly> >::type* = 0) \
 { \
-    fmpz_mod_poly_factorxx res; \
+    fmpz_mod_poly_factorxx res(p.evaluate().get_ctx()); \
     res.set_##name(p); \
     return res; \
 }
