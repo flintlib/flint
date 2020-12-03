@@ -84,7 +84,7 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
                          const fmpz_mat_t A, const fmpz_mat_t B,
                                                  const fmpz_t N, const fmpz_t D)
 {
-    fmpz_t bound, pprod;
+    fmpz_t pprod;
     fmpz_mat_t x;
     fmpq_mat_t AX;
     nmod_mat_t Xmod, Amod, Bmod;
@@ -96,7 +96,6 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
 
     n = A->r;
 
-    fmpz_init(bound);
     fmpz_init(pprod);
 
     perm = (slong *) flint_malloc(n*sizeof(slong)); /* current row perm */
@@ -120,22 +119,11 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
     fmpq_mat_init(AX, B->r, B->c);
     fmpz_mat_init(x, X->r, X->c);
 
-    /* Compute bound for the needed modulus. TODO: if one of N and D
-       is much smaller than the other, we could use a tighter bound (i.e. 2ND).
-       This would require the ability to forward N and D to the
-       CRT routine.
-     */
-    if (fmpz_cmpabs(N, D) < 0)
-        fmpz_mul(bound, D, D);
-    else
-        fmpz_mul(bound, N, N);
-    fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
-
     fmpz_set_ui(pprod, 1);
     i = 0; /* working with i primes */
     nexti = 1; /* when to do next termination test */
 
-    while (1) /*fmpz_cmp(pprod, bound) <= 0)*/
+    while (1)
     {
         stabilised = i == nexti;
         if (stabilised) /* set next termination test iteration */
@@ -206,7 +194,6 @@ multi_mod_done:
     nmod_mat_clear(Bmod);
     nmod_mat_clear(Amod);
 
-    fmpz_clear(bound);
     fmpz_clear(pprod);
 
     fmpq_mat_clear(AX);

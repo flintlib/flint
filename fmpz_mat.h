@@ -510,6 +510,7 @@ fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
 FLINT_DLL int
 fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
                                       const fmpz_mat_t A, const fmpz_mat_t B);
+
 /* Nullspace ****************************************************************/
 
 FLINT_DLL slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
