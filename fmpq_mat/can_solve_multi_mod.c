@@ -88,10 +88,10 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
     fmpz_mat_t x;
     fmpq_mat_t AX;
     nmod_mat_t Xmod, Amod, Bmod;
-    slong i, n, nexti, rank, rnk;
+    slong i, j, k, n, nexti, rank, rnk;
     slong * prm, * perm, * piv, * pivots;
     int stabilised; /* has CRT stabilised */
-    int res = 1, pcmp, firstp = 1;
+    int res = 1, pcmp, firstp = 1, badp;
     mp_limb_t p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
     n = A->r;
@@ -150,6 +150,20 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
            _nmod_mat_set_mod(Bmod, p);
            fmpz_mat_get_nmod_mat(Amod, A);
            fmpz_mat_get_nmod_mat(Bmod, B);
+
+           /* check no entries were 0 mod p */
+           badp = 0;
+           for (j = 0; j < Amod->r && !badp; j++)
+           {
+               for (k = 0; k < Amod->c && !badp; k++)
+               {
+                   if (!fmpz_is_zero(fmpz_mat_entry(A, j, k)) && nmod_mat_entry(Amod, j, k) == 0)
+                       badp = 1;
+               }
+           }
+           if (badp)
+               continue;
+
            if (!nmod_mat_can_solve_inner(&rank, perm, pivots, Xmod, Amod, Bmod))
            {
                res = 0;
@@ -215,10 +229,16 @@ fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
     int res;
 
     if (A->r == 0)
+    {
+        fmpq_mat_zero(X);
         return 1;
+    }
 
     if (A->c == 0)
+    {
+        fmpq_mat_zero(X);
         return fmpz_mat_is_zero(B);
+    }
 
     fmpz_init(N);
     fmpz_init(D);
@@ -232,23 +252,33 @@ fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
     return res;
 }
 
-/*
-int
-fmpq_mat_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+int fmpq_mat_can_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 {
     fmpz_mat_t Anum;
     fmpz_mat_t Bnum;
     int success;
 
+    if (A->r == 0)
+    {
+        fmpq_mat_zero(X);
+        return 1;
+    }
+
+    if (A->c == 0)
+    {
+        fmpq_mat_zero(X);
+        return fmpq_mat_is_zero(B);
+    }
+
     fmpz_mat_init(Anum, A->r, A->c);
     fmpz_mat_init(Bnum, B->r, B->c);
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
-    success = fmpq_mat_solve_fmpz_mat_multi_mod(X, Anum, Bnum);
+    success = fmpq_mat_can_solve_fmpz_mat_multi_mod(X, Anum, Bnum);
 
     fmpz_mat_clear(Anum);
     fmpz_mat_clear(Bnum);
 
     return success;
 }
-*/
+
