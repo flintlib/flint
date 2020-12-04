@@ -20,6 +20,12 @@ fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
     int success;
     fmpq_mat_t Q;
 
+    if (A->r != B->r || A->c != X->r || X->c != B->c)
+    {
+        flint_printf("Exception (fmpz_mat_can_solve_multi_mod_den). Incompatible matrix dimensions.\n");
+        flint_abort();
+    }
+
     fmpq_mat_init(Q, fmpz_mat_nrows(X), fmpz_mat_ncols(X));
     success = fmpq_mat_can_solve_fmpz_mat_multi_mod(Q, A, B);
 
