@@ -81,22 +81,24 @@ _permpiv_copy(slong * perm, slong * prm, slong * pivots, slong * piv, slong n)
 
 int
 _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
-                         const fmpz_mat_t A, const fmpz_mat_t B,
-                                                 const fmpz_t N, const fmpz_t D)
+                         const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t D)
 {
-    fmpz_t pprod;
+    fmpz_t pprod, badprod;
     fmpz_mat_t x;
     fmpq_mat_t AX;
     nmod_mat_t Xmod, Amod, Bmod;
-    slong i, j, k, n, nexti, rank, rnk;
+    slong i, n, nexti, rank, rnk;
     slong * prm, * perm, * piv, * pivots;
     int stabilised; /* has CRT stabilised */
-    int res = 1, pcmp, firstp = 1, badp;
+    int res = 1, pcmp, firstp = 1;
     mp_limb_t p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
     n = A->r;
 
     fmpz_init(pprod);
+    fmpz_init(badprod);
+
+    fmpz_one(badprod);
 
     perm = (slong *) flint_malloc(n*sizeof(slong)); /* current row perm */
     prm = (slong *) flint_malloc(n*sizeof(slong)); /* best row perm */
@@ -151,24 +153,16 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
            fmpz_mat_get_nmod_mat(Amod, A);
            fmpz_mat_get_nmod_mat(Bmod, B);
 
-           /* check no entries were 0 mod p */
-           badp = 0;
-           for (j = 0; j < Amod->r && !badp; j++)
-           {
-               for (k = 0; k < Amod->c && !badp; k++)
-               {
-                   if (!fmpz_is_zero(fmpz_mat_entry(A, j, k)) && nmod_mat_entry(Amod, j, k) == 0)
-                       badp = 1;
-               }
-           }
-           if (badp)
-               continue;
-
            if (!nmod_mat_can_solve_inner(&rank, perm, pivots, Xmod, Amod, Bmod))
            {
-               res = 0;
-               fmpq_mat_zero(X);
-               goto multi_mod_done;
+               fmpz_mul_ui(badprod, badprod, p);
+               if (fmpz_cmp(badprod, D) > 0)
+               {
+                   res = 0;
+                   fmpq_mat_zero(X);
+                   goto multi_mod_done;
+               } else
+                   continue;
            }
            pcmp = _permpiv_cmp(perm, prm, pivots, piv, n);
            if (rank != rnk || pcmp != 0) /* structure not the same as last solve */
@@ -209,6 +203,7 @@ multi_mod_done:
     nmod_mat_clear(Amod);
 
     fmpz_clear(pprod);
+    fmpz_clear(badprod);
 
     fmpq_mat_clear(AX);
     fmpz_mat_clear(x);
@@ -225,7 +220,7 @@ int
 fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
                         const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    fmpz_t N, D;
+    fmpz_t D;
     int res;
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
@@ -246,13 +241,12 @@ fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
         return fmpz_mat_is_zero(B);
     }
 
-    fmpz_init(N);
     fmpz_init(D);
-    fmpz_mat_solve_bound(N, D, A, B);
 
-    res = _fmpq_mat_can_solve_multi_mod(X, A, B, N, D);
+    fmpz_mat_det_bound_nonzero(D, A);
 
-    fmpz_clear(N);
+    res = _fmpq_mat_can_solve_multi_mod(X, A, B, D);
+
     fmpz_clear(D);
 
     return res;

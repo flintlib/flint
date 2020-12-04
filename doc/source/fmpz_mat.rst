@@ -677,6 +677,10 @@ Determinant
     `|\det(A)| \le \prod \|a_i\|_2` where the product is taken
     over the rows `a_i` of `A`.
 
+void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+    As per ``fmpz_mat_det_bound()`` but excludes zero columns. For use with
+    non-square matrices.
+
 .. function:: void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
     Sets `d` to some positive divisor of the determinant of the given

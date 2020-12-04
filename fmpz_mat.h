@@ -394,6 +394,8 @@ FLINT_DLL void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A
         const fmpz_t d, int proved);
 
 FLINT_DLL void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A);
+
 FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 /* Transforms */
