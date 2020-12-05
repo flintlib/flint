@@ -834,6 +834,10 @@ int fq_nmod_mpoly_is_square(const fq_nmod_mpoly_t A,
     return res;
 }
 
+FLINT_DLL int fq_nmod_mpoly_quadratic_root(fq_nmod_mpoly_t Q,
+                            const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 /* GCD ***********************************************************************/
 
 FLINT_DLL void fq_nmod_mpoly_term_content(fq_nmod_mpoly_t M,

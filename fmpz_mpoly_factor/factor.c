@@ -16,13 +16,13 @@
 
 
 /* A has degree 2 wrt gen(0) */
-static void _apply_quadratic(
+static int _apply_quadratic(
     fmpz_mpolyv_t Af,
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
-    slong i;
-    slong shift, off, N;
+    int success;
+    slong i, shift, off, N;
     flint_bitcnt_t bits = A->bits;
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     fmpz_mpoly_t a_mock, b_mock, c_mock;
@@ -75,12 +75,16 @@ static void _apply_quadratic(
         fmpz_mpolyv_fit_length(Af, 1, ctx);
         Af->length = 1;
         fmpz_mpoly_swap(Af->coeffs + 0, A, ctx);
+        success = 1;
         goto cleanup;
     }
 
     fmpz_mpoly_add(t2, t0, b_mock, ctx);
     fmpz_mpoly_scalar_divides_si(t2, t2, 2, ctx);
-    fmpz_mpoly_gcd_cofactors(t0, t1, t2, a_mock, t2, ctx);
+    success = fmpz_mpoly_gcd_cofactors(t0, t1, t2, a_mock, t2, ctx);
+    if (!success)
+        goto cleanup;
+
     fmpz_mpoly_divides(t3, c_mock, t2, ctx);
 
     fmpz_mpolyv_fit_length(Af, 2, ctx);
@@ -88,12 +92,16 @@ static void _apply_quadratic(
     fmpz_mpoly_add(Af->coeffs + 0, t1, t2, ctx);
     fmpz_mpoly_add(Af->coeffs + 1, t0, t3, ctx);
 
+    success = 1;
+
 cleanup:
 
     fmpz_mpoly_clear(t0, ctx);
     fmpz_mpoly_clear(t1, ctx);
     fmpz_mpoly_clear(t2, ctx);
     fmpz_mpoly_clear(t3, ctx);
+
+    return success;
 }
 
 
@@ -150,8 +158,7 @@ static int _factor_irred_compressed(
     }
     else if (Adegs[0] == 2)
     {
-        _apply_quadratic(Af, A, ctx);
-        success = 1;
+        success = _apply_quadratic(Af, A, ctx);
         goto cleanup;
     }
 

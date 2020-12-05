@@ -512,13 +512,15 @@ Square Root
 
 .. function:: int fq_nmod_mpoly_sqrt(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
-    If `A` is a perfect square return `1` and set `Q` to the square root
-    with positive leading coefficient. Otherwise return `0` and set `Q` to zero.
+    If `Q^2=A` has a solution, set `Q` to a solution and return `1`, otherwise return `0` and set `Q` to zero.
 
 .. function:: int fq_nmod_mpoly_is_square(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Return `1` if `A` is a perfect square, otherwise return `0`.
 
+.. function:: int fq_nmod_mpoly_quadratic_root(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
+
+    If `Q^2+AQ=B` has a solution, set `Q` to a solution and return `1`, otherwise return `0`.
 
 Univariate Functions
 --------------------------------------------------------------------------------
