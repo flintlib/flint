@@ -12,13 +12,12 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod.h"
 
-
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
 void _fmpz_mod_poly_split_rabin(
     fmpz_mod_poly_t a,
     fmpz_mod_poly_t b,
     const fmpz_mod_poly_t f,
-    const fmpz_t halfp,
+    const fmpz_t halfp, /* floor((p-1)/2) */
     fmpz_mod_poly_t t,
     fmpz_mod_poly_t t2,
     flint_rand_t randstate,
@@ -26,35 +25,80 @@ void _fmpz_mod_poly_split_rabin(
 {
     FLINT_ASSERT(fmpz_mod_poly_degree(f, ctx) > 1);
 
+    fmpz_mod_poly_fit_length(a, 2, ctx);
+    fmpz_mod_poly_fit_length(b, 2, ctx);
+    fmpz_mod_poly_fit_length(t, 3, ctx);
+
+    if (fmpz_mod_poly_degree(f, ctx) == 2)
+    {
+        fmpz * A, * T;
+        const fmpz * B;
+
+        B = f->coeffs + 0;
+        A = t->coeffs + 1;
+        T = t->coeffs + 2;
+
+        if (!fmpz_is_zero(halfp))
+        {
+            fmpz_mod_mul(A, f->coeffs + 1, halfp, ctx);
+            fmpz_mod_neg(A, A, ctx);
+            if (!fmpz_is_one(f->coeffs + 2))
+            {
+                fmpz_mod_inv(T, f->coeffs + 2, ctx);
+                fmpz_mod_mul(A, A, T, ctx);
+                fmpz_mod_mul(t->coeffs + 0, B, T, ctx);
+                B = t->coeffs + 0;
+            }
+
+            fmpz_mod_mul(T, A, A, ctx);
+            fmpz_mod_sub(T, T, B, ctx);
+            if (!fmpz_sqrtmod(b->coeffs + 0, T, fmpz_mod_ctx_modulus(ctx)))
+                flint_throw(FLINT_ERROR, "_fmpz_mod_poly_split_rabin: f is irreducible");
+
+            fmpz_mod_add(a->coeffs + 0, A, b->coeffs + 0, ctx);
+            fmpz_mod_sub(b->coeffs + 0, A, b->coeffs + 0, ctx);
+        }
+        else
+        {
+            fmpz_one(a->coeffs + 0);
+            fmpz_zero(b->coeffs + 0);
+        }
+
+        fmpz_one(a->coeffs + 1);
+        fmpz_one(b->coeffs + 1);
+        _fmpz_mod_poly_set_length(a, 2);
+        _fmpz_mod_poly_set_length(b, 2);
+
+    #if FLINT_WANT_ASSERT
+        fmpz_mod_add(T, a->coeffs + 0, b->coeffs + 0, ctx);
+        fmpz_mod_mul(T, T, f->coeffs + 2, ctx);
+        FLINT_ASSERT(fmpz_equal(T, f->coeffs + 1));
+        fmpz_mod_mul(T, a->coeffs + 0, b->coeffs + 0, ctx);
+        fmpz_mod_mul(T, T, f->coeffs + 2, ctx);
+        FLINT_ASSERT(fmpz_equal(T, f->coeffs + 0));
+    #endif
+
+        return;
+    }
+
     fmpz_mod_poly_reverse(t, f, f->length, ctx);
     fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
 
 try_again:
 
-    /* a = random linear */
-    fmpz_mod_poly_fit_length(a, 2, ctx);
-    fmpz_one(a->coeffs + 1);
-    fmpz_randm(a->coeffs + 0, randstate, fmpz_mod_ctx_modulus(ctx));
-    a->length = 2;
-
-    fmpz_mod_poly_powmod_fmpz_binexp_preinv(t, a, halfp, f, t2, ctx);
-    fmpz_mod_poly_zero(a, ctx);
-    fmpz_mod_poly_set_coeff_ui(a, 0, 1, ctx);
-    fmpz_mod_poly_sub(t, t, a, ctx);
+    fmpz_randm(a->coeffs, randstate, fmpz_mod_ctx_modulus(ctx));
+    fmpz_mod_poly_powmod_linear_fmpz_preinv(t, a->coeffs, halfp, f, t2, ctx);
+    fmpz_mod_poly_sub_si(t, t, 1, ctx);
     fmpz_mod_poly_gcd(a, t, f, ctx);
 
-    FLINT_ASSERT(!fmpz_mod_poly_is_zero(a, ctx));
-
-    if (0 >= fmpz_mod_poly_degree(a, ctx) ||
-        fmpz_mod_poly_degree(a, ctx) >= fmpz_mod_poly_degree(f, ctx))
-    {
+    if (a->length <= 1 || a->length >= f->length)
         goto try_again;
-    }
 
-    fmpz_mod_poly_div_basecase(b, f, a, ctx);
+    fmpz_mod_poly_divrem(b, t, f, a, ctx);
+    FLINT_ASSERT(fmpz_mod_poly_is_zero(t, ctx));
 
     /* ensure deg a >= deg b */
-    if (fmpz_mod_poly_degree(a, ctx) < fmpz_mod_poly_degree(b, ctx))
+    if (a->length < b->length)
         fmpz_mod_poly_swap(a, b, ctx);
 
     return;
@@ -129,24 +173,17 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
 
     fmpz_mod_poly_make_monic(f, P, ctx);
     fmpz_mod_poly_reverse(t, f, f->length, ctx);
-    fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
-
+    fmpz_mod_poly_inv_series_newton(t2, t, f->length, ctx);
 
     a = stack + 0;
-    fmpz_mod_poly_zero(a, ctx);
-    fmpz_mod_poly_set_coeff_ui(a, 1, 1, ctx);
     fmpz_sub_ui(halfp, fmpz_mod_ctx_modulus(ctx), 1);
     fmpz_divexact_ui(halfp, halfp, 2);
-    fmpz_mod_poly_powmod_fmpz_binexp(t, a, halfp, f, ctx);
-    fmpz_mod_poly_zero(a, ctx);
-    fmpz_mod_poly_set_coeff_ui(a, 0, 1, ctx);
-    fmpz_mod_poly_sub(t, t, a, ctx);
+    fmpz_mod_poly_powmod_x_fmpz_preinv(t, halfp, f, t2, ctx);
+    fmpz_mod_poly_sub_si(t, t, 1, ctx);
     fmpz_mod_poly_gcd(a, t, f, ctx);
 
     b = stack + 1;
-    fmpz_mod_poly_zero(b, ctx);
-    fmpz_mod_poly_set_coeff_ui(b, 0, 2, ctx);
-    fmpz_mod_poly_add(t, t, b, ctx);
+    fmpz_mod_poly_add_si(t, t, 2, ctx);
     fmpz_mod_poly_gcd(b, t, f, ctx);
 
     if (fmpz_mod_poly_degree(b, ctx) + fmpz_mod_poly_degree(a, ctx) != d)

@@ -24,11 +24,10 @@ fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
     fmpz_t x;
     slong deg, i, p_ui;
 
+    res->num = 0;
+
     if (f->length <= 1)
-    {
-        res->num = 0;
         return;
-    }
 
     if (f->length == 2)
     {
