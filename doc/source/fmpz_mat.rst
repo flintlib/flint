@@ -677,6 +677,10 @@ Determinant
     `|\det(A)| \le \prod \|a_i\|_2` where the product is taken
     over the rows `a_i` of `A`.
 
+void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+    As per ``fmpz_mat_det_bound()`` but excludes zero columns. For use with
+    non-square matrices.
+
 .. function:: void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
     Sets `d` to some positive divisor of the determinant of the given
@@ -902,6 +906,17 @@ allowed between arguments.
 
     Uses a Chinese remainder algorithm with early termination once the lifting
     stabilises.
+
+.. function:: int fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Returns `1` if the system `AX = B` can be solved. If so it computes
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`. The
+    computed denominator will not generally be minimal.
+
+    Uses a Chinese remainder algorithm.
+
+    Note that the matrices `A` and `B` may have any shape as long as they have
+    the same number of rows.
 
 Row reduction
 --------------------------------------------------------------------------------

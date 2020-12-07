@@ -11,8 +11,8 @@
 
 #include "fmpz_mat.h"
 
-void
-fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
+static void
+fmpz_mat_det_bound_inner(fmpz_t bound, const fmpz_mat_t A, int zero_cols)
 {
     fmpz_t p, s, t;
     slong i, j;
@@ -33,11 +33,24 @@ fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
         if (!fmpz_is_zero(t))
             fmpz_add_ui(s, s, UWORD(1));
 
-        fmpz_mul(p, p, s);
+        if (zero_cols || !fmpz_is_zero(s))
+            fmpz_mul(p, p, s);
     }
 
     fmpz_set(bound, p);
     fmpz_clear(p);
     fmpz_clear(s);
     fmpz_clear(t);
+}
+
+void
+fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
+{
+    fmpz_mat_det_bound_inner(bound, A, 1);
+}
+
+void
+fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+{
+    fmpz_mat_det_bound_inner(bound, A, 0);
 }
