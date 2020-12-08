@@ -121,19 +121,33 @@ FLINT_DLL int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
                        flint_rand_t state, const fmpz_mod_poly_t pol, slong d,
                                                      const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_poly_factor_equal_deg_with_frob(
+             fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t f, slong d,
+                         const fmpz_mod_poly_t frob, const fmpz_mod_ctx_t ctx);
+
 FLINT_DLL void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
                  const fmpz_mod_poly_t pol, slong d, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_poly_factor_distinct_deg_with_frob(
+                    fmpz_mod_poly_factor_t res,  const fmpz_mod_poly_t poly,
+                    const fmpz_mod_poly_t polyinv, const fmpz_mod_poly_t frob,
+                                                     const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
                               const fmpz_mod_poly_t poly, slong * const *degs,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
-                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
+FLINT_DLL void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
+                    fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly,
+                    const fmpz_mod_poly_t polyinv, const fmpz_mod_poly_t frob,
+                                                     const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_factor_distinct_deg_threaded(
                     fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly,
                                slong * const * degs, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
+                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);

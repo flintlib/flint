@@ -20,7 +20,7 @@
 #include "flint.h"
 #include "thread_support.h"
 
-#define MAX_DEG 7
+#define MAX_DEG 9
 
 int main(void)
 {
@@ -37,7 +37,7 @@ int main(void)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         fmpz_mod_poly_t poly1, poly, q, r, product;
         fmpz_mod_poly_factor_t res;
@@ -53,7 +53,7 @@ int main(void)
         fmpz_set_ui(modulus, n_randtest_prime(state, 0));
         fmpz_mod_ctx_set_modulus(ctx, modulus);
 
-        flint_set_num_threads(1 + n_randint(state, 3));
+        flint_set_num_threads(1 + n_randint(state, 5));
 
         fmpz_mod_poly_init(poly1, ctx);
         fmpz_mod_poly_init(poly, ctx);
@@ -76,7 +76,7 @@ int main(void)
 
         num_of_deg[fmpz_mod_poly_degree(poly, ctx)]++;
 
-        num = n_randint(state, 5) + 1;
+        num = n_randint(state, 10) + 1;
 
         for (i = 1; i < num; i++)
         {

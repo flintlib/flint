@@ -96,18 +96,12 @@ static void _fmpz_mod_poly_push_roots(
     fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
 
     a = stack + 0;
-    fmpz_mod_poly_zero(a, ctx);
-    fmpz_mod_poly_set_coeff_ui(a, 1, 1, ctx);
-    fmpz_mod_poly_powmod_fmpz_binexp_preinv(t, a, halfp, f, t2, ctx);
-    fmpz_mod_poly_zero(a, ctx);
-    fmpz_mod_poly_set_coeff_ui(a, 0, 1, ctx);
-    fmpz_mod_poly_sub(t, t, a, ctx);
+    fmpz_mod_poly_powmod_x_fmpz_preinv(t, halfp, f, t2, ctx);
+    fmpz_mod_poly_sub_si(t, t, 1, ctx);
     fmpz_mod_poly_gcd(a, t, f, ctx);
 
     b = stack + 1;
-    fmpz_mod_poly_zero(b, ctx);
-    fmpz_mod_poly_set_coeff_ui(b, 0, 2, ctx);
-    fmpz_mod_poly_add(t, t, b, ctx);
+    fmpz_mod_poly_add_si(t, t, 2, ctx);
     fmpz_mod_poly_gcd(b, t, f, ctx);
 
     /* ensure deg a >= deg b */
@@ -191,11 +185,13 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
     for (i = 0; i < FLINT_BITS + 3; i++)
         fmpz_mod_poly_init(t + i, ctx);
 
+    fmpz_mod_poly_make_monic(t + 0, f, ctx);
+
     if (with_mult)
     {
         fmpz_mod_poly_factor_t sqf;
         fmpz_mod_poly_factor_init(sqf, ctx);
-        fmpz_mod_poly_factor_squarefree(sqf, f, ctx);
+        fmpz_mod_poly_factor_squarefree(sqf, t + 0, ctx);
         for (i = 0; i < sqf->num; i++)
         {
             _fmpz_mod_poly_push_roots(r, sqf->poly + i, sqf->exp[i],
@@ -205,7 +201,6 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
     }
     else
     {
-        fmpz_mod_poly_make_monic(t + 0, f, ctx);
         _fmpz_mod_poly_push_roots(r, t + 0, 1,
                                       p2, t + 1, t + 2, t + 3, randstate, ctx);
     }

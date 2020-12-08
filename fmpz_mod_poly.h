@@ -225,6 +225,12 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 }
 
 FMPZ_MOD_POLY_INLINE
+int fmpz_mod_poly_is_monic(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
+{
+    return f->length > 0 && fmpz_is_one(f->coeffs + f->length - 1);
+}
+
+FMPZ_MOD_POLY_INLINE
 int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
    return poly->length == 1 && fmpz_is_one(poly->coeffs + 0);
@@ -268,16 +274,12 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_one(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
-   if (fmpz_is_one(fmpz_mod_ctx_modulus(ctx)))
-   {
-      _fmpz_mod_poly_set_length(poly, 0);
-   } else
-   {
-      fmpz_mod_poly_fit_length(poly, 1, ctx);
-      _fmpz_mod_poly_set_length(poly, 1);
-      fmpz_set_ui(poly->coeffs + 0, 1);
-   }
+    fmpz_mod_poly_fit_length(poly, 1, ctx);
+    fmpz_one(poly->coeffs + 0);
+    _fmpz_mod_poly_set_length(poly, !fmpz_is_one(fmpz_mod_ctx_modulus(ctx)));
 }
+
+FLINT_DLL void fmpz_mod_poly_gen(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly,
                                    slong i, slong j, const fmpz_mod_ctx_t ctx);
@@ -540,6 +542,10 @@ FLINT_DLL void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e,
 FLINT_DLL void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res,
          const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv,
                                                      const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_poly_powmod_linear_fmpz_preinv(fmpz_mod_poly_t res,
+                      const fmpz_t a, const fmpz_t e, const fmpz_mod_poly_t f,
+                         const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res,
                     const fmpz * f, slong flen, slong n, const fmpz * g,

@@ -289,7 +289,7 @@ void fmpz_mpoly_interp_lift_p_mpolyn(
     slong Ai;
     slong var = ctx->minfo->nvars;
 
-    FLINT_ASSERT(var = pctx->minfo->nvars);
+    FLINT_ASSERT(var == pctx->minfo->nvars);
 
     fmpz_mpoly_fit_length(A, Blen, ctx);
     Acoeff = A->coeffs;

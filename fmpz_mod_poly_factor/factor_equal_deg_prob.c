@@ -22,7 +22,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state,
 {
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);
     fmpz_mod_poly_t a, b, c, polinv;
-    fmpz_t exp, t;
+    fmpz_t exp;
     int res = 1;
     slong i;
 
@@ -61,7 +61,6 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state,
         fmpz_pow_ui(exp, p, d);
         fmpz_sub_ui(exp, exp, 1);
         fmpz_fdiv_q_2exp(exp, exp, 1);
-
         fmpz_mod_poly_powmod_fmpz_binexp_preinv(b, a, exp, pol, polinv, ctx);
     }
     else
@@ -81,12 +80,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state,
     }
     fmpz_clear(exp);
 
-    fmpz_init(t);
-    fmpz_sub_ui(t, &(b->coeffs[0]), 1);
-    fmpz_mod(t, t, p);
-    fmpz_mod_poly_set_coeff_fmpz(b, 0, t, ctx);
-    fmpz_clear(t);
-
+    fmpz_mod_poly_sub_si(b, b, 1, ctx);
     fmpz_mod_poly_gcd(factor, b, pol, ctx);
 
     if ((factor->length <= 1) || (factor->length == pol->length))
