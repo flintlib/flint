@@ -342,6 +342,7 @@ test_printing()
     frandxx state;
     fmpz_modxx_ctx M(7);
     fmpz_mod_polyxx f = fmpz_mod_polyxx::randtest(M, state, 4);
+    test_print_read(f);
     f.set_zero();
     f.set_coeff(0, 3);
     f.set_coeff(1, 1);

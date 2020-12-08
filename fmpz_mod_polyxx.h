@@ -522,7 +522,9 @@ FLINT_DEFINE_PRINT_COND(FMPZ_MOD_POLYXX_COND_S,
 FLINT_DEFINE_PRINT_PRETTY_COND_2(FMPZ_MOD_POLYXX_COND_S, const char*,
     fmpz_mod_poly_fprint_pretty(to, from._poly(), extra, from._ctx()))
 
-//fread is illegal because the ctx is read-only
+// be careful with fread as it writes to the possibly shared ctx
+FLINT_DEFINE_READ_COND(FMPZ_MOD_POLYXX_COND_T,
+    fmpz_mod_poly_fread(from, to._poly(), to._ctx()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(plus,
     fmpz_mod_polyxx, FMPZ_MOD_POLYXX_COND_S, FMPZ_MOD_POLYXX_COND_S,
