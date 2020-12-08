@@ -20,9 +20,9 @@
 using namespace flint;
 
 void
-test_init()
+test_init(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(2003);
+    M.set_modulus(2003);
     fmpz_mod_polyxx p(M);
     tassert(p.length() == 0);
     tassert(p.modulus() == 2003);
@@ -30,9 +30,9 @@ test_init()
 }
 
 void
-test_manipulation()
+test_manipulation(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_polyxx p(M), q(M);
     p.set_coeff(5, 17u + M.modulus());
     tassert(p.degree() == 5);
@@ -54,9 +54,9 @@ test_manipulation()
 }
 
 void
-test_assignment()
+test_assignment(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(31);
+    M.set_modulus(31);
     fmpz_mod_polyxx p(M), q(M);
     p.set_coeff(0, 1);
     tassert(p != q);
@@ -65,9 +65,9 @@ test_assignment()
 }
 
 void
-test_conversion()
+test_conversion(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_polyxx p(M);
 
     p = 4u + 1031;
@@ -87,9 +87,9 @@ test_conversion()
 }
 
 void
-test_arithmetic()
+test_arithmetic(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_polyxx g(M), h(M);
     g.set_coeff(0, 17); h.set_coeff(0, 15u + M.modulus());
     tassert((g + h).get_coeff(0) == 15 + 17);
@@ -131,9 +131,9 @@ test_arithmetic()
 }
 
 void
-test_functions()
+test_functions(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_polyxx g(M), res(M);
 
     g.set_coeff(5, 15);
@@ -245,9 +245,9 @@ bool equiv_fac(const fmpz_mod_poly_factorxx& fac1,
             && fac1.p(1) == fac2.p(0);
 }
 void
-test_factoring()
+test_factoring(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(fmpzxx(1031));
+    M.set_modulus(1031);
     fmpz_mod_polyxx f(M), g(M);
     frandxx state;
     f.set_randtest_irreducible(state, 4); f = f.make_monic();
@@ -294,10 +294,10 @@ test_factoring()
 }
 
 void
-test_randomisation()
+test_randomisation(fmpz_modxx_ctx& M)
 {
     frandxx state, state2;
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_polyxx p(M);
 
     p.set_randtest(state, 10);
@@ -309,9 +309,9 @@ test_randomisation()
 }
 
 void
-test_radix()
+test_radix(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_poly_vecxx v1(10, M), v2(10, M);
     v1[0].set_coeff(7, 1);
     tassert(v1 != v2);
@@ -337,10 +337,10 @@ test_radix()
 }
 
 void
-test_printing()
+test_printing(fmpz_modxx_ctx& M)
 {
     frandxx state;
-    fmpz_modxx_ctx M(7);
+    M.set_modulus(7);
     fmpz_mod_polyxx f = fmpz_mod_polyxx::randtest(M, state, 4);
     test_print_read(f);
     f.set_zero();
@@ -350,9 +350,9 @@ test_printing()
 }
 
 void
-test_unified_access()
+test_unified_access(fmpz_modxx_ctx& M)
 {
-    fmpz_modxx_ctx M(1031);
+    M.set_modulus(1031);
     fmpz_mod_polyxx p(M);
     p.set_coeff(0, 1);
     const fmpz_mod_polyxx& q = p;
@@ -363,18 +363,19 @@ int
 main()
 {
     std::cout << "fmpz_mod_polyxx....";
+    fmpz_modxx_ctx M(2);
 
-    test_init();
-    test_manipulation();
-    test_assignment();
-    test_conversion();
-    test_arithmetic();
-    test_functions();
-    test_factoring();
-    test_randomisation();
-    test_radix();
-    test_printing();
-    test_unified_access();
+    test_init(M);
+    test_manipulation(M);
+    test_assignment(M);
+    test_conversion(M);
+    test_arithmetic(M);
+    test_functions(M);
+    test_factoring(M);
+    test_randomisation(M);
+    test_radix(M);
+    test_printing(M);
+    test_unified_access(M);
 
     std::cout << "PASS" << std::endl;
     return 0;

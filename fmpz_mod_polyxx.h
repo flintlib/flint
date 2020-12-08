@@ -56,6 +56,16 @@ public:
     }
 
     ~fmpz_modxx_ctx() {fmpz_mod_ctx_clear(ctx);}
+
+    void set_modulus(fmpzxx_srcref p)
+    {
+        fmpz_mod_ctx_set_modulus(ctx, p._fmpz());
+    }
+
+    void set_modulus(ulong p)
+    {
+        fmpz_mod_ctx_set_modulus_ui(ctx, p);
+    }
 };
 
 class fmpz_modxx_ctx_srcref
