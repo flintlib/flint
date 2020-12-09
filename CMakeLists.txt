@@ -5,6 +5,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckPrototypeDefinition)
 include(CheckCCompilerFlag)
+include(CheckCSourceRuns)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
@@ -35,15 +36,24 @@ if (WITH_NTL)
 endif()
 find_package(PythonInterp REQUIRED)
 
+find_package(BLAS)
+set(FLINT_USES_BLAS ${BLAS_FOUND})
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  set(FLINT_WANT_ASSERT ON)
+endif()
+
+# pthread configuration
+
 if(MSVC)
     find_package(PThreads REQUIRED)
-    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use thread local storage.")
+    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 else()
     option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
     option(THREADS_PREFER_PTHREAD_FLAG "Prefer -pthread flag" yes)
     find_package(Threads REQUIRED)
     set(PThreads_LIBRARIES Threads::Threads)
-    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use thread local storage.")
+    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
 # Find sources
@@ -114,14 +124,24 @@ with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
 )
 configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
 
-# setup for flint-config.h
-check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
+# Setup for flint-config.h
+check_c_compiler_flag("-mpopcnt" FLINT_USES_POPCNT)
 check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
 
+# fenv configuration
+check_c_source_compiles([[#include <fenv.h>
+  #ifndef FE_DOWNWARD
+  # error FE_DOWNWARD not available
+  #endif
+  void main(){};]] FLINT_USES_FENV)
+
+# cpu_set_t configuration
 check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" FLINT_USES_CPUSET)
 
-set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
+# Thread-local storage configuration
+check_c_source_runs([[__thread int x = 42; int main(int argc, char ** argv) { return x != 42; }]] FLINT_USES_TLS)
 
+# Memory manager configuration
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 
@@ -131,6 +151,7 @@ else()
 	set(FLINT_REENTRANT OFF)
 endif()
 
+# Populate headers
 configure_file(
     config.h.in
     flint-config.h
@@ -197,7 +218,7 @@ if(BUILD_SHARED_LIBS AND WIN32)
     target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
-if (HAS_FLAG_MPOPCNT)
+if (FLINT_USES_MPOPCNT)
     target_compile_options(flint PUBLIC "-mpopcnt")
 endif()
 if (HAS_FLAG_UNROLL_LOOPS)
