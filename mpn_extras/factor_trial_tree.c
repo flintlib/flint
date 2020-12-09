@@ -147,6 +147,12 @@ int flint_mpn_factor_trial_tree(slong * factors,
 
     MPN_NORM(_factor_trial_tree[m] + 0, n);
 
+    if (n == 0) /* nothing to be done */
+    {
+        flint_free(gtemp);
+        return 0;
+    }
+    
     rlimbs[m] = flint_mpn_gcd_full2(gtemp, x, xsize,
 		                                   _factor_trial_tree[m] + 0, n, temp);
 
