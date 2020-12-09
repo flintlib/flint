@@ -692,8 +692,9 @@ printf "%s" "$MSG"
 printf "%s" "$MSG" >> config.log
 echo "#define _GNU_SOURCE
 #include <sched.h>
-int main(){cpu_set_t s;CPU_ZERO(&s);return 0;}" > build/test-cpu_set_t.c
-$CC build/test-cpu_set_t.c -o ./build/test-cpu_set_t > /dev/null 2>&1
+#include <pthread.h>
+int main(){cpu_set_t s;CPU_ZERO(&s); pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), 0); return 0;}" > build/test-cpu_set_t.c
+$CC build/test-cpu_set_t.c -lpthread -o ./build/test-cpu_set_t > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     rm -f build/test-cpu_set_t
     printf "%s\n" "yes"
