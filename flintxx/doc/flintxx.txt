@@ -3514,7 +3514,30 @@ Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu_precomp(
 
     fmpz\_mod\_polyxx
 
+    The type \code{fmpz_mod_polyxx} wraps \code{fmpz_mod_poly}.
+    Every instance of \code{fmpz_mod_poly} contains a reference to a context
+    \code{fmpz_mod_ctx}. The only polynomial operation that can change the
+    context object is \code{read}.
+
 *******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Context
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_modxx_ctx::fmpz_modxx_ctx(Fmpz_src n)
+fmpz_modxx_ctx::fmpz_modxx_ctx(ulong n)
+
+    Initialize a context for the integers modulo \code{n}.
+
+fmpz_modxx_ctx::set_modulus(Fmpz_src n)
+fmpz_modxx_ctx::set_modulus(ulong n)
+
+    Change the modulus of the context.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Operations
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpz_mod_poly_expr::unary operation() const
 
@@ -3571,8 +3594,8 @@ read(FILE*, Fmpz_mod_poly_target)
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n)
-fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n, slong alloc)
+fmpz_mod_polyxx::fmpz_mod_polyxx(fmpz_modxx_ctx_srcref)
+fmpz_mod_polyxx::fmpz_mod_polyxx(fmpz_modxx_ctx_srcref, slong alloc)
 
 void Fmpz_mod_poly_target realloc(slong alloc)
 void Fmpz_mod_poly_target::fit_length(slong len)
@@ -3802,7 +3825,7 @@ bool Fmpz_mod_poly_expr::is_irreducible_ddf() const
 bool Fmpz_mod_poly_expr::is_irreducible_rabin() const
 slong Fmpz_mod_poly_target::remove(Fmpz_mod_poly_expr)
 
-fmpz_mod_poly_factorxx::nmod_poly_factorxx()
+fmpz_mod_poly_factorxx::fmpz_poly_factorxx(fmpz_modxx_ctx_srcref)
 
     Initialise an empty factorisation.
 
@@ -3823,7 +3846,6 @@ slong& fmpz_mod_poly_factorxx::exp(slong i)
 
     Obtain the exponent of the ith factor.
 
-fmpz_mod_polyxx_srcref nmod_poly_factorxx::p(slong i) const
 fmpz_mod_polyxx_ref nmod_poly_factorxx::p(slong i)
 
     Obtain the ith factor.
