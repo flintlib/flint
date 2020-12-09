@@ -10,7 +10,7 @@
 /* Define if you cpu_set_t in sched.h */
 #cmakedefine01 FLINT_USES_CPUSET
 
-#cmakedefine FLINT_USES_PTHREAD 1
+#cmakedefine01 FLINT_USES_PTHREAD
 
 #ifdef _MSC_VER
 #define access _access

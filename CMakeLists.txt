@@ -37,11 +37,13 @@ find_package(PythonInterp REQUIRED)
 
 if(MSVC)
     find_package(PThreads REQUIRED)
+    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use thread local storage.")
 else()
     option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
     option(THREADS_PREFER_PTHREAD_FLAG "Prefer -pthread flag" yes)
     find_package(Threads REQUIRED)
     set(PThreads_LIBRARIES Threads::Threads)
+    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use thread local storage.")
 endif()
 
 # Find sources
