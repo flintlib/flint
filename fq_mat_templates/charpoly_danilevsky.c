@@ -14,12 +14,13 @@
 
 void
 TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p, 
-                      const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
+                      const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx)
 {
-   slong n = A->r, i, j, k;
+   slong n = M->r, i, j, k;
    TEMPLATE(T, struct) * V, * W, * T;
    TEMPLATE(T, poly_t) b;
    TEMPLATE(T, t) c, h;
+   TEMPLATE(T, mat_t) A;
    
    if (n == 0)
    {
@@ -33,7 +34,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
    {
       TEMPLATE(T, set_ui) (c, 1, ctx); 
       TEMPLATE(T, poly_set_coeff) (p, 1, c, ctx);
-      TEMPLATE(T, neg) (c, TEMPLATE(T, mat_entry) (A, 0, 0), ctx);
+      TEMPLATE(T, neg) (c, TEMPLATE(T, mat_entry) (M, 0, 0), ctx);
       TEMPLATE(T, poly_set_coeff) (p, 0, c, ctx);
       _TEMPLATE(T, poly_set_length) (p, 2, ctx);
       TEMPLATE(T, clear) (c, ctx);
@@ -44,6 +45,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
    TEMPLATE(T, init) (h, ctx);
    TEMPLATE(T, poly_one) (p, ctx);
    TEMPLATE(T, poly_init) (b, ctx);
+   TEMPLATE(T, mat_init_set) (A, M, ctx);
    V = (TEMPLATE(T, struct) *) _TEMPLATE(T, vec_init) (n, ctx);
    W = (TEMPLATE(T, struct) *) _TEMPLATE(T, vec_init) (n, ctx);
    T = (TEMPLATE(T, struct) *) _TEMPLATE(T, vec_init) (n, ctx);
@@ -189,6 +191,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
  
 cleanup:
   
+   TEMPLATE(T, mat_clear) (A, ctx);
    TEMPLATE(T, clear) (c, ctx);
    TEMPLATE(T, clear) (h, ctx);
    TEMPLATE(T, poly_clear) (b, ctx);

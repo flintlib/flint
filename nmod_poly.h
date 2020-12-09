@@ -1411,20 +1411,7 @@ FLINT_DLL void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
 NMOD_POLY_INLINE
 void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
 {
-   nmod_mat_t A;
-
-   nmod_mat_init(A, M->r, M->c, p->mod.n);
-   nmod_mat_set(A, M);
-
-   if (A->r != A->c)
-   {
-       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
-   }
-
-   nmod_mat_charpoly_danilevsky(p, A);
-
-   nmod_mat_clear(A);
+   nmod_mat_charpoly_danilevsky(p, M);
 }
 
 FLINT_DLL void nmod_mat_minpoly_with_gens(nmod_poly_t p, 
