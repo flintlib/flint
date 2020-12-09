@@ -619,7 +619,6 @@ Transforms
 Characteristic polynomial
 --------------------------------------------------------------------------------
 
-
 .. function:: void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix

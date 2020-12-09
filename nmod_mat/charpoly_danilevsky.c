@@ -19,14 +19,19 @@
 void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
 {
    slong n = M->r, i, j, k;
-   ulong ** A = M->rows;
+   ulong ** A;
    ulong * V, * W, * T;
    ulong h;
    nmod_poly_t b;
+   nmod_mat_t M2;
    int num_limbs;
    TMP_INIT;
 
-   TMP_START;
+   if (M->r != M->c)
+   {
+      flint_printf("Exception (nmod_mat_charpoly_danilevsky).  Non-square matrix.\n");
+      flint_abort();
+   }
 
    if (n == 0)
    {
@@ -37,18 +42,22 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
    if (n == 1)
    {
       nmod_poly_set_coeff_ui(p, 1, 1);
-      nmod_poly_set_coeff_ui(p, 0, n_negmod(A[0][0], p->mod.n));
+      nmod_poly_set_coeff_ui(p, 0, n_negmod(M->rows[0][0], p->mod.n));
       _nmod_poly_set_length(p, 2);
       return;
    }
 
+   TMP_START;
+   
    i = 1;
    num_limbs = _nmod_vec_dot_bound_limbs(n, p->mod);
    nmod_poly_one(p);
    nmod_poly_init(b, p->mod.n);
+   nmod_mat_init_set(M2, M);
    V = (ulong *) TMP_ALLOC(n*sizeof(ulong));
    W = (ulong *) TMP_ALLOC(n*sizeof(ulong));
    T = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+   A = M2->rows;
 
    while (i < n)
    {
@@ -153,6 +162,8 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
  
 cleanup:
   
+   nmod_mat_clear(M2);
    nmod_poly_clear(b);
    TMP_END;
 }
+
