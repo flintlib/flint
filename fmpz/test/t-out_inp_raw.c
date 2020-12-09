@@ -10,6 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+/* try to get fdopen declared */
+#if defined __STRICT_ANSI__
+#undef __STRICT_ANSI__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with standard libraries */
 #include <sys/types.h>

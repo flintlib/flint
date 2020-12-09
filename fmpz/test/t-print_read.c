@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+/* try to get fdopen declared */
+#if defined __STRICT_ANSI__
+#undef __STRICT_ANSI__
+#endif
+
 #include <sys/types.h>
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 #include <unistd.h>
