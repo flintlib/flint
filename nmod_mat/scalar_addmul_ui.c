@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 
 void
-nmod_mat_scalar_addmul(nmod_mat_t dest, const nmod_mat_t X,
+nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X,
                                           const nmod_mat_t Y, const mp_limb_t b)
 {
     slong i, j;

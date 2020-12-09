@@ -56,18 +56,18 @@ nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t po
 
     for (i = 0; i < rem; i++)
     {
-        nmod_mat_scalar_addmul(dest, dest,
+        nmod_mat_scalar_addmul_ui(dest, dest,
                                 temp[i], poly->coeffs[poly->length - rem + i]);
     }
 
     for (i = 0; i < quo; i++)
     {
         nmod_mat_mul(tmat, dest, temp[lim]);
-        nmod_mat_scalar_addmul(dest, tmat, temp[lim - 1], poly->coeffs[curr--]);
+        nmod_mat_scalar_addmul_ui(dest, tmat, temp[lim - 1], poly->coeffs[curr--]);
 
         for (j = 1; j < lim; j++)
         {
-            nmod_mat_scalar_addmul(dest, dest, temp[lim - 1 - j],
+            nmod_mat_scalar_addmul_ui(dest, dest, temp[lim - 1 - j],
                                                           poly->coeffs[curr--]);
         }
     }
