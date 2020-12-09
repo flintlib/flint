@@ -262,9 +262,9 @@ Matrix-scalar arithmetic
     Sets `B = cA`, where the scalar `c` is assumed to be reduced
     modulo the modulus. Dimensions of `A` and `B` must be identical.
 
-.. function:: void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b, const nmod_mat_t Y)
+.. function:: void nmod_mat_scalar_addmul(nmod_mat_t dest, const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b)
 
-    Sets `dest = X + bY`, where the scalar `c` is assumed to be reduced
+    Sets `dest = X + bY`, where the scalar `b` is assumed to be reduced
     modulo the modulus. Dimensions of dest, X and Y must be identical.
     dest can be aliased with X or Y.
 

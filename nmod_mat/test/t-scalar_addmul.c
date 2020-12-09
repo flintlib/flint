@@ -19,8 +19,7 @@ main(void)
     mp_limb_t x;
     FLINT_TEST_INIT(state);
     
-
-    flint_printf("scaler_mul_add....");
+    flint_printf("scalar_addmul....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -42,7 +41,7 @@ main(void)
 
         nmod_mat_scalar_mul(C, A, x);
         nmod_mat_add(C, B, C);
-        nmod_mat_scalar_mul_add(D, B, x, A);
+        nmod_mat_scalar_addmul(D, B, A, x);
 
         if (!nmod_mat_equal(C, D))
         {

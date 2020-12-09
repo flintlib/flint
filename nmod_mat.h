@@ -154,8 +154,18 @@ FLINT_DLL void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 /* Matrix-scalar arithmetic */
 
 FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
-FLINT_DLL void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
-                                const mp_limb_t b, const nmod_mat_t Y);
+FLINT_DLL void nmod_mat_scalar_addmul(nmod_mat_t dest,
+                       const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
+
+NMOD_MAT_INLINE
+void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
+                                const mp_limb_t b, const nmod_mat_t Y)
+{
+    flint_printf("WARNING: nmod_mat_scalar_mul_add is deprecated. "
+                 "Please use nmod_mat_scalar_addmul\n");
+    nmod_mat_scalar_addmul(dest, X, Y, b);
+}
+
 NMOD_MAT_INLINE
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
 {
@@ -165,7 +175,6 @@ void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c
     nmod_mat_scalar_mul(res, M, fmpz_get_ui(d));
     fmpz_clear(d);
 }
-
 
 /* Matrix multiplication */
 
