@@ -1239,7 +1239,7 @@ v 2.6.3 -- 12 Aug 2020
 
 2.7.0 -- 11 Dec 2020
 
- * Multivariate factorisation and irreducibility testing
+ * Multivariate factorisation
  * Square root and square testing for finite fields
  * Square root and square testing for multivariates
  * Zassenhaus factoring speedups (incl. degree pruning)
