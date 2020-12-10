@@ -36,8 +36,8 @@ if (WITH_NTL)
 endif()
 find_package(PythonInterp REQUIRED)
 
-find_package(BLAS)
-set(FLINT_USES_BLAS ${BLAS_FOUND})
+find_package(CBLAS)
+set(FLINT_USES_BLAS ${CBLAS_FOUND})
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
   set(FLINT_WANT_ASSERT ON)
@@ -202,6 +202,10 @@ target_link_libraries(flint PUBLIC
     ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
 )
 
+if(FLINT_USES_BLAS)
+    target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
+endif()
+
 # Include directories
 
 target_include_directories(flint PUBLIC 
@@ -210,6 +214,9 @@ target_include_directories(flint PUBLIC
     ${NTL_INCLUDE_DIR}
 )
 
+if(FLINT_USES_BLAS)
+    target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
+endif()
 
 if(BUILD_SHARED_LIBS AND WIN32)
     # Export flint's functions
