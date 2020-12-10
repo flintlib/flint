@@ -1237,3 +1237,15 @@ v 2.6.3 -- 12 Aug 2020
  * Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
  * Fix some old license headers
 
+2.7.0 -- 11 Dec 2020
+
+ * Multivariate factorisation and irreducibility testing
+ * Square root and square testing for finite fields
+ * Square root and square testing for multivariates
+ * Zassenhaus factoring speedups (incl. degree pruning)
+ * Fast factorisation of cubic univariate polynomials
+ * Add context objects to fmpz_mod_poly functions
+ * Use BLAS for matrix multiplication over Z/nZ (small n)
+ * Linear solving for non-square/singular matrices (can_solve)
+ * Speed up factorisation over Z/nZ (for multiprecision n)
+
