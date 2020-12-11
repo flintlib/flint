@@ -125,8 +125,21 @@ with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
 configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
 
 # Setup for flint-config.h
-check_c_compiler_flag("-mpopcnt" FLINT_USES_POPCNT)
+check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
 check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
+
+if(HAS_FLAG_MPOPCNT)
+  set(CMAKE_REQUIRED_FLAGS "-mpopcnt")
+endif()
+# Testing __builtin_popcountl...
+check_c_source_runs([[int main(int argc, char ** argv) {
+  #if defined(_WIN64)
+  return __builtin_popcountll(argc) == 100;
+  #else
+  return __builtin_popcountl(argc) == 100;
+  #endif
+  }]] FLINT_USES_POPCNT)
+unset(CMAKE_REQUIRED_FLAGS)
 
 # fenv configuration
 check_c_source_compiles([[#include <fenv.h>
@@ -225,7 +238,7 @@ if(BUILD_SHARED_LIBS AND WIN32)
     target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
-if (FLINT_USES_MPOPCNT)
+if (HAS_FLAG_MPOPCNT)
     target_compile_options(flint PUBLIC "-mpopcnt")
 endif()
 if (HAS_FLAG_UNROLL_LOOPS)
