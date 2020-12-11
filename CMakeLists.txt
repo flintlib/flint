@@ -149,7 +149,14 @@ check_c_source_compiles([[#include <fenv.h>
   void main(){};]] FLINT_USES_FENV)
 
 # cpu_set_t configuration
-check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" FLINT_USES_CPUSET)
+set(CMAKE_REQUIRED_FLAGS "${PThreads_LIBRARIES}")
+check_c_source_compiles([[#define _GNU_SOURCE
+  #include <sched.h>
+  #include <pthread.h>
+  int main() { cpu_set_t s; CPU_ZERO(&s);
+  pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), 0);
+  return 0; }]] FLINT_USES_CPUSET)
+unset(CMAKE_REQUIRED_FLAGS)
 
 # Thread-local storage configuration
 check_c_source_runs([[__thread int x = 42; int main(int argc, char ** argv) { return x != 42; }]] FLINT_USES_TLS)
@@ -157,6 +164,7 @@ check_c_source_runs([[__thread int x = 42; int main(int argc, char ** argv) { re
 # Memory manager configuration
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
+message(STATUS "Using FLINT memory manager: ${MEMORY_MANAGER}")
 
 if(MEMORY_MANAGER STREQUAL "reentrant")
 	set(FLINT_REENTRANT ON)
