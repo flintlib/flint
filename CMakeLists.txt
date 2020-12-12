@@ -159,7 +159,8 @@ check_c_source_compiles([[#define _GNU_SOURCE
 unset(CMAKE_REQUIRED_FLAGS)
 
 # Thread-local storage configuration
-check_c_source_runs([[__thread int x = 42; int main(int argc, char ** argv) { return x != 42; }]] FLINT_USES_TLS)
+set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
+#check_c_source_runs([[__thread int x = 42; int main(int argc, char ** argv) { return x != 42; }]] FLINT_USES_TLS)
 
 # Memory manager configuration
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
