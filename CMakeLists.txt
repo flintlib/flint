@@ -159,8 +159,9 @@ check_c_source_compiles([[#define _GNU_SOURCE
 unset(CMAKE_REQUIRED_FLAGS)
 
 # Thread-local storage configuration
-set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
-#check_c_source_runs([[__thread int x = 42; int main(int argc, char ** argv) { return x != 42; }]] FLINT_USES_TLS)
+if(cxx_thread_local IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+  set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
+endif()
 
 # Memory manager configuration
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
