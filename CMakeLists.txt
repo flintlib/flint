@@ -5,6 +5,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckPrototypeDefinition)
 include(CheckCCompilerFlag)
+include(CheckCSourceRuns)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
@@ -35,13 +36,24 @@ if (WITH_NTL)
 endif()
 find_package(PythonInterp REQUIRED)
 
+find_package(CBLAS)
+set(FLINT_USES_BLAS ${CBLAS_FOUND})
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  set(FLINT_WANT_ASSERT ON)
+endif()
+
+# pthread configuration
+
 if(MSVC)
     find_package(PThreads REQUIRED)
+    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 else()
     option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
     option(THREADS_PREFER_PTHREAD_FLAG "Prefer -pthread flag" yes)
     find_package(Threads REQUIRED)
     set(PThreads_LIBRARIES Threads::Threads)
+    set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
 # Find sources
@@ -112,16 +124,49 @@ with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
 )
 configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
 
-# setup for flint-config.h
+# Setup for flint-config.h
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
 check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
 
-check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" FLINT_USES_CPUSET)
+if(HAS_FLAG_MPOPCNT)
+  set(CMAKE_REQUIRED_FLAGS "-mpopcnt")
+endif()
+# Testing __builtin_popcountl...
+check_c_source_runs([[int main(int argc, char ** argv) {
+  #if defined(_WIN64)
+  return __builtin_popcountll(argc) == 100;
+  #else
+  return __builtin_popcountl(argc) == 100;
+  #endif
+  }]] FLINT_USES_POPCNT)
+unset(CMAKE_REQUIRED_FLAGS)
 
-set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
+# fenv configuration
+check_c_source_compiles([[#include <fenv.h>
+  #ifndef FE_DOWNWARD
+  # error FE_DOWNWARD not available
+  #endif
+  void main(){};]] FLINT_USES_FENV)
 
+# cpu_set_t configuration
+set(CMAKE_REQUIRED_FLAGS "${PThreads_LIBRARIES}")
+check_c_source_compiles([[#define _GNU_SOURCE
+  #include <sched.h>
+  #include <pthread.h>
+  int main() { cpu_set_t s; CPU_ZERO(&s);
+  pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), 0);
+  return 0; }]] FLINT_USES_CPUSET)
+unset(CMAKE_REQUIRED_FLAGS)
+
+# Thread-local storage configuration
+if(cxx_thread_local IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+  set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
+endif()
+
+# Memory manager configuration
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
+message(STATUS "Using FLINT memory manager: ${MEMORY_MANAGER}")
 
 if(MEMORY_MANAGER STREQUAL "reentrant")
 	set(FLINT_REENTRANT ON)
@@ -129,6 +174,7 @@ else()
 	set(FLINT_REENTRANT OFF)
 endif()
 
+# Populate headers
 configure_file(
     config.h.in
     flint-config.h
@@ -179,6 +225,10 @@ target_link_libraries(flint PUBLIC
     ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
 )
 
+if(FLINT_USES_BLAS)
+    target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
+endif()
+
 # Include directories
 
 target_include_directories(flint PUBLIC 
@@ -187,6 +237,9 @@ target_include_directories(flint PUBLIC
     ${NTL_INCLUDE_DIR}
 )
 
+if(FLINT_USES_BLAS)
+    target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
+endif()
 
 if(BUILD_SHARED_LIBS AND WIN32)
     # Export flint's functions
