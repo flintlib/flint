@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017-2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 
-slong _nmod_mpoly_derivative(
+static slong _nmod_mpoly_derivative(
     mp_limb_t * coeff1, ulong * exp1,
     const mp_limb_t * coeff2, const ulong * exp2, slong len2,
     flint_bitcnt_t bits,
@@ -23,20 +23,20 @@ slong _nmod_mpoly_derivative(
     nmod_t fctx)
 {
     slong i, len1;
+    ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
 
     /* x^c -> c*x^(c-1) */
     len1 = 0;
     for (i = 0; i < len2; i++)
     {
         mp_limb_t cr;
-        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         ulong c = (exp2[N*i + offset] >> shift) & mask;
         if (c == 0)
             continue;
         NMOD_RED(cr, c, fctx);
-        if (cr == 0)
-            continue;
         coeff1[len1] = nmod_mul(coeff2[i], cr, fctx);
+        if (coeff1[len1] == 0)
+            continue;
         mpoly_monomial_sub(exp1 + N*len1, exp2 + N*i, oneexp, N);
         len1++;
     }
@@ -45,7 +45,7 @@ slong _nmod_mpoly_derivative(
 }
 
 
-slong _nmod_mpoly_derivative_mp(
+static slong _nmod_mpoly_derivative_mp(
     mp_limb_t * coeff1, ulong * exp1,
     const mp_limb_t * coeff2, const ulong * exp2, slong len2,
     flint_bitcnt_t bits,
@@ -55,26 +55,26 @@ slong _nmod_mpoly_derivative_mp(
     nmod_t fctx)
 {
     slong i, len1;
-    fmpz_t c;
-    fmpz_init(c);
+    slong esize = bits/FLINT_BITS;
+    mp_limb_t * t;
+    TMP_INIT;
+
+    TMP_START;
+    t = (mp_limb_t *) TMP_ALLOC(esize*sizeof(mp_limb_t));
 
     /* x^c -> c*x^(c-1) */
     len1 = 0;
     for (i = 0; i < len2; i++)
     {
-        mp_limb_t cr;
-        fmpz_set_ui_array(c, exp2 + N*i + offset, bits/FLINT_BITS);
-        if (fmpz_is_zero(c))
-            continue;
-        cr = fmpz_fdiv_ui(c, fctx.n);
-        if (cr == 0)
-            continue;
+        mp_limb_t cr = mpn_divrem_1(t, 0, exp2 + N*i + offset, esize, fctx.n);
         coeff1[len1] = nmod_mul(coeff2[i], cr, fctx);
+        if (coeff1[len1] == 0)
+            continue;
         mpoly_monomial_sub_mp(exp1 + N*len1, exp2 + N*i, oneexp, N);
         len1++;
     }
 
-    fmpz_clear(c);
+    TMP_END;
 
     return len1;
 }
