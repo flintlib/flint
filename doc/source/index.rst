@@ -60,6 +60,7 @@ Integers
    fmpz_poly_mat.rst
    fmpz_poly_factor.rst
    fmpz_mpoly.rst
+   fmpz_mpoly_factor.rst
    long_extras.rst
    longlong.rst
    mpn_extras.rst
@@ -78,6 +79,7 @@ Rational numbers
    fmpq_vec.rst
    fmpq_mat.rst
    fmpq_poly.rst
+   fmpq_mpoly_factor.rst
    fmpq_mpoly.rst
    fmpz_poly_q.rst
 
@@ -93,6 +95,7 @@ Integers mod n
    nmod_poly_mat.rst
    nmod_poly_factor.rst
    nmod_mpoly.rst
+   nmod_mpoly_factor.rst
    fmpz_mod.rst
    fmpz_mod_poly.rst
    fmpz_mod_poly_factor.rst
@@ -121,6 +124,7 @@ Finite fields
    fq_nmod_poly_factor.rst
    fq_nmod_embed.rst
    fq_nmod_mpoly.rst
+   fq_nmod_mpoly_factor.rst
 
 .. toctree::
    :maxdepth: 1
