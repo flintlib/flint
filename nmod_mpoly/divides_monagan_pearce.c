@@ -46,10 +46,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     q_len = WORD(0);
 
@@ -80,22 +77,20 @@ static int _nmod_mpoly_divides_monagan_pearce1(
         lt_divides = mpoly_monomial_divides1(q_exp + q_len, exp, exp3[0], mask);
 
         acc0 = acc1 = acc2 = 0;
-        do
-        {
+        do {
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-            do
-            {
+            do {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
 
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  WORD(0), WORD(0), fctx.n - coeff2[x->j]);
-                } else
+                }
+                else
                 {
+                    hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
@@ -245,6 +240,8 @@ int _nmod_mpoly_divides_monagan_pearce(
     exps = (ulong *) TMP_ALLOC(len3*N*sizeof(ulong));
     /* list of pointers to available exponent vectors */
     exp_list = (ulong **) TMP_ALLOC(len3*sizeof(ulong *));
+    /* space to save copy of current exponent vector */
+    exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     /* set up list of available exponent vectors */
     exp_next = 0;
     for (i = 0; i < len3; i++)
@@ -255,10 +252,7 @@ int _nmod_mpoly_divides_monagan_pearce(
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     q_len = WORD(0);
 
@@ -280,44 +274,40 @@ int _nmod_mpoly_divides_monagan_pearce(
 
     while (heap_len > 1)
     {
-        exp = heap[1].exp;
+        _nmod_mpoly_fit_length(&q_coeff, &Q->coeffs_alloc,
+                               &q_exp, &Q->exps_alloc, N, q_len + 1);
+
+        mpoly_monomial_set(exp, heap[1].exp, N);
 
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
                 goto not_exact_division;
-        } else
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+        }
+        else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
                 goto not_exact_division;
+            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
         }
 
-        _nmod_mpoly_fit_length(&q_coeff, &Q->coeffs_alloc,
-                               &q_exp, &Q->exps_alloc, N, q_len + 1);
-
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
-
         acc0 = acc1 = acc2 = 0;
-        do
-        {
+        do {
             exp_list[--exp_next] = heap[1].exp;
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do
-            {
+            do {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
 
                 if (x->i == -WORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  WORD(0), WORD(0), fctx.n - coeff2[x->j]);
-                } else
+                }
+                else
                 {
+                    hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);                    
                 }
@@ -366,9 +356,8 @@ int _nmod_mpoly_divides_monagan_pearce(
                         mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                                  q_exp + x->j*N, N);
 
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 /* should we go up? */
                 if (j + 1 == q_len)
@@ -391,9 +380,8 @@ int _nmod_mpoly_divides_monagan_pearce(
                         mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                                  q_exp + x->j*N, N);
 
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -406,8 +394,10 @@ int _nmod_mpoly_divides_monagan_pearce(
         }
 
         if (!lt_divides ||
-                mpoly_monomial_gt(exp2 + N*(len2 - 1), exp, N, cmpmask))
+            mpoly_monomial_gt(exp2 + N*(len2 - 1), exp, N, cmpmask))
+        {
             goto not_exact_division;
+        }
 
         if (s > 1)
         {
@@ -423,9 +413,8 @@ int _nmod_mpoly_divides_monagan_pearce(
             else
                 mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, q_exp + x->j*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;      
         q_len++;

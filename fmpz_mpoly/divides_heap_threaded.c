@@ -1310,6 +1310,8 @@ slong _fmpz_mpoly_divides_stripe(
     i +=  Blen*N*sizeof(ulong);
     exp_list = (ulong **)(S->big_mem + i);
     i +=  Blen*sizeof(ulong *);
+    exp = (ulong *)(S->big_mem + i);
+    i +=  N*sizeof(ulong);
     FLINT_ASSERT(i <= S->big_mem_alloc);
 
     fmpz_init(acc_lg);
@@ -1322,10 +1324,7 @@ slong _fmpz_mpoly_divides_stripe(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     Qlen = WORD(0);
 
@@ -1357,47 +1356,36 @@ slong _fmpz_mpoly_divides_stripe(
 
     while (heap_len > 1)
     {
-        exp = heap[1].exp;
+        _fmpz_mpoly_fit_length(&Qcoeff, &Qexp, &Qalloc, Qlen + 1, N);
+
+        mpoly_monomial_set(exp, heap[1].exp, N);
 
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
-            {
                 goto not_exact_division;
-            }
+            lt_divides = mpoly_monomial_divides(Qexp + N*Qlen, exp,
+                                                         Bexp + N*0, N, mask);
         }
         else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
                 goto not_exact_division;
-            }
+            lt_divides = mpoly_monomial_divides_mp(Qexp + N*Qlen, exp,
+                                                         Bexp + N*0, N, bits);
         }
 
         FLINT_ASSERT(mpoly_monomial_cmp(exp, S->emin, N, S->cmpmask) >= 0);
 
-        _fmpz_mpoly_fit_length(&Qcoeff, &Qexp, &Qalloc, Qlen + 1, N);
-
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(Qexp + N*Qlen, exp,
-                                                         Bexp + N*0, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(Qexp + N*Qlen, exp,
-                                                         Bexp + N*0, N, bits);
-
         if (small)
         {
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
-            do
-            {
+            do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, S->cmpmask);
-                do
-                {
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
 
                     if (x->i == -WORD(1))
                     {
@@ -1405,6 +1393,7 @@ slong _fmpz_mpoly_divides_stripe(
                     }
                     else
                     {
+                        hind[x->i] |= WORD(1);
                         FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[x->i]));
                         FLINT_ASSERT(!COEFF_IS_MPZ(Qcoeff[x->j]));
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm,
@@ -1416,16 +1405,12 @@ slong _fmpz_mpoly_divides_stripe(
         else
         {
             fmpz_zero(acc_lg);
-            do
-            {
+            do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, S->cmpmask);
-                do
-                {
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
 
                     if (x->i == -WORD(1))
                     {
@@ -1433,6 +1418,7 @@ slong _fmpz_mpoly_divides_stripe(
                     }
                     else
                     {
+                        hind[x->i] |= WORD(1);
                         fmpz_submul(acc_lg, Bcoeff + x->i, Qcoeff + x->j);
                     }
                 } while ((x = x->next) != NULL);

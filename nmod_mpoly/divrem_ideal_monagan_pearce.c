@@ -66,9 +66,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
     q_len = (slong *) TMP_ALLOC(Blen*sizeof(slong));
     s = (slong *) TMP_ALLOC(Blen*sizeof(slong));
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     for (w = 0; w < Blen; w++)
     {
@@ -306,9 +304,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     for (w = 0; w < Blen; w++)
     {
