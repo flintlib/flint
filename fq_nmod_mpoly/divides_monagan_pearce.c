@@ -52,10 +52,7 @@ static int _fq_nmod_mpoly_divides_monagan_pearce1(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     Qlen = 0;
 
@@ -285,6 +282,7 @@ int _fq_nmod_mpoly_divides_monagan_pearce(
     store = store_base = (slong *) TMP_ALLOC(2*Blen*sizeof(mpoly_heap_t *));
     exps = (ulong *) TMP_ALLOC(Blen*N*sizeof(ulong));
     exp_list = (ulong **) TMP_ALLOC(Blen*sizeof(ulong *));
+    exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     exp_next = 0;
     for (i = 0; i < Blen; i++)
         exp_list[i] = exps + i*N;
@@ -293,10 +291,7 @@ int _fq_nmod_mpoly_divides_monagan_pearce(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     Qlen = 0;
 
@@ -319,26 +314,23 @@ int _fq_nmod_mpoly_divides_monagan_pearce(
 
     while (heap_len > 1)
     {
-        exp = heap[1].exp;
+        _fq_nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc, d,
+                                  &Qexps, &Q->exps_alloc, N, Qlen + 1);
+
+        mpoly_monomial_set(exp, heap[1].exp, N);
 
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
                 goto not_exact_division;
+            lt_divides = mpoly_monomial_divides(Qexps + N*Qlen, exp, Bexps, N, mask);
         }
         else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
                 goto not_exact_division;
-        }
-
-        _fq_nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc, d,
-                                  &Qexps, &Q->exps_alloc, N, Qlen + 1);
-
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(Qexps + N*Qlen, exp, Bexps, N, mask);
-        else
             lt_divides = mpoly_monomial_divides_mp(Qexps + N*Qlen, exp, Bexps, N, bits);
+        }
 
         _n_fq_zero(Qcoeffs + d*Qlen, d);
         _nmod_vec_zero(t, 6*d);

@@ -172,10 +172,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     /* quotient and remainder poly indices start at -1 */
     Qlen = WORD(0);
@@ -207,15 +204,11 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
         lt_divides = mpoly_monomial_divides1(Qexps + Qlen, exp, Bexps[0], mask);
 
         acc0 = acc1 = acc2 = 0;
-        do
-        {
+        do {
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-            do
-            {
+            do {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
 
                 if (x->i == -WORD(1))
                 {
@@ -224,6 +217,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
                 }
                 else
                 {
+                    hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, Bcoeffs[x->i], Qcoeffs[x->j]);
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, UWORD(0), pp1, pp0);
                 }
@@ -411,10 +405,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     Qlen = WORD(0);
     Rlen = WORD(0);
@@ -457,12 +448,10 @@ static int _nmod_mpoly_divrem_monagan_pearce(
         }
 
         acc0 = acc1 = acc2 = 0;
-        do
-        {
+        do {
             exp_list[--exp_next] = heap[1].exp;
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do
-            {
+            do {
                 *store++ = x->i;
                 *store++ = x->j;
 

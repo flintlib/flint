@@ -27,22 +27,16 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
     mpoly_nheap_t ** chains;
     slong ** hinds;
     mpoly_nheap_t * x;
-
     ulong exp, texp;
     ulong mask;
-
     fmpz ** qs, * rs;
     slong * qs_alloc, rs_alloc;
     slong * q_len, * s;
-
     fmpz * r_coeff = *polyr;
     ulong * r_exp = *expr;
     slong r_len;
-
     fmpz_t ns, gcd, acc_lg, tp;
-
     TMP_INIT;
-
 
     TMP_START;
 
@@ -85,9 +79,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
     store = store_base = (slong *) TMP_ALLOC(3*len3*sizeof(slong));
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     x = chains[0] + 0;
     x->i = -WORD(1);
@@ -95,7 +87,6 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
     x->p = -WORD(1);
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
-
 
     while (heap_len > 1)
     {
@@ -313,22 +304,17 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
     mpoly_nheap_t ** chains;
     slong ** hinds;
     mpoly_nheap_t * x;
-
     ulong * exp, * exps, * texp;
     ulong ** exp_list;
     slong exp_next;
     ulong mask;
-
     fmpz ** qs, * rs;
     slong * qs_alloc, rs_alloc;
     slong * q_len, * s;
-
     fmpz * r_coeff = *polyr;
     ulong * r_exp = *expr;
     slong r_len;
-
     fmpz_t ns, gcd, acc_lg, tp;
-
     TMP_INIT;
 
     if (N == 1)
@@ -384,9 +370,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
    
     x = chains[0] + 0;
     x->i = -WORD(1);
@@ -410,7 +394,6 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
                 goto exp_overflow;
-
         }
 
         fmpz_zero(acc_lg);

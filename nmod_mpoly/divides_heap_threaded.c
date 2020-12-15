@@ -1099,6 +1099,8 @@ static int _nmod_mpoly_divides_stripe(
     i +=  Blen*N*sizeof(ulong);
     exp_list = (ulong **)(S->big_mem + i);
     i +=  Blen*sizeof(ulong *);
+    exp = (ulong *)(S->big_mem + i);
+    i +=  N*sizeof(ulong);
     FLINT_ASSERT(i <= S->big_mem_alloc);
 
     exp_next = 0;
@@ -1108,10 +1110,7 @@ static int _nmod_mpoly_divides_stripe(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     Qlen = WORD(0);
 
@@ -1136,7 +1135,7 @@ static int _nmod_mpoly_divides_stripe(
         _nmod_mpoly_fit_length(&Qcoeff, &Q->coeffs_alloc,
                                &Qexp, &Q->exps_alloc, N, Qlen + 1);
 
-        exp = heap[1].exp;
+        mpoly_monomial_set(exp, heap[1].exp, N);
 
         if (bits <= FLINT_BITS)
         {
@@ -1160,8 +1159,6 @@ static int _nmod_mpoly_divides_stripe(
             do {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
 
                 if (x->i == -WORD(1))
                 {
@@ -1170,6 +1167,7 @@ static int _nmod_mpoly_divides_stripe(
                 }
                 else
                 {
+                    hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, Bcoeff[x->i], Qcoeff[x->j]);
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);                    
                 }

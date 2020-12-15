@@ -11,7 +11,7 @@
 
 #include "fq_zech_mpoly.h"
 
-slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
+static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
                   fq_zech_struct ** polyq,      ulong ** expq, slong * allocq,
                   fq_zech_struct ** polyr,      ulong ** expr, slong * allocr,
             const fq_zech_struct * coeff2, const ulong * exp2, slong len2,
@@ -64,10 +64,7 @@ slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     q_len = WORD(0);
     r_len = WORD(0);
@@ -90,33 +87,28 @@ slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
    
     while (heap_len > 1)
     {
+        _fq_zech_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N, fqctx);
+
         mpoly_monomial_set(exp, heap[1].exp, N);
 
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
                 goto exp_overflow2;
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
         }
         else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
                 goto exp_overflow2;
-        }
-      
-        _fq_zech_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N, fqctx);
-
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
-        else
             lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
+        }
 
         fq_zech_zero(q_coeff + q_len, fqctx);
-        do
-        {
+        do {
             exp_list[--exp_next] = heap[1].exp;
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do
-            {
+            do {
                 *store++ = x->i;
                 *store++ = x->j;
                 if (x->i != -WORD(1))

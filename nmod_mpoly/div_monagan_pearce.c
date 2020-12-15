@@ -46,10 +46,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     q_len = WORD(0);
 
@@ -283,10 +280,7 @@ static int _nmod_mpoly_div_monagan_pearce(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     q_len = WORD(0);
    
@@ -355,23 +349,21 @@ static int _nmod_mpoly_div_monagan_pearce(
         }
         else
         {
-            do
-            {
+            do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-                do
-                {
+                do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
 
                     if (x->i == -WORD(1))
                     {
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                      WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);
-                    } else
+                    }
+                    else
                     {
+                        hind[x->i] |= WORD(1);
                         umul_ppmm(pp1, pp0, Bcoeffs[x->i], Qcoeffs[x->j]);
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                     }

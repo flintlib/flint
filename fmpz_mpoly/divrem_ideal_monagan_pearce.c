@@ -52,7 +52,6 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
 
     TMP_START;
 
-
     fmpz_init(q);
     fmpz_init(qc);
 
@@ -86,9 +85,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
     ub = (ulong *) TMP_ALLOC(len*sizeof(ulong));
     mb = (fmpz * ) TMP_ALLOC(len*sizeof(fmpz));
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     for (w = 0; w < len; w++)
     {
@@ -408,9 +405,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     for (w = 0; w < len; w++)
     {
