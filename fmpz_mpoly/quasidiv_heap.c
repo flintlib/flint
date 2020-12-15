@@ -69,10 +69,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
@@ -449,10 +446,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;

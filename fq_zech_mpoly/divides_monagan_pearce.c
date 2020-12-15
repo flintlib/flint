@@ -11,7 +11,7 @@
 
 #include "fq_zech_mpoly.h"
 
-slong _fq_zech_mpoly_divides_monagan_pearce(
+static slong _fq_zech_mpoly_divides_monagan_pearce(
                      fq_zech_struct ** coeff1,      ulong ** exp1, slong * alloc,
                 const fq_zech_struct * coeff2, const ulong * exp2, slong len2,
                 const fq_zech_struct * coeff3, const ulong * exp3, slong len3,
@@ -48,6 +48,8 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
     exps = (ulong *) TMP_ALLOC(len3*N*sizeof(ulong));
     /* list of pointers to available exponent vectors */
     exp_list = (ulong **) TMP_ALLOC(len3*sizeof(ulong *));
+    /* space to save copy of current exponent vector */
+    exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     /* set up list of available exponent vectors */
     exp_next = 0;
     for (i = 0; i < len3; i++)
@@ -58,10 +60,7 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     q_len = WORD(0);
 
@@ -84,42 +83,38 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
 
     while (heap_len > 1)
     {
-        exp = heap[1].exp;
+        _fq_zech_mpoly_fit_length(&q_coeff, &q_exp, alloc, q_len + 1, N, fqctx);
+
+        mpoly_monomial_set(exp, heap[1].exp, N);
 
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
                 goto not_exact_division;
-        } else
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+        }
+        else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
                 goto not_exact_division;
+            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
         }
 
-        _fq_zech_mpoly_fit_length(&q_coeff, &q_exp, alloc, q_len + 1, N, fqctx);
-
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
-
         fq_zech_zero(q_coeff + q_len, fqctx);
-        do
-        {
+        do {
             exp_list[--exp_next] = heap[1].exp;
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do
-            {
+            do {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
 
                 if (x->i == -WORD(1))
                 {
                     fq_zech_sub(q_coeff + q_len, q_coeff + q_len, coeff2 + x->j, fqctx);
-                } else
+                }
+                else
                 {
+                    hind[x->i] |= WORD(1);
                     fq_zech_mul(pp, coeff3 + x->i, q_coeff + x->j, fqctx);
                     fq_zech_add(q_coeff + q_len, q_coeff + q_len, pp, fqctx);
                 }
@@ -142,9 +137,8 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -166,10 +160,10 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
                         mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                                  q_exp + x->j*N, N);
 
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
+
                 /* should we go up? */
                 if (j + 1 == q_len)
                 {
@@ -191,9 +185,8 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
                         mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                                  q_exp + x->j*N, N);
 
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -206,8 +199,10 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
         }
 
         if (!lt_divides ||
-                mpoly_monomial_gt(exp2 + N*(len2 - 1), exp, N, cmpmask))
+            mpoly_monomial_gt(exp2 + N*(len2 - 1), exp, N, cmpmask))
+        {
             goto not_exact_division;
+        }
 
         if (s > 1)
         {
@@ -223,9 +218,8 @@ slong _fq_zech_mpoly_divides_monagan_pearce(
             else
                 mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, q_exp + x->j*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;      
         q_len++;

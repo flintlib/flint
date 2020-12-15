@@ -81,10 +81,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     /* quotient and remainder poly indices start at -1 */
     q_len = WORD(0);
@@ -421,10 +418,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     /* quotient and remainder poly indices start at -1 */
     q_len = WORD(0);
