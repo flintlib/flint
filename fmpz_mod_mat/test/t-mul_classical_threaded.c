@@ -24,6 +24,10 @@ main(void)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     slong i, max_threads = 5;
+    slong tmul = 1000;
+#ifdef _WIN32
+    tmul = 50;
+#endif
 #endif
     FLINT_TEST_INIT(state);
 
@@ -31,7 +35,7 @@ main(void)
     fflush(stdout);
 
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mod_mat_t A, B, C, D;
         fmpz_t mod;
