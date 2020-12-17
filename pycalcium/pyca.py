@@ -1222,6 +1222,17 @@ class ca_mat:
     def __add__(self, other):
         if type(self) is not type(other):
             try:
+                other = ca(other)
+                if self._ctx_python is not other._ctx_python:
+                    raise ValueError("different context objects!")
+                m = self.nrows()
+                n = self.ncols()
+                res = ca_mat(m, n)
+                libcalcium.ca_mat_add_ca(res, self, other, self._ctx)
+                return res
+            except TypeError:
+                pass
+            try:
                 other = ca_mat(other)
             except TypeError:
                 return NotImplemented
@@ -1237,6 +1248,17 @@ class ca_mat:
 
     def __sub__(self, other):
         if type(self) is not type(other):
+            try:
+                other = ca(other)
+                if self._ctx_python is not other._ctx_python:
+                    raise ValueError("different context objects!")
+                m = self.nrows()
+                n = self.ncols()
+                res = ca_mat(m, n)
+                libcalcium.ca_mat_sub_ca(res, self, other, self._ctx)
+                return res
+            except TypeError:
+                pass
             try:
                 other = ca_mat(other)
             except TypeError:
