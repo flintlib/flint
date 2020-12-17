@@ -70,6 +70,7 @@ class _fmpz_struct(ctypes.Structure):
 
 # ctypes.cast(x, ctypes.POINTER(ctypes.c_ulong))
 # ctypes.POINTER(ctypes.c_ulong)
+libflint.flint_malloc.restype = ctypes.c_void_p
 
 class ca_struct(ctypes.Structure):
     """Low-level wrapper for ca_struct, for internal use by ctypes."""
@@ -87,17 +88,24 @@ class ca_mat_struct(ctypes.Structure):
                 ('c', ctypes.c_long),
                 ('rows', ctypes.c_void_p)]
 
+libcalcium.ca_mat_entry_ptr.restype = ctypes.POINTER(ca_mat_struct)
+
 class ca_vec_struct(ctypes.Structure):
     """Low-level wrapper for ca_vec_struct, for internal use by ctypes."""
     _fields_ = [('entries', ctypes.c_void_p),
                 ('length', ctypes.c_long),
                 ('alloc', ctypes.c_long)]
 
+libcalcium.ca_vec_entry_ptr.restype = ctypes.POINTER(ca_vec_struct)
+
+
 class ca_poly_struct(ctypes.Structure):
     """Low-level wrapper for ca_poly_struct, for internal use by ctypes."""
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('length', ctypes.c_long),
                 ('alloc', ctypes.c_long)]
+
+libcalcium.ca_poly_coeff_ptr.restype = ctypes.POINTER(ca_struct)
 
 class ca_poly_vec_struct(ctypes.Structure):
     """Low-level wrapper for ca_poly_vec_struct, for internal use by ctypes."""
