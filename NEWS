@@ -1237,7 +1237,7 @@ v 2.6.3 -- 12 Aug 2020
  * Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
  * Fix some old license headers
 
-2.7.0 -- 11 Dec 2020
+2.7.0 -- 18 Dec 2020
 
  * Multivariate factorisation
  * Square root and square testing for finite fields
