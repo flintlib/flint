@@ -296,10 +296,12 @@ if(NOT MSVC)
 	target_link_libraries(flint PUBLIC m)
 endif()
 
+include(GNUInstallDirs)
+
 install(TARGETS flint
-            RUNTIME DESTINATION bin
-            ARCHIVE DESTINATION lib
-            LIBRARY DESTINATION lib
+            RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
         )
 
 install(FILES ${HEADERS} DESTINATION include/flint)
