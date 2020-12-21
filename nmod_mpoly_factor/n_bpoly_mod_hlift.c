@@ -53,9 +53,16 @@ int n_bpoly_mod_hlift2_cubic(
     n_bpoly_mod_taylor_shift_gen0(B0, alpha, ctx);
     n_bpoly_mod_taylor_shift_gen0(B1, alpha, ctx);
 
-    /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
-    FLINT_ASSERT(n_poly_degree(A->coeffs + 0) == n_poly_degree(B0->coeffs + 0) +
-                                                 n_poly_degree(B1->coeffs + 0));
+    /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
+#if FLINT_WANT_ASSERT
+    {
+        n_poly_t T;
+        n_poly_init(T);
+        n_poly_mod_mul(T, B0->coeffs + 0, B1->coeffs + 0, ctx);
+        FLINT_ASSERT(n_poly_equal(A->coeffs + 0, T));
+        n_poly_clear(T);
+    }
+#endif
 
     if (n_poly_degree(A->coeffs + 0) != degree_inner)
     {
@@ -222,9 +229,16 @@ int n_bpoly_mod_hlift2(
     n_bpoly_mod_taylor_shift_gen0(B0, alpha, ctx);
     n_bpoly_mod_taylor_shift_gen0(B1, alpha, ctx);
 
-    /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
-    FLINT_ASSERT(n_poly_degree(A->coeffs + 0) == n_poly_degree(B0->coeffs + 0) +
-                                                 n_poly_degree(B1->coeffs + 0));
+    /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
+#if FLINT_WANT_ASSERT
+    {
+        n_poly_t T;
+        n_poly_init(T);
+        n_poly_mod_mul(T, B0->coeffs + 0, B1->coeffs + 0, ctx);
+        FLINT_ASSERT(n_poly_equal(A->coeffs + 0, T));
+        n_poly_clear(T);
+    }
+#endif
 
     if (n_poly_degree(A->coeffs + 0) != degree_inner)
     {
@@ -392,6 +406,19 @@ int n_bpoly_mod_hlift_cubic(
     for (i = 0; i < r; i++)
         n_bpoly_mod_taylor_shift_gen0(B + i, alpha, ctx);
 
+    /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
+#if FLINT_WANT_ASSERT
+    {
+        n_poly_t T;
+        n_poly_init(T);
+        n_poly_mod_mul(T, B[0].coeffs + 0, B[1].coeffs + 0, ctx);
+        for (i = 2; i < r; i++)
+            n_poly_mod_mul(T, T, B[i].coeffs + 0, ctx);
+        FLINT_ASSERT(n_poly_equal(A->coeffs + 0, T));
+        n_poly_clear(T);
+    }
+#endif
+
     /* the required degree in x is supposed to be deg_x(A) */
     if (n_poly_degree(A->coeffs + 0) != degree_inner)
     {
@@ -400,17 +427,6 @@ int n_bpoly_mod_hlift_cubic(
     }
 
     FLINT_ASSERT(n_bpoly_degree1(A) == degree_inner);
-
-    /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#if FLINT_WANT_ASSERT
-    n_poly_one(c);
-    for (i = 0; i < r; i++)
-    {
-        n_poly_mod_mul(t, c, B[i].coeffs + 0, ctx);
-        n_poly_swap(c, t);
-    }
-    FLINT_ASSERT(n_poly_equal(c, A->coeffs + 0));
-#endif
 
     for (k = 0; k < r; k++)
     {
@@ -618,11 +634,18 @@ int n_bpoly_mod_hlift(
     for (i = 0; i < r; i++)
         n_bpoly_mod_taylor_shift_gen0(B + i, alpha, ctx);
 
-    /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-    j = 0;
-    for (i = 0; i < r; i++)
-        j += n_poly_degree(B[i].coeffs + 0);
-    FLINT_ASSERT(j == n_poly_degree(A->coeffs + 0));
+    /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
+#if FLINT_WANT_ASSERT
+    {
+        n_poly_t T;
+        n_poly_init(T);
+        n_poly_mod_mul(T, B[0].coeffs + 0, B[1].coeffs + 0, ctx);
+        for (i = 2; i < r; i++)
+            n_poly_mod_mul(T, T, B[i].coeffs + 0, ctx);
+        FLINT_ASSERT(n_poly_equal(A->coeffs + 0, T));
+        n_poly_clear(T);
+    }
+#endif
 
     if (n_poly_degree(A->coeffs + 0) != degree_inner)
     {
