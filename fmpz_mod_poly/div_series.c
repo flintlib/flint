@@ -47,10 +47,9 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
         if (fmpz_is_one(B + 0))
             _fmpz_vec_set(Q, A, Alen);
         else
-        {
            _fmpz_mod_poly_scalar_mul_fmpz(Q, A, Alen, u, p);
-           _fmpz_vec_zero(Q + Alen, n - Alen);
-        }      
+
+        _fmpz_vec_zero(Q + Alen, n - Alen);
     }
     else if (n < 32 || Blen < 20)
     {
