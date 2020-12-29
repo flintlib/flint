@@ -34,9 +34,9 @@ fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
         }
     }
 
-    if (fac->alloc == fac->num)
+    if (fac->alloc <= fac->num)
     {
-        slong new_size = 2 * fac->alloc;
+        slong new_size = FLINT_MAX(fac->num + 1, 2*fac->alloc);
 
         fac->poly = flint_realloc(fac->poly,
                                       sizeof(fmpz_mod_poly_struct) * new_size);
