@@ -4,6 +4,7 @@
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -21,13 +22,8 @@
 void
 fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
 {
-    slong i;
-
-    fac->alloc = 5;
+    fac->alloc = 0;
     fac->num = 0;
-    fac->poly = flint_malloc(sizeof(fmpz_mod_poly_struct) * 5);
-    fac->exp = flint_malloc(sizeof(slong) * 5);
-
-    for (i = 0; i < 5; i++)
-        fmpz_mod_poly_init(fac->poly + i, ctx);
+    fac->poly = NULL;
+    fac->exp = NULL;
 }

@@ -64,7 +64,7 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
             fmpz_mod_poly_divrem(t, EDxp, DDxp, DD->poly + j, ctx);
             fmpz_mod_poly_factor_equal_deg_with_frob(ED, DD->poly + j,
                                                         DD->exp[j], EDxp, ctx);
-            fmpz_mod_poly_factor_fit_length(res, ED->num, ctx);
+            fmpz_mod_poly_factor_fit_length(res, res->num + ED->num, ctx);
             for (k = 0; k < ED->num; k++)
             {
                 fmpz_mod_poly_swap(res->poly + res->num, ED->poly + k, ctx);
