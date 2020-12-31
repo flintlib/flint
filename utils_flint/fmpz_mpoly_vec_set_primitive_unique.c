@@ -29,6 +29,7 @@ fmpz_mpoly_vec_set_primitive_unique(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F
                 fmpz_mpoly_vec_entry(G, len - 1), ctx);
             G->length--;
             len--;
+            i--;
         }
         else
         {
