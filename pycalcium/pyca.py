@@ -65,12 +65,49 @@ T_TRUE = 0
 T_FALSE = 1
 T_UNKNOWN = 2
 
+# ctypes.cast(x, ctypes.POINTER(ctypes.c_ulong))
+# ctypes.POINTER(ctypes.c_ulong)
+
+
 class _fmpz_struct(ctypes.Structure):
     _fields_ = [('val', ctypes.c_long)]
 
-# ctypes.cast(x, ctypes.POINTER(ctypes.c_ulong))
-# ctypes.POINTER(ctypes.c_ulong)
-libflint.flint_malloc.restype = ctypes.c_void_p
+class _fmpq_struct(ctypes.Structure):
+    _fields_ = [('num', ctypes.c_long),
+                ('den', ctypes.c_long)]
+
+def fmpz_to_python_int(xref):
+    # todo: this leaks memory
+    s = libflint.fmpz_get_str(None, 10, xref)
+    return int(s)
+
+# todo
+def fmpq_set_python(cref, x):
+    assert isinstance(x, int) and -sys.maxsize <= x <= sys.maxsize
+    libflint.fmpq_set_si(cref, x, 1)
+
+class _fmpz_poly_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('alloc', ctypes.c_long),
+                ('length', ctypes.c_long)]
+
+class _fmpq_poly_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('den', ctypes.c_long),
+                ('alloc', ctypes.c_long),
+                ('length', ctypes.c_long)]
+
+class _arb_struct(ctypes.Structure):
+    _fields_ = [('data', ctypes.c_long * 6)]
+
+class _acb_struct(ctypes.Structure):
+    _fields_ = [('real', _arb_struct),
+                ('imag', _arb_struct)]
+
+class qqbar_struct(ctypes.Structure):
+    """Low-level wrapper for qqbar_struct, for internal use by ctypes."""
+    _fields_ = [('poly', _fmpz_poly_struct),
+                ('enclosure', _acb_struct)]
 
 class ca_struct(ctypes.Structure):
     """Low-level wrapper for ca_struct, for internal use by ctypes."""
@@ -88,7 +125,6 @@ class ca_mat_struct(ctypes.Structure):
                 ('c', ctypes.c_long),
                 ('rows', ctypes.c_void_p)]
 
-libcalcium.ca_mat_entry_ptr.restype = ctypes.POINTER(ca_mat_struct)
 
 class ca_vec_struct(ctypes.Structure):
     """Low-level wrapper for ca_vec_struct, for internal use by ctypes."""
@@ -96,22 +132,603 @@ class ca_vec_struct(ctypes.Structure):
                 ('length', ctypes.c_long),
                 ('alloc', ctypes.c_long)]
 
-libcalcium.ca_vec_entry_ptr.restype = ctypes.POINTER(ca_vec_struct)
-
-
 class ca_poly_struct(ctypes.Structure):
     """Low-level wrapper for ca_poly_struct, for internal use by ctypes."""
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('length', ctypes.c_long),
                 ('alloc', ctypes.c_long)]
 
-libcalcium.ca_poly_coeff_ptr.restype = ctypes.POINTER(ca_struct)
-
 class ca_poly_vec_struct(ctypes.Structure):
     """Low-level wrapper for ca_poly_vec_struct, for internal use by ctypes."""
     _fields_ = [('entries', ctypes.POINTER(ca_poly_struct)),
                 ('length', ctypes.c_long),
                 ('alloc', ctypes.c_long)]
+
+
+
+
+class qqbar:
+    """
+    Wrapper around the qqbar type, representing an algebraic number.
+
+        >>> (qqbar(2).sqrt() / qqbar(-2).sqrt()) ** 2
+        -1.00000 (deg 1)
+        >>> qqbar(0.5) == qqbar(1) / 2
+        True
+        >>> qqbar(0.1) == qqbar(1) / 10
+        False
+        >>> qqbar(3+4j)
+        3.00000 + 4.00000*I (deg 2)
+        >>> qqbar(3+4j).root(5)
+        1.35607 + 0.254419*I (deg 10)
+        >>> qqbar(3+4j).root(5) ** 5
+        3.00000 + 4.00000*I (deg 2)
+
+    """
+
+    def __init__(self, val=0):
+        self._data = qqbar_struct()
+        self._ref = ctypes.byref(self._data)
+        libcalcium.qqbar_init(self)
+        if val is not 0:
+            typ = type(val)
+            if typ is int:
+                b = sys.maxsize
+                if -b <= val <= b:
+                    libcalcium.qqbar_set_si(self, val)
+                else:
+                    n = _fmpz_struct()
+                    nref = ctypes.byref(n)
+                    libflint.fmpz_init(nref)
+                    libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
+                    libcalcium.qqbar_set_fmpz(self, nref)
+                    libflint.fmpz_clear(nref)
+            elif typ is qqbar:
+                libcalcium.qqbar_set(self, val)
+            elif typ is float:
+                libcalcium.qqbar_set_d(self, val)
+            elif typ is complex:
+                libcalcium.qqbar_set_re_im_d(self, val.real, val.imag)
+            else:
+                raise TypeError
+
+    def __del__(self):
+        libcalcium.qqbar_clear(self)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
+
+    def __repr__(self):
+        s = libcalcium.qqbar_get_str_nd(self, 6)
+        res = str(s, 'ascii')
+        return res
+
+    def __bool__(self):
+        """
+            >>> bool(qqbar(2))
+            True
+            >>> bool(qqbar(0))
+            False
+        """
+        if libcalcium.qqbar_is_zero(self):
+            return False
+        return True
+
+    def __eq__(self, other):
+        """
+            >>> qqbar(2)/3 == qqbar(1)/3
+            False
+            >>> qqbar(2)/3 == 1 - qqbar(1)/3
+            True
+            >>> qqbar(1) == 1
+            True
+            >>> qqbar(1) == 2
+            False
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if libcalcium.qqbar_equal(self, other):
+            return True
+        return False
+
+    def __ne__(self, other):
+        """
+            >>> qqbar(2)/3 != qqbar(1)/3
+            True
+            >>> qqbar(2)/3 != 1 - qqbar(1)/3
+            False
+            >>> qqbar(1) != 1
+            False
+            >>> qqbar(1) != 2
+            True
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if libcalcium.qqbar_equal(self, other):
+            return False
+        return True
+
+    def __le__(self, other):
+        """
+            >>> qqbar(2) <= 2
+            True
+            >>> qqbar(2) <= 1.5
+            False
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not (libcalcium.qqbar_is_real(self) and libcalcium.qqbar_is_real(other)):
+            raise ValueError("qqbar order comparison: inputs must be real")
+        c = libcalcium.qqbar_cmp_re(self, other)
+        return c <= 0
+
+    def __lt__(self, other):
+        """
+            >>> qqbar(2) < 3
+            True
+            >>> qqbar(2) < 2
+            False
+            >>> qqbar(2) < 1.5
+            False
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not (libcalcium.qqbar_is_real(self) and libcalcium.qqbar_is_real(other)):
+            raise ValueError("qqbar order comparison: inputs must be real")
+        c = libcalcium.qqbar_cmp_re(self, other)
+        return c < 0
+
+    def __ge__(self, other):
+        """
+            >>> qqbar(2) >= 2
+            True
+            >>> qqbar(2) >= 1.5
+            True
+            >>> qqbar(2) >= 3
+            False
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not (libcalcium.qqbar_is_real(self) and libcalcium.qqbar_is_real(other)):
+            raise ValueError("qqbar order comparison: inputs must be real")
+        c = libcalcium.qqbar_cmp_re(self, other)
+        return c >= 0
+
+    def __gt__(self, other):
+        """
+            >>> qqbar(2) > 2
+            False
+            >>> qqbar(2) > 1.5
+            True
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not (libcalcium.qqbar_is_real(self) and libcalcium.qqbar_is_real(other)):
+            raise ValueError("qqbar order comparison: inputs must be real")
+        c = libcalcium.qqbar_cmp_re(self, other)
+        return c > 0
+
+    def __add__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        res = qqbar()
+        libcalcium.qqbar_add(res, self, other)
+        return res
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        res = qqbar()
+        libcalcium.qqbar_sub(res, self, other)
+        return res
+
+    def __rsub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        res = qqbar()
+        libcalcium.qqbar_sub(res, other, self)
+        return res
+
+    def __mul__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        res = qqbar()
+        libcalcium.qqbar_mul(res, self, other)
+        return res
+
+    __rmul__ = __mul__
+
+    def __truediv__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not other:
+            raise ZeroDivisionError
+        res = qqbar()
+        libcalcium.qqbar_div(res, self, other)
+        return res
+
+    def __rtruediv__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not self:
+            raise ZeroDivisionError
+        res = qqbar()
+        libcalcium.qqbar_div(res, other, self)
+        return res
+
+    def __floordiv__(self, other):
+        return (self / other).floor()
+
+    def __rfloordiv__(self, other):
+        return (other / self).floor()
+
+    def __bool__(self):
+        t = libcalcium.qqbar_is_zero(self)
+        if t:
+            return False
+        return True
+
+    def __abs__(self):
+        res = qqbar()
+        libcalcium.qqbar_abs(res, self)
+        return res
+
+    def __neg__(self):
+        res = qqbar()
+        libcalcium.qqbar_neg(res, self)
+        return res
+
+    def __pos__(self):
+        res = qqbar()
+        libcalcium.qqbar_set(res, self)
+        return res
+
+    def re(self):
+        res = qqbar()
+        libcalcium.qqbar_re(res, self)
+        return res
+
+    def im(self):
+        res = qqbar()
+        libcalcium.qqbar_im(res, self)
+        return res
+
+    def conj(self):
+        res = qqbar()
+        libcalcium.qqbar_conj(res, self)
+        return res
+
+    conjugate = conj
+
+    def floor(self):
+        res = qqbar()
+        libcalcium.qqbar_floor(res, self)
+        return res
+
+    def ceil(self):
+        res = qqbar()
+        libcalcium.qqbar_ceil(res, self)
+        return res
+
+    def sgn(self):
+        """
+        The sign of this algebraic number.
+
+            >>> qqbar(-3).sgn()
+            -1.00000 (deg 1)
+            >>> qqbar(2+3j).sgn()
+            0.554700 + 0.832050*I (deg 4)
+            >>> qqbar(0).sgn()
+            0 (deg 1)
+        """
+        res = qqbar()
+        libcalcium.qqbar_sgn(res, self)
+        return res
+
+    sign = sgn
+
+    def sqrt(self):
+        """
+        Principal square root of this algebraic number.
+
+            >>> qqbar(-1).sqrt()
+            1.00000*I (deg 2)
+            >>> qqbar(-1).sqrt().sqrt()
+            0.707107 + 0.707107*I (deg 4)
+        """
+        res = qqbar()
+        libcalcium.qqbar_sqrt(res, self)
+        return res
+
+    def root(self, n):
+        """
+        Principal nth root of this algebraic number.
+
+            >>> qqbar(3).root(1)
+            3.00000 (deg 1)
+            >>> qqbar(3).root(2)
+            1.73205 (deg 2)
+            >>> qqbar(3).root(3)
+            1.44225 (deg 3)
+        """
+        assert n >= 1
+        res = qqbar()
+        libcalcium.qqbar_root_ui(res, self, n)
+        return res
+
+    @staticmethod
+    def polynomial_roots(coeffs):
+        """
+        Returns the roots of the polynomial defined by coeffs as a list.
+        The output is not guaranteed to be sorted in any particular
+        order, except that all instances of a repeated root always
+        appear consecutively.
+
+        At present, the implementation only allows integers
+        (not algebraic numbers) as coefficients.
+
+            >>> qqbar.polynomial_roots([])
+            []
+            >>> qqbar.polynomial_roots([0])
+            []
+            >>> qqbar.polynomial_roots([1,2])
+            [-0.500000 (deg 1)]
+            >>> qqbar.polynomial_roots([3,2,1])
+            [-1.00000 + 1.41421*I (deg 2), -1.00000 - 1.41421*I (deg 2)]
+            >>> qqbar.polynomial_roots([1,2,1])
+            [-1.00000 (deg 1), -1.00000 (deg 1)]
+
+        """
+        d = len(coeffs) - 1
+        if d <= 0:
+            return []
+        c = ctypes.byref(_fmpq_struct())
+        pol = ctypes.byref(_fmpq_poly_struct())
+        vec = libcalcium.qqbar_vec_init(d)
+        libflint.fmpq_init(c)
+        libflint.fmpq_poly_init(pol)
+        for i in range(d + 1):
+            fmpq_set_python(c, coeffs[i])
+            libflint.fmpq_poly_set_coeff_fmpq(pol, i, c)
+        libcalcium.qqbar_roots_fmpq_poly(vec, pol, 0)
+        res = [qqbar() for i in range(d)]
+        for i in range(d):
+            libcalcium.qqbar_set(res[i], ctypes.byref(vec[i]))
+        libcalcium.qqbar_vec_clear(vec, d)
+        libflint.fmpq_clear(c)
+        libflint.fmpq_poly_clear(pol)
+        return res
+
+    def minpoly(self):
+        """
+        Returns the minimal polynomial of self over the integers
+        as a list of Python integers specifying the coefficients.
+
+            >>> qqbar(0).minpoly()
+            [0, 1]
+            >>> (qqbar(2) / 3).minpoly()
+            [-2, 3]
+            >>> qqbar(2).sqrt().minpoly()
+            [-2, 0, 1]
+            >>> ((qqbar(2).sqrt() + 1).root(3) + 1).minpoly()
+            [2, -12, 21, -22, 15, -6, 1]
+            >>> qqbar(0.5).minpoly()
+            [-1, 2]
+            >>> qqbar(0.1).minpoly()
+            [-3602879701896397, 36028797018963968]
+            >>> (qqbar(1) / 10).minpoly()
+            [-1, 10]
+
+        """
+        deg = self.degree()
+        c = [0] * (deg + 1)
+        n = _fmpz_struct()
+        nref = ctypes.byref(n)
+        libflint.fmpz_init(nref)
+        poly = ctypes.byref(self._data.poly)
+        for i in range(deg+1):
+            libflint.fmpz_poly_get_coeff_fmpz(nref, poly, i)
+            c[i] = fmpz_to_python_int(nref)
+        libflint.fmpz_clear(nref)
+        return c
+
+    def is_real(self):
+        """
+        Check if this algebraic number is a real number.
+
+            >>> qqbar(2).sqrt().is_real()
+            True
+            >>> qqbar(-2).sqrt().is_real()
+            False
+        """
+        if libcalcium.qqbar_is_real(self):
+            return True
+        return False
+
+    def is_rational(self):
+        """
+        Check if this algebraic number is a rational number.
+
+            >>> (qqbar(-5) / 7).is_rational()
+            True
+            >>> (qqbar(-5) / 7).sqrt().is_rational()
+            False
+        """
+        if libcalcium.qqbar_is_rational(self):
+            return True
+        return False
+
+    def is_integer(self):
+        """
+        Check if this algebraic number is an integer.
+
+            >>> qqbar(3).is_integer()
+            True
+            >>> (qqbar(3) / 5).is_integer()
+            False
+        """
+        if libcalcium.qqbar_is_integer(self):
+            return True
+        return False
+
+    def degree(self):
+        """
+        The degree of this algebraic number (the degree of the
+        minimal polynomial).
+
+            >>> qqbar(5).degree()
+            1
+            >>> qqbar(5).sqrt().degree()
+            2
+        """
+        return int(libcalcium.qqbar_degree(self))
+
+    def p(self):
+        """
+        Assuming that self is a rational number, returns the
+        numerator as a Python integer.
+
+            >>> (qqbar(-2)/3).p()
+            -2
+            >>> qqbar(-1).sqrt().p()
+            Traceback (most recent call last):
+              ...
+            ValueError: self must be a rational number
+
+        """
+        if not self.is_rational():
+            raise ValueError("self must be a rational number")
+        n = _fmpz_struct()
+        nref = ctypes.byref(n)
+        libflint.fmpz_init(nref)
+        poly = ctypes.byref(self._data.poly)
+        libflint.fmpz_poly_get_coeff_fmpz(nref, poly, 0)
+        libflint.fmpz_neg(nref, nref)
+        res = fmpz_to_python_int(nref)
+        libflint.fmpz_clear(nref)
+        return res
+
+    def q(self):
+        """
+        Assuming that self is a rational number, returns the
+        denominator as a Python integer.
+
+            >>> (qqbar(-2)/3).q()
+            3
+            >>> qqbar(-1).sqrt().q()
+            Traceback (most recent call last):
+              ...
+            ValueError: self must be a rational number
+
+        """
+        if not self.is_rational():
+            raise ValueError("self must be a rational number")
+        n = _fmpz_struct()
+        nref = ctypes.byref(n)
+        libflint.fmpz_init(nref)
+        poly = ctypes.byref(self._data.poly)
+        libflint.fmpz_poly_get_coeff_fmpz(nref, poly, 1)
+        res = fmpz_to_python_int(nref)
+        libflint.fmpz_clear(nref)
+        return res
+
+    def __pow__(self, other):
+        """
+            >>> qqbar(2) ** (qqbar(1) / 2)
+            1.41421 (deg 2)
+            >>> (1 / qqbar(64)) ** (qqbar(1) / 3)
+            0.250000 (deg 1)
+            >>> (-1 / qqbar(64)) ** (qqbar(1) / 3)
+            0.125000 + 0.216506*I (deg 2)
+            >>> qqbar(1+1j) ** 123
+            -2.30584e+18 + 2.30584e+18*I (deg 2)
+            >>> qqbar(1+1j) ** 124
+            -4.61169e+18 (deg 1)
+            >>> qqbar(2+3j) ** (qqbar(1) / 4)
+            1.33660 + 0.335171*I (deg 8)
+            >>> qqbar(2+3j) ** qqbar(1+2j)
+            Traceback (most recent call last):
+              ...
+            ValueError: qqbar exponent must be rational
+            >>> qqbar(0) ** 0
+            1.00000 (deg 1)
+            >>> qqbar(0) ** -1
+            Traceback (most recent call last):
+              ...
+            ZeroDivisionError
+
+        """
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        if not other.is_rational():
+            raise ValueError("qqbar exponent must be rational")
+        p = other.p()
+        q = other.q()
+        assert q <= 100000
+        if q != 1:
+            self = self.root(q)
+        res = qqbar()
+        if p >= 0:
+            libcalcium.qqbar_pow_ui(res, self, p)
+        else:
+            libcalcium.qqbar_pow_ui(res, self, -p)
+            res = 1 / res
+        return res
+
+    def __rpow__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = qqbar(other)
+            except TypeError:
+                return NotImplemented
+        return other ** self
+
 
 class ca_ctx:
     """
@@ -173,6 +790,8 @@ class ca:
         Unknown
         >>> 3 < pi < ca(22)/7
         True
+        >>> ca(qqbar(200).sqrt())
+        14.1421 {10*a where a = 1.41421 [a^2-2=0]}
 
     """
 
@@ -201,6 +820,8 @@ class ca:
                 libcalcium.ca_set_d(self, val, self._ctx)
             elif typ is complex:
                 libcalcium.ca_set_d_d(self, val.real, val.imag, self._ctx)
+            elif typ is qqbar:
+                libcalcium.ca_set_qqbar(self, val, self._ctx)
             else:
                 raise TypeError
 
@@ -2406,14 +3027,25 @@ def tanh(x):
 #    def __del__(self):
 #        libflint.flint_free(self)
 
+libflint.flint_malloc.restype = ctypes.c_void_p
+libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
+libflint.fmpz_get_str.argtypes = ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(_fmpz_struct)
+libflint.fmpz_get_str.restype = ctypes.c_char_p
+
+libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double
+libcalcium.qqbar_set_re_im_d.argtypes = qqbar, ctypes.c_double, ctypes.c_double
+libcalcium.qqbar_get_str_nd.restype = ctypes.c_char_p
+libcalcium.qqbar_vec_init.restype = ctypes.POINTER(qqbar_struct)
+
+libcalcium.ca_mat_entry_ptr.restype = ctypes.POINTER(ca_mat_struct)
+libcalcium.ca_vec_entry_ptr.restype = ctypes.POINTER(ca_vec_struct)
+libcalcium.ca_poly_coeff_ptr.restype = ctypes.POINTER(ca_struct)
 libcalcium.ca_set_si.argtypes = ca, ctypes.c_long, ca_ctx
 libcalcium.ca_set_d.argtypes = ca, ctypes.c_double, ca_ctx
 libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
-
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
 libcalcium.ca_get_str.restype = ctypes.c_char_p
 
-libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
 
 
 i = j = I = ca.i()
