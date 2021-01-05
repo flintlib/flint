@@ -33,8 +33,6 @@ static void nmod_mpoly_get_eval_helper2(
     slong * off, * shift;
     TMP_INIT;
 
-    FLINT_ASSERT(Alen > 0);
-
     TMP_START;
 
     mpoly_gen_offset_shift_sp(&off0, &shift0, 0, bits, ctx->minfo);
@@ -321,7 +319,7 @@ static void _nmod_mpoly_set_fmpz_mpoly(
 }
 
 
-static void _fmpz_mpoly_modpk_taylor_coeff(
+static int _fmpz_mpoly_modpk_taylor_coeff(
     const fmpz_t pk,
     nmod_mpoly_t T,
     const nmod_mpoly_ctx_t ctxp,
@@ -330,25 +328,35 @@ static void _fmpz_mpoly_modpk_taylor_coeff(
 {
     slong i, Tlen;
     slong N = mpoly_words_per_exp(E->bits, ctx->minfo);
-    fmpz_t t;
+    fmpz_t t, r;
 
     fmpz_init(t);
+    fmpz_init(r);
 
     nmod_mpoly_fit_length_reset_bits(T, E->length, E->bits, ctxp);
     Tlen = 0;
     for (i = 0; i < E->length; i++)
     {
-        FLINT_ASSERT(fmpz_divisible(E->coeffs + i, pk)); /* TODO !!! */
-        fmpz_divexact(t, E->coeffs + i, pk);
+        fmpz_tdiv_qr(t, r, E->coeffs + i, pk);
+        if (!fmpz_is_zero(r))
+        {
+            fmpz_clear(t);
+            fmpz_clear(r);
+            return 0;
+        }
+
         T->coeffs[Tlen] = fmpz_fdiv_ui(t, ctxp->mod.n);
         if (T->coeffs[Tlen] == 0)
             continue;
+
         mpoly_monomial_set(T->exps + N*Tlen, E->exps + N*i, N);
         Tlen++;
     }
     T->length = Tlen;
 
     fmpz_clear(t);
+    fmpz_clear(r);
+    return 1;
 }
 
 
@@ -562,7 +570,10 @@ next_power:
         goto cleanup;
     }
 
-    _fmpz_mpoly_modpk_taylor_coeff(pk, Tp, ctxp, e, ctx);
+    success = _fmpz_mpoly_modpk_taylor_coeff(pk, Tp, ctxp, e, ctx);
+    if (!success)
+        goto cleanup;
+
     nmod_mpoly_get_eval_helper2(Teh, Tp, beta_caches, ctxp);
 
     if (fmpz_cmp_ui(pk, ctxp->mod.n) > 0)
