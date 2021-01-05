@@ -122,7 +122,7 @@ void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c,
 }
 
 void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
-                                            fmpz_t c, const fmpz_mod_ctx_t ctx)
+                                     const fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
@@ -149,7 +149,7 @@ void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
 }
 
 void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
-                                            fmpz_t c, const fmpz_mod_ctx_t ctx)
+                                      const fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
 
@@ -179,7 +179,7 @@ void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
    fmpz_clear(d);
 }
 
-void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, fmpz_t c,
+void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, const fmpz_t c,
                           const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
    fmpz_t d;
