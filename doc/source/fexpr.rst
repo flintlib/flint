@@ -211,7 +211,7 @@ Function call structure
 .. function:: void fexpr_arg(fexpr_t res, const fexpr_t expr, slong i)
 
     Assuming that *expr* represents a function call
-    `f(e_1,\ldots,e_n)`, sets *res* to the argument `e_{i-1}`.
+    `f(e_1,\ldots,e_n)`, sets *res* to the argument `e_{i+1}`.
     Note that indexing starts from 0.
     The index must be in bounds, with `0 \le i < n`.
 
