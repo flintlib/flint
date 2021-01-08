@@ -12,7 +12,7 @@ QUIET_AR  = @echo '   ' AR  ' ' $@;
 
 AT=@
 
-BUILD_DIRS = calcium ca ca_ext ca_field ca_vec ca_poly ca_mat utils_flint fmpz_mpoly_q qqbar $(EXTRA_BUILD_DIRS)
+BUILD_DIRS = calcium ca ca_ext ca_field ca_vec ca_poly fexpr ca_mat utils_flint fmpz_mpoly_q qqbar $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = 
 

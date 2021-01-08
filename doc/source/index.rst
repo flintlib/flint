@@ -95,6 +95,7 @@ use in appropriate external applications is encouraged.
 .. toctree::
    :maxdepth: 2
 
+   fexpr.rst
    fmpz_mpoly_q.rst
    qqbar.rst
    utils_flint.rst
