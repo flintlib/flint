@@ -209,7 +209,7 @@ Function call structure
     As :func:`fexpr_func`, but sets *view* to a shallow view
     instead of copying the expression.
     The variable *view* must not be initialized before use or
-    cleared before use, and *expr* must not be modified or cleared
+    cleared after use, and *expr* must not be modified or cleared
     as long as *view* is in use.
 
 .. function:: void fexpr_arg(fexpr_t res, const fexpr_t expr, slong i)
@@ -224,7 +224,7 @@ Function call structure
     As :func:`fexpr_arg`, but sets *view* to a shallow view
     instead of copying the expression.
     The variable *view* must not be initialized before use or
-    cleared before use, and *expr* must not be modified or cleared
+    cleared after use, and *expr* must not be modified or cleared
     as long as *view* is in use.
 
 .. function:: void fexpr_view_next(fexpr_t view)
