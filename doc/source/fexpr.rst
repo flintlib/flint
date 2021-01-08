@@ -140,6 +140,10 @@ Comparisons
 
     Checks if *a* and *b* are exactly equal as expressions.
 
+.. function:: ulong fexpr_hash(const fexpr_t expr)
+
+    Returns a hash of the expression *expr*.
+
 Atoms
 -------------------------------------------------------------------------------
 
@@ -200,13 +204,13 @@ Function call structure
     Assuming that *expr* represents a function call
     `f(e_1,\ldots,e_n)`, sets *res* to the function expression *f*.
 
-.. function:: void fexpr_view_func(fexpr_t res, const fexpr_t expr)
+.. function:: void fexpr_view_func(fexpr_t view, const fexpr_t expr)
 
-    As :func:`fexpr_func`, but sets *res* to a shallow view
+    As :func:`fexpr_func`, but sets *view* to a shallow view
     instead of copying the expression.
-    The variable *res* must not be initialized before use or
+    The variable *view* must not be initialized before use or
     cleared before use, and *expr* must not be modified or cleared
-    as long as *res* is in use.
+    as long as *view* is in use.
 
 .. function:: void fexpr_arg(fexpr_t res, const fexpr_t expr, slong i)
 
@@ -215,13 +219,13 @@ Function call structure
     Note that indexing starts from 0.
     The index must be in bounds, with `0 \le i < n`.
 
-.. function:: void fexpr_view_arg(fexpr_t res, const fexpr_t expr, slong i)
+.. function:: void fexpr_view_arg(fexpr_t view, const fexpr_t expr, slong i)
 
-    As :func:`fexpr_arg`, but sets *res* to a shallow view
+    As :func:`fexpr_arg`, but sets *view* to a shallow view
     instead of copying the expression.
-    The variable *res* must not be initialized before use or
+    The variable *view* must not be initialized before use or
     cleared before use, and *expr* must not be modified or cleared
-    as long as *res* is in use.
+    as long as *view* is in use.
 
 .. function:: void fexpr_view_next(fexpr_t view)
 
