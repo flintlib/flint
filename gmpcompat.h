@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
+#include <limits.h>
 
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
@@ -29,7 +30,7 @@
   } while (0)
 
 
-#if defined(__MINGW64__) && !defined(__MPIR_VERSION)
+#if WORD_MAX != LONG_MAX && !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
@@ -733,55 +734,6 @@ int flint_mpf_fits_slong_p(mpf_srcptr f)
   return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
 }
 
-/* double mpf_get_d_2exp (signed long int *exp, mpf_t src).
-
-Copyright 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
-
-This file is part of the GNU MP Library.
-
-The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or (at your
-option) any later version.
-
-The GNU MP Library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA. */
-
-extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
-
-static __inline__
-double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
-{
-  mp_size_t size, abs_size;
-  mp_limb_t * ptr;
-  int cnt;
-  slong exp;
-
-  size = src->_mp_size;
-  if (size == 0)
-    {
-      *exp2 = 0;
-      return 0.0;
-    }
-
-  ptr = src->_mp_d;
-  abs_size = FLINT_ABS(size);
-  count_leading_zeros (cnt, ptr[abs_size - 1]);
-
-  exp = src->_mp_exp * FLINT_BITS - cnt;
-  *exp2 = exp;
-
-  return __gmpn_get_d (ptr, abs_size, size,
-                    (long) - (abs_size * FLINT_BITS - cnt));
-}
-
 #else
 
 #define flint_mpz_get_si mpz_get_si
@@ -831,7 +783,68 @@ double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 #define flint_mpf_get_si mpf_get_si
 #define flint_mpf_cmp_ui mpf_cmp_ui
 #define flint_mpf_fits_slong_p mpf_fits_slong_p
+
+#endif
+
+#if WORD_MAX == LONG_MAX
+
 #define flint_mpf_get_d_2exp mpf_get_d_2exp
+
+#else
+
+/* double mpf_get_d_2exp (signed long int *exp, mpf_t src).
+
+Copyright 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
+
+extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
+
+/*
+  This function is only required for MPIR >= 3.0.0 and for GMP, but we include
+  unconditionally when sizeof(ulong) != sizeof(unsigned long)
+*/
+
+static __inline__
+double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
+{
+  mp_size_t size, abs_size;
+  mp_limb_t * ptr;
+  int cnt;
+  slong exp;
+
+  size = src->_mp_size;
+  if (size == 0)
+    {
+      *exp2 = 0;
+      return 0.0;
+    }
+
+  ptr = src->_mp_d;
+  abs_size = FLINT_ABS(size);
+  count_leading_zeros (cnt, ptr[abs_size - 1]);
+
+  exp = src->_mp_exp * FLINT_BITS - cnt;
+  *exp2 = exp;
+
+  return __gmpn_get_d (ptr, abs_size, size,
+                    (long) - (abs_size * FLINT_BITS - cnt));
+}
 
 #endif
 
