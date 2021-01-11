@@ -68,7 +68,7 @@ main(void)
 
         num_of_deg[fmpz_mod_poly_degree(poly, ctx)]++;
 
-        num = n_randint(state, 5) + 1;
+        num = n_randint(state, 6) + 1;
 
         for (i = 1; i < num; i++)
         {

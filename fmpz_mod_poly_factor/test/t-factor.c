@@ -35,7 +35,7 @@ main(void)
         fmpz_mod_poly_factor_t res;
         fmpz_t modulus;
         slong i, j, length, num;
-        slong exp[5];
+        slong exp[6];
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
         fmpz_mod_ctx_set_modulus(ctx, modulus);
@@ -61,7 +61,7 @@ main(void)
         for (i = 0; i < exp[0]; i++)
             fmpz_mod_poly_mul(poly1, poly1, poly, ctx);
 
-        num = n_randint(state, 5) + 1;
+        num = n_randint(state, 6) + 1;
 
         for (i = 1; i < num; i++)
         {
