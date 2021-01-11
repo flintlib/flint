@@ -29,7 +29,9 @@
   } while (0)
 
 
-#if defined(__MINGW64__) && !defined(__MPIR_VERSION)
+#if sizeof(slong) != sizeof(long)
+
+#if !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
@@ -733,6 +735,8 @@ int flint_mpf_fits_slong_p(mpf_srcptr f)
   return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
 }
 
+#endif
+
 /* double mpf_get_d_2exp (signed long int *exp, mpf_t src).
 
 Copyright 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
@@ -755,6 +759,9 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
 extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
+
+# This function is only required for MPIR >= 3.0.0 and for GMP, but we include
+# unconditionally when sizeof(long) != sizeof(slong)
 
 static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
