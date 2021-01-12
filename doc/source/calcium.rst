@@ -157,6 +157,7 @@ Input and output
     Writes *s* to *out* and then frees *s* by calling ``flint_free()``.
 
 .. function:: void calcium_write_si(calcium_stream_t out, slong x)
+              void calcium_write_fmpz(calcium_stream_t out, const fmpz_t x)
 
     Writes the integer *x* to *out*.
 

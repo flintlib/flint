@@ -12,7 +12,7 @@
 #include "fexpr.h"
 
 void
-fexpr_print(const fexpr_t expr)
+fexpr_write(calcium_stream_t stream, const fexpr_t expr)
 {
     ulong type = FEXPR_TYPE(expr->data[0]);
 
@@ -21,26 +21,29 @@ fexpr_print(const fexpr_t expr)
         case FEXPR_TYPE_SMALL_INT:
             {
                 slong c = ((slong) (expr->data[0])) >> FEXPR_TYPE_BITS;
-                flint_printf("%ld", c);
+                calcium_write_si(stream, c);
             }
             break;
         case FEXPR_TYPE_SMALL_SYMBOL:
             {
                 slong i;
+                char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
+
+                tmp[FEXPR_SMALL_SYMBOL_LEN] = '\0';
                 for (i = 0; i < FEXPR_SMALL_SYMBOL_LEN; i++)
                 {
                     char c = expr->data[0] >> ((i + 1) * 8);
-
+                    tmp[i] = c;
                     if (c == '\0')
                         break;
-                    else
-                        flint_printf("%c", c);
                 }
+
+                calcium_write(stream, tmp);
             }
             break;
         case FEXPR_TYPE_BIG_SYMBOL:
             {
-                flint_printf("%s", (const char *) (expr->data + 1));
+                calcium_write(stream, (const char *) (expr->data + 1));
             }
             break;
         case FEXPR_TYPE_BIG_INT_NEG:
@@ -49,7 +52,7 @@ fexpr_print(const fexpr_t expr)
                 fmpz_t c;
                 fmpz_init(c);
                 fexpr_get_fmpz(c, expr);
-                fmpz_print(c);
+                calcium_write_fmpz(stream, c);
                 fmpz_clear(c);
             }
             break;
@@ -77,24 +80,41 @@ fexpr_print(const fexpr_t expr)
 
                 t->data = ptr;
                 t->alloc = 1;
-                fexpr_print(t);
+                fexpr_write(stream, t);
                 t->data += fexpr_size(t);
 
-                flint_printf("(");
+                calcium_write(stream, "(");
 
                 for (i = 0; i < num; i++)
                 {
-                    fexpr_print(t);
+                    fexpr_write(stream, t);
                     t->data += fexpr_size(t);
 
                     if (i < num - 1)
-                        printf(", ");
+                        calcium_write(stream, ", ");
                 }
 
-                flint_printf(")");
+                calcium_write(stream, ")");
             }
             break;
         default:
-            flint_printf("?UNKNOWN?");
+            calcium_write(stream, "?UNKNOWN?");
     }
+}
+
+void
+fexpr_print(const fexpr_t expr)
+{
+    calcium_stream_t t;
+    calcium_stream_init_file(t, stdout);
+    fexpr_write(t, expr);
+}
+
+char *
+fexpr_get_str(const fexpr_t expr)
+{
+    calcium_stream_t t;
+    calcium_stream_init_str(t);
+    fexpr_write(t, expr);
+    return t->s;
 }

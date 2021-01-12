@@ -104,6 +104,11 @@ class _acb_struct(ctypes.Structure):
     _fields_ = [('real', _arb_struct),
                 ('imag', _arb_struct)]
 
+class fexpr_struct(ctypes.Structure):
+    """Low-level wrapper for qqbar_struct, for internal use by ctypes."""
+    _fields_ = [('data', ctypes.c_void_p),
+                ('alloc', ctypes.c_long)]
+
 class qqbar_struct(ctypes.Structure):
     """Low-level wrapper for qqbar_struct, for internal use by ctypes."""
     _fields_ = [('poly', _fmpz_poly_struct),
@@ -145,6 +150,208 @@ class ca_poly_vec_struct(ctypes.Structure):
                 ('alloc', ctypes.c_long)]
 
 
+class fexpr:
+
+    def __init__(self, val=0):
+        self._data = fexpr_struct()
+        self._ref = ctypes.byref(self._data)
+        libcalcium.fexpr_init(self)
+        if val is not 0:
+            typ = type(val)
+            if typ is int:
+                b = sys.maxsize
+                if -b <= val <= b:
+                    libcalcium.fexpr_set_si(self, val)
+                else:
+                    n = _fmpz_struct()
+                    nref = ctypes.byref(n)
+                    libflint.fmpz_init(nref)
+                    libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
+                    libcalcium.fexpr_set_fmpz(self, nref)
+                    libflint.fmpz_clear(nref)
+            elif typ is str:
+                libcalcium.fexpr_set_symbol_str(self, val.encode('ascii'))
+            else:
+                raise TypeError
+
+    def __del__(self):
+        libcalcium.fexpr_clear(self)
+
+    @property
+    def _as_parameter_(self):
+        return self._ref
+
+    @staticmethod
+    def from_param(arg):
+        return arg
+
+    def __repr__(self):
+        # todo: memory leak
+        s = libcalcium.fexpr_get_str(self)
+        res = str(s, 'ascii')
+        return res
+
+    def __eq__(self, other):
+        if type(self) is not type(other):
+            return NotImplemented
+        if libcalcium.fexpr_equal(self, other):
+            return True
+        return False
+
+    def __hash__(self):
+        return libcalcium.fexpr_hash(self)
+
+    def __call__(self, *args):
+        args2 = []
+        for arg in args:
+            if type(arg) is not fexpr:
+                arg = fexpr(arg)
+            args2.append(arg)
+        n = len(args2)
+        res = fexpr()
+        if n == 0:
+            libcalcium.fexpr_call0(res, self)
+        elif n == 1:
+            libcalcium.fexpr_call1(res, self, args2[0])
+        elif n == 2:
+            libcalcium.fexpr_call2(res, self, args2[0], args2[1])
+        elif n == 3:
+            libcalcium.fexpr_call3(res, self, args2[0], args2[1], args2[2])
+        elif n == 4:
+            libcalcium.fexpr_call4(res, self, args2[0], args2[1], args2[2], args2[3])
+        else:
+            raise NotImplementedError
+        return res
+
+    def __add__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_add(res, self, other)
+        return res
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_sub(res, self, other)
+        return res
+
+    def __rsub__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_sub(res, other, self)
+        return res
+
+    def __mul__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_mul(res, self, other)
+        return res
+
+    __rmul__ = __mul__
+
+    def __truediv__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_div(res, self, other)
+        return res
+
+    def __rtruediv__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_div(res, other, self)
+        return res
+
+    def __pow__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_pow(res, self, other)
+        return res
+
+    def __rpow__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_pow(res, other, self)
+        return res
+
+    # def __floordiv__(self, other):
+    #     return (self / other).floor()
+    # def __rfloordiv__(self, other):
+    #     return (other / self).floor()
+
+    def __bool__(self):
+        return True
+
+    #def __abs__(self):
+
+    def __neg__(self):
+        res = fexpr()
+        libcalcium.fexpr_neg(res, self)
+        return res
+
+    #def __pos__(self):
+    #    res = fexpr()
+    #    libcalcium.fexpr_pos(res, self)
+    #    return res
+
+    def expanded_normal_form(self):
+        """
+        Converts this expression to expanded normal form as
+        a formal rational function of its non-arithmetic subexpressions.
+
+            >>> x = fexpr("x"); y = fexpr("y")
+            >>> (x / x**2).expanded_normal_form()
+            Div(1, x)
+            >>> (((x ** 0) + 3) ** 5).expanded_normal_form()
+            1024
+            >>> ((x+y+1)**3 - (y+1)**3 - (x+y)**3 - (x+1)**3).expanded_normal_form()
+            Add(Mul(-1, Pow(x, 3)), Mul(6, x, y), Mul(-1, Pow(y, 3)), -1)
+            >>> (1/((1/y + 1/x))).expanded_normal_form()
+            Div(Add(Mul(x, y)), Add(x, y))
+            >>> (((x+y)**5 * (x-y)) / (x**2 - y**2)).expanded_normal_form()
+            Add(Pow(x, 4), Mul(4, Pow(x, 3), y), Mul(6, Pow(x, 2), Pow(y, 2)), Mul(4, x, Pow(y, 3)), Pow(y, 4))
+            >>> (1 / (x - x)).expanded_normal_form()
+            Traceback (most recent call last):
+              ...
+            ValueError: expanded_normal_form: overflow, formal division by zero or unsupported expression
+        """
+        res = fexpr()
+        if not libcalcium.fexpr_expanded_normal_form(res, self, 0):
+            raise ValueError("expanded_normal_form: overflow, formal division by zero or unsupported expression")
+        return res
 
 
 class qqbar:
@@ -204,6 +411,7 @@ class qqbar:
         return arg
 
     def __repr__(self):
+        # todo: memory leak
         s = libcalcium.qqbar_get_str_nd(self, 6)
         res = str(s, 'ascii')
         return res
@@ -3031,6 +3239,9 @@ libflint.flint_malloc.restype = ctypes.c_void_p
 libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
 libflint.fmpz_get_str.argtypes = ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(_fmpz_struct)
 libflint.fmpz_get_str.restype = ctypes.c_char_p
+
+libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
+libcalcium.fexpr_get_str.restype = ctypes.c_char_p
 
 libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double
 libcalcium.qqbar_set_re_im_d.argtypes = qqbar, ctypes.c_double, ctypes.c_double

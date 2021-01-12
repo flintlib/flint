@@ -37,7 +37,6 @@ Flat-packed representation
 Symbolic expressions are often implemented using trees of pointers
 (often together with hash tables for uniqueness),
 requiring some form of memory management.
-
 The :type:`fexpr_t` type, by contrast, stores a symbolic expression
 using a "flat-packed" representation without internal pointers.
 The expression data is just an array of words (``ulong``).
@@ -72,6 +71,11 @@ Cons:
   zero overhead).
 * Manipulating a part of an expression generally requires rebuilding
   the whole expression.
+* Building an expression incrementally is typically `O(n^2)`.
+  As a workaround, it is a good idea to work with balanced (low-depth)
+  expressions and try to construct an expression in one go
+  (for example, to create a sum, create a single ``Add`` expression
+  with many arguments instead of chaining binary ``Add`` operations).
 
 Types and macros
 -------------------------------------------------------------------------------
@@ -89,12 +93,25 @@ Types and macros
 
 .. type:: fexpr_ptr
 
-   Alias for ``fexpr_struct *``, used for vectors of expressions.
+   Alias for ``fexpr_struct *``, used for arrays of expressions.
 
 .. type:: fexpr_srcptr
 
-   Alias for ``const fexpr_struct *``, used for vectors of expressions
+   Alias for ``const fexpr_struct *``, used for arrays of expressions
    when passed as constant input to functions.
+
+.. type:: fexpr_vec_struct
+
+.. type:: fexpr_vec_t
+
+    A type representing a vector of expressions with managed length.
+    The structure contains an :type:`fexpr_ptr` *entries* for
+    the entries, an integer *length* (the size of the vector), and
+    an integer *alloc* (the number of allocated entries).
+
+.. macro:: fexpr_vec_entry(vec, i)
+
+    Returns a pointer to entry *i* in the vector *vec*.
 
 Memory management
 -------------------------------------------------------------------------------
@@ -144,6 +161,14 @@ Comparisons
 
     Returns a hash of the expression *expr*.
 
+.. function:: int fexpr_cmp_fast(const fexpr_t a, const fexpr_t b)
+
+    Compares *a* and *b* using an ordering based on the internal
+    representation, returning -1, 0 or 1. This can be used, for
+    instance, to maintain sorted arrays of expressions for binary
+    search; the sort order has no mathematical significance.
+
+
 Atoms
 -------------------------------------------------------------------------------
 
@@ -163,7 +188,16 @@ Atoms
 
     Returns whether *expr* is any atom.
 
+.. function:: void fexpr_zero(fexpr_t res)
+
+    Sets *res* to the atomic integer 0.
+
+.. function:: int fexpr_is_zero(const fexpr_t expr)
+
+    Returns whether *expr* is the atomic integer 0.
+
 .. function:: void fexpr_set_si(fexpr_t res, slong c)
+              void fexpr_set_ui(fexpr_t res, ulong c)
               void fexpr_set_fmpz(fexpr_t res, const fmpz_t c)
 
     Sets *res* to the atomic integer *c*.
@@ -186,9 +220,18 @@ Atoms
 Input and output
 ------------------------------------------------------------------------
 
+.. function:: void fexpr_write(calcium_stream_t stream, const fexpr_t expr)
+
+    Writes *expr* to *stream*.
+
 .. function:: void fexpr_print(const fexpr_t expr)
 
     Prints *expr* to standard output.
+
+.. function:: char * fexpr_get_str(const fexpr_t expr)
+
+    Returns a string representation of *expr*. The string must
+    be freed with :func:`flint_free`.
 
 Function call structure
 ------------------------------------------------------------------------
@@ -271,6 +314,114 @@ Arithmetic expressions
     Constructs an arithmetic expression with given arguments.
     No simplifications whatsoever are performed.
 
+.. function:: int fexpr_is_arithmetic_operation(const fexpr_t expr)
+
+    Returns whether *expr* is of the form `f(e_1,\ldots,e_n)`
+    where *f* is one of the arithmetic operators ``Pos``, ``Neg``,
+    ``Add``, ``Sub``, ``Mul``, ``Div``.
+
+.. function:: void fexpr_arithmetic_nodes(fexpr_vec_t nodes, const fexpr_t expr)
+
+    Sets *nodes* to a vector of subexpressions of *expr* such that *expr*
+    is an arithmetic expression with *nodes* as leaves.
+    More precisely, *expr* will be constructed out of nested application
+    the arithmetic operators
+    ``Pos``, ``Neg``, ``Add``, ``Sub``, ``Mul``, ``Div`` with
+    integers and expressions in *nodes* as leaves.
+    Powers ``Pow`` with an atomic integer exponent are also allowed.
+    The nodes are output without repetition but are not automatically sorted in
+    a canonical order.
+
+.. function:: int fexpr_get_fmpz_mpoly_q(fmpz_mpoly_q_t res, const fexpr_t expr, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to the expression *expr* as a formal rational
+    function of the subexpressions in *vars*.
+    The vector *vars* must have the same length as the number of
+    variables specified in *ctx*.
+    To build *vars* automatically for a given expression,
+    :func:`fexpr_arithmetic_nodes` may be used.
+
+    Returns 1 on success and 0 on failure. Failure can occur for the
+    following reasons:
+
+    * A subexpression is encountered that cannot be interpreted
+      as an arithmetic operation and does not appear (exactly) in *vars*.
+    * Overflow (too many terms or too large exponent).
+    * Division by zero (a zero denominator is encountered).
+
+    It is important to note that this function views *expr* as
+    a formal rational function with *vars* as formal indeterminates.
+    It does thus not check for algebraic relations between *vars*
+    and can implicitly divide by zero if *vars* are not algebraically
+    independent.
+
+.. function:: void fexpr_set_fmpz_mpoly(fexpr_t res, const fmpz_mpoly_t poly, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx)
+              void fexpr_set_fmpz_mpoly_q(fexpr_t res, const fmpz_mpoly_q_t frac, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to an expression for the multivariate polynomial *poly*
+    (or rational function *frac*),
+    using the expressions in *vars* as the variables. The length
+    of *vars* must agree with the number of variables in *ctx*.
+    If *NULL* is passed for *vars*, a default choice of symbols
+    is used.
+
+.. function:: int fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags)
+
+    Sets *res* to *expr* converted to expanded normal form viewed
+    as a formal rational function with its non-arithmetic subexpressions
+    as terminal nodes.
+    This function first computes nodes with :func:`fexpr_arithmetic_nodes`,
+    sorts the nodes, evaluates to a rational function with
+    :func:`fexpr_get_fmpz_mpoly_q`, and then converts back to an
+    expression with :func:`fexpr_set_fmpz_mpoly_q`.
+    Optional *flags* are reserved for future use.
+
+
+Vectors
+------------------------------------------------------------------------
+
+.. function:: void fexpr_vec_init(fexpr_vec_t vec)
+
+    Initializes *vec* to a vector of length zero.
+
+.. function:: void fexpr_vec_clear(fexpr_vec_t vec)
+
+    Clears the vector *vec*.
+
+.. function:: void fexpr_vec_print(const fexpr_vec_t vec)
+
+    Prints *vec* to standard output.
+
+.. function:: void fexpr_vec_swap(fexpr_vec_t x, fexpr_vec_t y)
+
+    Swaps *x* and *y* efficiently.
+
+.. function:: void fexpr_vec_fit_length(fexpr_vec_t vec, slong len)
+
+    Ensures that *vec* has space for *len* entries.
+
+.. function:: void fexpr_vec_set(fexpr_vec_t dest, const fexpr_vec_t src)
+
+    Sets *dest* to a copy of *src*.
+
+.. function:: void fexpr_vec_append(fexpr_vec_t vec, const fexpr_t expr)
+
+    Appends *expr* to the end of the vector *vec*.
+
+.. function:: slong fexpr_vec_insert_unique(fexpr_vec_t vec, const fexpr_t expr)
+
+    Inserts *expr* without duplication into vec, returning its
+    position. If this expression already exists, *vec* is unchanged.
+    If this expression does not exist in *vec*, it is appended.
+
+.. function:: void fexpr_vec_set_length(fexpr_vec_t vec, slong len)
+
+    Sets the length of *vec* to *len*, truncating or zero-extending as needed.
+
+.. function:: void _fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
+
+    Sorts the *len* entries in *vec* using 
+    the comparison function :func:`fexpr_cmp_fast`.
 
 .. raw:: latex
 

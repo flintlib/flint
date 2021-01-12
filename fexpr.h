@@ -27,6 +27,7 @@ extern "C" {
 #include "flint/fmpz.h"
 #include "flint/fmpq.h"
 #include "calcium.h"
+#include "fmpz_mpoly_q.h"
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)
 #define FEXPR_TYPE_SMALL_SYMBOL  UWORD(1)
@@ -56,6 +57,7 @@ extern "C" {
 
 #define _FEXPR_SYMBOL_3(x,y,z) (FEXPR_TYPE_SMALL_SYMBOL | ((ulong)(x) << 8) | ((ulong)(y) << 16) | ((ulong)(z) << 24))
 
+#define FEXPR_SYMBOL_Pos  _FEXPR_SYMBOL_3('P', 'o', 's')
 #define FEXPR_SYMBOL_Neg  _FEXPR_SYMBOL_3('N', 'e', 'g')
 #define FEXPR_SYMBOL_Add  _FEXPR_SYMBOL_3('A', 'd', 'd')
 #define FEXPR_SYMBOL_Sub  _FEXPR_SYMBOL_3('S', 'u', 'b')
@@ -74,6 +76,18 @@ fexpr_struct;
 typedef fexpr_struct fexpr_t[1];
 typedef fexpr_struct * fexpr_ptr;
 typedef const fexpr_struct * fexpr_srcptr;
+
+typedef struct
+{
+    fexpr_struct * entries;
+    slong length;
+    slong alloc;
+}
+fexpr_vec_struct;
+
+typedef fexpr_vec_struct fexpr_vec_t[1];
+
+#define fexpr_vec_entry(vec, i) ((vec)->entries + (i))
 
 FEXPR_INLINE void
 fexpr_init(fexpr_t expr)
@@ -185,6 +199,14 @@ fexpr_equal(const fexpr_t a, const fexpr_t b)
     return _mpn_equal(a->data + 1, b->data + 1, sa - 1);
 }
 
+int fexpr_cmp_fast(const fexpr_t a, const fexpr_t b);
+
+FEXPR_INLINE void
+_fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
+{
+    qsort(vec, len, sizeof(fexpr_struct), (int(*)(const void*,const void*)) fexpr_cmp_fast);
+}
+
 FEXPR_INLINE int
 _fexpr_is_integer(const ulong * expr)
 {
@@ -236,7 +258,20 @@ fexpr_is_atom(const fexpr_t expr)
     return _fexpr_is_atom(expr->data);
 }
 
+FEXPR_INLINE void
+fexpr_zero(fexpr_t res)
+{
+    res->data[0] = 0;
+}
+
+FEXPR_INLINE int
+fexpr_is_zero(const fexpr_t expr)
+{
+    return expr->data[0] == 0;
+}
+
 void fexpr_set_si(fexpr_t res, slong c);
+void fexpr_set_ui(fexpr_t res, ulong c);
 void fexpr_set_fmpz(fexpr_t res, const fmpz_t c);
 void fexpr_get_fmpz(fmpz_t c, const fexpr_t x);
 void fexpr_set_fmpq(fexpr_t res, const fmpq_t x);
@@ -284,7 +319,9 @@ void fexpr_call4(fexpr_t res, const fexpr_t f, const fexpr_t x1, const fexpr_t x
 
 void fexpr_call_vec(fexpr_t res, const fexpr_t f, fexpr_srcptr args, slong len);
 
+void fexpr_write(calcium_stream_t stream, const fexpr_t expr);
 void fexpr_print(const fexpr_t expr);
+char * fexpr_get_str(const fexpr_t expr);
 
 FEXPR_INLINE void
 fexpr_neg(fexpr_t res, const fexpr_t a)
@@ -344,6 +381,156 @@ fexpr_pow(fexpr_t res, const fexpr_t a, const fexpr_t b)
     tmp->data = &tmp_head;
     tmp->alloc = 1;
     fexpr_call2(res, tmp, a, b);
+}
+
+int fexpr_is_arithmetic_operation(const fexpr_t expr);
+
+void fexpr_arithmetic_nodes(fexpr_vec_t nodes, const fexpr_t expr);
+
+/* todo: document/change */
+FEXPR_INLINE int
+fexpr_is_Pow(const fexpr_t expr)
+{
+    fexpr_t op;
+    ulong op_head;
+
+    if (fexpr_is_atom(expr))
+        return 0;
+
+    fexpr_view_func(op, expr);
+    op_head = op->data[0];
+
+    return op_head == FEXPR_SYMBOL_Pow;
+}
+
+int fexpr_get_fmpz_mpoly_q(fmpz_mpoly_q_t res, const fexpr_t expr, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx);
+
+void fexpr_set_fmpz_mpoly(fexpr_t res, const fmpz_mpoly_t poly, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx);
+void fexpr_set_fmpz_mpoly_q(fexpr_t res, const fmpz_mpoly_q_t frac, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx);
+
+int fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags);
+
+/* Vectors */
+
+FEXPR_INLINE void
+fexpr_vec_init(fexpr_vec_t vec)
+{
+    vec->entries = NULL;
+    vec->length = 0;
+    vec->alloc = 0;
+}
+
+FEXPR_INLINE void
+fexpr_vec_print(const fexpr_vec_t F)
+{
+    slong i;
+
+    flint_printf("[");
+    for (i = 0; i < F->length; i++)
+    {
+        fexpr_print(F->entries + i);
+        if (i < F->length - 1)
+            flint_printf(", ");
+    }
+    flint_printf("]");
+}
+
+FEXPR_INLINE void
+fexpr_vec_swap(fexpr_vec_t x, fexpr_vec_t y)
+{
+    fexpr_vec_t tmp;
+    *tmp = *x;
+    *x = *y;
+    *y = *tmp;
+}
+
+FEXPR_INLINE void
+fexpr_vec_fit_length(fexpr_vec_t vec, slong len)
+{
+    if (len > vec->alloc)
+    {
+        slong i;
+
+        if (len < 2 * vec->alloc)
+            len = 2 * vec->alloc;
+
+        vec->entries = flint_realloc(vec->entries, len * sizeof(fexpr_struct));
+
+        for (i = vec->alloc; i < len; i++)
+            fexpr_init(vec->entries + i);
+
+        vec->alloc = len;
+    }
+}
+
+FEXPR_INLINE void
+fexpr_vec_clear(fexpr_vec_t vec)
+{
+    slong i;
+
+    for (i = 0; i < vec->alloc; i++)
+        fexpr_clear(vec->entries + i);
+
+    flint_free(vec->entries);
+}
+
+FEXPR_INLINE void
+fexpr_vec_set(fexpr_vec_t dest, const fexpr_vec_t src)
+{
+    if (dest != src)
+    {
+        slong i;
+
+        fexpr_vec_fit_length(dest, src->length);
+
+        for (i = 0; i < src->length; i++)
+            fexpr_set(dest->entries + i, src->entries + i);
+
+        dest->length = src->length;
+    }
+}
+
+FEXPR_INLINE void
+fexpr_vec_append(fexpr_vec_t vec, const fexpr_t f)
+{
+    fexpr_vec_fit_length(vec, vec->length + 1);
+    fexpr_set(vec->entries + vec->length, f);
+    vec->length++;
+}
+
+FEXPR_INLINE slong
+fexpr_vec_insert_unique(fexpr_vec_t vec, const fexpr_t f)
+{
+    slong i;
+
+    for (i = 0; i < vec->length; i++)
+    {
+        if (fexpr_equal(vec->entries + i, f))
+            return i;
+    }
+
+    fexpr_vec_append(vec, f);
+    return vec->length - 1;
+}
+
+FEXPR_INLINE void
+fexpr_vec_set_length(fexpr_vec_t vec, slong len)
+{
+    slong i;
+
+    if (len > vec->length)
+    {
+        fexpr_vec_fit_length(vec, len);
+        for (i = vec->length; i < len; i++)
+            fexpr_zero(vec->entries + i);
+    }
+    else if (len < vec->length)
+    {
+        for (i = len; i < vec->length; i++)
+           fexpr_zero(vec->entries + i);
+    }
+
+    vec->length = len;
 }
 
 #ifdef __cplusplus

@@ -72,6 +72,7 @@ void calcium_stream_init_str(calcium_stream_t out)
 
 void calcium_write(calcium_stream_t out, const char * s);
 void calcium_write_si(calcium_stream_t out, slong x);
+void calcium_write_fmpz(calcium_stream_t out, const fmpz_t c);
 void calcium_write_acb(calcium_stream_t out, const acb_t z, slong digits, ulong flags);
 
 CALCIUM_INLINE
