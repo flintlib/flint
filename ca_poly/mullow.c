@@ -102,26 +102,59 @@ _ca_poly_mullow(ca_ptr res,
             fmpz *z1, *z2, *z3;
             fmpz_t den1, den2;
 
-            fmpz_init(den1);
-            fmpz_init(den2);
-            z1 = _fmpz_vec_init(len1 + len2 + n);
-            z2 = z1 + len1;
-            z3 = z2 + len2;
+            /* todo: handle mixed cases */
+            if (_ca_vec_fmpq_vec_is_fmpz_vec(poly1, len1, ctx) &&
+                _ca_vec_fmpq_vec_is_fmpz_vec(poly2, len2, ctx))
+            {
+                slong i;
 
-            _ca_vec_fmpq_vec_get_fmpz_vec_den(z1, den1, poly1, len1, ctx);
-            _ca_vec_fmpq_vec_get_fmpz_vec_den(z2, den2, poly2, len2, ctx);
+                z1 = _fmpz_vec_init(len1 + len2 + n);
+                z2 = z1 + len1;
+                z3 = z2 + len2;
 
-            fmpz_mul(den1, den1, den2);
-            if (len1 >= len2)
-                _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
+                for (i = 0; i < len1; i++)
+                    z1[i] = *CA_FMPQ_NUMREF(poly1 + i);
+                for (i = 0; i < len2; i++)
+                    z2[i] = *CA_FMPQ_NUMREF(poly2 + i);
+
+                if (len1 >= len2)
+                    _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
+                else
+                    _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+
+                for (i = 0; i < n; i++)
+                {
+                    _ca_make_fmpq(res + i, ctx);
+                    fmpz_one(CA_FMPQ_DENREF(res + i));
+                    fmpz_clear(CA_FMPQ_NUMREF(res + i));
+                    *CA_FMPQ_NUMREF(res + i) = z3[i];
+                }
+
+                flint_free(z1);
+            }
             else
-                _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+            {
+                fmpz_init(den1);
+                fmpz_init(den2);
+                z1 = _fmpz_vec_init(len1 + len2 + n);
+                z2 = z1 + len1;
+                z3 = z2 + len2;
 
-            _ca_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n, ctx);
+                _ca_vec_fmpq_vec_get_fmpz_vec_den(z1, den1, poly1, len1, ctx);
+                _ca_vec_fmpq_vec_get_fmpz_vec_den(z2, den2, poly2, len2, ctx);
 
-            _fmpz_vec_clear(z1, len1 + len2 + n);
-            fmpz_clear(den1);
-            fmpz_clear(den2);
+                fmpz_mul(den1, den1, den2);
+                if (len1 >= len2)
+                    _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
+                else
+                    _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+
+                _ca_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n, ctx);
+
+                _fmpz_vec_clear(z1, len1 + len2 + n);
+                fmpz_clear(den1);
+                fmpz_clear(den2);
+            }
         }
         else
         {
