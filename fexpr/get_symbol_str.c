@@ -19,6 +19,15 @@ char * fexpr_get_symbol_str(const fexpr_t expr)
 
     if (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL)
     {
+        if (((head >> 8) & 0xff) == 0)
+        {
+            i = head >> 16;
+            len = strlen(fexpr_builtins[i].string);
+            res = flint_malloc(len + 1);
+            memcpy(res, fexpr_builtins[i].string, len + 1);
+            return res;
+        }
+
         res = flint_malloc(FEXPR_SMALL_SYMBOL_LEN + 1);
         res[FEXPR_SMALL_SYMBOL_LEN] = '\0';
 

@@ -14,7 +14,15 @@
 void
 fexpr_set_symbol_str(fexpr_t res, const char * s)
 {
-    slong len;
+    slong i, len;
+
+    i = fexpr_get_builtin_str(s);
+
+    if (i != -1)
+    {
+        res->data[0] = FEXPR_TYPE_SMALL_SYMBOL | (i << 16);
+        return;
+    }
 
     len = strlen(s);
 

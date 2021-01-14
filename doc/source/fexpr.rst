@@ -3,8 +3,8 @@
 **fexpr.h** -- flat-packed symbolic expressions
 ===============================================================================
 
-This module supports working with symbolic expressions. Formally,
-a symbolic expression is either:
+This module supports working with symbolic expressions.
+Formally, a symbolic expression is either:
 
 * An atom, being one of the following:
 
@@ -30,6 +30,24 @@ For example, with a standard intepretation (used within Calcium) of the symbols
 ``Neg``, the expression ``Mul(3, Add(Neg(x), y))``
 encodes the formula `3 \cdot ((-x)+y)`
 where ``x`` and ``y`` are symbolic variables.
+
+Symbolic expressions are usually not the best data structure to use
+directly for heavy-duty computations. Functions acting on
+symbolic expressions will typically convert
+to a dedicated data structure (e.g. polynomials) internally
+and (optionally) convert the final result back to a symbolic expression.
+
+We do not allow embedding arbitrary binary objects
+such as
+Flint/Arb/Antic/Calcium types as atoms.
+To embed an object in an expression, one has the following options:
+
+* Represent the object structurally using atoms supported natively by
+  symbolic expressions (for example, an integer polynomial can be
+  represented as a list of coefficients or as an arithmetic expression tree).
+* Introduce a dummy symbol to represent the object, maintaining
+  an external translation table mapping this symbol to the intended value.
+* Encode the object using a string or symbol name (requiring parsing).
 
 Flat-packed representation
 -----------------------------------------------------------------------

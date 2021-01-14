@@ -71,6 +71,13 @@ static char * arb_get_str2(const arb_t x, slong digits, ulong flags)
     return s;
 }
 
+/* todo: document */
+void
+calcium_write_arb(calcium_stream_t out, const arb_t x, slong digits, ulong flags)
+{
+    calcium_write_free(out, arb_get_str2(x, digits, flags));
+}
+
 void
 calcium_write_acb(calcium_stream_t out, const acb_t z, slong digits, ulong flags)
 {

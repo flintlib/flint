@@ -340,7 +340,7 @@ class fexpr:
             >>> ((x+y+1)**3 - (y+1)**3 - (x+y)**3 - (x+1)**3).expanded_normal_form()
             Add(Mul(-1, Pow(x, 3)), Mul(6, x, y), Mul(-1, Pow(y, 3)), -1)
             >>> (1/((1/y + 1/x))).expanded_normal_form()
-            Div(Add(Mul(x, y)), Add(x, y))
+            Div(Mul(x, y), Add(x, y))
             >>> (((x+y)**5 * (x-y)) / (x**2 - y**2)).expanded_normal_form()
             Add(Pow(x, 4), Mul(4, Pow(x, 3), y), Mul(6, Pow(x, 2), Pow(y, 2)), Mul(4, x, Pow(y, 3)), Pow(y, 4))
             >>> (1 / (x - x)).expanded_normal_form()
@@ -352,6 +352,55 @@ class fexpr:
         if not libcalcium.fexpr_expanded_normal_form(res, self, 0):
             raise ValueError("expanded_normal_form: overflow, formal division by zero or unsupported expression")
         return res
+
+    def nstr(self, n=16):
+        """
+        Evaluates this expression numerically using Arb, returning
+        a decimal string correct within 1 ulp in the last output digit.
+        Attempts to obtain *n* digits (but the actual output accuracy
+        may be lower).
+
+            >>> Exp = fexpr("Exp"); Exp(1).nstr()
+            '2.718281828459045'
+            >>> Pi = fexpr("Pi"); Pi.nstr(30)
+            '3.14159265358979323846264338328'
+            >>> Log = fexpr("Log"); Log(-2).nstr()
+            '0.6931471805599453 + 3.141592653589793*I'
+            >>> Im = fexpr("Im")
+            >>> Im(Log(2)).nstr()   # exact zero
+            '0'
+
+        Here the imaginary part is zero, but Arb is not able to
+        compute so exactly. The output ``0e-N``
+        indicates only that the absolute value is bounded by ``1e-N``:
+
+            >>> Exp(Log(-2)).nstr()
+            '-2.000000000000000 + 0e-22*I'
+            >>> Im(Exp(Log(-2))).nstr()
+            '0e-731'
+
+        The algorithm fails if the expression or any subexpression
+        is not a finite complex number:
+
+            >>> Log(0).nstr()
+            Traceback (most recent call last):
+              ...
+            ValueError: nstr: unable to evaluate to a number
+
+        Expressions must be constant:
+
+            >>> fexpr("x").nstr()
+            Traceback (most recent call last):
+              ...
+            ValueError: nstr: unable to evaluate to a number
+
+        """
+        # todo: memory leak
+        s = libcalcium.fexpr_get_decimal_str(self, n, 0)
+        s = s.decode("ascii")
+        if s == "?":
+            raise ValueError("nstr: unable to evaluate to a number")
+        return s
 
 
 class qqbar:
@@ -3242,6 +3291,8 @@ libflint.fmpz_get_str.restype = ctypes.c_char_p
 
 libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libcalcium.fexpr_get_str.restype = ctypes.c_char_p
+
+libcalcium.fexpr_get_decimal_str.restype = ctypes.c_char_p
 
 libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double
 libcalcium.qqbar_set_re_im_d.argtypes = qqbar, ctypes.c_double, ctypes.c_double

@@ -11,7 +11,7 @@
 
 #include "fexpr.h"
 
-void
+int
 fexpr_get_fmpz(fmpz_t c, const fexpr_t x)
 {
     ulong head = x->data[0];
@@ -38,8 +38,7 @@ fexpr_get_fmpz(fmpz_t c, const fexpr_t x)
         }
         else
         {
-            flint_printf("fexpr_get_fmpz: an atomic integer expression is required\n");
-            flint_abort();
+            return 0;
         }
 
         if (nlimbs == 1 && x->data[1] <= COEFF_MAX)
@@ -52,4 +51,6 @@ fexpr_get_fmpz(fmpz_t c, const fexpr_t x)
             fmpz_set_mpn_large(c, x->data + 1, nlimbs, negative);
         }
     }
+
+    return 1;
 }

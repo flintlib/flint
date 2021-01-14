@@ -55,15 +55,98 @@ extern "C" {
 #define FEXPR_HEADER_SIZE        WORD(1)
 #define FEXPR_SMALL_SYMBOL_LEN   ((FLINT_BITS / 8) - 1)
 
-#define _FEXPR_SYMBOL_3(x,y,z) (FEXPR_TYPE_SMALL_SYMBOL | ((ulong)(x) << 8) | ((ulong)(y) << 16) | ((ulong)(z) << 24))
+/* Builtin symbols */
 
-#define FEXPR_SYMBOL_Pos  _FEXPR_SYMBOL_3('P', 'o', 's')
-#define FEXPR_SYMBOL_Neg  _FEXPR_SYMBOL_3('N', 'e', 'g')
-#define FEXPR_SYMBOL_Add  _FEXPR_SYMBOL_3('A', 'd', 'd')
-#define FEXPR_SYMBOL_Sub  _FEXPR_SYMBOL_3('S', 'u', 'b')
-#define FEXPR_SYMBOL_Mul  _FEXPR_SYMBOL_3('M', 'u', 'l')
-#define FEXPR_SYMBOL_Div  _FEXPR_SYMBOL_3('D', 'i', 'v')
-#define FEXPR_SYMBOL_Pow  _FEXPR_SYMBOL_3('P', 'o', 'w')
+/* Must be listed in alphabetical order with corresponding entry
+   in fexpr_builtins (the alphabetical order is just so that
+   we can do binary search on the strings). */
+typedef enum
+{
+    FEXPR_Abs,
+    FEXPR_Acos,
+    FEXPR_Acosh,
+    FEXPR_Add,
+    FEXPR_AiryAi,
+    FEXPR_AiryBi,
+    FEXPR_Arg,
+    FEXPR_Asin,
+    FEXPR_Asinh,
+    FEXPR_Atan,
+    FEXPR_Atanh,
+    FEXPR_BesselI,
+    FEXPR_BesselJ,
+    FEXPR_BesselK,
+    FEXPR_BesselY,
+    FEXPR_Ceil,
+    FEXPR_Conjugate,
+    FEXPR_Cos,
+    FEXPR_Cosh,
+    FEXPR_Div,
+    FEXPR_Erf,
+    FEXPR_Erfc,
+    FEXPR_Erfi,
+    FEXPR_Euler,
+    FEXPR_Exp,
+    FEXPR_Floor,
+    FEXPR_Gamma,
+    FEXPR_HurwitzZeta,
+    FEXPR_I,
+    FEXPR_Im,
+    FEXPR_JacobiTheta,
+    FEXPR_LambertW,
+    FEXPR_Log,
+    FEXPR_LogGamma,
+    FEXPR_Mul,
+    FEXPR_Neg,
+    FEXPR_Pi,
+    FEXPR_Pos,
+    FEXPR_Pow,
+    FEXPR_Psi,
+    FEXPR_Re,
+    FEXPR_RiemannZeta,
+    FEXPR_Root,
+    FEXPR_RootOfUnity,
+    FEXPR_Sign,
+    FEXPR_Sin,
+    FEXPR_Sinh,
+    FEXPR_Sqrt,
+    FEXPR_Sub,
+    FEXPR_Tan,
+    FEXPR_Tanh,
+    FEXPR_BUILTIN_LENGTH
+}
+fexpr_builtin_symbol;
+
+typedef struct
+{
+    fexpr_builtin_symbol symbol;
+    const char * string;
+}
+fexpr_symbol_info;
+
+extern const fexpr_symbol_info fexpr_builtins[FEXPR_BUILTIN_LENGTH];
+
+slong fexpr_get_builtin_str(const char * s);
+
+#define FEXPR_SYMBOL_Pos  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pos << 16))
+#define FEXPR_SYMBOL_Neg  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Neg << 16))
+#define FEXPR_SYMBOL_Add  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Add << 16))
+#define FEXPR_SYMBOL_Sub  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Sub << 16))
+#define FEXPR_SYMBOL_Mul  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Mul << 16))
+#define FEXPR_SYMBOL_Div  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Div << 16))
+#define FEXPR_SYMBOL_Pow  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pow << 16))
+
+#define FEXPR_SYMBOL_I   (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_I << 16))
+#define FEXPR_SYMBOL_Pi  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pi << 16))
+#define FEXPR_SYMBOL_Euler   (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Euler << 16))
+#define FEXPR_SYMBOL_Re  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Re << 16))
+#define FEXPR_SYMBOL_Im  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Im << 16))
+#define FEXPR_SYMBOL_Abs  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Abs << 16))
+#define FEXPR_SYMBOL_Exp  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Exp << 16))
+#define FEXPR_SYMBOL_Log  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Log << 16))
+#define FEXPR_SYMBOL_Cos  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Cos << 16))
+#define FEXPR_SYMBOL_Sin  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Sin << 16))
+#define FEXPR_SYMBOL_Tan  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Tan << 16))
 
 
 typedef struct
@@ -273,7 +356,7 @@ fexpr_is_zero(const fexpr_t expr)
 void fexpr_set_si(fexpr_t res, slong c);
 void fexpr_set_ui(fexpr_t res, ulong c);
 void fexpr_set_fmpz(fexpr_t res, const fmpz_t c);
-void fexpr_get_fmpz(fmpz_t c, const fexpr_t x);
+int fexpr_get_fmpz(fmpz_t c, const fexpr_t x);
 void fexpr_set_fmpq(fexpr_t res, const fmpq_t x);
 
 void fexpr_set_symbol_str(fexpr_t res, const char * s);
@@ -532,6 +615,7 @@ fexpr_vec_set_length(fexpr_vec_t vec, slong len)
 
     vec->length = len;
 }
+
 
 #ifdef __cplusplus
 }
