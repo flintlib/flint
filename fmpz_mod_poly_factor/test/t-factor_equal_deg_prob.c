@@ -49,7 +49,7 @@ main(void)
         }
         while ((poly1->length < 2) || (!fmpz_mod_poly_is_irreducible(poly1, ctx)));
 
-        num = n_randint(state, 5) + 1;
+        num = n_randint(state, 6) + 1;
 
         for (i = 0; i < num; i++)
         {
