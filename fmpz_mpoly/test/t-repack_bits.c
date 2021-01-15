@@ -17,7 +17,8 @@
 int
 main(void)
 {
-    int i, j, success;
+    slong i, j;
+    int success;
 
     FLINT_TEST_INIT(state);
 
@@ -25,7 +26,7 @@ main(void)
     fflush(stdout);
 
     /* Check packing up */
-    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g;
@@ -36,8 +37,8 @@ main(void)
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
 
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
         coeff_bits = n_randint(state, 100);
@@ -78,7 +79,7 @@ main(void)
     }
 
     /* Check repacking down up */
-    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -90,8 +91,8 @@ main(void)
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
 
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
         coeff_bits = n_randint(state, 100);
@@ -139,7 +140,7 @@ main(void)
     }
 
     /* Check packing down */
-    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g;
@@ -150,8 +151,8 @@ main(void)
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
 
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
         coeff_bits = n_randint(state, 100);

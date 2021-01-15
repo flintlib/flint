@@ -207,26 +207,14 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     /* sort the exponents if needed */
     if (ctx->minfo->ord != ORD_LEX)
     {
-        slong msb;
+        flint_bitcnt_t pos;
         mpoly_get_cmpmask(ptempexp, N, bits, ctx->minfo);
-        if (topmask != WORD(0))
-        {
-            count_leading_zeros(msb, topmask);
-            msb = (FLINT_BITS - 1)^msb;
-        } else
-        {
-            msb = -WORD(1);
-        }
-        if (N == 1) {
-            if (msb >= WORD(0))
-            {
-                _fmpz_mpoly_radix_sort1(A, 0, A->length,
-                                                   msb, ptempexp[0], topmask);
-            }
-        } else {
+        pos = FLINT_BIT_COUNT(topmask);
+        if (N == 1)
+            _fmpz_mpoly_radix_sort1(A, 0, A->length, pos, ptempexp[0], topmask);
+        else
             _fmpz_mpoly_radix_sort(A, 0, A->length,
-                                        (N - 1)*FLINT_BITS + msb, N, ptempexp);
-        }
+                                        (N - 1)*FLINT_BITS + pos, N, ptempexp);
     }
 
     flint_free(B->deg_bounds);
