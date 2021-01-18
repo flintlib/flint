@@ -1252,7 +1252,7 @@ v 2.6.3 -- 12 Aug 2020
 2.7.1 -- 18 Jan 2021
 
  * Fix build bug due to missing test files
- * Fix bug in multivariate factoring when there are more than six factors
+ * Fix bug in multivariate factoring when there are more than five factors
  * Fix issue when using MPIR 3.0.0 on Win64 with command line build
  * Fix bug in fmpz_mod_poly_div_series
  * Fix some broken asserts
