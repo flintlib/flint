@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 
 int
@@ -22,184 +22,180 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("repack....");
+    flint_printf("repack_bits....");
     fflush(stdout);
 
     /* Check packing up */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g;
         slong len1, len2;
-        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2, newbits;
+        flint_bitcnt_t exp_bits1, exp_bits2, newbits;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, n_randint(state, 10000) + 2);
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
-        coeff_bits = n_randint(state, 100);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
 
             newbits = g->bits + n_randint(state, 2*FLINT_BITS);
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            success = fmpz_mpoly_repack_bits(f, g, newbits, ctx);
-            fmpz_mpoly_assert_canonical(f, ctx);
+            success = nmod_mpoly_repack_bits(f, g, newbits, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
 
-            if (!success || !fmpz_mpoly_equal(f, g, ctx))
+            if (!success || !nmod_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check packing up\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
 
             newbits = g->bits + n_randint(state, 2*FLINT_BITS);
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            success = fmpz_mpoly_repack_bits(g, g, newbits, ctx);
-            fmpz_mpoly_assert_canonical(g, ctx);
+            success = nmod_mpoly_repack_bits(g, g, newbits, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
 
-            if (!success || !fmpz_mpoly_equal(f, g, ctx))
+            if (!success || !nmod_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check packing up with aliasing\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check repacking down up */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g, h;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h;
         slong len1, len2;
-        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2, newbits;
+        flint_bitcnt_t exp_bits1, exp_bits2, newbits;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(h, ctx);
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, n_randint(state, 10000) + 2);
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h, ctx);
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
-        coeff_bits = n_randint(state, 100);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpz_mpoly_randtest_bits(h, state, len2, coeff_bits, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len2, exp_bits2, ctx);
 
             newbits = g->bits + n_randint(state, 2*FLINT_BITS);
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            fmpz_mpoly_repack_bits(f, g, newbits, ctx);
-            fmpz_mpoly_assert_canonical(f, ctx);
+            nmod_mpoly_repack_bits(f, g, newbits, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
 
             newbits = g->bits + n_randint(state, 2*FLINT_BITS);
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            success = fmpz_mpoly_repack_bits(h, f, newbits, ctx);
-            fmpz_mpoly_assert_canonical(h, ctx);
+            success = nmod_mpoly_repack_bits(h, f, newbits, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
-            if (!success || !fmpz_mpoly_equal(h, g, ctx))
+            if (!success || !nmod_mpoly_equal(h, g, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check repacking down\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
 
             newbits = g->bits + n_randint(state, 2*FLINT_BITS);
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            success = fmpz_mpoly_repack_bits(f, f, newbits, ctx);
-            fmpz_mpoly_assert_canonical(f, ctx);
+            success = nmod_mpoly_repack_bits(f, f, newbits, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
 
-            if (!success || !fmpz_mpoly_equal(f, g, ctx))
+            if (!success || !nmod_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check repacking down with aliasing\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check packing down */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g;
         slong len1, len2;
-        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2, newbits;
+        flint_bitcnt_t exp_bits1, exp_bits2, newbits;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, n_randint(state, 10000) + 2);
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
-        coeff_bits = n_randint(state, 100);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
 
             if (g->bits <= MPOLY_MIN_BITS)
                 continue;
 
             newbits = n_randint(state, g->bits - MPOLY_MIN_BITS) + MPOLY_MIN_BITS;
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            success = fmpz_mpoly_repack_bits(f, g, newbits, ctx);
-            fmpz_mpoly_assert_canonical(f, ctx);
+            success = nmod_mpoly_repack_bits(f, g, newbits, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
 
-            if (success && !fmpz_mpoly_equal(f, g, ctx))
+            if (success && !nmod_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check packing down\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
 
-            fmpz_mpoly_set(f, g, ctx);
+            nmod_mpoly_set(f, g, ctx);
             newbits = n_randint(state, g->bits - MPOLY_MIN_BITS) + MPOLY_MIN_BITS;
             newbits = mpoly_fix_bits(newbits, ctx->minfo);
-            success = fmpz_mpoly_repack_bits(g, g, newbits, ctx);
-            fmpz_mpoly_assert_canonical(g, ctx);
+            success = nmod_mpoly_repack_bits(g, g, newbits, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
 
-            if (success && !fmpz_mpoly_equal(f, g, ctx))
+            if (success && !nmod_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 flint_printf("Check packing down with aliasing\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 
