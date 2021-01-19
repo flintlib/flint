@@ -192,6 +192,10 @@ class fexpr:
                     libflint.fmpz_clear(nref)
             elif typ is str:
                 libcalcium.fexpr_set_symbol_str(self, val.encode('ascii'))
+            elif typ is float:
+                libcalcium.fexpr_set_d(self, val)
+            elif typ is complex:
+                libcalcium.fexpr_set_re_im_d(self, val.real, val.imag)
             else:
                 raise TypeError
 
@@ -3323,7 +3327,8 @@ libcalcium.fexpr_builtin_name.restype = ctypes.c_char_p
 libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libcalcium.fexpr_get_str.restype = ctypes.c_char_p
 libcalcium.fexpr_get_str_latex.restype = ctypes.c_char_p
-
+libcalcium.fexpr_set_d.argtypes = fexpr, ctypes.c_double
+libcalcium.fexpr_set_re_im_d.argtypes = fexpr, ctypes.c_double, ctypes.c_double
 libcalcium.fexpr_get_decimal_str.restype = ctypes.c_char_p
 
 libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double

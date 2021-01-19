@@ -15,11 +15,23 @@
 void
 fexpr_neg(fexpr_t res, const fexpr_t a)
 {
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Neg;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call1(res, tmp, a);
+    /* todo: handle aliasing in call1 */
+    if (res == a)
+    {
+        fexpr_t tmp;
+        fexpr_init(tmp);
+        fexpr_set(tmp, a);
+        fexpr_neg(res, tmp);
+        fexpr_clear(tmp);
+    }
+    else
+    {
+        fexpr_t tmp;
+        ulong tmp_head = FEXPR_SYMBOL_Neg;
+        tmp->data = &tmp_head;
+        tmp->alloc = 1;
+        fexpr_call1(res, tmp, a);
+    }
 }
 
 void

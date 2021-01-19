@@ -267,6 +267,12 @@ void fexpr_set_fmpz(fexpr_t res, const fmpz_t c);
 int fexpr_get_fmpz(fmpz_t c, const fexpr_t x);
 void fexpr_set_fmpq(fexpr_t res, const fmpq_t x);
 
+FEXPR_INLINE void
+fexpr_set_symbol_builtin(fexpr_t res, slong id)
+{
+    res->data[0] = FEXPR_TYPE_SMALL_SYMBOL | (id << 16);
+}
+
 void fexpr_set_symbol_str(fexpr_t res, const char * s);
 char * fexpr_get_symbol_str(const fexpr_t expr);
 
@@ -335,6 +341,9 @@ void fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flag
 void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_infix(calcium_stream_t out, const fexpr_t expr, ulong flags);
 
+void fexpr_set_arf(fexpr_t res, const arf_t x);
+void fexpr_set_d(fexpr_t res, double x);
+void fexpr_set_re_im_d(fexpr_t res, double x, double y);
 
 void fexpr_neg(fexpr_t res, const fexpr_t a);
 void fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b);

@@ -225,6 +225,11 @@ Atoms
     Sets *res* to the atomic integer in *expr*. This aborts
     if *expr* is not an atomic integer.
 
+.. function:: void fexpr_set_symbol_builtin(fexpr_t res, slong id)
+
+    Sets *res* to the builtin symbol with internal index *id*
+    (see :ref:`fexpr-builtin`).
+
 .. function:: void fexpr_set_symbol_str(fexpr_t res, const char * s)
 
     Sets *res* to the symbol given by *s*.
@@ -341,6 +346,20 @@ Arithmetic expressions
     Sets *res* to the rational number *x*. This creates an atomic
     integer if the denominator of *x* is one, and otherwise creates a
     division expression.
+
+.. function:: void fexpr_set_arf(fexpr_t res, const arf_t x)
+              void fexpr_set_d(fexpr_t res, double x)
+
+    Sets *res* to an expression for the value of the
+    floating-point number *x*. NaN is represented
+    as ``Undefined``. For a regular value, this creates an atomic integer
+    or a rational fraction if the exponent is small, and otherwise
+    creates an expression of the form ``Mul(m, Pow(2, e))``.
+
+.. function:: void fexpr_set_re_im_d(fexpr_t res, double x, double y)
+
+    Sets *res* to an expression for the complex number with real part
+    *x* and imaginary part *y*.
 
 .. function:: void fexpr_neg(fexpr_t res, const fexpr_t a)
               void fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b)
