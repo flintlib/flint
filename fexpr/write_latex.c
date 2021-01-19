@@ -41,6 +41,31 @@ void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, 
 }
 
 void
+fexpr_write_latex_infix(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t func, arg;
+    slong i, nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    fexpr_view_func(func, expr);
+    fexpr_view_func(arg, expr);
+
+    for (i = 0; i < nargs; i++)
+    {
+        fexpr_view_next(arg);
+        fexpr_write_latex(out, arg, flags);
+        if (i < nargs - 1)
+        {
+            calcium_write(out, " ");
+            fexpr_write_latex(out, func, flags);
+            calcium_write(out, " ");
+        }
+    }
+}
+
+
+void
 fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     if (fexpr_is_atom(expr))
@@ -70,10 +95,27 @@ fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags)
                 calcium_write(out, "}");
             }
         }
+        else
+        {
+            fexpr_write(out, expr);
+        }
     }
     else
     {
-        fexpr_write_latex_call(out, expr, flags);
+        fexpr_t func;
+        slong i;
+
+        fexpr_view_func(func, expr);
+        i = FEXPR_BUILTIN_ID(func->data[0]);
+
+        if (i != -1 && fexpr_builtin_table[i].latex_writer != NULL)
+        {
+            (fexpr_builtin_table[i].latex_writer)(out, expr, flags);
+        }
+        else
+        {
+            fexpr_write_latex_call(out, expr, flags);
+        }
     }
 }
 

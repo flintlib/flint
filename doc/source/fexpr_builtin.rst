@@ -629,6 +629,8 @@ Integrals
 Complex analysis
 ........................................................................
 
+.. macro:: Path
+
 TBD.
 
 Matrices and linear algebra
@@ -738,6 +740,8 @@ Primes and divisibility
 .. macro:: CongruentMod
 
 .. macro:: Divides
+
+.. macro:: Mod
 
 .. macro:: GCD
 
