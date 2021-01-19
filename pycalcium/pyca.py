@@ -152,6 +152,27 @@ class ca_poly_vec_struct(ctypes.Structure):
 
 class fexpr:
 
+    @staticmethod
+    def inject():
+        """
+        Inject all builtin symbol names into the calling namespace.
+        For interactive use only!
+
+        >>> fexpr.inject()
+        >>> n = fexpr("n")
+        >>> Sum(Sin(Pi*n/3)/Factorial(n), For(n,0,Infinity))
+        Sum(Div(Sin(Div(Mul(Pi, n), 3)), Factorial(n)), For(n, 0, Infinity))
+
+        """
+        from inspect import currentframe
+        frame = currentframe().f_back
+        num = libcalcium.fexpr_builtin_length()
+        for i in range(num):
+            symbol_name = libcalcium.fexpr_builtin_name(i)
+            symbol_name = symbol_name.decode('ascii')
+            frame.f_globals[symbol_name] = fexpr(symbol_name)
+        del frame  # break cyclic dependencies as stated in inspect docs
+
     def __init__(self, val=0):
         self._data = fexpr_struct()
         self._ref = ctypes.byref(self._data)
@@ -3289,6 +3310,7 @@ libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
 libflint.fmpz_get_str.argtypes = ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(_fmpz_struct)
 libflint.fmpz_get_str.restype = ctypes.c_char_p
 
+libcalcium.fexpr_builtin_name.restype = ctypes.c_char_p
 libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libcalcium.fexpr_get_str.restype = ctypes.c_char_p
 
@@ -3307,6 +3329,7 @@ libcalcium.ca_set_d.argtypes = ca, ctypes.c_double, ca_ctx
 libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
 libcalcium.ca_get_str.restype = ctypes.c_char_p
+
 
 
 

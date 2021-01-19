@@ -9,6 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#define FEXPR_BUILTIN_C
+#define FEXPR_BUILTIN_INLINES_C
 #include "fexpr_builtin.h"
 
