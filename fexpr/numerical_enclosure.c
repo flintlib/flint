@@ -32,14 +32,6 @@ _acb_root(acb_t res, const acb_t x, const acb_t y, slong prec)
     }
 }
 
-int
-fexpr_is_builtin_symbol(const fexpr_t expr)
-{
-    ulong head;
-    head = expr->data[0];
-    return (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL) && (((head >> 8) & 0xff) == 0);
-}
-
 #define FEXPR_BUILTIN(head) ((head) >> 16)
 
 #define REQUIRE_NARGS(n)  if (nargs != n) { success = 0; break; }

@@ -188,9 +188,13 @@ typedef enum
     FEXPR_Hypergeometric0F1Regularized,
     FEXPR_Hypergeometric1F1,
     FEXPR_Hypergeometric1F1Regularized,
+    FEXPR_Hypergeometric1F2,
+    FEXPR_Hypergeometric1F2Regularized,
     FEXPR_Hypergeometric2F0,
     FEXPR_Hypergeometric2F1,
     FEXPR_Hypergeometric2F1Regularized,
+    FEXPR_Hypergeometric2F2,
+    FEXPR_Hypergeometric2F2Regularized,
     FEXPR_Hypergeometric3F2,
     FEXPR_Hypergeometric3F2Regularized,
     FEXPR_HypergeometricU,
@@ -372,10 +376,14 @@ typedef enum
 }
 fexpr_builtin_symbol;
 
+typedef void (*_fexpr_latex_writer)(calcium_stream_t, const fexpr_t, ulong);
+
 typedef struct
 {
     fexpr_builtin_symbol symbol;
     const char * string;
+    const char * latex_string;
+    _fexpr_latex_writer latex_writer;
 }
 fexpr_symbol_info;
 

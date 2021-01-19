@@ -55,6 +55,8 @@ extern "C" {
 #define FEXPR_HEADER_SIZE        WORD(1)
 #define FEXPR_SMALL_SYMBOL_LEN   ((FLINT_BITS / 8) - 1)
 
+#define FEXPR_BUILTIN_ID(head) ((head) >> 16)
+
 typedef struct
 {
     ulong * data;
@@ -268,6 +270,15 @@ void fexpr_set_fmpq(fexpr_t res, const fmpq_t x);
 void fexpr_set_symbol_str(fexpr_t res, const char * s);
 char * fexpr_get_symbol_str(const fexpr_t expr);
 
+/* todo: document */
+FEXPR_INLINE int
+fexpr_is_builtin_symbol(const fexpr_t expr)
+{
+    ulong head;
+    head = expr->data[0];
+    return (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL) && (((head >> 8) & 0xff) == 0);
+}
+
 FEXPR_INLINE slong
 fexpr_nargs(const fexpr_t expr)
 {
@@ -308,9 +319,21 @@ void fexpr_call4(fexpr_t res, const fexpr_t f, const fexpr_t x1, const fexpr_t x
 
 void fexpr_call_vec(fexpr_t res, const fexpr_t f, fexpr_srcptr args, slong len);
 
+/* Input/output */
+
 void fexpr_write(calcium_stream_t stream, const fexpr_t expr);
 void fexpr_print(const fexpr_t expr);
 char * fexpr_get_str(const fexpr_t expr);
+
+/* LaTeX output */
+
+void fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_print_latex(const fexpr_t expr, ulong flags);
+char * fexpr_get_str_latex(const fexpr_t expr, ulong flags);
+
+void fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
+
 
 void fexpr_neg(fexpr_t res, const fexpr_t a);
 void fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b);

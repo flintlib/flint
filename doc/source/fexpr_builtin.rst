@@ -978,7 +978,11 @@ Hypergeometric functions
 
 .. macro:: Hypergeometric1F1
 
+.. macro:: Hypergeometric1F2
+
 .. macro:: Hypergeometric2F1
+
+.. macro:: Hypergeometric2F2
 
 .. macro:: Hypergeometric2F0
 
@@ -992,7 +996,11 @@ Hypergeometric functions
 
 .. macro:: Hypergeometric1F1Regularized
 
+.. macro:: Hypergeometric1F2Regularized
+
 .. macro:: Hypergeometric2F1Regularized
+
+.. macro:: Hypergeometric2F2Regularized
 
 .. macro:: Hypergeometric3F2Regularized
 

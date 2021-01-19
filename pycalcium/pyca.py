@@ -212,6 +212,15 @@ class fexpr:
         res = str(s, 'ascii')
         return res
 
+    def latex(self):
+        # todo: memory leak
+        s = libcalcium.fexpr_get_str_latex(self, 0)
+        res = str(s, 'ascii')
+        return res
+
+    def _repr_latex_(self):
+        return "$$" + self.latex() + "$$"
+
     def __eq__(self, other):
         if type(self) is not type(other):
             return NotImplemented
@@ -3313,6 +3322,7 @@ libflint.fmpz_get_str.restype = ctypes.c_char_p
 libcalcium.fexpr_builtin_name.restype = ctypes.c_char_p
 libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libcalcium.fexpr_get_str.restype = ctypes.c_char_p
+libcalcium.fexpr_get_str_latex.restype = ctypes.c_char_p
 
 libcalcium.fexpr_get_decimal_str.restype = ctypes.c_char_p
 

@@ -251,6 +251,26 @@ Input and output
     Returns a string representation of *expr*. The string must
     be freed with :func:`flint_free`.
 
+LaTeX output
+------------------------------------------------------------------------
+
+The *flags* parameter is reserved for future use specifying options
+for LaTeX output.
+
+.. function:: void fexpr_write_latex(calcium_stream_t stream, const fexpr_t expr, ulong flags)
+
+    Writes the LaTeX representation of *expr* to *stream*.
+
+.. function:: void fexpr_print_latex(const fexpr_t expr, ulong flags)
+
+    Prints the LaTeX representation of *expr* to standard output.
+
+.. function:: char * fexpr_get_str_latex(const fexpr_t expr, ulong flags)
+
+    Returns a string of the LaTeX representation of *expr*. The string
+    must be freed with :func:`flint_free`.
+
+
 Function call structure
 ------------------------------------------------------------------------
 
