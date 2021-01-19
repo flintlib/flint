@@ -84,6 +84,16 @@ symbolic representations of numbers.
    ca_ext.rst
    ca_field.rst
 
+Symbolic expressions
+--------------------------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   fexpr.rst
+   fexpr_eval.rst
+   fexpr_builtin.rst
+
 Basic algebraic structures
 --------------------------------------------
 
@@ -95,7 +105,6 @@ use in appropriate external applications is encouraged.
 .. toctree::
    :maxdepth: 2
 
-   fexpr.rst
    fmpz_mpoly_q.rst
    qqbar.rst
    utils_flint.rst

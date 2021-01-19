@@ -10,6 +10,7 @@
 */
 
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 char * fexpr_get_symbol_str(const fexpr_t expr)
 {
@@ -22,9 +23,9 @@ char * fexpr_get_symbol_str(const fexpr_t expr)
         if (((head >> 8) & 0xff) == 0)
         {
             i = head >> 16;
-            len = strlen(fexpr_builtins[i].string);
+            len = strlen(fexpr_builtin_table[i].string);
             res = flint_malloc(len + 1);
-            memcpy(res, fexpr_builtins[i].string, len + 1);
+            memcpy(res, fexpr_builtin_table[i].string, len + 1);
             return res;
         }
 

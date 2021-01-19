@@ -10,6 +10,7 @@
 */
 
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 int
 fexpr_get_fmpz_mpoly_q(fmpz_mpoly_q_t res, const fexpr_t expr, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx)

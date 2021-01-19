@@ -10,13 +10,14 @@
 */
 
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 void
 fexpr_set_symbol_str(fexpr_t res, const char * s)
 {
     slong i, len;
 
-    i = fexpr_get_builtin_str(s);
+    i = fexpr_builtin_lookup(s);
 
     if (i != -1)
     {

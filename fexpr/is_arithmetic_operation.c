@@ -10,6 +10,7 @@
 */
 
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 #define FEXPR_IS_ARITHMETIC_OP(h) \
     ((h) == FEXPR_SYMBOL_Add || (h) == FEXPR_SYMBOL_Sub || \

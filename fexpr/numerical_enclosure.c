@@ -13,6 +13,7 @@
 #include "acb_modular.h"
 #include "acb_dirichlet.h"
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 void
 _acb_root(acb_t res, const acb_t x, const acb_t y, slong prec)
@@ -85,23 +86,55 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
     }
     else if (fexpr_is_atom(expr))
     {
-        /* todo: clean up these cases */
+        ulong op;
 
-        if (expr->data[0] == FEXPR_SYMBOL_I)
+        if (!fexpr_is_builtin_symbol(expr))
         {
-            acb_onei(res);
-            return 1;
+            acb_indeterminate(res);
+            return 0;
         }
 
-        if (expr->data[0] == FEXPR_SYMBOL_Pi)
+        /* todo: clean up these cases */
+        op = FEXPR_BUILTIN(expr->data[0]);
+
+        if (op == FEXPR_Pi)
         {
             acb_const_pi(res, prec);
             return 1;
         }
 
-        if (expr->data[0] == FEXPR_SYMBOL_Euler)
+        if (op == FEXPR_NumberI)
+        {
+            acb_onei(res);
+            return 1;
+        }
+
+        if (op == FEXPR_NumberE)
+        {
+            arb_const_e(acb_realref(res), prec);
+            arb_zero(acb_imagref(res));
+            return 1;
+        }
+
+        if (op == FEXPR_Euler)
         {
             arb_const_euler(acb_realref(res), prec);
+            arb_zero(acb_imagref(res));
+            return 1;
+        }
+
+        if (op == FEXPR_CatalanConstant)
+        {
+            arb_const_catalan(acb_realref(res), prec);
+            arb_zero(acb_imagref(res));
+            return 1;
+        }
+
+        if (op == FEXPR_GoldenRatio)
+        {
+            arb_sqrt_ui(acb_realref(res), 5, prec);
+            arb_add_ui(acb_realref(res), acb_realref(res), 1, prec);
+            arb_mul_2exp_si(acb_realref(res), acb_realref(res), -1);
             arb_zero(acb_imagref(res));
             return 1;
         }
@@ -230,6 +263,9 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
 
         case FEXPR_Cosh:
             ACB_FUNCTION_1(acb_cosh)
+
+        case FEXPR_DedekindEta:
+            ACB_FUNCTION_1(acb_modular_eta)
 
         case FEXPR_Div:
             ACB_FUNCTION_2(acb_div)
@@ -370,7 +406,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
             ACB_FUNCTION_2(acb_pow)
 
         /* todo: acb_polygamma */
-        case FEXPR_Psi:
+        case FEXPR_DigammaFunction:
             ACB_FUNCTION_1(acb_digamma)
 
         case FEXPR_Re:

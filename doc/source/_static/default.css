@@ -22,3 +22,5 @@ li p { margin: 0.2em; }
 .citation dd {
     margin-left: 6em;
 }
+
+code { padding: 0.1em; background-color: #f8f8f8; border: 1px solid #eee; }

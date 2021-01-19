@@ -11,6 +11,7 @@
 
 #include "calcium.h"
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 int main()
 {
@@ -26,35 +27,35 @@ int main()
 
         for (i = 0; i < FEXPR_BUILTIN_LENGTH; i++)
         {
-            if (fexpr_builtins[i].symbol != i)
+            if (fexpr_builtin_table[i].symbol != i)
             {
                 flint_printf("FAIL (missing)\n");
-                flint_printf("%s\n", fexpr_builtins[i].string);
+                flint_printf("%s\n", fexpr_builtin_name(i));
                 flint_abort();
             }
 
             if (i < FEXPR_BUILTIN_LENGTH - 1 &&
-                strcmp(fexpr_builtins[i].string, fexpr_builtins[i + 1].string) >= 0)
+                strcmp(fexpr_builtin_name(i), fexpr_builtin_name(i + 1)) >= 0)
             {
                 flint_printf("FAIL (order)\n");
-                flint_printf("%s\n", fexpr_builtins[i].string);
-                flint_printf("%s\n", fexpr_builtins[i + 1].string);
+                flint_printf("%s\n", fexpr_builtin_name(i));
+                flint_printf("%s\n", fexpr_builtin_name(i + 1));
                 flint_abort();
             }
 
-            j = fexpr_get_builtin_str(fexpr_builtins[i].string);
+            j = fexpr_builtin_lookup(fexpr_builtin_name(i));
 
             if (i != j)
             {
                 flint_printf("FAIL (lookup)\n");
-                flint_printf("%s\n", fexpr_builtins[i].string);
+                flint_printf("%s\n", fexpr_builtin_name(i));
                 flint_abort();
             }
         }
     }
 
-    if (fexpr_get_builtin_str("") != -1 || fexpr_get_builtin_str("FooBarBaz") != -1 ||
-        fexpr_get_builtin_str("ZZZZZZZ") != -1)
+    if (fexpr_builtin_lookup("") != -1 || fexpr_builtin_lookup("FooBarBaz") != -1 ||
+        fexpr_builtin_lookup("ZZZZZZZ") != -1)
     {
         flint_printf("FAIL (lookup)\n");
         flint_abort();

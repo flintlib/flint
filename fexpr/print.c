@@ -10,6 +10,7 @@
 */
 
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 void
 fexpr_write(calcium_stream_t stream, const fexpr_t expr)
@@ -30,7 +31,7 @@ fexpr_write(calcium_stream_t stream, const fexpr_t expr)
 
                 if (((expr->data[0] >> 8) & 0xff) == 0)
                 {
-                    calcium_write(stream, fexpr_builtins[expr->data[0] >> 16].string);
+                    calcium_write(stream, fexpr_builtin_table[expr->data[0] >> 16].string);
                 }
                 else
                 {

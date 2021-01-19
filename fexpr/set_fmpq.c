@@ -10,6 +10,7 @@
 */
 
 #include "fexpr.h"
+#include "fexpr_builtin.h"
 
 void
 fexpr_set_fmpq(fexpr_t res, const fmpq_t x)

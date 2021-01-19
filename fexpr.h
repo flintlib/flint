@@ -55,100 +55,6 @@ extern "C" {
 #define FEXPR_HEADER_SIZE        WORD(1)
 #define FEXPR_SMALL_SYMBOL_LEN   ((FLINT_BITS / 8) - 1)
 
-/* Builtin symbols */
-
-/* Must be listed in alphabetical order with corresponding entry
-   in fexpr_builtins (the alphabetical order is just so that
-   we can do binary search on the strings). */
-typedef enum
-{
-    FEXPR_Abs,
-    FEXPR_Acos,
-    FEXPR_Acosh,
-    FEXPR_Add,
-    FEXPR_AiryAi,
-    FEXPR_AiryBi,
-    FEXPR_Arg,
-    FEXPR_Asin,
-    FEXPR_Asinh,
-    FEXPR_Atan,
-    FEXPR_Atanh,
-    FEXPR_BesselI,
-    FEXPR_BesselJ,
-    FEXPR_BesselK,
-    FEXPR_BesselY,
-    FEXPR_Ceil,
-    FEXPR_Conjugate,
-    FEXPR_Cos,
-    FEXPR_Cosh,
-    FEXPR_Div,
-    FEXPR_Erf,
-    FEXPR_Erfc,
-    FEXPR_Erfi,
-    FEXPR_Euler,
-    FEXPR_Exp,
-    FEXPR_Floor,
-    FEXPR_Gamma,
-    FEXPR_HurwitzZeta,
-    FEXPR_I,
-    FEXPR_Im,
-    FEXPR_JacobiTheta,
-    FEXPR_LambertW,
-    FEXPR_Log,
-    FEXPR_LogGamma,
-    FEXPR_Mul,
-    FEXPR_Neg,
-    FEXPR_Pi,
-    FEXPR_Pos,
-    FEXPR_Pow,
-    FEXPR_Psi,
-    FEXPR_Re,
-    FEXPR_RiemannZeta,
-    FEXPR_Root,
-    FEXPR_RootOfUnity,
-    FEXPR_Sign,
-    FEXPR_Sin,
-    FEXPR_Sinh,
-    FEXPR_Sqrt,
-    FEXPR_Sub,
-    FEXPR_Tan,
-    FEXPR_Tanh,
-    FEXPR_BUILTIN_LENGTH
-}
-fexpr_builtin_symbol;
-
-typedef struct
-{
-    fexpr_builtin_symbol symbol;
-    const char * string;
-}
-fexpr_symbol_info;
-
-extern const fexpr_symbol_info fexpr_builtins[FEXPR_BUILTIN_LENGTH];
-
-slong fexpr_get_builtin_str(const char * s);
-
-#define FEXPR_SYMBOL_Pos  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pos << 16))
-#define FEXPR_SYMBOL_Neg  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Neg << 16))
-#define FEXPR_SYMBOL_Add  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Add << 16))
-#define FEXPR_SYMBOL_Sub  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Sub << 16))
-#define FEXPR_SYMBOL_Mul  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Mul << 16))
-#define FEXPR_SYMBOL_Div  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Div << 16))
-#define FEXPR_SYMBOL_Pow  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pow << 16))
-
-#define FEXPR_SYMBOL_I   (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_I << 16))
-#define FEXPR_SYMBOL_Pi  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pi << 16))
-#define FEXPR_SYMBOL_Euler   (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Euler << 16))
-#define FEXPR_SYMBOL_Re  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Re << 16))
-#define FEXPR_SYMBOL_Im  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Im << 16))
-#define FEXPR_SYMBOL_Abs  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Abs << 16))
-#define FEXPR_SYMBOL_Exp  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Exp << 16))
-#define FEXPR_SYMBOL_Log  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Log << 16))
-#define FEXPR_SYMBOL_Cos  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Cos << 16))
-#define FEXPR_SYMBOL_Sin  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Sin << 16))
-#define FEXPR_SYMBOL_Tan  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Tan << 16))
-
-
 typedef struct
 {
     ulong * data;
@@ -406,85 +312,19 @@ void fexpr_write(calcium_stream_t stream, const fexpr_t expr);
 void fexpr_print(const fexpr_t expr);
 char * fexpr_get_str(const fexpr_t expr);
 
-FEXPR_INLINE void
-fexpr_neg(fexpr_t res, const fexpr_t a)
-{
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Neg;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call1(res, tmp, a);
-}
-
-FEXPR_INLINE void
-fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b)
-{
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Add;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
-}
-
-FEXPR_INLINE void
-fexpr_sub(fexpr_t res, const fexpr_t a, const fexpr_t b)
-{
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Sub;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
-}
-
-FEXPR_INLINE void
-fexpr_mul(fexpr_t res, const fexpr_t a, const fexpr_t b)
-{
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Mul;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
-}
-
-FEXPR_INLINE void
-fexpr_div(fexpr_t res, const fexpr_t a, const fexpr_t b)
-{
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Div;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
-}
-
-FEXPR_INLINE void
-fexpr_pow(fexpr_t res, const fexpr_t a, const fexpr_t b)
-{
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Pow;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
-}
+void fexpr_neg(fexpr_t res, const fexpr_t a);
+void fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b);
+void fexpr_sub(fexpr_t res, const fexpr_t a, const fexpr_t b);
+void fexpr_mul(fexpr_t res, const fexpr_t a, const fexpr_t b);
+void fexpr_div(fexpr_t res, const fexpr_t a, const fexpr_t b);
+void fexpr_pow(fexpr_t res, const fexpr_t a, const fexpr_t b);
 
 int fexpr_is_arithmetic_operation(const fexpr_t expr);
 
 void fexpr_arithmetic_nodes(fexpr_vec_t nodes, const fexpr_t expr);
 
 /* todo: document/change */
-FEXPR_INLINE int
-fexpr_is_Pow(const fexpr_t expr)
-{
-    fexpr_t op;
-    ulong op_head;
-
-    if (fexpr_is_atom(expr))
-        return 0;
-
-    fexpr_view_func(op, expr);
-    op_head = op->data[0];
-
-    return op_head == FEXPR_SYMBOL_Pow;
-}
+int fexpr_is_Pow(const fexpr_t expr);
 
 int fexpr_get_fmpz_mpoly_q(fmpz_mpoly_q_t res, const fexpr_t expr, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx);
 
