@@ -267,7 +267,7 @@ class fexpr:
         libcalcium.fexpr_add(res, self, other)
         return res
 
-    def __add__(self, other):
+    def __radd__(self, other):
         if type(self) is not type(other):
             try:
                 other = fexpr(other)
@@ -365,17 +365,16 @@ class fexpr:
     def __bool__(self):
         return True
 
-    #def __abs__(self):
+    def __abs__(self):
+        return fexpr("Abs")(self)
 
     def __neg__(self):
         res = fexpr()
         libcalcium.fexpr_neg(res, self)
         return res
 
-    #def __pos__(self):
-    #    res = fexpr()
-    #    libcalcium.fexpr_pos(res, self)
-    #    return res
+    def __pos__(self):
+        return fexpr("Pos")(self)
 
     def expanded_normal_form(self):
         """

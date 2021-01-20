@@ -342,6 +342,8 @@ char * fexpr_get_str(const fexpr_t expr);
 
 /* LaTeX output */
 
+#define FEXPR_LATEX_SMALL 1
+
 void fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_print_latex(const fexpr_t expr, ulong flags);
 char * fexpr_get_str_latex(const fexpr_t expr, ulong flags);
@@ -350,6 +352,10 @@ void fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flag
 void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_infix(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_mul(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_div(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_neg_pos(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_add(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_sub(calcium_stream_t out, const fexpr_t expr, ulong flags);
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);
