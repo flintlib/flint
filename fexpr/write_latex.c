@@ -102,6 +102,14 @@ fexpr_need_cdot_before_factor(const fexpr_t expr)
         fexpr_is_builtin_call(expr, FEXPR_Pos))
         return 1;
 
+    if (fexpr_is_builtin_call(expr, FEXPR_Pow) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t first;
+        fexpr_view_arg(first, expr, 0);
+        if (fexpr_is_integer(first))
+            return 1;
+    }
+
     return 0;
 }
 
