@@ -270,7 +270,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_PolynomialFractions, "PolynomialFractions", "", NULL, },
     { FEXPR_Polynomials, "Polynomials", "", NULL, },
     { FEXPR_Pos, "Pos", "", fexpr_write_latex_neg_pos, },
-    { FEXPR_Pow, "Pow", "", NULL, },
+    { FEXPR_Pow, "Pow", "", fexpr_write_latex_pow, },
     { FEXPR_Prime, "Prime", "", NULL, },
     { FEXPR_PrimePi, "PrimePi", "\\pi", NULL, },
     { FEXPR_PrimeProduct, "PrimeProduct", "", NULL, },

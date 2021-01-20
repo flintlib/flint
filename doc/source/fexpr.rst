@@ -259,9 +259,6 @@ Input and output
 LaTeX output
 ------------------------------------------------------------------------
 
-The *flags* parameter is reserved for future use specifying options
-for LaTeX output.
-
 .. function:: void fexpr_write_latex(calcium_stream_t stream, const fexpr_t expr, ulong flags)
 
     Writes the LaTeX representation of *expr* to *stream*.
@@ -275,6 +272,16 @@ for LaTeX output.
     Returns a string of the LaTeX representation of *expr*. The string
     must be freed with :func:`flint_free`.
 
+The *flags* parameter allows specifying options for LaTeX output.
+The following flags are supported:
+
+.. macro:: FEXPR_LATEX_SMALL
+
+    Generate more compact formulas, most importantly by printing
+    fractions inline as `p/q` instead of as `\displaystyle{\frac{p}{q}}`.
+    This flag is automatically activated within
+    subscripts and superscripts and in certain other parts of
+    formulas.
 
 Function call structure
 ------------------------------------------------------------------------

@@ -356,6 +356,7 @@ void fexpr_write_latex_div(calcium_stream_t out, const fexpr_t expr, ulong flags
 void fexpr_write_latex_neg_pos(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_add(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_sub(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t expr, ulong flags);
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);
