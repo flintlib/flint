@@ -80,7 +80,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
     {
         ulong op;
 
-        if (!fexpr_is_builtin_symbol(expr))
+        if (!fexpr_is_any_builtin_symbol(expr))
         {
             acb_indeterminate(res);
             return 0;
@@ -149,7 +149,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
 
         fexpr_view_func(func, expr);
 
-        if (!fexpr_is_builtin_symbol(func))
+        if (!fexpr_is_any_builtin_symbol(func))
         {
             acb_indeterminate(res);
             return 0;

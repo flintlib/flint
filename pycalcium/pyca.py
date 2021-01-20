@@ -267,7 +267,15 @@ class fexpr:
         libcalcium.fexpr_add(res, self, other)
         return res
 
-    __radd__ = __add__
+    def __add__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_add(res, other, self)
+        return res
 
     def __sub__(self, other):
         if type(self) is not type(other):
@@ -299,7 +307,15 @@ class fexpr:
         libcalcium.fexpr_mul(res, self, other)
         return res
 
-    __rmul__ = __mul__
+    def __rmul__(self, other):
+        if type(self) is not type(other):
+            try:
+                other = fexpr(other)
+            except TypeError:
+                return NotImplemented
+        res = fexpr()
+        libcalcium.fexpr_mul(res, other, self)
+        return res
 
     def __truediv__(self, other):
         if type(self) is not type(other):

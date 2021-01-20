@@ -245,7 +245,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_ModularLambda, "ModularLambda", "\\lambda", NULL, },
     { FEXPR_ModularLambdaFundamentalDomain, "ModularLambdaFundamentalDomain", "\\mathcal{F}_{\\lambda}", NULL, },
     { FEXPR_MoebiusMu, "MoebiusMu", "\\mu", NULL, },
-    { FEXPR_Mul, "Mul", "", NULL, },
+    { FEXPR_Mul, "Mul", "", fexpr_write_latex_mul, },
     { FEXPR_MultiZetaValue, "MultiZetaValue", "\\zeta", NULL, },
     { FEXPR_NN, "NN", "", NULL, },
     { FEXPR_Neg, "Neg", "", NULL, },
