@@ -594,6 +594,38 @@ fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t expr, ulong flags)
     }
 }
 
+void
+fexpr_write_latex_factorial(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    if (fexpr_nargs(expr) == 1)
+    {
+        fexpr_t func, arg;
+
+        fexpr_view_func(func, expr);
+        fexpr_view_arg(arg, expr, 0);
+
+        if (fexpr_is_symbol(arg) || (fexpr_is_integer(arg) && !fexpr_is_neg_integer(arg)))
+        {
+            fexpr_write_latex(out, arg, flags);
+        }
+        else
+        {
+            calcium_write(out, "\\left(");
+            fexpr_write_latex(out, arg, flags);
+            calcium_write(out, "\\right)");
+        }
+
+        if (fexpr_is_builtin_symbol(func, FEXPR_DoubleFactorial))
+            calcium_write(out, "!!");
+        else
+            calcium_write(out, "!");
+    }
+    else
+    {
+        fexpr_write_latex_call(out, expr, flags);
+    }
+}
+
 
 void
 fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags)
