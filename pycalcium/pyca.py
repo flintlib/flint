@@ -153,7 +153,7 @@ class ca_poly_vec_struct(ctypes.Structure):
 class fexpr:
 
     @staticmethod
-    def inject():
+    def inject(vars=False):
         """
         Inject all builtin symbol names into the calling namespace.
         For interactive use only!
@@ -171,7 +171,16 @@ class fexpr:
             symbol_name = libcalcium.fexpr_builtin_name(i)
             symbol_name = symbol_name.decode('ascii')
             frame.f_globals[symbol_name] = fexpr(symbol_name)
-        del frame  # break cyclic dependencies as stated in inspect docs
+        if vars:
+            def inject_vars(string):
+                for s in string.split():
+                    for symbol_name in [s, s + "_"]:
+                        frame.f_globals[symbol_name] = fexpr(symbol_name)
+            inject_vars("""a b c d e f g h i j k l m n o p q r s t u v w x y z""")
+            inject_vars("""A B C D E F G H I J K L M N O P Q R S T U V W X Y Z""")
+            inject_vars("""alpha beta gamma delta epsilon zeta eta theta iota kappa lamda mu nu xi pi rho sigma tau phi chi psi omega ell""")
+            inject_vars("""Alpha Beta GreekGamma Delta Epsilon Zeta Eta Theta Iota Kappa Lamda Mu Nu Xi GreekPi Rho Sigma Tau Phi Chi Psi Omega""")
+        del frame
 
     def __init__(self, val=0):
         self._data = fexpr_struct()
@@ -196,6 +205,11 @@ class fexpr:
                 libcalcium.fexpr_set_d(self, val)
             elif typ is complex:
                 libcalcium.fexpr_set_re_im_d(self, val.real, val.imag)
+            elif typ is bool:
+                if val:
+                    libcalcium.fexpr_set_symbol_str(self, ("True").encode('ascii'))
+                else:
+                    libcalcium.fexpr_set_symbol_str(self, ("False").encode('ascii'))
             else:
                 raise TypeError
 
@@ -3420,7 +3434,6 @@ def test_gamma():
     #assert gamma(pi+1)/gamma(pi) == pi
     assert gamma(pi)/gamma(pi-1) == pi-1
 
-
 def test_xfail():
     # Test some simplifications that are known not to work yet.
     # When a case starts working, we will get a test failure so we can
@@ -3436,6 +3449,14 @@ def test_xfail():
         raise AssertionError
 
     # expect_error(lambda: tan(gd(1)/2) - tanh(ca(1)/2) == 0)
+
+def test_latex():
+    from pyca_test import test_latex
+    test_latex.test_latex(fexpr)
+
+def latex_test_report():
+    from pyca_test import test_latex
+    test_latex.latex_report(fexpr)
 
 if __name__ == "__main__":
     from time import time

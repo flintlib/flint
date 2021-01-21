@@ -634,18 +634,220 @@ fexpr_write_latex_factorial(calcium_stream_t out, const fexpr_t expr, ulong flag
     }
 }
 
+void
+fexpr_write_latex_sum_product(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    slong nargs, forexpr_nargs;
+    fexpr_t f, forexpr, var, low, high, domain, predicate;
+    int have_predicate = 0;
+    int have_domain = 0;
+    int have_low_high = 0;
+    int need_parens;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs != 2 && nargs != 3)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(f, expr, 0);
+    fexpr_view_arg(forexpr, expr, 1);
+
+    if (nargs == 3)
+    {
+        fexpr_view_arg(predicate, expr, 2);
+        have_predicate = 1;
+    }
+
+    forexpr_nargs = fexpr_nargs(forexpr);
+
+    if (forexpr_nargs != 2 && forexpr_nargs != 3)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(var, forexpr, 0);
+
+    if (forexpr_nargs == 2)
+    {
+        fexpr_view_arg(domain, forexpr, 1);
+        have_domain = 1;
+    }
+    else
+    {
+        fexpr_view_arg(low, forexpr, 1);
+        fexpr_view_arg(high, forexpr, 2);
+        have_low_high = 1;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Sum))
+        calcium_write(out, "\\sum");
+    else
+        calcium_write(out, "\\prod");
+
+    if (have_domain)
+    {
+        if (have_predicate)
+        {
+            calcium_write(out, "_{\\textstyle{");
+            fexpr_write_latex(out, var, flags);
+            calcium_write(out, "  \\in ");
+            fexpr_write_latex(out, domain, flags);
+            calcium_write(out, " \\atop ");
+            fexpr_write_latex(out, predicate, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}}");
+        }
+        else
+        {
+            calcium_write(out, "_{");
+            fexpr_write_latex(out, var, flags);
+            calcium_write(out, "  \\in ");
+            fexpr_write_latex(out, domain, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+        }
+    }
+    else if (have_low_high)
+    {
+        if (have_predicate)
+        {
+            calcium_write(out, "_{\\textstyle{");
+            fexpr_write_latex(out, var, flags);
+            calcium_write(out, "=");
+            fexpr_write_latex(out, low, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, " \\atop ");
+            fexpr_write_latex(out, predicate, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}}^{");
+            fexpr_write_latex(out, high, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+        }
+        else
+        {
+            calcium_write(out, "_{");
+            fexpr_write_latex(out, var, flags);
+            calcium_write(out, "=");
+            fexpr_write_latex(out, low, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}^{");
+            fexpr_write_latex(out, high, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+        }
+    }
+
+    calcium_write(out, " ");
+
+    need_parens = fexpr_is_builtin_call(f, FEXPR_Add) ||
+                  fexpr_is_builtin_call(f, FEXPR_Sub);
+
+    if (need_parens)
+        calcium_write(out, "\\left(");
+
+    fexpr_write_latex(out, f, flags);
+
+    if (need_parens)
+        calcium_write(out, "\\right)");
+}
+
+void
+fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    if (fexpr_nargs(expr) == 2)
+    {
+        fexpr_t f, iter, var, low, high, domain;
+        int need_parens;
+
+        fexpr_view_arg(f, expr, 0);
+        fexpr_view_arg(iter, expr, 1);
+
+        need_parens = fexpr_is_builtin_call(f, FEXPR_Add) ||
+                      fexpr_is_builtin_call(f, FEXPR_Sub);
+
+        if (fexpr_is_builtin_call(iter, FEXPR_For))
+        {
+            if (fexpr_nargs(iter) == 2)
+            {
+                fexpr_view_arg(var, iter, 0);
+                fexpr_view_arg(domain, iter, 1);
+
+                calcium_write(out, "\\int_{");
+                fexpr_write_latex(out, var, flags | FEXPR_LATEX_SMALL);
+                calcium_write(out, " \\in ");
+                fexpr_write_latex(out, domain, flags | FEXPR_LATEX_SMALL);
+                calcium_write(out, "} ");
+                if (need_parens)
+                    calcium_write(out, "\\left(");
+                fexpr_write_latex(out, f, flags);
+                if (need_parens)
+                    calcium_write(out, "\\right)");
+                calcium_write(out, " \\, d");
+                fexpr_write_latex(out, var, flags);
+                return;
+            }
+
+            if (fexpr_nargs(iter) == 3)
+            {
+                fexpr_view_arg(var, iter, 0);
+                fexpr_view_arg(low, iter, 1);
+                fexpr_view_arg(high, iter, 2);
+
+                calcium_write(out, "\\int_{");
+                fexpr_write_latex(out, low, flags | FEXPR_LATEX_SMALL);
+                calcium_write(out, "}^{");
+                fexpr_write_latex(out, high, flags | FEXPR_LATEX_SMALL);
+                calcium_write(out, "} ");
+                if (need_parens)
+                    calcium_write(out, "\\left(");
+                fexpr_write_latex(out, f, flags);
+                if (need_parens)
+                    calcium_write(out, "\\right)");
+                calcium_write(out, " \\, d");
+                fexpr_write_latex(out, var, flags);
+                return;
+            }
+        }
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
+static int
+_fexpr_all_arguments_small(const fexpr_t expr)
+{
+    fexpr_t arg;
+    slong i, nargs;
+
+    nargs = fexpr_nargs(expr);
+    fexpr_view_arg(arg, expr, 0);
+
+    for (i = 0; i < nargs; i++)
+    {
+        if (!fexpr_is_atom(arg))
+            return 0;
+
+        fexpr_view_next(arg);
+    }
+
+    return 1;
+}
 
 void
 fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     fexpr_t view;
     slong i, nargs;
+    int small;
 
     nargs = fexpr_nargs(expr);
     fexpr_view_func(view, expr);
     fexpr_write_latex(out, view, flags);
 
-    calcium_write(out, "\\!\\left(");
+    small = _fexpr_all_arguments_small(expr);
+
+    if (small)
+        calcium_write(out, "(");
+    else
+        calcium_write(out, "\\!\\left(");
 
     for (i = 0; i < nargs; i++)
     {
@@ -655,7 +857,10 @@ fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags)
             calcium_write(out, ", ");
     }
 
-    calcium_write(out, "\\right)");
+    if (small)
+        calcium_write(out, ")");
+    else
+        calcium_write(out, "\\right)");
 }
 
 void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags)
@@ -729,16 +934,19 @@ fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags)
         slong i;
 
         fexpr_view_func(func, expr);
-        i = FEXPR_BUILTIN_ID(func->data[0]);
 
-        if (i != -1 && fexpr_builtin_table[i].latex_writer != NULL)
+        if (fexpr_is_any_builtin_symbol(func))
         {
-            (fexpr_builtin_table[i].latex_writer)(out, expr, flags);
+            i = FEXPR_BUILTIN_ID(func->data[0]);
+
+            if (fexpr_builtin_table[i].latex_writer != NULL)
+            {
+                (fexpr_builtin_table[i].latex_writer)(out, expr, flags);
+                return;
+            }
         }
-        else
-        {
-            fexpr_write_latex_call(out, expr, flags);
-        }
+
+        fexpr_write_latex_call(out, expr, flags);
     }
 }
 

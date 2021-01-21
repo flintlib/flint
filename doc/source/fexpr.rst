@@ -4,6 +4,10 @@
 ===============================================================================
 
 This module supports working with symbolic expressions.
+
+Introduction
+-----------------------------------------------------------------------
+
 Formally, a symbolic expression is either:
 
 * An atom, being one of the following:
@@ -30,6 +34,10 @@ For example, with a standard intepretation (used within Calcium) of the symbols
 ``Neg``, the expression ``Mul(3, Add(Neg(x), y))``
 encodes the formula `3 \cdot ((-x)+y)`
 where ``x`` and ``y`` are symbolic variables.
+See :ref:`fexpr-builtin` for documentation of builtin symbols.
+
+Computing and embedding data
+.......................................................................
 
 Symbolic expressions are usually not the best data structure to use
 directly for heavy-duty computations. Functions acting on
@@ -37,9 +45,10 @@ symbolic expressions will typically convert
 to a dedicated data structure (e.g. polynomials) internally
 and (optionally) convert the final result back to a symbolic expression.
 
-We do not allow embedding arbitrary binary objects
-such as
-Flint/Arb/Antic/Calcium types as atoms.
+Symbolic expressions do not allow embedding arbitrary binary objects
+such as Flint/Arb/Antic/Calcium types as atoms.
+This is done on purpose to make symbolic expressions easy to use
+as a data exchange format.
 To embed an object in an expression, one has the following options:
 
 * Represent the object structurally using atoms supported natively by
@@ -47,10 +56,13 @@ To embed an object in an expression, one has the following options:
   represented as a list of coefficients or as an arithmetic expression tree).
 * Introduce a dummy symbol to represent the object, maintaining
   an external translation table mapping this symbol to the intended value.
-* Encode the object using a string or symbol name (requiring parsing).
+* Encode the object using a string or symbol name. This is generally not
+  recommended, as it requires parsing; properly used, symbolic
+  expressions have the benefit of being able to represent the parsed
+  structure.
 
 Flat-packed representation
------------------------------------------------------------------------
+.......................................................................
 
 Symbolic expressions are often implemented using trees of pointers
 (often together with hash tables for uniqueness),
