@@ -55,6 +55,34 @@ fexpr_write(calcium_stream_t stream, const fexpr_t expr)
                 calcium_write(stream, (const char *) (expr->data + 1));
             }
             break;
+        case FEXPR_TYPE_SMALL_STRING:
+            {
+                slong i;
+                char tmp[FEXPR_SMALL_SYMBOL_LEN + 3];
+
+                /* todo: escape string */
+                tmp[FEXPR_SMALL_SYMBOL_LEN] = '\0';
+                for (i = 0; i < FEXPR_SMALL_SYMBOL_LEN; i++)
+                {
+                    char c = expr->data[0] >> ((i + 1) * 8);
+                    tmp[i] = c;
+                    if (c == '\0')
+                        break;
+                }
+
+                calcium_write(stream, "\"");
+                calcium_write(stream, tmp);
+                calcium_write(stream, "\"");
+            }
+            break;
+        case FEXPR_TYPE_BIG_STRING:
+            {
+                calcium_write(stream, "\"");
+                /* todo: escape string */
+                calcium_write(stream, (const char *) (expr->data + 1));
+                calcium_write(stream, "\"");
+            }
+            break;
         case FEXPR_TYPE_BIG_INT_NEG:
         case FEXPR_TYPE_BIG_INT_POS: /* todo: print without copying */
             {

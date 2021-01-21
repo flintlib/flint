@@ -252,6 +252,16 @@ Atoms
     be freed with :func:`flint_free`.
     This aborts if *expr* is not an atomic symbol.
 
+.. function:: void fexpr_set_string(fexpr_t res, const char * s)
+
+    Sets *res* to the atomic string *s*.
+
+.. function:: char * fexpr_get_string(const fexpr_t expr)
+
+    Assuming that *expr* is an atomic string, returns a copy of this
+    string. The string must be freed with :func:`flint_free`.
+
+
 Input and output
 ------------------------------------------------------------------------
 
@@ -268,6 +278,9 @@ Input and output
     Returns a string representation of *expr*. The string must
     be freed with :func:`flint_free`.
 
+    Warning: string literals appearing in expressions
+    are currently not escaped.
+
 LaTeX output
 ------------------------------------------------------------------------
 
@@ -283,6 +296,9 @@ LaTeX output
 
     Returns a string of the LaTeX representation of *expr*. The string
     must be freed with :func:`flint_free`.
+
+    Warning: string literals appearing in expressions
+    are currently not escaped.
 
 The *flags* parameter allows specifying options for LaTeX output.
 The following flags are supported:

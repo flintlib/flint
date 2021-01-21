@@ -904,7 +904,15 @@ fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags)
         }
         else if (fexpr_is_string(expr))
         {
-            flint_abort();
+            char * s;
+
+            /* todo: escape string */
+            s = fexpr_get_string(expr);
+
+            calcium_write(out, "\\text{``");
+            calcium_write(out, s);
+            calcium_write(out, "''}");
+            flint_free(s);
         }
         else if (fexpr_is_any_builtin_symbol(expr))
         {

@@ -276,6 +276,9 @@ fexpr_set_symbol_builtin(fexpr_t res, slong id)
 void fexpr_set_symbol_str(fexpr_t res, const char * s);
 char * fexpr_get_symbol_str(const fexpr_t expr);
 
+void fexpr_set_string(fexpr_t res, const char * s);
+char * fexpr_get_string(const fexpr_t expr);
+
 /* todo: document */
 FEXPR_INLINE int
 fexpr_is_any_builtin_symbol(const fexpr_t expr)

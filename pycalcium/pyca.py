@@ -200,7 +200,10 @@ class fexpr:
                     libcalcium.fexpr_set_fmpz(self, nref)
                     libflint.fmpz_clear(nref)
             elif typ is str:
-                libcalcium.fexpr_set_symbol_str(self, val.encode('ascii'))
+                if val[0] == "'" or val[0] == '"':
+                    libcalcium.fexpr_set_string(self, val[1:-1].encode('ascii'))
+                else:
+                    libcalcium.fexpr_set_symbol_str(self, val.encode('ascii'))
             elif typ is float:
                 libcalcium.fexpr_set_d(self, val)
             elif typ is complex:

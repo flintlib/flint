@@ -247,7 +247,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_MoebiusMu, "MoebiusMu", "\\mu", NULL, },
     { FEXPR_Mul, "Mul", "", fexpr_write_latex_mul, },
     { FEXPR_MultiZetaValue, "MultiZetaValue", "\\zeta", NULL, },
-    { FEXPR_NN, "NN", "", NULL, },
+    { FEXPR_NN, "NN", "\\mathbb{N}", NULL, },
     { FEXPR_Neg, "Neg", "", fexpr_write_latex_neg_pos, },
     { FEXPR_Not, "Not", "", NULL, },
     { FEXPR_NotElement, "NotElement", "\\notin", fexpr_write_latex_infix, },
