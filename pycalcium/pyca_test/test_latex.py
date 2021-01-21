@@ -1,6 +1,6 @@
 latex_test_cases = [
     ("""f(0)""", "f(0)"),
-    ("""f('"Hello, world!"')""", "f(\\text{``Hello, world!''})"),
+    ("""f("Hello, world!")""", "f(\\text{``Hello, world!''})"),
     ("Mul(2, Pi, NumberI)", r"2 \pi i"),
     ("Mul(-2, Pi, NumberI)", r"-2 \pi i"),
     ("Add(2, x)", r"2 + x"),
@@ -42,7 +42,7 @@ latex_test_cases = [
     ("Integral(f(x), For(x, -Infinity, Infinity))", r"\int_{-\infty}^{\infty} f(x) \, dx"),
     ("Integral(f(x), For(x, RR))", r"\int_{x \in \mathbb{R}} f(x) \, dx"),
     ("Integral(f(x) + g(x) / h(x), For(x, a, b))", r"\int_{a}^{b} \left(f(x) + \frac{g(x)}{h(x)}\right) \, dx"),
-    ("Mul(Mul(Gamma(s), Gamma(Sub(1, s))), RiemannZeta(s))", r"\Gamma(s) \Gamma\!\left(1 - s\right) \zeta(s)"),
+    ("Equal(RiemannZeta(s), Mul(Mul(Mul(Mul(2, Pow(Mul(2, Pi), Sub(s, 1))), Sin(Div(Mul(Pi, s), 2))), Gamma(Sub(1, s))), RiemannZeta(Sub(1, s))))", r"\zeta(s) = 2 {\left(2 \pi\right)}^{s - 1} \sin\!\left(\frac{\pi s}{2}\right) \Gamma\!\left(1 - s\right) \zeta\!\left(1 - s\right)"),
     ("(Hypergeometric2F1Regularized(Div(-1,4),Div(1,4),1/2, (x-1)/2)**2)", r"{\left(\,{}_2{\textbf F}_1\!\left(-\frac{1}{4}, \frac{1}{4}, \frac{1}{2}, \frac{x - 1}{2}\right)\right)}^{2}"),
 ]
 
@@ -72,9 +72,10 @@ def latex_report(fexpr):
 tt { padding: 0.2em; background-color: #f8f8f8; border:1px solid #eee; }
 table { border-collapse:collapse; margin: 1em; }
 table, th, td { border: 1px solid #aaa; }
-th, td { padding:0.3em; padding-top: 0; margin-top: 0; }
+th, td { padding:0em 0.3em 0em 0.3em; }
 table { width: 95%; }
 .katex { font-size: 1.1em !important; } 
+.katex-display { margin:0.1em; padding:0.1em; }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
@@ -93,11 +94,13 @@ table { width: 95%; }
 </head>
 <body>
 """)
-    t1 = clock()
     output = [formula.latex() for formula in formulas]
+    one_big = fexpr("BigLatex")(*formulas)
+    t1 = clock()
+    one_big_latex = one_big.latex()
     t2 = clock()
     fp.write("""<h1>fexpr to LaTeX test sheet</h1>""")
-    fp.write("""<p>Converted %i formulas to LaTeX. <!-- in %f seconds. --></p>""" % (len(formulas), (t2-t1)))
+    fp.write("""<p>Converted %i formulas to LaTeX in %f seconds.</p>""" % (len(formulas), (t2-t1)))
     fp.write("""<table>""")
     fp.write("""<tr><th>fexpr</th> <th>Generated LaTeX</th> <th>KaTeX display</th>""")
     for formula, latex in zip(formulas, output):

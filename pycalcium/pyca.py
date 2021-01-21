@@ -255,7 +255,10 @@ class fexpr:
     def __call__(self, *args):
         args2 = []
         for arg in args:
-            if type(arg) is not fexpr:
+            tp = type(arg)
+            if tp is not fexpr:
+                if tp is str:
+                    arg = "'" + arg + "'"
                 arg = fexpr(arg)
             args2.append(arg)
         n = len(args2)
@@ -271,7 +274,12 @@ class fexpr:
         elif n == 4:
             libcalcium.fexpr_call4(res, self, args2[0], args2[1], args2[2], args2[3])
         else:
-            raise NotImplementedError
+            vec = libcalcium.flint_malloc(n * ctypes.sizeof(fexpr_struct))
+            vec = ctypes.cast(vec, ctypes.POINTER(fexpr_struct))
+            for i in range(n):
+                vec[i] = ctypes.cast(args2[i], ctypes.POINTER(fexpr_struct))[0]
+            libcalcium.fexpr_call_vec(res, self, vec, n)
+            libcalcium.flint_free(vec)
         return res
 
     def __add__(self, other):
