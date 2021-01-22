@@ -811,6 +811,112 @@ fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags
     fexpr_write_latex_call(out, expr, flags);
 }
 
+void
+fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t arg;
+    slong i, nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Not) && nargs == 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        if (flags & FEXPR_LATEX_LOGIC)
+            calcium_write(out, "\\neg ");
+        else
+            calcium_write(out, "\\operatorname{not} ");
+
+        if (fexpr_is_atom(arg))
+        {
+            fexpr_write_latex(out, arg, flags);
+        }
+        else
+        {
+            if (!(flags & FEXPR_LATEX_LOGIC))
+                calcium_write(out, "\\,");
+
+            calcium_write(out, "\\left(");
+            fexpr_write_latex(out, arg, flags);
+            calcium_write(out, "\\right)");
+        }
+
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Or) && nargs >= 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        for (i = 0; i < nargs; i++)
+        {
+            if (fexpr_is_builtin_call(arg, FEXPR_And) ||
+                fexpr_is_builtin_call(arg, FEXPR_Or) ||
+                fexpr_is_builtin_call(arg, FEXPR_Not))
+            {
+                calcium_write(out, "\\left(");
+                fexpr_write_latex(out, arg, flags);
+                calcium_write(out, "\\right)");
+            }
+            else
+            {
+                fexpr_write_latex(out, arg, flags);
+            }
+
+            if (i < nargs - 1)
+            {
+                if (flags & FEXPR_LATEX_LOGIC)
+                    calcium_write(out, " \\,\\lor\\, ");
+                else
+                    calcium_write(out, " \\;\\mathbin{\\operatorname{or}}\\; ");
+
+                fexpr_view_next(arg);
+            }
+        }
+
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_And) && nargs >= 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        for (i = 0; i < nargs; i++)
+        {
+            if (fexpr_is_builtin_call(arg, FEXPR_And) ||
+                fexpr_is_builtin_call(arg, FEXPR_Or) ||
+                fexpr_is_builtin_call(arg, FEXPR_All) ||
+                fexpr_is_builtin_call(arg, FEXPR_Exists))
+            {
+                calcium_write(out, "\\left(");
+                fexpr_write_latex(out, arg, flags);
+                calcium_write(out, "\\right)");
+            }
+            else
+            {
+                fexpr_write_latex(out, arg, flags);
+            }
+
+            if (i < nargs - 1)
+            {
+                if (flags & FEXPR_LATEX_LOGIC)
+                    calcium_write(out, " \\,\\land\\, ");
+                else if (flags & FEXPR_LATEX_SMALL)  /* see see ff190c */
+                    calcium_write(out, " ,\\, ");
+                else
+                    calcium_write(out, " \\;\\mathbin{\\operatorname{and}}\\; ");
+
+                fexpr_view_next(arg);
+            }
+        }
+
+        return;
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
 static int
 _fexpr_all_arguments_small(const fexpr_t expr)
 {

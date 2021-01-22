@@ -346,6 +346,7 @@ char * fexpr_get_str(const fexpr_t expr);
 /* LaTeX output */
 
 #define FEXPR_LATEX_SMALL 1
+#define FEXPR_LATEX_LOGIC 2
 
 void fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_print_latex(const fexpr_t expr, ulong flags);
@@ -364,6 +365,7 @@ void fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t expr, ulong flags
 void fexpr_write_latex_factorial(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_sum_product(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags);
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);

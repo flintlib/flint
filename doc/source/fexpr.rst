@@ -311,6 +311,11 @@ The following flags are supported:
     subscripts and superscripts and in certain other parts of
     formulas.
 
+.. macro:: FEXPR_LATEX_LOGIC
+
+    Use symbols for logical operators such as Not, And, Or, which by
+    default are rendered as words for legibility.
+
 Function call structure
 ------------------------------------------------------------------------
 
