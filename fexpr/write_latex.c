@@ -917,6 +917,81 @@ fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
     fexpr_write_latex_call(out, expr, flags);
 }
 
+void
+fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t arg;
+    slong nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    /* Set comprehension */
+    if (fexpr_is_builtin_call(expr, FEXPR_Set) && (nargs == 2 || nargs == 3))
+    {
+        fexpr_view_arg(arg, expr, 1);
+
+        if (fexpr_is_builtin_call(arg, FEXPR_For) && fexpr_nargs(arg) == 2)
+        {
+            fexpr_t func, var, domain, predicate;
+
+            fexpr_view_arg(func, expr, 0);
+            fexpr_view_arg(var, arg, 0);
+            fexpr_view_arg(domain, arg, 1);
+
+            calcium_write(out, "\\left\\{ ");
+
+            fexpr_write_latex(out, func, flags);
+            calcium_write(out, " : ");
+            fexpr_write_latex(out, var, flags);
+            calcium_write(out, " \\in ");
+            fexpr_write_latex(out, domain, flags);
+
+            if (nargs == 3)
+            {
+                fexpr_view_arg(predicate, expr, 2);
+                calcium_write(out, "\\,\\mathbin{\\operatorname{and}}\\, ");
+                fexpr_write_latex(out, predicate, flags);
+            }
+
+            calcium_write(out, " \\right\\}");
+
+            return;
+        }
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Set))
+        calcium_write(out, "\\left\\{");
+    else if (fexpr_is_builtin_call(expr, FEXPR_Tuple))
+        calcium_write(out, "\\left(");
+    else
+        calcium_write(out, "\\left[");
+
+    if (nargs >= 1)
+    {
+        slong i;
+
+        fexpr_view_arg(arg, expr, 0);
+
+        for (i = 0; i < nargs; i++)
+        {
+            fexpr_write_latex(out, arg, flags);
+
+            if (i < nargs - 1)
+            {
+                calcium_write(out, ", ");
+                fexpr_view_next(arg);
+            }
+        }
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Set))
+        calcium_write(out, "\\right\\}");
+    else if (fexpr_is_builtin_call(expr, FEXPR_Tuple))
+        calcium_write(out, "\\right)");
+    else
+        calcium_write(out, "\\right]");
+}
+
 static int
 _fexpr_all_arguments_small(const fexpr_t expr)
 {
