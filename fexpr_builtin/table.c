@@ -101,6 +101,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_DedekindEtaEpsilon, "DedekindEtaEpsilon", "\\varepsilon", NULL, },
     { FEXPR_DedekindSum, "DedekindSum", "s", NULL, },
     { FEXPR_Def, "Def", "", NULL, },
+    { FEXPR_Delta, "Delta", "\\Delta", NULL },
+    { FEXPR_Delta_, "Delta_", "\\Delta", fexpr_write_latex_subscript },
     { FEXPR_Derivative, "Derivative", "", NULL, },
     { FEXPR_Det, "Det", "\\operatorname{det}", NULL, },
     { FEXPR_DigammaFunction, "DigammaFunction", "\\psi", NULL, },
@@ -159,6 +161,10 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_GoldenRatio, "GoldenRatio", "\\varphi", NULL, },
     { FEXPR_Greater, "Greater", ">", fexpr_write_latex_infix, },
     { FEXPR_GreaterEqual, "GreaterEqual", "\\ge", fexpr_write_latex_infix, },
+    { FEXPR_GreekGamma, "GreekGamma", "\\Gamma", NULL },
+    { FEXPR_GreekGamma_, "GreekGamma_", "\\Gamma", fexpr_write_latex_subscript },
+    { FEXPR_GreekPi, "GreekPi", "\\Pi", NULL },
+    { FEXPR_GreekPi_, "GreekPi_", "\\Pi", fexpr_write_latex_subscript },
     { FEXPR_HankelH1, "HankelH1", "", NULL, },
     { FEXPR_HankelH2, "HankelH2", "", NULL, },
     { FEXPR_HarmonicNumber, "HarmonicNumber", "H", fexpr_write_latex_subscript, },
@@ -211,6 +217,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_LCM, "LCM", "\\operatorname{lcm}", NULL, },
     { FEXPR_LaguerreL, "LaguerreL", "", NULL, },
     { FEXPR_LambertW, "LambertW", "", NULL, },
+    { FEXPR_Lamda, "Lamda", "\\Lambda", NULL },
+    { FEXPR_Lamda_, "Lamda_", "\\Lambda", fexpr_write_latex_subscript },
     { FEXPR_LandauG, "LandauG", "g", NULL, },
     { FEXPR_LeftLimit, "LeftLimit", "", NULL, },
     { FEXPR_LegendreP, "LegendreP", "", NULL, },
@@ -254,6 +262,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_NotEqual, "NotEqual", "\\ne", fexpr_write_latex_infix, },
     { FEXPR_NumberE, "NumberE", "e", NULL, },
     { FEXPR_NumberI, "NumberI", "i", NULL, },
+    { FEXPR_Omega, "Omega", "\\Omega", NULL },
+    { FEXPR_Omega_, "Omega_", "\\Omega", fexpr_write_latex_subscript },
     { FEXPR_One, "One", "1", fexpr_write_latex_subscript, },
     { FEXPR_OpenClosedInterval, "OpenClosedInterval", "", NULL, },
     { FEXPR_OpenComplexDisk, "OpenComplexDisk", "", NULL, },
@@ -263,6 +273,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_Otherwise, "Otherwise", "", NULL, },
     { FEXPR_PartitionsP, "PartitionsP", "p", NULL, },
     { FEXPR_Path, "Path", "\\rightsquigarrow", fexpr_write_latex_infix, },
+    { FEXPR_Phi, "Phi", "\\Phi", NULL },
+    { FEXPR_Phi_, "Phi_", "\\Phi", fexpr_write_latex_subscript },
     { FEXPR_Pi, "Pi", "\\pi", NULL, },
     { FEXPR_Pol, "Pol", "", NULL, },
     { FEXPR_PolyLog, "PolyLog", "", NULL, },
@@ -281,6 +293,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_Product, "Product", "", fexpr_write_latex_sum_product, },
     { FEXPR_ProjectiveComplexNumbers, "ProjectiveComplexNumbers", "", NULL, },
     { FEXPR_ProjectiveRealNumbers, "ProjectiveRealNumbers", "", NULL, },
+    { FEXPR_Psi, "Psi", "\\Psi", NULL },
+    { FEXPR_Psi_, "Psi_", "\\Psi", fexpr_write_latex_subscript },
     { FEXPR_QQ, "QQ", "\\mathbb{Q}", NULL, },
     { FEXPR_QuotientRing, "QuotientRing", "", NULL, },
     { FEXPR_RR, "RR", "\\mathbb{R}", NULL, },
@@ -313,6 +327,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_Set, "Set", "", NULL, },
     { FEXPR_SetMinus, "SetMinus", "\\setminus", fexpr_write_latex_infix, },
     { FEXPR_Sets, "Sets", "", NULL, },
+    { FEXPR_Sigma, "Sigma", "\\Sigma", NULL },
+    { FEXPR_Sigma_, "Sigma_", "\\Sigma", fexpr_write_latex_subscript },
     { FEXPR_Sign, "Sign", "\\operatorname{sgn}", NULL, },
     { FEXPR_SignExtendedComplexNumbers, "SignExtendedComplexNumbers", "", NULL, },
     { FEXPR_Sin, "Sin", "\\sin", NULL, },
@@ -338,6 +354,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_SymmetricPolynomial, "SymmetricPolynomial", "", NULL, },
     { FEXPR_Tan, "Tan", "\\tan", NULL, },
     { FEXPR_Tanh, "Tanh", "\\tanh", NULL, },
+    { FEXPR_Theta, "Theta", "\\Theta", NULL },
+    { FEXPR_Theta_, "Theta_", "\\Theta", fexpr_write_latex_subscript },
     { FEXPR_True, "True", "\\operatorname{True}", NULL, },
     { FEXPR_Tuple, "Tuple", "", NULL, },
     { FEXPR_Tuples, "Tuples", "", NULL, },
@@ -353,6 +371,8 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_WeierstrassZeta, "WeierstrassZeta", "\\zeta", NULL, },
     { FEXPR_Where, "Where", "", NULL, },
     { FEXPR_XGCD, "XGCD", "\\operatorname{xgcd}", NULL, },
+    { FEXPR_Xi, "Xi", "\\Xi", NULL },
+    { FEXPR_Xi_, "Xi_", "\\Xi", fexpr_write_latex_subscript },
     { FEXPR_ZZ, "ZZ", "\\mathbb{Z}", NULL, },
     { FEXPR_Zero, "Zero", "0", fexpr_write_latex_subscript, },
     { FEXPR_ZeroMatrix, "ZeroMatrix", "0", fexpr_write_latex_subscript, },
@@ -407,12 +427,6 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_zeta_, "zeta_", "\\zeta", fexpr_write_latex_subscript },
 };
 
-/*
-Add(BellNumber(5), BernoulliB(5), EulerE(5), Fibonacci(5), HarmonicNumber(5), Prime(5), RiemannZetaZero(5))
-Add(ZeroMatrix(2), IdentityMatrix(2), HilbertMatrix(2))
-Equal(One(QQ), 1)
-Equal(Zero(QQ), 0)
-*/
 
 
 /*
