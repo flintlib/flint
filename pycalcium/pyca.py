@@ -168,6 +168,7 @@ class fexpr:
         frame = currentframe().f_back
         num = libcalcium.fexpr_builtin_length()
         for i in range(num):
+            # memory leak
             symbol_name = libcalcium.fexpr_builtin_name(i)
             symbol_name = symbol_name.decode('ascii')
             frame.f_globals[symbol_name] = fexpr(symbol_name)
@@ -181,6 +182,16 @@ class fexpr:
             inject_vars("""alpha beta gamma delta epsilon zeta eta theta iota kappa lamda mu nu xi pi rho sigma tau phi chi psi omega ell""")
             inject_vars("""Alpha Beta GreekGamma Delta Epsilon Zeta Eta Theta Iota Kappa Lamda Mu Nu Xi GreekPi Rho Sigma Tau Phi Chi Psi Omega""")
         del frame
+
+    def builtins():
+        num = libcalcium.fexpr_builtin_length()
+        names = []
+        for i in range(num):
+            # memory leak
+            symbol_name = libcalcium.fexpr_builtin_name(i)
+            symbol_name = symbol_name.decode('ascii')
+            names.append(symbol_name)
+        return names
 
     def __init__(self, val=0):
         self._data = fexpr_struct()
@@ -241,6 +252,9 @@ class fexpr:
 
     def _repr_latex_(self):
         return "$$" + self.latex() + "$$"
+
+    def nwords(self):
+        return libcalcium.fexpr_size(self)
 
     def __eq__(self, other):
         if type(self) is not type(other):
