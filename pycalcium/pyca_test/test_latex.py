@@ -6,6 +6,18 @@ latex_test_cases = [
     ("f_(0)", r"f_{0}"),
     ("f()", r"f()"),
     ("Add(Add(Add(f(a, b), c_(n)), f_(x, y)), f_())", r"f(a, b) + c_{n} + f_{x, y} + f_{}"),
+    ("f(alpha, beta, chi, delta, ell, epsilon, eta)", r"f(\alpha, \beta, \chi, \delta, \ell, \epsilon, \eta)"),
+    ("f(gamma, iota, kappa, lamda, mu, nu, omega, phi)", r"f(\gamma, \iota, \kappa, \lambda, \mu, \nu, \omega, \phi)"),
+    ("f(pi, rho, sigma, tau, theta, varphi, vartheta, xi, zeta)", r"f(\pi, \rho, \sigma, \tau, \theta, \varphi, \vartheta, \xi, \zeta)"),
+    ("f(alpha_, beta_, chi_, delta_, ell_, epsilon_, eta_)", r"f(\alpha, \beta, \chi, \delta, \ell, \epsilon, \eta)"),
+    ("f(gamma_, iota_, kappa_, lamda_, mu_, nu_, omega_, phi_)", r"f(\gamma, \iota, \kappa, \lambda, \mu, \nu, \omega, \phi)"),
+    ("f(pi_, rho_, sigma_, tau_, theta_, varphi_, vartheta_, xi_, zeta)", r"f(\pi, \rho, \sigma, \tau, \theta, \varphi, \vartheta, \xi, \zeta)"),
+    ("f(alpha(x), beta(x), chi(x), delta(x), ell(x), epsilon(x), eta(x))", r"f\!\left(\alpha(x), \beta(x), \chi(x), \delta(x), \ell(x), \epsilon(x), \eta(x)\right)"),
+    ("f(gamma(x), iota(x), kappa(x), lamda(x), mu(x), nu(x), omega(x), phi(x))", r"f\!\left(\gamma(x), \iota(x), \kappa(x), \lambda(x), \mu(x), \nu(x), \omega(x), \phi(x)\right)"),
+    ("f(pi(x), rho(x), sigma(x), tau(x), theta(x), varphi(x), vartheta(x), xi(x), zeta(x))", r"f\!\left(\pi(x), \rho(x), \sigma(x), \tau(x), \theta(x), \varphi(x), \vartheta(x), \xi(x), \zeta(x)\right)"),
+    ("f(alpha_(n), beta_(n), chi_(n), delta_(n), ell_(n), epsilon_(n), eta_(n))", r"f\!\left(\alpha_{n}, \beta_{n}, \chi_{n}, \delta_{n}, \ell_{n}, \epsilon_{n}, \eta_{n}\right)"),
+    ("f(gamma_(n), iota_(n), kappa_(n), lamda_(n), mu_(n), nu_(n), omega_(n), phi_(n))", r"f\!\left(\gamma_{n}, \iota_{n}, \kappa_{n}, \lambda_{n}, \mu_{n}, \nu_{n}, \omega_{n}, \phi_{n}\right)"),
+    ("f(pi_(n), rho_(n), sigma_(n), tau_(n), theta_(n), varphi_(n), vartheta_(n), xi_(n), zeta_(n))", r"f\!\left(\pi_{n}, \rho_{n}, \sigma_{n}, \tau_{n}, \theta_{n}, \varphi_{n}, \vartheta_{n}, \xi_{n}, \zeta_{n}\right)"),
     ("f(a)(b)", r"f(a)(b)"),
     ("Mul(f, g)(x)", r"\left(f g\right)(x)"),
     ("Add(f, g)(x)", r"\left(f + g\right)(x)"),
@@ -43,6 +55,7 @@ latex_test_cases = [
     ("Subset(Primes, NN, ZZ, QQ, RR, CC)", r"\mathbb{P} \subset \mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}"),
     ("Subset(QQ, AlgebraicNumbers, CC)", r"\mathbb{Q} \subset \overline{\mathbb{Q}} \subset \mathbb{C}"),
     ("SubsetEqual(S, QQ)", r"S \subseteq \mathbb{Q}"),
+    ("Divides(GCD(a, b), LCM(a, b))", r"\gcd(a, b) \mid \operatorname{lcm}(a, b)"),
     ("Sum(f(n) + g(n), For(n, a, b))", r"\sum_{n=a}^{b} \left(f(n) + g(n)\right)"),
     ("Sum(f(n), For(n, ZZ))", r"\sum_{n  \in \mathbb{Z}} f(n)"),
     ("Sum(f(n), For(n, ZZ), NotEqual(n, 0))", r"\sum_{\textstyle{n  \in \mathbb{Z} \atop n \ne 0}} f(n)"),
@@ -60,7 +73,10 @@ latex_test_cases = [
     ("Add(Sinh(x), Cosh(x), Tanh(x), Coth(x), Sech(x), Csch(x))", r"\sinh(x) + \cosh(x) + \tanh(x) + \coth(x) + \operatorname{sech}(x) + \operatorname{csch}(x)"),
     ("Add(Asin(x), Acos(x), Atan(x), Acot(x), Asec(x), Acsc(x))", r"\operatorname{asin}(x) + \operatorname{acos}(x) + \operatorname{atan}(x) + \operatorname{acot}(x) + \operatorname{asec}(x) + \operatorname{acsc}(x)"),
     ("Add(Asinh(x), Acosh(x), Atanh(x), Acoth(x), Asech(x), Acsch(x))", r"\operatorname{asinh}(x) + \operatorname{acosh}(x) + \operatorname{atanh}(x) + \operatorname{acoth}(x) + \operatorname{asech}(x) + \operatorname{acsch}(x)"),
+    ("Add(Factorial(0), Factorial(1), Div(1, Factorial(-3)), Factorial(Div(1, 2)), Factorial(Factorial(n)), DoubleFactorial(n))", r"0! + 1! + \frac{1}{\left(-3\right)!} + \left(\frac{1}{2}\right)! + \left(n!\right)! + n!!"),
+    ("Add(BellNumber(5), BernoulliB(5), EulerE(5), Fibonacci(5), HarmonicNumber(5), Prime(5), RiemannZetaZero(5))", r"\operatorname{B}_{5} + B_{5} + E_{5} + F_{5} + H_{5} + p_{5} + \rho_{5}"),
     ("Equal(RiemannZeta(s), Mul(Mul(Mul(Mul(2, Pow(Mul(2, Pi), Sub(s, 1))), Sin(Div(Mul(Pi, s), 2))), Gamma(Sub(1, s))), RiemannZeta(Sub(1, s))))", r"\zeta(s) = 2 {\left(2 \pi\right)}^{s - 1} \sin\!\left(\frac{\pi s}{2}\right) \Gamma\!\left(1 - s\right) \zeta\!\left(1 - s\right)"),
+    ("Pow(Div(Pow(DedekindEta(Mul(2, tau)), 2), Mul(DedekindEta(tau), DedekindEta(Mul(4, tau)))), 24)", r"{\left(\frac{\eta^{2}\!\left(2 \tau\right)}{\eta(\tau) \eta\!\left(4 \tau\right)}\right)}^{24}"),
     ("Mul(Mul(Erf(z), Erfc(z)), Erfi(z))", r"\operatorname{erf}(z) \operatorname{erfc}(z) \operatorname{erfi}(z)"),
     ("Mul(EllipticK(m), EllipticE(m), EllipticPi(n, m))", r"K(m) E(m) \Pi(n, m)"),
     ("Mul(IncompleteEllipticE(z, m), IncompleteEllipticF(z, m), IncompleteEllipticPi(n, z, m))", r"E(z, m) F(z, m) \Pi(n, z, m)"),
@@ -74,7 +90,12 @@ latex_test_cases = [
     ("Mul(Hypergeometric2F2(a, b, c, d, z), Hypergeometric2F2Regularized(a, b, c, d, z))", r"\,{}_2F_2(a, b, c, d, z) \,{}_2{\textbf F}_2(a, b, c, d, z)"),
     ("Mul(Hypergeometric3F2(a, b, c, d, e, z), Hypergeometric3F2Regularized(a, b, c, d, e, z))", r"\,{}_3F_2(a, b, c, d, e, z) \,{}_3{\textbf F}_2(a, b, c, d, e, z)"),
     ("(Hypergeometric2F1Regularized(Div(-1,4),Div(1,4),1/2, (x-1)/2)**2)", r"{\left(\,{}_2{\textbf F}_1\!\left(-\frac{1}{4}, \frac{1}{4}, \frac{1}{2}, \frac{x - 1}{2}\right)\right)}^{2}"),
+    ("Add(ZeroMatrix(2), IdentityMatrix(2), HilbertMatrix(2))", r"0_{2} + I_{2} + H_{2}"),
+    ("Equal(One(QQ), 1)", r"1_{\mathbb{Q}} = 1"),
+    ("Equal(Zero(QQ), 0)", r"0_{\mathbb{Q}} = 0"),
 ]
+
+
 
 def test_latex(fexpr):
     print("test latex!")
@@ -95,7 +116,7 @@ def latex_report(fexpr):
 <!DOCTYPE html>
 <html>
 <head>
-<title>Fredrik Johansson's website</title>
+<title>fexpr to LaTeX test sheet</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -146,7 +167,7 @@ table { width: 95%; }
     for c in '-+()_,"':
         s = s.replace(c, " ")
     used = set(s.split())
-    builtins = fexpr.builtins()
+    builtins = [name.strip("_") for name in fexpr.builtins()]
     unused = [name for name in builtins if name not in used]
     for name in unused:
         fp.write(name)

@@ -989,6 +989,30 @@ void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, 
 }
 
 void
+fexpr_write_latex_subscript(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t view;
+    slong i, nargs;
+    int subscript;
+
+    nargs = fexpr_nargs(expr);
+
+    fexpr_view_func(view, expr);
+    fexpr_write_latex_symbol(&subscript, out, view, flags);
+
+    calcium_write(out, "_{");
+    for (i = 0; i < nargs; i++)
+    {
+        fexpr_view_next(view);
+        fexpr_write_latex(out, view, flags | FEXPR_LATEX_SMALL);
+        if (i < nargs - 1)
+            calcium_write(out, ", ");
+    }
+    calcium_write(out, "}");
+}
+
+
+void
 fexpr_write_latex_infix(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     fexpr_t func, arg;

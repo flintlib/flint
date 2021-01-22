@@ -352,6 +352,7 @@ void fexpr_print_latex(const fexpr_t expr, ulong flags);
 char * fexpr_get_str_latex(const fexpr_t expr, ulong flags);
 
 void fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_subscript(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_infix(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_mul(calcium_stream_t out, const fexpr_t expr, ulong flags);
