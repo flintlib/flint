@@ -366,6 +366,7 @@ void fexpr_write_latex_exp(calcium_stream_t out, const fexpr_t expr, ulong flags
 void fexpr_write_latex_factorial(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_sum_product(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_limit(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_simple(calcium_stream_t out, const fexpr_t expr, ulong flags);

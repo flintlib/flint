@@ -894,6 +894,83 @@ fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags
 }
 
 void
+fexpr_write_latex_limit(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t op, formula, forexpr, var, point, predicate;
+    slong nargs, id;
+    int have_predicate = 0;
+    int parens;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs != 2 && nargs != 3)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_func(op, expr);
+    fexpr_view_arg(formula, expr, 0);
+    fexpr_view_arg(forexpr, expr, 1);
+
+    if (fexpr_nargs(forexpr) != 2)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(var, forexpr, 0);
+    fexpr_view_arg(point, forexpr, 1);
+
+    if (nargs == 3)
+    {
+        fexpr_view_arg(predicate, expr, 2);
+        have_predicate = 1;
+    }
+
+    id = FEXPR_BUILTIN_ID(op->data[0]);
+
+    if (id == FEXPR_SequenceLimitInferior)
+        calcium_write(out, "\\liminf_{");
+    else if (id == FEXPR_SequenceLimitSuperior)
+        calcium_write(out, "\\limsup_{");
+    else
+        calcium_write(out, "\\lim_{");
+
+    fexpr_write_latex(out, var, flags);
+    calcium_write(out, " \\to ");
+
+    if (id == FEXPR_LeftLimit || id == FEXPR_RightLimit)
+        calcium_write(out, "{");
+
+    fexpr_write_latex(out, point, flags | FEXPR_LATEX_SMALL);
+
+    if (id == FEXPR_LeftLimit)
+        calcium_write(out, "}^{-}");
+    if (id == FEXPR_RightLimit)
+        calcium_write(out, "}^{+}");
+
+    if (have_predicate)
+    {
+        calcium_write(out, ",\\,");
+        fexpr_write_latex(out, predicate, flags | FEXPR_LATEX_SMALL);
+    }
+
+    calcium_write(out, "} ");
+
+    parens = (fexpr_is_builtin_call(formula, FEXPR_Add) ||
+              fexpr_is_builtin_call(formula, FEXPR_Sub));
+
+    if (parens)
+        calcium_write(out, "\\left[");
+
+    fexpr_write_latex(out, formula, flags);
+
+    if (parens)
+        calcium_write(out, "\\right]");
+}
+
+void
 fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     fexpr_t arg;
