@@ -140,7 +140,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_EulerPolynomial, "EulerPolynomial", "", NULL, },
     { FEXPR_EulerQSeries, "EulerQSeries", "\\phi", NULL, },
     { FEXPR_Exists, "Exists", "", NULL, },
-    { FEXPR_Exp, "Exp", "\\exp", NULL, },
+    { FEXPR_Exp, "Exp", "\\exp", fexpr_write_latex_exp, },
     { FEXPR_ExtendedRealNumbers, "ExtendedRealNumbers", "", NULL, },
     { FEXPR_Factorial, "Factorial", "", fexpr_write_latex_factorial, },
     { FEXPR_FallingFactorial, "FallingFactorial", "", fexpr_write_latex_simple2, },

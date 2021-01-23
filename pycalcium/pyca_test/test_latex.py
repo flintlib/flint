@@ -98,10 +98,13 @@ latex_test_cases = [
     ("Integral(f(x), For(x, -Infinity, Infinity))", r"\int_{-\infty}^{\infty} f(x) \, dx"),
     ("Integral(f(x), For(x, RR))", r"\int_{x \in \mathbb{R}} f(x) \, dx"),
     ("Integral(f(x) + g(x) / h(x), For(x, a, b))", r"\int_{a}^{b} \left(f(x) + \frac{g(x)}{h(x)}\right) \, dx"),
+    ("Set(Exp(x), Exp(Div(3, 2)), Exp(Add(Neg(Pow(x, 2)), x)), Exp(Abs(Im(z))), Exp(Div(3, Add(2, x))), Exp(Sin(x)))", r"\left\{e^{x}, e^{3 / 2}, e^{-{x}^{2} + x}, e^{\left|\operatorname{Im}(z)\right|}, \exp\!\left(\frac{3}{2 + x}\right), \exp\!\left(\sin(x)\right)\right\}"),
     ("Add(Sin(x), Cos(x), Tan(x), Cot(x), Sec(x), Csc(x))", r"\sin(x) + \cos(x) + \tan(x) + \cot(x) + \sec(x) + \csc(x)"),
     ("Add(Sinh(x), Cosh(x), Tanh(x), Coth(x), Sech(x), Csch(x))", r"\sinh(x) + \cosh(x) + \tanh(x) + \coth(x) + \operatorname{sech}(x) + \operatorname{csch}(x)"),
     ("Add(Asin(x), Acos(x), Atan(x), Acot(x), Asec(x), Acsc(x))", r"\operatorname{asin}(x) + \operatorname{acos}(x) + \operatorname{atan}(x) + \operatorname{acot}(x) + \operatorname{asec}(x) + \operatorname{acsc}(x)"),
     ("Add(Asinh(x), Acosh(x), Atanh(x), Acoth(x), Asech(x), Acsch(x))", r"\operatorname{asinh}(x) + \operatorname{acosh}(x) + \operatorname{atanh}(x) + \operatorname{acoth}(x) + \operatorname{asech}(x) + \operatorname{acsch}(x)"),
+    ("Exp(Neg(Euler))", r"e^{-\gamma}"),
+    ("Set(Re(z), Im(z), Atan2(y, x))", r"\left\{\operatorname{Re}(z), \operatorname{Im}(z), \operatorname{atan2}(y, x)\right\}"),
     ("Add(NumberE, GoldenRatio, CatalanConstant)", r"e + \varphi + G"),
     ("Add(Sinc(x), Pow(Sinc(x), 2))", r"\operatorname{sinc}(x) + \operatorname{sinc}^{2}\!\left(x\right)"),
     ("Add(LogIntegral(x), SinIntegral(x))", r"\operatorname{li}(x) + \operatorname{Si}(x)"),
@@ -146,6 +149,7 @@ latex_test_cases = [
     ("List(FormalPowerSeries(QQ, x), FormalPowerSeries(QQ, x, y), FormalPowerSeries(QQ, Tuple()), FormalPowerSeries(QQ, Tuple(x)), FormalPowerSeries(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}[[x]], \mathbb{Q}[[x, y]], \mathbb{Q}[[]], \mathbb{Q}[[x]], \mathbb{Q}[[x, y]]\right]"),
     ("List(FormalLaurentSeries(QQ, x), FormalLaurentSeries(QQ, x, y), FormalLaurentSeries(QQ, Tuple()), FormalLaurentSeries(QQ, Tuple(x)), FormalLaurentSeries(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}(\!(x)\!), \mathbb{Q}(\!(x, y)\!), \mathbb{Q}(\!()\!), \mathbb{Q}(\!(x)\!), \mathbb{Q}(\!(x, y)\!)\right]"),
     ("List(FormalPuiseuxSeries(QQ, x), FormalPuiseuxSeries(QQ, x, y), FormalPuiseuxSeries(QQ, Tuple()), FormalPuiseuxSeries(QQ, Tuple(x)), FormalPuiseuxSeries(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}\!\left\langle\!\left\langle x \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle x, y \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle  \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle x \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle x, y \right\rangle\!\right\rangle\right]"),
+    ("f(a, b, Ellipsis, g(Ellipsis))", r"f\!\left(a, b, \ldots, g(\ldots)\right)"),
 ]
 
 

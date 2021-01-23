@@ -602,6 +602,88 @@ fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t expr, ulong flags)
     }
 }
 
+static int
+fexpr_show_exp_as_power(const fexpr_t expr)
+{
+    fexpr_t func, arg;
+    slong i, nargs;
+
+    if (fexpr_is_atom(expr))
+        return 1;
+
+    fexpr_view_func(func, expr);
+
+    /* todo: more systematic solution */
+    if (fexpr_is_builtin_symbol(func, FEXPR_Pos) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Neg) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Add) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Sub) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Mul) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Div) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Pow) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Abs) ||
+        fexpr_is_builtin_symbol(func, FEXPR_RealAbs) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Sqrt) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Re) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Im) ||
+        fexpr_is_builtin_symbol(func, FEXPR_Log))
+    {
+        nargs = fexpr_nargs(expr);
+
+        if (fexpr_is_builtin_symbol(func, FEXPR_Div) && nargs == 2)
+        {
+            fexpr_view_arg(arg, expr, 1);
+            if (!fexpr_is_atom(arg))
+                return 0;
+        }
+
+        fexpr_view_arg(arg, expr, 0);
+
+        for (i = 0; i < nargs; i++)
+        {
+            if (!fexpr_show_exp_as_power(arg))
+                return 0;
+
+            fexpr_view_next(arg);
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+void
+fexpr_write_latex_exp(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t arg;
+    slong nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs == 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        if (fexpr_show_exp_as_power(arg))
+        {
+            calcium_write(out, "e^{");
+            fexpr_write_latex(out, arg, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+        }
+        else
+        {
+            calcium_write(out, "\\exp\\!\\left(");
+            fexpr_write_latex(out, arg, flags);
+            calcium_write(out, "\\right)");
+        }
+
+        return;
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
 void
 fexpr_write_latex_factorial(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
