@@ -79,6 +79,7 @@ latex_test_cases = [
     ("Subset(Primes, NN, ZZ, QQ, RR, CC)", r"\mathbb{P} \subset \mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}"),
     ("Subset(QQ, AlgebraicNumbers, CC)", r"\mathbb{Q} \subset \overline{\mathbb{Q}} \subset \mathbb{C}"),
     ("SubsetEqual(S, QQ)", r"S \subseteq \mathbb{Q}"),
+    ("NotElement(123456789012345678901234567890, SetMinus(QQ, ZZ))", r"123456789012345678901234567890 \notin \mathbb{Q} \setminus \mathbb{Z}"),
     ("KroneckerDelta(x, Div(1, 2))", r"\delta_{(x,1 / 2)}"),
     ("Set(Interval(a, b), OpenInterval(a, b), ClosedOpenInterval(a, b), OpenClosedInterval(a, b))", r"\left\{\left[a, b\right], \left(a, b\right), \left[a, b\right), \left(a, b\right]\right\}"),
     ("Set(Interval(a, Div(1, 2)), OpenInterval(a, Div(1, 2)), ClosedOpenInterval(a, Div(1, 2)), OpenClosedInterval(a, Div(1, 2)))", r"\left\{\left[a, 1 / 2\right], \left(a, 1 / 2\right), \left[a, 1 / 2\right), \left(a, 1 / 2\right]\right\}"),
@@ -95,6 +96,9 @@ latex_test_cases = [
     ("Product(f(n), For(n, NN), NotEqual(g(n), 0))", r"\prod_{\textstyle{n  \in \mathbb{N} \atop g(n) \ne 0}} f(n)"),
     ("Product(f(n), For(n, a, b), NotEqual(n, 0))", r"\prod_{\textstyle{n=a \atop n \ne 0}}^{b} f(n)"),
     ("Product(f(n), For(n, a, b))", r"\prod_{n=a}^{b} f(n)"),
+    ("Equal(Set(f(n), For(n, ZZ)), Union(Set(f(n), For(n, ZZ), IsEven(n)), Set(f(n), For(n, ZZ), IsOdd(n))))", r"\left\{ f(n) : n \in \mathbb{Z} \right\} = \left\{ f(n) : n \in \mathbb{Z}\,\mathbin{\operatorname{and}}\, n \text{ even} \right\} \cup \left\{ f(n) : n \in \mathbb{Z}\,\mathbin{\operatorname{and}}\, n \text{ odd} \right\}"),
+    ("Equal(Primes, Set(p, For(p, NN), IsPrime(p)))", r"\mathbb{P} = \left\{ p : p \in \mathbb{N}\,\mathbin{\operatorname{and}}\, p \text{ prime} \right\}"),
+    ("Equal(Sum(f(n), Element(n, ZZ)), Add(Sum(f(n), Element(n, ZZ), IsOdd(n)), Sum(f(n), Element(n, ZZ), IsEven(n))))", r"\sum_{n  \in \mathbb{Z}} f(n) = \sum_{\textstyle{n  \in \mathbb{Z} \atop n \text{ odd}}} f(n) + \sum_{\textstyle{n  \in \mathbb{Z} \atop n \text{ even}}} f(n)"),
     ("Integral(f(x), For(x, -Infinity, Infinity))", r"\int_{-\infty}^{\infty} f(x) \, dx"),
     ("Integral(f(x), For(x, RR))", r"\int_{x \in \mathbb{R}} f(x) \, dx"),
     ("Integral(f(x) + g(x) / h(x), For(x, a, b))", r"\int_{a}^{b} \left(f(x) + \frac{g(x)}{h(x)}\right) \, dx"),
@@ -112,14 +116,20 @@ latex_test_cases = [
     ("Set(Re(z), Im(z), Atan2(y, x))", r"\left\{\operatorname{Re}(z), \operatorname{Im}(z), \operatorname{atan2}(y, x)\right\}"),
     ("Add(NumberE, GoldenRatio, CatalanConstant)", r"e + \varphi + G"),
     ("Add(Sinc(x), Pow(Sinc(x), 2))", r"\operatorname{sinc}(x) + \operatorname{sinc}^{2}\!\left(x\right)"),
-    ("Add(LogIntegral(x), SinIntegral(x))", r"\operatorname{li}(x) + \operatorname{Si}(x)"),
     ("AGM(a, b)", r"\operatorname{agm}(a, b)"),
     ("And(Equal(LogBarnesG(z), Log(BarnesG(z))), Equal(LogGamma(z), Log(Gamma(z))))", r"\log G(z) = \log\!\left(G(z)\right) \;\mathbin{\operatorname{and}}\; \log \Gamma(z) = \log\!\left(\Gamma(z)\right)"),
     ("DirichletL(s, chi)", r"L(s, \chi)"),
     ("DirichletLambda(s, chi)", r"\Lambda(s, \chi)"),
-    ("HurwitzZeta(s, a)", r"\zeta(s, a)"),
+    ("Implies(GeneralizedRiemannHypothesis, RiemannHypothesis)", r"\operatorname{GRH} \;\implies\; \operatorname{RH}"),
+    ("Set(ModularJ(tau), ModularLambda(tau), JacobiTheta(n, z, tau))", r"\left\{j(\tau), \lambda(\tau), \theta_{n}\!\left(z, \tau\right)\right\}"),
+    ("Set(WeierstrassP(z, tau), WeierstrassSigma(z, tau), WeierstrassZeta(z, tau))", r"\left\{\wp(z, \tau), \sigma(z, \tau), \zeta(z, \tau)\right\}"),
+    ("Mul(ChebyshevT(n, x), ChebyshevU(n, x))", r"T_{n}\!\left(x\right) U_{n}\!\left(x\right)"),
+    ("Add(FresnelC(z), FresnelS(z))", r"C(z) + S(z)"),
+    ("Div(EisensteinE(Mul(2, n), tau), EisensteinG(Mul(2, n), tau))", r"\frac{E_{2 n}\!\left(\tau\right)}{G_{2 n}\!\left(\tau\right)}"),
+    ("Equal(Div(IncompleteBeta(z, a, b), IncompleteBetaRegularized(z, a, b)), BetaFunction(a, b))", r"\frac{\mathrm{B}_{z}\!\left(a, b\right)}{I_{z}\!\left(a, b\right)} = \mathrm{B}(a, b)"),
+    ("Set(PolyLog(s, z), HurwitzZeta(s, z), LerchPhi(z, s, a))", r"\left\{\operatorname{Li}_{s}\!\left(z\right), \zeta(s, z), \Phi(z, s, a)\right\}"),
+    ("Equal(PartitionsP(n), Mul(Div(1, n), Sum(Mul(DivisorSigma(1, Sub(n, k)), PartitionsP(k)), For(k, 0, Sub(n, 1)))))", r"p(n) = \frac{1}{n} \sum_{k=0}^{n - 1} \sigma_{1}\!\left(n - k\right) p(k)"),
     ("MultiZetaValue(a, b, c)", r"\zeta(a, b, c)"),
-    ("LerchPhi(z, s, a)", r"\Phi(z, s, a)"),
     ("RiemannXi(s)", r"\xi(s)"),
     ("Mul(LiouvilleLambda(n), EulerPhi(n), MoebiusMu(n))", r"\lambda(n) \varphi(n) \mu(n)"),
     ("BetaFunction(a, b)", r"\mathrm{B}(a, b)"),
@@ -131,6 +141,10 @@ latex_test_cases = [
     ("List(Binomial(x, n), RisingFactorial(x, n), FallingFactorial(x, n), StirlingCycle(x, n), StirlingS1(x, n), StirlingS2(x, n))", r"\left[{x \choose n}, \left(x\right)_{n}, \left(x\right)^{\underline{n}}, \left[{x \atop n}\right], s\!\left(x, n\right), \left\{{x \atop n}\right\}\right]"),
     ("Add(BellNumber(5), BernoulliB(5), EulerE(5), Fibonacci(5), HarmonicNumber(5), Prime(5), RiemannZetaZero(5))", r"\operatorname{B}_{5} + B_{5} + E_{5} + F_{5} + H_{5} + p_{5} + \rho_{5}"),
     ("List(LegendreSymbol(p, q), JacobiSymbol(p, q), KroneckerSymbol(p, q))", r"\left[\left(\frac{p}{q}\right), \left(\frac{p}{q}\right), \left(\frac{p}{q}\right)\right]"),
+    ("Add(ExpIntegralEi(x), ExpIntegralE(n, x), SinIntegral(x), SinhIntegral(x), CosIntegral(x), CoshIntegral(x), LogIntegral(x))", r"\operatorname{Ei}(x) + E_{n}\!\left(x\right) + \operatorname{Si}(x) + \operatorname{Shi}(x) + \operatorname{Ci}(x) + \operatorname{Chi}(x) + \operatorname{li}(x)"),
+    ("Mul(BesselJ(nu, z), BesselI(nu, z), BesselY(nu, z), BesselK(nu, z))", r"J_{\nu}\!\left(z\right) I_{\nu}\!\left(z\right) Y_{\nu}\!\left(z\right) K_{\nu}\!\left(z\right)"),
+    ("Equal(AiryAi(AiryAiZero(n)), AiryBi(AiryBiZero(n)), 0)", r"\operatorname{Ai}\!\left(a_{n}\right) = \operatorname{Bi}\!\left(b_{n}\right) = 0"),
+    ("Equal(BesselJ(nu, BesselJZero(nu, n)), BesselY(nu, BesselYZero(nu, n)), 0)", r"J_{\nu}\!\left(j_{\nu, n}\right) = Y_{\nu}\!\left(y_{\nu, n}\right) = 0"),
     ("Equal(RiemannZeta(s), Mul(Mul(Mul(Mul(2, Pow(Mul(2, Pi), Sub(s, 1))), Sin(Div(Mul(Pi, s), 2))), Gamma(Sub(1, s))), RiemannZeta(Sub(1, s))))", r"\zeta(s) = 2 {\left(2 \pi\right)}^{s - 1} \sin\!\left(\frac{\pi s}{2}\right) \Gamma\!\left(1 - s\right) \zeta\!\left(1 - s\right)"),
     ("Pow(Div(Pow(DedekindEta(Mul(2, tau)), 2), Mul(DedekindEta(tau), DedekindEta(Mul(4, tau)))), 24)", r"{\left(\frac{\eta^{2}\!\left(2 \tau\right)}{\eta(\tau) \eta\!\left(4 \tau\right)}\right)}^{24}"),
     ("Mul(Mul(Erf(z), Erfc(z)), Erfi(z))", r"\operatorname{erf}(z) \operatorname{erfc}(z) \operatorname{erfi}(z)"),
@@ -147,6 +161,7 @@ latex_test_cases = [
     ("Mul(Hypergeometric3F2(a, b, c, d, e, z), Hypergeometric3F2Regularized(a, b, c, d, e, z))", r"\,{}_3F_2(a, b, c, d, e, z) \,{}_3{\textbf F}_2(a, b, c, d, e, z)"),
     ("(Hypergeometric2F1Regularized(Div(-1,4),Div(1,4),1/2, (x-1)/2)**2)", r"{\left(\,{}_2{\textbf F}_1\!\left(-\frac{1}{4}, \frac{1}{4}, \frac{1}{2}, \frac{x - 1}{2}\right)\right)}^{2}"),
     ("Add(ZeroMatrix(2), IdentityMatrix(2), HilbertMatrix(2))", r"0_{2} + I_{2} + H_{2}"),
+    ("Set(SpecialLinearGroup(n, ZZ), GeneralLinearGroup(n, ZZ))", r"\left\{\operatorname{SL}_{n}\!\left(\mathbb{Z}\right), \operatorname{GL}_{n}\!\left(\mathbb{Z}\right)\right\}"),
     ("Equal(One(QQ), 1)", r"1_{\mathbb{Q}} = 1"),
     ("Equal(Zero(QQ), 0)", r"0_{\mathbb{Q}} = 0"),
     ("List(Polynomials(QQ, x), Polynomials(QQ, x, y), Polynomials(QQ, Tuple()), Polynomials(QQ, Tuple(x)), Polynomials(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}[x], \mathbb{Q}[x, y], \mathbb{Q}[], \mathbb{Q}[x], \mathbb{Q}[x, y]\right]"),
@@ -213,7 +228,7 @@ table { width: 95%; }
     one_big_latex = one_big.latex()
     t2 = clock()
     fp.write("""<h1>fexpr to LaTeX test sheet</h1>""")
-    fp.write("""<p>Converted %i formulas to LaTeX in %f seconds.</p>""" % (len(formulas), (t2-t1)))
+    fp.write("""<p>Converted %i formulas (%i leaves, %i bytes) to LaTeX in %f seconds.</p>""" % (len(formulas), one_big.num_leaves(), one_big.size_bytes(), (t2-t1)))
     fp.write("""<table>""")
     fp.write("""<tr><th>fexpr</th> <th>Generated LaTeX</th> <th>KaTeX display</th>""")
     for formula, latex in zip(formulas, output):

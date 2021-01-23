@@ -1195,6 +1195,18 @@ fexpr_write_latex_simple(calcium_stream_t out, const fexpr_t expr, ulong flags)
             a = "\\left\\langle ";
             b = "\\right\\rangle";
             break;
+        case FEXPR_IsEven:
+            a = "";
+            b = " \\text{ even}";
+            break;
+        case FEXPR_IsOdd:
+            a = "";
+            b = " \\text{ odd}";
+            break;
+        case FEXPR_IsPrime:
+            a = "";
+            b = " \\text{ prime}";
+            break;
         default:
             fexpr_write_latex_call(out, expr, flags);
             return;
@@ -1655,7 +1667,37 @@ fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags)
 
 void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
-    
+    fexpr_t view;
+    slong i, nargs;
+    int subscript;
+
+    nargs = fexpr_nargs(expr);
+
+    fexpr_view_func(view, expr);
+    fexpr_write_latex_symbol(&subscript, out, view, flags);
+
+    if (nargs >= 1)
+    {
+        calcium_write(out, "_{");
+        fexpr_view_next(view);
+        fexpr_write_latex(out, view, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}");
+    }
+
+    if (nargs >= 2)
+    {
+        calcium_write(out, "\\!\\left(");
+
+        for (i = 1; i < nargs; i++)
+        {
+            fexpr_view_next(view);
+            fexpr_write_latex(out, view, flags);
+            if (i < nargs - 1)
+                calcium_write(out, ", ");
+        }
+
+        calcium_write(out, "\\right)");
+    }
 }
 
 void
