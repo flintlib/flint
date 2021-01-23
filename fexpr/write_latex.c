@@ -914,7 +914,255 @@ fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
         return;
     }
 
+    if (fexpr_is_builtin_call(expr, FEXPR_Implies) && nargs == 2)
+    {
+        fexpr_t arg1, arg2;
+        fexpr_view_arg(arg1, expr, 0);
+        fexpr_view_arg(arg2, expr, 1);
+
+        if (!(fexpr_is_atom(arg1) || fexpr_is_builtin_call(arg1, FEXPR_Element)))
+        {
+            calcium_write(out, "\\left(");
+            fexpr_write_latex(out, arg1, flags);
+            calcium_write(out, "\\right)");
+        }
+        else
+        {
+            fexpr_write_latex(out, arg1, flags);
+        }
+
+        calcium_write(out, " \\;\\implies\\; ");
+
+        if (!(fexpr_is_atom(arg2) || fexpr_is_builtin_call(arg2, FEXPR_Element)))
+        {
+            calcium_write(out, "\\left(");
+            fexpr_write_latex(out, arg2, flags);
+            calcium_write(out, "\\right)");
+        }
+        else
+        {
+            fexpr_write_latex(out, arg2, flags);
+        }
+
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Equivalent) && nargs >= 1)
+    {
+        fexpr_view_func(arg, expr);
+
+        for (i = 0; i < nargs; i++)
+        {
+            fexpr_view_next(arg);
+
+            if (!fexpr_is_atom(arg))
+                calcium_write(out, "\\left(");
+            fexpr_write_latex(out, arg, flags);
+            if (!fexpr_is_atom(arg))
+                calcium_write(out, "\\right)");
+
+            if (i < nargs - 1)
+            {
+                calcium_write(out, " \\iff ");
+            }
+        }
+
+        return;
+    }
+
     fexpr_write_latex_call(out, expr, flags);
+}
+
+void
+fexpr_write_latex_simple(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    slong i;
+    const char * a;
+    const char * b;
+    fexpr_t func, arg;
+
+    if (fexpr_nargs(expr) != 1 || !fexpr_is_any_builtin_call(expr))
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_func(func, expr);
+    fexpr_view_arg(arg, expr, 0);
+
+    i = FEXPR_BUILTIN_ID(func->data[0]);
+
+    switch (i)
+    {
+        case FEXPR_Sqrt:
+            a = "\\sqrt{";
+            b = "}";
+            break;
+        case FEXPR_Conjugate:
+            a = "\\overline{";
+            b = "}";
+            break;
+        case FEXPR_Cardinality:
+        case FEXPR_Length:
+            a = "\\# ";
+            b = "";
+            break;
+        case FEXPR_Abs:
+        case FEXPR_RealAbs:
+            a = "\\left|";
+            b = "\\right|";
+            break;
+        case FEXPR_Floor:
+            a = "\\left\\lfloor ";
+            b = " \\right\\rfloor";
+            break;
+        case FEXPR_Ceil:
+            a = "\\left\\lceil ";
+            b = "\\right\\rceil";
+            break;
+        case FEXPR_Parentheses:
+            a = "\\left(";
+            b = "\\right)";
+            break;
+        case FEXPR_Brackets:
+            a = "\\left[";
+            b = "\\right]";
+            break;
+        case FEXPR_Braces:
+            a = "\\left\\{";
+            b = "\\right\\}";
+            break;
+        case FEXPR_AngleBrackets:
+            a = "\\left\\langle ";
+            b = "\\right\\rangle";
+            break;
+        default:
+            fexpr_write_latex_call(out, expr, flags);
+            return;
+    }
+
+    calcium_write(out, a);
+    fexpr_write_latex(out, arg, flags);
+    calcium_write(out, b);
+}
+
+void
+_fexpr_write_latex_simple2(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    slong i;
+    const char * a;
+    const char * b;
+    const char * c;
+    fexpr_t func, arg1, arg2;
+
+    if (fexpr_nargs(expr) != 2 || !fexpr_is_any_builtin_call(expr))
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_func(func, expr);
+    fexpr_view_arg(arg1, expr, 0);
+    fexpr_view_arg(arg2, expr, 1);
+
+    i = FEXPR_BUILTIN_ID(func->data[0]);
+
+    switch (i)
+    {
+        case FEXPR_RisingFactorial:
+            a = "\\left(";
+            b = "\\right)_{";
+            c = "}";
+            break;
+        case FEXPR_FallingFactorial:
+            a = "\\left(";
+            b = "\\right)^{\\underline{";
+            c = "}}";
+            break;
+        case FEXPR_Binomial:
+            a = "{";
+            b = " \\choose ";
+            c = "}";
+            break;
+        case FEXPR_StirlingCycle:
+            a = "\\left[{";
+            b = " \\atop ";
+            c = "}\\right]";
+            break;
+        case FEXPR_StirlingS1:
+            a = "s\\!\\left(";
+            b = ", ";
+            c = "\\right)";
+            break;
+        case FEXPR_StirlingS2:
+            a = "\\left\\{{";
+            b = " \\atop ";
+            c = "}\\right\\}";
+            break;
+        case FEXPR_LegendreSymbol:
+        case FEXPR_JacobiSymbol:
+        case FEXPR_KroneckerSymbol:
+            a = "\\left(\\frac{";
+            b = "}{";
+            c = "}\\right)";
+            break;
+        case FEXPR_Interval:
+            a = "\\left[";
+            b = ", ";
+            c = "\\right]";
+            break;
+        case FEXPR_OpenInterval:
+            a = "\\left(";
+            b = ", ";
+            c = "\\right)";
+            break;
+        case FEXPR_ClosedOpenInterval:
+            a = "\\left[";
+            b = ", ";
+            c = "\\right)";
+            break;
+        case FEXPR_OpenClosedInterval:
+            a = "\\left(";
+            b = ", ";
+            c = "\\right]";
+            break;
+        case FEXPR_RealBall:
+            a = "\\left[";
+            b = " \\pm ";
+            c = "\\right]";
+            break;
+        case FEXPR_OpenRealBall:
+            a = "\\left(";
+            b = " \\pm ";
+            c = "\\right)";
+            break;
+        case FEXPR_KroneckerDelta:
+            a = "\\delta_{(";
+            b = ",";
+            c = ")}";
+            break;
+        default:
+            fexpr_write_latex_call(out, expr, flags);
+            return;
+    }
+
+    calcium_write(out, a);
+    fexpr_write_latex(out, arg1, flags);
+    calcium_write(out, b);
+    fexpr_write_latex(out, arg2, flags);
+    calcium_write(out, c);
+}
+
+void
+fexpr_write_latex_simple2(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    _fexpr_write_latex_simple2(out, expr, flags);
+}
+
+void
+fexpr_write_latex_simple2_small(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    _fexpr_write_latex_simple2(out, expr, flags | FEXPR_LATEX_SMALL);
 }
 
 void
@@ -990,6 +1238,88 @@ fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong fla
         calcium_write(out, "\\right)");
     else
         calcium_write(out, "\\right]");
+}
+
+void
+fexpr_write_latex_alg_structure(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t func, arg;
+    const char *a;
+    const char *b;
+    slong i, nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs <= 1)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_func(func, expr);
+    fexpr_view_arg(arg, expr, 0);
+
+    i = FEXPR_BUILTIN_ID(func->data[0]);
+
+    switch (i)
+    {
+        case FEXPR_Polynomials:
+            a = "[";
+            b = "]";
+            break;
+        case FEXPR_PolynomialFractions:
+            a = "(";
+            b = ")";
+            break;
+        case FEXPR_FormalPowerSeries:
+            a = "[[";
+            b = "]]";
+            break;
+        case FEXPR_FormalLaurentSeries:
+            a = "(\\!(";
+            b = ")\\!)";
+            break;
+        case FEXPR_FormalPuiseuxSeries:
+            a = "\\!\\left\\langle\\!\\left\\langle ";
+            b = " \\right\\rangle\\!\\right\\rangle";
+            break;
+        default:
+            fexpr_write_latex_call(out, expr, flags);
+            return;
+    }
+
+    fexpr_write_latex(out, arg, flags);
+    calcium_write(out, a);
+
+    if (nargs >= 1)
+    {
+        slong i;
+
+        fexpr_view_next(arg);
+
+        if (fexpr_is_builtin_call(arg, FEXPR_Tuple))
+        {
+            nargs = fexpr_nargs(arg);
+            fexpr_view_arg(arg, arg, 0);
+        }
+        else
+        {
+            nargs--;
+        }
+
+        for (i = 0; i < nargs; i++)
+        {
+            fexpr_write_latex(out, arg, flags);
+
+            if (i < nargs - 1)
+            {
+                calcium_write(out, ", ");
+                fexpr_view_next(arg);
+            }
+        }
+    }
+
+    calcium_write(out, b);
 }
 
 static int

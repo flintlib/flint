@@ -642,6 +642,8 @@ Matrices and linear algebra
 
 .. macro:: Matrix2x1
 
+.. macro:: ZeroMatrix
+
 .. macro:: IdentityMatrix
 
 .. macro:: Det
@@ -848,6 +850,8 @@ Combinatorial functions
 .. macro:: BernoulliB
 
 .. macro:: BernoulliPolynomial
+
+.. macro:: StirlingCycle
 
 .. macro:: StirlingS1
 
@@ -1120,6 +1124,35 @@ Elliptic, theta and modular functions
 
 .. macro:: JacobiThetaPermutation
 
+Nonsemantic markup
+........................................................................
+
+.. macro:: Ellipsis
+
+    ``Ellipsis`` renders as `\ldots` in LaTeX. It can be used to
+    indicate missing function arguments for display purposes,
+    but it has no predefined builtin semantics.
+
+.. macro:: Parentheses
+
+    ``Parentheses(x)`` semantically represents ``x``, but renders
+    with parentheses (`\left(x\right)`) when converted to LaTeX.
+
+.. macro:: Brackets
+
+    ``Brackets(x)`` semantically represents ``x``, but renders
+    with brackets (`\left[x\right]`) when converted to LaTeX.
+
+.. macro:: Braces
+
+    ``Braces(x)`` semantically represents ``x``, but renders
+    with braces (`\left\{x\right\}`) when converted to LaTeX.
+
+.. macro:: AngleBrackets
+
+    ``AngleBrackets(x)`` semantically represents ``x``, but renders
+    with angle brackets (`\left\langle x\right\rangle`) when
+    converted to LaTeX.
 
 
 .. raw:: latex
