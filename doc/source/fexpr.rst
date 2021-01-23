@@ -167,11 +167,6 @@ Memory management
 
     Ensures that *expr* has room for *size* words.
 
-.. function:: slong fexpr_size(const fexpr_t expr)
-
-    Returns the number of words in the internal representation
-    of *expr*.
-
 .. function:: void fexpr_set(fexpr_t res, const fexpr_t expr)
 
     Sets *res* to the a copy of *expr*.
@@ -179,6 +174,37 @@ Memory management
 .. function:: void fexpr_swap(fexpr_t a, fexpr_t b)
 
     Swaps *a* and *b* efficiently.
+
+Size information
+-------------------------------------------------------------------------------
+
+.. function:: slong fexpr_depth(const fexpr_t expr)
+
+    Returns the depth of *expr* as a symbolic expression tree.
+
+.. function:: slong fexpr_num_leaves(const fexpr_t expr)
+
+    Returns the number of leaves (atoms, counted with repetition)
+    in the expression *expr*.
+
+.. function:: slong fexpr_size(const fexpr_t expr)
+
+    Returns the number of words in the internal representation
+    of *expr*.
+
+.. function:: slong fexpr_size_bytes(const fexpr_t expr)
+
+    Returns the number of bytes in the internal representation
+    of *expr*. The count excludes the size of the structure itself.
+    Add ``sizeof(fexpr_struct)`` to get the size of the object as a
+    whole.
+
+.. function:: slong fexpr_allocated_bytes(const fexpr_t expr)
+
+    Returns the number of allocated bytes in the internal
+    representation of *expr*. The count excludes the size of the
+    structure itself. Add ``sizeof(fexpr_struct)`` to get the size of
+    the object as a whole.
 
 Comparisons
 -------------------------------------------------------------------------------

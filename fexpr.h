@@ -279,6 +279,21 @@ char * fexpr_get_symbol_str(const fexpr_t expr);
 void fexpr_set_string(fexpr_t res, const char * s);
 char * fexpr_get_string(const fexpr_t expr);
 
+slong fexpr_depth(const fexpr_t expr);
+slong fexpr_num_leaves(const fexpr_t expr);
+
+FEXPR_INLINE slong
+fexpr_size_bytes(const fexpr_t expr)
+{
+    return fexpr_size(expr) * sizeof(ulong);
+}
+
+FEXPR_INLINE slong
+fexpr_allocated_bytes(const fexpr_t expr)
+{
+    return expr->alloc * sizeof(ulong);
+}
+
 /* todo: document */
 FEXPR_INLINE int
 fexpr_is_any_builtin_symbol(const fexpr_t expr)

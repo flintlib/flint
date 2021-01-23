@@ -256,6 +256,18 @@ class fexpr:
     def nwords(self):
         return libcalcium.fexpr_size(self)
 
+    def size_bytes(self):
+        return libcalcium.fexpr_size_bytes(self)
+
+    def allocated_bytes(self):
+        return libcalcium.fexpr_allocated_bytes(self)
+
+    def num_leaves(self):
+        return libcalcium.fexpr_num_leaves(self)
+
+    def depth(self):
+        return libcalcium.fexpr_depth(self)
+
     def __eq__(self, other):
         if type(self) is not type(other):
             return NotImplemented
