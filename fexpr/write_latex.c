@@ -971,6 +971,94 @@ fexpr_write_latex_limit(calcium_stream_t out, const fexpr_t expr, ulong flags)
 }
 
 void
+fexpr_write_latex_setop(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t op, formula, forexpr, var, domain, predicate;
+    const char * ops;
+    slong nargs, id;
+    int have_predicate = 0;
+    int parens;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs != 2 && nargs != 3)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_func(op, expr);
+    fexpr_view_arg(formula, expr, 0);
+    fexpr_view_arg(forexpr, expr, 1);
+
+    if (fexpr_nargs(forexpr) != 2)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(var, forexpr, 0);
+    fexpr_view_arg(domain, forexpr, 1);
+
+    if (nargs == 3)
+    {
+        fexpr_view_arg(predicate, expr, 2);
+        have_predicate = 1;
+    }
+
+    id = FEXPR_BUILTIN_ID(op->data[0]);
+
+    calcium_write(out, "\\mathop{");
+
+    switch (id)
+    {
+        case FEXPR_Minimum: ops = "\\min\\,"; break;
+        case FEXPR_Maximum: ops = "\\max\\,"; break;
+        case FEXPR_ArgMin: ops = "\\operatorname{arg\\,min}\\,"; break;
+        case FEXPR_ArgMax: ops = "\\operatorname{arg\\,max}\\,"; break;
+        case FEXPR_ArgMinUnique: ops = "\\operatorname{arg\\,min*}\\,"; break;
+        case FEXPR_ArgMaxUnique: ops = "\\operatorname{arg\\,max*}\\,"; break;
+        case FEXPR_Infimum: ops = "\\operatorname{inf}\\,"; break;
+        case FEXPR_Supremum: ops = "\\operatorname{sup}\\,"; break;
+        case FEXPR_Zeros: ops = "\\operatorname{zeros}\\,"; break;
+        case FEXPR_UniqueZero: ops = "\\operatorname{zero*}\\,"; break;
+        case FEXPR_Solutions: ops = "\\operatorname{solutions}\\,"; break;
+        case FEXPR_UniqueSolution: ops = "\\operatorname{solution*}\\,"; break;
+        default: ops = "";
+    }
+
+    calcium_write(out, ops);
+    calcium_write(out, "}\\limits_{");
+
+    fexpr_write_latex(out, var, flags | FEXPR_LATEX_SMALL);
+    calcium_write(out, " \\in ");
+    fexpr_write_latex(out, domain, flags | FEXPR_LATEX_SMALL);
+
+    if (have_predicate)
+    {
+        calcium_write(out, ",\\,");
+        fexpr_write_latex(out, predicate, flags | FEXPR_LATEX_SMALL);
+    }
+
+    calcium_write(out, "} ");
+
+    parens = (fexpr_is_builtin_call(formula, FEXPR_Add) ||
+              fexpr_is_builtin_call(formula, FEXPR_Sub) ||
+              fexpr_is_builtin_call(formula, FEXPR_Neg) ||
+              fexpr_is_builtin_call(formula, FEXPR_Sum) ||
+              fexpr_is_builtin_call(formula, FEXPR_Product) ||
+              fexpr_is_builtin_call(formula, FEXPR_Integral));
+
+    if (parens)
+        calcium_write(out, "\\left[");
+
+    fexpr_write_latex(out, formula, flags);
+
+    if (parens)
+        calcium_write(out, "\\right]");
+}
+
+void
 fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     fexpr_t arg;
