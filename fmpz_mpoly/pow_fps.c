@@ -254,80 +254,6 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return rnext;
 }
 
-void fmpz_set_mpn(fmpz_t f, ulong * c_in, slong n)		
-{		
-    slong i;
-    ulong * c;
-    
-    TMP_INIT;
-
-    TMP_START;
-
-    c = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-
-    for (i = 0; i < n; i++)
-       c[i] = c_in[i];
-
-    while (n > 0 && c[n - 1] == 0)		
-       n--;		
- 		
-    if (n <= 1)		
-       fmpz_set_ui(f, c[0]);		
-    else		
-    {		
-       __mpz_struct * mpz = _fmpz_promote(f);		
- 	
-       mpz_realloc2(mpz, n*FLINT_BITS);		
- 		
-       mpn_copyi(mpz->_mp_d, c, n);		
-       mpz->_mp_size = n;		
-    }	
-
-    TMP_END;
- }		
-
-
-void fmpz_set_mpn_signed(fmpz_t f, ulong * c_in, slong n)		
-{		
-    slong i;
-    ulong * c;
-    int neg;
-
-    TMP_INIT;
-
-    TMP_START;
-
-    c = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-
-    for (i = 0; i < n; i++)
-       c[i] = c_in[i];
-
-    neg = 0 > (slong) c[n - 1];		
-		
-    if (neg)		
-       mpn_neg_n(c, c, n);		
-		
-    while (n > 0 && c[n - 1] == 0)		
-       n--;		
- 		
-    if (n <= 1)		
-       fmpz_set_ui(f, c[0]);		
-    else		
-    {		
-       __mpz_struct * mpz = _fmpz_promote(f);		
- 	
-       mpz_realloc2(mpz, n*FLINT_BITS);		
- 		
-       mpn_copyi(mpz->_mp_d, c, n);		
-       mpz->_mp_size = n;		
-    }		
-
-    if (neg)		
-       fmpz_neg(f, f);
-
-    TMP_END;		
- }		
- 
 
 slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2, ulong k,
@@ -477,7 +403,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
          if (!mpoly_monomial_gt(finalexp, exp, N, cmpmask))
          {
             mpn_sub_n(temp2, fik + x->i*N, ge + x->j*N, N);
-            fmpz_set_mpn_signed(t2, temp2, N);
+            fmpz_set_signed_ui_array(t2, temp2, N);
             fmpz_addmul(C, t1, t2);
          }
 
@@ -503,7 +429,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
             if (!mpoly_monomial_gt(finalexp, exp, N, cmpmask))
             {
                mpn_sub_n(temp2, fik + x->i*N, ge + x->j*N, N);
-               fmpz_set_mpn_signed(t2, temp2, N);
+               fmpz_set_signed_ui_array(t2, temp2, N);
                fmpz_addmul(C, t1, t2);
             }
 
@@ -566,7 +492,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
              mpoly_monomial_mul_ui_mp(temp2, exp2 + 0, N, k);
 
          mpn_sub_n(temp2, exp_copy, temp2, N);
-         fmpz_set_mpn_signed(t2, temp2, N);
+         fmpz_set_signed_ui_array(t2, temp2, N);
          fmpz_divexact(temp1, C, t2);
          fmpz_add(S, S, temp1);
          fmpz_divexact(gc + gnext, temp1, poly2 + 0);

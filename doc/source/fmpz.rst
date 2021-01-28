@@ -297,6 +297,14 @@ Conversion
     ``in[0] + in[1]*X  + ... + in[in_len - 1]*X^(in_len - 1)``
     where ``X = 2^FLINT_BITS``. It is assumed that ``in_len > 0``.
 
+.. function:: void fmpz_set_signed_ui_array(fmpz_t out, const ulong * in, slong in_len)
+
+    Sets ``out`` to the integer represented in ``in[0], ..., in[in_len - 1]``
+    as a signed two's complement integer with ``in_len * FLINT_BITS`` bits.
+    It is assumed that ``in_len > 0``. The function operates as a call to
+    :func:`fmpz_set_ui_array` followed by a symmetric remainder modulo
+    ``2*(in_len*FLINT_BITS)``.
+
 .. function:: void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in)
 
     Assuming that the nonnegative integer ``in`` can be represented in the
@@ -603,8 +611,7 @@ Comparison
 
 .. function:: int fmpz_is_pm1(const fmpz_t f)
 
-    Returns `1` if `f` is equal to one or minus one, otherwise returns 
-    `0`.
+    Returns `1` if `f` is equal to one or minus one, otherwise returns `0`.
 
 .. function:: int fmpz_is_even(const fmpz_t f)
 
@@ -628,65 +635,42 @@ Basic arithmetic
     Sets `f_1` to the absolute value of `f_2`.
 
 .. function:: void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_add_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets `f` to `g + h`.
 
-.. function:: void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets `f` to `g + x` where `x` is an ``ulong``.
-
-.. function:: void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
-
-    Sets `f` to `g + x` where `x` is an ``slong``.
-
 .. function:: void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets `f` to `g - h`.
 
-.. function:: void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets `f` to `g - x` where `x` is an ``ulong``.
-
-.. function:: void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
-
-    Sets `f` to `g - x` where `x` is an ``slong``.
-
 .. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets `f` to `g \times h`.
 
-.. function:: void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
-
-    Sets `f` to `g \times x` where `x` is a ``slong``.
-
-.. function:: void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets `f` to `g \times x` where `x` is an ``ulong``.
-
 .. function:: void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
-    Sets `f` to `g \times x \times y` where `x` and `y` are of type
-    ``ulong``.
+    Sets `f` to `g \times x \times y` where `x` and `y` are of type ``ulong``.
 
 .. function:: void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong e)
 
     Sets `f` to `g \times 2^e`.
 
 .. function:: void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets `f` to `f + g \times h`.
 
-.. function:: void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets `f` to `f + g \times x` where `x` is an ``ulong``.
-
 .. function:: void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets `f` to `f - g \times h`.
-
-.. function:: void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets `f` to `f - g \times x` where `x` is an ``ulong``.
 
 .. function:: void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)
 
