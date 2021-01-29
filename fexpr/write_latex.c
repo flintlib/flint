@@ -1217,7 +1217,108 @@ fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
         return;
     }
 
+    if ((fexpr_is_builtin_call(expr, FEXPR_All) || fexpr_is_builtin_call(expr, FEXPR_Exists))
+        && (nargs == 2 || nargs == 3))
+    {
+        fexpr_t func, forarg, var, domain, condition;
+
+        fexpr_view_arg(func, expr, 0);
+        fexpr_view_arg(forarg, expr, 1);
+        if (nargs == 3)
+            fexpr_view_arg(condition, expr, 2);
+
+        if (fexpr_nargs(forarg) == 2)
+        {
+            fexpr_view_arg(var, forarg, 0);
+            fexpr_view_arg(domain, forarg, 1);
+
+            if (flags & FEXPR_LATEX_LOGIC)
+            {
+                if (fexpr_is_builtin_call(expr, FEXPR_All))
+                    calcium_write(out, "\\forall ");
+                else
+                    calcium_write(out, "\\exists ");
+
+                fexpr_write_latex(out, var, flags);
+                calcium_write(out, " \\in ");
+                fexpr_write_latex(out, domain, flags);
+                if (nargs == 3)
+                {
+                    calcium_write(out, ", \\,");
+                    fexpr_write_latex(out, condition, flags);
+                }
+
+                calcium_write(out, " : \\, ");
+                fexpr_write_latex(out, func, flags);
+            }
+            else
+            {
+                fexpr_write_latex(out, func, flags);
+
+                if (fexpr_is_builtin_call(expr, FEXPR_All))
+                    calcium_write(out, " \\;\\text{ for all } ");
+                else
+                    calcium_write(out, " \\;\\text{ for some } ");
+
+                fexpr_write_latex(out, var, flags);
+                calcium_write(out, " \\in ");
+                fexpr_write_latex(out, domain, flags);
+                if (nargs == 3)
+                {
+                    calcium_write(out, " \\text{ with } ");
+                    fexpr_write_latex(out, condition, flags);
+                }
+            }
+
+            return;
+        }
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Logic) && nargs == 1)
+    {
+        fexpr_t arg;
+        fexpr_view_arg(arg, expr, 0);
+        fexpr_write_latex(out, arg, flags | FEXPR_LATEX_LOGIC);
+        return;
+    }
+
     fexpr_write_latex_call(out, expr, flags);
+}
+
+void
+fexpr_write_latex_cases(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t arg, value, condition;
+    slong i, nargs;
+
+    calcium_write(out, "\\begin{cases} ");
+
+    nargs = fexpr_nargs(expr);
+    fexpr_view_arg(arg, expr, 0);
+
+    for (i = 0; i < nargs; i++)
+    {
+        if (fexpr_nargs(arg) != 2)
+            continue;
+
+        fexpr_view_arg(value, arg, 0);
+        fexpr_view_arg(condition, arg, 1);
+
+        fexpr_write_latex(out, value, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, ", & ");
+
+        if (fexpr_is_builtin_symbol(condition, FEXPR_Otherwise))
+            calcium_write(out, "\\text{otherwise}");
+        else
+            fexpr_write_latex(out, condition, flags | FEXPR_LATEX_SMALL);
+
+        calcium_write(out, "\\\\");
+
+        if (i < nargs - 1)
+            fexpr_view_next(arg);
+    }
+
+    calcium_write(out, " \\end{cases}");
 }
 
 void

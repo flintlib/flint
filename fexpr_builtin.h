@@ -263,6 +263,7 @@ typedef enum
     FEXPR_LogBarnesG,
     FEXPR_LogGamma,
     FEXPR_LogIntegral,
+    FEXPR_Logic,
     FEXPR_LowerGamma,
     FEXPR_Matrices,
     FEXPR_Matrix,

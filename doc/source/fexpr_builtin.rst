@@ -1154,6 +1154,11 @@ Nonsemantic markup
     with angle brackets (`\left\langle x\right\rangle`) when
     converted to LaTeX.
 
+.. macro:: Logic
+
+    ``Logic(x)`` semantically represents ``x``, but forces logical
+    expressions within *x* to be rendered using symbols instead
+    of text.
 
 .. raw:: latex
 
