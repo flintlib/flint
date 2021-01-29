@@ -130,6 +130,11 @@ latex_test_cases = [
     ("Integral(f(x), For(x, -Infinity, Infinity))", r"\int_{-\infty}^{\infty} f(x) \, dx"),
     ("Integral(f(x), For(x, RR))", r"\int_{x \in \mathbb{R}} f(x) \, dx"),
     ("Integral(f(x) + g(x) / h(x), For(x, a, b))", r"\int_{a}^{b} \left(f(x) + \frac{g(x)}{h(x)}\right) \, dx"),
+    ("Set(Derivative(f(x_), For(x_, x)), Derivative(f(x_), For(x_, Div(x, y))), Derivative(Gamma(x_), For(x_, 1)))", r"\left\{f'\!\left(x\right), f'\!\left(\frac{x}{y}\right), \Gamma'\!\left(1\right)\right\}"),
+    ("Set(Derivative(f(x_), For(x_, x, 0)), Derivative(f(x_), For(x_, x, 1)), Derivative(f(x_), For(x_, x, 2)), Derivative(f(x_), For(x_, x, 3)), Derivative(f(x_), For(x_, x, 4)), Derivative(f(x_), For(x_, x, n)), Derivative(f(x_), For(x_, x, Add(Mul(2, n), 3))))", r"\left\{{f}^{(0)}\!\left(x\right), f'\!\left(x\right), f''\!\left(x\right), f'''\!\left(x\right), {f}^{(4)}\!\left(x\right), {f}^{(n)}\!\left(x\right), {f}^{(2 n + 3)}\!\left(x\right)\right\}"),
+    ("Set(Derivative(f(Add(x, 1)), For(x, x)), Derivative(f(Add(x, 1)), For(x, x, 0)), Derivative(f(Add(x, 1)), For(x, x, 1)), Derivative(f(Add(x, 1)), For(x, x, n)))", r"\left\{\frac{d}{d x}\, f\!\left(x + 1\right), \frac{d^{0}}{{d x}^{0}}\, f\!\left(x + 1\right), \frac{d}{d x}\, f\!\left(x + 1\right), \frac{d^{n}}{{d x}^{n}}\, f\!\left(x + 1\right)\right\}"),
+    ("Set(Derivative(Add(f(x), g(x)), For(x, Add(y, 3))), Derivative(Add(f(x), g(x)), For(x, Add(y, 3), 5)))", r"\left\{\left[\frac{d}{d x}\, \left[f(x) + g(x)\right] \right]_{x = y + 3}, \left[\frac{d^{5}}{{d x}^{5}}\, \left[f(x) + g(x)\right] \right]_{x = y + 3}\right\}"),
+    ("Set(RealDerivative(f(x), For(x, 1)), ComplexDerivative(f(x), For(x, 1)), ComplexBranchDerivative(f(x), For(x, 1)), MeromorphicDerivative(f(x), For(x, 1)))", r"\left\{f'\!\left(1\right), f'\!\left(1\right), f'\!\left(1\right), f'\!\left(1\right)\right\}"),
     ("Set(Limit(f(x), For(x, a)), Limit(f(x), For(x, a), P(x)))", r"\left\{\lim_{x \to a} f(x), \lim_{x \to a,\,P(x)} f(x)\right\}"),
     ("Set(Limit(f(x), For(x, a)), RealLimit(f(x), For(x, a)), ComplexLimit(f(x), For(x, a)), MeromorphicLimit(f(x), For(x, a)))", r"\left\{\lim_{x \to a} f(x), \lim_{x \to a} f(x), \lim_{x \to a} f(x), \lim_{x \to a} f(x)\right\}"),
     ("Set(LeftLimit(f(x), For(x, 0)), RightLimit(f(x), For(x, 0)))", r"\left\{\lim_{x \to {0}^{-}} f(x), \lim_{x \to {0}^{+}} f(x)\right\}"),
@@ -194,11 +199,7 @@ latex_test_cases = [
     ("Equal(One(QQ), 1)", r"1_{\mathbb{Q}} = 1"),
     ("Equal(Zero(QQ), 0)", r"0_{\mathbb{Q}} = 0"),
     ("List(Polynomials(QQ, x), Polynomials(QQ, x, y), Polynomials(QQ, Tuple()), Polynomials(QQ, Tuple(x)), Polynomials(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}[x], \mathbb{Q}[x, y], \mathbb{Q}[], \mathbb{Q}[x], \mathbb{Q}[x, y]\right]"),
-    ("List(PolynomialFractions(QQ, x), PolynomialFractions(QQ, x, y), PolynomialFractions(QQ, Tuple()), PolynomialFractions(QQ, Tuple(x)), PolynomialFractions(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}(x), \mathbb{Q}(x, y), \mathbb{Q}(), \mathbb{Q}(x), \mathbb{Q}(x, y)\right]"),
-    ("List(FormalPowerSeries(QQ, x), FormalPowerSeries(QQ, x, y), FormalPowerSeries(QQ, Tuple()), FormalPowerSeries(QQ, Tuple(x)), FormalPowerSeries(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}[[x]], \mathbb{Q}[[x, y]], \mathbb{Q}[[]], \mathbb{Q}[[x]], \mathbb{Q}[[x, y]]\right]"),
-    ("List(FormalLaurentSeries(QQ, x), FormalLaurentSeries(QQ, x, y), FormalLaurentSeries(QQ, Tuple()), FormalLaurentSeries(QQ, Tuple(x)), FormalLaurentSeries(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}(\!(x)\!), \mathbb{Q}(\!(x, y)\!), \mathbb{Q}(\!()\!), \mathbb{Q}(\!(x)\!), \mathbb{Q}(\!(x, y)\!)\right]"),
-    ("List(FormalPuiseuxSeries(QQ, x), FormalPuiseuxSeries(QQ, x, y), FormalPuiseuxSeries(QQ, Tuple()), FormalPuiseuxSeries(QQ, Tuple(x)), FormalPuiseuxSeries(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}\!\left\langle\!\left\langle x \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle x, y \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle  \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle x \right\rangle\!\right\rangle, \mathbb{Q}\!\left\langle\!\left\langle x, y \right\rangle\!\right\rangle\right]"),
-    ("f(a, b, Ellipsis, g(Ellipsis))", r"f\!\left(a, b, \ldots, g(\ldots)\right)"),
+    ("List(Polynomials(QQ, x), PolynomialFractions(QQ, x), FormalPowerSeries(QQ, x), FormalLaurentSeries(QQ, x), FormalPuiseuxSeries(QQ, x))", r"\left[\mathbb{Q}[x], \mathbb{Q}(x), \mathbb{Q}[[x]], \mathbb{Q}(\!(x)\!), \mathbb{Q}\!\left\langle\!\left\langle x \right\rangle\!\right\rangle\right]"),
 ]
 
 

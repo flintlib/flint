@@ -970,6 +970,148 @@ fexpr_write_latex_limit(calcium_stream_t out, const fexpr_t expr, ulong flags)
         calcium_write(out, "\\right]");
 }
 
+/* todo: make public, document, test */
+static int
+fexpr_equal_ui(const fexpr_t expr, ulong c)
+{
+    if (c <= FEXPR_COEFF_MAX)
+    {
+        return expr->data[0] == (c << FEXPR_TYPE_BITS);
+    }
+    else
+    {
+        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS))
+                    && expr->data[1] == c);
+    }
+}
+
+void
+fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t formula, forexpr, var, point, order;
+    slong nargs, forexpr_nargs;
+    int parens;
+    ulong tmp;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs != 2)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(formula, expr, 0);
+    fexpr_view_arg(forexpr, expr, 1);
+
+    forexpr_nargs = fexpr_nargs(forexpr);
+
+    if (forexpr_nargs != 2 && forexpr_nargs != 3)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(var, forexpr, 0);
+    fexpr_view_arg(point, forexpr, 1);
+
+    if (forexpr_nargs == 3)
+    {
+        fexpr_view_arg(order, forexpr, 2);
+    }
+    else
+    {
+        order->data = &tmp;
+        order->alloc = 1;
+        fexpr_set_ui(order, 1);
+    }
+
+    if (fexpr_nargs(formula) == 1)
+    {
+        fexpr_t f, x;
+        fexpr_view_func(f, formula);
+        fexpr_view_arg(x, formula, 0);
+
+        /* d/dx f(x) -> f'(x) */
+        if (fexpr_equal(x, var) &&
+            fexpr_is_symbol(f) && !fexpr_is_builtin_symbol(f, FEXPR_Exp)
+                               && !fexpr_is_builtin_symbol(f, FEXPR_Sqrt))
+        {
+            if (fexpr_equal_ui(order, 1))
+            {
+                fexpr_write_latex(out, f, flags);
+                calcium_write(out, "'");
+            }
+            else if (fexpr_equal_ui(order, 2))
+            {
+                fexpr_write_latex(out, f, flags);
+                calcium_write(out, "''");
+            }
+            else if (fexpr_equal_ui(order, 3))
+            {
+                fexpr_write_latex(out, f, flags);
+                calcium_write(out, "'''");
+            }
+            else
+            {
+                calcium_write(out, "{");
+                fexpr_write_latex(out, f, flags);
+                calcium_write(out, "}^{(");
+                fexpr_write_latex(out, order, flags);
+                calcium_write(out, ")}");
+            }
+
+            calcium_write(out, "\\!\\left(");
+            fexpr_write_latex(out, point, flags);
+            calcium_write(out, "\\right)");
+            return;
+        }
+
+        /* todo: */
+        /* d/dx f_n(x) -> f'_n(x) */
+    }
+
+    if (!fexpr_equal(var, point))
+        calcium_write(out, "\\left[");
+
+    if (fexpr_equal_ui(order, 1))
+    {
+        calcium_write(out, "\\frac{d}{d ");
+        fexpr_write_latex(out, var, flags);
+        calcium_write(out, "}\\, ");
+    }
+    else
+    {
+        calcium_write(out, "\\frac{d^{");
+        fexpr_write_latex(out, order, flags);
+        calcium_write(out, "}}{{d ");
+        fexpr_write_latex(out, var, flags);
+        calcium_write(out, "}^{");
+        fexpr_write_latex(out, order, flags);
+        calcium_write(out, "}}\\, ");
+    }
+
+    parens = (fexpr_is_builtin_call(formula, FEXPR_Add) ||
+              fexpr_is_builtin_call(formula, FEXPR_Sub));
+
+    if (parens)
+        calcium_write(out, "\\left[");
+
+    fexpr_write_latex(out, formula, flags);
+
+    if (parens)
+        calcium_write(out, "\\right]");
+
+    if (!fexpr_equal(var, point))
+    {
+        calcium_write(out, " \\right]_{");
+        fexpr_write_latex(out, var, flags);
+        calcium_write(out, " = ");
+        fexpr_write_latex(out, point, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}");
+    }
+}
+
 void
 fexpr_write_latex_setop(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
