@@ -385,6 +385,7 @@ void fexpr_write_latex_limit(calcium_stream_t out, const fexpr_t expr, ulong fla
 void fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_simple(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_simple2(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_simple2_small(calcium_stream_t out, const fexpr_t expr, ulong flags);

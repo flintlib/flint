@@ -1742,6 +1742,140 @@ fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong fla
         calcium_write(out, "\\right]");
 }
 
+/* todo: render For-expression */
+void
+fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t arg, row, elem;
+    slong i, j, nargs, nrows, ncols;
+
+    nargs = fexpr_nargs(expr);
+
+    if (fexpr_is_builtin_call(expr, FEXPR_RowMatrix) || fexpr_is_builtin_call(expr, FEXPR_ColumnMatrix))
+    {
+        int isrow = fexpr_is_builtin_call(expr, FEXPR_RowMatrix);
+
+        calcium_write(out, "\\displaystyle{\\begin{pmatrix}");
+
+        if (nargs > 0)
+        {
+            fexpr_view_arg(elem, expr, 0);
+
+            for (i = 0; i < nargs; i++)
+            {
+                fexpr_write_latex(out, elem, flags);
+
+                if (i < nargs - 1)
+                {
+                    if (isrow)
+                        calcium_write(out, " & ");
+                    else
+                        calcium_write(out, " \\\\ ");
+
+                    fexpr_view_next(elem);
+                }
+            }
+        }
+
+        calcium_write(out, "\\end{pmatrix}}");
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_DiagonalMatrix))
+    {
+        calcium_write(out, "\\displaystyle{\\begin{pmatrix}");
+
+        if (nargs > 0)
+        {
+            fexpr_view_arg(elem, expr, 0);
+
+            for (i = 0; i < nargs; i++)
+            {
+                for (j = 0; j < i; j++)
+                    calcium_write(out, " & ");
+
+                fexpr_write_latex(out, elem, flags);
+
+                for (j = i + 1; j < nargs; j++)
+                    calcium_write(out, " & ");
+
+                if (i < nargs - 1)
+                {
+                    calcium_write(out, " \\\\ ");
+                    fexpr_view_next(elem);
+                }
+            }
+        }
+
+        calcium_write(out, "\\end{pmatrix}}");
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Matrix2x2) && nargs == 4)
+    {
+        calcium_write(out, "\\displaystyle{\\begin{pmatrix}");
+        fexpr_view_arg(elem, expr, 0);
+        fexpr_write_latex(out, elem, flags);
+        calcium_write(out, " & ");
+        fexpr_view_next(elem);
+        fexpr_write_latex(out, elem, flags);
+        calcium_write(out, " \\\\ ");
+        fexpr_view_next(elem);
+        fexpr_write_latex(out, elem, flags);
+        calcium_write(out, " & ");
+        fexpr_view_next(elem);
+        fexpr_write_latex(out, elem, flags);
+        calcium_write(out, "\\end{pmatrix}}");
+        return;
+    }
+
+    if (nargs == 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        if (fexpr_is_builtin_call(arg, FEXPR_Tuple) ||
+            fexpr_is_builtin_call(arg, FEXPR_List))
+        {
+            nrows = fexpr_nargs(arg);
+
+            calcium_write(out, "\\displaystyle{\\begin{pmatrix}");
+
+            fexpr_view_arg(row, arg, 0);
+            for (i = 0; i < nrows; i++)
+            {
+                ncols = fexpr_nargs(row);
+
+                if (ncols >= 0)
+                {
+                    fexpr_view_arg(elem, row, 0);
+
+                    for (j = 0; j < ncols; j++)
+                    {
+                        fexpr_write_latex(out, elem, flags);
+
+                        if (j < ncols - 1)
+                        {
+                            calcium_write(out, " & ");
+                            fexpr_view_next(elem);
+                        }
+                    }
+                }
+
+                if (i < nrows - 1)
+                {
+                    calcium_write(out, " \\\\");
+                    fexpr_view_next(row);
+                }
+            }
+
+            calcium_write(out, "\\end{pmatrix}}");
+            return;
+        }
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
 void
 fexpr_write_latex_alg_structure(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {

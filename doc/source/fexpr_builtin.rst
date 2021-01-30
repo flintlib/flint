@@ -638,9 +638,13 @@ Matrices and linear algebra
 
 .. macro:: Matrix
 
-.. macro:: Matrix2x2
+.. macro:: RowMatrix
 
-.. macro:: Matrix2x1
+.. macro:: ColumnMatrix
+
+.. macro:: DiagonalMatrix
+
+.. macro:: Matrix2x2
 
 .. macro:: ZeroMatrix
 

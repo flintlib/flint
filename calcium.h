@@ -65,9 +65,10 @@ CALCIUM_INLINE
 void calcium_stream_init_str(calcium_stream_t out)
 {
     out->fp = NULL;
-    out->s = NULL;
+    out->s = flint_malloc(16);
+    out->s[0] = '\0';
     out->len = 0;
-    out->alloc = 0;
+    out->alloc = 16;
 }
 
 void calcium_write(calcium_stream_t out, const char * s);
