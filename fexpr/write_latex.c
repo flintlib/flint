@@ -832,6 +832,90 @@ fexpr_write_latex_sum_product(calcium_stream_t out, const fexpr_t expr, ulong fl
 }
 
 void
+fexpr_write_latex_divsum(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    slong nargs, forexpr_nargs;
+    fexpr_t f, forexpr, var, high, predicate;
+    slong expected_forargs;
+    int have_predicate = 0;
+    int need_parens;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs != 2 && nargs != 3)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(f, expr, 0);
+    fexpr_view_arg(forexpr, expr, 1);
+
+    if (nargs == 3)
+    {
+        fexpr_view_arg(predicate, expr, 2);
+        have_predicate = 1;
+    }
+
+    forexpr_nargs = fexpr_nargs(forexpr);
+
+    if (fexpr_is_builtin_call(expr, FEXPR_DivisorSum) || fexpr_is_builtin_call(expr, FEXPR_DivisorProduct))
+        expected_forargs = 2;
+    else
+        expected_forargs = 1;
+
+    if (forexpr_nargs != expected_forargs)
+    {
+        fexpr_write_latex_call(out, expr, flags);
+        return;
+    }
+
+    fexpr_view_arg(var, forexpr, 0);
+
+    if (forexpr_nargs == 2)
+        fexpr_view_arg(high, forexpr, 1);
+
+    if (fexpr_is_builtin_call(expr, FEXPR_DivisorSum) ||
+        fexpr_is_builtin_call(expr, FEXPR_PrimeSum))
+        calcium_write(out, "\\sum_{");
+    else
+        calcium_write(out, "\\prod_{");
+
+    if (fexpr_is_builtin_call(expr, FEXPR_DivisorSum) ||
+        fexpr_is_builtin_call(expr, FEXPR_DivisorProduct))
+    {
+        fexpr_write_latex(out, var, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, " \\mid ");
+        fexpr_write_latex(out, high, flags | FEXPR_LATEX_SMALL);
+        if (have_predicate)
+        {
+            calcium_write(out, ",\\, ");
+            fexpr_write_latex(out, predicate, flags | FEXPR_LATEX_SMALL);
+        }
+    }
+    else
+    {
+        if (have_predicate)
+            fexpr_write_latex(out, predicate, flags | FEXPR_LATEX_SMALL);
+        else
+            fexpr_write_latex(out, var, flags | FEXPR_LATEX_SMALL);
+    }
+
+    calcium_write(out, "} ");
+
+    need_parens = fexpr_is_builtin_call(f, FEXPR_Add) ||
+                  fexpr_is_builtin_call(f, FEXPR_Sub);
+
+    if (need_parens)
+        calcium_write(out, "\\left(");
+
+    fexpr_write_latex(out, f, flags);
+
+    if (need_parens)
+        calcium_write(out, "\\right)");
+}    
+
+void
 fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     if (fexpr_nargs(expr) == 2)
