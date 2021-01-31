@@ -393,7 +393,7 @@ void fexpr_write_latex_simple2_small(calcium_stream_t out, const fexpr_t expr, u
 void fexpr_write_latex_alg_structure(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_setop(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_cases(calcium_stream_t out, const fexpr_t expr, ulong flags);
-
+void fexpr_write_latex_where(calcium_stream_t out, const fexpr_t expr, ulong flags);
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);

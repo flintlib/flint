@@ -385,7 +385,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_WeierstrassP, "WeierstrassP", "\\wp", NULL, },
     { FEXPR_WeierstrassSigma, "WeierstrassSigma", "\\sigma", NULL, },
     { FEXPR_WeierstrassZeta, "WeierstrassZeta", "\\zeta", NULL, },
-    { FEXPR_Where, "Where", "", NULL, },
+    { FEXPR_Where, "Where", "", fexpr_write_latex_where, },
     { FEXPR_XGCD, "XGCD", "\\operatorname{xgcd}", NULL, },
     { FEXPR_Xi, "Xi", "\\Xi", NULL },
     { FEXPR_Xi_, "Xi_", "\\Xi", fexpr_write_latex_subscript },

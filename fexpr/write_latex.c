@@ -2042,6 +2042,47 @@ fexpr_write_latex_alg_structure(calcium_stream_t out, const fexpr_t expr, ulong 
     calcium_write(out, b);
 }
 
+void
+fexpr_write_latex_where(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t f, arg, x, val;
+    slong i, nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs > 0)
+    {
+        fexpr_view_arg(f, expr, 0);
+        fexpr_write_latex(out, f, flags);
+    }
+
+    if (nargs > 1)
+    {
+        calcium_write(out, "\\; \\text{ where } ");
+
+        fexpr_view_arg(arg, expr, 1);
+
+        for (i = 1; i < nargs; i++)
+        {
+            if (fexpr_nargs(arg) == 2)
+            {
+                fexpr_view_arg(x, arg, 0);
+                fexpr_view_arg(val, arg, 1);
+
+                fexpr_write_latex(out, x, flags);
+                calcium_write(out, " = ");
+                fexpr_write_latex(out, val, flags);
+
+                if (i < nargs - 1)
+                {
+                    calcium_write(out, ",\\;");
+                    fexpr_view_next(arg);
+                }
+            }
+        }
+    }
+}
+
 static int
 _fexpr_all_arguments_small(const fexpr_t expr)
 {
