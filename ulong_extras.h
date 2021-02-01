@@ -170,6 +170,8 @@ FLINT_DLL ulong n_flog(ulong n, ulong b);
 
 FLINT_DLL ulong n_clog(ulong n, ulong b);
 
+FLINT_DLL ulong n_clog_2exp(ulong n, ulong b);
+
 ULONG_EXTRAS_INLINE 
 double n_precompute_inverse(ulong n)
 {

@@ -90,15 +90,21 @@ Basic arithmetic
 
 .. function:: ulong n_flog(ulong n, ulong b)
 
-    Returns `\lfloor\log_b x\rfloor`.
+    Returns `\lfloor\log_b n\rfloor`.
 
-    Assumes that `x \geq 1` and `b \geq 2`.
+    Assumes that `n \geq 1` and `b \geq 2`.
 
 .. function:: ulong n_clog(ulong n, ulong b)
 
-    Returns `\lceil\log_b x\rceil`.
+    Returns `\lceil\log_b n\rceil`.
 
-    Assumes that `x \geq 1` and `b \geq 2`.
+    Assumes that `n \geq 1` and `b \geq 2`.
+
+.. function:: ulong n_clog_2exp(ulong n, ulong b)
+
+    Returns `\lceil\log_b 2^n\rceil`.
+
+    Assumes that `b \geq 2`.
 
 
 Miscellaneous
