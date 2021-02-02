@@ -167,6 +167,10 @@ fexpr_need_cdot_before_factor(const fexpr_t expr)
     if (fexpr_is_integer(expr))
         return 1;
 
+    if (fexpr_is_builtin_symbol(expr, FEXPR_Infinity) ||
+        fexpr_is_builtin_symbol(expr, FEXPR_UnsignedInfinity))
+        return 1;
+
     if (fexpr_is_builtin_call(expr, FEXPR_Mul) && fexpr_nargs(expr) >= 1)
     {
         fexpr_t first;
