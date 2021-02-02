@@ -1340,15 +1340,15 @@ class ca:
             >>> unknown == unknown
             Traceback (most recent call last):
               ...
-            ValueError: unable to decide predicate: equal
+            NotImplementedError: unable to decide predicate: equal
             >>> unknown == 0
             Traceback (most recent call last):
               ...
-            ValueError: unable to decide predicate: equal
+            NotImplementedError: unable to decide predicate: equal
             >>> unknown == undefined
             Traceback (most recent call last):
               ...
-            ValueError: unable to decide predicate: equal
+            NotImplementedError: unable to decide predicate: equal
             >>> unknown + unknown
             Unknown
             >>> unknown + 3
@@ -1447,7 +1447,7 @@ class ca:
             return False
         if t == T_FALSE:
             return True
-        raise ValueError("unable to decide predicate: is_zero")
+        raise NotImplementedError("unable to decide predicate: is_zero")
 
     def __eq__(self, other):
         if type(self) is not type(other):
@@ -1460,7 +1460,7 @@ class ca:
             return True
         if t == T_FALSE:
             return False
-        raise ValueError("unable to decide predicate: equal")
+        raise NotImplementedError("unable to decide predicate: equal")
 
     def __ne__(self, other):
         if type(self) is not type(other):
@@ -1473,7 +1473,7 @@ class ca:
             return False
         if t == T_FALSE:
             return True
-        raise ValueError("unable to decide predicate: equal")
+        raise NotImplementedError("unable to decide predicate: equal")
 
     def __le__(self, other):
         if type(self) is not type(other):
@@ -1486,7 +1486,7 @@ class ca:
             return True
         if t == T_FALSE:
             return False
-        raise ValueError("unable to decide predicate: le")
+        raise NotImplementedError("unable to decide predicate: le")
 
     def __lt__(self, other):
         if type(self) is not type(other):
@@ -1499,7 +1499,7 @@ class ca:
             return True
         if t == T_FALSE:
             return False
-        raise ValueError("unable to decide predicate: lt")
+        raise NotImplementedError("unable to decide predicate: lt")
 
     def __ge__(self, other):
         if type(self) is not type(other):
@@ -1512,7 +1512,7 @@ class ca:
             return True
         if t == T_FALSE:
             return False
-        raise ValueError("unable to decide predicate: ge")
+        raise NotImplementedError("unable to decide predicate: ge")
 
     def __gt__(self, other):
         if type(self) is not type(other):
@@ -1525,7 +1525,7 @@ class ca:
             return True
         if t == T_FALSE:
             return False
-        raise ValueError("unable to decide predicate: gt")
+        raise NotImplementedError("unable to decide predicate: gt")
 
     def __add__(self, other):
         if type(self) is not type(other):
@@ -2103,7 +2103,7 @@ class ca_mat:
             return True
         if res == T_FALSE:
             return False
-        raise ValueError("unable to decide equality")
+        raise NotImplementedError("unable to decide equality")
 
     def __ne__(self, other):
         """
@@ -2125,7 +2125,7 @@ class ca_mat:
             return False
         if res == T_FALSE:
             return True
-        raise ValueError("unable to decide equality")
+        raise NotImplementedError("unable to decide equality")
 
     def nrows(self):
         return self._data.r
@@ -2443,7 +2443,7 @@ class ca_mat:
         success = libcalcium.ca_mat_eigenvalues(lamda, exp, self, self._ctx)
         if not success:
             libflint.flint_free(exp)
-            raise ValueError("failed to compute eigenvalues")
+            raise NotImplementedError("failed to compute eigenvalues")
         else:
             res = [(lamda[i], exp[i]) for i in range(len(lamda))]
             libflint.flint_free(exp)
@@ -2466,14 +2466,14 @@ class ca_mat:
             >>> ca_mat([[1, 0, 0], [0, 1-exp(ca(2)**-10000), 0]]).rref()
             Traceback (most recent call last):
               ...
-            ValueError: failed to compute rref
+            NotImplementedError: failed to compute rref
 
         """
         res = ca_mat(self.nrows(), self.ncols())
         rank = (ctypes.c_long * 1)()
         if libcalcium.ca_mat_rref(rank, res, self, self._ctx):
             return res
-        raise ValueError("failed to compute rref")
+        raise NotImplementedError("failed to compute rref")
 
     def rank(self):
         """
@@ -2484,13 +2484,13 @@ class ca_mat:
             >>> ca_mat([[1, 0, 0], [0, 1-exp(ca(2)**-10000), 0]]).rank()
             Traceback (most recent call last):
               ...
-            ValueError: failed to compute rank
+            NotImplementedError: failed to compute rank
 
         """
         r = (ctypes.c_long * 1)()
         if libcalcium.ca_mat_rank(r, self, self._ctx):
             return int(r[0])
-        raise ValueError("failed to compute rank")
+        raise NotImplementedError("failed to compute rank")
 
     def inv(self):
         """
@@ -2507,7 +2507,7 @@ class ca_mat:
             >>> ca_mat([[1, 0], [0, 1-exp(ca(2)**-10000)]]).inv()
             Traceback (most recent call last):
               ...
-            ValueError: failed to prove matrix singular or nonsingular
+            NotImplementedError: failed to prove matrix singular or nonsingular
 
         """
         n = self.nrows()
@@ -2520,7 +2520,7 @@ class ca_mat:
             return res
         if invertible == T_FALSE:
             raise ZeroDivisionError("singular matrix")
-        raise ValueError("failed to prove matrix singular or nonsingular")
+        raise NotImplementedError("failed to prove matrix singular or nonsingular")
 
     def solve(self, other, algorithm=None):
         """
@@ -2537,7 +2537,7 @@ class ca_mat:
             >>> ca_mat([[1, 0], [0, 1-exp(ca(2)**-10000)]]).solve([[5],[6]])
             Traceback (most recent call last):
               ...
-            ValueError: failed to prove matrix singular or nonsingular
+            NotImplementedError: failed to prove matrix singular or nonsingular
 
         """
         if type(self) is not type(other):
@@ -2569,7 +2569,7 @@ class ca_mat:
             return res
         if invertible == T_FALSE:
             raise ZeroDivisionError("singular matrix")
-        raise ValueError("failed to prove matrix singular or nonsingular")
+        raise NotImplementedError("failed to prove matrix singular or nonsingular")
 
     def right_kernel(self):
         """
@@ -2591,7 +2591,7 @@ class ca_mat:
         res = ca_mat(0, 0)
         if libcalcium.ca_mat_right_kernel(res, self, self._ctx):
             return res
-        raise ValueError("failed to compute right kernel")
+        raise NotImplementedError("failed to compute right kernel")
 
     def diagonalization(self):
         """
@@ -2885,7 +2885,7 @@ class ca_poly:
             return True
         if res == T_FALSE:
             return False
-        raise ValueError("unable to decide equality")
+        raise NotImplementedError("unable to decide equality")
 
     def __ne__(self, other):
         """
@@ -2907,7 +2907,7 @@ class ca_poly:
             return False
         if res == T_FALSE:
             return True
-        raise ValueError("unable to decide equality")
+        raise NotImplementedError("unable to decide equality")
 
     def __len__(self):
         return self._data.length
@@ -3231,12 +3231,12 @@ class ca_poly:
             >>> ca_poly([1,2,1-exp(ca(2)**-10000)]).degree()
             Traceback (most recent call last):
               ...
-            ValueError: unable to determine degree
+            NotImplementedError: unable to determine degree
 
         """
         if self.is_proper():
             return len(self) - 1
-        raise ValueError("unable to determine degree")
+        raise NotImplementedError("unable to determine degree")
 
 
 
