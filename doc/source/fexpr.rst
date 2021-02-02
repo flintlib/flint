@@ -404,6 +404,34 @@ Composition
     The *vec* version takes the arguments as an array *args*
     and *n* is given by *len*.
 
+
+Subexpressions and replacement
+------------------------------------------------------------------------
+
+.. function:: int fexpr_contains(const fexpr_t expr, const fexpr_t x)
+
+    Returns whether *expr* contains the expression *x* as a subexpression
+    (this includes the case where *expr* and *x* are equal).
+
+.. function:: int fexpr_replace(fexpr_t res, const fexpr_t expr, const fexpr_t x, const fexpr_t y)
+
+    Sets *res* to the expression *expr* with all occurrences of the subexpression
+    *x* replaced by the expression *y*. Returns a boolean value indicating whether
+    any replacements have been performed.
+    Aliasing is allowed between *res* and *expr* but not between *res*
+    and *x* or *y*.
+
+.. function:: int fexpr_replace_vec(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, const fexpr_vec_t ys)
+
+    Sets *res* to the expression *expr* with all occurrences of the
+    subexpressions given by entries in *xs* replaced by the corresponding
+    expressions in *ys*. It is required that *xs* and *ys* have the same length.
+    Returns a boolean value indicating whether any replacements
+    have been performed.
+    Aliasing is allowed between *res* and *expr* but not between *res*
+    and the entries of *xs* or *ys*.
+
+
 Arithmetic expressions
 ------------------------------------------------------------------------
 
