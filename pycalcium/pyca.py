@@ -308,6 +308,47 @@ class fexpr:
             libcalcium.flint_free(vec)
         return res
 
+    def contains(self, x):
+        """
+        Check if *x* appears exactly as a subexpression in *self*.
+
+            >>> f = fexpr("f"); x = fexpr("x"); y = fexpr("y")
+            >>> (f(x+1).contains(f), f(x+1).contains(x), f(x+1).contains(y))
+            (True, True, False)
+            >>> (f(x+1).contains(1), f(x+1).contains(2))
+            (True, False)
+            >>> (f(x+1).contains(x+1), f(x+1).contains(f(x+1)))
+            (True, True)
+        """
+        if type(x) is not fexpr:
+            x = fexpr(x)
+        if libcalcium.fexpr_contains(self, x):
+            return True
+        return False
+
+    def replace(self, old, new=None):
+        """
+        Replace subexpression.
+
+            >>> f = fexpr("f"); x = fexpr("x"); y = fexpr("y")
+            >>> f(x+1, x-1).replace(x, y)
+            f(Add(y, 1), Sub(y, 1))
+            >>> f(x+1, x-1).replace(x+1, y-1)
+            f(Sub(y, 1), Sub(x, 1))
+            >>> f(x+1, x-1).replace(f, f+1)
+            Add(f, 1)(Add(x, 1), Sub(x, 1))
+            >>> f(x+1, x-1).replace(x+2, y)
+            f(Add(x, 1), Sub(x, 1))
+        """
+        # todo: dict replacement
+        if type(old) is not fexpr:
+            old = fexpr(old)
+        if type(new) is not fexpr:
+            new = fexpr(new)
+        res = fexpr()
+        libcalcium.fexpr_replace(res, self, old, new)
+        return res
+
     def __add__(self, other):
         if type(self) is not type(other):
             try:
