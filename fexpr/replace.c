@@ -175,3 +175,40 @@ fexpr_replace(fexpr_t res, const fexpr_t expr, const fexpr_t x, const fexpr_t y)
 
     return changed;
 }
+
+int
+fexpr_replace2(fexpr_t res, const fexpr_t expr, const fexpr_t x1, const fexpr_t y1, const fexpr_t x2, const fexpr_t y2)
+{
+    int changed;
+    fexpr_t res_view;
+    fexpr_struct tmp[4];
+
+    tmp[0] = *x1;
+    tmp[1] = *x2;
+    tmp[2] = *y1;
+    tmp[3] = *y2;
+
+    changed = _fexpr_replace_vec(res_view, expr, tmp, tmp + 2, 2);
+
+    if (changed)
+    {
+        if (res_view->alloc != 0)
+        {
+            /* We have new data */
+            fexpr_swap(res, res_view);
+            fexpr_clear(res_view);
+        }
+        else
+        {
+            /* Must be a view of some ys; we assume that res is not aliased
+               with any entry in ys. */
+            fexpr_set(res, res_view);
+        }
+    }
+    else
+    {
+        fexpr_set(res, expr);
+    }
+
+    return changed;
+}

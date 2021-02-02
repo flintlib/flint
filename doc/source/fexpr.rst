@@ -421,6 +421,11 @@ Subexpressions and replacement
     Aliasing is allowed between *res* and *expr* but not between *res*
     and *x* or *y*.
 
+.. function:: int fexpr_replace2(fexpr_t res, const fexpr_t expr, const fexpr_t x1, const fexpr_t y1, const fexpr_t x2, const fexpr_t y2)
+
+    Like :func:`fexpr_replace`, but simultaneously replaces *x1* by *y1*
+    and *x2* by *y2*.
+
 .. function:: int fexpr_replace_vec(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, const fexpr_vec_t ys)
 
     Sets *res* to the expression *expr* with all occurrences of the

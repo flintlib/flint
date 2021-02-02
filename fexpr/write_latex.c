@@ -13,6 +13,82 @@
 #include "fexpr_builtin.h"
 
 static int
+fexpr_view_call0(fexpr_t func, const fexpr_t expr)
+{
+    slong nargs;
+    nargs = fexpr_nargs(expr);
+    if (nargs != 0)
+        return 0;
+    fexpr_view_func(func, expr);
+    return 1;
+}
+
+static int
+fexpr_view_call1(fexpr_t func, fexpr_t x1, const fexpr_t expr)
+{
+    slong nargs;
+    nargs = fexpr_nargs(expr);
+    if (nargs != 1)
+        return 0;
+    fexpr_view_func(func, expr);
+    *x1 = *func;
+    fexpr_view_next(x1);
+    return 1;
+}
+
+static int
+fexpr_view_call2(fexpr_t func, fexpr_t x1, fexpr_t x2, const fexpr_t expr)
+{
+    slong nargs;
+    nargs = fexpr_nargs(expr);
+    if (nargs != 2)
+        return 0;
+    fexpr_view_func(func, expr);
+    *x1 = *func;
+    fexpr_view_next(x1);
+    *x2 = *x1;
+    fexpr_view_next(x2);
+    return 1;
+}
+
+static int
+fexpr_view_call3(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, const fexpr_t expr)
+{
+    slong nargs;
+    nargs = fexpr_nargs(expr);
+    if (nargs != 3)
+        return 0;
+    fexpr_view_func(func, expr);
+    *x1 = *func;
+    fexpr_view_next(x1);
+    *x2 = *x1;
+    fexpr_view_next(x2);
+    *x3 = *x2;
+    fexpr_view_next(x3);
+    return 1;
+}
+
+static int
+fexpr_view_call4(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, fexpr_t x4, const fexpr_t expr)
+{
+    slong nargs;
+    nargs = fexpr_nargs(expr);
+    if (nargs != 4)
+        return 0;
+    fexpr_view_func(func, expr);
+    *x1 = *func;
+    fexpr_view_next(x1);
+    *x2 = *x1;
+    fexpr_view_next(x2);
+    *x3 = *x2;
+    fexpr_view_next(x3);
+    *x4 = *x3;
+    fexpr_view_next(x4);
+    return 1;
+}
+
+
+static int
 fexpr_is_neg_integer(const fexpr_t expr)
 {
     ulong head = expr->data[0];
@@ -1826,7 +1902,6 @@ fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong fla
         calcium_write(out, "\\right]");
 }
 
-/* todo: render For-expression */
 void
 fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
@@ -1913,6 +1988,131 @@ fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
         return;
     }
 
+    if (fexpr_is_builtin_call(expr, FEXPR_Matrix) && nargs == 3)
+    {
+        fexpr_t for1, for2, f1, f2, i, a, b, j, c, d;
+
+        fexpr_view_arg(for1, expr, 1);
+        fexpr_view_arg(for2, expr, 2);
+
+        if (fexpr_view_call3(f1, i, a, b, for1) &&
+            fexpr_view_call3(f2, j, c, d, for2) &&
+            fexpr_is_builtin_symbol(f1, FEXPR_For) &&
+            fexpr_is_builtin_symbol(f2, FEXPR_For))
+        {
+            fexpr_t a1, c1, x;
+            fmpz_t n;
+
+            fmpz_init(n);
+            fexpr_init(a1);
+            fexpr_init(c1);
+            fexpr_init(x);
+
+            fexpr_view_arg(arg, expr, 0);
+
+            /* a1 = a + 1 */
+            if (fexpr_is_integer(a))
+            {
+                fexpr_get_fmpz(n, a);
+                fmpz_add_ui(n, n, 1);
+                fexpr_set_fmpz(a1, n);
+            }
+            else
+            {
+                fexpr_set_ui(x, 1);
+                fexpr_add(a1, a, x);
+            }
+
+            /* c1 = c + 1 */
+            if (fexpr_is_integer(c))
+            {
+                fexpr_get_fmpz(n, c);
+                fmpz_add_ui(n, n, 1);
+                fexpr_set_fmpz(c1, n);
+            }
+            else
+            {
+                fexpr_set_ui(x, 1);
+                fexpr_add(c1, c, x);
+            }
+
+            calcium_write(out, "\\displaystyle{\\begin{pmatrix} ");
+
+            fexpr_replace2(x, arg, i, a, j, c);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " & ");
+
+            fexpr_replace2(x, arg, i, a, j, c1);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " & \\cdots & ");
+
+            fexpr_replace2(x, arg, i, a, j, d);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " \\\\ ");
+
+            fexpr_replace2(x, arg, i, a1, j, c);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " & ");
+
+            fexpr_replace2(x, arg, i, a1, j, c1);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " & \\cdots & ");
+
+            fexpr_replace2(x, arg, i, a1, j, d);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " \\\\ ");
+
+            calcium_write(out, "\\vdots & \\vdots & \\ddots & \\vdots \\\\ ");
+
+            fexpr_replace2(x, arg, i, b, j, c);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " & ");
+
+            fexpr_replace2(x, arg, i, b, j, c1);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " & \\cdots & ");
+
+            fexpr_replace2(x, arg, i, b, j, d);
+            fexpr_write_latex(out, x, flags);
+            calcium_write(out, " \\end{pmatrix}}");
+
+            fmpz_clear(n);
+            fexpr_clear(a1);
+            fexpr_clear(c1);
+            fexpr_clear(x);
+
+            return;
+        }
+
+
+/*
+    if len(args) == 3 and args[1].head() == For and args[2].head() == For:
+        i, a, b = args[1].args()
+        j, c, d = args[2].args()
+        expr = args[0]
+        if a.is_integer():
+            a1 = Expr(int(a)+1)
+        else:
+            a1 = a+1
+        if c.is_integer():
+            c1 = Expr(int(c)+1)
+        else:
+            c1 = c+1
+        xac = expr.replace({i:a, j:c}).latex(**kwargs)
+        xac1 = expr.replace({i:a, j:c1}).latex(**kwargs)
+        xad = expr.replace({i:a, j:d}).latex(**kwargs)
+        xa1c = expr.replace({i:a1, j:c}).latex(**kwargs)
+        xa1c1 = expr.replace({i:a1, j:c1}).latex(**kwargs)
+        xa1d = expr.replace({i:a1, j:d}).latex(**kwargs)
+        xbc = expr.replace({i:b, j:c}).latex(**kwargs)
+        xbc1 = expr.replace({i:b, j:c1}).latex(**kwargs)
+        xbd = expr.replace({i:b, j:d}).latex(**kwargs)
+        s = r"\displaystyle{\begin{pmatrix} %s & %s & \cdots & %s \\ %s & %s & \cdots & %s \\ \vdots & \vdots & \ddots & \vdots \\ %s & %s & \ldots & %s \end{pmatrix}}"
+        s = s % (xac, xac1, xad, xa1c, xa1c1, xa1d, xbc, xbc1, xbd)
+        return s
+*/
+    }
+
     if (nargs == 1)
     {
         fexpr_view_arg(arg, expr, 0);
@@ -1955,6 +2155,24 @@ fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
             calcium_write(out, "\\end{pmatrix}}");
             return;
         }
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
+void
+fexpr_write_latex_show_form(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t f, arg;
+
+    if (fexpr_view_call1(f, arg, expr) && fexpr_is_builtin_symbol(f, FEXPR_ShowExpandedNormalForm))
+    {
+        fexpr_t v;
+        fexpr_init(v);
+        fexpr_expanded_normal_form(v, arg, 0);
+        fexpr_write_latex(out, v, flags);
+        fexpr_clear(v);
+        return;
     }
 
     fexpr_write_latex_call(out, expr, flags);

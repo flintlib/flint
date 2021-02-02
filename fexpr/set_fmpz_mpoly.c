@@ -71,11 +71,18 @@ fexpr_set_fmpz_mpoly(fexpr_t res, const fmpz_mpoly_t poly, const fexpr_vec_t var
 
     for (i = 0; i < len; i++)
     {
+        int constant_term;
+
         fmpz_mpoly_get_term_exp_ui(exp, poly, i, ctx);
 
         factors_len = 0;
 
-        if (!fmpz_is_one(poly->coeffs + i))
+        constant_term = (i == len - 1);
+        for (j = 0; constant_term && j < nvars; j++)
+            if (exp[j] != 0)
+                constant_term = 0;
+
+        if (!fmpz_is_one(poly->coeffs + i) || constant_term)
         {
             fexpr_set_fmpz(factors, poly->coeffs + i);
             factors_len = 1;

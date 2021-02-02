@@ -341,6 +341,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_Set, "Set", "", fexpr_write_latex_collection, },
     { FEXPR_SetMinus, "SetMinus", "\\setminus", fexpr_write_latex_infix, },
     { FEXPR_Sets, "Sets", "", NULL, },
+    { FEXPR_ShowExpandedNormalForm, "ShowExpandedNormalForm", "", fexpr_write_latex_show_form, },
     { FEXPR_Sigma, "Sigma", "\\Sigma", NULL },
     { FEXPR_Sigma_, "Sigma_", "\\Sigma", fexpr_write_latex_subscript },
     { FEXPR_Sign, "Sign", "\\operatorname{sgn}", NULL, },

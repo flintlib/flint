@@ -356,6 +356,7 @@ void fexpr_call_vec(fexpr_t res, const fexpr_t f, fexpr_srcptr args, slong len);
 
 int fexpr_contains(const fexpr_t expr, const fexpr_t x);
 int fexpr_replace(fexpr_t res, const fexpr_t expr, const fexpr_t x, const fexpr_t y);
+int fexpr_replace2(fexpr_t res, const fexpr_t expr, const fexpr_t x1, const fexpr_t y1, const fexpr_t x2, const fexpr_t y2);
 int fexpr_replace_vec(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, const fexpr_vec_t ys);
 
 
@@ -401,6 +402,8 @@ void fexpr_write_latex_alg_structure(calcium_stream_t out, const fexpr_t expr, u
 void fexpr_write_latex_setop(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_cases(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_where(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_show_form(calcium_stream_t out, const fexpr_t expr, ulong flags);
+
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);

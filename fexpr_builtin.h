@@ -359,6 +359,7 @@ typedef enum
     FEXPR_Set,
     FEXPR_SetMinus,
     FEXPR_Sets,
+    FEXPR_ShowExpandedNormalForm,
     FEXPR_Sigma,
     FEXPR_Sigma_,
     FEXPR_Sign,

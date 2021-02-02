@@ -1164,6 +1164,14 @@ Nonsemantic markup
     expressions within *x* to be rendered using symbols instead
     of text.
 
+.. macro:: ShowExpandedNormalForm
+
+    ``ShowExpandedNormalForm(x)`` semantically represents ``x``, but
+    displays the expanded normal form of the expression instead of
+    rendering the expression verbatim.
+    Warning: this triggers a nontrivial (potentially very expensive)
+    computation.
+
 .. raw:: latex
 
     \newpage

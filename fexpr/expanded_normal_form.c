@@ -24,7 +24,8 @@ fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags)
     fexpr_arithmetic_nodes(args, expr);
     _fexpr_vec_sort_fast(args->entries, args->length);
 
-    fmpz_mpoly_ctx_init(ctx, args->length, ORD_LEX);
+    /* todo: when length == 0, use fmpq arithmetic instead */
+    fmpz_mpoly_ctx_init(ctx, FLINT_MAX(args->length, 1), ORD_LEX);
     fmpz_mpoly_q_init(frac, ctx);
 
     success = fexpr_get_fmpz_mpoly_q(frac, expr, args, ctx);

@@ -224,6 +224,15 @@ class fexpr:
                     libcalcium.fexpr_set_symbol_str(self, ("True").encode('ascii'))
                 else:
                     libcalcium.fexpr_set_symbol_str(self, ("False").encode('ascii'))
+            elif typ is tuple:
+                tmp = fexpr("Tuple")(*val)         # todo: create without copying
+                libcalcium.fexpr_set(self, tmp)
+            elif typ is list:
+                tmp = fexpr("List")(*val)
+                libcalcium.fexpr_set(self, tmp)
+            elif typ is set:
+                tmp = fexpr("Set")(*val)
+                libcalcium.fexpr_set(self, tmp)
             else:
                 raise TypeError
 
