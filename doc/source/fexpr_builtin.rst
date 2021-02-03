@@ -320,6 +320,14 @@ Particular numbers
 
     ``CatalanConstant`` is Catalan's constant `G`.
 
+.. macro:: KhinchinConstant
+
+    ``KhinchinConstant`` is Khinchin's constant `K`.
+
+.. macro:: GlaisherConstant
+
+    ``GlaisherConstant`` is Glaisher's constant `A`.
+
 .. macro:: RootOfUnity
 
     ``RootOfUnity(n)`` is the principal complex *n*-th root of unity `\zeta_n = e^{2 \pi i / n}`.
@@ -1004,6 +1012,8 @@ Hypergeometric functions
 
 .. macro:: HypergeometricUStar
 
+.. macro:: HypergeometricUStarRemainder
+
 .. macro:: Hypergeometric0F1Regularized
 
 .. macro:: Hypergeometric1F1Regularized
@@ -1109,6 +1119,8 @@ Elliptic, theta and modular functions
 .. macro:: WeierstrassZeta
 
 .. macro:: WeierstrassSigma
+
+.. macro:: EllipticRootE
 
 .. macro:: HilbertClassPolynomial
 

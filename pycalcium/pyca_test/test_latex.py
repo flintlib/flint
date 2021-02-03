@@ -211,6 +211,13 @@ latex_test_cases = [
     ("Equal(Zero(QQ), 0)", r"0_{\mathbb{Q}} = 0"),
     ("List(Polynomials(QQ, x), Polynomials(QQ, x, y), Polynomials(QQ, Tuple()), Polynomials(QQ, Tuple(x)), Polynomials(QQ, Tuple(x, y)))", r"\left[\mathbb{Q}[x], \mathbb{Q}[x, y], \mathbb{Q}[], \mathbb{Q}[x], \mathbb{Q}[x, y]\right]"),
     ("List(Polynomials(QQ, x), PolynomialFractions(QQ, x), FormalPowerSeries(QQ, x), FormalLaurentSeries(QQ, x), FormalPuiseuxSeries(QQ, x))", r"\left[\mathbb{Q}[x], \mathbb{Q}(x), \mathbb{Q}[[x]], \mathbb{Q}(\!(x)\!), \mathbb{Q}\!\left\langle\!\left\langle x \right\rangle\!\right\rangle\right]"),
+    ("Set(IntegersGreaterEqual(0), IntegersGreaterEqual(n), IntegersLessEqual(0), IntegersLessEqual(n))", r"\left\{\mathbb{Z}_{\ge 0}, \mathbb{Z}_{\ge n}, \{0, -1, \ldots\}, \mathbb{Z}_{\le n}\right\}"),
+    ("List(Range(a, b), Range(1, b), Range(-3, 5))", r"\left[\{a, a + 1, \ldots, b\}, \{1, 2, \ldots, b\}, \{-3, -2, \ldots, 5\}\right]"),
+    ("CongruentMod(f(n), 0, p)", r"f(n) \equiv 0 \pmod {p }"),
+    ("PrimitiveReducedPositiveIntegralBinaryQuadraticForms(D)", r"\mathcal{Q}^{*}_{D}"),
+    ("Set(EllipticRootE(1, tau), EllipticRootE(2, tau), EllipticRootE(3, tau))", r"\left\{e_{1}\!\left(\tau\right), e_{2}\!\left(\tau\right), e_{3}\!\left(\tau\right)\right\}"),
+    ("GaussSum(n, chi)", r"G_{n}\!\left(\chi\right)"),
+    ("Set(GlaisherConstant, KhinchinConstant)", r"\left\{A, K\right\}"),
 ]
 
 

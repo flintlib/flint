@@ -1588,6 +1588,22 @@ fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
         return;
     }
 
+    /* todo: move this */
+    if (fexpr_is_builtin_call(expr, FEXPR_CongruentMod) && nargs == 3)
+    {
+        fexpr_t arg;
+        fexpr_view_arg(arg, expr, 0);
+        fexpr_write_latex(out, arg, flags);
+        calcium_write(out, " \\equiv ");
+        fexpr_view_next(arg);
+        fexpr_write_latex(out, arg, flags);
+        calcium_write(out, " \\pmod {");
+        fexpr_view_next(arg);
+        fexpr_write_latex(out, arg, flags);
+        calcium_write(out, " }");
+        return;
+    }
+
     fexpr_write_latex_call(out, expr, flags);
 }
 
@@ -1610,13 +1626,13 @@ fexpr_write_latex_cases(calcium_stream_t out, const fexpr_t expr, ulong flags)
         fexpr_view_arg(value, arg, 0);
         fexpr_view_arg(condition, arg, 1);
 
-        fexpr_write_latex(out, value, flags | FEXPR_LATEX_SMALL);
+        fexpr_write_latex(out, value, flags /* | FEXPR_LATEX_SMALL */);
         calcium_write(out, ", & ");
 
         if (fexpr_is_builtin_symbol(condition, FEXPR_Otherwise))
             calcium_write(out, "\\text{otherwise}");
         else
-            fexpr_write_latex(out, condition, flags | FEXPR_LATEX_SMALL);
+            fexpr_write_latex(out, condition, flags /* | FEXPR_LATEX_SMALL */);
 
         calcium_write(out, "\\\\");
 
@@ -1904,6 +1920,81 @@ fexpr_write_latex_collection(calcium_stream_t out, const fexpr_t expr, ulong fla
         calcium_write(out, "\\right)");
     else
         calcium_write(out, "\\right]");
+}
+
+void
+fexpr_write_latex_range(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t a, b;
+
+    if (fexpr_is_builtin_call(expr, FEXPR_IntegersGreaterEqual) && fexpr_nargs(expr) == 1)
+    {
+        fexpr_view_arg(a, expr, 0);
+        calcium_write(out, "\\mathbb{Z}_{\\ge ");
+        fexpr_write_latex(out, a, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}");
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_IntegersLessEqual) && fexpr_nargs(expr) == 1)
+    {
+        fexpr_view_arg(a, expr, 0);
+        if (fexpr_is_integer(a))
+        {
+            fmpz_t n;
+            fmpz_init(n);
+            fexpr_get_fmpz(n, a);
+            calcium_write(out, "\\{");
+            calcium_write_fmpz(out, n);
+            calcium_write(out, ", ");
+            fmpz_sub_ui(n, n, 1);
+            calcium_write_fmpz(out, n);
+            calcium_write(out, ", \\ldots\\}");
+            fmpz_clear(n);
+        }
+        else
+        {
+            calcium_write(out, "\\mathbb{Z}_{\\le ");
+            fexpr_write_latex(out, a, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+        }
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Range) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_view_arg(a, expr, 0);
+        fexpr_view_arg(b, expr, 1);
+
+        if (fexpr_is_integer(a))
+        {
+            fmpz_t n;
+            fmpz_init(n);
+            fexpr_get_fmpz(n, a);
+            calcium_write(out, "\\{");
+            calcium_write_fmpz(out, n);
+            calcium_write(out, ", ");
+            fmpz_add_ui(n, n, 1);
+            calcium_write_fmpz(out, n);
+            calcium_write(out, ", \\ldots, ");
+            fexpr_write_latex(out, b, flags);
+            calcium_write(out, "\\}");
+            fmpz_clear(n);
+        }
+        else
+        {
+            calcium_write(out, "\\{");
+            fexpr_write_latex(out, a, flags);
+            calcium_write(out, ", ");
+            fexpr_write_latex(out, a, flags);
+            calcium_write(out, " + 1, \\ldots, ");
+            fexpr_write_latex(out, b, flags);
+            calcium_write(out, "\\}");
+        }
+        return;
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
 }
 
 void
@@ -2373,9 +2464,16 @@ fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t ex
             *subscript = 1;
             free(tmp2);
         }
-        else
+        else if (len == 1)
         {
             calcium_write(out, s);
+            *subscript = 0;
+        }
+        else
+        {
+            calcium_write(out, "\\operatorname{");
+            calcium_write(out, s);
+            calcium_write(out, "}");
             *subscript = 0;
         }
     }
