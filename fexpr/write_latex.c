@@ -589,13 +589,23 @@ fexpr_power_base_is_safe(const fexpr_t base)
     }
     else
     {
-        /* todo: Parentheses, Braces, Brackets, ... */
-        if (fexpr_is_builtin_call(base, FEXPR_Abs))
-            return 1;
-        if (fexpr_is_builtin_call(base, FEXPR_Binomial))
-            return 1;
-        if (fexpr_is_builtin_call(base, FEXPR_Matrix2x2))
-            return 1;
+        slong id;
+        fexpr_t func;
+
+        if (fexpr_is_any_builtin_call(base))
+        {
+            fexpr_view_func(func, base);
+            id = FEXPR_BUILTIN_ID(func->data[0]);
+
+            if (id == FEXPR_Abs) return 1;
+            if (id == FEXPR_Binomial) return 1;
+            if (id == FEXPR_Matrix) return 1;
+            if (id == FEXPR_Matrix2x2) return 1;
+            if (id == FEXPR_Parentheses) return 1;
+            if (id == FEXPR_Brackets) return 1;
+            if (id == FEXPR_Braces) return 1;
+            if (id == FEXPR_AngleBrackets) return 1;
+        }
 
         return 0;
     }
@@ -605,6 +615,30 @@ fexpr_power_base_is_safe(const fexpr_t base)
 Special cases todo:
 - Subscripted functions
 - ...
+
+    if not base.is_atom() and base.head().is_symbol() and base.head()._symbol.endswith("_"):
+        # see entry 936694
+        return base.latex() + "^{" + expo.latex(in_small=True) + "}"
+
+    if not base.is_atom() and base.head() in subscript_call_latex_table and len(base.args()) == 2:
+        h = subscript_call_latex_table[base.head()]
+        s = base.args()[0].latex(in_small=True)
+        e = expo.latex(in_small=True)
+        v = base.args()[1].latex(in_small=in_small)
+        return "%s_{%s}^{%s}\\!\\left(%s\\right)" % (h, s, e, v)
+
+    if not base.is_atom() and base.head() == Subscript:
+        assert len(base.args()) == 2
+        return "{%s}_{%s}^{%s}" % (base.args()[0].latex(in_small=in_small), base.args()[1].latex(in_small=True), expo.latex(in_small=True))
+
+    if base.head() in subscript_latex_table:
+        if len(base.args()) == 1:
+            return "%s_{%s}^{%s}" % (subscript_latex_table[base.head()], base.args()[0].latex(in_small=in_small), expo.latex(in_small=True))
+        elif len(base.args()) == 0:
+            return "{%s}^{%s}" % (subscript_latex_table[base.head()], expo.latex(in_small=True))
+
+
+
 */
 void
 _fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t base, const fexpr_t expo, ulong flags)
@@ -644,6 +678,26 @@ _fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t base, const fexpr_t e
             default:
                 break;
         }
+    }
+
+    if (fexpr_is_builtin_call(base, FEXPR_JacobiTheta) && fexpr_nargs(base) == 3)
+    {
+        fexpr_t func, x, y, z;
+
+        fexpr_view_func(func, base);
+        fexpr_view_arg(x, base, 0);
+        fexpr_view_arg(y, base, 1);
+        fexpr_view_arg(z, base, 2);
+        calcium_write(out, "\\theta_{");
+        fexpr_write_latex(out, x, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}^{");
+        fexpr_write_latex(out, expo, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}\\!\\left(");
+        fexpr_write_latex(out, y, flags);
+        calcium_write(out, ", ");
+        fexpr_write_latex(out, z, flags);
+        calcium_write(out, "\\right)");
+        return;
     }
 
     if (fexpr_power_base_is_safe(base))
@@ -1150,6 +1204,34 @@ fexpr_equal_ui(const fexpr_t expr, ulong c)
 }
 
 void
+_fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t f, const fexpr_t order, ulong flags)
+{
+    if (fexpr_equal_ui(order, 1))
+    {
+        fexpr_write_latex(out, f, flags);
+        calcium_write(out, "'");
+    }
+    else if (fexpr_equal_ui(order, 2))
+    {
+        fexpr_write_latex(out, f, flags);
+        calcium_write(out, "''");
+    }
+    else if (fexpr_equal_ui(order, 3))
+    {
+        fexpr_write_latex(out, f, flags);
+        calcium_write(out, "'''");
+    }
+    else
+    {
+        calcium_write(out, "{");
+        fexpr_write_latex(out, f, flags);
+        calcium_write(out, "}^{(");
+        fexpr_write_latex(out, order, flags);
+        calcium_write(out, ")}");
+    }
+}
+
+void
 fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     fexpr_t formula, forexpr, var, point, order;
@@ -1201,29 +1283,7 @@ fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t expr, ulong fla
             fexpr_is_symbol(f) && !fexpr_is_builtin_symbol(f, FEXPR_Exp)
                                && !fexpr_is_builtin_symbol(f, FEXPR_Sqrt))
         {
-            if (fexpr_equal_ui(order, 1))
-            {
-                fexpr_write_latex(out, f, flags);
-                calcium_write(out, "'");
-            }
-            else if (fexpr_equal_ui(order, 2))
-            {
-                fexpr_write_latex(out, f, flags);
-                calcium_write(out, "''");
-            }
-            else if (fexpr_equal_ui(order, 3))
-            {
-                fexpr_write_latex(out, f, flags);
-                calcium_write(out, "'''");
-            }
-            else
-            {
-                calcium_write(out, "{");
-                fexpr_write_latex(out, f, flags);
-                calcium_write(out, "}^{(");
-                fexpr_write_latex(out, order, flags);
-                calcium_write(out, ")}");
-            }
+            _fexpr_write_latex_derivative(out, f, order, flags);
 
             calcium_write(out, "\\!\\left(");
             fexpr_write_latex(out, point, flags);
@@ -1823,6 +1883,11 @@ _fexpr_write_latex_simple2(calcium_stream_t out, const fexpr_t expr, ulong flags
             b = ",";
             c = ")}";
             break;
+        case FEXPR_Subscript:
+            a = "{";
+            b = "}_{";
+            c = "}";
+            break;
         default:
             fexpr_write_latex_call(out, expr, flags);
             return;
@@ -2228,6 +2293,132 @@ fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
 }
 
 void
+fexpr_write_latex_decimal(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t arg;
+    char * s;
+    slong i, len;
+
+    if (fexpr_nargs(expr) == 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        if (fexpr_is_string(arg))
+        {
+            s = fexpr_get_string(arg);
+            len = strlen(s);
+
+            for (i = 0; i < len; i++)
+            {
+                if (s[i] == 'e' || s[i] == 'E')
+                {
+                    s[i] = '\0';
+                    calcium_write(out, s);
+                    calcium_write(out, " \\cdot 10^{");
+                    calcium_write(out, s + i + 1);
+                    calcium_write(out, "}");
+                    flint_free(s);
+                    return;
+                }
+            }
+
+            calcium_write(out, s);
+            flint_free(s);
+            return;
+        }
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
+/* Write (x) */
+void
+_fexpr_write_latex_call1(calcium_stream_t out, const fexpr_t x, ulong flags)
+{
+    if (fexpr_is_atom(x))
+    {
+        calcium_write(out, "(");
+        fexpr_write_latex(out, x, flags);
+        calcium_write(out, ")");
+    }
+    else
+    {
+        calcium_write(out, "\\!\\left(");
+        fexpr_write_latex(out, x, flags);
+        calcium_write(out, "\\right)");
+    }
+}
+
+void
+fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    if (fexpr_is_builtin_call(expr, FEXPR_DirichletCharacter))
+    {
+        fexpr_t a, b, n;
+
+        if (fexpr_nargs(expr) == 2 || fexpr_nargs(expr) == 3)
+        {
+            fexpr_view_arg(a, expr, 0);
+            fexpr_view_arg(b, expr, 1);
+
+            calcium_write(out, "\\chi_{");
+            fexpr_write_latex(out, a, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, " \\, . \\, ");
+            fexpr_write_latex(out, b, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+
+            if (fexpr_nargs(expr) == 3)
+            {
+                fexpr_view_arg(n, expr, 2);
+                _fexpr_write_latex_call1(out, n, flags);
+            }
+
+            return;
+        }
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_LambertW))
+    {
+        fexpr_t f, x, n, r;
+
+        if (fexpr_nargs(expr) == 1)
+        {
+            fexpr_view_arg(n, expr, 0);
+            calcium_write(out, "W");
+            _fexpr_write_latex_call1(out, n, flags);
+            return;
+        }
+
+        if (fexpr_nargs(expr) == 2)
+        {
+            fexpr_view_arg(x, expr, 0);
+            fexpr_view_arg(n, expr, 1);
+            calcium_write(out, "W_{");
+            fexpr_write_latex(out, n, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+            _fexpr_write_latex_call1(out, x, flags);
+            return;
+        }
+
+        if (fexpr_nargs(expr) == 3)
+        {
+            fexpr_view_func(f, expr);
+            fexpr_view_arg(x, expr, 0);
+            fexpr_view_arg(n, expr, 1);
+            fexpr_view_arg(r, expr, 2);
+            _fexpr_write_latex_derivative(out, f, r, flags);
+            calcium_write(out, "_{");
+            fexpr_write_latex(out, n, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}");
+            _fexpr_write_latex_call1(out, x, flags);
+            return;
+        }
+    }
+
+    fexpr_write_latex_call(out, expr, flags);
+}
+
+void
 fexpr_write_latex_show_form(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     fexpr_t f, arg;
@@ -2605,6 +2796,94 @@ fexpr_write_latex_subscript(calcium_stream_t out, const fexpr_t expr, ulong flag
     calcium_write(out, "}");
 }
 
+/* f(x) */
+/* f(x,n) -> nth derivative */
+void
+fexpr_write_latex_call1_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t func, x, order;
+    slong nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs == 2)
+    {
+        fexpr_view_func(func, expr);
+        fexpr_view_arg(x, expr, 0);
+        fexpr_view_arg(order, expr, 1);
+        _fexpr_write_latex_derivative(out, func, order, flags);
+        calcium_write(out, "\\!\\left(");
+        fexpr_write_latex(out, x, flags);
+        calcium_write(out, "\\right)");
+    }
+    else
+    {
+        fexpr_write_latex_call(out, expr, flags);
+    }
+}
+
+/* f_x(y) */
+/* f_x(y,n) -> nth derivative */
+void
+fexpr_write_latex_sub1_call1_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t func, x, y, order;
+    slong nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs == 3)
+    {
+        fexpr_view_func(func, expr);
+        fexpr_view_arg(x, expr, 0);
+        fexpr_view_arg(y, expr, 1);
+        fexpr_view_arg(order, expr, 2);
+        _fexpr_write_latex_derivative(out, func, order, flags);
+        calcium_write(out, "_{");
+        fexpr_write_latex(out, x, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}");
+        calcium_write(out, "\\!\\left(");
+        fexpr_write_latex(out, y, flags);
+        calcium_write(out, "\\right)");
+    }
+    else
+    {
+        fexpr_write_latex_subscript_call(out, expr, flags);
+    }
+}
+
+/* f_x(y,z) */
+/* f_x(y,z,n) -> nth derivative */
+void
+fexpr_write_latex_sub1_call2_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags)
+{
+    fexpr_t func, x, y, z, order;
+    slong nargs;
+
+    nargs = fexpr_nargs(expr);
+
+    if (nargs == 4)
+    {
+        fexpr_view_func(func, expr);
+        fexpr_view_arg(x, expr, 0);
+        fexpr_view_arg(y, expr, 1);
+        fexpr_view_arg(z, expr, 2);
+        fexpr_view_arg(order, expr, 3);
+        _fexpr_write_latex_derivative(out, func, order, flags);
+        calcium_write(out, "_{");
+        fexpr_write_latex(out, x, flags | FEXPR_LATEX_SMALL);
+        calcium_write(out, "}");
+        calcium_write(out, "\\!\\left(");
+        fexpr_write_latex(out, y, flags);
+        calcium_write(out, ", ");
+        fexpr_write_latex(out, z, flags);
+        calcium_write(out, "\\right)");
+    }
+    else
+    {
+        fexpr_write_latex_subscript_call(out, expr, flags);
+    }
+}
 
 void
 fexpr_write_latex_infix(calcium_stream_t out, const fexpr_t expr, ulong flags)

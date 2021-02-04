@@ -218,6 +218,17 @@ latex_test_cases = [
     ("Set(EllipticRootE(1, tau), EllipticRootE(2, tau), EllipticRootE(3, tau))", r"\left\{e_{1}\!\left(\tau\right), e_{2}\!\left(\tau\right), e_{3}\!\left(\tau\right)\right\}"),
     ("GaussSum(n, chi)", r"G_{n}\!\left(\chi\right)"),
     ("Set(GlaisherConstant, KhinchinConstant)", r"\left\{A, K\right\}"),
+    ('Decimal("0.3141")', r"0.3141"),
+    ('Decimal("0.3141e-27")', r"0.3141 \cdot 10^{-27}"),
+    ("Set(DigammaFunction(z), DigammaFunction(z, 1), DigammaFunction(z, n))", r"\left\{\psi(z), \psi'\!\left(z\right), {\psi}^{(n)}\!\left(z\right)\right\}"),
+    ("Set(AiryAi(z, 1), AiryAi(z, 2), AiryBi(z, n), BesselJ(n, z, 1), BesselY(n, z, 2), BesselK(n, z, Add(Mul(3, r), 1)))", r"\left\{\operatorname{Ai}'\!\left(z\right), \operatorname{Ai}''\!\left(z\right), {\operatorname{Bi}}^{(n)}\!\left(z\right), J'_{n}\!\left(z\right), Y''_{n}\!\left(z\right), {K}^{(3 r + 1)}_{n}\!\left(z\right)\right\}"),
+    ("Set(HankelH1(n, z), HankelH2(n, z))", r"\left\{H^{(1)}_{n}\!\left(z\right), H^{(2)}_{n}\!\left(z\right)\right\}"),
+    ("Element(DirichletCharacter(q, k), PrimitiveDirichletCharacters(q))", r"\chi_{q \, . \, k} \in G^{\text{Primitive}}_{q}"),
+    ("DirichletCharacter(q, k, n)", r"\chi_{q \, . \, k}(n)"),
+    ("JacobiTheta(3, z, tau, 2)", r"\theta''_{3}\!\left(z, \tau\right)"),
+    ("Set(RiemannZeta(s, 1), RiemannZeta(s, r))", r"\left\{\zeta'\!\left(s\right), {\zeta}^{(r)}\!\left(s\right)\right\}"),
+    ("Subscript(x, y)", r"{x}_{y}"),
+    ("Set(BernsteinEllipse(r), UnitCircle, PSL2Z, AGMSequence(n, a, b), CarlsonHypergeometricR, CarlsonHypergeometricT)", r"\left\{\mathcal{E}_{r}, \mathbb{T}, \operatorname{PSL}_2(\mathbb{Z}), \operatorname{agm}_{n}\!\left(a, b\right), R, T\right\}"),
 ]
 
 

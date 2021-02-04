@@ -3443,10 +3443,12 @@ libcalcium.fexpr_builtin_name.restype = ctypes.c_char_p
 libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libcalcium.fexpr_get_str.restype = ctypes.c_char_p
 libcalcium.fexpr_get_str_latex.restype = ctypes.c_char_p
+libcalcium.fexpr_set_si.argtypes = fexpr, ctypes.c_long
 libcalcium.fexpr_set_d.argtypes = fexpr, ctypes.c_double
 libcalcium.fexpr_set_re_im_d.argtypes = fexpr, ctypes.c_double, ctypes.c_double
 libcalcium.fexpr_get_decimal_str.restype = ctypes.c_char_p
 
+libcalcium.qqbar_set_si.argtypes = qqbar, ctypes.c_long
 libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double
 libcalcium.qqbar_set_re_im_d.argtypes = qqbar, ctypes.c_double, ctypes.c_double
 libcalcium.qqbar_get_str_nd.restype = ctypes.c_char_p
