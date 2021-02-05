@@ -128,6 +128,10 @@ in binding variables.
     The symbol ``x`` becomes locally bound within this ``Fun``
     expression.
 
+.. macro:: Step
+
+.. macro:: Repeat
+
 Booleans and logic
 ------------------------------------------------------------------------
 
@@ -143,6 +147,15 @@ Booleans and logic
 
     ``NotEqual(a, b)``, signifying `a \ne b`, is equivalent to
     ``Not(Equal(a, b))``.
+
+.. macro:: Same
+ 
+    ``Same(a, b)`` gives ``a`` (or equivalently ``b``) if ``a`` and
+    ``b`` represent the same object, and ``Undefined`` otherwise.
+    This can be used to assert or emphasize that two expressions
+    represent the same value within a formula.
+    This operator can be called with any number of arguments,
+    in which case it asserts that all arguments are equal.
 
 .. macro:: True
 
@@ -477,6 +490,13 @@ Sets of numbers
     ``UpperHalfPlane`` is the set `\mathbb{H}` of complex numbers
     with positive imaginary part.
 
+.. macro:: UnitCircle
+
+.. macro:: BernsteinEllipse
+
+.. macro:: Lattice
+
+
 Infinities and extended numbers
 ........................................................................
 
@@ -639,7 +659,11 @@ Complex analysis
 
 .. macro:: Path
 
-TBD.
+.. macro:: Poles
+
+.. macro:: IsHolomorphicOn
+
+.. macro:: IsMeromorphicOn
 
 Matrices and linear algebra
 ------------------------------------------------------------------------
@@ -908,6 +932,10 @@ Gamma function and factorials
 .. macro:: BarnesG
 
 .. macro:: LogBarnesG
+
+.. macro:: StirlingSeriesRemainder
+
+.. macro:: LogBarnesGRemainder
 
 Orthogonal polynomials
 ........................................................................

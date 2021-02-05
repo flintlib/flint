@@ -406,6 +406,7 @@ void fexpr_write_latex_show_form(calcium_stream_t out, const fexpr_t expr, ulong
 void fexpr_write_latex_range(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_decimal(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_call1_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_call2_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_sub1_call1_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_sub1_call2_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong flags);
