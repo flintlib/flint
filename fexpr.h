@@ -410,6 +410,7 @@ void fexpr_write_latex_call2_optional_derivative(calcium_stream_t out, const fex
 void fexpr_write_latex_sub1_call1_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_sub1_call2_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex_residue(calcium_stream_t out, const fexpr_t expr, ulong flags);
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);

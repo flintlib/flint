@@ -659,11 +659,19 @@ Complex analysis
 
 .. macro:: Path
 
+.. macro:: CurvePath
+
 .. macro:: Poles
 
 .. macro:: IsHolomorphicOn
 
 .. macro:: IsMeromorphicOn
+
+.. macro:: Residue
+
+.. macro:: ComplexZeroMultiplicity
+
+.. macro:: AnalyticContinuation
 
 Matrices and linear algebra
 ------------------------------------------------------------------------
@@ -1129,6 +1137,8 @@ Elliptic, theta and modular functions
 ........................................................................
 
 .. macro:: JacobiTheta
+
+.. macro:: JacobiThetaQ
 
 .. macro:: DedekindEta
 
