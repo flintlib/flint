@@ -37,6 +37,7 @@ fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags)
 
     fmpz_mpoly_q_clear(frac, ctx);
     fmpz_mpoly_ctx_clear(ctx);
+    fexpr_vec_clear(args);
 
     return success;
 }
