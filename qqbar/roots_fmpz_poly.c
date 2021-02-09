@@ -18,7 +18,7 @@ qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags)
 {
     slong d = fmpz_poly_degree(poly);
 
-    if (d == 0)
+    if (d == 0 || d == -1)
         return;
 
     if (d == 1)
@@ -108,5 +108,9 @@ qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags)
 
         fmpz_poly_factor_clear(fac);
     }
-}
 
+    if (!(flags & QQBAR_ROOTS_UNSORTED))
+    {
+        qsort(res, d, sizeof(qqbar_struct), (int (*)(const void *, const void *)) qqbar_cmp_root_order);
+    }
+}

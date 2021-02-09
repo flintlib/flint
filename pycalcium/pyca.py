@@ -910,9 +910,7 @@ class qqbar:
     def polynomial_roots(coeffs):
         """
         Returns the roots of the polynomial defined by coeffs as a list.
-        The output is not guaranteed to be sorted in any particular
-        order, except that all instances of a repeated root always
-        appear consecutively.
+        Roots are sorted in a fixed, canonical order.
 
         At present, the implementation only allows integers
         (not algebraic numbers) as coefficients.
@@ -940,13 +938,43 @@ class qqbar:
         for i in range(d + 1):
             fmpq_set_python(c, coeffs[i])
             libflint.fmpq_poly_set_coeff_fmpq(pol, i, c)
-        libcalcium.qqbar_roots_fmpq_poly(vec, pol, 0)
+        flags = 0
+        libcalcium.qqbar_roots_fmpq_poly(vec, pol, flags)
         res = [qqbar() for i in range(d)]
         for i in range(d):
             libcalcium.qqbar_set(res[i], ctypes.byref(vec[i]))
         libcalcium.qqbar_vec_clear(vec, d)
         libflint.fmpq_clear(c)
         libflint.fmpq_poly_clear(pol)
+        return res
+
+    def conjugates(self):
+        """
+        Returns the algebraic conjugates of this algebraic number.
+        The output is a list, with elements sorted in a fixed,
+        canonical order.
+
+            >>> qqbar(0).conjugates()
+            [0 (deg 1)]
+            >>> ((qqbar(5).sqrt()+1)/2).conjugates()
+            [1.61803 (deg 2), -0.618034 (deg 2)]
+            >>> qqbar(2+3j).conjugates()
+            [2.00000 + 3.00000*I (deg 2), 2.00000 - 3.00000*I (deg 2)]
+            >>> qqbar.polynomial_roots([4,3,2,1])[0].conjugates()
+            [-1.65063 (deg 3), -0.174685 + 1.54687*I (deg 3), -0.174685 - 1.54687*I (deg 3)]
+            >>> qqbar.polynomial_roots([-35,0,315,0,-693,0,429])[0].conjugates()
+            [0.949108 (deg 6), 0.741531 (deg 6), 0.405845 (deg 6), -0.405845 (deg 6), -0.741531 (deg 6), -0.949108 (deg 6)]
+
+        """
+        d = self.degree()
+        if d == 1:
+            return [self]
+        vec = libcalcium.qqbar_vec_init(d)
+        libcalcium.qqbar_conjugates(vec, self)
+        res = [qqbar() for i in range(d)]
+        for i in range(d):
+            libcalcium.qqbar_set(res[i], ctypes.byref(vec[i]))
+        libcalcium.qqbar_vec_clear(vec, d)
         return res
 
     def minpoly(self):
@@ -2439,7 +2467,7 @@ class ca_mat:
         Returns a list of (value, multiplicity) pairs.
 
             >>> ca_mat(4, 4, range(16)).eigenvalues()
-            [(-2.46425 {-a+15 where a = 17.4642 [a^2-305=0]}, 1), (32.4642 {a+15 where a = 17.4642 [a^2-305=0]}, 1), (0, 2)]
+            [(32.4642 {a+15 where a = 17.4642 [a^2-305=0]}, 1), (-2.46425 {-a+15 where a = 17.4642 [a^2-305=0]}, 1), (0, 2)]
             >>> ca_mat([[1,pi],[-pi,1]]).eigenvalues()[0]
             (1.00000 + 3.14159*I {a*b+1 where a = 3.14159 [Pi], b = I [b^2+1=0]}, 1)
 
@@ -2613,8 +2641,8 @@ class ca_mat:
             >>> D, P = A.diagonalization()
             >>> D
             ca_mat of size 2 x 2
-            [-0.372281 {(-a+5)/2 where a = 5.74456 [a^2-33=0]},                                              0]
-            [                                                0, 5.37228 {(a+5)/2 where a = 5.74456 [a^2-33=0]}]
+            [5.37228 {(a+5)/2 where a = 5.74456 [a^2-33=0]},                                                 0]
+            [                                             0, -0.372281 {(-a+5)/2 where a = 5.74456 [a^2-33=0]}]
             >>> P * D * P.inv()
             ca_mat of size 2 x 2
             [1, 2]

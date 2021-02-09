@@ -218,16 +218,12 @@ void qqbar_printnd(const qqbar_t x, slong n);
 /* Comparisons */
 
 int qqbar_equal(const qqbar_t x, const qqbar_t y);
-
 int qqbar_cmp_re(const qqbar_t x, const qqbar_t y);
-
 int qqbar_cmp_im(const qqbar_t x, const qqbar_t y);
-
 int qqbar_cmpabs_re(const qqbar_t x, const qqbar_t y);
-
 int qqbar_cmpabs_im(const qqbar_t x, const qqbar_t y);
-
 int qqbar_cmpabs(const qqbar_t x, const qqbar_t y);
+int qqbar_cmp_root_order(const qqbar_t x, const qqbar_t y);
 
 /* Complex parts */
 
@@ -354,6 +350,7 @@ int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t f, qqbar_sr
 int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
 
 #define QQBAR_ROOTS_IRREDUCIBLE 1
+#define QQBAR_ROOTS_UNSORTED 2
 
 void qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags);
 

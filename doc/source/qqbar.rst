@@ -274,6 +274,20 @@ Comparisons
 
     Compares the absolute values of *x* and *y*, returning -1, 0 or +1.
 
+.. function:: int qqbar_cmp_root_order(const qqbar_t x, const qqbar_t y)
+
+    Compares *x* and *y* using an arbitrary but convenient ordering
+    defined on the complex numbers. This is useful for sorting the
+    roots of a polynomial in a canonical order.
+
+    We define the root order as follows: real roots come first, in
+    descending order. Nonreal roots are subsequently ordered first by
+    real part in descending order, then in ascending order by the
+    absolute value of the imaginary part, and then in descending
+    order of the sign. This implies that complex conjugate roots
+    are adjacent, with the root in the upper half plane first.
+
+
 Complex parts
 -------------------------------------------------------------------------------
 
@@ -473,8 +487,8 @@ Conjugates
 .. function:: void qqbar_conjugates(qqbar_ptr res, const qqbar_t x)
 
     Sets the entries of the vector *res* to the *d* algebraic conjugates of
-    *x*, including *x* itself, where *d* is the degree of *x*. The output is
-    not guaranteed to be sorted in any particular order.
+    *x*, including *x* itself, where *d* is the degree of *x*. The output
+    is sorted in a canonical order (as defined by :func:`qqbar_cmp_root_order`).
 
 Polynomial evaluation
 -------------------------------------------------------------------------------
@@ -517,16 +531,19 @@ Polynomial roots
 
     Sets the entries of the vector *res* to the *d* roots of the polynomial
     *poly*. Roots with multiplicity appear with repetition in the
-    output array.
-    The output is not guaranteed to be sorted in any particular order,
-    except that all instances of a repeated root always appear
-    consecutively.
+    output array. By default, the roots will be sorted in a
+    convenient canonical order (as defined by :func:`qqbar_cmp_root_order`).
+    Instances of a repeated root always appear consecutively.
 
     The following *flags* are supported:
 
     - QQBAR_ROOTS_IRREDUCIBLE - if set, *poly* is assumed to be
       irreducible (it may still have constant content), and no polynomial
       factorization is performed internally.
+
+    - QQBAR_ROOTS_UNSORTED - if set, the roots will not be guaranteed
+      to be sorted (except for repeated roots being listed
+      consecutively).
 
 .. function:: void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
               void qqbar_eigenvalues_fmpq_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
