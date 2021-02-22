@@ -1110,10 +1110,8 @@ static int _try_zippel(
     const mpoly_gcd_info_t I,
     const nmod_mpoly_ctx_t ctx)
 {
-    slong i, k;
     slong m = I->mvars;
     int success;
-    mpoly_zipinfo_t zinfo;
     flint_bitcnt_t wbits;
     flint_rand_t randstate;
     nmod_mpoly_ctx_t uctx;
@@ -1132,22 +1130,8 @@ static int _try_zippel(
 
     flint_randinit(randstate);
 
-    /* interpolation will continue in m variables */
-    mpoly_zipinfo_init(zinfo, m);
-
     /* uctx is context for Z[y_1,...,y_{m-1}]*/
     nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->mod.n);
-
-    /* fill in a valid zinfo->perm and degrees */
-    for (i = 0; i < m; i++)
-    {
-        k = I->zippel_perm[i];
-        zinfo->perm[i] = k;
-        zinfo->Adegs[i] = I->Adeflate_deg[k];
-        zinfo->Bdegs[i] = I->Bdeflate_deg[k];
-        FLINT_ASSERT(I->Adeflate_deg[k] != 0);
-        FLINT_ASSERT(I->Bdeflate_deg[k] != 0);
-    }
 
     wbits = FLINT_MAX(A->bits, B->bits);
 
@@ -1162,10 +1146,10 @@ static int _try_zippel(
     nmod_mpoly_init3(Abarc, 0, wbits, uctx);
     nmod_mpoly_init3(Bbarc, 0, wbits, uctx);
 
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx, zinfo->perm,
-                                             I->Amin_exp, I->Gstride, NULL, 0);
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx, zinfo->perm,
-                                             I->Bmin_exp, I->Gstride, NULL, 0);
+    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx,
+                             I->zippel_perm, I->Amin_exp, I->Gstride, NULL, 0);
+    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx,
+                             I->zippel_perm, I->Bmin_exp, I->Gstride, NULL, 0);
 
     success = nmod_mpolyu_content_mpoly(Ac, Au, uctx) && 
               nmod_mpolyu_content_mpoly(Bc, Bu, uctx);
@@ -1175,9 +1159,7 @@ static int _try_zippel(
     nmod_mpolyu_divexact_mpoly_inplace(Au, Ac, uctx);
     nmod_mpolyu_divexact_mpoly_inplace(Bu, Bc, uctx);
 
-    /* after removing content, degree bounds in zinfo are still valid bounds */
-    success = nmod_mpolyu_gcdm_zippel(Gu, Abaru, Bbaru, Au, Bu,
-                                                       uctx, zinfo, randstate);
+    success = nmod_mpolyu_gcdm_zippel(Gu, Abaru, Bbaru, Au, Bu, uctx, randstate);
     if (!success)
         goto cleanup;
 
@@ -1191,7 +1173,7 @@ static int _try_zippel(
         nmod_mpolyu_mul_mpoly_inplace(Gu, Gc, uctx);
 
         nmod_mpoly_from_mpolyu_perm_inflate(G, I->Gbits, ctx, Gu, uctx,
-                                         zinfo->perm, I->Gmin_exp, I->Gstride);
+                                      I->zippel_perm, I->Gmin_exp, I->Gstride);
     }
     else
     {
@@ -1208,15 +1190,15 @@ static int _try_zippel(
         nmod_mpolyu_mul_mpoly_inplace(Bbaru, Bbarc, uctx);
 
         nmod_mpoly_from_mpolyu_perm_inflate(G, I->Gbits, ctx, Gu, uctx,
-                                        zinfo->perm, I->Gmin_exp, I->Gstride);
+                                      I->zippel_perm, I->Gmin_exp, I->Gstride);
 
         if (Abar != NULL)
             nmod_mpoly_from_mpolyu_perm_inflate(Abar, I->Abarbits, ctx,
-                         Abaru, uctx, zinfo->perm, I->Abarmin_exp, I->Gstride);
+                      Abaru, uctx, I->zippel_perm, I->Abarmin_exp, I->Gstride);
 
         if (Bbar != NULL)
             nmod_mpoly_from_mpolyu_perm_inflate(Bbar, I->Bbarbits, ctx,
-                         Bbaru, uctx, zinfo->perm, I->Bbarmin_exp, I->Gstride);
+                      Bbaru, uctx, I->zippel_perm, I->Bbarmin_exp, I->Gstride);
     }
 
     success = 1;
@@ -1235,8 +1217,6 @@ cleanup:
     nmod_mpoly_clear(Bbarc, uctx);
 
     nmod_mpoly_ctx_clear(uctx);
-
-    mpoly_zipinfo_clear(zinfo);
 
     flint_randclear(randstate);
 
@@ -1700,7 +1680,7 @@ cleanup:
     Both A and B have to be packed into bits <= FLINT_BITS
     return is 1 for success, 0 for failure.
 */
-static int _nmod_mpoly_gcd_algo_small(
+int _nmod_mpoly_gcd_algo_small(
     nmod_mpoly_t G,
     nmod_mpoly_t Abar, /* could be NULL */
     nmod_mpoly_t Bbar, /* could be NULL */

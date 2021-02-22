@@ -11,9 +11,6 @@
 
 #include "nmod_mpoly_factor.h"
 
-#define FLINT_TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC(n*sizeof(T))
-
-
 int n_bpoly_mod_hlift2_cubic(
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_t B0,
@@ -380,7 +377,7 @@ int n_bpoly_mod_hlift_cubic(
 #endif
 
     n_bpoly_stack_fit_request(St->bpoly_stack, 2*r);
-    Ue = FLINT_TMP_ARRAY_ALLOC(2*r, n_bpoly_struct *);
+    Ue = TMP_ARRAY_ALLOC(2*r, n_bpoly_struct *);
     Be = Ue + r;
     for (i = 0; i < r; i++)
     {
@@ -389,7 +386,7 @@ int n_bpoly_mod_hlift_cubic(
     }
 
     n_poly_stack_fit_request(St->poly_stack, 2*r + 5);
-    s = FLINT_TMP_ARRAY_ALLOC(2*r, n_poly_struct *);
+    s = TMP_ARRAY_ALLOC(2*r, n_poly_struct *);
     Binv = s + r;
     for (i = 0; i < r; i++)
     {
@@ -604,7 +601,7 @@ int n_bpoly_mod_hlift(
     TMP_START;
 
     n_bpoly_stack_fit_request(St->bpoly_stack, r);
-    U = FLINT_TMP_ARRAY_ALLOC(r, n_bpoly_struct *);
+    U = TMP_ARRAY_ALLOC(r, n_bpoly_struct *);
     for (i = 0; i < r; i++)
     {
         U[i] = n_bpoly_stack_take_top(St->bpoly_stack);
@@ -616,7 +613,7 @@ int n_bpoly_mod_hlift(
     }
 
     n_poly_stack_fit_request(St->poly_stack, 3*r + 3);
-    s = FLINT_TMP_ARRAY_ALLOC(3*r, n_poly_struct *);
+    s = TMP_ARRAY_ALLOC(3*r, n_poly_struct *);
     v = s + r;
     Binv = v + r;
     for (i = 0; i < r; i++)

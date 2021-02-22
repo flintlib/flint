@@ -19,7 +19,6 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     nmod_mpolyu_t A,
     nmod_mpolyu_t B,
     nmod_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
     slong var = 0;
@@ -219,7 +218,6 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyu_t A,
     nmod_mpolyu_t B,
     nmod_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
     slong degbound;
@@ -240,7 +238,7 @@ int nmod_mpolyu_gcdm_zippel(
     FLINT_ASSERT(B->bits == A->bits);
 
     success = nmod_mpolyu_gcdp_zippel(G, Abar, Bbar, A, B,
-                                 ctx->minfo->nvars - 1, ctx, zinfo, randstate);
+                                        ctx->minfo->nvars - 1, ctx, randstate);
     if (success)
     {
         return 1;
@@ -249,8 +247,7 @@ int nmod_mpolyu_gcdm_zippel(
     /* bivariate more comfortable separated */
     if (ctx->minfo->nvars == 1)
     {
-        return nmod_mpolyu_gcdm_zippel_bivar(G, Abar, Bbar, A, B,
-                                                        ctx, zinfo, randstate);
+        return nmod_mpolyu_gcdm_zippel_bivar(G, Abar, Bbar, A, B, ctx, randstate);
     }
 
     FLINT_ASSERT(ctx->minfo->nvars > 1);
@@ -344,7 +341,7 @@ choose_prime_outer:
         goto choose_prime_outer;
 
     success = fq_nmod_mpolyu_gcdp_zippel(Gff, Abarff, Bbarff, Aff, Bff,
-                               ctx->minfo->nvars - 2, ffctx, zinfo, randstate);
+                                      ctx->minfo->nvars - 2, ffctx, randstate);
     if (!success || Gff->exps[0] > degbound)
         goto choose_prime_outer;
     degbound = Gff->exps[0];

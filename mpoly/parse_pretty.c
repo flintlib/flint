@@ -396,7 +396,7 @@ int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
                 goto failed;
 
             s = _parse_int(c, s, send);
-
+            
             if (fparse_pop_prec(E, PREC_POWER))
                 goto failed;
 

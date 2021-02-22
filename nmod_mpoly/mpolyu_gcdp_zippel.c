@@ -663,8 +663,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(
     nmod_mpolyu_t Bbar,
     nmod_mpolyu_t A,
     nmod_mpolyu_t B,
-    const nmod_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo)
+    const nmod_mpoly_ctx_t ctx)
 {
     slong var = 0;
     slong Alastdeg;
@@ -867,7 +866,6 @@ int nmod_mpolyu_gcdp_zippel(
     nmod_mpolyu_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
     slong lastdeg;
@@ -902,7 +900,7 @@ int nmod_mpolyu_gcdp_zippel(
     if (var == WORD(0))
     {
         /* bivariate is more comfortable separated */
-        return nmod_mpolyu_gcdp_zippel_bivar(G, Abar, Bbar, A, B, ctx, zinfo);
+        return nmod_mpolyu_gcdp_zippel_bivar(G, Abar, Bbar, A, B, ctx);
     }
 
     nmod_mpolyun_init(An, A->bits, ctx);
@@ -999,7 +997,7 @@ int nmod_mpolyu_gcdp_zippel(
         }
 
         success = nmod_mpolyu_gcdp_zippel(Geval, Abareval, Bbareval, Aeval, Beval,
-                                               var - 1, ctx, zinfo, randstate);
+                                                      var - 1, ctx, randstate);
         if (!success || Geval->exps[0] > degbound)
         {
             success = 0;

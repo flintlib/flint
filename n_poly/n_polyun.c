@@ -14,20 +14,32 @@
 #include "nmod_vec.h"
 
 
+int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod)
+{
+    slong i;
+    if (A->length < 0)
+        return 0;
+    for (i = 0; i < A->length; i++)
+    {
+        if (!n_poly_mod_is_canonical(A->terms[i].coeff, mod) ||
+            n_poly_is_zero(A->terms[i].coeff))
+        {
+            return 0;
+        }
+        if (i > 0 && A->terms[i].exp >= A->terms[i - 1].exp)
+            return 0;
+    }
+    return 1;
+}
+
 void n_polyun_clear(n_polyun_t A)
 {
     slong i;
-    if (A->alloc > 0)
-    {
-        FLINT_ASSERT(A->terms != NULL);
-        for (i = 0; i < A->alloc; i++)
-            n_poly_clear(A->terms[i].coeff);
-        flint_free(A->terms);
-    }
-    else
-    {
-        FLINT_ASSERT(A->terms == NULL);
-    }
+
+    for (i = 0; i < A->alloc; i++)
+        n_poly_clear(A->terms[i].coeff);
+
+    flint_free(A->terms);
 }
 
 void n_polyun_realloc(n_polyun_t A, slong len)
@@ -40,23 +52,35 @@ void n_polyun_realloc(n_polyun_t A, slong len)
     if (len <= A->alloc)
         return;
 
-    if (old_alloc > 0)
-    {
-        FLINT_ASSERT(A->terms != NULL);
-        A->terms = (n_polyun_term_struct *) flint_realloc(A->terms,
-                                      new_alloc*sizeof(n_polyun_term_struct));
-    }
-    else
-    {
-        FLINT_ASSERT(A->terms == NULL);
-        A->terms = (n_polyun_term_struct *) flint_malloc(
-                                      new_alloc*sizeof(n_polyun_term_struct));
-    }
+    A->terms = FLINT_ARRAY_REALLOC(A->terms, new_alloc, n_polyun_term_struct);
 
     for (i = old_alloc; i < new_alloc; i++)
         n_poly_init(A->terms[i].coeff);
 
     A->alloc = new_alloc;
+}
+
+void n_polyu1n_print_pretty(
+    const n_polyun_t A,
+    const char * var0,
+    const char * varlast)
+{
+    slong i;
+    int first = 1;
+
+    for (i = 0; i < A->length; i++)
+    {
+        if (!first)
+            printf(" + ");
+        first = 0;
+        flint_printf("(");
+        n_poly_print_pretty(A->terms[i].coeff, varlast);
+        flint_printf(")*%s^%wu",
+            var0, A->terms[i].exp);
+    }
+
+    if (first)
+        flint_printf("0");
 }
 
 void n_polyu2n_print_pretty(
@@ -83,19 +107,6 @@ void n_polyu2n_print_pretty(
     if (first)
         flint_printf("0");
 }
-
-void n_polyun_set(n_polyun_t A, const n_polyun_t B)
-{
-    slong i;
-    n_polyun_fit_length(A, B->length);
-    for (i = 0; i < B->length; i++)
-    {
-        A->terms[i].exp = B->terms[i].exp;
-        n_poly_set(A->terms[i].coeff, B->terms[i].coeff);
-    }
-    A->length = B->length;
-}
-
 
 void n_polyu3n_print_pretty(
     const n_polyun_t A,
@@ -124,3 +135,36 @@ void n_polyu3n_print_pretty(
         flint_printf("0");
 }
 
+
+void n_polyun_set(n_polyun_t A, const n_polyun_t B)
+{
+    slong i;
+    n_polyun_fit_length(A, B->length);
+    for (i = 0; i < B->length; i++)
+    {
+        A->terms[i].exp = B->terms[i].exp;
+        n_poly_set(A->terms[i].coeff, B->terms[i].coeff);
+    }
+    A->length = B->length;
+}
+
+int n_polyun_equal(
+    const n_polyun_t A,
+    const n_polyun_t B)
+{
+    slong i;
+
+    if (A->length != B->length)
+        return 0;
+
+    for (i = 0; i < A->length; i++)
+    {
+        if (A->terms[i].exp != B->terms[i].exp)
+            return 0;
+
+        if (!n_poly_equal(A->terms[i].coeff, B->terms[i].coeff))
+            return 0;
+    }
+
+    return 1;
+}

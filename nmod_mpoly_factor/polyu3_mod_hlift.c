@@ -61,25 +61,6 @@ int n_polyu_mod_is_canonical(const n_polyu_t A, nmod_t mod)
     return 1;
 }
 
-
-int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod)
-{
-    slong i;
-    if (A->length < 0)
-        return 0;
-    for (i = 0; i < A->length; i++)
-    {
-        if (!n_poly_mod_is_canonical(A->terms[i].coeff, mod) ||
-            n_poly_is_zero(A->terms[i].coeff))
-        {
-            return 0;
-        }
-        if (i > 0 && A->terms[i].exp >= A->terms[i - 1].exp)
-            return 0;
-    }
-    return 1;
-}
-
 static void n_polyu_mod_combine_like_terms(n_polyu_t A, nmod_t ctx)
 {
     slong in, out;

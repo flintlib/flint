@@ -19,7 +19,6 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
     fq_nmod_mpolyu_t A,
     fq_nmod_mpolyu_t B,
     fq_nmod_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
     slong var = 0;
@@ -217,7 +216,6 @@ int fq_nmod_mpolyu_gcdm_zippel(
     fq_nmod_mpolyu_t A,
     fq_nmod_mpolyu_t B,
     fq_nmod_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
     slong degbound;
@@ -237,7 +235,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
     FLINT_ASSERT(B->bits == A->bits);
 
     success = fq_nmod_mpolyu_gcdp_zippel(G, Abar, Bbar, A, B,
-                                 ctx->minfo->nvars - 1, ctx, zinfo, randstate);
+                                        ctx->minfo->nvars - 1, ctx, randstate);
     if (success)
     {
         return 1;
@@ -247,7 +245,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
     if (ctx->minfo->nvars == 1)
     {
         return fq_nmod_mpolyu_gcdm_zippel_bivar(G, Abar, Bbar, A, B,
-                                                        ctx, zinfo, randstate);
+                                                               ctx, randstate);
     }
 
     FLINT_ASSERT(ctx->minfo->nvars > 1);
@@ -338,7 +336,7 @@ have_prime:
     FLINT_ASSERT(fq_nmod_mpolyu_is_canonical(Beval, ectx));
 
     success = fq_nmod_mpolyu_gcdp_zippel(Geval, Abareval, Bbareval, Aeval, Beval,
-                                ctx->minfo->nvars - 2, ectx, zinfo, randstate);
+                                       ctx->minfo->nvars - 2, ectx, randstate);
 
     FLINT_ASSERT(!success || Geval->length > 0);
     if (!success || Geval->exps[0] > degbound)

@@ -143,6 +143,26 @@ typedef struct {
 
 typedef n_poly_bpoly_stack_struct n_poly_bpoly_stack_t[1];
 
+
+typedef struct
+{
+    n_polyun_struct ** array;
+    slong alloc;
+    slong top;
+} n_polyun_stack_struct;
+
+typedef n_polyun_stack_struct n_polyun_stack_t[1];
+
+
+typedef struct {
+    n_poly_stack_t poly_stack;
+    n_polyun_stack_t polyun_stack;
+} n_poly_polyun_stack_struct;
+
+typedef n_poly_polyun_stack_struct n_poly_polyun_stack_t[1];
+
+
+
 /*****************************************************************************/
 
 N_POLY_INLINE
@@ -236,6 +256,13 @@ N_POLY_INLINE
 int n_poly_is_one(const n_poly_t A)
 {
     return A->length == 1 && A->coeffs[0] == 1;
+}
+
+N_POLY_INLINE
+mp_limb_t n_poly_lead(const n_poly_t A)
+{
+    FLINT_ASSERT(A->length > 0);
+    return A->coeffs[A->length - 1];
 }
 
 N_POLY_INLINE
@@ -1480,6 +1507,10 @@ FLINT_DLL int n_bpoly_mod_gcd_brown_smprime(n_bpoly_t G, n_bpoly_t Abar,
                                     n_bpoly_t Bbar, n_bpoly_t A, n_bpoly_t B,
                                           nmod_t ctx, n_poly_bpoly_stack_t Sp);
 
+FLINT_DLL int n_polyu1n_mod_gcd_brown_smprime(n_polyun_t G, n_polyun_t Abar,
+                                n_polyun_t Bbar,n_polyun_t A, n_polyun_t B,
+                                         nmod_t ctx, n_poly_polyun_stack_t St);
+
 /*****************************************************************************/
 
 FLINT_DLL int n_fq_bpoly_equal(
@@ -1795,6 +1826,8 @@ void n_polyun_fit_length(n_polyun_t A, slong len)
         n_polyun_realloc(A, len);
 }
 
+FLINT_DLL int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod);
+
 N_POLY_INLINE
 void n_polyun_term_swap(n_polyun_term_struct * A, n_polyun_term_struct * B)
 {
@@ -1813,6 +1846,9 @@ void n_polyun_swap(n_polyun_t A, n_polyun_t B)
 
 FLINT_DLL void n_polyun_set(n_polyun_t A, const n_polyun_t B);
 
+FLINT_DLL void n_polyu1n_print_pretty(const n_polyun_t A,
+                                      const char * var0, const char * varlast);
+
 FLINT_DLL void n_polyu2n_print_pretty(const n_polyun_t A, const char * gen0,
                                       const char * gen1, const char * varlast);
 
@@ -1821,6 +1857,80 @@ FLINT_DLL void n_polyu3n_print_pretty(const n_polyun_t A, const char * gen0,
 
 FLINT_DLL void n_fq_polyun_set(n_fq_polyun_t A, const n_fq_polyun_t B,
                                                       const fq_nmod_ctx_t ctx);
+
+
+FLINT_DLL int n_polyun_equal(const n_polyun_t A, const n_polyun_t B);
+
+N_POLY_INLINE
+void n_polyun_one(n_polyun_t A)
+{
+    n_polyun_fit_length(A, 1);
+    A->length = 1;
+    A->terms[0].exp = 0;
+    n_poly_one(A->terms[0].coeff);
+}
+
+N_POLY_INLINE
+void n_polyun_scalar_mul_nmod(
+    n_polyun_t A,
+    mp_limb_t c,
+    nmod_t ctx)
+{
+    slong i;
+
+    FLINT_ASSERT(c != 0);
+
+    if (c == 1)
+        return;
+
+    for (i = 0; i < A->length; i++)
+        _n_poly_mod_scalar_mul_nmod_inplace(A->terms[i].coeff, c, ctx);
+}
+
+
+N_POLY_INLINE
+ulong n_polyu1n_bidegree(n_polyun_t A)
+{
+    ulong x = A->terms[0].exp;
+    ulong y = A->terms[0].coeff->length - 1;
+    return (x << (FLINT_BITS/2)) + y;
+}
+
+N_POLY_INLINE
+slong n_polyun_lastdeg(n_polyun_t A)
+{
+    slong i, len = 0;
+    for (i = 0; i < A->length; i++)
+        len = FLINT_MAX(len, A->terms[i].coeff->length);
+    return len - 1;
+}
+
+N_POLY_INLINE
+void n_polyun_content_last(n_poly_t g, n_polyun_t A, nmod_t ctx)
+{
+    slong i;
+    n_poly_zero(g);
+    for (i = 0; i < A->length; i++)
+        n_poly_mod_gcd(g, g, A->terms[i].coeff, ctx);
+}
+
+N_POLY_INLINE
+void n_polyun_divexact_last(n_polyun_t A, const n_poly_t g, nmod_t ctx)
+{
+    slong i;
+    for (i = 0; i < A->length; i++)
+        n_poly_mod_div(A->terms[i].coeff, A->terms[i].coeff, g, ctx);
+}
+
+N_POLY_INLINE
+void n_polyun_mul_last(n_polyun_t A, const n_poly_t g, nmod_t ctx)
+{
+    slong i;
+    for (i = 0; i < A->length; i++)
+        n_poly_mod_mul(A->terms[i].coeff, A->terms[i].coeff, g, ctx);
+}
+
+
 
 /*****************************************************************************/
 
@@ -1960,6 +2070,48 @@ slong n_bpoly_stack_size(const n_bpoly_stack_t S)
 {
     return S->top;
 }
+
+/*****************************************************************************/
+
+FLINT_DLL void n_polyun_stack_init(n_polyun_stack_t S);
+
+FLINT_DLL void n_polyun_stack_clear(n_polyun_stack_t S);
+
+FLINT_DLL n_polyun_struct ** n_polyun_stack_fit_request(n_polyun_stack_t S, slong k);
+
+N_POLY_INLINE
+n_polyun_struct ** n_polyun_stack_request(n_polyun_stack_t S, slong k)
+{
+    n_polyun_struct ** polyun_top;
+    polyun_top = n_polyun_stack_fit_request(S, k);
+    S->top += k;
+    return polyun_top;
+}
+
+N_POLY_INLINE
+n_polyun_struct * n_polyun_stack_take_top(n_polyun_stack_t S)
+{
+    /* assume the request for 1 has already been fitted */
+    n_polyun_struct ** polyun_top;
+    FLINT_ASSERT(S->top + 1 <= S->alloc);
+    polyun_top = S->array + S->top;
+    S->top += 1;
+    return polyun_top[0];
+}
+
+N_POLY_INLINE
+void n_polyun_stack_give_back(n_polyun_stack_t S, slong k)
+{
+    FLINT_ASSERT(S->top >= k);
+    S->top -= k;
+}
+
+N_POLY_INLINE
+slong n_polyun_stack_size(const n_polyun_stack_t S)
+{
+    return S->top;
+}
+
 
 /*****************************************************************************/
 

@@ -148,7 +148,7 @@ int _fmpz_mpoly_vec_content_mpoly(
 
     if (Alen <= 1)
     {
-        if (Alen == 1)
+        if (Alen == 1 && A[0].length > 0)
         {
             if (fmpz_sgn(A[0].coeffs + 0) < 0)
                 fmpz_mpoly_neg(g, A + 0, ctx);
