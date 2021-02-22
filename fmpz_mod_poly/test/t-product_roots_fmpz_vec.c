@@ -22,7 +22,7 @@
 int
 main(void)
 {
-    int i, result;
+    slong i;
     FLINT_TEST_INIT(state);
 
     flint_printf("product_roots_fmpz_vec....");
@@ -30,10 +30,11 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t P, Q, tmp;
+        fmpz_mod_poly_t P, Q, tmp;
         fmpz * x;
         slong j, n, bits;
         fmpz_t mod;
+        fmpz_mod_ctx_t ctx;
 
         n = n_randint(state, 100);
         bits = n_randint(state, 100);
@@ -41,50 +42,48 @@ main(void)
         fmpz_init(mod);
         fmpz_randtest_unsigned(mod, state, bits);
         fmpz_add_ui(mod, mod, 2);
+        fmpz_mod_ctx_init(ctx, mod);
 
         x = _fmpz_vec_init(n);
         _fmpz_vec_randtest(x, state, n, bits);
 
         for (j = 0; j < n; j++)
-            fmpz_mod(x + j, x + j, mod);
+            fmpz_mod_set_fmpz(x + j, x + j, ctx);
 
-        fmpz_poly_init(P);
-        fmpz_poly_init(Q);
-        fmpz_poly_init(tmp);
+        fmpz_mod_poly_init(P, ctx);
+        fmpz_mod_poly_init(Q, ctx);
+        fmpz_mod_poly_init(tmp, ctx);
 
-        fmpz_mod_poly_product_roots_fmpz_vec(P, x, n, mod);
+        fmpz_mod_poly_product_roots_fmpz_vec(P, x, n, ctx);
 
-        fmpz_poly_set_ui(Q, UWORD(1));
+        fmpz_mod_poly_one(Q, ctx);
         for (j = 0; j < n; j++)
         {
-            fmpz_poly_zero(tmp);
-            fmpz_poly_set_coeff_si(tmp, 1, WORD(-1));
-            fmpz_poly_set_coeff_fmpz(tmp, 0, x + j);
-            fmpz_poly_neg(tmp, tmp);
-            fmpz_poly_mul(Q, Q, tmp);
+            fmpz_mod_poly_zero(tmp, ctx);
+            fmpz_mod_poly_set_coeff_si(tmp, 1, -WORD(1), ctx);
+            fmpz_mod_poly_set_coeff_fmpz(tmp, 0, x + j, ctx);
+            fmpz_mod_poly_neg(tmp, tmp, ctx);
+            fmpz_mod_poly_mul(Q, Q, tmp, ctx);
         }
 
-        for (j = 0; j < Q->length; j ++)
-            fmpz_mod(Q->coeffs + j, Q->coeffs + j, mod);
-
-        result = (fmpz_poly_equal(P, Q));
-        if (!result)
+        if (!fmpz_mod_poly_equal(P, Q, ctx))
         {
             flint_printf("FAIL (P != Q):\n");
-            fmpz_poly_print(P), flint_printf("\n\n");
-            fmpz_poly_print(Q), flint_printf("\n\n");
-            abort();
+            fmpz_mod_poly_print(P, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(Q, ctx), flint_printf("\n\n");
+            flint_abort();
         }
 
-        fmpz_poly_clear(P);
-        fmpz_poly_clear(Q);
-        fmpz_poly_clear(tmp);
+        fmpz_mod_poly_clear(P, ctx);
+        fmpz_mod_poly_clear(Q, ctx);
+        fmpz_mod_poly_clear(tmp, ctx);
         _fmpz_vec_clear(x, n);
+        fmpz_mod_ctx_clear(ctx);
         fmpz_clear(mod);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
