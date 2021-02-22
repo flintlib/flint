@@ -1192,7 +1192,14 @@ FLINT_DLL void fmpz_mod_mpoly_from_mpolyv(fmpz_mod_mpoly_t A, flint_bitcnt_t Abi
                                                    const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mod_mpoly_vec_content_mpoly(fmpz_mod_mpoly_t g,
-          const fmpz_mod_mpoly_struct * A, slong Alen, const fmpz_mod_mpoly_ctx_t ctx);
+                                const fmpz_mod_mpoly_struct * A, slong Alen,
+                                              const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mod_mpoly_vec_divexact_mpoly(fmpz_mod_mpoly_struct * A,
+         slong Alen, const fmpz_mod_mpoly_t c, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mod_mpoly_vec_mul_mpoly(fmpz_mod_mpoly_struct * A,
+         slong Alen, const fmpz_mod_mpoly_t c, const fmpz_mod_mpoly_ctx_t ctx);
 
 /*****************************************************************************/
 

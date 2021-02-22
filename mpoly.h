@@ -1324,7 +1324,8 @@ FLINT_DLL void mpoly_from_mpolyl_perm_inflate(
 #define MPOLY_GCD_USE_BROWN   2
 #define MPOLY_GCD_USE_ZIPPEL  4
 #define MPOLY_GCD_USE_ZIPPEL2 8
-#define MPOLY_GCD_USE_ALL     15
+#define MPOLY_GCD_USE_PRS     16
+#define MPOLY_GCD_USE_ALL     31
 
 typedef struct
 {

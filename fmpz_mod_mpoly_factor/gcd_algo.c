@@ -652,6 +652,125 @@ static int _try_divides(
 }
 
 
+/********************* Hit A and B with a prs ********************************/
+
+static int _try_prs(
+    fmpz_mod_mpoly_t G,
+    fmpz_mod_mpoly_t Abar,
+    fmpz_mod_mpoly_t Bbar,
+    const fmpz_mod_mpoly_t A,
+    const fmpz_mod_mpoly_t B,
+    const mpoly_gcd_info_t I,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    int success;
+    slong j, var = -WORD(1);
+    fmpz_mod_mpoly_t Ac, Bc, Gc, s, t;
+    fmpz_mod_mpoly_univar_t Ax, Bx, Gx;
+
+    for (j = 0; j < ctx->minfo->nvars; j++)
+    {
+        if (I->Amax_exp[j] <= I->Amin_exp[j] ||
+            I->Bmax_exp[j] <= I->Bmin_exp[j] /* not needed */)
+        {
+            FLINT_ASSERT(I->Amax_exp[j] == I->Amin_exp[j]);
+            FLINT_ASSERT(I->Bmax_exp[j] == I->Bmin_exp[j]);
+            continue;
+        }
+
+        FLINT_ASSERT(I->Gstride[j] != UWORD(0));
+        FLINT_ASSERT((I->Amax_exp[j] - I->Amin_exp[j]) % I->Gstride[j] == 0);
+        FLINT_ASSERT((I->Bmax_exp[j] - I->Bmin_exp[j]) % I->Gstride[j] == 0);
+
+        var = j;
+        break;
+    }
+
+    if (var < 0)
+        return 0;
+
+    fmpz_mod_mpoly_init(Ac, ctx);
+    fmpz_mod_mpoly_init(Bc, ctx);
+    fmpz_mod_mpoly_init(Gc, ctx);
+    fmpz_mod_mpoly_init(s, ctx);
+    fmpz_mod_mpoly_init(t, ctx);
+    fmpz_mod_mpoly_univar_init(Ax, ctx);
+    fmpz_mod_mpoly_univar_init(Bx, ctx);
+    fmpz_mod_mpoly_univar_init(Gx, ctx);
+
+    fmpz_mod_mpoly_to_univar(Ax, A, var, ctx);
+    fmpz_mod_mpoly_to_univar(Bx, B, var, ctx);
+
+    success = _fmpz_mod_mpoly_vec_content_mpoly(Ac, Ax->coeffs, Ax->length, ctx) &&
+              _fmpz_mod_mpoly_vec_content_mpoly(Bc, Bx->coeffs, Bx->length, ctx) &&
+              fmpz_mod_mpoly_gcd(Gc, Ac, Bc, ctx);
+    if (!success)
+        goto cleanup;
+
+    _fmpz_mod_mpoly_vec_divexact_mpoly(Ax->coeffs, Ax->length, Ac, ctx);
+    _fmpz_mod_mpoly_vec_divexact_mpoly(Bx->coeffs, Bx->length, Bc, ctx);
+
+    success = fmpz_cmp(Ax->exps + 0, Bx->exps + 0) > 0 ?
+                _fmpz_mod_mpoly_univar_pgcd_ducos(Gx, Ax, Bx, ctx) :
+                _fmpz_mod_mpoly_univar_pgcd_ducos(Gx, Bx, Ax, ctx);
+
+    if (!success)
+        goto cleanup;
+
+    if (fmpz_mod_mpoly_gcd(t, Ax->coeffs + 0, Bx->coeffs + 0, ctx) &&
+                                                                t->length == 1)
+    {
+        fmpz_mod_mpoly_term_content(s, Gx->coeffs + 0, ctx);
+        fmpz_mod_mpoly_divexact(t, Gx->coeffs + 0, s, ctx);
+        _fmpz_mod_mpoly_vec_divexact_mpoly(Gx->coeffs, Gx->length, t, ctx);
+    }
+    else if (fmpz_mod_mpoly_gcd(t, Ax->coeffs + Ax->length - 1,
+                           Bx->coeffs + Bx->length - 1, ctx) && t->length == 1)
+    {
+        fmpz_mod_mpoly_term_content(s, Gx->coeffs + Gx->length - 1, ctx);
+        fmpz_mod_mpoly_divexact(t, Gx->coeffs + Gx->length - 1, s, ctx);
+        _fmpz_mod_mpoly_vec_divexact_mpoly(Gx->coeffs, Gx->length, t, ctx);
+    }
+
+    success = _fmpz_mod_mpoly_vec_content_mpoly(t, Gx->coeffs, Gx->length, ctx);
+    if (!success)
+        goto cleanup;
+
+    _fmpz_mod_mpoly_vec_divexact_mpoly(Gx->coeffs, Gx->length, t, ctx);
+    _fmpz_mod_mpoly_vec_mul_mpoly(Gx->coeffs, Gx->length, Gc, ctx);
+    _fmpz_mod_mpoly_from_univar(Gc, I->Gbits, Gx, var, ctx);
+
+    if (Abar != NULL)
+        fmpz_mod_mpoly_divexact(s, A, Gc, ctx);
+
+    if (Bbar != NULL)
+        fmpz_mod_mpoly_divexact(t, B, Gc, ctx);
+
+    fmpz_mod_mpoly_swap(G, Gc, ctx);
+
+    if (Abar != NULL)
+        fmpz_mod_mpoly_swap(Abar, s, ctx);
+
+    if (Bbar != NULL)
+        fmpz_mod_mpoly_swap(Bbar, t, ctx);
+
+    success = 1;
+
+cleanup:
+
+    fmpz_mod_mpoly_clear(Ac, ctx);
+    fmpz_mod_mpoly_clear(Bc, ctx);
+    fmpz_mod_mpoly_clear(Gc, ctx);
+    fmpz_mod_mpoly_clear(s, ctx);
+    fmpz_mod_mpoly_clear(t, ctx);
+    fmpz_mod_mpoly_univar_clear(Ax, ctx);
+    fmpz_mod_mpoly_univar_clear(Bx, ctx);
+    fmpz_mod_mpoly_univar_clear(Gx, ctx);
+
+    return success;
+}
+
+
 /********************** Hit A and B with zippel ******************************/
 
 static int _try_zippel(
@@ -1419,6 +1538,12 @@ skip_monomial_cofactors:
 
         if (try_b && _try_divides(G, Abar, Bbar, A, B, ctx))
             goto successful;
+    }
+
+    if (algo == MPOLY_GCD_USE_PRS)
+    {
+        success = _try_prs(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
     }
 
     if (I->mvars < 3)
