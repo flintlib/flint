@@ -11,7 +11,10 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_set_ui(
+    nmod_mpoly_t A,
+    ulong c,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N;
 
@@ -31,3 +34,12 @@ void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
     mpoly_monomial_zero(A->exps, N);
     _nmod_mpoly_set_length(A, 1, ctx);
 }
+
+void nmod_mpoly_set_fmpz(
+    nmod_mpoly_t A,
+    const fmpz_t c,
+    const nmod_mpoly_ctx_t ctx)
+{
+    nmod_mpoly_set_ui(A, fmpz_fdiv_ui(c, ctx->mod.n), ctx);
+}
+

@@ -19,8 +19,8 @@ void fq_nmod_mpoly_set_ui(
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (c >= fq_nmod_ctx_mod(ctx->fqctx).n)
-        NMOD_RED(c, c, fq_nmod_ctx_mod(ctx->fqctx));
+    if (c >= ctx->fqctx->mod.n)
+        NMOD_RED(c, c, ctx->fqctx->mod);
 
     if (c == 0)
     {
@@ -34,3 +34,13 @@ void fq_nmod_mpoly_set_ui(
     mpoly_monomial_zero(A->exps, N);
     _fq_nmod_mpoly_set_length(A, 1, ctx);
 }
+
+
+void fq_nmod_mpoly_set_fmpz(
+    fq_nmod_mpoly_t A,
+    const fmpz_t c,
+    const fq_nmod_mpoly_ctx_t ctx)
+{
+    fq_nmod_mpoly_set_ui(A, fmpz_fdiv_ui(c, ctx->fqctx->mod.n), ctx);
+}
+

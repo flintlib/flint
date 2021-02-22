@@ -471,8 +471,11 @@ FLINT_DLL int nmod_mpoly_is_ui(const nmod_mpoly_t A,
 FLINT_DLL ulong nmod_mpoly_get_ui(const nmod_mpoly_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t A,
-                                          ulong c, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_fmpz(nmod_mpoly_t A, const fmpz_t c,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
 void nmod_mpoly_zero(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
@@ -1748,34 +1751,6 @@ FLINT_DLL void nmod_mpoly_geobucket_add(nmod_mpoly_geobucket_t B,
 
 FLINT_DLL void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B,
                                    nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_set_ui(nmod_mpoly_geobucket_t B,
-                                          ulong c, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_gen(nmod_mpoly_geobucket_t B, slong var,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_add_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_sub_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_neg_inplace(nmod_mpoly_geobucket_t B1,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_pow_ui_inplace(nmod_mpoly_geobucket_t B1,
-                                          ulong k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_pow_fmpz_inplace(nmod_mpoly_geobucket_t B1,
-                                   const fmpz_t k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_geobucket_divides_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
 
 
 /******************************************************************************
