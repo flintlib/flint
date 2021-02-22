@@ -166,6 +166,10 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_
 FLINT_DLL void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res,
                 const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL int fmpz_mod_poly_is_canonical(const fmpz_mod_poly_t A,
+                                                     const fmpz_mod_ctx_t ctx);
+
+
 /*  Randomisation ************************************************************/
 
 FLINT_DLL void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state,
