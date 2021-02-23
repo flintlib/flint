@@ -17,3 +17,19 @@ void fmpz_mod_set_fmpz(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
+
+void fmpz_mod_set_ui(fmpz_t a, ulong b, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_set_ui(a, b);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_set_si(fmpz_t a, slong b, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_set_si(a, b);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}

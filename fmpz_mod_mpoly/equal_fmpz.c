@@ -32,6 +32,19 @@ int fmpz_mod_mpoly_equal_fmpz(
     return fmpz_mod_equal_fmpz(A->coeffs + 0, c, ctx->ffinfo);
 }
 
+int fmpz_mod_mpoly_equal_ui(
+    const fmpz_mod_mpoly_t A,
+    ulong c,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    int result;
+    fmpz_t C;
+    fmpz_init_set_ui(C, c);
+    result = fmpz_mod_mpoly_equal_fmpz(A, C, ctx);
+    fmpz_clear(C);
+    return result;
+}
+
 int fmpz_mod_mpoly_equal_si(
     const fmpz_mod_mpoly_t A,
     slong c,

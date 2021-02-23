@@ -107,10 +107,12 @@ FLINT_DLL int fmpz_mod_equal_fmpz(const fmpz_t a, const fmpz_t b,
 FLINT_DLL int fmpz_mod_equal_si(const fmpz_t a, slong b,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_set_si(fmpz_t a, slong b, const fmpz_mod_ctx_t ctx);
-
 FLINT_DLL void fmpz_mod_set_fmpz(fmpz_t a, const fmpz_t b,
                                                      const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_set_ui(fmpz_t a, ulong b, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_set_si(fmpz_t a, slong b, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);

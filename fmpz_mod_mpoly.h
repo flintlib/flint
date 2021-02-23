@@ -182,16 +182,9 @@ FMPZ_MOD_MPOLY_INLINE
 void _fmpz_mod_mpoly_set_length(fmpz_mod_mpoly_t A, slong newlen, 
                                                 const fmpz_mod_mpoly_ctx_t ctx)
 {
-/*
-    slong i;
-*/
-
     FLINT_ASSERT(newlen <= A->coeffs_alloc);
     FLINT_ASSERT(mpoly_words_per_exp(A->bits, ctx->minfo)*newlen <= A->exps_alloc);
-/*
-    for (i = A->length - 1; i >= newlen; i--)
-       _fmpz_demote(A->coeffs + i);
-*/
+
     A->length = newlen;
 }
 
@@ -267,6 +260,9 @@ FLINT_DLL void fmpz_mod_mpoly_set_fmpz_mod(fmpz_mod_mpoly_t A,
 FLINT_DLL void fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_t A,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_mpoly_set_ui(fmpz_mod_mpoly_t A,
+                                      slong c, const fmpz_mod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mod_mpoly_set_si(fmpz_mod_mpoly_t A,
                                       slong c, const fmpz_mod_mpoly_ctx_t ctx);
 
@@ -284,6 +280,9 @@ void fmpz_mod_mpoly_one(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx)
 
 FLINT_DLL int fmpz_mod_mpoly_equal_fmpz(const fmpz_mod_mpoly_t A,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_mpoly_equal_ui(const fmpz_mod_mpoly_t A,
+                                      ulong c, const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_mpoly_equal_si(const fmpz_mod_mpoly_t A,
                                       slong c, const fmpz_mod_mpoly_ctx_t ctx);
@@ -384,8 +383,20 @@ FLINT_DLL void _fmpz_mod_mpoly_set_coeff_fmpz_fmpz(fmpz_mod_mpoly_t A,
 FLINT_DLL void fmpz_mod_mpoly_set_coeff_fmpz_fmpz(fmpz_mod_mpoly_t A,
            const fmpz_t c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_mpoly_set_coeff_ui_fmpz(fmpz_mod_mpoly_t A,
+                  ulong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_set_coeff_si_fmpz(fmpz_mod_mpoly_t A,
+                  slong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mod_mpoly_set_coeff_fmpz_ui(fmpz_mod_mpoly_t A,
             const fmpz_t c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_set_coeff_ui_ui(fmpz_mod_mpoly_t A,
+                   ulong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_set_coeff_si_ui(fmpz_mod_mpoly_t A,
+                   slong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_get_coeff_vars_ui(fmpz_mod_mpoly_t C,
              const fmpz_mod_mpoly_t A, const slong * vars, const ulong * exps,
@@ -399,24 +410,15 @@ FMPZ_MOD_MPOLY_INLINE fmpz * fmpz_mod_mpoly_leadcoeff(fmpz_mod_mpoly_t A)
 
 /* conversion ****************************************************************/
 
-FLINT_DLL int fmpz_mod_mpoly_is_fmpz_mod_poly(
-    const fmpz_mod_mpoly_t A,
-    slong var,
-    const fmpz_mod_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mod_mpoly_is_fmpz_mod_poly(const fmpz_mod_mpoly_t A,
+                                    slong var, const fmpz_mod_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mod_mpoly_get_fmpz_mod_poly(
-    fmpz_mod_poly_t A,
-    const fmpz_mod_mpoly_t B,
-    slong var,
-    const fmpz_mod_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mod_mpoly_get_fmpz_mod_poly(fmpz_mod_poly_t A,
+          const fmpz_mod_mpoly_t B, slong var, const fmpz_mod_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mod_mpoly_set_fmpz_mod_poly(
-    fmpz_mod_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const fmpz * Bcoeffs,
-    slong Blen,
-    slong var,
-    const fmpz_mod_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mod_mpoly_set_fmpz_mod_poly(fmpz_mod_mpoly_t A,
+                    flint_bitcnt_t Abits, const fmpz * Bcoeffs, slong Blen,
+                                    slong var, const fmpz_mod_mpoly_ctx_t ctx);
 
 /* comparison ****************************************************************/
 
@@ -444,6 +446,12 @@ FLINT_DLL void fmpz_mod_mpoly_get_term_coeff_fmpz(fmpz_t c,
 
 FLINT_DLL void fmpz_mod_mpoly_set_term_coeff_fmpz(fmpz_mod_mpoly_t A, slong i,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_set_term_coeff_ui(fmpz_mod_mpoly_t A, slong i,
+                                      ulong c, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_set_term_coeff_si(fmpz_mod_mpoly_t A, slong i,
+                                      slong c, const fmpz_mod_mpoly_ctx_t ctx);
 
 FMPZ_MOD_MPOLY_INLINE
 int fmpz_mod_mpoly_term_exp_fits_ui(const fmpz_mod_mpoly_t A, slong i,
@@ -491,8 +499,20 @@ FLINT_DLL void fmpz_mod_mpoly_get_term_monomial(fmpz_mod_mpoly_t M,
 FLINT_DLL void fmpz_mod_mpoly_push_term_fmpz_fmpz(fmpz_mod_mpoly_t A,
            const fmpz_t c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_mpoly_push_term_ui_fmpz(fmpz_mod_mpoly_t A,
+                  ulong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_push_term_si_fmpz(fmpz_mod_mpoly_t A,
+                  slong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mod_mpoly_push_term_fmpz_ui(fmpz_mod_mpoly_t A,
-           const fmpz_t c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
+            const fmpz_t c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_push_term_ui_ui(fmpz_mod_mpoly_t A,
+                   ulong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_push_term_si_ui(fmpz_mod_mpoly_t A,
+                   slong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_sort_terms(fmpz_mod_mpoly_t A,
                                                const fmpz_mod_mpoly_ctx_t ctx);
@@ -547,12 +567,20 @@ FLINT_DLL void fmpz_mod_mpoly_add_fmpz(fmpz_mod_mpoly_t A,
                                     const fmpz_mod_mpoly_t B, const fmpz_t c,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_mpoly_add_ui(fmpz_mod_mpoly_t A,
+                                    const fmpz_mod_mpoly_t B, ulong c,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mod_mpoly_add_si(fmpz_mod_mpoly_t A,
                                     const fmpz_mod_mpoly_t B, slong c,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_sub_fmpz(fmpz_mod_mpoly_t A,
                                     const fmpz_mod_mpoly_t B, const fmpz_t c,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_sub_ui(fmpz_mod_mpoly_t A,
+                                    const fmpz_mod_mpoly_t B, ulong c,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_sub_si(fmpz_mod_mpoly_t A,
@@ -578,12 +606,21 @@ FLINT_DLL void fmpz_mod_mpoly_scalar_mul_fmpz(fmpz_mod_mpoly_t A,
                                     const fmpz_mod_mpoly_t B, const fmpz_t c,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_t A,
-                     const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mod_mpoly_scalar_mul_ui(fmpz_mod_mpoly_t A,
+                                    const fmpz_mod_mpoly_t B, ulong c,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_scalar_mul_si(fmpz_mod_mpoly_t A,
+                                    const fmpz_mod_mpoly_t B, slong c,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_scalar_addmul_fmpz(fmpz_mod_mpoly_t A,
                         const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_t C,
                                const fmpz_t d, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_t A,
+                     const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx);
+
 
 /* Differention **************************************************************/
 
@@ -611,10 +648,6 @@ FLINT_DLL void _fmpz_mod_mpoly_compose_mat(fmpz_mod_mpoly_t A,
             const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
 
 FLINT_DLL int fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(fmpz_mod_mpoly_t A,
-            const fmpz_mod_mpoly_t B, fmpz_mod_mpoly_struct * const * C,
-            const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
-
-FLINT_DLL int fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(fmpz_mod_mpoly_t A,
             const fmpz_mod_mpoly_t B, fmpz_mod_mpoly_struct * const * C,
             const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
 
@@ -686,7 +719,7 @@ void fmpz_mod_mpoly_divexact(
     if (fmpz_mod_mpoly_divides(Q, A, B, ctx))
         return;
 
-    flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_divexact");
+    flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_divexact: nonexact division");
 }
 
 FLINT_DLL int _fmpz_mod_mpoly_divides_dense_maxfields(fmpz_mod_mpoly_t Q,
@@ -796,6 +829,109 @@ FLINT_DLL void fmpz_mod_mpoly_inflate(fmpz_mod_mpoly_t A,
             const fmpz_mod_mpoly_t B, const fmpz * shift, const fmpz * stride,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
+/* Univariates ***************************************************************/
+
+FLINT_DLL void fmpz_mod_mpoly_univar_init(fmpz_mod_mpoly_univar_t A,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_univar_clear(fmpz_mod_mpoly_univar_t A,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_univar_fit_length(fmpz_mod_mpoly_univar_t A,
+                                 slong length, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_univar_print_pretty(const fmpz_mod_mpoly_univar_t A,
+                              const char ** x, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_univar_assert_canonical(fmpz_mod_mpoly_univar_t A,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FMPZ_MOD_MPOLY_INLINE
+void fmpz_mod_mpoly_univar_zero(fmpz_mod_mpoly_univar_t A,
+                                                const fmpz_mod_mpoly_ctx_t ctx)
+{
+    A->length = 0;
+}
+
+FLINT_DLL void fmpz_mod_mpoly_univar_set_coeff_ui(fmpz_mod_mpoly_univar_t A,
+            ulong e, const fmpz_mod_mpoly_t c, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_to_univar(fmpz_mod_mpoly_univar_t A,
+          const fmpz_mod_mpoly_t B, slong var, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mod_mpoly_from_univar(fmpz_mod_mpoly_t A,
+            flint_bitcnt_t Abits, const fmpz_mod_mpoly_univar_t B, slong var,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mpoly_from_univar(fmpz_mod_mpoly_t A,
+                                  const fmpz_mod_mpoly_univar_t B, slong var,
+                                               const fmpz_mod_mpoly_ctx_t ctx);
+
+FMPZ_MOD_MPOLY_INLINE
+void fmpz_mod_mpoly_univar_swap(fmpz_mod_mpoly_univar_t A,
+                     fmpz_mod_mpoly_univar_t B, const fmpz_mod_mpoly_ctx_t ctx)
+{
+    fmpz_mod_mpoly_univar_struct t = *A;
+    *A = *B;
+    *B = t;
+}
+
+FMPZ_MOD_MPOLY_INLINE
+int fmpz_mod_mpoly_univar_degree_fits_si(const fmpz_mod_mpoly_univar_t A,
+                                                const fmpz_mod_mpoly_ctx_t ctx)
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
+
+FMPZ_MOD_MPOLY_INLINE
+slong fmpz_mod_mpoly_univar_length(const fmpz_mod_mpoly_univar_t A,
+                                                const fmpz_mod_mpoly_ctx_t ctx)
+{
+    return A->length;
+}
+
+FMPZ_MOD_MPOLY_INLINE
+slong fmpz_mod_mpoly_univar_get_term_exp_si(fmpz_mod_mpoly_univar_t A, slong i,
+                                                const fmpz_mod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
+}
+
+FMPZ_MOD_MPOLY_INLINE
+void fmpz_mod_mpoly_univar_get_term_coeff(fmpz_mod_mpoly_t c,
+      const fmpz_mod_mpoly_univar_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    fmpz_mod_mpoly_set(c, A->coeffs + i, ctx);
+}
+
+FMPZ_MOD_MPOLY_INLINE
+void fmpz_mod_mpoly_univar_swap_term_coeff(fmpz_mod_mpoly_t c,
+            fmpz_mod_mpoly_univar_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    fmpz_mod_mpoly_swap(c, A->coeffs + i, ctx);
+}
+
+FLINT_DLL int fmpz_mod_mpoly_univar_resultant(
+    fmpz_mod_mpoly_t R,
+    const fmpz_mod_mpoly_univar_t Ax,
+    const fmpz_mod_mpoly_univar_t Bx,
+    const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_mpoly_univar_discriminant(
+    fmpz_mod_mpoly_t D,
+    const fmpz_mod_mpoly_univar_t Fx,
+    const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mod_mpoly_univar_pgcd_ducos(
+    fmpz_mod_mpoly_univar_t Gx,
+    const fmpz_mod_mpoly_univar_t Ax,
+    const fmpz_mod_mpoly_univar_t Bx,
+    const fmpz_mod_mpoly_ctx_t ctx);
+
+
 /******************************************************************************
 
    Internal functions (guaranteed to change without notice)
@@ -904,109 +1040,6 @@ FLINT_DLL void fmpz_mod_mpoly_from_mpolyl_perm_inflate(
     const slong * perm,
     const ulong * shift,
     const ulong * stride);
-
-
-/* Univariates ***************************************************************/
-
-FLINT_DLL void fmpz_mod_mpoly_univar_init(fmpz_mod_mpoly_univar_t A,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_mpoly_univar_clear(fmpz_mod_mpoly_univar_t A,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_mpoly_univar_fit_length(fmpz_mod_mpoly_univar_t A,
-                                 slong length, const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_mpoly_univar_print_pretty(const fmpz_mod_mpoly_univar_t A,
-                              const char ** x, const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_mpoly_univar_assert_canonical(fmpz_mod_mpoly_univar_t A,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
-
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_univar_zero(fmpz_mod_mpoly_univar_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    A->length = 0;
-}
-
-FLINT_DLL void fmpz_mod_mpoly_univar_set_coeff_ui(fmpz_mod_mpoly_univar_t A,
-            ulong e, const fmpz_mod_mpoly_t c, const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_mpoly_to_univar(fmpz_mod_mpoly_univar_t A,
-          const fmpz_mod_mpoly_t B, slong var, const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mod_mpoly_from_univar(fmpz_mod_mpoly_t A,
-            flint_bitcnt_t Abits, const fmpz_mod_mpoly_univar_t B, slong var,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_mpoly_from_univar(fmpz_mod_mpoly_t A,
-                                  const fmpz_mod_mpoly_univar_t B, slong var,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
-
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_univar_swap(fmpz_mod_mpoly_univar_t A,
-                     fmpz_mod_mpoly_univar_t B, const fmpz_mod_mpoly_ctx_t ctx)
-{
-    fmpz_mod_mpoly_univar_struct t = *A;
-    *A = *B;
-    *B = t;
-}
-
-FMPZ_MOD_MPOLY_INLINE
-int fmpz_mod_mpoly_univar_degree_fits_si(const fmpz_mod_mpoly_univar_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return A->length == 0 || fmpz_fits_si(A->exps + 0);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-slong fmpz_mod_mpoly_univar_length(const fmpz_mod_mpoly_univar_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return A->length;
-}
-
-FMPZ_MOD_MPOLY_INLINE
-slong fmpz_mod_mpoly_univar_get_term_exp_si(fmpz_mod_mpoly_univar_t A, slong i,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong)A->length);
-    return fmpz_get_si(A->exps + i);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_univar_get_term_coeff(fmpz_mod_mpoly_t c,
-      const fmpz_mod_mpoly_univar_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT((ulong)i < (ulong)A->length);
-    fmpz_mod_mpoly_set(c, A->coeffs + i, ctx);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_univar_swap_term_coeff(fmpz_mod_mpoly_t c,
-            fmpz_mod_mpoly_univar_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT((ulong)i < (ulong)A->length);
-    fmpz_mod_mpoly_swap(c, A->coeffs + i, ctx);
-}
-
-FLINT_DLL int fmpz_mod_mpoly_univar_resultant(
-    fmpz_mod_mpoly_t R,
-    const fmpz_mod_mpoly_univar_t Ax,
-    const fmpz_mod_mpoly_univar_t Bx,
-    const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mod_mpoly_univar_discriminant(
-    fmpz_mod_mpoly_t D,
-    const fmpz_mod_mpoly_univar_t Fx,
-    const fmpz_mod_mpoly_ctx_t ctx);
-
-FLINT_DLL int _fmpz_mod_mpoly_univar_pgcd_ducos(
-    fmpz_mod_mpoly_univar_t Gx,
-    const fmpz_mod_mpoly_univar_t Ax,
-    const fmpz_mod_mpoly_univar_t Bx,
-    const fmpz_mod_mpoly_ctx_t ctx);
 
 
 /******************************************************************************

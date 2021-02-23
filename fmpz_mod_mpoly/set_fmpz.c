@@ -37,6 +37,18 @@ void fmpz_mod_mpoly_set_fmpz(
 }
 
 
+void fmpz_mod_mpoly_set_ui(
+    fmpz_mod_mpoly_t A,
+    slong c,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    fmpz_mod_mpoly_fit_length(A, 1, ctx);
+    mpoly_monomial_zero(A->exps, mpoly_words_per_exp(A->bits, ctx->minfo));
+    fmpz_mod_set_ui(A->coeffs + 0, c, ctx->ffinfo);
+    _fmpz_mod_mpoly_set_length(A, !fmpz_is_zero(A->coeffs + 0), ctx);
+}
+
+
 void fmpz_mod_mpoly_set_si(
     fmpz_mod_mpoly_t A,
     slong c,
