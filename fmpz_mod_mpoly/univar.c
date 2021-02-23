@@ -691,7 +691,16 @@ int _fmpz_mod_mpoly_univar_pgcd_ducos(
     FLINT_ASSERT(polyP->length > 0);
     FLINT_ASSERT(polyQ->length > 0);
     FLINT_ASSERT(fmpz_cmp(polyP->exps + 0, polyQ->exps + 0) >= 0);
-    FLINT_ASSERT(fmpz_sgn(polyQ->exps + 0) > 0);
+    FLINT_ASSERT(fmpz_sgn(polyQ->exps + 0) >= 0);
+
+    if (fmpz_is_zero(polyQ->exps + 0))
+    {
+        fmpz_mod_mpoly_univar_fit_length(poly1, 1, ctx);
+        poly1->length = 1;
+        fmpz_zero(poly1->exps + 0);
+        return fmpz_mod_mpoly_pow_fmpz(poly1->coeffs + 0, polyQ->coeffs + 0,
+                                                         polyQ->exps + 0, ctx);
+    }
 
     fmpz_init(n);
     fmpz_init(d);
