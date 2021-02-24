@@ -420,6 +420,9 @@ FLINT_DLL void _fmpz_mod_mpoly_set_fmpz_mod_poly(fmpz_mod_mpoly_t A,
                     flint_bitcnt_t Abits, const fmpz * Bcoeffs, slong Blen,
                                     slong var, const fmpz_mod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_mpoly_set_fmpz_mod_poly(fmpz_mod_mpoly_t A,
+           const fmpz_mod_poly_t B, slong var, const fmpz_mod_mpoly_ctx_t ctx);
+
 /* comparison ****************************************************************/
 
 FLINT_DLL int fmpz_mod_mpoly_cmp(const fmpz_mod_mpoly_t A,

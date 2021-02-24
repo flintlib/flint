@@ -11,13 +11,18 @@
 
 #include "fmpz_mod_mpoly.h"
 
-void fmpz_mod_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mod_mpoly_t A, 
+void fmpz_mod_mpoly_get_term(fmpz_mod_mpoly_t M, const fmpz_mod_mpoly_t A,
                                        slong i, const fmpz_mod_mpoly_ctx_t ctx)
 {
-    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    flint_bitcnt_t bits = A->bits;
+    slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
     if (i >= (ulong) A->length)
-        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_get_term_exp_ui: index out of range");
+        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_get_term: index out of range");
 
-    mpoly_get_monomial_ui(exp, A->exps + N*i, A->bits, ctx->minfo);
+    fmpz_mod_mpoly_fit_length_reset_bits(M, 1, bits, ctx);
+    mpoly_monomial_set(M->exps + N*0, A->exps + N*i, N);
+    fmpz_set(M->coeffs + 0, A->coeffs + i);
+    _fmpz_mod_mpoly_set_length(M, 1, ctx);
 }
+

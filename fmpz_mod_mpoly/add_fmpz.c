@@ -88,6 +88,19 @@ void fmpz_mod_mpoly_add_fmpz(
     fmpz_clear(cc);
 }
 
+void fmpz_mod_mpoly_add_ui(
+    fmpz_mod_mpoly_t A,
+    const fmpz_mod_mpoly_t B,
+    ulong c,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    fmpz_t cc;
+    fmpz_init(cc);
+    fmpz_mod_set_ui(cc, c, ctx->ffinfo);
+    fmpz_mod_mpoly_add_fmpz_mod(A, B, cc, ctx);
+    fmpz_clear(cc);
+}
+
 void fmpz_mod_mpoly_add_si(
     fmpz_mod_mpoly_t A,
     const fmpz_mod_mpoly_t B,

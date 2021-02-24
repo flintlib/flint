@@ -102,3 +102,30 @@ void fmpz_mod_mpoly_scalar_mul_fmpz(
         fmpz_clear(cc);
     }
 }
+
+void fmpz_mod_mpoly_scalar_mul_ui(
+    fmpz_mod_mpoly_t A,
+    const fmpz_mod_mpoly_t B,
+    ulong c,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    fmpz_t cc;
+    fmpz_init(cc);
+    fmpz_mod_set_ui(cc, c, ctx->ffinfo);
+    fmpz_mod_mpoly_scalar_mul_fmpz_mod(A, B, cc, ctx);
+    fmpz_clear(cc);
+}
+
+void fmpz_mod_mpoly_scalar_mul_si(
+    fmpz_mod_mpoly_t A,
+    const fmpz_mod_mpoly_t B,
+    slong c,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    fmpz_t cc;
+    fmpz_init(cc);
+    fmpz_mod_set_si(cc, c, ctx->ffinfo);
+    fmpz_mod_mpoly_scalar_mul_fmpz_mod(A, B, cc, ctx);
+    fmpz_clear(cc);
+}
+

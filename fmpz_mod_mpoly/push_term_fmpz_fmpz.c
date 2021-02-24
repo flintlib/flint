@@ -57,3 +57,24 @@ void fmpz_mod_mpoly_push_term_fmpz_fmpz(
     _fmpz_mod_mpoly_push_exp_pfmpz(A, exp, ctx);
     fmpz_mod_set_fmpz(A->coeffs + A->length - 1, c, ctx->ffinfo);
 }
+
+void fmpz_mod_mpoly_push_term_ui_fmpz(
+    fmpz_mod_mpoly_t A,
+    ulong c,
+    fmpz * const * exp,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    _fmpz_mod_mpoly_push_exp_pfmpz(A, exp, ctx);
+    fmpz_mod_set_ui(A->coeffs + A->length - 1, c, ctx->ffinfo);
+}
+
+void fmpz_mod_mpoly_push_term_si_fmpz(
+    fmpz_mod_mpoly_t A,
+    slong c,
+    fmpz * const * exp,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    _fmpz_mod_mpoly_push_exp_pfmpz(A, exp, ctx);
+    fmpz_mod_set_si(A->coeffs + A->length - 1, c, ctx->ffinfo);
+}
+
