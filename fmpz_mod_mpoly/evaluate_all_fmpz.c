@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018,2020 Daniel Schultz
+    Copyright (C) 2020, 2021 Daniel Schultz
 
     This file is part of FLINT.
 

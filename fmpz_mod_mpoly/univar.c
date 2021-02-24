@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -132,7 +132,8 @@ void fmpz_mod_mpoly_univar_assert_canonical(
             fmpz_sgn(A->exps + i) < 0 ||
             fmpz_sgn(A->exps + i + 1) < 0)
         {
-            flint_throw(FLINT_ERROR, "Univariate polynomial exponents out of order");
+            flint_throw(FLINT_ERROR,
+                               "Univariate polynomial exponents out of order");
         }
     }
 
@@ -172,7 +173,8 @@ static void _mpoly_rbnode_clear_sp(
     FLINT_ASSERT(A->length < A->alloc);
 
     fmpz_set_si(A->exps + A->length, node->key);
-    fmpz_mod_mpoly_swap(A->coeffs + A->length, (fmpz_mod_mpoly_struct *)(node->data), NULL);
+    fmpz_mod_mpoly_swap(A->coeffs + A->length,
+                                  (fmpz_mod_mpoly_struct *)(node->data), NULL);
     A->length++;
 
     fmpz_mod_mpoly_clear(node->data, NULL);
@@ -196,7 +198,8 @@ static void _mpoly_rbnode_clear_mp(
     FLINT_ASSERT(A->length < A->alloc);
 
     fmpz_swap(A->exps + A->length, (fmpz*)(&node->key));
-    fmpz_mod_mpoly_swap(A->coeffs + A->length, (fmpz_mod_mpoly_struct *)(node->data), NULL);
+    fmpz_mod_mpoly_swap(A->coeffs + A->length,
+                                  (fmpz_mod_mpoly_struct *)(node->data), NULL);
     A->length++;
 
     fmpz_clear((fmpz*)(&node->key));
@@ -518,9 +521,9 @@ void fmpz_mod_mpoly_from_univar(
     TMP_START;
 
     /* find bits required to represent result */
-    gen_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    tmp_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    max_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    gen_fields = TMP_ARRAY_ALLOC(3*ctx->minfo->nfields, fmpz);
+    tmp_fields = gen_fields + ctx->minfo->nfields;
+    max_fields = tmp_fields + ctx->minfo->nfields;
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
         fmpz_init(gen_fields + i);
@@ -533,7 +536,8 @@ void fmpz_mod_mpoly_from_univar(
     for (i = 0; i < B->length; i++)
     {
         fmpz_mod_mpoly_struct * Bi = B->coeffs + i;
-        mpoly_max_fields_fmpz(tmp_fields, Bi->exps, Bi->length, Bi->bits, ctx->minfo);
+        mpoly_max_fields_fmpz(tmp_fields, Bi->exps, Bi->length, Bi->bits,
+                                                                   ctx->minfo);
         _fmpz_vec_scalar_addmul_fmpz(tmp_fields, gen_fields, n, B->exps + i);
         _fmpz_vec_max_inplace(max_fields, tmp_fields, n);
     }
@@ -634,17 +638,22 @@ looper:
             i++;
             j++;
         }
-        else if (i < A->length && (j >= B->length || fmpz_cmp(A->exps + i, z1) > 0))
+        else if (i < A->length && (j >= B->length ||
+                                                fmpz_cmp(A->exps + i, z1) > 0))
         {
-            fmpz_mod_mpoly_mul(C->coeffs + C->length, A->coeffs + i, B->coeffs + 0, ctx);
-            fmpz_mod_mpoly_neg(C->coeffs + C->length, C->coeffs + C->length, ctx);
+            fmpz_mod_mpoly_mul(C->coeffs + C->length, A->coeffs + i,
+                                                           B->coeffs + 0, ctx);
+            fmpz_mod_mpoly_neg(C->coeffs + C->length,
+                                                   C->coeffs + C->length, ctx);
             fmpz_set(C->exps + C->length, A->exps + i);
             i++;
         }
         else
         {
-            FLINT_ASSERT(j < B->length && (i >= A->length || fmpz_cmp(A->exps + i, z1) < 0));
-            fmpz_mod_mpoly_mul(C->coeffs + C->length, A->coeffs + 0, B->coeffs + j, ctx);
+            FLINT_ASSERT(j < B->length && (i >= A->length ||
+                                               fmpz_cmp(A->exps + i, z1) < 0));
+            fmpz_mod_mpoly_mul(C->coeffs + C->length, A->coeffs + 0,
+                                                           B->coeffs + j, ctx);
             fmpz_set(C->exps + C->length, z1);
             j++;
         }
@@ -674,7 +683,10 @@ done:
     fmpz_mod_mpoly_clear(v, ctx);
 }
 
-
+/*
+    poly1 = pseudo-gcd of P and Q
+          = last nonzero subresultant polynomial starting with P and Q
+*/
 int _fmpz_mod_mpoly_univar_pgcd_ducos(
     fmpz_mod_mpoly_univar_t poly1,
     const fmpz_mod_mpoly_univar_t polyP,
@@ -766,29 +778,36 @@ looper:
         {
             fmpz_mod_mpoly_univar_fit_length(D, D->length + 1, ctx);
 
-            if (i < A->length && j < B->length && fmpz_equal(A->exps + i, B->exps + j))
+            if (i < A->length && j < B->length &&
+                                          fmpz_equal(A->exps + i, B->exps + j))
             {
                 fmpz_mod_mpoly_mul(u, A->coeffs + i, B->coeffs + 0, ctx);
                 fmpz_mod_mpoly_mul(v, A->coeffs + 1, B->coeffs + j, ctx);
                 fmpz_mod_mpoly_sub(w, u, v, ctx);
-                fmpz_mod_mpoly_divexact(D->coeffs + D->length, w, A->coeffs + 0, ctx);
+                fmpz_mod_mpoly_divexact(D->coeffs + D->length, w,
+                                                           A->coeffs + 0, ctx);
                 fmpz_set(D->exps + D->length, A->exps + i);
                 i++;
                 j++;                
             }
-            else if (i < A->length && (j >= B->length || fmpz_cmp(A->exps + i, B->exps + j) > 0))
+            else if (i < A->length && (j >= B->length ||
+                                       fmpz_cmp(A->exps + i, B->exps + j) > 0))
             {
                 fmpz_mod_mpoly_mul(u, A->coeffs + i, B->coeffs + 0, ctx);
-                fmpz_mod_mpoly_divexact(D->coeffs + D->length, u, A->coeffs + 0, ctx);
+                fmpz_mod_mpoly_divexact(D->coeffs + D->length, u,
+                                                           A->coeffs + 0, ctx);
                 fmpz_set(D->exps + D->length, A->exps + i);
                 i++;
             }
             else
             {
-                FLINT_ASSERT((j < B->length && (i >= A->length || fmpz_cmp(B->exps + j, A->exps + i) > 0)));
+                FLINT_ASSERT((j < B->length && (i >= A->length ||
+                                     fmpz_cmp(B->exps + j, A->exps + i) > 0)));
                 fmpz_mod_mpoly_mul(v, A->coeffs + 1, B->coeffs + j, ctx);
-                fmpz_mod_mpoly_divexact(D->coeffs + D->length, v, A->coeffs + 0, ctx);
-                fmpz_mod_mpoly_neg(D->coeffs + D->length, D->coeffs + D->length, ctx);
+                fmpz_mod_mpoly_divexact(D->coeffs + D->length, v,
+                                                           A->coeffs + 0, ctx);
+                fmpz_mod_mpoly_neg(D->coeffs + D->length,
+                                                   D->coeffs + D->length, ctx);
                 fmpz_set(D->exps + D->length, B->exps + j);
                 j++;
             }
@@ -883,7 +902,8 @@ looper:
                 {
                     fmpz_mod_mpoly_mul(u, B->coeffs + 0, B->coeffs + j, ctx);
                     fmpz_mod_mpoly_divexact(A->coeffs + A->length, u, s, ctx);
-                    fmpz_mod_mpoly_neg(A->coeffs + A->length, A->coeffs + A->length, ctx);
+                    fmpz_mod_mpoly_neg(A->coeffs + A->length,
+                                                   A->coeffs + A->length, ctx);
                 }
             }
 
@@ -962,7 +982,8 @@ looper:
         {
             fmpz_mod_mpoly_univar_fit_length(D, D->length + 1, ctx);
 
-            if (i < A->length && j < H->length && fmpz_equal(A->exps + i, H->exps + j))
+            if (i < A->length && j < H->length &&
+                                          fmpz_equal(A->exps + i, H->exps + j))
             {
                 fmpz_mod_mpoly_mul(u, A->coeffs + i, C->coeffs + 0, ctx);
                 fmpz_mod_mpoly_mul(v, A->coeffs + ae, H->coeffs + j, ctx);
@@ -971,17 +992,22 @@ looper:
                 i++;
                 j++;                
             }
-            else if (i < A->length && (j >= H->length || fmpz_cmp(A->exps + i, H->exps + j) > 0))
+            else if (i < A->length && (j >= H->length ||
+                                       fmpz_cmp(A->exps + i, H->exps + j) > 0))
             {
-                fmpz_mod_mpoly_mul(D->coeffs + D->length, A->coeffs + i, C->coeffs + 0, ctx);
+                fmpz_mod_mpoly_mul(D->coeffs + D->length,
+                                            A->coeffs + i, C->coeffs + 0, ctx);
                 fmpz_set(D->exps + D->length, A->exps + i);
                 i++;
             }
             else
             {
-                FLINT_ASSERT(j < H->length && (i >= A->length || fmpz_cmp(H->exps + j, A->exps + i) > 0));
-                fmpz_mod_mpoly_mul(D->coeffs + D->length, A->coeffs + ae, H->coeffs + j, ctx);
-                fmpz_mod_mpoly_neg(D->coeffs + D->length, D->coeffs + D->length, ctx);
+                FLINT_ASSERT(j < H->length && (i >= A->length ||
+                                      fmpz_cmp(H->exps + j, A->exps + i) > 0));
+                fmpz_mod_mpoly_mul(D->coeffs + D->length,
+                                           A->coeffs + ae, H->coeffs + j, ctx);
+                fmpz_mod_mpoly_neg(D->coeffs + D->length,
+                                                   D->coeffs + D->length, ctx);
                 fmpz_set(D->exps + D->length, H->exps + j);
                 j++;
             }
@@ -1008,16 +1034,19 @@ looper:
                     if (i < H->length)
                         fmpz_add_ui(z1, H->exps + i, 1);
 
-                    if (i < H->length && j < B->length && fmpz_equal(z1, B->exps + j))
+                    if (i < H->length && j < B->length &&
+                                                   fmpz_equal(z1, B->exps + j))
                     {
                         fmpz_mod_mpoly_mul(u, H->coeffs + 0, B->coeffs + j, ctx);
                         fmpz_mod_mpoly_divexact(v, u, B->coeffs + 0, ctx);
-                        fmpz_mod_mpoly_sub(T->coeffs + T->length, H->coeffs + i, v, ctx);
+                        fmpz_mod_mpoly_sub(T->coeffs + T->length,
+                                                        H->coeffs + i, v, ctx);
                         fmpz_set(T->exps + T->length, B->exps + j);
                         i++;
                         j++;                
                     }
-                    else if (i < H->length && (j >= B->length || fmpz_cmp(z1, B->exps + j) > 0))
+                    else if (i < H->length && (j >= B->length ||
+                                                fmpz_cmp(z1, B->exps + j) > 0))
                     {
                         fmpz_mod_mpoly_set(T->coeffs + T->length, H->coeffs + i, ctx);
                         fmpz_set(T->exps + T->length, z1);
@@ -1025,10 +1054,13 @@ looper:
                     }
                     else
                     {
-                        FLINT_ASSERT(j < B->length && (i >= H->length || fmpz_cmp(z1, B->exps + j) < 0));
+                        FLINT_ASSERT(j < B->length && (i >= H->length ||
+                                               fmpz_cmp(z1, B->exps + j) < 0));
                         fmpz_mod_mpoly_mul(u, H->coeffs + 0, B->coeffs + j, ctx);
-                        fmpz_mod_mpoly_divexact(T->coeffs + T->length, u, B->coeffs + 0, ctx);
-                        fmpz_mod_mpoly_neg(T->coeffs + T->length, T->coeffs + T->length, ctx);
+                        fmpz_mod_mpoly_divexact(T->coeffs + T->length, u,
+                                                           B->coeffs + 0, ctx);
+                        fmpz_mod_mpoly_neg(T->coeffs + T->length,
+                                                   T->coeffs + T->length, ctx);
                         fmpz_set(T->exps + T->length, B->exps + j);
                         j++;                
                     }
@@ -1060,15 +1092,18 @@ looper:
             {
                 fmpz_mod_mpoly_univar_fit_length(T, T->length + 1, ctx);
 
-                if (i < D->length && j < H->length && fmpz_equal(D->exps + i, H->exps + j))
+                if (i < D->length && j < H->length &&
+                                          fmpz_equal(D->exps + i, H->exps + j))
                 {
-                    fmpz_mod_mpoly_mul_johnson(u, H->coeffs + j, A->coeffs + aJ, ctx);
-                    fmpz_mod_mpoly_sub(T->coeffs + T->length, D->coeffs + i, u, ctx);
+                    fmpz_mod_mpoly_mul(u, H->coeffs + j, A->coeffs + aJ, ctx);
+                    fmpz_mod_mpoly_sub(T->coeffs + T->length, D->coeffs + i,
+                                                                       u, ctx);
                     fmpz_set(T->exps + T->length, D->exps + i);
                     i++;
                     j++;                
                 }
-                else if (i < D->length && (j >= H->length || fmpz_cmp(D->exps + i, H->exps + j) > 0))
+                else if (i < D->length && (j >= H->length ||
+                                       fmpz_cmp(D->exps + i, H->exps + j) > 0))
                 {
                     fmpz_mod_mpoly_set(T->coeffs + T->length, D->coeffs + i, ctx);
                     fmpz_set(T->exps + T->length, D->exps + i);
@@ -1076,9 +1111,12 @@ looper:
                 }
                 else
                 {
-                    FLINT_ASSERT(j < H->length && (i >= D->length || fmpz_cmp(D->exps + i, H->exps + j) < 0));
-                    fmpz_mod_mpoly_mul(T->coeffs + T->length, H->coeffs + j, A->coeffs + aJ, ctx);
-                    fmpz_mod_mpoly_neg(T->coeffs + T->length, T->coeffs + T->length, ctx);
+                    FLINT_ASSERT(j < H->length && (i >= D->length ||
+                                      fmpz_cmp(D->exps + i, H->exps + j) < 0));
+                    fmpz_mod_mpoly_mul(T->coeffs + T->length, H->coeffs + j,
+                                                          A->coeffs + aJ, ctx);
+                    fmpz_mod_mpoly_neg(T->coeffs + T->length,
+                                                   T->coeffs + T->length, ctx);
                     fmpz_set(T->exps + T->length, H->exps + j);
                     j++;
                 }
@@ -1174,12 +1212,14 @@ looper:
                 {
                     fmpz_mod_mpoly_mul(u, B->coeffs + 0, H->coeffs + j, ctx);
                     fmpz_mod_mpoly_divexact(T->coeffs + T->length, u, s, ctx);
-                    fmpz_mod_mpoly_neg(T->coeffs + T->length, T->coeffs + T->length, ctx);
+                    fmpz_mod_mpoly_neg(T->coeffs + T->length,
+                                                    T->coeffs + T->length, ctx);
                 }
             }
 
             if (((fmpz_get_ui(d) - fmpz_get_ui(e)) & 1) == 0)
-                fmpz_mod_mpoly_neg(T->coeffs + T->length, T->coeffs + T->length, ctx);            
+                fmpz_mod_mpoly_neg(T->coeffs + T->length,
+                                                   T->coeffs + T->length, ctx);            
 
             T->length += !fmpz_mod_mpoly_is_zero(T->coeffs + T->length, ctx);
 
@@ -1320,7 +1360,8 @@ int fmpz_mod_mpoly_univar_discriminant(
         /* the discriminant of the constant polynomial a should be 1/a^2 */
         fmpz_mod_mpoly_one(d, ctx);
         if (!fmpz_mod_mpoly_divides(d, d, fx->coeffs + 0, ctx))
-            flint_throw(FLINT_IMPINV, "fmpz_mod_mpoly_discriminant: non-unit constant polynomial");
+            flint_throw(FLINT_IMPINV,
+                  "fmpz_mod_mpoly_discriminant: non-unit constant polynomial");
         fmpz_mod_mpoly_mul(d, d, d, ctx);
         return 1;
     }

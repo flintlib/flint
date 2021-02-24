@@ -11,7 +11,7 @@ Types, macros and constants
 
 .. type:: fmpz_mpoly_struct
 
-    Context structure for ``fmpz_mpoly``.
+    A structure holding a multivariate integer polynomial.
 
 .. type:: fmpz_mpoly_t
 
@@ -19,7 +19,7 @@ Types, macros and constants
 
 .. type:: fmpz_mpoly_ctx_struct
 
-    A structure holding a multivariate integer polynomial.
+    Context structure for ``fmpz_mpoly``.
 
 .. type:: fmpz_mpoly_ctx_t
 
