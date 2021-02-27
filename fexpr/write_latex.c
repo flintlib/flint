@@ -1980,6 +1980,18 @@ fexpr_write_latex_simple(calcium_stream_t out, const fexpr_t expr, ulong flags)
             a = "";
             b = " \\text{ prime}";
             break;
+        case FEXPR_Enclosure:
+            a = "\\left(\\in ";
+            b = " \\right)";
+            break;
+        case FEXPR_Guess:
+            a = "\\left(?\\; ";
+            b = " \\right)";
+            break;
+        case FEXPR_Approximation:
+            a = "\\left(\\approx ";
+            b = " \\right)";
+            break;
         default:
             fexpr_write_latex_call(out, expr, flags);
             return;

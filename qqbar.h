@@ -400,6 +400,10 @@ int qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int f
 
 int qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x, slong max_bits, int flags, slong prec);
 
+/* Conversions to radicals and expressions */
+
+void qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, const qqbar_t x, int factoring);
+
 /* Internal functions */
 
 void qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c);

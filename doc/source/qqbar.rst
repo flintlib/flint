@@ -692,6 +692,49 @@ Guessing and simplification
     repeatedly with successively larger parameters when the size of the
     intended solution is unknown or may be much smaller than a worst-case bound.
 
+
+Conversion to radicals and expressions
+-------------------------------------------------------------------------------
+
+.. function:: void qqbar_get_quadratic(fmpz_t a, fmpz_t b, fmpz_t c, const fmpz_t q, const qqbar_t x, int factoring)
+
+    Assuming that *x* has degree 1 or 2, computes integers *a*, *b*, *c*
+    and *q* such that
+
+        .. math ::
+
+            x = \frac{a + b \sqrt{c}}{q}
+
+    and such that *c* is not a perfect square, *q* is positive, and
+    *q* has no content in common with both *a* and *b*. In other words,
+    this determines a quadratic field `\mathbb{Q}(\sqrt{c})` containing
+    *x*, and then finds the canonical reduced coefficients *a*, *b* and
+    *q* expressing *x* in this field.
+    For convenience, this function supports rational *x*,
+    for which *b* and *c* will both be set to zero.
+    The following remarks apply to irrationals.
+
+    The radicand *c* will not be a perfect square, but will not
+    automatically be squarefree since this would require factoring the
+    discriminant. As a special case, *c* will be set to `-1` if *x*
+    is a Gaussian rational number. Otherwise, behavior is controlled
+    by the *factoring* parameter.
+
+    * If *factoring* is 0, no factorization is performed apart from
+      removing powers of two.
+
+    * If *factoring* is 1, a complete factorization is performed (*c*
+      will be minimal). This can be very expensive if the discriminant
+      is large.
+
+    * If *factoring* is 2, a smooth factorization is performed to remove
+      small factors from *c*. This is a tradeoff that provides pretty
+      output in most cases while avoiding extreme worst-case slowdown.
+      The smooth factorization guarantees finding all small factors
+      (up to some trial division limit determined internally by Flint),
+      but large factors are only found heuristically.
+
+
 Internal functions
 -------------------------------------------------------------------------------
 
