@@ -233,6 +233,8 @@ void fmpz_mpoly_factor_append_ui(fmpz_mpoly_factor_t f, const fmpz_mpoly_t A,
 
 /*****************************************************************************/
 
+/*****************************************************************************/
+
 typedef struct
 {
     fmpz_mpoly_struct * coeffs;
@@ -281,6 +283,38 @@ FLINT_DLL void fmpz_mpoly_from_mpolyv(fmpz_mpoly_t A, flint_bitcnt_t Abits,
 FLINT_DLL int _fmpz_mpoly_vec_content_mpoly(fmpz_mpoly_t g,
           const fmpz_mpoly_struct * A, slong Alen, const fmpz_mpoly_ctx_t ctx);
 
+/*****************************************************************************/
+
+FLINT_DLL int _fmpz_mpoly_gcd_algo(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
+                 fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                const fmpz_mpoly_ctx_t ctx, unsigned int algo);
+
+FLINT_DLL void fmpz_mpoly_to_mpolyl_perm_deflate(
+                fmpz_mpoly_t A, const fmpz_mpoly_ctx_t lctx,
+                const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+                const slong * perm, const ulong * shift, const ulong * stride);
+
+FLINT_DLL void fmpz_mpoly_from_mpolyl_perm_inflate(fmpz_mpoly_t A,
+                flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
+                const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t lctx,
+                const slong * perm, const ulong * shift, const ulong * stride);
+
+FLINT_DLL int fmpz_mpolyl_gcd_brown(fmpz_mpoly_t G,
+        fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, fmpz_mpoly_t A, fmpz_mpoly_t B,
+                         const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t I);
+
+FLINT_DLL int fmpz_mpolyl_gcd_brown_threaded_pool(fmpz_mpoly_t G,
+        fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, fmpz_mpoly_t A, fmpz_mpoly_t B,
+                         const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
+                        const thread_pool_handle * handles, slong num_handles);
+
+FLINT_DLL int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G, fmpz_mpolyu_t Abar,
+                        fmpz_mpolyu_t Bbar, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+                           const fmpz_mpoly_ctx_t ctx, flint_rand_t randstate);
+
+FLINT_DLL int fmpz_mpolyl_gcd_zippel2(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
+                fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                         const fmpz_mpoly_t Gamma, const fmpz_mpoly_ctx_t ctx);
 
 /*****************************************************************************/
 

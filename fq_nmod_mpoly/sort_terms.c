@@ -14,7 +14,7 @@
 
 /*
     sort terms in [left, right) by exponent
-    assuming that bits in position >= pos are already sorted
+    assuming that bits in position > pos are already sorted
     and assuming exponent vectors fit into one word
     and assuming that all bit positions that need to be sorted are in totalmask
 */
@@ -27,76 +27,66 @@ void _fq_nmod_mpoly_radix_sort1(
     ulong totalmask,
     slong d)
 {
-    ulong mask, cmp;
+    ulong mask = UWORD(1) << pos;
+    ulong cmp = cmpmask & mask;
     slong mid, cur;
 
-    while (pos > 0)
+    FLINT_ASSERT(left <= right);
+    FLINT_ASSERT(pos < FLINT_BITS);
+
+    /* do nothing on lists of 0 or 1 elements */
+    if (left + 1 >= right)
     {
-        pos--;
+        return;
+    }
 
-        FLINT_ASSERT(left <= right);
-        FLINT_ASSERT(pos < FLINT_BITS);
-
-        mask = UWORD(1) << pos;
-        cmp = cmpmask & mask;
-
-        /* insertion base case */
-        if (right - left < 20)
-        {
-            slong i, j;
-
-            for (i = left + 1; i < right; i++)
-            {
-                for (j = i; j > left && mpoly_monomial_gt1(A->exps[j],
-                                                 A->exps[j - 1], cmpmask); j--)
-                {
-                    _n_fq_swap(A->coeffs + d*j, A->coeffs + d*(j - 1), d);
-                    ULONG_SWAP(A->exps[j], A->exps[j - 1]);
-                }
-            }
-
+    /* return if there is no information to sort on this bit */
+    if ((totalmask & mask) == WORD(0))
+    {
+        if (pos < 1)
             return;
-        }
 
-        /* return if there is no information to sort on this bit */
-        if ((totalmask & mask) == 0)
-            continue;
+        pos--;
+        _fq_nmod_mpoly_radix_sort1(A, left, right, pos, cmpmask, totalmask, d);
+        return;
+    }
 
-        /* find first 'zero' */
-        mid = left;
-        while (mid < right && (A->exps[mid] & mask) != cmp)
+    /* find first 'zero' */
+    mid = left;
+    while (mid < right && ((A->exps + 1*mid)[0] & mask) != cmp)
+    {
+        mid++;
+    }
+
+    /* make sure [left,mid)  doesn't match cmpmask in position pos 'one'
+                 [mid,right)    does match cmpmask in position pos 'zero' */
+    cur = mid;
+    while (++cur < right)
+    {
+        if (((A->exps + 1*cur)[0] & mask) != cmp)
+        {
+            _n_fq_swap(A->coeffs + d*cur, A->coeffs + d*mid, d);
+            mpoly_monomial_swap(A->exps + 1*cur, A->exps + 1*mid, 1);
             mid++;
-
-        /* make sure [left,mid)  doesn't match cmpmask in position pos 'one'
-                     [mid,right)    does match cmpmask in position pos 'zero' */
-        cur = mid;
-        while (++cur < right)
-        {
-            if ((A->exps[cur] & mask) != cmp)
-            {
-                _n_fq_swap(A->coeffs + d*cur, A->coeffs + d*mid, d);
-                ULONG_SWAP(A->exps[cur], A->exps[mid]);
-                mid++;
-            }
-        }
-
-        if (mid - left < right - mid)
-        {
-            _fq_nmod_mpoly_radix_sort1(A, left, mid, pos, cmpmask, totalmask, d);
-            left = mid;
-        }
-        else
-        {
-            _fq_nmod_mpoly_radix_sort1(A, mid, right, pos, cmpmask, totalmask, d);
-            right = mid;
         }
     }
+
+    if (pos < 1)
+        return;
+
+    pos--;
+    _fq_nmod_mpoly_radix_sort1(A, left,  mid, pos, cmpmask, totalmask, d);
+    _fq_nmod_mpoly_radix_sort1(A, mid, right, pos, cmpmask, totalmask, d);
 }
 
 
 /*
     sort terms in [left, right) by exponent
-    assuming that bits in position >= pos are already sorted
+    assuming that bits in position > pos are already sorted
+
+    TODO: Stack depth is proportional to N*FLINT_BITS
+            Might turn into iterative version
+            Low priority
 */
 void _fq_nmod_mpoly_radix_sort(
     fq_nmod_mpoly_t A,
@@ -107,70 +97,45 @@ void _fq_nmod_mpoly_radix_sort(
     ulong * cmpmask,
     slong d)
 {
-    ulong off, bit, mask, cmp;
+    ulong off = pos/FLINT_BITS;
+    ulong bit = pos%FLINT_BITS;
+    ulong mask = UWORD(1) << bit;
+    ulong cmp = cmpmask[off] & mask;
     slong mid, check;
 
-    while (pos > 0)
+    FLINT_ASSERT(left <= right);
+    FLINT_ASSERT(pos < N*FLINT_BITS);
+
+    /* do nothing on lists of 0 or 1 elements */
+    if (left + 1 >= right)
+        return;
+
+    /* find first 'zero' */
+    mid = left;
+    while (mid < right && ((A->exps+N*mid)[off] & mask) != cmp)
     {
-        pos--;
+        mid++;
+    }
 
-        FLINT_ASSERT(left <= right);
-        FLINT_ASSERT(pos < N*FLINT_BITS);
-
-        off = pos/FLINT_BITS;
-        bit = pos%FLINT_BITS;
-        mask = UWORD(1) << bit;
-        cmp = cmpmask[off] & mask;
-
-        /* insertion base case */
-        if (right - left < 10)
+    /* make sure [left,mid)  doesn't match cmpmask in position pos 'one'
+                 [mid,right)    does match cmpmask in position pos 'zero' */
+    check = mid;
+    while (++check < right)
+    {
+        if (((A->exps + N*check)[off] & mask) != cmp)
         {
-            slong i, j;
-
-            for (i = left + 1; i < right; i++)
-            {
-                for (j = i; j > left && mpoly_monomial_gt(A->exps + N*j,
-                                         A->exps + N*(j - 1), N, cmpmask); j--)
-                {
-                    _n_fq_swap(A->coeffs + d*j, A->coeffs + d*(j - 1), d);
-                    mpoly_monomial_swap(A->exps + N*j, A->exps + N*(j - 1), N);
-                }
-            }
-
-            return;
-        }
-
-        /* find first 'zero' */
-        mid = left;
-        while (mid < right && ((A->exps+N*mid)[off] & mask) != cmp)
+            _n_fq_swap(A->coeffs + d*check, A->coeffs + d*mid, d);
+            mpoly_monomial_swap(A->exps + N*check, A->exps + N*mid, N);
             mid++;
-
-        /* make sure [left,mid)  doesn't match cmpmask in position pos 'one'
-                     [mid,right)    does match cmpmask in position pos 'zero' */
-        check = mid;
-        while (++check < right)
-        {
-            if (((A->exps + N*check)[off] & mask) != cmp)
-            {
-                _n_fq_swap(A->coeffs + d*check, A->coeffs + d*mid, d);
-                mpoly_monomial_swap(A->exps + N*check, A->exps + N*mid, N);
-                mid++;
-            }
-        }
-
-        FLINT_ASSERT(left <= mid && mid <= right);
-
-        if (mid - left < right - mid)
-        {
-            _fq_nmod_mpoly_radix_sort(A, left, mid, pos, N, cmpmask, d);
-            left = mid;
-        }
-        else
-        {
-            _fq_nmod_mpoly_radix_sort(A, mid, right, pos, N, cmpmask, d);
-            right = mid;
         }
     }
+
+    if (pos < 1)
+        return;
+
+    pos--;
+    _fq_nmod_mpoly_radix_sort(A, left,  mid, pos, N, cmpmask, d);
+    _fq_nmod_mpoly_radix_sort(A, mid, right, pos, N, cmpmask, d);
 }
 
 
@@ -180,8 +145,8 @@ void _fq_nmod_mpoly_radix_sort(
 */
 void fq_nmod_mpoly_sort_terms(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong d, i, N;
-    flint_bitcnt_t pos;
+    slong d;
+    slong i, msb, N;
     ulong himask, * ptempexp;
     TMP_INIT;
 
@@ -192,16 +157,33 @@ void fq_nmod_mpoly_sort_terms(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     himask = 0;
     for (i = 0; i < A->length; i++)
+    {
         himask |= (A->exps + N*i)[N - 1];
+    }
 
-    pos = FLINT_BIT_COUNT(himask);
+    if (himask != 0)
+    {
+        count_leading_zeros(msb, himask);
+        msb = (FLINT_BITS - 1)^msb;
+    }
+    else
+    {
+        msb = -WORD(1);
+    }
+
     d = fq_nmod_ctx_degree(ctx->fqctx);
 
     if (N == 1)
-        _fq_nmod_mpoly_radix_sort1(A, 0, A->length, pos, ptempexp[0], himask, d);
+    {
+        if (msb >= 0)
+        {
+            _fq_nmod_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], himask, d);
+        }
+    }
     else
-        _fq_nmod_mpoly_radix_sort(A, 0, A->length,
-                                     (N - 1)*FLINT_BITS + pos, N, ptempexp, d);
+    {
+        _fq_nmod_mpoly_radix_sort(A, 0, A->length, (N - 1)*FLINT_BITS + msb, N, ptempexp, d);
+    }
 
     TMP_END;
 }

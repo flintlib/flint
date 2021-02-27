@@ -73,10 +73,12 @@ _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n, con
     }
 }
 
-void
-fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, slong n, const fmpz_t mod)
+void fmpz_mod_poly_product_roots_fmpz_vec(
+   fmpz_mod_poly_t poly,
+   const fmpz * xs, slong xlen,
+   const fmpz_mod_ctx_t ctx)
 {
-    fmpz_poly_fit_length(poly, n + 1);
-    _fmpz_mod_poly_product_roots_fmpz_vec(poly->coeffs, xs, n, mod);
-    _fmpz_poly_set_length(poly, n + 1);
+    fmpz_mod_poly_fit_length(poly, xlen + 1, ctx);
+    _fmpz_mod_poly_product_roots_fmpz_vec(poly->coeffs, xs, xlen, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_set_length(poly, xlen + 1);
 }

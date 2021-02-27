@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 - 2019 Daniel Schultz
+    Copyright (C) 2017 - 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -471,8 +471,11 @@ FLINT_DLL int nmod_mpoly_is_ui(const nmod_mpoly_t A,
 FLINT_DLL ulong nmod_mpoly_get_ui(const nmod_mpoly_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t A,
-                                          ulong c, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_fmpz(nmod_mpoly_t A, const fmpz_t c,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
 void nmod_mpoly_zero(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
@@ -987,6 +990,15 @@ FLINT_DLL int nmod_mpoly_content_vars(nmod_mpoly_t g, const nmod_mpoly_t A,
 FLINT_DLL int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A,
                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int _nmod_mpoly_gcd_algo_small(
+    nmod_mpoly_t G,
+    nmod_mpoly_t Abar, /* could be NULL */
+    nmod_mpoly_t Bbar, /* could be NULL */
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    unsigned int algo);
+
 FLINT_DLL int _nmod_mpoly_gcd_algo(nmod_mpoly_t G, nmod_mpoly_t Abar,
                 nmod_mpoly_t Bbar, const nmod_mpoly_t A, const nmod_mpoly_t B,
                                 const nmod_mpoly_ctx_t ctx, unsigned int algo);
@@ -1341,7 +1353,7 @@ FLINT_DLL void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
 
 FLINT_DLL int nmod_mpolyu_gcdm_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
                        nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B,
-         nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo, flint_rand_t randstate);
+                                 nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
 
 NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyu_leadcoeff(
                                    nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctx)
@@ -1598,7 +1610,7 @@ FLINT_DLL nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
 
 FLINT_DLL int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
              nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B, slong var,
-    const nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo, flint_rand_t randstate);
+                           const nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
 
 FLINT_DLL void nmod_mpoly_to_mpolyl_perm_deflate(
     nmod_mpoly_t A,
@@ -1748,35 +1760,6 @@ FLINT_DLL void nmod_mpoly_geobucket_add(nmod_mpoly_geobucket_t B,
 
 FLINT_DLL void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B,
                                    nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_set_ui(nmod_mpoly_geobucket_t B,
-                                          ulong c, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_gen(nmod_mpoly_geobucket_t B, slong var,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_add_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_sub_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_neg_inplace(nmod_mpoly_geobucket_t B1,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_pow_ui_inplace(nmod_mpoly_geobucket_t B1,
-                                          ulong k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_geobucket_pow_fmpz_inplace(nmod_mpoly_geobucket_t B1,
-                                   const fmpz_t k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_geobucket_divides_inplace(nmod_mpoly_geobucket_t B1,
-                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
-
-
 
 /******************************************************************************
 

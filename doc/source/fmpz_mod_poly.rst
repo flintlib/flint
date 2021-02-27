@@ -470,19 +470,16 @@ Products
 
     Sets ``(poly, n + 1)`` to the monic polynomial which is the product
     of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
-    given by ``xs``. The coefficients reduced modulo ``f``.
+    given by ``xs``. It is required that the roots are canonical.
 
-    Aliasing of the input and output is not allowed. It is required that
-    ``poly`` is reduced modulo ``f``.
+    Aliasing of the input and output is not allowed.
 
 
-.. function:: void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, slong n, fmpz_t f, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_mod_poly_t poly, const fmpz * xs, slong n, fmpz_t f, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to the monic polynomial which is the product
     of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
-    given by ``xs``. The coefficients reduced modulo ``f``.
-
-    It is required that ``poly`` is reduced modulo ``f``.
+    given by ``xs``. It is required that the roots are canonical.
 
 
 .. function:: int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots, const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx)

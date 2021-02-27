@@ -166,6 +166,10 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_
 FLINT_DLL void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res,
                 const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL int fmpz_mod_poly_is_canonical(const fmpz_mod_poly_t A,
+                                                     const fmpz_mod_ctx_t ctx);
+
+
 /*  Randomisation ************************************************************/
 
 FLINT_DLL void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state,
@@ -276,7 +280,7 @@ void fmpz_mod_poly_one(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_fit_length(poly, 1, ctx);
     fmpz_one(poly->coeffs + 0);
-    _fmpz_mod_poly_set_length(poly, !fmpz_is_one(fmpz_mod_ctx_modulus(ctx)));
+    _fmpz_mod_poly_set_length(poly, fmpz_is_one(fmpz_mod_ctx_modulus(ctx)) ? 0 : 1);
 }
 
 FLINT_DLL void fmpz_mod_poly_gen(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
@@ -697,6 +701,16 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
     fmpz_mod_poly_init(Q, ctx);
     fmpz_mod_poly_divrem(Q, R, A, B, ctx);
     fmpz_mod_poly_clear(Q, ctx);
+}
+
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_mod_poly_t R;
+    fmpz_mod_poly_init(R, ctx);
+    fmpz_mod_poly_divrem(Q, R, A, B, ctx);
+    fmpz_mod_poly_clear(R, ctx);
 }
 
 FMPZ_MOD_POLY_INLINE
@@ -1265,11 +1279,11 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const
 
 /* Products *****************************************************************/
 
-FLINT_DLL void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs,
-                                                     slong n, const fmpz_t mod);
+FLINT_DLL void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly,
+                                   const fmpz * xs, slong n, const fmpz_t mod);
 
-FLINT_DLL void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs,
-                                                    slong n, const fmpz_t mod);
+FLINT_DLL void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_mod_poly_t poly,
+                           const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots,
                             const fmpz_mod_poly_t P, const fmpz_mod_ctx_t ctx);

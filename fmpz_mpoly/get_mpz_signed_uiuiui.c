@@ -36,6 +36,7 @@ mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x, mpz_ptr t)
         sm[1] = 0;
         sm[2] = 0;
 
+        s = FLINT_SIGN_EXT(p->_mp_size);
         abs_size = FLINT_ABS(p->_mp_size);
 
         if (abs_size > 3 || (abs_size == 3 && p->_mp_d[2] >= COEFF_MAX))
@@ -44,7 +45,6 @@ mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x, mpz_ptr t)
         for (i = 0; i < abs_size; i++)
             sm[i] = p->_mp_d[i];
 
-        s = FLINT_SIGN_EXT(p->_mp_size);
         sub_dddmmmsss(sm[2], sm[1], sm[0], s^sm[2], s^sm[1], s^sm[0], s, s, s);
     }
 

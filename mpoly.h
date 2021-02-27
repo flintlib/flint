@@ -1286,13 +1286,46 @@ FLINT_DLL void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abit
 FLINT_DLL void mpoly_monomials_shift_right_ffmpz(ulong * Aexps, flint_bitcnt_t Abits,
                 slong Alength, const fmpz * user_exps, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly1_fill_marks(ulong ** Dcoeffs, slong * Dlen, slong * Dalloc,
+                        const ulong * Aexps, slong Alen, flint_bitcnt_t Abits,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly2_fill_marks(ulong ** Dcoeffs, slong * Dlen, slong * Dalloc,
+                        const ulong * Aexps, slong Alen, flint_bitcnt_t Abits,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_to_mpolyl_perm_deflate(
+    ulong * Aexps,
+    flint_bitcnt_t Abits,
+    const mpoly_ctx_t Actx,
+    ulong * Bexps,
+    flint_bitcnt_t Bbits,
+    const mpoly_ctx_t Bctx,
+    slong length,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride);
+
+FLINT_DLL void mpoly_from_mpolyl_perm_inflate(
+    ulong * Bexps,
+    flint_bitcnt_t Bbits,
+    const mpoly_ctx_t Bctx,
+    ulong * Aexps,
+    flint_bitcnt_t Abits,
+    const mpoly_ctx_t Actx,
+    slong length,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride);
+
 /* gcd ***********************************************************************/
 
 #define MPOLY_GCD_USE_HENSEL  1
 #define MPOLY_GCD_USE_BROWN   2
 #define MPOLY_GCD_USE_ZIPPEL  4
 #define MPOLY_GCD_USE_ZIPPEL2 8
-#define MPOLY_GCD_USE_ALL     15
+#define MPOLY_GCD_USE_PRS     16
+#define MPOLY_GCD_USE_ALL     31
 
 typedef struct
 {
@@ -1371,19 +1404,6 @@ FLINT_DLL void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t I,
 
 FLINT_DLL void mpoly_gcd_info_measure_zippel2(mpoly_gcd_info_t I,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
-
-typedef struct
-{
-    slong nvars;
-    slong * Adegs;
-    slong * Bdegs;
-    slong * perm;
-} mpoly_zipinfo_struct;
-typedef mpoly_zipinfo_struct mpoly_zipinfo_t[1];
-
-void mpoly_zipinfo_init(mpoly_zipinfo_t zinfo, slong nvars);
-
-void mpoly_zipinfo_clear(mpoly_zipinfo_t zinfo);
 
 FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
                                     const ulong * Aexps, flint_bitcnt_t Abits,
@@ -1638,6 +1658,53 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    return 1;
 }
+
+/* Parsing *******************************************************************/
+
+typedef struct {
+    char * str;
+    slong str_len;
+} string_with_length_struct;
+
+typedef struct {
+    const void * ctx;
+    slong sz;
+    void (*init_fxn)(void *, const void *);
+    void (*clear_fxn)(void *, const void *);
+    void (*swap_fxn)(void *, void *, const void *);
+    void (*set_fxn)(void *, const void *, const void *);
+    void (*set_fmpz_fxn)(void *, const fmpz_t, const void *);
+    int (*pow_fmpz_fxn)(void *, const void *, const fmpz_t, const void *);
+    void (*mul_fxn)(void *, const void *, const void *, const void *);
+    void (*add_fxn)(void *, const void *, const void *, const void *);
+    void (*sub_fxn)(void *, const void *, const void *, const void *);
+    void (*neg_fxn)(void *, const void *, const void *);
+    int (*div_fxn)(void *, const void *, const void *, const void *);
+    slong (*length_fxn)(const void *, const void *);
+    slong * stack;
+    slong stack_len;
+    slong stack_alloc;
+    char * estore;
+    slong estore_len;
+    slong estore_alloc;
+    void * tmp;
+    string_with_length_struct * terminal_strings;
+    char * terminal_values;
+    slong terminals_alloc;
+    slong terminals_len;
+} fparse_struct;
+
+typedef fparse_struct fparse_t[1];
+
+FLINT_DLL void fparse_init(fparse_t E, void (*init_fxn)(void *, const void *),
+                                                   slong sz, const void * ctx);
+
+FLINT_DLL void fparse_clear(fparse_t E);
+
+FLINT_DLL void fparse_add_terminal(fparse_t E, const char * s, const void * v);
+
+FLINT_DLL int fparse_parse(fparse_t E, void * res, const char * s, slong len);
+
 
 /* chunking */
 

@@ -43,14 +43,14 @@ void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
 int
 main(void)
 {
-    int i, j, result;
+    slong i, j, tmul = 20;
     FLINT_TEST_INIT(state);
 
     flint_printf("pow_ui....");
     fflush(stdout);
 
-    /* Check pow_si against pow_naive */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    /* Check pow_ui against pow_naive */
+    for (i = 0; i < 10 * tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -73,7 +73,7 @@ main(void)
         exp_bits1 = n_randint(state, 600) + 10;
         exp_bits1 = n_randint(state, exp_bits1) + 2; /* increase chances of lower values */
 
-        coeff_bits = n_randint(state, 200);
+        coeff_bits = n_randint(state, 100);
 
         for (j = 0; j < 4; j++)
         {
@@ -85,12 +85,11 @@ main(void)
             fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_pow_naive(h, f, pow, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_equal(g, h, ctx);
 
-            if (!result)
+            if (!fmpz_mpoly_equal(g, h, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check pow_si against pow_naive\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("FAIL: Check pow_ui against pow_naive\n");
+                flint_printf("i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
         }
@@ -102,7 +101,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g;
@@ -134,12 +133,11 @@ main(void)
             fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_pow_ui(f, f, pow, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
-            result = fmpz_mpoly_equal(f, g, ctx);
 
-            if (!result)
+            if (!fmpz_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check aliasing\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("FAIL: Check aliasing\n");
+                flint_printf("i = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
