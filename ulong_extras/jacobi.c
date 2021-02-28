@@ -14,85 +14,43 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int
-n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
+/* return (x|y)*(-1)^tstbit(r,1) */
+int _n_jacobi_unsigned(mp_limb_t x, mp_limb_t y, unsigned int r)
 {
-    mp_limb_t a, b, temp;
-    int s, exp;
+    mp_limb_t t, st;
+    int e;
 
-    a = x;
-    b = y;
-    s = 1;
+    FLINT_ASSERT(y & 1);
 
-    if ((a < b) && (b != UWORD(1)))
+    r ^= 2;
+
+    while (y > 1)
     {
-        if (a == UWORD(0))
+        if (x == 0)
             return 0;
 
-        temp = a;
-        a = b;
-        b = temp;
+        /* x = odd part of x */
+        count_trailing_zeros(e, x);
+        x >>= e;
+        r ^= ((y ^ (y>>1)) & (2*e)); /* (2|y) = (-1)^((y^2-1)/8) */
 
-        count_trailing_zeros(exp, b);
-        b >>= exp;
-
-        /* We are only interested in values mod 8, so overflows don't matter here */
-        if (((exp * (a * a - 1)) / 8) % 2 == UWORD(1))
-            s = -s;
-
-        /* We are only interested in values mod 4, so overflows don't matter here */
-        if ((((a - 1) * (b - 1)) / 4) % 2 == UWORD(1))
-            s = -s;
+        /* (x, y) = (|x - y|, min(x, y)) */
+        sub_ddmmss(st, t, UWORD(0), x, UWORD(0), y);
+        r ^= (x & y & st);  /* if y > x, (x|y) = (y|x)*(-1)^((x-1)(y-1)/4) */
+        y += (st & t);
+        x = (t ^ st) - st;
     }
 
-    while (b != UWORD(1))
-    {
-        if ((a >> 2) < b)
-        {
-            temp = a - b;
-            a = b;
-            if (temp < b)
-                b = temp;
-            else if (temp < (b << 1))
-                b = temp - a;
-            else
-                b = temp - (a << 1);
-        }
-        else
-        {
-            temp = a % b;
-            a = b;
-            b = temp;
-        }
-
-        if (b == UWORD(0))
-            return 0;
-
-        count_trailing_zeros(exp, b);
-        b >>= exp;
-
-        /* We are only interested in values mod 8, so overflows don't matter here */
-        if (((exp * (a * a - 1)) / 8) % 2 == UWORD(1))
-            s = -s;
-
-        /* We are only interested in values mod 4, so overflows don't matter here */
-        if ((((a - 1) * (b - 1)) / 4) % 2 == UWORD(1))
-            s = -s;
-    }
-
-    return s;
+    return (int)(r & 2) - 1;
 }
 
-int
-n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
 {
-    if (x < WORD(0))
-    {
-        if (((y - 1) / 2) % 2 == UWORD(1))
-            return -n_jacobi_unsigned(-x, y);
-        else
-            return n_jacobi_unsigned(-x, y);
-    }
-    else
-        return n_jacobi_unsigned(x, y);
+    return _n_jacobi_unsigned(x, y, 0);
 }
+
+int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+{
+    return _n_jacobi_unsigned(FLINT_ABS(x), y, FLINT_SIGN_EXT(x) & y);
+}
+

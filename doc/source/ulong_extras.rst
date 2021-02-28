@@ -388,11 +388,7 @@ Jacobi and Kronecker symbols
 
 .. function:: int n_jacobi(mp_limb_signed_t x, ulong y)
 
-    Computes the Jacobi symbol of `x \bmod{y}` for any x and odd `y`.
-
-    This is just a straightforward application of the law of quadratic
-    reciprocity. For performance, divisions are replaced with some 
-    comparisons and subtractions where possible.
+    Computes the Jacobi symbol `\left(\frac{x}{y}\right)` for any x and odd `y`.
 
 .. function:: int n_jacobi_unsigned(ulong x, ulong y)
 
