@@ -19,57 +19,43 @@
 int
 main(void)
 {
-    int i, result;
+    slong i, j;
     FLINT_TEST_INIT(state);
 
     flint_printf("jacobi....");
     fflush(stdout);
 
-    
-    _flint_rand_init_gmp(state);
-
     for (i = 0; i < 3000 * flint_test_multiplier(); i++)
     {
-        fmpz_t a, p;
-        mpz_t b, q;
-        int r1, r2;
+        fmpz_t a, n;
+        mpz_t aa, nn;
 
         fmpz_init(a);
-        fmpz_init(p);
+        fmpz_init(n);
+        mpz_init(aa);
+        mpz_init(nn);
 
-        mpz_init(b);
-        mpz_init(q);
-
-        mpz_rrandomb(q, state->gmp_state, n_randint(state, 200) + 1);
-#ifdef mpz_next_likely_prime
-        mpz_next_likely_prime(q, q, state->gmp_state);
-#else
-        mpz_nextprime(q, q);
-#endif
-        fmpz_set_mpz(p, q);
-
-        mpz_rrandomb(b, state->gmp_state, n_randint(state, 200) + 1);
-        mpz_mod(b, b, q);
-        if (n_randint(state, 2))
-            mpz_neg(b, b);
-        fmpz_set_mpz(a, b);
-
-        r1 = fmpz_jacobi(a, p);
-        r2 = mpz_jacobi(b, q);
-        result = (r1 == r2);
-
-        if (!result)
+        for (j = 0; j < 100; j++)
         {
-            flint_printf("FAIL:\n");
-            gmp_printf("b = %Zd, q = %Zd\n", b, q);
-            abort();
+            fmpz_randtest(a, state, 150);
+            fmpz_randtest_unsigned(n, state, 150);
+            fmpz_setbit(n, 0);
+
+            fmpz_get_mpz(aa, a);
+            fmpz_get_mpz(nn, n);
+
+            if (mpz_jacobi(aa, nn) != fmpz_jacobi(a, n))
+            {
+                flint_printf("FAIL:\n");
+                gmp_printf("a = %Zd, n = %Zd\n", aa, nn);
+                flint_abort();
+            }
         }
 
         fmpz_clear(a);
-        fmpz_clear(p);
-
-        mpz_clear(b);
-        mpz_clear(q);
+        fmpz_clear(n);
+        mpz_clear(aa);
+        mpz_clear(nn);
     }
 
     FLINT_TEST_CLEANUP(state);
