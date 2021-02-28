@@ -340,6 +340,8 @@ FLINT_DLL int n_jacobi(slong x, ulong y);
 
 FLINT_DLL int n_jacobi_unsigned(ulong x, ulong y);
 
+FLINT_DLL int _n_jacobi_unsigned(ulong x, ulong y, unsigned int r);
+
 FLINT_DLL ulong n_sqrt(ulong a);
 
 FLINT_DLL ulong n_sqrtrem(ulong * r, ulong a);

@@ -1077,6 +1077,10 @@ Modular arithmetic
 
     Computes the Jacobi symbol `\left(\frac{a}{n}\right)` for any `a` and odd positive `n`.
 
+.. function:: int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
+
+    Computes the Kronecker symbol `\left(\frac{a}{n}\right)` for any `a` and any `n`.
+
 .. function:: void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)
 
     Set `xstart`, `xstride`, and `xlength` so that the solution set for x modulo `n` in `a x = b mod n` is exactly `\{xstart + xstride i | 0 \le i < xlength\}`.

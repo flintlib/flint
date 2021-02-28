@@ -67,6 +67,10 @@ FLINT_DLL mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
 
 FLINT_DLL mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
 
+/*****************************************************************************/
+
+FLINT_DLL int z_kronecker(slong a, slong n);
+
 #ifdef __cplusplus
 }
 #endif
