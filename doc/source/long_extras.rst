@@ -46,3 +46,11 @@ Random functions
     Returns a pseudo random number of absolute value less than 
     ``limit``.  If ``limit`` is zero or exceeds ``WORD_MAX``, 
     it is interpreted as ``WORD_MAX``.
+
+
+Modular arithmetic
+--------------------------------------------------------------------------------
+
+.. function:: int z_kronecker(slong a, slong n)
+
+    Return the Kronecker symbol `\left(\frac{a}{n}\right)` for any `a` and any `n`.
