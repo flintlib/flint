@@ -1073,10 +1073,9 @@ Modular arithmetic
 
     Sets `f` to `-g \pmod{h}`, assuming `g` is reduced modulo `h`.
 
-.. function:: int fmpz_jacobi(const fmpz_t a, const fmpz_t p)
+.. function:: int fmpz_jacobi(const fmpz_t a, const fmpz_t n)
 
-    Computes the Jacobi symbol of `a` modulo `p`, where `p` is a prime
-    and `a` is reduced modulo `p`.
+    Computes the Jacobi symbol `\left(\frac{a}{n}\right)` for any `a` and odd positive `n`.
 
 .. function:: void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)
 
