@@ -328,8 +328,9 @@ typedef struct {
     fmpz_t old_pk;
     fmpz_t pk;
     fmpz_t p;
-    fmpz_t halfpk;
-    fmpz_mod_ctx_t ctx;
+    fmpz * halfpks;
+    fmpz_mod_ctx_t ctxp;
+    fmpz_mod_ctx_struct * ctxs;
     fmpz_mod_poly_t T;
     fmpz_mod_poly_t R;
     fmpz_mod_poly_t Q;

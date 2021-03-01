@@ -12,13 +12,8 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mpoly_factor.h"
-
-static int n_sub_checked(ulong * a, ulong b, ulong c)
-{
-    int of = b < c;
-    *a = b - c;
-    return of;
-}
+#include "fmpz_mod_vec.h"
+#include "ulong_extras.h"
 
 /* return n with ||a||_2 < 2^n */
 static flint_bitcnt_t fmpz_poly_norm2_bits(const fmpz_poly_t a)
@@ -31,18 +26,6 @@ static flint_bitcnt_t fmpz_poly_norm2_bits(const fmpz_poly_t a)
     fmpz_clear(t);
     return (bits + 1)/2;
 }
-
-static void _fmpz_mod_vec_sub(
-    fmpz * a,
-    const fmpz * b,
-    const fmpz * c,
-    slong n,
-    const fmpz_mod_ctx_t ctx)
-{
-    while (--n >= 0)
-        fmpz_mod_sub(a + n, b + n, c + n, ctx);
-}
-
 
 /* reduce A mod B, return new length of A */
 static slong _reduce_inplace(
@@ -96,6 +79,8 @@ void fmpz_poly_pfrac_init(fmpz_poly_pfrac_t I)
     I->bits = NULL;
     I->b = I->bprod = NULL;
     I->B = I->invBprod = I->inwBprod = I->B_inv = NULL;
+    I->ctxs = NULL;
+    I->halfpks = NULL;
 
     fmpz_poly_init(I->a);
     fmpz_poly_init(I->newa);
@@ -104,13 +89,12 @@ void fmpz_poly_pfrac_init(fmpz_poly_pfrac_t I)
     fmpz_init(I->old_pk);
     fmpz_init(I->pk);
     fmpz_init(I->p);
-    fmpz_init(I->halfpk);
 
-    fmpz_mod_ctx_init_ui(I->ctx, 2);
+    fmpz_mod_ctx_init_ui(I->ctxp, 2);
 
-    fmpz_mod_poly_init(I->T, I->ctx);
-    fmpz_mod_poly_init(I->R, I->ctx);
-    fmpz_mod_poly_init(I->Q, I->ctx);
+    fmpz_mod_poly_init(I->T, I->ctxp);
+    fmpz_mod_poly_init(I->R, I->ctxp);
+    fmpz_mod_poly_init(I->Q, I->ctxp);
 }
 
 static void _clear_arrays(fmpz_poly_pfrac_t I)
@@ -121,11 +105,15 @@ static void _clear_arrays(fmpz_poly_pfrac_t I)
     {
         fmpz_poly_clear(I->b + i);
         fmpz_poly_clear(I->bprod + i);
-        fmpz_mod_poly_clear(I->B + i, I->ctx);
-        fmpz_mod_poly_clear(I->invBprod + i, I->ctx);
-        fmpz_mod_poly_clear(I->inwBprod + i, I->ctx);
-        fmpz_mod_poly_clear(I->B_inv + i, I->ctx);
+        fmpz_mod_poly_clear(I->B + i, I->ctxs + i);
+        fmpz_mod_poly_clear(I->invBprod + i, I->ctxs + i);
+        fmpz_mod_poly_clear(I->inwBprod + i, I->ctxs + i);
+        fmpz_mod_poly_clear(I->B_inv + i, I->ctxs + i);
+        fmpz_clear(I->halfpks + i);
+        fmpz_mod_ctx_clear(I->ctxs + i);
     }
+    flint_free(I->halfpks);
+    flint_free(I->ctxs);
     flint_free(I->bits);
     flint_free(I->b);
     flint_free(I->B);
@@ -143,13 +131,12 @@ void fmpz_poly_pfrac_clear(fmpz_poly_pfrac_t I)
     fmpz_clear(I->old_pk);
     fmpz_clear(I->pk);
     fmpz_clear(I->p);
-    fmpz_clear(I->halfpk);
 
-    fmpz_mod_poly_clear(I->T, I->ctx);
-    fmpz_mod_poly_clear(I->R, I->ctx);
-    fmpz_mod_poly_clear(I->Q, I->ctx);
+    fmpz_mod_poly_clear(I->T, I->ctxp);
+    fmpz_mod_poly_clear(I->R, I->ctxp);
+    fmpz_mod_poly_clear(I->Q, I->ctxp);
 
-    fmpz_mod_ctx_clear(I->ctx);
+    fmpz_mod_ctx_clear(I->ctxp);
 }
 
 int fmpz_poly_pfrac_precompute(
@@ -173,6 +160,14 @@ int fmpz_poly_pfrac_precompute(
     I->r = r;
     I->bits = FLINT_ARRAY_ALLOC(r, flint_bitcnt_t);
 
+    I->ctxs = FLINT_ARRAY_ALLOC(r, fmpz_mod_ctx_struct);
+    I->halfpks = FLINT_ARRAY_ALLOC(r, fmpz);
+    for (i = 0; i < r; i++)
+    {
+        fmpz_init(I->halfpks + i);
+        fmpz_mod_ctx_init_ui(I->ctxs + i, 2);
+    }
+
     I->b = FLINT_ARRAY_ALLOC(2*r, fmpz_poly_struct);
     I->bprod = I->b + r;
     for (i = 0; i < r; i++)
@@ -189,10 +184,10 @@ int fmpz_poly_pfrac_precompute(
 
     for (i = 0; i < r; i++)
     {
-        fmpz_mod_poly_init(I->B + i, I->ctx);
-        fmpz_mod_poly_init(I->invBprod + i, I->ctx);
-        fmpz_mod_poly_init(I->inwBprod + i, I->ctx);
-        fmpz_mod_poly_init(I->B_inv + i, I->ctx);
+        fmpz_mod_poly_init(I->B + i, I->ctxs + i);
+        fmpz_mod_poly_init(I->invBprod + i, I->ctxs + i);
+        fmpz_mod_poly_init(I->inwBprod + i, I->ctxs + i);
+        fmpz_mod_poly_init(I->B_inv + i, I->ctxs + i);
     }
 
     /* init done */
@@ -219,34 +214,40 @@ int fmpz_poly_pfrac_precompute(
 next_p:
 
     fmpz_nextprime(I->p, I->p, 1);
-    fmpz_mod_ctx_set_modulus(I->ctx, I->p);
+    fmpz_mod_ctx_set_modulus(I->ctxp, I->p);
     fmpz_set(I->pk, I->p);
-    fmpz_fdiv_q_2exp(I->halfpk, fmpz_mod_ctx_modulus(I->ctx), 1);
 
     for (i = 0; i < r; i++)
     {
         /* B[i] = make_monic(b[i] mod p^k) */
-        fmpz_mod_poly_set_fmpz_poly(I->B + i, I->b + i, I->ctx);
+        fmpz_mod_poly_set_fmpz_poly(I->B + i, I->b + i, I->ctxp);
         if (I->B[i].length != I->b[i].length)
             goto next_p;
 
-        fmpz_mod_poly_make_monic(I->B + i, I->B + i, I->ctx);
+        fmpz_mod_poly_make_monic(I->B + i, I->B + i, I->ctxp);
 
         fmpz_mod_poly_reverse(I->B_inv + i, I->B + i,
-                                                     I->B[i].length, I->ctx);
+                                                     I->B[i].length, I->ctxp);
         fmpz_mod_poly_inv_series_newton(I->B_inv + i, I->B_inv + i,
-                                                     I->B[i].length, I->ctx);
+                                                     I->B[i].length, I->ctxp);
     }
 
     for (i = 0; i < r; i++)
     {
-        fmpz_mod_poly_set_fmpz_poly(I->T, I->bprod + i, I->ctx);
+        fmpz_mod_poly_set_fmpz_poly(I->T, I->bprod + i, I->ctxp);
         fmpz_mod_poly_xgcd(I->R, I->invBprod + i, I->inwBprod + i,
-                                                   I->T, I->B + i, I->ctx);
-        if (!fmpz_mod_poly_is_one(I->R, I->ctx))
+                                                   I->T, I->B + i, I->ctxp);
+        if (!fmpz_mod_poly_is_one(I->R, I->ctxp))
             goto next_p;
 
         /* now 1 = invBprod[i]*bprod[i] + inwBprod[i]*B[i] mod p^k */
+    }
+
+    /* set all ctx's to mod p*/
+    for (i = 0; i < r; i++)
+    {
+        fmpz_mod_ctx_set_modulus(I->ctxs + i, I->p);
+        fmpz_fdiv_q_2exp(I->halfpks + i, fmpz_mod_ctx_modulus(I->ctxs + i), 1);
     }
 
     return 1;
@@ -285,9 +286,9 @@ again:
     for (i = 0; i + 1 < I->r; i++)
     {
         /* T = a mod B[i] */
-        fmpz_mod_poly_set_fmpz_poly(I->T, a, I->ctx);
+        fmpz_mod_poly_set_fmpz_poly(I->T, a, I->ctxs + i);
         I->T->length = _reduce_inplace(I->T->coeffs, I->T->length,
-                                   I->B + i, I->B_inv + i, I->ctx, I->Q, I->R);
+                              I->B + i, I->B_inv + i, I->ctxs + i, I->Q, I->R);
 
         /* c = T*invBprod[i] */
         if (I->T->length < 1)
@@ -302,21 +303,21 @@ again:
             fmpz_poly_fit_length(c + i, clen);
             _fmpz_mod_poly_mul(c[i].coeffs, I->T->coeffs, I->T->length,
                                I->invBprod[i].coeffs, I->invBprod[i].length,
-                                                 fmpz_mod_ctx_modulus(I->ctx));
+                                            fmpz_mod_ctx_modulus(I->ctxs + i));
             while (clen > 0 && fmpz_is_zero(c[i].coeffs + clen - 1))
                 clen--;
         }
 
         /* c = c smod B[i] */
         clen = _reduce_inplace(c[i].coeffs, clen,
-                                   I->B + i, I->B_inv + i, I->ctx, I->Q, I->R);
+                              I->B + i, I->B_inv + i, I->ctxs + i, I->Q, I->R);
         c[i].length = clen;
         while (--clen >= 0)
         {
-            if (fmpz_cmp(c[i].coeffs + clen, I->halfpk) > 0)
+            if (fmpz_cmp(c[i].coeffs + clen, I->halfpks + i) > 0)
             {
                 fmpz_sub(c[i].coeffs + clen, c[i].coeffs + clen,
-                                                 fmpz_mod_ctx_modulus(I->ctx));
+                                            fmpz_mod_ctx_modulus(I->ctxs + i));
             }
         }
 
@@ -326,7 +327,7 @@ again:
         if (!fmpz_poly_divides(I->newa, I->t, I->b + i))
         {
             flint_bitcnt_t abits = fmpz_poly_norm2_bits(a);
-            flint_bitcnt_t pkbits = fmpz_bits(fmpz_mod_ctx_modulus(I->ctx));
+            flint_bitcnt_t pkbits = fmpz_bits(fmpz_mod_ctx_modulus(I->ctxs + i));
 
             if (pkbits > abits && pkbits - abits > I->bits[i])
                 return 0;
@@ -345,50 +346,49 @@ again:
 
 more_prec:
 
-    fmpz_set(I->old_pk, fmpz_mod_ctx_modulus(I->ctx));
-    fmpz_mul(I->pk, fmpz_mod_ctx_modulus(I->ctx), I->p);
-    fmpz_mod_ctx_set_modulus(I->ctx, I->pk);
-    fmpz_fdiv_q_2exp(I->halfpk, fmpz_mod_ctx_modulus(I->ctx), 1);
+    /* increase the precision of the i^th factor only */
 
-    for (i = 0; i < I->r; i++)
-    {
-        fmpz_mod_poly_set_fmpz_poly(I->T, I->bprod + i, I->ctx);
-        /* lift_only_inverses wants monic bases */
-        fmpz_mod_poly_scalar_div_fmpz(I->T, I->T,
-                                         fmpz_poly_lead(I->bprod + i), I->ctx);
-        fmpz_mod_poly_scalar_mul_fmpz(I->invBprod + i, I->invBprod + i,
-                                         fmpz_poly_lead(I->bprod + i), I->ctx);
+    fmpz_set(I->old_pk, fmpz_mod_ctx_modulus(I->ctxs + i));
+    fmpz_mul(I->pk, fmpz_mod_ctx_modulus(I->ctxs + i), I->p);
+    fmpz_mod_ctx_set_modulus(I->ctxs + i, I->pk);
+    fmpz_fdiv_q_2exp(I->halfpks + i, fmpz_mod_ctx_modulus(I->ctxs + i), 1);
 
-        fmpz_mod_poly_set_fmpz_poly(I->B + i, I->b + i, I->ctx);
-        fmpz_mod_poly_make_monic(I->B + i, I->B + i, I->ctx);
+    fmpz_mod_poly_set_fmpz_poly(I->T, I->bprod + i, I->ctxs + i);
+    /* lift_only_inverses wants monic bases */
+    fmpz_mod_poly_scalar_div_fmpz(I->T, I->T,
+                                    fmpz_poly_lead(I->bprod + i), I->ctxs + i);
+    fmpz_mod_poly_scalar_mul_fmpz(I->invBprod + i, I->invBprod + i,
+                                    fmpz_poly_lead(I->bprod + i), I->ctxs + i);
 
-        fmpz_mod_poly_fit_length(I->invBprod + i, I->B[i].length - 1, I->ctx);
-        fmpz_mod_poly_fit_length(I->inwBprod + i, I->T->length - 1, I->ctx);
+    fmpz_mod_poly_set_fmpz_poly(I->B + i, I->b + i, I->ctxs + i);
+    fmpz_mod_poly_make_monic(I->B + i, I->B + i, I->ctxs + i);
 
-        _fmpz_poly_hensel_lift_only_inverse(
+    fmpz_mod_poly_fit_length(I->invBprod + i, I->B[i].length - 1, I->ctxs + i);
+    fmpz_mod_poly_fit_length(I->inwBprod + i, I->T->length - 1, I->ctxs + i);
+
+    _fmpz_poly_hensel_lift_only_inverse(
             I->invBprod[i].coeffs, I->inwBprod[i].coeffs,
             I->T->coeffs, I->T->length, I->B[i].coeffs, I->B[i].length,
             I->invBprod[i].coeffs, I->invBprod[i].length,
             I->inwBprod[i].coeffs, I->inwBprod[i].length,
             I->old_pk, I->p);
 
-        I->invBprod[i].length = I->B[i].length - 1;
-        _fmpz_mod_poly_normalise(I->invBprod + i);
+    I->invBprod[i].length = I->B[i].length - 1;
+    _fmpz_mod_poly_normalise(I->invBprod + i);
 
-        I->inwBprod[i].length = I->T->length - 1;
-        _fmpz_mod_poly_normalise(I->inwBprod + i);
+    I->inwBprod[i].length = I->T->length - 1;
+    _fmpz_mod_poly_normalise(I->inwBprod + i);
 
-        /* correct monic bases */
-        fmpz_mod_poly_scalar_mul_fmpz(I->T, I->T,
-                                         fmpz_poly_lead(I->bprod + i), I->ctx);
-        fmpz_mod_poly_scalar_div_fmpz(I->invBprod + i, I->invBprod + i,
-                                         fmpz_poly_lead(I->bprod + i), I->ctx);
+    /* correct monic bases */
+    fmpz_mod_poly_scalar_mul_fmpz(I->T, I->T,
+                                    fmpz_poly_lead(I->bprod + i), I->ctxs + i);
 
-        fmpz_mod_poly_reverse(I->B_inv + i, I->B + i, I->B[i].length, I->ctx);
-        fmpz_mod_poly_inv_series_newton(I->B_inv + i, I->B_inv + i,
-                                                       I->B[i].length, I->ctx);
-    }
+    fmpz_mod_poly_scalar_div_fmpz(I->invBprod + i, I->invBprod + i,
+                                    fmpz_poly_lead(I->bprod + i), I->ctxs + i);
 
+    fmpz_mod_poly_reverse(I->B_inv + i, I->B + i, I->B[i].length, I->ctxs + i);
+    fmpz_mod_poly_inv_series_newton(I->B_inv + i, I->B_inv + i,
+                                                  I->B[i].length, I->ctxs + i);
     goto again;
 }
 
