@@ -306,6 +306,7 @@ got_alpha:
                 dfac->length = 2;
                 fmpz_mpoly_one(dfac->coeffs + 0, ctx);
                 fmpz_mpoly_one(dfac->coeffs + 1, ctx);
+
                 for (i = 0; i < len; i++)
                 {
                     int in = subset[i] >= 0;
@@ -324,8 +325,11 @@ got_alpha:
                     fmpz_mpoly_swap(q, tfac->coeffs + 0, ctx);
                     fmpz_mpoly_swap(p, dfac->coeffs + 0, ctx);
                     len -= k;
-                    if (!zassenhaus_subset_next_disjoint(subset, len + k))
+                    if (k > len/2 ||
+                        !zassenhaus_subset_next_disjoint(subset, len + k))
+                    {
                         break;
+                    }
                 }
                 else if (success < 0)
                 {
