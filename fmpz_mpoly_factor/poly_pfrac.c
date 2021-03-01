@@ -349,8 +349,9 @@ more_prec:
     /* increase the precision of the i^th factor only */
 
     fmpz_set(I->old_pk, fmpz_mod_ctx_modulus(I->ctxs + i));
-    fmpz_mul(I->pk, fmpz_mod_ctx_modulus(I->ctxs + i), I->p);
-    fmpz_mod_ctx_set_modulus(I->ctxs + i, I->pk);
+    fmpz_pow_ui(I->pk, I->p, 1 + fmpz_bits(I->old_pk)/512);
+    fmpz_mul(I->halfpks + i, fmpz_mod_ctx_modulus(I->ctxs + i), I->pk);
+    fmpz_mod_ctx_set_modulus(I->ctxs + i, I->halfpks + i);
     fmpz_fdiv_q_2exp(I->halfpks + i, fmpz_mod_ctx_modulus(I->ctxs + i), 1);
 
     fmpz_mod_poly_set_fmpz_poly(I->T, I->bprod + i, I->ctxs + i);
@@ -371,7 +372,7 @@ more_prec:
             I->T->coeffs, I->T->length, I->B[i].coeffs, I->B[i].length,
             I->invBprod[i].coeffs, I->invBprod[i].length,
             I->inwBprod[i].coeffs, I->inwBprod[i].length,
-            I->old_pk, I->p);
+            I->old_pk, I->pk);
 
     I->invBprod[i].length = I->B[i].length - 1;
     _fmpz_mod_poly_normalise(I->invBprod + i);

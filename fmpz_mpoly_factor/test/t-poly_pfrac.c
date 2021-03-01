@@ -188,7 +188,7 @@ main(void)
                 fmpz_poly_init(b + k);
                 do {
                     fmpz_poly_randtest(b + k, state, 2 + n_randint(state, 5),
-                                                    2 + n_randint(state, 200));
+                                                    2 + n_randint(state, 350));
                 } while (b[k].length < 2);
             }
 
