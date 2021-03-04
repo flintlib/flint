@@ -977,7 +977,7 @@ FLINT_DLL void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 FLINT_DLL void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
           const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_gcd_prs(fmpz_mpoly_t G,
+FLINT_DLL int fmpz_mpoly_gcd_hensel(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G,

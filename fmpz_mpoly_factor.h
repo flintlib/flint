@@ -316,6 +316,10 @@ FLINT_DLL int fmpz_mpolyl_gcd_zippel2(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
                 fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                          const fmpz_mpoly_t Gamma, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpolyl_gcd_hensel(fmpz_mpoly_t G, slong Gdeg,
+                fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
 /*****************************************************************************/
 
 typedef struct {
