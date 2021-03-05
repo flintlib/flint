@@ -144,6 +144,13 @@ ULONG_EXTRAS_INLINE int n_add_checked(ulong * a, ulong b, ulong c)
     return of;
 }
 
+ULONG_EXTRAS_INLINE int n_sub_checked(ulong * a, ulong b, ulong c)
+{
+    int of = b < c;
+    *a = b - c;
+    return of;
+}
+
 /*****************************************************************************/
 
 FLINT_DLL ulong n_randlimb(flint_rand_t state);

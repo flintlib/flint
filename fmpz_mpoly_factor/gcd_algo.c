@@ -1063,8 +1063,127 @@ cleanup:
 }
 
 
-/*********************** Hit A and B with brown ******************************/
+/******************** Hit A and B with hensel lifting ************************/
+static int _try_hensel(
+    fmpz_mpoly_t G,
+    fmpz_mpoly_t Abar,
+    fmpz_mpoly_t Bbar,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const mpoly_gcd_info_t I,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, k;
+    slong m = I->mvars;
+    int success;
+    flint_bitcnt_t wbits;
+    fmpz_mpoly_ctx_t lctx;
+    fmpz_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
+    fmpz_mpoly_t Ac, Bc, Gc, Abarc, Bbarc;
+    slong max_deg;
 
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length > 0);
+
+    if (!(I->can_use & MPOLY_GCD_USE_HENSEL))
+        return 0;
+
+    FLINT_ASSERT(m >= 2);
+
+    fmpz_mpoly_ctx_init(lctx, m, ORD_LEX);
+
+    max_deg = 0;
+    for (i = 0; i < m; i++)
+    {
+        k = I->hensel_perm[i];
+        max_deg = FLINT_MAX(max_deg, I->Adeflate_deg[k]);
+        max_deg = FLINT_MAX(max_deg, I->Bdeflate_deg[k]);
+    }
+
+    wbits = 1 + FLINT_BIT_COUNT(max_deg);
+    wbits = mpoly_fix_bits(wbits, lctx->minfo);
+    FLINT_ASSERT(wbits <= FLINT_BITS);
+
+    fmpz_mpoly_init3(Al, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Gl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Abarl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bbarl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Ac, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bc, 0, wbits, lctx);
+    fmpz_mpoly_init3(Gc, 0, wbits, lctx);
+    fmpz_mpoly_init3(Abarc, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bbarc, 0, wbits, lctx);
+
+    fmpz_mpoly_to_mpolyl_perm_deflate(Al, lctx, A, ctx,
+                                      I->hensel_perm, I->Amin_exp, I->Gstride);
+    fmpz_mpoly_to_mpolyl_perm_deflate(Bl, lctx, B, ctx,
+                                      I->hensel_perm, I->Bmin_exp, I->Gstride);
+
+    success = fmpz_mpolyl_content(Ac, Al, 1, lctx) &&
+              fmpz_mpolyl_content(Bc, Bl, 1, lctx);
+    if (!success)
+        goto cleanup;
+
+    success = _fmpz_mpoly_gcd_algo(Gc, Abar == NULL ? NULL : Abarc,
+                 Bbar == NULL ? NULL : Bbarc, Ac, Bc, lctx, MPOLY_GCD_USE_ALL);
+    if (!success)
+        goto cleanup;
+
+    success = fmpz_mpoly_divides(Al, Al, Ac, lctx);
+    FLINT_ASSERT(success);
+
+    success = fmpz_mpoly_divides(Bl, Bl, Bc, lctx);
+    FLINT_ASSERT(success);
+
+    fmpz_mpoly_repack_bits_inplace(Al, wbits, lctx);
+    fmpz_mpoly_repack_bits_inplace(Bl, wbits, lctx);
+
+    max_deg = I->Gdeflate_deg_bound[I->hensel_perm[0]];
+    success = fmpz_mpolyl_gcd_hensel(Gl, max_deg, Abarl, Bbarl, Al, Bl, lctx);
+    if (!success)
+        goto cleanup;
+
+    fmpz_mpoly_mul(Gl, Gl, Gc, lctx);
+    fmpz_mpoly_from_mpolyl_perm_inflate(G, I->Gbits, ctx, Gl, lctx,
+                                      I->hensel_perm, I->Gmin_exp, I->Gstride);
+    if (Abar != NULL)
+    {
+        fmpz_mpoly_mul(Abarl, Abarl, Abarc, lctx);
+        fmpz_mpoly_from_mpolyl_perm_inflate(Abar, I->Abarbits, ctx, Abarl, lctx,
+                                   I->hensel_perm, I->Abarmin_exp, I->Gstride);
+    }
+
+    if (Bbar != NULL)
+    {
+        fmpz_mpoly_mul(Bbarl, Bbarl, Bbarc, lctx);
+        fmpz_mpoly_from_mpolyl_perm_inflate(Bbar, I->Bbarbits, ctx, Bbarl, lctx,
+                                   I->hensel_perm, I->Bbarmin_exp, I->Gstride);
+    }
+
+    success = 1;
+
+cleanup:
+
+    fmpz_mpoly_clear(Al, lctx);
+    fmpz_mpoly_clear(Bl, lctx);
+    fmpz_mpoly_clear(Gl, lctx);
+    fmpz_mpoly_clear(Abarl, lctx);
+    fmpz_mpoly_clear(Bbarl, lctx);
+    fmpz_mpoly_clear(Ac, lctx);
+    fmpz_mpoly_clear(Bc, lctx);
+    fmpz_mpoly_clear(Gc, lctx);
+    fmpz_mpoly_clear(Abarc, lctx);
+    fmpz_mpoly_clear(Bbarc, lctx);
+
+    fmpz_mpoly_ctx_clear(lctx);
+
+    return success;
+}
+
+/*********************** Hit A and B with brown ******************************/
 static int _try_brown(
     fmpz_mpoly_t G,
     fmpz_mpoly_t Abar,
@@ -1362,6 +1481,13 @@ skip_monomial_cofactors:
 
         if (try_b && _try_divides(G, Abar, Bbar, A, B, ctx))
             goto successful;
+    }
+
+    if (algo == MPOLY_GCD_USE_HENSEL)
+    {
+        mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
+        success = _try_hensel(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);

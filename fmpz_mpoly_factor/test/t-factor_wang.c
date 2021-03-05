@@ -102,7 +102,7 @@ main(void)
     {
         slong lower;
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t a, t;
+        fmpz_mpoly_t a, at, t;
         flint_bitcnt_t coeff_bits;
         slong nfacs, len;
         ulong expbound, powbound, pow;
@@ -110,6 +110,7 @@ main(void)
         fmpz_mpoly_ctx_init_rand(ctx, state, 6);
 
         fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(at, ctx);
         fmpz_mpoly_init(t, ctx);
 
         nfacs = 1 + (4 + n_randint(state, 5))/ctx->minfo->nvars;
@@ -121,20 +122,27 @@ main(void)
         for (j = 0; j < nfacs; j++)
         {
             do {
-                len = 1 + n_randint(state, 10);
-                coeff_bits = 10 + n_randint(state, 300)/nfacs;
+                len = 2 + n_randint(state, 10);
+                coeff_bits = 100 + n_randint(state, 300)/nfacs;
                 fmpz_mpoly_randtest_bound(t, state, len, coeff_bits, expbound, ctx);
             } while (t->length == 0);
             pow = 1 + n_randint(state, powbound);
-            if (!fmpz_mpoly_is_fmpz(t, ctx))
-                lower += pow;
+
             fmpz_mpoly_pow_ui(t, t, pow, ctx);
-            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_mul(at, a, t, ctx);
+
+            if (t->length < 200)
+            {
+                fmpz_mpoly_swap(a, at, ctx);
+                if (!fmpz_mpoly_is_fmpz(t, ctx))
+                    lower += pow;
+            }
         }
 
         check_omega(lower, WORD_MAX, a, ctx);
 
         fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_clear(at, ctx);
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }

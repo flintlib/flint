@@ -316,14 +316,47 @@ FLINT_DLL int fmpz_mpolyl_gcd_zippel2(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
                 fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                          const fmpz_mpoly_t Gamma, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpolyl_gcd_hensel(fmpz_mpoly_t G, slong Gdeg,
+                fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
 /*****************************************************************************/
+
+typedef struct {
+    slong r;
+    flint_bitcnt_t * bits;
+    fmpz_poly_t a;
+    fmpz_poly_t newa;
+    fmpz_poly_t t;
+    fmpz_poly_struct * b, * bprod;
+    fmpz_t old_pk;
+    fmpz_t pk;
+    fmpz_t p;
+    fmpz * halfpks;
+    fmpz_mod_ctx_t ctxp;
+    fmpz_mod_ctx_struct * ctxs;
+    fmpz_mod_poly_t T;
+    fmpz_mod_poly_t R;
+    fmpz_mod_poly_t Q;
+    fmpz_mod_poly_struct * B, * invBprod, * inwBprod, * B_inv;
+} fmpz_poly_pfrac_struct;
+
+typedef fmpz_poly_pfrac_struct fmpz_poly_pfrac_t[1];
+
+FLINT_DLL void fmpz_poly_pfrac_init(fmpz_poly_pfrac_t I);
+
+FLINT_DLL void fmpz_poly_pfrac_clear(fmpz_poly_pfrac_t I);
+
+FLINT_DLL int fmpz_poly_pfrac_precompute(fmpz_poly_pfrac_t I,
+                                          const fmpz_poly_struct * b, slong r);
+
+FLINT_DLL int fmpz_poly_pfrac_precomp(fmpz_poly_struct * c,
+                                     const fmpz_poly_t A, fmpz_poly_pfrac_t I);
 
 typedef struct {
     flint_bitcnt_t bits;
     slong w;
     slong r;
-    fmpq_poly_struct * inv_prod_dbetas;
-    fmpq_poly_struct * dbetas;
     fmpz_mpoly_struct * prod_mbetas;
     fmpz_mpolyv_struct * prod_mbetas_coeffs;
     fmpz_mpoly_struct * mbetas;
@@ -335,7 +368,9 @@ typedef struct {
     fmpz_mpoly_struct * qt;
     fmpz_mpoly_struct * newt;
     fmpz_mpolyv_struct * delta_coeffs;
-    fmpq_poly_t dtq, S, R;
+    fmpz_poly_pfrac_t uni_pfrac;
+    fmpz_poly_t uni_a;
+    fmpz_poly_struct * uni_c;
 } fmpz_mpoly_pfrac_struct;
 
 typedef fmpz_mpoly_pfrac_struct fmpz_mpoly_pfrac_t[1];
