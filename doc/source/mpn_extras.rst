@@ -189,6 +189,23 @@ Division
 
     Note that this function is not always as fast as ordinary division.
 
+Square root
+--------------------------------------------------------------------------------
+
+.. function:: mp_size_t flint_mpn_sqrtrem2(mp_ptr sp, mp_ptr rp, mp_srcptr np)
+
+    Equivalent to ``mpn_sqrtrem2(sp, rp, np, 2)``.
+    Sets ``sp`` to the integer square root of ``(np, 2)`` and if
+    ``rp`` is not ``NULL``, writes the remainder (two words)
+    to ``rp``. If ``rp`` is ``NULL``, the return value is zero
+    if the square root is exact and nonzero (warning: not necessarily
+    one) otherwise. If ``rp`` is not ``NULL``, the return value
+    is the number of limbs in the remainder (0, 1 or 2).
+
+    This function computes a ``double`` floating-point approximation
+    of the square root, which is refined using a single Newton step if
+    the square root is larger than about 53 bits. The square root is
+    then adjusted until the remainder is correct.
 
 GCD
 --------------------------------------------------------------------------------

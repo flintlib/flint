@@ -160,6 +160,8 @@ FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r,
 FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
     int c, flint_bitcnt_t b, mp_ptr tp);
 
+FLINT_DLL mp_size_t flint_mpn_sqrtrem2(mp_ptr sp, mp_ptr rp, mp_srcptr np);
+
 MPN_EXTRAS_INLINE
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 {
