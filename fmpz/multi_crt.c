@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2019-2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,7 +11,7 @@
 
 #include "fmpz.h"
 
-void fmpz_multi_crt_init(fmpz_multi_crt_t P)
+void fmpz_multi_CRT_init(fmpz_multi_crt_t P)
 {
     P->prog = NULL;
     P->alloc = 0;
@@ -22,7 +22,7 @@ void fmpz_multi_crt_init(fmpz_multi_crt_t P)
     P->good = 0;
 }
 
-static void _fmpz_multi_crt_fit_length(fmpz_multi_crt_t P, slong k)
+static void _fmpz_multi_CRT_fit_length(fmpz_multi_crt_t P, slong k)
 {
     k = FLINT_MAX(WORD(1), k);
 
@@ -42,7 +42,7 @@ static void _fmpz_multi_crt_fit_length(fmpz_multi_crt_t P, slong k)
     }
 }
 
-static void _fmpz_multi_crt_set_length(fmpz_multi_crt_t P, slong k)
+static void _fmpz_multi_CRT_set_length(fmpz_multi_crt_t P, slong k)
 {
     slong i;
 
@@ -56,15 +56,16 @@ static void _fmpz_multi_crt_set_length(fmpz_multi_crt_t P, slong k)
     P->length = k;
 }
 
-void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
+void fmpz_multi_CRT_clear(fmpz_multi_crt_t P)
 {
-    _fmpz_multi_crt_set_length(P, 0);
+    _fmpz_multi_CRT_set_length(P, 0);
 
     if (P->alloc > 0)
     {
         flint_free(P->prog);
     }
 }
+
 
 typedef struct {
     slong idx;
@@ -164,7 +165,7 @@ static slong _push_prog(
 
     /* compile [start, end) */
     i = P->length;
-    _fmpz_multi_crt_fit_length(P, i + 1);
+    _fmpz_multi_CRT_fit_length(P, i + 1);
     fmpz_init(P->prog[i].modulus);
     fmpz_init(P->prog[i].idem);
     P->good = P->good &&
@@ -190,22 +191,26 @@ static int index_deg_pair_cmp(
     Return 1 if moduli can be CRT'ed, 0 otherwise.
     A return of 0 means that future calls to run will leave output undefined.
 */
-int fmpz_multi_crt_precompute_p(
+int fmpz_multi_CRT_precompute(
     fmpz_multi_crt_t P,
-    const fmpz * const * moduli,
+    const fmpz * m,
     slong len)
 {
     slong i;
     index_deg_pair * perm;
+    const fmpz ** moduli = FLINT_ARRAY_ALLOC(len, const fmpz*);
     TMP_INIT;
 
     FLINT_ASSERT(len > 0);
+
+    P->moduli_count = len;
 
     TMP_START;
     perm = (index_deg_pair *) TMP_ALLOC(len * sizeof(index_deg_pair));
 
     for (i = 0; i < len; i++)
     {
+        moduli[i] = m + i;
         perm[i].idx = i;
         perm[i].degree = fmpz_bits(moduli[i]);
     }
@@ -219,8 +224,8 @@ int fmpz_multi_crt_precompute_p(
         FLINT_ASSERT(i == 0 || perm[i - 1].degree <= perm[i].degree);
     }
 
-    _fmpz_multi_crt_fit_length(P, FLINT_MAX(WORD(1), len - 1));
-    _fmpz_multi_crt_set_length(P, 0);
+    _fmpz_multi_CRT_fit_length(P, FLINT_MAX(WORD(1), len - 1));
+    _fmpz_multi_CRT_set_length(P, 0);
     P->localsize = 1;
     P->good = 1;
 
@@ -248,7 +253,7 @@ int fmpz_multi_crt_precompute_p(
 
     if (!P->good)
     {
-        _fmpz_multi_crt_set_length(P, 0);
+        _fmpz_multi_CRT_set_length(P, 0);
     }
 
     /* two more spots for temporaries */
@@ -257,100 +262,43 @@ int fmpz_multi_crt_precompute_p(
 
     TMP_END;
 
+    flint_free(moduli);
+
     return P->good;
 }
 
-int fmpz_multi_crt_precompute(
-    fmpz_multi_crt_t P,
-    const fmpz * moduli,
-    slong len)
-{
-    int success;
-    slong i;
-    const fmpz ** m;
-    TMP_INIT;
 
-    FLINT_ASSERT(len > 0);
-
-    TMP_START;
-
-    m = (const fmpz **) TMP_ALLOC(len*sizeof(fmpz *));
-    for (i = 0; i < len; i++)
-    {
-        m[i] = moduli + i;
-    }
-
-    success = fmpz_multi_crt_precompute_p(P, (const fmpz * const *) m, len);
-
-    TMP_END;
-
-    return success;
-}
-
-
-
-void fmpz_multi_crt_precomp(
+void fmpz_multi_CRT_precomp(
     fmpz_t output,
     const fmpz_multi_crt_t P,
-    const fmpz * inputs)
+    const fmpz * inputs,
+    int sign)
 {
     slong i;
     fmpz * out;
     TMP_INIT;
 
     TMP_START;
-    out = (fmpz *) TMP_ALLOC(P->localsize*sizeof(fmpz));
+    out = TMP_ARRAY_ALLOC(P->localsize, fmpz);
     for (i = 0; i < P->localsize; i++)
-    {
         fmpz_init(out + i);
-    }
 
     fmpz_swap(out + 0, output);
-    _fmpz_multi_crt_run(out, P, inputs);
+    _fmpz_multi_CRT_run(out, P, inputs, sign);
     fmpz_swap(out + 0, output);
 
     for (i = 0; i < P->localsize; i++)
-    {
         fmpz_clear(out + i);
-    }
 
     TMP_END;
 }
 
-void fmpz_multi_crt_precomp_p(
-    fmpz_t output,
-    const fmpz_multi_crt_t P,
-    const fmpz * const * inputs)
-{
-    slong i;
-    fmpz * out;
-    TMP_INIT;
-
-    TMP_START;
-    out = (fmpz *) TMP_ALLOC(P->localsize*sizeof(fmpz));
-    for (i = 0; i < P->localsize; i++)
-    {
-        fmpz_init(out + i);
-    }
-
-    fmpz_swap(out + 0, output);
-    _fmpz_multi_crt_run_p(out, P, inputs);
-    fmpz_swap(out + 0, output);
-
-    for (i = 0; i < P->localsize; i++)
-    {
-        fmpz_clear(out + i);
-    }
-
-    TMP_END;
-}
-
-
-int fmpz_multi_crt(
+int fmpz_multi_CRT(
     fmpz_t output,
     const fmpz * moduli,
     const fmpz * values,
-    slong len)
+    slong len,
+    int sign)
 {
     int success;
     slong i;
@@ -362,25 +310,21 @@ int fmpz_multi_crt(
 
     TMP_START;
 
-    fmpz_multi_crt_init(P);
-    success = fmpz_multi_crt_precompute(P, moduli, len);
+    fmpz_multi_CRT_init(P);
+    success = fmpz_multi_CRT_precompute(P, moduli, len);
 
-    out = (fmpz *) TMP_ALLOC(P->localsize*sizeof(fmpz));
+    out = TMP_ARRAY_ALLOC(P->localsize, fmpz);
     for (i = 0; i < P->localsize; i++)
-    {
         fmpz_init(out + i);
-    }
 
     fmpz_swap(out + 0, output);
-    _fmpz_multi_crt_run(out, P, values);
+    _fmpz_multi_CRT_run(out, P, values, sign);
     fmpz_swap(out + 0, output);
 
     for (i = 0; i < P->localsize; i++)
-    {
         fmpz_clear(out + i);
-    }
 
-    fmpz_multi_crt_clear(P);
+    fmpz_multi_CRT_clear(P);
 
     TMP_END;
 
@@ -388,21 +332,11 @@ int fmpz_multi_crt(
 }
 
 
-/*
-    If P was set with a call to fmpz_poly_crt_compile(P, m, len), return
-    in outputs[0] signed integer r of smallest abs value such that
-        r = inputs[0] mod m[0]
-        r = inputs[1] mod m[1]
-            ...
-        r = inputs[len-1] mod m[len-1]
-    For thread safety "outputs" is expected to have enough space for all
-    temporaries, thus should be at least as long as P->localsize.
-*/
-
-void _fmpz_multi_crt_run(
+void _fmpz_multi_CRT_run(
     fmpz * outputs,
     const fmpz_multi_crt_t P,
-    const fmpz * inputs)
+    const fmpz * inputs,
+    int sign)
 {
     slong i;
     slong a, b, c;
@@ -426,7 +360,7 @@ void _fmpz_multi_crt_run(
         fmpz_sub(t1, B, C);
         fmpz_mul(t2, P->prog[i].idem, t1);
         fmpz_sub(t1, B, t2);
-        fmpz_smod(A, t1, P->prog[i].modulus);
+        _fmpz_mods(A, t1, P->prog[i].modulus, sign, t2);
 
         /* last calculation should write answer to outputs[0] */
         if (i + 1 >= P->length)
@@ -434,6 +368,86 @@ void _fmpz_multi_crt_run(
             FLINT_ASSERT(A == outputs + 0);
         }
     }
+}
+
+/* depreciated functions *****************************************************/
+
+void fmpz_multi_crt_init(fmpz_multi_crt_t P)
+{
+    fmpz_multi_CRT_init(P);
+}
+
+void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
+{
+    fmpz_multi_CRT_clear(P);
+}
+
+int fmpz_multi_crt_precompute(
+    fmpz_multi_crt_t P,
+    const fmpz * moduli,
+    slong len)
+{
+    return fmpz_multi_CRT_precompute(P, moduli, len);
+}
+
+int fmpz_multi_crt_precompute_p(
+    fmpz_multi_crt_t P,
+    const fmpz * const * moduli,
+    slong len)
+{
+    int success;
+    slong i;
+    fmpz * m = FLINT_ARRAY_ALLOC(len, fmpz);
+
+    for (i = 0; i < len; i++)
+        m[i] = *moduli[i];
+
+    success = fmpz_multi_CRT_precompute(P, m, len);
+
+    flint_free(m);
+
+    return success;
+}
+
+void fmpz_multi_crt_precomp(
+    fmpz_t output,
+    const fmpz_multi_crt_t P,
+    const fmpz * inputs)
+{
+    fmpz_multi_CRT_precomp(output, P, inputs, 1);
+}
+
+void fmpz_multi_crt_precomp_p(
+    fmpz_t output,
+    const fmpz_multi_crt_t P,
+    const fmpz * const * inputs)
+{
+    slong i;
+    fmpz * ins = FLINT_ARRAY_ALLOC(P->moduli_count, fmpz);
+
+    for (i = 0; i < P->moduli_count; i++)
+        ins[i] = *inputs[i];
+
+    fmpz_multi_CRT_precomp(output, P, ins, 1);
+
+    flint_free(ins);
+}
+
+int fmpz_multi_crt(
+    fmpz_t output,
+    const fmpz * moduli,
+    const fmpz * values,
+    slong len)
+{
+    return fmpz_multi_CRT(output, moduli, values, len, 1);
+}
+
+void _fmpz_multi_crt_run(
+    fmpz * outputs,
+    const fmpz_multi_crt_t P,
+    const fmpz * inputs)
+{
+    _fmpz_multi_CRT_run(outputs, P, inputs, 1);
 }
 
 void _fmpz_multi_crt_run_p(
@@ -442,33 +456,13 @@ void _fmpz_multi_crt_run_p(
     const fmpz * const * inputs)
 {
     slong i;
-    slong a, b, c;
-    const fmpz * B, * C;
-    fmpz * A, * t1, * t2;
+    fmpz * ins = FLINT_ARRAY_ALLOC(P->moduli_count, fmpz);
 
-    t1 = outputs + P->temp1loc;
-    t2 = outputs + P->temp2loc;
+    for (i = 0; i < P->moduli_count; i++)
+        ins[i] = *inputs[i];
 
-    for (i = 0; i < P->length; i++)
-    {
-        a = P->prog[i].a_idx;
-        b = P->prog[i].b_idx;
-        c = P->prog[i].c_idx;
-        FLINT_ASSERT(a >= 0);
-        A = outputs + a;
-        B = b < 0 ? inputs[-b-1] : outputs + b;
-        C = c < 0 ? inputs[-c-1] : outputs + c;
+    _fmpz_multi_CRT_run(outputs, P, ins, 1);
 
-        /* A = B + I*(C - B) mod M */
-        fmpz_sub(t1, B, C);
-        fmpz_mul(t2, P->prog[i].idem, t1);
-        fmpz_sub(t1, B, t2);
-        fmpz_smod(A, t1, P->prog[i].modulus);
-
-        /* last calculation should write answer to outputs[0] */
-        if (i + 1 >= P->length)
-        {
-            FLINT_ASSERT(A == outputs + 0);
-        }
-    }
+    flint_free(ins);
 }
+

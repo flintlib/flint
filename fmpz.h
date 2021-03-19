@@ -836,6 +836,7 @@ typedef struct
 typedef struct
 {
     _fmpz_multi_crt_prog_instr * prog; /* straight line program */
+    slong moduli_count;
     slong length; /* length of prog */
     slong alloc;  /* alloc of prog */
     slong localsize; /* length of outputs required in nmod_poly_crt_run */
@@ -845,6 +846,29 @@ typedef struct
 } fmpz_multi_crt_struct;
 
 typedef fmpz_multi_crt_struct fmpz_multi_crt_t[1];
+
+FLINT_DLL void fmpz_multi_CRT_init(fmpz_multi_crt_t CRT);
+
+FLINT_DLL int fmpz_multi_CRT_precompute(fmpz_multi_crt_t CRT,
+                                               const fmpz * moduli, slong len);
+
+FLINT_DLL void fmpz_multi_CRT_precomp(fmpz_t output, const fmpz_multi_crt_t P,
+                                                const fmpz * inputs, int sign);
+
+FLINT_DLL int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli,
+                                     const fmpz * values, slong len, int sign);
+
+FLINT_DLL void fmpz_multi_CRT_clear(fmpz_multi_crt_t P);
+
+FLINT_DLL void _fmpz_multi_CRT_run(fmpz * outputs, const fmpz_multi_crt_t P,
+                                                const fmpz * inputs, int sign);
+
+/* depreciated versions that assume sign = 1 *********************************/
+FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
+                                                          const fmpz * inputs);
+
+FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
+                      const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
 
 FLINT_DLL void fmpz_multi_crt_init(fmpz_multi_crt_t CRT);
 
@@ -875,7 +899,7 @@ FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
 
 FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
                       const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
-
+/*****************************************************************************/
 
 typedef struct
 {
