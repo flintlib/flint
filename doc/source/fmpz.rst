@@ -589,6 +589,11 @@ Comparison
     Returns a negative value if `\lvert f\rvert < \lvert g\rvert`, positive value if 
     `\lvert g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
+.. function:: int fmpz_cmp2abs(const fmpz_t f, const fmpz_t g)
+
+    Returns a negative value if `\lvert f\rvert < \lvert 2g\rvert`, positive value if 
+    `\lvert 2g\rvert < \lvert f \rvert`, otherwise returns `0`.
+
 .. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
     Returns `1` if `f` is equal to `g`, otherwise returns `0`.

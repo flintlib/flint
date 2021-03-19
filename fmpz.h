@@ -409,6 +409,8 @@ FLINT_DLL int fmpz_cmp_si(const fmpz_t f, slong g);
 
 FLINT_DLL int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
+FLINT_DLL int fmpz_cmp2abs(const fmpz_t f, const fmpz_t g);
+
 FMPZ_INLINE
 int fmpz_is_even(const fmpz_t f)
 {
@@ -605,6 +607,9 @@ FLINT_DLL ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+FLINT_DLL void _fmpz_mods(fmpz_t r, const fmpz_t a, const fmpz_t m,
+                                                           int sign, fmpz_t t);
 
 FMPZ_INLINE void
 fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
@@ -870,6 +875,44 @@ FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
 
 FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
                       const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
+
+
+typedef struct
+{
+    slong in_idx;
+    slong out_idx;
+    fmpz_t modulus;
+} _fmpz_multi_mod_instr;
+
+typedef struct
+{
+    _fmpz_multi_mod_instr * prog; /* straight line program */
+    fmpz * moduli;
+    slong moduli_count;
+    flint_bitcnt_t min_modulus_bits;
+    slong length; /* length of prog */
+    slong alloc;  /* alloc of prog */
+    slong localsize; /* length of tmp required in fmpz_multi_mod_run */
+    slong temp1loc;
+    int good;   /* the moduli are good for MOD, none are zero */
+} fmpz_multi_mod_struct;
+
+typedef fmpz_multi_mod_struct fmpz_multi_mod_t[1];
+
+
+FLINT_DLL void fmpz_multi_mod_init(fmpz_multi_mod_t P);
+
+FLINT_DLL void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k);
+
+FLINT_DLL void fmpz_multi_mod_clear(fmpz_multi_mod_t P);
+
+FLINT_DLL int fmpz_multi_mod_precompute(fmpz_multi_mod_t P, const fmpz * f,
+                                                                      slong r);
+FLINT_DLL void fmpz_multi_mod_precomp(fmpz * outputs,
+                       const fmpz_multi_mod_t P, const fmpz_t input, int sign);
+
+FLINT_DLL void _fmpz_multi_mod_run(fmpz * outputs, const fmpz_multi_mod_t P,
+                                     const fmpz_t input, int sign, fmpz * tmp);
 
 /*****************************************************************************/
 
