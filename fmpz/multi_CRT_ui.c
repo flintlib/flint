@@ -13,126 +13,82 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "nmod_vec.h"
 
+#define MAC(h, l, a, b)                 \
+do {                                    \
+    mp_limb_t p1, p0;                   \
+    umul_ppmm(p1, p0, a, b);            \
+    add_ssaaaa(h, l, h, l, p1, p0);     \
+} while (0)
 
-void
-__fmpz_multi_CRT_ui_sign(fmpz_t output, const fmpz_t input,
-    const fmpz_comb_t comb, fmpz_t temp)
+void fmpz_multi_CRT_ui(
+    fmpz_t b,
+    mp_srcptr in,
+    const fmpz_comb_t C,
+    fmpz_comb_temp_t CT,
+    int sign)
 {
-    slong n = comb->n;
-    slong p;
+    slong i, k, l;
+    slong klen = C->crt_klen;
+    slong * step = C->step;
+    crt_lut_entry * lu = C->crt_lu;
+    fmpz * T = CT->T;
+    fmpz * A = CT->A;
+    slong * offsets = C->crt_offsets;
+    const mp_limb_t * md = C->packed_multipliers;
 
-    if (n == WORD(0))
+    for (k = 0, i = 0, l = 0; k < klen; k++)
     {
-        if (fmpz_is_zero(input)) 
+        slong s = step[k];
+        slong j = offsets[k];
+        mpz_ptr az = _fmpz_promote(A + k);
+        mp_limb_t * ad = FLINT_MPZ_REALLOC(az, s + 2);
+        mp_limb_t t, hi, lo;
+
+        flint_mpn_zero(ad, s + 2);
+
+        for ( ; i < j; md += s, i++)
         {
-            fmpz_zero(output);
-            return;
+            /* low level combination: 1, 2, or 3 small primes */
+            FLINT_ASSERT(l + 1 <= C->num_primes);
+            umul_ppmm(hi, lo, in[l*1], lu[i].i0); l++;
+
+            if (lu[i].i2 != 0)
+            {
+                FLINT_ASSERT(l + 2 <= C->num_primes);
+                MAC(hi, lo, in[l*1], lu[i].i1); l++;
+                MAC(hi, lo, in[l*1], lu[i].i2); l++;
+            }
+            else if (lu[i].i1 != 0)
+            {
+                FLINT_ASSERT(l + 1 <= C->num_primes);
+                MAC(hi, lo, in[l*1], lu[i].i1); l++;
+            }
+
+            FLINT_ASSERT(hi < lu[i].mod.n);
+            NMOD_RED2(t, hi, lo, lu[i].mod);
+
+            /* mid level combination: depends on FMPZ_CRT_UI_CUTOFF */
+            hi = mpn_addmul_1(ad, md, s, t);
+            add_ssaaaa(ad[s + 1], ad[s], ad[s + 1], ad[s], UWORD(0), hi);
         }
 
-        /* XXX: overflow possible? */
-        p = comb->primes[0];
-        if ((p - (*input)) < (*input))
-            fmpz_set_si(output, (slong) ((*input) - p));
-        else
-            fmpz_set_ui(output, (*input));
-        return;
+        s += 2;
+        MPN_NORM(ad, s);
+        az->_mp_size = s;
+        _fmpz_demote_val(A + k);
+
+        _fmpz_mods(A + k, A + k, C->crt_P->moduli + k, sign, T + 0);
     }
 
-    fmpz_sub(temp, input, comb->comb[comb->n - 1]);
+    FLINT_ASSERT(l == C->num_primes);
 
-    if (fmpz_cmpabs(temp, input) <= 0)
-        fmpz_set(output, temp);
-    else
-        fmpz_set(output, input);
-
-    return;
+    /* high level combination */
+    fmpz_swap(T + 0, b);
+    _fmpz_multi_CRT_run(T, C->crt_P, A, sign);
+    fmpz_swap(T + 0, b);
 }
 
-void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
-    const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
-{
-    slong i, j;
-    slong n = comb->n;
-    slong num;
-    slong log_res;
-    slong num_primes = comb->num_primes;
-
-    fmpz ** comb_temp = ctemp->comb_temp;
-    fmpz * temp = ctemp->temp;
-    fmpz * temp2 = ctemp->temp2;
-
-    /* The output is less than a single prime, so just output the result */
-    if (num_primes == 1)
-    {
-        if (sign)
-        {
-            mp_limb_t p = comb->primes[0];
-
-            if ((p - residues[0]) < residues[0])
-                fmpz_set_si(output, residues[0] - p);
-            else
-                fmpz_set_ui(output, residues[0]);
-        }
-        else
-        {
-            fmpz_set_ui(output, residues[0]);
-        }
-        return;
-    }
-
-    /* First layer of reconstruction */
-    num = (WORD(1) << n);
-
-    for (i = 0, j = 0; i + 2 <= num_primes; i += 2, j++)
-    {
-        fmpz_set_ui(temp, residues[i]);
-        fmpz_mod_ui(temp2, temp, comb->primes[i+1]);
-        fmpz_sub_ui(temp2, temp2, residues[i + 1]);
-        fmpz_neg(temp2, temp2);
-        fmpz_mul(temp, temp2, comb->res[0] + j);
-        fmpz_mod_ui(temp2, temp, comb->primes[i+1]);
-        fmpz_mul_ui(temp, temp2, comb->primes[i]); 
-        fmpz_add_ui(comb_temp[0] + j, temp, residues[i]);
-    }
-
-    if (i < num_primes)
-        fmpz_set_ui(comb_temp[0] + j, residues[i]);
-
-    /* Compute other layers of reconstruction */
-    num /= 2;
-    log_res = 1;
-
-    while (log_res < n)
-    {
-        for (i = 0, j = 0; i < num; i += 2, j++)
-        {
-            if (fmpz_is_one(comb->comb[log_res-1] + i + 1))
-            {
-                if (!fmpz_is_one(comb->comb[log_res-1] + i))
-                    fmpz_set(comb_temp[log_res] + j, comb_temp[log_res-1] + i);
-            }
-            else
-            {
-                fmpz_mod(temp2, comb_temp[log_res-1] + i,
-                    comb->comb[log_res-1] + i + 1);
-                fmpz_sub(temp, comb_temp[log_res-1] + i + 1, temp2);
-                fmpz_mul(temp2, temp, comb->res[log_res] + j);
-                fmpz_mod(temp, temp2, comb->comb[log_res-1] + i + 1);
-                fmpz_mul(temp2, temp, comb->comb[log_res-1] + i);
-                fmpz_add(comb_temp[log_res] + j, temp2,
-                    comb_temp[log_res-1] + i);
-            }
-        }
-        log_res++;
-        num /= 2; 
-    }
-
-    /* Write out the output */
-    if (sign)
-        __fmpz_multi_CRT_ui_sign(output, comb_temp[log_res - 1], comb, temp);
-    else
-        fmpz_set(output, comb_temp[log_res - 1]);
-}

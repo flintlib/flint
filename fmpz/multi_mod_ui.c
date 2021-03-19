@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2008, 2009, William Hart 
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -16,87 +17,77 @@
 #include "fmpz.h"
 #include "nmod_vec.h"
 
-void
-fmpz_multi_mod_ui_basecase(mp_limb_t * out, const fmpz_t in, mp_srcptr primes,
-                           slong num_primes)
+
+void fmpz_multi_mod_ui_stride(
+    mp_limb_t * out, slong stride,
+    const fmpz_t input,
+    const fmpz_comb_t C,
+    fmpz_comb_temp_t CT)
 {
-    slong i;
-    for (i = 0; i < num_primes; i++)
-    {
-        out[i] = fmpz_fdiv_ui(in, primes[i]);
-    }
-}
+    slong i, k, l;
+    fmpz * A = CT->A;
+    mod_lut_entry * lu;
+    slong * offsets;
+    slong klen = C->mod_klen;
+    fmpz_t ttt;
 
-void
-fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb,
-    fmpz_comb_temp_t temp)
-{
-    slong i, j;
-    slong n = comb->n;
-    slong log_comb;
-    slong stride;
-    slong num;
-    slong num_primes = comb->num_primes;
-    fmpz ** comb_temp = temp->comb_temp;
-
-    if (num_primes <= 80)
+    /* high level split */
+    if (klen == 1)
     {
-        fmpz_multi_mod_ui_basecase(out, in, comb->primes, comb->num_primes);
-        return;
-    }
-
-    log_comb = n - 1;
-   
-    /* Find level in comb with entries bigger than the input integer */
-    log_comb = 0;
-    if (fmpz_sgn(in) < 0)
-    {
-        while ((fmpz_bits(in) >= fmpz_bits(comb->comb[log_comb]) - 1)
-            && (log_comb < comb->n - 1)) log_comb++;
+        *ttt = A[0];
+        A[0] = *input;
     }
     else
     {
-        while (fmpz_cmpabs(in, comb->comb[log_comb]) >= 0 &&
-            (log_comb < comb->n - 1))
-            log_comb++;
+        _fmpz_multi_mod_run(A, C->mod_P, input, -1, CT->T);
     }
 
-    num = (WORD(1) << (n - log_comb - 1));
+    offsets = C->mod_offsets;
+    lu = C->mod_lu;
 
-    /* Set each entry of this level of temp to the input integer */
-    for (i = 0; i < num; i++)
+    for (k = 0, i = 0, l = 0; k < klen; k++)
     {
-        fmpz_set(comb_temp[log_comb] + i, in);
-    }
+        slong j = offsets[k];
 
-    log_comb--;
-    num *= 2;
-
-    /* Fill in other entries of temp by taking entries of temp
-        at higher level mod pairs from comb */
-
-    /* keep going until we reach the basecase */
-    while (log_comb > FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF)
-    {
-        for (i = 0, j = 0; i < num; i += 2, j++)
+        for ( ; i < j; i++)
         {
-            fmpz_mod(comb_temp[log_comb] + i, comb_temp[log_comb + 1] + j,
-                comb->comb[log_comb] + i);
-            fmpz_mod(comb_temp[log_comb] + i + 1, comb_temp[log_comb + 1] + j,
-                comb->comb[log_comb] + i + 1);
+            /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
+            mp_limb_t t = fmpz_fdiv_ui(A + k, lu[i].mod.n);
+
+            /* low level split: 1, 2, or 3 small primes */
+            if (lu[i].mod2.n != 0)
+            {
+                FLINT_ASSERT(l + 3 <= C->num_primes);
+                NMOD_RED(out[l*stride], t, lu[i].mod0); l++;
+                NMOD_RED(out[l*stride], t, lu[i].mod1); l++;
+                NMOD_RED(out[l*stride], t, lu[i].mod2); l++;
+            }
+            else if (lu[i].mod1.n != 0)
+            {
+                FLINT_ASSERT(l + 2 <= C->num_primes);
+                NMOD_RED(out[l*stride], t, lu[i].mod0); l++;
+                NMOD_RED(out[l*stride], t, lu[i].mod1); l++;
+            }
+            else
+            {
+                FLINT_ASSERT(l + 1 <= C->num_primes);
+                out[l*stride] = t; l++;
+            }
         }
-        num *= 2;
-        log_comb--;
     }
 
-    /* Do basecase */
-    num /= 2;
-    log_comb++;
+    FLINT_ASSERT(l == C->num_primes);
 
-    stride = (WORD(1) << (log_comb + 1));
-    for (i = 0, j = 0; j < num_primes; i++, j += stride)
-    {
-        fmpz_multi_mod_ui_basecase(out + j, comb_temp[log_comb] + i,
-            comb->primes + j, FLINT_MIN(stride, num_primes - j));
-    }
+    if (klen == 1)
+        A[0] = *ttt;
 }
+
+void fmpz_multi_mod_ui(
+    mp_limb_t * output,
+    const fmpz_t input,
+    const fmpz_comb_t C,
+    fmpz_comb_temp_t CT)
+{
+    fmpz_multi_mod_ui_stride(output, 1, input, C, CT);
+}
+

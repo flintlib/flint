@@ -775,45 +775,8 @@ FLINT_DLL void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1
 FLINT_DLL void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, int sign);
 
-#define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
-
-typedef struct
-{
-    const mp_limb_t * primes;
-    slong num_primes;
-    slong n;         /* we have 2^n >= num_primes > 2^(n-1) */
-    fmpz ** comb;   /* Array of arrays of products */
-    fmpz ** res;    /* successive residues r_i^-1 mod r_{i+1} for pairs r_i, r_{i+1} */
-    nmod_t * mod;
-}
-fmpz_comb_struct;
-
-typedef struct
-{
-    slong n;
-    fmpz ** comb_temp;
-    fmpz_t temp;
-    fmpz_t temp2;
-}
-fmpz_comb_temp_struct;
-
-typedef fmpz_comb_struct fmpz_comb_t[1];
-typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
-
-FLINT_DLL void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb);
-FLINT_DLL void fmpz_comb_temp_clear(fmpz_comb_temp_t temp);
-
-FLINT_DLL void fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes);
-FLINT_DLL void fmpz_comb_clear(fmpz_comb_t comb);
-
-FLINT_DLL void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
-
-FLINT_DLL void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
-
 FLINT_DLL void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-                                                fmpz_t r2, fmpz_t m2, int sign);
+                                               fmpz_t r2, fmpz_t m2, int sign);
 
 FMPZ_INLINE void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 {
@@ -822,6 +785,8 @@ FMPZ_INLINE void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     else
         fmpz_set_si(f, x - m);
 }
+
+/* multi CRT *****************************************************************/
 
 typedef struct
 {
@@ -865,7 +830,6 @@ FLINT_DLL void _fmpz_multi_CRT_run(fmpz * outputs, const fmpz_multi_CRT_t P,
                                                 const fmpz * inputs, int sign);
 
 /* depreciated versions that assume sign = 1 *********************************/
-
 typedef fmpz_multi_CRT_struct fmpz_multi_crt_struct;
 typedef fmpz_multi_CRT_t fmpz_multi_crt_t;
 
@@ -904,7 +868,8 @@ FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
 
 FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
                       const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
-/*****************************************************************************/
+
+/* multi mod *****************************************************************/
 
 typedef struct
 {
@@ -942,6 +907,62 @@ FLINT_DLL void fmpz_multi_mod_precomp(fmpz * outputs,
 
 FLINT_DLL void _fmpz_multi_mod_run(fmpz * outputs, const fmpz_multi_mod_t P,
                                      const fmpz_t input, int sign, fmpz * tmp);
+
+/* multi mod/multi CRT ui ****************************************************/
+
+typedef struct {
+    nmod_t mod;
+    mp_limb_t i0, i1, i2;
+} crt_lut_entry;
+
+typedef struct {
+    nmod_t mod;
+    nmod_t mod0, mod1, mod2;
+} mod_lut_entry;
+
+typedef struct {
+    fmpz_multi_CRT_t crt_P;
+    fmpz_multi_mod_t mod_P;
+    mp_limb_t * packed_multipliers;
+    slong * step;
+    slong * crt_offsets;
+    slong crt_offsets_alloc;
+    slong * mod_offsets;
+    slong mod_offsets_alloc;
+    crt_lut_entry * crt_lu;
+    slong crt_lu_alloc;
+    slong crt_klen;
+    mod_lut_entry * mod_lu;
+    slong mod_lu_alloc;
+    slong mod_klen;
+    slong num_primes;
+} fmpz_comb_struct;
+
+typedef fmpz_comb_struct fmpz_comb_t[1];
+
+typedef struct {
+    slong Alen, Tlen;
+    fmpz * A, * T;
+} fmpz_comb_temp_struct;
+
+typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
+
+FLINT_DLL void fmpz_comb_temp_init(fmpz_comb_temp_t CT, const fmpz_comb_t C);
+
+FLINT_DLL void fmpz_comb_temp_clear(fmpz_comb_temp_t CT);
+
+FLINT_DLL void fmpz_comb_init(fmpz_comb_t C, mp_srcptr primes, slong num_primes);
+
+FLINT_DLL void fmpz_comb_clear(fmpz_comb_t C);
+
+FLINT_DLL void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
+                                     const fmpz_comb_t C, fmpz_comb_temp_t CT);
+
+void fmpz_new_multi_mod_ui_stride(mp_limb_t * out, slong stride,
+                 const fmpz_t input, const fmpz_comb_t C, fmpz_comb_temp_t CT);
+
+FLINT_DLL void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
+                      const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
 /*****************************************************************************/
 
