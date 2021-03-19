@@ -58,7 +58,7 @@ main(void)
         fmpz_multi_CRT_clear(P);
     }
 
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_multi_crt_t P;
         fmpz_multi_mod_t M;
@@ -75,7 +75,7 @@ main(void)
         fmpz_multi_CRT_init(P);
         fmpz_multi_mod_init(M);
 
-        for (j = 0; j < 4; j++)
+        for (j = 0; j < 5; j++)
         {
             moduli_count = n_randint(state, 40) + 1;
 
