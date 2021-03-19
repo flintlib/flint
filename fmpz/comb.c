@@ -69,7 +69,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
     int success;
     slong l, i, j, k;
     ulong tt, mm, mt;
-    fmpz_poly_t M, Mm;
+    fmpz_poly_t M, Mm; /* only used for resizable fmpz array convenience */
 
     if (len < 1)
         flint_throw(FLINT_ERROR, "fmpz_comb_init");
@@ -107,7 +107,9 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
         fmpz_poly_fit_length(M, k + 1);
         fmpz_one(M->coeffs + k);
 
-        for (j = i; l < len && fmpz_size(M->coeffs + k) <= FMPZ_CRT_UI_CUTOFF; j++)
+        for (j = i;
+             l < len && fmpz_size(M->coeffs + k) <= FMPZ_CRT_UI_CUTOFF;
+             j++)
         {
             if (j + 1 >= C->crt_lu_alloc)
             {
@@ -127,9 +129,12 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
                 if (l + 2 < len && !n_mul_checked(&mt, mm, m[l+2]))
                 {
                     mm = mt;
-                    success = (1 == n_gcdinv(&C->crt_lu[j].i0, m[l+1]*m[l+2] % m[l+0], m[l+0])) &&
-                              (1 == n_gcdinv(&C->crt_lu[j].i1, m[l+0]*m[l+2] % m[l+1], m[l+1])) &&
-                              (1 == n_gcdinv(&C->crt_lu[j].i2, m[l+0]*m[l+1] % m[l+2], m[l+2]));
+                    success = (1 == n_gcdinv(&C->crt_lu[j].i0,
+                                          m[l+1]*m[l+2] % m[l+0], m[l+0])) &&
+                              (1 == n_gcdinv(&C->crt_lu[j].i1,
+                                          m[l+0]*m[l+2] % m[l+1], m[l+1])) &&
+                              (1 == n_gcdinv(&C->crt_lu[j].i2,
+                                          m[l+0]*m[l+1] % m[l+2], m[l+2]));
                     if (!success)
                         flint_throw(FLINT_ERROR, "fmpz_comb_init");
 
@@ -140,8 +145,10 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
                 }
                 else
                 {
-                    success = (1 == n_gcdinv(&C->crt_lu[j].i0, m[l+1] % m[l+0], m[l+0])) &&
-                              (1 == n_gcdinv(&C->crt_lu[j].i1, m[l+0] % m[l+1], m[l+1]));
+                    success = (1 == n_gcdinv(&C->crt_lu[j].i0,
+                                             m[l+1] % m[l+0], m[l+0])) &&
+                              (1 == n_gcdinv(&C->crt_lu[j].i1,
+                                             m[l+0] % m[l+1], m[l+1]));
                     if (!success)
                         flint_throw(FLINT_ERROR, "fmpz_comb_init");
 
@@ -187,7 +194,9 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
                      fmpz_size(M->coeffs + k - 1) <= FMPZ_CRT_UI_CUTOFF*3/4))
     {
         k--;
-        for (i = (k >= 2) ? C->crt_offsets[k - 2] : 0; i < C->crt_offsets[k]; i++)
+        for (i = (k >= 2) ? C->crt_offsets[k - 2] : 0;
+             i < C->crt_offsets[k];
+             i++)
         {
             int last = (i >= C->crt_offsets[k - 1]);
 
@@ -238,7 +247,8 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
     {
         for ( ; i < C->crt_offsets[k]; i++)
         {
-            fmpz_get_ui_array(C->packed_multipliers + l, C->step[k], Mm->coeffs + i);
+            fmpz_get_ui_array(C->packed_multipliers + l, C->step[k],
+                                                               Mm->coeffs + i);
             l += C->step[k];
         }
     }
@@ -262,7 +272,8 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
             if (j + 1 >= C->mod_lu_alloc)
             {
                 C->mod_lu_alloc = FLINT_MAX(j + 1, C->mod_lu_alloc*3/2);
-                C->mod_lu = FLINT_ARRAY_REALLOC(C->mod_lu, C->mod_lu_alloc, mod_lut_entry);
+                C->mod_lu = FLINT_ARRAY_REALLOC(C->mod_lu, C->mod_lu_alloc,
+                                                                mod_lut_entry);
             }
 
             C->mod_lu[j].mod0.n = 0;

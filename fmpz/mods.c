@@ -16,7 +16,7 @@ void _fmpz_mods(
     fmpz_t r,
     const fmpz_t a,
     const fmpz_t m,
-    int sign, /* -1: don't care just get close,  0: 0<=r<m,  1: 2|r|<=m  */
+    int sign, /* -1: |r| < m,  0: 0 <= r < m,  1: -m < 2r <= m */
     fmpz_t t) /* temp */
 {
     FLINT_ASSERT(fmpz_sgn(m) > 0);
@@ -30,16 +30,29 @@ void _fmpz_mods(
     }
     else if (sign > 0)
     {
-        if (fmpz_cmp2abs(m, a) >= 0)
+        int cmp = fmpz_cmp2abs(m, a);
+
+        if (cmp >= 0)
         {
-            fmpz_set(r, a);
+            if (cmp == 0 && fmpz_sgn(a) < 0)
+                fmpz_neg(r, a);
+            else
+                fmpz_set(r, a);
+
             return;
         }
 
         fmpz_tdiv_qr(t, r, a, m);
 
-        if (fmpz_cmp2abs(m, r) >= 0)
+        cmp = fmpz_cmp2abs(m, r);
+
+        if (cmp >= 0)
+        {
+            if (cmp == 0 && fmpz_sgn(r) < 0)
+                fmpz_neg(r, r);
+
             return;
+        }
 
         if (fmpz_sgn(r) < 0)
             fmpz_add(r, r, m);

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2008, 2009, William Hart 
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -24,6 +25,10 @@ do {                                    \
     add_ssaaaa(h, l, h, l, p1, p0);     \
 } while (0)
 
+/*
+    TODO: a slight speedup (< 10%) can be achived in the case of few primes
+          where the switching in the low level combination is a bottleneck.
+*/
 void fmpz_multi_CRT_ui(
     fmpz_t b,
     mp_srcptr in,
