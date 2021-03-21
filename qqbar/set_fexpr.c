@@ -29,14 +29,220 @@ fexpr_is_builtin_call(const fexpr_t expr, slong i)
 
 int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 
+/* todo: deduplicate */
+static int
+fexpr_equal_ui(const fexpr_t expr, ulong c)
+{
+    if (c <= FEXPR_COEFF_MAX)
+    {
+        return expr->data[0] == (c << FEXPR_TYPE_BITS);
+    }
+    else
+    {
+        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS))
+                    && expr->data[1] == c);
+    }
+}
+
+int
+_fexpr_parse_arf(arf_t res, const fexpr_t expr)
+{
+    if (fexpr_is_integer(expr))
+    {
+        fmpz_t m;
+        fmpz_init(m);
+
+        fexpr_get_fmpz(m, expr);
+        arf_set_fmpz(res, m);
+
+        fmpz_clear(m);
+        return 1;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Neg) && fexpr_nargs(expr) == 1)
+    {
+        int success;
+        fexpr_t t;
+        fexpr_view_arg(t, expr, 0);
+        success = _fexpr_parse_arf(res, t);
+        arf_neg(res, res);
+        return success;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Div) && fexpr_nargs(expr) == 2)
+    {
+        int success;
+        fexpr_t num, den;
+        fmpz_t p, q;
+
+        fexpr_view_arg(num, expr, 0);
+        fexpr_view_arg(den, expr, 1);
+
+        fmpz_init(p);
+        fmpz_init(q);
+
+        success = fexpr_get_fmpz(p, num) && fexpr_get_fmpz(q, den);
+
+        success = success && (fmpz_sgn(q) > 0) && (fmpz_val2(q) == fmpz_bits(q) - 1);
+
+        if (success)
+        {
+            arf_set_fmpz(res, p);
+            arf_mul_2exp_si(res, res, -(fmpz_bits(q) - 1));
+        }
+
+        fmpz_clear(p);
+        fmpz_clear(q);
+
+        return success;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Pow) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t base, exp;
+
+        fexpr_view_arg(base, expr, 0);
+        fexpr_view_arg(exp, expr, 1);
+
+        if (fexpr_equal_ui(base, 2))
+        {
+            fmpz_t m, e;
+            int success;    
+
+            fmpz_init(m);
+            fmpz_init(e);
+
+            success = fexpr_get_fmpz(e, exp);
+
+            if (success)
+            {
+                arf_one(res);
+                arf_mul_2exp_fmpz(res, res, e);
+            }
+
+            fmpz_clear(m);
+            fmpz_clear(e);
+
+            return success;
+        }
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Mul) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t man, pow, base, exp;
+
+        fexpr_view_arg(man, expr, 0);
+        fexpr_view_arg(pow, expr, 1);
+
+        if (fexpr_is_builtin_call(pow, FEXPR_Pow) && fexpr_nargs(expr) == 2)
+        {
+            fexpr_view_arg(base, pow, 0);
+            fexpr_view_arg(exp, pow, 1);
+
+            if (fexpr_equal_ui(base, 2))
+            {
+                fmpz_t m, e;
+                int success;    
+
+                fmpz_init(m);
+                fmpz_init(e);
+
+                success = fexpr_get_fmpz(m, man) && fexpr_get_fmpz(e, exp);
+
+                if (success)
+                {
+                    arf_set_fmpz(res, m);
+                    arf_mul_2exp_fmpz(res, res, e);
+                }
+
+                fmpz_clear(m);
+                fmpz_clear(e);
+
+                return success;
+            }
+        }
+    }
+
+    return 0;
+}
+
+int
+_fexpr_parse_mag(mag_t res, const fexpr_t expr)
+{
+    int success;
+    arf_t t;
+    arf_init(t);
+    success = _fexpr_parse_arf(t, expr);
+
+    success = success && (arf_sgn(t) >= 0) && arf_is_finite(t) && (arf_bits(t) <= MAG_BITS);
+
+    if (success)
+    {
+        fmpz_t m, e;
+
+        fmpz_init(m);
+        fmpz_init(e);
+
+        arf_get_fmpz_2exp(m, e, t);
+
+        mag_set_ui(res, fmpz_get_ui(m));
+        mag_mul_2exp_fmpz(res, res, e);
+
+        fmpz_clear(m);
+        fmpz_clear(e);
+    }
+
+    arf_clear(t);
+    return success;
+}
+
+
+int
+_fexpr_parse_arb(arb_t res, const fexpr_t expr)
+{
+    if (fexpr_is_builtin_call(expr, FEXPR_RealBall) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t t, u;
+
+        fexpr_view_arg(t, expr, 0);
+        fexpr_view_arg(u, expr, 1);
+
+        return _fexpr_parse_arf(arb_midref(res), t) && _fexpr_parse_mag(arb_radref(res), u);
+    }
+
+    return 0;
+}
+
 int
 _fexpr_parse_acb(acb_t res, const fexpr_t expr)
 {
-/*
+    fexpr_t t, u;
+
     if (fexpr_is_builtin_call(expr, FEXPR_RealBall) && fexpr_nargs(expr) == 2)
     {
+        arb_zero(acb_imagref(res));
+        return _fexpr_parse_arb(acb_realref(res), expr);
     }
-*/
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Mul) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_view_arg(t, expr, 1);
+        if (!fexpr_is_builtin_symbol(t, FEXPR_NumberI))
+            return 0;
+
+        fexpr_view_arg(u, expr, 0);
+        arb_zero(acb_realref(res));
+        return _fexpr_parse_arb(acb_imagref(res), u);
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_Add) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_view_arg(t, expr, 0);
+        fexpr_view_arg(u, expr, 1);
+
+        if (_fexpr_parse_acb(res, u) && arb_is_zero(acb_realref(res)))
+            return _fexpr_parse_arb(acb_realref(res), t);
+    }
 
     return 0;
 }
