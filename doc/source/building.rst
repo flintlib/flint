@@ -136,6 +136,12 @@ modules you wish to use in your C program.  Then compile your program,
 linking against the FLINT library, GMP/MPIR, MPFR and pthreads with the
 options ``-lflint -lmpfr -lgmp -lpthread``.
 
+To uninstall FLINT with GNU make, type:
+
+.. code-block:: bash
+
+    make uninstall
+
 Note that you may have to set ``LD_LIBRARY_PATH`` or equivalent for your
 system to let the linker know where to find these libraries. Please refer to
 your system documentation for how to do this.

@@ -219,6 +219,12 @@ install: library
 		install_name_tool -id "$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 
+uninstall:
+	rm -rf "$(DESTDIR)$(PREFIX)/include/flint"
+	rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)"
+	rm -rf $(shell ls $(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)*)
+	rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/libflint.a"
+
 build:
 	mkdir -p build
 
