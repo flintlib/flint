@@ -570,6 +570,24 @@ class qqbar:
         >>> qqbar(3+4j).root(5) ** 5
         3.00000 + 4.00000*I (deg 2)
 
+    The constructor can evaluate fexpr symbolic expressions
+    provided that the expressions are constant and composed strictly
+    of algebraic-valued basic operations applied to algebraic numbers.
+
+        >>> fexpr.inject()
+        >>> qqbar(Pow(0, 0))
+        1.00000 (deg 1)
+        >>> qqbar(Sqrt(2) * Abs(1+1j) + (+Re(3-4j)) + (-Im(5+6j)))
+        -1.00000 (deg 1)
+        >>> qqbar((Floor(Sqrt(1000)) + Ceil(Sqrt(1000)) + Sign(1+1j) / Sign(1-1j) + Csgn(1j) + Conjugate(1j)) ** Div(-1, 3))
+        0.250000 (deg 1)
+        >>> [qqbar(RootOfUnity(3)), qqbar(RootOfUnity(3,2))]
+        [-0.500000 + 0.866025*I (deg 2), -0.500000 - 0.866025*I (deg 2)]
+        >>> qqbar(Decimal("0.125")) == qqbar(125)/1000
+        True
+        >>> qqbar(Decimal("-2.7e5")) == -270000
+        True
+
     """
 
     def __init__(self, val=0):
@@ -595,6 +613,9 @@ class qqbar:
                 libcalcium.qqbar_set_d(self, val)
             elif typ is complex:
                 libcalcium.qqbar_set_re_im_d(self, val.real, val.imag)
+            elif typ is fexpr:
+                if not libcalcium.qqbar_set_fexpr(self, val):
+                    raise ValueError("unable to parse the given fexpr as an algebraic number")
             else:
                 raise TypeError
 
@@ -1163,6 +1184,21 @@ class qqbar:
             except TypeError:
                 return NotImplemented
         return other ** self
+
+    def fexpr(self):
+        """
+        """
+        res = fexpr()
+        if not libcalcium.qqbar_get_fexpr_formula(res, self, 0):
+            libcalcium.qqbar_get_fexpr_root_nearest(res, self)
+        return res
+
+    def fexpr_repr(self):
+        """
+        """
+        res = fexpr()
+        libcalcium.qqbar_get_fexpr_repr(res, self)
+        return res
 
 
 class ca_ctx:
@@ -3591,3 +3627,4 @@ if __name__ == "__main__":
     import doctest
     doctest.testmod(verbose=True)
     print("----------------------------------------------------------")
+

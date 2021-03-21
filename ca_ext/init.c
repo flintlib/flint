@@ -55,6 +55,8 @@ ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t ctx)
     qqbar_init(CA_EXT_QQBAR(res));
     qqbar_set(CA_EXT_QQBAR(res), x);
 
+    /* qqbar_cache_enclosure(CA_EXT_QQBAR(res), 2 * QQBAR_DEFAULT_PREC); */
+
     /* nf_init wants an fmpq_poly_t, so mock up one */
     t->coeffs = QQBAR_POLY(x)->coeffs;
     t->den[0] = 1;

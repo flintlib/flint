@@ -30,6 +30,7 @@ extern "C" {
 #include "acb.h"
 
 #include "calcium.h"
+#include "fexpr.h"
 
 typedef struct
 {
@@ -372,13 +373,13 @@ void qqbar_cos_pi(qqbar_t res, slong p, ulong q);
 
 void qqbar_sin_pi(qqbar_t res, slong p, ulong q);
 
-void qqbar_tan_pi(qqbar_t res, slong p, ulong q);
+int qqbar_tan_pi(qqbar_t res, slong p, ulong q);
 
-void qqbar_cot_pi(qqbar_t res, slong p, ulong q);
+int qqbar_cot_pi(qqbar_t res, slong p, ulong q);
 
-void qqbar_sec_pi(qqbar_t res, slong p, ulong q);
+int qqbar_sec_pi(qqbar_t res, slong p, ulong q);
 
-void qqbar_csc_pi(qqbar_t res, slong p, ulong q);
+int qqbar_csc_pi(qqbar_t res, slong p, ulong q);
 
 int qqbar_log_pi_i(slong * p, ulong * q, const qqbar_t x);
 
@@ -403,6 +404,13 @@ int qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x
 /* Conversions to radicals and expressions */
 
 void qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, const qqbar_t x, int factoring);
+
+void qqbar_get_fexpr_repr(fexpr_t res, const qqbar_t x);
+void qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x);
+void qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x);
+int qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags);
+
+int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 
 /* Internal functions */
 

@@ -11,7 +11,7 @@
 
 #include "qqbar.h"
 
-void
+int
 qqbar_cot_pi(qqbar_t res, slong p, ulong q)
 {
     slong g;
@@ -26,8 +26,7 @@ qqbar_cot_pi(qqbar_t res, slong p, ulong q)
 
     if (q == 1)
     {
-        flint_printf("qqbar_tan_pi: division by zero\n");
-        flint_abort();
+        return 0;
     }
     else if (q == 2)
     {
@@ -38,4 +37,6 @@ qqbar_cot_pi(qqbar_t res, slong p, ulong q)
         qqbar_tan_pi(res, p, q);
         qqbar_inv(res, res);
     }
+
+    return 1;
 }

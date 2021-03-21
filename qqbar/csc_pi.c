@@ -11,10 +11,13 @@
 
 #include "qqbar.h"
 
-void
+int
 qqbar_csc_pi(qqbar_t res, slong p, ulong q)
 {
     qqbar_sin_pi(res, p, q);
+    if (qqbar_is_zero(res))
+        return 0;
     qqbar_inv(res, res);
+    return 1;
 }
 

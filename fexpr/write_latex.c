@@ -2637,9 +2637,134 @@ _fexpr_write_latex_call1(calcium_stream_t out, const fexpr_t x, ulong flags)
     }
 }
 
+static void
+_write_poly(calcium_stream_t out, const fexpr_t pol, ulong flags)
+{
+    fexpr_t c;
+    slong i, d;
+
+    d = fexpr_nargs(pol) - 1;
+
+    if (d < 0)
+    {
+        calcium_write(out, "0");
+        return;
+    }
+
+    for (i = d; i >= 0; i--)
+    {
+        fexpr_view_arg(c, pol, i);
+
+        if (fexpr_equal_si(c, 0))
+            continue;
+
+        if (fexpr_equal_si(c, 1))
+        {
+            if (i == 0)
+                calcium_write(out, "+1");
+            else if (i != d)
+                calcium_write(out, "+");
+        }
+        else if (fexpr_equal_si(c, -1))
+        {
+            if (i == 0)
+                calcium_write(out, "-1");
+            else
+                calcium_write(out, "-");
+        }
+        else
+        {
+            if (fexpr_need_parens_in_mul(c, 0))
+            {
+                calcium_write(out, "+ \\left(");
+                fexpr_write_latex(out, c, flags);
+                calcium_write(out, "\\right)");
+            }
+            else
+            {
+                if (!(fexpr_can_extract_leading_sign(c) || i == d))
+                    calcium_write(out, "+");
+
+                fexpr_write_latex(out, c, flags);
+            }
+        }
+
+        if (i == 1)
+        {
+            calcium_write(out, " x");
+        }
+        else if (i >= 2)
+        {
+            calcium_write(out, " x^{");
+            calcium_write_si(out, i);
+            calcium_write(out, "}");
+        }
+    }
+}
+
+
 void
 fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
+    if (fexpr_is_builtin_call(expr, FEXPR_PolynomialRootNearest) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t pol, point;
+
+        fexpr_view_arg(pol, expr, 0);
+        fexpr_view_arg(point, expr, 1);
+
+        calcium_write(out, "\\left(x \\approx ");
+        fexpr_write_latex(out, point, flags);
+        calcium_write(out, ", \\,");
+        _write_poly(out, pol, flags);
+        calcium_write(out, "= 0\\right)");
+        return;
+
+
+        calcium_write(out, "\\left(\\text{Root of }\\, {");
+        _write_poly(out, pol, flags);
+/*        calcium_write(out, "} \\,\\text{ near } {"); */
+        calcium_write(out, "}, \\, x \\approx {");
+        fexpr_write_latex(out, point, flags);
+        calcium_write(out, "}\\right)");
+
+        return;
+    }
+
+    if (fexpr_is_builtin_call(expr, FEXPR_PolynomialRootIndexed) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t pol, point;
+
+        fexpr_view_arg(pol, expr, 0);
+        fexpr_view_arg(point, expr, 1);
+
+        calcium_write(out, "\\left(\\text{Root \\#}");
+        fexpr_write_latex(out, point, flags);
+        calcium_write(out, " \\text{ of }\\, {");
+        _write_poly(out, pol, flags);
+        calcium_write(out, "}\\right)");
+
+        return;
+    }
+
+/*
+    if (fexpr_is_builtin_call(expr, FEXPR_AlgebraicNumberSerialized) && fexpr_nargs(expr) == 2)
+    {
+        fexpr_t pol, index;
+
+        fexpr_view_arg(pol, expr, 0);
+        fexpr_view_arg(index, expr, 1);
+
+        calcium_write(out, "\\left(\\text{Algebraic } ");
+        fexpr_write_latex(out, pol, flags);
+        calcium_write(out, "_{");
+        fexpr_write_latex(out, index, flags);
+        calcium_write(out, "}\\right)");
+
+        return;
+    }
+*/
+
     if (fexpr_is_builtin_call(expr, FEXPR_Call) && fexpr_nargs(expr) == 2)
     {
         fexpr_t f, x;
