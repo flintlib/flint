@@ -25,10 +25,7 @@ do {                                    \
     add_ssaaaa(h, l, h, l, p1, p0);     \
 } while (0)
 
-/*
-    TODO: a slight speedup (< 10%) can be achived in the case of few primes
-          where the switching in the low level combination is a bottleneck.
-*/
+
 void fmpz_multi_CRT_ui(
     fmpz_t b,
     mp_srcptr in,
@@ -55,6 +52,11 @@ void fmpz_multi_CRT_ui(
 
         flint_mpn_zero(ad, s + 2);
 
+        /*
+            TODO: Make a special case when everything in this chunk has 1 small
+                  prime and bake the lu[i].i0 into the md table like
+                  _fmpz_mat_mul_multi_mod.
+        */
         for ( ; i < j; md += s, i++)
         {
             /* low level combination: 1, 2, or 3 small primes */
@@ -66,11 +68,19 @@ void fmpz_multi_CRT_ui(
                 FLINT_ASSERT(l + 2 <= C->num_primes);
                 MAC(hi, lo, in[l*1], lu[i].i1); l++;
                 MAC(hi, lo, in[l*1], lu[i].i2); l++;
+            /*
+                We have lu[i].mod.n = p0*p1*p2, and each lu[i].i{0|1|2} is
+                strictly less than p1*p2*p3, and the inputs are reduced mod pi.
+                Therefore, the sum is at most (p0*p1*p2-1)*(p0-1+p1-1+p2-1).
+                Since p0*p1*p2 fits into a word, the sum fits into two words
+                and the hi word is less than p0*p1*p2.
+            */
             }
             else if (lu[i].i1 != 0)
             {
                 FLINT_ASSERT(l + 1 <= C->num_primes);
                 MAC(hi, lo, in[l*1], lu[i].i1); l++;
+                /* Ditto for two */
             }
 
             FLINT_ASSERT(hi < lu[i].mod.n);

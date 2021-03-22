@@ -896,8 +896,6 @@ typedef fmpz_multi_mod_struct fmpz_multi_mod_t[1];
 
 FLINT_DLL void fmpz_multi_mod_init(fmpz_multi_mod_t P);
 
-FLINT_DLL void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k);
-
 FLINT_DLL void fmpz_multi_mod_clear(fmpz_multi_mod_t P);
 
 FLINT_DLL int fmpz_multi_mod_precompute(fmpz_multi_mod_t P, const fmpz * f,
@@ -957,9 +955,6 @@ FLINT_DLL void fmpz_comb_clear(fmpz_comb_t C);
 
 FLINT_DLL void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
                                      const fmpz_comb_t C, fmpz_comb_temp_t CT);
-
-void fmpz_new_multi_mod_ui_stride(mp_limb_t * out, slong stride,
-                 const fmpz_t input, const fmpz_comb_t C, fmpz_comb_temp_t CT);
 
 FLINT_DLL void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
                       const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);

@@ -18,13 +18,14 @@
 #include "nmod_vec.h"
 
 
-void fmpz_multi_mod_ui_stride(
-    mp_limb_t * out, slong stride,
+void fmpz_multi_mod_ui(
+    mp_limb_t * out,
     const fmpz_t input,
     const fmpz_comb_t C,
     fmpz_comb_temp_t CT)
 {
     slong i, k, l;
+    slong stride = 1;
     fmpz * A = CT->A;
     mod_lut_entry * lu;
     slong * offsets;
@@ -80,14 +81,5 @@ void fmpz_multi_mod_ui_stride(
 
     if (klen == 1)
         A[0] = *ttt;
-}
-
-void fmpz_multi_mod_ui(
-    mp_limb_t * output,
-    const fmpz_t input,
-    const fmpz_comb_t C,
-    fmpz_comb_temp_t CT)
-{
-    fmpz_multi_mod_ui_stride(output, 1, input, C, CT);
 }
 

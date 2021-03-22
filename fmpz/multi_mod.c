@@ -25,7 +25,7 @@ void fmpz_multi_mod_init(fmpz_multi_mod_t P)
 }
 
 
-void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k)
+static void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k)
 {
     slong i;
 
