@@ -1,0 +1,582 @@
+/*
+    Copyright (C) 2021 Daniel Schultz
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include <stdint.h>
+#include <gmp.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "ulong_extras.h"
+#include "n_poly.h"
+#include "mpn_extras.h"
+
+#if FLINT_USES_BLAS && FLINT_BITS == 64
+
+#include "cblas.h"
+
+/*
+    Several defines and helper functions from nmod_mat_mul_blas that are
+    slightly different (or could or should be).
+*/
+
+#define MAX_BLAS_DP_INT  (UWORD(1) << 53)
+
+static void _distribute_rows(
+    slong * Astartrow, slong * Astoprow,    /* limits for A */
+    slong * Bstartrow, slong * Bstoprow,    /* limits for B */
+    slong m,                                /* number of rows of A */
+    slong start, slong stop)
+{
+    FLINT_ASSERT(stop <= stop);
+
+    if (start >= m)
+    {
+        *Astartrow = 0;
+        *Astoprow  = 0;
+        *Bstartrow = start - m;
+        *Bstoprow  = stop - m;
+    }
+    else if (stop <= m)
+    {
+        *Astartrow = start;
+        *Astoprow  = stop;
+        *Bstartrow = 0;
+        *Bstoprow  = 0;
+    }
+    else
+    {
+        *Astartrow = start;
+        *Astoprow  = m;
+        *Bstartrow = 0;
+        *Bstoprow  = stop - m;
+    }
+}
+
+static void _lift_vec(double * a, const uint32_t * b, slong len, uint32_t n)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        a[i] = (int32_t)(b[i] - (n & (-(uint32_t)((int32_t)(n/2 - b[i]) < 0))));
+}
+
+static uint32_t _reduce_uint32(mp_limb_t a, nmod_t mod)
+{
+    mp_limb_t r;
+    NMOD_RED(r, a, mod);
+    return (uint32_t)r;
+}
+
+/* fmpz_multi_mod_ui for strided uint32 output */
+static void fmpz_multi_mod_uint32_stride(
+    uint32_t * out, slong stride,
+    const fmpz_t input,
+    const fmpz_comb_t C,
+    fmpz_comb_temp_t CT)
+{
+    slong i, k, l;
+    fmpz * A = CT->A;
+    mod_lut_entry * lu;
+    slong * offsets;
+    slong klen = C->mod_klen;
+    fmpz_t ttt;
+
+    /* high level split */
+    if (klen == 1)
+    {
+        *ttt = A[0];
+        A[0] = *input;
+    }
+    else
+    {
+        _fmpz_multi_mod_run(A, C->mod_P, input, -1, CT->T);
+    }
+
+    offsets = C->mod_offsets;
+    lu = C->mod_lu;
+
+    for (k = 0, i = 0, l = 0; k < klen; k++)
+    {
+        slong j = offsets[k];
+
+        for ( ; i < j; i++)
+        {
+            /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
+            mp_limb_t t = fmpz_fdiv_ui(A + k, lu[i].mod.n);
+
+            /* low level split: 1, 2, or 3 small primes */
+            if (lu[i].mod2.n != 0)
+            {
+                FLINT_ASSERT(l + 3 <= C->num_primes);
+                out[l*stride] = _reduce_uint32(t, lu[i].mod0); l++;
+                out[l*stride] = _reduce_uint32(t, lu[i].mod1); l++;
+                out[l*stride] = _reduce_uint32(t, lu[i].mod2); l++;
+            }
+            else if (lu[i].mod1.n != 0)
+            {
+                FLINT_ASSERT(l + 2 <= C->num_primes);
+                out[l*stride] = _reduce_uint32(t, lu[i].mod0); l++;
+                out[l*stride] = _reduce_uint32(t, lu[i].mod1); l++;
+            }
+            else
+            {
+                FLINT_ASSERT(l + 1 <= C->num_primes);
+                out[l*stride] = (uint32_t)(t); l++;
+            }
+        }
+    }
+
+    FLINT_ASSERT(l == C->num_primes);
+
+    if (klen == 1)
+        A[0] = *ttt;
+}
+
+
+typedef struct {
+    slong num_primes;
+    slong m;
+    slong k;
+    slong n;
+    slong Astartrow;
+    slong Astoprow;
+    slong Bstartrow;
+    slong Bstoprow;
+    uint32_t * bigA;
+    uint32_t * bigB;
+    fmpz ** Arows;
+    fmpz ** Brows;
+    const fmpz_comb_struct * comb;
+} _mod_blas_worker_arg;
+
+void _mod_blas_worker(void * arg_ptr)
+{
+    _mod_blas_worker_arg * arg = (_mod_blas_worker_arg *) arg_ptr;
+    slong i, j;
+    slong num_primes = arg->num_primes;
+    slong k = arg->k;
+    slong n = arg->n;
+    slong Astartrow = arg->Astartrow;
+    slong Astoprow = arg->Astoprow;
+    slong Bstartrow = arg->Bstartrow;
+    slong Bstoprow = arg->Bstoprow;
+    uint32_t * bigA = arg->bigA;
+    uint32_t * bigB = arg->bigB;
+    fmpz ** Arows = arg->Arows;
+    fmpz ** Brows = arg->Brows;
+    const fmpz_comb_struct * comb = arg->comb;
+    fmpz_comb_temp_t comb_temp;
+
+    fmpz_comb_temp_init(comb_temp, comb);
+
+    /* Calculate residues of A */
+    for (i = Astartrow; i < Astoprow; i++)
+        for (j = 0; j < k; j++)
+            fmpz_multi_mod_uint32_stride(bigA + i*k*num_primes + j, k,
+                                                &Arows[i][j], comb, comb_temp);
+
+    /* Calculate residues of B */
+    for (i = Bstartrow; i < Bstoprow; i++)
+        for (j = 0; j < n; j++)
+            fmpz_multi_mod_uint32_stride(bigB + i*n*num_primes + j, n,
+                                                &Brows[i][j], comb, comb_temp);
+
+    fmpz_comb_temp_clear(comb_temp);
+}
+
+
+typedef struct {
+    slong l;
+    slong num_primes;
+    slong m;
+    slong k;
+    slong n;
+    slong Astartrow;
+    slong Astoprow;
+    slong Bstartrow;
+    slong Bstoprow;
+    const uint32_t * bigA;
+    const uint32_t * bigB;
+    double * dA;
+    double * dB;
+    mp_limb_t prime;
+} _tod_blas_worker_arg;
+
+void _tod_blas_worker(void * arg_ptr)
+{
+    _tod_blas_worker_arg * arg = (_tod_blas_worker_arg *) arg_ptr;
+    slong i;
+    slong l = arg->l;
+    slong num_primes = arg->num_primes;
+    slong k = arg->k;
+    slong n = arg->n;
+    slong Astartrow = arg->Astartrow;
+    slong Astoprow = arg->Astoprow;
+    slong Bstartrow = arg->Bstartrow;
+    slong Bstoprow = arg->Bstoprow;
+    const uint32_t * bigA = arg->bigA;
+    const uint32_t * bigB = arg->bigB;
+    double * dA = arg->dA;
+    double * dB = arg->dB;
+    uint32_t prime = arg->prime;
+
+    for (i = Astartrow; i < Astoprow; i++)
+        _lift_vec(dA + i*k, bigA + l*k + i*k*num_primes, k, prime);
+
+    for (i = Bstartrow; i < Bstoprow; i++)
+        _lift_vec(dB + i*n, bigB + l*n + i*n*num_primes, n, prime);
+}
+
+typedef struct {
+    slong l;
+    slong num_primes;
+    slong n;
+    slong Cstartrow;
+    slong Cstoprow;
+    uint32_t * bigC;
+    double * dC;
+    mp_limb_t prime;
+} _fromd_blas_worker_arg;
+
+void _fromd_blas_worker(void * arg_ptr)
+{
+    _fromd_blas_worker_arg * arg = (_fromd_blas_worker_arg *) arg_ptr;
+    slong i, j;
+    slong l = arg->l;
+    slong num_primes = arg->num_primes;
+    slong n = arg->n;
+    slong Cstartrow = arg->Cstartrow;
+    slong Cstoprow = arg->Cstoprow;
+    uint32_t * bigC = arg->bigC;
+    double * dC = arg->dC;
+    ulong shift;
+    nmod_t mod;
+
+    nmod_init(&mod, arg->prime);
+
+    shift = ((2*MAX_BLAS_DP_INT)/mod.n)*mod.n;
+
+    for (i = Cstartrow; i < Cstoprow; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            mp_limb_t r;
+            slong a = (slong) dC[i*n + j];
+            mp_limb_t b = (a < 0) ? a + shift : a;
+            NMOD_RED(r, b, mod);
+            bigC[n*(num_primes*i + l) + j] = r;
+        }
+    }
+}
+
+typedef struct {
+    slong num_primes;
+    slong n;
+    slong Cstartrow;
+    slong Cstoprow;
+    uint32_t * bigC;
+    fmpz ** Crows;
+    const fmpz_comb_struct * comb;
+} _crt_blas_worker_arg;
+
+void _crt_blas_worker(void * arg_ptr)
+{
+    _crt_blas_worker_arg * arg = (_crt_blas_worker_arg *) arg_ptr;
+    slong i, j, k;
+    slong num_primes = arg->num_primes;
+    slong n = arg->n;
+    slong Cstartrow = arg->Cstartrow;
+    slong Cstoprow = arg->Cstoprow;
+    uint32_t * bigC = arg->bigC;
+    fmpz ** Crows = arg->Crows;
+    const fmpz_comb_struct * comb = arg->comb;
+    fmpz_comb_temp_t comb_temp;
+    mp_limb_t * r;
+
+    fmpz_comb_temp_init(comb_temp, comb);
+    r = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+
+    for (i = Cstartrow; i < Cstoprow; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            for (k = 0; k < num_primes; k++)
+                r[k] = bigC[(i*num_primes + k)*n + j];
+
+            fmpz_multi_CRT_ui(&Crows[i][j], r, comb, comb_temp, 1);
+        }
+    }
+
+    flint_free(r);
+    fmpz_comb_temp_clear(comb_temp);
+}
+
+static mp_limb_t * _calculate_primes_primes(
+    slong * num_primes_,
+    flint_bitcnt_t bits,
+    slong k)
+{
+    slong num_primes, primes_alloc;
+    mp_limb_t * primes;
+    mp_limb_t p;
+    fmpz_t prod;
+
+    p = 2 + 2*n_sqrt((MAX_BLAS_DP_INT - 1)/(ulong)k);
+    if (bits > 200)
+    {
+        /* if mod is the bottleneck, ensure p1*p2*p3 < 2^62 */
+        p = FLINT_MIN(p, UWORD(1664544));
+    }
+
+    primes_alloc = 1 + bits/FLINT_BIT_COUNT(p);
+    primes = FLINT_ARRAY_ALLOC(primes_alloc, mp_limb_t);
+    num_primes = 0;
+
+    fmpz_init_set_ui(prod, 1);
+
+    do {
+        do {
+            if (p < 1000)
+            {
+                fmpz_clear(prod);
+                flint_free(primes);
+                *num_primes_ = 0;
+                return NULL;
+            }
+            p--;
+        } while (!n_is_prime(p));
+
+        if (num_primes + 1 > primes_alloc)
+        {
+            primes_alloc = FLINT_MAX(num_primes + 1, primes_alloc*5/4);
+            primes = FLINT_ARRAY_REALLOC(primes, primes_alloc, mp_limb_t);
+        }
+
+        primes[num_primes] = p;
+        num_primes++;
+
+        fmpz_mul_ui(prod, prod, p);
+
+    } while (fmpz_bits(prod) <= bits);
+
+    fmpz_clear(prod);
+
+    *num_primes_ = num_primes;
+    return primes;
+}
+
+
+int _fmpz_mat_mul_blas(
+    fmpz_mat_t C,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B,
+    flint_bitcnt_t bits)
+{
+    slong i, l;
+    slong m = A->r;
+    slong k = A->c;
+    slong n = B->c;
+    uint32_t * bigC, * bigA, * bigB;
+    double * dC, * dA, * dB;
+    mp_limb_t * primes;
+    slong num_primes;
+    fmpz_comb_t comb;
+    thread_pool_handle * handles;
+    slong num_workers;
+    void * bigargs;
+
+    FLINT_ASSERT(m == A->r && m == C->r);
+    FLINT_ASSERT(k == A->c && k == B->r);
+    FLINT_ASSERT(n == B->c && n == C->c);
+
+    if (m < 1 || k < 1 || n < 1 || m > INT_MAX || k > INT_MAX || n > INT_MAX)
+        return 0;
+
+    primes = _calculate_primes_primes(&num_primes, bits, k);
+    if (primes == NULL)
+        return 0;
+
+    fmpz_comb_init(comb, primes, num_primes);
+
+    /*
+        To allow the 3D transpose to and from blas to be at least slightly
+        cache friendly, matrices M mod p[l] are stored with the prime index
+        in the middle:
+            M[i,j] mod p[l] is at bigM[(i*num_primes + l)*M->c + j]
+    */
+    bigA = FLINT_ARRAY_ALLOC(m*k*num_primes, uint32_t);
+    bigB = FLINT_ARRAY_ALLOC(k*n*num_primes, uint32_t);
+    bigC = FLINT_ARRAY_ALLOC(m*n*num_primes, uint32_t);
+    dA = FLINT_ARRAY_ALLOC(m*k, double);
+    dB = FLINT_ARRAY_ALLOC(k*n, double);
+    dC = (double *) flint_calloc(m*n, sizeof(double));
+
+    num_workers = flint_request_threads(&handles, INT_MAX);
+
+    i = sizeof(_mod_blas_worker_arg);
+    i = FLINT_MAX(i, sizeof(_tod_blas_worker_arg));
+    i = FLINT_MAX(i, sizeof(_fromd_blas_worker_arg));
+    i = FLINT_MAX(i, sizeof(_crt_blas_worker_arg));
+    bigargs = flint_malloc((num_workers + 1)*i);
+
+    /* mod inputs */
+    {
+        _mod_blas_worker_arg * args = (_mod_blas_worker_arg *) bigargs;
+
+        for (i = 0; i <= num_workers; i++)
+        {
+            args[i].num_primes = num_primes;
+            args[i].m = m;
+            args[i].k = k;
+            args[i].n = n;
+            args[i].bigA = bigA;
+            args[i].bigB = bigB;
+            args[i].Arows = A->rows;
+            args[i].Brows = B->rows;
+            args[i].comb = comb;
+            _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
+                             &args[i].Bstartrow, &args[i].Bstoprow, m,
+                                  ((m + k)*(i + 0))/(num_workers + 1),
+                                  ((m + k)*(i + 1))/(num_workers + 1));
+        }
+
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wake(global_thread_pool, handles[i], 0,
+                                                   _mod_blas_worker, &args[i]);
+        _mod_blas_worker(&args[num_workers]);
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
+    }
+
+    /* multiply and reduce answers mod the primes */
+    for (l = 0; l < num_primes; l++)
+    {
+        {
+            _tod_blas_worker_arg * args = (_tod_blas_worker_arg *) bigargs;
+
+            for (i = 0; i <= num_workers; i++)
+            {
+                args[i].l = l;
+                args[i].num_primes = num_primes;
+                args[i].m = m;
+                args[i].k = k;
+                args[i].n = n;
+                args[i].bigA = bigA;
+                args[i].bigB = bigB;
+                args[i].dA = dA;
+                args[i].dB = dB;
+                args[i].prime = primes[l];
+                _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
+                                 &args[i].Bstartrow, &args[i].Bstoprow, m,
+                                      ((m + k)*(i + 0))/(num_workers + 1),
+                                      ((m + k)*(i + 1))/(num_workers + 1));
+            }
+
+            for (i = 0; i < num_workers; i++)
+                thread_pool_wake(global_thread_pool, handles[i], 0,
+                                                   _tod_blas_worker, &args[i]);
+            _tod_blas_worker(&args[num_workers]);
+            for (i = 0; i < num_workers; i++)
+                thread_pool_wait(global_thread_pool, handles[i]);
+        }
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                     m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
+
+        /* TODO: modify _distribute_rows and combine _fromd and _tod */
+        {
+            _fromd_blas_worker_arg * args = (_fromd_blas_worker_arg *) bigargs;
+
+            for (i = 0; i <= num_workers; i++)
+            {
+                args[i].l = l;
+                args[i].num_primes = num_primes;
+                args[i].n = n;
+                args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
+                args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
+                args[i].bigC = bigC;
+                args[i].dC = dC;
+                args[i].prime = primes[l];
+            }
+
+            for (i = 0; i < num_workers; i++)
+                thread_pool_wake(global_thread_pool, handles[i], 0,
+                                                 _fromd_blas_worker, &args[i]);
+            _fromd_blas_worker(&args[num_workers]);
+            for (i = 0; i < num_workers; i++)
+                thread_pool_wait(global_thread_pool, handles[i]);
+        }
+    }
+
+    /* crt output */
+    {
+        _crt_blas_worker_arg * args = (_crt_blas_worker_arg *) bigargs;
+
+        for (i = 0; i <= num_workers; i++)
+        {
+            args[i].num_primes = num_primes;
+            args[i].n = n;
+            args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
+            args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
+            args[i].bigC = bigC;
+            args[i].Crows = C->rows;
+            args[i].comb = comb;
+        }
+
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wake(global_thread_pool, handles[i], 0,
+                                                   _crt_blas_worker, &args[i]);
+        _crt_blas_worker(&args[num_workers]);
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
+    }
+
+    flint_give_back_threads(handles, num_workers);
+
+    /* cleanup */
+    fmpz_comb_clear(comb);
+    flint_free(primes);
+
+    flint_free(bigargs);
+    flint_free(bigA);
+    flint_free(bigB);
+    flint_free(bigC);
+    flint_free(dA);
+    flint_free(dB);
+    flint_free(dC);
+
+    return 1;
+}
+
+#else
+
+int _fmpz_mat_mul_blas(
+    fmpz_mat_t C,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B,
+    flint_bitcnt_t bits)
+{
+    return 0;
+}
+
+#endif
+
+
+int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+{
+    slong A_bits = fmpz_mat_max_bits(A);
+    slong B_bits = fmpz_mat_max_bits(B);
+    flint_bitcnt_t bits = FLINT_ABS(A_bits) + FLINT_ABS(B_bits) +
+                          FLINT_BIT_COUNT(A->c) + 1;
+
+    return _fmpz_mat_mul_blas(C, A, B, bits);
+}
+
