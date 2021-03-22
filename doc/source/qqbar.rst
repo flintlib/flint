@@ -254,6 +254,11 @@ Comparisons
 
     Returns whether *x* and *y* are equal.
 
+.. function:: int qqbar_equal_fmpq_poly_val(const qqbar_t x, const fmpq_poly_t f, const qqbar_t y)
+
+    Returns whether *x* is equal to `f(y)`. This function is more efficient
+    than evaluating `f(y)` and comparing the results.
+
 .. function:: int qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
 
     Compares the real parts of *x* and *y*, returning -1, 0 or +1.
@@ -811,9 +816,10 @@ Symbolic expressions and conversion to radicals
     or ``PolynomialRootIndexed``.
     Returns 0 on failure and 1 on success.
 
-    At the moment, this function only supports rational and quadratic numbers
-    as well as certain special values; higher-degree radicals and trigonometric
-    expressions will be implemented in the future.
+    At the moment, this function only recognizes rational and quadratic numbers
+    as well as cyclotomic numbers. Higher-degree radicals and other special 
+    cases will be implemented in the future. Detection of cyclotomic numbers is
+    currently heuristic, and this function may miss some cyclotomics.
 
 
 Internal functions

@@ -219,6 +219,7 @@ void qqbar_printnd(const qqbar_t x, slong n);
 /* Comparisons */
 
 int qqbar_equal(const qqbar_t x, const qqbar_t y);
+int qqbar_equal_fmpq_poly_val(const qqbar_t x, const fmpq_poly_t f, const qqbar_t y);
 int qqbar_cmp_re(const qqbar_t x, const qqbar_t y);
 int qqbar_cmp_im(const qqbar_t x, const qqbar_t y);
 int qqbar_cmpabs_re(const qqbar_t x, const qqbar_t y);

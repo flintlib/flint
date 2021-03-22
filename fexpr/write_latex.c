@@ -2713,19 +2713,20 @@ fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong f
         fexpr_view_arg(pol, expr, 0);
         fexpr_view_arg(point, expr, 1);
 
+/*
         calcium_write(out, "\\left(x \\approx ");
         fexpr_write_latex(out, point, flags);
         calcium_write(out, ", \\,");
         _write_poly(out, pol, flags);
         calcium_write(out, "= 0\\right)");
         return;
+*/
 
-
-        calcium_write(out, "\\left(\\text{Root of }\\, {");
-        _write_poly(out, pol, flags);
-/*        calcium_write(out, "} \\,\\text{ near } {"); */
-        calcium_write(out, "}, \\, x \\approx {");
+        calcium_write(out, "\\left(\\text{Root }\\, ");
+        calcium_write(out, "x \\approx {");
         fexpr_write_latex(out, point, flags);
+        calcium_write(out, "} \\;\\text{ of } \\;{");
+        _write_poly(out, pol, flags);
         calcium_write(out, "}\\right)");
 
         return;

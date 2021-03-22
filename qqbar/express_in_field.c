@@ -49,17 +49,12 @@ qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x, sl
     if (_qqbar_acb_lindep(res->coeffs, vec, d + 1, 1, prec) &&
         !fmpz_is_zero(res->coeffs + d))
     {
-        qqbar_t v;
-
         fmpz_neg(res->den, res->coeffs + d);
         _fmpq_poly_set_length(res, d);
         _fmpq_poly_normalise(res);
         fmpq_poly_canonicalise(res);
 
-        qqbar_init(v);
-        qqbar_evaluate_fmpq_poly(v, res, alpha);
-        found = qqbar_equal(v, x);
-        qqbar_clear(v);
+        found = qqbar_equal_fmpq_poly_val(x, res, alpha);
     }
 
     acb_clear(z);

@@ -388,10 +388,278 @@ qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x)
     qqbar_vec_clear(conjugates, d);
 }
 
+void
+fexpr_sqrt(fexpr_t res, const fexpr_t a)
+{
+    /* todo: handle aliasing in call1 */
+    if (res == a)
+    {
+        fexpr_t tmp;
+        fexpr_init(tmp);
+        fexpr_set(tmp, a);
+        fexpr_sqrt(res, tmp);
+        fexpr_clear(tmp);
+    }
+    else
+    {
+        /* todo: avoid tmp alloc */
+        fexpr_t tmp;
+        fexpr_init(tmp);
+        fexpr_set_symbol_builtin(tmp, FEXPR_Sqrt);
+        fexpr_call1(res, tmp, a);
+        fexpr_clear(tmp);
+    }
+}
+
+void
+fexpr_div_ui(fexpr_t res, const fexpr_t a, ulong c)
+{
+    fexpr_t t, u;
+    fexpr_init(t);
+    fexpr_init(u);
+    fexpr_set_ui(u, c);
+    fexpr_div(t, a, u);
+    fexpr_swap(res, t);
+    fexpr_clear(t);
+    fexpr_clear(u);
+}
+
+/* cos(pi p/q) */
+void
+_fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
+{
+    int sign = 1;
+    int sine = 0;
+    ulong g;
+    fexpr_t t, u;
+
+    if (p < 0)
+    {
+        _fexpr_cos_pi_pq(res, -p, q);
+        return;
+    }
+
+    p = p % (2 * q);
+
+    if (p > q)
+    {
+        p = 2 * q - p;
+    }
+
+    if (2 * p > q)
+    {
+        p = q - p;
+        sign = -1;
+    }
+
+    if (p == 0)
+    {
+        fexpr_set_si(res, sign);
+        return;
+    }
+
+    if (2 * p == q)
+    {
+        fexpr_set_ui(res, 0);
+        return;
+    }
+
+    if (3 * p == q)
+    {
+        fexpr_set_si(res, sign);
+        fexpr_div_ui(res, res, 2);
+        return;
+    }
+
+    if (4 * p == q)
+    {
+        fexpr_set_ui(res, 2);
+        fexpr_sqrt(res, res);
+        fexpr_div_ui(res, res, 2);
+        if (sign == -1)
+            fexpr_neg(res, res);
+        return;
+    }
+
+    if (6 * p == q)
+    {
+        fexpr_set_ui(res, 3);
+        fexpr_sqrt(res, res);
+        fexpr_div_ui(res, res, 2);
+        if (sign == -1)
+            fexpr_neg(res, res);
+        return;
+    }
+
+    if (12 * p == q || 12 * p == 5 * q)
+    {
+        fexpr_init(t);
+        fexpr_init(u);
+
+        fexpr_set_ui(t, 3);
+        fexpr_sqrt(t, t);
+        fexpr_set_ui(u, 1);
+
+        if (12 * p == q)
+            fexpr_add(res, t, u);
+        else
+            fexpr_sub(res, t, u);
+
+        fexpr_set_ui(t, 2);
+        fexpr_sqrt(t, t);
+
+        fexpr_mul(u, t, res);
+        fexpr_div_ui(res, u, 4);
+
+        if (sign == -1)
+            fexpr_neg(res, res);
+
+        fexpr_clear(t);
+        fexpr_clear(u);
+        return;
+    }
+
+    if (4 * p > q)
+    {
+        p = q - 2 * p;
+        q = 2 * q;
+        sine = 1;
+    }
+
+    g = n_gcd(p, q);
+    if (g != 1)
+    {
+        p /= g;
+        q /= g;
+    }
+
+    fexpr_init(t);
+    fexpr_init(u);
+
+    if (p == 1)
+    {
+        fexpr_set_symbol_builtin(res, FEXPR_Pi);
+    }
+    else
+    {
+        fexpr_set_ui(t, p);
+        fexpr_set_symbol_builtin(u, FEXPR_Pi);
+        fexpr_mul(res, t, u);
+    }
+
+    fexpr_div_ui(t, res, q);
+
+    if (sine)
+        fexpr_set_symbol_builtin(u, FEXPR_Sin);
+    else
+        fexpr_set_symbol_builtin(u, FEXPR_Cos);
+
+    fexpr_call1(res, u, t);
+    if (sign == -1)
+        fexpr_neg(res, res);
+
+    fexpr_clear(t);
+    fexpr_clear(u);
+}
+
+/* poly(exp(2 pi i / n)) */
+void
+_qqbar_get_fexpr_cyclotomic(fexpr_t res, const fmpq_poly_t poly, slong n, int pure_real, int pure_imag)
+{
+    fexpr_vec_t terms;
+    fexpr_t term, t, u, v, w;
+    ulong p, q, g;
+    slong i;
+
+    fexpr_vec_init(terms);
+    fexpr_init(term);
+    fexpr_init(t);
+    fexpr_init(u);
+    fexpr_init(v);
+    fexpr_init(w);
+
+    for (i = 0; i < poly->length; i++)
+    {
+        if (!fmpz_is_zero(poly->coeffs + i))
+        {
+            if (i == 0)
+            {
+                fexpr_set_fmpz(term, poly->coeffs + i);
+            }
+            else
+            {
+                p = 2 * i;
+                q = n;
+                g = n_gcd(p, q);
+                p /= g;
+                q /= g;
+
+                if (pure_real)
+                {
+                    _fexpr_cos_pi_pq(v, p, q);
+                }
+                else
+                {
+                    fexpr_set_ui(t, p);
+                    fexpr_set_symbol_builtin(u, FEXPR_Pi);
+                    fexpr_set_symbol_builtin(v, FEXPR_NumberI);
+                    fexpr_set_symbol_builtin(w, FEXPR_Mul);
+
+                    if (p == 1)
+                        fexpr_call2(term, w, u, v);
+                    else
+                        fexpr_call3(term, w, t, u, v);
+
+                    fexpr_set_ui(t, q);
+                    fexpr_div(u, term, t);
+
+                    fexpr_set_symbol_builtin(w, FEXPR_Exp);
+                    fexpr_call1(v, w, u);
+                }
+
+                if (fmpz_is_one(poly->coeffs + i))
+                    fexpr_swap(term, v);
+                else
+                {
+                    fexpr_set_fmpz(t, poly->coeffs + i);
+                    fexpr_mul(term, t, v);
+                }
+            }
+
+            fexpr_vec_append(terms, term);
+        }
+    }
+
+    fexpr_set_symbol_builtin(t, FEXPR_Add);
+    fexpr_call_vec(res, t, terms->entries, terms->length);
+
+    if (!fmpz_is_one(poly->den))
+    {
+        fexpr_set_fmpz(t, poly->den);
+        fexpr_div(u, res, t);
+        fexpr_swap(res, u);
+    }
+
+    /* todo: also want this with expanded exponentials */
+    if (pure_real)
+    {
+        fexpr_expanded_normal_form(res, res, 0);
+    }
+
+    fexpr_vec_clear(terms);
+    fexpr_clear(term);
+    fexpr_clear(t);
+    fexpr_clear(u);
+    fexpr_clear(v);
+    fexpr_clear(w);
+}
+
+
 int
 qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
 {
     slong d;
+    int success;
 
     d = qqbar_degree(x);
 
@@ -533,5 +801,71 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
         }
     }
 
-    return 0;
+    success = 0;
+
+    /* Check for elements of cyclotomic fields */
+    {
+        ulong * phi;
+        ulong N1, N2, d2;
+        slong p, q, i;
+        double U;
+        slong bits;
+        fmpq_poly_t poly;
+        qqbar_t zeta;
+
+        bits = 2 * qqbar_height_bits(x) /*+ 20 * d */ + 40;
+        d2 = 4 * d;
+
+        /* Compute inverse image of the totient function for d and 2*d. */
+
+        /* Determine lower and upper bounds [N1, N2) */
+        U = d2;
+        for (p = 2; p <= d2; p++)
+            if (d2 % (p - 1) == 0 && n_is_prime(p))
+                U = (U * p) / (p - 1);
+        N1 = d + 1;
+        N2 = U + 3;   /* +3 as safety for possible floating-point rounding */
+
+/*        N2 = FLINT_MIN(N2, 1 + 30); */
+
+        phi = flint_malloc(N2 * sizeof(ulong));
+        fmpq_poly_init(poly);
+        qqbar_init(zeta);
+
+        for (i = 0; i < N2; i++)
+            phi[i] = i;
+
+        for (p = 2; p < N2; p++)
+        {
+            if (phi[p] == p)
+            {
+                phi[p] = p - 1;
+                for (q = 2 * p; q < N2; q += p)
+                    phi[q] = (phi[q] / p) * (p - 1);
+            }
+        }
+
+        for (i = N1; i < N2 && !success; i++)
+        {
+            if (phi[i] == d || phi[i] == 2 * d || phi[i] == 4 * d)
+            {
+                qqbar_root_of_unity(zeta, 1, i);
+
+                /* printf("testing root of unity %ld\n", i); */
+
+                if (qqbar_express_in_field(poly, zeta, x, bits, 0, bits))
+                {
+                    _qqbar_get_fexpr_cyclotomic(res, poly, i, qqbar_sgn_im(x) == 0, qqbar_sgn_re(x) == 0);
+                    /* printf("match!\n"); */
+                    success = 1;
+                }
+            }
+        }
+
+        flint_free(phi);
+        fmpq_poly_clear(poly);
+        qqbar_clear(zeta);
+    }
+
+    return success;
 }

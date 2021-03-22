@@ -1185,12 +1185,17 @@ class qqbar:
                 return NotImplemented
         return other ** self
 
-    def fexpr(self):
+    def fexpr(self, formula=True, root_index=False):
         """
         """
         res = fexpr()
-        if not libcalcium.qqbar_get_fexpr_formula(res, self, 0):
-            libcalcium.qqbar_get_fexpr_root_nearest(res, self)
+        if formula:
+            if libcalcium.qqbar_get_fexpr_formula(res, self, 0):
+                return res
+        if root_index:
+            libcalcium.qqbar_get_fexpr_root_indexed(res, self)
+            return res
+        libcalcium.qqbar_get_fexpr_root_nearest(res, self)
         return res
 
     def fexpr_repr(self):

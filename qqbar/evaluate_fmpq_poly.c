@@ -120,21 +120,48 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
     }
     else
     {
+        slong p;
+        ulong q;
+
         qqbar_t t;
         slong i;
 
         qqbar_init(t);
 
-        qqbar_mul_fmpz(t, x, poly + len - 1);
-        qqbar_add_fmpz(t, t, poly + len - 2);
-
-        for (i = len - 3; i >= 0; i--)
+        /* Special case for cyclotomic fields. */
+        /* This is not necessarily faster, but it's worth trying. */
+        if (0 && qqbar_degree(x) > 2 && qqbar_is_root_of_unity(&p, &q, x))
         {
-            qqbar_mul(t, t, x);
-            qqbar_add_fmpz(t, t, poly + i);
-        }
+            qqbar_t u;
+            qqbar_init(u);
 
-        qqbar_div_fmpz(res, t, den);
+            /* todo: exploit symmetries */
+            for (i = 0; i < len; i++)
+            {
+                if (!fmpz_is_zero(poly + i))
+                {
+                    qqbar_root_of_unity(u, p * i, q);
+                    qqbar_mul_fmpz(u, u, poly + i);
+                    qqbar_add(t, t, u);
+                }
+            }
+
+            qqbar_div_fmpz(res, t, den);
+            qqbar_clear(u);
+        }
+        else
+        {
+            qqbar_mul_fmpz(t, x, poly + len - 1);
+            qqbar_add_fmpz(t, t, poly + len - 2);
+
+            for (i = len - 3; i >= 0; i--)
+            {
+                qqbar_mul(t, t, x);
+                qqbar_add_fmpz(t, t, poly + i);
+            }
+
+            qqbar_div_fmpz(res, t, den);
+        }
 
         qqbar_clear(t);
     }
