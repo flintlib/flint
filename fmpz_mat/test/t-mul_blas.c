@@ -20,8 +20,8 @@
 
 int main(void)
 {
-    fmpz_mat_t A, B, C, D;
     slong i;
+    slong max_num_threads = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_blas....");
@@ -30,6 +30,7 @@ int main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong m, n, k;
+        fmpz_mat_t A, B, C, D;
 
         m = 1 + n_randint(state, 50);
         n = 1 + n_randint(state, 50);
@@ -63,15 +64,18 @@ int main(void)
         }
 #endif
 
+        flint_set_num_threads(1 + n_randint(state, max_num_threads));
+
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
         fmpz_mat_clear(D);
     }
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         slong m, n, k;
+        fmpz_mat_t A, B, C, D;
 
         m = 1 + n_randint(state, 3);
         n = 1 + n_randint(state, 3);
@@ -82,8 +86,8 @@ int main(void)
         fmpz_mat_init(C, m, k);
         fmpz_mat_init(D, m, k);
 
-        fmpz_mat_randtest(A, state, n_randint(state, 25000) + 1);
-        fmpz_mat_randtest(B, state, n_randint(state, 25000) + 1);
+        fmpz_mat_randtest(A, state, n_randint(state, 20000) + 1);
+        fmpz_mat_randtest(B, state, n_randint(state, 20000) + 1);
 
         /* Make sure noise in the output is ok */
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
@@ -105,6 +109,8 @@ int main(void)
             flint_abort();
         }
 #endif
+
+        flint_set_num_threads(1 + n_randint(state, max_num_threads));
 
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
