@@ -52,7 +52,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
     fmpz_poly_t M, Mm; /* only used for resizable fmpz array convenience */
 
     if (len < 1)
-        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+        flint_throw(FLINT_ERROR, "fmpz_comb_init: len should be positive");
 
     fmpz_poly_init(Mm);
     fmpz_poly_init(M);
@@ -116,7 +116,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
                               (1 == n_gcdinv(&C->crt_lu[j].i2,
                                           m[l+0]*m[l+1] % m[l+2], m[l+2]));
                     if (!success)
-                        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                        goto bad_moduli;
 
                     C->crt_lu[j].i0 *= m[l+1]*m[l+2];
                     C->crt_lu[j].i1 *= m[l+0]*m[l+2];
@@ -130,7 +130,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
                               (1 == n_gcdinv(&C->crt_lu[j].i1,
                                              m[l+0] % m[l+1], m[l+1]));
                     if (!success)
-                        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                        goto bad_moduli;
 
                     C->crt_lu[j].i0 *= m[l+1];
                     C->crt_lu[j].i1 *= m[l+0];
@@ -158,7 +158,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
             success = (1 == n_gcdinv(&tt, tt, C->crt_lu[i].mod.n));
             if (!success)
-                flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                goto bad_moduli;
 
             C->crt_lu[i].i0 = nmod_mul(tt, C->crt_lu[i].i0, C->crt_lu[i].mod);
             C->crt_lu[i].i1 = nmod_mul(tt, C->crt_lu[i].i1, C->crt_lu[i].mod);
@@ -185,7 +185,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
             success = (1 == n_gcdinv(&tt, tt, C->crt_lu[i].mod.n));
             if (!success)
-                flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                goto bad_moduli;
 
             C->crt_lu[i].i0 = nmod_mul(tt, C->crt_lu[i].i0, C->crt_lu[i].mod);
             C->crt_lu[i].i1 = nmod_mul(tt, C->crt_lu[i].i1, C->crt_lu[i].mod);
@@ -200,7 +200,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
     success = fmpz_multi_CRT_precompute(C->crt_P, M->coeffs, C->crt_klen);
     if (!success)
-        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+        goto bad_moduli;
 
     C->step = FLINT_ARRAY_ALLOC(C->crt_klen, slong);
 
@@ -270,7 +270,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
                     success = (m[l+0] != 0) && (m[l+1] != 0) && (m[l+2] != 0);
                     if (!success)
-                        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                            goto zero_moduli;
 
                     nmod_init(&C->mod_lu[j].mod0, m[l+0]);
                     nmod_init(&C->mod_lu[j].mod1, m[l+1]);
@@ -281,7 +281,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
                 {
                     success = (m[l+0] != 0) && (m[l+1] != 0);
                     if (!success)
-                        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                        goto zero_moduli;
 
                     nmod_init(&C->mod_lu[j].mod0, m[l+0]);
                     nmod_init(&C->mod_lu[j].mod1, m[l+1]);
@@ -292,7 +292,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
             {
                 success = (m[l+0] != 0);
                 if (!success)
-                    flint_throw(FLINT_ERROR, "fmpz_comb_init");
+                    goto zero_moduli;
 
                 nmod_init(&C->mod_lu[j].mod0, m[l+0]);
                 l += 1;
@@ -323,9 +323,19 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
     success = fmpz_multi_mod_precompute(C->mod_P, M->coeffs, C->mod_klen);
     if (!success)
-        flint_throw(FLINT_ERROR, "fmpz_comb_init");
+        goto zero_moduli;
 
     fmpz_poly_clear(M);
     fmpz_poly_clear(Mm);
+
+    return;
+
+bad_moduli:
+
+    flint_throw(FLINT_ERROR, "fmpz_comb_init: moduli are not pairwise prime");
+
+zero_moduli:
+
+    flint_throw(FLINT_ERROR, "fmpz_comb_init: moduli are not nonzero");
 }
 

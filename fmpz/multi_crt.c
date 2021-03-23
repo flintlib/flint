@@ -119,8 +119,7 @@ static int _fill_pfrac(
         fmpz_mul(w + j + 0, v + j + 0, w + j + 1);
         fmpz_sub(t, A, w + j + 0);
         fmpz_fdiv_qr(w + j + 0, g, t, v + j + 1);
-        if (!fmpz_is_zero(g))
-            flint_throw(FLINT_ERROR, "internal error");
+        FLINT_ASSERT(fmpz_is_zero(g) && "division should be exact");
 
         fmpz_mod(w + j + 0, w + j + 0, v + j + 0);
 
