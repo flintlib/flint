@@ -44,26 +44,6 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t CT, const fmpz_comb_t C)
 }
 
 
-void fmpz_comb_temp_clear(fmpz_comb_temp_t CT)
-{
-    _fmpz_vec_clear(CT->A, CT->Alen);
-    _fmpz_vec_clear(CT->T, CT->Tlen);
-}
-
-
-void fmpz_comb_clear(fmpz_comb_t C)
-{
-    flint_free(C->step);
-    flint_free(C->packed_multipliers);
-    flint_free(C->crt_lu);
-    flint_free(C->mod_lu);
-    flint_free(C->crt_offsets);
-    flint_free(C->mod_offsets);
-    fmpz_multi_CRT_clear(C->crt_P);
-    fmpz_multi_mod_clear(C->mod_P);
-}
-
-
 void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 {
     int success;
