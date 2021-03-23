@@ -829,15 +829,20 @@ FLINT_DLL void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P);
 FLINT_DLL void _fmpz_multi_CRT_run(fmpz * outputs, const fmpz_multi_CRT_t P,
                                                 const fmpz * inputs, int sign);
 
-/* depreciated versions that assume sign = 1 *********************************/
+/* deprecated versions that assume sign = 1 **********************************/
+/*
+deprecated functions and types   new functions and types
+fmpz_multi_crt_t              => fmpz_multi_CRT_t
+fmpz_multi_crt_init           => fmpz_multi_CRT_init
+fmpz_multi_crt_precompute     => fmpz_multi_CRT_precompute
+fmpz_multi_crt_precompute_p   gone
+fmpz_multi_crt_precomp        => fmpz_multi_CRT_precomp now with sign option
+fmpz_multi_crt_precomp_p      gone
+fmpz_multi_crt                => fmpz_multi_CRT now with sign option
+fmpz_multi_crt_clear          => fmpz_multi_CRT_clear
+*/
 typedef fmpz_multi_CRT_struct fmpz_multi_crt_struct;
 typedef fmpz_multi_CRT_t fmpz_multi_crt_t;
-
-FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
-                                                          const fmpz * inputs);
-
-FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
-                      const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
 
 FLINT_DLL void fmpz_multi_crt_init(fmpz_multi_crt_t CRT);
 

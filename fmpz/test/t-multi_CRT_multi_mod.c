@@ -142,7 +142,7 @@ main(void)
                 if (sign ? (fmpz_cmp2abs(p, output) < 0) :
                            (fmpz_cmp(output, p) >= 0 || fmpz_sgn(output) < 0))
                 {
-                    flint_printf("FAIL: Check crt output size\n");
+                    flint_printf("FAIL: Check CRT output size\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
                     flint_abort();
                 }
@@ -187,7 +187,7 @@ main(void)
 
                 if (!ok)
                 {
-                    flint_printf("FAIL: Check flat crt failure\n");
+                    flint_printf("FAIL: Check flat CRT failure\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
                     flint_abort();
                 }
@@ -287,7 +287,7 @@ main(void)
                 if (!ok)
                 {
                     printf("FAIL\n");
-                    flint_printf("Check lazy crt failure i = %wd, j = %wd\n", i, j);
+                    flint_printf("Check lazy CRT failure i = %wd, j = %wd\n", i, j);
                     flint_abort();                    
                 }
             }
