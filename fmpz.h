@@ -608,7 +608,7 @@ FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-FLINT_DLL void _fmpz_mods(fmpz_t r, const fmpz_t a, const fmpz_t m,
+FLINT_DLL void _fmpz_smod(fmpz_t r, const fmpz_t a, const fmpz_t m,
                                                            int sign, fmpz_t t);
 
 FMPZ_INLINE void

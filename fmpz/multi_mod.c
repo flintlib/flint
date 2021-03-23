@@ -314,7 +314,7 @@ void _fmpz_multi_mod_run(
 
             if (b < 0)
             {
-                _fmpz_mods(outputs - b - 1, T + a, instr[i].modulus, sign, t1);
+                _fmpz_smod(outputs - b - 1, T + a, instr[i].modulus, sign, t1);
             }
             else
             {
@@ -328,7 +328,7 @@ void _fmpz_multi_mod_run(
 
             if (b < 0)
             {
-                _fmpz_mods(outputs - b - 1, input, instr[i].modulus, sign, t1);
+                _fmpz_smod(outputs - b - 1, input, instr[i].modulus, sign, t1);
             }
             else if (fmpz_cmpabs(instr[i].modulus, input) > 0)
             {

@@ -26,9 +26,7 @@ main(void)
     flint_printf("smod....");
     fflush(stdout);
 
-
-
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, d, e;
 
@@ -41,32 +39,49 @@ main(void)
         fmpz_randtest(a, state, 200);
         fmpz_randtest_not_zero(b, state, 200);
 
+        if (n_randint(state, 10) == 0)
+        {
+            fmpz_fdiv_q_ui(a, b, 2);
+            if (n_randint(state, 2))
+                fmpz_add(a, b, b);
+            if (n_randint(state, 2))
+                fmpz_sub(a, b, b);
+            if (n_randint(state, 2))
+                fmpz_add(a, b, b);
+        }
+
         fmpz_smod(c, a, b);
+
         fmpz_sub(d, a, c);
         fmpz_mod(d, d, b);
-        fmpz_abs(e, b);
-        fmpz_fdiv_q_2exp(e, e, 1);
-
-        result = (fmpz_is_zero(d) && fmpz_cmp(c, e) <= 0);
-        if (!result)
+        if (!fmpz_is_zero(d))
         {
-            flint_printf("FAIL:\n");
-            flint_printf("a = ");
-            fmpz_print(a);
-            flint_printf("\n");
-            flint_printf("b = ");
-            fmpz_print(b);
-            flint_printf("\n");
-            flint_printf("c = ");
-            fmpz_print(c);
-            flint_printf("\n");
-            flint_printf("d = ");
-            fmpz_print(d);
-            flint_printf("\n");
-            flint_printf("e = ");
-            fmpz_print(e);
-            flint_printf("\n");
-            abort();
+            flint_printf("FAIL: check b|(smod(a,b) - a)\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("smod(a,b) = "), fmpz_print(c), flint_printf("\n");
+            flint_abort();
+        }
+
+        fmpz_abs(e, b);
+        fmpz_mul_2exp(d, c, 1);
+        if (fmpz_cmp(d, e) > 0)
+        {
+            flint_printf("FAIL: check 2*smod(a,b) <= |b|\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("smod(a,b) = "), fmpz_print(c), flint_printf("\n");
+            flint_abort();
+        }
+
+        fmpz_neg(e, e);
+        if (fmpz_cmp(e, d) >= 0)
+        {
+            flint_printf("FAIL: check -|b| < 2*smod(a,b)\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("smod(a,b) = "), fmpz_print(c), flint_printf("\n");
+            flint_abort();
         }
 
         fmpz_clear(a);

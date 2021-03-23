@@ -96,7 +96,7 @@ void fmpz_multi_CRT_ui(
         az->_mp_size = s;
         _fmpz_demote_val(A + k);
 
-        _fmpz_mods(A + k, A + k, C->crt_P->moduli + k, sign, T + 0);
+        _fmpz_smod(A + k, A + k, C->crt_P->moduli + k, sign, T + 0);
     }
 
     FLINT_ASSERT(l == C->num_primes);

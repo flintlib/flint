@@ -404,7 +404,7 @@ void _fmpz_multi_CRT_run(
         }
     }
 
-    _fmpz_mods(outputs + 0, inputs + 0, P->final_modulus, sign, t4);
+    _fmpz_smod(outputs + 0, inputs + 0, P->final_modulus, sign, t4);
     return;
 
 doit:
@@ -425,7 +425,7 @@ doit:
             B = t1;
 
             fmpz_mul(t3, inputs + b, mf + b);
-            _fmpz_mods(B, t3, m + b, sign, t4);
+            _fmpz_smod(B, t3, m + b, sign, t4);
         }
 
         if (c < 0)
@@ -434,7 +434,7 @@ doit:
             C = t2;
 
             fmpz_mul(t3, inputs + c, mf + c);
-            _fmpz_mods(C, t3, m + c, sign, t4);
+            _fmpz_smod(C, t3, m + c, sign, t4);
         }
 
         /* A = B*c_m + C*b_m */
@@ -443,7 +443,7 @@ doit:
         fmpz_add(A, A, t3);
     }
 
-    _fmpz_mods(outputs + 0, A, P->final_modulus, sign, t4);
+    _fmpz_smod(outputs + 0, A, P->final_modulus, sign, t4);
 }
 
 
