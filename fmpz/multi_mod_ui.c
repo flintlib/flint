@@ -40,7 +40,7 @@ void fmpz_multi_mod_ui(
     }
     else
     {
-        _fmpz_multi_mod_run(A, C->mod_P, input, -1, CT->T);
+        _fmpz_multi_mod_precomp(A, C->mod_P, input, -1, CT->T);
     }
 
     offsets = C->mod_offsets;

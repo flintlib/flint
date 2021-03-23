@@ -103,7 +103,7 @@ void fmpz_multi_CRT_ui(
 
     /* high level combination */
     fmpz_swap(T + 0, b);
-    _fmpz_multi_CRT_run(T, C->crt_P, A, sign);
+    _fmpz_multi_CRT_precomp(T, C->crt_P, A, sign);
     fmpz_swap(T + 0, b);
 }
 

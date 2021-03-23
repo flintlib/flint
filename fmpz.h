@@ -826,7 +826,7 @@ FLINT_DLL int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli,
 
 FLINT_DLL void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P);
 
-FLINT_DLL void _fmpz_multi_CRT_run(fmpz * outputs, const fmpz_multi_CRT_t P,
+FLINT_DLL void _fmpz_multi_CRT_precomp(fmpz * outputs, const fmpz_multi_CRT_t P,
                                                 const fmpz * inputs, int sign);
 
 /* deprecated versions that assume sign = 1 **********************************/
@@ -891,7 +891,7 @@ typedef struct
     flint_bitcnt_t min_modulus_bits;
     slong length; /* length of prog */
     slong alloc;  /* alloc of prog */
-    slong localsize; /* length of tmp required in fmpz_multi_mod_run */
+    slong localsize; /* length of tmp required in _fmpz_multi_mod_precomp */
     slong temp1loc;
     int good;   /* the moduli are good for MOD, none are zero */
 } fmpz_multi_mod_struct;
@@ -908,7 +908,7 @@ FLINT_DLL int fmpz_multi_mod_precompute(fmpz_multi_mod_t P, const fmpz * f,
 FLINT_DLL void fmpz_multi_mod_precomp(fmpz * outputs,
                        const fmpz_multi_mod_t P, const fmpz_t input, int sign);
 
-FLINT_DLL void _fmpz_multi_mod_run(fmpz * outputs, const fmpz_multi_mod_t P,
+FLINT_DLL void _fmpz_multi_mod_precomp(fmpz * outputs, const fmpz_multi_mod_t P,
                                      const fmpz_t input, int sign, fmpz * tmp);
 
 /* multi mod/multi CRT ui ****************************************************/

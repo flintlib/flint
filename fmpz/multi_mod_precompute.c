@@ -13,18 +13,6 @@
 #include "fmpz_vec.h"
 
 
-void fmpz_multi_mod_init(fmpz_multi_mod_t P)
-{
-    P->prog = NULL;
-    P->moduli = NULL;
-    P->alloc = 0;
-    P->length = 0;
-    P->localsize = 1;
-    P->temp1loc = 0;
-    P->good = 0;
-}
-
-
 static void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k)
 {
     slong i;
@@ -48,22 +36,6 @@ static void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k)
 
     P->alloc = k;
 }
-
-
-void fmpz_multi_mod_clear(fmpz_multi_mod_t P)
-{
-    slong i;
-
-    for (i = 0; i < P->alloc; i++)
-    {
-        fmpz_clear(P->prog[i].modulus);
-        fmpz_clear(P->moduli + i);
-    }
-
-    flint_free(P->prog);
-    flint_free(P->moduli);
-}
-
 
 static int _fill_sort(slong * link, fmpz * v, slong j)
 {
@@ -247,101 +219,5 @@ done:
     }
 
     return P->good;
-}
-
-
-void fmpz_multi_mod_precomp(
-    fmpz * outputs,
-    const fmpz_multi_mod_t P,
-    const fmpz_t input,
-    int sign)
-{
-    slong i;
-    fmpz * tmp;
-    TMP_INIT;
-
-    TMP_START;
-    tmp = TMP_ARRAY_ALLOC(P->localsize, fmpz);
-    for (i = 0; i < P->localsize; i++)
-        fmpz_init(tmp + i);
-
-    _fmpz_multi_mod_run(outputs, P, input, sign, tmp);
-
-    for (i = 0; i < P->localsize; i++)
-        fmpz_clear(tmp + i);
-
-    TMP_END;
-}
-
-
-void _fmpz_multi_mod_run(
-    fmpz * outputs,
-    const fmpz_multi_mod_t P,
-    const fmpz_t input,
-    int sign,
-    fmpz * T)
-{
-    slong i, a, b;
-    slong len = P->length;
-    _fmpz_multi_mod_instr * instr = P->prog;
-    fmpz * t1 = T + P->temp1loc;
-    unsigned char * org;
-    TMP_INIT;
-
-    TMP_START;
-
-    /*
-        Efficiently propogate small inputs without copying:
-        ord[i] = 1 means T[i] should be read from input
-    */
-    org = TMP_ARRAY_ALLOC(P->localsize, unsigned char);
-
-#if FLINT_WANT_ASSERT
-    for (i = 0; i < P->localsize; i++)
-        org[i] = 2;
-#endif
-
-    for (i = 0; i < len; i++)
-    {
-        a = P->prog[i].in_idx;
-        b = P->prog[i].out_idx;
-
-        FLINT_ASSERT(a < 1 || org[a] < 2);
-
-        if (a > 0 && org[a] == 0)
-        {
-            /* read input from T[a] */
-
-            if (b < 0)
-            {
-                _fmpz_smod(outputs - b - 1, T + a, instr[i].modulus, sign, t1);
-            }
-            else
-            {
-                org[b] = 0;
-                fmpz_tdiv_qr(t1, T + b, T + a, instr[i].modulus);
-            }
-        }
-        else
-        {
-            /* read input from input */
-
-            if (b < 0)
-            {
-                _fmpz_smod(outputs - b - 1, input, instr[i].modulus, sign, t1);
-            }
-            else if (fmpz_cmpabs(instr[i].modulus, input) > 0)
-            {
-                org[b] = 1;
-            }
-            else
-            {
-                org[b] = 0;
-                fmpz_tdiv_qr(t1, T + b, input, instr[i].modulus);
-            }
-        }
-    }
-
-    TMP_END;
 }
 

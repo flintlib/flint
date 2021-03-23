@@ -48,7 +48,7 @@ main(void)
 
         for (k = 0; k < 1; k++)
         {
-            _fmpz_multi_CRT_run(outputs, P, inputs, 1);
+            _fmpz_multi_CRT_precomp(outputs, P, inputs, 1);
         }
 
         _fmpz_vec_clear(moduli, moduli_count);
