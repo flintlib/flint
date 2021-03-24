@@ -17,6 +17,10 @@
 #include "fmpz_mat.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
+#include "thread_support.h"
+#if FLINT_USES_BLAS
+#include "cblas.h"
+#endif
 
 typedef struct
 {
@@ -35,7 +39,6 @@ void sample(void * arg, ulong count)
     slong bits = params->bits;
     int algorithm = params->algorithm;
 
-    flint_rand_t rnd;
     fmpz_mat_t A, B, C;
     FLINT_TEST_INIT(state);
     
@@ -64,6 +67,11 @@ void sample(void * arg, ulong count)
     else if (algorithm == 4)
 	for (i = 0; i < count; i++)
 	    fmpz_mat_mul_strassen(C, A, B);
+#if FLINT_USES_BLAS
+    else if (algorithm == 5)
+	for (i = 0; i < count; i++)
+	    fmpz_mat_mul_blas(C, A, B);
+#endif
 
     prof_stop();
 
@@ -76,51 +84,55 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-    double min_default, min_classical, min_inline, min_multi_mod, min_strassen, max;
+    double min_default, min_classical, min_inline, min_multi_mod, min_strassen, min_blas = 0.0, max;
     mat_mul_t params;
     slong bits, dim;
+    int threads;
 
-    for (bits = 1; bits <= 2000; bits = (slong) ((double) bits * 1.3) + 1)
+    for (bits = 1; bits <= 1024; bits = (slong) ((double) bits * 1.3) + 1)
     {
         params.bits = bits;
 
         flint_printf("fmpz_mat_mul (bits = %wd):\n", params.bits);
 
-        for (dim = 1; dim <= 512; dim = (slong) ((double) dim * 1.3) + 1)
+        for (dim = 1; dim <= (bits < 100 ? 1000 : bits < 500 ? 200 : 100); dim = (slong) ((double) dim * 1.3) + 1)
         {
-            params.m = dim;
-            params.n = dim;
-            params.k = dim;
+            flint_printf("dim = %wd default/classical/inline/modular/strassen/blas:\n", dim);
+	    
+	    for (threads = 1; threads <= 8; threads++)
+	    {
+#if FLINT_USES_BLAS
+    		    openblas_set_num_threads(threads);
+#endif
+    		    flint_set_num_threads(threads);
 
-            params.algorithm = 0;
-            prof_repeat(&min_default, &max, sample, &params);
+		params.m = dim;
+                params.n = dim;
+                params.k = dim;
 
-            params.algorithm = 1;
-            prof_repeat(&min_classical, &max, sample, &params);
+                params.algorithm = 0;
+                prof_repeat(&min_default, &max, sample, &params);
 
-            params.algorithm = 2;
-            prof_repeat(&min_inline, &max, sample, &params);
+                params.algorithm = 1;
+                prof_repeat(&min_classical, &max, sample, &params);
 
-            params.algorithm = 3;
-            prof_repeat(&min_multi_mod, &max, sample, &params);
+                params.algorithm = 2;
+                prof_repeat(&min_inline, &max, sample, &params);
+
+                params.algorithm = 3;
+                prof_repeat(&min_multi_mod, &max, sample, &params);
             
-            params.algorithm = 4;
-            prof_repeat(&min_strassen, &max, sample, &params);
+                params.algorithm = 4;
+                prof_repeat(&min_strassen, &max, sample, &params);
 
-            flint_printf("dim = %wd default/classical/inline/multi_mod/strassen %.2f %.2f %.2f %.2f %.2f (us)\n", 
-                dim, min_default, min_classical, min_inline, min_multi_mod, min_strassen);
+#if FLINT_USES_BLAS
+	        params.algorithm = 5;
+	        prof_repeat(&min_blas, &max, sample, &params);
+#endif
 
-            if (min_multi_mod < 0.6*min_default)
-                flint_printf("BAD!\n");
-
-            if (min_inline < 0.6*min_default)
-                flint_printf("BAD!\n");
-                
-            if (min_strassen < 0.7*min_default)
-                flint_printf("BAD!\n");
-
-            if (min_multi_mod < 0.7*min_inline)
-                break;
+                flint_printf(" (%d): %.2f %.2f %.2f %.2f %.2f %.2f(us)\n", 
+                    threads, min_default, min_classical, min_inline, min_multi_mod, min_strassen, min_blas);
+	    }
         }
     }
 
