@@ -47,7 +47,7 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t CT, const fmpz_comb_t C)
 void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 {
     int success;
-    slong l, i, j, k;
+    slong l, i, j, k, s;
     ulong tt, mm, mt;
     fmpz_poly_t M, Mm; /* only used for resizable fmpz array convenience */
 
@@ -207,16 +207,38 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
     l = 0;
     for (k = 0, i = 0; k < C->crt_klen; k++)
     {
-        C->step[k] = 1;
-        for (j = i ; j < C->crt_offsets[k]; j++)
+        int all_large = 1;
+
+        s = 1;
+        for (j = i; j < C->crt_offsets[k]; j++)
         {
+            if (C->crt_lu[j].i1 != 0 || C->crt_lu[j].i2 != 0)
+                all_large = 0;
+
             FLINT_ASSERT(fmpz_cmp(Mm->coeffs + j, M->coeffs + k) <= 0);
-            C->step[k] = FLINT_MAX(C->step[k], fmpz_size(Mm->coeffs + j));
+            s = FLINT_MAX(s, fmpz_size(Mm->coeffs + j));
+        }
+
+        if (all_large)
+        {
+            s = 1;
+            for (j = i; j < C->crt_offsets[k]; j++)
+            {
+                FLINT_ASSERT(C->crt_lu[i].i1 == 0 && C->crt_lu[i].i2 == 0);
+                fmpz_mul_ui(Mm->coeffs + j, Mm->coeffs + j, C->crt_lu[j].i0);
+                s = FLINT_MAX(s, fmpz_size(Mm->coeffs + j));
+            }
+
+            C->step[k] = -s - 1;
+        }
+        else
+        {
+            C->step[k] = s;
         }
 
         for ( ; i < C->crt_offsets[k]; i++)
         {
-            l += C->step[k];
+            l += s;
         }
     }
 
@@ -225,11 +247,14 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
     l = 0;
     for (k = 0, i = 0; k < C->crt_klen; k++)
     {
+        s = C->step[k];
+        if (s < 0)
+            s = -s - 1;
+
         for ( ; i < C->crt_offsets[k]; i++)
         {
-            fmpz_get_ui_array(C->packed_multipliers + l, C->step[k],
-                                                               Mm->coeffs + i);
-            l += C->step[k];
+            fmpz_get_ui_array(C->packed_multipliers + l, s, Mm->coeffs + i);
+            l += s;
         }
     }
 

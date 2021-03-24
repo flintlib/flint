@@ -24,6 +24,7 @@ int main()
     fmpz_t input, temp, prod;
     mp_limb_t * output;
     slong i, j, k;
+    flint_bitcnt_t bits1, bits2, bits;
     mp_limb_t * primes;
     fmpz * primes2;
     slong num_primes;
@@ -50,10 +51,16 @@ int main()
 
 try_again:
 
+        bits1 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
+        bits2 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
+        if (bits1 > bits2)
+            ULONG_SWAP(bits1, bits2);
+
         fmpz_one(prod);
         for (j = 0; j < num_primes; j++)
         {
-            primes[j] = n_randint(state, UWORD_MAX_PRIME);
+            bits = bits1 + n_randint(state, bits2 - bits1 + 1);
+            primes[j] = n_randbits(state, bits);
             primes[j] = n_nextprime(primes[j], 1);
             fmpz_mul_ui(prod, prod, primes[j]);
             fmpz_set_ui(primes2 + j, primes[j]);
