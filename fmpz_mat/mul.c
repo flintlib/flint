@@ -11,6 +11,9 @@
 */
 
 #include "fmpz_mat.h"
+#if FLINT_USES_BLAS
+#include "cblas.h"
+#endif
 
 static int
 fmpz_get_sgnbit_mpn2(mp_ptr r, const fmpz_t x)
@@ -328,10 +331,27 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     dim = FLINT_MIN(ar, bc);
     dim = FLINT_MIN(dim, br);
 
-    if (bits <= FLINT_BITS - 2)
+    /*make more use of strassen on 1 thread and mul_blas on more than one thread */
+    if (
+#if FLINT_USES_BLAS
+        (openblas_get_num_threads() == 1 && abits + bbits >= 10) &&
+#endif
+        ((abits + bbits >= 20  && abits + bbits < 60 && dim > 150) || (dim > 500)))
+            fmpz_mat_mul_strassen(C, A, B);
+#if FLINT_USES_BLAS
+    else if ((openblas_get_num_threads() > 1 && abits + bbits >= 15) &&
+	((abits + bbits >= 400 && dim > 40) ||
+	 (abits + bbits >= 120 && dim > 60) || dim > 500))
+	    fmpz_mat_mul_blas(C, A, B);
+#endif
+    else if (bits <= FLINT_BITS - 2)
     {
-        if ((dim > 160 && abits + bbits <= 20) || dim > 600) /* tuning param */
-            _fmpz_mat_mul_multi_mod(C, A, B, bits);
+        if ((abits + bbits < 18 && dim > 100) ||
+#if FLINT_USES_BLAS
+	    (abits + bbits < 50 && openblas_get_num_threads() > 1 && dim > 100) ||
+#endif
+	    ((dim > 160 && abits + bbits <= 20) || dim > 600)) /* tuning param */
+                _fmpz_mat_mul_multi_mod(C, A, B, bits);
         else if (dim > 160) /* tuning param */
             fmpz_mat_mul_strassen(C, A, B);
         else
