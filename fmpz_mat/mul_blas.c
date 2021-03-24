@@ -23,43 +23,125 @@
 
 #include "cblas.h"
 
-/*
-    Several defines and helper functions from nmod_mat_mul_blas that are
-    slightly different (or could or should be).
-*/
+/* Same as in nmod_mat_mul_blas */
 
 #define MAX_BLAS_DP_INT  (UWORD(1) << 53)
 
-static void _distribute_rows(
-    slong * Astartrow, slong * Astoprow,    /* limits for A */
-    slong * Bstartrow, slong * Bstoprow,    /* limits for B */
-    slong m,                                /* number of rows of A */
-    slong start, slong stop)
-{
-    FLINT_ASSERT(stop <= stop);
+/* helpers for dividing up the work */
 
-    if (start >= m)
+static void _distribute_rows2(
+    slong start, slong stop,
+    slong * Astart, slong * Astop, slong Alen,
+    slong * Bstart, slong * Bstop, slong Blen)
+{
+    FLINT_ASSERT(0 <= start);
+    FLINT_ASSERT(start <= stop);
+    FLINT_ASSERT(stop <= Alen + Blen);
+
+    if (start >= Alen)
     {
-        *Astartrow = 0;
-        *Astoprow  = 0;
-        *Bstartrow = start - m;
-        *Bstoprow  = stop - m;
+        *Astart = 0;
+        *Astop  = 0;
+        *Bstart = start - Alen;
+        *Bstop  = stop - Alen;
     }
-    else if (stop <= m)
+    else if (stop <= Alen)
     {
-        *Astartrow = start;
-        *Astoprow  = stop;
-        *Bstartrow = 0;
-        *Bstoprow  = 0;
+        *Astart = start;
+        *Astop  = stop;
+        *Bstart = 0;
+        *Bstop  = 0;
     }
     else
     {
-        *Astartrow = start;
-        *Astoprow  = m;
-        *Bstartrow = 0;
-        *Bstoprow  = stop - m;
+        *Astart = start;
+        *Astop  = Alen;
+        *Bstart = 0;
+        *Bstop  = stop - Alen;
     }
 }
+
+static void _distribute_rows3(
+    slong start, slong stop,
+    slong * Astart, slong * Astop, slong Alen,
+    slong * Bstart, slong * Bstop, slong Blen,
+    slong * Cstart, slong * Cstop, slong Clen)
+{
+    FLINT_ASSERT(0 <= start);
+    FLINT_ASSERT(start <= stop);
+    FLINT_ASSERT(stop <= Alen + Blen + Clen);
+
+    if (stop <= Alen + Blen)
+    {
+        *Cstart = 0;
+        *Cstop = 0;
+        _distribute_rows2(start, stop, Astart, Astop, Alen, Bstart, Bstop, Blen);
+    }
+    else if (start >= Alen + Blen)
+    {
+        *Astart = 0;
+        *Astop  = 0;
+        *Bstart = 0;
+        *Bstop  = 0;
+        *Cstart = start - (Alen + Blen);
+        *Cstop = stop - (Alen + Blen);
+    }
+    else if (start >= Alen)
+    {
+        *Astart = 0;
+        *Astop  = 0;
+        *Bstart = start - Alen;
+        *Bstop  = Blen;
+        *Cstart = 0;
+        *Cstop = stop - (Alen + Blen);
+    }
+    else
+    {
+        *Astart = start;
+        *Astop  = Alen;
+        *Bstart = 0;
+        *Bstop  = Blen;
+        *Cstart = 0;
+        *Cstop = stop - (Alen + Blen);
+    }
+}
+
+
+static ulong _peicewise_linear_inverse2(
+    ulong a, ulong alpha,
+    ulong b, ulong beta,
+    ulong yn, ulong yd)
+{
+    ulong y = yn*(a*alpha + b*beta)/yd;
+
+    if (y <= a*alpha)
+        return y/alpha;
+
+    return a + (y - a*alpha)/beta;
+}
+
+
+static ulong _peicewise_linear_inverse3(
+    ulong a, ulong alpha,
+    ulong b, ulong beta,
+    ulong c, ulong gamma,
+    ulong yn, ulong yd)
+{
+    ulong y = yn*(a*alpha + b*beta + c*gamma)/yd;
+
+    if (y <= a*alpha)
+        return y/alpha;
+
+    if (y - a*alpha <= b*beta)
+        return a + (y - a*alpha)/beta;
+
+    return a + b + (y - (a*alpha + b*beta))/gamma;
+}
+
+/*************************************************************************/
+
+
+
 
 static void _lift_vec(double * a, const uint32_t * b, slong len, uint32_t n)
 {
@@ -142,6 +224,8 @@ static void fmpz_multi_mod_uint32_stride(
 
 
 typedef struct {
+    mp_limb_t prime;
+    slong l;
     slong num_primes;
     slong m;
     slong k;
@@ -150,16 +234,23 @@ typedef struct {
     slong Astoprow;
     slong Bstartrow;
     slong Bstoprow;
+    slong Cstartrow;
+    slong Cstoprow;
     uint32_t * bigA;
     uint32_t * bigB;
+    uint32_t * bigC;
+    double * dA;
+    double * dB;
+    double * dC;
     fmpz ** Arows;
     fmpz ** Brows;
+    fmpz ** Crows;
     const fmpz_comb_struct * comb;
-} _mod_blas_worker_arg;
+} _worker_arg;
 
-void _mod_blas_worker(void * arg_ptr)
+static void _mod_worker(void * arg_ptr)
 {
-    _mod_blas_worker_arg * arg = (_mod_blas_worker_arg *) arg_ptr;
+    _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i, j;
     slong num_primes = arg->num_primes;
     slong k = arg->k;
@@ -177,13 +268,11 @@ void _mod_blas_worker(void * arg_ptr)
 
     fmpz_comb_temp_init(comb_temp, comb);
 
-    /* Calculate residues of A */
     for (i = Astartrow; i < Astoprow; i++)
         for (j = 0; j < k; j++)
             fmpz_multi_mod_uint32_stride(bigA + i*k*num_primes + j, k,
                                                 &Arows[i][j], comb, comb_temp);
 
-    /* Calculate residues of B */
     for (i = Bstartrow; i < Bstoprow; i++)
         for (j = 0; j < n; j++)
             fmpz_multi_mod_uint32_stride(bigB + i*n*num_primes + j, n,
@@ -192,27 +281,9 @@ void _mod_blas_worker(void * arg_ptr)
     fmpz_comb_temp_clear(comb_temp);
 }
 
-
-typedef struct {
-    slong l;
-    slong num_primes;
-    slong m;
-    slong k;
-    slong n;
-    slong Astartrow;
-    slong Astoprow;
-    slong Bstartrow;
-    slong Bstoprow;
-    const uint32_t * bigA;
-    const uint32_t * bigB;
-    double * dA;
-    double * dB;
-    mp_limb_t prime;
-} _tod_blas_worker_arg;
-
-void _tod_blas_worker(void * arg_ptr)
+void _tod_worker(void * arg_ptr)
 {
-    _tod_blas_worker_arg * arg = (_tod_blas_worker_arg *) arg_ptr;
+    _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i;
     slong l = arg->l;
     slong num_primes = arg->num_primes;
@@ -235,20 +306,9 @@ void _tod_blas_worker(void * arg_ptr)
         _lift_vec(dB + i*n, bigB + l*n + i*n*num_primes, n, prime);
 }
 
-typedef struct {
-    slong l;
-    slong num_primes;
-    slong n;
-    slong Cstartrow;
-    slong Cstoprow;
-    uint32_t * bigC;
-    double * dC;
-    mp_limb_t prime;
-} _fromd_blas_worker_arg;
-
-void _fromd_blas_worker(void * arg_ptr)
+void _fromd_worker(void * arg_ptr)
 {
-    _fromd_blas_worker_arg * arg = (_fromd_blas_worker_arg *) arg_ptr;
+    _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i, j;
     slong l = arg->l;
     slong num_primes = arg->num_primes;
@@ -277,19 +337,9 @@ void _fromd_blas_worker(void * arg_ptr)
     }
 }
 
-typedef struct {
-    slong num_primes;
-    slong n;
-    slong Cstartrow;
-    slong Cstoprow;
-    uint32_t * bigC;
-    fmpz ** Crows;
-    const fmpz_comb_struct * comb;
-} _crt_blas_worker_arg;
-
-void _crt_blas_worker(void * arg_ptr)
+void _crt_worker(void * arg_ptr)
 {
-    _crt_blas_worker_arg * arg = (_crt_blas_worker_arg *) arg_ptr;
+    _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i, j, k;
     slong num_primes = arg->num_primes;
     slong n = arg->n;
@@ -380,7 +430,7 @@ int _fmpz_mat_mul_blas(
     const fmpz_mat_t B,
     flint_bitcnt_t bits)
 {
-    slong i, l;
+    slong i, l, start, stop;
     slong m = A->r;
     slong k = A->c;
     slong n = B->c;
@@ -391,7 +441,7 @@ int _fmpz_mat_mul_blas(
     fmpz_comb_t comb;
     thread_pool_handle * handles;
     slong num_workers;
-    void * bigargs;
+    _worker_arg * args;
 
     FLINT_ASSERT(m == A->r && m == C->r);
     FLINT_ASSERT(k == A->c && k == B->r);
@@ -421,123 +471,95 @@ int _fmpz_mat_mul_blas(
 
     num_workers = flint_request_threads(&handles, INT_MAX);
 
-    i = sizeof(_mod_blas_worker_arg);
-    i = FLINT_MAX(i, sizeof(_tod_blas_worker_arg));
-    i = FLINT_MAX(i, sizeof(_fromd_blas_worker_arg));
-    i = FLINT_MAX(i, sizeof(_crt_blas_worker_arg));
-    bigargs = flint_malloc((num_workers + 1)*i);
+    args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg);
+    for (i = 0; i <= num_workers; i++)
+    {
+        args[i].l = -1;
+        args[i].prime = 0;
+        args[i].num_primes = num_primes;
+        args[i].m = m;
+        args[i].k = k;
+        args[i].n = n;
+        args[i].bigA = bigA;
+        args[i].bigB = bigB;
+        args[i].bigC = bigC;
+        args[i].Arows = A->rows;
+        args[i].Brows = B->rows;
+        args[i].Crows = C->rows;
+        args[i].dA = dA;
+        args[i].dB = dB;
+        args[i].dC = dC;
+        args[i].comb = comb;
+    }
 
     /* mod inputs */
+    for (start = 0, i = 0; i <= num_workers; start = stop, i++)
     {
-        _mod_blas_worker_arg * args = (_mod_blas_worker_arg *) bigargs;
-
-        for (i = 0; i <= num_workers; i++)
-        {
-            args[i].num_primes = num_primes;
-            args[i].m = m;
-            args[i].k = k;
-            args[i].n = n;
-            args[i].bigA = bigA;
-            args[i].bigB = bigB;
-            args[i].Arows = A->rows;
-            args[i].Brows = B->rows;
-            args[i].comb = comb;
-            _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
-                             &args[i].Bstartrow, &args[i].Bstoprow, m,
-                                  ((m + k)*(i + 0))/(num_workers + 1),
-                                  ((m + k)*(i + 1))/(num_workers + 1));
-        }
-
-        for (i = 0; i < num_workers; i++)
-            thread_pool_wake(global_thread_pool, handles[i], 0,
-                                                   _mod_blas_worker, &args[i]);
-        _mod_blas_worker(&args[num_workers]);
-        for (i = 0; i < num_workers; i++)
-            thread_pool_wait(global_thread_pool, handles[i]);
+        stop = _peicewise_linear_inverse2(m, k, k, n, i + 1, num_workers + 1);
+        _distribute_rows2(start, stop,
+                          &args[i].Astartrow, &args[i].Astoprow, m,
+                          &args[i].Bstartrow, &args[i].Bstoprow, k);
     }
+
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wake(global_thread_pool, handles[i], 0, _mod_worker, &args[i]);
+    _mod_worker(&args[num_workers]);
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wait(global_thread_pool, handles[i]);
 
     /* multiply and reduce answers mod the primes */
     for (l = 0; l < num_primes; l++)
     {
+        for (start = 0, i = 0; i <= num_workers; start = stop, i++)
         {
-            _tod_blas_worker_arg * args = (_tod_blas_worker_arg *) bigargs;
+            stop = _peicewise_linear_inverse2(m, k, k, n, i + 1, num_workers + 1);
 
-            for (i = 0; i <= num_workers; i++)
-            {
-                args[i].l = l;
-                args[i].num_primes = num_primes;
-                args[i].m = m;
-                args[i].k = k;
-                args[i].n = n;
-                args[i].bigA = bigA;
-                args[i].bigB = bigB;
-                args[i].dA = dA;
-                args[i].dB = dB;
-                args[i].prime = primes[l];
-                _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
-                                 &args[i].Bstartrow, &args[i].Bstoprow, m,
-                                      ((m + k)*(i + 0))/(num_workers + 1),
-                                      ((m + k)*(i + 1))/(num_workers + 1));
-            }
-
-            for (i = 0; i < num_workers; i++)
-                thread_pool_wake(global_thread_pool, handles[i], 0,
-                                                   _tod_blas_worker, &args[i]);
-            _tod_blas_worker(&args[num_workers]);
-            for (i = 0; i < num_workers; i++)
-                thread_pool_wait(global_thread_pool, handles[i]);
-        }
-
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-                     m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
-
-        /* TODO: modify _distribute_rows and combine _fromd and _tod */
-        {
-            _fromd_blas_worker_arg * args = (_fromd_blas_worker_arg *) bigargs;
-
-            for (i = 0; i <= num_workers; i++)
-            {
-                args[i].l = l;
-                args[i].num_primes = num_primes;
-                args[i].n = n;
-                args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
-                args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
-                args[i].bigC = bigC;
-                args[i].dC = dC;
-                args[i].prime = primes[l];
-            }
-
-            for (i = 0; i < num_workers; i++)
-                thread_pool_wake(global_thread_pool, handles[i], 0,
-                                                 _fromd_blas_worker, &args[i]);
-            _fromd_blas_worker(&args[num_workers]);
-            for (i = 0; i < num_workers; i++)
-                thread_pool_wait(global_thread_pool, handles[i]);
-        }
-    }
-
-    /* crt output */
-    {
-        _crt_blas_worker_arg * args = (_crt_blas_worker_arg *) bigargs;
-
-        for (i = 0; i <= num_workers; i++)
-        {
-            args[i].num_primes = num_primes;
-            args[i].n = n;
-            args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
-            args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
-            args[i].bigC = bigC;
-            args[i].Crows = C->rows;
-            args[i].comb = comb;
+            args[i].l = l;
+            args[i].prime = primes[l];
+            _distribute_rows2(start, stop,
+                              &args[i].Astartrow, &args[i].Astoprow, m,
+                              &args[i].Bstartrow, &args[i].Bstoprow, k);
         }
 
         for (i = 0; i < num_workers; i++)
-            thread_pool_wake(global_thread_pool, handles[i], 0,
-                                                   _crt_blas_worker, &args[i]);
-        _crt_blas_worker(&args[num_workers]);
+            thread_pool_wake(global_thread_pool, handles[i], 0, _tod_worker, &args[i]);
+        _tod_worker(&args[num_workers]);
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                                       m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
+
+        /* TODO: modify _distribute_rows and combine _fromd and _tod */
+        for (start = 0, i = 0; i <= num_workers; start = stop, i++)
+        {
+            stop = ((i + 1)*m)/(num_workers + 1);
+            args[i].l = l;
+            args[i].prime = primes[l];
+            args[i].Cstartrow = start;
+            args[i].Cstoprow  = stop;
+        }
+
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wake(global_thread_pool, handles[i], 0, _fromd_worker, &args[i]);
+        _fromd_worker(&args[num_workers]);
         for (i = 0; i < num_workers; i++)
             thread_pool_wait(global_thread_pool, handles[i]);
     }
+
+    /* crt output */
+    for (start = 0, i = 0; i <= num_workers; start = stop, i++)
+    {
+        stop = ((i + 1)*m)/(num_workers + 1);
+        args[i].Cstartrow = start;
+        args[i].Cstoprow  = stop;
+    }
+
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wake(global_thread_pool, handles[i], 0, _crt_worker, &args[i]);
+    _crt_worker(&args[num_workers]);
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wait(global_thread_pool, handles[i]);
 
     flint_give_back_threads(handles, num_workers);
 
@@ -545,7 +567,7 @@ int _fmpz_mat_mul_blas(
     fmpz_comb_clear(comb);
     flint_free(primes);
 
-    flint_free(bigargs);
+    flint_free(args);
     flint_free(bigA);
     flint_free(bigB);
     flint_free(bigC);
