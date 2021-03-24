@@ -396,7 +396,11 @@ FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
    moduli giving nlimbs = 2. This should hold both in the classical
    range and in Strassen blocks.
  */
+#if FLINT_USES_BLAS
+#define NMOD_MAT_OPTIMAL_MODULUS_BITS 20
+#else
 #define NMOD_MAT_OPTIMAL_MODULUS_BITS (FLINT_BITS-5)
+#endif
 
 /* Inlines *******************************************************************/
 
