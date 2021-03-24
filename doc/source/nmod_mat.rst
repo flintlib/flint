@@ -649,6 +649,9 @@ Strong echelon form and Howell form
     Puts `A` into strong echelon form. The Howell form and the strong echelon
     form are equal up to permutation of the rows, see [FieHof2014]_ for a
     definition of the strong echelon form and the algorithm used here.
+    Note that [FieHof2014]_ defines strong echelon form as a lower left normal form,
+    while the implemented version returns an upper right normal form,
+    agreeing with the definition of Howell form in [StoMul1998]_.
 
     `A` must have at least as many rows as columns.
 
