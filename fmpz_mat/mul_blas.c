@@ -23,11 +23,9 @@
 
 #include "cblas.h"
 
-/* Same as in nmod_mat_mul_blas */
+/* Stuff that should be shared with nmod_mat_mul_blas */
 
 #define MAX_BLAS_DP_INT  (UWORD(1) << 53)
-
-/* helpers for dividing up the work */
 
 static void _distribute_rows2(
     slong start, slong stop,
@@ -61,57 +59,21 @@ static void _distribute_rows2(
     }
 }
 
-static void _distribute_rows3(
-    slong start, slong stop,
-    slong * Astart, slong * Astop, slong Alen,
-    slong * Bstart, slong * Bstop, slong Blen,
-    slong * Cstart, slong * Cstop, slong Clen)
-{
-    FLINT_ASSERT(0 <= start);
-    FLINT_ASSERT(start <= stop);
-    FLINT_ASSERT(stop <= Alen + Blen + Clen);
+/*
+    if f is continuous with
+        f(0) = 0
+        f'(x) = alpha for 0 < x < a
+        f'(x) = beta for a < x < a + b
 
-    if (stop <= Alen + Blen)
-    {
-        *Cstart = 0;
-        *Cstop = 0;
-        _distribute_rows2(start, stop, Astart, Astop, Alen, Bstart, Bstop, Blen);
-    }
-    else if (start >= Alen + Blen)
-    {
-        *Astart = 0;
-        *Astop  = 0;
-        *Bstart = 0;
-        *Bstop  = 0;
-        *Cstart = start - (Alen + Blen);
-        *Cstop = stop - (Alen + Blen);
-    }
-    else if (start >= Alen)
-    {
-        *Astart = 0;
-        *Astop  = 0;
-        *Bstart = start - Alen;
-        *Bstop  = Blen;
-        *Cstart = 0;
-        *Cstop = stop - (Alen + Blen);
-    }
-    else
-    {
-        *Astart = start;
-        *Astop  = Alen;
-        *Bstart = 0;
-        *Bstop  = Blen;
-        *Cstart = 0;
-        *Cstop = stop - (Alen + Blen);
-    }
-}
-
-
+    return solution for x to f(x) = (a*alpha + b*beta)*yn/yd
+    for 0 <= yn/yd <= 1
+*/
 static ulong _peicewise_linear_inverse2(
     ulong a, ulong alpha,
     ulong b, ulong beta,
     ulong yn, ulong yd)
 {
+    /* very low priority TODO: this can overflow only in very extreme cases */
     ulong y = yn*(a*alpha + b*beta)/yd;
 
     if (y <= a*alpha)
@@ -120,28 +82,7 @@ static ulong _peicewise_linear_inverse2(
     return a + (y - a*alpha)/beta;
 }
 
-
-static ulong _peicewise_linear_inverse3(
-    ulong a, ulong alpha,
-    ulong b, ulong beta,
-    ulong c, ulong gamma,
-    ulong yn, ulong yd)
-{
-    ulong y = yn*(a*alpha + b*beta + c*gamma)/yd;
-
-    if (y <= a*alpha)
-        return y/alpha;
-
-    if (y - a*alpha <= b*beta)
-        return a + (y - a*alpha)/beta;
-
-    return a + b + (y - (a*alpha + b*beta))/gamma;
-}
-
-/*************************************************************************/
-
-
-
+/* mod/lift helpers */
 
 static void _lift_vec(double * a, const uint32_t * b, slong len, uint32_t n)
 {
@@ -157,7 +98,6 @@ static uint32_t _reduce_uint32(mp_limb_t a, nmod_t mod)
     return (uint32_t)r;
 }
 
-/* fmpz_multi_mod_ui for strided uint32 output */
 static void fmpz_multi_mod_uint32_stride(
     uint32_t * out, slong stride,
     const fmpz_t input,
@@ -222,6 +162,7 @@ static void fmpz_multi_mod_uint32_stride(
         A[0] = *ttt;
 }
 
+/* workers */
 
 typedef struct {
     mp_limb_t prime;
@@ -472,7 +413,7 @@ int _fmpz_mat_mul_blas(
     num_workers = flint_request_threads(&handles, INT_MAX);
 
     args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg);
-    for (i = 0; i <= num_workers; i++)
+    for (start = 0, i = 0; i <= num_workers; start = stop, i++)
     {
         args[i].l = -1;
         args[i].prime = 0;
@@ -490,17 +431,19 @@ int _fmpz_mat_mul_blas(
         args[i].dB = dB;
         args[i].dC = dC;
         args[i].comb = comb;
-    }
 
-    /* mod inputs */
-    for (start = 0, i = 0; i <= num_workers; start = stop, i++)
-    {
+        /* distribute rows of C evenly */
+        args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
+        args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
+
+        /* distribute rows of A and B evenly as weighted by their columns */
         stop = _peicewise_linear_inverse2(m, k, k, n, i + 1, num_workers + 1);
         _distribute_rows2(start, stop,
                           &args[i].Astartrow, &args[i].Astoprow, m,
                           &args[i].Bstartrow, &args[i].Bstoprow, k);
     }
 
+    /* mod inputs */
     for (i = 0; i < num_workers; i++)
         thread_pool_wake(global_thread_pool, handles[i], 0, _mod_worker, &args[i]);
     _mod_worker(&args[num_workers]);
@@ -510,15 +453,10 @@ int _fmpz_mat_mul_blas(
     /* multiply and reduce answers mod the primes */
     for (l = 0; l < num_primes; l++)
     {
-        for (start = 0, i = 0; i <= num_workers; start = stop, i++)
+        for (i = 0; i <= num_workers; i++)
         {
-            stop = _peicewise_linear_inverse2(m, k, k, n, i + 1, num_workers + 1);
-
             args[i].l = l;
             args[i].prime = primes[l];
-            _distribute_rows2(start, stop,
-                              &args[i].Astartrow, &args[i].Astoprow, m,
-                              &args[i].Bstartrow, &args[i].Bstoprow, k);
         }
 
         for (i = 0; i < num_workers; i++)
@@ -530,16 +468,6 @@ int _fmpz_mat_mul_blas(
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                                        m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
 
-        /* TODO: modify _distribute_rows and combine _fromd and _tod */
-        for (start = 0, i = 0; i <= num_workers; start = stop, i++)
-        {
-            stop = ((i + 1)*m)/(num_workers + 1);
-            args[i].l = l;
-            args[i].prime = primes[l];
-            args[i].Cstartrow = start;
-            args[i].Cstoprow  = stop;
-        }
-
         for (i = 0; i < num_workers; i++)
             thread_pool_wake(global_thread_pool, handles[i], 0, _fromd_worker, &args[i]);
         _fromd_worker(&args[num_workers]);
@@ -548,13 +476,6 @@ int _fmpz_mat_mul_blas(
     }
 
     /* crt output */
-    for (start = 0, i = 0; i <= num_workers; start = stop, i++)
-    {
-        stop = ((i + 1)*m)/(num_workers + 1);
-        args[i].Cstartrow = start;
-        args[i].Cstoprow  = stop;
-    }
-
     for (i = 0; i < num_workers; i++)
         thread_pool_wake(global_thread_pool, handles[i], 0, _crt_worker, &args[i]);
     _crt_worker(&args[num_workers]);
