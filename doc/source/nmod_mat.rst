@@ -338,11 +338,11 @@ Matrix Exponentiation
 
 .. function:: void _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
- 	   Sets `dest = mat^pow`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
+ 	   Sets `dest = mat^{pow}`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
 .. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
 
-    Sets `dest = mat^pow`. ``dest`` and ``mat`` may be aliased. Implements
+    Sets `dest = mat^{pow}`. ``dest`` and ``mat`` may be aliased. Implements
    	exponentiation by squaring.
 
 
