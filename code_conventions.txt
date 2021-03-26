@@ -11,6 +11,14 @@ We note the following exceptions:
       __asm__ and __inline__ in flint.h so that gcc allows compiling with 
       the flags "-ansi -pendatic" nonetheless.
 
+Build system
+------------
+
+Each module should go in Makefile.in and in CMakeLists.txt under BUILD_DIRS.
+Each module should have a non-empty test directory.
+The file names in a module should friendly to case-insensitivity, i.e. it is
+not a good idea to have both fmpz/FOO.c and fmpz/foo.c.
+
 Primitive types
 ---------------
 

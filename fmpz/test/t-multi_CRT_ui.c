@@ -16,21 +16,18 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
 
 int main()
 {
-    int result = 1;
-    fmpz_t input, temp;
-    mpz_t num1;
-    mp_limb_t * output, * output2;
+    fmpz_t input, temp, prod;
+    mp_limb_t * output;
     slong i, j, k;
+    flint_bitcnt_t bits1, bits2, bits;
     mp_limb_t * primes;
-    mp_limb_t prime;
+    fmpz * primes2;
     slong num_primes;
-    slong bits;
-    double primes_per_limb;
-
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
@@ -39,80 +36,85 @@ int main()
     flint_printf("multi_CRT_ui....");
     fflush(stdout);
 
-    
-    mpz_init(num1);
-
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        bits = n_randint(state, 300)+1;
+        int sign = n_randint(state, 2);
 
-        if (FLINT_BITS == 32)
-            primes_per_limb = 1.0325;
-        else if (FLINT_BITS == 64)
-            primes_per_limb = 1.016;
+        num_primes = 1 + n_randint(state, 400);
 
-        num_primes = ((bits + 1)*primes_per_limb)/FLINT_BITS + 1;
+        fmpz_init(temp);
+        fmpz_init(input);
+        fmpz_init(prod);
+        output = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+        primes = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+        primes2 = _fmpz_vec_init(num_primes);
 
-        primes = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
-        prime = n_nextprime((UWORD(1) << (FLINT_BITS-1)) - WORD(10000000), 0);
+try_again:
 
+        bits1 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
+        bits2 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
+        if (bits1 > bits2)
+            ULONG_SWAP(bits1, bits2);
+
+        fmpz_one(prod);
         for (j = 0; j < num_primes; j++)
         {
-            primes[j] = prime;
-            prime = n_nextprime(prime, 0);
+            bits = bits1 + n_randint(state, bits2 - bits1 + 1);
+            primes[j] = n_randbits(state, bits);
+            primes[j] = n_nextprime(primes[j], 1);
+            fmpz_mul_ui(prod, prod, primes[j]);
+            fmpz_set_ui(primes2 + j, primes[j]);
         }
 
-        fmpz_init(input);
+        _fmpz_vec_sort(primes2, num_primes);
 
-        fmpz_randtest(input, state, bits);
-        fmpz_get_mpz(num1, input);
+        for (j = 1; j < num_primes; j++)
+            if (fmpz_equal(primes2 + j, primes2 + j - 1))
+                goto try_again;
 
-        output = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
-        output2 = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
+        fmpz_randtest(input, state, n_randint(state, 300) + 1);
 
         fmpz_comb_init(comb, primes, num_primes);
         fmpz_comb_temp_init(comb_temp, comb);
-
         fmpz_multi_mod_ui(output, input, comb, comb_temp);
-      
-        fmpz_init(temp);
-
-        fmpz_multi_CRT_ui(temp, output, comb, comb_temp, 1);
-        result &= fmpz_equal(temp, input);
-      
+        fmpz_multi_CRT_ui(temp, output, comb, comb_temp, sign);
         fmpz_comb_temp_clear(comb_temp);
+        fmpz_comb_clear(comb);
 
-        if (!result)
+        if (sign ? fmpz_cmp2abs(prod, temp) < 0 :
+                   (fmpz_sgn(temp) < 0 || fmpz_cmp(prod, temp) <= 0))
         {
-            flint_printf("FAIL: bits = %wd, num_primes = %wd\n", bits, num_primes);
-            fmpz_print(temp); flint_printf("\n");
-            fmpz_print(input); flint_printf("\n");
-            abort();
+            flint_printf("FAIL: check crt output range\n");
+            flint_printf("i = %wd\n", i);
+            flint_abort();
+        }
+
+        fmpz_sub(temp, temp, input);
+        if (!fmpz_divisible(temp, prod))
+        {
+            flint_printf("FAIL: check crt modulo product of primes\n");
+            flint_printf("i = %wd\n", i);
+            flint_abort();
         }
 
         for (k = 0; k < num_primes; k++)
         {
-            output2[k] = fmpz_mod_ui(temp, input, primes[k]);
-            result &= (output[k] == output2[k]);
-		  
-            if (!result)
+            if (output[k] != fmpz_fdiv_ui(input, primes[k]))
             {
-                flint_printf("FAIL: bits = %wd, num_primes = %wd\n", bits, num_primes);
-                flint_printf("FAIL: k = %wd, output[k] = %wd, output2[k] = %wd\n", k, output[k], output2[k]);
-                abort();
+                flint_printf("FAIL: check multi_mod_ui output");
+                flint_printf("i = %wd, k = %wd\n", i, k);
+                flint_abort();
             }
         }
 
-        fmpz_comb_clear(comb);
         fmpz_clear(temp);
         fmpz_clear(input);
+        fmpz_clear(prod);
         flint_free(output);
-        flint_free(output2);
         flint_free(primes);
+        _fmpz_vec_clear(primes2, num_primes);
     }
 
-    
-    mpz_clear(num1);
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
