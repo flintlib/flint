@@ -54,21 +54,18 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
 
     nt = flint_get_num_threads();
 
-    if (fmpz_is_one(c))
+    cutoff = 100 + 10 * n_sqrt(FLINT_MAX(bits - FLINT_BITS, 0));
+
+    /* Parallel cutoff is set lower since shift_horner is serial. */
+    if (nt == 1)
+        cutoff = FLINT_MIN(cutoff, 1000);
+    else
+        cutoff = FLINT_MIN(cutoff, 300);
+
+    if (len < cutoff)
     {
-        cutoff = 100 + 10 * n_sqrt(FLINT_MAX(bits - FLINT_BITS, 0));
-
-        /* Parallel cutoff is set lower since shift_horner is serial. */
-        if (nt == 1)
-            cutoff = FLINT_MIN(cutoff, 1000);
-        else
-            cutoff = FLINT_MIN(cutoff, 300);
-
-        if (len < cutoff)
-        {
-            _fmpz_poly_taylor_shift_horner(poly, c, len);
-            return;
-        }
+        _fmpz_poly_taylor_shift_horner(poly, c, len);
+        return;
     }
 
     len1 = len / 2;

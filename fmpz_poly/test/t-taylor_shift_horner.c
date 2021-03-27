@@ -17,6 +17,24 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
+static void
+_taylor_simple(fmpz * poly, const fmpz_t c, slong n)
+{
+    slong i, j;
+
+    for (i = n - 2; i >= 0; i--)
+        for (j = i; j < n - 1; j++)
+            fmpz_addmul(poly + j, poly + j + 1, c);
+}
+
+static void
+taylor_simple(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
+{
+    if (f != g)
+        fmpz_poly_set(g, f);
+    _taylor_simple(g->coeffs, c, g->length);
+}
+
 int
 main(void)
 {
@@ -123,7 +141,7 @@ main(void)
         fmpz_set_si(c, n_randint(state, 2) ? 1 : -1);
         fmpz_poly_taylor_shift_horner(h1, f, c);
         fmpz_neg(c, c);
-        fmpz_poly_taylor_shift_horner(h2, h1, c);
+        taylor_simple(h2, h1, c);
 
         if (!fmpz_poly_equal(f, h2))
         {
