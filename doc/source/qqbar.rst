@@ -816,11 +816,67 @@ Symbolic expressions and conversion to radicals
     or ``PolynomialRootIndexed``.
     Returns 0 on failure and 1 on success.
 
-    At the moment, this function only recognizes rational and quadratic numbers
-    as well as cyclotomic numbers. Higher-degree radicals and other special 
-    cases will be implemented in the future. Detection of cyclotomic numbers is
-    currently heuristic, and this function may miss some cyclotomics.
+    The *flags* parameter toggles different methods for generating formulas.
+    It can be set to any combination of the following. If *flags* is 0,
+    only rational numbers will be handled.
 
+    .. macro:: QQBAR_FORMULA_ALL
+
+        Toggles all methods (potentially expensive).
+
+    .. macro:: QQBAR_FORMULA_GAUSSIANS
+
+        Detect Gaussian rational numbers `a + bi`.
+
+    .. macro:: QQBAR_FORMULA_QUADRATICS
+
+        Solve quadratics in the form `a + b \sqrt{d}`.
+
+    .. macro:: QQBAR_FORMULA_CYCLOTOMICS
+
+        Detect elements of cyclotomic fields. This works by trying plausible
+        cyclotomic fields (based on the degree of the input), using LLL
+        to find candidate number field elements, and certifying candidates
+        through an exact computation. Detection is heuristic and
+        is not guaranteed to find all cyclotomic numbers.
+
+    .. macro:: QQBAR_FORMULA_CUBICS
+               QQBAR_FORMULA_QUARTICS
+               QQBAR_FORMULA_QUINTICS
+
+        Solve polynomials of degree 3, 4 and (where applicable) 5 using
+        cubic, quartic and quintic formulas (not yet implemented).
+
+    .. macro:: QQBAR_FORMULA_DEPRESSION
+
+        Use depression to try to generate simpler numbers.
+
+    .. macro:: QQBAR_FORMULA_DEFLATION
+
+        Use deflation to try to generate simpler numbers.
+        This allows handling number of the form `a^{1/n}` where *a* can
+        be represented in closed form.
+
+    .. macro:: QQBAR_FORMULA_SEPARATION
+
+        Try separating real and imaginary parts or sign and magnitude of
+        complex numbers. This allows handling numbers of the form `a + bi`
+        or `m \cdot s` (with `m > 0, |s| = 1`) where *a* and *b* or *m* and *s* can be
+        represented in closed form. This is only attempted as a fallback after
+        other methods fail: if an explicit Cartesian or magnitude-sign
+        represented is desired, the user should manually separate the number
+        into complex parts before calling :func:`qqbar_get_fexpr_formula`.
+
+    .. macro:: QQBAR_FORMULA_EXP_FORM
+               QQBAR_FORMULA_TRIG_FORM
+               QQBAR_FORMULA_RADICAL_FORM
+               QQBAR_FORMULA_AUTO_FORM
+
+        Select output form for cyclotomic numbers. The *auto* form (equivalent
+        to no flags being set) results in radicals for numbers of low degree,
+        trigonometric functions for real numbers, and complex exponentials
+        for nonreal numbers. The other flags (not fully implemented) can be
+        used to force exponential form, trigonometric form, or radical form.
 
 Internal functions
 -------------------------------------------------------------------------------

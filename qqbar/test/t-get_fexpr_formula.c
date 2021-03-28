@@ -16,7 +16,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("get_fexpr....");
+    flint_printf("get_fexpr_formula....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -25,6 +25,7 @@ int main()
     {
         qqbar_t x, y;
         fexpr_t e;
+        ulong flags;
 
         qqbar_init(x);
         qqbar_init(y);
@@ -32,7 +33,12 @@ int main()
 
         qqbar_randtest(x, state, 5, 10);
 
-        if (qqbar_get_fexpr_formula(e, x, 0))
+        if (n_randint(state, 2))
+            flags = n_randlimb(state);
+        else
+            flags = QQBAR_FORMULA_ALL;
+
+        if (qqbar_get_fexpr_formula(e, x, flags))
         {
             qqbar_set_fexpr(y, e);
 
@@ -107,7 +113,7 @@ int main()
             qqbar_zero(y);
         }
 
-        if (qqbar_get_fexpr_formula(e, x, 0))
+        if (qqbar_get_fexpr_formula(e, x, QQBAR_FORMULA_ALL))
         {
             qqbar_set_fexpr(y, e);
 

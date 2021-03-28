@@ -1185,15 +1185,31 @@ class qqbar:
                 return NotImplemented
         return other ** self
 
-    def fexpr(self, formula=True, root_index=False):
+    def fexpr(self, formula=True, root_index=False, serialized=False,
+            gaussians=True, quadratics=True, cyclotomics=True, cubics=True,
+            quartics=True, quintics=True, depression=True, deflation=True,
+            separation=True):
         """
         """
         res = fexpr()
         if formula:
-            if libcalcium.qqbar_get_fexpr_formula(res, self, 0):
+            flags = 0
+            if gaussians: flags |= 1
+            if quadratics: flags |= 2
+            if cyclotomics: flags |= 4
+            if cubics: flags |= 8
+            if quartics: flags |= 16
+            if quintics: flags |= 32
+            if depression: flags |= 64
+            if deflation: flags |= 128
+            if separation: flags |= 256
+            if libcalcium.qqbar_get_fexpr_formula(res, self, flags):
                 return res
         if root_index:
             libcalcium.qqbar_get_fexpr_root_indexed(res, self)
+            return res
+        if serialized:
+            libcalcium.qqbar_get_fexpr_repr(res, self)
             return res
         libcalcium.qqbar_get_fexpr_root_nearest(res, self)
         return res
@@ -3589,8 +3605,10 @@ def test_gamma():
     assert gamma(0.5) == sqrt(pi)
     assert 1/gamma(0) == 0
     assert gamma(sqrt(2)*sqrt(3)) == gamma(sqrt(6))
-    #assert gamma(pi+1)/gamma(pi) == pi
+    assert gamma(pi+1)/gamma(pi) == pi
     assert gamma(pi)/gamma(pi-1) == pi-1
+    assert log(gamma(pi+1)) - log(gamma(pi)) - log(pi) == 0
+    assert log(gamma(-pi+1)) - log(gamma(-pi)) - log(pi) == pi * i
 
 def test_xfail():
     # Test some simplifications that are known not to work yet.

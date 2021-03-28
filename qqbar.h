@@ -411,6 +411,24 @@ void qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x);
 void qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x);
 int qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags);
 
+#define QQBAR_FORMULA_GAUSSIANS    1 
+#define QQBAR_FORMULA_QUADRATICS   2
+#define QQBAR_FORMULA_CYCLOTOMICS  4
+#define QQBAR_FORMULA_CUBICS       8
+#define QQBAR_FORMULA_QUARTICS     16
+#define QQBAR_FORMULA_QUINTICS     32
+#define QQBAR_FORMULA_DEPRESSION   64
+#define QQBAR_FORMULA_DEFLATION    128
+#define QQBAR_FORMULA_SEPARATION   256
+
+#define QQBAR_FORMULA_EXP_FORM        2048
+#define QQBAR_FORMULA_TRIG_FORM       4096
+#define QQBAR_FORMULA_RADICAL_FORM    8192
+#define QQBAR_FORMULA_AUTO_FORM       0
+
+#define QQBAR_FORMULA_ALL ((2 * QQBAR_FORMULA_SEPARATION - 1) | QQBAR_FORMULA_AUTO_FORM)
+
+
 int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 
 /* Internal functions */

@@ -15,6 +15,38 @@
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
 int _fexpr_is_symbol_with_underscore(const fexpr_t expr);
 
+/* todo: make public, document, test */
+static int
+fexpr_equal_ui(const fexpr_t expr, ulong c)
+{
+    if (c <= FEXPR_COEFF_MAX)
+    {
+        return expr->data[0] == (c << FEXPR_TYPE_BITS);
+    }
+    else
+    {
+        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS))
+                    && expr->data[1] == c);
+    }
+}
+
+static int
+fexpr_equal_si(const fexpr_t expr, slong c)
+{
+    if (c >= FEXPR_COEFF_MIN && c <= FEXPR_COEFF_MAX)
+    {
+        return expr->data[0] == (c << FEXPR_TYPE_BITS);
+    }
+    else if (c > 0)
+    {
+        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == c);
+    }
+    else
+    {
+        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_NEG | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == (-(ulong) c));
+    }
+}
+
 static int
 fexpr_view_call0(fexpr_t func, const fexpr_t expr)
 {
@@ -215,24 +247,41 @@ fexpr_write_latex_mul(calcium_stream_t out, const fexpr_t expr, ulong flags)
 
     for (i = 0; i < len; i++)
     {
-        need_parens = fexpr_need_parens_in_mul(arg, i);
-
-        if (need_parens)
-            calcium_write(out, "\\left(");
-
-        fexpr_write_latex(out, arg, flags);
-
-        if (need_parens)
-            calcium_write(out, "\\right)");
-
-        if (i < len - 1)
+        /* 1 * x * y or -1 * x * y  ->  x * y,  - x * y */
+        if (i == 0 && len >= 2 && fexpr_is_integer(arg) &&
+            (fexpr_equal_si(arg, 1) || fexpr_equal_si(arg, -1)))
         {
+            if (fexpr_equal_si(arg, -1))
+                calcium_write(out, "-");
+
             fexpr_view_next(arg);
 
             if (fexpr_need_cdot_before_factor(arg))
-                calcium_write(out, " \\cdot ");
+                calcium_write(out, "1 \\cdot ");
             else
                 calcium_write(out, " ");
+        }
+        else
+        {
+            need_parens = fexpr_need_parens_in_mul(arg, i);
+
+            if (need_parens)
+                calcium_write(out, "\\left(");
+
+            fexpr_write_latex(out, arg, flags);
+
+            if (need_parens)
+                calcium_write(out, "\\right)");
+
+            if (i < len - 1)
+            {
+                fexpr_view_next(arg);
+
+                if (fexpr_need_cdot_before_factor(arg))
+                    calcium_write(out, " \\cdot ");
+                else
+                    calcium_write(out, " ");
+            }
         }
     }
 }
@@ -1293,39 +1342,6 @@ fexpr_write_latex_residue(calcium_stream_t out, const fexpr_t expr, ulong flags)
     if (parens)
         calcium_write(out, "\\right]");
 }
-
-/* todo: make public, document, test */
-static int
-fexpr_equal_ui(const fexpr_t expr, ulong c)
-{
-    if (c <= FEXPR_COEFF_MAX)
-    {
-        return expr->data[0] == (c << FEXPR_TYPE_BITS);
-    }
-    else
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS))
-                    && expr->data[1] == c);
-    }
-}
-
-static int
-fexpr_equal_si(const fexpr_t expr, slong c)
-{
-    if (c >= FEXPR_COEFF_MIN && c <= FEXPR_COEFF_MAX)
-    {
-        return expr->data[0] == (c << FEXPR_TYPE_BITS);
-    }
-    else if (c > 0)
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == c);
-    }
-    else
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_NEG | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == (-(ulong) c));
-    }
-}
-
 
 void
 _fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t f, const fexpr_t subscript, const fexpr_t order, ulong flags)

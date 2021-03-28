@@ -9,9 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_fmpz_poly.h"
 #include "acb_poly.h"
 #include "fexpr_builtin.h"
 #include "qqbar.h"
+
+static ulong _deflation(const fmpz * poly, slong len)
+{
+    fmpz_poly_t t;
+    t->alloc = t->length = len;
+    t->coeffs = (fmpz *) poly;
+    return arb_fmpz_poly_deflation(t);
+}
 
 void
 fexpr_set_arb(fexpr_t res, const arb_t x)
@@ -654,7 +663,6 @@ _qqbar_get_fexpr_cyclotomic(fexpr_t res, const fmpq_poly_t poly, slong n, int pu
     fexpr_clear(w);
 }
 
-
 int
 qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
 {
@@ -676,7 +684,7 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
         return 1;
     }
 
-    if (d <= 2)
+    if (d <= 2 && (flags & (QQBAR_FORMULA_QUADRATICS | QQBAR_FORMULA_GAUSSIANS)))
     {
         fmpz_t a, b, c, q;
         fexpr_t t, u, v;
@@ -691,58 +699,67 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
 
         qqbar_get_quadratic(a, b, c, q, x, 2);
 
-        if (fmpz_equal_si(c, -1))
+        if (fmpz_equal_si(c, -1) && (flags & QQBAR_FORMULA_GAUSSIANS))
         {
             fexpr_set_symbol_builtin(t, FEXPR_NumberI);
+            success = 1;
         }
-        else
+        else if (flags & QQBAR_FORMULA_QUADRATICS)
         {
             fexpr_set_fmpz(u, c);
             fexpr_set_symbol_builtin(v, FEXPR_Sqrt);
             fexpr_call1(t, v, u);
-        }
-
-        if (fmpz_is_zero(a))
-        {
-            if (fmpz_equal_si(b, -1))
-                fexpr_neg(u, t);
-            else if (fmpz_equal_si(b, 1))
-                fexpr_swap(u, t);
-            else
-            {
-                fexpr_set_fmpz(v, b);
-                fexpr_mul(u, v, t);
-            }
+            success = 1;
         }
         else
         {
-            if (fmpz_equal_si(b, -1))
+            success = 0;
+        }
+
+        if (success)
+        {
+            if (fmpz_is_zero(a))
             {
-                fexpr_set_fmpz(v, a);
-                fexpr_sub(u, v, t);
-            }
-            else if (fmpz_equal_si(b, 1))
-            {
-                fexpr_set_fmpz(v, a);
-                fexpr_add(u, v, t);
+                if (fmpz_equal_si(b, -1))
+                    fexpr_neg(u, t);
+                else if (fmpz_equal_si(b, 1))
+                    fexpr_swap(u, t);
+                else
+                {
+                    fexpr_set_fmpz(v, b);
+                    fexpr_mul(u, v, t);
+                }
             }
             else
             {
-                fexpr_set_fmpz(u, b);
-                fexpr_mul(v, u, t);
-                fexpr_set_fmpz(t, a);
-                fexpr_add(u, t, v);
+                if (fmpz_equal_si(b, -1))
+                {
+                    fexpr_set_fmpz(v, a);
+                    fexpr_sub(u, v, t);
+                }
+                else if (fmpz_equal_si(b, 1))
+                {
+                    fexpr_set_fmpz(v, a);
+                    fexpr_add(u, v, t);
+                }
+                else
+                {
+                    fexpr_set_fmpz(u, b);
+                    fexpr_mul(v, u, t);
+                    fexpr_set_fmpz(t, a);
+                    fexpr_add(u, t, v);
+                }
             }
-        }
 
-        if (fmpz_is_one(q))
-        {
-            fexpr_swap(res, u);
-        }
-        else
-        {
-            fexpr_set_fmpz(t, q);
-            fexpr_div(res, u, t);
+            if (fmpz_is_one(q))
+            {
+                fexpr_swap(res, u);
+            }
+            else
+            {
+                fexpr_set_fmpz(t, q);
+                fexpr_div(res, u, t);
+            }
         }
 
         fmpz_clear(a);
@@ -753,14 +770,18 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
         fexpr_clear(u);
         fexpr_clear(v);
 
-        return 1;
+        if (success)
+            return 1;
     }
 
     /* Identify special constants */
+    if (flags & QQBAR_FORMULA_CYCLOTOMICS)
     {
         slong p;
         ulong q;
 
+        /* Quick detection of roots of unity. Todo: could also detect
+           rational multiples of roots of unity. */
         if (qqbar_is_root_of_unity(&p, &q, x))
         {
             fexpr_t s, t, u, v, w;
@@ -801,9 +822,8 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
         }
     }
 
-    success = 0;
-
     /* Check for elements of cyclotomic fields */
+    if (flags & QQBAR_FORMULA_CYCLOTOMICS)
     {
         ulong * phi;
         ulong N1, N2, d2;
@@ -812,6 +832,8 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
         slong bits;
         fmpq_poly_t poly;
         qqbar_t zeta;
+
+        success = 0;
 
         bits = 2 * qqbar_height_bits(x) /*+ 20 * d */ + 40;
         d2 = 4 * d;
@@ -856,7 +878,7 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
                 if (qqbar_express_in_field(poly, zeta, x, bits, 0, bits))
                 {
                     _qqbar_get_fexpr_cyclotomic(res, poly, i, qqbar_sgn_im(x) == 0, qqbar_sgn_re(x) == 0);
-                    /* printf("match!\n"); */
+                  /*  printf("match!\n"); */
                     success = 1;
                 }
             }
@@ -865,7 +887,148 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
         flint_free(phi);
         fmpq_poly_clear(poly);
         qqbar_clear(zeta);
+
+        if (success)
+            return 1;
     }
 
-    return success;
+    if (flags & QQBAR_FORMULA_DEFLATION)
+    {
+        slong deflation;
+        ulong flags2;
+
+        deflation = _deflation(QQBAR_COEFFS(x), d + 1);
+
+        if (deflation > 1)
+        {
+            int neg;
+            qqbar_t t, u, v;
+
+            /* Avoid possible cases of infinite recursion. */
+            /* Todo: in some cases, we might want to carefully allow deflation recursively. */
+            flags2 = flags & ~QQBAR_FORMULA_DEFLATION;
+
+            neg = qqbar_is_real(x) && qqbar_sgn_re(x) < 0;
+
+            qqbar_init(t);
+            qqbar_init(u);
+            qqbar_init(v);
+
+            if (neg)
+                qqbar_neg(t, x);
+            else
+                qqbar_set(t, x);
+
+            qqbar_pow_ui(u, t, deflation);
+            success = qqbar_get_fexpr_formula(res, u, flags2);
+
+            if (success)
+            {
+                fexpr_t a, b;
+
+                fexpr_init(a);
+                fexpr_init(b);
+
+                /* todo: compute the root of unity more efficiently */
+                qqbar_root_ui(v, u, deflation);
+                qqbar_div(u, x, v);
+
+                if (deflation == 2)
+                {
+                    fexpr_sqrt(b, res);
+                }
+                else
+                {
+                    fexpr_set_ui(b, 1);
+                    fexpr_div_ui(a, b, deflation);
+                    fexpr_pow(b, res, a);
+                }
+
+                if (qqbar_is_one(u))
+                    fexpr_set(res, b);
+                else if (qqbar_is_neg_one(u))
+                    fexpr_neg(res, b);
+                else
+                {
+                    /* Todo: | flags by GAUSSIANS, CYCLOTOMICS etc. to always express the root of unity? */
+                    success = qqbar_get_fexpr_formula(a, u, flags2);
+
+                    if (success)
+                        fexpr_mul(res, b, a);
+                }
+
+                fexpr_clear(a);
+                fexpr_clear(b);
+            }
+
+            qqbar_clear(t);
+            qqbar_clear(u);
+            qqbar_clear(v);
+
+            if (success)
+                return 1;
+        }
+    }
+
+    /* Try a+bi or |x|*s separation. */
+    if ((flags & QQBAR_FORMULA_SEPARATION) && !qqbar_is_real(x))
+    {
+        qqbar_t a, b;
+        fexpr_t t, u, v;
+        ulong flags2;
+
+        qqbar_init(a);
+        qqbar_init(b);
+        fexpr_init(t);
+        fexpr_init(u);
+        fexpr_init(v);
+
+        qqbar_re_im(a, b, x);
+
+        /* Avoid possible cases of infinite recursion. */
+        /* Todo: in some cases, we might want to carefully allow separation recursively,
+           e.g. if the degree has been strictly decreased. */
+        flags2 = flags & ~QQBAR_FORMULA_SEPARATION;
+
+        success = (qqbar_degree(a) <= d) && (qqbar_degree(b) <= d) &&
+                    qqbar_get_fexpr_formula(t, a, flags2) &&
+                    qqbar_get_fexpr_formula(u, b, flags2);
+
+        if (success)
+        {
+            fexpr_set_symbol_builtin(res, FEXPR_NumberI);
+            fexpr_mul(v, u, res);
+
+            if (qqbar_is_zero(a))
+                fexpr_swap(res, v);
+            else
+                fexpr_add(res, t, v);
+        }
+        else
+        {
+            qqbar_abs(a, x);
+
+            if (qqbar_degree(a) <= d && qqbar_get_fexpr_formula(t, a, flags2))
+            {
+                qqbar_div(b, x, a);
+
+                if (qqbar_get_fexpr_formula(u, b, flags2))
+                {
+                    fexpr_mul(res, t, u);
+                    success = 1;
+                }
+            }
+        }
+
+        qqbar_clear(a);
+        qqbar_clear(b);
+        fexpr_clear(t);
+        fexpr_clear(u);
+        fexpr_clear(v);
+
+        if (success)
+            return 1;
+    }
+
+    return 0;
 }
