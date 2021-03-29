@@ -38,12 +38,12 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
 {
     fmpz *tmp, *tmp2;
     slong k, len1, len2;
-    slong bits, max_horner;
+    slong bits, cutoff;
     slong nt, nw;
     thread_pool_handle * threads;
     worker_t args[2];
 
-    if (len < 64 || fmpz_is_zero(c))
+    if (len < 50 || fmpz_is_zero(c))
     {
         _fmpz_poly_taylor_shift_horner(poly, c, len);
         return;
@@ -54,21 +54,17 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
 
     nt = flint_get_num_threads();
 
-    /* A big problem for parallel tuning is that we have no
-       multithreading in shift_horner. Moreover, shift_horner is
-       currently implemented without good cache locality, which makes
-       it perform much worse when run on several instances in parallel.
-       Therefore, only use it for smaller lengths. */
-    if (nt == 1)
-        max_horner = 3000;
-    else
-        max_horner = 200;
+    cutoff = 100 + 10 * n_sqrt(FLINT_MAX(bits - FLINT_BITS, 0));
 
-    /* Horner is faster with huge coefficients. */
-    if (len < max_horner && bits > pow(2.0, 7.0 + len * 0.005))
+    /* Parallel cutoff is set lower since shift_horner is serial. */
+    if (nt == 1)
+        cutoff = FLINT_MIN(cutoff, 1000);
+    else
+        cutoff = FLINT_MIN(cutoff, 300);
+
+    if (len < cutoff)
     {
         _fmpz_poly_taylor_shift_horner(poly, c, len);
-
         return;
     }
 
