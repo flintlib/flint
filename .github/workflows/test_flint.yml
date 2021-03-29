@@ -4,9 +4,9 @@ jobs:
   ubuntu-gcc:
     runs-on: ubuntu-latest
     env:
-      LOCAL=$GITHUB_WORKSPACE
-      LDFLAGS="-Wl,-rpath,$LOCAL/lib"
-      MAKE="make -j"
+      LOCAL: $GITHUB_WORKSPACE
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install texinfo
@@ -18,9 +18,9 @@ jobs:
   ubuntu-cmake-gcc:
     runs-on: ubuntu-latest
     env:
-      LOCAL=$GITHUB_WORKSPACE
-      LDFLAGS="-Wl,-rpath,$LOCAL/lib"
-      MAKE="make -j"
+      LOCAL: $GITHUB_WORKSPACE
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install texinfo
