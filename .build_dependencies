@@ -5,7 +5,7 @@ cd yasm
 git checkout v1.3.0
 ./autogen.sh
 ./configure ABI=$ABI --prefix=${LOCAL}
-${MAKE} > /dev/null 2>&1
+${MAKE}
 ${MAKE} install > /dev/null 2>&1
 cd ..
 
