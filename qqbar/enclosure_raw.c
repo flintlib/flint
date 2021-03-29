@@ -42,6 +42,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
     prec = FLINT_MAX(acc, 32) + 10;
 
     fmpz_poly_init(deriv);
+    fmpz_poly_derivative(deriv, poly);
     acb_init(z);
     acb_init(zmid);
     acb_init(t);
