@@ -6,7 +6,7 @@ git checkout v1.3.0
 ./autogen.sh
 ./configure ABI=$ABI --prefix=${LOCAL}
 ${MAKE}
-${MAKE} install > /dev/null 2>&1
+${MAKE} install
 cd ..
 
 wget http://mpir.org/mpir-3.0.0.tar.bz2
