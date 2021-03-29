@@ -6,16 +6,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          echo "LOCAL=${GITHUB_WORKSPACE}/local" >> $GITHUB_ENV
-          echo "LDFLAGS=-Wl,-rpath,$LOCAL/lib" >> $GITHUB_ENV
-          echo "MAKE=make-j" >> $GITHUB_ENV
           sudo apt-get install texinfo
           ./.build_dependencies
           ./configure CFLAGS="-Wredundant-decls" --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
           $MAKE
           ldd libflint.so
           $MAKE check
-       env:
+        env:
           LOCAL: ${{ github.workspace }}/local
           LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
           MAKE: "make -j"
