@@ -9,7 +9,7 @@ jobs:
       MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
-        run:
+      - run:
           sudo apt-get install texinfo
           ./.build_dependencies
           ./configure CFLAGS="-Wredundant-decls" --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
