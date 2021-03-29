@@ -18,6 +18,7 @@
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "thread_support.h"
+
 #include "cblas.h"
 
 typedef struct
@@ -112,9 +113,9 @@ int main(void)
             for (blas_num = flint_num; blas_num <= flint_num; blas_num *= 2)
             {
                 double min_old, min_new, min_ratio = 100;
-
+/*
                 openblas_set_num_threads(blas_num);
-
+*/
                 flint_printf("[flint %wd, blas %wd]: (", flint_num, blas_num);
 
                 for (i = 7; i < FLINT_BITS; i += 8)
