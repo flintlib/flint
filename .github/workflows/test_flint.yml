@@ -3,6 +3,10 @@ on: [push, pull_request]
 jobs:
   ubuntu-gcc:
     runs-on: ubuntu-latest
+    env:
+      LOCAL: ${{ env.GITHUB_WORKSPACE }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
       - run:
@@ -12,10 +16,6 @@ jobs:
           $MAKE;
           ldd libflint.so;
           $MAKE check;
-        env:
-          LOCAL: ${{ GITHUB_WORKSPACE }}/local
-          LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
-          MAKE: "make -j"
   ubuntu-cmake-gcc:
     runs-on: ubuntu-latest
     env:
