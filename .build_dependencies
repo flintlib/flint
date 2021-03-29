@@ -1,17 +1,18 @@
 #! /bin/sh
 
+mkdir -p local
+
 git clone https://github.com/yasm/yasm
 cd yasm
 git checkout v1.3.0
 ./autogen.sh
 ./configure ABI=$ABI --prefix=${LOCAL}
-${MAKE}
-${MAKE} install
+${MAKE} > /dev/null 2>&1
+${MAKE} install > /dev/null 2>&1
 cd ..
 
 wget http://mpir.org/mpir-3.0.0.tar.bz2
 tar -xf mpir-3.0.0.tar.bz2
-mkdir -p local
 
 cd mpir-3.0.0
 ./configure ABI=$ABI --enable-gmpcompat --prefix=${LOCAL} --with-yasm=${LOCAL}/bin/yasm
