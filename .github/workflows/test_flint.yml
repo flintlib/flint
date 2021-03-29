@@ -1,5 +1,5 @@
 name: flint-tests
-on: [push]
+on: [push, pull_request]
 jobs:
   ubuntu-gcc:
     runs-on: ubuntu-latest
