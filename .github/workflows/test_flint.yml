@@ -30,7 +30,7 @@ jobs:
           ./.build_dependencies
           mkdir build
           cd build
-          cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL ..
+          cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL ..
           $MAKE
           ldd lib/libflint.so
         env:
