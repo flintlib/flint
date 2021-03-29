@@ -13,7 +13,7 @@ jobs:
           ldd libflint.so;
           $MAKE check;
         env:
-          LOCAL: ${{ env.GITHUB_WORKSPACE }}/local
+          LOCAL: ${{ GITHUB_WORKSPACE }}/local
           LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
           MAKE: "make -j"
   ubuntu-cmake-gcc:
