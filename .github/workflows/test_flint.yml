@@ -4,14 +4,13 @@ jobs:
   ubuntu-gcc:
     runs-on: ubuntu-latest
     env:
-      LOCAL: $GITHUB_WORKSPACE
+      LOCAL: $GITHUB_WORKSPACE/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install texinfo
-      - run: cd $GITHUB_WORKSPACE
-      - run: .build_dependencies
+      - run: ./.build_dependencies
       - run: ./configure CFLAGS="-Wredundant-decls" --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
       - run: $MAKE
       - run: ldd libflint.so
@@ -19,15 +18,14 @@ jobs:
   ubuntu-cmake-gcc:
     runs-on: ubuntu-latest
     env:
-      LOCAL: $GITHUB_WORKSPACE
+      LOCAL: $GITHUB_WORKSPACE/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install texinfo
       - run: sudo apt-get install cmake
-      - run: cd $GITHUB_WORKSPACE
-      - run: .build_dependencies
+      - run: ./.build_dependencies
       - run: mkdir build
       - run: cd build
       - run: cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL ..
