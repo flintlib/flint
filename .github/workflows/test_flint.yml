@@ -3,19 +3,15 @@ on: [push, pull_request]
 jobs:
   ubuntu-gcc:
     runs-on: ubuntu-latest
-    env:
-      LOCAL: ${GITHUB_WORKSPACE}/local
-      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
-      MAKE: "make -j"
     steps:
       - uses: actions/checkout@v2
       - run:
-          sudo apt-get install texinfo
-          ./.build_dependencies
-          ./configure CFLAGS="-Wredundant-decls" --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
-          $MAKE
-          ldd libflint.so
-          $MAKE check
+          sudo apt-get install texinfo;
+          ./.build_dependencies;
+          ./configure CFLAGS="-Wredundant-decls" --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL};
+          $MAKE;
+          ldd libflint.so;
+          $MAKE check;
         env:
           LOCAL: ${GITHUB_WORKSPACE}/local
           LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
