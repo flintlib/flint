@@ -18,7 +18,7 @@ BUILD_DIRS = aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    fmpz_mod_mat mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly \
    thread_pool fmpz_mod fmpz_mod_vec fmpz_mod_mpoly fmpz_mod_mpoly_factor \
    n_poly fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor \
-   fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor \
+   fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor fq_default \
    $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
