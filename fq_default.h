@@ -356,6 +356,21 @@ FQ_DEFAULT_INLINE void fq_default_inv(fq_default_t rop,
    }
 }
 
+FQ_DEFAULT_INLINE void fq_default_div(fq_default_t rop, fq_default_t op1,
+                                  fq_default_t op2, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_div(rop->fq_zech, op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_div(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_div(rop->fq, op1->fq, op2->fq, ctx->ctx.fq);
+   }
+}
+
 FQ_DEFAULT_INLINE void fq_default_pow(fq_default_t rop,
 	    const fq_default_t op1, const fmpz_t e, const fq_default_ctx_t ctx)
 {
@@ -622,6 +637,21 @@ FQ_DEFAULT_INLINE void fq_default_one(fq_default_t rop,
    } else
    {
       fq_one(rop->fq, ctx->ctx.fq);
+   }
+}
+
+FQ_DEFAULT_INLINE void fq_default_swap(fq_default_t op1,
+		                  fq_default_t op2, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_swap(op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_swap(op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_swap(op1->fq, op2->fq, ctx->ctx.fq);
    }
 }
 
