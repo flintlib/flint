@@ -192,6 +192,8 @@ FLINT_DLL slong fmpz_get_si(const fmpz_t f);
 
 FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
 
+FLINT_DLL mp_limb_t fmpz_get_nmod(const fmpz_t f, nmod_t mod);
+
 FMPZ_INLINE void
 fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
 {

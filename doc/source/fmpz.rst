@@ -201,6 +201,10 @@ Conversion
     and low limbs, otherwise `*low` is set to the low limb and `*hi` is set
     to 0.
 
+.. function:: mp_limb_t fmpz_get_nmod(const fmpz_t f, nmod_t mod)
+
+    Returns `f` modulo ``mod.n``.
+
 .. function:: double fmpz_get_d(const fmpz_t f)
 
     Returns `f` as a ``double``, rounding down towards zero if
