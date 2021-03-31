@@ -14,7 +14,7 @@
 void
 _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 {
-    if (Qlen <= 8 || n <= 24)
+    if (Qlen < 64 || n < 64)
         _fmpz_poly_inv_series_basecase(Qinv, Q, Qlen, n);
     else
         _fmpz_poly_inv_series_newton(Qinv, Q, Qlen, n);
