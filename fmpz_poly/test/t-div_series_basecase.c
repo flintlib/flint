@@ -91,7 +91,7 @@ main(void)
     }
 
     /* Check that Q * B == A */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
         slong n = n_randint(state, 50) + 1;
@@ -128,7 +128,7 @@ main(void)
     }
 
     /* Check that (A * B)/B == A */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
         slong n = n_randint(state, 50) + 1;
