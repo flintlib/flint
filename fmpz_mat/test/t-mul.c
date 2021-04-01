@@ -18,11 +18,6 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-void fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-void fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-void fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-void fmpz_mat_mul_4(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-
 int main(void)
 {
     fmpz_mat_t A, B, C, D;
@@ -82,7 +77,7 @@ int main(void)
 
         if (bits <= FLINT_BITS - 2)
         {
-            fmpz_mat_mul_1(C, A, B);
+            _fmpz_mat_mul_1(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
@@ -97,7 +92,7 @@ int main(void)
 
         if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2 && bits <= 2 * FLINT_BITS - 1)
         {
-            fmpz_mat_mul_2a(C, A, B);
+            _fmpz_mat_mul_2a(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
@@ -112,7 +107,7 @@ int main(void)
 
         if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
         {
-            fmpz_mat_mul_2b(C, A, B);
+            _fmpz_mat_mul_2b(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
@@ -127,7 +122,7 @@ int main(void)
 
         if (abits <= 2 * FLINT_BITS && bbits <= 2 * FLINT_BITS && bits <= 4 * FLINT_BITS - 1)
         {
-            fmpz_mat_mul_4(C, A, B);
+            _fmpz_mat_mul_4(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {

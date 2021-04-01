@@ -557,6 +557,12 @@ Matrix multiplication
     where ``A`` must be a square matrix. Aliasing is allowed.
 
 
+.. function:: void _fmpz_mat_mul_4(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    This function is only for internal use and assumes that the entries of
+    `A` and `B` are bounded in absolute value by `2^{2*FLINT_BITS}` and that
+    the entries of the product `C` are bounded by `2^{4*FLINT_BITS - 1}`.
+
 
 Inverse
 --------------------------------------------------------------------------------
