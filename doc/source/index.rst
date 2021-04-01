@@ -108,9 +108,12 @@ Finite fields
    :maxdepth: 1
 
    fq.rst
+   fq_default.rst
    fq_vec.rst
    fq_mat.rst
+   fq_default_mat.rst
    fq_poly.rst
+   fq_default_poly.rst
    fq_poly_factor.rst
    fq_embed.rst
 
