@@ -1279,23 +1279,43 @@ char * fq_default_poly_get_str(const fq_default_poly_t poly,
    return fq_poly_get_str(poly->fq, ctx->ctx.fq);
 }
 
+#include "fq_default_mat.h"
+
 /* Characteristic polynomial *************************************************/
 
-/*
 FQ_POLY_TEMPLATES_INLINE
 void fq_default_mat_charpoly(fq_default_poly_t p,
                           const fq_default_mat_t M, const fq_default_ctx_t ctx)
 {
+   if (ctx->type == 1)
+   {
+      fq_zech_mat_charpoly(p->fq_zech, M->fq_zech, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_mat_charpoly(p->fq_nmod, M->fq_nmod, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_mat_charpoly(p->fq, M->fq, ctx->ctx.fq);
+   }
 }
-*/
 
 /* Minimal polynomial ********************************************************/
 
-/*
 FQ_DEFAULT_POLY_INLINE 
 void fq_default_mat_minpoly(fq_default_poly_t p, 
                           const fq_default_mat_t X, const fq_default_ctx_t ctx)
-*/
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_mat_minpoly(p->fq_zech, X->fq_zech, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_mat_minpoly(p->fq_nmod, X->fq_nmod, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_mat_minpoly(p->fq, X->fq, ctx->ctx.fq);
+   }
+}
 
 #ifdef __cplusplus
 }
