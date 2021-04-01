@@ -181,8 +181,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         else
             _fmpz_mat_mul_2b(C, A, B);
     }
-    else if (abits <= 2 * FLINT_BITS && bbits <= 2 * FLINT_BITS
-                                     && bits <= 4 * FLINT_BITS - 1)
+    else if (abits < 2 * FLINT_BITS && bbits < 2 * FLINT_BITS)
     {
         if (dim > 40) /* tuning param */
             _fmpz_mat_mul_multi_mod(C, A, B, bits);

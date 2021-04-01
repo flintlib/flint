@@ -291,11 +291,11 @@ Conversion
     ``2*FLINT_BITS`` bits, interpreted as a signed two's complement
     integer with ``3 * FLINT_BITS`` bits.
 
-.. function:: void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
+.. function:: void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong n)
 
     Sets ``out`` to the nonnegative integer
-    ``in[0] + in[1]*X  + ... + in[in_len - 1]*X^(in_len - 1)``
-    where ``X = 2^FLINT_BITS``. It is assumed that ``in_len > 0``.
+    ``in[0] + in[1]*X  + ... + in[n - 1]*X^(n - 1)``
+    where ``X = 2^FLINT_BITS``. It is assumed that ``n > 0``.
 
 .. function:: void fmpz_set_signed_ui_array(fmpz_t out, const ulong * in, slong n)
 
@@ -318,7 +318,7 @@ Conversion
     words of the result in ``out[0], ..., out[n-1]``. This will give a signed
     two's complement representation of `in` (assuming `in` doesn't overflow the array).
 
-.. function::void fmpz_get_signed_uiui(ulong * hi, ulong * lo, slong n, const fmpz_t in)
+.. function::void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t in)
 
     Retrieves the value of `in` modulo `2^{2 * FLINT\_BITS}` and puts the high
     and low words into ``*hi`` and ``*lo`` respectively.
