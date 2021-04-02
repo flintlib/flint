@@ -37,9 +37,9 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
 
     if (Blen == 1)
     {
-        if (fmpz_is_pm1(B))
+        if (fmpz_is_pm1(B + 0))
         {
-            if (fmpz_is_one(B))
+            if (fmpz_is_one(B + 0))
                 _fmpz_vec_set(Q, A, Alen);
             else
                 _fmpz_vec_neg(Q, A, Alen);
@@ -53,11 +53,11 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
 
         _fmpz_vec_zero(Q + Alen, n - Alen);
     }
-    else if (Alen == 1 && fmpz_is_pm1(B))
+    else if (Alen == 1 && fmpz_is_pm1(B + 0))
     {
         _fmpz_poly_inv_series_basecase(Q, B, Blen, n);
-        if (!fmpz_is_one(A))
-            _fmpz_vec_scalar_mul_fmpz(Q, Q, n, A);
+        if (!fmpz_is_one(A + 0))
+            _fmpz_vec_scalar_mul_fmpz(Q, Q, n, A + 0);
     }
     else
     {
@@ -68,24 +68,24 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
 
         TMP_START;
 
-        if (fmpz_is_pm1(B))
+        if (fmpz_is_pm1(B + 0))
         {
-            if (fmpz_is_one(B))
-                fmpz_set(Q, A);
+            if (fmpz_is_one(B + 0))
+                fmpz_set(Q + 0, A + 0);
             else
-                fmpz_neg(Q, A);
+                fmpz_neg(Q + 0, A + 0);
         }
         else
         {
-            fmpz_divexact_checked(Q, A, B);
+            fmpz_divexact_checked(Q + 0, A + 0, B + 0);
         }
 
         /* Bbits[i] = max(bits(B[0]), ..., bits(B[i])), as long as coeffs are small */
         Bbits = TMP_ALLOC(Blen);
-        Bbits[0] = fmpz_bits(B);
+        Bbits[0] = fmpz_bits(B + 0);
 
         /* Maximum bits of all Q coefficients encountered so far */
-        Qbits = fmpz_bits(Q);
+        Qbits = fmpz_bits(Q + 0);
 
         /* We have small coefficients for i < nsmall */
         for (nsmall = 0; nsmall < Blen; nsmall++)
@@ -96,7 +96,7 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
                 break;
 
             b = FLINT_ABS(b);
-            if (nsmall == 0 || (b >> Bbits[nsmall - 1]))
+            if (nsmall == 0 || (b >> Bbits[nsmall - 1]) != 0)
                 Bbits[nsmall] = FLINT_BIT_COUNT(b);
             else
                 Bbits[nsmall] = Bbits[nsmall - 1];
@@ -187,9 +187,9 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
 
             if (i < Alen)
             {
-                if (fmpz_is_pm1(B))
+                if (fmpz_is_pm1(B + 0))
                 {
-                    if (fmpz_is_one(B))
+                    if (fmpz_is_one(B + 0))
                         fmpz_sub(Q + i, A + i, Q + i);
                     else
                         fmpz_sub(Q + i, Q + i, A + i);
@@ -197,20 +197,20 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
                 else
                 {
                     fmpz_sub(Q + i, A + i, Q + i);
-                    fmpz_divexact_checked(Q + i, Q + i, B);
+                    fmpz_divexact_checked(Q + i, Q + i, B + 0);
                 }
             }
             else
             {
-                if (fmpz_is_pm1(B))
+                if (fmpz_is_pm1(B + 0))
                 {
-                    if (fmpz_is_one(B))
+                    if (fmpz_is_one(B + 0))
                         fmpz_neg(Q + i, Q + i);
                 }
                 else
                 {
                     fmpz_neg(Q + i, Q + i);
-                    fmpz_divexact_checked(Q + i, Q + i, B);
+                    fmpz_divexact_checked(Q + i, Q + i, B + 0);
                 }
             }
 

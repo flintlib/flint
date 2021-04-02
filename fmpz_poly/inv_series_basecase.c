@@ -17,8 +17,8 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
     int neg;
     Qlen = FLINT_MIN(Qlen, n);
 
-    neg = fmpz_is_one(Q);
-    fmpz_set(Qinv, Q);
+    neg = fmpz_is_one(Q + 0);
+    fmpz_set(Qinv + 0, Q + 0);
 
     if (Qlen == 1)
     {
@@ -73,7 +73,7 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
                 break;
 
             b = FLINT_ABS(b);
-            if (b >> Qbits[nsmall - 1])
+            if ((b >> Qbits[nsmall - 1]) != 0)
                 Qbits[nsmall] = FLINT_BIT_COUNT(b);
             else
                 Qbits[nsmall] = Qbits[nsmall - 1];
