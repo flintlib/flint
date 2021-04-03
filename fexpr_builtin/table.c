@@ -420,6 +420,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_UniqueSolution, "UniqueSolution", "", fexpr_write_latex_setop, },
     { FEXPR_UniqueZero, "UniqueZero", "", fexpr_write_latex_setop, },
     { FEXPR_UnitCircle, "UnitCircle", "\\mathbb{T}", NULL, },
+    { FEXPR_Unknown, "Unknown", "\\operatorname{Unknown}", NULL, },
     { FEXPR_UnsignedInfinity, "UnsignedInfinity", "\\hat{\\infty}", NULL, },
     { FEXPR_UpperGamma, "UpperGamma", "\\Gamma", NULL, },
     { FEXPR_UpperHalfPlane, "UpperHalfPlane", "\\mathbb{H}", NULL, },

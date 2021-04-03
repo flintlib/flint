@@ -352,6 +352,9 @@ void fexpr_call4(fexpr_t res, const fexpr_t f, const fexpr_t x1, const fexpr_t x
 
 void fexpr_call_vec(fexpr_t res, const fexpr_t f, fexpr_srcptr args, slong len);
 
+void fexpr_call_builtin1(fexpr_t res, slong f, const fexpr_t x);
+void fexpr_call_builtin2(fexpr_t res, slong f, const fexpr_t x, const fexpr_t y);
+
 /* Subexpressions and replacement */
 
 int fexpr_contains(const fexpr_t expr, const fexpr_t x);

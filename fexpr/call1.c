@@ -29,3 +29,26 @@ fexpr_call1(fexpr_t res, const fexpr_t f, const fexpr_t x1)
     flint_mpn_copyi(out, f->data, f_size); out += f_size;
     flint_mpn_copyi(out, x1->data, x1_size);
 }
+
+void
+fexpr_call_builtin1(fexpr_t res, slong f, const fexpr_t x)
+{
+    fexpr_t t;
+    ulong d;
+    t->data = &d;
+    t->alloc = 1;
+    fexpr_set_symbol_builtin(t, f);
+
+    if (res == x)
+    {
+        fexpr_t u;
+        fexpr_init(u);
+        fexpr_call1(u, t, x);
+        fexpr_swap(res, u);
+        fexpr_clear(u);
+    }
+    else
+    {
+        fexpr_call1(res, t, x);
+    }
+}

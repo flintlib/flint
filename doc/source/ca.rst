@@ -188,6 +188,14 @@ Memory management for numbers
     Efficiently swaps the variables *x* and *y*.
 
 
+Symbolic expressions
+-------------------------------------------------------------------------------
+
+.. function:: void ca_get_fexpr(fexpr_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
+
+    Sets *res* to a symbolic expression representing *x*.
+
+
 .. _ca-printing:
 
 Printing

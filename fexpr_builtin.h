@@ -438,6 +438,7 @@ typedef enum
     FEXPR_UniqueSolution,
     FEXPR_UniqueZero,
     FEXPR_UnitCircle,
+    FEXPR_Unknown,
     FEXPR_UnsignedInfinity,
     FEXPR_UpperGamma,
     FEXPR_UpperHalfPlane,

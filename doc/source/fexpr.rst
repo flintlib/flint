@@ -403,7 +403,13 @@ Composition
     Creates the function call `f(x_1,\ldots,x_n)`.
     The *vec* version takes the arguments as an array *args*
     and *n* is given by *len*.
+    Warning: aliasing between inputs and outputs is not implemented.
 
+.. function:: void fexpr_call_builtin1(fexpr_t res, slong f, const fexpr_t x1)
+              void fexpr_call_builtin2(fexpr_t res, slong f, const fexpr_t x1, const fexpr_t x2)
+
+    Creates the function call `f(x_1,\ldots,x_n)`, where *f* defines
+    a builtin symbol.
 
 Subexpressions and replacement
 ------------------------------------------------------------------------

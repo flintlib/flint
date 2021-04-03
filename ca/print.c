@@ -436,7 +436,7 @@ _ca_ext_insert_extension(ca_ext_ptr ** extensions, slong * length, ca_ext_t x, c
     else
     {
         if (((*length + 1) & (*length)) == 0)
-            extensions[0] = realloc(extensions[0], ((*length + 1) * 2) * sizeof(ca_ext_ptr));
+            extensions[0] = flint_realloc(extensions[0], ((*length + 1) * 2) * sizeof(ca_ext_ptr));
 
         for (i = 0; i < *length; i++)
         {

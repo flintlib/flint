@@ -26,6 +26,7 @@
 #include "qqbar.h"
 #include "fmpz_mpoly_q.h"
 #include "utils_flint.h"
+#include "fexpr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -313,6 +314,10 @@ int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx);
 int ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx);
+
+/* Symbolic expressions */
+
+void ca_get_fexpr(fexpr_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
 
 /* Printing */
 

@@ -15,73 +15,37 @@
 void
 fexpr_neg(fexpr_t res, const fexpr_t a)
 {
-    /* todo: handle aliasing in call1 */
-    if (res == a)
-    {
-        fexpr_t tmp;
-        fexpr_init(tmp);
-        fexpr_set(tmp, a);
-        fexpr_neg(res, tmp);
-        fexpr_clear(tmp);
-    }
-    else
-    {
-        fexpr_t tmp;
-        ulong tmp_head = FEXPR_SYMBOL_Neg;
-        tmp->data = &tmp_head;
-        tmp->alloc = 1;
-        fexpr_call1(res, tmp, a);
-    }
+    fexpr_call_builtin1(res, FEXPR_Neg, a);
 }
 
 void
 fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b)
 {
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Add;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
+    fexpr_call_builtin2(res, FEXPR_Add, a, b);
 }
 
 void
 fexpr_sub(fexpr_t res, const fexpr_t a, const fexpr_t b)
 {
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Sub;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
+    fexpr_call_builtin2(res, FEXPR_Sub, a, b);
 }
 
 void
 fexpr_mul(fexpr_t res, const fexpr_t a, const fexpr_t b)
 {
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Mul;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
+    fexpr_call_builtin2(res, FEXPR_Mul, a, b);
 }
 
 void
 fexpr_div(fexpr_t res, const fexpr_t a, const fexpr_t b)
 {
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Div;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
+    fexpr_call_builtin2(res, FEXPR_Div, a, b);
 }
 
 void
 fexpr_pow(fexpr_t res, const fexpr_t a, const fexpr_t b)
 {
-    fexpr_t tmp;
-    ulong tmp_head = FEXPR_SYMBOL_Pow;
-    tmp->data = &tmp_head;
-    tmp->alloc = 1;
-    fexpr_call2(res, tmp, a, b);
+    fexpr_call_builtin2(res, FEXPR_Pow, a, b);
 }
 
 int
