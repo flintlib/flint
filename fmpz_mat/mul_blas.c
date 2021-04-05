@@ -23,6 +23,45 @@
 
 #include "cblas.h"
 
+
+static int _fmpz_mat_mul_blas_direct(
+    fmpz_mat_t C,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B)
+{
+    slong i, j;
+    slong m = A->r;
+    slong k = A->c;
+    slong n = B->c;
+    double * dC, * dA, * dB;
+
+    dA = FLINT_ARRAY_ALLOC(m*k, double);
+    dB = FLINT_ARRAY_ALLOC(k*n, double);
+    dC = (double *) flint_calloc(m*n, sizeof(double));
+
+    for (i = 0; i < m; i++)
+        for (j = 0; j < k; j++)
+            dA[k*i + j] = (double)(A->rows[i][j]);
+
+    for (i = 0; i < k; i++)
+        for (j = 0; j < n; j++)
+            dB[n*i + j] = (double)(B->rows[i][j]);
+
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                                       m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
+
+    for (i = 0; i < m; i++)
+        for (j = 0; j < n; j++)
+            fmpz_set_si(&C->rows[i][j], (slong)(dC[n*i + j]));
+
+    flint_free(dA);
+    flint_free(dB);
+    flint_free(dC);
+
+    return 1;
+}
+
+
 /* Stuff that should be shared with nmod_mat_mul_blas */
 
 #define MAX_BLAS_DP_INT  (UWORD(1) << 53)
@@ -187,6 +226,7 @@ typedef struct {
     fmpz ** Brows;
     fmpz ** Crows;
     const fmpz_comb_struct * comb;
+    int sign;
 } _worker_arg;
 
 static void _mod_worker(void * arg_ptr)
@@ -291,6 +331,7 @@ void _crt_worker(void * arg_ptr)
     const fmpz_comb_struct * comb = arg->comb;
     fmpz_comb_temp_t comb_temp;
     mp_limb_t * r;
+    int sign = arg->sign;
 
     fmpz_comb_temp_init(comb_temp, comb);
     r = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
@@ -302,7 +343,7 @@ void _crt_worker(void * arg_ptr)
             for (k = 0; k < num_primes; k++)
                 r[k] = bigC[(i*num_primes + k)*n + j];
 
-            fmpz_multi_CRT_ui(&Crows[i][j], r, comb, comb_temp, 1);
+            fmpz_multi_CRT_ui(&Crows[i][j], r, comb, comb_temp, sign);
         }
     }
 
@@ -310,7 +351,7 @@ void _crt_worker(void * arg_ptr)
     fmpz_comb_temp_clear(comb_temp);
 }
 
-static mp_limb_t * _calculate_primes_primes(
+static mp_limb_t * _calculate_primes(
     slong * num_primes_,
     flint_bitcnt_t bits,
     slong k)
@@ -364,12 +405,20 @@ static mp_limb_t * _calculate_primes_primes(
     return primes;
 }
 
+/*
+    max|A| < 2^Abits
+    max|B| < 2^Bbits
+    max|C| < 2^Cbits
 
+    sign = 1:   either A or B could have negative entries.
+    sign = 0:   all entries are >= 0.
+*/
 int _fmpz_mat_mul_blas(
     fmpz_mat_t C,
-    const fmpz_mat_t A,
-    const fmpz_mat_t B,
-    flint_bitcnt_t bits)
+    const fmpz_mat_t A, flint_bitcnt_t Abits,
+    const fmpz_mat_t B, flint_bitcnt_t Bbits,
+    int sign,
+    flint_bitcnt_t Cbits)
 {
     slong i, l, start, stop;
     slong m = A->r;
@@ -384,6 +433,7 @@ int _fmpz_mat_mul_blas(
     slong num_workers;
     _worker_arg * args;
 
+    FLINT_ASSERT(sign == 0 || sign == 1);
     FLINT_ASSERT(m == A->r && m == C->r);
     FLINT_ASSERT(k == A->c && k == B->r);
     FLINT_ASSERT(n == B->c && n == C->c);
@@ -391,7 +441,10 @@ int _fmpz_mat_mul_blas(
     if (m < 1 || k < 1 || n < 1 || m > INT_MAX || k > INT_MAX || n > INT_MAX)
         return 0;
 
-    primes = _calculate_primes_primes(&num_primes, bits, k);
+    if (Abits + Bbits + FLINT_BIT_COUNT(k) <= 53)
+        return _fmpz_mat_mul_blas_direct(C, A, B);
+
+    primes = _calculate_primes(&num_primes, Cbits + sign, k);
     if (primes == NULL)
         return 0;
 
@@ -431,6 +484,7 @@ int _fmpz_mat_mul_blas(
         args[i].dB = dB;
         args[i].dC = dC;
         args[i].comb = comb;
+        args[i].sign = sign;
 
         /* distribute rows of C evenly */
         args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
@@ -515,11 +569,25 @@ int _fmpz_mat_mul_blas(
 
 int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    slong A_bits = fmpz_mat_max_bits(A);
-    slong B_bits = fmpz_mat_max_bits(B);
-    flint_bitcnt_t bits = FLINT_ABS(A_bits) + FLINT_ABS(B_bits) +
-                          FLINT_BIT_COUNT(A->c) + 1;
+    slong Abits = fmpz_mat_max_bits(A);
+    slong Bbits = fmpz_mat_max_bits(B);
+    flint_bitcnt_t Cbits;
+    int sign = 0;
 
-    return _fmpz_mat_mul_blas(C, A, B, bits);
+    if (Abits < 0)
+    {
+        sign = 1;
+        Abits = -Abits;
+    }
+
+    if (Bbits < 0)
+    {
+        sign = 1;
+        Bbits = -Bbits;
+    }
+
+    Cbits = Abits + Bbits + FLINT_BIT_COUNT(A->c);
+
+    return _fmpz_mat_mul_blas(C, A, Abits, B, Bbits, sign, Cbits);
 }
 

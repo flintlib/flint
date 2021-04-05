@@ -41,8 +41,15 @@ int main(void)
         fmpz_mat_init(C, m, k);
         fmpz_mat_init(D, m, k);
 
-        fmpz_mat_randtest(A, state, n_randint(state, 200) + 1);
-        fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
+        if (n_randint(state, 2))
+            fmpz_mat_randtest(A, state, n_randint(state, 200) + 1);
+        else
+            fmpz_mat_randtest_unsigned(A, state, n_randint(state, 200) + 1);
+
+        if (n_randint(state, 2))
+            fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
+        else
+            fmpz_mat_randtest_unsigned(B, state, n_randint(state, 200) + 1);
 
         /* Make sure noise in the output is ok */
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
