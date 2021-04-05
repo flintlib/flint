@@ -333,6 +333,9 @@ FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 FLINT_DLL mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
     slong len, nmod_t mod, int nlimbs);
 
+FLINT_DLL mp_limb_t _nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2,
+    slong len, nmod_t mod, int nlimbs);
+
 FLINT_DLL mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
     slong len, nmod_t mod, int nlimbs);
 

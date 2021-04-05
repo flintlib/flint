@@ -119,9 +119,18 @@ main(void)
         else
             trunc = n_randint(state, b->length + c->length - 1);
 
-        nmod_poly_mul_classical(a, b, c);
-        nmod_poly_truncate(a, trunc);
-        nmod_poly_mullow_classical(d, b, c, trunc);
+        if (n_randint(state, 2))  /* check squaring */
+        {
+            nmod_poly_mul_classical(a, b, b);
+            nmod_poly_truncate(a, trunc);
+            nmod_poly_mullow_classical(d, b, b, trunc);
+        }
+        else
+        {
+            nmod_poly_mul_classical(a, b, c);
+            nmod_poly_truncate(a, trunc);
+            nmod_poly_mullow_classical(d, b, c, trunc);
+        }
 
         result = (nmod_poly_equal(a, d));
         if (!result)

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -20,43 +21,100 @@ void
 _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
                          slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
 {
-    slong i;
-    slong log_len = FLINT_BIT_COUNT(len2);
-    slong bits = FLINT_BITS - (slong) mod.norm;
+    slong i, j, bits, log_len, nlimbs, n1, n2;
+    int squaring;
+    mp_limb_t c;
 
-    if (2 * bits + log_len <= FLINT_BITS)
+    if (len1 == 1)
     {
-        /* Set res[i] = poly1[i]*poly2[0] */
-        mpn_mul_1(res, poly1, len1, poly2[0]);
+        res[0] = nmod_mul(poly1[0], poly2[0], mod);
+        return;
+    }
 
-        if (len2 != 1)
+    if (len2 == 1)
+    {
+        _nmod_vec_scalar_mul_nmod(res, poly1, len1, poly2[0], mod);
+        return;
+    }
+
+    squaring = (poly1 == poly2 && len1 == len2);
+
+    log_len = FLINT_BIT_COUNT(len2);
+    bits = FLINT_BITS - (slong) mod.norm;
+    bits = 2 * bits + log_len;
+
+    if (bits <= FLINT_BITS)
+    {
+        flint_mpn_zero(res, len1 + len2 - 1);
+
+        if (squaring)
         {
-            /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-            mpn_mul_1(res + len1, poly2 + 1, len2 - 1, poly1[len1 - 1]);
+            for (i = 0; i < len1; i++)
+            {
+                c = poly1[i];
 
-            /* out[i+j] += in1[i]*in2[j] */
-            for (i = 0; i < len1 - 1; i++)
-                mpn_addmul_1(res + i + 1, poly2 + 1, len2 - 1, poly1[i]);
+                res[2 * i] += c * c;
+                c *= 2;
+
+                for (j = i + 1; j < len1; j++)
+                    res[i + j] += poly1[j] * c;
+            }
+        }
+        else
+        {
+            for (i = 0; i < len1; i++)
+            {
+                mp_limb_t c = poly1[i];
+
+                for (j = 0; j < len2; j++)
+                    res[i + j] += c * poly2[j];
+            }
         }
 
-        /* final reduction */
         _nmod_vec_reduce(res, res, len1 + len2 - 1, mod);
+        return;
+    }
+
+    if (len2 == 2)
+    {
+        _nmod_vec_scalar_mul_nmod(res, poly1, len1, poly2[0], mod);
+        _nmod_vec_scalar_addmul_nmod(res + 1, poly1, len1 - 1, poly2[1], mod);
+        res[len1 + len2 - 2] = nmod_mul(poly1[len1 - 1], poly2[len2 - 1], mod);
+        return;
+    }
+
+    if (bits <= 2 * FLINT_BITS)
+        nlimbs = 2;
+    else
+        nlimbs = 3;
+
+    if (squaring)
+    {
+        for (i = 0; i < 2 * len1 - 1; i++)
+        {
+            n1 = FLINT_MAX(0, i - len1 + 1);
+            n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
+
+            c = _nmod_vec_dot_rev(poly1 + n1, poly1 + i - n2, n2 - n1 + 1, mod, nlimbs);
+            c = nmod_add(c, c, mod);
+
+            if (i % 2 == 0 && i / 2 < len1)
+                NMOD_ADDMUL(c, poly1[i / 2], poly1[i / 2], mod);
+
+            res[i] = c;
+        }
     }
     else
     {
-        /* Set res[i] = poly1[i]*poly2[0] */
-        _nmod_vec_scalar_mul_nmod(res, poly1, len1, poly2[0], mod);
-        if (len2 == 1)
-            return;
+        for (i = 0; i < len1 + len2 - 1; i++)
+        {
+            n1 = FLINT_MIN(len1 - 1, i);
+            n2 = FLINT_MIN(len2 - 1, i);
 
-        /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        _nmod_vec_scalar_mul_nmod(res + len1, poly2 + 1, len2 - 1,
-                             poly1[len1 - 1], mod);
-
-        /* out[i+j] += in1[i]*in2[j] */
-        for (i = 0; i < len1 - 1; i++)
-            _nmod_vec_scalar_addmul_nmod(res + i + 1, poly2 + 1, len2 - 1,
-                                    poly1[i], mod);
+            res[i] = _nmod_vec_dot_rev(poly1 + i - n2,
+                                       poly2 + i - n1,
+                                       n1 + n2 - i + 1, mod, nlimbs);
+        }
     }
 }
 

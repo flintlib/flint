@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -18,21 +19,20 @@
 void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, 
                              mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
-    slong bits, bits2;
+    slong bits;
 
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
 
-    if (len1 + len2 <= 6 || n <= 6)
+    if (len2 <= 5)
     {
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
         return;
     }
 
     bits = FLINT_BITS - (slong) mod.norm;
-    bits2 = FLINT_BIT_COUNT(len1);
 
-    if (2 * bits + bits2 <= FLINT_BITS && len1 + len2 < 16)
+    if (n < 10 + bits * bits / 10)
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
     else
         _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, 0, n, mod);

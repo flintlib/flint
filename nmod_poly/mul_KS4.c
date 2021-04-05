@@ -31,6 +31,7 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
    mp_ptr v1on, v1en, v1pn, v1mn, v2on, v2en, v2pn, v2mn, v3on, v3en, v3pn, v3mn;
    mp_ptr v1or, v1er, v1pr, v1mr, v2or, v2er, v2pr, v2mr, v3or, v3er, v3pr, v3mr;
    mp_ptr z, zn, zr;
+   TMP_INIT;
 
    if (n2 == 1)
    {
@@ -38,6 +39,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
       _nmod_vec_scalar_mul_nmod(res, op1, n1, op2[0], mod);
       return;
    }
+
+   TMP_START;
 
    sqr = (op1 == op2 && n1 == n2);
 
@@ -81,7 +84,7 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
    k3 = k1 + k2;
 
    /* allocate space */
-   v1_buf0 = _nmod_vec_init(5*k3); /* k1 limbs */
+   v1_buf0 = TMP_ALLOC(sizeof(mp_limb_t) * 5 * k3); /* k1 limbs */
    v2_buf0 = v1_buf0 + k1;         /* k2 limbs */
    v1_buf1 = v2_buf0 + k2;         /* k1 limbs */
    v2_buf1 = v1_buf1 + k1;         /* k2 limbs */
@@ -123,7 +126,7 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
    v3er = v1_buf2;
    v3or = v1_buf3;
    
-   z = _nmod_vec_init(2*w*(n3e + 1));
+   z = TMP_ALLOC(sizeof(mp_limb_t) * 2*w*(n3e + 1));
    zn = z;
    zr = z + w*(n3e + 1);
 
@@ -332,8 +335,7 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
    /* combine ho(B^2) and ho(1/B^2) information to get odd coefficients of h */
    _nmod_poly_KS2_recover_reduce(res + 1, 2, zn, zr, n3o, 2 * b, mod);
    
-   _nmod_vec_clear(z);
-   _nmod_vec_clear(v1_buf0);
+   TMP_END;
 }
 
 void

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -18,25 +19,25 @@
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
                              mp_srcptr poly2, slong len2, nmod_t mod)
 {
-    slong bits, bits2;
+    slong bits, cutoff_len;
 
-    if (len1 + len2 <= 6 || len2 <= 2)
+    if (len2 <= 5)
     {
         _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
         return;
     }
 
     bits = FLINT_BITS - (slong) mod.norm;
-    bits2 = FLINT_BIT_COUNT(len1);
+    cutoff_len = FLINT_MIN(len1, 2 * len2);
 
-    if (2 * bits + bits2 <= FLINT_BITS && len1 + len2 < 16)
+    if (3 * cutoff_len < 2 * FLINT_MAX(bits, 10))
         _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
-    else if (bits * len2 > 2000)
-        _nmod_poly_mul_KS4(res, poly1, len1, poly2, len2, mod);
-    else if (bits * len2 > 200)
+    else if (cutoff_len * bits < 800)
+        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, 0, mod);
+    else if (cutoff_len * (bits + 1) * (bits + 1) < 100000)
         _nmod_poly_mul_KS2(res, poly1, len1, poly2, len2, mod);
     else
-        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, 0, mod);
+        _nmod_poly_mul_KS4(res, poly1, len1, poly2, len2, mod);
 }
 
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
