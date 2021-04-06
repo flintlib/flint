@@ -205,6 +205,46 @@ FQ_DEFAULT_INLINE void fq_default_clear(fq_default_t rop,
    }
 }
 
+/* Get/set *******************************************************************/
+
+FQ_DEFAULT_INLINE void fq_default_get_nmod_poly(nmod_poly_t poly,
+                             const fq_default_t op, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_get_nmod_poly(poly, op->fq_zech, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_get_nmod_poly(poly, op->fq_nmod, ctx->ctx.fq_nmod);
+   } else
+   {
+      fmpz_poly_t p;
+      fmpz_poly_init(p);
+      fq_get_fmpz_poly(p, op->fq, ctx->ctx.fq);
+      fmpz_poly_get_nmod_poly(poly, p);
+      fmpz_poly_clear(p);
+   }
+}
+
+FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
+                            const nmod_poly_t poly, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_set_nmod_poly(op->fq_zech, poly, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_set_nmod_poly(op->fq_nmod, poly, ctx->ctx.fq_nmod);
+   } else
+   {
+      fmpz_poly_t p;
+      fmpz_poly_init(p);
+      fmpz_poly_set_nmod_poly(p, poly); 
+      fq_set_fmpz_poly(op->fq, p, ctx->ctx.fq);
+      fmpz_poly_clear(p);
+   }
+}
+
 /* Basic arithmetic **********************************************************/
 
 FQ_DEFAULT_INLINE void fq_default_add(fq_default_t rop, const fq_default_t op1,
