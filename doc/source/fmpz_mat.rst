@@ -560,8 +560,8 @@ Matrix multiplication
 .. function:: void _fmpz_mat_mul_4(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     This function is only for internal use and assumes that either:
-        - the entries of `A` and `B` are all nonnegative and bounded by `2^{2*FLINT_BITS}`, or
-        - the entries of `A` and `B` are all bounded by `2^{2*FLINT_BITS - 1}` in absolute value.
+        - the entries of `A` and `B` are all nonnegative and strictly less than `2^{2*FLINT_BITS}`, or
+        - the entries of `A` and `B` are all strictly less than `2^{2*FLINT_BITS - 1}` in absolute value.
 
 
 Inverse
