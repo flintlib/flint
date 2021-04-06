@@ -23,7 +23,9 @@ int main(void)
     timeit_t timer;
     FLINT_TEST_INIT(state);
 
-    flint_set_num_threads(4);
+    flint_set_num_threads(1);
+
+    flint_printf("*** timings are nanoseconds per dim^3 ***\n");
 
     for (dim = 16; dim <= 2000; dim += 5 + dim/8)
     {
