@@ -557,9 +557,10 @@ int _fmpz_mat_mul_blas(
 
 int _fmpz_mat_mul_blas(
     fmpz_mat_t C,
-    const fmpz_mat_t A,
-    const fmpz_mat_t B,
-    flint_bitcnt_t bits)
+    const fmpz_mat_t A, flint_bitcnt_t Abits,
+    const fmpz_mat_t B, flint_bitcnt_t Bbits,
+    int sign,
+    flint_bitcnt_t Cbits)
 {
     return 0;
 }
