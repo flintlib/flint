@@ -27,18 +27,23 @@ main(void)
     fflush(stdout);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, one;
-        slong n = n_randint(state, 80) + 1;
+        slong bits, n;
+
+        bits = 1 + n_randint(state, 80);
+        n = n_randint(state, 80) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(one);
 
-        fmpz_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, 100);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(state, 100) + 1, bits);
         fmpz_poly_set_coeff_si(a, 0, n_randint(state, 2) ? 1 : -1);
+        if (n_randint(state, 2))
+            fmpz_poly_inv_series(a, a, n);
 
         fmpz_poly_set_ui(one, 1);
 

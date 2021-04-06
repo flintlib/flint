@@ -91,18 +91,18 @@ main(void)
     }
 
     /* Check that Q * B == A */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 300 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
-        slong n = n_randint(state, 50) + 1;
+        slong n = n_randint(state, 90) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
-        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_randtest(a, state, n_randint(state, 90) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 90) + 1, 2 + n_randint(state, 100));
         fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
         fmpz_poly_div_series(q, a, b, n);
@@ -131,19 +131,19 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
-        slong n = n_randint(state, 50) + 1;
+        slong n = n_randint(state, 80) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100))
+        fmpz_poly_randtest(a, state, n_randint(state, 80) + 1, 2 + n_randint(state, 100))
 ;
-        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 80) + 1, 2 + n_randint(state, 100));
 
         while (fmpz_is_zero(b->coeffs + 0))
-            fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+            fmpz_poly_randtest_not_zero(b, state, n_randint(state, 80) + 1, 2 + n_randint(state, 100));
 
         fmpz_poly_mullow(p, a, b, n);
 

@@ -20,7 +20,7 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     Alen = FLINT_MIN(Alen, n);
     Blen = FLINT_MIN(Blen, n);
 
-    if (n < 32 || Blen < 20)
+    if (n < 72 || Blen < 72 || Alen == 1)
        _fmpz_poly_div_series_basecase(Q, A, Alen, B, Blen, n);
     else if (fmpz_is_pm1(B + 0))
     {
