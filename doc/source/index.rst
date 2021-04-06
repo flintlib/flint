@@ -115,6 +115,7 @@ Finite fields
    fq_poly.rst
    fq_default_poly.rst
    fq_poly_factor.rst
+   fq_default_poly_factor.rst
    fq_embed.rst
 
 .. toctree::
