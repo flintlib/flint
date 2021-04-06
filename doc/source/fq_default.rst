@@ -87,33 +87,6 @@ Memory management
     Clears the element ``rop``.
 
 
-Assignments and conversions
---------------------------------------------------------------------------------
-
-.. function:: void fq_default_get_nmod_poly(nmod_poly_t poly, const fq_default_t op, const fq_default_ctx_t ctx)
-
-    Sets ``poly`` to the polynomial representation of ``op``. Assumes the
-    characteristic of the field and the modulus of the polynomial are the same.
-    No checking of this occurs.
-
-.. function:: void fq_default_set_nmod_poly(fq_default_t op, const nmod_poly_t poly, const fq_default_ctx_t ctx)
-
-    Sets ``op`` to the finite field element represented by the polynomial
-    ``poly``. Assumes the characteristic of the field and the modulus of the
-    polynomial are the same. No checking of this occurs.
-
-.. function:: void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly, const fq_default_t op, const fmpz_mod_ctx_t mod_ctx, const fq_default_ctx_t ctx)
-
-    Sets ``poly`` to the polynomial representation of ``op``. Assumes the
-    characteristic of the field and the modulus of the polynomial are the same.
-    No checking of this occurs.
-
-.. function:: void fq_default_set_fmpz_mod_poly(fq_default_t op, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t mod_ctx, const fq_default_ctx_t ctx)
-
-    Sets ``op`` to the finite field element represented by the polynomial
-    ``poly``. Assumes the characteristic of the field and the modulus of the
-    polynomial are the same. No checking of this occurs.
-
 Basic arithmetic
 --------------------------------------------------------------------------------
 
@@ -307,6 +280,30 @@ Assignments and conversions
     Sets ``rop`` to a generator for the finite field.
     There is no guarantee this is a multiplicative generator of
     the finite field.
+
+.. function:: void fq_default_get_nmod_poly(nmod_poly_t poly, const fq_default_t op, const fq_default_ctx_t ctx)
+
+    Sets ``poly`` to the polynomial representation of ``op``. Assumes the
+    characteristic of the field and the modulus of the polynomial are the same.
+    No checking of this occurs.
+
+.. function:: void fq_default_set_nmod_poly(fq_default_t op, const nmod_poly_t poly, const fq_default_ctx_t ctx)
+
+    Sets ``op`` to the finite field element represented by the polynomial
+    ``poly``. Assumes the characteristic of the field and the modulus of the
+    polynomial are the same. No checking of this occurs.
+
+.. function:: void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly, const fq_default_t op, const fmpz_mod_ctx_t mod_ctx, const fq_default_ctx_t ctx)
+
+    Sets ``poly`` to the polynomial representation of ``op``. Assumes the
+    characteristic of the field and the modulus of the polynomial are the same.
+    No checking of this occurs.
+
+.. function:: void fq_default_set_fmpz_mod_poly(fq_default_t op, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t mod_ctx, const fq_default_ctx_t ctx)
+
+    Sets ``op`` to the finite field element represented by the polynomial
+    ``poly``. Assumes the characteristic of the field and the modulus of the
+    polynomial are the same. No checking of this occurs.
 
 
 Comparison
