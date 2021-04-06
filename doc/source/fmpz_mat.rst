@@ -505,6 +505,12 @@ Matrix multiplication
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
     
+.. function:: int fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    This internal function sets `C` to the matrix product `C = A B` computed
+    using classical matrix algorithm assuming that all entries of `A` and `B`
+    are small, that is, have bits ` \le FLINT\_BITS - 2`. No aliasing is allowed.
+
 .. function:: void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
