@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -16,19 +17,16 @@
 
 flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 {
-    flint_bitcnt_t bits = 0;
-    mp_limb_t mask   = ~(mp_limb_t) 0;
     slong i;
+    mp_limb_t mask = 0;
 
     for (i = 0; i < len; i++)
     {
-        if (vec[i] & mask)
-        {
-            bits = FLINT_BIT_COUNT(vec[i]);
-            if (bits == FLINT_BITS) break;
-            else mask = ~(mp_limb_t) 0 - ((UWORD(1) << bits) - UWORD(1));
-        }
+        mask |= vec[i];
+
+        if (mask >= (UWORD(1) << (FLINT_BITS - 1)))
+            return FLINT_BITS;
     }
 
-    return bits;
+    return FLINT_BIT_COUNT(mask);
 }

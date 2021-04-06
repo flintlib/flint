@@ -29,6 +29,7 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    mp_ptr v1_buf0, v2_buf0, v1_buf1, v2_buf1, v1_buf2, v2_buf2;
    mp_ptr v1o, v1e, v1p, v1m, v2o, v2e, v2p, v2m, v3o, v3e, v3p, v3m;
    mp_ptr z;
+   TMP_INIT;
 
    if (n2 == 1)
    {
@@ -36,6 +37,8 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
       _nmod_vec_scalar_mul_nmod(res, op1, n1, op2[0], mod);
       return;
    }
+
+   TMP_START;
 
    sqr = (op1 == op2 && n1 == n2);
 
@@ -76,7 +79,7 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    k3 = k1 + k2;
 
    /* allocate space */
-   v1_buf0 = _nmod_vec_init(3*k3); /* k1 limbs */
+   v1_buf0 = TMP_ALLOC(sizeof(mp_limb_t) * 3 * k3); /* k1 limbs */
    v2_buf0 = v1_buf0 + k1;         /* k2 limbs */
    v1_buf1 = v2_buf0 + k2;         /* k1 limbs */
    v2_buf1 = v1_buf1 + k1;         /* k2 limbs */
@@ -100,7 +103,7 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    v3e = v1_buf2;
    v3o = v1_buf0;
    
-   z = _nmod_vec_init(w*n3e);
+   z = TMP_ALLOC(sizeof(mp_limb_t) * w * n3e);
    
    if (!sqr)
    {
@@ -187,9 +190,8 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    _nmod_poly_KS2_unpack(z, v3o, n3o, 2 * b, b + 1);
    _nmod_poly_KS2_reduce(res + 1, 2, z, n3o, w, mod);
 
-   _nmod_vec_clear(z);
-   _nmod_vec_clear(v1_buf0);
-}                  
+   TMP_END;
+}
 
 void
 nmod_poly_mul_KS2(nmod_poly_t res,

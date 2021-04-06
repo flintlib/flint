@@ -126,6 +126,40 @@ main(void)
         nmod_poly_clear(d);
     }
 
+    /* check b^2 = b*b */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a1, a2, b, c;
+
+        mp_limb_t n = n_randtest_not_zero(state);
+
+        nmod_poly_init(a1, n);
+        nmod_poly_init(a2, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(a1, state, n_randint(state, 50));
+        nmod_poly_randtest(a2, state, n_randint(state, 50));
+
+        nmod_poly_set(c, b);
+        nmod_poly_mul_classical(a1, b, b);
+        nmod_poly_mul_classical(a2, b, c);
+
+        result = (nmod_poly_equal(a1, a2));
+        if (!result)
+        {
+            flint_printf("FAIL (squaring):\n");
+            nmod_poly_print(a1), flint_printf("\n\n");
+            nmod_poly_print(a2), flint_printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a1);
+        nmod_poly_clear(a2);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

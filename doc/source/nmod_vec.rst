@@ -227,6 +227,10 @@ Dot products
     0, 1, 2 or 3, specifying the number of limbs needed to represent the
     unreduced result.
 
+.. function:: mp_limb_t _nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2, slong len, nmod_t mod, int nlimbs)
+
+    The same as ``_nmod_vec_dot``, but reverses ``vec2``.
+
 .. function:: mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset, slong len, nmod_t mod, int nlimbs)
 
     Returns the dot product of (``vec1``, ``len``) and the values at
