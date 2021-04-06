@@ -100,17 +100,18 @@ FQ_DEFAULT_INLINE slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
    }
 }
 
-FQ_DEFAULT_INLINE const fmpz * fq_default_ctx_prime(const fq_default_ctx_t ctx)
+FQ_DEFAULT_INLINE void fq_default_ctx_prime(fmpz_t prime,
+                                                    const fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
    {
-      return fq_zech_ctx_prime(ctx->ctx.fq_zech);
+      fmpz_set(prime, fq_zech_ctx_prime(ctx->ctx.fq_zech));
    } else if (ctx->type == 2)
    {
-      return fq_nmod_ctx_prime(ctx->ctx.fq_nmod);
+      fmpz_set(prime, fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
    } else
    {
-      return fq_ctx_prime(ctx->ctx.fq);
+      fmpz_set(prime, fq_ctx_prime(ctx->ctx.fq));
    }
 }
 

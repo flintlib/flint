@@ -20,7 +20,3 @@
 #include "ulong_extras.h"
 #include "fq_default.h"
 
-void __fq_default_ctx_prime(fmpz_t p, fq_default_ctx_t ctx)
-{
-   fmpz_set(p, fq_default_ctx_prime(ctx));
-}

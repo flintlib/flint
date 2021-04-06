@@ -46,9 +46,9 @@ Context Management
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
     is equal to `\log_{p} q`.
 
-.. function:: fmpz * fq_default_ctx_prime(const fq_default_ctx_t ctx)
+.. function:: void fq_default_ctx_prime(fmpz_t prime, const fq_default_ctx_t ctx)
 
-    Returns a pointer to the prime `p` in the context.
+    Sets `prime` to the prime `p` in the context.
 
 .. function:: void fq_default_ctx_order(fmpz_t f, const fq_default_ctx_t ctx)
 
