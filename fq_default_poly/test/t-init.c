@@ -36,9 +36,9 @@ main(void)
 
         fmpz_init(p);
         
-        fmpz_set_ui(p, 5);
+        fmpz_set_ui(p, 3);
 
-        fq_default_ctx_init(ctx, p, 5, "x");
+        fq_default_ctx_init(ctx, p, 3, "x");
 
         fq_default_poly_init(fq_poly, ctx);
 
