@@ -469,6 +469,38 @@ fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
    }
 }
 
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_set_nmod_poly(fq_default_poly_t rop,
+                          const     nmod_poly_t op, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_poly_set_nmod_poly(rop->fq_zech, op, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_poly_set_nmod_poly(rop->fq_nmod, op, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_poly_set_nmod_poly(rop->fq, op, ctx->ctx.fq);
+   }
+}
+
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop,
+                          const fmpz_mod_poly_t op, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_poly_set_fmpz_mod_poly(rop->fq_zech, op, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_poly_set_fmpz_mod_poly(rop->fq_nmod, op, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_poly_set_fmpz_mod_poly(rop->fq, op, ctx->ctx.fq);
+   }
+}
+
 /*  Comparison  **************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
