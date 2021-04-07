@@ -27,61 +27,6 @@
 
 #define MAX_BLAS_DP_INT  (UWORD(1) << 53)
 
-static void _distribute_rows2(
-    slong start, slong stop,
-    slong * Astart, slong * Astop, slong Alen,
-    slong * Bstart, slong * Bstop, slong Blen)
-{
-    FLINT_ASSERT(0 <= start);
-    FLINT_ASSERT(start <= stop);
-    FLINT_ASSERT(stop <= Alen + Blen);
-
-    if (start >= Alen)
-    {
-        *Astart = 0;
-        *Astop  = 0;
-        *Bstart = start - Alen;
-        *Bstop  = stop - Alen;
-    }
-    else if (stop <= Alen)
-    {
-        *Astart = start;
-        *Astop  = stop;
-        *Bstart = 0;
-        *Bstop  = 0;
-    }
-    else
-    {
-        *Astart = start;
-        *Astop  = Alen;
-        *Bstart = 0;
-        *Bstop  = stop - Alen;
-    }
-}
-
-/*
-    if f is continuous with
-        f(0) = 0
-        f'(x) = alpha for 0 < x < a
-        f'(x) = beta for a < x < a + b
-
-    return solution for x to f(x) = (a*alpha + b*beta)*yn/yd
-    for 0 <= yn/yd <= 1
-*/
-static ulong _peicewise_linear_inverse2(
-    ulong a, ulong alpha,
-    ulong b, ulong beta,
-    ulong yn, ulong yd)
-{
-    /* very low priority TODO: this can overflow only in very extreme cases */
-    ulong y = yn*(a*alpha + b*beta)/yd;
-
-    if (y <= a*alpha)
-        return y/alpha;
-
-    return a + (y - a*alpha)/beta;
-}
-
 /* mod/lift helpers */
 
 static void _lift_vec(double * a, const uint32_t * b, slong len, uint32_t n)
@@ -132,7 +77,7 @@ static void fmpz_multi_mod_uint32_stride(
         for ( ; i < j; i++)
         {
             /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
-            mp_limb_t t = fmpz_fdiv_ui(A + k, lu[i].mod.n);
+            mp_limb_t t = fmpz_get_nmod(A + k, lu[i].mod);
 
             /* low level split: 1, 2, or 3 small primes */
             if (lu[i].mod2.n != 0)
@@ -437,8 +382,8 @@ int _fmpz_mat_mul_blas(
         args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
 
         /* distribute rows of A and B evenly as weighted by their columns */
-        stop = _peicewise_linear_inverse2(m, k, k, n, i + 1, num_workers + 1);
-        _distribute_rows2(start, stop,
+        stop = _thread_pool_find_work_2(m, k, k, n, i + 1, num_workers + 1);
+        _thread_pool_distribute_work_2(start, stop,
                           &args[i].Astartrow, &args[i].Astoprow, m,
                           &args[i].Bstartrow, &args[i].Bstoprow, k);
     }

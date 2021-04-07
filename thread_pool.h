@@ -93,6 +93,15 @@ FLINT_DLL void thread_pool_give_back(thread_pool_t T, thread_pool_handle i);
 
 FLINT_DLL void thread_pool_clear(thread_pool_t T);
 
+/* misc internal helpers *****************************************************/
+
+FLINT_DLL void _thread_pool_distribute_work_2(slong start, slong stop,
+                                    slong * Astart, slong * Astop, slong Alen,
+                                    slong * Bstart, slong * Bstop, slong Blen);
+
+FLINT_DLL ulong _thread_pool_find_work_2(ulong a, ulong alpha,
+                                      ulong b, ulong beta, ulong yn, ulong yd);
+
 #ifdef __cplusplus
 }
 #endif

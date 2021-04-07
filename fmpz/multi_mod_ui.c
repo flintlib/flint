@@ -53,7 +53,7 @@ void fmpz_multi_mod_ui(
         for ( ; i < j; i++)
         {
             /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
-            mp_limb_t t = fmpz_fdiv_ui(A + k, lu[i].mod.n);
+            mp_limb_t t = fmpz_get_nmod(A + k, lu[i].mod);
 
             /* low level split: 1, 2, or 3 small primes */
             if (lu[i].mod2.n != 0)
