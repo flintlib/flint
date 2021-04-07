@@ -115,6 +115,9 @@ FQ_DEFAULT_INLINE void fq_default_ctx_prime(fmpz_t prime,
    }
 }
 
+FLINT_DLL void fq_default_ctx_modulus(fmpz_mod_poly_t p,
+		                                   const fq_default_ctx_t ctx);
+
 FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
 		                                    const fq_default_ctx_t ctx)
 {

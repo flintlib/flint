@@ -54,6 +54,10 @@ Context Management
 
      Sets `f` to be the size of the finite field.
 
+.. function:: void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
+
+    Sets `p` to the defining polynomial of the finite field..
+
 .. function:: int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
 
     Prints the context information to ``file``. Returns 1 for a
