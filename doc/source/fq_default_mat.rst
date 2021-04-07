@@ -96,6 +96,19 @@ Basic properties and manipulation
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
+
+Conversions
+--------------------------------------------------------------------------------
+
+.. function:: void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1, const nmod_mat_t mat2, const fq_default_ctx_t ctx)
+
+    Sets the matrix ``mat1`` to the matrix ``mat2``.
+
+.. function:: void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1, const fmpz_mod_mat_t mat2, const fq_default_ctx_t ctx)
+
+    Sets the matrix ``mat1`` to the matrix ``mat2``.
+
+
 Concatenate
 --------------------------------------------------------------------------------
 
