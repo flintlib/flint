@@ -22,18 +22,28 @@ int main(void)
 {
     fmpz_mat_t A, B, C, D;
     slong i;
+    slong max_threads = 6;
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_small....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong m, k, n;
 
-        m = n_randint(state, 50);
-        n = n_randint(state, 50);
-        k = n_randint(state, 50);
+        if (flint_get_num_threads() >= max_threads - 1)
+        {
+            m = n_randint(state, 200);
+            n = n_randint(state, 200);
+            k = n_randint(state, 200);
+        }
+        else
+        {
+            m = n_randint(state, 50);
+            n = n_randint(state, 50);
+            k = n_randint(state, 50);
+        }
 
         fmpz_mat_init(A, m, k);
         fmpz_mat_init(B, k, n);
@@ -57,6 +67,8 @@ int main(void)
             fmpz_mat_print(D); flint_printf("\n\n");
             flint_abort();
         }
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);

@@ -191,7 +191,6 @@ static void _mul_worker(void * varg)
     slong Astoprow = arg->Astoprow;
     slong n = arg->n;
     slong k = arg->k;
-    slong m = arg->m;
     slong m_blk_sz = arg->m_blk_sz;
     slong k_blk_sz = arg->k_blk_sz;
     fmpz ** Crows = arg->Crows;
@@ -203,9 +202,9 @@ static void _mul_worker(void * varg)
     int words = arg->words;
     TMP_INIT;
 
-    /* no blocking overhead when things are small */
-    if (k <= k_blk_sz || Astoprow - Astartrow < 2*m_blk_sz)
+    if (k <= k_blk_sz)
     {
+        /* no blocking overhead: the B matrix is fully transposed in BL */
         if (words == 1)
         {
             for (h = Astartrow; h < Astoprow; h++)
@@ -235,7 +234,7 @@ static void _mul_worker(void * varg)
 
     for (h = Astartrow; h < Astoprow; h += m_blk_sz)
     {
-        slong hstop = FLINT_MIN(m - h, m_blk_sz);
+        slong hstop = FLINT_MIN(Astoprow - h, m_blk_sz);
 
         /* TC is a compressed block for the answer C[h:h+hhstop-1, all] */
         for (j = 0; j < n*hstop*words; j++)
