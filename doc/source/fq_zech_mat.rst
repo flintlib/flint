@@ -79,7 +79,19 @@ Basic properties and manipulation
 
 .. function:: void fq_zech_mat_one(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
-    Sets all the diagonal entries of ``mat`` to 1 and all other entries to 0.
+    Sets all diagonal entries of ``mat`` to 1 and all other entries to 0.
+
+
+Conversions
+--------------------------------------------------------------------------------
+
+.. function:: void fq_zech_mat_set_nmod_mat(fq_zech_mat_t mat1, const nmod_mat_t mat2, const fq_zech_ctx_t ctx)
+
+    Sets the matrix ``mat1`` to the matrix ``mat2``.
+
+.. function:: void fq_zech_mat_set_fmpz_mod_mat(fq_zech_mat_t mat1, const fmpz_mod_mat_t mat2, const fq_zech_ctx_t ctx)
+
+    Sets the matrix ``mat1`` to the matrix ``mat2``.
 
 
 Concatenate

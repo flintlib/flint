@@ -17,6 +17,6 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_mat_templates/one.c"
+#include "fq_mat_templates/set_fmpz_mod_mat.c"
 #undef CAP_T
 #undef T

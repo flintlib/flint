@@ -9,14 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_mat.h"
+#include "fq_zech_mat.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_mat_templates/one.c"
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_mat_templates/set_fmpz_mod_mat.c"
 #undef CAP_T
 #undef T
