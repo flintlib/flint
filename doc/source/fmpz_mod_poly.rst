@@ -223,6 +223,16 @@ Conversion
     Sets `f` to `g`.  This is done simply by lifting the coefficients
     of `g` taking representatives `[0, p) \subset \mathbf{Z}`.
 
+.. function:: void fmpz_mod_poly_get_nmod_poly(nmod_poly_t f, const fmpz_mod_poly_t g)
+
+   Sets `f` to `g` assuming the modulus of both polynomials is the same (no
+   checking is performed).
+
+.. function:: void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f, const nmod_poly_t g)
+
+   Sets `f` to `g` assuming the modulus of both polynomials is the same (no
+   checking is performed).
+
 
 Comparison
 --------------------------------------------------------------------------------
