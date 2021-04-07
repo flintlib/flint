@@ -24,7 +24,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_fmpz_mod_poly....");
+    flint_printf("get/set_fmpz_poly....");
     fflush(stdout);
 
     /* fq_zech range */
@@ -32,8 +32,7 @@ main(void)
     {
         fq_default_ctx_t ctx;
         fq_default_t fq1, fq2;
-	fmpz_mod_ctx_t fctx;
-        fmpz_mod_poly_t fmod;
+        fmpz_poly_t f;
 	fmpz_t p;
 
         fmpz_init(p);
@@ -45,13 +44,12 @@ main(void)
         fq_default_init(fq1, ctx);
 	fq_default_init(fq2, ctx);
 
-	fmpz_mod_ctx_init(fctx, p);
-	fmpz_mod_poly_init(fmod, fctx);
+	fmpz_poly_init(f);
 
         fq_default_randtest(fq1, state, ctx);
 
-	fq_default_get_fmpz_mod_poly(fmod, fq1, ctx);
-	fq_default_set_fmpz_mod_poly(fq2, fmod, ctx);
+	fq_default_get_fmpz_poly(f, fq1, ctx);
+	fq_default_set_fmpz_poly(fq2, f, ctx);
 
         result = (fq_default_equal(fq1, fq2, ctx));
         if (!result)
@@ -59,12 +57,11 @@ main(void)
             flint_printf("FAIL:\n");
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
-            fmpz_mod_poly_print(fmod, fctx); flint_printf("\n\n");
+            fmpz_poly_print(f); flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(fmod, fctx);
-	fmpz_mod_ctx_clear(fctx);
+        fmpz_poly_clear(f);
 
 	fq_default_clear(fq1, ctx);
         fq_default_clear(fq2, ctx);
@@ -77,8 +74,7 @@ main(void)
     {
         fq_default_ctx_t ctx;
         fq_default_t fq1, fq2;
-        fmpz_mod_ctx_t fctx;
-	fmpz_mod_poly_t fmod;
+	fmpz_poly_t f;
         fmpz_t p;
 
         fmpz_init(p);
@@ -90,13 +86,12 @@ main(void)
         fq_default_init(fq1, ctx);
         fq_default_init(fq2, ctx);
 
-        fmpz_mod_ctx_init(fctx, p);
-        fmpz_mod_poly_init(fmod, fctx);
+        fmpz_poly_init(f);
 
         fq_default_randtest(fq1, state, ctx);
 
-        fq_default_get_fmpz_mod_poly(fmod, fq1, ctx);
-        fq_default_set_fmpz_mod_poly(fq2, fmod, ctx);
+        fq_default_get_fmpz_poly(f, fq1, ctx);
+        fq_default_set_fmpz_poly(fq2, f, ctx);
 
         result = (fq_default_equal(fq1, fq2, ctx));
         if (!result)
@@ -104,12 +99,11 @@ main(void)
             flint_printf("FAIL:\n");
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
-            fmpz_mod_poly_print(fmod, fctx); flint_printf("\n\n");
+            fmpz_poly_print(f); flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(fmod, fctx);
-        fmpz_mod_ctx_clear(fctx);
+        fmpz_poly_clear(f);
 
         fq_default_clear(fq1, ctx);
         fq_default_clear(fq2, ctx);
@@ -124,8 +118,7 @@ main(void)
     {
         fq_default_ctx_t ctx;
         fq_default_t fq1, fq2;
-        fmpz_mod_ctx_t fctx;
-	fmpz_mod_poly_t fmod;
+	fmpz_poly_t f;
         fmpz_t p;
 
         fmpz_init(p);
@@ -137,13 +130,12 @@ main(void)
         fq_default_init(fq1, ctx);
         fq_default_init(fq2, ctx);
 
-        fmpz_mod_ctx_init(fctx, p);
-        fmpz_mod_poly_init(fmod, fctx);
+        fmpz_poly_init(f);
 
         fq_default_randtest(fq1, state, ctx);
 
-        fq_default_get_fmpz_mod_poly(fmod, fq1, ctx);
-        fq_default_set_fmpz_mod_poly(fq2, fmod, ctx);
+        fq_default_get_fmpz_poly(f, fq1, ctx);
+        fq_default_set_fmpz_poly(fq2, f, ctx);
 
         result = (fq_default_equal(fq1, fq2, ctx));
         if (!result)
@@ -151,12 +143,11 @@ main(void)
             flint_printf("FAIL:\n");
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
-            fmpz_mod_poly_print(fmod, fctx); flint_printf("\n\n");
+            fmpz_poly_print(f); flint_printf("\n\n");
             abort();
         }
 
-        fmpz_mod_poly_clear(fmod, fctx);
-        fmpz_mod_ctx_clear(fctx);
+        fmpz_poly_clear(f);
 
         fq_default_clear(fq1, ctx);
         fq_default_clear(fq2, ctx);

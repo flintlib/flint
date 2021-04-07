@@ -709,6 +709,12 @@ FLINT_DLL void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
 FLINT_DLL void fq_default_set_fmpz_mod_poly(fq_default_t op,
                        const fmpz_mod_poly_t poly, const fq_default_ctx_t ctx);
 
+FLINT_DLL void fq_default_get_fmpz_poly(fmpz_poly_t poly,
+                            const fq_default_t op, const fq_default_ctx_t ctx);
+
+FLINT_DLL void fq_default_set_fmpz_poly(fq_default_t op,
+                           const fmpz_poly_t poly, const fq_default_ctx_t ctx);
+
 /* Output ********************************************************************/
 
 FQ_DEFAULT_INLINE
