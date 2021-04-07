@@ -51,8 +51,8 @@ main(void)
 
         fq_default_randtest(fq1, state, ctx);
 
-	fq_default_get_fmpz_mod_poly(fmod, fq1, fctx, ctx);
-	fq_default_set_fmpz_mod_poly(fq2, fmod, fctx, ctx);
+	fq_default_get_fmpz_mod_poly(fmod, fq1, ctx);
+	fq_default_set_fmpz_mod_poly(fq2, fmod, ctx);
 
         result = (fq_default_equal(fq1, fq2, ctx));
         if (!result)
@@ -96,8 +96,8 @@ main(void)
 
         fq_default_randtest(fq1, state, ctx);
 
-        fq_default_get_fmpz_mod_poly(fmod, fq1, fctx, ctx);
-        fq_default_set_fmpz_mod_poly(fq2, fmod, fctx, ctx);
+        fq_default_get_fmpz_mod_poly(fmod, fq1, ctx);
+        fq_default_set_fmpz_mod_poly(fq2, fmod, ctx);
 
         result = (fq_default_equal(fq1, fq2, ctx));
         if (!result)
@@ -143,8 +143,8 @@ main(void)
 
         fq_default_randtest(fq1, state, ctx);
 
-        fq_default_get_fmpz_mod_poly(fmod, fq1, fctx, ctx);
-        fq_default_set_fmpz_mod_poly(fq2, fmod, fctx, ctx);
+        fq_default_get_fmpz_mod_poly(fmod, fq1, ctx);
+        fq_default_set_fmpz_mod_poly(fq2, fmod, ctx);
 
         result = (fq_default_equal(fq1, fq2, ctx));
         if (!result)
