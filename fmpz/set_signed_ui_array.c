@@ -13,51 +13,55 @@
 #include "fmpz.h"
 
 /*
-    Given an array of limbs "in" representing a integer mod 2^(FLINT_BITS*n),
-    set "out" to the symmetric remainder with the halfway point
+    Given an array of limbs "c" representing a integer mod 2^(FLINT_BITS*n),
+    set "f" to the symmetric remainder with the halfway point
     2^(FLINT_BITS*n/2) mapping to -2^(FLINT_BITS*n/2)
 */
 
-void fmpz_set_signed_ui_array(fmpz_t f, const ulong * c_in, slong n)
+void fmpz_set_signed_ui_array(fmpz_t f, const ulong * c, slong n)
 {
-    slong i;
-    ulong * c;
-    int neg;
+    ulong csign;
 
-    TMP_INIT;
+    FLINT_ASSERT(n > 0);
 
-    TMP_START;
+    csign = FLINT_SIGN_EXT(c[n - 1]);
 
-    c = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    while (n > 0 && c[n - 1] == csign)
+        n--;
 
-    for (i = 0; i < n; i++)
-       c[i] = c_in[i];
-
-    neg = 0 > (slong) c[n - 1];
-
-    if (neg)
-       mpn_neg_n(c, c, n);
-
-    while (n > 0 && c[n - 1] == 0)
-       n--;
-
-    if (n <= 1)
+    if (n < 2)
     {
-       fmpz_set_ui(f, c[0]);
+        if (csign == 0)
+            fmpz_set_ui(f, c[0]);
+        else if (c[0] != 0)
+            fmpz_neg_ui(f, -c[0]);
+        else
+            fmpz_neg_uiui(f, 1, 0);
     }
     else
     {
-       __mpz_struct * mpz = _fmpz_promote(f);
+        __mpz_struct * z = _fmpz_promote(f);
+        mp_limb_t * zd = FLINT_MPZ_REALLOC(z, n);
 
-       mpz_realloc2(mpz, n*FLINT_BITS);
-
-       mpn_copyi(mpz->_mp_d, c, n);
-       mpz->_mp_size = n;
+        if (csign == 0)
+        {
+            flint_mpn_copyi(zd, c, n);
+            z->_mp_size = n;
+        }
+        else
+        {
+            if (mpn_neg(zd, c, n))
+            {
+                FLINT_ASSERT(zd[n - 1] != 0);
+                z->_mp_size = -n;
+            }
+            else
+            {
+                zd = FLINT_MPZ_REALLOC(z, n + 1);
+                zd[n] = 1;
+                z->_mp_size = -(n + 1);
+            }
+        }
     }
-
-    if (neg)
-       fmpz_neg(f, f);
-
-    TMP_END;
 }
 

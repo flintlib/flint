@@ -29,14 +29,22 @@ main(void)
     fmpz_init(c);
     limbs = (ulong *) flint_malloc(max_limbs*sizeof(ulong));
 
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         slong j, n;
 
         n = n_randint(state, max_limbs) + 1;
 
         for (j = 0; j < n; j++)
+        {
             limbs[j] = n_randlimb(state);
+
+            if (n_randint(state, 10) == 0)
+                limbs[j] = 0;
+
+            if (n_randint(state, 10) == 0)
+                limbs[j] = -UWORD(1);
+        }
 
         fmpz_set_ui_array(a, limbs, n);
         fmpz_set_signed_ui_array(b, limbs, n);

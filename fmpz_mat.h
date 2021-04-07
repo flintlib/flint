@@ -251,6 +251,21 @@ FLINT_DLL void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
 FLINT_DLL int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A,
                                                            const fmpz_mat_t B);
 
+FLINT_DLL void _fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A,
+                                                           const fmpz_mat_t B);
+
+FLINT_DLL void _fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A,
+                                                           const fmpz_mat_t B);
+
+FLINT_DLL void _fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A,
+                                                           const fmpz_mat_t B);
+
+FLINT_DLL void _fmpz_mat_mul_4(fmpz_mat_t C, const fmpz_mat_t A,
+                                                           const fmpz_mat_t B);
+
+FLINT_DLL void _fmpz_mat_mul_22(fmpz_mat_t C, const fmpz_mat_t A,
+                            const fmpz_mat_t B, int sign, flint_bitcnt_t bits);
+
 FLINT_DLL void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A);

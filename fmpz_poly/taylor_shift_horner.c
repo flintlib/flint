@@ -14,62 +14,6 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-static void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
-{
-    int neg;
-    slong i, sz;
-
-    FLINT_ASSERT(n > 0);
-
-    if (!COEFF_IS_MPZ(*x))
-    {
-        neg = *x < 0;
-        r[0] = FLINT_ABS(*x);
-        i = 1;
-    }
-    else
-    {
-        __mpz_struct * p = COEFF_TO_PTR(*x);
-        neg = p->_mp_size < 0;
-        sz = FLINT_ABS(p->_mp_size);
-
-        for (i = 0; i < n && i < sz; i++)
-            r[i] = p->_mp_d[i];
-    }
-
-    for ( ; i < n; i++)
-        r[i] = 0;
-
-    if (neg)
-        mpn_neg(r, r, n);
-}
-
-static void fmpz_get_signed_uiui(mp_limb_t * r, const fmpz_t x)
-{
-    ulong r0, r1, s;
-
-    if (!COEFF_IS_MPZ(*x))
-    {
-        r0 = *x;
-        r1 = FLINT_SIGN_EXT(r0);
-    }
-    else
-    {
-        __mpz_struct * p = COEFF_TO_PTR(*x);
-        s = -(ulong)(p->_mp_size < 0);
-        r0 = p->_mp_d[0];
-        if (p->_mp_size == 2 || p->_mp_size == -2)
-            r1 = p->_mp_d[1];
-        else
-            r1 = 0;
-
-        sub_ddmmss(r1, r0, r1^s, r0^s, s, s);
-    }
-
-    r[0] = r0;
-    r[1] = r1;
-}
-
 /* Improve cache locality with huge coefficients */
 #define BLOCK_SIZE 32
 
@@ -166,14 +110,15 @@ _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
         t = TMP_ALLOC(2 * n * sizeof(mp_limb_t));
 
         for (i = 0; i < n; i++)
-            fmpz_get_signed_uiui(t + 2 * i, poly + i);
+            fmpz_get_signed_uiui(t + 2*i + 1, t + 2*i + 0, poly + i);
 
         for (i = n - 2; i >= 0; i--)
             for (j = i; j < n - 1; j++)
-                add_ssaaaa(t[2 * j + 1], t[2 * j], t[2 * j + 1], t[2 * j], t[2 * (j + 1) + 1], t[2 * (j + 1)]);
+                add_ssaaaa(t[2*j + 1], t[2*j], t[2*j + 1], t[2*j],
+                                               t[2*(j + 1) + 1], t[2*(j + 1)]);
 
         for (i = 0; i < n; i++)
-            fmpz_set_signed_uiui(poly + i, t[2 * i + 1], t[2 * i]);
+            fmpz_set_signed_uiui(poly + i, t[2*i + 1], t[2*i]);
 
         TMP_END;
     }
