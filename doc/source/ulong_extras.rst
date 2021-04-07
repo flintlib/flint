@@ -39,7 +39,7 @@ Random functions
     the given limit. If zero is passed as a parameter, an entire random
     limb is returned.
 
-.. function:: ulong n_urandint(flint_rant_t state, ulong limit)
+.. function:: ulong n_urandint(flint_rand_t state, ulong limit)
     
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire
