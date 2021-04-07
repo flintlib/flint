@@ -2224,14 +2224,13 @@ Evaluation
     Flint for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
-.. function:: double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp, ulong prec_in) 
+.. function:: double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
 
     Evaluate ``poly`` at ``d*2^dexp``. Return the result as a double
     and an exponent ``exp`` combination. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
     Flint for quick and dirty evaluations of polynomials with all coefficients
-    positive. If ``prec_in`` is not set to `0` the evaluation will be done to
-    the supplied precision only.
+    positive.
 
 
 Newton basis
