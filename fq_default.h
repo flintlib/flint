@@ -718,6 +718,32 @@ FLINT_DLL void fq_default_get_fmpz_poly(fmpz_poly_t poly,
 FLINT_DLL void fq_default_set_fmpz_poly(fq_default_t op,
                            const fmpz_poly_t poly, const fq_default_ctx_t ctx);
 
+FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,
+                          fq_default_t op, slong n, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      nmod_poly_t p;
+      ulong c0;
+      nmod_poly_init(p, fmpz_get_ui(fq_zech_ctx_prime(ctx->ctx.fq_zech)));
+      fq_zech_get_nmod_poly(p, op->fq_zech, ctx->ctx.fq_zech);
+      c0 = nmod_poly_get_coeff_ui(p, n);
+      fmpz_set_ui(c, c0);
+      nmod_poly_clear(p);
+   } else if (ctx->type == 2)
+   {
+      ulong c0 = nmod_poly_get_coeff_ui((nmod_poly_struct *) op->fq_nmod, n);
+      fmpz_set_ui(c, c0);
+   } else
+   {
+      fmpz_mod_ctx_t mod_ctx;
+      fmpz_mod_ctx_init(mod_ctx, fq_ctx_prime(ctx->ctx.fq));
+      fmpz_mod_poly_get_coeff_fmpz(c,
+		                  (fmpz_mod_poly_struct *) op->fq, n, mod_ctx);
+      fmpz_mod_ctx_clear(mod_ctx);
+   }
+}
+
 /* Output ********************************************************************/
 
 FQ_DEFAULT_INLINE

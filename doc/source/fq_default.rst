@@ -72,6 +72,11 @@ Context Management
     Initializes ``ctx`` to a random finite field.  Assumes that
     ``fq_default_ctx_init`` has not been called on ``ctx`` already.
 
+.. function:: void fq_default_get_coeff_fmpz(fmpz_t c, fq_default_t op, slong n, const fq_default_ctx_t ctx)
+
+    Set `c` to the degree `n` coefficient of the polynomial representation of
+    the finite field element ``op``.
+
 
 Memory management
 --------------------------------------------------------------------------------
