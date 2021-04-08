@@ -12,6 +12,8 @@
 #include "ca.h"
 #include "ca_field.h"
 
+void ca_clear_unchecked(ca_t x, ca_ctx_t ctx);
+
 /* todo: recycle storage when compatible */
 void
 _ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx)
@@ -32,7 +34,7 @@ _ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx)
         return;
     }
 
-    ca_clear(x, ctx);
+    ca_clear_unchecked(x, ctx);
 
     if (field == ctx->field_qq)
     {

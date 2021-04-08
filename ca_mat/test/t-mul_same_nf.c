@@ -33,6 +33,7 @@ ca_randtest_same_nf(ca_t res, flint_rand_t state, const ca_t x, slong bits, slon
 
         ca_set(res, x, ctx);
         nf_elem_set_fmpq_poly(CA_NF_ELEM(res), p, CA_FIELD_NF(CA_FIELD(x, ctx)));
+        ca_condense_field(res, ctx);
 
         fmpq_poly_clear(p);
     }

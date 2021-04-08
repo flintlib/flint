@@ -244,11 +244,14 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
                             fmpz_mpoly_sub(fmpz_mpoly_q_numref(CA_MPOLY_Q(x_deflated)), fmpz_mpoly_q_numref(rat), fmpz_mpoly_q_numref(CA_MPOLY_Q(x_deflated)), mctx);
                             fmpz_mpoly_set(fmpz_mpoly_q_denref(CA_MPOLY_Q(x_deflated)), fmpz_mpoly_q_denref(rat), mctx);
                             fmpz_mpoly_q_canonicalise(CA_MPOLY_Q(x_deflated), mctx);
+                            _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(x_deflated), K, ctx);
+                            ca_condense_field(x_deflated, ctx);
 
                             ca_set_fmpz(power, fmpz_mpoly_q_numref(rat)->coeffs + i, ctx);
                             ca_div_fmpz(power, power, fmpz_mpoly_q_denref(rat)->coeffs, ctx);
 
                             ca_pow(power, CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, log_index)), power, ctx);
+
                             ca_exp(x_deflated, x_deflated, ctx);
                             ca_mul(res, power, x_deflated, ctx);
 
@@ -272,4 +275,3 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
     _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
     ca_condense_field(res, ctx);
 }
-

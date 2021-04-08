@@ -132,6 +132,7 @@ ca_pow_pow(ca_t res, const ca_t z, const ca_t a, const ca_t b, ca_ctx_t ctx)
         ca_mul_ui(t, t, 2, ctx);
         ca_mul(t, t, b, ctx);
         ca_neg(t, t, ctx);
+
         ca_exp(t, t, ctx);
 
         ca_mul(u, a, b, ctx);

@@ -282,6 +282,7 @@ _ca_function_fxy(ca_t res, calcium_func_code func, const ca_t x, const ca_t y, c
 }
 
 void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_transfer(ca_t res, ca_ctx_t res_ctx, const ca_t src, ca_ctx_t src_ctx);
 
 void ca_zero(ca_t x, ca_ctx_t ctx);
 void ca_one(ca_t x, ca_ctx_t ctx);

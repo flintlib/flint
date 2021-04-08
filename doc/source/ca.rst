@@ -375,7 +375,6 @@ Assignment and conversion
 
     Sets *res* to a copy of *x*.
 
-
 .. function:: void ca_set_si(ca_t res, slong v, ca_ctx_t ctx)
               void ca_set_ui(ca_t res, ulong v, ca_ctx_t ctx)
               void ca_set_fmpz(ca_t res, const fmpz_t v, ca_ctx_t ctx)
@@ -390,6 +389,15 @@ Assignment and conversion
 
     Sets *res* to the value of *x*, or the complex value `x + yi`.
     NaN is interpreted as *Unknown* (not *Undefined*).
+
+.. function:: void ca_transfer(ca_t res, ca_ctx_t res_ctx, const ca_t src, ca_ctx_t src_ctx)
+
+    Sets *res* to *src* where the corresponding context objects *res_ctx* and
+    *src_ctx* may be different.
+
+    This operation preserves the mathematical value represented by *src*,
+    but may result in a different internal representation depending on the
+    settings of the context objects.
 
 Conversion of algebraic numbers
 -------------------------------------------------------------------------------
