@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021Fredrik Johansson
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of Calcium.
 
@@ -256,6 +256,11 @@ _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,
     fexpr_set_symbol_builtin(res, FEXPR_Unknown);
 }
 
+#define GET_UNARY(fsymbol) \
+    _ca_get_fexpr_given_ext(res, CA_EXT_FUNC_ARGS(x), flags, ext, num_ext, ext_vars, ctx); \
+    fexpr_call_builtin1(res, fsymbol, res); \
+    return; \
+
 void
 _ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
         ca_ext_ptr * ext, slong num_ext, const fexpr_struct * ext_vars, ca_ctx_t ctx)
@@ -283,26 +288,20 @@ _ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
             case CA_Euler:
                 fexpr_set_symbol_builtin(res, FEXPR_Euler);
                 return;
-            case CA_Exp:
-                _ca_get_fexpr_given_ext(res, CA_EXT_FUNC_ARGS(x), flags, ext, num_ext, ext_vars, ctx);
-                fexpr_call_builtin1(res, FEXPR_Exp, res);
-                return;
-            case CA_Log:
-                _ca_get_fexpr_given_ext(res, CA_EXT_FUNC_ARGS(x), flags, ext, num_ext, ext_vars, ctx);
-                fexpr_call_builtin1(res, FEXPR_Log, res);
-                return;
-            case CA_Sign:
-                _ca_get_fexpr_given_ext(res, CA_EXT_FUNC_ARGS(x), flags, ext, num_ext, ext_vars, ctx);
-                fexpr_call_builtin1(res, FEXPR_Sign, res);
-                return;
-            case CA_Abs:
-                _ca_get_fexpr_given_ext(res, CA_EXT_FUNC_ARGS(x), flags, ext, num_ext, ext_vars, ctx);
-                fexpr_call_builtin1(res, FEXPR_Abs, res);
-                return;
-            case CA_Sqrt:
-                _ca_get_fexpr_given_ext(res, CA_EXT_FUNC_ARGS(x), flags, ext, num_ext, ext_vars, ctx);
-                fexpr_call_builtin1(res, FEXPR_Sqrt, res);
-                return;
+            case CA_Exp: GET_UNARY(FEXPR_Exp)
+            case CA_Log: GET_UNARY(FEXPR_Log)
+            case CA_Sign: GET_UNARY(FEXPR_Sign)
+            case CA_Abs: GET_UNARY(FEXPR_Abs)
+            case CA_Sqrt: GET_UNARY(FEXPR_Sqrt)
+            case CA_Re: GET_UNARY(FEXPR_Re)
+            case CA_Im: GET_UNARY(FEXPR_Im)
+            case CA_Conjugate: GET_UNARY(FEXPR_Conjugate)
+            case CA_Floor: GET_UNARY(FEXPR_Floor)
+            case CA_Ceil: GET_UNARY(FEXPR_Ceil)
+            case CA_Gamma: GET_UNARY(FEXPR_Gamma)
+            case CA_Erf: GET_UNARY(FEXPR_Erf)
+            case CA_Erfc: GET_UNARY(FEXPR_Erfc)
+            case CA_Erfi: GET_UNARY(FEXPR_Erfi)
             case CA_Pow:
                 fexpr_init(t);
                 fexpr_init(u);

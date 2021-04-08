@@ -32,8 +32,6 @@ _acb_root(acb_t res, const acb_t x, const acb_t y, slong prec)
     }
 }
 
-#define FEXPR_BUILTIN(head) ((head) >> 16)
-
 #define REQUIRE_NARGS(n)  if (nargs != n) { success = 0; break; }
 
 
@@ -87,7 +85,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
         }
 
         /* todo: clean up these cases */
-        op = FEXPR_BUILTIN(expr->data[0]);
+        op = FEXPR_BUILTIN_ID(expr->data[0]);
 
         if (op == FEXPR_Pi)
         {
@@ -158,7 +156,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
         if (nargs > 0)
             fexpr_view_arg(arg, expr, 0);
 
-        op = FEXPR_BUILTIN(func->data[0]);
+        op = FEXPR_BUILTIN_ID(func->data[0]);
 
         switch (op)
         {

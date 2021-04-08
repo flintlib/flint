@@ -195,6 +195,15 @@ Symbolic expressions
 
     Sets *res* to a symbolic expression representing *x*.
 
+.. function:: int ca_set_fexpr(ca_t res, const fexpr_t expr, ca_ctx_t ctx)
+
+    Sets *res* to the value represented by the symbolic expression *expr*.
+    Returns 1 on success and 0 on failure.
+    This function essentially just traverses the expression tree using
+    ``ca`` arithmetic; it does not provide advanced symbolic evaluation.
+    It is guaranteed to at least be able to parse the output of
+    :func:`ca_get_fexpr`.
+
 
 .. _ca-printing:
 

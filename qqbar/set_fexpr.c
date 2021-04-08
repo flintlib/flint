@@ -13,36 +13,7 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
-/* todo: deduplicate */
-static int
-fexpr_is_builtin_call(const fexpr_t expr, slong i)
-{
-    fexpr_t func;
-
-    if (fexpr_is_atom(expr))
-        return 0;
-
-    fexpr_view_func(func, expr);
-
-    return fexpr_is_builtin_symbol(func, i);
-}
-
 int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
-
-/* todo: deduplicate */
-static int
-fexpr_equal_ui(const fexpr_t expr, ulong c)
-{
-    if (c <= FEXPR_COEFF_MAX)
-    {
-        return expr->data[0] == (c << FEXPR_TYPE_BITS);
-    }
-    else
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS))
-                    && expr->data[1] == c);
-    }
-}
 
 int
 _fexpr_parse_arf(arf_t res, const fexpr_t expr)

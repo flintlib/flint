@@ -190,6 +190,10 @@ fexpr_equal(const fexpr_t a, const fexpr_t b)
     return _mpn_equal(a->data + 1, b->data + 1, sa - 1);
 }
 
+/* todo: document, test */
+int fexpr_equal_si(const fexpr_t expr, slong c);
+int fexpr_equal_ui(const fexpr_t expr, ulong c);
+
 int fexpr_cmp_fast(const fexpr_t a, const fexpr_t b);
 
 FEXPR_INLINE void
@@ -210,6 +214,9 @@ fexpr_is_integer(const fexpr_t expr)
 {
     return _fexpr_is_integer(expr->data);
 }
+
+/* todo: document, test */
+int fexpr_is_neg_integer(const fexpr_t expr);
 
 FEXPR_INLINE int
 _fexpr_is_symbol(const ulong * expr)
@@ -311,6 +318,10 @@ fexpr_is_builtin_symbol(const fexpr_t expr, slong i)
     head = expr->data[0];
     return (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL) && (((head >> 8) & 0xff) == 0) && (FEXPR_BUILTIN_ID(head) == i);
 }
+
+/* todo: document, test */
+int fexpr_is_builtin_call(const fexpr_t expr, slong i);
+int fexpr_is_any_builtin_call(const fexpr_t expr);
 
 FEXPR_INLINE slong
 fexpr_nargs(const fexpr_t expr)

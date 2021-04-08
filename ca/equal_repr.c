@@ -20,6 +20,9 @@ ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
     if (x->field != y->field)
         return 0;
 
+    if (CA_IS_SPECIAL(x) && !CA_IS_SIGNED_INF(x))
+        return x->field == y->field;
+
     field = CA_FIELD_UNSPECIAL(x, ctx);
 
     if (CA_FIELD_IS_QQ(field))

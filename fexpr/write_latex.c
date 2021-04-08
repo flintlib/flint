@@ -15,38 +15,6 @@
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
 int _fexpr_is_symbol_with_underscore(const fexpr_t expr);
 
-/* todo: make public, document, test */
-static int
-fexpr_equal_ui(const fexpr_t expr, ulong c)
-{
-    if (c <= FEXPR_COEFF_MAX)
-    {
-        return expr->data[0] == (c << FEXPR_TYPE_BITS);
-    }
-    else
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS))
-                    && expr->data[1] == c);
-    }
-}
-
-static int
-fexpr_equal_si(const fexpr_t expr, slong c)
-{
-    if (c >= FEXPR_COEFF_MIN && c <= FEXPR_COEFF_MAX)
-    {
-        return expr->data[0] == (c << FEXPR_TYPE_BITS);
-    }
-    else if (c > 0)
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == c);
-    }
-    else
-    {
-        return (expr->data[0] == (FEXPR_TYPE_BIG_INT_NEG | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == (-(ulong) c));
-    }
-}
-
 static int
 fexpr_view_call0(fexpr_t func, const fexpr_t expr)
 {
@@ -122,21 +90,6 @@ fexpr_view_call4(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, fexpr_t x4, c
     return 1;
 }
 
-
-static int
-fexpr_is_neg_integer(const fexpr_t expr)
-{
-    ulong head = expr->data[0];
-
-    if (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_INT)
-        return (((slong) head) >> FEXPR_TYPE_BITS) < 0;
-
-    if (FEXPR_TYPE(head) == FEXPR_TYPE_BIG_INT_NEG)
-        return 1;
-
-    return 0;
-}
-
 static int
 fexpr_need_parens_in_mul(const fexpr_t expr, slong arg_index)
 {
@@ -167,33 +120,6 @@ fexpr_need_parens_in_mul(const fexpr_t expr, slong arg_index)
         return 0;
     }
 }
-
-static int
-fexpr_is_builtin_call(const fexpr_t expr, slong i)
-{
-    fexpr_t func;
-
-    if (fexpr_is_atom(expr))
-        return 0;
-
-    fexpr_view_func(func, expr);
-
-    return fexpr_is_builtin_symbol(func, i);
-}
-
-static int
-fexpr_is_any_builtin_call(const fexpr_t expr)
-{
-    fexpr_t func;
-
-    if (fexpr_is_atom(expr))
-        return 0;
-
-    fexpr_view_func(func, expr);
-
-    return fexpr_is_any_builtin_symbol(func);
-}
-
 
 /* todo */
 static int
