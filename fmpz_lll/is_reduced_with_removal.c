@@ -13,14 +13,18 @@
 
 #include "fmpz_lll.h"
 
+#define WANT_MPFR 0
+
 int
 fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                  const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 {
     return (gs_B !=
             NULL) ? ((fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd)
-                      || fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B,
-                                                               newd, prec))
+#if WANT_MPFR
+                      || fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B, newd, prec)
+#endif
+                    )
                      || ((fl->rt == Z_BASIS) ?
                          fmpz_mat_is_reduced_with_removal(B, fl->delta,
                                                           fl->eta, gs_B,
