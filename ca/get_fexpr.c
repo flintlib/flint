@@ -267,7 +267,9 @@ _ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
 {
     if (CA_EXT_IS_QQBAR(x))
     {
-        if (!qqbar_get_fexpr_formula(res, CA_EXT_QQBAR(x), QQBAR_FORMULA_GAUSSIANS | QQBAR_FORMULA_QUADRATICS))
+        if (flags & CA_FEXPR_SERIALIZATION)
+            qqbar_get_fexpr_repr(res, CA_EXT_QQBAR(x));
+        else if (!qqbar_get_fexpr_formula(res, CA_EXT_QQBAR(x), QQBAR_FORMULA_GAUSSIANS | QQBAR_FORMULA_QUADRATICS))
             qqbar_get_fexpr_root_nearest(res, CA_EXT_QQBAR(x));
     }
     else

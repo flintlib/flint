@@ -318,6 +318,8 @@ int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx);
 
 /* Symbolic expressions */
 
+#define CA_FEXPR_SERIALIZATION 1
+
 void ca_get_fexpr(fexpr_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
 int ca_set_fexpr(ca_t res, const fexpr_t expr, ca_ctx_t ctx);
 

@@ -30,7 +30,7 @@ ca_transfer(ca_t res, ca_ctx_t res_ctx, const ca_t src, ca_ctx_t src_ctx)
 
         /* todo: optimizations, e.g. direct transfer of number field
            elements where permissible */
-        ca_get_fexpr(expr, src, 0, src_ctx);
+        ca_get_fexpr(expr, src, CA_FEXPR_SERIALIZATION, src_ctx);
 
         if (!ca_set_fexpr(res, expr, res_ctx))
         {
