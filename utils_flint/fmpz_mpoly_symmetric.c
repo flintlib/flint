@@ -35,7 +35,7 @@ fmpz_mpoly_symmetric_gens(fmpz_mpoly_t res, ulong k, slong * vars, slong n, cons
     Knuth algorithm T is faster. */
 
     c = flint_malloc(sizeof(slong) * (k + 2));
-    exp = flint_malloc(sizeof(ulong) * nvars);
+    exp = flint_calloc(nvars, sizeof(ulong));
 
     for (j = 0; j < k; j++)
         c[j] = j;
