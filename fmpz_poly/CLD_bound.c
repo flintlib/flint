@@ -127,8 +127,8 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
       {
          /* r is really 2^rpow * 2^rexp */
          double r = pow(2.0, rpow);
-         hi_eval = fmpz_poly_evaluate_horner_d_2exp2(&hi_exp, hi, r, rexp, 100);
-         lo_eval = fmpz_poly_evaluate_horner_d_2exp2(&lo_exp, lo, 1/r, -rexp, 100);
+         hi_eval = fmpz_poly_evaluate_horner_d_2exp2(&hi_exp, hi, r, rexp);
+         lo_eval = fmpz_poly_evaluate_horner_d_2exp2(&lo_exp, lo, 1/r, -rexp);
       }  /* if max exponent may overwhelm a double (with safety margin) */
       else if (max_exp > 950 || too_much) /* result of eval has large exponent */
       {

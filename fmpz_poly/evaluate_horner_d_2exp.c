@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,60 +16,132 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp, ulong prec_in)
+/* Naive double+exponent arithmetic; not designed to deal with
+   underflow/overflow. */
+typedef struct
 {
-   slong i, size_p = FLINT_ABS(_fmpz_vec_max_bits(poly, n));
-   ulong vbits = ceil(fabs(dexp + log(fabs(d))/log(2.0)));
-   ulong prec = vbits*(n - 1) + size_p + FLINT_BIT_COUNT(n);
-   mpf_t mpf_d, mpf_coeff, output;
-   double res;
+    double m;
+    slong e;
+}
+dpe_t;
 
-   if (prec_in > 0)
-       prec = prec_in;
+/* Do up to ADJUSTMENT_DELAY steps without adjusting mantissa.
+   This may cause the mantissa to drift from the normalized range [0.5, 1)
+   by a factor about 2^ADJUSTMENT_DELAY. */
+#define ADJUSTMENT_DELAY 16
 
-   if (d == 0)
-      return fmpz_get_d(poly + 0);
+/* Standardize nonzero mantissa to +/- [0.5, 1). */
+#define DPE_ADJUST(x) \
+    do { \
+        int _e; \
+        (x).m = frexp((x).m, &_e); \
+        (x).e += _e; \
+    } while (0)
 
-   mpf_set_default_prec(prec);
+static dpe_t dpe_set_d_exp(double x, slong e)
+{
+    dpe_t res;
+    res.m = x;
+    res.e = e;
+    DPE_ADJUST(res);
+    return res;
+}
 
-   mpf_init(mpf_coeff);   
-   mpf_init(output);   
-   mpf_init(mpf_d);
+static dpe_t dpe_set_fmpz(const fmpz_t x)
+{
+    dpe_t res;
+    res.m = fmpz_get_d_2exp(&res.e, x);
+    return res;
+}
 
-   fmpz_get_mpf(output, poly + n - 1);
- 
-   mpf_set_d(mpf_d, d); /* set fval to mpf from the double val */
+static dpe_t
+dpe_add(dpe_t x, dpe_t y)
+{
+    dpe_t res;
+    slong d;
 
-   if (dexp >= 0)
-       mpf_mul_2exp(mpf_d, mpf_d, dexp);
-   else
-       mpf_div_2exp(mpf_d, mpf_d, -dexp);
+    d = x.e - y.e;
 
-   for (i = n - 2; i >= 0; i--)
-   {
-      mpf_mul(output, output, mpf_d);
-      fmpz_get_mpf(mpf_coeff, poly + i);    
-      mpf_add(output, output, mpf_coeff);
-   }
+    if (x.m == 0.0)
+        return y;
 
-   res = flint_mpf_get_d_2exp(exp, output);
-   
-   if (mpf_sgn(output) < 0 && res >= 0.0)
-      res = -res; /* work around bug in earlier versions of GMP/MPIR */
+    if (y.m == 0.0)
+        return x;
 
-   mpf_clear(mpf_coeff);
-   mpf_clear(output);
-   mpf_clear(mpf_d);
+    if (d >= 0)
+    {
+        if (d > 53 + ADJUSTMENT_DELAY)
+            return x;
 
-   return res;
+        res.m = x.m + ldexp(y.m, -d);
+        res.e = x.e;
+    }
+    else
+    {
+        d = -d;
+
+        if (d > 53 + ADJUSTMENT_DELAY)
+            return y;
+
+        res.m = y.m + ldexp(x.m, -d);
+        res.e = y.e;
+    }
+
+    /* We delay adjustments */
+    /* DPE_ADJUST(res); */
+    return res;
+}
+
+static dpe_t
+dpe_mul(dpe_t x, dpe_t y)
+{
+    dpe_t res;
+    res.m = x.m * y.m;
+    res.e = x.e + y.e;
+
+    /* We delay adjustments */
+    /* DPE_ADJUST(res); */
+    return res;
+}
+
+double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
+{
+    dpe_t s, t, x;
+    slong i;
+
+    if (d == 0.0)
+        return fmpz_get_d_2exp(exp, poly + 0);
+
+    x = dpe_set_d_exp(d, dexp);
+    s = dpe_set_fmpz(poly + n - 1);
+
+    for (i = n - 2; i >= 0; i--)
+    {
+        s = dpe_mul(s, x);
+
+        if (!fmpz_is_zero(poly + i))
+        {
+            t = dpe_set_fmpz(poly + i);
+            s = dpe_add(s, t);
+        }
+
+        /* Delayed adjustments. */
+        if (i % ADJUSTMENT_DELAY == 0)
+            DPE_ADJUST(s);
+    }
+
+    DPE_ADJUST(s);
+
+    *exp = s.e;
+    return s.m;
 }
 
 double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n, double d)
 {
-    return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly, n, d, 0, 0);
+    return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly, n, d, 0);
 }
 
-double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, double d, slong dexp, ulong prec)
+double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, double d, slong dexp)
 {
    if (poly->length == 0)
    {
@@ -76,7 +149,7 @@ double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, do
       return 0.0;
    }
 
-   return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly->coeffs, poly->length, d, dexp, prec);
+   return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly->coeffs, poly->length, d, dexp);
 }
 
 
@@ -88,6 +161,5 @@ double fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz_poly_t poly, dou
       return 0.0;
    }
 
-   return _fmpz_poly_evaluate_horner_d_2exp(exp, poly->coeffs,
-                                                              poly->length, d);
+   return _fmpz_poly_evaluate_horner_d_2exp(exp, poly->coeffs, poly->length, d);
 }
