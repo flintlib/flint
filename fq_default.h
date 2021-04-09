@@ -72,6 +72,36 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
    }
 }
 
+FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
+       const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+{
+   fmpz const * p = fmpz_mod_ctx_modulus(mod_ctx);
+   int bits = fmpz_bits(p);
+   int d = fmpz_mod_poly_degree(modulus, mod_ctx);
+
+   if (bits*d <= 16 && n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16))
+   {
+      nmod_poly_t nmodulus;
+      ctx->type = 1;
+      nmod_poly_init(nmodulus, fmpz_get_ui(p));
+      fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
+      fq_zech_ctx_init_modulus(ctx->ctx.fq_zech, nmodulus, var);
+      nmod_poly_clear(nmodulus);
+   } else if (fmpz_abs_fits_ui(p))
+   {
+      nmod_poly_t nmodulus;
+      ctx->type = 2;
+      nmod_poly_init(nmodulus, fmpz_get_ui(p));
+      fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
+      fq_nmod_ctx_init_modulus(ctx->ctx.fq_nmod, nmodulus, var);
+      nmod_poly_clear(nmodulus);
+   } else
+   {
+      ctx->type = 3;
+      fq_ctx_init_modulus(ctx->ctx.fq, modulus, mod_ctx, var);
+   }
+}
+
 FQ_DEFAULT_INLINE void fq_default_ctx_clear(fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
@@ -206,6 +236,21 @@ FQ_DEFAULT_INLINE void fq_default_clear(fq_default_t rop,
    {
       fq_clear(rop->fq, ctx->ctx.fq);
    }
+}
+
+/* Predicates ****************************************************************/
+
+FQ_DEFAULT_INLINE int fq_default_is_invertible(const fq_default_t op,
+		                                    const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      return fq_zech_is_invertible(op->fq_zech, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      return fq_nmod_is_invertible(op->fq_nmod, ctx->ctx.fq_nmod);
+   }
+   return fq_is_invertible(op->fq, ctx->ctx.fq);
 }
 
 /* Basic arithmetic **********************************************************/
