@@ -159,3 +159,135 @@ void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1,
 {
     fmpq_poly_sub_can(res, poly1, poly2, 1);
 }
+
+void fmpq_poly_sub_si(fmpq_poly_t res, const fmpq_poly_t poly, slong c)
+{
+    if (c == 0)
+    {
+        fmpq_poly_set(res, poly);
+    }
+    else if (poly->length == 0)
+    {
+        fmpq_poly_set_si(res, c);
+        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+    }
+    else
+    {
+        fmpz_t p, q;
+        fmpz_init_set_si(p, c);
+        *q = 1;
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_set_length(res, poly->length);
+        _fmpq_poly_sub(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, p, q, 1);
+        _fmpq_poly_normalise(res);
+        fmpz_clear(p);
+    }
+}
+
+void fmpq_poly_si_sub(fmpq_poly_t res, slong c, const fmpq_poly_t poly)
+{
+    if (c == 0)
+    {
+        fmpq_poly_neg(res, poly);
+    }
+    else if (poly->length == 0)
+    {
+        fmpq_poly_set_si(res, c);
+    }
+    else
+    {
+        fmpz_t p, q;
+        fmpz_init_set_si(p, c);
+        *q = 1;
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_set_length(res, poly->length);
+        _fmpq_poly_sub(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, p, q, 1);
+        _fmpq_poly_normalise(res);
+        _fmpz_vec_neg(res->coeffs, res->coeffs, res->length);
+        fmpz_clear(p);
+    }
+}
+
+void fmpq_poly_sub_fmpz(fmpq_poly_t res, const fmpq_poly_t poly, const fmpz_t c)
+{
+    if (fmpz_is_zero(c))
+    {
+        fmpq_poly_set(res, poly);
+    }
+    else if (poly->length == 0)
+    {
+        fmpq_poly_set_fmpz(res, c);
+        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+    }
+    else
+    {
+        fmpz_t q;
+        *q = 1;
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_set_length(res, poly->length);
+        _fmpq_poly_sub(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, c, q, 1);
+        _fmpq_poly_normalise(res);
+    }
+}
+
+void fmpq_poly_fmpz_sub(fmpq_poly_t res, const fmpz_t c, const fmpq_poly_t poly)
+{
+    if (fmpz_is_zero(c))
+    {
+        fmpq_poly_neg(res, poly);
+    }
+    else if (poly->length == 0)
+    {
+        fmpq_poly_set_fmpz(res, c);
+    }
+    else
+    {
+        fmpz_t q;
+        *q = 1;
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_set_length(res, poly->length);
+        _fmpq_poly_sub(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, c, q, 1);
+        _fmpq_poly_normalise(res);
+        _fmpz_vec_neg(res->coeffs, res->coeffs, res->length);
+    }
+}
+
+void fmpq_poly_sub_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t c)
+{
+    if (fmpq_is_zero(c))
+    {
+        fmpq_poly_set(res, poly);
+    }
+    else if (poly->length == 0)
+    {
+        fmpq_poly_set_fmpq(res, c);
+        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+    }
+    else
+    {
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_set_length(res, poly->length);
+        _fmpq_poly_sub(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, fmpq_numref(c), fmpq_denref(c), 1);
+        _fmpq_poly_normalise(res);
+    }
+}
+
+void fmpq_poly_fmpq_sub(fmpq_poly_t res, const fmpq_t c, const fmpq_poly_t poly)
+{
+    if (fmpq_is_zero(c))
+    {
+        fmpq_poly_neg(res, poly);
+    }
+    else if (poly->length == 0)
+    {
+        fmpq_poly_set_fmpq(res, c);
+    }
+    else
+    {
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_set_length(res, poly->length);
+        _fmpq_poly_sub(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, fmpq_numref(c), fmpq_denref(c), 1);
+        _fmpq_poly_normalise(res);
+        _fmpz_vec_neg(res->coeffs, res->coeffs, res->length);
+    }
+}

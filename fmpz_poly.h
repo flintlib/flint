@@ -310,6 +310,13 @@ FLINT_DLL void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 FLINT_DLL void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
 
+FLINT_DLL void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
+FLINT_DLL void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
+FLINT_DLL void fmpz_poly_si_sub(fmpz_poly_t res, slong c, const fmpz_poly_t poly);
+FLINT_DLL void fmpz_poly_add_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_poly_sub_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_poly_fmpz_sub(fmpz_poly_t res, fmpz_t c, const fmpz_poly_t poly);
+
 /*  Scalar absolute value multiplication and division  ***********************/
 
 FLINT_DLL void fmpz_poly_scalar_abs(fmpz_poly_t res, const fmpz_poly_t poly);
@@ -1429,15 +1436,6 @@ FLINT_DLL void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
 FLINT_DLL void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
 
 FLINT_DLL void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
-
-/* Inlines *******************************************************************/
-
-FLINT_DLL void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
-FLINT_DLL void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
-FLINT_DLL void fmpz_poly_si_sub(fmpz_poly_t res, slong c, const fmpz_poly_t poly);
-FLINT_DLL void fmpz_poly_add_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c);
-FLINT_DLL void fmpz_poly_sub_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c);
-FLINT_DLL void fmpz_poly_fmpz_sub(fmpz_poly_t res, fmpz_t c, const fmpz_poly_t poly);
 
 #ifdef __cplusplus
 }

@@ -46,3 +46,67 @@ fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1,
     _fmpz_poly_set_length(res, max);
     _fmpz_poly_normalise(res);  /* there may have been cancellation */
 }
+
+void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c)
+{
+   if (poly->length == 0)
+   {
+      fmpz_poly_set_si(res, c);
+      fmpz_poly_neg(res, res);
+   }
+   else
+   {
+      fmpz_poly_set(res, poly);
+
+      if (c < 0)
+         fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, -c);
+      else
+         fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, c);
+
+      _fmpz_poly_normalise(res);
+   }
+}
+
+void fmpz_poly_si_sub(fmpz_poly_t res, slong c, const fmpz_poly_t poly)
+{
+    if (poly->length == 0)
+        fmpz_poly_set_si(res, c);
+    else
+    {
+        fmpz_poly_neg(res, poly);
+
+        if (c < 0)
+            fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, -c);
+         else
+            fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, c);
+
+        _fmpz_poly_normalise(res);
+    }
+}
+
+void fmpz_poly_sub_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c)
+{
+    if (poly->length == 0)
+    {
+        fmpz_poly_set_fmpz(res, c);
+        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+    }
+    else
+    {
+        fmpz_poly_set(res, poly);
+        fmpz_sub(res->coeffs + 0, res->coeffs + 0, c);
+        _fmpz_poly_normalise(res);
+    }
+}
+
+void fmpz_poly_fmpz_sub(fmpz_poly_t res, fmpz_t c, const fmpz_poly_t poly)
+{
+    if (poly->length == 0)
+        fmpz_poly_set_fmpz(res, c);
+    else
+    {
+        fmpz_poly_neg(res, poly);
+        fmpz_add(res->coeffs + 0, res->coeffs + 0, c);
+        _fmpz_poly_normalise(res);
+    }
+}
