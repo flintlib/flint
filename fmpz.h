@@ -627,6 +627,7 @@ fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
 }
 
 FLINT_DLL void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_gcd3(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c);
 
 FLINT_DLL void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
 

@@ -33,10 +33,7 @@ void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden,
         else if (can)
         {
             fmpz_init(d);
-            _fmpz_vec_content(d, rpoly, max);
-
-            if (!fmpz_is_one(d))
-                fmpz_gcd(d, d, den1);
+            _fmpz_vec_content_chained(d, rpoly, max, den1);
 
             if (fmpz_is_one(d))
                   fmpz_set(rden, den1);
@@ -93,9 +90,7 @@ void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden,
             {
                fmpz_t e;
                fmpz_init(e);
-               _fmpz_vec_content(e, rpoly, max);
-               if (!fmpz_is_one(e))
-                  fmpz_gcd(e, e, d);
+               _fmpz_vec_content_chained(e, rpoly, max, d);
             
                if (fmpz_is_one(e))
                   fmpz_mul(rden, den1, den22);

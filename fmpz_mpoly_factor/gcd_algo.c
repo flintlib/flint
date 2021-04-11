@@ -398,7 +398,7 @@ static void _do_trivial(
 
     fmpz_init(cG);
     _fmpz_vec_content(cG, A->coeffs, A->length);
-    _fmpz_vec_content_chained(cG, B->coeffs, B->length);
+    _fmpz_vec_content_chained(cG, B->coeffs, B->length, cG);
 
     _parallel_set(Abar, Bbar, A, B, ctx);
 
@@ -472,7 +472,7 @@ static int _do_monomial_gcd(
 
     /* compute the coefficient of G */
     fmpz_abs(g, B->coeffs + 0);
-    _fmpz_vec_content_chained(g, A->coeffs, A->length);
+    _fmpz_vec_content_chained(g, A->coeffs, A->length, g);
 
     _parallel_set(Abar, Bbar, A, B, ctx);
 

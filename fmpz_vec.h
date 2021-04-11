@@ -234,7 +234,7 @@ FLINT_DLL void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len,
 
 FLINT_DLL void _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len);
 
-FLINT_DLL void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len);
+FLINT_DLL void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp);
 
 FLINT_DLL void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len);
 

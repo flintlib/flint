@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 William Hart
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -18,12 +19,43 @@
 void
 _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len)
 {
-    fmpz_zero(res);
-    while (len--)
+    while (len > 0 && fmpz_is_zero(vec + 0))
     {
-        fmpz_gcd(res, res, vec + len);
-
-        if (fmpz_is_one(res))
-            return;
+        len--;
+        vec++;
     }
+
+    while (len > 1 && fmpz_is_zero(vec + len - 1))
+        len--;
+
+    if (len <= 2)
+    {
+        if (len == 0)
+            fmpz_zero(res);
+        else if (len == 1)
+            fmpz_abs(res, vec + 0);
+        else
+            fmpz_gcd(res, vec + 0, vec + 1);
+        return;
+    }
+
+    if (fmpz_is_pm1(vec + 0) || fmpz_is_pm1(vec + len - 1))
+    {
+        fmpz_one(res);
+        return;
+    }
+
+    fmpz_gcd3(res, vec + 0, vec + 1, vec + len - 1);
+    vec += 2;
+    len -= 3;
+
+    while (len >= 2 && !fmpz_is_one(res))
+    {
+        fmpz_gcd3(res, vec + 0, vec + len - 1, res);
+        vec++;
+        len -= 2;
+    }
+
+    if (len != 0 && !fmpz_is_one(res))
+        fmpz_gcd(res, res, vec + 0);
 }

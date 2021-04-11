@@ -1017,6 +1017,11 @@ Greatest common divisor
     result is always positive, even if one of `g` and `h` is
     negative.
 
+.. function:: void fmpz_gcd3(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c)
+
+    Sets `f` to the greatest common divisor of `a`, `b` and `c`.
+    This is equivalent to calling ``fmpz_gcd`` twice, but may be faster.
+
 .. function:: void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the least common multiple of `g` and `h`.  The 
