@@ -32,6 +32,17 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
+.. function:: void fq_default_ctx_init_modulus(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+
+    Initialises the context for the finite field defined by the given
+    polynomial ``modulus``. The characteristic will be the modulus of
+    the polynomial and the degree equal to its degree.
+    
+    Assumes that the characteristic is prime and the polynomial irreducible.
+
+    Assumes that the string ``var`` is a null-terminated string
+    of length at least one.
+    
 .. function:: void fq_default_ctx_clear(fq_default_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
