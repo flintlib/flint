@@ -33,10 +33,19 @@ main(void)
         fq_default_ctx_t ctx;
         fq_default_t fq;
         fmpz_t p;
+        fmpz_mod_ctx_t mod_ctx;
+	fmpz_mod_poly_t mod;
 
         fmpz_init(p);
         
         fmpz_set_ui(p, 3);
+
+        fmpz_mod_ctx_init(mod_ctx, p);
+        fmpz_mod_poly_init(mod, mod_ctx);
+
+	fmpz_mod_poly_set_coeff_si(mod, 0, 1, mod_ctx);
+	fmpz_mod_poly_set_coeff_si(mod, 1, 2, mod_ctx);
+        fmpz_mod_poly_set_coeff_si(mod, 3, 1, mod_ctx);
 
         fq_default_ctx_init(ctx, p, 3, "x");
 
@@ -46,7 +55,25 @@ main(void)
 
         fq_default_ctx_clear(ctx);
 
+        fq_default_ctx_init_modulus(ctx, mod, mod_ctx, "x");
+
+        fq_default_init(fq, ctx);
+
+        fq_default_clear(fq, ctx);	
+	 
+        fq_default_ctx_clear(ctx);
+
+        fmpz_mod_poly_set_coeff_si(mod, 16, 1, mod_ctx);
+
         fq_default_ctx_init(ctx, p, 16, "x");
+
+        fq_default_init(fq, ctx);
+
+        fq_default_clear(fq, ctx);
+
+        fq_default_ctx_clear(ctx);
+
+        fq_default_ctx_init_modulus(ctx, mod, mod_ctx, "x");
 
         fq_default_init(fq, ctx);
 
@@ -63,6 +90,17 @@ main(void)
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
+
+        fq_default_ctx_init_modulus(ctx, mod, mod_ctx, "x");
+
+        fq_default_init(fq, ctx);
+
+        fq_default_clear(fq, ctx);
+
+        fq_default_ctx_clear(ctx);
+
+	fmpz_mod_poly_clear(mod, mod_ctx);
+        fmpz_mod_ctx_clear(mod_ctx);
 
         fmpz_clear(p);
 
