@@ -82,6 +82,18 @@ Basic Operations
     Removes the highest possible power of ``p`` from ``f`` and
     returns the exponent.
 
+.. function:: slong fq_default_poly_factor_length(fq_default_poly_factor_t fac, const fq_default_ctx_t ctx)
+
+    Return the number of factors, not including the unit.
+
+.. function:: void fq_default_poly_factor_get_poly(fq_default_poly_t poly, const fq_default_poly_factor_t fac, slong i, const fq_default_ctx_t ctx)
+
+    Set ``poly`` to factor ``i`` of ``fac`` (numbering starts at zero).
+
+.. function:: slong fq_default_poly_factor_exp(fq_default_poly_factor_t fac, slong i, const fq_default_ctx_t ctx)
+
+    Return the exponent of factor ``i`` of ``fac``.
+
 
 Irreducibility Testing
 --------------------------------------------------------------------------------
