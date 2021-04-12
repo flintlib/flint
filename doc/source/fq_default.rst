@@ -96,6 +96,15 @@ Memory management
     Clears the element ``rop``.
 
 
+Predicates
+--------------------------------------------------------------------------------
+
+
+.. function:: int fq_default_is_invertible(const fq_default_t op, const fq_default_ctx_t ctx)
+
+    Return ``1`` if ``op`` is an invertible element.
+
+
 Basic arithmetic
 --------------------------------------------------------------------------------
 

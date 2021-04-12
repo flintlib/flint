@@ -138,6 +138,22 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_fit_length(fq_default_poly_t poly,
    }
 }
 
+FQ_DEFAULT_POLY_INLINE
+void _fq_default_poly_set_length(fq_default_poly_t poly,
+                                         slong len, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      _fq_zech_poly_set_length(poly->fq_zech, len, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      _fq_nmod_poly_set_length(poly->fq_nmod, len, ctx->ctx.fq_nmod);
+   } else
+   {
+      _fq_poly_set_length(poly->fq, len, ctx->ctx.fq);
+   }
+}
+
 FQ_DEFAULT_POLY_INLINE void fq_default_poly_clear(fq_default_poly_t poly,
                                                     const fq_default_ctx_t ctx)
 {
