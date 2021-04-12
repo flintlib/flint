@@ -155,7 +155,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_clear(fq_default_poly_t poly,
 
 /*  Polynomial parameters  ***************************************************/
 
-FQ_POLY_TEMPLATES_INLINE slong
+FQ_DEFAULT_POLY_INLINE slong
 fq_default_poly_length(const fq_default_poly_t poly,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -169,7 +169,7 @@ fq_default_poly_length(const fq_default_poly_t poly,
    return fq_poly_length(poly->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE slong
+FQ_DEFAULT_POLY_INLINE slong
 fq_default_poly_degree(const fq_default_poly_t poly,
                                                     const fq_default_ctx_t ctx)
 {
@@ -298,7 +298,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_swap(fq_default_poly_t op1,
    }
 }
 
-FQ_POLY_TEMPLATES_INLINE void
+FQ_DEFAULT_POLY_INLINE void
 fq_default_poly_zero(fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
@@ -453,7 +453,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_coeff(fq_default_poly_t poly,
    }
 }
 
-FQ_POLY_TEMPLATES_INLINE void 
+FQ_DEFAULT_POLY_INLINE void 
 fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
                            slong n, const fmpz_t x, const fq_default_ctx_t ctx)
 {
@@ -533,7 +533,7 @@ int fq_default_poly_equal_trunc(const fq_default_poly_t poly1,
    return fq_poly_equal_trunc(poly1->fq, poly2->fq, n, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_is_zero(const fq_default_poly_t poly,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -547,7 +547,7 @@ fq_default_poly_is_zero(const fq_default_poly_t poly,
    return fq_poly_is_zero(poly->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
@@ -560,7 +560,7 @@ fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
    return fq_poly_is_one(op->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
@@ -573,7 +573,7 @@ fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
    return fq_poly_is_unit(op->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_is_gen(const fq_default_poly_t poly,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -587,7 +587,7 @@ fq_default_poly_is_gen(const fq_default_poly_t poly,
    return fq_poly_is_gen(poly->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_equal_fq_default(const fq_default_poly_t poly,
                               const fq_default_t c, const fq_default_ctx_t ctx)
 {
@@ -1020,7 +1020,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_gcd(fq_default_poly_t rop,
    }
 }
 
-FQ_POLY_TEMPLATES_INLINE void
+FQ_DEFAULT_POLY_INLINE void
 fq_default_poly_xgcd(fq_default_poly_t G,
                        fq_default_poly_t S, fq_default_poly_t T,
                   const fq_default_poly_t A, const fq_default_poly_t B,
@@ -1055,7 +1055,7 @@ FQ_DEFAULT_POLY_INLINE ulong fq_default_poly_remove(fq_default_poly_t f,
    return fq_poly_remove(f->fq, g->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE void
+FQ_DEFAULT_POLY_INLINE void
 fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R,
                    const fq_default_poly_t A, const fq_default_poly_t B,
                                                     const fq_default_ctx_t ctx)
@@ -1074,7 +1074,7 @@ fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R,
    }
 }
 
-FQ_POLY_TEMPLATES_INLINE void
+FQ_DEFAULT_POLY_INLINE void
 fq_default_poly_rem(fq_default_poly_t R,
              const fq_default_poly_t A, const fq_default_poly_t B,
                                                     const fq_default_ctx_t ctx)
@@ -1091,7 +1091,7 @@ fq_default_poly_rem(fq_default_poly_t R,
    }
 }
 
-FQ_POLY_TEMPLATES_INLINE void
+FQ_DEFAULT_POLY_INLINE void
 fq_default_poly_inv_series(fq_default_poly_t Qinv,
                                const fq_default_poly_t Q, slong n,
                                                     const fq_default_ctx_t ctx)
@@ -1255,7 +1255,7 @@ FQ_DEFAULT_POLY_INLINE int fq_default_poly_fprint(FILE * file,
    return fq_poly_fprint(file, poly->fq, ctx->ctx.fq);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_print(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
@@ -1269,7 +1269,7 @@ fq_default_poly_print(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 }
 
 
-FQ_POLY_TEMPLATES_INLINE int
+FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_print_pretty(const fq_default_poly_t poly,
                                      const char *x, const fq_default_ctx_t ctx)
 {
@@ -1315,7 +1315,7 @@ char * fq_default_poly_get_str(const fq_default_poly_t poly,
 
 /* Characteristic polynomial *************************************************/
 
-FQ_POLY_TEMPLATES_INLINE
+FQ_DEFAULT_POLY_INLINE
 void fq_default_mat_charpoly(fq_default_poly_t p,
                           const fq_default_mat_t M, const fq_default_ctx_t ctx)
 {
