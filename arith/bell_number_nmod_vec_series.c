@@ -34,7 +34,7 @@ arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
     }
     tmp[0] = UWORD(0);
 
-    _nmod_poly_exp_series(res, tmp, n, mod);
+    _nmod_poly_exp_series(res, tmp, n, n, mod);
 
     /* Multiply by factorials */
     c = UWORD(1);

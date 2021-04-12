@@ -28,7 +28,7 @@ _nmod_poly_power_sums_to_poly_schoenhage(mp_ptr res, mp_srcptr poly, slong len,
 
     _nmod_vec_neg(t, poly + 1, len - 1, mod);
     _nmod_poly_integral(t, t, len, mod);
-    _nmod_poly_exp_series2(res, t, len, d + 1, mod);
+    _nmod_poly_exp_series(res, t, len, d + 1, mod);
     _nmod_poly_reverse(res, res, d + 1, d + 1);
 
     flint_free(t);
