@@ -116,22 +116,33 @@ void
 fmpz_poly_roots_padic (fmpz_poly_roots_padic_t roots, fmpz_poly_t poly,
 		       padic_ctx_t pctx)
 {
-  slong j;
+  slong j, k, multiplicity;
   fq_ctx_t fctx;
   fmpz_poly_roots_fq_t froots;
+  fmpz_poly_t tmp_poly;
   
   fq_ctx_init (fctx, pctx->p, 1, "a");
   
   fmpz_poly_roots_fq (froots, poly, fctx);
   fmpz_poly_roots_padic_init2 (roots, froots->num);
+
+  fmpz_poly_init(tmp_poly);
   
   for (j = 0; j < roots->num; j++)
     {
-      *(roots->multiplicity + j) = *(froots->multiplicity + j);
+      multiplicity = *(froots->multiplicity + j);
+      *(roots->multiplicity + j) = multiplicity;
+      fmpz_poly_set(tmp_poly, poly);
+      if( multiplicity > 1 ) {
+	for(k = 1; k < multiplicity; k++) {
+	  fmpz_poly_derivative(tmp_poly, tmp_poly);
+	}
+      }
       padic_set_fmpz (roots->x0 + j, (froots->x0 + j)->coeffs, pctx);
-      padic_hensel_iteration (poly, roots->x0 + j, pctx);
+      padic_hensel_iteration (tmp_poly, roots->x0 + j, pctx);
     }
-  
+
+  fmpz_poly_clear(tmp_poly);
   fq_ctx_clear (fctx);
   fmpz_poly_roots_fq_clear (froots, fctx);
 }

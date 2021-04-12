@@ -114,23 +114,26 @@ void
 fmpz_poly_roots_qadic (fmpz_poly_roots_qadic_t roots, fmpz_poly_t poly,
 		       qadic_ctx_t qctx)
 {
-  slong j, k;
-  
+  slong j, k, multiplicity;
   fq_ctx_t fctx;
   fmpz_poly_roots_fq_t froots;
+  fmpz_poly_t tmp_poly;
   qadic_t q, a;
   
   fq_ctx_init (fctx, (qctx->pctx).p, qadic_ctx_degree (qctx), "a");
   fmpz_poly_roots_fq (froots, poly, fctx);
   fmpz_poly_roots_qadic_init2 (roots, froots->num);
- 
+  
+  fmpz_poly_init(tmp_poly);
+  
   qadic_init (q);
   qadic_init (a);
   qadic_gen (q, qctx);
   
   for (j = 0; j < roots->num; j++)
     {
-      *(roots->multiplicity + j) = *(froots->multiplicity + j);
+      multiplicity = *(froots->multiplicity + j);
+      *(roots->multiplicity + j) = multiplicity;
       padic_poly_set_fmpz (roots->x0 + j,
 			   (froots->x0 + j)->coeffs + (froots->x0 +
 						       j)->length - 1,
@@ -142,7 +145,13 @@ fmpz_poly_roots_qadic (fmpz_poly_roots_qadic_t roots, fmpz_poly_t poly,
 			       &(qctx->pctx));
 	  qadic_add (roots->x0 + j, roots->x0 + j, a, qctx);
 	}
-      qadic_hensel_iteration (poly, roots->x0 + j, qctx);
+      fmpz_poly_set(tmp_poly, poly);
+      if( multiplicity > 1 ) {
+	for(k = 1; k < multiplicity; k++) {
+	  fmpz_poly_derivative(tmp_poly, tmp_poly);
+	}
+      }
+      qadic_hensel_iteration (tmp_poly, roots->x0 + j, qctx);
     }
   
   qadic_clear (a);
