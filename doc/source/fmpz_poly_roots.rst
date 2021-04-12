@@ -22,7 +22,7 @@ Type containing the information of roots over a finite field.
 Memory management
 _________________
 
-.. function:: void fmpz_poly_roots_fq_init2 (fmpz_poly_roots_fq_t roots, slong n, fq_ctx_ fctx)
+.. function:: void fmpz_poly_roots_fq_init2 (fmpz_poly_roots_fq_t roots, slong n, fq_ctx_t fctx)
 
 	Initializes ``roots`` for use, with context ``fctx``
 	to contain at most ``n`` roots. A corresponding call to
@@ -87,7 +87,7 @@ Type containing the information of roots over a p-adic field.
 Memory management
 _________________
 
-.. function:: void fmpz_poly_roots_padic_init2 (fmpz_poly_roots_padic_t roots, slong n, fq_ctx_ fctx)
+.. function:: void fmpz_poly_roots_padic_init2 (fmpz_poly_roots_padic_t roots, slong n, fq_ctx_t fctx)
 
 	Initializes ``roots`` for use, with context ``fctx``
 	to contain at most ``n`` roots. A corresponding call to :func:`fmpz_poly_roots_padic_clear` must be made to free the memory
@@ -141,7 +141,7 @@ extension over p-adic field.
 Memory management
 _________________
 
-.. function:: void fmpz_poly_roots_qadic_init2 (fmpz_poly_roots_qadic_t roots, slong n, fq_ctx_ fctx)
+.. function:: void fmpz_poly_roots_qadic_init2 (fmpz_poly_roots_qadic_t roots, slong n, fq_ctx_t fctx)
 
 	Initializes ``roots`` for use, with context ``fctx``
 	to contain at most ``n`` roots. A corresponding call to
