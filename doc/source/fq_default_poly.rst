@@ -57,6 +57,10 @@ Memory management
     Clears the given polynomial, releasing any memory used.  It must
     be reinitialised in order to be used again.
 
+.. function:: void _fq_default_poly_set_length(fq_default_poly_t poly, slong len, const fq_default_ctx_t ctx)
+
+    Set the length of ``poly`` to ``len``.
+
 .. function:: void fq_default_poly_truncate(fq_default_poly_t poly, slong newlen, const fq_default_ctx_t ctx)
 
     Truncates the polynomial to length at most `n`.
