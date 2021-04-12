@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,63 +15,46 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-/* Avoid computing every reciprocal */
-#if FLINT64
-#define PROD_TAKE4 UWORD(65535)
-#define PROD_TAKE3 UWORD(2642245)
-#define PROD_TAKE2 UWORD(4294967295)
-#else
-#define PROD_TAKE4 UWORD(255)
-#define PROD_TAKE3 UWORD(1625)
-#define PROD_TAKE2 UWORD(65535)
-#endif
-
-#define MUL3(xx,yy,zz) n_mulmod2_preinv(xx,\
-    n_mulmod2_preinv(yy,zz,mod.n,mod.ninv),mod.n,mod.ninv);
-
-void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
+void _nmod_poly_integral(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
 {
-    mp_limb_t r;
-    slong k = len - 1;
-
-    while (k > 0)
+    if (len > 2)
     {
-        if (k > 3 && k < PROD_TAKE4)
+        slong k;
+        mp_limb_t t, u;
+
+        res[len - 1] = poly[len - 2];
+        t = len - 1;
+        for (k = len - 2; k >= 2; k--)
         {
-            r = k*(k-1)*(k-2)*(k-3);
-            r = n_invmod(r >= mod.n ? r % mod.n : r, mod.n);
-            x_int[k]   = MUL3(x[k-1], r, (k-1)*(k-2)*(k-3));
-            x_int[k-1] = MUL3(x[k-2], r, k*(k-2)*(k-3));
-            x_int[k-2] = MUL3(x[k-3], r, k*(k-1)*(k-3));
-            x_int[k-3] = MUL3(x[k-4], r, k*(k-1)*(k-2));
-            k -= 4;
+            res[k] = n_mulmod2_preinv(poly[k - 1], t, mod.n, mod.ninv);
+            umul_ppmm(u, t, t, k);
+            if (u != 0)
+                t = n_ll_mod_preinv(u, t, mod.n, mod.ninv);
         }
-        else if (k > 2 && k < PROD_TAKE3)
+
+        if (t >= mod.n)
+            t = n_mod2_preinv(t, mod.n, mod.ninv);
+        t = n_invmod(t, mod.n);
+
+        res[2] = n_mulmod2_preinv(res[2], t, mod.n, mod.ninv);
+        t = n_addmod(t, t, mod.n);
+
+        if (len >= 4)
         {
-            r = k*(k-1)*(k-2);
-            r = n_invmod(r >= mod.n ? r % mod.n : r, mod.n);
-            x_int[k]   = MUL3(x[k-1], r, (k-1)*(k-2));
-            x_int[k-1] = MUL3(x[k-2], r, k*(k-2));
-            x_int[k-2] = MUL3(x[k-3], r, k*(k-1));
-            k -= 3;
-        }
-        else if (k > 1 && k < PROD_TAKE2)
-        {
-            r = k*(k-1);
-            r = n_invmod(r >= mod.n ? r % mod.n : r, mod.n);
-            x_int[k]   = MUL3(x[k-1], r, k-1);
-            x_int[k-1] = MUL3(x[k-2], r, k);
-            k -= 2;
-        }
-        else
-        {
-            r = n_invmod(k >= mod.n ? k % mod.n : k, mod.n);
-            x_int[k] = n_mulmod2_preinv(x[k-1], r, mod.n, mod.ninv);
-            k -= 1;
+            res[3] = n_mulmod2_preinv(res[3], t, mod.n, mod.ninv);
+
+            for (k = 4; k < len; k++)
+            {
+                t = n_mulmod2_preinv(t, k - 1, mod.n, mod.ninv);
+                res[k] = n_mulmod2_preinv(res[k], t, mod.n, mod.ninv);
+            }
         }
     }
 
-    x_int[0] = UWORD(0);
+    if (len >= 2)
+        res[1] = poly[0];
+
+    res[0] = 0;
 }
 
 void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
