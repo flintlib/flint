@@ -110,6 +110,34 @@ void fq_default_poly_factor_fit_length(fq_default_poly_factor_t fac,
 }
 
 FQ_DEFAULT_POLY_FACTOR_INLINE
+slong fq_default_poly_factor_length(fq_default_poly_factor_t fac,
+                                                   const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      return fac->fq_zech->num;
+   } else if (ctx->type == 2)
+   {
+      return fac->fq_nmod->num;
+   }
+   return fac->fq->num;
+}
+
+FQ_DEFAULT_POLY_FACTOR_INLINE
+slong fq_default_poly_factor_exp(fq_default_poly_factor_t fac, slong i,
+                                                   const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      return fac->fq_zech->exp[i];
+   } else if (ctx->type == 2)
+   {
+      return fac->fq_nmod->exp[i];
+   }
+   return fac->fq->exp[i];
+}
+
+FQ_DEFAULT_POLY_FACTOR_INLINE
 void fq_default_poly_factor_set(fq_default_poly_factor_t res,
                 const fq_default_poly_factor_t fac, const fq_default_ctx_t ctx)
 {
@@ -140,6 +168,24 @@ void fq_default_poly_factor_insert(fq_default_poly_factor_t fac,
    } else
    {
       fq_poly_factor_insert(fac->fq, poly->fq, exp, ctx->ctx.fq);
+   }
+}
+
+FQ_DEFAULT_POLY_FACTOR_INLINE
+void fq_default_poly_factor_get_poly(fq_default_poly_t poly,
+       const fq_default_poly_factor_t fac, slong i, const fq_default_ctx_t ctx)
+{
+   if (ctx->type == 1)
+   {
+      fq_zech_poly_factor_get_poly(poly->fq_zech,
+                                            fac->fq_zech, i, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fq_nmod_poly_factor_get_poly(poly->fq_nmod,
+                                            fac->fq_nmod, i, ctx->ctx.fq_nmod);
+   } else
+   {
+      fq_poly_factor_get_poly(poly->fq, fac->fq, i, ctx->ctx.fq);
    }
 }
 

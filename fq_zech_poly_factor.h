@@ -45,4 +45,7 @@ int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length
 #undef CAP_T
 #undef T
 
+FLINT_DLL void fq_zech_poly_factor_get_poly(fq_zech_poly_t z,
+            const fq_zech_poly_factor_t fac, slong i, const fq_zech_ctx_t ctx);
+
 #endif
