@@ -376,6 +376,32 @@ void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
    }
 }
 
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
+		             const fmpz_mat_t mat2, const fq_default_ctx_t ctx)
+{
+   fmpz_mod_mat_t mod_mat;
+   if (ctx->type == 1)
+   {
+      fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c,
+		                          fq_zech_ctx_prime(ctx->ctx.fq_zech));
+      fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
+      fq_zech_mat_set_fmpz_mod_mat(mat1->fq_zech, mod_mat, ctx->ctx.fq_zech);
+   } else if (ctx->type == 2)
+   {
+      fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c,
+		                          fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+      fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
+      fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mod_mat, ctx->ctx.fq_nmod);
+   } else
+   {
+      fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, fq_ctx_prime(ctx->ctx.fq));
+      fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
+      fq_mat_set_fmpz_mod_mat(mat1->fq, mod_mat, ctx->ctx.fq);
+   }
+   fmpz_mod_mat_clear(mod_mat);
+}
+
 /* Windows and concatenation */
 
 FQ_DEFAULT_MAT_INLINE

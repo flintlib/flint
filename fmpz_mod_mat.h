@@ -201,6 +201,11 @@ void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
     fmpz_mat_transpose(B->mat, A->mat);
 }
 
+/* Conversions */
+
+FLINT_DLL void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B);
+
+FLINT_DLL void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B);
 
 /* Addition and subtraction */
 

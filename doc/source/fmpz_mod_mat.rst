@@ -171,6 +171,17 @@ Set and transpose
     Set ``B`` to the transpose of ``A``.
 
 
+Conversions
+-------------------------------------------------------------------------------
+
+.. function:: void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B)
+
+    Set ``A`` to the matrix ``B`` reducing modulo the modulus of ``A``.
+
+.. function::  void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B)
+
+    Set ``A`` to a lift of ``B``.
+
 Addition and subtraction
 -------------------------------------------------------------------------------
 
