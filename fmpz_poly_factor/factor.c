@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include "fmpz_poly.h"
 
-void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
+void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int deflation)
 {
     const slong lenG = G->length;
     fmpz_poly_t g;
@@ -47,7 +47,7 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
     }
     else
     {
-        slong j, k;
+        slong i, j, k, d;
         fmpz_poly_factor_t sq_fr_fac;
 
         /* Does a presearch for a factor of form x^k */
@@ -65,23 +65,53 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 
         fmpz_poly_shift_right(g, G, k);
 
-        /* Could make other tests for x-1 or simple things 
-           maybe take advantage of the composition algorithm */
-        fmpz_poly_factor_init(sq_fr_fac);
-        fmpz_poly_factor_squarefree(sq_fr_fac, g);
-
-        fmpz_set(&fac->c, &sq_fr_fac->c);
-
-        /* Factor each square-free part */
-        for (j = 0; j < sq_fr_fac->num; j++)
+        if (deflation && (d = fmpz_poly_deflation(G)) > 1)
         {
-            _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j],
-                                                       sq_fr_fac->p + j, 8, 1);
-        }
+            fmpz_poly_factor_t gfac;
+            fmpz_poly_factor_init(gfac);
 
-        fmpz_poly_factor_clear(sq_fr_fac);
+            fmpz_poly_deflate(g, g, d);
+            fmpz_poly_factor(gfac, g);
+            fmpz_set(&fac->c, &gfac->c);
+
+            for (i = 0; i < gfac->num; i++)
+            {
+                fmpz_poly_factor_t hfac;
+                fmpz_poly_factor_init(hfac);
+                fmpz_poly_inflate(gfac->p + i, gfac->p + i, d);
+                fmpz_poly_factor_deflation(hfac, gfac->p + i, 0);
+
+                for (j = 0; j < hfac->num; j++)
+                    fmpz_poly_factor_insert(fac, hfac->p + j, gfac->exp[i] * hfac->exp[j]);
+
+                fmpz_poly_factor_clear(hfac);
+            }
+
+            fmpz_poly_factor_clear(gfac);
+        }
+        else
+        {
+            /* Could make other tests for x-1 or simple things 
+               maybe take advantage of the composition algorithm */
+            fmpz_poly_factor_init(sq_fr_fac);
+            fmpz_poly_factor_squarefree(sq_fr_fac, g);
+
+            fmpz_set(&fac->c, &sq_fr_fac->c);
+
+            /* Factor each square-free part */
+            for (j = 0; j < sq_fr_fac->num; j++)
+            {
+                _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j],
+                                                           sq_fr_fac->p + j, 8, 1);
+            }
+
+            fmpz_poly_factor_clear(sq_fr_fac);
+        }
     }
     fmpz_poly_clear(g);
 }
 
-
+void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
+{
+    fmpz_poly_factor_deflation(fac, G, 1);
+}
