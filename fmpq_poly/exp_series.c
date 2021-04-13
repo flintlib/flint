@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2011, 2014 Fredrik Johansson
+    Copyright (C) 2011, 2014, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -22,12 +22,17 @@ fmpz_gcd_ui(const fmpz_t x, ulong c)
     return n_gcd(c, fmpz_fdiv_ui(x, c));
 }
 
+/* Basecase algorithm, given a precomputed derivative of
+   of the input series (Alen still refers to the length
+   of the original series). */
 void
-_fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
-    const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
+_fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
+    const fmpz * Aprime, const fmpz_t Aden, slong Alen, slong n)
 {
     fmpz_t t, u;
     slong j, k;
+
+    Alen = FLINT_MIN(Alen, n);
 
     fmpz_init(t);
     fmpz_init(u);
@@ -40,13 +45,10 @@ _fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
 
     for (k = 1; k < n; k++)
     {
-        fmpz_zero(t);
+        fmpz_mul(t, Aprime, B + k - 1);
 
-        for (j = 1; j < FLINT_MIN(Alen, k + 1); j++)
-        {
-            fmpz_mul_ui(u, A + j, j);
-            fmpz_addmul(t, u, B + k - j);
-        }
+        for (j = 2; j < FLINT_MIN(Alen, k + 1); j++)
+            fmpz_addmul(t, Aprime + j - 1, B + k - j);
 
         fmpz_mul_ui(u, Aden, k);
         fmpz_divexact(B + k, t, u);
@@ -58,42 +60,218 @@ _fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
     fmpz_clear(u);
 }
 
+/* Basecase algorithm; supports aliasing and guarantees canonical output. */
 void
-_fmpq_poly_exp_series_newton(fmpz * g, fmpz_t gden,
-                    const fmpz * h, const fmpz_t hden, slong hlen, slong n)
+_fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
+    const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
 {
-    slong m;
-    fmpz * t, * u;
-    fmpz_t tden, uden;
+    fmpz * Aprime;
+    fmpz_t Aden2;
+
+    Alen = FLINT_MIN(Alen, n);
+
+    Aprime = _fmpz_vec_init(Alen - 1);
+    fmpz_init(Aden2);
+
+    /* There is probably not much content, so avoid the overhead of canonicalising. */
+    if (Alen <= 6)
+    {
+        _fmpz_poly_derivative(Aprime, A, Alen);
+        fmpz_set(Aden2, Aden);
+    }
+    else
+    {
+        _fmpq_poly_derivative(Aprime, Aden2, A, Aden, Alen);
+    }
+
+    _fmpq_poly_exp_series_basecase_deriv(B, Bden, Aprime, Aden2, Alen, n);
+
+    _fmpz_vec_clear(Aprime, Alen - 1);
+    fmpz_clear(Aden2);
+}
+
+/* c_k x^k -> c_k x^k / (m+k) */
+/* Todo: actually compute lcm(m,m+1,...) instead of m*(m+1)...
+   to reduce the content. */
+void
+_fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, slong m)
+{
+    slong k;
+    fmpz_t t;
+    fmpz_init(t);
+
+    fmpz_one(t);
+    for (k = len - 1; k >= 0; k--)
+    {
+        fmpz_mul(rpoly + k, poly + k, t);
+        fmpz_mul_ui(t, t, m + k);
+    }
+
+    fmpz_mul(rden, den, t);
+
+    fmpz_one(t);
+    for (k = 0; k < len; k++)
+    {
+        fmpz_mul(rpoly + k, rpoly + k, t);
+        fmpz_mul_ui(t, t, m + k);
+    }
+
+    _fmpq_poly_canonicalise(rpoly, rden, len);
+    fmpz_clear(t);
+}
+
+static void
+MULLOW(fmpz * z, fmpz_t zden, const fmpz * x, const fmpz_t xden, slong xn, const fmpz * y, const fmpz_t yden, slong yn, slong n)
+{
+    if (xn + yn - 1 < n)
+        flint_abort();
+
+    if (xn >= yn)
+        _fmpz_poly_mullow(z, x, xn, y, yn, n);
+    else
+        _fmpz_poly_mullow(z, y, yn, x, xn, n);
+
+    fmpz_mul(zden, xden, yden);
+}
+
+/* Assuming that the low m coefficients of poly have denominator
+   den in canonical form and that the high n - m coefficients have
+   denominator high_den in canonical form, combine the high and lower
+   parts and put the polynomial in canonical form {poly, den, n}. */
+static void
+CONCATENATE(fmpz * poly, fmpz_t den, const fmpz_t high_den, slong m, slong n)
+{
+    fmpz_t gcd, d1, d2;
+
+    fmpz_init(gcd);
+    fmpz_init(d1);
+    fmpz_init(d2);
+
+    fmpz_gcd(gcd, den, high_den);
+    fmpz_divexact(d1, high_den, gcd);
+    fmpz_divexact(d2, den, gcd);
+
+    _fmpz_vec_scalar_mul_fmpz(poly, poly, m, d1);
+    _fmpz_vec_scalar_mul_fmpz(poly + m, poly + m, n - m, d2);
+
+    fmpz_mul(den, d2, high_den);
+
+    fmpz_clear(gcd);
+    fmpz_clear(d1);
+    fmpz_clear(d2);
+}
+
+/* Newton iteration. If g == NULL, computes {f, fden, n} = exp({h, hden, hlen}).
+   If g != NULL, simultaneously computes {g, gden, n} = exp(-{h, hden, hlen}).
+   Allows aliasing between (f, fden) and (h, hden) but not with (g, gden). */
+void
+_fmpq_poly_exp_series_newton(fmpz * f, fmpz_t fden,
+    fmpz * g, fmpz * gden,
+    const fmpz * h, const fmpz_t hden,
+    slong hlen, slong n)
+{
+    slong a[FLINT_BITS];
+    slong original_n, i, m, l, r, cutoff;
+    fmpz * t, * hprime;
+    fmpz_t tden, hprimeden, uden, d, hdenin;
+    int inverse;
+
+    /* If g is provided, we compute g = exp(-h), and we can use g as
+       scratch space. Otherwise, we still need to compute exp(-h) to length
+       (n+1)/2 for intermediate use, and we still need n coefficients of
+       scratch space. */
+    original_n = n;
+    inverse = (g != NULL);
+    if (!inverse)
+    {
+        g = _fmpz_vec_init(n + 1);
+        gden = g + n;
+    }
 
     hlen = FLINT_MIN(hlen, n);
 
-    if (hlen < 10)
+    t = _fmpz_vec_init(n);
+    hprime = _fmpz_vec_init(hlen - 1);
+    fmpz_init(tden);
+    fmpz_init(hprimeden);
+    fmpz_init(uden);
+    fmpz_init(d);
+    fmpz_init(hdenin);
+
+    /* Precompute h' which is needed throughout. We will not
+       canonicalise immediately; we want the truncated series
+       to have minimal content in each step of the Newton iteration,
+       so we canonicalise gradually. */
+    fmpz_set(hdenin, hden);
+    fmpz_set(hprimeden, hden);
+    _fmpz_poly_derivative(hprime, h, hlen);
+
+    cutoff = 20 + 1000 / n_sqrt(fmpz_bits(hden));
+
+    for (i = 1; (WORD(1) << i) < n; i++);
+    a[i = 0] = n;
+    while (n >= cutoff || i == 0)
+        a[++i] = (n = (n + 1) / 2);
+
+    /* Canonicalise h' for first step. */
+    _fmpq_poly_canonicalise(hprime, hprimeden, FLINT_MIN(n, hlen) - 1);
+
+    /* Initial approximation f := exp(h) + O(x^n) using basecase algorithm. */
+    _fmpq_poly_exp_series_basecase_deriv(f, fden, hprime, hprimeden, hlen, n);
+
+    /* Initial approximation of inverse g := exp(-h) + O(x^n) */
+    _fmpq_poly_inv_series(g, gden, f, fden, n, n);
+
+    for (i--; i >= 0; i--)
     {
-        _fmpq_poly_exp_series_basecase(g, gden, h, hden, hlen, n);
-        return;
+        m = n;             /* previous length */
+        n = a[i];          /* new length */
+
+        l = FLINT_MIN(hlen, n) - 1;
+        r = FLINT_MIN(l + m - 1, n - 1);
+
+        /* Extend h' */
+        if (l > m - 1)
+        {
+            fmpz_set(uden, hdenin);
+            _fmpq_poly_canonicalise(hprime + m - 1, uden, l - m + 1);
+            CONCATENATE(hprime, hprimeden, uden, m - 1, l);
+        }
+
+        MULLOW(t, tden, hprime, hprimeden, l, f, fden, m, r);
+        _fmpq_poly_canonicalise(t + m - 1, tden, r + 1 - m);
+        MULLOW(g + m, uden, g, gden, n - m, t + m - 1, tden, r + 1 - m, n - m);
+        _fmpq_poly_canonicalise(g + m, uden, n - m);
+        _fmpq_poly_integral_offset(g + m, uden, g + m, uden, n - m, m);
+        MULLOW(f + m, uden, f, fden, n - m, g + m, uden, n - m, n - m);
+        /* Assuming that the low part is canonicalised on input,
+           we just need to canonicalise the high part. */
+        _fmpq_poly_canonicalise(f + m, uden, n - m);
+        CONCATENATE(f, fden, uden, m, n);
+
+        /* g := exp(-h) + O(x^n); not needed if we only want exp(x) */
+        if (i != 0 || inverse)
+        {
+            MULLOW(t, tden, f, fden, n, g, gden, m, n);
+            _fmpq_poly_canonicalise(t + m, tden, n - m);
+            MULLOW(g + m, uden, g, gden, m, t + m, tden, n - m, n - m);
+            /* Assuming that the low part is canonicalised on input,
+               we just need to canonicalise the high part. */
+            _fmpq_poly_canonicalise(g + m, uden, n - m);
+            CONCATENATE(g, gden, uden, m, n);
+            _fmpz_vec_neg(g + m, g + m, n - m);
+        }
     }
 
-    m = (n + 1) / 2;
-    _fmpq_poly_exp_series(g, gden, h, hden, hlen, m);
-    _fmpz_vec_zero(g + m, n - m);
-
-    t = _fmpz_vec_init(n);
-    u = _fmpz_vec_init(n);
-    fmpz_init(tden);
-    fmpz_init(uden);
-
-    _fmpq_poly_log_series(t, tden, g, gden, m, n);
-    _fmpq_poly_sub(t, tden, t, tden, n, h, hden, hlen);
-    /* TODO: half of product is redundant! */
-    _fmpq_poly_mullow(u, uden, t, tden, n, g, gden, m, n);
-    _fmpq_poly_sub(g, gden, g, gden, m, u, uden, n);
-    _fmpq_poly_canonicalise(g, gden, n);
-
+    _fmpz_vec_clear(hprime, hlen - 1);
+    _fmpz_vec_clear(t, original_n);
     fmpz_clear(tden);
+    fmpz_clear(hprimeden);
     fmpz_clear(uden);
-    _fmpz_vec_clear(t, n);
-    _fmpz_vec_clear(u, n);
+    fmpz_clear(d);
+    fmpz_clear(hdenin);
+    if (!inverse)
+        _fmpz_vec_clear(g, original_n + 1);
 }
 
 void
@@ -160,13 +338,13 @@ _fmpq_poly_exp_series(fmpz * B, fmpz_t Bden,
         return;
     }
 
-    if (Alen < 15)
+    if (Alen <= 12 || n <= 10 + 1000 / n_sqrt(fmpz_bits(Aden)))
     {
         _fmpq_poly_exp_series_basecase(B, Bden, A, Aden, Alen, n);
     }
     else
     {
-        _fmpq_poly_exp_series_newton(B, Bden, A, Aden, Alen, n);
+        _fmpq_poly_exp_series_newton(B, Bden, NULL, NULL, A, Aden, Alen, n);
     }
 }
 
@@ -190,23 +368,9 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
         flint_abort();
     }
 
-    if (res != poly)
-    {
-        fmpq_poly_fit_length(res, n);
-        _fmpq_poly_exp_series(res->coeffs, res->den,
-            poly->coeffs, poly->den, poly->length, n);
-    }
-    else
-    {
-        fmpq_poly_t t;
-        fmpq_poly_init2(t, n);
-        _fmpq_poly_exp_series(t->coeffs, t->den,
-            poly->coeffs, poly->den, poly->length, n);
-        fmpq_poly_swap(res, t);
-        fmpq_poly_clear(t);
-    }
-
+    fmpq_poly_fit_length(res, n);
+    _fmpq_poly_exp_series(res->coeffs, res->den,
+        poly->coeffs, poly->den, poly->length, n);
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
 }
-

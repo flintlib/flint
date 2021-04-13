@@ -32,7 +32,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         slong n = n_randint(state, 50) + 1;
@@ -65,10 +65,10 @@ main(void)
     }
 
     /* Check exp(a+b) = exp(a) * exp(b) */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, ab, expa, expb, expab, expa_expb;
-        slong n = n_randint(state, 80) + 1;
+        slong n = n_randint(state, 20) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -78,10 +78,10 @@ main(void)
         fmpq_poly_init(expab);
         fmpq_poly_init(expa_expb);
 
-        fmpq_poly_randtest_not_zero(a, state, n_randint(state, 60) + 1, 80);
+        fmpq_poly_randtest(a, state, n_randint(state, 20) + 1, 1 + n_randint(state, 80));
         fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
-        fmpq_poly_randtest_not_zero(b, state, n_randint(state, 60) + 1, 80);
+        fmpq_poly_randtest(b, state, n_randint(state, 20) + 1, 1 + n_randint(state, 80));
         fmpq_poly_set_coeff_ui(b, 0, UWORD(0));
 
         fmpq_poly_add(ab, a, b);
@@ -114,6 +114,59 @@ main(void)
         fmpq_poly_clear(expb);
         fmpq_poly_clear(expab);
         fmpq_poly_clear(expa_expb);
+    }
+
+    /* Compare with nmod_poly_exp */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        fmpq_poly_t a, expa;
+        nmod_poly_t pa, pexpa, pexpa2;
+        ulong p;
+        slong n = n_randint(state, 200) + 1;
+
+        fmpq_poly_init(a);
+        fmpq_poly_init(expa);
+
+        p = n_nextprime((UWORD(1) << (FLINT_BITS - 1)) + 1000, 0);
+
+        nmod_poly_init(pa, p);
+        nmod_poly_init(pexpa, p);
+        nmod_poly_init(pexpa2, p);
+
+        fmpq_poly_randtest(a, state, n_randint(state, 200) + 1, 1 + n_randint(state, 200));
+        fmpz_randtest_not_zero(fmpq_poly_denref(a), state, 1 + n_randint(state, 200));
+        fmpq_poly_canonicalise(a);
+
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
+
+        fmpq_poly_get_nmod_poly(pa, a);
+        nmod_poly_exp_series(pexpa, pa, n);
+
+        if (n_randint(state, 2))
+        {
+            fmpq_poly_exp_series(expa, a, n);
+        }
+        else
+        {
+            fmpq_poly_set(expa, a);
+            fmpq_poly_exp_series(expa, expa, n);
+        }
+
+        fmpq_poly_get_nmod_poly(pexpa2, expa);
+
+        if (!fmpq_poly_is_canonical(expa) || !nmod_poly_equal(pexpa, pexpa2))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("exp(a) = "), fmpq_poly_debug(expa), flint_printf("\n\n");
+            abort();
+        }
+
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(expa);
+        nmod_poly_clear(pa);
+        nmod_poly_clear(pexpa);
+        nmod_poly_clear(pexpa2);
     }
 
     FLINT_TEST_CLEANUP(state);

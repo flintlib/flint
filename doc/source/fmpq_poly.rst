@@ -1121,7 +1121,7 @@ Transcendental functions
     exponential function of ``(h, hden, hlen)``.  Assumes
     ``n > 0, hlen > 0`` and
     that ``(h, hden, hlen)`` has constant term 0.
-    Does not support aliasing between the input and output polynomials.
+    Supports aliasing between the input and output polynomials.
 
 .. function:: void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t h, slong n)
 
