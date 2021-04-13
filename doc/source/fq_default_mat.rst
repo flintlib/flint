@@ -53,6 +53,10 @@ Basic properties and manipulation
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 
+.. function::  void fq_default_mat_entry_set_fmpz(fq_default_mat_t mat, slong i, slong j, const fmpz_t x, const fq_default_ctx_t ctx)
+
+    Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
+
 .. function:: slong fq_mat_nrows(fq_default_mat_t mat, const fq_default_ctx_t ctx)
 
     Returns the number of rows in ``mat``.

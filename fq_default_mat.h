@@ -217,7 +217,17 @@ fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j,
    {
       fq_mat_entry_set(mat->fq, i, j, x->fq, ctx->ctx.fq);
    }
+}
 
+FQ_DEFAULT_MAT_INLINE void
+fq_default_mat_entry_set_fmpz(fq_default_mat_t mat, slong i, slong j,
+                                    const fmpz_t x, const fq_default_ctx_t ctx)
+{
+   fq_default_t c;
+   fq_default_init(c, ctx);
+   fq_default_set_fmpz(c, x, ctx);
+   fq_default_mat_entry_set(mat, i, j, c, ctx);
+   fq_default_clear(c, ctx);
 }
 
 FQ_DEFAULT_MAT_INLINE slong
