@@ -108,6 +108,11 @@ Conversions
 
     Sets the matrix ``mat1`` to the matrix ``mat2``.
 
+.. function:: void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1, const fmpz_mat_t mat2, const fq_default_ctx_t ctx)
+
+    Sets the matrix ``mat1`` to the matrix ``mat2``, reducing the entries
+    modulo the characteristic of the finite field.
+
 
 Concatenate
 --------------------------------------------------------------------------------
