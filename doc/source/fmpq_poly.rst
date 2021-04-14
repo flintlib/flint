@@ -1129,6 +1129,19 @@ Transcendental functions
     of ``h`` to order ``n > 0``. Requires ``f`` to have
     constant term 0.
 
+.. function:: void _fmpq_poly_exp_expinv_series(fmpz * res1, fmpz_t res1den, fmpz * res2, fmpz_t res2den, const fmpz * h, const fmpz_t hden, slong hlen, slong n)
+
+    The same as ``fmpq_poly_exp_series``, but simultaneously computes
+    the exponential (in ``res1``, ``res1den``) and its multiplicative inverse
+    (in ``res2``, ``res2den``).
+    Supports aliasing between the input and output polynomials.
+
+.. function:: void fmpq_poly_exp_expinv_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t h, slong n)
+
+    The same as ``fmpq_poly_exp_series``, but simultaneously computes
+    the exponential (in ``res1``) and its multiplicative inverse
+    (in ``res2``).
+
 .. function:: void _fmpq_poly_atan_series(fmpz * g, fmpz_t gden, const fmpz * f, const fmpz_t fden, slong flen, slong n)
 
     Sets ``(g, gden, n)`` to the series expansion of the
@@ -1253,6 +1266,20 @@ Transcendental functions
 
     Sets ``res`` to the series expansion of the hyperbolic cosine of
     ``f`` to order ``n > 0``. Requires ``f`` to have constant term 0.
+
+.. function:: void _fmpq_poly_sinh_cosh_series(fmpz * s, fmpz_t sden, fmpz * c, fmpz_t cden, const fmpz * f, const fmpz_t fden, slong flen, slong n)
+
+    Sets ``(s, sden, n)`` to the series expansion of the hyperbolic
+    sine of ``(f, fden, flen)``, and ``(c, cden, n)`` to the series
+    expansion of the hyperbolic cosine.  Assumes ``n > 0`` and
+    that ``(f, fden, flen)`` has constant term 0.
+    Supports aliasing between the input and output polynomials.
+
+.. function:: void fmpq_poly_sinh_cosh_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t f, slong n)
+
+    Sets ``res1`` to the series expansion of the hyperbolic sine of ``f``
+    to order ``n > 0``, and ``res2`` to the series expansion
+    of the hyperbolic cosine. Requires ``f`` to have constant term 0.
 
 .. function:: void _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden, const fmpz * f, const fmpz_t fden, slong flen, slong n)
 

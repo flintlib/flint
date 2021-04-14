@@ -348,6 +348,58 @@ _fmpq_poly_exp_series(fmpz * B, fmpz_t Bden,
     }
 }
 
+void
+_fmpq_poly_exp_expinv_series(fmpz * B, fmpz_t Bden, fmpz * C, fmpz_t Cden,
+    const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
+{
+    Alen = FLINT_MIN(Alen, n);
+
+    if (Alen == 1)
+    {
+        fmpz_one(B);
+        fmpz_one(Bden);
+        fmpz_one(C);
+        fmpz_one(Cden);
+        _fmpz_vec_zero(B + 1, n - 1);
+        _fmpz_vec_zero(C + 1, n - 1);
+        return;
+    }
+
+    if (_fmpz_vec_is_zero(A + 1, Alen - 2))
+    {
+        slong i;
+        _fmpq_poly_exp_series(B, Bden, A, Aden, Alen, n);
+        _fmpz_vec_set(C, B, n);
+        for (i = Alen - 1; i < n; i += 2 * (Alen - 1))
+            fmpz_neg(C + i, C + i);
+        fmpz_set(Cden, Bden);
+        return;
+    }
+
+    /* todo: tweak tuning for this function */
+    if (Alen <= 12 || n <= 10 + 1000 / n_sqrt(fmpz_bits(Aden)))
+    {
+        _fmpq_poly_exp_series_basecase(B, Bden, A, Aden, Alen, n);
+        _fmpq_poly_inv_series(C, Cden, B, Bden, n, n);
+    }
+    else
+    {
+        fmpz * tmp;
+        if (A == C || Aden == Cden)
+        {
+            tmp = _fmpz_vec_init(n + 1);
+            _fmpq_poly_exp_series_newton(B, Bden, tmp, tmp + n, A, Aden, Alen, n);
+            _fmpz_vec_swap(C, tmp, n);
+            fmpz_swap(Cden, tmp + n);
+            _fmpz_vec_clear(tmp, n);
+        }
+        else
+        {
+            _fmpq_poly_exp_series_newton(B, Bden, C, Cden, A, Aden, Alen, n);
+        }
+    }
+}
+
 void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (n == 0)
@@ -373,4 +425,37 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
         poly->coeffs, poly->den, poly->length, n);
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
+}
+
+void fmpq_poly_exp_expinv_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t poly, slong n)
+{
+    if (n == 0)
+    {
+        fmpq_poly_zero(res1);
+        fmpq_poly_zero(res2);
+        return;
+    }
+
+    if (poly->length == 0 || n == 1)
+    {
+        fmpq_poly_one(res1);
+        fmpq_poly_one(res2);
+        return;
+    }
+
+    if (!fmpz_is_zero(poly->coeffs))
+    {
+        flint_printf("Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
+        flint_abort();
+    }
+
+    fmpq_poly_fit_length(res1, n);
+    fmpq_poly_fit_length(res2, n);
+    _fmpq_poly_exp_expinv_series(res1->coeffs, res1->den,
+                          res2->coeffs, res2->den,
+        poly->coeffs, poly->den, poly->length, n);
+    _fmpq_poly_set_length(res1, n);
+    _fmpq_poly_set_length(res2, n);
+    _fmpq_poly_normalise(res1);
+    _fmpq_poly_normalise(res2);
 }
