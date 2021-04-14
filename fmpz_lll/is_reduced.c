@@ -21,8 +21,9 @@ want_mpfr(const fmpz_mat_t A)
     bits = fmpz_mat_max_bits(A);
     bits = FLINT_ABS(bits);
 
-    /* highest double exponent is 1023, with some margin */
-    return bits > 1024 - 64;
+    /* highest double exponent is 1023; use mpfr when products in
+       is_reduced_d could possibly have overflowed */
+    return bits > 512 - 32;
 }
 
 int
