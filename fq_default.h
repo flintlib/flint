@@ -75,7 +75,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_type(fq_default_ctx_t ctx,
 }
 
 FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
-                            const fmpz_t p, slong d, const char *var, int type)
+                                      const fmpz_t p, slong d, const char *var)
 {
    fq_default_ctx_init_type(ctx, p, d, var, 0);
 }
