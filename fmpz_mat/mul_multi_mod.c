@@ -274,6 +274,7 @@ void _fmpz_mat_mul_multi_mod(
     slong num_workers;
     thread_pool_handle * handles;
     slong limit;
+    ulong first_prime; /* not prime */
 
     mainarg.m = m = A->r;
     mainarg.k = k = A->c;
@@ -291,22 +292,27 @@ void _fmpz_mat_mul_multi_mod(
     /* TUNING */
     primes_bits = NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
-    if (bits < primes_bits)
+    if (bits < primes_bits || bits <= FLINT_BITS - 1)
     {
-        primes_bits = bits;
         mainarg.num_primes = 1;
+        first_prime = UWORD(1) << bits;
     }
     else
     {
         /* Round up in the division */
-        mainarg.num_primes = (bits + primes_bits - 1) / primes_bits;
+        mainarg.num_primes = 1 + (bits - (FLINT_BITS - 1) + primes_bits - 1)/primes_bits;
+        first_prime = UWORD(1) << (FLINT_BITS - 1);
     }
 
     /* Initialize */
     mainarg.primes = FLINT_ARRAY_ALLOC(mainarg.num_primes, mp_limb_t);
-    mainarg.primes[0] = n_nextprime(UWORD(1) << primes_bits, 0);
-    for (i = 1; i < mainarg.num_primes; i++)
-        mainarg.primes[i] = n_nextprime(mainarg.primes[i-1], 0);
+    mainarg.primes[0] = first_prime;
+    if (mainarg.num_primes > 1)
+    {
+        mainarg.primes[1] = n_nextprime(UWORD(1) << primes_bits, 0);
+        for (i = 2; i < mainarg.num_primes; i++)
+            mainarg.primes[i] = n_nextprime(mainarg.primes[i-1], 0);
+    }
 
     mainarg.mod_A = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
     mainarg.mod_B = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);

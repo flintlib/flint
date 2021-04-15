@@ -191,11 +191,17 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
+        if ((mod.n & (mod.n - 1)) == 0)
+            nlimbs = 1;
+
         _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
     }
     else
     {
+        if ((mod.n & (mod.n - 1)) == 0)
+            nlimbs = 1;
+
         _nmod_mat_addmul_transpose_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
     }
