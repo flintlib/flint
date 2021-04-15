@@ -149,6 +149,10 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         return;
     }
 
+    dim = FLINT_MIN(ar, bc);
+    dim = FLINT_MIN(dim, br);
+    /* TODO: for space reasons maybe just call strassen here if dim > 10000 */
+
     abits = fmpz_mat_max_bits(A);
     bbits = fmpz_mat_max_bits(B);
 
@@ -172,54 +176,76 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 
     bits = abits + bbits + FLINT_BIT_COUNT(br) + 1;
-    dim = FLINT_MIN(ar, bc);
-    dim = FLINT_MIN(dim, br);
 
-    if (bits <= FLINT_BITS - 2)
+    if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
     {
-        if ((dim > 160 && abits + bbits <= 20) || dim > 600) /* tuning param */
-            _fmpz_mat_mul_multi_mod(C, A, B, bits);
-        else if (dim > 160) /* tuning param */
-            fmpz_mat_mul_strassen(C, A, B);
-        else
-            _fmpz_mat_mul_1(C, A, B);
-    }
-    else if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
-    {
-        if (dim > 400) /* tuning param */
-            _fmpz_mat_mul_multi_mod(C, A, B, bits);
-        else if (bits <= 2 * FLINT_BITS - 1)
-            _fmpz_mat_mul_2a(C, A, B);
-        else
-            _fmpz_mat_mul_2b(C, A, B);
+        /*
+            A and B are small fmpz's: strassen is effective at large dimension
+            either through small fmpz's or through multi_mod. The cutoff
+            for multi_mod's strassen has not been observed, but it must exist
+            somewhere past 4000.
+        */
+
+        /* first take care of small cases */
+        if (ar < 9 || ar + br < 20)
+        {
+            if (bits <= FLINT_BITS - 2)
+                _fmpz_mat_mul_1(C, A, B);
+            else if (bits <= 2*FLINT_BITS - 1)
+                _fmpz_mat_mul_2a(C, A, B);
+            else
+                _fmpz_mat_mul_2b(C, A, B);
+
+            return;
+        }
+
+        if (dim > 1000)
+        {
+            /* do more mul_small with more threads */
+            limit = 300*flint_get_num_threads();
+
+            if (bits <= FLINT_BITS - 2 && dim - 1000 > limit)
+            {
+                /* strassen avoids big fmpz intermediates */
+                fmpz_mat_mul_strassen(C, A, B);
+                return;
+            }
+            else if (bits > FLINT_BITS - 2 && dim - 4000 > limit)
+            {
+                _fmpz_mat_mul_multi_mod(C, A, B, bits);
+                return;
+            }
+        }
+
+        _fmpz_mat_mul_small(C, A, B, bits - 1);
+        return;
     }
     else if (abits + sign <= 2*FLINT_BITS && bbits + sign <= 2*FLINT_BITS)
     {
         /*
-            both A and B fit into two words: mul_22 is more effective as bits
-            approaches 4*FLINT_BITS, but mul_multi_mod eventually does strassen.
+            both A and B fit into two words: the complexity of mul_22 does not
+            depend on bits much and hence does better as bits increases, but
+            mul_multi_mod eventually does strassen.
         */
 
         /* mul_22 handles unsigned input better than signed input. */
         if (sign)
             dim = 2*dim;
 
-        /* mul_22 wins at small dimension */
-        dim = dim - 300;
-        if (dim <= 0)
+        if (dim > 300)
         {
-            _fmpz_mat_mul_22(C, A, B, sign, bits - 1);
-            return;
+            /* do more mul_22 with more threads and more C bits */
+            limit = (bits - 2*FLINT_BITS)/8;
+            limit = limit*limit*flint_get_num_threads();
+            if (dim - 300 > limit)
+            {
+                _fmpz_mat_mul_multi_mod(C, A, B, bits);
+                return;
+            }
         }
 
-        /* do more mul_22 with more threads and more answer bits */
-        limit = (bits - 2*FLINT_BITS)/8;
-        limit = limit*limit*flint_get_num_threads();
-
-        if (dim < limit)
-            _fmpz_mat_mul_22(C, A, B, sign, bits - 1);
-        else
-            _fmpz_mat_mul_multi_mod(C, A, B, bits);
+        _fmpz_mat_mul_22(C, A, B, sign, bits - 1);
+        return;
     }
     else
     {

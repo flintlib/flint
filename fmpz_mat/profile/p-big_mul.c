@@ -127,11 +127,10 @@ static void fmpz_mat_pascal(fmpz_mat_t mat, int triangular)
 slong rep_time(timeit_t timer, fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
 {
     slong i, j, t, reps = 1;
-    slong t;
 
     timeit_start(timer);
     fmpz_mat_mul(C, A, B);
-    t = timeit_query_wall(timer)
+    t = timeit_query_wall(timer);
     if (t < 300)
     {
         j = 2 + 300/(1 + t);
@@ -155,7 +154,7 @@ int main(void)
     timeit_t timer;
     FLINT_TEST_INIT(state);
 
-    flint_set_num_threads(1);
+    flint_set_num_threads(8);
 
     for (t = 0; t < tmul; t++)
     {
@@ -185,7 +184,7 @@ int main(void)
         fmpz_mat_clear(C);
     }
 
-    for (t = 0; t < 3 + tmul; t++)
+    for (t = 0; t < tmul; t++)
     {
         if (t % 10 == 0)
             fprintf(stderr, "#randtest square %d/%d\n", (int)t, (int)tmul);
