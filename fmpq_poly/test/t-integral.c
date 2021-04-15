@@ -30,34 +30,6 @@ main(void)
     flint_printf("integral....");
     fflush(stdout);  
 
-    /* Check aliasing */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        fmpq_poly_t a, b;
-
-        fmpq_poly_init(a);
-        fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
-
-        fmpq_poly_integral(b, a);
-        fmpq_poly_integral(a, a);
-
-        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
-        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
-        result = (fmpq_poly_equal(a, b) && !cflags);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpq_poly_debug(a), flint_printf("\n\n");
-            fmpq_poly_debug(b), flint_printf("\n\n");
-            flint_printf("cflags = %wu\n\n", cflags);
-            abort();
-        }
-
-        fmpq_poly_clear(a);
-        fmpq_poly_clear(b);
-    }
-
     /* Check inverse of fmpq_poly_derivative */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -66,9 +38,18 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 1 + n_randint(state, 200));
 
-        fmpq_poly_integral(b, a);
+        if (n_randint(state, 2))
+        {
+            fmpq_poly_integral(b, a);
+        }
+        else  /* Check aliasing */
+        {
+            fmpq_poly_set(b, a);
+            fmpq_poly_integral(b, b);
+        }
+
         fmpq_poly_derivative(c, b);
 
         cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
@@ -87,6 +68,7 @@ main(void)
         fmpq_poly_clear(b);
         fmpq_poly_clear(c);
     }
+
 
     FLINT_TEST_CLEANUP(state);
     

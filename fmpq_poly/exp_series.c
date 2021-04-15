@@ -16,11 +16,21 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-static __inline__ ulong
-fmpz_gcd_ui(const fmpz_t x, ulong c)
+static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
 {
-    return n_gcd(c, fmpz_fdiv_ui(x, c));
+    __mpz_struct * z = COEFF_TO_PTR(*g);
+
+    return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
 }
+
+static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
+{
+    if (!COEFF_IS_MPZ(*g))
+        return n_gcd(FLINT_ABS(*g), h);
+    else
+        return _fmpz_gcd_big_small(g, h);
+}
+
 
 /* Basecase algorithm, given a precomputed derivative of
    of the input series (Alen still refers to the length
@@ -91,33 +101,96 @@ _fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
 }
 
 /* c_k x^k -> c_k x^k / (m+k) */
-/* Todo: actually compute lcm(m,m+1,...) instead of m*(m+1)...
-   to reduce the content. */
-void
-_fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, slong m)
+void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, slong len, slong m)
 {
     slong k;
-    fmpz_t t;
-    fmpz_init(t);
+    ulong v, c, d;
+    mp_ptr divisors;
+    fmpz_t t, u;
+    TMP_INIT;
 
+    TMP_START;
+    divisors = TMP_ALLOC(sizeof(ulong) * len);
+
+    fmpz_init(t);
     fmpz_one(t);
+
     for (k = len - 1; k >= 0; k--)
     {
-        fmpz_mul(rpoly + k, poly + k, t);
-        fmpz_mul_ui(t, t, m + k);
+        if (fmpz_is_zero(poly + k))
+        {
+            fmpz_zero(rpoly + k);
+        }
+        else
+        {
+            c = _fmpz_gcd_small(poly + k, k + m);
+
+            if (c == k + m)
+            {
+                fmpz_divexact_ui(rpoly + k, poly + k, k + m);
+                divisors[k] = 1;
+            }
+            else
+            {
+                if (c == 1)
+                {
+                    fmpz_set(rpoly + k, poly + k);
+                    divisors[k] = k + m;
+                }
+                else
+                {
+                    fmpz_divexact_ui(rpoly + k, poly + k, c);
+                    divisors[k] = (k + m) / c;
+                }
+
+                c = divisors[k];
+                d = _fmpz_gcd_small(t, c);
+                if (d != c)
+                    fmpz_mul_ui(t, t, c / d);
+            }
+        }
     }
 
     fmpz_mul(rden, den, t);
 
-    fmpz_one(t);
-    for (k = 0; k < len; k++)
+    if (!fmpz_is_one(t))
     {
-        fmpz_mul(rpoly + k, rpoly + k, t);
-        fmpz_mul_ui(t, t, m + k);
+        if (!COEFF_IS_MPZ(*t))
+        {
+            v = *t;
+            for (k = len - 1; k >= 0; k--)
+            {
+                if (!fmpz_is_zero(rpoly + k) && v != divisors[k])
+                    fmpz_mul_ui(rpoly + k, rpoly + k, divisors[k] == 1 ? v : v / divisors[k]);
+            }
+        }
+        else
+        {
+            fmpz_init(u);
+
+            for (k = len - 1; k >= 0; k--)
+            {
+                if (!fmpz_is_zero(rpoly + k))
+                {
+                    if (divisors[k] == 1)
+                    {
+                        fmpz_mul(rpoly + k, rpoly + k, t);
+                    }
+                    else
+                    {
+                        fmpz_divexact_ui(u, t, divisors[k]);
+                        fmpz_mul(rpoly + k, rpoly + k, u);
+                    }
+                }
+            }
+
+            fmpz_clear(u);
+        }
     }
 
-    _fmpq_poly_canonicalise(rpoly, rden, len);
     fmpz_clear(t);
+    TMP_END;
 }
 
 static void
@@ -314,7 +387,7 @@ _fmpq_poly_exp_series(fmpz * B, fmpz_t Bden,
             fmpz_mul(B + i * d, B + (i - 1) * d, B + d);
             fmpz_mul(Bden, Bden, R);
 
-            v = fmpz_gcd_ui(B + i * d, i);
+            v = _fmpz_gcd_small(B + i * d, i);
             fmpz_divexact_ui(B + i * d, B + i * d, v);
             fmpz_mul_ui(Bden, Bden, i / v);
             fmpz_mul_ui(R + i, R, i / v);

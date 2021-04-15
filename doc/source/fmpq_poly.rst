@@ -1032,6 +1032,8 @@ Derivative and integral
     Sets ``(rpoly, rden, len)`` to the integral of 
     ``(poly, den, len - 1)``.  Assumes ``len >= 0``.  
     Supports aliasing between the two polynomials.
+    The output will be in canonical form if the input is
+    in canonical form.
 
 .. function:: void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)
 
