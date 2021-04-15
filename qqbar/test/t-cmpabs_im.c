@@ -23,21 +23,36 @@ int main()
 
     for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
     {
-        qqbar_t x, y, xr, yr;
+        qqbar_t x, y, xr, yr, z, i;
         int c1, c2;
 
         qqbar_init(x);
         qqbar_init(y);
         qqbar_init(xr);
         qqbar_init(yr);
+        qqbar_init(z);
+        qqbar_init(i);
 
         qqbar_randtest(x, state, 3, 100);
-        qqbar_randtest(y, state, 3, 100);
+
+        if (n_randint(state, 4) == 0)
+            qqbar_conj(y, x);
+        else
+            qqbar_randtest(y, state, 3, 100);
 
         qqbar_im(xr, x);
         qqbar_im(yr, y);
         qqbar_abs(xr, xr);
         qqbar_abs(yr, yr);
+
+        if (n_randint(state, 2))
+        {
+            qqbar_i(i);
+            qqbar_randtest(z, state, 1, 100);
+            qqbar_mul(z, z, i);
+            qqbar_add(x, x, z);
+            qqbar_sub(x, x, z);
+        }
 
         c1 = qqbar_cmpabs_im(x, y);
         c2 = qqbar_cmp_re(xr, yr);
@@ -56,6 +71,8 @@ int main()
         qqbar_clear(y);
         qqbar_clear(xr);
         qqbar_clear(yr);
+        qqbar_clear(z);
+        qqbar_clear(i);
     }
 
     flint_randclear(state);

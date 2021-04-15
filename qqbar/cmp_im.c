@@ -33,6 +33,17 @@ qqbar_cmp_im(const qqbar_t x, const qqbar_t y)
     if (qqbar_equal(x, y))
         return 0;
 
+    {
+        qqbar_t t;
+        qqbar_init(t);
+        qqbar_neg(t, y);
+        qqbar_conj(t, t);
+        res = qqbar_equal(x, t);
+        qqbar_clear(t);
+        if (res == 1)
+            return 0;
+    }
+
     acb_init(z1);
     acb_init(z2);
 
