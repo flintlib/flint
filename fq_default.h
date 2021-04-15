@@ -118,8 +118,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
 }
 
 FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
-                      const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
-                                                    const char * var, int type)
+       const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 {
    fq_default_ctx_init_modulus_type(ctx, modulus, mod_ctx, var, 0);
 }
