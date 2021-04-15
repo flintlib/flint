@@ -107,7 +107,8 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
     slong abits, bbits, bits;
-    slong i, j, dim;
+    slong i, j, dim, limit;
+    int sign;
 
     ar = fmpz_mat_nrows(A);
     br = fmpz_mat_nrows(B);
@@ -150,8 +151,19 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     abits = fmpz_mat_max_bits(A);
     bbits = fmpz_mat_max_bits(B);
-    abits = FLINT_ABS(abits);
-    bbits = FLINT_ABS(bbits);
+
+    sign = 0;
+    if (abits < 0)
+    {
+        sign = 1;
+        abits = -abits;
+    }
+
+    if (bbits < 0)
+    {
+        sign = 1;
+        bbits = -bbits;
+    }
 
     if (abits == 0 || bbits == 0)
     {
@@ -181,12 +193,33 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         else
             _fmpz_mat_mul_2b(C, A, B);
     }
-    else if (abits < 2 * FLINT_BITS && bbits < 2 * FLINT_BITS)
+    else if (abits + sign <= 2*FLINT_BITS && bbits + sign <= 2*FLINT_BITS)
     {
-        if (dim > 40) /* tuning param */
-            _fmpz_mat_mul_multi_mod(C, A, B, bits);
+        /*
+            both A and B fit into two words: mul_22 is more effective as bits
+            approaches 4*FLINT_BITS, but mul_multi_mod eventually does strassen.
+        */
+
+        /* mul_22 handles unsigned input better than signed input. */
+        if (sign)
+            dim = 2*dim;
+
+        /* mul_22 wins at small dimension */
+        dim = dim - 300;
+        if (dim <= 0)
+        {
+            _fmpz_mat_mul_22(C, A, B, sign, bits - 1);
+            return;
+        }
+
+        /* do more mul_22 with more threads and more answer bits */
+        limit = (bits - 2*FLINT_BITS)/8;
+        limit = limit*limit*flint_get_num_threads();
+
+        if (dim < limit)
+            _fmpz_mat_mul_22(C, A, B, sign, bits - 1);
         else
-            _fmpz_mat_mul_4(C, A, B);
+            _fmpz_mat_mul_multi_mod(C, A, B, bits);
     }
     else
     {
