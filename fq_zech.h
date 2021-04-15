@@ -56,6 +56,8 @@ typedef fq_zech_ctx_struct fq_zech_ctx_t[1];
 
 FLINT_DLL void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
+FLINT_DLL int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
+
 FLINT_DLL void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 
 FLINT_DLL int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
@@ -65,6 +67,10 @@ FLINT_DLL void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong 
 FLINT_DLL void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
 FLINT_DLL void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
+                              const nmod_poly_t modulus,
+                              const char *var);
+
+FLINT_DLL int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
                               const nmod_poly_t modulus,
                               const char *var);
 
