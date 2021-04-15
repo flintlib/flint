@@ -20,7 +20,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_default_ctx_init(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_default_ctx_init(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -32,6 +32,13 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
+.. function:: void fq_default_ctx_init_type(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char * var, int type)
+
+    As per the previous function except that if ``type == 1`` an ``fq_zech``
+    context is created, if ``type == 2`` an ``fq_nmod`` and if ``type == 3``
+    an ``fq``. If ``type == 0`` the functionality is as per the previous
+    function.
+
 .. function:: void fq_default_ctx_init_modulus(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 
     Initialises the context for the finite field defined by the given
@@ -42,14 +49,22 @@ Context Management
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
-    
+
+.. function:: void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var, int type)
+
+    As per the previous function except that if ``type == 1`` an ``fq_zech``
+    context is created, if ``type == 2`` an ``fq_nmod`` and if ``type == 3``
+    an ``fq``. If ``type == 0`` the functionality is as per the previous
+    function.
+
 .. function:: void fq_default_ctx_clear(fq_default_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
 
-.. function:: const fmpz_mod_poly_struct* fq_default_ctx_modulus(const fq_default_ctx_t ctx)
+.. function:: int fq_default_ctx_type(const fq_default_ctx_t ctx)
 
-    Returns a pointer to the modulus in the context.
+    Returns `1` if the context contains an ``fq_zech`` context, `2` if it
+    contains an ``fq_mod`` context and `3` if it contains an ``fq`` context.
 
 .. function:: slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
 

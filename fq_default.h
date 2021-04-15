@@ -52,16 +52,18 @@ typedef struct
 
 typedef fq_default_ctx_struct fq_default_ctx_t[1];
 
-FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
-		                      const fmpz_t p, slong d, const char *var)
+FQ_DEFAULT_INLINE void fq_default_ctx_init_type(fq_default_ctx_t ctx,
+                            const fmpz_t p, slong d, const char *var, int type)
 {
    int bits = fmpz_bits(p);
 
-   if (bits*d <= 16 && n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16))
+   if (type == 1 ||
+       (type == 0 && bits*d <= 16 &&
+	n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16)))
    {
       ctx->type = 1;
       fq_zech_ctx_init(ctx->ctx.fq_zech, p, d, var);
-   } else if (fmpz_abs_fits_ui(p))
+   } else if (type == 2 || (type == 0 && fmpz_abs_fits_ui(p)))
    {
       ctx->type = 2;
       fq_nmod_ctx_init(ctx->ctx.fq_nmod, p, d, var);
@@ -72,14 +74,23 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
    }
 }
 
-FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
-       const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
+                            const fmpz_t p, slong d, const char *var, int type)
+{
+   fq_default_ctx_init_type(ctx, p, d, var, 0);
+}
+
+FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
+                        const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
+                                                    const char * var, int type)
 {
    fmpz const * p = fmpz_mod_ctx_modulus(mod_ctx);
    int bits = fmpz_bits(p);
    int d = fmpz_mod_poly_degree(modulus, mod_ctx);
 
-   if (bits*d <= 16 && n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16))
+   if (type == 1 ||
+       (type == 0 && bits*d <= 16 &&
+	n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16)))
    {
       nmod_poly_t nmodulus;
       ctx->type = 1;
@@ -87,7 +98,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
       fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
       fq_zech_ctx_init_modulus(ctx->ctx.fq_zech, nmodulus, var);
       nmod_poly_clear(nmodulus);
-   } else if (fmpz_abs_fits_ui(p))
+   } else if (type == 2 || (type == 0 && fmpz_abs_fits_ui(p)))
    {
       nmod_poly_t nmodulus;
       ctx->type = 2;
@@ -102,6 +113,13 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
    }
 }
 
+FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
+                      const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
+                                                    const char * var, int type)
+{
+   fq_default_ctx_init_modulus_type(ctx, modulus, mod_ctx, var, 0);
+}
+
 FQ_DEFAULT_INLINE void fq_default_ctx_clear(fq_default_ctx_t ctx)
 {
    if (ctx->type == 1)
@@ -114,6 +132,11 @@ FQ_DEFAULT_INLINE void fq_default_ctx_clear(fq_default_ctx_t ctx)
    {
       fq_ctx_clear(ctx->ctx.fq);
    }
+}
+
+FQ_DEFAULT_INLINE int fq_default_ctx_type(const fq_default_ctx_t ctx)
+{
+   return ctx->type;
 }
 
 FQ_DEFAULT_INLINE slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
