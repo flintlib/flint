@@ -57,6 +57,24 @@ Context Management
     an ``fq``. If ``type == 0`` the functionality is as per the previous
     function.
 
+.. function:: void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+
+    Initialises the context for the finite field defined by the given
+    polynomial ``modulus``. The characteristic will be the modulus of
+    the polynomial and the degree equal to its degree.
+
+    Assumes that the characteristic is prime and the polynomial irreducible.
+
+    Assumes that the string ``var`` is a null-terminated string
+    of length at least one.
+
+.. function:: void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var, int type)
+
+    As per the previous function except that if ``type == 1`` an ``fq_zech``
+    context is created, if ``type == 2`` an ``fq_nmod`` and if ``type == 3``
+    an ``fq``. If ``type == 0`` the functionality is as per the previous
+    function.
+
 .. function:: void fq_default_ctx_clear(fq_default_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.

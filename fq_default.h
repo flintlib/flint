@@ -80,8 +80,9 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
    fq_default_ctx_init_type(ctx, p, d, var, 0);
 }
 
-FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
-                        const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
+FQ_DEFAULT_INLINE
+void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
+                const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
                                                     const char * var, int type)
 {
    fmpz const * p = fmpz_mod_ctx_modulus(mod_ctx);
@@ -123,11 +124,20 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
    }
 }
 
-FQ_DEFAULT_INLINE void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
+FQ_DEFAULT_INLINE
+void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
        const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 {
    fq_default_ctx_init_modulus_type(ctx, modulus, mod_ctx, var, 0);
 }
+
+FLINT_DLL
+void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
+                        const nmod_poly_t modulus, const char * var, int type);
+
+FLINT_DLL
+void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx,
+                                  const nmod_poly_t modulus, const char * var);
 
 FQ_DEFAULT_INLINE void fq_default_ctx_clear(fq_default_ctx_t ctx)
 {
