@@ -24,28 +24,116 @@
 #include "cblas.h"
 
 
+typedef struct {
+    slong m;
+    slong k;
+    slong n;
+    slong Astartrow;
+    slong Astoprow;
+    slong Bstartrow;
+    slong Bstoprow;
+    fmpz ** Arows;
+    fmpz ** Brows;
+    double * dA;
+    double * dB;
+} _red_worker_arg;
+
+static void _red_worker(void * varg)
+{
+    _red_worker_arg * arg = (_red_worker_arg *) varg;
+    slong i, j;
+    slong k = arg->k;
+    slong n = arg->n;
+    slong Astartrow = arg->Astartrow;
+    slong Astoprow = arg->Astoprow;
+    slong Bstartrow = arg->Bstartrow;
+    slong Bstoprow = arg->Bstoprow;
+    fmpz ** Arows = arg->Arows;
+    fmpz ** Brows = arg->Brows;
+    double * dA = arg->dA;
+    double * dB = arg->dB;
+
+    for (i = Astartrow; i < Astoprow; i++)
+        for (j = 0; j < k; j++)
+            dA[k*i + j] = (double)(Arows[i][j]);
+
+    for (i = Bstartrow; i < Bstoprow; i++)
+        for (j = 0; j < n; j++)
+            dB[n*i + j] = (double)(Brows[i][j]);
+}
+
 static int _fmpz_mat_mul_blas_direct(
     fmpz_mat_t C,
     const fmpz_mat_t A,
     const fmpz_mat_t B)
 {
-    slong i, j;
+    slong i, j, start, stop;
     slong m = A->r;
     slong k = A->c;
     slong n = B->c;
     double * dC, * dA, * dB;
+    slong limit;
+    _red_worker_arg mainarg;
+    _red_worker_arg * args;
+    slong num_workers;
+    thread_pool_handle * handles;
 
     dA = FLINT_ARRAY_ALLOC(m*k, double);
     dB = FLINT_ARRAY_ALLOC(k*n, double);
     dC = (double *) flint_calloc(m*n, sizeof(double));
 
-    for (i = 0; i < m; i++)
-        for (j = 0; j < k; j++)
-            dA[k*i + j] = (double)(A->rows[i][j]);
+    mainarg.m = m = A->r;
+    mainarg.k = k = A->c;
+    mainarg.n = n = B->c;
+    mainarg.Arows = A->rows;
+    mainarg.Brows = B->rows;
+    mainarg.dA = dA;
+    mainarg.dB = dB;
 
-    for (i = 0; i < k; i++)
-        for (j = 0; j < n; j++)
-            dB[n*i + j] = (double)(B->rows[i][j]);
+    limit = m + k + n;
+    limit = (limit < 300) ? 0 : (limit - 300)/128;
+
+    if (limit < 1)
+    {
+red_single:
+        mainarg.Astartrow = 0;
+        mainarg.Astoprow = m;
+        mainarg.Bstartrow = 0;
+        mainarg.Bstoprow = k;
+        _red_worker(&mainarg);
+    }
+    else
+    {
+        num_workers = flint_request_threads(&handles, limit);
+        if (num_workers < 1)
+        {
+            flint_give_back_threads(handles, num_workers);
+            goto red_single;
+        }
+
+        args = FLINT_ARRAY_ALLOC(num_workers, _red_worker_arg);
+        for (start = 0, i = 0; i < num_workers; start = stop, i++)
+        {
+            args[i] = mainarg;
+            stop = _thread_pool_find_work_2(m, k, k, n, i + 1, num_workers + 1);
+            _thread_pool_distribute_work_2(start, stop,
+                                     &args[i].Astartrow, &args[i].Astoprow, m,
+                                     &args[i].Bstartrow, &args[i].Bstoprow, k);
+        }
+
+        _thread_pool_distribute_work_2(start, m + k,
+                                     &mainarg.Astartrow, &mainarg.Astoprow, m,
+                                     &mainarg.Bstartrow, &mainarg.Bstoprow, k);
+
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wake(global_thread_pool, handles[i], 0, _red_worker, &args[i]);
+        _red_worker(&mainarg);
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
+
+        flint_give_back_threads(handles, num_workers);
+        flint_free(args);
+    }
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                                        m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);

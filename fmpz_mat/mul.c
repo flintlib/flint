@@ -177,6 +177,25 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     bits = abits + bbits + FLINT_BIT_COUNT(br) + 1;
 
+#if FLINT_USES_BLAS && FLINT_BITS == 64
+    if (dim > 50)
+    {
+        if (bits-1 <= 53)
+            limit = 0;
+        else if (bits-1 <= 64)
+            limit = 1000;
+        else if (bits-1 <= 128)
+            limit = 1300;
+        else if (bits-1 <= 256)
+            limit = 250;
+        else
+            limit = 200 + 8*FLINT_BIT_COUNT(bits);
+
+        if (dim > limit && _fmpz_mat_mul_blas(C, A, abits, B, bbits, sign, bits-1))
+            return;
+    }
+#endif
+
     if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
     {
         /*
