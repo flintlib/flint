@@ -27,7 +27,7 @@ main(void)
     flint_printf("set_fmpz_mat....");
     fflush(stdout);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fq_default_mat_t fq_mat1, fq_mat2;
@@ -71,7 +71,7 @@ main(void)
         fmpz_clear(p);
     }
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fq_default_mat_t fq_mat1, fq_mat2;
@@ -115,7 +115,7 @@ main(void)
         fmpz_clear(p);
     }
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fq_default_mat_t fq_mat1, fq_mat2;

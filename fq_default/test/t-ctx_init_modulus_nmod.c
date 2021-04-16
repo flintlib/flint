@@ -24,7 +24,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("ctx_init_modulus_nmod....");
     fflush(stdout);
 
@@ -46,6 +45,8 @@ main(void)
         fq_default_ctx_init_modulus_nmod(ctx, mod, "x");
 
         fq_default_init(fq, ctx);
+
+        fq_default_randtest(fq, state, ctx);
 
         fq_default_clear(fq, ctx);
 
@@ -70,6 +71,8 @@ main(void)
         fq_default_ctx_init_modulus_nmod_type(ctx, mod, "x", 3);
 
         fq_default_init(fq, ctx);
+
+        fq_default_randtest(fq, state, ctx);
 
         fq_default_clear(fq, ctx);
 

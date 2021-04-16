@@ -45,6 +45,8 @@ main(void)
 
         fq_default_mat_init(fq_mat, rows, cols, ctx);
 
+        fq_default_mat_randtest(fq_mat, state, ctx);
+
         fq_default_mat_clear(fq_mat, ctx);
 
         fq_default_ctx_clear(ctx);
@@ -52,6 +54,8 @@ main(void)
         fq_default_ctx_init(ctx, p, 16, "x");
 
         fq_default_mat_init(fq_mat, rows, cols, ctx);
+
+        fq_default_mat_randtest(fq_mat, state, ctx);
 
         fq_default_mat_clear(fq_mat, ctx);
 
@@ -62,6 +66,8 @@ main(void)
         fq_default_ctx_init(ctx, p, 1, "x");
 
         fq_default_mat_init(fq_mat, rows, cols, ctx);
+
+        fq_default_mat_randtest(fq_mat, state, ctx);
 
         fq_default_mat_clear(fq_mat, ctx);
 

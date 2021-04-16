@@ -42,6 +42,8 @@ main(void)
 
         fq_default_poly_init(fq_poly, ctx);
 
+        fq_default_poly_randtest(fq_poly, state, n_randint(state, 10), ctx);
+
         fq_default_poly_clear(fq_poly, ctx);
 
         fq_default_ctx_clear(ctx);
@@ -49,6 +51,8 @@ main(void)
         fq_default_ctx_init(ctx, p, 16, "x");
 
         fq_default_poly_init(fq_poly, ctx);
+
+        fq_default_poly_randtest(fq_poly, state, n_randint(state, 10), ctx);
 
         fq_default_poly_clear(fq_poly, ctx);
 
@@ -59,6 +63,8 @@ main(void)
         fq_default_ctx_init(ctx, p, 1, "x");
 
         fq_default_poly_init(fq_poly, ctx);
+
+        fq_default_poly_randtest(fq_poly, state, n_randint(state, 10), ctx);
 
         fq_default_poly_clear(fq_poly, ctx);
 

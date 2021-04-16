@@ -44,11 +44,15 @@ main(void)
 
         fq_default_clear(fq, ctx);
 
+        fq_default_randtest(fq, state, ctx);
+
         fq_default_ctx_clear(ctx);
 
         fq_default_ctx_init(ctx, p, 16, "x");
 
         fq_default_init(fq, ctx);
+
+        fq_default_randtest(fq, state, ctx);
 
         fq_default_clear(fq, ctx);
 
@@ -59,6 +63,8 @@ main(void)
         fq_default_ctx_init(ctx, p, 1, "x");
 
         fq_default_init(fq, ctx);
+
+        fq_default_randtest(fq, state, ctx);
 
         fq_default_clear(fq, ctx);
 

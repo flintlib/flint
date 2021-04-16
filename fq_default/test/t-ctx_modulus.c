@@ -28,7 +28,7 @@ main(void)
     fflush(stdout);
 
     /* fq_zech range */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
 	fmpz_mod_ctx_t mod_ctx;
@@ -61,7 +61,7 @@ main(void)
     }
     
     /* fq_nmod range */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fmpz_mod_ctx_t mod_ctx;
@@ -96,7 +96,7 @@ main(void)
     }
 
     /* fq range */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fmpz_mod_ctx_t mod_ctx;

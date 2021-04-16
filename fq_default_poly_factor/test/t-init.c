@@ -24,14 +24,15 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("init/clear....");
     fflush(stdout);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fq_default_poly_factor_t fq_poly_fac;
+        fq_default_poly_t poly;
+        fq_default_t c;
         fmpz_t p;
 
         fmpz_init(p);
@@ -42,6 +43,17 @@ main(void)
 
         fq_default_poly_factor_init(fq_poly_fac, ctx);
 
+        fq_default_poly_init(poly, ctx);
+
+	fq_default_init(c, ctx);
+	
+        while (fq_default_poly_is_zero(poly, ctx))
+            fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
+
+	fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
+
+        fq_default_clear(c, ctx);
+
         fq_default_poly_factor_clear(fq_poly_fac, ctx);
 
         fq_default_ctx_clear(ctx);
@@ -49,6 +61,17 @@ main(void)
         fq_default_ctx_init(ctx, p, 16, "x");
 
         fq_default_poly_factor_init(fq_poly_fac, ctx);
+
+        fq_default_poly_init(poly, ctx);
+
+        fq_default_init(c, ctx);
+
+        while (fq_default_poly_is_zero(poly, ctx))
+            fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
+
+        fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
+
+        fq_default_clear(c, ctx);
 
         fq_default_poly_factor_clear(fq_poly_fac, ctx);
 
@@ -59,6 +82,17 @@ main(void)
         fq_default_ctx_init(ctx, p, 1, "x");
 
         fq_default_poly_factor_init(fq_poly_fac, ctx);
+
+        fq_default_poly_init(poly, ctx);
+
+        fq_default_init(c, ctx);
+
+        while (fq_default_poly_is_zero(poly, ctx))
+            fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
+
+        fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
+
+        fq_default_clear(c, ctx);
 
         fq_default_poly_factor_clear(fq_poly_fac, ctx);
 
