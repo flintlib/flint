@@ -31,7 +31,6 @@ extern "C" {
 
 #define CA_FIELD_HASH_C UWORD(100003)
 
-/* todo: all take ctx; update and check docs */
 void ca_field_init_qq(ca_field_t K, ca_ctx_t ctx);
 void ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx);
 void ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx);
@@ -42,7 +41,7 @@ void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
 
 void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx);
 
-    void ca_field_print(const ca_field_t K, ca_ctx_t ctx);
+void ca_field_print(const ca_field_t K, ca_ctx_t ctx);
 
 int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 

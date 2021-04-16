@@ -12,9 +12,7 @@
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
-
-void
-fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol, const fmpz_mpoly_ctx_t ctx);
+#include "utils_flint.h"
 
 void
 _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf)

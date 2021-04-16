@@ -44,19 +44,6 @@
     } \
     return 0; \
 
-/* todo: move */
-void _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
-
-/* todo: move */
-void
-ca_vec_append(ca_vec_t vec, const ca_t f, ca_ctx_t ctx)
-{
-    _ca_vec_fit_length(vec, vec->length + 1, ctx);
-    ca_set(vec->entries + vec->length, f, ctx);
-    vec->length++;
-}
-
-
 int
 _ca_set_fexpr(ca_t res, fexpr_vec_t inputs, ca_vec_t outputs, const fexpr_t expr, ca_ctx_t ctx)
 {

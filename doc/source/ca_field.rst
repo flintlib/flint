@@ -129,6 +129,11 @@ Memory management
     `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin
     univariate function *func* (example: *func* = *CA_Exp* for `e^x`).
 
+.. function:: void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Initializes *K* to represent the field
+    `\mathbb{Q}(a,b)` where `a = f(x, y)`.
+
 .. function:: void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
 
     Initializes *K* to represent a multivariate field

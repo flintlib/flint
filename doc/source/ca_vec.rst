@@ -72,6 +72,10 @@ Length
 
     Returns the length of *vec*.
 
+.. function:: void _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx)
+
+    Allocates space in *vec* for *len* elements.
+
 .. function:: void ca_vec_set_length(ca_vec_t vec, slong len, ca_ctx_t ctx)
 
     Sets the length of *vec* to *len*.
@@ -111,6 +115,13 @@ Input and output
 
     Prints a decimal representation of *vec* with precision specified by *digits*.
     The coefficients are comma-separated and the whole list is enclosed in square brackets.
+
+List operations
+-------------------------------------------------------------------------------
+
+.. function:: void ca_vec_append(ca_vec_t vec, const ca_t f, ca_ctx_t ctx)
+
+    Appends *f* to the end of *vec*.
 
 Arithmetic
 -------------------------------------------------------------------------------

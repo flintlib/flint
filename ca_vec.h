@@ -78,6 +78,7 @@ slong ca_vec_length(const ca_vec_t vec, ca_ctx_t ctx)
     return vec->length;
 }
 
+void _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
 void ca_vec_set_length(ca_vec_t res, slong len, ca_ctx_t ctx);
 
 /* Assignment */
@@ -94,6 +95,16 @@ void ca_vec_zero(ca_vec_t res, slong len, ca_ctx_t ctx);
 
 void ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx);
 void ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx);
+
+/* List operations */
+
+CA_VEC_INLINE void
+ca_vec_append(ca_vec_t vec, const ca_t f, ca_ctx_t ctx)
+{
+    _ca_vec_fit_length(vec, vec->length + 1, ctx);
+    ca_set(vec->entries + vec->length, f, ctx);
+    vec->length++;
+}
 
 /* Arithmetic */
 

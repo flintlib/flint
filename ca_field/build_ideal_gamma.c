@@ -12,10 +12,10 @@
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "utils_flint.h"
 
 void _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
 void _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf);
-void fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol, const fmpz_mpoly_ctx_t ctx);
 
 void
 fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
