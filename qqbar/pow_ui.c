@@ -160,9 +160,7 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
         }
 
         /* fast path for principal roots of positive rational numbers */
-        if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, qqbar_degree(x) - 1) &&
-            fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
-            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))))
+        if (_qqbar_fast_detect_simple_principal_surd(x))
         {
             fmpq_t t;
             fmpq_init(t);

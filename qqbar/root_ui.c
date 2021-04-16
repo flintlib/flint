@@ -13,6 +13,45 @@
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 
+int
+_qqbar_fast_detect_simple_principal_surd(const qqbar_t x)
+{
+    slong d;
+
+    d = qqbar_degree(x);
+
+    if (d == 1)
+        return 0;
+
+    if (fmpz_sgn(QQBAR_COEFFS(x)) > 0)
+        return 0;
+
+    if (!_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, d - 1))
+        return 0;
+
+    /* Slow exact version, but we only want a fast check here. */
+    /* return qqbar_is_real(x) && qqbar_sgn_re(x) > 0; */
+
+    if (arb_is_zero(acb_imagref(QQBAR_ENCLOSURE(x))))
+    {
+        if (arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))))
+            return 1;
+
+        return 0;
+    }
+
+    if (!arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))))
+        return 0;
+
+    /* The imaginary part enclosure may not be exactly zero; we
+       can still use the enclosure if it is precise enough to guarantee
+       that there are no collisions with the conjugate roots. */
+    if (acb_rel_accuracy_bits(QQBAR_ENCLOSURE(x)) > FLINT_BIT_COUNT(d) + 5)
+        return arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x)));
+
+    return 0;
+}
+
 void
 qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
 {
@@ -43,9 +82,7 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
 
         /* handle principal roots of positive rational numbers */
         /* todo: could also handle conjugates of such roots */
-        if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, d - 1) &&
-            fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
-            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))))
+        if (_qqbar_fast_detect_simple_principal_surd(x))
         {
             fmpq_t t;
             fmpq_init(t);

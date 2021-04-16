@@ -20,6 +20,10 @@ qqbar_abs2(qqbar_t res, const qqbar_t x)
     {
         qqbar_sqr(res, x);
     }
+    else if (qqbar_is_root_of_unity(NULL, NULL, x))
+    {
+        qqbar_one(res);
+    }
     else
     {
         qqbar_t t;

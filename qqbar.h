@@ -300,6 +300,9 @@ void qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp);
 void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong e);
 int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t e);
 
+/* Check if x = (p/q)^(1/n), p > 0 */
+int _qqbar_fast_detect_simple_principal_surd(const qqbar_t x);
+
 void qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n);
 
 QQBAR_INLINE void

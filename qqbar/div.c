@@ -75,12 +75,8 @@ qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y)
         fmpz_clear(b);
         fmpz_clear(c);
     }
-    else if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, qqbar_degree(x) - 1) &&
-             _fmpz_vec_is_zero(QQBAR_COEFFS(y) + 1, qqbar_degree(y) - 1) &&
-            fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
-            fmpz_sgn(QQBAR_COEFFS(y)) < 0 &&
-            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))) &&
-            arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(y))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(y))))
+    else if (_qqbar_fast_detect_simple_principal_surd(x) &&
+             _qqbar_fast_detect_simple_principal_surd(y))
     {
         /* (p/q)^(1/d) * (r/s)^(1/e) */
 
