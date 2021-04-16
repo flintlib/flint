@@ -97,9 +97,23 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
     }
     else
     {
-        /* Fast detection of perfect powers */
+        slong p;
+        ulong q;
         ulong f;
 
+        /* Fast path for roots of unity. Todo: generalize to
+           rational multiples of roots of unity. */
+        if (qqbar_is_root_of_unity(&p, &q, x))
+        {
+            if (p < 0)
+                p += 2 * q;
+
+            p = n_mulmod2(p, n, 2 * q);
+            qqbar_root_of_unity(res, p, q);
+            return;
+        }
+
+        /* Fast detection of perfect powers */
         f = arb_fmpz_poly_deflation(QQBAR_POLY(x));
 
         if (f % n == 0)

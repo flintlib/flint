@@ -161,9 +161,10 @@ Input and output
 
     Writes the integer *x* to *out*.
 
-.. function:: void calcium_write_acb(calcium_stream_t out, const acb_t z, slong digits, ulong flags)
+.. function:: void calcium_write_arb(calcium_stream_t out, const arb_t z, slong digits, ulong flags)
+              void calcium_write_acb(calcium_stream_t out, const acb_t z, slong digits, ulong flags)
 
-    Writes the Arb complex number *z* to *out*, showing *digits*
+    Writes the Arb number *z* to *out*, showing *digits*
     digits and with the display style specified by *flags*
     (``ARB_STR_NO_RADIUS``, etc.).
 

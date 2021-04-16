@@ -7249,31 +7249,6 @@ void main_ca()
     ca_ctx_clear(ctx);
 }
 
-/* todo: add these functions */
-static void
-qqbar_si_sub(qqbar_t res, slong x, const qqbar_t y)
-{
-    qqbar_sub_si(res, y, x);
-    qqbar_neg(res, res);
-}
-
-static void
-qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t y)
-{
-    slong p, q;
-
-    p = QQBAR_COEFFS(y)[0];
-    q = QQBAR_COEFFS(y)[1];
-    p = -p;
-
-    if (p < 0)
-        flint_abort();
-
-    qqbar_root_ui(res, x, q);
-    qqbar_pow_ui(res, res, p);
-
-}
-
 void main_qqbar()
 {
     qqbar_t N, M, E;

@@ -1148,13 +1148,26 @@ class qqbar:
             >>> qqbar(2+3j) ** qqbar(1+2j)
             Traceback (most recent call last):
               ...
-            ValueError: qqbar exponent must be rational
+            ValueError: qqbar powering: transcendental result
             >>> qqbar(0) ** 0
             1.00000 (deg 1)
             >>> qqbar(0) ** -1
             Traceback (most recent call last):
               ...
             ZeroDivisionError
+            >>> qqbar(1) ** qqbar(2).sqrt()
+            1.00000 (deg 1)
+            >>> qqbar(0) ** qqbar(2).sqrt()
+            0 (deg 1)
+            >>> qqbar(0) ** (-qqbar(2).sqrt())
+            Traceback (most recent call last):
+              ...
+            ZeroDivisionError
+
+        A special code path is implemented for roots of unity:
+
+            >>> qqbar(-1).root(23) ** (qqbar(10**100) / qqbar(7))
+            0.981022 - 0.193894*I (deg 132)
 
         """
         if type(self) is not type(other):
@@ -1162,20 +1175,13 @@ class qqbar:
                 other = qqbar(other)
             except TypeError:
                 return NotImplemented
-        if not other.is_rational():
-            raise ValueError("qqbar exponent must be rational")
-        p = other.p()
-        q = other.q()
-        assert q <= 100000
-        if q != 1:
-            self = self.root(q)
         res = qqbar()
-        if p >= 0:
-            libcalcium.qqbar_pow_ui(res, self, p)
+        if libcalcium.qqbar_pow(res, self, other):
+            return res
         else:
-            libcalcium.qqbar_pow_ui(res, self, -p)
-            res = 1 / res
-        return res
+            if not self:
+                raise ZeroDivisionError
+            raise ValueError("qqbar powering: transcendental result")
 
     def __rpow__(self, other):
         if type(self) is not type(other):

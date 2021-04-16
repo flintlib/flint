@@ -248,7 +248,6 @@ int qqbar_csgn(const qqbar_t x);
 /* Integer parts */
 
 void qqbar_floor(fmpz_t res, const qqbar_t x);
-
 void qqbar_ceil(fmpz_t res, const qqbar_t x);
 
 /* Arithmetic */
@@ -266,6 +265,10 @@ void qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y);
 void qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y);
 void qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y);
 void qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y);
+void qqbar_fmpq_sub(qqbar_t res, const fmpq_t x, const qqbar_t y);
+void qqbar_fmpz_sub(qqbar_t res, const fmpz_t x, const qqbar_t y);
+void qqbar_ui_sub(qqbar_t res, ulong x, const qqbar_t y);
+void qqbar_si_sub(qqbar_t res, slong x, const qqbar_t y);
 
 void qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y);
 void qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y);
@@ -294,7 +297,8 @@ void qqbar_inv(qqbar_t res, const qqbar_t x);
 
 void qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp);
 
-void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n);
+void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong e);
+int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t e);
 
 void qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n);
 

@@ -104,3 +104,42 @@ qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y)
     qqbar_clear(t);
 }
 
+void
+qqbar_fmpq_sub(qqbar_t res, const fmpq_t x, const qqbar_t y)
+{
+    qqbar_t t;
+    qqbar_init(t);
+    qqbar_set_fmpq(t, x);
+    qqbar_sub(res, t, y);
+    qqbar_clear(t);
+}
+
+void
+qqbar_fmpz_sub(qqbar_t res, const fmpz_t x, const qqbar_t y)
+{
+    qqbar_t t;
+    qqbar_init(t);
+    qqbar_set_fmpz(t, x);
+    qqbar_sub(res, t, y);
+    qqbar_clear(t);
+}
+
+void
+qqbar_ui_sub(qqbar_t res, ulong x, const qqbar_t y)
+{
+    qqbar_t t;
+    qqbar_init(t);
+    qqbar_set_ui(t, x);
+    qqbar_sub(res, t, y);
+    qqbar_clear(t);
+}
+
+void
+qqbar_si_sub(qqbar_t res, slong x, const qqbar_t y)
+{
+    qqbar_t t;
+    qqbar_init(t);
+    qqbar_set_si(t, x);
+    qqbar_sub(res, t, y);
+    qqbar_clear(t);
+}

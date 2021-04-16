@@ -375,6 +375,10 @@ Arithmetic
               void qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
               void qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y)
               void qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y)
+              void qqbar_fmpq_sub(qqbar_t res, const fmpq_t x, const qqbar_t y)
+              void qqbar_fmpz_sub(qqbar_t res, const fmpz_t x, const qqbar_t y)
+              void qqbar_ui_sub(qqbar_t res, ulong x, const qqbar_t y)
+              void qqbar_si_sub(qqbar_t res, slong x, const qqbar_t y)
 
     Sets *res* to the difference of *x* and *y*.
 
@@ -445,6 +449,12 @@ Powers and roots
 
     Sets *res* to the principal branch of `x^{m/n}`. The order *n*
     must be positive. Division by zero calls *flint_abort*.
+
+.. function:: int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t y)
+
+    General exponentiation: if `x^y` is an algebraic number, sets *res*
+    to this value and returns 1. If `x^y` is transcendental or undefined,
+    returns 0.
 
 
 Numerical enclosures

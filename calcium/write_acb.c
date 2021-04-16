@@ -12,6 +12,7 @@
 #include <string.h>
 #include "calcium.h"
 
+/* todo: this will be obsolete with a new arb release */
 static char * arb_get_str2(const arb_t x, slong digits, ulong flags)
 {
     char * s;
@@ -71,7 +72,6 @@ static char * arb_get_str2(const arb_t x, slong digits, ulong flags)
     return s;
 }
 
-/* todo: document */
 void
 calcium_write_arb(calcium_stream_t out, const arb_t x, slong digits, ulong flags)
 {
