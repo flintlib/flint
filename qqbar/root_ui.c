@@ -43,7 +43,6 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
 
         /* handle principal roots of positive rational numbers */
         /* todo: could also handle conjugates of such roots */
-        /* todo: also specialize roots of unity, etc. */
         if (_fmpz_vec_is_zero(QQBAR_COEFFS(x) + 1, d - 1) &&
             fmpz_sgn(QQBAR_COEFFS(x)) < 0 &&
             arb_contains_zero(acb_imagref(QQBAR_ENCLOSURE(x))) && arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x))))
@@ -55,6 +54,18 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
             qqbar_fmpq_root_ui(res, t, d * n);
             fmpq_clear(t);
             return;
+        }
+
+        /* special-case roots of unity */
+        /* todo: also specialize rational multiples of roots of unity */
+        {
+            slong p;
+            ulong q;
+            if (qqbar_is_root_of_unity(&p, &q, x))
+            {
+                qqbar_root_of_unity(res, p, q * n);
+                return;
+            }
         }
 
         fmpz_poly_init(H);
