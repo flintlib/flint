@@ -47,18 +47,3 @@ fexpr_pow(fexpr_t res, const fexpr_t a, const fexpr_t b)
 {
     fexpr_call_builtin2(res, FEXPR_Pow, a, b);
 }
-
-int
-fexpr_is_Pow(const fexpr_t expr)
-{
-    fexpr_t op;
-    ulong op_head;
-
-    if (fexpr_is_atom(expr))
-        return 0;
-
-    fexpr_view_func(op, expr);
-    op_head = op->data[0];
-
-    return op_head == FEXPR_SYMBOL_Pow;
-}

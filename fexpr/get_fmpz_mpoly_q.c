@@ -96,7 +96,7 @@ cleanup1:
             return success;
         }
 
-        if (fexpr_is_Pow(expr) && (fexpr_nargs(expr) == 2))
+        if (fexpr_is_builtin_call(expr, FEXPR_Pow) && (fexpr_nargs(expr) == 2))
         {
             fexpr_t base, exp;
             int success;

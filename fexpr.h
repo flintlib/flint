@@ -441,9 +441,6 @@ int fexpr_is_arithmetic_operation(const fexpr_t expr);
 
 void fexpr_arithmetic_nodes(fexpr_vec_t nodes, const fexpr_t expr);
 
-/* todo: document/change */
-int fexpr_is_Pow(const fexpr_t expr);
-
 int fexpr_get_fmpz_mpoly_q(fmpz_mpoly_q_t res, const fexpr_t expr, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx);
 
 void fexpr_set_fmpz_mpoly(fexpr_t res, const fmpz_mpoly_t poly, const fexpr_vec_t vars, const fmpz_mpoly_ctx_t ctx);

@@ -15,6 +15,7 @@
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
 int _fexpr_is_symbol_with_underscore(const fexpr_t expr);
 
+/*
 static int
 fexpr_view_call0(fexpr_t func, const fexpr_t expr)
 {
@@ -25,6 +26,7 @@ fexpr_view_call0(fexpr_t func, const fexpr_t expr)
     fexpr_view_func(func, expr);
     return 1;
 }
+*/
 
 static int
 fexpr_view_call1(fexpr_t func, fexpr_t x1, const fexpr_t expr)
@@ -39,6 +41,7 @@ fexpr_view_call1(fexpr_t func, fexpr_t x1, const fexpr_t expr)
     return 1;
 }
 
+/*
 static int
 fexpr_view_call2(fexpr_t func, fexpr_t x1, fexpr_t x2, const fexpr_t expr)
 {
@@ -53,6 +56,7 @@ fexpr_view_call2(fexpr_t func, fexpr_t x1, fexpr_t x2, const fexpr_t expr)
     fexpr_view_next(x2);
     return 1;
 }
+*/
 
 static int
 fexpr_view_call3(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, const fexpr_t expr)
@@ -71,6 +75,7 @@ fexpr_view_call3(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, const fexpr_t
     return 1;
 }
 
+/*
 static int
 fexpr_view_call4(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, fexpr_t x4, const fexpr_t expr)
 {
@@ -89,6 +94,7 @@ fexpr_view_call4(fexpr_t func, fexpr_t x1, fexpr_t x2, fexpr_t x3, fexpr_t x4, c
     fexpr_view_next(x4);
     return 1;
 }
+*/
 
 static int
 fexpr_need_parens_in_mul(const fexpr_t expr, slong arg_index)

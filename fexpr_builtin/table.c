@@ -485,32 +485,3 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_zeta, "zeta", "\\zeta", NULL },
     { FEXPR_zeta_, "zeta_", "\\zeta", fexpr_write_latex_subscript },
 };
-
-
-
-
-
-
-/*
-document: 
-
-missing:
-    UnitCircle: "\\mathbb{T}",
-    PSL2Z: "\\operatorname{PSL}_2(\\mathbb{Z})",
-    RationalFunctionDegree: "\\deg",
-    ZZp: "\\mathbb{Z}",
-    QQp: "\\mathbb{Q}",
-
-todo: regular calls:
-    derivative for RiemannZeta, HurwitzZeta, ...
-    todo: subcall, derivative ...
-        HankelH1: "H^{(1)}",
-        HankelH2: "H^{(2)}",
-        AiryAi: "\\operatorname{Ai}",
-        AiryBi: "\\operatorname{Bi}",
-        AiryAiZero: "a",
-        AiryBiZero: "b",
-        BesselJZero: "j",
-        BesselYZero: "y",
-
-*/

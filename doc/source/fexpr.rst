@@ -213,6 +213,12 @@ Comparisons
 
     Checks if *a* and *b* are exactly equal as expressions.
 
+.. function:: int fexpr_equal_si(const fexpr_t expr, slong c)
+
+.. function:: int fexpr_equal_ui(const fexpr_t expr, ulong c)
+
+    Checks if *expr* is an atomic integer exactly equal to *c*.
+
 .. function:: ulong fexpr_hash(const fexpr_t expr)
 
     Returns a hash of the expression *expr*.
@@ -252,6 +258,10 @@ Atoms
 
     Returns whether *expr* is the atomic integer 0.
 
+.. function:: int fexpr_is_neg_integer(const fexpr_t expr)
+
+    Returns whether *expr* is any negative atomic integer.
+
 .. function:: void fexpr_set_si(fexpr_t res, slong c)
               void fexpr_set_ui(fexpr_t res, ulong c)
               void fexpr_set_fmpz(fexpr_t res, const fmpz_t c)
@@ -266,6 +276,16 @@ Atoms
 .. function:: void fexpr_set_symbol_builtin(fexpr_t res, slong id)
 
     Sets *res* to the builtin symbol with internal index *id*
+    (see :ref:`fexpr-builtin`).
+
+.. function:: int fexpr_is_builtin_symbol(const fexpr_t expr, slong id)
+
+    Returns whether *expr* is the builtin symbol with index *id*
+    (see :ref:`fexpr-builtin`).
+
+.. function:: int fexpr_is_any_builtin_symbol(const fexpr_t expr)
+
+    Returns whether *expr* is any builtin symbol
     (see :ref:`fexpr-builtin`).
 
 .. function:: void fexpr_set_symbol_str(fexpr_t res, const char * s)
@@ -389,6 +409,15 @@ Function call structure
     This function can also be called when *view* refers to the function *f*,
     in which case it will make *view* point to `e_1`.
 
+.. function:: int fexpr_is_builtin_call(const fexpr_t expr, slong id)
+
+    Returns whether *expr* has the form `f(\ldots)` where *f* is
+    a builtin function defined by *id* (see :ref:`fexpr-builtin`).
+
+.. function:: int fexpr_is_any_builtin_call(const fexpr_t expr)
+
+    Returns whether *expr* has the form `f(\ldots)` where *f* is
+    any builtin function (see :ref:`fexpr-builtin`).
 
 Composition
 ------------------------------------------------------------------------
