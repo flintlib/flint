@@ -55,6 +55,9 @@ _ca_mat_same_field(const ca_mat_t A, ca_ctx_t ctx)
             if (CA_IS_QQ(ca_mat_entry(A, i, j), ctx))
                 continue;
 
+            if (CA_IS_SPECIAL(ca_mat_entry(A, i, j)))
+                return NULL;
+
             if (K == QQ)
                 K = CA_FIELD(ca_mat_entry(A, i, j), ctx);
             else if (K != CA_FIELD(ca_mat_entry(A, i, j), ctx))

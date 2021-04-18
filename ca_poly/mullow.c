@@ -26,6 +26,9 @@ _ca_vec_same_field2(ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, ca_ctx_t c
         if (CA_IS_QQ(A + i, ctx))
             continue;
 
+        if (CA_IS_SPECIAL(A + i))
+            return NULL;
+
         if (K == QQ)
             K = CA_FIELD(A + i, ctx);
         else if (K != CA_FIELD(A + i, ctx))
@@ -38,6 +41,9 @@ _ca_vec_same_field2(ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, ca_ctx_t c
         {
             if (CA_IS_QQ(B + i, ctx))
                 continue;
+
+            if (CA_IS_SPECIAL(B + i))
+                return NULL;
 
             if (K == QQ)
                 K = CA_FIELD(B + i, ctx);
