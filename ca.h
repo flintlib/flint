@@ -339,6 +339,7 @@ char * ca_get_str(const ca_t x, ca_ctx_t ctx);
 
 /* Random generation */
 
+void ca_randtest_same_nf(ca_t res, flint_rand_t state, const ca_t x, slong bits, slong den_bits, ca_ctx_t ctx);
 void ca_randtest_rational(ca_t res, flint_rand_t state, slong bits, ca_ctx_t ctx);
 void ca_randtest(ca_t res, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx);
 void ca_randtest_special(ca_t res, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx);

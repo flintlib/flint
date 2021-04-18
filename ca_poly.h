@@ -176,6 +176,19 @@ ca_poly_div_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
     _ca_poly_normalise(res, ctx);
 }
 
+/* todo: improve, document */
+CA_POLY_INLINE void
+ca_poly_div_fmpz(ca_poly_t res, const ca_poly_t poly, const fmpz_t c, ca_ctx_t ctx)
+{
+    ca_t t;
+    ca_init(t, ctx);
+    ca_set_fmpz(t, c, ctx);
+    ca_poly_div_ca(res, res, t, ctx);
+    ca_clear(t, ctx);
+}
+
+void _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, slong len, ca_field_t K, ca_ctx_t ctx);
+
 void _ca_poly_mullow(ca_ptr C, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, slong n, ca_ctx_t ctx);
 void ca_poly_mullow(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, slong n, ca_ctx_t ctx);
 

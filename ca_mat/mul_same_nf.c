@@ -153,7 +153,7 @@ get_mat_colwise(fmpz_poly_mat_t Aclear, const ca_mat_t A, const fmpz * Aden, ca_
     fmpz_clear(t);
 }
 
-static void
+void
 _ca_set_nf_fmpz_poly_den(ca_t res, const fmpz_poly_t poly, const fmpz_t den, ca_field_t K, ca_ctx_t ctx)
 {
     if (poly->length == 0)

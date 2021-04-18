@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2020, 2021 Fredrik Johansson
 
     This file is part of Calcium.
 
@@ -10,6 +10,24 @@
 */
 
 #include "ca_poly.h"
+
+void
+ca_poly_randtest_same_nf(ca_poly_t res, flint_rand_t state, const ca_t x, slong len, slong bits, slong den_bits, ca_ctx_t ctx)
+{
+    slong i;
+    fmpz_t t;
+
+    ca_poly_fit_length(res, len, ctx);
+    for (i = 0; i < len; i++)
+        ca_randtest_same_nf(res->coeffs + i, state, x, bits, 1, ctx);
+    _ca_poly_set_length(res, len, ctx);
+    _ca_poly_normalise(res, ctx);
+
+    fmpz_init(t);
+    fmpz_randtest_not_zero(t, state, den_bits);
+    ca_poly_div_fmpz(res, res, t, ctx);
+    fmpz_clear(t);
+}
 
 int main()
 {
@@ -37,9 +55,31 @@ int main()
         ca_poly_init(AC, ctx);
         ca_poly_init(ABAC, ctx);
 
-        ca_poly_randtest(A, state, 4, 2, 10, ctx);
-        ca_poly_randtest(B, state, 4, 2, 10, ctx);
-        ca_poly_randtest(C, state, 4, 2, 10, ctx);
+        if (n_randint(state, 2))
+        {
+            ca_poly_randtest(A, state, 4, 2, 10, ctx);
+            ca_poly_randtest(B, state, 4, 2, 10, ctx);
+            ca_poly_randtest(C, state, 4, 2, 10, ctx);
+        }
+        else
+        {
+            qqbar_t t;
+            ca_t x;
+
+            qqbar_init(t);
+            ca_init(x, ctx);
+
+            qqbar_randtest(t, state, 8, 10);
+            ca_set_qqbar(x, t, ctx);
+
+            ca_poly_randtest_same_nf(A, state, x, 1 + n_randint(state, 20), 2 + n_randint(state, 100), 2 + n_randint(state, 100), ctx);
+            ca_poly_randtest_same_nf(B, state, x, 1 + n_randint(state, 20), 2 + n_randint(state, 100), 2 + n_randint(state, 100), ctx);
+            ca_poly_randtest_same_nf(C, state, x, 1 + n_randint(state, 20), 2 + n_randint(state, 100), 2 + n_randint(state, 100), ctx);
+
+            qqbar_clear(t);
+            ca_clear(x, ctx);
+        }
+
         ca_poly_randtest(ABC, state, 4, 2, 10, ctx);
         ca_poly_randtest(AB, state, 4, 2, 10, ctx);
         ca_poly_randtest(AC, state, 4, 2, 10, ctx);

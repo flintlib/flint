@@ -471,6 +471,13 @@ Random generation
 
     Randomly generates either a special value or a number.
 
+.. function:: void ca_randtest_same_nf(ca_t res, flint_rand_t state, const ca_t x, slong bits, slong den_bits, ca_ctx_t ctx)
+
+    Sets *res* to a random element in the same number field as *x*,
+    with numerator coefficients up to *bits* in size and denominator
+    up to *den_bits* in size. This function requires that *x* is an
+    element of an absolute number field.
+
 Representation properties
 -------------------------------------------------------------------------------
 
