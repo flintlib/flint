@@ -69,7 +69,7 @@ Memory management
 
     Frees the window matrix.
 
-Conversions
+Assignment and conversions
 -------------------------------------------------------------------------------
 
 .. function:: void ca_mat_set(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx)
@@ -82,6 +82,16 @@ Conversions
 
     Sets *mat* to the matrix with the scalar *c* on the main diagonal
     and zeros elsewhere.
+
+.. function:: void ca_mat_transfer(ca_mat_t res, ca_ctx_t res_ctx, const ca_mat_t src, ca_ctx_t src_ctx)
+
+    Sets *res* to *src* where the corresponding context objects *res_ctx* and
+    *src_ctx* may be different.
+
+    This operation preserves the mathematical value represented by *src*,
+    but may result in a different internal representation depending on the
+    settings of the context objects.
+
 
 Random generation
 -------------------------------------------------------------------------------

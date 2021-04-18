@@ -247,6 +247,16 @@ void ca_ctx_init(ca_ctx_t ctx);
 void ca_ctx_clear(ca_ctx_t ctx);
 void ca_ctx_print(ca_ctx_t ctx);
 
+CA_INLINE slong ca_ctx_get_option(ca_ctx_t ctx, slong i)
+{
+    return ctx->options[i];
+}
+
+CA_INLINE void ca_ctx_set_option(ca_ctx_t ctx, slong i, slong value)
+{
+    ctx->options[i] = value;
+}
+
 ca_field_ptr _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func);
 ca_field_ptr _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x);
 ca_field_ptr _ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const ca_t x, const ca_t y);

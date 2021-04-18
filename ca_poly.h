@@ -111,6 +111,8 @@ void ca_poly_set(ca_poly_t res, const ca_poly_t src, ca_ctx_t ctx);
 void ca_poly_set_fmpz_poly(ca_poly_t res, const fmpz_poly_t src, ca_ctx_t ctx);
 void ca_poly_set_fmpq_poly(ca_poly_t res, const fmpq_poly_t src, ca_ctx_t ctx);
 
+void ca_poly_transfer(ca_poly_t res, ca_ctx_t res_ctx, const ca_poly_t src, ca_ctx_t src_ctx);
+
 void ca_poly_set_coeff_ca(ca_poly_t poly, slong n, const ca_t x, ca_ctx_t ctx);
 
 /* Random generation */

@@ -110,6 +110,15 @@ Assignment and simple values
 
     Sets the coefficient at position *n* in *poly* to *x*.
 
+.. function:: void ca_poly_transfer(ca_poly_t res, ca_ctx_t res_ctx, const ca_poly_t src, ca_ctx_t src_ctx)
+
+    Sets *res* to *src* where the corresponding context objects *res_ctx* and
+    *src_ctx* may be different.
+
+    This operation preserves the mathematical value represented by *src*,
+    but may result in a different internal representation depending on the
+    settings of the context objects.
+
 Random generation
 -------------------------------------------------------------------------------
 

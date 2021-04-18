@@ -224,6 +224,8 @@ class fexpr:
                     libcalcium.fexpr_set_symbol_str(self, ("True").encode('ascii'))
                 else:
                     libcalcium.fexpr_set_symbol_str(self, ("False").encode('ascii'))
+            elif typ is ca:
+                libcalcium.ca_get_fexpr(self, val, 0, val._ctx)
             elif typ is tuple:
                 tmp = fexpr("Tuple")(*val)         # todo: create without copying
                 libcalcium.fexpr_set(self, tmp)
@@ -1227,6 +1229,21 @@ class qqbar:
         libcalcium.qqbar_get_fexpr_repr(res, self)
         return res
 
+_ca_options = [
+    "verbose",
+    "print_flags",
+    "mpoly_ord",
+    "prec_limit",
+    "qqbar_deg_limit",
+    "low_prec",
+    "smooth_limit",
+    "lll_prec",
+    "pow_limit",
+    "use_gb",
+    "gb_length_limit",
+    "gb_poly_length_limit",
+    "gb_poly_bits_limit",
+    "vieta_limit"]
 
 class ca_ctx:
     """
@@ -1234,10 +1251,15 @@ class ca_ctx:
     Currently only supports a global instance.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._data = ca_ctx_struct()
         self._ref = ctypes.byref(self._data)
         libcalcium.ca_ctx_init(self._ref)
+        for w in kwargs:
+            i = _ca_options.index(w)
+            if i == -1:
+                raise ValueError("unknown option %s" % w)
+            libcalcium.ca_ctx_set_option(self._ref, i, kwargs[w])
 
     def __del__(self):
         # Python calls ctx_default.__del__ before all ca instances are
@@ -1246,6 +1268,16 @@ class ca_ctx:
         # WHY??????????????
         # libcalcium.ca_ctx_clear(self._ref)
         pass
+
+    def __repr__(self):
+        s = "ca_ctx("
+        for i in range(len(_ca_options)):
+            val = libcalcium.ca_ctx_get_option(self._ref, i)
+            s += "%s=%s" % (_ca_options[i], val)
+            if i < len(_ca_options) - 1:
+                s += ", "
+        s += ")"
+        return s
 
     @property
     def _as_parameter_(self):
@@ -1293,8 +1325,11 @@ class ca:
 
     """
 
-    def __init__(self, val=0):
-        self._ctx_python = ctx_default
+    def __init__(self, val=0, context=None):
+        if context is None:
+            self._ctx_python = ctx_default
+        else:
+            self._ctx_python = context
         self._ctx = self._ctx_python._ref
         self._data = ca_struct()
         self._ref = ctypes.byref(self._data)
@@ -1320,6 +1355,9 @@ class ca:
                 libcalcium.ca_set_d_d(self, val.real, val.imag, self._ctx)
             elif typ is qqbar:
                 libcalcium.ca_set_qqbar(self, val, self._ctx)
+            elif typ is fexpr:
+                if not libcalcium.ca_set_fexpr(self, val, self._ctx):
+                    raise ValueError("unable to parse the given expression as a ca")
             else:
                 raise TypeError
 
@@ -1549,12 +1587,35 @@ class ca:
             return True
         raise NotImplementedError("unable to decide predicate: is_zero")
 
-    def __eq__(self, other):
-        if type(self) is not type(other):
+    @staticmethod
+    def operands_with_same_context(a, b):
+        type_a = type(a)
+        type_b = type(b)
+        if type_a is ca and type_b is ca:
+            if a._ctx_python is b._ctx_python:
+                return a, b
+            # which context object to choose?
+            c = a._new()
+            libcalcium.ca_transfer(c, c._ctx, b, b._ctx)
+            return a, c
+        if type_a is ca:
             try:
-                other = ca(other)
+                b = ca(b, context=a._ctx_python)
             except TypeError:
-                return NotImplemented
+                return NotImplemented, NotImplemented
+            return a, b
+        else:
+            try:
+                a = ca(a, context=b._ctx_python)
+            except TypeError:
+                return NotImplemented, NotImplemented
+            return a, b
+        return NotImplemented, NotImplemented
+
+    def __eq__(self, other):
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         t = libcalcium.ca_check_equal(self, other, self._ctx)
         if t == T_TRUE:
             return True
@@ -1563,11 +1624,9 @@ class ca:
         raise NotImplementedError("unable to decide predicate: equal")
 
     def __ne__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         t = libcalcium.ca_check_equal(self, other, self._ctx)
         if t == T_TRUE:
             return False
@@ -1576,11 +1635,9 @@ class ca:
         raise NotImplementedError("unable to decide predicate: equal")
 
     def __le__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         t = libcalcium.ca_check_le(self, other, self._ctx)
         if t == T_TRUE:
             return True
@@ -1589,11 +1646,9 @@ class ca:
         raise NotImplementedError("unable to decide predicate: le")
 
     def __lt__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         t = libcalcium.ca_check_lt(self, other, self._ctx)
         if t == T_TRUE:
             return True
@@ -1602,11 +1657,9 @@ class ca:
         raise NotImplementedError("unable to decide predicate: lt")
 
     def __ge__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         t = libcalcium.ca_check_ge(self, other, self._ctx)
         if t == T_TRUE:
             return True
@@ -1615,11 +1668,9 @@ class ca:
         raise NotImplementedError("unable to decide predicate: ge")
 
     def __gt__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         t = libcalcium.ca_check_gt(self, other, self._ctx)
         if t == T_TRUE:
             return True
@@ -1627,79 +1678,58 @@ class ca:
             return False
         raise NotImplementedError("unable to decide predicate: gt")
 
+    def _new(self):
+        return ca(context=self._ctx_python)
+
     def __add__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_add(res, self, other, self._ctx)
         return res
 
     __radd__ = __add__
 
     def __sub__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_sub(res, self, other, self._ctx)
         return res
 
     def __rsub__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_sub(res, other, self, self._ctx)
         return res
 
     def __mul__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_mul(res, self, other, self._ctx)
         return res
 
     __rmul__ = __mul__
 
     def __truediv__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_div(res, self, other, self._ctx)
         return res
 
     def __rtruediv__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_div(res, other, self, self._ctx)
         return res
 
@@ -1710,41 +1740,33 @@ class ca:
         return (other / self).floor()
 
     def __pow__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_pow(res, self, other, self._ctx)
         return res
 
     def __rpow__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca()
+        self, other = ca.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_pow(res, other, self, self._ctx)
         return res
 
     def __abs__(self):
-        res = ca()
+        res = self._new()
         libcalcium.ca_abs(res, self, self._ctx)
         return res
 
     def __neg__(self):
-        res = ca()
+        res = self._new()
         libcalcium.ca_neg(res, self, self._ctx)
         return res
 
     def __pos__(self):
-        res = ca()
+        res = self._new()
         libcalcium.ca_set(res, self, self._ctx)
         return res
 
@@ -1760,7 +1782,7 @@ class ca:
             2
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_re(res, self, self._ctx)
         return res
 
@@ -1776,7 +1798,7 @@ class ca:
             3
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_im(res, self, self._ctx)
         return res
 
@@ -1794,7 +1816,7 @@ class ca:
             3.14159 {a where a = 3.14159 [Pi]}
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_conjugate(res, self, self._ctx)
         return res
 
@@ -1814,7 +1836,7 @@ class ca:
             -4
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_floor(res, self, self._ctx)
         return res
 
@@ -1832,7 +1854,7 @@ class ca:
             -3
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_ceil(res, self, self._ctx)
         return res
 
@@ -1854,7 +1876,7 @@ class ca:
             -1.00000*I {-a where a = I [a^2+1=0]}
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_sgn(res, self, self._ctx)
         return res
 
@@ -1888,7 +1910,7 @@ class ca:
             Unknown
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_sqrt(res, self, self._ctx)
         return res
 
@@ -1930,7 +1952,7 @@ class ca:
             Unknown
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_log(res, self, self._ctx)
         return res
 
@@ -1962,7 +1984,7 @@ class ca:
             Unknown
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_exp(res, self, self._ctx)
         return res
 
@@ -1988,7 +2010,7 @@ class ca:
             Undefined
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_erf(res, self, self._ctx)
         return res
 
@@ -2014,7 +2036,7 @@ class ca:
             Undefined
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_erfc(res, self, self._ctx)
         return res
 
@@ -2040,7 +2062,7 @@ class ca:
             0
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_erfi(res, self, self._ctx)
         return res
 
@@ -2064,7 +2086,7 @@ class ca:
             1
 
         """
-        res = ca()
+        res = self._new()
         libcalcium.ca_gamma(res, self, self._ctx)
         return res
 
@@ -2113,8 +2135,11 @@ class ca_mat:
 
     """
 
-    def __init__(self, *args):
-        self._ctx_python = ctx_default
+    def __init__(self, *args, context=None):
+        if context is None:
+            self._ctx_python = ctx_default
+        else:
+            self._ctx_python = context
         self._ctx = self._ctx_python._ref
         self._data = ca_mat_struct()
         self._ref = ctypes.byref(self._data)
@@ -2125,7 +2150,7 @@ class ca_mat:
                 m = val.nrows()
                 n = val.ncols()
                 libcalcium.ca_mat_init(self, m, n, self._ctx)
-                libcalcium.ca_mat_set(self, val, self._ctx)
+                libcalcium.ca_mat_transfer(self, self._ctx, val, val._ctx)
             elif isinstance(val, (list, tuple)):
                 m = len(val)
                 n = 0
@@ -2140,7 +2165,7 @@ class ca_mat:
                 for i in range(m):
                     row = val[i]
                     for j in range(n):
-                        x = ca(row[j])
+                        x = ca(row[j], context=self._ctx_python)
                         libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
             else:
                 raise TypeError("cannot create ca_mat from input of type %s" % type(val))
@@ -2159,7 +2184,7 @@ class ca_mat:
                 raise ValueError("list of entries has the wrong length")
             for i in range(m):
                 for j in range(n):
-                    x = ca(entries[i*n + j])
+                    x = ca(entries[i*n + j], context=self._ctx_python)
                     libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
         else:
             raise ValueError("ca_mat: expected 1-3 arguments")
@@ -2183,6 +2208,25 @@ class ca_mat:
             return True
         raise ValueError("unable to decide predicate: is_zero")
 
+    def _new(self, r, c):
+        return ca_mat(r, c, context=self._ctx_python)
+
+    def _new_ca(self):
+        return ca(context=self._ctx_python)
+
+    @staticmethod
+    def operands_with_same_context(a, b):
+        type_a = type(a)
+        type_b = type(b)
+        if type_a is ca_mat and type_b is ca_mat:
+            if a._ctx_python is b._ctx_python:
+                return a, b
+            # which context object to choose?
+            c = a._new(b.nrows(), b.ncols())
+            libcalcium.ca_mat_transfer(c, c._ctx, b, b._ctx)
+            return a, c
+        return NotImplemented, NotImplemented
+
     def __eq__(self, other):
         """
         Examples::
@@ -2191,13 +2235,9 @@ class ca_mat:
             True
 
         """
-        if type(self) is not type(other):
-            try:
-                other = ca_mat(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = self.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         res = libcalcium.ca_mat_check_equal(self, other, self._ctx)
         if res == T_TRUE:
             return True
@@ -2213,13 +2253,9 @@ class ca_mat:
             True
 
         """
-        if type(self) is not type(other):
-            try:
-                other = ca_mat(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = self.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         res = libcalcium.ca_mat_check_equal(self, other, self._ctx)
         if res == T_TRUE:
             return False
@@ -2286,7 +2322,7 @@ class ca_mat:
         ncols = self.ncols()
         assert 0 <= i < nrows
         assert 0 <= j < ncols
-        x = ca()
+        x = self._new_ca()
         libcalcium.ca_set(x, libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), self._ctx)
         return x
 
@@ -2296,7 +2332,7 @@ class ca_mat:
         ncols = self.ncols()
         assert 0 <= i < nrows
         assert 0 <= j < ncols
-        x = ca(x)
+        x = ca(x, context=self._ctx_python)
         libcalcium.ca_set(libcalcium.ca_mat_entry_ptr(self, i, j, self._ctx), x, self._ctx)
 
     def trace(self):
@@ -2313,10 +2349,9 @@ class ca_mat:
         ncols = self.ncols()
         if nrows != ncols:
             raise ValueError("a square matrix is required")
-        res = ca()
+        res = self._new_ca()
         libcalcium.ca_mat_trace(res, self, self._ctx)
         return res
-
 
     def det(self):
         """
@@ -2332,110 +2367,90 @@ class ca_mat:
         ncols = self.ncols()
         if nrows != ncols:
             raise ValueError("a square matrix is required")
-        res = ca()
+        res = self._new_ca()
         libcalcium.ca_mat_det(res, self, self._ctx)
         return res
 
     def __neg__(self):
-        res = ca_mat(self.nrows(), self.ncols())
+        res = self._new(self.nrows(), self.ncols())
         libcalcium.ca_mat_neg(res, self, self._ctx)
         return res
 
     def __pos__(self):
-        res = ca_mat(self.nrows(), self.ncols())
+        res = self._new(self.nrows(), self.ncols())
         libcalcium.ca_mat_set(res, self, self._ctx)
         return res
 
     def __add__(self, other):
-        if type(self) is not type(other):
+        s, t = self.operands_with_same_context(self, other)
+        if s is NotImplemented:
             try:
-                other = ca(other)
-                if self._ctx_python is not other._ctx_python:
-                    raise ValueError("different context objects!")
+                other = ca(other, context=self._ctx_python)
                 m = self.nrows()
                 n = self.ncols()
-                res = ca_mat(m, n)
+                res = self._new(m, n)
                 libcalcium.ca_mat_add_ca(res, self, other, self._ctx)
                 return res
             except TypeError:
-                pass
-            try:
-                other = ca_mat(other)
-            except TypeError:
                 return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = s, t
         m = self.nrows()
         n = self.ncols()
         if m != other.nrows() or n != other.ncols():
             raise ValueError("incompatible matrix shapes")
-        res = ca_mat(m, n)
+        res = self._new(m, n)
         libcalcium.ca_mat_add(res, self, other, self._ctx)
         return res
 
     def __sub__(self, other):
-        if type(self) is not type(other):
+        s, t = self.operands_with_same_context(self, other)
+        if s is NotImplemented:
             try:
-                other = ca(other)
-                if self._ctx_python is not other._ctx_python:
-                    raise ValueError("different context objects!")
+                other = ca(other, context=self._ctx_python)
                 m = self.nrows()
                 n = self.ncols()
-                res = ca_mat(m, n)
+                res = self._new(m, n)
                 libcalcium.ca_mat_sub_ca(res, self, other, self._ctx)
                 return res
             except TypeError:
-                pass
-            try:
-                other = ca_mat(other)
-            except TypeError:
                 return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = s, t
         m = self.nrows()
         n = self.ncols()
         if m != other.nrows() or n != other.ncols():
             raise ValueError("incompatible matrix shapes")
-        res = ca_mat(m, n)
+        res = self._new(m, n)
         libcalcium.ca_mat_sub(res, self, other, self._ctx)
         return res
 
     def __mul__(self, other):
-        if type(self) is not type(other):
+        s, t = self.operands_with_same_context(self, other)
+        if s is NotImplemented:
             try:
-                other = ca(other)
-                if self._ctx_python is not other._ctx_python:
-                    raise ValueError("different context objects!")
+                other = ca(other, context=self._ctx_python)
                 m = self.nrows()
                 n = self.ncols()
-                res = ca_mat(m, n)
+                res = self._new(m, n)
                 libcalcium.ca_mat_mul_ca(res, self, other, self._ctx)
                 return res
             except TypeError:
-                pass
-            try:
-                other = ca_mat(other)
-            except TypeError:
                 return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = s, t
         m = self.nrows()
         n = self.ncols()
         k = other.ncols()
         if n != other.nrows():
             raise ValueError("incompatible matrix shapes")
-        res = ca_mat(m, k)
+        res = self._new(m, k)
         libcalcium.ca_mat_mul(res, self, other, self._ctx)
         return res
 
     def __rmul__(self, other):
         try:
-            other = ca(other)
-            if self._ctx_python is not other._ctx_python:
-                raise ValueError("different context objects!")
+            other = ca(other, context=self._ctx_python)
             m = self.nrows()
             n = self.ncols()
-            res = ca_mat(m, n)
+            res = self._new(m, n)
             libcalcium.ca_mat_mul_ca(res, self, other, self._ctx)
             return res
         except TypeError:
@@ -2444,12 +2459,10 @@ class ca_mat:
 
     def __truediv__(self, other):
         try:
-            other = ca(other)
-            if self._ctx_python is not other._ctx_python:
-                raise ValueError("different context objects!")
+            other = ca(other, context=self._ctx_python)
             m = self.nrows()
             n = self.ncols()
-            res = ca_mat(m, n)
+            res = self._new(m, n)
             libcalcium.ca_mat_div_ca(res, self, other, self._ctx)
             return res
         except TypeError:
@@ -2462,7 +2475,7 @@ class ca_mat:
         assert m == n
         e = int(other)
         assert 0 <= e <= sys.maxsize
-        res = ca_mat(m, m)
+        res = self._new(m, m)
         libcalcium.ca_mat_pow_ui_binexp(res, self, e, self._ctx)
         return res
 
@@ -2474,7 +2487,7 @@ class ca_mat:
             ca_mat of size 1 x 2
             [5, 1.00000 + 1.00000*I {a+1 where a = I [a^2+1=0]}]
         """
-        res = ca_mat(self.nrows(), self.ncols())
+        res = self._new(self.nrows(), self.ncols())
         libcalcium.ca_mat_conjugate(res, self, self._ctx)
         return res
 
@@ -2504,7 +2517,7 @@ class ca_mat:
             [1.00000 + 1.00000*I {a+1 where a = I [a^2+1=0]}]
 
         """
-        res = ca_mat(self.ncols(), self.nrows())
+        res = self._new(self.ncols(), self.nrows())
         libcalcium.ca_mat_conjugate_transpose(res, self, self._ctx)
         return res
 
@@ -2520,7 +2533,7 @@ class ca_mat:
         m = self.nrows()
         n = self.ncols()
         assert m == n
-        res = ca_poly()
+        res = ca_poly(context=self._ctx_python)
         libcalcium.ca_mat_charpoly(res, self, self._ctx)
         return res
 
@@ -2538,7 +2551,7 @@ class ca_mat:
         m = self.nrows()
         n = self.ncols()
         assert m == n
-        lamda = ca_vec()
+        lamda = ca_vec(context=self._ctx_python)
         exp = ctypes.cast(libflint.flint_malloc(ctypes.sizeof(ctypes.c_ulong) * n), ctypes.POINTER(ctypes.c_ulong))
         success = libcalcium.ca_mat_eigenvalues(lamda, exp, self, self._ctx)
         if not success:
@@ -2569,7 +2582,7 @@ class ca_mat:
             NotImplementedError: failed to compute rref
 
         """
-        res = ca_mat(self.nrows(), self.ncols())
+        res = self._new(self.nrows(), self.ncols())
         rank = (ctypes.c_long * 1)()
         if libcalcium.ca_mat_rref(rank, res, self, self._ctx):
             return res
@@ -2614,7 +2627,7 @@ class ca_mat:
         m = self.ncols()
         if n != m:
             raise ValueError("matrix must be square")
-        res = ca_mat(n, m)
+        res = self._new(n, m)
         invertible = libcalcium.ca_mat_inv(res, self, self._ctx)
         if invertible == T_TRUE:
             return res
@@ -2634,19 +2647,15 @@ class ca_mat:
             Traceback (most recent call last):
               ...
             ZeroDivisionError: singular matrix
-            >>> ca_mat([[1, 0], [0, 1-exp(ca(2)**-10000)]]).solve([[5],[6]])
+            >>> ca_mat([[1, 0], [0, 1-exp(ca(2)**-10000)]]).solve(ca_mat([[5],[6]]))
             Traceback (most recent call last):
               ...
             NotImplementedError: failed to prove matrix singular or nonsingular
 
         """
-        if type(self) is not type(other):
-            try:
-                other = ca_mat(other)
-            except TypeError:
-                raise TypeError
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = self.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            raise TypeError
         n = self.nrows()
         m = self.ncols()
         if n != m:
@@ -2654,7 +2663,7 @@ class ca_mat:
         c = other.ncols()
         if n != other.nrows():
             raise ValueError("incompatible matrix shapes")
-        res = ca_mat(n, c)
+        res = self._new(n, c)
         if algorithm is None:
             invertible = libcalcium.ca_mat_nonsingular_solve(res, self, other, self._ctx)
         elif algorithm == "lu":
@@ -2688,7 +2697,7 @@ class ca_mat:
             [0]
 
         """
-        res = ca_mat(0, 0)
+        res = self._new(0, 0)
         if libcalcium.ca_mat_right_kernel(res, self, self._ctx):
             return res
         raise NotImplementedError("failed to compute right kernel")
@@ -2733,8 +2742,8 @@ class ca_mat:
         m = self.ncols()
         if n != m:
             raise ValueError("non-square matrix is not diagonalizable")
-        D = ca_mat(n, n)
-        P = ca_mat(n, n)
+        D = self._new(n, n)
+        P = self._new(n, n)
         res = libcalcium.ca_mat_diagonalization(D, P, self, self._ctx)
         if res == T_FALSE:
             raise ValueError("matrix is not diagonalizable")
@@ -2772,7 +2781,7 @@ class ca_mat:
         m = self.ncols()
         if n != m:
             raise ValueError("matrix must be square")
-        res = ca_mat(n, m)
+        res = self._new(n, m)
         invertible = libcalcium.ca_mat_log(res, self, self._ctx)
         if invertible == T_TRUE:
             return res
@@ -2813,7 +2822,7 @@ class ca_mat:
         m = self.ncols()
         if n != m:
             raise ValueError("matrix must be square")
-        res = ca_mat(n, m)
+        res = self._new(n, m)
         if libcalcium.ca_mat_exp(res, self, self._ctx):
             return res
         raise NotImplementedError("unable to compute matrix exponential")
@@ -2845,9 +2854,9 @@ class ca_mat:
         m = self.ncols()
         if n != m:
             raise ValueError("non-square matrix")
-        J = ca_mat(n, n)
+        J = self._new(n, n)
         if transform:
-            P = ca_mat(n, n)
+            P = self._new(n, n)
             if libcalcium.ca_mat_jordan_form(J, P, self, self._ctx):
                 return J, P
         else:
@@ -2860,8 +2869,11 @@ class ca_vec:
     Python class wrapping the ca_vec_t type for vectors.
     """
 
-    def __init__(self, n=0):
-        self._ctx_python = ctx_default
+    def __init__(self, n=0, context=None):
+        if context is None:
+            self._ctx_python = ctx_default
+        else:
+            self._ctx_python = context
         self._ctx = self._ctx_python._ref
         self._data = ca_vec_struct()
         self._ref = ctypes.byref(self._data)
@@ -2886,14 +2898,17 @@ class ca_vec:
     def __getitem__(self, i):
         n = len(self)
         assert 0 <= i < n
-        x = ca()
+        x = ca(context=self._ctx_python)
         libcalcium.ca_set(x, libcalcium.ca_vec_entry_ptr(self, i, self._ctx), self._ctx)
         return x
 
 class ca_poly_vec:
 
-    def __init__(self, n=0):
-        self._ctx_python = ctx_default
+    def __init__(self, n=0, context=None):
+        if context is None:
+            self._ctx_python = ctx_default
+        else:
+            self._ctx_python = context
         self._ctx = self._ctx_python._ref
         self._data = ca_poly_vec_struct()
         self._ref = ctypes.byref(self._data)
@@ -2918,7 +2933,7 @@ class ca_poly_vec:
     def __getitem__(self, i):
         n = len(self)
         assert 0 <= i < n
-        x = ca_poly()
+        x = ca_poly(context=self._ctx_python)
         libcalcium.ca_poly_set(x, ctypes.byref(self._data.entries[i]), self._ctx)
         return x
 
@@ -2928,22 +2943,24 @@ class ca_poly:
     Python class wrapping the ca_poly_t type for polynomials.
     """
 
-    def __init__(self, val=0):
-        self._ctx_python = ctx_default
+    def __init__(self, val=0, context=None):
+        if context is None:
+            self._ctx_python = ctx_default
+        else:
+            self._ctx_python = context
         self._ctx = self._ctx_python._ref
         self._data = ca_poly_struct()
         self._ref = ctypes.byref(self._data)
         libcalcium.ca_poly_init(self, self._ctx)
-        # todo: check conext objects
         if type(val) is ca_poly:
-            libcalcium.ca_poly_set(self, val, self._ctx)
+            libcalcium.ca_poly_transfer(self, self._ctx, val, val._ctx)
         elif val:
             try:
-                val = [ca(c) for c in val]
+                val = [ca(c, context=self._ctx_python) for c in val]
                 for i in range(len(val)):
                     libcalcium.ca_poly_set_coeff_ca(self, i, val[i], self._ctx)
             except TypeError:
-                val = ca(val)
+                val = ca(val, context=self._ctx_python)
                 libcalcium.ca_poly_set_ca(self, val, self._ctx)
 
     def __del__(self):
@@ -2965,6 +2982,37 @@ class ca_poly:
             return True
         raise ValueError("unable to decide predicate: is_zero")
 
+    def _new(self):
+        return ca_poly(context=self._ctx_python)
+
+    def _new_ca(self):
+        return ca(context=self._ctx_python)
+
+    @staticmethod
+    def operands_with_same_context(a, b):
+        type_a = type(a)
+        type_b = type(b)
+        if type_a is ca_poly and type_b is ca_poly:
+            if a._ctx_python is b._ctx_python:
+                return a, b
+            # which context object to choose?
+            c = a._new()
+            libcalcium.ca_poly_transfer(c, c._ctx, b, b._ctx)
+            return a, c
+        if type_a is ca_poly:
+            try:
+                b = ca_poly(b, context=a._ctx_python)
+            except TypeError:
+                return NotImplemented, NotImplemented
+            return a, b
+        else:
+            try:
+                a = ca_poly(a, context=b._ctx_python)
+            except TypeError:
+                return NotImplemented, NotImplemented
+            return a, b
+        return NotImplemented, NotImplemented
+
     def __eq__(self, other):
         """
         Examples::
@@ -2973,13 +3021,9 @@ class ca_poly:
             True
 
         """
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         res = libcalcium.ca_poly_check_equal(self, other, self._ctx)
         if res == T_TRUE:
             return True
@@ -2995,13 +3039,9 @@ class ca_poly:
             True
 
         """
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
         res = libcalcium.ca_poly_check_equal(self, other, self._ctx)
         if res == T_TRUE:
             return False
@@ -3023,67 +3063,52 @@ class ca_poly:
     def __getitem__(self, i):
         n = len(self)
         assert 0 <= i < n
-        x = ca()
+        x = self._new_ca()
         libcalcium.ca_set(x, libcalcium.ca_poly_coeff_ptr(self, i, self._ctx), self._ctx)
         return x
 
     def __neg__(self):
-        res = ca_poly()
+        res = self._new()
         libcalcium.ca_poly_neg(res, self, self._ctx)
         return res
 
     def __pos__(self):
-        res = ca_poly()
+        res = self._new()
         libcalcium.ca_poly_set(res, self, self._ctx)
         return res
 
     def __add__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_poly_add(res, self, other, self._ctx)
         return res
 
     __radd__ = __add__
 
     def __sub__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         res = ca_poly()
         libcalcium.ca_poly_sub(res, self, other, self._ctx)
         return res
 
     def __rsub__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_poly_sub(res, other, self, self._ctx)
         return res
 
     def __mul__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         libcalcium.ca_poly_mul(res, self, other, self._ctx)
         return res
 
@@ -3091,52 +3116,38 @@ class ca_poly:
 
     def __truediv__(self, other):
         try:
-            other = ca(other)
-            if self._ctx_python is not other._ctx_python:
-                raise ValueError("different context objects!")
-            res = ca_poly()
-            libcalcium.ca_poly_div_ca(res, self, other, self._ctx)
-            return res
-        except TypeError:
-            pass
-        return NotImplemented
+            other = ca(other, self._ctx_python)
+        except (TypeError, ValueError):
+            return NotImplemented
+        res = self._new()
+        # todo: catch division by zero
+        libcalcium.ca_poly_div_ca(res, self, other, self._ctx)
+        return res
 
     def __floordiv__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         if not libcalcium.ca_poly_div(res, self, other, self._ctx):
             raise ValueError("failed polynomial division: unable to prove leading coefficient nonzero")
         return res
 
     def __mod__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
         if not libcalcium.ca_poly_rem(res, self, other, self._ctx):
             raise ValueError("failed polynomial division: unable to prove leading coefficient nonzero")
         return res
 
     def __divmod__(self, other):
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res1 = ca_poly()
-        res2 = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res1 = self._new()
+        res2 = self._new()
         if not libcalcium.ca_poly_divrem(res1, res2, self, other, self._ctx):
             raise ValueError("failed polynomial division: unable to prove leading coefficient nonzero")
         return res1, res2
@@ -3144,7 +3155,7 @@ class ca_poly:
     def __pow__(self, other):
         e = int(other)
         assert e >= 0 and e * len(self) <= sys.maxsize
-        res = ca_poly()
+        res = self._new()
         libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
         return res
 
@@ -3160,18 +3171,14 @@ class ca_poly:
 
         """
         try:
-            other = ca(other)
-            if self._ctx_python is not other._ctx_python:
-                raise ValueError("different context objects!")
-            res = ca()
+            other = ca(other, context=self._ctx_python)
+            res = self._new_ca()
             libcalcium.ca_poly_evaluate(res, self, other, self._ctx)
             return res
         except TypeError:
             pass
-        other = ca_poly(other)
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        other = ca_poly(other, context=self._ctx_python)
+        res = self._new()
         libcalcium.ca_poly_compose(res, self, other, self._ctx)
         return res
 
@@ -3189,14 +3196,10 @@ class ca_poly:
             [3.14159*I {a*b where a = 3.14159 [Pi], b = I [b^2+1=0]}, 1]
 
         """
-        if type(self) is not type(other):
-            try:
-                other = ca_poly(other)
-            except TypeError:
-                return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise ValueError("different context objects!")
-        res = ca_poly()
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            raise TypeError
+        res = self._new()
         if not libcalcium.ca_poly_gcd(res, self, other, self._ctx):
             raise ValueError("failed polynomial gcd")
         return res
@@ -3211,7 +3214,7 @@ class ca_poly:
 
         """
         n = len(self)
-        roots = ca_vec()
+        roots = ca_vec(context=self._ctx_python)
         exp = ctypes.cast(libflint.flint_malloc(ctypes.sizeof(ctypes.c_ulong) * n), ctypes.POINTER(ctypes.c_ulong))
         success = libcalcium.ca_poly_roots(roots, exp, self, self._ctx)
         if not success:
@@ -3234,8 +3237,8 @@ class ca_poly:
 
         """
         n = len(self)
-        lc = ca()
-        fac = ca_poly_vec()
+        lc = self._new_ca()
+        fac = ca_poly_vec(context=self._ctx_python)
         exp = ctypes.cast(libflint.flint_malloc(ctypes.sizeof(ctypes.c_ulong) * n), ctypes.POINTER(ctypes.c_ulong))
         success = libcalcium.ca_poly_factor_squarefree(lc, fac, exp, self, self._ctx)
         if not success:
@@ -3254,7 +3257,7 @@ class ca_poly:
             ca_poly of length 4
             [-0.500000 {-1/2}, -0.666667 {-2/3}, -0.833333 {-5/6}, 1]
         """
-        res = ca_poly()
+        res = self._new()
         if not libcalcium.ca_poly_squarefree_part(res, self, self._ctx):
             raise ValueError("failed to compute squarefree part")
         return res
@@ -3267,7 +3270,7 @@ class ca_poly:
             ca_poly of length 5
             [0, 1, 0.500000 {1/2}, 0.333333 {1/3}, 0.250000 {1/4}]
         """
-        res = ca_poly()
+        res = self._new()
         libcalcium.ca_poly_integral(res, self, self._ctx)
         return res
 
@@ -3279,7 +3282,7 @@ class ca_poly:
             ca_poly of length 3
             [1, 2, 3]
         """
-        res = ca_poly()
+        res = self._new()
         libcalcium.ca_poly_derivative(res, self, self._ctx)
         return res
 
@@ -3295,7 +3298,7 @@ class ca_poly:
               ...
             ValueError: failed to make monic
         """
-        res = ca_poly()
+        res = self._new()
         if not libcalcium.ca_poly_make_monic(res, self, self._ctx):
             raise ValueError("failed to make monic")
         return res
@@ -3315,7 +3318,6 @@ class ca_poly:
             False
 
         """
-        res = ca_poly()
         if libcalcium.ca_poly_is_proper(self, self._ctx):
             return True
         return False
@@ -3554,6 +3556,8 @@ libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
 libcalcium.ca_get_str.restype = ctypes.c_char_p
 
+libcalcium.ca_ctx_set_option.argtypes = ca_ctx, ctypes.c_long, ctypes.c_long
+libcalcium.ca_ctx_get_option.restype = ctypes.c_long
 
 
 
