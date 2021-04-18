@@ -65,10 +65,10 @@ int main()
             default:
                 qqbar_evaluate_fmpq_poly(x, f, y);
                 d = qqbar_degree(x);
-                v = qqbar_vec_init(d);
+                v = _qqbar_vec_init(d);
                 qqbar_conjugates(v, x);
                 qqbar_set(x, v + n_randint(state, d));
-                qqbar_vec_clear(v, d);
+                _qqbar_vec_clear(v, d);
         }
 
         equal1 = qqbar_equal_fmpq_poly_val(x, f, y);

@@ -174,8 +174,7 @@ Calcium is presently in early development and should be considered
 experimental software.
 The interfaces are subject to change and many important
 functions and optimizations have not been implemented.
-A more stable and functional release can be expected in late
-2020 or more likely 2021.
+A more stable and functional release can be expected in late 2021.
 
 
 .. raw:: latex

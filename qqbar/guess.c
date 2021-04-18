@@ -89,7 +89,7 @@ qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags
                     }
 
                     deg = fmpz_poly_degree(fac->p + i);
-                    roots = qqbar_vec_init(deg);
+                    roots = _qqbar_vec_init(deg);
 
                     qqbar_roots_fmpz_poly(roots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
 
@@ -104,7 +104,7 @@ qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags
                         }
                     }
 
-                    qqbar_vec_clear(roots, deg);
+                    _qqbar_vec_clear(roots, deg);
 
                     if (found)
                         break;

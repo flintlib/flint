@@ -49,11 +49,22 @@ typedef fmpz_mpoly_vec_struct fmpz_mpoly_vec_t[1];
 #define fmpz_mpoly_vec_entry(vec, i) ((vec)->p + (i))
 
 UTILS_FLINT_INLINE void
-fmpz_mpoly_vec_init(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
+fmpz_mpoly_vec_init(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx)
 {
-    vec->p = NULL;
-    vec->length = 0;
-    vec->alloc = 0;
+    if (len == 0)
+    {
+        vec->p = NULL;
+        vec->length = 0;
+        vec->alloc = 0;
+    }
+    else
+    {
+        slong i;
+        vec->p = flint_malloc(sizeof(fmpz_mpoly_struct) * len);
+        for (i = 0; i < len; i++)
+            fmpz_mpoly_init(vec->p + i, ctx);
+        vec->length = vec->alloc = len;
+    }
 }
 
 UTILS_FLINT_INLINE void

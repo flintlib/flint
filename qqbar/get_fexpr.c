@@ -360,7 +360,7 @@ qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x)
 
     d = qqbar_degree(x);
 
-    conjugates = qqbar_vec_init(d);
+    conjugates = _qqbar_vec_init(d);
     qqbar_conjugates(conjugates, x);
 
     for (i = 0; i < d; i++)
@@ -394,7 +394,7 @@ qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x)
         }
     }
 
-    qqbar_vec_clear(conjugates, d);
+    _qqbar_vec_clear(conjugates, d);
 }
 
 void
@@ -580,7 +580,7 @@ _qqbar_get_fexpr_cyclotomic(fexpr_t res, const fmpq_poly_t poly, slong n, int pu
     ulong p, q, g;
     slong i;
 
-    fexpr_vec_init(terms);
+    fexpr_vec_init(terms, 0);
     fexpr_init(term);
     fexpr_init(t);
     fexpr_init(u);

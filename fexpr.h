@@ -451,11 +451,22 @@ int fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags);
 /* Vectors */
 
 FEXPR_INLINE void
-fexpr_vec_init(fexpr_vec_t vec)
+fexpr_vec_init(fexpr_vec_t vec, slong len)
 {
-    vec->entries = NULL;
-    vec->length = 0;
-    vec->alloc = 0;
+    if (len == 0)
+    {
+        vec->entries = NULL;
+        vec->length = 0;
+        vec->alloc = 0;
+    }
+    else
+    {
+        slong i;
+        vec->entries = flint_malloc(sizeof(fexpr_struct) * len);
+        for (i = 0; i < len; i++)
+            fexpr_init(vec->entries + i);
+        vec->length = vec->alloc = len;
+    }
 }
 
 FEXPR_INLINE void

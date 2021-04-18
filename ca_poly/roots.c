@@ -207,7 +207,7 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
 
         f->coeffs = _fmpz_vec_init(len);
         f->length = f->alloc = len;
-        r = qqbar_vec_init(len - 1);
+        r = _qqbar_vec_init(len - 1);
 
         if (_ca_vec_fmpq_vec_is_fmpz_vec(poly, len, ctx))
         {
@@ -237,7 +237,7 @@ _ca_poly_roots(ca_ptr roots, ca_srcptr poly, slong len, ca_ctx_t ctx)
             ca_set_qqbar(roots + i, r + i, ctx);
 
         _fmpz_vec_clear(f->coeffs, len);
-        qqbar_vec_clear(r, len - 1);
+        _qqbar_vec_clear(r, len - 1);
 
         return 1;
     }

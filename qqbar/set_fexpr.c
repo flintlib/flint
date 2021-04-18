@@ -475,10 +475,10 @@ qqbar_set_fmpz_poly_root_indexed(qqbar_t res, const fmpz_poly_t poly, slong root
     qqbar_ptr roots;
     slong d;
     d = fmpz_poly_degree(poly);
-    roots = qqbar_vec_init(d);
+    roots = _qqbar_vec_init(d);
     qqbar_roots_fmpz_poly(roots, poly, 0);
     qqbar_set(res, roots + root_index - 1);
-    qqbar_vec_clear(roots, d);
+    _qqbar_vec_clear(roots, d);
 }
 
 void
@@ -492,7 +492,7 @@ qqbar_set_fmpz_poly_root_nearest(qqbar_t res, const fmpz_poly_t poly, const qqba
 
     d = fmpz_poly_degree(poly);
 
-    roots = qqbar_vec_init(d);
+    roots = _qqbar_vec_init(d);
     acb_init(t);
     arb_init(distance);
     arb_init(best_distance);
@@ -561,7 +561,7 @@ qqbar_set_fmpz_poly_root_nearest(qqbar_t res, const fmpz_poly_t poly, const qqba
     acb_clear(t);
     arb_clear(distance);
     arb_clear(best_distance);
-    qqbar_vec_clear(roots, d);
+    _qqbar_vec_clear(roots, d);
 }
 
 

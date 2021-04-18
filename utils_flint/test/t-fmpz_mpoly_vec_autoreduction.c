@@ -29,8 +29,8 @@ int main()
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
 
-        fmpz_mpoly_vec_init(F, ctx);
-        fmpz_mpoly_vec_init(G, ctx);
+        fmpz_mpoly_vec_init(F, 0, ctx);
+        fmpz_mpoly_vec_init(G, 0, ctx);
 
         fmpz_mpoly_vec_randtest_not_zero(F, state, 1 + n_randint(state, 5), 1 + n_randint(state, 4), 1 + n_randint(state, 3), 1 + n_randint(state, 2), ctx);
 

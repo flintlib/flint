@@ -953,7 +953,7 @@ class qqbar:
             return []
         c = ctypes.byref(_fmpq_struct())
         pol = ctypes.byref(_fmpq_poly_struct())
-        vec = libcalcium.qqbar_vec_init(d)
+        vec = libcalcium._qqbar_vec_init(d)
         libflint.fmpq_init(c)
         libflint.fmpq_poly_init(pol)
         for i in range(d + 1):
@@ -964,7 +964,7 @@ class qqbar:
         res = [qqbar() for i in range(d)]
         for i in range(d):
             libcalcium.qqbar_set(res[i], ctypes.byref(vec[i]))
-        libcalcium.qqbar_vec_clear(vec, d)
+        libcalcium._qqbar_vec_clear(vec, d)
         libflint.fmpq_clear(c)
         libflint.fmpq_poly_clear(pol)
         return res
@@ -990,12 +990,12 @@ class qqbar:
         d = self.degree()
         if d == 1:
             return [self]
-        vec = libcalcium.qqbar_vec_init(d)
+        vec = libcalcium._qqbar_vec_init(d)
         libcalcium.qqbar_conjugates(vec, self)
         res = [qqbar() for i in range(d)]
         for i in range(d):
             libcalcium.qqbar_set(res[i], ctypes.byref(vec[i]))
-        libcalcium.qqbar_vec_clear(vec, d)
+        libcalcium._qqbar_vec_clear(vec, d)
         return res
 
     def minpoly(self):
@@ -3543,7 +3543,7 @@ libcalcium.qqbar_set_si.argtypes = qqbar, ctypes.c_long
 libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double
 libcalcium.qqbar_set_re_im_d.argtypes = qqbar, ctypes.c_double, ctypes.c_double
 libcalcium.qqbar_get_str_nd.restype = ctypes.c_char_p
-libcalcium.qqbar_vec_init.restype = ctypes.POINTER(qqbar_struct)
+libcalcium._qqbar_vec_init.restype = ctypes.POINTER(qqbar_struct)
 
 libcalcium.ca_mat_entry_ptr.restype = ctypes.POINTER(ca_mat_struct)
 libcalcium.ca_vec_entry_ptr.restype = ctypes.POINTER(ca_vec_struct)

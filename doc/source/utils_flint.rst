@@ -34,9 +34,9 @@ General methods for multivariate polynomials
 
     Macro for accessing the entry at position *i* in *vec*.
 
-.. function:: void fmpz_mpoly_vec_init(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_vec_init(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx)
 
-    Initializes *vec* for use, setting it to the empty vector.
+    Initializes *vec* to a vector of length *len*, setting all entries to the zero polynomial.
 
 .. function::void fmpz_mpoly_vec_clear(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
 

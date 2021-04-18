@@ -19,7 +19,7 @@ fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags)
     fmpz_mpoly_q_t frac;
     int success;
 
-    fexpr_vec_init(args);
+    fexpr_vec_init(args, 0);
 
     fexpr_arithmetic_nodes(args, expr);
     _fexpr_vec_sort_fast(args->entries, args->length);

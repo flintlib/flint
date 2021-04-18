@@ -56,7 +56,7 @@ void qqbar_init(qqbar_t res);
 void qqbar_clear(qqbar_t res);
 
 QQBAR_INLINE qqbar_ptr
-qqbar_vec_init(slong len)
+_qqbar_vec_init(slong len)
 {
     slong i;
     qqbar_ptr vec = flint_malloc(len * sizeof(qqbar_struct));
@@ -66,7 +66,7 @@ qqbar_vec_init(slong len)
 }
 
 QQBAR_INLINE void
-qqbar_vec_clear(qqbar_ptr vec, slong len)
+_qqbar_vec_clear(qqbar_ptr vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)

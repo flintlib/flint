@@ -44,8 +44,7 @@ fexpr_set_fmpz_mpoly(fexpr_t res, const fmpz_mpoly_t poly, const fexpr_vec_t var
     if (vars == NULL)
     {
         fexpr_vec_t v;
-        fexpr_vec_init(v);
-        fexpr_vec_set_length(v, nvars);
+        fexpr_vec_init(v, nvars);
 
         /* FIXME */
         for (i = 0; i < nvars; i++)

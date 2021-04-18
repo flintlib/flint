@@ -37,7 +37,7 @@ int main()
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
 
-        x = qqbar_vec_init(n);
+        x = _qqbar_vec_init(n);
         qqbar_init(fx);
         qqbar_init(gx);
         qqbar_init(hx);
@@ -77,7 +77,7 @@ int main()
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_ctx_clear(ctx);
 
-        qqbar_vec_clear(x, n);
+        _qqbar_vec_clear(x, n);
         qqbar_clear(fx);
         qqbar_clear(gx);
         qqbar_clear(hx);

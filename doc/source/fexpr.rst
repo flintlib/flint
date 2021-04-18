@@ -571,9 +571,10 @@ Arithmetic expressions
 Vectors
 ------------------------------------------------------------------------
 
-.. function:: void fexpr_vec_init(fexpr_vec_t vec)
+.. function:: void fexpr_vec_init(fexpr_vec_t vec, slong len)
 
-    Initializes *vec* to a vector of length zero.
+    Initializes *vec* to a vector of length *len*. All entries
+    are set to the atomic integer 0.
 
 .. function:: void fexpr_vec_clear(fexpr_vec_t vec)
 

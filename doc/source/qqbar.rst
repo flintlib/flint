@@ -67,11 +67,11 @@ Memory management
 
     Clears the variable *res*, freeing or recycling its allocated memory.
 
-.. function:: qqbar_ptr qqbar_vec_init(slong len)
+.. function:: qqbar_ptr _qqbar_vec_init(slong len)
 
     Returns a pointer to an array of *len* initialized *qqbar_struct*:s.
 
-.. function:: void qqbar_vec_clear(qqbar_ptr vec, slong len)
+.. function:: void _qqbar_vec_clear(qqbar_ptr vec, slong len)
 
     Clears all *len* entries in the vector *vec* and frees the
     vector itself.

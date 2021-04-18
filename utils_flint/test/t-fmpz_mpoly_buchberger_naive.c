@@ -31,9 +31,9 @@ int main()
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
         nvars = ctx->minfo->nvars;
 
-        fmpz_mpoly_vec_init(F, ctx);
-        fmpz_mpoly_vec_init(G, ctx);
-        fmpz_mpoly_vec_init(H, ctx);
+        fmpz_mpoly_vec_init(F, 0, ctx);
+        fmpz_mpoly_vec_init(G, 0, ctx);
+        fmpz_mpoly_vec_init(H, 0, ctx);
 
         /*
         flint_printf("iter %ld   %ld  %d\n\n", iter, nvars, ctx->minfo->ord);

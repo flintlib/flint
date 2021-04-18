@@ -36,7 +36,7 @@ int main()
         qqbar_randtest(x, state, 4, 10);
         d = qqbar_degree(x);
 
-        r = qqbar_vec_init(d);
+        r = _qqbar_vec_init(d);
 
         qqbar_conjugates(r, x);
 
@@ -64,7 +64,7 @@ int main()
         qqbar_clear(x);
         qqbar_clear(y);
         qqbar_clear(z);
-        qqbar_vec_clear(r, d);
+        _qqbar_vec_clear(r, d);
         fmpq_clear(s);
     }
 

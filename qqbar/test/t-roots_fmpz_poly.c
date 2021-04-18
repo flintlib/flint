@@ -45,7 +45,7 @@ int main()
 
         acb_init(x);
         acb_init(y);
-        r = qqbar_vec_init(d);
+        r = _qqbar_vec_init(d);
 
         qqbar_roots_fmpz_poly(r, poly, 0);
 
@@ -70,7 +70,7 @@ int main()
 
         fmpz_poly_clear(poly);
         fmpz_poly_clear(f);
-        qqbar_vec_clear(r, d);
+        _qqbar_vec_clear(r, d);
         acb_clear(x);
         acb_clear(y);
     }

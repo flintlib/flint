@@ -276,7 +276,7 @@ ca_set_fexpr(ca_t res, const fexpr_t expr, ca_ctx_t ctx)
     fexpr_vec_t inputs;
     ca_vec_t outputs;
 
-    fexpr_vec_init(inputs);
+    fexpr_vec_init(inputs, 0);
     ca_vec_init(outputs, 0, ctx);
 
     success = _ca_set_fexpr(res, inputs, outputs, expr, ctx);

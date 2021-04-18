@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         fmpq_mat_init(mat, n, n);
         qqbar_init(trace);
         qqbar_init(det);
-        eig = qqbar_vec_init(n);
+        eig = _qqbar_vec_init(n);
 
         fmpq_mat_hilbert_matrix(mat);
         qqbar_eigenvalues_fmpq_mat(eig, mat, 0);
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         fmpq_mat_clear(mat);
         qqbar_clear(trace);
         qqbar_clear(det);
-        qqbar_vec_clear(eig, n);
+        _qqbar_vec_clear(eig, n);
     }
     else
     {

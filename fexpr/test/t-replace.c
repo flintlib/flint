@@ -161,10 +161,8 @@ int main()
         fexpr_randtest1(res2, state, 5, 2 + n_randint(state, 5));
 
         len = n_randint(state, 4);
-        fexpr_vec_init(xs);
-        fexpr_vec_init(ys);
-        fexpr_vec_set_length(xs, len);
-        fexpr_vec_set_length(ys, len);
+        fexpr_vec_init(xs, len);
+        fexpr_vec_init(ys, len);
         for (i = 0; i < len; i++)
         {
             fexpr_randtest1(xs->entries + i, state, 1 + n_randint(state, 3), 1 + n_randint(state, 2));
