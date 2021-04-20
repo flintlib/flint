@@ -10,4 +10,4 @@ export LDFLAGS="-Wl,-rpath,${NB_PYTHON_PREFIX}/lib -L${NB_PYTHON_PREFIX}/lib"
     --with-antic=${NB_PYTHON_PREFIX}
 make -j4
 make install
-ln -s $PWD/pycalcium $(${NB_PYTHON_PREFIX}/bin/python -c 'import site; print(site.getsitepackages()[0])')/pycalcium
+ln -s $PWD/pycalcium/pyca.py $(${NB_PYTHON_PREFIX}/bin/python -c 'import site; print(site.getsitepackages()[0])')/pyca.py
