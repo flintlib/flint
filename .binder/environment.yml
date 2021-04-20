@@ -1,0 +1,10 @@
+name: calcium
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - gmp
+  - mpfr
+  - arb
+  - libflint
+  - antic

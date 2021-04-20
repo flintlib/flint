@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+export LDFLAGS="-Wl,-rpath,${NB_PYTHON_PREFIX}/lib -L${NB_PYTHON_PREFIX}/lib"
+./configure --prefix=$NB_PYTHON_PREFIX
+make -j4
+make install
