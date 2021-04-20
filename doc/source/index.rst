@@ -33,6 +33,13 @@ and in PDF format at http://fredrikj.net/calcium/calcium.pdf.
 This edition of the documentation was updated
 |today| and describes Calcium |version|.
 
+Tutorial
+---------------------------
+
+For new users, this introductory `Jupyter notebook <https://fredrikj.net/calcium/introduction_ipynb.html>`_
+is a good place to start.
+
+
 General information
 ---------------------------
 

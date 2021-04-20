@@ -13,7 +13,79 @@
 #include "fexpr_builtin.h"
 
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
-int _fexpr_is_symbol_with_underscore(const fexpr_t expr);
+int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr);
+
+const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
+{
+    slong i;
+    ulong head = expr->data[0];
+
+    if (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL)
+    {
+        if (((head >> 8) & 0xff) == 0)
+        {
+            i = head >> 16;
+            return fexpr_builtin_table[i].string;
+        }
+
+        tmp[FEXPR_SMALL_SYMBOL_LEN] = '\0';
+
+        for (i = 0; i < FEXPR_SMALL_SYMBOL_LEN; i++)
+        {
+            tmp[i] = (head >> ((i + 1) * 8));
+            if (tmp[i] == '\0')
+                break;
+        }
+
+        return tmp;
+    }
+    else if (FEXPR_TYPE(head) == FEXPR_TYPE_BIG_SYMBOL)
+    {
+        return (const char *) (expr->data + 1);
+    }
+    else
+    {
+        flint_printf("fexpr_get_symbol_str_pointer: a symbol is required\n");
+        flint_abort();
+    }
+}
+
+int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr)
+{
+    const char *s;
+    char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
+    slong len;
+
+    if (!fexpr_is_symbol(expr))
+        return 0;
+
+    s = fexpr_get_symbol_str_pointer(tmp, expr);
+    len = strlen(s);
+
+    return (len > 1 && s[len - 1] == '_');
+}
+
+int _fexpr_is_symbol_with_internal_underscore(const fexpr_t expr)
+{
+    const char *s;
+    char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
+    slong i, len;
+
+    if (!fexpr_is_symbol(expr))
+        return 0;
+
+    s = fexpr_get_symbol_str_pointer(tmp, expr);
+    len = strlen(s);
+
+    if (len >= 3)
+    {
+        for (i = 1; i < len - 1; i++)
+            if (s[i] == '_')
+                return i;
+    }
+
+    return 0;
+}
 
 /*
 static int
@@ -657,6 +729,45 @@ _fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t base, const fexpr_t e
         return;
     }
 
+    if (fexpr_is_symbol(base))
+    {
+        slong underscore_pos;
+        char * s;
+
+        /*  Need to change {x_3}^{y} -> x^{y}_{3} for correct rendering */
+        underscore_pos = _fexpr_is_symbol_with_internal_underscore(base);
+
+        if (underscore_pos > 0)
+        {
+            char *sym, *sub;
+
+            s = fexpr_get_symbol_str(base);
+            s[underscore_pos] = '\0';
+            sym = s;
+            sub = s + underscore_pos + 1;
+
+            if (underscore_pos == 1)
+            {
+                calcium_write(out, sym);
+            }
+            else
+            {
+                calcium_write(out, "\\operatorname{");
+                calcium_write(out, sym);
+                calcium_write(out, "}");
+            }
+
+            calcium_write(out, "^{");
+            fexpr_write_latex(out, expo, flags | FEXPR_LATEX_SMALL);
+            calcium_write(out, "}_{");
+
+            calcium_write(out, sub);
+
+            calcium_write(out, "}");
+            return;
+        }
+    }
+
     if (fexpr_is_any_builtin_call(base))
     {
         slong id;
@@ -720,7 +831,7 @@ _fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t base, const fexpr_t e
 
         fexpr_view_func(func, base);
 
-        if (_fexpr_is_symbol_with_underscore(func))
+        if (_fexpr_is_symbol_with_trailing_underscore(func))
         {
             fexpr_view_arg(x, base, 0);
             fexpr_write_latex_symbol(&subscript, out, func, flags);
@@ -2481,6 +2592,50 @@ fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
         }
     }
 
+    if (fexpr_is_builtin_call(expr, FEXPR_Matrix) && nargs >= 1)
+    {
+        fexpr_view_arg(arg, expr, 0);
+
+        /* Todo: handle columns too */
+        if (fexpr_is_builtin_call(arg, FEXPR_Row))
+        {
+            nrows = fexpr_nargs(expr);
+
+            calcium_write(out, "\\displaystyle{\\begin{pmatrix}");
+
+            fexpr_view_arg(row, expr, 0);
+            for (i = 0; i < nrows; i++)
+            {
+                ncols = fexpr_nargs(row);
+
+                if (ncols >= 0)
+                {
+                    fexpr_view_arg(elem, row, 0);
+
+                    for (j = 0; j < ncols; j++)
+                    {
+                        fexpr_write_latex(out, elem, flags);
+
+                        if (j < ncols - 1)
+                        {
+                            calcium_write(out, " & ");
+                            fexpr_view_next(elem);
+                        }
+                    }
+                }
+
+                if (i < nrows - 1)
+                {
+                    calcium_write(out, " \\\\");
+                    fexpr_view_next(row);
+                }
+            }
+
+            calcium_write(out, "\\end{pmatrix}}");
+            return;
+        }
+    }
+
     if (nargs == 1)
     {
         fexpr_view_arg(arg, expr, 0);
@@ -2624,16 +2779,38 @@ _write_poly(calcium_stream_t out, const fexpr_t pol, ulong flags)
         {
             if (fexpr_need_parens_in_mul(c, 0))
             {
-                calcium_write(out, "+ \\left(");
+                if (i != d)
+                    calcium_write(out, "+ ");
+                calcium_write(out, "\\left(");
                 fexpr_write_latex(out, c, flags);
                 calcium_write(out, "\\right)");
             }
             else
             {
-                if (!(fexpr_can_extract_leading_sign(c) || i == d))
-                    calcium_write(out, "+");
+                if (fexpr_is_integer(c))
+                {
+                    if (!(fexpr_can_extract_leading_sign(c) || i == d))
+                        calcium_write(out, "+");
 
-                fexpr_write_latex(out, c, flags);
+                    fexpr_write_latex(out, c, flags);
+                }
+                else
+                {
+                    char * s = fexpr_get_str_latex(c, flags);
+
+                    if (s[0] == '+' || s[0] == '-')
+                    {
+                        calcium_write(out, s);
+                    }
+                    else
+                    {
+                        if (i != d)
+                            calcium_write(out, " + ");
+                        calcium_write(out, s);
+                    }
+
+                    flint_free(s);
+                }
             }
         }
 
@@ -2654,6 +2831,17 @@ _write_poly(calcium_stream_t out, const fexpr_t pol, ulong flags)
 void
 fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
+    if (fexpr_is_builtin_call(expr, FEXPR_Polynomial) && fexpr_nargs(expr) == 1)
+    {
+        fexpr_t pol;
+
+        fexpr_view_arg(pol, expr, 0);
+
+        _write_poly(out, pol, flags);
+
+        return;
+    }
+
     if (fexpr_is_builtin_call(expr, FEXPR_PolynomialRootNearest) && fexpr_nargs(expr) == 2)
     {
         fexpr_t pol, point;
@@ -3399,56 +3587,6 @@ _fexpr_all_arguments_small(const fexpr_t expr)
     return 1;
 }
 
-const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
-{
-    slong i;
-    ulong head = expr->data[0];
-
-    if (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL)
-    {
-        if (((head >> 8) & 0xff) == 0)
-        {
-            i = head >> 16;
-            return fexpr_builtin_table[i].string;
-        }
-
-        tmp[FEXPR_SMALL_SYMBOL_LEN] = '\0';
-
-        for (i = 0; i < FEXPR_SMALL_SYMBOL_LEN; i++)
-        {
-            tmp[i] = (head >> ((i + 1) * 8));
-            if (tmp[i] == '\0')
-                break;
-        }
-
-        return tmp;
-    }
-    else if (FEXPR_TYPE(head) == FEXPR_TYPE_BIG_SYMBOL)
-    {
-        return (const char *) (expr->data + 1);
-    }
-    else
-    {
-        flint_printf("fexpr_get_symbol_str_pointer: a symbol is required\n");
-        flint_abort();
-    }
-}
-
-int _fexpr_is_symbol_with_underscore(const fexpr_t expr)
-{
-    const char *s;
-    char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
-    slong len;
-
-    if (!fexpr_is_symbol(expr))
-        return 0;
-
-    s = fexpr_get_symbol_str_pointer(tmp, expr);
-    len = strlen(s);
-
-    return (len > 1 && s[len - 1] == '_');
-}
-
 void
 fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
@@ -3475,7 +3613,7 @@ fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t ex
     {
         const char *s;
         char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
-        slong len;
+        slong i, len;
 
         s = fexpr_get_symbol_str_pointer(tmp, expr);
         len = strlen(s);
@@ -3488,7 +3626,7 @@ fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t ex
             tmp2[len - 1] = '\0';
             calcium_write(out, tmp2);
             *subscript = 1;
-            free(tmp2);
+            flint_free(tmp2);
         }
         else if (len == 1)
         {
@@ -3497,10 +3635,49 @@ fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t ex
         }
         else
         {
-            calcium_write(out, "\\operatorname{");
-            calcium_write(out, s);
-            calcium_write(out, "}");
-            *subscript = 0;
+            /* Look for internal underscore */
+            slong pos = 0;
+            for (i = 1; i < len - 1; i++)
+            {
+                if (s[i] == '_')
+                {
+                    pos = i;
+                    break;
+                }
+            }
+
+            if (pos == 0)
+            {
+                calcium_write(out, "\\operatorname{");
+                calcium_write(out, s);
+                calcium_write(out, "}");
+                *subscript = 0;
+            }
+            else
+            {
+                char * tmp2;
+                tmp2 = flint_malloc(len);
+                memcpy(tmp2, tmp, pos);
+                tmp2[pos] = '\0';
+
+                if (pos == 1)
+                {
+                    calcium_write(out, tmp2);
+                }
+                else
+                {
+                    calcium_write(out, "\\operatorname{");
+                    calcium_write(out, tmp2);
+                    calcium_write(out, "}");
+                }
+
+                calcium_write(out, "_{");
+                calcium_write(out, s + pos + 1);
+                calcium_write(out, "}");
+
+                flint_free(tmp2);
+                *subscript = 0;
+            }
         }
     }
     else

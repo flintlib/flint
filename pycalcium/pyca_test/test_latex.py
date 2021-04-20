@@ -312,14 +312,14 @@ def test_latex(fexpr):
     print("test latex!")
     fexpr.inject(vars=True)
     for formula, expected in latex_test_cases:
-        expr = eval(formula)
+        expr = eval(formula, globals(), locals())
         latex = expr.latex()
         if latex != expected:
             raise AssertionError("%s:  got '%s', expected '%s'" % (formula, latex, expected))
 
 def latex_report(fexpr):
     fexpr.inject(vars=True)
-    formulas = [eval(formula) for formula, expected in latex_test_cases]
+    formulas = [eval(formula, globals(), locals()) for formula, expected in latex_test_cases]
     from os.path import expanduser
     from time import clock
     fp = open(expanduser("~/Desktop/latex_report.html"), "w")

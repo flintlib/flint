@@ -3,6 +3,7 @@ build/*
 libcalcium.so*
 libcalcium.a
 doc/build/*
+doc/.ipynb_checkpoints/*
 *.ppm
 *.lo
 *.deps/

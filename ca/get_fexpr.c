@@ -160,6 +160,24 @@ _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,
         return;
     }
 
+    if (CA_IS_UNKNOWN(x))
+    {
+        fexpr_set_symbol_builtin(res, FEXPR_Unknown);
+        return;
+    }
+
+    if (CA_IS_UNDEFINED(x))
+    {
+        fexpr_set_symbol_builtin(res, FEXPR_Undefined);
+        return;
+    }
+
+    if (CA_IS_UNSIGNED_INF(x))
+    {
+        fexpr_set_symbol_builtin(res, FEXPR_UnsignedInfinity);
+        return;
+    }
+
     if (CA_IS_SIGNED_INF(x))
     {
         ca_t t;
@@ -320,6 +338,34 @@ _ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
 }
 
 void
+_ca_default_variables(fexpr_ptr ext_vars, slong num_ext)
+{
+    slong i;
+
+    if (num_ext <= 26 && 0)
+    {
+        char tmp[20];
+
+        for (i = 0; i < num_ext; i++)
+        {
+            tmp[0] = 'a' + i;
+            tmp[1] = '\0';
+            fexpr_set_symbol_str(ext_vars + i, tmp);
+        }
+    }
+    else
+    {
+        char tmp[20];
+
+        for (i = 0; i < num_ext; i++)
+        {
+            flint_sprintf(tmp, "a_%wd", i + 1);
+            fexpr_set_symbol_str(ext_vars + i, tmp);
+        }
+    }
+}
+
+void
 ca_get_fexpr(fexpr_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 {
     ca_ext_ptr * ext;
@@ -376,28 +422,7 @@ ca_get_fexpr(fexpr_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
     where_args = _fexpr_vec_init(num_ext + 1);
     fexpr_init(t);
 
-    if (num_ext <= 26)
-    {
-        char tmp[20];
-
-        for (i = 0; i < num_ext; i++)
-        {
-            tmp[0] = 'a' + i;
-            tmp[1] = '\0';
-            fexpr_set_symbol_str(ext_vars + i, tmp);
-        }
-    }
-    else
-    {
-        char tmp[20];
-
-        for (i = 0; i < num_ext; i++)
-        {
-            sprintf(tmp, "a%d", (int) i + 1);  /* todo: assumes < 2^31 ... */
-            fexpr_set_symbol_str(ext_vars + i, tmp);
-        }
-    }
-
+    _ca_default_variables(ext_vars, num_ext);
     _ca_get_fexpr_given_ext(where_args + 0, x, flags, ext, num_ext, ext_vars, ctx);
 
     for (i = 0; i < num_ext; i++)

@@ -171,7 +171,8 @@ class fexpr:
             # memory leak
             symbol_name = libcalcium.fexpr_builtin_name(i)
             symbol_name = symbol_name.decode('ascii')
-            frame.f_globals[symbol_name] = fexpr(symbol_name)
+            if not symbol_name[0].islower():
+                frame.f_globals[symbol_name] = fexpr(symbol_name)
         if vars:
             def inject_vars(string):
                 for s in string.split():
@@ -179,7 +180,7 @@ class fexpr:
                         frame.f_globals[symbol_name] = fexpr(symbol_name)
             inject_vars("""a b c d e f g h i j k l m n o p q r s t u v w x y z""")
             inject_vars("""A B C D E F G H I J K L M N O P Q R S T U V W X Y Z""")
-            inject_vars("""alpha beta gamma delta epsilon zeta eta theta iota kappa lamda mu nu xi pi rho sigma tau phi chi psi omega ell""")
+            inject_vars("""alpha beta gamma delta epsilon zeta eta theta iota kappa lamda mu nu xi pi rho sigma tau phi chi psi omega ell varphi vartheta""")
             inject_vars("""Alpha Beta GreekGamma Delta Epsilon Zeta Eta Theta Iota Kappa Lamda Mu Nu Xi GreekPi Rho Sigma Tau Phi Chi Psi Omega""")
         del frame
 
@@ -224,8 +225,16 @@ class fexpr:
                     libcalcium.fexpr_set_symbol_str(self, ("True").encode('ascii'))
                 else:
                     libcalcium.fexpr_set_symbol_str(self, ("False").encode('ascii'))
+            elif typ is qqbar:
+                #libcalcium.qqbar_get_fexpr_repr(self, val, val._ctx)
+                tmp = val.fexpr()
+                libcalcium.fexpr_set(self, tmp)
             elif typ is ca:
                 libcalcium.ca_get_fexpr(self, val, 0, val._ctx)
+            elif typ is ca_mat:
+                libcalcium.ca_mat_get_fexpr(self, val, 0, val._ctx)
+            elif typ is ca_poly:
+                libcalcium.ca_poly_get_fexpr(self, val, 0, val._ctx)
             elif typ is tuple:
                 tmp = fexpr("Tuple")(*val)         # todo: create without copying
                 libcalcium.fexpr_set(self, tmp)
@@ -285,6 +294,37 @@ class fexpr:
         if libcalcium.fexpr_equal(self, other):
             return True
         return False
+
+    def is_atom(self):
+        return bool(libcalcium.fexpr_is_atom(self))
+
+    def is_atom_integer(self):
+        return bool(libcalcium.fexpr_is_integer(self))
+
+    def is_symbol(self):
+        return bool(libcalcium.fexpr_is_symbol(self))
+
+    def head(self):
+        if libcalcium.fexpr_is_atom(self):
+            return None
+        res = fexpr()
+        libcalcium.fexpr_func(res, self)
+        return res
+
+    def nargs(self):
+        # todo: long
+        if self.is_atom():
+            return None
+        return libcalcium.fexpr_nargs(self)
+
+    def args(self):
+        if libcalcium.fexpr_is_atom(self):
+            return None
+        n = self.nargs()
+        args = [fexpr() for i in range(n)]
+        for i in range(n):
+            libcalcium.fexpr_arg(args[i], self, i)
+        return tuple(args)
 
     def __hash__(self):
         return libcalcium.fexpr_hash(self)
@@ -637,6 +677,9 @@ class qqbar:
         s = libcalcium.qqbar_get_str_nd(self, 6)
         res = str(s, 'ascii')
         return res
+
+    def _repr_latex_(self):
+        return self.fexpr(formula=False)._repr_latex_()
 
     def __bool__(self):
         """
@@ -1348,7 +1391,7 @@ class ca:
                     libcalcium.ca_set_fmpz(self, nref, self._ctx)
                     libflint.fmpz_clear(nref)
             elif typ is ca:
-                libcalcium.ca_set(self, val, self._ctx)
+                libcalcium.ca_transfer(self, self._ctx, val, val._ctx)
             elif typ is float:
                 libcalcium.ca_set_d(self, val, self._ctx)
             elif typ is complex:
@@ -1578,6 +1621,9 @@ class ca:
 
     def __str__(self):
         return self.__repr__()
+
+    def _repr_latex_(self):
+        return fexpr(self)._repr_latex_()
 
     def __bool__(self):
         t = libcalcium.ca_check_is_zero(self, self._ctx)
@@ -2316,6 +2362,9 @@ class ca_mat:
 
     __str__ = __repr__
 
+    def _repr_latex_(self):
+        return fexpr(self)._repr_latex_()
+
     def __getitem__(self, ij):
         i, j = ij
         nrows = self.nrows()
@@ -2954,6 +3003,8 @@ class ca_poly:
         libcalcium.ca_poly_init(self, self._ctx)
         if type(val) is ca_poly:
             libcalcium.ca_poly_transfer(self, self._ctx, val, val._ctx)
+        if type(val) is ca_mat:
+            raise TypeError
         elif val:
             try:
                 val = [ca(c, context=self._ctx_python) for c in val]
@@ -3059,6 +3110,9 @@ class ca_poly:
         return s
 
     __str__ = __repr__
+
+    def _repr_latex_(self):
+        return fexpr(self)._repr_latex_()
 
     def __getitem__(self, i):
         n = len(self)
@@ -3170,14 +3224,22 @@ class ca_poly:
             [34, 40, 32, 12, 3]
 
         """
-        try:
-            other = ca(other, context=self._ctx_python)
-            res = self._new_ca()
-            libcalcium.ca_poly_evaluate(res, self, other, self._ctx)
-            return res
-        except TypeError:
-            pass
-        other = ca_poly(other, context=self._ctx_python)
+        if type(other) is not ca_poly or other._ctx_python is not self._ctx_python:
+            try:
+                other = ca(other, context=self._ctx_python)
+                res = self._new_ca()
+                libcalcium.ca_poly_evaluate(res, self, other, self._ctx)
+                return res
+            except TypeError:
+                pass
+            try:
+                other = ca_poly(other, context=self._ctx_python)
+            except TypeError:
+                other = ca_mat(other, context=self._ctx_python)
+                assert other.nrows() == other.ncols()
+                res = other._new(other.nrows(), other.ncols())
+                libcalcium.ca_mat_ca_poly_evaluate(res, self, other, self._ctx)
+                return res
         res = self._new()
         libcalcium.ca_poly_compose(res, self, other, self._ctx)
         return res
@@ -3341,53 +3403,80 @@ class ca_poly:
         raise NotImplementedError("unable to determine degree")
 
 
-
-# todo: in functions, don't create copies of the input
-
 def re(x):
-    return ca(x).re()
+    if type(x) != ca:
+        x = ca(x)
+    return x.re()
 
 def im(x):
-    return ca(x).im()
+    if type(x) != ca:
+        x = ca(x)
+    return x.im()
 
 def sgn(x):
-    return ca(x).sgn()
+    if type(x) != ca:
+        x = ca(x)
+    return x.sgn()
 
 def sign(x):
-    return ca(x).sign()
+    if type(x) != ca:
+        x = ca(x)
+    return x.sign()
 
 def floor(x):
-    return ca(x).floor()
+    if type(x) != ca:
+        x = ca(x)
+    return x.floor()
 
 def ceil(x):
-    return ca(x).ceil()
+    if type(x) != ca:
+        x = ca(x)
+    return x.ceil()
 
 def conj(x):
-    return ca(x).conj()
+    if type(x) != ca:
+        x = ca(x)
+    return x.conj()
 
 def conjugate(x):
-    return ca(x).conjugate()
+    if type(x) != ca:
+        x = ca(x)
+    return x.conjugate()
 
 def sqrt(x):
-    return ca(x).sqrt()
+    if type(x) != ca:
+        x = ca(x)
+    return x.sqrt()
 
 def log(x):
-    return ca(x).log()
+    if type(x) != ca:
+        x = ca(x)
+    return x.log()
 
 def exp(x):
-    return ca(x).exp()
+    if type(x) != ca:
+        x = ca(x)
+    return x.exp()
 
 def erf(x):
-    return ca(x).erf()
+    if type(x) != ca:
+        x = ca(x)
+    return x.erf()
 
 def erfc(x):
-    return ca(x).erfc()
+    if type(x) != ca:
+        x = ca(x)
+    return x.erfc()
 
 def erfi(x):
-    return ca(x).erfi()
+    if type(x) != ca:
+        x = ca(x)
+    return x.erfi()
 
 def gamma(x):
-    return ca(x).gamma()
+    if type(x) != ca:
+        x = ca(x)
+    return x.gamma()
 
 def fac(x):
     """
@@ -3399,7 +3488,9 @@ def fac(x):
         3.62880e+6 {3628800}
 
     """
-    return (ca(x)+1).gamma()
+    if type(x) != ca:
+        x = ca(x)
+    return (x+1).gamma()
 
 def cos(x):
     """
@@ -3423,7 +3514,9 @@ def cos(x):
         1
 
     """
-    ix = ca(x)*i
+    if type(x) != ca:
+        x = ca(x)
+    ix = x*i
     y = exp(ix)
     return (y + 1/y)/2
 
@@ -3449,7 +3542,9 @@ def sin(x):
         0
 
     """
-    ix = ca(x)*i
+    if type(x) != ca:
+        x = ca(x)
+    ix = x*i
     y = exp(ix)
     return (y - 1/y)/(2*i)
 
@@ -3570,6 +3665,9 @@ inf = ca.inf()
 uinf = ca.uinf()
 undefined = ca.undefined()
 unknown = ca.unknown()
+
+fexpr.inject()
+
 
 def prod(s):
     res = ca(1)
