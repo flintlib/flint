@@ -7,5 +7,7 @@ computation with real and complex numbers, presently in early development.
 
 Documentation: http://fredrikj.net/calcium/
 
+Try Online: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fredrik-johansson/calcium/HEAD?filepath=doc%2Fintroduction.ipynb)
+
 Author: Fredrik Johansson <fredrik.johansson@gmail.com>
 
