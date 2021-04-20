@@ -8,3 +8,5 @@ dependencies:
   - arb
   - libflint
   - antic
+  - python
+  - notebook
