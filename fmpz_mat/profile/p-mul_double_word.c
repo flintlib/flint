@@ -63,7 +63,7 @@ int main(void)
 
             timeit_start(timer);
             for (i = reps; i > 0; i--)
-                _fmpz_mat_mul_4(E, A, B);
+                _fmpz_mat_mul_double_word(E, A, B);
             timeit_stop(timer);
 
             total += timer->wall;

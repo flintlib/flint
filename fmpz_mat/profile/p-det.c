@@ -32,8 +32,6 @@ void sample(void * arg, ulong count)
     ulong i, dim = params->dim;
     slong bits = params->bits;
     int algorithm = params->algorithm;
-
-    flint_rand_t rnd;
     fmpz_mat_t A;
     fmpz_t d;
     FLINT_TEST_INIT(state);
@@ -66,7 +64,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-    double min_default, min_classical, min_modular, min_modular_2, max;
+    double min_classical, min_modular, min_modular_2, max;
     mat_mul_t params;
     slong dim, bits;
 

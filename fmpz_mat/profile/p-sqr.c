@@ -33,8 +33,6 @@ void sample(void * arg, ulong count)
     slong i, n = params->n, m = params->m ;
     slong bits = params->bits;
     int algorithm = params->algorithm;
-
-    flint_rand_t rnd;
     fmpz_mat_t A, C;
     FLINT_TEST_INIT(state);
     

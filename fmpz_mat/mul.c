@@ -12,7 +12,7 @@
 
 #include "fmpz_mat.h"
 
-void _fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+void _fmpz_mat_mul_small_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
     slong i, j, k;
@@ -37,7 +37,7 @@ void _fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 }
 
-void _fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+void _fmpz_mat_mul_small_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
     slong i, j, k;
@@ -69,7 +69,7 @@ void _fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 }
 
-void _fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+void _fmpz_mat_mul_small_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
     slong i, j, k;
@@ -82,10 +82,10 @@ void _fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     {
         for (j = 0; j < bc; j++)
         {
-            mp_limb_t hi, lo, cy, shh, shi, slo;
+            mp_limb_t hi, lo, shi, smid, slo;
             slong x, y;
 
-            shh = shi = slo = 0;
+            shi = smid = slo = 0;
 
             for (k = 0; k < br; k++)
             {
@@ -93,11 +93,11 @@ void _fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
                 y = *fmpz_mat_entry(B, k, j);
 
                 smul_ppmm(hi, lo, x, y);
-                add_sssaaaaaa(cy, shi, slo, 0, shi, slo, 0, hi, lo);
-                shh += (0 <= (slong) hi) ? cy : cy - 1;
+                add_sssaaaaaa(shi, smid, slo, shi, smid, slo,
+                              FLINT_SIGN_EXT(hi), hi, lo);
             }
 
-            fmpz_set_signed_uiuiui(fmpz_mat_entry(C, i, j), shh, shi, slo);
+            fmpz_set_signed_uiuiui(fmpz_mat_entry(C, i, j), shi, smid, slo);
         }
     }
 }
@@ -209,11 +209,11 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         if (ar < 9 || ar + br < 20)
         {
             if (bits <= FLINT_BITS - 2)
-                _fmpz_mat_mul_1(C, A, B);
+                _fmpz_mat_mul_small_1(C, A, B);
             else if (bits <= 2*FLINT_BITS - 1)
-                _fmpz_mat_mul_2a(C, A, B);
+                _fmpz_mat_mul_small_2a(C, A, B);
             else
-                _fmpz_mat_mul_2b(C, A, B);
+                _fmpz_mat_mul_small_2b(C, A, B);
 
             return;
         }
@@ -236,24 +236,24 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
             }
         }
 
-        _fmpz_mat_mul_small(C, A, B, bits - 1);
+        _fmpz_mat_mul_small_internal(C, A, B, bits - 1);
         return;
     }
     else if (abits + sign <= 2*FLINT_BITS && bbits + sign <= 2*FLINT_BITS)
     {
         /*
-            both A and B fit into two words: the complexity of mul_22 does not
+            both A and B fit into two words: the complexity of mul_double does not
             depend on bits much and hence does better as bits increases, but
             mul_multi_mod eventually does strassen.
         */
 
-        /* mul_22 handles unsigned input better than signed input. */
+        /* mul_double_word handles unsigned input better than signed input. */
         if (sign)
             dim = 2*dim;
 
         if (dim > 300)
         {
-            /* do more mul_22 with more threads and more C bits */
+            /* do more mul_double_word with more threads and more C bits */
             limit = (bits - 2*FLINT_BITS)/8;
             limit = limit*limit*flint_get_num_threads();
             if (dim - 300 > limit)
@@ -263,7 +263,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
             }
         }
 
-        _fmpz_mat_mul_22(C, A, B, sign, bits - 1);
+        _fmpz_mat_mul_double_word_internal(C, A, B, sign, bits - 1);
         return;
     }
     else

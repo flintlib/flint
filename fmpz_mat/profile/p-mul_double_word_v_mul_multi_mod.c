@@ -65,7 +65,7 @@ int main(void)
 
             timeit_start(timer);
             for (i = reps; i > 0; i--)
-                _fmpz_mat_mul_4(C, A, B);
+                _fmpz_mat_mul_double_word(C, A, B);
             timeit_stop(timer);
             total1 += timer->wall;
             min1 = FLINT_MIN(min1, timer->wall);

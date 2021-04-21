@@ -232,11 +232,6 @@ FLINT_DLL void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const 
 
 /* Multiplication */
 
-FLINT_DLL void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A,
-                                     const fmpz_mat_t B, flint_bitcnt_t Cbits);
-
-FLINT_DLL void fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-
 FLINT_DLL void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,
@@ -261,20 +256,26 @@ FLINT_DLL int _fmpz_mat_mul_blas(fmpz_mat_t C,
 FLINT_DLL int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A,
                                                            const fmpz_mat_t B);
 
-FLINT_DLL void _fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A,
+FLINT_DLL void _fmpz_mat_mul_small_1(fmpz_mat_t C, const fmpz_mat_t A,
                                                            const fmpz_mat_t B);
 
-FLINT_DLL void _fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A,
+FLINT_DLL void _fmpz_mat_mul_small_2a(fmpz_mat_t C, const fmpz_mat_t A,
                                                            const fmpz_mat_t B);
 
-FLINT_DLL void _fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A,
+FLINT_DLL void _fmpz_mat_mul_small_2b(fmpz_mat_t C, const fmpz_mat_t A,
                                                            const fmpz_mat_t B);
 
-FLINT_DLL void _fmpz_mat_mul_4(fmpz_mat_t C, const fmpz_mat_t A,
+FLINT_DLL void _fmpz_mat_mul_small_internal(fmpz_mat_t C, const fmpz_mat_t A,
+                                     const fmpz_mat_t B, flint_bitcnt_t Cbits);
+
+FLINT_DLL void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A,
                                                            const fmpz_mat_t B);
 
-FLINT_DLL void _fmpz_mat_mul_22(fmpz_mat_t C, const fmpz_mat_t A,
-                            const fmpz_mat_t B, int sign, flint_bitcnt_t bits);
+FLINT_DLL void _fmpz_mat_mul_double_word(fmpz_mat_t C, const fmpz_mat_t A,
+                                                           const fmpz_mat_t B);
+
+FLINT_DLL void _fmpz_mat_mul_double_word_internal(fmpz_mat_t C,
+        const fmpz_mat_t A, const fmpz_mat_t B, int sign, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A);
 

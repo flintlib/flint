@@ -65,7 +65,7 @@ int main(void)
 
             timeit_start(timer);
             for (i = reps; i > 0; i--)
-                fmpz_mat_mul_small(C, A, B);
+                _fmpz_mat_mul_small(C, A, B);
             timeit_stop(timer);
 
             new_total += timer->wall;
@@ -130,7 +130,7 @@ int main(void)
 
             timeit_start(timer);
             for (i = reps; i > 0; i--)
-                fmpz_mat_mul_small(C, A, B);
+                _fmpz_mat_mul_small(C, A, B);
             timeit_stop(timer);
 
             new_total += timer->wall;

@@ -27,7 +27,7 @@ int main(void)
 
     flint_printf("*** timings are nanoseconds per dim^3 ***\n");
 
-    for (dim = 50*0+2012; dim <= 5000; dim += 2 + dim/4)
+    for (dim = 50; dim <= 5000; dim += 2 + dim/4)
     {
         fmpz_mat_t A, B, C, D;
 
@@ -59,7 +59,7 @@ int main(void)
 
             timeit_start(timer);
             for (i = reps; i > 0; i--)
-                fmpz_mat_mul_small(C, A, B);
+                _fmpz_mat_mul_small(C, A, B);
             timeit_stop(timer);
             total1 += timer->wall;
             min1 = FLINT_MIN(min1, timer->wall);
