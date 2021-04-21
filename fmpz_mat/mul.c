@@ -106,7 +106,8 @@ void
 fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
-    slong abits, bbits, bits;
+    slong abits, bbits;
+    flint_bitcnt_t cbits;
     slong i, j, dim, limit;
     int sign;
 
@@ -175,23 +176,23 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         return;
     }
 
-    bits = abits + bbits + FLINT_BIT_COUNT(br) + 1;
+    cbits = abits + bbits + FLINT_BIT_COUNT(br);
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
     if (dim > 50)
     {
-        if (bits-1 <= 53)
+        if (cbits <= 53)
             limit = 0;
-        else if (bits-1 <= 64)
+        else if (cbits <= 64)
             limit = 1000;
-        else if (bits-1 <= 128)
+        else if (cbits <= 128)
             limit = 1300;
-        else if (bits-1 <= 256)
+        else if (cbits <= 256)
             limit = 250;
         else
             limit = 200 + 8*FLINT_BIT_COUNT(bits);
 
-        if (dim > limit && _fmpz_mat_mul_blas(C, A, abits, B, bbits, sign, bits-1))
+        if (dim > limit && _fmpz_mat_mul_blas(C, A, abits, B, bbits, sign, cbits))
             return;
     }
 #endif
@@ -208,9 +209,9 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         /* first take care of small cases */
         if (ar < 9 || ar + br < 20)
         {
-            if (bits <= FLINT_BITS - 2)
+            if (cbits <= FLINT_BITS - 2)
                 _fmpz_mat_mul_small_1(C, A, B);
-            else if (bits <= 2*FLINT_BITS - 1)
+            else if (cbits <= 2*FLINT_BITS - 1)
                 _fmpz_mat_mul_small_2a(C, A, B);
             else
                 _fmpz_mat_mul_small_2b(C, A, B);
@@ -223,28 +224,28 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
             /* do more mul_small with more threads */
             limit = 300*flint_get_num_threads();
 
-            if (bits <= FLINT_BITS - 2 && dim - 1000 > limit)
+            if (cbits <= FLINT_BITS - 2 && dim - 1000 > limit)
             {
                 /* strassen avoids big fmpz intermediates */
                 fmpz_mat_mul_strassen(C, A, B);
                 return;
             }
-            else if (bits > FLINT_BITS - 2 && dim - 4000 > limit)
+            else if (cbits > FLINT_BITS - 2 && dim - 4000 > limit)
             {
-                _fmpz_mat_mul_multi_mod(C, A, B, bits);
+                _fmpz_mat_mul_multi_mod(C, A, B, sign, cbits);
                 return;
             }
         }
 
-        _fmpz_mat_mul_small_internal(C, A, B, bits - 1);
+        _fmpz_mat_mul_small_internal(C, A, B, cbits);
         return;
     }
     else if (abits + sign <= 2*FLINT_BITS && bbits + sign <= 2*FLINT_BITS)
     {
         /*
-            both A and B fit into two words: the complexity of mul_double does not
-            depend on bits much and hence does better as bits increases, but
-            mul_multi_mod eventually does strassen.
+            both A and B fit into two words: the complexity of mul_double_word
+            does not depend on cbits much and hence does better as cbits
+            increases, but mul_multi_mod eventually does strassen.
         */
 
         /* mul_double_word handles unsigned input better than signed input. */
@@ -253,23 +254,23 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
         if (dim > 300)
         {
-            /* do more mul_double_word with more threads and more C bits */
-            limit = (bits - 2*FLINT_BITS)/8;
+            /* do more mul_double_word with more threads and more cbits */
+            limit = (cbits - 2*FLINT_BITS)/8;
             limit = limit*limit*flint_get_num_threads();
             if (dim - 300 > limit)
             {
-                _fmpz_mat_mul_multi_mod(C, A, B, bits);
+                _fmpz_mat_mul_multi_mod(C, A, B, sign, cbits);
                 return;
             }
         }
 
-        _fmpz_mat_mul_double_word_internal(C, A, B, sign, bits - 1);
+        _fmpz_mat_mul_double_word_internal(C, A, B, sign, cbits);
         return;
     }
     else
     {
-        if (dim >= 3 * FLINT_BIT_COUNT(bits))  /* tuning param */
-            _fmpz_mat_mul_multi_mod(C, A, B, bits);
+        if (dim >= 3 * FLINT_BIT_COUNT(cbits))  /* tuning param */
+            _fmpz_mat_mul_multi_mod(C, A, B, sign, cbits);
         else if (abits >= 500 && bbits >= 500 && dim >= 8)  /* tuning param */
             fmpz_mat_mul_strassen(C, A, B);
         else

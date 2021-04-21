@@ -243,10 +243,10 @@ FLINT_DLL void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 FLINT_DLL void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B, flint_bitcnt_t bits);
+                           const fmpz_mat_t B, int sign, flint_bitcnt_t Cbits);
 
 FLINT_DLL void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B);
+                                                           const fmpz_mat_t B);
 
 FLINT_DLL int _fmpz_mat_mul_blas(fmpz_mat_t C,
                                     const fmpz_mat_t A, flint_bitcnt_t Abits,
