@@ -190,7 +190,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         else if (cbits <= 256)
             limit = 250;
         else
-            limit = 200 + 8*FLINT_BIT_COUNT(bits);
+            limit = 200 + 8*FLINT_BIT_COUNT(cbits);
 
         if (dim > limit && _fmpz_mat_mul_blas(C, A, abits, B, bbits, sign, cbits))
             return;
