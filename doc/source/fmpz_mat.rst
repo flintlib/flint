@@ -511,7 +511,7 @@ Matrix multiplication
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
     multiplication (the Strassen-Winograd variant).
 
-.. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, flint_bitcnt_t bits)
+.. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, int sign, flint_bitcnt_t bits)
               void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Sets ``C`` to the matrix product `C = AB` computed using a multimodular 
@@ -519,9 +519,9 @@ Matrix multiplication
     and reconstructed using the Chinese Remainder Theorem. This generally
     becomes more efficient than classical multiplication for large matrices.
 
-    The ``bits`` parameter is a bound for the bit size of largest 
-    element of `C`, or twice the absolute value of the largest element 
-    if any elements of `C` are negative. The function
+    The absolute value of the elements of `C` should be `< 2^{\text{bits}}`,
+    and ``sign`` should be `0` if the entries of `C` are known to be nonnegative
+    and `1` otherwise. The function
     :func:`fmpz_mat_mul_multi_mod` calculates a rigorous bound automatically.
     If the default bound is too pessimistic, :func:`_fmpz_mat_mul_multi_mod`
     can be used with a custom bound.
