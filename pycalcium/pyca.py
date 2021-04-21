@@ -651,6 +651,9 @@ class qqbar:
                     libflint.fmpz_clear(nref)
             elif typ is qqbar:
                 libcalcium.qqbar_set(self, val)
+            elif typ is ca:
+                if not libcalcium.ca_get_qqbar(self, val, val._ctx):
+                    raise ValueError("unable to parse the given ca as an algebraic number")
             elif typ is float:
                 libcalcium.qqbar_set_d(self, val)
             elif typ is complex:
@@ -3717,6 +3720,10 @@ def test_gamma():
     assert gamma(pi)/gamma(pi-1) == pi-1
     assert log(gamma(pi+1)) - log(gamma(pi)) - log(pi) == 0
     assert log(gamma(-pi+1)) - log(gamma(-pi)) - log(pi) == pi * i
+
+def test_conversions():
+    assert ca(qqbar(sqrt(2))) == sqrt(2)
+    assert ca(fexpr(ca(Sqrt(2)))) == sqrt(2)
 
 def test_notebook_examples():
     # algebraic number identity
