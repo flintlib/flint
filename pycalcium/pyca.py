@@ -3718,6 +3718,64 @@ def test_gamma():
     assert log(gamma(pi+1)) - log(gamma(pi)) - log(pi) == 0
     assert log(gamma(-pi+1)) - log(gamma(-pi)) - log(pi) == pi * i
 
+def test_notebook_examples():
+    # algebraic number identity
+    I = NumberI
+    lhs = Sqrt(36 + 3*(-54+35*I*Sqrt(3))**Div(1,3)*3**Div(1,3) + \
+                117/(-162+105*I*Sqrt(3))**Div(1,3))/3 + \
+                Sqrt(5)*(1296*I+840*Sqrt(3)-35*3**Div(5,6)*(-54+35*I*Sqrt(3))**Div(1,3)-\
+                54*I*(-162+105*I*Sqrt(3))**Div(1,3)+13*I*(-162+105*I*Sqrt(3))**Div(2,3))/(5*(162*I+105*Sqrt(3)))
+    rhs = Sqrt(5) + Sqrt(7)
+    assert qqbar(lhs) == qqbar(rhs)
+    assert ca(lhs) == ca(rhs)
+    assert fexpr(ca(lhs) - ca(rhs)) == fexpr(0)
+    # misc
+    assert fexpr(exp(pi) * exp(-pi + log(2))) == fexpr(2)
+    assert i**i - exp(pi / ((sqrt(-2)**sqrt(2)) ** sqrt(2))) == 0
+    assert log(sqrt(2)+sqrt(3)) / log(5 + 2*sqrt(6)) == ca(1)/2
+    assert ca(10)**-30 < (640320**3 + 744)/exp(pi*sqrt(163)) - 1 < ca(10)**-29
+    A = ca_mat([[5, pi], [1, -1]])**4
+    assert A.charpoly()(A) == ca_mat([[0,0],[0,0]])
+    # comparison with higher precision
+    ctx = ca_ctx(prec_limit=65536)
+    eps = ca(10, context=ctx) ** (-10000)
+    assert (exp(eps) == 1) == False
+
+def test_context_switch():
+    ctx2 = ca_ctx()
+    a = ca(3)
+    b = ca(3, context=ctx2)
+    assert a == b
+    a = exp(a)
+    b = exp(b)
+    assert a == b
+    assert a._ctx_python is not b._ctx_python
+    assert a - b == 0
+    assert a + b == 2 * a
+    assert b + a == 2 * a
+    assert a + b == 2 * b
+    assert b + a == 2 * b
+    A = ca_mat([[b]])
+    B = ca_mat([[a]], context=ctx2)
+    assert A._ctx_python is not B._ctx_python
+    assert A == B
+    assert A + B == 2 * A
+    assert A + B == 2 * B
+    assert B + A == 2 * A
+    assert B + A == 2 * B
+    assert A.det() == B.det()
+    assert A[0,0] == B[0,0]
+    A = ca_poly([b])
+    B = ca_poly([a], context=ctx2)
+    assert A._ctx_python is not B._ctx_python
+    assert A == B
+    assert A + B == 2 * A
+    assert B + A == 2 * A
+    assert A + B == 2 * B
+    assert B + A == 2 * B
+    assert A[0] == B[0]
+
+
 def test_xfail():
     # Test some simplifications that are known not to work yet.
     # When a case starts working, we will get a test failure so we can
