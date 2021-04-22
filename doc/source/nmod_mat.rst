@@ -44,6 +44,11 @@ Memory management
 
     Exchanges ``mat1`` and ``mat2``.
 
+.. function:: void nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 
 Basic properties and manipulation
 --------------------------------------------------------------------------------

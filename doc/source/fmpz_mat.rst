@@ -47,6 +47,11 @@ Basic assignment and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2`` 
     are allowed to be different.
 
+.. function:: void fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: fmpz * fmpz_mat_entry(fmpz_mat_t mat, slong i, slong j)
 
     Returns a reference to the entry of ``mat`` at row `i` and column `j`.

@@ -66,6 +66,10 @@ Basic assignment and manipulation
 
     Swaps ``mat1`` and ``mat2`` efficiently.
 
+.. function:: void fmpz_poly_mat_swap_entrywise(fmpz_poly_mat_t mat1, fmpz_poly_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
 
 
 Input and output

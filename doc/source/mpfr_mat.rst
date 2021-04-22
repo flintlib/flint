@@ -34,6 +34,11 @@ Basic manipulation
 
     Efficiently swap matrices ``mat1`` and ``mat2``.
 
+.. function:: void mpfr_mat_swap_entrywise(mpfr_mat_t mat1, mpfr_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: void mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2)
 
     Set ``mat1`` to the value of ``mat2``.

@@ -68,6 +68,11 @@ Basic properties and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
+.. function:: void fq_zech_mat_swap_entrywise(fq_zech_mat_t mat1, fq_zech_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: void fq_zech_mat_zero(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Sets all entries of ``mat`` to 0.
