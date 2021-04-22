@@ -48,6 +48,36 @@ qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong b)
         return;
     }
 
+    if (b == 2)
+    {
+        if (fmpz_is_square(fmpq_numref(x)) && fmpz_is_square(fmpq_denref(x)))
+        {
+            fmpz_poly_fit_length(QQBAR_POLY(res), 2);
+            _fmpz_poly_set_length(QQBAR_POLY(res), 2);
+            fmpz_sqrt(QQBAR_COEFFS(res) + 0, fmpq_numref(x));
+            fmpz_neg(QQBAR_COEFFS(res) + 0, QQBAR_COEFFS(res) + 0);
+            fmpz_sqrt(QQBAR_COEFFS(res) + 1, fmpq_denref(x));
+            acb_set_fmpz(QQBAR_ENCLOSURE(res), QQBAR_COEFFS(res) + 0);
+            acb_neg(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(res));
+            acb_div_fmpz(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(res), QQBAR_COEFFS(res) + 1, QQBAR_DEFAULT_PREC);
+        }
+        else
+        {
+            fmpz_poly_fit_length(QQBAR_POLY(res), 3);
+            _fmpz_poly_set_length(QQBAR_POLY(res), 3);
+
+            fmpz_set(QQBAR_COEFFS(res) + 0, fmpq_numref(x));
+            fmpz_neg(QQBAR_COEFFS(res) + 0, QQBAR_COEFFS(res) + 0);
+            fmpz_zero(QQBAR_COEFFS(res) + 1);
+            fmpz_set(QQBAR_COEFFS(res) + 2, fmpq_denref(x));
+
+            acb_set_fmpq(QQBAR_ENCLOSURE(res), x, QQBAR_DEFAULT_PREC);
+            acb_sqrt(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(res), QQBAR_DEFAULT_PREC);
+        }
+
+        return;
+    }
+
     if (fmpq_sgn(x) < 0)
     {
         qqbar_set_fmpq(res, x);

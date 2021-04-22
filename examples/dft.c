@@ -5,7 +5,7 @@
 #include "ca_vec.h"
 
 void
-benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
+benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, slong gb, ca_ctx_t ctx)
 {
     ca_ptr x, X, y, w;
     ca_t t;
@@ -19,6 +19,9 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
     ca_init(t, ctx);
 
     /* ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEBUG; */
+    /* ctx->options[CA_OPT_VERBOSE] = 1; */
+
+    ctx->options[CA_OPT_USE_GROEBNER] = gb;
 
     if (qqbar_limit != 0)
         ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = qqbar_limit;
@@ -170,20 +173,21 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, ca_ctx_t ctx)
 
 void usage()
 {
-    printf("usage: dft [-verbose] [-input i] [-limit B] [-timing T] N\n");
+    printf("usage: dft [-verbose] [-input i] [-limit B] [-timing T] [-nogb] N\n");
 }
 
 int main(int argc, char *argv[])
 {
     ca_ctx_t ctx;
     int verbose, input, timing;
-    slong i, Nmin, Nmax, N, qqbar_limit;
+    slong i, Nmin, Nmax, N, qqbar_limit, gb;
 
     Nmin = Nmax = 2;
     verbose = 0;
     input = 0;
     timing = 0;
     qqbar_limit = 0;
+    gb = 1;
 
     if (argc < 2)
     {
@@ -207,6 +211,10 @@ int main(int argc, char *argv[])
             qqbar_limit = atol(argv[i+1]);
             i += 1;
         }
+        else if (!strcmp(argv[i], "-nogb"))
+        {
+            gb = 0;
+        }
         else if (!strcmp(argv[i], "-timing"))
         {
             timing = atol(argv[i+1]);
@@ -225,13 +233,27 @@ int main(int argc, char *argv[])
 
     for (N = Nmin; N <= Nmax; N++)
     {
-        printf("DFT benchmark, length N = %ld\n\n", N);
+        flint_printf("DFT benchmark, length N = %wd\n", N);
+        if (input == 0)
+            flint_printf("x_k = k + 2\n");
+        else if (input == 1)
+            flint_printf("x_k = sqrt(k + 2)\n");
+        else if (input == 2)
+            flint_printf("x_k = log(k + 2)\n");
+        else if (input == 3)
+            flint_printf("x_k = exp(2 pi i / (k + 2))\n");
+        else if (input == 4)
+            flint_printf("x_k = 1 / (1 + (k + 2) pi)\n");
+        else if (input == 5)
+            flint_printf("x_k = 1 / (1 + sqrt(k + 2) pi)\n");
+
+        flint_printf("\n");
 
         if (timing == 0)
         {
             TIMEIT_ONCE_START
             ca_ctx_init(ctx);
-            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
             ca_ctx_clear(ctx);
             TIMEIT_ONCE_STOP
         }
@@ -239,16 +261,16 @@ int main(int argc, char *argv[])
         {
             TIMEIT_START
             ca_ctx_init(ctx);
-            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
             ca_ctx_clear(ctx);
             TIMEIT_STOP
         }
         else
         {
             ca_ctx_init(ctx);
-            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
             TIMEIT_START
-            benchmark_DFT(N, input, verbose, qqbar_limit, ctx);
+            benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
             TIMEIT_STOP
             ca_ctx_clear(ctx);
         }

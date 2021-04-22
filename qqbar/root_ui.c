@@ -82,7 +82,7 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
 
         /* handle principal roots of positive rational numbers */
         /* todo: could also handle conjugates of such roots */
-        if (_qqbar_fast_detect_simple_principal_surd(x))
+        if ((d == 1 && (n == 2 || qqbar_sgn_re(x) > 0)) || _qqbar_fast_detect_simple_principal_surd(x))
         {
             fmpq_t t;
             fmpq_init(t);

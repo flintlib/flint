@@ -12,7 +12,7 @@
 #include "ca_ext.h"
 #include "ca_vec.h"
 
-static ulong hash_qqbar(const qqbar_t x)
+ulong ca_ext_hash_qqbar(const qqbar_t x)
 {
     ulong s;
     slong i, len;
@@ -66,7 +66,7 @@ ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t ctx)
     CA_EXT_QQBAR_NF(res) = flint_malloc(sizeof(nf_struct));
     nf_init(CA_EXT_QQBAR_NF(res), t);
 
-    res->hash = hash_qqbar(CA_EXT_QQBAR(res));
+    res->hash = ca_ext_hash_qqbar(CA_EXT_QQBAR(res));
     res->depth = 0;
 }
 

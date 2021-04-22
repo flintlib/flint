@@ -34,6 +34,16 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
         ca_factor_t fac;
         ca_t A, B, t;
 
+        if (CA_IS_QQ(x, ctx))
+        {
+            qqbar_t t;
+            qqbar_init(t);
+            qqbar_fmpq_root_ui(t, CA_FMPQ(x), 2);
+            ca_set_qqbar(res, t, ctx);
+            qqbar_clear(t);
+            return;
+        }
+
         ca_factor_init(fac, ctx);
         ca_init(A, ctx);
         ca_init(B, ctx);

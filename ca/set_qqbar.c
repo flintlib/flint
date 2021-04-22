@@ -53,19 +53,25 @@ _fmpz_factor_square_root(fmpz_t A, fmpz_t B, const fmpz_t n, slong smooth_bound)
     fmpz_clear(t);
 }
 
-/* fixme: this is slow!!! */
+ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx);
+
 ca_field_ptr ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x)
 {
     ca_ext_t ext;
     ca_ext_struct * ext_ptr[1];
     ca_field_ptr field;
 
-    /* todo: shallow copy */
-    ca_ext_init_qqbar(ext, x, ctx);
-    ext_ptr[0] = ca_ext_cache_insert(CA_CTX_EXT_CACHE(ctx), ext, ctx);
-    field = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext_ptr, 1, ctx);
+    field = ca_field_cache_lookup_qqbar(CA_CTX_FIELD_CACHE(ctx), x, ctx);
 
-    ca_ext_clear(ext, ctx);
+    if (field == NULL)
+    {
+        /* todo: shallow copy */
+        ca_ext_init_qqbar(ext, x, ctx);
+        ext_ptr[0] = ca_ext_cache_insert(CA_CTX_EXT_CACHE(ctx), ext, ctx);
+        field = ca_field_cache_insert_ext(CA_CTX_FIELD_CACHE(ctx), ext_ptr, 1, ctx);
+        ca_ext_clear(ext, ctx);
+    }
+
     return field;
 }
 
@@ -131,14 +137,24 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 
 #else
 
-/* todo: optimize! */
 ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 {
     ca_field_srcptr res;
     qqbar_t x;
     qqbar_init(x);
+
+#if 0
     qqbar_set_fmpz(x, A);
     qqbar_sqrt(x, x);
+#else
+    fmpz_poly_fit_length(QQBAR_POLY(x), 3);
+    _fmpz_poly_set_length(QQBAR_POLY(x), 3);
+    fmpz_neg(QQBAR_COEFFS(x) + 0, A);
+    fmpz_zero(QQBAR_COEFFS(x) + 1);
+    fmpz_one(QQBAR_COEFFS(x) + 2);
+    acb_set_fmpz(QQBAR_ENCLOSURE(x), A);
+    acb_sqrt(QQBAR_ENCLOSURE(x), QQBAR_ENCLOSURE(x), QQBAR_DEFAULT_PREC);
+#endif
     res = ca_ctx_get_field_qqbar(ctx, x);
     qqbar_clear(x);
     return res;

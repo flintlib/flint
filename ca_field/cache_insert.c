@@ -12,6 +12,38 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+ulong ca_ext_hash_qqbar(const qqbar_t x);
+
+ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx)
+{
+    ulong xhash;
+    ca_field_ptr K;
+    slong i, loc;
+
+    xhash = ca_ext_hash_qqbar(x);
+
+    loc = xhash % ((ulong) cache->hash_size);
+
+    for (i = 0; i < cache->hash_size; i++)
+    {
+        /* not found */
+        if (cache->hash_table[loc] == -1)
+            return NULL;
+
+        K = cache->items[cache->hash_table[loc]];
+        /* found */
+        if (CA_FIELD_IS_NF(K) && qqbar_equal(x, CA_FIELD_NF_QQBAR(K)))
+            return K;
+
+        loc++;
+        if (loc == cache->hash_size)
+            loc = 0;
+    }
+
+    /* cannot happen */
+    flint_abort();
+}
+
 ulong
 _ca_field_hash(ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
 {
