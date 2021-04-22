@@ -24,7 +24,7 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 		fmpz_mat_t t;
 		fmpz_mat_init(t, B->r, B->c);
 		fmpz_mat_gram(t, A);
-		fmpz_mat_swap(B, t);
+		fmpz_mat_swap_entrywise(B, t);
 		fmpz_mat_clear(t);
 		return;
 	}

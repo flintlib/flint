@@ -188,7 +188,7 @@ padic_mat_swap_entrywise(padic_mat_t mat1, padic_mat_t mat2)
 
     for (i = 0; i < padic_mat_nrows(mat1); i++)
         for (j = 0; j < padic_mat_ncols(mat1); j++)
-            padic_swap(padic_mat_entry(mat2, i, j), padic_mat_entry(mat1, i, j));
+            fmpz_swap(padic_mat_entry(mat2, i, j), padic_mat_entry(mat1, i, j));
 }
 
 FLINT_DLL void padic_mat_zero(padic_mat_t A);

@@ -30,7 +30,7 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
         mpf_mat_t T;
         mpf_mat_init(T, A->r, A->c, Q->prec);
         mpf_mat_qr(T, R, A);
-        mpf_mat_swap(Q, T);
+        mpf_mat_swap_entrywise(Q, T);
         mpf_mat_clear(T);
         return;
     }

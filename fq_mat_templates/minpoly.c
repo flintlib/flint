@@ -18,7 +18,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
 {
    slong n = X->r, i, j, c, c1, c2, r1, r2;
    slong  * P1, * P2, * L1, * L2;
-   TEMPLATE(T, mat_t) A, B, v, w;
+   TEMPLATE(T, mat_t) A, B, v;
    int first_poly = 1, indep = 1;
    TEMPLATE(T, poly_t) b, g, r;
    TEMPLATE(T, t) t, h;
@@ -59,7 +59,6 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
    TEMPLATE(T, mat_init) (A, n + 1, 2*n + 1, ctx);
    TEMPLATE(T, mat_init) (B, n, n, ctx);
    TEMPLATE(T, mat_init) (v, n, 1, ctx);
-   TEMPLATE(T, mat_init) (w, n, 1, ctx);
  
    L1 = (slong *) TMP_ALLOC((n + 1)*sizeof(slong));
    L2 = (slong *) TMP_ALLOC(n*sizeof(slong));
@@ -109,9 +108,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
          r1++;
          r2 = indep ? r2 + 1 : r2;
          
-         /* fq_mat_mul does not support aliasing, so mul and swap */
-         TEMPLATE(T, mat_mul) (w, X, v, ctx);
-         TEMPLATE(T, mat_swap) (v, w, ctx);
+         TEMPLATE(T, mat_mul) (v, X, v, ctx);
          
          for (i = 0; i < n; i++)
             TEMPLATE(T, set) (TEMPLATE(T, mat_entry) (A, r1, i), TEMPLATE(T, mat_entry) (v, i, 0), ctx);
@@ -185,7 +182,6 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
    TEMPLATE(T, mat_clear) (A, ctx);
    TEMPLATE(T, mat_clear) (B, ctx);
    TEMPLATE(T, mat_clear) (v, ctx);
-   TEMPLATE(T, mat_clear) (w, ctx);
 
    TEMPLATE(T, poly_clear) (b, ctx);
    TEMPLATE(T, poly_clear) (g, ctx);

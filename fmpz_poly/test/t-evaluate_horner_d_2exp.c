@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    int i, result;
+    int i;
     FLINT_TEST_INIT(state);
 
     flint_printf("evaluate_horner_d_2exp....");
@@ -30,7 +30,7 @@ main(void)
     {
         fmpz_poly_t f;
         double x, y, z, t;
-        slong xexp, yexp, zexp;
+        slong xexp, yexp;
 
         x = d_randtest(state);
         xexp = n_randint(state, 20) - 10;

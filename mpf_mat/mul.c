@@ -28,7 +28,7 @@ mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B)
         mpf_mat_t t;
         mpf_mat_init(t, ar, bc, C->prec);
         mpf_mat_mul(t, A, B);
-        mpf_mat_swap(C, t);
+        mpf_mat_swap_entrywise(C, t);
         mpf_mat_clear(t);
         return;
     }

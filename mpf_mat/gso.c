@@ -30,7 +30,7 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
         mpf_mat_t T;
         mpf_mat_init(T, A->r, A->c, B->prec);
         mpf_mat_gso(T, A);
-        mpf_mat_swap(B, T);
+        mpf_mat_swap_entrywise(B, T);
         mpf_mat_clear(T);
         return;
     }

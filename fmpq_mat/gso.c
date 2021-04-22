@@ -28,7 +28,7 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
         fmpq_mat_t t;
         fmpq_mat_init(t, B->r, B->c);
         fmpq_mat_gso(t, A);
-        fmpq_mat_swap(B, t);
+        fmpq_mat_swap_entrywise(B, t);
         fmpq_mat_clear(t);
         return;
     }
