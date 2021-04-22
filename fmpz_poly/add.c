@@ -46,3 +46,32 @@ fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1,
     _fmpz_poly_set_length(res, max);
     _fmpz_poly_normalise(res);  /* there may have been cancellation */
 }
+
+void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c)
+{
+    if (poly->length == 0)
+        fmpz_poly_set_si(res, c);
+    else
+    {
+        fmpz_poly_set(res, poly);
+
+        if (c < 0)
+            fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, -c);
+        else
+            fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, c);
+
+        _fmpz_poly_normalise(res);
+    }
+}
+
+void fmpz_poly_add_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c)
+{
+    if (poly->length == 0)
+        fmpz_poly_set_fmpz(res, c);
+    else
+    {
+        fmpz_poly_set(res, poly);
+        fmpz_add(res->coeffs + 0, res->coeffs + 0, c);
+        _fmpz_poly_normalise(res);
+    }
+}

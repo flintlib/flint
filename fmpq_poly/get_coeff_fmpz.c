@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2010 William Hart
 
     This file is part of FLINT.
 
@@ -9,15 +10,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPZ_POLY_INLINES_C
-
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
 #include <gmp.h>
+#include <stdlib.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpq.h"
+#include "fmpq_poly.h"
+
+void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n)
+{
+    if (n >= poly->length)  /* Coefficient is beyond the end of poly */
+        fmpz_zero(x);
+    else
+        fmpz_set(x, poly->coeffs + n);
+}
 
