@@ -66,8 +66,8 @@ main(void)
         m = n_randint(state, 10);
         n = n_randint(state, 10);
 
-        mpfr_mat_init(A, m, n, 200);
-        mpfr_mat_init(B, n, n, 200);
+        mpfr_mat_init(A, m, m, 200);
+        mpfr_mat_init(B, m, n, 200);
         mpfr_mat_init(C, m, n, 200);
 
         mpfr_mat_randtest(A, state);

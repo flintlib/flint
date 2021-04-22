@@ -19,5 +19,6 @@ d_mat_clear(d_mat_t mat)
     {
         flint_free(mat->entries);   /* Clean up array of entries */
         flint_free(mat->rows);  /* Clean up row array */
-    }
+    } else if (mat->r != 0)
+	flint_free(mat->rows);
 }
