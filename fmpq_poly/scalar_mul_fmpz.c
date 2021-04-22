@@ -30,9 +30,9 @@ void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden,
 
     fmpz_init(gcd);
     fmpz_one(gcd);
-    if (*c != WORD(1))
+    if (!fmpz_is_one(c))
         fmpz_gcd(gcd, c, den);
-    if (*gcd == WORD(1))
+    if (fmpz_is_one(gcd))
     {
         _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, c);
         fmpz_set(rden, den);

@@ -40,8 +40,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
         fmpz_init(f);
         
         fmpz_set_si(f, c);
-        _fmpz_vec_content(d, poly, len);
-        fmpz_gcd(d, d, f);
+        _fmpz_vec_content_chained(d, poly, len, f);
 
         if (c > 0)
         {

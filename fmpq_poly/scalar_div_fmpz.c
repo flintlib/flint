@@ -19,7 +19,7 @@
 void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                                 const fmpz_t den, slong len, const fmpz_t c)
 {
-    if (*c == WORD(1))
+    if (fmpz_is_one(c))
     {
         if (rpoly != poly)
         {
@@ -36,8 +36,7 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     {
         fmpz_t d;
         fmpz_init(d);
-        _fmpz_vec_content(d, poly, len);
-        fmpz_gcd(d, d, c);
+        _fmpz_vec_content_chained(d, poly, len, c);
         
         if (fmpz_sgn(c) < 0)
             fmpz_neg(d, d);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,13 +12,47 @@
 
 #include "fmpz_vec.h"
 
-void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len)
+void
+_fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t in)
 {
-    while (--len >= 0)
+    while (len > 0 && fmpz_is_zero(vec + 0))
     {
-        if (fmpz_is_one(res))
-            return;
-
-        fmpz_gcd(res, res, vec + len);
+        len--;
+        vec++;
     }
+
+    while (len > 1 && fmpz_is_zero(vec + len - 1))
+        len--;
+
+    if (len == 0)
+    {
+        fmpz_abs(res, in);
+        return;
+    }
+
+    if (len == 1)
+    {
+        fmpz_gcd(res, vec + 0, in);
+        return;
+    }
+
+    if (fmpz_is_pm1(in) || fmpz_is_pm1(vec + 0) || fmpz_is_pm1(vec + len - 1))
+    {
+        fmpz_one(res);
+        return;
+    }
+
+    fmpz_gcd3(res, vec + 0, vec + len - 1, in);
+    vec++;
+    len -= 2;
+
+    while (len >= 2 && !fmpz_is_one(res))
+    {
+        fmpz_gcd3(res, vec + 0, vec + len - 1, res);
+        vec++;
+        len -= 2;
+    }
+
+    if (len != 0 && !fmpz_is_one(res))
+        fmpz_gcd(res, res, vec + 0);
 }

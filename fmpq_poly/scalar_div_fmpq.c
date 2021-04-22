@@ -26,18 +26,14 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden,
     fmpz_init(gcd2);
     fmpz_one(gcd1);
     fmpz_one(gcd2);
-    if (*r != WORD(1))
-    {
-        _fmpz_vec_content(gcd1, poly, len);
-        if (*gcd1 != WORD(1))
-            fmpz_gcd(gcd1, gcd1, r);
-    }
-    if (*den != WORD(1) && *s != WORD(1))
+    if (!fmpz_is_one(r))
+        _fmpz_vec_content_chained(gcd1, poly, len, r);
+    if (!fmpz_is_one(den) && !fmpz_is_one(s))
         fmpz_gcd(gcd2, s, den);
-    
-    if (*gcd1 == WORD(1))
+
+    if (fmpz_is_one(gcd1))
     {
-        if (*gcd2 == WORD(1))
+        if (fmpz_is_one(gcd2))
         {
             _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, s);
             fmpz_mul(rden, den, r);
@@ -58,7 +54,7 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden,
         fmpz_t r2;
         fmpz_init(r2);
         fmpz_divexact(r2, r, gcd1);
-        if (*gcd2 == WORD(1))
+        if (fmpz_is_one(gcd2))
         {
             _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
             _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, s);
@@ -112,4 +108,3 @@ void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq
                                    fmpq_numref(c), fmpq_denref(c));
     }
 }
-

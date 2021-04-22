@@ -35,19 +35,12 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
     fmpz_one(gcd1);
     fmpz_one(gcd2);
     
-    if (*den2 != WORD(1))
-    {
-        _fmpz_vec_content(gcd1, poly1, len1);
-        if (*gcd1 != WORD(1))
-            fmpz_gcd(gcd1, gcd1, den2);
-    }
-    if (*den1 != WORD(1))
-    {
-        _fmpz_vec_content(gcd2, poly2, len2);
-        if (*gcd2 != WORD(1))
-            fmpz_gcd(gcd2, gcd2, den1);
-    }
-    
+    if (!fmpz_is_one(den2))
+        _fmpz_vec_content_chained(gcd1, poly1, len1, den2);
+
+    if (!fmpz_is_one(den1))
+        _fmpz_vec_content_chained(gcd2, poly2, len2, den1);
+
     /*
        TODO:  If gcd1 and gcd2 are very large compared to the degrees of 
        poly1 and poly2, we might want to create copies of the polynomials 
@@ -57,7 +50,7 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
     _fmpz_poly_mul(rpoly, poly1, len1, poly2, len2);
     fmpz_mul(rden, den1, den2);
 
-    if ((*gcd1 != WORD(1)) | (*gcd2 != WORD(1)))
+    if (!fmpz_is_one(gcd1) || !fmpz_is_one(gcd2))
     {
         fmpz_t g;
         fmpz_init(g);

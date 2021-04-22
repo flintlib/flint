@@ -31,9 +31,9 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
         ulong ud;
         fmpz_init(d);
         fmpz_init(fc);
-        _fmpz_vec_content(d, poly, len);
         fmpz_set_ui(fc, c);
-        fmpz_gcd(d, d, fc);
+        _fmpz_vec_content_chained(d, poly, len, fc);
+
         ud = fmpz_get_ui(d);  /* gcd of d and c fits into a ulong */
         
         _fmpz_vec_scalar_divexact_ui(rpoly, poly, len, ud);
