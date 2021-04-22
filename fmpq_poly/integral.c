@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,33 +15,123 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
+static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
+{
+    __mpz_struct * z = COEFF_TO_PTR(*g);
+
+    return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
+}
+
+static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
+{
+    if (!COEFF_IS_MPZ(*g))
+        return n_gcd(FLINT_ABS(*g), h);
+    else
+        return _fmpz_gcd_big_small(g, h);
+}
+
 void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, slong len)
 {
     slong k;
-    fmpz_t t;
+    ulong v, c, d;
+    mp_ptr divisors;
+    fmpz_t t, u;
+    TMP_INIT;
+
+    if (len <= 2)
+    {
+        if (len == 2)
+            fmpz_set(rpoly + 1, poly);
+        fmpz_zero(rpoly);
+        fmpz_set(rden, den);
+        return;
+    }
+
+    TMP_START;
+    divisors = TMP_ALLOC(sizeof(ulong) * len);
 
     fmpz_init(t);
     fmpz_one(t);
 
-    for (k = len - 1; k > 0; k--)
+    for (k = len - 1; k >= 2; k--)
     {
-        fmpz_mul(rpoly + k, poly + k - 1, t);
-        fmpz_mul_ui(t, t, k);
+        if (fmpz_is_zero(poly + k - 1))
+        {
+            fmpz_zero(rpoly + k);
+        }
+        else
+        {
+            c = _fmpz_gcd_small(poly + k - 1, k);
+
+            if (c == k)
+            {
+                fmpz_divexact_ui(rpoly + k, poly + k - 1, k);
+                divisors[k] = 1;
+            }
+            else
+            {
+                if (c == 1)
+                {
+                    fmpz_set(rpoly + k, poly + k - 1);
+                    divisors[k] = k;
+                }
+                else
+                {
+                    fmpz_divexact_ui(rpoly + k, poly + k - 1, c);
+                    divisors[k] = k / c;
+                }
+
+                c = divisors[k];
+                d = _fmpz_gcd_small(t, c);
+                if (d != c)
+                    fmpz_mul_ui(t, t, c / d);
+            }
+        }
     }
 
     fmpz_mul(rden, den, t);
 
-    fmpz_set_ui(t, UWORD(2));
-    for (k = 3; k < len; k++)
+    if (!fmpz_is_one(t))
     {
-        fmpz_mul(rpoly + k, rpoly + k, t);
-        fmpz_mul_ui(t, t, k);
+        if (!COEFF_IS_MPZ(*t))
+        {
+            v = *t;
+            for (k = len - 1; k >= 2; k--)
+            {
+                if (!fmpz_is_zero(rpoly + k) && v != divisors[k])
+                    fmpz_mul_ui(rpoly + k, rpoly + k, divisors[k] == 1 ? v : v / divisors[k]);
+            }
+        }
+        else
+        {
+            fmpz_init(u);
+
+            for (k = len - 1; k >= 2; k--)
+            {
+                if (!fmpz_is_zero(rpoly + k))
+                {
+                    if (divisors[k] == 1)
+                    {
+                        fmpz_mul(rpoly + k, rpoly + k, t);
+                    }
+                    else
+                    {
+                        fmpz_divexact_ui(u, t, divisors[k]);
+                        fmpz_mul(rpoly + k, rpoly + k, u);
+                    }
+                }
+            }
+
+            fmpz_clear(u);
+        }
     }
 
+    fmpz_mul(rpoly + 1, poly + 0, t);
     fmpz_zero(rpoly);
-    _fmpq_poly_canonicalise(rpoly, rden, len);
+
     fmpz_clear(t);
+    TMP_END;
 }
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)

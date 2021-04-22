@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,58 +15,65 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
+#include "fmpq_poly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
-    int i, result;
-    ulong cflags = UWORD(0);
-
+    int i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("integral....");
-    fflush(stdout);  
+    flint_printf("exp_expinv_series....");
+    fflush(stdout);
 
-    /* Check inverse of fmpq_poly_derivative */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpq_poly_t a, b, c;
+        fmpq_poly_t a, b, c, d;
+        slong n = n_randint(state, 50) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(state, 100), 1 + n_randint(state, 200));
+        fmpq_poly_init(d);
+
+        fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 10);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
+
+        fmpq_poly_canonicalise(a);
 
         if (n_randint(state, 2))
         {
-            fmpq_poly_integral(b, a);
+            fmpq_poly_set(c, a);
+            fmpq_poly_exp_expinv_series(b, c, c, n);
         }
-        else  /* Check aliasing */
+        else if (n_randint(state, 2))
         {
             fmpq_poly_set(b, a);
-            fmpq_poly_integral(b, b);
+            fmpq_poly_exp_expinv_series(b, c, b, n);
+        }
+        else
+        {
+            fmpq_poly_exp_expinv_series(b, c, a, n);
         }
 
-        fmpq_poly_derivative(c, b);
+        fmpq_poly_mullow(d, b, c, n);
 
-        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
-        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
-        result = fmpq_poly_equal(a, c) && !cflags;
-        if (!result)
+        if (!fmpq_poly_is_one(d) || !fmpq_poly_is_canonical(b) || !fmpq_poly_is_canonical(c))
         {
             flint_printf("FAIL:\n");
             fmpq_poly_debug(a), flint_printf("\n\n");
             fmpq_poly_debug(b), flint_printf("\n\n");
-            flint_printf("cflags = %wu\n\n", cflags);
+            fmpq_poly_debug(c), flint_printf("\n\n");
+            fmpq_poly_debug(d), flint_printf("\n\n");
             abort();
         }
 
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
         fmpq_poly_clear(c);
+        fmpq_poly_clear(d);
     }
-
 
     FLINT_TEST_CLEANUP(state);
     

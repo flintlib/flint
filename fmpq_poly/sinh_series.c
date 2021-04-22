@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -26,11 +26,9 @@ _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden,
     fmpz_init(tden);
 
     /* sinh(x) = (exp(x)-exp(-x))/2 */
-    _fmpq_poly_exp_series(g, gden, h, hden, hlen, n);
-    _fmpq_poly_inv_series(t, tden, g, gden, n, n);
+    _fmpq_poly_exp_expinv_series(g, gden, t, tden, h, hden, hlen, n);
     _fmpq_poly_sub(g, gden, g, gden, n, t, tden, n);
-    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, UWORD(2));
-    _fmpq_poly_canonicalise(g, gden, n);
+    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, 2);
 
     _fmpz_vec_clear(t, n);
     fmpz_clear(tden);
@@ -50,23 +48,8 @@ void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
         return;
     }
 
-    if (res != poly)
-    {
-        fmpq_poly_fit_length(res, n);
-        _fmpq_poly_sinh_series(res->coeffs, res->den,
-            poly->coeffs, poly->den, poly->length, n);
-    }
-    else
-    {
-        fmpq_poly_t t;
-        fmpq_poly_init2(t, n);
-        _fmpq_poly_sinh_series(t->coeffs, t->den,
-            poly->coeffs, poly->den, poly->length, n);
-        fmpq_poly_swap(res, t);
-        fmpq_poly_clear(t);
-    }
-
+    fmpq_poly_fit_length(res, n);
+    _fmpq_poly_sinh_series(res->coeffs, res->den, poly->coeffs, poly->den, poly->length, n);
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
 }
-

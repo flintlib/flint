@@ -2377,19 +2377,14 @@ of polynomial multiplication.
 
     Set `g = \exp(h) + O(x^n)` using a simple `O(n^2)` algorithm.
 
-.. function:: void _nmod_poly_exp_series2(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+.. function:: void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set `f = \exp(h) + O(x^n)` where ``h`` is a polynomial. Assume
     `n > 0`. Aliasing of `g` and `h` is not allowed.
 
-    Uses Newton iteration (the version given in [HanZim2004]_).
+    Uses Newton iteration (an improved version of the
+    algorithm in [HanZim2004]_).
     For small `n`, falls back to the basecase algorithm.
-
-.. function:: void _nmod_poly_exp_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
-
-    Deprecated version of ``_nmod_poly_exp_series2`` in which the result
-    ``(g,n)`` and the input ``(h,n)`` must have the same length
-    (zero-padded if necessary).
 
 .. function:: void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 

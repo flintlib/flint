@@ -1310,16 +1310,10 @@ FLINT_DLL void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
 FLINT_DLL void nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
                 ulong power, slong n);
 
-
-FLINT_DLL void _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
-                                    slong hlen, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n);
-
-FLINT_DLL void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
-
-FLINT_DLL void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod);
-FLINT_DLL void _nmod_poly_exp_series2(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
-
+FLINT_DLL void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);
 
 /* Products  *****************************************************************/

@@ -19,7 +19,7 @@ void
 _nmod_poly_cosh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
 {
     mp_ptr g = _nmod_vec_init(n);
-    _nmod_poly_exp_expinv_series(f, g, h, n, mod);
+    _nmod_poly_exp_expinv_series(f, g, h, n, n, mod);
     _nmod_vec_add(f, f, g, n, mod);
     _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(UWORD(2), mod.n), mod);
     _nmod_vec_clear(g);
