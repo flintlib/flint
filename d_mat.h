@@ -58,11 +58,36 @@ double d_mat_get_entry(const d_mat_t mat, slong i, slong j)
    return mat->rows[i][j];
 }
 
+D_MAT_INLINE
+slong d_mat_nrows(const d_mat_t mat)
+{
+    return mat->r;
+}
+
+D_MAT_INLINE
+slong d_mat_ncols(const d_mat_t mat)
+{
+    return mat->c;
+}
+
 /* Memory management  ********************************************************/
 
 FLINT_DLL void d_mat_init(d_mat_t mat, slong rows, slong cols);
 
 FLINT_DLL void d_mat_swap(d_mat_t mat1, d_mat_t mat2);
+
+D_MAT_INLINE void
+d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
+{
+    slong i, j;
+    for (i = 0; i < d_mat_nrows(mat1); i++)
+    {
+       double * row1 = mat1->rows[i];
+       double * row2 = mat2->rows[i];
+       for (j = 0; j < d_mat_ncols(mat1); j++)
+          DOUBLE_SWAP(row1[j], row2[j]);
+    }
+}
 
 FLINT_DLL void d_mat_set(d_mat_t mat1, const d_mat_t mat2);
 

@@ -38,8 +38,48 @@ FLINT_DLL void TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong c
 FLINT_DLL void TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) src,
                           const TEMPLATE(T, ctx_t) ctx);
 
+FQ_MAT_TEMPLATES_INLINE slong
+TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat ,
+                       const TEMPLATE(T, ctx_t) ctx)
+{
+    return mat->r;
+}
+
+FQ_MAT_TEMPLATES_INLINE slong
+TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
+                       const TEMPLATE(T, ctx_t) ctx)
+{
+    return mat->c;
+}
+
+FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
+TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
+
+FQ_MAT_TEMPLATES_INLINE void
+TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
+                           const TEMPLATE(T, t) x,
+                           const TEMPLATE(T, ctx_t) ctx)
+{
+    TEMPLATE(T, set)(TEMPLATE(T, mat_entry)(mat, i, j), x, ctx);
+}
+
 FLINT_DLL void TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
                       const TEMPLATE(T, ctx_t) ctx);
+
+FQ_MAT_TEMPLATES_INLINE void
+TEMPLATE(T, mat_swap_entrywise)(TEMPLATE(T, mat_t) mat1,
+		         TEMPLATE(T, mat_t) mat2, const TEMPLATE(T, ctx_t) ctx)
+{
+    slong i, j;
+
+    for (i = 0; i < TEMPLATE(T, mat_nrows)(mat1, ctx); i++)
+        for (j = 0; j < TEMPLATE(T, mat_ncols)(mat1, ctx); j++)
+            TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat2, i, j),
+			      TEMPLATE(T, mat_entry)(mat1, i, j), ctx);
+}
 
 FLINT_DLL void TEMPLATE(T, mat_set)(TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
                      const TEMPLATE(T, ctx_t) ctx);
@@ -65,34 +105,6 @@ TEMPLATE(T, mat_is_square)(const TEMPLATE(T, mat_t) mat,
                            const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == mat->c);
-}
-
-FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
-TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
-{
-    return mat->rows[i] + j;
-}
-
-FQ_MAT_TEMPLATES_INLINE void
-TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
-                           const TEMPLATE(T, t) x,
-                           const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, set)(TEMPLATE(T, mat_entry)(mat, i, j), x, ctx);
-}
-
-FQ_MAT_TEMPLATES_INLINE slong
-TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat ,
-                       const TEMPLATE(T, ctx_t) ctx)
-{
-    return mat->r;
-}
-
-FQ_MAT_TEMPLATES_INLINE slong
-TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
-                       const TEMPLATE(T, ctx_t) ctx)
-{
-    return mat->c;
 }
 
 FQ_MAT_TEMPLATES_INLINE void

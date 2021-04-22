@@ -48,20 +48,6 @@ nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, slong i, slong
     return mat->rows[i] + j;
 }
 
-/* Memory management *********************************************************/
-
-FLINT_DLL void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n);
-
-FLINT_DLL void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
-
-FLINT_DLL void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
-
-FLINT_DLL void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
-
-FLINT_DLL void nmod_poly_mat_clear(nmod_poly_mat_t mat);
-
-/* Basic properties **********************************************************/
-
 NMOD_POLY_MAT_INLINE slong
 nmod_poly_mat_nrows(const nmod_poly_mat_t mat)
 {
@@ -73,6 +59,30 @@ nmod_poly_mat_ncols(const nmod_poly_mat_t mat)
 {
     return mat->c;
 }
+
+/* Memory management *********************************************************/
+
+FLINT_DLL void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n);
+
+FLINT_DLL void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
+
+FLINT_DLL void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
+
+NMOD_POLY_MAT_INLINE void
+nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < nmod_poly_mat_nrows(mat1); i++)
+        for (j = 0; j < nmod_poly_mat_ncols(mat1); j++)
+            nmod_poly_swap(nmod_poly_mat_entry(mat2, i, j), nmod_poly_mat_entry(mat1, i, j));
+}
+
+FLINT_DLL void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
+
+FLINT_DLL void nmod_poly_mat_clear(nmod_poly_mat_t mat);
+
+/* Basic properties **********************************************************/
 
 NMOD_POLY_MAT_INLINE mp_limb_t
 nmod_poly_mat_modulus(const nmod_poly_mat_t mat)

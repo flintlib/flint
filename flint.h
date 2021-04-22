@@ -322,6 +322,13 @@ typedef __mpfr_struct flint_mpfr;
         B = __t_m_p_;           \
     } while (0)
 
+#define DOUBLE_SWAP(A, B)    \
+    do {                     \
+        double __t_m_p_ = A; \
+        A = B;               \
+        B = __t_m_p_;        \
+    } while (0)
+
 #define r_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
 
