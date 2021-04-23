@@ -12,7 +12,7 @@
 # calcium     => soname
 # 0.0.1   => 0.0.1
 CALCIUM_MAJOR=0
-CALCIUM_MINOR=2
+CALCIUM_MINOR=3
 CALCIUM_PATCH=0
 
 PREFIX="/usr/local"

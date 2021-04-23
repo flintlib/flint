@@ -22,7 +22,7 @@ sys.path.append(os.path.abspath('../../pycalcium'))
 # -- Project information -----------------------------------------------------
 
 project = u'Calcium'
-copyright = u'2020, Fredrik Johansson'
+copyright = u'2020-2021, Fredrik Johansson'
 author = u'Fredrik Johansson'
 
 # The short X.Y version

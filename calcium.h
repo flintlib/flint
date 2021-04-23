@@ -34,7 +34,7 @@ const char * calcium_version(void);
 #define __CALCIUM_VERSION 0
 #define __CALCIUM_VERSION_MINOR 3
 #define __CALCIUM_VERSION_PATCHLEVEL 0
-#define CALCIUM_VERSION "0.3.0-git"
+#define CALCIUM_VERSION "0.3.0"
 #define __CALCIUM_RELEASE (__CALCIUM_VERSION * 10000 + \
                          __CALCIUM_VERSION_MINOR * 100 + \
                          __CALCIUM_VERSION_PATCHLEVEL)
