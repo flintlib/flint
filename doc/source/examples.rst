@@ -222,49 +222,44 @@ that `N = -(1 - |M|^2)^2` where *N* and *M* are given by huge symbolic
 expressions involving nested square roots (about 7000
 operations in total).
 
-By default, the program runs the computation using :type:`qqbar_t` arithmetic.
-This takes half a minute::
+By default, the program runs the computation using :type:`qqbar_t` arithmetic:
 
     > build/examples/huge_expr 
     Evaluating N...
-    cpu/wall(s): 18.279 18.279
+    cpu/wall(s): 7.205 7.206
     Evaluating M...
-    cpu/wall(s): 6.049 6.051
+    cpu/wall(s): 0.933 0.934
     Evaluating E = -(1-|M|^2)^2...
-    cpu/wall(s): 0.595 0.595
+    cpu/wall(s): 0.391 0.391
     N ~ -0.16190853053311203695842869991458578203473645660641
     E ~ -0.16190853053311203695842869991458578203473645660641
     Testing E = N...
-    cpu/wall(s): 0 0
+    cpu/wall(s): 0.001 0
 
     Equal = T_TRUE
 
-    Total: cpu/wall(s): 24.927 24.93
-    virt/peak/res/peak(MB): 56.61 68.64 28.73 40.70
+    Total: cpu/wall(s): 8.53 8.531
+    virt/peak/res/peak(MB): 54.50 64.56 24.64 34.61
 
-To run the computation using :type:`ca_t` arithmetic instead, one
-may pass the ``-ca`` flag. This currently takes much longer::
+To run the computation using :type:`ca_t` arithmetic instead,
+pass the -ca flag::
 
     > build/examples/huge_expr -ca
     Evaluating N...
-    cpu/wall(s): 0.178 0.178
+    cpu/wall(s): 0.193 0.193
     Evaluating M...
-    cpu/wall(s): 0.027 0.027
+    cpu/wall(s): 0.024 0.024
     Evaluating E = -(1-|M|^2)^2...
-    cpu/wall(s): 0.011 0.011
+    cpu/wall(s): 0.008 0.009
     N ~ -0.16190853053311203695842869991458578203473645660641
     E ~ -0.16190853053311203695842869991458578203473645660641
     Testing E = N...
-    cpu/wall(s): 104.387 104.395
+    cpu/wall(s): 8.017 8.019
 
     Equal = T_TRUE
 
-    Total: cpu/wall(s): 104.604 104.613
-    virt/peak/res/peak(MB): 51.26 63.32 24.69 36.81
-
-This should be possible to improve;
-we keep this program as a benchmark for future optimizations
-to the :type:`ca_t` type.
+    Total: cpu/wall(s): 8.243 8.246
+    virt/peak/res/peak(MB): 61.67 65.29 33.97 37.54
 
 This simplification problem was posted in a help request for Sage
 (https://ask.sagemath.org/question/52653).
