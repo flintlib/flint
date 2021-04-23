@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2021 William Hart
 
     This file is part of FLINT.
 
@@ -150,6 +151,35 @@ int main(void)
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
         fmpz_mat_clear(D);
+    }
+
+    /* Test aliasing with windows */
+    {
+        fmpz_mat_t A, B, A_window;
+
+        fmpz_mat_init(A, 2, 2);
+        fmpz_mat_init(B, 2, 2);
+
+        fmpz_mat_window_init(A_window, A, 0, 0, 2, 2);
+
+        fmpz_mat_one(A);
+        fmpz_mat_one(B);
+        fmpz_set_ui(fmpz_mat_entry(B, 0, 1), 1);
+        fmpz_set_ui(fmpz_mat_entry(B, 1, 0), 1);
+
+        fmpz_mat_mul(A_window, B, A_window);
+
+        if (!fmpz_mat_equal(A, B))
+        {
+            flint_printf("FAIL: window aliasing failed\n");
+	    fmpz_mat_print(A); flint_printf("\n\n");
+	    fmpz_mat_print(B); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        fmpz_mat_window_clear(A_window);
+        fmpz_mat_clear(A);
+        fmpz_mat_clear(B);
     }
 
     FLINT_TEST_CLEANUP(state);

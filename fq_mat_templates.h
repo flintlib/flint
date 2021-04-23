@@ -93,6 +93,9 @@ FLINT_DLL int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1,
 FLINT_DLL int TEMPLATE(T, mat_is_zero)(const TEMPLATE(T, mat_t) mat,
                          const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL int TEMPLATE(T, mat_is_one)(const TEMPLATE(T, mat_t) mat,
+		                         const TEMPLATE(T, ctx_t) ctx);
+
 FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_empty)(const TEMPLATE(T, mat_t) mat,
                           const TEMPLATE(T, ctx_t) ctx)
@@ -191,6 +194,8 @@ TEMPLATE(T, mat_invert_cols)(TEMPLATE(T, mat_t) mat, slong * perm, const TEMPLAT
 /* Assignment  ***************************************************************/
 
 FLINT_DLL void TEMPLATE(T, mat_zero)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_one)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
 /* Windows and concatenation */
 

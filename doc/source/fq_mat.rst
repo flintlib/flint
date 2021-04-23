@@ -76,6 +76,10 @@ Basic properties and manipulation
 
     Sets all entries of ``mat`` to 0.
 
+.. function:: void fq_mat_one(fq_mat_t mat, const fq_ctx_t ctx)
+
+    Sets all the diagonal entries of ``mat`` to 1 and all other entries to 0.
+
 .. function:: void fq_mat_swap_rows(fq_mat_t mat, slong * perm, slong r, slong s)
     
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
@@ -227,6 +231,11 @@ Comparison
 
     Returns a non-zero value if all entries ``mat`` are zero, and
     otherwise returns zero.
+
+.. function:: int fq_mat_is_one(const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Returns a non-zero value if all entries ``mat`` are zero except the
+    diagonal entries which must be one, otherwise returns zero..
 
 .. function:: int fq_mat_is_empty(const fq_mat_t mat, const fq_ctx_t ctx)
 
