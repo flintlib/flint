@@ -222,7 +222,7 @@ that `N = -(1 - |M|^2)^2` where *N* and *M* are given by huge symbolic
 expressions involving nested square roots (about 7000
 operations in total).
 
-By default, the program runs the computation using :type:`qqbar_t` arithmetic:
+By default, the program runs the computation using :type:`qqbar_t` arithmetic::
 
     > build/examples/huge_expr 
     Evaluating N...
