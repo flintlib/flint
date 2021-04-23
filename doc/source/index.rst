@@ -98,7 +98,6 @@ Symbolic expressions
    :maxdepth: 2
 
    fexpr.rst
-   fexpr_eval.rst
    fexpr_builtin.rst
 
 Basic algebraic structures
