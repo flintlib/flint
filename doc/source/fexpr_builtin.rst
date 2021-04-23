@@ -236,7 +236,6 @@ Booleans and logic
 
     See ``Cases``.
 
-
 Tuples, lists and sets
 ------------------------------------------------------------------------
 
@@ -251,6 +250,8 @@ Tuples, lists and sets
 .. macro:: Element
 
 .. macro:: NotElement
+
+.. macro:: EqualAndElement
 
 .. macro:: Length
 
@@ -359,6 +360,21 @@ can be constructed as ``Div(p, q)``.
     string *str* in ordinary decimal floating-point notation
     (for example ``-3.25e-725``).
 
+.. macro:: AlgebraicNumberSerialized
+
+.. macro:: PolynomialRootIndexed
+
+.. macro:: PolynomialRootNearest
+
+.. macro:: Enclosure
+
+.. macro:: Approximation
+
+.. macro:: Guess
+
+.. macro:: Unknown
+
+
 Arithmetic operations
 ........................................................................
 
@@ -391,6 +407,9 @@ Inequalities
 .. macro:: Greater
 
 .. macro:: GreaterEqual
+
+.. macro:: EqualNearestDecimal
+
 
 Sets of numbers
 ........................................................................
@@ -636,6 +655,8 @@ Limits
 
 .. macro:: SequenceLimitSuperior
 
+.. macro:: AsymptoticTo
+
 Derivatives
 ........................................................................
 
@@ -678,6 +699,10 @@ Matrices and linear algebra
 
 .. macro:: Matrix
 
+.. macro:: Row
+
+.. macro:: Column
+
 .. macro:: RowMatrix
 
 .. macro:: ColumnMatrix
@@ -700,6 +725,8 @@ Matrices and linear algebra
 
 .. macro:: SL2Z
 
+.. macro:: PSL2Z
+
 .. macro:: SpecialLinearGroup
 
 .. macro:: GeneralLinearGroup
@@ -713,6 +740,8 @@ Polynomials, series and rings
 .. macro:: Pol
 
 .. macro:: Ser
+
+.. macro:: Polynomial
 
 .. macro:: Coefficient
 
@@ -743,6 +772,16 @@ Polynomials, series and rings
 .. macro:: QuotientRing
 
 .. macro:: FiniteField
+
+.. macro:: EqualQSeriesEllipsis
+
+.. macro:: IndefiniteIntegralEqual
+
+.. macro:: QSeriesCoefficient
+
+.. macro:: Call
+
+.. macro:: CallIndeterminate
 
 Special functions
 ------------------------------------------------------------------------
@@ -885,6 +924,8 @@ Elementary functions
 Combinatorial functions
 ........................................................................
 
+.. macro:: SloaneA
+
 .. macro:: SymmetricPolynomial
 
 .. macro:: Cyclotomic
@@ -985,9 +1026,24 @@ Exponential integrals
 
 .. macro:: IncompleteBetaRegularized
 
+.. macro:: LogIntegral
+
+.. macro:: ExpIntegralE
+
+.. macro:: ExpIntegralEi
+
 .. macro:: SinIntegral
 
-.. macro:: LogIntegral
+.. macro:: SinhIntegral
+
+.. macro:: CosIntegral
+
+.. macro:: CoshIntegral
+
+.. macro:: FresnelC
+
+.. macro:: FresnelS
+
 
 Bessel and Airy functions
 ........................................................................
@@ -1111,6 +1167,8 @@ Elliptic integrals
 
 .. macro:: AGM
 
+.. macro:: AGMSequence
+
 .. macro:: EllipticK
 
 .. macro:: EllipticE
@@ -1132,6 +1190,11 @@ Elliptic integrals
 .. macro:: CarlsonRD
 
 .. macro:: CarlsonRC
+
+.. macro:: CarlsonHypergeometricR
+
+.. macro:: CarlsonHypergeometricT
+
 
 Elliptic, theta and modular functions
 ........................................................................
@@ -1221,6 +1284,9 @@ Nonsemantic markup
     rendering the expression verbatim.
     Warning: this triggers a nontrivial (potentially very expensive)
     computation.
+
+.. macro:: Subscript
+
 
 .. raw:: latex
 
