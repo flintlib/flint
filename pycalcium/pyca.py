@@ -32,8 +32,6 @@ If you don't mind polluting the global namespace, import everything:
 Current limitations
 .....................
 
-* Does not support creating new context objects or modifying
-  the settings of a context object.
 * Leaks memory (for example, when printing).
 * Because ``ctypes`` is used, this is not as efficient as a
   Cython wrapper. This interface should be used for testing
