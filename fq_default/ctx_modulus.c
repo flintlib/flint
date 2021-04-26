@@ -40,7 +40,7 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
          flint_mpn_zero((mp_ptr) (p->coeffs + p->alloc), alloc - p->alloc);
       }
 
-      _fmpz_vec_set(p->coeffs, modulus_coeffs, len);
+      _fmpz_vec_set(p->coeffs, modulus->coeffs, len);
 
       _fmpz_mod_poly_set_length(p, len);
    }
