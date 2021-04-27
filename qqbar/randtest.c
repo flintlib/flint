@@ -29,7 +29,7 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
 
     fmpz_init(c);
 
-    fmpz_randprime(c, state, bits, 0);
+    fmpz_randprime(c, state, FLINT_MAX(bits, 2), 0);
     fmpz_mod_ctx_init(ctx, c);
     fmpz_mod_poly_init(q, ctx);
     fmpz_mod_poly_randtest_irreducible(q, state, len, ctx);
@@ -68,7 +68,7 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
 
     fmpz_init(c);
 
-    fmpz_randprime(c, state, bits, 0);
+    fmpz_randprime(c, state, FLINT_MAX(bits, 2), 0);
     fmpz_mod_poly_init(q, c);
     fmpz_mod_poly_randtest_irreducible(q, state, len);
 
