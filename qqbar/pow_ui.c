@@ -174,41 +174,18 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
 
         if (n == 2)
         {
-#if 1
             _qqbar_sqr_undeflatable(res, x);
-#else
-            qqbar_binary_op(res, x, x, 2);
-#endif
-            return;
-        }
-
-        /* todo: is left-to-right or right-to-left better? */
-        if (n % 2 == 0)
-        {
-#if 0
-            qqbar_pow_ui(res, x, n / 2);
-            qqbar_pow_ui(res, res, 2);
-#else
-            qqbar_pow_ui(res, x, 2);
-            qqbar_pow_ui(res, res, n / 2);
-#endif
         }
         else
         {
-            if (res == x)
-            {
-                qqbar_t t;
-                qqbar_init(t);
-                qqbar_pow_ui(t, x, n - 1);
-                qqbar_binary_op(res, t, x, 2);
-                qqbar_clear(t);
-            }
-            else
-            {
-                qqbar_pow_ui(res, x, n - 1);
-                qqbar_mul(res, res, x);
-            }
+            /* todo: don't construct this polynomial when n is huge */
+            fmpz * coeffs;
+            fmpz_t den;
+            coeffs = _fmpz_vec_init(n + 1);
+            fmpz_one(coeffs + n);
+            *den = 1;
+            _qqbar_evaluate_fmpq_poly(res, coeffs, den, n + 1, x);
+            _fmpz_vec_clear(coeffs, n + 1);
         }
     }
 }
-

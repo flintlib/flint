@@ -148,7 +148,8 @@ qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, co
                 acb_div_fmpz(w, w, c, prec);
         }
 
-        if (_qqbar_validate_uniqueness(t, H, w, 2 * prec))
+        if (_qqbar_validate_uniqueness(t, H, w, 2 * prec)
+            /* && acb_rel_accuracy_bits(t) >= QQBAR_DEFAULT_PREC / 2 */)
         {
             fmpz_poly_set(QQBAR_POLY(res), H);
             acb_set(QQBAR_ENCLOSURE(res), t);

@@ -9,22 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "antic/nf.h"
+#include "antic/nf_elem.h"
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 
-static ulong _deflation(const fmpz * poly, slong len)
-{
-    fmpz_poly_t t;
-    t->alloc = t->length = len;
-    t->coeffs = (fmpz *) poly;
-    return arb_fmpz_poly_deflation(t);
-}
-
-/* todo: use linear algebra instead of naive horner */
 void
 _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slong len, const qqbar_t x)
 {
-    ulong deflation;
+    slong d = qqbar_degree(x);
 
     if (len == 0)
     {
@@ -61,45 +54,12 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
     {
         qqbar_scalar_op(res, x, poly + 1, poly, den);
     }
-    else if (fmpz_is_zero(poly))
-    {
-        slong n;
-        qqbar_t t;
-
-        n = 1;
-        while (n < len && fmpz_is_zero(poly + n))
-            n++;
-
-        qqbar_init(t);
-        qqbar_pow_ui(t, x, n);
-        _qqbar_evaluate_fmpq_poly(res, poly + n, den, len - n, x);
-        qqbar_mul(res, res, t);
-        qqbar_clear(t);
-    }
-    else if ((deflation =_deflation(poly, len)) > 1)
-    {
-        slong i, len2;
-        fmpz * tmp;
-        qqbar_t t;
-
-        len2 = (len - 1) / deflation + 1;
-        tmp = flint_malloc(sizeof(fmpz) * len2);
-        for (i = 0; i < len2; i++)
-            tmp[i] = poly[i * deflation];
-
-        qqbar_init(t);
-        qqbar_pow_ui(t, x, deflation);
-        _qqbar_evaluate_fmpq_poly(res, tmp, den, len2, t);
-        qqbar_clear(t);
-        flint_free(tmp);
-    }
-    else if (len > qqbar_degree(x))
+    else if (len > d)
     {
         fmpz * tmp;
         fmpz_t r, one;
-        slong d, len2;
+        slong len2;
 
-        d = qqbar_degree(x);
         tmp = _fmpz_vec_init(len);
         fmpz_init(r);
         fmpz_init(one);
@@ -109,7 +69,7 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
             QQBAR_COEFFS(x), one, d + 1, NULL);
 
         len2 = d;
-        while (len2 > 1 && fmpz_is_zero(tmp + len2 - 1))
+        while (len2 >= 1 && fmpz_is_zero(tmp + len2 - 1))
             len2--;
 
         _qqbar_evaluate_fmpq_poly(res, tmp, r, len2, x);
@@ -120,50 +80,94 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
     }
     else
     {
-        slong p;
-        ulong q;
+        fmpq_poly_t t, minpoly;
+        nf_t nf;
+        nf_elem_t elem;
+        fmpq_mat_t mat;
+        int is_power;
 
-        qqbar_t t;
-        slong i;
+        /* todo: detect squaring. x^4, x^8, ...? */
+        /* todo: other special cases; deflation? */
+        is_power = _fmpz_vec_is_zero(poly, len - 1);
 
-        qqbar_init(t);
+        /* nf_init wants an fmpq_poly_t, so mock up one */
+        t->coeffs = QQBAR_POLY(x)->coeffs;
+        t->den[0] = 1;
+        t->length = QQBAR_POLY(x)->length;
+        t->alloc = QQBAR_POLY(x)->alloc;
 
-        /* Special case for cyclotomic fields. */
-        /* This is not necessarily faster, but it's worth trying. */
-        if (0 && qqbar_degree(x) > 2 && qqbar_is_root_of_unity(&p, &q, x))
+        nf_init(nf, t);
+        nf_elem_init(elem, nf);
+
+        t->coeffs = (fmpz *) poly;
+        t->length = len;
+        t->den[0] = *den;
+        t->alloc = len;
+        nf_elem_set_fmpq_poly(elem, t, nf);
+
+        fmpq_mat_init(mat, d, d);
+        nf_elem_rep_mat(mat, elem, nf);
+        fmpq_poly_init(minpoly);
+        fmpq_mat_minpoly(minpoly, mat);
+        fmpq_mat_clear(mat);
+
         {
-            qqbar_t u;
-            qqbar_init(u);
+            fmpz_poly_t A;
+            acb_t z, t, w;
+            slong prec;
+            int pure_real, pure_imag;
 
-            /* todo: exploit symmetries */
-            for (i = 0; i < len; i++)
+            A->coeffs = minpoly->coeffs;
+            A->length = minpoly->length;
+            A->alloc = A->length;
+
+            acb_init(z);
+            acb_init(t);
+            acb_init(w);
+
+            acb_set(z, QQBAR_ENCLOSURE(x));
+            pure_real = (qqbar_sgn_im(x) == 0);
+            pure_imag = (qqbar_sgn_re(x) == 0);
+
+            for (prec = QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
             {
-                if (!fmpz_is_zero(poly + i))
+                _qqbar_enclosure_raw(z, QQBAR_POLY(x), z, prec);
+                if (pure_real)
+                    arb_zero(acb_imagref(z));
+                if (pure_imag)
+                    arb_zero(acb_realref(z));
+
+                if (is_power)
                 {
-                    qqbar_root_of_unity(u, p * i, q);
-                    qqbar_mul_fmpz(u, u, poly + i);
-                    qqbar_add(t, t, u);
+                    acb_pow_ui(w, z, len - 1, prec);
+                    if (!fmpz_is_one(poly + len - 1))
+                        acb_mul_fmpz(w, w, poly + len - 1, prec);
+                    if (!fmpz_is_one(den))
+                        acb_div_fmpz(w, w, den, prec);
+                }
+                else
+                {
+                    _arb_fmpz_poly_evaluate_acb(w, poly, len, z, prec);
+                    if (!fmpz_is_one(den))
+                        acb_div_fmpz(w, w, den, prec);
+                }
+
+                if (_qqbar_validate_uniqueness(t, A, w, 2 * prec))
+                {
+                    fmpz_poly_set(QQBAR_POLY(res), A);
+                    acb_set(QQBAR_ENCLOSURE(res), t);
+                    break;
                 }
             }
 
-            qqbar_div_fmpz(res, t, den);
-            qqbar_clear(u);
-        }
-        else
-        {
-            qqbar_mul_fmpz(t, x, poly + len - 1);
-            qqbar_add_fmpz(t, t, poly + len - 2);
-
-            for (i = len - 3; i >= 0; i--)
-            {
-                qqbar_mul(t, t, x);
-                qqbar_add_fmpz(t, t, poly + i);
-            }
-
-            qqbar_div_fmpz(res, t, den);
+            acb_clear(z);
+            acb_clear(t);
+            acb_clear(w);
         }
 
-        qqbar_clear(t);
+        fmpq_poly_clear(minpoly);
+        nf_elem_clear(elem, nf);
+        nf_clear(nf);
     }
 }
 
@@ -172,4 +176,3 @@ qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpq_poly_t poly, const qqbar_t x)
 {
     _qqbar_evaluate_fmpq_poly(res, poly->coeffs, poly->den, poly->length, x);
 }
-
