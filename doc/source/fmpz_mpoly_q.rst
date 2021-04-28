@@ -93,6 +93,13 @@ Properties
 
     Returns whether *x* is the constant 1.
 
+.. function:: void fmpz_mpoly_q_used_vars(int * used, const fmpz_mpoly_q_t f, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_q_used_vars_num(int * used, const fmpz_mpoly_q_t f, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_q_used_vars_den(int * used, const fmpz_mpoly_q_t f, const fmpz_mpoly_ctx_t ctx)
+
+    For each variable, sets the corresponding entry in *used* to the
+    boolean flag indicating whether that variable appears in the
+    rational function (respectively its numerator or denominator).
 
 Special values
 -------------------------------------------------------------------------------
@@ -183,8 +190,7 @@ Content
 -------------------------------------------------------------------------------
 
 .. function:: void _fmpz_mpoly_q_content(fmpz_t num, fmpz_t den, const fmpz_mpoly_t xnum, const fmpz_mpoly_t xden, const fmpz_mpoly_ctx_t ctx)
-
-.. function:: void fmpz_mpoly_q_content(fmpq_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_q_content(fmpq_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
 
     Sets *res* to the content of the coefficients of *x*.
 
