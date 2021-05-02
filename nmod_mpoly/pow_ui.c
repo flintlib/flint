@@ -77,18 +77,11 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                        ctx->minfo->nfields, 1);
 
         A->coeffs[0] = nmod_pow_ui(B->coeffs[0], k, ctx->mod);
+
         _nmod_mpoly_set_length(A, A->coeffs[0] != 0, ctx);
 
-        for (i = 0; i < ctx->minfo->nfields; i++)
-            fmpz_clear(maxBfields + i);
-
-        TMP_END;
-
-        return 1;
+        goto cleanup;
     }
-
-    for (i = 0; i < ctx->minfo->nfields; i++)
-        fmpz_clear(maxBfields + i);
 
     freeBexps = 0;
     Bexps = B->exps;
@@ -172,6 +165,11 @@ int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
 
     if (freeBexps)
         flint_free(Bexps);
+
+cleanup:
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+        fmpz_clear(maxBfields + i);
 
     TMP_END;
 

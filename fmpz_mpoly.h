@@ -807,9 +807,8 @@ FLINT_DLL int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                           ulong k, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
-                slong * alloc, const fmpz * poly2, const ulong * exp2, 
-        slong len2, ulong k, flint_bitcnt_t bits, slong N, const ulong * cmpmask);
+FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz * poly2, const ulong * exp2, 
+                          slong len2, ulong k, slong N, const ulong * cmpmask);
 
 
 /* Division ******************************************************************/
