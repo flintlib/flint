@@ -126,11 +126,11 @@ typedef enum
     /* Elementary constants */
     CA_Pi,
     /* Elementary functions */
+    CA_Sin,
+    CA_Cos,
     CA_Exp,
     CA_Log,
     CA_Pow,
-    CA_Cos,
-    CA_Sin,
     CA_Tan,
     CA_Cosh,
     CA_Sinh,

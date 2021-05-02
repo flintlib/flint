@@ -1313,6 +1313,18 @@ class ca_ctx:
         # libcalcium.ca_ctx_clear(self._ref)
         pass
 
+    def _no_gb(self):
+        libcalcium.ca_ctx_set_option(self, _ca_options.index("use_gb"), 0)
+
+    def _no_gb_limits(self):
+        libcalcium.ca_ctx_set_option(self, _ca_options.index("gb_length_limit"), 1<<30)
+        libcalcium.ca_ctx_set_option(self, _ca_options.index("gb_poly_length_limit"), 1<<30)
+        libcalcium.ca_ctx_set_option(self, _ca_options.index("gb_poly_bits_limit"), 1<<30)
+
+    def _debug(self):
+        libcalcium.ca_ctx_set_option(self, _ca_options.index("verbose"), 1)
+        libcalcium.ca_ctx_set_option(self, _ca_options.index("print_flags"), (1 | 2 | 4))
+
     def __repr__(self):
         s = "ca_ctx("
         for i in range(len(_ca_options)):
@@ -1864,7 +1876,7 @@ class ca:
 
         """
         res = self._new()
-        libcalcium.ca_conjugate(res, self, self._ctx)
+        libcalcium.ca_conj(res, self, self._ctx)
         return res
 
     conjugate = conj
@@ -2034,6 +2046,22 @@ class ca:
         res = self._new()
         libcalcium.ca_exp(res, self, self._ctx)
         return res
+
+    def xsin(self):
+        res = self._new()
+        libcalcium.ca_sin(res, self, self._ctx)
+        return res
+
+    def xcos(self):
+        res = self._new()
+        libcalcium.ca_cos(res, self, self._ctx)
+        return res
+
+    def xtan(self):
+        res = self._new()
+        libcalcium.ca_tan(res, self, self._ctx)
+        return res
+
 
     def erf(self):
         """
@@ -2538,7 +2566,7 @@ class ca_mat:
             [5, 1.00000 + 1.00000*I {a+1 where a = I [a^2+1=0]}]
         """
         res = self._new(self.nrows(), self.ncols())
-        libcalcium.ca_mat_conjugate(res, self, self._ctx)
+        libcalcium.ca_mat_conj(res, self, self._ctx)
         return res
 
     conj = conjugate
@@ -2568,8 +2596,10 @@ class ca_mat:
 
         """
         res = self._new(self.ncols(), self.nrows())
-        libcalcium.ca_mat_conjugate_transpose(res, self, self._ctx)
+        libcalcium.ca_mat_conj_transpose(res, self, self._ctx)
         return res
+
+    conj_transpose = conjugate_transpose
 
     def charpoly(self):
         """
@@ -3493,6 +3523,22 @@ def fac(x):
         x = ca(x)
     return (x+1).gamma()
 
+def xsin(x):
+    if type(x) != ca:
+        x = ca(x)
+    return x.xsin()
+
+def xcos(x):
+    if type(x) != ca:
+        x = ca(x)
+    return x.xcos()
+
+def xtan(x):
+    if type(x) != ca:
+        x = ca(x)
+    return x.xtan()
+
+
 def cos(x):
     """
     The cosine function is not yet implemented in Calcium.
@@ -3676,6 +3722,9 @@ def prod(s):
         res *= x
     return res
 
+def gd(x):
+    return 2*atan(exp(x))-pi/2
+
 def test_floor_ceil():
     assert floor(sqrt(2)) == 1
     assert ceil(sqrt(2)) == 2
@@ -3702,8 +3751,6 @@ def test_erf():
     assert erf(sqrt(2))**2 + erfi(sqrt(-2))**2 == 0
 
 def test_gudermannian():
-    def gd(x):
-        return 2*atan(exp(x))-pi/2
     assert sin(gd(1)) == tanh(1)
     assert tan(gd(1)) == sinh(1)
     assert sin(gd(sqrt(2))) == tanh(sqrt(2))
@@ -3780,6 +3827,89 @@ def test_context_switch():
     assert B + A == 2 * B
     assert A[0] == B[0]
 
+def test_trigonometric():
+
+    def expect_not_implemented(f):
+        try:
+            v = f()
+            assert v
+        except NotImplementedError:
+            return
+        raise AssertionError
+
+    a = 1+sqrt(2)
+    b = 2+sqrt(2)
+    xsin = sin; xcos = cos; xtan = tan
+
+    assert xsin(a)**2 + xcos(a)**2 == 1
+    assert xsin(-a)**2 + xcos(a)**2 == 1
+    assert xsin(a) == -xsin(-a)
+    assert xcos(a) == xcos(-a)
+    assert xtan(a) == -xtan(-a)
+    assert xsin(a+2*pi) == xsin(a)
+    assert xcos(a+2*pi) == xcos(a)
+    assert xtan(a+pi) == xtan(a)
+    assert xsin(a+pi) == -xsin(a)
+    assert xcos(a+pi) == -xcos(a)
+    assert xtan(a+pi/2) == -1/xtan(a)
+    assert xsin(a+pi/2) == xcos(a)
+    assert xcos(a+pi/2) == -xsin(a)
+    assert xsin(a-pi/2) == -xcos(a)
+    assert xcos(a-pi/2) == xsin(a)
+    assert xtan(a+pi/4) == (xtan(a)+1)/(1-xtan(a))
+    assert xtan(a-pi/4) == (xtan(a)-1)/(1+xtan(a))
+    assert xsin(pi/2 - a) == xcos(a)
+    assert xcos(pi/2 - a) == xsin(a)
+    assert xtan(pi/2 - a) == 1 / xtan(a)
+    assert xsin(pi - a) == xsin(a)
+    assert xcos(pi - a) == -xcos(a)
+    assert xtan(pi - a) == -tan(a)
+    assert xsin(2*pi - a) == -xsin(a)
+    assert xcos(2*pi - a) == xcos(a)
+    assert xsin(a+b) == xsin(a)*xcos(b) + xcos(a)*xsin(b)
+    assert xsin(a-b) == xsin(a)*xcos(b) - xcos(a)*xsin(b)
+    assert xcos(a+b) == xcos(a)*xcos(b) - xsin(a)*xsin(b)
+    assert xcos(a-b) == xcos(a)*xcos(b) + xsin(a)*xsin(b)
+    assert xtan(a+b) == (xtan(a)+xtan(b)) / (1 - xtan(a)*xtan(b))
+    assert xtan(a-b) == (xtan(a)-xtan(b)) / (1 + xtan(a)*xtan(b))
+    assert xsin(2*a) == 2*xsin(a)*xcos(a)
+    assert xsin(2*a) == 2*xtan(a)/(1+xtan(a)**2)
+    assert xcos(2*a) == xcos(a)**2 - xsin(a)**2
+    assert xcos(2*a) == 2*xcos(a)**2 - 1
+    assert xcos(2*a) == 1 - 2*xsin(a)**2
+    assert xcos(2*a) == (1 - xtan(a)**2) / (1 + xtan(a)**2)
+    assert xtan(2*a) == (2*xtan(a)) / (1 - xtan(a)**2)
+
+    assert xsin(3*a) == 3*xsin(a) - 4*xsin(a)**3
+    assert xcos(3*a) == 4*xcos(a)**3 - 3*xcos(a)
+    assert xtan(3*a) == (3*xtan(a) - xtan(a)**3) / (1 - 3*xtan(a)**2)
+    assert xsin(a/2)**2 == (1-xcos(a))/2
+    assert xcos(a/2)**2 == (1+xcos(a))/2
+    assert xtan((a-b)/2) == (xsin(a) - xsin(b)) / (xcos(a) + xcos(b))
+
+    assert 2*xcos(a)*xcos(b) == xcos(a-b) + xcos(a+b)
+    assert 2*xsin(a)*xsin(b) == xcos(a-b) - xcos(a+b)
+    assert 2*xsin(a)*xcos(b) == xsin(a+b) + xsin(a-b)
+    assert 2*xcos(a)*xsin(b) == xsin(a+b) - xsin(a-b)
+
+    assert xsin(a) + xsin(b) == 2*xsin((a+b)/2)*xcos((a-b)/2)
+    assert xsin(a) - xsin(b) == 2*xsin((a-b)/2)*xcos((a+b)/2)
+
+    assert xcos(a) + xcos(b) == 2*xcos((a+b)/2)*xcos((a-b)/2)
+    assert xcos(a) - xcos(b) == -2*xsin((a+b)/2)*xsin((a-b)/2)
+    assert xsin(a) == sqrt(1 - xcos(a)**2)
+
+    for N in range(1,17):
+        print(N)
+        assert sum(cos(n*a) for n in range(1,N+1)) == sin((N+0.5)*a)/(2*sin(a/2)) - 0.5
+
+    assert xcos(a) == -sqrt(1 - xsin(a)**2)
+    expect_not_implemented(lambda: xsin(a/2) == sqrt((1-xcos(a))/2))
+
+    expect_not_implemented(lambda: xsin(3*a) == 4*xsin(a)*xsin(pi/3-a)*xsin(pi/3+a))
+    assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
+    assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
+    expect_not_implemented(lambda: xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b))))
 
 def test_xfail():
     # Test some simplifications that are known not to work yet.

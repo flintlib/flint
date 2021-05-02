@@ -779,6 +779,22 @@ Arithmetic
     Aliasing is allowed between *res* and *s* but not between
     *res* and the entries of *x* and *y*.
 
+.. function:: void ca_fmpz_poly_evaluate(ca_t res, const fmpz_poly_t poly, const ca_t x, ca_ctx_t ctx)
+              void ca_fmpq_poly_evaluate(ca_t res, const fmpq_poly_t poly, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the polynomial *poly* evaluated at *x*.
+
+.. function:: void ca_fmpz_mpoly_evaluate_horner(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+              void ca_fmpz_mpoly_evaluate_iter(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+              void ca_fmpz_mpoly_evaluate(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+
+    Sets *res* to the multivariate polynomial *f* evaluated at the vector of arguments *x*.
+
+.. function:: void ca_fmpz_mpoly_q_evaluate(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+
+    Sets *res* to the multivariate rational function *f* evaluated at the vector of arguments *x*.
+
+
 Powers and roots
 -------------------------------------------------------------------------------
 
@@ -884,9 +900,16 @@ Complex parts
     Sets *res* to the imaginary part of *x*. The result is *Undefined* if *x*
     is any infinity (including an imaginary infinity).
 
-.. function:: void ca_conjugate(ca_t res, const ca_t x, ca_ctx_t ctx)
+.. function:: void ca_conj_deep(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_conj_shallow(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_conj(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     Sets *res* to the complex conjugate of *x*.
+    The *shallow* version creates a new extension element
+    `\overline{x}` unless *x* can be trivially conjugated in-place
+    in the existing field.
+    The *deep* version recursively conjugates the extension numbers
+    in the field of *x*.
 
 .. function:: void ca_floor(ca_t res, const ca_t x, ca_ctx_t ctx)
 

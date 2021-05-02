@@ -201,11 +201,11 @@ Conjugate and transpose
 
     Sets *res* to the transpose of *A*.
 
-.. function:: void ca_mat_conjugate(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+.. function:: void ca_mat_conj(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
 
     Sets *res* to the entrywise complex conjugate of *A*.
 
-.. function:: void ca_mat_conjugate_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
+.. function:: void ca_mat_conj_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
 
     Sets *res* to the conjugate transpose (Hermitian transpose) of *A*.
 

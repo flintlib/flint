@@ -135,8 +135,8 @@ truth_t ca_mat_check_is_one(const ca_mat_t A, ca_ctx_t ctx);
 /* Conjugate and transpose */
 
 void ca_mat_transpose(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
-void ca_mat_conjugate(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
-void ca_mat_conjugate_transpose(ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+void ca_mat_conj(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_conj_transpose(ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
 
 /* Arithmetic */
 

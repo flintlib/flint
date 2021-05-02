@@ -12,18 +12,18 @@
 #include "ca_mat.h"
 
 void
-ca_mat_conjugate(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx)
+ca_mat_conj(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx)
 {
     slong i, j;
 
     if ((ca_mat_nrows(B) != ca_mat_nrows(A)) ||
         (ca_mat_ncols(B) != ca_mat_ncols(A)))
     {
-        flint_printf("ca_mat_conjugate: incompatible dimensions.\n");
+        flint_printf("ca_mat_conj: incompatible dimensions.\n");
         flint_abort();
     }
 
     for (i = 0; i < ca_mat_nrows(A); i++)
         for (j = 0; j < ca_mat_ncols(A); j++)
-            ca_conjugate(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), ctx);
+            ca_conj(ca_mat_entry(B, i, j), ca_mat_entry(A, i, j), ctx);
 }

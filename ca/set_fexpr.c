@@ -205,7 +205,7 @@ _ca_set_fexpr(ca_t res, fexpr_vec_t inputs, ca_vec_t outputs, const fexpr_t expr
             case FEXPR_Abs: UNARY_OP(ca_abs)
             case FEXPR_Re: UNARY_OP(ca_re)
             case FEXPR_Im: UNARY_OP(ca_im)
-            case FEXPR_Conjugate: UNARY_OP(ca_conjugate)
+            case FEXPR_Conjugate: UNARY_OP(ca_conj)
             case FEXPR_Floor: UNARY_OP(ca_floor)
             case FEXPR_Ceil: UNARY_OP(ca_ceil)
             case FEXPR_Gamma: UNARY_OP(ca_gamma)

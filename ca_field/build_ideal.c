@@ -529,21 +529,25 @@ ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
     ca_init(t, ctx);
     ca_init(u, ctx);
 
-/*
-    flint_printf("Candidate: ");
-    for (i = 0; i < num_powers + 1; i++)
+    if (ctx->options[CA_OPT_VERBOSE])
     {
-        fmpz_print(rel + i); printf(" * ");
-
-        if (i == num_powers)
-            printf("Pi*I  ");
-        else
+        flint_printf("Attempt to prove multiplicative relation:\n");
+        for (i = 0; i < num_powers + 1; i++)
         {
-            ca_ext_print(CA_FIELD_EXT_ELEM(K, powers[i]), ctx); flint_printf("  ");
+            flint_printf("    [ ^");
+            fmpz_print(rel + i);
+            flint_printf("] ");
+
+            if (i == num_powers)
+                printf("(-1)  ");
+            else
+            {
+                ca_ext_print(CA_FIELD_EXT_ELEM(K, powers[i]), ctx); flint_printf("  ");
+            }
+            flint_printf("\n");
         }
+        flint_printf("\n");
     }
-    flint_printf("\n\n");
-*/
 
     /* Todo: don't duplicate these computations */
     for (i = 0; i < num_powers; i++)
@@ -588,30 +592,13 @@ ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
         ca_add(t, t, u, ctx);
     }
 
-/*
-    printf("prove: "); ca_print(t, ctx); printf("\n");
-*/
-
     success = (ca_check_is_zero(t, ctx) == T_TRUE);
 
-/*
-    if (success)
+    if (ctx->options[CA_OPT_VERBOSE])
     {
-        flint_printf("Found: ");
-        for (i = 0; i < num_powers + 1; i++)
-        {
-            fmpz_print(rel + i); printf(" * ");
-
-            if (i == num_powers)
-                printf("Pi*I  ");
-            else
-            {
-                ca_ext_print(CA_FIELD_EXT_ELEM(K, powers[i]), ctx); flint_printf("  ");
-            }
-        }
-        flint_printf("\n\n");
+        flint_printf("    Success = %d\n\n", success);
     }
-*/
+
     ca_clear(t, ctx);
     ca_clear(u, ctx);
 
@@ -1050,6 +1037,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
     ca_field_build_ideal_logs(K, ctx);
     ca_field_build_ideal_multiplicative(K, ctx);
+    /* ca_field_build_ideal_sin_cos(K, ctx); */
     ca_field_build_ideal_erf(K, ctx);
     ca_field_build_ideal_gamma(K, ctx);
 
@@ -1068,11 +1056,12 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             }
         }
 
-        if (want_groebner)
+        if (want_groebner && CA_FIELD_IDEAL(K)->length > 0)
         {
             if (ctx->options[CA_OPT_VERBOSE])
             {
-                flint_printf("F = "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n");
+                flint_printf("Attempt to compute Groebner basis for:\n    ");
+                fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n\n");
             }
 
             /* Consider autoreduction as a preprocessing step. This is not necessarily a win,
@@ -1094,17 +1083,21 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 CA_FIELD_MCTX(K, ctx)))
             {
                 fmpz_mpoly_vec_autoreduction_groebner(CA_FIELD_IDEAL(K), CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
+
+                if (ctx->options[CA_OPT_VERBOSE])
+                {
+                    flint_printf("Computed Groebner basis:\n    "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n\n");
+                }
             }
             else
             {
                 if (ctx->options[CA_OPT_VERBOSE])
-                    flint_printf("INFO: Failed to compute a Groebner basis\n"); 
+                {
+                    flint_printf("WARNING: Failed to compute a Groebner basis\n"); 
+                    flint_printf("Current ideal:\n    "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n\n");
+                }
             }
 
-            if (ctx->options[CA_OPT_VERBOSE])
-            {
-                flint_printf("G = "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n");
-            }
         }
     }
 }

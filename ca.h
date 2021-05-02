@@ -219,8 +219,20 @@ enum
     CA_OPT_GROEBNER_POLY_LENGTH_LIMIT,
     CA_OPT_GROEBNER_POLY_BITS_LIMIT,
     CA_OPT_VIETA_LIMIT,
+    CA_OPT_ELEMENTARY_FORM,
+    CA_OPT_ELEMENTARY_LINK_HACK,
+    CA_OPT_ELEMENTARY_ATOMIZE,
     CA_OPT_NUM_OPTIONS
 };
+
+#define CA_ELEMENTARY_ORIGINAL 0
+#define CA_ELEMENTARY_EXPONENTIAL 1
+#define CA_ELEMENTARY_REAL 2
+#define CA_ELEMENTARY_REAL_TAN 3
+
+#define CA_ATOMIZE_MIN 0
+#define CA_ATOMIZE_SOME 1
+#define CA_ATOMIZE_MAX 2
 
 typedef struct
 {
@@ -445,6 +457,15 @@ void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
 void ca_dot(ca_t res, const ca_t initial, int subtract,
     ca_srcptr x, slong xstep, ca_srcptr y, slong ystep, slong len, ca_ctx_t ctx);
 
+void ca_fmpz_poly_evaluate(ca_t res, const fmpz_poly_t poly, const ca_t x, ca_ctx_t ctx);
+void ca_fmpq_poly_evaluate(ca_t res, const fmpq_poly_t poly, const ca_t x, ca_ctx_t ctx);
+
+void ca_fmpz_mpoly_evaluate_horner(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
+void ca_fmpz_mpoly_evaluate_iter(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
+void ca_fmpz_mpoly_evaluate(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
+
+void ca_fmpz_mpoly_q_evaluate(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
+
 /* Powers and roots */
 
 CA_INLINE void
@@ -473,11 +494,14 @@ ca_sqrt_ui(ca_t res, ulong n, ca_ctx_t ctx)
 
 /* Complex parts */
 
+void ca_conj_shallow(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_conj_deep(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_conj(ca_t res, const ca_t x, ca_ctx_t ctx);
+
 void ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_sgn(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_re(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_im(ca_t res, const ca_t x, ca_ctx_t ctx);
-void ca_conjugate(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_floor(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_ceil(ca_t res, const ca_t x, ca_ctx_t ctx);
 
