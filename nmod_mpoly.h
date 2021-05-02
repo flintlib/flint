@@ -895,6 +895,13 @@ FLINT_DLL int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
 
 /* Powering ******************************************************************/
 
+FLINT_DLL void _nmod_mpoly_pow_rmul(nmod_mpoly_t A, const mp_limb_t * Bcoeffs,
+                            const ulong * Bexps, slong Blen, ulong k, slong N,
+                            const ulong * cmpmask, nmod_t mod, nmod_mpoly_t T);
+
+FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                          ulong k, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
                                    const fmpz_t k, const nmod_mpoly_ctx_t ctx);
 
@@ -1040,9 +1047,6 @@ FLINT_DLL void nmod_mpolyl_lead_coeff(nmod_mpoly_t c, const nmod_mpoly_t A,
 
 FLINT_DLL int nmod_mpolyl_content(nmod_mpoly_t g, const nmod_mpoly_t A,
                                    slong num_vars, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                          ulong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
                         slong var, const ulong * Bshift, const ulong * Bstride,
