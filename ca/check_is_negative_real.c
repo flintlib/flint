@@ -39,7 +39,7 @@ ca_check_is_negative_real(const ca_t x, ca_ctx_t ctx)
     else
     {
         acb_t t;
-        truth_t res;
+        truth_t res, is_real;
         slong prec, prec_limit;
 
         res = T_UNKNOWN;
@@ -49,20 +49,44 @@ ca_check_is_negative_real(const ca_t x, ca_ctx_t ctx)
         prec_limit = ctx->options[CA_OPT_PREC_LIMIT];
         prec_limit = FLINT_MAX(prec_limit, 64);
 
+        is_real = T_UNKNOWN;
+
         for (prec = 64; (prec <= prec_limit) && (res == T_UNKNOWN); prec *= 2)
         {
             ca_get_acb_raw(t, x, prec, ctx);
 
-            if (arb_is_zero(acb_imagref(t)) && arb_is_negative(acb_realref(t)))
+            if (is_real == T_UNKNOWN)
+            {
+                if (arb_is_zero(acb_imagref(t)))
+                    is_real = T_TRUE;
+                else if (!arb_contains_zero(acb_imagref(t)))
+                    is_real = T_FALSE;
+            }
+
+            if ((is_real == T_TRUE) && arb_is_negative(acb_realref(t)))
             {
                 res = T_TRUE;
                 break;
             }
 
-            if (arb_is_nonnegative(acb_realref(t)) || !arb_contains_zero(acb_imagref(t)))
+            if ((is_real == T_FALSE) || arb_is_nonnegative(acb_realref(t)))
             {
                 res = T_FALSE;
                 break;
+            }
+
+            if (prec == 64 && is_real == T_UNKNOWN)
+            {
+                ca_t t;
+                ca_init(t, ctx);
+                ca_conj_deep(t, x, ctx);
+                is_real = ca_check_equal(t, x, ctx);
+                ca_clear(t, ctx);
+                if (is_real == T_FALSE)
+                {
+                    res = T_FALSE;
+                    break;
+                }
             }
 
             /* try qqbar computation */

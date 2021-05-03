@@ -99,6 +99,20 @@ ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
             }
             break;
 
+        /* Todo: CA_Conjugate, CA_Sign, ...? */
+
+        /* Real-valued extensions */
+        case CA_Pi:
+        case CA_Euler:
+        case CA_Re:
+        case CA_Im:
+        case CA_Abs:
+        case CA_Arg:
+        case CA_Floor:
+        case CA_Ceil:
+            ca_set_ext(res, ext, ctx);
+            break;
+
         /* Functions with branch cuts */
         /* Todo: negate things that are pure imaginary */
         /* Todo: reevaluate functions (they may want to insert new objects in the field)? */

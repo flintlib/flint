@@ -68,6 +68,20 @@ ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
                 break;
             }
 
+            /* try conjugation */
+            /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
+            if (prec == 64)
+            {
+                ca_t t;
+                ca_init(t, ctx);
+                ca_conj_deep(t, x, ctx);
+                ca_neg(t, t, ctx);
+                res = ca_check_equal(t, x, ctx);
+                ca_clear(t, ctx);
+                if (res != T_UNKNOWN)
+                    break;
+            }
+
             /* try qqbar computation */
             /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
             if (prec == 64)
