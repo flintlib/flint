@@ -804,13 +804,6 @@ FLINT_DLL int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 FLINT_DLL int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                           ulong k, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          ulong k, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz * poly2, const ulong * exp2, 
-                          slong len2, ulong k, slong N, const ulong * cmpmask);
-
-
 /* Division ******************************************************************/
 
 FLINT_DLL int fmpz_mpoly_divides(fmpz_mpoly_t Q,
@@ -1066,6 +1059,9 @@ void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c,
    Internal functions (guaranteed to change without notice)
 
 ******************************************************************************/
+
+FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          ulong k, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyl_lead_coeff(fmpz_mpoly_t c, const fmpz_mpoly_t A,
                                    slong num_vars, const fmpz_mpoly_ctx_t ctx);

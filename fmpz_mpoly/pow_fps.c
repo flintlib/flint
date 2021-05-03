@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017,2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -15,93 +15,58 @@
 #include "fmpz_mod_mpoly.h"
 
 /*
-Dense algorithm for the k^th power
+Dense algorithm for the k^th power:
 
-f = f_0 + f_1*x + .... + f_d*x^d
+f = f[0] + f[1]*x + ... + f[d]*x^d
 g = f^k
-  = g_0 + g_1*x +      + g_{k*d}*x^(k*d)
+  = g[0] + g[1]*x + ... + g[k*d]*x^(k*d)
 
-where i*g_i*f_0 = sum_{0 <= j <= min(i,d)} ((k+1)*j-i)*f_j*g_{i-j}
+where i*g[i]*f[0] = sum_{0 <= j <= min(i,d)} ((k+1)*j-i)*f[j]*g[i-j]
 
-g_{k*d} = f_d^k
+g_[k*d] = f[d]^k
 for i from k*d-1 to 0
     c = 0
-    for 1 <= j <= min(d,k*d-i)
-        c += (i+j-(d-j)*k)*g_{i+j}*f_{d-j} [*x^(i+d)]
+    for j from 1 to min(d,k*d-i)
+        c += (i+j-(d-j)*k)*g[i+j]*f[d-j]
     end
-    g_i = c/((k*d-i)*f_d [*x^d])
-*/
-
-
-/*
-Sparse algorithm for k^th power:
-
-output g = (f1 + f2 + ... + ft)^k:
-
-g = g1^k
-H = {2,1,f2*g1}
-while #H > 0 && H1 >= f1
-    M = H1
-    C = 0
-    Q = {};
-    while #H > 0 && H1 == M
-        (i,j) = popmax(H)
-        C += (exp(gj)-k*exp(fi))*coeff(fi)*coeff(gj)
-        Q += (i,j)
-    end
-    for (i,j) in Q
-        ...
-    end
-    if C != 0
-        g += C/((exp(g1)-M)*coeff(f1))*x^(M-exp(f1))
-        ...
-    end
+    g[i] = c/((k*d-i)*f[d])
 end
-*/
 
-/*  
-Sparse algorithm for k^th power using the (k-1)^st power:
 
-output h = (f1 + f2 + ... + ft)^k:
+Dense algorithm for the k^th power and (k-1)^st power:
 
-h = 0;
-g = g1^(k-1)
-H = {2,1,f2*g1}
-while #H > 0
-    M = H1
-    C = 0
-    S = 0
-    Q = {};
-    while #H > 0 && H1 == M
-        (i,j) = popmax(H)
-        S += coeff(fi)*coeff(gj)
-        if M >= exp(f1)
-            C += (exp(gj)-k*exp(fi))*coeff(fi)*coeff(gj)
+g comes out as f^(k-1)
+a comes out as f^k
+
+g[(k-1)*d] = f[d]^(k-1)
+a[k*d] = f[d]^k
+for i from k*d-1 to 0
+    s = c = 0
+    for k from max(0, d+i-d*k) to min(d-1, i)
+        s += g[i-j]*f[j]
+        if i >= d
+            c += (i-k*j)*g[i-j]*f[j]
         end
-        Q += (i,j)
     end
-    for (i,j) in Q
-        ...
+    c = c/((d*k-i)*f[d])
+    s += c*f[d]
+    if i >= d
+        g[i-d] = c
     end
-    if C != 0
-        C /= (exp(g1)-M)*coeff(f1)
-        S += C*coeff(f1)
-        g += C*x^(M-exp(f1))
-        ...
-    end
-    h += S*x^M
+    a[i] = s
 end
+
+For the sparse version, the only thing to note is that the i >= d condition
+is implemented as _divisibility_ of monomials and not merely a comparison.
 */
 
-
-slong _fmpz_mpoly_pow_fps1(
+static slong _fmpz_mpoly_pow_fps1(
     fmpz_mpoly_t A,
-    const fmpz * fcoeffs, const ulong * fexps, slong flen,
+    const fmpz * fcoeffs, const ulong * fexps, slong Flen,
     ulong k,
-    ulong cmpmask)
+    ulong cmpmask,
+    ulong ofmask)
 {
-    slong N = 1;
-    flint_bitcnt_t bits = A->bits;
     slong i, j;
     slong next_loc, Qlen = 0, heap_len = 2; /* heap zero index unused */
     mpoly_heap1_s * heap;
@@ -115,91 +80,79 @@ slong _fmpz_mpoly_pow_fps1(
     slong Alen;
     fmpz * Gcoeffs = NULL;
     ulong * Gexps;
-    slong galloc, glen;
+    slong Galloc, Glen, Gdemote = 0;
     fmpz_t t1, temp1;
     fmpz * S, * C;
-    slong gdemote = 0;
-    ulong ofmask = mpoly_overflow_mask_sp(bits);
+    int divides;
     TMP_INIT;
 
     TMP_START;
 
-    next_loc = flen + 4;   /* something bigger than heap can ever be */
-    heap = TMP_ARRAY_ALLOC(flen + 1, mpoly_heap1_s);
-    chain = TMP_ARRAY_ALLOC(flen, mpoly_heap_t);
-    Q = TMP_ARRAY_ALLOC(3*flen, slong);
-    hind = Q + 2*flen; /* space for heap indices */    
-    for (i = 0; i < flen; i++)
+    next_loc = Flen + 4;   /* something bigger than heap can ever be */
+    heap = TMP_ARRAY_ALLOC(Flen + 1, mpoly_heap1_s);
+    chain = TMP_ARRAY_ALLOC(Flen, mpoly_heap_t);
+    Q = TMP_ARRAY_ALLOC(3*Flen, slong);
+    hind = Q + 2*Flen; /* flagged heap indices */
+
+    for (i = 0; i < Flen; i++)
         hind[i] = 1;
 
     fmpz_init(t1);
     fmpz_init(temp1);
 
-    _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, 2, N);
+    _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, 2, 1);
 
-    galloc = k*(flen - 1) + 1;
-    Gexps = FLINT_ARRAY_ALLOC(galloc, ulong);
-    glen = 1;
-    Alen = 1;
+    Galloc = k*(Flen - 1) + 2;
+    Gexps = FLINT_ARRAY_ALLOC(Galloc, ulong);
+    Gcoeffs = (fmpz *) flint_calloc(Galloc, sizeof(fmpz));
 
     Gexps[0] = fexps[0]*(k - 1);
-
     Aexps[0] = fexps[0]*k;
-
-    Gcoeffs = (fmpz *) flint_calloc(galloc, sizeof(fmpz));
     fmpz_pow_ui(Gcoeffs + 0, fcoeffs + 0, k - 1);
     fmpz_mul(Acoeffs + 0, Gcoeffs + 0, fcoeffs + 0);
+    Glen = 1;
+    Alen = 1;
 
     x = chain + 1;
     x->i = 1;
     x->j = 0;
     x->next = NULL;
-
-    HEAP_ASSIGN(heap[1], fexps[1] + Gexps[0], x);
-
     hind[1] = 2*1 + 0;
+    HEAP_ASSIGN(heap[1], fexps[1] + Gexps[0], x);
 
     while (heap_len > 1)
     {
         exp = heap[1].exp;
-
-        _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, Alen + 1, N);
-
-        if (glen >= galloc)
-        {
-            Gexps = FLINT_ARRAY_REALLOC(Gexps, 2*galloc, ulong);
-            Gcoeffs = FLINT_ARRAY_REALLOC(Gcoeffs, 2*galloc, fmpz);
-            flint_mpn_zero(Gcoeffs + galloc, galloc);
-            galloc *= 2;
-        }
-
         Aexps[Alen] = exp;
         S = Acoeffs + Alen;
-        C = Gcoeffs + glen;
+        C = Gcoeffs + Glen;
 
         fmpz_zero(C);
         fmpz_zero(S);
-
         Qlen = 0;
 
-        Gexps[glen] = exp - fexps[0];
+        Gexps[Glen] = exp - fexps[0];
 
-        if ((Gexps[glen] & ofmask) == 0)
-        {
+        divides = !mpoly_monomial_overflows1(Gexps[Glen], ofmask);
+
+        do {
+            x = _mpoly_heap_pop1(heap, &heap_len, cmpmask);
             do {
-                x = _mpoly_heap_pop1(heap, &heap_len, cmpmask);
-                do {
-                    fmpz fi;
-                    slong dd, ddd;
-                    hind[x->i] |= 1;
-                    Q[Qlen++] = i = x->i;
-                    Q[Qlen++] = j = x->j;
-                    fi = fcoeffs[i];
+                fmpz fi;
+                slong dd, ddd;
 
-                    FLINT_ASSERT(j >= gdemote);
+                Q[Qlen++] = i = x->i;
+                Q[Qlen++] = j = x->j;
+                hind[i] |= 1;
 
-                    dd = (k - 1)*fexps[i] - Gexps[j];
+                fi = fcoeffs[i];
 
+                FLINT_ASSERT(j >= Gdemote);
+
+                dd = (k - 1)*fexps[i] - Gexps[j];
+
+                if (divides)
+                {
                     if (!COEFF_IS_MPZ(fi) && !z_mul_checked(&ddd, dd, fi))
                     {
                         fmpz_addmul_si(S, Gcoeffs + j, fi);
@@ -211,24 +164,15 @@ slong _fmpz_mpoly_pow_fps1(
                         fmpz_add(S, S, t1);
                         fmpz_addmul_si(C, t1, dd);
                     }
-                } while ((x = x->next) != NULL);
-            } while (heap_len > 1 && heap[1].exp == exp);
-        }
-        else
-        {
-            do {
-                x = _mpoly_heap_pop1(heap, &heap_len, cmpmask);
-                do {
-                    hind[x->i] |= 1;
-                    Q[Qlen++] = i = x->i;
-                    Q[Qlen++] = j = x->j;
-                    FLINT_ASSERT(j >= gdemote);
+                }
+                else
+                {
                     fmpz_addmul(S, fcoeffs + x->i, Gcoeffs + x->j);
-                } while ((x = x->next) != NULL);
-            } while (heap_len > 1 && heap[1].exp == exp);
-        }
+                }
+            } while ((x = x->next) != NULL);
+        } while (heap_len > 1 && heap[1].exp == exp);
 
-        FLINT_ASSERT(Qlen <= 2*flen);
+        FLINT_ASSERT(Qlen <= 2*Flen);
       
         while (Qlen > 0)
         {
@@ -237,7 +181,7 @@ slong _fmpz_mpoly_pow_fps1(
             i = Q[--Qlen];
 
             /* should we go right? */
-            if (i + 1 < flen && hind[i + 1] == 2*j + 1)
+            if (i + 1 < Flen && hind[i + 1] == 2*j + 1)
             {
                 x = chain + i + 1;
                 x->i = i + 1;
@@ -245,12 +189,14 @@ slong _fmpz_mpoly_pow_fps1(
                 x->next = NULL;
 
                 hind[x->i] = 2*j + 2;
+
+                FLINT_ASSERT(j >= Gdemote);
                 _mpoly_heap_insert1(heap, fexps[i + 1] + Gexps[j], x,
                                                 &next_loc, &heap_len, cmpmask);
             }
 
-            /* should we go up */
-            if (j + 1 < glen && hind[i] < 2*j + 4)
+            /* should we go up? */
+            if (j + 1 < Glen && hind[i] < 2*j + 4)
             {
                 x = chain + i;
                 x->i = i;
@@ -258,14 +204,17 @@ slong _fmpz_mpoly_pow_fps1(
                 x->next = NULL;
 
                 hind[x->i] = 2*j + 4;
+
+                FLINT_ASSERT(j + 1 >= Gdemote);
                 _mpoly_heap_insert1(heap, fexps[i] + Gexps[j + 1], x,
                                                 &next_loc, &heap_len, cmpmask);
             }
         }
 
-        j = hind[flen - 1]/2 - 1;
-        for ( ; gdemote < j; gdemote++)
-            fmpz_clear(Gcoeffs + gdemote);
+        /* cleanup unused Gcoeffs */
+        j = hind[Flen - 1]/2 - 1;
+        for ( ; Gdemote < j; Gdemote++)
+            fmpz_clear(Gcoeffs + Gdemote);
 
         if (!fmpz_is_zero(C))
         {
@@ -284,19 +233,30 @@ slong _fmpz_mpoly_pow_fps1(
             if ((hind[1] & 1) != 0)
             {
                 x = chain + 1;
-
                 x->i = 1;
-                x->j = glen;
+                x->j = Glen;
                 x->next = NULL;
-                hind[x->i] = 2*(x->j+1) + 0;
-                _mpoly_heap_insert1(heap, fexps[1] + Gexps[glen], x,
+
+                hind[x->i] = 2*(Glen + 1) + 0;
+
+                FLINT_ASSERT(Glen >= Gdemote);
+                _mpoly_heap_insert1(heap, fexps[1] + Gexps[Glen], x,
                                                 &next_loc, &heap_len, cmpmask);
             }
 
-            glen += 1;
+            Glen++;
+
+            if (Glen >= Galloc)
+            {
+                Gexps = FLINT_ARRAY_REALLOC(Gexps, 2*Galloc, ulong);
+                Gcoeffs = FLINT_ARRAY_REALLOC(Gcoeffs, 2*Galloc, fmpz);
+                flint_mpn_zero(Gcoeffs + Galloc, Galloc);
+                Galloc *= 2;
+            }
         }
 
         Alen += !fmpz_is_zero(S);
+        _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, Alen + 1, 1);
     }
 
     A->coeffs = Acoeffs;
@@ -305,8 +265,8 @@ slong _fmpz_mpoly_pow_fps1(
     fmpz_clear(t1);
     fmpz_clear(temp1);
 
-    for ( ; gdemote < galloc; gdemote++)
-        fmpz_clear(Gcoeffs + gdemote);
+    for ( ; Gdemote < Galloc; Gdemote++)
+        fmpz_clear(Gcoeffs + Gdemote);
     flint_free(Gcoeffs);
     flint_free(Gexps);
 
@@ -316,7 +276,7 @@ slong _fmpz_mpoly_pow_fps1(
 }
 
 
-slong _fmpz_mpoly_pow_fps(
+static slong _fmpz_mpoly_pow_fps(
     fmpz_mpoly_t A,
     const fmpz * Fcoeffs, const ulong * Fexps, slong Flen,
     ulong k,
@@ -326,8 +286,7 @@ slong _fmpz_mpoly_pow_fps(
     flint_bitcnt_t bits = A->bits;
     ulong ofmask = (bits > FLINT_BITS) ? 0 : mpoly_overflow_mask_sp(bits);
     slong i, j, exp_next;
-    slong next_loc;
-    slong heap_len; /* heap zero index unused */
+    slong next_loc, heap_len = 2; /* heap zero index unused */
     mpoly_heap_s * heap;
     mpoly_heap_t * chain;
     slong * Q;
@@ -338,7 +297,7 @@ slong _fmpz_mpoly_pow_fps(
     ulong * Aexps = A->exps;
     slong Alen;
     fmpz * Gcoeffs;
-    slong Galloc, Glen;
+    slong Galloc, Glen, Gdemote = 0;
     ulong * Gexps;
     ulong * fik, * exps;
     ulong ** exp_list;
@@ -348,19 +307,19 @@ slong _fmpz_mpoly_pow_fps(
     TMP_INIT;
 
     if (N == 1)
-        return _fmpz_mpoly_pow_fps1(A, Fcoeffs, Fexps, Flen, k, cmpmask[0]);
+        return _fmpz_mpoly_pow_fps1(A, Fcoeffs, Fexps, Flen, k, cmpmask[0], ofmask);
 
     TMP_START;
 
     next_loc = Flen + 4;   /* something bigger than heap can ever be */
-    heap = (mpoly_heap_s *) TMP_ALLOC((Flen + 1)*sizeof(mpoly_heap_s));
+    heap = TMP_ARRAY_ALLOC(Flen + 1, mpoly_heap_s);
     chain = TMP_ARRAY_ALLOC(Flen, mpoly_heap_t);
-    exps = (ulong *) TMP_ALLOC((Flen + 1)*N*sizeof(ulong));
-    exp_list = (ulong **) TMP_ALLOC((Flen + 1)*sizeof(ulong *));
-    fik = (ulong *) TMP_ALLOC(N*Flen*sizeof(ulong));
-    temp2 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    exp_list = TMP_ARRAY_ALLOC((Flen + 1), ulong *);
+    exps = TMP_ARRAY_ALLOC(N*(Flen + 1) + N*Flen + N, ulong);
+    fik = exps + N*(Flen + 1);
+    temp2 = fik + N*Flen;
     Q = TMP_ARRAY_ALLOC(3*Flen, slong);
-    hind = Q + 2*Flen; /* space for heap indices */
+    hind = Q + 2*Flen; /* flagged heap indices */
 
     for (i = 0; i < Flen; i++)
         mpoly_monomial_mul_ui_mp(fik + i*N, Fexps + i*N, N, k - 1);
@@ -378,7 +337,7 @@ slong _fmpz_mpoly_pow_fps(
 
     _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, 2, N);
 
-    Galloc = 2*Flen + 3;
+    Galloc = (k - 1)*Flen + 2;
     Gexps = (ulong *) flint_malloc(Galloc*sizeof(ulong)*N);
     Gcoeffs = (fmpz *) flint_calloc(Galloc, sizeof(fmpz));
 
@@ -397,7 +356,6 @@ slong _fmpz_mpoly_pow_fps(
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_add_mp(heap[1].exp, Fexps + N, Gexps + 0, N);
-    heap_len = 2;
 
     while (heap_len > 1)
     {
@@ -413,6 +371,7 @@ slong _fmpz_mpoly_pow_fps(
 
         fmpz_zero(C);
         fmpz_zero(S);
+        Qlen = 0;
 
         while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, Aexps + N*Alen, N))
         {
@@ -424,23 +383,28 @@ slong _fmpz_mpoly_pow_fps(
                 Q[Qlen++] = j = x->j;
                 hind[i] |= 1;
 
-                fmpz_mul(t1, Fcoeffs + x->i, Gcoeffs + x->j);
+                FLINT_ASSERT(j + 1 >= Gdemote);
+
+                fmpz_mul(t1, Fcoeffs + i, Gcoeffs + j);
                 fmpz_add(S, S, t1);
                 if (divides)
                 {
-                    mpn_sub_n(temp2, fik + x->i*N, Gexps + x->j*N, N);
+                    mpn_sub_n(temp2, fik + N*i, Gexps + N*j, N);
                     fmpz_set_signed_ui_array(t2, temp2, N);
                     fmpz_addmul(C, t1, t2);
                 }
             } while ((x = x->next) != NULL);
         }
-      
+
+        FLINT_ASSERT(Qlen <= 2*Flen);
+
         while (Qlen > 0)
         {
             /* take node from store */
             j = Q[--Qlen];
             i = Q[--Qlen];
 
+            /* should we go right? */
             if (i + 1 < Flen && hind[i + 1] == 2*j + 1)
             {
                 x = chain + i + 1;
@@ -450,6 +414,7 @@ slong _fmpz_mpoly_pow_fps(
 
                 hind[x->i] = 2*j + 2;
 
+                FLINT_ASSERT(j >= Gdemote);
                 mpoly_monomial_add_mp(exp_list[exp_next], Fexps + N*(i + 1),
                                                           Gexps + N*j, N);
 
@@ -457,6 +422,7 @@ slong _fmpz_mpoly_pow_fps(
                                              &next_loc, &heap_len, N, cmpmask);
             }
 
+            /* should we go up? */
             if (j + 1 < Glen && hind[i] < 2*j + 4)
             {
                 x = chain + i;
@@ -466,7 +432,8 @@ slong _fmpz_mpoly_pow_fps(
 
                 hind[x->i] = 2*j + 4;
 
-                mpoly_monomial_add_mp(exp_list[exp_next], Fexps + i*N,
+                FLINT_ASSERT(j + 1 >= Gdemote);
+                mpoly_monomial_add_mp(exp_list[exp_next], Fexps + N*i,
                                                           Gexps + N*(j + 1), N);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -474,26 +441,39 @@ slong _fmpz_mpoly_pow_fps(
             }
         }
 
+        /* cleanup unused Gcoeffs */
+        j = hind[Flen - 1]/2 - 1;
+        for ( ; Gdemote < j; Gdemote++)
+            fmpz_clear(Gcoeffs + Gdemote);
+
         if (!fmpz_is_zero(C))
         {
             mpoly_monomial_mul_ui_mp(temp2, Fexps + 0, N, k);
             mpn_sub_n(temp2, Aexps + N*Alen, temp2, N);
             fmpz_set_signed_ui_array(t2, temp2, N);
 
-            fmpz_divexact(t1, C, t2);
-            fmpz_add(S, S, t1);
-            fmpz_divexact(Gcoeffs + Glen, t1, Fcoeffs + 0);
+            if (fmpz_is_one(Fcoeffs + 0))
+            {
+                fmpz_divexact(Gcoeffs + Glen, C, t2);
+                fmpz_add(S, S, Gcoeffs + Glen);
+            }
+            else
+            {
+                fmpz_divexact(t1, C, t2);
+                fmpz_add(S, S, t1);
+                fmpz_divexact(Gcoeffs + Glen, t1, Fcoeffs + 0);
+            }
 
             if ((hind[1] & 1) != 0)
             {
                 x = chain + 1;
-
                 x->i = 1;
                 x->j = Glen;
                 x->next = NULL;
 
                 hind[x->i] = 2*(Glen + 1) + 0;
 
+                FLINT_ASSERT(Glen >= Gdemote);
                 mpoly_monomial_add_mp(exp_list[exp_next], Fexps + N,
                                                           Gexps + N*Glen, N);
 
@@ -505,15 +485,15 @@ slong _fmpz_mpoly_pow_fps(
 
             if (Glen >= Galloc)
             {
-                Gexps = (ulong *) flint_realloc(Gexps, 2*N*sizeof(ulong)*Galloc);
-                Gcoeffs = (fmpz *) flint_realloc(Gcoeffs, 2*sizeof(fmpz)*Galloc);
+                Gexps = FLINT_ARRAY_REALLOC(Gexps, 2*N*Galloc, ulong);
+                Gcoeffs = FLINT_ARRAY_REALLOC(Gcoeffs, 2*Galloc, fmpz);
                 flint_mpn_zero(Gcoeffs + Galloc, Galloc);
                 Galloc *= 2;
             }
         }
 
         Alen += !fmpz_is_zero(Acoeffs + Alen);
-        _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, Alen+1, N);
+        _fmpz_mpoly_fit_length(&Acoeffs, &Aexps, &A->alloc, Alen + 1, N);
     }
 
     A->coeffs = Acoeffs;
@@ -523,8 +503,8 @@ slong _fmpz_mpoly_pow_fps(
     fmpz_clear(t2);
     fmpz_clear(C);
 
-    for (i = 0; i < Galloc; i++)
-        fmpz_clear(Gcoeffs + i);
+    for ( ; Gdemote < Galloc; Gdemote++)
+        fmpz_clear(Gcoeffs + Gdemote);
     flint_free(Gcoeffs);
     flint_free(Gexps);
 
