@@ -17,6 +17,9 @@
 #include "qqbar.h"
 #include "utils_flint.h"
 
+int qqbar_mul_checked(qqbar_t res, const qqbar_t x, const qqbar_t y, slong deg_limit, slong bits_limit);
+int qqbar_pow_fmpz_checked(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, slong bits_limit);
+
 slong
 acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong prec)
 {
@@ -236,13 +239,13 @@ ca_field_prove_log_relation(ca_field_t K, const fmpz * rel,
     int success = 0;
 
     /*
-        printf("possible log relation!\n");
-        for (j = 0; j < num_logs; j++)
-        {
-            fmpz_print(rel + j); printf(" ");
-            acb_printn(z + j, 10, 0); printf("   ");
-        }
-        printf("\n");
+    printf("possible log relation!\n");
+    for (j = 0; j < num_logs; j++)
+    {
+        fmpz_print(rel + j); printf(" ");
+        acb_printn(z + j, 10, 0); printf("   ");
+    }
+    printf("\n");
     */
 
     acb_init(t);
@@ -283,8 +286,7 @@ ca_field_prove_log_relation(ca_field_t K, const fmpz * rel,
         ca_clear(upow, ctx);
     }
 
-    /*
-    if (success)
+    if (0 && success)
     {
         printf("proved log relation!\n");
         for (j = 0; j < num_logs; j++)
@@ -306,7 +308,6 @@ ca_field_prove_log_relation(ca_field_t K, const fmpz * rel,
         }
         flint_printf("\n");
     }
-    */
 
     acb_clear(t);
     mag_clear(tm);
@@ -524,7 +525,8 @@ ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
 {
     ca_t t, u;
     slong i;
-    int success;
+    int success = 0;
+    int all_qqbar = 1;
 
     ca_init(t, ctx);
     ca_init(u, ctx);
@@ -549,50 +551,113 @@ ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
         flint_printf("\n");
     }
 
-    /* Todo: don't duplicate these computations */
-    for (i = 0; i < num_powers; i++)
+    /* Special-case all qqbars; todo -- separate qqbars, exps; better algorithm */
+    for (i = 0; i < num_powers && all_qqbar; i++)
     {
         if (!fmpz_is_zero(rel + i))
         {
             ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
 
-            if (CA_EXT_HEAD(ext) == CA_Sqrt)
-            {
-                ca_log(u, CA_EXT_FUNC_ARGS(ext), ctx);
-                ca_div_ui(u, u, 2, ctx);
-            }
-            else if (CA_EXT_HEAD(ext) == CA_Pow)
-            {
-                ca_log(u, CA_EXT_FUNC_ARGS(ext), ctx);
-                ca_mul(u, u, CA_EXT_FUNC_ARGS(ext) + 1, ctx);
-            }
-            else if (CA_EXT_HEAD(ext) == CA_Exp)
-            {
-                ca_set(u, CA_EXT_FUNC_ARGS(ext), ctx);
-            }
-            else if (CA_EXT_IS_QQBAR(ext))
-            {
-                ca_set_qqbar(u, CA_EXT_QQBAR(ext), ctx);
-                ca_log(u, u, ctx);
-            }
-            else
-            {
-                flint_abort();
-            }
-
-            ca_mul_fmpz(u, u, rel + i, ctx);
-            ca_add(t, t, u, ctx);
+            if (!CA_EXT_IS_QQBAR(ext))
+                all_qqbar = 0;
         }
     }
 
-    if (!fmpz_is_zero(rel + num_powers))
+    if (all_qqbar)
     {
-        ca_pi_i(u, ctx);
-        ca_mul_fmpz(u, u, rel + num_powers, ctx);
-        ca_add(t, t, u, ctx);
-    }
+        qqbar_t a, b;
 
-    success = (ca_check_is_zero(t, ctx) == T_TRUE);
+        qqbar_init(a);
+        qqbar_init(b);
+
+        qqbar_one(a);
+
+        for (i = 0; i < num_powers; i++)
+        {
+            if (!fmpz_is_zero(rel + i))
+            {
+                ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
+
+                /* xxx: bogus limits */
+                if (!qqbar_pow_fmpz_checked(b, CA_EXT_QQBAR(ext), rel + i, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10))
+                {
+                    success = 0;
+                    goto qqbar_end;
+                }
+
+                if (!qqbar_mul_checked(a, a, b, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10))
+                {
+                    success = 0;
+                    goto qqbar_end;
+                }
+            }
+        }
+
+        /* (-1)^ */
+        if (fmpz_is_odd(rel + num_powers))
+            qqbar_neg(a, a);
+
+        success = qqbar_is_one(a);
+
+qqbar_end:
+
+/*
+        if (!success)
+        {
+            printf("qqbar failed!\n");
+        }
+*/
+
+        qqbar_clear(a);
+        qqbar_clear(b);
+    }
+    else
+    {
+        /* Todo: don't duplicate these computations */
+        for (i = 0; i < num_powers; i++)
+        {
+            if (!fmpz_is_zero(rel + i))
+            {
+                ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
+
+                if (CA_EXT_HEAD(ext) == CA_Sqrt)
+                {
+                    ca_log(u, CA_EXT_FUNC_ARGS(ext), ctx);
+                    ca_div_ui(u, u, 2, ctx);
+                }
+                else if (CA_EXT_HEAD(ext) == CA_Pow)
+                {
+                    ca_log(u, CA_EXT_FUNC_ARGS(ext), ctx);
+                    ca_mul(u, u, CA_EXT_FUNC_ARGS(ext) + 1, ctx);
+                }
+                else if (CA_EXT_HEAD(ext) == CA_Exp)
+                {
+                    ca_set(u, CA_EXT_FUNC_ARGS(ext), ctx);
+                }
+                else if (CA_EXT_IS_QQBAR(ext))
+                {
+                    ca_set_qqbar(u, CA_EXT_QQBAR(ext), ctx);
+                    ca_log(u, u, ctx);
+                }
+                else
+                {
+                    flint_abort();
+                }
+
+                ca_mul_fmpz(u, u, rel + i, ctx);
+                ca_add(t, t, u, ctx);
+            }
+        }
+
+        if (!fmpz_is_zero(rel + num_powers))
+        {
+            ca_pi_i(u, ctx);
+            ca_mul_fmpz(u, u, rel + num_powers, ctx);
+            ca_add(t, t, u, ctx);
+        }
+
+        success = (ca_check_is_zero(t, ctx) == T_TRUE);
+    }
 
     if (ctx->options[CA_OPT_VERBOSE])
     {

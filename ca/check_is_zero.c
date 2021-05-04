@@ -27,13 +27,12 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     return res;
 }
 
-truth_t
-ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
-{
-    acb_t v;
-    truth_t res;
-    slong prec, prec_limit;
+void
+ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx);
 
+truth_t
+ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx)
+{
     if (CA_IS_SPECIAL(x))
     {
         if (ca_is_unknown(x, ctx))
@@ -70,7 +69,20 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
             return T_FALSE;
     }
 
-    res = T_UNKNOWN;
+    return T_UNKNOWN;
+}
+
+truth_t
+ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
+{
+    acb_t v;
+    truth_t res;
+    slong prec, prec_limit;
+
+    res = ca_is_zero_check_fast(x, ctx);
+
+    if (res != T_UNKNOWN)
+        return res;
 
     /* todo: in the following, we should extract the numerator; the denominator is irrelevant */
 
@@ -99,6 +111,23 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
     acb_clear(v);
 
+    if (res == T_UNKNOWN)
+    {
+        ca_t tmp;
+        ca_init(tmp, ctx);
+        ca_rewrite_complex_normal_form(tmp, x, 1, ctx);
+        res = ca_is_zero_check_fast(tmp, ctx);
+
+        if (ctx->options[CA_OPT_VERBOSE])
+        {
+            flint_printf("is_zero: complex_normal form:\n");
+            ca_print(x, ctx); flint_printf("\n");
+            ca_print(tmp, ctx); flint_printf("\n");
+            truth_print(res); flint_printf("\n");
+        }
+
+        ca_clear(tmp, ctx);
+    }
+
     return res;
 }
-

@@ -571,6 +571,71 @@ _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
     fexpr_clear(u);
 }
 
+ulong
+qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x)
+{
+    ulong * phi;
+    ulong N1, N2, d2, order, d;
+    slong p, q, i;
+    double U;
+    slong bits;
+    int success;
+
+    d = qqbar_degree(x);
+
+    success = 0;
+    order = 0;
+
+    bits = 2 * qqbar_height_bits(x) /*+ 20 * d */ + 40;
+    d2 = 4 * d;
+
+    /* Compute inverse image of the totient function for d, 2*d and 4*d. */
+
+    /* Determine lower and upper bounds [N1, N2) */
+    U = d2;
+    for (p = 2; p <= d2; p++)
+        if (d2 % (p - 1) == 0 && n_is_prime(p))
+            U = (U * p) / (p - 1);
+    N1 = d + 1;
+    N2 = U + 3;   /* +3 as safety for possible floating-point rounding */
+
+/*        N2 = FLINT_MIN(N2, 1 + 30); */
+
+    phi = flint_malloc(N2 * sizeof(ulong));
+
+    for (i = 0; i < N2; i++)
+        phi[i] = i;
+
+    for (p = 2; p < N2; p++)
+    {
+        if (phi[p] == p)
+        {
+            phi[p] = p - 1;
+            for (q = 2 * p; q < N2; q += p)
+                phi[q] = (phi[q] / p) * (p - 1);
+        }
+    }
+
+    for (i = N1; i < N2 && !success; i++)
+    {
+        if (phi[i] == d || phi[i] == 2 * d || phi[i] == 4 * d)
+        {
+            qqbar_root_of_unity(zeta, 1, i);
+
+            if (qqbar_express_in_field(poly, zeta, x, bits, 0, bits))
+            {
+                order = i;
+                success = 1;
+                break;
+            }
+        }
+    }
+
+    flint_free(phi);
+
+    return order;
+}
+
 /* poly(exp(2 pi i / n)) */
 void
 _qqbar_get_fexpr_cyclotomic(fexpr_t res, const fmpq_poly_t poly, slong n, int pure_real, int pure_imag)
@@ -825,70 +890,22 @@ qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags)
     /* Check for elements of cyclotomic fields */
     if (flags & QQBAR_FORMULA_CYCLOTOMICS)
     {
-        ulong * phi;
-        ulong N1, N2, d2;
-        slong p, q, i;
-        double U;
-        slong bits;
         fmpq_poly_t poly;
         qqbar_t zeta;
+        ulong q;
 
-        success = 0;
-
-        bits = 2 * qqbar_height_bits(x) /*+ 20 * d */ + 40;
-        d2 = 4 * d;
-
-        /* Compute inverse image of the totient function for d and 2*d. */
-
-        /* Determine lower and upper bounds [N1, N2) */
-        U = d2;
-        for (p = 2; p <= d2; p++)
-            if (d2 % (p - 1) == 0 && n_is_prime(p))
-                U = (U * p) / (p - 1);
-        N1 = d + 1;
-        N2 = U + 3;   /* +3 as safety for possible floating-point rounding */
-
-/*        N2 = FLINT_MIN(N2, 1 + 30); */
-
-        phi = flint_malloc(N2 * sizeof(ulong));
         fmpq_poly_init(poly);
         qqbar_init(zeta);
 
-        for (i = 0; i < N2; i++)
-            phi[i] = i;
+        q = qqbar_try_as_cyclotomic(zeta, poly, x);
 
-        for (p = 2; p < N2; p++)
-        {
-            if (phi[p] == p)
-            {
-                phi[p] = p - 1;
-                for (q = 2 * p; q < N2; q += p)
-                    phi[q] = (phi[q] / p) * (p - 1);
-            }
-        }
+        if (q != 0)
+            _qqbar_get_fexpr_cyclotomic(res, poly, q, qqbar_sgn_im(x) == 0, qqbar_sgn_re(x) == 0);
 
-        for (i = N1; i < N2 && !success; i++)
-        {
-            if (phi[i] == d || phi[i] == 2 * d || phi[i] == 4 * d)
-            {
-                qqbar_root_of_unity(zeta, 1, i);
-
-                /* printf("testing root of unity %ld\n", i); */
-
-                if (qqbar_express_in_field(poly, zeta, x, bits, 0, bits))
-                {
-                    _qqbar_get_fexpr_cyclotomic(res, poly, i, qqbar_sgn_im(x) == 0, qqbar_sgn_re(x) == 0);
-                  /*  printf("match!\n"); */
-                    success = 1;
-                }
-            }
-        }
-
-        flint_free(phi);
         fmpq_poly_clear(poly);
         qqbar_clear(zeta);
 
-        if (success)
+        if (q != 0)
             return 1;
     }
 

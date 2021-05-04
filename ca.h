@@ -375,6 +375,9 @@ CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
 
 /* Value predicates and comparisons */
 
+truth_t ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx);
+
+
 truth_t ca_check_is_number(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_zero(const ca_t x, ca_ctx_t ctx);
 truth_t ca_check_is_one(const ca_t x, ca_ctx_t ctx);
@@ -465,6 +468,10 @@ void ca_fmpz_mpoly_evaluate_iter(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, co
 void ca_fmpz_mpoly_evaluate(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
 
 void ca_fmpz_mpoly_q_evaluate(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
+
+void ca_fmpz_mpoly_q_evaluate_zero_impossible(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
+void ca_inv_zero_impossible(ca_t res, const ca_t x, ca_ctx_t ctx);
+
 
 /* Powers and roots */
 

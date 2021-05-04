@@ -3827,6 +3827,10 @@ def test_context_switch():
     assert B + A == 2 * B
     assert A[0] == B[0]
 
+def test_improved_zero_recognition():
+    assert sqrt(2)*(1+i)/2 * pi - exp(pi*i/4) * pi == 0
+    assert (sqrt(3) + i)/2  * pi - exp(pi*i/6) * pi == 0
+
 def test_trigonometric():
 
     def expect_not_implemented(f):
@@ -3900,7 +3904,6 @@ def test_trigonometric():
     assert xsin(a) == sqrt(1 - xcos(a)**2)
 
     for N in range(1,17):
-        print(N)
         assert sum(cos(n*a) for n in range(1,N+1)) == sin((N+0.5)*a)/(2*sin(a/2)) - 0.5
 
     assert xcos(a) == -sqrt(1 - xsin(a)**2)
@@ -3909,7 +3912,7 @@ def test_trigonometric():
     expect_not_implemented(lambda: xsin(3*a) == 4*xsin(a)*xsin(pi/3-a)*xsin(pi/3+a))
     assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
     assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
-    expect_not_implemented(lambda: xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b))))
+    assert xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b)))
 
 def test_xfail():
     # Test some simplifications that are known not to work yet.

@@ -147,10 +147,233 @@ ca_pow_pow(ca_t res, const ca_t z, const ca_t a, const ca_t b, ca_ctx_t ctx)
     ca_clear(pi, ctx);
 }
 
+/* warning: must have already checked for special values */
+void
+_ca_pow_inert(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
+{
+    _ca_function_fxy(res, CA_Pow, x, y, ctx);
+    _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
+    ca_condense_field(res, ctx);
+}
+
+void
+_ca_pow_general(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
+    {
+        ca_unknown(res, ctx);
+        return;
+    }
+
+    {
+        ca_ext_ptr ext = ca_is_gen_as_ext(x, ctx);
+
+        /* (z^a)^b */
+        /* todo: also detect ((z^a)^n)^b, etc. */
+        if (ext != NULL && CA_EXT_HEAD(ext) == CA_Pow)
+        {
+            if (ca_check_is_zero(CA_EXT_FUNC_ARGS(ext), ctx) == T_FALSE)
+            {
+                ca_pow_pow(res, CA_EXT_FUNC_ARGS(ext), CA_EXT_FUNC_ARGS(ext) + 1, y, ctx);
+                return;
+            }
+        }
+    }
+
+    /* todo: more simplifications */
+
+    /* inert pow must be a number -- avoid division by zero */
+    /* todo: more generally handle re(y) > 0 */
+    if (!(CA_IS_QQ(y, ctx) && fmpz_sgn(CA_FMPQ_NUMREF(y)) > 0))
+    {
+        if (ca_check_is_zero(x, ctx) != T_FALSE)
+        {
+            /* todo: implement various cases */
+            ca_unknown(res, ctx);
+            return;
+        }
+    }
+
+    _ca_pow_inert(res, x, y, ctx);
+}
+
+void
+ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+    {
+        if (CA_IS_UNSIGNED_INF(x))
+        {
+            if (fmpz_sgn(y) > 0)
+                ca_uinf(res, ctx);
+            else if (fmpz_sgn(y) < 0)
+                ca_zero(res, ctx);
+            else
+                ca_undefined(res, ctx);
+        }
+        else if (CA_IS_SIGNED_INF(x))
+        {
+            if (fmpz_is_zero(y))
+                ca_undefined(res, ctx);
+            else if (fmpz_sgn(y) < 0)
+                ca_zero(res, ctx);
+            else
+            {
+                ca_t t;
+                ca_init(t, ctx);
+                ca_sgn(t, x, ctx);
+                ca_pow_fmpz(t, t, y, ctx);
+                ca_pos_inf(res, ctx);
+                ca_mul(res, res, t, ctx);
+                ca_clear(t, ctx);
+            }
+        }
+        else
+        {
+            /* unknown, undefined map to themselves */
+            ca_set(res, x, ctx);
+        }
+
+        return;
+    }
+
+    /* Deal with the most common cases */
+    if (fmpz_is_zero(y))
+    {
+        ca_one(res, ctx);
+        return;
+    }
+
+    if (fmpz_is_one(y))
+    {
+        ca_set(res, x, ctx);
+        return;
+    }
+
+    if (fmpz_equal_si(y, -1))
+    {
+        ca_inv(res, x, ctx);
+        return;
+    }
+
+    if (fmpz_equal_si(y, 2))
+    {
+        ca_mul(res, x, x, ctx);
+        return;
+    }
+
+    if (fmpz_equal_si(y, -2))
+    {
+        ca_inv(res, x, ctx);
+        ca_mul(res, res, res, ctx);
+        return;
+    }
+
+    /* Rational base */
+    if (CA_IS_QQ(x, ctx))
+    {
+        /* 0^y, y != 0 */
+        if (fmpz_is_zero(CA_FMPQ_NUMREF(x)))
+        {
+            if (fmpz_sgn(y) < 0)
+                ca_uinf(res, ctx);
+            else
+                ca_zero(res, ctx);
+            return;
+        }
+
+        /* 1^y or (-1)^y */
+        if (fmpz_is_one(CA_FMPQ_DENREF(x)) && fmpz_is_pm1(CA_FMPQ_NUMREF(x)))
+        {
+            if (fmpz_is_one(CA_FMPQ_NUMREF(x)) || fmpz_is_even(y))
+                ca_one(res, ctx);
+            else
+                ca_neg_one(res, ctx);
+            return;
+        }
+
+        if (fmpz_bits(y) <= FLINT_BITS - 2)
+        {
+            slong xbits1, xbits2;
+
+            xbits1 = fmpz_bits(CA_FMPQ_NUMREF(x));
+            xbits2 = fmpz_bits(CA_FMPQ_DENREF(x));
+            xbits1 = FLINT_MAX(xbits1, xbits2);
+
+            if (xbits1 * (double) FLINT_ABS(*y) < ctx->options[CA_OPT_PREC_LIMIT])
+            {
+                fmpq_t t;
+                fmpq_init(t);
+                fmpq_pow_si(t, CA_FMPQ(x), *y);
+                ca_set_fmpq(res, t, ctx);
+                fmpq_clear(t);
+                return;
+            }
+        }
+    }
+
+    /* Todo: special case all roots of unity */
+
+    /* Number field base */
+    if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)) && fmpz_bits(y) <= FLINT_BITS - 2)
+    {
+        slong xbits1;
+
+        xbits1 = nf_elem_bits(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx)));
+
+        /* Need to be sure we don't divide by zero, but more generally
+           the base should never be a rational number here. */
+        if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
+        {
+            flint_printf("ca_pow_fmpz: unexpected rational nf_elem\n");
+            flint_abort();
+        }
+
+        if (xbits1 * (double) FLINT_ABS(*y) < ctx->options[CA_OPT_PREC_LIMIT])
+        {
+            ca_t t;
+            ca_init(t, ctx);
+
+            if (fmpz_sgn(y) > 0)
+                ca_set(t, x, ctx);
+            else
+                ca_inv(t, x, ctx);
+
+            nf_elem_pow(CA_NF_ELEM(t), CA_NF_ELEM(t), FLINT_ABS(*y), CA_FIELD_NF(CA_FIELD(t, ctx)));
+            ca_condense_field(t, ctx);
+            ca_swap(res, t, ctx);
+
+            ca_clear(t, ctx);
+            return;
+        }
+    }
+
+    /* todo: evaluation limits */
+    if (fmpz_cmp_si(y, -ctx->options[CA_OPT_POW_LIMIT]) >= 0 && fmpz_cmp_si(y, ctx->options[CA_OPT_POW_LIMIT]) <= 0)
+    {
+        _ca_pow_binexp(res, x, *y, ctx);
+        return;
+    }
+
+    {
+        ca_t t;
+        ca_init(t, ctx);
+        ca_set_fmpz(t, y, ctx);
+        _ca_pow_general(res, x, t, ctx);
+        ca_clear(t, ctx);
+    }
+}
+
+
 void
 ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
-    truth_t xzero;
+
+    if (CA_IS_QQ(y, ctx) && fmpz_is_one(CA_FMPQ_DENREF(y)))
+    {
+        ca_pow_fmpz(res, x, CA_FMPQ_NUMREF(y), ctx);
+        return;
+    }
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
@@ -158,179 +381,34 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         return;
     }
 
-    xzero = ca_check_is_zero(x, ctx);
-
-    if (xzero != T_FALSE)
+    if (CA_IS_QQ(y, ctx) && fmpz_equal_ui(CA_FMPQ_DENREF(y), 2))
     {
-        if (xzero == T_TRUE)
+        if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 1))
         {
-            if (CA_IS_QQ(y, ctx))
-            {
-                if (fmpq_is_zero(CA_FMPQ(y)))
-                {
-                    ca_one(res, ctx);
-                    return;
-                }
-                else if (fmpq_sgn(CA_FMPQ(y)) > 0)
-                {
-                    ca_zero(res, ctx);
-                    return;
-                }
-                else
-                {
-                    ca_uinf(res, ctx);
-                    return;
-                }
-            }
+            ca_sqrt(res, x, ctx);
+            return;
         }
-
-        ca_unknown(res, ctx);
+        else if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 3))
+        {
+            ca_t t;
+            ca_init(t, ctx);
+            ca_sqrt(t, x, ctx);
+            ca_mul(res, t, x, ctx);
+            ca_clear(t, ctx);
+            return;
+        }  /* todo: evaluation limits */
+        else if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -ctx->options[CA_OPT_POW_LIMIT] / 2) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), ctx->options[CA_OPT_POW_LIMIT] / 2) <= 0)
+        {
+            ca_t t;
+            ca_init(t, ctx);
+            ca_sqrt(t, x, ctx);
+            _ca_pow_binexp(res, t, *CA_FMPQ_NUMREF(y), ctx);
+            ca_clear(t, ctx);
+            return;
+        }
     }
-    else
-    {
-        if (CA_IS_QQ(y, ctx))
-        {
-            if (fmpz_is_one(CA_FMPQ_DENREF(y)))
-            {
-                if (fmpz_is_zero(CA_FMPQ_NUMREF(y)))
-                {
-                    ca_one(res, ctx);
-                    return;
-                }
 
-                if (fmpz_is_one(CA_FMPQ_NUMREF(y)))
-                {
-                    ca_set(res, x, ctx);
-                    return;
-                }
-
-                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), -1))
-                {
-                    ca_inv(res, x, ctx);
-                    return;
-                }
-
-                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 2))
-                {
-                    ca_mul(res, x, x, ctx);
-                    return;
-                }
-
-                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), -2))
-                {
-                    ca_inv(res, x, ctx);
-                    ca_mul(res, res, res, ctx);
-                    return;
-                }
-
-                if (CA_IS_QQ(x, ctx) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
-                {
-                    slong xbits1, xbits2;
-
-                    xbits1 = fmpz_bits(CA_FMPQ_NUMREF(x));
-                    xbits2 = fmpz_bits(CA_FMPQ_DENREF(x));
-                    xbits1 = FLINT_MAX(xbits1, xbits2);
-
-                    if (xbits1 * (double) FLINT_ABS(*CA_FMPQ_NUMREF(y)) < ctx->options[CA_OPT_PREC_LIMIT])
-                    {
-                        fmpq_t t;
-                        fmpq_init(t);
-                        fmpq_pow_si(t, CA_FMPQ(x), *CA_FMPQ_NUMREF(y));
-                        ca_set_fmpq(res, t, ctx);
-                        fmpq_clear(t);
-                        return;
-                    }
-                }
-
-                if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)) && fmpz_bits(CA_FMPQ_NUMREF(y)) <= FLINT_BITS - 2)
-                {
-                    slong xbits1;
-
-                    xbits1 = nf_elem_bits(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx)));
-
-                    if (xbits1 * (double) FLINT_ABS(*CA_FMPQ_NUMREF(y)) < ctx->options[CA_OPT_PREC_LIMIT])
-                    {
-                        ca_t t;
-                        ca_init(t, ctx);
-
-                        if (fmpq_sgn(CA_FMPQ(y)) > 0)
-                            ca_set(t, x, ctx);
-                        else
-                            ca_inv(t, x, ctx);
-
-                        nf_elem_pow(CA_NF_ELEM(t), CA_NF_ELEM(t), FLINT_ABS(*CA_FMPQ_NUMREF(y)), CA_FIELD_NF(CA_FIELD(t, ctx)));
-                        ca_condense_field(t, ctx);
-                        ca_swap(res, t, ctx);
-
-                        ca_clear(t, ctx);
-                        return;
-                    }
-                }
-
-                /* todo: evaluation limits */
-                if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -ctx->options[CA_OPT_POW_LIMIT]) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), ctx->options[CA_OPT_POW_LIMIT]) <= 0)
-                {
-                    _ca_pow_binexp(res, x, *CA_FMPQ_NUMREF(y), ctx);
-                    return;
-                }
-            }
-            else if (fmpz_equal_ui(CA_FMPQ_DENREF(y), 2))
-            {
-                if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 1))
-                {
-                    ca_sqrt(res, x, ctx);
-                    return;
-                }
-                else if (fmpz_equal_si(CA_FMPQ_NUMREF(y), 3))
-                {
-                    ca_t t;
-                    ca_init(t, ctx);
-                    ca_sqrt(t, x, ctx);
-                    ca_mul(res, t, x, ctx);
-                    ca_clear(t, ctx);
-                    return;
-                }  /* todo: evaluation limits */
-                else if (fmpz_cmp_si(CA_FMPQ_NUMREF(y), -ctx->options[CA_OPT_POW_LIMIT] / 2) >= 0 && fmpz_cmp_si(CA_FMPQ_NUMREF(y), ctx->options[CA_OPT_POW_LIMIT] / 2) <= 0)
-                {
-                    ca_t t;
-                    ca_init(t, ctx);
-                    ca_sqrt(t, x, ctx);
-                    _ca_pow_binexp(res, t, *CA_FMPQ_NUMREF(y), ctx);
-                    ca_clear(t, ctx);
-                    return;
-                }
-            }
-        }
-
-        {
-            ca_ext_ptr ext = ca_is_gen_as_ext(x, ctx);
-
-            /* (z^a)^b */
-            if (ext != NULL && CA_EXT_HEAD(ext) == CA_Pow)
-            {
-                if (ca_check_is_zero(CA_EXT_FUNC_ARGS(ext), ctx) == T_FALSE)
-                {
-                    ca_pow_pow(res, CA_EXT_FUNC_ARGS(ext), CA_EXT_FUNC_ARGS(ext) + 1, y, ctx);
-                    return;
-                }
-            }
-        }
-
-        _ca_function_fxy(res, CA_Pow, x, y, ctx);
-        /* todo: detect simple values instead of creating extension element in the first place */
-        _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
-        ca_condense_field(res, ctx);
-    }
-}
-
-void
-ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
-{
-    ca_t t;
-    ca_init(t, ctx);
-    ca_set_fmpz(t, y, ctx);
-    ca_pow(res, x, t, ctx);
-    ca_clear(t, ctx);
+    _ca_pow_general(res, x, y, ctx);
 }
 
 void
@@ -346,19 +424,19 @@ ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
 void
 ca_pow_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx)
 {
-    ca_t t;
-    ca_init(t, ctx);
-    ca_set_si(t, y, ctx);
-    ca_pow(res, x, t, ctx);
-    ca_clear(t, ctx);
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_si(t, y);
+    ca_pow_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
 }
 
 void
 ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx)
 {
-    ca_t t;
-    ca_init(t, ctx);
-    ca_set_ui(t, y, ctx);
-    ca_pow(res, x, t, ctx);
-    ca_clear(t, ctx);
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_ui(t, y);
+    ca_pow_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
 }

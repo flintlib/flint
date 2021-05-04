@@ -23,3 +23,18 @@ ca_fmpz_mpoly_q_evaluate(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fm
     ca_clear(t, ctx);
     ca_clear(u, ctx);
 }
+
+void
+ca_fmpz_mpoly_q_evaluate_zero_impossible(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+{
+    ca_t t, u;
+    ca_init(t, ctx);
+    ca_init(u, ctx);
+    ca_fmpz_mpoly_evaluate(t, fmpz_mpoly_q_numref(f), x, mctx, ctx);
+    ca_fmpz_mpoly_evaluate(u, fmpz_mpoly_q_denref(f), x, mctx, ctx);
+    /* todo: write a div function for this */
+    ca_inv_zero_impossible(u, u, ctx);
+    ca_mul(res, t, u, ctx);
+    ca_clear(t, ctx);
+    ca_clear(u, ctx);
+}

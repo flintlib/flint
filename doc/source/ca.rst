@@ -1035,6 +1035,29 @@ Numerical evaluation
     double rounding); the user may call *acb_set_round* when rounding
     is desired.
 
+
+Rewriting and simplification
+-------------------------------------------------------------------------------
+
+.. function:: void ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx)
+
+    Sets *res* to *x* rewritten using standardizing transformations
+    over the complex numbers:
+
+    * Elementary functions are rewritten in terms of (complex) exponentials, roots and logarithms
+    * Complex parts are rewritten using logarithms, square roots, and (deep) complex conjugates
+    * Algebraic numbers are rewritten in terms of cyclotomic fields where applicable
+
+    If *deep* is set, the rewriting is applied recursively to the tower
+    of extension numbers; otherwise, the rewriting is only applied
+    to the top-level extension numbers.
+
+    The result is not a normal form in the strong sense (the same
+    number can have many possible representations even after applying
+    this transformation), but in practice this is a powerful heuristic
+    for simplification.
+
+
 Factorization
 -------------------------------------------------------------------------------
 

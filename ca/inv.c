@@ -70,3 +70,46 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
     }
 }
 
+void
+ca_inv_zero_impossible(ca_t res, const ca_t x, ca_ctx_t ctx)
+{
+    ca_field_srcptr field;
+
+    if (ca_is_zero_check_fast(x, ctx) == T_TRUE)
+    {
+        flint_printf("ca_inv_zero_impossible: zero element encountered!\n");
+        flint_abort();
+    }
+
+    if (CA_IS_QQ(x, ctx))
+    {
+        _ca_make_fmpq(res, ctx);
+        fmpq_inv(CA_FMPQ(res), CA_FMPQ(x));
+        return;
+    }
+
+    if (CA_IS_SPECIAL(x))
+    {
+        if (CA_IS_INF(x))
+            ca_zero(res, ctx);
+        else
+            ca_set(res, x, ctx);
+        return;
+    }
+
+    field = CA_FIELD(x, ctx);
+    _ca_make_field_element(res, field, ctx);
+
+    if (CA_FIELD_IS_QQ(field))  /* todo: should not happen? */
+    {
+        fmpq_inv(CA_FMPQ(res), CA_FMPQ(x));
+    }
+    else if (CA_FIELD_IS_NF(field))
+    {
+        nf_elem_inv(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(field));
+    }
+    else
+    {
+        fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
+    }
+}

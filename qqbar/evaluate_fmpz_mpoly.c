@@ -66,14 +66,21 @@ qqbar_mul_checked(qqbar_t res, const qqbar_t x, const qqbar_t y, slong deg_limit
     return 1;
 }
 
-static int
-qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, slong bits_limit)
+/* todo: special cases; combine with qqbar_pow */
+int
+qqbar_pow_fmpz_checked(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, slong bits_limit)
 {
+    slong n;
+
     if (fmpz_is_zero(y))
     {
         qqbar_one(res);
         return 1;
     }
+
+    /* abort? */
+    if (qqbar_is_zero(x) && fmpz_sgn(y) < 0)
+        return 0;
 
     if (qqbar_is_zero(x) || qqbar_is_one(x))
     {
@@ -90,14 +97,25 @@ qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, sl
         return 1;
     }
 
-    if (*y < 0 || *y >= COEFF_MAX)
+    n = *y;
+
+    if (n < COEFF_MIN || n > COEFF_MAX)
         return 0;
 
     /* todo */
-    if ((double) *y * qqbar_height_bits(x) > bits_limit)
+    if ((double) FLINT_ABS(n) * qqbar_height_bits(x) > bits_limit)
         return 0;
 
-    qqbar_pow_ui(res, x, *y);
+    if (n > 0)
+    {
+        qqbar_pow_ui(res, x, n);
+    }
+    else
+    {
+        qqbar_pow_ui(res, x, -n);
+        qqbar_inv(res, res);
+    }
+
     return 1;
 }
 
@@ -112,7 +130,7 @@ static int _qqbar_pmul(qqbar_t A, const qqbar_t X,
     }
     else
     {
-        if (!qqbar_pow_fmpz(T, X, pow, deg_limit, bits_limit))
+        if (!qqbar_pow_fmpz_checked(T, X, pow, deg_limit, bits_limit))
             return 0;
 
         return qqbar_mul_checked(A, A, T, deg_limit, bits_limit);
@@ -246,7 +264,7 @@ HornerForm:
     else if (totalcounts == 1)
     {
         FLINT_ASSERT(!fmpz_is_zero(Buexp + nvars*f + v)); /* this term should not be a scalar */
-        if (!qqbar_pow_fmpz(regs + rp, C + v, Buexp + nvars*f + v, deg_limit, bits_limit))
+        if (!qqbar_pow_fmpz_checked(regs + rp, C + v, Buexp + nvars*f + v, deg_limit, bits_limit))
         {
             success = 0;
         }
@@ -389,7 +407,7 @@ HornerForm2:
         else if (rtypes[rp - 1] != -WORD(1) && rtypes[rp] == -WORD(1))
         {
             /* quotient is a scalar, remainder is a polynomial */
-            if (!qqbar_pow_fmpz(temp, C + (stack + sp)->v_var,
+            if (!qqbar_pow_fmpz_checked(temp, C + (stack + sp)->v_var,
                                                    (stack + sp)->v_exp, deg_limit, bits_limit))
             {
                 success = 0;
