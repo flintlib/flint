@@ -49,7 +49,7 @@ void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG,
     }
     else
     {
-        if (fmpz_is_one(cA))
+        if (fmpz_is_one(cB))
         {
             alloc |= 2;
             primA = _fmpz_vec_init(lenA);
