@@ -1829,6 +1829,11 @@ class ca:
         libcalcium.ca_set(res, self, self._ctx)
         return res
 
+    def rewrite_cnf(self, deep=True):
+        res = self._new()
+        libcalcium.ca_rewrite_complex_normal_form(res, self, deep, self._ctx)
+        return res
+
     def re(self):
         """
         Real part.
@@ -1940,6 +1945,26 @@ class ca:
         return res
 
     sign = sgn
+
+    def arg(self):
+        """
+        Complex argument (phase).
+
+        Examples::
+
+            >>> arg(2) == arg(0) == ca(0).arg() == 0
+            True
+            >>> arg(-10)
+            -3.14159 {-a where a = 3.14159 [Pi]}
+            >>> arg(sqrt(-3))
+            1.57080 {(a)/2 where a = 3.14159 [Pi]}
+            >>> arg(-sqrt(sqrt(-3)))
+            -2.35619 {(-3*a)/4 where a = 3.14159 [Pi]}
+
+        """
+        res = self._new()
+        libcalcium.ca_arg(res, self, self._ctx)
+        return res
 
     def sqrt(self):
         """
@@ -3454,6 +3479,11 @@ def sign(x):
         x = ca(x)
     return x.sign()
 
+def arg(x):
+    if type(x) != ca:
+        x = ca(x)
+    return x.arg()
+
 def floor(x):
     if type(x) != ca:
         x = ca(x)
@@ -3830,6 +3860,7 @@ def test_context_switch():
 def test_improved_zero_recognition():
     assert sqrt(2)*(1+i)/2 * pi - exp(pi*i/4) * pi == 0
     assert (sqrt(3) + i)/2  * pi - exp(pi*i/6) * pi == 0
+    assert arg(sqrt(-pi*i)) == -pi/4
 
 def test_trigonometric():
 

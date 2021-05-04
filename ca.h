@@ -507,6 +507,7 @@ void ca_conj(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_sgn(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_arg(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_re(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_im(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_floor(ca_t res, const ca_t x, ca_ctx_t ctx);

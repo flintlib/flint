@@ -160,12 +160,12 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
             }
             break;
 
-        /* todo: arg(z) = -i log(z/|z|) */
         case CA_Re:
         case CA_Im:
         case CA_Conjugate:
         case CA_Abs:
         case CA_Sign:
+        case CA_Arg:
             {
                 ca_t t, u;
                 truth_t is_zero;
@@ -221,6 +221,29 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
                         else
                         {
                             ca_sgn(res, t, ctx);
+                        }
+                        break;
+
+                    case CA_Arg:
+                        is_zero = ca_check_is_zero(t, ctx);
+                        if (is_zero == T_TRUE)
+                        {
+                            ca_zero(res, ctx);
+                        }
+                        else if (is_zero == T_FALSE)
+                        {
+                            /* todo: better to create two logs? */
+                            ca_conj_deep(u, t, ctx);
+                            ca_mul(u, t, u, ctx);
+                            ca_sqrt(u, u, ctx);
+                            ca_div(u, t, u, ctx);
+                            ca_log(u, u, ctx);
+                            ca_neg_i(t, ctx);
+                            ca_mul(res, t, u, ctx);
+                        }
+                        else
+                        {
+                            ca_arg(res, t, ctx);
                         }
                         break;
 

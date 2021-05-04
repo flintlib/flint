@@ -890,6 +890,18 @@ Complex parts
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\operatorname{sgn}(x))`.
 
+.. function:: void ca_arg(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the complex argument (phase) of *x*, normalized
+    to the range `(-\pi, +\pi]`. The argument of 0 is defined as 0.
+    For special values, the following definitions apply:
+
+    * `\operatorname{arg}(c \infty) = \operatorname{arg}(c)`.
+
+    * `\operatorname{arg}(\tilde \infty) = \operatorname{Undefined}`.
+
+    * Both *Undefined* and *Unknown* map to themselves.
+
 .. function:: void ca_re(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     Sets *res* to the real part of *x*. The result is *Undefined* if *x*
