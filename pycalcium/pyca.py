@@ -3823,6 +3823,11 @@ def test_notebook_examples():
     eps = ca(10, context=ctx) ** (-10000)
     assert (exp(eps) == 1) == False
 
+def test_qqbar_misc():
+    x = (1 + 100*qqbar(2)**(-1000)).root(100)
+    y = (1 + 101*qqbar(2)**(-1000)).root(101)
+    assert x > y
+
 def test_context_switch():
     ctx2 = ca_ctx()
     a = ca(3)

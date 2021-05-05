@@ -16,7 +16,7 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
 {
     slong prec;
     acb_t z1, z2;
-    int res;
+    int res, both_real;
 
     if (!arb_overlaps(acb_realref(QQBAR_ENCLOSURE(x)), acb_realref(QQBAR_ENCLOSURE(y))))
     {
@@ -74,6 +74,7 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
     acb_set(z1, QQBAR_ENCLOSURE(x));
     acb_set(z2, QQBAR_ENCLOSURE(y));
 
+    both_real = -1;
     res = 0;
     for (prec = QQBAR_DEFAULT_PREC; ; prec *= 2)
     {
@@ -86,8 +87,15 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
             break;
         }
 
+        if (both_real == -1)
+            both_real = qqbar_is_real(x) && qqbar_is_real(y);
+
         /* Force an exact computation (may be slow) */
-        if (prec >= 4 * QQBAR_DEFAULT_PREC)
+        /* Todo: tune the cutoff based on degrees, bit sizes. */
+        /* Todo: use the improved closures we have computed. */
+        /* Todo: when is it better to compute and compare the real
+           parts?  */
+        if (!both_real && prec >= 4 * QQBAR_DEFAULT_PREC)
         {
             qqbar_t t;
             qqbar_init(t);
@@ -103,4 +111,3 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
 
     return res;
 }
-
