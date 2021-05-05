@@ -72,8 +72,14 @@ ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx)
     return T_UNKNOWN;
 }
 
+int
+_ca_generic_has_nontrivial_denominator(const ca_t x, ca_ctx_t ctx)
+{
+    return !fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx));
+}
+
 truth_t
-ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
+ca_check_is_zero_no_factoring(const ca_t x, ca_ctx_t ctx)
 {
     acb_t v;
     truth_t res;
@@ -81,10 +87,22 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
     res = ca_is_zero_check_fast(x, ctx);
 
-    if (res != T_UNKNOWN)
+    if (res != T_UNKNOWN || CA_IS_SPECIAL(x))
         return res;
 
-    /* todo: in the following, we should extract the numerator; the denominator is irrelevant */
+    /* The denominator is irrelevant. */
+    /* Todo: we should probably also factor out monomials. */
+    if (_ca_generic_has_nontrivial_denominator(x, ctx))
+    {
+        ca_t t;
+        ca_init(t, ctx);
+        ca_set(t, x, ctx);
+        /* Todo: could also remove content */
+        fmpz_mpoly_one(fmpz_mpoly_q_denref(CA_MPOLY_Q(t)), CA_FIELD_MCTX(CA_FIELD(t, ctx), ctx));
+        res = ca_check_is_zero_no_factoring(t, ctx);
+        ca_clear(t, ctx);
+        return res;
+    }
 
     acb_init(v);
 
@@ -127,6 +145,65 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         }
 
         ca_clear(tmp, ctx);
+    }
+
+    return res;
+}
+
+truth_t
+ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
+{
+    truth_t res;
+
+    res = ca_check_is_zero_no_factoring(x, ctx);
+
+    if (res == T_UNKNOWN && !CA_IS_SPECIAL(x))
+    {
+        ca_factor_t fac;
+        ca_t t;
+        truth_t factor_res;
+        slong i, nontrivial_factors;
+
+        /* the zero test will surely have succeeded over a number field */
+        if (!CA_FIELD_IS_GENERIC(CA_FIELD(x, ctx)))
+            flint_abort();
+
+        /* extract numerator */
+        ca_init(t, ctx);
+        ca_set(t, x, ctx);
+        fmpz_mpoly_one(fmpz_mpoly_q_denref(CA_MPOLY_Q(t)), CA_FIELD_MCTX(CA_FIELD(t, ctx), ctx));
+
+        ca_factor_init(fac, ctx);
+        ca_factor(fac, t, CA_FACTOR_ZZ_NONE | CA_FACTOR_POLY_FULL, ctx);
+
+        nontrivial_factors = 0;
+        for (i = 0; i < fac->length; i++)
+            nontrivial_factors += !CA_IS_QQ(fac->base + i, ctx);
+
+        if (nontrivial_factors >= 2)
+        {
+            for (i = 0; i < fac->length; i++)
+            {
+                factor_res = ca_check_is_zero_no_factoring(fac->base + i, ctx);
+
+                if (factor_res == T_TRUE)
+                {
+                    if (ctx->options[CA_OPT_VERBOSE])
+                    {
+                        flint_printf("is_zero: factoring:\n");
+                        ca_print(x, ctx); flint_printf("\n");
+                        ca_print(fac->base + i, ctx); flint_printf("\n");
+                        truth_print(res); flint_printf("\n");
+                    }
+
+                    res = T_TRUE;
+                    break;
+                }
+            }
+        }
+
+        ca_clear(t, ctx);
+        ca_factor_clear(fac, ctx);
     }
 
     return res;

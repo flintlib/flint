@@ -51,17 +51,31 @@ ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx)
     }
     else
     {
-        slong len, i;
+        slong nvars, i;
+        int res;
+        int * used;
 
-        len = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
+        nvars = CA_FIELD_LENGTH(CA_FIELD(x, ctx));
+        used = flint_calloc(nvars, sizeof(int));
+
+        fmpz_mpoly_q_used_vars(used, CA_MPOLY_Q(x), CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx));
+        res = 1;
 
         /* todo: exclude extension numbers that are not actually used */
-        for (i = 0; i < len; i++)
+        for (i = 0; i < nvars; i++)
         {
-            if (!ca_ext_can_evaluate_qqbar(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i), ctx))
-                return 0;
+            if (used[i])
+            {
+                if (!ca_ext_can_evaluate_qqbar(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i), ctx))
+                {
+                    res = 0;
+                    break;
+                }
+            }
         }
 
-        return 1;
+        flint_free(used);
+
+        return res;
     }
 }

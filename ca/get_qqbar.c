@@ -59,9 +59,9 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
         {
             slong i, len, deg_limit, bits_limit;
             qqbar_ptr xs;
-            qqbar_t y;
+            qqbar_t y, zero;
             int success;
-            int * init_mask;
+            int * init_mask, * used;
 
             if (!ca_can_evaluate_qqbar(x, ctx))
                 return 0;
@@ -74,11 +74,21 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
             success = 0;
             xs = (qqbar_struct *) flint_malloc(sizeof(qqbar_struct) * len);
             init_mask = (int *) flint_calloc(sizeof(int), len);
+            used = (int *) flint_calloc(sizeof(int), len);
             qqbar_init(y);
+            qqbar_init(zero);
+
+            fmpz_mpoly_q_used_vars(used, CA_MPOLY_Q(x), CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx));
 
             /* todo: allow non-qqbar extension elements to cache a qqbar value */
             for (i = 0; i < len; i++)
             {
+                if (!used[i])
+                {
+                    xs[i] = *zero;
+                    continue;
+                }
+
                 if (CA_EXT_IS_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i)))
                 {
                     xs[i] = *CA_EXT_QQBAR(CA_FIELD_EXT_ELEM(CA_FIELD(x, ctx), i));
@@ -246,8 +256,10 @@ cleanup:
             }
 
             flint_free(init_mask);
+            flint_free(used);
             flint_free(xs);
             qqbar_clear(y);
+            qqbar_clear(zero);
 
             return success;
         }

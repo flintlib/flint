@@ -3866,6 +3866,7 @@ def test_improved_zero_recognition():
     assert sqrt(2)*(1+i)/2 * pi - exp(pi*i/4) * pi == 0
     assert (sqrt(3) + i)/2  * pi - exp(pi*i/6) * pi == 0
     assert arg(sqrt(-pi*i)) == -pi/4
+    assert (pi + sqrt(2) + sqrt(3)) / (pi + sqrt(5 + 2*sqrt(6))) == 1
 
     def expect_not_implemented(f):
         try:
@@ -3876,10 +3877,10 @@ def test_improved_zero_recognition():
         raise AssertionError
 
     # Some examples from Stoutemyer
-    z=pi
+    z = pi
     assert str(i*((3-5*1j)*z+1)/(((5+3j)*z+1j)*z)) == "0.318310 {(1)/(a) where a = 3.14159 [Pi], b = I [b^2+1=0]}"
     assert str(ca(-1)**(1/8.) * sqrt(i+1) / ca(2)**(3/4.) + i*exp(i*pi/2)) == "-0.500000 + 0.500000*I {(a-1)/2 where a = I [a^2+1=0]}"
-    expect_not_implemented(lambda: sin(2*atan(z)) + (15*sqrt(3)+26)**(ca(1)/3) == 2*z/(z**2+1) + sqrt(3)+2)
+    assert sin(2*atan(z)) + (15*sqrt(3)+26)**(ca(1)/3) == 2*z/(z**2+1) + sqrt(3) + 2
 
 def test_trigonometric():
 
