@@ -30,7 +30,7 @@ mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B,
         mpfr_mat_t t;
         mpfr_mat_init(t, ar, bc, C->prec);
         mpfr_mat_mul_classical(t, A, B, rnd);
-        mpfr_mat_swap(C, t);
+        mpfr_mat_swap_entrywise(C, t);
         mpfr_mat_clear(t);
         return;
     }

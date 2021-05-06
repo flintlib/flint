@@ -124,7 +124,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         fmpz_mat_t T;
         fmpz_mat_init(T, ar, bc);
         fmpz_mat_mul(T, A, B);
-        fmpz_mat_swap(C, T);
+        fmpz_mat_swap_entrywise(C, T);
         fmpz_mat_clear(T);
         return;
     }

@@ -55,12 +55,12 @@ _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
         if(pow%2 == 1)
         {
             nmod_mat_mul(temp1, dest, temp2);
-            nmod_mat_swap(temp1, dest);
+            nmod_mat_swap_entrywise(temp1, dest);
         }
         if (pow > 1)
         {
             nmod_mat_mul(temp1, temp2, temp2);
-            nmod_mat_swap(temp1, temp2);
+            nmod_mat_swap_entrywise(temp1, temp2);
         }
         pow /= 2;
     }

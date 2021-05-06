@@ -78,7 +78,19 @@ slong fmpz_mat_ncols(const fmpz_mat_t mat)
 
 FLINT_DLL void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols);
 FLINT_DLL void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
+
 FLINT_DLL void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
+
+FMPZ_MAT_INLINE void
+fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < fmpz_mat_nrows(mat1); i++)
+        for (j = 0; j < fmpz_mat_ncols(mat1); j++)
+            fmpz_swap(fmpz_mat_entry(mat2, i, j), fmpz_mat_entry(mat1, i, j));
+}
+
 FLINT_DLL void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 FLINT_DLL void fmpz_mat_clear(fmpz_mat_t mat);
 

@@ -36,7 +36,7 @@ nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A,
         nmod_poly_mat_t T;
         nmod_poly_mat_init(T, ar, bc, nmod_poly_mat_modulus(A));
         nmod_poly_mat_mul_classical(T, A, B);
-        nmod_poly_mat_swap(C, T);
+        nmod_poly_mat_swap_entrywise(C, T);
         nmod_poly_mat_clear(T);
         return;
     }

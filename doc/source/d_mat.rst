@@ -32,6 +32,11 @@ Basic assignment and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2`` 
     are allowed to be different.
 
+.. function:: void d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: double d_mat_entry(d_mat_t mat, slong i, slong j)
 
     Returns the entry of ``mat`` at row `i` and column `j`.

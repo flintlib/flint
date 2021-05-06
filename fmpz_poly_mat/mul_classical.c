@@ -37,7 +37,7 @@ fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
         fmpz_poly_mat_t T;
         fmpz_poly_mat_init(T, ar, bc);
         fmpz_poly_mat_mul_classical(T, A, B);
-        fmpz_poly_mat_swap(C, T);
+        fmpz_poly_mat_swap_entrywise(C, T);
         fmpz_poly_mat_clear(T);
         return;
     }

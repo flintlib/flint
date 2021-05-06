@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2021 William Hart
 
     This file is part of FLINT.
 
@@ -125,6 +126,35 @@ main(void)
         nmod_mat_clear(B);
         nmod_mat_clear(C);
         nmod_mat_clear(D);
+    }
+
+    /* Test aliasing with windows */
+    {
+        nmod_mat_t A, B, A_window;
+
+        nmod_mat_init(A, 2, 2, 3);
+        nmod_mat_init(B, 2, 2, 3);
+
+        nmod_mat_window_init(A_window, A, 0, 0, 2, 2);
+
+        nmod_mat_one(A);
+        nmod_mat_one(B);
+        nmod_mat_entry(B, 0, 1) = 1;
+        nmod_mat_entry(B, 1, 0) = 1;
+
+        nmod_mat_mul(A_window, B, A_window);
+
+        if (!nmod_mat_equal(A, B))
+        {
+            flint_printf("FAIL: window aliasing failed\n");
+            nmod_mat_print_pretty(A); flint_printf("\n\n");
+            nmod_mat_print_pretty(B); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        nmod_mat_window_clear(A_window);
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
     }
 
     FLINT_TEST_CLEANUP(state);

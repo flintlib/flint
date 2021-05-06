@@ -61,7 +61,8 @@ FLINT_DLL void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
 
 /* Basic manipulation  ********************************************************/
 
-FMPZ_MOD_MAT_INLINE                                                                      slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat)
+FMPZ_MOD_MAT_INLINE
+slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat)
 {
     return fmpz_mat_nrows(mat->mat);
 }
@@ -113,6 +114,16 @@ void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
         *mat1 = *mat2;
         *mat2 = tmp;
     }
+}
+
+FMPZ_MOD_MAT_INLINE void
+fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < fmpz_mod_mat_nrows(mat1); i++)
+        for (j = 0; j < fmpz_mod_mat_ncols(mat1); j++)
+            fmpz_swap(fmpz_mod_mat_entry(mat2, i, j), fmpz_mod_mat_entry(mat1, i, j));
 }
 
 FMPZ_MOD_MAT_INLINE

@@ -92,7 +92,21 @@ FLINT_DLL void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n
 FLINT_DLL void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 FLINT_DLL void nmod_mat_clear(nmod_mat_t mat);
 FLINT_DLL void nmod_mat_one(nmod_mat_t mat);
+
 FLINT_DLL void nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2);
+
+NMOD_MAT_INLINE void
+nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
+{
+    slong i, j;
+    for (i = 0; i < nmod_mat_nrows(mat1); i++)
+    {
+       mp_limb_t * row1 = mat1->rows[i];
+       mp_limb_t * row2 = mat2->rows[i];
+       for (j = 0; j < nmod_mat_ncols(mat1); j++)
+          MP_LIMB_SWAP(row1[j], row2[j]);
+    }
+}
 
 /* Windows and concatenation */
 

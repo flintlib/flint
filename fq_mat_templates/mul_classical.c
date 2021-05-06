@@ -40,7 +40,7 @@ TEMPLATE(T, mat_mul_classical) (TEMPLATE(T, mat_t) C,
         TEMPLATE(T, mat_t) T;
         TEMPLATE(T, mat_init) (T, ar, bc, ctx);
         TEMPLATE(T, mat_mul_classical) (T, A, B, ctx);
-        TEMPLATE(T, mat_swap) (C, T, ctx);
+        TEMPLATE(T, mat_swap_entrywise) (C, T, ctx);
         TEMPLATE(T, mat_clear) (T, ctx);
         return;
     }

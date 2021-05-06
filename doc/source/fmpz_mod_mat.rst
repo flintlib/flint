@@ -79,6 +79,11 @@ Basic manipulation                                                              
 
     Efficiently swap the matrices ``mat1`` and ``mat2``.
 
+.. function:: void fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: int fmpz_mod_mat_is_empty(const fmpz_mod_mat_t mat)
 
     Return `1` if ``mat`` has either zero rows or columns.

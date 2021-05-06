@@ -108,6 +108,39 @@ int main(void)
         fmpz_clear(mod);
     }
 
+    /* Test aliasing with windows */
+    {
+        fmpz_mod_mat_t A, B, A_window;
+        fmpz_t p;
+
+        fmpz_init_set_ui(p, 3);
+
+        fmpz_mod_mat_init(A, 2, 2, p);
+        fmpz_mod_mat_init(B, 2, 2, p);
+
+        fmpz_mod_mat_window_init(A_window, A, 0, 0, 2, 2);
+
+        fmpz_mod_mat_one(A);
+        fmpz_mod_mat_one(B);
+        fmpz_set_ui(fmpz_mod_mat_entry(B, 0, 1), 1);
+        fmpz_set_ui(fmpz_mod_mat_entry(B, 1, 0), 1);
+
+        fmpz_mod_mat_mul(A_window, B, A_window);
+
+        if (!fmpz_mod_mat_equal(A, B))
+        {
+            flint_printf("FAIL: window aliasing failed\n");
+            fmpz_mod_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mod_mat_print_pretty(B); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        fmpz_clear(p);
+        fmpz_mod_mat_window_clear(A_window);
+        fmpz_mod_mat_clear(A);
+        fmpz_mod_mat_clear(B);
+    }
+
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

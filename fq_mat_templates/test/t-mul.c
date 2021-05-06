@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2021 William Hart
 
     This file is part of FLINT.
 
@@ -120,6 +121,39 @@ main(void)
         TEMPLATE(T, mat_clear) (B, ctx);
         TEMPLATE(T, mat_clear) (C, ctx);
 
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
+    /* Test aliasing with windows */
+    {
+        TEMPLATE(T, ctx_t) ctx;
+        TEMPLATE(T, mat_t) A, B, A_window;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+	
+	TEMPLATE(T, mat_init)(A, 2, 2, ctx);
+        TEMPLATE(T, mat_init)(B, 2, 2, ctx);
+
+        TEMPLATE(T, mat_window_init)(A_window, A, 0, 0, 2, 2, ctx);
+
+        TEMPLATE(T, mat_one)(A, ctx);
+        TEMPLATE(T, mat_one)(B, ctx);
+        TEMPLATE(T, set_ui)(TEMPLATE(T, mat_entry)(B, 0, 1), 1, ctx);
+        TEMPLATE(T, set_ui)(TEMPLATE(T, mat_entry)(B, 1, 0), 1, ctx);
+
+        TEMPLATE(T, mat_mul)(A_window, B, A_window, ctx);
+
+        if (!TEMPLATE(T, mat_equal)(A, B, ctx))
+        {
+            flint_printf("FAIL: window aliasing failed\n");
+            TEMPLATE(T, mat_print)(A, ctx); flint_printf("\n\n");
+            TEMPLATE(T, mat_print)(B, ctx); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        TEMPLATE(T, mat_window_clear)(A_window, ctx);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
         TEMPLATE(T, ctx_clear) (ctx);
     }
 

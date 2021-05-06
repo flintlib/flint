@@ -37,6 +37,11 @@ Memory management
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
+.. function:: void fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 
 Entry access
 --------------------------------------------------------------------------------

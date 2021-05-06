@@ -30,7 +30,7 @@ d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B)
         d_mat_t t;
         d_mat_init(t, ar, bc);
         d_mat_mul_classical(t, A, B);
-        d_mat_swap(C, t);
+        d_mat_swap_entrywise(C, t);
         d_mat_clear(t);
         return;
     }

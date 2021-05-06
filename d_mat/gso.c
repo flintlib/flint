@@ -29,7 +29,7 @@ d_mat_gso(d_mat_t B, const d_mat_t A)
         d_mat_t t;
         d_mat_init(t, A->r, A->c);
         d_mat_gso(t, A);
-        d_mat_swap(B, t);
+        d_mat_swap_entrywise(B, t);
         d_mat_clear(t);
         return;
     }

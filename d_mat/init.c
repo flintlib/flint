@@ -15,19 +15,25 @@
 void
 d_mat_init(d_mat_t mat, slong rows, slong cols)
 {
+    slong i;
+    
+    if (rows != 0)
+        mat->rows = (double **) flint_malloc(rows * sizeof(double *));
+    else
+        mat->rows = NULL;
+
     if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
-        slong i;
         mat->entries = (double *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(double));
-        mat->rows = (double **) flint_malloc(rows*sizeof(double *));  /* Initialise rows */
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;
     }
     else
     {
-       mat->entries = NULL;
-       mat->rows = NULL;
+        mat->entries = NULL;
+        for (i = 0; i < rows; i++)
+            mat->rows[i] = NULL;
     }
 
     mat->r = rows;

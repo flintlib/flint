@@ -181,6 +181,16 @@ FLINT_DLL void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx
 
 FLINT_DLL void padic_mat_swap(padic_mat_t A, padic_mat_t B);
 
+PADIC_MAT_INLINE void
+padic_mat_swap_entrywise(padic_mat_t mat1, padic_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < padic_mat_nrows(mat1); i++)
+        for (j = 0; j < padic_mat_ncols(mat1); j++)
+            fmpz_swap(padic_mat_entry(mat2, i, j), padic_mat_entry(mat1, i, j));
+}
+
 FLINT_DLL void padic_mat_zero(padic_mat_t A);
 
 FLINT_DLL void padic_mat_one(padic_mat_t A);

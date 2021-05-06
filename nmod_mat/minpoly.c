@@ -21,7 +21,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
    slong n = X->r, i, j, c, c1, c2, r1, r2;
    ulong ** A, ** B, ** v, t, h;
    slong  * P1, * P2, * L1, * L2;
-   nmod_mat_t matA, matB, matv, matw;
+   nmod_mat_t matA, matB, matv;
    int first_poly = 1, indep = 1;
    nmod_poly_t b, g;
    TMP_INIT;
@@ -56,7 +56,6 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
    nmod_mat_init(matA, n + 1, 2*n + 1, p->mod.n);
    nmod_mat_init(matB, n, n, p->mod.n);
    nmod_mat_init(matv, n, 1, p->mod.n);
-   nmod_mat_init(matw, n, 1, p->mod.n);
 
    A = matA->rows;
    B = matB->rows;
@@ -112,9 +111,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
          r1++;
          r2 = indep ? r2 + 1 : r2;
          
-         /* nmod_mat_mul does not support aliasing, so mul and swap */
-         nmod_mat_mul(matw, X, matv);
-         nmod_mat_swap(matv, matw);
+         nmod_mat_mul(matv, X, matv);
          v = matv->rows;
 
          for (i = 0; i < n; i++)
@@ -189,7 +186,6 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
    nmod_mat_clear(matA);
    nmod_mat_clear(matB);
    nmod_mat_clear(matv);
-   nmod_mat_clear(matw);
 
    nmod_poly_clear(b);
    nmod_poly_clear(g);

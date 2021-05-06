@@ -129,6 +129,11 @@ Basic assignment
     Swaps the two matrices `A` and `B`.  This is done efficiently by 
     swapping pointers.
 
+.. function:: void padic_mat_swap_entrywise(padic_mat_t mat1, padic_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: void padic_mat_zero(padic_mat_t A)
 
     Sets the matrix `A` to zero.

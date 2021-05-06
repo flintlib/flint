@@ -68,9 +68,18 @@ Basic properties and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
+.. function:: void fq_zech_mat_swap_entrywise(fq_zech_mat_t mat1, fq_zech_mat_t mat2)
+
+    Swaps two matrices by swapping the individual entries rather than swapping
+    the contents of the structs.
+
 .. function:: void fq_zech_mat_zero(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Sets all entries of ``mat`` to 0.
+
+.. function:: void fq_zech_mat_one(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
+
+    Sets all the diagonal entries of ``mat`` to 1 and all other entries to 0.
 
 
 Concatenate
@@ -201,6 +210,11 @@ Comparison
 
     Returns a non-zero value if all entries ``mat`` are zero, and
     otherwise returns zero.
+
+.. function:: int fq_zech_mat_is_one(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
+
+    Returns a non-zero value if all entries ``mat`` are zero except the
+    diagonal entries which must be one, otherwise returns zero.
 
 .. function:: int fq_zech_mat_is_empty(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 

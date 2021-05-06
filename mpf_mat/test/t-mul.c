@@ -65,12 +65,15 @@ main(void)
             abort();
         }
 
-        mpf_mat_mul(A, A, B);
+        if (n == k)
+	{
+            mpf_mat_mul(A, A, B);
 
-        if (!mpf_mat_equal(A, E))
-        {
-            flint_printf("FAIL: aliasing failed\n");
-            abort();
+            if (!mpf_mat_equal(A, E))
+            {
+                flint_printf("FAIL: aliasing failed\n");
+                abort();
+            }
         }
 
         mpf_mat_clear(A);

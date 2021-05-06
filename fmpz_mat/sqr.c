@@ -24,7 +24,7 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_mat_t t;
         fmpz_mat_init(t, n, n);
         fmpz_mat_sqr(t, A);
-        fmpz_mat_swap(B, t);
+        fmpz_mat_swap_entrywise(B, t);
         fmpz_mat_clear(t);
         return;
     }

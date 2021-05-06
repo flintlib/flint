@@ -26,7 +26,7 @@ main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("mul....");
+    flint_printf("mul_classical....");
     fflush(stdout);
 
     /* check associative law */
@@ -64,12 +64,15 @@ main(void)
             abort();
         }
 
-        d_mat_mul_classical(A, A, B);
-
-        if (!d_mat_equal(A, E))
+        if (n == k)
         {
-            flint_printf("FAIL: aliasing failed\n");
-            abort();
+            d_mat_mul_classical(A, A, B);
+
+            if (!d_mat_equal(A, E))
+            {
+                flint_printf("FAIL: aliasing failed\n");
+                abort();
+            }
         }
 
         d_mat_clear(A);

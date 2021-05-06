@@ -23,7 +23,7 @@ TEMPLATE(T, mat_mul) (TEMPLATE(T, mat_t) C,
         TEMPLATE(T, mat_t) TT;
         TEMPLATE(T, mat_init) (TT, A->r, B->c, ctx);
         TEMPLATE(T, mat_mul) (TT, A, B, ctx);
-        TEMPLATE(T, mat_swap) (TT, C, ctx);
+        TEMPLATE(T, mat_swap_entrywise) (TT, C, ctx);
         TEMPLATE(T, mat_clear) (TT, ctx);
         return;
     }

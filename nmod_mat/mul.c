@@ -74,7 +74,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         nmod_mat_t T;
         nmod_mat_init(T, m, n, A->mod.n);
         nmod_mat_mul(T, A, B);
-        nmod_mat_swap(C, T);
+        nmod_mat_swap_entrywise(C, T);
         nmod_mat_clear(T);
         return;
     }

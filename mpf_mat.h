@@ -44,11 +44,33 @@ mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
    return mat->rows[i] + j;
 }
 
+MPF_MAT_INLINE
+slong mpf_mat_nrows(const mpf_mat_t mat)
+{
+    return mat->r;
+}
+
+MPF_MAT_INLINE
+slong mpf_mat_ncols(const mpf_mat_t mat)
+{
+    return mat->c;
+}
+
 /* Memory management  ********************************************************/
 
 FLINT_DLL void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec);
 
 FLINT_DLL void mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2);
+
+MPF_MAT_INLINE void
+mpf_mat_swap_entrywise(mpf_mat_t mat1, mpf_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < mpf_mat_nrows(mat1); i++)
+        for (j = 0; j < mpf_mat_ncols(mat1); j++)
+            mpf_swap(mpf_mat_entry(mat2, i, j), mpf_mat_entry(mat1, i, j));
+}
 
 FLINT_DLL void mpf_mat_set(mpf_mat_t mat1, const mpf_mat_t mat2);
 

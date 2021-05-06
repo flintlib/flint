@@ -29,7 +29,7 @@ d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
         d_mat_t t;
         d_mat_init(t, A->r, A->c);
         d_mat_qr(t, R, A);
-        d_mat_swap(Q, t);
+        d_mat_swap_entrywise(Q, t);
         d_mat_clear(t);
         return;
     }

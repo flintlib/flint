@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
 
@@ -10,15 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat.h"
+#include "fq_nmod_mat.h"
 
-void
-d_mat_clear(d_mat_t mat)
-{
-    if (mat->entries)
-    {
-        flint_free(mat->entries);   /* Clean up array of entries */
-        flint_free(mat->rows);  /* Clean up row array */
-    } else if (mat->r != 0)
-	flint_free(mat->rows);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_mat_templates/one.c"
+#undef CAP_T
+#undef T
