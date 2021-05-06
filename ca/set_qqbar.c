@@ -162,6 +162,34 @@ ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 
 #endif
 
+ca_field_srcptr ca_ctx_get_cyclotomic_field(ca_ctx_t ctx, ulong n)
+{
+    ca_field_srcptr res;
+    qqbar_t x;
+    qqbar_init(x);
+    qqbar_root_of_unity(x, 1, n);
+    res = ca_ctx_get_field_qqbar(ctx, x);
+    qqbar_clear(x);
+    return res;
+}
+
+static int
+fmpz_discr_3(fmpz_t t, const fmpz_t D)
+{
+    if (fmpz_sgn(D) < 0)
+        return 0;
+
+    if (!fmpz_divisible_si(D, 3))
+        return 0;
+
+    fmpz_divexact_ui(t, D, 3);
+
+    if (!fmpz_is_square(t))
+        return 0;
+
+    return 1;
+}
+
 void
 ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
 {
@@ -178,7 +206,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
     else if (d == 2)
     {
         const fmpz *a, *b, *c;
-        fmpz_t D;
+        fmpz_t D, t;
         fmpz * res_num;
         fmpz * res_den;
 
@@ -189,6 +217,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
         /* x = (-b +/- sqrt(b^2 - 4ac))/(2a) */
 
         fmpz_init(D);
+        fmpz_init(t);
         fmpz_mul(D, a, c);
         fmpz_mul_2exp(D, D, 2);
         fmpz_submul(D, b, b);
@@ -212,6 +241,40 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
             fmpz_mul_2exp(res_den, a, 1);
 
             /* todo: is gcd avoidable? */
+            /* todo: at least use fmpz_gcd3 */
+            fmpz_gcd(D, res_num, res_num + 1);
+            fmpz_gcd(D, D, res_den);
+
+            if (!fmpz_is_one(D))
+            {
+                fmpz_divexact(res_num, res_num, D);
+                fmpz_divexact(res_num + 1, res_num + 1, D);
+                fmpz_divexact(res_den, res_den, D);
+            }
+        }
+        else if (0 && fmpz_discr_3(t, D))  /* Special case for Q(zeta_3) */
+        {
+            ca_field_srcptr K;
+
+            fmpz_sqrt(D, t);
+
+            K = ca_ctx_get_cyclotomic_field(ctx, 3);
+            _ca_make_field_element(res, K, ctx);
+
+            res_num = QNF_ELEM_NUMREF(CA_NF_ELEM(res));
+            res_den = QNF_ELEM_DENREF(CA_NF_ELEM(res));
+
+            if (qqbar_sgn_im(x) < 0)
+            {
+                fmpz_neg(D, D);
+            }
+
+            fmpz_sub(res_num, D, b);
+            fmpz_mul_2exp(res_num + 1, D, 1);
+            fmpz_mul_2exp(res_den, a, 1);
+
+            /* todo: is gcd avoidable? */
+            /* todo: at least use fmpz_gcd3 */
             fmpz_gcd(D, res_num, res_num + 1);
             fmpz_gcd(D, D, res_den);
 
@@ -307,6 +370,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
                 }
             }
 
+            /* todo: use fmpz_gcd3 */
             fmpz_gcd(D, res_num, res_num + 1);
             fmpz_gcd(D, D, res_den);
 
@@ -322,6 +386,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
         }
 
         fmpz_clear(D);
+        fmpz_clear(t);
     }
     else
     {
