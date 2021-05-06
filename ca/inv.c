@@ -71,13 +71,13 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
 }
 
 void
-ca_inv_zero_impossible(ca_t res, const ca_t x, ca_ctx_t ctx)
+ca_inv_no_division_by_zero(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     ca_field_srcptr field;
 
     if (ca_is_zero_check_fast(x, ctx) == T_TRUE)
     {
-        flint_printf("ca_inv_zero_impossible: zero element encountered!\n");
+        flint_printf("ca_inv_no_division_by_zero: zero element encountered!\n");
         flint_abort();
     }
 

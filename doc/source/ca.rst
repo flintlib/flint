@@ -794,6 +794,13 @@ Arithmetic
 
     Sets *res* to the multivariate rational function *f* evaluated at the vector of arguments *x*.
 
+.. function:: void ca_fmpz_mpoly_q_evaluate_no_division_by_zero(ca_t res, const fmpz_mpoly_q_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+              void ca_inv_no_division_by_zero(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    These functions behave like the normal arithmetic functions,
+    but assume (and do not check) that division by zero cannot occur.
+    Division by zero will result in undefined behavior.
+
 
 Powers and roots
 -------------------------------------------------------------------------------

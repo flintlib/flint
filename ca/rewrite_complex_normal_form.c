@@ -427,7 +427,7 @@ ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx)
                 }
             }
 
-            ca_fmpz_mpoly_q_evaluate_zero_impossible(res, CA_MPOLY_Q(x), cext, CA_FIELD_MCTX(K, ctx), ctx);
+            ca_fmpz_mpoly_q_evaluate_no_division_by_zero(res, CA_MPOLY_Q(x), cext, CA_FIELD_MCTX(K, ctx), ctx);
             _ca_vec_clear(cext, nvars, ctx);
             flint_free(used);
         }
