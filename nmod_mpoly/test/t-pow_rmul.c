@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include "nmod_mpoly.h"
 
-
 void nmod_mpoly_pow_naive(nmod_mpoly_t res, nmod_mpoly_t f,
                                                  slong n, nmod_mpoly_ctx_t ctx)
 {
@@ -46,7 +45,7 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pow_ui....");
+    flint_printf("pow_rmul....");
     fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -75,12 +74,7 @@ main(void)
         exp_bits1 = n_randint(state, 20) + 2;
         exp_bits2 = n_randint(state, 20) + 2;
 
-        if (n_is_prime(nmod_mpoly_ctx_modulus(ctx)))
-            pow_bound = 5000/(FLINT_BIT_COUNT(modulus)+1);
-        else
-            pow_bound = 200;
-
-        pow_bound = pow_bound/(len1+1);
+        pow_bound = 250/(len1+1);
         pow_bound = pow_bound/ctx->minfo->nvars;
         pow_bound = FLINT_MAX(pow_bound, UWORD(5));
 
@@ -94,12 +88,7 @@ main(void)
             nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
-            if (!nmod_mpoly_pow_ui(g, f, pow, ctx))
-            {
-                flint_printf("FAIL\n");
-                flint_printf("Check pow_ui success\ni = %wd, j = %wd\n", i, j);
-                flint_abort();
-            }
+            nmod_mpoly_pow_rmul(g, f, pow, ctx);
             nmod_mpoly_assert_canonical(g, ctx);
 
             nmod_mpoly_pow_naive(h, f, pow, ctx);
@@ -112,12 +101,7 @@ main(void)
                 flint_abort();
             }
 
-            if (!nmod_mpoly_pow_ui(f, f, pow, ctx))
-            {
-                flint_printf("FAIL: Check pow_ui success\n");
-                flint_printf("i = %wd, j = %wd\n", i, j);
-                flint_abort();
-            }
+            nmod_mpoly_pow_rmul(f, f, pow, ctx);
             nmod_mpoly_assert_canonical(f, ctx);
 
             if (!nmod_mpoly_equal(g, f, ctx))

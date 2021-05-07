@@ -15,6 +15,7 @@
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
+
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
                                                  slong n, fmpz_mpoly_ctx_t ctx)
 {
@@ -44,14 +45,14 @@ void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
 int
 main(void)
 {
-    slong i, j;
+    slong i, j, tmul = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("pow_fps....");
     fflush(stdout);
 
     /* Check pow_fps against pow_naive */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10*tmul*flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -105,7 +106,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g;
@@ -123,8 +124,8 @@ main(void)
         len = n_randint(state, 10);
         len1 = n_randint(state, 10);
 
-        exp_bits = n_randint(state, 600) + 2;
-        exp_bits1 = n_randint(state, 600) + 10;
+        exp_bits = n_randint(state, 400) + 2;
+        exp_bits1 = n_randint(state, 400) + 10;
 
         coeff_bits = n_randint(state, 200);
 
