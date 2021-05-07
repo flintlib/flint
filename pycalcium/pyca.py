@@ -1287,7 +1287,8 @@ _ca_options = [
     "gb_length_limit",
     "gb_poly_length_limit",
     "gb_poly_bits_limit",
-    "vieta_limit"]
+    "vieta_limit",
+    "trig_form"]
 
 class ca_ctx:
     """
@@ -2072,21 +2073,142 @@ class ca:
         libcalcium.ca_exp(res, self, self._ctx)
         return res
 
-    def xsin(self):
+    def sin(self, form=None):
+        """
+        Sine function.
+
+        Examples::
+
+            >>> sin(0)
+            0
+            >>> sin(pi)
+            0
+            >>> sin(pi/2)
+            1
+            >>> sin(pi/6)
+            0.500000 {1/2}
+            >>> sin(sqrt(2))**2 + cos(sqrt(2))**2
+            1
+            >>> sin(3 + pi) + sin(3)
+            0
+            >>> sin(1, form="exponential")
+            0.841471 - 0e-34*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            >>> sin(1, form="direct")
+            0.841471 {a where a = 0.841471 [Sin(1)]}
+            >>> sin(1, form="tangent")
+            0.841471 {(2*a)/(a^2+1) where a = 0.546302 [Tan(0.500000 {1/2})]}
+            >>> sin(inf)
+            Undefined
+            >>> sin(i * inf)
+            +I * Infinity
+            >>> sin(-i * inf)
+            -I * Infinity
+
+        """
         res = self._new()
-        libcalcium.ca_sin(res, self, self._ctx)
+        if form is None:
+            libcalcium.ca_sin_cos(res, None, self, self._ctx)
+        elif form == "exponential":
+            libcalcium.ca_sin_cos_exponential(res, None, self, self._ctx)
+        elif form == "tangent":
+            libcalcium.ca_sin_cos_tangent(res, None, self, self._ctx)
+        elif form == "direct":
+            libcalcium.ca_sin_cos_direct(res, None, self, self._ctx)
+        else:
+            raise ValueError("unknown form")
         return res
 
-    def xcos(self):
+    def cos(self, form=None):
+        """
+        Cosine function.
+
+        Examples::
+
+            >>> cos(0)
+            1
+            >>> cos(pi)
+            -1
+            >>> cos(pi/2)
+            0
+            >>> cos(pi/3)
+            0.500000 {1/2}
+            >>> cos(pi/6)**2
+            0.750000 {3/4}
+            >>> cos(1)**2 + sin(1)**2
+            1
+            >>> cos(1, form="exponential")
+            0.540302 - 0e-34*I {(a^2+1)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            >>> cos(1, form="direct")
+            0.540302 {a where a = 0.540302 [Cos(1)]}
+            >>> cos(1, form="tangent")
+            0.540302 {(-a^2+1)/(a^2+1) where a = 0.546302 [Tan(0.500000 {1/2})]}
+            >>> cos(i * inf)
+            +Infinity
+            >>> cos(-i * inf)
+            +Infinity
+            >>> cos(inf)
+            Undefined
+
+        """
         res = self._new()
-        libcalcium.ca_cos(res, self, self._ctx)
+        if form is None:
+            libcalcium.ca_sin_cos(None, res, self, self._ctx)
+        elif form == "exponential":
+            libcalcium.ca_sin_cos_exponential(None, res, self, self._ctx)
+        elif form == "tangent":
+            libcalcium.ca_sin_cos_tangent(None, res, self, self._ctx)
+        elif form == "direct":
+            libcalcium.ca_sin_cos_direct(None, res, self, self._ctx)
+        else:
+            raise ValueError("unknown form")
         return res
 
-    def xtan(self):
-        res = self._new()
-        libcalcium.ca_tan(res, self, self._ctx)
-        return res
+    def tan(self, form=None):
+        """
+        Tangent function.
 
+        Examples::
+
+            >>> tan(0)
+            0
+            >>> tan(pi)
+            0
+            >>> tan(pi/2)
+            UnsignedInfinity
+            >>> tan(pi/4)
+            1
+            >>> tan(3*pi/4)
+            -1
+            >>> tan(pi/3)**2
+            3
+            >>> tan(1 + pi) - tan(1)
+            0
+            >>> tan(1, form="direct")
+            1.55741 {a where a = 1.55741 [Tan(1)]}
+            >>> tan(1, form="sine_cosine")
+            1.55741 {(b)/(a) where a = 0.540302 [Cos(1)], b = 0.841471 [Sin(1)]}
+            >>> tan(1, form="exponential")
+            1.55741 + 0e-33*I {(-a^2*b+b)/(a^2+1) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            >>> tan(inf)
+            Undefined
+            >>> tan(i * inf)
+            1.00000*I {a where a = I [a^2+1=0]}
+            >>> tan(-i * inf)
+            -1.00000*I {-a where a = I [a^2+1=0]}
+
+        """
+        res = self._new()
+        if form is None:
+            libcalcium.ca_tan(res, self, self._ctx)
+        elif form == "exponential":
+            libcalcium.ca_tan_exponential(res, self, self._ctx)
+        elif form == "direct":
+            libcalcium.ca_tan_direct(res, self, self._ctx)
+        elif form == "sine_cosine":
+            libcalcium.ca_tan_sine_cosine(res, self, self._ctx)
+        else:
+            raise ValueError("unknown form")
+        return res
 
     def erf(self):
         """
@@ -3553,86 +3675,20 @@ def fac(x):
         x = ca(x)
     return (x+1).gamma()
 
-def xsin(x):
+def cos(x, form=None):
     if type(x) != ca:
         x = ca(x)
-    return x.xsin()
+    return x.cos(form=form)
 
-def xcos(x):
+def sin(x, form=None):
     if type(x) != ca:
         x = ca(x)
-    return x.xcos()
+    return x.sin(form=form)
 
-def xtan(x):
+def tan(x, form=None):
     if type(x) != ca:
         x = ca(x)
-    return x.xtan()
-
-
-def cos(x):
-    """
-    The cosine function is not yet implemented in Calcium.
-    This placeholder function evaluates the cosine function
-    using complex exponentials.
-
-    Examples::
-
-        >>> cos(0)
-        1
-        >>> cos(pi)
-        -1
-        >>> cos(pi/2)
-        0
-        >>> cos(pi/3)
-        0.500000 {1/2}
-        >>> cos(pi/6)**2
-        0.750000 {3/4}
-        >>> cos(1)**2 + sin(1)**2
-        1
-
-    """
-    if type(x) != ca:
-        x = ca(x)
-    ix = x*i
-    y = exp(ix)
-    return (y + 1/y)/2
-
-def sin(x):
-    """
-    The sine function is not yet implemented in Calcium.
-    This placeholder function evaluates the sine function
-    using complex exponentials.
-
-    Examples::
-
-        >>> sin(0)
-        0
-        >>> sin(pi)
-        0
-        >>> sin(pi/2)
-        1
-        >>> sin(pi/6)
-        0.500000 {1/2}
-        >>> sin(sqrt(2))**2 + cos(sqrt(2))**2
-        1
-        >>> sin(3 + pi) + sin(3)
-        0
-
-    """
-    if type(x) != ca:
-        x = ca(x)
-    ix = x*i
-    y = exp(ix)
-    return (y - 1/y)/(2*i)
-
-def tan(x):
-    """
-    The tangent function is not yet implemented in Calcium.
-    This placeholder function evaluates the tangent function
-    using complex exponentials.
-
-    """
-    return sin(x)/cos(x)
+    return x.tan(form=form)
 
 def atan(x):
     """

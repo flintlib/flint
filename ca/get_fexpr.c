@@ -310,6 +310,10 @@ _ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
                 return;
             case CA_Exp: GET_UNARY(FEXPR_Exp)
             case CA_Log: GET_UNARY(FEXPR_Log)
+            case CA_Sin: GET_UNARY(FEXPR_Sin)
+            case CA_Cos: GET_UNARY(FEXPR_Cos)
+            case CA_Tan: GET_UNARY(FEXPR_Tan)
+            case CA_Cot: GET_UNARY(FEXPR_Cot)
             case CA_Sign: GET_UNARY(FEXPR_Sign)
             case CA_Abs: GET_UNARY(FEXPR_Abs)
             case CA_Sqrt: GET_UNARY(FEXPR_Sqrt)

@@ -252,7 +252,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
                 fmpz_divexact(res_den, res_den, D);
             }
         }
-        else if (0 && fmpz_discr_3(t, D))  /* Special case for Q(zeta_3) */
+        else if (fmpz_discr_3(t, D))  /* Special case for Q(zeta_3) */
         {
             ca_field_srcptr K;
 

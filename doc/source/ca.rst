@@ -945,7 +945,7 @@ Complex parts
     real part.
 
 
-Elementary functions
+Exponentials and logarithms
 -------------------------------------------------------------------------------
 
 .. function:: void ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
@@ -1005,6 +1005,94 @@ Elementary functions
 
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\log(x))`.
+
+
+Trigonometric functions
+-------------------------------------------------------------------------------
+
+.. function:: void ca_sin_cos_exponential(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx)
+              void ca_sin_cos_direct(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx)
+              void ca_sin_cos_tangent(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx)
+              void ca_sin_cos(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res1* to the sine of *x* and *res2* to the cosine of *x*.
+    Either *res1* or *res2* can be *NULL* to compute only the other function.
+    Various representations are implemented:
+
+    * The *exponential* version expresses the sine and cosine in terms
+      of complex exponentials. Simple algebraic values will simplify to
+      rational numbers or elements of cyclotomic fields.
+
+    * The *direct* method expresses the sine and cosine in terms of
+      the original functions (perhaps after applying some symmetry
+      transformations, which may interchange sin and cos). Extremely
+      simple algebraic values will automatically simplify to elements
+      of real algebraic number fields.
+
+    * The *tangent* version expresses the sine and cosine in terms
+      of `\tan(x/2)`, perhaps after applying some symmetry
+      transformations. Extremely simple algebraic values will
+      automatically simplify to elements of real algebraic number
+      fields.
+
+    By default, the standard function uses the *exponential*
+    representation as this typically works best for field arithmetic
+    and simplifications, although it has the disadvantage of
+    introducing complex numbers where real numbers would be sufficient.
+    The behavior of the standard function can be changed using the
+    :macro:`CA_OPT_TRIG_FORM` context setting.
+
+    For special values, the following definitions apply:
+
+    * `\sin(\pm i \infty) = \pm i \infty`
+
+    * `\cos(\pm i \infty) = +\infty`
+
+    * All other infinities give `\operatorname{Undefined}`
+
+.. function:: void ca_sin(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_cos(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the sine or cosine of *x*.
+    These functions are shortcuts for :func:`ca_sin_cos`.
+
+.. function:: void ca_tan_sine_cosine(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_tan_exponential(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_tan_direct(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_tan(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the tangent of *x*.
+    The *sine_cosine* version evaluates the tangent as a quotient of
+    a sine and cosine, the *direct* version evaluates it directly
+    as a tangent (possibly after transforming the variable),
+    and the *exponential* version evaluates it in terms of complex
+    exponentials.
+    Simple algebraic values will automatically simplify to elements
+    of trigonometric or cyclotomic number fields.
+
+    By default, the standard function uses the *exponential*
+    representation as this typically works best for field arithmetic
+    and simplifications, although it has the disadvantage of
+    introducing complex numbers where real numbers would be sufficient.
+    The behavior of the standard function can be changed using the
+    :macro:`CA_OPT_TRIG_FORM` context setting.
+
+    For special values, the following definitions apply:
+
+    * At poles, `\tan((n+\tfrac{1}{2}) \pi) = \tilde \infty`.
+
+    * `\tan(e^{i \theta} \infty) = +i, \quad 0 < \theta < \pi`
+
+    * `\tan(e^{i \theta} \infty) = -i, \quad -\pi < \theta < 0`
+
+    * `\tan(\pm \infty) = \tan(\tilde \infty) = \operatorname{Undefined}`
+
+
+.. function:: void ca_cot(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the cotangent *x*. This is equivalent to
+    computing the reciprocal of the tangent.
+
 
 Special functions
 -------------------------------------------------------------------------------
@@ -1271,6 +1359,36 @@ Superficial options (printing) can be changed at any time.
     since the number of terms in Vieta's formulas is `O(2^n)`
     and the resulting Gröbner basis computations can be expensive.
     Default value: 6.
+
+.. macro:: CA_OPT_TRIG_FORM
+
+    Default representation of trigonometric functions.
+    The following values are possible:
+
+    .. macro :: CA_TRIG_DIRECT
+
+        Use the direct functions (with some exceptions).
+
+    .. macro :: CA_TRIG_EXPONENTIAL
+
+        Use complex exponentials.
+
+    .. macro :: CA_TRIG_SINE_COSINE
+
+        Use sines and cosines.
+
+    .. macro :: CA_TRIG_TANGENT
+
+        Use tangents.
+
+    Default value: ``CA_TRIG_EXPONENTIAL``.
+
+    The *exponential* representation is currently used by default
+    as typically works best for field arithmetic
+    and simplifications, although it has the disadvantage of
+    introducing complex numbers where real numbers would be sufficient.
+    This may change in the future.
+
 
 
 Internal representation

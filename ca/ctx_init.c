@@ -35,9 +35,7 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->options[CA_OPT_VIETA_LIMIT] = 6;
     ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_DEFAULT;
     ctx->options[CA_OPT_MPOLY_ORD] = ORD_LEX;
-    ctx->options[CA_OPT_ELEMENTARY_FORM] = CA_ELEMENTARY_EXPONENTIAL;
-    ctx->options[CA_OPT_ELEMENTARY_LINK_HACK] = 1;
-    ctx->options[CA_OPT_ELEMENTARY_ATOMIZE] = CA_ATOMIZE_SOME;
+    ctx->options[CA_OPT_TRIG_FORM] = CA_TRIG_EXPONENTIAL;
 
     ctx->mctx = NULL;
     ctx->mctx_len = 0;

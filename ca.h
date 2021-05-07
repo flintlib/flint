@@ -219,20 +219,14 @@ enum
     CA_OPT_GROEBNER_POLY_LENGTH_LIMIT,
     CA_OPT_GROEBNER_POLY_BITS_LIMIT,
     CA_OPT_VIETA_LIMIT,
-    CA_OPT_ELEMENTARY_FORM,
-    CA_OPT_ELEMENTARY_LINK_HACK,
-    CA_OPT_ELEMENTARY_ATOMIZE,
+    CA_OPT_TRIG_FORM,
     CA_OPT_NUM_OPTIONS
 };
 
-#define CA_ELEMENTARY_ORIGINAL 0
-#define CA_ELEMENTARY_EXPONENTIAL 1
-#define CA_ELEMENTARY_REAL 2
-#define CA_ELEMENTARY_REAL_TAN 3
-
-#define CA_ATOMIZE_MIN 0
-#define CA_ATOMIZE_SOME 1
-#define CA_ATOMIZE_MAX 2
+#define CA_TRIG_DIRECT       0
+#define CA_TRIG_EXPONENTIAL  1
+#define CA_TRIG_SINE_COSINE  2
+#define CA_TRIG_TANGENT      3
 
 typedef struct
 {
@@ -517,6 +511,21 @@ void ca_ceil(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_log(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+void ca_sin_cos_exponential(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx);
+void ca_sin_cos_direct_exp_hack(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx);
+void ca_sin_cos_direct(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx);
+void ca_sin_cos_tangent(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx);
+void ca_sin_cos(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx);
+void ca_sin(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_cos(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+void ca_tan_sine_cosine(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_tan_exponential(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_tan_direct(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_tan(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+void ca_cot(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 /* Special functions */
 

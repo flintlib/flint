@@ -84,39 +84,6 @@ ca_atan_logarithmic(ca_t res, const ca_t x, ca_ctx_t ctx)
     arb_clear(minus_one);
 }
 
-void
-ca_sin_cos_exponential(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx)
-{
-    ca_t ix, y, t;
-
-    ca_init(ix, ctx);
-    ca_init(y, ctx);
-    ca_init(t, ctx);
-
-    ca_i(ix, ctx);
-    ca_mul(ix, x, ix, ctx);
-    ca_exp(y, ix, ctx);
-    ca_inv(t, y, ctx);
-
-    if (res2 != NULL)
-    {
-        ca_add(res2, y, t, ctx);
-        ca_div_ui(res2, res2, 2, ctx);
-    }
-
-    if (res1 != NULL)
-    {
-        ca_sub(res1, y, t, ctx);
-        ca_div_ui(res1, res1, 2, ctx);
-        ca_neg_i(t, ctx);
-        ca_mul(res1, res1, t, ctx);
-    }
-
-    ca_clear(ix, ctx);
-    ca_clear(y, ctx);
-    ca_clear(t, ctx);
-}
-
 /* todo: Re, Im, Abs, Sgn ... */
 
 void
