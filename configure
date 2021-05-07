@@ -54,10 +54,11 @@ FLINT_SOLIB=0
 # 2.6.2 => 14.0.2
 # 2.6.3 => 14.0.3
 # 2.7.0 => 15.0.0
-# 2.7.1 =? 15.0.1
+# 2.7.1 => 15.0.1
+# 2.8.0 => 16.1.0
 
-FLINT_MAJOR=15
-FLINT_MINOR=0
+FLINT_MAJOR=16
+FLINT_MINOR=1
 FLINT_PATCH=0
 
 usage()
