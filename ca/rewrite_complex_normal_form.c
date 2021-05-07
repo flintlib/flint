@@ -21,69 +21,6 @@ void ca_set_ext(ca_t res, ca_ext_srcptr ext, ca_ctx_t ctx);
 /* todo */
 ulong qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x);
 
-void
-ca_atan_logarithmic(ca_t res, const ca_t x, ca_ctx_t ctx)
-{
-    ca_t t, u, v;
-    acb_t z;
-    arb_t one, minus_one;
-
-    acb_init(z);
-    arb_init(one);
-    arb_init(minus_one);
-
-    ca_init(t, ctx);
-    ca_init(u, ctx);
-    ca_init(v, ctx);
-
-    ca_i(t, ctx);
-    ca_mul(u, x, t, ctx);
-    /* v = 1 + i x */
-    ca_add_ui(v, u, 1, ctx);
-    /* res = 1 - i x */
-    ca_sub_ui(res, u, 1, ctx);
-    ca_neg(res, res, ctx);
-
-    ca_get_acb(z, x, ctx->options[CA_OPT_LOW_PREC], ctx);
-    arb_set_si(one, 1);
-    arb_set_si(minus_one, -1);
-
-    if (arb_lt(acb_imagref(z), one))
-    {
-        /* atan(x) = i/2 log((1-ix)/(1+ix)) */
-        ca_div(res, res, v, ctx);
-        ca_log(res, res, ctx);
-        ca_mul(res, res, t, ctx);
-        ca_div_ui(res, res, 2, ctx);
-    }
-    else if (arb_gt(acb_imagref(z), minus_one))
-    {
-        /* atan(x) = -i/2 log((1+ix)/(1-ix)) */
-        ca_div(res, v, res, ctx);
-        ca_log(res, res, ctx);
-        ca_mul(res, res, t, ctx);
-        ca_div_ui(res, res, 2, ctx);
-        ca_neg(res, res, ctx);
-    }
-    else
-    {
-        /* atan(x) = i/2 (log(1-ix) - log(1+ix)) */
-        ca_log(res, res, ctx);
-        ca_log(v, v, ctx);
-        ca_sub(res, res, v, ctx);
-        ca_mul(res, res, t, ctx);
-        ca_div_ui(res, res, 2, ctx);
-    }
-
-    ca_clear(t, ctx);
-    ca_clear(u, ctx);
-    ca_clear(v, ctx);
-
-    acb_clear(z);
-    arb_clear(one);
-    arb_clear(minus_one);
-}
-
 /* todo: Re, Im, Abs, Sgn ... */
 
 void
@@ -263,7 +200,7 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
                     ca_rewrite_complex_normal_form(t, CA_EXT_FUNC_ARGS(ext), deep, ctx);
                 else
                     ca_set(t, CA_EXT_FUNC_ARGS(ext), ctx);
-                ca_atan_logarithmic(res, t, ctx);
+                ca_atan_logarithm(res, t, ctx);
                 ca_clear(t, ctx);
             }
             break;

@@ -1079,7 +1079,7 @@ Trigonometric functions
 
     For special values, the following definitions apply:
 
-    * At poles, `\tan((n+\tfrac{1}{2}) \pi) = \tilde \infty`.
+    * At poles, `\tan((n+\tfrac{1}{2}) \pi) = \tilde \infty`
 
     * `\tan(e^{i \theta} \infty) = +i, \quad 0 < \theta < \pi`
 
@@ -1092,6 +1092,35 @@ Trigonometric functions
 
     Sets *res* to the cotangent *x*. This is equivalent to
     computing the reciprocal of the tangent.
+
+.. function:: void ca_atan_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_atan_direct(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_atan(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the inverse tangent of *x*.
+
+    The *direct* version expresses the result as an inverse tangent
+    (possibly after transforming the variable). The *logarithm*
+    version expresses it in terms of complex logarithms.
+    Simple algebraic inputs will automatically simplify to
+    rational multiples of `\pi`.
+
+    By default, the standard function uses the *logarithm*
+    representation as this typically works best for field arithmetic
+    and simplifications, although it has the disadvantage of
+    introducing complex numbers where real numbers would be sufficient.
+    The behavior of the standard function can be changed using the
+    :macro:`CA_OPT_TRIG_FORM` context setting (exponential mode
+    results in logarithmic forms).
+
+    For special values, the following definitions apply:
+
+    * `\operatorname{atan}(\pm i) = \pm i \infty`
+
+    * `\operatorname{atan}(c \infty) = \operatorname{csgn}(c) \pi / 2`
+
+    * `\operatorname{atan}(\tilde \infty) = \operatorname{Undefined}`
+
 
 
 Special functions

@@ -527,6 +527,10 @@ void ca_tan(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_cot(ca_t res, const ca_t x, ca_ctx_t ctx);
 
+void ca_atan_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_atan_direct(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_atan(ca_t res, const ca_t x, ca_ctx_t ctx);
+
 /* Special functions */
 
 void ca_erf(ca_t res, const ca_t x, ca_ctx_t ctx);

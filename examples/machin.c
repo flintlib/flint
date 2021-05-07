@@ -3,44 +3,12 @@
 #include "flint/profiler.h"
 #include "ca.h"
 
-/* atan(x) = -i/2 log((1+ix)/(1-ix)) */
-/* valid for -inf < x < inf */
-void
-simple_ca_atan(ca_t res, const ca_t x, ca_ctx_t ctx)
-{
-    ca_t t, u, v;
-
-    ca_init(t, ctx);
-    ca_init(u, ctx);
-    ca_init(v, ctx);
-
-    ca_i(t, ctx);
-    ca_mul(u, x, t, ctx);
-    /* v = 1 + i x */
-    ca_add_ui(v, u, 1, ctx);
-    /* res = 1 - i x */
-    ca_sub_ui(res, u, 1, ctx);
-    ca_neg(res, res, ctx);
-
-    ca_div(res, v, res, ctx);
-    ca_log(res, res, ctx);
-
-    ca_mul(res, res, t, ctx);
-
-    ca_div_ui(res, res, 2, ctx);
-    ca_neg(res, res, ctx);
-
-    ca_clear(t, ctx);
-    ca_clear(u, ctx);
-    ca_clear(v, ctx);
-}
-
 void
 simple_ca_atan_p_q(ca_t res, ulong p, ulong q, ca_ctx_t ctx)
 {
     ca_set_ui(res, p, ctx);
     ca_div_ui(res, res, q, ctx);
-    simple_ca_atan(res, res, ctx);
+    ca_atan(res, res, ctx);
 }
 
 /* valid for -1 < x < 1 */

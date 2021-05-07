@@ -2210,6 +2210,46 @@ class ca:
             raise ValueError("unknown form")
         return res
 
+    def atan(self, form=None):
+        """
+        Inverse tangent function.
+
+        Examples::
+
+            >>> atan(0)
+            0
+            >>> atan(1)
+            0.785398 {(a)/4 where a = 3.14159 [Pi]}
+            >>> atan(1-sqrt(2))
+            -0.392699 {(-a)/8 where a = 3.14159 [Pi]}
+            >>> atan(inf)
+            1.57080 {(a)/2 where a = 3.14159 [Pi]}
+            >>> atan(-inf)
+            -1.57080 {(-a)/2 where a = 3.14159 [Pi]}
+            >>> atan(i*inf)
+            1.57080 {(a)/2 where a = 3.14159 [Pi]}
+            >>> atan(-i*inf)
+            -1.57080 {(-a)/2 where a = 3.14159 [Pi]}
+            >>> atan((1+i)*inf)
+            1.57080 {(a)/2 where a = 3.14159 [Pi]}
+            >>> atan(tan(23*pi/27)) == -4*pi/27
+            True
+            >>> atan(2, form="direct")
+            1.10715 {a where a = 1.10715 [Atan(2)]}
+            >>> atan(2, form="logarithm")
+            1.10715 - 0e-35*I {(a*b)/2 where a = 0e-34 - 2.21430*I [Log(-0.600000 - 0.800000*I {(-4*b-3)/5})], b = I [b^2+1=0]}
+
+        """
+        res = self._new()
+        if form is None:
+            libcalcium.ca_atan(res, self, self._ctx)
+        elif form == "exponential" or form == "logarithm":
+            libcalcium.ca_atan_logarithm(res, self, self._ctx)
+        else:
+            libcalcium.ca_atan_direct(res, self, self._ctx)
+        return res
+
+
     def erf(self):
         """
         Error function.
@@ -3690,21 +3730,10 @@ def tan(x, form=None):
         x = ca(x)
     return x.tan(form=form)
 
-def atan(x):
-    """
-    The inverse tangent function is not yet implemented in Calcium.
-    This placeholder function evaluates the inverse tangent function
-    using complex logarithms.
-
-    Examples::
-
-        >>> atan(0)
-        0
-        >>> 4 * atan(1) == pi
-        True
-
-    """
-    return (-i/2)*log((i-x)/(i+x))
+def atan(x, form=None):
+    if type(x) != ca:
+        x = ca(x)
+    return x.atan(form=form)
 
 def cosh(x):
     """
