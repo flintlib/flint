@@ -15,43 +15,43 @@
 #include "fmpz_mod_mpoly.h"
 
 /*
-Dense algorithm for the k^th power:
+Dense algorithm (reference) for the k^th power:
 
 f = f[0] + f[1]*x + ... + f[d]*x^d
 g = f^k
   = g[0] + g[1]*x + ... + g[k*d]*x^(k*d)
 
-where i*g[i]*f[0] = sum_{0 <= j <= min(i,d)} ((k+1)*j-i)*f[j]*g[i-j]
+where i*g[i]*f[0] = sum_{0 <= j <= min(i, d)} ((k + 1)*j - i)*f[j]*g[i - j]
 
 g_[k*d] = f[d]^k
-for i from k*d-1 to 0
+for i from k*d - 1 to 0
     c = 0
     for j from 1 to min(d,k*d-i)
-        c += (i+j-(d-j)*k)*g[i+j]*f[d-j]
+        c += (i + j - k*(d - j))*g[i + j]*f[d - j]
     end
-    g[i] = c/((k*d-i)*f[d])
+    g[i] = c/((k*d - i)*f[d])
 end
 
 
-Dense algorithm for the k^th power and (k-1)^st power:
+Dense algorithm (used here) for the k^th power and (k - 1)^st power:
 
 g comes out as f^(k-1)
 a comes out as f^k
 
-g[(k-1)*d] = f[d]^(k-1)
+g[(k - 1)*d] = f[d]^(k-1)
 a[k*d] = f[d]^k
-for i from k*d-1 to 0
+for i from k*d - 1 to 0
     s = c = 0
-    for k from max(0, d+i-d*k) to min(d-1, i)
-        s += g[i-j]*f[j]
+    for k from max(0, d + i - d*k) to min(d - 1, i)
+        s += g[i - j]*f[j]
         if i >= d
-            c += (i-k*j)*g[i-j]*f[j]
+            c += (i - k*j)*g[i - j]*f[j]
         end
     end
-    c = c/((d*k-i)*f[d])
+    c = c/((d*k - i)*f[d])
     s += c*f[d]
     if i >= d
-        g[i-d] = c
+        g[i - d] = c
     end
     a[i] = s
 end
@@ -62,7 +62,7 @@ is implemented as _divisibility_ of monomials and not merely a comparison.
 
 static slong _fmpz_mpoly_pow_fps1(
     fmpz_mpoly_t A,
-    const fmpz * fcoeffs, const ulong * fexps, slong Flen,
+    const fmpz * Fcoeffs, const ulong * Fexps, slong Flen,
     ulong k,
     ulong cmpmask,
     ulong ofmask)
@@ -106,10 +106,10 @@ static slong _fmpz_mpoly_pow_fps1(
     Gexps = FLINT_ARRAY_ALLOC(Galloc, ulong);
     Gcoeffs = (fmpz *) flint_calloc(Galloc, sizeof(fmpz));
 
-    Gexps[0] = fexps[0]*(k - 1);
-    Aexps[0] = fexps[0]*k;
-    fmpz_pow_ui(Gcoeffs + 0, fcoeffs + 0, k - 1);
-    fmpz_mul(Acoeffs + 0, Gcoeffs + 0, fcoeffs + 0);
+    Gexps[0] = Fexps[0]*(k - 1);
+    Aexps[0] = Fexps[0]*k;
+    fmpz_pow_ui(Gcoeffs + 0, Fcoeffs + 0, k - 1);
+    fmpz_mul(Acoeffs + 0, Gcoeffs + 0, Fcoeffs + 0);
     Glen = 1;
     Alen = 1;
 
@@ -118,7 +118,7 @@ static slong _fmpz_mpoly_pow_fps1(
     x->j = 0;
     x->next = NULL;
     hind[1] = 2*1 + 0;
-    HEAP_ASSIGN(heap[1], fexps[1] + Gexps[0], x);
+    HEAP_ASSIGN(heap[1], Fexps[1] + Gexps[0], x);
 
     while (heap_len > 1)
     {
@@ -131,7 +131,7 @@ static slong _fmpz_mpoly_pow_fps1(
         fmpz_zero(S);
         Qlen = 0;
 
-        Gexps[Glen] = exp - fexps[0];
+        Gexps[Glen] = exp - Fexps[0];
 
         divides = !mpoly_monomial_overflows1(Gexps[Glen], ofmask);
 
@@ -145,11 +145,11 @@ static slong _fmpz_mpoly_pow_fps1(
                 Q[Qlen++] = j = x->j;
                 hind[i] |= 1;
 
-                fi = fcoeffs[i];
+                fi = Fcoeffs[i];
 
                 FLINT_ASSERT(j >= Gdemote);
 
-                dd = (k - 1)*fexps[i] - Gexps[j];
+                dd = (k - 1)*Fexps[i] - Gexps[j];
 
                 if (divides)
                 {
@@ -160,14 +160,14 @@ static slong _fmpz_mpoly_pow_fps1(
                     }
                     else
                     {
-                        fmpz_mul(t1, fcoeffs + i, Gcoeffs + j);
+                        fmpz_mul(t1, Fcoeffs + i, Gcoeffs + j);
                         fmpz_add(S, S, t1);
                         fmpz_addmul_si(C, t1, dd);
                     }
                 }
                 else
                 {
-                    fmpz_addmul(S, fcoeffs + x->i, Gcoeffs + x->j);
+                    fmpz_addmul(S, Fcoeffs + x->i, Gcoeffs + x->j);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
@@ -191,7 +191,7 @@ static slong _fmpz_mpoly_pow_fps1(
                 hind[x->i] = 2*j + 2;
 
                 FLINT_ASSERT(j >= Gdemote);
-                _mpoly_heap_insert1(heap, fexps[i + 1] + Gexps[j], x,
+                _mpoly_heap_insert1(heap, Fexps[i + 1] + Gexps[j], x,
                                                 &next_loc, &heap_len, cmpmask);
             }
 
@@ -206,7 +206,7 @@ static slong _fmpz_mpoly_pow_fps1(
                 hind[x->i] = 2*j + 4;
 
                 FLINT_ASSERT(j + 1 >= Gdemote);
-                _mpoly_heap_insert1(heap, fexps[i] + Gexps[j + 1], x,
+                _mpoly_heap_insert1(heap, Fexps[i] + Gexps[j + 1], x,
                                                 &next_loc, &heap_len, cmpmask);
             }
         }
@@ -218,16 +218,16 @@ static slong _fmpz_mpoly_pow_fps1(
 
         if (!fmpz_is_zero(C))
         {
-            if (fmpz_is_one(fcoeffs + 0))
+            if (fmpz_is_one(Fcoeffs + 0))
             {
-                fmpz_divexact_si(C, C, exp - k*fexps[0]);
+                fmpz_divexact_si(C, C, exp - k*Fexps[0]);
                 fmpz_add(S, S, C);
             }
             else
             {
-                fmpz_divexact_si(temp1, C, exp - k*fexps[0]);
+                fmpz_divexact_si(temp1, C, exp - k*Fexps[0]);
                 fmpz_add(S, S, temp1);
-                fmpz_divexact(C, temp1, fcoeffs + 0);
+                fmpz_divexact(C, temp1, Fcoeffs + 0);
             }
 
             if ((hind[1] & 1) != 0)
@@ -240,7 +240,7 @@ static slong _fmpz_mpoly_pow_fps1(
                 hind[x->i] = 2*(Glen + 1) + 0;
 
                 FLINT_ASSERT(Glen >= Gdemote);
-                _mpoly_heap_insert1(heap, fexps[1] + Gexps[Glen], x,
+                _mpoly_heap_insert1(heap, Fexps[1] + Gexps[Glen], x,
                                                 &next_loc, &heap_len, cmpmask);
             }
 
