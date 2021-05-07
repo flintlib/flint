@@ -78,11 +78,11 @@ int main(void)
 
         if (bits <= FLINT_BITS - 2)
         {
-            _fmpz_mat_mul_1(C, A, B);
+            _fmpz_mat_mul_small_1(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
-                flint_printf("FAIL: results not equal (mul_1)\n\n");
+                flint_printf("FAIL: results not equal (mul_small_1)\n\n");
                 fmpz_mat_print(A); flint_printf("\n\n");
                 fmpz_mat_print(B); flint_printf("\n\n");
                 fmpz_mat_print(C); flint_printf("\n\n");
@@ -93,11 +93,11 @@ int main(void)
 
         if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2 && bits <= 2 * FLINT_BITS - 1)
         {
-            _fmpz_mat_mul_2a(C, A, B);
+            _fmpz_mat_mul_small_2a(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
-                flint_printf("FAIL: results not equal (mul_2a)\n\n");
+                flint_printf("FAIL: results not equal (mul_small_2a)\n\n");
                 fmpz_mat_print(A); flint_printf("\n\n");
                 fmpz_mat_print(B); flint_printf("\n\n");
                 fmpz_mat_print(C); flint_printf("\n\n");
@@ -108,11 +108,11 @@ int main(void)
 
         if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
         {
-            _fmpz_mat_mul_2b(C, A, B);
+            _fmpz_mat_mul_small_2b(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
-                flint_printf("FAIL: results not equal (mul_2b)\n\n");
+                flint_printf("FAIL: results not equal (mul_small_2b)\n\n");
                 fmpz_mat_print(A); flint_printf("\n\n");
                 fmpz_mat_print(B); flint_printf("\n\n");
                 fmpz_mat_print(C); flint_printf("\n\n");
@@ -123,11 +123,11 @@ int main(void)
 
         if (abits < 2 * FLINT_BITS && bbits < 2 * FLINT_BITS)
         {
-            _fmpz_mat_mul_4(C, A, B);
+            _fmpz_mat_mul_double_word(C, A, B);
 
             if (!fmpz_mat_equal(C, D))
             {
-                flint_printf("FAIL: results not equal (mul_4)\n\n");
+                flint_printf("FAIL: results not equal (mul_double_word)\n\n");
                 fmpz_mat_print(A); flint_printf("\n\n");
                 fmpz_mat_print(B); flint_printf("\n\n");
                 fmpz_mat_print(C); flint_printf("\n\n");

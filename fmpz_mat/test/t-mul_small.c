@@ -55,7 +55,7 @@ int main(void)
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
         fmpz_mat_randtest(D, state, n_randint(state, 200) + 1);
 
-        fmpz_mat_mul_small(C, A, B);
+        _fmpz_mat_mul_small(C, A, B);
         fmpz_mat_mul_classical_inline(D, A, B);
 
         if (!fmpz_mat_equal(C, D))

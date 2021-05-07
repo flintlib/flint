@@ -32,6 +32,7 @@ typedef struct {
     const fmpz_comb_struct * comb;
     slong num_primes;
     mp_ptr primes;
+    int sign;
 } _worker_arg;
 
 
@@ -111,6 +112,9 @@ static void _crt_worker(void * varg)
     mp_limb_t * primes = arg->primes;
     slong num_primes = arg->num_primes;
     const fmpz_comb_struct * comb = arg->comb;
+    int sign = arg->sign;
+
+    FLINT_ASSERT(sign == 0 || sign == 1);
 
     if (comb != NULL)
     {
@@ -126,7 +130,7 @@ static void _crt_worker(void * varg)
             for (l = 0; l < num_primes; l++)
                 residues[l] = mod_C[l]->rows[i][j];
 
-            fmpz_multi_CRT_ui(&Crows[i][j], residues, comb, comb_temp, 1);
+            fmpz_multi_CRT_ui(&Crows[i][j], residues, comb, comb_temp, sign);
         }
 
         flint_free(residues);
@@ -136,15 +140,27 @@ static void _crt_worker(void * varg)
     {
         mp_limb_t r, t, p = primes[0];
 
-        for (i = Cstartrow; i < Cstoprow; i++)
-        for (j = 0; j < n; j++)
+        if (sign)
         {
-            r = nmod_mat_entry(mod_C[0], i, j);
-            t = p - r;
-            if (t < r)
-                fmpz_neg_ui(&Crows[i][j], t);
-            else
+            for (i = Cstartrow; i < Cstoprow; i++)
+            for (j = 0; j < n; j++)
+            {
+                r = nmod_mat_entry(mod_C[0], i, j);
+                t = p - r;
+                if (t < r)
+                    fmpz_neg_ui(&Crows[i][j], t);
+                else
+                    fmpz_set_ui(&Crows[i][j], r);
+            }
+        }
+        else
+        {
+            for (i = Cstartrow; i < Cstoprow; i++)
+            for (j = 0; j < n; j++)
+            {
+                r = nmod_mat_entry(mod_C[0], i, j);
                 fmpz_set_ui(&Crows[i][j], r);
+            }
         }
     }
     else if (num_primes == 2)
@@ -180,11 +196,18 @@ static void _crt_worker(void * varg)
 
             FLINT_ASSERT(t[1] < M[1] || (t[1] == M[1] && t[0] < M[0]));
 
-            sub_ddmmss(u[1], u[0], M[1], M[0], t[1], t[0]);
-            if (u[1] < t[1] || (u[1] == t[1] && u[0] < t[0]))
-                fmpz_neg_uiui(&Crows[i][j], u[1], u[0]);
+            if (sign)
+            {
+                sub_ddmmss(u[1], u[0], M[1], M[0], t[1], t[0]);
+                if (u[1] < t[1] || (u[1] == t[1] && u[0] < t[0]))
+                    fmpz_neg_uiui(&Crows[i][j], u[1], u[0]);
+                else
+                    fmpz_set_uiui(&Crows[i][j], t[1], t[0]);
+            }
             else
+            {
                 fmpz_set_uiui(&Crows[i][j], t[1], t[0]);
+            }
         }
     }
     else
@@ -238,9 +261,8 @@ static void _crt_worker(void * varg)
             }
 
             mpn_tdiv_qr(U, T, 0, T, Nsize, M, Msize);
-            mpn_sub_n(U, M, T, Msize);
 
-            if (mpn_cmp(U, T, Msize) < 0)
+            if (sign && (mpn_sub_n(U, M, T, Msize), mpn_cmp(U, T, Msize) < 0))
             {
                 fmpz_set_ui_array(&Crows[i][j], U, Msize);
                 fmpz_neg(&Crows[i][j], &Crows[i][j]);
@@ -263,6 +285,7 @@ void _fmpz_mat_mul_multi_mod(
     fmpz_mat_t C,
     const fmpz_mat_t A,
     const fmpz_mat_t B,
+    int sign,
     flint_bitcnt_t bits)
 {
     slong i, start, stop;
@@ -274,6 +297,7 @@ void _fmpz_mat_mul_multi_mod(
     slong num_workers;
     thread_pool_handle * handles;
     slong limit;
+    ulong first_prime; /* not prime */
 
     mainarg.m = m = A->r;
     mainarg.k = k = A->c;
@@ -288,25 +312,34 @@ void _fmpz_mat_mul_multi_mod(
         return;
     }
 
+    FLINT_ASSERT(sign == 0 || sign == 1);
+    bits += sign;
+
     /* TUNING */
     primes_bits = NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
-    if (bits < primes_bits)
+    if (bits < primes_bits || bits <= FLINT_BITS - 1)
     {
-        primes_bits = bits;
         mainarg.num_primes = 1;
+        first_prime = UWORD(1) << bits;
     }
     else
     {
         /* Round up in the division */
-        mainarg.num_primes = (bits + primes_bits - 1) / primes_bits;
+        mainarg.num_primes = 1 + (bits - (FLINT_BITS - 1) + primes_bits - 1)/primes_bits;
+        first_prime = UWORD(1) << (FLINT_BITS - 1);
     }
 
     /* Initialize */
+    mainarg.sign = sign;
     mainarg.primes = FLINT_ARRAY_ALLOC(mainarg.num_primes, mp_limb_t);
-    mainarg.primes[0] = n_nextprime(UWORD(1) << primes_bits, 0);
-    for (i = 1; i < mainarg.num_primes; i++)
-        mainarg.primes[i] = n_nextprime(mainarg.primes[i-1], 0);
+    mainarg.primes[0] = first_prime;
+    if (mainarg.num_primes > 1)
+    {
+        mainarg.primes[1] = n_nextprime(UWORD(1) << primes_bits, 0);
+        for (i = 2; i < mainarg.num_primes; i++)
+            mainarg.primes[i] = n_nextprime(mainarg.primes[i-1], 0);
+    }
 
     mainarg.mod_A = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
     mainarg.mod_B = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
@@ -446,14 +479,27 @@ crt_single:
 void
 fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    slong Abits;
-    slong Bbits;
+    slong Abits, Bbits;
+    int sign = 0;
     flint_bitcnt_t Cbits;
 
     Abits = fmpz_mat_max_bits(A);
     Bbits = fmpz_mat_max_bits(B);
-    Cbits = FLINT_ABS(Abits) + FLINT_ABS(Bbits) + FLINT_BIT_COUNT(A->c) + 1;
 
-    _fmpz_mat_mul_multi_mod(C, A, B, Cbits);
+    if (Abits < 0)
+    {
+        sign = 1;
+        Abits = -Abits;
+    }
+
+    if (Bbits < 0)
+    {
+        sign = 1;
+        Bbits = -Bbits;
+    }
+
+    Cbits = Abits + Bbits + FLINT_BIT_COUNT(A->c);
+
+    _fmpz_mat_mul_multi_mod(C, A, B, sign, Cbits);
 }
 

@@ -412,7 +412,7 @@ static void _mul_worker(void * varg)
 
     bits + sign <= 5*FLINT_BITS
 */
-FLINT_DLL void _fmpz_mat_mul_22(
+FLINT_DLL void _fmpz_mat_mul_double_word_internal(
     fmpz_mat_t C,
     const fmpz_mat_t A,
     const fmpz_mat_t B,
@@ -517,13 +517,14 @@ use_one_thread:
     return;
 }
 
-FLINT_DLL void _fmpz_mat_mul_4(
+void _fmpz_mat_mul_double_word(
     fmpz_mat_t C,
     const fmpz_mat_t A,
     const fmpz_mat_t B)
 {
     int sign = 0;
     slong Abits, Bbits;
+    flint_bitcnt_t Cbits;
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
     {
@@ -549,6 +550,8 @@ FLINT_DLL void _fmpz_mat_mul_4(
     FLINT_ASSERT(Abits + sign <= 2*FLINT_BITS);
     FLINT_ASSERT(Bbits + sign <= 2*FLINT_BITS);
 
-    _fmpz_mat_mul_22(C, A, B, sign, FLINT_BIT_COUNT(A->c) + Abits + Bbits);
+    Cbits = FLINT_BIT_COUNT(A->c) + Abits + Bbits;
+
+    _fmpz_mat_mul_double_word_internal(C, A, B, sign, Cbits);
 }
 

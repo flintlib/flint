@@ -27,7 +27,7 @@ int main(void)
     flint_printf("mul_blas....");
     fflush(stdout);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         slong m, n, k;
         fmpz_mat_t A, B, C, D;
@@ -79,7 +79,7 @@ int main(void)
         fmpz_mat_clear(D);
     }
 
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         slong m, n, k;
         fmpz_mat_t A, B, C, D;

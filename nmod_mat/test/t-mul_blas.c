@@ -42,7 +42,7 @@ main(void)
     flint_printf("mul_blas....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
         mp_limb_t modulus;
@@ -86,25 +86,24 @@ main(void)
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-        if (!nmod_mat_mul_blas(C, A, B))
+        if (nmod_mat_mul_blas(C, A, B))
         {
+            nmod_mat_mul_classical(D, A, B);
+
+            if (!nmod_mat_equal(C, D))
+            {
+                flint_printf("FAIL: results not equal\n");
+                flint_printf("m: %wd, k: %wd, n: %wd, mod: %wu\n", m, k, n, modulus);
+                flint_abort();
+            }
+        }
 #if FLINT_USES_BLAS && FLINT_BITS == 64
+        else
+        {
             flint_printf("FAIL: blas should have worked\n");
             flint_abort();
+        }
 #endif
-            goto cleanup_and_continue;
-        }
-
-        nmod_mat_mul_classical(D, A, B);
-
-        if (!nmod_mat_equal(C, D))
-        {
-            flint_printf("FAIL: results not equal\n");
-            flint_printf("m: %wd, k: %wd, n: %wd, mod: %wu\n", m, k, n, modulus);
-            flint_abort();
-        }
-
-cleanup_and_continue:
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

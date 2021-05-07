@@ -304,7 +304,7 @@ static void _mul_worker(void * varg)
 }
 
 
-void _fmpz_mat_mul_small(
+void _fmpz_mat_mul_small_internal(
     fmpz_mat_t C,
     const fmpz_mat_t A,
     const fmpz_mat_t B,
@@ -434,10 +434,7 @@ use_one_thread:
     TMP_END;
 }
 
-void fmpz_mat_mul_small(
-    fmpz_mat_t C,
-    const fmpz_mat_t A,
-    const fmpz_mat_t B)
+void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong Abits, Bbits;
     flint_bitcnt_t Cbits;
@@ -455,6 +452,6 @@ void fmpz_mat_mul_small(
 
     Cbits = Abits + Bbits + FLINT_BIT_COUNT(A->c);
 
-    _fmpz_mat_mul_small(C, A, B, Cbits);
+    _fmpz_mat_mul_small_internal(C, A, B, Cbits);
 }
 

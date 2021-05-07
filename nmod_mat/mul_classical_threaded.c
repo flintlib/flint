@@ -438,6 +438,9 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
     }
     else
     {
+        if ((mod.n & (mod.n - 1)) == 0)
+            nlimbs = 1;
+
         _nmod_mat_addmul_transpose_threaded_pool_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs, threads, num_threads);
     }

@@ -41,7 +41,7 @@ int main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("mul_4....");
+    flint_printf("mul_double_word....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -97,7 +97,7 @@ int main(void)
 
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
 
-        fmpz_mat_mul(C, A, B);
+        _fmpz_mat_mul_double_word(C, A, B);
         fmpz_mat_mul_classical_inline(D, A, B);
 
         if (!fmpz_mat_equal(C, D))
