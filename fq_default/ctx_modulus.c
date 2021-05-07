@@ -30,7 +30,7 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
    } else
    {
       fmpz_mod_poly_struct const * modulus = fq_ctx_modulus(ctx->ctx.fq);
-      slong i, len = modulus->length;
+      slong len = modulus->length;
 
       /* fit_length */
       if (p->alloc < len)
