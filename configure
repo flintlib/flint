@@ -421,7 +421,6 @@ if [ -z "$CALCIUM_LIB" ]; then
 	 EXTRA_SHARED_FLAGS="-Wl,-soname,libcalcium.so.$CALCIUM_MAJOR"
 	 CALCIUM_SOLIB=1;;
    esac
-   EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,${GMP_LIB_DIR} -Wl,-rpath,${MPFR_LIB_DIR} -Wl,-rpath,${FLINT_LIB_DIR} -Wl,-rpath,${ARB_LIB_DIR}"
 fi
 
 # sometimes LDCONFIG is not to be found in the path. Look at some common places.
