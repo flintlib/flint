@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2021 William Hart
 
     This file is part of FLINT.
 
@@ -26,21 +25,12 @@ TEMPLATE(T, mat_is_one) (const TEMPLATE(T, mat_t) mat,
     for (i = 0; i < mat->r; i++)
     {
         for (j = 0; j < mat->c; j++)
-	{
-            if (i == j)
-            {
-                if (!TEMPLATE(T, is_one)(TEMPLATE(T, mat_entry)(mat, i, j), ctx))
-                    return 0;
-            } else
-            {
-                if (!TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(mat, i, j), ctx))
-                    return 0;
-            }
-        }
+            if (i == j ? !TEMPLATE(T, is_one)(TEMPLATE(T, mat_entry)(mat, i, j), ctx) :
+                         !TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(mat, i, j), ctx))
+                return 0;
     }
 
     return 1;
 }
-
 
 #endif

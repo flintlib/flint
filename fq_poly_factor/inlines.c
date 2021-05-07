@@ -18,7 +18,8 @@
 #include "fq.h"
 #include "fq_poly.h"
 
-void fq_poly_factor_get_poly(fq_poly_t z, fq_poly_factor_t fac, slong i, fq_ctx_t ctx)
+void fq_poly_factor_get_poly(fq_poly_t z,
+                       const fq_poly_factor_t fac, slong i, const fq_ctx_t ctx)
 {
     fq_poly_set(z, fac->poly + i, ctx);
 }

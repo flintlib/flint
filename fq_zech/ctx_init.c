@@ -84,23 +84,32 @@ fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
     ctx->is_conway = 0;
 }
 
-void
-fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
+int
+fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
                          const nmod_poly_t modulus,
                          const char *var)
 {
+    int primitive;
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
     fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var);
-    fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
+    primitive = fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
+    return primitive;
 }
 
-
 void
-fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
+fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
+		   const nmod_poly_t modulus,
+		   const char *var)
+{
+   fq_zech_ctx_init_modulus_check(ctx, modulus, var);
+}
+
+int
+fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
                              fq_nmod_ctx_t fq_nmod_ctx)
 {
     ulong i, n;
@@ -173,10 +182,8 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     {
         nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
         result_ui = fmpz_get_ui(result);
-        if (n_reverse_table[result_ui] != ctx->qm1) {
-            flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Polynomial is not primitive.\n");
-            flint_abort();
-        }
+        if (n_reverse_table[result_ui] != ctx->qm1)
+            return 0; /* failure: modulus not primitive */
         n_reverse_table[result_ui] = i;
         ctx->eval_table[i] = result_ui;
         if (r->length == 1)
@@ -207,4 +214,16 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     flint_free(n_reverse_table);
     fmpz_clear(result);
     fmpz_clear(order);
+
+    return 1; /* success */
+}
+
+void
+fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
+{
+    if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx))
+    {
+        flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Polynomial is not primitive.\n");
+	flint_abort();
+    }
 }

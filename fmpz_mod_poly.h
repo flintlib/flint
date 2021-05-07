@@ -316,6 +316,12 @@ FLINT_DLL void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f,
 FLINT_DLL void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f,
                             const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_poly_get_nmod_poly(nmod_poly_t f,
+		                                      const fmpz_mod_poly_t g);
+
+FLINT_DLL void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f,
+		                                          const nmod_poly_t g);
+
 /*  Comparison ***************************************************************/
 
 FMPZ_MOD_POLY_INLINE 

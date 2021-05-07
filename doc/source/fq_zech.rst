@@ -79,15 +79,28 @@ Context Management
     ``var`` for the generator.
 
     Assumes that ``modulus`` is an primitive polynomial over
-    `\mathbf{F}_{p}`.
+    `\mathbf{F}_{p}`. An exception is raised if a non-primitive modulus is
+    detected.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
+
+.. function:: int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, nmod_poly_t modulus, const char *var)
+
+    As per the previous function, but returns `0` if the modulus was not
+    primitive and `1` if the context was successfully initialised with the
+    given modulus. No exception is raised.
 
 .. function:: void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn)
 
     Initializes the context ``ctx`` to be the Zech representation
     for the finite field given by ``ctxn``.
+
+.. function:: int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn)
+
+    As per the previous function but returns `0` if a non-primitive modulus is
+    detected. Returns `0` if the Zech representation was successfully
+    initialised.
 
 .. function:: void fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 

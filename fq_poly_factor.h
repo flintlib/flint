@@ -47,6 +47,7 @@ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
 
 /* Inlines *******************************************************************/
 
-FLINT_DLL void fq_poly_factor_get_poly(fq_poly_t z, fq_poly_factor_t fac, slong i, fq_ctx_t ctx);
+FLINT_DLL void fq_poly_factor_get_poly(fq_poly_t z,
+		      const fq_poly_factor_t fac, slong i, const fq_ctx_t ctx);
 
 #endif

@@ -21,7 +21,8 @@
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
 
-void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z, fq_nmod_poly_factor_t fac, slong i, fq_nmod_ctx_t ctx)
+void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z,
+             const fq_nmod_poly_factor_t fac, slong i, const fq_nmod_ctx_t ctx)
 {
     fq_nmod_poly_set(z, fac->poly + i, ctx);
 }
