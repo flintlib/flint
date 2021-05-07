@@ -100,6 +100,8 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
             ulong q;
             if (qqbar_is_root_of_unity(&p, &q, x))
             {
+                if (2 * p > q)
+                    p -= q;
                 qqbar_root_of_unity(res, p, q * n);
                 return;
             }
