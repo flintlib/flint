@@ -383,7 +383,7 @@ static slong _fmpz_mpoly_pow_fps(
                 Q[Qlen++] = j = x->j;
                 hind[i] |= 1;
 
-                FLINT_ASSERT(j + 1 >= Gdemote);
+                FLINT_ASSERT(j >= Gdemote);
 
                 fmpz_mul(t1, Fcoeffs + i, Gcoeffs + j);
                 fmpz_add(S, S, t1);
