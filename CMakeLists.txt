@@ -68,6 +68,7 @@ set(BUILD_DIRS
     fq fq_vec fq_mat fq_poly fq_poly_factor
     fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
+    fq_default fq_default_mat fq_default_poly fq_default_poly_factor
     thread_pool fmpz_mod fmpz_mod_vec n_poly
     mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly fmpz_mod_mpoly 
     fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor fmpz_mod_mpoly_factor 
