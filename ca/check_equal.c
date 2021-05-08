@@ -56,6 +56,14 @@ ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
     if (x->field == y->field && CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
         return T_FALSE;
 
+    /* Rational number field elements *should* have been demoted to QQ
+       automatically, but let's do a comparison as a precaution. */
+    if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)) && CA_IS_QQ(y, ctx))
+        return nf_elem_equal_fmpq(CA_NF_ELEM(x), CA_FMPQ(y), CA_FIELD_NF(CA_FIELD(x, ctx))) ? T_TRUE : T_FALSE;
+
+    if (CA_FIELD_IS_NF(CA_FIELD(y, ctx)) && CA_IS_QQ(x, ctx))
+        return nf_elem_equal_fmpq(CA_NF_ELEM(y), CA_FMPQ(x), CA_FIELD_NF(CA_FIELD(y, ctx))) ? T_TRUE : T_FALSE;
+
     res = T_UNKNOWN;
 
     acb_init(u);
