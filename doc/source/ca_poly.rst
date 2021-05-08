@@ -291,6 +291,15 @@ Derivative and integral
     Sets *res* to the integral of *poly*. The underscore method needs one more
     coefficient than *len* for the output array.
 
+Elementary functions
+-------------------------------------------------------------------------------
+
+.. function:: void _ca_poly_exp_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx)
+              void ca_poly_exp_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx)
+
+    Sets *res* to the power series exponential of *f* truncated
+    to length *len*.
+
 Greatest common divisor
 -------------------------------------------------------------------------------
 

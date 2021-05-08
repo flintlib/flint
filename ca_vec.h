@@ -91,6 +91,22 @@ void ca_vec_set(ca_vec_t res, const ca_vec_t src, ca_ctx_t ctx);
 void _ca_vec_zero(ca_ptr res, slong len, ca_ctx_t ctx);
 void ca_vec_zero(ca_vec_t res, slong len, ca_ctx_t ctx);
 
+CA_VEC_INLINE
+void _ca_vec_unknown(ca_ptr vec, slong len, ca_ctx_t ctx)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        ca_unknown(vec + i, ctx);
+}
+
+CA_VEC_INLINE
+void _ca_vec_undefined(ca_ptr vec, slong len, ca_ctx_t ctx)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        ca_undefined(vec + i, ctx);
+}
+
 /* Input and output */
 
 void ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx);
@@ -117,6 +133,10 @@ void _ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, c
 void _ca_vec_scalar_div_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
 void _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
 void _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
+
+/* Comparisons and predicates */
+
+truth_t _ca_vec_check_is_zero(ca_srcptr vec, slong len, ca_ctx_t ctx);
 
 /* Internal representation */
 

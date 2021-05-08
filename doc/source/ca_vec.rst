@@ -159,6 +159,13 @@ Arithmetic
     Subtracts *src* multiplied by *c* from the vector *res*, all vectors having
     length *len*.
 
+Comparisons and properties
+---------------------------------------------------------------------------------
+
+.. function:: truth_t _ca_vec_check_is_zero(ca_srcptr vec, slong len, ca_ctx_t ctx)
+
+    Returns whether *vec* is the zero vector.
+
 Internal representation
 ---------------------------------------------------------------------------------
 

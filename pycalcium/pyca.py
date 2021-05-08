@@ -3461,6 +3461,31 @@ class ca_poly:
         libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
         return res
 
+    def exp_series(self, n):
+        """
+        Power series exponential truncated to length n.
+
+        Examples::
+
+            >>> ca_poly([0,1]).exp_series(4)
+            ca_poly of length 4
+            [1, 1, 0.500000 {1/2}, 0.166667 {1/6}]
+            >>> ca_poly([1,-0.5]).exp_series(2)
+            ca_poly of length 2
+            [2.71828 {a where a = 2.71828 [Exp(1)]}, -1.35914 {(-a)/2 where a = 2.71828 [Exp(1)]}]
+            >>> ca_poly([inf]).exp_series(3)
+            ca_poly of length 3
+            [Undefined, Undefined, Undefined]
+            >>> ca_poly([unknown]).exp_series(3)
+            ca_poly of length 3
+            [Unknown, Unknown, Unknown]
+
+        """
+        res = self._new()
+        libcalcium.ca_poly_exp_series(res, self, n, self._ctx)
+        return res
+
+
     def __call__(self, other):
         """
         Evaluation or composition.

@@ -11,31 +11,6 @@
 
 #include "ca_mat.h"
 
-truth_t
-_ca_vec_check_is_zero(ca_srcptr vec, slong len, ca_ctx_t ctx)
-{
-    slong i;
-    int have_unknown;
-    truth_t is_zero;
-
-    have_unknown = 0;
-    for (i = 0; i < len; i++)
-    {
-        is_zero = ca_check_is_zero(vec + i, ctx);
-
-        if (is_zero == T_FALSE)
-            return T_FALSE;
-
-        if (is_zero == T_UNKNOWN)
-            have_unknown = 1;
-    }
-
-    if (have_unknown)
-        return T_UNKNOWN;
-    else
-        return T_TRUE;
-}
-
 /* The algorithm is taken from jordan_form() in Sage */
 
 /* Find a row vector v in the row span of V but not in the row span of W.

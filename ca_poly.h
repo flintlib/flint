@@ -243,6 +243,12 @@ int ca_poly_gcd_euclidean(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_
 slong _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
 int ca_poly_gcd(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
 
+/* Elementary functions */
+
+void _ca_poly_exp_series(ca_ptr f, ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx);
+void ca_poly_exp_series(ca_poly_t f, const ca_poly_t h, slong len, ca_ctx_t ctx);
+
+
 /* Vectors of polynomials */
 
 ca_poly_struct * _ca_poly_vec_init(slong len, ca_ctx_t ctx);
