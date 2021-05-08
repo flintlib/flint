@@ -67,7 +67,7 @@ int main()
             }
         }
 
-        if (!qqbar_equal(x, z))
+        if (!qqbar_equal(x, z) || (n > 1 && qqbar_csgn(y) == -1))
         {
             flint_printf("FAIL!\n");
             flint_printf("n = %wu\n\n", n);
