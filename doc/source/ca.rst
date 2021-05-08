@@ -897,6 +897,17 @@ Complex parts
     In the generic case, this function outputs an element of the formal
     field `\mathbb{Q}(\operatorname{sgn}(x))`.
 
+.. function:: void ca_csgn(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the extension of the real sign function taking the
+    value 1 for *z* strictly in the right half plane, -1 for *z* strictly
+    in the left half plane, and the sign of the imaginary part when *z* is on
+    the imaginary axis. Equivalently, `\operatorname{csgn}(z) = z / \sqrt{z^2}`
+    except that the value is 0 when *z* is exactly zero.
+    This function gives *Undefined* for unsigned infinity
+    and `\operatorname{csgn}(\operatorname{sgn}(c \infty)) = \operatorname{csgn}(c)` for
+    signed infinities.
+
 .. function:: void ca_arg(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     Sets *res* to the complex argument (phase) of *x*, normalized

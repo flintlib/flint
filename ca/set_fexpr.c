@@ -206,6 +206,7 @@ _ca_set_fexpr(ca_t res, fexpr_vec_t inputs, ca_vec_t outputs, const fexpr_t expr
             case FEXPR_Tan: UNARY_OP(ca_tan)
             case FEXPR_Cot: UNARY_OP(ca_cot)
             case FEXPR_Sign: UNARY_OP(ca_sgn)
+            case FEXPR_Csgn: UNARY_OP(ca_csgn)
             case FEXPR_Arg: UNARY_OP(ca_arg)
             case FEXPR_Abs: UNARY_OP(ca_abs)
             case FEXPR_Re: UNARY_OP(ca_re)

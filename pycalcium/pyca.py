@@ -1947,6 +1947,36 @@ class ca:
 
     sign = sgn
 
+    def csgn(self):
+        """
+        Real-valued complex extension of real sign function.
+
+        Examples::
+
+            >>> csgn(3)
+            1
+            >>> csgn(3*i)
+            1
+            >>> csgn(-3*i)
+            -1
+            >>> csgn(-3)
+            -1
+            >>> csgn(0)
+            0
+            >>> csgn(1+i)
+            1
+            >>> csgn((1+i)*inf)
+            1
+            >>> csgn(-i*inf)
+            -1
+            >>> csgn(uinf)
+            Undefined
+
+        """
+        res = self._new()
+        libcalcium.ca_csgn(res, self, self._ctx)
+        return res
+
     def arg(self):
         """
         Complex argument (phase).
@@ -3640,6 +3670,11 @@ def sign(x):
     if type(x) != ca:
         x = ca(x)
     return x.sign()
+
+def csgn(x):
+    if type(x) != ca:
+        x = ca(x)
+    return x.csgn()
 
 def arg(x):
     if type(x) != ca:
