@@ -414,6 +414,17 @@ slong fmpz_mpoly_total_degree_si(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ct
     return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
 }
 
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_used_vars(int * used, const fmpz_mpoly_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        used[i] = 0;
+
+    mpoly_used_vars_or(used, A->exps, A->length, A->bits, ctx->minfo);
+}
 
 /* Coefficients **************************************************************/
 
