@@ -3461,6 +3461,60 @@ class ca_poly:
         libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
         return res
 
+    def inv_series(self, n):
+        """
+        Power series inverse truncated to length n.
+
+        Examples::
+
+            >>> ca_poly([1,2,3]).inv_series(10)
+            ca_poly of length 10
+            [1, -2, 1, 4, -11, 10, 13, -56, 73, 22]
+            >>> ca_poly([sqrt(2), 1, 2]).inv_series(5).inv_series(5)
+            ca_poly of length 3
+            [1.41421 {a where a = 1.41421 [a^2-2=0]}, 1, 2]
+            >>> ca_poly([]).inv_series(3)
+            ca_poly of length 3
+            [UnsignedInfinity, Undefined, Undefined]
+            >>> ca_poly([0,1,2]).inv_series(3)
+            ca_poly of length 3
+            [UnsignedInfinity, Undefined, Undefined]
+            >>> ca_poly([inf,1,2]).inv_series(3)
+            ca_poly of length 3
+            [Undefined, Undefined, Undefined]
+
+        """
+        res = self._new()
+        libcalcium.ca_poly_inv_series(res, self, n, self._ctx)
+        return res
+
+    def log_series(self, n):
+        """
+        Power series logarithm truncated to length n.
+
+        Examples::
+
+            >>> ca_poly([1,1]).log_series(4)
+            ca_poly of length 4
+            [0, 1, -0.500000 {-1/2}, 0.333333 {1/3}]
+            >>> ca_poly([2,1]).log_series(4)
+            ca_poly of length 4
+            [0.693147 {a where a = 0.693147 [Log(2)]}, 0.500000 {1/2}, -0.125000 {-1/8}, 0.0416667 {1/24}]
+            >>> ca_poly([-2,2,3]).log_series(5).exp_series(5)
+            ca_poly of length 3
+            [-2, 2, 3]
+            >>> ca_poly([0,1]).log_series(3)
+            ca_poly of length 3
+            [-Infinity, Undefined, Undefined]
+            >>> ca_poly([inf,1]).log_series(3)
+            ca_poly of length 3
+            [Undefined, Undefined, Undefined]
+
+        """
+        res = self._new()
+        libcalcium.ca_poly_log_series(res, self, n, self._ctx)
+        return res
+
     def exp_series(self, n):
         """
         Power series exponential truncated to length n.

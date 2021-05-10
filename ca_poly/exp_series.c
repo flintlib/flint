@@ -75,7 +75,7 @@ _ca_poly_exp_series(ca_ptr f, ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx)
 {
     hlen = FLINT_MIN(hlen, len);
 
-    if (ca_check_is_number(h, ctx) != T_TRUE)
+    if (CA_IS_SPECIAL(h))
     {
         if (ca_is_unknown(h, ctx))
             _ca_vec_unknown(f, len, ctx);
