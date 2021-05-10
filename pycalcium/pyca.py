@@ -349,10 +349,13 @@ class fexpr:
         elif n == 4:
             libcalcium.fexpr_call4(res, self, args2[0], args2[1], args2[2], args2[3])
         else:
-            vec = (fexpr_struct * n)()
+            libcalcium.flint_malloc.restype = ctypes.c_void_p
+            vec = libcalcium.flint_malloc(n * ctypes.sizeof(fexpr_struct))
+            vec = ctypes.cast(vec, ctypes.POINTER(fexpr_struct))
             for i in range(n):
                 vec[i] = args2[i]._data
             libcalcium.fexpr_call_vec(res, self, vec, n)
+            libcalcium.flint_free(vec)
         return res
 
     def contains(self, x):
