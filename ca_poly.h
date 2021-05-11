@@ -248,6 +248,9 @@ int ca_poly_gcd(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx)
 void _ca_poly_inv_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx);
 void ca_poly_inv_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx);
 
+void _ca_poly_div_series(ca_ptr res, ca_srcptr f, slong flen, ca_srcptr g, slong glen, slong len, ca_ctx_t ctx);
+void ca_poly_div_series(ca_poly_t res, const ca_poly_t f, const ca_poly_t g, slong len, ca_ctx_t ctx);
+
 /* Elementary functions */
 
 void _ca_poly_exp_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx);
@@ -255,6 +258,9 @@ void ca_poly_exp_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ct
 
 void _ca_poly_log_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx);
 void ca_poly_log_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx);
+
+void _ca_poly_atan_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx);
+void ca_poly_atan_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx);
 
 
 /* Vectors of polynomials */

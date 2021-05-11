@@ -300,6 +300,15 @@ Power series division
     Sets *res* to the power series inverse of *f* truncated
     to length *len*.
 
+.. function:: void _ca_poly_div_series(ca_ptr res, ca_srcptr f, slong flen, ca_srcptr g, slong glen, slong len, ca_ctx_t ctx)
+              void ca_poly_div_series(ca_poly_t res, const ca_poly_t f, const ca_poly_t g, slong len, ca_ctx_t ctx)
+
+    Sets *res* to the power series quotient of *f* and *g* truncated
+    to length *len*.
+    This function divides by zero if *g* has constant term zero;
+    the user should manually remove initial zeros when an
+    exact cancellation is required.
+
 Elementary functions
 -------------------------------------------------------------------------------
 
@@ -313,6 +322,12 @@ Elementary functions
               void ca_poly_log_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx)
 
     Sets *res* to the power series logarithm of *f* truncated
+    to length *len*.
+
+.. function:: void _ca_poly_atan_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx)
+              void ca_poly_atan_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx)
+
+    Sets *res* to the power series inverse tangent of *f* truncated
     to length *len*.
 
 Greatest common divisor

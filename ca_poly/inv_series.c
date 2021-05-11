@@ -29,6 +29,29 @@ _ca_poly_inv_series(ca_ptr Qinv,
         return;
     }
 
+    /* todo: tuning */
+    /* todo: shallow copy with integers */
+    if (Qlen >= 4 && _ca_vec_is_fmpq_vec(Q, Qlen, ctx) && !fmpq_is_zero(CA_FMPQ(Q)))
+    {
+        fmpz *p, *r;
+        fmpz_t pden, rden;
+
+        p = _fmpz_vec_init(Qlen);
+        r = _fmpz_vec_init(len);
+        fmpz_init(pden);
+        fmpz_init(rden);
+
+        _ca_vec_fmpq_vec_get_fmpz_vec_den(p, pden, Q, Qlen, ctx);
+        _fmpq_poly_inv_series(r, rden, p, pden, Qlen, len);
+        _ca_vec_set_fmpz_vec_div_fmpz(Qinv, r, rden, len, ctx);
+
+        fmpz_clear(pden);
+        fmpz_clear(rden);
+        _fmpz_vec_clear(p, Qlen);
+        _fmpz_vec_clear(r, len);
+        return;
+    }
+
     ca_inv(Qinv, Q, ctx);
 
     if (CA_IS_SPECIAL(Qinv))

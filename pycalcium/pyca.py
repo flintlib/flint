@@ -3461,6 +3461,22 @@ class ca_poly:
         libcalcium.ca_poly_pow_ui(res, self, e, self._ctx)
         return res
 
+    def mul_series(self, other, n):
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
+        libcalcium.ca_poly_mullow(res, self, other, n, self._ctx)
+        return res
+
+    def div_series(self, other, n):
+        self, other = ca_poly.operands_with_same_context(self, other)
+        if self is NotImplemented:
+            return self
+        res = self._new()
+        libcalcium.ca_poly_div_series(res, self, other, n, self._ctx)
+        return res
+
     def inv_series(self, n):
         """
         Power series inverse truncated to length n.
@@ -3539,6 +3555,36 @@ class ca_poly:
         libcalcium.ca_poly_exp_series(res, self, n, self._ctx)
         return res
 
+    def atan_series(self, n):
+        """
+        Power series inverse tangent truncated to length n.
+
+            >>> ca_poly([0,1]).atan_series(6)
+            ca_poly of length 6
+            [0, 1, 0, -0.333333 {-1/3}, 0, 0.200000 {1/5}]
+            >>> ca_poly([1,1]).atan_series(4)
+            ca_poly of length 4
+            [0.785398 {(a)/4 where a = 3.14159 [Pi]}, 0.500000 {1/2}, -0.250000 {-1/4}, 0.0833333 {1/12}]
+            >>> f = ca_poly([2,3,4])
+            >>> 2*f.atan_series(5) - ((2*f).div_series(1-f**2, 5)).atan_series(5) == pi
+            True
+            >>> ca_poly([0]).atan_series(3)
+            ca_poly of length 0
+            []
+            >>> ca_poly([i,1]).atan_series(3)
+            ca_poly of length 3
+            [+I * Infinity, Undefined, Undefined]
+            >>> ca_poly([-i,1]).atan_series(3)
+            ca_poly of length 3
+            [-I * Infinity, Undefined, Undefined]
+            >>> ca_poly([unknown,1]).atan_series(3)
+            ca_poly of length 3
+            [Unknown, Unknown, Unknown]
+
+        """
+        res = self._new()
+        libcalcium.ca_poly_atan_series(res, self, n, self._ctx)
+        return res
 
     def __call__(self, other):
         """
