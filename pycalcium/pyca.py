@@ -4156,6 +4156,7 @@ def test_improved_zero_recognition():
     assert (sqrt(3) + i)/2  * pi - exp(pi*i/6) * pi == 0
     assert arg(sqrt(-pi*i)) == -pi/4
     assert (pi + sqrt(2) + sqrt(3)) / (pi + sqrt(5 + 2*sqrt(6))) == 1
+    assert log(1/exp(sqrt(2)+1)) == -sqrt(2)-1
 
     def expect_not_implemented(f):
         try:

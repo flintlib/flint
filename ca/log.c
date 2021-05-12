@@ -11,6 +11,96 @@
 
 #include "ca.h"
 
+ca_ext_ptr
+ca_is_gen_pow_fmpz_as_ext(fmpz_t exp, const ca_t x, ca_ctx_t ctx)
+{
+    ca_field_ptr K;
+
+    if (CA_IS_SPECIAL(x))
+        return NULL;
+
+    K = CA_FIELD(x, ctx);
+
+    if (CA_FIELD_IS_QQ(K))
+        return NULL;
+
+    /* todo: detect powers of the generator in number fields */
+    if (CA_FIELD_IS_NF(K))
+    {
+        if (!nf_elem_is_gen(CA_NF_ELEM(x), CA_FIELD_NF(K)))
+            return NULL;
+
+        fmpz_one(exp);
+        return CA_FIELD_EXT_ELEM(K, 0);
+    }
+
+    if (fmpz_mpoly_is_one(fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), CA_FIELD_MCTX(K, ctx)))
+    {
+        if (fmpz_mpoly_length(fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), CA_FIELD_MCTX(K, ctx)) == 1 &&
+            fmpz_is_one(fmpz_mpoly_q_numref(CA_MPOLY_Q(x))->coeffs))
+        {
+            int * used;
+            slong i, which, num_used;
+
+            used = flint_calloc(CA_FIELD_LENGTH(K), sizeof(int));
+            fmpz_mpoly_q_used_vars_num(used, CA_MPOLY_Q(x), CA_FIELD_MCTX(K, ctx));
+
+            which = num_used = 0;
+            for (i = 0; i < CA_FIELD_LENGTH(K); i++)
+            {
+                if (used[i])
+                {
+                    which = i;
+                    num_used++;
+                }
+            }
+
+            flint_free(used);
+
+            if (num_used == 1)
+            {
+                fmpz_mpoly_total_degree_fmpz(exp, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)),  CA_FIELD_MCTX(K, ctx));
+                return CA_FIELD_EXT_ELEM(K, which);
+            }
+        }
+    }
+
+    if (fmpz_mpoly_is_one(fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), CA_FIELD_MCTX(K, ctx)))
+    {
+        if (fmpz_mpoly_length(fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), CA_FIELD_MCTX(K, ctx)) == 1 &&
+            fmpz_is_one(fmpz_mpoly_q_denref(CA_MPOLY_Q(x))->coeffs))
+        {
+            int * used;
+            slong i, which, num_used;
+
+            used = flint_calloc(CA_FIELD_LENGTH(K), sizeof(int));
+            fmpz_mpoly_q_used_vars_den(used, CA_MPOLY_Q(x), CA_FIELD_MCTX(K, ctx));
+
+            which = num_used = 0;
+            for (i = 0; i < CA_FIELD_LENGTH(K); i++)
+            {
+                if (used[i])
+                {
+                    which = i;
+                    num_used++;
+                }
+            }
+
+            flint_free(used);
+
+            if (num_used == 1)
+            {
+                fmpz_mpoly_total_degree_fmpz(exp, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)),  CA_FIELD_MCTX(K, ctx));
+                fmpz_neg(exp, exp);
+                return CA_FIELD_EXT_ELEM(K, which);
+            }
+        }
+    }
+
+    return NULL;
+}
+
+
 /* log(exp(z)) -- http://fungrim.org/entry/a3a253/ */
 void
 ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
@@ -213,6 +303,52 @@ ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
         ca_log_pow(res, CA_EXT_FUNC_ARGS(ext), h, ctx);
         ca_clear(h, ctx);
         return;
+    }
+
+    /* If x is not a generator, maybe it is a power of a generator */
+    {
+        fmpz_t n;
+        ca_t t;
+        int success = 0;
+
+        fmpz_init(n);
+        ca_init(t, ctx);
+
+        ext = ca_is_gen_pow_fmpz_as_ext(n, x, ctx);
+
+        if (ext != NULL && CA_EXT_HEAD(ext) == CA_Exp)
+        {
+            /* log(exp(z)^n) = log(exp(n*z)) */
+            ca_mul_fmpz(t, CA_EXT_FUNC_ARGS(ext), n, ctx);
+            ca_log_exp(res, t, ctx);
+            success = 1;
+        }
+
+        if (ext != NULL && CA_EXT_HEAD(ext) == CA_Pow)
+        {
+            /* log((z^a)^n) = log(z^(a*n)) */
+            if (ca_check_is_zero(CA_EXT_FUNC_ARGS(ext), ctx) == T_FALSE)
+            {
+                ca_mul_fmpz(t, CA_EXT_FUNC_ARGS(ext) + 1, n, ctx);
+                ca_log_pow(res, CA_EXT_FUNC_ARGS(ext), t, ctx);
+                success = 1;
+            }
+        }
+
+        if (ext != NULL && CA_EXT_HEAD(ext) == CA_Sqrt)
+        {
+            /* log(sqrt(z)^n) = log(z^(n/2)) */
+            ca_set_fmpz(t, n, ctx);
+            ca_div_ui(t, t, 2, ctx);
+            ca_log_pow(res, CA_EXT_FUNC_ARGS(ext), t, ctx);
+            success = 1;
+        }
+
+        fmpz_clear(n);
+        ca_clear(t, ctx);
+
+        if (success)
+            return;
     }
 
     _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Log, x), ctx);
