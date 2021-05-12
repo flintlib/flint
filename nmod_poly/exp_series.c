@@ -71,7 +71,7 @@ _nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
         a[++i] = (n = (n + 1) / 2);
 
     /* f := exp(h) + O(x^n),  g := exp(-h) + O(x^n) */
-    _nmod_poly_exp_series_basecase(f, h, n, n, mod);
+    _nmod_poly_exp_series_basecase(f, h, hlen, n, mod);
     _nmod_poly_inv_series(g, f, n, n, mod);
 
     for (i--; i >= 0; i--)
