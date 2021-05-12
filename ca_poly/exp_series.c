@@ -211,7 +211,7 @@ _ca_poly_exp_series(ca_ptr f, ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx)
             /* Newton iteration where we have fast multiplication */
             if (K != NULL && CA_FIELD_IS_NF(K))
             {
-                if (len >= 4 * qqbar_degree(CA_FIELD_NF_QQBAR(K)))
+                if (len >= qqbar_degree(CA_FIELD_NF_QQBAR(K)))
                 {
                     _ca_poly_exp_series_newton(f, NULL, h, hlen, len, ctx);
                     return;
