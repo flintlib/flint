@@ -1872,12 +1872,15 @@ class ca:
 
 
         """
-        # todo: memory leak
-        s = libcalcium.ca_get_decimal_str(self, n, parts, self._ctx)
-        s = s.decode("ascii")
-        if s == "?":
-            raise ValueError("nstr: unable to evaluate to a number")
-        return s
+        ptr = libcalcium.ca_get_decimal_str(self, n, parts, self._ctx)
+        try:
+            s = ctypes.cast(ptr, ctypes.c_char_p).value.decode("ascii")
+            if s == "?":
+                raise ValueError("nstr: unable to evaluate to a number")
+            return s
+        finally:
+            libflint.flint_free(ptr)
+
 
     def rewrite_cnf(self, deep=True):
         res = self._new()
@@ -4022,7 +4025,7 @@ libcalcium.ca_set_d.argtypes = ca, ctypes.c_double, ca_ctx
 libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
 libcalcium.ca_get_str.restype = ctypes.c_void_p
-libcalcium.ca_get_decimal_str.restype = ctypes.c_char_p
+libcalcium.ca_get_decimal_str.restype = ctypes.c_void_p
 
 libcalcium.ca_ctx_set_option.argtypes = ca_ctx, ctypes.c_long, ctypes.c_long
 libcalcium.ca_ctx_get_option.restype = ctypes.c_long
