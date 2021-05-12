@@ -1165,8 +1165,7 @@ Numerical evaluation
     If *x* is any special value, *res* is set to *acb_indeterminate*.
 
 .. function:: void ca_get_acb(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
-
-.. function:: void ca_get_acb_accurate_parts(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
+              void ca_get_acb_accurate_parts(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
 
     Sets *res* to an enclosure of the numerical value of *x*.
     The working precision is increased adaptively to try to ensure *prec*
@@ -1181,6 +1180,22 @@ Numerical evaluation
     The output is not rounded down to *prec* bits (to avoid unnecessary
     double rounding); the user may call *acb_set_round* when rounding
     is desired.
+
+.. function:: char * ca_get_decimal_str(const ca_t x, slong digits, ulong flags, ca_ctx_t ctx)
+
+    Returns a decimal approximation of *x* with precision up to
+    *digits*. The output is guaranteed to be correct within 1 ulp
+    in the returned digits, but the number of returned digits may
+    be smaller than *digits* if the numerical evaluation does
+    not succeed.
+
+    If *flags* is set to 1, attempts to achieve full accuracy for
+    both the real and imaginary parts separately.
+
+    If *x* is not finite or a finite enclosure cannot be produced,
+    returns the string "?".
+
+    The user should free the returned string with ``flint_free``.
 
 
 Rewriting and simplification

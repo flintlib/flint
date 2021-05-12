@@ -546,6 +546,8 @@ void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
 void ca_get_acb(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
 void ca_get_acb_accurate_parts(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
 
+char * ca_get_decimal_str(const ca_t x, slong digits, ulong flags, ca_ctx_t ctx);
+
 /* Factorisation */
 
 #define CA_FACTOR_ZZ_NONE        0

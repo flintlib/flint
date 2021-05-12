@@ -1830,6 +1830,49 @@ class ca:
         libcalcium.ca_set(res, self, self._ctx)
         return res
 
+    def nstr(self, n=16, parts=False):
+        """
+        Evaluates this expression numerically using Arb, returning
+        a decimal string correct within 1 ulp in the last output digit.
+        Attempts to obtain *n* digits (but the actual output accuracy
+        may be lower).
+
+        Examples::
+
+            >>> ca(0).nstr()
+            '0'
+            >>> pi.nstr(30)
+            '3.14159265358979323846264338328'
+
+        By default, the result is considered accurate when the larger
+        of the real and imaginary parts is known to *n* digits.
+        If *parts* is set, the algorithm will attempt to compute both
+        real and imaginary parts accurately. It will, in particular,
+        attempt to recognize when a real or imaginary part is
+        exactly zero::
+
+            >>> (log(1+i) + log(1-i)).nstr()
+            '0.6931471805599453 + 0e-25*I'
+            >>> (log(1+i) + log(1-i)).nstr(parts=True)
+            '0.6931471805599453'
+
+        An exception is raised if the numerical evaluation code fails
+        to produce a finite enclosure::
+
+            >>> (1 / ca(0)).nstr()
+            Traceback (most recent call last):
+              ...
+            ValueError: nstr: unable to evaluate to a number
+
+
+        """
+        # todo: memory leak
+        s = libcalcium.ca_get_decimal_str(self, n, parts, self._ctx)
+        s = s.decode("ascii")
+        if s == "?":
+            raise ValueError("nstr: unable to evaluate to a number")
+        return s
+
     def rewrite_cnf(self, deep=True):
         res = self._new()
         libcalcium.ca_rewrite_complex_normal_form(res, self, deep, self._ctx)
@@ -3972,6 +4015,7 @@ libcalcium.ca_set_d.argtypes = ca, ctypes.c_double, ca_ctx
 libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
 libcalcium.ca_get_str.restype = ctypes.c_char_p
+libcalcium.ca_get_decimal_str.restype = ctypes.c_char_p
 
 libcalcium.ca_ctx_set_option.argtypes = ca_ctx, ctypes.c_long, ctypes.c_long
 libcalcium.ca_ctx_get_option.restype = ctypes.c_long
