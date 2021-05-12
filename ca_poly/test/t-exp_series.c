@@ -74,6 +74,10 @@ int main()
         {
             ca_poly_randtest(A, state, 4, 2, 10, ctx);
             ca_poly_randtest(B, state, 4, 2, 10, ctx);
+
+            n1 = n_randint(state, 6);
+            n2 = n_randint(state, 6);
+            n3 = n_randint(state, 6);
         }
         else
         {
@@ -89,6 +93,10 @@ int main()
             ca_poly_randtest_same_nf(A, state, x, 1 + n_randint(state, 20), 2 + n_randint(state, 100), 2 + n_randint(state, 100), ctx);
             ca_poly_randtest_same_nf(B, state, x, 1 + n_randint(state, 20), 2 + n_randint(state, 100), 2 + n_randint(state, 100), ctx);
 
+            n1 = n_randint(state, 50);
+            n2 = n_randint(state, 50);
+            n3 = n_randint(state, 50);
+
             qqbar_clear(t);
             ca_clear(x, ctx);
         }
@@ -98,10 +106,6 @@ int main()
         ca_poly_randtest(expAB, state, 4, 2, 10, ctx);
 
         ca_poly_add(AB, A, B, ctx);
-
-        n1 = n_randint(state, 6);
-        n2 = n_randint(state, 6);
-        n3 = n_randint(state, 6);
 
         ca_poly_exp_series(expA, A, n1, ctx);
         ca_poly_exp_series(expB, B, n2, ctx);

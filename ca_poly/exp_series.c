@@ -12,6 +12,9 @@
 #include "ca_vec.h"
 #include "ca_poly.h"
 
+ca_field_ptr
+_ca_vec_same_field2(ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, ca_ctx_t ctx);
+
 void
 _ca_poly_exp_series_basecase(ca_ptr f,
         ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx)
@@ -70,6 +73,93 @@ _ca_poly_exp_series_basecase(ca_ptr f,
     ca_clear(e, ctx);
 }
 
+/* c_k x^k -> c_k x^k / (m+k) */
+static void
+_ca_poly_integral_offset(ca_ptr res, ca_srcptr poly, slong len, slong m, ca_ctx_t ctx)
+{
+    slong k;
+
+    for (k = 0; k < len; k++)
+        ca_div_ui(res + k, poly + k, m + k, ctx);
+}
+
+void
+_ca_poly_exp_series_newton(ca_ptr f, ca_ptr g,
+    ca_srcptr h, slong hlen, slong n, ca_ctx_t ctx)
+{
+    slong a[FLINT_BITS];
+    slong i, m, l, r, alloc;
+    ca_ptr t, hprime;
+    int inverse;
+
+    if (!(CA_IS_QQ(h, ctx) && fmpq_is_zero(CA_FMPQ(h))))
+    {
+        hlen = FLINT_MIN(hlen, n);
+        t = _ca_vec_init(hlen + 1, ctx);
+        ca_exp(t + hlen, h, ctx);
+        _ca_vec_set(t + 1, h + 1, hlen - 1, ctx);
+        _ca_poly_exp_series_newton(f, g, t, hlen, n, ctx);
+        _ca_vec_scalar_mul_ca(f, f, n, t + hlen, ctx);
+        if (g != NULL)
+            _ca_vec_scalar_div_ca(g, g, n, t + hlen, ctx);
+        _ca_vec_clear(t, hlen + 1, ctx);
+        return;
+    }
+
+    /* If g is provided, we compute g = exp(-h), and we can use g as
+       scratch space. Otherwise, we still need to compute exp(-h) to length
+       (n+1)/2 for intermediate use, and we still need n coefficients of
+       scratch space. */
+    alloc = n;
+    inverse = (g != NULL);
+    if (!inverse)
+        g = _ca_vec_init(n, ctx);
+
+    hlen = FLINT_MIN(hlen, n);
+
+    t = _ca_vec_init(n, ctx);
+    hprime = _ca_vec_init(hlen - 1, ctx);
+    _ca_poly_derivative(hprime, h, hlen, ctx);
+
+    for (i = 1; (WORD(1) << i) < n; i++);
+    a[i = 0] = n;
+    while (n >= 15 || i == 0)
+        a[++i] = (n = (n + 1) / 2);
+
+    /* f := exp(h) + O(x^n),  g := exp(-h) + O(x^n) */
+    _ca_poly_exp_series_basecase(f, h, FLINT_MIN(hlen, n), n, ctx);
+    _ca_poly_inv_series(g, f, n, n, ctx);
+
+    for (i--; i >= 0; i--)
+    {
+        m = n;             /* previous length */
+        n = a[i];          /* new length */
+
+        l = FLINT_MIN(hlen, n) - 1;
+        r = FLINT_MIN(l + m - 1, n - 1);
+        if (l >= m)
+            _ca_poly_mullow(t, hprime, l, f, m, r, ctx);
+        else
+            _ca_poly_mullow(t, f, m, hprime, l, r, ctx);
+        _ca_poly_mullow(g + m, g, n - m, t + m - 1, r + 1 - m, n - m, ctx);
+        _ca_poly_integral_offset(g + m, g + m, n - m, m, ctx);
+        _ca_poly_mullow(f + m, f, n - m, g + m, n - m, n - m, ctx);
+
+        /* g := exp(-h) + O(x^n); not needed if we only want exp(x) */
+        if (i != 0 || inverse)
+        {
+            _ca_poly_mullow(t, f, n, g, m, n, ctx);
+            _ca_poly_mullow(g + m, g, m, t + m, n - m, n - m, ctx);
+            _ca_vec_neg(g + m, g + m, n - m, ctx);
+        }
+    }
+
+    _ca_vec_clear(hprime, hlen - 1, ctx);
+    _ca_vec_clear(t, alloc, ctx);
+    if (!inverse)
+        _ca_vec_clear(g, alloc, ctx);
+}
+
 void
 _ca_poly_exp_series(ca_ptr f, ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx)
 {
@@ -112,6 +202,23 @@ _ca_poly_exp_series(ca_ptr f, ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx)
     }
     else
     {
+        if (hlen >= 8)
+        {
+            ca_field_ptr K;
+
+            K = _ca_vec_same_field2(h + 1, hlen - 1, NULL, 0, ctx);
+
+            /* Newton iteration where we have fast multiplication */
+            if (K != NULL && CA_FIELD_IS_NF(K))
+            {
+                if (len >= qqbar_degree(CA_FIELD_NF_QQBAR(K)))
+                {
+                    _ca_poly_exp_series_newton(f, NULL, h, hlen, len, ctx);
+                    return;
+                }
+            }
+        }
+
         _ca_poly_exp_series_basecase(f, h, hlen, len, ctx);
     }
 }
