@@ -75,10 +75,11 @@ class _fmpq_struct(ctypes.Structure):
                 ('den', ctypes.c_long)]
 
 def fmpz_to_python_int(xref):
-    # todo: this leaks memory
-    s = libflint.fmpz_get_str(None, 10, xref)
-    return int(s)
-
+    ptr = libflint.fmpz_get_str(None, 10, xref)
+    try:
+        return int(ctypes.cast(ptr, ctypes.c_char_p).value.decode())
+    finally:
+        libflint.flint_free(ptr)
 # todo
 def fmpq_set_python(cref, x):
     assert isinstance(x, int) and -sys.maxsize <= x <= sys.maxsize
@@ -257,16 +258,18 @@ class fexpr:
         return arg
 
     def __repr__(self):
-        # todo: memory leak
-        s = libcalcium.fexpr_get_str(self)
-        res = str(s, 'ascii')
-        return res
+        ptr = libcalcium.fexpr_get_str(self)
+        try:
+            return ctypes.cast(ptr, ctypes.c_char_p).value.decode("ascii")
+        finally:
+            libflint.flint_free(ptr)
 
     def latex(self):
-        # todo: memory leak
-        s = libcalcium.fexpr_get_str_latex(self, 0)
-        res = str(s, 'ascii')
-        return res
+        ptr = libcalcium.fexpr_get_str_latex(self, 0)
+        try:
+            return ctypes.cast(ptr, ctypes.c_char_p).value.decode()
+        finally:
+            libflint.flint_free(ptr)
 
     def _repr_latex_(self):
         return "$$" + self.latex() + "$$"
@@ -585,13 +588,14 @@ class fexpr:
             ValueError: nstr: unable to evaluate to a number
 
         """
-        # todo: memory leak
-        s = libcalcium.fexpr_get_decimal_str(self, n, 0)
-        s = s.decode("ascii")
-        if s == "?":
-            raise ValueError("nstr: unable to evaluate to a number")
-        return s
-
+        ptr = libcalcium.fexpr_get_decimal_str(self, n, 0)
+        try:
+            s = ctypes.cast(ptr, ctypes.c_char_p).value.decode("ascii")
+            if s == "?":
+                raise ValueError("nstr: unable to evaluate to a number")
+            return s
+        finally:
+            libflint.flint_free(ptr)
 
 class qqbar:
     """
@@ -674,10 +678,11 @@ class qqbar:
         return arg
 
     def __repr__(self):
-        # todo: memory leak
-        s = libcalcium.qqbar_get_str_nd(self, 6)
-        res = str(s, 'ascii')
-        return res
+        ptr = libcalcium.qqbar_get_str_nd(self, 6)
+        try:
+            return ctypes.cast(ptr, ctypes.c_char_p).value.decode("ascii")
+        finally:
+            libflint.flint_free(ptr)
 
     def _repr_latex_(self):
         return self.fexpr(formula=False)._repr_latex_()
@@ -1628,10 +1633,11 @@ class ca:
         return res
 
     def __repr__(self):
-        s = libcalcium.ca_get_str(self, self._ctx)
-        res = str(s, 'ascii')
-        #libflint.flint_free(s)
-        return res
+        ptr = libcalcium.ca_get_str(self, self._ctx)
+        try:
+            return ctypes.cast(ptr, ctypes.c_char_p).value.decode('ascii')
+        finally:
+            libflint.flint_free(ptr)
 
     def __str__(self):
         return self.__repr__()
@@ -3988,23 +3994,24 @@ def tanh(x):
 #        libflint.flint_free(self)
 
 libflint.flint_malloc.restype = ctypes.c_void_p
+libflint.flint_free.argtypes = (ctypes.c_void_p,)
 libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
 libflint.fmpz_get_str.argtypes = ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(_fmpz_struct)
-libflint.fmpz_get_str.restype = ctypes.c_char_p
+libflint.fmpz_get_str.restype = ctypes.c_void_p
 
 libcalcium.fexpr_builtin_name.restype = ctypes.c_char_p
 libcalcium.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
-libcalcium.fexpr_get_str.restype = ctypes.c_char_p
-libcalcium.fexpr_get_str_latex.restype = ctypes.c_char_p
+libcalcium.fexpr_get_str.restype = ctypes.c_void_p
+libcalcium.fexpr_get_str_latex.restype = ctypes.c_void_p
 libcalcium.fexpr_set_si.argtypes = fexpr, ctypes.c_long
 libcalcium.fexpr_set_d.argtypes = fexpr, ctypes.c_double
 libcalcium.fexpr_set_re_im_d.argtypes = fexpr, ctypes.c_double, ctypes.c_double
-libcalcium.fexpr_get_decimal_str.restype = ctypes.c_char_p
+libcalcium.fexpr_get_decimal_str.restype = ctypes.c_void_p
 
 libcalcium.qqbar_set_si.argtypes = qqbar, ctypes.c_long
 libcalcium.qqbar_set_d.argtypes = qqbar, ctypes.c_double
 libcalcium.qqbar_set_re_im_d.argtypes = qqbar, ctypes.c_double, ctypes.c_double
-libcalcium.qqbar_get_str_nd.restype = ctypes.c_char_p
+libcalcium.qqbar_get_str_nd.restype = ctypes.c_void_p
 libcalcium._qqbar_vec_init.restype = ctypes.POINTER(qqbar_struct)
 
 libcalcium.ca_mat_entry_ptr.restype = ctypes.POINTER(ca_mat_struct)
@@ -4014,7 +4021,7 @@ libcalcium.ca_set_si.argtypes = ca, ctypes.c_long, ca_ctx
 libcalcium.ca_set_d.argtypes = ca, ctypes.c_double, ca_ctx
 libcalcium.ca_set_d_d.argtypes = ca, ctypes.c_double, ctypes.c_double, ca_ctx
 libcalcium.ca_get_str.argtypes = ca, ca_ctx
-libcalcium.ca_get_str.restype = ctypes.c_char_p
+libcalcium.ca_get_str.restype = ctypes.c_void_p
 libcalcium.ca_get_decimal_str.restype = ctypes.c_char_p
 
 libcalcium.ca_ctx_set_option.argtypes = ca_ctx, ctypes.c_long, ctypes.c_long
