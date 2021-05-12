@@ -377,6 +377,12 @@ slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
                                              A->zpoly->bits, ctx->zctx->minfo);
 }
 
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_used_vars(int * used, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_used_vars(used, A->zpoly, ctx->zctx);
+}
 
 /* Coefficients **************************************************************/
 

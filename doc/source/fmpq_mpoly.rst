@@ -211,6 +211,10 @@ Degrees
     Either return or set ``tdeg`` to the total degree of ``A``.
     If ``A`` is zero, the total degree is defined to be ``-1``.
 
+.. function:: void fmpq_mpoly_used_vars(int * used, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    For each variable index `i`, set ``used[i]`` to nonzero if the variable of index `i` appears in `A` and to zero otherwise.
+
 
 Coefficients
 --------------------------------------------------------------------------------

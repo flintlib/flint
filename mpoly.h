@@ -1221,6 +1221,9 @@ FLINT_DLL void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
 FLINT_DLL void mpoly_total_degree_fmpz_ref(fmpz_t totdeg, const ulong * exps,
                                 slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly_used_vars_or(int * used, const ulong * exps,
+                       slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
                    ulong * Bexp, flint_bitcnt_t Bbits, const mpoly_ctx_t mctx);
 

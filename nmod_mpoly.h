@@ -561,6 +561,17 @@ slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ct
     return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
 }
 
+NMOD_MPOLY_INLINE
+void nmod_mpoly_used_vars(int * used, const nmod_mpoly_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        used[i] = 0;
+
+    mpoly_used_vars_or(used, A->exps, A->length, A->bits, ctx->minfo);
+}
 
 /* Coefficients **************************************************************/
 
