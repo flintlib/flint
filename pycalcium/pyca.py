@@ -4032,10 +4032,10 @@ libcalcium.ca_ctx_get_option.restype = ctypes.c_long
 
 
 
-i = j = I = ca.i()
+i = j = ca.i()
 pi = ca.pi()
 euler = ca.euler()
-e = E = ca(1).exp()
+e = ca(1).exp()
 
 inf = ca.inf()
 uinf = ca.uinf()
@@ -4043,6 +4043,9 @@ undefined = ca.undefined()
 unknown = ca.unknown()
 
 fexpr.inject()
+
+I = NumberI
+E = NumberE
 
 
 def prod(s):
