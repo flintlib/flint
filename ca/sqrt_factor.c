@@ -60,6 +60,42 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
                 if (!fmpz_is_zero(CA_FMPQ_DENREF(fac->exp + i)))
                 {
                     fmpz_t e;
+                    ca_ext_ptr ext;
+
+                    ext = ca_is_gen_as_ext(fac->base + i, ctx);
+
+                    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Exp)
+                    {
+                        /* sqrt(exp(a)^n) = +/- exp(a*n/2) */
+                        ca_mul_fmpz(t, CA_EXT_FUNC_ARGS(ext), CA_FMPQ_NUMREF(fac->exp + i), ctx);
+                        ca_div_ui(t, t, 2, ctx);
+                        ca_exp(t, t, ctx);
+                        ca_mul(A, A, t, ctx);
+                        continue;
+                    }
+
+                    /* todo: assert a != 0? */
+                    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Sqrt)
+                    {
+                        /* sqrt(sqrt(a)^n) = +/- a^(n/4) */
+                        ca_set_fmpz(t, CA_FMPQ_NUMREF(fac->exp + i), ctx);
+                        ca_div_ui(t, t, 4, ctx);
+                        ca_pow(t, CA_EXT_FUNC_ARGS(ext), t, ctx);
+                        ca_mul(A, A, t, ctx);
+                        continue;
+                    }
+
+                    /* todo: assert a != 0? */
+                    if (ext != NULL && CA_EXT_HEAD(ext) == CA_Pow)
+                    {
+                        /* sqrt((a^b)^n) = +/- a^(n*b/2) */
+                        ca_mul_fmpz(t, CA_EXT_FUNC_ARGS(ext) + 1, CA_FMPQ_NUMREF(fac->exp + i), ctx);
+                        ca_div_ui(t, t, 2, ctx);
+                        ca_pow(t, CA_EXT_FUNC_ARGS(ext), t, ctx);
+                        ca_mul(A, A, t, ctx);
+                        continue;
+                    }
+
                     fmpz_init(e);
 
                     if (fmpz_is_odd(CA_FMPQ_NUMREF(fac->exp + i)))

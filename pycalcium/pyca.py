@@ -4258,7 +4258,7 @@ def test_trigonometric():
         assert sum(cos(n*a) for n in range(1,N+1)) == sin((N+0.5)*a)/(2*sin(a/2)) - 0.5
 
     assert xcos(a) == -sqrt(1 - xsin(a)**2)
-    expect_not_implemented(lambda: xsin(a/2) == sqrt((1-xcos(a))/2))
+    assert xsin(a/2) == sqrt((1-xcos(a))/2)
 
     expect_not_implemented(lambda: xsin(3*a) == 4*xsin(a)*xsin(pi/3-a)*xsin(pi/3+a))
     assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
