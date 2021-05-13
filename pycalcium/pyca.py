@@ -4168,6 +4168,7 @@ def test_improved_zero_recognition():
     assert (pi + sqrt(2) + sqrt(3)) / (pi + sqrt(5 + 2*sqrt(6))) == 1
     assert log(1/exp(sqrt(2)+1)) == -sqrt(2)-1
     assert abs(exp(sqrt(1+i))) == exp(re(sqrt(1+i)))
+    assert tan(pi*sqrt(2))*tan(pi*sqrt(3)) == (cos(pi*sqrt(5-2*sqrt(6))) - cos(pi*sqrt(5+2*sqrt(6))))/(cos(pi*sqrt(5-2*sqrt(6))) + cos(pi*sqrt(5+2*sqrt(6))))
 
     def expect_not_implemented(f):
         try:
@@ -4176,6 +4177,10 @@ def test_improved_zero_recognition():
         except NotImplementedError:
             return
         raise AssertionError
+
+    expect_not_implemented(lambda: tan(sqrt(pi*2))*tan(sqrt(pi*3)) == \
+        (cos(sqrt(pi*(5-2*sqrt(6)))) - cos(sqrt(pi*(5+2*sqrt(6)))))/(cos(sqrt(pi*(5-2*sqrt(6)))) + cos(sqrt(pi*(5+2*sqrt(6))))))
+    expect_not_implemented(lambda: sqrt(exp(2*sqrt(2)) + exp(-2*sqrt(2)) - 2) == (exp(2*sqrt(2))-1)/sqrt(exp(2*sqrt(2))))
 
     # Some examples from Stoutemyer
     z = pi
