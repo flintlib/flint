@@ -193,6 +193,7 @@ fexpr_equal(const fexpr_t a, const fexpr_t b)
 /* todo: document, test */
 int fexpr_equal_si(const fexpr_t expr, slong c);
 int fexpr_equal_ui(const fexpr_t expr, ulong c);
+ulong fexpr_hash(const fexpr_t expr);
 
 int fexpr_cmp_fast(const fexpr_t a, const fexpr_t b);
 
