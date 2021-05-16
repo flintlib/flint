@@ -270,6 +270,33 @@ ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
         }
     }
 
+    /* Could be optional: csgn normalization */
+    if (0)
+    {
+        ca_t t;
+        ca_init(t, ctx);
+        ca_sgn(t, x, ctx);
+
+        if (ca_check_is_neg_one(t, ctx) == T_TRUE)
+        {
+            ca_neg(t, x, ctx);
+            _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Exp, t), ctx);
+            fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
+            fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(res), CA_MCTX_1(ctx));
+            _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
+            ca_condense_field(res, ctx);
+        }
+        else
+        {
+            _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Exp, x), ctx);
+            fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
+            _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
+            ca_condense_field(res, ctx);
+        }
+
+        return;
+    }
+
     _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, CA_Exp, x), ctx);
     fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
     _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), CA_FIELD(res, ctx), ctx);
