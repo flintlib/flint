@@ -4373,6 +4373,56 @@ def test_trigonometric():
     assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
     assert xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b)))
 
+def test_comparisons():
+    assert inf >= inf
+    assert inf >= -inf
+    assert inf >= 3
+    assert not -inf >= inf
+    assert -inf >= -inf
+    assert not -inf >= 3
+
+    assert not inf > inf
+    assert inf > -inf
+    assert inf > 3
+    assert not -inf > inf
+    assert not -inf > -inf
+    assert not -inf >= 3
+
+    assert inf <= inf
+    assert not inf <= -inf
+    assert not inf <= 3
+    assert -inf <= inf
+    assert -inf <= -inf
+    assert -inf <= 3
+
+    assert not inf < inf
+    assert not inf < -inf
+    assert not inf < 3
+    assert -inf < inf
+    assert not -inf < -inf
+    assert -inf < 3
+
+    for a in [inf, -inf, ca(3)]:
+        for b in [uinf, undefined, inf*i, 2+i]:
+            assert not a < b
+            assert not a <= b
+            assert not a > b
+            assert not a >= b
+            assert not b < a
+            assert not b <= a
+            assert not b > a
+            assert not b >= a
+
+    assert pi + sqrt(2) + sqrt(3) <= pi + sqrt(5 + 2 * sqrt(6))
+    assert not pi + sqrt(2) + sqrt(3) < pi + sqrt(5 + 2 * sqrt(6))
+    assert pi + sqrt(2) + sqrt(3) >= pi + sqrt(5 + 2 * sqrt(6))
+    assert not pi + sqrt(2) + sqrt(3) > pi + sqrt(5 + 2 * sqrt(6))
+    assert pi + exp(-1000) > pi
+    assert pi - exp(-1000) < pi
+    assert sin(1) < 1
+    assert sin(1) <= sqrt(1 - cos(1)**2)
+    assert asin(ca(1)/10) > ca(1)/10
+
 def test_xfail():
     # Test some simplifications that are known not to work yet.
     # When a case starts working, we will get a test failure so we can
