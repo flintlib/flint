@@ -40,7 +40,7 @@ ca_atan_special(ca_t res, const ca_t x, ca_ctx_t ctx)
         return;
     }
 
-    if (ca_check_is_uinf(res, ctx) == T_TRUE || ca_check_is_undefined(res, ctx) == T_TRUE)
+    if (ca_check_is_uinf(x, ctx) == T_TRUE || ca_check_is_undefined(x, ctx) == T_TRUE)
     {
         ca_undefined(res, ctx);
         return;

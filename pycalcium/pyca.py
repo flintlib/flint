@@ -2270,7 +2270,7 @@ class ca:
             >>> tan(1, form="sine_cosine")
             1.55741 {(b)/(a) where a = 0.540302 [Cos(1)], b = 0.841471 [Sin(1)]}
             >>> tan(1, form="exponential")
-            1.55741 + 0e-33*I {(-a^2*b+b)/(a^2+1) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            1.55741 + 0e-34*I {(-a^2*b+b)/(a^2+1) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
             >>> tan(inf)
             Undefined
             >>> tan(i * inf)
@@ -2331,6 +2331,93 @@ class ca:
             libcalcium.ca_atan_direct(res, self, self._ctx)
         return res
 
+    def asin(self, form=None):
+        """
+        Inverse sine function.
+
+        Examples::
+
+            >>> asin(0)
+            0
+            >>> asin(1)
+            1.57080 {(a)/2 where a = 3.14159 [Pi]}
+            >>> asin(-1)
+            -1.57080 {(-a)/2 where a = 3.14159 [Pi]}
+            >>> asin(sqrt(2)/2)
+            0.785398 {(a)/4 where a = 3.14159 [Pi]}
+            >>> asin(i)
+            0.881374*I {-a*c where a = -0.881374 [Log(0.414214 {b-1})], b = 1.41421 [b^2-2=0], c = I [c^2+1=0]}
+            >>> sin(asin(sqrt(2)-1)) == sqrt(2)-1
+            True
+            >>> asin(sin(sqrt(2)-1)) == sqrt(2)-1
+            True
+            >>> asin(sqrt(2)-1, form="logarithm")
+            0.427079 + 0e-34*I {-a*d where a = 0e-34 + 0.427079*I [Log(0.910180 + 0.414214*I {b+c*d-d})], b = 0.910180 [Sqrt(0.828427 {2*c-2})], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+            >>> asin(sqrt(2)-1, form="direct")
+            0.427079 {a where a = 0.427079 [Asin(0.414214 {b-1})], b = 1.41421 [b^2-2=0]}
+            >>> asin(inf)
+            -I * Infinity
+            >>> asin(-inf)
+            +I * Infinity
+            >>> asin(inf*i)
+            +I * Infinity
+            >>> asin(-inf*i)
+            -I * Infinity
+            >>> asin(uinf)
+            UnsignedInfinity
+            >>> asin(undefined)
+            Undefined
+
+        """
+        res = self._new()
+        if form is None:
+            libcalcium.ca_asin(res, self, self._ctx)
+        elif form == "exponential" or form == "logarithm":
+            libcalcium.ca_asin_logarithm(res, self, self._ctx)
+        else:
+            libcalcium.ca_asin_direct(res, self, self._ctx)
+        return res
+
+    def acos(self, form=None):
+        """
+        Inverse cosine function.
+
+        Examples::
+
+            >>> acos(0)
+            1.57080 {(a)/2 where a = 3.14159 [Pi]}
+            >>> acos(1)
+            0
+            >>> acos(-1)
+            3.14159 {a where a = 3.14159 [Pi]}
+            >>> acos(sqrt(2)/2)
+            0.785398 {(a)/4 where a = 3.14159 [Pi]}
+            >>> acos(i)
+            1.57080 - 0.881374*I {(2*a*d+b)/2 where a = -0.881374 [Log(0.414214 {c-1})], b = 3.14159 [Pi], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+            >>> cos(acos(sqrt(2) - 1)) == sqrt(2) - 1
+            True
+            >>> acos(inf)
+            +I * Infinity
+            >>> acos(-inf)
+            -I * Infinity
+            >>> acos(inf*i)
+            -I * Infinity
+            >>> acos(-inf*i)
+            +I * Infinity
+            >>> acos(uinf)
+            UnsignedInfinity
+            >>> acos(undefined)
+            Undefined
+
+        """
+        res = self._new()
+        if form is None:
+            libcalcium.ca_acos(res, self, self._ctx)
+        elif form == "exponential" or form == "logarithm":
+            libcalcium.ca_acos_logarithm(res, self, self._ctx)
+        else:
+            libcalcium.ca_acos_direct(res, self, self._ctx)
+        return res
 
     def erf(self):
         """
@@ -3947,6 +4034,16 @@ def atan(x, form=None):
         x = ca(x)
     return x.atan(form=form)
 
+def asin(x, form=None):
+    if type(x) != ca:
+        x = ca(x)
+    return x.asin(form=form)
+
+def acos(x, form=None):
+    if type(x) != ca:
+        x = ca(x)
+    return x.acos(form=form)
+
 def cosh(x):
     """
     The hyperbolic cosine function is not yet implemented in Calcium.
@@ -4181,6 +4278,8 @@ def test_improved_zero_recognition():
             return
         raise AssertionError
 
+    expect_not_implemented(lambda: acos(cos(1)) == 1)
+    expect_not_implemented(lambda: acos(cos(sqrt(2) - 1)) == sqrt(2) - 1)
     expect_not_implemented(lambda: tan(sqrt(pi*2))*tan(sqrt(pi*3)) == \
         (cos(sqrt(pi*(5-2*sqrt(6)))) - cos(sqrt(pi*(5+2*sqrt(6)))))/(cos(sqrt(pi*(5-2*sqrt(6)))) + cos(sqrt(pi*(5+2*sqrt(6))))))
     expect_not_implemented(lambda: sqrt(exp(2*sqrt(2)) + exp(-2*sqrt(2)) - 2) == (exp(2*sqrt(2))-1)/sqrt(exp(2*sqrt(2))))

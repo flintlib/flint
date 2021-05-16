@@ -1132,6 +1132,31 @@ Trigonometric functions
 
     * `\operatorname{atan}(\tilde \infty) = \operatorname{Undefined}`
 
+.. function:: void ca_asin_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_acos_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_asin_direct(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_acos_direct(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_asin(ca_t res, const ca_t x, ca_ctx_t ctx)
+              void ca_acos(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the inverse sine (respectively, cosine) of *x*.
+
+    The *direct* version expresses the result as an inverse sine or
+    cosine (possibly after transforming the variable). The *logarithm*
+    version expresses it in terms of complex logarithms.
+    Simple algebraic inputs will automatically simplify to
+    rational multiples of `\pi`.
+
+    By default, the standard function uses the *logarithm*
+    representation as this typically works best for field arithmetic
+    and simplifications, although it has the disadvantage of
+    introducing complex numbers where real numbers would be sufficient.
+    The behavior of the standard function can be changed using the
+    :macro:`CA_OPT_TRIG_FORM` context setting (exponential mode
+    results in logarithmic forms).
+
+    The inverse cosine is presently implemented as
+    `\operatorname{acos}(x) = \pi/2 - \operatorname{asin}(x)`.
 
 
 Special functions

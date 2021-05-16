@@ -532,6 +532,14 @@ void ca_atan_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_atan_direct(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_atan(ca_t res, const ca_t x, ca_ctx_t ctx);
 
+void ca_asin_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_asin_direct(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_asin(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+void ca_acos_logarithm(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_acos_direct(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_acos(ca_t res, const ca_t x, ca_ctx_t ctx);
+
 /* Special functions */
 
 void ca_erf(ca_t res, const ca_t x, ca_ctx_t ctx);

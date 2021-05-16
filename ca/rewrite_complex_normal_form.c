@@ -193,6 +193,8 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
             break;
 
         case CA_Atan:
+        case CA_Asin:
+        case CA_Acos:
             {
                 ca_t t;
                 ca_init(t, ctx);
@@ -200,7 +202,12 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
                     ca_rewrite_complex_normal_form(t, CA_EXT_FUNC_ARGS(ext), deep, ctx);
                 else
                     ca_set(t, CA_EXT_FUNC_ARGS(ext), ctx);
-                ca_atan_logarithm(res, t, ctx);
+                if (CA_EXT_HEAD(ext) == CA_Asin)
+                    ca_asin_logarithm(res, t, ctx);
+                else if (CA_EXT_HEAD(ext) == CA_Acos)
+                    ca_acos_logarithm(res, t, ctx);
+                else
+                    ca_atan_logarithm(res, t, ctx);
                 ca_clear(t, ctx);
             }
             break;
