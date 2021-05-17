@@ -223,6 +223,7 @@ ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         {
             fmpz_mpoly_q_div(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(zfield, ctx));
             _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), zfield, ctx);
+            _ca_mpoly_q_simplify_fraction_ideal(CA_MPOLY_Q(res), zfield, ctx);
         }
 
         ca_condense_field(res, ctx);

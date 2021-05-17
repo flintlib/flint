@@ -413,6 +413,8 @@ ca_ext_ptr ca_is_gen_as_ext(const ca_t x, ca_ctx_t ctx);
 
 /* todo: document */
 void _ca_mpoly_q_reduce_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx);
+void _ca_mpoly_q_simplify_fraction_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx);
+
 
 void ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx);
 

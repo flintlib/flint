@@ -98,6 +98,79 @@ _ca_mpoly_q_reduce_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx
     }
 }
 
+/* This is currently very simplistic: just try to move monomial
+   factors in the denominator to the numerator. */
+void
+_ca_mpoly_q_simplify_fraction_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx)
+{
+    slong i, ideal_len;
+    int changed;
+    fmpz_mpoly_ctx_struct * mctx;
+    fmpz_mpoly_t t, u, g, q;
+    fmpz_mpoly_q_t f;
+
+    ideal_len = CA_FIELD_IDEAL_LENGTH(field);
+
+    if (ideal_len == 0)
+        return;
+
+    mctx = CA_FIELD_MCTX(field, ctx);
+
+    if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(res), mctx))
+        return;
+
+    fmpz_mpoly_init(t, mctx);
+
+    while (1)
+    {
+        changed = 0;
+
+        /* todo: only need monomial content? there should be a fmpz_mpoly_monomial_content */
+        fmpz_mpoly_term_content(t, fmpz_mpoly_q_denref(res), mctx);
+
+        if (fmpz_mpoly_is_fmpz(t, mctx))
+            break;
+
+        fmpz_one(t->coeffs);
+
+        fmpz_mpoly_init(u, mctx);
+        fmpz_mpoly_init(g, mctx);
+        fmpz_mpoly_init(q, mctx);
+        fmpz_mpoly_q_init(f, mctx);
+
+        for (i = 0; i < ideal_len; i++)
+        {
+            /* todo: error checks */
+
+            fmpz_mpoly_get_term_monomial(u, CA_FIELD_IDEAL_ELEM(field, i), 0, mctx);
+            fmpz_mpoly_gcd(g, t, u, mctx);
+            if (fmpz_mpoly_is_fmpz(g, mctx))
+                continue;
+
+            fmpz_mpoly_divexact(q, u, g, mctx);
+            fmpz_mpoly_mul(fmpz_mpoly_q_numref(f), fmpz_mpoly_q_numref(res), q, mctx);
+            fmpz_mpoly_mul(fmpz_mpoly_q_denref(f), fmpz_mpoly_q_denref(res), q, mctx);
+            _ca_mpoly_q_reduce_ideal(f, field, ctx);
+
+            if (fmpz_mpoly_cmp(fmpz_mpoly_q_denref(f), fmpz_mpoly_q_denref(res), mctx) < 0)
+            {
+                changed = 1;
+                fmpz_mpoly_q_swap(res, f, mctx);
+                break;
+            }
+        }
+
+        fmpz_mpoly_clear(u, mctx);
+        fmpz_mpoly_clear(g, mctx);
+        fmpz_mpoly_clear(q, mctx);
+        fmpz_mpoly_q_clear(f, mctx);
+
+        if (!changed)
+            break;
+    }
+
+    fmpz_mpoly_clear(t, mctx);
+}
 
 void
 ca_add_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
@@ -268,6 +341,7 @@ ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         {
             fmpz_mpoly_q_add(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(zfield, ctx));
             _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), zfield, ctx);
+            _ca_mpoly_q_simplify_fraction_ideal(CA_MPOLY_Q(res), zfield, ctx);
         }
 
         ca_condense_field(res, ctx);
@@ -394,6 +468,7 @@ ca_sub(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         {
             fmpz_mpoly_q_sub(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(zfield, ctx));
             _ca_mpoly_q_reduce_ideal(CA_MPOLY_Q(res), zfield, ctx);
+            _ca_mpoly_q_simplify_fraction_ideal(CA_MPOLY_Q(res), zfield, ctx);
         }
 
         ca_condense_field(res, ctx);

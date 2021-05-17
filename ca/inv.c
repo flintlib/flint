@@ -67,6 +67,7 @@ ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
     else
     {
         fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
+        _ca_mpoly_q_simplify_fraction_ideal(CA_MPOLY_Q(res), field, ctx);
     }
 }
 
@@ -111,5 +112,6 @@ ca_inv_no_division_by_zero(ca_t res, const ca_t x, ca_ctx_t ctx)
     else
     {
         fmpz_mpoly_q_inv(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
+        _ca_mpoly_q_simplify_fraction_ideal(CA_MPOLY_Q(res), field, ctx);
     }
 }

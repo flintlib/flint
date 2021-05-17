@@ -2787,7 +2787,7 @@ class ca_mat:
         libcalcium.ca_mat_trace(res, self, self._ctx)
         return res
 
-    def det(self):
+    def det(self, algorithm=None):
         """
         The determinant of this matrix.
 
@@ -2802,7 +2802,20 @@ class ca_mat:
         if nrows != ncols:
             raise ValueError("a square matrix is required")
         res = self._new_ca()
-        libcalcium.ca_mat_det(res, self, self._ctx)
+        if algorithm == "berkowitz":
+            libcalcium.ca_mat_det_berkowitz(res, self, self._ctx)
+        elif algorithm == "lu":
+            if not libcalcium.ca_mat_det_lu(res, self, self._ctx):
+                raise NotImplementedError("unable to compute determinant")
+        elif algorithm == "bareiss" or algorithm == "fflu":
+            if not libcalcium.ca_mat_det_bareiss(res, self, self._ctx):
+                raise NotImplementedError("unable to compute determinant")
+        elif algorithm == "cofactor":
+            if nrows > 4:
+                raise NotImplementedError("unable to compute determinant")
+            libcalcium.ca_mat_det_cofactor(res, self, self._ctx)
+        else:
+            libcalcium.ca_mat_det(res, self, self._ctx)
         return res
 
     def __neg__(self):
@@ -4269,6 +4282,7 @@ def test_improved_zero_recognition():
     assert log(1/exp(sqrt(2)+1)) == -sqrt(2)-1
     assert abs(exp(sqrt(1+i))) == exp(re(sqrt(1+i)))
     assert tan(pi*sqrt(2))*tan(pi*sqrt(3)) == (cos(pi*sqrt(5-2*sqrt(6))) - cos(pi*sqrt(5+2*sqrt(6))))/(cos(pi*sqrt(5-2*sqrt(6))) + cos(pi*sqrt(5+2*sqrt(6))))
+    assert log(exp(1j) / exp(-1j)) == 2*i
 
     def expect_not_implemented(f):
         try:
