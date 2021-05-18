@@ -169,7 +169,7 @@ static void _crt_worker(void * varg)
         m0 = primes[0];
         m1 = primes[1];
         i0 = n_invmod(m1 % m0, m0);
-        i1 = n_invmod(m0, m1);
+        i1 = n_invmod(m0 % m1, m1);
         umul_ppmm(M[1], M[0], m0, m1);
 
         for (i = Cstartrow; i < Cstoprow; i++)
