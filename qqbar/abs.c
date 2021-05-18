@@ -12,7 +12,6 @@
 #include "qqbar.h"
 
 /* todo: might be worth it to detect p/q * root of unity */
-/* todo: manually zero imaginary part? */
 void
 qqbar_abs(qqbar_t res, const qqbar_t x)
 {
@@ -48,4 +47,6 @@ qqbar_abs(qqbar_t res, const qqbar_t x)
 
         qqbar_clear(t);
     }
+
+    arb_zero(acb_imagref(QQBAR_ENCLOSURE(res)));
 }
