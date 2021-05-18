@@ -767,6 +767,11 @@ FLINT_DLL void n_fq_set_fq_nmod(
     const fq_nmod_t b,
     const fq_nmod_ctx_t ctx);
 
+FLINT_DLL void n_fq_get_n_poly(
+    n_poly_t a,
+    const mp_limb_t * b,
+    const fq_nmod_ctx_t ctx);
+
 FLINT_DLL void _n_fq_set_n_poly(
     mp_limb_t * a,
     const mp_limb_t * bcoeffs, slong blen,

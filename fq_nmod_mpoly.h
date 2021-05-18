@@ -1383,7 +1383,7 @@ FLINT_DLL void nmod_mpolyn_interp_lift_lg_poly(slong * lastdeg_,
                             const fq_nmod_poly_t B, const fq_nmod_ctx_t fqctx);
 
 FLINT_DLL int nmod_mpolyn_interp_crt_lg_poly(slong * lastdeg_,
-     nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_poly_t modulus,
+     nmod_mpolyn_t F, nmod_mpolyn_t T, n_poly_t modulus,
      const nmod_mpoly_ctx_t ctx, fq_nmod_poly_t A,  const fq_nmod_ctx_t fqctx);
 
 FLINT_DLL void nmod_mpolyn_interp_lift_lg_bpoly(slong * lastdeg_,
@@ -1403,7 +1403,7 @@ FLINT_DLL void nmod_mpolyn_interp_lift_lg_mpolyn(slong * lastdeg,
                            fq_nmod_mpolyn_t B, const fq_nmod_mpoly_ctx_t ectx);
 
 FLINT_DLL int nmod_mpolyn_interp_crt_lg_mpolyn(slong * lastdeg_,
-            nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_poly_t modulus, slong var,
+            nmod_mpolyn_t F, nmod_mpolyn_t T, n_poly_t modulus, slong var,
             const nmod_mpoly_ctx_t ctx, fq_nmod_mpolyn_t A,
                                                const fq_nmod_mpoly_ctx_t ectx);
 
@@ -1424,7 +1424,7 @@ FLINT_DLL void nmod_mpolyun_interp_lift_lg_mpolyu(nmod_mpolyun_t A,
                                                const fq_nmod_mpoly_ctx_t ctxp);
 
 FLINT_DLL int nmod_mpolyun_interp_crt_lg_mpolyu(slong * lastdeg,
-                          nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_poly_t m,
+                          nmod_mpolyun_t F, nmod_mpolyun_t T, n_poly_t m,
                           const nmod_mpoly_ctx_t ctx, fq_nmod_mpolyu_t A,
                                               const fq_nmod_mpoly_ctx_t ffctx);
 
@@ -1434,7 +1434,7 @@ FLINT_DLL int nmod_mpolyn_interp_mcrt_lg_mpoly(slong * lastdeg_,
                                               const fq_nmod_mpoly_ctx_t lgctx);
 
 FLINT_DLL int nmod_mpolyun_interp_mcrt_lg_mpolyu(slong * lastdeg,
-               nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx, nmod_poly_t m,
+               nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx, n_poly_t m,
                            fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp);
 
 FLINT_DLL void fq_nmod_mpolyn_interp_reduce_sm_poly(fq_nmod_poly_t E,

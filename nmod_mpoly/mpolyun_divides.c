@@ -34,7 +34,7 @@ int nmod_mpolyn_divides(
     slong exp_next;
     ulong mask;
     slong * hind;
-    nmod_poly_t r, acc;
+    n_poly_t r, acc;
     TMP_INIT;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
@@ -48,8 +48,8 @@ int nmod_mpolyn_divides(
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
-    nmod_poly_init_mod(r, ctx->mod);
-    nmod_poly_init_mod(acc, ctx->mod);
+    n_poly_init(r);
+    n_poly_init(acc);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = B->length + 4;   /* something bigger than heap can ever be */
@@ -101,7 +101,7 @@ int nmod_mpolyn_divides(
         lt_divides = mpoly_monomial_divides(Q->exps + Qlen*N,
                                                   exp, B->exps + N*0, N, mask);
 
-        nmod_poly_zero(acc);
+        n_poly_zero(acc);
         do
         {
             exp_list[--exp_next] = heap[1].exp;
@@ -115,12 +115,12 @@ int nmod_mpolyn_divides(
 
                 if (x->i == -WORD(1))
                 {
-                    nmod_poly_add(acc, acc, A->coeffs + x->j);
+                    n_poly_mod_add(acc, acc, A->coeffs + x->j, ctx->mod);
                 }
                 else
                 {
-                    nmod_poly_mul(r, B->coeffs + x->i, Q->coeffs + x->j);
-                    nmod_poly_sub(acc, acc, r);
+                    n_poly_mod_mul(r, B->coeffs + x->i, Q->coeffs + x->j, ctx->mod);
+                    n_poly_mod_sub(acc, acc, r, ctx->mod);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -187,11 +187,11 @@ int nmod_mpolyn_divides(
             }
         }
 
-        if (nmod_poly_is_zero(acc))
+        if (n_poly_is_zero(acc))
             continue;
 
-        nmod_poly_divrem(Q->coeffs + Qlen, r, acc, B->coeffs + 0);
-        if (!nmod_poly_is_zero(r))
+        n_poly_mod_divrem(Q->coeffs + Qlen, r, acc, B->coeffs + 0, ctx->mod);
+        if (!n_poly_is_zero(r))
             goto not_exact_division;
 
         if (!lt_divides)
@@ -220,8 +220,8 @@ int nmod_mpolyn_divides(
 
 cleanup:
 
-    nmod_poly_clear(r);
-    nmod_poly_clear(acc);
+    n_poly_clear(r);
+    n_poly_clear(acc);
 
     Q->length = Qlen;
 
@@ -258,7 +258,7 @@ int _nmod_mpolyn_divides(
     slong exp_next;
     ulong mask;
     slong * hind;
-    nmod_poly_t r, acc;
+    n_poly_t r, acc;
     TMP_INIT;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
@@ -268,8 +268,8 @@ int _nmod_mpolyn_divides(
 
     TMP_START;
 
-    nmod_poly_init_mod(r, ctx->mod);
-    nmod_poly_init_mod(acc, ctx->mod);
+    n_poly_init(r);
+    n_poly_init(acc);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = B->length + 4;   /* something bigger than heap can ever be */
@@ -321,7 +321,7 @@ int _nmod_mpolyn_divides(
         lt_divides = mpoly_monomial_divides(Q->exps + Qlen*N,
                                                   exp, B->exps + N*0, N, mask);
 
-        nmod_poly_zero(acc);
+        n_poly_zero(acc);
         do
         {
             exp_list[--exp_next] = heap[1].exp;
@@ -335,12 +335,12 @@ int _nmod_mpolyn_divides(
 
                 if (x->i == -WORD(1))
                 {
-                    nmod_poly_add(acc, acc, A->coeffs + x->j);
+                    n_poly_mod_add(acc, acc, A->coeffs + x->j, ctx->mod);
                 }
                 else
                 {
-                    nmod_poly_mul(r, B->coeffs + x->i, Q->coeffs + x->j);
-                    nmod_poly_sub(acc, acc, r);
+                    n_poly_mod_mul(r, B->coeffs + x->i, Q->coeffs + x->j, ctx->mod);
+                    n_poly_mod_sub(acc, acc, r, ctx->mod);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -407,11 +407,11 @@ int _nmod_mpolyn_divides(
             }
         }
 
-        if (nmod_poly_is_zero(acc))
+        if (n_poly_is_zero(acc))
             continue;
 
-        nmod_poly_divrem(Q->coeffs + Qlen, r, acc, B->coeffs + 0);
-        if (!nmod_poly_is_zero(r))
+        n_poly_mod_divrem(Q->coeffs + Qlen, r, acc, B->coeffs + 0, ctx->mod);
+        if (!n_poly_is_zero(r))
             goto not_exact_division;
 
         if (!lt_divides)
@@ -440,8 +440,8 @@ int _nmod_mpolyn_divides(
 
 cleanup:
 
-    nmod_poly_clear(r);
-    nmod_poly_clear(acc);
+    n_poly_clear(r);
+    n_poly_clear(acc);
 
     Q->length = Qlen;
 
@@ -478,22 +478,22 @@ void _nmod_mpolyn_add(
 
         if (cmp > 0)
         {
-            nmod_poly_set(A->coeffs + Alen, B->coeffs + i);
+            n_poly_set(A->coeffs + Alen, B->coeffs + i);
             mpoly_monomial_set(A->exps + Alen*N, B->exps + i*N, N);
             i++;
             Alen++;
         }
         else if (cmp == 0)
         {
-            nmod_poly_add(A->coeffs + Alen, B->coeffs + i, C->coeffs + j);
+            n_poly_mod_add(A->coeffs + Alen, B->coeffs + i, C->coeffs + j, ctx->mod);
             mpoly_monomial_set(A->exps + Alen*N, B->exps + i*N, N);
             i++;
             j++;
-            Alen += !nmod_poly_is_zero(A->coeffs + Alen);
+            Alen += !n_poly_is_zero(A->coeffs + Alen);
         }
         else
         {
-            nmod_poly_set(A->coeffs + Alen, C->coeffs + j);
+            n_poly_set(A->coeffs + Alen, C->coeffs + j);
             mpoly_monomial_set(A->exps + Alen*N, C->exps + j*N, N);
             j++;         
             Alen++;
@@ -502,7 +502,7 @@ void _nmod_mpolyn_add(
 
     while (i < B->length)
     {
-        nmod_poly_set(A->coeffs + Alen, B->coeffs + i);
+        n_poly_set(A->coeffs + Alen, B->coeffs + i);
         mpoly_monomial_set(A->exps + Alen*N, B->exps + i*N, N);
         i++;
         Alen++;
@@ -510,7 +510,7 @@ void _nmod_mpolyn_add(
 
     while (j < C->length)
     {
-        nmod_poly_set(A->coeffs + Alen, C->coeffs + j);
+        n_poly_set(A->coeffs + Alen, C->coeffs + j);
         mpoly_monomial_set(A->exps + Alen*N, C->exps + j*N, N);
         j++;
         Alen++;
@@ -550,7 +550,7 @@ void _nmod_mpolyn_mulsub(
     ulong ** exp_list;
     slong exp_next;
     slong * hind;
-    nmod_poly_t t;
+    n_poly_t t;
     TMP_INIT;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
@@ -564,7 +564,7 @@ void _nmod_mpolyn_mulsub(
 
     TMP_START;
 
-    nmod_poly_init_mod(t, ctx->mod);
+    n_poly_init(t);
 
     next_loc = B->length + 4; /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));
@@ -607,9 +607,9 @@ void _nmod_mpolyn_mulsub(
             nmod_mpolyn_fit_length(A, Alen + 1, ctx);
             mpoly_monomial_set(A->exps + N*Alen, D->exps + N*Di, N);
             if (saveD)
-                nmod_poly_set(A->coeffs + Alen, D->coeffs + Di);
+                n_poly_set(A->coeffs + Alen, D->coeffs + Di);
             else
-                nmod_poly_swap(A->coeffs + Alen, D->coeffs + Di);
+                n_poly_swap(A->coeffs + Alen, D->coeffs + Di);
             Alen++;
             Di++;
         }
@@ -621,14 +621,14 @@ void _nmod_mpolyn_mulsub(
         if (Di < Dlen && mpoly_monomial_equal(Dexp + N*Di, exp, N))
         {
             if (saveD)
-                nmod_poly_set(A->coeffs + Alen, D->coeffs + Di);
+                n_poly_set(A->coeffs + Alen, D->coeffs + Di);
             else
-                nmod_poly_swap(A->coeffs + Alen, D->coeffs + Di);
+                n_poly_swap(A->coeffs + Alen, D->coeffs + Di);
             Di++;
         }
         else
         {
-            nmod_poly_zero(A->coeffs + Alen);
+            n_poly_zero(A->coeffs + Alen);
         }
 
         do
@@ -640,12 +640,12 @@ void _nmod_mpolyn_mulsub(
                 hind[x->i] |= WORD(1);
                 *store++ = x->i;
                 *store++ = x->j;
-                nmod_poly_mul(t, B->coeffs + x->i, C->coeffs + x->j);
-                nmod_poly_sub(A->coeffs + Alen, A->coeffs + Alen, t);
+                n_poly_mod_mul(t, B->coeffs + x->i, C->coeffs + x->j, ctx->mod);
+                n_poly_mod_sub(A->coeffs + Alen, A->coeffs + Alen, t, ctx->mod);
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        Alen += !nmod_poly_is_zero(A->coeffs + Alen);
+        Alen += !n_poly_is_zero(A->coeffs + Alen);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -708,16 +708,16 @@ void _nmod_mpolyn_mulsub(
 
     for (i = 0; i < Dlen - Di; i++)
         if (saveD)
-            nmod_poly_set(A->coeffs + Alen + i, D->coeffs + Di + i);
+            n_poly_set(A->coeffs + Alen + i, D->coeffs + Di + i);
         else
-            nmod_poly_swap(A->coeffs + Alen + i, D->coeffs + Di + i);
+            n_poly_swap(A->coeffs + Alen + i, D->coeffs + Di + i);
 
     mpoly_copy_monomials(A->exps + N*Alen, Dexp + N*Di, Dlen - Di, N);
     Alen += Dlen - Di;
 
     A->length = Alen;
 
-    nmod_poly_clear(t);
+    n_poly_clear(t);
 
     TMP_END;
 }

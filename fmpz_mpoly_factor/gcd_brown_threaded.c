@@ -205,7 +205,7 @@ static void _splitworker(void * varg)
 
             FLINT_ASSERT(arg->G->length > 0);
 
-            k = nmod_poly_degree(arg->Gp->coeffs + 0);
+            k = n_poly_degree(arg->Gp->coeffs + 0);
             cmp = mpoly_monomial_cmp_nomask_extra(arg->G->exps + N*0,
                                    arg->Gp->exps + N*0, N, offset, k << shift);
             if (cmp < 0)

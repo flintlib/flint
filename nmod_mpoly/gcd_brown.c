@@ -15,7 +15,7 @@
 typedef struct
 {
     volatile int gcd_is_one;
-    nmod_poly_struct * gamma;
+    n_poly_struct * gamma;
     const nmod_mpoly_ctx_struct * ctx;
     nmod_mpolyn_struct * A, * B;
     ulong num_threads;
@@ -32,7 +32,7 @@ typedef struct
     slong idx;
     _splitbase_struct * base;
     nmod_mpolyn_t G, Abar, Bbar;
-    nmod_poly_t modulus;
+    n_poly_t modulus;
     mp_limb_t alpha;
     slong required_images;
 }
@@ -43,9 +43,9 @@ static void _splitworker_bivar(void * varg)
     _splitworker_arg_struct * arg = (_splitworker_arg_struct *) varg;
     _splitbase_struct * base = arg->base;
     const nmod_mpoly_ctx_struct * ctx = base->ctx;
-    nmod_poly_t modulus2, alphapow, r;
-    nmod_poly_t Aevalp, Bevalp, Gevalp, Abarevalp, Bbarevalp;
-    nmod_poly_t Aevalm, Bevalm, Gevalm, Abarevalm, Bbarevalm;
+    n_poly_t modulus2, alphapow, r;
+    n_poly_t Aevalp, Bevalp, Gevalp, Abarevalp, Bbarevalp;
+    n_poly_t Aevalm, Bevalm, Gevalm, Abarevalm, Bbarevalm;
     nmod_mpolyn_t T;
     mp_limb_t gammaevalp, alpha, temp;
     mp_limb_t gammaevalm;
@@ -58,21 +58,21 @@ static void _splitworker_bivar(void * varg)
 
     FLINT_ASSERT(base->var == 1);
 
-    nmod_poly_init_mod(r, ctx->mod);
-    nmod_poly_init_mod(modulus2, ctx->mod);
-    nmod_poly_init_mod(alphapow, ctx->mod);
-    nmod_poly_fit_length(alphapow, FLINT_MAX(WORD(3), base->bound + 1));
+    n_poly_init(r);
+    n_poly_init(modulus2);
+    n_poly_init(alphapow);
+    n_poly_fit_length(alphapow, FLINT_MAX(WORD(3), base->bound + 1));
 
-    nmod_poly_init_mod(Aevalp, ctx->mod);
-    nmod_poly_init_mod(Bevalp, ctx->mod);
-    nmod_poly_init_mod(Gevalp, ctx->mod);
-    nmod_poly_init_mod(Abarevalp, ctx->mod);
-    nmod_poly_init_mod(Bbarevalp, ctx->mod);
-    nmod_poly_init_mod(Aevalm, ctx->mod);
-    nmod_poly_init_mod(Bevalm, ctx->mod);
-    nmod_poly_init_mod(Gevalm, ctx->mod);
-    nmod_poly_init_mod(Abarevalm, ctx->mod);
-    nmod_poly_init_mod(Bbarevalm, ctx->mod);
+    n_poly_init(Aevalp);
+    n_poly_init(Bevalp);
+    n_poly_init(Gevalp);
+    n_poly_init(Abarevalp);
+    n_poly_init(Bbarevalp);
+    n_poly_init(Aevalm);
+    n_poly_init(Bevalm);
+    n_poly_init(Gevalm);
+    n_poly_init(Abarevalm);
+    n_poly_init(Bbarevalm);
     nmod_mpolyn_init(T, base->A->bits, ctx);
 
     alpha = arg->alpha;
@@ -80,8 +80,8 @@ static void _splitworker_bivar(void * varg)
     use_stab = 1;
     gstab = bstab = astab = 0;
 
-    nmod_poly_one(arg->modulus);
-    while (nmod_poly_degree(arg->modulus) < arg->required_images)
+    n_poly_one(arg->modulus);
+    while (n_poly_degree(arg->modulus) < arg->required_images)
     {
         /* get evaluation point */
         if (alpha <= base->num_threads)
@@ -123,40 +123,40 @@ static void _splitworker_bivar(void * varg)
                                                         arg->G, alphapow, ctx);
             Gdeg = ((arg->G->exps + N*0)[off]>>shift);
             success = 1;
-            success = success && nmod_poly_degree(Gevalp) == Gdeg;
-            success = success && nmod_poly_degree(Gevalm) == Gdeg;
+            success = success && n_poly_degree(Gevalp) == Gdeg;
+            success = success && n_poly_degree(Gevalm) == Gdeg;
             success = success && Gevalp->coeffs[Gdeg] == gammaevalp;
             success = success && Gevalm->coeffs[Gdeg] == gammaevalm;
-            nmod_poly_divrem_basecase(Abarevalp, r, Aevalp, Gevalp);
+            n_poly_mod_divrem(Abarevalp, r, Aevalp, Gevalp, ctx->mod);
             success = success && (r->length == 0);
-            nmod_poly_divrem_basecase(Abarevalm, r, Aevalm, Gevalm);
+            n_poly_mod_divrem(Abarevalm, r, Aevalm, Gevalm, ctx->mod);
             success = success && (r->length == 0);
-            nmod_poly_divrem_basecase(Bbarevalp, r, Bevalp, Gevalp);
+            n_poly_mod_divrem(Bbarevalp, r, Bevalp, Gevalp, ctx->mod);
             success = success && (r->length == 0);
-            nmod_poly_divrem_basecase(Bbarevalm, r, Bevalm, Gevalm);
+            n_poly_mod_divrem(Bbarevalm, r, Bevalm, Gevalm, ctx->mod);
             success = success && (r->length == 0);
 
             if (!success)
             {
                 use_stab = 0;
-                nmod_poly_one(arg->modulus);
+                n_poly_one(arg->modulus);
                 alpha = arg->alpha;
                 continue;
             }
 
-            nmod_poly_scalar_mul_nmod(Abarevalp, Abarevalp, gammaevalp);
-            nmod_poly_scalar_mul_nmod(Abarevalm, Abarevalm, gammaevalm);
-            nmod_poly_scalar_mul_nmod(Bbarevalp, Bbarevalp, gammaevalp);
-            nmod_poly_scalar_mul_nmod(Bbarevalm, Bbarevalm, gammaevalm);
+            _n_poly_mod_scalar_mul_nmod(Abarevalp, Abarevalp, gammaevalp, ctx->mod);
+            _n_poly_mod_scalar_mul_nmod(Abarevalm, Abarevalm, gammaevalm, ctx->mod);
+            _n_poly_mod_scalar_mul_nmod(Bbarevalp, Bbarevalp, gammaevalp, ctx->mod);
+            _n_poly_mod_scalar_mul_nmod(Bbarevalm, Bbarevalm, gammaevalm, ctx->mod);
         }
         else
         {
-            nmod_poly_gcd(Gevalp, Aevalp, Bevalp);
-            nmod_poly_div(Abarevalp, Aevalp, Gevalp);
-            nmod_poly_div(Bbarevalp, Bevalp, Gevalp);
-            nmod_poly_gcd(Gevalm, Aevalm, Bevalm);
-            nmod_poly_div(Abarevalm, Aevalm, Gevalm);
-            nmod_poly_div(Bbarevalm, Bevalm, Gevalm);
+            n_poly_mod_gcd(Gevalp, Aevalp, Bevalp, ctx->mod);
+            n_poly_mod_div(Abarevalp, Aevalp, Gevalp, ctx->mod);
+            n_poly_mod_div(Bbarevalp, Bevalp, Gevalp, ctx->mod);
+            n_poly_mod_gcd(Gevalm, Aevalm, Bevalm, ctx->mod);
+            n_poly_mod_div(Abarevalm, Aevalm, Gevalm, ctx->mod);
+            n_poly_mod_div(Bbarevalm, Bevalm, Gevalm, ctx->mod);
         }
 
         FLINT_ASSERT(Gevalp->length > 0);
@@ -171,42 +171,42 @@ static void _splitworker_bivar(void * varg)
         {
             break;
         }
-        if (nmod_poly_degree(Gevalp) == 0 || nmod_poly_degree(Gevalm) == 0)
+        if (n_poly_degree(Gevalp) == 0 || n_poly_degree(Gevalm) == 0)
         {
             base->gcd_is_one = 1;
             break;
         }
 
-        if (nmod_poly_degree(Gevalp) != nmod_poly_degree(Gevalm))
+        if (n_poly_degree(Gevalp) != n_poly_degree(Gevalm))
         {
             continue;
         }
 
         /* the Geval have matching degrees */
-        if (nmod_poly_degree(arg->modulus) > 0)
+        if (n_poly_degree(arg->modulus) > 0)
         {
             FLINT_ASSERT(arg->G->length > 0);
-            if (nmod_poly_degree(Gevalp) > ((arg->G->exps + N*0)[off]>>shift))
+            if (n_poly_degree(Gevalp) > ((arg->G->exps + N*0)[off]>>shift))
             {
                 continue;
             }
-            else if (nmod_poly_degree(Gevalp) < ((arg->G->exps + N*0)[off]>>shift))
+            else if (n_poly_degree(Gevalp) < ((arg->G->exps + N*0)[off]>>shift))
             {
-                nmod_poly_one(arg->modulus);
+                n_poly_one(arg->modulus);
             }
         }
         /* update interpolants */
-        nmod_poly_scalar_mul_nmod(Gevalp, Gevalp, gammaevalp);
-        nmod_poly_scalar_mul_nmod(Gevalm, Gevalm, gammaevalm);
-        if (nmod_poly_degree(arg->modulus) > 0)
+        _n_poly_mod_scalar_mul_nmod(Gevalp, Gevalp, gammaevalp, ctx->mod);
+        _n_poly_mod_scalar_mul_nmod(Gevalm, Gevalm, gammaevalm, ctx->mod);
+        if (n_poly_degree(arg->modulus) > 0)
         {
-            temp = nmod_poly_evaluate_nmod(arg->modulus, alpha);
-            FLINT_ASSERT(temp == nmod_poly_evaluate_nmod(arg->modulus,
-                                                          ctx->mod.n - alpha));
+            temp = n_poly_mod_evaluate_nmod(arg->modulus, alpha, ctx->mod);
+            FLINT_ASSERT(temp == n_poly_mod_evaluate_nmod(arg->modulus,
+                                                ctx->mod.n - alpha, ctx->mod));
             temp = nmod_mul(temp, alpha, ctx->mod);
             temp = nmod_add(temp, temp, ctx->mod);
             temp = n_invmod(temp, ctx->mod.n);
-            nmod_poly_scalar_mul_nmod(arg->modulus, arg->modulus, temp);
+            _n_poly_mod_scalar_mul_nmod(arg->modulus, arg->modulus, temp, ctx->mod);
             if (!gstab)
             {
                 gstab = !nmod_mpolyn_interp_crt_2sm_poly(&ldeg, arg->G, T,
@@ -228,25 +228,25 @@ static void _splitworker_bivar(void * varg)
             gstab = astab = bstab = 0;
         }
         temp = nmod_mul(alpha, alpha, ctx->mod);
-        nmod_poly_scalar_mul_nmod(modulus2, arg->modulus, temp);
-        nmod_poly_shift_left(arg->modulus, arg->modulus, 2);
-        nmod_poly_sub(arg->modulus, arg->modulus, modulus2);
+        _n_poly_mod_scalar_mul_nmod(modulus2, arg->modulus, temp, ctx->mod);
+        n_poly_shift_left(arg->modulus, arg->modulus, 2);
+        n_poly_mod_sub(arg->modulus, arg->modulus, modulus2, ctx->mod);
     }
 
-    nmod_poly_clear(r);
-    nmod_poly_clear(modulus2);
-    nmod_poly_clear(alphapow);
+    n_poly_clear(r);
+    n_poly_clear(modulus2);
+    n_poly_clear(alphapow);
 
-    nmod_poly_clear(Aevalp);
-    nmod_poly_clear(Bevalp);
-    nmod_poly_clear(Gevalp);
-    nmod_poly_clear(Abarevalp);
-    nmod_poly_clear(Bbarevalp);
-    nmod_poly_clear(Aevalm);
-    nmod_poly_clear(Bevalm);
-    nmod_poly_clear(Gevalm);
-    nmod_poly_clear(Abarevalm);
-    nmod_poly_clear(Bbarevalm);
+    n_poly_clear(Aevalp);
+    n_poly_clear(Bevalp);
+    n_poly_clear(Gevalp);
+    n_poly_clear(Abarevalp);
+    n_poly_clear(Bbarevalp);
+    n_poly_clear(Aevalm);
+    n_poly_clear(Bevalm);
+    n_poly_clear(Gevalm);
+    n_poly_clear(Abarevalm);
+    n_poly_clear(Bbarevalm);
     nmod_mpolyn_clear(T, ctx);
 }
 
@@ -260,7 +260,7 @@ static void _splitworker(void * varg)
     slong var = base->var;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     slong offset, shift;
-    nmod_poly_t modulus2, alphapow;
+    n_poly_t modulus2, alphapow;
     nmod_mpolyn_t Aevalp, Bevalp, Gevalp, Abarevalp, Bbarevalp;
     nmod_mpolyn_t Aevalm, Bevalm, Gevalm, Abarevalm, Bbarevalm;
     nmod_mpolyn_t T;
@@ -276,9 +276,9 @@ static void _splitworker(void * varg)
 
     mpoly_gen_offset_shift_sp(&offset, &shift, var - 1, bits, ctx->minfo);
 
-    nmod_poly_init(modulus2, ctx->mod.n);
-    nmod_poly_init(alphapow, ctx->mod.n);
-    nmod_poly_fit_length(alphapow, FLINT_MAX(WORD(3), base->bound + 1));
+    n_poly_init(modulus2);
+    n_poly_init(alphapow);
+    n_poly_fit_length(alphapow, FLINT_MAX(WORD(3), base->bound + 1));
 
     nmod_mpolyn_init(Aevalp, bits, ctx);
     nmod_mpolyn_init(Bevalp, bits, ctx);
@@ -294,8 +294,8 @@ static void _splitworker(void * varg)
 
     alpha = arg->alpha;
 
-    nmod_poly_one(arg->modulus);
-    while (nmod_poly_degree(arg->modulus) < arg->required_images)
+    n_poly_one(arg->modulus);
+    while (n_poly_degree(arg->modulus) < arg->required_images)
     {
         /* get evaluation point */
         if (alpha <= base->num_threads)
@@ -359,8 +359,8 @@ static void _splitworker(void * varg)
             break;
         }
 
-        if (   nmod_poly_degree(Gevalp->coeffs + 0)
-            != nmod_poly_degree(Gevalm->coeffs + 0))
+        if (n_poly_degree(Gevalp->coeffs + 0) !=
+            n_poly_degree(Gevalm->coeffs + 0))
         {
             continue;
         }
@@ -370,14 +370,14 @@ static void _splitworker(void * varg)
         }
 
         /* the Geval have matching degrees */
-        if (nmod_poly_degree(arg->modulus) > 0)
+        if (n_poly_degree(arg->modulus) > 0)
         {
             int cmp;
             slong k;
 
             FLINT_ASSERT(arg->G->length > 0);
 
-            k = nmod_poly_degree(Gevalp->coeffs + 0);
+            k = n_poly_degree(Gevalp->coeffs + 0);
             cmp = mpoly_monomial_cmp_nomask_extra(arg->G->exps + N*0,
                                     Gevalp->exps + N*0, N, offset, k << shift);
             if (cmp < 0)
@@ -386,7 +386,7 @@ static void _splitworker(void * varg)
             }
             else if (cmp > 0)
             {
-                nmod_poly_one(arg->modulus);
+                n_poly_one(arg->modulus);
             }
         }
 
@@ -399,14 +399,15 @@ static void _splitworker(void * varg)
         temp = n_invmod(temp, ctx->mod.n);
         temp = nmod_mul(gammaevalm, temp, ctx->mod);
         nmod_mpolyn_scalar_mul_nmod(Gevalm, temp, ctx);
-        if (nmod_poly_degree(arg->modulus) > 0)
+        if (n_poly_degree(arg->modulus) > 0)
         {
-            temp = nmod_poly_evaluate_nmod(arg->modulus, alpha);
-            FLINT_ASSERT(temp == nmod_poly_evaluate_nmod(arg->modulus, ctx->mod.n - alpha));
+            temp = n_poly_mod_evaluate_nmod(arg->modulus, alpha, ctx->mod);
+            FLINT_ASSERT(temp == n_poly_mod_evaluate_nmod(arg->modulus,
+                                                ctx->mod.n - alpha, ctx->mod));
             temp = nmod_mul(temp, alpha, ctx->mod);
             temp = nmod_add(temp, temp, ctx->mod);
             temp = n_invmod(temp, ctx->mod.n);
-            nmod_poly_scalar_mul_nmod(arg->modulus, arg->modulus, temp);
+            _n_poly_mod_scalar_mul_nmod(arg->modulus, arg->modulus, temp, ctx->mod);
             nmod_mpolyn_interp_crt_2sm_mpolyn(&ldeg, arg->G, T,
                              Gevalp, Gevalm, var, arg->modulus, alphapow, ctx);
             nmod_mpolyn_interp_crt_2sm_mpolyn(&ldeg, arg->Abar, T,
@@ -424,13 +425,13 @@ static void _splitworker(void * varg)
                                         Bbarevalp, Bbarevalm, var, alpha, ctx);
         }
         temp = nmod_mul(alpha, alpha, ctx->mod);
-        nmod_poly_scalar_mul_nmod(modulus2, arg->modulus, temp);
-        nmod_poly_shift_left(arg->modulus, arg->modulus, 2);
-        nmod_poly_sub(arg->modulus, arg->modulus, modulus2);
+        _n_poly_mod_scalar_mul_nmod(modulus2, arg->modulus, temp, ctx->mod);
+        n_poly_shift_left(arg->modulus, arg->modulus, 2);
+        n_poly_mod_sub(arg->modulus, arg->modulus, modulus2, ctx->mod);
     }
 
-    nmod_poly_clear(modulus2);
-    nmod_poly_clear(alphapow);
+    n_poly_clear(modulus2);
+    n_poly_clear(alphapow);
 
     nmod_mpolyn_clear(Aevalp, ctx);
     nmod_mpolyn_clear(Bevalp, ctx);
@@ -507,7 +508,7 @@ static slong _nmod_mpolyn_crt(
     nmod_mpolyn_struct * const * B,
     slong count,
     nmod_poly_struct * output,
-    nmod_poly_struct ** input,
+    nmod_poly_struct * input,
     const nmod_mpoly_ctx_t ctx)
 {
     int cmp;
@@ -516,8 +517,8 @@ static slong _nmod_mpolyn_crt(
     slong Ai;
     slong j, k;
     slong * start, * stop;
-    nmod_poly_t zero;
     nmod_mpolyn_t A;
+    n_poly_t zero;
     const ulong * exp_left = S->left_exp;
     const ulong * exp_right = S->right_exp;
     TMP_INIT;
@@ -525,6 +526,9 @@ static slong _nmod_mpolyn_crt(
     *A = *S->poly;
 
     TMP_START;
+
+    n_poly_init(zero);
+    n_poly_zero(zero);
 
     start = (slong *) TMP_ALLOC(2*count*sizeof(slong));
     stop = start + count;
@@ -580,8 +584,6 @@ static slong _nmod_mpolyn_crt(
     }
 #endif
 
-    nmod_poly_init_mod(zero, ctx->mod);
-
     Ai = 0;
     lastdegree = -WORD(1);
     while (1)
@@ -589,26 +591,23 @@ static slong _nmod_mpolyn_crt(
         nmod_mpolyn_fit_length(A, Ai + 1, ctx);
 
         k = 0;
-        do
-        {
-            input[k] = zero;
+        do {
+            nmod_poly_mock(&input[k], zero, ctx->mod);
             if (start[k] < stop[k])
-            {
                 goto found_max;
-            }
         } while (++k < count);
 
         break; /* all B[k] have been scanned completely */
 
     found_max:
 
-        input[k] = B[k]->coeffs + start[k];
+        nmod_poly_mock(&input[k], B[k]->coeffs + start[k], ctx->mod);
         mpoly_monomial_set(A->exps + N*Ai, B[k]->exps + N*start[k], N);
         start[k]++;
 
         for (k++; k < count; k++)
         {
-            input[k] = zero;
+            nmod_poly_mock(&input[k], zero, ctx->mod);
             if (start[k] >= stop[k])
             {
                 continue;
@@ -617,7 +616,8 @@ static slong _nmod_mpolyn_crt(
             cmp = mpoly_monomial_cmp_nomask(B[k]->exps + N*start[k], A->exps + N*Ai, N);
             if (cmp == 0)
             {
-                input[k] = B[k]->coeffs + start[k];
+                nmod_poly_mock(&input[k], B[k]->coeffs + start[k], ctx->mod);
+                FLINT_ASSERT(input[k].length > 0);
                 start[k]++;
             }
             else if (cmp > 0)
@@ -625,22 +625,21 @@ static slong _nmod_mpolyn_crt(
                 /* undo previous max's */
                 for (j = 0; j < k; j++)
                 {
-                    start[j] -= (input[j] != zero);
-                    input[j] = zero;
+                    start[j] -= (input[j].length > 0);
+                    nmod_poly_mock(&input[j], zero, ctx->mod);
                 }
                 goto found_max;
             }
         }
 
-        _nmod_poly_multi_crt_run_p(output, P,
-                                     (const nmod_poly_struct * const *) input);
-        nmod_poly_swap(A->coeffs + Ai, output + 0);
-        lastdegree = FLINT_MAX(lastdegree, nmod_poly_degree(A->coeffs + Ai));
-        Ai += !nmod_poly_is_zero(A->coeffs + Ai);
+        _nmod_poly_multi_crt_run(output, P, input);
+        n_poly_set_nmod_poly(A->coeffs + Ai, output + 0);
+        lastdegree = FLINT_MAX(lastdegree, n_poly_degree(A->coeffs + Ai));
+        Ai += !n_poly_is_zero(A->coeffs + Ai);
     }
     A->length = Ai;
 
-    nmod_poly_clear(zero);
+    n_poly_clear(zero);
 
     TMP_END;
 
@@ -680,15 +679,15 @@ static void _joinworker(void * varg)
 {
     _njoinworker_arg_struct * arg = (_njoinworker_arg_struct *) varg;
     _joinbase_struct * base = arg->base;
-    nmod_poly_struct ** input;
+    nmod_poly_struct * input;
     nmod_poly_struct * output;
     slong i, ls = _nmod_poly_multi_crt_local_size(base->CRT);
     TMP_INIT;
 
     TMP_START;
 
-    input = (nmod_poly_struct **) TMP_ALLOC(
-                               base->num_threads * sizeof(nmod_poly_struct *));
+    input = (nmod_poly_struct *) TMP_ALLOC(
+                               base->num_threads * sizeof(nmod_poly_struct));
     output = (nmod_poly_struct *) TMP_ALLOC(ls*sizeof(nmod_poly_struct));
     for (i = 0; i < ls; i++)
         nmod_poly_init_mod(output + i, base->ctx->mod);
@@ -755,10 +754,10 @@ static void _finaljoinworker(void * varg)
     slong i, j;
     slong source_len;
     ulong * source_exps;
-    nmod_poly_struct * source_coeffs;
+    n_poly_struct * source_coeffs;
     slong Ti;
     ulong * Texps;
-    nmod_poly_struct * Tcoeffs;
+    n_poly_struct * Tcoeffs;
 
     for (i = base->chunks_length - 1; i >= 0; i--)
     {
@@ -793,7 +792,7 @@ static void _finaljoinworker(void * varg)
         Ti = base->chunks[i].final_idx;
         mpoly_copy_monomials(Texps + N*Ti, source_exps, source_len, N);
         for (j = 0; j < source_len; j++)
-            nmod_poly_swap(Tcoeffs + Ti + j, source_coeffs + j);
+            n_poly_swap(Tcoeffs + Ti + j, source_coeffs + j);
     }
 }
 
@@ -826,14 +825,14 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     mp_limb_t alpha;
     slong deggamma, ldegA, ldegB;
     slong ldegGs_Abars_Bbars[3];
-    nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma;
-    nmod_poly_struct ** mptrs;
+    n_poly_t cA, cB, cG, cAbar, cBbar, gamma;
+    nmod_poly_struct * mptrs;
     nmod_mpolyn_struct ** gptrs, ** abarptrs, ** bbarptrs;
     _splitworker_arg_struct * splitargs;
     _splitbase_t splitbase;
     _njoinworker_arg_struct * joinargs;
     _joinbase_t joinbase;
-    nmod_poly_t t1;
+    n_poly_t t1;
     nmod_mpolyn_t T1, T2;
 #if FLINT_WANT_ASSERT
     nmod_mpolyn_t Aorg, Borg;
@@ -856,32 +855,32 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
 
     mpoly_gen_offset_shift_sp(&offset, &shift, 0, G->bits, ctx->minfo);
 
-    nmod_poly_init_mod(t1, ctx->mod);
+    n_poly_init(t1);
     nmod_mpolyn_init(T1, bits, ctx);
     nmod_mpolyn_init(T2, bits, ctx);
 
-    nmod_poly_init(cA, ctx->mod.n);
-    nmod_poly_init(cB, ctx->mod.n);
+    n_poly_init(cA);
+    n_poly_init(cB);
     nmod_mpolyn_content_last(cA, A, ctx);
     nmod_mpolyn_content_last(cB, B, ctx);
     nmod_mpolyn_divexact_last(A, cA, ctx);
     nmod_mpolyn_divexact_last(B, cB, ctx);
 
-    nmod_poly_init(cG, ctx->mod.n);
-    nmod_poly_gcd(cG, cA, cB);
+    n_poly_init(cG);
+    n_poly_mod_gcd(cG, cA, cB, ctx->mod);
 
-    nmod_poly_init(cAbar, ctx->mod.n);
-    nmod_poly_init(cBbar, ctx->mod.n);
-    nmod_poly_div(cAbar, cA, cG);
-    nmod_poly_div(cBbar, cB, cG);
+    n_poly_init(cAbar);
+    n_poly_init(cBbar);
+    n_poly_mod_div(cAbar, cA, cG, ctx->mod);
+    n_poly_mod_div(cBbar, cB, cG, ctx->mod);
 
-    nmod_poly_init(gamma, ctx->mod.n);
-    nmod_poly_gcd(gamma, nmod_mpolyn_leadcoeff_poly(A, ctx),
-                         nmod_mpolyn_leadcoeff_poly(B, ctx));
+    n_poly_init(gamma);
+    n_poly_mod_gcd(gamma, nmod_mpolyn_leadcoeff_poly(A, ctx),
+                          nmod_mpolyn_leadcoeff_poly(B, ctx), ctx->mod);
 
     ldegA = nmod_mpolyn_lastdeg(A, ctx);
     ldegB = nmod_mpolyn_lastdeg(B, ctx);
-    deggamma = nmod_poly_degree(gamma);
+    deggamma = n_poly_degree(gamma);
     bound = 1 + deggamma + FLINT_MAX(ldegA, ldegB);
     best_est = bound;
 
@@ -932,8 +931,8 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
                                     num_threads*sizeof(nmod_mpolyn_struct *));
     bbarptrs = (nmod_mpolyn_struct **) flint_malloc(
                                     num_threads*sizeof(nmod_mpolyn_struct *));
-    mptrs = (nmod_poly_struct **) flint_malloc(
-                                       num_threads*sizeof(nmod_poly_struct *));
+    mptrs = (nmod_poly_struct *) flint_malloc(
+                                       num_threads*sizeof(nmod_poly_struct));
     splitargs = (_splitworker_arg_struct *) flint_malloc(
                                   num_threads*sizeof(_splitworker_arg_struct));
     for (i = 0; i < num_threads; i++)
@@ -941,7 +940,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
         nmod_mpolyn_init(splitargs[i].G, bits, ctx);
         nmod_mpolyn_init(splitargs[i].Abar, bits, ctx);
         nmod_mpolyn_init(splitargs[i].Bbar, bits, ctx);
-        nmod_poly_init(splitargs[i].modulus, ctx->mod.n);
+        n_poly_init(splitargs[i].modulus);
     }
     splitbase->num_threads = num_threads;
     splitbase->A = A;
@@ -996,8 +995,8 @@ compute_split:
         gptrs[i] = splitargs[i].G;
         abarptrs[i] = splitargs[i].Abar;
         bbarptrs[i] = splitargs[i].Bbar;
-        mptrs[i] = splitargs[i].modulus;
-        if (nmod_poly_degree(splitargs[i].modulus) < splitargs[i].required_images)
+        nmod_poly_mock(&mptrs[i], splitargs[i].modulus, ctx->mod);
+        if (n_poly_degree(splitargs[i].modulus) < splitargs[i].required_images)
         {
             /* not enough evaluation points - must fail */
             success = 0;
@@ -1022,8 +1021,7 @@ compute_split:
     }
 
     nmod_poly_multi_crt_init(joinbase->CRT);
-    success = nmod_poly_multi_crt_precompute_p(joinbase->CRT,
-                        (const nmod_poly_struct * const *) mptrs, num_threads);
+    success = nmod_poly_multi_crt_precompute(joinbase->CRT, mptrs, num_threads);
     FLINT_ASSERT(success);
 
     joinbase->num_threads = num_threads;
@@ -1249,7 +1247,7 @@ cleanup_split:
         nmod_mpolyn_clear(splitargs[i].G, ctx);
         nmod_mpolyn_clear(splitargs[i].Abar, ctx);
         nmod_mpolyn_clear(splitargs[i].Bbar, ctx);
-        nmod_poly_clear(splitargs[i].modulus);
+        n_poly_clear(splitargs[i].modulus);
     }
 
     flint_free(gptrs);
@@ -1275,14 +1273,14 @@ cleanup:
     nmod_mpolyn_clear(Borg, ctx);
 #endif
 
-    nmod_poly_clear(cA);
-    nmod_poly_clear(cB);
-    nmod_poly_clear(cG);
-    nmod_poly_clear(cAbar);
-    nmod_poly_clear(cBbar);
-    nmod_poly_clear(gamma);
+    n_poly_clear(cA);
+    n_poly_clear(cB);
+    n_poly_clear(cG);
+    n_poly_clear(cAbar);
+    n_poly_clear(cBbar);
+    n_poly_clear(gamma);
 
-    nmod_poly_clear(t1);
+    n_poly_clear(t1);
     nmod_mpolyn_clear(T1, ctx);
     nmod_mpolyn_clear(T2, ctx);
 

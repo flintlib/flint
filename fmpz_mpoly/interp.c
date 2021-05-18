@@ -213,7 +213,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
     ulong * Aexp = A->exps;
     slong Alen = A->length;
     slong Ai;
-    nmod_poly_struct * Ecoeff;
+    n_poly_struct * Ecoeff;
     ulong * Eexp;
     slong Ei;
     slong m = ctx->minfo->nvars;
@@ -236,9 +236,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
         if (Ei > 0 && mpoly_monomial_equal_extra(Eexp + N*(Ei - 1),
                                         Aexp + N*Ai, N, offset, -(k << shift)))
         {
-            /* append to previous */
-            FLINT_ASSERT((Ecoeff + Ei - 1)->mod.n == pctx->mod.n);
-            nmod_poly_set_coeff_ui(Ecoeff + Ei - 1, k, v);
+            n_poly_set_coeff(Ecoeff + Ei - 1, k, v);
         }
         else
         {
@@ -253,11 +251,9 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
                 Eexp = E->exps;
             }
 
-            FLINT_ASSERT((Ecoeff + Ei)->mod.n == pctx->mod.n);
-
             mpoly_monomial_set_extra(Eexp + N*Ei, Aexp + N*Ai, N, offset, -(k << shift));
-            nmod_poly_zero(Ecoeff + Ei);
-            nmod_poly_set_coeff_ui(Ecoeff + Ei, k, v);
+            n_poly_zero(Ecoeff + Ei);
+            n_poly_set_coeff(Ecoeff + Ei, k, v);
             Ei++;
         }
     }
@@ -279,7 +275,7 @@ void fmpz_mpoly_interp_lift_p_mpolyn(
     slong offset, shift;
     slong vi;
 
-    nmod_poly_struct * Bcoeff = B->coeffs;
+    n_poly_struct * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
     slong Blen = B->length;
     slong Bi;
@@ -344,7 +340,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
     ulong * Texp;
     slong Ti;
 
-    nmod_poly_struct * Acoeff = A->coeffs;
+    n_poly_struct * Acoeff = A->coeffs;
     slong Alen = A->length;
     ulong * Aexp = A->exps;
     slong Ai;
@@ -376,7 +372,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
     Fi = Ai = vi = 0;
     if (Ai < Alen)
     {
-        vi = nmod_poly_degree(A->coeffs + Ai);
+        vi = n_poly_degree(A->coeffs + Ai);
     }
     while (Fi < Flen || Ai < Alen)
     {
@@ -405,7 +401,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
                 Ai++;
                 if (Ai < Alen)
                 {
-                    vi = nmod_poly_degree(A->coeffs + Ai);
+                    vi = n_poly_degree(A->coeffs + Ai);
                 }
             }
         }
@@ -441,7 +437,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
                 Ai++;
                 if (Ai < Alen)
                 {
-                    vi = nmod_poly_degree(A->coeffs + Ai);
+                    vi = n_poly_degree(A->coeffs + Ai);
                 }
             }
         }
