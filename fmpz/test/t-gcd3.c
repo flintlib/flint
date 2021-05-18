@@ -19,7 +19,7 @@
 int
 main(void)
 {
-    int i, result;
+    slong i;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd3....");

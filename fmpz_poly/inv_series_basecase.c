@@ -186,9 +186,9 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
                 if (neg)
                     fmpz_neg(Qinv + i, Qinv + i);
             }
-
-            TMP_END;
         }
+
+        TMP_END;
     }
 }
 
