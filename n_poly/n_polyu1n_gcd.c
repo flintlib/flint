@@ -477,8 +477,6 @@ successful_put_content:
 
 cleanup:
 
-    FLINT_ASSERT(success);
-
 #if FLINT_WANT_ASSERT
     if (success)
     {

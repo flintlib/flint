@@ -466,6 +466,18 @@ FLINT_DLL void _nmod_mpoly_set_n_bpoly_var1_zero(nmod_mpoly_t A,
                          flint_bitcnt_t Abits, const n_bpoly_t B, slong var,
                                                    const nmod_mpoly_ctx_t ctx);
 
+/* gcd ***********************************************************************/
+
+FLINT_DLL int nmod_mpolyl_gcdp_zippel_smprime(
+    nmod_mpoly_t G,
+    nmod_mpoly_t Abar,
+    nmod_mpoly_t Bbar,
+    nmod_mpoly_t A,
+    nmod_mpoly_t B,
+    slong var,
+    const nmod_mpoly_ctx_t ctx,
+    flint_rand_t state);
+
 #ifdef __cplusplus
 }
 #endif

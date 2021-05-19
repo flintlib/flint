@@ -22,8 +22,7 @@ void fmpz_mpolyl_lead_coeff(
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, off, shift;
-    ulong old_shift, new_shift;
-    ulong mask;
+    ulong mask, first_mask;
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     ulong * Aexps = A->exps;
     ulong * cexps;
@@ -36,20 +35,22 @@ void fmpz_mpolyl_lead_coeff(
 
     mpoly_gen_offset_shift_sp(&off, &shift, num_vars - 1, A->bits, ctx->minfo);
 
+    mask = (-UWORD(1)) << shift;
+
     i = 0;
-    old_shift = (Aexps + N*i)[off] >> shift;
+    first_mask = (Aexps + N*i)[off] & mask;
 
-    for (i = 1; i < Alen; old_shift = new_shift, i++)
+    for (i = 1; i < Alen; i++)
     {
-        new_shift = (Aexps + N*i)[off] >> shift;
-
-        if (new_shift != old_shift)
-            break;
+        if (((Aexps + N*i)[off] & mask) != first_mask)
+            goto break_outer;
 
         for (j = off + 1; j < N; j++)
             if ((Aexps + N*(i - 1))[j] != (Aexps + N*i)[j])
-                break;
+                goto break_outer;
     }
+
+break_outer:
 
     fmpz_mpoly_fit_length_reset_bits(c, i, A->bits, ctx);
 
@@ -58,7 +59,8 @@ void fmpz_mpolyl_lead_coeff(
 
     _fmpz_vec_set(c->coeffs, A->coeffs, c->length);
 
-    mask = (shift > 0) ? ((-UWORD(1)) >> (FLINT_BITS - shift)) : 0;
+    mask = ~mask;
+
     for (i = 0; i < c->length; i++)
     {
         for (j = 0; j < off; j++)

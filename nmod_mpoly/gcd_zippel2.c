@@ -223,7 +223,7 @@ static ulong _fq_nmod_mpoly_bidegree(
     return _mpoly_bidegree(A->exps, A->bits, ctx->minfo);
 }
 
-static void n_polyun_zip_start(n_polyun_t Z, n_polyun_t H, slong req_images)
+void n_polyun_zip_start(n_polyun_t Z, n_polyun_t H, slong req_images)
 {
     slong j;
     n_polyun_fit_length(Z, H->length);
@@ -284,7 +284,7 @@ int n_polyu2n_add_zip_must_match(
     return 1;
 }
 
-static int n_polyun_zip_solve(
+int n_polyun_zip_solve(
     nmod_mpoly_t A,
     n_polyun_t Z,
     n_polyun_t H,
