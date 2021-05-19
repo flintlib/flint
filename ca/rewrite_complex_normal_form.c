@@ -340,6 +340,30 @@ ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx)
 
             ca_fmpz_mpoly_q_evaluate_no_division_by_zero(res, CA_MPOLY_Q(x), cext, CA_FIELD_MCTX(K, ctx), ctx);
             _ca_vec_clear(cext, nvars, ctx);
+
+            /* Root of unity hack: introduce artificial root
+               of unity to force simplifications. This should not be necessary;
+               cases where it helps are a sign that we are not finding
+               all exponential relations. */
+            if (0 && !CA_IS_SPECIAL(res) && !CA_FIELD_IS_QQ(CA_FIELD(res, ctx)) && !CA_FIELD_IS_NF(CA_FIELD(res, ctx)))
+            {
+                ca_t t, u;
+                ca_init(t, ctx);
+                ca_init(u, ctx);
+
+                ca_pi_i(t, ctx);
+                ca_div_ui(t, t, 12, ctx);
+                ca_exp(t, t, ctx);
+                ca_add(u, res, t, ctx);
+                ca_sub(u, u, t, ctx);
+
+                if (ca_cmp_repr(u, res, ctx) < 0)
+                    ca_swap(res, u, ctx);
+
+                ca_clear(t, ctx);
+                ca_clear(u, ctx);
+            }
+
             flint_free(used);
         }
     }
