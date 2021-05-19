@@ -47,11 +47,19 @@ qqbar_sgn_im(const qqbar_t x)
                 break;
             }
 
+#if 0
             acb_conj(u, t);
             acb_union(u, u, t, prec);
 
             if (_qqbar_validate_uniqueness(u, QQBAR_POLY(x), u, 2 * prec))
                 break;
+#else
+            acb_set(u, t);
+            arb_zero(acb_imagref(u));
+
+            if (_qqbar_validate_existence_uniqueness(u, QQBAR_POLY(x), u, 2 * prec))
+                break;
+#endif
         }
 
         acb_clear(t);
