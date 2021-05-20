@@ -100,17 +100,14 @@ int compute_gcd(
     fmpz_mpoly_init3(Abarl, 0, wbits, lctx);
     fmpz_mpoly_init3(Bbarl, 0, wbits, lctx);
 
-    fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Al, lctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
-    fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Bl, lctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+    fmpz_mpoly_to_mpolyl_perm_deflate(Al, lctx, A, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyl_perm_deflate(Bl, lctx, B, ctx, perm, shift, stride);
 
     success = fmpz_mpolyl_gcd_brown(Gl, Abarl, Bbarl, Al, Bl, lctx, NULL);
     if (!success)
         goto cleanup;
 
-    fmpz_mpoly_from_mpoly_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
-                                                Gl, lctx, perm, shift, stride);
+    fmpz_mpoly_from_mpolyl_perm_inflate(G, wbits, ctx, Gl, lctx, perm, shift, stride);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
 

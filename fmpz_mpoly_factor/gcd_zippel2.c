@@ -586,23 +586,7 @@ add_same_exp:
 }
 
 
-
-static void n_polyun_zip_start(n_polyun_t Z, n_polyun_t H, slong req_images)
-{
-    slong j;
-    n_polyun_fit_length(Z, H->length);
-    Z->length = H->length;
-    for (j = 0; j < H->length; j++)
-    {
-        Z->terms[j].exp = H->terms[j].exp;
-        n_poly_fit_length(Z->terms[j].coeff, req_images);
-        Z->terms[j].coeff->length = 0;
-    }
-}
-
-
-
-int n_polyu2n_add_zipun_must_match(
+static int n_polyu2n_add_zipun_must_match(
     n_polyun_t Z,
     const n_polyun_t A,
     slong cur_length)

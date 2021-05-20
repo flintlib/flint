@@ -9,32 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly_factor.h"
 #include "fmpz_mpoly_factor.h"
-
-int nmod_mpolyl_gcds_zippel(
-    nmod_mpoly_t G, const ulong * Gmarks, slong Gmarkslen,
-    nmod_mpoly_t A,
-    nmod_mpoly_t B,
-    slong *perm,
-    slong l,
-    slong var,
-    const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state,
-    slong * Gdegbound,
-    n_poly_t Amarks,    /* temps */
-    n_poly_t Bmarks);
-
-int nmod_mpolyl_gcdp_zippel_smprime(
-    nmod_mpoly_t G,
-    nmod_mpoly_t Abar,
-    nmod_mpoly_t Bbar,
-    nmod_mpoly_t A,
-    nmod_mpoly_t B,
-    slong var,
-    const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
 
 /* return an n with |gcd(A,B)|_infty < 2^n or return UWORD_MAX */
 static flint_bitcnt_t fmpz_mpoly_gcd_bitbound(
