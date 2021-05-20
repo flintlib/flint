@@ -29,7 +29,10 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
 
     fmpz_init(c);
 
-    fmpz_randprime(c, state, FLINT_MAX(bits, 2), 0);
+    if (bits == 1)
+        fmpz_set_ui(c, 2);
+    else
+        fmpz_randprime(c, state, bits, 0);
     fmpz_mod_ctx_init(ctx, c);
     fmpz_mod_poly_init(q, ctx);
     fmpz_mod_poly_randtest_irreducible(q, state, len, ctx);
@@ -40,11 +43,8 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
     /* randomly subtract c so that some of them become negative.        */
     for (i = 0; i < p->length; i++)
     {
-        if (n_randint(state, 3) == 0)
-            fmpz_sub(
-                fmpz_poly_get_coeff_ptr(p, i),
-                fmpz_poly_get_coeff_ptr(p, i),
-                c);
+        if (n_randint(state, 3) == 0 && !(bits == 1 && fmpz_is_zero(p->coeffs + i)))
+            fmpz_sub(p->coeffs + i, p->coeffs + i, c);
     }
 
     fmpz_poly_content(c, p);
@@ -68,7 +68,10 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
 
     fmpz_init(c);
 
-    fmpz_randprime(c, state, FLINT_MAX(bits, 2), 0);
+    if (bits == 1)
+        fmpz_set_ui(c, 2);
+    else
+        fmpz_randprime(c, state, bits, 0);
     fmpz_mod_poly_init(q, c);
     fmpz_mod_poly_randtest_irreducible(q, state, len);
 
@@ -78,11 +81,8 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
     /* randomly subtract c so that some of them become negative.        */
     for (i = 0; i < p->length; i++)
     {
-        if (n_randint(state, 3) == 0)
-            fmpz_sub(
-                fmpz_poly_get_coeff_ptr(p, i),
-                fmpz_poly_get_coeff_ptr(p, i),
-                c);
+        if (n_randint(state, 3) == 0 && !(bits == 1 && fmpz_is_zero(p->coeffs + i)))
+            fmpz_sub(p->coeffs + i, p->coeffs + i, c);
     }
 
     fmpz_poly_content(c, p);
@@ -132,11 +132,14 @@ _qqbar_randtest(qqbar_t res, flint_rand_t state, slong deg, slong bits, int real
     deg = FLINT_MAX(deg, 1);
     bits = FLINT_MAX(bits, 1);
 
-    if (deg == 1 || n_randint(state, 4) == 0)
+    if ((deg == 1 || n_randint(state, 4) == 0) && real != 2)
     {
         fmpq_t t;
         fmpq_init(t);
-        fmpq_randtest(t, state, bits);
+        do {
+            fmpq_randtest(t, state, bits);
+        } while (fmpz_bits(fmpq_numref(t)) > bits ||
+                 fmpz_bits(fmpq_denref(t)) > bits);
         qqbar_set_fmpq(res, t);
         fmpq_clear(t);
         return;
@@ -208,4 +211,3 @@ qqbar_randtest_nonreal(qqbar_t res, flint_rand_t state, slong deg, slong bits)
 
     _qqbar_randtest(res, state, deg, bits, 2);
 }
-
