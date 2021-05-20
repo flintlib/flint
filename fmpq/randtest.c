@@ -17,6 +17,13 @@ _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
     mp_limb_t x = n_randlimb(state);
 
     fmpz_randtest(num, state, bits);
+
+    if (bits == 1)
+    {
+        fmpz_one(den);
+        return;
+    }
+
     fmpz_randtest_not_zero(den, state, bits);
 
     switch (x % 16)
