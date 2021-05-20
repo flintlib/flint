@@ -36,27 +36,7 @@ int nmod_mpolyl_gcdp_zippel_smprime(
     const nmod_mpoly_ctx_t ctx,
     flint_rand_t state);
 
-void fmpz_mpoly_interp_lift_p(
-    fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx,
-    nmod_mpoly_t Ap,
-    const nmod_mpoly_ctx_t ctxp);
-
-void fmpz_mpoly_interp_reduce_p(
-    nmod_mpoly_t Ap,
-    const nmod_mpoly_ctx_t ctxp,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_interp_mcrt_p(
-    flint_bitcnt_t * coeffbits,
-    fmpz_mpoly_t H,
-    const fmpz_mpoly_ctx_t ctx,
-    const fmpz_t m,
-    const nmod_mpoly_t A,
-    const nmod_mpoly_ctx_t ctxp);
-
-
+/* return an n with |gcd(A,B)|_infty < 2^n or return UWORD_MAX */
 static flint_bitcnt_t fmpz_mpoly_gcd_bitbound(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,

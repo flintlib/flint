@@ -1252,48 +1252,6 @@ FMPZ_MPOLY_INLINE fmpz * fmpz_mpolyu_leadcoeff(const fmpz_mpolyu_t A)
     return fmpz_mpoly_leadcoeff(A->coeffs + 0);
 }
 
-/* gcd_helper_eval_interp ****************************************************/
-
-FLINT_DLL void fmpz_mpolyu_interp_reduce_p(
-    nmod_mpolyu_t Ap,
-    const nmod_mpoly_ctx_t ctxp,
-    fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpolyu_interp_lift_p(
-    fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx,
-    nmod_mpolyu_t Ap,
-    const nmod_mpoly_ctx_t ctxp);
-
-FLINT_DLL int fmpz_mpolyu_interp_mcrt_p(
-    flint_bitcnt_t * coeffbits,
-    fmpz_mpolyu_t H,
-    const fmpz_mpoly_ctx_t ctx,
-    const fmpz_t m,
-    const nmod_mpolyu_t A,
-    const nmod_mpoly_ctx_t ctxp);
-
-FLINT_DLL void fmpz_mpoly_interp_reduce_p_mpolyn(
-    nmod_mpolyn_t E,
-    const nmod_mpoly_ctx_t pctx,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_interp_lift_p_mpolyn(
-    fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx,
-    const nmod_mpolyn_t B,
-    const nmod_mpoly_ctx_t pctx);
-
-FLINT_DLL int fmpz_mpoly_interp_crt_p_mpolyn(
-    fmpz_mpoly_t F,
-    fmpz_mpoly_t T,
-    const fmpz_mpoly_ctx_t ctx,
-    fmpz_t modulus,
-    const nmod_mpolyn_t A,
-    const nmod_mpoly_ctx_t pctx);
-
 /* geobuckets ****************************************************************/
 
 typedef struct fmpz_mpoly_geobucket
