@@ -1,10 +1,12 @@
-\documentclass[12pt,reqno]{amsart}
+\documentclass[11pt,reqno]{amsart}
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{graphicx}
 \usepackage{xtab}
 \usepackage{color}
 \usepackage{hyperref}
+\usepackage[linesnumbered,ruled]{algorithm2e}
 
+\SetKw{KwGoTo}{goto}
 
 \numberwithin{equation}{section}
 \newtheorem{theorem}{Theorem}[section]
@@ -15,10 +17,10 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{example}[theorem]{Example}
-\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{myalgorithm}[theorem]{Algorithm}
 
-\addtolength{\textwidth}{1.0in}
-\addtolength{\hoffset}{-0.5in}
+\addtolength{\textwidth}{1.5in}
+\addtolength{\hoffset}{-0.75in}
 %\addtolength{\textheight}{0.6in}
 %\addtolength{\voffset}{-0.3in}
 
@@ -45,7 +47,7 @@
 \newcommand{\goR}[0]  { \mathfrak{R}}
 
 \title{Algorithms for Multivariate Polynomials}
-\author{Daniel Schultz}
+\author{}
 
 \begin{document}
 
@@ -62,7 +64,8 @@ A polynomial $A \in R[x_1,\dots,x_n]$ is representation as a sums of terms
 \begin{equation*}
 A = t_1 + \cdots + t_a
 \end{equation*}
-where the terms are ordered as $t_1 > t_2 > \cdots > t_a$. The basic operations of addition and subtraction are then equivalent to a merge operation and run in time proportional to the sum of the input term counts.
+where the terms are ordered as $t_1 > t_2 > \cdots > t_a$ according to some term ordering. The basic operations of addition and subtraction are then equivalent to a merge operation and run in time proportional to the sum of the input term counts.
+
 
 \section{Monomial Representation}
 
@@ -115,16 +118,9 @@ No such interface is currently implemented.
 
 
 There is no limit to the size of the fields. The fields themselves are packed
-to a uniform bit width, usually denoted by {\tt bits} in the functions. This bit
-count should contain extra sign bit used for overflow detection. Thus, if the
-maximum field is $15$, then the fields only fit into a packing with {\tt bits >= 5}.
-The total number of machine words taken by an exponent packed into fields
-is usually denoted by {\tt N} in the code.
+to a uniform bit width, usually denoted by {\tt bits} in the functions. This bit count should contain an extra sign bit used for overflow detection. Thus, if the maximum field is $15$, then the fields only fit into a packing with {\tt bits >= 5}. The total number of machine words taken by an exponent packed into fields is usually denoted by {\tt N} in the code.
 
-If {\tt bits <= FLINT\_BITS} then precisely a maximum of {\tt floor(FLINT\_BITS/bits)}
-number of fields may be packed into a single word. Within a word, the packing
-is from low to high, and unused fields (as well as unused bits) at the top of
-the word are zero.
+If {\tt bits <= FLINT\_BITS} then precisely a maximum of {\tt floor(FLINT\_BITS/bits)} number of fields may be packed into a single word. Within a word, the packing is from low to high, and unused fields (as well as unused bits) at the top of the word are zero.
 
 \section{Multiplication}
 \subsection{Dense multiplication in $\bbZ[x_1,\dots,x_n]$ or $\bbZ_p[x_1,\dots,x_n]$}\
@@ -133,12 +129,11 @@ Given $A(x_1,\dots,x_n), B(x_1,\dots,x_n) \in R[x_1,\dots,x_n]$, set $r_i = 1 + 
 \begin{equation*}
 x_1 \to x, \quad x_2 \to x^{r_1}, \quad x_3 \to x^{r_1 r_2}, \quad \dots, \quad x_n \to x^{r_1 \cdots r_{n-1}}
 \end{equation*}
-gives two univariate polynomials to multiply in $\bbZ[x]$ or $\bbZ_p[x]$. This Kronecker substitution is chosen so that it can be reversed to find $A \cdot B \in R[x_1,\dots,x_n]$ from the univariate product. The flint functions {\tt \{nmod|fmpz\}\_mpoly\_mul\_\{dense|array\}} implement such techniques. The {\tt \{nmod|fmpz\}\_mpoly\_mul\_dense} functions use the ordinary polynomial multiplication functions {\tt \{nmod|fmpz\}\_poly\_mul} while {\tt \{nmod|fmpz\}\_mpoly\_mul\_array} use a multiply and accumulate technique that might be better for semi-sparse polynomials.
-
+gives two univariate polynomials to multiply in $\bbZ[x]$ or $\bbZ_p[x]$. This Kronecker substitution is chosen so that it can be reversed to find $A \cdot B \in R[x_1,\dots,x_n]$ from the univariate product. The flint functions {\tt \_mpoly\_mul\_\{dense|array\}} implement such techniques. The {\tt dense} functions use the ordinary polynomial multiplication functions while the {\tt array} functions use a multiply and accumulate technique that might be better for semi-sparse polynomials.
 
 \subsection{Sparse multiplication in $\bbZ[x_1,\dots,x_n]$ or $\bbZ_p[x_1,\dots,x_n]$}\
 
-Given $A = t_1 + \cdots + t_a, B = s_1 + \cdots + s_b, \in R[x_1,\dots,x_n]$, we need to calculate all products $t_i s_j$, sort them, and combine like terms. This is done using a heap in the functions {\tt \{nmod|fmpz\}\_mpoly\_mul\_johnson} as in \cite{Johnson}. The essential idea is to read off the product terms in order from a heap. The heap never needs to become too large if one uses the relations
+Given $A = t_1 + \cdots + t_a, B = s_1 + \cdots + s_b, \in R[x_1,\dots,x_n]$, we need to calculate all products $t_i s_j$, sort them, and combine like terms. This is done using a heap in the functions {\tt \_mpoly\_mul\_johnson} as in \cite{Johnson}. The essential idea is to read off the product terms in order from a heap. The heap never needs to become too large if one uses the relations
 \begin{equation*}
 t_i s_j > t_{i+1} s_j, \quad t_i s_j > t_i s_{j+1}\text{.}
 \end{equation*}
@@ -151,7 +146,7 @@ The techniques used for multiplication (Kronecker substitutions in the dense cas
 
 \section{Powering}
 
-Implements a corrected version of an algorithm called FPS and incorrectly stated in \cite{FPS}. The basic idea is to map the problem to $R[x]$ via a Kronecker substitution and use a recursion for the coefficients of $f^k$ derived from
+Implements a corrected version of an algorithm called FPS in \cite{FPS}. The basic idea is to map the problem to $R[x]$ via a Kronecker substitution and use a recursion for the coefficients of $f^k$ derived from
 \begin{equation*}
 f (f^k)' = k f' (f^k)\text{.}
 \end{equation*}
@@ -161,12 +156,68 @@ Since solving for the coefficients of $f^k$ involves division, this requires som
 
 \section{Interpolation}
 
+All of the interpolation methods for $f(x_1, \dots, x_n) \in R[x_1, \dots, x_n]$ require strict degree bounds $r_i$ with $\op{deg}_{x_i}(f) < r_i$.
+
 \subsection{Dense Newton Interpolation}
 
+Straightforward, variable-by-variable, recursive, dense interpolation. Number of probes to $f$ is $\prod_i r_i$. There is only one problem with this approach.
+\begin{itemize}
+\item insufficient evaluation points
+\end{itemize}
+
+
 \subsection{Sparse Zippel Interpolation}
+Similar to Newton interpolation, but we use the assumption that monomials don't disappear under evaluation. For example, suppose $r_x, r_y, r_z$ are the strict degree bounds. We first find $f(x,1,1)$ using dense interpolation with $r_x$ values of $x$, say $x_1, \dots, x_{r_x},$. If
+\begin{equation*}
+f(x,1,1) = x^5 + 2x^2 + 1\text{,}
+\end{equation*}
+we make the assumption that
+\begin{equation*}
+f(x,y,1) = a_1(y)x^5 + a_2(y)x^2 + a_3(y)\text{,}
+\end{equation*}
+and proceed to interpolate the $a_i(y)$ using dense univariate interpolation in $y$. We need $r_y$ values of $y$, say $y_1, \dots, y_{r_y}$. For each of these values $y=y_i$ we can find the coefficients (?) in
+\begin{equation*}
+f(x,y_i,1) = (?) x^5 + (?) x^2 + (?)
+\end{equation*}
+by plugging in \emph{three} random values of $x$ and solving the linear system. To find $f(x,y,1)$ at this point the number of probes to $f$ we have used is $r_x + 3r_y$, which is probably fewer than $r_x r_y$.
+
+Now suppose we obtain
+\begin{equation*}
+f(x,y,1) = y^2 x^5 + x^2 + y^7 x^2 + y^3.
+\end{equation*}
+Make the assumption
+\begin{equation*}
+f(x,y,z) = b_1(z)y^2 x^5 + b_2(z)x^2 + b_3(z)y^7 x^2 + b_4(z)y^3\text{,}
+\end{equation*}
+and interpolate the $b_i(z)$ using dense univariate interpolation in $z$. We need $r_z$ values of $z$, say $z_1, \dots, z_{r_z}$. For each of these values $z=z_i$ we can find the coefficients (?) in
+\begin{equation*}
+f(x,y,z) = (?)y^2 x^5 + (?)x^2 + (?)y^7 x^2 + (?)y^3
+\end{equation*}
+by plugging in \emph{four} random pairs of values of $(x,y)$ and solving the linear system. To find $f(x,y,z)$ at this point the number of probes to $f$ we have used is $r_x + 3r_y + 4r_z$, which is probably fewer than $r_x r_y r_z$.
+
+This approach has an additional problems.
+\begin{itemize}
+\item insufficient evaluation points
+\item inconsistent/underdetermined linear equations
+\item associated linear algebra costs
+\end{itemize}
 
 \subsection{Sparse Interpolation with the Berlekamp-Massey Algorithm}
-Since the presentation in \cite{BMAR} is overly complicated, incomplete, and presents incorrect code, it seems reasonable to review the Berlekamp-Massey Algorithm here. Given a formal power series
+Given the strict degree bounds $r_i$, in order to interpolate $f(x_1, \dots, x_n)$ it suffices to interpolate $f(\xi, \xi^{r_1}, \xi^{r_1 r_2}, \dots, \xi^{r_1 \cdots r_{n-1}})$, which is a univarate with degree bound $\prod_i r_i$. If $t$ is the number of terms of $f$, then we can summarize the probe counts of the three methods.
+\begin{enumerate}
+\item dense: $\prod_i r_i$
+\item zippel: approximately $t \cdot \sum_i r_i$.
+\item bma: $2t$.
+\end{enumerate}
+
+This approach has problems too.
+\begin{itemize}
+\item insufficient evaluation points
+\item costs of the associated linear algebra and discrete logarithms.
+\end{itemize}
+
+
+Since the presentation in \cite{BMAR} is overly complicated and does not deal with the half gcd, it seems reasonable to review the Berlekamp-Massey Algorithm here. Given a formal power series
 \begin{equation*}
 \frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots\text{,} \quad a_i \in \bbF
 \end{equation*}
@@ -227,6 +278,7 @@ Then, for any $A_1$, $B_1$ with $\deg(A_1),\deg(B_1) < m$,
 \op{deg}(B') &\le m + \op{max}( \deg(B_0'), \deg(A_0')-1)\\
 \op{deg}(B') &\le m + \op{max}( \deg(B_0'), \frac{\deg(A_0)}{2}-1)
 \end{align*}
+for some $A', B'$.
 \end{theorem}
 \begin{proof}
 This is a trivial rearrangement of Lemma 1 in \cite{YAP}.
@@ -254,7 +306,7 @@ M' = M \cdot \mattt{0}{1}{1}{q} \cdot \op{hgcd} \matto{\op{quo}(C,x^k)}{\op{quo}
 \end{equation*}
 \end{theorem}
 \begin{proof}
-By Theorem \ref{thm_correctness}, $\deg(A') = m + \deg(r_0) \ge m + \frac{n}{2} \ge \frac{n+m}{2}$. Now suppose $\frac{n+m}{2} \le \deg(B')$. Thus the assertion $k \le \deg(C)$ is proved. By Theorem \ref{thm_correctness}, $\deg(B') \le m + \max(\deg(r_1), \deg(r_0) - 1) < m + n$. Thus, the assertion $0 < k$ is proved. Finally, suppose
+By Theorem \ref{thm_correctness}, $\deg(A') = m + \deg(r_0) \ge m + \frac{n}{2} \ge \frac{n+m}{2}$. Now suppose $\frac{n+m}{2} \le \deg(B')$, from which the assertion $k \le \deg(C)$ follows automatically. By Theorem \ref{thm_correctness}, $\deg(B') \le m + \max(\deg(r_1), \deg(r_0) - 1) < m + n$. Thus, the assertion $0 < k$ is proved. Finally, suppose
 \begin{gather*}
 \matto{C_0 := \op{quo}(C,x^k)}{D_0 := \op{quo}(D,x^k)} \overset{H}{\longrightarrow} \matto{C_0'}{D_0'}\text{,}\\
 \deg(C_0') \ge \frac{\deg(C_0)}{2} > \deg(D_0')\text{.}
@@ -283,129 +335,556 @@ Also by Theorem \ref{thm_correctness},
 \section{Greatest Common Divisor}
 
 \subsection{Dense GCD in $\bbZ_p[x_1,\dots,x_n]$}\
-Brown's algorithm \cite{Brown} is used here. This comes in two versions - a small prime version and a large prime version. These refer not to the size of the $p$'s involved, but rather to the field from which evaluation points are chosen: it can either be $\bbF_p$ or an extension of $\bbF_p$. The small prime version interpolates in each variable by choosing evaluation points from $\bbF_p$. If this fails, then the large prime method use interpolation in $\bbF_p/(f(x_n))[x_1,\dots,x_{n-1}]$, i.e. $\bbF_q[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. No explicit divisibility checks are performed because the cofactors are reconstructed along with the GCD.
+Brown's algorithm \cite{Brown} is used here. This comes in two versions - a small prime version and a large prime version. These refer not to the size of the $p$'s involved, but rather to the field from which evaluation points are chosen: it can either be $\bbF_p$ or an extension of $\bbF_p$. The small prime version interpolates in each variable by choosing evaluation points from $\bbF_p$. If this fails, then the large prime method uses interpolation in $\bbF_p/(f(x_n))[x_1,\dots,x_{n-1}]$, i.e. $\bbF_q[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. No explicit divisibility checks need to be performed because the cofactors are reconstructed along with the GCD.
 
 \subsection{Dense GCD in $\bbZ[x_1,\dots,x_n]$}\
-We simply reconstruct the GCD from its image in $\bbZ_p[x_1,\dots,x_n]$ for sufficiently many $p$. Only large $p$'s are used, and dense GCD's in $\bbZ_p[x_1,\dots,x_n]$ only use the small prime version. Each image GCD in $\bbZ_p$ is correct and Brown's coefficient bounds \cite{Brown} are used instead of a divisibility check.
+We simply reconstruct the GCD from its image in $\bbZ_p[x_1,\dots,x_n]$ for sufficiently many $p$. Only large $p$'s are used, and dense GCD's in $\bbZ_p[x_1,\dots,x_n]$ only use the small prime version. Each image GCD in $\bbZ_p$ is correct and Brown's coefficient bounds \cite{Brown} are used instead of a divisibility check. Some pseudocode is Section \ref{Pseudocode}.
 
-\subsection{Sparse GCD in $\bbZ_p[x_1,\dots,x_n]$}\
-Implements a corrected version of an algorithm incorrectly stated in \cite{SULING}. The following is a high level summary.
+\subsection{Sparse GCD in $R[x_1,\dots,x_n]$}\
+Assuming that we have a gcd algorithm for $R[x_1,\dots,x_m]$, we can view the inputs as elements of $R[x_1,\dots,x_m][x_{m+1},\dots,x_n]$ and use interpolation to extend this algorithm from $m$ variables to $n$ variables. Brown's algorithm corresponds to taking $m=n-1$, using univariate interpolation for the extension of $n-1$ variables to $n$ variables, and recursively solving the $n-1$ variable gcd problem with the Euclidean algorithm as the base case. Taking $m=1$ gives Zippel's approach \cite{ZIPPEL}.
+If the inputs are made primitive with respect to $x_1,\dots,x_m$ by factoring out polynomials in $R[x_{m+1},\dots,x_n]$, the gcd of the leading coefficients of the input with respect to $x_1,\dots,x_m$ may be imposed as the leading coefficient of the interpolated gcd. Finally, if the primitive part with respect to $x_1,\dots,x_m$ of this interpolated gcd divides both inputs, it must be the true gcd.
 
+Of note here is an algorithm stated slightly incorrectly in \cite{SULING} and \cite{LINZIP}; The basic idea is to reconstruct the correct leading term of the gcd $\in R[x_1,\dots,x_m]$ using some linear algebra directly instead of constructing some known multiple and then removing content. This is in {\tt fmpz\_mpolyl\_gcd\_zippel} and a rough overview is:
 \ \\
-{\tt nmod\_mpoly\_gcd\_zippel}($\bbZ_p[x_1,\dots,x_n]$, $n \ge 2$):\\
+{\tt fmpz\_mpolyl\_gcdm\_zippel}($A, B \in \bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
-split into $\bbZ_p[x_1,\dots,x_{n-1}][X]$\\
-call {\tt nmod\_mpolyu\_gcd\_zippel}
-\end{tabular}\right.$
-\ \\
-{\tt nmod\_mpolyu\_gcd\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
-\indent $\left[\begin{tabular}{l}
-remove content in $x_1,\dots,x_n$ from the GCD via {\tt nmod\_mpoly\_gcd\_zippel}\\
-call {\tt nmod\_mpolyu\_gcdm\_zippel}\\
-multiply the content back into the GCD
-\end{tabular}\right.$
-\ \\
-{\tt nmod\_mpolyu\_gcdm\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
-\indent $\left[\begin{tabular}{l}
-(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
-call {\tt nmod\_mpolyu\_gcdp\_zippel} and return if succeeded\\
-(small primes have failed, try large primes now)\\
-choose an irreducible $f(x_n)\in \bbZ_p[x_n]$\\
-compute $F=$ GCD modulo $f(x_n)$ via {\tt fq\_nmod\_mpolyu\_gcdp\_zippel}\\
-($F$ is the correct gcd when the inputs are reduced modulo $f(x_n)$)\\
-For several new irreducibles $f(x_n)\in \bbZ_p[x_n]$, \\
-compute the GCD modulo $f(x_n)$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $F$\\
-combine via CRT and check divisibility every time the interpolant stabilizes\\
-start over if the interpolant coefficients have exceeded the obvious degree bound in $x_n$
+The GCD is assumed to have no content w.r.t. $X$ (content in $\bbZ[x_1, \dots, x_n]$)\\
+Pick a prime $p$ and call {\tt nmod\_polyl\_gcdp\_zippel} to get an probable image of $G \mod p$ \\
+Assume that the true gcd $G$ over $\bbZ$ has the same monomials as this image mod $p$.\\
+Pick more primes $p$ and call {\tt nmod\_mpolyl\_gcds\_zippel} to get more images of $G \mod p$. \\
+Combine the images via chinese remaindering and test divisibility.
 \end{tabular}\right.$
 
 \ \\
-The four functions {\tt [fq\_]nmod\_mpoly\_gcd\{p|s\}\_zippel} may be summarized as follows. The ``p'' versions produce a correct gcd when the inputs have no content in $\bbF_q[x_1,\dots,x_n]$. The ``s'' versions are the heart of Zippel's sparse interpolation. When the prefix {\tt fq\_} is present, $q$ is a power of $p$, otherwise $q$ is $p$.
-
+The ``p'' versions produce a correct gcd when the inputs have no content in $\bbF_p[x_1,\dots,x_n]$.
 \ \\
-{\tt [fq\_]nmod\_mpolyu\_gcdp\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+{\tt nmod\_mpolyl\_gcdp\_zippel}($A, B \in \bbF_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
-if the GCD has content w.r.t. $x_n$, fail\\
-pick an evaluation point $x_n \to \alpha$ for $\alpha \in \bbF_q$\\
-(1) call {\tt [fq\_]nmod\_mpolyu\_gcdp\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$\\
-record the form $f$ of the GCD obtained for step (2) below\\
-pick severial evaluation points $x_n \to \alpha$ for $\alpha \in \bbF_q$\\
-(2) call {\tt [fq\_]nmod\_mpoly\_gcds\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$\\
-combine the answer from (1) and the answers from (2) via dense interpolation in $x_n$\\
-check divisibility on the proposed GCD when the interpolation stabilizes 
-\end{tabular}\right.$
-\ \\
-{\tt [fq\_]nmod\_mpolyu\_gcds\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, assumed form $f$):\\
-\indent $\left[\begin{tabular}{l}
-via evaluations of the form $(x_1,\dots,x_n) \to (\alpha_1,\dots,\alpha_n) \in \bbF_q^n$\\ and GCD computations in $\bbF_q[X]$, try to compute the coefficients \\of the assumed form $f$ to match the GCD of the inputs (up to scalar multiples in $\bbF_q$)
+If the GCD has content w.r.t. $X, x_1, \dots, x_1$ (content in $\bbF_p[x_n]$), fail.\\
+Pick an evaluation point $x_n \to \alpha$ for $\alpha \in \bbF_p$.\\
+(1) Call {\tt nmod\_mpolyl\_gcdp\_zippel} recursively on the evaluated inputs in $\bbF_p[x_1,\dots,x_{n-1}][X]$.\\
+Record the form $f$ of the GCD obtained for step (2) below.\\
+Pick severial evaluation points $x_n \to \alpha$ for $\alpha \in \bbF_q$.\\
+(2) Call {\tt [fq\_]nmod\_mpoly\_gcds\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$.\\
+Combine the answer from (1) and the answers from (2) via interpolation in $x_n$.\\
+Check divisibility on the proposed interpolated GCD.
 \end{tabular}\right.$
 
 \ \\
-\subsection{Sparse GCD in $\bbZ[x_1,\dots,x_n]$}\
-Implements a corrected version of an algorithm called LINZIP and incorrectly stated in \cite{LINZIP}. The following is a high level summary.
-
+The ``s'' versions are the heart of Zippel's sparse interpolation.
 \ \\
-{\tt fmpz\_mpoly\_gcd\_zippel}($\bbZ[x_1,\dots,x_n]$, $n \ge 2$):\\
+{\tt nmod\_mpolyl\_gcds\_zippel}($A, B \in \bbF_q[x_1,\dots,x_n][X]$, assumed monomial form $f$ of gcd):\\
 \indent $\left[\begin{tabular}{l}
-split into $\bbZ[x_1,\dots,x_{n-1}][X]$\\
-call {\tt fmpz\_mpolyu\_gcd\_zippel}
+Via evaluations of the form $(x_1,\dots,x_n) \to (\alpha_1,\dots,\alpha_n) \in \bbF_p^n$,\\ and GCD computations in $\bbF_p[X]$, and linear algebra, try to compute the coefficients \\of the assumed form $f$ to match the GCD of the inputs (up to scalar multiples in $\bbF_p$).
 \end{tabular}\right.$
 
-\ \\
-{\tt fmpz\_mpolyu\_gcd\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
-\indent $\left[\begin{tabular}{l}
-remove content in $\bbZ[x_1,\dots,x_n]$ from the GCD via {\tt fmpz\_mpoly\_gcd\_zippel}\\
-call {\tt fmpz\_mpolyu\_gcdm\_zippel}\\
-multiply the content back into the GCD
-\end{tabular}\right.$
-
-\ \\
-{\tt fmpz\_mpolyu\_gcdm\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
-\indent $\left[\begin{tabular}{l}
-(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
-choose a prime $p$\\
-compute $F=$ GCD modulo $p$ via {\tt nmod\_mpolyu\_gcdp\_zippel}\\
-($F$ is the correct gcd when the inputs are reduced modulo $p$)\\
-For several new primes $p$, \\
-compute the GCD modulo $p$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $f$\\
-combine via CRT and check divisibility every time the interpolant stabilizes\\
-start over if the interpolant coefficients have exceeded the Landau--Mignotte bound
-\end{tabular}\right.$
-
-\ \\
 \subsection{PRS}
-The PRS algorithm works over $R=\bbZ$ or $R=\bbZ_p$.
-\ \\
-{\tt \_mpoly\_gcd\_prs}($A,B \in R[x_1,\dots,x_n][X]$, $n \ge 1$):\\
-\indent $\left[\begin{tabular}{l}
-(recursively use GCD in fewer variables for content calculation)\\
-let $Ac = \op{content}(A) \in R(x_1,\dots,x_n)$\\
-let $Bc = \op{content}(B) \in R(x_1,\dots,x_n)$\\
-divide $A$ and $B$ by $Ac$ and $Bc$\\
-let $G$ be a pseudo GCD of $A$ and $B$ computed using a prs\\
-divide $G$ by $\op{content}(G)$\\
-multiply $G$ by $\op{gcd}(Ac,Bc)$
-\end{tabular}\right.$
+The PRS algorithm works over any gcd domain $R$. It starts with a primitive input with respect to some main variable and calculates a pseudo gcd with a pseudo remainder sequence. Content is removed from the pseudo gcd to produce the true gcd by a recursive call. The final content can be computed without expensive recursive calls to gcd in the case when we know the leading or trailing coefficient in the main variable must be a monomial in the remaining variables.
 
-The content of $G$ can be computed without expensive recursive calls to gcd in the case when we know the leading or trailing coefficient of $G$ in the variable $X$ must be a monomial in $x_1,\dots,x_n$.
+This algorithm has been discarded because it is so bad but may be reintroduced for low degrees.
+
+\subsection{Hensel Lifting}
+The gcd can also be calculated using Hensel lifting \cite{EZGCD}. The gcd of the resulting univariates when all variables but one are substituted away gives two factorizations which can be lifted to obtain the multivariate gcd.
 
 
 \section{Factorization}
 
+
+\subsection{Squarefree Factorization in $K[x_1,\dots,x_n]$}
+\label{section_sqfr}
+By taking derivatives and greatest common divisors, we may assume that the input polynomial is squarefree and primitive with respect to each variable. Thus in characteristic zero the input polynomial $f \in K[x_1,\dots,x_n]$ may be assumed to satisfy
+\begin{equation*}
+\forall_i \quad f_{x_i} \neq 0 \quad \text{and} \quad \gcd(f,f_{x_i}) = 1\text{.}
+\end{equation*}
+Over a finite field ($K=\mathbb{F}_q$) of characteristic $p$, we have the slightly weaker conditions
+\begin{equation}
+\label{sqrfp_cond}
+\begin{alignedat}{3}
+&f_{x_1} \ne 0 \quad &\text{and}& \quad \gcd(f,f_{x_1}) = 1\\
+\forall_{i>1} \quad &f_{x_i} = 0 \quad &\text{or}& \quad \gcd(f,f_{x_i}) = 1
+\end{alignedat}
+\end{equation}
+
+While we could apply the factorization algorithms directly to this $f$ with $x_1$ as the main variable, it is possible to a bit better when some of the other derivatives vanish.
+
+\begin{theorem}
+With the assumption \ref{sqrfp_cond} on $f$ and prime powers $p^{e_2},\dots,p^{e_n}$ and a deflated polynomial $g$ with
+\begin{equation*}
+g(x_1,x_2^{p^{e_2}},\dots, x_n^{p^{e_n}}) = f(x_1,x_2,\dots,x_n)\text{,}
+\end{equation*}
+the factorization of $f$ is the inflated factorization of $g$.
+\end{theorem}
+The proof follows by induction from the following lemma: the polynomials $g(x_1,x_2, x_3,\dots, x_n)$ and $g(x_1,x_2^p, x_3,\dots, x_n)$ have the same factorization (up to inflation $x_2 \to x_2^p$).
+\begin{lemma}
+If $p = \operatorname{char}(K) > 0$ and $f(x,y) \in K[x,y] \setminus (K[x] \cup K[y])$ is irreducible and $f(x^p,y)$ is squarefree, then $f(x^p,y)$ is irreducible.
+\end{lemma}
+\begin{proof}
+Suppose that $f(x^p,y)=g(x,y)h(x,y)$ for $g,h \not \in K$. Since $f(x^p,y)$ is squarefree, $g$ and $h$ are squarefree, and there are $s, t \in K(y)[x]$ with $1=sg+th$. By differentiating $f(x^p,y)=g(x,y)h(x,y)$, we obtain $0=h g_x + g h_x$, which when combined with $1=sg+th$ gives $h(t h_x - s g_x)=h_x$. This implies that $h_x=0$ and in turn that $g_x=0$, which implies that $f(x,y)$ is reducible, a contradiction.
+\end{proof}
+
+\subsection{Factorization in $R[x]$}
+\subsubsection{Quadratic over characteristic $\ne 2$}
+The primitive polynomial $ax^2+bx+c$ factors if and only if $b^2-4ac$ is a square in $R$, in which case the factors are the primitive parts of $2ax+b\pm \sqrt{b^2-4ac}$.
+
+\subsubsection{Quadratic in $R[X]$ for $R=\mathbb{F}_{2^k}[x_1,\dots,x_n]$}
+
+We wish to determine if $X^2+AX+B$ has a root in $R$. Since $X_0+A$ is a root if $X_0$ is, at least one of the two roots does not have $\operatorname{lt}(A)$ as a term. (It very well may be the case that both roots have a monomial matching $\operatorname{lm}(A)$, but then both corresponding coefficients must be different from the leading coffcient of $A$). Therefore, we make the important assumption that \emph{we are searching for a root $X_0$ with $\operatorname{lt}(A)$ not a term of $X_0$}. Let $m$ denote the leading term of $X_0$. By taking leading terms in $X_0^2+AX_0+B$ and applying the assumption, we have
+\begin{equation*}
+\operatorname{lt}(m^2+\operatorname{lt}(A)m) = \operatorname{lt}(B)\text{,} \quad \text{and} \quad m \neq \operatorname{lt}(A)\text{.}
+\end{equation*}
+For any specific given terms $\operatorname{lt}(A)$, $\operatorname{lt}(B)$, this equation is easy to solve for $m$ or to determine that there is no solution.
+\begin{align*}
+\operatorname{lm}(m)>\operatorname{lm}(A)&: \quad m = \sqrt{\operatorname{lt}(B)}\\
+\operatorname{lm}(m)=\operatorname{lm}(A)&: \quad m = \zeta /\operatorname{lc}(A)\sqrt{\operatorname{lm}(B)}\text{,} \quad \zeta^2+\zeta =\operatorname{lc}(B)/\operatorname{lc}(A)^2\\
+\operatorname{lm}(m)<\operatorname{lm}(A)&: \quad m = \operatorname{lt}(B)/\operatorname{lt}(A)
+\end{align*}
+
+Once $m$ is found, the equation satisfied by $X_0-m$ has the same $A$ and a new $B$ with a smaller leading monomial. In this way the solution may be written down in order, and this process is a simplification of Sections 4 and 5 in \cite{QuadraticFactor}, which does not present a sparse algorithm due to the many (possibly disastrous) divisions performed. The quadratic $\zeta^2+\zeta+c \in \mathbb{F}_{2^k}$ has a root if and only if $\operatorname{Tr}(c)=0$, in which case $c=\sum_{i=1}^{k-1}c^{2^i}\sum_{j=0}^{i-1}u^{2^j}$ is a root where $u$ is any element of $\mathbb{F}_{2^k}$ with $\operatorname{Tr}(u)=1$. If $\mathbb{F}_{2^k} = \mathbb{F}_2[\theta]/P(\theta)$, then $u=1/(\theta P'(\theta))$ will do.
+
+\subsubsection{Cubic over $\mathbb{Z}$}
+To factor a cubic over $\mathbb{Z}$, we first find the roots over the more friendly ring $\mathbb{Z}_2$ and then test these roots over $\mathbb{Z}$. Since it is easy to bound the roots over $\mathbb{Z}$, the roots over $\mathbb{Z}_2$ only need to be calculated to some finite precision $p$, that is, to order $O(2^p)$.
+
+Factor $x^3+2^\alpha ax+2^\beta b $ over $\mathbb{Z}_2$ where $\alpha, \beta\geq 0$ and $a, b$ are odd integers:
+\begin{enumerate}
+	\item $2\beta=3\alpha$: irreducible, as replacing $x\leftarrow 2^{\beta/3}y$ has no roots modulo $2$ for $y$.
+	\item $ 2\beta< 3\alpha$:
+	\begin{enumerate}
+		\item $3\nmid \beta$: irreducible as all roots have valuation $\beta/3$.
+		\item $3\mid \beta$: Replacing $x\leftarrow 2^{\beta/3}y$ gives $y^3+2^{\alpha-2\beta/3}a y+b=0$, which factors as $(y^2+y+1)(y+1)=0$ modulo $2$. Hence there is a unique root in $\mathbb{Z}_2$, and this root has valuation $\beta/3$.
+	\end{enumerate}
+	\item $2\beta > 3\alpha$: Replacing $x\leftarrow 2^{\beta-\alpha}y$ gives $2^{2\beta-3\alpha}y^3+ay+b=0$, which has $y=1$ mod $2$ as a root. This gives a factorization
+	$$2^{2\beta-3\alpha}y^3+ay+b=(y+r)(2^{2\beta-3\alpha}y^2-2^{2\beta-3\alpha}ry+s)$$ for some odd $r, s\in \mathbb{Z}_2$. This becomes 
+	$$ (x+2^{\beta-\alpha}r)(x^2-2^{\beta-\alpha}rx+2^\alpha s)=0$$
+	\begin{enumerate}
+		\item $2\nmid \alpha$: quadratic is irreducible and $-2^{\beta-\alpha}r$ is the only root.
+		\item $2\mid \alpha$: assuming the square roots exist, the roots of the quadratic, which have valuation $\alpha/2$, are
+		\begin{equation*}
+		2^{\beta-\alpha-1}r \pm 2^{\alpha/2} \sqrt{2^{2\beta-3\alpha-2}r^2-s}
+		\end{equation*}
+		If $r$ and $s$ are calculated to some absolute precision $O(2^p)$, then this expression is also known to absolute precision $O(2^p)$ except when $\alpha=0$ and $\beta=1$, in which case the square root loses more than one bit of precision.
+	\end{enumerate}
+\end{enumerate}
+
+
+\subsection{Factorization in $K[x,y]$}
+For $K=\mathbb{Q}$, an irreducible bivariate polynomial $f(x,y)$ remains irreducible modulo $y=y_0$ for a generic $y_0 \in \mathbb{Q}$. Hence, all of the difficult recombination may be pushed to the univariate factorization. When $K=\mathbb{F}_q$ the recombination in \cite{GlobalFactor} is necessary.
+\subsubsection{Bivariate factorization over $\mathbb{Q}$}
+We begin with $f(x,y)$ satisfying
+\begin{enumerate}
+\item $f(x,y) \in \mathbb{Z}[x,y]$ and $f(x,0) \in \mathbb{Z}[x]$ are squarefree so that we can lift.
+\item $f(x,y)$ is primitive with respect to $x$ (i.e. $\op{cont}_x(f) \in \mathbb{Z}[y]$ is $1$) so that any factor is also primitive with respect to $x$.
+\item $\op{deg}_x (f(x,y)) = \op{deg}_x (f(x,0))$ (i.e. $\op{lc}_x(f)$ does not vanish at $y=0$) so that we can make $f$ monic.
+\end{enumerate}
+Let
+\begin{equation*}
+\tilde{f}(x,y) = f(x,y) / \op{lc}_x (f(x,y)) \in \mathbb{Q}[[y]][x]
+\end{equation*}
+be the monic version of $f$ computed to precision $O(y^{1 + \op{deg}_y f})$. We can factor $\tilde{f}(x,0) \in \mathbb{Q}[x]$ by a univariate algorithm and lift the factors to produce an irreducible factorization in $\mathbb{Q}[[y]][x]$ as
+\begin{equation*}
+\tilde{f}(x,y) = \prod_{i=1}^{l} \tilde{f}_i(x,y)\text{.}
+\end{equation*}
+The $\tilde{f}_i(x,y)$ are also monic and need to be computed to precision $O(y^{1 + \op{deg}_y f})$. For each subset $S$ of $\{1,\dots, l\}$, we then have the candidate true factor
+\begin{equation*}
+\op{ppart}_x \left(\op{lc}_x(f) \prod_{i \in S} \tilde{f}_i(x,y) \right)\text{,}
+\end{equation*}
+where, before taking the primitive part, the elements of $\mathbb{Q}[[y]][x]$ must be mapped to $\mathbb{Q}[y][x]$ via remainder upon division by $y^{1 + \op{deg}_y f}$. Since we are only interested in candidate factors over $\mathbb{Z}$, $\mathbb{Q}$ may be replaced by $\mathbb{Z}/p^k \mathbb{Z}$ for appropriate $p^k$ (in particular $p \nmid \op{lc}_x (f(x,0))$). The coefficients in $\mathbb{Z}/p^k \mathbb{Z}$ must then be mapped to $\mathbb{Z}$ via the symmetric remainder before taking the primitive part.
+
+\subsubsection{Bivariate Factorization over $\mathbb{F}_q$}
+We begin with $f(x,y) \in \mathbb{F}_q[x,y]$ and an irreducible $\alpha(y) \in \mathbb{F}_q[y]$ (with $\mathbb{F}_{q^k} := \mathbb{F}_q[y]/\alpha(y)$) such that
+\begin{enumerate}
+	\item $\alpha(y)$ does not divide $\op{lc}_x f(x,y)$ so that we can make $f$ monic.
+	\item $f(x,y) \bmod \alpha(y) \in \mathbb{F}_{q^k}[x]$ is squarefree so that we can lift.
+	\item $f(x,y)$ is primitive with respect to $x$.
+\end{enumerate}
+
+The irreducible factorization of $f(x,y) \bmod \alpha(y)$ can be lifted to a monic factorization in $\mathbb{F}_q[[\alpha(y)]][x]$. With the help of some linear algebra over $\mathbb{F}_p$ these factors can be recombined into true factors.
+
+
+\subsection{Factorization in $R[x_1,\dots,x_n][X]$}
+Factoring of a multivariate squarefree primitive polynomial $f$ over $R[x_1,...,x_n][X]$ (satisfying the assumptions of Section \ref{section_sqfr} works by reducing $f$ modulo the ideal
+\begin{equation*}
+\langle x_1 = \alpha_1, x_2 = \alpha_2, \dots, x_n = \alpha_n \rangle
+\end{equation*}
+for some $\alpha_i \in R$, factoring the resulting univariate into, say, $r$, factors, and then lifting the univariate factorization to a multivariate factorization. The evaluation points must be good in the sense that $f(\alpha_1, \dots, \alpha_n, X)$ is squarefree and has the same degree as $f(x_1, \dots, x_n, X)$ in $X$. This lifting process does not change the leading coefficients in $X$, hence it is necessary that the leading coefficients be ``correct" before the lifting. In the most general setting, we can determine $d_i \in R[x_1,...,x_n]$, such that it is known that $d_i$ divides the leading coefficient of the $i$-th lifted factor. Then, before lifting, we compute $m=\operatorname{lc}_X(f)/(d_1 \cdots d_r)$, impose a leading coefficient of $d_i m$ on the $i$-th factor, and multiply $f$ by $m^{r-1}$. If the lifting succeeds, then the actual factors can be obtained by taking principle parts. Doing no work to precompute leading coefficients corresponds to taking $d_i=1$, which can obviously lead to large swells.
+
+\subsubsection{Wang's leading coefficient computation}
+Wang \cite{WANG} has a good solution to the leading coefficient problem over $\mathbb{Z}$. The idea can be illustrated by a simple example.
+\begin{equation*}
+(2x_1^3 x_2+2x_1^3 x_2)X^2 + \cdots = (2x_1(x_1+x_2)X+x_1)(x_1 x_2 X + 6)
+\end{equation*}
+First the irreducible factorization of the leading coefficient is computed
+\begin{equation*}
+(2x_1^2 x_2+2x_1^2 x_2)=2x_1^2x_2(x_1+x_2)
+\end{equation*}
+Next, an evaluation point $x_i=\alpha_i$ such that there exists primes $p_i$ such that
+\begin{align*}
+&p_3 \mid \alpha_1 + \alpha_2, \quad p_3 \nmid \alpha_2, \quad p_3 \nmid \alpha_1,\\
+&p_2 \mid \alpha_2, \quad p_2 \nmid \alpha_1,\\
+&p_1 \mid \alpha_1
+\end{align*}
+Lets take $\alpha_1=10, \alpha_2=14$ and $p_1=5, p_2=7, p_3=3$. The univariate factorization comes out as
+\begin{equation*}
+20(48X+1)(70X + 3)
+\end{equation*}
+What is of interest here is the leading coefficients of the primitive factors over $\mathbb{Z}$. From $p_3=3$ we can correctly distribute $x_1+x_2$ to the first multivariate factor. From $p_2=7$ we can distribute $x_2^2$ to both factors, and from $p_1=5$, we can distribute $x_1$ to the second factor.
+
+When $R$ is a finite field, there is no useful notion of ``prime''. Furthermore, the probability that an irreducible univariate factorization can be lifted to a multivariate factorization is low and sometimes zero. Hence this does not work as stated. One may replace $R$ by $R[Y]$ for an auxiliary indeterminate $Y$ and consider polynomial substitutions of the form
+\begin{align*}
+x_1 &= \alpha_1 + \beta_1 Y + \gamma_1 Y^2 + \cdots\\
+x_2 &= \alpha_2 + \beta_2 Y + \gamma_2 Y^2 + \cdots\\
+&\cdots\\
+x_n &= \alpha_n + \beta_n Y + \gamma_n Y^2 + \cdots\text{.}
+\end{align*}
+The base case factorization is now not $R[X]$ but $R[Y][X]$. The points $\alpha_1, ..., \alpha_n$ still need to be good because the lifting will ultimately begin with univariates. However, the univariate factors come not from an irreducible univariate factorization, but from the $Y=0$ image of a bivariate factorization, which should greatly increases the changes of success in the lifting.
+
+\subsubsection{Kaltofen's leading coefficient computation}
+In this recursive approach \cite{KALTOFEN}, after substituting away all but \emph{two} of the variables, the bivariate polynomial is factored and the leading coefficients of the bivariate factors can be lifted against the leading cofficient of the original polynomial. Since only squarefree lifting is implemented, it is actually the squarefree parts of everything that are lifted.
+
+\subsubsection{Dense Hensel lifting}
+Some pseudocode is Section \ref{Pseudocode}. Of note here is that when lifting over $\mathbb{Z}$, we do not lift over $\mathbb{Z}/p^k\mathbb{Z}$ as Wang \cite{WANG} advises but do the lifting directly over $\mathbb{Z}$.
+
+\subsubsection{Sparse Hensel lifting}
+
+
+\section{Absolute Factorization}
+
+The goal of absolute factorization is to take an irreducible $f \in R[x_1, \dots, x_n]$ and either determine that $f$ is absolutely irreducible or provide a factorization
+\begin{equation*}
+f = g h \text{,} \quad g, h \in R'[x_1, \dots, x_n]
+\end{equation*}
+where $g$ is absolutely irreducible. $h$ may or may not be absolutely irreducible: it is simply the product of the rest.
+
+\subsection{Absolute Irreduciblity Testing}
+Here we follow Gao \cite{GAO}. For a multivariate polynomial $f = \sum_{\bold{i} \in \mathbb{Z}^n}{c_{\bold{i}} \, \pmb{x}^{\bold{i}}}$, the Newton polygon $N(f)$ is defined to be the convex hull of $\{\bold{i} \in \mathbb{Z}^n | c_{\bold{i}} \ne 0\}$ in $\mathbb{R}^n$.
+Since $N(fg) = N(f) + N(g)$ where $+$ denotes the Minkowski sum, if $N(f)$ is indecomposable, then $f$ is absolutely irreducible. Although indecomposability testing is hard, Gao gives a reasonable algorithm in two dimensions \cite{GAO2}, that is, for bivariate polynomials, and projects higher dimensional polytopes onto a two-dimensional ``shadow'' to test them for indecomposability.
+
+If $f \in K[\pmb{x}]$ happens to be irreducible over $K$ but not over the algebraic closure $\overline{K}$, then $N(f)$ will never be sufficient to prove the irreducibility over $K$. In the case that we are able to prove that $f$ is irreducible over $K$ using other methods, $N(f)$ can still be used to obtain some information on the degree of an extension of $K$ needed to factor $f$ absolutely. An absolute factorization of an irreducible $f(\pmb{x}) \in K[\pmb{x}]$ looks like
+\begin{equation*}
+f(\pmb{x}) = \operatorname{resultant}_{\alpha} (u(\alpha), g(\alpha, \pmb{x}))
+\end{equation*}
+for some irreducible $u(\alpha) \in K[\alpha]$ of degree, say, $m$. Since all $m$ of the $g(\alpha, \pmb{x})$ have the same Newton polygon, it follows that $N(f)=m\cdot N(g)$, and thus $m$ divides the coordinates of every vertex in $N(f)$. This can severely limit the possibilities for the extension degree required for an absolute factorization.
+
+\subsection{Bivariate Absolute Factorization over $\mathbb{Q}$}
+The idea here is that an absolutely irreducible $g(x,y) \in \overline{\mathbb{Q}}[x,y]$ remains absolutely irreducible in $\overline{\mathbb{F}}_p[x,y]$ for generic $p$.
+
+Assume that $f(x,y) \in \mathbb{Q}[y][x]$ is irreducible. Pick a good $\alpha \in \mathbb{Q}$ and a good rational prime $p$. The definition of ``good'' is that none of the following steps or assumptions fail. Determine an $\mathbb{F}_q = \mathbb{F}_{p^?}$ such that $f(x,\alpha)$ splits completely into distinct linear irreducibles:
+\begin{equation*}
+\frac{f(x,\alpha)}{\operatorname{lc}_x(f(x,y)) |_{y=\alpha}} = \prod_i x - r_i \text{ in } \mathbb{F}_q[x]\text{.}
+\end{equation*}
+Lift this to power series:
+\begin{equation*}
+\frac{f(x,y)}{\operatorname{lc}_x(f(x,y))} = \prod_i x - r_i(y) \text{ in } \mathbb{F}_q[[y-\alpha]][x]\text{.}
+\end{equation*}
+Do some linear algebra to recombine the factors into a real factorization:
+\begin{equation*}
+f(x,y) = \prod_j g_j(x,y) \text{ in } \mathbb{F}_q[y][x]\text{.}
+\end{equation*}
+The $g_i(x,y) \in \mathbb{F}_q[y][x]$ are absolutely irreducible. It might be possible to reduce the size of $q$ at this point.
+
+We then try to lift this to a factorization in $\mathbb{Q}_q[y][x]$:
+\begin{equation*}
+f(x,y) = \prod_j \widetilde{g}_j(x,y) \text{ in } \mathbb{Q}_q[y][x]\text{.}
+\end{equation*}
+In order to attemp this lift the $\operatorname{lc}_x(\widetilde{g}_j(x,y)) \in \mathbb{Q}_q[y]$ must be correct before starting. Assume $\operatorname{lc}_x(f(x,y))$ is monic in $y$, and that its squarefree part remains squarefree modulo $p$. Then, the squarefree factors of the $\operatorname{lc}_x \widetilde{g}_j(x,y)$ can be lifted and we can recover the monic $\operatorname{lc}_x(\widetilde{g}_j(x,y)) \in \mathbb{Q}_q[y]$.
+
+Finally, we map $\widetilde{g}_1(x,y)$ to some number field $K[x,y]$ (so that the other $\widetilde{g}_j(x,y)$ are its conjugates) and test divisibility $g_1|f$.
+
+\subsection{Bivariate Absolute Factorization over $\mathbb{F}_q$}
+
+
+
+\subsection{Multivariate Absolute Factorization}
+For absolutely factoring  an irreducible in $R[x_1,\dots,x_n][X]$, the plan is to substitute good auxiliary polynomials
+\begin{align*}
+x_1 &= \alpha_1 + \beta_1 Y + \gamma_1 Y^2 + \cdots\\
+x_2 &= \alpha_2 + \beta_2 Y + \gamma_2 Y^2 + \cdots\\
+&\cdots\\
+x_n &= \alpha_n + \beta_n Y + \gamma_n Y^2 + \cdots\text{,}
+\end{align*}
+and absolutely factor the resulting bivariate in $R[X,Y]$, and then lift the $Y=0$ images of the two factors back to a multivariate factorization. This would require the fact that an absolutely irreducible multivariate remains an absolutely irreducible bivariate under a generic substitution of this form.
+
 \begin{thebibliography}{99}
-\bibitem{Brown} W. S. Brown. On Euclid’s Algorithm and the
-Computation of Polynomial Greatest Common Divisors.
-J. ACM 18 (1971), 478-504.
+\bibitem{Brown} W. S. Brown. On Euclid’s Algorithm and theComputation of Polynomial Greatest Common Divisors. J. ACM 18 (1971), 478-504.
+
 \bibitem{Johnson} Johnson, S.C., 1974. Sparse polynomial arithmetic. ACM SIGSAM Bulletin 8 (3), pp. 63--71.
+
 \bibitem{FPS} Monagan M., Pearce R.: Sparse polynomial powering using heaps. “Computer Algebra in Scientific Computing”, Springer, 2012, s.236-247. 
-\bibitem{LINZIP}  J. de Kleine, M. Monagan and A. Wittkopf, Algorithms for the non-monic case of the sparse
-modular GCD algorithm. Proceedings of ISSAC ’05,
-ACM Press, pp. 124--131, 2005.
+
+\bibitem{ZIPPEL} Zippel, Richard, Probabilistic algorithms for sparse polynomials. Lecture Notes in Computer Science. 72. pp. 216--226, 1979
+
+\bibitem{LINZIP}  J. de Kleine, M. Monagan and A. Wittkopf, Algorithms for the non-monic case of the sparse modular GCD algorithm. Proceedings of ISSAC ’05, ACM Press, pp. 124--131, 2005.
+
 \bibitem{SULING} Yang, Suling. Computing the Greatest Common Divisor of Multivariate Polynomials over Finite Fields. http://www.cecm.sfu.ca/CAG/theses/suling.pdf
-
+	
 \bibitem{BMAR} The Berlekamp-Massey Algorithm revisited, N. B. Atti, G. M. Diaz–Toca, H. Lombardi, 9 March 2006
-
+	
 \bibitem{YAP} A Unified Approach to HGCD Algorithms for polynomials and integers by Klaus Thull , Chee K. Yap
- 
+	
+\bibitem{GlobalFactor}  Factoring polynomials over global fields Belabas, Karim; van Hoeij, Mark; Klüners, Jürgen; Steel, Allan Journal de théorie des nombres de Bordeaux, Volume 21 (2009) no. 1, p. 15-39
+
+\bibitem{EZGCD} P. S. Wang, The EEZ-GCD Algorithm, ACM SIGSAM Bulletin 14, pp. 50--60, 1980
+
+\bibitem{WANG} P. S. Wang, An improved multivariate polynomial factoring algorithm. Mathematics of Computation 32, no. 144, 1215--1231, 1978
+
+\bibitem{GAO} S. Gao, Absolute irreducibility of polynomials via Newton polytopes, Journal of Algebra
+237 (2001), 501--520.
+
+\bibitem{GAO2} S. Gao and A.G.B. Lauder, Decomposition of polytopes and polynomials, Discrete and Computational Geometry 26 (2001), 89--104.
+
+\bibitem{QuadraticFactor} Jørgen Cherly, Luis Gallardo, Leonid Vaserstein and Ethel Wheland:  Solving Quadratic Equations over Polynomial Rings of Characteristic Two. Publicacions Matemàtiques, Vol. 42, No. 1 (1998), pp. 131-142
+
+\bibitem{KALTOFEN} E. Kaltofen.  Sparse Hensel lifting.  In EUROCAL 85 European Conf. Comput. Algebra Proc. Vol. 2, pages 4–17, 1985
 \end{thebibliography}
+
+\section{Pseudocode}
+\label{Pseudocode}
+
+\subsection{gcd} For the dense gcd over finite fields, if one runs out of primes of the form $x-\alpha$, instead of failing it is possible to use any irreducible polynomial in place of $x-\alpha$ in Algorithm \ref{algo_brownp}, and this would constitute the large prime version of the algorithm.
+
+\begin{algorithm}[H]
+	\DontPrintSemicolon
+	\KwIn{
+		\begin{enumerate}
+			\item $A,B \in \mathbb{F}_q[x][x_1, \dots, x_n]$ neither is zero
+		\end{enumerate}
+	}
+	\KwOut{
+		\begin{enumerate}
+			\item monic $G= \op{gcd}(A,B)$, $\bar{A}=A/G$, $\bar{B}=B/G$
+		\end{enumerate}
+	}
+	\lIf{$n=0$}{\textbf{return} using univariate arithmetic}
+	set $cA= \op{cont}_{x_1,\dots, x_n}(A)$ and $ cB=\op{cont}_{x_1, \dots, x_n}(B) \in \mathbb{F}_p[x]$\;
+	set $A= A/cA$ and $B=B/cB$ \tcp*{content $cA, cB, \dots$ is always monic}
+	set $cG= \op{gcd}(cA, cB)$, $c\bar{A}=cA/cG$ and $c\bar{B}=cB/cG$\;
+	set $\gamma=\op{gcd}(\op{lc}_{x_1,\dots, x_n}(A),\op{lc}_{x_1,\dots, x_n}(B))\in \mathbb{F}_q[x]$\;
+	set $bound= 1+ \op{deg}_{x}\gamma+ \max(\op{deg}_x(A), \op{deg}_x(B))$,
+	and set $m=1\in \mathbb{F}_p[x]$\;
+	\texttt{pick a prime}: \tcp*{primes are $(x-\alpha)$}
+	
+	choose a new $\alpha\in \mathbb{F}_q$ else \textbf{return} FAIL\;
+	set $\gamma^*=\gamma\op{mod} {(x-\alpha)}$\;
+	set $A^*=A \op{mod} (x-\alpha)$ and $B^*=B\op{mod} (x-\alpha)\in \mathbb{F}_q[x_n][x_1,\dots,x_{n-1}]$\;
+	\lIf{$\gamma^*=0$}{\textbf{goto} \texttt{pick a prime}}
+	set $(G^*,\bar{A}^*, \bar{B}^*)= \textbf{brownp}(A^*,B^*)$ or \textbf{goto} \texttt{pick a prime} if the call failed\;
+	\lIf{$G^*=1$}
+	{set $G=1, A=\bar{A},B=\bar{B}$,
+		\textbf{goto} \texttt{put content}}
+	\If{$\op{deg}_x(m)>0$}
+	{\lIf{$\op{lm}_{x_1, \dots,x_n}(G^*)<\op{lm}_{x_1, \dots,x_n}(G)$}{set $m=1$}\lIf{$\op{lm}_{x_1, \dots,x_n}(G^*)>\op{lm}_{x_1, \dots,x_n}(G)$}{\textbf{goto} \texttt{pick a prime}}
+	}
+	set $\bar{A}=\op{crt}(\bar{A} \op{mod} m,\ \bar{A}^* \op{mod} \ (x-\alpha))$
+	and $\bar{B}=\op{crt}(\bar{B} \op{mod} m,\ \bar{B}^* \op{mod} \ (x-\alpha))$\; \label{algo_brownp_abcrt}
+	\If{$\bar{A}$ did not change and, with $T=\bar{A}/\op{cont}_{x_1, \dots, x_n}(\bar{A})$, $T\mid A$ and $A/T\mid B$ \label{algo_brownp_astab}}
+	{ set $G=A/T$, $\bar{A}=T$ and $\bar{B}={B}/G$, \textbf{goto} \texttt{fix lcs}
+	}
+	set $G=\op{crt}(G \op{mod} m,\ \gamma^*\cdot G^* \op{mod} \ (x-\alpha))$
+	and $m= m \cdot (x-\alpha)$\; \label{algo_brownp_gcrt}
+	\If{$G$ did not change and, with $T=G/\op{cont}_{x_1,\dots,x_n}(G)$, $T \mid A$ and $T\mid B$ \label{algo_brownp_gstab}}{set $G=T$, $\bar{A}=\bar{A}/G$ and $\bar{B}=B/G$, \textbf{goto} \texttt{fix lcs}}
+	\lIf{$\op{deg}_x(m)< bound$}{\textbf{goto} \texttt{pick a prime}}
+	\lIf{$\op{deg}_x\gamma+\op{deg}_xA=\op{deg}_xG+\op{deg}_x\bar{A}$ and $\op{deg}_x\gamma+\op{deg}_xB=\op{deg}_xG+\op{deg}_x\bar{B}$}{\textbf{goto} \texttt{success}}
+	set $m=1$, \textbf{goto} \texttt{pick a prime}
+	
+	\texttt{success:}\;
+	set $G=G/\op{cont}_{x_1,\dots, x_n}(G)$, $A=A/\op{lc}_{x_1,\dots, x_n}(G)$ and $B=B/\op{lc}_{x_1,\dots, x_n}(G)$\;
+	\texttt{put content:}\;
+	set $G=G \cdot cG$, $\bar{A}=\bar{A}\cdot c\bar{A}$ and $\bar{B}=\bar{B}\cdot c\bar{B}$\;
+	\Return{$(G, \bar{A}, \bar{B})$}\;
+	\texttt{fix lcs:}\;
+	with $\delta = \op{lc}_{x,x_1,\dots, x_n}(G)$, set $G=\delta^{-1} G$, $A=\delta A$ and $B=\delta B$, \textbf{goto} \texttt{put content}
+	\caption{$\textbf{brownp}$ dense gcd over finite field}
+	\label{algo_brownp}
+\end{algorithm}
+
+On lines \ref{algo_brownp_abcrt} and \ref{algo_brownp_gcrt}, the inputs $G, \bar{A}, \bar{B}$ are undefined only when $m=1$, in which case the $\op{crt}$ ignores them anyways. There should also be a check analogous to line \ref{algo_brownp_astab} for the stabilization of $\bar{B}$. This was omitted simply due to space constraints. Finally, the stability checks in lines \ref{algo_brownp_astab} and \ref{algo_brownp_gstab} (and the missing one for $\bar{B}$) are completely optional and may be executed or skipped on every iteration at the user's discretion.
+
+Similarly to the previous algorithm, divisibility checks could be performed over the integers as well.
+
+\begin{algorithm}[H]
+	\DontPrintSemicolon
+	\KwIn{ $n \ge 1$
+		\begin{enumerate}
+			\item $A,B \in \mathbb{Z}[x_1, \dots, x_n]$ neither is zero
+		\end{enumerate}
+	}
+	\KwOut{
+		\begin{enumerate}
+			\item unit normal $G= \op{gcd}(A,B)$, $\bar{A}=A/G$, $\bar{B}=B/G$
+		\end{enumerate}
+	}
+	set $cA= \op{cont}_{x_1,\dots, x_n}(A)$ and $cB=\op{cont}_{x_1, \dots, x_n}(B) \in \mathbb{Z}$\;
+	set $A= A/cA$ and $B=B/cB$ \tcp*{content $cA, cB, \dots$ is always positive}
+	set $cG= \op{gcd}(cA, cB)$, $c\bar{A}=cA/cG$ and $c\bar{B}=cB/cG$\;
+	set $\gamma=\op{gcd}(\op{lc}_{x_1,\dots, x_n}(A),\op{lc}_{x_1,\dots, x_n}(B))\in \mathbb{Z}[x]$\;
+	set $bound= 2 \cdot \gamma \cdot \max(|A|_{\infty}, |B|_{\infty})$,
+	and set $m=1 \in \mathbb{Z}$\;
+	\texttt{pick a prime}: \tcp*{primes are numbers}
+	choose a new prime $p \in \mathbb{Z}$ else \textbf{return} FAIL\;
+	set $\gamma^*=\gamma\op{mod} p$\;
+	set $A^*=A \op{mod} p$ and $B^*=B\op{mod} p\in \mathbb{F}_p[x_n][x_1,\dots,x_{n-1}]$\;
+	\lIf{$\gamma^*=0$}{\textbf{goto} \texttt{pick a prime}}
+	set $(G^*,\bar{A}^*, \bar{B}^*)= \textbf{brownp}(A^*,B^*)$ or \textbf{goto} \texttt{pick a prime} if the call failed\;
+	\lIf{$G^*=1$}
+	{set $G=1, A=\bar{A},B=\bar{B}$,
+		\textbf{goto} \texttt{put content}}
+	\If{$m>1$}
+	{\lIf{$\op{lm}_{x_1, \dots,x_n}(G^*)<\op{lm}_{x_1, \dots,x_n}(G)$}{set $m=1$}\lIf{$\op{lm}_{x_1, \dots,x_n}(G^*)>\op{lm}_{x_1, \dots,x_n}(G)$}{\textbf{goto} \texttt{pick a prime}}
+	}
+	set $\bar{A}=\op{crt}(\bar{A} \op{mod} m,\ \bar{A}^* \op{mod} p)$
+	and $\bar{B}=\op{crt}(\bar{B} \op{mod} m,\ \bar{B}^* \op{mod} p)$\;
+	set $G=\op{crt}(G \op{mod} m,\ \gamma^*\cdot G^* \op{mod} p)$
+	and $m= m \cdot p$\;
+	\lIf{$m< bound$}{\textbf{goto} \texttt{pick a prime}}
+	set $hA = \min(|G|_1 \cdot |\bar{A}|_\infty, |G|_\infty \cdot |\bar{A}|_1)$ \tcp*{upper bound on $|G\cdot\bar{A}|_\infty$}
+	set $hB = \min(|G|_1 \cdot |\bar{B}|_\infty, |G|_\infty \cdot |\bar{B}|_1)$ \tcp*{upper bound on $|G\cdot\bar{B}|_\infty$}
+	\lIf{$hA < m$ and $hB < m$}{\textbf{goto} \texttt{success}}
+	\textbf{goto }\texttt{pick a prime}
+	
+	\texttt{success:}\;
+	set $G=G/\op{cont}_{x_1,\dots, x_n}(G)$, $A=A/\op{lc}_{x_1,\dots, x_n}(G)$ and $B=B/\op{lc}_{x_1,\dots, x_n}(G)$\;
+	\texttt{put content:}\;
+	set $G=G \cdot cG$, $\bar{A}=\bar{A}\cdot c\bar{A}$ and $\bar{B}=\bar{B}\cdot c\bar{B}$\;
+	\Return{$(G, \bar{A}, \bar{B})$}\;
+	\caption{$\textbf{brownm}$ dense gcd over integers}
+	\label{algo_brownm}
+\end{algorithm}
+
+\subsection{factoring}
+
+The lifting algorithms with be stated with $3$ factors.
+
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\KwIn{	$m \ge 2$
+	\begin{enumerate}
+ 	\item $(\alpha_1, \dots, \alpha_m) \in R^m$
+ 	\item $A \in R[x_1, \dots, x_m][X]$ with $A(X, \alpha_1, \dots, \alpha_m)$ squarefree
+ 	\item $(B_1, B_2, B_3) \in R[x_1, \dots, x_m][X]$ (however, all but the leading coefficients of each $B_i$ are in $R[x_1, \dots, x_{m-1}]$) such that $A(X, x_1, \dots, x_{m-1}, \alpha_m) = (B_1 B_2 B_3)(X, x_1, \dots, x_{m-1}, \alpha_m)$
+	\end{enumerate}
+}
+\KwOut{
+	\begin{enumerate}
+ 	\item $(B_1, B_2, B_3) \in R[x_1, \dots, x_m][X]$ such that $A(X, x_1, \dots, x_m) = (B_1 B_2 B_3)(X, x_1, \dots, x_m)$ or FAIL
+ 	\end{enumerate}
+}
+
+set $e = A - B_1 B_2 B_3$ \tcp*{current error}
+set $\beta_i = B_i(X, x_1, \dots, x_{m-1}, \alpha_m) \in R[x_1, \dots, x_{m-1}][X]$\;
+\For{$j=1$ \KwTo $\op{deg}_{x_m}(A)$}
+{
+	assert that $e$ is divisible by $(x_m - \alpha_m)^j$\;
+	set $t =$ taylor coefficient of $(x_m - \alpha_m)^j$ in $e$ \tcp*{ $t \in R[x_1, \dots, x_{m-1}][X]$}
+	$(\delta_1, \delta_2, \delta_3) = \textbf{pfrac}(t, (\beta_1, \beta_2, \beta_3),(\alpha_1, \dots,\alpha_{m-1}), (\op{deg}_{x_1}A, \dots, \op{deg}_{x_{m-1}}A))$ \;
+		\tcp*{solve $t = \delta_1 \beta_2 \beta_3 + \delta_2 \beta_1 \beta_3 + \delta_3 \beta_1 \beta_2$}
+	\lIf{the solved failed}{\Return{FAIL}}
+	set $B_i = B_i + \delta_i (x_m - \alpha_m)^j$ for each $i$\;
+	set $e = A - B_1 B_2 B_3$
+}
+\leIf{$e=0$}{
+	\Return{$(B_1, B_2, B_3)$}
+}
+{
+	\Return{FAIL}
+}
+\caption{$\textbf{hlift}$ (Multivariate Hensel Lifting - Quintic version)}
+\label{algo_mlift}
+\end{algorithm}
+
+Since the solutions $\delta_i$ must satisfy $\op{deg}_{X} \delta_i < \op{deg}_{X} B_i$, the leading coefficients of the $B_i$ will not be changed by Algorithm \ref{algo_mlift}.
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\KwIn{	$m \ge 2$
+	\begin{enumerate}
+ 	\item $(\alpha_1, \dots, \alpha_m) \in R^m$
+ 	\item $F \in R[x_1, \dots, x_m][X]$ with $F(X, \alpha_1, \dots, \alpha_m)$ squarefree
+ 	\item $(A, B, C) \in R[x_1, \dots, x_m][X]$ (however, all but the leading coefficients of each $A,B,C$ are in $R[x_1, \dots, x_{m-1}]$) such that $F(X, x_1, \dots, x_{m-1}, \alpha_m) = (A B C)(X, x_1, \dots, x_{m-1}, \alpha_m)$
+	\end{enumerate}
+}
+\KwOut{
+	\begin{enumerate}
+ 	\item $(A, B, C) \in R[x_1, \dots, x_m][X]$ such that $A(X, x_1, \dots, x_m) = (A B C)(X, x_1, \dots, x_m)$ or FAIL
+ 	\end{enumerate}
+}
+
+set $a_0 = [(x_m - \alpha_m)^0] A$ and set $dA = 0$\;
+set $b_0 = [(x_m - \alpha_m)^0] B$ and set $dB = 0$\;
+set $c_0 = [(x_m - \alpha_m)^0] C$ and set $dC = 0$\;
+\For{$d=1$ \KwTo $\op{deg}_{x_m}(A)$}
+{
+	set $t = [(x_m - \alpha_m)^d]F - \sum_{\substack{i+j+k=d \\ i \le dA, \ j \le dB, \ k \le dC}} a_i b_j c_k$\;
+	use \textbf{pfrac} to find $a_d, b_d, c_d$ from $t=a_d b_0 c_0+a_0 b_d c_0+a_0 b_0 c_d$\;
+	\lIf{the solved failed}{\Return{FAIL}}
+	set $a_d = a_d + [(x_m - \alpha_m)^d]A$\;
+	set $b_d = b_d + [(x_m - \alpha_m)^d]B$\;
+	set $c_d = c_d + [(x_m - \alpha_m)^d]C$\;
+	\lIf{ $a_d \neq 0$}{set $dA = d$}
+	\lIf{ $b_d \neq 0$}{set $dB = d$}
+	\lIf{ $c_d \neq 0$}{set $dC = d$}
+	\lIf{$dA + dB + dC > \op{deg}_{x_m}(A)$}{\Return{FAIL}}
+}
+assert that $dA + dB + dC = \op{deg}_{x_m}(A)$\;
+set $A = \sum_{i=0}^{dA} a_i (x_m - \alpha_m)^i$\;
+set $B = \sum_{i=0}^{dB} b_i (x_m - \alpha_m)^i$\;
+set $C = \sum_{i=0}^{dC} c_i (x_m - \alpha_m)^i$\;
+\Return{(A,B,C)}
+\caption{$\textbf{hlift}$ (Multivariate Hensel Lifting - Quartic version)}
+\label{algo_mlift2}
+\end{algorithm}
+
+Finally the main work horse. It is easy to solve $t=\delta_1\beta_2\beta_3+\delta_2\beta_1\beta_3+\delta_3\beta_1\beta_2$ in $\op{frac}(R)(x_1,\dots,x_{m-1})[X]$ with pseudo remainder sequences, since 
+$\delta_i= t(\beta_j\beta_k)^{-1}\pmod {\beta_i}$ and check if the $\delta_i$'s are  defined in $R[x_1,\dots, x_{m-1}][X]$. However, as intermediate expression swell is a problem in this approach. We will use a different algorithm described as below.
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\KwIn{ 	 $l\geq 0$
+	\begin{enumerate}
+		\item $t\in R[x_1,\dots, x_l][X]$
+		\item $(\beta_1,\beta_2,\beta_3)$, $\text{where } \beta_i\in R[x_1,\dots, x_{l}][X],$ $ \beta_i \text{ pairwise coprime in } \op{frac}{(R)}(x_1,\dots,x_{l})[X]$
+		\item $(\alpha_1,\dots,\alpha_l) \in R^l$
+		\item $(d_1,\dots, d_l)\in \mathbb{N}^l$ degree bounds
+	\end{enumerate}
+}
+
+\KwOut{
+    \begin{enumerate}
+    	\item $(\delta_1,\delta_2,\delta_3), \delta_i\in R[x_1,\dots, x_r][X]\text{ such that }t=\delta_1\beta_2\beta_3+\delta_2\beta_1\beta_3+\delta_3\beta_1\beta_2$ and $\op{deg}_{X}\delta_i<\op{deg}_{X}\beta_i$
+    	or \it{FAIL}
+    \end{enumerate}
+}
+\eIf{$r=0$}{ 
+	set $\delta_i=t(\beta_j\beta_k)^{-1}\pmod {\beta_i} $ in  $\op{frac}(R)[X]$\\
+	\leIf{ each $\delta_i\in R[X]$}{
+		\Return{$(\delta_1,\delta_2,\delta_3)$}
+	}
+	{
+		\Return{FAIL}
+	}
+	}
+{
+	set $\tilde{\beta}_i(X)=\beta_i(X,x_1,\dots,x_{r-1},\alpha_l)\in R[x_1,\dots,x_{l-1}][X]$\;
+	set $\delta_i=0$ for each $i$\;
+	set $e=t$\;
+	\For{$j=0$ \KwTo $d_r$}	
+	  {
+	  	assert that $e$ is divisible by $(x_r - \alpha_r)^j$\;
+	  	set $\tilde{t}=$ taylor coefficient of $(x_r-\alpha_r)^j$ in $e$\;
+	  	set $(\tilde{\delta_1},\tilde{\delta}_2, \tilde{\delta}_3 )=\textbf{pfrac}(\tilde{t},(\alpha_1,\dots, \alpha_{l-1}),(\tilde{\beta}_1,\tilde{\beta}_2, \tilde{\beta}_3),(d_1,\dots, d_{l-1}))$\;
+	  	\lIf{the solved failed}{\Return{FAIL}}
+	    set $\delta_i=\delta_i+\tilde{\delta}_i(x_r-\alpha_r)^j$\;
+	    set $e=t-(\delta_1\beta_2\beta_3+\delta_2\beta_1\beta_3+\delta_3\beta_1\beta_2)$
+	  }
+  \leIf{$e=0$}{
+  	\Return{$(\delta_1, \delta_2, \delta_3)$}
+  }
+  {
+  	\Return{FAIL}
+  }
+}
+
+\caption{\textbf{pfrac} (Multivariate partial fraction solver)}
+\label{algo_pfrac}
+\end{algorithm}
+
 \end{document}
