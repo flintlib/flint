@@ -1424,6 +1424,9 @@ FLINT_DLL void nmod_mpolyn_set(nmod_mpolyn_t A, const nmod_mpolyn_t B,
 FLINT_DLL void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpoly_cvtfrom_mpolyn(nmod_mpoly_t A, const nmod_mpolyn_t B,
+                                        slong var, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpolyn_mul_poly(nmod_mpolyn_t A, const nmod_mpolyn_t B, 
                                  const n_poly_t c, const nmod_mpoly_ctx_t ctx);
 
@@ -1699,9 +1702,6 @@ FLINT_DLL void _nmod_mpoly_monomial_evals2_cache(n_polyun_t E,
           const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
           const mp_limb_t * betas, slong m, const mpoly_ctx_t ctx, nmod_t mod);
 
-FLINT_DLL int n_polyu2n_add_zip_must_match(n_polyun_t Z, const n_bpoly_t A,
-                                                             slong cur_length);
-
 /* interp ********************************************************************/
 
 FLINT_DLL void _nmod_poly_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
@@ -1743,8 +1743,15 @@ FLINT_DLL int nmod_mpolyn_interp_crt_2sm_mpolyn(slong * lastdeg,
 FLINT_DLL void nmod_mpolyun_interp_reduce_sm_mpolyu(nmod_mpolyu_t B,
                nmod_mpolyun_t A, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpolyn_interp_lift_sm_mpoly(nmod_mpolyn_t A,
+                            const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpolyun_interp_lift_sm_mpolyu(nmod_mpolyun_t A,
                            const nmod_mpolyu_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyn_interp_crt_sm_mpoly(slong * lastdeg, nmod_mpolyn_t F,
+                            nmod_mpolyn_t T, nmod_mpoly_t A, n_poly_t modulus,
+                                  mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyun_interp_crt_sm_mpolyu(slong * lastdeg,
              nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,

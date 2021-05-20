@@ -9,10 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "n_poly.h"
 #include "mpn_extras.h"
 #include "nmod_vec.h"
 
+int n_poly_is_canonical(const n_poly_t A)
+{
+    if (A->length < 0)
+        return 0;
+
+    return A->length < 1 || A->coeffs[A->length - 1] != 0;
+}
 
 void n_poly_realloc(n_poly_t A, slong len)
 {
