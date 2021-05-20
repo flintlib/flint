@@ -29,7 +29,7 @@
 void fmpz_mpoly_interp_reduce_p(
     nmod_mpoly_t Ap,
     const nmod_mpoly_ctx_t ctxp,
-    fmpz_mpoly_t A,
+    const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, k, N;
@@ -42,8 +42,8 @@ void fmpz_mpoly_interp_reduce_p(
     for (i = 0; i < A->length; i++)
     {
         mpoly_monomial_set(Ap->exps + N*k, A->exps + N*i, N);
-        Ap->coeffs[k] = fmpz_fdiv_ui(A->coeffs + i, ctxp->mod.n);
-        k += (Ap->coeffs[k] != UWORD(0));
+        Ap->coeffs[k] = fmpz_get_nmod(A->coeffs + i, ctxp->mod);
+        k += (Ap->coeffs[k] != 0);
     }
     Ap->length = k;
 }
@@ -76,7 +76,7 @@ void fmpz_mpolyu_interp_reduce_p(
 
 
 /*
-    Convert Ap to A using the symmetric range [-p/2, p/2)
+    Convert Ap to A using the symmetric range (-p/2, p/2]
     A  is in ZZ[x_0, ..., x_(n-1)], n = ctx->minfo->nvars
     Ap is in Fp[x_0, ..., x_(n-1)]
 */
@@ -86,16 +86,14 @@ void fmpz_mpoly_interp_lift_p(
     nmod_mpoly_t Ap,
     const nmod_mpoly_ctx_t ctxp)
 {
-    slong i;
-    slong N;
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     FLINT_ASSERT(Ap->bits == A->bits);
+
     fmpz_mpoly_fit_length(A, Ap->length, ctx);
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    for (i = 0; i < Ap->length*N; i++)
-         A->exps[i] = Ap->exps[i];
+    mpoly_copy_monomials(A->exps, Ap->exps, Ap->length, N);
     _fmpz_vec_set_nmod_vec(A->coeffs, Ap->coeffs, Ap->length, ctxp->mod);
-    A->length = Ap->length;
+    _fmpz_mpoly_set_length(A, Ap->length, ctx);
 }
 
 /*
@@ -128,7 +126,7 @@ void fmpz_mpolyu_interp_lift_p(
     A is in Fp[x_0, ..., x_(n-1)]
 */
 int fmpz_mpoly_interp_mcrt_p(
-    flint_bitcnt_t * coeffbits,
+    flint_bitcnt_t * coeffbits_,
     fmpz_mpoly_t H,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_t m,
@@ -137,27 +135,26 @@ int fmpz_mpoly_interp_mcrt_p(
 {
     slong i;
 #if FLINT_WANT_ASSERT
-    slong N;
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;
+    flint_bitcnt_t coeffbits = 0;
     fmpz_t t;
 
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
 
-#if FLINT_WANT_ASSERT
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-#endif
     fmpz_init(t);
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
         fmpz_CRT_ui(t, H->coeffs + i, m, A->coeffs[i], ctxp->mod.n, 1);
-        *coeffbits = FLINT_MAX(*coeffbits, fmpz_bits(t));
+        coeffbits = FLINT_MAX(coeffbits, fmpz_bits(t));
         changed |= !fmpz_equal(t, H->coeffs + i);
         fmpz_swap(t, H->coeffs + i);
     }
     fmpz_clear(t);
+    *coeffbits_ = coeffbits;
     return changed;
 }
 
@@ -177,6 +174,7 @@ int fmpz_mpolyu_interp_mcrt_p(
 {
     slong i;
     int changed = 0;
+    flint_bitcnt_t coeffbits2;
 
     FLINT_ASSERT(H->bits == A->bits);
     FLINT_ASSERT(H->length == A->length);
@@ -185,8 +183,9 @@ int fmpz_mpolyu_interp_mcrt_p(
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(H->exps[i] == A->exps[i]);
-        changed |= fmpz_mpoly_interp_mcrt_p(coeffbits, H->coeffs + i, ctx, m,
+        changed |= fmpz_mpoly_interp_mcrt_p(&coeffbits2, H->coeffs + i, ctx, m,
                                                           A->coeffs + i, ctxp);
+        *coeffbits = FLINT_MAX(*coeffbits, coeffbits2);
     }
     H->length = A->length;
     return changed;

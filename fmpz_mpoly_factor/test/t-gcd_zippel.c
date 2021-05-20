@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly_factor.h"
 
-
 int compute_gcd(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -20,14 +19,13 @@ int compute_gcd(
 {
     slong i;
     flint_bitcnt_t wbits;
-    flint_rand_t randstate;
+    flint_rand_t state;
     int success = 0;
-    fmpz_mpoly_ctx_t uctx;
-    fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
+    fmpz_mpoly_ctx_t lctx;
+    fmpz_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
     fmpz_mpoly_t Ac, Bc, Gc;
     ulong * shift, * stride;
     slong * perm;
-    ulong amin, bmin;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -68,9 +66,14 @@ int compute_gcd(
         return 0;
     }
 
-    perm = (slong *) flint_malloc(ctx->minfo->nvars*sizeof(slong));
-    shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-    stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+    if (ctx->minfo->nvars < 2)
+    {
+        return fmpz_mpoly_gcd(G, A, B, ctx);
+    }
+
+    perm = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
+    shift = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, ulong);
+    stride = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, ulong);
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
         perm[i] = i;
@@ -78,83 +81,52 @@ int compute_gcd(
         stride[i] = 1;
     }
 
-    if (ctx->minfo->nvars == 1)
-    {
-        fmpz_poly_t a, b, g;
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(g);
-        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, 0, shift, stride, ctx);
-        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, 0, shift, stride, ctx);
-        fmpz_poly_gcd(g, a, b);
-        _fmpz_mpoly_from_fmpz_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(g);
-
-        success = 1;
-        goto cleanup1;
-    }
-
-    FLINT_ASSERT(A->bits <= FLINT_BITS);
-    FLINT_ASSERT(B->bits <= FLINT_BITS);
-    FLINT_ASSERT(!fmpz_mpoly_is_zero(A, ctx));
-    FLINT_ASSERT(!fmpz_mpoly_is_zero(B, ctx));
-    FLINT_ASSERT(ctx->minfo->nvars > WORD(1));
-
-    flint_randinit(randstate);
+    flint_randinit(state);
 
     wbits = FLINT_MAX(A->bits, B->bits);
 
-    fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX);
+    fmpz_mpoly_ctx_init(lctx, ctx->minfo->nvars, ORD_LEX);
 
-    fmpz_mpolyu_init(Au, wbits, uctx);
-    fmpz_mpolyu_init(Bu, wbits, uctx);
-    fmpz_mpolyu_init(Gu, wbits, uctx);
-    fmpz_mpolyu_init(Abaru, wbits, uctx);
-    fmpz_mpolyu_init(Bbaru, wbits, uctx);
-    fmpz_mpoly_init3(Ac, 0, wbits, uctx);
-    fmpz_mpoly_init3(Bc, 0, wbits, uctx);
-    fmpz_mpoly_init3(Gc, 0, wbits, uctx);
+    fmpz_mpoly_init3(Al, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Gl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Abarl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bbarl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Ac, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bc, 0, wbits, lctx);
+    fmpz_mpoly_init3(Gc, 0, wbits, lctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx,
-                                           perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx,
-                                           perm, shift, stride, NULL, NULL, 0);
+    fmpz_mpoly_to_mpolyl_perm_deflate(Al, lctx, A, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyl_perm_deflate(Bl, lctx, B, ctx, perm, shift, stride);
 
-    FLINT_ASSERT(Au->length > 0);
-    FLINT_ASSERT(Bu->length > 0);
-    amin = Au->exps[Au->length - 1];
-    bmin = Bu->exps[Bu->length - 1];
-    fmpz_mpolyu_shift_right(Au, amin);
-    fmpz_mpolyu_shift_right(Bu, bmin);
-
-    success = _fmpz_mpoly_vec_content_mpoly(Ac, Au->coeffs, Au->length, uctx) &&
-              _fmpz_mpoly_vec_content_mpoly(Bc, Bu->coeffs, Bu->length, uctx);
+    success = fmpz_mpolyl_content(Ac, Al, 1, lctx) &&
+              fmpz_mpolyl_content(Bc, Bl, 1, lctx);
     if (!success)
         goto cleanup;
 
-    fmpz_mpoly_repack_bits_inplace(Ac, wbits, uctx);
-    fmpz_mpoly_repack_bits_inplace(Bc, wbits, uctx);
-    fmpz_mpolyu_divexact_mpoly_inplace(Au, Ac, uctx);
-    fmpz_mpolyu_divexact_mpoly_inplace(Bu, Bc, uctx);
+    if (!fmpz_mpoly_divides(Al, Al, Ac, lctx) ||
+        !fmpz_mpoly_divides(Bl, Bl, Bc, lctx))
+    {
+        flint_printf("FAIL: Check content divides\n");
+        flint_abort();
+    }
 
-    /* after removing content, degree bounds in zinfo are still valid bounds */
-    success = fmpz_mpolyu_gcdm_zippel(Gu, Abaru, Bbaru, Au, Bu, uctx, randstate);
+    fmpz_mpoly_repack_bits_inplace(Al, wbits, lctx);
+    fmpz_mpoly_repack_bits_inplace(Bl, wbits, lctx);
+
+    success = fmpz_mpolyl_gcd_zippel(Gl, Abarl, Bbarl, Al, Bl, lctx, state);
     if (!success)
         goto cleanup;
 
-    success = fmpz_mpoly_gcd(Gc, Ac, Bc, uctx);
+    success = fmpz_mpoly_gcd(Gc, Ac, Bc, lctx);
     if (!success)
         goto cleanup;
 
-    fmpz_mpoly_repack_bits_inplace(Gc, wbits, uctx);
+    fmpz_mpoly_mul(Gl, Gl, Gc, lctx);
+    fmpz_mpoly_repack_bits_inplace(Gl, wbits, lctx);
 
-    fmpz_mpolyu_mul_mpoly_inplace(Gu, Gc, uctx);
-    fmpz_mpolyu_shift_left(Gu, FLINT_MIN(amin, bmin));
-
-    fmpz_mpoly_from_mpolyu_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
-                                                Gu, uctx, perm, shift, stride);
+    fmpz_mpoly_from_mpolyl_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
+                                                Gl, lctx, perm, shift, stride);
     success = 1;
 
     if (fmpz_sgn(G->coeffs + 0) < 0)
@@ -162,20 +134,18 @@ int compute_gcd(
 
 cleanup:
 
-    fmpz_mpolyu_clear(Au, uctx);
-    fmpz_mpolyu_clear(Bu, uctx);
-    fmpz_mpolyu_clear(Gu, uctx);
-    fmpz_mpolyu_clear(Abaru, uctx);
-    fmpz_mpolyu_clear(Bbaru, uctx);
-    fmpz_mpoly_clear(Ac, uctx);
-    fmpz_mpoly_clear(Bc, uctx);
-    fmpz_mpoly_clear(Gc, uctx);
+    fmpz_mpoly_clear(Al, lctx);
+    fmpz_mpoly_clear(Bl, lctx);
+    fmpz_mpoly_clear(Gl, lctx);
+    fmpz_mpoly_clear(Abarl, lctx);
+    fmpz_mpoly_clear(Bbarl, lctx);
+    fmpz_mpoly_clear(Ac, lctx);
+    fmpz_mpoly_clear(Bc, lctx);
+    fmpz_mpoly_clear(Gc, lctx);
 
-    fmpz_mpoly_ctx_clear(uctx);
+    fmpz_mpoly_ctx_clear(lctx);
 
-    flint_randclear(randstate);
-
-cleanup1:
+    flint_randclear(state);
 
     flint_free(perm);
     flint_free(shift);
@@ -241,9 +211,8 @@ void gcd_check(
         flint_abort();
     }
 
-    res = 1;
-    res = res && fmpz_mpoly_divides(ca, a, g, ctx);
-    res = res && fmpz_mpoly_divides(cb, b, g, ctx);
+    res = fmpz_mpoly_divides(ca, a, g, ctx) &&
+          fmpz_mpoly_divides(cb, b, g, ctx);
     if (!res)
     {
         flint_printf("FAIL: Check divisibility\n");
@@ -279,7 +248,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, tmul = 20;
+    slong i, j, tmul = 25;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_zippel....");
@@ -387,7 +356,7 @@ main(void)
             fmpz_mpoly_mul(g, g, d, ctx);
 
             fmpz_mpoly_randtest_bits(r, state, 10, 100, FLINT_BITS, ctx);
-            gcd_check(r, f, g, d, ctx, -1, i, "example");
+            gcd_check(r, f, g, d, ctx, -2, i, "example");
 
             fmpz_mpoly_clear(r, ctx);
             fmpz_mpoly_clear(d, ctx);
@@ -395,7 +364,32 @@ main(void)
             fmpz_mpoly_clear(g, ctx);
             fmpz_mpoly_ctx_clear(ctx);
         }
+    }
 
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t g, a, b, t;
+        const char * vars[] = {"t" ,"z", "y", "x"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        fmpz_mpoly_set_str_pretty(t, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
+        fmpz_mpoly_set_str_pretty(a, "39 - t*x - 7*x^2*y^3*z^11 + x^1000*y^3*z^20", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
+        fmpz_mpoly_mul(a, a, t, ctx);
+        fmpz_mpoly_mul(b, b, t, ctx);
+
+        gcd_check(g, a, b, t, ctx, -1, 1, "example");
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -413,13 +407,13 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 20) + 1;
-        len1 = n_randint(state, 20) + 1;
-        len2 = n_randint(state, 20) + 1;
+        len = n_randint(state, 25) + 1;
+        len1 = n_randint(state, 25) + 1;
+        len2 = n_randint(state, 25) + 1;
 
         degbound = 2 + 100/(2*ctx->minfo->nvars - 1);
 
-        coeff_bits = n_randint(state, 100);
+        coeff_bits = n_randint(state, 300);
 
         for (j = 0; j < 4; j++)
         {

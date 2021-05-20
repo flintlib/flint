@@ -582,7 +582,7 @@ int nmod_mpolyl_gcds_zippel(
     nmod_mat_t MF, Msol, MFtemp, Mwindow;
 
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
-    FLINT_ASSERT(1 < var && var < ctx->minfo->nvars);
+    FLINT_ASSERT(1 < var && var <= ctx->minfo->nvars);
 
     FLINT_ASSERT(bits <= FLINT_BITS);
     FLINT_ASSERT(G->bits == bits);
@@ -1088,7 +1088,13 @@ outer_loop:
     FLINT_ASSERT(Geval->coeffs[0] == 1);
 
     if (nmod_mpoly_is_one(Geval, ctx))
-        goto gcd_is_trivial;
+    {
+        nmod_mpoly_one(G, ctx);
+        nmod_mpoly_set(Abar, A, ctx);
+        nmod_mpoly_set(Bbar, B, ctx);
+        success = 1;
+        goto cleanup;
+    }
 
     Gdeg = nmod_mpoly_degree_si(Geval, 0, ctx);
 
@@ -1284,12 +1290,4 @@ cleanup:
     }
 
     return success;
-
-gcd_is_trivial:
-
-    nmod_mpoly_one(G, ctx);
-    nmod_mpoly_set(Abar, A, ctx);
-    nmod_mpoly_set(Bbar, B, ctx);
-    success = 1;
-    goto cleanup;
 }
