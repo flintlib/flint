@@ -38,7 +38,7 @@ void nmod_poly_stack_clear(nmod_poly_stack_t S)
 
     for (i = 0; i < S->poly_alloc; i++)
     {
-        nmod_poly_clear(S->poly_array[i]);
+        n_poly_clear(S->poly_array[i]);
         flint_free(S->poly_array[i]);
     }
     if (S->poly_array)
@@ -71,11 +71,6 @@ void nmod_poly_stack_set_ctx(nmod_poly_stack_t S, const nmod_mpoly_ctx_t ctx)
 
     S->ctx = ctx;
 
-    for (i = 0; i < S->poly_alloc; i++)
-    {
-        nmod_poly_set_mod(S->poly_array[i], S->ctx->mod);
-    }
-
     for (i = 0; i < S->mpolyun_alloc; i++)
     {
         nmod_mpolyun_set_mod(S->mpolyun_array[i], S->ctx->mod);
@@ -88,7 +83,7 @@ void nmod_poly_stack_set_ctx(nmod_poly_stack_t S, const nmod_mpoly_ctx_t ctx)
 }
 
 /* insure that k slots are available after top and return pointer to top */
-nmod_poly_struct ** nmod_poly_stack_fit_request_poly(nmod_poly_stack_t S, slong k)
+n_poly_struct ** nmod_poly_stack_fit_request_poly(nmod_poly_stack_t S, slong k)
 {
     slong newalloc, i;
 
@@ -100,20 +95,20 @@ nmod_poly_struct ** nmod_poly_stack_fit_request_poly(nmod_poly_stack_t S, slong 
 
         if (S->poly_array)
         {
-            S->poly_array = (nmod_poly_struct **) flint_realloc(S->poly_array,
-                                           newalloc*sizeof(nmod_poly_struct*));
+            S->poly_array = (n_poly_struct **) flint_realloc(S->poly_array,
+                                           newalloc*sizeof(n_poly_struct*));
         }
         else
         {
-            S->poly_array = (nmod_poly_struct **) flint_malloc(
-                                           newalloc*sizeof(nmod_poly_struct*));
+            S->poly_array = (n_poly_struct **) flint_malloc(
+                                           newalloc*sizeof(n_poly_struct*));
         }
 
         for (i = S->poly_alloc; i < newalloc; i++)
         {
-            S->poly_array[i] = (nmod_poly_struct *) flint_malloc(
-                                                     sizeof(nmod_poly_struct));
-            nmod_poly_init_mod(S->poly_array[i], S->ctx->mod);
+            S->poly_array[i] = (n_poly_struct *) flint_malloc(
+                                                     sizeof(n_poly_struct));
+            n_poly_init(S->poly_array[i]);
         }
         S->poly_alloc = newalloc;
     }

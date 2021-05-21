@@ -82,21 +82,21 @@ static void stripe_fit_length(nmod_mpolyn_stripe_struct * S, slong new_len)
 */
 typedef struct _nmod_mpolyn_ts_struct
 {
-    nmod_poly_struct * volatile coeffs; /* this is coeff_array[idx] */
+    n_poly_struct * volatile coeffs; /* this is coeff_array[idx] */
     ulong * volatile exps;       /* this is exp_array[idx] */
     volatile slong length;
     slong alloc;
     flint_bitcnt_t bits;
     flint_bitcnt_t idx;    
     ulong * exp_array[FLINT_BITS];
-    nmod_poly_struct * coeff_array[FLINT_BITS];
+    n_poly_struct * coeff_array[FLINT_BITS];
 } nmod_mpolyn_ts_struct;
 
 typedef nmod_mpolyn_ts_struct nmod_mpolyn_ts_t[1];
 
 /* Bcoeff is changed */
 static void nmod_mpolyn_ts_init(nmod_mpolyn_ts_t A,
-                        nmod_poly_struct * Bcoeff, ulong * Bexp, slong Blen,
+                        n_poly_struct * Bcoeff, ulong * Bexp, slong Blen,
                       flint_bitcnt_t bits, slong N, const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -113,17 +113,17 @@ static void nmod_mpolyn_ts_init(nmod_mpolyn_ts_t A,
     A->exps = A->exp_array[idx]
             = (ulong *) flint_malloc(N*A->alloc*sizeof(ulong));
     A->coeffs = A->coeff_array[idx]
-              = (nmod_poly_struct *) flint_malloc(A->alloc*sizeof(nmod_poly_struct));
+              = (n_poly_struct *) flint_malloc(A->alloc*sizeof(n_poly_struct));
 
     for (i = 0; i < A->alloc; i++)
     {
-        nmod_poly_init_mod(A->coeffs + i, ctx->mod);
+        n_poly_init(A->coeffs + i);
     }
 
     A->length = Blen;
     for (i = 0; i < Blen; i++)
     {
-        nmod_poly_swap(A->coeffs + i, Bcoeff + i);
+        n_poly_swap(A->coeffs + i, Bcoeff + i);
         mpoly_monomial_set(A->exps + N*i, Bexp + N*i, N);
     }
 }
@@ -134,7 +134,7 @@ static void nmod_mpolyn_ts_clear(nmod_mpolyn_ts_t A)
 
     for (i = 0; i < A->length; i++)
     {
-        nmod_poly_clear(A->coeffs + i);
+        n_poly_clear(A->coeffs + i);
     }
 
     for (i = 0; i < FLINT_BITS; i++)
@@ -159,7 +159,7 @@ static void nmod_mpolyn_ts_clear_poly(nmod_mpolyn_t Q, nmod_mpolyn_ts_t A)
 
         for (i = 0; i < Q->alloc; i++)
         {
-            nmod_poly_clear(Q->coeffs + i);
+            n_poly_clear(Q->coeffs + i);
         }
 
         flint_free(Q->exps);
@@ -181,14 +181,14 @@ static void nmod_mpolyn_ts_clear_poly(nmod_mpolyn_t Q, nmod_mpolyn_ts_t A)
 
 /* put B on the end of A - Bcoeff is changed*/
 static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
-                       nmod_poly_struct * Bcoeff, ulong * Bexps, slong Blen,
+                       n_poly_struct * Bcoeff, ulong * Bexps, slong Blen,
                                            slong N, const nmod_mpoly_ctx_t ctx)
 {
 /* TODO: this needs barriers on non-x86 */
 
     slong i;
     ulong * oldexps = A->exps;
-    nmod_poly_struct * oldcoeffs = A->coeffs;
+    n_poly_struct * oldcoeffs = A->coeffs;
     slong oldlength = A->length;
     slong newlength = A->length + Blen;
 
@@ -197,7 +197,7 @@ static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
         /* write new terms first */
         for (i = 0; i < Blen; i++)
         {
-            nmod_poly_swap(oldcoeffs + oldlength + i, Bcoeff + i);
+            n_poly_swap(oldcoeffs + oldlength + i, Bcoeff + i);
             mpoly_monomial_set(oldexps + N*(oldlength + i), Bexps + N*i, N);
         }
     }
@@ -205,7 +205,7 @@ static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
     {
         slong newalloc;
         ulong * newexps;
-        nmod_poly_struct * newcoeffs;
+        n_poly_struct * newcoeffs;
         flint_bitcnt_t newidx;
         newidx = FLINT_BIT_COUNT(newlength - 1);
         newidx = (newidx > 8) ? newidx - 8 : 0;
@@ -216,11 +216,11 @@ static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
         newexps = A->exp_array[newidx]
                 = (ulong *) flint_malloc(N*newalloc*sizeof(ulong));
         newcoeffs = A->coeff_array[newidx]
-                  = (nmod_poly_struct *) flint_malloc(newalloc*sizeof(nmod_poly_struct));
+                  = (n_poly_struct *) flint_malloc(newalloc*sizeof(n_poly_struct));
 
         for (i = 0; i < newalloc; i++)
         {
-            nmod_poly_init_mod(newcoeffs + i, ctx->mod);
+            n_poly_init(newcoeffs + i);
         }
 
         for (i = 0; i < oldlength; i++)
@@ -230,7 +230,7 @@ static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
         }
         for (i = 0; i < Blen; i++)
         {
-            nmod_poly_swap(newcoeffs + oldlength + i, Bcoeff + i);
+            n_poly_swap(newcoeffs + oldlength + i, Bcoeff + i);
             mpoly_monomial_set(newexps + N*(oldlength + i), Bexps + N*i, N);
         }
 
@@ -379,7 +379,7 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
 }
 
 
-static void _nmod_mpolyn_fit_length(nmod_poly_struct ** coeffs,
+static void _nmod_mpolyn_fit_length(n_poly_struct ** coeffs,
                             ulong ** exps, slong * alloc, slong length,
                                     slong N, const nmod_mpoly_ctx_t ctx)
 {
@@ -392,16 +392,16 @@ static void _nmod_mpolyn_fit_length(nmod_poly_struct ** coeffs,
         if (old_alloc == 0)
         {
             *exps = (ulong *) flint_malloc(new_alloc*N*sizeof(ulong));
-            *coeffs = (nmod_poly_struct *) flint_malloc(new_alloc*sizeof(nmod_poly_struct));
+            *coeffs = (n_poly_struct *) flint_malloc(new_alloc*sizeof(n_poly_struct));
         } else
         {
             *exps = (ulong *) flint_realloc(*exps, new_alloc*N*sizeof(ulong));
-            *coeffs = (nmod_poly_struct *) flint_realloc(*coeffs, new_alloc*sizeof(nmod_poly_struct));
+            *coeffs = (n_poly_struct *) flint_realloc(*coeffs, new_alloc*sizeof(n_poly_struct));
         }
 
         for (i = old_alloc; i < new_alloc; i++)
         {
-            nmod_poly_init_mod(*coeffs + i, ctx->mod);
+            n_poly_init(*coeffs + i);
         }
         *alloc = new_alloc;
     }
@@ -409,10 +409,10 @@ static void _nmod_mpolyn_fit_length(nmod_poly_struct ** coeffs,
 
 
 static slong _nmod_mpolyn_mulsub_stripe1(
-    nmod_poly_struct ** A_coeff, ulong ** A_exp, slong * A_alloc,
-    const nmod_poly_struct * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
-    const nmod_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
-    const nmod_poly_struct * Ccoeff, const ulong * Cexp, slong Clen,
+    n_poly_struct ** A_coeff, ulong ** A_exp, slong * A_alloc,
+    const n_poly_struct * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
+    const n_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
+    const n_poly_struct * Ccoeff, const ulong * Cexp, slong Clen,
     const nmod_mpolyn_stripe_t S)
 {
     int upperclosed;
@@ -431,18 +431,18 @@ static slong _nmod_mpolyn_mulsub_stripe1(
     slong Di;
     slong Alen;
     slong Aalloc = *A_alloc;
-    nmod_poly_struct * Acoeff = *A_coeff;
+    n_poly_struct * Acoeff = *A_coeff;
     ulong * Aexp = *A_exp;
     ulong exp;
     slong * ends;
     ulong texp;
     slong * hind;
-    nmod_poly_t pp;
+    n_poly_t pp;
 
     FLINT_ASSERT(S->N == 1);
     FLINT_ASSERT(S->bits <= FLINT_BITS);
 
-    nmod_poly_init_mod(pp, S->ctx->mod);
+    n_poly_init(pp);
 
     i = 0;
     hind = (slong *)(S->big_mem + i);
@@ -535,9 +535,9 @@ static slong _nmod_mpolyn_mulsub_stripe1(
             _nmod_mpolyn_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1, S->ctx);
             Aexp[Alen] = Dexp[Di];
             if (saveD)
-                nmod_poly_set(Acoeff + Alen, Dcoeff + Di);
+                n_poly_set(Acoeff + Alen, Dcoeff + Di);
             else
-                nmod_poly_swap(Acoeff + Alen, (nmod_poly_struct *)(Dcoeff + Di));
+                n_poly_swap(Acoeff + Alen, (n_poly_struct *)(Dcoeff + Di));
             Alen++;
             Di++;
         }
@@ -548,12 +548,12 @@ static slong _nmod_mpolyn_mulsub_stripe1(
 
         if (Di < Dlen && Dexp[Di] == exp)
         {
-            nmod_poly_set(Acoeff + Alen, Dcoeff + Di);
+            n_poly_set(Acoeff + Alen, Dcoeff + Di);
             Di++;
         }
         else
         {
-            nmod_poly_zero(Acoeff + Alen);
+            n_poly_zero(Acoeff + Alen);
         }
 
         do
@@ -563,12 +563,12 @@ static slong _nmod_mpolyn_mulsub_stripe1(
                 hind[x->i] |= WORD(1);
                 *store++ = x->i;
                 *store++ = x->j;
-                nmod_poly_mul(pp, Bcoeff + x->i, Ccoeff + x->j);
-                nmod_poly_sub(Acoeff + Alen, Acoeff + Alen, pp);
+                n_poly_mod_mul(pp, Bcoeff + x->i, Ccoeff + x->j, S->ctx->mod);
+                n_poly_mod_sub(Acoeff + Alen, Acoeff + Alen, pp, S->ctx->mod);
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        Alen += !nmod_poly_is_zero(Acoeff + Alen);
+        Alen += !n_poly_is_zero(Acoeff + Alen);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -617,12 +617,12 @@ static slong _nmod_mpolyn_mulsub_stripe1(
     if (saveD)
     {
         for (i = 0; i < Dlen - Di; i++)
-            nmod_poly_set(Acoeff + Alen + i, Dcoeff + Di + i);
+            n_poly_set(Acoeff + Alen + i, Dcoeff + Di + i);
     }
     else
     {
         for (i = 0; i < Dlen - Di; i++)
-            nmod_poly_swap(Acoeff + Alen + i, (nmod_poly_struct *)(Dcoeff + Di + i));
+            n_poly_swap(Acoeff + Alen + i, (n_poly_struct *)(Dcoeff + Di + i));
     }
 
     mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);
@@ -632,17 +632,17 @@ static slong _nmod_mpolyn_mulsub_stripe1(
     *A_exp = Aexp;
     *A_alloc = Aalloc;
 
-    nmod_poly_clear(pp);
+    n_poly_clear(pp);
 
     return Alen;
 }
 
 
 static slong _nmod_mpolyn_mulsub_stripe(
-    nmod_poly_struct ** A_coeff, ulong ** A_exp, slong * A_alloc,
-    const nmod_poly_struct * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
-    const nmod_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
-    const nmod_poly_struct * Ccoeff, const ulong * Cexp, slong Clen,
+    n_poly_struct ** A_coeff, ulong ** A_exp, slong * A_alloc,
+    const n_poly_struct * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
+    const n_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
+    const n_poly_struct * Ccoeff, const ulong * Cexp, slong Clen,
     const nmod_mpolyn_stripe_t S)
 {
     int upperclosed;
@@ -661,7 +661,7 @@ static slong _nmod_mpolyn_mulsub_stripe(
     slong Di;
     slong Alen;
     slong Aalloc = *A_alloc;
-    nmod_poly_struct * Acoeff = *A_coeff;
+    n_poly_struct * Acoeff = *A_coeff;
     ulong * Aexp = *A_exp;
     ulong * exp, * exps;
     ulong ** exp_list;
@@ -669,11 +669,11 @@ static slong _nmod_mpolyn_mulsub_stripe(
     slong * ends;
     ulong * texp;
     slong * hind;
-    nmod_poly_t pp;
+    n_poly_t pp;
 
     FLINT_ASSERT(S->bits <= FLINT_BITS);
 
-    nmod_poly_init_mod(pp, S->ctx->mod);
+    n_poly_init(pp);
 
     i = 0;
     hind = (slong *)(S->big_mem + i);
@@ -778,9 +778,9 @@ static slong _nmod_mpolyn_mulsub_stripe(
             _nmod_mpolyn_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N, S->ctx);
             mpoly_monomial_set(Aexp + N*Alen, Dexp + N*Di, N);
             if (saveD)
-                nmod_poly_set(Acoeff + Alen, Dcoeff + Di);
+                n_poly_set(Acoeff + Alen, Dcoeff + Di);
             else
-                nmod_poly_swap(Acoeff + Alen, (nmod_poly_struct *)(Dcoeff + Di));
+                n_poly_swap(Acoeff + Alen, (n_poly_struct *)(Dcoeff + Di));
             Alen++;
             Di++;
         }
@@ -791,12 +791,12 @@ static slong _nmod_mpolyn_mulsub_stripe(
 
         if (Di < Dlen && mpoly_monomial_equal(Dexp + N*Di, exp, N))
         {
-            nmod_poly_set(Acoeff + Alen, Dcoeff + Di);
+            n_poly_set(Acoeff + Alen, Dcoeff + Di);
             Di++;
         }
         else
         {
-            nmod_poly_zero(Acoeff + Alen);
+            n_poly_zero(Acoeff + Alen);
         }
 
         do
@@ -810,12 +810,12 @@ static slong _nmod_mpolyn_mulsub_stripe(
                 *store++ = x->j;
                 FLINT_ASSERT(startidx <= x->j);
                 FLINT_ASSERT(x->j < ends[0]);
-                nmod_poly_mul(pp, Bcoeff + x->i, Ccoeff + x->j);
-                nmod_poly_sub(Acoeff + Alen, Acoeff + Alen, pp);
+                n_poly_mod_mul(pp, Bcoeff + x->i, Ccoeff + x->j, S->ctx->mod);
+                n_poly_mod_sub(Acoeff + Alen, Acoeff + Alen, pp, S->ctx->mod);
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        Alen += !nmod_poly_is_zero(Acoeff + Alen);
+        Alen += !n_poly_is_zero(Acoeff + Alen);
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -873,12 +873,12 @@ static slong _nmod_mpolyn_mulsub_stripe(
     if (saveD)
     {
         for (i = 0; i < Dlen - Di; i++)
-            nmod_poly_set(Acoeff + Alen + i, Dcoeff + Di + i);
+            n_poly_set(Acoeff + Alen + i, Dcoeff + Di + i);
     }
     else
     {
         for (i = 0; i < Dlen - Di; i++)
-            nmod_poly_swap(Acoeff + Alen + i, (nmod_poly_struct *)(Dcoeff + Di + i));
+            n_poly_swap(Acoeff + Alen + i, (n_poly_struct *)(Dcoeff + Di + i));
     }
 
     mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
@@ -888,7 +888,7 @@ static slong _nmod_mpolyn_mulsub_stripe(
     *A_exp = Aexp;
     *A_alloc = Aalloc;
 
-    nmod_poly_clear(pp);
+    n_poly_clear(pp);
 
     return Alen;
 }
@@ -898,9 +898,9 @@ static slong _nmod_mpolyn_mulsub_stripe(
     return Qlen = 0 if exact division is impossible
 */
 static slong _nmod_mpolyn_divides_stripe1(
-            nmod_poly_struct ** Q_coeff,     ulong ** Q_exp, slong * Q_alloc,
-        const nmod_poly_struct * Acoeff, const ulong * Aexp, slong Alen,
-        const nmod_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
+            n_poly_struct ** Q_coeff,     ulong ** Q_exp, slong * Q_alloc,
+        const n_poly_struct * Acoeff, const ulong * Aexp, slong Alen,
+        const n_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
                                                   const nmod_mpolyn_stripe_t S)
 {
     flint_bitcnt_t bits = S->bits;
@@ -916,12 +916,12 @@ static slong _nmod_mpolyn_divides_stripe1(
     mpoly_heap_t * x;
     slong Qlen;
     slong Qalloc = * Q_alloc;
-    nmod_poly_struct * Qcoeff = * Q_coeff;
+    n_poly_struct * Qcoeff = * Q_coeff;
     ulong * Qexp = * Q_exp;
     ulong exp;
     ulong mask;
     slong * hind;
-    nmod_poly_t acc_lg, pp;
+    n_poly_t acc_lg, pp;
 
     FLINT_ASSERT(S->cmpmask[0] == 0);
 
@@ -943,8 +943,8 @@ static slong _nmod_mpolyn_divides_stripe1(
     i += Blen*sizeof(mpoly_heap_t);
     FLINT_ASSERT(i <= S->big_mem_alloc);
 
-    nmod_poly_init_mod(acc_lg, S->ctx->mod);
-    nmod_poly_init_mod(pp, S->ctx->mod);
+    n_poly_init(acc_lg);
+    n_poly_init(pp);
 
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
@@ -983,7 +983,7 @@ static slong _nmod_mpolyn_divides_stripe1(
 
         lt_divides = mpoly_monomial_divides1(Qexp + Qlen, exp, Bexp[0], mask);
 
-        nmod_poly_zero(acc_lg);
+        n_poly_zero(acc_lg);
         do
         {
             x = _mpoly_heap_pop1(heap, &heap_len, cmpmask);
@@ -996,12 +996,12 @@ static slong _nmod_mpolyn_divides_stripe1(
 
                 if (x->i == -WORD(1))
                 {
-                    nmod_poly_add(acc_lg, acc_lg, Acoeff + x->j);
+                    n_poly_mod_add(acc_lg, acc_lg, Acoeff + x->j, S->ctx->mod);
                 }
                 else
                 {
-                    nmod_poly_mul(pp, Bcoeff + x->i, Qcoeff + x->j);
-                    nmod_poly_sub(acc_lg, acc_lg, pp);
+                    n_poly_mod_mul(pp, Bcoeff + x->i, Qcoeff + x->j, S->ctx->mod);
+                    n_poly_mod_sub(acc_lg, acc_lg, pp, S->ctx->mod);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
@@ -1081,14 +1081,14 @@ static slong _nmod_mpolyn_divides_stripe1(
             }
         }
 
-        if (nmod_poly_is_zero(acc_lg))
+        if (n_poly_is_zero(acc_lg))
         {
             continue;
         }
 
-        nmod_poly_divrem(Qcoeff + Qlen, pp, acc_lg, Bcoeff + 0);
+        n_poly_mod_divrem(Qcoeff + Qlen, pp, acc_lg, Bcoeff + 0, S->ctx->mod);
 
-        if (!nmod_poly_is_zero(pp))
+        if (!n_poly_is_zero(pp))
         {
             goto not_exact_division;
         }
@@ -1124,8 +1124,8 @@ static slong _nmod_mpolyn_divides_stripe1(
 
 cleanup:
 
-    nmod_poly_clear(acc_lg);
-    nmod_poly_clear(pp);
+    n_poly_clear(acc_lg);
+    n_poly_clear(pp);
 
     *Q_alloc = Qalloc;
     *Q_coeff = Qcoeff;
@@ -1139,9 +1139,9 @@ not_exact_division:
 }
 
 static slong _nmod_mpolyn_divides_stripe(
-                nmod_poly_struct ** Q_coeff,     ulong ** Q_exp, slong * Q_alloc,
-            const nmod_poly_struct * Acoeff, const ulong * Aexp, slong Alen,
-            const nmod_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
+                n_poly_struct ** Q_coeff,     ulong ** Q_exp, slong * Q_alloc,
+            const n_poly_struct * Acoeff, const ulong * Aexp, slong Alen,
+            const n_poly_struct * Bcoeff, const ulong * Bexp, slong Blen,
                                                   const nmod_mpolyn_stripe_t S)
 {
     flint_bitcnt_t bits = S->bits;
@@ -1155,14 +1155,14 @@ static slong _nmod_mpolyn_divides_stripe(
     mpoly_heap_t * x;
     slong Qlen;
     slong Qalloc = * Q_alloc;
-    nmod_poly_struct * Qcoeff = * Q_coeff;
+    n_poly_struct * Qcoeff = * Q_coeff;
     ulong * Qexp = * Q_exp;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
     ulong mask;
     slong * hind;
-    nmod_poly_t acc_lg, pp;
+    n_poly_t acc_lg, pp;
 
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);
@@ -1185,8 +1185,8 @@ static slong _nmod_mpolyn_divides_stripe(
     i +=  Blen*sizeof(ulong *);
     FLINT_ASSERT(i <= S->big_mem_alloc);
 
-    nmod_poly_init_mod(acc_lg, S->ctx->mod);
-    nmod_poly_init_mod(pp, S->ctx->mod);
+    n_poly_init(acc_lg);
+    n_poly_init(pp);
 
     exp_next = 0;
     for (i = 0; i < Blen; i++)
@@ -1234,7 +1234,7 @@ static slong _nmod_mpolyn_divides_stripe(
         lt_divides = mpoly_monomial_divides(Qexp + N*Qlen, exp,
                                                          Bexp + N*0, N, mask);
 
-        nmod_poly_zero(acc_lg);
+        n_poly_zero(acc_lg);
         do
         {
             exp_list[--exp_next] = heap[1].exp;
@@ -1248,12 +1248,12 @@ static slong _nmod_mpolyn_divides_stripe(
 
                 if (x->i == -WORD(1))
                 {
-                    nmod_poly_add(acc_lg, acc_lg, Acoeff + x->j);
+                    n_poly_mod_add(acc_lg, acc_lg, Acoeff + x->j, S->ctx->mod);
                 }
                 else
                 {
-                    nmod_poly_mul(pp, Bcoeff + x->i, Qcoeff + x->j);
-                    nmod_poly_sub(acc_lg, acc_lg, pp);
+                    n_poly_mod_mul(pp, Bcoeff + x->i, Qcoeff + x->j, S->ctx->mod);
+                    n_poly_mod_sub(acc_lg, acc_lg, pp, S->ctx->mod);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -1340,14 +1340,14 @@ static slong _nmod_mpolyn_divides_stripe(
             }
         }
 
-        if (nmod_poly_is_zero(acc_lg))
+        if (n_poly_is_zero(acc_lg))
         {
             continue;
         }
 
-        nmod_poly_divrem(Qcoeff + Qlen, pp, acc_lg, Bcoeff + 0);
+        n_poly_mod_divrem(Qcoeff + Qlen, pp, acc_lg, Bcoeff + 0, S->ctx->mod);
 
-        if (!nmod_poly_is_zero(pp))
+        if (!n_poly_is_zero(pp))
         {
             goto not_exact_division;
         }
@@ -1387,8 +1387,8 @@ static slong _nmod_mpolyn_divides_stripe(
 
 cleanup:
 
-    nmod_poly_clear(acc_lg);
-    nmod_poly_clear(pp);
+    n_poly_clear(acc_lg);
+    n_poly_clear(pp);
 
     *Q_alloc = Qalloc;
     *Q_coeff = Qcoeff;
@@ -1557,7 +1557,7 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
     if (L->producer == 1)
     {
         divides_heap_chunk_struct * next;
-        nmod_poly_struct * Rcoeff;
+        n_poly_struct * Rcoeff;
         ulong * Rexp;
         slong Rlen;
 
@@ -1737,7 +1737,7 @@ int nmod_mpolyn_divides_threaded_pool(
     flint_bitcnt_t bits = A->bits;
     ulong * cmpmask;
     worker_arg_struct * worker_args;
-    nmod_poly_t qcoeff, r;
+    n_poly_t qcoeff, r;
     ulong * texps, * qexps;
     divides_heap_base_t H;
     TMP_INIT;
@@ -1758,8 +1758,8 @@ int nmod_mpolyn_divides_threaded_pool(
 
     TMP_START;
 
-    nmod_poly_init_mod(qcoeff, ctx->mod);
-    nmod_poly_init_mod(r, ctx->mod);
+    n_poly_init(qcoeff);
+    n_poly_init(r);
 
     N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -1768,8 +1768,8 @@ int nmod_mpolyn_divides_threaded_pool(
     fmpz_mpoly_ctx_init(zctx, ctx->minfo->nvars, ctx->minfo->ord);
     fmpz_mpoly_init(S, zctx);
 
-    nmod_poly_rem(r, A->coeffs + 0, B->coeffs + 0);
-    if (!nmod_poly_is_zero(r))
+    n_poly_mod_rem(r, A->coeffs + 0, B->coeffs + 0, ctx->mod);
+    if (!n_poly_is_zero(r))
     {
         divides = 0;
         nmod_mpolyn_zero(Q, ctx);
@@ -1828,7 +1828,7 @@ int nmod_mpolyn_divides_threaded_pool(
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     mpoly_monomial_sub(qexps + N*0, A->exps + N*0, B->exps + N*0, N);
-    nmod_poly_div(qcoeff, A->coeffs + 0, B->coeffs + 0); /* already checked */
+    n_poly_mod_div(qcoeff, A->coeffs + 0, B->coeffs + 0, ctx->mod); /* already checked */
 
     nmod_mpolyn_ts_init(H->polyQ, qcoeff, qexps, 1, H->bits, H->N, ctx);
 
@@ -1847,8 +1847,8 @@ int nmod_mpolyn_divides_threaded_pool(
             break;
         }
 
-        nmod_poly_divrem(qcoeff, r, A->coeffs + k, B->coeffs + 0);
-        if (!nmod_poly_is_zero(r))
+        n_poly_mod_divrem(qcoeff, r, A->coeffs + k, B->coeffs + 0, ctx->mod);
+        if (!n_poly_is_zero(r))
         {
             H->failed = 1;
             break;
@@ -1892,8 +1892,8 @@ cleanup1:
     fmpz_mpoly_clear(S, zctx);
     fmpz_mpoly_ctx_clear(zctx);
 
-    nmod_poly_clear(qcoeff);
-    nmod_poly_clear(r);
+    n_poly_clear(qcoeff);
+    n_poly_clear(r);
 
     TMP_END;
 

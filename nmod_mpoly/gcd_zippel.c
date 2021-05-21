@@ -30,7 +30,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     slong deg;
     fq_nmod_mpoly_ctx_t ffctx;
     fq_nmod_mpolyu_t Aeval, Beval, Geval;
-    nmod_poly_t modulus, gamma, hc;
+    n_poly_t modulus, gamma, hc;
     fq_nmod_t t, geval;
 
     FLINT_ASSERT(G->bits == A->bits);
@@ -50,18 +50,18 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     FLINT_ASSERT(An->exps[A->length - 1] == 0);
     FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
 
-    nmod_poly_init_mod(gamma, ctx->mod);
-    nmod_poly_gcd(gamma, nmod_mpolyun_leadcoeff_poly(An, ctx),
-                         nmod_mpolyun_leadcoeff_poly(Bn, ctx));
+    n_poly_init(gamma);
+    n_poly_mod_gcd(gamma, nmod_mpolyun_leadcoeff_poly(An, ctx),
+                          nmod_mpolyun_leadcoeff_poly(Bn, ctx), ctx->mod);
 
     /* bound on the number of images */
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
-    bound = 1 + nmod_poly_degree(gamma) + FLINT_MIN(Alastdeg, Blastdeg);
+    bound = 1 + n_poly_degree(gamma) + FLINT_MIN(Alastdeg, Blastdeg);
 
-    nmod_poly_init_mod(hc, ctx->mod);
-    nmod_poly_init_mod(modulus, ctx->mod);
-    nmod_poly_one(modulus);
+    n_poly_init(hc);
+    n_poly_init(modulus);
+    n_poly_one(modulus);
     nmod_mpolyun_init(H, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
@@ -105,7 +105,9 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         fq_nmod_init(t, ffctx->fqctx);
 
         /* make sure reduction does not kill both lc(A) and lc(B) */
-        nmod_poly_rem(geval, gamma, ffctx->fqctx->modulus);
+        n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(geval), gamma,
+                   evil_const_cast_nmod_poly_to_n_poly(ffctx->fqctx->modulus),
+                                                                     ctx->mod);
         if (fq_nmod_is_zero(geval, ffctx->fqctx))
             goto outer_continue;
 
@@ -131,7 +133,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
 
         FLINT_ASSERT(Geval->length > 0);
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (n_poly_degree(modulus) > 0)
         {
             if (Geval->exps[0] > H->exps[0])
             {
@@ -139,7 +141,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                nmod_poly_one(modulus);                
+                n_poly_one(modulus);                
             }
         }
 
@@ -148,13 +150,15 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         fq_nmod_mul(t, t, geval, ffctx->fqctx);
         fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, t, ffctx);
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (n_poly_degree(modulus) > 0)
         {
             changed = nmod_mpolyun_interp_crt_lg_mpolyu(&lastdeg, H, Ht,
                                                    modulus, ctx, Geval, ffctx);
-            nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
+            n_poly_mod_mul(modulus, modulus,
+                 evil_const_cast_nmod_poly_to_n_poly(ffctx->fqctx->modulus),
+                                                                     ctx->mod);
 
-            have_enough = nmod_poly_degree(modulus) >= bound;
+            have_enough = n_poly_degree(modulus) >= bound;
 
             if (changed && !have_enough)
             {
@@ -177,14 +181,14 @@ int nmod_mpolyu_gcdm_zippel_bivar(
 
             if (have_enough)
             {
-                nmod_poly_one(modulus);
+                n_poly_one(modulus);
                 goto outer_continue;
             }
         }
         else
         {
             nmod_mpolyun_interp_lift_lg_mpolyu(H, ctx, Geval, ffctx);
-            nmod_poly_set(modulus, ffctx->fqctx->modulus);
+            n_poly_set_nmod_poly(modulus, ffctx->fqctx->modulus);
         }
 
 outer_continue:;
@@ -192,9 +196,9 @@ outer_continue:;
 
 finished:
 
-    nmod_poly_clear(gamma);
-    nmod_poly_clear(hc);
-    nmod_poly_clear(modulus);
+    n_poly_clear(gamma);
+    n_poly_clear(hc);
+    n_poly_clear(modulus);
     nmod_mpolyun_clear(An, ctx);
     nmod_mpolyun_clear(Bn, ctx);
     nmod_mpolyun_clear(H, ctx);
@@ -229,7 +233,7 @@ int nmod_mpolyu_gcdm_zippel(
     slong deg;
     fq_nmod_mpoly_ctx_t ffctx;
     fq_nmod_mpolyu_t Aff, Bff, Gff, Abarff, Bbarff, Gform;
-    nmod_poly_t modulus, gamma, hc;
+    n_poly_t modulus, gamma, hc;
     fq_nmod_t t, gammaff;
 
     FLINT_ASSERT(G->bits == A->bits);
@@ -252,8 +256,8 @@ int nmod_mpolyu_gcdm_zippel(
 
     FLINT_ASSERT(ctx->minfo->nvars > 1);
 
-    nmod_poly_init(hc, ctx->mod.n);
-    nmod_poly_init(modulus, ctx->mod.n);
+    n_poly_init(hc);
+    n_poly_init(modulus);
 
     nmod_mpolyun_init(An, A->bits, ctx);
     nmod_mpolyun_init(Bn, A->bits, ctx);
@@ -267,19 +271,19 @@ int nmod_mpolyu_gcdm_zippel(
     FLINT_ASSERT(An->exps[A->length - 1] == 0);
     FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
 
-    nmod_poly_init_mod(gamma, ctx->mod);
-    nmod_poly_gcd(gamma, nmod_mpolyun_leadcoeff_poly(An, ctx),
-                         nmod_mpolyun_leadcoeff_poly(Bn, ctx));
+    n_poly_init(gamma);
+    n_poly_mod_gcd(gamma, nmod_mpolyun_leadcoeff_poly(An, ctx),
+                          nmod_mpolyun_leadcoeff_poly(Bn, ctx), ctx->mod);
 
     /* bound on the number of images */
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
-    bound = 1 + nmod_poly_degree(gamma) + FLINT_MIN(Alastdeg, Blastdeg);
+    bound = 1 + n_poly_degree(gamma) + FLINT_MIN(Alastdeg, Blastdeg);
 
     /* degree bound on the gcd */
     degbound = FLINT_MIN(A->exps[0], B->exps[0]);
 
-    nmod_poly_one(modulus);
+    n_poly_one(modulus);
 
     nmod_mpolyun_init(Hn, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
@@ -330,7 +334,8 @@ choose_prime_outer:
     fq_nmod_init(t, ffctx->fqctx);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    nmod_poly_rem(gammaff, gamma, ffctx->fqctx->modulus);
+    n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(gammaff), gamma,
+         evil_const_cast_nmod_poly_to_n_poly(ffctx->fqctx->modulus), ctx->mod);
     if (fq_nmod_is_zero(gammaff, ffctx->fqctx))
         goto choose_prime_outer;
 
@@ -365,7 +370,7 @@ choose_prime_outer:
     fq_nmod_mpolyu_setform(Gform, Gff, ffctx);
     nmod_mpolyun_interp_lift_lg_mpolyu(Hn, ctx, Gff, ffctx);
 
-    nmod_poly_set(modulus, ffctx->fqctx->modulus);
+    n_poly_set_nmod_poly(modulus, ffctx->fqctx->modulus);
 
 choose_prime_inner:
 
@@ -398,7 +403,8 @@ choose_prime_inner:
     fq_nmod_init(t, ffctx->fqctx);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    nmod_poly_rem(gammaff, gamma, ffctx->fqctx->modulus);
+    n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(gammaff), gamma,
+         evil_const_cast_nmod_poly_to_n_poly(ffctx->fqctx->modulus), ctx->mod);
     if (fq_nmod_is_zero(gammaff, ffctx->fqctx))
         goto choose_prime_inner;
 
@@ -435,9 +441,10 @@ choose_prime_inner:
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
     changed = nmod_mpolyun_interp_mcrt_lg_mpolyu(&lastdeg, Hn, ctx, modulus, Gff, ffctx);
-    nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
+    n_poly_mod_mul(modulus, modulus,
+         evil_const_cast_nmod_poly_to_n_poly(ffctx->fqctx->modulus), ctx->mod);
 
-    have_enough = nmod_poly_degree(modulus) >= bound;
+    have_enough = n_poly_degree(modulus) >= bound;
 
     if (changed && !have_enough)
     {
@@ -460,7 +467,7 @@ choose_prime_inner:
 
     if (have_enough)
     {
-        nmod_poly_one(modulus);
+        n_poly_one(modulus);
         goto choose_prime_outer;
     }
 
@@ -468,10 +475,9 @@ choose_prime_inner:
 
 finished:
 
-    nmod_poly_clear(gamma);
-
-    nmod_poly_clear(hc);
-    nmod_poly_clear(modulus);
+    n_poly_clear(gamma);
+    n_poly_clear(hc);
+    n_poly_clear(modulus);
 
     nmod_mpolyun_clear(An, ctx);
     nmod_mpolyun_clear(Bn, ctx);

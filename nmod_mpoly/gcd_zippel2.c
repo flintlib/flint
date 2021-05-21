@@ -223,115 +223,6 @@ static ulong _fq_nmod_mpoly_bidegree(
     return _mpoly_bidegree(A->exps, A->bits, ctx->minfo);
 }
 
-static void n_polyun_zip_start(n_polyun_t Z, n_polyun_t H, slong req_images)
-{
-    slong j;
-    n_polyun_fit_length(Z, H->length);
-    Z->length = H->length;
-    for (j = 0; j < H->length; j++)
-    {
-        Z->terms[j].exp = H->terms[j].exp;
-        n_poly_fit_length(Z->terms[j].coeff, req_images);
-        Z->terms[j].coeff->length = 0;
-    }
-}
-
-
-int n_polyu2n_add_zip_must_match(
-    n_polyun_t Z,
-    const n_bpoly_t A,
-    slong cur_length)
-{
-    slong i, Ai, ai;
-    n_polyun_term_struct * Zt = Z->terms;
-    const n_poly_struct * Acoeffs = A->coeffs;
-
-    Ai = A->length - 1;
-    ai = (Ai < 0) ? 0 : n_poly_degree(A->coeffs + Ai);
-
-    for (i = 0; i < Z->length; i++)
-    {
-        if (Ai >= 0 && Zt[i].exp == pack_exp2(Ai, ai))
-        {
-            /* Z present, A present */
-            Zt[i].coeff->coeffs[cur_length] = Acoeffs[Ai].coeffs[ai];
-            Zt[i].coeff->length = cur_length + 1;
-            do {
-                ai--;
-            } while (ai >= 0 && Acoeffs[Ai].coeffs[ai] == 0);
-            if (ai < 0)
-            {
-                do {
-                    Ai--;
-                } while (Ai >= 0 && Acoeffs[Ai].length == 0);
-                if (Ai >= 0)
-                    ai = n_poly_degree(Acoeffs + Ai);
-            }
-        }
-        else if (Ai < 0 || Zt[i].exp > pack_exp2(Ai, ai))
-        {
-            /* Z present, A missing */
-            Zt[i].coeff->coeffs[cur_length] = 0;
-            Zt[i].coeff->length = cur_length + 1;
-        }
-        else
-        {
-            /* Z missing, A present */
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-static int n_polyun_zip_solve(
-    nmod_mpoly_t A,
-    n_polyun_t Z,
-    n_polyun_t H,
-    n_polyun_t M,
-    const nmod_mpoly_ctx_t ctx)
-{
-    int success;
-    slong Ai, i, n;
-    mp_limb_t * Acoeffs = A->coeffs;
-    n_poly_t t;
-
-    n_poly_init(t);
-
-    FLINT_ASSERT(Z->length == H->length);
-    FLINT_ASSERT(Z->length == M->length);
-
-    Ai = 0;
-    for (i = 0; i < H->length; i++)
-    {
-        n = H->terms[i].coeff->length;
-        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
-        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
-        FLINT_ASSERT(Ai + n <= A->length);
-
-        n_poly_fit_length(t, n);
-
-        success = _nmod_zip_vand_solve(Acoeffs + Ai,
-                         H->terms[i].coeff->coeffs, n,
-                         Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                         M->terms[i].coeff->coeffs, t->coeffs, ctx->mod);
-        if (success < 1)
-        {
-            n_poly_clear(t);
-            return success;
-        }
-
-        Ai += n;
-        FLINT_ASSERT(Ai <= A->length);
-
-    }
-
-    FLINT_ASSERT(Ai == A->length);
-
-    n_poly_clear(t);
-    return 1;
-}
-
 
 #define USE_G    1
 #define USE_ABAR 2
@@ -456,18 +347,6 @@ int nmod_mpoly_gcd_get_use_new(
 
     return use;
 }
-
-void nmod_mpoly_cvtfrom_mpolyn(
-    nmod_mpoly_t A,
-    const nmod_mpolyn_t B,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
-void nmod_mpolyn_interp_lift_sm_mpoly(
-    nmod_mpolyn_t A,
-    const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t ctx);
-
 
 mp_limb_t n_poly_mod_eval_step_sep(
     n_poly_t cur,

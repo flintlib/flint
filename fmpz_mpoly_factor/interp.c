@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2019, 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -29,7 +29,7 @@
 void fmpz_mpoly_interp_reduce_p(
     nmod_mpoly_t Ap,
     const nmod_mpoly_ctx_t ctxp,
-    fmpz_mpoly_t A,
+    const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, k, N;
@@ -42,41 +42,14 @@ void fmpz_mpoly_interp_reduce_p(
     for (i = 0; i < A->length; i++)
     {
         mpoly_monomial_set(Ap->exps + N*k, A->exps + N*i, N);
-        Ap->coeffs[k] = fmpz_fdiv_ui(A->coeffs + i, ctxp->mod.n);
-        k += (Ap->coeffs[k] != UWORD(0));
+        Ap->coeffs[k] = fmpz_get_nmod(A->coeffs + i, ctxp->mod);
+        k += (Ap->coeffs[k] != 0);
     }
     Ap->length = k;
 }
 
 /*
-    Ap = A mod p
-    Ap is in Fp[X][x_0, ..., x_(n-1)]
-    A  is in ZZ[X][x_0, ..., x_(n-1)], n = ctx->minfo->nvars
-*/
-void fmpz_mpolyu_interp_reduce_p(
-    nmod_mpolyu_t Ap,
-    const nmod_mpoly_ctx_t ctxp,
-    fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, k;
-
-    FLINT_ASSERT(Ap->bits == A->bits);
-
-    nmod_mpolyu_fit_length(Ap, A->length, ctxp);
-    k = 0;
-    for (i = 0; i < A->length; i++)
-    {
-        Ap->exps[k] = A->exps[i];
-        fmpz_mpoly_interp_reduce_p(Ap->coeffs + k, ctxp, A->coeffs + i, ctx);
-        k += !nmod_mpoly_is_zero(Ap->coeffs + k, ctxp);
-    }
-    Ap->length = k;
-}
-
-
-/*
-    Convert Ap to A using the symmetric range [-p/2, p/2)
+    Convert Ap to A using the symmetric range (-p/2, p/2]
     A  is in ZZ[x_0, ..., x_(n-1)], n = ctx->minfo->nvars
     Ap is in Fp[x_0, ..., x_(n-1)]
 */
@@ -86,39 +59,14 @@ void fmpz_mpoly_interp_lift_p(
     nmod_mpoly_t Ap,
     const nmod_mpoly_ctx_t ctxp)
 {
-    slong i;
-    slong N;
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     FLINT_ASSERT(Ap->bits == A->bits);
+
     fmpz_mpoly_fit_length(A, Ap->length, ctx);
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    for (i = 0; i < Ap->length*N; i++)
-         A->exps[i] = Ap->exps[i];
+    mpoly_copy_monomials(A->exps, Ap->exps, Ap->length, N);
     _fmpz_vec_set_nmod_vec(A->coeffs, Ap->coeffs, Ap->length, ctxp->mod);
-    A->length = Ap->length;
-}
-
-/*
-    Convert Ap to A using the symmetric range [-p/2, p/2)
-    A  is in ZZ[X][x_0, ..., x_(n-1)], n = ctx->minfo->nvars
-    Ap is in Fp[X][x_0, ..., x_(n-1)]
-*/
-void fmpz_mpolyu_interp_lift_p(
-    fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx,
-    nmod_mpolyu_t Ap,
-    const nmod_mpoly_ctx_t ctxp)
-{
-    slong i;
-
-    FLINT_ASSERT(Ap->bits == A->bits);
-    fmpz_mpolyu_fit_length(A, Ap->length, ctx);
-    for (i = 0; i < Ap->length; i++)
-    {
-        A->exps[i] = Ap->exps[i];
-        fmpz_mpoly_interp_lift_p(A->coeffs + i, ctx, Ap->coeffs + i, ctxp);
-    }
-    A->length = Ap->length;
+    _fmpz_mpoly_set_length(A, Ap->length, ctx);
 }
 
 /*
@@ -128,7 +76,7 @@ void fmpz_mpolyu_interp_lift_p(
     A is in Fp[x_0, ..., x_(n-1)]
 */
 int fmpz_mpoly_interp_mcrt_p(
-    flint_bitcnt_t * coeffbits,
+    flint_bitcnt_t * coeffbits_,
     fmpz_mpoly_t H,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_t m,
@@ -137,58 +85,26 @@ int fmpz_mpoly_interp_mcrt_p(
 {
     slong i;
 #if FLINT_WANT_ASSERT
-    slong N;
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;
+    flint_bitcnt_t coeffbits = 0;
     fmpz_t t;
 
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
 
-#if FLINT_WANT_ASSERT
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-#endif
     fmpz_init(t);
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
         fmpz_CRT_ui(t, H->coeffs + i, m, A->coeffs[i], ctxp->mod.n, 1);
-        *coeffbits = FLINT_MAX(*coeffbits, fmpz_bits(t));
+        coeffbits = FLINT_MAX(coeffbits, fmpz_bits(t));
         changed |= !fmpz_equal(t, H->coeffs + i);
         fmpz_swap(t, H->coeffs + i);
     }
     fmpz_clear(t);
-    return changed;
-}
-
-/*
-    Update H so that it does not change mod m, and is now A mod p
-    It is asserted that the monomials in H and A match
-    H is in ZZ[X][x_0, ..., x_(n-1)], n = ctx->minfo->nvars
-    A is in Fp[X][x_0, ..., x_(n-1)]
-*/
-int fmpz_mpolyu_interp_mcrt_p(
-    flint_bitcnt_t * coeffbits,
-    fmpz_mpolyu_t H,
-    const fmpz_mpoly_ctx_t ctx,
-    const fmpz_t m,
-    const nmod_mpolyu_t A,
-    const nmod_mpoly_ctx_t ctxp)
-{
-    slong i;
-    int changed = 0;
-
-    FLINT_ASSERT(H->bits == A->bits);
-    FLINT_ASSERT(H->length == A->length);
-
-    *coeffbits = 0;
-    for (i = 0; i < A->length; i++)
-    {
-        FLINT_ASSERT(H->exps[i] == A->exps[i]);
-        changed |= fmpz_mpoly_interp_mcrt_p(coeffbits, H->coeffs + i, ctx, m,
-                                                          A->coeffs + i, ctxp);
-    }
-    H->length = A->length;
+    *coeffbits_ = coeffbits;
     return changed;
 }
 
@@ -213,7 +129,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
     ulong * Aexp = A->exps;
     slong Alen = A->length;
     slong Ai;
-    nmod_poly_struct * Ecoeff;
+    n_poly_struct * Ecoeff;
     ulong * Eexp;
     slong Ei;
     slong m = ctx->minfo->nvars;
@@ -236,9 +152,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
         if (Ei > 0 && mpoly_monomial_equal_extra(Eexp + N*(Ei - 1),
                                         Aexp + N*Ai, N, offset, -(k << shift)))
         {
-            /* append to previous */
-            FLINT_ASSERT((Ecoeff + Ei - 1)->mod.n == pctx->mod.n);
-            nmod_poly_set_coeff_ui(Ecoeff + Ei - 1, k, v);
+            n_poly_set_coeff(Ecoeff + Ei - 1, k, v);
         }
         else
         {
@@ -253,11 +167,9 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
                 Eexp = E->exps;
             }
 
-            FLINT_ASSERT((Ecoeff + Ei)->mod.n == pctx->mod.n);
-
             mpoly_monomial_set_extra(Eexp + N*Ei, Aexp + N*Ai, N, offset, -(k << shift));
-            nmod_poly_zero(Ecoeff + Ei);
-            nmod_poly_set_coeff_ui(Ecoeff + Ei, k, v);
+            n_poly_zero(Ecoeff + Ei);
+            n_poly_set_coeff(Ecoeff + Ei, k, v);
             Ei++;
         }
     }
@@ -278,12 +190,10 @@ void fmpz_mpoly_interp_lift_p_mpolyn(
     slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
     slong offset, shift;
     slong vi;
-
-    nmod_poly_struct * Bcoeff = B->coeffs;
+    n_poly_struct * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
     slong Blen = B->length;
     slong Bi;
-
     fmpz * Acoeff;
     ulong * Aexp;
     slong Ai;
@@ -339,16 +249,13 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
     slong N = mpoly_words_per_exp_sp(T->bits, ctx->minfo);
     slong offset, shift;
     slong vi;
-
     fmpz * Tcoeff;
     ulong * Texp;
     slong Ti;
-
-    nmod_poly_struct * Acoeff = A->coeffs;
+    n_poly_struct * Acoeff = A->coeffs;
     slong Alen = A->length;
     ulong * Aexp = A->exps;
     slong Ai;
-
     fmpz * Fcoeff = F->coeffs;
     slong Flen = F->length;
     ulong * Fexp = F->exps;
@@ -375,9 +282,8 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
 
     Fi = Ai = vi = 0;
     if (Ai < Alen)
-    {
-        vi = nmod_poly_degree(A->coeffs + Ai);
-    }
+        vi = n_poly_degree(A->coeffs + Ai);
+
     while (Fi < Flen || Ai < Alen)
     {
         if (Ti >= T->alloc)
@@ -404,9 +310,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
             {
                 Ai++;
                 if (Ai < Alen)
-                {
-                    vi = nmod_poly_degree(A->coeffs + Ai);
-                }
+                    vi = n_poly_degree(A->coeffs + Ai);
             }
         }
         else if (Fi < Flen && (Ai >= Alen || mpoly_monomial_gt_nomask_extra(
@@ -440,9 +344,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
             {
                 Ai++;
                 if (Ai < Alen)
-                {
-                    vi = nmod_poly_degree(A->coeffs + Ai);
-                }
+                    vi = n_poly_degree(A->coeffs + Ai);
             }
         }
 

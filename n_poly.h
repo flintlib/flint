@@ -191,6 +191,8 @@ void n_poly_clear(n_poly_t A)
         flint_free(A->coeffs);
 }
 
+FLINT_DLL int n_poly_is_canonical(const n_poly_t A);
+
 FLINT_DLL void n_poly_realloc(n_poly_t A, slong len);
 
 FLINT_DLL void n_poly_print_pretty(const n_poly_t A, const char * x);
@@ -765,6 +767,11 @@ FLINT_DLL void n_fq_get_fq_nmod(
 FLINT_DLL void n_fq_set_fq_nmod(
     mp_limb_t * a,
     const fq_nmod_t b,
+    const fq_nmod_ctx_t ctx);
+
+FLINT_DLL void n_fq_get_n_poly(
+    n_poly_t a,
+    const mp_limb_t * b,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void _n_fq_set_n_poly(
@@ -1814,6 +1821,8 @@ void n_polyun_init(n_polyun_t A)
     A->length = 0;
     A->alloc = 0;
 }
+
+FLINT_DLL int n_polyun_is_canonical(const n_polyun_t A);
 
 FLINT_DLL void n_polyun_clear(n_polyun_t A);
 

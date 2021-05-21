@@ -196,7 +196,7 @@ choose_prime:
         slong k;
         FLINT_ASSERT(G->length > 0);
 
-        k = nmod_poly_degree(Gp->coeffs + 0);
+        k = n_poly_degree(Gp->coeffs + 0);
         cmp = mpoly_monomial_cmp_nomask_extra(G->exps + N*0,
                                         Gp->exps + N*0, N, offset, k << shift);
         if (cmp < 0)

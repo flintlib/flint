@@ -32,9 +32,8 @@ static void _worker_convertu(void * varg)
 {
     _convertl_arg_struct * arg = (_convertl_arg_struct *) varg;
 
-    fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(arg->Pl, arg->lctx, arg->P, arg->ctx,
-                                         arg->perm, arg->shift, arg->stride,
-                                               arg->handles, arg->num_handles);
+    fmpz_mpoly_to_mpolyl_perm_deflate(arg->Pl, arg->lctx, arg->P, arg->ctx,
+                                         arg->perm, arg->shift, arg->stride);
 }
 
 int compute_gcd(
@@ -92,6 +91,11 @@ int compute_gcd(
         return 0;
     }
 
+    if (ctx->minfo->nvars < 2)
+    {
+        return fmpz_mpoly_gcd(G, A, B, ctx);
+    }
+
     perm = (slong *) flint_malloc(ctx->minfo->nvars*sizeof(slong));
     shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
@@ -100,23 +104,6 @@ int compute_gcd(
         perm[i] = i;
         shift[i] = 0;
         stride[i] = 1;
-    }
-
-    if (ctx->minfo->nvars == 1)
-    {
-        fmpz_poly_t a, b, g;
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(g);
-        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, 0, shift, stride, ctx);
-        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, 0, shift, stride, ctx);
-        fmpz_poly_gcd(g, a, b);
-        _fmpz_mpoly_from_fmpz_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(g);
-        success = 1;
-        goto cleanup1;
     }
 
     ABbits = FLINT_MAX(A->bits, B->bits);
@@ -151,17 +138,14 @@ int compute_gcd(
 
         thread_pool_wake(global_thread_pool, handles[m], 0, _worker_convertu, arg);
 
-        fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Al, lctx, A, ctx,
-                                         perm, shift, stride, handles + 0, m);
+        fmpz_mpoly_to_mpolyl_perm_deflate(Al, lctx, A, ctx, perm, shift, stride);
 
         thread_pool_wait(global_thread_pool, handles[m]);
     }
     else
     {
-        fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Al, lctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
-        fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Bl, lctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+        fmpz_mpoly_to_mpolyl_perm_deflate(Al, lctx, A, ctx, perm, shift, stride);
+        fmpz_mpoly_to_mpolyl_perm_deflate(Bl, lctx, B, ctx, perm, shift, stride);
     }
 
     /* calculate gcd */
@@ -172,7 +156,7 @@ int compute_gcd(
 
     if (success)
     {
-        fmpz_mpoly_from_mpoly_perm_inflate(G, ABbits, ctx, Gl, lctx,
+        fmpz_mpoly_from_mpolyl_perm_inflate(G, ABbits, ctx, Gl, lctx,
                                                           perm, shift, stride);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_mpoly_neg(G, G, ctx);
@@ -184,8 +168,6 @@ int compute_gcd(
     fmpz_mpoly_clear(Abarl, lctx);
     fmpz_mpoly_clear(Bbarl, lctx);
     fmpz_mpoly_ctx_clear(lctx);
-
-cleanup1:
 
     flint_free(perm);
     flint_free(shift);
