@@ -2174,7 +2174,7 @@ class ca:
             >>> sin(3 + pi) + sin(3)
             0
             >>> sin(1, form="exponential")
-            0.841471 - 0e-34*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            0.841471 - 0e-24*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
             >>> sin(1, form="direct")
             0.841471 {a where a = 0.841471 [Sin(1)]}
             >>> sin(1, form="tangent")
@@ -2219,7 +2219,7 @@ class ca:
             >>> cos(1)**2 + sin(1)**2
             1
             >>> cos(1, form="exponential")
-            0.540302 - 0e-34*I {(a^2+1)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            0.540302 - 0e-24*I {(a^2+1)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
             >>> cos(1, form="direct")
             0.540302 {a where a = 0.540302 [Cos(1)]}
             >>> cos(1, form="tangent")
@@ -2270,7 +2270,7 @@ class ca:
             >>> tan(1, form="sine_cosine")
             1.55741 {(b)/(a) where a = 0.540302 [Cos(1)], b = 0.841471 [Sin(1)]}
             >>> tan(1, form="exponential")
-            1.55741 + 0e-34*I {(-a^2*b+b)/(a^2+1) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+            1.55741 + 0e-23*I {(-a^2*b+b)/(a^2+1) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
             >>> tan(inf)
             Undefined
             >>> tan(i * inf)
@@ -2319,7 +2319,7 @@ class ca:
             >>> atan(2, form="direct")
             1.10715 {a where a = 1.10715 [Atan(2)]}
             >>> atan(2, form="logarithm")
-            1.10715 - 0e-35*I {(a*b)/2 where a = 0e-34 - 2.21430*I [Log(-0.600000 - 0.800000*I {(-4*b-3)/5})], b = I [b^2+1=0]}
+            1.10715 - 0e-24*I {(a*b)/2 where a = 0e-24 - 2.21430*I [Log(-0.600000 - 0.800000*I {(-4*b-3)/5})], b = I [b^2+1=0]}
 
         """
         res = self._new()
@@ -2352,7 +2352,7 @@ class ca:
             >>> asin(sin(sqrt(2)-1)) == sqrt(2)-1
             True
             >>> asin(sqrt(2)-1, form="logarithm")
-            0.427079 + 0e-34*I {-a*d where a = 0e-34 + 0.427079*I [Log(0.910180 + 0.414214*I {b+c*d-d})], b = 0.910180 [Sqrt(0.828427 {2*c-2})], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
+            0.427079 + 0e-24*I {-a*d where a = 0e-24 + 0.427079*I [Log(0.910180 + 0.414214*I {b+c*d-d})], b = 0.910180 [Sqrt(0.828427 {2*c-2})], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
             >>> asin(sqrt(2)-1, form="direct")
             0.427079 {a where a = 0.427079 [Asin(0.414214 {b-1})], b = 1.41421 [b^2-2=0]}
             >>> asin(inf)

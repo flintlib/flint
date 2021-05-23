@@ -321,7 +321,7 @@ _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t c
     {
         acb_t t;
         acb_init(t);
-        ca_get_acb(t, x, info->digits * 3.33 + 64, ctx);
+        ca_get_acb_raw(t, x, info->digits * 3.33 + 64, ctx);
         calcium_write_acb(out, t, info->digits, ARB_STR_NO_RADIUS);
         acb_clear(t);
     }
