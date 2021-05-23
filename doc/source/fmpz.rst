@@ -1044,6 +1044,14 @@ Greatest common divisor
     Assumes that `d` is not aliased with `a` or `b` and that `a` and `b`
     are not aliased.
 
+.. function:: void fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
+
+    Computes the extended GCD of `(f, g)` such that the solution `(a, b)` is
+    the smallest solution.
+
+    Assumes that `d` is not aliased with `a` or `b` and that `a` and `b`
+    are not aliased.
+
 .. function:: void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)
 
     This function is an implementation of Lehmer extended GCD with early 
