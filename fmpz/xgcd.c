@@ -34,17 +34,17 @@ fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
     }
     else if (fmpz_cmpabs(f, g) == 0)
     {
-        if (fmpz_sgn(f) > 0)
+        if (fmpz_sgn(g) > 0)
         {
-            fmpz_set(d, f);
-            fmpz_set_ui(a, 1);
+            fmpz_set(d, g);
+            fmpz_set_ui(b, 1);
         }
         else
         {
-            fmpz_neg(d, f);
-            fmpz_set_si(a, -1);
+            fmpz_neg(d, g);
+            fmpz_set_si(b, -1);
         }
-        fmpz_set_si(b, 0);
+        fmpz_set_si(a, 0);
     }
     else
     {
