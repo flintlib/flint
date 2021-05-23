@@ -9,79 +9,105 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpz.h"
 
 void
 fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 {
-    fmpz_t kc; /* integer transforming new coefficients via ceil */
-    fmpz_t kf; /* integer transforming new coefficients via floor */
-    fmpz_t ca; /* ceil transformed `a` */
-    fmpz_t cb; /* ceil transformed `b` */
-    fmpz_t fa; /* floor transformed `a` */
-    fmpz_t fb; /* floor transformed `b` */
-    fmpz_t tmp;
+    mpz_t dd, aa, bb;
 
-    fmpz_xgcd(d, a, b, f, g);
-
-    if (fmpz_is_zero(f) || fmpz_is_zero(g))
+    if (fmpz_is_zero(g))
+    {
+        fmpz_abs(d, f);
+        fmpz_set_si(a, fmpz_sgn(f));
+        fmpz_zero(b);
         return;
-
-    fmpz_init(kc);
-    fmpz_init(kf);
-    fmpz_init_set(ca, a);
-    fmpz_init_set(cb, b);
-    fmpz_init_set(fa, a);
-    fmpz_init_set(fb, b);
-    fmpz_init(tmp);
-
-    fmpz_mul(tmp, a, d);
-    fmpz_cdiv_q(kc, tmp, g);
-    fmpz_fdiv_q(kf, tmp, g);
-    fmpz_divexact(tmp, g, d);
-    fmpz_submul(ca, kc, tmp); /* ca = a - kc g / d */
-    fmpz_submul(fa, kf, tmp); /* fa = a - kf g / d */
-    fmpz_divexact(tmp, f, d);
-    fmpz_addmul(cb, kc, tmp); /* cb = b + kc f / d */
-    fmpz_addmul(fb, kf, tmp); /* fb = b + kf f / d */
-
-    fmpz_abs(kc, ca); /* using kf and kc since they won't be of use anymore */
-    fmpz_abs(tmp, cb);
-    fmpz_add(kc, kc, tmp); /* kc = |ca| + |cb| */
-    fmpz_abs(kf, fa);
-    fmpz_abs(tmp, fb);
-    fmpz_add(kf, kf, tmp); /* kf = |fa| + |fb| */
-
-    if (fmpz_cmp(kf, kc) >= 0)
-    {
-        /* we want to use ceil */
-        fmpz_abs(kf, a);
-        fmpz_abs(tmp, b);
-        fmpz_add(kf, kf, tmp); /* kf = |a| + |b| */
-        if (fmpz_cmp(kf, kc) > 0)
-        {
-            fmpz_set(a, ca);
-            fmpz_set(b, cb);
-        }
     }
-    else
+    else if (fmpz_is_zero(f))
     {
-        /* we want to use floor */
-        fmpz_abs(kc, a);
-        fmpz_abs(tmp, b);
-        fmpz_add(kc, kc, tmp); /* kc = |a| + |b| */
-        if (fmpz_cmp(kc, kf) > 0)
-        {
-            fmpz_set(a, fa);
-            fmpz_set(b, fb);
-        }
+        fmpz_abs(d, g);
+        fmpz_set_si(b, fmpz_sgn(g));
+        fmpz_zero(a);
+        return;
     }
 
-    fmpz_clear(kc);
-    fmpz_clear(kf);
-    fmpz_clear(ca);
-    fmpz_clear(cb);
-    fmpz_clear(fa);
-    fmpz_clear(fb);
-    fmpz_clear(tmp);
+	mpz_init(dd);
+	mpz_init(aa);
+	mpz_init(bb);
+	
+    if (!COEFF_IS_MPZ(*f) && !COEFF_IS_MPZ(*g))  /* both are small */
+    {
+        mpz_t ff, gg;
+        fmpz_t absf, absg;
+
+        fmpz_init(absf);
+        fmpz_init(absg);
+        fmpz_abs(absf, f);
+        fmpz_abs(absg, g);
+
+        ff->_mp_alloc = 1;
+        gg->_mp_alloc = 1;
+        ff->_mp_size  = fmpz_sgn(f);
+        gg->_mp_size  = fmpz_sgn(g);
+        ff->_mp_d = (mp_limb_t *) absf;
+        gg->_mp_d = (mp_limb_t *) absg;
+
+        mpz_gcdext(dd, aa, bb, ff, gg);
+
+        fmpz_clear(absf);
+        fmpz_clear(absg);
+    }
+    else if (!COEFF_IS_MPZ(*f))  /* only f is small */
+    {
+        mpz_t ff;
+        fmpz_t absf;
+
+        fmpz_init(absf);
+        fmpz_abs(absf, f);
+
+        ff->_mp_alloc = 1;
+        ff->_mp_size = fmpz_sgn(f);
+        ff->_mp_d = (mp_limb_t *) absf;
+
+        mpz_gcdext(dd, aa, bb, ff, COEFF_TO_PTR(*g));
+
+        fmpz_clear(absf);
+    }
+    else if (!COEFF_IS_MPZ(*g))  /* only g is small */
+    {
+        mpz_t gg;
+        fmpz_t absg;
+
+        fmpz_init(absg);
+        fmpz_abs(absg, g);
+
+        gg->_mp_alloc = 1;
+        gg->_mp_size = fmpz_sgn(g);
+        gg->_mp_d = (mp_limb_t *) absg;
+
+        mpz_gcdext(dd, aa, bb, COEFF_TO_PTR(*f), gg);
+
+        fmpz_clear(absg);
+    }
+    else /* both are big */
+    {
+        mpz_gcdext(dd, aa, bb, COEFF_TO_PTR(*f), COEFF_TO_PTR(*g));
+    }
+
+	_fmpz_promote_val(d);
+    _fmpz_promote_val(a);
+    _fmpz_promote_val(b);
+
+	mpz_swap(COEFF_TO_PTR(*d), dd);
+	mpz_swap(COEFF_TO_PTR(*a), aa);
+	mpz_swap(COEFF_TO_PTR(*b), bb);
+
+	mpz_clear(dd);
+	mpz_clear(aa);
+	mpz_clear(bb);
+
+    _fmpz_demote_val(d);
+    _fmpz_demote_val(a);
+    _fmpz_demote_val(b);
 }
