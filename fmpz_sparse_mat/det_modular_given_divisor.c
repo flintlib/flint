@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -40,6 +41,7 @@ fmpz_sparse_mat_det_modular_given_divisor(fmpz_t det, const fmpz_sparse_mat_t A,
     nmod_t mod;
     nmod_sparse_mat_t Amod;
     slong n = A->r;
+    FLINT_ASSERT(A->r == A->c);
 
     if (A->r == 0) {fmpz_one(det); return;}
     if (fmpz_is_zero(d)) {fmpz_zero(det); return;}

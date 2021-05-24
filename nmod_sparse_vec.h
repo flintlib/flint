@@ -2,6 +2,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2010,2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -76,6 +77,35 @@ void nmod_sparse_vec_clear(nmod_sparse_vec_t vec)
     flint_free(vec->entries);
     memset(vec, 0, sizeof(*vec));
 }
+
+NMOD_SPARSE_VEC_INLINE
+void _nmod_sparse_vec_resize(nmod_sparse_vec_t vec, slong nnz) 
+{
+    FLINT_ASSERT(nnz >= 0);
+    if (nnz == 0) nmod_sparse_vec_clear(vec);
+    else if (nnz != vec->nnz)
+    {
+        vec->entries = flint_realloc(vec->entries, nnz*sizeof(*vec->entries));
+    }
+    vec->nnz = nnz;
+}
+
+NMOD_SPARSE_VEC_INLINE
+void nmod_sparse_vec_resize(nmod_sparse_vec_t vec, slong cols) 
+{
+    slong i;
+    FLINT_ASSERT(cols >= 0);
+    if (vec->nnz == 0) return;
+    for (i = 0; i < vec->nnz; ++i) {
+        if (vec->entries[i].ind >= cols)
+        {
+            break;
+        }
+    }
+    _nmod_sparse_vec_resize(vec, i);
+}
+
+
 NMOD_SPARSE_VEC_INLINE 
 void nmod_sparse_vec_swap(nmod_sparse_vec_t vec1, nmod_sparse_vec_t vec2) 
 {

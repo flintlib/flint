@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -20,7 +21,7 @@
 int
 main(void)
 {
-    slong rep, r, c, i;
+    slong rep, r, r2, c, i;
     mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A;
@@ -33,6 +34,7 @@ main(void)
     for (rep = 0; rep < 100; rep++)
     {
         r = n_randint(state, 200);
+        r2 = n_randint(state, 200);
         c = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
         while (n == UWORD(1));
@@ -52,6 +54,7 @@ main(void)
                 abort();
             }
         }
+        
 
         nmod_sparse_mat_clear(A);
     }

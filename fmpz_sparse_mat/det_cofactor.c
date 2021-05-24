@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010,2011,2018 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
     FLINT is free software: you can redistribute it and/or modify it under
@@ -14,6 +15,7 @@ void
 fmpz_sparse_mat_det_cofactor(fmpz_t det, const fmpz_sparse_mat_t M)
 {
     fmpz_mat_t dM;
+    FLINT_ASSERT(M->r == M->c);
     if (M->r != M->c) {fmpz_zero(det); return;}
     if (M->r > 4)
     {

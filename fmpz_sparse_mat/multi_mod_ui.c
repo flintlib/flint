@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -41,6 +42,9 @@ void
 fmpz_sparse_mat_multi_mod_ui(nmod_sparse_mat_struct * residues, slong nres, const fmpz_sparse_mat_t M)
 {
     slong i;
+    for(i = 0; i < nres; ++i) {
+        FLINT_ASSERT(mat->r == residues[i].r);
+    }
     mp_limb_t *primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t temp;

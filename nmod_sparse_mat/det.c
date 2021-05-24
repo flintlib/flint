@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -23,11 +24,7 @@ nmod_sparse_mat_det(const nmod_sparse_mat_t M)
     slong *P, *Q;
     mp_limb_t det;
     nmod_sparse_mat_t L, U;
-    if (M->r != M->c)
-    {
-        flint_printf("Exception (nmod_mat_det). Non-square matrix.\n");
-        flint_abort();
-    }
+    FLINT_ASSERT(M->r == M->c);
 
     if (M->r == 0) return UWORD(1);
     if (nmod_sparse_mat_is_zero(M)) return UWORD(0);

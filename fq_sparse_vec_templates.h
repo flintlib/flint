@@ -2,6 +2,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2010,2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -71,6 +72,7 @@ void _TEMPLATE(T, sparse_vec_resize)(TEMPLATE(T, sparse_vec_t) vec, slong nnz,
                                     const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(nnz >= 0);
     if (nnz == 0) TEMPLATE(T, sparse_vec_clear) (vec, ctx);
     else if (nnz != vec->nnz)
     {
@@ -81,6 +83,22 @@ void _TEMPLATE(T, sparse_vec_resize)(TEMPLATE(T, sparse_vec_t) vec, slong nnz,
             TEMPLATE(T, init) (vec->entries[i].val, ctx);
     }
     vec->nnz = nnz;
+}
+
+FQ_SPARSE_VEC_TEMPLATES_INLINE
+void TEMPLATE(T, sparse_vec_resize)(TEMPLATE(T, sparse_vec_t) vec, slong cols,
+                                    const TEMPLATE(T, ctx_t) ctx) 
+{
+    slong i;
+    FLINT_ASSERT(cols >= 0);
+    if (vec->nnz == 0) return;
+    for (i = 0; i < vec->nnz; ++i) {
+        if (vec->entries[i].ind >= cols)
+        {
+            break;
+        }
+    }
+    _TEMPLATE(T, sparse_vec_resize)(vec, i, ctx);
 }
 
 FQ_SPARSE_VEC_TEMPLATES_INLINE 

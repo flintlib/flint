@@ -1,5 +1,6 @@
 /*
-    wopyright (w) 2011 Fredrik Johansson
+    Copyright (w) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

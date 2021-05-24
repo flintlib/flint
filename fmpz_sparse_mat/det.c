@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -15,12 +16,7 @@ void
 fmpz_sparse_mat_det(fmpz_t det, const fmpz_sparse_mat_t A)
 {
     slong dim = A->r;
-
-    if (dim != A->c)
-    {
-        flint_printf("Exception (fmpz_mat_det). Non-square matrix.\n");
-        flint_abort();
-    }
+    FLINT_ASSERT(A->r == A->c);
 
     if (dim < 5)
         fmpz_sparse_mat_det_cofactor(det, A);

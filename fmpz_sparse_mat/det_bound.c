@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -16,6 +17,7 @@ fmpz_sparse_mat_det_bound(fmpz_t bound, const fmpz_sparse_mat_t A)
 {
     fmpz_t s, t;
     slong i, j;
+    FLINT_ASSERT(A->r == A->c);
 
     fmpz_init(s);
     fmpz_init(t);

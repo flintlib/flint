@@ -1,6 +1,7 @@
 /*
 
     Copyright (C) 2015 Elena Sergeicheva
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

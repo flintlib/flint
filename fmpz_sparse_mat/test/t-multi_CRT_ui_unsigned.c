@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2007 William Hart and David Harvey
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

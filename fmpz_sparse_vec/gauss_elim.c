@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -45,14 +46,13 @@ void fmpz_sparse_vec_gauss_elim(fmpz_sparse_vec_t u, const fmpz_sparse_vec_t v)
 /* Apply unimodular transformation to (u,v) to minimize both vectors lexicographically */
 void fmpz_sparse_vec_gauss_elim_ext(fmpz_sparse_vec_t u, fmpz_sparse_vec_t v)
 {
-    slong vnnz = v->nnz, unnz = u->nnz, nnz, k, pc, i;
+    slong vnnz = v->nnz, unnz = u->nnz, nnz, k;
     fmpz_sparse_entry_struct *lu = u->entries;
     fmpz_sparse_entry_struct *lv = v->entries;
     fmpz_t g, vv, vu, uv, uu, a, b;
     fmpz_sparse_entry_struct *ue, *ve, *nue, *nve;
     if (u->nnz == 0 || v->nnz == 0) return;
     if (lu->ind != lv->ind) {fmpz_sparse_vec_gauss_elim(u, v); return;}
-    pc = lu->ind;
     if (fmpz_cmpabs(lu->val, lv->val) < 0) /* Pre-apply transform [[0, -1], [1, 0]] */
     {
         fmpz_sparse_vec_swap(u, v);

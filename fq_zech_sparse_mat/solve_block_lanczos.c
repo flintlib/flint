@@ -1,10 +1,9 @@
 /*
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2020 Kartik Venkatram
 
     Algorithm taken from P. Montgomery, "A Block Lanczos Algorithm for 
     Finding Dependencies over GF(2)", Advances in Cryptology - EUROCRYPT '95
-
-    Copyright (C) 2010 Fredrik Johansson
 
     This file is part of FLINT.
 

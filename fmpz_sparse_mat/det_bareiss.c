@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -18,7 +19,7 @@ fmpz_sparse_mat_det_bareiss(fmpz_t det, const fmpz_sparse_mat_t M)
     slong i, rk, *P, *Q;
     fmpz *D;
     fmpz_sparse_mat_t L, U;
-    if (M->r != M->c) {fmpz_zero(det); return;}
+    FLINT_ASSERT(M->r == M->c);
     fmpz_one(det);
     if (M->r == UWORD(0)) return; 
     

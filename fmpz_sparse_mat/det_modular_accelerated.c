@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -15,6 +16,7 @@ void
 fmpz_sparse_mat_det_modular_accelerated(fmpz_t det, const fmpz_sparse_mat_t A, int proved)
 {
     fmpz_t d;
+    FLINT_ASSERT(A->r == A->c);
     fmpz_init(d);
     fmpz_sparse_mat_det_divisor(d, A);
     fmpz_sparse_mat_det_modular_given_divisor(det, A, d, proved);

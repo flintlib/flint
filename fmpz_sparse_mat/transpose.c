@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -19,6 +20,8 @@ fmpz_sparse_mat_transpose(fmpz_sparse_mat_t B, const fmpz_sparse_mat_t A)
 {
     slong r, c, i, j, *nnz;
     fmpz_sparse_entry_struct *Ae, *Be;
+    FLINT_ASSERT(B->r == A->c);
+    FLINT_ASSERT(A->r == B->c);
     nnz = flint_calloc(A->c, sizeof(*nnz));
     /* Get number of nnzs in each column of A (thus each row of B) */
     for (c = 0; c < A->c; ++c) 

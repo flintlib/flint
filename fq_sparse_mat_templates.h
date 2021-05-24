@@ -2,6 +2,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2010,2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -42,11 +43,13 @@ typedef TEMPLATE(T, sparse_mat_struct) TEMPLATE(T, sparse_mat_t)[1];
 FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_init) (TEMPLATE(T, sparse_mat_t) M, slong rows, slong cols, const TEMPLATE(T, ctx_t) ctx) 
 {
+    FLINT_ASSERT(rows >= 0 && cols >= 0);
     M->rows = flint_calloc(rows, sizeof(*M->rows));
     M->r = rows;
     M->c = cols;
     M->c_off = 0;
 }
+
 FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_clear) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx) 
 {
@@ -55,6 +58,40 @@ void TEMPLATE(T, sparse_mat_clear) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
     flint_free(M->rows);
     memset(M, 0, sizeof(*M));
 }
+
+FQ_SPARSE_MAT_TEMPLATES_INLINE
+void TEMPLATE(T, sparse_mat_resize) (TEMPLATE(T, sparse_mat_t) M, slong rows, slong cols, const TEMPLATE(T, ctx_t) ctx) 
+{
+    slong i;
+    FLINT_ASSERT(rows >= 0 && cols >= 0);
+    if (M->r != rows) {
+        if (M->r > rows)
+        {
+            for (i = rows; i < M->r; ++i)
+            {
+                TEMPLATE(T, sparse_vec_clear)(&M->rows[i], ctx);
+            }
+        }
+        M->rows = flint_realloc(M->rows, rows*sizeof(*M->rows));
+        if (M->r < rows) 
+        {
+            for (i = M->r; i < rows; ++i)
+            {
+                TEMPLATE(T, sparse_vec_init)(&M->rows[i], ctx);
+            }
+        } 
+        M->r = rows;
+    }
+    if (cols < M->c)
+    {
+        for (i = 0; i < M->r; ++i)
+        {
+            TEMPLATE(T, sparse_vec_resize)(&M->rows[i], cols, ctx);
+        }
+    }
+    M->c = cols;
+}
+
 FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_swap) (TEMPLATE(T, sparse_mat_t) M1, TEMPLATE(T, sparse_mat_t) M2, const TEMPLATE(T, ctx_t) ctx) 
 {
@@ -237,6 +274,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_neg) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) TEMPLATE(T, sparse_vec_neg)(&N->rows[i], &M->rows[i], ctx);
 }
 
@@ -244,6 +282,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, TEMPLATE(sparse_mat_scalar_mul, T)) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T))(&N->rows[i], &M->rows[i], c, ctx);    
 }
 
@@ -252,6 +291,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_add) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) TEMPLATE(T, sparse_vec_add)(&O->rows[i], &M->rows[i], &N->rows[i], ctx);
 }
 
@@ -259,6 +299,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_sub) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) TEMPLATE(T, sparse_vec_sub)(&O->rows[i], &M->rows[i], &N->rows[i], ctx);
 }
 
@@ -266,6 +307,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, TEMPLATE(sparse_mat_scalar_addmul, T)) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);
 }
 
@@ -273,6 +315,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, TEMPLATE(sparse_mat_scalar_submul, T)) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T))(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);
 }
 
@@ -287,6 +330,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_mul_mat) (TEMPLATE(T, mat_t) Y, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i, j;
+    FLINT_ASSERT(M->r == Y->r && M->c == X->r && X->c == Y->c);
     TEMPLATE(T, mat_zero) (Y, ctx);
     for (i = 0; i < M->r; ++i)
     {

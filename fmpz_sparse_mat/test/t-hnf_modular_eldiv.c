@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2015 Tommy Hofmann
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2014 Alex J. Best
     Copyright (C) 2017 Tommy Hofmann
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

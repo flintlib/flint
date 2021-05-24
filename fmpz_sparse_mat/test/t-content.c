@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2015 Dharak Kharod
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

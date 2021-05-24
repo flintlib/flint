@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014, 2015 Alex J. Best
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 

@@ -2,6 +2,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2010,2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -70,6 +71,7 @@ void fmpz_sparse_vec_init(fmpz_sparse_vec_t vec)
 {
     memset(vec, 0, sizeof(*vec));
 }
+
 FMPZ_SPARSE_VEC_INLINE
 void fmpz_sparse_vec_clear(fmpz_sparse_vec_t vec) 
 {
@@ -84,6 +86,7 @@ FMPZ_SPARSE_VEC_INLINE
 void _fmpz_sparse_vec_resize(fmpz_sparse_vec_t vec, slong nnz) 
 {
     slong i;
+    FLINT_ASSERT(nnz >= 0);
     if (nnz == 0) fmpz_sparse_vec_clear(vec);
     else if (nnz != vec->nnz)
     {
@@ -94,6 +97,21 @@ void _fmpz_sparse_vec_resize(fmpz_sparse_vec_t vec, slong nnz)
             fmpz_init (vec->entries[i].val);
     }
     vec->nnz = nnz;
+}
+
+FMPZ_SPARSE_VEC_INLINE
+void fmpz_sparse_vec_resize(fmpz_sparse_vec_t vec, slong cols) 
+{
+    slong i;
+    FLINT_ASSERT(cols >= 0);
+    if (vec->nnz == 0) return;
+    for (i = 0; i < vec->nnz; ++i) {
+        if (vec->entries[i].ind >= cols)
+        {
+            break;
+        }
+    }
+    _fmpz_sparse_vec_resize(vec, i);
 }
 
 FMPZ_SPARSE_VEC_INLINE 

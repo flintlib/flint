@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -19,6 +20,7 @@ TEMPLATE(T, sparse_mat_transpose) (TEMPLATE(T, sparse_mat_t) B, const TEMPLATE(T
 {
     slong r, c, i, j, *nnz;
     TEMPLATE(T, sparse_entry_struct) *Ae, *Be;
+    FLINT_ASSERT(B->r == A->c && A->r == B->c);
     nnz = flint_calloc(A->c, sizeof(*nnz));
     /* Get number of nnzs in each column of A (thus each row of B) */
     for (c = 0; c < A->c; ++c) 

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -21,6 +22,8 @@ nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
     slong r, c, i, j;
     nmod_sparse_entry_struct *Ae, *Be;
     nmod_sparse_vec_struct *row;
+    FLINT_ASSERT(M->r == A->c);
+    FLINT_ASSERT(A->r == M->c);
 
     /* Get number of nnzs in each column of A (thus each row of B) */
     for (c = 0; c < A->c; ++c) 

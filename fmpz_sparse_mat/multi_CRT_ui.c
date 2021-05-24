@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -36,6 +37,10 @@ fmpz_sparse_mat_multi_CRT_ui(fmpz_sparse_mat_t mat, nmod_sparse_mat_struct * res
     mp_limb_t *primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t temp;
+
+    for(i = 0; i < nres; ++i) {
+        FLINT_ASSERT(mat->r == residues[i].r);
+    }
 
     primes = flint_malloc(nres * sizeof(*primes));
     for (i = 0; i < nres; i++) primes[i] = residues[i].mod.n;

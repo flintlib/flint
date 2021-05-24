@@ -2,6 +2,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2010,2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
@@ -67,6 +68,7 @@ typedef fmpz_sparse_mat_with_transpose_struct fmpz_sparse_mat_with_transpose_t[1
 FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_init (fmpz_sparse_mat_t M, slong rows, slong cols) 
 {
+    FLINT_ASSERT(rows >= 0 && cols >= 0);
     M->rows = flint_calloc(rows, sizeof(*M->rows));
     M->r = rows;
     M->c = cols;
@@ -77,10 +79,44 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_clear (fmpz_sparse_mat_t M) 
 {
     slong i;
-    for (i = 0; i < M->r; ++i) fmpz_sparse_vec_clear(&M->rows[i]);
+    for (i = 0; i < M->r; ++i) 
+    {
+        fmpz_sparse_vec_clear(&M->rows[i]);
+    }
     flint_free(M->rows);
     memset(M, 0, sizeof(*M));
 }
+
+FMPZ_SPARSE_MAT_INLINE
+void fmpz_sparse_mat_resize (fmpz_sparse_mat_t M, slong rows, slong cols) 
+{
+    slong i;
+     FLINT_ASSERT(rows >= 0 && cols >= 0);
+   if (M->r != rows) {
+        if (M->r > rows)
+        {
+            for (i = rows; i < M->r; ++i)
+            {
+                fmpz_sparse_vec_clear(&M->rows[i]);
+            }
+        }
+        M->rows = flint_realloc(M->rows, rows*sizeof(*M->rows));
+        if (M->r < rows) 
+        {
+            memset(M->rows+M->r, 0, (rows-M->r)*sizeof(*M->rows));
+        } 
+        M->r = rows;
+    }
+    if (cols < M->c)
+    {
+        for (i = 0; i < M->r; ++i)
+        {
+            fmpz_sparse_vec_resize(&M->rows[i], cols);
+        }
+    }
+    M->c = cols;
+}
+
 FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_swap (fmpz_sparse_mat_t M1, fmpz_sparse_mat_t M2) 
 {
@@ -315,6 +351,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_neg (fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) fmpz_sparse_vec_neg(&N->rows[i], &M->rows[i]);
 }
 
@@ -322,6 +359,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_scalar_mul_fmpz(fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M, const fmpz_t c) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) fmpz_sparse_vec_scalar_mul_fmpz(&N->rows[i], &M->rows[i], c);    
 }
 
@@ -329,6 +367,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_mul_diag_fmpz(fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M, fmpz * D) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) fmpz_sparse_vec_scalar_mul_fmpz(&N->rows[i], &M->rows[i], &D[i]);    
 }
 
@@ -337,6 +376,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_scalar_divexact_fmpz(fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M, const fmpz_t c) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) fmpz_sparse_vec_scalar_divexact_fmpz(&N->rows[i], &M->rows[i], c);    
 }
 
@@ -345,6 +385,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_scalar_mod_fmpz(fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M, const fmpz_t mod) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) fmpz_sparse_vec_scalar_mod_fmpz(&N->rows[i], &M->rows[i], mod);    
 }
 
@@ -352,6 +393,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_scalar_mods_fmpz(fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M, const fmpz_t mod) 
 {
     slong i;
+    FLINT_ASSERT(M->r == N->r);
     for (i = 0; i < N->r; ++i) fmpz_sparse_vec_scalar_mods_fmpz(&N->rows[i], &M->rows[i], mod);    
 }
 
@@ -360,6 +402,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_add (fmpz_sparse_mat_t O, const fmpz_sparse_mat_t M, const fmpz_sparse_mat_t N) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) fmpz_sparse_vec_add(&O->rows[i], &M->rows[i], &N->rows[i]);
 }
 
@@ -367,6 +410,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_sub (fmpz_sparse_mat_t O, const fmpz_sparse_mat_t M, const fmpz_sparse_mat_t N) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) fmpz_sparse_vec_sub(&O->rows[i], &M->rows[i], &N->rows[i]);
 }
 
@@ -374,6 +418,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_scalar_addmul_fmpz(fmpz_sparse_mat_t O, const fmpz_sparse_mat_t M, const fmpz_sparse_mat_t N, const fmpz_t c) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) fmpz_sparse_vec_scalar_addmul_fmpz(&O->rows[i], &M->rows[i], &N->rows[i], c);
 }
 
@@ -381,6 +426,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_scalar_submul_fmpz(fmpz_sparse_mat_t O, const fmpz_sparse_mat_t M, const fmpz_sparse_mat_t N, const fmpz_t c) 
 {
     slong i;
+    FLINT_ASSERT(O->r == M->r && O->r == N->r);
     for (i = 0; i < O->r; ++i) fmpz_sparse_vec_scalar_submul_fmpz(&O->rows[i], &M->rows[i], &N->rows[i], c);
 }
 
@@ -396,6 +442,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_mul_mat (fmpz_mat_t Y, const fmpz_sparse_mat_t M, const fmpz_mat_t X) 
 {
     slong i, j;
+    FLINT_ASSERT(M->r == Y->r && M->c == X->r && X->c == Y->c);
     fmpz_mat_zero (Y);
     for (i = 0; i < M->r; ++i)
     {

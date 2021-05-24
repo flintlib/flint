@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2020 Kartik Venkatram
 
     This file is part of FLINT.
 
