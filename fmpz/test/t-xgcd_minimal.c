@@ -59,18 +59,23 @@ main(void)
 
     _fmpz_promote_val(a);
     _fmpz_promote_val(b);
+    fmpz_zero(a);
+    fmpz_zero(b);
 
     fmpz_xgcd_minimal(d, x, y, a, b); /* check promoted (0, 0)
                                        * gives (0, 0, 0) */
     result = (fmpz_is_zero(d)
            && fmpz_is_zero(x)
-           && fmpz_is_zero(y)
-           && fmpz_is_zero(a)
-           && fmpz_is_zero(b));
+           && fmpz_is_zero(y));
 
     if (!result)
     {
         flint_printf("FAIL:\n\n");
+        flint_printf("d %d\n",fmpz_is_zero(d));
+        flint_printf("x %d\n",fmpz_is_zero(x));
+        flint_printf("y %d\n",fmpz_is_zero(y));
+        flint_printf("a %d\n",fmpz_is_zero(a));
+        flint_printf("b %d\n",fmpz_is_zero(b));
         flint_printf("d = "), fmpz_print(d), flint_printf("\n");
         flint_printf("x = "), fmpz_print(x), flint_printf("\n");
         flint_printf("y = "), fmpz_print(y), flint_printf("\n");
@@ -268,12 +273,12 @@ main(void)
     fmpz_abs(tx, a);
     result = (fmpz_equal(d, tx)
            && fmpz_is_zero(x)
-           && fmpz_equal_si(y, fmpz_sgn(a)));
+           && fmpz_equal_si(y, -fmpz_sgn(a)));
 
     if (!result)
     {
         flint_printf("FAIL:\n\n");
-        flint_printf("d = "), fmpz_print(d), flint_printf("\n");
+        flint_printf("d =akjsdn "), fmpz_print(d), flint_printf("\n");
         flint_printf("x = "), fmpz_print(x), flint_printf("\n");
         flint_printf("y = "), fmpz_print(y), flint_printf("\n");
         flint_printf("a = "), fmpz_print(a), flint_printf("\n");
@@ -364,8 +369,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(f, g, c, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(f, g, c, f, g);
 
         result = (fmpz_equal(d, f)
                && fmpz_equal(b, c)
@@ -417,8 +422,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(g, f, c, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(g, f, c, f, g);
 
         result = (fmpz_equal(d, g)
                && fmpz_equal(b, c)
@@ -470,8 +475,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(f, c, g, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(f, c, g, f, g);
 
         result = (fmpz_equal(d, f) 
                && fmpz_equal(a, c)
@@ -523,8 +528,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(g, c, f, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(g, c, f, f, g);
 
         result = (fmpz_equal(d, g)
                && fmpz_equal(a, c)
@@ -573,7 +578,7 @@ main(void)
         if (n_randint(state, 2)) fmpz_neg(g, g);
         if (n_randint(state, 2)) fmpz_neg(f, f);
         
-        fmpz_xgcd(d, a, b, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
 
         fmpz_mul(t1, a, f);
         fmpz_mul(t2, b, g);

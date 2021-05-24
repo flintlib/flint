@@ -31,6 +31,21 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         fmpz_zero(a);
         return;
     }
+    else if (d == f || a == f || b == f || d == g || a == g || b == g)
+    {
+        fmpz_t d2, a2, b2;
+        fmpz_init(d2);
+        fmpz_init(a2);
+        fmpz_init(b2);
+        fmpz_xgcd_minimal(d2, a2, b2, f, g);
+        fmpz_swap(d, d2);
+        fmpz_swap(a, a2);
+        fmpz_swap(b, b2);
+        fmpz_clear(d2);
+        fmpz_clear(a2);
+        fmpz_clear(b2);
+        return;
+    }
 
     _fmpz_promote(d);
     _fmpz_promote(a);
@@ -38,15 +53,13 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
     if (!COEFF_IS_MPZ(*f) && !COEFF_IS_MPZ(*g))  /* both are small */
     {
-        ulong tf, tg;
         mpz_t mf, mg;
+        ulong tf = FLINT_ABS(*f);
+        ulong tg = FLINT_ABS(*g);
 
-        tf = fmpz_get_ui(f);
         mf->_mp_d = (mp_limb_t *) &tf;
-        mf->_mp_size  = fmpz_sgn(f);
-
-        tg = fmpz_get_ui(g);
         mg->_mp_d = (mp_limb_t *) &tg;
+        mf->_mp_size  = fmpz_sgn(f);
         mg->_mp_size  = fmpz_sgn(g);
 
         mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
@@ -54,10 +67,9 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
     }
     else if (!COEFF_IS_MPZ(*f))  /* only f is small */
     {
-        ulong tf;
         mpz_t mf;
+        ulong tf = FLINT_ABS(*f);
 
-        tf = fmpz_get_ui(f);
         mf->_mp_d = (mp_limb_t *) &tf;
         mf->_mp_size  = fmpz_sgn(f);
 
@@ -66,10 +78,9 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
     }
     else if (!COEFF_IS_MPZ(*g))  /* only g is small */
     {
-        ulong tg;
         mpz_t mg;
+        ulong tg = FLINT_ABS(*g);
 
-        tg = fmpz_get_ui(g);
         mg->_mp_d = (mp_limb_t *) &tg;
         mg->_mp_size  = fmpz_sgn(g);
 
