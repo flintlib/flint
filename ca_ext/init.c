@@ -12,26 +12,6 @@
 #include "ca_ext.h"
 #include "ca_vec.h"
 
-ulong ca_ext_hash_qqbar(const qqbar_t x)
-{
-    ulong s;
-    slong i, len;
-    const fmpz * c;
-
-    len = QQBAR_POLY(x)->length;
-    c = QQBAR_COEFFS(x);
-
-    s = 1234567;
-
-    for (i = 0; i < len; i++)
-        s = calcium_fmpz_hash(c + i) * 1000003 + s;
-
-    /* todo: add in some bits describing the enclosure, e.g.
-       a floor value or just the signs */
-
-    return s;
-}
-
 static ulong hash_func(calcium_func_code func, ca_srcptr args, slong nargs, ca_ctx_t ctx)
 {
     ulong s;
@@ -66,7 +46,7 @@ ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t ctx)
     CA_EXT_QQBAR_NF(res) = flint_malloc(sizeof(nf_struct));
     nf_init(CA_EXT_QQBAR_NF(res), t);
 
-    res->hash = ca_ext_hash_qqbar(CA_EXT_QQBAR(res));
+    res->hash = qqbar_hash(CA_EXT_QQBAR(res));
     res->depth = 0;
 }
 

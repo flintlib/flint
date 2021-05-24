@@ -227,6 +227,8 @@ int qqbar_cmpabs_im(const qqbar_t x, const qqbar_t y);
 int qqbar_cmpabs(const qqbar_t x, const qqbar_t y);
 int qqbar_cmp_root_order(const qqbar_t x, const qqbar_t y);
 
+ulong qqbar_hash(const qqbar_t x);
+
 /* Complex parts */
 
 void qqbar_conj(qqbar_t res, const qqbar_t x);

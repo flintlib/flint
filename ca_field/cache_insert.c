@@ -12,15 +12,13 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-ulong ca_ext_hash_qqbar(const qqbar_t x);
-
 ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx)
 {
     ulong xhash;
     ca_field_ptr K;
     slong i, loc;
 
-    xhash = ca_ext_hash_qqbar(x);
+    xhash = qqbar_hash(x);
 
     loc = xhash % ((ulong) cache->hash_size);
 

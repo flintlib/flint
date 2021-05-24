@@ -292,6 +292,17 @@ Comparisons
     order of the sign. This implies that complex conjugate roots
     are adjacent, with the root in the upper half plane first.
 
+.. function:: ulong qqbar_hash(const qqbar_t x)
+
+    Returns a hash of *x*. As currently implemented, this function
+    only hashes the minimal polynomial of *x*. The user should
+    mix in some bits based on the numerical value if it is critical
+    to distinguish between conjugates of the same minimal polynomial.
+    This function is also likely to produce serial runs of values for
+    lexicographically close minimal polynomials. This is not
+    necessarily a problem for use in hash tables, but if it is
+    important that all bits in the output are random,
+    the user should apply an integer hash function to the output.
 
 Complex parts
 -------------------------------------------------------------------------------
