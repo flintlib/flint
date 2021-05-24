@@ -124,15 +124,6 @@ mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 }
 
 NMOD_VEC_INLINE
-mp_limb_t nmod_addmul(mp_limb_t a, mp_limb_t b, mp_limb_t c, nmod_t mod)
-{
-    if(c==UWORD(1)) return nmod_add(a, b, mod);
-    if(c==mod.n-UWORD(1)) return nmod_sub(a, b, mod);
-    NMOD_ADDMUL(a, b, c, mod);
-    return a;
-}
-
-NMOD_VEC_INLINE
 mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 {
    if (a)

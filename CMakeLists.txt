@@ -76,7 +76,7 @@ set(BUILD_DIRS
 )
 
 set(TEMPLATE_DIRS
-    fq_vec_templates fq_mat_templates fq_poly_templates
+    fq_vec_templates fq_sparse_vec_templates fq_mat_templates fq_sparse_mat_templates fq_poly_templates
     fq_poly_factor_templates fq_templates
 )
 
