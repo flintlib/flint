@@ -380,7 +380,6 @@ Integer parts
     Sets *res* to the ceiling function of *x*. If *x* is not real, the
     value is defined as the ceiling function of the real part of *x*.
 
-
 Arithmetic
 -------------------------------------------------------------------------------
 
@@ -525,6 +524,18 @@ can be used to avoid recomputations.
     if *res* will be used as an invariant operand for many operations,
     calling this function as a precomputation step can improve performance.
 
+Numerator and denominator
+-------------------------------------------------------------------------------
+
+.. function:: void qqbar_denominator(fmpz_t res, const qqbar_t y)
+
+    Sets *res* to the denominator of *y*, i.e. the leading coefficient
+    of the minimal polynomial of *y*.
+
+.. function:: void qqbar_numerator(qqbar_t res, const qqbar_t y)
+
+    Sets *res* to the numerator of *y*, i.e. *y* multiplied by
+    its denominator.
 
 Conjugates
 -------------------------------------------------------------------------------

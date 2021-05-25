@@ -259,6 +259,9 @@ int qqbar_csgn(const qqbar_t x);
 void qqbar_floor(fmpz_t res, const qqbar_t x);
 void qqbar_ceil(fmpz_t res, const qqbar_t x);
 
+void qqbar_numerator(qqbar_t res, const qqbar_t y);
+void qqbar_denominator(fmpz_t res, const qqbar_t y);
+
 /* Arithmetic */
 
 void qqbar_neg(qqbar_t res, const qqbar_t x);
