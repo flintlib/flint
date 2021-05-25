@@ -28,7 +28,7 @@ main(void)
     FLINT_TEST_INIT(state);
     fmpz_set_str(maxval, "999999999999999999999999999999999999999999", 10);
 
-    flint_printf("xgcd....");
+    flint_printf("xgcd_minimal....");
     fflush(stdout);
 
 
@@ -38,7 +38,7 @@ main(void)
     fmpz_init(a);
     fmpz_init(b);
 
-    fmpz_xgcd(d, x, y, a, b); /* check small (0, 0)
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check small (0, 0)
                                        * gives (0, 0, 0) */
     result = (fmpz_is_zero(d)
            && fmpz_is_zero(x)
@@ -63,7 +63,7 @@ main(void)
     fmpz_zero(a);
     fmpz_zero(b);
 
-    fmpz_xgcd(d, x, y, a, b); /* check promoted (0, 0)
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check promoted (0, 0)
                                        * gives (0, 0, 0) */
     result = (fmpz_is_zero(d)
            && fmpz_is_zero(x)
@@ -88,7 +88,7 @@ main(void)
 
     fmpz_one(a);
     fmpz_set_str(b, "999", 10);
-    fmpz_xgcd(d, x, y, a, b); /* check (1, b) for small b gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (1, b) for small b gives
                                        * (1, **long expressions**) */
 
     /* i = |sgn((b - 1) * (b + 1))| */
@@ -124,7 +124,7 @@ main(void)
 
     fmpz_one(a);
     fmpz_set_str(b, "99999999999999999999999999999999999999999999", 10);
-    fmpz_xgcd(d, x, y, a, b); /* check (1, b) for big b gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (1, b) for big b gives
                                        * (1, **long expressions**) */
 
     /* i = |sgn((b - 1) * (b + 1))| */
@@ -160,7 +160,7 @@ main(void)
 
     fmpz_set_str(a, "999", 10);
     fmpz_one(b);
-    fmpz_xgcd(d, x, y, a, b); /* check (a, 1) for small a gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (a, 1) for small a gives
                                        * (1, 0, 1) */
 
     result = (fmpz_is_one(d)
@@ -181,7 +181,7 @@ main(void)
 
     fmpz_set_str(a, "9771293786198273698712639876198276398716298736999", 10);
     fmpz_one(b);
-    fmpz_xgcd(d, x, y, a, b); /* check (a, 1) for big a gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (a, 1) for big a gives
                                        * (1, 0, 1) */
 
     result = (fmpz_is_one(d)
@@ -202,7 +202,7 @@ main(void)
 
     fmpz_set_str(a, "977", 10);
     fmpz_set_str(b, "977", 10);
-    fmpz_xgcd(d, x, y, a, b); /* check (a, a) for small a gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (a, a) for small a gives
                                        * (|a|, 0, sgn(a)) */
     
     fmpz_abs(tx, a);
@@ -224,7 +224,7 @@ main(void)
 
     fmpz_set_str(a, "977817236128736817263876121723681726387618273681", 10);
     fmpz_set_str(b, "977817236128736817263876121723681726387618273681", 10);
-    fmpz_xgcd(d, x, y, a, b); /* check (a, a) for big a gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (a, a) for big a gives
                                        * (|a|, 0, sgn(a)) */
     
     fmpz_abs(tx, a);
@@ -246,7 +246,7 @@ main(void)
 
     fmpz_set_str(a, "97177", 10);
     fmpz_set_str(b, "-97177", 10);
-    fmpz_xgcd(d, x, y, a, b); /* check (a, -a) for small a gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (a, -a) for small a gives
                                        * (|a|, 0, -sgn(a)) */
     
     fmpz_abs(tx, a);
@@ -268,7 +268,7 @@ main(void)
 
     fmpz_set_str(a, "9778172361736817263876121723681726387618273681", 10);
     fmpz_set_str(b, "-9778172361736817263876121723681726387618273681", 10);
-    fmpz_xgcd(d, x, y, a, b); /* check (a, -a) for big a gives
+    fmpz_xgcd_minimal(d, x, y, a, b); /* check (a, -a) for big a gives
                                        * (|a|, 0, -sgn(a)) */
     
     fmpz_abs(tx, a);
@@ -312,8 +312,8 @@ main(void)
         if (n_randint(state, 2)) fmpz_neg(g, g);
         if (n_randint(state, 2)) fmpz_neg(f, f);
 
-        fmpz_xgcd(d1, a1, b1, f, g);
-        fmpz_xgcd(d2, b2, a2, g, f);
+        fmpz_xgcd_minimal(d1, a1, b1, f, g);
+        fmpz_xgcd_minimal(d2, b2, a2, g, f);
 
         fmpz_divexact(tmpa, g, d1);
         fmpz_divexact(tmpb, f, d1);
@@ -370,8 +370,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(f, g, c, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(f, g, c, f, g);
 
         result = (fmpz_equal(d, f)
                && fmpz_equal(b, c)
@@ -423,8 +423,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(g, f, c, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(g, f, c, f, g);
 
         result = (fmpz_equal(d, g)
                && fmpz_equal(b, c)
@@ -476,8 +476,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(f, c, g, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(f, c, g, f, g);
 
         result = (fmpz_equal(d, f) 
                && fmpz_equal(a, c)
@@ -529,8 +529,8 @@ main(void)
         fmpz_set(f, F);
         fmpz_set(g, G);
 
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(g, c, f, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
+        fmpz_xgcd_minimal(g, c, f, f, g);
 
         result = (fmpz_equal(d, g)
                && fmpz_equal(a, c)
@@ -579,7 +579,7 @@ main(void)
         if (n_randint(state, 2)) fmpz_neg(g, g);
         if (n_randint(state, 2)) fmpz_neg(f, f);
         
-        fmpz_xgcd(d, a, b, f, g);
+        fmpz_xgcd_minimal(d, a, b, f, g);
 
         fmpz_mul(t1, a, f);
         fmpz_mul(t2, b, g);
