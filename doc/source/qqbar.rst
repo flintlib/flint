@@ -462,8 +462,12 @@ Powers and roots
     Division by zero calls *flint_abort*.
 
 .. function:: void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
+              void qqbar_pow_si(qqbar_t res, const qqbar_t x, ulong n)
+              void qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t n)
+              void qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t n)
 
     Sets *res* to *x* raised to the *n*-th power.
+    Raising zero to a negative power aborts.
 
 .. function:: void qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
               void qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong n)
@@ -479,9 +483,9 @@ Powers and roots
 .. function:: int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t y)
 
     General exponentiation: if `x^y` is an algebraic number, sets *res*
-    to this value and returns 1. If `x^y` is transcendental or undefined,
-    returns 0.
-
+    to this value and returns 1. If `x^y` is transcendental or
+    undefined, returns 0. Note that this function returns 0 instead of
+    aborting on division zero.
 
 Numerical enclosures
 -------------------------------------------------------------------------------

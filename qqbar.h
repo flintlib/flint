@@ -307,6 +307,10 @@ void qqbar_inv(qqbar_t res, const qqbar_t x);
 void qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp);
 
 void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong e);
+void qqbar_pow_si(qqbar_t res, const qqbar_t x, slong n);
+void qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t n);
+void qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t n);
+
 int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t e);
 
 /* Check if x = (p/q)^(1/n), p > 0 */
