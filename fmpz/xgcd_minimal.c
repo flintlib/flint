@@ -15,23 +15,8 @@
 void
 fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 {
-    if (fmpz_is_zero(g))
-    {
-        slong sgn = fmpz_sgn(f);
-        fmpz_abs(d, f);
-        fmpz_set_si(a, sgn);
-        fmpz_zero(b);
-        return;
-    }
-    else if (fmpz_is_zero(f))
-    {
-        slong sgn = fmpz_sgn(g);
-        fmpz_abs(d, g);
-        fmpz_set_si(b, sgn);
-        fmpz_zero(a);
-        return;
-    }
-    else if (d == f || a == f || b == f || d == g || a == g || b == g)
+    /* check aliasing */
+    if (d == f || a == f || b == f || d == g || a == g || b == g)
     {
         fmpz_t d2, a2, b2;
         fmpz_init(d2);
