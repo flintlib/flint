@@ -55,8 +55,7 @@ qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t y)
 
         fmpq_init(t);
         fmpz_init(r);
-        fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(y));
-        fmpz_set(fmpq_denref(t), QQBAR_COEFFS(y) + 1);
+        qqbar_get_fmpq(t, y);
 
         success = 0;
 

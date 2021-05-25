@@ -24,39 +24,29 @@ qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y)
     }
     else if (qqbar_is_rational(y))
     {
-        fmpz_t a, b, c;
+        fmpz_t a, b;
 
         fmpz_init(a);
         fmpz_init(b);
-        fmpz_init(c);
 
-        fmpz_set(a, QQBAR_COEFFS(y) + 1);
-        fmpz_neg(b, QQBAR_COEFFS(y));
-        fmpz_set(c, QQBAR_COEFFS(y) + 1);
-
-        qqbar_scalar_op(res, x, a, b, c);
+        _qqbar_get_fmpq(b, a, y);
+        qqbar_scalar_op(res, x, a, b, a);
 
         fmpz_clear(a);
         fmpz_clear(b);
-        fmpz_clear(c);
     }
     else if (qqbar_is_rational(x))
     {
-        fmpz_t a, b, c;
+        fmpz_t a, b;
 
         fmpz_init(a);
         fmpz_init(b);
-        fmpz_init(c);
 
-        fmpz_set(a, QQBAR_COEFFS(x) + 1);
-        fmpz_neg(b, QQBAR_COEFFS(x));
-        fmpz_set(c, QQBAR_COEFFS(x) + 1);
-
-        qqbar_scalar_op(res, y, a, b, c);
+        _qqbar_get_fmpq(b, a, x);
+        qqbar_scalar_op(res, y, a, b, a);
 
         fmpz_clear(a);
         fmpz_clear(b);
-        fmpz_clear(c);
     }
     else
     {

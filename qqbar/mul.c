@@ -42,9 +42,7 @@ qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y)
         fmpz_init(b);
         fmpz_init(c);
 
-        fmpz_neg(a, QQBAR_COEFFS(y));
-        fmpz_set(c, QQBAR_COEFFS(y) + 1);
-
+        _qqbar_get_fmpq(a, c, y);
         qqbar_scalar_op(res, x, a, b, c);
 
         fmpz_clear(a);
@@ -59,9 +57,7 @@ qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y)
         fmpz_init(b);
         fmpz_init(c);
 
-        fmpz_neg(a, QQBAR_COEFFS(x));
-        fmpz_set(c, QQBAR_COEFFS(x) + 1);
-
+        _qqbar_get_fmpq(a, c, x);
         qqbar_scalar_op(res, y, a, b, c);
 
         fmpz_clear(a);

@@ -88,8 +88,7 @@ qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
     {
         fmpq_t t;
         fmpq_init(t);
-        fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(x));
-        fmpz_set(fmpq_denref(t), QQBAR_COEFFS(x) + 1);
+        qqbar_get_fmpq(t, x);
         fmpz_pow_ui(fmpq_numref(t), fmpq_numref(t), n);
         fmpz_pow_ui(fmpq_denref(t), fmpq_denref(t), n);
         qqbar_set_fmpq(res, t);

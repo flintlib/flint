@@ -43,8 +43,7 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
         fmpq_t t, u;
         fmpq_init(t);
         fmpq_init(u);
-        fmpz_neg(fmpq_numref(u), QQBAR_COEFFS(x));
-        fmpz_set(fmpq_denref(u), QQBAR_COEFFS(x) + 1);
+        qqbar_get_fmpq(u, x);
         _fmpq_poly_evaluate_fmpq(fmpq_numref(t), fmpq_denref(t), poly, den, len, fmpq_numref(u), fmpq_denref(u));
         qqbar_set_fmpq(res, t);
         fmpq_clear(t);

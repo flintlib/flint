@@ -26,8 +26,7 @@ qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x, sl
     {
         fmpq_t t;
         fmpq_init(t);
-        fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(x));
-        fmpz_set(fmpq_denref(t), QQBAR_COEFFS(x) + 1);
+        qqbar_get_fmpq(t, x);
         fmpq_poly_set_fmpq(res, t);
         fmpq_clear(t);
         return 1;
