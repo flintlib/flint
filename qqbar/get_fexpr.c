@@ -192,13 +192,12 @@ _qqbar_get_fexpr_root_nearest(fexpr_t res, const fmpz_poly_t poly, const char * 
 }
 
 void
-qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
+qqbar_get_decimal_root_nearest(char ** re_s, char ** im_s, const qqbar_t x, slong default_digits)
 {
     acb_t z, point, delta;
     acb_poly_t poly;
     arb_t lhs, rhs, R, Rpow, tmpr;
     slong k, d, digits, prec, wp;
-    char * re_s, * im_s;
     int success;
     int imag_zero, real_zero;
 
@@ -209,11 +208,10 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
     {
         arb_t t;
         arb_init(t);
-        digits = 6;
+        digits = default_digits;
         qqbar_get_arb(t, x, 3.333 * digits + 10);
-        re_s = arb_get_str(t, digits, ARB_STR_NO_RADIUS);
-        _qqbar_get_fexpr_root_nearest(res, QQBAR_POLY(x), re_s, NULL);
-        flint_free(re_s);
+        re_s[0] = arb_get_str(t, digits, ARB_STR_NO_RADIUS);
+        im_s[0] = NULL;
         arb_clear(t);
         return;
     }
@@ -227,13 +225,13 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
     {
         acb_t t;
         acb_init(t);
-        digits = 6;
+        digits = default_digits;
         qqbar_get_acb(t, x, 3.333 * digits + 10);
-        re_s = arb_get_str(acb_realref(t), digits, ARB_STR_NO_RADIUS);
-        im_s = arb_get_str(acb_imagref(t), digits, ARB_STR_NO_RADIUS);
-        _qqbar_get_fexpr_root_nearest(res, QQBAR_POLY(x), re_s, im_s);
-        flint_free(re_s);
-        flint_free(im_s);
+        if (real_zero)
+            re_s[0] = NULL;
+        else
+            re_s[0] = arb_get_str(acb_realref(t), digits, ARB_STR_NO_RADIUS);
+        im_s[0] = arb_get_str(acb_imagref(t), digits, ARB_STR_NO_RADIUS);
         acb_clear(t);
         return;
     }
@@ -252,14 +250,14 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
     if (imag_zero) arb_zero(acb_imagref(z));
     if (real_zero) arb_zero(acb_realref(z));
 
-    re_s = im_s = NULL;
+    re_s[0] = im_s[0] = NULL;
 
     success = 0;
-    for (digits = 6; !success; digits *= 2)
+    for (digits = default_digits; !success; digits *= 2)
     {
         prec = digits * 3.333 + 10;
 
-        if (digits != 6)
+        if (digits != 6 && 0)
             printf("digits %ld\n", digits);
 
         if (acb_rel_accuracy_bits(z) < prec)
@@ -269,10 +267,10 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
             if (real_zero) arb_zero(acb_realref(z));
         }
 
-        flint_free(re_s);
-        flint_free(im_s);
-        re_s = arb_get_str(acb_realref(z), digits, ARB_STR_NO_RADIUS);
-        im_s = arb_get_str(acb_imagref(z), digits, ARB_STR_NO_RADIUS);
+        flint_free(re_s[0]);
+        flint_free(im_s[0]);
+        re_s[0] = arb_get_str(acb_realref(z), digits, ARB_STR_NO_RADIUS);
+        im_s[0] = arb_get_str(acb_imagref(z), digits, ARB_STR_NO_RADIUS);
 
         /* Let x be the true root and let z = a + bi be the approximate point. */
         /* Verify that D(z, C*|z-x|) contains a unique root, for some C > 1. */
@@ -288,8 +286,8 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
                 if (real_zero) arb_zero(acb_realref(z));
             }
 
-            arb_set_str(acb_realref(point), re_s, wp);
-            arb_set_str(acb_imagref(point), im_s, wp);
+            arb_set_str(acb_realref(point), re_s[0], wp);
+            arb_set_str(acb_imagref(point), im_s[0], wp);
 
             acb_sub(delta, z, point, wp);
             acb_abs(R, delta, wp);
@@ -334,12 +332,17 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
         }
     }
 
-    _qqbar_get_fexpr_root_nearest(res, QQBAR_POLY(x),
-        real_zero ? NULL : re_s,
-        imag_zero ? NULL : im_s);
+    if (real_zero)
+    {
+        flint_free(re_s[0]);
+        re_s[0] = NULL;
+    }
 
-    flint_free(re_s);
-    flint_free(im_s);
+    if (imag_zero)
+    {
+        flint_free(im_s[0]);
+        im_s[0] = NULL;
+    }
 
     acb_clear(z);
     acb_clear(point);
@@ -350,6 +353,19 @@ qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
     arb_clear(R);
     arb_clear(Rpow);
     arb_clear(tmpr);
+}
+
+void
+qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x)
+{
+    char * re_s;
+    char * im_s;
+
+    qqbar_get_decimal_root_nearest(&re_s, &im_s, x, 6);
+    _qqbar_get_fexpr_root_nearest(res, QQBAR_POLY(x), re_s, im_s);
+
+    flint_free(re_s);
+    flint_free(im_s);
 }
 
 void
