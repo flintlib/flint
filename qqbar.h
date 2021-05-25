@@ -182,6 +182,13 @@ qqbar_binop_within_limits(const qqbar_t x, const qqbar_t y, slong deg_limit, slo
            (bits_limit == 0 || (qqbar_height_bits(x) + qqbar_height_bits(y) <= bits_limit));
 }
 
+/* Conversions */
+
+void _qqbar_get_fmpq(fmpz_t num, fmpz_t den, const qqbar_t x);
+void qqbar_get_fmpq(fmpq_t res, const qqbar_t x);
+void qqbar_get_fmpz(fmpz_t res, const qqbar_t x);
+
+
 /* Special values */
 
 QQBAR_INLINE void

@@ -333,8 +333,7 @@ ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx)
         success = ca_get_qqbar(t, x, ctx);
         if (success && qqbar_is_rational(t))
         {
-            fmpz_neg(fmpq_numref(res), QQBAR_COEFFS(t));
-            fmpz_set(fmpq_denref(res), QQBAR_COEFFS(t) + 1);
+            qqbar_get_fmpq(res, t);
             success = 1;
         }
         else
@@ -406,7 +405,7 @@ ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
         success = ca_get_qqbar(t, x, ctx);
         if (success && qqbar_is_integer(t))
         {
-            fmpz_neg(res, QQBAR_COEFFS(t));
+            qqbar_get_fmpz(res, t);
             success = 1;
         }
         else

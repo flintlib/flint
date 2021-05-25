@@ -200,8 +200,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
     if (d == 1)
     {
         _ca_make_fmpq(res, ctx);
-        fmpz_neg(CA_FMPQ_NUMREF(res), QQBAR_COEFFS(x));
-        fmpz_set(CA_FMPQ_DENREF(res), QQBAR_COEFFS(x) + 1);
+        qqbar_get_fmpq(CA_FMPQ(res), x);
     }
     else if (d == 2)
     {

@@ -164,6 +164,21 @@ Properties
     If *deg_limit* is set to 0, the degree check is skipped,
     and similarly for *bits_limit*.
 
+Conversions
+-------------------------------------------------------------------------------
+
+.. function:: void _qqbar_get_fmpq(fmpz_t num, fmpz_t den, const qqbar_t x)
+
+    Sets *num* and *den* to the numerator and denominator of *x*.
+    Aborts if *x* is not a rational number.
+
+.. function:: void qqbar_get_fmpq(fmpq_t res, const qqbar_t x)
+
+    Sets *res* to *x*. Aborts if *x* is not a rational number.
+
+.. function:: void qqbar_get_fmpz(fmpz_t res, const qqbar_t x)
+
+    Sets *res* to *x*. Aborts if *x* is not an integer.
 
 Special values
 -------------------------------------------------------------------------------

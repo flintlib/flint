@@ -85,8 +85,7 @@ qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, cons
     {
         fmpz_zero(res_b);
         fmpz_zero(res_c);
-        fmpz_neg(res_a, QQBAR_COEFFS(x));
-        fmpz_set(res_q, QQBAR_COEFFS(x) + 1);
+        _qqbar_get_fmpq(res_a, res_q, x);
         return;
     }
 
