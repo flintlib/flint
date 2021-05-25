@@ -71,6 +71,9 @@ Types, macros and constants
    if f doesn't represent an mpz_t, initialise one and associate it to f, but
    preserve the value of f.
 
+   Note that some functions like ``fmpz_is_zero`` assumes that `f` represents a
+   slong if `f = 0`, so use this function with care.
+
 .. function:: void _fmpz_demote(fmpz_t f)
 
    if f represents an mpz_t clear it and make f just represent an slong.
