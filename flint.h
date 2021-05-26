@@ -292,6 +292,7 @@ typedef __mpfr_struct flint_mpfr;
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
 #define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
+#define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
 
 #define MP_PTR_SWAP(x, y) \
     do { \
