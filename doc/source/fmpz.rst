@@ -1046,8 +1046,10 @@ Greatest common divisor
 
 .. function:: void fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
-    Computes the extended GCD of `(f, g)` such that the solution `(a, b)` is
-    the smallest solution.
+    Computes the extended GCD of `(f, g)` such that the solution `(a, b)`
+    are the canonical Bézout coefficients satisfying ` | a | \le | g / d | `
+    and `| b | \le | f / d | ` where `d = \gcd(f, g)`. Furthermore it will
+    often satisfy `| 2 a | \le | g / d | ` and `| 2 b | \le | f / d | `.
 
     Assumes that `d` is not aliased with `a` or `b` and that `a` and `b`
     are not aliased.
