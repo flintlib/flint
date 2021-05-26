@@ -10,6 +10,7 @@
 */
 
 #include <gmp.h>
+#include "flint.h"
 #include "fmpz.h"
 
 void
@@ -32,23 +33,96 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         return;
     }
 
-    _fmpz_promote(d);
-    _fmpz_promote(a);
-    _fmpz_promote(b);
 
     if (!COEFF_IS_MPZ(*f) && !COEFF_IS_MPZ(*g))  /* both are small */
     {
-        mpz_t mf, mg;
-        ulong tf = FLINT_ABS(*f);
-        ulong tg = FLINT_ABS(*g);
+        slong k, tmp;
+        ulong fn = FLINT_ABS(*f);
+        ulong gn = FLINT_ABS(*g);
 
-        mf->_mp_d = (mp_limb_t *) &tf;
-        mg->_mp_d = (mp_limb_t *) &tg;
-        mf->_mp_size  = fmpz_sgn(f);
-        mg->_mp_size  = fmpz_sgn(g);
+        _fmpz_demote(d);
+        _fmpz_demote(a);
+        _fmpz_demote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
-                   mf, mg);
+        if (fn == 0)
+        {
+            /* xgcd(0, g) = (|g|, 0, sgn(g)) */
+            *d = (slong) gn;
+            *a = 0;
+            *b = FLINT_SGN(*g);
+            return;
+        }
+        else if (gn == 0)
+        {
+            /* xgcd(f, 0) = (|f|, sgn(f), 0) */
+            *d = (slong) fn;
+            *a = FLINT_SGN(*f);
+            *b = 0;
+            return;
+        }
+        else if (fn == 1)
+        {
+            /* xgcd(±1, g) =
+             * (1, ±|sgn((g - 1)(g + 1))|, sgn(g)(sgn(g + 1) - sgn(g - 1))) */
+            slong gp = *g + 1;
+            slong gm = *g - 1;
+            *d = 1;
+            *a = FLINT_SGN(*f) * FLINT_ABS(FLINT_SGN(gp * gm));
+            *b = FLINT_SGN(*g) * (FLINT_SGN(gp) - FLINT_SGN(gm));
+            return;
+        }
+        else if (gn == 1)
+        {
+            /* xgcd(f, ±1) = (1, 0, ±1) */
+            *d = 1;
+            *a = 0;
+            *b = FLINT_SGN(*g);
+            return;
+        }
+        else if (gn == fn)
+        {
+            /* xgcd(±g, g) = (|g|, 0, sgn(g)) */
+            *d = gn;
+            *a = 0;
+            *b = FLINT_SGN(*g);
+            return;
+        }
+        else if (gn > fn)
+            *d = n_xgcd((ulong *) b, (ulong *) a, gn, fn);
+        else
+            *d = n_xgcd((ulong *) a, (ulong *) b, fn, gn);
+
+        /* We have a solution for +/-(a |f| - b |g|) = d where a, b > 0.
+         * Now we want to
+         * 0) make sure |f| =/= 2 d =/= |g|
+         * 1) solve a f + b g = d and
+         * 2) calculate the minimal solution */
+
+        *a *= (2 * (fn >= gn) - 1) * FLINT_SGN(*f);
+        *b *= (1 - 2 * (fn >= gn)) * FLINT_SGN(*g); /* we are done with (1) */
+        
+        if (fn == 2 * *d)
+        {
+            *b = FLINT_SGN(*g);
+            *a = (*d - *b * *g) / *f;
+            return;
+        }
+        else if (gn == 2 * *d)
+        {
+            *a = FLINT_SGN(*f);
+            *b = (*d - *a * *f) / *g;
+            return;
+        }
+
+        /* The k we want to use lie within d a / g +/- 1 / 2 */
+        tmp = *g / *d;
+        k = *a / tmp;
+        k += (FLINT_ABS(*a - (k + 1) * tmp) <= FLINT_ABS(tmp / 2));
+        k -= (FLINT_ABS(*a - (k - 1) * tmp) <= FLINT_ABS(tmp / 2));
+        *a -= k * tmp;
+        *b += k * (*f / *d);
+
+        return;
     }
     else if (!COEFF_IS_MPZ(*f))  /* only f is small */
     {
@@ -57,6 +131,10 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
         mf->_mp_d = (mp_limb_t *) &tf;
         mf->_mp_size  = fmpz_sgn(f);
+
+        _fmpz_promote(d);
+        _fmpz_promote(a);
+        _fmpz_promote(b);
 
         mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
                    mf, COEFF_TO_PTR(*g));
@@ -69,11 +147,19 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         mg->_mp_d = (mp_limb_t *) &tg;
         mg->_mp_size  = fmpz_sgn(g);
 
+        _fmpz_promote(d);
+        _fmpz_promote(a);
+        _fmpz_promote(b);
+
         mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
                    COEFF_TO_PTR(*f), mg);
     }
     else /* both are big */
     {
+        _fmpz_promote(d);
+        _fmpz_promote(a);
+        _fmpz_promote(b);
+
         mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
                    COEFF_TO_PTR(*f), COEFF_TO_PTR(*g));
     }
