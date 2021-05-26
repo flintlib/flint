@@ -69,6 +69,9 @@ ca_set_ext(ca_t res, ca_ext_srcptr ext, ca_ctx_t ctx)
 void
 ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
 {
+    slong p;
+    ulong q;
+
     switch (CA_EXT_HEAD(ext))
     {
         case CA_QQBar:
@@ -88,6 +91,19 @@ ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
                 _ca_make_field_element(res, field, ctx);
                 nf_elem_gen(CA_NF_ELEM(res), CA_FIELD_NF(field));
                 nf_elem_neg(CA_NF_ELEM(res), CA_NF_ELEM(res), CA_FIELD_NF(field));
+            }
+            else if (qqbar_is_root_of_unity(&p, &q, CA_EXT_QQBAR(ext)))
+            {
+                ca_field_srcptr field;
+                nf_struct * nf;
+
+                field = ca_ctx_get_field_qqbar(ctx, CA_EXT_QQBAR(ext));
+                nf = CA_FIELD_NF(field);
+
+                _ca_make_field_element(res, field, ctx);
+                nf_elem_gen(CA_NF_ELEM(res), CA_FIELD_NF(field));
+                nf_elem_pow(CA_NF_ELEM(res), CA_NF_ELEM(res), q - 1, nf);
+                ca_condense_field(res, ctx);
             }
             else
             {
@@ -243,6 +259,8 @@ ca_conj_deep(ca_t res, const ca_t x, ca_ctx_t ctx)
     else
     {
         ca_field_ptr K;
+        slong p;
+        ulong q;
 
         K = CA_FIELD(x, ctx);
 
@@ -256,6 +274,26 @@ ca_conj_deep(ca_t res, const ca_t x, ca_ctx_t ctx)
             {
                 ca_set(res, x, ctx);
                 nf_elem_conj_imag(CA_NF_ELEM(res), CA_NF_ELEM(res), CA_FIELD_NF(K));
+            }
+            else if (ca_is_cyclotomic_nf_elem(&p, &q, x, ctx))
+            {
+                nf_struct * nf;
+                fmpq_poly_t poly;
+
+                nf = CA_FIELD_NF(CA_FIELD(x, ctx));
+
+                fmpq_poly_init(poly);
+
+                nf_elem_get_fmpq_poly(poly, CA_NF_ELEM(x), nf);
+
+                ca_set(res, x, ctx);
+                nf_elem_gen(CA_NF_ELEM(res), nf);
+                nf_elem_pow(CA_NF_ELEM(res), CA_NF_ELEM(res), q - 1, nf);
+                ca_condense_field(res, ctx);
+
+                ca_fmpq_poly_evaluate(res, poly, res, ctx);
+
+                fmpq_poly_clear(poly);
             }
             else
             {

@@ -516,6 +516,23 @@ for predicates is 0 for false and 1 for true.
 
     Hashes the representation of *x*.
 
+.. function:: int ca_is_cyclotomic_nf_elem(slong * p, ulong * q, const ca_t x, ca_ctx_t ctx)
+
+    Returns 1 if *x* is represented as an element of a (univariate)
+    cyclotomic field, and 0 otherwise.
+    If *p* and *q* are not *NULL* and *x* is represented as an
+    element of a cyclotomic field, this also sets *p* and *q* to the
+    minimal integers with `0 \le p < q` such that the generating
+    root of unity is `e^{2 \pi i p / q}`.
+    Note that the answer 0 does not prove that *x* is not
+    a cyclotomic number,
+    and the order *q* is also not necessarily the generator of the
+    *smallest* cyclotomic field containing *x*.
+    For the purposes of this function, only nontrivial
+    cyclotomic fields count; the return value is 0 if *x*
+    is represented as a rational number.
+
+
 Value predicates
 -------------------------------------------------------------------------------
 

@@ -367,6 +367,9 @@ CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
     return CA_IS_UNKNOWN(x);
 }
 
+int
+ca_is_cyclotomic_nf_elem(slong * p, ulong * q, const ca_t x, ca_ctx_t ctx);
+
 /* Value predicates and comparisons */
 
 truth_t ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx);
