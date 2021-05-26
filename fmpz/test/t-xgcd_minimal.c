@@ -291,7 +291,7 @@ main(void)
     /* Test the switch (f, g) -> (g, f) is ok */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_t d1, d2, a1, a2, b1, b2, f, g, tmpa, tmpb;
+        fmpz_t d1, d2, a1, a2, b1, b2, f, g, tmp1, tmp2, tmp3, tmp4;
 
         fmpz_init(d1);
         fmpz_init(a1);
@@ -301,8 +301,10 @@ main(void)
         fmpz_init(b2);
         fmpz_init(f);
         fmpz_init(g);
-        fmpz_init(tmpa);
-        fmpz_init(tmpb);
+        fmpz_init(tmp1);
+        fmpz_init(tmp2);
+        fmpz_init(tmp3);
+        fmpz_init(tmp4);
 
         fmpz_randm(f, state, maxval);
         fmpz_randm(g, state, maxval);
@@ -314,12 +316,20 @@ main(void)
         fmpz_xgcd_minimal(d1, a1, b1, f, g);
         fmpz_xgcd_minimal(d2, b2, a2, g, f);
 
-        fmpz_divexact(tmpa, g, d1);
-        fmpz_divexact(tmpb, f, d1);
+        fmpz_divexact(tmp1, g, d1);
+        fmpz_divexact(tmp2, f, d1);
+        fmpz_set(tmp3, a1);
+        fmpz_mul(tmp3, tmp3, f);
+        fmpz_addmul(tmp3, b1, g);
+        fmpz_set(tmp4, a2);
+        fmpz_mul(tmp4, tmp4, f);
+        fmpz_addmul(tmp4, b2, g);
         result = (fmpz_equal(d1, d2)
                && (fmpz_is_zero(g) || fmpz_is_zero(f)
-               || (fmpz_cmpabs(a1, tmpa) <= 0 && fmpz_cmpabs(b1, tmpb) <= 0)
-               || (fmpz_cmpabs(a2, tmpa) <= 0 && fmpz_cmpabs(b2, tmpb) <= 0)));
+                 || (fmpz_cmpabs(a1, tmp1) <= 0 && fmpz_cmpabs(b1, tmp2) <= 0)
+                 || (fmpz_cmpabs(a2, tmp1) <= 0 && fmpz_cmpabs(b2, tmp2) <= 0))
+               && fmpz_equal(tmp3, d1)
+               && fmpz_equal(tmp4, d2));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -342,8 +352,10 @@ main(void)
         fmpz_clear(b2);
         fmpz_clear(f);
         fmpz_clear(g);
-        fmpz_init(tmpa);
-        fmpz_init(tmpb);
+        fmpz_init(tmp1);
+        fmpz_init(tmp2);
+        fmpz_init(tmp3);
+        fmpz_init(tmp4);
     }
 
 
