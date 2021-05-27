@@ -172,7 +172,7 @@ FLINT_DLL void nmod_mat_scalar_addmul_ui(nmod_mat_t dest,
                        const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
 
 
-# deprecated
+/* deprecated */
 #define nmod_mat_scalar_mul_add(dest, X, b, Y) nmod_mat_scalar_addmul_ui(dest, X, Y, b)
 
 NMOD_MAT_INLINE
