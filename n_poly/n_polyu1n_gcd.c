@@ -26,9 +26,9 @@ void n_polyu1n_mod_interp_reduce_2sm_poly(
     n_poly_zero(F);
     for (i = 0; i < A->length; i++)
     {
-        n_poly_mod_eval2_pow(&u, &v, A->terms[i].coeff, alphapow, ctx);
-        n_poly_set_coeff(E, A->terms[i].exp, u);
-        n_poly_set_coeff(F, A->terms[i].exp, v);
+        n_poly_mod_eval2_pow(&u, &v, A->coeffs + i, alphapow, ctx);
+        n_poly_set_coeff(E, A->exps[i], u);
+        n_poly_set_coeff(F, A->exps[i], v);
     }
 }
 
@@ -83,14 +83,14 @@ void n_polyu1n_mod_interp_lift_2sm_poly(
 
         FLINT_ASSERT(Fi < F->alloc);
 
-        F->terms[Fi].exp = e;
+        F->exps[Fi] = e;
 
         FLINT_ASSERT(u != 0 || v != 0);
-        n_poly_fit_length(F->terms[Fi].coeff, 2);
-        F->terms[Fi].coeff->coeffs[0] = u;
-        F->terms[Fi].coeff->coeffs[1] = v;
-        F->terms[Fi].coeff->length = 1 + (v != 0);
-        lastlen = FLINT_MAX(lastlen, F->terms[Fi].coeff->length);
+        n_poly_fit_length(F->coeffs + Fi, 2);
+        F->coeffs[Fi].coeffs[0] = u;
+        F->coeffs[Fi].coeffs[1] = v;
+        F->coeffs[Fi].length = 1 + (v != 0);
+        lastlen = FLINT_MAX(lastlen, F->coeffs[Fi].length);
         Fi++;
 
         if (e == Aexp)
@@ -163,9 +163,9 @@ int n_polyu1n_mod_interp_crt_2sm_poly(
         fexp = e = -WORD(1);
         if (Fi < Flen)
         {
-            fexp = e = F->terms[Fi].exp;
-            FLINT_ASSERT(!n_poly_is_zero(F->terms[Fi].coeff));
-            FLINT_ASSERT(n_poly_degree(F->terms[Fi].coeff) < n_poly_degree(modulus));
+            fexp = e = F->exps[Fi];
+            FLINT_ASSERT(!n_poly_is_zero(F->coeffs + Fi));
+            FLINT_ASSERT(n_poly_degree(F->coeffs + Fi) < n_poly_degree(modulus));
         }
         if (Aexp >= 0)
         {
@@ -180,7 +180,7 @@ int n_polyu1n_mod_interp_crt_2sm_poly(
 
         FLINT_ASSERT(e >= 0);
 
-        T->terms[Ti].exp = e;
+        T->exps[Ti] = e;
 
         Fvalue = zero;
         FvalueA = 0;
@@ -189,7 +189,7 @@ int n_polyu1n_mod_interp_crt_2sm_poly(
         if (Fi < Flen && e == fexp)
         {
             Finc = 1;
-            Fvalue = F->terms[Fi].coeff;
+            Fvalue = F->coeffs + Fi;
             n_poly_mod_eval2_pow(&FvalueA, &FvalueB, Fvalue, alphapow, ctx);
         }
 
@@ -207,10 +207,10 @@ int n_polyu1n_mod_interp_crt_2sm_poly(
         v = nmod_mul(v, alphapow->coeffs[1], ctx);
         v = nmod_neg(v, ctx);
         changed |= u != 0 || v != 0;
-        n_poly_mod_addmul_linear(T->terms[Ti].coeff, Fvalue, modulus, u, v, ctx);
+        n_poly_mod_addmul_linear(T->coeffs + Ti, Fvalue, modulus, u, v, ctx);
 
-        FLINT_ASSERT(T->terms[Ti].coeff->length > 0);
-        lastlen = FLINT_MAX(lastlen, T->terms[Ti].coeff->length);
+        FLINT_ASSERT(T->coeffs[Ti].length > 0);
+        lastlen = FLINT_MAX(lastlen, T->coeffs[Ti].length);
         Ti++;
 
         Fi += Finc;
@@ -260,10 +260,13 @@ int n_polyu1n_mod_gcd_brown_smprime(
 #if FLINT_WANT_ASSERT
     n_poly_t leadA, leadB;
 
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length > 0);
+
     n_poly_init(leadA);
     n_poly_init(leadB);
-    n_poly_set(leadA, A->terms[0].coeff);
-    n_poly_set(leadB, B->terms[0].coeff);
+    n_poly_set(leadA, A->coeffs + 0);
+    n_poly_set(leadB, B->coeffs + 0);
 #endif
 
     n_poly_stack_fit_request(St->poly_stack, 19);
@@ -299,7 +302,7 @@ int n_polyu1n_mod_gcd_brown_smprime(
     n_poly_mod_div(cAbar, cA, cG, ctx);
     n_poly_mod_div(cBbar, cB, cG, ctx);
 
-    n_poly_mod_gcd(gamma, A->terms[0].coeff, B->terms[0].coeff, ctx);
+    n_poly_mod_gcd(gamma, A->coeffs + 0, B->coeffs + 0, ctx);
 
     ldegA = n_polyun_lastdeg(A);
     ldegB = n_polyun_lastdeg(B);
@@ -346,21 +349,20 @@ choose_prime: /* primes are v - alpha, v + alpha */
     {
         slong Gdeg;
         n_polyu1n_mod_interp_reduce_2sm_poly(Gevalp, Gevalm, G, alphapow, ctx);
-        Gdeg = G->terms[0].exp;
+        Gdeg = G->exps[0];
         success = 1;
         success = success && n_poly_degree(Gevalp) == Gdeg;
         success = success && n_poly_degree(Gevalm) == Gdeg;
         success = success && Gevalp->coeffs[Gdeg] == gammaevalp;
         success = success && Gevalm->coeffs[Gdeg] == gammaevalm;
-        n_poly_mod_divrem(Abarevalp, r, Aevalp, Gevalp, ctx);
-        success = success && (r->length == 0);
-        n_poly_mod_divrem(Abarevalm, r, Aevalm, Gevalm, ctx);
-        success = success && (r->length == 0);
-        n_poly_mod_divrem(Bbarevalp, r, Bevalp, Gevalp, ctx);
-        success = success && (r->length == 0);
-        n_poly_mod_divrem(Bbarevalm, r, Bevalm, Gevalm, ctx);
-        success = success && (r->length == 0);
-
+        success = success && (n_poly_mod_divrem(Abarevalp, r,
+                                         Aevalp, Gevalp, ctx), r->length == 0);
+        success = success && (n_poly_mod_divrem(Abarevalm, r,
+                                         Aevalm, Gevalm, ctx), r->length == 0);
+        success = success && (n_poly_mod_divrem(Bbarevalp, r,
+                                         Bevalp, Gevalp, ctx), r->length == 0);
+        success = success && (n_poly_mod_divrem(Bbarevalm, r,
+                                         Bevalm, Gevalm, ctx), r->length == 0);
         if (!success)
         {
             use_stab = 0;
@@ -408,11 +410,11 @@ choose_prime: /* primes are v - alpha, v + alpha */
     if (n_poly_degree(modulus) > 0)
     {
         FLINT_ASSERT(G->length > 0);
-        if (n_poly_degree(Gevalp) > G->terms[0].exp)
+        if (n_poly_degree(Gevalp) > G->exps[0])
         {
             goto choose_prime;
         }
-        else if (n_poly_degree(Gevalp) < G->terms[0].exp)
+        else if (n_poly_degree(Gevalp) < G->exps[0])
         {
             n_poly_one(modulus);
         }
@@ -452,7 +454,7 @@ choose_prime: /* primes are v - alpha, v + alpha */
     FLINT_ASSERT(ldegBbar >= 0);
 
     if (deggamma + ldegA == ldegG + ldegAbar &&
-        deggamma + ldegB == ldegG + ldegBbar )
+        deggamma + ldegB == ldegG + ldegBbar)
     {
         goto successful;
     }
@@ -464,8 +466,8 @@ successful:
 
     n_polyun_content_last(modulus, G, ctx);
     n_polyun_divexact_last(G, modulus, ctx);
-    n_polyun_divexact_last(Abar, G->terms[0].coeff, ctx);
-    n_polyun_divexact_last(Bbar, G->terms[0].coeff, ctx);
+    n_polyun_divexact_last(Abar, G->coeffs + 0, ctx);
+    n_polyun_divexact_last(Bbar, G->coeffs + 0, ctx);
 
 successful_put_content:
 
@@ -480,10 +482,10 @@ cleanup:
 #if FLINT_WANT_ASSERT
     if (success)
     {
-        FLINT_ASSERT(1 == n_poly_lead(G->terms[0].coeff));
-        n_poly_mod_mul(modulus, G->terms[0].coeff, Abar->terms[0].coeff, ctx);
+        FLINT_ASSERT(1 == n_poly_lead(G->coeffs + 0));
+        n_poly_mod_mul(modulus, G->coeffs + 0, Abar->coeffs + 0, ctx);
         FLINT_ASSERT(n_poly_equal(modulus, leadA));
-        n_poly_mod_mul(modulus, G->terms[0].coeff, Bbar->terms[0].coeff, ctx);
+        n_poly_mod_mul(modulus, G->coeffs + 0, Bbar->coeffs + 0, ctx);
         FLINT_ASSERT(n_poly_equal(modulus, leadB));
     }
     n_poly_clear(leadA);

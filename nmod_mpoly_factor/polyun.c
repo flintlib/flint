@@ -34,22 +34,22 @@ void nmod_mpoly_get_polyu1n(
         Bexpx = ((B->exps + NB*j)[Boffx] >> Bshiftx) & mask;
         Bexpy = ((B->exps + NB*j)[Boffy] >> Bshifty) & mask;
 
-        if (Ai < 0 || A->terms[Ai].exp != Bexpx)
+        if (Ai < 0 || A->exps[Ai] != Bexpx)
         {
             Ai++;
             n_polyun_fit_length(A, Ai + 1);
-            A->terms[Ai].exp = Bexpx;
-            n_poly_zero(A->terms[Ai].coeff);
+            A->exps[Ai] = Bexpx;
+            n_poly_zero(A->coeffs + Ai);
         }
 
-        n_poly_set_coeff(A->terms[Ai].coeff, Bexpy, B->coeffs[j]);
-        if (n_poly_is_zero(A->terms[Ai].coeff))
+        n_poly_set_coeff(A->coeffs + Ai, Bexpy, B->coeffs[j]);
+        if (n_poly_is_zero(A->coeffs + Ai))
             Ai--;
     }
 
     A->length = Ai + 1;
 
-    FLINT_ASSERT(n_polyun_is_canonical(A));
+    FLINT_ASSERT(n_polyun_mod_is_canonical(A, ctx->mod));
 }
 
 void nmod_mpoly_set_polyu1n(
@@ -69,16 +69,16 @@ void nmod_mpoly_set_polyu1n(
     B->length = 0;
     for (i = 0; i < A->length; i++)
     {
-        for (j = A->terms[i].coeff->length - 1; j >= 0; j--)
+        for (j = A->coeffs[i].length - 1; j >= 0; j--)
         {
-            if (A->terms[i].coeff->coeffs[j] == 0)
+            if (A->coeffs[i].coeffs[j] == 0)
                 continue;
 
             nmod_mpoly_fit_length(B, B->length + 1, ctx);
             mpoly_monomial_zero(B->exps + N*B->length, N);
-            (B->exps + N*B->length)[Boffx] += A->terms[i].exp << Bshiftx;
+            (B->exps + N*B->length)[Boffx] += A->exps[i] << Bshiftx;
             (B->exps + N*B->length)[Boffy] += j << Bshifty;
-            B->coeffs[B->length] = A->terms[i].coeff->coeffs[j];
+            B->coeffs[B->length] = A->coeffs[i].coeffs[j];
             B->length++;
         }
     }

@@ -61,11 +61,10 @@ slong n_polyun_product_roots(
     M->length = H->length;
     for (i = 0; i < H->length; i++)
     {
-        slong len = H->terms[i].coeff->length;
-        M->terms[i].exp = H->terms[i].exp;
+        slong len = H->coeffs[i].length;
+        M->exps[i] = H->exps[i];
         max_length = FLINT_MAX(max_length, len);
-        n_poly_mod_product_roots_nmod_vec(M->terms[i].coeff,
-                                          H->terms[i].coeff->coeffs, len, ctx);
+        n_poly_mod_product_roots_nmod_vec(M->coeffs + i, H->coeffs[i].coeffs, len, ctx);
     }
 
     return max_length;
@@ -83,11 +82,10 @@ slong n_fq_polyun_product_roots(
     M->length = H->length;
     for (i = 0; i < H->length; i++)
     {
-        slong len = H->terms[i].coeff->length;
-        M->terms[i].exp = H->terms[i].exp;
+        slong len = H->coeffs[i].length;
+        M->exps[i] = H->exps[i];
         max_length = FLINT_MAX(max_length, len);
-        n_fq_poly_product_roots_n_fq(M->terms[i].coeff,
-                                      H->terms[i].coeff->coeffs, len, ctx, St);
+        n_fq_poly_product_roots_n_fq(M->coeffs + i, H->coeffs[i].coeffs, len, ctx, St);
     }
 
     return max_length;

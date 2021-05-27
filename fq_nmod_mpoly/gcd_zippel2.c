@@ -124,10 +124,10 @@ void _fq_nmod_mpoly_monomial_evals2_cache(
     e1 = (Aexps[N*Ai + off[1]] >> shift[1]) & mask;
     e01 = pack_exp2(e0, e1);
     n_polyun_fit_length(E, Ei + 1);
-    E->terms[Ei].exp = e01;
-    n_poly_fit_length(E->terms[Ei].coeff, d*1);
-    c = E->terms[Ei].coeff->coeffs + d*0;
-    E->terms[Ei].coeff->length = 1;
+    E->exps[Ei] = e01;
+    n_poly_fit_length(E->coeffs + Ei, d*1);
+    c = E->coeffs[Ei].coeffs + d*0;
+    E->coeffs[Ei].length = 1;
     Ei++;
     _n_fq_one(c, d);
     for (i = 2; i < m; i++)
@@ -143,20 +143,20 @@ void _fq_nmod_mpoly_monomial_evals2_cache(
         e0 = (Aexps[N*Ai + off[0]] >> shift[0]) & mask;
         e1 = (Aexps[N*Ai + off[1]] >> shift[1]) & mask;
         e01 = pack_exp2(e0, e1);
-        if (e01 == E->terms[Ei-1].exp)
+        if (e01 == E->exps[Ei - 1])
         {
-            slong len = E->terms[Ei-1].coeff->length;
-            n_poly_fit_length(E->terms[Ei-1].coeff, d*(len + 1));
-            c = E->terms[Ei-1].coeff->coeffs + d*len;
-            E->terms[Ei-1].coeff->length = len + 1;
+            slong len = E->coeffs[Ei - 1].length;
+            n_poly_fit_length(E->coeffs + Ei - 1, d*(len + 1));
+            c = E->coeffs[Ei - 1].coeffs + d*len;
+            E->coeffs[Ei - 1].length = len + 1;
         }
         else
         {
             n_polyun_fit_length(E, Ei + 1);
-            E->terms[Ei].exp = e01;
-            n_poly_fit_length(E->terms[Ei].coeff, d*1);
-            c = E->terms[Ei].coeff->coeffs + d*0;
-            E->terms[Ei].coeff->length = 1;
+            E->exps[Ei] = e01;
+            n_poly_fit_length(E->coeffs + Ei, d*1);
+            c = E->coeffs[Ei].coeffs + d*0;
+            E->coeffs[Ei].length = 1;
             Ei++;
         }
 
@@ -184,7 +184,7 @@ void _fq_nmod_mpoly_monomial_evals2_cache(
 #if FLINT_WANT_ASSERT
     Ai = 0;
     for (i = 0; i < E->length; i++)
-        Ai += E->terms[i].coeff->length;
+        Ai += E->coeffs[i].length;
     FLINT_ASSERT(Ai == Alen);
 #endif
 }
@@ -208,16 +208,15 @@ void n_fq_bpoly_eval_step_sep(
     Ai = 0;
     for (i = 0; i < cur->length; i++)
     {
-        slong this_len = cur->terms[i].coeff->length;
+        slong this_len = cur->coeffs[i].length;
 
-        _n_fq_zip_eval_step(c, cur->terms[i].coeff->coeffs,
-                                  inc->terms[i].coeff->coeffs,
+        _n_fq_zip_eval_step(c, cur->coeffs[i].coeffs, inc->coeffs[i].coeffs,
                                   A->coeffs + d*Ai, this_len, ctx);
 
         Ai += this_len;
 
-        e0 = extract_exp(cur->terms[i].exp, 1, 2);
-        e1 = extract_exp(cur->terms[i].exp, 0, 2);
+        e0 = extract_exp(cur->exps[i], 1, 2);
+        e1 = extract_exp(cur->exps[i], 0, 2);
         if (_n_fq_is_zero(c, d))
             continue;
 
@@ -259,16 +258,15 @@ static void n_fq_bpoly_evalp_step_sep(
     Ai = 0;
     for (i = 0; i < cur->length; i++)
     {
-        slong this_len = cur->terms[i].coeff->length;
+        slong this_len = cur->coeffs[i].length;
 
-        _n_fqp_zip_eval_step(c, cur->terms[i].coeff->coeffs,
-                                  inc->terms[i].coeff->coeffs,
+        _n_fqp_zip_eval_step(c, cur->coeffs[i].coeffs, inc->coeffs[i].coeffs,
                                   A->coeffs + d*Ai, this_len, d, ctx->mod);
 
         Ai += this_len;
 
-        e0 = extract_exp(cur->terms[i].exp, 1, 2);
-        e1 = extract_exp(cur->terms[i].exp, 0, 2);
+        e0 = extract_exp(cur->exps[i], 1, 2);
+        e1 = extract_exp(cur->exps[i], 0, 2);
         if (_n_fq_is_zero(c, d))
             continue;
 
@@ -376,17 +374,17 @@ int n_fq_polyun_zip_solve(
     Ai = 0;
     for (i = 0; i < H->length; i++)
     {
-        n = H->terms[i].coeff->length;
-        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
-        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
+        n = H->coeffs[i].length;
+        FLINT_ASSERT(M->coeffs[i].length == n + 1);
+        FLINT_ASSERT(Z->coeffs[i].length >= n);
         FLINT_ASSERT(Ai + n <= A->length);
 
         n_poly_fit_length(t, d*n);
 
         success = _n_fq_zip_vand_solve(A->coeffs + d*Ai,
-                         H->terms[i].coeff->coeffs, n,
-                         Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                         M->terms[i].coeff->coeffs, t->coeffs, ctx->fqctx);
+                         H->coeffs[i].coeffs, n,
+                         Z->coeffs[i].coeffs, Z->coeffs[i].length,
+                         M->coeffs[i].coeffs, t->coeffs, ctx->fqctx);
         if (success < 1)
         {
             n_poly_clear(t);
@@ -426,24 +424,24 @@ static int n_fq_polyun_zip_solvep(
     if (A->length*d > A->coeffs_alloc)
     {
         slong new_alloc = FLINT_MAX(A->coeffs_alloc + A->coeffs_alloc/2, A->length*d);
-        A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, new_alloc*sizeof(mp_limb_t));
+        A->coeffs = FLINT_ARRAY_REALLOC(A->coeffs, new_alloc, mp_limb_t);
         A->coeffs_alloc = new_alloc;
     }
 
     Ai = 0;
     for (i = 0; i < H->length; i++)
     {
-        n = H->terms[i].coeff->length;
-        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
-        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
+        n = H->coeffs[i].length;
+        FLINT_ASSERT(M->coeffs[i].length == n + 1);
+        FLINT_ASSERT(Z->coeffs[i].length >= n);
         FLINT_ASSERT(Ai + n <= A->length);
 
         n_poly_fit_length(t, n);
 
         success = _n_fqp_zip_vand_solve(A->coeffs + d*Ai,
-                         H->terms[i].coeff->coeffs, n,
-                         Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                         M->terms[i].coeff->coeffs, t->coeffs, ctx->fqctx);
+                         H->coeffs[i].coeffs, n,
+                         Z->coeffs[i].coeffs, Z->coeffs[i].length,
+                         M->coeffs[i].coeffs, t->coeffs, ctx->fqctx);
         if (success < 1)
         {
             n_poly_clear(t);
@@ -473,9 +471,9 @@ void n_fq_polyun_zip_start(
     Z->length = H->length;
     for (j = 0; j < H->length; j++)
     {
-        Z->terms[j].exp = H->terms[j].exp;
-        n_poly_fit_length(Z->terms[j].coeff, d*req_images);
-        Z->terms[j].coeff->length = 0;
+        Z->exps[j] = H->exps[j];
+        n_poly_fit_length(Z->coeffs + j, d*req_images);
+        Z->coeffs[j].length = 0;
     }
 }
 
@@ -488,7 +486,8 @@ int n_fq_polyu2n_add_zip_must_match(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i, Ai, ai;
-    n_polyun_term_struct * Zt = Z->terms;
+    n_poly_struct * Zcoeffs = Z->coeffs;
+    ulong * Zexps = Z->exps;
     const n_poly_struct * Acoeffs = A->coeffs;
 
     Ai = A->length - 1;
@@ -496,11 +495,11 @@ int n_fq_polyu2n_add_zip_must_match(
 
     for (i = 0; i < Z->length; i++)
     {
-        if (Ai >= 0 && Zt[i].exp == pack_exp2(Ai, ai))
+        if (Ai >= 0 && Zexps[i] == pack_exp2(Ai, ai))
         {
             /* Z present, A present */
-            _n_fq_set(Zt[i].coeff->coeffs + d*cur_length, Acoeffs[Ai].coeffs + d*ai, d);
-            Zt[i].coeff->length = cur_length + 1;
+            _n_fq_set(Zcoeffs[i].coeffs + d*cur_length, Acoeffs[Ai].coeffs + d*ai, d);
+            Zcoeffs[i].length = cur_length + 1;
             do {
                 ai--;
             } while (ai >= 0 && _n_fq_is_zero(Acoeffs[Ai].coeffs + d*ai, d));
@@ -513,11 +512,11 @@ int n_fq_polyu2n_add_zip_must_match(
                     ai = n_fq_poly_degree(Acoeffs + Ai);
             }
         }
-        else if (Ai < 0 || Zt[i].exp > pack_exp2(Ai, ai))
+        else if (Ai < 0 || Zexps[i] > pack_exp2(Ai, ai))
         {
             /* Z present, A missing */
-            _n_fq_zero(Zt[i].coeff->coeffs + d*cur_length, d);
-            Zt[i].coeff->length = cur_length + 1;
+            _n_fq_zero(Zcoeffs[i].coeffs + d*cur_length, d);
+            Zcoeffs[i].length = cur_length + 1;
         }
         else
         {

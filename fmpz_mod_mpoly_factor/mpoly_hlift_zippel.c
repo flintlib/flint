@@ -392,8 +392,8 @@ static void _clearit(
         _clearit(W, T, nodes[idx].right);
 
     FLINT_ASSERT(W->length < W->alloc);
-    W->terms[W->length].exp = nodes[idx].key;
-    W->terms[W->length].coeff[0] = ((n_poly_struct *) T->data)[idx];
+    W->exps[W->length] = nodes[idx].key;
+    W->coeffs[W->length] = ((n_poly_struct *) T->data)[idx];
     W->length++;
 
     if (nodes[idx].left >= 0)
@@ -467,7 +467,8 @@ static void fmpz_mod_mpoly_set_eval_helper3(
 
     FLINT_ASSERT(W->length > 0);
 
-    T->terms = FLINT_ARRAY_ALLOC(W->length, n_polyun_term_struct);
+    T->exps = FLINT_ARRAY_ALLOC(W->length, ulong);
+    T->coeffs = FLINT_ARRAY_ALLOC(W->length, n_poly_struct);
     T->alloc = W->length;
     T->length = 0;
     _clearit(T, W, W->nodes[2 - 1].left);
@@ -480,12 +481,12 @@ static void fmpz_mod_mpoly_set_eval_helper3(
 
     for (i = 0; i < T->length; i++)
     {
-        EHexps[i] = T->terms[i].exp;
-        n = T->terms[i].coeff->length;
+        EHexps[i] = T->exps[i];
+        n = T->coeffs[i].length;
         fmpz_mod_poly_fit_length(EHcoeffs + i, 3*n, ctx->ffinfo);
         EHcoeffs[i].length = n;
         p = EHcoeffs[i].coeffs;
-        ind = T->terms[i].coeff->coeffs;
+        ind = T->coeffs[i].coeffs;
 
         for (j = 0; j < n; j++)
         {
@@ -605,7 +606,8 @@ static slong fmpz_mod_mpoly_set_eval_helper_and_zip_form3(
 
         FLINT_ASSERT(W->length > 0);
 
-        T->terms = flint_malloc(W->length*sizeof(n_polyun_term_struct));
+        T->exps = FLINT_ARRAY_ALLOC(W->length, ulong);
+        T->coeffs = FLINT_ARRAY_ALLOC(W->length, n_poly_struct);
         T->alloc = W->length;
         T->length = 0;
         _clearit(T, W, W->nodes[2 - 1].left);
@@ -621,15 +623,15 @@ static slong fmpz_mod_mpoly_set_eval_helper_and_zip_form3(
 
     for (i = 0; i < T->length; i++)
     {
-        EHexps[i] = T->terms[i].exp;
+        EHexps[i] = T->exps[i];
         y = extract_exp(EHexps[i], 2, 3);
         x = extract_exp(EHexps[i], 1, 3);
         z = extract_exp(EHexps[i], 0, 3);
-        n = T->terms[i].coeff->length;
+        n = T->coeffs[i].length;
         fmpz_mod_poly_fit_length(EHcoeffs + i, 3*n, ctx->ffinfo);
         EHcoeffs[i].length = n;
         p = EHcoeffs[i].coeffs;
-        ind = T->terms[i].coeff->coeffs;
+        ind = T->coeffs[i].coeffs;
 
         for (j = 0; j < n; j++)
         {

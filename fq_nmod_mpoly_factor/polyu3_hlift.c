@@ -13,7 +13,7 @@
 
 
 #if FLINT_WANT_ASSERT
-static void fq_nmod_polyu_get_fq_nmod_polyun(
+static void n_fq_polyu_set_n_fq_polyun(
     n_polyu_t A,
     const n_polyun_t B,
     const fq_nmod_ctx_t ctx)
@@ -23,19 +23,19 @@ static void fq_nmod_polyu_get_fq_nmod_polyun(
     A->length = 0;
     for (i = 0; i < B->length; i++)
     {
-        for (j = B->terms[i].coeff->length - 1; j >= 0; j--)
+        for (j = B->coeffs[i].length - 1; j >= 0; j--)
         {
-            if (_n_fq_is_zero(B->terms[i].coeff->coeffs + d*j, d))
+            if (_n_fq_is_zero(B->coeffs[i].coeffs + d*j, d))
                 continue;
             n_polyu_fit_length(A, d*(A->length + 1));
-            _n_fq_set(A->coeffs + d*A->length, B->terms[i].coeff->coeffs + d*j, d);
-            A->exps[A->length] = B->terms[i].exp + j;
+            _n_fq_set(A->coeffs + d*A->length, B->coeffs[i].coeffs + d*j, d);
+            A->exps[A->length] = B->exps[i] + j;
             A->length++;
         }
     }
 }
 
-static void fq_nmod_polyu_sort_terms(
+static void n_fq_polyu_sort_terms(
     n_polyu_t A,
     const fq_nmod_ctx_t ctx)
 {
@@ -50,8 +50,8 @@ static void fq_nmod_polyu_sort_terms(
     return;
 }
 
-static void fq_nmod_polyu_combine_like_terms(
-    n_polyu_t A,
+static void n_fq_polyu_combine_like_terms(
+    n_fq_polyu_t A,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -87,7 +87,7 @@ static void fq_nmod_polyu_combine_like_terms(
     A->length = out;
 }
 
-static int fq_nmod_polyu_equal(
+static int n_fq_polyu_equal(
     n_polyu_t A,
     n_polyu_t B,
     const fq_nmod_ctx_t ctx)
@@ -129,8 +129,8 @@ static void fq_nmod_polyu_mul(
         Ai++;
     }
     A->length = Ai;
-    fq_nmod_polyu_sort_terms(A, ctx);
-    fq_nmod_polyu_combine_like_terms(A, ctx);
+    n_fq_polyu_sort_terms(A, ctx);
+    n_fq_polyu_combine_like_terms(A, ctx);
 }
 
 #endif
@@ -249,8 +249,8 @@ void fq_nmod_polyu3n_interp_lift_sm_bpoly(
             if (_n_fq_is_zero(Ac->coeffs + d*j, d))
                 continue;
             n_polyun_fit_length(T, Ti + 1);
-            T->terms[Ti].exp = pack_exp3(Ai, j, 0);
-            n_fq_poly_set_n_fq(T->terms[Ti].coeff, Ac->coeffs + d*j, ctx);
+            T->exps[Ti] = pack_exp3(Ai, j, 0);
+            n_fq_poly_set_n_fq(T->coeffs + Ti, Ac->coeffs + d*j, ctx);
             Ti++;
             lastlength = 1;
         }
@@ -282,9 +282,11 @@ int fq_nmod_polyu3n_interp_crt_sm_bpoly(
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     int changed = 0;
     slong lastlength = 0;
-    n_polyun_term_struct * Tterms;
+    n_poly_struct * Tcoeffs;
+    ulong * Texps;
     slong Ti;
-    n_polyun_term_struct * Fterms = F->terms;
+    n_poly_struct * Fcoeffs = F->coeffs;
+    ulong * Fexps = F->exps;
     slong Flen = F->length;
     slong Fi;
     const n_poly_struct * Acoeffs = A->coeffs;
@@ -295,7 +297,8 @@ int fq_nmod_polyu3n_interp_crt_sm_bpoly(
     FLINT_ASSERT(n_polyun_fq_is_canonical(F, ctx));
 
     n_polyun_fit_length(T, FLINT_MAX(Flen, A->length));
-    Tterms = T->terms;
+    Tcoeffs = T->coeffs;
+    Texps = T->exps;
 
     Ti = Fi = 0;
     Ai = A->length - 1;
@@ -308,29 +311,30 @@ int fq_nmod_polyu3n_interp_crt_sm_bpoly(
             slong extra = Flen - Fi;
             extra = FLINT_MAX(extra, Ai);
             n_polyun_fit_length(T, Ti + extra + 1);
-            Tterms = T->terms;
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
         }
 
-        FLINT_ASSERT(Fi >= Flen || Fterms[Fi].coeff->length > 0);
+        FLINT_ASSERT(Fi >= Flen || Fcoeffs[Fi].length > 0);
         FLINT_ASSERT(Ai < 0 || !_n_fq_is_zero(Acoeffs[Ai].coeffs + d*ai, d));
 
-        if (Fi < Flen && Ai >= 0 && Fterms[Fi].exp == pack_exp3(Ai, ai, 0))
+        if (Fi < Flen && Ai >= 0 && Fexps[Fi] == pack_exp3(Ai, ai, 0))
         {
             /* F term ok, A term ok */
-            n_fq_poly_eval_pow(v, Fterms[Fi].coeff, alphapow, ctx);
+            n_fq_poly_eval_pow(v, Fcoeffs + Fi, alphapow, ctx);
             _n_fq_sub(v, Acoeffs[Ai].coeffs + d*ai, v, d, mod);
             if (!_n_fq_is_zero(v, d))
             {
                 changed = 1;
-                n_fq_poly_scalar_addmul_n_fq(Tterms[Ti].coeff,
-                                            Fterms[Fi].coeff, modulus, v, ctx);
+                n_fq_poly_scalar_addmul_n_fq(Tcoeffs + Ti,
+                                                Fcoeffs + Fi, modulus, v, ctx);
             }
             else
             {
-                n_fq_poly_set(Tterms[Ti].coeff, Fterms[Fi].coeff, ctx);
+                n_fq_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, ctx);
             }
 
-            Tterms[Ti].exp = Fterms[Fi].exp;
+            Texps[Ti] = Fexps[Fi];
 
             Fi++;
 
@@ -346,35 +350,36 @@ int fq_nmod_polyu3n_interp_crt_sm_bpoly(
                     ai = n_poly_degree(Acoeffs + Ai);
             }
         }
-        else if (Fi < Flen && (Ai < 0 || Fterms[Fi].exp > pack_exp3(Ai, ai, 0)))
+        else if (Fi < Flen && (Ai < 0 || Fexps[Fi] > pack_exp3(Ai, ai, 0)))
         {
             /* F term ok, A term missing */
 
-            n_fq_poly_eval_pow(v, Fterms[Fi].coeff, alphapow, ctx);
+            n_fq_poly_eval_pow(v, Fcoeffs + Fi, alphapow, ctx);
             if (!_n_fq_is_zero(v, d))
             {
                 changed = 1;
                 _n_fq_neg(v, v, d, ctx->mod);
-                n_fq_poly_scalar_addmul_n_fq(Tterms[Ti].coeff,
-                                            Fterms[Fi].coeff, modulus, v, ctx);
+                n_fq_poly_scalar_addmul_n_fq(Tcoeffs + Ti,
+                                                Fcoeffs + Fi, modulus, v, ctx);
             }
             else
             {
-                n_fq_poly_set(Tterms[Ti].coeff, Fterms[Fi].coeff, ctx);
+                n_fq_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, ctx);
             }
 
-            Tterms[Ti].exp = Fterms[Fi].exp;
+            Texps[Ti] = Fexps[Fi];
 
             Fi++;
         }
         else
         {
-            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fterms[Fi].exp < pack_exp3(Ai, ai, 0)));
+            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fexps[Fi] < pack_exp3(Ai, ai, 0)));
             /* F term missing, Aterm ok */
 
+            Texps[Ti] = pack_exp3(Ai, ai, 0);
+
             changed = 1;
-            n_fq_poly_scalar_mul_n_fq(Tterms[Ti].coeff, modulus, Acoeffs[Ai].coeffs + d*ai, ctx);
-            Tterms[Ti].exp = pack_exp3(Ai, ai, 0);
+            n_fq_poly_scalar_mul_n_fq(Tcoeffs + Ti, modulus, Acoeffs[Ai].coeffs + d*ai, ctx);
 
             do {
                 ai--;
@@ -389,8 +394,8 @@ int fq_nmod_polyu3n_interp_crt_sm_bpoly(
             }
         }
 
-        FLINT_ASSERT(!n_poly_is_zero(Tterms[Ti].coeff));
-        lastlength = FLINT_MAX(lastlength, Tterms[Ti].coeff->length);
+        FLINT_ASSERT(!n_poly_is_zero(Tcoeffs + Ti));
+        lastlength = FLINT_MAX(lastlength, Tcoeffs[Ti].length);
         Ti++;
     }
     T->length = Ti;
@@ -548,16 +553,16 @@ cleanup:
         n_polyu_init(T1);
         n_polyu_init(T2);
         n_polyu_init(T3);
-        fq_nmod_polyu_get_fq_nmod_polyun(T2, BB + 0, ctx);
-        fq_nmod_polyu_get_fq_nmod_polyun(T3, BB + 1, ctx);
+        n_fq_polyu_set_n_fq_polyun(T2, BB + 0, ctx);
+        n_fq_polyu_set_n_fq_polyun(T3, BB + 1, ctx);
         fq_nmod_polyu_mul(T1, T2, T3, ctx);
         for (i = 2; i < r; i++)
         {
-            fq_nmod_polyu_get_fq_nmod_polyun(T3, BB + i, ctx);
+            n_fq_polyu_set_n_fq_polyun(T3, BB + i, ctx);
             fq_nmod_polyu_mul(T2, T1, T3, ctx);
             n_polyu_swap(T2, T1);
         }
-        FLINT_ASSERT(fq_nmod_polyu_equal(A, T1, ctx));
+        FLINT_ASSERT(n_fq_polyu_equal(A, T1, ctx));
         n_polyu_clear(T1);
         n_polyu_clear(T2);
         n_polyu_clear(T3);

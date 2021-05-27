@@ -21,7 +21,6 @@ static void nmod_mpoly_get_eval_helper2(
 {
     slong start, Ai, j, k, n;
     slong e0, e1, EHi;
-    n_polyun_term_struct * EHterms;
     mp_limb_t * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
@@ -67,11 +66,10 @@ static void nmod_mpoly_get_eval_helper2(
         n = Ai - start;
 
         n_polyun_fit_length(EH, EHi + 1);
-        EHterms = EH->terms;
-        EHterms[EHi].exp = pack_exp2(e0, e1);
-        n_poly_fit_length(EHterms[EHi].coeff, 2*n);
-        EHterms[EHi].coeff->length = n;
-        p = EHterms[EHi].coeff->coeffs;
+        EH->exps[EHi] = pack_exp2(e0, e1);
+        n_poly_fit_length(EH->coeffs + EHi, 2*n);
+        EH->coeffs[EHi].length = n;
+        p = EH->coeffs[EHi].coeffs;
         EHi++;
 
         for (j = 0; j < n; j++)
@@ -109,7 +107,6 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
 {
     slong start, Bi, j, k, n;
     slong e0, e1, Hi, EHi;
-    n_polyun_term_struct * EHterms, * Hterms, * Mterms;
     mp_limb_t * p;
     slong zip_length = 0;
     flint_bitcnt_t bits = B->bits;
@@ -160,11 +157,10 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
         n = Bi - start;
 
         n_polyun_fit_length(EH, EHi + 1);
-        EHterms = EH->terms;
-        EHterms[EHi].exp = pack_exp2(e0, e1);
-        n_poly_fit_length(EHterms[EHi].coeff, 2*n);
-        EHterms[EHi].coeff->length = n;
-        p = EHterms[EHi].coeff->coeffs;
+        EH->exps[EHi] = pack_exp2(e0, e1);
+        n_poly_fit_length(EH->coeffs + EHi, 2*n);
+        EH->coeffs[EHi].length = n;
+        p = EH->coeffs[EHi].coeffs;
         EHi++;
 
         for (j = 0; j < n; j++)
@@ -189,15 +185,13 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
         {
             n_polyun_fit_length(H, Hi + 1);
             n_polyun_fit_length(M, Hi + 1);
-            Hterms = H->terms;
-            Mterms = M->terms;
-            Hterms[Hi].exp = pack_exp2(e0, e1);
-            Mterms[Hi].exp = pack_exp2(e0, e1);
-            n_poly_fit_length(Hterms[Hi].coeff, n);
+            H->exps[Hi] = pack_exp2(e0, e1);
+            M->exps[Hi] = pack_exp2(e0, e1);
+            n_poly_fit_length(H->coeffs + Hi, n);
             zip_length = FLINT_MAX(zip_length, n);
-            Hterms[Hi].coeff->length = n;
-            flint_mpn_copyi(Hterms[Hi].coeff->coeffs, p, n);
-            n_poly_mod_product_roots_nmod_vec(Mterms[Hi].coeff, p, n, ctx->mod);
+            H->coeffs[Hi].length = n;
+            flint_mpn_copyi(H->coeffs[Hi].coeffs, p, n);
+            n_poly_mod_product_roots_nmod_vec(M->coeffs + Hi, p, n, ctx->mod);
             Hi++;
         }
     }
@@ -255,9 +249,9 @@ static int _fmpz_mpoly_modpk_update_zip(
 
     for (i = 0; i < Z->length; i++)
     {
-        n = H->terms[i].coeff->length;
-        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
-        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
+        n = H->coeffs[i].length;
+        FLINT_ASSERT(M->coeffs[i].length == n + 1);
+        FLINT_ASSERT(Z->coeffs[i].length >= n);
 
         n_poly_fit_length(c, n);
         n_poly_fit_length(t, n);
@@ -265,9 +259,9 @@ static int _fmpz_mpoly_modpk_update_zip(
         ccoeffs = c->coeffs;
 
         success = _nmod_zip_vand_solve(c->coeffs,
-                      H->terms[i].coeff->coeffs, n,
-                      Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                      M->terms[i].coeff->coeffs, t->coeffs, ctxp->mod);
+                              H->coeffs[i].coeffs, n,
+                              Z->coeffs[i].coeffs, Z->coeffs[i].length,
+                              M->coeffs[i].coeffs, t->coeffs, ctxp->mod);
         if (success < 1)
         {
             n_poly_clear(t);
@@ -385,7 +379,7 @@ static void n_polyun_eval_reset(n_polyun_t A)
 {
     slong Ai;
     for (Ai = 0; Ai < A->length; Ai++)
-        n_poly_eval_reset(A->terms[Ai].coeff);
+        n_poly_eval_reset(A->coeffs + Ai);
 }
 
 
@@ -399,7 +393,6 @@ static void n_bpoly_mod_eval_step(
     mp_limb_t * p;
     mp_limb_t c;
     ulong e0, e1;
-    n_polyun_term_struct * EHterms = EH->terms;
     slong EHlen = EH->length;
 
     Ai = 0;
@@ -407,15 +400,15 @@ static void n_bpoly_mod_eval_step(
     n_bpoly_zero(E);
     for (i = 0; i < EHlen; i++)
     {
-        n = EHterms[i].coeff->length;
-        p = EHterms[i].coeff->coeffs;
-        FLINT_ASSERT(EHterms[i].coeff->alloc >= 2*n);
+        n = EH->coeffs[i].length;
+        p = EH->coeffs[i].coeffs;
+        FLINT_ASSERT(EH->coeffs[i].alloc >= 2*n);
         FLINT_ASSERT(Ai + n <= A->length);
 
         c = _nmod_zip_eval_step(p + 0*n, p + 1*n, A->coeffs + Ai, n, ctx);
         Ai += n;
-        e0 = extract_exp(EHterms[i].exp, 1, 2);
-        e1 = extract_exp(EHterms[i].exp, 0, 2);
+        e0 = extract_exp(EH->exps[i], 1, 2);
+        e1 = extract_exp(EH->exps[i], 0, 2);
         if (c == 0)
             continue;
         n_bpoly_set_coeff_nonzero(E, e0, e1, c);
@@ -528,9 +521,9 @@ static int fmpz_mfactor_lift_prime_power_zippel(
         Z[i].length = H[i].length;
         for (j = 0; j < H[i].length; j++)
         {
-            Z[i].terms[j].exp = H[i].terms[j].exp;
-            n_poly_fit_length(Z[i].terms[j].coeff, req_zip_images);
-            Z[i].terms[j].coeff->length = 0;
+            Z[i].exps[j] = H[i].exps[j];
+            n_poly_fit_length(Z[i].coeffs + j, req_zip_images);
+            Z[i].coeffs[j].length = 0;
         }
     }
 

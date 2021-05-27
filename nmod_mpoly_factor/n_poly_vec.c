@@ -73,6 +73,6 @@ void n_polyun_mod_content(n_poly_t c, const n_polyun_t A, nmod_t ctx)
 
     n_poly_zero(c);
     for (i = 0; i < A->length; i++)
-        n_poly_mod_gcd(c, c, A->terms[i].coeff, ctx);
+        n_poly_mod_gcd(c, c, A->coeffs + i, ctx);
 }
 

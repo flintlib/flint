@@ -14,19 +14,20 @@
 
 #if FLINT_WANT_ASSERT
 
-static void n_polyu_get_n_polyun(n_polyu_t A, const n_polyun_t B)
+/* take last variable out of dense storage */
+static void n_polyu_set_n_polyun(n_polyu_t A, const n_polyun_t B)
 {
     slong i, j;
     A->length = 0;
     for (i = 0; i < B->length; i++)
     {
-        for (j = B->terms[i].coeff->length - 1; j >= 0; j--)
+        for (j = B->coeffs[i].length - 1; j >= 0; j--)
         {
-            if (B->terms[i].coeff->coeffs[j] == 0)
+            if (B->coeffs[i].coeffs[j] == 0)
                 continue;
             n_polyu_fit_length(A, A->length + 1);
-            A->coeffs[A->length] = B->terms[i].coeff->coeffs[j];
-            A->exps[A->length] = B->terms[i].exp + j;
+            A->coeffs[A->length] = B->coeffs[i].coeffs[j];
+            A->exps[A->length] = B->exps[i] + j;
             A->length++;
         }
     }
@@ -253,7 +254,8 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
     nmod_t mod)
 {
     slong lastlength = 0;
-    n_polyun_term_struct * Tterms;
+    n_poly_struct * Tcoeffs;
+    ulong * Texps;
     slong Ti;
     n_poly_struct * Acoeffs = A->coeffs;
     slong Ai, ai;
@@ -268,7 +270,8 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
     d1 = nmod_inv(nmod_add(alpha, alpha, mod), mod);
 
     n_polyun_fit_length(T, FLINT_MAX(A->length, B->length));
-    Tterms = T->terms;
+    Tcoeffs = T->coeffs;
+    Texps = T->exps;
 
     Ti = 0;
     Ai = A->length - 1;
@@ -281,7 +284,8 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
         if (Ti >= T->alloc)
         {
             n_polyun_fit_length(T, Ti + FLINT_MAX(Ai, Bi) + 1);
-            Tterms = T->terms;
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
         }
 
         FLINT_ASSERT(Ai < 0 || Acoeffs[Ai].coeffs[ai] != 0);
@@ -291,7 +295,7 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
         if (Ai >= 0)
         {
             Avalue = Acoeffs[Ai].coeffs[ai];
-            Tterms[Ti].exp = pack_exp3(Ai, ai, 0);
+            Texps[Ti] = pack_exp3(Ai, ai, 0);
         }
 
         Bvalue = 0;
@@ -301,18 +305,18 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
             if (Avalue == 0)
             {
                 Bvalue = Bcoeffs[Bi].coeffs[bi];
-                Tterms[Ti].exp = Bexp;
+                Texps[Ti] = Bexp;
             }
             else
             {
-                if (Tterms[Ti].exp <= Bexp)
+                if (Texps[Ti] <= Bexp)
                 {
                     Bvalue = Bcoeffs[Bi].coeffs[bi];
                 }
-                if (Tterms[Ti].exp < Bexp)
+                if (Texps[Ti] < Bexp)
                 {
                     Avalue = 0;
-                    Tterms[Ti].exp = Bexp;
+                    Texps[Ti] = Bexp;
                 }
             }
         }
@@ -324,11 +328,11 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
 
         FLINT_ASSERT(u != 0 || v != 0);
 
-        n_poly_fit_length(Tterms[Ti].coeff, 2);
-        Tterms[Ti].coeff->coeffs[0] = v;
-        Tterms[Ti].coeff->coeffs[1] = u;
-        Tterms[Ti].coeff->length = 1 + (u != 0);
-        lastlength = FLINT_MAX(lastlength, Tterms[Ti].coeff->length);
+        n_poly_fit_length(Tcoeffs + Ti, 2);
+        Tcoeffs[Ti].coeffs[0] = v;
+        Tcoeffs[Ti].coeffs[1] = u;
+        Tcoeffs[Ti].length = 1 + (u != 0);
+        lastlength = FLINT_MAX(lastlength, Tcoeffs[Ti].length);
         Ti++;
 
         if (Avalue != 0)
@@ -383,9 +387,11 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
     int changed = 0;
     slong lastlength = 0;
     n_poly_t zero;
-    n_polyun_term_struct * Tterms;
+    n_poly_struct * Tcoeffs;
+    ulong * Texps;
     slong Ti;
-    n_polyun_term_struct * Fterms = F->terms;
+    n_poly_struct * Fcoeffs = F->coeffs;
+    ulong * Fexps = F->exps;
     slong Flen = F->length;
     slong Fi;
     n_poly_struct * Acoeffs = A->coeffs;
@@ -413,7 +419,8 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
     FLINT_ASSERT(n_polyun_mod_is_canonical(F, mod));
 
     n_polyun_fit_length(T, FLINT_MAX(Flen, A->length));
-    Tterms = T->terms;
+    Tcoeffs = T->coeffs;
+    Texps = T->exps;
 
     zero->alloc = 0;
     zero->length = 0;
@@ -433,10 +440,11 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
             extra = FLINT_MAX(extra, Ai);
             extra = FLINT_MAX(extra, Bi);
             n_polyun_fit_length(T, Ti + extra + 1);
-            Tterms = T->terms;
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
         }
 
-        FLINT_ASSERT(Fi >= Flen || Fterms[Fi].coeff->length > 0);
+        FLINT_ASSERT(Fi >= Flen || Fcoeffs[Fi].length > 0);
         FLINT_ASSERT(Ai < 0 || Acoeffs[Ai].coeffs[ai] != 0);
         FLINT_ASSERT(Bi < 0 || Bcoeffs[Bi].coeffs[bi] != 0);
 
@@ -444,9 +452,9 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
         texp_set = 0;
         if (Fi < Flen)
         {
-            Fvalue = Fterms[Fi].coeff;
+            Fvalue = Fcoeffs + Fi;
             texp_set = 1;
-            Tterms[Ti].exp = Fterms[Fi].exp;
+            Texps[Ti] = Fexps[Fi];
         }
 
         Avalue = 0;
@@ -454,8 +462,8 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
         {
             ulong Aexp = pack_exp3(Ai, ai, 0);
             cmp = (!texp_set) ? -1 :
-                  Tterms[Ti].exp < Aexp ? -1 :
-                  Tterms[Ti].exp > Aexp ? 1 : 0;
+                  Texps[Ti] < Aexp ? -1 :
+                  Texps[Ti] > Aexp ? 1 : 0;
             if (cmp <= 0)
             {
                 Avalue = Acoeffs[Ai].coeffs[ai];
@@ -464,7 +472,7 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
             {
                 Fvalue = zero;
                 texp_set = 1;
-                Tterms[Ti].exp = Aexp;
+                Texps[Ti] = Aexp;
             }
         }
 
@@ -473,8 +481,8 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
         {
             ulong Bexp = pack_exp3(Bi, bi, 0);
             cmp = (!texp_set) ? -1 :
-                  Tterms[Ti].exp < Bexp ? -1 :
-                  Tterms[Ti].exp > Bexp ? 1 : 0;
+                  Texps[Ti] < Bexp ? -1 :
+                  Texps[Ti] > Bexp ? 1 : 0;
             if (cmp <= 0)
             {
                 Bvalue = Bcoeffs[Bi].coeffs[bi];
@@ -484,7 +492,7 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
                 Fvalue = zero;
                 Avalue = 0;
                 texp_set = 1;
-                Tterms[Ti].exp = Bexp;
+                Texps[Ti] = Bexp;
             }
         }
 
@@ -498,16 +506,15 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
         if (u != 0 || v != 0)
         {
             changed = 1;
-            n_poly_mod_addmul_linear(Tterms[Ti].coeff, Fvalue, modulus,
-                                                               u, v, mod);
+            n_poly_mod_addmul_linear(Tcoeffs + Ti, Fvalue, modulus, u, v, mod);
         }
         else
         {
             FLINT_ASSERT(!n_poly_is_zero(Fvalue));
-            n_poly_set(Tterms[Ti].coeff, Fvalue);
+            n_poly_set(Tcoeffs + Ti, Fvalue);
         }
 
-        FLINT_ASSERT(Tterms[Ti].coeff->length >= Fvalue->length);
+        FLINT_ASSERT(Tcoeffs[Ti].length >= Fvalue->length);
 
         Fi += (Fvalue != zero);
         if (Avalue != 0)
@@ -539,8 +546,8 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
             }
         }
 
-        FLINT_ASSERT(!n_poly_is_zero(Tterms[Ti].coeff));
-        lastlength = FLINT_MAX(lastlength, Tterms[Ti].coeff->length);
+        FLINT_ASSERT(!n_poly_is_zero(Tcoeffs + Ti));
+        lastlength = FLINT_MAX(lastlength, Tcoeffs[Ti].length);
         Ti++;
     }
     T->length = Ti;
@@ -709,8 +716,8 @@ cleanup:
         n_polyu_init(T1);
         n_polyu_init(T2);
         n_polyu_init(T3);
-        n_polyu_get_n_polyun(T2, BB0);
-        n_polyu_get_n_polyun(T3, BB1);
+        n_polyu_set_n_polyun(T2, BB0);
+        n_polyu_set_n_polyun(T3, BB1);
         n_polyu_mod_mul(T1, T2, T3, ctx);
         FLINT_ASSERT(n_polyu_equal(A, T1));
         n_polyu_clear(T1);
@@ -902,12 +909,12 @@ cleanup:
         n_polyu_init(T1);
         n_polyu_init(T2);
         n_polyu_init(T3);
-        n_polyu_get_n_polyun(T2, BB + 0);
-        n_polyu_get_n_polyun(T3, BB + 1);
+        n_polyu_set_n_polyun(T2, BB + 0);
+        n_polyu_set_n_polyun(T3, BB + 1);
         n_polyu_mod_mul(T1, T2, T3, ctx);
         for (i = 2; i < r; i++)
         {
-            n_polyu_get_n_polyun(T3, BB + i);
+            n_polyu_set_n_polyun(T3, BB + i);
             n_polyu_mod_mul(T2, T1, T3, ctx);
             n_polyu_swap(T2, T1);
         }

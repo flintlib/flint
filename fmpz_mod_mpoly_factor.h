@@ -199,12 +199,6 @@ typedef fmpz_mod_tpoly_struct fmpz_mod_tpoly_t[1];
 
 typedef struct
 {
-    ulong exp;
-    fmpz_t coeff;
-} fmpz_mod_polyu_term_struct;
-
-typedef struct
-{
     ulong * exps;
     fmpz * coeffs;
     slong length;

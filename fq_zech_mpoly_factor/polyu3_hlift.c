@@ -13,7 +13,7 @@
 
 
 #if FLINT_WANT_ASSERT
-static void fq_zech_polyu_get_fq_zech_polyun(
+static void fq_zech_polyu_set_fq_zech_polyun(
     fq_zech_polyu_t A,
     const fq_zech_polyun_t B,
     const fq_zech_ctx_t ctx)
@@ -22,13 +22,13 @@ static void fq_zech_polyu_get_fq_zech_polyun(
     A->length = 0;
     for (i = 0; i < B->length; i++)
     {
-        for (j = B->terms[i].coeff->length - 1; j >= 0; j--)
+        for (j = B->coeffs[i].length - 1; j >= 0; j--)
         {
-            if (fq_zech_is_zero(B->terms[i].coeff->coeffs + j, ctx))
+            if (fq_zech_is_zero(B->coeffs[i].coeffs + j, ctx))
                 continue;
             fq_zech_polyu_fit_length(A, A->length + 1, ctx);
-            fq_zech_set(A->coeffs + A->length, B->terms[i].coeff->coeffs + j, ctx);
-            A->exps[A->length] = B->terms[i].exp + j;
+            fq_zech_set(A->coeffs + A->length, B->coeffs[i].coeffs + j, ctx);
+            A->exps[A->length] = B->exps[i] + j;
             A->length++;
         }
     }
@@ -222,8 +222,8 @@ void fq_zech_polyu3n_interp_lift_sm_bpoly(
             if (fq_zech_is_zero(Ac->coeffs + j, ctx))
                 continue;
             fq_zech_polyun_fit_length(T, Ti + 1, ctx);
-            T->terms[Ti].exp = pack_exp3(Ai, j, 0);
-            fq_zech_poly_set_fq_zech(T->terms[Ti].coeff, Ac->coeffs + j, ctx);
+            T->exps[Ti] = pack_exp3(Ai, j, 0);
+            fq_zech_poly_set_fq_zech(T->coeffs + Ti, Ac->coeffs + j, ctx);
             Ti++;
             lastlength = 1;
         }
@@ -249,9 +249,11 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
 {
     int changed = 0;
     slong lastlength = 0;
-    fq_zech_polyun_term_struct * Tterms;
+    fq_zech_poly_struct * Tcoeffs;
+    ulong * Texps;
     slong Ti;
-    fq_zech_polyun_term_struct * Fterms = F->terms;
+    fq_zech_poly_struct * Fcoeffs = F->coeffs;
+    ulong * Fexps = F->exps;
     slong Flen = F->length;
     slong Fi;
     const fq_zech_poly_struct * Acoeffs = A->coeffs;
@@ -266,7 +268,8 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
     FLINT_ASSERT(fq_zech_polyun_is_canonical(F, ctx));
 
     fq_zech_polyun_fit_length(T, FLINT_MAX(Flen, A->length), ctx);
-    Tterms = T->terms;
+    Tcoeffs = T->coeffs;
+    Texps = T->exps;
 
     Ti = Fi = 0;
     Ai = A->length - 1;
@@ -279,28 +282,29 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
             slong extra = Flen - Fi;
             extra = FLINT_MAX(extra, Ai);
             fq_zech_polyun_fit_length(T, Ti + extra + 1, ctx);
-            Tterms = T->terms;
+            Tcoeffs = T->coeffs;
+            Texps = T->exps;
         }
 
-        FLINT_ASSERT(Fi >= Flen || Fterms[Fi].coeff->length > 0);
+        FLINT_ASSERT(Fi >= Flen || Fcoeffs[Fi].length > 0);
         FLINT_ASSERT(Ai < 0 || !fq_zech_is_zero(Acoeffs[Ai].coeffs + ai, ctx));
 
-        if (Fi < Flen && Ai >= 0 && Fterms[Fi].exp == pack_exp3(Ai, ai, 0))
+        if (Fi < Flen && Ai >= 0 && Fexps[Fi] == pack_exp3(Ai, ai, 0))
         {
             /* F term ok, A term ok */
-            fq_zech_poly_evaluate_fq_zech(v, Fterms[Fi].coeff, alpha, ctx);
+            fq_zech_poly_evaluate_fq_zech(v, Fcoeffs + Fi, alpha, ctx);
             fq_zech_sub(v, Acoeffs[Ai].coeffs + ai, v, ctx);
             if (!fq_zech_is_zero(v, ctx))
             {
                 changed = 1;
                 fq_zech_poly_scalar_mul_fq_zech(tp, modulus, v, ctx);
-                fq_zech_poly_add(Tterms[Ti].coeff, Fterms[Fi].coeff, tp, ctx);
+                fq_zech_poly_add(Tcoeffs + Ti, Fcoeffs + Fi, tp, ctx);
             }
             else
             {
-                fq_zech_poly_set(Tterms[Ti].coeff, Fterms[Fi].coeff, ctx);
+                fq_zech_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, ctx);
             }
-            Tterms[Ti].exp = Fterms[Fi].exp;
+            Texps[Ti] = Fexps[Fi];
 
             Fi++;
 
@@ -316,32 +320,32 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
                     ai = fq_zech_poly_degree(Acoeffs + Ai, ctx);
             }
         }
-        else if (Fi < Flen && (Ai < 0 || Fterms[Fi].exp > pack_exp3(Ai, ai, 0)))
+        else if (Fi < Flen && (Ai < 0 || Fexps[Fi] > pack_exp3(Ai, ai, 0)))
         {
             /* F term ok, A term missing */
-            fq_zech_poly_evaluate_fq_zech(v, Fterms[Fi].coeff, alpha, ctx);
+            fq_zech_poly_evaluate_fq_zech(v, Fcoeffs + Fi, alpha, ctx);
             if (!fq_zech_is_zero(v, ctx))
             {
                 changed = 1;
                 fq_zech_poly_scalar_mul_fq_zech(tp, modulus, v, ctx);
-                fq_zech_poly_sub(Tterms[Ti].coeff, Fterms[Fi].coeff, tp, ctx);
+                fq_zech_poly_sub(Tcoeffs + Ti, Fcoeffs + Fi, tp, ctx);
             }
             else
             {
-                fq_zech_poly_set(Tterms[Ti].coeff, Fterms[Fi].coeff, ctx);
+                fq_zech_poly_set(Tcoeffs + Ti, Fcoeffs + Fi, ctx);
             }
 
-            Tterms[Ti].exp = Fterms[Fi].exp;
+            Texps[Ti] = Fexps[Fi];
 
             Fi++;
         }
         else
         {
-            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fterms[Fi].exp < pack_exp3(Ai, ai, 0)));
+            FLINT_ASSERT(Ai >= 0 && (Fi >= Flen || Fexps[Fi] < pack_exp3(Ai, ai, 0)));
             /* F term missing, Aterm ok */
             changed = 1;
-            fq_zech_poly_scalar_mul_fq_zech(Tterms[Ti].coeff, modulus, Acoeffs[Ai].coeffs + ai, ctx);
-            Tterms[Ti].exp = pack_exp3(Ai, ai, 0);
+            fq_zech_poly_scalar_mul_fq_zech(Tcoeffs + Ti, modulus, Acoeffs[Ai].coeffs + ai, ctx);
+            Texps[Ti] = pack_exp3(Ai, ai, 0);
 
             do {
                 ai--;
@@ -356,8 +360,8 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
             }
         }
 
-        FLINT_ASSERT(!fq_zech_poly_is_zero(Tterms[Ti].coeff, ctx));
-        lastlength = FLINT_MAX(lastlength, Tterms[Ti].coeff->length);
+        FLINT_ASSERT(!fq_zech_poly_is_zero(Tcoeffs + Ti, ctx));
+        lastlength = FLINT_MAX(lastlength, Tcoeffs[Ti].length);
         Ti++;
     }
     T->length = Ti;
@@ -515,12 +519,12 @@ cleanup:
         fq_zech_polyu_init(T1, ctx);
         fq_zech_polyu_init(T2, ctx);
         fq_zech_polyu_init(T3, ctx);
-        fq_zech_polyu_get_fq_zech_polyun(T2, BB + 0, ctx);
-        fq_zech_polyu_get_fq_zech_polyun(T3, BB + 1, ctx);
+        fq_zech_polyu_set_fq_zech_polyun(T2, BB + 0, ctx);
+        fq_zech_polyu_set_fq_zech_polyun(T3, BB + 1, ctx);
         fq_zech_polyu_mul(T1, T2, T3, ctx);
         for (i = 2; i < r; i++)
         {
-            fq_zech_polyu_get_fq_zech_polyun(T3, BB + i, ctx);
+            fq_zech_polyu_set_fq_zech_polyun(T3, BB + i, ctx);
             fq_zech_polyu_mul(T2, T1, T3, ctx);
             fq_zech_polyu_swap(T2, T1, ctx);
         }
