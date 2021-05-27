@@ -362,9 +362,44 @@ void ca_randtest_special(ca_t res, flint_rand_t state, slong depth, slong bits, 
 
 /* Representation properties */
 
+CA_INLINE int ca_is_special(const ca_t x, ca_ctx_t ctx)
+{
+    return CA_IS_SPECIAL(x);
+}
+
 CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
 {
     return CA_IS_UNKNOWN(x);
+}
+
+CA_INLINE int ca_is_qq_elem(const ca_t x, ca_ctx_t ctx)
+{
+    return CA_IS_QQ(x, ctx);
+}
+
+CA_INLINE int ca_is_qq_elem_zero(const ca_t x, ca_ctx_t ctx)
+{
+    return CA_IS_QQ(x, ctx) && fmpq_is_zero(CA_FMPQ(x));
+}
+
+CA_INLINE int ca_is_qq_elem_one(const ca_t x, ca_ctx_t ctx)
+{
+    return CA_IS_QQ(x, ctx) && fmpq_is_one(CA_FMPQ(x));
+}
+
+CA_INLINE int ca_is_qq_elem_integer(const ca_t x, ca_ctx_t ctx)
+{
+    return CA_IS_QQ(x, ctx) && fmpz_is_one(CA_FMPQ_DENREF(x));
+}
+
+CA_INLINE int ca_is_nf_elem(const ca_t x, ca_ctx_t ctx)
+{
+    return !CA_IS_SPECIAL(x) && CA_FIELD_IS_NF(CA_FIELD(x, ctx));
+}
+
+CA_INLINE int ca_is_generic_elem(const ca_t x, ca_ctx_t ctx)
+{
+    return !CA_IS_SPECIAL(x) && CA_FIELD_IS_GENERIC(CA_FIELD(x, ctx));
 }
 
 int

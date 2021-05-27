@@ -485,10 +485,6 @@ The following functions deal with the representation of a :type:`ca_t` and
 hence can always be decided quickly and unambiguously. The return value
 for predicates is 0 for false and 1 for true.
 
-.. function:: int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
-
-    Returns 1 if *x* is Unknown, and 0 otherwise.
-
 .. function:: int ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     Returns whether *x* and *y* have identical representation. For field
@@ -516,14 +512,40 @@ for predicates is 0 for false and 1 for true.
 
     Hashes the representation of *x*.
 
+.. function:: int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
+
+    Returns whether *x* is Unknown.
+
+.. function:: int ca_is_special(const ca_t x, ca_ctx_t ctx)
+
+    Returns whether *x* is a special value or metavalue
+    (not a field element).
+
+.. function:: int ca_is_qq_elem(const ca_t x, ca_ctx_t ctx)
+
+    Returns whether *x* is represented as an element of the
+    rational field `\mathbb{Q}`.
+
+.. function:: int ca_is_qq_elem_zero(const ca_t x, ca_ctx_t ctx)
+              int ca_is_qq_elem_one(const ca_t x, ca_ctx_t ctx)
+              int ca_is_qq_elem_integer(const ca_t x, ca_ctx_t ctx)
+
+    Returns whether *x* is represented as the element 0, 1 or
+    any integer in the rational field `\mathbb{Q}`.
+
+.. function:: int ca_is_nf_elem(const ca_t x, ca_ctx_t ctx)
+
+    Returns whether *x* is represented as an element of a univariate
+    algebraic number field `\mathbb{Q}(a)`.
+
 .. function:: int ca_is_cyclotomic_nf_elem(slong * p, ulong * q, const ca_t x, ca_ctx_t ctx)
 
-    Returns 1 if *x* is represented as an element of a (univariate)
-    cyclotomic field, and 0 otherwise.
+    Returns whether *x* is represented as an element of a univariate
+    cyclotomic field, i.e. `\mathbb{Q}(a)` where *a* is a root of unity.
     If *p* and *q* are not *NULL* and *x* is represented as an
     element of a cyclotomic field, this also sets *p* and *q* to the
     minimal integers with `0 \le p < q` such that the generating
-    root of unity is `e^{2 \pi i p / q}`.
+    root of unity is `a = e^{2 \pi i p / q}`.
     Note that the answer 0 does not prove that *x* is not
     a cyclotomic number,
     and the order *q* is also not necessarily the generator of the
@@ -531,6 +553,13 @@ for predicates is 0 for false and 1 for true.
     For the purposes of this function, only nontrivial
     cyclotomic fields count; the return value is 0 if *x*
     is represented as a rational number.
+
+.. function:: int ca_is_generic_elem(const ca_t x, ca_ctx_t ctx)
+
+    Returns whether *x* is represented as a generic field element;
+    i.e. it is not a special value, not represented as
+    an element of the rational field, and not represented as
+    an element of a univariate algebraic number field.
 
 
 Value predicates
