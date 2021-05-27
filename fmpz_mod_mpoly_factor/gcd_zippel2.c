@@ -739,7 +739,7 @@ choose_alphas:
     }
 
     fmpz_mod_mpoly_get_fmpz(gammaev, gammaevals + m, ctx);
-    fmpz_mod_polyun_scalar_mul_fmpz(Gev, gammaev, ctx->ffinfo);
+    _fmpz_mod_poly_vec_mul_fmpz_mod(Gev->coeffs, Gev->length, gammaev, ctx->ffinfo);
 
     fmpz_mod_mpolyn_interp_lift_sm_polyu1n(Gn, Gev, ctx);
     fmpz_mod_mpolyn_interp_lift_sm_polyu1n(Abarn, Abarev, ctx);
@@ -796,7 +796,7 @@ choose_alphas:
         }
 
         fmpz_mod_mpoly_get_fmpz(gammaev, gammaevals + m, ctx);
-        fmpz_mod_polyun_scalar_mul_fmpz(Gev, gammaev, ctx->ffinfo);
+        _fmpz_mod_poly_vec_mul_fmpz_mod(Gev->coeffs, Gev->length, gammaev, ctx->ffinfo);
 
         fmpz_mod_poly_eval_pow(c, modulus, alphapow, ctx->ffinfo);
         fmpz_mod_inv(c, c, ctx->ffinfo);
@@ -1042,20 +1042,13 @@ choose_alphas:
                     goto choose_alphas;
                 }
 
-
-if (use & USE_BBAR)
-{
-FLINT_ASSERT(fmpz_mod_polyun_is_canonical(Bbarev, ctx->ffinfo));
-}
-
-                fmpz_mod_polyun_scalar_mul_fmpz(Gev, gammaev, ctx->ffinfo);
+                _fmpz_mod_poly_vec_mul_fmpz_mod(Gev->coeffs, Gev->length, gammaev, ctx->ffinfo);
                 if ((use & USE_G) && !fmpz_mod_polyun_add_zip_must_match(ZG, Gev, cur_zip_image))
                     goto choose_alphas;
                 if ((use & USE_ABAR) && !fmpz_mod_polyun_add_zip_must_match(ZAbar, Abarev, cur_zip_image))
                     goto choose_alphas;
                 if ((use & USE_BBAR) && !fmpz_mod_polyun_add_zip_must_match(ZBbar, Bbarev, cur_zip_image))
                     goto choose_alphas;
-
             }
 
             if ((use & USE_G) && fmpz_mod_polyun_zip_solve(G, ZG, HG, MG, ctx) < 1)

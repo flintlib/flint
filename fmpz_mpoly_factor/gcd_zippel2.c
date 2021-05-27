@@ -1291,7 +1291,8 @@ int static _random_check_sp(
         if (success)
             continue;
 
-        n_polyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+        _n_poly_vec_mul_nmod_intertible(Geval_sp->coeffs, Geval_sp->length,
+                                                         Gammaeval_sp, ctx_sp);
         FLINT_ASSERT(Geval_sp->length > 0);
         *GevaldegXY = n_polyu1n_bidegree(Geval_sp);
 
@@ -1373,8 +1374,8 @@ int static _random_check_mp(
         if (!success)
             continue;
 
-        fmpz_mod_polyun_scalar_mul_fmpz(Geval_mp, Gammaeval_mp, ctx_mp);
-
+        _fmpz_mod_poly_vec_mul_fmpz_mod(Geval_mp->coeffs, Geval_mp->length,
+                                                         Gammaeval_mp, ctx_mp);
         FLINT_ASSERT(Geval_mp->length > 0);
         *GevaldegXY = fmpz_mod_polyu1n_bidegree(Geval_mp);
 
@@ -1845,7 +1846,8 @@ pick_bma_prime:
 
         FLINT_ASSERT(Geval_sp->length > 0);
         GevaldegXY = n_polyu1n_bidegree(Geval_sp);
-        n_polyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+        _n_poly_vec_mul_nmod_intertible(Geval_sp->coeffs, Geval_sp->length,
+                                                         Gammaeval_sp, ctx_sp);
 
         if (GdegboundXY < GevaldegXY)
         {
@@ -2058,7 +2060,8 @@ pick_bma_prime:
 
         FLINT_ASSERT(Geval_mp->length > 0);
         GevaldegXY = fmpz_mod_polyu1n_bidegree(Geval_mp);
-        fmpz_mod_polyun_scalar_mul_fmpz(Geval_mp, Gammaeval_mp, ctx_mp);
+        _fmpz_mod_poly_vec_mul_fmpz_mod(Geval_mp->coeffs, Geval_mp->length,
+                                                         Gammaeval_mp, ctx_mp);
 
         FLINT_ASSERT(fmpz_equal(Gammaeval_mp, fmpz_mod_polyun_leadcoeff(Geval_mp)));
 
@@ -2270,7 +2273,8 @@ pick_zip_prime:
             goto pick_bma_prime;
         }
 
-        n_polyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+        _n_poly_vec_mul_nmod_intertible(Geval_sp->coeffs, Geval_sp->length,
+                                                         Gammaeval_sp, ctx_sp);
 
         success = n_polyu2n_add_zipun_must_match(ZH,
                                 which_check == 1 ? Abareval_sp :

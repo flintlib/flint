@@ -518,10 +518,9 @@ static int _do_bivar_or_univar(
 
         success = n_polyu1n_mod_gcd_brown_smprime(Gev, Abarev, Bbarev,
                                                        Aev, Bev, ctx->mod, St);
-
         if (success)
         {
-            n_polyun_mod_content(c, Gev, ctx->mod);
+            _n_poly_vec_mod_content(c, Gev->coeffs, Gev->length, ctx->mod);
             success = n_poly_is_one(c);
             nmod_mpoly_set_polyu1n(G, Gev, 0, 1, ctx);
         }

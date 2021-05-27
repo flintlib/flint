@@ -1864,64 +1864,11 @@ void n_polyun_one(n_polyun_t A)
 }
 
 N_POLY_INLINE
-void n_polyun_scalar_mul_nmod(
-    n_polyun_t A,
-    mp_limb_t c,
-    nmod_t ctx)
-{
-    slong i;
-
-    FLINT_ASSERT(c != 0);
-
-    if (c == 1)
-        return;
-
-    for (i = 0; i < A->length; i++)
-        _n_poly_mod_scalar_mul_nmod_inplace(A->coeffs + i, c, ctx);
-}
-
-
-N_POLY_INLINE
 ulong n_polyu1n_bidegree(n_polyun_t A)
 {
     ulong x = A->exps[0];
     ulong y = A->coeffs[0].length - 1;
     return (x << (FLINT_BITS/2)) + y;
-}
-
-/* TODO these four can be replaced by n_poly_vec functions */
-N_POLY_INLINE
-slong n_polyun_lastdeg(n_polyun_t A)
-{
-    slong i, len = 0;
-    for (i = 0; i < A->length; i++)
-        len = FLINT_MAX(len, A->coeffs[i].length);
-    return len - 1;
-}
-
-N_POLY_INLINE
-void n_polyun_content_last(n_poly_t g, n_polyun_t A, nmod_t ctx)
-{
-    slong i;
-    n_poly_zero(g);
-    for (i = 0; i < A->length; i++)
-        n_poly_mod_gcd(g, g, A->coeffs + i, ctx);
-}
-
-N_POLY_INLINE
-void n_polyun_divexact_last(n_polyun_t A, const n_poly_t g, nmod_t ctx)
-{
-    slong i;
-    for (i = 0; i < A->length; i++)
-        n_poly_mod_div(A->coeffs + i, A->coeffs + i, g, ctx);
-}
-
-N_POLY_INLINE
-void n_polyun_mul_last(n_polyun_t A, const n_poly_t g, nmod_t ctx)
-{
-    slong i;
-    for (i = 0; i < A->length; i++)
-        n_poly_mod_mul(A->coeffs + i, A->coeffs + i, g, ctx);
 }
 
 /*****************************************************************************/

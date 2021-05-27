@@ -10,9 +10,9 @@
 */
 
 #include "n_poly.h"
+#include "nmod_mpoly_factor.h"
 
-
-void n_polyu1n_mod_interp_reduce_2sm_poly(
+static void n_polyu1n_mod_interp_reduce_2sm_poly(
     n_poly_t E,
     n_poly_t F,
     const n_polyun_t A,
@@ -32,7 +32,7 @@ void n_polyu1n_mod_interp_reduce_2sm_poly(
     }
 }
 
-void n_polyu1n_mod_interp_lift_2sm_poly(
+static void n_polyu1n_mod_interp_lift_2sm_poly(
     slong * lastdeg,
     n_polyun_t F,
     const n_poly_t A,
@@ -112,7 +112,7 @@ void n_polyu1n_mod_interp_lift_2sm_poly(
     return;
 }
 
-int n_polyu1n_mod_interp_crt_2sm_poly(
+static int n_polyu1n_mod_interp_crt_2sm_poly(
     slong * lastdeg,
     n_polyun_t F,
     n_polyun_t T,
@@ -293,10 +293,8 @@ int n_polyu1n_mod_gcd_brown_smprime(
     n_polyun_stack_fit_request(St->polyun_stack, 1);
     T           = n_polyun_stack_take_top(St->polyun_stack);
 
-    n_polyun_content_last(cA, A, ctx);
-    n_polyun_content_last(cB, B, ctx);
-    n_polyun_divexact_last(A, cA, ctx);
-    n_polyun_divexact_last(B, cB, ctx);
+    _n_poly_vec_mod_remove_content(cA, A->coeffs, A->length, ctx);
+    _n_poly_vec_mod_remove_content(cB, B->coeffs, B->length, ctx);
 
     n_poly_mod_gcd(cG, cA, cB, ctx);
     n_poly_mod_div(cAbar, cA, cG, ctx);
@@ -304,8 +302,8 @@ int n_polyu1n_mod_gcd_brown_smprime(
 
     n_poly_mod_gcd(gamma, A->coeffs + 0, B->coeffs + 0, ctx);
 
-    ldegA = n_polyun_lastdeg(A);
-    ldegB = n_polyun_lastdeg(B);
+    ldegA = _n_poly_vec_max_degree(A->coeffs, A->length);
+    ldegB = _n_poly_vec_max_degree(B->coeffs, B->length);
     deggamma = n_poly_degree(gamma);
     bound = 1 + deggamma + FLINT_MAX(ldegA, ldegB);
 
@@ -464,16 +462,15 @@ choose_prime: /* primes are v - alpha, v + alpha */
 
 successful:
 
-    n_polyun_content_last(modulus, G, ctx);
-    n_polyun_divexact_last(G, modulus, ctx);
-    n_polyun_divexact_last(Abar, G->coeffs + 0, ctx);
-    n_polyun_divexact_last(Bbar, G->coeffs + 0, ctx);
+    _n_poly_vec_mod_remove_content(modulus, G->coeffs, G->length, ctx);
+    _n_poly_vec_mod_divexact_poly(Abar->coeffs, Abar->length, G->coeffs + 0, ctx);
+    _n_poly_vec_mod_divexact_poly(Bbar->coeffs, Bbar->length, G->coeffs + 0, ctx);
 
 successful_put_content:
 
-    n_polyun_mul_last(G, cG, ctx);
-    n_polyun_mul_last(Abar, cAbar, ctx);
-    n_polyun_mul_last(Bbar, cBbar, ctx);
+    _n_poly_vec_mod_mul_poly(G->coeffs, G->length, cG, ctx);
+    _n_poly_vec_mod_mul_poly(Abar->coeffs, Abar->length, cAbar, ctx);
+    _n_poly_vec_mod_mul_poly(Bbar->coeffs, Bbar->length, cBbar, ctx);
 
     success = 1;
 

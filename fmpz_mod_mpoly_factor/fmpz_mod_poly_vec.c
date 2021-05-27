@@ -12,6 +12,15 @@
 #include "fmpz_mod_mpoly_factor.h"
 
 
+slong _fmpz_mod_poly_vec_max_degree(const fmpz_mod_poly_struct * A,
+                                         slong Alen, const fmpz_mod_ctx_t ctx)
+{
+    slong i, len = 0;
+    for (i = 0; i < Alen; i++)
+        len = FLINT_MAX(len, fmpz_mod_poly_length(A + i, ctx));
+    return len - 1;
+}
+
 void _fmpz_mod_poly_vec_content(
     fmpz_mod_poly_t g,
     const fmpz_mod_poly_struct * A,
