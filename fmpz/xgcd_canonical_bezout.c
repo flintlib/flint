@@ -14,7 +14,7 @@
 #include "fmpz.h"
 
 void
-fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
+fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 {
     /* check aliasing */
     if (d == f || a == f || b == f || d == g || a == g || b == g)
@@ -23,7 +23,7 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         fmpz_init(d2);
         fmpz_init(a2);
         fmpz_init(b2);
-        fmpz_xgcd_minimal(d2, a2, b2, f, g);
+        fmpz_xgcd_canonical_bezout(d2, a2, b2, f, g);
         fmpz_swap(d, d2);
         fmpz_swap(a, a2);
         fmpz_swap(b, b2);
@@ -44,59 +44,38 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         _fmpz_demote(a);
         _fmpz_demote(b);
 
-        if (fn == 0)
+        if (fn == 0 || gn == 0 || fn == gn)
         {
             /* xgcd(0, g) = (|g|, 0, sgn(g)) */
-            *d = (slong) gn;
-            *a = 0;
-            *b = FLINT_SGN(*g);
-            return;
-        }
-        else if (gn == 0)
-        {
             /* xgcd(f, 0) = (|f|, sgn(f), 0) */
-            *d = (slong) fn;
-            *a = FLINT_SGN(*f);
-            *b = 0;
-            return;
-        }
-        else if (fn == 1)
-        {
-            /* xgcd(±1, g) =
-             * (1, ±|sgn((g - 1)(g + 1))|, sgn(g)(sgn(g + 1) - sgn(g - 1))) */
-            slong gp = *g + 1;
-            slong gm = *g - 1;
-            *d = 1;
-            *a = FLINT_SGN(*f) * FLINT_ABS(FLINT_SGN(gp * gm));
-            *b = FLINT_SGN(*g) * (FLINT_SGN(gp) - FLINT_SGN(gm));
-            return;
-        }
-        else if (gn == 1)
-        {
-            /* xgcd(f, ±1) = (1, 0, ±1) */
-            *d = 1;
-            *a = 0;
-            *b = FLINT_SGN(*g);
-            return;
-        }
-        else if (gn == fn)
-        {
             /* xgcd(±g, g) = (|g|, 0, sgn(g)) */
-            *d = gn;
-            *a = 0;
+            *d = (slong) gn + (slong) (fn != gn) * fn;
+            *a = (gn == 0) * FLINT_SGN(*f);
             *b = FLINT_SGN(*g);
+            return;
+        }
+        else if (fn == 1 || gn == 1)
+        {
+            /* xgcd(f, ±1) = (1, 0, ±1)
+             * and for g not equal to 0 or ±1, we have
+             * xgcd(±1, g) = (1, ±1, 0) */
+            *d = 1;
+            *a = (fn == 1) * FLINT_SGN(*f);
+            *b = (gn == 1) * FLINT_SGN(*g);
             return;
         }
         else if (gn > fn)
+        {
             *d = n_xgcd((ulong *) b, (ulong *) a, gn, fn);
+        }
         else
             *d = n_xgcd((ulong *) a, (ulong *) b, fn, gn);
 
         /* We have a solution for +/-(a |f| - b |g|) = d where a, b > 0.
          * Now we want to
-         * 0) make sure |f| =/= 2 d =/= |g|
          * 1) solve a f + b g = d and
-         * 2) calculate the minimal solution */
+         * 2) make sure |f| =/= 2 d =/= |g|
+         * 3) calculate the minimal solution */
 
         *a *= (2 * (fn >= gn) - 1) * FLINT_SGN(*f);
         *b *= (1 - 2 * (fn >= gn)) * FLINT_SGN(*g); /* we are done with (1) */
@@ -114,7 +93,7 @@ fmpz_xgcd_minimal(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
             return;
         }
 
-        /* The k we want to use lie within d a / g +/- 1 / 2 */
+        /* The k we want to use lie within d a / g ± 1 / 2 */
         tmp = *g / *d;
         k = *a / tmp;
         k += (FLINT_ABS(*a - (k + 1) * tmp) <= FLINT_ABS(tmp / 2));
