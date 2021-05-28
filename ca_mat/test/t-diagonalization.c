@@ -62,18 +62,21 @@ int main()
                 flint_abort();
             }
 
-            ca_mat_mul(B, P, D, ctx);
-            ca_mat_mul(B, B, Pinv, ctx);
-
-            result = ca_mat_check_equal(A, B, ctx);
-
-            if (result == T_FALSE)
+            if (result == T_TRUE)
             {
-                flint_printf("FAIL\n");
-                flint_printf("A: "); ca_mat_print(A, ctx); flint_printf("\n");
-                flint_printf("D: "); ca_mat_print(D, ctx); flint_printf("\n");
-                flint_printf("P: "); ca_mat_print(P, ctx); flint_printf("\n");
-                flint_abort();
+                ca_mat_mul(B, P, D, ctx);
+                ca_mat_mul(B, B, Pinv, ctx);
+
+                result = ca_mat_check_equal(A, B, ctx);
+
+                if (result == T_FALSE)
+                {
+                    flint_printf("FAIL\n");
+                    flint_printf("A: "); ca_mat_print(A, ctx); flint_printf("\n");
+                    flint_printf("D: "); ca_mat_print(D, ctx); flint_printf("\n");
+                    flint_printf("P: "); ca_mat_print(P, ctx); flint_printf("\n");
+                    flint_abort();
+                }
             }
         }
 
