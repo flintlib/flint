@@ -9,6 +9,77 @@ in the git repository https://github.com/fredrik-johansson/calcium
 Old releases of the code can be accessed from
 https://github.com/fredrik-johansson/calcium/releases
 
+2021-05-28 - version 0.4
+-------------------------------------------------------------------------------
+
+* Algebraic numbers
+
+  * Fixed bug in special-casing of roots of unity in qqbar_root_ui.
+  * Fixed qqbar_randtest with bits == 1.
+  * Faster qqbar_cmp_re for nearby reals.
+  * Faster qqbar polynomial evaluation and powering using linear algebra.
+  * Improved qqbar_abs, qqbar_abs2 to produce cleaner enclosures.
+  * Use a slightly better method to detect real numbers in qqbar_sgn_im.
+  * Added qqbar_hash.
+  * Added qqbar_get_fmpq, qqbar_get_fmpz.
+  * Added qqbar_pow_fmpq, qqbar_pow_fmpz, qqbar_pow_si.
+  * Added qqbar_numerator, qqbar_denominator.
+
+* Basic arithmetic and elementary functions
+
+  * Improved ca_condense_field: automatically demote to a simple number field
+    when the only used extension number is algebraic.
+  * Improved multivariate field arithmetic to automatically remove algebraic
+    or redundant monomial factors from denominators.
+  * Added ca_pow_si_arithmetic (guaranteed in-field exponentiation).
+  * Added polynomial evaluation functions (ca_fmpz_poly_evaluate,
+    ca_fmpq_poly_evaluate, ca_fmpz_poly_evaluate, ca_fmpz_mpoly_q_evaluate).
+  * Added several helper functions (ca_is_special, ca_is_qq_elem,
+    ca_is_qq_elem_zero, ca_is_qq_elem_one, ca_is_qq_elem_integer,
+    ca_is_nf_elem, ca_is_cyclotomic_nf_elem, ca_is_generic_elem).
+  * Added ca_rewrite_complex_normal_form.
+  * Perform direct complex conjugation in cyclotomic fields.
+  * Use ca_get_acb_raw instead of ca_get_acb when printing to avoid expensive
+    recomputations.
+  * Added alternative algorithms for various basic functions.
+  * Deep complex conjugation.
+  * Use complex conjugation in is_real, is_imaginary, is_negative_real.
+  * Added functions for unsafe inversion for internal use.
+  * Significantly stronger zero testing in mixed algebraic-transcendental fields.
+  * Added ca_arg.
+  * Added special case for testing equality between number field elements
+    and rationals.
+  * Added ca_sin_cos, ca_sin, ca_cos, ca_tan and variants.
+  * Added ca_atan, ca_asin, ca_acos and variants.
+  * Added ca_csgn.
+  * Improved ca_get_acb and ca_get_acb_accurate_parts to fall back on exact
+    zero tests when direct numerical evaluation does not give precise enclosures.
+  * Added ca_get_decimal_str.
+  * More automatic simplifications of logarithms (simplify logarithms of
+    exponentials, square roots and powers raised to integer powers).
+  * More automatic simplifications of square roots (simplify square roots of
+    exponentials, square roots and powers raised to integer powers).
+  * Improved order comparisons (ca_check_ge etc.) to handle special values
+    and to fall back on strong equality tests.
+  * Fixed a test failure in the ca_mat module.
+
+* Polynomials
+
+  * Added ca_poly_inv_series, ca_poly_div_series (power series division).
+  * Added ca_poly_exp_series (power series exponential).
+  * Added ca_poly_log_series (power series logarithm).
+  * Added ca_poly_atan_series (power series arctangent).
+
+* Other
+
+  * Added fmpz_mpoly_q_used_vars.
+  * Remove useless rpath line from configure (reported by Julien Puydt).
+  * Added missing declaration of fexpr_hash.
+  * Fixed crashes on OS X in Python interface (contributed by deinst).
+  * Fixed memory leaks in Python string conversions (contributed by deinst).
+  * Reserve I, E for symbolic expressions in Python interface.
+
+
 2021-04-23 - version 0.3
 -------------------------------------------------------------------------------
 
