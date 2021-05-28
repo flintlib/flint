@@ -1,0 +1,23 @@
+# Deprecated in Flint 2.6.0
+
+  n_gcd_full -> n_gcd
+  fmpz_poly_is_x -> fmpz_poly_is_gen
+  fmpz_mod_poly_is_x -> fmpz_mod_poly_is_gen
+  fmpq_poly_is_x -> fmpq_poly_is_gen
+
+# Deprecated in Flint 2.7.0
+
+  nmod_mat_scalar_mul_add -> nmod_mat_scalar_adduml_ui
+
+# Deprecated in Flint 2.8.0
+
+  fmpz_multi_crt_t -> fmpz_multi_CRT_t
+  fmpz_multi_crt_init -> fmpz_multi_CRT_init
+  fmpz_multi_crt_precompute -> fmpz_multi_CRT_precompute
+  fmpz_multi_crt_precompute_p (removed)
+  fmpz_multi_crt_precomp -> fmpz_multi_CRT_precomp now with sign option
+  fmpz_multi_crt_precomp_p (removed)
+  fmpz_multi_crt -> fmpz_multi_CRT now with sign option
+  fmpz_multi_crt_clear -> fmpz_multi_CRT_clear
+
+
