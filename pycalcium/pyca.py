@@ -1821,6 +1821,12 @@ class ca:
         libcalcium.ca_pow(res, other, self, self._ctx)
         return res
 
+    def pow_arithmetic(self, n):
+        res = self._new()
+        n = int(n)
+        libcalcium.ca_pow_si_arithmetic(res, self, n, self._ctx)
+        return res
+
     def __abs__(self):
         res = self._new()
         libcalcium.ca_abs(res, self, self._ctx)

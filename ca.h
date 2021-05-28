@@ -521,6 +521,8 @@ void ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_pow_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
 void ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
 
+void ca_pow_si_arithmetic(ca_t res, const ca_t x, slong n, ca_ctx_t ctx);
+
 void ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx);

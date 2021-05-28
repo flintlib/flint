@@ -91,6 +91,79 @@ _ca_pow_binexp(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
     }
 }
 
+void
+ca_pow_si_arithmetic(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+    {
+        ca_unknown(res, ctx);
+    }
+    else if (n == 0)
+    {
+        ca_one(res, ctx);
+    }
+    else if (n == 1)
+    {
+        ca_set(res, x, ctx);
+    }
+    else if (n == -1)
+    {
+        ca_inv(res, x, ctx);
+    }
+    else if (n == 2)
+    {
+        ca_sqr(res, x, ctx);
+    }
+    else if (CA_IS_QQ(x, ctx))
+    {
+        if (n < 0 && fmpq_is_zero(CA_FMPQ(x)))
+        {
+            ca_uinf(res, ctx);
+        }
+        else
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpq_pow_si(t, CA_FMPQ(x), n);
+            ca_set_fmpq(res, t, ctx);
+            fmpq_clear(t);
+        }
+    }
+    else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
+    {
+        ca_t t;
+
+        /* Need to be sure we don't divide by zero, but more generally
+           the base should never be a rational number here. */
+        if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
+        {
+            flint_printf("ca_pow_fmpz: unexpected rational nf_elem\n");
+            flint_abort();
+        }
+
+        ca_init(t, ctx);
+
+        if (n >= 0)
+            ca_set(t, x, ctx);
+        else
+        {
+            ca_inv(t, x, ctx);
+            n = -n;
+        }
+
+        nf_elem_pow(CA_NF_ELEM(t), CA_NF_ELEM(t), n, CA_FIELD_NF(CA_FIELD(t, ctx)));
+        ca_condense_field(t, ctx);
+        ca_swap(res, t, ctx);
+
+        ca_clear(t, ctx);
+    }
+    else
+    {
+        _ca_pow_binexp(res, x, n, ctx);
+    }
+}
+
+
 /* (z^a)^b, assuming z != 0 */
 void
 ca_pow_pow(ca_t res, const ca_t z, const ca_t a, const ca_t b, ca_ctx_t ctx)
@@ -368,7 +441,6 @@ ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
 void
 ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
-
     if (CA_IS_QQ(y, ctx) && fmpz_is_one(CA_FMPQ_DENREF(y)))
     {
         ca_pow_fmpz(res, x, CA_FMPQ_NUMREF(y), ctx);

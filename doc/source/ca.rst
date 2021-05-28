@@ -864,6 +864,13 @@ Powers and roots
     Sets *res* to *x* raised to the power *y*.
     Handling of special values is not yet implemented.
 
+.. function:: void ca_pow_si_arithmetic(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
+
+    Sets *res* to *x* raised to the power *n*. Whereas :func:`ca_pow`,
+    :func:`ca_pow_si` etc. may create `x^n` as an extension number
+    if *n* is large, this function always perform the exponentiation
+    using field arithmetic.
+
 .. function:: void ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
               void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
               void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
