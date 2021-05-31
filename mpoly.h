@@ -173,6 +173,8 @@ typedef struct mpoly_heap_s
 } mpoly_heap_s;
 
 /* trees *********************************************************************/
+
+/* old bad red-black. TODO replace this with a proper mpoly_rbtree_fmpz */
 typedef struct mpoly_rbnode
 {
     struct mpoly_rbnode * up;
@@ -207,6 +209,32 @@ FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get(int * new_node,
 
 FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get_fmpz(int * new_node,
                                         struct mpoly_rbtree *tree, fmpz_t rcx);
+
+/* red-black with ui keys */
+typedef struct {
+    ulong key;
+    slong up;
+    slong left;
+    slong right;
+    int color;
+} mpoly_rbnode_ui_struct;
+
+typedef struct {
+    slong length;
+    mpoly_rbnode_ui_struct * nodes;
+    slong node_alloc;
+    char * data;
+    slong data_alloc;
+} mpoly_rbtree_ui_struct;
+
+typedef mpoly_rbtree_ui_struct mpoly_rbtree_ui_t[1];
+
+FLINT_DLL void mpoly_rbtree_ui_init(mpoly_rbtree_ui_t T);
+
+FLINT_DLL void mpoly_rbtree_ui_clear(mpoly_rbtree_ui_t T);
+
+FLINT_DLL void * mpoly_rbtree_ui_lookup(mpoly_rbtree_ui_t T,
+                                        int * its_new, ulong rcx, slong dsize);
 
 /* Orderings *****************************************************************/
 

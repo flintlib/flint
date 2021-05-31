@@ -2052,37 +2052,6 @@ slong n_polyun_stack_size(const n_polyun_stack_t S)
 }
 
 
-/*****************************************************************************/
-
-typedef struct {
-    ulong key;
-    slong up;
-    slong left;
-    slong right;
-    int color;
-} mpoly_rbnode_ui_struct;
-
-typedef struct {
-    slong length;
-    mpoly_rbnode_ui_struct * nodes;
-    slong node_alloc;
-    char * data;
-    slong data_alloc;
-} mpoly_rbtree_ui_struct;
-
-typedef mpoly_rbtree_ui_struct mpoly_rbtree_ui_t[1];
-
-FLINT_DLL void mpoly_rbtree_ui_init(mpoly_rbtree_ui_t T);
-
-FLINT_DLL void mpoly_rbtree_ui_clear(mpoly_rbtree_ui_t T);
-
-FLINT_DLL void * mpoly_rbtree_ui_lookup(
-    mpoly_rbtree_ui_t T,
-    int * its_new,
-    ulong rcx,
-    slong dsize);
-
-
 #ifdef __cplusplus
 }
 #endif
