@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,14 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
-typedef struct {
-    fmpz * powers;
-    slong length;
-    slong alloc;
-    fmpz_t tmp;
-} fmpz_pow_cache_t[1];
-
-static void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val)
+void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val)
 {
     fmpz_init(T->tmp);
     T->alloc = 10;
@@ -28,14 +21,14 @@ static void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val)
     T->length = 2;
 }
 
-static void fmpz_pow_cache_clear(fmpz_pow_cache_t T)
+void fmpz_pow_cache_clear(fmpz_pow_cache_t T)
 {
     fmpz_clear(T->tmp);
     _fmpz_vec_clear(T->powers, T->alloc);
 }
 
 /* a = b * val^k */
-static int fmpz_pow_cache_mulpow_ui(
+int fmpz_pow_cache_mulpow_ui(
     fmpz_t a,
     const fmpz_t b,
     ulong k,
@@ -73,7 +66,7 @@ static int fmpz_pow_cache_mulpow_ui(
     return 1;
 }
 
-static int fmpz_pow_cache_mulpow_fmpz(
+int fmpz_pow_cache_mulpow_fmpz(
     fmpz_t a,
     const fmpz_t b,
     const fmpz_t k,
@@ -154,6 +147,11 @@ static int _fmpz_mpoly_evaluate_one_fmpz_sp(
         fmpz_add(Acoeffs + Alen - 1, Acoeffs + Alen - 1, Acoeffs + Alen);
         Alen -= fmpz_is_zero(Acoeffs + Alen - 1);
     }
+
+    /* from the fmpz_add: at most two junk coeffs past length */
+    for (i = Alen; i < Alen + 2 && i < A->alloc; i++)
+        _fmpz_demote(Acoeffs + i);
+
     _fmpz_mpoly_set_length(A, Alen, ctx);
 
     TMP_END;
@@ -237,6 +235,11 @@ static int _fmpz_mpoly_evaluate_one_fmpz_mp(
         fmpz_add(Acoeffs + Alen - 1, Acoeffs + Alen - 1, Acoeffs + Alen);
         Alen -= fmpz_is_zero(Acoeffs + Alen - 1);
     }
+
+    /* from the fmpz_add: at most two junk coeffs past length */
+    for (i = Alen; i < Alen + 2 && i < A->alloc; i++)
+        _fmpz_demote(Acoeffs + i);
+
     _fmpz_mpoly_set_length(A, Alen, ctx);
 
     fmpz_clear(k);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,473 +12,219 @@
 #include "fmpq_mpoly.h"
 
 /* exponents of B are not multiprecision */
-int _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                       slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
+static int _fmpq_mpoly_evaluate_one_fmpq_sp(
+    fmpq_mpoly_t A,
+    const fmpq_mpoly_t B,
+    slong var,
+    fmpz_pow_cache_t num_cache,
+    fmpz_pow_cache_t den_cache,
+    ulong deg,
+    const fmpq_mpoly_ctx_t ctx)
 {
     int success = 1;
-    int new;
-    slong i, j, N;
-    flint_bitcnt_t bits;
-    slong main_shift, main_off;
-    ulong main_exp, emin, emax;
+    slong i, N, off, shift;
     ulong * cmpmask, * one;
-    slong Aalloc, Alen, Blen;
-    fmpz * Acoeff, * Bcoeff;
-    ulong * Aexp, * Bexp;
-    ulong * main_exps;
-    slong poweralloc;
-    fmpz * powers;
-    slong * inds;
-    ulong * exp_array, * exp;
-    slong next_loc;
-    slong heap_len;
-    mpoly_heap_s * heap;
-    mpoly_heap_t * x;
-    mpoly_heap_t * chain;
-    slong * store, * store_base;
-    mpoly_rbnode_struct ** stack;
-    slong stack_size;
-    mpoly_rbtree_t tree;
-    mpoly_rbnode_struct * node;
-    mpoly_rbnode_struct * root;
-    fmpq_t u;
+    slong Blen = B->zpoly->length;
+    const fmpz * Bcoeffs = B->zpoly->coeffs;
+    const ulong * Bexps = B->zpoly->exps;
+    flint_bitcnt_t bits = B->zpoly->bits;
+    slong Alen;
+    fmpz * Acoeffs;
+    ulong * Aexps;
+    ulong mask, k;
+    int need_sort = 0, cmp;
     TMP_INIT;
 
-    Blen = B->zpoly->length;
-    Bcoeff = B->zpoly->coeffs;
-    Bexp = B->zpoly->exps;
-    bits = B->zpoly->bits;
-
-    FLINT_ASSERT(A != B);
     FLINT_ASSERT(bits <= FLINT_BITS);
-    FLINT_ASSERT(Blen > 0);
 
     TMP_START;
 
-    fmpq_init(u);
+    if (A != B)
+        fmpz_mpoly_fit_length_reset_bits(A->zpoly, Blen, bits, ctx->zctx);
 
+    Acoeffs = A->zpoly->coeffs;
+    Aexps = A->zpoly->exps;
+
+    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     N = mpoly_words_per_exp_sp(bits, ctx->zctx->minfo);
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_monomial_offset_shift_sp(one, &main_off, &main_shift,
-                                                  var, bits, ctx->zctx->minfo);
+    cmpmask = TMP_ARRAY_ALLOC(2*N, ulong);
+    one = cmpmask + N;
+    mpoly_gen_monomial_offset_shift_sp(one, &off, &shift, var, bits, ctx->zctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->zctx->minfo);
 
-    /* scan poly2 and put powers of var into tree */
-    /*
-        suppose x > y with lex order and poly2 is
-        x^3*y + x^2*y^3 + x*y + y + 1
-        and we are evaluating at y = 2
-
-        The data member of nodes in the tree of powers of y appearing in
-        the polynomial contain the term number of the first such appearance
-             data
-        y^0  4    (1       term)
-        y^1  0    (x^3*y   term)
-        y^3  1    (x^2*y^3 term)
-
-        the inds array conains the term number of the next term with
-        the same power of y
-
-        inds[0] = 2  (x*y term)
-        inds[1] = -1 
-        inds[2] = 3  (y   term)
-        inds[3] = -1
-        inds[4] = -1
-    */
-    inds = (slong *) TMP_ALLOC(Blen*sizeof(slong));
-    mpoly_rbtree_init(tree);
-    emin = -UWORD(1);
-    emax = UWORD(0);
-    
+    Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        main_exp = (Bexp[N*i + main_off] >> main_shift) & mask;
-        emin = FLINT_MIN(emin, main_exp);
-        emax = FLINT_MAX(emax, main_exp);
-        node = mpoly_rbtree_get(&new, tree, main_exp);
-        if (new)
+        k = (Bexps[N*i + off] >> shift) & mask;
+        success = fmpz_pow_cache_mulpow_ui(Acoeffs + Alen, Bcoeffs + i,
+                                                              k, num_cache) &&
+                  fmpz_pow_cache_mulpow_ui(Acoeffs + Alen, Acoeffs + Alen,
+                                                           deg - k, den_cache);
+        if (!success)
+            break;
+
+        if (fmpz_is_zero(Acoeffs + Alen))
+            continue;
+
+        mpoly_monomial_msub(Aexps + N*Alen, Bexps + N*i, k, one, N);
+        if (Alen < 1)
         {
-            node->data = (void *) i;
-        } else
-        {
-            inds[(slong) node->data2] = i;
+            Alen = 1;
+            continue;
         }
-        node->data2 = (void *) i;
-        inds[i] = -WORD(1);
-    }
-    FLINT_ASSERT(emin <= emax);
-
-
-    success = success && !_fmpz_pow_ui_is_not_feasible(
-                                            fmpz_bits(fmpq_numref(val)), emin);
-    success = success && !_fmpz_pow_ui_is_not_feasible(
-                                            fmpz_bits(fmpq_denref(val)), emax);
-    if (success)
-    {
-        fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), emin);
-        fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax);
-        fmpq_mul(A->content, B->content, u);
-    }
-
-    /* manually traverse tree and add node data to heap */
-    heap_len = 1;
-    next_loc = tree->size + 4;
-    heap = (mpoly_heap_s *) TMP_ALLOC((tree->size + 1)*sizeof(mpoly_heap_s));
-    chain = (mpoly_heap_t *) TMP_ALLOC(tree->size*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*tree->size*sizeof(slong));
-    exp_array = (ulong *) TMP_ALLOC(tree->size*N*sizeof(ulong));
-
-    i = 0;
-    stack_size = 0;
-    main_exps = (ulong *) TMP_ALLOC(tree->size*N*sizeof(ulong));
-    poweralloc = tree->size;
-    powers = _fmpz_vec_init(poweralloc);
-    stack = (mpoly_rbnode_struct **) TMP_ALLOC(tree->size
-                                              * sizeof(mpoly_rbnode_struct *));
-    root = tree->head->left;
-
-looper:
-
-    while (root != tree->null)
-    {
-        stack[stack_size++] = root;
-        root = root->left;
-    }
-
-    if (stack_size == 0)
-        goto done;
-
-    root = stack[--stack_size];
-
-    FLINT_ASSERT(root->key >= emin);
-    FLINT_ASSERT(root->key <= emax);
-    mpoly_monomial_mul_ui(main_exps + N*i, one, N, root->key);
-
-    success = success && !_fmpz_pow_ui_is_not_feasible(
-                                fmpz_bits(fmpq_numref(val)), root->key - emin);
-    success = success && !_fmpz_pow_ui_is_not_feasible(
-                                fmpz_bits(fmpq_numref(val)), root->key - emin);
-    if (success)
-    {
-        fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), root->key - emin);
-        fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax - root->key);
-        fmpz_mul(powers + i, fmpq_numref(u), fmpq_denref(u));
-    }
-
-    x = chain + i;
-    x->i = i;
-    x->j = (slong) root->data;
-
-    x->next = NULL;
-    mpoly_monomial_sub(exp_array + N*i, Bexp + N*x->j, main_exps + N*i, N);
-    _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, cmpmask);
-
-    i++;    
-    node = root->right;
-    flint_free(root);
-    root = node;
-
-    goto looper;
-
-done:
-
-    FLINT_ASSERT(i == tree->size);
-
-    /* take from heap and put into A */
-    fmpz_mpoly_fit_bits(A->zpoly, bits, ctx->zctx);
-    A->zpoly->bits = bits;
-    Acoeff = A->zpoly->coeffs;
-    Aexp = A->zpoly->exps;
-    Aalloc = A->zpoly->alloc;
-    Alen = 0;
-    while (heap_len > 1)
-    {
-        exp = heap[1].exp;
-
-        _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-
-        mpoly_monomial_set(Aexp + Alen*N, exp, N);
-        
-        fmpz_zero(Acoeff + Alen);
-        do {
-            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do {
-                *store++ = x->i;
-                *store++ = x->j;
-                fmpz_addmul(Acoeff + Alen, powers + x->i, Bcoeff + x->j);
-            } while ((x = x->next) != NULL);
-        } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
-
-        Alen += !fmpz_is_zero(Acoeff + Alen);
-
-        while (store > store_base)
+        cmp = mpoly_monomial_cmp(Aexps + N*(Alen - 1), Aexps + N*Alen, N, cmpmask);
+        if (cmp != 0)
         {
-            j = *--store;
-            i = *--store;
-            if (inds[j] >= 0)
-            {
-                x = chain + i;
-                x->i = i;
-                x->j = inds[j];
-                x->next = NULL;
-                mpoly_monomial_sub(exp_array + N*i, Bexp + x->j*N,
-                                                       main_exps + N*i, N);
-                _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, cmpmask);
-            }
+            need_sort |= (cmp < 0);
+            Alen++;
+            continue;
         }
+        fmpz_add(Acoeffs + Alen - 1, Acoeffs + Alen - 1, Acoeffs + Alen);
+        Alen -= fmpz_is_zero(Acoeffs + Alen - 1);
     }
 
-    A->zpoly->coeffs = Acoeff;
-    A->zpoly->exps = Aexp;
-    A->zpoly->alloc = Aalloc;
+    /* from the fmpz_add: at most two junk coeffs past length */
+    for (i = Alen; i < Alen + 2 && i < A->zpoly->alloc; i++)
+        _fmpz_demote(Acoeffs + i);
+
     _fmpz_mpoly_set_length(A->zpoly, Alen, ctx->zctx);
+
+    TMP_END;
+
+    if (success)
+    {
+        fmpz_set(fmpq_numref(A->content), fmpq_numref(B->content));
+        success = fmpz_pow_cache_mulpow_ui(fmpq_denref(A->content),
+                                      fmpq_denref(B->content), deg, den_cache);
+        fmpq_canonicalise(A->content);
+    }
+    else
+    {
+        fmpq_zero(A->content);
+    }
+
+    if (need_sort)
+    {
+        fmpz_mpoly_sort_terms(A->zpoly, ctx->zctx);
+        fmpz_mpoly_combine_like_terms(A->zpoly, ctx->zctx);
+    }
 
     fmpq_mpoly_reduce(A, ctx);
 
-    _fmpz_vec_clear(powers, poweralloc);
-
-    fmpq_clear(u);
-
-    TMP_END;
+    FLINT_ASSERT(fmpq_mpoly_is_canonical(A, ctx));
 
     return success;
 }
 
 /* exponents of B are multiprecision */
-int _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                       slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
+static int _fmpq_mpoly_evaluate_one_fmpq_mp(
+    fmpq_mpoly_t A,
+    const fmpq_mpoly_t B,
+    slong var,
+    fmpz_pow_cache_t num_cache,
+    fmpz_pow_cache_t den_cache,
+    const fmpz_t deg,
+    const fmpq_mpoly_ctx_t ctx)
 {
     int success = 1;
-    int new;
-    slong i, j, N, bits;
-    slong main_off;
-    fmpz_t main_exp, emin, emax;
-    ulong * cmpmask, * main_one;
-    slong Aalloc, Alen, Blen;
-    fmpz * Acoeff, * Bcoeff;
-    ulong * Aexp, * Bexp;
-    ulong * main_exps;
-    slong poweralloc;
-    fmpz * powers;
-    slong * inds;
-    ulong * exp_array, * exp;
-    slong next_loc;
-    slong heap_len;
-    mpoly_heap_s * heap;
-    mpoly_heap_t * x;
-    mpoly_heap_t * chain;
-    slong * store, * store_base;
-    mpoly_rbnode_struct ** stack;
-    slong stack_size;
-    mpoly_rbtree_t tree;
-    mpoly_rbnode_struct * node;
-    mpoly_rbnode_struct * root;
-    fmpz_t t;
-    fmpq_t u;
+    slong i, N, off;
+    ulong * cmpmask, * one, * tmp;
+    slong Blen = B->zpoly->length;
+    const fmpz * Bcoeffs = B->zpoly->coeffs;
+    const ulong * Bexps = B->zpoly->exps;
+    flint_bitcnt_t bits = B->zpoly->bits;
+    slong Alen;
+    fmpz * Acoeffs;
+    ulong * Aexps;
+    fmpz_t k, degmk;
+    int need_sort = 0, cmp;
     TMP_INIT;
 
-    Blen = B->zpoly->length;
-    Bcoeff = B->zpoly->coeffs;
-    Bexp = B->zpoly->exps;
-    bits = B->zpoly->bits;
-
-    FLINT_ASSERT(A != B);
-    FLINT_ASSERT(bits > FLINT_BITS);
-    FLINT_ASSERT(Blen > 0);
+    FLINT_ASSERT((bits % FLINT_BITS) == 0);
 
     TMP_START;
 
-    fmpz_init(t);
-    fmpq_init(u);
-    fmpz_init(emin);
-    fmpz_init(emax);
+    fmpz_init(k);
+    fmpz_init(degmk);
+    
+    if (A != B)
+        fmpz_mpoly_fit_length_reset_bits(A->zpoly, Blen, bits, ctx->zctx);
+
+    Acoeffs = A->zpoly->coeffs;
+    Aexps = A->zpoly->exps;
 
     N = mpoly_words_per_exp(bits, ctx->zctx->minfo);
-    main_one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    main_off = mpoly_gen_monomial_offset_mp(main_one, var, bits, ctx->zctx->minfo);
+    one = (ulong *) TMP_ALLOC(3*N*sizeof(ulong));
+    cmpmask = one + N;
+    tmp = cmpmask + N;
+    off = mpoly_gen_monomial_offset_mp(one, var, bits, ctx->zctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->zctx->minfo);
 
-    /* scan poly2 and put powers of var into tree */
-    /*
-        suppose x > y with lex order and poly2 is
-        x^3*y + x^2*y^3 + x*y + y + 1
-        and we are evaluating at y = 2
-
-        The data member of nodes in the tree of powers of y appearing in
-        the polynomial contain the term number of the first such appearance
-             data
-        y^0  4    (1       term)
-        y^1  0    (x^3*y   term)
-        y^3  1    (x^2*y^3 term)
-
-        the inds array conains the term number of the next term with
-        the same power of y
-
-        inds[0] = 2  (x*y term)
-        inds[1] = -1 
-        inds[2] = 3  (y   term)
-        inds[3] = -1
-        inds[4] = -1
-    */
-    inds = (slong *) TMP_ALLOC(Blen*sizeof(slong));
-    mpoly_rbtree_init(tree);
-    fmpz_init(main_exp);
+    Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        fmpz_set_ui_array(main_exp, Bexp + N*i + main_off, bits/FLINT_BITS);
-        node = mpoly_rbtree_get_fmpz(&new, tree, main_exp);
-        if (i == 0)
+        fmpz_set_ui_array(k, Bexps + N*i + off, bits/FLINT_BITS);
+        fmpz_sub(degmk, deg, k);
+        success = fmpz_pow_cache_mulpow_fmpz(Acoeffs + Alen, Bcoeffs + i,
+                                                              k, num_cache) &&
+                  fmpz_pow_cache_mulpow_fmpz(Acoeffs + Alen, Acoeffs + Alen,
+                                                             degmk, den_cache);
+        if (!success)
+            break;
+
+        if (fmpz_is_zero(Acoeffs + Alen))
+            continue;
+
+        mpoly_monomial_mul_fmpz(tmp, one, N, k);
+        mpoly_monomial_sub_mp(Aexps + N*Alen, Bexps + N*i, tmp, N);
+        if (Alen < 1)
         {
-            fmpz_set(emin, main_exp);
-            fmpz_set(emax, main_exp);
+            Alen = 1;
+            continue;
         }
-        else
+        cmp = mpoly_monomial_cmp(Aexps + N*(Alen - 1), Aexps + N*Alen, N, cmpmask);
+        if (cmp != 0)
         {
-            if (fmpz_cmp(emin, main_exp) > 0)
-                fmpz_set(emin, main_exp);
-            if (fmpz_cmp(emax, main_exp) < 0)
-                fmpz_set(emax, main_exp);
+            need_sort |= (cmp < 0);
+            Alen++;
+            continue;
         }
-        if (new)
-        {
-            node->data = (void *) i;
-        } else
-        {
-            inds[(slong) node->data2] = i;
-        }
-        node->data2 = (void *) i;
-        inds[i] = -WORD(1);
-    }
-    fmpz_clear(main_exp);
-    FLINT_ASSERT(fmpz_cmp(emax, emin) >= 0);
-
-    success = success && fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), emin);
-    success = success && fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), emax);
-    fmpq_mul(A->content, B->content, u);
-
-    /* manually traverse tree and add node data to heap */
-    heap_len = 1;
-    next_loc = tree->size + 4;
-    heap = (mpoly_heap_s *) TMP_ALLOC((tree->size + 1)*sizeof(mpoly_heap_s));
-    chain = (mpoly_heap_t *) TMP_ALLOC(tree->size*sizeof(mpoly_heap_t));
-    store = store_base = (slong *) TMP_ALLOC(2*tree->size*sizeof(slong));
-    exp_array = (ulong *) TMP_ALLOC(tree->size*N*sizeof(ulong));
-
-    i = 0;
-    stack_size = 0;
-    main_exps = (ulong *) TMP_ALLOC(tree->size*N*sizeof(ulong));
-    poweralloc = tree->size;
-    powers = _fmpz_vec_init(poweralloc);
-    stack = (mpoly_rbnode_struct **) TMP_ALLOC(tree->size
-                                              * sizeof(mpoly_rbnode_struct *));
-    root = tree->head->left;
-
-looper:
-
-    while (root != tree->null)
-    {
-        stack[stack_size++] = root;
-        root = root->left;
+        fmpz_add(Acoeffs + Alen - 1, Acoeffs + Alen - 1, Acoeffs + Alen);
+        Alen -= fmpz_is_zero(Acoeffs + Alen - 1);
     }
 
-    if (stack_size == 0)
-        goto done;
+    /* from the fmpz_add: at most two junk coeffs past length */
+    for (i = Alen; i < Alen + 2 && i < A->zpoly->alloc; i++)
+        _fmpz_demote(Acoeffs + i);
 
-    root = stack[--stack_size];
-
-    mpoly_monomial_mul_fmpz(main_exps + N*i, main_one, N, &root->key);
-
-    fmpz_sub(t, &root->key, emin);
-    success = success && fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), t);
-    fmpz_sub(t, emax, &root->key);
-    success = success && fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), t);
-    fmpz_mul(powers + i, fmpq_numref(u), fmpq_denref(u));
-
-    x = chain + i;
-    x->i = i;
-    x->j = (slong) root->data;
-
-    x->next = NULL;
-    mpoly_monomial_sub_mp(exp_array + N*i, Bexp + N*x->j, main_exps + N*i, N);
-    _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, cmpmask);
-
-    i++;    
-    node = root->right;
-    fmpz_clear(&root->key);
-    flint_free(root);
-    root = node;
-
-    goto looper;
-
-done:
-
-    FLINT_ASSERT(i == tree->size);
-
-    /* take from heap and put into A */
-    fmpz_mpoly_fit_bits(A->zpoly, bits, ctx->zctx);
-    A->zpoly->bits = bits;
-    Acoeff = A->zpoly->coeffs;
-    Aexp = A->zpoly->exps;
-    Aalloc = A->zpoly->alloc;
-    Alen = 0;
-    while (heap_len > 1)
-    {
-        exp = heap[1].exp;
-
-        _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-
-        mpoly_monomial_set(Aexp + Alen*N, exp, N);
-        
-        fmpz_zero(Acoeff + Alen);
-        do {
-            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do {
-                *store++ = x->i;
-                *store++ = x->j;
-                fmpz_addmul(Acoeff + Alen, powers + x->i, Bcoeff + x->j);
-            } while ((x = x->next) != NULL);
-        } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
-
-        Alen += !fmpz_is_zero(Acoeff + Alen);
-
-        while (store > store_base)
-        {
-            j = *--store;
-            i = *--store;
-            if (inds[j] >= 0)
-            {
-                x = chain + i;
-                x->i = i;
-                x->j = inds[j];
-                x->next = NULL;
-                mpoly_monomial_sub_mp(exp_array + N*i, Bexp + N*x->j,
-                                                           main_exps + N*i, N);
-                _mpoly_heap_insert(heap, exp_array + N*i, x,
-                                      &next_loc, &heap_len, N, cmpmask);
-            }
-        }
-    }
-
-    A->zpoly->coeffs = Acoeff;
-    A->zpoly->exps = Aexp;
-    A->zpoly->alloc = Aalloc;
     _fmpz_mpoly_set_length(A->zpoly, Alen, ctx->zctx);
 
-    _fmpz_vec_clear(powers, poweralloc);
-    fmpq_clear(u);
-    fmpz_clear(t);
-    fmpz_clear(emin);
-    fmpz_clear(emax);
+    fmpz_clear(k);
+    fmpz_clear(degmk);
+
+    TMP_END;
+
+    if (success)
+    {
+        fmpz_set(fmpq_numref(A->content), fmpq_numref(B->content));
+        success = fmpz_pow_cache_mulpow_fmpz(fmpq_denref(A->content),
+                                      fmpq_denref(B->content), deg, den_cache);
+        fmpq_canonicalise(A->content);
+    }
+    else
+    {
+        fmpq_zero(A->content);
+    }
+
+    if (need_sort)
+    {
+        fmpz_mpoly_sort_terms(A->zpoly, ctx->zctx);
+        fmpz_mpoly_combine_like_terms(A->zpoly, ctx->zctx);
+    }
 
     fmpq_mpoly_reduce(A, ctx);
 
-    TMP_END;
+    FLINT_ASSERT(fmpq_mpoly_is_canonical(A, ctx));
 
     return success;
 }
@@ -487,6 +233,10 @@ int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
                            const fmpq_mpoly_t B, slong var, const fmpq_t val,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
+    flint_bitcnt_t height;
+    fmpz_pow_cache_t num_cache, den_cache;
+    int success;
+
     if (B->zpoly->length == 0)
     {
         fmpq_mpoly_zero(A, ctx);
@@ -504,13 +254,31 @@ int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
         return success;
     }
 
+    fmpz_pow_cache_init(num_cache, fmpq_numref(val));
+    fmpz_pow_cache_init(den_cache, fmpq_denref(val));
+    height = fmpq_height_bits(val);
+
     if (B->zpoly->bits <= FLINT_BITS)
     {
-        return _fmpq_mpoly_evaluate_one_fmpq_sp(A, B, var, val, ctx);
+        ulong deg = fmpq_mpoly_degree_si(B, var, ctx);
+        success = (!_fmpz_pow_ui_is_not_feasible(height, deg)) &&
+                  _fmpq_mpoly_evaluate_one_fmpq_sp(A, B, var,
+                                               num_cache, den_cache, deg, ctx);
     }
     else
     {
-        return _fmpq_mpoly_evaluate_one_fmpq_mp(A, B, var, val, ctx);
+        fmpz_t deg;
+        fmpz_init(deg);
+        fmpq_mpoly_degree_fmpz(deg, B, var, ctx);
+        success = (!_fmpz_pow_fmpz_is_not_feasible(height, deg)) &&
+                  _fmpq_mpoly_evaluate_one_fmpq_mp(A, B, var,
+                                               num_cache, den_cache, deg, ctx);
+        fmpz_clear(deg);
     }
+
+    fmpz_pow_cache_clear(num_cache);
+    fmpz_pow_cache_clear(den_cache);
+
+    return success;
 }
 

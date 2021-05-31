@@ -174,44 +174,6 @@ typedef struct mpoly_heap_s
 
 /* trees *********************************************************************/
 
-#if 1
-/* old bad red-black. TODO replace this with a proper mpoly_rbtree_fmpz */
-typedef struct mpoly_rbnode
-{
-    struct mpoly_rbnode * up;
-    struct mpoly_rbnode * left;
-    struct mpoly_rbnode * right;
-    void * data;
-    void * data2;
-    slong key;
-    int col;
-} mpoly_rbnode_struct;
-
-typedef mpoly_rbnode_struct mpoly_rbnode_t[1];
-
-typedef struct mpoly_rbtree
-{
-    slong size;
-    mpoly_rbnode_t head;  /* dummy node for pointer to head */
-    mpoly_rbnode_t null;  /* dummy node to be pointed to by leaves */
-} mpoly_rbtree_struct;
-
-typedef mpoly_rbtree_struct mpoly_rbtree_t[1];
-
-FLINT_DLL void mpoly_rbtree_init(mpoly_rbtree_t tree);
-
-FLINT_DLL void mpoly_rbnode_clear(mpoly_rbtree_t tree, mpoly_rbnode_t node,
-                                void ** dataout, slong * keysout, slong * idx);
-
-FLINT_DLL void mpoly_rbtree_clear(mpoly_rbtree_t tree, void ** dataout, slong * keysout);
-
-FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get(int * new_node,
-                                         struct mpoly_rbtree *tree, slong rcx);
-
-FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get_fmpz(int * new_node,
-                                        struct mpoly_rbtree *tree, fmpz_t rcx);
-#endif
-
 /* red-black with ui keys */
 typedef struct {
     ulong key;
@@ -277,7 +239,6 @@ MPOLY_INLINE slong mpoly_rbtree_fmpz_head(const mpoly_rbtree_fmpz_t T)
     FLINT_ASSERT(T->nodes[1].left >= 0 || T->length < 1);
     return T->nodes[1].left;
 }
-
 
 /* Orderings *****************************************************************/
 
