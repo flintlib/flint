@@ -36,18 +36,18 @@ main(void)
         slong len1, len2, n;
         flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2, bits;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 15);
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
         fmpz_mpoly_univar_init(fx, ctx);
         fmpz_mpoly_univar_init(gx, ctx);
 
-        len1 = n_randint(state, 50);
-        len2 = n_randint(state, 50);
+        len1 = n_randint(state, 200);
+        len2 = n_randint(state, 200);
 
-        exp_bits1 = n_randint(state, 3*FLINT_BITS) + 1;
-        exp_bits2 = n_randint(state, 3*FLINT_BITS) + 1;
+        exp_bits1 = n_randint(state, (i%2) ? 4 : 3*FLINT_BITS) + 1;
+        exp_bits2 = n_randint(state, (i%2) ? 4 : 3*FLINT_BITS) + 1;
         coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < ctx->minfo->nvars; j++)
@@ -62,8 +62,8 @@ main(void)
 
             if (!fmpz_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check mpoly -> mpoly_univar -> mpoly\ni: %wd  j: %wd\n",i,j);
+                flint_printf("FAIL: Check mpoly -> mpoly_univar -> mpoly\n");
+                flint_printf("i: %wd  j: %wd\n",i,j);
                 flint_abort();
             }
 
@@ -72,8 +72,8 @@ main(void)
             fmpz_mpoly_assert_canonical(h, ctx);
             if (h->bits != bits || !fmpz_mpoly_equal(f, h, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check mpoly -> mpoly_univar -> mpoly with bits\ni: %wd  j: %wd\n",i,j);
+                flint_printf("FAIL: Check mpoly -> mpoly_univar -> mpoly with bits\n");
+                flint_printf("i: %wd  j: %wd\n",i,j);
                 flint_abort();
             }
 
@@ -92,8 +92,8 @@ main(void)
             fmpz_mpoly_from_univar(g, gx, j, ctx);
             if (!fmpz_mpoly_equal(f, g, ctx))
             {
-                printf("FAIL\n");
-                flint_printf("Check construction\ni: %wd  j: %wd\n",i,j);
+                flint_printf("FAIL: Check construction\n");
+                flint_printf("i: %wd  j: %wd\n",i,j);
                 flint_abort();
             }
         }

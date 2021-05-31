@@ -106,58 +106,60 @@ void fq_zech_mpoly_univar_print_pretty(const fq_zech_mpoly_univar_t A,
     }
 }
 
-static void _mpoly_rbnode_clear_sp(
+static void _tree_data_clear_sp(
     fq_zech_mpoly_univar_t A,
-    mpoly_rbtree_t tree,
-    mpoly_rbnode_t node)
+    mpoly_rbtree_ui_t tree,
+    slong idx,
+    const fq_zech_mpoly_ctx_t ctx)
 {
-    mpoly_rbnode_struct * left = node->left;
+    mpoly_rbnode_ui_struct * nodes = tree->nodes + 2;
+    fq_zech_mpoly_struct * data = (fq_zech_mpoly_struct *) tree->data;
 
-    if (node->right != tree->null)
-        _mpoly_rbnode_clear_sp(A, tree, node->right);
+    if (idx < 0)
+        return;
+
+    _tree_data_clear_sp(A, tree, nodes[idx].right, ctx);
 
     FLINT_ASSERT(A->length < A->alloc);
 
-    fmpz_set_si(A->exps + A->length, node->key);
-    fq_zech_mpoly_swap(A->coeffs + A->length, (fq_zech_mpoly_struct *)(node->data), NULL);
+    fmpz_set_ui(A->exps + A->length, nodes[idx].key);
+    fq_zech_mpoly_swap(A->coeffs + A->length, data + idx, ctx);
     A->length++;
 
-    fq_zech_mpoly_clear(node->data, NULL);
-    flint_free(node->data);
-    flint_free(node);
+    fq_zech_mpoly_clear(data + idx, ctx);
 
-    if (left != tree->null)
-        _mpoly_rbnode_clear_sp(A, tree, left);
+    _tree_data_clear_sp(A, tree, nodes[idx].left, ctx);
 }
 
-static void _mpoly_rbnode_clear_mp(
+static void _tree_data_clear_mp(
     fq_zech_mpoly_univar_t A,
-    mpoly_rbtree_t tree,
-    mpoly_rbnode_t node)
+    mpoly_rbtree_fmpz_t tree,
+    slong idx,
+    const fq_zech_mpoly_ctx_t ctx)
 {
-    mpoly_rbnode_struct * left = node->left;
+    mpoly_rbnode_fmpz_struct * nodes = tree->nodes + 2;
+    fq_zech_mpoly_struct * data = (fq_zech_mpoly_struct *) tree->data;
 
-    if (node->right != tree->null)
-        _mpoly_rbnode_clear_mp(A, tree, node->right);
+    if (idx < 0)
+        return;
+
+    _tree_data_clear_mp(A, tree, nodes[idx].right, ctx);
 
     FLINT_ASSERT(A->length < A->alloc);
 
-    fmpz_swap(A->exps + A->length, (fmpz*)(&node->key));
-    fq_zech_mpoly_swap(A->coeffs + A->length, (fq_zech_mpoly_struct *)(node->data), NULL);
+    fmpz_set(A->exps + A->length, nodes[idx].key);
+    fq_zech_mpoly_swap(A->coeffs + A->length, data + idx, ctx);
     A->length++;
 
-    fmpz_clear((fmpz*)(&node->key));
-    fq_zech_mpoly_clear(node->data, NULL);
-    flint_free(node->data);
-    flint_free(node);
+    fq_zech_mpoly_clear(data + idx, ctx);
 
-    if (left != tree->null)
-        _mpoly_rbnode_clear_mp(A, tree, left);
+    _tree_data_clear_mp(A, tree, nodes[idx].left, ctx);
 }
+
 
 /* the coefficients of A should be constructed with the same bits as B */
 void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
-                                      slong var, const fq_zech_mpoly_ctx_t ctx)
+                                         slong var, const fq_zech_mpoly_ctx_t ctx)
 {
     flint_bitcnt_t bits = B->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
@@ -166,14 +168,10 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
     const fq_zech_struct * Bcoeff = B->coeffs;
     const ulong * Bexp = B->exps;
     slong i;
-    int new;
+    int its_new;
     ulong * one;
-    mpoly_rbtree_t tree;
-    mpoly_rbnode_struct * node;
-    fq_zech_mpoly_struct * d;
 #define LUT_limit (48)
     fq_zech_mpoly_struct LUT[LUT_limit];
-    TMP_INIT;
 
     if (B->length == 0)
     {
@@ -181,15 +179,17 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
         return;
     }
 
-    TMP_START;
-
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-
-    mpoly_rbtree_init(tree);
+    one = FLINT_ARRAY_ALLOC(N, ulong);
 
     if (bits <= FLINT_BITS)
     {
+        slong Alen;
+        mpoly_rbtree_ui_t tree;
+        fq_zech_mpoly_struct * d;
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+
+        mpoly_rbtree_ui_init(tree, sizeof(fq_zech_mpoly_struct));
+
         mpoly_gen_monomial_offset_shift_sp(one, &off, &shift,
                                                         var, bits, ctx->minfo);
         for (i = 0; i < LUT_limit; i++)
@@ -205,17 +205,9 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
             }
             else
             {
-                node = mpoly_rbtree_get(&new, tree, k);
-                if (new)
-                {
-                    d = flint_malloc(sizeof(fq_zech_mpoly_struct));
+                d = mpoly_rbtree_ui_lookup(tree, &its_new, k);
+                if (its_new)
                     fq_zech_mpoly_init3(d, 4, bits, ctx);
-                    node->data = d;
-                }
-                else
-                {
-                    d = node->data;
-                }
             }
             fq_zech_mpoly_fit_length(d, d->length + 1, ctx);
             fq_zech_set(d->coeffs + d->length, Bcoeff + i, ctx->fqctx);
@@ -224,10 +216,15 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
         }
 
         /* clear out tree to A */
-        fq_zech_mpoly_univar_fit_length(A, tree->size + LUT_limit, ctx);
+
+        Alen = tree->length;
+        for (i = LUT_limit - 1; i >= 0; i--)
+            Alen += (LUT[i].length > 0);
+
+        fq_zech_mpoly_univar_fit_length(A, Alen, ctx);
         A->length = 0;
-        if (tree->size > 0)
-            _mpoly_rbnode_clear_sp(A, tree, tree->head->left);
+
+        _tree_data_clear_sp(A, tree, mpoly_rbtree_ui_head(tree), ctx);
 
         for (i = LUT_limit - 1; i >= 0; i--)
         {
@@ -241,11 +238,17 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
             }
             fq_zech_mpoly_clear(d, ctx);
         }
+
+        mpoly_rbtree_ui_clear(tree);
     }
     else
     {
+        mpoly_rbtree_fmpz_t tree;
+        fq_zech_mpoly_struct * d;
         fmpz_t k;
+
         fmpz_init(k);
+        mpoly_rbtree_fmpz_init(tree, sizeof(fq_zech_mpoly_struct));
 
         off = mpoly_gen_monomial_offset_mp(one, var, bits, ctx->minfo);
 
@@ -254,17 +257,10 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
         {
             fmpz_set_ui_array(k, Bexp + N*i + off, bits/FLINT_BITS);
 
-            node = mpoly_rbtree_get_fmpz(&new, tree, k);
-            if (new)
-            {
-                d = flint_malloc(sizeof(fq_zech_mpoly_struct));
+            d = mpoly_rbtree_fmpz_lookup(tree, &its_new, k);
+            if (its_new)
                 fq_zech_mpoly_init3(d, 4, bits, ctx);
-                node->data = d;
-            }
-            else
-            {
-                d = node->data;
-            }
+
             fq_zech_mpoly_fit_length(d, d->length + 1, ctx);
             fq_zech_set(d->coeffs + d->length, Bcoeff + i, ctx->fqctx);
             mpoly_monomial_msub_ui_array(d->exps + N*d->length, Bexp + N*i,
@@ -273,15 +269,16 @@ void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A, const fq_zech_mpoly_t B,
         }
 
         /* clear out tree to A */
-        fq_zech_mpoly_univar_fit_length(A, tree->size, ctx);
+        fq_zech_mpoly_univar_fit_length(A, tree->length, ctx);
         A->length = 0;
-        FLINT_ASSERT(tree->size > 0);
-        _mpoly_rbnode_clear_mp(A, tree, tree->head->left);
+
+        _tree_data_clear_mp(A, tree, mpoly_rbtree_fmpz_head(tree), ctx);
 
         fmpz_clear(k);
+        mpoly_rbtree_fmpz_clear(tree);
     }
 
-    TMP_END;
+    flint_free(one);
 }
 
 

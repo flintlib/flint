@@ -194,7 +194,7 @@ static void nmod_mpoly_set_eval_helper3(
     for (i = 2; i < yvar; i++)
         mpoly_gen_offset_shift_sp(&off[i], &shift[i], i, bits, ctx->minfo);
 
-    mpoly_rbtree_ui_init(W);
+    mpoly_rbtree_ui_init(W, sizeof(n_poly_struct));
     for (i = 0; i < Alen; i++)
     {
         n_poly_struct * Wc;
@@ -203,8 +203,7 @@ static void nmod_mpoly_set_eval_helper3(
         y = (Aexps[N*i + yoff] >> yshift) & mask;
         x = (Aexps[N*i + xoff] >> xshift) & mask;
         z = (Aexps[N*i + zoff] >> zshift) & mask;
-        Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z),
-                                                        sizeof(n_poly_struct));
+        Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z));
         if (its_new)
         {
             n_poly_init2(Wc, 4);
@@ -327,7 +326,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
 
         deg = (Bexps[N*0 + xoff] >> xshift) & mask;
 
-        mpoly_rbtree_ui_init(W);
+        mpoly_rbtree_ui_init(W, sizeof(n_poly_struct));
         for (i = 0; i < Blen; i++)
         {
             y = (Bexps[N*i + yoff] >> yshift) & mask;
@@ -336,8 +335,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
 
             FLINT_ASSERT(x <= deg);
 
-            Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z),
-                                                        sizeof(n_poly_struct));
+            Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z));
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
