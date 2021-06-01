@@ -8,77 +8,87 @@ Types, macros and constants
 
 .. type:: fmpz
 
-   an fmpz is implemented as an slong. When its second most significant bit 
-   is 0 the fmpz represents an ordinary slong integer whose absolute
-   value is at most FLINT_BITS - 2 bits.
+   an ``fmpz`` is implemented as an `slong`. When its second most significant
+   bit is `0` the ``fmpz`` represents an ordinary ``slong`` integer whose
+   absolute value is at most ``FLINT_BITS - 2`` bits.
 
-   When the second most significant bit is 1 then the value represents a 
-   pointer (the pointer is shifted right 2 bits and the second msb is set
-   to 1 - this relies on the fact that malloc always allocates memory
-   blocks on a 4 or 8 byte boundary).
+   When the second most significant bit is `1` then the value represents a 
+   pointer (the pointer is shifted right `2` bits and the second most
+   significant bit is set to `1`. This relies on the fact that ``malloc`` always
+   allocates memory blocks on a `4` or `8` byte boundary).
 
 .. type:: fmpz_t
 
-   An array of length 1 of fmpz's. This is used to pass fmpz's around by
-   reference without fuss, similar to the way mpz_t's work.
+   An array of length 1 of ``fmpz``'s. This is used to pass ``fmpz``'s around by
+   reference without fuss, similar to the way ``mpz_t`` work.
 
 .. macro:: COEFF_MAX
  
-   the largest (positive) value an fmpz can be if just an slong
+   the largest (positive) value an ``fmpz`` can be if just an ``slong``.
 
 .. macro:: COEFF_MIN
  
-   the smallest (negative) value an fmpz can be if just an slong
+   the smallest (negative) value an ``fmpz`` can be if just an ``slong``.
 
 .. function:: fmpz PTR_TO_COEFF(__mpz_struct * ptr)
 
-   a macro to convert an mpz_t (or more generally any ``__mpz_struct *``) to an 
-   fmpz (shifts the pointer right by 2 and sets the second most significant 
-   bit). 
+   a macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
+   to an ``fmpz`` (shifts the pointer right by `2` and sets the second most
+   significant bit). 
 
 .. function:: __mpz_struct * COEFF_TO_PTR(fmpz f)
 
-   a macro to convert an fmpz which represents a pointer into an actual 
-   pointer to an __mpz_struct (i.e. to an mpz_t)
+   a macro to convert an ``fmpz`` which represents a pointer into an actual 
+   pointer to an ``__mpz_struct`` (i.e. to an ``mpz_t``).
 
 .. function:: int COEFF_IS_MPZ(fmpz f)
 
-   a macro which returns 1 if f represents an mpz_t, otherwise 0 is returned.
+   a macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
+   returned.
 
 .. function:: __mpz_struct * _fmpz_new_mpz(void)
 
-   initialises a new mpz_t and returns a pointer to it. This is only used 
+   initialises a new ``mpz_t`` and returns a pointer to it. This is only used 
    internally.
 
 .. function:: void _fmpz_clear_mpz(fmpz f)
 
-   clears the mpz_t "pointed to" by the fmpz f. This is only used internally.
+   clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
+   internally.
 
 .. function:: void _fmpz_cleanup_mpz_content()
 
-   this function does nothing in the reentrant version of fmpz.
+   this function does nothing in the reentrant version of ``fmpz``.
 
 .. function:: void _fmpz_cleanup()
 
-   this function does nothing in the reentrant version of fmpz.
+   this function does nothing in the reentrant version of ``fmpz``.
 
 .. function:: __mpz_struct * _fmpz_promote(fmpz_t f)
 
-   if f doesn't represent an mpz_t, initialise one and associate it to f.
+   if `f` doesn't represent an ``mpz_t``, initialise one and associate it to
+   `f`.
 
 .. function:: __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
-   if f doesn't represent an mpz_t, initialise one and associate it to f, but
-   preserve the value of f.
+   if `f` doesn't represent an ``mpz_t``, initialise one and associate it to
+   `f`, but preserve the value of `f`.
+
+   This function is for internal use. The resulting ``fmpz`` will be backed by
+   an ``mpz_t`` that can be passed to GMP, but the ``fmpz`` will be in an
+   inconsistent state with respect to the other Flint ``fmpz`` functions such as
+   ``fmpz_is_zero``, etc.
 
 .. function:: void _fmpz_demote(fmpz_t f)
 
-   if f represents an mpz_t clear it and make f just represent an slong.
+   if `f` represents an ``mpz_t`` clear it and make `f` just represent an
+   ``slong``.
 
 .. function:: void _fmpz_demote_val(fmpz_t f)
 
-   if f represents an mpz_t and its value will fit in an slong, preserve the 
-   value in f which we make to represent an slong, and clear the mpz_t.
+   if `f` represents an ``mpz_t`` and its value will fit in an ``slong``,
+   preserve the value in `f` which we make to represent an ``slong``, and
+   clear the ``mpz_t``.
 
 
 Memory management
@@ -197,19 +207,19 @@ Conversion
 
 .. function:: void fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
 
-    If ``f`` consists of two limbs, then `*hi` and `*low` are set to the high
-    and low limbs, otherwise `*low` is set to the low limb and `*hi` is set
-    to 0.
+    If `f` consists of two limbs, then ``*hi`` and ``*low`` are set to the high
+    and low limbs, otherwise ``*low`` is set to the low limb and ``*hi`` is set
+    to `0`.
 
 .. function:: mp_limb_t fmpz_get_nmod(const fmpz_t f, nmod_t mod)
 
-    Returns `f` modulo ``mod.n``.
+    Returns `f \mod n`.
 
 .. function:: double fmpz_get_d(const fmpz_t f)
 
     Returns `f` as a ``double``, rounding down towards zero if
-    ``f`` cannot be represented exactly. The outcome is undefined
-    if ``f`` is too large to fit in the normal range of a double.
+    `f` cannot be represented exactly. The outcome is undefined
+    if `f` is too large to fit in the normal range of a double.
 
 .. function:: void fmpz_set_mpf(fmpz_t f, const mpf_t x)
 
@@ -218,17 +228,17 @@ Conversion
 
 .. function:: void fmpz_get_mpf(mpf_t x, const fmpz_t f)
 
-    Sets the value of ``x`` from ``f``.
+    Sets the value of the ``mpf_t`` `x` to the value of `f`.
 
 .. function:: void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
 
-    Sets the value of ``x`` from ``f``, rounded toward the given
+    Sets the value of `x` from `f`, rounded toward the given
     direction ``rnd``.
 
 .. function:: double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns `f` as a normalized ``double`` along with a `2`-exponent 
-    ``exp``, i.e.\ if `r` is the return value then ``f = r * 2^exp``, 
+    ``exp``, i.e.\ if `r` is the return value then `f = r 2^{exp}`, 
     to within 1 ULP.
 
 .. function:: void fmpz_get_mpz(mpz_t x, const fmpz_t f)
@@ -237,9 +247,9 @@ Conversion
 
 .. function:: int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
 
-    Sets the ``mp_ptr`` `n` to the same value as `n_in`. Returned
+    Sets the ``mp_ptr`` `n` to the same value as `n_{in}`. Returned
     integer is number of limbs allocated to `n`, minimum number of limbs
-    required to hold the value stored in `n_in`.
+    required to hold the value stored in `n_{in}`.
 
 .. function:: char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
@@ -266,7 +276,7 @@ Conversion
 
 .. function:: void fmpz_set_d_2exp(fmpz_t f, double d, slong exp)
 
-    Sets `f` to the nearest integer to ``d*2^(exp)``.
+    Sets `f` to the nearest integer to `d 2^{exp}`.
 
 .. function:: void fmpz_neg_ui(fmpz_t f, ulong val)
 
