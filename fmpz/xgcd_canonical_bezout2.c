@@ -88,12 +88,13 @@ fmpz_xgcd_canonical_bezout2(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const 
             /* Done with (2) */
 
             /* The k we want to use lie within d a / g ± 1 / 2 */
-            tmp = *g / *d;
+            *a *= FLINT_SGN(*f);
+            tmp = gn / *d;
             k = *a / tmp;
             k += (FLINT_ABS(*a - (k + 1) * tmp) <= FLINT_ABS(tmp / 2));
             k -= (FLINT_ABS(*a - (k - 1) * tmp) <= FLINT_ABS(tmp / 2));
             *a -= k * tmp;
-            *b += k * (*f / *d); /* Done with (3) */
+            *b = (*d - *a * *f) / *g; /* Done with (3) */
             return;
         }
         else
@@ -117,12 +118,13 @@ fmpz_xgcd_canonical_bezout2(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const 
                 return;
             }
 
-            tmp = *f / *d;
+            *b *= FLINT_SGN(*g);
+            tmp = fn / *d;
             k = *b / tmp;
             k += (FLINT_ABS(*b - (k + 1) * tmp) <= FLINT_ABS(tmp / 2));
             k -= (FLINT_ABS(*b - (k - 1) * tmp) <= FLINT_ABS(tmp / 2));
             *b -= k * tmp;
-            *a += k * (*g / *d);
+            *a = (*d - *b * *g) / *f;
             return;
         }
     }
