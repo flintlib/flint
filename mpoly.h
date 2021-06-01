@@ -1694,7 +1694,61 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
    return 1;
 }
 
-/* Parsing *******************************************************************/
+/* generic parsing ***********************************************************/
+
+typedef struct {
+    char * coeffs;
+    fmpz * exps;
+    slong length;
+    slong alloc;
+} mpoly_univar_struct;
+
+typedef mpoly_univar_struct mpoly_univar_t[1];
+
+typedef struct {
+    slong elem_size;
+    const void * ctx;
+    void (*init)(void *, const void *);
+    void (*clear)(void *, const void *);
+    int (*is_zero)(const void *, const void *);
+    void (*zero)(void *, const void *);
+    void (*one)(void *, const void *);
+    void (*set)(void *, const void *, const void *);
+    void (*swap)(void *, void *, const void *);
+    void (*neg)(void *, const void *, const void *);
+    void (*add)(void *, const void *, const void *, const void *);
+    void (*sub)(void *, const void *, const void *, const void *);
+    void (*mul_fmpz)(void *, const void *, const fmpz_t, const void *);
+    void (*mul)(void *, const void *, const void *, const void *);
+    void (*divexact)(void *, const void *, const void *, const void *);
+    int (*divides)(void *, const void *, const void *, const void *);
+    int (*pow_fmpz)(void *, const void *, const fmpz_t, const void *);
+} mpoly_void_ring_t[1];
+
+FLINT_DLL void * mpoly_void_ring_elem_init(mpoly_void_ring_t R);
+
+FLINT_DLL void mpoly_void_ring_elem_clear(void * a, mpoly_void_ring_t R);
+
+FLINT_DLL void mpoly_univar_init(mpoly_univar_t A, mpoly_void_ring_t R);
+
+FLINT_DLL void mpoly_univar_clear(mpoly_univar_t A, mpoly_void_ring_t R);
+
+FLINT_DLL void mpoly_univar_swap(mpoly_univar_t A, mpoly_univar_t B);
+
+FLINT_DLL void mpoly_univar_fit_length(mpoly_univar_t A, slong len,
+                                                          mpoly_void_ring_t R);
+
+FLINT_DLL void mpoly_univar_init2(mpoly_univar_t A, slong len,
+                                                          mpoly_void_ring_t R);
+
+FLINT_DLL int mpoly_univar_pseudo_gcd_ducos(mpoly_univar_t G,
+                      mpoly_univar_t B, mpoly_univar_t A, mpoly_void_ring_t R);
+
+FLINT_DLL int mpoly_univar_resultant(void * r, mpoly_univar_t fx,
+                                       mpoly_univar_t gx, mpoly_void_ring_t R);
+
+FLINT_DLL int mpoly_univar_discriminant(void * d, mpoly_univar_t fx,
+                                                          mpoly_void_ring_t R);
 
 typedef struct {
     char * str;

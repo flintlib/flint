@@ -937,7 +937,7 @@ FLINT_DLL int fmpz_mod_mpoly_univar_resultant(fmpz_mod_mpoly_t R,
 FLINT_DLL int fmpz_mod_mpoly_univar_discriminant(fmpz_mod_mpoly_t D,
              const fmpz_mod_mpoly_univar_t Fx, const fmpz_mod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fmpz_mod_mpoly_univar_pgcd_ducos(fmpz_mod_mpoly_univar_t Gx,
+FLINT_DLL int fmpz_mod_mpoly_univar_pseudo_gcd(fmpz_mod_mpoly_univar_t Gx,
         const fmpz_mod_mpoly_univar_t Ax, const fmpz_mod_mpoly_univar_t Bx,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
@@ -957,6 +957,9 @@ void _fmpz_mod_mpoly_clear_dense_mock(fmpz_mod_poly_t D)
 FLINT_DLL void _fmpz_mod_mpoly_init_dense_mock(fmpz_mod_poly_t D,
                         const fmpz_mod_mpoly_t A, const slong * Adeg_bounds,
                                                const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_DLL void mpoly_void_ring_init_fmpz_mod_mpoly_ctx(mpoly_void_ring_t R,
+                                              const fmpz_mod_mpoly_ctx_t ctx);
 
 /* geobuckets ****************************************************************/
 

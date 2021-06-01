@@ -711,9 +711,8 @@ static int _try_prs(
     _fmpz_mod_mpoly_vec_divexact_mpoly(Bx->coeffs, Bx->length, Bc, ctx);
 
     success = fmpz_cmp(Ax->exps + 0, Bx->exps + 0) > 0 ?
-                _fmpz_mod_mpoly_univar_pgcd_ducos(Gx, Ax, Bx, ctx) :
-                _fmpz_mod_mpoly_univar_pgcd_ducos(Gx, Bx, Ax, ctx);
-
+                            fmpz_mod_mpoly_univar_pseudo_gcd(Gx, Ax, Bx, ctx) :
+                            fmpz_mod_mpoly_univar_pseudo_gcd(Gx, Bx, Ax, ctx);
     if (!success)
         goto cleanup;
 
