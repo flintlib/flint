@@ -58,17 +58,10 @@ static slong _op_name(slong a)
     return a&255;
 }
 
-void fparse_init(
-    fparse_t E,
-    void (*init_fxn)(void *, const void *),
-    slong sz,   /* size of the element struct */
-    const void * ctx)
+/* initialize the R member first */
+void mpoly_parse_init(mpoly_parse_t E)
 {
     slong i;
-
-    E->ctx = ctx;
-    E->sz = sz;
-    E->init_fxn = init_fxn;
 
     E->stack_len = 0;
     E->stack_alloc = 20;
@@ -76,37 +69,37 @@ void fparse_init(
 
     E->estore_len = 0;
     E->estore_alloc = 10;
-    E->estore = flint_malloc(E->estore_alloc*E->sz);
+    E->estore = flint_malloc(E->estore_alloc*E->R->elem_size);
 
     for (i = 0; i < E->estore_alloc; i++)
-        E->init_fxn(E->estore + i*E->sz, E->ctx);
+        E->R->init(E->estore + i*E->R->elem_size, E->R->ctx);
 
     E->terminals_len = 0;
     E->terminals_alloc = 5;
     E->terminal_strings = FLINT_ARRAY_ALLOC(E->terminals_alloc, string_with_length_struct);
-    E->terminal_values = FLINT_ARRAY_ALLOC(E->terminals_alloc*E->sz, char);
+    E->terminal_values = FLINT_ARRAY_ALLOC(E->terminals_alloc*E->R->elem_size, char);
     for (i = 0; i < E->terminals_alloc; i++)
     {
         E->terminal_strings[i].str = NULL;
         E->terminal_strings[i].str_len = 0;
-        E->init_fxn(E->terminal_values + E->sz*i, ctx);
+        E->R->init(E->terminal_values + E->R->elem_size*i, E->R->ctx);
     }
 }
 
-void fparse_clear(fparse_t E)
+void mpoly_parse_clear(mpoly_parse_t E)
 {
     slong i;
 
     flint_free(E->stack);
 
     for (i = 0; i < E->estore_alloc; i++)
-        E->clear_fxn(E->estore + E->sz*i, E->ctx);
+        E->R->clear(E->estore + E->R->elem_size*i, E->R->ctx);
     flint_free(E->estore);
 
     for (i = 0; i < E->terminals_alloc; i++)
     {
         flint_free(E->terminal_strings[i].str);
-        E->clear_fxn(E->terminal_values + E->sz*i, E->ctx);
+        E->R->clear(E->terminal_values + E->R->elem_size*i, E->R->ctx);
     }
     flint_free(E->terminal_strings);
     flint_free(E->terminal_values);
@@ -119,7 +112,7 @@ void fparse_clear(fparse_t E)
         b = _tmp_;          \
     } while (0);
 
-void fparse_add_terminal(fparse_t E, const char * s, const void * val)
+void mpoly_parse_add_terminal(mpoly_parse_t E, const char * s, const void * val)
 {
     slong l, n = E->terminals_len;
 
@@ -133,12 +126,12 @@ void fparse_add_terminal(fparse_t E, const char * s, const void * val)
                                             sizeof(string_with_length_struct));
 
         E->terminal_values = (char *) flint_realloc(E->terminal_values,
-                                                              E->sz*new_alloc);
+                                                              E->R->elem_size*new_alloc);
         for ( ; i < new_alloc; i++)
         {
             E->terminal_strings[i].str = NULL;
             E->terminal_strings[i].str_len = 0;
-            E->init_fxn(E->terminal_values + E->sz*i, E->ctx);
+            E->R->init(E->terminal_values + E->R->elem_size*i, E->R->ctx);
         }
 
         E->terminals_alloc = new_alloc;
@@ -150,7 +143,7 @@ void fparse_add_terminal(fparse_t E, const char * s, const void * val)
     E->terminal_strings[n].str = (char *) flint_realloc(E->terminal_strings[n].str, l + 1);
     memcpy(E->terminal_strings[n].str, s, l + 1);
 
-    E->set_fxn(E->terminal_values + E->sz*n, val, E->ctx);
+    E->R->set(E->terminal_values + E->R->elem_size*n, val, E->R->ctx);
 
     E->terminals_len = n + 1;
 
@@ -158,24 +151,24 @@ void fparse_add_terminal(fparse_t E, const char * s, const void * val)
     {
         PTR_SWAP(char, E->terminal_strings[n-1].str, E->terminal_strings[n].str);
         SLONG_SWAP(E->terminal_strings[n-1].str_len, E->terminal_strings[n].str_len);
-        E->swap_fxn(E->terminal_values + E->sz*(n-1), E->terminal_values + E->sz*n, E->ctx);
+        E->R->swap(E->terminal_values + E->R->elem_size*(n-1), E->terminal_values + E->R->elem_size*n, E->R->ctx);
         n--;
     }
 }
 
-static int fparse_top_is_expr(const fparse_t E)
+static int mpoly_parse_top_is_expr(const mpoly_parse_t E)
 {
     return E->stack_len > 0 && !_is_op(E->stack[E->stack_len - 1]);
 }
 
-static void * fparse_top_expr(fparse_t E)
+static void * mpoly_parse_top_expr(mpoly_parse_t E)
 {
     FLINT_ASSERT(E->stack_len > 0);
     FLINT_ASSERT(E->stack[E->stack_len - 1] < 0);
-    return E->estore + E->sz*(-1 - E->stack[E->stack_len - 1]);
+    return E->estore + E->R->elem_size*(-1 - E->stack[E->stack_len - 1]);
 }
 
-static void fparse_push_op(fparse_t E, slong op)
+static void mpoly_parse_push_op(mpoly_parse_t E, slong op)
 {
     FLINT_ASSERT(_is_op(op));
     _slong_array_fit_length(&E->stack, &E->stack_alloc, E->stack_len + 1);
@@ -184,43 +177,43 @@ static void fparse_push_op(fparse_t E, slong op)
 }
 
 /* if the top is not an expr, push the tmp, otherwise fail */
-static int fparse_push_expr(fparse_t E)
+static int mpoly_parse_push_expr(mpoly_parse_t E)
 {
-    if (fparse_top_is_expr(E))
+    if (mpoly_parse_top_is_expr(E))
         return -1;
 
     if (E->estore_len + 1 > E->estore_alloc)
     {
         slong i = E->estore_alloc;
         slong new_alloc = FLINT_MAX(E->estore_len + 1, i + i/2);
-        E->estore = flint_realloc(E->estore, new_alloc*E->sz);
+        E->estore = flint_realloc(E->estore, new_alloc*E->R->elem_size);
         for ( ; i < new_alloc; i++)
-            E->init_fxn(E->estore + E->sz*i, E->ctx);
+            E->R->init(E->estore + E->R->elem_size*i, E->R->ctx);
         E->estore_alloc = new_alloc;
     }
 
     _slong_array_fit_length(&E->stack, &E->stack_alloc, E->stack_len + 1);
     E->stack[E->stack_len] = -1 - E->estore_len;
     E->stack_len++;
-    E->swap_fxn(E->estore + E->sz*E->estore_len, E->tmp, E->ctx);
+    E->R->swap(E->estore + E->R->elem_size*E->estore_len, E->tmp, E->R->ctx);
     E->estore_len++;
     return 0;
 }
 
 /* if the top is an expr, pop it, otherwise fail */
-static int fparse_pop_expr(fparse_t E)
+static int mpoly_parse_pop_expr(mpoly_parse_t E)
 {
-    if (!fparse_top_is_expr(E))
+    if (!mpoly_parse_top_is_expr(E))
         return -1;
 
-    E->swap_fxn(E->tmp, E->estore + E->sz*(-1 - E->stack[E->stack_len - 1]), E->ctx);
+    E->R->swap(E->tmp, E->estore + E->R->elem_size*(-1 - E->stack[E->stack_len - 1]), E->R->ctx);
     E->estore_len--;
     E->stack_len--;
     return 0;
 }
 
 /* if the top is an operation op, pop it, otherwise fail */
-static int fparse_pop_op(fparse_t E, slong op)
+static int mpoly_parse_pop_op(mpoly_parse_t E, slong op)
 {
     slong n = E->stack_len - 1;
 
@@ -232,7 +225,7 @@ static int fparse_pop_op(fparse_t E, slong op)
 }
 
 /* pop ops with precedence > prec */
-static int fparse_pop_prec(fparse_t E, slong prec)
+static int mpoly_parse_pop_prec(mpoly_parse_t E, slong prec)
 {
     slong n, n1, n2, n3, p, l1, l3;
 
@@ -268,28 +261,28 @@ again:
 
         if (_op_name(n2) == OP_TIMES)
         {
-            E->mul_fxn(E->tmp, E->estore + E->sz*n3, E->estore + E->sz*n1, E->ctx);
-            E->swap_fxn(E->estore + E->sz*n3, E->tmp, E->ctx);
+            E->R->mul(E->tmp, E->estore + E->R->elem_size*n3, E->estore + E->R->elem_size*n1, E->R->ctx);
+            E->R->swap(E->estore + E->R->elem_size*n3, E->tmp, E->R->ctx);
             E->estore_len -= 1;
             E->stack_len -= 2;
         }
         else if (_op_name(n2) == OP_PLUS)
         {
-            l1 = E->length_fxn(E->estore + E->sz*n1, E->ctx);
-            l3 = E->length_fxn(E->estore + E->sz*n3, E->ctx);
+            l1 = E->R->length(E->estore + E->R->elem_size*n1, E->R->ctx);
+            l3 = E->R->length(E->estore + E->R->elem_size*n3, E->R->ctx);
 
         do_plus:
 
             if (l1 > l3)
             {
                 SLONG_SWAP(l3, l1);
-                E->swap_fxn(E->estore + E->sz*n3, E->estore + E->sz*n1, E->ctx);
+                E->R->swap(E->estore + E->R->elem_size*n3, E->estore + E->R->elem_size*n1, E->R->ctx);
             }
 
             if (p > prec || 2*l1 >= l3)
             {
-                E->add_fxn(E->estore + E->sz*n3, E->estore + E->sz*n3,
-                                                 E->estore + E->sz*n1, E->ctx);
+                E->R->add(E->estore + E->R->elem_size*n3, E->estore + E->R->elem_size*n3,
+                                                 E->estore + E->R->elem_size*n1, E->R->ctx);
                 E->estore_len -= 1;
                 E->stack_len -= 2;
             }
@@ -300,19 +293,19 @@ again:
         }
         else if (_op_name(n2) == OP_MINUS)
         {
-            l1 = E->length_fxn(E->estore + E->sz*n1, E->ctx);
-            l3 = E->length_fxn(E->estore + E->sz*n3, E->ctx);
+            l1 = E->R->length(E->estore + E->R->elem_size*n1, E->R->ctx);
+            l3 = E->R->length(E->estore + E->R->elem_size*n3, E->R->ctx);
 
             if (4*l1 >= l3 || 4*l3 >= l1)
             {
-                E->sub_fxn(E->estore + E->sz*n3, E->estore + E->sz*n3,
-                                                 E->estore + E->sz*n1, E->ctx);
+                E->R->sub(E->estore + E->R->elem_size*n3, E->estore + E->R->elem_size*n3,
+                                                 E->estore + E->R->elem_size*n1, E->R->ctx);
                 E->estore_len -= 1;
                 E->stack_len -= 2;
             }
             else
             {
-                E->neg_fxn(E->estore + E->sz*n1, E->estore + E->sz*n1, E->ctx);
+                E->R->neg(E->estore + E->R->elem_size*n1, E->estore + E->R->elem_size*n1, E->R->ctx);
                 E->stack[n-2] = _op_make(OP_PLUS, FIX_INFIX, PREC_PLUS);
                 goto do_plus;
             }
@@ -324,11 +317,13 @@ again:
                   multiplications were to be delayed as the addition are,
                   then there would have to be more shenenigans here.
             */
-            if (!E->div_fxn(E->tmp, E->estore + E->sz*n3,
-                                    E->estore + E->sz*n1, E->ctx))
+            if (!E->R->divides(E->tmp, E->estore + E->R->elem_size*n3,
+                                    E->estore + E->R->elem_size*n1, E->R->ctx))
+            {
                 return -1;
+            }
 
-            E->swap_fxn(E->estore + E->sz*n3, E->tmp, E->ctx);
+            E->R->swap(E->estore + E->R->elem_size*n3, E->tmp, E->R->ctx);
             E->estore_len -= 1;
             E->stack_len -= 2;
         }
@@ -342,7 +337,7 @@ again:
     else if (_op_fix(n2) == FIX_PREFIX)
     {
         if (_op_name(n2) == OP_MINUS)
-            E->neg_fxn(E->estore + E->sz*n1, E->estore + E->sz*n1, E->ctx);
+            E->R->neg(E->estore + E->R->elem_size*n1, E->estore + E->R->elem_size*n1, E->R->ctx);
 
         E->stack[n-2] = -1-n1;
         E->stack_len -= 1;
@@ -371,7 +366,7 @@ static const char * _parse_int(fmpz_t c, const char * s, const char * end)
     return s;
 }
 
-int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
+int mpoly_parse_parse(mpoly_parse_t E, void * poly, const char * s, slong slen)
 {
     const char * send = s + slen;
     fmpz_t c;
@@ -386,8 +381,8 @@ int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
         {
             s = _parse_int(c, s, send);
 
-            E->set_fmpz_fxn(E->tmp, c, E->ctx);
-            if (fparse_push_expr(E))
+            E->R->set_fmpz(E->tmp, c, E->R->ctx);
+            if (mpoly_parse_push_expr(E))
                 goto failed;
         }
         else if (*s == '^')
@@ -397,65 +392,65 @@ int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
 
             s = _parse_int(c, s, send);
             
-            if (fparse_pop_prec(E, PREC_POWER))
+            if (mpoly_parse_pop_prec(E, PREC_POWER))
                 goto failed;
 
-            if (!fparse_top_is_expr(E))
+            if (!mpoly_parse_top_is_expr(E))
                 goto failed;
 
-            if (!E->pow_fmpz_fxn(fparse_top_expr(E), fparse_top_expr(E), c, E->ctx))
+            if (!E->R->pow_fmpz(mpoly_parse_top_expr(E), mpoly_parse_top_expr(E), c, E->R->ctx))
                 goto failed;
         }
         else if (*s == '*')
         {
-            if (!fparse_top_is_expr(E))
+            if (!mpoly_parse_top_is_expr(E))
                 goto failed;
 
-            if (fparse_pop_prec(E, PREC_TIMES))
+            if (mpoly_parse_pop_prec(E, PREC_TIMES))
                 goto failed;
 
-            fparse_push_op(E, _op_make(OP_TIMES, FIX_INFIX, PREC_TIMES));
+            mpoly_parse_push_op(E, _op_make(OP_TIMES, FIX_INFIX, PREC_TIMES));
             s++;
         }
         else if (*s == '+')
         {
-            if (!fparse_top_is_expr(E))
+            if (!mpoly_parse_top_is_expr(E))
             {
-                fparse_push_op(E, _op_make(OP_PLUS, FIX_PREFIX, PREC_UPLUS));
+                mpoly_parse_push_op(E, _op_make(OP_PLUS, FIX_PREFIX, PREC_UPLUS));
             }
             else
             {
-                if (fparse_pop_prec(E, PREC_PLUS))
+                if (mpoly_parse_pop_prec(E, PREC_PLUS))
                     goto failed;
 
-                fparse_push_op(E, _op_make(OP_PLUS, FIX_INFIX, PREC_PLUS));
+                mpoly_parse_push_op(E, _op_make(OP_PLUS, FIX_INFIX, PREC_PLUS));
             }
             s++;
         }
         else if (*s == '-')
         {
-            if (!fparse_top_is_expr(E))
+            if (!mpoly_parse_top_is_expr(E))
             {
-                fparse_push_op(E, _op_make(OP_MINUS, FIX_PREFIX, PREC_UMINUS));
+                mpoly_parse_push_op(E, _op_make(OP_MINUS, FIX_PREFIX, PREC_UMINUS));
             }
             else
             {
-                if (fparse_pop_prec(E, PREC_MINUS))
+                if (mpoly_parse_pop_prec(E, PREC_MINUS))
                     goto failed;
 
-                fparse_push_op(E, _op_make(OP_MINUS, FIX_INFIX, PREC_MINUS));
+                mpoly_parse_push_op(E, _op_make(OP_MINUS, FIX_INFIX, PREC_MINUS));
             }
             s++;
         }
         else if (*s == '/')
         {
-            if (!fparse_top_is_expr(E))
+            if (!mpoly_parse_top_is_expr(E))
                 goto failed;
 
-            if (fparse_pop_prec(E, PREC_DIVIDES))
+            if (mpoly_parse_pop_prec(E, PREC_DIVIDES))
                 goto failed;
 
-            fparse_push_op(E, _op_make(OP_DIVIDES, FIX_INFIX, PREC_DIVIDES));
+            mpoly_parse_push_op(E, _op_make(OP_DIVIDES, FIX_INFIX, PREC_DIVIDES));
             s++;
         }
         else if (*s == ' ')
@@ -464,24 +459,24 @@ int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
         }
         else if (*s == '(')
         {
-            if (fparse_top_is_expr(E))
+            if (mpoly_parse_top_is_expr(E))
                 goto failed;
 
-            fparse_push_op(E, _op_make(OP_LROUND, FIX_MATCHFIX, PREC_LOWEST));
+            mpoly_parse_push_op(E, _op_make(OP_LROUND, FIX_MATCHFIX, PREC_LOWEST));
             s++;
         }
         else if (*s == ')')
         {
-            if (fparse_pop_prec(E, PREC_LOWEST))
+            if (mpoly_parse_pop_prec(E, PREC_LOWEST))
                 goto failed;
 
-            if (fparse_pop_expr(E))
+            if (mpoly_parse_pop_expr(E))
                 goto failed;
 
-            if (fparse_pop_op(E, OP_LROUND))
+            if (mpoly_parse_pop_op(E, OP_LROUND))
                 goto failed;
 
-            if (fparse_push_expr(E))
+            if (mpoly_parse_push_expr(E))
                 goto failed;
 
             s++;
@@ -494,8 +489,8 @@ int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
                 slong l = E->terminal_strings[k].str_len;
                 if (0 == strncmp(s, E->terminal_strings[k].str, l))
                 {
-                    E->set_fxn(E->tmp, E->terminal_values + E->sz*k, E->ctx);
-                    if (fparse_push_expr(E))
+                    E->R->set(E->tmp, E->terminal_values + E->R->elem_size*k, E->R->ctx);
+                    if (mpoly_parse_push_expr(E))
                         goto failed;
 
                     s += l;
@@ -508,10 +503,10 @@ int fparse_parse(fparse_t E, void * poly, const char * s, slong slen)
     continue_outer:;
     }
 
-    if (fparse_pop_prec(E, PREC_LOWEST))
+    if (mpoly_parse_pop_prec(E, PREC_LOWEST))
         goto failed;
 
-    if (fparse_pop_expr(E))
+    if (mpoly_parse_pop_expr(E))
         goto failed;
 
     if (E->stack_len != 0)

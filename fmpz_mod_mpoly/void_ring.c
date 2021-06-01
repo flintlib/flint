@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <string.h>
 #include "fmpz_mod_mpoly.h"
 
 static void fmpz_mod_mpoly_void_init(void * a, const void * ctx)
@@ -41,6 +39,11 @@ static void fmpz_mod_mpoly_void_one(void * a, const void * ctx)
 static void fmpz_mod_mpoly_void_set(void * a, const void * b, const void * ctx)
 {
     fmpz_mod_mpoly_set(a, b, ctx);
+}
+
+static void fmpz_mod_mpoly_void_set_fmpz(void * a, const fmpz_t b, const void * ctx)
+{
+    fmpz_mod_mpoly_set_fmpz(a, b, ctx);
 }
 
 static void fmpz_mod_mpoly_void_swap(void * a, void * b, const void * ctx)
@@ -96,6 +99,11 @@ static int fmpz_mod_mpoly_void_pow_fmpz(void * a, const void * b,
     return fmpz_mod_mpoly_pow_fmpz(a, b, c, ctx);
 }
 
+static slong fmpz_mod_mpoly_void_length(const void * a, const void * ctx)
+{
+    return fmpz_mod_mpoly_length(a, ctx);
+}
+
 void mpoly_void_ring_init_fmpz_mod_mpoly_ctx(
     mpoly_void_ring_t R,
     const fmpz_mod_mpoly_ctx_t ctx)
@@ -108,6 +116,7 @@ void mpoly_void_ring_init_fmpz_mod_mpoly_ctx(
     R->zero = fmpz_mod_mpoly_void_zero;
     R->one = fmpz_mod_mpoly_void_one;
     R->set = fmpz_mod_mpoly_void_set;
+    R->set_fmpz = fmpz_mod_mpoly_void_set_fmpz;
     R->swap = fmpz_mod_mpoly_void_swap;
     R->neg = fmpz_mod_mpoly_void_neg;
     R->add = fmpz_mod_mpoly_void_add;
@@ -117,5 +126,6 @@ void mpoly_void_ring_init_fmpz_mod_mpoly_ctx(
     R->divexact = fmpz_mod_mpoly_void_divexact;
     R->divides = fmpz_mod_mpoly_void_divides;
     R->pow_fmpz = fmpz_mod_mpoly_void_pow_fmpz;
+    R->length = fmpz_mod_mpoly_void_length;
 }
 

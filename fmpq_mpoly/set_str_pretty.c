@@ -19,23 +19,11 @@ int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
     int ret;
     slong i;
     fmpq_mpoly_t val;
-    fparse_t E;
+    mpoly_parse_t E;
     char dummy[FLINT_BITS/2];
 
-    fparse_init(E, (void (*)(void *, const void *)) fmpq_mpoly_init,
-                             sizeof(fmpq_mpoly_struct), (const void *) ctx);
-
-    E->clear_fxn = (void (*)(void *, const void *)) fmpq_mpoly_clear;
-    E->swap_fxn = (void (*)(void *, void *, const void *)) fmpq_mpoly_swap;
-    E->set_fxn = (void (*)(void *, const void *, const void *)) fmpq_mpoly_set;
-    E->set_fmpz_fxn = (void (*)(void *, const fmpz_t, const void *)) fmpq_mpoly_set_fmpz;
-    E->pow_fmpz_fxn = (int (*)(void *, const void *, const fmpz_t, const void *)) fmpq_mpoly_pow_fmpz;
-    E->mul_fxn = (void (*)(void *, const void *, const void *, const void *)) fmpq_mpoly_mul;
-    E->add_fxn = (void (*)(void *, const void *, const void *, const void *)) fmpq_mpoly_add;
-    E->sub_fxn = (void (*)(void *, const void *, const void *, const void *)) fmpq_mpoly_sub;
-    E->neg_fxn = (void (*)(void *, const void *, const void *)) fmpq_mpoly_neg;
-    E->div_fxn = (int (*)(void *, const void *, const void *, const void *)) fmpq_mpoly_divides;
-    E->length_fxn = (slong (*)(const void *, const void *)) fmpq_mpoly_length;
+    mpoly_void_ring_init_fmpq_mpoly_ctx(E->R, ctx);
+    mpoly_parse_init(E);
 
     fmpq_mpoly_init(val, ctx);
     for (i = 0; i < ctx->zctx->minfo->nvars; i++)
@@ -44,18 +32,18 @@ int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
         if (x == NULL)
         {
             flint_sprintf(dummy, "x%wd", i + 1);
-            fparse_add_terminal(E, dummy, (const void *)val);
+            mpoly_parse_add_terminal(E, dummy, (const void *)val);
         }
         else
         {
-            fparse_add_terminal(E, x[i], (const void *)val);
+            mpoly_parse_add_terminal(E, x[i], (const void *)val);
         }
     }
     fmpq_mpoly_clear(val, ctx);
 
-    ret = fparse_parse(E, poly, str, strlen(str));
+    ret = mpoly_parse_parse(E, poly, str, strlen(str));
 
-    fparse_clear(E);
+    mpoly_parse_clear(E);
 
     return ret;
 }

@@ -778,9 +778,11 @@ FLINT_DLL int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
 
 ******************************************************************************/
 
-FLINT_DLL int fmpq_mpoly_repack_bits(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                flint_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void mpoly_void_ring_init_fmpq_mpoly_ctx(mpoly_void_ring_t R,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpq_mpoly_repack_bits(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                             flint_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
 
 /* Univariates ***************************************************************/
 

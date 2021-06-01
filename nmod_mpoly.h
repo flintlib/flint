@@ -1066,6 +1066,9 @@ FLINT_DLL void nmod_mpoly_inflate(nmod_mpoly_t A, const nmod_mpoly_t B,
 
 ******************************************************************************/
 
+FLINT_DLL void mpoly_void_ring_init_nmod_mpoly_ctx(mpoly_void_ring_t R,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpolyl_lead_coeff(nmod_mpoly_t c, const nmod_mpoly_t A,
                                    slong num_vars, const nmod_mpoly_ctx_t ctx);
 

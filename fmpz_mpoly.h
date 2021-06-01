@@ -1059,6 +1059,9 @@ void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c,
 
 ******************************************************************************/
 
+FLINT_DLL void mpoly_void_ring_init_fmpz_mpoly_ctx(mpoly_void_ring_t R,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                           ulong k, const fmpz_mpoly_ctx_t ctx);
 
