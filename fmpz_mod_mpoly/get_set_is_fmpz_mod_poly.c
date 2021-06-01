@@ -10,9 +10,6 @@
 */
 
 #include "fmpz_mod_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
-
-
 
 int fmpz_mod_mpoly_is_fmpz_mod_poly(
     const fmpz_mod_mpoly_t A,

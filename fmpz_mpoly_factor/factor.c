@@ -394,7 +394,7 @@ static int _refine_content_factors(
                 {
                     fmpz_mpolyv_fit_length(g, g->length + 1, ctx);
                     c = g->coeffs + g->length;
-                    fmpz_mpoly_from_univar_bits(c, bits, u, v, ctx);
+                    _fmpz_mpoly_from_univar(c, bits, u, v, ctx);
                     g->length++;
                 }
                 else

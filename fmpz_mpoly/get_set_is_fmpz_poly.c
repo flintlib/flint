@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
-
+#include "fmpz_mpoly.h"
 
 int fmpz_mpoly_is_fmpz_poly(
     const fmpz_mpoly_t A,
@@ -20,7 +18,6 @@ int fmpz_mpoly_is_fmpz_poly(
 {
     return mpoly_is_poly(A->exps, A->length, A->bits, var, ctx->minfo);
 }
-
 
 int fmpz_mpoly_get_fmpz_poly(
     fmpz_poly_t A,
@@ -77,42 +74,6 @@ int fmpz_mpoly_get_fmpz_poly(
     }
 }
 
-void fmpz_mpoly_fit_length_set_bits(
-    fmpz_mpoly_t A,
-    slong len,
-    flint_bitcnt_t bits,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong N = mpoly_words_per_exp(bits, ctx->minfo);
-    slong new_alloc;
-
-    FLINT_ASSERT(len >= 0);
-
-    if (A->alloc < len)
-    {
-        new_alloc = FLINT_MAX(len, 2*A->alloc);
-        if (A->alloc > 0)
-        {
-            A->coeffs = (fmpz *) flint_realloc(A->coeffs, new_alloc*sizeof(fmpz));
-            A->exps = (ulong *) flint_realloc(A->exps, new_alloc*N*sizeof(ulong));
-            memset(A->coeffs + A->alloc, 0, (new_alloc - A->alloc)*sizeof(fmpz));
-        }
-        else
-        {
-            A->coeffs = (fmpz *) flint_calloc(new_alloc, sizeof(fmpz));
-            A->exps   = (ulong *) flint_malloc(new_alloc*N*sizeof(ulong));
-        }
-        A->alloc = new_alloc;
-    }
-    else if (A->bits < bits)
-    {
-        if (A->alloc > 0)
-            A->exps = (ulong *) flint_realloc(A->exps, A->alloc*N*sizeof(ulong));
-    }
-
-    A->bits = bits;
-}
-
 void _fmpz_mpoly_set_fmpz_poly(
     fmpz_mpoly_t A,
     flint_bitcnt_t Abits,
@@ -138,7 +99,7 @@ void _fmpz_mpoly_set_fmpz_poly(
     for (i = 0; i < Blen; i++)
         Alen += (Bcoeffs[i] != 0);
 
-    fmpz_mpoly_fit_length_set_bits(A, Alen, Abits, ctx);
+    fmpz_mpoly_fit_length_reset_bits(A, Alen, Abits, ctx);
 
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)

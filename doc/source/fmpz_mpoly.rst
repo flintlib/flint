@@ -611,6 +611,14 @@ Greatest Common Divisor
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
 
+.. function:: int fmpz_mpoly_resultant(fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``R`` to the resultant of ``A`` and ``B`` with respect to the variable of index ``var``.
+
+.. function:: int fmpz_mpoly_discriminant(fmpz_mpoly_t D, const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``D`` to the discriminant of ``A`` and ``B`` with respect to the variable of index ``var``.
+
 
 Square Root
 --------------------------------------------------------------------------------

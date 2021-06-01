@@ -118,8 +118,6 @@ void fmpz_mod_mpoly_univar_set_coeff_ui(
     return;
 }
 
-
-
 void fmpz_mod_mpoly_univar_assert_canonical(
     fmpz_mod_mpoly_univar_t A,
     const fmpz_mod_mpoly_ctx_t ctx)
@@ -569,7 +567,7 @@ void fmpz_mod_mpoly_univar_set(
 
 #define COEFF(A, i) ((void*)(A->coeffs + (i)*R->elem_size))
 
-void mpoly_univar_set_fmpz_mod_mpoly_univar(
+static void mpoly_univar_set_fmpz_mod_mpoly_univar(
     mpoly_univar_t A,
     mpoly_void_ring_t R,
     const fmpz_mod_mpoly_univar_t B,
@@ -587,7 +585,7 @@ void mpoly_univar_set_fmpz_mod_mpoly_univar(
     }
 }
 
-void mpoly_univar_swap_fmpz_mod_mpoly_univar(
+static void mpoly_univar_swap_fmpz_mod_mpoly_univar(
     mpoly_univar_t A,
     mpoly_void_ring_t R,
     fmpz_mod_mpoly_univar_t B,

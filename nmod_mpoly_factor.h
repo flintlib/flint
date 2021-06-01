@@ -58,13 +58,6 @@ FLINT_DLL int nmod_mat_is_reduced(const nmod_mat_t N);
 
 FLINT_DLL void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp);
 
-FLINT_DLL int mpoly_is_poly(
-    const ulong * Aexps,
-    slong Alen,
-    flint_bitcnt_t Abits,
-    slong var,
-    const mpoly_ctx_t mctx);
-
 FLINT_DLL int nmod_mpoly_is_nmod_poly(
     const nmod_mpoly_t A,
     slong var,
@@ -380,15 +373,6 @@ FLINT_DLL void nmod_mpoly_compression_do(nmod_mpoly_t L,
 FLINT_DLL void nmod_mpoly_compression_undo(nmod_mpoly_t A,
              flint_bitcnt_t Abits, const nmod_mpoly_ctx_t Actx, nmod_mpoly_t L,
                            const nmod_mpoly_ctx_t Lctx, mpoly_compression_t M);
-
-/*****************************************************************************/
-
-NMOD_MPOLY_FACTOR_INLINE
-flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong v, ulong e,
-                                                        const mpoly_ctx_t mctx)
-{
-    return 1 + FLINT_BIT_COUNT(e); /* only lex and deg supported */
-}
 
 /*****************************************************************************/
 

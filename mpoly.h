@@ -1090,6 +1090,16 @@ FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
 FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                        const mpoly_ctx_t mctx);
 
+MPOLY_INLINE
+flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong v, ulong e,
+                                                        const mpoly_ctx_t mctx)
+{
+    return 1 + FLINT_BIT_COUNT(e); /* only lex and deg supported */
+}
+
+FLINT_DLL int mpoly_is_poly(const ulong * Aexps, slong Alen,
+                      flint_bitcnt_t Abits, slong var, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2,
                                 flint_bitcnt_t bits, slong nfields, slong len);
 FLINT_DLL void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2,

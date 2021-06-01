@@ -726,11 +726,8 @@ FLINT_DLL void fmpz_mod_mpoly_divrem_ideal(fmpz_mod_mpoly_struct ** Q,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_divexact(
-    fmpz_mod_mpoly_t Q,
-    const fmpz_mod_mpoly_t A,
-    const fmpz_mod_mpoly_t B,
-    const fmpz_mod_mpoly_ctx_t ctx)
+void fmpz_mod_mpoly_divexact(fmpz_mod_mpoly_t Q, const fmpz_mod_mpoly_t A,
+                      const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx)
 {
     if (fmpz_mod_mpoly_divides(Q, A, B, ctx))
         return;

@@ -35,21 +35,6 @@
 
 /*****************************************************************************/
 
-FLINT_DLL void fmpz_mpoly_fit_length_set_bits(fmpz_mpoly_t A, slong len,
-                              flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_is_fmpz_poly(const fmpz_mpoly_t A, slong var,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_get_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, flint_bitcnt_t Abits,
-      const fmpz * Bcoeffs, slong Blen, slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, const fmpz_poly_t B,
-                                          slong v, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void tuple_print(fmpz * alpha, slong n);
 
 FLINT_DLL void tuple_saturate(fmpz * alpha, slong n, slong m);
@@ -305,6 +290,12 @@ FLINT_DLL void fmpz_mpoly_from_mpolyv(fmpz_mpoly_t A, flint_bitcnt_t Abits,
 
 FLINT_DLL int _fmpz_mpoly_vec_content_mpoly(fmpz_mpoly_t g,
           const fmpz_mpoly_struct * A, slong Alen, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_vec_divexact_mpoly(fmpz_mpoly_struct * A,
+                 slong Alen, const fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_vec_mul_mpoly(fmpz_mpoly_struct * A,
+                 slong Alen, const fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
 
 /*****************************************************************************/
 
