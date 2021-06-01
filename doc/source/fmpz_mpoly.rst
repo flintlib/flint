@@ -617,7 +617,7 @@ Greatest Common Divisor
 
 .. function:: int fmpz_mpoly_discriminant(fmpz_mpoly_t D, const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
-    Try to set ``D`` to the discriminant of ``A`` and ``B`` with respect to the variable of index ``var``.
+    Try to set ``D`` to the discriminant of ``A`` with respect to the variable of index ``var``.
 
 
 Square Root
