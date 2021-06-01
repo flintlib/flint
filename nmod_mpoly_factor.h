@@ -254,16 +254,22 @@ FLINT_DLL void _nmod_mpoly_set_lead0(
 
 /* n_poly_vec ****************************************************************/
 
+FLINT_DLL slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen);
+
+FLINT_DLL void _n_poly_vec_mul_nmod_intertible(n_poly_struct * A,
+                                          slong Alen, mp_limb_t c, nmod_t ctx);
+
 FLINT_DLL void _n_poly_vec_mod_mul_poly(n_poly_struct * A, slong Alen,
                                            const n_poly_t g, const nmod_t ctx);
+
+FLINT_DLL void _n_poly_vec_mod_divexact_poly(n_poly_struct * A, slong Alen,
+                                                 const n_poly_t g, nmod_t ctx);
 
 FLINT_DLL void _n_poly_vec_mod_content(n_poly_t g, const n_poly_struct * A,
                                                        slong Alen, nmod_t ctx);
 
 FLINT_DLL void _n_poly_vec_mod_remove_content(n_poly_t g, n_poly_struct * A,
                                                        slong Alen, nmod_t ctx);
-
-FLINT_DLL void n_polyun_mod_content(n_poly_t c, const n_polyun_t A, nmod_t ctx);
 
 /* polyun ********************************************************************/
 

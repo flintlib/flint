@@ -87,17 +87,15 @@ int fmpz_mod_polyu1n_gcd_brown_smprime(
     fmpz_mod_polyun_stack_fit_request(St_polyun, 1);
     T = fmpz_mod_polyun_stack_take_top(St_polyun);
 
-    fmpz_mod_polyun_content_poly(cA, A, ctx);
-    fmpz_mod_polyun_content_poly(cB, B, ctx);
-    fmpz_mod_polyun_divexact_poly(A, cA, ctx);
-    fmpz_mod_polyun_divexact_poly(B, cB, ctx);
+    _fmpz_mod_poly_vec_remove_content(cA, A->coeffs, A->length, ctx);
+    _fmpz_mod_poly_vec_remove_content(cB, B->coeffs, B->length, ctx);
 
     _fmpz_mod_poly_gcd_cofactors(cG, cAbar, cBbar, cA, cB, ctx, r);
 
     fmpz_mod_poly_gcd(gamma, A->coeffs + 0, B->coeffs + 0, ctx);
 
-    ldegA = fmpz_mod_polyun_lastdeg(A, ctx);
-    ldegB = fmpz_mod_polyun_lastdeg(B, ctx);
+    ldegA = _fmpz_mod_poly_vec_max_degree(A->coeffs, A->length, ctx);
+    ldegB = _fmpz_mod_poly_vec_max_degree(B->coeffs, B->length, ctx);
     deggamma = fmpz_mod_poly_degree(gamma, ctx);
     bound = 1 + deggamma + FLINT_MAX(ldegA, ldegB);
 
@@ -254,16 +252,15 @@ choose_prime:
 
 successful:
 
-    fmpz_mod_polyun_content_poly(r, G, ctx);
-    fmpz_mod_polyun_divexact_poly(G, r, ctx);
-    fmpz_mod_polyun_divexact_poly(Abar, G->coeffs + 0, ctx);
-    fmpz_mod_polyun_divexact_poly(Bbar, G->coeffs + 0, ctx);
+    _fmpz_mod_poly_vec_remove_content(r, G->coeffs, G->length, ctx);
+    _fmpz_mod_poly_vec_divexact_poly(Abar->coeffs, Abar->length, G->coeffs + 0, ctx);
+    _fmpz_mod_poly_vec_divexact_poly(Bbar->coeffs, Bbar->length, G->coeffs + 0, ctx);
 
 successful_put_content:
 
-    fmpz_mod_polyun_mul_poly(G, cG, ctx);
-    fmpz_mod_polyun_mul_poly(Abar, cAbar, ctx);
-    fmpz_mod_polyun_mul_poly(Bbar, cBbar, ctx);
+    _fmpz_mod_poly_vec_mul_poly(G->coeffs, G->length, cG, ctx);
+    _fmpz_mod_poly_vec_mul_poly(Abar->coeffs, Abar->length, cAbar, ctx);
+    _fmpz_mod_poly_vec_mul_poly(Bbar->coeffs, Bbar->length, cBbar, ctx);
 
     success = 1;
 

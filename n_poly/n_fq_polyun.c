@@ -17,8 +17,8 @@ void n_fq_polyun_set(n_fq_polyun_t A, const n_fq_polyun_t B, const fq_nmod_ctx_t
     n_polyun_fit_length(A, B->length);
     for (i = 0; i < B->length; i++)
     {
-        A->terms[i].exp = B->terms[i].exp;
-        n_fq_poly_set(A->terms[i].coeff, B->terms[i].coeff, ctx);
+        A->exps[i] = B->exps[i];
+        n_fq_poly_set(A->coeffs + i, B->coeffs + i, ctx);
     }
     A->length = B->length;
 }

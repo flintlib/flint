@@ -180,67 +180,12 @@ void fmpz_mod_polyu3n_print_pretty(
 }
 
 
-
-
-void fmpz_mod_polyun_content_poly(
-    fmpz_mod_poly_t g,
-    const fmpz_mod_polyun_t A,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    fmpz_mod_poly_zero(g, ctx);
-    for (i = 0; i < A->length; i++)
-        fmpz_mod_poly_gcd(g, g, A->coeffs + i, ctx);
-}
-
-void fmpz_mod_polyun_divexact_poly(
-    fmpz_mod_polyun_t A,
-    const fmpz_mod_poly_t g,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < A->length; i++)
-        fmpz_mod_poly_div(A->coeffs + i, A->coeffs + i, g, ctx);
-}
-
-void fmpz_mod_polyun_mul_poly(
-    fmpz_mod_polyun_t A,
-    const fmpz_mod_poly_t g,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < A->length; i++)
-        fmpz_mod_poly_mul(A->coeffs + i, A->coeffs + i, g, ctx);
-}
-
-
-slong fmpz_mod_polyun_lastdeg(
-    const fmpz_mod_polyun_t A,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i, len = 0;
-    for (i = 0; i < A->length; i++)
-        len = FLINT_MAX(len, A->coeffs[i].length);
-    return len - 1;
-}
-
 void fmpz_mod_polyun_one(fmpz_mod_polyun_t A, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_polyun_fit_length(A, 1, ctx);
     fmpz_mod_poly_one(A->coeffs + 0, ctx);
     A->exps[0] = 0;
     A->length = 1;
-}
-
-
-void fmpz_mod_polyun_scalar_mul_fmpz(
-    fmpz_mod_polyun_t A,
-    const fmpz_t c,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < A->length; i++)
-        fmpz_mod_poly_scalar_mul_fmpz(A->coeffs + i, A->coeffs + i, c, ctx);
 }
 
 

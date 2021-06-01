@@ -111,10 +111,10 @@ void mpoly1_monomial_evals_nmod(
         FLINT_ASSERT(start < stop);
         n = stop - start;
 
-        EH->terms[i].exp = (Aexps[N*start + off[0]] >> shift[0]) & mask;
-        n_poly_fit_length(EH->terms[i].coeff, n);
-        EH->terms[i].coeff->length = n;
-        p = EH->terms[i].coeff->coeffs;
+        EH->exps[i] = (Aexps[N*start + off[0]] >> shift[0]) & mask;
+        n_poly_fit_length(EH->coeffs + i, n);
+        EH->coeffs[i].length = n;
+        p = EH->coeffs[i].coeffs;
 
         for (j = 0; j < n; j++)
         {
@@ -186,10 +186,10 @@ void mpoly2_monomial_evals_nmod(
         e0 = (Aexps[N*start + off[0]] >> shift[0]) & mask;
         e1 = (Aexps[N*start + off[1]] >> shift[1]) & mask;
 
-        EH->terms[i].exp = pack_exp2(e0, e1);
-        n_poly_fit_length(EH->terms[i].coeff, n);
-        EH->terms[i].coeff->length = n;
-        p = EH->terms[i].coeff->coeffs;
+        EH->exps[i] = pack_exp2(e0, e1);
+        n_poly_fit_length(EH->coeffs + i, n);
+        EH->coeffs[i].length = n;
+        p = EH->coeffs[i].coeffs;
 
         for (j = 0; j < n; j++)
         {
@@ -217,9 +217,9 @@ void n_polyun_zip_start(n_polyun_t Z, n_polyun_t H, slong req_images)
     Z->length = H->length;
     for (j = 0; j < H->length; j++)
     {
-        Z->terms[j].exp = H->terms[j].exp;
-        n_poly_fit_length(Z->terms[j].coeff, req_images);
-        Z->terms[j].coeff->length = 0;
+        Z->exps[j] = H->exps[j];
+        n_poly_fit_length(Z->coeffs + j, req_images);
+        Z->coeffs[j].length = 0;
     }
 }
 
@@ -230,7 +230,6 @@ int n_polyu2n_add_zip_must_match(
     slong cur_length)
 {
     slong i, Ai, ai;
-    n_polyun_term_struct * Zt = Z->terms;
     const n_poly_struct * Acoeffs = A->coeffs;
 
     Ai = A->length - 1;
@@ -238,11 +237,11 @@ int n_polyu2n_add_zip_must_match(
 
     for (i = 0; i < Z->length; i++)
     {
-        if (Ai >= 0 && Zt[i].exp == pack_exp2(Ai, ai))
+        if (Ai >= 0 && Z->exps[i] == pack_exp2(Ai, ai))
         {
             /* Z present, A present */
-            Zt[i].coeff->coeffs[cur_length] = Acoeffs[Ai].coeffs[ai];
-            Zt[i].coeff->length = cur_length + 1;
+            Z->coeffs[i].coeffs[cur_length] = Acoeffs[Ai].coeffs[ai];
+            Z->coeffs[i].length = cur_length + 1;
             do {
                 ai--;
             } while (ai >= 0 && Acoeffs[Ai].coeffs[ai] == 0);
@@ -255,11 +254,11 @@ int n_polyu2n_add_zip_must_match(
                     ai = n_poly_degree(Acoeffs + Ai);
             }
         }
-        else if (Ai < 0 || Zt[i].exp > pack_exp2(Ai, ai))
+        else if (Ai < 0 || Z->exps[i] > pack_exp2(Ai, ai))
         {
             /* Z present, A missing */
-            Zt[i].coeff->coeffs[cur_length] = 0;
-            Zt[i].coeff->length = cur_length + 1;
+            Z->coeffs[i].coeffs[cur_length] = 0;
+            Z->coeffs[i].length = cur_length + 1;
         }
         else
         {
@@ -291,17 +290,17 @@ int n_polyun_zip_solve(
     Ai = 0;
     for (i = 0; i < H->length; i++)
     {
-        n = H->terms[i].coeff->length;
-        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
-        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
+        n = H->coeffs[i].length;
+        FLINT_ASSERT(M->coeffs[i].length == n + 1);
+        FLINT_ASSERT(Z->coeffs[i].length >= n);
         FLINT_ASSERT(Ai + n <= A->length);
 
         n_poly_fit_length(t, n);
 
         success = _nmod_zip_vand_solve(Acoeffs + Ai,
-                         H->terms[i].coeff->coeffs, n,
-                         Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                         M->terms[i].coeff->coeffs, t->coeffs, ctx->mod);
+                                 H->coeffs[i].coeffs, n,
+                                 Z->coeffs[i].coeffs, Z->coeffs[i].length,
+                                 M->coeffs[i].coeffs, t->coeffs, ctx->mod);
         if (success < 1)
         {
             n_poly_clear(t);

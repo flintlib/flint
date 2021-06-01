@@ -12,7 +12,7 @@
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mpoly_factor.h"
 
-
+/* set up mock to point to the coefficients of A, which are not owned by mock */
 static void nmod_mpoly_mock_eval_coeff(
     n_polyun_t mock,
     const nmod_mpoly_t A,
@@ -24,8 +24,8 @@ static void nmod_mpoly_mock_eval_coeff(
     if (mock->alloc < Aeh_inc->length)
     {
         mock->alloc = FLINT_MAX(Aeh_inc->length, mock->alloc + mock->alloc/2);
-        mock->terms = FLINT_ARRAY_REALLOC(mock->terms, mock->alloc,
-                                                         n_polyun_term_struct);        
+        mock->coeffs = FLINT_ARRAY_REALLOC(mock->coeffs, mock->alloc,
+                                                                n_poly_struct);        
     }
 
     mock->length = Aeh_inc->length;
@@ -33,11 +33,10 @@ static void nmod_mpoly_mock_eval_coeff(
     k = 0;
     for (i = 0; i < Aeh_inc->length; i++)
     {
-        slong l = Aeh_inc->terms[i].coeff->length;
-        mock->terms[i].exp = Aeh_inc->terms[i].exp;
-        mock->terms[i].coeff->coeffs = A->coeffs + k;
-        mock->terms[i].coeff->alloc = l;
-        mock->terms[i].coeff->length = l;
+        slong l = Aeh_inc->coeffs[i].length;
+        mock->coeffs[i].coeffs = A->coeffs + k;
+        mock->coeffs[i].alloc = l;
+        mock->coeffs[i].length = l;
         k += l;
     }
 
@@ -73,13 +72,12 @@ static void n_polyu1n_mod_zip_eval_cur_inc_coeff(
 
     for (i = 0; i < Acur->length; i++)
     {
-        slong this_len = Acur->terms[i].coeff->length;
-        FLINT_ASSERT(this_len == Ainc->terms[i].coeff->length);
-        FLINT_ASSERT(this_len == Acoeff->terms[i].coeff->length);
-        c = _nmod_zip_eval_step(Acur->terms[i].coeff->coeffs,
-                                Ainc->terms[i].coeff->coeffs,
-                                Acoeff->terms[i].coeff->coeffs, this_len, ctx);
-        n_poly_set_coeff(E, Acur->terms[i].exp, c);
+        slong this_len = Acur->coeffs[i].length;
+        FLINT_ASSERT(this_len == Ainc->coeffs[i].length);
+        FLINT_ASSERT(this_len == Acoeff->coeffs[i].length);
+        c = _nmod_zip_eval_step(Acur->coeffs[i].coeffs, Ainc->coeffs[i].coeffs,
+                                Acoeff->coeffs[i].coeffs, this_len, ctx);
+        n_poly_set_coeff(E, Acur->exps[i], c);
     }
 }
 
@@ -90,27 +88,28 @@ static int n_poly_add_zip_must_match(
 {
     slong i, ai;
     slong Alen = A->length;
-    n_polyun_term_struct * Zterms = Z->terms;
+    ulong * Zexps = Z->exps;
+    n_poly_struct * Zcoeffs = Z->coeffs;
     mp_limb_t * Acoeffs = A->coeffs;
 
     ai = Alen - 1;
 
     for (i = 0; i < Z->length; i++)
     {
-        if (ai >= 0 && Zterms[i].exp == ai)
+        if (ai >= 0 && Zexps[i] == ai)
         {
             /* Z present, A present */
-            Zterms[i].coeff->coeffs[cur_length] = Acoeffs[ai];
-            Zterms[i].coeff->length = cur_length + 1;
+            Zcoeffs[i].coeffs[cur_length] = Acoeffs[ai];
+            Zcoeffs[i].length = cur_length + 1;
             do {
                 ai--;
             } while (ai >= 0 && Acoeffs[ai] == 0);
         }
-        else if (ai < 0 || Zterms[i].exp > ai)
+        else if (ai < 0 || Zexps[i] > ai)
         {
             /* Z present, A missing */
-            Zterms[i].coeff->coeffs[cur_length] = 0;
-            Zterms[i].coeff->length = cur_length + 1;
+            Zcoeffs[i].coeffs[cur_length] = 0;
+            Zcoeffs[i].length = cur_length + 1;
         }
         else
         {
@@ -223,10 +222,12 @@ int nmod_mpolyl_gcds_zippel(
     n_polyun_init(Aeh_cur);
     n_polyun_init(Beh_inc);
     n_polyun_init(Beh_cur);
-    Aeh_coeff_mock->terms = NULL;
+    Aeh_coeff_mock->exps = NULL;
+    Aeh_coeff_mock->coeffs = NULL;
     Aeh_coeff_mock->length = 0;
     Aeh_coeff_mock->alloc = 0;
-    Beh_coeff_mock->terms = NULL;
+    Beh_coeff_mock->exps = NULL;
+    Beh_coeff_mock->coeffs = NULL;
     Beh_coeff_mock->length = 0;
     Beh_coeff_mock->alloc = 0;
 
@@ -325,13 +326,13 @@ next_betas:
 
         for (i = 0; i < l; i++)
         {
-            temp = nmod_mul(temp, HG->terms[s].coeff->coeffs[0], ctx->mod);
+            temp = nmod_mul(temp, HG->coeffs[s].coeffs[0], ctx->mod);
 
-            if (ZG->terms[s].coeff->coeffs[i] == 0)
+            if (ZG->coeffs[s].coeffs[i] == 0)
                 goto general_case;
 
             nmod_mat_entry(Msol, 0, i) = nmod_div(temp,
-                                      ZG->terms[s].coeff->coeffs[i], ctx->mod);
+                                            ZG->coeffs[s].coeffs[i], ctx->mod);
         }
 
         goto try_it;
@@ -359,18 +360,18 @@ general_case:
             nmod_mat_init(ML + s, l, l + n, nmod_mpoly_ctx_modulus(ctx));
         }
 
-        _nmod_vec_set(nmod_mat_row_ref(ML + s, 0), HG->terms[s].coeff->coeffs, n);
+        _nmod_vec_set(nmod_mat_row_ref(ML + s, 0), HG->coeffs[s].coeffs, n);
         for (i = 1; i < l; i++)
         {
             _nmod_vec_mul(nmod_mat_row_ref(ML + s, i),
                           nmod_mat_row_ref(ML + s, i - 1), 
-                                      HG->terms[s].coeff->coeffs, n, ctx->mod);
+                                      HG->coeffs[s].coeffs, n, ctx->mod);
         }
 
         for (i = 0; i < l; i++)
         {
             _nmod_vec_zero(nmod_mat_row_ref(ML + s, i) + n, l);
-            nmod_mat_entry(ML + s, i, n + i) = ZG->terms[s].coeff->coeffs[i];
+            nmod_mat_entry(ML + s, i, n + i) = ZG->coeffs[s].coeffs[i];
         }
 
         /*
@@ -440,7 +441,7 @@ try_it:
 
     for (s = 0; s < Gmarkslen; s++)
     {
-        _nmod_vec_mul(ZG->terms[s].coeff->coeffs, ZG->terms[s].coeff->coeffs,
+        _nmod_vec_mul(ZG->coeffs[s].coeffs, ZG->coeffs[s].coeffs,
                                        nmod_mat_row_ref(Msol, 0), l, ctx->mod);
     }
 
@@ -475,8 +476,8 @@ cleanup:
     n_polyun_clear(Aeh_cur);
     n_polyun_clear(Beh_inc);
     n_polyun_clear(Beh_cur);
-    flint_free(Aeh_coeff_mock->terms);
-    flint_free(Beh_coeff_mock->terms);
+    flint_free(Aeh_coeff_mock->coeffs);
+    flint_free(Beh_coeff_mock->coeffs);
 
     n_polyun_clear(HG);
     n_polyun_clear(MG);
@@ -517,10 +518,9 @@ static int _do_bivar_or_univar(
 
         success = n_polyu1n_mod_gcd_brown_smprime(Gev, Abarev, Bbarev,
                                                        Aev, Bev, ctx->mod, St);
-
         if (success)
         {
-            n_polyun_mod_content(c, Gev, ctx->mod);
+            _n_poly_vec_mod_content(c, Gev->coeffs, Gev->length, ctx->mod);
             success = n_poly_is_one(c);
             nmod_mpoly_set_polyu1n(G, Gev, 0, 1, ctx);
         }

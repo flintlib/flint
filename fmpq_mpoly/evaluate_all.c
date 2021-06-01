@@ -11,93 +11,29 @@
 
 #include "fmpq_mpoly.h"
 
-/*
-    Given a polynomial tree with exponents stored in the keys and
-    coefficients stored in the data member,
-    the function _mpoly_rbnode_clear_evalall_tree_fmpz clears the tree
-    and stores the evaluation of the polynomial in "l".
-
-    poly = a0 x^0 + a1 x^1 + a2 x^2 + a3 x^3 + a4 x^4 + a5 x^5 + a6 x^6
-
-    tree =                 a3 x^3
-                 a1 x^1              a5 x^5
-
-            a0 x^0    a2 x^2    a4 x^4    a6 x^6
-
-    l = a0*x^0 + x^1*(a1 + a2*x^1) + x^3*(a3 + a4*x^1 + x^2*(a5 + a6*x^1))
-
-*/
-static void _mpoly_rbnode_clear_sp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
-                                             slong s, fmpq_t l, const fmpq_t x)
-{
-    fmpq_t r, xp;
-    slong e = node->key;
-    FLINT_ASSERT(e >= s);
-
-    fmpq_init(r);
-    fmpq_zero(r);
-    if (node->right != tree->null)
-        _mpoly_rbnode_clear_sp(tree, node->right, e, r, x);
-
-    fmpq_zero(l);
-    if (node->left != tree->null)
-        _mpoly_rbnode_clear_sp(tree, node->left, s, l, x);
-
-    fmpq_init(xp);
-    fmpq_pow_si(xp, x, e - s);
-    fmpq_add(r, r, (fmpq*)(&node->data));
-    fmpq_addmul(l, xp, r);
-
-    fmpq_clear(r);
-    fmpq_clear(xp);
-    fmpq_clear((fmpq*)(&node->data));
-    flint_free(node);
-}
-
-
-/*
-    evaluate a f(xbar) at xbar = val,
-*/
-int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
+static int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
                                fmpq * const * vals, const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;
-    int new;
-    slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
-    slong main_exp, main_var, main_shift, main_off, shift, off;
-    ulong mask;
-    slong entries, k_len;
-    slong p_len;
-    fmpz * p_coeff;
-    ulong * p_exp;
+    flint_bitcnt_t bits = poly->bits;
+    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong entries, k_len, shift, off;
+    slong p_len = poly->length;
+    const fmpz * p_coeff = poly->coeffs;
+    const ulong * p_exp = poly->exps;
     slong * degrees;
     slong * offs;
     ulong * masks;
     fmpq * powers;
     fmpq_t t;
-    mpoly_rbtree_t tree;
-    mpoly_rbnode_struct * node;
     TMP_INIT;
-
-    p_len = poly->length;
-    p_coeff = poly->coeffs;
-    p_exp = poly->exps;
-    bits = poly->bits;
 
     FLINT_ASSERT(p_len > 0);
 
     TMP_START;
 
-    degrees = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    degrees = TMP_ARRAY_ALLOC(nvars, slong);
     fmpz_mpoly_degrees_si(degrees, poly, ctx);
-
-    /* pick main variable with highest degree */
-    main_var = 0;
-    for (i = 1; i < nvars; i++)
-    {
-        if (degrees[i] > degrees[main_var])
-            main_var = i;
-    }
 
     /* compute how many masks are needed */
     entries = 0;
@@ -109,14 +45,11 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
             goto cleanup_degrees;
         }
 
-        if (i == main_var)
-            continue;
-
         entries += FLINT_BIT_COUNT(degrees[i]);
     }
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (fmpq *) TMP_ALLOC(entries*sizeof(fmpq));
+    offs = TMP_ARRAY_ALLOC(entries, slong);
+    masks = TMP_ARRAY_ALLOC(entries, ulong);
+    powers = TMP_ARRAY_ALLOC(entries, fmpq);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
 
@@ -124,13 +57,9 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits;
-
-        if (i == main_var)
-            continue;
+        flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        varibits = FLINT_BIT_COUNT(degrees[i]);
         for (j = 0; j < varibits; j++)
         {
             offs[k] = off;
@@ -146,21 +75,11 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
     k_len = k;
     FLINT_ASSERT(k_len == entries);
 
-    /* accumulate coefficients of the main variable */
-    mpoly_gen_offset_shift_sp(&main_off, &main_shift, main_var, bits, ctx->minfo);
-    mpoly_rbtree_init(tree);
+    /* accumulate answer */
+    fmpq_zero(ev);
     fmpq_init(t);
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     for (i = 0; i < p_len; i++)
     {
-        main_exp = (p_exp[N*i + main_off] >> main_shift) & mask;
-        node = mpoly_rbtree_get(&new, tree, main_exp);
-        if (new)
-        {
-            fmpq_init((fmpq*)(&node->data));
-            fmpq_zero((fmpq*)(&node->data));
-        }
-
         fmpz_set(fmpq_numref(t), p_coeff + i);
         fmpz_one(fmpq_denref(t));
         for (k = 0; k < k_len; k++)
@@ -168,15 +87,12 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
             if ((p_exp[N*i + offs[k]] & masks[k]) != WORD(0))
                 fmpq_mul(t, t, powers + k);
         }
-        fmpq_add((fmpq*)(&node->data), (fmpq*)(&node->data), t);
+        fmpq_add(ev, ev, t);
     }
     fmpq_clear(t);
 
     for (k = 0; k < k_len; k++)
         fmpq_clear(powers + k);
-
-    /* use tree method to evaluate in the main variable */
-    _mpoly_rbnode_clear_sp(tree, tree->head->left, WORD(0), ev, vals[main_var]);
 
 cleanup_degrees:
 
@@ -185,92 +101,22 @@ cleanup_degrees:
     return success;
 }
 
-
-
-/*
-    Given a polynomial tree with exponents stored in the keys and
-    coefficients stored in the data member,
-    the function _mpoly_rbnode_clear_evalall_tree_fmpz clears the tree
-    and stores the evaluation of the polynomial in "l".
-
-    poly = a0 x^0 + a1 x^1 + a2 x^2 + a3 x^3 + a4 x^4 + a5 x^5 + a6 x^6
-
-    tree =                 a3 x^3
-                 a1 x^1              a5 x^5
-
-            a0 x^0    a2 x^2    a4 x^4    a6 x^6
-
-    l = a0*x^0 + x^1*(a1 + a2*x^1) + x^3*(a3 + a4*x^1 + x^2*(a5 + a6*x^1))
-
-*/
-static int _mpoly_rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
-                                      const fmpz_t s, fmpq_t l, const fmpq_t x)
-{
-    int success = 1;
-    fmpq_t r, xp;
-    FLINT_ASSERT(fmpz_cmp(&node->key, s) >= 0);
-
-    fmpq_init(r);
-    if (node->right != tree->null)
-    {
-        if (!_mpoly_rbnode_clear_mp(tree, node->right, &node->key, r, x))
-            success = 0;
-    }
-
-    fmpq_zero(l);
-    if (node->left != tree->null)
-    {
-        if (!_mpoly_rbnode_clear_mp(tree, node->left, s, l, x))
-            success = 0;
-    }
-
-    fmpq_init(xp);
-
-    fmpz_sub((fmpz*)(&node->key), (fmpz*)(&node->key), s);
-    if (!fmpq_pow_fmpz(xp, x, (fmpz*)(&node->key)))
-        success = 0;
-    fmpq_add(r, r, (fmpq*)(&node->data));
-    fmpq_addmul(l, xp, r);
-
-    fmpq_clear(r);
-    fmpq_clear(xp);
-    fmpq_clear((fmpq*)(&node->data));
-    fmpz_clear((fmpz*)(&node->key));
-    flint_free(node);
-
-    return success;
-}
-
-
-/*
-    evaluate a f(xbar) at xbar = val,
-*/
-int _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
+static int _fmpz_mpoly_evaluate_all_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
                                fmpq * const * vals, const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;
-    int new;
-    slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
-    slong main_var, main_off, off;
-    fmpz_t main_exp;
-    slong entries, k_len;
-    slong p_len;
-    fmpz * p_coeff;
-    ulong * p_exp;
+    flint_bitcnt_t bits = poly->bits;
+    slong i, j, k, N,  nvars = ctx->minfo->nvars;
+    slong entries, k_len, off;
+    slong p_len = poly->length;
+    const fmpz * p_coeff = poly->coeffs;
+    ulong * p_exp = poly->exps;
     slong * degrees;
     slong * offs;
     ulong * masks;
     fmpq * powers;
     fmpq_t t;
-    fmpz_t s;
-    mpoly_rbtree_t tree;
-    mpoly_rbnode_struct * node;
     TMP_INIT;
-
-    p_len = poly->length;
-    p_coeff = poly->coeffs;
-    p_exp = poly->exps;
-    bits = poly->bits;
 
     FLINT_ASSERT(p_len > 0);
 
@@ -278,14 +124,6 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
 
     degrees = _fmpz_vec_init(nvars);
     mpoly_degrees_ffmpz(degrees, p_exp, p_len, bits, ctx->minfo);
-
-    /* pick main variable with highest degree */
-    main_var = 0;
-    for (i = 1; i < nvars; i++)
-    {
-        if (fmpz_cmp(degrees + i, degrees + main_var) > 0)
-            main_var = i;
-    }
 
     /* compute how many masks are needed */
     entries = 0;
@@ -297,14 +135,11 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
             goto cleanup_degrees;
         }
 
-        if (i == main_var)
-            continue;
-
         entries += fmpz_bits(degrees + i);
     }
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (fmpq *) TMP_ALLOC(entries*sizeof(fmpq));
+    offs = TMP_ARRAY_ALLOC(entries, slong);
+    masks = TMP_ARRAY_ALLOC(entries, ulong);
+    powers = TMP_ARRAY_ALLOC(entries, fmpq);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
 
@@ -312,19 +147,9 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits;
-
-        if (i == main_var)
-            continue;
+        flint_bitcnt_t varibits = fmpz_bits(degrees + i);
 
         off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
-        varibits = fmpz_bits(degrees + i);
-        if (varibits >= FLINT_BITS && !fmpz_is_one(fmpq_denref(vals[i]))
-                                  && (fmpz_is_zero(fmpq_denref(vals[i]))
-                                        ))
-        {
-            flint_throw(FLINT_ERROR, "Exponent too large in fmpq_mpoly_evaluate_one_fmpq");
-        }
         for (j = 0; j < varibits; j++)
         {
             offs[k] = off + (j / FLINT_BITS);
@@ -340,21 +165,11 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
     k_len = k;
     FLINT_ASSERT(k_len == entries);
 
-    /* accumulate coefficients of the main variable */
-    main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
-    mpoly_rbtree_init(tree);
+    /* accumulate answer */
+    fmpq_zero(ev);
     fmpq_init(t);
-    fmpz_init(main_exp);
     for (i = 0; i < p_len; i++)
     {
-        fmpz_set_ui_array(main_exp, p_exp + N*i + main_off, bits/FLINT_BITS);
-        node = mpoly_rbtree_get_fmpz(&new, tree, main_exp);
-        if (new)
-        {
-            fmpq_init((fmpq*)(&node->data));
-            fmpq_zero((fmpq*)(&node->data));
-        }
-
         fmpz_set(fmpq_numref(t), p_coeff + i);
         fmpz_one(fmpq_denref(t));
         for (k = 0; k < k_len; k++)
@@ -362,19 +177,12 @@ int _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
             if ((p_exp[N*i + offs[k]] & masks[k]) != WORD(0))
                 fmpq_mul(t, t, powers + k);
         }
-        fmpq_add((fmpq*)(&node->data), (fmpq*)(&node->data), t);
+        fmpq_add(ev, ev, t);
     }
-    fmpz_clear(main_exp);
     fmpq_clear(t);
 
     for (k = 0; k < k_len; k++)
         fmpq_clear(powers + k);
-
-    /* use tree method to evaluate in the main variable */
-    fmpz_init(s);
-    if (!_mpoly_rbnode_clear_mp(tree, tree->head->left, s, ev, vals[main_var]))
-        success = 0;
-    fmpz_clear(s);
 
 cleanup_degrees:
 
@@ -386,6 +194,7 @@ cleanup_degrees:
 }
 
 
+/* evaluate A(xbar) at xbar = vals */
 int fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A,
                                fmpq * const * vals, const fmpq_mpoly_ctx_t ctx)
 {
@@ -406,7 +215,7 @@ int fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A,
     }
     else
     {
-        success = _fmpz_mpoly_evaluate_all_tree_fmpq_mp(t, A->zpoly, vals, ctx->zctx);
+        success = _fmpz_mpoly_evaluate_all_fmpq_mp(t, A->zpoly, vals, ctx->zctx);
     }
 
     if (success)

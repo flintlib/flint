@@ -142,10 +142,10 @@ void _nmod_mpoly_monomial_evals2_cache(
     e1 = (Aexps[N*Ai + off[1]] >> shift[1]) & mask;
     e01 = pack_exp2(e0, e1);
     n_polyun_fit_length(E, Ei + 1);
-    E->terms[Ei].exp = e01;
-    n_poly_fit_length(E->terms[Ei].coeff, 1);
-    c = E->terms[Ei].coeff->coeffs + 0;
-    E->terms[Ei].coeff->length = 1;
+    E->exps[Ei] = e01;
+    n_poly_fit_length(E->coeffs + Ei, 1);
+    c = E->coeffs[Ei].coeffs + 0;
+    E->coeffs[Ei].length = 1;
     Ei++;
     *c = 1;
     for (i = 2; i < m; i++)
@@ -161,20 +161,20 @@ void _nmod_mpoly_monomial_evals2_cache(
         e0 = (Aexps[N*Ai + off[0]] >> shift[0]) & mask;
         e1 = (Aexps[N*Ai + off[1]] >> shift[1]) & mask;
         e01 = pack_exp2(e0, e1);
-        if (e01 == E->terms[Ei-1].exp)
+        if (e01 == E->exps[Ei - 1])
         {
-            slong len = E->terms[Ei-1].coeff->length;
-            n_poly_fit_length(E->terms[Ei-1].coeff, len + 1);
-            c = E->terms[Ei-1].coeff->coeffs + len;
-            E->terms[Ei-1].coeff->length = len + 1;
+            slong len = E->coeffs[Ei - 1].length;
+            n_poly_fit_length(E->coeffs + Ei - 1, len + 1);
+            c = E->coeffs[Ei - 1].coeffs + len;
+            E->coeffs[Ei - 1].length = len + 1;
         }
         else
         {
             n_polyun_fit_length(E, Ei + 1);
-            E->terms[Ei].exp = e01;
-            n_poly_fit_length(E->terms[Ei].coeff, 1);
-            c = E->terms[Ei].coeff->coeffs + 0;
-            E->terms[Ei].coeff->length = 1;
+            E->exps[Ei] = e01;
+            n_poly_fit_length(E->coeffs + Ei, 1);
+            c = E->coeffs[Ei].coeffs + 0;
+            E->coeffs[Ei].length = 1;
             Ei++;
         }
 
@@ -202,7 +202,7 @@ void _nmod_mpoly_monomial_evals2_cache(
 #if FLINT_WANT_ASSERT
     Ai = 0;
     for (i = 0; i < E->length; i++)
-        Ai += E->terms[i].coeff->length;
+        Ai += E->coeffs[i].length;
     FLINT_ASSERT(Ai == Alen);
 #endif
 }
@@ -305,8 +305,8 @@ int nmod_mpoly_gcd_get_use_new(
         maxnumci = totnumci = 0;
         for (i = 0; i < G->length; i++)
         {
-            maxnumci = FLINT_MAX(maxnumci, G->terms[i].coeff->length);
-            totnumci += G->terms[i].coeff->length;
+            maxnumci = FLINT_MAX(maxnumci, G->coeffs[i].length);
+            totnumci += G->coeffs[i].length;
         }
         FLINT_ASSERT(Gdeg >= 0);
         Gcost = interp_cost(Gdeg,
@@ -315,8 +315,8 @@ int nmod_mpoly_gcd_get_use_new(
         maxnumci = totnumci = 0;
         for (i = 0; i < Abar->length; i++)
         {
-            maxnumci = FLINT_MAX(maxnumci, Abar->terms[i].coeff->length);
-            totnumci += Abar->terms[i].coeff->length;
+            maxnumci = FLINT_MAX(maxnumci, Abar->coeffs[i].length);
+            totnumci += Abar->coeffs[i].length;
         }
         FLINT_ASSERT(gammadeg + Adeg - Gdeg >= 0);
         Abarcost = interp_cost(gammadeg + Adeg - Gdeg,
@@ -325,8 +325,8 @@ int nmod_mpoly_gcd_get_use_new(
         maxnumci = totnumci = 0;
         for (i = 0; i < Bbar->length; i++)
         {
-            maxnumci = FLINT_MAX(maxnumci, Bbar->terms[i].coeff->length);
-            totnumci += Bbar->terms[i].coeff->length;
+            maxnumci = FLINT_MAX(maxnumci, Bbar->coeffs[i].length);
+            totnumci += Bbar->coeffs[i].length;
         }
         FLINT_ASSERT(gammadeg + Bdeg - Gdeg >= 0);
         Bbarcost = interp_cost(gammadeg + Bdeg - Gdeg,
@@ -387,15 +387,14 @@ void static n_bpoly_mod_eval_step_sep(
     Ai = 0;
     for (i = 0; i < cur->length; i++)
     {
-        slong this_len = cur->terms[i].coeff->length;
+        slong this_len = cur->coeffs[i].length;
 
-        c = _nmod_zip_eval_step(cur->terms[i].coeff->coeffs,
-                                  inc->terms[i].coeff->coeffs,
+        c = _nmod_zip_eval_step(cur->coeffs[i].coeffs, inc->coeffs[i].coeffs,
                                   A->coeffs + Ai, this_len, ctx->mod);
         Ai += this_len;
 
-        e0 = extract_exp(cur->terms[i].exp, 1, 2);
-        e1 = extract_exp(cur->terms[i].exp, 0, 2);
+        e0 = extract_exp(cur->exps[i], 1, 2);
+        e1 = extract_exp(cur->exps[i], 0, 2);
         if (c == 0)
             continue;
 

@@ -336,8 +336,8 @@ static void _clearit(
         _clearit(W, T, nodes[idx].right);
 
     FLINT_ASSERT(W->length < W->alloc);
-    W->terms[W->length].exp = nodes[idx].key;
-    W->terms[W->length].coeff[0] = ((n_poly_struct *) T->data)[idx];
+    W->exps[W->length] = nodes[idx].key;
+    W->coeffs[W->length] = ((n_poly_struct *) T->data)[idx];
     W->length++;
 
     if (nodes[idx].left >= 0)
@@ -358,7 +358,6 @@ static void fq_zech_mpoly_set_eval_helper3(
     ulong y, x, z;
     slong yoff, xoff, zoff;
     slong yshift, xshift, zshift;
-    fq_zech_polyun_term_struct * EHterms;
     fq_zech_struct * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
@@ -376,7 +375,7 @@ static void fq_zech_mpoly_set_eval_helper3(
     mpoly_gen_offset_shift_sp(&xoff, &xshift, xvar, bits, ctx->minfo);
     mpoly_gen_offset_shift_sp(&zoff, &zshift, zvar, bits, ctx->minfo);
 
-    mpoly_rbtree_ui_init(W);
+    mpoly_rbtree_ui_init(W, sizeof(n_poly_struct));
     for (i = 0; i < Alen; i++)
     {
         n_poly_struct * Wc;
@@ -385,8 +384,7 @@ static void fq_zech_mpoly_set_eval_helper3(
         y = (Aexps[N*i + yoff] >> yshift) & mask;
         x = (Aexps[N*i + xoff] >> xshift) & mask;
         z = (Aexps[N*i + zoff] >> zshift) & mask;
-        Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z),
-                                                        sizeof(n_poly_struct));
+        Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z));
         if (its_new)
         {
             n_poly_init2(Wc, 4);
@@ -403,7 +401,8 @@ static void fq_zech_mpoly_set_eval_helper3(
 
     FLINT_ASSERT(W->length > 0);
 
-    T->terms = flint_malloc(W->length*sizeof(n_polyun_term_struct));
+    T->coeffs = FLINT_ARRAY_ALLOC(W->length, n_poly_struct);
+    T->exps   = FLINT_ARRAY_ALLOC(W->length, ulong);
     T->alloc = W->length;
     T->length = 0;
     _clearit(T, W, W->nodes[2 - 1].left);
@@ -411,16 +410,15 @@ static void fq_zech_mpoly_set_eval_helper3(
 
     fq_zech_polyun_fit_length(EH, T->length, ctx->fqctx);
     EH->length = T->length;
-    EHterms = EH->terms;
 
     for (i = 0; i < T->length; i++)
     {
-        EHterms[i].exp = T->terms[i].exp;
-        n = T->terms[i].coeff->length;
-        fq_zech_poly_fit_length(EHterms[i].coeff, 3*n, ctx->fqctx);
-        EHterms[i].coeff->length = n;
-        p = EHterms[i].coeff->coeffs;
-        ind = T->terms[i].coeff->coeffs;
+        EH->exps[i] = T->exps[i];
+        n = T->coeffs[i].length;
+        fq_zech_poly_fit_length(EH->coeffs + i, 3*n, ctx->fqctx);
+        EH->coeffs[i].length = n;
+        p = EH->coeffs[i].coeffs;
+        ind = T->coeffs[i].coeffs;
         _fq_zech_mpoly_monomial_evals_indirect(p, Aexps, bits, ind, n, alpha,
                                                                 2, yvar, ctx);
         for (j = n - 1; j >= 0; j--)
@@ -453,7 +451,6 @@ static slong fq_zech_mpoly_set_eval_helper_and_zip_form3(
     slong zvar = 1;
     slong i, j, n;
     ulong y, x, z;
-    fq_zech_polyun_term_struct * EHterms;
     fq_zech_struct * p;
     fq_zech_mpoly_struct * Hc;
     slong old_len, zip_length = 0;
@@ -486,7 +483,7 @@ static slong fq_zech_mpoly_set_eval_helper_and_zip_form3(
 
         deg = (Bexps[N*0 + xoff] >> xshift) & mask;
 
-        mpoly_rbtree_ui_init(W);
+        mpoly_rbtree_ui_init(W, sizeof(n_poly_struct));
         for (i = 0; i < Blen; i++)
         {
             y = (Bexps[N*i + yoff] >> yshift) & mask;
@@ -495,8 +492,7 @@ static slong fq_zech_mpoly_set_eval_helper_and_zip_form3(
 
             FLINT_ASSERT(x <= deg);
 
-            Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z),
-                                                        sizeof(n_poly_struct));
+            Wc = mpoly_rbtree_ui_lookup(W, &its_new, pack_exp3(y, x, z));
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
@@ -513,7 +509,8 @@ static slong fq_zech_mpoly_set_eval_helper_and_zip_form3(
 
         FLINT_ASSERT(W->length > 0);
 
-        T->terms = flint_malloc(W->length*sizeof(n_polyun_term_struct));
+        T->coeffs = FLINT_ARRAY_ALLOC(W->length, n_poly_struct);
+        T->exps   = FLINT_ARRAY_ALLOC(W->length, ulong);
         T->alloc = W->length;
         T->length = 0;
         _clearit(T, W, W->nodes[2 - 1].left);
@@ -522,21 +519,20 @@ static slong fq_zech_mpoly_set_eval_helper_and_zip_form3(
 
     fq_zech_polyun_fit_length(EH, T->length, ctx->fqctx);
     EH->length = T->length;
-    EHterms = EH->terms;
 
     H->length = 0;
 
     for (i = 0; i < T->length; i++)
     {
-        EHterms[i].exp = T->terms[i].exp;
-        y = extract_exp(EHterms[i].exp, 2, 3);
-        x = extract_exp(EHterms[i].exp, 1, 3);
-        z = extract_exp(EHterms[i].exp, 0, 3);
-        n = T->terms[i].coeff->length;
-        fq_zech_poly_fit_length(EHterms[i].coeff, 3*n, ctx->fqctx);
-        EHterms[i].coeff->length = n;
-        p = EHterms[i].coeff->coeffs;
-        ind = T->terms[i].coeff->coeffs;
+        EH->exps[i] = T->exps[i];
+        y = extract_exp(EH->exps[i], 2, 3);
+        x = extract_exp(EH->exps[i], 1, 3);
+        z = extract_exp(EH->exps[i], 0, 3);
+        n = T->coeffs[i].length;
+        fq_zech_poly_fit_length(EH->coeffs + i, 3*n, ctx->fqctx);
+        EH->coeffs[i].length = n;
+        p = EH->coeffs[i].coeffs;
+        ind = T->coeffs[i].coeffs;
         _fq_zech_mpoly_monomial_evals_indirect(p, Bexps, bits, ind, n, alpha,
                                                                 2, yvar, ctx);
         if (x < deg)
@@ -616,7 +612,6 @@ void fq_zech_polyu_eval_step(
     const fq_zech_ctx_t ctx)
 {
     slong Ai, Ei;
-    fq_zech_polyun_term_struct * Aterms = A->terms;
 
     fq_zech_polyu_fit_length(E, A->length, ctx);
 
@@ -624,8 +619,8 @@ void fq_zech_polyu_eval_step(
     for (Ai = 0; Ai < A->length; Ai++)
     {
         FLINT_ASSERT(Ei < E->alloc);
-        E->exps[Ei] = Aterms[Ai].exp;
-        fq_zech_poly_eval_step(E->coeffs + Ei, Aterms[Ai].coeff, ctx);
+        E->exps[Ei] = A->exps[Ai];
+        fq_zech_poly_eval_step(E->coeffs + Ei, A->coeffs + Ai, ctx);
         Ei += !fq_zech_is_zero(E->coeffs + Ei, ctx);
     }
     E->length = Ei;
@@ -640,74 +635,79 @@ void fq_zech_polyu3_add_zip_limit1(
     slong fit_length,
     const fq_zech_ctx_t ctx)
 {
-    const fq_zech_polyun_term_struct * At = A->terms;
-    const fq_zech_polyun_term_struct * Ait;
-    fq_zech_polyun_term_struct * Zit;
+    const fq_zech_poly_struct * Acoeffs = A->coeffs;
+    ulong * Aexps = A->exps;
+    fq_zech_poly_struct * Zcoeffs = Z->coeffs;
+    ulong * Zexps = Z->exps;
     slong Ai, ai, Zi, j;
 
     for (Zi = 0; Zi < Z->length; Zi++)
     {
-        FLINT_ASSERT(Z->terms[Zi].coeff->length == cur_length);
+        FLINT_ASSERT(Z->coeffs[Zi].length == cur_length);
     }
-
 
     Ai = -1;
     ai = -1;
     do {
         Ai++;
-        Ait = At + Ai;
-    } while (Ai < A->length && extract_exp(Ait->exp, 1, 3) >= deg1);
+    } while (Ai < A->length && extract_exp(Aexps[Ai], 1, 3) >= deg1);
     if (Ai < A->length)
-        ai = fq_zech_poly_degree(Ait->coeff, ctx);
+        ai = fq_zech_poly_degree(Acoeffs + Ai, ctx);
 
     Zi = 0;
 
     while (Ai < A->length && Zi < Z->length)
     {
-        Zit = Z->terms + Zi;
-        Ait = At + Ai;
-        if (Ait->exp + ai > Zit->exp)
+        if (Aexps[Ai] + ai > Zexps[Zi])
         {
             /* missing from Z */
             fq_zech_polyun_fit_length(Z, Z->length + 1, ctx);
+            Zcoeffs = Z->coeffs;
+            Zexps = Z->exps;
+
             for (j = Z->length; j > Zi; j--)
-                fq_zech_polyun_term_swap(Z->terms + j, Z->terms + j - 1);
+            {
+                fq_zech_poly_swap(Zcoeffs + j, Zcoeffs + j - 1, ctx);
+                ULONG_SWAP(Zexps[j], Zexps[j - 1]);
+            }
+
             Z->length++;
-            Zit = Z->terms + Zi;
-            Zit->exp = Ait->exp + ai;
-            fq_zech_poly_fit_length(Zit->coeff, fit_length, ctx);
-            Zit->coeff->length = cur_length;
+
+            Zexps[Zi] = Aexps[Ai] + ai;
+            fq_zech_poly_fit_length(Zcoeffs + Zi, fit_length, ctx);
+            Zcoeffs[Zi].length = cur_length;
+
             for (j = 0; j < cur_length; j++)
-                fq_zech_zero(Zit->coeff->coeffs + j, ctx);
+                fq_zech_zero(Zcoeffs[Zi].coeffs + j, ctx);
+
             goto in_both;            
         }
-        else if (Ait->exp + ai < Zit->exp)
+        else if (Aexps[Ai] + ai < Zexps[Zi])
         {
             /* missing from A */
-            FLINT_ASSERT(cur_length + 1 <= Zit->coeff->alloc);
-            fq_zech_zero(Zit->coeff->coeffs + cur_length, ctx);
-            Zit->coeff->length = cur_length + 1;
+            FLINT_ASSERT(cur_length + 1 <= Zcoeffs[Zi].alloc);
+            fq_zech_zero(Zcoeffs[Zi].coeffs + cur_length, ctx);
+            Zcoeffs[Zi].length = cur_length + 1;
             Zi++;
         }
         else
         {
-in_both:
-            FLINT_ASSERT(cur_length == Zit->coeff->length);
-            FLINT_ASSERT(cur_length + 1 <= Zit->coeff->alloc);
-            fq_zech_set(Zit->coeff->coeffs + cur_length, Ait->coeff->coeffs + ai, ctx);
-            Zit->coeff->length = cur_length + 1;
+    in_both:
+            FLINT_ASSERT(cur_length == Zcoeffs[Zi].length);
+            FLINT_ASSERT(cur_length + 1 <= Zcoeffs[Zi].alloc);
+            fq_zech_set(Zcoeffs[Zi].coeffs + cur_length, Acoeffs[Ai].coeffs + ai, ctx);
+            Zcoeffs[Zi].length = cur_length + 1;
             Zi++;
             do {
                 ai--;
-            } while (ai >= 0 && fq_zech_is_zero(Ait->coeff->coeffs + ai, ctx));
+            } while (ai >= 0 && fq_zech_is_zero(Acoeffs[Ai].coeffs + ai, ctx));
             if (ai < 0)
             {
                 do {
                     Ai++;
-                    Ait = At + Ai;
-                } while (Ai < A->length && extract_exp(Ait->exp, 1, 3) >= deg1);
+                } while (Ai < A->length && extract_exp(Aexps[Ai], 1, 3) >= deg1);
                 if (Ai < A->length)
-                    ai = fq_zech_poly_degree(Ait->coeff, ctx);
+                    ai = fq_zech_poly_degree(Acoeffs + Ai, ctx);
             }
         }
     }
@@ -716,46 +716,51 @@ in_both:
     while (Ai < A->length)
     {
         Zi = Z->length;
+
         fq_zech_polyun_fit_length(Z, Zi + A->length - Ai, ctx);
-        Zit = Z->terms + Zi;
-        Zit->exp = Ait->exp + ai;
-        fq_zech_poly_fit_length(Zit->coeff, fit_length, ctx);
-        Zit->coeff->length = cur_length;
+        Zcoeffs = Z->coeffs;
+        Zexps = Z->exps;
+
+        Zexps[Zi] = Aexps[Ai] + ai;
+        fq_zech_poly_fit_length(Zcoeffs + Zi, fit_length, ctx);
+        Zcoeffs[Zi].length = cur_length;
+
         for (j = 0; j < cur_length; j++)
-            fq_zech_zero(Zit->coeff->coeffs + j, ctx);
+            fq_zech_zero(Zcoeffs[Zi].coeffs + j, ctx);
+
+        FLINT_ASSERT(cur_length == Zcoeffs[Zi].length);
+        FLINT_ASSERT(cur_length + 1 <= Zcoeffs[Zi].alloc);
+        fq_zech_set(Zcoeffs[Zi].coeffs + cur_length, Acoeffs[Ai].coeffs + ai, ctx);
+        Zcoeffs[Zi].length = cur_length + 1;
+
         Z->length = ++Zi;
-        FLINT_ASSERT(cur_length == Zit->coeff->length);
-        FLINT_ASSERT(cur_length + 1 <= Zit->coeff->alloc);
-        fq_zech_set(Zit->coeff->coeffs + cur_length, Ait->coeff->coeffs + ai, ctx);
-        Zit->coeff->length = cur_length + 1;
+
         do {
             ai--;
-        } while (ai >= 0 && fq_zech_is_zero(Ait->coeff->coeffs + ai, ctx));
+        } while (ai >= 0 && fq_zech_is_zero(Acoeffs[Ai].coeffs + ai, ctx));
         if (ai < 0)
         {
             do {
                 Ai++;
-                Ait = At + Ai;
-            } while (Ai < A->length && extract_exp(Ait->exp, 1, 3) >= deg1);
+            } while (Ai < A->length && extract_exp(Aexps[Ai], 1, 3) >= deg1);
             if (Ai < A->length)
-                ai = fq_zech_poly_degree(Ait->coeff, ctx);
+                ai = fq_zech_poly_degree(Acoeffs + Ai, ctx);
         }
     }
 
     /* everything in Z must have a zero appended */
     while (Zi < Z->length)
     {
-        Zit = Z->terms + Zi;
-        FLINT_ASSERT(cur_length == Zit->coeff->length);
-        FLINT_ASSERT(cur_length + 1 <= Zit->coeff->alloc);
-        fq_zech_zero(Zit->coeff->coeffs + cur_length, ctx);
-        Zit->coeff->length = cur_length + 1;
+        FLINT_ASSERT(cur_length == Zcoeffs[Zi].length);
+        FLINT_ASSERT(cur_length + 1 <= Zcoeffs[Zi].alloc);
+        fq_zech_zero(Zcoeffs[Zi].coeffs + cur_length, ctx);
+        Zcoeffs[Zi].length = cur_length + 1;
         Zi++;
     }
 
     for (Zi = 0; Zi < Z->length; Zi++)
     {
-        FLINT_ASSERT(Z->terms[Zi].coeff->length == cur_length + 1);
+        FLINT_ASSERT(Z->coeffs[Zi].length == cur_length + 1);
     }
 }
 
@@ -780,7 +785,6 @@ static int fq_zech_mpoly_from_zip(
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     slong xoff, xshift, yoff, yshift, zoff, zshift;
-    fq_zech_polyun_term_struct * Zt = Z->terms;
     fq_zech_mpoly_struct * Hc;
     slong Hlen = H->length;
 
@@ -788,7 +792,7 @@ static int fq_zech_mpoly_from_zip(
 
     fq_zech_polyun_fit_length(M, Hlen + 1, ctx->fqctx);
     for (i = 0; i <= Hlen; i++)
-        M->terms[i].coeff->length = 0;
+        M->coeffs[i].length = 0;
 
     mpoly_gen_offset_shift_sp(&yoff, &yshift, yvar, bits, ctx->minfo);
     mpoly_gen_offset_shift_sp(&xoff, &xshift, xvar, bits, ctx->minfo);
@@ -807,9 +811,9 @@ static int fq_zech_mpoly_from_zip(
 
     for (Zi = 0; Zi < Z->length; Zi++)
     {
-        y = extract_exp(Zt[Zi].exp, 2, 3);
-        x = extract_exp(Zt[Zi].exp, 1, 3);
-        z = extract_exp(Zt[Zi].exp, 0, 3);
+        y = extract_exp(Z->exps[Zi], 2, 3);
+        x = extract_exp(Z->exps[Zi], 1, 3);
+        z = extract_exp(Z->exps[Zi], 0, 3);
         FLINT_ASSERT(x < deg);
         Hi = fq_zech_mpolyu_find_term(H, pack_exp3(0, x, z));
         if (Hi < 0)
@@ -824,18 +828,18 @@ static int fq_zech_mpoly_from_zip(
         fq_zech_mpoly_fit_length(B, Bi + Hc->length, ctx);
         Bcoeffs = B->coeffs;
 
-        if (M->terms[Hi].coeff->length < 1)
+        if (M->coeffs[Hi].length < 1)
         {
-            fq_zech_poly_product_roots(M->terms[Hi].coeff,
+            fq_zech_poly_product_roots(M->coeffs + Hi,
                                            Hc->coeffs, Hc->length, ctx->fqctx);
         }
 
-        fq_zech_poly_fit_length(M->terms[Hlen].coeff, Hc->length, ctx->fqctx);
+        fq_zech_poly_fit_length(M->coeffs + Hlen, Hc->length, ctx->fqctx);
 
-        success = fq_zech_zip_find_coeffs_new(Bcoeffs + Bi, Hc->coeffs,
-                    Hc->length, Zt[Zi].coeff->coeffs, Zt[Zi].coeff->length,
-                    M->terms[Hi].coeff->coeffs, M->terms[Hlen].coeff->coeffs,
-                                                             ctx->fqctx);
+        success = fq_zech_zip_find_coeffs_new(Bcoeffs + Bi, Hc->coeffs, Hc->length,
+                                Z->coeffs[Zi].coeffs, Z->coeffs[Zi].length,
+                                M->coeffs[Hi].coeffs, M->coeffs[Hlen].coeffs,
+                                                                   ctx->fqctx);
         if (success < 1)
             return success;
 
@@ -844,8 +848,10 @@ static int fq_zech_mpoly_from_zip(
         {
             if (fq_zech_is_zero(Bcoeffs + j, ctx->fqctx))
                 continue;
-            fq_zech_set(Bcoeffs + Bi, Bcoeffs + j, ctx->fqctx);
+
             FLINT_ASSERT(Bi < B->alloc);
+
+            fq_zech_set(Bcoeffs + Bi, Bcoeffs + j, ctx->fqctx);
             mpoly_monomial_set(Bexps + N*Bi, Hc->exps + N*i, N);
             (Bexps + N*Bi)[yoff] += y << yshift;
             Bi++;

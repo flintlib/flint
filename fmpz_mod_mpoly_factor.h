@@ -199,12 +199,6 @@ typedef fmpz_mod_tpoly_struct fmpz_mod_tpoly_t[1];
 
 typedef struct
 {
-    ulong exp;
-    fmpz_t coeff;
-} fmpz_mod_polyu_term_struct;
-
-typedef struct
-{
     ulong * exps;
     fmpz * coeffs;
     slong length;
@@ -549,6 +543,9 @@ slong fmpz_mod_mpolyn_stack_size(const fmpz_mod_mpolyn_stack_t S)
 
 /* poly_vec ******************************************************************/
 
+FLINT_DLL slong _fmpz_mod_poly_vec_max_degree(const fmpz_mod_poly_struct * A,
+                                         slong Alen, const fmpz_mod_ctx_t ctx);
+
 FLINT_DLL void _fmpz_mod_poly_vec_content(fmpz_mod_poly_t g,
          const fmpz_mod_poly_struct * A, slong Alen, const fmpz_mod_ctx_t ctx);
 
@@ -605,11 +602,6 @@ void fmpz_mod_polyun_init(fmpz_mod_polyun_t A, const fmpz_mod_ctx_t ctx)
     A->exps = NULL;
 }
 
-FLINT_DLL void fmpz_mod_polyun_scalar_mul_fmpz(
-    fmpz_mod_polyun_t A,
-    const fmpz_t c,
-    const fmpz_mod_ctx_t ctx);
-
 FLINT_DLL void fmpz_mod_polyun_clear(fmpz_mod_polyun_t A,
                                                      const fmpz_mod_ctx_t ctx);
 
@@ -640,18 +632,6 @@ void fmpz_mod_polyun_fit_length(fmpz_mod_polyun_t A, slong len,
     if (len > A->alloc)
         fmpz_mod_polyun_realloc(A, len, ctx);
 }
-
-FLINT_DLL void fmpz_mod_polyun_content_poly(fmpz_mod_poly_t g,
-                          const fmpz_mod_polyun_t A, const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_polyun_divexact_poly(fmpz_mod_polyun_t A,
-                            const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_polyun_mul_poly(fmpz_mod_polyun_t A,
-                            const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL slong fmpz_mod_polyun_lastdeg(const fmpz_mod_polyun_t A,
-                                                     const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_polyun_one(fmpz_mod_polyun_t A, const fmpz_mod_ctx_t ctx);
 

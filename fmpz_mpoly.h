@@ -1120,6 +1120,25 @@ FLINT_DLL void fmpz_mpolyd_clear(fmpz_mpolyd_t poly);
 
 /*****************************************************************************/
 
+typedef struct {
+    fmpz * powers;
+    slong length;
+    slong alloc;
+    fmpz_t tmp;
+} fmpz_pow_cache_t[1];
+
+void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val);
+
+void fmpz_pow_cache_clear(fmpz_pow_cache_t T);
+
+int fmpz_pow_cache_mulpow_ui(fmpz_t a, const fmpz_t b, ulong k,
+                                                          fmpz_pow_cache_t T);
+
+int fmpz_pow_cache_mulpow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t k,
+                                                          fmpz_pow_cache_t T);
+
+/*****************************************************************************/
+
 FLINT_DLL void fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(
                                 fmpz_mpoly_t A, const fmpz_mpoly_ctx_t lctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,

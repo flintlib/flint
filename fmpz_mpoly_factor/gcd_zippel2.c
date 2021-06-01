@@ -100,10 +100,10 @@ static void mpoly2_nmod_monomial_evals(
         e0 = (Aexps[N*start + off[0]] >> shift[0]) & mask;
         e1 = (Aexps[N*start + off[1]] >> shift[1]) & mask;
 
-        EH->terms[i].exp = pack_exp2(e0, e1);
-        n_poly_fit_length(EH->terms[i].coeff, n);
-        EH->terms[i].coeff->length = n;
-        p = EH->terms[i].coeff->coeffs;
+        EH->exps[i] = pack_exp2(e0, e1);
+        n_poly_fit_length(EH->coeffs + i, n);
+        EH->coeffs[i].length = n;
+        p = EH->coeffs[i].coeffs;
 
         for (j = 0; j < n; j++)
         {
@@ -191,10 +191,10 @@ static void fmpz_mpoly2_nmod_coeffs(
         FLINT_ASSERT(start < stop);
         n = stop - start;
 
-        EH->terms[i].exp = 0;
-        n_poly_fit_length(EH->terms[i].coeff, n);
-        EH->terms[i].coeff->length = n;
-        _fmpz_vec_get_nmod_vec(EH->terms[i].coeff->coeffs, Acoeffs + start, n, fpctx);
+        EH->exps[i] = 0;
+        n_poly_fit_length(EH->coeffs + i, n);
+        EH->coeffs[i].length = n;
+        _fmpz_vec_get_nmod_vec(EH->coeffs[i].coeffs, Acoeffs + start, n, fpctx);
     }
 
     EH->length = Amarkslen;
@@ -285,41 +285,40 @@ static void n_polyun_mod_zip_eval_cur_inc_coeff(
     FLINT_ASSERT(Acur->length == Ainc->length);
     FLINT_ASSERT(Acur->length == Acoeff->length);
 
-    e0 = extract_exp(Acur->terms[0].exp, 1, 2);
-    e1 = extract_exp(Acur->terms[0].exp, 0, 2);
+    e0 = extract_exp(Acur->exps[0], 1, 2);
+    e1 = extract_exp(Acur->exps[0], 0, 2);
 
     n_polyun_fit_length(E, 4);
     Ei = 0;
-    E->terms[Ei].exp = e1;
-    Ec = E->terms[Ei].coeff;
+    E->exps[Ei] = e1;
+    Ec = E->coeffs + Ei;
     n_poly_zero(Ec);
 
     for (i = 0; i < Acur->length; i++)
     {
-        slong this_len = Acur->terms[i].coeff->length;
-        FLINT_ASSERT(this_len == Ainc->terms[i].coeff->length);
-        FLINT_ASSERT(this_len == Acoeff->terms[i].coeff->length);
+        slong this_len = Acur->coeffs[i].length;
+        FLINT_ASSERT(this_len == Ainc->coeffs[i].length);
+        FLINT_ASSERT(this_len == Acoeff->coeffs[i].length);
 
-        c = _nmod_zip_eval_step(Acur->terms[i].coeff->coeffs,
-                                Ainc->terms[i].coeff->coeffs,
-                                Acoeff->terms[i].coeff->coeffs, this_len, ctx);
+        c = _nmod_zip_eval_step(Acur->coeffs[i].coeffs, Ainc->coeffs[i].coeffs,
+                                      Acoeff->coeffs[i].coeffs, this_len, ctx);
 
-        e0 = extract_exp(Acur->terms[i].exp, 1, 2);
-        e1 = extract_exp(Acur->terms[i].exp, 0, 2);
+        e0 = extract_exp(Acur->exps[i], 1, 2);
+        e1 = extract_exp(Acur->exps[i], 0, 2);
 
-        if (E->terms[Ei].exp != e0)
+        if (E->exps[Ei] != e0)
         {
             n_polyun_fit_length(E, Ei + 2);
-            Ei += !n_poly_is_zero(E->terms[Ei].coeff);
-            E->terms[Ei].exp = e0;
-            Ec = E->terms[Ei].coeff;
+            Ei += !n_poly_is_zero(E->coeffs + Ei);
+            E->exps[Ei] = e0;
+            Ec = E->coeffs + Ei;
             n_poly_zero(Ec);
         }
 
         n_poly_set_coeff(Ec, e1, c);
     }
 
-    Ei += !n_poly_is_zero(E->terms[Ei].coeff);
+    Ei += !n_poly_is_zero(E->coeffs + Ei);
     E->length = Ei;
 
     FLINT_ASSERT(n_polyun_mod_is_canonical(E, ctx));
@@ -498,8 +497,8 @@ void nmod_bma_mpoly_add_point(
     {
         slong tot = 0;
         for (Ai = 0; Ai < Alen; Ai++)
-        for (ai = A->terms[Ai].coeff->length - 1; ai >= 0; ai--)
-            tot += (0 != A->terms[Ai].coeff->coeffs[ai]);
+        for (ai = A->coeffs[Ai].length - 1; ai >= 0; ai--)
+            tot += (0 != A->coeffs[Ai].coeffs[ai]);
         nmod_bma_mpoly_fit_length(L, tot, fpctx);
     }
 
@@ -512,8 +511,8 @@ void nmod_bma_mpoly_add_point(
     Aexp = 0;
     if (Ai < Alen)
     {
-        ai = n_poly_degree(A->terms[Ai].coeff);
-        Aexp = pack_exp2(A->terms[Ai].exp, ai);
+        ai = n_poly_degree(A->coeffs + Ai);
+        Aexp = pack_exp2(A->exps[Ai], ai);
     }
 
     while (Li < Llen || Ai < Alen)
@@ -522,25 +521,25 @@ void nmod_bma_mpoly_add_point(
         {
             /* L term present, A term present */
 add_same_exp:
-            nmod_berlekamp_massey_add_point(Lcoeff + Li, A->terms[Ai].coeff->coeffs[ai]);
+            nmod_berlekamp_massey_add_point(Lcoeff + Li, A->coeffs[Ai].coeffs[ai]);
             Li++;
 
             do {
                 ai--;
-            } while (ai >= 0 && A->terms[Ai].coeff->coeffs[ai] == 0);
+            } while (ai >= 0 && A->coeffs[Ai].coeffs[ai] == 0);
             if (ai < 0)
             {
                 Ai++;
                 if (Ai < Alen)
                 {
-                    ai = n_poly_degree(A->terms[Ai].coeff);
-                    Aexp = pack_exp2(A->terms[Ai].exp, ai);
+                    ai = n_poly_degree(A->coeffs + Ai);
+                    Aexp = pack_exp2(A->exps[Ai], ai);
                 }
             }
             else
             {
                 FLINT_ASSERT(Ai < A->length);
-                Aexp = pack_exp2(A->terms[Ai].exp, ai);
+                Aexp = pack_exp2(A->exps[Ai], ai);
             }
         }
         else if (Li < Llen && (Ai >= Alen || Lexp[Li] > Aexp))
@@ -592,7 +591,6 @@ static int n_polyu2n_add_zipun_must_match(
     slong cur_length)
 {
     slong i, Ai, ai;
-    n_polyun_term_struct * Zt = Z->terms;
     ulong Aexp;
     slong Alen = A->length;
 
@@ -600,41 +598,41 @@ static int n_polyu2n_add_zipun_must_match(
     Aexp = 0;
     if (Ai < Alen)
     {
-        ai = n_poly_degree(A->terms[Ai].coeff);
-        Aexp = pack_exp2(A->terms[Ai].exp, ai);
+        ai = n_poly_degree(A->coeffs + Ai);
+        Aexp = pack_exp2(A->exps[Ai], ai);
     }
 
     for (i = 0; i < Z->length; i++)
     {
-        if (Ai < Alen && Zt[i].exp == Aexp)
+        if (Ai < Alen && Z->exps[i] == Aexp)
         {
             /* Z present, A present */
-            Zt[i].coeff->coeffs[cur_length] = A->terms[Ai].coeff->coeffs[ai];
-            Zt[i].coeff->length = cur_length + 1;
+            Z->coeffs[i].coeffs[cur_length] = A->coeffs[Ai].coeffs[ai];
+            Z->coeffs[i].length = cur_length + 1;
 
             do {
                 ai--;
-            } while (ai >= 0 && A->terms[Ai].coeff->coeffs[ai] == 0);
+            } while (ai >= 0 && A->coeffs[Ai].coeffs[ai] == 0);
             if (ai < 0)
             {
                 Ai++;
                 if (Ai < Alen)
                 {
-                    ai = n_poly_degree(A->terms[Ai].coeff);
-                    Aexp = pack_exp2(A->terms[Ai].exp, ai);
+                    ai = n_poly_degree(A->coeffs + Ai);
+                    Aexp = pack_exp2(A->exps[Ai], ai);
                 }
             }
             else
             {
                 FLINT_ASSERT(Ai < A->length);
-                Aexp = pack_exp2(A->terms[Ai].exp, ai);
+                Aexp = pack_exp2(A->exps[Ai], ai);
             }
         }
-        else if (Ai > Alen || Zt[i].exp > Aexp)
+        else if (Ai > Alen || Z->exps[i] > Aexp)
         {
             /* Z present, A missing */
-            Zt[i].coeff->coeffs[cur_length] = 0;
-            Zt[i].coeff->length = cur_length + 1;
+            Z->coeffs[i].coeffs[cur_length] = 0;
+            Z->coeffs[i].length = cur_length + 1;
         }
         else
         {
@@ -1293,7 +1291,8 @@ int static _random_check_sp(
         if (success)
             continue;
 
-        n_polyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+        _n_poly_vec_mul_nmod_intertible(Geval_sp->coeffs, Geval_sp->length,
+                                                         Gammaeval_sp, ctx_sp);
         FLINT_ASSERT(Geval_sp->length > 0);
         *GevaldegXY = n_polyu1n_bidegree(Geval_sp);
 
@@ -1375,8 +1374,8 @@ int static _random_check_mp(
         if (!success)
             continue;
 
-        fmpz_mod_polyun_scalar_mul_fmpz(Geval_mp, Gammaeval_mp, ctx_mp);
-
+        _fmpz_mod_poly_vec_mul_fmpz_mod(Geval_mp->coeffs, Geval_mp->length,
+                                                         Gammaeval_mp, ctx_mp);
         FLINT_ASSERT(Geval_mp->length > 0);
         *GevaldegXY = fmpz_mod_polyu1n_bidegree(Geval_mp);
 
@@ -1435,16 +1434,16 @@ static int zip_solve(
     Ai = 0;
     for (i = 0; i < H->length; i++)
     {
-        n = H->terms[i].coeff->length;
-        FLINT_ASSERT(M->terms[i].coeff->length == n + 1);
-        FLINT_ASSERT(Z->terms[i].coeff->length >= n);
+        n = H->coeffs[i].length;
+        FLINT_ASSERT(M->coeffs[i].length == n + 1);
+        FLINT_ASSERT(Z->coeffs[i].length >= n);
 
         n_poly_fit_length(t, n);
 
         success = _nmod_zip_vand_solve(Acoeffs + Ai,
-                         H->terms[i].coeff->coeffs, n,
-                         Z->terms[i].coeff->coeffs, Z->terms[i].coeff->length,
-                         M->terms[i].coeff->coeffs, t->coeffs, fpctx);
+                                 H->coeffs[i].coeffs, n,
+                                 Z->coeffs[i].coeffs, Z->coeffs[i].length,
+                                 M->coeffs[i].coeffs, t->coeffs, fpctx);
         if (success < 1)
         {
             n_poly_clear(t);
@@ -1847,7 +1846,8 @@ pick_bma_prime:
 
         FLINT_ASSERT(Geval_sp->length > 0);
         GevaldegXY = n_polyu1n_bidegree(Geval_sp);
-        n_polyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+        _n_poly_vec_mul_nmod_intertible(Geval_sp->coeffs, Geval_sp->length,
+                                                         Gammaeval_sp, ctx_sp);
 
         if (GdegboundXY < GevaldegXY)
         {
@@ -2060,7 +2060,8 @@ pick_bma_prime:
 
         FLINT_ASSERT(Geval_mp->length > 0);
         GevaldegXY = fmpz_mod_polyu1n_bidegree(Geval_mp);
-        fmpz_mod_polyun_scalar_mul_fmpz(Geval_mp, Gammaeval_mp, ctx_mp);
+        _fmpz_mod_poly_vec_mul_fmpz_mod(Geval_mp->coeffs, Geval_mp->length,
+                                                         Gammaeval_mp, ctx_mp);
 
         FLINT_ASSERT(fmpz_equal(Gammaeval_mp, fmpz_mod_polyun_leadcoeff(Geval_mp)));
 
@@ -2272,7 +2273,8 @@ pick_zip_prime:
             goto pick_bma_prime;
         }
 
-        n_polyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+        _n_poly_vec_mul_nmod_intertible(Geval_sp->coeffs, Geval_sp->length,
+                                                         Gammaeval_sp, ctx_sp);
 
         success = n_polyu2n_add_zipun_must_match(ZH,
                                 which_check == 1 ? Abareval_sp :

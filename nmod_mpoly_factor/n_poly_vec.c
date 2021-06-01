@@ -11,6 +11,34 @@
 
 #include "nmod_mpoly_factor.h"
 
+
+slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen)
+{
+    slong i, len = 0;
+    for (i = 0; i < Alen; i++)
+        len = FLINT_MAX(len, A[i].length);
+    return len - 1;
+}
+
+
+void _n_poly_vec_mul_nmod_intertible(
+    n_poly_struct * A,
+    slong Alen,
+    mp_limb_t c,
+    nmod_t ctx)
+{
+    slong i;
+
+    FLINT_ASSERT(n_gcd(c, ctx.n) == 1);
+
+    if (c == 1)
+        return;
+
+    for (i = 0; i < Alen; i++)
+        _n_poly_mod_scalar_mul_nmod_inplace(A + i, c, ctx);
+}
+
+
 void _n_poly_vec_mod_mul_poly(
     n_poly_struct * A,
     slong Alen,
@@ -44,16 +72,14 @@ void _n_poly_vec_mod_content(
     }
 }
 
-void _n_poly_vec_mod_remove_content(
-    n_poly_t g,
+void _n_poly_vec_mod_divexact_poly(
     n_poly_struct * A,
     slong Alen,
+    const n_poly_t g,
     nmod_t ctx)
 {
     slong i;
     n_poly_t r;
-
-    _n_poly_vec_mod_content(g, A, Alen, ctx);
 
     if (n_poly_is_one(g))
         return;
@@ -61,18 +87,22 @@ void _n_poly_vec_mod_remove_content(
     n_poly_init(r);
 
     for (i = 0; i < Alen; i++)
+    {
         n_poly_mod_divrem(A + i, r, A + i, g, ctx);
+        FLINT_ASSERT(n_poly_is_zero(r));
+    }
 
     n_poly_clear(r);
 }
 
-/* TODO get rid of the need for this */
-void n_polyun_mod_content(n_poly_t c, const n_polyun_t A, nmod_t ctx)
-{
-    slong i;
 
-    n_poly_zero(c);
-    for (i = 0; i < A->length; i++)
-        n_poly_mod_gcd(c, c, A->terms[i].coeff, ctx);
+void _n_poly_vec_mod_remove_content(
+    n_poly_t g,
+    n_poly_struct * A,
+    slong Alen,
+    nmod_t ctx)
+{
+    _n_poly_vec_mod_content(g, A, Alen, ctx);
+    _n_poly_vec_mod_divexact_poly(A, Alen, g, ctx);
 }
 

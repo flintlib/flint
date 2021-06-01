@@ -173,40 +173,72 @@ typedef struct mpoly_heap_s
 } mpoly_heap_s;
 
 /* trees *********************************************************************/
-typedef struct mpoly_rbnode
+
+/* red-black with ui keys */
+typedef struct {
+    ulong key;
+    slong up;
+    slong left;
+    slong right;
+    int color;
+} mpoly_rbnode_ui_struct;
+
+typedef struct {
+    slong length;
+    mpoly_rbnode_ui_struct * nodes;
+    slong node_alloc;
+    char * data;
+    slong data_alloc;
+    slong data_size;
+} mpoly_rbtree_ui_struct;
+
+typedef mpoly_rbtree_ui_struct mpoly_rbtree_ui_t[1];
+
+FLINT_DLL void mpoly_rbtree_ui_init(mpoly_rbtree_ui_t T, slong data_size);
+
+FLINT_DLL void mpoly_rbtree_ui_clear(mpoly_rbtree_ui_t T);
+
+FLINT_DLL void * mpoly_rbtree_ui_lookup(mpoly_rbtree_ui_t T, int * its_new,
+                                                                    ulong key);
+
+MPOLY_INLINE slong mpoly_rbtree_ui_head(const mpoly_rbtree_ui_t T)
 {
-    struct mpoly_rbnode * up;
-    struct mpoly_rbnode * left;
-    struct mpoly_rbnode * right;
-    void * data;
-    void * data2;
-    slong key;
-    int col;
-} mpoly_rbnode_struct;
+    FLINT_ASSERT(T->nodes[1].left >= 0 || T->length < 1);
+    return T->nodes[1].left;
+}
 
-typedef mpoly_rbnode_struct mpoly_rbnode_t[1];
+/* red-black with fmpz keys */
+typedef struct {
+    fmpz_t key;
+    slong up;
+    slong left;
+    slong right;
+    int color;
+} mpoly_rbnode_fmpz_struct;
 
-typedef struct mpoly_rbtree
+typedef struct {
+    slong length;
+    mpoly_rbnode_fmpz_struct * nodes;
+    slong node_alloc;
+    char * data;
+    slong data_alloc;
+    slong data_size;
+} mpoly_rbtree_fmpz_struct;
+
+typedef mpoly_rbtree_fmpz_struct mpoly_rbtree_fmpz_t[1];
+
+FLINT_DLL void mpoly_rbtree_fmpz_init(mpoly_rbtree_fmpz_t T, slong data_size);
+
+FLINT_DLL void mpoly_rbtree_fmpz_clear(mpoly_rbtree_fmpz_t T);
+
+FLINT_DLL void * mpoly_rbtree_fmpz_lookup(mpoly_rbtree_fmpz_t T, int * its_new,
+                                                             const fmpz_t key);
+
+MPOLY_INLINE slong mpoly_rbtree_fmpz_head(const mpoly_rbtree_fmpz_t T)
 {
-    slong size;
-    mpoly_rbnode_t head;  /* dummy node for pointer to head */
-    mpoly_rbnode_t null;  /* dummy node to be pointed to by leaves */
-} mpoly_rbtree_struct;
-
-typedef mpoly_rbtree_struct mpoly_rbtree_t[1];
-
-FLINT_DLL void mpoly_rbtree_init(mpoly_rbtree_t tree);
-
-FLINT_DLL void mpoly_rbnode_clear(mpoly_rbtree_t tree, mpoly_rbnode_t node,
-                                void ** dataout, slong * keysout, slong * idx);
-
-FLINT_DLL void mpoly_rbtree_clear(mpoly_rbtree_t tree, void ** dataout, slong * keysout);
-
-FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get(int * new_node,
-                                         struct mpoly_rbtree *tree, slong rcx);
-
-FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get_fmpz(int * new_node,
-                                        struct mpoly_rbtree *tree, fmpz_t rcx);
+    FLINT_ASSERT(T->nodes[1].left >= 0 || T->length < 1);
+    return T->nodes[1].left;
+}
 
 /* Orderings *****************************************************************/
 
