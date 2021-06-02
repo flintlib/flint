@@ -232,7 +232,7 @@ int mpoly_univar_pseudo_gcd_ducos(
         mpoly_univar_fit_length(G, 1, R);
         G->length = 1;
         fmpz_zero(G->exps + 0);
-        return POW_FMPZ(COEFF(G, 0), COEFF(A, 0), A->exps + 0);
+        return POW_FMPZ(COEFF(G, 0), COEFF(A, 0), B->exps + 0);
     }
 
     fmpz_init(n);
@@ -853,10 +853,10 @@ int mpoly_univar_discriminant(
     {
         /* the discriminant of the constant polynomial a should be 1/a^2 */
         ONE(d);
-        if (!DIVIDES(d, d, COEFF(fx, 0)))
-            flint_throw(FLINT_IMPINV, "mpoly_discriminant: non-unit constant");
-        MUL(d, d, d);
-        return 1;
+        success = DIVIDES(d, d, COEFF(fx, 0));
+        if (success)
+            MUL(d, d, d);
+        return success;
     }
 
     if (fmpz_is_one(fx->exps + 0))
@@ -866,7 +866,7 @@ int mpoly_univar_discriminant(
         return 1;
     }
 
-    /* the discriminant is (-1)^(n*(n-1)/2) res(f, f')/a_n */
+    /* the discriminant is (-1)^(n*(n-1)/2)*res(f,f')*a_n^(n-m-2), m=deg(f') */
     mpoly_univar_init(rx, R);
     mpoly_univar_init(fxp, R);
     mpoly_univar_derivative(fxp, fx, R);
@@ -879,20 +879,42 @@ int mpoly_univar_discriminant(
     else
     {
         int change_sign = fmpz_get_ui(fx->exps + 0) & 2;
-        SET(d, COEFF(fx, 0));
+        fmpz_t exp_diff;
+        void * u;
+
+        fmpz_init(exp_diff);
+        fmpz_sub(exp_diff, fx->exps + 0, fxp->exps + 0);
+        fmpz_sub_ui(exp_diff, exp_diff, 2);
+
+        u = mpoly_void_ring_elem_init(R);
+        SET(u, COEFF(fx, 0));   /* will be clobbered */
 
         success = mpoly_univar_pseudo_gcd_ducos(rx, fx, fxp, R);
 
         if (success && rx->length == 1 && fmpz_is_zero(rx->exps + 0))
         {
-            DIVEXACT(d, COEFF(rx, 0), d);
             if (change_sign != 0)
-                NEG(d, d);
+                NEG(COEFF(rx, 0), COEFF(rx, 0));
+
+            if (fmpz_sgn(exp_diff) < 0)
+            {
+                FLINT_ASSERT(fmpz_equal_si(exp_diff, -1));
+                DIVEXACT(d, COEFF(rx, 0), u);
+            }
+            else
+            {
+                success = POW_FMPZ(u, u, exp_diff);
+                if (success)
+                    MUL(d, COEFF(rx, 0), u);
+            }
         }
         else
         {
             ZERO(d);
         }
+
+        fmpz_clear(exp_diff);
+        mpoly_void_ring_elem_clear(u, R);
     }
 
     mpoly_univar_clear(rx, R);
