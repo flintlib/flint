@@ -66,7 +66,7 @@ main(void)
             }
 
             bits = mpoly_fix_bits(f->bits + n_randint(state, FLINT_BITS), ctx->minfo);
-            nmod_mpoly_from_univar_bits(h, bits, fx, j, ctx);
+            _nmod_mpoly_from_univar(h, bits, fx, j, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
             if (h->bits != bits || !nmod_mpoly_equal(f, h, ctx))
             {

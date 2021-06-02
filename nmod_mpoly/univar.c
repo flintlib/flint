@@ -69,6 +69,58 @@ void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t A,
     }
 }
 
+void nmod_mpoly_univar_set_coeff_ui(
+    nmod_mpoly_univar_t A,
+    ulong e,
+    const nmod_mpoly_t c,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i, j;
+
+    for (i = A->length; i >= 0; i--)
+    {
+        int cmp = i > 0 ? fmpz_cmp_ui(A->exps + i - 1, e) : 1;
+
+        if (cmp > 0)
+        {
+            if (nmod_mpoly_is_zero(c, ctx))
+                return;
+
+            nmod_mpoly_univar_fit_length(A, A->length + 1, ctx);
+
+            for (j = A->length; j > i; j--)
+            {
+                nmod_mpoly_swap(A->coeffs + j, A->coeffs + j + 1, ctx);
+                fmpz_swap(A->exps + j, A->exps + j + 1);
+            }
+
+            A->length++;
+
+            fmpz_set_ui(A->exps + i, e);
+            nmod_mpoly_set(A->coeffs + i, c, ctx);
+            return;
+        }
+        else if (cmp == 0)
+        {
+            nmod_mpoly_set(A->coeffs + i, c, ctx);
+
+            if (!nmod_mpoly_is_zero(A->coeffs + i, ctx))
+                return;
+
+            A->length--;
+
+            for (j = i; j < A->length; j++)
+            {
+                nmod_mpoly_swap(A->coeffs + j, A->coeffs + j + 1, ctx);
+                fmpz_swap(A->exps + j, A->exps + j + 1);
+            }
+        }
+    }
+
+    FLINT_ASSERT(0 && "unreachable");
+    return;
+}
+
 void nmod_mpoly_univar_assert_canonical(nmod_mpoly_univar_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -286,7 +338,7 @@ void nmod_mpoly_to_univar(nmod_mpoly_univar_t A, const nmod_mpoly_t B,
     The assertion x->next == NULL would need to be replaced by a loop.
     Other asserts would need to be removed as well.
 */
-void nmod_mpoly_from_univar_bits(
+void _nmod_mpoly_from_univar(
     nmod_mpoly_t A,
     flint_bitcnt_t Abits,
     const nmod_mpoly_univar_t B,
@@ -485,6 +537,119 @@ void nmod_mpoly_from_univar(nmod_mpoly_t A, const nmod_mpoly_univar_t B,
     }
     TMP_END;
 
-    nmod_mpoly_from_univar_bits(A, bits, B, var, ctx);
+    _nmod_mpoly_from_univar(A, bits, B, var, ctx);
+}
+
+#define COEFF(A, i) ((void*)(A->coeffs + (i)*R->elem_size))
+
+static void mpoly_univar_set_nmod_mpoly_univar(
+    mpoly_univar_t A,
+    mpoly_void_ring_t R,
+    const nmod_mpoly_univar_t B,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    mpoly_univar_fit_length(A, B->length, R);
+    A->length = B->length;
+
+    for (i = B->length - 1; i >= 0; i--)
+    {
+        fmpz_set(A->exps + i, B->exps + i);
+        nmod_mpoly_set(COEFF(A, i), B->coeffs + i, ctx);
+    }
+}
+
+static void mpoly_univar_swap_nmod_mpoly_univar(
+    mpoly_univar_t A,
+    mpoly_void_ring_t R,
+    nmod_mpoly_univar_t B,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    mpoly_univar_fit_length(A, B->length, R);
+    nmod_mpoly_univar_fit_length(B, A->length, ctx);
+
+    for (i = FLINT_MAX(A->length, B->length) - 1; i >= 0; i--)
+    {
+        fmpz_swap(A->exps + i, B->exps + i);
+        nmod_mpoly_swap(COEFF(A, i), B->coeffs + i, ctx);
+    }
+
+    SLONG_SWAP(A->length, B->length);
+}
+
+int nmod_mpoly_univar_pseudo_gcd(
+    nmod_mpoly_univar_t gx,
+    const nmod_mpoly_univar_t ax,
+    const nmod_mpoly_univar_t bx,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int success;
+    mpoly_void_ring_t R;
+    mpoly_univar_t Ax, Bx, Gx;
+
+    mpoly_void_ring_init_nmod_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Ax, R);
+    mpoly_univar_init(Bx, R);
+    mpoly_univar_init(Gx, R);
+    mpoly_univar_set_nmod_mpoly_univar(Ax, R, ax, ctx);
+    mpoly_univar_set_nmod_mpoly_univar(Bx, R, bx, ctx);
+
+    success = mpoly_univar_pseudo_gcd_ducos(Gx, Ax, Bx, R);
+
+    if (success)
+        mpoly_univar_swap_nmod_mpoly_univar(Gx, R, gx, ctx);
+
+    mpoly_univar_clear(Ax, R);
+    mpoly_univar_clear(Bx, R);
+    mpoly_univar_clear(Gx, R);
+
+    return success;
+}
+
+int nmod_mpoly_univar_resultant(
+    nmod_mpoly_t d,
+    const nmod_mpoly_univar_t ax,
+    const nmod_mpoly_univar_t bx,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int success;
+    mpoly_void_ring_t R;
+    mpoly_univar_t Ax, Bx;
+
+    mpoly_void_ring_init_nmod_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Ax, R);
+    mpoly_univar_init(Bx, R);
+    mpoly_univar_set_nmod_mpoly_univar(Ax, R, ax, ctx);
+    mpoly_univar_set_nmod_mpoly_univar(Bx, R, bx, ctx);
+
+    success = mpoly_univar_resultant(d, Ax, Bx, R);
+
+    mpoly_univar_clear(Ax, R);
+    mpoly_univar_clear(Bx, R);
+
+    return success;
+}
+
+int nmod_mpoly_univar_discriminant(
+    nmod_mpoly_t d,
+    const nmod_mpoly_univar_t fx,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int success;
+    mpoly_void_ring_t R;
+    mpoly_univar_t Fx;
+
+    mpoly_void_ring_init_nmod_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Fx, R);
+    mpoly_univar_set_nmod_mpoly_univar(Fx, R, fx, ctx);
+
+    success = mpoly_univar_discriminant(d, Fx, R);
+
+    mpoly_univar_clear(Fx, R);
+
+    return success;
 }
 

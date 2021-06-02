@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "nmod_mpoly.h"
 
 int nmod_mpoly_is_nmod_poly(
     const nmod_mpoly_t A,
@@ -26,7 +26,7 @@ int nmod_mpoly_get_nmod_poly(
     const nmod_mpoly_ctx_t ctx)
 {
     A->mod = ctx->mod;
-    return nmod_mpoly_get_n_poly((n_poly_struct *) A, B, var, ctx);
+    return nmod_mpoly_get_n_poly(evil_cast_nmod_poly_to_n_poly(A), B, var, ctx);
 }
 
 int nmod_mpoly_get_n_poly(
@@ -99,7 +99,7 @@ void _nmod_mpoly_set_nmod_poly(
 
     TMP_START;
 
-    genexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    genexp = TMP_ARRAY_ALLOC(N, ulong);
     if (Abits <= FLINT_BITS)
         mpoly_gen_monomial_sp(genexp, var, Abits, ctx->minfo);
     else
@@ -155,5 +155,5 @@ void nmod_mpoly_set_nmod_poly(
     slong var,
     const nmod_mpoly_ctx_t ctx)
 {
-    nmod_mpoly_set_n_poly_mod(A, (n_poly_struct *) B, var, ctx);
+    nmod_mpoly_set_n_poly_mod(A, evil_const_cast_nmod_poly_to_n_poly(B), var, ctx);
 }

@@ -555,6 +555,14 @@ The greatest common divisor functions assume that the modulus is prime.
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
 
+.. function:: int nmod_mpoly_resultant(nmod_mpoly_t R, const nmod_mpoly_t A, const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Try to set ``R`` to the resultant of ``A`` and ``B`` with respect to the variable of index ``var``.
+
+.. function:: int nmod_mpoly_discriminant(nmod_mpoly_t D, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Try to set ``D`` to the discriminant of ``A`` with respect to the variable of index ``var``.
+
 
 Square Root
 --------------------------------------------------------------------------------
