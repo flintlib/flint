@@ -423,6 +423,17 @@ FLINT_DLL void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C,
                  const fmpq_mpoly_t A, const slong * vars, const ulong * exps,
                                      slong length, const fmpq_mpoly_ctx_t ctx);
 
+/* conversion ****************************************************************/
+
+FLINT_DLL int fmpq_mpoly_is_fmpq_poly(const fmpq_mpoly_t A,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_get_fmpq_poly(fmpq_poly_t A,  const fmpq_mpoly_t B,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_fmpq_poly(fmpq_mpoly_t A, const fmpq_poly_t B,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
+
 /* comparison ****************************************************************/
 
 FLINT_DLL int fmpq_mpoly_cmp(const fmpq_mpoly_t A, const fmpq_mpoly_t B,
@@ -771,6 +782,11 @@ FLINT_DLL int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
              fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                    const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
+                  const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_discriminant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
