@@ -282,33 +282,6 @@ FLINT_DLL int n_polyun_fq_is_canonical(
 
 /*****************************************************************************/
 
-FLINT_DLL int fq_nmod_mpoly_is_fq_nmod_poly(
-    const fq_nmod_mpoly_t A,
-    slong var,
-    const fq_nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int fq_nmod_mpoly_get_fq_nmod_poly(
-    fq_nmod_poly_t A,
-    const fq_nmod_mpoly_t B,
-    slong var,
-    const fq_nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fq_nmod_mpoly_set_fq_nmod_poly(
-    fq_nmod_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const fq_nmod_struct * Bcoeffs,
-    slong Blen,
-    slong var,
-    const fq_nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fq_nmod_mpoly_set_fq_nmod_poly(
-    fq_nmod_mpoly_t A,
-    const fq_nmod_poly_t B,
-    slong var,
-    const fq_nmod_mpoly_ctx_t ctx);
-
-/*****************************************************************************/
-
 typedef struct
 {
     fq_nmod_mpoly_struct * coeffs;
@@ -358,6 +331,12 @@ FLINT_DLL void fq_nmod_mpoly_from_mpolyv(fq_nmod_mpoly_t A,
 FLINT_DLL int _fq_nmod_mpoly_vec_content_mpoly(fq_nmod_mpoly_t g,
                                   const fq_nmod_mpoly_struct * A, slong Alen,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fq_nmod_mpoly_vec_divexact_mpoly(fq_nmod_mpoly_struct * A,
+           slong Alen, const fq_nmod_mpoly_t c, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fq_nmod_mpoly_vec_mul_mpoly(fq_nmod_mpoly_struct * A,
+           slong Alen, const fq_nmod_mpoly_t c, const fq_nmod_mpoly_ctx_t ctx);
 
 /*****************************************************************************/
 
