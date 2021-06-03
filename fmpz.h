@@ -635,6 +635,9 @@ FLINT_DLL void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g);
 
 FLINT_DLL void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g);
 
+FLINT_DLL void fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b,
+                                            const fmpz_t f, const fmpz_t g);
+
 FLINT_DLL void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, 
                                        fmpz_t r2, fmpz_t r1, const fmpz_t L);
 
