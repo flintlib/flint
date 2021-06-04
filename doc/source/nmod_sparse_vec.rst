@@ -1,0 +1,176 @@
+.. _nmod-sparse-vec:
+
+**nmod_sparse_vec.h** -- sparse vectors over integers mod word-size integers
+===============================================================================
+
+Description.
+
+Types, macros and constants
+-------------------------------------------------------------------------------
+
+.. type:: nmod_sparse_entry_t
+
+    Holds a pair (ind, val), where ind (of type slong) is an index into the
+    vector and val (of type mp_limb_t) is the value at that index
+
+.. type:: nmod_sparse_vec_t
+
+    Holds an array of nonzero entries (of type nmod_sparse_entry_struct *) of 
+    specified length nnz, sorted by ind
+
+Memory management
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_sparse_vec_init(nmod_sparse_vec_t vec)
+
+    Initializes an empty sparse vector (no allocation)
+
+.. function:: void nmod_sparse_vec_clear(nmod_sparse_vec_t vec, slong len)
+
+    Clears the entries of vec and frees the space allocated for it
+
+.. function:: void nmod_sparse_vec_swap(nmod_sparse_vec_t vec1, nmod_sparse_vec_t vec2)
+
+    Swaps two vectors (no reallocaton)
+
+Instantiation
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_zero(nmod_sparse_vec_t vec)
+
+    Sets vec to zero (the empty sparse vector)
+
+.. function:: void nmod_sparse_vec_one(nmod_sparse_vec_t vec, slong ind)
+
+    Sets vec to the ind-th basis vector (single one in position ind)
+
+.. function:: void nmod_sparse_vec_set(nmod_sparse_vec_t dst, nmod_sparse_vec_t src)
+
+    Makes dst a (deep) copy of src
+
+.. function:: void nmod_sparse_vec_set_entry(nmod_sparse_vec_t vec, slong ind, const mp_limb_t val)
+
+    Sets the value at index ``ind`` to nonzero ``val``, either replacing an existing value or 
+    extending the array of entries
+
+.. function:: void nmod_sparse_vec_from_entries(nmod_sparse_vec_t vec, slong *inds, mp_ptr vals, slong nnz)
+
+    Constructs vec from a given sequence of indices and associated values, both of length nnz.
+    Assumes no duplicate indices
+
+Comparison
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_is_zero(nmod_sparse_vec_t vec)
+
+    Checks if the given vector is trivial (empty), returning `1` if so and `0` 
+    otherwise
+
+.. function:: void nmod_sparse_vec_equal(const nmod_sparse_vec_t vec1, const nmod_sparse_vec_t vec2, slong ioff)
+
+    Checks if vec1 equals vec2 (with s specified column offset ioff), returning
+    `1` if so and `0` otherwise
+
+Indexing
+--------------------------------------------------------------------------------
+
+.. function:: mp_limb_t * nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong ind)
+
+    Returns a pointer to the value at the index ind (or NULL if index not found)
+
+
+Conversion to/from dense vector
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_from_dense(nmod_sparse_vec_t dst, mp_srcptr src, slong len)
+
+    Converts the dense vector src of length len to a sparse vector
+
+.. function:: void nmod_sparse_vec_to_dense(mp_ptr dst, const nmod_sparse_vec_t src, slong len)
+
+    Converts the sparse vector src to a dense vector of length len
+
+
+Windows, concatenation, and splitting
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_window_init(nmod_sparse_vec_t window, const nmod_sparse_vec_t vec, slong i1, slong i2)
+
+    Constructs a window on a the sparse vector vec between indices i1 and i2
+    Note that window is only valid as long as original vector remains uzechified
+
+.. function:: void nmod_sparse_vec_window_clear(nmod_sparse_vec_t window)
+
+    Clears a window (for safety only)
+
+.. function:: void nmod_sparse_vec_concat(nmod_sparse_vec_t res, const nmod_sparse_vec_t vec1, const nmod_sparse_vec_t vec2, slong len1)
+
+    Concatenates two vectors vec1 and vec2 into res, with indices of vec2 
+    offset by len1
+
+.. function:: void nmod_sparse_vec_split(nmod_sparse_vec_t res1, nmod_sparse_vec_t res1, const nmod_sparse_vec_t vec, slong ind)
+
+    Splits vec into two vectors res1 and res2, with res1 containing all entries 
+    below index ind and res2 containing the rest
+
+Permutation
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_permute_inds(nmod_sparse_vec_t vec, slong *P)
+
+    Permutes the indices of vec according to P, and re-sorts
+
+
+Randomization
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_sparse_vec_randtest(nmod_sparse_vec_t vec, flint_rand_t state, slong nnz, slong len, nmod_t mod)
+
+    Makes vec a sparse vector with nnz nonzero entries uniformly distributed
+    between 0 and len - 1, with individual entries generated by nmod_randtest
+
+
+Output
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_print_pretty(const nmod_sparse_vec_t vec, slong ioff, slong maxi, nmod_t mod)
+
+    Prints the vector of given length to ``stdout`` in a human-readable format
+
+
+Arithmetic
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_sparse_vec_neg(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, nmod_t mod)
+
+    Sets ``v`` to the negation of ``u``
+
+.. function:: void nmod_sparse_vec_scalar_mul_nmod(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, const mp_limb_t c, nmod_t mod)
+
+    Sets ``v`` to the scalar multiple of ``u`` by ``c``
+
+.. function:: void nmod_sparse_vec_add(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
+
+    Sets ``w`` to the sum of ``u`` and ``v``
+
+.. function:: void nmod_sparse_vec_sub(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
+
+    Sets ``w`` to the difference of ``u`` and ``v``
+
+.. function:: void nmod_sparse_vec_scalar_addmul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod)
+
+    Sets ``w`` to the sum of ``u`` and ``c` times ``v``
+
+.. function:: void nmod_sparse_vec_scalar_submul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod)
+
+    Sets ``w`` to the difference of ``u`` and ``c` times ``v``
+
+.. function:: mp_limb_t nmod_sparse_vec_dot(const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
+
+    Sets ``ret`` to the dot product of ``u`` and ``v``
+
+.. function:: mp_limb_t nmod_sparse_vec_dot_dense(const nmod_sparse_vec_t u, mp_srcptr v, nmod_t mod)
+
+    Sets ``ret`` to the dot product of ``u`` and ``v``

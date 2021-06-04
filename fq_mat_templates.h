@@ -274,6 +274,10 @@ FLINT_DLL void TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_t st
 
 /* Transpose */
 
+FLINT_DLL void TEMPLATE(T, mat_transpose)(TEMPLATE(T, mat_t) B,
+                          const TEMPLATE(T, mat_t) A,
+                          const TEMPLATE(T, ctx_t) ctx);
+
 /* Addition and subtraction */
 
 FLINT_DLL void TEMPLATE(T, mat_add)(TEMPLATE(T, mat_t) C,
@@ -290,6 +294,12 @@ FLINT_DLL void TEMPLATE(T, mat_neg)(TEMPLATE(T, mat_t) B,
                           const TEMPLATE(T, mat_t) A,
                           const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void TEMPLATE(T, mat_addmul)(TEMPLATE(T, mat_t) D,
+                        const TEMPLATE(T, mat_t) C,
+                        const TEMPLATE(T, mat_t) A,
+                        const TEMPLATE(T, mat_t) B,
+                        const TEMPLATE(T, ctx_t) ctx);
+
 FLINT_DLL void TEMPLATE(T, mat_submul)(TEMPLATE(T, mat_t) D,
                         const TEMPLATE(T, mat_t) C,
                         const TEMPLATE(T, mat_t) A,
@@ -298,11 +308,34 @@ FLINT_DLL void TEMPLATE(T, mat_submul)(TEMPLATE(T, mat_t) D,
 
 /* Scalar operations */
 
+FLINT_DLL void TEMPLATE(T, mat_scalar_mul)(TEMPLATE(T, mat_t) B,
+                        const TEMPLATE(T, mat_t) A,
+                        const TEMPLATE(T, t) c,
+                        const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_scalar_addmul)(TEMPLATE(T, mat_t) C,
+                        const TEMPLATE(T, mat_t) A,
+                        const TEMPLATE(T, mat_t) B,
+                        const TEMPLATE(T, t) c,
+                        const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_scalar_submul)(TEMPLATE(T, mat_t) C,
+                        const TEMPLATE(T, mat_t) A,
+                        const TEMPLATE(T, mat_t) B,
+                        const TEMPLATE(T, t) c,
+                        const TEMPLATE(T, ctx_t) ctx);
+
+
 /* Multiplication */
 
 FLINT_DLL void TEMPLATE(T, mat_mul)(TEMPLATE(T, mat_t) C,
                      const TEMPLATE(T, mat_t) A,
                      const TEMPLATE(T, mat_t) B,
+                     const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_mul_vec)(TEMPLATE(T, struct) *y,
+                     const TEMPLATE(T, mat_t) A,
+                     const TEMPLATE(T, struct) *x,
                      const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL void TEMPLATE(T, mat_mul_classical)(TEMPLATE(T, mat_t) C,

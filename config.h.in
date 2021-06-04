@@ -8,7 +8,7 @@
 #cmakedefine01 FLINT_WANT_ASSERT
 
 /* Define if you cpu_set_t in sched.h */
-#cmakedefine01 FLINT_USES_CPUSET
+#cmakedefine01 HAVE_CPU_SET_T
 
 #cmakedefine01 FLINT_USES_PTHREAD
 

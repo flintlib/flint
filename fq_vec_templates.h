@@ -47,6 +47,20 @@ int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
     return _TEMPLATE(T, vec_fprint)(stdout, vec, len, ctx);
 }
 
+FQ_VEC_TEMPLATES_INLINE
+void _TEMPLATE(T, vec_print_pretty)(const TEMPLATE(T, struct) * vec, slong len,
+                            const TEMPLATE(T, ctx_t) ctx)
+{
+    slong i;
+    flint_printf("[");
+    for (i = 0; i < len; ++i)
+    {
+        if (i > 0) flint_printf(" ");
+        TEMPLATE(T, print_pretty) (&vec[i], ctx);
+    }
+    flint_printf("]");
+}
+
 /*  Conversions  *************************************************************/
 
 /*  Assignment and basic manipulation  ***************************************/

@@ -14,7 +14,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "hashmap.h"
 
 /* improve locality */
 #define BLOCK 128

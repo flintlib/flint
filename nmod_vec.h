@@ -221,6 +221,18 @@ void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)
 }
 
 NMOD_VEC_INLINE
+void _nmod_vec_print_pretty(mp_ptr a, slong length, nmod_t mod)
+{
+    slong i;
+    flint_printf("[");
+    for(i=0; i<length; ++i) {
+        flint_printf("%wd ", a[i]);
+    }
+    flint_printf("]\n");
+    
+}
+
+NMOD_VEC_INLINE
 int _nmod_vec_equal(mp_srcptr vec, mp_srcptr vec2, slong len)
 {
    slong i;
