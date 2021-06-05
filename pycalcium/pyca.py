@@ -4290,6 +4290,9 @@ def test_improved_zero_recognition():
     assert tan(pi*sqrt(2))*tan(pi*sqrt(3)) == (cos(pi*sqrt(5-2*sqrt(6))) - cos(pi*sqrt(5+2*sqrt(6))))/(cos(pi*sqrt(5-2*sqrt(6))) + cos(pi*sqrt(5+2*sqrt(6))))
     assert log(exp(1j) / exp(-1j)) == 2*i
 
+    v = cos(acos(sqrt(2) - sqrt(3))/3)
+    assert 1 - 90*v**2 + 321*v**4 - 592*v**6 + 864*v**8 - 768*v**10 + 256*v**12 == 0
+
     def expect_not_implemented(f):
         try:
             v = f()
