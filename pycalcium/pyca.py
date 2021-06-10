@@ -193,11 +193,11 @@ class fexpr:
             names.append(symbol_name)
         return names
 
-    def __init__(self, val=0):
+    def __init__(self, val=None):
         self._data = fexpr_struct()
         self._ref = ctypes.byref(self._data)
         libcalcium.fexpr_init(self)
-        if val is not 0:
+        if val is not None:
             typ = type(val)
             if typ is int:
                 b = sys.maxsize
@@ -634,11 +634,11 @@ class qqbar:
 
     """
 
-    def __init__(self, val=0):
+    def __init__(self, val=None):
         self._data = qqbar_struct()
         self._ref = ctypes.byref(self._data)
         libcalcium.qqbar_init(self)
-        if val is not 0:
+        if val is not None:
             typ = type(val)
             if typ is int:
                 b = sys.maxsize
@@ -1387,7 +1387,7 @@ class ca:
 
     """
 
-    def __init__(self, val=0, context=None):
+    def __init__(self, val=None, context=None):
         if context is None:
             self._ctx_python = ctx_default
         else:
@@ -1396,7 +1396,7 @@ class ca:
         self._data = ca_struct()
         self._ref = ctypes.byref(self._data)
         libcalcium.ca_init(self, self._ctx)
-        if val is not 0:
+        if val is not None:
             typ = type(val)
             if typ is int:
                 b = sys.maxsize
