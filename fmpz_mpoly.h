@@ -997,6 +997,9 @@ FLINT_DLL int fmpz_mpoly_gcd_hensel(fmpz_mpoly_t G,
 FLINT_DLL int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpoly_gcd_subresultant(fmpz_mpoly_t G,
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 

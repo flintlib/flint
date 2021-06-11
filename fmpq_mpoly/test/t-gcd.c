@@ -24,10 +24,8 @@ void gcd_check(
     const char * name)
 {
     int res;
-    fmpq_t lc;
     fmpq_mpoly_t ca, cb, cg;
 
-    fmpq_init(lc);
     fmpq_mpoly_init(ca, ctx);
     fmpq_mpoly_init(cb, ctx);
     fmpq_mpoly_init(cg, ctx);
@@ -65,8 +63,7 @@ void gcd_check(
         goto cleanup;
     }
 
-    fmpq_mpoly_get_term_coeff_fmpq(lc, g, 0, ctx);
-    if (!fmpq_is_one(lc))
+    if (!fmpq_mpoly_is_monic(g, ctx))
     {
         printf("FAIL\n");
         flint_printf("Check gcd is monic\n"
@@ -132,7 +129,6 @@ void gcd_check(
 
 cleanup:
 
-    fmpq_clear(lc);
     fmpq_mpoly_clear(ca, ctx);
     fmpq_mpoly_clear(cb, ctx);
     fmpq_mpoly_clear(cg, ctx);

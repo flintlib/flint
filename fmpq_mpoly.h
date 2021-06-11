@@ -393,6 +393,9 @@ void fmpq_mpoly_get_denominator(fmpz_t d, const fmpq_mpoly_t A,
     fmpz_set(d, fmpq_denref(A->content));
 }
 
+FLINT_DLL int fmpq_mpoly_is_monic(const fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c,
                               const fmpq_mpoly_t A, const fmpq_mpoly_t M,
                                                    const fmpq_mpoly_ctx_t ctx);
@@ -781,6 +784,21 @@ FLINT_DLL void fmpq_mpoly_inflate(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 FLINT_DLL int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
              fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                    const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_hensel(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_brown(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_subresultant(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_zippel(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_zippel2(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
                   const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx);

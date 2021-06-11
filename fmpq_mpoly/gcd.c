@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018,2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,16 +11,8 @@
 
 #include "fmpq_mpoly.h"
 
-
-int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                                    const fmpq_mpoly_ctx_t ctx)
+static void _make_monic(fmpq_mpoly_t G)
 {
-    int success;
-
-    success = fmpz_mpoly_gcd(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);
-    if (!success)
-        return 0;
-
     if (G->zpoly->length > 0)
     {
         fmpz_one(fmpq_numref(G->content));
@@ -30,7 +22,23 @@ int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
     {
         fmpq_zero(G->content);
     }
-
-    return 1;
 }
+
+#define FMPQ_MPOLY_GCD_EXT(ext)                                             \
+int fmpq_mpoly_##ext(fmpq_mpoly_t G, const fmpq_mpoly_t A,                  \
+                         const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)  \
+{                                                                           \
+    int success;                                                            \
+    success = fmpz_mpoly_##ext(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);    \
+    if (success)                                                            \
+        _make_monic(G);                                                     \
+    return success;                                                         \
+}
+
+FMPQ_MPOLY_GCD_EXT(gcd)
+FMPQ_MPOLY_GCD_EXT(gcd_brown)
+FMPQ_MPOLY_GCD_EXT(gcd_hensel)
+FMPQ_MPOLY_GCD_EXT(gcd_subresultant)
+FMPQ_MPOLY_GCD_EXT(gcd_zippel)
+FMPQ_MPOLY_GCD_EXT(gcd_zippel2)
 

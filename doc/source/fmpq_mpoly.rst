@@ -570,6 +570,14 @@ Greatest Common Divisor
 
     Do the operation of :func:`fmpq_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
+.. function:: int fmpq_mpoly_gcd_brown(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_gcd_hensel(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_gcd_subresultant(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_gcd_zippel(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_gcd_zippel2(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using various algorithms.
+
 .. function:: int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
 
     Try to set ``R`` to the resultant of ``A`` and ``B`` with respect to the variable of index ``var``.
