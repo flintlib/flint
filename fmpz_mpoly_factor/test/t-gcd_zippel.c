@@ -368,27 +368,40 @@ main(void)
 
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t g, a, b, t;
+        fmpz_mpoly_t g, a, b, c;
         const char * vars[] = {"t" ,"z", "y", "x"};
 
         fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(t, ctx);
+        fmpz_mpoly_init(c, ctx);
 
-        fmpz_mpoly_set_str_pretty(t, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
+        fmpz_mpoly_set_str_pretty(c, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
         fmpz_mpoly_set_str_pretty(a, "39 - t*x - 7*x^2*y^3*z^11 + x^1000*y^3*z^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
-        fmpz_mpoly_mul(a, a, t, ctx);
-        fmpz_mpoly_mul(b, b, t, ctx);
+        fmpz_mpoly_mul(a, a, c, ctx);
+        fmpz_mpoly_mul(b, b, c, ctx);
 
-        gcd_check(g, a, b, t, ctx, -1, 1, "example");
+        gcd_check(g, a, b, c, ctx, -1, 1, "example");
+
+        /*
+            Main variable is t and c has content wrt t mod first chosen prime.
+            However, this content doesn't depend on z and must be caught before
+            it gets down to bivariate. Buggy code hangs on this example.
+        */
+        fmpz_mpoly_set_str_pretty(c, "t*(y+x)+9223372036854775837", vars, ctx);
+        fmpz_mpoly_set_str_pretty(a, "1+x^2+y^2+z^2+t^2", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "1+x^3+y^3+z^3+t^3", vars, ctx);
+        fmpz_mpoly_mul(a, a, c, ctx);
+        fmpz_mpoly_mul(b, b, c, ctx);
+
+        gcd_check(g, a, b, c, ctx, -1, 1, "bug check");
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_clear(c, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 
