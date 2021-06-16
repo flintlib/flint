@@ -608,8 +608,8 @@ int fmpz_mod_mpolyl_gcdp_zippel(
         FLINT_ASSERT(success);
     }
 
-    fmpz_mod_mpoly_get_fmpz_mod_poly(a, Ac, 0, ctx);
-    fmpz_mod_mpoly_get_fmpz_mod_poly(b, Bc, 0, ctx);
+    fmpz_mod_mpoly_get_fmpz_mod_poly(a, Ac, var, ctx);
+    fmpz_mod_mpoly_get_fmpz_mod_poly(b, Bc, var, ctx);
     fmpz_mod_poly_gcd(c, a, b, ctx->ffinfo);
     success = fmpz_mod_poly_is_one(c, ctx->ffinfo);
     if (!success)

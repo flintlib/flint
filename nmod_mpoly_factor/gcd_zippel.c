@@ -641,8 +641,8 @@ int nmod_mpolyl_gcdp_zippel_smprime(
         FLINT_ASSERT(success);
     }
 
-    nmod_mpoly_get_n_poly(a, Ac, 0, ctx);
-    nmod_mpoly_get_n_poly(b, Bc, 0, ctx);
+    nmod_mpoly_get_n_poly(a, Ac, var, ctx);
+    nmod_mpoly_get_n_poly(b, Bc, var, ctx);
     n_poly_mod_gcd(c, a, b, ctx->mod);
     success = n_poly_is_one(c);
     if (!success)
