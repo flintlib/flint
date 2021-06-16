@@ -393,6 +393,9 @@ void fmpq_mpoly_get_denominator(fmpz_t d, const fmpq_mpoly_t A,
     fmpz_set(d, fmpq_denref(A->content));
 }
 
+FLINT_DLL int fmpq_mpoly_is_monic(const fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c,
                               const fmpq_mpoly_t A, const fmpq_mpoly_t M,
                                                    const fmpq_mpoly_ctx_t ctx);
@@ -422,6 +425,17 @@ FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A,
 FLINT_DLL void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C,
                  const fmpq_mpoly_t A, const slong * vars, const ulong * exps,
                                      slong length, const fmpq_mpoly_ctx_t ctx);
+
+/* conversion ****************************************************************/
+
+FLINT_DLL int fmpq_mpoly_is_fmpq_poly(const fmpq_mpoly_t A,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_get_fmpq_poly(fmpq_poly_t A,  const fmpq_mpoly_t B,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_fmpq_poly(fmpq_mpoly_t A, const fmpq_poly_t B,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
 
 /* comparison ****************************************************************/
 
@@ -771,6 +785,26 @@ FLINT_DLL int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
              fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                    const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpq_mpoly_gcd_hensel(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_brown(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_subresultant(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_zippel(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd_zippel2(fmpq_mpoly_t G,
+       const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
+                  const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_discriminant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
+                                        slong var, const fmpq_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
@@ -778,9 +812,11 @@ FLINT_DLL int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
 
 ******************************************************************************/
 
-FLINT_DLL int fmpq_mpoly_repack_bits(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                flint_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void mpoly_void_ring_init_fmpq_mpoly_ctx(mpoly_void_ring_t R,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpq_mpoly_repack_bits(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                             flint_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
 
 /* Univariates ***************************************************************/
 

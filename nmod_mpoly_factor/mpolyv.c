@@ -173,3 +173,25 @@ int _nmod_mpoly_vec_content_mpoly(
     return 1;
 }
 
+void _nmod_mpoly_vec_divexact_mpoly(
+    nmod_mpoly_struct * A, slong Alen,
+    const nmod_mpoly_t c,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < Alen; i++)
+        nmod_mpoly_divexact(A + i, A + i, c, ctx);
+}
+
+void _nmod_mpoly_vec_mul_mpoly(
+    nmod_mpoly_struct * A, slong Alen,
+    const nmod_mpoly_t c,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < Alen; i++)
+        nmod_mpoly_mul(A + i, A + i, c, ctx);
+}
+

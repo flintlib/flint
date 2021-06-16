@@ -118,8 +118,6 @@ void fmpz_mod_mpoly_univar_set_coeff_ui(
     return;
 }
 
-
-
 void fmpz_mod_mpoly_univar_assert_canonical(
     fmpz_mod_mpoly_univar_t A,
     const fmpz_mod_mpoly_ctx_t ctx)
@@ -567,825 +565,116 @@ void fmpz_mod_mpoly_univar_set(
     A->length = B->length;
 }
 
-static void _fmpz_max(fmpz_t a, const fmpz_t b, const fmpz_t c)
-{
-    fmpz_set(a, fmpz_cmp(b, c) > 0 ? b : c);
-}
-
-
-/*
-    A = prem(A, -B)
-    C is used for working space
-*/
-void _fmpz_mod_mpoly_univar_prem(
-    fmpz_mod_mpoly_univar_t A,
-    const fmpz_mod_mpoly_univar_t B,
-    fmpz_mod_mpoly_univar_t C,
-    const fmpz_mod_mpoly_ctx_t ctx)
-{
-    slong i, j;
-    fmpz_t z1, delta, delta_org;
-    fmpz_mod_mpoly_t u, v;
-
-    FLINT_ASSERT(A != B);
-    FLINT_ASSERT(B != C);
-    FLINT_ASSERT(C != A);
-    FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(B->length > 0);
-    FLINT_ASSERT(fmpz_cmp(A->exps + 0, B->exps + 0) >= 0);
-
-    fmpz_init(z1);
-    fmpz_init(delta);
-    fmpz_init(delta_org);
-    fmpz_mod_mpoly_init(u, ctx);
-    fmpz_mod_mpoly_init(v, ctx);
-
-    fmpz_sub(delta_org, A->exps + 0, B->exps + 0);
-    fmpz_add_ui(delta_org, delta_org, 1);
-
-looper:
-
-    if (A->length < 1)
-        goto done;
-
-    fmpz_sub(delta, A->exps + 0, B->exps + 0);
-    if (fmpz_sgn(delta) < 0)
-        goto done;
-
-    i = 1;
-    j = 1;
-    C->length = 0;
-    while (i < A->length || j < B->length)
-    {
-        fmpz_mod_mpoly_univar_fit_length(C, C->length + 1, ctx);
-
-        if (j < B->length)
-            fmpz_add(z1, B->exps + j, delta);
-
-        if (i < A->length && j < B->length && fmpz_equal(A->exps + i, z1))
-        {
-            fmpz_mod_mpoly_mul(u, A->coeffs + i, B->coeffs + 0, ctx);
-            fmpz_mod_mpoly_mul(v, A->coeffs + 0, B->coeffs + j, ctx);
-            fmpz_mod_mpoly_sub(C->coeffs + C->length, v, u, ctx);
-            fmpz_set(C->exps + C->length, A->exps + i);
-            i++;
-            j++;
-        }
-        else if (i < A->length && (j >= B->length ||
-                                                fmpz_cmp(A->exps + i, z1) > 0))
-        {
-            fmpz_mod_mpoly_mul(C->coeffs + C->length, A->coeffs + i,
-                                                           B->coeffs + 0, ctx);
-            fmpz_mod_mpoly_neg(C->coeffs + C->length,
-                                                   C->coeffs + C->length, ctx);
-            fmpz_set(C->exps + C->length, A->exps + i);
-            i++;
-        }
-        else
-        {
-            FLINT_ASSERT(j < B->length && (i >= A->length ||
-                                               fmpz_cmp(A->exps + i, z1) < 0));
-            fmpz_mod_mpoly_mul(C->coeffs + C->length, A->coeffs + 0,
-                                                           B->coeffs + j, ctx);
-            fmpz_set(C->exps + C->length, z1);
-            j++;
-        }
-
-        C->length += !fmpz_mod_mpoly_is_zero(C->coeffs + C->length, ctx);
-    }
-
-    fmpz_mod_mpoly_univar_swap(A, C, ctx);
-    fmpz_sub_ui(delta_org, delta_org, 1);
-    goto looper;
-
-done:
-
-    FLINT_ASSERT(fmpz_sgn(delta_org) >= 0);
-
-    if (!fmpz_is_zero(delta_org))
-    {
-        fmpz_mod_mpoly_neg(v, B->coeffs + 0, ctx);
-        fmpz_mod_mpoly_pow_fmpz(u, v, delta_org, ctx);
-        for (i = 0; i < A->length; i++)
-            fmpz_mod_mpoly_mul(A->coeffs + i, A->coeffs + i, u, ctx);
-    }
-
-    fmpz_clear(delta);
-    fmpz_clear(delta_org);
-    fmpz_mod_mpoly_clear(u, ctx);
-    fmpz_mod_mpoly_clear(v, ctx);
-}
-
-/*
-    poly1 = pseudo-gcd of P and Q
-          = last nonzero subresultant polynomial starting with P and Q
-*/
-int _fmpz_mod_mpoly_univar_pgcd_ducos(
-    fmpz_mod_mpoly_univar_t poly1,
-    const fmpz_mod_mpoly_univar_t polyP,
-    const fmpz_mod_mpoly_univar_t polyQ,
-    const fmpz_mod_mpoly_ctx_t ctx)
-{
-    slong i, j, k, aJ, ae;
-    fmpz_t n, d, e, J, z1, alpha;
-    int iexists, jexists, kexists;
-    fmpz_mod_mpoly_t u, v, w, s;
-    fmpz_mod_mpoly_univar_t A, B, C, D, H, T;
-    fmpz_mod_mpoly_univar_struct * last;
-
-    FLINT_ASSERT(polyP->length > 0);
-    FLINT_ASSERT(polyQ->length > 0);
-    FLINT_ASSERT(fmpz_cmp(polyP->exps + 0, polyQ->exps + 0) >= 0);
-    FLINT_ASSERT(fmpz_sgn(polyQ->exps + 0) >= 0);
-
-    if (fmpz_is_zero(polyQ->exps + 0))
-    {
-        fmpz_mod_mpoly_univar_fit_length(poly1, 1, ctx);
-        poly1->length = 1;
-        fmpz_zero(poly1->exps + 0);
-        return fmpz_mod_mpoly_pow_fmpz(poly1->coeffs + 0, polyQ->coeffs + 0,
-                                                         polyQ->exps + 0, ctx);
-    }
-
-    fmpz_init(n);
-    fmpz_init(d);
-    fmpz_init(e);
-    fmpz_init(J);
-    fmpz_init(z1);
-    fmpz_init(alpha);
-    fmpz_mod_mpoly_init(u,ctx);
-    fmpz_mod_mpoly_init(v,ctx);
-    fmpz_mod_mpoly_init(w,ctx);
-    fmpz_mod_mpoly_init(s,ctx);
-    fmpz_mod_mpoly_univar_init(A,ctx);
-    fmpz_mod_mpoly_univar_init(B,ctx);
-    fmpz_mod_mpoly_univar_init(C,ctx);
-    fmpz_mod_mpoly_univar_init(D,ctx);
-    fmpz_mod_mpoly_univar_init(H,ctx);
-    fmpz_mod_mpoly_univar_init(T,ctx);
-
-    i = FLINT_MAX(polyP->length, polyQ->length);
-    fmpz_mod_mpoly_univar_fit_length(A, 1 + i, ctx);
-    fmpz_mod_mpoly_univar_fit_length(B, 1 + i, ctx);
-    fmpz_mod_mpoly_univar_fit_length(C, 1 + i, ctx);
-    fmpz_mod_mpoly_univar_fit_length(D, 1 + i, ctx);
-    fmpz_mod_mpoly_univar_fit_length(H, 1 + i, ctx);
-    fmpz_mod_mpoly_univar_fit_length(T, 1 + i, ctx);
-
-    fmpz_mod_mpoly_univar_set(B, polyP, ctx);
-    fmpz_mod_mpoly_univar_set(A, polyQ, ctx);
-
-    last = A;
-
-    fmpz_sub(z1, polyP->exps + 0, polyQ->exps + 0);
-    fmpz_mod_mpoly_pow_fmpz(s, polyQ->coeffs + 0, z1, ctx);
-
-    _fmpz_mod_mpoly_univar_prem(B, A, D, ctx);
-
-looper:
-
-    if (B->length < 1)
-        goto done;
-
-    fmpz_set(d, A->exps + 0);
-    fmpz_set(e, B->exps + 0);
-
-    last = B;
-
-    fmpz_sub(z1, d, e);
-    if (fmpz_is_one(z1))
-    {
-        if (fmpz_is_zero(e))
-            goto done;
-
-        /* D = (B[e]*A - A[e]*B)/A[d] */
-        /*           i        j       */
-        i = 1;
-        j = 1;
-        if (A->length > 1 && fmpz_equal(A->exps + 1, e))
-            i++;
-        else
-            j = B->length;
-        D->length = 0;
-        while (i < A->length || j < B->length)
-        {
-            fmpz_mod_mpoly_univar_fit_length(D, D->length + 1, ctx);
-
-            if (i < A->length && j < B->length &&
-                                          fmpz_equal(A->exps + i, B->exps + j))
-            {
-                fmpz_mod_mpoly_mul(u, A->coeffs + i, B->coeffs + 0, ctx);
-                fmpz_mod_mpoly_mul(v, A->coeffs + 1, B->coeffs + j, ctx);
-                fmpz_mod_mpoly_sub(w, u, v, ctx);
-                fmpz_mod_mpoly_divexact(D->coeffs + D->length, w,
-                                                           A->coeffs + 0, ctx);
-                fmpz_set(D->exps + D->length, A->exps + i);
-                i++;
-                j++;                
-            }
-            else if (i < A->length && (j >= B->length ||
-                                       fmpz_cmp(A->exps + i, B->exps + j) > 0))
-            {
-                fmpz_mod_mpoly_mul(u, A->coeffs + i, B->coeffs + 0, ctx);
-                fmpz_mod_mpoly_divexact(D->coeffs + D->length, u,
-                                                           A->coeffs + 0, ctx);
-                fmpz_set(D->exps + D->length, A->exps + i);
-                i++;
-            }
-            else
-            {
-                FLINT_ASSERT((j < B->length && (i >= A->length ||
-                                     fmpz_cmp(B->exps + j, A->exps + i) > 0)));
-                fmpz_mod_mpoly_mul(v, A->coeffs + 1, B->coeffs + j, ctx);
-                fmpz_mod_mpoly_divexact(D->coeffs + D->length, v,
-                                                           A->coeffs + 0, ctx);
-                fmpz_mod_mpoly_neg(D->coeffs + D->length,
-                                                   D->coeffs + D->length, ctx);
-                fmpz_set(D->exps + D->length, B->exps + j);
-                j++;
-            }
-
-            D->length += !fmpz_mod_mpoly_is_zero(D->coeffs + D->length, ctx);
-        }
-
-        /* A = (B[e]*(D - B*x) + B[e-1]*B)/s */
-        /*            i    j            k    */
-        i = 0;
-        fmpz_sub_ui(z1, e, 1);
-        if (B->length > 1 && fmpz_equal(B->exps + 1, z1))
-        {
-            j = 2;            
-            k = 1;
-        }
-        else
-        {
-            j = 1;
-            k = B->length;
-        }
-
-        A->length = 0;
-        while (i < D->length || j < B->length || k < B->length)
-        {
-            fmpz * exp;
-
-            fmpz_mod_mpoly_univar_fit_length(A, A->length + 1, ctx);
-
-            exp = A->exps + A->length;
-
-            fmpz_zero(exp);
-
-            if (i < D->length)
-                _fmpz_max(exp, exp, D->exps + i);
-
-            if (j < B->length)
-            {
-                fmpz_add_ui(z1, B->exps + j, 1);
-                _fmpz_max(exp, exp, z1);
-            }
-
-            if (k < B->length)
-                _fmpz_max(exp, exp, B->exps + k);
-
-            iexists = (i < D->length) && fmpz_equal(exp, D->exps + i);
-            jexists = (j < B->length) && fmpz_equal(exp, z1);
-            kexists = (k < B->length) && fmpz_equal(exp, B->exps + k);
-
-            FLINT_ASSERT(iexists || jexists || kexists);
-
-            if (iexists)
-            {
-                if (jexists)
-                {
-                    fmpz_mod_mpoly_sub(w, D->coeffs + i, B->coeffs + j, ctx);
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 0, w, ctx);
-                }
-                else
-                {
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 0, D->coeffs + i, ctx);
-                }
-
-                if (kexists)
-                {
-                    fmpz_mod_mpoly_mul(v, B->coeffs + 1, B->coeffs + k, ctx);
-                    fmpz_mod_mpoly_add(w, u, v, ctx);
-                    fmpz_mod_mpoly_divexact(A->coeffs + A->length, w, s, ctx);
-                }
-                else
-                {
-                    fmpz_mod_mpoly_divexact(A->coeffs + A->length, u, s, ctx);
-                }
-            }
-            else
-            {
-                if (kexists)
-                {
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 1, B->coeffs + k, ctx);
-                    if (jexists)
-                    {
-                        fmpz_mod_mpoly_mul(v, B->coeffs + 0, B->coeffs + j, ctx);
-                        fmpz_mod_mpoly_sub(w, u, v, ctx);
-                        fmpz_mod_mpoly_divexact(A->coeffs + A->length, w, s, ctx);
-                    }
-                    else
-                    {
-                        fmpz_mod_mpoly_divexact(A->coeffs + A->length, u, s, ctx);
-                    }
-                }
-                else
-                {
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 0, B->coeffs + j, ctx);
-                    fmpz_mod_mpoly_divexact(A->coeffs + A->length, u, s, ctx);
-                    fmpz_mod_mpoly_neg(A->coeffs + A->length,
-                                                   A->coeffs + A->length, ctx);
-                }
-            }
-
-            A->length += !fmpz_mod_mpoly_is_zero(A->coeffs + A->length, ctx);
-
-            i += iexists;
-            j += jexists;
-            k += kexists;
-        }
-
-        fmpz_mod_mpoly_univar_swap(A, B, ctx);
-        fmpz_mod_mpoly_set(s, A->coeffs + 0, ctx);
-        last = A;
-    }
-    else
-    {
-        fmpz_sub(n, d, e);
-        fmpz_sub_ui(n, n, 1);
-        fmpz_one(alpha);
-        while (fmpz_add(z1, alpha, alpha), fmpz_cmp(z1, n) <= 0)
-            fmpz_set(alpha, z1);
-
-        fmpz_mod_mpoly_set(u, B->coeffs + 0, ctx);
-        fmpz_sub(n, n, alpha);
-        while (fmpz_cmp_ui(alpha, 1) > 0)
-        {
-            fmpz_tdiv_q_2exp(alpha, alpha, 1);
-            fmpz_mod_mpoly_mul(v, u, u, ctx);
-            fmpz_mod_mpoly_divexact(u, v, s, ctx);
-            if (fmpz_cmp(n, alpha) >= 0)
-            {
-                fmpz_mod_mpoly_mul(v, u, B->coeffs + 0, ctx);
-                fmpz_mod_mpoly_divexact(u, v, s, ctx);
-                fmpz_sub(n, n, alpha);
-            }
-        }
-
-        fmpz_mod_mpoly_univar_fit_length(C, B->length, ctx);
-        for (i = 0; i < B->length; i++)
-        {
-            fmpz_mod_mpoly_mul(v, u, B->coeffs + i, ctx);
-            fmpz_mod_mpoly_divexact(C->coeffs + i, v, s, ctx);
-            fmpz_set(C->exps + i, B->exps + i);
-        }
-        C->length = B->length;
-
-        last = C;
-
-        if (fmpz_is_zero(e))
-            goto done;
-
-        /* H = C - C[e]*x^e */
-        fmpz_mod_mpoly_univar_fit_length(H, C->length, ctx);
-        for (i = 1; i < C->length; i++)
-        {
-            fmpz_mod_mpoly_set(H->coeffs + i - 1, C->coeffs + i, ctx);
-            fmpz_set(H->exps + i - 1, C->exps + i);
-        }
-        H->length = C->length - 1;
-
-        /* D = C[e]*A - A[e]*H  (truncated to powers of x < e) */
-        i = 0;
-        j = H->length;
-        ae = A->length;
-        while (i < A->length && fmpz_cmp(A->exps + i, e) >= 0)
-        {
-            if (fmpz_equal(A->exps + i, e))
-            {
-                j = 0;
-                ae = i;
-            }
-            i++;
-        }
-        D->length = 0;
-        while (i < A->length || j < H->length)
-        {
-            fmpz_mod_mpoly_univar_fit_length(D, D->length + 1, ctx);
-
-            if (i < A->length && j < H->length &&
-                                          fmpz_equal(A->exps + i, H->exps + j))
-            {
-                fmpz_mod_mpoly_mul(u, A->coeffs + i, C->coeffs + 0, ctx);
-                fmpz_mod_mpoly_mul(v, A->coeffs + ae, H->coeffs + j, ctx);
-                fmpz_mod_mpoly_sub(D->coeffs + D->length, u, v, ctx);
-                fmpz_set(D->exps + D->length, A->exps + i);
-                i++;
-                j++;                
-            }
-            else if (i < A->length && (j >= H->length ||
-                                       fmpz_cmp(A->exps + i, H->exps + j) > 0))
-            {
-                fmpz_mod_mpoly_mul(D->coeffs + D->length,
-                                            A->coeffs + i, C->coeffs + 0, ctx);
-                fmpz_set(D->exps + D->length, A->exps + i);
-                i++;
-            }
-            else
-            {
-                FLINT_ASSERT(j < H->length && (i >= A->length ||
-                                      fmpz_cmp(H->exps + j, A->exps + i) > 0));
-                fmpz_mod_mpoly_mul(D->coeffs + D->length,
-                                           A->coeffs + ae, H->coeffs + j, ctx);
-                fmpz_mod_mpoly_neg(D->coeffs + D->length,
-                                                   D->coeffs + D->length, ctx);
-                fmpz_set(D->exps + D->length, H->exps + j);
-                j++;
-            }
-
-            D->length += !fmpz_mod_mpoly_is_zero(D->coeffs + D->length, ctx);
-        }
-
-        for (fmpz_add_ui(J, e, 1); fmpz_cmp(J, d) < 0; fmpz_add_ui(J, J, 1))
-        {
-            if (H->length < 1)
-                break;
-
-            /* H = H*x - H[e-1]*B/B[e] */
-            fmpz_sub_ui(z1, e, 1);
-            if (fmpz_equal(H->exps + 0, z1))
-            {
-                i = 1;
-                j = 1;
-                T->length = 0;
-                while (i < H->length || j < B->length)
-                {
-                    fmpz_mod_mpoly_univar_fit_length(T, T->length + 1, ctx);
-
-                    if (i < H->length)
-                        fmpz_add_ui(z1, H->exps + i, 1);
-
-                    if (i < H->length && j < B->length &&
-                                                   fmpz_equal(z1, B->exps + j))
-                    {
-                        fmpz_mod_mpoly_mul(u, H->coeffs + 0, B->coeffs + j, ctx);
-                        fmpz_mod_mpoly_divexact(v, u, B->coeffs + 0, ctx);
-                        fmpz_mod_mpoly_sub(T->coeffs + T->length,
-                                                        H->coeffs + i, v, ctx);
-                        fmpz_set(T->exps + T->length, B->exps + j);
-                        i++;
-                        j++;                
-                    }
-                    else if (i < H->length && (j >= B->length ||
-                                                fmpz_cmp(z1, B->exps + j) > 0))
-                    {
-                        fmpz_mod_mpoly_set(T->coeffs + T->length, H->coeffs + i, ctx);
-                        fmpz_set(T->exps + T->length, z1);
-                        i++;
-                    }
-                    else
-                    {
-                        FLINT_ASSERT(j < B->length && (i >= H->length ||
-                                               fmpz_cmp(z1, B->exps + j) < 0));
-                        fmpz_mod_mpoly_mul(u, H->coeffs + 0, B->coeffs + j, ctx);
-                        fmpz_mod_mpoly_divexact(T->coeffs + T->length, u,
-                                                           B->coeffs + 0, ctx);
-                        fmpz_mod_mpoly_neg(T->coeffs + T->length,
-                                                   T->coeffs + T->length, ctx);
-                        fmpz_set(T->exps + T->length, B->exps + j);
-                        j++;                
-                    }
-
-                    T->length += !fmpz_mod_mpoly_is_zero(T->coeffs + T->length, ctx);
-                }
-
-                fmpz_mod_mpoly_univar_swap(H, T, ctx);
-            }
-            else
-            {
-                FLINT_ASSERT(fmpz_cmp(H->exps + 0, z1) < 0);
-                for (i = 0; i < H->length; i++)
-                    fmpz_add_ui(H->exps + i, H->exps + i, 1);
-            }
-
-            /* find coefficient of x^J in A */
-            aJ = 0;
-            while (aJ < A->length && !fmpz_equal(A->exps + aJ, J))
-                aJ++;
-            if (aJ >= A->length)
-                continue;
-
-            /* D = D - A[J]*H */
-            i = 0;
-            j = 0;
-            T->length = 0;
-            while (i < D->length || j < H->length)
-            {
-                fmpz_mod_mpoly_univar_fit_length(T, T->length + 1, ctx);
-
-                if (i < D->length && j < H->length &&
-                                          fmpz_equal(D->exps + i, H->exps + j))
-                {
-                    fmpz_mod_mpoly_mul(u, H->coeffs + j, A->coeffs + aJ, ctx);
-                    fmpz_mod_mpoly_sub(T->coeffs + T->length, D->coeffs + i,
-                                                                       u, ctx);
-                    fmpz_set(T->exps + T->length, D->exps + i);
-                    i++;
-                    j++;                
-                }
-                else if (i < D->length && (j >= H->length ||
-                                       fmpz_cmp(D->exps + i, H->exps + j) > 0))
-                {
-                    fmpz_mod_mpoly_set(T->coeffs + T->length, D->coeffs + i, ctx);
-                    fmpz_set(T->exps + T->length, D->exps + i);
-                    i++;
-                }
-                else
-                {
-                    FLINT_ASSERT(j < H->length && (i >= D->length ||
-                                      fmpz_cmp(D->exps + i, H->exps + j) < 0));
-                    fmpz_mod_mpoly_mul(T->coeffs + T->length, H->coeffs + j,
-                                                          A->coeffs + aJ, ctx);
-                    fmpz_mod_mpoly_neg(T->coeffs + T->length,
-                                                   T->coeffs + T->length, ctx);
-                    fmpz_set(T->exps + T->length, H->exps + j);
-                    j++;
-                }
-
-                T->length += !fmpz_mod_mpoly_is_zero(T->coeffs + T->length, ctx);
-            }
-            fmpz_mod_mpoly_univar_swap(D, T, ctx);
-        }
-
-        /* B = (-1)^(d-e+1) * (B[e]*(D/A[d] - H*x) +  H[e-1]*B)/s */
-        i = 0;
-        fmpz_sub_ui(z1, e, 1);
-        if (H->length > 0 && fmpz_equal(H->exps + 0, z1))
-        {
-            j = 1;
-            k = 1;
-        }
-        else
-        {
-            j = 0;
-            k = B->length;
-        }
-        T->length = 0;
-        while (i < D->length || j < H->length || k < B->length)
-        {
-            fmpz * exp;
-
-            fmpz_mod_mpoly_univar_fit_length(T, T->length + 1, ctx);
-
-            exp = T->exps + T->length;
-
-            fmpz_zero(exp);
-
-            if (i < D->length)
-                _fmpz_max(exp, exp, D->exps + i);
-
-            if (j < H->length)
-            {
-                fmpz_add_ui(z1, H->exps + j, 1);
-                _fmpz_max(exp, exp, z1);
-            }
-
-            if (k < B->length)
-                _fmpz_max(exp, exp, B->exps + k);
-
-            iexists = (i < D->length && fmpz_equal(exp, D->exps + i));
-            jexists = (j < H->length && fmpz_equal(exp, z1));
-            kexists = (k < B->length && fmpz_equal(exp, B->exps + k));
-
-            FLINT_ASSERT(iexists || jexists || kexists);
-
-            if (iexists)
-            {
-                if (jexists)
-                {
-                    fmpz_mod_mpoly_divexact(u, D->coeffs + i, A->coeffs + 0, ctx);
-                    fmpz_mod_mpoly_sub(w, u, H->coeffs + j, ctx);
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 0, w, ctx);
-                }
-                else
-                {
-                    fmpz_mod_mpoly_divexact(u, D->coeffs + i, A->coeffs + 0, ctx);
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 0, u, ctx);
-                }
-                if (kexists)
-                {
-                    fmpz_mod_mpoly_mul(v, H->coeffs + 0, B->coeffs + k, ctx);
-                    fmpz_mod_mpoly_add(w, u, v, ctx);
-                    fmpz_mod_mpoly_divexact(T->coeffs + T->length, w, s, ctx);
-                }
-                else
-                {
-                    fmpz_mod_mpoly_divexact(T->coeffs + T->length, u, s, ctx);
-                }
-            }
-            else
-            {
-                if (kexists)
-                {
-                    fmpz_mod_mpoly_mul(u, H->coeffs + 0, B->coeffs + k, ctx);
-                    if (jexists)
-                    {
-                        fmpz_mod_mpoly_mul(v, B->coeffs + 0, H->coeffs + j, ctx);
-                        fmpz_mod_mpoly_sub(w, u, v, ctx);
-                        fmpz_mod_mpoly_divexact(T->coeffs + T->length, w, s, ctx);
-                    }
-                    else
-                    {
-                        fmpz_mod_mpoly_divexact(T->coeffs + T->length, u, s, ctx);
-                    }
-                }
-                else
-                {
-                    fmpz_mod_mpoly_mul(u, B->coeffs + 0, H->coeffs + j, ctx);
-                    fmpz_mod_mpoly_divexact(T->coeffs + T->length, u, s, ctx);
-                    fmpz_mod_mpoly_neg(T->coeffs + T->length,
-                                                    T->coeffs + T->length, ctx);
-                }
-            }
-
-            if (((fmpz_get_ui(d) - fmpz_get_ui(e)) & 1) == 0)
-                fmpz_mod_mpoly_neg(T->coeffs + T->length,
-                                                   T->coeffs + T->length, ctx);            
-
-            T->length += !fmpz_mod_mpoly_is_zero(T->coeffs + T->length, ctx);
-
-            i += iexists;
-            j += jexists;
-            k += kexists;
-        }
-
-        fmpz_mod_mpoly_univar_swap(B, T, ctx);
-        fmpz_mod_mpoly_univar_swap(A, C, ctx);
-        fmpz_mod_mpoly_set(s, A->coeffs + 0, ctx);
-        last = A;
-    }
-
-    goto looper;
-
-done:
-
-    fmpz_mod_mpoly_univar_swap(poly1, last, ctx);
-
-    fmpz_clear(n);
-    fmpz_clear(d);
-    fmpz_clear(e);
-    fmpz_clear(J);
-    fmpz_clear(z1);
-    fmpz_clear(alpha);
-    fmpz_mod_mpoly_clear(u, ctx);
-    fmpz_mod_mpoly_clear(v, ctx);
-    fmpz_mod_mpoly_clear(w, ctx);
-    fmpz_mod_mpoly_clear(s, ctx);
-    fmpz_mod_mpoly_univar_clear(A, ctx);
-    fmpz_mod_mpoly_univar_clear(B, ctx);
-    fmpz_mod_mpoly_univar_clear(C, ctx);
-    fmpz_mod_mpoly_univar_clear(D, ctx);
-    fmpz_mod_mpoly_univar_clear(H, ctx);
-    fmpz_mod_mpoly_univar_clear(T, ctx);
-    return 1;
-}
-
-
-
-void fmpz_mod_mpoly_univar_derivative(
-    fmpz_mod_mpoly_univar_t A,
+#define COEFF(A, i) ((void*)(A->coeffs + (i)*R->elem_size))
+
+static void mpoly_univar_set_fmpz_mod_mpoly_univar(
+    mpoly_univar_t A,
+    mpoly_void_ring_t R,
     const fmpz_mod_mpoly_univar_t B,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
-    slong Ai, Bi;
+    slong i;
 
-    fmpz_mod_mpoly_univar_fit_length(A, B->length, ctx);
+    mpoly_univar_fit_length(A, B->length, R);
+    A->length = B->length;
 
-    Ai = 0;
-    for (Bi = 0; Bi < B->length; Bi++)
+    for (i = B->length - 1; i >= 0; i--)
     {
-        if (fmpz_sgn(B->exps + Bi) <= 0)
-            continue;
-
-        fmpz_mod_mpoly_scalar_mul_fmpz(A->coeffs + Ai, B->coeffs + Bi,
-                                                            B->exps + Bi, ctx);
-        fmpz_sub_ui(A->exps + Ai, B->exps + Bi, 1);
-
-        Ai += !fmpz_mod_mpoly_is_zero(A->coeffs + Ai, ctx);
+        fmpz_set(A->exps + i, B->exps + i);
+        fmpz_mod_mpoly_set(COEFF(A, i), B->coeffs + i, ctx);
     }
-
-    A->length = Ai;
 }
 
+static void mpoly_univar_swap_fmpz_mod_mpoly_univar(
+    mpoly_univar_t A,
+    mpoly_void_ring_t R,
+    fmpz_mod_mpoly_univar_t B,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    mpoly_univar_fit_length(A, B->length, R);
+    fmpz_mod_mpoly_univar_fit_length(B, A->length, ctx);
+
+    for (i = FLINT_MAX(A->length, B->length) - 1; i >= 0; i--)
+    {
+        fmpz_swap(A->exps + i, B->exps + i);
+        fmpz_mod_mpoly_swap(COEFF(A, i), B->coeffs + i, ctx);
+    }
+
+    SLONG_SWAP(A->length, B->length);
+}
+
+int fmpz_mod_mpoly_univar_pseudo_gcd(
+    fmpz_mod_mpoly_univar_t gx,
+    const fmpz_mod_mpoly_univar_t ax,
+    const fmpz_mod_mpoly_univar_t bx,
+    const fmpz_mod_mpoly_ctx_t ctx)
+{
+    int success;
+    mpoly_void_ring_t R;
+    mpoly_univar_t Ax, Bx, Gx;
+
+    mpoly_void_ring_init_fmpz_mod_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Ax, R);
+    mpoly_univar_init(Bx, R);
+    mpoly_univar_init(Gx, R);
+    mpoly_univar_set_fmpz_mod_mpoly_univar(Ax, R, ax, ctx);
+    mpoly_univar_set_fmpz_mod_mpoly_univar(Bx, R, bx, ctx);
+
+    success = mpoly_univar_pseudo_gcd_ducos(Gx, Ax, Bx, R);
+
+    if (success)
+        mpoly_univar_swap_fmpz_mod_mpoly_univar(Gx, R, gx, ctx);
+
+    mpoly_univar_clear(Ax, R);
+    mpoly_univar_clear(Bx, R);
+    mpoly_univar_clear(Gx, R);
+
+    return success;
+}
 
 int fmpz_mod_mpoly_univar_resultant(
-    fmpz_mod_mpoly_t r,
-    const fmpz_mod_mpoly_univar_t fx,
-    const fmpz_mod_mpoly_univar_t gx,
+    fmpz_mod_mpoly_t d,
+    const fmpz_mod_mpoly_univar_t ax,
+    const fmpz_mod_mpoly_univar_t bx,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
-    int change_sign;
-    fmpz_mod_mpoly_univar_t rx;
-    const fmpz_mod_mpoly_univar_struct * F, * G;
+    int success;
+    mpoly_void_ring_t R;
+    mpoly_univar_t Ax, Bx;
 
-    if (fx->length < 1 || gx->length < 1)
-    {
-        fmpz_mod_mpoly_zero(r, ctx);
-        return 1;
-    }
+    mpoly_void_ring_init_fmpz_mod_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Ax, R);
+    mpoly_univar_init(Bx, R);
+    mpoly_univar_set_fmpz_mod_mpoly_univar(Ax, R, ax, ctx);
+    mpoly_univar_set_fmpz_mod_mpoly_univar(Bx, R, bx, ctx);
 
-    fmpz_mod_mpoly_univar_init(rx, ctx);
+    success = mpoly_univar_resultant(d, Ax, Bx, R);
 
-    if (fmpz_cmp(fx->exps + 0, gx->exps + 0) < 0)
-    {
-        change_sign = 1 & fmpz_get_ui(fx->exps + 0) & fmpz_get_ui(gx->exps + 0);
-        F = gx;
-        G = fx;
-    }
-    else
-    {
-        change_sign = 0;
-        F = fx;
-        G = gx;
-    }
+    mpoly_univar_clear(Ax, R);
+    mpoly_univar_clear(Bx, R);
 
-    if (fmpz_is_zero(G->exps + 0))
-    {
-        fmpz_mod_mpoly_pow_fmpz(r, G->coeffs + 0, F->exps + 0, ctx);
-    }
-    else
-    {
-        _fmpz_mod_mpoly_univar_pgcd_ducos(rx, F, G, ctx);
-
-        if (rx->length == 1 && fmpz_is_zero(rx->exps + 0))
-            fmpz_mod_mpoly_swap(r, rx->coeffs + 0, ctx);
-        else
-            fmpz_mod_mpoly_zero(r, ctx);
-    }
-
-    if (change_sign)
-        fmpz_mod_mpoly_neg(r, r, ctx);
-
-    fmpz_mod_mpoly_univar_clear(rx, ctx);
-
-    return 1;
+    return success;
 }
-
 
 int fmpz_mod_mpoly_univar_discriminant(
     fmpz_mod_mpoly_t d,
     const fmpz_mod_mpoly_univar_t fx,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
-    fmpz_mod_mpoly_univar_t rx, fxp;
+    int success;
+    mpoly_void_ring_t R;
+    mpoly_univar_t Fx;
 
-    if (fx->length < 1 || fmpz_cmp_ui(fx->exps + fx->length - 1, 1) > 0)
-    {
-        /* the discriminant of the zero polynomial should be zero */
-        fmpz_mod_mpoly_zero(d, ctx);
-        return 1;
-    }
+    mpoly_void_ring_init_fmpz_mod_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Fx, R);
+    mpoly_univar_set_fmpz_mod_mpoly_univar(Fx, R, fx, ctx);
 
-    if (fmpz_is_zero(fx->exps + 0))
-    {
-        /* the discriminant of the constant polynomial a should be 1/a^2 */
-        fmpz_mod_mpoly_one(d, ctx);
-        if (!fmpz_mod_mpoly_divides(d, d, fx->coeffs + 0, ctx))
-            flint_throw(FLINT_IMPINV,
-                  "fmpz_mod_mpoly_discriminant: non-unit constant polynomial");
-        fmpz_mod_mpoly_mul(d, d, d, ctx);
-        return 1;
-    }
+    success = mpoly_univar_discriminant(d, Fx, R);
 
-    if (fmpz_is_one(fx->exps + 0))
-    {
-        /* the discriminant of a linear polynomial should be 1 */
-        fmpz_mod_mpoly_one(d, ctx);
-        return 1;
-    }
+    mpoly_univar_clear(Fx, R);
 
-    /* the discriminant is (-1)^(n*(n-1)/2) res(f, f')/a_n */
-    fmpz_mod_mpoly_univar_init(rx, ctx);
-    fmpz_mod_mpoly_univar_init(fxp, ctx);
-    fmpz_mod_mpoly_univar_derivative(fxp, fx, ctx);
-    _fmpz_mod_mpoly_univar_pgcd_ducos(rx, fx, fxp, ctx);
-
-    if (rx->length == 1 && fmpz_is_zero(rx->exps + 0))
-    {
-        fmpz_mod_mpoly_divexact(d, rx->coeffs + 0, fx->coeffs + 0, ctx);
-        if (fmpz_get_ui(fx->exps + 0) & 2)
-            fmpz_mod_mpoly_neg(d, d, ctx);
-    }
-    else
-    {
-        fmpz_mod_mpoly_zero(d, ctx);
-    }
-
-    fmpz_mod_mpoly_univar_clear(rx, ctx);
-    fmpz_mod_mpoly_univar_clear(fxp, ctx);
-
-    return 1;
+    return success;
 }
 

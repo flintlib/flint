@@ -58,50 +58,6 @@ FLINT_DLL int nmod_mat_is_reduced(const nmod_mat_t N);
 
 FLINT_DLL void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp);
 
-FLINT_DLL int mpoly_is_poly(
-    const ulong * Aexps,
-    slong Alen,
-    flint_bitcnt_t Abits,
-    slong var,
-    const mpoly_ctx_t mctx);
-
-FLINT_DLL int nmod_mpoly_is_nmod_poly(
-    const nmod_mpoly_t A,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_get_n_poly(
-    n_poly_t A,
-    const nmod_mpoly_t B,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_get_nmod_poly(
-    nmod_poly_t A,
-    const nmod_mpoly_t B,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _nmod_mpoly_set_nmod_poly(
-    nmod_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const mp_limb_t * Bcoeffs,
-    slong Blen,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_n_poly_mod(
-    nmod_mpoly_t A,
-    const n_poly_t B,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_nmod_poly(
-    nmod_mpoly_t A,
-    const nmod_poly_t B,
-    slong var,
-    const nmod_mpoly_ctx_t ctx);
-
 /*****************************************************************************/
 
 typedef struct {
@@ -328,6 +284,12 @@ FLINT_DLL void nmod_mpoly_from_mpolyv(nmod_mpoly_t A, flint_bitcnt_t Abits,
 FLINT_DLL int _nmod_mpoly_vec_content_mpoly(nmod_mpoly_t g,
           const nmod_mpoly_struct * A, slong Alen, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void _nmod_mpoly_vec_divexact_mpoly(nmod_mpoly_struct * A,
+                 slong Alen, const nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_vec_mul_mpoly(nmod_mpoly_struct * A,
+                 slong Alen, const nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
+
 /*****************************************************************************/
 
 FLINT_DLL int _nmod_mpoly_factor_separable(nmod_mpoly_factor_t f,
@@ -380,15 +342,6 @@ FLINT_DLL void nmod_mpoly_compression_do(nmod_mpoly_t L,
 FLINT_DLL void nmod_mpoly_compression_undo(nmod_mpoly_t A,
              flint_bitcnt_t Abits, const nmod_mpoly_ctx_t Actx, nmod_mpoly_t L,
                            const nmod_mpoly_ctx_t Lctx, mpoly_compression_t M);
-
-/*****************************************************************************/
-
-NMOD_MPOLY_FACTOR_INLINE
-flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong v, ulong e,
-                                                        const mpoly_ctx_t mctx)
-{
-    return 1 + FLINT_BIT_COUNT(e); /* only lex and deg supported */
-}
 
 /*****************************************************************************/
 

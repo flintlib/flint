@@ -801,6 +801,142 @@ static int _try_divides(
 }
 
 
+/********************* Hit A and B with a prs ********************************/
+static int _try_prs(
+    fmpz_mpoly_t G,
+    fmpz_mpoly_t Abar,
+    fmpz_mpoly_t Bbar,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const mpoly_gcd_info_t I,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success;
+    slong j, var = -WORD(1);
+    ulong score, best_score = WORD(1) << 24;
+    fmpz_mpoly_t Ac, Bc, Gc, s, t;
+    fmpz_mpoly_univar_t Ax, Bx, Gx;
+
+    /*
+        Pick a main variable. TODO:
+            (1) consider the expected degree of G, and
+            (2) add a size limit to univar_pseudo_gcd to abort the calculation
+                if things are getting too big.
+    */
+    for (j = 0; j < ctx->minfo->nvars; j++)
+    {
+        if (I->Amax_exp[j] <= I->Amin_exp[j] ||
+            I->Bmax_exp[j] <= I->Bmin_exp[j] /* not needed */)
+        {
+            FLINT_ASSERT(I->Amax_exp[j] == I->Amin_exp[j]);
+            FLINT_ASSERT(I->Bmax_exp[j] == I->Bmin_exp[j]);
+            continue;
+        }
+
+        FLINT_ASSERT(I->Gstride[j] != UWORD(0));
+        FLINT_ASSERT((I->Amax_exp[j] - I->Amin_exp[j]) % I->Gstride[j] == 0);
+        FLINT_ASSERT((I->Bmax_exp[j] - I->Bmin_exp[j]) % I->Gstride[j] == 0);
+
+        score = FLINT_BIT_COUNT(I->Alead_count[j] - 1);
+        score *= FLINT_BIT_COUNT(I->Blead_count[j] - 1);
+        score *= FLINT_BIT_COUNT(I->Atail_count[j] - 1);
+        score *= FLINT_BIT_COUNT(I->Btail_count[j] - 1);
+        score = FLINT_MAX(score, 1);
+        if (n_mul_checked(&score, score, I->Amax_exp[j]))
+            continue;
+        if (n_mul_checked(&score, score, I->Bmax_exp[j]))
+            continue;
+
+        if (score < best_score)
+        {
+            best_score = score;
+            var = j;
+        }
+    }
+
+    if (var < 0)
+        return 0;
+
+    fmpz_mpoly_init(Ac, ctx);
+    fmpz_mpoly_init(Bc, ctx);
+    fmpz_mpoly_init(Gc, ctx);
+    fmpz_mpoly_init(s, ctx);
+    fmpz_mpoly_init(t, ctx);
+    fmpz_mpoly_univar_init(Ax, ctx);
+    fmpz_mpoly_univar_init(Bx, ctx);
+    fmpz_mpoly_univar_init(Gx, ctx);
+
+    fmpz_mpoly_to_univar(Ax, A, var, ctx);
+    fmpz_mpoly_to_univar(Bx, B, var, ctx);
+
+    success = _fmpz_mpoly_vec_content_mpoly(Ac, Ax->coeffs, Ax->length, ctx) &&
+              _fmpz_mpoly_vec_content_mpoly(Bc, Bx->coeffs, Bx->length, ctx) &&
+              fmpz_mpoly_gcd(Gc, Ac, Bc, ctx);
+    if (!success)
+        goto cleanup;
+
+    _fmpz_mpoly_vec_divexact_mpoly(Ax->coeffs, Ax->length, Ac, ctx);
+    _fmpz_mpoly_vec_divexact_mpoly(Bx->coeffs, Bx->length, Bc, ctx);
+
+    success = fmpz_cmp(Ax->exps + 0, Bx->exps + 0) > 0 ?
+                            fmpz_mpoly_univar_pseudo_gcd(Gx, Ax, Bx, ctx) :
+                            fmpz_mpoly_univar_pseudo_gcd(Gx, Bx, Ax, ctx);
+    if (!success)
+        goto cleanup;
+
+    if (fmpz_mpoly_gcd(t, Ax->coeffs + 0, Bx->coeffs + 0, ctx) &&
+                                                                t->length == 1)
+    {
+        fmpz_mpoly_term_content(s, Gx->coeffs + 0, ctx);
+        fmpz_mpoly_divexact(t, Gx->coeffs + 0, s, ctx);
+        _fmpz_mpoly_vec_divexact_mpoly(Gx->coeffs, Gx->length, t, ctx);
+    }
+    else if (fmpz_mpoly_gcd(t, Ax->coeffs + Ax->length - 1,
+                           Bx->coeffs + Bx->length - 1, ctx) && t->length == 1)
+    {
+        fmpz_mpoly_term_content(s, Gx->coeffs + Gx->length - 1, ctx);
+        fmpz_mpoly_divexact(t, Gx->coeffs + Gx->length - 1, s, ctx);
+        _fmpz_mpoly_vec_divexact_mpoly(Gx->coeffs, Gx->length, t, ctx);
+    }
+
+    success = _fmpz_mpoly_vec_content_mpoly(t, Gx->coeffs, Gx->length, ctx);
+    if (!success)
+        goto cleanup;
+
+    _fmpz_mpoly_vec_divexact_mpoly(Gx->coeffs, Gx->length, t, ctx);
+    _fmpz_mpoly_vec_mul_mpoly(Gx->coeffs, Gx->length, Gc, ctx);
+    _fmpz_mpoly_from_univar(Gc, I->Gbits, Gx, var, ctx);
+
+    if (Abar != NULL)
+        fmpz_mpoly_divexact(s, A, Gc, ctx);
+
+    if (Bbar != NULL)
+        fmpz_mpoly_divexact(t, B, Gc, ctx);
+
+    fmpz_mpoly_swap(G, Gc, ctx);
+
+    if (Abar != NULL)
+        fmpz_mpoly_swap(Abar, s, ctx);
+
+    if (Bbar != NULL)
+        fmpz_mpoly_swap(Bbar, t, ctx);
+
+    success = 1;
+
+cleanup:
+
+    fmpz_mpoly_clear(Ac, ctx);
+    fmpz_mpoly_clear(Bc, ctx);
+    fmpz_mpoly_clear(Gc, ctx);
+    fmpz_mpoly_clear(s, ctx);
+    fmpz_mpoly_clear(t, ctx);
+    fmpz_mpoly_univar_clear(Ax, ctx);
+    fmpz_mpoly_univar_clear(Bx, ctx);
+    fmpz_mpoly_univar_clear(Gx, ctx);
+
+    return success;
+}
+
 /********************** Hit A and B with zippel ******************************/
 static int _try_zippel(
     fmpz_mpoly_t G,
@@ -1486,10 +1622,22 @@ skip_monomial_cofactors:
             goto successful;
     }
 
+    /*
+        TODO: (1) the single-bit algo == MPOLY_GCD_USE_xxx is supposed to only
+                  use that one algorithm xxx, and
+              (2) multi-bit algo is supposed to choose among the present bits.
+        (2) is not implemented completely.
+    */
+
     if (algo == MPOLY_GCD_USE_HENSEL)
     {
         mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
         success = _try_hensel(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (algo == MPOLY_GCD_USE_PRS)
+    {
+        success = _try_prs(G, Abar, Bbar, A, B, I, ctx);
         goto cleanup;
     }
     else if (algo == MPOLY_GCD_USE_ZIPPEL)
@@ -1508,6 +1656,16 @@ skip_monomial_cofactors:
 
         if (_try_brown(G, Abar, Bbar, A, B, I, ctx))
             goto successful;
+    }
+    else if (algo == MPOLY_GCD_USE_BROWN)
+    {
+        success = _try_brown(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (algo == MPOLY_GCD_USE_ZIPPEL2)
+    {
+        success = _try_bma(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
     }
     else if ((I->can_use & MPOLY_GCD_USE_BROWN) &&
              (I->can_use & MPOLY_GCD_USE_ZIPPEL2) &&

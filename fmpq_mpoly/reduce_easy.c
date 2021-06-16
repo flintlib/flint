@@ -30,5 +30,5 @@ void fmpq_mpoly_reduce_easy(
         _fmpz_vec_neg(A->zpoly->coeffs, A->zpoly->coeffs, A->zpoly->length);
     }
 
-    fmpq_mpoly_assert_canonical(A, ctx);
+    FLINT_ASSERT(fmpq_mpoly_is_canonical(A, ctx));
 }
