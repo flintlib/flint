@@ -574,6 +574,12 @@ Matrix multiplication
         - the entries of `A` and `B` are all nonnegative and strictly less than `2^{2*FLINT_BITS}`, or
         - the entries of `A` and `B` are all strictly less than `2^{2*FLINT_BITS - 1}` in absolute value.
 
+.. function:: void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A, const fmpz * b, slong blen)
+
+    Compute a matrix-vector product of ``A`` and ``(b, blen)`` and store the result in ``c``.
+    The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
+    The number entries written to ``c`` is always equal to the number of rows of ``A``.
+
 
 Inverse
 --------------------------------------------------------------------------------

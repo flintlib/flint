@@ -295,6 +295,9 @@ FLINT_DLL void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 
+FLINT_DLL void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A,
+                                                   const fmpz * b, slong blen);
+
 /* Kronecker product */
 
 FLINT_DLL void fmpz_mat_kronecker_product(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
