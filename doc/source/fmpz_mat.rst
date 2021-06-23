@@ -580,6 +580,12 @@ Matrix multiplication
     The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
     The number entries written to ``c`` is always equal to the number of rows of ``A``.
 
+.. function:: void fmpz_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen, const fmpz_mat_t B)
+
+    Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
+    The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
+    The number entries written to ``c`` is always equal to the number of columns of ``B``.
+
 
 Inverse
 --------------------------------------------------------------------------------
