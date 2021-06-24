@@ -830,8 +830,8 @@ Basic arithmetic
 .. function:: void fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 
     Sets `q` to the quotient of `a` by `b`, rounding towards the nearest
-    integer and sets `r` to the remainder.  If `b` is `0` an exception 
-    is raised.
+    integer where ties rounds towards zero and sets `r` to the remainder.
+    If `b` is `0` an exception is raised.
 
 .. function:: void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
