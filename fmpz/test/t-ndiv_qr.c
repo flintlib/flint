@@ -25,7 +25,7 @@ main(void)
     fflush(stdout);
 
     
-
+    /* Check that a = b * nquo + nrem, and tha nrem is smallest */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t max;
@@ -60,7 +60,6 @@ main(void)
         fmpz_fdiv_qr(fquo, frem, a, b);
         fmpz_cdiv_qr(cquo, crem, a, b);
 
-        /* Check that a = b * nquo + nrem, and tha nrem is smallest */
         fmpz_set(tmp, nrem);
         fmpz_addmul(tmp, b, nquo);
         result = ( fmpz_cmp(tmp, a) == 0
@@ -73,8 +72,6 @@ main(void)
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("q = "); fmpz_print(nquo); flint_printf("\n");
             flint_printf("r = "); fmpz_print(nrem); flint_printf("\n");
-            flint_printf("a is big? %d\n", COEFF_IS_MPZ(*a));
-            flint_printf("b is big? %d\n", COEFF_IS_MPZ(*b));
             abort();
         }
 
@@ -88,6 +85,71 @@ main(void)
         fmpz_clear(frem);
         fmpz_clear(cquo);
         fmpz_clear(crem);
+    }
+
+    /* Check that it rounds towards zero for ties */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        fmpz_t max;
+        fmpz_t tmp;
+        fmpz_t a, b;
+        fmpz_t nquo, nrem;
+        fmpz_t tquo, trem;
+        ulong multiplier;
+
+        fmpz_init(max);
+        fmpz_init(tmp);
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(nquo);
+        fmpz_init(nrem);
+        fmpz_init(tquo);
+        fmpz_init(trem);
+
+        fmpz_set_d_2exp(max, 1.0, FLINT_BITS);
+        fmpz_randm(a, state, max);
+        fmpz_set(b, a);
+
+        /* a -> odd * a, b -> 2 * b */
+        /* Thus a // b = odd // 2 and q should have to round down */
+        multiplier = n_randint(state, 50);
+        multiplier += (multiplier % 2 == 0);
+        fmpz_mul_ui(a, a, multiplier);
+        fmpz_mul_ui(b, b, 2);
+
+        if (n_randint(state, 2))
+            fmpz_neg(a, a);
+        if (n_randint(state, 2))
+            fmpz_neg(b, b);
+        if (fmpz_is_zero(b))
+            fmpz_one(b);
+
+        fmpz_ndiv_qr(nquo, nrem, a, b);
+        fmpz_tdiv_qr(tquo, trem, a, b);
+
+        fmpz_set(tmp, nrem);
+        fmpz_addmul(tmp, b, nquo);
+        result = ( fmpz_cmp(tmp, a) == 0
+                && fmpz_cmp(nquo, tquo) == 0
+                && fmpz_cmp(nrem, trem) == 0);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("b = "); fmpz_print(b); flint_printf("\n");
+            flint_printf("q = "); fmpz_print(nquo); flint_printf("\n");
+            flint_printf("r = "); fmpz_print(nrem); flint_printf("\n");
+            abort();
+        }
+
+        fmpz_clear(max);
+        fmpz_clear(tmp);
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(nquo);
+        fmpz_clear(nrem);
+        fmpz_clear(tquo);
+        fmpz_clear(trem);
     }
 
     FLINT_TEST_CLEANUP(state);
