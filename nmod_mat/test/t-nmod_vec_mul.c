@@ -11,58 +11,60 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpz_mat.h"
+#include "nmod_mat.h"
 
 int main(void)
 {
     slong i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("fmpz_vec_mul....");
+    flint_printf("nmod_vec_mul....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_mat_t A, B, C;
-        fmpz * a, * c;
+        mp_limb_t p;
+        nmod_mat_t A, B, C;
+        mp_limb_t * a, * c;
         slong j, m, n, alen;
 
+        p = n_randtest_not_zero(state);
         m = n_randint(state, 50);
         n = n_randint(state, 50);
         alen = n_randint(state, 50);
 
-        fmpz_mat_init(C, 1, n);
-        fmpz_mat_init(A, 1, m);
-        fmpz_mat_init(B, m, n);
-        c = _fmpz_vec_init(n);
-        a = _fmpz_vec_init(alen);
+        nmod_mat_init(C, 1, n, p);
+        nmod_mat_init(A, 1, m, p);
+        nmod_mat_init(B, m, n, p);
+        c = _nmod_vec_init(n);
+        a = _nmod_vec_init(alen);
 
-        fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
-        _fmpz_vec_randtest(c, state, n, n_randint(state, 200) + 1);
-        _fmpz_vec_randtest(a, state, alen, n_randint(state, 200) + 1);
+        nmod_mat_randtest(B, state);
+        _nmod_vec_randtest(c, state, n, B->mod);
+        _nmod_vec_randtest(a, state, alen, B->mod);
 
-        fmpz_mat_fmpz_vec_mul(c, a, alen, B);
+        nmod_mat_nmod_vec_mul(c, a, alen, B);
 
         /* supposed to match mul of the chopped or zero-extended a */
         for (j = 0; j < m && j < alen; j++)
-            fmpz_set(fmpz_mat_entry(A, 0, j), a + j);
+            nmod_mat_entry(A, 0, j) = a[j];
 
-        fmpz_mat_mul(C, A, B);
+        nmod_mat_mul(C, A, B);
 
         for (j = 0; j < n; j++)
         {
-            if (!fmpz_equal(fmpz_mat_entry(C, 0, j), c + j))
+            if (nmod_mat_entry(C, 0, j) != c[j])
             {
                 flint_printf("FAIL: wrong answer\n");
                 flint_abort();
             }
         }
 
-        fmpz_mat_clear(A);
-        fmpz_mat_clear(B);
-        fmpz_mat_clear(C);
-        _fmpz_vec_clear(c, n);
-        _fmpz_vec_clear(a, alen);
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+        _nmod_vec_clear(c);
+        _nmod_vec_clear(a);
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -70,3 +72,4 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
+
