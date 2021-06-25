@@ -298,8 +298,14 @@ FLINT_DLL void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 FLINT_DLL void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A,
                                                    const fmpz * b, slong blen);
 
+FLINT_DLL void fmpz_mat_mul_fmpz_vec_ptr(fmpz * const * c, const fmpz_mat_t A,
+                                           const fmpz * const * b, slong blen);
+
 FLINT_DLL void fmpz_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,
                                                            const fmpz_mat_t B);
+
+FLINT_DLL void fmpz_mat_fmpz_vec_mul_ptr(fmpz * const * c,
+                       const fmpz * const * a, slong alen, const fmpz_mat_t B);
 
 /* Kronecker product */
 

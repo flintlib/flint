@@ -25,6 +25,7 @@ int main(void)
     {
         fmpz_mat_t A, B, C;
         fmpz * b, * c;
+        fmpz ** bb, ** cc;
         slong j, m, n, blen;
 
         m = n_randint(state, 50);
@@ -41,7 +42,22 @@ int main(void)
         _fmpz_vec_randtest(c, state, m, n_randint(state, 200) + 1);
         _fmpz_vec_randtest(b, state, blen, n_randint(state, 200) + 1);
 
+        cc = FLINT_ARRAY_ALLOC(m, fmpz*);
+        for (j = 0; j < m; j++)
+        {
+            cc[j] = FLINT_ARRAY_ALLOC(1, fmpz);
+            fmpz_init_set(cc[j], c + j);
+        }
+
+        bb = FLINT_ARRAY_ALLOC(blen, fmpz*);
+        for (j = 0; j < blen; j++)
+        {
+            bb[j] = FLINT_ARRAY_ALLOC(1, fmpz);
+            fmpz_init_set(bb[j], b + j);
+        }
+
         fmpz_mat_mul_fmpz_vec(c, A, b, blen);
+        fmpz_mat_mul_fmpz_vec_ptr(cc, A, (const fmpz * const *)bb, blen);
 
         /* supposed to match mul of the chopped or zero-extended b */
         for (j = 0; j < n && j < blen; j++)
@@ -51,7 +67,8 @@ int main(void)
 
         for (j = 0; j < m; j++)
         {
-            if (!fmpz_equal(fmpz_mat_entry(C, j, 0), c + j))
+            if (!fmpz_equal(fmpz_mat_entry(C, j, 0), c + j) ||
+                !fmpz_equal(fmpz_mat_entry(C, j, 0), cc[j]))
             {
                 flint_printf("FAIL: wrong answer\n");
                 flint_abort();
@@ -63,6 +80,20 @@ int main(void)
         fmpz_mat_clear(C);
         _fmpz_vec_clear(c, m);
         _fmpz_vec_clear(b, blen);
+
+        for (j = 0; j < m; j++)
+        {
+            fmpz_clear(cc[j]);
+            flint_free(cc[j]);
+        }
+        flint_free(cc);
+
+        for (j = 0; j < blen; j++)
+        {
+            fmpz_clear(bb[j]);
+            flint_free(bb[j]);
+        }
+        flint_free(bb);
     }
 
     FLINT_TEST_CLEANUP(state);
