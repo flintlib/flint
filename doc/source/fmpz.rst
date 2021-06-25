@@ -827,6 +827,12 @@ Basic arithmetic
     Sets `f` to `g` divided by ``2^exp``, rounding down towards
     zero.
 
+.. function:: void fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets `q` to the quotient of `a` by `b`, rounding towards the nearest
+    integer where ties rounds towards zero and sets `r` to the remainder.
+    If `b` is `0` an exception is raised.
+
 .. function:: void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the quotient of `g` and `h`, assuming that the
