@@ -26,6 +26,7 @@ int main(void)
         mp_limb_t p;
         nmod_mat_t A, B, C;
         mp_limb_t * b, * c;
+        mp_limb_t ** bb, ** cc;
         slong j, m, n, blen;
 
         p = n_randtest_not_zero(state);
@@ -43,7 +44,22 @@ int main(void)
         _nmod_vec_randtest(c, state, m, A->mod);
         _nmod_vec_randtest(b, state, blen, A->mod);
 
+        cc = FLINT_ARRAY_ALLOC(m, mp_limb_t*);
+        for (j = 0; j < m; j++)
+        {
+            cc[j] = FLINT_ARRAY_ALLOC(1, mp_limb_t);
+            cc[j][0] = c[j];
+        }
+
+        bb = FLINT_ARRAY_ALLOC(blen, mp_limb_t*);
+        for (j = 0; j < blen; j++)
+        {
+            bb[j] = FLINT_ARRAY_ALLOC(1, mp_limb_t);
+            bb[j][0] = b[j];
+        }
+
         nmod_mat_mul_nmod_vec(c, A, b, blen);
+        nmod_mat_mul_nmod_vec_ptr(cc, A, (const mp_limb_t * const *)bb, blen);
 
         /* supposed to match mul of the chopped or zero-extended b */
         for (j = 0; j < n && j < blen; j++)
@@ -53,7 +69,8 @@ int main(void)
 
         for (j = 0; j < m; j++)
         {
-            if (nmod_mat_entry(C, j, 0) != c[j])
+            if (nmod_mat_entry(C, j, 0) != c[j] ||
+                nmod_mat_entry(C, j, 0) != cc[j][0])
             {
                 flint_printf("FAIL: wrong answer\n");
                 flint_abort();
@@ -65,6 +82,18 @@ int main(void)
         nmod_mat_clear(C);
         _nmod_vec_clear(c);
         _nmod_vec_clear(b);
+
+        for (j = 0; j < m; j++)
+        {
+            flint_free(cc[j]);
+        }
+        flint_free(cc);
+
+        for (j = 0; j < blen; j++)
+        {
+            flint_free(bb[j]);
+        }
+        flint_free(bb);
     }
 
     FLINT_TEST_CLEANUP(state);
