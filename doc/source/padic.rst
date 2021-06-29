@@ -4,6 +4,28 @@
 ===============================================================================
 
 
+Introduction
+--------------------------------------------------------------------------------
+
+The ``padic_t`` data type represents elements of `\mathbf{Q}_p` to
+precision `N`, stored in the form `x = p^v u` with `u, v \in \mathbf{Z}`.
+Arithmetic operations can be carried out with respect to a context
+containing the prime number `p` and various pieces of pre-computed data.
+
+Independent of the context, we consider a `p`-adic number
+`x = u p^v` to be in canonical form whenever either
+`p \nmid u` or `u = v = 0`, and we say it is reduced
+if, in addition, for non-zero `u`, `u \in (0, p^{N-v})`.
+
+We briefly describe the interface:
+
+The functions in this module expect arguments of type ``padic_t``,
+and each variable carries its own precision.  The functions have an
+interface that is similar to the MPFR functions.  In particular, they
+have the same semantics, specified as follows:  Compute the requested
+operation exactly and then reduce the result to the precision of the
+output variable.
+
 Data structures
 --------------------------------------------------------------------------------
 
