@@ -379,6 +379,26 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
                                       int unit,
                                       const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void TEMPLATE(T, mat_mul_vec)(TEMPLATE(T, struct) * c,
+                                    const TEMPLATE(T, mat_t) A,
+                                    const TEMPLATE(T, struct) * b, slong blen,
+                                    const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_mul_vec_ptr)(TEMPLATE(T, struct) * const * c,
+                            const TEMPLATE(T, mat_t) A,
+                            const TEMPLATE(T, struct) * const * b, slong blen,
+                            const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_vec_mul)(TEMPLATE(T, struct) * c,
+                                    const TEMPLATE(T, struct) * a, slong alen,
+                                    const TEMPLATE(T, mat_t) B,
+                                    const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_vec_mul_ptr)(TEMPLATE(T, struct) * const * c,
+                            const TEMPLATE(T, struct) * const * a, slong alen,
+                            const TEMPLATE(T, mat_t) B,
+                            const TEMPLATE(T, ctx_t) ctx);
+
 /* Nonsingular solving *******************************************************/
 
 FLINT_DLL int TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X,

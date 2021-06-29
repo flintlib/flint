@@ -236,6 +236,18 @@ FLINT_DLL void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
 
 FLINT_DLL void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
+FLINT_DLL void fmpz_mod_mat_mul_fmpz_vec(fmpz * c, const fmpz_mod_mat_t A,
+                                                   const fmpz * b, slong blen);
+
+FLINT_DLL void fmpz_mod_mat_mul_fmpz_vec_ptr(fmpz * const * c,
+                   const fmpz_mod_mat_t A, const fmpz * const * b, slong blen);
+
+FLINT_DLL void fmpz_mod_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,
+                                                       const fmpz_mod_mat_t B);
+
+FLINT_DLL void fmpz_mod_mat_fmpz_vec_mul_ptr(fmpz * const * c,
+                   const fmpz * const * a, slong alen, const fmpz_mod_mat_t B);
+
 /* Trace */
 
 FLINT_DLL void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);

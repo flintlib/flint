@@ -242,6 +242,20 @@ Matrix multiplication
 
     Set ``B`` to ``A^2``. The matrix ``A`` must be square.
 
+.. function:: void fmpz_mod_mat_mul_fmpz_vec(fmpz * c, const fmpz_mod_mat_t A, const fmpz * b, slong blen)
+              void fmpz_mod_mat_mul_fmpz_vec_ptr(fmpz * const * c, const fmpz_mod_mat_t A, const fmpz * const * b, slong blen)
+
+    Compute a matrix-vector product of ``A`` and ``(b, blen)`` and store the result in ``c``.
+    The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
+    The number entries written to ``c`` is always equal to the number of rows of ``A``.
+
+.. function:: void fmpz_mod_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen, const fmpz_mod_mat_t B)
+              void fmpz_mod_mat_fmpz_vec_mul_ptr(fmpz * const * c, const fmpz * const * a, slong alen, const fmpz_mod_mat_t B)
+
+    Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
+    The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
+    The number entries written to ``c`` is always equal to the number of columns of ``B``.
+
 
 Trace
 ---------------------------------------------------------------------------------
