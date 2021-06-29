@@ -19,7 +19,7 @@ skip_commits:
 environment:
   global:
     CONDA_INSTALL_LOCN_32: "C:\\Miniconda36"
-    CONDA_INSTALL_LOCN_64: "C:\\Miniconda36-x64"
+    CONDA_INSTALL_LOCN_64: "C:\\Miniconda38-x64"
     VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
     - COMPILER: cl
