@@ -481,8 +481,8 @@ Logarithm
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
-    but this only converges when `\operatorname{ord}_p(x)` is at least `2` or `1` 
-    when `p = 2` or `p > 2`, respectively.
+    but this only converges when `\operatorname{ord}_p(x - 1)` is at least `2`
+    or `1` when `p = 2` or `p > 2`, respectively.
 
 .. function:: int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
