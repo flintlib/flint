@@ -432,7 +432,7 @@ Matrix-scalar arithmetic
               void fmpz_mat_scalar_mul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
               void fmpz_mat_scalar_mul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
 
-    Set ``A = B*c`` where ``B`` is an ``fmpz_mat_t`` and ``c``
+    Set ``B = A*c`` where ``A`` is an ``fmpz_mat_t`` and ``c``
     is a scalar respectively of type ``slong``, ``ulong``,
     or ``fmpz_t``. The dimensions of ``A`` and ``B`` must
     be compatible.
@@ -441,7 +441,7 @@ Matrix-scalar arithmetic
               void fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
               void fmpz_mat_scalar_addmul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
 
-    Set ``A = A + B*c`` where ``B`` is an ``fmpz_mat_t`` and ``c``
+    Set ``B = B + A*c`` where ``A`` is an ``fmpz_mat_t`` and ``c``
     is a scalar respectively of type ``slong``, ``ulong``,
     or ``fmpz_t``. The dimensions of ``A`` and ``B`` must
     be compatible.
@@ -450,7 +450,7 @@ Matrix-scalar arithmetic
               void fmpz_mat_scalar_submul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
               void fmpz_mat_scalar_submul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
 
-    Set ``A = A - B*c`` where ``B`` is an ``fmpz_mat_t`` and ``c``
+    Set ``B = B - A*c`` where ``A`` is an ``fmpz_mat_t`` and ``c``
     is a scalar respectively of type ``slong``, ``ulong``,
     or ``fmpz_t``. The dimensions of ``A`` and ``B`` must
     be compatible.
@@ -458,7 +458,7 @@ Matrix-scalar arithmetic
 .. function:: void fmpz_mat_scalar_addmul_nmod_mat_ui(fmpz_mat_t B, const nmod_mat_t A, ulong c)
               void fmpz_mat_scalar_addmul_nmod_mat_fmpz(fmpz_mat_t B, const nmod_mat_t A, const fmpz_t c)
 
-    Set ``A = A + B*c`` where ``B`` is an ``nmod_mat_t`` and ``c``
+    Set ``B = B + A*c`` where ``A`` is an ``nmod_mat_t`` and ``c``
     is a scalar respectively of type ``ulong`` or ``fmpz_t``.
     The dimensions of ``A`` and ``B`` must be compatible.
 
