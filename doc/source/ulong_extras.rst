@@ -544,6 +544,14 @@ Modular Arithmetic
     part of `w * 2^{\mathtt{FLINT\_BITS}} / p`.
 
 
+Divisibility testing
+--------------------------------------------------------------------------------
+
+.. function:: int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p)
+
+   Returns ``1`` if ``p`` divides ``n`` and sets ``q`` to the quotient,
+   otherwise return ``0`` and sets ``q`` to ``0``.
+
 Prime number generation and counting
 --------------------------------------------------------------------------------
 

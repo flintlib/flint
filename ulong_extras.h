@@ -371,6 +371,8 @@ FLINT_DLL int n_is_perfect_power235(ulong n);
 
 FLINT_DLL int n_is_perfect_power(ulong * root, ulong n);
 
+FLINT_DLL int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p);
+
 FLINT_DLL int n_is_oddprime_small(ulong n);
 
 FLINT_DLL int n_is_oddprime_binary(ulong n);
