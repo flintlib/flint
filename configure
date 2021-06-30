@@ -10,7 +10,7 @@ GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 NTL_DIR="/usr/local"
 GC_DIR="/usr/local"
-BLAS_DIR="/usr/local"
+BLAS_DIR="/usr"
 WANT_NTL=0
 WANT_BLAS=0
 SHARED=1
@@ -71,7 +71,7 @@ usage()
    echo "     --with-mpir=<path>   Specify location of MPIR (default: /usr/local)"
    echo "     --with-gmp=<path>    Specify location of GMP (default: /usr/local)"
    echo "     --with-mpfr=<path>   Specify location of MPFR (default: /usr/local)"
-   echo "     --with-blas[=<path>] Use BLAS and specify its location (default: /usr/local)"
+   echo "     --with-blas[=<path>] Use BLAS and specify its location (default: /usr)"
    echo "     --without-blas       Do not use BLAS (default)"
    echo "     --with-ntl[=<path>]  Build NTL interface and specify its location (default: /usr/local)"
    echo "     --without-ntl        Do not build NTL interface (default)"
@@ -299,7 +299,13 @@ if [ "$WANT_NTL" = "1" ]; then
 fi
 
 if [ "$WANT_BLAS" = "1" ]; then
-   if [ -d "${BLAS_DIR}" ]; then
+   if [ -d "${BLAS_DIR}/lib/x86_64-linux-gnu/openblas-pthread" ]; then
+      BLAS_LIB_DIR="${BLAS_DIR}/lib/x86_64-linux-gnu"
+      BLAS_INC_DIR="${BLAS_DIR}/include/x86_64-linux-gnu"
+   elif [ -d "${BLAS_DIR}/lib" ]; then
+      BLAS_LIB_DIR="${BLAS_DIR}/lib"
+      BLAS_INC_DIR="${BLAS_DIR}/include"
+   elif [ -d "${BLAS_DIR}" ]; then
       BLAS_LIB_DIR="${BLAS_DIR}"
       BLAS_INC_DIR="${BLAS_DIR}"
    else
