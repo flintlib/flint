@@ -247,18 +247,21 @@ TEMPLATE(T, poly_xgcd_euclidean_f) (TEMPLATE(T, t) f, TEMPLATE(T, poly_t) G,
                 _TEMPLATE(T, vec_clear) (G->coeffs, G->alloc, ctx);
                 G->coeffs = g;
                 G->alloc = FLINT_MIN(lenA, lenB);
+		G->length = G->alloc;
             }
             if (S == A || S == B)
             {
                 _TEMPLATE(T, vec_clear) (S->coeffs, S->alloc, ctx);
                 S->coeffs = s;
                 S->alloc = lenB;
+		S->length = S->alloc;
             }
             if (T == A || T == B)
             {
                 _TEMPLATE(T, vec_clear) (T->coeffs, T->alloc, ctx);
                 T->coeffs = t;
                 T->alloc = lenA;
+		T->length = T->length;
             }
 
             _TEMPLATE(T, poly_set_length) (G, lenG, ctx);

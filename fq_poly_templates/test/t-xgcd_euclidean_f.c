@@ -182,6 +182,330 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
+    /* test aliasing of g and a */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+	TEMPLATE(T, t) f1, f2;
+        TEMPLATE(T, poly_t) a, b, g, s, t, v, w;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (g, ctx);
+        TEMPLATE(T, poly_init) (s, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (v, ctx);
+        TEMPLATE(T, poly_init) (w, ctx);
+	TEMPLATE(T, init) (f1, ctx);
+	TEMPLATE(T, init) (f2, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f1, g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f2, a, v, w, a, b, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (s, v, ctx) &&
+                  TEMPLATE(T, poly_equal) (t, w, ctx) &&
+                  TEMPLATE(T, poly_equal) (g, a, ctx) &&
+                  TEMPLATE(T, equal) (f1, f2, ctx));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (g, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (s, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (v, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (g, ctx);
+        TEMPLATE(T, poly_clear) (s, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (v, ctx);
+        TEMPLATE(T, poly_clear) (w, ctx);
+        TEMPLATE(T, clear) (f1, ctx);
+        TEMPLATE(T, clear) (f2, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
+    /* test aliasing of g and b */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+	TEMPLATE(T, t) f1, f2;
+        TEMPLATE(T, poly_t) a, b, g, s, t, v, w;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (g, ctx);
+        TEMPLATE(T, poly_init) (s, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (v, ctx);
+        TEMPLATE(T, poly_init) (w, ctx);
+	TEMPLATE(T, init) (f1, ctx);
+	TEMPLATE(T, init) (f2, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f1, g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f2, b, v, w, a, b, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (s, v, ctx) &&
+                  TEMPLATE(T, poly_equal) (t, w, ctx) &&
+                  TEMPLATE(T, poly_equal) (g, b, ctx) &&
+                  TEMPLATE(T, equal) (f1, f2, ctx));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (g, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (s, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (v, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (g, ctx);
+        TEMPLATE(T, poly_clear) (s, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (v, ctx);
+        TEMPLATE(T, poly_clear) (w, ctx);
+        TEMPLATE(T, clear) (f1, ctx);
+        TEMPLATE(T, clear) (f2, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
+    /* test aliasing of s and a */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+	TEMPLATE(T, t) f1, f2;
+        TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (g, ctx);
+        TEMPLATE(T, poly_init) (s, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (d, ctx);
+        TEMPLATE(T, poly_init) (w, ctx);
+        TEMPLATE(T, init) (f1, ctx);
+        TEMPLATE(T, init) (f2, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f1, g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f2, d, a, w, a, b, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (s, a, ctx) &&
+                  TEMPLATE(T, poly_equal) (t, w, ctx) &&
+                  TEMPLATE(T, poly_equal) (g, d, ctx) &&
+                  TEMPLATE(T, equal) (f1, f2, ctx));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (g, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (s, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (g, ctx);
+        TEMPLATE(T, poly_clear) (s, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (d, ctx);
+        TEMPLATE(T, poly_clear) (w, ctx);
+        TEMPLATE(T, clear) (f1, ctx);
+        TEMPLATE(T, clear) (f2, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
+    /* test aliasing of s and b */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+	TEMPLATE(T, t) f1, f2;
+        TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (g, ctx);
+        TEMPLATE(T, poly_init) (s, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (d, ctx);
+        TEMPLATE(T, poly_init) (w, ctx);
+        TEMPLATE(T, init) (f1, ctx);
+        TEMPLATE(T, init) (f2, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f1, g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f2, d, b, w, a, b, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (s, b, ctx) &&
+                  TEMPLATE(T, poly_equal) (t, w, ctx) &&
+                  TEMPLATE(T, poly_equal) (g, d, ctx) &&
+                  TEMPLATE(T, equal) (f1, f2, ctx));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (g, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (s, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (g, ctx);
+        TEMPLATE(T, poly_clear) (s, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (d, ctx);
+        TEMPLATE(T, poly_clear) (w, ctx);
+        TEMPLATE(T, clear) (f1, ctx);
+        TEMPLATE(T, clear) (f2, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
+    /* test aliasing of s and a */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+	TEMPLATE(T, t) f1, f2;
+        TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (g, ctx);
+        TEMPLATE(T, poly_init) (s, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (d, ctx);
+        TEMPLATE(T, poly_init) (w, ctx);
+        TEMPLATE(T, init) (f1, ctx);
+        TEMPLATE(T, init) (f2, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f1, g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f2, d, w, a, a, b, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (s, w, ctx) &&
+                  TEMPLATE(T, poly_equal) (t, a, ctx) &&
+                  TEMPLATE(T, poly_equal) (g, d, ctx) &&
+                  TEMPLATE(T, equal) (f1, f2, ctx));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (g, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (s, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (g, ctx);
+        TEMPLATE(T, poly_clear) (s, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (d, ctx);
+        TEMPLATE(T, poly_clear) (w, ctx);
+        TEMPLATE(T, clear) (f1, ctx);
+        TEMPLATE(T, clear) (f2, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
+    /* test aliasing of t and b */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+	TEMPLATE(T, t) f1, f2;
+        TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
+
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (g, ctx);
+        TEMPLATE(T, poly_init) (s, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (d, ctx);
+        TEMPLATE(T, poly_init) (w, ctx);
+        TEMPLATE(T, init) (f1, ctx);
+        TEMPLATE(T, init) (f2, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f1, g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd_euclidean_f) (f2, d, w, b, a, b, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (s, w, ctx) &&
+                  TEMPLATE(T, poly_equal) (t, b, ctx) &&
+                  TEMPLATE(T, poly_equal) (g, d, ctx) &&
+                  TEMPLATE(T, equal) (f1, f2, ctx));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (g, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (s, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (g, ctx);
+        TEMPLATE(T, poly_clear) (s, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (d, ctx);
+        TEMPLATE(T, poly_clear) (w, ctx);
+        TEMPLATE(T, clear) (f1, ctx);
+        TEMPLATE(T, clear) (f2, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");
