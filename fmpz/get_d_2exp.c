@@ -15,8 +15,6 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
-
 double
 fmpz_get_d_2exp(slong *exp, const fmpz_t f)
 {
@@ -33,9 +31,9 @@ fmpz_get_d_2exp(slong *exp, const fmpz_t f)
         d_abs = FLINT_ABS(d);
         (*exp) = FLINT_BIT_COUNT(d_abs);
         if (d < WORD(0))
-            return __gmpn_get_d((mp_limb_t *) &d_abs, WORD(1), WORD(-1), -*exp);
+            return flint_mpn_get_d((mp_limb_t *) &d_abs, WORD(1), WORD(-1), -*exp);
         else
-            return __gmpn_get_d((mp_limb_t *) &d, WORD(1), WORD(1), -*exp);
+            return flint_mpn_get_d((mp_limb_t *) &d, WORD(1), WORD(1), -*exp);
     }
     else
     {

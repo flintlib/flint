@@ -22,8 +22,6 @@
 #define DOUBLE_MIN COEFF_MIN
 #endif
 
-extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
-
 double
 fmpz_get_d(const fmpz_t f)
 {
@@ -40,12 +38,12 @@ fmpz_get_d(const fmpz_t f)
         if (c > 0)
         {
             d = c;
-            return __gmpn_get_d(&d, 1, 1, 0);
+            return flint_mpn_get_d(&d, 1, 1, 0);
         }
         else
         {
             d = -c;
-            return __gmpn_get_d(&d, 1, -1, 0);
+            return flint_mpn_get_d(&d, 1, -1, 0);
         }
     }
     else

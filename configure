@@ -687,6 +687,25 @@ else
 fi
 rm -f build/test-fenv.h
 
+CONFIG_BIG_ENDIAN="#define FLINT_BIG_ENDIAN 0"
+
+mkdir -p build
+MSG="Testing big endian..."
+printf "%s" "$MSG"
+printf "%s" "MSG" >> config.log
+echo "int main(int argc, char ** argv){ union { unsigned int i; char c[4]; } be_int = {0x01020304}; return be_int.c[0] == 1; }" > build/test-endian.c
+$CC build/test-endian.c -o ./build/test-endian > /dev/null 2>&1
+build/test-endian > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+  printf "%s\n" "no"
+  echo "no" >> config.log
+else
+  printf "%s\n" "yes"
+  echo "yes" >> config.log
+  CONFIG_BIG_ENDIAN="#define FLINT_BIG_ENDIAN 1"
+fi
+rm -f build/test-endian{,.c}
+
 #pthread configuration
 
 CONFIG_PTHREAD="#define FLINT_USES_PTHREAD ${PTHREAD}"
@@ -766,6 +785,7 @@ echo "$CONFIG_BLAS" >> flint-config.h
 echo "$CONFIG_TLS" >> flint-config.h
 echo "$CONFIG_FENV" >> flint-config.h
 echo "$CONFIG_PTHREAD" >> flint-config.h
+echo "$CONFIG_BIG_ENDIAN" >> flint-config.h
 echo "$CONFIG_GC" >> flint-config.h
 echo "$CONFIG_CPU_SET_T" >> flint-config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> flint-config.h
