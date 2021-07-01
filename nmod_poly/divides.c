@@ -38,7 +38,7 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
 
 	_nmod_poly_div(Q, A, lenA, B, lenB, mod);
 
-        while (lenB - offset - 1 >= lenQ)
+        while (offset < lenB - 1)
         {
             if (offset + 2*lenQ - 1 < lenB)
             {
@@ -46,11 +46,11 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
 	        _nmod_poly_add(R + offset, R + offset, 2*lenQ - 1, P, 2*lenQ - 1, mod);
             } else
             {
-                _nmod_poly_mullow(P, B + offset, lenQ, Q, lenQ, lenB - offset - 1, mod);
+                _nmod_poly_mullow(P, Q, lenQ, B + offset, lenQ, lenB - offset - 1, mod);
                 _nmod_poly_add(R + offset, R + offset, lenB - offset - 1, P, lenB - offset - 1, mod);
             }
 
-	    for (i = 0; i < lenQ; i++)
+	    for (i = 0; i < FLINT_MIN(lenQ, lenB - offset - 1); i++)
             {
                 if (R[offset + i] != A[offset + i])
 		{
@@ -60,22 +60,6 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
             }
 
 	    offset += lenQ;
-	}
-
-	if (res)
-	{
-            _nmod_poly_mullow(P, Q, lenQ, B + offset, lenB - offset - 1, lenB - offset - 1, mod);
-
-	    _nmod_poly_add(R + offset, R + offset, lenB - offset - 1, P, lenB - offset - 1, mod);
-
-            for (i = 0; i < lenB - offset - 1; i++)
-            {
-                if (R[offset + i] != A[offset + i])
-                {
-                    res = 0;
-                    break;
-                }
-            }
 	}
 
         _nmod_vec_clear(P);
