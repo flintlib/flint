@@ -840,6 +840,20 @@ FLINT_DLL mp_limb_t _nmod_poly_div_root(mp_ptr Q,
 FLINT_DLL mp_limb_t nmod_poly_div_root(nmod_poly_t Q,
                                              const nmod_poly_t A, mp_limb_t c);
 
+/* Divisibility testing  *****************************************************/
+
+FLINT_DLL int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA,
+                                          mp_srcptr B, slong lenB, nmod_t mod);
+
+FLINT_DLL int nmod_poly_divides_classical(nmod_poly_t Q,
+		                     const nmod_poly_t A, const nmod_poly_t B);
+
+FLINT_DLL int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
+                                          mp_srcptr B, slong lenB, nmod_t mod);
+
+FLINT_DLL int nmod_poly_divides(nmod_poly_t Q,
+		                     const nmod_poly_t A, const nmod_poly_t B);
+
 /* Derivative  ***************************************************************/
 
 FLINT_DLL void _nmod_poly_derivative(mp_ptr x_prime, 

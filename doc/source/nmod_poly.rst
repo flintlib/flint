@@ -1230,6 +1230,33 @@ Division
     the remainder, equal to the value of `A` evaluated at `c`.
 
 
+Divisibility testing
+--------------------------------------------------------------------------------
+
+
+.. function:: int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+
+    Returns `1` if `(B, lenB)` divides `(A, lenA)` and sets
+    `(Q, lenA - lenB + 1)` to the quotient. Otherwise, returns `0` and sets
+    `(Q, lenA - lenB + 1)` to zero. We require that `lenA >= lenB > 0`.
+
+.. function:: int nmod_poly_divides_classical(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
+
+    Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
+    returns `0` and sets `Q` to zero.
+
+.. function:: int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+
+    Returns `1` if `(B, lenB)` divides `(A, lenA)` and sets
+    `(Q, lenA - lenB + 1)` to the quotient. Otherwise, returns `0` and sets
+    `(Q, lenA - lenB + 1)` to zero. We require that `lenA >= lenB > 0`.
+
+.. function:: int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
+
+    Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
+    returns `0` and sets `Q` to zero.
+
+
 Derivative and integral
 --------------------------------------------------------------------------------
 
