@@ -19,7 +19,7 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
                                            mp_srcptr B, slong lenB, nmod_t mod)
 {    
     mp_ptr R;
-    slong i;
+    slong i, lenQ = lenA - lenB + 1;
     int res = 1;
 
     if (lenA < 40 && lenB < 20) 
@@ -27,21 +27,76 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
 
     R = _nmod_vec_init(lenB - 1);
 
-    _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
-
-    for (i = 0; i < lenB - 1; i++)
+    if (lenA < 2*lenB - 1)
     {
-        if (R[i] != 0)
+	slong offset = 0;
+        mp_ptr P;
+
+	P = (mp_ptr) _nmod_vec_init(2*lenQ - 1);
+
+	_nmod_vec_zero(R, lenB - 1);
+
+	_nmod_poly_div(Q, A, lenA, B, lenB, mod);
+
+        while (lenB - offset - 1 >= lenQ)
         {
-            res = 0;
-	    break;
+            if (offset + 2*lenQ - 1 < lenB)
+            {
+                _nmod_poly_mul(P, B + offset, lenQ, Q, lenQ, mod);
+	        _nmod_poly_add(R + offset, R + offset, 2*lenQ - 1, P, 2*lenQ - 1, mod);
+            } else
+            {
+                _nmod_poly_mullow(P, B + offset, lenQ, Q, lenQ, lenB - offset - 1, mod);
+                _nmod_poly_add(R + offset, R + offset, lenB - offset - 1, P, lenB - offset - 1, mod);
+            }
+
+	    for (i = 0; i < lenQ; i++)
+            {
+                if (R[offset + i] != A[offset + i])
+		{
+                    res = 0;
+		    break;
+	        }
+            }
+
+	    offset += lenQ;
+	}
+
+	if (res)
+	{
+            _nmod_poly_mullow(P, Q, lenQ, B + offset, lenB - offset - 1, lenB - offset - 1, mod);
+
+	    _nmod_poly_add(R + offset, R + offset, lenB - offset - 1, P, lenB - offset - 1, mod);
+
+            for (i = 0; i < lenB - offset - 1; i++)
+            {
+                if (R[offset + i] != A[offset + i])
+                {
+                    res = 0;
+                    break;
+                }
+            }
+	}
+
+        _nmod_vec_clear(P);
+    } else
+    {
+        _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
+
+        for (i = 0; i < lenB - 1; i++)
+        {
+            if (R[i] != 0)
+            {
+                res = 0;
+	        break;
+            }
         }
     }
 
     _nmod_vec_clear(R);
 
     if (res == 0)
-	_nmod_vec_zero(Q, lenA - lenB + 1);
+	_nmod_vec_zero(Q, lenQ);
 
     return res;
 }
