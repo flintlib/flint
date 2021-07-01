@@ -861,6 +861,11 @@ Basic arithmetic
 
     Returns `1` if there is an integer `q` with `f = q g` and `0` if not.
 
+.. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
+
+    Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
+    quotient. Otherwise returns `0` and sets `q` to `0`.
+
 .. function:: int fmpz_divisible_si(const fmpz_t f, slong g)
 
     Returns whether `f` is divisible by `g > 0`.

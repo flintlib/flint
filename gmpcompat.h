@@ -519,27 +519,75 @@ void flint_mpq_set_ui(mpq_ptr a, ulong b, ulong c)
 }
 
 static __inline__
-void flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
+ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
-   FLINT_MOCK_MPZ_UI(tc, c);
+   if (FLINT_BIT_COUNT(c) <= 32)
+      return (ulong) mpz_cdiv_q_ui(q, n, (unsigned long) c);
+   else
+   {
+      ulong r;
+      mpz_t rz;
 
-   mpz_cdiv_q(q, n, tc);
-}
+      mpz_init(rz);
+      
+      FLINT_MOCK_MPZ_UI(tc, c);
+
+      mpz_cdiv_qr(q, r, n, tc);
+
+      r = flint_mpz_get_ui(rz);
+
+      mpz_clear(rz);
+
+      return r;
+   }
+}    
 
 static __inline__
-void flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
+ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
-   FLINT_MOCK_MPZ_UI(tc, c);
+   if (FLINT_BIT_COUNT(c) <= 32)
+      return (ulong) mpz_fdiv_q_ui(q, n, (unsigned long) c);
+   else
+   {
+      ulong r;
+      mpz_t rz;
 
-   mpz_fdiv_q(q, n, tc);
+      mpz_init(rz);
+      
+      FLINT_MOCK_MPZ_UI(tc, c);
+
+      mpz_fdiv_qr(q, r, n, tc);
+
+      r = flint_mpz_get_ui(rz);
+
+      mpz_clear(rz);
+
+      return r;
+   }
 }
 
 static __inline__
 void flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
-   FLINT_MOCK_MPZ_UI(tc, c);
+    if (FLINT_BIT_COUNT(c) <= 32)
+      return (ulong) mpz_tdiv_q_ui(q, n, (unsigned long) c);
+   else
+   {
+      ulong r;
+      mpz_t rz;
 
-   mpz_tdiv_q(q, n, tc);
+      mpz_init(rz);
+      
+      FLINT_MOCK_MPZ_UI(tc, c);
+
+      mpz_tdiv_qr(q, r, n, tc);
+
+      r = flint_mpz_get_ui(rz);
+
+      mpz_clear(rz);
+
+      return r;
+   }
 }
 
 static __inline__
