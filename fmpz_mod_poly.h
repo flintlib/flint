@@ -730,6 +730,14 @@ void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
     fmpz_mod_poly_clear(Q, ctx);
 }
 
+/* Divisibility testing ******************************************************/
+
+FLINT_DLL int _fmpz_mod_poly_divides_classical(fmpz * Q,
+   const fmpz * A, slong lenA, const fmpz * B, slong lenB, fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q,
+         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx);
+
 /*  Power series inversion ***************************************************/
 
 FLINT_DLL void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 

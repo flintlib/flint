@@ -47,6 +47,9 @@ FLINT_DLL void _fmpz_mod_vec_scalar_div_fmpz_mod(fmpz * A, const fmpz * B,
 FLINT_DLL void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B,
                                           slong len, const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a,
+		          const fmpz * b, slong len, const fmpz_mod_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif
