@@ -710,6 +710,16 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
 }
 
 FMPZ_MOD_POLY_INLINE
+void _fmpz_mod_poly_div(fmpz *Q,
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                           const fmpz_t invB, const fmpz_t p)
+{
+    fmpz * R = (fmpz *) _fmpz_vec_init(lenA);
+    _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
+    _fmpz_vec_clear(R, lenA);
+}
+
+FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                              const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
@@ -736,6 +746,12 @@ FLINT_DLL int _fmpz_mod_poly_divides_classical(fmpz * Q,
    const fmpz * A, slong lenA, const fmpz * B, slong lenB, fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q,
+         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mod_poly_divides(fmpz * Q,
+   const fmpz * A, slong lenA, const fmpz * B, slong lenB, fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_poly_divides(fmpz_mod_poly_t Q,
          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx);
 
 /*  Power series inversion ***************************************************/

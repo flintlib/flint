@@ -917,6 +917,16 @@ Divisibility testing
     Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
     returns `0` and sets `Q` to zero.
 
+.. function:: int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, fmpz_mod_ctx_t mod)
+
+    Returns `1` if `(B, lenB)` divides `(A, lenA)` and sets
+    `(Q, lenA - lenB + 1)` to the quotient. Otherwise, returns `0` and sets
+    `(Q, lenA - lenB + 1)` to zero. We require that `lenA >= lenB > 0`.
+
+.. function:: int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx)
+
+    Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
+    returns `0` and sets `Q` to zero.
 
 Power series inversion
 --------------------------------------------------------------------------------
