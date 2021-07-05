@@ -250,7 +250,7 @@ slong _fmpz_mpoly_addmul(
    slong * hind;
    int first, small;
    slong hind_len;
-   ulong offset, offset2;
+   ulong offset, offset2, offset3;
    ulong candidate;
    ulong partial_multiindex;
    fmpz_t tmp_coeff;
@@ -437,21 +437,23 @@ slong _fmpz_mpoly_addmul(
          for (i=0; i<Blen; i++)
          {
              candidate = multiindex + offset;
+             if (EXPTEST) fprintf(stderr, "Considering candidate %ld\n", candidate);
              if ((candidate < hind_len) && (hind[candidate] < 2*B[0].length) && (hind[candidate] & 1))
              {
                  offset2 = 1;
                  for (j=1; j<Blen; j++)
                  {
-                     if (((candidate - offset2) >= 0) && (hind[candidate - offset2] < hind[candidate] + 2))
+                     offset3 = offset2 * B[j].length;
+                     if (((candidate % offset3) / offset2 != 0) && (hind[candidate - offset2] < hind[candidate] + 2))
                          break;
-                     offset2 *= B[i].length;
+                     offset2 *= B[j].length;
                  }
                  if (j == Blen)
                  {
                      x = chain + candidate;
                      x->next = NULL;
 
-                     mpoly_monomial_set(exp_list[exp_next], B[0].exps + (hind[candidate] >> 1), N);
+                     mpoly_monomial_set(exp_list[exp_next], B[0].exps + N*(hind[candidate] >> 1), N);
                      hind[candidate] ++;
 
                      partial_multiindex = candidate;
@@ -459,10 +461,10 @@ slong _fmpz_mpoly_addmul(
                      {
                          if (bits <= FLINT_BITS)
                              mpoly_monomial_add(exp_list[exp_next], exp_list[exp_next],
-                                                B[l].exps + (partial_multiindex % B[l].length), N);
+                                                B[l].exps + N*(partial_multiindex % B[l].length), N);
                          else
                              mpoly_monomial_add_mp(exp_list[exp_next], exp_list[exp_next],
-                                                   B[l].exps + (partial_multiindex % B[l].length), N);
+                                                   B[l].exps + N*(partial_multiindex % B[l].length), N);
                          partial_multiindex /= B[l].length;
                      }
 
@@ -652,11 +654,11 @@ void fmpz_mpoly_addmul(
 
     for (i = 0; i < Blen; i++)
     {
-        mpoly_max_fields_fmpz(maxfields, (B+i)->exps, (B+i)->length, (B+i)->bits, ctx->minfo);
+        mpoly_max_fields_fmpz(maxBfields, (B+i)->exps, (B+i)->length, (B+i)->bits, ctx->minfo);
         _fmpz_vec_add(maxfields, maxfields, maxBfields, ctx->minfo->nfields);
     }
 
-    _fmpz_mpoly_addmul_maxfields(A, B, Blen, maxBfields, ctx);
+    _fmpz_mpoly_addmul_maxfields(A, B, Blen, maxfields, ctx);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
