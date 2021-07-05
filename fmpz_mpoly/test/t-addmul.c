@@ -84,6 +84,64 @@ main(void)
         flint_set_num_threads(n_randint(state, max_threads) + 1);
     }
 
+    /* Check triple multiplication f*g*h = (f*g)*h */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_struct f[3];
+        fmpz_mpoly_t g, h;
+        slong len, len1, len2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
+
+        fmpz_mpoly_init(f + 0, ctx);
+        fmpz_mpoly_init(f + 1, ctx);
+        fmpz_mpoly_init(f + 2, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(h, ctx);
+
+        len = n_randint(state, 100);
+        len1 = n_randint(state, 100);
+        len2 = n_randint(state, 100);
+
+        coeff_bits = n_randint(state, 200);
+
+        for (j = 0; j < 2; j++)
+        {
+            exp_bits = n_randint(state, 100) + 2;
+            exp_bits1 = n_randint(state, 100) + 2;
+            exp_bits2 = n_randint(state, 100) + 2;
+
+            fmpz_mpoly_randtest_bits(f + 0, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f + 1, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f + 2, state, len1, coeff_bits, exp_bits1, ctx);
+
+            fmpz_mpoly_mul(g, f + 0, f + 1, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+            fmpz_mpoly_mul(g, g, f + 2, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+
+            fmpz_mpoly_addmul(h, f, 3, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+
+            result = fmpz_mpoly_equal(g, h, ctx);
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check f*g*h = (f*g)*h\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
+
+        fmpz_mpoly_clear(f + 0, ctx);
+        fmpz_mpoly_clear(f + 1, ctx);
+        fmpz_mpoly_clear(f + 2, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* Check f*(g + h) = f*g + f*h */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
