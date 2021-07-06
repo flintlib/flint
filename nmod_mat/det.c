@@ -61,11 +61,14 @@ nmod_mat_det(const nmod_mat_t A)
         flint_abort();
     }
 
-    if (dim == 0) return UWORD(1);
+    if (dim == 0) return A->mod.n != 1;
     if (dim == 1) return nmod_mat_entry(A, 0, 0);
 
     nmod_mat_init_set(tmp, A);
-    det = _nmod_mat_det(tmp);
+    if (n_is_prime(A->mod.n))
+       det = _nmod_mat_det(tmp);
+    else
+       det = _nmod_mat_det_howell(tmp);
     nmod_mat_clear(tmp);
 
     return det;

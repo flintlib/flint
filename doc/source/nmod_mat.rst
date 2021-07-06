@@ -378,12 +378,15 @@ Trace
 Determinant and rank
 --------------------------------------------------------------------------------
 
+.. function:: mp_limb_t nmod_mat_det_howell(const nmod_mat_t A)
 
-.. function:: mp_limb_t nmod_mat_det(nmod_mat_t A)
+    Returns the determinant of `A`.
 
-    Returns the determinant of `A`. The modulus of `A` must be a prime number.
+.. function:: mp_limb_t nmod_mat_det(const nmod_mat_t A)
 
-.. function:: slong nmod_mat_rank(nmod_mat_t A)
+    Returns the determinant of `A`.
+
+.. function:: slong nmod_mat_rank(const nmod_mat_t A)
 
     Returns the rank of `A`. The modulus of `A` must be a prime number.
 

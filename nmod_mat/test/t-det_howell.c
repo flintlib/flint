@@ -25,8 +25,7 @@ main(void)
     slong m, mod, rep;
     FLINT_TEST_INIT(state);
     
-
-    flint_printf("det....");
+    flint_printf("det_howell....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -37,14 +36,14 @@ main(void)
         fmpz_t Bdet;
         ulong t;
 
-        m = n_randint(state, 30);
+	m = n_randint(state, 30);
         mod = n_randtest(state);
 	mod += mod == 0;
 
         nmod_mat_init(A, m, m, mod);
         fmpz_mat_init(B, m, m);
 
-	switch (rep % 3)
+        switch (rep % 3)
         {
             case 0:
                 nmod_mat_randrank(A, state, m);
@@ -52,7 +51,7 @@ main(void)
                 break;
             case 1:
                 t = n_randint(state, m);
-		t = FLINT_MIN(t, m);
+                t = FLINT_MIN(t, m);
                 nmod_mat_randrank(A, state, t);
                 nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
                 break;
@@ -60,9 +59,9 @@ main(void)
                 nmod_mat_randtest(A, state);
         }
 
-	fmpz_mat_set_nmod_mat_unsigned(B, A);
+        fmpz_mat_set_nmod_mat_unsigned(B, A);
 
-        Adet = nmod_mat_det(A);
+        Adet = nmod_mat_det_howell(A);
 
         fmpz_init(Bdet);
         fmpz_mat_det_bareiss(Bdet, B);
@@ -80,7 +79,6 @@ main(void)
         fmpz_clear(Bdet);
     }
 
-    
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

@@ -237,6 +237,9 @@ FLINT_DLL mp_limb_t nmod_mat_trace(const nmod_mat_t mat);
 FLINT_DLL mp_limb_t _nmod_mat_det(nmod_mat_t A);
 FLINT_DLL mp_limb_t nmod_mat_det(const nmod_mat_t A);
 
+FLINT_DLL mp_limb_t _nmod_mat_det_howell(nmod_mat_t A);
+FLINT_DLL mp_limb_t nmod_mat_det_howell(const nmod_mat_t A);
+
 /* Rank */
 
 FLINT_DLL slong nmod_mat_rank(const nmod_mat_t A);
