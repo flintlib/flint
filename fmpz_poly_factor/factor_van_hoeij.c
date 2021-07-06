@@ -123,6 +123,12 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    fmpz_poly_factor_mignotte(B, f);
    fmpz_mul_ui(B, B, 2);
    fmpz_add_ui(B, B, 1);
+   /*
+      bound adjustment, we multiply true factors (which might be
+      monic) by the leading coefficient of f in the implementation
+      below
+   */
+   fmpz_mul(B, B, f->coeffs + f->length - 1);
    a = fmpz_clog_ui(B, p);
                 
    /* compute heuristic starting precision */

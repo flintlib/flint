@@ -193,6 +193,12 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_poly_factor_mignotte(T, f);
             fmpz_mul_ui(T, T, 2);
             fmpz_add_ui(T, T, 1);
+	    /*
+	       bound adjustment, we multiply true factors (which might be
+	       monic) by the leading coefficient of f in the implementation
+	       below
+	    */
+	    fmpz_mul(T, T, f->coeffs + f->length - 1); 
             a = fmpz_clog_ui(T, p);
 
             fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
