@@ -29,22 +29,27 @@ n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
     {
         mpz_t t, m;
         mp_limb_t y;
-        mpz_init(t);
+
+	mpz_init(t);
         mpz_init(m);
-        flint_mpz_set_ui(t, a);
+
+	flint_mpz_set_ui(t, a);
         flint_mpz_set_ui(m, n);
-        mpz_powm(t, t, exp, m);
-        y = flint_mpz_get_ui(t);
-        mpz_clear(t);
+
+	mpz_powm(t, t, exp, m);
+
+	y = flint_mpz_get_ui(t);
+
+	mpz_clear(t);
         mpz_clear(m);
-        return y;
+
+	return y;
     }
 }
 
 void
-_nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, 
-                                mpz_srcptr e, mp_srcptr f,
-                                slong lenf, nmod_t mod)
+_nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, mpz_srcptr e,
+	                                  mp_srcptr f, slong lenf, nmod_t mod)
 {
     mp_ptr T, Q;
     slong lenT, lenQ;
@@ -67,12 +72,12 @@ _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly,
     for (i = mpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {
         _nmod_poly_mul(T, res, lenf - 1, res, lenf - 1, mod);
-        _nmod_poly_divrem(Q, res, T, 2 * lenf - 3, f, lenf, mod);
+        _nmod_poly_divrem(Q, res, T, 2*lenf - 3, f, lenf, mod);
 
         if (mpz_tstbit(e, i))
         {
             _nmod_poly_mul(T, res, lenf - 1, poly, lenf - 1, mod);
-            _nmod_poly_divrem(Q, res, T, 2 * lenf - 3, f, lenf, mod);
+            _nmod_poly_divrem(Q, res, T, 2*lenf - 3, f, lenf, mod);
         }
     }
 
@@ -82,8 +87,7 @@ _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly,
 
 void
 nmod_poly_powmod_mpz_binexp(nmod_poly_t res, 
-                           const nmod_poly_t poly, mpz_srcptr e,
-                           const nmod_poly_t f)
+                     const nmod_poly_t poly, mpz_srcptr e, const nmod_poly_t f)
 {
     mp_ptr p;
     slong len = poly->length;
@@ -112,13 +116,18 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
     if (len >= lenf)
     {
         nmod_poly_t t, r;
-        nmod_poly_init_preinv(t, res->mod.n, res->mod.ninv);
-        nmod_poly_init_preinv(r, res->mod.n, res->mod.ninv);
-        nmod_poly_divrem(t, r, poly, f);
+
+        nmod_poly_init_mod(t, res->mod);
+        nmod_poly_init_mod(r, res->mod);
+        
+	nmod_poly_divrem(t, r, poly, f);
+
         nmod_poly_powmod_mpz_binexp(res, r, e, f);
-        nmod_poly_clear(t);
+        
+	nmod_poly_clear(t);
         nmod_poly_clear(r);
-        return;
+        
+	return;
     }
 
     if (mpz_fits_ulong_p(e))
@@ -127,19 +136,19 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
         if (exp <= 2)
         {
-            if (exp == UWORD(0))
+            if (exp == 0)
             {
                 nmod_poly_fit_length(res, 1);
-                res->coeffs[0] = UWORD(1);
+        
+		res->coeffs[0] = 1;
                 res->length = 1;
-            }
-            else if (exp == UWORD(1))
+            } else if (exp == 1)
             {
                 nmod_poly_set(res, poly);
-            }
-            else
+            } else
                 nmod_poly_mulmod(res, poly, poly, f);
-            return;
+
+	    return;
         }
     }
 
@@ -152,26 +161,32 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
     if (poly->length < trunc)
     {
         p = _nmod_vec_init(trunc);
-        flint_mpn_copyi(p, poly->coeffs, poly->length);
-        flint_mpn_zero(p + poly->length, trunc - poly->length);
-        pcopy = 1;
+
+	flint_mpn_copyi(p, poly->coeffs, poly->length);
+	flint_mpn_zero(p + poly->length, trunc - poly->length);
+
+	pcopy = 1;
     } else
         p = poly->coeffs;
 
-    if ((res == poly && !pcopy) || (res == f))
+    if ((res == poly && !pcopy) || res == f)
     {
         nmod_poly_t t;
-        nmod_poly_init2(t, poly->mod.n, trunc);
-        _nmod_poly_powmod_mpz_binexp(t->coeffs,
-            p, e, f->coeffs, lenf, poly->mod);
-        nmod_poly_swap(res, t);
+
+	nmod_poly_init2(t, poly->mod.n, trunc);
+
+	_nmod_poly_powmod_mpz_binexp(t->coeffs, p, e,
+			                           f->coeffs, lenf, poly->mod);
+
+	nmod_poly_swap(res, t);
         nmod_poly_clear(t);
     }
     else
     {
         nmod_poly_fit_length(res, trunc);
-        _nmod_poly_powmod_mpz_binexp(res->coeffs,
-            p, e, f->coeffs, lenf, poly->mod);
+
+	_nmod_poly_powmod_mpz_binexp(res->coeffs,
+                                             p, e, f->coeffs, lenf, poly->mod);
     }
 
     if (pcopy)
