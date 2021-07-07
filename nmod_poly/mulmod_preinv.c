@@ -82,25 +82,21 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
     {
         if (f == res)
         {
-            fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
+            fcoeffs = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * lenf);
             _nmod_vec_set(fcoeffs, f->coeffs, lenf);
-        }
-        else
+        } else
             fcoeffs = f->coeffs;
 
         nmod_poly_fit_length(res, lenf - 1);
         _nmod_poly_mulmod_preinv(res->coeffs, poly1->coeffs, len1,
-                                       poly2->coeffs, len2,
-                                       fcoeffs, lenf,
-                                       finv->coeffs, finv->length,
-                                       res->mod);
+                                     poly2->coeffs, len2, fcoeffs, lenf,
+                                         finv->coeffs, finv->length, res->mod);
         if (f == res)
             flint_free(fcoeffs);
 
         res->length = lenf - 1;
         _nmod_poly_normalise(res);
-    }
-    else
+    } else
     {
         nmod_poly_mul(res, poly1, poly2);
     }
