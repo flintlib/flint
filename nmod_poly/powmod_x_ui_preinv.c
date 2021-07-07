@@ -44,7 +44,7 @@ _nmod_poly_powmod_x_ui_preinv(mp_ptr res, ulong e, mp_srcptr f, slong lenf,
     Q = T + lenT;
 
     flint_mpn_zero(res, lenf - 1);
-    res[0] = WORD(1);
+    res[0] = 1;
 
     l = (int) z_sizeinbase(lenf - 1, 2) - 2;
     window = (WORD(1) << l);
@@ -64,7 +64,7 @@ _nmod_poly_powmod_x_ui_preinv(mp_ptr res, ulong e, mp_srcptr f, slong lenf,
         _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window, f,
                                                      lenf, finv, lenfinv, mod);
         c = l + 1;
-        window = WORD(0);
+        window = 0;
     }
 
     for ( ; i >= 0; i--)
@@ -77,12 +77,12 @@ _nmod_poly_powmod_x_ui_preinv(mp_ptr res, ulong e, mp_srcptr f, slong lenf,
 
         if (e & (UWORD(1) << i))
         {
-            if (window == WORD(0) && i <= l - 1)
+            if (window == 0 && i <= l - 1)
                 c = i;
         
 	    if ( c >= 0)
               window = window | (WORD(1) << c);
-        } else if (window == WORD(0))
+        } else if (window == 0)
             c = l + 1;
         
 	if (c == 0)
@@ -92,7 +92,7 @@ _nmod_poly_powmod_x_ui_preinv(mp_ptr res, ulong e, mp_srcptr f, slong lenf,
 			                          f, lenf, finv, lenfinv, mod);
 
             c = l + 1;
-            window = WORD(0);
+            window = 0;
         }
     }
 
@@ -143,14 +143,14 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
 
     if (e <= 2)
     {
-        if (e == UWORD(0))
+        if (e == 0)
         {
             nmod_poly_fit_length(res, 1);
         
-	    res->coeffs[0] = UWORD(1);
+	    res->coeffs[0] = 1;
             res->length = 1;
         }
-        else if (e == UWORD(1))
+        else if (e == 1)
         {
             nmod_poly_t r;
         

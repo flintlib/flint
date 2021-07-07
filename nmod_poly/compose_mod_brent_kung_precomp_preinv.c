@@ -30,7 +30,7 @@ _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
 
     tmp1 = _nmod_vec_init(B->c - f->length + 1);
     
-    A->rows[0][0] = UWORD(1);
+    A->rows[0][0] = 1;
 
     for (i = 1; i < m; i++)
         _nmod_poly_divrem(tmp1, A->rows[i], B->rows[i], B->c, f->coeffs,
