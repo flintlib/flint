@@ -20,12 +20,9 @@
 
 void
 _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                                             const nmod_poly_struct * polys,
-                                             slong lenpolys, slong l,
-                                             mp_srcptr g, slong glen,
-                                             mp_srcptr poly, slong len,
-                                             mp_srcptr polyinv, slong leninv,
-                                             nmod_t mod)
+                const nmod_poly_struct * polys, slong lenpolys, slong l,
+                         mp_srcptr g, slong glen, mp_srcptr poly, slong len,
+                                   mp_srcptr polyinv, slong leninv, nmod_t mod)
 {
     nmod_mat_t A, B, C;
     mp_ptr t, h;
@@ -33,30 +30,31 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 
     n = len - 1;
 
-    m = n_sqrt(n * len2) + 1;
+    m = n_sqrt(n*len2) + 1;
 
     h = _nmod_vec_init(n);
     t = _nmod_vec_init(n);
 
-    k = len / m + 1;
+    k = len/m + 1;
 
     nmod_mat_init(A, m, n, mod.n);
-    nmod_mat_init(B, k * len2, m, mod.n);
-    nmod_mat_init(C, k * len2, n, mod.n);
+    nmod_mat_init(B, k*len2, m, mod.n);
+    nmod_mat_init(C, k*len2, n, mod.n);
 
     /* Set rows of B to the segments of polys */
     for (j = 0; j < len2; j++)
     {
         len1 = (polys + j)->length;
-        for (i = 0; i < len1 / m; i++)
-            _nmod_vec_set(B->rows[i + j * k], (polys + j)->coeffs + i * m, m);
-        _nmod_vec_set(B->rows[i + j * k], (polys + j)->coeffs + i * m,
-                      len1 % m);
+
+        for (i = 0; i < len1/m; i++)
+            _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, m);
+        
+	_nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, len1%m);
     }
 
     /* Set rows of A to powers of last element of polys */
     _nmod_poly_powers_mod_preinv_naive(A->rows, g, glen,
-	                 m, poly, len, polyinv, leninv, mod);
+	                                   m, poly, len, polyinv, leninv, mod);
 
     nmod_mat_mul(C, B, A);
 
@@ -73,7 +71,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     
     for (j = 0; j < len2; j++)
     {
-        _nmod_vec_set((res + j)->coeffs, C->rows[(j + 1) * k - 1], n);
+        _nmod_vec_set((res + j)->coeffs, C->rows[(j + 1)*k - 1], n);
 
         if (n == 1)
         {
@@ -82,16 +80,16 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                 t[0] = n_mulmod2_preinv(res[j].coeffs[0],
                                                         h[0], mod.n, mod.ninv);
                 res[j].coeffs[0] = n_addmod(t[0],
-                                           C->rows[(j + 1) * k - i][0], mod.n);
+                                             C->rows[(j + 1)*k - i][0], mod.n);
             }
         } else
         {
             for (i = 2; i <= k; i++)
             {
                 _nmod_poly_mulmod_preinv(t, res[j].coeffs,
-                              n, h, n, poly, len, polyinv, leninv, mod);
+                                     n, h, n, poly, len, polyinv, leninv, mod);
                 _nmod_poly_add(res[j].coeffs, t, n,
-                                      C->rows[(j + 1) * k - i], n, mod);
+                                               C->rows[(j + 1)*k - i], n, mod);
             }
         }
     }
@@ -106,11 +104,8 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 
 void
 nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                                            const nmod_poly_struct * polys,
-                                            slong len1, slong n,
-                                            const nmod_poly_t g,
-                                            const nmod_poly_t poly,
-                                            const nmod_poly_t polyinv)
+                     const nmod_poly_struct * polys, slong len1, slong n,
+        const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv)
 {
     slong len2 = poly->length;
     slong len3, i;
@@ -118,10 +113,10 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     for (i = 0; i < len1; i++)
     {
         len3 = (polys + i)->length;
-        if (len3 >= len2)
+        
+	if (len3 >= len2)
         {
-            flint_printf
-                ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
+            flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
                  "The degree of the first polynomial must be smaller than that of the "
                  " modulus\n");
             flint_abort();
@@ -130,9 +125,8 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 
     if (n > len1)
     {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
-             "n is larger than the length of polys\n");
+        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
+                                     "n is larger than the length of polys\n");
         flint_abort();
     }
 
@@ -162,10 +156,8 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     }
 
     _nmod_poly_compose_mod_brent_kung_vec_preinv(res, polys, len1, n,
-                                                 g->coeffs, g->length,
-                                                 poly->coeffs, len2,
-                                                 polyinv->coeffs,
-                                                 polyinv->length, poly->mod);
+                g->coeffs, g->length, poly->coeffs, len2, polyinv->coeffs,
+                                                   polyinv->length, poly->mod);
 
     for (i = 0; i < n; i++)
         _nmod_poly_normalise(res + i);
