@@ -41,8 +41,7 @@ _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
 
 void
 _nmod_poly_precompute_matrix(nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
-                              slong len2, mp_srcptr poly2inv, slong len2inv,
-                              nmod_t mod)
+                     slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod)
 {
     /* Set rows of A to powers of poly1 */
     slong n, m;
@@ -90,24 +89,21 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
     {
         flint_mpn_copyi(ptr1, poly1->coeffs, len1);
         flint_mpn_zero(ptr1 + len1, len - len1);
-    }
-    else
+    } else
     {
-        _nmod_poly_rem(ptr1, poly1->coeffs, len1,
-                             poly2->coeffs, len2, A->mod);
+        _nmod_poly_rem(ptr1, poly1->coeffs, len1, poly2->coeffs, len2, A->mod);
     }
 
-    _nmod_poly_precompute_matrix (A, ptr1, poly2->coeffs, len2, poly2inv->coeffs,
-                   poly2inv->length, A->mod);
+    _nmod_poly_precompute_matrix(A, ptr1, poly2->coeffs,
+		             len2, poly2inv->coeffs, poly2inv->length, A->mod);
 
-    _nmod_vec_clear (ptr1);
+    _nmod_vec_clear(ptr1);
 }
 
 void
-_nmod_poly_compose_mod_brent_kung_precomp_preinv
-                            (mp_ptr res, mp_srcptr poly1, slong len1,
-                            const nmod_mat_t A, mp_srcptr poly3, slong len3,
-                            mp_srcptr poly3inv, slong len3inv, nmod_t mod)
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
+		  slong len1, const nmod_mat_t A, mp_srcptr poly3, slong len3,
+                                 mp_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t B, C;
     mp_ptr t, h;
@@ -141,22 +137,22 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv
     t = _nmod_vec_init(n);
 
     /* Set rows of B to the segments of poly1 */
-    for (i = 0; i < len1 / m; i++)
+    for (i = 0; i < len1/m; i++)
         _nmod_vec_set(B->rows[i], poly1 + i*m, m);
 
-    _nmod_vec_set(B->rows[i], poly1 + i*m, len1 % m);
+    _nmod_vec_set(B->rows[i], poly1 + i*m, len1%m);
 
     nmod_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
     _nmod_vec_set(res, C->rows[m - 1], n);
     _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n,
-                             poly3, len3, poly3inv, len3inv,mod);
+                                           poly3, len3, poly3inv, len3inv,mod);
 
     for (i = m - 2; i >= 0; i--)
     {
         _nmod_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
-                                 poly3inv, len3inv, mod);
+                                                       poly3inv, len3inv, mod);
         _nmod_poly_add(res, t, n, C->rows[i], n, mod);
     }
 
@@ -207,10 +203,10 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     {
         nmod_poly_t tmp;
         
-        nmod_poly_init_preinv(tmp, res->mod.n, res->mod.ninv);
+        nmod_poly_init_mod(tmp, res->mod);
         
         nmod_poly_compose_mod_brent_kung_precomp_preinv(tmp, poly1, A,
-                                                poly3, poly3inv);
+                                                              poly3, poly3inv);
         
         nmod_poly_swap(tmp, res);
         
@@ -222,8 +218,8 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     nmod_poly_fit_length(res, len);
 
     _nmod_poly_compose_mod_brent_kung_precomp_preinv(res->coeffs,
-        poly1->coeffs, len1, A, poly3->coeffs, len3,
-        poly3inv->coeffs, poly3inv->length, res->mod);
+                            poly1->coeffs, len1, A, poly3->coeffs, len3,
+                                 poly3inv->coeffs, poly3inv->length, res->mod);
 
     res->length = len;
     
