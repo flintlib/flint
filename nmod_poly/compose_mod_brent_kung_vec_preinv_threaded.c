@@ -70,7 +70,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
         if (j >= arg.len2)
             return;
 
-        _nmod_vec_set(res[j].coeffs, C->rows[(j + 1) * k - 1], n);
+        _nmod_vec_set(res[j].coeffs, C->rows[(j + 1)*k - 1], n);
 
         if (n == 1) /* special case, constant polynomials */
         {    
@@ -78,7 +78,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
             {
                 t[0] = n_mulmod2_preinv(res[j].coeffs[0], h[0], p.n, p.ninv);
                 res[j].coeffs[0] = n_addmod(t[0],
-                                             C->rows[(j + 1) * k - i][0], p.n);
+                                               C->rows[(j + 1)*k - i][0], p.n);
             }
         } else
         { 
@@ -87,7 +87,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
                 _nmod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
                                                       len, polyinv, leninv, p);
                 _nmod_poly_add(res[j].coeffs, t, n,
-                                               C->rows[(j + 1) * k - i], n, p);
+                                                 C->rows[(j + 1)*k - i], n, p);
             }
         }
     }
@@ -114,15 +114,15 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
 
     n = len - 1;
 
-    m = n_sqrt(n * len2) + 1;
+    m = n_sqrt(n*len2) + 1;
 
     h = _nmod_vec_init(n);
 
-    k = len / m + 1;
+    k = len/m + 1;
 
     nmod_mat_init(A, m, n, mod.n);
-    nmod_mat_init(B, k * len2, m, mod.n);
-    nmod_mat_init(C, k * len2, n, mod.n);
+    nmod_mat_init(B, k*len2, m, mod.n);
+    nmod_mat_init(C, k*len2, n, mod.n);
 
     /* Set rows of B to the segments of polys */
     for (j = 0; j < len2; j++)
