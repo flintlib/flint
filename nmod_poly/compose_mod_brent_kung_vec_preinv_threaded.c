@@ -138,7 +138,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
 
     /* Set rows of A to powers of g */
     _nmod_poly_powers_mod_preinv_threaded_pool(A->rows, g, glen,
-	                 m, poly, len, polyinv, leninv, mod, threads, num_threads);
+                         m, poly, len, polyinv, leninv, mod, threads, num_threads);
 
     _nmod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
                                                          threads, num_threads);
@@ -151,7 +151,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     } else
     {
         
-	_nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
+        _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                              len, polyinv, leninv, mod);
     }
 
@@ -174,7 +174,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
         args[i].p       = mod;
         args[i].len2    = len2;
 #if FLINT_USES_PTHREAD
-	args[i].mutex   = &mutex;
+        args[i].mutex   = &mutex;
 #endif
     }
 

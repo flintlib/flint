@@ -95,14 +95,14 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
     }
 
     _nmod_poly_precompute_matrix(A, ptr1, poly2->coeffs,
-		             len2, poly2inv->coeffs, poly2inv->length, A->mod);
+                             len2, poly2inv->coeffs, poly2inv->length, A->mod);
 
     _nmod_vec_clear(ptr1);
 }
 
 void
 _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
-		  slong len1, const nmod_mat_t A, mp_srcptr poly3, slong len3,
+                  slong len1, const nmod_mat_t A, mp_srcptr poly3, slong len3,
                                  mp_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t B, C;

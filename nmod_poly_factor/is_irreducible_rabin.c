@@ -48,12 +48,12 @@ nmod_poly_is_irreducible_rabin(const nmod_poly_t f)
         nmod_poly_init(x, p);
         nmod_poly_init(x_p, p);
 
-	nmod_poly_set_coeff_ui(x, 1, 1);
+	    nmod_poly_set_coeff_ui(x, 1, 1);
 
         /* Compute x^q mod f */
         nmod_poly_powpowmod(x_p, x, p, n, f);
 
-	if (!nmod_poly_is_zero(x_p))
+	    if (!nmod_poly_is_zero(x_p))
             nmod_poly_make_monic(x_p, x_p);
 
         /* Now do the irreducibility test */
@@ -71,7 +71,7 @@ nmod_poly_is_irreducible_rabin(const nmod_poly_t f)
 
             n_factor_init(&factors);
 
-	    n_factor(&factors, n, 1);
+	        n_factor(&factors, n, 1);
 
             for (i = 0; i < factors.num; i++)
             {

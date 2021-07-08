@@ -108,8 +108,8 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                 if (work_to_do)
                 {
                     for (j = i + 1; j < n; j++)
-                    {	
-			if (i < c && piv[i] < c)
+                    {        
+                        if (i < c && piv[i] < c)
                         {
                             smul_ppmm(p1h, p1l, *XXx(j, k), diag[i]);
                             smul_ppmm(p2h, p2l, *LU(j, piv[i]), *XXx(i, k));
@@ -134,9 +134,9 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                                         flag = fmpz_divides(XXx(j, k), XXx(j, k), diag + i - 1);
                                         if (!flag)
                                             goto cleanup;
-				    }
+                                    }
 
-				    small = 0;
+                                    small = 0;
                                 } else
                                 {
                                     udiv_qrnnd_preinv(quo, rem,
@@ -189,11 +189,11 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                 for (j = i + 1; j < n; j++)
                 {
                     if (i < c && piv[i] < c)
-		    {
+                    {
                         fmpz_mul(XXx(j, k), XXx(j, k), diag + i);
                         fmpz_mul(T, LU(j, piv[i]), XXx(i, k));
                         fmpz_sub(XXx(j, k), XXx(j, k), T);
-		    }
+                    }
                     if (i > 0)
                     {
                         if (i < c && piv[i - 1] < c)
@@ -217,7 +217,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                 {
                     if (rnk != 0)
                        smul_ppmm(p1m, p1l, *XXx(l, k), diag[rnk - 1]);
-		    else
+                        else
                     {
                        p1l = *XXx(l, k);
                        p1m = FLINT_SIGN_EXT(p1l);
@@ -286,10 +286,10 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                         fmpz_sub(XX(i, k), XX(i, k), T);
                     }
                     flag = fmpz_divides(XX(i, k), XX(i, k), diag + l);
-		    if (!flag)
+                        if (!flag)
                         goto cleanup;
                 }
-		l--;
+                l--;
             } else
                  fmpz_zero(XX(i, k));
         }

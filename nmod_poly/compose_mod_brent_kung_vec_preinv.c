@@ -49,12 +49,12 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
         for (i = 0; i < len1/m; i++)
             _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, m);
         
-	_nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, len1%m);
+        _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, len1%m);
     }
 
     /* Set rows of A to powers of last element of polys */
     _nmod_poly_powers_mod_preinv_naive(A->rows, g, glen,
-	                                   m, poly, len, polyinv, leninv, mod);
+                                           m, poly, len, polyinv, leninv, mod);
 
     nmod_mat_mul(C, B, A);
 
@@ -114,7 +114,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     {
         len3 = (polys + i)->length;
         
-	if (len3 >= len2)
+        if (len3 >= len2)
         {
             flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
                  "The degree of the first polynomial must be smaller than that of the "
@@ -138,7 +138,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
         for (i = 0; i < n; i++)
             nmod_poly_zero(res + i);
 
-	return;
+        return;
     }
 
     if (len2 == 2)
@@ -146,13 +146,13 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
         for (i = 0; i < n; i++)
             nmod_poly_set(res + i, polys + i);
 
-	return;
+        return;
     }
 
     for (i = 0; i < n; i++)
     {
         nmod_poly_fit_length(res + i, len2 - 1);
-	_nmod_poly_set_length(res + i, len2 - 1);
+        _nmod_poly_set_length(res + i, len2 - 1);
     }
 
     _nmod_poly_compose_mod_brent_kung_vec_preinv(res, polys, len1, n,

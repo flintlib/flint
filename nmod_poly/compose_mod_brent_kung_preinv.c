@@ -20,7 +20,7 @@
 
 void
 _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
-		  slong len1, mp_srcptr poly2, mp_srcptr poly3, slong len3,
+                  slong len1, mp_srcptr poly2, mp_srcptr poly3, slong len3,
                                  mp_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t A, B, C;
@@ -61,7 +61,7 @@ _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
 
     /* Set rows of A to powers of poly2 */
     _nmod_poly_powers_mod_preinv_naive(A->rows, poly2, n,
-	                               m, poly3, len3, poly3inv, len3inv, mod);
+                                       m, poly3, len3, poly3inv, len3inv, mod);
 
     nmod_mat_mul(C, B, A);
 

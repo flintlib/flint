@@ -69,7 +69,7 @@ _nmod_poly_powmod_ui_binexp_preinv(mp_ptr res, mp_srcptr poly, ulong e,
 
 void
 nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
-		          ulong e, const nmod_poly_t f, const nmod_poly_t finv)
+                          ulong e, const nmod_poly_t f, const nmod_poly_t finv)
 {
     mp_ptr p;
     slong len = poly->length;
@@ -93,14 +93,14 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
     {
         nmod_poly_t t, r;
         
-	nmod_poly_init_mod(t, res->mod);
+        nmod_poly_init_mod(t, res->mod);
         nmod_poly_init_mod(r, res->mod);
 
         nmod_poly_divrem(t, r, poly, f);
         
-	nmod_poly_powmod_ui_binexp_preinv(res, r, e, f, finv);
+        nmod_poly_powmod_ui_binexp_preinv(res, r, e, f, finv);
         
-	nmod_poly_clear(t);
+        nmod_poly_clear(t);
         nmod_poly_clear(r);
         return;
     }
@@ -111,14 +111,14 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
         {
             nmod_poly_fit_length(res, 1);
         
-	    res->coeffs[0] = 1;
+            res->coeffs[0] = 1;
             res->length = 1;
         } else if (e == 1)
             nmod_poly_set(res, poly);
         else
             nmod_poly_mulmod_preinv(res, poly, poly, f, finv);
 
-	return;
+        return;
     }
 
     if (len == 0)
@@ -131,10 +131,10 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
     {
         p = _nmod_vec_init(trunc);
 
-	flint_mpn_copyi(p, poly->coeffs, len);
+        flint_mpn_copyi(p, poly->coeffs, len);
         flint_mpn_zero(p + len, trunc - len);
 
-	pcopy = 1;
+        pcopy = 1;
     } else
         p = poly->coeffs;
 
@@ -144,16 +144,16 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
 
         nmod_poly_init2(t, poly->mod.n, trunc);
         
-	_nmod_poly_powmod_ui_binexp_preinv(t->coeffs,
+        _nmod_poly_powmod_ui_binexp_preinv(t->coeffs,
                  p, e, f->coeffs, lenf, finv->coeffs, finv->length, poly->mod);
         
-	nmod_poly_swap(res, t);
+        nmod_poly_swap(res, t);
         nmod_poly_clear(t);
     } else
     {
         nmod_poly_fit_length(res, trunc);
       
-      	_nmod_poly_powmod_ui_binexp_preinv(res->coeffs,
+        _nmod_poly_powmod_ui_binexp_preinv(res->coeffs,
                  p, e, f->coeffs, lenf, finv->coeffs, finv->length, poly->mod);
     }
 
