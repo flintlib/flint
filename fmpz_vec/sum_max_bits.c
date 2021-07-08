@@ -46,7 +46,9 @@ void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
 
         for (j = 0; j < length; j++)
         {
-            maxabs[0] = FLINT_MAX(maxabs[0], fmpz_sizeinbase(coeffs + j, 2));
+            slong this_size = fmpz_sizeinbase(coeffs + j, 2);
+
+            maxabs[0] = FLINT_MAX(maxabs[0], this_size);
 
             if (fmpz_sgn(coeffs + j) < 0)
                 fmpz_sub(sum, sum, coeffs + j);
