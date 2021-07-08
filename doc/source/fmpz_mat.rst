@@ -973,6 +973,15 @@ allowed between arguments.
     Note that the matrices `A` and `B` may have any shape as long as they have
     the same number of rows.
 
+.. function:: int fmpz_mat_can_solve(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Returns `1` if the system `AX = B` can be solved. If so it computes
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`. The
+    computed denominator will not generally be minimal.
+
+    Note that the matrices `A` and `B` may have any shape as long as they have
+    the same number of rows.
+
 Row reduction
 --------------------------------------------------------------------------------
 
