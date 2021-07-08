@@ -567,7 +567,7 @@ ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 }
 
 static __inline__
-void flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
+ulong flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
     if (FLINT_BIT_COUNT(c) <= 32)
       return (ulong) mpz_tdiv_q_ui(q, n, (unsigned long) c);
