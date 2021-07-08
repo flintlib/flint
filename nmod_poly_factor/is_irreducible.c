@@ -20,9 +20,7 @@ int
 nmod_poly_is_irreducible(const nmod_poly_t f)
 {
     if (nmod_poly_length(f) > 2)
-    {
         return nmod_poly_is_irreducible_ddf(f);
-    }
 
     return 1;
 }

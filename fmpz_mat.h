@@ -510,40 +510,40 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
    fmpz_mat_minpoly_modular(cp, mat);
 }
 
-/* Rank *********************************************************************/
+/* Rank **********************************************************************/
 
 FLINT_DLL slong fmpz_mat_rank(const fmpz_mat_t A);
 
-/* Nonsingular solving ******************************************************/
+/* Nonsingular solving *******************************************************/
 
 FLINT_DLL void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,
-        const fmpz_mat_t A, const fmpz_mat_t B);
+                                       const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL int fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
-        const fmpz_mat_t A, const fmpz_mat_t B);
+                                       const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
-        const fmpz_mat_t A, const fmpz_mat_t B);
+                                       const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
-        const fmpz_mat_t A, const fmpz_mat_t B);
+                                       const fmpz_mat_t A, const fmpz_mat_t B);
 
-FLINT_DLL void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm,
-        const fmpz_mat_t FFLU, const fmpz_mat_t B);
+FLINT_DLL int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm,
+                                    const fmpz_mat_t FFLU, const fmpz_mat_t B);
 
 FLINT_DLL mp_limb_t
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
-		                  const fmpz_mat_t A, const fmpz_t det_bound);
+		                   const fmpz_mat_t A, const fmpz_t det_bound);
 
 FLINT_DLL mp_limb_t *
 fmpz_mat_dixon_get_crt_primes(slong * num_primes,
-		                             const fmpz_mat_t A, mp_limb_t p);
+		                              const fmpz_mat_t A, mp_limb_t p);
 
 FLINT_DLL void
 _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 		  const fmpz_mat_t A, const fmpz_mat_t B,
-			       const nmod_mat_t Ainv, mp_limb_t p,
-		                              const fmpz_t N, const fmpz_t D);
+ 			       const nmod_mat_t Ainv, mp_limb_t p,
+                                               const fmpz_t N, const fmpz_t D);
 
 FLINT_DLL int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         const fmpz_mat_t A, const fmpz_mat_t B);
@@ -552,29 +552,33 @@ FLINT_DLL void
 _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                      const fmpz_mat_t A, const fmpz_mat_t B,
                                  const nmod_mat_t Ainv, mp_limb_t p,
-                                              const fmpz_t N, const fmpz_t D);
-
+                                               const fmpz_t N, const fmpz_t D);
+ 
 FLINT_DLL int
 fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-		                              const fmpz_mat_t A, const fmpz_mat_t B);
+		                       const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL int
 fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
-	                                  const fmpz_mat_t A, const fmpz_mat_t B);
+	                               const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL int
 fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
-                                      const fmpz_mat_t A, const fmpz_mat_t B);
+                                       const fmpz_mat_t A, const fmpz_mat_t B);
 
-/* Nullspace ****************************************************************/
+FLINT_DLL int
+fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den,
+ 		                       const fmpz_mat_t A, const fmpz_mat_t B);
+
+/* Nullspace *****************************************************************/
 
 FLINT_DLL slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
 
-/* Inverse ******************************************************************/
+/* Inverse *******************************************************************/
 
 FLINT_DLL int fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 
-/* Modular reduction and reconstruction *************************************/
+/* Modular reduction and reconstruction **************************************/
 
 FLINT_DLL void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
 

@@ -873,10 +873,17 @@ allowed between arguments.
     Uses fraction-free LU decomposition followed by fraction-free
     forward and back substitution.
 
-.. function:: void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm, const fmpz_mat_t FFLU, const fmpz_mat_t B)
+.. function:: int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm, const fmpz_mat_t FFLU, const fmpz_mat_t B)
 
     Performs fraction-free forward and back substitution given a precomputed
-    fraction-free LU decomposition and corresponding permutation.
+    fraction-free LU decomposition and corresponding permutation. If no
+    impossible division is encountered, the function returns `1`. This does not
+    mean the system has a solution, however a return value of `0` can only
+    occur if the system is insoluble.
+
+    If the return value is `1` and `r` is the rank of the matrix `A` whose FFLU
+    we have, then the first `r` rows of `p(A)y = p(b)d` hold, where `d` is the
+    denominator of the FFLU. The remaining rows must be checked by the caller.
 
 .. function:: int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
@@ -951,6 +958,17 @@ allowed between arguments.
     computed denominator will not generally be minimal.
 
     Uses a Chinese remainder algorithm.
+
+    Note that the matrices `A` and `B` may have any shape as long as they have
+    the same number of rows.
+
+.. function:: fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Returns `1` if the system `AX = B` can be solved. If so it computes
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`. The
+    computed denominator will not generally be minimal.
+
+    Uses a fraction free LU decomposition algorithm.
 
     Note that the matrices `A` and `B` may have any shape as long as they have
     the same number of rows.
