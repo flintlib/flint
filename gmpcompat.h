@@ -532,7 +532,7 @@ ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       
       FLINT_MOCK_MPZ_UI(tc, c);
 
-      mpz_cdiv_qr(q, r, n, tc);
+      mpz_cdiv_qr(q, rz, n, tc);
 
       r = flint_mpz_get_ui(rz);
 
@@ -556,7 +556,7 @@ ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       
       FLINT_MOCK_MPZ_UI(tc, c);
 
-      mpz_fdiv_qr(q, r, n, tc);
+      mpz_fdiv_qr(q, rz, n, tc);
 
       r = flint_mpz_get_ui(rz);
 
@@ -580,7 +580,7 @@ void flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       
       FLINT_MOCK_MPZ_UI(tc, c);
 
-      mpz_tdiv_qr(q, r, n, tc);
+      mpz_tdiv_qr(q, rz, n, tc);
 
       r = flint_mpz_get_ui(rz);
 
