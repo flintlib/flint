@@ -1258,3 +1258,28 @@ v 2.6.3 -- 12 Aug 2020
  * Fix some broken asserts
  * Support standard GNU installation directories in CMake build
  * Fix stack overflow with ICC
+
+2.8.0 -- 9 Jul 2021
+
+ * New fq_default module which combines existing finite fields
+ * Speedups for linear algebra when using BLAS and/or threading
+ * New series expansions with coefficients in QQ
+ * Faster CRT
+ * New fmpz_mod_mpoly module
+ * Polynomial factoring improvements over ZZ
+ * Fixed bugs in gmpcompat on Windows
+ * Add fmpz_mat_can_solve_fflu and fmpz_mat_can_solve
+ * Cleanup of the nmod_poly and nmod_poly_factor code
+ * Implement nmod_mat_det_howell
+ * Add fmpz_mod_poly_divides, fmpz_divides, n_divides, nmod_poly_divides
+ * Interface for multiplying matrices by vectors and arrays
+ * Nearest Euclidean division
+ * Subresultant GCD
+ * XGCD over ZZ with canonical Bezout coefficients
+ * Add fmpz_mpoly resultant and discriminant
+ * Add deprecations list
+ * Add FLINT_SGN macro
+ * Speedups for series computations
+ * Switch to GitHub Actions for CI
+ * Improve Taylor shift
+ * Numerous bug fixes and speedups
