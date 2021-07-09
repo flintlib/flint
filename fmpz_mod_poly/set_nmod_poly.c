@@ -18,14 +18,7 @@ void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f, const nmod_poly_t g)
 {
     slong i;
     
-    /* fit_length */
-    if (f->alloc < g->length)
-    {
-        slong alloc = FLINT_MAX(2*f->alloc, g->length);
-        f->coeffs = (fmpz *) flint_realloc(f->coeffs, alloc*sizeof(fmpz));
-        flint_mpn_zero((mp_ptr) (f->coeffs + f->alloc), alloc - f->alloc);
-    }
-
+    _fmpz_mod_poly_fit_length(f, g->length);
     _fmpz_mod_poly_set_length(f, g->length);
 
     for (i = 0; i < g->length; i++)

@@ -121,8 +121,15 @@ FLINT_DLL void fmpz_mod_poly_clear(fmpz_mod_poly_t poly,
 FLINT_DLL void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len,
-                                                     const fmpz_mod_ctx_t ctx);
+FLINT_DLL void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len);
+
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    _fmpz_mod_poly_fit_length(poly, len);
+}
+
 
 /*  Normalisation and truncation *********************************************/
 

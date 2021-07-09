@@ -18,7 +18,7 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
     const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 {
-    slong i, iQ, iR;
+    slong iQ, iR;
     fmpz * W;
     TMP_INIT;
 	
@@ -26,14 +26,14 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
 	
     if (R != A)
     {
-        W = (fmpz *) TMP_ALLOC(lenA*sizeof(fmpz));
-		
-		for (i = 0; i < lenA; i++)
-		   fmpz_init(W + i);
-		   
+        /* cannot use R as it might not have enough space */
+        FMPZ_VEC_TMP_INIT(W, lenA);
         _fmpz_vec_set(W, A, lenA);
-    } else
+    }
+    else
+    {
        W = R;
+    }
 
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
@@ -56,11 +56,8 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
 	
     if (R != A)
     {
-       for (i = 0; i < lenB - 1; i++)
-	      fmpz_swap(R + i, W + i);
-	   
-	   for (i = 0; i < lenA; i++)
-	      fmpz_clear(W + i);
+        _fmpz_vec_swap(R, W, lenB - 1);
+        FMPZ_VEC_TMP_CLEAR(W, lenA);
     }
 	
 	TMP_END;
