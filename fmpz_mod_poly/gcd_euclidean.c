@@ -29,8 +29,11 @@ slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
         fmpz_t invR3;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
         slong lenR2, lenR3;
+        TMP_INIT;
 
-        W  = _fmpz_vec_init(lenW);
+        TMP_START;
+
+        FMPZ_VEC_TMP_INIT(W, lenW);
         Q  = W;
         R1 = W + FLINT_MAX(lenA - lenB + 1, lenB);
         R2 = R1 + lenA;
@@ -44,7 +47,9 @@ slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
         if (lenR3 == 0)
         {
             _fmpz_vec_set(G, B, lenB);
-            _fmpz_vec_clear(W, lenW);
+            FMPZ_VEC_TMP_CLEAR(W, lenW);
+
+            TMP_END;
             return lenB;
         }
 
@@ -69,9 +74,10 @@ slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
 
         _fmpz_vec_set(G, R2, lenR2);
 
-        _fmpz_vec_clear(W, lenW);
+        FMPZ_VEC_TMP_CLEAR(W, lenW);
         fmpz_clear(invR3);
 
+        TMP_END;
         return lenR2;
     }
 }

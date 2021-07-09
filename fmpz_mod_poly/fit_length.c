@@ -15,15 +15,14 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len,
-                                                      const fmpz_mod_ctx_t ctx)
+void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t f, slong len)
 {
-    if (len > poly->alloc)
+    if (f->alloc < len)
     {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * poly->alloc)
-            len = 2 * poly->alloc;
-        fmpz_mod_poly_realloc(poly, len, ctx);
+        slong alloc = FLINT_MAX(2*f->alloc, len);
+        f->coeffs = FLINT_ARRAY_REALLOC(f->coeffs, alloc, fmpz);
+        flint_mpn_zero((mp_ptr) (f->coeffs + f->alloc), alloc - f->alloc);
+        f->alloc = alloc;
     }
 }
 

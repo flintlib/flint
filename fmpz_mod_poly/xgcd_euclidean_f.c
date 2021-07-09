@@ -34,8 +34,10 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
     {
         fmpz *Q, *R;
         slong lenQ, lenR, lenD = 0;
+        TMP_INIT;
+        TMP_START;
 
-        Q = _fmpz_vec_init(2 * lenA);
+        FMPZ_VEC_TMP_INIT(Q, 2*lenA);
         R = Q + lenA;
 
         _fmpz_mod_poly_divrem_f(f, Q, R, A, lenA, B, lenB, p);
@@ -51,7 +53,9 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
             _fmpz_vec_set(G, B, lenB);
             fmpz_one(T + 0);
 
-            _fmpz_vec_clear(Q, 2 * lenA);
+            FMPZ_VEC_TMP_CLEAR(Q, 2*lenA);
+
+            TMP_END;
             return lenB;
         }
         else
@@ -61,7 +65,7 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
             slong lenU, lenV1, lenV3, lenW;
 
             fmpz_init(inv);
-            W  = _fmpz_vec_init(FLINT_MAX(5 * lenB, lenA + lenB));
+            FMPZ_VEC_TMP_INIT(W, FLINT_MAX(5*lenB, lenA + lenB));
             D  = W  + lenB;
             U  = D  + lenB;
             V1 = U  + lenB;
@@ -114,11 +118,12 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
 
 cleanup:
             fmpz_clear(inv);
-            _fmpz_vec_clear(W, FLINT_MAX(5 * lenB, lenA + lenB));
+            FMPZ_VEC_TMP_CLEAR(W, FLINT_MAX(5*lenB, lenA + lenB));
 			
 cleanup2:
-            _fmpz_vec_clear(Q, 2 * lenA);
+            FMPZ_VEC_TMP_CLEAR(Q, 2*lenA);
 
+            TMP_END;
             return lenD;
         }
     }

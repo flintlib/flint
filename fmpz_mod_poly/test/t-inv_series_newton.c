@@ -22,25 +22,23 @@ int
 main(void)
 {
     int i, result;
-    fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
     flint_printf("inv_series_newton....");
     fflush(stdout);
 
-    fmpz_mod_ctx_init_ui(ctx, 2);
-
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
+        fmpz_mod_ctx_t ctx;
         fmpz_mod_poly_t a, b, c, one;
         slong n = n_randint(state, 80) + 1;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
-        fmpz_mod_ctx_set_modulus(ctx, p);
+        fmpz_mod_ctx_init(ctx, p);
 
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
@@ -82,6 +80,7 @@ main(void)
         fmpz_mod_poly_clear(c, ctx);
         fmpz_mod_poly_clear(one, ctx);
         fmpz_clear(p);
+        fmpz_mod_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

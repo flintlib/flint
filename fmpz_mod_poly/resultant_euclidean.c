@@ -45,13 +45,15 @@ _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
         fmpz *u, *v, *r, *t, *w;
         slong l0, l1, l2;
         fmpz_t lc, invB;
+        TMP_INIT;
+        TMP_START;
 
         fmpz_init(lc);
         fmpz_init(invB);
 
         fmpz_set_ui(res, 1);
 
-        w = _fmpz_vec_init(3 * len1);
+        FMPZ_VEC_TMP_INIT(w, 3*len1);
         u = w;
         v = w + len1;
         r = v + len1;
@@ -105,10 +107,12 @@ _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
         }
         while (l2 > 0);
 
-        _fmpz_vec_clear(w, 3 * len1);
+        FMPZ_VEC_TMP_CLEAR(w, 3*len1);
 
         fmpz_clear(invB);
         fmpz_clear(lc);
+
+        TMP_END;
     }
 }
 

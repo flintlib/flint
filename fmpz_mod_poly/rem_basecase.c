@@ -21,15 +21,22 @@ void _fmpz_mod_poly_rem_basecase(fmpz *R,
     fmpz_t q;
     slong iR;
     fmpz * W;
+    TMP_INIT;
+
+    TMP_START;
 
     fmpz_init(q);
 
     if (R != A)
     {
-       W = _fmpz_vec_init(lenA);
-       _fmpz_vec_set(W, A, lenA);
-    } else
-       W = R;
+        /* cannot use R as it might not have enough space */
+        FMPZ_VEC_TMP_INIT(W, lenA);
+        _fmpz_vec_set(W, A, lenA);
+    }
+    else
+    {
+        W = R;
+    }
 
     for (iR = lenA - 1; iR >= lenB - 1; iR--)
     {
@@ -46,10 +53,12 @@ void _fmpz_mod_poly_rem_basecase(fmpz *R,
     if (R != A)
     {
        _fmpz_vec_set(R, W, lenB - 1);
-       _fmpz_vec_clear(W, lenA);
+       FMPZ_VEC_TMP_CLEAR(W, lenA);
     }
 
     fmpz_clear(q);
+
+    TMP_END;
 }
 
 void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, const fmpz_mod_poly_t A,

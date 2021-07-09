@@ -37,8 +37,11 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
         const slong lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
         slong lenR2, lenR3;
+        TMP_INIT;
 
-        W  = _fmpz_vec_init(lenW);
+        TMP_START;
+
+        FMPZ_VEC_TMP_INIT(W, lenW);
         Q  = W;
         R1 = W + FLINT_MAX(lenA - lenB + 1, lenB);
         R2 = R1 + lenA;
@@ -90,7 +93,8 @@ cleanup:
         }
 
       exit:
-        _fmpz_vec_clear(W, lenW);
+        FMPZ_VEC_TMP_CLEAR(W, lenW);
+        TMP_END;
     }
 
     return lenG;

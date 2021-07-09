@@ -19,11 +19,6 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                                    const fmpz *B, slong lenB, 
                                    const fmpz_t invA, const fmpz_t p)
 {
-    slong i;
-	
-	TMP_INIT;
-	TMP_START;
-	
 	_fmpz_vec_zero(G, lenA);
     _fmpz_vec_zero(S, lenB - 1);
 
@@ -36,13 +31,12 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
     else
     {
         fmpz *Q, *R;
-        slong lenQ, lenR;
+        slong i, lenQ, lenR;
+	    TMP_INIT;
+	    TMP_START;
 
-        Q = (fmpz *) TMP_ALLOC(2*lenB*sizeof(fmpz));
+        FMPZ_VEC_TMP_INIT(Q, 2*lenB);
         R = Q + lenB;
-		
-		for (i = 0; i < 2*lenB; i++)
-		   fmpz_init(Q + i);
 
         _fmpz_mod_poly_divrem(Q, R, B, lenB, A, lenA, invA, p);
         lenR = lenA - 1;
@@ -53,8 +47,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             _fmpz_vec_set(G, A, lenA);
             fmpz_one(S + 0);
 
-            for (i = 0; i < 2*lenB; i++)
-		        fmpz_clear(Q + i);
+            FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
 			TMP_END;
 			
@@ -74,8 +67,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                     fmpz_add(S + i, S + i, p);
             }
 
-            for (i = 0; i < 2*lenB; i++)
-		        fmpz_clear(Q + i);
+            FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
 			TMP_END;
 
@@ -87,14 +79,11 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             slong lenD, lenU1, lenU2, lenV3, lenW;
 
             fmpz_init(inv);
-            W  = (fmpz *) TMP_ALLOC((3*lenB + 2*lenA)*sizeof(fmpz));
+            FMPZ_VEC_TMP_INIT(W, 3*lenB + 2*lenA);
             D  = W  + lenB;
             U1 = D  + lenA;
             U2 = U1 + lenB;
             V3 = U2 + lenB;
-			
-			for (i = 0; i < 3*lenB + 2*lenA; i++)
-			   fmpz_init(W + i);
 
 			lenQ = lenB - lenA + 1;
 			FMPZ_VEC_NORM(Q, lenQ);
@@ -141,11 +130,8 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                     fmpz_add(S + i, S + i, p);
             }
 
-            for (i = 0; i < 3*lenB + 2*lenA; i++)
-			   fmpz_clear(W + i);
-			   
-            for (i = 0; i < 2*lenB; i++)
-		        fmpz_clear(Q + i);
+            FMPZ_VEC_TMP_CLEAR(W, 3*lenB + 2*lenA);
+            FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
 		    fmpz_clear(inv);
 

@@ -19,17 +19,14 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
     const fmpz_t invB, const fmpz_t p)
 {
     const slong alloc = (R == NULL) ? lenA : 0;
-    slong i, lenR = lenB - 1, iQ;
+    slong lenR = lenB - 1, iQ;
     TMP_INIT;
 	
 	TMP_START;
 	
     if (alloc)
-    {
-        R = (fmpz *) TMP_ALLOC(alloc*sizeof(fmpz));
-		for (i = 0; i < alloc; i++)
-		   fmpz_init(R + i);
-    }
+        FMPZ_VEC_TMP_INIT(R, alloc);
+
 	if (R != A)
         _fmpz_vec_set(R + lenR, A + lenR, lenA - lenR);
 
@@ -59,10 +56,7 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
     }
 
     if (alloc)
-	{
-        for (i = 0; i < alloc; i++)
-		    fmpz_clear(R + i);
-	}
+        FMPZ_VEC_TMP_CLEAR(R, alloc);
 	
 	TMP_END;
 }

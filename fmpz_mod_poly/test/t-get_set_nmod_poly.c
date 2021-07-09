@@ -43,7 +43,7 @@ main(void)
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
         
-	nmod_poly_init(c, fmpz_get_ui(p));
+        nmod_poly_init(c, fmpz_get_ui(p));
 
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
 
