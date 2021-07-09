@@ -51,8 +51,8 @@ main(void)
         nmod_mat_mul(C, A, B);
         nmod_mat_mul(D, B, A);
 
-        nmod_mat_charpoly(f, C);
-        nmod_mat_charpoly(g, D);
+        nmod_mat_charpoly_berkowitz(f, C);
+        nmod_mat_charpoly_berkowitz(g, D);
 
         if (!nmod_poly_equal(f, g))
         {
@@ -88,7 +88,7 @@ main(void)
 
         nmod_mat_randtest(A, state);
 
-        nmod_mat_charpoly(f, A);
+        nmod_mat_charpoly_berkowitz(f, A);
 
         for (i = 0; i < 10; i++)
            nmod_mat_similarity(A, n_randint(state, m), n_randint(state, mod));
