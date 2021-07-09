@@ -799,6 +799,7 @@ void fmpz_bpoly_factor(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t B)
     fmpz_poly_factor_t Bevalfac;
     slong Blengthx, Blengthy;
     flint_bitcnt_t Bbits;
+    slong sumabs, maxabs;
     ulong pkbits;
     ulong k;
     fmpz_t p;
@@ -878,7 +879,14 @@ next_prime:
     if (fmpz_divisible((B->coeffs + B->length - 1)->coeffs + 0, p))
         goto next_prime;
 
-    k = (pkbits + fmpz_bits(p))/fmpz_bits(p);
+    /*
+        2^pkbits is strict upperbound on the coefficient of any factor of B.
+        An upperbound on the coefficient of any factor of B*lc_x(B) is needed.
+    */
+    _fmpz_vec_sum_max_bits(&sumabs, &maxabs, B->coeffs[B->length - 1].coeffs,
+                                             B->coeffs[B->length - 1].length);
+
+    k = (pkbits + sumabs + fmpz_bits(p))/fmpz_bits(p);
 
     bpoly_info_clear(I);
     bpoly_info_init(I, Bevalfac->num, p, k);
@@ -938,6 +946,7 @@ int fmpz_bpoly_factor_ordered(
     flint_bitcnt_t Bbits;
     ulong pkbits;
     ulong k;
+    slong sumabs, maxabs;
     fmpz_t p, malpha;
     bpoly_info_t I;
     fmpz_bpoly_t Q, trymez;
@@ -995,7 +1004,10 @@ next_prime:
     if (fmpz_divisible((B->coeffs + B->length - 1)->coeffs + 0, p))
         goto next_prime;
 
-    k = (pkbits + fmpz_bits(p))/fmpz_bits(p);
+    _fmpz_vec_sum_max_bits(&sumabs, &maxabs, B->coeffs[B->length - 1].coeffs,
+                                             B->coeffs[B->length - 1].length);
+
+    k = (pkbits + sumabs + fmpz_bits(p))/fmpz_bits(p);
 
     bpoly_info_clear(I);
     bpoly_info_init(I, Bevalf->num, p, k);
