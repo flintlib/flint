@@ -21,6 +21,7 @@
 int main(void)
 {
     fmpz_mod_mat_t A, B, B1, B2, C, C1, C2, D;
+    slong max_threads = 5;
     slong i;
     FLINT_TEST_INIT(state);
 
@@ -28,17 +29,24 @@ int main(void)
     fflush(stdout);
 
     /* test A*(B1+B1) = A*B1 + A*B2 */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong m, n, k;
-
         fmpz_t mod;
 
         fmpz_init(mod);
         fmpz_randtest_not_zero(mod, state, 200);
         fmpz_abs(mod, mod);
 
-        if (n_randint(state, 10) == 0)
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+        if (n_randint(state, 100) == 0)
+        {
+            m = n_randint(state, 300) + 100;
+            n = n_randint(state, 300) + 100;
+            k = n_randint(state, 300) + 100;
+        }
+        else if (n_randint(state, 10) == 0)
         {
             m = n_randint(state, 50);
             n = n_randint(state, 50);
@@ -71,8 +79,8 @@ int main(void)
 
         fmpz_mod_mat_mul(C1, A, B1);
         fmpz_mod_mat_mul(C2, A, B2);
-	fmpz_mod_mat_add(B, B1, B2);
-	fmpz_mod_mat_mul(C, A, B);
+        fmpz_mod_mat_add(B, B1, B2);
+        fmpz_mod_mat_mul(C, A, B);
         fmpz_mod_mat_add(D, C1, C2);
 
         if (!fmpz_mod_mat_equal(C, D))

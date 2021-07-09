@@ -126,20 +126,7 @@ fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
             fmpz_swap(fmpz_mod_mat_entry(mat2, i, j), fmpz_mod_mat_entry(mat1, i, j));
 }
 
-FMPZ_MOD_MAT_INLINE
-void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat)
-{
-    slong i, j;
-    fmpz *entry;
-    for (i = 0; i < mat->mat->r; i++)
-    {
-        for (j = 0; j < mat->mat->c; j++)
-        {
-            entry = fmpz_mod_mat_entry(mat, i, j);
-            fmpz_mod(entry, entry, mat->mod);
-        }
-    }
-}
+FLINT_DLL void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
 
 /* Random matrix generation */
 FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);

@@ -437,9 +437,9 @@ FLINT_DLL void _fmpz_mat_mul_double_word_internal(
     TMP_START;
 
     /* limit on number of threads */
-    limit = FLINT_MAX(bc, bc);
+    limit = FLINT_MAX(br, bc);
     limit = FLINT_MIN(limit, ar);
-    limit = limit < 16 ? 0 : (ar - 16)/8;
+    limit = limit < 16 ? 0 : (limit - 16)/16;
 
     mainarg.Astartrow = 0;
     mainarg.Astoprow = ar;
