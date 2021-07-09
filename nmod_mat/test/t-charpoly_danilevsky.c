@@ -25,7 +25,7 @@ main(void)
     ulong mod;
     FLINT_TEST_INIT(state);
 
-    flint_printf("charpoly....");
+    flint_printf("charpoly_danilevsky....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -36,7 +36,7 @@ main(void)
         m = n_randint(state, 10);
         n = m;
 
-        mod = n_randtest_not_zero(state);
+        mod = n_randprime(state, 6, 0);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, m, n, mod);
@@ -51,8 +51,8 @@ main(void)
         nmod_mat_mul(C, A, B);
         nmod_mat_mul(D, B, A);
 
-        nmod_mat_charpoly(f, C);
-        nmod_mat_charpoly(g, D);
+        nmod_mat_charpoly_danilevsky(f, C);
+        nmod_mat_charpoly_danilevsky(g, D);
 
         if (!nmod_poly_equal(f, g))
         {
@@ -80,7 +80,7 @@ main(void)
         m = n_randint(state, 10);
         n = m;
 
-        mod = n_randtest_not_zero(state);
+        mod = n_randprime(state, 6, 0);
 
         nmod_mat_init(A, m, n, mod);
         nmod_poly_init(f, mod);
@@ -93,7 +93,7 @@ main(void)
         for (i = 0; i < 10; i++)
            nmod_mat_similarity(A, n_randint(state, m), n_randint(state, mod));
 
-        nmod_mat_charpoly(g, A);
+        nmod_mat_charpoly_danilevsky(g, A);
 
         if (!nmod_poly_equal(f, g))
         {
