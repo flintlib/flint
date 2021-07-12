@@ -445,9 +445,30 @@ static int _do_monomial_gcd(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length == 1);
 
-    TMP_START;
-
     fmpz_init(g);
+
+    /* compute the coefficient of G */
+    _fmpz_vec_content_chained(g, A->coeffs, A->length, B->coeffs + 0);
+    fmpz_abs(g, g);
+
+    if (B->exps[0] == 0 && mpoly_monomial_is_zero(B->exps,
+                                     mpoly_words_per_exp(B->bits, ctx->minfo)))
+    {
+        _parallel_set(Abar, Bbar, A, B, ctx);
+
+        if (Abar != NULL && !fmpz_is_one(g))
+            _fmpz_vec_scalar_divexact_fmpz(Abar->coeffs, Abar->coeffs,
+                                                              Abar->length, g);
+        if (Bbar != NULL && !fmpz_is_one(g))
+            _fmpz_vec_scalar_divexact_fmpz(Bbar->coeffs, Bbar->coeffs,
+                                                              Bbar->length, g);
+        fmpz_mpoly_fit_length(G, 1, ctx);
+        mpoly_monomial_zero(G->exps, mpoly_words_per_exp(G->bits, ctx->minfo));
+
+        goto done;
+    }
+
+    TMP_START;
 
     /* get the field-wise minimum of A */
     minAfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
@@ -470,10 +491,6 @@ static int _do_monomial_gcd(
     /* compute the degree of each variable in G */
     _fmpz_vec_min_inplace(minBdegs, minAdegs, ctx->minfo->nvars);
 
-    /* compute the coefficient of G */
-    fmpz_abs(g, B->coeffs + 0);
-    _fmpz_vec_content_chained(g, A->coeffs, A->length, g);
-
     _parallel_set(Abar, Bbar, A, B, ctx);
 
     if (Abar != NULL)
@@ -493,8 +510,6 @@ static int _do_monomial_gcd(
     /* write G */
     fmpz_mpoly_fit_length_reset_bits(G, 1, Gbits, ctx);
     mpoly_set_monomial_ffmpz(G->exps, minBdegs, Gbits, ctx->minfo);
-    fmpz_swap(G->coeffs + 0, g);
-    _fmpz_mpoly_set_length(G, 1, ctx);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
@@ -506,9 +521,14 @@ static int _do_monomial_gcd(
         fmpz_clear(minBdegs + i);
     }
 
-    fmpz_clear(g);
-
     TMP_END;
+
+done:
+
+    fmpz_swap(G->coeffs + 0, g);
+    _fmpz_mpoly_set_length(G, 1, ctx);
+
+    fmpz_clear(g);
 
     return 1;
 }

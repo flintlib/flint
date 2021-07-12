@@ -184,6 +184,18 @@ int main(int argc, char *argv[])
             exp_bound = len + 1;
             coeff_bits = 10 + n_randint(state, 10);
             fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+        }
+        for (i = 0; i + 2 <= npolys; i += 2)
+        {
+            len = 1 + n_randint(state, 5);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 10);
+            fmpz_mpoly_randtest_bound(mres + 0, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_mul(mpolys + i, mpolys + i, mres + 0, ctx);
+            fmpz_mpoly_mul(mpolys + i + 1, mpolys + i + 1, mres + 0, ctx);
+        }
+        for (i = 0; i < npolys; i++)
+        {
             fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
         }
         run_cmp(mpolys, polys, mres, res, npolys, ctx, (void (*)(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t)) fmpz_mpoly_gcd, fmpz_poly_gcd);
@@ -195,6 +207,18 @@ int main(int argc, char *argv[])
             exp_bound = len + 1;
             coeff_bits = 10 + n_randint(state, 200);
             fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+        }
+        for (i = 0; i + 2 <= npolys; i += 2)
+        {
+            len = 1 + n_randint(state, 5);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 200);
+            fmpz_mpoly_randtest_bound(mres + 0, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_mul(mpolys + i, mpolys + i, mres + 0, ctx);
+            fmpz_mpoly_mul(mpolys + i + 1, mpolys + i + 1, mres + 0, ctx);
+        }
+        for (i = 0; i < npolys; i++)
+        {
             fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
         }
         run_cmp(mpolys, polys, mres, res, npolys, ctx, (void (*)(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t)) fmpz_mpoly_gcd, fmpz_poly_gcd);

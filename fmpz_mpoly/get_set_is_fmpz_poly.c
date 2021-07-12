@@ -191,7 +191,7 @@ void _fmpz_mpoly_set_fmpz_poly_one_var(
     }
     else
     {
-        FLINT_ASSERT(2 == mpoly_words_per_exp(Abits, ctx->minfo))
+        FLINT_ASSERT(2 == mpoly_words_per_exp(Abits, ctx->minfo));
 
         for (i = Adeg; i >= 0; i--)
         {
