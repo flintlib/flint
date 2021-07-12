@@ -14,16 +14,59 @@
 #include "profiler.h"
 #include "fmpz_mpoly.h"
 
-int main(int argc, char *argv[])
+
+void run_cmp(
+    fmpz_mpoly_struct * mpolys,
+    fmpz_poly_struct * polys,
+    fmpz_mpoly_struct * mres,
+    fmpz_poly_struct * res,
+    slong npolys,
+    const fmpz_mpoly_ctx_t ctx,
+    void (*f)(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t),
+    void (*g)(fmpz_poly_t, const fmpz_poly_t, const fmpz_poly_t))
 {
     slong i, j, k;
+    slong nreps = 100;
     timeit_t timer;
+
+    for (j = 0; j < 2; j++)
+    {
+        timeit_start(timer);
+        for (k = 0; k < nreps; k++)
+        for (i = 1; i < npolys; i++)
+            f(mres + i, mpolys + i, mpolys + i - 1, ctx);
+        timeit_stop(timer);
+        flint_printf("mpoly: %wd  ", timer->wall);
+        fflush(stdout);
+
+        timeit_start(timer);
+        for (k = 0; k < nreps; k++)
+        for (i = 1; i < npolys; i++)
+            g(res + i, polys + i, polys + i - 1);
+        timeit_stop(timer);
+        flint_printf("poly: %wd\n", timer->wall);
+        fflush(stdout);
+
+        for (i = 1; i < npolys; i++)
+        {
+            if (!fmpz_mpoly_get_fmpz_poly(res + 0, mres + i, 0, ctx) ||
+                !fmpz_poly_equal(res + 0, res + i))
+            {
+                flint_printf("oops");
+                flint_abort();
+            }
+        }
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    slong i;
     FLINT_TEST_INIT(state);
 
     flint_printf("\n");
 
     {
-        slong nreps = 100;
         slong npolys = 10000;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_struct * mpolys, * mres;
@@ -38,54 +81,123 @@ int main(int argc, char *argv[])
         mres = FLINT_ARRAY_ALLOC(npolys, fmpz_mpoly_struct);
         res = FLINT_ARRAY_ALLOC(npolys, fmpz_poly_struct);
 
-        flint_printf("****** dense mul ********\n");
-
         for (i = 0; i < npolys; i++)
         {
             fmpz_mpoly_init(mpolys + i, ctx);
             fmpz_poly_init(polys + i);
             fmpz_mpoly_init(mres + i, ctx);
             fmpz_poly_init(res + i);
+        }
 
+        flint_printf("****** dense mul, small coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 10);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 10);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** dense mul, large coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 10);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 200);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** large dense mul, small coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 30);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 10);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** large dense mul, large coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 30);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 200);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** sparse mul, small coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 10);
+            exp_bound = n_randint(state, 10*len) + 10;
+            coeff_bits = 10 + n_randint(state, 10);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** sparse mul, large coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 10);
+            exp_bound = n_randint(state, 10*len) + 10;
+            coeff_bits = 10 + n_randint(state, 100);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** very sparse mul, small coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 10);
+            exp_bound = n_randint(state, 20*len) + 10;
+            coeff_bits = 10 + n_randint(state, 10);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** very sparse mul, large coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
+            len = 1 + n_randint(state, 10);
+            exp_bound = n_randint(state, 20*len) + 10;
+            coeff_bits = 10 + n_randint(state, 100);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
+        }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, fmpz_mpoly_mul, fmpz_poly_mul);
+
+        flint_printf("****** gcd, small coeffs ********\n");
+        for (i = 0; i < npolys; i++)
+        {
             len = 1 + n_randint(state, 5);
             exp_bound = len + 1;
             coeff_bits = 10 + n_randint(state, 10);
             fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
-            if (!fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx))
-            {
-                flint_printf("oops");
-                flint_abort();
-            }
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
         }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, (void (*)(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t)) fmpz_mpoly_gcd, fmpz_poly_gcd);
 
-        for (j = 0; j < 4; j++)
+        flint_printf("****** gcd, large coeffs ********\n");
+        for (i = 0; i < npolys; i++)
         {
-            timeit_start(timer);
-            for (k = 0; k < nreps; k++)
-            for (i = 1; i < npolys; i++)
-                fmpz_mpoly_mul(mres + i, mpolys + i, mpolys + i - 1, ctx);
-            timeit_stop(timer);
-            flint_printf("mpoly: %wd  ", timer->wall);
-            fflush(stdout);
-
-            timeit_start(timer);
-            for (k = 0; k < nreps; k++)
-            for (i = 1; i < npolys; i++)
-                fmpz_poly_mul(res + i, polys + i, polys + i - 1);
-            timeit_stop(timer);
-            flint_printf("poly: %wd\n", timer->wall);
-            fflush(stdout);
-
-            for (i = 1; i < npolys; i++)
-            {
-                if (!fmpz_mpoly_get_fmpz_poly(res + 0, mres + i, 0, ctx) ||
-                    !fmpz_poly_equal(res + 0, res + i))
-                {
-                    flint_printf("oops");
-                    flint_abort();
-                }
-            }
+            len = 1 + n_randint(state, 5);
+            exp_bound = len + 1;
+            coeff_bits = 10 + n_randint(state, 200);
+            fmpz_mpoly_randtest_bound(mpolys + i, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_get_fmpz_poly(polys + i, mpolys + i, 0, ctx);
         }
+        run_cmp(mpolys, polys, mres, res, npolys, ctx, (void (*)(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t)) fmpz_mpoly_gcd, fmpz_poly_gcd);
 
         for (i = 0; i < npolys; i++)
         {
