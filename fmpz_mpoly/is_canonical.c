@@ -37,11 +37,11 @@ void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ct
 {
     slong i;
 
-    if (!mpoly_monomials_valid_test(A->exps, A->length, A->bits, ctx->minfo))
-        flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
-
     if (mpoly_monomials_overflow_test(A->exps, A->length, A->bits, ctx->minfo))
         flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
+
+    if (!mpoly_monomials_valid_test(A->exps, A->length, A->bits, ctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
 
     if (!mpoly_monomials_inorder_test(A->exps, A->length, A->bits, ctx->minfo))
         flint_throw(FLINT_ERROR, "Polynomial exponents out of order");
