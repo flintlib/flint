@@ -22,7 +22,7 @@ main(void)
     tmul = 2;
 #endif
 
-    flint_printf("addmul....");
+    flint_printf("addmul_multi....");
     fflush(stdout);
 
     /* check fixed cases (same as mul test) */
@@ -45,7 +45,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(f+0, "((1-x)*(1+y)*(1+z))^10", vars, ctx);
         fmpz_mpoly_set_str_pretty(f+1, "((1+x)*(1-y)*(1-z))^10", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1-x^2)*(1-y^2)*(1-z^2))^10", vars, ctx);
-        fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
+        fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("FAIL\n");
@@ -57,7 +57,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(f+0, "(1+x+y+z+t)^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(f+1, "(1-x-y-z-t)^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1+x+y+z+t)*(1-x-y-z-t))^20", vars, ctx);
-        fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
+        fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("FAIL\n");
@@ -69,7 +69,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(f+0, "(1+x^10)^50", vars, ctx);
         fmpz_mpoly_set_str_pretty(f+1, "(1+y^10)^50", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1+x^10)*(1+y^10))^50", vars, ctx);
-        fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
+        fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("FAIL\n");
@@ -126,7 +126,7 @@ main(void)
             fmpz_mpoly_mul(g, g, f + 2, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
 
-            fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
+            fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
 
             result = fmpz_mpoly_equal(g, h, ctx);

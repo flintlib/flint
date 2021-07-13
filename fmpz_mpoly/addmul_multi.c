@@ -24,7 +24,7 @@
    realocates its output and returns the length of the product. This
    version of the function assumes the exponent vectors take N words.
 */
-slong _fmpz_mpoly_addmul(
+slong _fmpz_mpoly_addmul_multi(
     fmpz_mpoly_t A,
     const fmpz_mpoly_struct * Blist,
     const slong * Blengths,
@@ -248,7 +248,7 @@ slong _fmpz_mpoly_addmul(
    return k;
 }
 
-void _fmpz_mpoly_addmul_maxfields(
+void _fmpz_mpoly_addmul_multi_maxfields(
     fmpz_mpoly_t A,
     const fmpz_mpoly_struct ** Blist,
     const slong * Blengths,
@@ -347,7 +347,7 @@ void _fmpz_mpoly_addmul_maxfields(
         fmpz_mpoly_t T;
         fmpz_mpoly_init3(T, maxlen, Abits, ctx);
 
-        Alen = _fmpz_mpoly_addmul(T, B1, Blengths, Bnumseq, Btotallen, Abits, N, cmpmask, ctx);
+        Alen = _fmpz_mpoly_addmul_multi(T, B1, Blengths, Bnumseq, Btotallen, Abits, N, cmpmask, ctx);
 
         fmpz_mpoly_swap(T, A, ctx);
         fmpz_mpoly_clear(T, ctx);
@@ -356,7 +356,7 @@ void _fmpz_mpoly_addmul_maxfields(
     {
         fmpz_mpoly_fit_length_reset_bits(A, maxlen, Abits, ctx);
 
-        Alen = _fmpz_mpoly_addmul(A, B1, Blengths, Bnumseq, Btotallen, Abits, N, cmpmask, ctx);
+        Alen = _fmpz_mpoly_addmul_multi(A, B1, Blengths, Bnumseq, Btotallen, Abits, N, cmpmask, ctx);
     }
 
     for (i = 0; i < Btotallen; i++)
@@ -378,7 +378,7 @@ void _fmpz_mpoly_addmul_maxfields(
  * by the lengths in the Blengths array.
  */
 
-void fmpz_mpoly_addmul(
+void fmpz_mpoly_addmul_multi(
     fmpz_mpoly_t A,
     const fmpz_mpoly_struct ** Blist,
     const slong * Blengths,
@@ -433,7 +433,7 @@ void fmpz_mpoly_addmul(
         _fmpz_vec_zero(maxtermfields, ctx->minfo->nfields);
     }
 
-    _fmpz_mpoly_addmul_maxfields(A, Blist, Blengths, Bnumseq, Btotallen, maxfields, ctx);
+    _fmpz_mpoly_addmul_multi_maxfields(A, Blist, Blengths, Bnumseq, Btotallen, maxfields, ctx);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
