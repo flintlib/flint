@@ -37,7 +37,7 @@ slong _fmpz_mpoly_addmul_multi(
 {
    slong i, j, k, l;
    slong next_loc;
-   slong Q_len = 0, heap_len = 2; /* heap zero index unused */
+   slong Q_len = 0, heap_len = 1; /* heap starts empty, and its zero index is unused, so heap_len = 1 */
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
    ulong * Q;
@@ -50,11 +50,15 @@ slong _fmpz_mpoly_addmul_multi(
    slong exp_next;
    slong * hind;
    int first;
-   slong hind_len;
+   slong hind_totallen = 0;
+   slong * hind_len;
+   slong * hind_start;
    ulong offset, offset2, offset3;
    ulong candidate;
    ulong partial_multiindex;
    fmpz_t tmp_coeff;
+   const fmpz_mpoly_struct ** Bstart;
+   slong term;
    TMP_INIT;
 
    TMP_START;
@@ -64,47 +68,67 @@ slong _fmpz_mpoly_addmul_multi(
 
    fmpz_init(tmp_coeff);
 
-   /* First polynomial should be the largest; it's left out of this calculation */
-   hind_len = 1;
-   for (i = 1; i < Btotallen; i++)
-       hind_len *= Blist[i].length;
+   Bstart = (const fmpz_mpoly_struct **) TMP_ALLOC(Bnumseq*sizeof(fmpz_mpoly_struct *));
 
-   next_loc = hind_len + 4;   /* something bigger than heap can ever be */
-   heap = (mpoly_heap_s *) TMP_ALLOC((hind_len + 1)*sizeof(mpoly_heap_s));
+   /* First polynomial should be the largest; it's left out of this calculation */
+   hind_len = TMP_ALLOC(Bnumseq*sizeof(slong));
+   hind_start = TMP_ALLOC(Bnumseq*sizeof(slong));
+
+   for (i = 0; i < Bnumseq; i++)
+   {
+      if (i == 0)
+          Bstart[i] = Blist;
+      else
+          Bstart[i] = Bstart[i-1] + Blengths[i-1];
+
+      hind_start[i] = hind_totallen;
+      hind_len[i] = 1;
+
+      for (j = 1; j < Blengths[i]; j++)
+          hind_len[i] *= Bstart[i][j].length;
+      hind_totallen += hind_len[i];
+   }
+
+   next_loc = hind_totallen + 4;   /* something bigger than heap can ever be */
+   heap = (mpoly_heap_s *) TMP_ALLOC((hind_totallen + 1)*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
-   chain = (mpoly_heap_t *) TMP_ALLOC(hind_len*sizeof(mpoly_heap_t));
+   chain = (mpoly_heap_t *) TMP_ALLOC(hind_totallen*sizeof(mpoly_heap_t));
    /* space for temporary storage of pointers to heap nodes */
-   Q = (ulong *) TMP_ALLOC(hind_len*sizeof(ulong));
+   Q = (ulong *) TMP_ALLOC(hind_totallen*sizeof(ulong));
    /* allocate space for exponent vectors of N words */
-   exps = (ulong *) TMP_ALLOC(hind_len*N*sizeof(ulong));
+   exps = (ulong *) TMP_ALLOC(hind_totallen*N*sizeof(ulong));
    /* list of pointers to allocated exponent vectors */
-   exp_list = (ulong **) TMP_ALLOC(hind_len*sizeof(ulong *));
-   for (i = 0; i < hind_len; i++)
+   exp_list = (ulong **) TMP_ALLOC(hind_totallen*sizeof(ulong *));
+   for (i = 0; i < hind_totallen; i++)
       exp_list[i] = exps + i*N;
 
    /* space for heap indices */
-   hind = (slong *) TMP_ALLOC(hind_len*sizeof(slong));
-   for (i = 0; i < hind_len; i++)
+   hind = (slong *) TMP_ALLOC(hind_totallen*sizeof(slong));
+   for (i = 0; i < hind_totallen; i++)
        hind[i] = 1;
 
    /* start with no heap nodes and no exponent vectors in use */
    exp_next = 0;
 
-   /* put (0...0, exp2[0] + ... + expn[0]) on heap */
-   x = chain + 0;
-   x->next = NULL;
+   for (i = 0; i < Bnumseq; i++)
+   {
+      /* for each term, put (0...0, exp2[0] + ... + expn[0]) on heap */
+      x = chain + hind_start[i] + 0;
+      x->next = NULL;
 
-   heap[1].next = x;
-   heap[1].exp = exp_list[exp_next++];
+      mpoly_monomial_zero(exp_list[exp_next], N);
+      for (j = 0; j < Blengths[i]; j++)
+          if (bits <= FLINT_BITS)
+              mpoly_monomial_add(exp_list[exp_next], exp_list[exp_next], Bstart[i][j].exps, N);
+          else
+              mpoly_monomial_add_mp(exp_list[exp_next], exp_list[exp_next], Bstart[i][j].exps, N);
 
-   mpoly_monomial_zero(heap[1].exp, N);
-   for (i = 0; i < Btotallen; i++)
-       if (bits <= FLINT_BITS)
-           mpoly_monomial_add(heap[1].exp, heap[1].exp, Blist[i].exps, N);
-       else
-           mpoly_monomial_add_mp(heap[1].exp, heap[1].exp, Blist[i].exps, N);
+      hind[hind_start[i] + 0] = 2*1 + 0;
 
-   hind[0] = 2*1 + 0;
+      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                              &next_loc, &heap_len, N, cmpmask))
+         exp_next--;
+   }
 
    /* output poly index starts at -1, will be immediately updated to 0 */
    k = -WORD(1);
@@ -148,19 +172,24 @@ slong _fmpz_mpoly_addmul_multi(
          {
             multiindex = x - chain;
 
+            for (term=0; term < Bnumseq-1; term++)
+            {
+                if (multiindex < hind_start[term+1])
+                    break;
+            }
+
             if (EXPTEST) {
-                fprintf(stderr, "Processing %ld with exp %lx\n", multiindex, *exp);
+                fprintf(stderr, "Processing %ld from term %ld with exp %lx\n", multiindex, term, *exp);
             }
             /* addmul product of input poly coeffs */
 
-            fmpz_set(tmp_coeff, Blist[0].coeffs + (hind[multiindex] >> 1) - 1);
-            partial_multiindex = multiindex;
-            for (i=1; i<Btotallen-1; i++)
+            fmpz_set(tmp_coeff, Bstart[term][0].coeffs + (hind[multiindex] >> 1) - 1);
+            partial_multiindex = multiindex - hind_start[term];
+            for (i=1; i<Blengths[term]; i++)
             {
-                fmpz_mul(tmp_coeff, tmp_coeff, Blist[i].coeffs + (partial_multiindex % Blist[i].length));
-                partial_multiindex /= Blist[i].length;
+                fmpz_mul(tmp_coeff, tmp_coeff, Bstart[term][i].coeffs + (partial_multiindex % Bstart[term][i].length));
+                partial_multiindex /= Bstart[term][i].length;
             }
-            fmpz_mul(tmp_coeff, tmp_coeff, Blist[Btotallen-1].coeffs + partial_multiindex);
             fmpz_add(A->coeffs + k, A->coeffs + k, tmp_coeff);
 
             if (EXPTEST) {
@@ -184,43 +213,49 @@ slong _fmpz_mpoly_addmul_multi(
          /* take node from store */
          multiindex = Q[--Q_len];
 
-         offset = 0;
-         for (i=0; i<Btotallen; i++)
+         for (term=0; term < Bnumseq-1; term++)
          {
-             candidate = multiindex + offset;
-             if (EXPTEST) fprintf(stderr, "Considering candidate %ld\n", candidate);
-             if ((candidate < hind_len) && (hind[candidate] < 2*Blist[0].length) && (hind[candidate] & 1))
+             if (multiindex < hind_start[term+1])
+                 break;
+         }
+
+         offset = 0;
+         for (i=0; i<Blengths[term]; i++)
+         {
+             candidate = multiindex - hind_start[term] + offset;
+             if (EXPTEST) fprintf(stderr, "Considering term %ld candidate %ld\n", term, candidate);
+             if ((candidate < hind_len[term]) && (hind[hind_start[term] + candidate] < 2*Bstart[term][0].length) && (hind[hind_start[term] + candidate] & 1))
              {
                  offset2 = 1;
-                 for (j=1; j<Btotallen; j++)
+                 for (j=1; j<Blengths[term]; j++)
                  {
-                     offset3 = offset2 * Blist[j].length;
-                     if (((candidate % offset3) / offset2 != 0) && (hind[candidate - offset2] < hind[candidate] + 2))
+                     offset3 = offset2 * Bstart[term][j].length;
+                     if (((candidate % offset3) / offset2 != 0) && (hind[hind_start[term] + candidate - offset2] < hind[hind_start[term] + candidate] + 2))
                          break;
-                     offset2 *= Blist[j].length;
+                     offset2 *= Bstart[term][j].length;
                  }
-                 if (j == Btotallen)
+                 if (j == Blengths[term])
                  {
-                     x = chain + candidate;
+                     x = chain + hind_start[term] + candidate;
                      x->next = NULL;
 
-                     mpoly_monomial_set(exp_list[exp_next], Blist[0].exps + N*(hind[candidate] >> 1), N);
-                     hind[candidate] ++;
+                     mpoly_monomial_set(exp_list[exp_next], Bstart[term][0].exps + N*(hind[hind_start[term] + candidate] >> 1), N);
+                     hind[hind_start[term] + candidate] ++;
 
                      partial_multiindex = candidate;
-                     for (l = 1; l < Btotallen; l++)
+                     for (l = 1; l < Blengths[term]; l++)
                      {
                          if (bits <= FLINT_BITS)
                              mpoly_monomial_add(exp_list[exp_next], exp_list[exp_next],
-                                                Blist[l].exps + N*(partial_multiindex % Blist[l].length), N);
+                                                Bstart[term][l].exps + N*(partial_multiindex % Bstart[term][l].length), N);
                          else
                              mpoly_monomial_add_mp(exp_list[exp_next], exp_list[exp_next],
-                                                   Blist[l].exps + N*(partial_multiindex % Blist[l].length), N);
-                         partial_multiindex /= Blist[l].length;
+                                                   Bstart[term][l].exps + N*(partial_multiindex % Bstart[term][l].length), N);
+                         partial_multiindex /= Bstart[term][l].length;
                      }
 
                      if (EXPTEST) {
-	                 fprintf(stderr, "Adding %ld because of %ld with hind[%ld] %ld\n", candidate, multiindex, candidate, hind[candidate]);
+	                 fprintf(stderr, "Adding %ld (term %ld) because of %ld with hind[%ld] %ld\n", candidate, term, multiindex, candidate, hind[hind_start[term] + candidate]);
                      }
                      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                              &next_loc, &heap_len, N, cmpmask))
@@ -231,7 +266,7 @@ slong _fmpz_mpoly_addmul_multi(
              if (offset == 0)
                  offset = 1;
              else
-                 offset *= Blist[i].length;
+                 offset *= Bstart[term][i].length;
          }
       }
 
