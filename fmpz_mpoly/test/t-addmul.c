@@ -30,6 +30,8 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_struct f[2];
+        const fmpz_mpoly_struct * fptr[] = {f + 0, f + 1};
+        slong f_length = 2;
         fmpz_mpoly_t h, k;
         const char * vars[] = {"x", "y", "z", "t"};
 
@@ -43,7 +45,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(f+0, "((1-x)*(1+y)*(1+z))^10", vars, ctx);
         fmpz_mpoly_set_str_pretty(f+1, "((1+x)*(1-y)*(1-z))^10", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1-x^2)*(1-y^2)*(1-z^2))^10", vars, ctx);
-        fmpz_mpoly_addmul(h, f, 2, ctx);
+        fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("FAIL\n");
@@ -55,7 +57,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(f+0, "(1+x+y+z+t)^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(f+1, "(1-x-y-z-t)^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1+x+y+z+t)*(1-x-y-z-t))^20", vars, ctx);
-        fmpz_mpoly_addmul(h, f, 2, ctx);
+        fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("FAIL\n");
@@ -67,7 +69,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(f+0, "(1+x^10)^50", vars, ctx);
         fmpz_mpoly_set_str_pretty(f+1, "(1+y^10)^50", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1+x^10)*(1+y^10))^50", vars, ctx);
-        fmpz_mpoly_addmul(h, f, 2, ctx);
+        fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("FAIL\n");
@@ -89,6 +91,8 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_struct f[3];
+        const fmpz_mpoly_struct * fptr [] = {f + 0, f + 1, f + 2};
+        slong f_length = 3;
         fmpz_mpoly_t g, h;
         slong len, len1, len2;
         flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
@@ -122,7 +126,7 @@ main(void)
             fmpz_mpoly_mul(g, g, f + 2, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
 
-            fmpz_mpoly_addmul(h, f, 3, ctx);
+            fmpz_mpoly_addmul(h, fptr, &f_length, 1, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
 
             result = fmpz_mpoly_equal(g, h, ctx);

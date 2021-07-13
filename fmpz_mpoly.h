@@ -812,7 +812,7 @@ FLINT_DLL int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
 /* Combined Addition and Multiplication **************************************/
 
 FLINT_DLL void fmpz_mpoly_addmul(fmpz_mpoly_t A,
-       const fmpz_mpoly_struct * B, const slong Blen, const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_struct ** Blist, const slong * Blengths, const slong Bnumseq, const fmpz_mpoly_ctx_t ctx);
 
 /* Powering ******************************************************************/
 
