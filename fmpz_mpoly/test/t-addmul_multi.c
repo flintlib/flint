@@ -151,6 +151,8 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k1, k2, t1, t2;
+        const fmpz_mpoly_struct * fptr [] = {f, g, f, h};
+        slong f_lengths[] = {2,2};
         slong len, len1, len2;
         flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
@@ -186,13 +188,10 @@ main(void)
             fmpz_mpoly_assert_canonical(t1, ctx);
             fmpz_mpoly_mul(k1, f, t1, ctx);
             fmpz_mpoly_assert_canonical(k1, ctx);
-            fmpz_mpoly_mul(t1, f, g, ctx);
-            fmpz_mpoly_assert_canonical(t1, ctx);
-            flint_set_num_threads(n_randint(state, max_threads) + 1);
-            fmpz_mpoly_mul(t2, f, h, ctx);
-            fmpz_mpoly_assert_canonical(t2, ctx);
-            fmpz_mpoly_add(k2, t1, t2, ctx);
+
+            fmpz_mpoly_addmul_multi(k2, fptr, f_lengths, 2, ctx);
             fmpz_mpoly_assert_canonical(k2, ctx);
+
             result = fmpz_mpoly_equal(k1, k2, ctx);
             if (!result)
             {

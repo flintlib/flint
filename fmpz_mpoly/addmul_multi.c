@@ -63,9 +63,6 @@ slong _fmpz_mpoly_addmul_multi(
 
    TMP_START;
 
-   /* for right now, we only can do a single multiplication */
-   FLINT_ASSERT(Blengths[0] == Btotallen);
-
    fmpz_init(tmp_coeff);
 
    Bstart = (const fmpz_mpoly_struct **) TMP_ALLOC(Bnumseq*sizeof(fmpz_mpoly_struct *));
