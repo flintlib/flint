@@ -18,7 +18,7 @@
     Since the coefficient alloc and the exponent alloc are coupled, we must
     have the assumption that A is allocated wrt ctx upon entry.
 
-    TODO: possibly decouple the two allocations as in nmod_mpoly/fq_nmod_mpoly
+    TODO: decouple the two allocations as in nmod_mpoly/fq_nmod_mpoly
 */
 void fmpz_mpoly_fit_length_reset_bits(
     fmpz_mpoly_t A,
@@ -42,7 +42,7 @@ void fmpz_mpoly_fit_length_reset_bits(
 
         A->alloc = len;
     }
-    else if (newN > oldN)
+    else if (newN > oldN && A->alloc > 0)
     {
         A->exps = (ulong *) flint_realloc(A->exps, newN*A->alloc*sizeof(ulong));
     }

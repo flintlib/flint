@@ -138,3 +138,72 @@ void fmpz_mpoly_set_fmpz_poly(
     bits = mpoly_fix_bits(bits, ctx->minfo);
     _fmpz_mpoly_set_fmpz_poly(A, bits, B->coeffs, B->length, v, ctx);
 }
+
+/*
+    construct a polynomial with at least Aminbits bits from the coefficients
+    Acoeffs[0], ..., Acoeffs[deg]. *** These fmpz's are cleared *** .
+*/
+void _fmpz_mpoly_set_fmpz_poly_one_var(
+    fmpz_mpoly_t A,
+    flint_bitcnt_t Aminbits,
+    fmpz * Acoeffs,     /* cleared upon return */
+    slong Adeg,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, Alen;
+    flint_bitcnt_t Abits;
+
+    Abits = mpoly_gen_pow_exp_bits_required(0, Adeg, ctx->minfo);
+    Abits = FLINT_MAX(Abits, Aminbits);
+    Abits = mpoly_fix_bits(Abits, ctx->minfo);
+    fmpz_mpoly_fit_length_reset_bits(A, Adeg + 1, Abits, ctx);
+
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+
+    Alen = 0;
+    if (ctx->minfo->ord == ORD_LEX)
+    {
+        FLINT_ASSERT(1 == mpoly_words_per_exp(Abits, ctx->minfo));
+
+        for (i = Adeg; i >= 0; i--)
+        {
+            if (fmpz_is_zero(Acoeffs + i))
+                continue;
+
+            fmpz_swap(A->coeffs + Alen, Acoeffs + i);
+            A->exps[Alen] = i;
+            Alen++;
+            fmpz_clear(Acoeffs + i);
+        }
+    }
+    else if (1 == mpoly_words_per_exp(Abits, ctx->minfo))
+    {
+        for (i = Adeg; i >= 0; i--)
+        {
+            if (fmpz_is_zero(Acoeffs + i))
+                continue;
+
+            fmpz_swap(A->coeffs + Alen, Acoeffs + i);
+            A->exps[Alen] = i + (i << Abits);
+            Alen++;
+            fmpz_clear(Acoeffs + i);
+        }
+    }
+    else
+    {
+        FLINT_ASSERT(2 == mpoly_words_per_exp(Abits, ctx->minfo));
+
+        for (i = Adeg; i >= 0; i--)
+        {
+            if (fmpz_is_zero(Acoeffs + i))
+                continue;
+
+            fmpz_swap(A->coeffs + Alen, Acoeffs + i);
+            A->exps[2*Alen + 1] = A->exps[2*Alen + 0] = i;
+            Alen++;
+            fmpz_clear(Acoeffs + i);
+        }
+    }
+
+    _fmpz_mpoly_set_length(A, Alen, ctx);
+}

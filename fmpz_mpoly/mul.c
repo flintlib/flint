@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mpoly.h"
+#include "long_extras.h"
 
 
 static int _try_dense(int try_array, slong * Bdegs, slong * Cdegs,
@@ -107,6 +108,94 @@ static int _try_array_DEG(slong Btotaldeg, slong Ctotaldeg,
            dense_size/Blen/Clen < WORD(10);
 }
 
+/* !!! this function DOES need to change with new orderings */
+static int _try_dense_univar(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_t C,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    ulong maskB = (-UWORD(1)) >> (FLINT_BITS - B->bits);
+    ulong maskC = (-UWORD(1)) >> (FLINT_BITS - C->bits);
+    slong NB = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
+    slong NC = mpoly_words_per_exp_sp(C->bits, ctx->minfo);
+    slong Blen = B->length;
+    slong Clen = C->length;
+    slong BClen;
+    const ulong * Bexps = B->exps;
+    const ulong * Cexps = C->exps;
+    fmpz * Acoeffs, * Bcoeffs, * Ccoeffs;
+    slong Adeg, Bdeg, Cdeg;
+    TMP_INIT;
+
+    /* the variable power is stored at offset 0 */
+    Bdeg = Bexps[NB*0 + 0] & maskB;
+    Cdeg = Cexps[NC*0 + 0] & maskC;
+
+    if (z_mul_checked(&BClen, Blen, Clen))
+    {
+        if (z_add_checked(&Adeg, Bdeg, Cdeg))
+            return 0;
+    }
+    else
+    {
+        Adeg = Bdeg + Cdeg;
+    }
+
+    if (Adeg > WORD_MAX/FLINT_BITS)
+        return 0;
+
+    if (Adeg > BClen)
+        return 0;
+
+    {
+        slong Bcoeffbits = _fmpz_vec_max_bits(B->coeffs, Blen);
+        slong Ccoeffbits = _fmpz_vec_max_bits(C->coeffs, Clen);
+        slong t = FLINT_ABS(Bcoeffbits) + FLINT_ABS(Ccoeffbits);
+
+        if (t > FLINT_BITS && Adeg > BClen/4)
+            return 0;
+    }
+
+    TMP_START;
+
+    Acoeffs = TMP_ARRAY_ALLOC(Adeg + 1 + Bdeg + 1 + Cdeg + 1, fmpz);
+    Bcoeffs = Acoeffs + Adeg + 1;
+    Ccoeffs = Bcoeffs + Bdeg + 1;
+
+    /* we own the fmpz's in Acoeffs */
+    for (i = 0; i < Adeg + 1; i++)
+        fmpz_init(Acoeffs + i);
+
+    if (A != B && A != C)
+    {
+        for (i = FLINT_MIN(A->length - 1, Adeg); i >= 0; i--)
+            fmpz_swap(Acoeffs + i, A->coeffs + i);
+    }
+
+    /* Bcoeffs and Ccoeffs are shallow copies */
+    for (i = 0; i < Bdeg + 1 + Cdeg + 1; i++)
+        Bcoeffs[i] = 0;
+
+    for (i = 0; i < Blen; i++)
+        Bcoeffs[Bexps[NB*i + 0] & maskB] = B->coeffs[i];
+
+    for (i = 0; i < Clen; i++)
+        Ccoeffs[Cexps[NC*i + 0] & maskC] = C->coeffs[i];
+
+    if (Bdeg >= Cdeg)
+        _fmpz_poly_mul(Acoeffs, Bcoeffs, Bdeg + 1, Ccoeffs, Cdeg + 1);
+    else
+        _fmpz_poly_mul(Acoeffs, Ccoeffs, Cdeg + 1, Bcoeffs, Bdeg + 1);
+
+    /* Acoeffs cleared */
+    _fmpz_mpoly_set_fmpz_poly_one_var(A, FLINT_MAX(B->bits, C->bits),
+                                                           Acoeffs, Adeg, ctx);
+    TMP_END;
+    return 1;
+}
+
 
 void fmpz_mpoly_mul(
     fmpz_mpoly_t A,
@@ -125,42 +214,26 @@ void fmpz_mpoly_mul(
     slong thread_limit;
     TMP_INIT;
 
-    if (B->length == 0 || C->length == 0)
+    if (B->length < 1 || C->length < 1)
     {
         fmpz_mpoly_zero(A, ctx);
         return;
     }
-
-    if (fmpz_mpoly_is_fmpz(B, ctx))
+    else if (B->length == 1)
     {
-        if (A == B || C == B)
-        {
-            fmpz_t t;
-            fmpz_init_set(t, B->coeffs);
-            fmpz_mpoly_scalar_mul_fmpz(A, C, t, ctx);
-            fmpz_clear(t);
-        }
-        else
-        {
-            fmpz_mpoly_scalar_mul_fmpz(A, C, B->coeffs, ctx);
-        }
+        fmpz_mpoly_mul_monomial(A, C, B, ctx);
+        return;
+    }
+    else if (C->length == 1)
+    {
+        fmpz_mpoly_mul_monomial(A, B, C, ctx);
         return;
     }
 
-    if (fmpz_mpoly_is_fmpz(C, ctx))
+    if (nvars == 1 && B->bits <= FLINT_BITS && C->bits <= FLINT_BITS)
     {
-        if (A == C || B == C)
-        {
-            fmpz_t t;
-            fmpz_init_set(t, C->coeffs);
-            fmpz_mpoly_scalar_mul_fmpz(A, B, t, ctx);
-            fmpz_clear(t);
-        }
-        else
-        {
-            fmpz_mpoly_scalar_mul_fmpz(A, B, C->coeffs, ctx);
-        }
-        return;
+        if (_try_dense_univar(A, B, C, ctx))
+            return;
     }
 
     TMP_START;
