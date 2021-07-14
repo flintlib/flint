@@ -2683,7 +2683,7 @@ Berlekamp-Massey Algorithm
 
     .. math ::
 
-        U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.
+        U x^n + V (a_1 x^{n-1} + a_{n-1} x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.
 
     The polynomials `V` and `R` may be obtained with :func:`nmod_berlekamp_massey_V_poly` and :func:`nmod_berlekamp_massey_R_poly`.
     This class differs from :func:`fmpz_mod_poly_minpoly` in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
