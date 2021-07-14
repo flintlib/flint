@@ -35,8 +35,8 @@ name: Run Sage CI for Linux/Cygwin/macOS
 ## systems/configurations.
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  ## pull_request:
+  ##   types: [opened, synchronize]
   push:
     tags:
       - '*'
