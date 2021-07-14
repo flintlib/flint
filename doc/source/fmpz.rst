@@ -1062,8 +1062,7 @@ Greatest common divisor
     Computes the extended GCD of `f` and `g`, i.e. values `a` and `b`
     such that `af + bg = d`, where `d = \gcd(f, g)`. 
 
-    Assumes that `d` is not aliased with `a` or `b` and that `a` and `b`
-    are not aliased.
+    Assumes that there is no aliasing among the outputs.
 
 .. function:: void fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
@@ -1097,7 +1096,7 @@ Greatest common divisor
             \qquad \Bigl| |b| < \frac{f}{2 d} \Bigr|.
         \end{equation*}
 
-    Assumes that the outputs are not aliased.
+    Assumes that there is no aliasing among the outputs.
 
 .. function:: void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)
 

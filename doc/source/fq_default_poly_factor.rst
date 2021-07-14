@@ -1,7 +1,7 @@
 .. _fq-poly_factor:
 
 **fq_default_poly_factor.h** -- factorisation of univariate polynomials over finite fields
-==================================================================================
+==========================================================================================
 
 Description.
 
