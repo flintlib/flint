@@ -2683,7 +2683,7 @@ Berlekamp-Massey Algorithm
 
     .. math ::
 
-        `U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2`.
+        U x^n + V (a_1 x^{n-1} + a_{n-1} x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.
 
     The polynomials `V` and `R` may be obtained with :func:`nmod_berlekamp_massey_V_poly` and :func:`nmod_berlekamp_massey_R_poly`.
     This class differs from :func:`fmpz_mod_poly_minpoly` in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
@@ -2691,14 +2691,14 @@ Berlekamp-Massey Algorithm
 
     .. math ::
 
-        `\sum_{i} v_i a_{j + i} = 0, \quad 1 \le j \le n - \deg(V)`.
+        \sum_{i} v_i a_{j + i} = 0, \quad 1 \le j \le n - \deg(V).
 
     The cost is that a polynomial of degree `n-1` might be returned and the return is not generally uniquely determined by the input sequence.
     For the nmod_berlekamp_massey_t we have
 
     .. math ::
 
-        `\sum_{i,j} v_i a_{j+i} x^{-j} = -U + \frac{R}{x^n}\text{,}
+        \sum_{i,j} v_i a_{j+i} x^{-j} = -U + \frac{R}{x^n}\text{,}
 
     and it can be seen that `\sum_{i} v_i a_{j + i}` is zero for `1 \le j < n - \deg(R)`. Thus whether or not `V` has annihilated the whole sequence may be checked by comparing the degrees of `V` and `R`.
 

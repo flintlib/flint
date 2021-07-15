@@ -1062,42 +1062,41 @@ Greatest common divisor
     Computes the extended GCD of `f` and `g`, i.e. values `a` and `b`
     such that `af + bg = d`, where `d = \gcd(f, g)`. 
 
-    Assumes that `d` is not aliased with `a` or `b` and that `a` and `b`
-    are not aliased.
+    Assumes that there is no aliasing among the outputs.
 
 .. function:: void fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
-    \\newcommand{\\xgcd}{\\operatorname{xgcd}}
-    \\newcommand{\\sgn}{\\operatorname{sgn}}
-    Computes the extended GCD `\xgcd(f, g) = (d, a, b)` such that
+    Computes the extended GCD `\operatorname{xgcd}(f, g) = (d, a, b)` such that
     the solution is the canonical solution to Bézout's identity. We define the
     canonical solution to satisfy either one of these cases:
-    \\begin{align*}
-        \\xgcd(\\pm g, g) &= \\bigl(|g|, 0, \\sgn(g)\\bigr)
-        \\\\
-        \\xgcd(f, 0) &= \\bigl(|f|, \\sgn(f), 0\\bigr)
-        \\\\
-        \\xgcd(0, g) &= \\bigl(|g|, 0, \\sgn(g)\\bigr)
-        \\\\
-        \\xgcd(f, \\mp 1) &= (1, 0, \\mp 1)
-        \\\\
-        \\xgcd(\\mp 1, g) &= (1, \\mp 1, 0)\\quad g \\neq 0, \\pm 1
-        \\\\
-        \\xgcd(\\mp 2 d, g) &=
-            \\bigl(d, {\\textstyle\\frac{d - |g|}{\\mp 2 d}}, \\sgn(g)\\bigr)
-        \\\\
-        \\xgcd(f, \\mp 2 d) &=
-            \\bigl(d, \\sgn(f), {\\textstyle\\frac{d - |g|}{\\mp 2 d}}\\bigr).
-    \\end{align*}
+
+    .. math ::
+
+        \newcommand{\xgcd}{\operatorname{xgcd}}
+        \newcommand{\sgn}{\operatorname{sgn}}
+        \begin{align*}
+            \xgcd(\pm g, g) &= \bigl(|g|, 0, \sgn(g)\bigr)\\
+            \xgcd(f, 0) &= \bigl(|f|, \sgn(f), 0\bigr)\\
+            \xgcd(0, g) &= \bigl(|g|, 0, \sgn(g)\bigr)\\
+            \xgcd(f, \mp 1) &= (1, 0, \mp 1)\\
+            \xgcd(\mp 1, g) &= (1, \mp 1, 0)\quad g \neq 0, \pm 1\\
+            \xgcd(\mp 2 d, g) &=
+                \bigl(d, {\textstyle\frac{d - |g|}{\mp 2 d}}, \sgn(g)\bigr)\\
+            \xgcd(f, \mp 2 d) &=
+                \bigl(d, \sgn(f), {\textstyle\frac{d - |g|}{\mp 2 d}}\bigr).
+        \end{align*}
+
     If the pair `(f, g)` does not satisfy any of the cases above, the solution
     `(d, a, b)` will satisfy
-    \\begin{equation*}
-        |a| < \\Bigl| \\frac{g}{2 d} \\Bigr|,
-        \\qquad \\Bigl| |b| < \\frac{f}{2 d} \\Bigr|.
-    \\end{equation*}
 
-    Assumes that `d` is not aliased with `a` or `b` and that `a` and `b`
-    are not aliased.
+    .. math ::
+
+        \begin{equation*}
+            |a| < \Bigl| \frac{g}{2 d} \Bigr|,
+            \qquad \Bigl| |b| < \frac{f}{2 d} \Bigr|.
+        \end{equation*}
+
+    Assumes that there is no aliasing among the outputs.
 
 .. function:: void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)
 

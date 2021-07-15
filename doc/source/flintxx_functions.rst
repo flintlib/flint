@@ -3615,14 +3615,6 @@ Logarithm
     Compute the logarithm function. These may raise ``flint_exception`` if the
     series do not converge.
 
-Special functions
--------------------------------------------------------------------------------
-
-.. function:: Padic_expr teichmuller(Padic_expr)
-
-.. function:: Fmpz_expr padic_val_fac(Fmpz_expr, Fmpz_expr)
-.. function:: ulong padic_val_fac(T:is_unsigned_integer, Fmpz_expr)
-
 Polynomials over the `p`-adics (``padic_poly``)
 ===============================================================================
 
