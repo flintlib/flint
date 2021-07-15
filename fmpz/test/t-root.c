@@ -103,6 +103,50 @@ main(void)
         fmpz_clear(pow);
     }
 
+    /* Not exact powers */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        fmpz_t f, g, pow;
+        slong n;
+
+        fmpz_init(f);
+        fmpz_init(g);
+        fmpz_init(pow);
+
+        n = n_randint(state, 20) + 2;
+        
+        while (fmpz_cmp_ui(g, 2) < 0)
+            fmpz_randtest_unsigned(g, state, 200);
+
+        while (fmpz_is_zero(f))
+            fmpz_randm(f, state, g);
+
+        fmpz_pow_ui(pow, g, n);
+        fmpz_add(pow, pow, f);
+
+        if ((n & 1) != 0 && n_randint(state, 2) == 0)
+        {
+            fmpz_neg(g, g);
+            fmpz_neg(pow, pow);
+        }
+
+        exact = fmpz_root(f, pow, n);
+
+        result = (!exact && fmpz_equal(f, g));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("g = "); fmpz_print(g); flint_printf("\n");
+            flint_printf("f = "); fmpz_print(f); flint_printf("\n");
+            flint_printf("exact = %d, n = %wu\n", exact, n);
+            abort();
+        }
+
+        fmpz_clear(f);
+        fmpz_clear(g);
+        fmpz_clear(pow);
+    }
+
     /* Check aliasing of f and g */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
