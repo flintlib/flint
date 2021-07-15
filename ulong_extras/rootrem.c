@@ -84,10 +84,10 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
     mp_limb_t x, currval, base, upper_limit; 
     double dx;
 
-    if (!n || !root)
+    if (!root)
         return 0;
 
-    if (root == 1)
+    if (n == 0 || root == 1)
     {
         *remainder = 0;
         return n;

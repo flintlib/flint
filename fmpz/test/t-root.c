@@ -20,13 +20,11 @@
 int
 main(void)
 {
-    int i, result;
+    int i, result, exact;
     FLINT_TEST_INIT(state);
 
     flint_printf("root....");
     fflush(stdout);
-
-    
 
     /* Comparison with mpz routines */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -68,6 +66,41 @@ main(void)
         mpz_clear(mf);
         mpz_clear(mf2);
         mpz_clear(mg);
+    }
+
+    /* Exact powers */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        fmpz_t f, g, pow;
+        slong n;
+
+        fmpz_init(f);
+        fmpz_init(g);
+        fmpz_init(pow);
+
+        n = n_randint(state, 20) + 1;
+        
+        fmpz_randtest(g, state, 200);
+        if ((n & 1) == 0)
+            fmpz_abs(g, g);
+
+        fmpz_pow_ui(pow, g, n);
+
+        exact = fmpz_root(f, pow, n);
+
+        result = (exact && fmpz_equal(f, g));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("g = "); fmpz_print(g); flint_printf("\n");
+            flint_printf("f = "); fmpz_print(f); flint_printf("\n");
+            flint_printf("exact = %d, n = %wu\n", exact, n);
+            abort();
+        }
+
+        fmpz_clear(f);
+        fmpz_clear(g);
+        fmpz_clear(pow);
     }
 
     /* Check aliasing of f and g */
