@@ -29,21 +29,20 @@ main(void)
     for (i = 0; i < 1 + tmul; i++)
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_struct f[2];
-        const fmpz_mpoly_struct * fptr[] = {f + 0, f + 1};
+        fmpz_mpoly_t f, g, h, k;
+        const fmpz_mpoly_struct * fptr[] = {f, g};
         slong f_length = 2;
-        fmpz_mpoly_t h, k;
         const char * vars[] = {"x", "y", "z", "t"};
 
         fmpz_mpoly_ctx_init(ctx, 4, ORD_DEGLEX);
-        fmpz_mpoly_init(f+0, ctx);
-        fmpz_mpoly_init(f+1, ctx);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
         fmpz_mpoly_init(k, ctx);
 
         /* designed to trigger the dense case; reduced exponent to 10 to make it run faster */
-        fmpz_mpoly_set_str_pretty(f+0, "((1-x)*(1+y)*(1+z))^10", vars, ctx);
-        fmpz_mpoly_set_str_pretty(f+1, "((1+x)*(1-y)*(1-z))^10", vars, ctx);
+        fmpz_mpoly_set_str_pretty(f, "((1-x)*(1+y)*(1+z))^10", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "((1+x)*(1-y)*(1-z))^10", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1-x^2)*(1-y^2)*(1-z^2))^10", vars, ctx);
         fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
@@ -54,8 +53,8 @@ main(void)
         }
 
         /* designed to trigger the array case */
-        fmpz_mpoly_set_str_pretty(f+0, "(1+x+y+z+t)^20", vars, ctx);
-        fmpz_mpoly_set_str_pretty(f+1, "(1-x-y-z-t)^20", vars, ctx);
+        fmpz_mpoly_set_str_pretty(f, "(1+x+y+z+t)^20", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "(1-x-y-z-t)^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1+x+y+z+t)*(1-x-y-z-t))^20", vars, ctx);
         fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
@@ -66,8 +65,8 @@ main(void)
         }
 
         /* designed to trigger the heap case */
-        fmpz_mpoly_set_str_pretty(f+0, "(1+x^10)^50", vars, ctx);
-        fmpz_mpoly_set_str_pretty(f+1, "(1+y^10)^50", vars, ctx);
+        fmpz_mpoly_set_str_pretty(f, "(1+x^10)^50", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "(1+y^10)^50", vars, ctx);
         fmpz_mpoly_set_str_pretty(k, "((1+x^10)*(1+y^10))^50", vars, ctx);
         fmpz_mpoly_addmul_multi(h, fptr, &f_length, 1, ctx);
         if (!fmpz_mpoly_equal(h, k, ctx))
@@ -77,8 +76,8 @@ main(void)
             flint_abort();
         }
 
-        fmpz_mpoly_clear(f+0, ctx);
-        fmpz_mpoly_clear(f+1, ctx);
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(k, ctx);
         fmpz_mpoly_ctx_clear(ctx);
