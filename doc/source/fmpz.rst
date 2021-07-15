@@ -977,11 +977,12 @@ Basic arithmetic
 
     Returns nonzero if `f` is a perfect square and zero otherwise.
 
-.. function:: void fmpz_root(fmpz_t r, const fmpz_t f, slong n)
+.. function:: int fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
     Set `r` to the integer part of the `n`-th root of `f`. Requires that
     `n > 0` and that if `n` is even then `f` be non-negative, otherwise an 
-    exception is raised.
+    exception is raised. The function returns `1` if the root was exact,
+    otherwise `0`.
 
 .. function:: int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
 
