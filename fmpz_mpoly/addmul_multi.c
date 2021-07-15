@@ -20,9 +20,16 @@
 #define EXPTEST 0
 
 /*
-   Set A to B1*B2*---*Bn using Johnson's heap method. The function
-   realocates its output and returns the length of the product. This
-   version of the function assumes the exponent vectors take N words.
+   Set A to B1*B2*---*Bm + Bm+1*Bm+2*---*Bn + ... using Johnson's heap
+   method. The function reallocates its output and returns the length
+   of the product. This version of the function assumes the exponent
+   vectors take N words.
+
+   mul_johnson.c optimizes for medium sized coefficients (the coeffs
+   fit in a single machine word but their products do not) by keeping
+   the intermediate results in local variables until we're ready to
+   store them in memory.  This routine does not currently implement
+   such an optimization, though it could.
 */
 slong _fmpz_mpoly_addmul_multi(
     fmpz_mpoly_t A,
@@ -43,8 +50,6 @@ slong _fmpz_mpoly_addmul_multi(
    ulong * Q;
    mpoly_heap_t * x;
    ulong multiindex;
-   ulong cy;
-   ulong c[3], p[2]; /* for accumulating coefficients */
    ulong * exp, * exps;
    ulong ** exp_list;
    slong exp_next;
@@ -142,9 +147,6 @@ slong _fmpz_mpoly_addmul_multi(
 
       /* whether we are on first coeff product for this output exponent */
       first = 1;
-
-      /* set temporary coeff to zero */
-      c[0] = c[1] = c[2] = 0;
 
       /* while heap nonempty and contains chain with current output exponent */
       while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N))
