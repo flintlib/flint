@@ -183,7 +183,7 @@ ifndef MOD
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
 	mkdir -p build/interfaces/test
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
-		$(MAKE) build/interfaces/test/t-NTL-interface; \
+		$(MAKE) build/interfaces/test/t-NTL-interface$(EXEEXT); \
 		build/interfaces/test/t-NTL-interface$(EXEEXT); \
 	fi
 else
