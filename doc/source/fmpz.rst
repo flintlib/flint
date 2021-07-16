@@ -1069,7 +1069,8 @@ Greatest common divisor
 
     Computes the extended GCD `\operatorname{xgcd}(f, g) = (d, a, b)` such that
     the solution is the canonical solution to Bézout's identity. We define the
-    canonical solution to satisfy either one of these cases:
+    canonical solution to satisfy one of the following if one of the given
+    conditions apply:
 
     .. math ::
 
@@ -1087,14 +1088,14 @@ Greatest common divisor
                 \bigl(d, \sgn(f), {\textstyle\frac{d - |g|}{\mp 2 d}}\bigr).
         \end{align*}
 
-    If the pair `(f, g)` does not satisfy any of the cases above, the solution
-    `(d, a, b)` will satisfy
+    If the pair `(f, g)` does not satisfy any of these conditions, the solution
+    `(d, a, b)` will satisfy the following:
 
     .. math ::
 
         \begin{equation*}
             |a| < \Bigl| \frac{g}{2 d} \Bigr|,
-            \qquad \Bigl| |b| < \frac{f}{2 d} \Bigr|.
+            \qquad |b| < \Bigl| \frac{f}{2 d} \Bigr|.
         \end{equation*}
 
     Assumes that there is no aliasing among the outputs.
