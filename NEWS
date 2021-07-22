@@ -1259,7 +1259,7 @@ v 2.6.3 -- 12 Aug 2020
  * Support standard GNU installation directories in CMake build
  * Fix stack overflow with ICC
 
-2.8.0 -- 9 Jul 2021
+2.8.0 -- 23 Jul 2021
 
  * New fq_default module which combines existing finite fields
  * Speedups for linear algebra when using BLAS and/or threading
