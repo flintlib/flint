@@ -266,7 +266,7 @@ fmpz_mpoly_gcd_assert_successful(fmpz_mpoly_t res, const fmpz_mpoly_t x, const f
 }
 
 FMPZ_MPOLY_Q_INLINE void
-fmpz_mpoly_divexact(fmpz_mpoly_t res, const fmpz_mpoly_t x, const fmpz_mpoly_t y, const fmpz_mpoly_ctx_t ctx)
+_fmpz_mpoly_q_mpoly_divexact(fmpz_mpoly_t res, const fmpz_mpoly_t x, const fmpz_mpoly_t y, const fmpz_mpoly_ctx_t ctx)
 {
     if (fmpz_mpoly_is_fmpz(y, ctx))
         fmpz_mpoly_scalar_divexact_fmpz(res, x, y->coeffs, ctx);

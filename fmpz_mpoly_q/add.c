@@ -227,8 +227,8 @@ _fmpz_mpoly_q_add(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
             }
             else
             {
-                fmpz_mpoly_divexact(res_num, res_num, t, ctx);
-                fmpz_mpoly_divexact(res_den, x_den, t, ctx);
+                _fmpz_mpoly_q_mpoly_divexact(res_num, res_num, t, ctx);
+                _fmpz_mpoly_q_mpoly_divexact(res_den, x_den, t, ctx);
             }
 
             fmpz_mpoly_clear(t, ctx);
@@ -319,8 +319,8 @@ _fmpz_mpoly_q_add(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
             fmpz_mpoly_init(t, ctx);
             fmpz_mpoly_init(u, ctx);
 
-            fmpz_mpoly_divexact(a, x_den, g, ctx);
-            fmpz_mpoly_divexact(b, y_den, g, ctx);
+            _fmpz_mpoly_q_mpoly_divexact(a, x_den, g, ctx);
+            _fmpz_mpoly_q_mpoly_divexact(b, y_den, g, ctx);
 
             fmpz_mpoly_mul(t, x_num, b, ctx);
             fmpz_mpoly_mul(u, y_num, a, ctx);
@@ -334,8 +334,8 @@ _fmpz_mpoly_q_add(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
             }
             else
             {
-                fmpz_mpoly_divexact(res_num, res_num, t, ctx);
-                fmpz_mpoly_divexact(g, x_den, t, ctx);
+                _fmpz_mpoly_q_mpoly_divexact(res_num, res_num, t, ctx);
+                _fmpz_mpoly_q_mpoly_divexact(g, x_den, t, ctx);
                 fmpz_mpoly_mul(res_den, g, b, ctx);
             }
 

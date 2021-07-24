@@ -73,8 +73,8 @@ fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
 
         if (!fmpz_mpoly_is_one(g, ctx))
         {
-            fmpz_mpoly_divexact(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_numref(res), g, ctx);
-            fmpz_mpoly_divexact(fmpz_mpoly_q_denref(res), fmpz_mpoly_q_denref(res), g, ctx);
+            _fmpz_mpoly_q_mpoly_divexact(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_numref(res), g, ctx);
+            _fmpz_mpoly_q_mpoly_divexact(fmpz_mpoly_q_denref(res), fmpz_mpoly_q_denref(res), g, ctx);
         }
 
         fmpz_mpoly_clear(g, ctx);

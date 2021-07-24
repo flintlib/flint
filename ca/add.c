@@ -147,7 +147,7 @@ _ca_mpoly_q_simplify_fraction_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, c
             if (fmpz_mpoly_is_fmpz(g, mctx))
                 continue;
 
-            fmpz_mpoly_divexact(q, u, g, mctx);
+            _fmpz_mpoly_q_mpoly_divexact(q, u, g, mctx);
             fmpz_mpoly_mul(fmpz_mpoly_q_numref(f), fmpz_mpoly_q_numref(res), q, mctx);
             fmpz_mpoly_mul(fmpz_mpoly_q_denref(f), fmpz_mpoly_q_denref(res), q, mctx);
             _ca_mpoly_q_reduce_ideal(f, field, ctx);
