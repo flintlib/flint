@@ -9,6 +9,12 @@ in the git repository https://github.com/fredrik-johansson/calcium
 Old releases of the code can be accessed from
 https://github.com/fredrik-johansson/calcium/releases
 
+2021-07-24 - version 0.4.1
+-------------------------------------------------------------------------------
+
+* Flint 2.8 compatibility.
+
+
 2021-05-28 - version 0.4
 -------------------------------------------------------------------------------
 

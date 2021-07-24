@@ -33,7 +33,7 @@ const char * calcium_version(void);
 
 #define __CALCIUM_VERSION 0
 #define __CALCIUM_VERSION_MINOR 4
-#define __CALCIUM_VERSION_PATCHLEVEL 0
+#define __CALCIUM_VERSION_PATCHLEVEL 1
 #define CALCIUM_VERSION "0.4.0"
 #define __CALCIUM_RELEASE (__CALCIUM_VERSION * 10000 + \
                          __CALCIUM_VERSION_MINOR * 100 + \
