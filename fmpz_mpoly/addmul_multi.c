@@ -87,7 +87,10 @@ slong _fmpz_mpoly_addmul_multi(
       hind_len[i] = 1;
 
       for (j = 1; j < Blengths[i]; j++)
+      {
+          FLINT_ASSERT(Bstart[i][j].length <= Bstart[i][0].length);
           hind_len[i] *= Bstart[i][j].length;
+      }
       hind_totallen += hind_len[i];
    }
 
@@ -347,10 +350,10 @@ void _fmpz_mpoly_addmul_multi_maxfields(
 
        for (j = 0; j < Blengths[i]; j++)
        {
-           if (k + j == maxBindex)
-               m = k;
-           else if (k + j < maxBindex)
-               m = k + j + 1;
+           if (j == 0)
+               m = maxBindex;
+           else if (k + j <= maxBindex)
+               m = k + j - 1;
            else
                m = k + j;
 
