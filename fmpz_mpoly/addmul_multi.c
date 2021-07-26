@@ -45,6 +45,7 @@ slong _fmpz_mpoly_addmul_multi(
    slong i, j, k, l;
    slong next_loc;
    slong Q_len = 0, heap_len = 1; /* heap starts empty, and its zero index is unused, so heap_len = 1 */
+   slong heap_size;
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
    ulong * Q;
@@ -95,7 +96,9 @@ slong _fmpz_mpoly_addmul_multi(
    }
 
    next_loc = hind_totallen + 4;   /* something bigger than heap can ever be */
-   heap = (mpoly_heap_s *) TMP_ALLOC((hind_totallen + 1)*sizeof(mpoly_heap_s));
+   heap_size = 2*(Bnumseq + 1);    /* twice initially needed size */
+
+   heap = (mpoly_heap_s *) flint_malloc(heap_size*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
    chain = (mpoly_heap_t *) TMP_ALLOC(hind_totallen*sizeof(mpoly_heap_t));
    /* space for temporary storage of pointers to heap nodes */
@@ -259,6 +262,11 @@ slong _fmpz_mpoly_addmul_multi(
                      if (EXPTEST) {
 	                 fprintf(stderr, "Adding %ld (term %ld) because of %ld with hind[%ld] %ld\n", candidate, term, multiindex, candidate, hind[hind_start[term] + candidate]);
                      }
+                     if (heap_len + 1 > heap_size)
+                     {
+                         heap_size += 2*(Bnumseq + 1);
+                         heap = flint_realloc(heap, heap_size*sizeof(mpoly_heap_s));
+                     }
                      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                              &next_loc, &heap_len, N, cmpmask))
                          exp_next--;
@@ -279,6 +287,8 @@ slong _fmpz_mpoly_addmul_multi(
    k++;
 
    fmpz_clear(tmp_coeff);
+
+   flint_free(heap);
 
    TMP_END;
 
