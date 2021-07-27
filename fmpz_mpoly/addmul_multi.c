@@ -104,10 +104,10 @@ slong _fmpz_mpoly_addmul_multi(
    /* space for temporary storage of pointers to heap nodes */
    Q = (ulong *) TMP_ALLOC(hind_totallen*sizeof(ulong));
    /* allocate space for exponent vectors of N words */
-   exps = (ulong *) TMP_ALLOC(hind_totallen*N*sizeof(ulong));
+   exps = (ulong *) TMP_ALLOC(heap_size*N*sizeof(ulong));
    /* list of pointers to allocated exponent vectors */
-   exp_list = (ulong **) TMP_ALLOC(hind_totallen*sizeof(ulong *));
-   for (i = 0; i < hind_totallen; i++)
+   exp_list = (ulong **) flint_malloc(heap_size*sizeof(ulong *));
+   for (i = 0; i < heap_size; i++)
       exp_list[i] = exps + i*N;
 
    /* space for heap indices */
@@ -244,6 +244,16 @@ slong _fmpz_mpoly_addmul_multi(
                      x = chain + hind_start[term] + candidate;
                      x->next = NULL;
 
+                     if (heap_len == heap_size)
+                     {
+                         heap_size += 2*(Bnumseq + 1);
+                         heap = flint_realloc(heap, heap_size*sizeof(mpoly_heap_s));
+                         exps = TMP_ALLOC((2*(Bnumseq+1))*N*sizeof(ulong));
+                         exp_list = flint_realloc(exp_list, heap_size*sizeof(ulong *));
+                         for (l = 0; l < 2*(Bnumseq + 1); l++)
+                             exp_list[heap_len + l] = exps + l*N;
+                     }
+
                      mpoly_monomial_set(exp_list[exp_next], Bstart[term][0].exps + N*(hind[hind_start[term] + candidate] >> 1), N);
                      hind[hind_start[term] + candidate] ++;
 
@@ -261,11 +271,6 @@ slong _fmpz_mpoly_addmul_multi(
 
                      if (EXPTEST) {
 	                 fprintf(stderr, "Adding %ld (term %ld) because of %ld with hind[%ld] %ld\n", candidate, term, multiindex, candidate, hind[hind_start[term] + candidate]);
-                     }
-                     if (heap_len + 1 > heap_size)
-                     {
-                         heap_size += 2*(Bnumseq + 1);
-                         heap = flint_realloc(heap, heap_size*sizeof(mpoly_heap_s));
                      }
                      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                              &next_loc, &heap_len, N, cmpmask))
@@ -288,6 +293,7 @@ slong _fmpz_mpoly_addmul_multi(
 
    fmpz_clear(tmp_coeff);
 
+   flint_free(exp_list);
    flint_free(heap);
 
    TMP_END;
