@@ -22,6 +22,10 @@
 typedef unsigned short hind_t;
 #define HIND_FORMAT "%d"
 
+/* TMP_ALLOC will use alloca for allocations of 8192 or less, which causes problems */
+/* Allocate chain in 16KB blocks */
+static const int chain_block_size = 16384/sizeof(mpoly_heap_t);
+
 /*
    Set A to B1*B2*---*Bm + Bm+1*Bm+2*---*Bn + ... using Johnson's heap
    method. The function reallocates its output and returns the length
@@ -49,6 +53,7 @@ slong _fmpz_mpoly_addmul_multi(
    slong next_loc;
    slong Q_len = 0, heap_len = 1; /* heap starts empty, and its zero index is unused, so heap_len = 1 */
    slong heap_size;
+   slong heap_block_size;
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
    mpoly_heap_t ** chain_list;
@@ -106,8 +111,13 @@ slong _fmpz_mpoly_addmul_multi(
    }
 
    next_loc = hind_totallen + 4;   /* something bigger than heap can ever be */
-   heap_size = 2*(Bnumseq + 1);    /* twice initially needed size */
-   chain_size = 2*(Bnumseq + 1);   /* twice initially needed size */
+
+   heap_block_size = 16384/sizeof(ulong)/N;
+   heap_size = heap_block_size;
+   assert(heap_block_size >= Bnumseq + 1);
+
+   assert(chain_block_size >= Bnumseq);
+   chain_size = chain_block_size;
 
    heap = (mpoly_heap_s *) flint_malloc(heap_size*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
@@ -269,20 +279,20 @@ slong _fmpz_mpoly_addmul_multi(
                  {
                      if (heap_len == heap_size)
                      {
-                         heap_size += 2*(Bnumseq + 1);
+                         heap_size += heap_block_size;
                          heap = flint_realloc(heap, heap_size*sizeof(mpoly_heap_s));
-                         exps = TMP_ALLOC((2*(Bnumseq+1))*N*sizeof(ulong));
+                         exps = TMP_ALLOC(heap_block_size*N*sizeof(ulong));
                          exp_list = flint_realloc(exp_list, heap_size*sizeof(ulong *));
-                         for (l = 0; l < 2*(Bnumseq + 1); l++)
+                         for (l = 0; l < heap_block_size; l++)
                              exp_list[heap_len + l] = exps + l*N;
                      }
 
                      if (chain_next == chain_size)
                      {
-                         chain_size += 2*(Bnumseq + 1);
-                         chain = (mpoly_heap_t *) TMP_ALLOC((2*(Bnumseq+1))*sizeof(mpoly_heap_t));
+                         chain_size += chain_block_size;
+                         chain = (mpoly_heap_t *) TMP_ALLOC(chain_block_size*sizeof(mpoly_heap_t));
                          chain_list = (mpoly_heap_t **) flint_realloc(chain_list, chain_size*sizeof(mpoly_heap_t *));
-                         for (l = 0; l < 2*(Bnumseq + 1); l++)
+                         for (l = 0; l < chain_block_size; l++)
                              chain_list[chain_next + l] = chain + l;
                      }
 
