@@ -50,6 +50,7 @@ slong _fmpz_mpoly_addmul_multi(
    mpoly_heap_t * chain;
    mpoly_heap_t ** chain_list;
    ulong * Q;
+   slong Q_size;
    mpoly_heap_t * x;
    ulong multiindex;
    ulong * exp, * exps;
@@ -110,7 +111,9 @@ slong _fmpz_mpoly_addmul_multi(
       chain_list[i] = chain + i;
 
    /* space for temporary storage of pointers to heap nodes */
-   Q = (ulong *) TMP_ALLOC(hind_totallen*sizeof(ulong));
+   Q_size = Bnumseq;
+   Q = (ulong *) flint_malloc(Q_size*sizeof(ulong));
+
    /* allocate space for exponent vectors of N words */
    exps = (ulong *) TMP_ALLOC(heap_size*N*sizeof(ulong));
    /* list of pointers to allocated exponent vectors */
@@ -216,6 +219,11 @@ slong _fmpz_mpoly_addmul_multi(
             }
 
             /* take node out of heap and put into store */
+            if (Q_len == Q_size)
+            {
+                Q_size += Bnumseq;
+                Q = (ulong *) flint_realloc(Q, Q_size*sizeof(ulong));
+            }
             hind[multiindex] |= WORD(1);
             Q[Q_len++] = multiindex;
 
@@ -316,6 +324,7 @@ slong _fmpz_mpoly_addmul_multi(
    fmpz_clear(tmp_coeff);
 
    flint_free(exp_list);
+   flint_free(Q);
    flint_free(chain_list);
    flint_free(heap);
 
