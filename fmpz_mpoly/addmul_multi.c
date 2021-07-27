@@ -48,12 +48,15 @@ slong _fmpz_mpoly_addmul_multi(
    slong heap_size;
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
+   mpoly_heap_t ** chain_list;
    ulong * Q;
    mpoly_heap_t * x;
    ulong multiindex;
    ulong * exp, * exps;
    ulong ** exp_list;
    slong exp_next;
+   slong chain_next;
+   slong chain_size;
    slong * hind;
    int first;
    slong hind_totallen = 0;
@@ -97,10 +100,15 @@ slong _fmpz_mpoly_addmul_multi(
 
    next_loc = hind_totallen + 4;   /* something bigger than heap can ever be */
    heap_size = 2*(Bnumseq + 1);    /* twice initially needed size */
+   chain_size = 2*(Bnumseq + 1);   /* twice initially needed size */
 
    heap = (mpoly_heap_s *) flint_malloc(heap_size*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
-   chain = (mpoly_heap_t *) TMP_ALLOC(hind_totallen*sizeof(mpoly_heap_t));
+   chain = (mpoly_heap_t *) TMP_ALLOC(chain_size*sizeof(mpoly_heap_t));
+   chain_list = (mpoly_heap_t **) flint_malloc(chain_size*sizeof(mpoly_heap_t **));
+   for (i = 0; i < chain_size; i++)
+      chain_list[i] = chain + i;
+
    /* space for temporary storage of pointers to heap nodes */
    Q = (ulong *) TMP_ALLOC(hind_totallen*sizeof(ulong));
    /* allocate space for exponent vectors of N words */
@@ -117,11 +125,13 @@ slong _fmpz_mpoly_addmul_multi(
 
    /* start with no heap nodes and no exponent vectors in use */
    exp_next = 0;
+   chain_next = 0;
 
    for (i = 0; i < Bnumseq; i++)
    {
       /* for each term, put (0...0, exp2[0] + ... + expn[0]) on heap */
-      x = chain + hind_start[i] + 0;
+      x = chain_list[chain_next ++];
+      x->i = hind_start[i];
       x->next = NULL;
 
       mpoly_monomial_zero(exp_list[exp_next], N);
@@ -175,7 +185,7 @@ slong _fmpz_mpoly_addmul_multi(
          /* for each node in this chain */
          do
          {
-            multiindex = x - chain;
+            multiindex = x->i;
 
             for (term=0; term < Bnumseq-1; term++)
             {
@@ -208,6 +218,8 @@ slong _fmpz_mpoly_addmul_multi(
             /* take node out of heap and put into store */
             hind[multiindex] |= WORD(1);
             Q[Q_len++] = multiindex;
+
+            chain_list[-- chain_next] = x;
          }
          while ((x = x->next) != NULL);
       }
@@ -241,9 +253,6 @@ slong _fmpz_mpoly_addmul_multi(
                  }
                  if (j == Blengths[term])
                  {
-                     x = chain + hind_start[term] + candidate;
-                     x->next = NULL;
-
                      if (heap_len == heap_size)
                      {
                          heap_size += 2*(Bnumseq + 1);
@@ -253,6 +262,19 @@ slong _fmpz_mpoly_addmul_multi(
                          for (l = 0; l < 2*(Bnumseq + 1); l++)
                              exp_list[heap_len + l] = exps + l*N;
                      }
+
+                     if (chain_next == chain_size)
+                     {
+                         chain_size += 2*(Bnumseq + 1);
+                         chain = (mpoly_heap_t *) TMP_ALLOC((2*(Bnumseq+1))*sizeof(mpoly_heap_t));
+                         chain_list = (mpoly_heap_t **) flint_realloc(chain_list, chain_size*sizeof(mpoly_heap_t *));
+                         for (l = 0; l < 2*(Bnumseq + 1); l++)
+                             chain_list[chain_next + l] = chain + l;
+                     }
+
+                     x = chain_list[chain_next ++];
+                     x->i = hind_start[term] + candidate;
+                     x->next = NULL;
 
                      mpoly_monomial_set(exp_list[exp_next], Bstart[term][0].exps + N*(hind[hind_start[term] + candidate] >> 1), N);
                      hind[hind_start[term] + candidate] ++;
@@ -294,6 +316,7 @@ slong _fmpz_mpoly_addmul_multi(
    fmpz_clear(tmp_coeff);
 
    flint_free(exp_list);
+   flint_free(chain_list);
    flint_free(heap);
 
    TMP_END;
