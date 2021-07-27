@@ -19,6 +19,9 @@
 /* #define EXPTEST (*exp == 0x6000002000004LL) */
 #define EXPTEST 0
 
+typedef unsigned short hind_t;
+#define HIND_FORMAT "%d"
+
 /*
    Set A to B1*B2*---*Bm + Bm+1*Bm+2*---*Bn + ... using Johnson's heap
    method. The function reallocates its output and returns the length
@@ -58,7 +61,7 @@ slong _fmpz_mpoly_addmul_multi(
    slong exp_next;
    slong chain_next;
    slong chain_size;
-   slong * hind;
+   hind_t * hind;
    int first;
    slong hind_totallen = 0;
    slong * hind_len;
@@ -91,6 +94,9 @@ slong _fmpz_mpoly_addmul_multi(
       hind_start[i] = hind_totallen;
       hind_len[i] = 1;
 
+      /* XXX - FLINT_ASSERTs are only tested if configured with --enable-assert */
+      FLINT_ASSERT(Bstart[i][0].length < (UWORD(1) << (8*sizeof(hind_t) - 1)));
+
       for (j = 1; j < Blengths[i]; j++)
       {
           FLINT_ASSERT(Bstart[i][j].length <= Bstart[i][0].length);
@@ -122,7 +128,7 @@ slong _fmpz_mpoly_addmul_multi(
       exp_list[i] = exps + i*N;
 
    /* space for heap indices */
-   hind = (slong *) TMP_ALLOC(hind_totallen*sizeof(slong));
+   hind = (hind_t *) TMP_ALLOC(hind_totallen*sizeof(hind_t));
    for (i = 0; i < hind_totallen; i++)
        hind[i] = 1;
 
@@ -300,7 +306,8 @@ slong _fmpz_mpoly_addmul_multi(
                      }
 
                      if (EXPTEST) {
-	                 fprintf(stderr, "Adding %ld (term %ld) because of %ld with hind[%ld] %ld\n", candidate, term, multiindex, candidate, hind[hind_start[term] + candidate]);
+	                 fprintf(stderr, "Adding %ld (term %ld) because of %ld with hind[%ld] " HIND_FORMAT "\n",
+                                 candidate, term, multiindex, candidate, hind[hind_start[term] + candidate]);
                      }
                      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                              &next_loc, &heap_len, N, cmpmask))
