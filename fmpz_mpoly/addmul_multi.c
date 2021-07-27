@@ -113,11 +113,8 @@ slong _fmpz_mpoly_addmul_multi(
    next_loc = hind_totallen + 4;   /* something bigger than heap can ever be */
 
    heap_block_size = 16384/sizeof(ulong)/N;
-   heap_size = heap_block_size;
-   assert(heap_block_size >= Bnumseq + 1);
-
-   assert(chain_block_size >= Bnumseq);
-   chain_size = chain_block_size;
+   for (heap_size = 0; heap_size < Bnumseq + 1; heap_size += heap_block_size);
+   for (chain_size = 0; chain_size < Bnumseq; chain_size += chain_block_size);
 
    heap = (mpoly_heap_s *) flint_malloc(heap_size*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
