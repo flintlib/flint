@@ -82,3 +82,52 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
 
      flint_abort();
 }
+
+/**** overridable exception function *****************************************/
+
+FLINT_NORETURN static void
+def_exception_func(int exc, const char * msg, char * extra)
+{
+    flint_printf("flint exception (");
+
+    if (exc == FLINT_ERROR)
+        flint_printf("General error");
+    else if (exc == FLINT_IMPINV)
+        flint_printf("Impossible inverse");
+    else if (exc == FLINT_DOMERR)
+        flint_printf("Domain error");
+    else if (exc == FLINT_DIVZERO)
+        flint_printf("Divide by zero");
+    else if (exc == FLINT_INEXACT)
+        flint_printf("Inexact");
+    else
+        flint_printf("Unknown");
+
+    flint_printf("): ");
+    flint_printf(msg);
+
+    if (extra != NULL)
+    {
+        flint_printf(extra);
+        flint_free(extra);
+    }
+
+    flint_printf("\n");
+    fflush(stdout);
+
+    flint_abort();
+}
+
+FLINT_NORETURN void (*exception_func)(int, const char *, char *) = def_exception_func;
+
+FLINT_NORETURN void
+flint_exception(flint_err_t exc, const char * msg, char * extra)
+{
+    (*exception_func)((int)(exc), msg, extra);
+}
+
+void flint_set_exception(FLINT_NORETURN void (*func)(int, const char *, char *))
+{
+    exception_func = func;
+}
+

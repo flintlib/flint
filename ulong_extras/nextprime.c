@@ -82,8 +82,9 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
     if (n >= UWORD_MAX_PRIME)
     {
-        flint_printf("Exception (n_nextprime). No larger single-limb prime exists.\n");
-        flint_abort();
+        flint_exception(FLINT_DOMERR,
+                        "n_nextprime: No larger single-limb prime exists.",
+                        NULL);
     }
 
     index = n % 30;

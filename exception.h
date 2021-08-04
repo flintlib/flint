@@ -24,4 +24,7 @@ typedef enum
 
 FLINT_DLL void flint_throw(flint_err_t exc, const char * msg, ...);
 
+FLINT_DLL FLINT_NORETURN void flint_exception(flint_err_t exc,
+                                               const char * msg, char * extra);
+
 #endif
