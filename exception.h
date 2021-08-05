@@ -22,9 +22,20 @@ typedef enum
    FLINT_INEXACT /* inexact error */
 } flint_err_t;
 
+/* for all except NONE the "extra" is flint-mallocated object */
+typedef enum
+{
+    FLINT_EXC_EXTRA_NONE,
+    FLINT_EXC_EXTRA_STR,
+    FLINT_EXC_EXTRA_SI,
+    FLINT_EXC_EXTRA_UI,
+    FLINT_EXC_EXTRA_FMPZ,
+    FLINT_EXC_EXTRA_FMPQ
+} flint_exc_extra_t;
+
 FLINT_DLL void flint_throw(flint_err_t exc, const char * msg, ...);
 
-FLINT_DLL FLINT_NORETURN void flint_exception(flint_err_t exc,
-                                               const char * msg, char * extra);
+FLINT_DLL FLINT_NORETURN void flint_exception(flint_err_t exc, const char * msg,
+                                   flint_exc_extra_t extra_type, void * extra);
 
 #endif

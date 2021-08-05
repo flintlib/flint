@@ -19,9 +19,19 @@ void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
     fmpz_gcdinv(d, a, b, ctx->n);
     if (!fmpz_is_one(d))
     {
-        fmpz_clear(d);
-        /* printing b and n would entail leaking the string so no b nor n */
-        flint_throw(FLINT_IMPINV, "Exception in fmpz_mod_inv: Cannot invert.\n");
+        if (fmpz_is_zero(b))
+        {
+            fmpz_clear(d);
+            flint_exception(FLINT_DIVZERO, "fmpz_mod_inv: Division by zero.",
+                            FLINT_EXC_EXTRA_NONE, NULL);
+        }
+        else
+        {
+            fmpz * ex = FLINT_ARRAY_ALLOC(1, fmpz);
+            *ex = *d;
+            flint_exception(FLINT_IMPINV, "fmpz_mod_inv: Modulus has divisor ",
+                            FLINT_EXC_EXTRA_FMPZ, ex);
+        }
     }
     fmpz_clear(d);
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));

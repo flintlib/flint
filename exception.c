@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpq.h"
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
 #include <pthread.h>
@@ -86,7 +88,7 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
 /**** overridable exception function *****************************************/
 
 FLINT_NORETURN static void
-def_exception_func(int exc, const char * msg, char * extra)
+def_exception_func(int exc, const char * msg, int extra_type, void * extra)
 {
     flint_printf("flint exception (");
 
@@ -106,11 +108,35 @@ def_exception_func(int exc, const char * msg, char * extra)
     flint_printf("): ");
     flint_printf(msg);
 
-    if (extra != NULL)
+    if (extra_type == FLINT_EXC_EXTRA_STR)
     {
-        flint_printf(extra);
-        flint_free(extra);
+        char * v = (char *) extra;
+        flint_printf(v);
     }
+    else if (extra_type == FLINT_EXC_EXTRA_SI)
+    {
+        slong * v = (slong *) extra;
+        flint_printf("%wd", *v);
+    }
+    else if (extra_type == FLINT_EXC_EXTRA_UI)
+    {
+        ulong * v = (ulong *) extra;
+        flint_printf("%wu", *v);
+    }
+    else if (extra_type == FLINT_EXC_EXTRA_FMPZ)
+    {
+        fmpz * v = (fmpz *) extra;
+        fmpz_print(v);
+        fmpz_clear(v);
+    }
+    else if (extra_type == FLINT_EXC_EXTRA_FMPQ)
+    {
+        fmpq * v = (fmpq *) extra;
+        fmpq_print(v);
+        fmpq_clear(v);
+    }
+
+    flint_free(extra);
 
     flint_printf("\n");
     fflush(stdout);
@@ -118,15 +144,18 @@ def_exception_func(int exc, const char * msg, char * extra)
     flint_abort();
 }
 
-FLINT_NORETURN void (*exception_func)(int, const char *, char *) = def_exception_func;
+FLINT_NORETURN void (*exception_func)(int, const char *, int, void *) =
+                                                            def_exception_func;
 
 FLINT_NORETURN void
-flint_exception(flint_err_t exc, const char * msg, char * extra)
+flint_exception(flint_err_t exc, const char * msg,
+                                    flint_exc_extra_t extra_type, void * extra)
 {
-    (*exception_func)((int)(exc), msg, extra);
+    (*exception_func)((int)(exc), msg, (int)(extra_type), extra);
 }
 
-void flint_set_exception(FLINT_NORETURN void (*func)(int, const char *, char *))
+void flint_set_exception(
+    FLINT_NORETURN void (*func)(int, const char *, int, void *))
 {
     exception_func = func;
 }

@@ -84,7 +84,7 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
     {
         flint_exception(FLINT_DOMERR,
                         "n_nextprime: No larger single-limb prime exists.",
-                        NULL);
+                        FLINT_EXC_EXTRA_NONE, NULL);
     }
 
     index = n % 30;
