@@ -502,7 +502,7 @@ Multiplication
 
 .. function:: void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 
-    Set *A* to `B \time C`.
+    Set *A* to `B \times C`.
 
 
 Powering

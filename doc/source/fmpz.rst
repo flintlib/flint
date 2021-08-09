@@ -1074,29 +1074,30 @@ Greatest common divisor
 
     .. math ::
 
-        \newcommand{\xgcd}{\operatorname{xgcd}}
-        \newcommand{\sgn}{\operatorname{sgn}}
-        \begin{align*}
-            \xgcd(\pm g, g) &= \bigl(|g|, 0, \sgn(g)\bigr)\\
-            \xgcd(f, 0) &= \bigl(|f|, \sgn(f), 0\bigr)\\
-            \xgcd(0, g) &= \bigl(|g|, 0, \sgn(g)\bigr)\\
-            \xgcd(f, \mp 1) &= (1, 0, \mp 1)\\
-            \xgcd(\mp 1, g) &= (1, \mp 1, 0)\quad g \neq 0, \pm 1\\
-            \xgcd(\mp 2 d, g) &=
-                \bigl(d, {\textstyle\frac{d - |g|}{\mp 2 d}}, \sgn(g)\bigr)\\
-            \xgcd(f, \mp 2 d) &=
-                \bigl(d, \sgn(f), {\textstyle\frac{d - |g|}{\mp 2 d}}\bigr).
-        \end{align*}
+        \operatorname{xgcd}(\pm g, g) &= \bigl(|g|, 0, \operatorname{sgn}(g)\bigr)
+
+        \operatorname{xgcd}(f, 0) &= \bigl(|f|, \operatorname{sgn}(f), 0\bigr)
+
+        \operatorname{xgcd}(0, g) &= \bigl(|g|, 0, \operatorname{sgn}(g)\bigr)
+
+        \operatorname{xgcd}(f, \mp 1) &= (1, 0, \mp 1)
+
+        \operatorname{xgcd}(\mp 1, g) &= (1, \mp 1, 0)\quad g \neq 0, \pm 1
+
+        \operatorname{xgcd}(\mp 2 d, g) &=
+                \bigl(d, {\textstyle\frac{d - |g|}{\mp 2 d}}, \operatorname{sgn}(g)\bigr)
+
+         \operatorname{xgcd}(f, \mp 2 d) &=
+                \bigl(d, \operatorname{sgn}(f), {\textstyle\frac{d - |g|}{\mp 2 d}}\bigr).
+
 
     If the pair `(f, g)` does not satisfy any of these conditions, the solution
     `(d, a, b)` will satisfy the following:
 
     .. math ::
 
-        \begin{equation*}
             |a| < \Bigl| \frac{g}{2 d} \Bigr|,
             \qquad |b| < \Bigl| \frac{f}{2 d} \Bigr|.
-        \end{equation*}
 
     Assumes that there is no aliasing among the outputs.
 
