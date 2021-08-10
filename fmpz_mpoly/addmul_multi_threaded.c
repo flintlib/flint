@@ -41,10 +41,13 @@ static const int chain_block_size = 16384/sizeof(mpoly_heap_t);
 
    This version of the addmul routine is designed for threading.
 
+   A separate thread is used for each term in the B polynomial,
+   and a merge thread is used to sum the results from each term.
+
    We only want to output a block of data at a time.
 */
 
-/* per-block data structure accessed by the block threads */
+/* per-term data structure accessed by the block threads */
 
 struct _fmpz_mpoly_addmul_state {
    const fmpz_mpoly_struct * Blist;
@@ -56,9 +59,7 @@ struct _fmpz_mpoly_addmul_state {
    slong heap_size;
    slong heap_block_size;
    mpoly_heap_s * heap;
-   mpoly_heap_t * chain;
    mpoly_heap_t ** chain_list;
-   ulong * exps;
    ulong ** exp_list;
    slong exp_next;
    slong chain_next;
@@ -67,9 +68,11 @@ struct _fmpz_mpoly_addmul_state {
    slong hind_len;
 };
 
-/* per-block data structure that will accessed mainly by the merge thread,
+/* per-term data structure that will accessed mainly by the merge thread,
  * and is therefore kept separate from the state structure, which will
- * be accessed mainly by the block threads.
+ * be accessed mainly by the block threads.  Try to keep the control
+ * structures on a different cache line (64 bytes most commonly)
+ * from the state strctures.
  */
 
 struct _fmpz_mpoly_addmul_multi_control
@@ -93,7 +96,7 @@ struct _fmpz_mpoly_addmul_multi_control
     const struct _fmpz_mpoly_addmul_multi_worker * process_thread;
 };
 
-/* heap data structure */
+/* heap data structure used by the merge thread */
 
 struct _fmpz_mpoly_addmul_multi_heap
 {
@@ -139,7 +142,7 @@ struct _fmpz_mpoly_addmul_multi_worker
     struct _fmpz_mpoly_addmul_multi_master * master;
 };
 
-/* Initialize state for processing a single product */
+/* Initialize state for processing a single term */
 
 void _fmpz_mpoly_addmul_multi_init_state(
     const fmpz_mpoly_struct * Blist,
@@ -149,6 +152,8 @@ void _fmpz_mpoly_addmul_multi_init_state(
 {
    slong i, j;
    mpoly_heap_t * x;
+   mpoly_heap_t * chain;
+   ulong * exps;
 
    state->Blist = Blist;
    state->Blength = Blength;
@@ -173,21 +178,21 @@ void _fmpz_mpoly_addmul_multi_init_state(
 
    state->heap = (mpoly_heap_s *) flint_malloc(state->heap_size*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
-   state->chain = (mpoly_heap_t *) flint_malloc(state->chain_size*sizeof(mpoly_heap_t));
+   chain = (mpoly_heap_t *) flint_malloc(state->chain_size*sizeof(mpoly_heap_t));
    state->chain_list = (mpoly_heap_t **) flint_malloc(state->chain_size*sizeof(mpoly_heap_t **));
    for (i = 0; i < state->chain_size; i++)
-      state->chain_list[i] = state->chain + i;
+      state->chain_list[i] = chain + i;
 
    /* allocate space for exponent vectors of N words */
-   state->exps = (ulong *) flint_malloc(state->heap_size * master->N * sizeof(ulong));
+   exps = (ulong *) flint_malloc(state->heap_size * master->N * sizeof(ulong));
    /* list of pointers to allocated exponent vectors */
    state->exp_list = (ulong **) flint_malloc(state->heap_size*sizeof(ulong *));
    for (i = 0; i < state->heap_size; i++)
-      state->exp_list[i] = state->exps + i*master->N;
+      state->exp_list[i] = exps + i*master->N;
 
    state->malloced_memory_blocks = (void **) flint_malloc(2 * sizeof(void *));
-   state->malloced_memory_blocks[0] = state->chain;
-   state->malloced_memory_blocks[1] = state->exps;
+   state->malloced_memory_blocks[0] = chain;
+   state->malloced_memory_blocks[1] = exps;
    state->num_malloced_memory_blocks = 2;
 
    /* space for heap indices */
@@ -239,6 +244,8 @@ slong _fmpz_mpoly_addmul_multi_process_block(
    ulong candidate;
    ulong partial_multiindex;
    fmpz_t tmp_coeff;
+   mpoly_heap_t * chain_ptr;
+   ulong * exps_ptr;
 
    fmpz_init(tmp_coeff);
 
@@ -348,29 +355,29 @@ slong _fmpz_mpoly_addmul_multi_process_block(
                      {
                          state->heap_size += state->heap_block_size;
                          state->heap = flint_realloc(state->heap, state->heap_size*sizeof(mpoly_heap_s));
-                         state->exps = flint_malloc(state->heap_block_size*master->N*sizeof(ulong));
+                         exps_ptr = flint_malloc(state->heap_block_size*master->N*sizeof(ulong));
                          state->exp_list = flint_realloc(state->exp_list, state->heap_size*sizeof(ulong *));
                          for (l = 0; l < state->heap_block_size; l++)
-                             state->exp_list[state->heap_len + l] = state->exps + l*master->N;
+                             state->exp_list[state->heap_len + l] = exps_ptr + l*master->N;
 
                          state->num_malloced_memory_blocks ++;
                          state->malloced_memory_blocks = (void **) flint_realloc(state->malloced_memory_blocks,
                                                                                   state->num_malloced_memory_blocks * sizeof(void *));
-                         state->malloced_memory_blocks[state->num_malloced_memory_blocks - 1] = state->exps;
+                         state->malloced_memory_blocks[state->num_malloced_memory_blocks - 1] = exps_ptr;
                      }
 
                      if (state->chain_next == state->chain_size)
                      {
                          state->chain_size += chain_block_size;
-                         state->chain = (mpoly_heap_t *) flint_malloc(chain_block_size*sizeof(mpoly_heap_t));
+                         chain_ptr = (mpoly_heap_t *) flint_malloc(chain_block_size*sizeof(mpoly_heap_t));
                          state->chain_list = (mpoly_heap_t **) flint_realloc(state->chain_list, state->chain_size*sizeof(mpoly_heap_t *));
                          for (l = 0; l < chain_block_size; l++)
-                             state->chain_list[state->chain_next + l] = state->chain + l;
+                             state->chain_list[state->chain_next + l] = chain_ptr + l;
 
                          state->num_malloced_memory_blocks ++;
                          state->malloced_memory_blocks = (void **) flint_realloc(state->malloced_memory_blocks,
                                                                                   state->num_malloced_memory_blocks * sizeof(void *));
-                         state->malloced_memory_blocks[state->num_malloced_memory_blocks - 1] = state->chain;
+                         state->malloced_memory_blocks[state->num_malloced_memory_blocks - 1] = chain_ptr;
                      }
 
                      x = state->chain_list[state->chain_next ++];
@@ -421,46 +428,9 @@ slong _fmpz_mpoly_addmul_multi_process_block(
    return k;
 }
 
-/* For each term in the sum, we form a struct _fmpz_mpoly_addmul_state
- * and two 4-blocks (one for coeffs and one for exps).  We also keep
- * the index of the next term to remove from the blocks and the index
- * of the last valid term.  I want to keep that data separate from
- * _fmpz_mpoly_addmul_state to keep it on a different cache line
- * (64 bytes most commonly) since different threads will access
- * the two different structures.
- *
- *
- * We also need a heap structure that feeds from those blocks.
- *
- * heap structure: pointer to exponent vector in exp block
- *                 pointer to beginning of exp block
- *                 index into exp/coeff blocks
- *                 pointer to struct with pointers to exp/coeff blocks
- *                 index to struct with pointers to exp/coeff blocks
- *                 min 8 bits index to struct, since some of our addmuls have 130 input terms
- *               * short index to struct and short index into blocks
- *
- * struct control
- *    fmpz * coeffs  (4096 words)
- *    ulong * exps   (N*4096 words)
- *    addmul_state *
- *    
- *
- * We wait until all of the 1-blocks have been created before
- * initializing the heap structure.  Then we have a subroutine
- * that pulls from the heap structure until it stalls and writes
- * an output polynomial.
- *
- * We initialize all of the addmul_state structures.  We run
- * process_block once for each term.  Then we initialize the
- * heap structure and run the subroutine that feeds from it.
- *
- * When a process_block finishes, we atomically adjust the
- * last valid term, which may allow the output routine to keep
- * running.  Otherwise, when the output routine stalls, we
- * run an extra process_block.  If we fill up all of the
- * 4-blocks and can't run any more process_blocks until
- * the output routine finishes, we print a warning message.
+/* This subroutine pulls from the blocks into a heap structure
+ * merges, and writes an output polynomial until it stalls
+ * because it's run out of data in one or more blocks.
  */
 
 void _fmpz_mpoly_addmul_multi_merge(
@@ -560,6 +530,10 @@ void _fmpz_mpoly_addmul_multi_merge(
     }
 }
 
+/* We wait until at least one block has been created for each term
+ * before initializing the heap structure.
+ */
+
 void _fmpz_mpoly_addmul_multi_merge_init(
     struct _fmpz_mpoly_addmul_multi_master * master
 )
@@ -640,6 +614,27 @@ void _fmpz_mpoly_addmul_multi_merge_init(
     master->heaplen = heaplen;
 }
 
+void _fmpz_mpoly_addmul_multi_state_free(
+    struct _fmpz_mpoly_addmul_multi_master * master,
+    slong i
+)
+{
+    slong j;
+
+    for (j = 0; j < master->control[i].state->num_malloced_memory_blocks; j ++)
+        flint_free(master->control[i].state->malloced_memory_blocks[j]);
+
+    flint_free(master->control[i].state->malloced_memory_blocks);
+    flint_free(master->control[i].state->heap);
+    flint_free(master->control[i].state->chain_list);
+    flint_free(master->control[i].state->exp_list);
+    flint_free(master->control[i].state->hind);
+
+    flint_free(master->control[i].state);
+
+    master->control[i].state = NULL;
+}
+
 static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
 {
     struct _fmpz_mpoly_addmul_multi_worker * worker = (struct _fmpz_mpoly_addmul_multi_worker *) varg;
@@ -687,7 +682,7 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
 
         if (!all_done && able_to_merge && (! master->merge_thread))
         {
-            /* start a merge running; */
+            /* start a merge thread running */
             if (master->heap == NULL)
                 _fmpz_mpoly_addmul_multi_merge_init(master);
             master->merge_thread = worker;
@@ -711,14 +706,18 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
 #endif
             if (master->control[i].state == NULL)
             {
+                /* For each term in the sum, we initialize a state structure
+                 * and two blocks of size numblocks*blocksize (one for coeffs
+                 * and one for exps).
+                 */
                 master->control[i].state = (struct _fmpz_mpoly_addmul_state *) flint_malloc(sizeof(struct _fmpz_mpoly_addmul_state));
                 j = 0;
                 for (k = 0; k < i; k ++)
                     j += master->Blengths[i];
                 _fmpz_mpoly_addmul_multi_init_state(master->Blist+j, master->Blengths[i], master->control[i].state, master);
-                master->control[i].exps = (ulong *) flint_malloc(4 * blocksize * master->N * sizeof(ulong));
-                master->control[i].coeffs = (fmpz *) flint_malloc(4 * blocksize * sizeof(fmpz));
-                for (k = 0; k < 4 * blocksize; k ++)
+                master->control[i].exps = (ulong *) flint_malloc(numblocks * blocksize * master->N * sizeof(ulong));
+                master->control[i].coeffs = (fmpz *) flint_malloc(numblocks * blocksize * sizeof(fmpz));
+                for (k = 0; k < numblocks * blocksize; k ++)
                     fmpz_init(master->control[i].coeffs + k);
             }
             offset = master->control[i].total_generated % (blocksize * numblocks);
@@ -732,7 +731,10 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
             if (k)
                 master->control[i].total_generated += k;
             else
+            {
                 master->control[i].everything_generated = UWORD(1);
+                _fmpz_mpoly_addmul_multi_state_free(master, i);
+            }
             master->control[i].process_thread = NULL;
         }
         else
@@ -763,6 +765,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     struct _fmpz_mpoly_addmul_multi_master * master;
     struct _fmpz_mpoly_addmul_multi_worker self;
     slong i;
+    slong retval;
 
     master = (struct _fmpz_mpoly_addmul_multi_master *) flint_malloc(sizeof(struct _fmpz_mpoly_addmul_multi_master));
 
@@ -799,7 +802,22 @@ slong _fmpz_mpoly_addmul_multi_threaded(
         thread_pool_wait(global_thread_pool, handles[i]);
     }
 
-    return master->k + 1;
+    for (i = 0; i < master->numterms; i ++)
+    {
+       flint_free(master->control[i].coeffs);
+       flint_free(master->control[i].exps);
+    }
+
+    flint_free(master->control);
+    flint_free(master->heap);
+    flint_free(args);
+    retval = master->k + 1;
+#if FLINT_USES_PTHREAD
+    pthread_mutex_destroy(& master->mutex);
+#endif
+    flint_free(master);
+
+    return retval;
 }
 
 void _fmpz_mpoly_addmul_multi_threaded_maxfields(
