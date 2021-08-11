@@ -263,6 +263,84 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
+    /* Check f*g + h*k + l*m + s*t */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, h, k, l, m, s, t, r1, r2;
+        const fmpz_mpoly_struct * fptr [] = {f, g, h, k, l, m, s, t};
+        slong f_lengths[] = {2,2,2,2};
+        slong len1, len2;
+        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
+
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(h, ctx);
+        fmpz_mpoly_init(k, ctx);
+        fmpz_mpoly_init(l, ctx);
+        fmpz_mpoly_init(m, ctx);
+        fmpz_mpoly_init(s, ctx);
+        fmpz_mpoly_init(t, ctx);
+        fmpz_mpoly_init(r1, ctx);
+        fmpz_mpoly_init(r2, ctx);
+
+        len1 = n_randint(state, 100);
+        len2 = n_randint(state, 100);
+
+        coeff_bits = n_randint(state, 200);
+
+        for (j = 0; j < 2; j++)
+        {
+            exp_bits1 = n_randint(state, 100) + 2;
+            exp_bits2 = n_randint(state, 100) + 2;
+
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(k, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(l, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(m, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(s, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(t, state, len2, coeff_bits, exp_bits2, ctx);
+
+            fmpz_mpoly_mul(r1, f, g, ctx);
+            fmpz_mpoly_mul(r2, h, k, ctx);
+            fmpz_mpoly_add(r1, r1, r2, ctx);
+            fmpz_mpoly_mul(r2, l, m, ctx);
+            fmpz_mpoly_add(r1, r1, r2, ctx);
+            fmpz_mpoly_mul(r2, s, t, ctx);
+            fmpz_mpoly_add(r1, r1, r2, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            fmpz_mpoly_addmul_multi_threaded(r2, fptr, f_lengths, 4, ctx);
+            fmpz_mpoly_assert_canonical(r2, ctx);
+
+            result = fmpz_mpoly_equal(r1, r2, ctx);
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check f*g + h*k + l*m + s*t\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_clear(l, ctx);
+        fmpz_mpoly_clear(m, ctx);
+        fmpz_mpoly_clear(s, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_clear(r1, ctx);
+        fmpz_mpoly_clear(r2, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* Check aliasing first argument */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
