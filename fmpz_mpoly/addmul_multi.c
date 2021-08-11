@@ -352,7 +352,7 @@ void _fmpz_mpoly_addmul_multi_maxfields(
     const fmpz_mpoly_struct ** Blist,
     const slong * Blengths,
     const slong Bnumseq,
-    const slong Btotallen,
+    slong Btotallen,
     const fmpz * maxfields,
     const fmpz_mpoly_ctx_t ctx)
 {
@@ -360,11 +360,13 @@ void _fmpz_mpoly_addmul_multi_maxfields(
     flint_bitcnt_t Abits;
     ulong * cmpmask;
     int * freeBexp;
+    ulong numterms;
     ulong maxBlen = 0;
     slong maxlen = 0;
+    slong * B1lengths;
     int maxBindex;
     int aliasing_required = 0;
-    slong i, j, k, m;
+    slong i, j, k, k1, m;
 
     fmpz_mpoly_struct * B1;
 
@@ -394,8 +396,12 @@ void _fmpz_mpoly_addmul_multi_maxfields(
 
     freeBexp = (int *) TMP_ALLOC(Btotallen*sizeof(int));
 
+    B1lengths = (slong *) TMP_ALLOC(Bnumseq * sizeof(slong));
+
     /* ensure input exponents are packed into same sized fields as output */
     k = 0;
+    k1 = 0;
+    numterms = 0;
     for (i = 0; i < Bnumseq; i++)
     {
         /* algorithm more efficient if largest poly first */
@@ -403,11 +409,24 @@ void _fmpz_mpoly_addmul_multi_maxfields(
        maxBindex = 0;
        for (j = 0; j < Blengths[i]; j++)
        {
+           if (Blist[k + j]->length == 0)
+               break;
            if (Blist[k + j]->length > maxBlen)
            {
                maxBlen = Blist[k + j]->length;
                maxBindex = k + j;
            }
+       }
+
+       /* FLINT's convention is that zero-length polynomials are treated as zero polynomials,
+        * so drop any term that contained a zero-length polynomial as a factor.
+        */
+
+       if (j < Blengths[i])
+       {
+           k += Blengths[i];
+           Btotallen -= Blengths[i];
+           continue;
        }
 
        for (j = 0; j < Blengths[i]; j++)
@@ -419,25 +438,33 @@ void _fmpz_mpoly_addmul_multi_maxfields(
            else
                m = k + j;
 
-           B1[k + j].coeffs = Blist[m]->coeffs;
-           B1[k + j].length = Blist[m]->length;
-           B1[k + j].bits = Abits;
+           B1[k1 + j].coeffs = Blist[m]->coeffs;
+           B1[k1 + j].length = Blist[m]->length;
+           B1[k1 + j].bits = Abits;
 
            if (Abits > Blist[m]->bits)
            {
-               freeBexp[k + j] = 1;
-               B1[k + j].exps = (ulong *) flint_malloc(N*Blist[m]->length*sizeof(ulong));
-               mpoly_repack_monomials(B1[k + j].exps, Abits, Blist[m]->exps, Blist[m]->bits,
+               freeBexp[k1 + j] = 1;
+               B1[k1 + j].exps = (ulong *) flint_malloc(N*Blist[m]->length*sizeof(ulong));
+               mpoly_repack_monomials(B1[k1 + j].exps, Abits, Blist[m]->exps, Blist[m]->bits,
                                                                Blist[m]->length, ctx->minfo);
            }
            else
            {
                freeBexp[k + j] = 0;
-               B1[k + j].exps = Blist[m]->exps;
+               B1[k1 + j].exps = Blist[m]->exps;
            }
         }
 
         k += Blengths[i];
+        k1 += Blengths[i];
+        B1lengths[numterms ++] = Blengths[i];
+    }
+
+    if (Btotallen == 0)
+    {
+        fmpz_mpoly_zero(A, ctx);
+        return;
     }
 
     /* deal with aliasing and do multiplication */
@@ -446,7 +473,7 @@ void _fmpz_mpoly_addmul_multi_maxfields(
         fmpz_mpoly_t T;
         fmpz_mpoly_init3(T, maxlen, Abits, ctx);
 
-        Alen = _fmpz_mpoly_addmul_multi(T, B1, Blengths, Bnumseq, Btotallen, Abits, N, cmpmask, ctx);
+        Alen = _fmpz_mpoly_addmul_multi(T, B1, B1lengths, numterms, Btotallen, Abits, N, cmpmask, ctx);
 
         fmpz_mpoly_swap(T, A, ctx);
         fmpz_mpoly_clear(T, ctx);
@@ -455,7 +482,7 @@ void _fmpz_mpoly_addmul_multi_maxfields(
     {
         fmpz_mpoly_fit_length_reset_bits(A, maxlen, Abits, ctx);
 
-        Alen = _fmpz_mpoly_addmul_multi(A, B1, Blengths, Bnumseq, Btotallen, Abits, N, cmpmask, ctx);
+        Alen = _fmpz_mpoly_addmul_multi(A, B1, B1lengths, numterms, Btotallen, Abits, N, cmpmask, ctx);
     }
 
     for (i = 0; i < Btotallen; i++)
