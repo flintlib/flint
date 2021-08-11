@@ -455,8 +455,8 @@ void _fmpz_mpoly_addmul_multi_merge(
         {
             if (control[i].total_generated > control[i].total_transferred)
             {
-                heap[master->heaplen/2 + i].index = control[heap[1].control].total_transferred % (blocksize * numblocks);
-                control[heap[1].control].total_transferred ++;
+                heap[master->heaplen/2 + i].index = control[i].total_transferred % (blocksize * numblocks);
+                control[i].total_transferred ++;
             }
         }
         /* If there might be more generated data from any term, we can't run_until_heap_consumed */
@@ -477,9 +477,11 @@ void _fmpz_mpoly_addmul_multi_merge(
         mpoly_monomial_set(master->A->exps + master->k*master->N, control[heap[1].control].exps + master->N*heap[1].index, master->N);
         first = 1;
 
-        /* XXX need to keep going if need_to_block; I put this here for the 1-block case (heap[1] hasn't been updated) */
-        while ((heap[1].index != (unsigned short int) -1) && mpoly_monomial_equal(master->A->exps + master->k*N, control[heap[1].control].exps + master->N*heap[1].index, master->N))
+        while ((heap[1].index != (unsigned short int) -1)
+               && mpoly_monomial_equal(master->A->exps + master->k*N, control[heap[1].control].exps + master->N*heap[1].index, master->N))
         {
+            FLINT_ASSERT(control[heap[1].control].total_output % (numblocks * blocksize) == heap[1].index);
+
             if (first)
                 fmpz_swap(master->A->coeffs + master->k, control[heap[1].control].coeffs + heap[1].index);
             else
@@ -488,6 +490,7 @@ void _fmpz_mpoly_addmul_multi_merge(
             first = 0;
 
             control[heap[1].control].total_output ++;
+            FLINT_ASSERT(control[heap[1].control].total_output <= control[heap[1].control].total_transferred);
 
             /* pop lead item from heap and propagate items through the heap */
             i = 1;
@@ -513,7 +516,7 @@ void _fmpz_mpoly_addmul_multi_merge(
 
             if ((i >= master->heaplen/2) && (heap[i].index != (unsigned short int) -1))
             {
-                if (control[heap[1].control].total_transferred == control[heap[1].control].total_generated)
+                if (control[heap[i].control].total_transferred == control[heap[i].control].total_generated)
                 {
                     heap[i].index = -1;
                     if (! run_until_heap_consumed)
@@ -523,7 +526,7 @@ void _fmpz_mpoly_addmul_multi_merge(
                 {
                     heap[i].index ++;
                     heap[i].index %= (blocksize * numblocks);
-                    control[heap[1].control].total_transferred ++;
+                    control[heap[i].control].total_transferred ++;
                 }
             }
         }
@@ -538,7 +541,7 @@ void _fmpz_mpoly_addmul_multi_merge_init(
     struct _fmpz_mpoly_addmul_multi_master * master
 )
 {
-    slong i,j,k,l;
+    slong i,j,k;
     struct _fmpz_mpoly_addmul_multi_control * control = master->control;
     struct _fmpz_mpoly_addmul_multi_heap * heap;
     slong heaplen;
@@ -555,14 +558,11 @@ void _fmpz_mpoly_addmul_multi_merge_init(
     heaplen = 2<<k;
     heap = (struct _fmpz_mpoly_addmul_multi_heap *) flint_calloc(heaplen, sizeof(struct _fmpz_mpoly_addmul_multi_heap));
 
+    /* Fill in back half of heap, which always links directly to input blocks */
+
     for (i=0; i<heaplen; i++)
     {
-        if (i < heaplen/2)
-        {
-            heap[i].control = 0;
-            heap[i].index = -1;
-        }
-        else if (i - heaplen/2 < master->numterms)
+        if ((i >= heaplen/2) && (i - heaplen/2 < master->numterms))
         {
             heap[i].control = i - heaplen/2;
             heap[i].index = 0;
@@ -575,27 +575,30 @@ void _fmpz_mpoly_addmul_multi_merge_init(
         }
     }
 
-    for (l=0; l<k; l++)
+    /* Run heap algorithm from end to start on front half of heap */
+
+    for (k = heaplen/2 - 1; k > 0; k--)
     {
-        for (i=1; i<heaplen/2; i++)
+        i = k;
+        while ((j = HEAP_LEFT(i)) < heaplen)
         {
-            j = HEAP_LEFT(i);
             if ((heap[j].index == (unsigned short int) -1)
                 || ((heap[j+1].index != (unsigned short int) -1)
                     && !mpoly_monomial_gt(master->control[heap[j].control].exps + master->N*heap[j].index,
                                           master->control[heap[j+1].control].exps + master->N*heap[j+1].index, master->N, master->cmpmask)))
                 j ++;
             heap[i] = heap[j];
+            i = j;
 
             if ((j >= heaplen/2) && (j - heaplen/2 < master->numterms) && (heap[j].index != (unsigned short int) -1))
             {
                 if (control[j - heaplen/2].total_transferred == control[j - heaplen/2].total_generated)
                 {
                     /* Assume that the input blocks are larger than the log of the heap size,
-                     * so if we run out of data it's because there is no more, not because
+                     * so if we run out of data it's because everything_generated, not because
                      * we need to fetch another block.
                      */
-                    control[j - heaplen/2].everything_generated = UWORD(1);
+                    control[j - heaplen/2].everything_generated = 1;
                     heap[j].index = -1;
                 }
                 else
@@ -764,7 +767,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     struct _fmpz_mpoly_addmul_multi_worker * args;
     struct _fmpz_mpoly_addmul_multi_master * master;
     struct _fmpz_mpoly_addmul_multi_worker self;
-    slong i;
+    slong i, j;
     slong retval;
 
     master = (struct _fmpz_mpoly_addmul_multi_master *) flint_malloc(sizeof(struct _fmpz_mpoly_addmul_multi_master));
@@ -804,6 +807,8 @@ slong _fmpz_mpoly_addmul_multi_threaded(
 
     for (i = 0; i < master->numterms; i ++)
     {
+       for (j = 0; j < numblocks * blocksize; j ++)
+           fmpz_clear(master->control[i].coeffs + j);
        flint_free(master->control[i].coeffs);
        flint_free(master->control[i].exps);
     }
@@ -927,7 +932,7 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
            }
            else
            {
-               freeBexp[k + j] = 0;
+               freeBexp[k1 + j] = 0;
                B1[k1 + j].exps = Blist[m]->exps;
            }
         }
@@ -940,6 +945,7 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
     if (Btotallen == 0)
     {
         fmpz_mpoly_zero(A, ctx);
+        TMP_END;
         return;
     }
 
@@ -1009,8 +1015,6 @@ void fmpz_mpoly_addmul_multi_threaded(
     }
 
     TMP_START;
-
-    flint_set_num_threads(2);
 
     maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
     maxtermfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
