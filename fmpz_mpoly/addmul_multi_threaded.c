@@ -541,6 +541,9 @@ void _fmpz_mpoly_addmul_multi_merge(
                 }
             }
         }
+
+        if (fmpz_is_zero(master->A->coeffs + master->k))
+            master->k --;
     }
 }
 

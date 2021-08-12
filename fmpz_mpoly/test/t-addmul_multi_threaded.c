@@ -210,6 +210,52 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
+    /* Check f + -1*f = 0 */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, k2;
+        const fmpz_mpoly_struct * fptr [] = {f, f, g};
+        slong f_lengths[] = {1,2};
+        slong len;
+        flint_bitcnt_t coeff_bits, exp_bits;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
+
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(k2, ctx);
+
+        fmpz_mpoly_set_si(g, -1, ctx);
+
+        len = n_randint(state, 100);
+
+        coeff_bits = n_randint(state, 200);
+
+        for (j = 0; j < 2; j++)
+        {
+            exp_bits = n_randint(state, 100) + 2;
+
+            fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+
+            fmpz_mpoly_addmul_multi_threaded(k2, fptr, f_lengths, 2, ctx);
+            fmpz_mpoly_assert_canonical(k2, ctx);
+
+            result = fmpz_mpoly_is_zero(k2, ctx);
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check f + -1*f = 0\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(k2, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* Check f*g + f*g = 2*f*g */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
