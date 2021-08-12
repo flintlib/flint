@@ -716,7 +716,7 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
                 master->control[i].state = (struct _fmpz_mpoly_addmul_state *) flint_malloc(sizeof(struct _fmpz_mpoly_addmul_state));
                 j = 0;
                 for (k = 0; k < i; k ++)
-                    j += master->Blengths[i];
+                    j += master->Blengths[k];
                 _fmpz_mpoly_addmul_multi_init_state(master->Blist+j, master->Blengths[i], master->control[i].state, master);
                 master->control[i].exps = (ulong *) flint_malloc(numblocks * blocksize * master->N * sizeof(ulong));
                 master->control[i].coeffs = (fmpz *) flint_malloc(numblocks * blocksize * sizeof(fmpz));
