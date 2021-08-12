@@ -120,6 +120,7 @@ struct _fmpz_mpoly_addmul_multi_master
     const fmpz_mpoly_ctx_struct * ctx;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
+    pthread_cond_t wake_threads;
 #endif
     struct _fmpz_mpoly_addmul_multi_control * control;
     struct _fmpz_mpoly_addmul_multi_heap * heap;
@@ -492,6 +493,16 @@ void _fmpz_mpoly_addmul_multi_merge(
             control[heap[1].control].total_output ++;
             FLINT_ASSERT(control[heap[1].control].total_output <= control[heap[1].control].total_transferred);
 
+#if FLINT_USES_PTHREAD
+            /* If we just crossed a block boundary, then we might be able to wake a thread to generated a new block */
+            if (control[heap[1].control].total_output % blocksize == 0)
+            {
+                pthread_mutex_lock(& master->mutex);
+                pthread_cond_signal(& master->wake_threads);
+                pthread_mutex_unlock(& master->mutex);
+            }
+#endif
+
             /* pop lead item from heap and propagate items through the heap */
             i = 1;
             j = 2;
@@ -742,11 +753,28 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
         }
         else
         {
-            if (DEBUGTEST) fprintf(stderr, "threaded_worker %p returns\n", varg);
 #if FLINT_USES_PTHREAD
-            pthread_mutex_unlock(& master->mutex);
-#endif
+            /* Nothing to do at the moment.  Will there be more work later?
+             * Yes, if there's at least one term that isn't currently being processed and
+             * hasn't finished generating.
+             */
+            for (i = 0; i < master->numterms; i ++)
+            {
+                if ((! master->control[i].everything_generated) && (! master->control[i].process_thread))
+                    break;
+            }
+            if (!all_done && (i < master->numterms))
+                pthread_cond_wait(& master->wake_threads, & master->mutex);
+            else
+            {
+                if (DEBUGTEST) fprintf(stderr, "threaded_worker %p returns\n", varg);
+                pthread_mutex_unlock(& master->mutex);
+                return;
+            }
+#else
+            if (DEBUGTEST) fprintf(stderr, "threaded_worker %p returns\n", varg);
             return;
+#endif
         }
     }
 }
@@ -783,6 +811,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     master->ctx = ctx;
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(& master->mutex, NULL);
+    pthread_cond_init(& master->wake_threads, NULL);
 #endif
     master->k = -WORD(1);
     master->control = (struct _fmpz_mpoly_addmul_multi_control *) flint_calloc(Bnumseq, sizeof(struct _fmpz_mpoly_addmul_multi_control));
@@ -819,6 +848,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     retval = master->k + 1;
 #if FLINT_USES_PTHREAD
     pthread_mutex_destroy(& master->mutex);
+    pthread_cond_destroy(& master->wake_threads);
 #endif
     flint_free(master);
 
