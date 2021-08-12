@@ -100,8 +100,8 @@ struct _fmpz_mpoly_addmul_multi_control
 
 struct _fmpz_mpoly_addmul_multi_heap
 {
-    short unsigned int control;
-    short unsigned int index;
+    slong control;
+    slong index;
 };
 
 /* master data structure for an entire addmul_multi computation */
@@ -452,7 +452,7 @@ void _fmpz_mpoly_addmul_multi_merge(
 
     for (i=0; i < master->numterms; i++)
     {
-        if (heap[master->heaplen/2 + i].index == (unsigned short int ) -1)
+        if (heap[master->heaplen/2 + i].index == -WORD(1))
         {
             if (control[i].total_generated > control[i].total_transferred)
             {
@@ -465,7 +465,7 @@ void _fmpz_mpoly_addmul_multi_merge(
             run_until_heap_consumed = 0;
     }
 
-    while (! need_to_block && (heap[1].index != (unsigned short int) -1))
+    while (! need_to_block && (heap[1].index != -WORD(1)))
     {
 
         /* since the process_block routine combines all identical exponents in each block, */
@@ -478,7 +478,7 @@ void _fmpz_mpoly_addmul_multi_merge(
         mpoly_monomial_set(master->A->exps + master->k*master->N, control[heap[1].control].exps + master->N*heap[1].index, master->N);
         first = 1;
 
-        while ((heap[1].index != (unsigned short int) -1)
+        while ((heap[1].index != -WORD(1))
                && mpoly_monomial_equal(master->A->exps + master->k*N, control[heap[1].control].exps + master->N*heap[1].index, master->N))
         {
             FLINT_ASSERT(control[heap[1].control].total_output % (numblocks * blocksize) == heap[1].index);
@@ -509,14 +509,14 @@ void _fmpz_mpoly_addmul_multi_merge(
             while (j < master->heaplen)
             {
                 /* both j and j+1 have hit their ends */
-                if ((heap[j].index == (unsigned short int) -1) && (heap[j+1].index == (unsigned short int) -1))
+                if ((heap[j].index == -WORD(1)) && (heap[j+1].index == -WORD(1)))
                 {
-                    heap[i].index = -1;
+                    heap[i].index = -WORD(1);
                     break;
                 }
                 /* take the larger of j and j+1, or the one that hasn't hit its end */
-                if ((heap[j].index == (unsigned short int) -1)
-                    || ((heap[j+1].index != (unsigned short int) -1)
+                if ((heap[j].index == -WORD(1))
+                    || ((heap[j+1].index != -WORD(1))
                         && !mpoly_monomial_gt(control[heap[j].control].exps + master->N*heap[j].index,
                                               control[heap[j+1].control].exps + master->N*heap[j+1].index, N, cmpmask)))
                     j ++;
@@ -525,11 +525,11 @@ void _fmpz_mpoly_addmul_multi_merge(
                 j = HEAP_LEFT(j);
             }
 
-            if ((i >= master->heaplen/2) && (heap[i].index != (unsigned short int) -1))
+            if ((i >= master->heaplen/2) && (heap[i].index != -WORD(1)))
             {
                 if (control[heap[i].control].total_transferred == control[heap[i].control].total_generated)
                 {
-                    heap[i].index = -1;
+                    heap[i].index = -WORD(1);
                     if (! run_until_heap_consumed)
                         need_to_block = 1;
                 }
@@ -582,7 +582,7 @@ void _fmpz_mpoly_addmul_multi_merge_init(
         else
         {
             heap[i].control = 0;
-            heap[i].index = -1;
+            heap[i].index = -WORD(1);
         }
     }
 
@@ -593,15 +593,15 @@ void _fmpz_mpoly_addmul_multi_merge_init(
         i = k;
         while ((j = HEAP_LEFT(i)) < heaplen)
         {
-            if ((heap[j].index == (unsigned short int) -1)
-                || ((heap[j+1].index != (unsigned short int) -1)
+            if ((heap[j].index == -WORD(1))
+                || ((heap[j+1].index != -WORD(1))
                     && !mpoly_monomial_gt(master->control[heap[j].control].exps + master->N*heap[j].index,
                                           master->control[heap[j+1].control].exps + master->N*heap[j+1].index, master->N, master->cmpmask)))
                 j ++;
             heap[i] = heap[j];
             i = j;
 
-            if ((j >= heaplen/2) && (j - heaplen/2 < master->numterms) && (heap[j].index != (unsigned short int) -1))
+            if ((j >= heaplen/2) && (j - heaplen/2 < master->numterms) && (heap[j].index != -WORD(1)))
             {
                 if (control[j - heaplen/2].total_transferred == control[j - heaplen/2].total_generated)
                 {
@@ -610,7 +610,7 @@ void _fmpz_mpoly_addmul_multi_merge_init(
                      * we need to fetch another block.
                      */
                     control[j - heaplen/2].everything_generated = 1;
-                    heap[j].index = -1;
+                    heap[j].index = -WORD(1);
                 }
                 else
                 {
@@ -621,7 +621,7 @@ void _fmpz_mpoly_addmul_multi_merge_init(
         }
     }
 
-    FLINT_ASSERT(heap[0].index == (unsigned short int) -1);
+    FLINT_ASSERT(heap[0].index == -WORD(1));
     FLINT_ASSERT(heap[1].index == 0);
 
     master->heap = heap;
@@ -692,7 +692,7 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
             }
         }
 
-        all_done = all_done && (master->heap != NULL) && (master->heap[1].index == (unsigned short int) -1);
+        all_done = all_done && (master->heap != NULL) && (master->heap[1].index == -WORD(1));
 
         if (!all_done && able_to_merge && (! master->merge_thread))
         {
