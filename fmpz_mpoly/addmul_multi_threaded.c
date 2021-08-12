@@ -179,7 +179,7 @@ void _fmpz_mpoly_addmul_multi_init_state(
    state->heap = (mpoly_heap_s *) flint_malloc(state->heap_size*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
    chain = (mpoly_heap_t *) flint_malloc(state->chain_size*sizeof(mpoly_heap_t));
-   state->chain_list = (mpoly_heap_t **) flint_malloc(state->chain_size*sizeof(mpoly_heap_t **));
+   state->chain_list = (mpoly_heap_t **) flint_malloc(state->chain_size*sizeof(mpoly_heap_t *));
    for (i = 0; i < state->chain_size; i++)
       state->chain_list[i] = chain + i;
 
