@@ -129,6 +129,7 @@ struct _fmpz_mpoly_addmul_multi_master
     struct _fmpz_mpoly_addmul_multi_heap * heap;
     slong heaplen;
     const struct _fmpz_mpoly_addmul_multi_worker * merge_thread;
+    const char * status_str;
 };
 
 static int blocksize = 1024;
@@ -444,6 +445,7 @@ void _fmpz_mpoly_addmul_multi_print_status(
     slong total_processed = 0;
     double percentage_done = 0.0;
     int running = 0;
+    const char * status_str;
 
     if ((master->total_input_terms == 0) && (master->k > 0))
     {
@@ -458,10 +460,12 @@ void _fmpz_mpoly_addmul_multi_print_status(
         percentage_done = (double) total_processed / master->total_input_terms * 100.0;
     }
 
+    status_str = master->status_str ? master->status_str : "";
+
     if ((master->total_input_terms == 0) || (total_processed != master->total_input_terms))
-        fprintf(stderr, "Output length %ld %5.2f%%", master->k + 1, percentage_done);
+        fprintf(stderr, "Output length %ld %5.2f%% %s", master->k + 1, percentage_done, status_str);
     else
-        fprintf(stderr, "Output length %ld   100%%", master->k + 1);
+        fprintf(stderr, "Output length %ld   100%% %s", master->k + 1, status_str);
 
     if (master->merge_thread)
     {
@@ -504,6 +508,17 @@ void _fmpz_mpoly_addmul_multi_merge(
     int first;
     struct _fmpz_mpoly_addmul_multi_heap * heap = master->heap;
     struct _fmpz_mpoly_addmul_multi_control * control = master->control;
+    ulong * current_exp;
+    fmpz_t current_coeff;
+    TMP_INIT;
+
+    TMP_START;
+
+    if (master->A->output_function != NULL)
+    {
+        current_exp = TMP_ALLOC(master->N * sizeof(ulong));
+        fmpz_init(current_coeff);
+    }
 
     /* start by filling in the end of the heap with data from the blocks */
 
@@ -530,20 +545,35 @@ void _fmpz_mpoly_addmul_multi_merge(
         /* as each block has been loaded */
 
         master->k ++;
-        fmpz_mpoly_fit_length(master->A, master->k + 1, master->ctx);
 
-        mpoly_monomial_set(master->A->exps + master->k*master->N, control[heap[1].control].exps + master->N*heap[1].index, master->N);
+        if (master->A->output_function == NULL)
+        {
+            fmpz_mpoly_fit_length(master->A, master->k + 1, master->ctx);
+            mpoly_monomial_set(master->A->exps + master->k*master->N,
+                               control[heap[1].control].exps + master->N*heap[1].index, master->N);
+            current_exp = master->A->exps + master->k*master->N;
+        }
+        else
+            mpoly_monomial_set(current_exp,
+                               control[heap[1].control].exps + master->N*heap[1].index, master->N);
+
         first = 1;
 
         while ((heap[1].index != -WORD(1))
-               && mpoly_monomial_equal(master->A->exps + master->k*N, control[heap[1].control].exps + master->N*heap[1].index, master->N))
+               && mpoly_monomial_equal(current_exp, control[heap[1].control].exps + master->N*heap[1].index, master->N))
         {
             FLINT_ASSERT(control[heap[1].control].total_output % (numblocks * blocksize) == heap[1].index);
 
-            if (first)
-                fmpz_swap(master->A->coeffs + master->k, control[heap[1].control].coeffs + heap[1].index);
+            if (master->A->output_function == NULL)
+                if (first)
+                    fmpz_swap(master->A->coeffs + master->k, control[heap[1].control].coeffs + heap[1].index);
+                else
+                    fmpz_add(master->A->coeffs + master->k, master->A->coeffs + master->k, control[heap[1].control].coeffs + heap[1].index);
             else
-                fmpz_add(master->A->coeffs + master->k, master->A->coeffs + master->k, control[heap[1].control].coeffs + heap[1].index);
+                if (first)
+                    fmpz_swap(current_coeff, control[heap[1].control].coeffs + heap[1].index);
+                else
+                    fmpz_add(current_coeff, current_coeff, control[heap[1].control].coeffs + heap[1].index);
 
             first = 0;
 
@@ -601,6 +631,8 @@ void _fmpz_mpoly_addmul_multi_merge(
 
         if (fmpz_is_zero(master->A->coeffs + master->k))
             master->k --;
+        else if (master->A->output_function != NULL)
+            master->status_str = master->A->output_function(master->A, master->k, current_exp, current_coeff);
     }
 }
 
@@ -897,6 +929,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
 #endif
     master->k = -WORD(1);
     master->total_input_terms = 0;
+    master->status_str = NULL;
     master->control = (struct _fmpz_mpoly_addmul_multi_control *) flint_calloc(Bnumseq, sizeof(struct _fmpz_mpoly_addmul_multi_control));
     master->heap = NULL;
     master->merge_thread = NULL;
