@@ -19,6 +19,7 @@
 /* #define EXPTEST (*exp == 0x6000002000004LL) */
 #define EXPTEST 0
 #define DEBUGTEST 0
+#define PRINT_STATUS 1
 
 typedef unsigned short hind_t;
 #define HIND_FORMAT "%d"
@@ -66,6 +67,7 @@ struct _fmpz_mpoly_addmul_state {
    slong chain_size;
    hind_t * hind;
    slong hind_len;
+   slong total_processed;
 };
 
 /* per-term data structure that will accessed mainly by the merge thread,
@@ -110,6 +112,7 @@ struct _fmpz_mpoly_addmul_multi_master
 {
     fmpz_mpoly_struct * A;
     slong k;
+    slong total_input_terms;
     const fmpz_mpoly_struct * Blist;
     const slong * Blengths;
     slong numterms;
@@ -158,6 +161,8 @@ void _fmpz_mpoly_addmul_multi_init_state(
 
    state->Blist = Blist;
    state->Blength = Blength;
+
+   state->total_processed = 0;
 
    /* First polynomial should be the largest; it's left out of this calculation */
    state->hind_len = 1;
@@ -293,6 +298,8 @@ slong _fmpz_mpoly_addmul_multi_process_block(
          {
             multiindex = x->i;
 
+            state->total_processed ++;
+
             if (EXPTEST) {
                 fprintf(stderr, "Processing %ld with exp %lx\n", multiindex, *exp);
             }
@@ -427,6 +434,56 @@ slong _fmpz_mpoly_addmul_multi_process_block(
    flint_free(Q);
 
    return k;
+}
+
+void _fmpz_mpoly_addmul_multi_print_status(
+    struct _fmpz_mpoly_addmul_multi_master * master
+)
+{
+    slong i;
+    slong total_processed = 0;
+    double percentage_done = 0.0;
+    int running = 0;
+
+    if ((master->total_input_terms == 0) && (master->k > 0))
+    {
+        for (i = 0; i < master->numterms; i++)
+            master->total_input_terms += master->control[i].state->hind_len * master->control[i].state->Blist[0].length;
+    }
+
+    if (master->total_input_terms > 0)
+    {
+        for (i = 0; i < master->numterms; i++)
+            total_processed += master->control[i].state->total_processed;
+        percentage_done = (double) total_processed / master->total_input_terms * 100.0;
+    }
+
+    if ((master->total_input_terms == 0) || (total_processed != master->total_input_terms))
+        fprintf(stderr, "Output length %ld %5.2f%%", master->k + 1, percentage_done);
+    else
+        fprintf(stderr, "Output length %ld   100%%", master->k + 1);
+
+    if (master->merge_thread)
+    {
+        running = 1;
+        fprintf(stderr, " M");
+    }
+    else
+        fprintf(stderr, "  ");
+
+    for (i = 0; i < master->numterms; i++)
+    {
+        if (master->control[i].process_thread)
+        {
+            running = 1;
+            fprintf(stderr, " %02ld", i);
+        }
+    }
+
+    if (running || (master->total_input_terms == 0) || (total_processed != master->total_input_terms))
+        fprintf(stderr, "                                    \r");
+    else
+        fprintf(stderr, "                                    \n");
 }
 
 /* This subroutine pulls from the blocks into a heap structure
@@ -638,18 +695,32 @@ void _fmpz_mpoly_addmul_multi_state_free(
 {
     slong j;
 
-    for (j = 0; j < master->control[i].state->num_malloced_memory_blocks; j ++)
-        flint_free(master->control[i].state->malloced_memory_blocks[j]);
+    if (master->control[i].state->num_malloced_memory_blocks > 0)
+        for (j = 0; j < master->control[i].state->num_malloced_memory_blocks; j ++)
+            flint_free(master->control[i].state->malloced_memory_blocks[j]);
+    master->control[i].state->num_malloced_memory_blocks = 0;
 
-    flint_free(master->control[i].state->malloced_memory_blocks);
-    flint_free(master->control[i].state->heap);
-    flint_free(master->control[i].state->chain_list);
-    flint_free(master->control[i].state->exp_list);
-    flint_free(master->control[i].state->hind);
+    if (master->control[i].state->malloced_memory_blocks != NULL)
+        flint_free(master->control[i].state->malloced_memory_blocks);
+    master->control[i].state->malloced_memory_blocks = NULL;
 
-    flint_free(master->control[i].state);
+    if (master->control[i].state->heap != NULL)
+        flint_free(master->control[i].state->heap);
+    master->control[i].state->heap = NULL;
 
-    master->control[i].state = NULL;
+    if (master->control[i].state->chain_list != NULL)
+        flint_free(master->control[i].state->chain_list);
+    master->control[i].state->chain_list = NULL;
+
+    if (master->control[i].state->exp_list != NULL)
+        flint_free(master->control[i].state->exp_list);
+    master->control[i].state->exp_list = NULL;
+
+    if (master->control[i].state->hind != NULL)
+        flint_free(master->control[i].state->hind);
+    master->control[i].state->hind = NULL;
+
+    /* We don't free the state structure itself because it will still be used in the print_status routine */
 }
 
 static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
@@ -660,12 +731,14 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
     slong offset;
     slong able_to_merge;
     slong all_done;
+    slong working;
     slong least_valid_data;
     slong least_valid_data_block;
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(& master->mutex);
 #endif
+    working = 0;
     while (1)
     {
         able_to_merge = 1;
@@ -704,6 +777,8 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
                 _fmpz_mpoly_addmul_multi_merge_init(master);
             master->merge_thread = worker;
             if (DEBUGTEST) fprintf(stderr, "threaded_worker %p merging\n", varg);
+            working = 1;
+            if (PRINT_STATUS) _fmpz_mpoly_addmul_multi_print_status(master);
 #if FLINT_USES_PTHREAD
             pthread_mutex_unlock(& master->mutex);
 #endif
@@ -718,6 +793,8 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
             i = least_valid_data_block;
             master->control[i].process_thread = worker;
             if (DEBUGTEST) fprintf(stderr, "threaded_worker %p block %ld\n", varg, i);
+            working = 1;
+            if (PRINT_STATUS) _fmpz_mpoly_addmul_multi_print_status(master);
 #if FLINT_USES_PTHREAD
             pthread_mutex_unlock(& master->mutex);
 #endif
@@ -756,6 +833,8 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
         }
         else
         {
+            if ((PRINT_STATUS) && working) _fmpz_mpoly_addmul_multi_print_status(master);
+            working = 0;
 #if FLINT_USES_PTHREAD
             /* Nothing to do at the moment.  Will there be more work later?
              * Yes, if there's at least one term that isn't currently being processed and
@@ -817,6 +896,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     pthread_cond_init(& master->wake_threads, NULL);
 #endif
     master->k = -WORD(1);
+    master->total_input_terms = 0;
     master->control = (struct _fmpz_mpoly_addmul_multi_control *) flint_calloc(Bnumseq, sizeof(struct _fmpz_mpoly_addmul_multi_control));
     master->heap = NULL;
     master->merge_thread = NULL;
@@ -843,6 +923,12 @@ slong _fmpz_mpoly_addmul_multi_threaded(
            fmpz_clear(master->control[i].coeffs + j);
        flint_free(master->control[i].coeffs);
        flint_free(master->control[i].exps);
+
+       if (master->control[i].state != NULL)
+       {
+           _fmpz_mpoly_addmul_multi_state_free(master, i);
+           flint_free(master->control[i].state);
+       }
     }
 
     flint_free(master->control);
