@@ -493,6 +493,9 @@ void _fmpz_mpoly_addmul_multi_print_status(
 /* This subroutine pulls from the blocks into a heap structure
  * merges, and writes an output polynomial until it stalls
  * because it's run out of data in one or more blocks.
+ *
+ * The index field is either >= 0 if it's valid, -1 if we've hit the
+ * end of this term, or -2 if we're stalled waiting for another block.
  */
 
 void _fmpz_mpoly_addmul_multi_merge(
@@ -502,9 +505,8 @@ void _fmpz_mpoly_addmul_multi_merge(
     const slong N = master->N;
     const ulong * cmpmask = master->cmpmask;
 
-    slong i, j;
+    slong i, j, k;
     int need_to_block = 0;
-    int run_until_heap_consumed = 1;
     int first;
     struct _fmpz_mpoly_addmul_multi_heap * heap = master->heap;
     struct _fmpz_mpoly_addmul_multi_control * control = master->control;
@@ -517,21 +519,61 @@ void _fmpz_mpoly_addmul_multi_merge(
         fmpz_init(current_coeff);
     }
 
-    /* start by filling in the end of the heap with data from the blocks */
+    /* start by filling in all stalled slots in the back half of the heap with data from the blocks */
 
     for (i=0; i < master->numterms; i++)
     {
-        if (heap[master->heaplen/2 + i].index == -WORD(1))
+        if (heap[master->heaplen/2 + i].index == -WORD(2))
         {
             if (control[i].total_generated > control[i].total_transferred)
             {
                 heap[master->heaplen/2 + i].index = control[i].total_transferred % (blocksize * numblocks);
+                heap[master->heaplen/2 + i].control = i;
                 control[i].total_transferred ++;
             }
+            else
+            {
+                FLINT_ASSERT(control[i].everything_generated);
+                heap[master->heaplen/2 + i].index = -WORD(1);
+            }
         }
-        /* If there might be more generated data from any term, we can't run_until_heap_consumed */
-        if (! control[i].everything_generated)
-            run_until_heap_consumed = 0;
+    }
+
+    /* now run the heap algorithm on the front half to fill in anything missing due to a stall */
+
+    for (k = master->heaplen/2 - 1; k > 0; k--)
+    {
+        if (heap[k].index != -WORD(2))
+            continue;
+        i = k;
+        while ((j = HEAP_LEFT(i)) < master->heaplen)
+        {
+            if ((heap[j].index == -WORD(1))
+                || ((heap[j+1].index != -WORD(1))
+                    && !mpoly_monomial_gt(master->control[heap[j].control].exps + master->N*heap[j].index,
+                                          master->control[heap[j+1].control].exps + master->N*heap[j+1].index, master->N, master->cmpmask)))
+                j ++;
+            heap[i] = heap[j];
+            i = j;
+
+            if ((j >= master->heaplen/2) && (j - master->heaplen/2 < master->numterms) && (heap[j].index != -WORD(1)))
+            {
+                if (control[j - master->heaplen/2].total_transferred == control[j - master->heaplen/2].total_generated)
+                {
+                    /* Assume that the input blocks are larger than the log of the heap size,
+                     * so if we run out of data it's because everything_generated, not because
+                     * we need to fetch another block.
+                     */
+                    control[j - master->heaplen/2].everything_generated = 1;
+                    heap[j].index = -WORD(1);
+                }
+                else
+                {
+                    control[j - master->heaplen/2].total_transferred ++;
+                    heap[j].index ++;
+                }
+            }
+        }
     }
 
     while (! need_to_block && (heap[1].index != -WORD(1)))
@@ -556,7 +598,7 @@ void _fmpz_mpoly_addmul_multi_merge(
 
         first = 1;
 
-        while ((heap[1].index != -WORD(1))
+        while ((heap[1].index >= 0)
                && mpoly_monomial_equal(current_exp, control[heap[1].control].exps + master->N*heap[1].index, master->N))
         {
             FLINT_ASSERT(control[heap[1].control].total_output % (numblocks * blocksize) == heap[1].index);
@@ -598,8 +640,36 @@ void _fmpz_mpoly_addmul_multi_merge(
                     heap[i].index = -WORD(1);
                     break;
                 }
-                /* take the larger of j and j+1, or the one that hasn't hit its end */
-                if ((heap[j].index == -WORD(1))
+                /* if one is stalled, and the other is either stalled or at its end, then we stall */
+                if ((heap[j].index == -WORD(2)) && (heap[j+1].index < 0))
+                {
+                    heap[i].index = -WORD(2);
+                    break;
+                }
+                if ((heap[j].index < 0) && (heap[j+1].index == -WORD(2)))
+                {
+                    heap[i].index = -WORD(2);
+                    break;
+                }
+                /* if one is stalled, we know its lt current, so use the other if its ge current, otherwise stall */
+                if (heap[j].index == -WORD(2))
+                    if (!mpoly_monomial_lt(control[heap[j+1].control].exps + master->N*heap[j+1].index, current_exp, N, cmpmask))
+                        j ++;
+                    else
+                    {
+                        heap[i].index = -WORD(2);
+                        break;
+                    }
+                else if (heap[j+1].index == -WORD(2))
+                    if (!mpoly_monomial_lt(control[heap[j].control].exps + master->N*heap[j].index, current_exp, N, cmpmask))
+                        ;
+                    else
+                    {
+                        heap[i].index = -WORD(2);
+                        break;
+                    }
+                /* no more stall cases, so take the larger of j and j+1, or the one that hasn't hit its end */
+                else if ((heap[j].index == -WORD(1))
                     || ((heap[j+1].index != -WORD(1))
                         && !mpoly_monomial_gt(control[heap[j].control].exps + master->N*heap[j].index,
                                               control[heap[j+1].control].exps + master->N*heap[j+1].index, N, cmpmask)))
@@ -613,9 +683,14 @@ void _fmpz_mpoly_addmul_multi_merge(
             {
                 if (control[heap[i].control].total_transferred == control[heap[i].control].total_generated)
                 {
-                    heap[i].index = -WORD(1);
-                    if (! run_until_heap_consumed)
+                    if (control[heap[i].control].everything_generated)
+                        heap[i].index = -WORD(1);
+                    else
+                    {
+                        /* stall */
+                        heap[i].index = -WORD(2);
                         need_to_block = 1;
+                    }
                 }
                 else
                 {
@@ -667,60 +742,22 @@ void _fmpz_mpoly_addmul_multi_merge_init(
     heaplen = 2<<k;
     heap = (struct _fmpz_mpoly_addmul_multi_heap *) flint_calloc(heaplen, sizeof(struct _fmpz_mpoly_addmul_multi_heap));
 
-    /* Fill in back half of heap, which always links directly to input blocks */
+    /* Mark the bulk of the heap as stalled (-2), so it will be filled the first time we merge.
+     * The unused slots at the end of the heap (if numterms isn't a power of two), get marked
+     * ended (-1), though.
+     */
 
-    for (i=0; i<heaplen; i++)
+    for (i=1; i<heaplen; i++)
     {
-        if ((i >= heaplen/2) && (i - heaplen/2 < master->numterms))
+        if (i < heaplen/2 + master->numterms)
         {
-            heap[i].control = i - heaplen/2;
-            heap[i].index = 0;
-            control[i - heaplen/2].total_transferred ++;
+            heap[i].index = -WORD(2);
         }
         else
         {
-            heap[i].control = 0;
             heap[i].index = -WORD(1);
         }
     }
-
-    /* Run heap algorithm from end to start on front half of heap */
-
-    for (k = heaplen/2 - 1; k > 0; k--)
-    {
-        i = k;
-        while ((j = HEAP_LEFT(i)) < heaplen)
-        {
-            if ((heap[j].index == -WORD(1))
-                || ((heap[j+1].index != -WORD(1))
-                    && !mpoly_monomial_gt(master->control[heap[j].control].exps + master->N*heap[j].index,
-                                          master->control[heap[j+1].control].exps + master->N*heap[j+1].index, master->N, master->cmpmask)))
-                j ++;
-            heap[i] = heap[j];
-            i = j;
-
-            if ((j >= heaplen/2) && (j - heaplen/2 < master->numterms) && (heap[j].index != -WORD(1)))
-            {
-                if (control[j - heaplen/2].total_transferred == control[j - heaplen/2].total_generated)
-                {
-                    /* Assume that the input blocks are larger than the log of the heap size,
-                     * so if we run out of data it's because everything_generated, not because
-                     * we need to fetch another block.
-                     */
-                    control[j - heaplen/2].everything_generated = 1;
-                    heap[j].index = -WORD(1);
-                }
-                else
-                {
-                    control[j - heaplen/2].total_transferred ++;
-                    heap[j].index ++;
-                }
-            }
-        }
-    }
-
-    FLINT_ASSERT(heap[0].index == -WORD(1));
-    FLINT_ASSERT(heap[1].index == 0);
 
     master->heap = heap;
     master->heaplen = heaplen;

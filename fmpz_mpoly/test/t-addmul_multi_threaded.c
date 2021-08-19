@@ -85,6 +85,59 @@ main(void)
         flint_set_num_threads(n_randint(state, max_threads) + 1);
     }
 
+    /* Designed to trigger a bug in the merge code where terms in two input polynomials
+     * have the same exponent but are offset so that one hits the end of a buffering
+     * block before the other one does.
+     *
+     * The first polynomial needs to start with a few extra terms so that it hits
+     * the end of the buffer first (x + x^2 + x^3), then it needs to fill out the
+     * buffer with terms identical to the other polynomial ((1+y)^1021), then it
+     * needs enough trailing terms to completely fill another buffer ((1+z)^1024).
+     *
+     * Current test case is based on the blocksize variable being 1024.
+     */
+    for (i = 0; i < tmul; i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, r1, r2;
+        const fmpz_mpoly_struct * fptr [] = {f, g};
+        slong f_lengths[] = {1,1};
+        const char * vars[] = {"x", "y", "z", "t"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(r1, ctx);
+        fmpz_mpoly_init(r2, ctx);
+
+        fmpz_mpoly_set_str_pretty(f, "(1+y)^1021 + x + x^2 + x^3 + (1+z)^1024", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "(1+y)^1021", vars, ctx);
+
+        fmpz_mpoly_add(r1, f, g, ctx);
+
+        fmpz_mpoly_assert_canonical(r1, ctx);
+
+        flint_set_num_threads(0);
+
+        fmpz_mpoly_addmul_multi_threaded(r2, fptr, f_lengths, 2, ctx);
+        fmpz_mpoly_assert_canonical(r2, ctx);
+
+        result = fmpz_mpoly_equal(r1, r2, ctx);
+        if (!result)
+        {
+            printf("FAIL\n");
+            flint_printf("Check fixed case 4\n");
+            flint_abort();
+        }
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(r1, ctx);
+        fmpz_mpoly_clear(r2, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* Check triple multiplication f*g*h = (f*g)*h */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
