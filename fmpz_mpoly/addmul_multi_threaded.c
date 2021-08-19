@@ -510,13 +510,10 @@ void _fmpz_mpoly_addmul_multi_merge(
     struct _fmpz_mpoly_addmul_multi_control * control = master->control;
     ulong * current_exp;
     fmpz_t current_coeff;
-    TMP_INIT;
-
-    TMP_START;
 
     if (master->A->output_function != NULL)
     {
-        current_exp = TMP_ALLOC(master->N * sizeof(ulong));
+        current_exp = flint_malloc(master->N * sizeof(ulong));
         fmpz_init(current_coeff);
     }
 
@@ -629,10 +626,19 @@ void _fmpz_mpoly_addmul_multi_merge(
             }
         }
 
-        if (fmpz_is_zero(master->A->coeffs + master->k))
-            master->k --;
-        else if (master->A->output_function != NULL)
-            master->status_str = master->A->output_function(master->A, master->k, current_exp, current_coeff);
+        if (master->A->output_function != NULL)
+            if (fmpz_is_zero(current_coeff))
+                master->k --;
+            else
+                master->status_str = master->A->output_function(master->A, master->k, current_exp, current_coeff, master->ctx);
+        else if (fmpz_is_zero(master->A->coeffs + master->k))
+             master->k --;
+    }
+
+    if (master->A->output_function != NULL)
+    {
+        fmpz_clear(current_coeff);
+        flint_free(current_exp);
     }
 }
 
@@ -766,6 +772,8 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
     slong working;
     slong least_valid_data;
     slong least_valid_data_block;
+
+    if (DEBUGTEST) fprintf(stderr, "threaded_worker %p starting\n", varg);
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(& master->mutex);
@@ -1131,7 +1139,8 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
             flint_free(B1[i].exps);
     }
 
-    _fmpz_mpoly_set_length(A, Alen, ctx);
+    if (A->output_function == NULL)
+        _fmpz_mpoly_set_length(A, Alen, ctx);
 
     TMP_END;
 }

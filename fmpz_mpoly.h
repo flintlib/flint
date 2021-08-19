@@ -63,7 +63,7 @@ typedef struct _fmpz_mpoly_struct
    slong alloc;
    slong length;
    flint_bitcnt_t bits;     /* number of bits per exponent */
-   const char * (* output_function)(struct _fmpz_mpoly_struct * poly, slong index, ulong * exp, fmpz_t coeff);
+   const char * (* output_function)(struct _fmpz_mpoly_struct * poly, slong index, ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx);
 } fmpz_mpoly_struct;
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
