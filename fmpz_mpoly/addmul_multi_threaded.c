@@ -697,8 +697,20 @@ void _fmpz_mpoly_addmul_multi_merge(
                     heap[i].index ++;
                     heap[i].index %= (blocksize * numblocks);
                     control[heap[i].control].total_transferred ++;
+                    FLINT_ASSERT((heap[i].index % blocksize == 0)
+                                 || mpoly_monomial_gt(master->control[heap[i].control].exps + master->N*(heap[i].index-1),
+                                                      master->control[heap[i].control].exps + master->N*heap[i].index,
+                                                      master->N, master->cmpmask));
                 }
             }
+        }
+
+        for (i = 1; i < master->heaplen; i ++)
+        {
+            FLINT_ASSERT((heap[i].index < 0) || (heap[i].index % blocksize == 0)
+                         || mpoly_monomial_gt(master->control[heap[i].control].exps + master->N*(heap[i].index-1),
+                                              master->control[heap[i].control].exps + master->N*heap[i].index,
+                                              master->N, master->cmpmask));
         }
 
         if (master->A->output_function != NULL)
@@ -894,7 +906,7 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
             offset = master->control[i].total_generated % (blocksize * numblocks);
             k = _fmpz_mpoly_addmul_multi_process_block(master->control[i].coeffs + offset,
                                                        master->control[i].exps + master->N * offset,
-                                                       blocksize, master->control[i].state, master); /*  */
+                                                       blocksize, master->control[i].state, master);
             if (DEBUGTEST) fprintf(stderr, "threaded_worker %p block %ld returns %ld\n", varg, i, k);
 #if FLINT_USES_PTHREAD
             pthread_mutex_lock(& master->mutex);
@@ -905,6 +917,12 @@ static void _fmpz_mpoly_addmul_multi_threaded_worker(void * varg)
             {
                 master->control[i].everything_generated = UWORD(1);
                 _fmpz_mpoly_addmul_multi_state_free(master, i);
+            }
+            for (j = 1; j < k; j ++)
+            {
+                FLINT_ASSERT(mpoly_monomial_gt(master->control[i].exps + master->N * (offset + j - 1),
+                                               master->control[i].exps + master->N * (offset + j),
+                                               master->N, master->cmpmask));
             }
             master->control[i].process_thread = NULL;
         }
