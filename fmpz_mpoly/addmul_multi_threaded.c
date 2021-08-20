@@ -121,6 +121,8 @@ struct _fmpz_mpoly_addmul_multi_master
     slong N;
     const ulong * cmpmask;
     const fmpz_mpoly_ctx_struct * ctx;
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+                                     ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx);
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
     pthread_cond_t wake_threads;
@@ -513,7 +515,7 @@ void _fmpz_mpoly_addmul_multi_merge(
     ulong * current_exp;
     fmpz_t current_coeff;
 
-    if (master->A->output_function != NULL)
+    if (master->output_function != NULL)
     {
         current_exp = flint_malloc(master->N * sizeof(ulong));
         fmpz_init(current_coeff);
@@ -585,7 +587,7 @@ void _fmpz_mpoly_addmul_multi_merge(
 
         master->k ++;
 
-        if (master->A->output_function == NULL)
+        if (master->output_function == NULL)
         {
             fmpz_mpoly_fit_length(master->A, master->k + 1, master->ctx);
             mpoly_monomial_set(master->A->exps + master->k*master->N,
@@ -603,7 +605,7 @@ void _fmpz_mpoly_addmul_multi_merge(
         {
             FLINT_ASSERT(control[heap[1].control].total_output % (numblocks * blocksize) == heap[1].index);
 
-            if (master->A->output_function == NULL)
+            if (master->output_function == NULL)
                 if (first)
                     fmpz_swap(master->A->coeffs + master->k, control[heap[1].control].coeffs + heap[1].index);
                 else
@@ -713,16 +715,16 @@ void _fmpz_mpoly_addmul_multi_merge(
                                               master->N, master->cmpmask));
         }
 
-        if (master->A->output_function != NULL)
+        if (master->output_function != NULL)
             if (fmpz_is_zero(current_coeff))
                 master->k --;
             else
-                master->status_str = master->A->output_function(master->A, master->k, current_exp, current_coeff, master->ctx);
+                master->status_str = master->output_function(master->A, master->k, current_exp, current_coeff, master->ctx);
         else if (fmpz_is_zero(master->A->coeffs + master->k))
              master->k --;
     }
 
-    if (master->A->output_function != NULL)
+    if (master->output_function != NULL)
     {
         fmpz_clear(current_coeff);
         flint_free(current_exp);
@@ -966,6 +968,8 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     const slong N,
     const ulong * cmpmask,
     const fmpz_mpoly_ctx_t ctx,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+                                     ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx),
     const thread_pool_handle * handles,
     slong num_threads)
 {
@@ -986,6 +990,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     master->N = N;
     master->cmpmask = cmpmask;
     master->ctx = ctx;
+    master->output_function = output_function;
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(& master->mutex, NULL);
     pthread_cond_init(& master->wake_threads, NULL);
@@ -1047,7 +1052,9 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
     const slong Bnumseq,
     slong Btotallen,
     const fmpz * maxfields,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+                                     ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx))
 {
     slong N, Alen;
     flint_bitcnt_t Abits;
@@ -1172,7 +1179,7 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
 
         num_handles = flint_request_threads(&handles, thread_limit);
         if (DEBUGTEST) fprintf(stderr, "thread_limit %ld num_handles %ld\n", thread_limit, num_handles);
-        Alen = _fmpz_mpoly_addmul_multi_threaded(T, B1, B1lengths, numterms, Btotallen, Abits, N, cmpmask, ctx, handles, num_handles);
+        Alen = _fmpz_mpoly_addmul_multi_threaded(T, B1, B1lengths, numterms, Btotallen, Abits, N, cmpmask, ctx, output_function, handles, num_handles);
         flint_give_back_threads(handles, num_handles);
 
         fmpz_mpoly_swap(T, A, ctx);
@@ -1184,7 +1191,7 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
 
         num_handles = flint_request_threads(&handles, thread_limit);
         if (DEBUGTEST) fprintf(stderr, "thread_limit %ld num_handles %ld\n", thread_limit, num_handles);
-        Alen = _fmpz_mpoly_addmul_multi_threaded(A, B1, B1lengths, numterms, Btotallen, Abits, N, cmpmask, ctx, handles, num_handles);
+        Alen = _fmpz_mpoly_addmul_multi_threaded(A, B1, B1lengths, numterms, Btotallen, Abits, N, cmpmask, ctx, output_function, handles, num_handles);
         flint_give_back_threads(handles, num_handles);
     }
 
@@ -1194,7 +1201,7 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
             flint_free(B1[i].exps);
     }
 
-    if (A->output_function == NULL)
+    if (output_function == NULL)
         _fmpz_mpoly_set_length(A, Alen, ctx);
 
     TMP_END;
@@ -1208,12 +1215,14 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
  * by the lengths in the Blengths array.
  */
 
-void fmpz_mpoly_addmul_multi_threaded(
+void fmpz_mpoly_addmul_multi_threaded_abstract(
     fmpz_mpoly_t A,
     const fmpz_mpoly_struct ** Blist,
     const slong * Blengths,
     const slong Bnumseq,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+                                     ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx))
 {
     slong i, j, k;
     slong Btotallen;
@@ -1263,7 +1272,7 @@ void fmpz_mpoly_addmul_multi_threaded(
         _fmpz_vec_zero(maxtermfields, ctx->minfo->nfields);
     }
 
-    _fmpz_mpoly_addmul_multi_threaded_maxfields(A, Blist, Blengths, Bnumseq, Btotallen, maxfields, ctx);
+    _fmpz_mpoly_addmul_multi_threaded_maxfields(A, Blist, Blengths, Bnumseq, Btotallen, maxfields, ctx, output_function);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
@@ -1273,4 +1282,14 @@ void fmpz_mpoly_addmul_multi_threaded(
     }
 
     TMP_END;
+}
+
+void fmpz_mpoly_addmul_multi_threaded(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_struct ** Blist,
+    const slong * Blengths,
+    const slong Bnumseq,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_addmul_multi_threaded_abstract(A, Blist, Blengths, Bnumseq, ctx, NULL);
 }

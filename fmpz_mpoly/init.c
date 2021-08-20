@@ -20,7 +20,6 @@ void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
     A->alloc = 0;
     A->length = 0;
     A->bits = MPOLY_MIN_BITS;
-    A->output_function = NULL;
 }
 
 void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits,
@@ -43,7 +42,6 @@ void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits,
    A->alloc = alloc;
    A->length = 0;
    A->bits = bits;
-   A->output_function = NULL;
 }
 
 void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx)
