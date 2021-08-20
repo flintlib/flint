@@ -448,6 +448,8 @@ void _fmpz_mpoly_addmul_multi_print_status(
     double percentage_done = 0.0;
     int running = 0;
     const char * status_str;
+    static int last_line_len = 0;
+    int line_len = 0;
 
     if ((master->total_input_terms == 0) && (master->k > 0))
     {
@@ -465,31 +467,40 @@ void _fmpz_mpoly_addmul_multi_print_status(
     status_str = master->status_str ? master->status_str : "";
 
     if ((master->total_input_terms == 0) || (total_processed != master->total_input_terms))
-        fprintf(stderr, "Output length %ld %5.2f%% %s", master->k + 1, percentage_done, status_str);
+        line_len += fprintf(stderr, "Output length %ld %5.2f%% %s", master->k + 1, percentage_done, status_str);
     else
-        fprintf(stderr, "Output length %ld   100%% %s", master->k + 1, status_str);
+        line_len += fprintf(stderr, "Output length %ld   100%% %s", master->k + 1, status_str);
 
     if (master->merge_thread)
     {
         running = 1;
-        fprintf(stderr, " M");
+        line_len += fprintf(stderr, " M");
     }
     else
-        fprintf(stderr, "  ");
+        line_len += fprintf(stderr, "  ");
 
     for (i = 0; i < master->numterms; i++)
     {
         if (master->control[i].process_thread)
         {
             running = 1;
-            fprintf(stderr, " %02ld", i);
+            line_len += fprintf(stderr, " %02ld", i);
         }
     }
 
+    if (last_line_len > line_len)
+        fprintf(stderr, "%*s", last_line_len - line_len, "");
+
     if (running || (master->total_input_terms == 0) || (total_processed != master->total_input_terms))
-        fprintf(stderr, "                                    \r");
+    {
+        fprintf(stderr, "\r");
+        last_line_len = line_len;
+    }
     else
-        fprintf(stderr, "                                    \n");
+    {
+        fprintf(stderr, "\n");
+        last_line_len = 0;
+    }
 }
 
 /* This subroutine pulls from the blocks into a heap structure
