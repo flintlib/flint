@@ -163,7 +163,7 @@ void fmpz_mpoly_abstract_add(
                 i = j;
 
                 if ((j >= heaplen/2) && (j - heaplen/2 < Blen) && !fmpz_is_zero(coeffs + j))
-                    input_function(Blist[j - heaplen/2], Blength[j - heaplen/2], bits, exps + N*j, coeffs + j, ctx);
+                    input_function(Blist[j - heaplen/2], Blength[j - heaplen/2] ++, bits, exps + N*j, coeffs + j, ctx);
             }
         }
 
