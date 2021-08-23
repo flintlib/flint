@@ -121,7 +121,7 @@ struct _fmpz_mpoly_addmul_multi_master
     slong N;
     const ulong * cmpmask;
     const fmpz_mpoly_ctx_struct * ctx;
-    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index, const flint_bitcnt_t bits,
                                      ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx);
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
@@ -730,7 +730,7 @@ void _fmpz_mpoly_addmul_multi_merge(
             if (fmpz_is_zero(current_coeff))
                 master->k --;
             else
-                master->status_str = master->output_function(master->A, master->k, current_exp, current_coeff, master->ctx);
+                master->status_str = master->output_function(master->A, master->k, master->bits, current_exp, current_coeff, master->ctx);
         else if (fmpz_is_zero(master->A->coeffs + master->k))
              master->k --;
     }
@@ -979,7 +979,7 @@ slong _fmpz_mpoly_addmul_multi_threaded(
     const slong N,
     const ulong * cmpmask,
     const fmpz_mpoly_ctx_t ctx,
-    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index, const flint_bitcnt_t bits,
                                      ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx),
     const thread_pool_handle * handles,
     slong num_threads)
@@ -1064,7 +1064,7 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
     slong Btotallen,
     const fmpz * maxfields,
     const fmpz_mpoly_ctx_t ctx,
-    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index, const flint_bitcnt_t bits,
                                      ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx))
 {
     slong N, Alen;
@@ -1232,7 +1232,7 @@ void fmpz_mpoly_addmul_multi_threaded_abstract(
     const slong * Blengths,
     const slong Bnumseq,
     const fmpz_mpoly_ctx_t ctx,
-    const char * (* output_function)(fmpz_mpoly_t poly, slong index,
+    const char * (* output_function)(fmpz_mpoly_t poly, slong index, const flint_bitcnt_t bits,
                                      ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx))
 {
     slong i, j, k;
