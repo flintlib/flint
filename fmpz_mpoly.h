@@ -822,6 +822,19 @@ FLINT_DLL void fmpz_mpoly_addmul_multi_threaded_abstract(fmpz_mpoly_t A,
        const char * (* output_function)(fmpz_mpoly_t poly, slong index,
                                         ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx));
 
+/* Abstract Addition *********************************************************/
+
+void fmpz_mpoly_abstract_add(
+    void * A,
+    void ** Blist,
+    const slong Blen,
+    const flint_bitcnt_t bits,
+    const fmpz_mpoly_ctx_t ctx,
+    const void (* input_function)(void * poly, slong index, const flint_bitcnt_t bits,
+                                  ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx),
+    const void (* output_function)(void * poly, slong index, const flint_bitcnt_t bits,
+                                   ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx));
+
 /* Powering ******************************************************************/
 
 FLINT_DLL int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
