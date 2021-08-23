@@ -32,10 +32,10 @@ void _default_output_function(void * poly, slong index, const flint_bitcnt_t bit
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     fmpz_mpoly_struct * A = (fmpz_mpoly_struct *) poly;
 
-    fmpz_mpoly_fit_length(A, index, ctx);
+    fmpz_mpoly_fit_length(A, index + 1, ctx);
     mpoly_monomial_set(A->exps + index*N, exp, N);
     fmpz_swap(A->coeffs + index, coeff);
-    _fmpz_mpoly_set_length(A, index, ctx);
+    _fmpz_mpoly_set_length(A, index + 1, ctx);
 }
 
 void _default_input_function(void * poly, slong index, const flint_bitcnt_t bits,
