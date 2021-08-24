@@ -32,10 +32,12 @@ void _default_output_function(void * poly, slong index, const flint_bitcnt_t bit
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     fmpz_mpoly_struct * A = (fmpz_mpoly_struct *) poly;
 
+    fmpz_mpoly_fit_bits(A, bits, ctx);
     fmpz_mpoly_fit_length(A, index + 1, ctx);
     mpoly_monomial_set(A->exps + index*N, exp, N);
     fmpz_swap(A->coeffs + index, coeff);
     _fmpz_mpoly_set_length(A, index + 1, ctx);
+    A->bits = bits;
 }
 
 void _default_input_function(void * poly, slong index, const flint_bitcnt_t bits,
@@ -43,9 +45,17 @@ void _default_input_function(void * poly, slong index, const flint_bitcnt_t bits
 {
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     fmpz_mpoly_struct * B = (fmpz_mpoly_struct *) poly;
+    slong NB = mpoly_words_per_exp(B->bits, ctx->minfo);
 
-    mpoly_monomial_set(exp, B->exps + index*N, N);
-    fmpz_set(coeff, B->coeffs + index);
+    if (index < B->length)
+    {
+        if (bits == B->bits)
+            mpoly_monomial_set(exp, B->exps + index*N, N);
+        else
+            mpoly_repack_monomials(exp, bits, B->exps + index*NB, B->bits, 1, ctx->minfo);
+        fmpz_set(coeff, B->coeffs + index);
+    } else
+        fmpz_zero(coeff);
 }
 
 void fmpz_mpoly_abstract_add(
@@ -143,7 +153,7 @@ void fmpz_mpoly_abstract_add(
         while (!fmpz_is_zero(coeffs + 1) && mpoly_monomial_equal(exps + N*0, exps + N*1, N))
         {
             if (first)
-                fmpz_swap(coeffs + 0, coeffs + 1);
+                fmpz_set(coeffs + 0, coeffs + 1);
             else
                 fmpz_add(coeffs + 0, coeffs + 0, coeffs + 1);
 
@@ -161,10 +171,11 @@ void fmpz_mpoly_abstract_add(
                 fmpz_set(coeffs + i, coeffs + j);
                 mpoly_monomial_set(exps + N*i, exps + N*j, N);
                 i = j;
-
-                if ((j >= heaplen/2) && (j - heaplen/2 < Blen) && !fmpz_is_zero(coeffs + j))
-                    input_function(Blist[j - heaplen/2], Blength[j - heaplen/2] ++, bits, exps + N*j, coeffs + j, ctx);
             }
+
+            FLINT_ASSERT((i >= heaplen/2) && (i < heaplen));
+            if (! fmpz_is_zero(coeffs + i))
+                input_function(Blist[i - heaplen/2], Blength[i - heaplen/2] ++, bits, exps + N*i, coeffs + i, ctx);
         }
 
         if (fmpz_is_zero(coeffs + 0))
