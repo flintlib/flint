@@ -15,15 +15,19 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-/* This subroutine adds a set of polynomials by pulling from an input
- * function into a heap structure and writing an output polynomial.
+/* fmpz_mpoly_abstract_add adds a set of polynomials by pulling from an input
+ * function into a heap structure and writing an output polynomial by calling
+ * an output function.
  *
  * output_function is called every time we output a term
+ *     it is called with an index of -1 at the end of the polynomial
  *
  * input_function
- *
  *    copies an exponent vector and a coefficient into the provided pointer arguments
+ *    sets a coefficient of zero to indicate the end of the polynomial
  *
+ * The default input and output functions (used if the function pointers are NULL)
+ * read and write to/from a standard FLINT polynomial.
  */
 
 void _default_output_function(void * poly, slong index, const flint_bitcnt_t bits,
@@ -31,6 +35,9 @@ void _default_output_function(void * poly, slong index, const flint_bitcnt_t bit
 {
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     fmpz_mpoly_struct * A = (fmpz_mpoly_struct *) poly;
+
+    if (index == -WORD(1))
+        return;
 
     fmpz_mpoly_fit_bits(A, bits, ctx);
     fmpz_mpoly_fit_length(A, index + 1, ctx);
@@ -183,6 +190,8 @@ void fmpz_mpoly_abstract_add(
         else
             output_function(A, k, bits, exps + 0, coeffs + 0, ctx);
     }
+
+    output_function(A, -WORD(1), bits, NULL, NULL, ctx);
 
     for (i=0; i<heaplen; i++)
     {

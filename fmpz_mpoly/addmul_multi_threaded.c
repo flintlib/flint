@@ -1029,6 +1029,11 @@ slong _fmpz_mpoly_addmul_multi_threaded(
         thread_pool_wait(global_thread_pool, handles[i]);
     }
 
+    if (master->output_function)
+        master->status_str = master->output_function(master->A, -WORD(1), master->bits, NULL, NULL, master->ctx);
+
+    if (PRINT_STATUS) _fmpz_mpoly_addmul_multi_print_status(master);
+
     for (i = 0; i < master->numterms; i ++)
     {
        for (j = 0; j < numblocks * blocksize; j ++)
