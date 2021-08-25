@@ -19,7 +19,7 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("abstract....");
+    flint_printf("abstract_add....");
     fflush(stdout);
 
     /* Check f = f */
