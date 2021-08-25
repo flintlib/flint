@@ -123,7 +123,7 @@ void fmpz_mpoly_abstract_add(
     for (i=0; i < Blen; i++)
     {
         Blength[i] = 0;
-        input_function(Blist[i], Blength[i] ++, bits, exps + N*(heaplen/2 + i), coeffs + (heaplen/2 + i), ctx);
+        input_function(Blist ? Blist[i] : NULL, Blength[i] ++, bits, exps + N*(heaplen/2 + i), coeffs + (heaplen/2 + i), ctx);
     }
 
     /* now run the heap algorithm on the front half to fill it in */
@@ -142,7 +142,7 @@ void fmpz_mpoly_abstract_add(
             i = j;
 
             if ((j >= heaplen/2) && (j - heaplen/2 < Blen) && !fmpz_is_zero(coeffs + j))
-                input_function(Blist[j - heaplen/2], Blength[j - heaplen/2] ++, bits, exps + N*j, coeffs + j, ctx);
+                input_function(Blist ? Blist[j - heaplen/2] : NULL, Blength[j - heaplen/2] ++, bits, exps + N*j, coeffs + j, ctx);
         }
     }
 
@@ -182,7 +182,7 @@ void fmpz_mpoly_abstract_add(
 
             FLINT_ASSERT((i >= heaplen/2) && (i < heaplen));
             if (! fmpz_is_zero(coeffs + i))
-                input_function(Blist[i - heaplen/2], Blength[i - heaplen/2] ++, bits, exps + N*i, coeffs + i, ctx);
+                input_function(Blist ? Blist[i - heaplen/2] : NULL, Blength[i - heaplen/2] ++, bits, exps + N*i, coeffs + i, ctx);
         }
 
         if (fmpz_is_zero(coeffs + 0))
