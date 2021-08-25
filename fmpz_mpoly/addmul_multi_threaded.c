@@ -1103,7 +1103,13 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
         Abits = FLINT_MAX(Abits, Blist[i]->bits);
         maxlen = maxlen + Blist[i]->length;
 
-        if (Blist[i] == A)
+        /* No aliasing if output_function is specified, because A is just a pointer
+         * that gets passed to output_function and has no other significance.
+         * In particular, we can't call output_function on a temporary polynomial
+         * and then call fmpz_mpoly_swap() to exchange it with A.
+         */
+
+        if ((output_function == NULL) && (Blist[i] == A))
             aliasing_required = 1;
     }
 
@@ -1182,7 +1188,10 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
 
     if (Btotallen == 0)
     {
-        fmpz_mpoly_zero(A, ctx);
+        if (output_function == NULL)
+            fmpz_mpoly_zero(A, ctx);
+        else
+            output_function(A, -WORD(1), Abits, NULL, NULL, ctx);
         TMP_END;
         return;
     }
@@ -1203,7 +1212,8 @@ void _fmpz_mpoly_addmul_multi_threaded_maxfields(
     }
     else
     {
-        fmpz_mpoly_fit_length_reset_bits(A, maxlen, Abits, ctx);
+        if (output_function == NULL)
+            fmpz_mpoly_fit_length_reset_bits(A, maxlen, Abits, ctx);
 
         num_handles = flint_request_threads(&handles, thread_limit);
         if (DEBUGTEST) fprintf(stderr, "thread_limit %ld num_handles %ld\n", thread_limit, num_handles);
@@ -1249,7 +1259,7 @@ void fmpz_mpoly_addmul_multi_threaded_abstract(
 
     FLINT_ASSERT(Bnumseq > 0);
 
-    if ((Bnumseq == 1) && (Blengths[0] == 1))
+    if ((output_function == NULL) && (Bnumseq == 1) && (Blengths[0] == 1))
     {
         fmpz_mpoly_set(A, Blist[0], ctx);
 	return;
