@@ -750,8 +750,7 @@ void _fmpz_mpoly_addmul_multi_merge_init(
     struct _fmpz_mpoly_addmul_multi_master * master
 )
 {
-    slong i,j,k;
-    struct _fmpz_mpoly_addmul_multi_control * control = master->control;
+    slong i,k;
     struct _fmpz_mpoly_addmul_multi_heap * heap;
     slong heaplen;
 
