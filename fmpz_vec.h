@@ -223,6 +223,9 @@ FLINT_DLL void _fmpz_vec_scalar_tdiv_q_2exp(fmpz * vec1, const fmpz * vec2,
 FLINT_DLL void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
                                        const fmpz * vec2, slong len2, slong c);
 
+FLINT_DLL void _fmpz_vec_scalar_addmul_ui(fmpz * vec1,
+                                       const fmpz * vec2, slong len2, ulong c);
+
 FLINT_DLL void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, const fmpz * poly2, 
                                                   slong len2, const fmpz_t x);
 

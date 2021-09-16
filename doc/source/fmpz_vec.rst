@@ -328,15 +328,13 @@ Scalar multiplication and division
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by ``2^exp``, 
     rounding down towards zero whenever the division is not exact.
 
-.. function:: void _fmpz_vec_scalar_addmul_fmpz(fmpz * vec1, const fmpz * vec2, slong len2, const fmpz_t c)
-
-    Adds ``(vec2, len2)`` times `c` to ``(vec1, len2)``, where `c` is a 
-    ``fmpz_t``.
-
 .. function:: void _fmpz_vec_scalar_addmul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 
-    Adds ``(vec2, len2)`` times `c` to ``(vec1, len2)``, where `c` is a 
-    ``slong``.
+.. function:: void _fmpz_vec_scalar_addmul_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
+
+.. function:: void _fmpz_vec_scalar_addmul_fmpz(fmpz * vec1, const fmpz * vec2, slong len2, const fmpz_t c)
+
+    Adds ``(vec2, len2)`` times `c` to ``(vec1, len2)``.
 
 .. function:: void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, const fmpz * vec2, slong len2, slong c, ulong exp)
 
