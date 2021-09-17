@@ -896,8 +896,8 @@ next_prime:
     fmpz_mod_bpoly_make_monic_series(I->Btilde, I->Btilde, I->lifting_prec, I->ctxpk);
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalfac->p + i, I->ctxpk);
-        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i, I->ctxpk);
+        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalfac->p + i, I->ctxp);
+        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i, I->ctxp);
         fmpz_mod_poly_set_fmpz_poly(I->Bitilde + i, Bevalfac->p + i, I->ctxpk);
         fmpz_mod_poly_make_monic(I->Bitilde + i, I->Bitilde + i, I->ctxpk);
         fmpz_mod_bpoly_set_polyx(I->newBitilde + i, I->Bitilde + i, I->ctxpk);
@@ -1017,8 +1017,8 @@ next_prime:
     fmpz_mod_bpoly_make_monic_series(I->Btilde, I->Btilde, I->lifting_prec, I->ctxpk);
     for (i = 0; i < I->r; i++)
     {
-        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalf->p + i, I->ctxpk);
-        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i, I->ctxpk);
+        fmpz_mod_poly_set_fmpz_poly(I->Bitilde1 + i, Bevalf->p + i, I->ctxp);
+        fmpz_mod_poly_make_monic(I->Bitilde1 + i, I->Bitilde1 + i, I->ctxp);
         fmpz_mod_poly_set_fmpz_poly(I->Bitilde + i, Bevalf->p + i, I->ctxpk);
         fmpz_mod_poly_make_monic(I->Bitilde + i, I->Bitilde + i, I->ctxpk);
         fmpz_mod_bpoly_set_polyx(I->newBitilde + i, I->Bitilde + i, I->ctxpk);
