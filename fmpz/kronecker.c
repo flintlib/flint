@@ -30,7 +30,7 @@ int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
     flint_mpz_init_set_readonly(aa, a);
     flint_mpz_init_set_readonly(nn, n);
 
-    r = mpz_jacobi(aa, nn);
+    r = mpz_kronecker(aa, nn);
 
     flint_mpz_clear_readonly(aa);
     flint_mpz_clear_readonly(nn);
