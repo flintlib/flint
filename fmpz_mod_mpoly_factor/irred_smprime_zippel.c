@@ -313,8 +313,8 @@ cleanup:
         fmpz_mod_poly_clear(alphabetas + i, ctx->ffinfo);
     }
     flint_free(alphabetas);
-    flint_free(alpha);
     flint_free(Aevals);
+    _fmpz_vec_clear(alpha, n);
     flint_free(degs);
     flint_free(degeval);
 
