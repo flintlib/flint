@@ -11,6 +11,7 @@
 
 #include "flint/flint.h"
 #include "flint/fmpz.h"
+#include "flint/fmpz_vec.h"
 #include "flint/profiler.h"
 
 void sample_ndiv_qr(void * arg, ulong count)
@@ -196,6 +197,53 @@ int main(void)
                  "  max time is %.3f cycles\n\n",
                  (min/(double)FLINT_CLOCK_SCALE_FACTOR)/100,
                  (max/(double)FLINT_CLOCK_SCALE_FACTOR)/100);
+
+    {
+        flint_bitcnt_t abits, bbits;
+        fmpz * as, * bs;
+        fmpz_t q, r;
+        slong i, len = 2000000;
+        flint_rand_t state;
+        timeit_t timer;
+
+        flint_randinit(state);
+
+        as = _fmpz_vec_init(len);
+        bs = _fmpz_vec_init(len);
+
+        fmpz_init(q);
+        fmpz_init(r);
+
+        for (bbits = 10; bbits <= 300; bbits += bbits/4)
+        {
+            flint_printf("%4wu: ", bbits);
+            for (abits = 10; abits <= 300; abits += abits/4)
+            {
+                for (i = 0; i < len; i++)
+                {
+                    fmpz_randbits(as + i, state, abits);
+                    fmpz_randbits(bs + i, state, bbits);
+                }
+
+                timeit_start(timer);
+                for (i = 0; i < len; i++)
+                    fmpz_ndiv_qr(q, r, as + i, bs + i);
+                timeit_stop(timer);
+
+                flint_printf(" %4wd", timer->wall);
+                fflush(stdout);
+            }
+            flint_printf("\n");
+        }
+
+        fmpz_clear(q);
+        fmpz_clear(r);
+
+        _fmpz_vec_clear(as, len);
+        _fmpz_vec_clear(bs, len);
+
+        flint_randclear(state);
+    }
 
     return 0;
 }

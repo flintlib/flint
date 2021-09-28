@@ -13,110 +13,108 @@
 #include "flint.h"
 #include "fmpz.h"
 
+/* b aliases neither q nor r */
+static void _fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+{
+    int c, rbsgn;
+
+    fmpz_tdiv_qr(q, r, a, b);
+
+    c = fmpz_cmp2abs(b, r);
+
+    if (c > 0)
+        return;
+
+    rbsgn = fmpz_sgn(r)*fmpz_sgn(b);
+
+    if (c < 0)
+    {
+        if (rbsgn < 0)
+        {
+            fmpz_sub_ui(q, q, 1);
+            fmpz_add(r, r, b);
+        }
+        else
+        {
+            fmpz_add_ui(q, q, 1);
+            fmpz_sub(r, r, b);
+        }
+    }
+    else
+    {
+        int qsgn = fmpz_sgn(q);
+        if (rbsgn < 0 && qsgn > 0)
+        {
+            fmpz_sub_ui(q, q, 1);
+            fmpz_add(r, r, b);
+        }
+        else if (rbsgn > 0 && qsgn < 0)
+        {
+            fmpz_add_ui(q, q, 1);
+            fmpz_sub(r, r, b);
+        }
+    }
+}
+
 void
 fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 {
+    slong A = *a;
+    slong B = *b;
+
     if (fmpz_is_zero(b))
     {
         flint_printf("Exception: division by zero in fmpz_ndiv_qr\n");
         flint_abort();
     }
 
-    if (!COEFF_IS_MPZ(*a))
+    if (!COEFF_IS_MPZ(A) && !COEFF_IS_MPZ(B))
     {
-        if (!COEFF_IS_MPZ(*b))      /* a and b are small */
-        {
-            slong lquo;
-            slong lrem;
+        slong lquo, lrem;
 
-            _fmpz_demote(q);
-            _fmpz_demote(r);
+        _fmpz_demote(q);
+        _fmpz_demote(r);
 
-            if (FLINT_ABS(*b) == 1) /* avoid overflow in case */
-            {                       /* a = 2^(FLINT_BITS - 2) */
-                fmpz_set_si(q, *a * FLINT_SGN(*b));
-                fmpz_set_si(r, 0);
-                return;
-            }
-
-            *q = *a / *b;
-            *r = *a - *b * *q;
-            lquo = *q + FLINT_SGN(*a) * FLINT_SGN(*b);
-            lrem = *a - *b * lquo;
-
-            if (FLINT_ABS(lrem) < FLINT_ABS(*r))
-            {
-                *q = lquo;
-                *r = lrem;
-            }
+        if (FLINT_ABS(*b) == 1) /* avoid overflow in case */
+        {                       /* a = 2^(FLINT_BITS - 2) */
+            fmpz_set_si(q, A * FLINT_SGN(B));
+            fmpz_zero(r);
+            return;
         }
-        else                        /* a is small and b is large */
+
+        *q = A / B;
+        *r = A - B * *q;
+        lquo = *q + FLINT_SGN(A) * FLINT_SGN(B);
+        lrem = A - B * lquo;
+
+        if (FLINT_ABS(lrem) < FLINT_ABS(*r))
         {
-            fmpz_mul_si(q, a, 2);
-            if (fmpz_cmpabs(q, b) > 0) /* |a / b| > 1 / 2 */
-            {
-                fmpz_set_si(q, FLINT_SGN(*a) * mpz_sgn(COEFF_TO_PTR(*b)));
-                fmpz_set(r, a);
-                fmpz_submul(r, b, q);
-            }
-            else
-            {
-                fmpz_set_ui(q, WORD(0));
-                fmpz_set(r, a);
-            }
+            *q = lquo;
+            *r = lrem;
         }
     }
     else
     {
-        __mpz_struct *mpz_ptr, *mpz_ptr2;
-        fmpz_t lquo;
-        fmpz_t lrem;
-
-        fmpz_init(lquo);
-        fmpz_init(lrem);
-
-        _fmpz_promote(q); /* must not hang on to ptr whilst promoting s */
-        mpz_ptr2 = _fmpz_promote(r);
-		mpz_ptr  = COEFF_TO_PTR(*q);
-
-		if (!COEFF_IS_MPZ(*b))  /* a is large and b is small */
+        if (b == q)
         {
-            if (*b > 0)
-            {
-                flint_mpz_tdiv_qr_ui(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(*a), *b);
-            }
-            else
-            {
-                flint_mpz_tdiv_qr_ui(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(*a), -*b);
-                mpz_neg(mpz_ptr, mpz_ptr);
-            }
-
-            _fmpz_demote_val(q);
-            _fmpz_demote_val(r);
-
-            fmpz_add_si(lquo, q, mpz_sgn(COEFF_TO_PTR(*a)) * FLINT_SGN(*b));
+            fmpz_t t;
+            fmpz_init(t);
+            _fmpz_ndiv_qr(t, r, a, b);
+            fmpz_swap(q, t);
+            fmpz_clear(t);
         }
-        else                    /* a and b are large */
+        else if (b == r)
         {
-            mpz_tdiv_qr(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(*a), COEFF_TO_PTR(*b));
-
-            _fmpz_demote_val(q);
-            _fmpz_demote_val(r);
-
-            fmpz_add_si(lquo, q, mpz_sgn(COEFF_TO_PTR(*a))
-                                * mpz_sgn(COEFF_TO_PTR(*b)));
+            fmpz_t t;
+            fmpz_init(t);
+            _fmpz_ndiv_qr(q, t, a, b);
+            fmpz_swap(r, t);
+            fmpz_clear(t);
         }
-
-        fmpz_set(lrem, a);
-        fmpz_submul(lrem, b, lquo);
-
-        if (fmpz_cmpabs(lrem, r) < 0)
+        else
         {
-            fmpz_set(q, lquo);
-            fmpz_set(r, lrem);
+            _fmpz_ndiv_qr(q, r, a, b);
         }
-
-        fmpz_clear(lquo);
-        fmpz_clear(lrem);
     }
 }
+
