@@ -416,6 +416,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
 {
     int changed = 0;
     slong lastlength = 0;
+    fmpz_t zzero;
     fmpz_mod_poly_t zero;
     fmpz_mod_poly_struct * Tcoeffs;
     ulong * Texps;
@@ -429,13 +430,12 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
     fmpz_mod_poly_struct * Bcoeffs = B->coeffs;
     slong Bi, bi;
     fmpz_mod_poly_struct * Fvalue;
-    fmpz_t u, v, Avalue, Bvalue, FvalueA, FvalueB;
+    fmpz_t u, v, FvalueA, FvalueB;
+    const fmpz * Avalue, * Bvalue;
     int texp_set, cmp;
 
     fmpz_init(u);
     fmpz_init(v);
-    fmpz_init(Avalue);
-    fmpz_init(Bvalue);
     fmpz_init(FvalueA);
     fmpz_init(FvalueB);
 
@@ -459,6 +459,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
     Tcoeffs = T->coeffs;
     Texps = T->exps;
 
+    fmpz_init(zzero);
     zero->alloc = 0;
     zero->length = 0;
     zero->coeffs = NULL;
@@ -494,7 +495,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
             Texps[Ti] = Fexps[Fi];
         }
 
-        fmpz_zero(Avalue);
+        Avalue = zzero;
         if (Ai >= 0)
         {
             ulong Aexp = pack_exp3(Ai, ai, 0);
@@ -503,7 +504,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
                   Texps[Ti] > Aexp ? 1 : 0;
             if (cmp <= 0)
             {
-                fmpz_set(Avalue, Acoeffs[Ai].coeffs + ai);
+                Avalue = Acoeffs[Ai].coeffs + ai;
             }
             if (cmp < 0)
             {
@@ -513,7 +514,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
             }
         }
 
-        fmpz_zero(Bvalue);
+        Bvalue = zzero;
         if (Bi >= 0)
         {
             ulong Bexp = pack_exp3(Bi, bi, 0);
@@ -522,12 +523,12 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
                   Texps[Ti] > Bexp ? 1 : 0;
             if (cmp <= 0)
             {
-                fmpz_set(Bvalue, Bcoeffs[Bi].coeffs + bi);
+                Bvalue = Bcoeffs[Bi].coeffs + bi;
             }
             if (cmp < 0)
             {
                 Fvalue = zero;
-                fmpz_zero(Avalue);
+                Avalue = zzero;
                 texp_set = 1;
                 Texps[Ti] = Bexp;
             }
@@ -548,7 +549,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
         FLINT_ASSERT(Tcoeffs[Ti].length >= Fvalue->length);
 
         Fi += (Fvalue != zero);
-        if (Avalue != 0)
+        if (Avalue != zzero)
         {
             do {
                 ai--;
@@ -562,7 +563,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
                     ai = fmpz_mod_poly_degree(Acoeffs + Ai, ctx);
             }
         }
-        if (Bvalue != 0)
+        if (Bvalue != zzero)
         {
             do {
                 bi--;
@@ -588,10 +589,10 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
 
     FLINT_ASSERT(fmpz_mod_polyun_is_canonical(F, ctx));
 
+    fmpz_clear(zzero);
+
     fmpz_clear(u);
     fmpz_clear(v);
-    fmpz_clear(Avalue);
-    fmpz_clear(Bvalue);
     fmpz_clear(FvalueA);
     fmpz_clear(FvalueB);
 
