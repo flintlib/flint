@@ -484,6 +484,12 @@ if [ -z "$FLINT_LIB" ]; then
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-soname,libflint-$FLINT_MAJOR.dll.$FLINT_MINOR.$FLINT_PATCH"
          FLINT_DLL=1
          ;;
+      android)
+         FLINT_LIBNAME="libflint.so"
+         FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
+         EXTRA_SHARED_FLAGS="-Wl,-soname,libflint.so"
+         FLINT_SOLIB=1
+         ;;
       *)
          FLINT_LIBNAME="libflint.so"
          FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
