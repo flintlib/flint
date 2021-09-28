@@ -74,17 +74,10 @@ void _padic_poly_sub(fmpz *rop, slong *val, slong N,
 
         alloc = _padic_ctx_pow_ui(pow, N - *val, ctx);
 
-        if (N >= N1 && N >= N2)
-        {
-            slong i;
-            for (i = 0; i < len; i++)
-                if (fmpz_sgn(rop + i) < 0)
-                    fmpz_add(rop + i, rop + i, pow);
-        }
-        else
-        {
-            _fmpz_vec_scalar_mod_fmpz(rop, rop, len, pow);
-        }
+        _fmpz_vec_scalar_mod_fmpz(rop, rop, len, pow);
+
+        if (_fmpz_vec_is_zero(rop, len))
+            *val = 0;
 
         if (alloc)
             fmpz_clear(pow);
