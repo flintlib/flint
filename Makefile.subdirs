@@ -2,8 +2,18 @@ ifeq ($(strip $(VERBOSE)),)
 	QUIET_CC  = @echo '   ' CC  ' ' $@;
 	QUIET_CXX = @echo '   ' CXX ' ' $@;
 else
-	QUIET_CC  =
-	QUIET_CXX =
+	QUIET_CC  = ;
+	QUIET_CXX = ;
+endif
+
+ifeq ($(WANTDEPS), 1)
+	DEPFLAGS1 = -MMD -MP -MF $@.d -MT "$@" -MT "$@.d";
+	DEPFLAGS2 = -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$@";
+	DEPFLAGS3 = -MMD -MP -MF "$(BUILD_DIR)/$*.d" -MT "$(BUILD_DIR)/$*.d" -MT "$@";
+else
+    DEPFLAGS1 = ; 
+    DEPFLAGS2 = ;
+    DEPFLAGS3 = ;
 endif
 
 AT=@
@@ -54,7 +64,7 @@ profile: $(PROFS)
 -include $(patsubst %, %.d, $(PROFS))
 
 $(BUILD_DIR)/profile/%$(EXEEXT): profile/%.c $(BUILD_DIR)/../profiler.o
-	$(QUIET_CC) $(CC) $(CFLAGS) -std=gnu99 $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LIBS)  -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+	$(QUIET_CC) $(CC) $(CFLAGS) -std=gnu99 $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LIBS) $(DEPFLAGS1)
 
 tune: $(TUNE_SOURCES) $(HEADERS)
 	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
@@ -62,7 +72,7 @@ tune: $(TUNE_SOURCES) $(HEADERS)
 -include $(OBJS:.o=.d)
 
 $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@ -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$@"
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@ $(DEPFLAGS2)
 
 $(MOD_LOBJ): $(LOBJS)
 	$(QUIET_CC) $(CC) $(ABI_FLAG) -r $^ -o $@ -nostdlib
@@ -70,7 +80,7 @@ $(MOD_LOBJ): $(LOBJS)
 -include $(LOBJS:.lo=.d)
 
 $(BUILD_DIR)/%.lo: %.c
-	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@ -MMD -MP -MF "$(BUILD_DIR)/$*.d" -MT "$(BUILD_DIR)/$*.d" -MT "$@"
+	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@ $(DEPFLAGS3)
 
 clean:
 	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
@@ -88,10 +98,10 @@ $(BUILD_DIR)/test/%$(EXEEXT): $(BUILD_DIR)/../../libflint.a
 endif
 
 $(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) $(DEPFLAGS1)
 
 $(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
-	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) $(DEPFLAGS1)
 
 %_RUN: %
 	@$<
