@@ -13,6 +13,7 @@ GC_DIR="/usr/local"
 BLAS_DIR="/usr"
 WANT_NTL=0
 WANT_BLAS=0
+WANT_DEPS=1
 SHARED=1
 STATIC=1
 TLS=1
@@ -92,6 +93,7 @@ usage()
    echo "     --disable-assert     Disable use of asserts (default)"
    echo "     --enable-cxx         Enable C++ wrapper tests"
    echo "     --disable-cxx        Disable C++ wrapper tests (default)"
+   echo "     --disable-dependency-tracking Disable gcc automated dependency tracking"
    echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
    echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
    echo "     AR=<name>            Use the AR library builder with the given name (default: ar)"
@@ -207,6 +209,9 @@ while [ "$1" != "" ]; do
       --disable-cxx)
          WANT_CXX=0
          ;;
+      --disable-dependency-tracking)
+         WANT_DEPS=0
+         ;; 
       AR)
          AR="$VALUE"
          ;;
@@ -845,7 +850,8 @@ echo "" >> Makefile
 echo "EXTENSIONS=$EXTENSIONS" >> Makefile
 echo "EXTRA_BUILD_DIRS=$EXTRA_BUILD" >> Makefile
 echo "" >> Makefile
-
+echo "WANT_DEPS=$WANT_DEPS" >> Makefile
+echo "" >> Makefile
 
 cat Makefile.in >> Makefile
 
