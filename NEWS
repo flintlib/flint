@@ -1283,3 +1283,10 @@ v 2.6.3 -- 12 Aug 2020
  * Switch to GitHub Actions for CI
  * Improve Taylor shift
  * Numerous bug fixes and speedups
+
+2.8.1 -- 01 Oct 2021
+
+ * Numerous bug fixes
+ * Adjust soname on android
+ * Allow disabling of dependency tracking
+
