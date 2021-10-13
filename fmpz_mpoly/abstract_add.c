@@ -47,7 +47,7 @@ void _default_output_function(void * poly, slong index, const flint_bitcnt_t bit
     A->bits = bits;
 }
 
-void _default_input_function(void * poly, slong index, const flint_bitcnt_t bits,
+void _default_input_function(void * poly, ulong index, const flint_bitcnt_t bits,
                              ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
@@ -71,7 +71,7 @@ void fmpz_mpoly_abstract_add(
     const slong Blen,
     const flint_bitcnt_t bits,
     const fmpz_mpoly_ctx_t ctx,
-    void (* input_function)(void * poly, slong index, const flint_bitcnt_t bits,
+    void (* input_function)(void * poly, ulong index, const flint_bitcnt_t bits,
                             ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx),
     void (* output_function)(void * poly, slong index, const flint_bitcnt_t bits,
                              ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx))
