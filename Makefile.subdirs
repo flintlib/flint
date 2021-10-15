@@ -2,8 +2,8 @@ ifeq ($(strip $(VERBOSE)),)
 	QUIET_CC  = @echo '   ' CC  ' ' $@;
 	QUIET_CXX = @echo '   ' CXX ' ' $@;
 else
-	QUIET_CC  = ;
-	QUIET_CXX = ;
+	QUIET_CC  =
+	QUIET_CXX =
 endif
 
 ifeq ($(WANTDEPS), 1)
@@ -11,9 +11,9 @@ ifeq ($(WANTDEPS), 1)
 	DEPFLAGS2 = -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$@";
 	DEPFLAGS3 = -MMD -MP -MF "$(BUILD_DIR)/$*.d" -MT "$(BUILD_DIR)/$*.d" -MT "$@";
 else
-    DEPFLAGS1 = ; 
-    DEPFLAGS2 = ;
-    DEPFLAGS3 = ;
+	DEPFLAGS1 =
+	DEPFLAGS2 =
+	DEPFLAGS3 =
 endif
 
 AT=@
