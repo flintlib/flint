@@ -1290,7 +1290,7 @@ v 2.6.3 -- 12 Aug 2020
  * Adjust soname on android
  * Allow disabling of dependency tracking
 
-2.8.1 -- 15 Oct 2021
+2.8.2 -- 15 Oct 2021
 
  * Fix an issue with --disable-dependency-tracking on some distributions
 
