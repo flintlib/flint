@@ -11,6 +11,9 @@
 
 #include "fmpz_poly.h"
 
+/* Up to this order the coefficients fit inside small fmpz */
+#define SMALL_BOUND (FLINT_BITS == 64 ? 20 : 12)
+
 static void
 _fmpz_vec_powers(fmpz * res, ulong n, slong len)
 {
@@ -67,13 +70,12 @@ _fmpz_poly_eulerian_polynomial_rec(fmpz * res, ulong n)
     slong ix, jx;
 
     fmpz_one(res);
-    jx = FLINT_MIN(n / 2, 6 + (FLINT_BITS == 64) * 4);
-    for (ix = 1; ix <= jx; ix++)
+    for (ix = 1; ix <= FLINT_MIN(n / 2, SMALL_BOUND / 2); ix++)
         _fmpz_demote(res + ix);
 
     for (ix = 3; ix <= n; ix++)
     {
-        if (ix <= 12 || (FLINT_BITS == 64 && ix <= 20))
+        if (ix <= SMALL_BOUND)
         {
             res[ix / 2] = (ix + 1) * res[ix / 2 - 1];
             for (jx = ix / 2 - 1; jx >= 1; jx--)
