@@ -17,6 +17,6 @@ void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars)
     slong nvars;
 
     ord = mpoly_ordering_randtest(state);
-    nvars = n_randint(state, max_nvars) + 1;
+    nvars = n_randint(state, max_nvars + 1);
     mpoly_ctx_init(mctx, nvars, ord);
 }

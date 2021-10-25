@@ -253,7 +253,7 @@ int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
 
     FLINT_ASSERT(A->length != 0);
     FLINT_ASSERT(B->length != 0);
-
+    FLINT_ASSERT(nvars > 0);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
 
@@ -382,7 +382,8 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         return 1;
     }
 
-    if (B->bits > FLINT_BITS || C->bits > FLINT_BITS)
+    if (B->bits > FLINT_BITS || C->bits > FLINT_BITS ||
+        ctx->minfo->nvars < 1)
     {
         return 0;
     }

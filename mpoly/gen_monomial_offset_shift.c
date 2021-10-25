@@ -21,6 +21,7 @@ void mpoly_gen_offset_shift_sp(slong * offset, slong * shift, slong var,
     ulong fpw = FLINT_BITS/bits;
     ulong idx;
 
+    FLINT_ASSERT(0 <= var && var < nvars);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
     idx = var;
@@ -40,6 +41,7 @@ void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
     ulong fpw = FLINT_BITS/bits;
     slong i, N;
 
+    FLINT_ASSERT(0 <= var && var < nvars);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
     N = mpoly_words_per_exp_sp(bits, mctx);
@@ -67,6 +69,7 @@ void mpoly_gen_monomial_sp(ulong * mexp, slong var, flint_bitcnt_t bits,
     ulong idx = var;
     slong i, N;
 
+    FLINT_ASSERT(0 <= var && var < nvars);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
     N = mpoly_words_per_exp_sp(bits, mctx);
@@ -89,6 +92,7 @@ slong mpoly_gen_offset_mp(slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx
     ulong wpf = bits/FLINT_BITS;
     ulong idx;
 
+    FLINT_ASSERT(0 <= var && var < nvars);
     FLINT_ASSERT(bits > FLINT_BITS);
     FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
 
@@ -108,6 +112,7 @@ slong mpoly_gen_monomial_offset_mp(ulong * mexp,
     ulong idx;
     slong i, N, offset;
 
+    FLINT_ASSERT(0 <= var && var < nvars);
     FLINT_ASSERT(bits > FLINT_BITS);
     FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
 

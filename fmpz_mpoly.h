@@ -372,6 +372,7 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t A, slong var,
                                                    const fmpz_mpoly_ctx_t ctx)
 {
+    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
     mpoly_degree_fmpz(deg, A->exps, A->length, A->bits, var, ctx->minfo);
 }
 
@@ -379,6 +380,7 @@ FMPZ_MPOLY_INLINE
 slong fmpz_mpoly_degree_si(const fmpz_mpoly_t A, slong var,
                                                    const fmpz_mpoly_ctx_t ctx)
 {
+    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
     return mpoly_degree_si(A->exps, A->length, A->bits, var, ctx->minfo);
 }
 

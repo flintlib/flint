@@ -95,6 +95,9 @@ void mpoly_get_monomial_ui_sp(ulong * user_exps, const ulong * poly_exps,
         dir = UWORD(1);
     }
 
+    if (nvars < 1)
+        return;
+
     i = 0;
     u = *exp2++;
     shift = 0;

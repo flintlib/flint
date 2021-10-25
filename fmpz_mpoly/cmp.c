@@ -35,7 +35,7 @@ int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         cmp = fmpz_cmp(Acoeffs + i, Bcoeffs + i);
         if (cmp != 0)
-            return cmp;
+            return cmp < 0 ? -1 : 1;
     }
 
     return 0;

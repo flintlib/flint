@@ -21,12 +21,11 @@ flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
     slong i, nfields = mctx->nfields;
-    ulong max;
+    ulong max = 0;
 
-    max = user_exp[0];
     if (mctx->deg)
     {
-        for (i = 1; i < nfields - 1; i++)
+        for (i = 0; i < nfields - 1; i++)
         {
             max += user_exp[i];
             if (max < user_exp[i])
@@ -35,7 +34,7 @@ flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
     }
     else
     {
-        for (i = 1; i < nfields; i++)
+        for (i = 0; i < nfields; i++)
         {
             max |= user_exp[i];
         }
@@ -57,8 +56,8 @@ flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
     if (mctx->deg)
     {
         fmpz_t deg;
-        fmpz_init_set(deg, user_exp + 0);
-        for (i = 1; i < nvars; i++)
+        fmpz_init(deg);
+        for (i = 0; i < nvars; i++)
         {
             fmpz_add(deg, deg, user_exp + i);
         }
@@ -67,10 +66,11 @@ flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
     }
     else
     {
-        exp_bits = fmpz_bits(user_exp + 0);
-        for (i = 1; i < nvars; i++)
+        exp_bits = 0;
+        for (i = 0; i < nvars; i++)
         {
-            exp_bits = FLINT_MAX(exp_bits, fmpz_bits(user_exp + i));
+            flint_bitcnt_t this_bits = fmpz_bits(user_exp + i);
+            exp_bits = FLINT_MAX(exp_bits, this_bits);
         }
         exp_bits += 1;
     }
@@ -91,8 +91,8 @@ flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
     if (mctx->deg)
     {
         fmpz_t deg;
-        fmpz_init_set(deg, user_exp[0]);
-        for (i = 1; i < nvars; i++)
+        fmpz_init(deg);
+        for (i = 0; i < nvars; i++)
         {
             fmpz_add(deg, deg, user_exp[i]);
         }
@@ -101,10 +101,11 @@ flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
     }
     else
     {
-        exp_bits = fmpz_bits(user_exp[0]);
-        for (i = 1; i < nvars; i++)
+        exp_bits = 0;
+        for (i = 0; i < nvars; i++)
         {
-            exp_bits = FLINT_MAX(exp_bits, fmpz_bits(user_exp[i]));
+            flint_bitcnt_t this_bits = fmpz_bits(user_exp[i]);
+            exp_bits = FLINT_MAX(exp_bits, this_bits);
         }
         exp_bits += 1;
     }

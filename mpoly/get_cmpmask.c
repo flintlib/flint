@@ -16,7 +16,7 @@ void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
 {
     slong i;
 
-    if (mctx->ord == ORD_DEGREVLEX)
+    if (mctx->rev)
     {
         /* DEGREVLEX has a bit set everywhere except the in most significant field */
         if (bits <= FLINT_BITS)
