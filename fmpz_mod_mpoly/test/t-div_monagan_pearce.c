@@ -102,6 +102,7 @@ main(void)
         fmpz_mod_mpoly_ctx_t ctx;
         fmpz_mod_mpoly_t f, g, q, r, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong n;
 
         fmpz_mod_mpoly_ctx_init_rand_bits_prime(ctx, state, 20, 200);
 
@@ -115,9 +116,10 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound = n_randint(state, 50/ctx->minfo->nvars) + 1;
-        exp_bound1 = n_randint(state, 50/ctx->minfo->nvars) + 1;
-        exp_bound2 = n_randint(state, 50/ctx->minfo->nvars) + 1;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        exp_bound = n_randint(state, 50/n) + 1;
+        exp_bound1 = n_randint(state, 50/n) + 1;
+        exp_bound2 = n_randint(state, 50/n) + 1;
 
         for (j = 0; j < 4; j++)
         {

@@ -104,16 +104,18 @@ main(void)
         fmpz_mod_mpoly_t a, t;
         slong nfacs, len;
         ulong expbound, powbound, pow;
+        slong n;
 
         fmpz_mod_mpoly_ctx_init_rand_bits_prime(ctx, state, 7, 100);
 
         fmpz_mod_mpoly_init(a, ctx);
         fmpz_mod_mpoly_init(t, ctx);
 
-        nfacs = 1 + (6 + n_randint(state, 6))/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        nfacs = 1 + (6 + n_randint(state, 6))/n;
         powbound = 1 + n_randint(state, 3);
         powbound = 1 + n_randint(state, powbound);
-        expbound = 3 + 20/nfacs/ctx->minfo->nvars/powbound;
+        expbound = 3 + 20/nfacs/n/powbound;
 
         lower = 0;
         fmpz_mod_mpoly_one(a, ctx);
