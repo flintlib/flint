@@ -138,6 +138,7 @@ main(void)
         flint_bitcnt_t coeff_bits;
         slong len, len1, len2;
         slong degbound;
+        slong n;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 5);
 
@@ -149,7 +150,8 @@ main(void)
         len1 = n_randint(state, 60);
         len2 = n_randint(state, 60);
 
-        degbound = 1 + 50/fmpq_mpoly_ctx_nvars(ctx)/fmpq_mpoly_ctx_nvars(ctx);
+        n = FLINT_MAX(WORD(1), fmpq_mpoly_ctx_nvars(ctx));
+        degbound = 1 + 50/n/n;
 
         coeff_bits = n_randint(state, 200);
 

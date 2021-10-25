@@ -148,7 +148,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20);
 
-        degbound = 1 + 10/fmpq_mpoly_ctx_nvars(ctx);
+        degbound = 1 + 10/FLINT_MAX(WORD(1), fmpq_mpoly_ctx_nvars(ctx));
 
         for (j = 0; j < 4; j++)
         {

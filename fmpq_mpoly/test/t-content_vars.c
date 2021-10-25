@@ -32,6 +32,11 @@ main(void)
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
         nvars = ctx->zctx->minfo->nvars;
+        if (nvars < 1)
+        {
+            fmpq_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);

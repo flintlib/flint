@@ -28,7 +28,6 @@ main(void)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, r, k1, k2;
         fmpq_mpoly_struct * g, * q;
-        ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         slong coeff_bits;
         fmpq_mpoly_struct * qarr[5], * darr[5];
@@ -39,11 +38,8 @@ main(void)
         g = (fmpq_mpoly_struct *) flint_malloc(num*sizeof(fmpq_mpoly_struct));
         q = (fmpq_mpoly_struct *) flint_malloc(num*sizeof(fmpq_mpoly_struct));
 
-        ord = mpoly_ordering_randtest(state);
-
-        nvars = n_randint(state, 10) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 10);
+        nvars = fmpq_mpoly_ctx_nvars(ctx);
 
         for (w = 0; w < num; w++)
         {
@@ -62,9 +58,9 @@ main(void)
         len1 = n_randint(state, 12);
         len2 = n_randint(state, 8) + 1;
 
-        exp_bound = n_randint(state, 10/nvars + 1) + 2;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 2;
-        exp_bound2 = n_randint(state, 20/nvars + 1) + 1;
+        exp_bound = n_randint(state, 10/FLINT_MAX(WORD(1), nvars) + 1) + 2;
+        exp_bound1 = n_randint(state, 25/FLINT_MAX(WORD(1), nvars) + 1) + 2;
+        exp_bound2 = n_randint(state, 20/FLINT_MAX(WORD(1), nvars) + 1) + 1;
 
         coeff_bits = n_randint(state, 40);
 
@@ -145,7 +141,6 @@ main(void)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, r, k1, k2;
         fmpq_mpoly_struct * g, * q;
-        ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         slong coeff_bits;
         fmpq_mpoly_struct * qarr[5], * darr[5];
@@ -155,11 +150,8 @@ main(void)
         g = (fmpq_mpoly_struct *) flint_malloc(num*sizeof(fmpq_mpoly_struct));
         q = (fmpq_mpoly_struct *) flint_malloc(num*sizeof(fmpq_mpoly_struct));
 
-        ord = mpoly_ordering_randtest(state);
-
-        nvars = n_randint(state, 10) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 10);
+        nvars = fmpq_mpoly_ctx_nvars(ctx);
 
         for (w = 0; w < num; w++)
         {
@@ -178,9 +170,9 @@ main(void)
         len1 = n_randint(state, 12);
         len2 = n_randint(state, 8) + 1;
 
-        exp_bound = n_randint(state, 10/nvars + 1) + 2;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 2;
-        exp_bound2 = n_randint(state, 20/nvars + 1) + 1;
+        exp_bound = n_randint(state, 10/FLINT_MAX(WORD(1), nvars) + 1) + 2;
+        exp_bound1 = n_randint(state, 25/FLINT_MAX(WORD(1), nvars) + 1) + 2;
+        exp_bound2 = n_randint(state, 20/FLINT_MAX(WORD(1), nvars) + 1) + 1;
 
         coeff_bits = n_randint(state, 40);
 

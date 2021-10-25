@@ -244,10 +244,10 @@ main(void)
         fmpq_init(fe);
         fmpq_init(ge);
 
-        len1 = n_randint(state, 70/nvars1 + 1);
-        len2 = n_randint(state, 25/nvars2 + 1);
-        exp_bound1 = n_randint(state, 15/nvars1 + 2) + 1;
-        exp_bound2 = n_randint(state, 15/nvars2 + 2) + 1;
+        len1 = n_randint(state, 70/FLINT_MAX(WORD(1), nvars1) + 1);
+        len2 = n_randint(state, 25/FLINT_MAX(WORD(1), nvars2) + 1);
+        exp_bound1 = n_randint(state, 15/FLINT_MAX(WORD(1), nvars1) + 2) + 1;
+        exp_bound2 = n_randint(state, 15/FLINT_MAX(WORD(1), nvars2) + 2) + 1;
         coeff_bits = n_randint(state, 10);
 
         vals1 = (fmpq_mpoly_struct **) flint_malloc(nvars1

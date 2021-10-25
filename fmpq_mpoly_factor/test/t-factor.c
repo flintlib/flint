@@ -121,7 +121,7 @@ main(void)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t a, t;
         flint_bitcnt_t coeff_bits;
-        slong nfacs, len;
+        slong n, nfacs, len;
         ulong expbound, powbound, pow;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 8);
@@ -129,8 +129,9 @@ main(void)
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        nfacs = 1 + (5 + n_randint(state, 5))/ctx->zctx->minfo->nvars;
-        expbound = 3 + 40/nfacs/ctx->zctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->zctx->minfo->nvars);
+        nfacs = 1 + (5 + n_randint(state, 5))/n;
+        expbound = 3 + 40/nfacs/n;
         powbound = 1 + n_randint(state, 3);
 
         lower = 0;

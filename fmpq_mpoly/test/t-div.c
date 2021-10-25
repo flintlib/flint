@@ -137,7 +137,7 @@ main(void)
 
         coeff_bits = n_randint(state, 70);
 
-        max_bound = 1 + 400/nvars/nvars;
+        max_bound = 1 + 400/FLINT_MAX(WORD(1), nvars)/FLINT_MAX(WORD(1), nvars);
         exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
@@ -227,7 +227,7 @@ main(void)
 
         coeff_bits = n_randint(state, 70);
 
-        max_bound = 1 + 400/nvars/nvars;
+        max_bound = 1 + 400/FLINT_MAX(WORD(1), nvars)/FLINT_MAX(WORD(1), nvars);
         exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
@@ -315,7 +315,7 @@ main(void)
 
         coeff_bits = n_randint(state, 70);
 
-        max_bound = 1 + 400/nvars/nvars;
+        max_bound = 1 + 400/FLINT_MAX(WORD(1), nvars)/FLINT_MAX(WORD(1), nvars);
         exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
