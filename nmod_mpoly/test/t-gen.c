@@ -31,6 +31,11 @@ main(void)
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+        if (ctx->minfo->nvars < 1)
+        {
+            nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         nmod_mpoly_init(f1, ctx);
         nmod_mpoly_init(f2, ctx);

@@ -38,6 +38,11 @@ main(void)
         modulus = n_randbits(state, modulus);
 
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+        if (ctx->minfo->nvars < 1)
+        {
+            nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
@@ -123,6 +128,11 @@ main(void)
         modulus = n_randbits(state, modulus);
 
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+        if (ctx->minfo->nvars < 1)
+        {
+            nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);

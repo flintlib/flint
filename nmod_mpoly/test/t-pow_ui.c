@@ -81,7 +81,7 @@ main(void)
             pow_bound = 200;
 
         pow_bound = pow_bound/(len1+1);
-        pow_bound = pow_bound/ctx->minfo->nvars;
+        pow_bound = pow_bound/FLINT_MAX(WORD(1), ctx->minfo->nvars);
         pow_bound = FLINT_MAX(pow_bound, UWORD(5));
 
         for (j = 0; j < 10; j++)

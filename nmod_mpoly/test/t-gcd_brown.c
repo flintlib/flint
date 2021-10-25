@@ -156,7 +156,7 @@ main(void)
         len1 = n_randint(state, 80);
         len2 = n_randint(state, 80);
 
-        degbound = 1 + 20/ctx->minfo->nvars;
+        degbound = 1 + 20/FLINT_MAX(WORD(1), ctx->minfo->nvars);
 
         for (j = 0; j < 4; j++)
         {
@@ -186,7 +186,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
-        slong degbound;
+        slong n, degbound;
         mp_limb_t p;
 
         p = n_randint(state, FLINT_BITS - 1) + 1;
@@ -204,7 +204,8 @@ main(void)
         len1 = n_randint(state, 150);
         len2 = n_randint(state, 150);
 
-        degbound = 1 + 60/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        degbound = 1 + 60/n/n;
 
         for (j = 0; j < 4; j++)
         {

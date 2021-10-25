@@ -27,20 +27,15 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        ordering_t ord;
         mp_limb_t modulus;
         ulong c;
-        slong nvars, len, len1, len2;
+        slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
-
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
-
-        nmod_mpoly_ctx_init(ctx, nvars, ord, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
@@ -87,20 +82,15 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g;
-        ordering_t ord;
         mp_limb_t modulus;
         ulong c;
-        slong nvars, len1, len2;
+        slong len1, len2;
         slong exp_bits1, exp_bits2;
-
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
-
-        nmod_mpoly_ctx_init(ctx, nvars, ord, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
@@ -137,10 +127,8 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-
-
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

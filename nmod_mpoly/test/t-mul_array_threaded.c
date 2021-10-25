@@ -34,7 +34,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong max_bound;
+        slong n, max_bound;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 2) + 2;
@@ -51,7 +51,8 @@ main(void)
         len2 = n_randint(state, 100);
 
         max_bound = ctx->minfo->ord == ORD_LEX ? 200 : 100;
-        max_bound = max_bound/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars); 
+        max_bound = max_bound/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
@@ -95,7 +96,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong max_bound;
+        slong n, max_bound;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 2) + 2;
@@ -110,7 +111,8 @@ main(void)
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
 
-        max_bound = 200/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        max_bound = 200/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
@@ -151,7 +153,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong max_bound;
+        slong n, max_bound;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 2) + 2;
@@ -166,7 +168,8 @@ main(void)
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
 
-        max_bound = 200/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        max_bound = 200/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
