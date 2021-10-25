@@ -199,7 +199,9 @@ int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
         return 1;
     }
 
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS || ctx->minfo->nvars > FLINT_BITS)
+    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS ||
+        ctx->minfo->nvars > FLINT_BITS ||
+        ctx->minfo->nvars < 1)
     {
         return -1;
     }
