@@ -199,6 +199,9 @@ main(void)
             fmpz_mpoly_mul(g, f, f, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
 
+            if (nvars < 1)
+                continue;
+
             fmpz_mpoly_gen(x, n_randint(state, nvars), ctx);
             fmpz_mpoly_mul(k, x, x, ctx);
             fmpz_mpoly_add(k, k, x, ctx);

@@ -414,6 +414,11 @@ main(void)
         slong degbound;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+        if (ctx->minfo->nvars < 1)
+        {
+            fmpz_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(a, ctx);

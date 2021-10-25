@@ -94,7 +94,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, t;
-        slong nfacs, len;
+        slong n, nfacs, len;
         ulong * expbounds;
         flint_bitcnt_t coeffbits;
 
@@ -103,7 +103,8 @@ main(void)
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        nfacs = 5 + (8 + n_randint(state, 8))/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        nfacs = 5 + (8 + n_randint(state, 8))/n;
         expbounds = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, ulong);
         for (k = 0; k < ctx->minfo->nvars; k++)
             expbounds[k] = 3;
@@ -113,8 +114,11 @@ main(void)
         {
             len = 1 + n_randint(state, 9);
             coeffbits = 2 + n_randint(state, 100);
-            k = n_randint(state, ctx->minfo->nvars);
-            expbounds[k] = 1;
+            if (ctx->minfo->nvars > 0)
+            {            
+                k = n_randint(state, ctx->minfo->nvars);
+                expbounds[k] = 1;
+            }
             fmpz_mpoly_randtest_bounds(t, state, len, coeffbits, expbounds, ctx);
 
             if (!fmpz_mpoly_is_zero(t, ctx))

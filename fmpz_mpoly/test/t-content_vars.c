@@ -31,6 +31,11 @@ main(void)
         slong * vars;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
+        if (ctx->minfo->nvars < 1)
+        {
+            fmpz_mpoly_ctx_clear(ctx);
+            fmpz_mpoly_ctx_init(ctx, 1, ORD_LEX);
+        }
         nvars = ctx->minfo->nvars;
 
         fmpz_mpoly_init(f, ctx);

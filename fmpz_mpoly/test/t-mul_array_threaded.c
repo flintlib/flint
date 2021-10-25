@@ -35,6 +35,7 @@ main(void)
         fmpz_mpoly_t f, g, h, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong coeff_bits, max_bound;
+        slong n;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 5);
         fmpz_mpoly_init(f, ctx);
@@ -47,7 +48,8 @@ main(void)
         len2 = n_randint(state, 100);
 
         max_bound = ctx->minfo->ord == ORD_LEX ? 200 : 100;
-        max_bound = max_bound/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        max_bound = max_bound/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
@@ -94,6 +96,7 @@ main(void)
         fmpz_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong coeff_bits, max_bound;
+        slong n;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
         fmpz_mpoly_init(f, ctx);
@@ -104,7 +107,8 @@ main(void)
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
 
-        max_bound = 200/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        max_bound = 200/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
@@ -148,6 +152,7 @@ main(void)
         fmpz_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong coeff_bits, max_bound;
+        slong n;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
         fmpz_mpoly_init(f, ctx);
@@ -158,7 +163,8 @@ main(void)
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
 
-        max_bound = 200/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        max_bound = 200/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;

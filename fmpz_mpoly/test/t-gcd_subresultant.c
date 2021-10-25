@@ -148,7 +148,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20);
 
-        degbound = 1 + 10/ctx->minfo->nvars;
+        degbound = 1 + 10/FLINT_MAX(WORD(1), ctx->minfo->nvars);
 
         for (j = 0; j < 4; j++)
         {
