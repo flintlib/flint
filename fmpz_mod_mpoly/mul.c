@@ -28,6 +28,9 @@ static int _try_dense(
     ulong t, dense_size;
     TMP_INIT;
 
+    if (mctx->nvars < 1)
+        return 0;
+
     TMP_START;
 
     Bdegs = TMP_ARRAY_ALLOC(2*mctx->nvars, ulong);
