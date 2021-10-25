@@ -277,9 +277,9 @@ main(void)
         fq_nmod_init(fe, ctx1->fqctx);
         fq_nmod_init(ge, ctx1->fqctx);
 
-        len1 = n_randint(state, 50/nvars1 + 1);
-        len2 = n_randint(state, 10/nvars2 + 1);
-        exp_bound1 = n_randint(state, 10/nvars1 + 1) + 1;
+        len1 = n_randint(state, 50/FLINT_MAX(WORD(1), nvars1) + 1);
+        len2 = n_randint(state, 10/FLINT_MAX(WORD(1), nvars2) + 1);
+        exp_bound1 = n_randint(state, 10/FLINT_MAX(WORD(1), nvars1) + 1) + 1;
         exp_bits2 = n_randint(state, 100) + 1;
 
         fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx1);

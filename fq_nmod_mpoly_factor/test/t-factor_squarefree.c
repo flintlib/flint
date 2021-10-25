@@ -100,7 +100,7 @@ main(void)
 
         nfacs = 2 + n_randint(state, 4);
         powbound = 3;
-        expbound = 2 + 20/nfacs/ctx->minfo->nvars;
+        expbound = 2 + 20/nfacs/FLINT_MAX(WORD(1), ctx->minfo->nvars);
 
         fq_nmod_mpoly_one(a, ctx);
         for (j = 0; j < nfacs; j++)
