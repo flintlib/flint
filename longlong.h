@@ -314,6 +314,54 @@
 
 #endif /* ARM */
 
+
+#if defined(__arm64__)
+
+#define umul_ppmm(xh, xl, a, b) \
+  __asm__ ("mul %0,%2,%3\numulh %1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#define smul_ppmm(xh, xl, a, b) \
+  __asm__ ("mul %0,%2,%3\nsmulh %1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
+  __asm__ ("adds %1,%3,%5\n\tadc %0,%2,%4"               \
+       : "=r" (sh), "=&r" (sl)                           \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
+         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "cc")
+
+#define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
+  __asm__ ("adds %2,%5,%8\n\tadcs %1,%4,%7\n\tadc %0,%3,%6"                   \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
+         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "cc")
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)      \
+  __asm__ ("adds %3,%7,%11\n\tadcs %2,%6,%10\n\tadcs %1,%5,%9\n\tadc %0,%4,%8"\
+       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)),                        \
+         "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)),                        \
+         "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)),                        \
+         "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)               \
+  __asm__ ("subs %1,%3,%5\n\tsbc %0,%2,%4"               \
+       : "=r" (sh), "=&r" (sl)                           \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
+         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "cc")
+
+#define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
+  __asm__ ("subs %2,%5,%8\n\tsbcs %1,%4,%7\n\tsbc %0,%3,%6"                   \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
+         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "cc")
+
+#endif
+
 /* fallback code */
 #if !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
 
@@ -329,6 +377,7 @@
 
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 #if !(GMP_LIMB_BITS == 64 && defined (__ia64))
+#if !defined(__arm64__)
 
 #define umul_ppmm(w1, w0, u, v)				 \
   do {									          \
@@ -357,8 +406,10 @@
 
 #endif
 #endif
+#endif
 
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
+#if !defined(__arm64__)
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
   do {									          \
@@ -369,6 +420,9 @@
   } while (0)
 
 #endif
+#endif
+
+#if !defined(__arm64__)
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
   do {                                                              \
@@ -386,9 +440,12 @@
     add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __tt);                           \
   } while (0)
 
+#endif
+
 
 #if !((GMP_LIMB_BITS == 64 && defined (__ia64)) ||      \
       (GMP_LIMB_BITS == 32 && defined (__arm__)))
+#if !defined(__arm64__)
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
   do {									          \
@@ -399,7 +456,9 @@
   } while (0)
 
 #endif
+#endif
 
+#if !defined(__arm64__)
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)           \
   do {                                                              \
     mp_limb_t __t, __u;                                             \
@@ -407,9 +466,11 @@
     sub_ddmmss(__u, dm, (mp_limb_t) 0, mm, (mp_limb_t) 0, sm);      \
     sub_ddmmss(dh, dm, (mh) - (sh), dm, -__u, -__t);                \
   } while (0)
+#endif
 
 /* MIPS and ARM - Use clz builtins */
-#if (defined (__mips__) || defined (__arm__))
+/* NOTE: Apple clang version 12.0.5 miscompiles the count_leading_zeros fallback */
+#if (defined (__mips__) || defined (__arm__) || defined (__arm64__))
 
 #ifdef _LONG_LONG_LIMB
 #define count_leading_zeros(count,x)            \
@@ -591,6 +652,8 @@
 #if !( (GMP_LIMB_BITS == 32 && defined (__arm__))                              \
        || defined (__i386__) || defined (__i486__) || defined(__amd64__))
 
+#if !defined(__arm64__)
+
 #define smul_ppmm(w1, w0, u, v)                         \
   do {                                                  \
     mp_limb_t __w1;                                     \
@@ -599,6 +662,8 @@
     (w1) = __w1 - (-(__xm0 >> (FLINT_BITS-1)) & __xm1)  \
         - (-(__xm1 >> (FLINT_BITS-1)) & __xm0);         \
   } while (0)
+
+#endif
 
 #endif
 
