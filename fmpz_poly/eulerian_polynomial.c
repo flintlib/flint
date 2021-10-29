@@ -77,13 +77,15 @@ _fmpz_poly_eulerian_polynomial_rec(fmpz * res, ulong n)
     {
         if (ix <= SMALL_BOUND)
         {
-            res[ix / 2] = (ix + 1) * res[ix / 2 - 1];
+            if (ix & 1)
+                res[ix / 2] = (ix + 1) * res[ix / 2 - 1];
             for (jx = ix / 2 - 1; jx >= 1; jx--)
                 res[jx] = (ix - jx) * res[jx - 1] + (jx + 1) * res[jx];
         }
         else
         {
-            fmpz_mul_ui(res + ix / 2, res + ix / 2 - 1, ix + 1);
+            if (ix & 1)
+                fmpz_mul_ui(res + ix / 2, res + ix / 2 - 1, ix + 1);
             for (jx = ix / 2 - 1; jx >= 1; jx--)
             {
                 fmpz_mul_ui(res + jx, res + jx, jx + 1);
