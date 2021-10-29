@@ -412,6 +412,10 @@ Scalar absolute value, multiplication and division
 
     Sets ``poly1`` to ``poly2`` times ``2^exp``.
 
+.. function:: void fmpz_poly_scalar_addmul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
+
+.. function:: void fmpz_poly_scalar_addmul_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
+
 .. function:: void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets ``poly1`` to ``poly1 + x * poly2``.
@@ -3334,6 +3338,35 @@ Fibonacci polynomials
 
     Sets ``poly`` to the `n`-th Fibonacci polynomial.
     The coefficients are calculated using a hypergeometric recurrence.
+
+
+Eulerian numbers and polynomials
+--------------------------------------------------------------------------------
+
+Eulerian numbers are the coefficients to the Eulerian polynomials
+
+.. math ::
+
+    A_n(x) = \sum_{m = 0}^{n} A(n, m) x^m,
+
+where the Eulerian polynomials are defined by the exponential generating
+function
+
+.. math ::
+
+    \frac{x - 1}{x - e^{(x - 1) t}}
+    = \sum_{n = 0}^{\infty} A_n(x) \frac{t^n}{n!}.
+
+The Eulerian numbers can be expressed explicitly via the formula
+.. math ::
+    A(n, m) = \sum_{k = 0}^{m + 1} (-1)^k \binom{n + 1}{k} (m + 1 - k)^n.
+
+Note: Not to be confused with Euler numbers and polynomials.
+
+.. function:: void arith_eulerian_polynomial(fmpz_poly_t res, ulong n)
+
+    Sets ``res`` to the Eulerian polynomial `A_n(x)`, where we define
+    `A_0(x) = 1`. The polynomial is calculated via a recursive relation.
 
 
 Modular forms and q-series

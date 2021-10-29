@@ -333,6 +333,12 @@ FLINT_DLL void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1,
 FLINT_DLL void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
 
+FLINT_DLL void fmpz_poly_scalar_addmul_si(fmpz_poly_t poly1,
+                                   const fmpz_poly_t poly2, slong x);
+
+FLINT_DLL void fmpz_poly_scalar_addmul_ui(fmpz_poly_t poly1,
+                                   const fmpz_poly_t poly2, ulong x);
+
 FLINT_DLL void fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
 
@@ -1436,6 +1442,8 @@ FLINT_DLL void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
 FLINT_DLL void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
 
 FLINT_DLL void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
+
+FLINT_DLL void fmpz_poly_eulerian_polynomial(fmpz_poly_t poly, ulong n);
 
 #ifdef __cplusplus
 }
