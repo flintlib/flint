@@ -97,10 +97,17 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_horner(fq_nmod_mpoly_t A,
     fmpz_t score, tz;
     TMP_INIT;
 
-    if (Blen == 0)
+    if (Blen < 1)
     {
         fq_nmod_mpoly_zero(A, ctxAC);
         return 1;
+    }
+
+    if (nvars < 1)
+    {
+       FLINT_ASSERT(Blen == 1);
+       fq_nmod_mpoly_set_n_fq(A, B->coeffs + 0, ctxAC);
+       return 1;
     }
 
     FLINT_ASSERT(A != B);

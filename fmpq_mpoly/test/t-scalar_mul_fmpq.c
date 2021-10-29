@@ -27,18 +27,14 @@ main(void)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h, k;
-        ordering_t ord;
         fmpq_t a, b, c;
-        slong nvars, len, coeff_bits, exp_bits;
+        slong len, coeff_bits, exp_bits;
 
         fmpq_init(a);
         fmpq_init(b);
         fmpq_init(c);
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
 
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);
@@ -92,16 +88,12 @@ main(void)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h;
-        ordering_t ord;
         fmpq_t c;
-        slong nvars, len, coeff_bits, exp_bits;
+        slong len, coeff_bits, exp_bits;
 
         fmpq_init(c);
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
 
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);

@@ -60,6 +60,11 @@ main(void)
         slong var1;
 
         fmpz_mod_mpoly_ctx_init_rand_bits(ctx, state, 20, 200);
+        if (fmpz_mod_mpoly_ctx_nvars(ctx) < 1)
+        {
+            fmpz_mod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         fmpz_mod_mpoly_init(f, ctx);
         fmpz_mod_mpoly_init(g, ctx);
@@ -112,12 +117,11 @@ main(void)
         ulong exps[2];
         slong var1, var2;
 
-again:
         fmpz_mod_mpoly_ctx_init_rand_bits(ctx, state, 20, 200);
         if (fmpz_mod_mpoly_ctx_nvars(ctx) < 2)
         {
             fmpz_mod_mpoly_ctx_clear(ctx);
-            goto again;
+            continue;
         }
 
         fmpz_mod_mpoly_init(f, ctx);

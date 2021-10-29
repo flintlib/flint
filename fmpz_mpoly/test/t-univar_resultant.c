@@ -153,6 +153,9 @@ main(void)
 
             fmpz_mpoly_zero(g, ctx);
 
+            if (fmpz_mpoly_ctx_nvars(ctx) < 1)
+                continue;
+
             while (fmpz_mpoly_degree_si(f, 0, ctx) < 100)
             {
                 fmpz_mpoly_randtest_bound(t, state, 5, n_randint(state, 100) + 1, 10, ctx);

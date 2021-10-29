@@ -64,7 +64,7 @@ main(void)
         slong len1, len2, exp_bound1, exp_bound2;
         flint_bitcnt_t coeff_bits;
 
-        fmpq_mpoly_ctx_init_rand(ctx, state, 1);
+        fmpq_mpoly_ctx_init(ctx, 1, mpoly_ordering_randtest(state));
 
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);

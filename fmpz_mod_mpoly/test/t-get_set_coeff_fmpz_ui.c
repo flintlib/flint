@@ -43,10 +43,10 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            ulong * exp = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+            ulong * exp = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, ulong);
 
             fmpz_randtest_unsigned(c, state, 200);
-            for (k = 0; k < fmpz_mod_mpoly_ctx_nvars(ctx); k++)
+            for (k = 0; k < ctx->minfo->nvars; k++)
                 exp[k] = n_randtest(state);
 
             fmpz_mod_mpoly_set_coeff_fmpz_ui(f, c, exp, ctx);

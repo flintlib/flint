@@ -159,6 +159,7 @@ int _fmpz_mod_mpoly_divides_dense_maxfields(
     FLINT_ASSERT(B->length > 0);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(0 < ctx->minfo->nvars);
     FLINT_ASSERT(ctx->minfo->nvars <= FLINT_BITS);
 
     TMP_START;
@@ -262,7 +263,9 @@ int fmpz_mod_mpoly_divides_dense(
         return 1;
     }
 
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS || ctx->minfo->nvars > FLINT_BITS)
+    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS ||
+        ctx->minfo->nvars > FLINT_BITS ||
+        ctx->minfo->nvars < 1)
     {
         return -1;
     }

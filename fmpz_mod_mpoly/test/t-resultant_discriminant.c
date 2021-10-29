@@ -67,6 +67,11 @@ main(void)
         slong len1, len2, exp_bound1, exp_bound2;
 
         fmpz_mod_mpoly_ctx_init_rand_bits_prime(ctx, state, 1, 100);
+        if (fmpz_mod_mpoly_ctx_nvars(ctx) < 1)
+        {
+            fmpz_mod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         fmpz_mod_mpoly_init(a, ctx);
         fmpz_mod_mpoly_init(b, ctx);

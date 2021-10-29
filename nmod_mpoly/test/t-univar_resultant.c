@@ -140,7 +140,7 @@ main(void)
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
-        nmod_mpoly_ctx_init_rand(ctx, state, 1, modulus);
+        nmod_mpoly_ctx_init(ctx, 1, mpoly_ordering_randtest(state), modulus);
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(t, ctx);

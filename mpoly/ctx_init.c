@@ -15,24 +15,33 @@ void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
 {
     flint_bitcnt_t bits;
 
-    mctx->nvars = nvars;
     mctx->ord = ord;
-    switch (ord)
+    if (nvars > 0)
     {
-        case ORD_LEX:
-            mctx->deg = 0;
-            mctx->rev = 0;
-            break;
-        case ORD_DEGLEX:
-            mctx->deg = 1;
-            mctx->rev = 0;
-            break;
-        case ORD_DEGREVLEX:
-            mctx->deg = 1;
-            mctx->rev = 1;
-            break;
-        default:
-            flint_throw(FLINT_ERROR, "Invalid ordering in mpoly_ctx_init");
+        mctx->nvars = nvars;
+        switch (ord)
+        {
+            case ORD_LEX:
+                mctx->deg = 0;
+                mctx->rev = 0;
+                break;
+            case ORD_DEGLEX:
+                mctx->deg = 1;
+                mctx->rev = 0;
+                break;
+            case ORD_DEGREVLEX:
+                mctx->deg = 1;
+                mctx->rev = 1;
+                break;
+            default:
+                flint_throw(FLINT_ERROR, "Invalid ordering in mpoly_ctx_init");
+        }
+    }
+    else
+    {
+        mctx->nvars = 0;
+        mctx->deg = 1;  /* degree field will always be zero */
+        mctx->rev = 0;
     }
     mctx->nfields = mctx->nvars + mctx->deg;
 

@@ -62,6 +62,11 @@ main(void)
 
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
         nvars = ctx->minfo->nvars;
+        if (nvars < 1)
+        {
+            nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);

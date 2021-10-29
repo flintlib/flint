@@ -31,7 +31,6 @@ main(void)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f;
-       ordering_t ord;
        fmpz_t c, d;
        slong nvars, len, coeff_bits, exp_bits, j;
        ulong * exp;
@@ -39,10 +38,8 @@ main(void)
        fmpz_init(c);
        fmpz_init(d);
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 20) + 1;
-
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+       fmpz_mpoly_ctx_init_rand(ctx, state, 20);
+       nvars = ctx->minfo->nvars;
 
        fmpz_mpoly_init(f, ctx);
 

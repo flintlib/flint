@@ -36,7 +36,7 @@ main(void)
         fmpz_init(fdeg);
         used = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, int);
 
-        for (j = 0; j < 10; j++)
+        for (j = 0; j < ctx->minfo->nvars; j++)
         {
             len = n_randint(state, 500);
             exp_bits = n_randint(state, 20) + 2;

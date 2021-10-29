@@ -105,6 +105,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, q, r, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong n;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 10, FLINT_BITS, 5);
 
@@ -118,9 +119,10 @@ main(void)
         len1 = n_randint(state, 15);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound = n_randint(state, 100/ctx->minfo->nvars) + 1;
-        exp_bound1 = n_randint(state, 100/ctx->minfo->nvars) + 1;
-        exp_bound2 = n_randint(state, 100/ctx->minfo->nvars) + 1;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        exp_bound = n_randint(state, 100/n) + 1;
+        exp_bound1 = n_randint(state, 100/n) + 1;
+        exp_bound2 = n_randint(state, 100/n) + 1;
 
         for (j = 0; j < 4; j++)
         {

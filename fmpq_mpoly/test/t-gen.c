@@ -30,6 +30,12 @@ main(void)
         slong len, coeff_bits, exp_bits, k1, k2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
+        if (ctx->zctx->minfo->nvars < 1)
+        {
+            fmpq_mpoly_ctx_clear(ctx);
+            continue;
+        }
+
         fmpq_mpoly_init(f1, ctx);
         fmpq_mpoly_init(f2, ctx);
 

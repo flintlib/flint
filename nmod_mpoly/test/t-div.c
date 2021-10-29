@@ -145,7 +145,7 @@ main(void)
         slong len, len1, len2;
         mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
         fmpz * shifts, * strides;
-        slong nvars;
+        slong n, nvars;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -163,7 +163,8 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        max_bound = 1 + 400/nvars/nvars;
+        n = FLINT_MAX(WORD(1), nvars);
+        max_bound = 1 + 400/n/n;
         exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
         exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));

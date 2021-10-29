@@ -97,10 +97,17 @@ int nmod_mpoly_compose_nmod_mpoly_horner(nmod_mpoly_t A,
     fmpz_t score, tz;
     TMP_INIT;
 
-    if (Blen == 0)
+    if (Blen < 1)
     {
         nmod_mpoly_zero(A, ctxAC);
         return 1;
+    }
+
+    if (nvars < 1)
+    {
+       FLINT_ASSERT(Blen == 1);
+       nmod_mpoly_set_ui(A, B->coeffs[0], ctxAC);
+       return 1;
     }
 
     FLINT_ASSERT(A != B);

@@ -122,7 +122,7 @@ main(void)
         len1 = n_randint(state, 80);
         len2 = n_randint(state, 80);
 
-        degbound = 1 + 20/ctx->minfo->nvars;
+        degbound = 1 + 20/FLINT_MAX(WORD(1), ctx->minfo->nvars);
 
         for (j = 0; j < 4; j++)
         {
@@ -152,7 +152,7 @@ main(void)
         fmpz_mod_mpoly_ctx_t ctx;
         fmpz_mod_mpoly_t a, b, g, t;
         slong len, len1, len2;
-        slong degbound;
+        slong n, degbound;
 
         fmpz_mod_mpoly_ctx_init_rand_bits_prime(ctx, state, 4, 250);
 
@@ -165,7 +165,8 @@ main(void)
         len1 = n_randint(state, 150);
         len2 = n_randint(state, 150);
 
-        degbound = 1 + 60/ctx->minfo->nvars/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        degbound = 1 + 60/n/n;
 
         for (j = 0; j < 4; j++)
         {

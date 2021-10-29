@@ -230,6 +230,8 @@ void fmpz_mpoly_mul(
         return;
     }
 
+    FLINT_ASSERT(nvars > 0);
+
     if (nvars == 1 && B->bits <= FLINT_BITS && C->bits <= FLINT_BITS)
     {
         if (_try_dense_univar(A, B, C, ctx))

@@ -116,10 +116,17 @@ int fmpz_mpoly_compose_fmpz_mpoly_horner(fmpz_mpoly_t A,
     fmpz_t score, tz;
     TMP_INIT;
 
-    if (Blen == 0)
+    if (Blen < 1)
     {
         fmpz_mpoly_zero(A, ctxAC);
         return 1;
+    }
+
+    if (nvars < 1)
+    {
+       FLINT_ASSERT(Blen == 1);
+       fmpz_mpoly_set_fmpz(A, B->coeffs + 0, ctxAC);
+       return 1;
     }
 
     FLINT_ASSERT(A != B);

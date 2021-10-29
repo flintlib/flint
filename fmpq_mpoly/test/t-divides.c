@@ -81,14 +81,10 @@ main(void)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h, k;
-        ordering_t ord;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong coeff_bits, exp_bits, exp_bits1, exp_bits2, maxbits;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 10);
 
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);
@@ -99,7 +95,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        maxbits = 10/nvars + 2;
+        maxbits = 10/FLINT_MAX(WORD(1), fmpq_mpoly_ctx_nvars(ctx)) + 2;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;
@@ -207,14 +203,10 @@ main(void)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h;
-        ordering_t ord;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong coeff_bits, exp_bits, exp_bits1, exp_bits2, maxbits;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 10);
 
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);
@@ -224,7 +216,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        maxbits = 10/nvars + 2;
+        maxbits = 10/FLINT_MAX(WORD(1), fmpq_mpoly_ctx_nvars(ctx)) + 2;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;
@@ -326,14 +318,10 @@ main(void)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h;
-        ordering_t ord;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong coeff_bits, exp_bits, exp_bits1, exp_bits2, maxbits;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpq_mpoly_ctx_init(ctx, nvars, ord);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 10);
 
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);
@@ -343,7 +331,7 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        maxbits = 10/nvars + 2;
+        maxbits = 10/FLINT_MAX(WORD(1), fmpq_mpoly_ctx_nvars(ctx)) + 2;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;

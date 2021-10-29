@@ -101,7 +101,7 @@ main(void)
         slong lower;
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, t;
-        slong nfacs, len;
+        slong n, nfacs, len;
         ulong expbound, powbound, pow;
         mp_limb_t p;
 
@@ -114,10 +114,11 @@ main(void)
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(t, ctx);
 
-        nfacs = 1 + (6 + n_randint(state, 6))/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        nfacs = 1 + (6 + n_randint(state, 6))/n;
         powbound = 1 + n_randint(state, 3);
         powbound = 1 + n_randint(state, powbound);
-        expbound = 3 + 15/nfacs/ctx->minfo->nvars/powbound;
+        expbound = 3 + 15/nfacs/n/powbound;
 
         lower = 0;
         nmod_mpoly_one(a, ctx);

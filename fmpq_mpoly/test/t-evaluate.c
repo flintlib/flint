@@ -203,6 +203,7 @@ main(void)
         fmpq ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
         flint_bitcnt_t coeff_bits;
+        slong n;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
         nvars = ctx->zctx->minfo->nvars;
@@ -219,8 +220,9 @@ main(void)
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
 
-        exp_bound1 = n_randint(state, 2000/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 2000/nvars/nvars) + 1;
+        n = FLINT_MAX(WORD(1), nvars);
+        exp_bound1 = n_randint(state, 2000/n/n) + 1;
+        exp_bound2 = n_randint(state, 2000/n/n) + 1;
 
         coeff_bits = n_randint(state, 100);
 

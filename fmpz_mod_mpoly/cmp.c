@@ -37,7 +37,7 @@ int fmpz_mod_mpoly_cmp(
     {
         cmp = fmpz_cmp(Acoeffs + i, Bcoeffs + i);
         if (cmp != 0)
-            return cmp;
+            return cmp < 0 ? -1 : 1;
     }
 
     return 0;

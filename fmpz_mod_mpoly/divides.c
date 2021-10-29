@@ -28,7 +28,7 @@ static int _fmpz_mod_mpoly_divides_try_dense(
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);
 
-    if (mctx->nvars > FLINT_BITS)
+    if (mctx->nvars < 1 || mctx->nvars > FLINT_BITS)
         return 0;
 
     TMP_START;
@@ -104,7 +104,9 @@ int fmpz_mod_mpoly_divides(
     }
 
     if (A->length < 30 || A->bits > FLINT_BITS || B->bits > FLINT_BITS)
+    {
         goto do_heap;
+    }
 
     if (_fmpz_mod_mpoly_divides_try_dense(maxAfields, maxBfields,
                                              A->length, B->length, ctx->minfo))

@@ -94,14 +94,15 @@ main(void)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t a, t;
-        slong nfacs, len;
+        slong n, nfacs, len;
         ulong * expbounds;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 5, FLINT_BITS, 4);
         fq_nmod_mpoly_init(a, ctx);
         fq_nmod_mpoly_init(t, ctx);
 
-        nfacs = 5 + (8 + n_randint(state, 8))/ctx->minfo->nvars;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        nfacs = 5 + (8 + n_randint(state, 8))/n;
         expbounds = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, ulong);
         for (k = 0; k < ctx->minfo->nvars; k++)
             expbounds[k] = 3;
@@ -110,8 +111,11 @@ main(void)
         for (j = 0; j < nfacs; j++)
         {
             len = 1 + n_randint(state, 9);
-            k = n_randint(state, ctx->minfo->nvars);
-            expbounds[k] = 1;
+            if (ctx->minfo->nvars > 0)
+            {
+                k = n_randint(state, ctx->minfo->nvars);
+                expbounds[k] = 1;
+            }
             fq_nmod_mpoly_randtest_bounds(t, state, len, expbounds, ctx);
             if (!fq_nmod_mpoly_is_zero(t, ctx))
             {

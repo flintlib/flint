@@ -91,6 +91,7 @@ main(void)
         fmpz_mod_mpoly_struct * g, * q;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         fmpz_mod_mpoly_struct * qarr[5], * darr[5];
+        slong n;
 
         num = n_randint(state, 5) + 1;
 
@@ -117,9 +118,10 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound = n_randint(state, 10/ctx->minfo->nvars + 1) + 2;
-        exp_bound1 = n_randint(state, 25/ctx->minfo->nvars + 1) + 2;
-        exp_bound2 = n_randint(state, 20/ctx->minfo->nvars + 1) + 1;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        exp_bound = n_randint(state, 10/n + 1) + 2;
+        exp_bound1 = n_randint(state, 25/n + 1) + 2;
+        exp_bound2 = n_randint(state, 20/n + 1) + 1;
 
         for (j = 0; j < 4; j++)
         {
@@ -180,6 +182,7 @@ main(void)
         fmpz_mod_mpoly_struct * g, * q;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         fmpz_mod_mpoly_struct * qarr[5], * darr[5];
+        slong n;
 
         num = n_randint(state, 5) + 1;
 
@@ -206,9 +209,10 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound = n_randint(state, 10/ctx->minfo->nvars + 1) + 2;
-        exp_bound1 = n_randint(state, 25/ctx->minfo->nvars + 1) + 2;
-        exp_bound2 = n_randint(state, 20/ctx->minfo->nvars + 1) + 1;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        exp_bound = n_randint(state, 10/n + 1) + 2;
+        exp_bound1 = n_randint(state, 25/n + 1) + 2;
+        exp_bound2 = n_randint(state, 20/n + 1) + 1;
 
         for (j = 0; j < 4; j++)
         {

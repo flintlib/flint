@@ -104,7 +104,7 @@ main(void)
             }
         }
 
-        for (k = 0; k < ctx->zctx->minfo->nvars; k++)
+        for (k = 0; k < nvars; k++)
         {
             fmpz_clear(exp[k]);
             flint_free(exp[k]); 

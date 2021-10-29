@@ -894,7 +894,8 @@ int fmpz_mpoly_mul_array_threaded(
         return 1;
     }
 
-    if (1 != mpoly_words_per_exp(B->bits, ctx->minfo) ||
+    if (ctx->minfo->nvars < 1 ||
+        1 != mpoly_words_per_exp(B->bits, ctx->minfo) ||
         1 != mpoly_words_per_exp(C->bits, ctx->minfo))
     {
         return 0;

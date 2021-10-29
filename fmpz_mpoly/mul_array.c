@@ -737,6 +737,7 @@ int _fmpz_mpoly_mul_array_LEX(
     int success;
     TMP_INIT;
 
+    FLINT_ASSERT(ctx->minfo->nvars > 0);
     FLINT_ASSERT(B->length != 0);
     FLINT_ASSERT(C->length != 0);
 
@@ -1254,6 +1255,7 @@ int _fmpz_mpoly_mul_array_DEG(
     ulong deg;
     int success;
 
+    FLINT_ASSERT(ctx->minfo->nvars > 0);
     FLINT_ASSERT(B->length != 0);
     FLINT_ASSERT(C->length != 0);
 
@@ -1338,9 +1340,9 @@ int fmpz_mpoly_mul_array(
         return 1;
     }
 
-    if (  1 != mpoly_words_per_exp(B->bits, ctx->minfo)
-       || 1 != mpoly_words_per_exp(C->bits, ctx->minfo)
-       )
+    if (ctx->minfo->nvars < 1 ||
+        1 != mpoly_words_per_exp(B->bits, ctx->minfo) ||
+        1 != mpoly_words_per_exp(C->bits, ctx->minfo))
     {
         return 0;
     }

@@ -202,6 +202,11 @@ main(void)
         slong degbound;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 4, FLINT_BITS, 4);
+        if (fq_nmod_mpoly_ctx_nvars(ctx) < 1)
+        {
+            fq_nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);

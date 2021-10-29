@@ -110,6 +110,7 @@ main(void)
         nmod_mpoly_t f, g, q, r, k;
         mp_limb_t modulus;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong n;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -126,9 +127,10 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound = n_randint(state, 50/ctx->minfo->nvars) + 1;
-        exp_bound1 = n_randint(state, 50/ctx->minfo->nvars) + 1;
-        exp_bound2 = n_randint(state, 50/ctx->minfo->nvars) + 1;
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        exp_bound = n_randint(state, 50/n) + 1;
+        exp_bound1 = n_randint(state, 50/n) + 1;
+        exp_bound2 = n_randint(state, 50/n) + 1;
 
         for (j = 0; j < 4; j++)
         {

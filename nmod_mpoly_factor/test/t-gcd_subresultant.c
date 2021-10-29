@@ -206,6 +206,11 @@ main(void)
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
         nmod_mpoly_ctx_init_rand(ctx, state, 4, modulus);
+        if (ctx->minfo->nvars < 1)
+        {
+            nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);

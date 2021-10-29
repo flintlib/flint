@@ -278,10 +278,10 @@ main(void)
         fmpz_init(fe);
         fmpz_init(ge);
 
-        len1 = n_randint(state, 50/nvars1 + 1) + 1;
-        len2 = n_randint(state, 10/nvars2 + 1) + 1;
-        exp_bound1 = n_randint(state, 15/nvars1 + 2) + 2;
-        exp_bound2 = n_randint(state, 15/nvars2 + 2) + 3;
+        len1 = n_randint(state, 50/FLINT_MAX(WORD(1), nvars1) + 1) + 1;
+        len2 = n_randint(state, 10/FLINT_MAX(WORD(1), nvars2) + 1) + 1;
+        exp_bound1 = n_randint(state, 15/FLINT_MAX(WORD(1), nvars1) + 2) + 2;
+        exp_bound2 = n_randint(state, 15/FLINT_MAX(WORD(1), nvars2) + 2) + 3;
         coeff_bits1 = n_randint(state, 200);
         coeff_bits2 = n_randint(state, 8);
 

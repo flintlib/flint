@@ -31,6 +31,11 @@ main(void)
         flint_bitcnt_t exp_bits;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
+        if (fq_nmod_mpoly_ctx_nvars(ctx) < 1)
+        {
+            fq_nmod_mpoly_ctx_clear(ctx);
+            continue;
+        }
 
         fq_nmod_mpoly_init(f1, ctx);
         fq_nmod_mpoly_init(f2, ctx);

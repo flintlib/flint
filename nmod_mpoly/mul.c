@@ -154,7 +154,7 @@ void nmod_mpoly_mul(
         If one polynomial is tiny or if both polynomials are small,
         heap method with operational complexity O(B->length*C->length) is fine.
     */
-    if (min_length < 20 || max_length < 50)
+    if (nvars < 1 || min_length < 20 || max_length < 50)
     {
         _nmod_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
         goto cleanup;

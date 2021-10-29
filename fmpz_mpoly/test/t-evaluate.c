@@ -99,7 +99,6 @@ main(void)
     /* Check repeated evalone matches evalall */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
-        ordering_t ord;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
         fmpz_t fe;
@@ -108,10 +107,8 @@ main(void)
         slong nvars, len1, exp_bound1;
         flint_bitcnt_t coeff_bits;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+        nvars = ctx->minfo->nvars;
 
         fmpz_mpoly_init(f, ctx);
         fmpz_init(fe);
@@ -187,7 +184,6 @@ main(void)
     /* Check multiprecision repeated evalone matches evalall */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
-        ordering_t ord;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
         fmpz_t fe;
@@ -196,10 +192,8 @@ main(void)
         slong nvars, len1;
         flint_bitcnt_t exp_bits, coeff_bits;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+        nvars = ctx->minfo->nvars;
 
         fmpz_mpoly_init(f, ctx);
         fmpz_init(fe);
@@ -279,15 +273,13 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, fg;
         fmpz_t fe, ge, fge, t;
-        ordering_t ord;
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
         slong coeff_bits;
+        slong n;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+        nvars = ctx->minfo->nvars;
 
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
@@ -301,11 +293,11 @@ main(void)
         len1 = n_randint(state, 500);
         len2 = n_randint(state, 500);
 
-        exp_bound1 = n_randint(state, 5000/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 5000/nvars/nvars) + 1;
+        n = FLINT_MAX(WORD(1), nvars);
+        exp_bound1 = n_randint(state, 5000/n/n) + 1;
+        exp_bound2 = n_randint(state, 5000/n/n) + 1;
 
         coeff_bits = n_randint(state, 100);
-
 
         vals = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
         for (v = 0; v < nvars; v++)
@@ -363,15 +355,13 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, fg;
         fmpz_t fe, ge, fge, t;
-        ordering_t ord;
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
         slong coeff_bits;
+        slong n;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+        nvars = ctx->minfo->nvars;
 
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
@@ -385,8 +375,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bound1 = n_randint(state, 1000/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 1000/nvars/nvars) + 1;
+        n = FLINT_MAX(WORD(1), nvars);
+        exp_bound1 = n_randint(state, 1000/n/n) + 1;
+        exp_bound2 = n_randint(state, 1000/n/n) + 1;
 
         coeff_bits = n_randint(state, 100);
 
