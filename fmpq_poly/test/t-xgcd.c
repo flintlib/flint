@@ -206,6 +206,50 @@ main(void)
         fmpq_poly_clear(z);
     }
 
+    /* regression test, see #1014 */
+    {
+        fmpq_poly_t a, b, d, s, t, z, z1;
+
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(d);
+        fmpq_poly_init(s);
+        fmpq_poly_init(t);
+        fmpq_poly_init(z);
+        fmpq_poly_init(z1);
+
+         fmpq_poly_one(a);
+         fmpq_poly_one(b);
+         fmpq_poly_shift_left(a, a, 400);
+         fmpq_poly_shift_left(b, b, 400);
+         fmpq_poly_sub_si(a, a, 1);
+         fmpq_poly_add_si(b, b, 1);
+
+        fmpq_poly_xgcd(d, s, t, a, b);
+        fmpq_poly_mul(z, s, a);
+        fmpq_poly_mul(z1, t, b);
+        fmpq_poly_add(z, z, z1);
+
+        if (!fmpq_poly_equal(z, d))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); fmpq_poly_print_pretty(a, "x"), flint_printf("\n\n");
+            flint_printf("b: "); fmpq_poly_print_pretty(b, "x"), flint_printf("\n\n");
+            flint_printf("d: "); fmpq_poly_print_pretty(d, "x"), flint_printf("\n\n");
+            flint_printf("s: "); fmpq_poly_print_pretty(s, "x"), flint_printf("\n\n");
+            flint_printf("t: "); fmpq_poly_print_pretty(t, "x"), flint_printf("\n\n");
+            abort();
+        }
+
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(d);
+        fmpq_poly_clear(s);
+        fmpq_poly_clear(t);
+        fmpq_poly_clear(z);
+        fmpq_poly_clear(z1);
+    }
+
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

@@ -168,14 +168,15 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                     _nmod_vec_swap(S, T, FLINT_MAX(lenS, lenT));
                     l = lenS; lenS = lenT; lenT = l;
                 }
-                __sub(T, lenT, T, lenT, v, lenv);
-
-                if (lenr == 0)
+                if (lenr != 0) /* prevent overflow of T on last iteration */
+                    __sub(T, lenT, T, lenT, v, lenv);
+                else
                 {
                     __set(G, lenG, j, lenj);
 
                     goto cofactor;
                 }
+
                 if (lenj < cutoff)
                 {
                     mp_ptr u0 = R[0], u1 = R[1];
@@ -192,7 +193,7 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                     goto cofactor;
                 }
 
-                sgnR = _nmod_poly_hgcd(R, lenR, h, &lenh, j, &lenj, j,lenj, r, lenr, mod);
+                sgnR = _nmod_poly_hgcd(R, lenR, h, &lenh, j, &lenj, j, lenj, r, lenr, mod);
 
                 __mul(v, lenv, R[1], lenR[1], T, lenT);
                 __mul(w, lenw, R[2], lenR[2], S, lenS);
