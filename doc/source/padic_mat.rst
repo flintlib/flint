@@ -54,13 +54,6 @@ Macros
 
     Returns the `p`-adic precision of the matrix.
 
-.. function:: slong padic_mat_val(const padic_mat_t A)
-
-    Returns the valuation of the matrix.
-
-    This is implemented as a macro and can be used as an *lvalue* 
-    as well as an *rvalue*.
-
 .. function:: slong padic_mat_nrows(const padic_mat_t A)
 
     Returns the number of rows of the matrix `A`.
