@@ -1646,8 +1646,8 @@ Special functions
     `\mu(0) = 0`. The factor version takes a precomputed
     factorisation of `n`.
 
-.. function:: void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
-              void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+.. function:: void fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac)
+              void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
 
     Sets ``res`` to `\sigma_k(n)`, the sum of `k`th powers of all 
     divisors of `n`. The factor version takes a precomputed
