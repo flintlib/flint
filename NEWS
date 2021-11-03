@@ -1294,3 +1294,10 @@ v 2.6.3 -- 12 Aug 2020
 
  * Fix an issue with --disable-dependency-tracking on some distributions
 
+2.8.3 -- 03 Nov 2021
+
+ * Fix a serious bug in nmod_poly_xgcd_hgcd, nmod_poly_xgcd, fmpz_poly_xgcd_modular, fmpz_poly_xgcd,
+   fmpq_poly_xgcd for polynomials of length >= 340.
+ * Fix some copyright assignments
+ * Fix some documentation errors
+ 
