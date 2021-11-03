@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <sys/types.h>
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 #include <unistd.h>
@@ -46,7 +48,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 {
     qs_t qs_inf;
     mp_limb_t small_factor, delta;
-    ulong expt = 0;
+    ulongxx expt = 0;
     unsigned char * sieve;
     slong ncols, nrows, i, j = 0, count, relation = 0, num_primes;
     uint64_t * nullrows = NULL;
@@ -195,7 +197,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     qs_inf->num_handles = flint_request_threads(&qs_inf->handles, flint_get_num_threads());
 
     /* ensure cache lines don't overlap if num_handles > 0 */
-    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong)
+    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulongxx)
                + (qs_inf->num_handles > 0 ? 64 : 0))*(qs_inf->num_handles + 1));
 
 #if FLINT_USES_PTHREAD
