@@ -252,7 +252,8 @@ Roots
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)                                                
+.. function:: void fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
+
     Sets ``rop`` to the square root of ``op1`` if it is a square, and return
     `1`, otherwise return `0`.
 
