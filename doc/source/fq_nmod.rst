@@ -201,7 +201,7 @@ Basic arithmetic
     Sets ``rop`` to the square of ``op``,
     reducing the output in the given context.
 
-.. function:: void _fq_nmod_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_inv(mp_ptr * rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, d)`` to the inverse of the non-zero element
     ``(op, len)``.
@@ -216,7 +216,7 @@ Basic arithmetic
      of ``ctx``.  If ``op`` is not invertible, then ``f`` is
      set to a factor of the modulus; otherwise, it is set to one.
 
-.. function:: void _fq_nmod_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_pow(mp_ptr * rop, mp_srcptr * op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
@@ -240,7 +240,7 @@ Basic arithmetic
 
 .. function:: void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op, const ulong e, const fq_nmod_ctx_t ctx)
 
-    Sets ``rop`` the ``op`` raised to the power `e`.
+    Sets ``rop`` to ``op`` raised to the power `e`.
 
     Currently assumes that `e \geq 0`.
 
@@ -270,7 +270,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_nmod_fprint_pretty(FILE *file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``file``.
 
@@ -429,7 +429,7 @@ Special functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_nmod_trace(fmpz_t rop, mp_srcptr *op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_trace(fmpz_t rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the trace of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -445,7 +445,7 @@ Special functions
     `a` is equal to `\sum_{i=0}^{d-1} \Sigma^i (a)`, where `d =
     \log_{p} q`.
 
-.. function:: void _fq_nmod_norm(fmpz_t rop, mp_srcptr *op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_norm(fmpz_t rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the norm of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -463,7 +463,7 @@ Special functions
 
     Algorithm selection is automatic depending on the input.
 
-.. function:: void _fq_nmod_frobenius(mp_ptr *rop, mp_srcptr *op, slong len, slong e, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_frobenius(mp_ptr * rop, mp_srcptr * op, slong len, slong e, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, 2d-1)`` to the image of ``(op, len)`` under the
     Frobenius operator raised to the e-th power, assuming that neither
