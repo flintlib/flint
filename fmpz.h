@@ -1048,7 +1048,7 @@ FLINT_DLL void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 
 FLINT_DLL int fmpz_moebius_mu(const fmpz_t n);
 
-FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
+FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n);
 
 /* Functions that should be in ulong extras */
 
