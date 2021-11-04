@@ -28,9 +28,9 @@ Stirling numbers
 --------------------------------------------------------------------------------
 
 
-.. function:: void arith_stirling_number_1u(fmpz_t s, slong n, slong k)
+.. function:: void arith_stirling_number_1u(fmpz_t s, ulong n, ulong k)
 
-.. function:: void arith_stirling_number_1(fmpz_t s, slong n, slong k)
+.. function:: void arith_stirling_number_1(fmpz_t s, ulong n, ulong k)
 
 .. function:: void arith_stirling_number_2(fmpz_t s, slong n, slong k)
 
@@ -56,9 +56,9 @@ Stirling numbers
     numbers efficiently. To compute a range of numbers, the vector or 
     matrix versions should generally be used.
 
-.. function:: void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen)
+.. function:: void arith_stirling_number_1u_vec(fmpz * row, ulong n, slong klen)
 
-.. function:: void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
+.. function:: void arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen)
 
 .. function:: void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 

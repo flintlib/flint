@@ -54,12 +54,12 @@ FLINT_DLL void arith_divisors(fmpz_poly_t res, const fmpz_t n);
 
 /* Stirling numbers **********************************************************/
 
-FLINT_DLL void arith_stirling_number_1u(fmpz_t s, slong n, slong k);
-FLINT_DLL void arith_stirling_number_1(fmpz_t s, slong n, slong k);
+FLINT_DLL void arith_stirling_number_1u(fmpz_t s, ulong n, ulong k);
+FLINT_DLL void arith_stirling_number_1(fmpz_t s, ulong n, ulong k);
 FLINT_DLL void arith_stirling_number_2(fmpz_t s, slong n, slong k);
 
-FLINT_DLL void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen);
-FLINT_DLL void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen);
+FLINT_DLL void arith_stirling_number_1u_vec(fmpz * row, ulong n, slong klen);
+FLINT_DLL void arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen);
 FLINT_DLL void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen);
 
 FLINT_DLL void arith_stirling_number_1u_vec_next(fmpz * row,

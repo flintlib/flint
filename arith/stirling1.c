@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,94 +11,208 @@
 
 #include "arith.h"
 
-static void
-_rising_factorial(fmpz * res, slong a, slong b, slong trunc)
+static slong
+poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
-    const slong span = b - a;
-
-    switch (span)
-    {
-    case 0:
-        fmpz_one(res);
-        break;
-    case 1:
-        fmpz_set_ui(res, a);
-        if (trunc > 1) fmpz_one(res+1);
-        break;
-    case 2:
-        fmpz_set_ui(res, a);
-        fmpz_mul_ui(res, res, a + UWORD(1));
-        if (trunc > 1)
-        {
-            fmpz_set_ui(res+1, 2*a + UWORD(1));
-            if (trunc > 2) fmpz_one(res+2);
-        }
-        break;
-    case 3:
-        fmpz_set_ui(res, a);
-        fmpz_mul_ui(res, res, a + UWORD(1));
-        fmpz_mul_ui(res, res, a + UWORD(2));
-        if (trunc > 1)
-        {
-            fmpz_set_ui(res+1, 3*a);
-            fmpz_mul_ui(res+1, res+1, a + UWORD(2));
-            fmpz_add_ui(res+1, res+1, 2);
-            if (trunc > 2)
-            {
-                fmpz_set_ui(res+2, 3*(a+1));
-                if (trunc > 3)
-                    fmpz_one(res+3);
-            }
-        }
-        break;
-    default:
-        {
-            const slong mid    = (a + b) / 2;
-            const int  chk    = (b - a + 1 < trunc);  /* i.e. nprod < trunc */
-            const slong nleft  = chk ? mid - a + 1 : trunc;
-            const slong nright = chk ? b - mid + 1 : trunc;
-
-            fmpz *left  = _fmpz_vec_init(nleft);
-            fmpz *right = _fmpz_vec_init(nright);
-
-            _rising_factorial(left, a, mid, trunc);
-            _rising_factorial(right, mid, b, trunc);
-
-            if (chk)
-                _fmpz_poly_mul(res, right, nright, left, nleft);
-            else
-                _fmpz_poly_mullow(res, left, nleft, right, nright, trunc);
-
-            _fmpz_vec_clear(left, nleft);
-            _fmpz_vec_clear(right, nright);
-        }
-    }
+    mp_limb_t hi, lo;
+    umul_ppmm(hi, lo, poly_len - 1, exp);
+    add_ssaaaa(hi, lo, hi, lo, 0, 1);
+    if (hi != 0 || lo > (mp_limb_t) WORD_MAX)
+        return trunc;
+    return FLINT_MIN((slong) lo, trunc);
 }
 
-void
-arith_stirling_number_1u(fmpz_t s, slong n, slong k)
+/* compute single coefficient in polynomial product */
+static void
+_fmpz_poly_mulmid_single(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong i)
 {
-    /* Various special cases
-       TODO: factorials, binomial coefficients, harmonic numbers ... */
-    if (k < 1)
+    slong j, top1, top2;
+
+    top1 = FLINT_MIN(len1 - 1, i);
+    top2 = FLINT_MIN(len2 - 1, i);
+
+    fmpz_mul(res, poly1 + i - top2, poly2 + top2);
+
+    for (j = 1; j < top1 + top2 - i + 1; j++)
+        fmpz_addmul(res, poly1 + i - top2 + j, poly2 + top2 - j);
+}
+
+#define MAX_BASECASE 16
+
+/*
+which == 1: expand (a+x)...((b-1)+x) truncated to length len
+which == 2: expand (1+ax)...(1+(b-1)x) truncated to length len
+
+final: only extract final coefficient
+*/
+static void
+stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int final)
+{
+    ulong c, n, cbc;
+
+    len = FLINT_MIN(len, b - a + 1);
+
+    /* (c+x)^n has coefficients bounded by max(c,n)^n */
+    n = b - a;
+    c = FLINT_MAX(b - 1, n);
+    cbc = FLINT_BIT_COUNT(c);
+
+    if (n == 1 || (len <= MAX_BASECASE && n * cbc <= FLINT_BITS))
     {
-        fmpz_set_ui(s, (n == 0) & (k == 0));
-    }
-    if (k >= n)
-    {
-        fmpz_set_ui(s, n == k);
+        mp_limb_t v[MAX_BASECASE];
+        slong i, j;
+
+        if (which == 1)
+        {
+            v[0] = a;
+            v[1] = 1;
+
+            /* multiply by ((a+i) + x) */
+            for (i = 1; i < n; i++)
+            {
+                if (i + 1 < len)
+                    v[i + 1] = 1;
+                for (j = FLINT_MIN(i, len - 1); j >= 1; j--)
+                    v[j] = (a + i) * v[j] + v[j - 1];
+                v[0] *= (a + i);
+            }
+        }
+        else
+        {
+            v[0] = 1;
+            v[1] = a;
+
+            /* multiply by (1 + (a+i) x) */
+            for (i = 1; i < n; i++)
+            {
+                if (i + 1 < len)
+                    v[i + 1] = v[i] * (a + i);
+
+                for (j = FLINT_MIN(i, len - 1); j >= 1; j--)
+                    v[j] = v[j] + (a + i) * v[j - 1];
+            }
+        }
+
+        if (final)
+            fmpz_set_ui(res, v[len - 1]);
+        else
+            for (i = 0; i < len; i++)
+                fmpz_set_ui(res + i, v[i]);
     }
     else
     {
-        fmpz *tmp = _fmpz_vec_init(k+1);
-        _rising_factorial(tmp, 0, n, k+1);
-        fmpz_set(s, tmp+k);
-        _fmpz_vec_clear(tmp, k+1);
+        fmpz *L, *R;
+        slong len1, len2;
+        slong m = a + (b - a) / 2;
+
+        len1 = poly_pow_length(2, m - a, len);
+        len2 = poly_pow_length(2, b - m, len);
+
+        L = _fmpz_vec_init(len1 + len2);
+        R = L + len1;
+
+        stirling_1u_ogf_bsplit(L, a, m, len, which, 0);
+        stirling_1u_ogf_bsplit(R, m, b, len, which, 0);
+
+        if (final)
+            _fmpz_poly_mulmid_single(res, L, len1, R, len2, len - 1);
+        else
+            _fmpz_poly_mullow(res, R, len2, L, len1, FLINT_MIN(len, len1 + len2 - 1));
+
+        _fmpz_vec_clear(L, len1 + len2);
+    }
+}
+
+static void
+stirling_1u_egf(fmpz_t res, ulong n, ulong k)
+{
+    fmpz * num;
+    fmpz * rnum;
+    fmpz_t den;
+    fmpz_t rden;
+    slong i, len;
+
+    if (k >= n || k == 0)
+    {
+        fmpz_set_ui(res, n == k);
+        return;
+    }
+
+    len = n - k + 1;
+
+    num = _fmpz_vec_init(len + 1);
+    rnum = _fmpz_vec_init(len);
+    fmpz_init(den);
+    fmpz_init(rden);
+
+    fmpz_one(den);
+    for (i = 0; i < len; i++)
+        fmpz_one(num + i);
+
+    _fmpq_poly_integral(num, den, num, den, len + 1);
+    for (i = 0; i < len; i++)
+        fmpz_swap(num + i, num + i + 1);
+
+    _fmpq_poly_pow_trunc(rnum, rden, num, den, len, k, len);
+
+    fmpz_set_ui(num, k);
+    fmpz_add_ui(num, num, 1);
+    fmpz_rfac_ui(num, num, n - k);
+
+    fmpz_mul(num, num, rnum + n - k);
+    fmpz_divexact(res, num, rden);
+
+    _fmpz_vec_clear(num, len + 1);
+    _fmpz_vec_clear(rnum, len);
+    fmpz_clear(den);
+    fmpz_clear(rden);
+}
+
+
+void
+arith_stirling_number_1u(fmpz_t res, ulong n, ulong k)
+{
+    if (k >= n || k == 0)
+    {
+        fmpz_set_ui(res, n == k);
+    }
+    else if (k == 1)
+    {
+        fmpz_fac_ui(res, n - 1);
+    }
+    else if (n > 140 && k > 0.87 * n)
+    {
+        stirling_1u_egf(res, n, k);
+    }
+    else
+    {
+        if (k < n / 2)
+            stirling_1u_ogf_bsplit(res, 1, n, k, 1, 1);
+        else
+            stirling_1u_ogf_bsplit(res, 1, n, n - k + 1, 2, 1);
     }
 }
 
 void
-arith_stirling_number_1(fmpz_t s, slong n, slong k)
+arith_stirling_number_1u_vec(fmpz * res, ulong n, slong klen)
+{
+    slong k, len;
+
+    if (klen <= 0)
+        return;
+
+    len = FLINT_MIN(klen - 1, n - 1);
+
+    if (n >= 1 && len >= 1)
+        stirling_1u_ogf_bsplit(res + 1, 1, n, len, 1, 0);
+
+    fmpz_set_ui(res + 0, n == 0);
+    for (k = n; k < klen; k++)
+        fmpz_set_ui(res + k, n == k);
+}
+
+void
+arith_stirling_number_1(fmpz_t s, ulong n, ulong k)
 {
     arith_stirling_number_1u(s, n, k);
     if ((n + k) % 2)
@@ -106,14 +220,7 @@ arith_stirling_number_1(fmpz_t s, slong n, slong k)
 }
 
 void
-arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen)
-{
-    if (klen > 0)
-        _rising_factorial(row, 0, n, klen);
-}
-
-void
-arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
+arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen)
 {
     slong k;
 
@@ -122,3 +229,4 @@ arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
     for (k = (n + 1) % 2; k < klen; k += 2)
         fmpz_neg(row + k, row + k);
 }
+
