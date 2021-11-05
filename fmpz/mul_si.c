@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2021 Albin Ahlbäck
 
     This file is part of FLINT.
 
