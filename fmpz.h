@@ -294,7 +294,20 @@ fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
 
 FLINT_DLL void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x);
 
-FLINT_DLL void fmpz_set_signed_uiui(fmpz_t r, ulong hi, ulong lo);
+FMPZ_INLINE void
+fmpz_set_signed_uiui(fmpz_t r, ulong hi, ulong lo)
+{
+    if (((slong) hi) < 0)
+    {
+        hi = -hi - (lo != 0);
+        lo = -lo;
+        fmpz_neg_uiui(r, hi, lo);
+    }
+    else
+    {
+        fmpz_set_uiui(r, hi, lo);
+    }
+}
 
 FLINT_DLL void fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo);
 
