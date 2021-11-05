@@ -21,19 +21,6 @@ void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
     u = *c;
     v = *d;
 
-    if (s == 0 || t == 0)
-    {
-        fmpz_mul(f, c, d);
-        fmpz_neg(f, f);
-        return;
-    }
-
-    if (u == 0 || v == 0)
-    {
-        fmpz_mul(f, a, b);
-        return;
-    }
-
     if (!COEFF_IS_MPZ(s) && !COEFF_IS_MPZ(t) &&
         !COEFF_IS_MPZ(u) && !COEFF_IS_MPZ(v))
     {
@@ -44,6 +31,19 @@ void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
         sub_ddmmss(sh, sl, sh, sl, th, tl);
 
         fmpz_set_signed_uiui(f, sh, sl);
+        return;
+    }
+
+    if (s == 0 || t == 0)
+    {
+        fmpz_mul(f, c, d);
+        fmpz_neg(f, f);
+        return;
+    }
+
+    if (u == 0 || v == 0)
+    {
+        fmpz_mul(f, a, b);
         return;
     }
 
