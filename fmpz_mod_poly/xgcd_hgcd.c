@@ -174,9 +174,9 @@ slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T,
                     _fmpz_vec_swap(S, T, FLINT_MAX(lenS, lenT));
                     l = lenS; lenS = lenT; lenT = l;
                 }
-                __sub(T, lenT, T, lenT, v, lenv);
-
-                if (lenr == 0)
+                if (lenr != 0) /* prevent overflow of T on last iteration */
+                   __sub(T, lenT, T, lenT, v, lenv);
+                else /* lenr == 0 */
                 {
                     __set(G, lenG, j, lenj);
 
