@@ -32,7 +32,7 @@ Stirling numbers
 
 .. function:: void arith_stirling_number_1(fmpz_t s, ulong n, ulong k)
 
-.. function:: void arith_stirling_number_2(fmpz_t s, slong n, slong k)
+.. function:: void arith_stirling_number_2(fmpz_t s, ulong n, ulong k)
 
     Sets `s` to `S(n,k)` where `S(n,k)` denotes an unsigned Stirling
     number of the first kind `|S_1(n, k)|`, a signed Stirling number 
@@ -60,7 +60,7 @@ Stirling numbers
 
 .. function:: void arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen)
 
-.. function:: void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
+.. function:: void arith_stirling_number_2_vec(fmpz * row, ulong n, slong klen)
 
     Computes the row of Stirling numbers
     ``S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)``.
