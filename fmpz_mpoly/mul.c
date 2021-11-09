@@ -133,15 +133,8 @@ static int _try_dense_univar(
     Bdeg = Bexps[NB*0 + 0] & maskB;
     Cdeg = Cexps[NC*0 + 0] & maskC;
 
-    if (z_mul_checked(&BClen, Blen, Clen))
-    {
-        if (z_add_checked(&Adeg, Bdeg, Cdeg))
-            return 0;
-    }
-    else
-    {
-        Adeg = Bdeg + Cdeg;
-    }
+    if (z_mul_checked(&BClen, Blen, Clen) || z_add_checked(&Adeg, Bdeg, Cdeg))
+        return 0;
 
     if (Adeg > WORD_MAX/FLINT_BITS)
         return 0;
