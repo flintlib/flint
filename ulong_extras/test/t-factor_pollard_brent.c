@@ -22,18 +22,20 @@ int main(void)
 
     fails = 0;
 
-    flint_printf("pollard_brent....");
+    flint_printf("factor_pollard_brent....");
     fflush(stdout);
 
     for (l = 5; l < 26; l += 5)    
     {
-        for (i = l; i < 26; i += 5)
+        for (i = l; i < 26 && i + l <= FLINT_BITS; i += 5)
         {
             for (j = 0; j < 10 * flint_test_multiplier(); j++)
             {
-                prime1 = n_randtest_bits(state, l);
-                prime2 = n_randtest_bits(state, i);
-                primeprod = prime1 * prime2;
+                do {
+                    prime1 = n_randtest_bits(state, l);
+                    prime2 = n_randtest_bits(state, i);
+                    primeprod = prime1 * prime2;
+                } while (primeprod < 1);
 
                 k = n_factor_pollard_brent(&fac, state, primeprod, 5, 2500);
 
