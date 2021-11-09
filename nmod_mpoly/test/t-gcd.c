@@ -162,6 +162,30 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b;
+        const char * vars[] = {"x", "y"};
+
+        nmod_mpoly_ctx_init(ctx, 2, ORD_LEX, 536870909);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(g, ctx);
+
+        nmod_mpoly_set_str_pretty(g, "(1+x+y)^100", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "(2+x+y)^100", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "(3+x+y)^100", vars, ctx);
+        nmod_mpoly_mul(a, a, g, ctx);
+        nmod_mpoly_mul(b, b, g, ctx);
+
+        gcd_check(g, a, b, ctx, 0, 0, "big example");
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 3; i <= 8; i++)
     {
         nmod_mpoly_ctx_t ctx;
