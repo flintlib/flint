@@ -23,6 +23,7 @@ void _nmod_mpoly_pow_rmul(
     flint_bitcnt_t bits = A->bits;
 
     FLINT_ASSERT(bits == T->bits);
+    FLINT_ASSERT(Blen > 0);
 
     _nmod_mpoly_fit_length(&A->coeffs, &A->coeffs_alloc,
                            &A->exps, &A->exps_alloc, N, Blen + 2);
@@ -33,7 +34,7 @@ void _nmod_mpoly_pow_rmul(
                                    Bcoeffs, Bexps, Blen,
                                    bits, N, cmpmask, mod);
         k -= 2;
-        while (k >= 1)
+        while (k >= 1 && A->length > 0)
         {
             _nmod_mpoly_mul_johnson(T, A->coeffs, A->exps, A->length,
                                        Bcoeffs, Bexps, Blen,
