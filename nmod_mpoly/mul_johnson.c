@@ -165,6 +165,9 @@ slong _nmod_mpoly_mul_johnson(
     ulong acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
 
+    FLINT_ASSERT(len2 > 0);
+    FLINT_ASSERT(len3 > 0);
+
     if (N == 1)
         return _nmod_mpoly_mul_johnson1(A, coeff2, exp2, len2,
                                          coeff3, exp3, len3, cmpmask[0], fctx);
