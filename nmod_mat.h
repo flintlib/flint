@@ -410,9 +410,6 @@ FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 #define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
 #define NMOD_MAT_SOLVE_TRI_COLS_CUTOFF 64
 
-/* Cutoff between classical and recursive LU decomposition */
-#define NMOD_MAT_LU_RECURSIVE_CUTOFF 4
-
 /*
    Suggested initial modulus size for multimodular algorithms. This should
    be chosen so that we get the most number of bits per cycle
