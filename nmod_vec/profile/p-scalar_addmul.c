@@ -42,12 +42,14 @@ void sample(void * arg, ulong count)
       c = n_randint(state, n);
       for (j = 0; j < length; j++)
          vec[j] = n_randint(state, n);
-      
+      for (j = 0; j < length; j++)
+         vec2[j] = n_randint(state, n);
+
 	  nmod_init(&mod, n);
 
       prof_start();
       for (j = 0; j < 30; j++)
-		 _nmod_vec_scalar_mul_nmod(vec2, vec, length, c, mod);
+		 _nmod_vec_scalar_addmul_nmod(vec2, vec, length, c, mod);
 	  prof_stop();
    }
    

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -80,12 +81,41 @@ do {                                            \
        NMOD_RED2(r, v_hi, a_lo, mod); \
     } while (0)
 
-#define NMOD_ADDMUL(r, a, b, mod) \
+#define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
+#define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
+
+#define NMOD_MUL_PRENORM(res, a, b, mod) \
     do { \
-       mp_limb_t a_hi, a_lo; \
-       umul_ppmm(a_hi, a_lo, a, b); \
-       add_ssaaaa(a_hi, a_lo, a_hi, a_lo, (mp_limb_t) 0, r); \
-       NMOD_RED2(r, a_hi, a_lo, mod); \
+        mp_limb_t q0xx, q1xx, rxx, p_hixx, p_loxx; \
+        mp_limb_t nxx, ninvxx; \
+        unsigned int normxx; \
+        ninvxx = (mod).ninv; \
+        normxx = (mod).norm; \
+        nxx = (mod).n << normxx; \
+        umul_ppmm(p_hixx, p_loxx, (a), (b)); \
+        umul_ppmm(q1xx, q0xx, ninvxx, p_hixx); \
+        add_ssaaaa(q1xx, q0xx, q1xx, q0xx, p_hixx, p_loxx); \
+        rxx = (p_loxx - (q1xx + 1) * nxx); \
+        if (rxx > q0xx) \
+            rxx += nxx; \
+        rxx = (rxx < nxx ? rxx : rxx - nxx) >> normxx; \
+        (res) = rxx; \
+    } while (0)
+
+#define NMOD_MUL_FULLWORD(res, a, b, mod) \
+    do { \
+        mp_limb_t q0xx, q1xx, rxx, p_hixx, p_loxx; \
+        mp_limb_t nxx, ninvxx; \
+        ninvxx = (mod).ninv; \
+        nxx = (mod).n; \
+        umul_ppmm(p_hixx, p_loxx, (a), (b)); \
+        umul_ppmm(q1xx, q0xx, ninvxx, p_hixx); \
+        add_ssaaaa(q1xx, q0xx, q1xx, q0xx, p_hixx, p_loxx); \
+        rxx = (p_loxx - (q1xx + 1) * nxx); \
+        if (rxx > q0xx) \
+            rxx += nxx; \
+        rxx = (rxx < nxx ? rxx : rxx - nxx); \
+        (res) = rxx; \
     } while (0)
 
 NMOD_VEC_INLINE
@@ -135,18 +165,29 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 NMOD_VEC_INLINE
 mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
-    mp_limb_t res, hi, lo;
-    umul_ppmm(hi, lo, a, b);
-    NMOD_RED2(res, hi, lo, mod);
+    mp_limb_t res;
+    NMOD_MUL_PRENORM(res, a, b << mod.norm, mod);
+    return res;
+}
+
+NMOD_VEC_INLINE
+mp_limb_t _nmod_mul_fullword(mp_limb_t a, mp_limb_t b, nmod_t mod)
+{
+    mp_limb_t res;
+    NMOD_MUL_FULLWORD(res, a, b, mod);
     return res;
 }
 
 NMOD_VEC_INLINE
 mp_limb_t nmod_addmul(mp_limb_t a, mp_limb_t b, mp_limb_t c, nmod_t mod)
 {
-    NMOD_ADDMUL(a, b, c, mod);
-    return a;
+    return nmod_add(a, nmod_mul(b, c, mod), mod);
 }
+
+#define NMOD_ADDMUL(r, a, b, mod) \
+    do { \
+       (r) = nmod_addmul((r), (a), (b), (mod)); \
+    } while (0)
 
 NMOD_VEC_INLINE
 mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
@@ -157,8 +198,7 @@ mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
 NMOD_VEC_INLINE
 mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
-    b = n_invmod(b, mod.n);
-    return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
+    return nmod_mul(a, n_invmod(b, mod.n), mod);
 }
 
 NMOD_VEC_INLINE
