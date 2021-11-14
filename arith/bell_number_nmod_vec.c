@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,10 +12,20 @@
 #include "arith.h"
 
 void
-arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod)
+arith_bell_number_nmod_vec(mp_ptr b, slong len, nmod_t mod)
 {
-    if (n < 2000 || mod.n <= n)
-        arith_bell_number_nmod_vec_recursive(b, n, mod);
+    if (len < 300)
+    {
+        arith_bell_number_nmod_vec_recursive(b, len, mod);
+    }
     else
-        arith_bell_number_nmod_vec_series(b, n, mod);
+    {
+        if (mod.n >= len && arith_bell_number_nmod_vec_series(b, len, mod))
+            return;
+
+        if (len < 500 + NMOD_BITS(mod) * NMOD_BITS(mod))
+            arith_bell_number_nmod_vec_recursive(b, len, mod);
+        else
+            arith_bell_number_nmod_vec_ogf(b, len, mod);
+    }
 }

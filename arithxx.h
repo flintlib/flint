@@ -156,7 +156,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(stirling_matrix_2_op, fmpz_matxx,
 } // rules
 
 ARITHXX_DEFINE_UNOP(bell_number, fmpzxx, at::ulong)
-ARITHXX_DEFINE_UNOP(bell_number_bsplit, fmpzxx, at::ulong)
+ARITHXX_DEFINE_UNOP(bell_number_dobinski, fmpzxx, at::ulong)
 ARITHXX_DEFINE_UNOP(bell_number_multi_mod, fmpzxx, at::ulong)
 ARITHXX_DEFINE_UNOP(bell_number_vec, fmpz_vecxx, at::slong)
 ARITHXX_DEFINE_UNOP(bell_number_vec_recursive, fmpz_vecxx, at::slong)

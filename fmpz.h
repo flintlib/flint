@@ -482,6 +482,8 @@ FLINT_DLL void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
+FLINT_DLL void fmpz_one_2exp(fmpz_t f, ulong exp);
+
 FLINT_DLL void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 FLINT_DLL void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x);

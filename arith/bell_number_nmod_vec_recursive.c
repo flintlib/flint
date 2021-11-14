@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,29 +14,36 @@
 void
 arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
 {
-    slong i, k;
-    mp_ptr t;
-
-    if (n < BELL_NUMBER_TAB_SIZE)
+    if (mod.n == 1 || n == 0)
     {
-        for (i = 0; i < n; i++)
-            b[i] = n_mod2_preinv(bell_number_tab[i], mod.n, mod.ninv);
+        _nmod_vec_zero(b, n);
         return;
     }
 
-    n -= 1;
-    t = _nmod_vec_init(n);
+    b[0] = 1;
+    if (n >= 2)
+        b[1] = 1;
 
-    t[0] = b[0] = b[1] = 1;
-
-    for (i = 1; i < n; i++)
+    if (n >= 3)
     {
-        t[i] = t[0];
-        for (k = i; k > 0; k--)
-            t[k - 1] = n_addmod(t[k - 1], t[k], mod.n);
+        slong i, k;
+        mp_ptr t;
+        TMP_INIT;
+        TMP_START;
 
-        b[i + 1] = t[0];
+        n -= 1;
+        t = TMP_ALLOC(n * sizeof(mp_limb_t));
+        t[0] = 1;
+
+        for (i = 1; i < n; i++)
+        {
+            t[i] = t[0];
+            for (k = i; k > 0; k--)
+                t[k - 1] = n_addmod(t[k - 1], t[k], mod.n);
+
+            b[i + 1] = t[0];
+        }
+
+        TMP_END;
     }
-
-    _nmod_vec_clear(t);
 }

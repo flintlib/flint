@@ -19,7 +19,7 @@
 
 int main(void)
 {
-    mp_ptr b1, b2;
+    mp_ptr b1, b2, b3;
     slong n;
 
     const slong maxn = 3000;
@@ -31,31 +31,42 @@ int main(void)
 
     b1 = _nmod_vec_init(maxn);
     b2 = _nmod_vec_init(maxn);
+    b3 = _nmod_vec_init(maxn);
 
     for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
     {
         nmod_t mod;
         mp_limb_t p;
 
-        do {
-            p = n_randtest_prime(state, 0);
-        } while (p < n);
-
+        p = n_randtest_not_zero(state);
         nmod_init(&mod, p);
 
         arith_bell_number_nmod_vec_recursive(b1, n, mod);
-        arith_bell_number_nmod_vec_series(b2, n, mod);
+        arith_bell_number_nmod_vec_ogf(b2, n, mod);
 
         if (!_nmod_vec_equal(b1, b2, n))
         {
             flint_printf("FAIL:\n");
+            flint_printf("p = %wu\n", p);
             flint_printf("n = %wd\n", n);
             abort();
+        }
+
+        if (arith_bell_number_nmod_vec_series(b3, n, mod))
+        {
+            if (!_nmod_vec_equal(b1, b3, n))
+            {
+                flint_printf("FAIL (2):\n");
+                flint_printf("p = %wu\n", p);
+                flint_printf("n = %wd\n", n);
+                abort();
+            }
         }
     }
 
     _nmod_vec_clear(b1);
     _nmod_vec_clear(b2);
+    _nmod_vec_clear(b3);
 
     FLINT_TEST_CLEANUP(state);
     
