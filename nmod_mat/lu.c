@@ -36,7 +36,7 @@ nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
         {
             bits = NMOD_BITS(A->mod);
 
-            if (bits >= FLINT_BITS - 2)
+            if (bits >= FLINT_BITS - 1)
                 cutoff = 20;
             else if (bits >= FLINT_BITS / 2 - 2)
                 cutoff = 60;
