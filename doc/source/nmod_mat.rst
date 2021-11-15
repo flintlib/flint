@@ -538,6 +538,9 @@ LU decomposition
 
 
 .. function:: slong nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
+              slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
+              slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check)
+              slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition `LU = PA` of a given
     matrix `A`, returning the rank of `A`.
@@ -555,21 +558,11 @@ LU decomposition
     function will abandon the output matrix in an undefined state and
     return 0 if `A` is detected to be rank-deficient.
 
-    This function calls :func:`nmod_mat_lu_recursive`.
-
-.. function:: slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
-
-    Computes a generalised LU decomposition `LU = PA` of a given
-    matrix `A`, returning the rank of `A`. The behavior of this function
-    is identical to that of :func:`nmod_mat_lu`. Uses Gaussian elimination.
-
-.. function:: slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
-
-    Computes a generalised LU decomposition `LU = PA` of a given
-    matrix `A`, returning the rank of `A`. The behavior of this function
-    is identical to that of :func:`nmod_mat_lu`. Uses recursive block
-    decomposition, switching to classical Gaussian elimination for
-    sufficiently small blocks.
+    The *classical* version uses direct Gaussian elimination.
+    The *classical_delayed* version also uses Gaussian elimination,
+    but performs delayed modular reductions.
+    The *recursive* version uses block recursive decomposition.
+    The default function chooses an algorithm automatically.
 
 
 

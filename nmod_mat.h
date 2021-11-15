@@ -352,6 +352,7 @@ FLINT_DLL void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, c
 
 FLINT_DLL slong nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check);
 FLINT_DLL slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check);
+FLINT_DLL slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check);
 FLINT_DLL slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
 /* Nonsingular solving */
