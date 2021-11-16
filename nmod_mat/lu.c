@@ -37,7 +37,7 @@ nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
             bits = NMOD_BITS(A->mod);
 
             if (bits >= FLINT_BITS - 1)
-                cutoff = 20;
+                cutoff = 80;
             else if (bits >= FLINT_BITS / 2 - 2)
                 cutoff = 60;
             else if (bits >= FLINT_BITS / 4 - 1)
@@ -51,7 +51,7 @@ nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
 
         nlimbs = _nmod_vec_dot_bound_limbs(n, A->mod);
 
-        if (nlimbs <= 1 || (nlimbs <= 2 && n >= 12))
+        if (nlimbs <= 1 || (nlimbs == 2 && n >= 12) || (nlimbs == 3 && n >= 20))
             return nmod_mat_lu_classical_delayed(P, A, rank_check);
         else
             return nmod_mat_lu_classical(P, A, rank_check);
