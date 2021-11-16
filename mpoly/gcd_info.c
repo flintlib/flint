@@ -249,8 +249,8 @@ void mpoly_gcd_info_measure_hensel(
     if (m < 2)
         return;
 
-    abits = FLINT_BIT_COUNT(Alength) + 10;
-    bbits = FLINT_BIT_COUNT(Blength) + 10;
+    abits = FLINT_BIT_COUNT(Alength);
+    bbits = FLINT_BIT_COUNT(Blength);
 
     te = tg = ta = tb = 1;
     for (i = 0; i < m; i++)
@@ -334,8 +334,8 @@ void mpoly_gcd_info_measure_brown(
     if (m < 2)
         return;
 
-    abits = FLINT_BIT_COUNT(Alength) + 10;
-    bbits = FLINT_BIT_COUNT(Blength) + 10;
+    abits = FLINT_BIT_COUNT(Alength);
+    bbits = FLINT_BIT_COUNT(Blength);
 
     te = tg = ta = tb = 1;
     for (i = 0; i < m; i++)
