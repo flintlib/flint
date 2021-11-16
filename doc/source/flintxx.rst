@@ -6,6 +6,13 @@
 Introduction
 -------------------------------------------------------------------------------
 
+Flint provides a C++ wrapper which makes extensive use of metaprogramming.
+It is currently not maintained for the whole of Flint due to lack of a C++
+developer willing to step up and maintain it. Therefore it is provided as-is,
+though we do try to do sufficient maintenance to keep the
+`currently wrapped functions <https://github.com/wbhart/flint2/blob/trunk/doc/source/flintxx_functions.txt>`_
+compiling.
+
 In this section we describe how to use ``flintxx`` the Flint C++ wrapper.
 
 We begin with a simple example:
