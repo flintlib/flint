@@ -23,7 +23,6 @@
 int main(void)
 {
     fmpz_mat_t mat, mat2, mat3;
-
     fmpz * row;
     fmpz_t s;
 
@@ -37,6 +36,115 @@ int main(void)
     fflush(stdout);
 
     fmpz_init(s);
+
+    /* test a few large Stirling numbers */
+    {
+        slong iter;
+        fmpz_t a, b, c, d;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
+        fmpz_init(d);
+
+        for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+        {
+            n = n_randint(state, 200);
+            k = 1 + n_randint(state, 200);
+
+            arith_stirling_number_1u(a, n + 1, k);
+            arith_stirling_number_1u(b, n, k);
+            arith_stirling_number_1u(c, n, k - 1);
+
+            fmpz_set(d, c);
+            fmpz_addmul_ui(d, b, n);
+
+            if (!fmpz_equal(a, d))
+            {
+                flint_printf("stirling1u");
+                flint_printf("n = %wd, k = %wd\n", n, k);
+                flint_printf("a: "); fmpz_print(a); flint_printf("\n");
+                flint_printf("b: "); fmpz_print(b); flint_printf("\n");
+                flint_printf("c: "); fmpz_print(c); flint_printf("\n");
+                flint_printf("d: "); fmpz_print(d); flint_printf("\n");
+                abort();
+            }
+        }
+
+        for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+        {
+            n = n_randint(state, 1000);
+            k = 1 + n_randint(state, 1000);
+
+            arith_stirling_number_2(a, n + 1, k);
+            arith_stirling_number_2(b, n, k);
+            arith_stirling_number_2(c, n, k - 1);
+
+            fmpz_set(d, c);
+            fmpz_addmul_ui(d, b, k);
+
+            if (!fmpz_equal(a, d))
+            {
+                flint_printf("stirling2");
+                flint_printf("n = %wd, k = %wd\n", n, k);
+                flint_printf("a: "); fmpz_print(a); flint_printf("\n");
+                flint_printf("b: "); fmpz_print(b); flint_printf("\n");
+                flint_printf("c: "); fmpz_print(c); flint_printf("\n");
+                flint_printf("d: "); fmpz_print(d); flint_printf("\n");
+                abort();
+            }
+        }
+
+        for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+        {
+            n = n_randint(state, 200);
+            k = 1 + n_randint(state, 200);
+
+            row = _fmpz_vec_init(k + 1);
+
+            arith_stirling_number_1u_vec(row, n, k + 1);
+            arith_stirling_number_1u(b, n, k);
+
+            if (!fmpz_equal(row + k, b))
+            {
+                flint_printf("stirling1u (2)");
+                flint_printf("n = %wd, k = %wd\n", n, k);
+                flint_printf("a: "); fmpz_print(row + k); flint_printf("\n");
+                flint_printf("b: "); fmpz_print(b); flint_printf("\n");
+                abort();
+            }
+
+            _fmpz_vec_clear(row, k + 1);
+        }
+
+
+        for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+        {
+            n = n_randint(state, 400);
+            k = 1 + n_randint(state, 400);
+
+            row = _fmpz_vec_init(k + 1);
+
+            arith_stirling_number_2_vec(row, n, k + 1);
+            arith_stirling_number_2(b, n, k);
+
+            if (!fmpz_equal(row + k, b))
+            {
+                flint_printf("stirling2 (2)");
+                flint_printf("n = %wd, k = %wd\n", n, k);
+                flint_printf("a: "); fmpz_print(row + k); flint_printf("\n");
+                flint_printf("b: "); fmpz_print(b); flint_printf("\n");
+                abort();
+            }
+
+            _fmpz_vec_clear(row, k + 1);
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+        fmpz_clear(d);
+    }
 
     for (mm = 0; mm < maxn / 2; mm++)
     {
