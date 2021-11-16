@@ -97,8 +97,12 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                 {
                     uden = FLINT_ABS((slong)(diag[i - 1]));
                     dsgn = 0 > (slong)(diag[i - 1]);
-                    count_leading_zeros(norm, uden);
-                    invert_limb(dinv, uden << norm);
+                    if (uden != 0) /* see #1029 */
+                    {
+                       count_leading_zeros(norm, uden);
+                       invert_limb(dinv, uden << norm);
+                    } else
+                       dinv = 0;
                     den1 = fmpz_is_one(diag + i - 1);
                 }
 
@@ -226,8 +230,12 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
 
                     uden = FLINT_ABS((slong)(diag[l]));
                     dsgn = 0 > (slong)(diag[l]);
-                    count_leading_zeros(norm, uden);
-                    invert_limb(dinv, uden << norm);
+                    if (uden != 0) /* see #1029 */
+                    {
+                       count_leading_zeros(norm, uden);
+                       invert_limb(dinv, uden << norm);
+                    } else
+                       dinv = 0;
 
                     for (j = piv[l] + 1; j < c; j++)
                     {
