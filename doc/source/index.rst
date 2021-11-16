@@ -174,7 +174,6 @@ C++ Interface
    :maxdepth: 1
 
    flintxx.rst
-   flintxx_functions.rst
 
 References
 ----------------
