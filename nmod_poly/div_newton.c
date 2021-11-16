@@ -23,24 +23,17 @@ void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong lenA,
     const slong lenQ = lenA - lenB + 1;
     mp_ptr Arev, Brev;
 
-    Arev = _nmod_vec_init(2 * lenQ);
+    Arev = _nmod_vec_init(lenQ + FLINT_MIN(lenB, lenQ));
     Brev = Arev + lenQ;
 
     _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
 
     if (lenB >= lenQ)
-    {
         _nmod_poly_reverse(Brev, B + (lenB - lenQ), lenQ, lenQ);
-    }
     else
-    {
         _nmod_poly_reverse(Brev, B, lenB, lenB);
-        flint_mpn_zero(Brev + lenB, lenQ - lenB);
-    }
 
-    /* todo: don't zero pad! */
-    _nmod_poly_div_series(Q, Arev, lenQ, Brev, lenQ, lenQ, mod);
-
+    _nmod_poly_div_series(Q, Arev, lenQ, Brev, lenB, lenQ, mod);
     _nmod_poly_reverse(Q, Q, lenQ, lenQ);
 
     _nmod_vec_clear(Arev);
