@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -18,86 +18,131 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
+#define STRESS_TEST 0
+
+#if STRESS_TEST
+#define MAXN 100000
+#define MAXN_VEC 10000
+#else
+#define MAXN 4000
+#define MAXN_VEC 500
+#endif
+
 int main(void)
 {
-    fmpz * b1;
-    fmpz * b2;
-    slong n, k;
-
-    const slong maxn = 400;
-
     FLINT_TEST_INIT(state);
 
     flint_printf("bell_number....");
     fflush(stdout);    
 
-    b1 = _fmpz_vec_init(maxn);
-
-    /* Consistency test */
-    for (n = 0; n < maxn; n++)
-        arith_bell_number(b1 + n, n);
-
-    for (n = 0; n < maxn; n++)
     {
-        b2 = _fmpz_vec_init(n);
-        arith_bell_number_vec(b2, n);
+        slong len, prev_len;
+        fmpz * vb1, * vb2;
+        fmpz_t b;
+        mp_ptr vnb, vnr;
+        slong n, iter;
+        ulong nb;
+        nmod_t mod;
+        prev_len = 0;
 
-        if (!_fmpz_vec_equal(b1, b2, n))
+        fmpz_init(b);
+
+        for (n = 0; n < MAXN; n += n_randint(state, n / 4 + 2))
         {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wd\n", n);
-            abort();
-        }
+#if STRESS_TEST
+            flint_printf("%wd\n", n);
+#endif
 
-        _fmpz_vec_clear(b2, n);
-    }
+            arith_bell_number(b, n);
 
-    /* Compare with B_n = sum of Stirling numbers of 2nd kind */
-    for (n = 0; n < 1000; n += (n < 50) ? + 1 : n/4)
-    {
-        b2 = _fmpz_vec_init(n+1);
-
-        arith_stirling_number_2_vec(b2, n, n+1);
-
-        for (k = 1; k <= n; k++)
-            fmpz_add(b2, b2, b2 + k);
-
-        arith_bell_number(b1, n);
-
-        if (!fmpz_equal(b1, b2))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wd\n", n);
-            fmpz_print(b1);
-            flint_printf("\n");
-            fmpz_print(b2);
-            flint_printf("\n");
-            abort();
-        }
-
-        /* Also check nmod value */
-        {
-            nmod_t mod;
-            mp_limb_t bb;
-
-            nmod_init(&mod, n_randtest_prime(state, 0));
-            bb = arith_bell_number_nmod(n, mod);
-
-            if (fmpz_fdiv_ui(b1, mod.n) != bb)
+            for (iter = 0; iter < 3 + 10 * STRESS_TEST; iter++)
             {
-                flint_printf("FAIL:\n");
-                flint_printf("n = %wd\n", n);
-                fmpz_print(b1);
-                flint_printf("\n");
-                flint_printf("should be %wu mod %wu\n", bb, mod.n);
-                abort();
+                nmod_init(&mod, n_randtest_not_zero(state));
+                nb = arith_bell_number_nmod(n, mod);
+
+                if (nb != fmpz_fdiv_ui(b, mod.n))
+                {
+                    flint_printf("FAIL (vs nmod, n = %wd)\n", n);
+                    abort();
+                }
             }
         }
 
-        _fmpz_vec_clear(b2, n+1);
-    }
+        for (len = 0; len < MAXN_VEC; len = FLINT_MAX(len + 1, len * 1.25))
+        {
+            vb1 = _fmpz_vec_init(len);
+            vb2 = _fmpz_vec_init(len);
+            vnb = _nmod_vec_init(len);
+            vnr = _nmod_vec_init(len);
 
-    _fmpz_vec_clear(b1, maxn);
+            arith_bell_number_vec_recursive(vb1, len);
+            arith_bell_number_vec_multi_mod(vb2, len);
+
+            if (!_fmpz_vec_equal(vb1, vb2, len))
+            {
+                flint_printf("FAIL (len = %wd)\n", len);
+                abort();
+            }
+
+            for (n = prev_len; n < len; n++)
+            {
+#if STRESS_TEST
+                flint_printf("%wd\n", n);
+#endif
+                if (n < 5000)
+                {
+                    arith_bell_number_dobinski(b, n);
+                    if (!fmpz_equal(vb1 + n, b))
+                    {
+                        flint_printf("FAIL (dobinski, n = %wd)\n", n);
+                        abort();
+                    }
+                }
+
+                arith_bell_number_multi_mod(b, n);
+                if (!fmpz_equal(vb1 + n, b))
+                {
+                    flint_printf("FAIL (multi_mod, n = %wd)\n", n);
+                    abort();
+                }
+            }
+
+            for (iter = 0; iter < 30; iter++)
+            {
+                nmod_init(&mod, n_randtest_not_zero(state));
+                arith_bell_number_nmod_vec(vnb, len, mod);
+
+                _fmpz_vec_get_nmod_vec(vnr, vb1, len, mod);
+
+                if (!_nmod_vec_equal(vnr, vnb, len))
+                {
+                    flint_printf("FAIL (nmod_vec, len = %wd)\n", len);
+                    abort();
+                }
+
+                if (len)
+                {
+                    n = n_randint(state, len);
+                    nb = arith_bell_number_nmod(n, mod);
+
+                    if (nb != fmpz_fdiv_ui(vb1 + n, mod.n))
+                    {
+                        flint_printf("FAIL (nmod n = %wd)\n", n);
+                        abort();
+                    }
+                }
+            }
+
+            _fmpz_vec_clear(vb1, len);
+            _fmpz_vec_clear(vb2, len);
+            _nmod_vec_clear(vnb);
+            _nmod_vec_clear(vnr);
+
+            prev_len = len;
+        }
+
+        fmpz_clear(b);
+    }
 
     FLINT_TEST_CLEANUP(state);
 

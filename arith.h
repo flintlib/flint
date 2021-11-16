@@ -86,7 +86,7 @@ extern const mp_limb_t bell_number_tab[];
 FLINT_DLL double arith_bell_number_size(ulong n);
 
 FLINT_DLL void arith_bell_number(fmpz_t b, ulong n);
-FLINT_DLL void arith_bell_number_bsplit(fmpz_t res, ulong n);
+FLINT_DLL void arith_bell_number_dobinski(fmpz_t res, ulong n);
 FLINT_DLL void arith_bell_number_multi_mod(fmpz_t res, ulong n);
 
 FLINT_DLL void arith_bell_number_vec(fmpz * b, slong n);
@@ -97,7 +97,8 @@ FLINT_DLL mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod);
 
 FLINT_DLL void arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod);
 FLINT_DLL void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod);
-FLINT_DLL void arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod);
+FLINT_DLL int arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod);
+FLINT_DLL void arith_bell_number_nmod_vec_ogf(mp_ptr res, slong len, nmod_t mod);
 
 
 /* Euler numbers *************************************************************/

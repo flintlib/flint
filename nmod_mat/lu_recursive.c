@@ -45,14 +45,19 @@ _apply_permutation(slong * AP, nmod_mat_t A, slong * P,
 slong 
 nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 {
-    slong i, j, m, n, r1, r2, n1;
+    slong i, j, m, n, r1, r2, n1, cutoff;
     nmod_mat_t A0, A00, A01, A10, A11;
     slong * P1;
 
     m = A->r;
     n = A->c;
 
-    if (m < NMOD_MAT_LU_RECURSIVE_CUTOFF || n < NMOD_MAT_LU_RECURSIVE_CUTOFF)
+    if (NMOD_BITS(A->mod) == FLINT_BITS)
+        cutoff = 22;
+    else
+        cutoff = 12;
+
+    if (m < cutoff || n < cutoff)
     {
         r1 = nmod_mat_lu_classical(P, A, rank_check);
         return r1;

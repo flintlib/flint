@@ -20,31 +20,35 @@
 
 int main(void)
 {
-    slong i, j;
+    slong i, j, iter;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("bell_number_nmod....");
     fflush(stdout);    
 
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         mp_ptr b;
         slong n;
         nmod_t mod;
-        mp_limb_t p;
+        mp_limb_t p, u;
 
-        n = n_randint(state, 1000);
-        p = n_randtest_prime(state, 0);
+        n = n_randint(state, 800);
+        if (n_randint(state, 2))
+            p = n_randtest_not_zero(state);
+        else
+            p = n_randtest_prime(state, 0);
 
         nmod_init(&mod, p);
 
         b = _nmod_vec_init(n + 1);
         arith_bell_number_nmod_vec(b, n + 1, mod);
 
-        for (j = 0; j <= n; j++)
+        for (iter = 0; iter < 5; iter++)
         {
-            mp_limb_t u = arith_bell_number_nmod(j, mod);
+            j = n_randint(state, n + 1);
+            u = arith_bell_number_nmod(j, mod);
 
             if (u != b[j])
             {

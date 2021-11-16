@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -27,11 +27,34 @@ static const char bell_mod_2[3] = {1, 1, 0};
 static const char bell_mod_3[13] = {1, 1, 2, 2, 0, 1, 2, 1, 0, 0, 1, 0, 1};
 
 mp_limb_t
+arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
+{
+    mp_ptr bvec;
+    mp_limb_t s;
+
+    if (n > WORD_MAX / 4)
+    {
+        flint_printf("arith_bell_number_nmod: too large n\n");
+        flint_abort();
+    }
+
+    bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));
+    arith_bell_number_nmod_vec(bvec, n + 1, mod);
+    s = bvec[n];
+    flint_free(bvec);
+    return s;
+}
+
+
+mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod);
+
+mp_limb_t
 arith_bell_number_nmod(ulong n, nmod_t mod)
 {
-    mp_limb_t s, t, u;
+    mp_limb_t s, t, u, inv_fac;
     mp_ptr facs, pows;
     slong i, j;
+    int success;
 
     if (n < BELL_NUMBER_TAB_SIZE)
         return n_mod2_preinv(bell_number_tab[n], mod.n, mod.ninv);
@@ -40,57 +63,71 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
     if (mod.n == 3) return bell_mod_3[n % 13];
 
     if (mod.n <= n)
-    {
-        mp_ptr bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));
-        arith_bell_number_nmod_vec_recursive(bvec, n + 1, mod);
-        s = bvec[n];
-        flint_free(bvec);
-        return s;
-    }
+        return arith_bell_number_nmod_fallback(n, mod);
 
     /* Compute inverse factorials */
     /* We actually compute (n! / i!) and divide out (n!)^2 at the end */
     facs = flint_malloc(sizeof(mp_limb_t) * (n + 1));
     facs[n] = 1;
     for (i = n - 1; i >= 0; i--)
-        facs[i] = n_mulmod2_preinv(facs[i + 1], i + 1, mod.n, mod.ninv);
+        facs[i] = nmod_mul(facs[i + 1], i + 1, mod);
 
-    /* Compute powers */
-    pows = flint_calloc(n + 1, sizeof(mp_limb_t));
-    pows[0] = n_powmod2_ui_preinv(0, n, mod.n, mod.ninv);
-    pows[1] = n_powmod2_ui_preinv(1, n, mod.n, mod.ninv);
+    inv_fac = facs[0];
+    inv_fac = nmod_inv_check(inv_fac, mod);
+    success = (inv_fac != mod.n);
 
-    for (i = 2; i <= n; i++)
+    if (!success)
     {
-        if (pows[i] == 0)
-            pows[i] = n_powmod2_ui_preinv(i, n, mod.n, mod.ninv);
-
-        for (j = 2; j <= i && i * j <= n; j++)
-            if (pows[i * j] == 0)
-                pows[i * j] = n_mulmod2_preinv(pows[i],
-                                                pows[j], mod.n, mod.ninv);
+        s = arith_bell_number_nmod_fallback(n, mod);
     }
-
-    for (s = t = i = 0; i <= n; i++)
+    else
     {
-        if (i % 2 == 0)
-            t = n_addmod(t, facs[i], mod.n);
-        else
-            t = n_submod(t, facs[i], mod.n);
+        mp_limb_t v, s2, s1, s0, t1, t0, qq[3];
 
-        u = pows[n - i];
-        u = n_mulmod2_preinv(u, facs[n - i], mod.n, mod.ninv);
-        u = n_mulmod2_preinv(u, t, mod.n, mod.ninv);
-        s = n_addmod(s, u, mod.n);
+        /* Compute powers */
+        pows = flint_calloc(n + 1, sizeof(mp_limb_t));
+        pows[0] = nmod_pow_ui(0, n, mod);
+        pows[1] = nmod_pow_ui(1, n, mod);
+
+        for (i = 2; i <= n; i++)
+        {
+            if (pows[i] == 0)
+                pows[i] = nmod_pow_ui(i, n, mod);
+
+            for (j = 2; j <= i && i * j <= n; j++)
+                if (pows[i * j] == 0)
+                    pows[i * j] = nmod_mul(pows[i], pows[j], mod);
+        }
+
+        s2 = s1 = s0 = 0;
+
+        for (t = i = 0; i <= n; i++)
+        {
+            if (i % 2 == 0)
+                t = nmod_add(t, facs[i], mod);
+            else
+                t = nmod_sub(t, facs[i], mod);
+
+            u = pows[n - i];
+            v = facs[n - i];
+            u = nmod_mul(u, v, mod);
+            umul_ppmm(t1, t0, u, t);
+            add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
+        }
+
+        qq[2] = s2;
+        qq[1] = s1;
+        qq[0] = s0;
+        s = mpn_mod_1(qq, 3, mod.n);
+
+        /* Remove (n!)^2 */
+        u = inv_fac;
+        u = nmod_mul(u, u, mod);
+        s = nmod_mul(s, u, mod);
+        flint_free(pows);
     }
-
-    /* Remove (n!)^2 */
-    u = n_invmod(facs[0], mod.n);
-    u = n_mulmod2_preinv(u, u, mod.n, mod.ninv);
-    s = n_mulmod2_preinv(s, u, mod.n, mod.ninv);
 
     flint_free(facs);
-    flint_free(pows);
 
     return s;
 }

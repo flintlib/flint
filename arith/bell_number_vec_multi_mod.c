@@ -30,7 +30,7 @@ arith_bell_number_vec_multi_mod(fmpz * res, slong n)
 
     resolution = FLINT_MAX(1, FLINT_MIN(CRT_MAX_RESOLUTION, n / 16));
 
-    size = arith_bell_number_size(n);
+    size = arith_bell_number_size(n) + 1;
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 

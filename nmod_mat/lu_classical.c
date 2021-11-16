@@ -75,12 +75,12 @@ nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
         rank++;
 
         d = a[row][col];
-        d = n_invmod(d, mod.n);
+        d = nmod_inv(d, mod);
         length = n - col - 1;
 
         for (i = row + 1; i < m; i++)
         {
-            e = n_mulmod2_preinv(a[i][col], d, mod.n, mod.ninv);
+            e = nmod_mul(a[i][col], d, mod);
             if (length != 0)
                 _nmod_vec_scalar_addmul_nmod(a[i] + col + 1,
                     a[row] + col + 1, length, nmod_neg(e, mod), mod);

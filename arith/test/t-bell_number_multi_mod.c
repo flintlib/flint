@@ -37,7 +37,7 @@ int main(void)
 
         n = n_randint(state, 500);
 
-        arith_bell_number_bsplit(b1, n);
+        arith_bell_number_dobinski(b1, n);
         arith_bell_number_multi_mod(b2, n);
 
         if (!fmpz_equal(b1, b2))

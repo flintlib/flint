@@ -113,57 +113,44 @@ Bell numbers
 
 
 .. function:: void arith_bell_number(fmpz_t b, ulong n)
+              void arith_bell_number_dobinski(fmpz_t res, ulong n)
+              void arith_bell_number_multi_mod(fmpz_t res, ulong n)
 
     Sets `b` to the Bell number `B_n`, defined as the
     number of partitions of a set with `n` members. Equivalently,
     `B_n = \sum_{k=0}^n S_2(n,k)` where `S_2(n,k)` denotes a Stirling number
     of the second kind.
 
-    This function automatically selects between table lookup, binary
-    splitting, and the multimodular algorithm.
+    The default version automatically selects between table lookup,
+    Dobinski's formula, and the multimodular algorithm.
 
-.. function:: void arith_bell_number_bsplit(fmpz_t res, ulong n)
+    The ``dobinski`` version evaluates a precise truncation of
+    the series `B_n = e^{-1} \sum_{k=0}^{\infty} \frac{k^n}{k!}`
+    (Dobinski's formula). In fact, we compute `P = N! \sum_{k=0}^N \frac{k^n}{k!}`
+    and `Q = N! \sum_{k=0}^N \frac{1}{k!} \approx N! e` and
+    evaluate `B_n = \lceil P / Q \rceil`, avoiding the use
+    of floating-point arithmetic.
 
-    Computes the Bell number `B_n` by evaluating a precise truncation of
-    the series `B_n = e^{-1} \sum_{k=0}^{\infty} \frac{k^n}{k!}` using
-    binary splitting.
-
-.. function:: void arith_bell_number_multi_mod(fmpz_t res, ulong n)
-
-    Computes the Bell number `B_n` using a multimodular algorithm.
-
-    This function evaluates the Bell number modulo several limb-size
-    primes using\\ ``arith_bell_number_nmod`` and reconstructs the integer
-    value using the fast Chinese remainder algorithm.
+    The ``multi_mod`` version computes the result modulo several limb-size
+    primes and reconstructs the integer value using the fast
+    Chinese remainder algorithm.
     A bound for the number of needed primes is computed using
     ``arith_bell_number_size``.
 
 .. function:: void arith_bell_number_vec(fmpz * b, slong n)
+              void arith_bell_number_vec_recursive(fmpz * b, slong n)
+              void arith_bell_number_vec_multi_mod(fmpz * b, slong n)
 
     Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
-    inclusive. Automatically switches between the ``recursive``
-    and ``multi_mod`` algorithms depending on the size of `n`.
-
-.. function:: void arith_bell_number_vec_recursive(fmpz * b, slong n)
-
-    Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
-    inclusive. This function uses table lookup if `B_{n-1}` fits in a
-    single word, and a standard triangular recurrence otherwise.
-
-.. function:: void arith_bell_number_vec_multi_mod(fmpz * b, slong n)
-
-    Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
-    inclusive.
-
-    This function evaluates the Bell numbers modulo several limb-size
-    primes using\\ ``arith_bell_number_nmod_vec`` and reconstructs the 
-    integer values using the fast Chinese remainder algorithm.
-    A bound for the number of needed primes is computed using
-    ``arith_bell_number_size``.
+    inclusive. The ``recursive`` version uses the `O(n^3 \log n)`
+    triangular recurrence, while the ``multi_mod`` version implements
+    multimodular evaluation of the exponential generating function,
+    running in time `O(n^2 \log^{O(1)} n)`. The default version
+    chooses an algorithm automatically.
 
 .. function:: mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod)
 
-    Computes the Bell number `B_n` modulo a prime `p` given by ``mod``
+    Computes the Bell number `B_n` modulo an integer given by ``mod``.
 
     After handling special cases, we use the formula
 
@@ -177,39 +164,39 @@ Bell numbers
     we use sieving to reduce the number of powers that need to be
     evaluated. This results in `O(n)` memory usage.
 
-    The divisions by factorials require `n > p`, so we fall back to
-    calling\\ ``bell_number_nmod_vec_recursive`` and reading off the
-    last entry when `p \le n`.
+    If the divisions by factorials are impossible, we fall back to
+    calling ``arith_bell_number_nmod_vec`` and reading the last
+    coefficient.
 
 .. function:: void arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod)
+              void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
+              void arith_bell_number_nmod_vec_ogf(mp_ptr b, slong n, nmod_t mod)
+              int arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod)
 
     Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
-    inclusive modulo a prime `p` given by ``mod``. Automatically
-    switches between the ``recursive`` and ``series`` algorithms
-    depending on the size of `n` and whether `p` is large enough for the
-    series algorithm to work.
+    inclusive modulo an integer given by ``mod``.
 
-.. function:: void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
+    The *recursive* version uses the `O(n^2)` triangular recurrence.
+    The *ogf* version expands the ordinary generating function
+    using binary splitting, which is `O(n \log^2 n)`.
 
-    Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
-    inclusive modulo a prime `p` given by ``mod``. This function uses
-    table lookup if `B_{n-1}` fits in a single word, and a standard
-    triangular recurrence otherwise.
+    The *series* version uses the exponential generating function
+    `\sum_{k=0}^{\infty} \frac{B_n}{n!} x^n = \exp(e^x-1)`,
+    running in `O(n \log n)`.
+    This only works if division by `n!` is possible, and the function
+    returns whether it is successful. All other versions
+    support any modulus.
 
-.. function:: void arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod)
-
-    Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
-    inclusive modulo a prime `p` given by ``mod``. This function
-    expands the exponential generating function
-    ``\sum_{k=0}^{\infty} \frac{B_n}{n!} x^n = \exp(e^x-1).``
-    We require that `p \ge n`.
+    The default version of this function selects an algorithm
+    automatically.
 
 .. function:: double arith_bell_number_size(ulong n)
 
-    Returns `b` such that `B_n < 2^{\lfloor b \rfloor}`, using the inequality
-    ``B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n``
-    which is given in [BerTas2010]_.
-
+    Returns `b` such that `B_n < 2^{\lfloor b \rfloor}`. A previous
+    version of this function used the inequality
+    ``B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n`` which is given
+    in [BerTas2010]_; we now use a slightly better bound
+    based on an asymptotic expansion.
 
 Bernoulli numbers and polynomials
 --------------------------------------------------------------------------------

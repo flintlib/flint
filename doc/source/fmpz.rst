@@ -690,6 +690,10 @@ Basic arithmetic
 
     Sets `f` to `g \times 2^e`.
 
+.. function:: void fmpz_one_2exp(fmpz_t f, ulong e)
+
+    Sets `f` to `2^e`.
+
 .. function:: void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong h)
               void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong h)

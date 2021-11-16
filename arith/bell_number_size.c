@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,8 +15,17 @@
 double
 arith_bell_number_size(ulong n)
 {
-    if (n == 0)
-        return 2;
+    double l, ll, u;
 
-    return n * log(0.792 * n/log(n+1)) * 1.44269504088896 + 2;
+    if (n <= 1)
+        return 0;
+
+    /* Using de Bruijn's asymptotic expansion. Not sure if this is an
+       upper bound for all n, but suffices at least for n < 2^64. */
+    l = log((double) n);
+    ll = log(l);
+    u = 1.0 / l;
+
+    return 1.4426950408889634074 * n * (l - ll - 1.0 + ll * u
+        + 1.0 * u + 0.5 * (ll * u) * (ll * u) + 0.25 * ll * u * u) + 2;
 }
