@@ -55,7 +55,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL1\n");
-            gmp_printf("n = %wu, e = %Zd, f = %Zd, g = %Zd\n", n, e, f, g);
+            gmp_printf("n = %Mu, e = %Zd, f = %Zd, g = %Zd\n", n, e, f, g);
             abort();
         }
 
@@ -94,7 +94,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, n = %wu, f = %Zd, g = %Zd\n", d, n, f, g);
+            gmp_printf("d = %Zd, n = %Mu, f = %Zd, g = %Zd\n", d, n, f, g);
             abort();
         }
 
