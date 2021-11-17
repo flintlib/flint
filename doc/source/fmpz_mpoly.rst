@@ -458,7 +458,7 @@ Differentiation/Integration
 
 .. function:: void fmpz_mpoly_integral(fmpz_mpoly_t A, fmpz_t scale, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
 
-    Set *A* and *scale* so that *A* is an integral of `scale \time B` with respect to the variable of index *var*, where *scale* is positive and as small as possible.
+    Set *A* and *scale* so that *A* is an integral of `scale \times B` with respect to the variable of index *var*, where *scale* is positive and as small as possible.
 
 
 Evaluation
