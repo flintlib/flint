@@ -58,7 +58,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            gmp_printf("mf = %Zd, mf2 = %Zd, mg = %Zd, root = %wd\n", mf, mf2, mg, n);
+            gmp_printf("mf = %Zd, mf2 = %Zd, mg = %Zd, root = %Md\n", mf, mf2, mg, n);
             abort();
         }
 
@@ -99,7 +99,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            gmp_printf("mf = %Zd, mf2 = %Zd, root = %wd\n", mf, mf2, n);
+            gmp_printf("mf = %Zd, mf2 = %Zd, root = %Md\n", mf, mf2, n);
             abort();
         }
 

@@ -50,7 +50,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            gmp_printf("b = %Zd, j = %wu k = %d, l = %d\n", b, j, k, l);
+            gmp_printf("b = %Zd, j = %Mu k = %d, l = %d\n", b, j, k, l);
             abort();
         }
 
