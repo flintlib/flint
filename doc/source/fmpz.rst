@@ -1091,7 +1091,7 @@ Greatest common divisor
         \operatorname{xgcd}(\mp 2 d, g) &=
                 \bigl(d, {\textstyle\frac{d - |g|}{\mp 2 d}}, \operatorname{sgn}(g)\bigr)
 
-         \operatorname{xgcd}(f, \mp 2 d) &=
+        \operatorname{xgcd}(f, \mp 2 d) &=
                 \bigl(d, \operatorname{sgn}(f), {\textstyle\frac{d - |g|}{\mp 2 d}}\bigr).
 
 
@@ -1100,8 +1100,8 @@ Greatest common divisor
 
     .. math ::
 
-            |a| < \Bigl| \frac{g}{2 d} \Bigr|,
-            \qquad |b| < \Bigl| \frac{f}{2 d} \Bigr|.
+        |a| < \Bigl| \frac{g}{2 d} \Bigr|,
+        \qquad \Bigl| |b| < \frac{f}{2 d} \Bigr|.
 
     Assumes that there is no aliasing among the outputs.
 
