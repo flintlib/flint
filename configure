@@ -60,10 +60,11 @@ FLINT_SOLIB=0
 # 2.8.1 => 16.1.1
 # 2.8.2 => 16.1.2
 # 2.8.3 => 16.1.3
+# 2.8.4 => 16.1.4
 
 FLINT_MAJOR=16
 FLINT_MINOR=1
-FLINT_PATCH=3
+FLINT_PATCH=4
 
 usage()
 {
