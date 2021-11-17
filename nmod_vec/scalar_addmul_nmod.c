@@ -38,7 +38,7 @@ void _nmod_vec_scalar_addmul_nmod_generic(mp_ptr res, mp_srcptr vec,
     for (i = 0; i < len; i++)
     {
         NMOD_MUL_PRENORM(t, vec[i], c << mod.norm, mod);
-        res[i] = nmod_add(res[i], t, mod);
+        res[i] = _nmod_add(res[i], t, mod);
     }
 }
 
@@ -53,7 +53,7 @@ void _nmod_vec_scalar_addmul_nmod_shoup(mp_ptr res, mp_srcptr vec,
     for (i = 0; i < len; i++)
     {
         t = n_mulmod_shoup(c, vec[i], cinv, mod.n);
-        res[i] = nmod_add(res[i], t, mod);
+        res[i] = _nmod_add(res[i], t, mod);
     }
 }
 

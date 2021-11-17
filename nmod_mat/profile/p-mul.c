@@ -18,7 +18,10 @@
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "thread_support.h"
+
+#if FLINT_HAVE_BLAS
 #include "cblas.h"
+#endif
 
 typedef struct
 {
@@ -113,7 +116,9 @@ int main(void)
             {
                 double min_old, min_new, min_ratio = 100;
 
+#if FLINT_HAVE_BLAS
                 openblas_set_num_threads(blas_num);
+#endif
 
                 flint_printf("[flint %wd, blas %wd]: (", flint_num, blas_num);
 
