@@ -1303,7 +1303,7 @@ v 2.6.3 -- 12 Aug 2020
 
 2.8.4 -- 17 Nov 2021
 
- * Fix a serious big in fmpz_mod_poly_xgcd for polynomials of large length
+ * Fix a serious bug in fmpz_mod_poly_xgcd for polynomials of large length
  * Fix an assertion failure in fmpz_mat_solve_fflu (only relevant if asserts enabled)
  * Fix some bugs on 32 bit machines
  * Work around a compiler bug on Apple M1
