@@ -41,7 +41,7 @@ int main()
     if (!fmpz_equal(s, t))
     {
         flint_printf("FAIL: Hash disagrees with known value\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_clear(s);

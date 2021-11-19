@@ -40,7 +40,7 @@ main(void)
         if (!fmpz_mat_is_one(A))
         {
             flint_printf("FAIL!\n");
-            abort();
+            flint_abort();
         }
 
         if (rows && cols)
@@ -49,7 +49,7 @@ main(void)
             if (fmpz_mat_is_one(A))
             {
                 flint_printf("FAIL!\n");
-                abort();
+                flint_abort();
             }
         }
 

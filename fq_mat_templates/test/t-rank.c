@@ -40,7 +40,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
-                abort();
+                flint_abort();
             }
             TEMPLATE(T, mat_clear) (A, ctx);
         }
@@ -65,7 +65,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
-                abort();
+                flint_abort();
             }
             TEMPLATE(T, mat_clear) (A, ctx);
         }

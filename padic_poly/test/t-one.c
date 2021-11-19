@@ -52,7 +52,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
             flint_printf("N = %wd\n\n", N);
-            abort();
+            flint_abort();
         }
 
         padic_poly_clear(a);

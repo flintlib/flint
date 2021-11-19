@@ -73,7 +73,7 @@ main(void)
             gmp_printf("b = %Qd\n", b);
             flint_printf("base = %d\n", base);
             flint_printf("str1 = %s\n, str2 = %s\n", str1, str2);
-            abort();
+            flint_abort();
         }
 
         ans = fmpq_set_str(a2, str1, base);
@@ -84,7 +84,7 @@ main(void)
             flint_printf("str1 = %s\n", str1);
             flint_printf("base = %d\n", base);
             flint_printf("ans = %d\n", ans);
-            abort();
+            flint_abort();
         }
 
         flint_free(str1);

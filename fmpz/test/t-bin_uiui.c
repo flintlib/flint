@@ -46,7 +46,7 @@ main(void)
         if (!fmpz_equal(x, y))
         {
             flint_printf("FAIL: n,k = %wu,%wu\n", n, k);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(x);

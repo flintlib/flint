@@ -56,13 +56,13 @@ main(void)
                 printf("FAIL: output is not a Hadamard matrix\n");
                 printf("n = %d\n\n", n);
                 fmpz_mat_print_pretty(h); printf("\n\n");
-                abort();
+                flint_abort();
             }
         }
         else if (should_have_hadamard(n))
         {
             printf("FAIL: expected Hadamard matrix of size %d to work\n\n", n);
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(h);

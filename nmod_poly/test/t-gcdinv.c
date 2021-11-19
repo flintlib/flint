@@ -65,7 +65,7 @@ main(void)
             printf("s = "), nmod_poly_print(s), printf("\n\n");
             printf("t = "), nmod_poly_print(t), printf("\n\n");
             printf("u = "), nmod_poly_print(u), printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -120,7 +120,7 @@ main(void)
             printf("s = "), nmod_poly_print(s), printf("\n\n");
             printf("t = "), nmod_poly_print(t), printf("\n\n");
             printf("u = "), nmod_poly_print(u), printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);

@@ -45,7 +45,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
     }
 

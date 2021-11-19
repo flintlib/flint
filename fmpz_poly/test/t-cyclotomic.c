@@ -76,7 +76,7 @@ int main()
             flint_printf("\n\nExpected:\n");
             fmpz_poly_print_pretty(B, "x");
             flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(A);
@@ -110,7 +110,7 @@ int main()
             flint_printf("\nExpected height:\n");
             fmpz_print(ref);
             flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(A);

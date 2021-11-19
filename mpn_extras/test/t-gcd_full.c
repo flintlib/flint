@@ -66,7 +66,7 @@ int main(void)
           flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", g);
           gmp_printf("%Zd\n", c);
-          abort();
+          flint_abort();
        }
 
        flint_free(g->_mp_d);

@@ -56,7 +56,7 @@ main(void)
            {
               flint_printf("FAIL:\n");
               flint_printf("Error in limb %wd, %wu != %wu\n", j, in[j], out[j]);
-              abort();
+              flint_abort();
            }
         }
 

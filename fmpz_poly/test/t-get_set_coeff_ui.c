@@ -48,7 +48,7 @@ main(void)
             {
                 flint_printf("FAIL: n1 = %wu, n2 = %wu, coeff = %wd, length = %wd\n",
                        n1, n2, coeff, len);
-                abort();
+                flint_abort();
             }
         }
 

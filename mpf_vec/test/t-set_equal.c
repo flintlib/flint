@@ -43,7 +43,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);
@@ -65,7 +65,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);
@@ -91,7 +91,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);

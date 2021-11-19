@@ -114,7 +114,7 @@ main(void)
             for (i = 0; i < num; i++)
                 flint_printf("%wd ", exp[i]);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (quot, ctx);

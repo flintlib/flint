@@ -139,7 +139,7 @@ int main(void)
             {
                 flint_printf("FAIL (base minimum)\n");
                 fmpz_print(g->p+i); flint_printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -151,7 +151,7 @@ int main(void)
                 flint_printf("FAIL (base sorting)\n");
                 fmpz_print(g->p+i); flint_printf(" ");
                 fmpz_print(g->p+i+1); flint_printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -162,7 +162,7 @@ int main(void)
             {
                 flint_printf("FAIL (exponent minimum)\n");
                 flint_printf("%wd\n", g->exp[i]);
-                abort();
+                flint_abort();
             }
         }
 
@@ -181,7 +181,7 @@ int main(void)
                         flint_printf("FAIL (coprime bases)\n");
                         fmpz_print(g->p+u); flint_printf(" ");
                         fmpz_print(g->p+v); flint_printf("\n");
-                        abort();
+                        flint_abort();
                     }
                 }
             }
@@ -205,7 +205,7 @@ int main(void)
                 fmpz_print(x); flint_printf("\n");
                 fmpz_factor_print(g); flint_printf(" : ");
                 fmpz_print(y); flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_clear(x);
@@ -239,7 +239,7 @@ int main(void)
                         flint_printf("FAIL (representation)\n");
                         fmpz_factor_print(f); flint_printf("\n");
                         fmpz_factor_print(g); flint_printf("\n");
-                        abort();
+                        flint_abort();
                     }
                 }
             }
@@ -257,7 +257,7 @@ int main(void)
                 fmpz_factor_print(f); flint_printf("\n");
                 fmpz_factor_print(g); flint_printf("\n");
                 fmpz_factor_print(h); flint_printf("\n");
-                abort();
+                flint_abort();
             }
             fmpz_factor_clear(h);
         }
@@ -274,7 +274,7 @@ int main(void)
                 fmpz_factor_print(f); flint_printf("\n");
                 fmpz_factor_print(g); flint_printf("\n");
                 fmpz_factor_print(h); flint_printf("\n");
-                abort();
+                flint_abort();
             }
             fmpz_factor_clear(h);
         }
@@ -320,7 +320,7 @@ int main(void)
             {
                 flint_printf("FAIL (factorial)\n");
                 flint_printf("%wd\n", i);
-                abort();
+                flint_abort();
             }
 
             fmpz_clear(x);

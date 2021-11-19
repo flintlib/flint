@@ -48,7 +48,7 @@ void check(fmpz_t n)
         fmpz_print(m);
         flint_printf("\n");
 
-        abort();
+        flint_abort();
     }
 
     if (factor->num != factor2->num)
@@ -67,7 +67,7 @@ void check(fmpz_t n)
         fmpz_factor_print(factor2);
         flint_printf("\n");
 
-        abort();
+        flint_abort();
     }
 
     for (i = 0; i < factor->num - (full != 1); i++)
@@ -84,7 +84,7 @@ void check(fmpz_t n)
             fmpz_factor_print(factor);
             flint_printf("\n");
 
-            abort();
+            flint_abort();
         }
     }
 

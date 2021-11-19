@@ -67,7 +67,7 @@ main(void)
             nmod_poly_print(cinv); flint_printf("\n");
             nmod_poly_print(d); flint_printf("\n");
             nmod_poly_print(e); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -108,7 +108,7 @@ main(void)
             nmod_poly_print(c); flint_printf("\n");
             nmod_poly_print(cinv); flint_printf("\n");
             nmod_poly_print(d); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -148,7 +148,7 @@ main(void)
             nmod_poly_print(c); flint_printf("\n");
             nmod_poly_print(cinv); flint_printf("\n");
             nmod_poly_print(d); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -188,7 +188,7 @@ main(void)
             nmod_poly_print(c); flint_printf("\n");
             nmod_poly_print(cinv); flint_printf("\n");
             nmod_poly_print(d); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -228,7 +228,7 @@ main(void)
             nmod_poly_print(c); flint_printf("\n");
             nmod_poly_print(cinv); flint_printf("\n");
             nmod_poly_print(d); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);

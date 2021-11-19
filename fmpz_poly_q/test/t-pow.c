@@ -49,7 +49,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_q_print(a), flint_printf("\n\n");
             fmpz_poly_q_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_q_clear(a);

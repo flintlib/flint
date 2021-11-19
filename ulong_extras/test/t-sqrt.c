@@ -46,7 +46,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("a = %wu, s1 = %wd, s2 = %wu\n", a, s1, s2); 
-         abort();
+         flint_abort();
       }
 
       mpz_clear(a_m);
@@ -76,7 +76,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("a = %wu, s1 = %wd, s2 = %wu\n", a, s1, s2); 
-         abort();
+         flint_abort();
       }
 
       mpz_clear(a_m);

@@ -112,7 +112,7 @@ main(void)
         }
 
         if (!result)
-            abort();
+            flint_abort();
 
 
         nmod_poly_clear(product);

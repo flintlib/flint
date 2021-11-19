@@ -79,7 +79,7 @@ main(void)
            printf("s = "); fmpz_poly_print(s); printf("\n");
            printf("t = "); fmpz_poly_print(t); printf("\n");
            printf("c = "); flint_printf("%wd", c); printf("\n");
-           abort();
+           flint_abort();
         }
 
         fmpz_poly_clear(a);

@@ -58,7 +58,7 @@ main(void)
         if (!(TEMPLATE(T, mat_equal) (window1, A, ctx) && TEMPLATE(T, mat_equal) (window2, B, ctx)))
         {
             flint_printf("FAIL: results not equal\n");
-            abort();
+            flint_abort();
         }
         
         TEMPLATE(T, mat_clear) (A, ctx);

@@ -65,7 +65,7 @@ main(void)
             flint_printf("cosh(A): "); nmod_poly_print(coshA), flint_printf("\n\n");
             flint_printf("cosh(A)^2-1: "); nmod_poly_print(B), flint_printf("\n\n");
             flint_printf("sinh(A)^2: "); nmod_poly_print(C), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(A);
@@ -100,7 +100,7 @@ main(void)
             flint_printf("FAIL:\n");
             nmod_poly_print(A), flint_printf("\n\n");
             nmod_poly_print(B), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(A);

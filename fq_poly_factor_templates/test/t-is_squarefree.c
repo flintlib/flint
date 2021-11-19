@@ -88,7 +88,7 @@ main(void)
             flint_printf(" %wd, %d\n", max_exp, v);
             TEMPLATE(T, poly_print) (poly, ctx);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (poly, ctx);

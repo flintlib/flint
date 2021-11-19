@@ -49,7 +49,7 @@ main(void)
             fmpq_poly_debug(a), flint_printf("\n\n");
             fmpq_poly_debug(b), flint_printf("\n\n");
             fmpq_poly_debug(c), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(a);

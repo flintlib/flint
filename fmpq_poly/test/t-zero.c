@@ -47,7 +47,7 @@ main(void)
             flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
             flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(a);

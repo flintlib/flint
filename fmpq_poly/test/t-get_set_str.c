@@ -91,7 +91,7 @@ main(void)
             flint_printf("str    = %s\n\n", str);
             flint_printf("ans    = %d\n\n", ans);
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(f);

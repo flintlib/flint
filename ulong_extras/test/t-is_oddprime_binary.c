@@ -47,7 +47,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared composite\n", d); 
-         abort();
+         flint_abort();
       }
 
       mpz_clear(d_m);
@@ -72,7 +72,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared prime\n", d); 
-         abort();
+         flint_abort();
       }
 
       mpz_clear(d_m);

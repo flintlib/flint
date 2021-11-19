@@ -51,7 +51,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("minpoly(A) doesn't divide charpoly(A).\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear) (A, ctx);
@@ -104,7 +104,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("minpoly(P^{-1}AP) != minpoly(A).\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, clear) (t, ctx);

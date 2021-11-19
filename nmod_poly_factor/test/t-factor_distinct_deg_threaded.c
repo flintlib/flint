@@ -118,7 +118,7 @@ main(void)
             flint_printf("Error: product of factors does not equal to the original polynomial\n");
             flint_printf("poly:\n"); nmod_poly_print(poly1); flint_printf("\n");
             flint_printf("product:\n"); nmod_poly_print(product); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         flint_free(degs);

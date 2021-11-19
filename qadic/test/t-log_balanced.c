@@ -63,7 +63,7 @@ main(void)
             flint_printf("FAIL (aliasing):\n\n");
             flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         qadic_clear(a);
@@ -129,7 +129,7 @@ main(void)
             flint_printf("f = log(a) + log(b) = "), qadic_print_pretty(f, ctx), flint_printf("\n");
             flint_printf("g = log(a * b)      = "), qadic_print_pretty(g, ctx), flint_printf("\n");
             qadic_ctx_print(ctx);
-            abort();
+            flint_abort();
         }
 
         qadic_clear(a);
@@ -174,7 +174,7 @@ main(void)
             flint_printf("a =          "), qadic_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = exp(a) = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = log(b) = "), qadic_print_pretty(c, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         qadic_clear(a);

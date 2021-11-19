@@ -49,7 +49,7 @@ int main(void)
             flint_printf("FAIL:\n");
             flint_printf("p = %wu\n", p);
             flint_printf("n = %wd\n", n);
-            abort();
+            flint_abort();
         }
 
         if (arith_bell_number_nmod_vec_series(b3, n, mod))
@@ -59,7 +59,7 @@ int main(void)
                 flint_printf("FAIL (2):\n");
                 flint_printf("p = %wu\n", p);
                 flint_printf("n = %wd\n", n);
-                abort();
+                flint_abort();
             }
         }
     }

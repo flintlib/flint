@@ -44,7 +44,7 @@ int main()
             flint_printf("FAIL: n = %wd\n", n);
             flint_printf("T: "); fmpz_poly_print_pretty(T, "x"); flint_printf("\n");
             flint_printf("U: "); fmpz_poly_print_pretty(U, "x"); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
     }

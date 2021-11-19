@@ -43,7 +43,7 @@ int main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("i = %wu, p = %wu, q = %wu\n", i, p, q);
-                abort();
+                flint_abort();
             }
         }
 
@@ -71,7 +71,7 @@ int main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
-            abort();
+            flint_abort();
         }
 
         n_primes_clear(iter);

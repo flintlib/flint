@@ -63,7 +63,7 @@ main(int argc, char** argv)
     {
         printf("Exception (p-iterated_frobenius):\n");
         printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
 
     for (i = 0; i < l + 1; i++)

@@ -69,7 +69,7 @@ main(void)
             flint_printf("FAIL wrong rank! (r = %wd, rank1 = %wd)!\n", r, rank1);
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         if (!fmpz_mat_is_in_rref_with_rank(R, den, rank1))
@@ -77,7 +77,7 @@ main(void)
             flint_printf("FAIL matrix not in rref!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         /* check rref is the same as when computed classically */
@@ -105,7 +105,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R2); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         /* Concatenate the original matrix with the rref, scramble the rows,
@@ -149,7 +149,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R3); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(c);

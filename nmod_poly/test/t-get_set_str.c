@@ -48,7 +48,7 @@ main(void)
             flint_printf("%s\n", str);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         flint_free(str);

@@ -55,7 +55,7 @@ main(void)
             flint_printf("Computed height:\n");
             fmpz_print(h);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(h);

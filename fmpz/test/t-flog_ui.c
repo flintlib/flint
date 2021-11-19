@@ -57,7 +57,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("y = "), fmpz_print(y), flint_printf("\n");
             flint_printf("k = %wd\n", k);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -90,7 +90,7 @@ main(void)
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("k = %wd\n", k);
             flint_printf("l = %wd\n", l);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

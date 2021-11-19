@@ -43,7 +43,7 @@ main(void)
         if (!fmpz_poly_mat_is_one(A))
         {
             flint_printf("FAIL: expected matrix to be one\n");
-            abort();
+            flint_abort();
         }
 
         if (m > 0 && n > 0)
@@ -62,7 +62,7 @@ main(void)
             if (fmpz_poly_mat_is_one(A))
             {
                 flint_printf("FAIL: expected matrix not to be one\n");
-                abort();
+                flint_abort();
             }
         }
 

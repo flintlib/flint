@@ -48,7 +48,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("a = %wu, d = %wu\n", a, d); 
-         abort();
+         flint_abort();
       }
 
       mpz_clear(a_m);

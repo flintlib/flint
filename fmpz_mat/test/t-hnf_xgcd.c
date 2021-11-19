@@ -57,7 +57,7 @@ main(void)
             flint_printf("matrix not in hnf!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_hnf_classical(H2, A);
@@ -70,7 +70,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             fmpz_mat_print_pretty(H2); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_hnf_xgcd(H2, H);
@@ -83,7 +83,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             fmpz_mat_print_pretty(H2); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(U);

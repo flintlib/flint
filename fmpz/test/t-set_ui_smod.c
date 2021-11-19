@@ -52,7 +52,7 @@ main(void)
             flint_printf("m: %wu\n", m);
             flint_printf("r: %wu\n", m);
             flint_printf("b: "); fmpz_print(b); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

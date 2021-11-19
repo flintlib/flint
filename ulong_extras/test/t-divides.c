@@ -43,7 +43,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q); 
-         abort();
+         flint_abort();
       }
    }
    
@@ -68,7 +68,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q); 
-         abort();
+         flint_abort();
       }
    }
  

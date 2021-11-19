@@ -63,7 +63,7 @@ main(void)
             flint_printf("lo = %wu\n", lo);
             flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

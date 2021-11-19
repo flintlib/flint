@@ -65,7 +65,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("r = "), TEMPLATE(T, poly_print_pretty) (r, "X", ctx),
                 flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -109,7 +109,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("r = "), TEMPLATE(T, poly_print_pretty) (r, "X", ctx),
                 flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -152,7 +152,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("r = "), TEMPLATE(T, poly_print_pretty) (r, "X", ctx),
                 flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -195,7 +195,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("r = "), TEMPLATE(T, poly_print_pretty) (r, "X", ctx),
                 flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -238,7 +238,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("r = "), TEMPLATE(T, poly_print_pretty) (r, "X", ctx),
                 flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

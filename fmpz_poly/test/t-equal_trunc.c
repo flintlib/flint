@@ -53,7 +53,7 @@ main(void)
             fmpz_poly_print(a), flint_printf("\n\n");
             fmpz_poly_print(b), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(c);
@@ -93,7 +93,7 @@ main(void)
             fmpz_poly_print(b), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
             flint_printf("m = %wd\n", m);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(c);

@@ -72,7 +72,7 @@ main(void)
                 TEMPLATE(T, frobenius)(c, a, j, ctx);
                 flint_printf("sigma^%wd = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             }
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);

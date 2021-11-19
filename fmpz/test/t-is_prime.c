@@ -88,7 +88,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(p); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(p);
@@ -120,7 +120,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(p); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(p);
@@ -139,7 +139,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(t); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(t);
@@ -156,7 +156,7 @@ main(void)
             printf("FAIL\n");
             fmpz_print(p);
             printf("\n");
-	    abort();
+	    flint_abort();
         }
         fmpz_clear(p);
     }

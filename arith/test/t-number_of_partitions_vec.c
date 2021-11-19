@@ -51,7 +51,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("n = %wd, k = %wd\n", n, k);
-                abort();
+                flint_abort();
             }
         }
 
@@ -88,7 +88,7 @@ int main(void)
                 flint_printf("\n");
                 fmpz_print(p + n - 1);
                 flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_clear(s);

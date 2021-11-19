@@ -60,7 +60,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("bits = %wd, p1 = %wd, p2 = %wd\n", bits, p1, p2);
-            abort();
+            flint_abort();
         }
 
         _fmpz_vec_clear(a, len);

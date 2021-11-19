@@ -54,7 +54,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_print(c), flint_printf("\n\n");
             fmpz_print(d), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

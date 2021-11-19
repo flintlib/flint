@@ -61,7 +61,7 @@ main(void)
             flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             flint_printf("f(a) + g(a) = "), fmpq_print(x), flint_printf("\n\n");
             flint_printf("(f + g)(a)  = "), fmpq_print(y), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -99,7 +99,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(a), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(x);

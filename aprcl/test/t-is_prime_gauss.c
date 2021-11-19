@@ -43,7 +43,7 @@ int main(void)
             flint_printf("Testing number = ");
             fmpz_print(n);
             flint_printf("\nis_probabprime = %i, aprcl_is_prime_gauss = %i\n", pbprime, cycloprime);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(n);
@@ -93,7 +93,7 @@ int main(void)
         if (result == 0)
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(n);

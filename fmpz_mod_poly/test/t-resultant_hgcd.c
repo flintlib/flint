@@ -64,7 +64,7 @@ main(void)
             printf("x = "); fmpz_print(x); printf("\n");
             printf("y = "); fmpz_print(y); printf("\n");
             printf("n = "); fmpz_print(n); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(f, ctx);

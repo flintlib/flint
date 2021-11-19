@@ -60,7 +60,7 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\ncmp(x,y) = %d, cmp(X,Y) = %d\n", c1, c2);
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(x);

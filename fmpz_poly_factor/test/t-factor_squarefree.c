@@ -81,7 +81,7 @@ int main(void)
             }
             flint_printf("h = "), fmpz_poly_print_pretty(h, "x"), flint_printf("\n\n");
             fmpz_poly_factor_print(fac);
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(f);

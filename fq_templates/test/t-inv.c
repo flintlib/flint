@@ -56,7 +56,7 @@ main(void)
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             TEMPLATE(T, ctx_print)(ctx);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);
@@ -90,7 +90,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);

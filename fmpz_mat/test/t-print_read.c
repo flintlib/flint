@@ -58,14 +58,14 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to set-up the pipe.\n");
-            abort();
+            flint_abort();
         }
 
         if((childpid = fork()) == -1)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to fork the process.\n");
-            abort();
+            flint_abort();
         }
 
         if(childpid == 0)  /* Child process */
@@ -78,7 +78,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open output file at the pipe.\n");
-                abort();
+                flint_abort();
             }
 
             for (j = 0; j < k; j++)
@@ -91,7 +91,7 @@ int main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("Write error.\n");
-                    abort();
+                    flint_abort();
                 }
             }
 
@@ -112,7 +112,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open input file at the pipe.\n");
-                abort();
+                flint_abort();
             }
 
             for (i = 0; i < k && !feof(in); i++)
@@ -124,7 +124,7 @@ int main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("Read error.\n");
-                    abort();
+                    flint_abort();
                 }
 
                 result = fmpz_mat_equal(t, M[i]);
@@ -133,7 +133,7 @@ int main(void)
                     flint_printf("FAIL:\n");
                     flint_printf("M[i] = "), fmpz_mat_print(M[i]), flint_printf("\n");
                     flint_printf("t    = "), fmpz_mat_print(t), flint_printf("\n");
-                    abort();
+                    flint_abort();
                 }
 
                 fmpz_mat_clear(t);
@@ -146,7 +146,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Only %d out of %d objects were processed.\n", i, n);
-            abort();
+            flint_abort();
         }
 
         for (i = 0; i < k; i++)
@@ -162,14 +162,14 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to set-up the pipe.\n");
-            abort();
+            flint_abort();
         }
 
         if((childpid = fork()) == -1)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to fork the process.\n");
-            abort();
+            flint_abort();
         }
 
         if(childpid == 0)  /* Child process */
@@ -182,7 +182,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open output file at the pipe.\n");
-                abort();
+                flint_abort();
             }
 
             r = flint_fprintf(out, "blah");
@@ -190,7 +190,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Write error.\n");
-                abort();
+                flint_abort();
             }
 
             fclose(out);
@@ -207,7 +207,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open input file at the pipe.\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_mat_init(t,0,0);
@@ -220,7 +220,7 @@ int main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("r = %d\n", r);
-                    abort();
+                    flint_abort();
                 }
                 ++i;
             }
@@ -234,7 +234,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Carried out %d reads, but \"%s\" has only 4 characters.\n", i, str);
-            abort();
+            flint_abort();
         }
     }
 

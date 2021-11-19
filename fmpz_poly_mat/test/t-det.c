@@ -75,7 +75,7 @@ main(void)
             flint_printf("\ndet(A)*det(B):\n");
             fmpz_poly_print_pretty(ab, "x");
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(a);

@@ -39,7 +39,7 @@ main(void)
             flint_printf("x = %.20g\n", x);
             flint_printf("res1 = %.20g\n", res1);
             flint_printf("res2 = %.20g\n", res2);
-            abort();
+            flint_abort();
         }
     }
 

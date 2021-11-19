@@ -79,7 +79,7 @@ main(void)
             flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(a, ctx);
@@ -128,7 +128,7 @@ main(void)
             flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(a, ctx);
@@ -177,7 +177,7 @@ main(void)
             flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(a, ctx);
@@ -227,7 +227,7 @@ main(void)
             flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("finv:\n"); fmpz_mod_poly_print(finv, ctx), flint_printf("\n\n");
             flint_printf("res:\n"); fmpz_mod_poly_print(res, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(a, ctx);
@@ -278,7 +278,7 @@ main(void)
             flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("res1:\n"); fmpz_mod_poly_print(res1, ctx), flint_printf("\n\n");
             flint_printf("res2:\n"); fmpz_mod_poly_print(res2, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(a, ctx);

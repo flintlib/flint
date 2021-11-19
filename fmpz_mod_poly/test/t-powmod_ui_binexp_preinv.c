@@ -268,7 +268,7 @@ main(void)
             flint_printf("f:\n"); fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("res3:\n"); fmpz_mod_poly_print(res3, ctx), flint_printf("\n\n");
             flint_printf("res4:\n"); fmpz_mod_poly_print(res4, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(p);

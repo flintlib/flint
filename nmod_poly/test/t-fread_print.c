@@ -36,7 +36,7 @@ main(void)
         if (!f)
         {
             flint_printf("Error: unable to open file for writing.\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_init(a, n);
@@ -58,14 +58,14 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             fclose(f);
             remove("nmod_poly_test");
-            abort();
+            flint_abort();
         }
 
         fclose(f);
         if (remove("nmod_poly_test"))
         {
             flint_printf("Error, unable to delete file nmod_poly_test\n");
-            abort();
+            flint_abort();
         }
         nmod_poly_clear(a);
         nmod_poly_clear(b);

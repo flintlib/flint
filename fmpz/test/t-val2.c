@@ -58,7 +58,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("v1 = %wd  v2 = %wd\n", v1, v2);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(x);

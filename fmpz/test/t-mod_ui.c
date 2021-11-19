@@ -57,7 +57,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", d,
                  e, f, x, r1, r2);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -98,7 +98,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", d,
                  e, f, x, r1, r2);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

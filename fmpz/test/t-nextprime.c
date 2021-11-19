@@ -59,7 +59,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(start); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(start);
@@ -86,7 +86,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(start); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(start);

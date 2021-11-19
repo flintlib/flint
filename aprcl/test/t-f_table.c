@@ -47,7 +47,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("1 - %wu != %wu mod %wu\n", g_powx, g_powfx, q);
-                abort();
+                flint_abort();
             }
         }
 

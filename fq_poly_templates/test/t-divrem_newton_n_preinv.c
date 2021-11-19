@@ -62,7 +62,7 @@ main(void)
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -110,7 +110,7 @@ main(void)
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -157,7 +157,7 @@ main(void)
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -205,7 +205,7 @@ main(void)
             TEMPLATE(T, poly_print) (binv, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -251,7 +251,7 @@ main(void)
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -298,7 +298,7 @@ main(void)
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -346,7 +346,7 @@ main(void)
             TEMPLATE(T, poly_print) (binv, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

@@ -108,7 +108,7 @@ main(void)
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
-            abort();
+            flint_abort();
         }
 
         if (n == k)

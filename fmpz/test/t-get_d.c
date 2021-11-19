@@ -51,7 +51,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("a = %f\n", a);
             flint_printf("b = %f\n", b);
-            abort();
+            flint_abort();
         }
 
         a = a * (n_randtest(state) / (double) n_randtest_not_zero(state));
@@ -68,7 +68,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("y = "), fmpz_print(y), flint_printf("\n");
             flint_printf("a = %f\n", a);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(x);

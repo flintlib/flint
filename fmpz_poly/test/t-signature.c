@@ -106,7 +106,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("poly   = "), fmpz_poly_print(poly), flint_printf("\n\n");
             flint_printf("r1 r2  = %wd %wd\n\n", r1, r2);
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(poly);
@@ -129,7 +129,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("poly   = "), fmpz_poly_print(poly), flint_printf("\n\n");
             flint_printf("r1 r2  = %wd %wd\n\n", r1, r2);
-            abort();
+            flint_abort();
         }
         fmpz_poly_clear(poly);
     }
@@ -151,7 +151,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("Cyclotomic(%ld) has signature (%ld, %ld)\n", i + 3, r, s);
             flint_printf("Expected signature (%ld, %ld)\n", 0, (fmpz_poly_length(poly) - 1)/2);
-            abort();
+            flint_abort();
         }
         
         fmpz_poly_clear(poly);

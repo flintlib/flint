@@ -44,7 +44,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(p); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(p);
@@ -82,7 +82,7 @@ main(void)
     {
         flint_printf("FAIL:\n");
         flint_printf("count = %ld\n", count);
-        abort();
+        flint_abort();
     }
 
     FLINT_TEST_CLEANUP(state);

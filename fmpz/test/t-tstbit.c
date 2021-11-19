@@ -51,7 +51,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             gmp_printf("b = %Zd, j = %Mu k = %d, l = %d\n", b, j, k, l);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

@@ -63,7 +63,7 @@ main(void)
             padic_poly_print(b, ctx), flint_printf("\n\n");
             padic_poly_print(c, ctx), flint_printf("\n\n");
             padic_poly_print(d, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         padic_poly_clear(a);
@@ -101,7 +101,7 @@ main(void)
             padic_poly_print(a, ctx), flint_printf("\n\n");
             padic_poly_print(b, ctx), flint_printf("\n\n");
             padic_poly_print(c, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         padic_poly_clear(a);
@@ -138,7 +138,7 @@ main(void)
             padic_poly_print(a, ctx), flint_printf("\n\n");
             padic_poly_print(b, ctx), flint_printf("\n\n");
             padic_poly_print(c, ctx), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         padic_poly_clear(a);

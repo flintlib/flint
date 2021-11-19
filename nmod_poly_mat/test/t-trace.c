@@ -67,7 +67,7 @@ main(void)
             nmod_poly_mat_print(BA, "x"), flint_printf("\n");
             flint_printf("tr(AB): "),  nmod_poly_print(trab),    flint_printf("\n");
             flint_printf("tr(BA): "),  nmod_poly_print(trba),    flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_mat_clear(A);

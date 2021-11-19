@@ -62,7 +62,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %Mu, m = %Zd\n", d, e, f, x, m);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -101,7 +101,7 @@ main(void)
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             flint_printf("n = %wu\n", n);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -135,7 +135,7 @@ main(void)
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             flint_printf("n = %wu\n", n);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -166,7 +166,7 @@ main(void)
             flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             flint_printf("n = %wu\n", n);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

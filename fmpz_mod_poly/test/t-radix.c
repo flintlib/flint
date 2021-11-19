@@ -114,7 +114,7 @@ int main(void)
             {
                 flint_printf("b[%wd] = ", j), fmpz_mod_poly_print(b[j], ctx), flint_printf("\n\n");
             }
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(f, ctx);

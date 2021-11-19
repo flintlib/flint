@@ -143,7 +143,7 @@ main(void)
             nmod_poly_mat_print(A, "x"); flint_printf("\n\n");
             nmod_poly_mat_print(R, "x"); flint_printf("\n\n");
             nmod_poly_mat_print(R2, "x"); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(c);

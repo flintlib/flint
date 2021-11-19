@@ -67,7 +67,7 @@ main(void)
             flint_printf("y = %wu\n", y);
             flint_printf("z = %wd\n", z);
             flint_printf("n = %wu\n", n);
-            abort();
+            flint_abort();
         }
         
         nmod_poly_clear(f);
@@ -97,7 +97,7 @@ main(void)
             flint_printf("FAIL disc(f) == 0 for len f < 2:\n");
             nmod_poly_print(f), flint_printf("\n\n");
             flint_printf("y = %wu\n", y);
-            abort();
+            flint_abort();
         }
         
         nmod_poly_clear(f);

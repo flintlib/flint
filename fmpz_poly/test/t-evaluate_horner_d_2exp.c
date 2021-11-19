@@ -51,7 +51,7 @@ main(void)
             flint_printf("y, yexp = %.20g  %wd\n\n", y, yexp);
             flint_printf("z = %.20g\n\n", z);
             flint_printf("y = %.20g\n\n", t);
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(f);
@@ -111,7 +111,7 @@ main(void)
             mpfr_printf("%.17Rg\n", v);
             mpfr_printf("%.17Rg\n", e);
             mpfr_printf("%.17Rg\n\n", w);
-            abort();
+            flint_abort();
         }
 
         mpfr_clear(z);

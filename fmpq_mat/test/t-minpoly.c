@@ -54,7 +54,7 @@ main(void)
             flint_printf("Matrix A:\n"), fmpq_mat_print(A), flint_printf("\n");
             flint_printf("cp(A) = "), fmpq_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("mp(A) = "), fmpq_poly_print_pretty(g, "X"), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_mat_clear(A);
@@ -117,7 +117,7 @@ main(void)
             flint_printf("Matrix P^{-1}AP:\n"), fmpq_mat_print(B), flint_printf("\n");
             flint_printf("mp(P^{-1}AP) = "), fmpq_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("mp(A) = "), fmpq_poly_print_pretty(g, "X"), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(d);

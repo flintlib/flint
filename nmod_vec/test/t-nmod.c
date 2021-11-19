@@ -54,7 +54,7 @@ main(void)
         {
             flint_printf("FAIL (add):\n");
             flint_printf("m = %wu\n", m);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(x);
@@ -90,7 +90,7 @@ main(void)
         {
             flint_printf("FAIL (sub):\n");
             flint_printf("m = %wu\n", m);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(x);
@@ -126,7 +126,7 @@ main(void)
         {
             flint_printf("FAIL (mul):\n");
             flint_printf("m = %wu\n", m);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(x);
@@ -165,7 +165,7 @@ main(void)
         {
             flint_printf("FAIL (div):\n");
             flint_printf("m = %wu\n", m);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(x);
@@ -199,7 +199,7 @@ main(void)
         {
             flint_printf("FAIL (div):\n");
             flint_printf("m = %wu\n", m);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(y);
@@ -234,7 +234,7 @@ main(void)
         {
             flint_printf("FAIL (pow):\n");
             flint_printf("m = %wu\n", m);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(y);

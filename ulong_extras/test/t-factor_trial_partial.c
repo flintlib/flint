@@ -39,7 +39,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n1 = %wu, n2 = %wu, prod = %wu\n", n1, n2, prod);
-         abort();
+         flint_abort();
       }
 
       for (j = 0; j < factors.num; j++)
@@ -52,7 +52,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
-         abort();
+         flint_abort();
       }
    }
 

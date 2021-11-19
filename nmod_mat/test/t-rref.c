@@ -93,7 +93,7 @@ main(void)
             flint_printf("FAIL (malformed rref)\n");
             nmod_mat_print_pretty(A); flint_printf("\n\n");
             nmod_mat_print_pretty(B); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         /* Concatenate the original matrix with the rref, scramble the rows,
@@ -136,7 +136,7 @@ main(void)
             nmod_mat_print_pretty(A); flint_printf("\n\n");
             nmod_mat_print_pretty(B); flint_printf("\n\n");
             nmod_mat_print_pretty(D); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         _perm_clear(perm);

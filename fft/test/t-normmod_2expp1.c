@@ -70,7 +70,7 @@ main(void)
                     flint_printf("mpn_normmod_2expp1 error\n");
                     gmp_printf("want %Zx\n\n", m1);
                     gmp_printf("got  %Zx\n", m2);
-                    abort();
+                    flint_abort();
                 }
 
                 flint_free(nn);

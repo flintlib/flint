@@ -66,7 +66,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("result of is_irreducible and is_irreducible_ddf does not coincide\n");
             flint_printf("poly = "), nmod_poly_print(poly), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         length2 = n_randint(state, 10) + 2;
@@ -86,7 +86,7 @@ main(void)
         {
             flint_printf("Error: reducible polynomial declared irreducible!\n");
             nmod_poly_print(poly3); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(poly);

@@ -63,7 +63,7 @@ main(void)
                     flint_printf("FAIL (composite expected to pass test):\n");
                     fmpz_print(n); printf("\n");
                     fmpz_print(a); printf("\n");
-                    abort();
+                    flint_abort();
                 }
             }
 
@@ -76,7 +76,7 @@ main(void)
                 flint_printf("FAIL (composite expected to fail test):\n");
                 fmpz_print(n); printf("\n");
                 fmpz_print(a); printf("\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_clear(n);
@@ -109,7 +109,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_print(p); printf("\n");
             fmpz_print(b); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(p);
@@ -155,7 +155,7 @@ main(void)
     {
         flint_printf("FAIL:\n");
         flint_printf("count = %ld\n", count);
-        abort();
+        flint_abort();
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -53,7 +53,7 @@ main(void)
             flint_printf("FAIL (aliasing):\n");
             fmpq_poly_print(f), flint_printf("\n\n");
             fmpq_poly_print(g), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(f);
@@ -92,7 +92,7 @@ main(void)
             fmpq_poly_print(f), flint_printf("\n\n");
             fmpq_poly_print(g), flint_printf("\n\n");
             fmpq_poly_print(h), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(f);

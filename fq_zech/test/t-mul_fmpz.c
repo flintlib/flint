@@ -68,7 +68,7 @@ main(void)
                 flint_printf("c = ");
                 fq_zech_print_pretty(c, ctx);
                 flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_clear(x);
@@ -111,7 +111,7 @@ main(void)
                 flint_printf("b = ");
                 fq_zech_print_pretty(b, ctx);
                 flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_clear(x);

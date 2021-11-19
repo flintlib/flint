@@ -44,7 +44,7 @@ main(void)
         if (!fmpq_mat_is_integral(A))
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
 
         if (m && n)
@@ -58,7 +58,7 @@ main(void)
             if (fmpq_mat_is_integral(A))
             {
                 flint_printf("FAIL\n");
-                abort();
+                flint_abort();
             }
         }
 

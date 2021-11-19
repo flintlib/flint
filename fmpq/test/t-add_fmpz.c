@@ -56,7 +56,7 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_add(X, Y, Z);
@@ -71,7 +71,7 @@ main(void)
             flint_printf("\nz = ");
             fmpz_print(z);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -110,7 +110,7 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
-            abort();
+            flint_abort();
         }
 
         if (!fmpq_equal(X, x))
@@ -121,7 +121,7 @@ main(void)
             flint_printf("\ny = ");
             fmpz_print(y);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(x);

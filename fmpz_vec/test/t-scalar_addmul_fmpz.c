@@ -57,7 +57,7 @@ main(void)
             flint_printf("FAIL:\n");
             _fmpz_vec_print(c, len), flint_printf("\n\n");
             _fmpz_vec_print(b, len), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(n1);
@@ -93,7 +93,7 @@ main(void)
             flint_printf("FAIL:\n");
             _fmpz_vec_print(c, len), flint_printf("\n\n");
             _fmpz_vec_print(b, len), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(n1);

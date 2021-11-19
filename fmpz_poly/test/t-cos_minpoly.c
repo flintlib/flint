@@ -81,7 +81,7 @@ int main()
             flint_printf("y = %wu\n", y);
             flint_printf("p = "); fmpz_poly_print(p);
             flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
     }
 

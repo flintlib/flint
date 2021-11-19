@@ -66,7 +66,7 @@ main(void)
             flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_mat_clear(A);
@@ -106,7 +106,7 @@ main(void)
             flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_mat_clear(A);

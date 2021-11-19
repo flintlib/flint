@@ -100,7 +100,7 @@ main(void)
                 flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx); flint_printf("\n");
                 flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx); flint_printf("\n");
                 flint_printf("j: %wd\n", j);
-                abort();
+                flint_abort();
             }
         }
 

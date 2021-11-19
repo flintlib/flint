@@ -64,7 +64,7 @@ main(void)
             flint_printf("FAIL (aliasing)!\n");
             nmod_poly_mat_print(A, "x"); flint_printf("\n");
             nmod_poly_mat_print(Ainv, "x"); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_mat_clear(A);
@@ -104,7 +104,7 @@ main(void)
             if (nonsingular == 0 || !nmod_poly_is_one(den))
             {
                 flint_printf("FAIL: expected empty matrix to pass\n");
-                abort();
+                flint_abort();
             }
         }
         else
@@ -113,7 +113,7 @@ main(void)
             {
                 nmod_poly_neg(det, det);
                 flint_printf("FAIL: den != det(A)\n");
-                abort();
+                flint_abort();
             }
 
             nmod_poly_mat_mul(B, Ainv, A);
@@ -131,7 +131,7 @@ main(void)
                 nmod_poly_mat_print(B, "x");
                 flint_printf("den:\n");
                 nmod_poly_print(den);
-                abort();
+                flint_abort();
             }
         }
 

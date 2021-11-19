@@ -72,7 +72,7 @@ int main(void)
         if (result == 0)
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
 
         unity_zpq_clear(gausssigma);

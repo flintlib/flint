@@ -50,7 +50,7 @@ main(void)
             flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl,
                          d, dinv);
             flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            abort();
+            flint_abort();
         }
     }
 
@@ -86,7 +86,7 @@ main(void)
                          d, dinv);
             flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
             fmpz_clear(n);
-            abort();
+            flint_abort();
         }
     }
 

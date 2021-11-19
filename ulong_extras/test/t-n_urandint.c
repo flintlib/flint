@@ -59,7 +59,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
             flint_free(count);
-            abort();
+            flint_abort();
         }
     }
 
@@ -115,7 +115,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
             flint_free(count_in_subrange);
-            abort();
+            flint_abort();
         }
     }
 

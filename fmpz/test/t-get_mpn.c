@@ -68,7 +68,7 @@ int main()
                 printf("\nconverted value : ");
                 fmpz_print(b);
                 printf("\n");
-                abort();
+                flint_abort();
             }
 
             flint_free(mpna);
@@ -109,7 +109,7 @@ int main()
             printf("\nconverted value : ");
             fmpz_print(b);
             printf("\n");
-            abort();
+            flint_abort();
         }
 
 	flint_free(mpna);

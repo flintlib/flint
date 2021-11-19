@@ -62,7 +62,7 @@ main(void)
 	    fmpz_mod_poly_print(prod, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            flint_abort();
         }
         
         fmpz_clear(n);
@@ -109,7 +109,7 @@ main(void)
 	    fmpz_mod_poly_print(prod, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            flint_abort();
         }
         
         fmpz_clear(n);
@@ -153,7 +153,7 @@ main(void)
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            flint_abort();
         }
         
         fmpz_clear(n);
@@ -196,7 +196,7 @@ main(void)
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            flint_abort();
         }
         
         fmpz_clear(n);

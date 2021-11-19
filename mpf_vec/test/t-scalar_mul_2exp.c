@@ -47,7 +47,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("exp = %wu\n", exp);
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);
@@ -75,7 +75,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("e1 = %wu, e2 = %wu\n", e1, e2);
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);

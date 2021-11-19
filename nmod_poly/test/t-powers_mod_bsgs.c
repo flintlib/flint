@@ -85,7 +85,7 @@ main(void)
             flint_printf("j: %w\n", j);
             flint_printf("pow:\n"); nmod_poly_print(pow), flint_printf("\n\n");
 	    flint_printf("res[%w]:\n", j); nmod_poly_print(res + j), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(f);

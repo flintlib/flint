@@ -71,7 +71,7 @@ main(void)
                 flint_printf("a = "), padic_print(a, ctx), flint_printf("\n\n");
                 flint_printf("y = "), padic_print(y, ctx), flint_printf("\n\n");
                 flint_printf("z = "), padic_print(z, ctx), flint_printf("\n\n");
-                abort();
+                flint_abort();
             }
         }
         else
@@ -95,7 +95,7 @@ main(void)
                 flint_printf("z  = "), padic_print(z,  ctx), flint_printf("\n\n");
                 flint_printf("y2 = "), padic_print(y2, ctx), flint_printf("\n\n");
                 flint_printf("z2 = "), padic_print(z2, ctx), flint_printf("\n\n");
-                abort();
+                flint_abort();
             }
 
             padic_clear(y2);

@@ -45,7 +45,7 @@ void sample(void * arg, ulong count)
       prof_stop();
    }
 
-   if (r == 0) abort();
+   if (r == 0) flint_abort();
 
    flint_randclear(state);
    flint_free(array);

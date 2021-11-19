@@ -62,7 +62,7 @@ main(void)
             fmpq_mat_print(C);
             flint_printf("D:\n");
             fmpq_mat_print(D);
-            abort();
+            flint_abort();
         }
 
         fmpq_mat_clear(A);

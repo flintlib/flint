@@ -62,7 +62,7 @@ main(void)
                 fmpz_mod_mat_print_pretty(mat_a), flint_printf("^2\n=\n"),
                 fmpz_mod_mat_print_pretty(mat_a_a), flint_printf("\n=\n"),
                 fmpz_mod_mat_print_pretty(mat_a_sq), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_mat_clear(mat_a);

@@ -52,7 +52,7 @@ main(void)
             flint_printf("\n");
             mpf_out_str(stdout, 10, 0, res3);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);

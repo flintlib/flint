@@ -54,7 +54,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpz_print(p); printf("\n");
-            abort();
+            flint_abort();
         }
 
         _nmod_vec_clear(pm1);

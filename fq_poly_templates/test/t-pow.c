@@ -62,7 +62,7 @@ main(void)
             flint_printf("c = "), TEMPLATE(T, poly_print_pretty) (c, "X", ctx),
                 flint_printf("\n");
             flint_printf("exp = %wu\n", exp);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -117,7 +117,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("exp = %wu\n", exp);
             TEMPLATE(T, ctx_print) (ctx);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

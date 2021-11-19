@@ -70,7 +70,7 @@ main(void)
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
             nmod_mat_print_pretty(E);
-            abort();
+            flint_abort();
         }
 
         /* Check aliasing */
@@ -84,7 +84,7 @@ main(void)
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
             nmod_mat_print_pretty(E);
-            abort();
+            flint_abort();
         }
 
         nmod_mat_clear(A);

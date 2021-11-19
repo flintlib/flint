@@ -64,7 +64,7 @@ main(void)
             flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
             flint_printf("asinh(A): "); nmod_poly_print(asinhA), flint_printf("\n\n");
             flint_printf("atanh(B): "); nmod_poly_print(atanhB), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(A);
@@ -97,7 +97,7 @@ main(void)
             flint_printf("FAIL:\n");
             nmod_poly_print(A), flint_printf("\n\n");
             nmod_poly_print(B), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(A);

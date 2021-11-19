@@ -45,7 +45,7 @@ main(void)
         if (res1 != res2)
         {
             flint_printf("FAIL!\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

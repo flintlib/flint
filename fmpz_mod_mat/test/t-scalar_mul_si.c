@@ -64,7 +64,7 @@ main(void)
         if (!fmpz_mod_mat_equal(A, D))
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
 
         /* Aliasing */
@@ -74,7 +74,7 @@ main(void)
         if (!fmpz_mod_mat_equal(A, C))
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mod_mat_clear(A);

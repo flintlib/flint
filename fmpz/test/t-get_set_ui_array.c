@@ -58,14 +58,14 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Check get and set are inverse\n");
-            abort();
+            flint_abort();
         }
 
         if (!fmpz_equal(a, c))
         {
             flint_printf("FAIL:\n");
             flint_printf("Check limbs are accurate\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

@@ -58,7 +58,7 @@ main(void)
             flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         qadic_clear(a);
@@ -105,7 +105,7 @@ main(void)
             flint_printf("p = "), fmpz_print(p), flint_printf("\n");
             flint_printf("d = %wd\n", d);
             flint_printf("N = %wd\n", N);
-            abort();
+            flint_abort();
         }
 
         qadic_clear(a);

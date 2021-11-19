@@ -95,7 +95,7 @@ main(void)
         {
             flint_printf("Error: number of factors incorrect: %wd != %wd\n",
                          res->num, num);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_init) (product, ctx);
@@ -124,7 +124,7 @@ main(void)
             flint_printf("product:\n");
             TEMPLATE(T, poly_print_pretty) (product, "x", ctx);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, ctx_clear) (ctx);

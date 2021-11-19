@@ -52,7 +52,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("charpoly(AB) != charpoly(BA).\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear) (A, ctx);

@@ -52,7 +52,7 @@ main(void)
                 if (mpfr_cmp_si(mpfr_mat_entry(A, j, k), 3 * j + 7 * k) != 0)
                 {
                     flint_printf("FAIL: get/set entry %wd, %wd\n", j, k);
-                    abort();
+                    flint_abort();
                 }
             }
         }

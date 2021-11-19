@@ -77,7 +77,7 @@ main(void)
             flint_printf("log(B): "); nmod_poly_print(logB), flint_printf("\n\n");
             flint_printf("log(AB):       "); nmod_poly_print(logAB), flint_printf("\n\n");
             flint_printf("log(A)+log(B): "); nmod_poly_print(S), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(A);
@@ -113,7 +113,7 @@ main(void)
             flint_printf("FAIL:\n");
             nmod_poly_print(A), flint_printf("\n\n");
             nmod_poly_print(B), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(A);

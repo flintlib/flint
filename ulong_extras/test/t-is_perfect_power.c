@@ -35,13 +35,13 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d^2 = %wu is declared not a perfect power\n", d*d);
-         abort();
+         flint_abort();
       }
       if (n_pow(root, result) != n_pow(d, 2))
       {
          flint_printf("FAIL:\n");
          flint_printf("%wu^%wu != %wu\n", root, result, d*d);
-         abort();
+         flint_abort();
       }
    }
          
@@ -55,13 +55,13 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d^3 = %wu is declared not a perfect power\n", d*d*d);
-         abort();
+         flint_abort();
       }
       if (n_pow(root, result) != n_pow(d, 3))
       {
          flint_printf("FAIL:\n");
          flint_printf("%wu^%wu != %wu\n", root, result, d*d*d);
-         abort();
+         flint_abort();
       }
    }
          
@@ -75,13 +75,13 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d^5 = %wu is declared not a perfect power\n", d*d*d*d*d);
-         abort();
+         flint_abort();
       }
       if (n_pow(root, result) != n_pow(d, 5))
       {
          flint_printf("FAIL:\n");
          flint_printf("%wu^%wu != %wu\n", root, result, d*d*d*d*d);
-         abort();
+         flint_abort();
       }
    }
          
@@ -98,7 +98,7 @@ int main(void)
          {
             flint_printf("FAIL:\n");
             flint_printf("%wu^%wu != %wu\n", root, result, n);
-            abort();
+            flint_abort();
          }         
 
          umul_ppmm(hi, n, n, d);
@@ -121,7 +121,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared a perfect power\n", d); 
-         abort();
+         flint_abort();
       }
 
       mpz_clear(d_m);

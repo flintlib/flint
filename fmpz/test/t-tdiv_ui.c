@@ -50,7 +50,7 @@ main(void)
             flint_printf("FAIL:\n");
             gmp_printf
                 ("b = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", b, x, r1, r2);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

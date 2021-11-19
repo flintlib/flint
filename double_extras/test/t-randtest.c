@@ -35,7 +35,7 @@ main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("x = %.17g\n", x);
-            abort();
+            flint_abort();
         }
     }
 

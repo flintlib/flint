@@ -60,7 +60,7 @@ main(void)
             flint_printf("C:\n");
             nmod_poly_mat_print(C, "x");
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_mat_clear(A);
@@ -97,7 +97,7 @@ main(void)
             flint_printf("B:\n");
             nmod_poly_mat_print(B, "x");
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_mat_clear(A);

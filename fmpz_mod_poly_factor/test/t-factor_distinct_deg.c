@@ -92,7 +92,7 @@ main(void)
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
         {
             flint_printf("Fatal error: not enough memory.");
-            abort();
+            flint_abort();
         }
         fmpz_mod_poly_factor_init(res, ctx);
         fmpz_mod_poly_factor_distinct_deg(res, poly1, &degs, ctx);
@@ -124,7 +124,7 @@ main(void)
             flint_printf("product:\n");
             fmpz_mod_poly_print(product, ctx);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         flint_free(degs);

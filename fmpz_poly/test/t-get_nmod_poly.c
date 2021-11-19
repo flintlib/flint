@@ -57,7 +57,7 @@ main(void)
         if (!nmod_poly_equal(M, M2))
         {
             flint_printf("FAIL!\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(A);

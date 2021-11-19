@@ -66,7 +66,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -119,7 +119,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -172,7 +172,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -225,7 +225,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -278,7 +278,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

@@ -38,7 +38,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             TEMPLATE(T, ctx_print)(ctx);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);

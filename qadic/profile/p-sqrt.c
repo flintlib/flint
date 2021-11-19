@@ -104,7 +104,7 @@ for (l = 0; l < len; l++)
     if (!qadic_equal(b, z))
     {
         flint_printf("FAIL:\n");
-        abort();
+        flint_abort();
     }
 
     cputime = (long double) (c1 - c0) / (long double) CLOCKS_PER_SEC;

@@ -54,7 +54,7 @@ main(void)
                 if (d_mat_entry(A, j, k) != 3 * j + 7 * k)
                 {
                     flint_printf("FAIL: get/set entry %wd, %wd\n", j, k);
-                    abort();
+                    flint_abort();
                 }
             }
         }

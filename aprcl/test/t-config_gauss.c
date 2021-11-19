@@ -42,7 +42,7 @@ int main(void)
             fmpz_print(s2);
             flint_printf(" <= ");
             fmpz_print(n);
-            abort();
+            flint_abort();
         }
 
         aprcl_config_gauss_clear(conf);

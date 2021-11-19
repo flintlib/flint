@@ -58,7 +58,7 @@ main(void)
             fmpq_mat_print(B);
             flint_printf("C:\n");
             fmpq_mat_print(C);
-            abort();
+            flint_abort();
         }
 
         fmpq_mat_clear(A);
@@ -98,7 +98,7 @@ main(void)
             fmpq_mat_print(B);
             flint_printf("C:\n");
             fmpq_mat_print(C);
-            abort();
+            flint_abort();
         }
 
         fmpq_mat_clear(A);
@@ -141,7 +141,7 @@ main(void)
             fmpq_mat_print(C);
             flint_printf("D:\n");
             fmpq_mat_print(D);
-            abort();
+            flint_abort();
         }
 
         fmpq_mat_clear(A);

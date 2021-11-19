@@ -31,13 +31,13 @@ int main(void)
     if (n_nextprime(0, 0) != 2)
     {
         flint_printf("FAIL: expected n_nextprime(0) = 2");
-        abort();
+        flint_abort();
     }
 
     if (n_nextprime(UWORD_MAX_PRIME - 1, 0) != UWORD_MAX_PRIME)
     {
         flint_printf("FAIL: expected n_nextprime(UWORD_MAX_PRIME-1) = UWORD_MAX_PRIME");
-        abort();
+        flint_abort();
     }
 
     mpz_init(mpz_n);
@@ -59,7 +59,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("%wu, %wu\n", res1, res2); 
-            abort();
+            flint_abort();
         }
     }
 
@@ -78,7 +78,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("%wu, %wu\n", res1, res2); 
-            abort();
+            flint_abort();
         }
     }
 

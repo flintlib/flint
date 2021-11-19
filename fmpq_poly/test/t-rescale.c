@@ -54,7 +54,7 @@ main(void)
             fmpq_poly_debug(f), flint_printf("\n\n");
             fmpq_poly_debug(g), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(f);
@@ -88,7 +88,7 @@ main(void)
             fmpq_poly_debug(f), flint_printf("\n\n");
             fmpq_poly_debug(g), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(f);

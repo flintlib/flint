@@ -47,7 +47,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
-                abort();
+                flint_abort();
             }
             nmod_mat_clear(A);
         }
@@ -73,7 +73,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
-                abort();
+                flint_abort();
             }
             nmod_mat_clear(A);
         }

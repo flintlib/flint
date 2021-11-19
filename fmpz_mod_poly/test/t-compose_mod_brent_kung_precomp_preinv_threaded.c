@@ -139,7 +139,7 @@ main(void)
                 flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx); flint_printf("\n");
                 flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx); flint_printf("\n");
                 flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx); flint_printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -252,7 +252,7 @@ main(void)
                 flint_printf("a:\n"); fmpz_mod_poly_print(a, ctx); flint_printf("\n");
                 flint_printf("b:\n"); fmpz_mod_poly_print(b, ctx); flint_printf("\n");
                 flint_printf("c:\n"); fmpz_mod_poly_print(c, ctx); flint_printf("\n");
-                abort();
+                flint_abort();
             }
         }
 

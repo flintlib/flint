@@ -64,7 +64,7 @@ main(void)
                 flint_printf("cflags = %wu\n\n", cflags);
                 gmp_printf("n1 = %Qd\n\n", n1);
                 gmp_printf("n2 = %Qd\n\n", n2);
-                abort();
+                flint_abort();
             }
         }
 

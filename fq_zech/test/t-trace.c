@@ -63,7 +63,7 @@ main(void)
                 flint_printf("\n");
                 flint_printf("Tr(a) = "); fmpz_print(t2);
                 flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             fq_zech_clear(a, ctx);

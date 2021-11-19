@@ -69,7 +69,7 @@ main(void)
             flint_printf("FAIL (aliasing):\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -125,7 +125,7 @@ main(void)
             flint_printf("e = log(b)          = "), padic_print(e, ctx), flint_printf("\n");
             flint_printf("f = log(a) + log(b) = "), padic_print(f, ctx), flint_printf("\n");
             flint_printf("g = log(a * b)      = "), padic_print(g, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -171,7 +171,7 @@ main(void)
             flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -214,7 +214,7 @@ main(void)
             flint_printf("FAIL (aliasing):\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -278,7 +278,7 @@ main(void)
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
             flint_printf("ans3 = %d\n", ans3);
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -326,7 +326,7 @@ main(void)
             flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);

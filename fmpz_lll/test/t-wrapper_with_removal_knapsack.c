@@ -73,7 +73,7 @@ main(void)
                         ("FAIL (randntrulike): gram matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -107,7 +107,7 @@ main(void)
                         ("FAIL (randntrulike): basis matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -131,7 +131,7 @@ main(void)
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);
@@ -177,7 +177,7 @@ main(void)
                         ("FAIL (randintrel): gram matrices not equal!\n");
                     fmpz_mat_print_pretty(gmat);
                     fmpz_mat_print_pretty(gmat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -211,7 +211,7 @@ main(void)
                         ("FAIL (randintrel): basis matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -239,7 +239,7 @@ main(void)
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);
@@ -284,7 +284,7 @@ main(void)
                         ("FAIL (randajtai): gram matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -318,7 +318,7 @@ main(void)
                         ("FAIL (randajtai): basis matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -342,7 +342,7 @@ main(void)
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);
@@ -388,7 +388,7 @@ main(void)
                         ("FAIL (randsimdioph): gram matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -422,7 +422,7 @@ main(void)
                         ("FAIL (randsimdioph): basis matrices not equal!\n");
                     fmpz_mat_print_pretty(mat);
                     fmpz_mat_print_pretty(mat2);
-                    abort();
+                    flint_abort();
                 }
                 fmpz_mat_clear(U);
                 fmpz_mat_clear(mat2);
@@ -446,7 +446,7 @@ main(void)
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);

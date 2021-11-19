@@ -49,7 +49,7 @@ main(void)
             flint_printf("n = %wd\n", n);
             flint_printf("a = "), fmpq_poly_print(a), flint_printf("\n\n");
             flint_printf("b = "), fmpq_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(a);
@@ -87,7 +87,7 @@ main(void)
             flint_printf("n = %wd\n", n);
             flint_printf("a = "), fmpq_poly_print(a), flint_printf("\n\n");
             flint_printf("b = "), fmpq_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(a);

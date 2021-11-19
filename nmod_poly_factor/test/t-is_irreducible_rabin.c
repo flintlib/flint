@@ -68,7 +68,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("Irreducible polynomial should not have non-trivial factors!\n");
             flint_printf("poly = "), nmod_poly_print(poly), flint_printf("\n");
-            abort();
+            flint_abort();
         }
         nmod_poly_factor_clear(factors);
 
@@ -89,7 +89,7 @@ main(void)
         {
             flint_printf("Error: reducible polynomial declared irreducible!\n");
             nmod_poly_print(poly3); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(poly);

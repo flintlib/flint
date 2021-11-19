@@ -58,7 +58,7 @@ main(void)
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -114,7 +114,7 @@ main(void)
             flint_printf("e = exp(b)        = "), padic_print(e, ctx), flint_printf("\n");
             flint_printf("f = exp(a) exp(b) = "), padic_print(f, ctx), flint_printf("\n");
             flint_printf("g = exp(a + b)    = "), padic_print(g, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -164,7 +164,7 @@ main(void)
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);
@@ -220,7 +220,7 @@ main(void)
             flint_printf("e = exp(b)        = "), padic_print(e, ctx), flint_printf("\n");
             flint_printf("f = exp(a) exp(b) = "), padic_print(f, ctx), flint_printf("\n");
             flint_printf("g = exp(a + b)    = "), padic_print(g, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_clear(a);

@@ -50,7 +50,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("len = %wd, n = %wd\n", len, n);
-            abort();
+            flint_abort();
         }
 
         _nmod_vec_clear(vec);
@@ -83,7 +83,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("len = %wd, n = %wd\n", len, n);
-            abort();
+            flint_abort();
         }
 
         _nmod_vec_clear(vec);

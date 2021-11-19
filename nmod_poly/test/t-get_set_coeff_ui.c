@@ -48,7 +48,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("j = %wu, c1 = %wu, c2 = %wu, n = %wu\n", j, c1, c2, a->mod.n);
             nmod_poly_print(a), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);

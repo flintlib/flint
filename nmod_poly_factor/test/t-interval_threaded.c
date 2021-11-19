@@ -140,7 +140,7 @@ main(void)
                 flint_printf("b:\n"); nmod_poly_print(b); flint_printf("\n");
                 flint_printf("c:\n"); nmod_poly_print(c); flint_printf("\n");
                 flint_printf("e[j]:\n"); nmod_poly_print(e + j); flint_printf("\n");
-                abort();
+                flint_abort();
             }
         }
 

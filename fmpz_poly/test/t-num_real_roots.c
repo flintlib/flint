@@ -34,7 +34,7 @@ int main()
             printf("ERROR:\n");
             flint_printf("got k in wrong range k = %wd\n", k);
             printf("p = "); fmpz_poly_print(p); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(p);
@@ -60,7 +60,7 @@ int main()
             printf("ERROR:\n");
             flint_printf("found k1=%wd and k2=%wd\n", k1, k2);
             printf("p = "); fmpz_poly_print(p); printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(p);

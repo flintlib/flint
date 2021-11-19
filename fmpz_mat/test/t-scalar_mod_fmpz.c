@@ -54,7 +54,7 @@ main(void)
         if (!fmpz_mat_equal(A, Amod))
         {
             flint_printf("FAIL: aliasing!\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

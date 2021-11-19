@@ -74,7 +74,7 @@ main(void)
                 TEMPLATE(B, mat_print_pretty)(mat_aq), flint_printf("\n"),
                 TEMPLATE(B, mat_print_pretty)(res), flint_printf("\n");
             
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(B, mat_clear)(mat_frob);

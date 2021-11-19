@@ -191,7 +191,7 @@ main(void)
             fmpz_print(mod);
             flint_printf("\n\n");
 
-            abort();
+            flint_abort();
         }
 
         _perm_randtest(perm, 2 * m, state);
@@ -248,7 +248,7 @@ main(void)
             flint_printf("Modulus: ");
             fmpz_print(mod);
 
-            abort();
+            flint_abort();
         }
 
         _perm_clear(perm);

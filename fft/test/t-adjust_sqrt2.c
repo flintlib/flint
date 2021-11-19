@@ -95,7 +95,7 @@ main(void)
                         flint_printf("n = %wd, w = %wd, c = %wd\n", n, w, c);
                         gmp_printf("want %Zx\n\n", m2a);
                         gmp_printf("got  %Zx\n", m2b);
-                        abort();
+                        flint_abort();
                     }
                     
                     flint_free(temp);

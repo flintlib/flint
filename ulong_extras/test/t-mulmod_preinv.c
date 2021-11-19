@@ -50,7 +50,7 @@ main(void)
             flint_printf("a = %wu, b = %wu, d = %wu, dinv = %wu\n", a, b, d,
                          dinv);
             flint_printf("q = %wu, r1 = %wu, r2 = %wu\n", q, r1, r2);
-            abort();
+            flint_abort();
         }
     }
 

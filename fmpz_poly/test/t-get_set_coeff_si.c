@@ -49,7 +49,7 @@ main(void)
             {
                 flint_printf("FAIL: n1 = %wd, n2 = %wd, coeff = %wd, length = %wd\n",
                        n1, n2, coeff, len);
-                abort();
+                flint_abort();
             }
         }
 

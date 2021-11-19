@@ -79,7 +79,7 @@ main(void)
                     flint_printf("FAIL:\n");
                     flint_printf("n = %wd, trunc = %wd\n", n, trunc);
                     flint_printf("Error in entry %wd\n", i);
-                    abort();
+                    flint_abort();
                 }
             }
 

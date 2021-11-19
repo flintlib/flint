@@ -71,7 +71,7 @@ int main(void)
             if (unity_zpq_equal(f, h2) == 0)
             {
                 flint_printf("FAIL\n");
-                abort();
+                flint_abort();
             }
 
             unity_zpq_clear(h1);

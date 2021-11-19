@@ -116,7 +116,7 @@ int main(void)
             flint_printf("p(%wd) does not agree with power series\n", i);
             flint_printf("Computed p(%wd): ", i); fmpz_print(p); flint_printf("\n");
             flint_printf("Expected: "); fmpz_print(v + i); flint_printf("\n");
-            abort();
+            flint_abort();
         }
     }
 
@@ -133,7 +133,7 @@ int main(void)
                 testdata[i][0]);
             flint_printf("Computed: %wu\n", fmpz_fdiv_ui(p, 1000000000));
             flint_printf("Expected: %wu\n", testdata[i][1]);
-            abort();
+            flint_abort();
         }
     }
 

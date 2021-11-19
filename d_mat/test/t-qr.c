@@ -66,7 +66,7 @@ main(void)
             d_mat_print(R);
             flint_printf("B:\n");
             d_mat_print(B);
-            abort();
+            flint_abort();
         }
 
         for (j = 0; j < n; j++)
@@ -83,7 +83,7 @@ main(void)
                 d_mat_print(Q);
                 flint_printf("%g\n", norm);
                 flint_printf("%d\n", j);
-                abort();
+                flint_abort();
             }
             for (k = j + 1; k < n; k++)
             {
@@ -101,7 +101,7 @@ main(void)
                     d_mat_print(Q);
                     flint_printf("%g\n", dot);
                     flint_printf("%d %d\n", j, k);
-                    abort();
+                    flint_abort();
                 }
             }
         }

@@ -59,7 +59,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("mod=%wu, n=%wd, npoints=%wd\n\n", mod, n, npoints);
             flint_printf("P: "); nmod_poly_print(P); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(P);

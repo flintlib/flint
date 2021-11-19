@@ -49,7 +49,7 @@ main(void)
             flint_printf("FAIL\n");
             nmod_poly_print(f); flint_printf("\n");
             nmod_poly_print(g); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(f);
@@ -85,7 +85,7 @@ main(void)
             nmod_poly_print(g); flint_printf("\n");
             nmod_poly_print(h1); flint_printf("\n");
             nmod_poly_print(h2); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(f);

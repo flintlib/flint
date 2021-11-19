@@ -49,7 +49,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             printf("%g\n", fabs(res1 + res2 - res3));
-            abort();
+            flint_abort();
         }
 
         _d_vec_clear(a);

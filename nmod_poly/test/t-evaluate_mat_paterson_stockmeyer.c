@@ -61,7 +61,7 @@ main(void)
             nmod_mat_print_pretty(A);
             nmod_mat_print_pretty(B);
             flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -104,7 +104,7 @@ main(void)
             nmod_mat_print_pretty(C);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);

@@ -70,7 +70,7 @@ main(void)
             flint_printf("f = "), fmpq_poly_print(f), flint_printf("\n\n");
             flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_resultant(y, g, h);
@@ -81,7 +81,7 @@ main(void)
             flint_printf("h = "), fmpq_poly_print(f), flint_printf("\n\n");
             flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
             flint_printf("z = "), fmpq_print(y), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_resultant(z, p, h);
@@ -92,7 +92,7 @@ main(void)
             flint_printf("p = "), fmpq_poly_print(f), flint_printf("\n\n");
             flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         if (fmpq_is_zero(z)) 
@@ -129,7 +129,7 @@ main(void)
             flint_printf("nbits = %wu\n\n", nbits);
             flint_printf("divisor found = "), fmpq_print(z), flint_printf("\n\n");
             flint_printf("correct result = "), fmpq_print(y), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
         
         fmpq_poly_clear(f);

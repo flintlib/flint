@@ -64,7 +64,7 @@ main(void)
             for (j = 0; j < npoints; j++)
                 TEMPLATE(T, print_pretty)(z + j, ctx), flint_printf(" ");
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear)(P, ctx);

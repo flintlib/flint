@@ -58,7 +58,7 @@ main(void)
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
             fmpz_poly_print(f); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(f);
@@ -100,7 +100,7 @@ main(void)
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
             fmpz_poly_print(f); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(f);
@@ -144,7 +144,7 @@ main(void)
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
             fmpz_poly_print(f); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(f);

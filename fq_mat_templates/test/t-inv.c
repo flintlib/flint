@@ -63,7 +63,7 @@ main(void)
             flint_printf("A * A^-1:\n");
             TEMPLATE(T, mat_print_pretty)(C, ctx);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         /* Test aliasing */
@@ -76,7 +76,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("aliasing failed!\n");
             TEMPLATE(T, mat_print_pretty)(C, ctx);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear)(A, ctx);
@@ -109,7 +109,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("singular matrix reported as invertible\n");
-            abort();
+            flint_abort();
         }
 
         /* Aliasing */
@@ -118,7 +118,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("singular matrix reported as invertible\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear)(A, ctx);

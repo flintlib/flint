@@ -66,7 +66,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(d);
@@ -118,7 +118,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(d);
@@ -170,7 +170,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(d);
@@ -222,7 +222,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(d);
@@ -271,7 +271,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("t1 = "), fmpz_print(t1), flint_printf("\n");
             flint_printf("t2 = "), fmpz_print(t2), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(d);

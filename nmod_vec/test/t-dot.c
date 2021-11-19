@@ -68,7 +68,7 @@ main(void)
             flint_printf("m = %wu\n", m);
             flint_printf("len = %wd\n", len);
             flint_printf("limbs1 = %d\n", limbs1);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(s);

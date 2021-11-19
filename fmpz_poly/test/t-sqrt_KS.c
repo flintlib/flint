@@ -51,7 +51,7 @@ main(void)
             flint_printf("square1 = %d, square2 = %d\n\n", square1, square2);
             flint_printf("a: "); fmpz_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); fmpz_poly_print(b); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(a);
@@ -79,7 +79,7 @@ main(void)
             flint_printf("a: "); fmpz_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); fmpz_poly_print(b); flint_printf("\n\n");
             flint_printf("c: "); fmpz_poly_print(c); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         if (square == 1 && !fmpz_poly_is_zero(c) &&
@@ -89,7 +89,7 @@ main(void)
             flint_printf("a: "); fmpz_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); fmpz_poly_print(b); flint_printf("\n\n");
             flint_printf("c: "); fmpz_poly_print(c); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         if (square == 1)
@@ -101,7 +101,7 @@ main(void)
             flint_printf("a: "); fmpz_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); fmpz_poly_print(b); flint_printf("\n\n");
             flint_printf("c: "); fmpz_poly_print(c); flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(a);
@@ -142,7 +142,7 @@ main(void)
                 flint_printf("a: "); fmpz_poly_print(a); flint_printf("\n\n");
                 flint_printf("b: "); fmpz_poly_print(b); flint_printf("\n\n");
                 flint_printf("c: "); fmpz_poly_print(c); flint_printf("\n\n");
-                abort();
+                flint_abort();
             }
         }
 

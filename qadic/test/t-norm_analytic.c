@@ -78,7 +78,7 @@ main(void)
                 flint_printf("sigma^%wd = ", j), qadic_print_pretty(c, ctx), flint_printf("\n");
             }
             flint_printf("ans = %d\n", ans);
-            abort();
+            flint_abort();
         }
 
         qadic_clear(a);

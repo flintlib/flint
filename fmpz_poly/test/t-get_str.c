@@ -40,7 +40,7 @@ main(void)
         flint_printf("FAIL:\n");
         flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
         flint_printf("str(a) = {%s}\n", str);
-        abort();
+        flint_abort();
     }
     flint_free(str);
 
@@ -52,7 +52,7 @@ main(void)
         flint_printf("FAIL:\n");
         flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
         flint_printf("str(a) = {%s}\n", str);
-        abort();
+        flint_abort();
     }
     flint_free(str);
 
@@ -64,7 +64,7 @@ main(void)
         flint_printf("FAIL:\n");
         flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
         flint_printf("str(a) = {%s}\n", str);
-        abort();
+        flint_abort();
     }
     flint_free(str);
     fmpz_poly_clear(a);

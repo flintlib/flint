@@ -57,7 +57,7 @@ main(void)
         {
             flint_printf("FAIL (1):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -99,7 +99,7 @@ main(void)
         {
             flint_printf("FAIL (2):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

@@ -61,7 +61,7 @@ check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
             if (!TEMPLATE(T, is_zero) (TEMPLATE(T, mat_entry) (LU, i, j), ctx))
             {
                 printf("FAIL: wrong shape!\n");
-                abort();
+                flint_abort();
             }
         }
     }
@@ -92,7 +92,7 @@ check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
         TEMPLATE(T, mat_print_pretty) (LU, ctx);
         printf("B:\n");
         TEMPLATE(T, mat_print_pretty) (B, ctx);
-        abort();
+        flint_abort();
     }
 
     TEMPLATE(T, mat_clear) (B, ctx);
@@ -147,7 +147,7 @@ main(void)
                 TEMPLATE(T, mat_print_pretty) (A, ctx);
                 printf("LU:");
                 TEMPLATE(T, mat_print_pretty) (LU, ctx);
-                abort();
+                flint_abort();
             }
 
             check(P, LU, A, rank, ctx);

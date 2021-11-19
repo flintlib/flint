@@ -51,7 +51,7 @@ main(void)
             if (!fmpz_mat_is_zero(B))
             {
                 flint_printf("FAIL!\n");
-                abort();
+                flint_abort();
             }
         }
         else
@@ -61,7 +61,7 @@ main(void)
             if (!fmpz_mat_equal(C, A))
             {
                 flint_printf("FAIL!\n");
-                abort();
+                flint_abort();
             }
         }
 

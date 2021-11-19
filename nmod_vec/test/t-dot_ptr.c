@@ -63,7 +63,7 @@ main(void)
             flint_printf("m = %wu\n", m);
             flint_printf("len = %wd\n", len);
             flint_printf("limbs1 = %d\n", limbs1);
-            abort();
+            flint_abort();
         }
 
         _nmod_vec_clear(x);

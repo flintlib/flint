@@ -51,7 +51,7 @@ main(void)
             gmp_printf("b = %Zd\n", b);
             flint_printf("base = %d\n", base);
             flint_printf("r1 = %wu\n, r2 = %wu\n", (ulong) r1, (ulong) r2);
-            abort();
+            flint_abort();
         }
 
         mpz_clear(b);

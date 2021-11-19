@@ -45,7 +45,7 @@ void check(fmpz_t n)
         fmpz_print(m);
         flint_printf("\n");
 
-        abort();
+        flint_abort();
     }
 
     for (i = 0; i < factor->num; i++)
@@ -62,7 +62,7 @@ void check(fmpz_t n)
             fmpz_factor_print(factor);
             flint_printf("\n");
 
-            abort();
+            flint_abort();
         }
     }
 
@@ -81,7 +81,7 @@ void check(fmpz_t n)
                 fmpz_factor_print(factor);
                 flint_printf("\n");
 
-                abort();
+                flint_abort();
             }
         }
 
@@ -221,7 +221,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
-          abort();
+          flint_abort();
        }
 
        fmpz_factor_clear(factors);
@@ -244,7 +244,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
-          abort();
+          flint_abort();
        }
 
        fmpz_factor_clear(factors);
@@ -267,7 +267,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
-          abort();
+          flint_abort();
        }
 
        fmpz_factor_clear(factors);
@@ -287,7 +287,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
-          abort();
+          flint_abort();
        }
 
        fmpz_factor_clear(factors);
@@ -308,7 +308,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
-          abort();
+          flint_abort();
        }
        fmpz_factor_clear(factors);
     }
@@ -331,7 +331,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
-          abort();
+          flint_abort();
        }
        fmpz_factor_clear(factors);
     }
@@ -356,7 +356,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("%ld factors found\n", factors->num);
-            abort();
+            flint_abort();
         }
         fmpz_factor_clear(factors);
     }

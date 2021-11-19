@@ -48,7 +48,7 @@ main(void)
             flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
             nmod_poly_print(r1), flint_printf("\n\n");
             nmod_poly_print(a), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -78,7 +78,7 @@ main(void)
             flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
             nmod_poly_print(r1), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -109,7 +109,7 @@ main(void)
             flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
             nmod_poly_print(r1), flint_printf("\n\n");
             nmod_poly_print(r2), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);

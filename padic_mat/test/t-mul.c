@@ -63,7 +63,7 @@ main(void)
             flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
             flint_printf("d = "), padic_mat_print(d, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_mat_clear(a);
@@ -104,7 +104,7 @@ main(void)
             flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
             flint_printf("d = "), padic_mat_print(d, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_mat_clear(a);
@@ -142,7 +142,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
             flint_printf("d = "), padic_mat_print(d, ctx), flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         padic_mat_clear(a);
@@ -182,7 +182,7 @@ main(void)
             flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n");
             flint_printf("N = %wd\n", N);
-            abort();
+            flint_abort();
         }
 
         padic_mat_clear(a);
@@ -246,7 +246,7 @@ main(void)
                 flint_printf("e = "), padic_mat_print_pretty(e, ctx), flint_printf("\n");
                 flint_printf("t1 = "), padic_mat_print_pretty(t1, ctx), flint_printf("\n");
                 flint_printf("t2 = "), padic_mat_print_pretty(t2, ctx), flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             padic_mat_clear(d);
@@ -322,7 +322,7 @@ main(void)
                 flint_printf("c = "), padic_mat_print_pretty(c, ctx), flint_printf("\n");
                 flint_printf("lhs = "), padic_mat_print_pretty(lhs, ctx), flint_printf("\n");
                 flint_printf("rhs = "), padic_mat_print_pretty(rhs, ctx), flint_printf("\n");
-                abort();
+                flint_abort();
             }
 
             padic_mat_clear(lhs);

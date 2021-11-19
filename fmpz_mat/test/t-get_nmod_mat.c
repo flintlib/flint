@@ -58,7 +58,7 @@ main(void)
         if (!nmod_mat_equal(M, M2))
         {
             flint_printf("FAIL!\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

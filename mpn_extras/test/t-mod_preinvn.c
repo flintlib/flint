@@ -80,7 +80,7 @@ int main(void)
           gmp_printf("%Zd\n", r1);
           flint_printf("size = %wd\n", size);
           flint_printf("size2 = %wd\n", size2);
-          abort();
+          flint_abort();
        }
 
        flint_free(dinv);
@@ -125,7 +125,7 @@ int main(void)
           gmp_printf("%Zd\n", r1);
           flint_printf("size = %wd\n", size);
           flint_printf("size2 = %wd\n", size2);
-          abort();
+          flint_abort();
        }
 
        flint_free(dinv);

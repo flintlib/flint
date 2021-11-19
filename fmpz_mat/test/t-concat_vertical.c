@@ -56,7 +56,7 @@ int main(void)
         if (!(fmpz_mat_equal(window1, A) && fmpz_mat_equal(window2, B)))
         {
             flint_printf("FAIL: results not equal\n");
-            abort();
+            flint_abort();
         }
 
         

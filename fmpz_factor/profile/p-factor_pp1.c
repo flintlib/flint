@@ -34,14 +34,14 @@ int main(void)
       if (!fmpz_read(n))
       {
          flint_printf("Read failed\n");
-         abort();
+         flint_abort();
       }
    
       flint_printf("Enter B1: "); fflush(stdout);
       if (!flint_scanf("%wu", &B1))
       {
          flint_printf("Read failed\n");
-         abort();
+         flint_abort();
       }
     
       do

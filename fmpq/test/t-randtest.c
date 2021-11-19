@@ -42,7 +42,7 @@ main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("x: "); fmpq_print(x); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpq_clear(x);

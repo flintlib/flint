@@ -97,7 +97,7 @@ for (l = 0; l < len; l++)
         flint_printf("z = "), padic_print(z, ctx), flint_printf("\n");
         flint_printf("p = %wd\n", *p), flint_printf("\n");
         flint_printf("N = %wd\n", n), flint_printf("\n");
-        abort();
+        flint_abort();
     }
 
     cputime = (long double) (c1 - c0) / (long double) CLOCKS_PER_SEC;

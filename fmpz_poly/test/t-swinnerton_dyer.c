@@ -46,7 +46,7 @@ int main()
         if (r != known_values[n])
         {
             flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(S);

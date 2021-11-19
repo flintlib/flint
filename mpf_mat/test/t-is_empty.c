@@ -38,7 +38,7 @@ main(void)
         if (mpf_mat_is_empty(A) != (rows == 0 || cols == 0))
         {
             flint_printf("FAIL!\n");
-            abort();
+            flint_abort();
         }
         mpf_mat_clear(A);
     }

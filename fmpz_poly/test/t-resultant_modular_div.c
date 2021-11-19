@@ -58,7 +58,7 @@ main(void)
             flint_printf("divr = "), fmpz_print(div), flint_printf("\n\n");
             flint_printf("bitsbound = %wd", nbits), flint_printf("\n\n");
 
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(f);
@@ -117,7 +117,7 @@ main(void)
             flint_printf("result should be = "), fmpz_print(a), flint_printf("\n\n");
             flint_printf("res(p, h)/div    = "), fmpz_print(d), flint_printf("\n\n");
             flint_printf("bitsbound for result = %wd", nbits), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

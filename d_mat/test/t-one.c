@@ -47,12 +47,12 @@ main(void)
                 if (i == j && d_mat_entry(A, i, j) != 1)
                 {
                     flint_printf("FAIL: entry not one\n");
-                    abort();
+                    flint_abort();
                 }
                 else if (i != j && d_mat_entry(A, i, j) != 0)
                 {
                     flint_printf("FAIL: entry not zero\n");
-                    abort();
+                    flint_abort();
                 }
             }
         }

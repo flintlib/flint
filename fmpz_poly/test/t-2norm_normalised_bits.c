@@ -59,7 +59,7 @@ main(void)
             fmpz_print(b), flint_printf("\n\n");
             fmpz_print(c), flint_printf("\n\n");
             flint_printf("b1 = %wd, b2 = %wd\n", b1, b2);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

@@ -63,7 +63,7 @@ main(void)
                 flint_printf("fmpq_mat_rref_classical: wrong rank!\n");
                 fmpq_mat_print(A);
                 flint_printf("\nrank: %wd computed: %wd\n", r, rank);
-                abort();
+                flint_abort();
             }
 
             rank = fmpq_mat_rref_fraction_free(C, A);
@@ -71,7 +71,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("fmpq_mat_rref_fraction_free: wrong rank!\n");
-                abort();
+                flint_abort();
             }
 
             if (!fmpq_mat_equal(B, C))
@@ -84,7 +84,7 @@ main(void)
                 fmpq_mat_print(B);
                 flint_printf("\nC:\n");
                 fmpq_mat_print(C);
-                abort();
+                flint_abort();
             }
 
             fmpz_mat_clear(M);

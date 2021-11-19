@@ -52,7 +52,7 @@ int main(void)
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("ERROR\n");
-            abort();
+            flint_abort();
         }
 
         flint_printf("n = %wd: %.10lf s", n, (((double)timer->wall)/iters)/1000);
@@ -68,7 +68,7 @@ int main(void)
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("ERROR\n");
-            abort();
+            flint_abort();
         }
 
         flint_printf("  unchecked %.10lf s\n", n, (((double)timer->wall)/iters)/1000);
@@ -110,7 +110,7 @@ int main(void)
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("ERROR\n");
-            abort();
+            flint_abort();
         }
 
         flint_printf("n = %wd: %.10lf s", n, (((double)timer->wall)/iters)/1000);
@@ -126,7 +126,7 @@ int main(void)
         if (!fmpz_mpoly_equal(h, k, ctx))
         {
             printf("ERROR\n");
-            abort();
+            flint_abort();
         }
 
         flint_printf("  unchecked %.10lf s\n", n, (((double)timer->wall)/iters)/1000);

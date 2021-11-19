@@ -21,7 +21,7 @@ void check(mp_limb_t n, int mu1, int mu2)
     {
         flint_printf("FAIL:\n");
         flint_printf("mu(%wu): %d != %d\n", n, mu1, mu2); 
-        abort();
+        flint_abort();
     }
 }
 
@@ -73,7 +73,7 @@ int main(void)
     {
         flint_printf("FAIL:\n");
         flint_printf("expected mu(k), k <= 10000 to sum to %d (got %d)\n", -23, s);
-        abort();
+        flint_abort();
     }
 
     FLINT_TEST_CLEANUP(state);

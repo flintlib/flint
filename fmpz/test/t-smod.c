@@ -123,7 +123,7 @@ main(void)
             flint_printf("d = ");
             fmpz_print(d);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -166,7 +166,7 @@ main(void)
             flint_printf("d = ");
             fmpz_print(d);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -209,7 +209,7 @@ main(void)
             flint_printf("d = ");
             fmpz_print(d);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(a);

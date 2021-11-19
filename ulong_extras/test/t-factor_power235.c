@@ -40,7 +40,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("factor = %wu, exp = %wu\n", factor, exp); 
-         abort();
+         flint_abort();
       }
    }
    
@@ -59,7 +59,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("factor = %wu, exp = %wu\n", factor, exp); 
-         abort();
+         flint_abort();
       }
    }
    
@@ -78,7 +78,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("factor = %wu, exp = %wu\n", factor, exp); 
-         abort();
+         flint_abort();
       }
    }
    
@@ -96,7 +96,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n1 = %wu, exp = %wu\n", n1, exp); 
-         abort();
+         flint_abort();
       }
    }
    

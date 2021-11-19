@@ -67,7 +67,7 @@ main(void)
             flint_printf("AX:\n");
             TEMPLATE(T, mat_print_pretty)(AX, ctx);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear)(A, ctx);
@@ -107,7 +107,7 @@ main(void)
             TEMPLATE(T, mat_print_pretty)(A, ctx);
             TEMPLATE(T, mat_print_pretty)(X, ctx);
             TEMPLATE(T, mat_print_pretty)(B, ctx);
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear)(A, ctx);

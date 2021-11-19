@@ -56,7 +56,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("aliasing failed\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);
@@ -95,7 +95,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("n ( a + b ) test failed\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);
@@ -143,7 +143,7 @@ main(void)
             flint_printf("\n");
             mpf_out_str(stdout, 10, 0, n);
             flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         _mpf_vec_clear(a, len);

@@ -42,7 +42,7 @@ main(void)
             flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv);
             flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
             flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            abort();
+            flint_abort();
         }
     }
 

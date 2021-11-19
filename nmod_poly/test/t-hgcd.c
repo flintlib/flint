@@ -119,7 +119,7 @@ main(void)
             flint_printf("d  = "), nmod_poly_print(d), flint_printf("\n\n");
             flint_printf("c1 = "), nmod_poly_print(c1), flint_printf("\n\n");
             flint_printf("d1 = "), nmod_poly_print(d1), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);

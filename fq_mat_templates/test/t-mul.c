@@ -59,7 +59,7 @@ main(void)
             printf("C:\n");
             TEMPLATE(T, mat_print) (C, ctx);
             printf("\n");
-            abort();
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear) (A, ctx);
@@ -102,7 +102,7 @@ main(void)
             printf("C:\n");
             TEMPLATE(T, mat_print) (C, ctx);
             printf("\n");
-            abort();
+            flint_abort();
         }
 
         if (n == m)

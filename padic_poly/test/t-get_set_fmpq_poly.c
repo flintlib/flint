@@ -58,7 +58,7 @@ main(void)
             flint_printf("a = "), padic_poly_debug(a), flint_printf("\n\n");
             flint_printf("b = "), padic_poly_debug(b), flint_printf("\n\n");
             flint_printf("c = "), fmpq_poly_print(c), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         padic_poly_clear(a);

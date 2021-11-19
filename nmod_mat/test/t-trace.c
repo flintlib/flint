@@ -61,7 +61,7 @@ main(void)
             nmod_mat_print_pretty(BA), flint_printf("\n");
             flint_printf("tr(AB): %wu\n", trab);
             flint_printf("tr(BA): %wu\n", trba);
-            abort();
+            flint_abort();
         }
 
         nmod_mat_clear(A);

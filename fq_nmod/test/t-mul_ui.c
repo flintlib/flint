@@ -50,7 +50,7 @@ main(void)
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
 	    flint_printf("x = %wu\n",x);
-            abort();
+            flint_abort();
         }
 
         fq_nmod_clear(a, ctx);
@@ -86,7 +86,7 @@ main(void)
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), fq_nmod_print_pretty(c, ctx), flint_printf("\n");
 	    flint_printf("x = %wu\n",x);
-            abort();
+            flint_abort();
         }
 
         fq_nmod_clear(a, ctx);

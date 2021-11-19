@@ -56,7 +56,7 @@ int main(void)
          {
             flint_printf("FAIL\n");
             flint_printf("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
-            abort();
+            flint_abort();
          }
       }
 
@@ -96,7 +96,7 @@ int main(void)
          {
             flint_printf("FAIL:\n");
             flint_printf("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
-            abort();
+            flint_abort();
          }
       }
 

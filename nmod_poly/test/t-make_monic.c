@@ -52,7 +52,7 @@ main(void)
                 l, a->coeffs[a->length - 1], a->mod.n);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -84,7 +84,7 @@ main(void)
             flint_printf("l = %wu, a->lead = %wd, n = %wu\n", 
                 l, a->coeffs[a->length - 1], a->mod.n);
             nmod_poly_print(a), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         nmod_poly_clear(a);
