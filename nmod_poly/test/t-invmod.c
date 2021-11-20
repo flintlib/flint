@@ -59,6 +59,7 @@ main(void)
             nmod_poly_print(c), printf("\n\n");
             printf("ans1 = %d\n\n", ans1);
             printf("ans2 = %d\n\n", ans2);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -97,6 +98,7 @@ main(void)
             nmod_poly_print(c), printf("\n\n");
             printf("ans1 = %d\n\n", ans1);
             printf("ans2 = %d\n\n", ans2);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -143,6 +145,7 @@ main(void)
             nmod_poly_print(t), printf("\n\n");
             nmod_poly_print(u), printf("\n\n");
             printf("ans = %d\n\n", ans);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -191,6 +194,7 @@ main(void)
             nmod_poly_print(f), printf("\n\n");
             nmod_poly_print(u), printf("\n\n");
             printf("ans = %d\n\n", ans);
+            fflush(stdout);
             flint_abort();
         }
 

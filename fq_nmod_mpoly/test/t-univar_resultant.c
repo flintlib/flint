@@ -53,6 +53,7 @@ void test_resultant(
         fq_nmod_mpoly_print_pretty(R, NULL, ctx);
         flint_printf("\n");
         flint_printf("r: %wu\n", r);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -94,6 +95,7 @@ main(void)
         if (!fq_nmod_mpoly_equal(s, t, ctx))
         {
             flint_printf("FAIL: check linear discriminant\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -109,6 +111,7 @@ main(void)
         if (!fq_nmod_mpoly_equal(s, t, ctx))
         {
             flint_printf("FAIL: check quadratic discriminant\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -126,6 +129,7 @@ main(void)
         if (!fq_nmod_mpoly_equal(s, t, ctx))
         {
             flint_printf("FAIL: check cubic discriminant\n");
+            fflush(stdout);
             flint_abort();
         }
 

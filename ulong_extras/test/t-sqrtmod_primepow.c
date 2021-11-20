@@ -76,6 +76,7 @@ int main(void)
             if (i != num)
                 flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, pow);
 
+            fflush(stdout);
             flint_abort();
         }
 
@@ -138,6 +139,7 @@ int main(void)
             if (i != num)
                 flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, pow);
 
+            fflush(stdout);
             flint_abort();
         }
 
@@ -166,6 +168,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("%wu^2 is not %wu mod %wu\n", sqrt[0], a, pow);
+                fflush(stdout);
                 flint_abort();
             }
             
@@ -188,6 +191,7 @@ int main(void)
             flint_printf("a = %wu\n", a);
             flint_printf("b = %wu\n", b);
 
+            fflush(stdout);
             flint_abort();
         }
 

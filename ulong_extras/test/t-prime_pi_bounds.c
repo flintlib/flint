@@ -28,6 +28,7 @@ void check(mp_limb_t n, ulong ans)
 
     flint_printf("FAIL:\n");
     flint_printf("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi);
+    fflush(stdout);
     flint_abort();
 }
 

@@ -50,6 +50,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             gmp_printf("c = %Qd, d = %Qd\n", c, d);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -83,6 +84,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             gmp_printf("c = %Qd, d = %Qd\n", c, d);
+            fflush(stdout);
             flint_abort();
         }
 

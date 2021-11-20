@@ -65,6 +65,7 @@ int main(void)
             fmpz_mat_print(B); flint_printf("\n\n");
             fmpz_mat_print(C); flint_printf("\n\n");
             fmpz_mat_print(D); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

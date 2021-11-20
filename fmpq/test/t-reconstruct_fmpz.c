@@ -66,6 +66,7 @@ main(void)
             fmpq_print(y);
             flint_printf("\nfmpq_reconstruct_fmpz return value = %d", result);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

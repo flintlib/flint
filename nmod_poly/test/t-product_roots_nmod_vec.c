@@ -62,6 +62,7 @@ main(void)
             flint_printf("FAIL (P != Q):\n");
             nmod_poly_print(P), flint_printf("\n\n");
             nmod_poly_print(Q), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -69,6 +69,7 @@ main(void)
                     flint_printf("t: "); fq_poly_print_pretty(t, "x", ctx); flint_printf("\n");
                     flint_printf("g: "); fq_poly_print_pretty(g, "x", ctx); flint_printf("\n");
                     flint_printf("s*a+t*b: "); fq_poly_print_pretty(t1, "x", ctx); flint_printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }

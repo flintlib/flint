@@ -50,6 +50,7 @@ main(void)
             flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
             flint_printf("sum = %wu, eval = %wu\n", sum, eval);
             nmod_poly_print(a), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -84,6 +85,7 @@ main(void)
             flint_printf("eval1 = %wu, eval2 = %wu\n", eval1, eval2);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

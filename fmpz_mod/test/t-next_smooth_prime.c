@@ -38,6 +38,7 @@ main(void)
         {
             printf("FAIL\nprimality test failed p = ");
             fmpz_print(p);
+            fflush(stdout);
             flint_abort();
         }
     }

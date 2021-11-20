@@ -66,6 +66,7 @@ main(void)
             padic_poly_print(a, ctx), flint_printf("\n\n");
             padic_poly_print(b, ctx), flint_printf("\n\n");
             padic_poly_print(c, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -109,6 +110,7 @@ main(void)
             padic_poly_print(a, ctx), flint_printf("\n\n");
             fmpq_poly_print(b), flint_printf("\n\n");
             fmpq_poly_print(c), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -38,6 +38,7 @@ main(void)
         if (!fmpz_mat_is_zero(A))
         {
             flint_printf("FAIL!\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -47,6 +48,7 @@ main(void)
             if (fmpz_mat_is_zero(A))
             {
                 flint_printf("FAIL!\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

@@ -52,6 +52,7 @@ main(void)
             flint_printf("square1 = %d, square2 = %d\n\n", square1, square2);
             flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -81,6 +82,7 @@ main(void)
             flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
             flint_printf("c: "); nmod_poly_print(c); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +93,7 @@ main(void)
             flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
             flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
             flint_printf("c: "); nmod_poly_print(c); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -130,6 +133,7 @@ main(void)
                 flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
                 flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
                 flint_printf("c: "); nmod_poly_print(c); flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

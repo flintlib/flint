@@ -72,6 +72,7 @@ main(void)
                 flint_printf("C:\n");
                 fmpz_mat_print(C);
                 flint_printf("i,j: %d,%d\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 

@@ -66,6 +66,7 @@ int main()
             flint_printf("\nExpected: ");
             fmpq_poly_print_pretty(P, "x");
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -94,6 +94,7 @@ main(void)
             {
                 flint_printf("FAIL: results not equal\n");
                 flint_printf("m: %wd, k: %wd, n: %wd, mod: %wu\n", m, k, n, modulus);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -101,6 +102,7 @@ main(void)
         else
         {
             flint_printf("FAIL: blas should have worked\n");
+            fflush(stdout);
             flint_abort();
         }
 #endif

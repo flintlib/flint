@@ -48,6 +48,7 @@ main(void)
                 flint_printf("\n");
                 fmpz_print(y);
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

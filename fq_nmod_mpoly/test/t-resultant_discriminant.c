@@ -39,12 +39,14 @@ main(void)
         if (!fq_nmod_mpoly_discriminant(d, f, 0, ctx))
         {
             flint_printf("FAIL: could not compute quadratic discriminant\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (!fq_nmod_mpoly_equal(d, d1, ctx))
         {
             flint_printf("FAIL: Check quadratic polynomial\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +93,7 @@ main(void)
         {
             flint_printf("FAIL: Check univariate resultant \n");
             flint_printf("i: %wd\n",i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -154,6 +157,7 @@ main(void)
             {
                 flint_printf("FAIL: Check res(a*b,c) = res(a,c)*res(b,c)\n");
                 flint_printf("i: %wd  j: %wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -229,6 +233,7 @@ main(void)
                 flint_printf("res(a, b): "); fq_nmod_mpoly_print_pretty(r, NULL, ctx); flint_printf("\n");
 
                 flint_printf("i: %wd  j: %wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

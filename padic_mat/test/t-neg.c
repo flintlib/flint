@@ -60,6 +60,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -99,6 +100,7 @@ main(void)
             flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
             flint_printf("c = "), padic_mat_print(c, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

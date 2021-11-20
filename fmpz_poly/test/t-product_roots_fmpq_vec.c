@@ -42,6 +42,7 @@ int main()
                     n, fmpz_poly_degree(p));
             printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
             printf("p = "); fmpz_poly_print(p); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -58,6 +59,7 @@ int main()
                 printf(" is not zero");
                 printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
                 printf("p = "); fmpz_poly_print(p); printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

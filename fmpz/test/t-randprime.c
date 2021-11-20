@@ -35,6 +35,7 @@ int main(void)
             {
                 flint_printf("FAIL: not %wu bits\n", bits);
                 fmpz_print(p); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -42,6 +43,7 @@ int main(void)
             {
                 flint_printf("FAIL: not prime, %wu bits\n", bits);
                 fmpz_print(p); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -71,6 +73,7 @@ int main(void)
                 {
                     flint_printf("FAIL: not %wu bits\n", bits);
                     fmpz_print(p+j); flint_printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -78,6 +81,7 @@ int main(void)
                 {
                     flint_printf("FAIL: not prime, %wu bits\n", bits);
                     fmpz_print(p+j); flint_printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -87,6 +91,7 @@ int main(void)
                 flint_printf("FAIL: returned a duplicate\n");
                 fmpz_print(p+0); flint_printf("\n");
                 fmpz_print(p+1); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

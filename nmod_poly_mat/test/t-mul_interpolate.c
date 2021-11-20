@@ -76,6 +76,7 @@ main(void)
                 flint_printf("C:\n");
                 nmod_poly_mat_print(C, "x");
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -127,6 +128,7 @@ main(void)
                 flint_printf("C:\n");
                 nmod_poly_mat_print(C, "x");
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -172,6 +174,7 @@ main(void)
                 flint_printf("C:\n");
                 nmod_poly_mat_print(C, "x");
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

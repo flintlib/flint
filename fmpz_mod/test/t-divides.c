@@ -42,6 +42,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("check 6/3 is 2, 6, or 10 mod 12\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -51,6 +52,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("check 3 does not divide 5 mod 12\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +93,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -106,6 +109,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("aliasing first\ni = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -121,6 +125,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("aliasing second\ni = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

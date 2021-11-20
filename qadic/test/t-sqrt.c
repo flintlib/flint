@@ -73,6 +73,7 @@ int main(void)
                 flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -117,6 +118,7 @@ int main(void)
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("ans1,ans2 = %d,%d\n", ans1, ans2);
             qadic_ctx_print(ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -171,6 +173,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -186,6 +189,7 @@ int main(void)
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
+            fflush(stdout);
             flint_abort();
             }*/
 
@@ -238,6 +242,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -301,6 +306,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -322,6 +328,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -375,6 +382,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -427,6 +435,7 @@ int main(void)
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("ans1,ans2 = %d,%d\n", ans1, ans2);
             qadic_ctx_print(ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -486,6 +495,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -500,6 +510,7 @@ int main(void)
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -557,6 +568,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -618,6 +630,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -632,6 +645,7 @@ int main(void)
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -689,6 +703,7 @@ int main(void)
                 flint_printf("N = %wd\n", N);
                 flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
+                fflush(stdout);
                 flint_abort();
             }
 

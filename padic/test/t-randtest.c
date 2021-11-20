@@ -63,6 +63,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("N = %wd\n", N);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -111,6 +112,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("N = %wd\n", N);
+            fflush(stdout);
             flint_abort();
         }
 

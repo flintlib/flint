@@ -54,6 +54,7 @@ main(void)
                 flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -89,6 +90,7 @@ main(void)
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c1 = "), fq_zech_print_pretty(c1, ctx), flint_printf("\n");
                 flint_printf("c2 = "), fq_zech_print_pretty(c2, ctx), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

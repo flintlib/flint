@@ -58,6 +58,7 @@ main(void)
             if (!fmpz_mpoly_equal(a, d, ctx))
             {
                 flint_printf("FAIL: check mul_monomial against mul_johnson\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -69,6 +70,7 @@ main(void)
                  !fmpz_mpoly_equal(cc, c, ctx))
             {
                 flint_printf("FAIL: check aliasing first input\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -80,6 +82,7 @@ main(void)
                  !fmpz_mpoly_equal(bb, b, ctx))
             {
                 flint_printf("FAIL: check aliasing second input\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -90,6 +93,7 @@ main(void)
             if (!fmpz_mpoly_equal(cc, d, ctx))
             {
                 flint_printf("FAIL: check aliasing both inputs\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

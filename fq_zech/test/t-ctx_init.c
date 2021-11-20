@@ -90,6 +90,7 @@ main(void)
                         flint_printf("RHS: ");
                         fq_nmod_print_pretty(rhs, fq_nmod_ctx);
                         flint_printf("\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                 }

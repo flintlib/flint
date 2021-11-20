@@ -46,6 +46,7 @@ main(void)
             flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

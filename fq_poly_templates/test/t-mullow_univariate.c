@@ -64,6 +64,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("d = "), TEMPLATE(T, poly_print_pretty) (d, "X", ctx),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

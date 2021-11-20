@@ -64,6 +64,7 @@ main(void)
        {
           printf("FAIL\n");
           flint_printf("Set to random integer and compare\ni = %wd\n", i);
+          fflush(stdout);
           flint_abort();
        }
 

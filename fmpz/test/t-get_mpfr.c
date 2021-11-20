@@ -53,6 +53,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("b = "), mpfr_out_str(stdout, 10, 0, b, MPFR_RNDN),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

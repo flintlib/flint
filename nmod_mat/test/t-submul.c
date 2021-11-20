@@ -70,6 +70,7 @@ main(void)
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
             nmod_mat_print_pretty(E);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -84,6 +85,7 @@ main(void)
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
             nmod_mat_print_pretty(E);
+            fflush(stdout);
             flint_abort();
         }
 

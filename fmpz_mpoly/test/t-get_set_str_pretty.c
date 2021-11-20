@@ -49,6 +49,7 @@ main(void)
                 {
                     flint_printf("FAIL\n");
                     flint_printf("check that parsing inverts printing\ni = %wd, len1 = %wd\n", i ,len1);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

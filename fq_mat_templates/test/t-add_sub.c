@@ -54,6 +54,7 @@ main(void)
         if (!TEMPLATE(T, mat_equal) (A, C, ctx))
         {
             printf("FAIL: matrices not equal!\n");
+            fflush(stdout);
             flint_abort();
         }
 

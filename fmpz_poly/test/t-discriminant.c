@@ -66,6 +66,7 @@ main(void)
             flint_printf("disc(g)  = "), fmpz_print(b), flint_printf("\n\n");
             flint_printf("disc(fg) = "), fmpz_print(d), flint_printf("\n\n");
             flint_printf("disc(f)*disc(g)*res(f,g) = "), fmpz_print(c), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -98,6 +99,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
             flint_printf("disc(f)  = "), fmpz_print(a), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -49,6 +49,7 @@ main(void)
             flint_printf("exp = %wu\n", exp);
             _fmpz_vec_print(a, len), flint_printf("\n\n");
             _fmpz_vec_print(b, len), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -79,6 +80,7 @@ main(void)
             flint_printf("e1 = %wu, e2 = %wu\n", e1, e2);
             _fmpz_vec_print(a, len), flint_printf("\n\n");
             _fmpz_vec_print(b, len), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

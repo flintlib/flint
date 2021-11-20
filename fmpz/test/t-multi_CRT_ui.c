@@ -86,6 +86,7 @@ try_again:
         {
             flint_printf("FAIL: check crt output range\n");
             flint_printf("i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -94,6 +95,7 @@ try_again:
         {
             flint_printf("FAIL: check crt modulo product of primes\n");
             flint_printf("i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -103,6 +105,7 @@ try_again:
             {
                 flint_printf("FAIL: check multi_mod_ui output");
                 flint_printf("i = %wd, k = %wd\n", i, k);
+                fflush(stdout);
                 flint_abort();
             }
         }

@@ -60,6 +60,7 @@ main(void)
             flint_printf("FAIL (aliasing a and b):\n");
             flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
             flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -88,6 +89,7 @@ main(void)
             flint_printf("FAIL (aliasing a and c):\n");
             flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
             flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -125,6 +127,7 @@ main(void)
            flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
            flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
+           fflush(stdout);
            flint_abort();
         }
 
@@ -168,6 +171,7 @@ main(void)
            flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
            flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
+           fflush(stdout);
            flint_abort();
         } 
 
@@ -198,6 +202,7 @@ main(void)
         {
             flint_printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
             fmpz_poly_print(d); flint_printf("\n"); 
+            fflush(stdout);
             flint_abort();
         }
 
@@ -226,6 +231,7 @@ main(void)
         {
             flint_printf("FAIL (check special #2):\n");
             fmpz_poly_print(d); flint_printf("\n"); 
+            fflush(stdout);
             flint_abort();
         }
 

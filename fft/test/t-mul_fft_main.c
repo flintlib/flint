@@ -81,6 +81,7 @@ main(void)
                    if (r1[j] != r2[j]) 
                    {
                        flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
+                       fflush(stdout);
                        flint_abort();
                    }
                }

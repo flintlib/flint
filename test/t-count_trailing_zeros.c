@@ -39,6 +39,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n = %wu, count = %u\n", n, count); 
+         fflush(stdout);
          flint_abort();
       }
    }

@@ -72,6 +72,7 @@ main(void)
                 flint_printf("\n");
                 flint_printf("%d\n", prec);
                 flint_printf("%d\n", j);
+                fflush(stdout);
                 flint_abort();
             }
             mpf_clear(norm);
@@ -98,6 +99,7 @@ main(void)
                     mpf_out_str(stdout, 10, 0, dot);
                     flint_printf("\n");
                     flint_printf("%d %d\n", j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

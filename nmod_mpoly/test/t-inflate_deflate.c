@@ -84,6 +84,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check deflate undoes inflate\n"
                                                      "i: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -99,6 +100,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check deflate undoes inflate with aliasing\n"
                                                      "i: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -187,6 +189,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check deflating by deflation leaves trivial deflation\n"
                                                      "i: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

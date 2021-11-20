@@ -112,6 +112,7 @@ main(void)
         }
 
         if (!result)
+            fflush(stdout);
             flint_abort();
 
 

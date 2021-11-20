@@ -63,6 +63,7 @@ main(void)
             flint_printf("rf(x,a): "); fmpz_print(r1); flint_printf("\n\n");
             flint_printf("rf(x+a,b): "); fmpz_print(r2); flint_printf("\n\n");
             flint_printf("rf(x,a+b): "); fmpz_print(r3); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

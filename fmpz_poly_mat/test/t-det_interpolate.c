@@ -57,6 +57,7 @@ main(void)
             flint_printf("\ndet_interpolate(A):\n");
             fmpz_poly_print_pretty(b, "x");
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

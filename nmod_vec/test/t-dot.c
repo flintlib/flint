@@ -68,6 +68,7 @@ main(void)
             flint_printf("m = %wu\n", m);
             flint_printf("len = %wd\n", len);
             flint_printf("limbs1 = %d\n", limbs1);
+            fflush(stdout);
             flint_abort();
         }
 

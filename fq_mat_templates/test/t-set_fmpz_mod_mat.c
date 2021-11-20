@@ -58,6 +58,7 @@ main(void)
         {
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, mat_print)(a, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

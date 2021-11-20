@@ -84,6 +84,7 @@ int main(void)
           gmp_printf("%Zd\n", d);
           gmp_printf("%Zd\n", r1);
           gmp_printf("%Zd\n", r2);
+          fflush(stdout);
           flint_abort();
        }
 

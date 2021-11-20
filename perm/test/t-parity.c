@@ -58,6 +58,7 @@ int main(void)
             flint_printf("ap2 = %d\n", ap2);
             flint_printf("bp2 = %d\n", bp2);
             flint_printf("cp2 = %d\n", cp2);
+            fflush(stdout);
             flint_abort();
         }
 

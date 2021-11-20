@@ -64,6 +64,7 @@ main(void)
             TEMPLATE(T, mat_print_pretty) (C, ctx);
             TEMPLATE(T, mat_print_pretty) (D, ctx);
             TEMPLATE(T, mat_print_pretty) (E, ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -78,6 +79,7 @@ main(void)
             TEMPLATE(T, mat_print_pretty) (C, ctx);
             TEMPLATE(T, mat_print_pretty) (D, ctx);
             TEMPLATE(T, mat_print_pretty) (E, ctx);
+            fflush(stdout);
             flint_abort();
         }
 

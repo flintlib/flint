@@ -75,6 +75,7 @@ main(void)
             fmpq_mat_print(X);
             flint_printf("AX:\n");
             fmpq_mat_print(AX);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -137,6 +138,7 @@ main(void)
             fmpq_mat_print(X);
             flint_printf("AX:\n");
             fmpq_mat_print(AX);
+            fflush(stdout);
             flint_abort();
         }
 

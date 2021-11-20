@@ -64,6 +64,7 @@ main(void)
             fmpq_mat_print(BA), flint_printf("\n");
             flint_printf("tr(AB): "),  fmpq_print(trab),    flint_printf("\n");
             flint_printf("tr(BA): "),  fmpq_print(trba),    flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

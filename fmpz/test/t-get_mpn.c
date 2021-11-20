@@ -68,6 +68,7 @@ int main()
                 printf("\nconverted value : ");
                 fmpz_print(b);
                 printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -109,6 +110,7 @@ int main()
             printf("\nconverted value : ");
             fmpz_print(b);
             printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

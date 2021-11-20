@@ -63,6 +63,7 @@ main(void)
             flint_printf("FAIL:\n");
             gmp_printf("n = %Mu, m = %Mu, e = %Zd, f = %Zd, g = %Zd\n",
                 n, m, e, f, g);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -107,6 +108,7 @@ main(void)
             flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, n = %Mu, m = %Mu, f = %Zd, g = %Zd\n",
                 d, n, m, f, g);
+            fflush(stdout);
             flint_abort();
         }
 

@@ -54,6 +54,7 @@ main(void)
             || TEMPLATE(T, mat_equal) (A, E, ctx))
         {
             printf("FAIL: different dimensions should not be equal\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -63,6 +64,7 @@ main(void)
         if (!TEMPLATE(T, mat_equal) (A, B, ctx))
         {
             printf("FAIL: copied matrices should be equal\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -75,6 +77,7 @@ main(void)
             if (TEMPLATE(T, mat_equal) (A, B, ctx))
             {
                 printf("FAIL: modified matrices should not be equal\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

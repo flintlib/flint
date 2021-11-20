@@ -58,6 +58,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Check get and set are inverse\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +66,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Check limbs are accurate\n");
+            fflush(stdout);
             flint_abort();
         }
 

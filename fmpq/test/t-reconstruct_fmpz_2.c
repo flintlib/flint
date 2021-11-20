@@ -99,6 +99,7 @@ main(void)
             flint_printf("mod = "); fmpz_print(mod); flint_printf("\n");
             flint_printf("res = "); fmpz_print(res); flint_printf("\n");
             flint_printf("y = "); fmpq_print(y); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -179,6 +180,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("check match with naive: i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

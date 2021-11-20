@@ -49,6 +49,7 @@ main(void)
         if (!mpfr_mat_equal(C, A))
         {
             flint_printf("FAIL: aliasing failed\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -80,6 +81,7 @@ main(void)
         if (!mpfr_mat_equal(C, B))
         {
             flint_printf("FAIL: aliasing failed\n");
+            fflush(stdout);
             flint_abort();
         }
 

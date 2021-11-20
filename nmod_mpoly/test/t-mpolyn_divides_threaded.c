@@ -90,6 +90,7 @@ void _divides_check(
     if (divides != ndivides)
     {
         flint_printf("check divisibility i = %wd, j = %wd, %s\n", ii, jj, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -104,6 +105,7 @@ void _divides_check(
     if (!nmod_mpoly_equal(Q, Qcheck, ctx))
     {
         flint_printf("check quotient i = %wd, j = %wd, %s\n", ii, jj, name);
+        fflush(stdout);
         flint_abort();
     }
 

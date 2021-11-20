@@ -58,6 +58,7 @@ main(void)
             nmod_poly_print(q), flint_printf("\n\n");
             nmod_poly_print(r), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
+            fflush(stdout);
             flint_abort();
         }
         
@@ -95,6 +96,7 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             nmod_poly_print(r), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -130,6 +132,7 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             nmod_poly_print(r), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -172,6 +175,7 @@ main(void)
             nmod_poly_print(r0), flint_printf("\n\n");
             nmod_poly_print(r), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
+            fflush(stdout);
             flint_abort();
         }
         

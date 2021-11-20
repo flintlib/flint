@@ -36,6 +36,7 @@ main(void)
     if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
     {
         flint_printf("FAIL: COEFF_MIN");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -43,6 +44,7 @@ main(void)
     if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
     {
         flint_printf("FAIL: COEFF_MIN");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -50,6 +52,7 @@ main(void)
     if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != WORD_MIN)
     {
         flint_printf("FAIL: WORD_MIN");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -57,6 +60,7 @@ main(void)
     if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != WORD_MIN)
     {
         flint_printf("FAIL: WORD_MAX");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -79,6 +83,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("b = %wd, c = %wd\n", b, c);
+            fflush(stdout);
             flint_abort();
         }
 

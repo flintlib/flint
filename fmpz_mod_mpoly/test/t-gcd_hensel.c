@@ -31,6 +31,7 @@ void gcd_check(
     {
         flint_printf("FAIL: check gcd can be computed\n");
         flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -42,6 +43,7 @@ void gcd_check(
         {
             flint_printf("FAIL: check zero gcd\n");
             flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+            fflush(stdout);
             flint_abort();
         }
         goto cleanup;
@@ -51,6 +53,7 @@ void gcd_check(
     {
         flint_printf("FAIL: check gcd is monic\n");
         flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -58,6 +61,7 @@ void gcd_check(
     {
         flint_printf("FAIL: check gcd divisor\n");
         flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -66,6 +70,7 @@ void gcd_check(
     {
         flint_printf("FAIL: check divisibility\n");
         flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -73,6 +78,7 @@ void gcd_check(
     {
         flint_printf("FAIL: check cofactor gcd can be computed\n");
         flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -82,6 +88,7 @@ void gcd_check(
     {
         flint_printf("FAIL: check gcd of cofactors is one\n");
         flint_printf("i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 

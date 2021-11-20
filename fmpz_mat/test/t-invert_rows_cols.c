@@ -54,6 +54,7 @@ main(void)
                     fmpz_mat_print_pretty(A);
                     flint_printf("B:\n");
                     fmpz_mat_print_pretty(B);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

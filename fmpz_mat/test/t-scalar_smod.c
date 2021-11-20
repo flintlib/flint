@@ -65,6 +65,7 @@ main(void)
                  fmpz_print(A->rows[j] + k); flint_printf("\n");
                  fmpz_print(B->rows[j] + k); flint_printf("\n");
                  fmpz_print(P); flint_printf("\n");
+                 fflush(stdout);
                  flint_abort();
               }
            }

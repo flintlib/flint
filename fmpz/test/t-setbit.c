@@ -58,6 +58,7 @@ main(void)
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             gmp_printf("z = %Zd\n", z);
             flint_printf("j = %wd\n", j);
+            fflush(stdout);
             flint_abort();
         }
 

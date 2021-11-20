@@ -83,6 +83,7 @@ main(void)
             fmpz_print(b->coeffs + j - 1), flint_printf("\n\n");
             fmpz_print(bound), flint_printf("\n\n");
             fmpz_print(sum), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -165,6 +166,7 @@ main(void)
             flint_printf("length = %wd, bits = %wd, j = %wd\n", a->length, bits, j - 1);
             fmpz_print(b->coeffs + j - 1), flint_printf("\n\n");
             fmpz_print(bound), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

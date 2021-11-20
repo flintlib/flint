@@ -119,6 +119,7 @@ main(void)
             flint_printf("d  = "), nmod_poly_print(d), flint_printf("\n\n");
             flint_printf("c1 = "), nmod_poly_print(c1), flint_printf("\n\n");
             flint_printf("d1 = "), nmod_poly_print(d1), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -188,6 +189,7 @@ main(void)
             || !nmod_poly_equal(Br, B))
         {
             flint_printf("check reference match\n i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -195,6 +197,7 @@ main(void)
             && nmod_poly_degree(a) > 2*nmod_poly_degree(B)))
         {
             flint_printf("check degrees\n i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -208,6 +211,7 @@ main(void)
         if (!nmod_poly_is_one(t))
         {
             flint_printf("check sign of determinant\n i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

@@ -59,6 +59,7 @@ main(void)
             flint_printf("Mono -> Dual\n"),
                 TEMPLATE(B, mat_print_pretty)(m2d), flint_printf("\nDual -> Mono\n"),
                 TEMPLATE(B, mat_print_pretty)(d2m), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

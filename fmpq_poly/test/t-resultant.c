@@ -57,6 +57,7 @@ main(void)
             flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
             flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -98,6 +99,7 @@ main(void)
             flint_printf("h = "), fmpq_poly_print(h), flint_printf("\n\n");
             flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -157,6 +159,7 @@ main(void)
             flint_printf("FAIL (res(f,g) == (-1)^(m * n) res(g, f)):\n");
             flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

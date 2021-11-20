@@ -49,6 +49,7 @@ int main(void)
                         flint_printf("FAIL : Wrong factor calculated\n");
                         flint_printf("n : %wu\n", primeprod);
                         flint_printf("Factor calculated: %wn\n", fac);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -63,6 +64,7 @@ int main(void)
 #endif
     {
         printf("FAIL : Pollard Rho - Brent failed too many times (%d times)\n", fails);
+        fflush(stdout);
         flint_abort();
     }
 

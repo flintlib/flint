@@ -80,6 +80,7 @@ main(void)
             {
                 flint_printf("FAIL: Check pushed coefficient matches\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
             for (k = 0; k < nvars; k++)
@@ -88,6 +89,7 @@ main(void)
                 {
                     flint_printf("FAIL: Check pushed exponent matches\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();                    
                 }
             }
@@ -101,6 +103,7 @@ main(void)
         {
             flint_printf("FAIL: Check pushed polynomial matches add\n");
             flint_printf("i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

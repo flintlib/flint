@@ -78,6 +78,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check mul_array_threaded matches mul_johnson\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -135,6 +136,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing first argument\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -191,6 +193,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing second argument\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

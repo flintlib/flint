@@ -65,6 +65,7 @@ main(void)
             flint_printf("L = "), fmpz_print(L), flint_printf("\n");
             flint_printf("t1 = "), fmpz_print(t1), flint_printf("\n");
             flint_printf("t2 = "), fmpz_print(t2), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

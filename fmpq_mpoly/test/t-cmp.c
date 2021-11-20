@@ -64,6 +64,7 @@ main(void)
                 flint_printf("FAIL\n"
                              "check polynomial terms are in order\n"
                              "i = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -145,6 +146,7 @@ main(void)
             flint_printf("FAIL\n"
                          "check polynomial compares equal to itself\n"
                          "i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -155,6 +157,7 @@ main(void)
             flint_printf("FAIL\n"
                          "check polynomial comparison with differing bits\n"
                          "i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -163,6 +166,7 @@ main(void)
             flint_printf("FAIL\n"
                          "check transitivity\n"
                          "i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

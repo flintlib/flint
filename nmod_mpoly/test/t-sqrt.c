@@ -63,6 +63,7 @@ main(void)
             if (!sqr)
             {
                 flint_printf("FAIL: Check sqrt(f^2) returns 1\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -71,6 +72,7 @@ main(void)
             {
                 flint_printf("FAIL: Check sqrt(f^2) = +-f\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -122,12 +124,14 @@ main(void)
                 {
                     flint_printf("FAIL: Check sqrt(random)\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
             else if (!nmod_mpoly_is_zero(g, ctx))
             {
                flint_printf("FAIL: Check nonsquare returns 0 sqrt\n");
+               fflush(stdout);
                flint_abort();
             }
         }
@@ -182,6 +186,7 @@ main(void)
             {
                 printf("FAIL: Check aliasing\n");
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

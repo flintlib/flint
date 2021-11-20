@@ -64,6 +64,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("z = "), TEMPLATE(T, print_pretty) (z, ctx),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -119,6 +120,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("z = "), TEMPLATE(T, print_pretty) (z, ctx),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

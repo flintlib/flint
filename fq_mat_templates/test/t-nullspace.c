@@ -56,6 +56,7 @@ main(void)
                 flint_printf("rank(ker) != nullity!\n");
                 TEMPLATE(T, mat_print_pretty) (A, ctx);
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -65,6 +66,7 @@ main(void)
                 flint_printf("nullity + rank != n\n");
                 TEMPLATE(T, mat_print_pretty) (A, ctx);
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -76,6 +78,7 @@ main(void)
                 flint_printf("A * ker != 0\n");
                 TEMPLATE(T, mat_print_pretty) (A, ctx);
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

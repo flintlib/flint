@@ -71,6 +71,7 @@ main(void)
             flint_printf("FAIL (P != Q):\n");
             fmpz_mod_poly_print(P, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(Q, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

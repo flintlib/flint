@@ -62,6 +62,7 @@ main(void)
             flint_printf("b = "), nmod_poly_print_pretty(b, "X"),
                 flint_printf("\n");
             flint_printf("p = %u\n", p);
+            fflush(stdout);
             flint_abort();
         }
 

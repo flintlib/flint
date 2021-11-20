@@ -58,6 +58,7 @@ main(void)
             if (!fmpq_mpoly_equal(f, h, ctx))
             {
                 flint_printf("FAIL: Check (f + a) - a = f\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -76,6 +77,7 @@ main(void)
             if (!fmpq_mpoly_equal(f, h, ctx))
             {
                 flint_printf("FAIL: Check (f - a) + a = f\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -120,6 +122,7 @@ main(void)
             if (!fmpq_mpoly_equal(f, g, ctx))
             {
                 flint_printf("FAIL: check aliasing\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

@@ -60,6 +60,7 @@ int main()
                 flint_printf("recursive: "); fmpz_print(num1 + i); flint_printf("\n");
                 flint_printf("multi_mod: "); fmpz_print(num2 + i); flint_printf("\n");
                 flint_printf("zeta:      "); fmpz_print(num3 + i); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -70,6 +71,7 @@ int main()
                 flint_printf("recursive: "); fmpz_print(den1 + i); flint_printf("\n");
                 flint_printf("multi_mod: "); fmpz_print(den2 + i); flint_printf("\n");
                 flint_printf("zeta:      "); fmpz_print(den3 + i); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

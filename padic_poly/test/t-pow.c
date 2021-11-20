@@ -60,6 +60,7 @@ main(void)
             padic_poly_print(b, ctx), flint_printf("\n\n");
             padic_poly_print(c, ctx), flint_printf("\n\n");
             flint_printf("e = %wd\n\n", e);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -107,6 +108,7 @@ main(void)
                 padic_poly_print(a, ctx), flint_printf("\n\n");
                 padic_poly_print(b, ctx), flint_printf("\n\n");
                 padic_poly_print(c, ctx), flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -134,6 +136,7 @@ main(void)
                 flint_printf("N = %wd\n\n", N);
                 flint_printf("e = %wd\n\n", e);
                 flint_printf("N + (e - 1) v = %wd\n\n", N + (e - 1) * a->val);
+                fflush(stdout);
                 flint_abort();
             }
 

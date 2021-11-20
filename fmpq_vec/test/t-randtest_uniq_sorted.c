@@ -43,6 +43,7 @@ int main()
                 flint_printf("den size: %wu\n",
                         fmpz_bits(fmpq_denref(vec + i)));
                 flint_printf("bits    : %wu\n", bits);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -58,6 +59,7 @@ int main()
                 flint_printf("got vec[%wd] = ", i); fmpq_print(vec + i);
                 flint_printf(" and vec[%wd] = ", i+1); fmpq_print(vec + i + 1);
                 printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

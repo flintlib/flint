@@ -54,6 +54,7 @@ main(void)
             d_mat_print(C);
             flint_printf("A:\n");
             d_mat_print(A);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -84,6 +85,7 @@ main(void)
             d_mat_print(B);
             flint_printf("A:\n");
             d_mat_print(A);
+            fflush(stdout);
             flint_abort();
         }
 

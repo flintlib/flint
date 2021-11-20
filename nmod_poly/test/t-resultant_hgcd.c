@@ -57,6 +57,7 @@ main(void)
             flint_printf("x = %wu\n", x);
             flint_printf("y = %wu\n", y);
             flint_printf("n = %wu\n", n);
+            fflush(stdout);
             flint_abort();
         }
         
@@ -99,6 +100,7 @@ main(void)
             flint_printf("y = %wu\n", y);
             flint_printf("z = %wd\n", z);
             flint_printf("n = %wu\n", n);
+            fflush(stdout);
             flint_abort();
         }
         

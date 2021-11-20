@@ -58,6 +58,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("y = %.20g\n", y);
             flint_printf("w = %.20g\n", w);
+            fflush(stdout);
             flint_abort();
         }
 

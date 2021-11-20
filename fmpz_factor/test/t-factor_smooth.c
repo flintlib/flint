@@ -45,6 +45,7 @@ void checkb(fmpz_t n, slong bits)
         fmpz_print(m);
         flint_printf("\n");
 
+        fflush(stdout);
         flint_abort();
     }
 
@@ -62,6 +63,7 @@ void checkb(fmpz_t n, slong bits)
             fmpz_factor_print(factor);
             flint_printf("\n");
 
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -190,6 +192,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
+          fflush(stdout);
           flint_abort();
        }
 
@@ -213,6 +216,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
+          fflush(stdout);
           flint_abort();
        }
 
@@ -233,6 +237,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
+          fflush(stdout);
           flint_abort();
        }
 
@@ -254,6 +259,7 @@ int main(void)
        {
           flint_printf("FAIL:\n");
           flint_printf("%ld factors found\n", factors->num);
+          fflush(stdout);
           flint_abort();
        }
        fmpz_factor_clear(factors);

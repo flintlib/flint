@@ -55,6 +55,7 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("byte_swap(byte_swap(n)) != n\n");
          flint_printf("n = %wx, r1 = %wx, r2 = %wx\n", n, r1, r2);
+         fflush(stdout);
          flint_abort();
       }
    }
@@ -77,6 +78,7 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("byte_swap(n) != byte_swap_naive(n)\n");
          flint_printf("n = %wx, r1 = %wx, r2 = %wx\n", n, r1, r2);
+         fflush(stdout);
          flint_abort();
       }
    }

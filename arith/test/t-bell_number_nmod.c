@@ -53,6 +53,7 @@ int main(void)
             if (u != b[j])
             {
                 flint_printf("FAIL: p = %wu, i = %wd\n", p, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

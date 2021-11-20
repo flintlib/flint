@@ -52,6 +52,7 @@ int main()
             flint_printf("FAIL: n = %wd, numerator\n", n);
             flint_printf("vec:    "); fmpz_print(num1 + n); flint_printf("\n");
             flint_printf("single: "); fmpz_print(num2); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -60,6 +61,7 @@ int main()
             flint_printf("FAIL: n = %wd, denominator\n", n);
             flint_printf("vec:    "); fmpz_print(den1 + n); flint_printf("\n");
             flint_printf("single: "); fmpz_print(den2); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -84,6 +86,7 @@ int main()
             if (!fmpq_equal(x + n, t))
             {
                 flint_printf("FAIL!: n = %wd\n", n);
+                fflush(stdout);
                 flint_abort();
             }
         }

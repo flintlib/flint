@@ -42,6 +42,7 @@ void test_exact(int d)
             if (exp != i/j || mpz_cmp(a, c))
             {
                 gmp_printf("%d^%d / %d^%d\n", d, i, d, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

@@ -48,6 +48,7 @@ int main(void)
             flint_printf("b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[2], b[1], b[0]); 
             flint_printf("s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[2], s[1], s[0]); 
             flint_printf("t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[2], t[1], t[0]); 
+            fflush(stdout);
             flint_abort();
         }
     }

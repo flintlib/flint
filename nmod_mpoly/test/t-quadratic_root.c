@@ -31,6 +31,7 @@ void _test_root(
     if (sol_exists && !success)
     {
         flint_printf("FAIL: solution exists but root failed\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -42,6 +43,7 @@ void _test_root(
         {
 
             flint_printf("FAIL: reported solution is not a solution\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -51,6 +53,7 @@ void _test_root(
     if (success != success2 || (success && !nmod_mpoly_equal(x, t, ctx)))
     {
         flint_printf("FAIL: Check aliasing first argument\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -59,6 +62,7 @@ void _test_root(
     if (success != success2 || (success && !nmod_mpoly_equal(x, t, ctx)))
     {
         flint_printf("FAIL: Check aliasing second argument\n");
+        fflush(stdout);
         flint_abort();
     }
 

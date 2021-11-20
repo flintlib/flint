@@ -51,6 +51,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             printf("%g\n", fabs(res1 + res2 - res3));
+            fflush(stdout);
             flint_abort();
         }
 

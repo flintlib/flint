@@ -65,6 +65,7 @@ main(void)
                 flint_printf("\n");
                 flint_printf("N(a) = "); fmpz_print(t2);
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

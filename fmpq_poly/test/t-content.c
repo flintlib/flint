@@ -60,6 +60,7 @@ main(void)
             fmpq_print(a), flint_printf("\n\n");
             fmpq_print(b), flint_printf("\n\n");
             fmpq_print(c), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

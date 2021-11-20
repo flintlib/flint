@@ -53,6 +53,7 @@ main(void)
                 if (!nmod_mpoly_equal(f, f1, ctx))
                 {
                     flint_printf("FAIL\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 

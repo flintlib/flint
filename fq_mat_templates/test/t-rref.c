@@ -112,6 +112,7 @@ main(void)
             printf("\n\n");
             TEMPLATE(T, mat_print_pretty) (B, ctx);
             printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -173,6 +174,7 @@ main(void)
             printf("\n\n");
             TEMPLATE(T, mat_print_pretty) (D, ctx);
             printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -56,6 +56,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check packing up\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -68,6 +69,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check packing up with aliasing\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -115,6 +117,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check repacking down\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -127,6 +130,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check repacking down with aliasing\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -171,6 +175,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check packing down\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -184,6 +189,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check packing down with aliasing\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

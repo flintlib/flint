@@ -55,6 +55,7 @@ int main()
             flint_printf("FAIL!\n");
             flint_printf("n = %wd, p1 = %wu, p2 = %wu\n", n, primes[n], ref_primes[n]);
             flint_printf("inv1 = %g, inv2 = %g\n", inverses[n], ref_inverses[n]);
+            fflush(stdout);
             flint_abort();
         }
 

@@ -59,12 +59,14 @@ main(void)
             if (fmpz_sgn(xstride) <= 0)
             {
                 flint_printf("FAIL:\ncheck xstride > 0\n");
+                fflush(stdout);
                 flint_abort();
             }
 
             if (fmpz_cmp(xstart, xstride) >= 0)
             {
                 flint_printf("FAIL:\ncheck xstart < xstride\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -91,6 +93,7 @@ main(void)
                     fmpz_print(x);
                     flint_printf(" mod ");
                     fmpz_print(n);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -114,6 +117,7 @@ main(void)
                     fmpz_print(x);
                     flint_printf(" mod ");
                     fmpz_print(n);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -128,6 +132,7 @@ main(void)
             !fmpz_equal(x, xlength))
         {
             flint_printf("FAIL:\ncheck aliasing 1\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -140,6 +145,7 @@ main(void)
             !fmpz_equal(x, xlength))
         {
             flint_printf("FAIL:\ncheck aliasing 2\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -152,6 +158,7 @@ main(void)
             !fmpz_equal(x, xlength))
         {
             flint_printf("FAIL:\ncheck aliasing 3\n");
+            fflush(stdout);
             flint_abort();
         }
 

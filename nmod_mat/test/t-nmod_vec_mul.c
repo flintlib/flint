@@ -73,6 +73,7 @@ int main(void)
                 nmod_mat_entry(C, 0, j) != cc[j][0])
             {
                 flint_printf("FAIL: wrong answer\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

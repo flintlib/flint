@@ -29,6 +29,7 @@ fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
     if (rank < 0 || rank > mat->mat->r || rank > mat->mat->c)
     {
         flint_printf("Exception (fmpz_mod_mat_randrank). Impossible rank.\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -65,12 +66,14 @@ check_rref(fmpz_mod_mat_t A)
                 if (prev_row_zero)
                 {
                     flint_printf("nonzero row after zero row\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
                 if (j <= prev_pivot)
                 {
                     flint_printf("pivot not strictly to the right of previous\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -119,6 +122,7 @@ main(void)
                 fmpz_mod_mat_print_pretty(A);
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -157,6 +161,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
+                fflush(stdout);
                 flint_abort();
             }
 

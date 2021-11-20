@@ -46,6 +46,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared composite\n", d); 
+         fflush(stdout);
          flint_abort();
       }
 
@@ -70,6 +71,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared prime\n", d); 
+         fflush(stdout);
          flint_abort();
       }
 
@@ -79,6 +81,7 @@ int main(void)
    if (count > 200 * flint_test_multiplier())
    {
       flint_printf("FAIL: Pocklington-Lehmer failed too many times (%wu times)\n", count);
+      fflush(stdout);
       flint_abort();
    }
 

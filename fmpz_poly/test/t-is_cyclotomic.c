@@ -37,6 +37,7 @@ main(void)
             flint_printf("FAIL\n");
             fmpz_poly_print(f); flint_printf("\n\n");
             flint_printf("%wu %wu\n\n", n, r);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -60,6 +61,7 @@ main(void)
             flint_printf("FAIL\n");
             fmpz_poly_print(f); flint_printf("\n\n");
             flint_printf("%wu %wu\n\n", n, r);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +93,7 @@ main(void)
                 fmpz_poly_print(f); flint_printf("\n\n");
                 fmpz_poly_print(g); flint_printf("\n\n");
                 flint_printf("%wu\n\n", n);
+                fflush(stdout);
                 flint_abort();
             }
         }

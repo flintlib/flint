@@ -64,6 +64,7 @@ main(void)
             flint_printf("FAIL (aliasing)!\n");
             fmpz_poly_mat_print(A, "x"); flint_printf("\n");
             fmpz_poly_mat_print(Ainv, "x"); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -103,6 +104,7 @@ main(void)
             if (nonsingular == 0 || !fmpz_poly_is_one(den))
             {
                 flint_printf("FAIL: expected empty matrix to pass\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -112,6 +114,7 @@ main(void)
             {
                 fmpz_poly_neg(det, det);
                 flint_printf("FAIL: den != det(A)\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -130,6 +133,7 @@ main(void)
                 fmpz_poly_mat_print(B, "x");
                 flint_printf("den:\n");
                 fmpz_poly_print_pretty(den, "x");
+                fflush(stdout);
                 flint_abort();
             }
         }

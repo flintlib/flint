@@ -53,6 +53,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("modulo %wu log base %wu of %wu"
                                            " should be %wu\n", p, alpha, y, x);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

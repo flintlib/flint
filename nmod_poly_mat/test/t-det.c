@@ -76,6 +76,7 @@ main(void)
             flint_printf("\ndet(A)*det(B):\n");
             nmod_poly_print(ab);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

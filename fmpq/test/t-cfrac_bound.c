@@ -56,6 +56,7 @@ main(void)
         if (n > bound)
         {
             flint_printf("FAIL: length=%wd > bound=%wd\n", n, bound);
+            fflush(stdout);
             flint_abort();
         }
 

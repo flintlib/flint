@@ -76,6 +76,7 @@ main(void)
                 {
                     flint_printf("FAIL: Check evalone aliasing\n");
                     flint_printf("i: %wd  j: %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -84,6 +85,7 @@ main(void)
             {
                 flint_printf("FAIL: Check repeated evalone matches evalall\n");
                 flint_printf("i: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -150,6 +152,7 @@ main(void)
             {
                 flint_printf("FAIL: Check add commutes with evalall\n");
                 flint_printf("i: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -218,6 +221,7 @@ main(void)
             {
                 flint_printf("FAIL: Check mul commutes with evalall\n");
                 flint_printf("i: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

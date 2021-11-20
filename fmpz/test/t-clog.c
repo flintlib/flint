@@ -46,6 +46,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             flint_printf("l = %wd\n", l);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -85,6 +86,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("y = "), fmpz_print(y), flint_printf("\n");
             flint_printf("k = %wd\n", k);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -118,6 +120,7 @@ main(void)
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("k = %wd\n", k);
             flint_printf("l = %wd\n", l);
+            fflush(stdout);
             flint_abort();
         }
 

@@ -50,6 +50,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("gcd(ac, bc) != gcd(a, b)\n");
             flint_printf("a = %wu, b = %wu, c = %wu, g = %wu\n", a, b, c, g);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -69,6 +70,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("gcd(a, 0) != a\n");
             flint_printf("a = %wu\n", a);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -88,6 +90,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("gcd(0, b) != b\n");
             flint_printf("b = %wu\n", b);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -99,6 +102,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("gcd(0, 0) != 0\n");
+            fflush(stdout);
             flint_abort();
         }
     }

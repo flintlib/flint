@@ -54,6 +54,7 @@ int main(void)
         if (!fmpz_mat_equal(C, D))
         {
             flint_printf("FAIL: results not equal\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -57,6 +57,7 @@ main(void)
             fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -89,6 +90,7 @@ main(void)
             flint_printf("FAIL (da == 0):\n");
             fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -133,6 +135,7 @@ main(void)
             flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("(ab)' = "), fmpz_mod_poly_print(lhs, ctx), flint_printf("\n\n");
             flint_printf("a'b + ab' = "), fmpz_mod_poly_print(rhs, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

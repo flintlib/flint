@@ -56,6 +56,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +92,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -126,6 +128,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

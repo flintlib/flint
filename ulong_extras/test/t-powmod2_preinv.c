@@ -60,6 +60,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("a = %wu, exp = %wd, d = %wu, dinv = %wu\n", a, exp, d, dinv);
             flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -83,6 +84,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("0^0 != 1 mod %wd\n", d);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -103,6 +105,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("0^%wd != 0 mod 1\n", exp);
+            fflush(stdout);
             flint_abort();
         }
     }

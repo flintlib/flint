@@ -61,6 +61,7 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -77,6 +78,7 @@ main(void)
             flint_printf("\nz = ");
             fmpq_print(z);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -111,6 +113,7 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -125,6 +128,7 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -157,6 +161,7 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -171,6 +176,7 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

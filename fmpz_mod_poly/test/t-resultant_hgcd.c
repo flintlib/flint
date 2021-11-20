@@ -64,6 +64,7 @@ main(void)
             printf("x = "); fmpz_print(x); printf("\n");
             printf("y = "); fmpz_print(y); printf("\n");
             printf("n = "); fmpz_print(n); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -113,6 +114,7 @@ main(void)
             printf("y = "); fmpz_print(y); printf("\n");
             printf("z = "); fmpz_print(z); printf("\n");
             printf("n = "); fmpz_print(n); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

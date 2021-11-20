@@ -46,6 +46,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            fflush(stdout);
             flint_abort();
         }
         mpz_clear(mpz_n);
@@ -76,6 +77,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            fflush(stdout);
             flint_abort();
         }
         mpz_clear(mpz_n);
@@ -107,6 +109,7 @@ int main(void)
         { 
             flint_printf("FAIL:\n");
             flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            fflush(stdout);
             flint_abort();
         }
         mpz_clear(mpz_n);
@@ -138,6 +141,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            fflush(stdout);
             flint_abort();
         }
         mpz_clear(mpz_n);

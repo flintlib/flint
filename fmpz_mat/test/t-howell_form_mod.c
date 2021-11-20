@@ -191,6 +191,7 @@ main(void)
             fmpz_print(mod);
             flint_printf("\n\n");
 
+            fflush(stdout);
             flint_abort();
         }
 
@@ -248,6 +249,7 @@ main(void)
             flint_printf("Modulus: ");
             fmpz_print(mod);
 
+            fflush(stdout);
             flint_abort();
         }
 

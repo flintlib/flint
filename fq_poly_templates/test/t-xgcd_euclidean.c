@@ -65,6 +65,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (v, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -136,6 +137,7 @@ main(void)
             flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx);
             flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -186,6 +188,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (v, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -234,6 +237,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (v, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -282,6 +286,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -330,6 +335,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -378,6 +384,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -426,6 +433,7 @@ main(void)
             TEMPLATE(T, poly_print_pretty) (t, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (d, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (w, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

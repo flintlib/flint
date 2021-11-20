@@ -72,6 +72,7 @@ int main(void)
             fmpz_print(n2);
             flint_printf("\n"); 
             fmpz_print(r); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
          }
       }
@@ -87,6 +88,7 @@ int main(void)
    {
       flint_printf("FAIL:\n");
       flint_printf("Only %wu numbers factored\n", count); 
+      fflush(stdout);
       flint_abort();
    }
 

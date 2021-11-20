@@ -80,6 +80,7 @@ main(void)
             fmpz_print(c); printf("\n");
             fmpz_print(d); printf("\n");
             fmpz_print(e); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

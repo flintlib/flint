@@ -57,6 +57,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("A:\n");
             fmpz_mat_print_pretty(A);
+            fflush(stdout);
             flint_abort();
         }
 

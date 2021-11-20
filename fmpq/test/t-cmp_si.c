@@ -58,6 +58,7 @@ main(void)
             fmpq_print(x);
             flint_printf("\ny = %wd", y);
             flint_printf("\ncmp(x,y) = %d, cmp(X,Y) = %d\n", c1, c2);
+            fflush(stdout);
             flint_abort();
         }
 

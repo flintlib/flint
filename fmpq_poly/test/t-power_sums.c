@@ -73,6 +73,7 @@ main(void)
                         {
                             flint_printf("FAIL: power sums rational root\n");
                             flint_printf("%d %d %d %d %d\n", i, j, k, den, l);
+                            fflush(stdout);
                             flint_abort();
                         }
                         fmpz_mul_si(il, il, i);
@@ -90,6 +91,7 @@ main(void)
                         flint_printf("FAIL: power sums to poly\n");
                         fmpq_poly_print(a), flint_printf("\n\n");
                         fmpq_poly_print(b), flint_printf("\n\n");
+                        fflush(stdout);
                         flint_abort();
                     }
 
@@ -131,6 +133,7 @@ main(void)
             fmpq_poly_print(a), flint_printf("\n\n");
             fmpq_poly_print(b), flint_printf("\n\n");
             fmpq_poly_print(c), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -170,6 +173,7 @@ main(void)
             fmpq_poly_print(b), flint_printf("\n");
             fmpq_poly_print(c), flint_printf("\n");
             fmpq_poly_print(d), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

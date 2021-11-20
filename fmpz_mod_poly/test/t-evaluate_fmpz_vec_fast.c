@@ -79,6 +79,7 @@ main(void)
             for (j = 0; j < npoints; j++)
                fmpz_print(z + j), flint_printf(" ");
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

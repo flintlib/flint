@@ -37,6 +37,7 @@ static void check_factorization(
         if (fac->p[i].length < 2)
         {
             flint_printf("FAIL\ncheck constant factor\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -44,6 +45,7 @@ static void check_factorization(
         if (!fmpz_is_one(c) || fmpz_sgn(fac->p[i].coeffs + fac->p[i].length - 1) < 0)
         {
             flint_printf("FAIL\ncheck factor content\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -51,12 +53,14 @@ static void check_factorization(
     if (!fmpz_poly_equal(h, f))
     {
         flint_printf("FAIL\ncheck factorization matches\n");
+        fflush(stdout);
         flint_abort();
     }
 
     if (omega < omega_lower_bound)
     {
         flint_printf("FAIL\ncheck omega\n");
+        fflush(stdout);
         flint_abort();
     }
 

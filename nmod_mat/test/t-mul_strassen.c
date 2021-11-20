@@ -56,6 +56,7 @@ main(void)
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
+            fflush(stdout);
             flint_abort();
         }
 

@@ -69,6 +69,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -80,6 +81,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f aliasing dividend\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -90,6 +92,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f aliasing divisor\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -154,6 +157,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -164,6 +168,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check div matches divrem\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -175,6 +180,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check div matches divrem aliasing dividend\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
             
@@ -185,6 +191,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check div matches divrem aliasing divisor\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

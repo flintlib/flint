@@ -97,6 +97,7 @@ int main(void)
             flint_printf("FAIL 1:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
             fmpz_mod_poly_print(poly1, ctx); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -106,6 +107,7 @@ int main(void)
             flint_printf("FAIL 2:\n");
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
             fmpz_mod_poly_print(poly2, ctx); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -162,6 +164,7 @@ int main(void)
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
             fmpz_mod_poly_print(poly1, ctx); flint_printf("\n\n");
             fmpz_mod_poly_print(gen, ctx);  flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -178,6 +181,7 @@ int main(void)
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
             fmpz_mod_poly_print(poly1, ctx); flint_printf("\n\n");
             fmpz_mod_poly_print(gen, ctx);  flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -189,6 +193,7 @@ int main(void)
             _fmpz_vec_print(seq, len); flint_printf("\n\n");
             fmpz_mod_poly_print(poly2, ctx); flint_printf("\n\n");
             fmpz_mod_poly_print(gen, ctx);  flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

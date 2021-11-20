@@ -72,6 +72,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("bits = %wd, nfields = %wd\n", bits, nfields);
+                    fflush(stdout);
                     flint_abort();
                 }
         }

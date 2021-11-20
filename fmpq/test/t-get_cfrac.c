@@ -66,6 +66,7 @@ main(void)
         if (!fmpq_is_zero(r))
         {
             flint_printf("FAIL: expected zero remainder\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -82,6 +83,7 @@ main(void)
         if (n1 != n2)
         {
             flint_printf("FAIL: i = %wd, n1 = %wd, n2 = %wd\n", i, n1, n2);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -90,6 +92,7 @@ main(void)
             flint_printf("FAIL: i = %wd, vectors not equal\n", i);
             _fmpz_vec_print(c1, n1); flint_printf("\n");
             _fmpz_vec_print(c2, n2); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -55,6 +55,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("A:\n"), fmpq_mat_print(A);
             flint_printf("B:\n"), fmpq_mat_print(B);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -99,6 +100,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("A:\n"), fmpq_mat_print(A);
             flint_printf("B:\n"), fmpq_mat_print(B);
+            fflush(stdout);
             flint_abort();
         }
 

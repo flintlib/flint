@@ -62,6 +62,7 @@ main(void)
         if (!fmpz_mod_mat_equal(A, D))
         {
             flint_printf("FAIL\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -72,6 +73,7 @@ main(void)
         if (!fmpz_mod_mat_equal(A, C))
         {
             flint_printf("FAIL\n");
+            fflush(stdout);
             flint_abort();
         }
 

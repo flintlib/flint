@@ -79,6 +79,7 @@ main(void)
                         flint_printf("mpn_mul_2expmod_2expp1 error\n");
                         gmp_printf("want %Zx\n\n", m1);
                         gmp_printf("got  %Zx\n", m2);
+                        fflush(stdout);
                         flint_abort();
                     }
 

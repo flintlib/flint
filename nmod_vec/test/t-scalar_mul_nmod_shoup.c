@@ -56,6 +56,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("len = %wd, n = %wd\n", len, n);
+            fflush(stdout);
             flint_abort();
         }
 

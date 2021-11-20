@@ -48,6 +48,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2); 
+         fflush(stdout);
          flint_abort();
       }
 
@@ -81,6 +82,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2); 
+         fflush(stdout);
          flint_abort();
       }
 

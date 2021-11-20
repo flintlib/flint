@@ -77,6 +77,7 @@ int main(void)
           if (!result) {
              flint_printf("FAIL:\n");
              flint_printf("b = %wd\n", b);
+             fflush(stdout);
              flint_abort();
           }        
        }
@@ -134,6 +135,7 @@ int main(void)
           {
              flint_printf("FAIL:\n");
              flint_printf("b = %wd\n", b);
+             fflush(stdout);
              flint_abort();
           }        
        }
@@ -190,6 +192,7 @@ int main(void)
           if (!result) {
              flint_printf("FAIL\n");
              flint_printf("b = %wd\n", b);
+             fflush(stdout);
              flint_abort();
           }        
        }
@@ -231,6 +234,7 @@ int main(void)
           if (!result) {
              flint_printf("FAIL\n");
              flint_printf("b = %wd\n", b);
+             fflush(stdout);
              flint_abort();
           }        
        }

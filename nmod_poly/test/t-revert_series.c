@@ -57,6 +57,7 @@ main(void)
             flint_printf("FAIL (aliasing):\n");
             nmod_poly_print(f), flint_printf("\n\n");
             nmod_poly_print(g), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -94,6 +95,7 @@ main(void)
             nmod_poly_print(g), flint_printf("\n\n");
             nmod_poly_print(f), flint_printf("\n\n");
             nmod_poly_print(h), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

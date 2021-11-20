@@ -50,6 +50,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example 1\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -57,6 +58,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example 2\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -68,6 +70,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 3\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -75,6 +78,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 4\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -83,6 +87,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 4 equality\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -146,6 +151,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -155,6 +161,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
                 fmpz_mpoly_assert_canonical(f, ctx);
@@ -163,6 +170,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -231,6 +239,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -240,6 +249,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -249,6 +259,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check multiprecision repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -319,6 +330,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -327,6 +339,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check addition commutes with evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -401,6 +414,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -409,6 +423,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check multiplication commutes with evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

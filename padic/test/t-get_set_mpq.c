@@ -57,6 +57,7 @@ main(void)
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("c = "), padic_print(b, ctx), flint_printf("\n");
             gmp_printf("b = %Qd\n", b);
+            fflush(stdout);
             flint_abort();
         }
 

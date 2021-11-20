@@ -21,6 +21,7 @@ void check(mp_limb_t n, int s1, int s2)
     {
         flint_printf("FAIL:\n");
         flint_printf("%wu: got %d instead of %d\n", n, s1, s2); 
+        fflush(stdout);
         flint_abort();
     }
 }
@@ -63,6 +64,7 @@ int main(void)
     {
         flint_printf("FAIL:\n");
         flint_printf("expected %d squarefree numbers <= 10000 (got %d)\n", 6083, s);
+        fflush(stdout);
         flint_abort();
     }
 

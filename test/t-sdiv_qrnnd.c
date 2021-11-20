@@ -57,6 +57,7 @@ int main(void)
             flint_printf("q = %wd\n", q);
             flint_printf("r = %wd\n", r);
             flint_printf("ph = %wu, pl = %wu\n", ph, pl);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -72,6 +73,7 @@ int main(void)
             flint_printf("d = %wd\n", d);
             flint_printf("q = %wd\n", q);
             flint_printf("r = %wd\n", r);
+            fflush(stdout);
             flint_abort();
         }
     }

@@ -56,6 +56,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("x = "), padic_print(x, ctx), flint_printf("\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

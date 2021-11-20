@@ -67,6 +67,7 @@ int main(void)
                 flint_printf("b: "); fmpz_print(b); flint_printf("\n");
                 flint_printf("c: "); fmpz_print(c); flint_printf("\n");
                 flint_printf("d: "); fmpz_print(d); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -91,6 +92,7 @@ int main(void)
                 flint_printf("b: "); fmpz_print(b); flint_printf("\n");
                 flint_printf("c: "); fmpz_print(c); flint_printf("\n");
                 flint_printf("d: "); fmpz_print(d); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -111,6 +113,7 @@ int main(void)
                 flint_printf("n = %wd, k = %wd\n", n, k);
                 flint_printf("a: "); fmpz_print(row + k); flint_printf("\n");
                 flint_printf("b: "); fmpz_print(b); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -134,6 +137,7 @@ int main(void)
                 flint_printf("n = %wd, k = %wd\n", n, k);
                 flint_printf("a: "); fmpz_print(row + k); flint_printf("\n");
                 flint_printf("b: "); fmpz_print(b); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -169,6 +173,7 @@ int main(void)
                         _fmpz_vec_print(mat->rows[n], k);
                         flint_printf("\nvec: ");
                         _fmpz_vec_print(row, k);
+                        fflush(stdout);
                         flint_abort();
                     }
                     _fmpz_vec_clear(row, k);
@@ -182,6 +187,7 @@ int main(void)
                         fmpz_print(mat->rows[n]+k);
                         flint_printf("\nsingle: ");
                         fmpz_print(s);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -210,6 +216,7 @@ int main(void)
                         _fmpz_vec_print(mat->rows[n], k);
                         flint_printf("\nvec: ");
                         _fmpz_vec_print(row, k);
+                        fflush(stdout);
                         flint_abort();
                     }
                     _fmpz_vec_clear(row, k);
@@ -223,6 +230,7 @@ int main(void)
                         fmpz_print(mat->rows[n]+k);
                         flint_printf("\nsingle: ");
                         fmpz_print(s);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -251,6 +259,7 @@ int main(void)
                         _fmpz_vec_print(mat->rows[n], k);
                         flint_printf("\nvec: ");
                         _fmpz_vec_print(row, k);
+                        fflush(stdout);
                         flint_abort();
                     }
                     _fmpz_vec_clear(row, k);
@@ -264,6 +273,7 @@ int main(void)
                         fmpz_print(mat->rows[n]+k);
                         flint_printf("\nsingle: ");
                         fmpz_print(s);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -292,6 +302,7 @@ int main(void)
                 if (fmpz_get_ui(mat3->rows[n]+k) != (n == k))
                 {
                     flint_printf("not identity matrix: %wd, %wd, %wd\n", nn, n, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

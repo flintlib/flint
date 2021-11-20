@@ -44,6 +44,7 @@ main(void)
         if (!fmpz_poly_equal(a, b))
         {
             flint_printf("FAIL: dirty\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -76,6 +77,7 @@ main(void)
             flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
             flint_printf("x = %u", x), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -110,6 +112,7 @@ main(void)
             flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
             flint_printf("x = %u", x), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

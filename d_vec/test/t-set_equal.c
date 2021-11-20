@@ -43,6 +43,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +66,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +93,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            fflush(stdout);
             flint_abort();
         }
 

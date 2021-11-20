@@ -45,6 +45,7 @@ main(void)
         if (fmpz_mat_equal(A, D) || fmpz_mat_equal(A, E))
         {
             flint_printf("FAIL: different dimensions should not be equal\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -54,6 +55,7 @@ main(void)
         if (!fmpz_mat_equal(A, B))
         {
             flint_printf("FAIL: copied matrices should be equal\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +67,7 @@ main(void)
             if (fmpz_mat_equal(A, B))
             {
                 flint_printf("FAIL: modified matrices should not be equal\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

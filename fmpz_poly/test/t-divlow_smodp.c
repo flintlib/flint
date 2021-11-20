@@ -92,6 +92,7 @@ main(void)
             fmpz_poly_print(c), flint_printf("\n\n");
             fmpz_poly_print(d), flint_printf("\n\n");
             fmpz_print(P); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

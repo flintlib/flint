@@ -42,6 +42,7 @@ int main(void)
             fmpz_print(s2);
             flint_printf(" <= ");
             fmpz_print(n);
+            fflush(stdout);
             flint_abort();
         }
 

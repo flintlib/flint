@@ -62,6 +62,7 @@ main(void)
             flint_printf("FAIL: results not equal\n");
             mpf_mat_print(F);
             mpf_mat_print(G);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -72,6 +73,7 @@ main(void)
             if (!mpf_mat_equal(A, E))
             {
                 flint_printf("FAIL: aliasing failed\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

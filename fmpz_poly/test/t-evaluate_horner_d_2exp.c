@@ -51,6 +51,7 @@ main(void)
             flint_printf("y, yexp = %.20g  %wd\n\n", y, yexp);
             flint_printf("z = %.20g\n\n", z);
             flint_printf("y = %.20g\n\n", t);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -111,6 +112,7 @@ main(void)
             mpfr_printf("%.17Rg\n", v);
             mpfr_printf("%.17Rg\n", e);
             mpfr_printf("%.17Rg\n\n", w);
+            fflush(stdout);
             flint_abort();
         }
 

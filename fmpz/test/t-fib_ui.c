@@ -52,6 +52,7 @@ main(void)
                 flint_printf("\n");
                 fmpz_print(z);
                 flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

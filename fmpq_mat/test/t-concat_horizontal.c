@@ -55,6 +55,7 @@ int main(void)
         if (!(fmpq_mat_equal(window1, A) && fmpq_mat_equal(window2, B)))
         {
             flint_printf("FAIL: results not equal\n");
+            fflush(stdout);
             flint_abort();
         }
         

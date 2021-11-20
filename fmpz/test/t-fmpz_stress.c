@@ -152,6 +152,7 @@ main(void)
                 flint_printf("FAIL:\n");
                 flint_printf("total: "); fmpz_print(total); flint_printf("\n");
                 flint_printf("check: "); fmpz_print(check); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

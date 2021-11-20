@@ -59,6 +59,7 @@ main(void)
             flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
             flint_printf("tan(A): "); nmod_poly_print(tanA), flint_printf("\n\n");
             flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +92,7 @@ main(void)
             flint_printf("FAIL:\n");
             nmod_poly_print(A), flint_printf("\n\n");
             nmod_poly_print(B), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

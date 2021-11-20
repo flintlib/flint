@@ -59,6 +59,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check mpoly -> mpoly_univar -> mpoly\ni: %wd  j: %wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -69,6 +70,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check mpoly -> mpoly_univar -> mpoly with bits\ni: %wd  j: %wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -89,6 +91,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check construction\ni: %wd  j: %wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

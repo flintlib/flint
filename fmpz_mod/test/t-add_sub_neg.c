@@ -56,6 +56,7 @@ main(void)
             {
                 printf("FAIL1\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -68,6 +69,7 @@ main(void)
             {
                 printf("FAIL2\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

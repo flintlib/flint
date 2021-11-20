@@ -80,6 +80,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check degree does not go up under addition\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -149,6 +150,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check degree adds under multiplication\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

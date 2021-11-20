@@ -51,6 +51,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("a = %f\n", a);
             flint_printf("b = %f\n", b);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -68,6 +69,7 @@ main(void)
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("y = "), fmpz_print(y), flint_printf("\n");
             flint_printf("a = %f\n", a);
+            fflush(stdout);
             flint_abort();
         }
 

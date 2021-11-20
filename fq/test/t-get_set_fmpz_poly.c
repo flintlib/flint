@@ -48,6 +48,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("check get/set match i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

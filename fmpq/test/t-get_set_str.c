@@ -31,6 +31,7 @@ void check_invalid(char * s, int b)
     {
         printf("Got no error with s='%s'\n", s);
         printf("r = "); fmpq_print(r); printf("\n");
+        fflush(stdout);
         flint_abort();
     }
     fmpq_clear(r);
@@ -73,6 +74,7 @@ main(void)
             gmp_printf("b = %Qd\n", b);
             flint_printf("base = %d\n", base);
             flint_printf("str1 = %s\n, str2 = %s\n", str1, str2);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -84,6 +86,7 @@ main(void)
             flint_printf("str1 = %s\n", str1);
             flint_printf("base = %d\n", base);
             flint_printf("ans = %d\n", ans);
+            fflush(stdout);
             flint_abort();
         }
 

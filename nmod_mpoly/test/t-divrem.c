@@ -72,6 +72,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -137,6 +138,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -202,6 +204,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing of quotient with first argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -266,6 +269,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing of quotient with second argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -334,6 +338,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing of remainder with first argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -401,6 +406,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing of remainder with second argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

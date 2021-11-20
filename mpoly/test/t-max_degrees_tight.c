@@ -79,6 +79,7 @@ main(void)
                 if (max[j] != max2[j])
                 {
                     flint_printf("FAIL\nmax_degrees_tight");
+                    fflush(stdout);
                     flint_abort();
                 }
         }

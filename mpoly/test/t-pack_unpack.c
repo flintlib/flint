@@ -55,6 +55,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("bits1 = %wd  fields = %wd  len = %wd\n", bits1, nfields, length);
+                    fflush(stdout);
                     flint_abort();
                 }
         }
@@ -93,6 +94,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

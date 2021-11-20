@@ -38,12 +38,14 @@ void test_poly(
         if (nmod_poly_degree(roots->p + i) != 1)
         {
             flint_printf("FAIL:\ncheck root is linear\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (roots->p[i].coeffs[1] != 1)
         {
             flint_printf("FAIL:\ncheck root is monic\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -57,12 +59,14 @@ void test_poly(
         if (multiplicity <= 0)
         {
             flint_printf("FAIL:\ncheck root is a root\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (roots->exp[i] != (want_mult ? multiplicity : 1))
         {
             flint_printf("FAIL:\ncheck root multiplicity\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -71,6 +75,7 @@ void test_poly(
     if (roots->num > 0)
     {
         flint_printf("FAIL:\ncheck missing roots\n");
+        fflush(stdout);
         flint_abort();
     }
 

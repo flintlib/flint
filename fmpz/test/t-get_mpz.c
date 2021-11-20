@@ -54,6 +54,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             gmp_printf("b = %Zd, c = %Zd\n", b, c);
+            fflush(stdout);
             flint_abort();
         }
 

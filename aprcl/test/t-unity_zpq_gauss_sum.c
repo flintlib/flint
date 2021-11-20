@@ -72,6 +72,7 @@ int main(void)
         if (result == 0)
         {
             flint_printf("FAIL\n");
+            fflush(stdout);
             flint_abort();
         }
 

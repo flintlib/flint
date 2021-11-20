@@ -60,6 +60,7 @@ int main(void)
                 flint_printf("i, j = %wd, %wd, r[j] = %wd, r(j) = %wd, "
                     "expected: %wd\n",
                     i, j, fmpz_get_si(r + j), fmpz_get_si(t), known[i][j]);
+                fflush(stdout);
                 flint_abort();
             }
         }

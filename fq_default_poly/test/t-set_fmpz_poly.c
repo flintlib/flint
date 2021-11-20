@@ -54,6 +54,7 @@ main(void)
         if (!result)
         {
             flint_printf("Polynomials not equal\n");
+	    fflush(stdout);
 	    flint_abort();
         }
 
@@ -94,6 +95,7 @@ main(void)
         if (!result)
         {
             flint_printf("Polynomials not equal\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -134,6 +136,7 @@ main(void)
         if (!result)
         {
             flint_printf("Polynomials not equal\n");
+            fflush(stdout);
             flint_abort();
         }
 

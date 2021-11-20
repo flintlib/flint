@@ -64,6 +64,7 @@ main(void)
             flint_printf("Ax:\n");
             nmod_mat_print_pretty(Ax);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -98,6 +99,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("singular system was 'solved'\n");
+            fflush(stdout);
             flint_abort();
         }
 

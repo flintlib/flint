@@ -47,6 +47,7 @@ main(void)
                 if (flint_mpf_cmp_ui(mpf_mat_entry(A, i, j), 0) != 0)
                 {
                     flint_printf("FAIL: nonzero entry\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }

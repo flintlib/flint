@@ -33,6 +33,7 @@ main(void)
     {
         flint_printf("FAIL\n");
         flint_printf("0 returned for %g\n", x);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -42,6 +43,7 @@ main(void)
     {
         flint_printf("FAIL\n");
         flint_printf("Non-zero returned for %g\n", x);
+        fflush(stdout);
         flint_abort();
     }
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
@@ -51,6 +53,7 @@ main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("Non-zero returned for %g\n", x);
+            fflush(stdout);
             flint_abort();
         }
     }

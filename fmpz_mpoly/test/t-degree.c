@@ -41,6 +41,7 @@ void _check_degrees(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
     {
         printf("FAIL\n");
         flint_printf("Check degrees_fit_si\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -54,12 +55,14 @@ void _check_degrees(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
             {
                 printf("FAIL\n");
                 flint_printf("Check degrees_si\n");
+                fflush(stdout);
                 flint_abort();
             }
             if (degs_si[i] != fmpz_mpoly_degree_si(A, i, ctx))
             {
                 printf("FAIL\n");
                 flint_printf("Check individual degree_si\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -77,6 +80,7 @@ void _check_degrees(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
         {
             printf("FAIL\n");
             flint_printf("Check individual degree_fmpz\n");
+            fflush(stdout);
             flint_abort();
         }
         fmpz_clear(degi);
@@ -144,6 +148,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check degree does not go up under addition\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -209,6 +214,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check degree adds under multiplication\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

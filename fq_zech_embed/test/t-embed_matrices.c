@@ -56,6 +56,7 @@ main(void)
             flint_printf("Embed\n"),
                 nmod_mat_print_pretty(embed), flint_printf("\nProject\n"),
                 nmod_mat_print_pretty(project), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -118,6 +119,7 @@ main(void)
                     nmod_mat_print_pretty(embed), flint_printf("\nProject\n"),
                     nmod_mat_print_pretty(project), flint_printf("\nComposition\n"),
                     nmod_mat_print_pretty(comp), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

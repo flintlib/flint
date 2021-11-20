@@ -56,6 +56,7 @@ main(void)
             flint_printf("FAIL: roundtrip\n");
             fmpz_poly_print(f); flint_printf("\n");
             fmpz_poly_print(g); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

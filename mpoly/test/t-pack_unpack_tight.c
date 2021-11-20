@@ -67,6 +67,7 @@ main(void)
                 {
                     printf("FAIL\nunpack_monomials_tight\n");
                     flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
+                    fflush(stdout);
                     flint_abort();
                 }
         }

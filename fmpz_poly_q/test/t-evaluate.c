@@ -64,6 +64,7 @@ main(void)
             gmp_printf("b = %Qd\n", b);
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
+            fflush(stdout);
             flint_abort();
         }
 

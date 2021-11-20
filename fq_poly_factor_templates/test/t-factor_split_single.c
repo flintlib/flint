@@ -62,6 +62,7 @@ main(void)
             flint_printf("polynomial:\n");
             TEMPLATE(T, poly_print) (a, ctx);
             flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

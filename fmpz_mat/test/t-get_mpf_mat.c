@@ -61,6 +61,7 @@ main(void)
                     flint_printf("FAIL: j = %wd, k = %wd\n", j, k);
                     fmpz_mat_print_pretty(A);
                     mpf_mat_print(B);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

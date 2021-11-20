@@ -57,6 +57,7 @@ main(void)
             fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             fmpz_print(a), flint_printf("\n\n");
             fmpz_print(b), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -100,6 +101,7 @@ main(void)
             fmpz_print(a), flint_printf("\n\n");
             fmpz_print(b), flint_printf("\n\n");
             fmpz_print(c), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

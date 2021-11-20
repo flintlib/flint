@@ -103,6 +103,7 @@ int main()
             flint_printf("FAIL: n = %wd\n", n);
             flint_printf("y = %wu\n", y);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }

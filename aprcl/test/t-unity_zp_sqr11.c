@@ -69,6 +69,7 @@ int main(void)
         if (unity_zp_equal(f, g) == 0)
         {
             flint_printf("FAIL\n");
+            fflush(stdout);
             flint_abort();
         }
     

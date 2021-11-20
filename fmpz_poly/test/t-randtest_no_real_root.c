@@ -38,6 +38,7 @@ int main()
             flint_printf("got length (= %wd) above the requested limit %wd\n",
                     fmpz_poly_length(p), len);
             printf("p = "); fmpz_poly_print(p); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -50,6 +51,7 @@ int main()
                 flint_printf("%wd-th coefficient exceed requested bit size\n", i);
                 printf("p = "); fmpz_poly_print(p); printf("\n");
                 flint_printf("bits = %wu\n", bits);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -62,6 +64,7 @@ int main()
             printf("p = ");
             fmpz_poly_print(p);
             printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

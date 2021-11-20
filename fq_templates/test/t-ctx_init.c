@@ -80,6 +80,7 @@ main(void)
                 flint_printf("b   = "), TEMPLATE(T, print_pretty)(b, ctx_mod), flint_printf("\n");
                 flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx_conway), flint_printf("\n");
                 flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx_mod), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

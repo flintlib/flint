@@ -47,6 +47,7 @@ int main()
             flint_printf("FAIL: n = %wd\n", n);
             flint_printf("Direct: "); fmpq_poly_print_pretty(R, "x"); flint_printf("\n");
             flint_printf("Recur.: "); fmpq_poly_print_pretty(Pn, "x"); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

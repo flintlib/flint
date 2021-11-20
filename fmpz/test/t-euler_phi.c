@@ -43,6 +43,7 @@ int main(void)
         if (!fmpz_equal(x, y) || !fmpz_equal(x, z))
         {
             flint_printf("FAIL: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -62,6 +63,7 @@ int main(void)
             flint_printf("FAIL: ");
             fmpz_print(z);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -89,6 +91,7 @@ int main(void)
     if (!fmpz_equal(x, y))
     {
         flint_printf("FAIL: special test value\n");
+        fflush(stdout);
         flint_abort();
     }
 

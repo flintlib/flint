@@ -57,6 +57,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check simple example\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -117,6 +118,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -175,6 +177,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f with divisor aliasing\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -232,6 +235,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f with dividend aliasing\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -292,6 +296,7 @@ main(void)
             {
                 flint_printf("Check random polys don't divide\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -354,6 +359,7 @@ main(void)
             {
                 flint_printf("Check random polys don't divide alias dividend\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -415,6 +421,7 @@ main(void)
             {
                 flint_printf("Check random polys don't divide alias divisor\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

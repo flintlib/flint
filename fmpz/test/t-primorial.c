@@ -42,6 +42,7 @@ int main(void)
           flint_printf("primorial of %wu disagrees with direct product\n", k); 
           fmpz_print(x);
           flint_printf("\n");
+          fflush(stdout);
           flint_abort();
        }
     }

@@ -60,6 +60,7 @@ main(void)
             flint_printf("Matrix B:\n"), fmpq_mat_print(B), flint_printf("\n");
             flint_printf("cp(AB) = "), fmpq_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("cp(BA) = "), fmpq_poly_print_pretty(g, "X"), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

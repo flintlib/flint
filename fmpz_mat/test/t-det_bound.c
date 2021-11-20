@@ -53,6 +53,7 @@ main(void)
             fmpz_mat_print_pretty(A), flint_printf("\n");
             flint_printf("det: "), fmpz_print(det), flint_printf("\n");
             flint_printf("bound: "), fmpz_print(bound), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

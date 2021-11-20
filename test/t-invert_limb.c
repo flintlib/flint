@@ -42,6 +42,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("n = %wx, ninv1 = %wx, ninv2 = %wx\n", n, ninv1, ninv2); 
+         fflush(stdout);
          flint_abort();
       }
    }

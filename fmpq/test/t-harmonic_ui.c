@@ -32,6 +32,7 @@ void numerical_test(fmpq_t res, slong n, double ans)
     if (err > tol)
     {
         flint_printf("FAIL: %wd %.16f %.16f\n", n, mpq_get_d(tmp), ans);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -90,6 +91,7 @@ int main(void)
         if (!mpq_equal(x, y))
         {
             flint_printf("FAIL: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
     }

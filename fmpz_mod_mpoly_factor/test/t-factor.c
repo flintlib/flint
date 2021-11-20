@@ -33,6 +33,7 @@ void check_omega(
     if (!fmpz_mod_mpoly_factor(g, p, ctx))
     {
         flint_printf("FAIL: %s\ncheck factorization could be computed\n", s);
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -41,6 +42,7 @@ void check_omega(
         if (g->poly[i].length < 1 || !fmpz_is_one(g->poly[i].coeffs + 0))
         {
             flint_printf("FAIL: %s\nfactorization is not unit normal\n", s);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -52,6 +54,7 @@ void check_omega(
     if (fmpz_cmp_si(omega, lower) < 0 || fmpz_cmp_si(omega, upper) > 0)
     {
         flint_printf("FAIL: %s\nfactorization has wrong number of factors\n", s);
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -59,6 +62,7 @@ void check_omega(
     if (!fmpz_mod_mpoly_equal(q, p, ctx))
     {
         flint_printf("FAIL: %s\nfactorization does not match\n", s);
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -68,6 +72,7 @@ void check_omega(
         if (h->num != 1 || !fmpz_is_one(h->exp + 0))
         {
             flint_printf("FAIL: %s\nfactor is reducible\n", s);
+            fflush(stdout);
             flint_abort();
         }
     }

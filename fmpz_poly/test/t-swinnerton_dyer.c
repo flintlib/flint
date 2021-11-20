@@ -46,6 +46,7 @@ int main()
         if (r != known_values[n])
         {
             flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
+            fflush(stdout);
             flint_abort();
         }
 

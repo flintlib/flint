@@ -48,6 +48,7 @@ main(void)
             flint_printf("FAIL:\n");
             gmp_printf
                 ("b = %Zd, x = %ld, r1 = %ld, r2 = %ld\n", b, x, r1, r2);
+            fflush(stdout);
             flint_abort();
         }
 

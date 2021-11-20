@@ -109,6 +109,7 @@ main(void)
             for (i = 0; i < num; i++)
                 flint_printf("%wd ", exp[i]);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

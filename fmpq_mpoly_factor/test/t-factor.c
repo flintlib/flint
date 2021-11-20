@@ -28,6 +28,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     if (!fmpq_mpoly_factor(g, p, ctx))
     {
         flint_printf("check factorization could be computed\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -38,6 +39,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     if (fmpz_cmp_si(omega, lower) < 0 || fmpz_cmp_si(omega, upper) > 0)
     {
         flint_printf("factorization has wrong number of factors\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -45,6 +47,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     if (!fmpq_mpoly_equal(q, p, ctx))
     {
         flint_printf("factorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -54,6 +57,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
         if (h->num != 1 || !fmpz_is_one(h->exp + 0))
         {
             flint_printf("FAIL:\nfactor is reducible\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -67,6 +71,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
                                                              !fmpq_is_one(t)))
         {
             flint_printf("monic factorization is not monic\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -75,6 +80,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     if (!fmpq_mpoly_equal(q, p, ctx))
     {
         flint_printf("monic factorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -87,6 +93,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
                                                             fmpq_sgn(t) <= 0))
         {
             flint_printf("integral factorization is not integral\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -95,6 +102,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     if (!fmpq_mpoly_equal(q, p, ctx))
     {
         flint_printf("integral factorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();        
     }
 

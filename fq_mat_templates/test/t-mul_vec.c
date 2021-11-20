@@ -80,6 +80,7 @@ main(void)
                 !TEMPLATE(T, equal)(TEMPLATE(T, mat_entry)(C, j, 0), cc[j], ctx))
             {
                 flint_printf("FAIL: wrong answer\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

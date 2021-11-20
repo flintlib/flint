@@ -57,6 +57,7 @@ main(void)
         if (!nmod_poly_equal(M, M2))
         {
             flint_printf("FAIL!\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -58,6 +58,7 @@ main(void)
             printf("C:\n");
             TEMPLATE(T, mat_print) (C, ctx);
             printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -101,6 +102,7 @@ main(void)
             printf("C:\n");
             TEMPLATE(T, mat_print) (C, ctx);
             printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

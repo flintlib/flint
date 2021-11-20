@@ -63,6 +63,7 @@ main(void)
             flint_printf("Q:\n"); fmpz_poly_print(Q); flint_printf("\n\n");
             flint_printf("D:\n"); fmpz_poly_print(D); flint_printf("\n\n");
             flint_printf("DQ:\n"); fmpz_poly_print(DQ); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -103,6 +104,7 @@ main(void)
             flint_printf("P:\n"); fmpz_poly_print(P); flint_printf("\n\n");
             flint_printf("Q1:\n"); fmpz_poly_print(Q1); flint_printf("\n\n");
             flint_printf("Q2:\n"); fmpz_poly_print(Q2); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

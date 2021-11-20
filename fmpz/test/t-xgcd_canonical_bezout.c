@@ -62,6 +62,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -92,6 +93,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -120,6 +122,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -148,6 +151,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -177,6 +181,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -208,6 +213,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -244,6 +250,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -280,6 +287,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -320,6 +328,7 @@ main(void)
             flint_printf("b = "), fmpz_print(nb), flint_printf("\n");
             flint_printf("f = "), fmpz_print(nf), flint_printf("\n");
             flint_printf("g = "), fmpz_print(ng), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -365,6 +374,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -417,6 +427,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -469,6 +480,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -521,6 +533,7 @@ main(void)
             flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             flint_printf("F = "), fmpz_print(F), flint_printf("\n");
             flint_printf("G = "), fmpz_print(G), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

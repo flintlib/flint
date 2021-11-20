@@ -87,6 +87,7 @@ main(void)
             flint_printf("\nB: \n");
             fmpz_mat_print_pretty(B);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

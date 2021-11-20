@@ -71,6 +71,7 @@ main(void)
             fmpq_poly_debug(c), flint_printf("\n\n");
             fmpq_poly_debug(d), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -112,6 +113,7 @@ main(void)
             flint_printf("sin(a) = "), fmpq_poly_debug(sina2), flint_printf("\n\n");
             flint_printf("cos(a) = "), fmpq_poly_debug(cosa2), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
+            fflush(stdout);
             flint_abort();
         }
 

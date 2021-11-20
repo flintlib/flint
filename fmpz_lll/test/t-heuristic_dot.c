@@ -68,6 +68,7 @@ main(void)
                 ("expo1 = %d, expo2 = %d\nd1 = %g, d2 = %g, d3 = %g, d4 = %g\n",
                  expo1, expo2, d1, d2, d3, d4);
             flint_printf("%g\n", fabs(d4 - d3 - d2 - 2 * d1));
+            fflush(stdout);
             flint_abort();
         }
 

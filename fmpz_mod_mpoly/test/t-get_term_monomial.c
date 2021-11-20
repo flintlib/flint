@@ -66,6 +66,7 @@ main(void)
             {
                 flint_printf("FAIL\nCheck getting a coeff by its monomial\n");
                 flint_printf("i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }

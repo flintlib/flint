@@ -63,6 +63,7 @@ main(void)
             TEMPLATE(T, mat_print_pretty) (B, ctx);
             printf("Y:\n");
             TEMPLATE(T, mat_print_pretty) (Y, ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -76,6 +77,7 @@ main(void)
             TEMPLATE(T, mat_print_pretty) (A, ctx);
             printf("B:\n");
             TEMPLATE(T, mat_print_pretty) (B, ctx);
+            fflush(stdout);
             flint_abort();
         }
 

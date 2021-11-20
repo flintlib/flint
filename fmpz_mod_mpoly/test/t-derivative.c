@@ -89,7 +89,9 @@ main(void)
             {
                 flint_printf("FAIL: Check d(f*g) = df*g + f*dg\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -172,6 +174,7 @@ main(void)
             {
                 flint_printf("FAIL: Check d(f*g) = df*g + f*dg with aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

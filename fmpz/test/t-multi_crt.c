@@ -49,6 +49,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check simple example\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -125,6 +126,7 @@ main(void)
                         printf("FAIL\n");
                         flint_printf("Check remainder "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -134,6 +136,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check output size "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -166,6 +169,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check crt failure i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -234,6 +238,7 @@ main(void)
                         printf("FAIL\n");
                         flint_printf("Check remainder flat "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -243,6 +248,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check output size flat "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -275,6 +281,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check flat crt failure i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -336,6 +343,7 @@ main(void)
                         printf("FAIL\n");
                         flint_printf("Check remainder lazy "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -345,6 +353,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check output size lazy "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -377,6 +386,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check lazy crt failure i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();                    
                 }
             }

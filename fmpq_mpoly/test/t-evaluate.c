@@ -72,6 +72,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -81,6 +82,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
                 fmpq_mpoly_assert_canonical(f, ctx);
@@ -89,6 +91,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -158,6 +161,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -167,6 +171,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -176,6 +181,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check multiprecision repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -247,6 +253,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -255,6 +262,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check addition commutes with evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

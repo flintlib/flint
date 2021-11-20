@@ -44,6 +44,7 @@ main(void)
                 if (A->rows[i][j] != UWORD(0))
                 {
                     flint_printf("FAIL: entries not zero!\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -52,6 +53,7 @@ main(void)
         if (A->mod.n != mod)
         {
             flint_printf("FAIL: bad modulus\n");
+            fflush(stdout);
             flint_abort();
         }
 

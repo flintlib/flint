@@ -113,6 +113,7 @@ main()
             flint_printf("FAIL\n");
             flint_printf("x = %.17g, w = %.17g, error = %g\n", x, w,
                 mpfr_get_d(t, MPFR_RNDA));
+            fflush(stdout);
             flint_abort();
         }
 

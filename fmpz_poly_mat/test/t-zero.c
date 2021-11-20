@@ -43,6 +43,7 @@ main(void)
         if (!fmpz_poly_mat_is_zero(A))
         {
             flint_printf("FAIL: expected matrix to be zero\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -56,6 +57,7 @@ main(void)
             if (fmpz_poly_mat_is_zero(A))
             {
                 flint_printf("FAIL: expected matrix not to be zero\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

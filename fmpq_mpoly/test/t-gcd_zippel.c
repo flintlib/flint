@@ -71,6 +71,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check that gcd could be computed\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -80,6 +81,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check zero gcd only results from zero inputs\ni = %wd, j = %wd\n", i ,j);
+                    fflush(stdout);
                     flint_abort();
                 }
                 continue;
@@ -89,6 +91,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check gcd has positive lc\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -99,6 +102,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check divisibility\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -108,6 +112,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check that cofactor gcd could be computed\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -115,6 +120,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);                
+                fflush(stdout);
                 flint_abort();
             }
         }

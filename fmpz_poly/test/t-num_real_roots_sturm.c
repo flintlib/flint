@@ -34,6 +34,7 @@ int main()
             printf("ERROR:\n");
             flint_printf("got k in wrong range k = %wd\n", k);
             printf("p = "); fmpz_poly_print(p); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -68,6 +69,7 @@ int main()
             flint_printf("found k = %wd instead of n = %wd\n", k, n);
             printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
             printf("p = "); fmpz_poly_print(p); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -82,6 +84,7 @@ int main()
                         k_neg, k_pos, k, n - k);
                 printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
                 printf("p = "); fmpz_poly_print(p); printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

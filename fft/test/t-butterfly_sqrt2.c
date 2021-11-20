@@ -117,6 +117,7 @@ main(void)
                         flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", ma);
                         gmp_printf("got  %Zx\n", m2a);
+                        fflush(stdout);
                         flint_abort();
                     }
                     if (mpz_cmp(mb, m2b) != 0)
@@ -127,6 +128,7 @@ main(void)
                         flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", mb);
                         gmp_printf("got  %Zx\n", m2b);
+                        fflush(stdout);
                         flint_abort();
                     }
                     
@@ -182,6 +184,7 @@ main(void)
                         flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", ma);
                         gmp_printf("got  %Zx\n", m2a);
+                        fflush(stdout);
                         flint_abort();
                     }
                     if (mpz_cmp(mb, m2b) != 0)
@@ -192,6 +195,7 @@ main(void)
                         flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", mb);
                         gmp_printf("got  %Zx\n", m2b);
+                        fflush(stdout);
                         flint_abort();
                     }
                     flint_free(temp);

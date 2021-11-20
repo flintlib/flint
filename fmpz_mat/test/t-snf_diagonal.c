@@ -52,6 +52,7 @@ main(void)
             flint_printf("matrix not in snf!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(S); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +66,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(S); flint_printf("\n\n");
             fmpz_mat_print_pretty(S2); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

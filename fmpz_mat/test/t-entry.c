@@ -52,6 +52,7 @@ main(void)
                 if (fmpz_get_ui(fmpz_mat_entry(a,j,k)) != 3*j + 7*k)
                 {
                     flint_printf("FAIL: get/set entry %wd,%wd\n", j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

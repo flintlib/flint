@@ -75,6 +75,7 @@ int main()
                 fmpq_print(a); flint_printf("\n");
                 flint_printf("t: "); fmpq_poly_print_pretty(t, "x"); flint_printf("\n");
                 flint_printf("tt: "); fmpq_poly_print_pretty(tt, "x"); flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

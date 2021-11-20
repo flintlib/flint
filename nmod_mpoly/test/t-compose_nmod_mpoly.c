@@ -53,6 +53,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example 1\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +66,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example 2\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -77,6 +79,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 3\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -151,6 +154,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check composition success with generators\n"
                                                      "i: %wd, j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -161,6 +165,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check composition with generators\n"
                                                      "i: %wd, j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -228,6 +233,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check composition success\ni: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -239,6 +245,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check composition with identity\ni: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -320,6 +327,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check composition success\ni: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -334,6 +342,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check composition and evalall commute\ni: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -403,6 +412,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check composition success\ni: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -415,6 +425,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check composition with constants matches evalall\ni: %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

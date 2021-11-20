@@ -59,6 +59,7 @@ main(void)
                     flint_printf("FAIL: checked used matches degree\n");
                     flint_printf("var = %wd\n", var);
                     flint_printf("deg: "); fmpz_print(fdeg); flint_printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }

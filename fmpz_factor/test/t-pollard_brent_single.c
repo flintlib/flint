@@ -75,6 +75,7 @@ int main(void)
                     fmpz_print(primeprod);
                     printf(" factor calculated : ");
                     fmpz_print(fac);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -84,6 +85,7 @@ int main(void)
     if (fails > flint_test_multiplier())
     {
         printf("FAIL : Pollard Rho failed too many times (%d times)\n", fails);
+        fflush(stdout);
         flint_abort();
     }
 

@@ -46,6 +46,7 @@ main(void)
                 if (d_mat_entry(A, i, j) != 0)
                 {
                     flint_printf("FAIL: nonzero entry\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }

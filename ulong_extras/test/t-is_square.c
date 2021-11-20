@@ -38,6 +38,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("s = %wu is declared square\n", s); 
+         fflush(stdout);
          flint_abort();
       }
    }
@@ -55,6 +56,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("s = %wu is declared square\n", s); 
+         fflush(stdout);
          flint_abort();
       }
    }

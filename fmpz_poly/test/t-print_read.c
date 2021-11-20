@@ -56,6 +56,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to set-up the pipe.\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -63,6 +64,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to fork the process.\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -76,6 +78,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open output file at the pipe.\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -89,6 +92,7 @@ int main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("Write error.\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -110,6 +114,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open input file at the pipe.\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -123,6 +128,7 @@ int main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("Read error.\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -132,6 +138,7 @@ int main(void)
                     flint_printf("FAIL:\n");
                     flint_printf("a[i] = "), fmpz_poly_print(a[i]), flint_printf("\n");
                     flint_printf("t    = "), fmpz_poly_print(t), flint_printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -146,6 +153,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Only %d out of %d objects were processed.\n", i, n);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -162,6 +170,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to set-up the pipe.\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -169,6 +178,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Failed to fork the process.\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -182,6 +192,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open output file at the pipe.\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -190,6 +201,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Write error.\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -207,6 +219,7 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Could not open input file at the pipe.\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -220,6 +233,7 @@ int main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("r = %d\n", r);
+                    fflush(stdout);
                     flint_abort();
                 }
                 ++i;
@@ -234,6 +248,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("Carried out %d reads, but \"%s\" has only 4 characters.\n", i, str);
+            fflush(stdout);
             flint_abort();
         }
     }

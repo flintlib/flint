@@ -58,6 +58,7 @@ main(void)
             flint_printf("\ndet_interpolate(A):\n");
             nmod_poly_print(b);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

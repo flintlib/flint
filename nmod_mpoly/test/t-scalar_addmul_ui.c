@@ -66,6 +66,7 @@ main(void)
             {
                 flint_printf("FAIL: check definition\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -75,6 +76,7 @@ main(void)
             {
                 flint_printf("FAIL: check aliasing first argument\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -84,6 +86,7 @@ main(void)
             {
                 flint_printf("FAIL: check aliasing second argument\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

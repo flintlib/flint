@@ -57,6 +57,7 @@ main(void)
             flint_printf
                 ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
                  b, c, g, s, t);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -68,6 +69,7 @@ main(void)
             flint_printf
                 ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
                  b, c, g, s, t);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -79,6 +81,7 @@ main(void)
             flint_printf
                 ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
                  b, c, g, s, t);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -95,6 +98,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("Case a = 0, b = 0\n");
             flint_printf("g = %wu, s = %wu, t = %wu\n", g, s, t);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -113,6 +117,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("Case a = 0\n");
             flint_printf("a = %wu, g = %wu, s = %wu, t = %wu\n", a, g, s, t);
+            fflush(stdout);
             flint_abort();
         }
     }

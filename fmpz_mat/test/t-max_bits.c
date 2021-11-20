@@ -45,6 +45,7 @@ main(void)
         if (res1 != res2)
         {
             flint_printf("FAIL!\n");
+            fflush(stdout);
             flint_abort();
         }
 

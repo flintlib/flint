@@ -50,6 +50,7 @@ int main(void)
             flint_printf("Passed Parameters : n = %wu", c);
             flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
             flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
+            fflush(stdout);
             flint_abort();
         }
         mpz_clear(e);

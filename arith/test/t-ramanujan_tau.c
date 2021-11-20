@@ -29,6 +29,7 @@ void check_value(slong n, char *ans)
           flint_printf("tau(%wd) gave ", n);
           fmpz_print(x);
           flint_printf(", expected %s\n", ans); 
+          fflush(stdout);
           flint_abort();
     }
     fmpz_clear(x);
@@ -50,6 +51,7 @@ void consistency_check(slong n)
     {
         flint_printf("FAIL:\n");
         flint_printf("wrong length of polynomial %wd\n", n);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -66,6 +68,7 @@ void consistency_check(slong n)
             flint_printf("\n");
             fmpz_print(y);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
     }

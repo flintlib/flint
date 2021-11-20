@@ -44,6 +44,7 @@ main(void)
             {
                 flint_printf
                     ("FAIL: wrong deflation for constant polynomial\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -53,6 +54,7 @@ main(void)
             {
                 flint_printf
                     ("FAIL: constant polynomial changed on deflation\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -76,6 +78,7 @@ main(void)
                 flint_printf("poly2:\n");
                 TEMPLATE(T, poly_print) (poly2, ctx);
                 flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -94,6 +97,7 @@ main(void)
                 flint_printf("poly3:\n");
                 TEMPLATE(T, poly_print) (poly3, ctx);
                 flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -101,6 +105,7 @@ main(void)
             if (!TEMPLATE(T, poly_equal) (poly3, poly2, ctx))
             {
                 flint_printf("FAIL: aliasing\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

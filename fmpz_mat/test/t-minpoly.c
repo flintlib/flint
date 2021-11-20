@@ -72,6 +72,7 @@ main(void)
             flint_printf("Matrix A:\n"), fmpz_mat_print(A), flint_printf("\n");
             flint_printf("mp(A) = "), fmpz_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("cp(A) = "), fmpz_poly_print_pretty(g, "X"), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -128,6 +129,7 @@ main(void)
             flint_printf("Matrix P^{-1}AP:\n"), fmpz_mat_print(B), flint_printf("\n");
             flint_printf("mp(A) = "), fmpz_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("mp(P^{-1}AP) = "), fmpz_poly_print_pretty(g, "X"), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

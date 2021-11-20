@@ -58,6 +58,7 @@ main(void)
             flint_printf("x = %wd\n", x);
             _fmpz_vec_print(b, len), flint_printf("\n\n");
             _fmpz_vec_print(c, len), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

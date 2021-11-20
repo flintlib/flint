@@ -26,6 +26,7 @@ void check_it(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
     if (!fq_nmod_mpoly_factor_squarefree(g, p, ctx))
     {
         flint_printf("FAIL:\ncheck factorization 1 could be computed\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -34,6 +35,7 @@ void check_it(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
         if (!fq_nmod_mpoly_is_monic(g->poly + i, ctx))
         {
             flint_printf("FAIL:\nfactorization is not unit normal\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -42,6 +44,7 @@ void check_it(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
     if (!fq_nmod_mpoly_equal(q, p, ctx))
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -53,6 +56,7 @@ void check_it(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
             if (!fmpz_is_one(h->exp + j))
             {
                 flint_printf("FAIL:\nfactor has a square factor\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

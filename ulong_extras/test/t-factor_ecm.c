@@ -47,6 +47,7 @@ int main(void)
                         flint_printf("Number : %wu = %wu * %wu\n", prod, prime1, prime2);
                         flint_printf("Factor found : %wu", f);
                         flint_printf("Aborting");
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -60,6 +61,7 @@ int main(void)
     {
         flint_printf("Too many unsuccessful factorizations, %d\n", fails);
         flint_printf("Aborting\n");
+        fflush(stdout);
         flint_abort();
     }
 

@@ -63,6 +63,7 @@ main(void)
         {
             fmpz_print(c), flint_printf("\n\n");
             fmpz_print(d), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -48,6 +48,7 @@ void check(fmpz_t n)
         fmpz_print(m);
         flint_printf("\n");
 
+        fflush(stdout);
         flint_abort();
     }
 
@@ -67,6 +68,7 @@ void check(fmpz_t n)
         fmpz_factor_print(factor2);
         flint_printf("\n");
 
+        fflush(stdout);
         flint_abort();
     }
 
@@ -84,6 +86,7 @@ void check(fmpz_t n)
             fmpz_factor_print(factor);
             flint_printf("\n");
 
+            fflush(stdout);
             flint_abort();
         }
     }

@@ -52,6 +52,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example 1\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +66,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 2\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -72,6 +74,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 2 equality\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -135,6 +138,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check composition success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -145,6 +149,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check composition and evalall commute\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }

@@ -45,6 +45,7 @@ main(void)
             if (!fmpz_mod_mpoly_equal_fmpz(f, c, ctx))
             {
                 flint_printf("FAIL: Check is_fmpz and get_fmpz match\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -54,12 +55,14 @@ main(void)
         if (!fmpz_mod_mpoly_is_fmpz(f, ctx))
         {
             flint_printf("FAIL: Check set_fmpz makes is_fmpz true\n");
+            fflush(stdout);
             flint_abort();
         }
         fmpz_mod_mpoly_get_fmpz(d, f, ctx);
         if (!fmpz_mod_equal_fmpz(d, c, ctx->ffinfo))
         {
             flint_printf("FAIL: Check get_fmpz matches set_fmpz\n");
+            fflush(stdout);
             flint_abort();
         }
 

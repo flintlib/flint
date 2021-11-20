@@ -58,6 +58,7 @@ main(void)
             flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -100,6 +101,7 @@ main(void)
             flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -139,6 +141,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -182,6 +185,7 @@ main(void)
             flint_printf("b  = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c1 = "), qadic_print_pretty(c1, ctx), flint_printf("\n");
             flint_printf("c2 = "), qadic_print_pretty(c2, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -232,6 +236,7 @@ main(void)
             flint_printf("c   = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("lhs = "), qadic_print_pretty(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), qadic_print_pretty(rhs, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

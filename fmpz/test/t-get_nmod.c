@@ -50,6 +50,7 @@ main(void)
             flint_printf("x : %wu\n", x);
             flint_printf("r1: %wu\n", r1);
             flint_printf("r2: %wu\n", r2);
+            fflush(stdout);
             flint_abort();
         }
 

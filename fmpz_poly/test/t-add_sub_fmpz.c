@@ -79,6 +79,7 @@ main(void)
            printf("s = "); fmpz_poly_print(s); printf("\n");
            printf("t = "); fmpz_poly_print(t); printf("\n");
            printf("c = "); fmpz_print(c); printf("\n");
+           fflush(stdout);
            flint_abort();
         }
 

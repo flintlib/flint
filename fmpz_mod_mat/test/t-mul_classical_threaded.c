@@ -73,6 +73,7 @@ main(void)
             fmpz_mod_mat_print_pretty(B);
             fmpz_mod_mat_print_pretty(C);
             fmpz_mod_mat_print_pretty(D);
+            fflush(stdout);
             flint_abort();
         }
 

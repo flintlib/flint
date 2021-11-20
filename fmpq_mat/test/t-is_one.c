@@ -36,6 +36,7 @@ main(void)
         if (!fmpq_mat_is_one(A))
         {
             flint_printf("FAIL!\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -45,6 +46,7 @@ main(void)
             if (fmpq_mat_is_one(A))
             {
                 flint_printf("FAIL!\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

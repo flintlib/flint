@@ -79,6 +79,7 @@ main(void)
            printf("s = "); fmpq_poly_print(s); printf("\n");
            printf("t = "); fmpq_poly_print(t); printf("\n");
            printf("c = "); flint_printf("%wd", c); printf("\n");
+           fflush(stdout);
            flint_abort();
         }
 

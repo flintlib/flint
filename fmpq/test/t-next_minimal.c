@@ -42,6 +42,7 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -57,6 +58,7 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -75,6 +77,7 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -92,6 +95,7 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
+        fflush(stdout);
         flint_abort();
     }
 

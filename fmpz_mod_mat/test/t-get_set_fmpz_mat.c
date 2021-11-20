@@ -49,6 +49,7 @@ main(void)
         if (!fmpz_mod_mat_equal(A, B))
         {
             flint_printf("FAIL: matrices not equal!\n");
+            fflush(stdout);
             flint_abort();
         }
 

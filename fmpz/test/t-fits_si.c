@@ -26,6 +26,7 @@ static void check(fmpz_t x, int expected)
         flint_printf("x = "), fmpz_print(x), flint_printf("\n");
         flint_printf("fmpz_fits_si(x) = %d\n", fmpz_fits_si(x));
         flint_printf("WORD_MIN = %wd\n", WORD_MIN);
+        fflush(stdout);
         flint_abort();
     }
 }

@@ -68,6 +68,7 @@ main(void)
             flint_printf("B:\n");
             fmpz_mat_print_pretty(B);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -88,6 +89,7 @@ main(void)
                     flint_printf("B:\n");
                     fmpz_mat_print_pretty(B);
                     flint_printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }

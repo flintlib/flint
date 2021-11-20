@@ -59,6 +59,7 @@ main(void)
             flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             flint_printf("ans1 = %d\n", ans1);
             flint_printf("ans2 = %d\n", ans2);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -114,6 +115,7 @@ main(void)
             flint_printf("e = exp(b)        = "), qadic_print_pretty(e, ctx), flint_printf("\n");
             flint_printf("f = exp(a) exp(b) = "), qadic_print_pretty(f, ctx), flint_printf("\n");
             flint_printf("g = exp(a + b)    = "), qadic_print_pretty(g, ctx), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -58,6 +58,7 @@ main(void)
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
             fmpz_poly_print(f); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -100,6 +101,7 @@ main(void)
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
             fmpz_poly_print(f); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -144,6 +146,7 @@ main(void)
             fq_default_print(fq1, ctx); flint_printf("\n\n");
             fq_default_print(fq2, ctx); flint_printf("\n\n");
             fmpz_poly_print(f); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -47,6 +47,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("bits = %wd, bits2 = %wd bits3 = %wd\n", bits, bits2, bits3);
+            fflush(stdout);
             flint_abort();
         }
 

@@ -43,6 +43,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("check nmod_pow_fmpz matches nmod_pow_ui\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -75,6 +76,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("check b^e1*b^e2 = b^(e1+e2)\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

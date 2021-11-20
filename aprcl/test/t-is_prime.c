@@ -42,6 +42,7 @@ int main(void)
             flint_printf("Testing number = ");
             fmpz_print(n);
             flint_printf("\nis_probabprime = %i, aprcl_is_prime_jacobi = %i\n", pbprime, cycloprime);
+            fflush(stdout);
             flint_abort();
         }
 

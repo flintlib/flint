@@ -44,6 +44,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared composite\n", d); 
+         fflush(stdout);
          flint_abort();
       }
 
@@ -71,6 +72,7 @@ int main(void)
    {
       flint_printf("FAIL:\n");
       flint_printf("%wu composites declared prime\n", count); 
+      fflush(stdout);
       flint_abort();
    }
  

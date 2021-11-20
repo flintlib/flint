@@ -50,6 +50,7 @@ main(void)
             flint_printf("x: "); fmpz_print(x); flint_printf("\n\n");
             flint_printf("a = %wu\n\n", a);
             flint_printf("r: "); fmpz_print(r); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +92,7 @@ main(void)
             flint_printf("rf(x,a): "); fmpz_print(r1); flint_printf("\n\n");
             flint_printf("rf(x+a,b): "); fmpz_print(r2); flint_printf("\n\n");
             flint_printf("rf(x,a+b): "); fmpz_print(r3); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -49,6 +49,7 @@ main(void)
         if (!mpoly_test_irreducible(f->exps, f->bits, f->length, ctx->minfo))
         {
             flint_printf("FAIL: check 8 variable example\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -68,6 +69,7 @@ main(void)
         if (!mpoly_test_irreducible(f->exps, f->bits, f->length, ctx->minfo))
         {
             flint_printf("FAIL: check 2 variable example 1\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -75,6 +77,7 @@ main(void)
         if (!mpoly_test_irreducible(f->exps, f->bits, f->length, ctx->minfo))
         {
             flint_printf("FAIL: check 2 variable example 1\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -110,6 +113,7 @@ main(void)
             flint_printf("f: "); fmpz_mpoly_print_pretty(f, NULL, ctx); flint_printf("\n");
             flint_printf("g: "); fmpz_mpoly_print_pretty(g, NULL, ctx); flint_printf("\n");
             flint_printf("h: "); fmpz_mpoly_print_pretty(h, NULL, ctx); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

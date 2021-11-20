@@ -49,6 +49,7 @@ int main(void)
         {
             flint_printf("FAIL: n = %wu, base = %d\n", n, base);
             flint_printf("n_sizeinbase: %d, strlen: %d\n", size1, size2);
+            fflush(stdout);
             flint_abort();
         }
     }

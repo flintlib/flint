@@ -51,6 +51,7 @@ main(void)
         if (!nmod_mat_equal(C, D))
         {
             flint_printf("FAIL\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -60,6 +61,7 @@ main(void)
         if (!nmod_mat_equal(C, B))
         {
             flint_printf("FAIL\n");
+            fflush(stdout);
             flint_abort();
         }
 

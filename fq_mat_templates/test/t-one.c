@@ -44,6 +44,7 @@ main(void)
         if (!TEMPLATE(T, mat_is_one) (A, ctx))
         {
             printf("FAIL: expected matrix to be one\n");
+            fflush(stdout);
             flint_abort();
         }
 

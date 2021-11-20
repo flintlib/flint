@@ -66,6 +66,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("result of is_irreducible and is_irreducible_ddf does not coincide\n");
             flint_printf("poly = "), nmod_poly_print(poly), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -86,6 +87,7 @@ main(void)
         {
             flint_printf("Error: reducible polynomial declared irreducible!\n");
             nmod_poly_print(poly3); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

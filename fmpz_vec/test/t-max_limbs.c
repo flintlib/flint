@@ -52,6 +52,7 @@ main(void)
             flint_printf("limbs  = %wd\n", limbs);
             flint_printf("a      = {"), _fmpz_vec_print(a, len), flint_printf("}\n");
             flint_printf("limbs2 = %wd\n", limbs2);
+            fflush(stdout);
             flint_abort();
         }
 

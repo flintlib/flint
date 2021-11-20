@@ -62,6 +62,7 @@ main(void)
             flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
             flint_printf("log(A): "); nmod_poly_print(logA), flint_printf("\n\n");
             flint_printf("res: "); nmod_poly_print(res), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -58,6 +58,7 @@ main(void)
             flint_printf("FAIL:\n");
             TEMPLATE(T, poly_print_pretty) (a, "x", ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print_pretty) (b, "x", ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

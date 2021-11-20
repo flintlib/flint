@@ -51,6 +51,7 @@ int main(void)
          {
             flint_printf("FAIL:\n");
             flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+            fflush(stdout);
             flint_abort();
          }
       }
@@ -60,6 +61,7 @@ int main(void)
    {
       flint_printf("FAIL:\n");
       flint_printf("Only %wu numbers factored\n", count);
+      fflush(stdout);
       flint_abort();
    }
 

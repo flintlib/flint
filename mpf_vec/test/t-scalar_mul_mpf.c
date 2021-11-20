@@ -56,6 +56,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("aliasing failed\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -95,6 +96,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("n ( a + b ) test failed\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -143,6 +145,7 @@ main(void)
             flint_printf("\n");
             mpf_out_str(stdout, 10, 0, n);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

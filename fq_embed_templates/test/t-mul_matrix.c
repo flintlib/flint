@@ -64,6 +64,7 @@ main(void)
                 TEMPLATE(B, mat_print_pretty)(mat_a), flint_printf("^2\n=\n"),
                 TEMPLATE(B, mat_print_pretty)(mat_a_a), flint_printf("\n=\n"),
                 TEMPLATE(B, mat_print_pretty)(mat_a_sq), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

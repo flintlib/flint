@@ -57,6 +57,7 @@ main(void)
             flint_printf("FAIL:\n");
             _fmpz_vec_print(a, len1), flint_printf("\n\n");
             _fmpz_vec_print(b, len2), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

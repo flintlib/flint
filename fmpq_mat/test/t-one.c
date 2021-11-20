@@ -60,6 +60,7 @@ main(void)
             fmpq_mat_print(C);
             flint_printf("I:\n");
             fmpq_mat_print(I);
+            fflush(stdout);
             flint_abort();
         }
 

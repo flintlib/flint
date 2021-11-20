@@ -54,6 +54,7 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
             if (nmod_mat_entry(LU, i, j) != 0)
             {
                 flint_printf("FAIL: wrong shape!\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -81,6 +82,7 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
         nmod_mat_print_pretty(LU);
         flint_printf("B:\n");
         nmod_mat_print_pretty(B);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -137,6 +139,7 @@ main(void)
                 nmod_mat_print_pretty(A);
                 flint_printf("LU:");
                 nmod_mat_print_pretty(LU);
+                fflush(stdout);
                 flint_abort();
             }
 

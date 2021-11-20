@@ -74,6 +74,7 @@ main(void)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("Error in entry %wd\n", i);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

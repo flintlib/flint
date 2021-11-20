@@ -53,6 +53,7 @@ main(void)
                 flint_printf("\n");
             flint_printf("b = "), mpf_out_str(stdout, 10, 0, b),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -73,6 +74,7 @@ main(void)
             flint_printf("y = "), fmpz_print(y), flint_printf("\n");
             flint_printf("a = "), mpf_out_str(stdout, 10, 0, a),
                 flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

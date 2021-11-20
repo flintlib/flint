@@ -59,6 +59,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_q_print(a), flint_printf("\n\n");
             fmpz_poly_q_print(b), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -108,6 +109,7 @@ main(void)
             flint_printf("c = "), fmpz_poly_q_print(c), flint_printf("\n\n");
             flint_printf("d = "), fmpz_poly_q_print(d), flint_printf("\n\n");
             gmp_printf("y = %Qd\n\n", y);
+            fflush(stdout);
             flint_abort();
         }
 

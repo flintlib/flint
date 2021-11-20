@@ -84,6 +84,7 @@ main(void)
             flint_printf("A^-1:\n"),      fmpz_mat_print_pretty(B), flint_printf("\n");
             flint_printf("den(A^-1) = "), fmpz_print(den), flint_printf("\n");
             flint_printf("A * A^-1:\n"),  fmpz_mat_print_pretty(C), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -98,6 +99,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("aliasing failed!\n");
             fmpz_mat_print(C); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -130,6 +132,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("singular system gave nonzero denominator\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -139,6 +142,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("singular system gave nonzero denominator\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -59,6 +59,7 @@ main(void)
             {
                 flint_printf("FAIL: Check (f + c) - c = f\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -72,6 +73,7 @@ main(void)
             {
                 flint_printf("FAIL: Check aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

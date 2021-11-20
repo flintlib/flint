@@ -46,6 +46,7 @@ int main(void)
             flint_printf("b[3] = %wu, b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[3], b[2], b[1], b[0]);
             flint_printf("s[3] = %wu, s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[3], s[2], s[1], s[0]);
             flint_printf("t[3] = %wu, t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[3], t[2], t[1], t[0]);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -70,6 +71,7 @@ int main(void)
             flint_printf("b[3] = %wu, b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[3], b[2], b[1], b[0]);
             flint_printf("s[3] = %wu, s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[3], s[2], s[1], s[0]);
             flint_printf("t[3] = %wu, t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[3], t[2], t[1], t[0]);
+            fflush(stdout);
             flint_abort();
         }
     }

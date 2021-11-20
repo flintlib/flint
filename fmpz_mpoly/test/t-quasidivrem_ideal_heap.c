@@ -114,6 +114,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check s*f = g1*q1 + ... + gn*qn + r\ni=%wd j=%wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -216,6 +217,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing remainder\ni=%wd j=%wd\n",i,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

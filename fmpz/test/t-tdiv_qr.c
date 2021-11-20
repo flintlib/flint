@@ -63,6 +63,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -116,6 +117,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -169,6 +171,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -222,6 +225,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -275,6 +279,7 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
+            fflush(stdout);
             flint_abort();
         }
 

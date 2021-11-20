@@ -39,6 +39,7 @@ main(void)
         if (d_mat_is_empty(A) != (rows == 0 || cols == 0))
         {
             flint_printf("FAIL!\n");
+            fflush(stdout);
             flint_abort();
         }
         d_mat_clear(A);

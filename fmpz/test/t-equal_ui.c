@@ -54,6 +54,7 @@ main(void)
             flint_printf("n = %wu\n", n);
             flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
             flint_printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
+            fflush(stdout);
             flint_abort();
         }
 
@@ -87,6 +88,7 @@ main(void)
             flint_printf("n = %wu\n", n);
             flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
             flint_printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
+            fflush(stdout);
             flint_abort();
         }
 

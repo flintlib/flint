@@ -45,6 +45,7 @@ main(void)
         {
             printf("FAIL1:\n");
             _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -70,6 +71,7 @@ main(void)
         {
             printf("FAIL2:\n");
             _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

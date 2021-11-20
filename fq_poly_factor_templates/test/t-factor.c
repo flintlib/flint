@@ -112,6 +112,7 @@ main(void)
         {
             flint_printf("Error: number of factors incorrect, %wd, %wd\n",
                          res->num, num);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -131,6 +132,7 @@ main(void)
             flint_printf("\n");
             TEMPLATE(T, poly_print_pretty) (product, "x", ctx);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
         TEMPLATE(T, poly_clear) (product, ctx);
@@ -225,6 +227,7 @@ main(void)
         if (res->num != res2->num)
         {
             flint_printf("FAIL: different number of factors found\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -245,6 +248,7 @@ main(void)
             if (!found)
             {
                 flint_printf("FAIL: factor not found\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

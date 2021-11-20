@@ -36,6 +36,7 @@ void test_set(char * in, char * out)
     {
         flint_printf("test_set: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -60,6 +61,7 @@ void test_set_si(slong x, char * out)
     {
         flint_printf("test_set_si: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -90,6 +92,7 @@ void test_swap(char * in1, char * in2, char * out1, char * out2)
     {
         flint_printf("test_swap: failed\n");
         flint_printf("    Expected \"%s\" \"%s\", got \"%s\" \"%s\"\n", out1, out2, res1, res2);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -117,6 +120,7 @@ void test_zero(char * in, char * out)
     {
         flint_printf("test_zero: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -143,6 +147,7 @@ void test_neg(char * in, char * out)
     {
         flint_printf("test_neg: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -169,6 +174,7 @@ void test_inv(char * in, char * out)
     {
         flint_printf("test_inv: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -194,6 +200,7 @@ void test_inv_inplace(char * in, char * out)
     {
         flint_printf("test_inv_inplace: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -217,6 +224,7 @@ void test_is_zero(char * in, int out)
     {
         flint_printf("test_equal: failed\n");
         flint_printf("    Expected \"%d\", got \"%d\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -239,6 +247,7 @@ void test_is_one(char * in, int out)
     {
         flint_printf("test_equal: failed\n");
         flint_printf("    Expected \"%d\", got \"%d\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -264,6 +273,7 @@ void test_equal(char * in1, char * in2, int out)
     {
         flint_printf("test_equal: failed\n");
         flint_printf("    Expected \"%d\", got \"%d\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -293,6 +303,7 @@ void test_add(char * in1, char * in2, char * out)
     {
         flint_printf("test_add: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -324,6 +335,7 @@ void test_add_in_place1(char * in1, char * in2, char * out)
     {
         flint_printf("test_add_in_place1: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -354,6 +366,7 @@ void test_add_in_place2(char * in1, char * in2, char * out)
     {
         flint_printf("test_add_in_place2: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -382,6 +395,7 @@ void test_add_in_place3(char * in, char * out)
     {
         flint_printf("test_add_in_place3: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -412,6 +426,7 @@ void test_sub(char * in1, char * in2, char * out)
     {
         flint_printf("test_sub: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -443,6 +458,7 @@ void test_sub_in_place1(char * in1, char * in2, char * out)
     {
         flint_printf("test_sub_in_place1: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -473,6 +489,7 @@ void test_sub_in_place2(char * in1, char * in2, char * out)
     {
         flint_printf("test_sub_in_place2: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -501,6 +518,7 @@ void test_sub_in_place3(char * in, char * out)
     {
         flint_printf("test_sub_in_place3: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -528,6 +546,7 @@ void test_scalar_mul_si(char * in, slong x, char * out)
     {
         flint_printf("test_scalar_mul_si: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -555,6 +574,7 @@ void test_scalar_mul_mpz(char * in, mpz_t x, char * out)
     {
         flint_printf("test_scalar_mul_mpz: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -582,6 +602,7 @@ void test_scalar_mul_mpq(char * in, mpq_t x, char * out)
     {
         flint_printf("test_scalar_mul_mpq: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -609,6 +630,7 @@ void test_scalar_div_si(char * in, slong x, char * out)
     {
         flint_printf("test_scalar_div_si: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -636,6 +658,7 @@ void test_scalar_div_mpz(char * in, mpz_t x, char * out)
     {
         flint_printf("test_scalar_div_mpz: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -663,6 +686,7 @@ void test_scalar_div_mpq(char * in, mpq_t x, char * out)
     {
         flint_printf("test_scalar_div_mpq: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -693,6 +717,7 @@ void test_mul(char * in1, char * in2, char * out)
     {
         flint_printf("test_mul: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -724,6 +749,7 @@ void test_mul_in_place1(char * in1, char * in2, char * out)
     {
         flint_printf("test_mul_in_place1: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -754,6 +780,7 @@ void test_mul_in_place2(char * in1, char * in2, char * out)
     {
         flint_printf("test_mul_in_place2: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -782,6 +809,7 @@ void test_mul_in_place3(char * in, char * out)
     {
         flint_printf("test_mul_in_place3: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -812,6 +840,7 @@ void test_div(char * in1, char * in2, char * out)
     {
         flint_printf("test_div: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -843,6 +872,7 @@ void test_div_in_place1(char * in1, char * in2, char * out)
     {
         flint_printf("test_div_in_place1: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -873,6 +903,7 @@ void test_div_in_place2(char * in1, char * in2, char * out)
     {
         flint_printf("test_div_in_place2: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -901,6 +932,7 @@ void test_div_in_place3(char * in, char * out)
     {
         flint_printf("test_div_in_place3: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -928,6 +960,7 @@ void test_pow(char * in, ulong x, char * out)
     {
         flint_printf("test_pow: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -955,6 +988,7 @@ void test_derivative(char * in, char * out)
     {
         flint_printf("test_derivative: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -982,6 +1016,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
     {
         flint_printf("test_evaluate: failed\n");
         flint_printf("    Expected \"%s\", got a pole\n", out);
+        fflush(stdout);
         flint_abort();
     }
     if (!pole && !strcmp(out, "P"))
@@ -989,6 +1024,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
         res = mpq_get_str(NULL, 10, rop);
         flint_printf("test_evaluate: failed\n");
         flint_printf("    Expected a pole, got \"%s\"\n", res);
+        fflush(stdout);
         flint_abort();
     }
     if (!pole)
@@ -1000,6 +1036,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
         {
             flint_printf("test_evaluate: failed\n");
             flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -1025,6 +1062,7 @@ void test_get_str_pretty(char * in, char * out)
     {
         flint_printf("test_get_str_pretty: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -1054,6 +1092,7 @@ void test_addmul(char * in1, char * in2, char * in3, char * out)
     {
         flint_printf("test_addmul: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -1085,6 +1124,7 @@ void test_submul(char * in1, char * in2, char * in3, char * out)
     {
         flint_printf("test_submul: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
+        fflush(stdout);
         flint_abort();
     }
     
@@ -1122,6 +1162,7 @@ int main(int argc, char *argv[])
         flint_printf("test_numref: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
         flint_printf("    qpoly1 = \""), fmpz_poly_q_print(qpoly1), flint_printf("\"\n");
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1136,6 +1177,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_denref: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1152,6 +1194,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_get_num: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1170,6 +1213,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_get_den: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1188,6 +1232,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_set_num: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1206,6 +1251,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_set_den: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1223,6 +1269,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_canonicalize: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1237,6 +1284,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("test_canonicalize: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", str, strout);
+        fflush(stdout);
         flint_abort();
     }
     flint_free(strout);
@@ -1517,6 +1565,7 @@ int main(int argc, char *argv[])
     if ((ans == 0) || !fmpz_poly_q_is_zero(qpoly1))
     {
         flint_printf("test_set_str: failed\n");
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1526,6 +1575,7 @@ int main(int argc, char *argv[])
     if ((ans == 0) || !fmpz_poly_q_is_zero(qpoly1))
     {
         flint_printf("test_set_str: failed\n");
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);
@@ -1535,6 +1585,7 @@ int main(int argc, char *argv[])
     if ((ans == 0) || !fmpz_poly_q_is_zero(qpoly1))
     {
         flint_printf("test_set_str: failed\n");
+        fflush(stdout);
         flint_abort();
     }
     fmpz_poly_q_clear(qpoly1);

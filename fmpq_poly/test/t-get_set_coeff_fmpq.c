@@ -59,6 +59,7 @@ main(void)
                 flint_printf("cflags = %wu\n\n", cflags);
                 flint_printf("x = "), fmpq_print(x), flint_printf("\n");
                 flint_printf("y = "), fmpq_print(y), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

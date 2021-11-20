@@ -49,6 +49,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_print(f), flint_printf("\n\n");
             fmpz_poly_print(g), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -77,6 +78,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_print(f), flint_printf("\n\n");
             fmpz_poly_print(h), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -106,6 +108,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_print(f1), flint_printf("\n\n");
             fmpz_poly_print(f2), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

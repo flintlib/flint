@@ -88,6 +88,7 @@ int main(void)
         {
             flint_printf("FAIL: col_partition failed\n");
             flint_printf("m = %ld, n = %ld, p1 = %ld, p2 = %ld\n", m, n, p1, p2);
+            fflush(stdout);
             flint_abort();
         }
 

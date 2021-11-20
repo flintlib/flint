@@ -93,6 +93,7 @@ main(void)
             flint_printf("\n");
             TEMPLATE(T, poly_print_pretty) (poly1, "x", ctx);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -116,6 +117,7 @@ main(void)
             flint_printf("product:\n");
             TEMPLATE(T, poly_print) (product, ctx);
             flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

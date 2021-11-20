@@ -160,6 +160,7 @@ main(void)
             fmpz_poly_print(F_poly2); flint_printf("\n\n");
             fmpz_poly_print(F_poly3); flint_printf("\n\n");
             fmpz_poly_print(Prod_1); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         } 
 

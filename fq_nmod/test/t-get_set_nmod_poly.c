@@ -55,6 +55,7 @@ main(void)
                 flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), nmod_poly_print_pretty(c, "x"), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

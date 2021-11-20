@@ -77,6 +77,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check answer is between, i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -85,6 +86,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check denominator, i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -95,6 +97,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check answer is simplest, i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -105,6 +108,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check int answer is simplest, i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -112,6 +116,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check return has positive denominator, i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -120,6 +125,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check m left, i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -128,6 +134,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check m right, i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

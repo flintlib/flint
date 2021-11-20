@@ -44,6 +44,7 @@ void gcd_check(
     {
         flint_printf("Check gcd can be computed\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -54,6 +55,7 @@ void gcd_check(
             printf("FAIL\n");
             flint_printf("Check divisor of gcd\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -64,6 +66,7 @@ void gcd_check(
     {
         printf("FAIL\n");
         flint_printf("Check cofactors i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -74,6 +77,7 @@ void gcd_check(
             printf("FAIL\n");
             flint_printf("Check zero gcd only results from zero inputs\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+            fflush(stdout);
             flint_abort();
         }
         goto cleanup;
@@ -84,6 +88,7 @@ void gcd_check(
         printf("FAIL\n");
         flint_printf("Check gcd is monic\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -92,6 +97,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (a, u): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -100,6 +106,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (a, v): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -108,6 +115,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (a, w): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -116,6 +124,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (u, b): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -124,6 +133,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (v, b): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -132,6 +142,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (w, b): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -141,6 +152,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (u, v): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -150,6 +162,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (v, u): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -159,6 +172,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (u, w): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -168,6 +182,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (w, u): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -177,6 +192,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (v, w): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -186,6 +202,7 @@ void gcd_check(
     if (!nmod_mpoly_equal(g, u, ctx) || !nmod_mpoly_equal(abar, v, ctx) || !nmod_mpoly_equal(bbar, w, ctx))
     {
         flint_printf("FAIL (u, v, w), (w, v): i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -198,6 +215,7 @@ void gcd_check(
         printf("FAIL\n");
         flint_printf("Check gcd of cofactors can be computed\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -206,6 +224,7 @@ void gcd_check(
         printf("FAIL\n");
         flint_printf("Check gcd of cofactors is one\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -214,6 +233,7 @@ void gcd_check(
         printf("FAIL\n");
         flint_printf("Check cofactors of cofactors\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -225,6 +245,7 @@ void gcd_check(
         printf("FAIL\n");
         flint_printf("Check cofactors of cofactors with aliasing\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -350,6 +371,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -457,6 +479,7 @@ main(void)
             if (t1->length != 1 || t2->length != 1)
             {
                 flint_printf("FAIL:\ncheck random monomial generation\n");
+                fflush(stdout);
                 flint_abort();
             }
             nmod_mpoly_randtest_bits(a, state, len1, exp_bits, ctx);

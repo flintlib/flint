@@ -59,6 +59,7 @@ main(void)
             flint_printf("FAIL (aliasing a and b):\n");
             padic_poly_print(a, ctx), flint_printf("\n\n");
             padic_poly_print(b, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -96,6 +97,7 @@ main(void)
             flint_printf("FAIL (aliasing a and c):\n");
             padic_poly_print(a, ctx), flint_printf("\n\n");
             padic_poly_print(c, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -156,6 +158,7 @@ main(void)
                 flint_printf("d = "), padic_poly_print(d, ctx), flint_printf("\n\n");
                 flint_printf("a1 = "), padic_poly_print(a1, ctx), flint_printf("\n\n");
                 flint_printf("a2 = "), padic_poly_print(a2, ctx), flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -210,6 +213,7 @@ main(void)
             flint_printf("N = %wd, val(b) = %wd, val(c) = %wd\n", N, b->val, c->val);
             padic_poly_print(c, ctx), flint_printf("\n\n");
             padic_poly_print(d, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -38,6 +38,7 @@ main(void)
         if (mpf_mat_is_square(A) != (rows == cols))
         {
             flint_printf("FAIL!\n");
+            fflush(stdout);
             flint_abort();
         }
         mpf_mat_clear(A);

@@ -49,6 +49,7 @@ int main(void)
             flint_printf("FAIL:\n");
             flint_printf("p = %wu\n", p);
             flint_printf("n = %wd\n", n);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -59,6 +60,7 @@ int main(void)
                 flint_printf("FAIL (2):\n");
                 flint_printf("p = %wu\n", p);
                 flint_printf("n = %wd\n", n);
+                fflush(stdout);
                 flint_abort();
             }
         }

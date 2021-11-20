@@ -58,6 +58,7 @@ main(void)
             gmp_printf("n = %Mu\n\n", n);
             gmp_printf("r = %Mu\n\n", r);
             flint_printf("s = "), fmpz_print(s), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

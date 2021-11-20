@@ -49,6 +49,7 @@ main(void)
                 flint_printf("FAIL (aliasing):\n\n");
                 flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -82,6 +83,7 @@ main(void)
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
                 flint_printf("d = "), fq_zech_print_pretty(d, ctx), flint_printf("\n");
+                fflush(stdout);
                 flint_abort();
             }
 

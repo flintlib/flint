@@ -49,6 +49,7 @@ main(void)
             flint_printf("x = "), fmpq_print(x), flint_printf("\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n");
             flint_printf("z = "), fmpz_print(z), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -79,6 +80,7 @@ main(void)
             flint_printf("x = "), fmpq_print(x), flint_printf("\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n");
             flint_printf("z = "), fmpq_print(z), flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

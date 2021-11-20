@@ -54,6 +54,7 @@ main(void)
             flint_printf("q: "); fmpz_print(q); flint_printf("\n"); 
             flint_printf("x: "); fmpq_print(x); flint_printf("\n"); 
             flint_printf("y: "); fmpq_print(y); flint_printf("\n"); 
+            fflush(stdout);
             flint_abort();
         }
 

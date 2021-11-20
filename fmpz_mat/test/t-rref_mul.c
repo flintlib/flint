@@ -69,6 +69,7 @@ main(void)
             flint_printf("FAIL wrong rank! (r = %wd, rank1 = %wd)!\n", r, rank1);
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -77,6 +78,7 @@ main(void)
             flint_printf("FAIL matrix not in rref!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -105,6 +107,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R2); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -149,6 +152,7 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R3); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

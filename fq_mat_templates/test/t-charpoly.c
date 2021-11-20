@@ -52,6 +52,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("charpoly(AB) != charpoly(BA).\n");
+            fflush(stdout);
             flint_abort();
         }
 

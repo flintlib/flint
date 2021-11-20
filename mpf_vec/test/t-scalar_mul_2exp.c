@@ -47,6 +47,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("exp = %wu\n", exp);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -75,6 +76,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("e1 = %wu, e2 = %wu\n", e1, e2);
+            fflush(stdout);
             flint_abort();
         }
 

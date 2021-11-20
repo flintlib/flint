@@ -45,6 +45,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("ord = "), fmpz_print(ord), flint_printf("\n");
             TEMPLATE(T, ctx_print)(ctx);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -87,6 +88,7 @@ main(void)
                 flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("ord = "), fmpz_print(ord), flint_printf("\n");
                 TEMPLATE(T, ctx_print)(ctx);
+                fflush(stdout);
                 flint_abort();
             }
         }
