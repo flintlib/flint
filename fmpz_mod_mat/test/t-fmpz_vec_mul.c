@@ -76,6 +76,7 @@ int main(void)
                 !fmpz_equal(fmpz_mod_mat_entry(C, 0, j), cc[j]))
             {
                 flint_printf("FAIL: wrong answer\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

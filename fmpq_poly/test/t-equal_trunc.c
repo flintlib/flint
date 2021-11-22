@@ -57,7 +57,8 @@ main(void)
             flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
             flint_printf("equal(a, b) = %d\n", result);
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(c);
@@ -100,7 +101,8 @@ main(void)
             flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
             flint_printf("equal(a, b) = %d\n", result);
             flint_printf("n = %wd, m = %wd\n", n, m);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(c);

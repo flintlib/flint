@@ -55,7 +55,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             _fmpz_vec_print(a, len), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _fmpz_vec_clear(a, len);

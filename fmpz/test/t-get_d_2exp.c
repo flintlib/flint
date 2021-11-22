@@ -47,7 +47,8 @@ main(void)
             flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             flint_printf("output = %f\n", output);
             flint_printf("exp = %wd, bits = %wu\n", exp, fmpz_bits(a));
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

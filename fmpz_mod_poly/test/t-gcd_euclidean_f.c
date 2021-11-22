@@ -69,7 +69,8 @@ main(void)
             flint_printf("c = "), fmpz_mod_poly_print(c, ctx), flint_printf("\n\n");
             flint_printf("d = "), fmpz_mod_poly_print(d, ctx), flint_printf("\n\n");
             flint_printf("f = "), fmpz_print(f), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mod_poly_clear(a, ctx);

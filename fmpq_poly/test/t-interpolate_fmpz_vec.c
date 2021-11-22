@@ -65,7 +65,8 @@ main(void)
                 flint_printf("x:\n"); _fmpz_vec_print(x, n); flint_printf("\n\n");
                 flint_printf("y:\n"); _fmpz_vec_print(y, n); flint_printf("\n\n");
                 flint_printf("P:\n"); fmpq_poly_print(P), flint_printf("\n\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
         fmpq_clear(q);

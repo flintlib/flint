@@ -70,7 +70,8 @@ main(void)
             flint_printf("AX:\n");
             TEMPLATE(T, mat_print_pretty)(AX, ctx);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear)(A, ctx);
@@ -118,7 +119,8 @@ main(void)
             flint_printf("AX:\n");
             TEMPLATE(T, mat_print_pretty)(AX, ctx);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear)(A, ctx);

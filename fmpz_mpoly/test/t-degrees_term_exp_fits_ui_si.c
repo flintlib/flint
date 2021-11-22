@@ -40,6 +40,7 @@ main(void)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 1\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -48,6 +49,7 @@ main(void)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 2\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -56,6 +58,7 @@ main(void)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 3\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -64,6 +67,7 @@ main(void)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 4\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -72,6 +76,7 @@ main(void)
             if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 1\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -79,6 +84,7 @@ main(void)
             if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 2\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -86,6 +92,7 @@ main(void)
             if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 3\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -93,6 +100,7 @@ main(void)
             if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 4\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -103,6 +111,7 @@ main(void)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 1\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -111,6 +120,7 @@ main(void)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 2\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -119,6 +129,7 @@ main(void)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 3\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -127,6 +138,7 @@ main(void)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 4\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -135,6 +147,7 @@ main(void)
             if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 1\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -142,6 +155,7 @@ main(void)
             if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 2\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -149,6 +163,7 @@ main(void)
             if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 3\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -156,12 +171,14 @@ main(void)
             if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 4\n");
+                fflush(stdout);
                 flint_abort();
             }
 
         } else
         {
             printf("FAIL\nFLINT_BITS is not 64 or 32\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -213,6 +230,7 @@ main(void)
             if (result != fmpz_mpoly_term_exp_fits_si(f, j, ctx))
             {
                 flint_printf("FAIL\nCheck monomial_fit_si\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -222,6 +240,7 @@ main(void)
             if (result != fmpz_mpoly_term_exp_fits_ui(f, j, ctx))
             {
                 flint_printf("FAIL\nCheck monomial_fit_ui\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -233,6 +252,7 @@ main(void)
             if (!fmpz_equal(exp[k], deg[k]))
             {
                 flint_printf("FAIL\nCheck degree computation\ni = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }            
             result = result && fmpz_fits_si(exp[k]);
@@ -240,6 +260,7 @@ main(void)
         if (result != fmpz_mpoly_degrees_fit_si(f, ctx))
         {
             flint_printf("FAIL\nCheck degrees_fit_si\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }            
 

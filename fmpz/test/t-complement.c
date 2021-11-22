@@ -52,7 +52,8 @@ main(void)
         {
             flint_printf("FAIL (no alias):\n");
             gmp_printf("c = %Zd, d = %Zd\n", c, d);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -87,7 +88,8 @@ main(void)
         {
             flint_printf("FAIL (aliased):\n");
             gmp_printf("c = %Zd, d = %Zd\n", c, d);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

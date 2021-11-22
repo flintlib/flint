@@ -84,7 +84,8 @@ main(void)
             fmpz_print(modulus);
             flint_printf(" %wd, %d\n", max_exp, v);
             fmpz_mod_poly_print(poly, ctx); flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(modulus);

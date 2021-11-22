@@ -23,7 +23,8 @@ static void check(fmpz_t x, int expected)
     {
         flint_printf("FAIL:\n\n");
         flint_printf("x = "), fmpz_print(x), flint_printf("\n");
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 }
 

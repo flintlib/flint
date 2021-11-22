@@ -52,7 +52,8 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -90,7 +91,8 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -129,7 +131,8 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);

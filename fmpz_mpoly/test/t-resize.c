@@ -84,6 +84,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check pushback matches add\ni=%wd\n",i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -91,6 +92,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check resize+setterm matches add\ni=%wd\n",i);
+            fflush(stdout);
             flint_abort();
         }
 

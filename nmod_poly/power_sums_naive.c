@@ -48,7 +48,7 @@ nmod_poly_power_sums_naive(nmod_poly_t res, const nmod_poly_t poly, slong n)
     {
         flint_printf
             ("Exception (nmod_poly_power_sums_naive). Zero polynomial.\n");
-        abort();
+        flint_abort();
     }
     else if (n <= 0 || poly->length == 1)
     {

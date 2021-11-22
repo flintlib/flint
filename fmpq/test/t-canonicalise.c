@@ -39,7 +39,8 @@ main(void)
             flint_printf("FAIL: expected fmpq_randtest output to be canonical\n");
             fmpq_print(x);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_init(mult);
@@ -54,7 +55,8 @@ main(void)
             flint_printf("FAIL: expected fmpq_is_canonical to detect common factor\n");
             fmpq_print(x);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_canonicalise(x);
@@ -64,7 +66,8 @@ main(void)
             flint_printf("FAIL: result not canonical after calling fmpq_canonicalise\n");
             fmpq_print(x);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_neg(&x->den, &x->den);
@@ -74,7 +77,8 @@ main(void)
             flint_printf("FAIL: negative denominator reported as being canonical\n");
             fmpq_print(x);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_canonicalise(x);
@@ -84,7 +88,8 @@ main(void)
             flint_printf("FAIL: result not canonical after calling fmpq_canonicalise\n");
             fmpq_print(x);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(mult);

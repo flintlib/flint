@@ -52,6 +52,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example 1\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +66,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 2\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -74,6 +76,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check example 2 equality\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -145,6 +148,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -154,6 +158,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check composition and evalall commute\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -238,6 +243,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -247,6 +253,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check composition with constants matches evalall\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpz_poly_clear(t);
@@ -329,6 +336,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -338,6 +346,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check multiprecision composition with constants matches evalall\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpz_poly_clear(t);

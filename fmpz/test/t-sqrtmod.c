@@ -56,7 +56,8 @@ int main(void)
             flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -110,7 +111,8 @@ int main(void)
             flint_printf("c (= sqrt(a) = "), fmpz_print(c), flint_printf("\n");
             flint_printf("d (= c^2)    = "), fmpz_print(d), flint_printf("\n");
             flint_printf("ans          = %d\n", ans);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

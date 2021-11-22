@@ -60,6 +60,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check (f + g) - g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -109,6 +110,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f + g = g + f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -159,6 +161,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f + g = g + f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -212,6 +215,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f + (g + h) = (f + g) + h\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -266,6 +270,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f - (g + h) = (f - g) - h\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -314,6 +319,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing first arg\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -371,6 +377,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing second arg\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

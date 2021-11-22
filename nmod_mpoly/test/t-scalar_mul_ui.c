@@ -74,6 +74,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check (f*a)*b = f*(a*b)\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -90,6 +91,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check (f*a)*b = f*(a*b) with aliasing\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -156,6 +158,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check f*a*inv(a) = f\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -171,6 +174,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check f*a*inv(a) = f with aliasing\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 

@@ -66,7 +66,8 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong value for n=%wd, k=%wd\n", n, k);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
     }

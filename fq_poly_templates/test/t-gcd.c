@@ -56,7 +56,8 @@ main(void)
                 flint_printf("\n");
             flint_printf("g = "), TEMPLATE(T, poly_print_pretty) (g, "X", ctx),
                 flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -105,7 +106,8 @@ main(void)
             flint_printf
                 ("could not find coprime polynomials after %wd tries\n",
                  j + 1);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         for (j = 0; (j < 100 * flint_test_multiplier()) && (c->length < 2);
@@ -118,7 +120,8 @@ main(void)
             flint_printf
                 ("could not find non-unit polynomial after %wd tries\n",
                  j + 1);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_make_monic) (c, c, ctx);
@@ -140,7 +143,8 @@ main(void)
                 flint_printf("\n");
             flint_printf("g = "), TEMPLATE(T, poly_print_pretty) (g, "X", ctx),
                 flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -181,7 +185,8 @@ main(void)
                 flint_printf("\n");
             flint_printf("g = "), TEMPLATE(T, poly_print_pretty) (g, "X", ctx),
                 flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -222,7 +227,8 @@ main(void)
                 flint_printf("\n");
             flint_printf("g = "), TEMPLATE(T, poly_print_pretty) (g, "X", ctx),
                 flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

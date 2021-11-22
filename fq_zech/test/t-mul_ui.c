@@ -69,7 +69,8 @@ main(void)
                 flint_printf("c = ");
                 fq_zech_print_pretty(c, ctx);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fq_nmod_clear(bb, ctx->fq_nmod_ctx);
@@ -110,7 +111,8 @@ main(void)
                 flint_printf("b = ");
                 fq_zech_print_pretty(b, ctx);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fq_nmod_clear(bb, ctx->fq_nmod_ctx);

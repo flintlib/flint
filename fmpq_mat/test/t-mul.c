@@ -62,7 +62,8 @@ main(void)
             fmpq_mat_print(C);
             flint_printf("D:\n");
             fmpq_mat_print(D);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_mat_clear(A);
@@ -92,6 +93,7 @@ main(void)
             flint_printf("FAIL: window aliasing failed\n");
             fmpq_mat_print(A); flint_printf("\n\n");
             fmpq_mat_print(B); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

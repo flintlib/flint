@@ -187,6 +187,7 @@ main(void)
             if (!fmpz_mpoly_factor_squarefree(tf, t1, ctx))
             {
                 flint_printf("FAIL:\ncheck factor_squarefree success\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -229,6 +230,7 @@ main(void)
                     if (!fmpz_poly_divides(ulcs + j, ut1, ut2))
                     {
                         flint_printf("FAIL:\nbad divisor\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                 }
@@ -264,6 +266,7 @@ main(void)
                 if (!fmpz_divisible(Af->constant, content_divs + j))
                 {
                     flint_printf("FAIL:\nbad divisor\n");
+                    fflush(stdout);
                     flint_abort();
                 }
                 fmpz_divexact(Af->constant, Af->constant, content_divs + j);
@@ -273,6 +276,7 @@ main(void)
                 if (!fmpz_mpoly_divides(t1, lcs + j, divs + j, ctx))
                 {
                     flint_printf("FAIL:\nbad divisor\n");
+                    fflush(stdout);
                     flint_abort();                    
                 }
             }

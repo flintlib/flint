@@ -58,7 +58,8 @@ main(void)
                 flint_printf("\n\n");
             flint_printf("ctx = "), TEMPLATE(T, ctx_print) (ctx),
                 flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

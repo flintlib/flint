@@ -60,6 +60,7 @@ main(void)
         if (nmod_mpoly_is_zero(b, ctx) || !nmod_mpoly_is_zero(a, ctx))
         {
             flint_printf("FAIL: Check simple example\n");
+            fflush(stdout);
             flint_abort();
         }
         nmod_mpoly_clear(a, ctx);
@@ -117,6 +118,7 @@ main(void)
             {
                 flint_printf("FAIL: Check pow_ui against pow_naive\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -127,6 +129,7 @@ main(void)
             {
                 flint_printf("FAIL: Check aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

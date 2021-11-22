@@ -61,7 +61,8 @@ main(void)
             flint_printf("FAIL: results not equal\n");
             d_mat_print(F);
             d_mat_print(G);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (n == k)
@@ -71,7 +72,8 @@ main(void)
             if (!d_mat_equal(A, E))
             {
                 flint_printf("FAIL: aliasing failed\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 

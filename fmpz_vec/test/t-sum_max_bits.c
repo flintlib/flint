@@ -55,12 +55,14 @@ main(void)
         if (sum_bits != fmpz_bits(sum))
         {
             flint_printf("FAIL: sum bits is wrong\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (max_bits != fmpz_bits(max))
         {
             flint_printf("FAIL: max bits is wrong\n");
+            fflush(stdout);
             flint_abort();
         }
 

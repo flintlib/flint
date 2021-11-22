@@ -108,7 +108,8 @@ main(void)
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
             nmod_mat_print_pretty(D);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (n == k)
@@ -118,6 +119,7 @@ main(void)
             if (!nmod_mat_equal(A, C))
             {
                 flint_printf("FAIL: aliasing failed\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -149,6 +151,7 @@ main(void)
             flint_printf("FAIL: window aliasing failed\n");
             nmod_mat_print_pretty(A); flint_printf("\n\n");
             nmod_mat_print_pretty(B); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

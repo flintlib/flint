@@ -63,7 +63,8 @@ main(void)
             flint_printf("B:\n");
             nmod_poly_mat_print(B, "x");
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_mat_clear(A);
@@ -102,7 +103,8 @@ main(void)
             flint_printf("B:\n");
             nmod_poly_mat_print(B, "x");
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_mat_clear(A);

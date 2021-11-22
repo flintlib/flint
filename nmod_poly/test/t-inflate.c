@@ -54,7 +54,8 @@ main(void)
             flint_printf("poly1:\n"); nmod_poly_print(poly1); flint_printf("\n\n");
             flint_printf("poly2:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
             flint_printf("poly3:\n"); nmod_poly_print(poly3); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_inflate(poly1, poly1, inflation);
@@ -63,7 +64,8 @@ main(void)
             flint_printf("FAIL: aliasing (inflation = %wu)\n", inflation);
             flint_printf("poly1:\n"); nmod_poly_print(poly1); flint_printf("\n\n");
             flint_printf("poly2:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(poly1);

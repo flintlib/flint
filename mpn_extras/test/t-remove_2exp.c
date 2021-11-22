@@ -43,7 +43,8 @@ int main(void)
             if (check != zero || mpz_cmp(a,b))
             {
                 gmp_printf("%d %d \n", zero, nonzero);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
     }

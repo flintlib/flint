@@ -40,7 +40,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv);
             flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

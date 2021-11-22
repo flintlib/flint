@@ -66,7 +66,8 @@ main(void)
             flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
             flint_printf("Computed rank: %wd (zrank = %wd)\n", rank, zrank);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(x);

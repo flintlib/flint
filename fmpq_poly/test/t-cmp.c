@@ -42,7 +42,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             fmpq_poly_debug(f), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(f);
@@ -71,7 +72,8 @@ main(void)
             fmpq_poly_debug(f), flint_printf("\n");
             fmpq_poly_debug(g), flint_printf("\n");
             fmpq_poly_debug(h), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(f);
@@ -98,7 +100,8 @@ main(void)
             fmpq_poly_debug(f), flint_printf("\n");
             fmpq_poly_debug(g), flint_printf("\n");
             flint_printf("cmp(f,g) = %d\n", fmpq_poly_cmp(f, g));
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(f);

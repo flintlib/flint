@@ -70,6 +70,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -133,6 +134,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
        }
@@ -197,6 +199,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys, alias quotient and numerator\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
        }
@@ -261,6 +264,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys, alias quotient and numerator\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
        }
@@ -326,6 +330,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys, alias quotient and numerator\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
        }
@@ -390,6 +395,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f = g*q + r for random polys, alias quotient and numerator\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
        }

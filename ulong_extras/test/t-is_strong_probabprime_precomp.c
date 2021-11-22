@@ -57,7 +57,8 @@ int main(void)
          {
             flint_printf("FAIL:\n");
             flint_printf("a = %wu, d = %wu\n", a, d); 
-            abort();
+            fflush(stdout);
+            flint_abort();
          }
       }
 
@@ -98,7 +99,8 @@ int main(void)
    {
       flint_printf("FAIL:\n");
       flint_printf("count = %wu\n", count);
-      abort();
+      fflush(stdout);
+      flint_abort();
    }
 
    FLINT_TEST_CLEANUP(state);

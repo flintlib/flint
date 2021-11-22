@@ -64,7 +64,8 @@ int main(void)
           gmp_printf("%Zd\n", c);
           gmp_printf("%Zd\n", a);
           gmp_printf("%Zd\n", b);
-          abort();
+          fflush(stdout);
+          flint_abort();
        }
 
        flint_free(g->_mp_d);
@@ -102,7 +103,8 @@ int main(void)
           gmp_printf("%Zd\n", a);
           gmp_printf("%Zd\n", b);
           gmp_printf("%Zd\n", s);
-          abort();
+          fflush(stdout);
+          flint_abort();
        }
 
        flint_free(g->_mp_d);

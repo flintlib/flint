@@ -67,7 +67,8 @@ main(void)
             fmpz_poly_mat_print(BA, "x"), flint_printf("\n");
             flint_printf("tr(AB): "),  fmpz_poly_print(trab),    flint_printf("\n");
             flint_printf("tr(BA): "),  fmpz_poly_print(trba),    flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_mat_clear(A);

@@ -46,6 +46,7 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("ah1 = %wu, al1 = %wu, ah2 = %wu, al1 = %wu\n", ah1, al1, ah2, al1); 
          flint_printf("sh2 = %wu, sh1 = %wu, sl2 = %wu, sl1 = %wu\n", sh2, sh1, sl2, sl1);
+         fflush(stdout);
          flint_abort();
       }
    }

@@ -37,6 +37,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("check fibonacci 1\n");
+            fflush(stdout);
             flint_abort();
         }
         nmod_berlekamp_massey_add_point(B, 5);
@@ -48,6 +49,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("check fibonacci 2\n");
+            fflush(stdout);
             flint_abort();
         }
         nmod_berlekamp_massey_clear(B);
@@ -88,6 +90,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("check intermediate reductions match\n"
                                                    "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -130,6 +133,7 @@ main(void)
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
                     printf("v: "); nmod_poly_print_pretty(v, "#"); printf("\n");
                     printf("B: "); nmod_berlekamp_massey_print(B1); printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
                 if (   nmod_poly_degree(nmod_berlekamp_massey_R_poly(B1))
@@ -139,6 +143,7 @@ main(void)
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
                     printf("v: "); nmod_poly_print_pretty(v, "#"); printf("\n");
                     printf("B: "); nmod_berlekamp_massey_print(B1); printf("\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 

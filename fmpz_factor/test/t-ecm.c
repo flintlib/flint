@@ -56,7 +56,8 @@ int main(void)
                     fmpz_print(primeprod);
                     printf(" factor calculated : ");
                     fmpz_print(fac);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }
@@ -65,7 +66,8 @@ int main(void)
     if (fails > flint_test_multiplier())
     {
         printf("FAIL : ECM failed too many times (%d times)\n", fails);
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 
     /* Tests for hangs and crashes, don't care about result */

@@ -55,7 +55,8 @@ main(void)
             flint_printf("Embed\n"),
                 fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
                 fmpz_mod_mat_print_pretty(project), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mod_mat_clear(embed);
@@ -111,7 +112,8 @@ main(void)
                     fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
                     fmpz_mod_mat_print_pretty(project), flint_printf("\nComposition\n"),
                     fmpz_mod_mat_print_pretty(comp), flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_mod_mat_clear(embed);

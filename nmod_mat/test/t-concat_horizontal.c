@@ -60,7 +60,8 @@ int main(void)
             flint_printf("A concat_horizontal B = \n");
             nmod_mat_print_pretty(C);
             flint_printf("FAIL: results not equal\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         
         nmod_mat_clear(A);

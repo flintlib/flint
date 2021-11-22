@@ -144,7 +144,8 @@ main(void)
             fmpz_poly_print(G); flint_printf("\n\n");
             fmpz_poly_print(H); flint_printf("\n\n");
             fmpz_poly_factor_print(F_fac); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         } 
 
         nmod_poly_factor_clear(f_fac);

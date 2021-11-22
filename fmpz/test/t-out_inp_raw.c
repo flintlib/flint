@@ -58,14 +58,16 @@ int main(void)
         {
             printf("FAIL:\n");
             printf("Failed to set-up the pipe.\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if((childpid = fork()) == -1)
         {
             printf("FAIL:\n");
             printf("Failed to fork the process.\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if(childpid == 0)  /* Child process */
@@ -78,7 +80,8 @@ int main(void)
             {
                 printf("FAIL:\n");
                 printf("Could not open output file at the pipe.\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             for (j = 0; j < n; j++)
@@ -89,7 +92,8 @@ int main(void)
                 {
                     printf("FAIL:\n");
                     printf("Write error.\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
 
@@ -110,7 +114,8 @@ int main(void)
             {
                 printf("FAIL:\n");
                 printf("Could not open input file at the pipe.\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_init(t);
@@ -124,7 +129,8 @@ int main(void)
                     printf("FAIL:\n");
                     printf("a[i] = "), fmpz_print(a + i), printf("\n");
                     printf("t    = "), fmpz_print(t), printf("\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
 
                 ++i;
@@ -138,7 +144,8 @@ int main(void)
         {
             printf("FAIL:\n");
             printf("Only %d out of %d objects were processed.\n", i, n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         for (i = 0; i < n; i++)

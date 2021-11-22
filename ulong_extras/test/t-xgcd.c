@@ -57,7 +57,8 @@ main(void)
             flint_printf
                 ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
                  b, c, g, s, t);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         result = (t <= a * c || a * c == 0);
@@ -68,7 +69,8 @@ main(void)
             flint_printf
                 ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
                  b, c, g, s, t);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         result = (g == c && ph == UWORD(0) && pl == c);
@@ -79,7 +81,8 @@ main(void)
             flint_printf
                 ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
                  b, c, g, s, t);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -95,7 +98,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("Case a = 0, b = 0\n");
             flint_printf("g = %wu, s = %wu, t = %wu\n", g, s, t);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -113,7 +117,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("Case a = 0\n");
             flint_printf("a = %wu, g = %wu, s = %wu, t = %wu\n", a, g, s, t);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

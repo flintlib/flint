@@ -188,6 +188,7 @@ main(void)
                 printf("x: "); fmpz_print(x); printf("\n");
                 printf("y: "); fmpz_print(y); printf("\n");
                 printf("test1 failed\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -198,6 +199,7 @@ main(void)
                 printf("x: "); fmpz_print(x); printf("\n");
                 printf("y: "); fmpz_print(y); printf("\n");
                 printf("test2 failed\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

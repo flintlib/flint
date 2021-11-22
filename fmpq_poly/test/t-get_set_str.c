@@ -30,6 +30,7 @@ void check_invalid(char * s)
     {
         printf("Got no error with s='%s'\n", s);
         printf("p = "); fmpq_poly_print(p); printf("\n");
+        fflush(stdout);
         flint_abort();
     }
     fmpq_poly_clear(p);
@@ -91,7 +92,8 @@ main(void)
             flint_printf("str    = %s\n\n", str);
             flint_printf("ans    = %d\n\n", ans);
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(f);

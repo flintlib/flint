@@ -87,7 +87,8 @@ main(void)
             flint_printf("\nB: \n");
             fmpz_poly_print(B);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(Amod);

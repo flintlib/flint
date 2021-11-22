@@ -63,7 +63,8 @@ main(void)
             fmpz_print(a), flint_printf("\n\n");
             gmp_printf("y = %Qd\n\n", y);
             gmp_printf("z = %Qd\n\n", z);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -109,7 +110,8 @@ main(void)
             fmpz_print(a), flint_printf("\n\n");
             gmp_printf("y = %Qd\n\n", y);
             gmp_printf("z = %Qd\n\n", z);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

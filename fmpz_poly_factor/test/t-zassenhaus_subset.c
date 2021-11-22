@@ -101,6 +101,7 @@ main(void)
                     if (s[j] != j && s[j] != -j - 1)
                     {
                         flint_printf("FAIL\ncheck subset element\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                     k += (s[j] >= 0);
@@ -108,6 +109,7 @@ main(void)
                 if (k != i)
                 {
                     flint_printf("FAIL\ncheck subset size\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -126,6 +128,7 @@ main(void)
                     my_subset_print(s, r);
                     flint_printf("\n");
                     flint_printf("res1: %d  res2: %d\n", res1, res2);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -137,6 +140,7 @@ main(void)
                         if (s1[k] != s[j] && s1[k] != -s[j] - 1)
                         {
                             flint_printf("FAIL\ncheck next disjoint is disjoint\n");
+                            fflush(stdout);
                             flint_abort();
                         }
                         k++;
@@ -159,6 +163,7 @@ main(void)
                             flint_printf("s2: ");
                             my_subset_print(s2, r - i);
                             flint_printf("\n");
+                            fflush(stdout);
                             flint_abort();
                         }
                     }
@@ -169,6 +174,7 @@ main(void)
             if (!fmpz_equal_ui(f, cnt))
             {
                 flint_printf("FAIL\ncheck subset size\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

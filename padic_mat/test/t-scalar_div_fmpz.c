@@ -64,7 +64,8 @@ main(void)
             flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
             flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_mat_clear(a);

@@ -65,7 +65,8 @@ int main(void)
             flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
             flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
             flint_printf("Expected answer : base = %wu remainder = %wu", val, j);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         mpz_clear(e);
         mpz_clear(f);
@@ -97,7 +98,8 @@ int main(void)
             flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
             printf("\n");
             flint_printf("Expected answer : base = %wu remainder = 0", base);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -125,7 +127,8 @@ int main(void)
             flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
             printf("\n");
             flint_printf("Expected answer : base = %wu remainder = 1", base);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
    }
 
@@ -164,7 +167,8 @@ int main(void)
             flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
             flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
             flint_printf("Expected answer : base = %wu remainder = %wu", val, j);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpz_clear(e);

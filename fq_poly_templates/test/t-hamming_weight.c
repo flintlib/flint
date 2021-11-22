@@ -58,7 +58,8 @@ main(void)
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
                 flint_printf("\n");
             flint_printf("w1 = %wd \n w2 = %wd \n", w1, w2);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
@@ -99,7 +100,8 @@ main(void)
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
                 flint_printf("\n");
             flint_printf("w1 = %wd \n w2 = %wd \n wsum = %wd", w1, w2, wsum);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

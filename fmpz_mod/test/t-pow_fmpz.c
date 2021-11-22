@@ -69,6 +69,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("check a^(e + f) =  a^e * a^f\n"
                                             "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
     skip1:
@@ -87,6 +88,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("check a^(e + f) =  a^e * a^f with aliasing\n"
                                             "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
     skip2:
@@ -100,6 +102,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("check 0^0 = 1\n"
                                             "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -117,6 +120,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("check (a*b)^e =  a^e * b^e with aliasing\n"
                                             "i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
     skip3:;

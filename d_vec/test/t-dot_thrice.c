@@ -58,7 +58,8 @@ main(void)
             flint_printf("%g\n", err1);
             flint_printf("%g\n", err2);
             flint_printf("%g\n", err3);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _d_vec_clear(a);

@@ -57,7 +57,8 @@ main(void)
             flint_printf("x = %wu\n", x);
             flint_printf("y = %wu\n", y);
             flint_printf("n = %wu\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         
         nmod_poly_clear(f);
@@ -99,7 +100,8 @@ main(void)
             flint_printf("y = %wu\n", y);
             flint_printf("z = %wd\n", z);
             flint_printf("n = %wu\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         
         nmod_poly_clear(f);

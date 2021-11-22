@@ -55,7 +55,8 @@ main(void)
             flint_printf("Mono -> Dual\n"),
                 fmpz_mod_mat_print_pretty(m2d), flint_printf("\nDual -> Mono\n"),
                 fmpz_mod_mat_print_pretty(d2m), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mod_mat_clear(m2d);

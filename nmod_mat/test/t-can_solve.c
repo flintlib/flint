@@ -69,7 +69,8 @@ main(void)
             flint_printf("AX:\n");
             nmod_mat_print_pretty(AX);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);
@@ -114,7 +115,8 @@ main(void)
             flint_printf("AX:\n");
             nmod_mat_print_pretty(AX);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);

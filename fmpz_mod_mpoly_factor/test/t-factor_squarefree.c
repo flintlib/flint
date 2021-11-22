@@ -25,6 +25,7 @@ void check_it(const fmpz_mod_mpoly_t p, const fmpz_mod_mpoly_ctx_t ctx)
     if (!fmpz_mod_mpoly_factor_squarefree(g, p, ctx))
     {
         flint_printf("FAIL:\ncheck factorization could be computed\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -33,6 +34,7 @@ void check_it(const fmpz_mod_mpoly_t p, const fmpz_mod_mpoly_ctx_t ctx)
         if (g->poly[i].length < 1 || !fmpz_is_one(g->poly[i].coeffs + 0))
         {
             flint_printf("FAIL:\nfactorization is not unit normal\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -41,6 +43,7 @@ void check_it(const fmpz_mod_mpoly_t p, const fmpz_mod_mpoly_ctx_t ctx)
     if (!fmpz_mod_mpoly_equal(q, p, ctx))
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -52,6 +55,7 @@ void check_it(const fmpz_mod_mpoly_t p, const fmpz_mod_mpoly_ctx_t ctx)
             if (!fmpz_is_one(h->exp + j))
             {
                 flint_printf("FAIL:\nfactor has a square factor\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

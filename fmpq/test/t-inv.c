@@ -55,13 +55,15 @@ main(void)
         if (!fmpq_equal(x, z))
         {
             flint_printf("FAIL: applying inv twice did not give back the input!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (!fmpq_is_canonical(y) || !fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpq_inv(Y, Z);
@@ -80,7 +82,8 @@ main(void)
             flint_printf("\nz = ");
             fmpq_print(z);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -113,7 +116,8 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpq_inv(X, X);
@@ -125,7 +129,8 @@ main(void)
             flint_printf("x = ");
             fmpq_print(x);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);

@@ -64,7 +64,8 @@ main(void)
             TEMPLATE(T, mat_print_pretty) (C, ctx);
             TEMPLATE(T, mat_print_pretty) (D, ctx);
             TEMPLATE(T, mat_print_pretty) (E, ctx);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         /* Check aliasing */
@@ -78,7 +79,8 @@ main(void)
             TEMPLATE(T, mat_print_pretty) (C, ctx);
             TEMPLATE(T, mat_print_pretty) (D, ctx);
             TEMPLATE(T, mat_print_pretty) (E, ctx);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear) (A, ctx);

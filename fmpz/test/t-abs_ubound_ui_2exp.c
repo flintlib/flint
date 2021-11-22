@@ -79,7 +79,8 @@ main(void)
             flint_printf("y = "); fmpz_print(y); flint_printf("\n\n");
             flint_printf("yexp = %wd\n\n", yexp);
             flint_printf("man = %wu, exp = %wd\n", man, exp);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         /* ok if equal */
@@ -111,7 +112,8 @@ main(void)
             flint_printf("bits(x) = %wd\n\n", fmpz_bits(x));
             flint_printf("y = "); fmpz_print(y); flint_printf(", yexp = %wd\n\n", yexp);
             flint_printf("man = %wu, exp = %wd\n", man, exp);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(x);

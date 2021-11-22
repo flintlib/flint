@@ -62,6 +62,7 @@ int main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("check positive answer, i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }            
         }
@@ -71,6 +72,7 @@ int main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("check zero answer, i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -80,6 +82,7 @@ int main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("check failed answer, i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }            
         }

@@ -69,7 +69,8 @@ main(void)
             flint_printf("X:\n"),      fmpz_mat_print_pretty(X),  flint_printf("\n");
             flint_printf("mod = "),    fmpz_print(mod),           flint_printf("\n");
             flint_printf("AX:\n"),     fmpz_mat_print_pretty(AX), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);
@@ -104,7 +105,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("singular system, returned nonzero\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

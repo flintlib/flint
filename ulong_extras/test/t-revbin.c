@@ -54,7 +54,8 @@ main(void)
             flint_printf("b = %wu\n", b);
             flint_printf("n = %wx\n", n);
             flint_printf("r = %wx\n", r);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -85,7 +86,8 @@ main(void)
                     flint_printf("d = %wx\n", d);
                     flint_printf("r1 = %wx\n", r1);
                     flint_printf("r2 = %wx\n", r2);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }
@@ -120,7 +122,8 @@ main(void)
                 flint_printf("d = %wx\n", d);
                 flint_printf("r1 = %wx\n", r1);
                 flint_printf("r2 = %wx\n", r2);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
     }

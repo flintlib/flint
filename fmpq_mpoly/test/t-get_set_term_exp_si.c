@@ -80,6 +80,7 @@ main(void)
             if (!result)
             {
                 flint_printf("FAIL\ncheck get and set match\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 

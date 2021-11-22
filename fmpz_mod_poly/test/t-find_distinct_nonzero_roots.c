@@ -65,6 +65,7 @@ main(void)
             if (fmpz_mod_poly_degree(b, ctx) > 0)
             {
                 flint_printf("FAIL\ncheck multiple roots i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -74,11 +75,13 @@ main(void)
                 if (fmpz_is_zero(r->coeffs + j))
                 {
                     flint_printf("FAIL\ncheck zero root i = %wd\n", i);
+                    fflush(stdout);
                     flint_abort();
                 }
                 if (fmpz_mod_poly_evaluate_fmpz(e, a, r->coeffs + j, ctx), !fmpz_is_zero(e))
                 {
                     flint_printf("FAIL\ncheck root is a root i = %wd\n", i);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -92,6 +95,7 @@ main(void)
                 && (fmpz_mod_poly_evaluate_fmpz(e, a, zero, ctx), !fmpz_is_zero(e)))
             {
                 flint_printf("FAIL\ncheck fail return i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }

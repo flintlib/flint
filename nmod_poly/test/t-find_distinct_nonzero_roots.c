@@ -60,6 +60,7 @@ main(void)
             if (nmod_poly_degree(b) > 0)
             {
                 flint_printf("FAIL\ncheck multiple roots i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -69,11 +70,13 @@ main(void)
                 if (r->coeffs[j] == 0)
                 {
                     flint_printf("FAIL\ncheck zero root i = %wd\n", i);
+                    fflush(stdout);
                     flint_abort();
                 }
                 if (nmod_poly_evaluate_nmod(a, r->coeffs[j]) != 0)
                 {
                     flint_printf("FAIL\ncheck root is a root i = %wd\n", i);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -87,6 +90,7 @@ main(void)
                 && nmod_poly_evaluate_nmod(a, 0) != 0)
             {
                 flint_printf("FAIL\ncheck fail return i = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }

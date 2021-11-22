@@ -56,7 +56,8 @@ main(void)
         if (n > bound)
         {
             flint_printf("FAIL: length=%wd > bound=%wd\n", n, bound);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _fmpz_vec_clear(c, bound + 10);

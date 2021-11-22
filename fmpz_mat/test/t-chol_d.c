@@ -61,7 +61,8 @@ main(void)
             d_mat_print(Rt);
             flint_printf("Btmp:\n");
             d_mat_print(Btmp);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

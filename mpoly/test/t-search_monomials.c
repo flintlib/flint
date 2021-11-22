@@ -108,6 +108,7 @@ main(void)
                 flint_printf("lower = %wd  upper = %wd\n",lower,upper);
                 fmpz_mpoly_print_pretty(f,NULL,ctx);printf("\n\n");
                 fmpz_mpoly_print_pretty(g,NULL,ctx);printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -118,6 +119,7 @@ main(void)
         if (score != e_score)
         {
             printf("e_score is not right\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -153,12 +155,14 @@ main(void)
                     if (!(score < lower || score > upper))
                     {
                         printf("returned score is outside, but score inside exists\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                     new_error = score < lower ? lower - score : score - upper;
                     if (new_error < returned_error)
                     {
                         printf("returned score is not closest possible\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                 }

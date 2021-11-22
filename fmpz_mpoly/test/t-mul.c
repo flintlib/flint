@@ -46,6 +46,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check fixed case 1\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -58,6 +59,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check fixed case 2\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -70,6 +72,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check fixed case 3\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -134,6 +137,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*(g + h) = f*g + f*h\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -200,6 +204,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing first arg\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -262,6 +267,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing second arg\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

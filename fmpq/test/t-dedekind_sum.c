@@ -108,7 +108,8 @@ int main(void)
                 flint_printf("s(%wd,%wd)\n", h, k);
                 flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
                 flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
     }
@@ -133,7 +134,8 @@ int main(void)
             flint_printf("s(%wd,%wd)\n", h, k);
             flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
             flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -152,7 +154,8 @@ int main(void)
         flint_printf("Wrong large value:\n");
         fmpq_print(s1);
         flint_printf("\n");
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 
 
@@ -224,6 +227,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("check reciprocity law i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

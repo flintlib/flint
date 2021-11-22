@@ -55,7 +55,8 @@ main(void)
             flint_printf("n = %wd\n", n);
             flint_printf("cmp(a, b) = %d\n", fmpz_cmp(a, b));
             flint_printf("cmp_si(a, n) = %d\n", fmpz_cmp_si(a, n));
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

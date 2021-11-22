@@ -74,7 +74,8 @@ main(void)
             nmod_poly_print(s), flint_printf("\n\n");
             nmod_poly_print(t), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         
         nmod_poly_clear(a);
@@ -116,7 +117,8 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             nmod_poly_print(g), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -154,7 +156,8 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             nmod_poly_print(g), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -191,7 +194,8 @@ main(void)
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(s), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -228,7 +232,8 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             nmod_poly_print(s), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -265,7 +270,8 @@ main(void)
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(t), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);
@@ -302,7 +308,8 @@ main(void)
             nmod_poly_print(b), flint_printf("\n\n");
             nmod_poly_print(t), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);

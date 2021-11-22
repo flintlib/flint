@@ -84,6 +84,7 @@ main(void)
             flint_printf("j: %w\n", j);
             flint_printf("pow:\n"); fmpz_mod_poly_print(pow, ctx), flint_printf("\n\n");
             flint_printf("res[%w]:\n", j); fmpz_mod_poly_print(res + j, ctx), flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

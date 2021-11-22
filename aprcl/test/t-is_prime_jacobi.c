@@ -49,7 +49,8 @@ int main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("in function _aprcl_is_prime_jacobi_check_pk() wrong answer\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         unity_zp_clear(j);
@@ -70,7 +71,8 @@ int main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("in function _aprcl_is_prime_jacobi_check_21() wrong answer\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(n);
@@ -100,7 +102,8 @@ int main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("in function _aprcl_is_prime_jacobi_check_22() wrong answer\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         unity_zp_clear(j);
@@ -138,7 +141,8 @@ int main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("in function _aprcl_is_prime_jacobi_check_2k() wrong answer\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         unity_zp_clear(j);
@@ -169,7 +173,8 @@ int main(void)
                 flint_printf("Testing number = ");
                 fmpz_print(n);
                 flint_printf("\nis_probabprime = %i, aprcl_is_prime_jacobi = %i\n", pbprime, cycloprime);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_clear(n);
@@ -224,7 +229,8 @@ int main(void)
             if (result == 0)
             {
                 flint_printf("FAIL\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_clear(n);

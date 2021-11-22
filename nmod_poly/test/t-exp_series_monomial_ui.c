@@ -61,7 +61,8 @@ main(void)
             flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
             flint_printf("exp(A): "); nmod_poly_print(expA), flint_printf("\n\n");
             flint_printf("res: "); nmod_poly_print(res), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(A);

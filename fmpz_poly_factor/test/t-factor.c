@@ -149,7 +149,8 @@ main(void)
             flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
             flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
             flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         for (j = 0; j < fac->num; j++)
@@ -163,7 +164,8 @@ main(void)
                     flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
                     flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
                     flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
 
@@ -175,7 +177,8 @@ main(void)
                 flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
                 flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
                 flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 

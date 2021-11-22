@@ -63,7 +63,8 @@ int main(void)
                 if (nb != fmpz_fdiv_ui(b, mod.n))
                 {
                     flint_printf("FAIL (vs nmod, n = %wd)\n", n);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }
@@ -81,7 +82,8 @@ int main(void)
             if (!_fmpz_vec_equal(vb1, vb2, len))
             {
                 flint_printf("FAIL (len = %wd)\n", len);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             for (n = prev_len; n < len; n++)
@@ -95,7 +97,8 @@ int main(void)
                     if (!fmpz_equal(vb1 + n, b))
                     {
                         flint_printf("FAIL (dobinski, n = %wd)\n", n);
-                        abort();
+                        fflush(stdout);
+                        flint_abort();
                     }
                 }
 
@@ -103,7 +106,8 @@ int main(void)
                 if (!fmpz_equal(vb1 + n, b))
                 {
                     flint_printf("FAIL (multi_mod, n = %wd)\n", n);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
 
@@ -117,7 +121,8 @@ int main(void)
                 if (!_nmod_vec_equal(vnr, vnb, len))
                 {
                     flint_printf("FAIL (nmod_vec, len = %wd)\n", len);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
 
                 if (len)
@@ -128,7 +133,8 @@ int main(void)
                     if (nb != fmpz_fdiv_ui(vb1 + n, mod.n))
                     {
                         flint_printf("FAIL (nmod n = %wd)\n", n);
-                        abort();
+                        fflush(stdout);
+                        flint_abort();
                     }
                 }
             }

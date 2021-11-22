@@ -36,6 +36,7 @@ void test_poly(
     if (!fmpz_mod_poly_roots_factored(roots, f, want_mult, n, ctx))
     {
         flint_printf("FAILED:\ncheck roots could be computed\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -44,12 +45,14 @@ void test_poly(
         if (fmpz_mod_poly_degree(roots->poly + i, ctx) != 1)
         {
             flint_printf("FAILED:\ncheck root is linear\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (!fmpz_is_one(roots->poly[i].coeffs + 1))
         {
             flint_printf("FAILED:\ncheck root is monic\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -67,12 +70,14 @@ void test_poly(
         {
             flint_printf("FAILED:\ncheck root is a root\n");
             fmpz_mod_poly_print_pretty(roots->poly + i, "x", ctx); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (roots->exp[i] != (want_mult ? multiplicity : 1))
         {
             flint_printf("FAILED:\ncheck root multiplicity\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -100,6 +105,7 @@ void test_poly(
                     if (found)
                     {
                         flint_printf("FAILED:\ncheck duplicate roots\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                     found = 1;
@@ -109,6 +115,7 @@ void test_poly(
             if (!found)
             {
                 flint_printf("FAILED:\ncheck missing roots\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -156,6 +163,7 @@ main(void)
         if (fmpz_mod_poly_roots_factored(r, f, 0, n, ctx))
         {
             flint_printf("FAILED:\ncheck non example with too many roots\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -196,6 +204,7 @@ main(void)
         if ((!fmpz_mod_poly_roots_factored(r, f, 0, n, ctx)) || (r->num != 0))
         {
             flint_printf("FAILED:\ncheck example with no roots\n");
+            fflush(stdout);
             flint_abort();
         }
 

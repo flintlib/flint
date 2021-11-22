@@ -56,7 +56,8 @@ main(void)
             flint_printf("\n\n");
             flint_printf("g = "), TEMPLATE(T, print_pretty)(g, ctx);
             flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);

@@ -66,7 +66,8 @@ main(void)
             flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
             flint_printf("2*atan(A): "); nmod_poly_print(atanA), flint_printf("\n\n");
             flint_printf("atan(B): "); nmod_poly_print(atanB), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(A);
@@ -99,7 +100,8 @@ main(void)
             flint_printf("FAIL:\n");
             nmod_poly_print(A), flint_printf("\n\n");
             nmod_poly_print(B), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(A);

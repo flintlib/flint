@@ -142,7 +142,8 @@ main(void)
             fmpz_poly_mat_print(A, "x"); flint_printf("\n\n");
             fmpz_poly_mat_print(R, "x"); flint_printf("\n\n");
             fmpz_poly_mat_print(R2, "x"); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_clear(c);

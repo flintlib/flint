@@ -90,7 +90,8 @@ int main(void)
           gmp_printf("%Zd\n", r1);
           gmp_printf("%Zd\n", r2);
           flint_printf("size_d = %wd\n", size_d);
-          abort();
+          fflush(stdout);
+          flint_abort();
        }
 
        if (r2->_mp_alloc)

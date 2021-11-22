@@ -55,7 +55,8 @@ main(void)
             flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c);
             flint_printf("g = %wu, g2 = %wu, t = %wd, t2 = %wd\n", g, g2, t,
                          t2);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         /* test b*t2 == 1 mod a */
@@ -70,7 +71,8 @@ main(void)
             flint_printf("Incorrect inverse\n");
             flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c);
             flint_printf("g2 = %wu, s = %wd, t2 = %wd\n", g2, s, t2);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -86,7 +88,8 @@ main(void)
             flint_printf("FAIL\n");
             flint_printf("Incorrect modulo 1\n");
             flint_printf("g = %wu, s = %wu\n", g, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -105,7 +108,8 @@ main(void)
             flint_printf("FAIL\n");
             flint_printf("gcd(0, b) == 1\n");
             flint_printf("b = %wu, s = %wu\n", b, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

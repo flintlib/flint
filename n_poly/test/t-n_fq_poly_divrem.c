@@ -67,6 +67,7 @@ main(void)
                 !n_fq_poly_equal(d, r, ctx))
             {
                 flint_printf("FAIL\n i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

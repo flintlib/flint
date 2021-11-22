@@ -40,7 +40,7 @@ nmod_poly_power_sums_schoenhage(nmod_poly_t res, const nmod_poly_t poly,
     {
         flint_printf
             ("Exception (nmod_poly_power_sums_schoenhage). Zero polynomial.\n");
-        abort();
+        flint_abort();
     }
     else if ((n <= 0) || (poly->length == 1))
     {

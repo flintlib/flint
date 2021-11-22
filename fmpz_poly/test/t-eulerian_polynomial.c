@@ -38,7 +38,8 @@ int main()
             flint_printf("The first coefficient is not 1 for n = %u. Received:\n", n);
             fmpz_poly_print_pretty(poly, "x");
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (!fmpz_is_one(poly->coeffs + (n - 1)))
@@ -46,7 +47,8 @@ int main()
             flint_printf("The last coefficient is not 1 for n = %u. Received:\n", n);
             fmpz_poly_print_pretty(poly, "x");
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         for (mx = 0; mx <= n / 2; mx++)
@@ -55,13 +57,15 @@ int main()
             {
                 flint_printf("A(n, m) is not equal to A(n, n - m - 1)"
                         "for n = %u and m = %u.\n", n, mx);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
             if (fmpz_cmp_si(poly->coeffs + mx, 0) <= 0)
             {
                 flint_printf("Negative coefficients for A(n, m)"
                         "where n = %u and m = %u.\n", n, mx);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
         fmpz_zero(sum);
@@ -74,7 +78,8 @@ int main()
                     "was not equal to %u!.\n", n, n);
             flint_printf("Expected: "), fmpz_print(fac), flint_printf("\n");
             flint_printf("Got:      "), fmpz_print(sum), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

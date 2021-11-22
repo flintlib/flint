@@ -54,7 +54,8 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("n = %wu\np = %wu\nx = %wu\ny = %wu\n", n, p, x, y);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
     }

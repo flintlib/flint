@@ -76,7 +76,8 @@ main(void)
             }
             flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         qadic_clear(a);

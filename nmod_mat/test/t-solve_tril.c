@@ -61,7 +61,8 @@ main(void)
             nmod_mat_print_pretty(B);
             flint_printf("Y:\n");
             nmod_mat_print_pretty(Y);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         /* Check aliasing */
@@ -74,7 +75,8 @@ main(void)
             nmod_mat_print_pretty(A);
             flint_printf("B:\n");
             nmod_mat_print_pretty(B);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);

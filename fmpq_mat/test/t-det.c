@@ -70,7 +70,8 @@ main(void)
             fmpq_print(b);
             flint_printf("\ndet(C):\n");
             fmpq_print(c);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(a);

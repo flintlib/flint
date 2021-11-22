@@ -59,6 +59,7 @@ main(void)
         if (!fmpz_mpoly_equal(f, h, ctx))
         {
             flint_printf("FAIL\nCheck a polynomial is the sum of its terms\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

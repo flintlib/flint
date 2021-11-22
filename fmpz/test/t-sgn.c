@@ -49,7 +49,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             gmp_printf("b = %Zd\n", b);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

@@ -38,7 +38,8 @@ main(void)
         if (fmpz_mat_is_empty(A) != (rows == 0 || cols == 0))
         {
             flint_printf("FAIL!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         fmpz_mat_clear(A);
     }

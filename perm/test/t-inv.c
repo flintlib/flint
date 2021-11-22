@@ -46,7 +46,8 @@ int main(void)
             flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
             flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
             flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _perm_clear(a);
@@ -74,7 +75,8 @@ int main(void)
             flint_printf("FAIL:\n");
             flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
             flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _perm_clear(a);

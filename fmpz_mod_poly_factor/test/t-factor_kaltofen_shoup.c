@@ -90,7 +90,8 @@ main(void)
         {
             flint_printf("Error: number of factors incorrect: %wd != %wd\n",
                    res->num, num);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mod_poly_init(product, ctx);
@@ -112,7 +113,8 @@ main(void)
             flint_printf("product:\n");
             fmpz_mod_poly_print(product, ctx);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(modulus);

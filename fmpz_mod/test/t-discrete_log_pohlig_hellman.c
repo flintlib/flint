@@ -62,6 +62,7 @@ main(void)
                 {
                     printf("FAIL\ncheck random word-sized primes\n");
                     flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -100,6 +101,7 @@ main(void)
             {
                 printf("FAIL\nprimality test failed p = ");
                 fmpz_print(p);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -113,6 +115,7 @@ main(void)
             {
                 printf("FAIL\nsmooth prime score %f too high\np = ", score);
                 fmpz_print(p);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -134,6 +137,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("i = %wd, j = %kw, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
 

@@ -41,7 +41,8 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("%wu ** (%wu) == %wu != %wu\n", root, d, result, b);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

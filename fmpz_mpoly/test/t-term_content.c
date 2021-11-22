@@ -62,6 +62,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check zero\ni = %wd, j = %wd\n", i ,j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -72,6 +73,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check content is monomial\ni = %wd, j = %wd\n", i ,j);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -80,6 +82,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check content has positive lc\ni = %wd, j = %wd\n", i ,j);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -88,6 +91,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check content divides\ni = %wd, j = %wd\n", i ,j);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -97,6 +101,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check quotient is primitive\ni = %wd, j = %wd\n", i ,j);
+                    fflush(stdout);
                     flint_abort();
                 }  
             }
@@ -107,6 +112,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing \ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

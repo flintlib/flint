@@ -54,7 +54,8 @@ main(void)
             fmpz_mat_print_pretty(A), flint_printf("\n");
             flint_printf("det1: "), fmpz_print(det1), flint_printf("\n");
             flint_printf("det2: "), fmpz_print(det2), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(det1);
@@ -79,7 +80,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("expected zero determinant!\n");
             fmpz_mat_print_pretty(A), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

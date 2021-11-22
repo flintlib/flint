@@ -39,6 +39,7 @@ main(void)
         if (!nmod_mpoly_equal(f, g, ctx))
         {
             flint_printf("FAIL: check simple example\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -102,6 +103,7 @@ main(void)
         if (!nmod_mpoly_content_vars(g, f, vars, num_vars, ctx))
         {
             flint_printf("FAIL: check content could be computed\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -110,6 +112,7 @@ main(void)
             if (!nmod_mpoly_is_zero(f, ctx))
             {
                 flint_printf("FAIL: check zero content\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -120,6 +123,7 @@ main(void)
                 if (nmod_mpoly_degree_si(g, vars[j], ctx) != 0)
                 {
                     flint_printf("FAIL: content depends on a bad variable\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -127,18 +131,21 @@ main(void)
             if (!nmod_mpoly_divides(t, f, g, ctx))
             {
                 flint_printf("FAIL: check content divides\n");
+                fflush(stdout);
                 flint_abort();
             }
 
             if (!nmod_mpoly_content_vars(t, t, vars, num_vars, ctx))
             {
                 flint_printf("FAIL: check cofactor content could be computed\n");
+                fflush(stdout);
                 flint_abort();
             }
 
             if (!nmod_mpoly_is_one(t, ctx))
             {
                 flint_printf("FAIL: check cofactor content is one\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -146,12 +153,14 @@ main(void)
         if (!nmod_mpoly_content_vars(f, f, vars, num_vars, ctx))
         {
             flint_printf("FAIL: check aliased content could be computed\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (!nmod_mpoly_equal(f, g, ctx))
         {
             flint_printf("FAIL: check aliasing\n");
+            fflush(stdout);
             flint_abort();
         }
 

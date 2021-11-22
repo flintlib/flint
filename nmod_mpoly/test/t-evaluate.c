@@ -79,6 +79,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check evalone aliasing\ni: %wd  j: %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -86,6 +87,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -145,6 +147,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check add commutes with evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -202,6 +205,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check mul commutes with evalall\ni: %wd  j: %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

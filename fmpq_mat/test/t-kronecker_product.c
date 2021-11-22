@@ -71,7 +71,8 @@ main(void)
                 flint_printf("C:\n");
                 fmpq_mat_print(C);
                 flint_printf("i,j: %d,%d\n", i, j);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpq_mat_window_clear(window1);

@@ -75,7 +75,8 @@ main(void)
             fmpz_mat_print_pretty(A), flint_printf("\n");
             flint_printf("det: ");  fmpz_print(det);    flint_printf("\n");
             flint_printf("d: "); fmpz_print(d); flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

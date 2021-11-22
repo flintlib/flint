@@ -43,7 +43,8 @@ main(void)
         if (!TEMPLATE(T, mat_is_zero) (A, ctx))
         {
             printf("FAIL!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, init) (x, ctx);
@@ -57,7 +58,8 @@ main(void)
             if (TEMPLATE(T, mat_is_zero) (A, ctx))
             {
                 printf("FAIL!\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 

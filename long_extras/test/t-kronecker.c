@@ -46,6 +46,7 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("a = %wd, n = %wd\n", a, n);
+            fflush(stdout);
             flint_abort();
         }
     }

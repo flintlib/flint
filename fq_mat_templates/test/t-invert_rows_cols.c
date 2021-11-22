@@ -59,7 +59,8 @@ main(void)
                     TEMPLATE(T, mat_print_pretty)(A, ctx);
                     flint_printf("B:\n");
                     TEMPLATE(T, mat_print_pretty)(B, ctx);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }

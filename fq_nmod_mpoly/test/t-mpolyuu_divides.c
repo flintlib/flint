@@ -82,6 +82,7 @@ void univar_divides_check(
     {
         flint_printf("check univariate divisibility\n"
                                        "i = %wd, j = %wd, %s\n", ii, jj, name);
+        fflush(stdout);
         flint_abort();
     }
 
@@ -97,6 +98,7 @@ void univar_divides_check(
     {
         flint_printf("check univariate quotient\n"
                                        "i = %wd, j = %wd, %s\n", ii, jj, name);
+        fflush(stdout);
         flint_abort();
     }
 

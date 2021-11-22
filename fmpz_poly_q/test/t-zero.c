@@ -42,7 +42,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("a = "), fmpz_poly_q_print(a), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_q_clear(a);

@@ -46,7 +46,8 @@ main(void)
         {
             printf("FAIL:\n");
             _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _TEMPLATE(T, vec_clear) (a, len, ctx);

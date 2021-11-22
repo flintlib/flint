@@ -71,7 +71,8 @@ main(void)
         {
             flint_printf("FAIL\n");
 	    flint_printf("Adet = %wu, Bdet = %wu\n", Adet, fmpz_get_ui(Bdet));
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);

@@ -100,6 +100,7 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -108,6 +109,7 @@ main(void)
                 {
                     printf("FAIL\ncheck aliasing first");
                     flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -116,6 +118,7 @@ main(void)
                 {
                     printf("FAIL\ncheck aliasing second");
                     flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

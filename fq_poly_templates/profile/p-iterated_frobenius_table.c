@@ -45,7 +45,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
     {
         flint_printf("Exception (p-iterated_frobenius):\n");
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
 
     flint_printf("Trying %d %d %d\n", degree, bits, length);
@@ -83,7 +83,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
             flint_printf("Order too big for zech representation: ");
             fmpz_print(q);
             flint_printf("\n");
-            abort();            
+            flint_abort();            
         }
 #endif        
         
@@ -357,7 +357,7 @@ main(int argc, char** argv)
                 if (imid >= imax)
                 {
                     flint_printf("Error in computing midpoint\n");
-                    abort();
+                    flint_abort();
                 }
                 
                 is_hit = get_timings(s, degree, bits, imid);

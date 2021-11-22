@@ -53,7 +53,8 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_mul(X, Y, Z);
@@ -68,7 +69,8 @@ main(void)
             flint_printf("\nz = ");
             flint_printf("%wd", z);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -102,7 +104,8 @@ main(void)
         if (!fmpq_is_canonical(x))
         {
             flint_printf("FAIL: result not canonical!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (!fmpq_equal(X, x))
@@ -113,7 +116,8 @@ main(void)
             flint_printf("\ny = ");
             flint_printf("%wd", y);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);

@@ -80,7 +80,8 @@ main(void)
             flint_printf("polynomial:\n");
             fmpz_mod_poly_print(poly1, ctx);
             flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(modulus);

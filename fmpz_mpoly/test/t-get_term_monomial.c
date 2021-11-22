@@ -68,6 +68,7 @@ main(void)
             if (!fmpz_equal(c, d))
             {
                 flint_printf("FAIL\nCheck getting a coeff by its monomial\ni = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }

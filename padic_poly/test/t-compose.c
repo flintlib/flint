@@ -71,7 +71,8 @@ main(void)
                 flint_printf("h2 = "), padic_poly_debug(h2), flint_printf("\n\n");
                 flint_printf("p  = "), fmpz_print(p), flint_printf("\n\n");
                 flint_printf("N  = %wd\n\n", N);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
         else
@@ -98,7 +99,8 @@ main(void)
                 flint_printf("p   = "), fmpz_print(p), flint_printf("\n\n");
                 flint_printf("N   = %wd\n\n", N);
                 flint_printf("N2  = %wd\n\n", N2);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             padic_poly_clear(hX);

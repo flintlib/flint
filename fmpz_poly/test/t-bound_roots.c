@@ -79,7 +79,8 @@ main(void)
             flint_printf("f = "); fmpz_poly_print(f); flint_printf("\n\n");
             flint_printf("bound = "); fmpz_print(bound); flint_printf("\n\n");
             flint_printf("computed bound = "); fmpz_print(nbound); flint_printf("\n\n");
-            abort(); 
+            fflush(stdout);
+            flint_abort(); 
        }
 
         fmpz_clear(t);

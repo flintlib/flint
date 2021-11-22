@@ -51,7 +51,8 @@ int main(void)
         if (!fmpz_mat_equal(C, B))
         {
             flint_printf("FAIL: results not equal\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_sqr(A, A);
@@ -59,7 +60,8 @@ int main(void)
         if (!fmpz_mat_equal(A, B))
         {
             flint_printf("FAIL: aliasing failed\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

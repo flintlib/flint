@@ -68,7 +68,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("wrong rank!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (!fmpz_mat_is_in_rref_with_rank(R, den, rank1))
@@ -76,7 +77,8 @@ main(void)
             flint_printf("FAIL matrix not in rref!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         /* Concatenate the original matrix with the rref, scramble the rows,
@@ -120,7 +122,8 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R2); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(c);

@@ -58,6 +58,7 @@ main(void)
         {
             flint_printf("FAIL: Check a polynomial is the sum of its terms\n");
             flint_printf("i = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

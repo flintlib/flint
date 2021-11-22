@@ -87,7 +87,8 @@ main(void)
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
         {
             flint_printf("Fatal error: not enough memory.");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         nmod_poly_factor_init(res);
         nmod_poly_factor_distinct_deg(res, poly1, &degs);
@@ -102,6 +103,7 @@ main(void)
             {
                flint_printf("Error: product of factors of degree %w incorrect\n", degs[i]);
                flint_printf("Degree %w != %w * %w\n", nmod_poly_degree(res->p + i), degs[i], num_of_deg[degs[i]]);
+               fflush(stdout);
                flint_abort();
             }
         }
@@ -114,6 +116,7 @@ main(void)
             flint_printf("Error: product of factors does not equal to the original polynomial\n");
             flint_printf("poly:\n"); nmod_poly_print(poly1); flint_printf("\n");
             flint_printf("product:\n"); nmod_poly_print(product); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

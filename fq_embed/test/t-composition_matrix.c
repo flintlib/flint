@@ -72,7 +72,8 @@ main(void)
                 fmpz_mod_mat_print_pretty(mat_aq), flint_printf("\n"),
                 fmpz_mod_mat_print_pretty(res), flint_printf("\n");
             
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mod_mat_clear(mat_frob);

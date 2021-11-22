@@ -150,7 +150,8 @@ main(void)
             flint_printf("d1 = "), TEMPLATE(T, poly_print_pretty) (d1, "x",
                                                                    ctx),
                 flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);

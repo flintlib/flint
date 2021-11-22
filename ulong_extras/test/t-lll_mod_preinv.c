@@ -46,7 +46,8 @@ main(void)
             flint_printf("nh = %wu, nm = %wd, nl = %wu, d = %wu, dinv = %wu\n",
                          nh, nm, nl, d, dinv);
             flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

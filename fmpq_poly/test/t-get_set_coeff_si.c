@@ -62,7 +62,8 @@ main(void)
                 flint_printf("cflags = %wu\n", cflags);
                 flint_printf("n      = %wd\n", n);
                 gmp_printf("n_mpq  = %Qd\n", n_mpq);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
         fmpq_poly_clear(a);

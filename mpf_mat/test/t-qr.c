@@ -69,7 +69,8 @@ main(void)
                     mpf_out_str(stdout, 10, 0, dot);
                     flint_printf("\n");
                     flint_printf("%d\n", prec);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }
@@ -96,7 +97,8 @@ main(void)
                 mpf_out_str(stdout, 10, 0, norm);
                 flint_printf("\n");
                 flint_printf("%d\n", j);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
             mpf_clear(norm);
             for (k = j + 1; k < n; k++)
@@ -120,7 +122,8 @@ main(void)
                     mpf_out_str(stdout, 10, 0, dot);
                     flint_printf("\n");
                     flint_printf("%d %d\n", j, k);
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }

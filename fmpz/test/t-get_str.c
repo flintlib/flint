@@ -59,7 +59,8 @@ main(void)
             gmp_printf("b = %Zd\n", b);
             flint_printf("base = %d\n", base);
             flint_printf("str1 = %s\n, str2 = %s\n", str1, str2);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         flint_free(str1);

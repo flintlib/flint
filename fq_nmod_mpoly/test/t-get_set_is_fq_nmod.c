@@ -52,6 +52,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check is_fq_nmod and get_fq_nmod catch constants\ni = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -62,6 +63,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check set_fq_nmod makes is_fq_nmod true\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
         fq_nmod_mpoly_get_fq_nmod(d, f, ctx);
@@ -69,6 +71,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check get_fq_nmod matches set_fq_nmod\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -79,6 +82,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check set_ui makes is_fq_nmod true\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
         fq_nmod_mpoly_get_fq_nmod(d, f, ctx);
@@ -86,6 +90,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check get_fq_nmod matches set_ui\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

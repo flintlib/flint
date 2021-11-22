@@ -40,6 +40,7 @@ main(void)
         if (!fq_nmod_mpoly_equal(f, g, ctx))
         {
             flint_printf("FAIL\ncheck simple example\n");
+            fflush(stdout);
             flint_abort();
         }
         fq_nmod_mpoly_clear(f, ctx);
@@ -91,6 +92,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check power success\ni = %wd, j1 = %wd\n", i, j1);
+                fflush(stdout);
                 flint_abort();                
             }
             fq_nmod_mpoly_mul(g, g, m, ctx);
@@ -101,6 +103,7 @@ main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("Check 1 variable sum of coefficients\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -160,6 +163,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check power success\ni = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                fflush(stdout);
                 flint_abort();
             }
             fq_nmod_mpoly_mul(g, g, m, ctx);
@@ -168,6 +172,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check power success\ni = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -180,6 +185,7 @@ main(void)
         {
             flint_printf("FAIL\n"
                          "check 2 variable sum of coefficients\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

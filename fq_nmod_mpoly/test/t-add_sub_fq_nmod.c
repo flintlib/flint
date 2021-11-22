@@ -60,6 +60,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check (f + a) - a = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -123,6 +124,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

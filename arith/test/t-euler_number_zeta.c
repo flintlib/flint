@@ -46,7 +46,8 @@ int main()
         {
             flint_printf("FAIL: n = %wd\n", n);
             flint_printf("Value: "); fmpz_print(res); flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(res);

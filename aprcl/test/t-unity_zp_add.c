@@ -70,7 +70,8 @@ int main(void)
         {
             
             flint_printf("FAIL\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     
         fmpz_clear(n);

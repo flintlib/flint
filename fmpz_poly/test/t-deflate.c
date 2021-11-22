@@ -36,6 +36,7 @@ main(void)
             if (fmpz_poly_deflation(poly1) != fmpz_poly_length(poly1))
             {
                 flint_printf("FAIL: wrong deflation for constant polynomial\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -43,6 +44,7 @@ main(void)
             if (!fmpz_poly_equal(poly2, poly1))
             {
                 flint_printf("FAIL: constant polynomial changed on deflation\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -65,6 +67,7 @@ main(void)
                 flint_printf("poly2:\n");
                 fmpz_poly_print(poly2);
                 flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -83,6 +86,7 @@ main(void)
                 flint_printf("poly3:\n");
                 fmpz_poly_print(poly3);
                 flint_printf("\n\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -90,6 +94,7 @@ main(void)
             if (!fmpz_poly_equal(poly3, poly2))
             {
                 flint_printf("FAIL: aliasing\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

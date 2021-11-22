@@ -41,7 +41,8 @@ int main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
     }

@@ -27,12 +27,14 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     if (!nmod_mpoly_factor_zassenhaus(g, p, ctx))
     {
         flint_printf("FAIL:\ncheck factorization 1 could be computed\n");
+        fflush(stdout);
         flint_abort();        
     }
 
     if (!nmod_mpoly_factor(h, p, ctx))
     {
         flint_printf("check factorization 2 could be computed\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -41,6 +43,7 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
         if (g->poly[i].length < 1 || g->poly[i].coeffs[0] != 1)
         {
             flint_printf("FAIL:\nfactorization is not unit normal\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -52,6 +55,7 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     if (fmpz_cmp_si(omega, lower) < 0 || fmpz_cmp_si(omega, upper) > 0)
     {
         flint_printf("FAIL:\nfactorization has wrong number of factors\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -59,6 +63,7 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     if (!nmod_mpoly_equal(q, p, ctx))
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -67,6 +72,7 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     if (nmod_mpoly_factor_cmp(g, h, ctx) != 0)
     {
         flint_printf("factorizations do not match\n");
+        fflush(stdout);
         flint_abort();        
     }
 
@@ -76,6 +82,7 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
         if (h->num != 1 || !fmpz_is_one(h->exp + 0))
         {
             flint_printf("FAIL:\nfactor is reducible\n");
+            fflush(stdout);
             flint_abort();
         }
     }

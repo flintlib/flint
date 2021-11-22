@@ -58,7 +58,8 @@ main(void)
             flint_printf("Embed\n"),
                 TEMPLATE(B, mat_print_pretty)(embed), flint_printf("\nProject\n"),
                 TEMPLATE(B, mat_print_pretty)(project), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(B, mat_clear)(embed);
@@ -117,7 +118,8 @@ main(void)
                     TEMPLATE(B, mat_print_pretty)(embed), flint_printf("\nProject\n"),
                     TEMPLATE(B, mat_print_pretty)(project), flint_printf("\nComposition\n"),
                     TEMPLATE(B, mat_print_pretty)(comp), flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             TEMPLATE(B, mat_clear)(embed);

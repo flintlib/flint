@@ -32,7 +32,8 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("phi(%d) = %d, got %wu\n", n, t, n_euler_phi(n)); 
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

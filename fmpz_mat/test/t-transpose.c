@@ -49,7 +49,8 @@ main(void)
         if (!fmpz_mat_equal(C, A))
         {
             flint_printf("FAIL: C != A\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);
@@ -75,7 +76,8 @@ main(void)
         if (!fmpz_mat_equal(B, A))
         {
             flint_printf("FAIL: B != A\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

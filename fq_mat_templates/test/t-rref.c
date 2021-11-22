@@ -112,7 +112,8 @@ main(void)
             printf("\n\n");
             TEMPLATE(T, mat_print_pretty) (B, ctx);
             printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         /* Concatenate the original matrix with the rref, scramble the rows,
@@ -173,7 +174,8 @@ main(void)
             printf("\n\n");
             TEMPLATE(T, mat_print_pretty) (D, ctx);
             printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _perm_clear(perm);

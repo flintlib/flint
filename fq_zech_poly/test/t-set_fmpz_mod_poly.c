@@ -62,6 +62,7 @@ main(void)
             flint_printf("CTX\n"); fq_zech_ctx_print(ctx);
             flint_printf("\nb = "); fmpz_mod_poly_print_pretty(b, "X", ctxp);
             flint_printf("\np = "); fmpz_print(p); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

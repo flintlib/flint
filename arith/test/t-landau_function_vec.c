@@ -44,7 +44,8 @@ int main(void)
             flint_printf("FAIL:\n");
             flint_printf("k = %wd, res[k] = %wd, expected: %wd\n",
                 k, fmpz_get_si(res + k), known[k]);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

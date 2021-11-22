@@ -44,7 +44,8 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("b = %wd, c = %wd\n", b, c);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

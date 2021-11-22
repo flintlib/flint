@@ -76,7 +76,8 @@ main(void)
         {
             flint_printf("FAIL: %wu, %wd, %d\n", modulus, max_exp, v);
             nmod_poly_print(poly); flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(poly);

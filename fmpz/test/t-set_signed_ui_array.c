@@ -57,6 +57,7 @@ main(void)
         if (!fmpz_divisible(a, c))
         {
             flint_printf("FAIL: check answer mod 2^(n*FLINT_BITS)\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -66,6 +67,7 @@ main(void)
         if (fmpz_cmp(b, c) >= 0)
         {
             flint_printf("FAIL: check answer < 2^(n*FLINT_BITS - 1)\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -73,6 +75,7 @@ main(void)
         if (fmpz_cmp(b, c) < 0)
         {
             flint_printf("FAIL: check answer >= -2^(n*FLINT_BITS - 1)\n");
+            fflush(stdout);
             flint_abort();
         }
     }

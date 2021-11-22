@@ -90,6 +90,7 @@ main(void)
             {
                 flint_printf("FAIL: Check pow_ui against pow_naive\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -138,6 +139,7 @@ main(void)
             {
                 flint_printf("FAIL: Check aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

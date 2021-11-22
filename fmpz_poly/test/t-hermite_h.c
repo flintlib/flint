@@ -49,7 +49,8 @@ main()
             flint_printf("T1: ");
             fmpz_poly_print_pretty(T1, "x");
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_swap(T0, T1);

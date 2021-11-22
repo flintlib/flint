@@ -67,6 +67,7 @@ void _test_pfrac(
     if (success != fmpz_poly_pfrac_precompute(I, b, r))
     {
         flint_printf("FAIL: check precompute\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -113,6 +114,7 @@ void _test_pfrac(
             if (found_bad)
             {
                 flint_printf("FAIL: precomp should have failed");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -122,6 +124,7 @@ void _test_pfrac(
                 if (!fmpq_poly_equal(S, cQ + i))
                 {
                     flint_printf("FAIL: precomp produced wrong answer\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -131,6 +134,7 @@ void _test_pfrac(
             if (!found_bad)
             {
                 flint_printf("FAIL: precomp should not have failed\n");
+                fflush(stdout);
                 flint_abort();
             }
         }

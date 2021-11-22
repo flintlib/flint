@@ -75,6 +75,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f sparse\n"
                                                    "i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -84,6 +85,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f sparse input modification\n"
                                                    "i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -158,6 +160,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f dense\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -241,6 +244,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check divisibility of random polys\n"
                                                    "i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -325,6 +329,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f aliasing first\n"
                                                    "i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -399,6 +404,7 @@ main(void)
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f aliasing second\n"
                                                    "i = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

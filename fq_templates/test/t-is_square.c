@@ -49,7 +49,8 @@ main(void)
             flint_printf("FAIL (is_square(a^2)):\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);
@@ -87,7 +88,8 @@ main(void)
                 flint_printf("FAIL (is_square(a^2)):\n\n");
                 flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("z = "), TEMPLATE(T, print_pretty)(z, ctx), flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             TEMPLATE(T, clear)(a, ctx);

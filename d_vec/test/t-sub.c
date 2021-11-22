@@ -47,7 +47,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _d_vec_clear(a);
@@ -74,7 +75,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _d_vec_clear(a);
@@ -102,7 +104,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _d_vec_clear(a);

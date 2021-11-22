@@ -80,6 +80,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -152,6 +153,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check divisibility of random polys\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -226,6 +228,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -300,6 +303,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check f*g/g = f aliasing second argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

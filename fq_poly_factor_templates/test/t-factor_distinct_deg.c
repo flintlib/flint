@@ -83,7 +83,8 @@ main(void)
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
         {
             flint_printf("Fatal error: not enough memory.");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         TEMPLATE(T, poly_factor_init) (res, ctx);
         TEMPLATE(T, poly_factor_distinct_deg) (res, poly1, &degs, ctx);
@@ -107,7 +108,8 @@ main(void)
             flint_printf("product:\n");
             TEMPLATE(T, poly_print) (product, ctx);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         flint_free(degs);

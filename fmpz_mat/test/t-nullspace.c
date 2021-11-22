@@ -59,7 +59,8 @@ main(void)
                 flint_printf("rank(ker) != nullity!\n");
                 fmpz_mat_print_pretty(A);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             if (nullity + r != n)
@@ -68,7 +69,8 @@ main(void)
                 flint_printf("nullity + rank != n\n");
                 fmpz_mat_print_pretty(A);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_mat_mul(B, A, ker);
@@ -79,7 +81,8 @@ main(void)
                 flint_printf("A * ker != 0\n");
                 fmpz_mat_print_pretty(A);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_mat_clear(A);
@@ -117,7 +120,8 @@ main(void)
                 flint_printf("rank(ker) != nullity!\n");
                 fmpz_mat_print_pretty(A);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             if (nullity + r != n)
@@ -126,7 +130,8 @@ main(void)
                 flint_printf("nullity + rank != n\n");
                 fmpz_mat_print_pretty(A);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_mat_mul(B, A, ker);
@@ -137,7 +142,8 @@ main(void)
                 flint_printf("A * ker != 0\n");
                 fmpz_mat_print_pretty(A);
                 flint_printf("\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_mat_clear(A);

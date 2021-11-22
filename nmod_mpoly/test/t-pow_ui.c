@@ -98,6 +98,7 @@ main(void)
             {
                 flint_printf("FAIL\n");
                 flint_printf("Check pow_ui success\ni = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
             nmod_mpoly_assert_canonical(g, ctx);
@@ -109,6 +110,7 @@ main(void)
             {
                 flint_printf("FAIL: Check pow_ui against pow_naive\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -116,6 +118,7 @@ main(void)
             {
                 flint_printf("FAIL: Check pow_ui success\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
             nmod_mpoly_assert_canonical(f, ctx);
@@ -124,6 +127,7 @@ main(void)
             {
                 flint_printf("FAIL: Check aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
+                fflush(stdout);
                 flint_abort();
             }
         }

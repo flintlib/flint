@@ -57,7 +57,8 @@ main(void)
             fmpq_poly_debug(a), flint_printf("\n\n");
             fmpq_poly_debug(b), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(a);
@@ -104,7 +105,8 @@ main(void)
             flint_printf("exp(b) = "), fmpq_poly_debug(expb), flint_printf("\n\n");
             flint_printf("exp(ab) = "), fmpq_poly_debug(expab), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(a);
@@ -159,7 +161,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
             flint_printf("exp(a) = "), fmpq_poly_debug(expa), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(a);

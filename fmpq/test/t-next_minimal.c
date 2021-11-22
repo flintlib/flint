@@ -42,7 +42,8 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 
     fmpq_set_si(r, 0, 1);
@@ -57,7 +58,8 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 
 
@@ -75,7 +77,8 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 
     fmpz_set_str(fmpq_numref(r), "36893488147419102231", 10);
@@ -92,7 +95,8 @@ main(void)
         flint_printf("\n");
         fmpq_print(ans);
         flint_printf("\n");
-        abort();
+        fflush(stdout);
+        flint_abort();
     }
 
 

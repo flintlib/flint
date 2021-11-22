@@ -47,7 +47,8 @@ main(void)
                 if (!mpfr_zero_p(mpfr_mat_entry(A, i, j)))
                 {
                     flint_printf("FAIL: nonzero entry\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }

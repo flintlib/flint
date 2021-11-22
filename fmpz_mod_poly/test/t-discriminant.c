@@ -76,6 +76,7 @@ main(void)
             flint_printf("y = "); fmpz_print(y); printf("\n");
             flint_printf("z = "); fmpz_print(z); printf("\n");
             flint_printf("n = "); fmpz_print(n); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
         
@@ -115,6 +116,7 @@ main(void)
             flint_printf("FAIL disc(f) == 0 for len f < 2:\n");
             fmpz_mod_poly_print(f, ctx), flint_printf("\n\n");
             flint_printf("y = "); fmpz_print(y); printf("\n");
+            fflush(stdout);
             flint_abort();
         }
         

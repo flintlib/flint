@@ -59,7 +59,8 @@ main(void)
             if (solved == 0)
             {
                 flint_printf("FAIL: expected empty system to pass\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
         else
@@ -78,14 +79,16 @@ main(void)
                 fmpz_poly_mat_print(B, "x");
                 flint_printf("X:\n");
                 fmpz_poly_mat_print(X, "x");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 
         if (solved != !fmpz_poly_is_zero(den))
         {
             flint_printf("FAIL: return value does not match denominator\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_mat_mul(AX, A, X);
@@ -104,7 +107,8 @@ main(void)
             fmpz_poly_mat_print(AX, "x");
             flint_printf("Bden:\n");
             fmpz_poly_mat_print(Bden, "x");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_clear(den);

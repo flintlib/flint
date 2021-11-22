@@ -75,7 +75,8 @@ main(void)
             fmpq_mat_print(X);
             flint_printf("AX:\n");
             fmpq_mat_print(AX);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(den);
@@ -137,7 +138,8 @@ main(void)
             fmpq_mat_print(X);
             flint_printf("AX:\n");
             fmpq_mat_print(AX);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(den);

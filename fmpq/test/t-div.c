@@ -58,7 +58,8 @@ main(void)
             flint_printf("\n");
             fmpq_print(z);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpq_div(X, Y, Z);
@@ -74,7 +75,8 @@ main(void)
             flint_printf("\nz = ");
             fmpq_print(z);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -112,7 +114,8 @@ main(void)
             flint_printf("\n");
             fmpq_print(y);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpq_div(X, X, Y);
@@ -126,7 +129,8 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -162,7 +166,8 @@ main(void)
             flint_printf("\n");
             fmpq_print(y);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpq_div(X, Y, X);
@@ -176,7 +181,8 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);

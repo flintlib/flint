@@ -59,7 +59,8 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\nc = %wu\n", c);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_get_mpq(X, x);
@@ -75,7 +76,8 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -114,7 +116,8 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\nc = %wu\n", c);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (!fmpq_equal(x, y))
@@ -125,7 +128,8 @@ main(void)
             flint_printf("\ny = ");
             fmpq_print(y);
             flint_printf("\nc = %wu\n", c);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);

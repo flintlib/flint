@@ -88,7 +88,8 @@ int main()
             flint_printf("result: "); fmpz_print(result); flint_printf("\n");
             flint_printf("%wd Equalness: %d\n", i, fmpz_equal(result, input));
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

@@ -75,7 +75,8 @@ main(void)
             flint_printf("poly:\n");
             TEMPLATE(T, poly_print) (poly1, ctx);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (poly1, ctx);

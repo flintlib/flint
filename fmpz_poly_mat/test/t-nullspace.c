@@ -58,13 +58,15 @@ main(void)
             flint_printf("\n");
             fmpz_poly_mat_print(N, "x");
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (fmpz_poly_mat_rank(N) != nullity)
         {
             flint_printf("FAIL: wrong rank(N) != nullity!\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_mat_mul(AN, A, N);
@@ -72,7 +74,8 @@ main(void)
         if (!fmpz_poly_mat_is_zero(AN))
         {
             flint_printf("FAIL: A * N != 0\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_mat_clear(A);

@@ -68,7 +68,8 @@ main(void)
             flint_printf("B:\n");
             fmpz_mat_print_pretty(B);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         for (j = 0; j < m; j++)
@@ -88,7 +89,8 @@ main(void)
                     flint_printf("B:\n");
                     fmpz_mat_print_pretty(B);
                     flint_printf("\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }

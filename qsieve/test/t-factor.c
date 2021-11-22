@@ -67,7 +67,8 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("Test n with large prime factor\n");
          flint_printf("%ld factors found\n", factors->num);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       fmpz_factor_clear(factors);
@@ -96,7 +97,8 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("Test random n, two factors\ni = %wd\n", i);
          flint_printf("%ld factors found\n", factors->num);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       fmpz_factor_clear(factors);
@@ -127,7 +129,8 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("Test random n, three factors\ni = %wd\n", i);
          flint_printf("%ld factors found\n", factors->num);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       fmpz_factor_clear(factors);
@@ -156,7 +159,8 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("Test random n, small factors\ni = %wd\n", i);
          flint_printf("%ld factors found\n", factors->num);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       fmpz_factor_clear(factors);

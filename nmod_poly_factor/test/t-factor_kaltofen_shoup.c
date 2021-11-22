@@ -86,7 +86,8 @@ main(void)
         if (res->num != num)
         {
             flint_printf("Error: number of factors incorrect: %wd != %wd\n", res->num, num);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_init_preinv(product, poly1->mod.n, poly1->mod.ninv);
@@ -103,7 +104,8 @@ main(void)
             flint_printf("Error: product of factors does not equal to the original polynomial\n");
             flint_printf("poly:\n"); nmod_poly_print(poly1); flint_printf("\n");
             flint_printf("product:\n"); nmod_poly_print(product); flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(product);

@@ -72,7 +72,8 @@ main(void)
             fmpq_mat_print(B);
             flint_printf("C:\n");
             fmpq_mat_print(C);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_mat_clear(A);
@@ -115,7 +116,8 @@ main(void)
             fmpq_mat_print(A);
             flint_printf("B:\n");
             fmpq_mat_print(B);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_mat_clear(A);
@@ -159,7 +161,8 @@ main(void)
                 flint_printf("FAIL:\n");
                 flint_printf("matrix reported as invertible:\n");
                 fmpq_mat_print(A);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             fmpz_mat_clear(M);

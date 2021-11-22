@@ -43,7 +43,8 @@ main(void)
         if (!nmod_poly_mat_is_zero(A))
         {
             flint_printf("FAIL: expected matrix to be zero\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (m > 0 && n > 0)
@@ -55,7 +56,8 @@ main(void)
             if (nmod_poly_mat_is_zero(A))
             {
                 flint_printf("FAIL: expected matrix not to be zero\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 

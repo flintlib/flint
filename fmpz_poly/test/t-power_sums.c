@@ -50,7 +50,8 @@ main(void)
                     flint_printf("%d %d %d\n\n", i, j, k);
                     fmpz_poly_print(b), flint_printf("\n\n");
                     fmpz_poly_print(c), flint_printf("\n\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
 
                 fmpz_init(il);
@@ -70,7 +71,8 @@ main(void)
                     {
                         flint_printf("FAIL:\n\n");
                         flint_printf("%d %d %d %d\n", i, j, k, l);
-                        abort();
+                        fflush(stdout);
+                        flint_abort();
                     }
                     fmpz_mul_si(il, il, i);
                     fmpz_mul_si(jl, jl, j);
@@ -123,7 +125,8 @@ main(void)
                     ("FAIL: equality power_sums, power_sums_naive\n");
                 flint_printf("%ld", n);
                 fmpz_poly_print(a), flint_printf("\n\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             if (n >= 1)
@@ -139,7 +142,8 @@ main(void)
                     flint_printf("FAIL: equality with schoenhage formula\n");
                     flint_printf("%ld", n);
                     fmpz_poly_print(a), flint_printf("\n\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
             }
         }
@@ -195,7 +199,8 @@ main(void)
             fmpz_poly_print(d), flint_printf("\n");
             fmpz_poly_print(e), flint_printf("\n");
             fmpz_poly_print(f), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_clear(a);

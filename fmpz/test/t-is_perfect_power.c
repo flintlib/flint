@@ -45,7 +45,8 @@ int main(void)
          flint_printf("FAIL:\n");
          fmpz_print(n);
          flint_printf(" is declared not a perfect power\n");
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       fmpz_pow_ui(pow, root, result);
@@ -55,7 +56,8 @@ int main(void)
          fmpz_print(root);
          flint_printf("^%d != ", result);
          fmpz_print(n);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
    }         
  
@@ -77,7 +79,8 @@ int main(void)
          flint_printf("FAIL:\n");
          fmpz_print(n);
          flint_printf(" is declared a perfect power\n"); 
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       mpz_clear(d_m);
@@ -97,7 +100,8 @@ int main(void)
          flint_printf("FAIL:\n");
          fmpz_print(n2);
          flint_printf(" is declared not a perfect power\n");
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       fmpz_pow_ui(pow, n, result);
@@ -107,7 +111,8 @@ int main(void)
          fmpz_print(n);
          flint_printf("^%d != ", result);
          fmpz_print(n2);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
    }         
  
@@ -129,7 +134,8 @@ int main(void)
          flint_printf("FAIL:\n");
          fmpz_print(n2);
          flint_printf(" is declared a perfect power\n"); 
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       mpz_clear(d_m);

@@ -34,6 +34,7 @@ void test_poly(
     if (!nmod_poly_roots_factored(roots, f, want_mult, n))
     {
         flint_printf("FAILED:\ncheck roots could be computed\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -42,12 +43,14 @@ void test_poly(
         if (nmod_poly_degree(roots->p + i) != 1)
         {
             flint_printf("FAILED:\ncheck root is linear\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (roots->p[i].coeffs[1] != 1)
         {
             flint_printf("FAILED:\ncheck root is monic\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -63,12 +66,14 @@ void test_poly(
         if (multiplicity <= 0)
         {
             flint_printf("FAILED:\ncheck root is a root\n");
+            fflush(stdout);
             flint_abort();
         }
 
         if (roots->exp[i] != (want_mult ? multiplicity : 1))
         {
             flint_printf("FAILED:\ncheck root multiplicity\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -91,6 +96,7 @@ void test_poly(
                     if (found)
                     {
                         flint_printf("FAILED:\ncheck duplicate roots\n");
+                        fflush(stdout);
                         flint_abort();
                     }
                     found = 1;
@@ -100,6 +106,7 @@ void test_poly(
             if (!found)
             {
                 flint_printf("FAILED:\ncheck missing roots\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -147,12 +154,14 @@ main(void)
             if (!nmod_poly_roots_factored(roots, f, 0, &nfac))
             {
                 flint_printf("FAILED:\ncheck sqrt could be calculated\n");
+                fflush(stdout);
                 flint_abort();
             }
 
             if (roots->num != n_sqrtmodn(&sqrt, a, &nfac))
             {
                 flint_printf("FAILED:\ncheck root count against n_sqrtmodn\n");
+                fflush(stdout);
                 flint_abort();
             }
 

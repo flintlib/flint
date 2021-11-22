@@ -49,7 +49,8 @@ main(void)
         if (!nmod_mat_equal(C, A))
         {
             flint_printf("FAIL\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);

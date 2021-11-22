@@ -58,7 +58,7 @@ void sample(void * arg, ulong count)
           nmod_poly_mul(c, a, b);
       }
 	  prof_stop();
-      if (c->coeffs[n - 2] == 123) abort();
+      if (c->coeffs[n - 2] == 123) flint_abort();
    }
   
    nmod_poly_clear(a);

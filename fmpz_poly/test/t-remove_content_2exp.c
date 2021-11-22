@@ -48,6 +48,7 @@ int main()
             flint_printf("g2 = "); fmpz_poly_print(g2); flint_printf("\n\n");
             flint_printf("g3 = "); fmpz_poly_print(g3); flint_printf("\n\n");
             flint_printf("ERROR \n");
+            fflush(stdout);
             flint_abort();
         }
 

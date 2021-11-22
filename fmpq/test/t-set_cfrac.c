@@ -52,7 +52,8 @@ main(void)
             flint_printf("x = "); fmpq_print(x); flint_printf("\n");
             flint_printf("y = "); fmpq_print(y); flint_printf("\n");
             flint_printf("c = "); _fmpz_vec_print(c, n); flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         _fmpz_vec_clear(c, bound);

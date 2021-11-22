@@ -66,7 +66,8 @@ main(void)
         {
             flint_printf("FAIL (cmp f with MPIR e := d^y mod m):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, y = %Zd, m = %Zd\n", d, e, f, y, m);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -108,7 +109,8 @@ main(void)
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             flint_printf("n = "), fmpz_print(n), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -144,7 +146,8 @@ main(void)
             flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             flint_printf("n = "), fmpz_print(n), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -177,7 +180,8 @@ main(void)
             flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             flint_printf("n = "), fmpz_print(n), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

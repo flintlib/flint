@@ -56,6 +56,7 @@ main(void)
                 {
                     flint_printf("FAIL: check get and set match\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -63,6 +64,7 @@ main(void)
                 {
                     flint_printf("FAIL: check reference match\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
+                    fflush(stdout);
                     flint_abort();
                 }
             }

@@ -55,7 +55,8 @@ int main(void)
             flint_printf("p = "), fmpz_print(p), flint_printf("\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -112,7 +113,8 @@ int main(void)
                 flint_printf("d2 = "), padic_print(d2, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             padic_clear(a2);
@@ -129,7 +131,8 @@ int main(void)
                 flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 
@@ -191,7 +194,8 @@ int main(void)
                 flint_printf("d2 = "), padic_print(d2, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             padic_clear(a2);
@@ -209,7 +213,8 @@ int main(void)
                 flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 
@@ -253,7 +258,8 @@ int main(void)
             flint_printf("FAIL (aliasing):\n\n");
             flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
             flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -310,7 +316,8 @@ int main(void)
                 flint_printf("d2 = "), padic_print(d2, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             padic_clear(a2);
@@ -327,7 +334,8 @@ int main(void)
                 flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 
@@ -388,7 +396,8 @@ int main(void)
                 flint_printf("d2 = "), padic_print(d2, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             padic_clear(a2);
@@ -406,7 +415,8 @@ int main(void)
                 flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
                 flint_printf("p = "), fmpz_print(p), flint_printf("\n");
                 flint_printf("ans = %d\n", ans);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 

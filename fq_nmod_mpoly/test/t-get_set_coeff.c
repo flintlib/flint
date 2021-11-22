@@ -64,6 +64,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check _fmpz_fmpz\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -118,6 +119,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check _fmpz_ui\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
 

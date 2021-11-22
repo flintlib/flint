@@ -72,7 +72,8 @@ main(void)
             fmpq_mat_print(X);
             flint_printf("AX:\n");
             fmpq_mat_print(AX);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);
@@ -109,7 +110,8 @@ main(void)
             flint_printf("Expected success = 0\n");
             fmpz_mat_print(A);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(A);

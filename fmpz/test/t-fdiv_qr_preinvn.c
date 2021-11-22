@@ -65,7 +65,8 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_preinvn_clear(inv);
@@ -121,7 +122,8 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_preinvn_clear(inv);
@@ -177,7 +179,8 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_preinvn_clear(inv);
@@ -233,7 +236,8 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_preinvn_clear(inv);
@@ -289,7 +293,8 @@ main(void)
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_preinvn_clear(inv);

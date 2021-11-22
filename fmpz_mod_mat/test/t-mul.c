@@ -91,6 +91,7 @@ int main(void)
             fmpz_mod_mat_print_pretty(B2); flint_printf("\n\n");
             fmpz_mod_mat_print_pretty(C); flint_printf("\n\n");
             fmpz_mod_mat_print_pretty(D); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -101,6 +102,7 @@ int main(void)
             if (!fmpz_mod_mat_equal(A, C))
             {
                 flint_printf("FAIL: aliasing failed\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -140,6 +142,7 @@ int main(void)
             flint_printf("FAIL: window aliasing failed\n");
             fmpz_mod_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mod_mat_print_pretty(B); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

@@ -72,6 +72,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check mul_dense matches mul_johnson\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -131,6 +132,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing first argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -189,6 +191,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check aliasing first argument\ni = %wd, j = %wd\n", i ,j);
+                fflush(stdout);
                 flint_abort();
             }
         }

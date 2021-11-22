@@ -59,7 +59,8 @@ main(void)
             printf("C:\n");
             TEMPLATE(T, mat_print) (C, ctx);
             printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, mat_clear) (A, ctx);
@@ -102,7 +103,8 @@ main(void)
             printf("C:\n");
             TEMPLATE(T, mat_print) (C, ctx);
             printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         if (n == m)
@@ -113,6 +115,7 @@ main(void)
             if (!TEMPLATE(T, mat_equal) (A, C, ctx))
             {
                 flint_printf("FAIL: aliasing failed\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -148,6 +151,7 @@ main(void)
             flint_printf("FAIL: window aliasing failed\n");
             TEMPLATE(T, mat_print)(A, ctx); flint_printf("\n\n");
             TEMPLATE(T, mat_print)(B, ctx); flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

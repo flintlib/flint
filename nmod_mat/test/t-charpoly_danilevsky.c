@@ -61,7 +61,8 @@ main(void)
             flint_printf("Matrix B:\n"), nmod_mat_print_pretty(B), flint_printf("\n");
             flint_printf("cp(AB) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("cp(BA) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);
@@ -101,7 +102,8 @@ main(void)
             flint_printf("Matrix A:\n"), nmod_mat_print_pretty(A), flint_printf("\n");
             flint_printf("cp(A) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
             flint_printf("cp(P^{-1}AP) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);

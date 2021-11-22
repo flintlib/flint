@@ -52,6 +52,7 @@ main(void)
                 flint_printf("num_bits = %wu\n", num_bits);
                 flint_printf("den_bits = %wu\n", den_bits);
                 flint_printf("d = %f\n", d);
+                fflush(stdout);
                 flint_abort();
             }
         }

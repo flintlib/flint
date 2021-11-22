@@ -93,7 +93,8 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared composite\n", d); 
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       mpz_clear(d_m);
@@ -116,7 +117,8 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("d = %wu is declared prime\n", d); 
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
 
       mpz_clear(d_m);
@@ -137,7 +139,8 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("Perfect power d = %wu is declared prime\n", d); 
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
    }
 
@@ -151,7 +154,8 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          flint_printf("Known composite d = %wu is declared prime\n", d);
-         abort();
+         fflush(stdout);
+         flint_abort();
       }
    }
 #endif

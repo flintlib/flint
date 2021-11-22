@@ -54,6 +54,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("check left neighbor i = %wd, q = %wd\n", i, q);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -64,6 +65,7 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("check right neighbor i = %wd, q = %wd\n", i, q);
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -75,6 +77,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("check end q = %wd\n", q);
+            fflush(stdout);
             flint_abort();            
         }
 

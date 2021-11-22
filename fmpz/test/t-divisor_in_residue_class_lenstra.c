@@ -70,7 +70,8 @@ main(void)
             fmpz_print(s); printf("\n");
             fmpz_print(a); printf("\n");
             fmpz_print(d); printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(p);
@@ -118,7 +119,8 @@ main(void)
             fmpz_print(r); printf("\n");
             fmpz_print(s); printf("\n");
             fmpz_print(d); printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(p);

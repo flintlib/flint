@@ -48,6 +48,7 @@ main(void)
         if (!fmpq_equal(g, g1))
         {
             flint_printf("FAIL: check gcd\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -56,6 +57,7 @@ main(void)
         if (!fmpq_equal(t1, a) || !fmpq_equal(t2, b))
         {
             flint_printf("FAIL: check cofactors\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -65,6 +67,7 @@ main(void)
             !fmpz_equal(abar1, abar) ||!fmpz_equal(bbar1, bbar))
         {
             flint_printf("FAIL: check aliasing first argument\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -74,6 +77,7 @@ main(void)
             !fmpz_equal(abar1, abar) ||!fmpz_equal(bbar1, bbar))
         {
             flint_printf("FAIL: check aliasing second argument\n");
+            fflush(stdout);
             flint_abort();
         }
 

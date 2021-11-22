@@ -53,7 +53,8 @@ main(void)
                 flint_printf("x1 = "), fmpz_print(x1), flint_printf("\n");
                 flint_printf("x2 = "), fmpz_print(x2), flint_printf("\n");
                 flint_printf("coeff = %wd, length = %wd\n", coeff, len);
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
         }
 

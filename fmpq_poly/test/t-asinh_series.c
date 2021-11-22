@@ -57,7 +57,8 @@ main(void)
             fmpq_poly_debug(a), flint_printf("\n\n");
             fmpq_poly_debug(b), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(a);
@@ -97,7 +98,8 @@ main(void)
             flint_printf("asinh(A) = "), fmpq_poly_debug(asinhA), flint_printf("\n\n");
             flint_printf("atanh(B) = "), fmpq_poly_debug(atanhB), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_poly_clear(A);

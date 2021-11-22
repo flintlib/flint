@@ -66,7 +66,8 @@ main(void)
             flint_printf("\n\nf1: \n");
             mpfr_out_str(stdout, 10, 0, f2, MPFR_RNDN);
             flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpq_clear(x);

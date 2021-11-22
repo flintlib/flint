@@ -61,6 +61,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check one generator\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -74,6 +75,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check product of two generators\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

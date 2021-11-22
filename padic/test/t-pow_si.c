@@ -59,7 +59,8 @@ main(void)
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -107,7 +108,8 @@ main(void)
             flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -163,7 +165,8 @@ main(void)
             flint_printf("s = "), fmpq_print(s), flint_printf("\n");
             flint_printf("t = "), fmpq_print(t), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);
@@ -222,7 +225,8 @@ main(void)
             flint_printf("N_lo  = %wd\n", N_lo);
             flint_printf("N_hi  = %wd\n", N_hi);
             flint_printf("N_res = %wd\n", N_res);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         padic_clear(a);

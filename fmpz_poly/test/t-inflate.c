@@ -54,6 +54,7 @@ main(void)
             flint_printf("poly3:\n");
             fmpz_poly_print(poly3);
             flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -67,6 +68,7 @@ main(void)
             flint_printf("poly2:\n");
             fmpz_poly_print(poly2);
             flint_printf("\n\n");
+            fflush(stdout);
             flint_abort();
         }
 

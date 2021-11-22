@@ -22,7 +22,7 @@ void p_is_prime_repeat(fmpz_t n)
     if (aprcl_is_prime(n) == 0)
     {
         flint_printf("Primality test failed\n");
-        abort();
+        flint_abort();
     }
     TIMEIT_STOP
 }

@@ -55,7 +55,8 @@ main(void)
             flint_printf("limbs1 = %d\n", limbs1);
             flint_printf("limbs2 = %d\n", limbs2);
             gmp_printf("bound: %Zd\n", t);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         mpz_clear(t);

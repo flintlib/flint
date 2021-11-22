@@ -59,7 +59,8 @@ main(void)
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);
@@ -103,7 +104,8 @@ main(void)
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);
@@ -153,7 +155,8 @@ main(void)
             flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);
@@ -207,7 +210,8 @@ main(void)
             flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, clear)(a, ctx);

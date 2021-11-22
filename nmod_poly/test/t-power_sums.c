@@ -58,7 +58,8 @@ main(void)
             flint_printf("c = "), nmod_poly_print(c), flint_printf("\n");
             flint_printf("d = "), nmod_poly_print(d), flint_printf("\n");
             flint_printf("e = "), nmod_poly_print(e), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_make_monic(a, a);
@@ -75,7 +76,8 @@ main(void)
             flint_printf("a = "), nmod_poly_print(a), flint_printf("\n");
             flint_printf("b = "), nmod_poly_print(b), flint_printf("\n");
             flint_printf("c = "), nmod_poly_print(c), flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(a);

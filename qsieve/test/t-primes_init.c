@@ -57,7 +57,8 @@ int main(void)
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(qs_inf->n);
                flint_printf("\n");
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
            else
                goto cleanup1;
@@ -77,7 +78,8 @@ int main(void)
                flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
                fmpz_print(qs_inf->kn);
                flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
 
            /* check if inverse of factor base primes are correct */
@@ -90,7 +92,8 @@ int main(void)
            {
                flint_printf("%wd is not an inverse of %wd\n",
                         qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
        }
 
@@ -105,7 +108,8 @@ int main(void)
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(qs_inf->n);
                flint_printf("\n");
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
            else goto cleanup1;
        }
@@ -122,7 +126,8 @@ int main(void)
                flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
                fmpz_print(qs_inf->kn);
                flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
 
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
@@ -134,7 +139,8 @@ int main(void)
            {
                flint_printf("%wd is not an inverse of %wd\n",
                         qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
        }
 
@@ -149,7 +155,8 @@ int main(void)
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(n);
                flint_printf("\n");
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
            else goto cleanup1;
        }
@@ -166,7 +173,8 @@ int main(void)
                flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
                fmpz_print(qs_inf->kn);
                flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
 
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
@@ -178,7 +186,8 @@ int main(void)
            {
                flint_printf("%wd is not an inverse of %wd\n",
                         qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
        }
 
@@ -193,7 +202,8 @@ int main(void)
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(n);
                flint_printf("\n");
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
            else goto cleanup1;
        }
@@ -210,7 +220,8 @@ int main(void)
                flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
                fmpz_print(qs_inf->kn);
                flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
 
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
@@ -222,7 +233,8 @@ int main(void)
            {
                flint_printf("%wd is not an inverse of %wd\n",
                         qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
-               abort();
+               fflush(stdout);
+               flint_abort();
            }
        }
 

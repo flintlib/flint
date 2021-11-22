@@ -79,7 +79,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL: %wu, %wd, %wd\n", modulus, num, res->num);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
       
         nmod_poly_clear(quot);

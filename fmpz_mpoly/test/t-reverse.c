@@ -55,6 +55,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check rev(rev(a)) == a\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -92,6 +93,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check aliasing\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

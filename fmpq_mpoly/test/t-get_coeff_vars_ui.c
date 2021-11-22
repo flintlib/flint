@@ -41,6 +41,7 @@ main(void)
         if (!fmpq_mpoly_equal(f, g, ctx))
         {
             flint_printf("FAIL\ncheck simple example\n");
+            fflush(stdout);
             flint_abort();
         }
         fmpq_mpoly_clear(f, ctx);
@@ -95,6 +96,7 @@ main(void)
         {
             flint_printf("FAIL\n"
                          "check 1 variable sum of coefficients\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 
@@ -161,6 +163,7 @@ main(void)
         {
             flint_printf("FAIL\n"
                          "check 2 variable sum of coefficients\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

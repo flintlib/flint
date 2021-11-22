@@ -64,7 +64,8 @@ main(void)
             flint_printf("cos(A): "); nmod_poly_print(cosA), flint_printf("\n\n");
             flint_printf("1-cos(A)^2: "); nmod_poly_print(B), flint_printf("\n\n");
             flint_printf("sin(A)^2: "); nmod_poly_print(C), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(A);
@@ -99,7 +100,8 @@ main(void)
             flint_printf("FAIL:\n");
             nmod_poly_print(A), flint_printf("\n\n");
             nmod_poly_print(B), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_poly_clear(A);

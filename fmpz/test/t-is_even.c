@@ -44,7 +44,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("f = "), fmpz_print(f), flint_printf("\n");
             gmp_printf("g = %Zd\n", g);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(f);
@@ -68,7 +69,8 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("f = "), fmpz_print(f), flint_printf("\n");
             gmp_printf("g = %Zd\n", g);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(f);

@@ -109,10 +109,9 @@ main(void)
             flint_printf("Error: product of factors does not equal original polynomial\n");
             nmod_poly_print(pol1); flint_printf("\n");
             nmod_poly_print(product); flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
         }
-
-        if (!result)
-            abort();
 
 
         nmod_poly_clear(product);

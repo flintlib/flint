@@ -37,13 +37,15 @@ check_rref(fmpz_mat_t A)
                 if (prev_row_zero)
                 {
                     flint_printf("nonzero row after zero row\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
 
                 if (j <= prev_pivot)
                 {
                     flint_printf("pivot not strictly to the right of previous\n");
-                    abort();
+                    fflush(stdout);
+                    flint_abort();
                 }
 
                 prev_pivot = j;
@@ -97,7 +99,8 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             check_rref(A);
@@ -139,7 +142,8 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
-                abort();
+                fflush(stdout);
+                flint_abort();
             }
 
             check_rref(A);

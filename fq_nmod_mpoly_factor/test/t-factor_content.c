@@ -26,6 +26,7 @@ void check_content(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
     if (!fq_nmod_mpoly_factor_content(g, p, ctx))
     {
         flint_printf("FAIL:\ncheck factorization could be computed\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -34,6 +35,7 @@ void check_content(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
         if (g->poly[i].length < 1 || g->poly[i].coeffs[0] != 1)
         {
             flint_printf("FAIL:\nfactorization is not unit normal\n");
+            fflush(stdout);
             flint_abort();
         }
     }
@@ -42,6 +44,7 @@ void check_content(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
     if (!fq_nmod_mpoly_equal(q, p, ctx))
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
+        fflush(stdout);
         flint_abort();
     }
 
@@ -54,6 +57,7 @@ void check_content(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
                 if (!fq_nmod_mpoly_is_gen(g->poly + i, -1, ctx))
                 {
                     flint_printf("FAIL:\nmonomial is bad\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -62,6 +66,7 @@ void check_content(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
                 if (!fq_nmod_mpoly_content_vars(q, g->poly + i, &v, 1, ctx))
                 {
                     flint_printf("FAIL:\ncheck content could be computed\n");
+                    fflush(stdout);
                     flint_abort();
                 }
 
@@ -69,6 +74,7 @@ void check_content(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
                 if (!fq_nmod_mpoly_is_one(q, ctx) && !fmpz_is_zero(deg))
                 {
                     flint_printf("FAIL:\ncontent is bad\n");
+                    fflush(stdout);
                     flint_abort();
                 }
             }

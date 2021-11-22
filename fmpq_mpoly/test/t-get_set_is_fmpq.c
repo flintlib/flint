@@ -51,6 +51,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check is_fmpq and get_fmpq catch constants\ni = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -61,6 +62,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check set_fmpq makes is_fmpq true\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
         fmpq_mpoly_get_fmpq(d, f, ctx);
@@ -68,6 +70,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check get_fmpq matches set_fmpq true\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

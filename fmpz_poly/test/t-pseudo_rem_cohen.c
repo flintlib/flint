@@ -52,7 +52,8 @@ main(void)
             flint_printf("b  = "), fmpz_poly_print(b), flint_printf("\n\n");
             flint_printf("r1 = "), fmpz_poly_print(r1), flint_printf("\n\n");
             flint_printf("r2 = "), fmpz_poly_print(r2), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_clear(a);
@@ -82,7 +83,8 @@ main(void)
             flint_printf("FAIL (aliasing r, a):\n");
             fmpz_poly_print(a), flint_printf("\n\n");
             fmpz_poly_print(r), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_clear(a);
@@ -110,7 +112,8 @@ main(void)
             flint_printf("FAIL (aliasing r, b):\n");
             fmpz_poly_print(b), flint_printf("\n\n");
             fmpz_poly_print(r), flint_printf("\n\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_poly_clear(a);

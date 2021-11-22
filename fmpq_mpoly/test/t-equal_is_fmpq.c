@@ -68,6 +68,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 1\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -103,6 +104,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 2\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -135,6 +137,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 3\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -165,6 +168,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 4\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -206,6 +210,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 5\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -253,6 +258,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 6\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -287,6 +293,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("test 7\n");
+            fflush(stdout);
             flint_abort();
         }
 

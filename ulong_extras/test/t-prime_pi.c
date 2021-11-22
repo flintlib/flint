@@ -29,7 +29,8 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 
@@ -39,7 +40,8 @@ int main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("expected pi(prime(%d)) = %d\n", n, n); 
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
     }
 

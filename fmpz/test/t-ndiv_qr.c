@@ -58,6 +58,7 @@ main(void)
             if (!fmpz_equal(A, nquo) || !fmpz_equal(B, nrem))
             {
                 flint_printf("FAIL: check (A, B, A, B) aliasing\n");
+                fflush(stdout);
                 flint_abort();
             }
 
@@ -67,6 +68,7 @@ main(void)
             if (!fmpz_equal(B, nquo) || !fmpz_equal(A, nrem))
             {
                 flint_printf("FAIL: check (B, A, A, B) aliasing\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -86,6 +88,7 @@ main(void)
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("q = "); fmpz_print(nquo); flint_printf("\n");
             flint_printf("r = "); fmpz_print(nrem); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 
@@ -154,6 +157,7 @@ main(void)
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("q = "); fmpz_print(nquo); flint_printf("\n");
             flint_printf("r = "); fmpz_print(nrem); flint_printf("\n");
+            fflush(stdout);
             flint_abort();
         }
 

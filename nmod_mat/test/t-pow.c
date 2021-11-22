@@ -58,7 +58,8 @@ main()
             nmod_mat_print_pretty(A);
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         nmod_mat_clear(A);

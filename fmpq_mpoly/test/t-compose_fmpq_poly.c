@@ -82,6 +82,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpq_poly_evaluate_fmpq(ge, g, vals2);
@@ -89,6 +90,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check composition and evalall commute\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -173,6 +175,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpq_poly_init(t);
@@ -181,6 +184,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check composition with constants matches evalall\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpq_poly_clear(t);
@@ -261,6 +265,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check evaluation success\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpq_poly_init(t);
@@ -269,6 +274,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check multiprecision composition with constants matches evalall\ni: %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
             fmpq_poly_clear(t);

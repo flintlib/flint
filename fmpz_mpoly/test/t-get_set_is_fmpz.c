@@ -52,6 +52,7 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("Check is_fmpz and get_fmpz catch constants\ni = %wd\n", i);
+                fflush(stdout);
                 flint_abort();
             }
         }
@@ -62,6 +63,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check set_fmpz makes is_fmpz true\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
         fmpz_mpoly_get_fmpz(d, f, ctx);
@@ -69,6 +71,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check get_fmpz matches set_fmpz true\ni = %wd\n", i);
+            fflush(stdout);
             flint_abort();
         }
 

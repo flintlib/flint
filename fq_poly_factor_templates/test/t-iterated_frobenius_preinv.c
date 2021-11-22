@@ -50,7 +50,8 @@ main(void)
         {
             flint_printf("Exception (t-fq_poly_iterated_frobenius_preinv):\n");
             flint_printf("Not enough memory.\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
         h2 = h1 + n;
 
@@ -75,7 +76,8 @@ main(void)
             flint_printf("v:\n");
             TEMPLATE(T, poly_print) (v, ctx);
             flint_printf("\n");
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         TEMPLATE(T, poly_clear) (v, ctx);

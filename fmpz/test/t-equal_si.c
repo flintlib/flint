@@ -55,7 +55,8 @@ main(void)
             flint_printf("n = %wd\n", n);
             flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
             flint_printf("equal_si(a, n) = %d\n", fmpz_equal_si(a, n));
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);
@@ -88,7 +89,8 @@ main(void)
             flint_printf("n = %wd\n", n);
             flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
             flint_printf("equal_si(a, n) = %d\n", fmpz_equal_si(a, n));
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(a);

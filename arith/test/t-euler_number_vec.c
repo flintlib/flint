@@ -53,7 +53,8 @@ int main()
         {
             flint_printf("ERROR: sum over 0,...,n = %wd\n", n);
             _fmpz_vec_print(r, n + 1);
-            abort();
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_clear(s);
