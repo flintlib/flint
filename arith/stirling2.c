@@ -224,27 +224,47 @@ arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
 }
 
 static void
-arith_stirling_number_2_nmod_vec(mp_ptr res, ulong n, slong len, nmod_t mod)
+divisor_table(unsigned int * tab, slong len)
+{
+    slong i, j;
+
+    for (i = 0; i < len; i++)
+    {
+        tab[2 * i] = 1;
+        tab[2 * i + 1] = i;
+    }
+
+    for (i = 2; i < len; i++)
+    {
+        for (j = 2; j <= i && i * j < len; j++)
+        {
+            tab[2 * i * j] = j;
+            tab[2 * i * j + 1] = i;
+        }
+    }
+}
+
+static void
+arith_stirling_number_2_nmod_vec(mp_ptr res, const unsigned int * divtab, ulong n, slong len, nmod_t mod)
 {
     mp_ptr t, u;
-    slong i, j;
+    slong i;
     mp_limb_t c;
     TMP_INIT;
     TMP_START;
 
     t = TMP_ALLOC(len * sizeof(mp_limb_t));
     u = TMP_ALLOC(len * sizeof(mp_limb_t));
-    memset(u, 0, len * sizeof(mp_limb_t));
 
     /* compute inverse factorials */
     t[len - 1] = 1;
     for (i = len - 2; i >= 0; i--)
-        t[i] = nmod_mul(t[i + 1], i + 1, mod);
+        t[i] = _nmod_mul_fullword(t[i + 1], i + 1, mod);
 
     c = nmod_inv(t[0], mod);
     t[0] = 1;
     for (i = 1; i < len; i++)
-        t[i] = nmod_mul(t[i], c, mod);
+        t[i] = _nmod_mul_fullword(t[i], c, mod);
 
     /* compute powers */
     u[0] = nmod_pow_ui(0, n, mod);
@@ -252,16 +272,14 @@ arith_stirling_number_2_nmod_vec(mp_ptr res, ulong n, slong len, nmod_t mod)
 
     for (i = 2; i < len; i++)
     {
-        if (u[i] == 0)
+        if (divtab[2 * i] == 1)
             u[i] = nmod_pow_ui(i, n, mod);
-
-        for (j = 2; j <= i && i * j < len; j++)
-            if (u[i * j] == 0)
-                u[i * j] = nmod_mul(u[i], u[j], mod);
+        else
+            u[i] = _nmod_mul_fullword(u[divtab[2 * i]], u[divtab[2 * i + 1]], mod);
     }
 
     for (i = 1; i < len; i++)
-        u[i] = nmod_mul(u[i], t[i], mod);
+        u[i] = _nmod_mul_fullword(u[i], t[i], mod);
 
     for (i = 1; i < len; i += 2)
         t[i] = nmod_neg(t[i], mod);
@@ -284,6 +302,7 @@ arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
     slong i, j, k, len, num_primes, num_primes_k, resolution;
     slong need_bits, size, prime_bits;
     slong *bounds;
+    unsigned int * divtab;
     /* per comb */
     slong * local_len;
     slong * local_num_primes;
@@ -323,6 +342,9 @@ arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
     primes = flint_malloc(num_primes * sizeof(mp_limb_t));
     residues = flint_malloc(num_primes * sizeof(mp_limb_t));
     polys = flint_malloc(num_primes * sizeof(mp_ptr));
+    divtab = flint_malloc(2 * len * sizeof(unsigned int));
+
+    divisor_table(divtab, len);
 
     local_len = flint_malloc(resolution * sizeof(slong));
     local_num_primes = flint_malloc(resolution * sizeof(slong));
@@ -354,7 +376,7 @@ arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
 
         polys[j] = _nmod_vec_init(local_len[i]);
         nmod_init(&mod, primes[j]);
-        arith_stirling_number_2_nmod_vec(polys[j], n, local_len[i], mod);
+        arith_stirling_number_2_nmod_vec(polys[j], divtab, n, local_len[i], mod);
     }
 
     for (k = 0; k < len; k++)
@@ -385,6 +407,7 @@ arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
     flint_free(primes);
     flint_free(residues);
     flint_free(polys);
+    flint_free(divtab);
 
     flint_free(bounds);
 
@@ -532,10 +555,10 @@ stirling_2_powsum(fmpz_t s, ulong n, ulong k)
 
 /* req: k >= 2 */
 static mp_limb_t
-stirling_2_nmod(ulong n, ulong k, nmod_t mod)
+stirling_2_nmod(const unsigned int * divtab, ulong n, ulong k, nmod_t mod)
 {
     mp_ptr t, u;
-    slong i, j, bin_len, pow_len;
+    slong i, bin_len, pow_len;
     mp_limb_t s1, s2, bden, bd;
     int bound_limbs;
     TMP_INIT;
@@ -546,19 +569,18 @@ stirling_2_nmod(ulong n, ulong k, nmod_t mod)
 
     t = TMP_ALLOC(bin_len * sizeof(mp_limb_t));
     u = TMP_ALLOC(pow_len * sizeof(mp_limb_t));
-    memset(u, 0, pow_len * sizeof(mp_limb_t));
 
     /* compute binomial coefficients + denominator */
     t[0] = 1;
     for (i = 1; i < bin_len; i++)
-        t[i] = nmod_mul(t[i - 1], k + 1 - i, mod);
+        t[i] = _nmod_mul_fullword(t[i - 1], k + 1 - i, mod);
 
     bd = t[bin_len - 1 - (k + 1) % 2];
     bden = 1;
     for (i = bin_len - 1; i >= 0; i--)
     {
-        bden = nmod_mul(bden, i + 1, mod);
-        t[i] = nmod_mul(t[i], bden, mod);
+        bden = _nmod_mul_fullword(bden, i + 1, mod);
+        t[i] = _nmod_mul_fullword(t[i], bden, mod);
     }
 
     /* compute powers */
@@ -567,12 +589,10 @@ stirling_2_nmod(ulong n, ulong k, nmod_t mod)
 
     for (i = 2; i < pow_len; i++)
     {
-        if (u[i] == 0)
+        if (divtab[2 * i] == 1)
             u[i] = nmod_pow_ui(i, n, mod);
-
-        for (j = 2; j <= i && i * j < pow_len; j++)
-            if (u[i * j] == 0)
-                u[i * j] = nmod_mul(u[i], u[j], mod);
+        else
+            u[i] = _nmod_mul_fullword(u[divtab[2 * i]], u[divtab[2 * i + 1]], mod);
     }
 
     for (i = 1; i < bin_len; i += 2)
@@ -655,6 +675,7 @@ stirling_2_multi_mod(fmpz_t res, ulong n, ulong k)
     mp_ptr primes, residues;
     slong i, num_primes;
     flint_bitcnt_t size, prime_bits;
+    unsigned int * divtab;
 
     size = stirling_2_bound_2exp(n, k);
     prime_bits = FLINT_BITS - 1;
@@ -664,6 +685,9 @@ stirling_2_multi_mod(fmpz_t res, ulong n, ulong k)
     primes = flint_malloc(num_primes * sizeof(mp_limb_t));
     residues = flint_malloc(num_primes * sizeof(mp_limb_t));
 
+    divtab = flint_malloc(2 * sizeof(unsigned int) * (n + 1));
+    divisor_table(divtab, n + 1);
+
     primes[0] = n_nextprime(UWORD(1) << prime_bits, 0);
     for (i = 1; i < num_primes; i++)
         primes[i] = n_nextprime(primes[i - 1], 0);
@@ -671,13 +695,14 @@ stirling_2_multi_mod(fmpz_t res, ulong n, ulong k)
     for (i = 0; i < num_primes; i++)
     {
         nmod_init(&mod, primes[i]);
-        residues[i] = stirling_2_nmod(n, k, mod);
+        residues[i] = stirling_2_nmod(divtab, n, k, mod);
     }
 
     tree_crt(res, tmp, residues, primes, num_primes);
 
     flint_free(primes);
     flint_free(residues);
+    flint_free(divtab);
     fmpz_clear(tmp);
 }
 
@@ -746,4 +771,3 @@ arith_stirling_number_2(fmpz_t res, ulong n, ulong k)
             stirling_2_multi_mod(res, n, k);
     }
 }
-
