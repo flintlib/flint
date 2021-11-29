@@ -41,6 +41,7 @@ typedef union fq_default_struct
    fq_t fq;
    fq_nmod_t fq_nmod;
    fq_zech_t fq_zech;
+   ulong nmod;
 } fq_default_struct;
 
 typedef fq_default_struct fq_default_t[1];
@@ -53,6 +54,7 @@ typedef struct
       fq_ctx_t fq;
       fq_nmod_ctx_t fq_nmod;
       fq_zech_ctx_t fq_zech;
+      nmod_t nmod;
    } ctx;
 } fq_default_ctx_struct;
 
@@ -63,15 +65,20 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_type(fq_default_ctx_t ctx,
 {
     int bits = fmpz_bits(p);
 
-    if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && bits*d <= 16))
+    if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && d > 1 && bits*d <= 16))
     {
         ctx->type = FQ_DEFAULT_FQ_ZECH;
         fq_zech_ctx_init(ctx->ctx.fq_zech, p, d, var);
     }
-    else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && fmpz_abs_fits_ui(p)))
+    else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1 && fmpz_abs_fits_ui(p)))
     {
         ctx->type = FQ_DEFAULT_FQ_NMOD;
         fq_nmod_ctx_init(ctx->ctx.fq_nmod, p, d, var);
+    }
+    else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
+    {
+        ctx->type = FQ_DEFAULT_NMOD;
+        nmod_init(&ctx->ctx.nmod, fmpz_get_ui(p));
     }
     else
     {
@@ -112,6 +119,9 @@ FQ_DEFAULT_INLINE void fq_default_ctx_clear(fq_default_ctx_t ctx)
     {
         fq_nmod_ctx_clear(ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+    }
     else
     {
         fq_ctx_clear(ctx->ctx.fq);
@@ -133,6 +143,9 @@ FQ_DEFAULT_INLINE slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
     {
         return fq_nmod_ctx_degree(ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+    }
     else
     {
         return fq_ctx_degree(ctx->ctx.fq);
@@ -149,6 +162,10 @@ FQ_DEFAULT_INLINE void fq_default_ctx_prime(fmpz_t prime,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fmpz_set(prime, fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_set_ui(prime, ctx->ctx.nmod.n);
     }
     else
     {
@@ -170,6 +187,10 @@ FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
     {
         fq_nmod_ctx_order(f, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_set_ui(f, ctx->ctx.nmod.n);
+    }
     else
     {
         fq_ctx_order(f, ctx->ctx.fq);
@@ -187,6 +208,10 @@ FQ_DEFAULT_INLINE int fq_default_ctx_fprint(FILE * file,
     {
         return fq_nmod_ctx_fprint(file, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return flint_fprintf(file, "p = %wu\n", ctx->ctx.nmod.n);
+    }
     else
     {
         return fq_ctx_fprint(file, ctx->ctx.fq);
@@ -202,6 +227,10 @@ FQ_DEFAULT_INLINE void fq_default_ctx_print(const fq_default_ctx_t ctx)
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_ctx_print(ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        flint_printf("p = %wu\n", ctx->ctx.nmod.n);
     }
     else
     {
@@ -223,6 +252,9 @@ FQ_DEFAULT_INLINE void fq_default_init(fq_default_t rop,
     {
         fq_nmod_init(rop->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+    }
     else
     {
         fq_init(rop->fq, ctx->ctx.fq);
@@ -240,6 +272,9 @@ FQ_DEFAULT_INLINE void fq_default_init2(fq_default_t rop,
     {
         fq_nmod_init2(rop->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+    }
     else
     {
         fq_init2(rop->fq, ctx->ctx.fq);
@@ -256,6 +291,9 @@ FQ_DEFAULT_INLINE void fq_default_clear(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_clear(rop->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
     }
     else
     {
@@ -276,6 +314,10 @@ FQ_DEFAULT_INLINE int fq_default_is_invertible(const fq_default_t op,
     {
         return fq_nmod_is_invertible(op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return op->nmod != 0;
+    }
     else
     {
         return fq_is_invertible(op->fq, ctx->ctx.fq);
@@ -295,6 +337,10 @@ FQ_DEFAULT_INLINE void fq_default_add(fq_default_t rop, const fq_default_t op1,
     {
         fq_nmod_add(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_add(op1->nmod, op2->nmod, ctx->ctx.nmod);
+    }
     else
     {
         fq_add(rop->fq, op1->fq, op2->fq, ctx->ctx.fq);
@@ -311,6 +357,10 @@ FQ_DEFAULT_INLINE void fq_default_sub(fq_default_t rop, const fq_default_t op1,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_sub(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_sub(op1->nmod, op2->nmod, ctx->ctx.nmod);
     }
     else
     {
@@ -329,6 +379,10 @@ FQ_DEFAULT_INLINE void fq_default_sub_one(fq_default_t rop,
     {
         fq_nmod_sub_one(rop->fq_nmod, op1->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_sub(op1->nmod, 1, ctx->ctx.nmod);
+    }
     else
     {
         fq_sub_one(rop->fq, op1->fq, ctx->ctx.fq);
@@ -345,6 +399,10 @@ FQ_DEFAULT_INLINE void fq_default_neg(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_neg(rop->fq_nmod, op1->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_neg(op1->nmod, ctx->ctx.nmod);
     }
     else
     {
@@ -363,6 +421,10 @@ FQ_DEFAULT_INLINE void fq_default_mul(fq_default_t rop, const fq_default_t op1,
     {
         fq_nmod_mul(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_mul(op1->nmod, op2->nmod, ctx->ctx.nmod);
+    }
     else
     {
         fq_mul(rop->fq, op1->fq, op2->fq, ctx->ctx.fq);
@@ -379,6 +441,11 @@ FQ_DEFAULT_INLINE void fq_default_mul_fmpz(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_mul_fmpz(rop->fq_nmod, op->fq_nmod, x, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_mul(op->nmod, fmpz_get_nmod(x, ctx->ctx.nmod),
+                                                                ctx->ctx.nmod);
     }
     else
     {
@@ -397,6 +464,14 @@ FQ_DEFAULT_INLINE void fq_default_mul_si(fq_default_t rop,
     {
         fq_nmod_mul_si(rop->fq_nmod, op->fq_nmod, x, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        ulong xu = FLINT_ABS(x);
+        NMOD_RED(xu, xu, ctx->ctx.nmod);
+        if (x < 0)
+            xu = nmod_neg(xu, ctx->ctx.nmod);
+        rop->nmod = nmod_mul(op->nmod, xu, ctx->ctx.nmod);
+    }
     else
     {
         fq_mul_si(rop->fq, op->fq, x, ctx->ctx.fq);
@@ -413,6 +488,11 @@ FQ_DEFAULT_INLINE void fq_default_mul_ui(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_mul_ui(rop->fq_nmod, op->fq_nmod, x, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        NMOD_RED(x, x, ctx->ctx.nmod);
+        rop->nmod = nmod_mul(op->nmod, x, ctx->ctx.nmod);
     }
     else
     {
@@ -431,6 +511,10 @@ FQ_DEFAULT_INLINE void fq_default_sqr(fq_default_t rop,
     {
         fq_nmod_sqr(rop->fq_nmod, op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_mul(op->nmod, op->nmod, ctx->ctx.nmod);
+    }
     else
     {
         fq_sqr(rop->fq, op->fq, ctx->ctx.fq);
@@ -447,6 +531,10 @@ FQ_DEFAULT_INLINE void fq_default_inv(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_inv(rop->fq_nmod, op1->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_inv(op1->nmod, ctx->ctx.nmod);
     }
     else
     {
@@ -465,6 +553,10 @@ FQ_DEFAULT_INLINE void fq_default_div(fq_default_t rop, fq_default_t op1,
     {
         fq_nmod_div(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_div(op1->nmod, op2->nmod, ctx->ctx.nmod);
+    }
     else
     {
         fq_div(rop->fq, op1->fq, op2->fq, ctx->ctx.fq);
@@ -482,6 +574,10 @@ FQ_DEFAULT_INLINE void fq_default_pow(fq_default_t rop,
     {
         fq_nmod_pow(rop->fq_nmod, op1->fq_nmod, e, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_pow_fmpz(op1->nmod, e, ctx->ctx.nmod);
+    }
     else
     {
         fq_pow(rop->fq, op1->fq, e, ctx->ctx.fq);
@@ -498,6 +594,10 @@ FQ_DEFAULT_INLINE void fq_default_pow_ui(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_pow_ui(rop->fq_nmod, op->fq_nmod, e, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = nmod_pow_ui(op->nmod, e, ctx->ctx.nmod);
     }
     else
     {
@@ -518,6 +618,19 @@ FQ_DEFAULT_INLINE int fq_default_sqrt(fq_default_t rop,
     {
         return fq_nmod_sqrt(rop->fq_nmod, op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        if (op->nmod == 0)
+        {
+            rop->nmod = 0;
+            return 1;
+        }
+        else
+        {
+            rop->nmod = n_sqrtmod(op->nmod, ctx->ctx.nmod.n);
+            return rop->nmod != 0;
+        }
+    }
     else
     {
         return fq_sqrt(rop->fq, op->fq, ctx->ctx.fq);
@@ -535,6 +648,10 @@ FQ_DEFAULT_INLINE void fq_default_pth_root(fq_default_t rop,
     {
         fq_nmod_pth_root(rop->fq_nmod, op1->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = op1->nmod;
+    }
     else
     {
         fq_pth_root(rop->fq, op1->fq, ctx->ctx.fq);
@@ -551,6 +668,10 @@ FQ_DEFAULT_INLINE int fq_default_is_square(const fq_default_t op,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         return fq_nmod_is_square(op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return op->nmod == 0 || n_sqrtmod(op->nmod, ctx->ctx.nmod.n) != 0;
     }
     else
     {
@@ -571,6 +692,10 @@ FQ_DEFAULT_INLINE void fq_default_randtest(fq_default_t rop,
     {
         fq_nmod_randtest(rop->fq_nmod, state, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = n_randint(state, ctx->ctx.nmod.n);
+    }
     else
     {
         fq_randtest(rop->fq, state, ctx->ctx.fq);
@@ -587,6 +712,10 @@ FQ_DEFAULT_INLINE void fq_default_randtest_not_zero(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_randtest_not_zero(rop->fq_nmod, state, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = n_randint(state, ctx->ctx.nmod.n - 1) + 1;
     }
     else
     {
@@ -605,6 +734,10 @@ FQ_DEFAULT_INLINE void fq_default_rand(fq_default_t rop,
     {
         fq_nmod_rand(rop->fq_nmod, state, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = n_randint(state, ctx->ctx.nmod.n);
+    }
     else
     {
         fq_rand(rop->fq, state, ctx->ctx.fq);
@@ -621,6 +754,10 @@ FQ_DEFAULT_INLINE void fq_default_rand_not_zero(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_rand_not_zero(rop->fq_nmod, state, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = n_randint(state, ctx->ctx.nmod.n - 1) + 1;
     }
     else
     {
@@ -641,6 +778,10 @@ FQ_DEFAULT_INLINE int fq_default_equal(const fq_default_t op1,
     {
         return fq_nmod_equal(op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return op1->nmod == op2->nmod;
+    }
     else
     {
         return fq_equal(op1->fq, op2->fq, ctx->ctx.fq);
@@ -658,6 +799,10 @@ FQ_DEFAULT_INLINE int fq_default_is_zero(const fq_default_t op,
     {
         return fq_nmod_is_zero(op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return op->nmod == 0;
+    }
     else
     {
         return fq_is_zero(op->fq, ctx->ctx.fq);
@@ -674,6 +819,10 @@ FQ_DEFAULT_INLINE int fq_default_is_one(const fq_default_t op,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         return fq_nmod_is_one(op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return op->nmod == 1;
     }
     else
     {
@@ -694,6 +843,10 @@ FQ_DEFAULT_INLINE void fq_default_set(fq_default_t rop,
     {
         fq_nmod_set(rop->fq_nmod, op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = op->nmod;
+    }
     else
     {
         fq_set(rop->fq, op->fq, ctx->ctx.fq);
@@ -710,6 +863,10 @@ FQ_DEFAULT_INLINE void fq_default_set_fmpz(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_set_fmpz(rop->fq_nmod, x, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = fmpz_get_nmod(x, ctx->ctx.nmod);
     }
     else
     {
@@ -728,6 +885,10 @@ FQ_DEFAULT_INLINE void fq_default_set_ui(fq_default_t rop,
     {
         fq_nmod_set_ui(rop->fq_nmod, x, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        NMOD_RED(rop->nmod, x, ctx->ctx.nmod);
+    }
     else
     {
         fq_set_ui(rop->fq, x, ctx->ctx.fq);
@@ -744,6 +905,14 @@ FQ_DEFAULT_INLINE void fq_default_set_si(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_set_si(rop->fq_nmod, x, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        ulong xu = FLINT_ABS(x);
+        NMOD_RED(xu, xu, ctx->ctx.nmod);
+        if (x < 0)
+            xu = nmod_neg(xu, ctx->ctx.nmod);
+        rop->nmod = xu;
     }
     else
     {
@@ -762,6 +931,10 @@ FQ_DEFAULT_INLINE void fq_default_zero(fq_default_t rop,
     {
         fq_nmod_zero(rop->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = 0;
+    }
     else
     {
         fq_zero(rop->fq, ctx->ctx.fq);
@@ -778,6 +951,10 @@ FQ_DEFAULT_INLINE void fq_default_one(fq_default_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_one(rop->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = 1;
     }
     else
     {
@@ -796,6 +973,12 @@ FQ_DEFAULT_INLINE void fq_default_swap(fq_default_t op1,
     {
         fq_nmod_swap(op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        ulong t = op1->nmod;
+        op1->nmod = op2->nmod;
+        op2->nmod = t;
+    }
     else
     {
         fq_swap(op1->fq, op2->fq, ctx->ctx.fq);
@@ -813,6 +996,10 @@ FQ_DEFAULT_INLINE void fq_default_gen(fq_default_t rop,
     {
         fq_nmod_gen(rop->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = 0;
+    }
     else
     {
         fq_gen(rop->fq, ctx->ctx.fq);
@@ -829,6 +1016,12 @@ FQ_DEFAULT_INLINE void fq_default_get_nmod_poly(nmod_poly_t poly,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_get_nmod_poly(poly, op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        nmod_poly_fit_length(poly, 1);
+        poly->length = (op->nmod != 0);
+        poly->coeffs[0] = op->nmod;
     }
     else
     {
@@ -848,6 +1041,13 @@ FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
     {
         fq_nmod_set_nmod_poly(op->fq_nmod, poly, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        if (poly->length > 0)
+            op->nmod = poly->coeffs[0];
+        else
+            op->nmod = 0;
+    }    
     else
     {
         flint_printf("Impossible conversion\n");
@@ -885,6 +1085,13 @@ FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,
         ulong c0 = nmod_poly_get_coeff_ui((nmod_poly_struct *) op->fq_nmod, n);
         fmpz_set_ui(c, c0);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        if (n != 0)
+            fmpz_zero(c);
+        else
+            fmpz_set_ui(c, op->nmod);
+    }
     else
     {
         fmpz_mod_ctx_t mod_ctx;
@@ -909,6 +1116,10 @@ int fq_default_fprint(FILE * file, const fq_default_t op,
     {
         return fq_nmod_fprint(file, op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return flint_fprintf(file, "%wu", op->nmod);
+    }
     else
     {
         return fq_fprint(file, op->fq, ctx->ctx.fq);
@@ -925,6 +1136,10 @@ void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx)
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_print(op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        flint_printf("%wu", op->nmod);
     }
     else
     {
@@ -944,6 +1159,10 @@ int fq_default_fprint_pretty(FILE * file, const fq_default_t op,
     {
         return fq_nmod_fprint_pretty(file, op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return flint_fprintf(file, "%wu", op->nmod);
+    }
     else
     {
         return fq_fprint_pretty(file, op->fq, ctx->ctx.fq);
@@ -960,6 +1179,10 @@ void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_print_pretty(op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        flint_printf("%wu", op->nmod);
     }
     else
     {
@@ -978,6 +1201,15 @@ FQ_DEFAULT_INLINE char * fq_default_get_str(const fq_default_t op,
     {
         return fq_nmod_get_str(op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_t f;
+        char* s;
+        fmpz_init_set_ui(f, op->nmod);
+        s = fmpz_get_str(NULL, 10, f);
+        fmpz_clear(f);
+        return s;
+    }
     else
     {
         return fq_get_str(op->fq, ctx->ctx.fq);
@@ -994,6 +1226,15 @@ FQ_DEFAULT_INLINE char * fq_default_get_str_pretty(const fq_default_t op,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         return fq_nmod_get_str_pretty(op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_t f;
+        char* s;
+        fmpz_init_set_ui(f, op->nmod);
+        s = fmpz_get_str(NULL, 10, f);
+        fmpz_clear(f);
+        return s;
     }
     else
     {
@@ -1014,6 +1255,10 @@ FQ_DEFAULT_INLINE void fq_default_trace(fmpz_t rop,
     {
         fq_nmod_trace(rop, op->fq_nmod, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_set_ui(rop, op->nmod);
+    }
     else
     {
         fq_trace(rop, op->fq, ctx->ctx.fq);
@@ -1031,6 +1276,10 @@ FQ_DEFAULT_INLINE void fq_default_frobenius(fq_default_t rop,
     {
         fq_nmod_frobenius(rop->fq_nmod, op->fq_nmod, e, ctx->ctx.fq_nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        rop->nmod = op->nmod;
+    }
     else
     {
         fq_frobenius(rop->fq, op->fq, e, ctx->ctx.fq);
@@ -1047,6 +1296,10 @@ FQ_DEFAULT_INLINE void fq_default_norm(fmpz_t rop,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_norm(rop, op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_set_ui(rop, op->nmod);
     }
     else
     {

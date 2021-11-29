@@ -19,7 +19,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     int bits = fmpz_bits(p);
     int d = fmpz_mod_poly_degree(modulus, mod_ctx);
 
-    if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && bits*d <= 16))
+    if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && d > 1 && bits*d <= 16))
     {
         nmod_poly_t nmodulus;
         fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -40,7 +40,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
         }
         nmod_poly_clear(nmodulus);
     }
-    else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && fmpz_abs_fits_ui(p)))
+    else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1 && fmpz_abs_fits_ui(p)))
     {
         nmod_poly_t nmodulus;
         ctx->type = FQ_DEFAULT_FQ_NMOD;
@@ -48,6 +48,11 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
         fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
         fq_nmod_ctx_init_modulus(ctx->ctx.fq_nmod, nmodulus, var);
         nmod_poly_clear(nmodulus);
+    }
+    else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
+    {
+        ctx->type = FQ_DEFAULT_NMOD;
+        nmod_init(&ctx->ctx.nmod, fmpz_get_ui(p));
     }
     else
     {
