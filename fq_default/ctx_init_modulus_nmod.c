@@ -18,11 +18,11 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     int bits = FLINT_BIT_COUNT(p);
     int d = nmod_poly_degree(modulus);
 
-    if (type == 1 || (type == 0 && bits*d <= 16))
+    if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && bits*d <= 16))
     {
         fq_nmod_ctx_struct * fq_nmod_ctx =
                                      flint_malloc(sizeof(fq_nmod_ctx_struct));
-        ctx->type = 1;
+        ctx->type = FQ_DEFAULT_FQ_ZECH;
         fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var);
         if (fq_zech_ctx_init_fq_nmod_ctx_check(ctx->ctx.fq_zech, fq_nmod_ctx))
         {
@@ -32,12 +32,12 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
         {
             *ctx->ctx.fq_nmod = *fq_nmod_ctx;
             flint_free(fq_nmod_ctx);
-            ctx->type = 2;
+            ctx->type = FQ_DEFAULT_FQ_NMOD;
         }
     }
-    else if (type == 2 || type == 0)
+    else if (type == FQ_DEFAULT_FQ_NMOD || type == 0)
     {
-        ctx->type = 2;
+        ctx->type = FQ_DEFAULT_FQ_NMOD;
         fq_nmod_ctx_init_modulus(ctx->ctx.fq_nmod, modulus, var);
     }
     else
@@ -45,7 +45,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
         fmpz_mod_ctx_t fmod_ctx;
         fmpz_mod_poly_t fmod;
         fmpz_t p;
-        ctx->type = 3;
+        ctx->type = FQ_DEFAULT_FQ;
         fmpz_init_set_ui(p, modulus->mod.n);
         fmpz_mod_ctx_init(fmod_ctx, p);
         fmpz_mod_poly_init(fmod, fmod_ctx);

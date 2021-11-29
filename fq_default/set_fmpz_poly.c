@@ -14,7 +14,7 @@
 void fq_default_set_fmpz_poly(fq_default_t op,
                             const fmpz_poly_t poly, const fq_default_ctx_t ctx)
 {
-    if (ctx->type == 1)
+    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         nmod_poly_t p;
         ulong mod = fmpz_get_ui(fq_zech_ctx_prime(ctx->ctx.fq_zech));
@@ -23,7 +23,7 @@ void fq_default_set_fmpz_poly(fq_default_t op,
         fq_zech_set_nmod_poly(op->fq_zech, p, ctx->ctx.fq_zech);
         nmod_poly_clear(p);
     }
-    else if (ctx->type == 2)
+    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         nmod_poly_t p;
         ulong mod = fmpz_get_ui(fq_nmod_ctx_prime(ctx->ctx.fq_nmod));

@@ -13,12 +13,12 @@
 
 void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
 {
-    if (ctx->type == 1)
+    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         nmod_poly_struct const * mod = fq_zech_ctx_modulus(ctx->ctx.fq_zech);
         fmpz_mod_poly_set_nmod_poly(p, mod);
     }
-    else if (ctx->type == 2)
+    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         nmod_poly_struct const * mod = fq_nmod_ctx_modulus(ctx->ctx.fq_nmod);
         fmpz_mod_poly_set_nmod_poly(p, mod);
