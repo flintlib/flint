@@ -145,6 +145,7 @@ FQ_DEFAULT_INLINE slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
+        return 1;
     }
     else
     {
