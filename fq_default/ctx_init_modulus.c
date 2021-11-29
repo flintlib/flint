@@ -19,9 +19,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     int bits = fmpz_bits(p);
     int d = fmpz_mod_poly_degree(modulus, mod_ctx);
 
-    if (type == 1 ||
-       (type == 0 && bits*d <= 16 &&
-        n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16)))
+    if (type == 1 || (type == 0 && bits*d <= 16))
     {
         nmod_poly_t nmodulus;
         fq_nmod_ctx_struct * fq_nmod_ctx;

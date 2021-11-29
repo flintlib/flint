@@ -18,9 +18,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     int bits = FLINT_BIT_COUNT(p);
     int d = nmod_poly_degree(modulus);
 
-    if (type == 1 ||
-       (type == 0 && bits*d <= 16 &&
-        n_pow(p, d) < (UWORD(1) << 16)))
+    if (type == 1 || (type == 0 && bits*d <= 16))
     {
         fq_nmod_ctx_struct * fq_nmod_ctx =
                                      flint_malloc(sizeof(fq_nmod_ctx_struct));

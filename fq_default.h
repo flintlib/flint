@@ -63,7 +63,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_type(fq_default_ctx_t ctx,
 {
     int bits = fmpz_bits(p);
 
-    if (type == 1 || (type == 0 && bits*d <= 16 && n_pow(fmpz_get_ui(p), d) < (UWORD(1) << 16)))
+    if (type == 1 || (type == 0 && bits*d <= 16))
     {
         ctx->type = 1;
         fq_zech_ctx_init(ctx->ctx.fq_zech, p, d, var);
