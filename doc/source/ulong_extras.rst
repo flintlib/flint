@@ -321,18 +321,7 @@ Greatest common divisor
     Returns the greatest common divisor `g` of `x` and `y`. No assumptions
     are made about the values `x` and `y`.
 
-    The algorithm is a slight embellishment of the Euclidean algorithm
-    which uses some branches to avoid most divisions.
-
-    One wishes to compute the quotient and remainder of `u_3 / v_3` without 
-    division where possible. This is accomplished when `u_3 < 4 v_3`, i.e. 
-    the quotient is either `1`, `2` or `3`.
-
-    We first compute `s = u_3 - v_3`. If `s < v_3`, i.e.\ `u_3 < 2 v_3`, we 
-    know the quotient is `1`, else if `s < 2 v_3`, i.e.\ `u_3 < 3 v_3` we 
-    know the quotient is `2`. In the remaining cases, the quotient must 
-    be `3`. When the quotient is `4` or above, we use division. However this 
-    happens rarely for generic inputs.
+    This function wraps GMP's ``mpn_gcd_1``.
 
 .. function:: ulong n_gcd_full(ulong x, ulong y)
 
