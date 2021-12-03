@@ -50,15 +50,20 @@ _fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
         else
         {
             __mpz_struct * ma = COEFF_TO_PTR(*a);
-            c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
-            if (c != 1)
+
+            if (!COEFF_IS_MPZ(*b))
             {
-                if (!COEFF_IS_MPZ(*b))
-                {
-                    if (*b != 0)
-                        c = mpn_gcd_1(&c, 1, FLINT_ABS(*b));
-                }
-                else
+                if (*b != 0)
+                    c = mpn_gcd_1(&c, 1, FLINT_ABS(*b));
+
+                if (c != 1)
+                    c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
+            }
+            else
+            {
+                c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
+
+                if (c != 1)
                 {
                     ma = COEFF_TO_PTR(*b);
                     c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
