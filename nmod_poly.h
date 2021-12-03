@@ -467,6 +467,9 @@ FLINT_DLL void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 FLINT_DLL void nmod_poly_scalar_mul_nmod(nmod_poly_t res, 
                                          const nmod_poly_t poly1, mp_limb_t c);
 
+FLINT_DLL void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B,
+                                                                      ulong x);
+
 FLINT_DLL void _nmod_poly_make_monic(mp_ptr output, 
                                    mp_srcptr input, slong len, nmod_t mod);
 
@@ -1134,6 +1137,22 @@ FLINT_DLL void _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1,
 
 FLINT_DLL void nmod_poly_compose_series_divconquer(nmod_poly_t res, 
     const nmod_poly_t poly1, const nmod_poly_t poly2, slong N);
+
+/* norms *********************************************************************/
+
+NMOD_POLY_INLINE slong _nmod_poly_hamming_weight(mp_srcptr a, slong len)
+{
+    slong i, sum = 0;
+    for (i = 0; i < len; i++)
+        sum += !(a[i] == 0);
+    return sum;
+}
+
+NMOD_POLY_INLINE slong nmod_poly_hamming_weight(const nmod_poly_t A)
+{
+    return _nmod_poly_hamming_weight(A->coeffs, A->length);
+}
+
 
 /* Greatest common divisor  **************************************************/
 

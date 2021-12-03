@@ -1092,9 +1092,7 @@ void fq_default_poly_scalar_addmul_fq_default(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        /*nmod_poly_scalar_addmul_nmod(rop->nmod, op->nmod, x->nmod);*/
+        nmod_poly_scalar_addmul_nmod(rop->nmod, op->nmod, x->nmod);
     }
     else
     {
@@ -1119,9 +1117,8 @@ void fq_default_poly_scalar_submul_fq_default(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        /*nmod_poly_scalar_submul_nmod(rop->nmod, op->nmod, x->nmod);*/
+        nmod_poly_scalar_addmul_nmod(rop->nmod, op->nmod,
+                                             nmod_neg(x->nmod, ctx->ctx.nmod));
     }
     else
     {
@@ -1409,9 +1406,7 @@ slong fq_default_poly_hamming_weight(const fq_default_poly_t op,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();        
-        /*return nmod_poly_hamming_weight(op->nmod);*/
+        return nmod_poly_hamming_weight(op->nmod);
     }
     else
     {
