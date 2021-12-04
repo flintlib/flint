@@ -34,13 +34,30 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
     }
     else                        /* c2 is large */
     {
-        if (x == 0)
-            fmpz_zero(f);
+        __mpz_struct * mpz_ptr;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            if (x == 0)
+            {
+                *f = 0;
+                return;
+            }
+            
+            mpz_ptr = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mpz_ptr);
+        }
         else
         {
-            /* Promote without val as if aliased both are large */
-            __mpz_struct *mpz_ptr = _fmpz_promote(f);
-            flint_mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
+            if (x == 0)
+            {
+                _fmpz_clear_mpz(*f);
+                *f = 0;
+                return;
+            }
+
+            mpz_ptr = COEFF_TO_PTR(*f);
         }
+
+        flint_mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
     }
 }
