@@ -1036,6 +1036,7 @@ Basic arithmetic
 Greatest common divisor
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_gcd_ui(fmpz_t f, const fmpz_t g, ulong h)
 
 .. function:: void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

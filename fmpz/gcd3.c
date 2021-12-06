@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
+    Copyright (C) 2021 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -14,23 +15,9 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
-{
-    __mpz_struct * z = COEFF_TO_PTR(*g);
-
-    return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
-}
-
-static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
-{
-    if (!COEFF_IS_MPZ(*g))
-        return n_gcd(FLINT_ABS(*g), h);
-    else
-        return _fmpz_gcd_big_small(g, h);
-}
-
+/* Assumes that c fits in fmpz */
 static void
-fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
+_fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
 {
     if (c <= 1)
     {
@@ -43,18 +30,50 @@ fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
     {
         if (!COEFF_IS_MPZ(*a))
         {
-            c = n_gcd(FLINT_ABS(*a), c);
+            if (*a != 0)
+                c = mpn_gcd_1(&c, 1, FLINT_ABS(*a));
+
             if (c != 1)
-                c = _fmpz_gcd_small(b, c);
+            {
+                if (!COEFF_IS_MPZ(*b))
+                {
+                    if (*b != 0)
+                        c = mpn_gcd_1(&c, 1, FLINT_ABS(*b));
+                }
+                else
+                {
+                    __mpz_struct * mb = COEFF_TO_PTR(*b);
+                    c = mpn_gcd_1(mb->_mp_d, FLINT_ABS(mb->_mp_size), c);
+                }
+            }
         }
         else
         {
-            c = _fmpz_gcd_small(b, c);
-            if (c != 1)
-                c = _fmpz_gcd_big_small(a, c);
+            __mpz_struct * ma = COEFF_TO_PTR(*a);
+
+            if (!COEFF_IS_MPZ(*b))
+            {
+                if (*b != 0)
+                    c = mpn_gcd_1(&c, 1, FLINT_ABS(*b));
+
+                if (c != 1)
+                    c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
+            }
+            else
+            {
+                c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
+
+                if (c != 1)
+                {
+                    ma = COEFF_TO_PTR(*b);
+                    c = mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), c);
+                }
+            }
         }
 
-        fmpz_set_ui(res, c);
+        if (COEFF_IS_MPZ(*res) && res != a && res != b)
+            _fmpz_demote(res);
+        *res = c;
     }
 }
 
@@ -63,15 +82,15 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
 {
     if (!COEFF_IS_MPZ(*a))
     {
-        fmpz_gcd3_small(res, b, c, FLINT_ABS(*a));
+        _fmpz_gcd3_small(res, b, c, FLINT_ABS(*a));
     }
     else if (!COEFF_IS_MPZ(*b))
     {
-        fmpz_gcd3_small(res, a, c, FLINT_ABS(*b));
+        _fmpz_gcd3_small(res, a, c, FLINT_ABS(*b));
     }
     else if (!COEFF_IS_MPZ(*c))
     {
-        fmpz_gcd3_small(res, a, b, FLINT_ABS(*c));
+        _fmpz_gcd3_small(res, a, b, FLINT_ABS(*c));
     }
     else
     {
