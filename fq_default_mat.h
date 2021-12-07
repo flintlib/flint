@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 William Hart
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -205,9 +206,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_one(const fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        /*return nmod_mat_is_one(mat->nmod);*/
+        return nmod_mat_is_one(mat->nmod);
     }
     else
     {
@@ -527,9 +526,7 @@ void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        /*nmod_mat_set_fmpz_mod_mat(mat1->nmod, mat2);*/
+        fmpz_mat_get_nmod_mat(mat1->nmod, mat2->mat);
     }
     else
     {
