@@ -683,10 +683,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint(FILE * file,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        return -1;
-        /*return nmod_mat_fprint(file, mat->nmod);*/
+        return nmod_mat_fprint(file, mat->nmod);
     }
     else
     {
@@ -707,10 +704,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint_pretty(FILE * file,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        return -1;
-        /*return nmod_mat_fprint_pretty(file, mat->nmod);*/
+        return nmod_mat_fprint_pretty(file, mat->nmod);
     }
     else
     {
@@ -732,10 +726,7 @@ int fq_default_mat_print(const fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();
-        return -1;
-        /*return nmod_mat_print(mat->nmod);*/
+        return nmod_mat_print(mat->nmod);
     }
     else
     {

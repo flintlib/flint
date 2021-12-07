@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,40 +12,52 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
-#include "ulong_extras.h"
 
-void
-nmod_mat_print_pretty(const nmod_mat_t mat)
+int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
 {
     slong i, j;
-    int width;
+    int z, width;
     char fmt[FLINT_BITS + 5];
 
-    flint_printf("<%wd x %wd integer matrix mod %wu>\n", mat->r, mat->c, mat->mod.n);
+    z = flint_fprintf("<%wd x %wd integer matrix mod %wu>\n", mat->r, mat->c, mat->mod.n);
+    if (z <= 0)
+        return z;
 
     if (!(mat->c) || !(mat->r))
-        return;
+        return z;
 
     width = n_sizeinbase(mat->mod.n, 10);
 
-    flint_sprintf(fmt, "%%%dwu", width);
+    z = flint_sprintf(fmt, "%%%dwu", width);
+    if (z <= 0)
+        return z;
 
     for (i = 0; i < mat->r; i++)
     {
-        flint_printf("[");
+        z = flint_printf("[");
+        if (z <= 0)
+            return z;
 
         for (j = 0; j < mat->c; j++)
         {
-            flint_printf(fmt, mat->rows[i][j]);
+            z = flint_printf(fmt, mat->rows[i][j]);
+            if (z <= 0)
+                return z;
+
             if (j + 1 < mat->c)
-                flint_printf(" ");
+            {
+                z = flint_printf(" ");
+                if (z <= 0)
+                    return z;
+            }
         }
 
         flint_printf("]\n");
+        if (z <= 0)
+            return z;
     }
+
+    return z;
 }
 
