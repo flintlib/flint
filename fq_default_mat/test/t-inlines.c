@@ -29,7 +29,7 @@ int main(void)
         fq_default_ctx_t ctx;
         fq_default_t t;
         fq_default_mat_t a, b, c, d, e, f, g;
-        slong n = n_randinit(state, 4) + 1;
+        slong n = n_randint(state, 4) + 1;
 
         fmpz_init(p);
         fmpz_randprime(p, state, n_randint(state, 2) ? 60 : 120, 1);
@@ -58,14 +58,14 @@ int main(void)
         fq_default_mat_mul(f, a, c, ctx);
         fq_default_mat_mul(g, b, c, ctx);
         fq_default_mat_add(e, f, g, ctx);
-        TEST(fq_defaul_mat_equal(d, e, ctx));
+        TEST(fq_default_mat_equal(d, e, ctx));
 
         fq_default_mat_sub(e, a, b, ctx);
         fq_default_mat_mul(d, e, c, ctx);
         fq_default_mat_mul(f, a, c, ctx);
         fq_default_mat_mul(g, b, c, ctx);
         fq_default_mat_sub(e, f, g, ctx);
-        TEST(fq_defaul_mat_equal(d, e, ctx));
+        TEST(fq_default_mat_equal(d, e, ctx));
 
 
         fq_default_clear(t, ctx);

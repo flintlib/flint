@@ -81,10 +81,20 @@ void nmod_poly_factor_swap(nmod_poly_factor_t a, nmod_poly_factor_t b)
     *b = t;
 }
 
+NMOD_POLY_FACTOR_INLINE
+void nmod_poly_factor_get_poly(nmod_poly_t a, const nmod_poly_factor_t b,
+                                                                       slong i)
+{
+    nmod_poly_set(a, b->p + i);
+}
+
 FLINT_DLL void nmod_poly_factor_insert(nmod_poly_factor_t fac,
                              const nmod_poly_t poly, slong exp);
 
 FLINT_DLL void nmod_poly_factor_print(const nmod_poly_factor_t fac);
+
+FLINT_DLL void nmod_poly_factor_print_pretty(const nmod_poly_factor_t fac,
+                                                              const char *var);
 
 FLINT_DLL void nmod_poly_factor_concat(nmod_poly_factor_t res,
                         const nmod_poly_factor_t fac);
@@ -150,6 +160,7 @@ FLINT_DLL int nmod_poly_roots_factored(nmod_poly_factor_t r,
 
 /* Inlines *******************************************************************/
 
+/* this should be depreciated and then removed */
 FLINT_DLL void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i);
 
 #ifdef __cplusplus
