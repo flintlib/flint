@@ -814,10 +814,7 @@ fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented\n");
-        flint_abort();        
-        /*return nmod_poly_is_unit(op->nmod);*/
-        return 0;
+        return nmod_poly_is_unit(op->nmod);
     }
     else
     {
@@ -839,9 +836,7 @@ fq_default_poly_is_gen(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        return nmod_poly_length(poly->nmod) == 2 &&
-                nmod_poly_get_coeff_ui(poly->nmod, 0) == 0 &&
-                nmod_poly_get_coeff_ui(poly->nmod, 1) == 1;
+        return nmod_poly_is_gen(poly->nmod);
     }
     else
     {

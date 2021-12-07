@@ -46,7 +46,13 @@ int main(void)
         fq_default_poly_randtest(b, state, n_randint(state, 100), ctx);
         fq_default_poly_randtest(c, state, n_randint(state, 100), ctx);
 
-        TEST(fq_default_poly_hamming_weight(a, ctx) <= fq_default_poly_length(a, ctx));
+        fq_default_poly_get_coeff(t, a, 0, ctx);
+        TEST(!fq_default_poly_is_unit(a, ctx) ==
+                                       !fq_default_is_invertible(t, ctx) ||
+                                        fq_default_poly_length(a, ctx) != 1);
+
+        TEST(fq_default_poly_hamming_weight(a, ctx) <=
+                                               fq_default_poly_length(a, ctx));
 
         fq_default_poly_add(a, b, c, ctx);
         fq_default_poly_sub(a, a, c, ctx);

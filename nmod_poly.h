@@ -324,7 +324,21 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
 NMOD_POLY_INLINE
 int nmod_poly_is_one(const nmod_poly_t poly)
 {
-    return (poly->length == 1) && (poly->coeffs[0] == 1);
+    return (poly->mod.n == 0) || (poly->length == 1 && poly->coeffs[0] == 1);
+}
+
+/* bogus for non-prime modulus */
+NMOD_POLY_INLINE
+int nmod_poly_is_unit(const nmod_poly_t poly)
+{
+    return (poly->length == 1) && poly->coeffs[0] != 0;
+}
+
+NMOD_POLY_INLINE
+int nmod_poly_is_gen(const nmod_poly_t poly)
+{
+    return (poly->mod.n == 0) ||
+           (poly->length == 2 && poly->coeffs[0] == 0 && poly->coeffs[1] == 1);
 }
 
 /* Randomisation  ************************************************************/
