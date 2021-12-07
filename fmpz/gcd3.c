@@ -71,7 +71,7 @@ _fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
             }
         }
 
-        if (COEFF_IS_MPZ(*res) && res != a && res != b)
+        if (COEFF_IS_MPZ(*res))
             _fmpz_demote(res);
         *res = c;
     }
