@@ -137,6 +137,8 @@ FLINT_DLL void nmod_mat_zero(nmod_mat_t mat);
 
 FLINT_DLL int nmod_mat_is_zero(const nmod_mat_t mat);
 
+FLINT_DLL int nmod_mat_is_one(const nmod_mat_t mat);
+
 NMOD_MAT_INLINE
 int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
 {
