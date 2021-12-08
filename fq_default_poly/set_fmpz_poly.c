@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 William Hart
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -26,7 +27,7 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        fmpz_mod_ctx_init_ui(mod, ctx->ctx.nmod.n);
+        fmpz_mod_ctx_init_ui(mod, ctx->ctx.nmod.mod.n);
     }
     else
     {

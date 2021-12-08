@@ -43,7 +43,8 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1))
     {
         ctx->type = FQ_DEFAULT_NMOD;
-        nmod_init(&ctx->ctx.nmod, p);
+        nmod_init(&ctx->ctx.nmod.mod, p);
+        ctx->ctx.nmod.a = 0;
     }
     else
     {

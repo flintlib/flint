@@ -34,10 +34,11 @@ void fq_default_set_fmpz_mod_poly(fq_default_t op,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        if (poly->length > 0)
-            op->nmod = fmpz_get_ui(poly->coeffs + 0);
-        else
-            op->nmod = 0;
+        nmod_poly_t p;
+        nmod_poly_init_mod(p, ctx->ctx.nmod.mod);
+        fmpz_mod_poly_get_nmod_poly(p, poly);
+        op->nmod = nmod_poly_evaluate_nmod(p, ctx->ctx.nmod.a);
+        nmod_poly_clear(p);
     }
     else
     {

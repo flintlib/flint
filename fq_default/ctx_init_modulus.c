@@ -52,7 +52,11 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
     {
         ctx->type = FQ_DEFAULT_NMOD;
-        nmod_init(&ctx->ctx.nmod, fmpz_get_ui(p));
+        nmod_init(&ctx->ctx.nmod.mod, fmpz_get_ui(p));
+        mp_limb_t c0 = fmpz_get_ui(modulus->coeffs + 0);
+        mp_limb_t c1 = fmpz_get_ui(modulus->coeffs + 1);
+        c0 = nmod_neg(c0, ctx->ctx.nmod.mod);
+        ctx->ctx.nmod.a = nmod_div(c0, c1, ctx->ctx.nmod.mod);
     }
     else
     {

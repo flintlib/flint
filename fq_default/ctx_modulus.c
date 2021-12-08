@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 William Hart
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -27,7 +28,7 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
     {
         _fmpz_mod_poly_fit_length(p, 2);
         _fmpz_mod_poly_set_length(p, 2);
-        fmpz_zero(p->coeffs + 0);
+        fmpz_set_ui(p->coeffs + 0, nmod_neg(ctx->ctx.nmod.a, ctx->ctx.nmod.mod));
         fmpz_one(p->coeffs + 1);
     }
     else

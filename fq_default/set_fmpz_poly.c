@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 William Hart
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -32,12 +33,13 @@ void fq_default_set_fmpz_poly(fq_default_t op,
         fq_nmod_set_nmod_poly(op->fq_nmod, p, ctx->ctx.fq_nmod);
         nmod_poly_clear(p);
     }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        if (poly->length > 0)
-            op->nmod = fmpz_get_nmod(poly->coeffs + 0, ctx->ctx.nmod);
-        else
-            op->nmod = 0;
+        nmod_poly_t p;
+        nmod_poly_init_mod(p, ctx->ctx.nmod.mod);
+        fmpz_poly_get_nmod_poly(p, poly);
+        op->nmod = nmod_poly_evaluate_nmod(p, ctx->ctx.nmod.a);
+        nmod_poly_clear(p);
     }
     else
     {

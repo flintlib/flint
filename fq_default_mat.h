@@ -59,7 +59,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_mat_init(mat->nmod, rows, cols, ctx->ctx.nmod.n);
+        nmod_mat_init(mat->nmod, rows, cols, ctx->ctx.nmod.mod.n);
     }
     else
     {
