@@ -38,6 +38,12 @@ void fq_default_get_fmpz_poly(fmpz_poly_t poly,
         fmpz_set_ui(poly->coeffs + 0, op->nmod);
         _fmpz_poly_set_length(poly, op->nmod != 0);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_poly_fit_length(poly, 1);
+        fmpz_set(poly->coeffs + 0, op->fmpz_mod);
+        _fmpz_poly_set_length(poly, !fmpz_is_zero(op->fmpz_mod));
+    }
     else
     {
         fq_get_fmpz_poly(poly, op->fq, ctx->ctx.fq);

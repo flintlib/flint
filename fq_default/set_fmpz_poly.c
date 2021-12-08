@@ -41,6 +41,15 @@ void fq_default_set_fmpz_poly(fq_default_t op,
         op->nmod = nmod_poly_evaluate_nmod(p, ctx->ctx.nmod.a);
         nmod_poly_clear(p);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_poly_t p;
+        fmpz_mod_poly_init(p, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set_fmpz_poly(p, poly, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_evaluate_fmpz(op->fmpz_mod, p, ctx->ctx.fmpz_mod.a,
+                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_clear(p, ctx->ctx.fmpz_mod.mod);
+    }
     else
     {
         fq_set_fmpz_poly(op->fq, poly, ctx->ctx.fq);

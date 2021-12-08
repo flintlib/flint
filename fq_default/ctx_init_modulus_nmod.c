@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 William Hart
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -45,6 +46,12 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
         ctx->type = FQ_DEFAULT_NMOD;
         nmod_init(&ctx->ctx.nmod.mod, p);
         ctx->ctx.nmod.a = 0;
+    }
+    else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
+    {
+        ctx->type = FQ_DEFAULT_FMPZ_MOD;
+        fmpz_mod_ctx_init_ui(ctx->ctx.fmpz_mod.mod, p);
+        fmpz_init_set_ui(ctx->ctx.fmpz_mod.a, 0);
     }
     else
     {

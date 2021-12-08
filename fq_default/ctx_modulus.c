@@ -31,6 +31,13 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
         fmpz_set_ui(p->coeffs + 0, nmod_neg(ctx->ctx.nmod.a, ctx->ctx.nmod.mod));
         fmpz_one(p->coeffs + 1);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        _fmpz_mod_poly_fit_length(p, 2);
+        _fmpz_mod_poly_set_length(p, 2);
+        fmpz_mod_neg(p->coeffs + 0, ctx->ctx.fmpz_mod.a, ctx->ctx.fmpz_mod.mod);
+        fmpz_one(p->coeffs + 1);
+    }
     else
     {
         fmpz_mod_ctx_struct const * mod = ctx->ctx.fq->ctxp;
