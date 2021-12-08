@@ -29,6 +29,14 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     {
         fmpz_mod_ctx_init_ui(mod, ctx->ctx.nmod.mod.n);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_poly_init(mod_poly, mod);
+        fmpz_mod_poly_set_fmpz_poly(mod_poly, op, mod);
+        fq_default_poly_set_fmpz_mod_poly(rop, mod_poly, ctx);
+        fmpz_mod_poly_clear(mod_poly, mod);
+        return;
+    }
     else
     {
         fmpz_mod_ctx_init(mod, fq_ctx_prime(ctx->ctx.fq));
