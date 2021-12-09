@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Ralf Stephan
+    Copyright (C) 2021 Mathieu Gouttenoire
 
     This file is part of FLINT.
 
@@ -14,46 +15,35 @@
 void
 _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
 {
-    fmpz_t c;
-    ulong fac = 1;
-
+    long k;
+    
     if (n == 0)
     {
         fmpz_one(coeffs);
         return;
     }
-
+    
     if (n == 1)
     {
         fmpz_zero(coeffs);
         fmpz_set_ui(coeffs + 1, 2);
         return;
     }
-
-    fmpz_init(c);
-    fmpz_one(c);
-    fmpz_mul_2exp(c, c, n);
-
-    while (1)
+    
+    for (k = n & 1; k < n; k += 2)
     {
-        fmpz_set(coeffs + n, c);
-        if (--n == 0)
-            break;
-
-        fmpz_zero(coeffs + n);
-        fmpz_neg(c, c);
-        fmpz_mul2_uiui(c, c, n+1, n);
-        fmpz_fdiv_q_2exp(c, c, 2);
-        fmpz_divexact_ui(c, c, fac);
-        ++fac;
-        if (--n == 0)
-        {
-            fmpz_set(coeffs, c);
-            break;
-        }
+        fmpz_zero(coeffs + k);
     }
-
-    fmpz_clear(c);
+    
+    fmpz_one(coeffs + n);
+    fmpz_mul_2exp(coeffs + n, coeffs + n, n);
+    
+    for (k = n - 2; k >= 0; k -= 2)
+    {
+        fmpz_mul2_uiui(coeffs + k, coeffs + k+2, k+1, k+2);
+        fmpz_divexact_ui(coeffs + k, coeffs + k, (n - k) << 1);
+        fmpz_neg(coeffs + k, coeffs + k);
+    }
 }
 
 void
