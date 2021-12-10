@@ -82,11 +82,22 @@ void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a,
     *b = t;
 }
 
+FMPZ_MOD_POLY_FACTOR_INLINE
+void fmpz_mod_poly_factor_get_poly(fmpz_mod_poly_t a,
+             const fmpz_mod_poly_factor_t b, slong i, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_mod_poly_set(a, b->poly + i, ctx);
+}
+
+
 FLINT_DLL void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
               const fmpz_mod_poly_t poly, slong exp, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac,
                                                      const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_poly_factor_print_pretty(const fmpz_mod_poly_factor_t fac,
+                                    const char *var, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
                    const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx);
