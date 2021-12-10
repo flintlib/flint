@@ -253,6 +253,13 @@ int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx)
     return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0));
 }
 
+/* bogus for non-prime modulus */
+FMPZ_MOD_POLY_INLINE
+int fmpz_mod_poly_is_unit(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx)
+{
+    return (op->length == 1) && fmpz_mod_is_invertible(op->coeffs + 0, ctx);
+}
+
 /* Deprecated */
 #define fmpz_mod_poly_is_x fmpz_mod_poly_is_gen
 
@@ -293,7 +300,20 @@ void fmpz_mod_poly_one(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 FLINT_DLL void fmpz_mod_poly_gen(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly,
+
                                    slong i, slong j, const fmpz_mod_ctx_t ctx);
+FMPZ_MOD_POLY_INLINE
+ulong fmpz_mod_poly_deflation(const fmpz_mod_poly_t input,
+                                                    const fmpz_mod_ctx_t ctx)
+{
+    return _fmpz_poly_deflation(input->coeffs, input->length);
+}
+
+FLINT_DLL void fmpz_mod_poly_deflate(fmpz_mod_poly_t result,
+       const fmpz_mod_poly_t input, ulong deflation, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_poly_inflate(fmpz_mod_poly_t result,
+       const fmpz_mod_poly_t input, ulong inflation, const fmpz_mod_ctx_t ctx);
 
 /*  Conversion ***************************************************************/
 
@@ -450,6 +470,9 @@ FLINT_DLL void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly,
 FLINT_DLL void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, 
                 const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,
+            const fmpz_mod_poly_t B, const fmpz_t x, const fmpz_mod_ctx_t ctx);
+
 /*  Scalar division ****************************************************/
 
 FLINT_DLL void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly,
@@ -476,6 +499,10 @@ FLINT_DLL void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
 
 FLINT_DLL void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, slong len,
                                                                const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res,
+        const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong start,
+                                                     const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_sqr(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
@@ -749,17 +776,18 @@ void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
 
 /* Divisibility testing ******************************************************/
 
-FLINT_DLL int _fmpz_mod_poly_divides_classical(fmpz * Q,
-   const fmpz * A, slong lenA, const fmpz * B, slong lenB, fmpz_mod_ctx_t ctx);
+FLINT_DLL int _fmpz_mod_poly_divides_classical(fmpz * Q, const fmpz * A,
+             slong lenA, const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q,
-         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx);
+                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                                                     const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL int _fmpz_mod_poly_divides(fmpz * Q,
-   const fmpz * A, slong lenA, const fmpz * B, slong lenB, fmpz_mod_ctx_t ctx);
+FLINT_DLL int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
+                         const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL int fmpz_mod_poly_divides(fmpz_mod_poly_t Q,
-         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx);
+FLINT_DLL int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                            const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
 
 /*  Power series inversion ***************************************************/
 
@@ -1248,7 +1276,16 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
                     const fmpz_mod_poly_struct * polys, slong len1, slong n,
                     const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
                       const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx);
- 
+
+/* Norms *********************************************************************/
+
+FMPZ_MOD_POLY_INLINE
+slong fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A,
+                                                     const fmpz_mod_ctx_t ctx)
+{
+    return _fmpz_poly_hamming_weight(A->coeffs, A->length);
+}
+
 /*  Radix conversion *********************************************************/
 
 typedef struct {
@@ -1279,6 +1316,21 @@ FLINT_DLL void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly
                       const fmpz_mod_poly_radix_t D, const fmpz_mod_ctx_t ctx);
 
 /*  Input and output *********************************************************/
+
+FMPZ_MOD_POLY_INLINE
+char * fmpz_mod_poly_get_str(const fmpz_mod_poly_t poly,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    return _fmpz_poly_get_str(poly->coeffs, poly->length);
+}
+
+FMPZ_MOD_POLY_INLINE
+char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
+}
+
 
 FLINT_DLL int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p);

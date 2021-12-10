@@ -20,7 +20,8 @@ int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
     int z, width;
     char fmt[FLINT_BITS + 5];
 
-    z = flint_fprintf("<%wd x %wd integer matrix mod %wu>\n", mat->r, mat->c, mat->mod.n);
+    z = flint_fprintf(file, "<%wd x %wd integer matrix mod %wu>\n",
+                                                   mat->r, mat->c, mat->mod.n);
     if (z <= 0)
         return z;
 

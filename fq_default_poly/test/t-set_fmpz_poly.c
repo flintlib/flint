@@ -31,7 +31,7 @@ main(void)
     {
         fq_default_ctx_t ctx;
         fq_default_poly_t fq_poly1, fq_poly2;
-	fmpz_poly_t poly;
+        fmpz_poly_t poly;
         fmpz_t p;
 
         fmpz_init(p);
@@ -54,11 +54,11 @@ main(void)
         if (!result)
         {
             flint_printf("Polynomials not equal\n");
-	    fflush(stdout);
-	    flint_abort();
+            fflush(stdout);
+            flint_abort();
         }
 
-	fmpz_poly_clear(poly);
+        fmpz_poly_clear(poly);
 
         fq_default_poly_clear(fq_poly1, ctx);
         fq_default_poly_clear(fq_poly2, ctx);
@@ -73,7 +73,7 @@ main(void)
         fq_default_ctx_t ctx;
         fq_default_poly_t fq_poly1, fq_poly2;
         fmpz_poly_t poly;
-	fmpz_t p;
+        fmpz_t p;
 
         fmpz_init(p);
 
@@ -114,7 +114,7 @@ main(void)
         fq_default_ctx_t ctx;
         fq_default_poly_t fq_poly1, fq_poly2;
         fmpz_poly_t poly;
-	fmpz_t p;
+        fmpz_t p;
 
         fmpz_init(p);
 
@@ -150,9 +150,9 @@ main(void)
         fmpz_clear(p);
 
     }
-    
+
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");
-        return 0;
+    return 0;
 }

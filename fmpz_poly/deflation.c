@@ -11,26 +11,26 @@
 
 #include "fmpz_poly.h"
 
-ulong fmpz_poly_deflation(const fmpz_poly_t input)
+ulong _fmpz_poly_deflation(const fmpz* a, slong len)
 {
     ulong deflation;
     slong i, coeff;
 
-    if (input->length <= 1)
-        return input->length;
+    if (len <= 1)
+        return len;
 
     coeff = 1;
-    while (fmpz_is_zero(input->coeffs + coeff))
+    while (fmpz_is_zero(a + coeff))
         coeff++;
 
-    deflation = n_gcd(input->length - 1, coeff);
+    deflation = n_gcd(len - 1, coeff);
 
-    while ((deflation > 1) && (coeff + deflation < input->length))
+    while ((deflation > 1) && (coeff + deflation < len))
     {
         for (i = 0; i < deflation - 1; i++)
         {
             coeff++;
-            if (!fmpz_is_zero(input->coeffs + coeff))
+            if (!fmpz_is_zero(a + coeff))
                 deflation = n_gcd(coeff, deflation);
         }
 

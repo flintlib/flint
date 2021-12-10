@@ -31,10 +31,10 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_init(mod_poly, mod);
-        fmpz_mod_poly_set_fmpz_poly(mod_poly, op, mod);
+        fmpz_mod_poly_init(mod_poly, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set_fmpz_poly(mod_poly, op, ctx->ctx.fmpz_mod.mod);
         fq_default_poly_set_fmpz_mod_poly(rop, mod_poly, ctx);
-        fmpz_mod_poly_clear(mod_poly, mod);
+        fmpz_mod_poly_clear(mod_poly, ctx->ctx.fmpz_mod.mod);
         return;
     }
     else
