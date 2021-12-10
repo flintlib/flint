@@ -64,6 +64,12 @@ FLINT_DLL void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n);
 
 FLINT_DLL void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n);
 
+FLINT_DLL void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,
+                                  flint_rand_t state, flint_bitcnt_t max_bits);
+
+FLINT_DLL void fmpz_mod_ctx_init_rand_bits_prime(fmpz_mod_ctx_t ctx,
+                                  flint_rand_t state, flint_bitcnt_t max_bits);
+
 FLINT_DLL void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
