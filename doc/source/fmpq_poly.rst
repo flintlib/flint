@@ -1027,6 +1027,16 @@ Derivative and integral
 
     Sets ``res`` to the derivative of ``poly``.
 
+.. function:: void _fmpq_poly_nth_derivative(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, ulong n, slong len)
+
+    Sets ``(rpoly, rden, len - n)`` to the nth derivative of 
+    ``(poly, den, len)``.  Does nothing if ``len <= n``.  
+    Supports aliasing between the two polynomials.
+    
+.. function:: void fmpq_poly_nth_derivative(fmpq_poly_t res, const fmpq_poly_t poly, ulong n)
+
+    Sets ``res`` to the nth derivative of ``poly``.
+
 .. function:: void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len)
 
     Sets ``(rpoly, rden, len)`` to the integral of 

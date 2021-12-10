@@ -44,3 +44,4 @@ build.vc14/flint-profiles*.sln
 build.vc12
 build
 flint2
+.DS_Store

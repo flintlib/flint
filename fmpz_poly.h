@@ -944,6 +944,10 @@ FLINT_DLL void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, slong len)
  
 FLINT_DLL void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
 
+FLINT_DLL void _fmpz_poly_nth_derivative(fmpz * rpoly, const fmpz * poly, ulong n, slong len);
+
+FLINT_DLL void fmpz_poly_nth_derivative(fmpz_poly_t res, const fmpz_poly_t poly, ulong n);
+
 /*  Evaluation  **************************************************************/
 
 void 

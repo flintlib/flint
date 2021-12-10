@@ -2085,6 +2085,16 @@ Derivative
 
     Sets ``res`` to the derivative of ``poly``.
 
+.. function:: void _fmpz_poly_nth_derivative(fmpz * rpoly, const fmpz * poly, ulong n, slong len)
+
+    Sets ``(rpoly, len - n)`` to the nth derivative of ``(poly, len)``.  
+    Also handles the cases where ``len <= n`` correctly. 
+    Supports aliasing of ``rpoly`` and ``poly``.
+    
+.. function:: void fmpz_poly_nth_derivative(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+
+    Sets ``res`` to the nth derivative of ``poly``.
+
 
 Evaluation
 --------------------------------------------------------------------------------
