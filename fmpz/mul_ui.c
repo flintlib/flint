@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2021 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -19,27 +20,44 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 {
     fmpz c2 = *g;
 
-    if (x == 0)
+    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
     {
-        fmpz_zero(f);
-        return;
-    }
-    else if (!COEFF_IS_MPZ(c2)) /* c2 is small */
-    {
-        mp_limb_t prod[2];
+        mp_limb_t th, tl;
         mp_limb_t uc2 = FLINT_ABS(c2);
 
         /* unsigned limb by limb multiply (assembly for most CPU's) */
-        umul_ppmm(prod[1], prod[0], uc2, x);
-        if (c2 < WORD(0))
-            fmpz_neg_uiui(f, prod[1], prod[0]);
+        umul_ppmm(th, tl, uc2, x);
+        if (c2 >= 0)
+            fmpz_set_uiui(f, th, tl);
         else
-            fmpz_set_uiui(f, prod[1], prod[0]);
+            fmpz_neg_uiui(f, th, tl);
     }
     else                        /* c2 is large */
     {
-        /* Promote without val as if aliased both are large */
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);
+        __mpz_struct * mpz_ptr;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            if (x == 0)
+            {
+                *f = 0;
+                return;
+            }
+            
+            mpz_ptr = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mpz_ptr);
+        }
+        else
+        {
+            if (x == 0)
+            {
+                _fmpz_clear_mpz(*f);
+                *f = 0;
+                return;
+            }
+
+            mpz_ptr = COEFF_TO_PTR(*f);
+        }
+
         flint_mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
     }
 }

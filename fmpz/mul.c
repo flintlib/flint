@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2021 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -17,29 +18,51 @@
 void
 fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
-    fmpz c1, c2;
-    __mpz_struct *mpz_ptr;
+    __mpz_struct * mf;
+    fmpz c1 = *g;
+    fmpz c2 = *h;
 
-    c1 = *g;
-
-    if (!COEFF_IS_MPZ(c1))      /* g is small */
+    if (!COEFF_IS_MPZ(c1))
     {
-        fmpz_mul_si(f, h, c1);
-        return;
+        if (!COEFF_IS_MPZ(c2))
+        {
+            ulong th, tl;
+            smul_ppmm(th, tl, c1, c2);
+            fmpz_set_signed_uiui(f, th, tl);
+            return;
+        }
+        else if (c1 != 0)
+        {
+            mf = _fmpz_promote(f);
+            flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), c1);
+            return;
+        }
+    }
+    
+    if (!COEFF_IS_MPZ(*f))
+    {
+        if (c1 == 0 || c2 == 0)
+        {
+            *f = 0;
+            return;
+        }
+        mf = _fmpz_new_mpz();
+        (*f) = PTR_TO_COEFF(mf);
+    }
+    else
+    {
+        if (c1 == 0 || c2 == 0)
+        {
+            _fmpz_clear_mpz(*f);
+            *f = 0;
+            return;
+        }
+        
+        mf = COEFF_TO_PTR(*f);
     }
 
-    c2 = *h;                    /* save h in case it is aliased with f */
-
-    if (c2 == WORD(0))               /* special case, h = 0  */
-    {
-        fmpz_zero(f);
-        return;
-    }
-
-    mpz_ptr = _fmpz_promote(f); /* h is saved, g is already large */
-
-    if (!COEFF_IS_MPZ(c2))      /* g is large, h is small */
-        flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c1), c2);
-    else                        /* c1 and c2 are large */
-        mpz_mul(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+    if (!COEFF_IS_MPZ(c2))
+        flint_mpz_mul_si(mf, COEFF_TO_PTR(c1), c2);
+    else
+        mpz_mul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
 }
