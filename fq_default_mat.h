@@ -28,6 +28,8 @@
 #include "fq_mat.h"
 #include "fq_nmod_mat.h"
 #include "fq_zech_mat.h"
+#include "nmod_mat.h"
+#include "fmpz_mod_mat.h"
 #include "flint.h"
 
 #ifdef __cplusplus
@@ -40,6 +42,7 @@ typedef union fq_default_mat_struct
     fq_nmod_mat_t fq_nmod;
     fq_zech_mat_t fq_zech;
     nmod_mat_t nmod;
+    fmpz_mod_mat_t fmpz_mod;
 } fq_default_mat_struct;
 
 typedef fq_default_mat_struct fq_default_mat_t[1];
@@ -60,6 +63,11 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_init(mat->nmod, rows, cols, ctx->ctx.nmod.mod.n);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_init(mat->fmpz_mod, rows, cols,
+                                  fmpz_mod_ctx_modulus(ctx->ctx.fmpz_mod.mod));
     }
     else
     {
@@ -82,6 +90,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init_set(fq_default_mat_t mat,
     {
         nmod_mat_init_set(mat->nmod, src->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_init_set(mat->fmpz_mod, src->fmpz_mod);
+    }
     else
     {
         fq_mat_init_set(mat->fq, src->fq, ctx->ctx.fq);
@@ -102,6 +114,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_swap(fq_default_mat_t mat1,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_swap(mat1->nmod, mat2->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_swap(mat1->fmpz_mod, mat2->fmpz_mod);
     }
     else
     {
@@ -124,6 +140,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_set(fq_default_mat_t mat1,
     {
         nmod_mat_set(mat1->nmod, mat2->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_set(mat1->fmpz_mod, mat2->fmpz_mod);
+    }
     else
     {
         fq_mat_set(mat1->fq, mat2->fq, ctx->ctx.fq);
@@ -144,6 +164,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_clear(fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_clear(mat->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_clear(mat->fmpz_mod);
     }
     else
     {
@@ -166,6 +190,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_equal(const fq_default_mat_t mat1,
     {
         return nmod_mat_equal(mat1->nmod, mat2->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_equal(mat1->fmpz_mod, mat2->fmpz_mod);
+    }
     else
     {
         return fq_mat_equal(mat1->fq, mat2->fq, ctx->ctx.fq);
@@ -186,6 +214,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_zero(const fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_is_zero(mat->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_is_zero(mat->fmpz_mod);
     }
     else
     {
@@ -208,6 +240,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_one(const fq_default_mat_t mat,
     {
         return nmod_mat_is_one(mat->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_is_one(mat->fmpz_mod);
+    }
     else
     {
         return fq_mat_is_one(mat->fq, ctx->ctx.fq);
@@ -228,6 +264,10 @@ fq_default_mat_is_empty(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_is_empty(mat->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_is_empty(mat->fmpz_mod);
     }
     else
     {
@@ -250,6 +290,10 @@ fq_default_mat_is_square(const fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_is_square(mat->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_is_square(mat->fmpz_mod);
     }
     else
     {
@@ -275,6 +319,10 @@ fq_default_mat_entry(fq_default_t val, const fq_default_mat_t mat,
     {
         val->nmod = nmod_mat_entry(mat->nmod, i, j);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_set(val->fmpz_mod, fmpz_mod_mat_entry(mat->fmpz_mod, i, j));
+    }
     else
     {
         fq_set(val->fq, fq_mat_entry(mat->fq, i, j), ctx->ctx.fq);
@@ -296,6 +344,10 @@ fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_entry(mat->nmod, i, j) = x->nmod;
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_set(fmpz_mod_mat_entry(mat->fmpz_mod, i, j), x->fmpz_mod);
     }
     else
     {
@@ -329,6 +381,10 @@ fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     {
         return nmod_mat_nrows(mat->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_nrows(mat->fmpz_mod);
+    }
     else
     {
         return fq_mat_nrows(mat->fq, ctx->ctx.fq);
@@ -349,6 +405,10 @@ fq_default_mat_ncols(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_ncols(mat->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_ncols(mat->fmpz_mod);
     }
     else
     {
@@ -372,6 +432,10 @@ fq_default_mat_swap_rows(fq_default_mat_t mat,
     {
         nmod_mat_swap_rows(mat->nmod, perm, r, s);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_swap_rows(mat->fmpz_mod, perm, r, s);
+    }
     else
     {
         fq_mat_swap_rows(mat->fq, perm, r, s, ctx->ctx.fq);
@@ -393,6 +457,10 @@ fq_default_mat_invert_rows(fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_invert_rows(mat->nmod, perm);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_invert_rows(mat->fmpz_mod, perm);
     }
     else
     {
@@ -416,6 +484,10 @@ fq_default_mat_swap_cols(fq_default_mat_t mat,
     {
         nmod_mat_swap_cols(mat->nmod, perm, r, s);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_swap_cols(mat->fmpz_mod, perm, r, s);
+    }
     else
     {
         fq_mat_swap_cols(mat->fq, perm, r, s, ctx->ctx.fq);
@@ -437,6 +509,10 @@ fq_default_mat_invert_cols(fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_invert_cols(mat->nmod, perm);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_invert_cols(mat->fmpz_mod, perm);
     }
     else
     {

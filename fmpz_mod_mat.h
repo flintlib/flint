@@ -20,6 +20,7 @@
 
 #include "flint.h"
 #include "fmpz_mat.h"
+#include "fmpz_mod.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -174,6 +175,13 @@ int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat)
     return fmpz_mat_is_zero(mat->mat);
 }
 
+FMPZ_MOD_MAT_INLINE
+int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat)
+{
+    return fmpz_is_one(mat->mod) || fmpz_mat_is_one(mat->mat);
+}
+
+
 /* Set and transpose */
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
@@ -243,11 +251,43 @@ FLINT_DLL void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);
 
 FLINT_DLL slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat);
 
+FLINT_DLL slong _fmpz_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, 
+                                            slong m, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL slong fmpz_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
+                                                                      slong m);
+
 /* Howell and strong echelon form ***********************************/
 
 FLINT_DLL slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat);
 
 FLINT_DLL void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat);
+
+/* Permutations ************************************************************/
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_swap_rows(fmpz_mod_mat_t mat, slong * perm, slong r, slong s)
+{
+    fmpz_mat_swap_rows(mat->mat, perm, r, s);
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_invert_rows(fmpz_mod_mat_t mat, slong * perm)
+{
+    fmpz_mat_invert_rows(mat->mat, perm);
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_swap_cols(fmpz_mod_mat_t mat, slong * perm, slong r, slong s)
+{
+    fmpz_mat_swap_cols(mat->mat, perm, r, s);
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm)
+{
+    fmpz_mat_invert_cols(mat->mat, perm);
+}
 
 /* Inlines *******************************************************************/
 

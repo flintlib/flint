@@ -2236,9 +2236,7 @@ void fq_default_mat_charpoly(fq_default_poly_t p,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        flint_printf("not implemented");
-        flint_abort();
-        /*fmpz_mod_mat_charpoly(p->fmpz_mod, X->fmpz_mod);*/
+        fmpz_mod_mat_charpoly(p->fmpz_mod, M->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -2266,9 +2264,7 @@ void fq_default_mat_minpoly(fq_default_poly_t p,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        flint_printf("not implemented");
-        flint_abort();
-        /*fmpz_mod_mat_minpoly(p->fmpz_mod, X->fmpz_mod);*/
+        fmpz_mod_mat_minpoly(p->fmpz_mod, X->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
