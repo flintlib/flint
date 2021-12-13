@@ -537,6 +537,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_zero(fq_default_mat_t A,
     {
         nmod_mat_zero(A->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_zero(A->fmpz_mod);
+    }
     else
     {
         fq_mat_zero(A->fq, ctx->ctx.fq);
@@ -557,6 +561,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_one(fq_default_mat_t A,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_one(A->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_one(A->fmpz_mod);
     }
     else
     {
@@ -582,6 +590,10 @@ void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1,
     {
         nmod_mat_set(mat1->nmod, mat2);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_mod_mat_set_nmod_mat(mat1->fmpz_mod, mat2);
+    }
     else
     {
         fq_mat_set_nmod_mat(mat1->fq, mat2, ctx->ctx.fq);
@@ -603,6 +615,10 @@ void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         fmpz_mat_get_nmod_mat(mat1->nmod, mat2->mat);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_set(mat1->fmpz_mod, mat2);
     }
     else
     {
@@ -632,6 +648,10 @@ void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         fmpz_mat_get_nmod_mat(mat1->nmod, mat2);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_set_fmpz_mat(mat1->fmpz_mod, mat2);
     }
     else
     {
@@ -664,6 +684,11 @@ void fq_default_mat_window_init(fq_default_mat_t window,
         nmod_mat_window_init(window->nmod,
                                mat->nmod, r1, c1, r2, c2);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_window_init(window->fmpz_mod,
+                               mat->fmpz_mod, r1, c1, r2, c2);
+    }
     else
     {
         fq_mat_window_init(window->fq,
@@ -686,6 +711,10 @@ void fq_default_mat_window_clear(fq_default_mat_t window,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_window_clear(window->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_window_clear(window->fmpz_mod);
     }
     else
     {
@@ -713,6 +742,11 @@ void fq_default_mat_concat_horizontal(fq_default_mat_t res,
     {
         nmod_mat_concat_horizontal(res->nmod, mat1->nmod, mat2->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_concat_horizontal(res->fmpz_mod,
+                                       mat1->fmpz_mod, mat2->fmpz_mod);
+    }
     else
     {
         fq_mat_concat_horizontal(res->fq, mat1->fq, mat2->fq, ctx->ctx.fq);
@@ -738,6 +772,11 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res,
     {
         nmod_mat_concat_vertical(res->nmod, mat1->nmod, mat2->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_concat_vertical(res->fmpz_mod,
+                                     mat1->fmpz_mod, mat2->fmpz_mod);
+    }
     else
     {
         fq_mat_concat_vertical(res->fq, mat1->fq, mat2->fq, ctx->ctx.fq);
@@ -761,6 +800,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint(FILE * file,
     {
         return nmod_mat_fprint(file, mat->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return fmpz_mod_mat_fprint(file, mat->fmpz_mod);
+    }
     else
     {
         return fq_mat_fprint(file, mat->fq, ctx->ctx.fq);
@@ -781,6 +824,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint_pretty(FILE * file,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_fprint_pretty(file, mat->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_fprint_pretty(file, mat->fmpz_mod);
     }
     else
     {
@@ -804,6 +851,10 @@ int fq_default_mat_print(const fq_default_mat_t mat,
     {
         return nmod_mat_print(mat->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_print(mat->fmpz_mod);
+    }
     else
     {
         return fq_mat_print(mat->fq, ctx->ctx.fq);
@@ -825,6 +876,11 @@ int fq_default_mat_print_pretty(const fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_print_pretty(mat->nmod);
+        return 1;
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_print_pretty(mat->fmpz_mod);
         return 1;
     }
     else
@@ -852,6 +908,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
     {
         nmod_mat_randtest(mat->nmod, state);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_randtest(mat->fmpz_mod, state);
+    }
     else
     {
         fq_mat_randtest(mat->fq, state, ctx->ctx.fq);
@@ -872,6 +932,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_randrank(mat->nmod, state, rank);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_randrank(mat->fmpz_mod, state, rank);
     }
     else
     {
@@ -896,6 +960,10 @@ void fq_default_mat_randops(fq_default_mat_t mat,
     {
         nmod_mat_randops(mat->nmod, count, state);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_randops(mat->fmpz_mod, count, state);
+    }
     else
     {
         fq_mat_randops(mat->fq, count, state, ctx->ctx.fq);
@@ -918,6 +986,10 @@ void fq_default_mat_randtril(fq_default_mat_t mat,
     {
         nmod_mat_randtril(mat->nmod, state, unit);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_randtril(mat->fmpz_mod, state, unit);
+    }
     else
     {
         fq_mat_randtril(mat->fq, state, unit, ctx->ctx.fq);
@@ -939,6 +1011,10 @@ void fq_default_mat_randtriu(fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_randtriu(mat->nmod, state, unit);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_randtriu(mat->fmpz_mod, state, unit);
     }
     else
     {
@@ -968,6 +1044,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_add(fq_default_mat_t C,
     {
         nmod_mat_add(C->nmod, A->nmod, B->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_add(C->fmpz_mod, A->fmpz_mod, B->fmpz_mod);
+    }
     else
     {
         fq_mat_add(C->fq, A->fq, B->fq, ctx->ctx.fq);
@@ -990,6 +1070,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_sub(fq_default_mat_t C,
     {
         nmod_mat_sub(C->nmod, A->nmod, B->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_sub(C->fmpz_mod, A->fmpz_mod, B->fmpz_mod);
+    }
     else
     {
         fq_mat_sub(C->fq, A->fq, B->fq, ctx->ctx.fq);
@@ -1010,6 +1094,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_neg(fq_default_mat_t B,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_neg(B->nmod, A->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_neg(B->fmpz_mod, A->fmpz_mod);
     }
     else
     {
@@ -1034,6 +1122,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_submul(fq_default_mat_t D,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_submul(D->nmod, C->nmod, A->nmod, B->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_submul(D->fmpz_mod, C->fmpz_mod, A->fmpz_mod, B->fmpz_mod);
     }
     else
     {
@@ -1061,6 +1153,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_mul(fq_default_mat_t C,
     {
         nmod_mat_mul(C->nmod, A->nmod, B->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_mul(C->fmpz_mod, A->fmpz_mod, B->fmpz_mod);
+    }
     else
     {
         fq_mat_mul(C->fq, A->fq, B->fq, ctx->ctx.fq);
@@ -1081,6 +1177,10 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_lu(slong * P,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_lu(P, A->nmod, rank_check);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_lu(P, A->fmpz_mod, rank_check);
     }
     else
     {
@@ -1105,6 +1205,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_inv(fq_default_mat_t B,
     {
         return nmod_mat_inv(B->nmod, A->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_inv(B->fmpz_mod, A->fmpz_mod);
+    }
     else
     {
         return fq_mat_inv(B->fq, A->fq, ctx->ctx.fq);
@@ -1128,6 +1232,10 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t A,
     {
         return nmod_mat_rref(A->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return fmpz_mod_mat_rref(NULL, A->fmpz_mod);
+    }
     else
     {
         return fq_mat_rref(A->fq, ctx->ctx.fq);
@@ -1149,6 +1257,10 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_nullspace(fq_default_mat_t X,
     {
         return nmod_mat_nullspace(X->nmod, A->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_nullspace(X->fmpz_mod, A->fmpz_mod);
+    }
     else
     {
         return fq_mat_nullspace(X->fq, A->fq, ctx->ctx.fq);
@@ -1169,6 +1281,10 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rank(const fq_default_mat_t A,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         return nmod_mat_rank(A->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return fmpz_mod_mat_rank(A->fmpz_mod);
     }
     else
     {
@@ -1192,6 +1308,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_tril(fq_default_mat_t X,
     {
         nmod_mat_solve_tril(X->nmod, L->nmod, B->nmod, unit);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_solve_tril(X->fmpz_mod, L->fmpz_mod, B->fmpz_mod, unit);
+    }
     else
     {
         fq_mat_solve_tril(X->fq, L->fq, B->fq, unit, ctx->ctx.fq);
@@ -1213,6 +1333,10 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_triu(fq_default_mat_t X,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_solve_triu(X->nmod, U->nmod, B->nmod, unit);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_solve_triu(X->fmpz_mod, U->fmpz_mod, B->fmpz_mod, unit);
     }
     else
     {
@@ -1240,6 +1364,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_solve(fq_default_mat_t X,
     {
         return nmod_mat_solve(X->nmod, A->nmod, C->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_solve(X->fmpz_mod, A->fmpz_mod, C->fmpz_mod);
+    }
     else
     {
         return fq_mat_solve(X->fq, A->fq, C->fq, ctx->ctx.fq);
@@ -1266,6 +1394,10 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_can_solve(fq_default_mat_t X,
     {
         return nmod_mat_can_solve(X->nmod, A->nmod, B->nmod);
     }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_mat_can_solve(X->fmpz_mod, A->fmpz_mod, B->fmpz_mod);
+    }
     else
     {
         return fq_mat_can_solve(X->fq, A->fq, B->fq, ctx->ctx.fq);
@@ -1289,6 +1421,10 @@ void fq_default_mat_similarity(fq_default_mat_t A, slong r,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_mat_similarity(A->nmod, r, d->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_mat_similarity(A->fmpz_mod, r, d->fmpz_mod);
     }
     else
     {
