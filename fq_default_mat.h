@@ -648,10 +648,12 @@ void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         fmpz_mat_get_nmod_mat(mat1->nmod, mat2);
+        return;
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_mat_set_fmpz_mat(mat1->fmpz_mod, mat2);
+        return;
     }
     else
     {
