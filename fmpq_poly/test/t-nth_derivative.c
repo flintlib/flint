@@ -27,8 +27,6 @@ main(void)
     flint_printf("nth_derivative....");
     fflush(stdout);
 
-    
-
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
