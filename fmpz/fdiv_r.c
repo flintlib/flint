@@ -59,22 +59,22 @@ fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mpz_ptr = _fmpz_promote(f);
+        __mpz_struct * mf = _fmpz_promote(f);
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
             if (c2 > 0)         /* h > 0 */
             {
-                flint_mpz_fdiv_r_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+                flint_mpz_fdiv_r_ui(mf, COEFF_TO_PTR(c1), c2);
             }
             else
             {
-                flint_mpz_cdiv_r_ui(mpz_ptr, COEFF_TO_PTR(c1), -c2);
+                flint_mpz_cdiv_r_ui(mf, COEFF_TO_PTR(c1), -c2);
             }
         }
         else                    /* both are large */
         {
-            mpz_fdiv_r(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_fdiv_r(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
         }
         _fmpz_demote_val(f);    /* division by h may result in small value */
     }

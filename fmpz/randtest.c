@@ -56,10 +56,10 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
     }
     else
     {
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);
+        __mpz_struct * mf = _fmpz_promote(f);
 
         _flint_rand_init_gmp(state);
-        mpz_rrandomb(mpz_ptr, state->gmp_state, bits);
+        mpz_rrandomb(mf, state->gmp_state, bits);
         _fmpz_demote_val(f);
     }
 }

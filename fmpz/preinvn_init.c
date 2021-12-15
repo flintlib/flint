@@ -36,16 +36,16 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
       inv->n = 1;
    } else /* c is big */
    {
-      __mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
-      slong size = FLINT_ABS(mpz_ptr->_mp_size);
+      __mpz_struct * mc = COEFF_TO_PTR(c);
+      slong size = FLINT_ABS(mc->_mp_size);
       inv->dinv = flint_malloc(size*sizeof(mp_limb_t));
-      count_leading_zeros(norm, mpz_ptr->_mp_d[size - 1]);
+      count_leading_zeros(norm, mc->_mp_d[size - 1]);
       if (norm) 
       {
          t = flint_malloc(size*sizeof(mp_limb_t));
-         mpn_lshift(t, mpz_ptr->_mp_d, size, norm);
+         mpn_lshift(t, mc->_mp_d, size, norm);
       } else
-         t = mpz_ptr->_mp_d;
+         t = mc->_mp_d;
 
       flint_mpn_preinvn(inv->dinv, t, size);
       

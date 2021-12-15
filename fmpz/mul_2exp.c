@@ -33,14 +33,14 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         }
         else                    /* result is large */
         {
-            __mpz_struct *mpz_ptr = _fmpz_promote(f);   /* g is saved */
-            flint_mpz_set_si(mpz_ptr, d);
-            mpz_mul_2exp(mpz_ptr, mpz_ptr, exp);
+            __mpz_struct * mf = _fmpz_promote(f);   /* g is saved */
+            flint_mpz_set_si(mf, d);
+            mpz_mul_2exp(mf, mf, exp);
         }
     }
     else                        /* g is large */
     {
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);   /* g is already large */
-        mpz_mul_2exp(mpz_ptr, COEFF_TO_PTR(d), exp);
+        __mpz_struct * mf = _fmpz_promote(f);   /* g is already large */
+        mpz_mul_2exp(mf, COEFF_TO_PTR(d), exp);
     }
 }

@@ -171,7 +171,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     mp_ptr a, y, n, ninv, temp;
     mp_limb_t n_size, normbits, ans, size, cy;
     mp_limb_t al, yl, val, valinv;
-    __mpz_struct *fac, *mpz_ptr;
+    __mpz_struct *fac, *mptr;
     int ret;
 
     TMP_INIT;
@@ -202,7 +202,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
         return ret;
     }
 
-    mpz_ptr = COEFF_TO_PTR(*yi);
+    mptr = COEFF_TO_PTR(*yi);
     temp = COEFF_TO_PTR(*n_in)->_mp_d;
     count_leading_zeros(normbits, temp[n_size - 1]);
 
@@ -241,9 +241,9 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
         }
         else
         {
-            mpz_ptr = COEFF_TO_PTR(*yi);
-            temp = mpz_ptr->_mp_d;
-            size = mpz_ptr->_mp_size;    
+            mptr = COEFF_TO_PTR(*yi);
+            temp = mptr->_mp_d;
+            size = mptr->_mp_size;    
             cy = mpn_lshift(y, temp, size, normbits);
 
             if (cy)
@@ -259,9 +259,9 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
         }
         else
         {
-            mpz_ptr = COEFF_TO_PTR(*ai);
-            temp = mpz_ptr->_mp_d;
-            size = mpz_ptr->_mp_size;
+            mptr = COEFF_TO_PTR(*ai);
+            temp = mptr->_mp_d;
+            size = mptr->_mp_size;
             cy = mpn_lshift(a, temp, size, normbits);
             if (cy)
                 a[size] = cy;

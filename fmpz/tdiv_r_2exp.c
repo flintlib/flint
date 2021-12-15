@@ -32,8 +32,8 @@ void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     }
     else  /*g is large */
     {
-        __mpz_struct * mpz_ptr = _fmpz_promote(f);  /* g is already large */
-        mpz_tdiv_r_2exp(mpz_ptr, COEFF_TO_PTR(d), exp);
+        __mpz_struct * mf = _fmpz_promote(f);  /* g is already large */
+        mpz_tdiv_r_2exp(mf, COEFF_TO_PTR(d), exp);
         _fmpz_demote_val(f);  /* division may make value small */
     }
 }

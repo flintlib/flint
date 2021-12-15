@@ -34,18 +34,18 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
     }
     else  /* g is large */
     {
-        __mpz_struct * mpz_ptr = _fmpz_promote(f);
+        __mpz_struct * mf = _fmpz_promote(f);
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
             if (c2 > 0)  /* h > 0 */
             {
-                flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+                flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), c2);
                 _fmpz_demote_val(f);  /* division by h may result in small value */
             }
             else
             {
-                flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), -c2);
+                flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), -c2);
                 _fmpz_demote_val(f);  /* division by h may result in small value */
 
                 fmpz_neg(f, f);
@@ -53,7 +53,7 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else  /* both are large */
         {
-            mpz_divexact(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_divexact(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);  /* division by h may result in small value */
         }
     }

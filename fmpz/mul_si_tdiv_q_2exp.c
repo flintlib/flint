@@ -65,21 +65,21 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        }
        else /* result takes two limbs */
        {
-           __mpz_struct *mpz_ptr = _fmpz_promote(f);
+           __mpz_struct * mf = _fmpz_promote(f);
 
            /* two limbs, least significant first, native endian, no
 nails, stored in prod */
-           mpz_import(mpz_ptr, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
+           mpz_import(mf, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
            if ((c2 ^ x) < WORD(0))
-               mpz_neg(mpz_ptr, mpz_ptr);
+               mpz_neg(mf, mf);
        }
    }
    else /* c2 is large */
    {
-       __mpz_struct *mpz_ptr = _fmpz_promote(f); /* ok without val as
+       __mpz_struct * mf = _fmpz_promote(f); /* ok without val as
             if aliased both are large */
-       flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
-       mpz_tdiv_q_2exp(mpz_ptr, mpz_ptr, exp);
+       flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
+       mpz_tdiv_q_2exp(mf, mf, exp);
        _fmpz_demote_val(f);  /* value may be small */
    }
 }

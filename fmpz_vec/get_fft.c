@@ -45,14 +45,14 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
 				coeff = (mp_limb_t *) coeffs_m;
 		} else /* coeff is an mpz_t */
 		{
-			__mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
-		   size_j = mpz_ptr->_mp_size;
+			__mpz_struct * mc = COEFF_TO_PTR(c);
+		   size_j = mc->_mp_size;
 			if (size_j < 0) 
 			{
 				signed_c = 1;
 				size_j = -size_j;
 			}
-			coeff = mpz_ptr->_mp_d;
+			coeff = mc->_mp_d;
 		}
 
 		if (signed_c) sign = -1;

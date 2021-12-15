@@ -37,14 +37,14 @@ fmpz_set_mpz(fmpz_t f, const mpz_t x)
         }
         else                    /* x is large but one limb */
         {
-            __mpz_struct *mpz_ptr = _fmpz_promote(f);
-            flint_mpz_set_ui(mpz_ptr, uval);
-            mpz_neg(mpz_ptr, mpz_ptr);
+            __mpz_struct * mf = _fmpz_promote(f);
+            flint_mpz_set_ui(mf, uval);
+            mpz_neg(mf, mf);
         }
     }
     else                        /* x is more than one limb */
     {
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_set(mpz_ptr, x);
+        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_set(mf, x);
     }
 }

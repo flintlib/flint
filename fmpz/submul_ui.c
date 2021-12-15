@@ -34,7 +34,7 @@ fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
         mp_limb_t prod[2];
         ulong uc1 = FLINT_ABS(c1);
 
-        __mpz_struct * mpz_ptr;
+        __mpz_struct * mf;
         mpz_t temp;
 
         umul_ppmm(prod[1], prod[0], uc1, x);    /* compute product */
@@ -67,17 +67,17 @@ fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
            in all remaining cases res is either big already, 
            or will be big in the end
          */
-        mpz_ptr = _fmpz_promote_val(f);
+        mf = _fmpz_promote_val(f);
         /* set up a temporary, cheap mpz_t to contain prod */
         temp->_mp_d = prod;
         temp->_mp_size = (c1 < WORD(0) ? -2 : 2);
-        mpz_sub(mpz_ptr, mpz_ptr, temp);
+        mpz_sub(mf, mf, temp);
         _fmpz_demote_val(f);    /* cancellation may have occurred */
     }
     else                        /* c1 is large */
     {
-        __mpz_struct *mpz_ptr = _fmpz_promote_val(f);
-        flint_mpz_submul_ui(mpz_ptr, COEFF_TO_PTR(c1), x);
+        __mpz_struct * mf = _fmpz_promote_val(f);
+        flint_mpz_submul_ui(mf, COEFF_TO_PTR(c1), x);
         _fmpz_demote_val(f);    /* cancellation may have occurred */
     }
 }

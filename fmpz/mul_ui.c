@@ -34,7 +34,7 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
     }
     else                        /* c2 is large */
     {
-        __mpz_struct * mpz_ptr;
+        __mpz_struct * mf;
         if (!COEFF_IS_MPZ(*f))
         {
             if (x == 0)
@@ -43,8 +43,8 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
                 return;
             }
             
-            mpz_ptr = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mpz_ptr);
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
         }
         else
         {
@@ -55,9 +55,9 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
                 return;
             }
 
-            mpz_ptr = COEFF_TO_PTR(*f);
+            mf = COEFF_TO_PTR(*f);
         }
 
-        flint_mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
+        flint_mpz_mul_ui(mf, COEFF_TO_PTR(c2), x);
     }
 }

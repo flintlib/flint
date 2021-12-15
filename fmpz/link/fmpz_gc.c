@@ -131,9 +131,9 @@ __mpz_struct * _fmpz_promote(fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f)) /* f is small so promote it first */
     {
-        __mpz_struct * mpz_ptr = _fmpz_new_mpz();
-        (*f) = PTR_TO_COEFF(mpz_ptr);
-        return mpz_ptr;
+        __mpz_struct * mf = _fmpz_new_mpz();
+        (*f) = PTR_TO_COEFF(mf);
+        return mf;
     }
     else /* f is large already, just return the pointer */
         return COEFF_TO_PTR(*f);
@@ -144,10 +144,10 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
     fmpz c = (*f);
     if (!COEFF_IS_MPZ(c)) /* f is small so promote it */
     {
-        __mpz_struct * mpz_ptr = _fmpz_new_mpz();
-        (*f) = PTR_TO_COEFF(mpz_ptr);
-        flint_mpz_set_si(mpz_ptr, c);
-        return mpz_ptr;
+        __mpz_struct * mf = _fmpz_new_mpz();
+        (*f) = PTR_TO_COEFF(mf);
+        flint_mpz_set_si(mf, c);
+        return mf;
     }
     else /* f is large already, just return the pointer */
         return COEFF_TO_PTR(c);
@@ -155,12 +155,12 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f)
 {
-    __mpz_struct * mpz_ptr = COEFF_TO_PTR(*f);
-    int size = mpz_ptr->_mp_size;
+    __mpz_struct * mf = COEFF_TO_PTR(*f);
+    int size = mf->_mp_size;
 
     if (size == 1 || size == -1)
     {
-        ulong uval = mpz_ptr->_mp_d[0];
+        ulong uval = mf->_mp_d[0];
 
         if (uval <= (ulong) COEFF_MAX)
         {

@@ -27,13 +27,13 @@ void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int prove
          * but it has different semantics from n_randbits,
          * and in particular may return integers with fewer bits.
          */
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);
+        __mpz_struct * mf = _fmpz_promote(f);
         _flint_rand_init_gmp(state);
 
         do
         {
-            mpz_urandomb(mpz_ptr, state->gmp_state, bits - 1);
-            mpz_setbit(mpz_ptr, bits - 1);
+            mpz_urandomb(mf, state->gmp_state, bits - 1);
+            mpz_setbit(mf, bits - 1);
 
             fmpz_nextprime(f, f, proved);
         } while (fmpz_bits(f) != bits);
