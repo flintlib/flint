@@ -20,7 +20,7 @@ void _fmpq_poly_nth_derivative(fmpz * rpoly, fmpz_t rden,
 {
     _fmpz_poly_nth_derivative(rpoly, poly, n, len);
     fmpz_set(rden, den);
-    _fmpq_poly_canonicalise(rpoly, rden, len - 1);
+    _fmpq_poly_canonicalise(rpoly, rden, len - n);
 }
 
 void fmpq_poly_nth_derivative(fmpq_poly_t res, const fmpq_poly_t poly, ulong n)
