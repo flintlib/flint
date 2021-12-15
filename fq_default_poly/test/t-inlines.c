@@ -47,21 +47,21 @@ int main(void)
         fq_default_poly_randtest(c, state, n_randint(state, 100), ctx);
 
         fq_default_poly_get_coeff(t, a, 0, ctx);
-        TEST(!fq_default_poly_is_unit(a, ctx) ==
+        FLINT_TEST(!fq_default_poly_is_unit(a, ctx) ==
                                        !fq_default_is_invertible(t, ctx) ||
                                         fq_default_poly_length(a, ctx) != 1);
 
-        TEST(fq_default_poly_hamming_weight(a, ctx) <=
+        FLINT_TEST(fq_default_poly_hamming_weight(a, ctx) <=
                                                fq_default_poly_length(a, ctx));
 
         fq_default_poly_add(a, b, c, ctx);
         fq_default_poly_sub(a, a, c, ctx);
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 
         fq_default_poly_neg(b, a, ctx);
         fq_default_poly_add(b, a, b, ctx);
         fq_default_poly_zero(a, ctx);
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 
         fq_default_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_default_poly_randtest(b, state, n_randint(state, 100), ctx);
@@ -71,26 +71,26 @@ int main(void)
 
         fq_default_poly_add_si(a, b, 1, ctx);
         fq_default_poly_add_si(a, a, -1, ctx);
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 
         fq_default_poly_set_fq_default(d, t, ctx);
         fq_default_poly_scalar_mul_fq_default(a, c, t, ctx);
         fq_default_poly_mul(b, c, d, ctx);
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
         if (!fq_default_is_zero(t, ctx))
         {
             fq_default_poly_scalar_div_fq_default(a, a, t, ctx);
-            TEST(fq_default_poly_equal(a, c, ctx));
+            FLINT_TEST(fq_default_poly_equal(a, c, ctx));
         }
 
         fq_default_poly_set(a, b, ctx);
         fq_default_poly_scalar_addmul_fq_default(a, c, t, ctx);
         fq_default_poly_scalar_submul_fq_default(a, c, t, ctx);
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 
         fq_default_poly_shift_left(a, b, 1, ctx);
         fq_default_poly_shift_right(a, a, 1, ctx);
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 
         fq_default_poly_randtest(a, state, n_randint(state, 50), ctx);
         fq_default_poly_randtest(b, state, n_randint(state, 50), ctx);
@@ -101,28 +101,28 @@ int main(void)
         fq_default_poly_mul(a, a, e, ctx);
         fq_default_poly_mul(b, b, e, ctx);
         fq_default_poly_gcd(d, a, b, ctx);
-        TEST(fq_default_poly_divides(c, d, e, ctx));
+        FLINT_TEST(fq_default_poly_divides(c, d, e, ctx));
         if (!fq_default_poly_is_zero(d, ctx))
         {
-            TEST(fq_default_poly_divides(c, a, d, ctx));
+            FLINT_TEST(fq_default_poly_divides(c, a, d, ctx));
             fq_default_poly_mul(c, c, d, ctx);
-            TEST(fq_default_poly_equal(c, a, ctx));
+            FLINT_TEST(fq_default_poly_equal(c, a, ctx));
 
-            TEST(fq_default_poly_divides(c, b, d, ctx));
+            FLINT_TEST(fq_default_poly_divides(c, b, d, ctx));
             fq_default_poly_mul(c, c, d, ctx);
-            TEST(fq_default_poly_equal(c, b, ctx));
+            FLINT_TEST(fq_default_poly_equal(c, b, ctx));
         }
         else
         {
-            TEST(fq_default_poly_is_zero(a, ctx));
-            TEST(fq_default_poly_is_zero(b, ctx));
+            FLINT_TEST(fq_default_poly_is_zero(a, ctx));
+            FLINT_TEST(fq_default_poly_is_zero(b, ctx));
         }
 
         fq_default_poly_xgcd(d, c, e, a, b, ctx);
         fq_default_poly_mul(c, c, a, ctx);
         fq_default_poly_mul(e, e, b, ctx);
         fq_default_poly_add(c, c, e, ctx);
-        TEST(fq_default_poly_equal(c, d, ctx));
+        FLINT_TEST(fq_default_poly_equal(c, d, ctx));
 
         fq_default_poly_randtest(a, state, n_randint(state, 50), ctx);
         fq_default_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
@@ -132,10 +132,10 @@ int main(void)
 
         fq_default_poly_rem(e, a, b, ctx);
         fq_default_poly_divrem(c, d, a, b, ctx);
-        TEST(fq_default_poly_equal(d, e, ctx));
+        FLINT_TEST(fq_default_poly_equal(d, e, ctx));
         fq_default_poly_mul(e, c, b, ctx);
         fq_default_poly_add(e, e, d, ctx);
-        TEST(fq_default_poly_equal(e, a, ctx));
+        FLINT_TEST(fq_default_poly_equal(e, a, ctx));
 
         fq_default_clear(t, ctx);
         fq_default_poly_clear(a, ctx);

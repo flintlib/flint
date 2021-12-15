@@ -40,27 +40,27 @@ int main(void)
         fq_default_init(b, ctx);
         fq_default_init(c, ctx);
 
-        TEST(fq_default_ctx_degree(ctx) == d);
+        FLINT_TEST(fq_default_ctx_degree(ctx) == d);
         fq_default_ctx_prime(p1, ctx);
-        TEST(fmpz_equal(p1, p));
+        FLINT_TEST(fmpz_equal(p1, p));
         fq_default_ctx_order(o, ctx);
         fmpz_pow_ui(o1, p, d);
-        TEST(fmpz_equal(o1, o));
+        FLINT_TEST(fmpz_equal(o1, o));
 
         fq_default_randtest(a, state, ctx);
         fq_default_randtest(b, state, ctx);
         fq_default_randtest(c, state, ctx);
 
-        TEST(!!fq_default_is_zero(a, ctx) == !fq_default_is_invertible(a, ctx));
+        FLINT_TEST(!!fq_default_is_zero(a, ctx) == !fq_default_is_invertible(a, ctx));
 
         fq_default_add(a, b, c, ctx);
         fq_default_sub(a, a, c, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
 
         fq_default_sub_one(a, c, ctx);
         fq_default_one(b, ctx);
         fq_default_sub(b, c, b, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
         
         fq_default_randtest(a, state, ctx);
         fq_default_randtest(b, state, ctx);
@@ -68,33 +68,33 @@ int main(void)
 
         fq_default_inv(a, c, ctx);
         fq_default_mul(a, a, c, ctx);
-        TEST(fq_default_is_one(a, ctx));
+        FLINT_TEST(fq_default_is_one(a, ctx));
 
         fq_default_div(a, b, c, ctx);
         fq_default_mul(a, a, c, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
 
         fq_default_neg(a, c, ctx);
         fq_default_mul_si(b, c, -1, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
 
         fq_default_add(a, c, c, ctx);
         fq_default_mul_ui(b, c, 2, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
         
         fq_default_mul_fmpz(a, c, p, ctx);
-        TEST(fq_default_is_zero(a, ctx));
+        FLINT_TEST(fq_default_is_zero(a, ctx));
 
         fq_default_pow_ui(c, b, 2, ctx);
         fq_default_sqr(a, b, ctx);
-        TEST(fq_default_equal(a, c, ctx));
+        FLINT_TEST(fq_default_equal(a, c, ctx));
 
         fq_default_pow(a, b, o, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
 
         fq_default_mul(a, b, b, ctx);
         fq_default_sqr(c, b, ctx);
-        TEST(fq_default_equal(a, c, ctx));
+        FLINT_TEST(fq_default_equal(a, c, ctx));
 
         fq_default_randtest(a, state, ctx);
         fq_default_randtest(b, state, ctx);
@@ -102,13 +102,13 @@ int main(void)
 
         fq_default_pth_root(a, b, ctx);
         fq_default_pow(a, a, p, ctx);
-        TEST(fq_default_equal(a, b, ctx));
+        FLINT_TEST(fq_default_equal(a, b, ctx));
 
         fq_default_sqr(a, b, ctx);
-        TEST(fq_default_is_square(a, ctx));
-        TEST(fq_default_sqrt(c, a, ctx));
+        FLINT_TEST(fq_default_is_square(a, ctx));
+        FLINT_TEST(fq_default_sqrt(c, a, ctx));
         fq_default_sqr(c, c, ctx);
-        TEST(fq_default_equal(c, a, ctx));
+        FLINT_TEST(fq_default_equal(c, a, ctx));
 
         fq_default_clear(a, ctx);
         fq_default_clear(b, ctx);

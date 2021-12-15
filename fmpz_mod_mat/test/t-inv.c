@@ -47,13 +47,13 @@ int main(void)
 
         result = fmpz_mod_mat_inv(B, A);
         fmpz_mod_mat_mul(C, A, B);
-        TEST(result && fmpz_mod_mat_equal(C, I));
+        FLINT_TEST(result && fmpz_mod_mat_equal(C, I));
 
         /* Test aliasing */
         fmpz_mod_mat_set(C, A);
         fmpz_mod_mat_inv(A, A);
         fmpz_mod_mat_mul(B, A, C);
-        TEST(fmpz_mod_mat_equal(B, I));
+        FLINT_TEST(fmpz_mod_mat_equal(B, I));
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);
@@ -79,8 +79,8 @@ int main(void)
         if (n_randint(state, 2))
             fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
-        TEST(!fmpz_mod_mat_inv(B, A));
-        TEST(!fmpz_mod_mat_inv(A, A));
+        FLINT_TEST(!fmpz_mod_mat_inv(B, A));
+        FLINT_TEST(!fmpz_mod_mat_inv(A, A));
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);

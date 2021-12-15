@@ -47,7 +47,7 @@ int main(void)
 
         solved = fmpz_mod_mat_solve(X, A, B);
         fmpz_mod_mat_mul(AX, A, X);
-        TEST(solved && fmpz_mod_mat_equal(AX, B));
+        FLINT_TEST(solved && fmpz_mod_mat_equal(AX, B));
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);
@@ -78,7 +78,7 @@ int main(void)
             fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
         solved = fmpz_mod_mat_solve(X, A, B);
-        TEST(!solved);
+        FLINT_TEST(!solved);
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);

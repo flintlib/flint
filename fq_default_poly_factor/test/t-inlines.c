@@ -55,12 +55,12 @@ int main(void)
         for (j = fq_default_poly_factor_length(f, ctx) - 1; j >= 0; j--)
         {
             fq_default_poly_factor_get_poly(c, f, j, ctx);
-            TEST(fq_default_poly_is_irreducible(c, ctx));
+            FLINT_TEST(fq_default_poly_is_irreducible(c, ctx));
             fq_default_poly_pow(d, c, fq_default_poly_factor_exp(f, j, ctx), ctx);
             fq_default_poly_mul(b, b, d, ctx);
         }
 
-        TEST(fq_default_poly_equal(a, b, ctx));
+        FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 
         fq_default_clear(t, ctx);
         fq_default_poly_clear(a, ctx);

@@ -12,7 +12,8 @@
 #ifndef TEST_HELPERS_H
 #define TEST_HELPERS_H
 
-#define TEST(e)                                         \
+/* easy way to test a condition in test code */
+#define FLINT_TEST(e)                                   \
     do {                                                \
         if (!(e))                                       \
         {                                               \

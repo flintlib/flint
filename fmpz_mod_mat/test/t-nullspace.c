@@ -48,11 +48,11 @@ int main(void)
 
             nullity = fmpz_mod_mat_nullspace(ker, A);
             nulrank = fmpz_mod_mat_rank(ker);
-            TEST(nullity == nulrank);
-            TEST(nullity + r == n);
+            FLINT_TEST(nullity == nulrank);
+            FLINT_TEST(nullity + r == n);
 
             fmpz_mod_mat_mul(B, A, ker);
-            TEST(fmpz_mod_mat_rank(B) == 0);
+            FLINT_TEST(fmpz_mod_mat_rank(B) == 0);
 
             fmpz_mod_mat_clear(A);
             fmpz_mod_mat_clear(ker);

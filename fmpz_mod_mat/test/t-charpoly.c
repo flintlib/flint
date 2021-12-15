@@ -45,8 +45,8 @@ int main(void)
         fmpz_mod_mat_charpoly(p1, C, ctx);
         fmpz_mod_mat_mul(C, B, A);
         fmpz_mod_mat_charpoly(p2, C, ctx);
-        TEST(fmpz_mod_poly_degree(p1, ctx) == n);
-        TEST(fmpz_mod_poly_equal(p1, p2, ctx));
+        FLINT_TEST(fmpz_mod_poly_degree(p1, ctx) == n);
+        FLINT_TEST(fmpz_mod_poly_equal(p1, p2, ctx));
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);

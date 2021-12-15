@@ -50,7 +50,7 @@ void check(slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, slong rank,
     {
         for (j = i; j < n; j++)
         {
-            TEST(fmpz_is_zero(fmpz_mod_mat_entry(LU, i, j)));
+            FLINT_TEST(fmpz_is_zero(fmpz_mod_mat_entry(LU, i, j)));
         }
     }
 
@@ -67,7 +67,7 @@ void check(slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, slong rank,
     fmpz_mod_mat_mul(B, L, U);
     perm(B, P);
 
-    TEST(fmpz_mod_mat_equal(A, B));
+    FLINT_TEST(fmpz_mod_mat_equal(A, B));
 
     fmpz_mod_mat_clear(B);
     fmpz_mod_mat_clear(L);
@@ -110,7 +110,7 @@ int main(void)
 
             rank = fmpz_mod_mat_lu(P, LU, 0);
 
-            TEST(r == rank);
+            FLINT_TEST(r == rank);
 
             check(P, LU, A, rank, ctx);
 

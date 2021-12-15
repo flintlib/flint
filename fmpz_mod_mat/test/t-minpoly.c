@@ -46,7 +46,7 @@ int main(void)
         fmpz_mod_mat_minpoly(p2, A, ctx);
         
         fmpz_mod_poly_divrem(q, r, p1, p2, ctx);
-        TEST(fmpz_mod_poly_is_zero(r, ctx));
+        FLINT_TEST(fmpz_mod_poly_is_zero(r, ctx));
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_poly_clear(p1, ctx);
@@ -92,7 +92,7 @@ int main(void)
         }
 
         fmpz_mod_mat_minpoly(p2, B, ctx);
-        TEST(fmpz_mod_poly_equal(p1, p2, ctx));
+        FLINT_TEST(fmpz_mod_poly_equal(p1, p2, ctx));
 
         fmpz_clear(t);
         fmpz_mod_mat_clear(A);

@@ -46,11 +46,11 @@ int main(void)
 
         /* Check Y = A^(-1) * (A * X) = X */
         fmpz_mod_mat_solve_triu(Y, A, B, unit);
-        TEST(fmpz_mod_mat_equal(Y, X));
+        FLINT_TEST(fmpz_mod_mat_equal(Y, X));
 
         /* Check aliasing */
         fmpz_mod_mat_solve_triu(B, A, B, unit);
-        TEST(fmpz_mod_mat_equal(B, X));
+        FLINT_TEST(fmpz_mod_mat_equal(B, X));
 
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);

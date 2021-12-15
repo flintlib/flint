@@ -35,7 +35,7 @@ int main(void)
         {
             fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
             fmpz_mod_mat_randrank(A, state, r);
-            TEST(r == fmpz_mod_mat_rank(A));
+            FLINT_TEST(r == fmpz_mod_mat_rank(A));
             fmpz_mod_mat_clear(A);
         }
 
@@ -55,7 +55,7 @@ int main(void)
             fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
             fmpz_mod_mat_randrank(A, state, r);
             fmpz_mod_mat_randops(A, d, state);
-            TEST(r == fmpz_mod_mat_rank(A));
+            FLINT_TEST(r == fmpz_mod_mat_rank(A));
             fmpz_mod_mat_clear(A);
         }
         fmpz_mod_ctx_clear(ctx);

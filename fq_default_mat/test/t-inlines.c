@@ -58,15 +58,14 @@ int main(void)
         fq_default_mat_mul(f, a, c, ctx);
         fq_default_mat_mul(g, b, c, ctx);
         fq_default_mat_add(e, f, g, ctx);
-        TEST(fq_default_mat_equal(d, e, ctx));
+        FLINT_TEST(fq_default_mat_equal(d, e, ctx));
 
         fq_default_mat_sub(e, a, b, ctx);
         fq_default_mat_mul(d, e, c, ctx);
         fq_default_mat_mul(f, a, c, ctx);
         fq_default_mat_mul(g, b, c, ctx);
         fq_default_mat_sub(e, f, g, ctx);
-        TEST(fq_default_mat_equal(d, e, ctx));
-
+        FLINT_TEST(fq_default_mat_equal(d, e, ctx));
 
         fq_default_clear(t, ctx);
         fq_default_mat_clear(a, ctx);
