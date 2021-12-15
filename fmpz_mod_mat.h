@@ -28,6 +28,9 @@
 #endif
 
 #define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10
+#define FMPZ_MOD_MAT_LU_RECURSIVE_CUTOFF 4
+#define FMPZ_MOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
+#define FMPZ_MOD_MAT_SOLVE_TRI_COLS_CUTOFF 64
 
 typedef struct
 {
@@ -301,35 +304,31 @@ FLINT_DLL slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
 FLINT_DLL slong fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
                                                                       slong m);
 
+FLINT_DLL slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check);
+
 FLINT_DLL slong fmpz_mod_mat_lu_classical(slong * P, fmpz_mod_mat_t A,
                                                                int rank_check);
 
-FMPZ_MOD_MAT_INLINE
-slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check)
-{
-    return fmpz_mod_mat_lu_classical(P, A, rank_check);
-}
+FLINT_DLL slong fmpz_mod_mat_lu_recursive(slong * P, fmpz_mod_mat_t A,
+                                                               int rank_check);
+
+FLINT_DLL void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
+                                             const fmpz_mod_mat_t B, int unit);
 
 FLINT_DLL void fmpz_mod_mat_solve_triu_classical(fmpz_mod_mat_t X,
-                     const fmpz_mod_mat_t U, const fmpz_mod_mat_t B, int unit);
+                    const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t U,
-                                             const fmpz_mod_mat_t B, int unit)
-{
-    fmpz_mod_mat_solve_triu_classical(X, U, B, unit);
-}
+FLINT_DLL void fmpz_mod_mat_solve_triu_recursive(fmpz_mod_mat_t X,
+                    const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
+FLINT_DLL void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
+                                             const fmpz_mod_mat_t B, int unit);
 
 FLINT_DLL void fmpz_mod_mat_solve_tril_classical(fmpz_mod_mat_t X,
                     const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
-                                             const fmpz_mod_mat_t B, int unit)
-{
-    fmpz_mod_mat_solve_tril_classical(X, L, B, unit);
-}
+FLINT_DLL void fmpz_mod_mat_solve_tril_recursive(fmpz_mod_mat_t X,
+                    const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
 FLINT_DLL int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
                                                        const fmpz_mod_mat_t B);

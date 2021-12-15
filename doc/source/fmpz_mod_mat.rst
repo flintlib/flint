@@ -387,7 +387,7 @@ Solving
 
 .. function:: int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, fmpz_mod_mat_t A, fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 
-    Solves the matrix-matrix equation `AX = B` over `Fq`.
+    Solves the matrix-matrix equation `AX = B` over `Fp`.
 
     Returns `1` if a solution exists; otherwise returns `0` and sets the
     elements of `X` to zero. If more than one solution exists, one of the
