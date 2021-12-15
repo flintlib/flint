@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010, 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2021 Daniel Schultz
 
