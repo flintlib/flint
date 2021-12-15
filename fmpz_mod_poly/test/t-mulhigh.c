@@ -48,7 +48,7 @@ int main(void)
         _fmpz_mod_poly_normalise(a);
         _fmpz_mod_poly_normalise(b);
 
-        TEST(fmpz_mod_poly_equal(a, b, ctx));
+        FLINT_TEST(fmpz_mod_poly_equal(a, b, ctx));
 
         fmpz_mod_poly_clear(a, ctx);
         fmpz_mod_poly_clear(b, ctx);

@@ -44,14 +44,14 @@ int main(void)
         {
             fmpz_mod_poly_deflate(a, b, k, ctx);
             fmpz_mod_poly_inflate(c, a, k, ctx);
-            TEST(fmpz_mod_poly_equal(b, c, ctx));
+            FLINT_TEST(fmpz_mod_poly_equal(b, c, ctx));
 
             fmpz_mod_poly_inflate(a, a, k, ctx);
-            TEST(fmpz_mod_poly_equal(a, c, ctx));
+            FLINT_TEST(fmpz_mod_poly_equal(a, c, ctx));
         }
         else
         {
-            TEST(fmpz_mod_poly_is_zero(b, ctx));
+            FLINT_TEST(fmpz_mod_poly_is_zero(b, ctx));
         }
 
         fmpz_mod_poly_clear(a, ctx);
