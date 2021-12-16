@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011, 2010 Sebastian Pancratz
+    Copyright (C) 2021, Mathieu Gouttenoire
 
     This file is part of FLINT.
 

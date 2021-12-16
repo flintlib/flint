@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2021 Mathieu Gouttenoire
 
     This file is part of FLINT.
 
@@ -36,4 +37,3 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
     _fmpq_poly_derivative(res->coeffs, res->den, poly->coeffs, poly->den, len);
     _fmpq_poly_set_length(res, len - 1);
 }
-

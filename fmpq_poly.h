@@ -565,6 +565,11 @@ FLINT_DLL void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden,
 
 FLINT_DLL void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
 
+FLINT_DLL void _fmpq_poly_nth_derivative(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, ulong n, slong len);
+    
+FLINT_DLL void fmpq_poly_nth_derivative(fmpq_poly_t res, const fmpq_poly_t poly, ulong n);
+
 FLINT_DLL void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, slong len);
 
