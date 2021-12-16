@@ -369,7 +369,7 @@ Addition and subtraction
     Sets ``res`` to the negative of ``poly`` modulo `p`.
 
 
-Scalar multiplication
+Scalar multiplication and division
 --------------------------------------------------------------------------------
 
 
@@ -382,10 +382,9 @@ Scalar multiplication
 
     Sets ``res`` to ``poly`` multiplied by `x`.
 
+.. function:: void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, const fmpz_t x, const fmpz_mod_ctx_t ctx)
 
-Scalar division
---------------------------------------------------------------------------------
-
+    Adds to ``rop`` the product of ``op`` by the scalar ``x``.
 
 .. function:: void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, const fmpz_t x, const fmpz_t p)
 
@@ -434,6 +433,12 @@ Multiplication
 .. function:: void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 
     Computes ``res`` as the square of ``poly``.
+
+.. function:: void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong start, const fmpz_mod_ctx_t ctx)
+
+    Computes the product of ``poly1`` and ``poly2`` and writes the
+    coefficients from ``start`` onwards into the high coefficients of
+    ``res``, the remaining coefficients being arbitrary.
 
 .. function:: void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz * f, slong lenf, const fmpz_t p)
 
@@ -2013,6 +2018,27 @@ representation is ``"5*x^3+2*x+1"``.
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+Inflation and deflation
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_inflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong inflation, const fmpz_mod_ctx_t ctx)
+
+    Sets ``result`` to the inflated polynomial `p(x^n)` where
+    `p` is given by ``input`` and `n` is given by ``inflation``.
+
+.. function:: void fmpz_mod_poly_deflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong deflation, const fmpz_mod_ctx_t ctx)
+
+    Sets ``result`` to the deflated polynomial `p(x^{1/n})` where
+    `p` is given by ``input`` and `n` is given by ``deflation``.
+    Requires `n > 0`.
+
+.. function:: ulong fmpz_mod_poly_deflation(const fmpz_mod_poly_t input, const fmpz_mod_ctx_t ctx)
+
+    Returns the largest integer by which ``input`` can be deflated.
+    As special cases, returns 0 if ``input`` is the zero polynomial
+    and 1 of ``input`` is a constant polynomial.
 
 Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------

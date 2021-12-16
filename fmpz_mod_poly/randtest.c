@@ -113,23 +113,16 @@ static void
 fmpz_mod_poly_randtest_monic_irreducible_sparse(fmpz_mod_poly_t poly,
                        flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
-    slong i = 3, attempts;
-
-    while (i <= len/2)
-    {
-        attempts = 0;
-        while (i == len/2 || attempts < 2*len)
-        {
-            fmpz_mod_poly_randtest_monic_sparse(poly, state, len, i, ctx);
-            if (!fmpz_mod_poly_is_zero(poly, ctx) &&
-                fmpz_mod_poly_is_irreducible(poly, ctx))
-            {
-               return;
-            }
-            attempts++;
-        }
+    slong i = 0;
+    slong terms = 3;
+    do {
         i++;
-    }
+        terms += ((i % 4) == 0);
+        if (terms >= len)
+            terms = 3;
+        fmpz_mod_poly_randtest_monic_sparse(poly, state, len, terms, ctx);
+    } while (fmpz_mod_poly_is_zero(poly, ctx) ||
+             !fmpz_mod_poly_is_irreducible(poly, ctx));
 }
 
 void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly,

@@ -129,13 +129,30 @@ FLINT_DLL void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
 
 
-FLINT_DLL void nmod_mat_print_pretty(const nmod_mat_t mat);
+FLINT_DLL int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat);
+
+NMOD_MAT_INLINE void nmod_mat_print_pretty(const nmod_mat_t mat)
+{
+    nmod_mat_fprint_pretty(stdout, mat);
+}
+
+NMOD_MAT_INLINE int nmod_mat_print(const nmod_mat_t mat)
+{
+    return nmod_mat_fprint_pretty(stdout, mat);
+}
+
+NMOD_MAT_INLINE int nmod_mat_fprint(FILE* f, const nmod_mat_t mat)
+{
+    return nmod_mat_fprint_pretty(f, mat);
+}
 
 FLINT_DLL int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 
 FLINT_DLL void nmod_mat_zero(nmod_mat_t mat);
 
 FLINT_DLL int nmod_mat_is_zero(const nmod_mat_t mat);
+
+FLINT_DLL int nmod_mat_is_one(const nmod_mat_t mat);
 
 NMOD_MAT_INLINE
 int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)

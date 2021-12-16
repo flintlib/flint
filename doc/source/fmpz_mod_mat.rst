@@ -265,6 +265,7 @@ Trace
 
     Set ``trace`` to the trace of the matrix ``mat``.
 
+
 Gaussian elimination
 --------------------------------------------------------------------------------
 
@@ -276,6 +277,8 @@ Gaussian elimination
 
     If ``perm`` is non-``NULL``, the permutation of
     rows in the matrix will also be applied to ``perm``.
+
+    The modulus is assumed to be prime.
 
 
 Strong echelon form and Howell form
@@ -298,4 +301,142 @@ Strong echelon form and Howell form
     putting `mat` into strong echelon form and then ordering the rows.
 
     `mat` must have at least as many rows as columns.
+
+Inverse
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A, fmpz_mod_ctx_t ctx)
+
+    Sets `B = A^{-1}` and returns `1` if `A` is invertible. If `A` is singular,
+    returns `0` and sets the elements of `B` to undefined values.
+
+    `A` and `B` must be square matrices with the same dimensions.
+
+    The modulus is assumed to be prime.
+
+
+LU decomposition
+--------------------------------------------------------------------------------
+
+
+.. function:: slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check, const fmpz_mod_ctx_t ctx)
+
+    Computes a generalised LU decomposition `LU = PA` of a given
+    matrix `A`, returning the rank of `A`.
+
+    If `A` is a nonsingular square matrix, it will be overwritten with
+    a unit diagonal lower triangular matrix `L` and an upper
+    triangular matrix `U` (the diagonal of `L` will not be stored
+    explicitly).
+
+    If `A` is an arbitrary matrix of rank `r`, `U` will be in row
+    echelon form having `r` nonzero rows, and `L` will be lower
+    triangular but truncated to `r` columns, having implicit ones on
+    the `r` first entries of the main diagonal. All other entries will
+    be zero.
+
+    If a nonzero value for ``rank_check`` is passed, the function
+    will abandon the output matrix in an undefined state and return 0
+    if `A` is detected to be rank-deficient.
+
+    The modulus is assumed to be prime.
+
+
+Triangular solving
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit, const fmpz_mod_ctx_t ctx)
+
+    Sets `X = L^{-1} B` where `L` is a full rank lower triangular
+    square matrix. If ``unit`` = 1, `L` is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  `X`
+    and `B` are allowed to be the same matrix, but no other aliasing
+    is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+    The modulus is assumed to be prime.
+
+.. function:: void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t U, const fmpz_mod_mat_t B, int unit, const fmpz_mod_ctx_t ctx)
+
+    Sets `X = U^{-1} B` where `U` is a full rank upper triangular
+    square matrix. If ``unit`` = 1, `U` is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  `X`
+    and `B` are allowed to be the same matrix, but no other aliasing
+    is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+    The modulus is assumed to be prime.
+
+
+Solving
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
+
+    Solves the matrix-matrix equation `AX = B`.
+
+    Returns `1` if `A` has full rank; otherwise returns `0` and sets the
+    elements of `X` to undefined values.
+
+    The matrix `A` must be square.
+    
+    The modulus is assumed to be prime.
+
+.. function:: int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, fmpz_mod_mat_t A, fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
+
+    Solves the matrix-matrix equation `AX = B` over `Fp`.
+
+    Returns `1` if a solution exists; otherwise returns `0` and sets the
+    elements of `X` to zero. If more than one solution exists, one of the
+    valid solutions is given.
+
+    There are no restrictions on the shape of `A` and it may be singular.
+
+    The modulus is assumed to be prime.
+
+
+Transforms
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_mat_similarity(fmpz_mod_mat_t M, slong r, fmpz_t d, fmpz_mod_ctx_t ctx)
+
+    Applies a similarity transform to the `n\times n` matrix `M` in-place.
+
+    If `P` is the `n\times n` identity matrix the zero entries of whose row
+    `r` (`0`-indexed) have been replaced by `d`, this transform is equivalent
+    to `M = P^{-1}MP`.
+
+    Similarity transforms preserve the determinant, characteristic polynomial
+    and minimal polynomial.
+
+    The value `d` is required to be reduced modulo the modulus of the entries
+    in the matrix.
+
+    The modulus is assumed to be prime.
+
+
+Characteristic polynomial
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_mat_charpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx)
+
+    Compute the characteristic polynomial `p` of the matrix `M`. The matrix
+    is required to be square, otherwise an exception is raised.
+
+
+Minimal polynomial
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx)
+
+    Compute the minimal polynomial `p` of the matrix `M`. The matrix
+    is required to be square, otherwise an exception is raised.
+
+    The modulus is assumed to be prime.
 

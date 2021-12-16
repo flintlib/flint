@@ -16,7 +16,7 @@
 #include "fmpz_mod_poly.h"
 
 int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA, 
-                                const fmpz * B, slong lenB, fmpz_mod_ctx_t ctx)
+                          const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
 {    
     fmpz * R;
     fmpz_t invB;
@@ -92,7 +92,8 @@ int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
     return res;
 }
 
-int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx)
+int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_t tQ;
     fmpz * q;

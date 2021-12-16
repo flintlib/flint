@@ -69,19 +69,16 @@ static void
 nmod_poly_randtest_monic_irreducible_sparse(nmod_poly_t poly,
                                               flint_rand_t state, slong len)
 {
-    slong i = 3, attempts;
-
-    while (i <= len/2)
-    {
-        attempts = 0;
-        while (i == len/2 || attempts < 2*len) {
-            nmod_poly_randtest_monic_sparse(poly, state, len, i);
-            if (!nmod_poly_is_zero(poly) && nmod_poly_is_irreducible(poly))
-               return;
-            attempts++;
-        }
+    slong i = 0;
+    slong terms = 3;
+    do {
         i++;
-    }
+        terms += ((i % 4) == 0);
+        if (terms >= len)
+            terms = 3;
+        nmod_poly_randtest_monic_sparse(poly, state, len, terms);
+    } while (nmod_poly_is_zero(poly) ||
+             !nmod_poly_is_irreducible(poly));
 }
 
 void

@@ -186,7 +186,13 @@ FLINT_DLL void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, slong len, slon
 
 FLINT_DLL void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
 
-FLINT_DLL ulong fmpz_poly_deflation(const fmpz_poly_t input);
+FLINT_DLL ulong _fmpz_poly_deflation(const fmpz* a, slong len);
+
+FMPZ_POLY_INLINE
+ulong fmpz_poly_deflation(const fmpz_poly_t input)
+{
+    return _fmpz_poly_deflation(input->coeffs, input->length);
+}
 
 FLINT_DLL void fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input,
                                                               ulong deflation);
@@ -1217,6 +1223,16 @@ void fmpz_poly_debug(const fmpz_poly_t poly)
     }
     flint_printf(")");
     fflush(stdout);
+}
+
+/* Norms *********************************************************************/
+
+FMPZ_POLY_INLINE slong _fmpz_poly_hamming_weight(const fmpz * a, slong len)
+{
+    slong i, sum = 0;
+    for (i = 0; i < len; i++)
+        sum += !fmpz_is_zero(a + i);
+    return sum;
 }
 
 /*  CRT  ********************************************************************/
