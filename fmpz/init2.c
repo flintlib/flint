@@ -19,9 +19,9 @@ fmpz_init2(fmpz_t f, ulong limbs)
 {
     if (limbs)
     {
-        __mpz_struct *mpz_ptr = _fmpz_new_mpz();
-        *f = PTR_TO_COEFF(mpz_ptr);
-        _mpz_realloc(mpz_ptr, limbs);
+        __mpz_struct * mf = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(mf);
+        _mpz_realloc(mf, limbs);
     }
     else
     {

@@ -37,9 +37,9 @@ static void fmpz_set_limbs(fmpz_t f, mp_srcptr x, mp_size_t limbs)
         fmpz_set_ui(f, x[0]);
     else
     {
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);
+        __mpz_struct *mf = _fmpz_promote(f);
 
-        mpz_import(mpz_ptr, limbs, -1, sizeof(mp_limb_t), 0, 0, x);
+        mpz_import(mf, limbs, -1, sizeof(mp_limb_t), 0, 0, x);
     }
 }
 

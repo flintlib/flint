@@ -51,7 +51,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     mp_limb_t P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;
     int i, j, ret;
     ecm_t ecm_inf;
-    __mpz_struct *fac, *mpz_ptr;
+    __mpz_struct *fac, *mptr;
     mp_ptr n, mpsig;
 
     TMP_INIT;
@@ -81,12 +81,12 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     }
     else
     {
-        mpz_ptr = COEFF_TO_PTR(* n_in);
-        count_leading_zeros(ecm_inf->normbits, mpz_ptr->_mp_d[n_size - 1]);
+        mptr = COEFF_TO_PTR(* n_in);
+        count_leading_zeros(ecm_inf->normbits, mptr->_mp_d[n_size - 1]);
         if (ecm_inf->normbits)
-           mpn_lshift(n, mpz_ptr->_mp_d, n_size, ecm_inf->normbits);
+           mpn_lshift(n, mptr->_mp_d, n_size, ecm_inf->normbits);
         else
-           flint_mpn_copyi(n, mpz_ptr->_mp_d, n_size);
+           flint_mpn_copyi(n, mptr->_mp_d, n_size);
     }
 
     flint_mpn_preinvn(ecm_inf->ninv, n, n_size);
@@ -193,16 +193,16 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         }
         else
         {
-            mpz_ptr = COEFF_TO_PTR(*sig);
+            mptr = COEFF_TO_PTR(*sig);
 
             if (ecm_inf->normbits)
             {
-                cy = mpn_lshift(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size, ecm_inf->normbits);
+                cy = mpn_lshift(mpsig, mptr->_mp_d, mptr->_mp_size, ecm_inf->normbits);
                 if (cy)
-                    mpsig[mpz_ptr->_mp_size] = cy;
+                    mpsig[mptr->_mp_size] = cy;
             } else
             {
-                flint_mpn_copyi(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
+                flint_mpn_copyi(mpsig, mptr->_mp_d, mptr->_mp_size);
             }
         }
 

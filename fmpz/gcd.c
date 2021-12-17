@@ -76,8 +76,8 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             /* TODO: Change to mpn_gcd in order to save some calculations that
              * have already been already made. */
-            __mpz_struct * mpz_ptr = _fmpz_promote(f);
-            mpz_gcd(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            __mpz_struct * mf = _fmpz_promote(f);
+            mpz_gcd(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);
         }
     }

@@ -67,19 +67,19 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
     }
     else  /* large coefficient */
     {
-        __mpz_struct * mpz_ptr;
+        __mpz_struct * mcoeff;
         mp_limb_t * p;
         ulong l, b;
         
-        mpz_ptr = _fmpz_promote(coeff);
+        mcoeff = _fmpz_promote(coeff);
 
         /* the number of limbs to hold the bitfield _including_ b extra bits */
         l = (bits - 1) / FLINT_BITS + 1;
         b = bits % FLINT_BITS;
 
         /* allocate space for l limbs only */
-        mpz_realloc(mpz_ptr, l);
-        p = mpz_ptr->_mp_d;
+        mpz_realloc(mcoeff, l);
+        p = mcoeff->_mp_d;
 
         /* shift in l limbs */
         if (shift)
@@ -113,7 +113,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
             while (l && (p[l - 1] == (mp_limb_t) 0))
                 l--;
 
-            mpz_ptr->_mp_size = -l;
+            mcoeff->_mp_size = -l;
 
             sign = 1;
         }
@@ -127,13 +127,13 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
             while (l && (p[l - 1] == (mp_limb_t) 0))
                 l--;
 
-            mpz_ptr->_mp_size = l;
+            mcoeff->_mp_size = l;
             sign = 0;
         }
 
         /* negate if required */
         if (negate)
-            mpz_neg(mpz_ptr, mpz_ptr);
+            mpz_neg(mcoeff, mcoeff);
 
         /* coeff may fit in a small */
         _fmpz_demote_val(coeff);
@@ -165,19 +165,19 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
     }
     else  /* large coefficient */
     {
-        __mpz_struct * mpz_ptr;
+        __mpz_struct * mcoeff;
         mp_limb_t * p;
         ulong l, b;
 
-        mpz_ptr = _fmpz_promote(coeff);
+        mcoeff = _fmpz_promote(coeff);
 
         /* the number of limbs to hold the bitfield _including_ b extra bits */
         l = (bits - 1) / FLINT_BITS + 1;
         b = bits % FLINT_BITS;
 
         /* allocate space for l limbs only */
-        mpz_realloc(mpz_ptr, l);
-        p = mpz_ptr->_mp_d;
+        mpz_realloc(mcoeff, l);
+        p = mcoeff->_mp_d;
 
         /* shift in l limbs */
         if (shift)
@@ -200,7 +200,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
         while (l && (p[l - 1] == (mp_limb_t) 0))
             l--;
 
-        mpz_ptr->_mp_size = l;
+        mcoeff->_mp_size = l;
 
         /* coeff may fit in a small */
         _fmpz_demote_val(coeff);

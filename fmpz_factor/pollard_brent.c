@@ -27,7 +27,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_t fa, fy, maxa, maxy;
     mp_ptr a, y, n, ninv, temp;
     mp_limb_t n_size, normbits, ans, val, size, cy;
-    __mpz_struct *fac, *mpz_ptr;
+    __mpz_struct *fac, *mptr;
     int ret;
 
     TMP_INIT;
@@ -97,9 +97,9 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
             }
             else
             {
-                mpz_ptr = COEFF_TO_PTR(*fy);
-                temp = mpz_ptr->_mp_d;
-                size = mpz_ptr->_mp_size;
+                mptr = COEFF_TO_PTR(*fy);
+                temp = mptr->_mp_d;
+                size = mptr->_mp_size;
 		cy = mpn_lshift(y, temp, size, normbits);
                 if (cy)
                     y[size] = cy;
@@ -114,9 +114,9 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
             }
             else
             {
-                mpz_ptr = COEFF_TO_PTR(*fa);
-                temp = mpz_ptr->_mp_d;
-                size = mpz_ptr->_mp_size;
+                mptr = COEFF_TO_PTR(*fa);
+                temp = mptr->_mp_d;
+                size = mptr->_mp_size;
 		cy = mpn_lshift(a, temp, size, normbits);
                 if (cy)
                     a[size] = cy;

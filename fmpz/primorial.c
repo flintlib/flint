@@ -133,7 +133,7 @@ fmpz_primorial(fmpz_t res, ulong n)
 {
     mp_size_t len, pi;
     ulong bits;
-    __mpz_struct * mpz_ptr;
+    __mpz_struct * mres;
     const mp_limb_t * primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
@@ -150,10 +150,10 @@ fmpz_primorial(fmpz_t res, ulong n)
     primes = n_primes_arr_readonly(pi);
     bits = FLINT_BIT_COUNT(primes[pi - 1]);
     
-    mpz_ptr = _fmpz_promote(res);
-    mpz_realloc2(mpz_ptr, pi*bits);
+    mres = _fmpz_promote(res);
+    mpz_realloc2(mres, pi*bits);
     
-    len = mpn_prod_limbs(mpz_ptr->_mp_d, primes, pi, bits);
-    mpz_ptr->_mp_size = len;
+    len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
+    mres->_mp_size = len;
 }
 

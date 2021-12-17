@@ -28,8 +28,8 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g)
         fmpz_set_ui(f, n_sqrt(*g));
     else
     {
-        __mpz_struct * mpz_ptr = _fmpz_promote(f);
-        mpz_sqrt(mpz_ptr, COEFF_TO_PTR(*g));
+        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_sqrt(mf, COEFF_TO_PTR(*g));
         _fmpz_demote_val(f);
     }
 }

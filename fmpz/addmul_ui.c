@@ -78,18 +78,18 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
            or will be big in the end
          */
         {
-            __mpz_struct * mpz_ptr = _fmpz_promote_val(f);
+            __mpz_struct * mf = _fmpz_promote_val(f);
             mpz_t temp;  /* set up a temporary, cheap mpz_t to contain prod */
             temp->_mp_d = prod;
             temp->_mp_size = (c1 < WORD(0) ? -2 : 2);
-            mpz_add(mpz_ptr, mpz_ptr, temp);
+            mpz_add(mf, mf, temp);
             _fmpz_demote_val(f);  /* cancellation may have occurred */
         }
     }
     else  /* c1 is large */
     {
-        __mpz_struct * mpz_ptr = _fmpz_promote_val(f);
-        flint_mpz_addmul_ui(mpz_ptr, COEFF_TO_PTR(c1), x);
+        __mpz_struct * mf = _fmpz_promote_val(f);
+        flint_mpz_addmul_ui(mf, COEFF_TO_PTR(c1), x);
         _fmpz_demote_val(f);  /* cancellation may have occurred */
     }
 }

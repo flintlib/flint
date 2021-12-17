@@ -30,13 +30,13 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
 	else 
    {
       mp_size_t tlimbs;
-      __mpz_struct * mpz_ptr = COEFF_TO_PTR(*gc);
+      __mpz_struct * mgc = COEFF_TO_PTR(*gc);
       
       mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
       flint_mpn_copyi(temp, arrayg, limbsg);
       
-      mpn_tdiv_q(arrayg, temp, limbsg, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
-      tlimbs = limbsg - mpz_ptr->_mp_size + 1;
+      mpn_tdiv_q(arrayg, temp, limbsg, mgc->_mp_d, mgc->_mp_size);
+      tlimbs = limbsg - mgc->_mp_size + 1;
       tlimbs -= (arrayg[tlimbs - 1] == 0);
       
       flint_free(temp);

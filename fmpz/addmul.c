@@ -17,7 +17,7 @@
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2;
-    __mpz_struct * mpz_ptr;
+    __mpz_struct * mf;
 	
     c1 = *g;
 	
@@ -38,7 +38,7 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 	} 
 
 	/* both g and h are large */
-    mpz_ptr = _fmpz_promote_val(f);
-    mpz_addmul(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+    mf = _fmpz_promote_val(f);
+    mpz_addmul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
     _fmpz_demote_val(f);  /* cancellation may have occurred	*/
 }

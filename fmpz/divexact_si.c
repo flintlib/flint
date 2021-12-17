@@ -33,16 +33,16 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
     }
     else  /* g is large */
     {
-        __mpz_struct * mpz_ptr = _fmpz_promote(f);
+        __mpz_struct * mf = _fmpz_promote(f);
 
         if (h > 0)
         {
-            flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), h);
+            flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), h);
             _fmpz_demote_val(f);  /* division by h may result in small value */
         }
         else
         {
-            flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), -h);
+            flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), -h);
             _fmpz_demote_val(f);  /* division by h may result in small value */
             fmpz_neg(f, f);
         }

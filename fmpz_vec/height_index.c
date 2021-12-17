@@ -45,9 +45,9 @@ _fmpz_vec_height_index(const fmpz * vec, slong len)
             }
             else
             {
-                __mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
-                max_d = mpz_ptr->_mp_d;
-                max_mpz_limbs = mpz_ptr->_mp_size;
+                __mpz_struct * mc = COEFF_TO_PTR(c);
+                max_d = mc->_mp_d;
+                max_mpz_limbs = mc->_mp_size;
                 max_mpz_limbs = FLINT_ABS(max_mpz_limbs);
                 max_i = i;
                 i++;
@@ -62,14 +62,14 @@ _fmpz_vec_height_index(const fmpz * vec, slong len)
             /* we have found at least one mpz, so only look for those */
             if (COEFF_IS_MPZ(c))
             {
-                __mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
-                mpz_limbs = mpz_ptr->_mp_size;
+                __mpz_struct * mc = COEFF_TO_PTR(c);
+                mpz_limbs = mc->_mp_size;
                 mpz_limbs = FLINT_ABS(mpz_limbs);
                 if (mpz_limbs > max_mpz_limbs ||
                     ((mpz_limbs == max_mpz_limbs) &&
-                    (mpn_cmp(mpz_ptr->_mp_d, max_d, max_mpz_limbs) > 0)))
+                    (mpn_cmp(mc->_mp_d, max_d, max_mpz_limbs) > 0)))
                 {
-                    max_d = mpz_ptr->_mp_d;
+                    max_d = mc->_mp_d;
                     max_mpz_limbs = mpz_limbs;
                     max_i = i;
                 }

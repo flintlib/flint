@@ -22,14 +22,14 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 {
     slong i, size;
     mp_limb_t * data;
-    __mpz_struct * mpz_ptr;
+    __mpz_struct * mcoeffs_m;
 
     if (sign)
     {
         for (i = 0; i < length; i++)
         {
-            mpz_ptr = _fmpz_promote(coeffs_m);
-            data = FLINT_MPZ_REALLOC(mpz_ptr, limbs);
+            mcoeffs_m = _fmpz_promote(coeffs_m);
+            data = FLINT_MPZ_REALLOC(mcoeffs_m, limbs);
 
 			if ((coeffs_f[i][limbs - 1] >> (FLINT_BITS - 1)) || coeffs_f[i][limbs])
             {
@@ -37,7 +37,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
                 mpn_add_1(data, data, limbs, WORD(1));
                 size = limbs;
                 while ((size) && (data[size - 1] == 0)) size--; /* normalise */
-                mpz_ptr->_mp_size = -size;
+                mcoeffs_m->_mp_size = -size;
                 if (size >= WORD(-1)) _fmpz_demote_val(coeffs_m); /* coefficient may be small*/
             }
             else
@@ -45,7 +45,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
                 flint_mpn_copyi(data, coeffs_f[i], limbs);
                 size = limbs;
                 while ((size) && (data[size - 1] == WORD(0))) size--; /* normalise */
-                mpz_ptr->_mp_size = size;
+                mcoeffs_m->_mp_size = size;
                 if (size <= 1) _fmpz_demote_val(coeffs_m); /* coefficient may be small */
             }
 
@@ -56,12 +56,12 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
     {
         for (i = 0; i < length; i++)
         {
-            mpz_ptr = _fmpz_promote(coeffs_m);
-            data = FLINT_MPZ_REALLOC(mpz_ptr, limbs);
+            mcoeffs_m = _fmpz_promote(coeffs_m);
+            data = FLINT_MPZ_REALLOC(mcoeffs_m, limbs);
             flint_mpn_copyi(data, coeffs_f[i], limbs); 
             size = limbs;
             while ((size) && (data[size - 1] == WORD(0))) size--; /* normalise */
-            mpz_ptr->_mp_size = size;
+            mcoeffs_m->_mp_size = size;
             if (size <= 1) _fmpz_demote_val(coeffs_m); /* coefficient may be small */
 
             coeffs_m++;
