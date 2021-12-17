@@ -22,4 +22,9 @@
 #include "fmpz_poly.h"
 #include "padic.h"
 
+void padic_get_unit(fmpz_t f, padic_t p)
+{
+   fmpz_set(f, padic_unit(p));
+}
+
 
