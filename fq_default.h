@@ -1269,6 +1269,33 @@ FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
     }
 }
 
+FQ_DEFAULT_INLINE int fq_default_get_fmpz(fmpz_t z, const fq_default_t op,
+                                                    const fq_default_ctx_t ctx)
+{
+    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    {
+        return fq_zech_get_fmpz(z, op->fq_zech, ctx->ctx.fq_zech);
+    }
+    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    {
+        return fq_nmod_get_fmpz(z, op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        fmpz_set_ui(z, op->nmod);
+        return 1;
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_set(z, op->fmpz_mod);
+        return 1;
+    }
+    else
+    {
+        return fq_get_fmpz(z, op->fq, ctx->ctx.fq);
+    }
+}
+
 FLINT_DLL void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
                             const fq_default_t op, const fq_default_ctx_t ctx);
 

@@ -410,6 +410,11 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: int fq_zech_get_fmpz(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
+
+    If ``op`` has a lift to the integers, return `1` and set ``rop`` to the lift in `[0,p)`.
+    Otherwise, return `0` and leave `rop` undefined.
+
 .. function:: void fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Sets ``rop`` to the ``fq_nmod_t`` element corresponding to ``op``.

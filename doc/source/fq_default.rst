@@ -343,6 +343,11 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: int fq_default_get_fmpz(fmpz_t rop, const fq_default_t op, const fq_default_ctx_t ctx)
+
+    If ``op`` has a lift to the integers, return `1` and set ``rop`` to the lift in `[0,p)`.
+    Otherwise, return `0` and leave `rop` undefined.
+
 .. function:: void fq_default_get_nmod_poly(nmod_poly_t poly, const fq_default_t op, const fq_default_ctx_t ctx)
 
     Sets ``poly`` to the polynomial representation of ``op``. Assumes the

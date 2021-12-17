@@ -287,6 +287,10 @@ fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
     rop->value = 1;
 }
 
+
+FLINT_DLL int fq_zech_get_fmpz(fmpz_t a, const fq_zech_t op,
+                                                      const fq_zech_ctx_t ctx);
+
 FLINT_DLL void fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op,
                                                       const fq_zech_ctx_t ctx);
 
