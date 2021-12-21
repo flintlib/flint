@@ -36,9 +36,9 @@
 typedef struct
 {
     fmpz * coeffs;
-    fmpz_t den;
     slong alloc;
     slong length;
+    fmpz_t den;
 } fmpq_poly_struct;
 
 typedef fmpq_poly_struct fmpq_poly_t[1];
