@@ -1020,6 +1020,14 @@ FLINT_DLL int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P,
                                                      const fmpz_mod_ctx_t ctx);
 
+/* Square root ***************************************************************/
+
+FLINT_DLL void _fmpz_mod_poly_invsqrt_series(fmpz * g,
+                                  const fmpz * h, slong n, fmpz_mod_ctx_t mod);
+
+FLINT_DLL void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g,
+                         const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx);
+
 /*  Minpoly  *****************************************************************/
 
 FLINT_DLL slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, 
