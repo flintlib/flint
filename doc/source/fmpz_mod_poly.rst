@@ -1729,6 +1729,16 @@ It is assumed that `h` has constant term `1` and that the coefficients
     Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
 
+.. function:: int _fmpz_mod_poly_sqrt(fmpz * s, const fmpz * p, slong n, fmpz_mod_ctx_t mod)
+
+    If ``(p, n)`` is a perfect square, sets ``(s, n / 2 + 1)``
+    to a square root of `p` and returns 1. Otherwise returns 0.
+
+.. function:: int fmpz_mod_poly_sqrt(fmpz_mod_poly_t s, const fmpz_mod_poly_t p, fmpz_mod_ctx_t mod)
+
+    If `p` is a perfect square, sets `s` to a square root of `p`
+    and returns 1. Otherwise returns 0.
+
 
 Modular composition
 --------------------------------------------------------------------------------
