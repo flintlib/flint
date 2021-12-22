@@ -92,7 +92,7 @@ void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, sl
         _fmpz_vec_set(h_coeffs, h->coeffs, hlen);
     }
     else
-        h_coeffs = (fmpz *) h->coeffs;
+        h_coeffs = h->coeffs;
 
     if (h == g && hlen >= n)
     {
@@ -102,7 +102,7 @@ void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, sl
     else
     {
         fmpz_mod_poly_fit_length(g, n, ctx);
-        g_coeffs = (fmpz *) g->coeffs;
+        g_coeffs = g->coeffs;
     }
 
     _fmpz_mod_poly_invsqrt_series(g_coeffs, h_coeffs, n, ctx);

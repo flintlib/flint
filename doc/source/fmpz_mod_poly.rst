@@ -1718,6 +1718,16 @@ It is assumed that `h` has constant term `1` and that the coefficients
     Set `g` to the series expansion of `1/\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
 
+.. function:: void _fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong n, fmpz_mod_ctx_t ctx)
+
+    Set the first `n` terms of `g` to the series expansion of `\sqrt{h}`.
+    It is assumed that `n > 0`, that `h` has constant term 1 and that `h`
+    is zero-padded as necessary to length `n`. Aliasing is not permitted.
+
+.. function:: void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx)
+
+    Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
+    It is assumed that `h` has constant term 1.
 
 
 Modular composition
