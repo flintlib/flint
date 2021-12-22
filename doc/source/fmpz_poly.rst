@@ -742,6 +742,15 @@ Multiplication
     precisely `n` coefficients in length, zero padded if necessary.  The 
     remaining `n - 1` coefficients may be arbitrary.
 
+.. function:: void _fmpz_poly_mulhigh(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong start)
+
+    Sets all but the low `n` coefficients of `res` to the corresponding
+    coefficients of the product of `poly1` of length `len1` and `poly2` of
+    length `len2`, the remaining coefficients being arbitrary. It is assumed
+    that `len1 >= len2 > 0` and that `0 < n < len1 + len2 - 1`. Aliasing of
+    inputs is not permitted.
+
+
 FFT precached multiplication
 --------------------------------------------------------------------------------
 

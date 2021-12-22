@@ -20,6 +20,12 @@ void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     len2 = poly2->length;
     len_out = len1 + len2 - 1;
 
+    if (start == 0)
+    {
+        fmpz_mod_poly_mul(res, poly1, poly2, ctx);
+        return;
+    }
+
     if (len1 < 1 || len2 < 1 || start >= len_out)
     {
         fmpz_mod_poly_zero(res, ctx);
@@ -32,10 +38,10 @@ void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         fmpz_mod_poly_init2(temp, len_out, ctx);
 
         if (len1 >= len2)
-            _fmpz_poly_mulhigh_classical(temp->coeffs, poly1->coeffs, len1,
+            _fmpz_poly_mulhigh(temp->coeffs, poly1->coeffs, len1,
                                          poly2->coeffs, len2, start);
         else
-            _fmpz_poly_mulhigh_classical(temp->coeffs, poly2->coeffs, len2,
+            _fmpz_poly_mulhigh(temp->coeffs, poly2->coeffs, len2,
                                          poly1->coeffs, len1, start);
         
         fmpz_mod_poly_swap(temp, res, ctx);
@@ -46,10 +52,10 @@ void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         fmpz_mod_poly_fit_length(res, len_out, ctx);
         
         if (len1 >= len2)
-            _fmpz_poly_mulhigh_classical(res->coeffs, poly1->coeffs, len1,
+            _fmpz_poly_mulhigh(res->coeffs, poly1->coeffs, len1,
                                          poly2->coeffs, len2, start);
         else
-            _fmpz_poly_mulhigh_classical(res->coeffs, poly2->coeffs, len2,
+            _fmpz_poly_mulhigh(res->coeffs, poly2->coeffs, len2,
                                          poly1->coeffs, len1, start);
     }
 

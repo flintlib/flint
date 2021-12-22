@@ -527,6 +527,10 @@ FLINT_DLL void fmpz_poly_mullow(fmpz_poly_t res,
 FLINT_DLL void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
 
+FLINT_DLL void _fmpz_poly_mulhigh(fmpz * res,
+                          const fmpz * poly1, slong len1,
+                                   const fmpz * poly2, slong len2, slong start);
+
 /* FFT precached multiplication **********************************************/
 
 FLINT_DLL void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
