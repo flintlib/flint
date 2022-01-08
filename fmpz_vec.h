@@ -113,6 +113,8 @@ int _fmpz_vec_read(fmpz ** vec, slong * len)
     return _fmpz_vec_fread(stdin, vec, len);
 }
 
+FLINT_DLL int _fmpz_vec_set_str(fmpz * res, slong * len, const char * str);
+
 /*  Conversions  *************************************************************/
 
 FLINT_DLL void _fmpz_vec_set_nmod_vec(fmpz * res, 

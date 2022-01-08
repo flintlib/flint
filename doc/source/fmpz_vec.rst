@@ -114,9 +114,9 @@ Input and output
 
 .. function:: int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len)
 
-    Prints the vector of given length to the stream ``file``. The 
-    format is the length followed by two spaces, then a space separated 
-    list of coefficients. If the length is zero, only `0` is printed.
+    Prints the vector of given length to the stream ``file``. The format is the
+    length followed by two spaces, then a space separated list of coefficients.
+    If the length is zero, only `0` is printed. Prints in decimal.
 
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
@@ -126,6 +126,17 @@ Input and output
     Prints the vector of given length to ``stdout``.
 
     For further details, see ``_fmpz_vec_fprint()``.
+
+.. function:: int _fmpz_vec_set_str(fmpz * res, slong * len, const char * str)
+
+    Reads ``str`` and sets ``res`` accordingly.  The string is required to have
+    the same format as if it would be printed via ``_fmpz_vec_fprint()``.
+    Assumes that ``res`` has enough allocation to store the result.
+
+    In case of success, returns `0`.  In case of failure it returns `-1`.
+
+    Note: No number in the sequence can be represented by 512 characters or
+    more. Will fail otherwise.
 
 
 Conversions
