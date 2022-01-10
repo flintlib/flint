@@ -1065,8 +1065,12 @@ Greatest common divisor
 
 .. function:: void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
-    Computes the extended GCD of `f` and `g`, i.e. values `a` and `b`
-    such that `af + bg = d`, where `d = \gcd(f, g)`. 
+    Computes the extended GCD of `f` and `g`, i.e. the values `a` and `b` such
+    that `af + bg = d`, where `d = \gcd(f, g)`. Here `a` will be the same as
+    calling ``fmpz_gcdinv`` when `f < g` (or vice versa for `b` when `g < f`).
+
+    To obtain the canonical solution to Bézout's identity, call
+    ``fmpz_xgcd_canonical_bezout`` instead. This is also faster.
 
     Assumes that there is no aliasing among the outputs.
 
@@ -1102,7 +1106,7 @@ Greatest common divisor
     .. math ::
 
         |a| < \Bigl| \frac{g}{2 d} \Bigr|,
-        \qquad \Bigl| |b| < \frac{f}{2 d} \Bigr|.
+        \qquad |b| < \Bigl| \frac{f}{2 d} \Bigr|.
 
     Assumes that there is no aliasing among the outputs.
 
