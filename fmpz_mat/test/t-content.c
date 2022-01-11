@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2015 Dharak Kharod
+    Copyright (C) 2021 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,25 +10,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-
-int main()
+int
+main()
 {
 	int i;
 	fmpz_mat_t A,B;
 	fmpz_t scalar, gcd_mat, temp;
 	FLINT_TEST_INIT(state);
 
-	flint_printf("fmpz_mat_content....");
+	flint_printf("content....");
 	fflush(stdout);
 
 	for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -91,4 +84,3 @@ cleanup:
 	flint_printf("PASS\n");
 	return 0;
 }
-

@@ -313,7 +313,11 @@ FLINT_DLL void fmpz_mat_kronecker_product(fmpz_mat_t C, const fmpz_mat_t A, cons
 
 /* Content */
 
-FLINT_DLL void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A);
+FMPZ_MAT_INLINE
+void fmpz_mat_content(fmpz_t res, const fmpz_mat_t A)
+{
+    _fmpz_vec_content(res, A->entries, A->r * A->c);
+}
 
 /* Permutations */
 
