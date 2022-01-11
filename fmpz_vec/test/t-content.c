@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2021 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,64 +11,68 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
+
+void
+_fmpz_vec_content_naive(fmpz_t res, const fmpz * vec, slong len)
+{
+    if (len == 0)
+        fmpz_zero(res);
+    else if (len == 1)
+        fmpz_abs(res, vec + 0);
+
+    fmpz_gcd(res, vec + 0, vec + 1);
+    for (len -= 2, vec += 2; len > 0; len--, vec++)
+        fmpz_gcd(res, res, vec);
+}
 
 int
 main(void)
 {
-    int i, result;
+    int ix, result;
+    fmpz_t res_naive, res, multiplier;
     FLINT_TEST_INIT(state);
 
     flint_printf("content....");
     fflush(stdout);
 
+    fmpz_init(res_naive);
+    fmpz_init(res);
+    fmpz_init(multiplier);
     
-
-    /* Check that content(a f) = abs(a) content(f) */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    /* Check that the naive implementation gives the same result */
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
-        fmpz_t a, c, d;
-        fmpz * f, *g;
+        fmpz * vec;
         slong len = n_randint(state, 100);
 
-        fmpz_init(a);
-        fmpz_init(c);
-        fmpz_init(d);
-        f = _fmpz_vec_init(len);
-        g = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(f, state, len, 200);
-        fmpz_randtest(a, state, 100);
+        vec = _fmpz_vec_init(len);
 
-        _fmpz_vec_content(c, f, len);
-        _fmpz_vec_scalar_mul_fmpz(g, f, len, a);
-        fmpz_abs(a, a);
-        fmpz_mul(c, a, c);
-        _fmpz_vec_content(d, g, len);
+        _fmpz_vec_randtest(vec, state, len, 200);
+        fmpz_randtest_not_zero(multiplier, state, 100);
 
-        result = (fmpz_equal(c, d));
+        _fmpz_vec_scalar_mul_fmpz(vec, vec, len, multiplier);
+        _fmpz_vec_content(res, vec, len);
+        _fmpz_vec_content_naive(res_naive, vec, len);
+
+        result = fmpz_equal(res_naive, res);
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("d = "), fmpz_print(d), flint_printf("\n\n");
-            flint_printf("vec = "), _fmpz_vec_print(f, len), flint_printf("\n\n");
+            flint_printf("res        = "), fmpz_print(res), flint_printf("\n");
+            flint_printf("res_naive  = "), fmpz_print(res_naive), flint_printf("\n");
+            flint_printf("multiplier = "), fmpz_print(multiplier), flint_printf("\n");
+            flint_printf("vec        = "); _fmpz_vec_scalar_divexact_fmpz(vec, vec, len, multiplier); _fmpz_vec_print(vec, len), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
 
-        fmpz_clear(a);
-        fmpz_clear(c);
-        fmpz_clear(d);
-        _fmpz_vec_clear(f, len);
-        _fmpz_vec_clear(g, len);
+        _fmpz_vec_clear(vec, len);
     }
+
+    fmpz_clear(res_naive);
+    fmpz_clear(res);
+    fmpz_clear(multiplier);
 
     FLINT_TEST_CLEANUP(state);
     

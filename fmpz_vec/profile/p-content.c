@@ -68,7 +68,7 @@ _fmpz_vec_content_old(fmpz_t res, const fmpz * vec, slong len)
 void
 sample_new(void * arg, ulong count)
 {
-    fmpz_t res;
+    fmpz_t res, multiplier;
     fmpz * vec;
     slong len;
     int ix;
@@ -76,23 +76,29 @@ sample_new(void * arg, ulong count)
     slong bits = info->bits;
 
     fmpz_init(res);
+    fmpz_init(multiplier);
     vec = _fmpz_vec_init(MAXLENGTH);
 
     FLINT_TEST_INIT(state);
 
-    prof_start();
-    for (ix = 0; ix < 1000 * count; ix++)
+    for (ix = 0; ix < 10000 * count; ix++)
     {
         len = n_randint(state, MAXLENGTH);
         while (len == 0)
             len = n_randint(state, MAXLENGTH);
 
         _fmpz_vec_randtest(vec, state, len, bits);
+        fmpz_randtest_not_zero(multiplier, state, bits);
+
+        _fmpz_vec_scalar_mul_fmpz(vec, vec, len, multiplier);
+
+        prof_start();
         _fmpz_vec_content(res, vec, len);
+        prof_stop();
     }
-    prof_stop();
 
     fmpz_clear(res);
+    fmpz_clear(multiplier);
     _fmpz_vec_clear(vec, MAXLENGTH);
 
     flint_randclear(state);
@@ -101,7 +107,7 @@ sample_new(void * arg, ulong count)
 void
 sample_old(void * arg, ulong count)
 {
-    fmpz_t res;
+    fmpz_t res, multiplier;
     fmpz * vec;
     slong len;
     int ix;
@@ -109,23 +115,29 @@ sample_old(void * arg, ulong count)
     slong bits = info->bits;
 
     fmpz_init(res);
+    fmpz_init(multiplier);
     vec = _fmpz_vec_init(MAXLENGTH);
 
     FLINT_TEST_INIT(state);
 
-    prof_start();
-    for (ix = 0; ix < 1000 * count; ix++)
+    for (ix = 0; ix < 10000 * count; ix++)
     {
         len = n_randint(state, MAXLENGTH);
         while (len == 0)
             len = n_randint(state, MAXLENGTH);
 
         _fmpz_vec_randtest(vec, state, len, bits);
+        fmpz_randtest_not_zero(multiplier, state, bits);
+
+        _fmpz_vec_scalar_mul_fmpz(vec, vec, len, multiplier);
+
+        prof_start();
         _fmpz_vec_content_old(res, vec, len);
+        prof_stop();
     }
-    prof_stop();
 
     fmpz_clear(res);
+    fmpz_clear(multiplier);
     _fmpz_vec_clear(vec, MAXLENGTH);
 
     flint_randclear(state);
