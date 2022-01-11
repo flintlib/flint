@@ -622,10 +622,12 @@ Content
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
+.. function:: void fmpz_mat_content(fmpz_t res, const fmpz_mat_t A)
 
-    Sets ``mat_gcd`` as the gcd of all the elements of the matrix ``A``.
-    Returns 0 if the matrix is empty. 
+    Sets ``res`` to the non-negative content of the entries in `A`, i.e.
+    calculating the greatest common divisor (GCD) of all the elements in `A`.
+    The content of a zero matrix, including the case when `A` has zero columns
+    and rows, is defined to be zero.
     
 
 

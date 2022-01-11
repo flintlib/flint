@@ -1,7 +1,7 @@
 .. _fmpz-vec:
 
 **fmpz_vec.h** -- vectors of integers
-==================================================================================================
+================================================================================
 
 Description.
 
@@ -388,11 +388,11 @@ Reduction mod `p`
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
+.. function:: void _fmpz_vec_scalar_mod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`.
 
-.. function:: void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
+.. function:: void _fmpz_vec_scalar_smod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`, choosing 
     the unique representative in `(-p/2, p/2]`.
@@ -404,9 +404,10 @@ Gaussian content
 
 .. function:: void _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len)
 
-    Sets ``res`` to the non-negative content of the entries in ``vec``.  
-    The content of a zero vector, including the case when the length is zero, 
-    is defined to be zero.
+    Sets ``res`` to the non-negative content of the entries in ``vec``, i.e.
+    calculating the greatest common divisor (GCD) of all the elements in
+    ``vec``.  The content of a zero vector, including the case when the length
+    is zero, is defined to be zero.
 
 .. function:: void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t input)
 
