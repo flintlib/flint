@@ -1220,6 +1220,22 @@ Derivative
     Sets ``rop`` to the derivative of ``op``.
 
 
+Square root
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fq_zech_poly_invsqrt_series(fq_zech_struct * g, const fq_zech_struct * h, slong n, fq_zech_ctx_t mod)
+
+    Set the first `n` terms of `g` to the series expansion of `1/\sqrt{h}`.
+    It is assumed that `n > 0`, that `h` has constant term 1 and that `h`
+    is zero-padded as necessary to length `n`. Aliasing is not permitted.
+
+.. function:: void fq_zech_poly_invsqrt_series(fq_zech_poly_t g, const fq_zech_poly_t h, slong n, fq_zech_ctx_t ctx)
+
+    Set `g` to the series expansion of `1/\sqrt{h}` to order `O(x^n)`.
+    It is assumed that `h` has constant term 1.
+
+
 Evaluation
 --------------------------------------------------------------------------------
 

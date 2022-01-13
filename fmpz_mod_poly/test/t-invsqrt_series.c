@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, 2011 William Hart
+    Copyright (C) 2011, 2021 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
     This file is part of FLINT.
