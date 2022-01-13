@@ -970,6 +970,12 @@ FLINT_DLL void _TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, struct) * g,
 FLINT_DLL void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
                  const TEMPLATE(T, poly_t) h, slong n, TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void _TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, struct) * g,
+               const TEMPLATE(T, struct) * h, slong n, TEMPLATE(T, ctx_t) ctx);
+ 
+FLINT_DLL void TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, poly_t) g,
+                 const TEMPLATE(T, poly_t) h, slong n, TEMPLATE(T, ctx_t) ctx);
+
 /*  Evaluation  **************************************************************/
 
 FLINT_DLL void _TEMPLATE3(T, poly_evaluate, T)(TEMPLATE(T, t) rop,
