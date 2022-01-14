@@ -1294,6 +1294,16 @@ Square root
     Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
 
+.. function:: int _fq_poly_sqrt(fq_struct * s, const fq_struct * p, slong n, fq_ctx_t mod)
+
+    If ``(p, n)`` is a perfect square, sets ``(s, n / 2 + 1)``
+    to a square root of `p` and returns 1. Otherwise returns 0.
+
+.. function:: int fq_poly_sqrt(fq_poly_t s, const fq_poly_t p, fq_ctx_t mod)
+
+    If `p` is a perfect square, sets `s` to a square root of `p`
+    and returns 1. Otherwise returns 0.
+
 
 Evaluation
 --------------------------------------------------------------------------------
