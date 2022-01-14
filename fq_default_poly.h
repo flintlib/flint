@@ -1958,6 +1958,86 @@ void fq_default_poly_derivative(fq_default_poly_t rop,
     }
 }
 
+/* Square root ***************************************************************/
+
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_invsqrt_series(fq_default_poly_t rop,
+                    const fq_default_poly_t op, slong n, fq_default_ctx_t ctx)
+{
+    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    {
+        fq_zech_poly_invsqrt_series(rop->fq_zech, op->fq_zech, n, ctx->ctx.fq_zech);
+    }
+    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    {
+        fq_nmod_poly_invsqrt_series(rop->fq_nmod, op->fq_nmod, n, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        nmod_poly_invsqrt_series(rop->nmod, op->nmod, n);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_poly_invsqrt_series(rop->fmpz_mod, op->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
+    }
+    else
+    {
+        fq_poly_invsqrt_series(rop->fq, op->fq, n, ctx->ctx.fq);
+    }
+}
+
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_sqrt_series(fq_default_poly_t rop,
+                    const fq_default_poly_t op, slong n, fq_default_ctx_t ctx)
+{
+    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    {
+        fq_zech_poly_sqrt_series(rop->fq_zech, op->fq_zech, n, ctx->ctx.fq_zech);
+    }
+    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    {
+        fq_nmod_poly_sqrt_series(rop->fq_nmod, op->fq_nmod, n, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        nmod_poly_sqrt_series(rop->nmod, op->nmod, n);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        fmpz_mod_poly_sqrt_series(rop->fmpz_mod, op->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
+    }
+    else
+    {
+        fq_poly_sqrt_series(rop->fq, op->fq, n, ctx->ctx.fq);
+    }
+}
+
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_sqrt(fq_default_poly_t rop,
+                              const fq_default_poly_t op, fq_default_ctx_t ctx)
+{
+    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    {
+        return fq_zech_poly_sqrt(rop->fq_zech, op->fq_zech, ctx->ctx.fq_zech);
+    }
+    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    {
+        return fq_nmod_poly_sqrt(rop->fq_nmod, op->fq_nmod, ctx->ctx.fq_nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_NMOD)
+    {
+        return nmod_poly_sqrt(rop->nmod, op->nmod);
+    }
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    {
+        return fmpz_mod_poly_sqrt(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+    }
+    else
+    {
+        return fq_poly_sqrt(rop->fq, op->fq, ctx->ctx.fq);
+    }
+}
+                                    
 /*  Evaluation  **************************************************************/
 
 FQ_DEFAULT_POLY_INLINE

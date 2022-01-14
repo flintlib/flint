@@ -441,6 +441,26 @@ Derivative
     Sets ``rop`` to the derivative of ``op``.
 
 
+Square root
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_default_poly_invsqrt_series(fq_default_poly_t g, const fq_default_poly_t h, slong n, fq_default_ctx_t ctx)
+
+    Set `g` to the series expansion of `1/\sqrt{h}` to order `O(x^n)`.
+    It is assumed that `h` has constant term 1.
+
+.. function:: void fq_default_poly_sqrt_series(fq_default_poly_t g, const fq_default_poly_t h, slong n, fq_default_ctx_t ctx)
+
+    Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
+    It is assumed that `h` has constant term 1.
+
+.. function:: int fq_default_poly_sqrt(fq_default_poly_t s, const fq_default_poly_t p, fq_default_ctx_t mod)
+
+    If `p` is a perfect square, sets `s` to a square root of `p`
+    and returns 1. Otherwise returns 0.
+
+
 Evaluation
 --------------------------------------------------------------------------------
 
