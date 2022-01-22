@@ -254,6 +254,12 @@ FLINT_DLL void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmp
 FLINT_DLL void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
+FLINT_DLL void _fmpz_mat_mul_fft(fmpz_mat_t C,
+                                    const fmpz_mat_t A, slong abits,
+                                    const fmpz_mat_t B, slong bbits);
+
+FLINT_DLL void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+
 FLINT_DLL void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
                            const fmpz_mat_t B, int sign, flint_bitcnt_t Cbits);
 
