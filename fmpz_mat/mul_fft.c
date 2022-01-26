@@ -13,17 +13,6 @@
 #include "fft.h"
 #include "fft_tuning.h"
 
-void _fmpz_mat_mul_mfa_truncate_sqrt2(
-    fmpz_mat_t C,
-    const fmpz_mat_t A, slong Abits,
-    const fmpz_mat_t B, slong Bbits,
-    flint_bitcnt_t depth,
-    flint_bitcnt_t w)
-{
-    flint_printf("mfa not implemented");
-    flint_abort();
-}
-
 mp_size_t fft_split_bits_fmpz(
     mp_limb_t ** poly,
     const fmpz_t x,
@@ -62,30 +51,113 @@ void fft_combine_bits_fmpz(
     _fmpz_demote_val(x);
 }
 
+
+static void _either_fft_or_mfa(
+    ulong ** coeffs,
+    slong n, flint_bitcnt_t w,
+    ulong ** t1, ulong ** t2, ulong ** t3,
+    slong n1,
+    flint_bitcnt_t depth,
+    slong trunc,
+    slong limbs,
+    int use_mfa)
+{
+    ulong trunc2, rs, s, u;
+    slong l;
+
+    if (use_mfa)
+    {
+        fft_mfa_truncate_sqrt2(coeffs, n, w, t1, t2, t3, n1, trunc);
+
+        for (l = 0; l < 2*n; l++)
+            mpn_normmod_2expp1(coeffs[l], limbs);
+
+        /* the second half is out of order */
+        trunc2 = (trunc - 2*n)/n1;
+        for (s = 0; s < trunc2; s++)
+        {
+            rs = n_revbin(s, depth - depth/2 + 1);
+            for (u = 0; u < n1; u++)
+            {
+                l = 2*n + rs*n1 + u;
+                mpn_normmod_2expp1(coeffs[l], limbs);
+            }
+        }
+    }
+    else
+    {
+        fft_truncate_sqrt2(coeffs, n, w, t1, t2, t3, trunc);
+
+        for (l = 0; l < trunc; l++)
+            mpn_normmod_2expp1(coeffs[l], limbs);
+    }
+}
+
+static void _dot(
+    ulong* c,
+    ulong** A, slong Astride,
+    ulong** B, slong Bstride,
+    slong len,
+    slong limbs,
+    ulong* t,   /* temp of length limbs + 1 */
+    ulong* t2)  /* temp of length limbs + 1 */
+{
+    slong i;
+    flint_bitcnt_t nw = limbs*FLINT_BITS; /* n*w */
+
+    FLINT_ASSERT(len > 0);
+
+    i = 0;
+    do {
+        const ulong* a = A[i*Astride];
+        const ulong* b = B[i*Bstride];
+        if (i == 0)
+        {
+            c[limbs] = flint_mpn_mulmod_2expp1_basecase(c, a, b,
+                                                 2*a[limbs] + b[limbs], nw, t2);
+        }
+        else
+        {
+            t[limbs] = flint_mpn_mulmod_2expp1_basecase(t, a, b,
+                                                 2*a[limbs] + b[limbs], nw, t2);
+
+            c[limbs] += t[limbs];
+            c[limbs] += mpn_add_n(c, c, t, limbs);
+
+            mpn_normmod_2expp1(c, limbs);
+        }
+    } while (++i < len);
+}
+
+
 void _fmpz_mat_mul_truncate_sqrt2(
     fmpz_mat_t C,
     const fmpz_mat_t A, slong Abits,
     const fmpz_mat_t B, slong Bbits,
     flint_bitcnt_t depth,
     flint_bitcnt_t w,
-    slong j1, slong j2)
+    slong j1, slong j2,
+    const int use_mfa)
 {
     slong M = fmpz_mat_nrows(A);
     slong K = fmpz_mat_ncols(A);
     slong N = fmpz_mat_ncols(B);
-    slong Kbits = FLINT_BIT_COUNT(K);
+    slong clgK = FLINT_CLOG2(K);
     slong n = WORD(1) << depth;
-    ulong bits1 = (n*w - (depth + Kbits))/2;
-    slong Climbs = (Abits + Bbits + Kbits + FLINT_BITS - 1)/FLINT_BITS;
+    ulong trunc, sqrt;
+    ulong bits1 = (n*w - (depth + 1 + clgK))/2;
+    slong Climbs = (Abits + Bbits + clgK + FLINT_BITS - 1)/FLINT_BITS;
     slong limbs = (n*w)/FLINT_BITS;
     slong size = limbs + 1;
     slong i, j, l, h;
-    slong trunc;
     ulong * temp, *t, * t1, * t2, * t3, * Adata, * Bdata, * Cdata;
     ulong ** coeffs, ** Acoeffs, ** Bcoeffs, ** Ccoeffs;
 
     FLINT_ASSERT(limbs > 0);
     FLINT_ASSERT(limbs*FLINT_BITS == n*w);
+
+    /* should have K*min(j1,j2)*2^bits1 <= 2^(n*w) */
+    FLINT_ASSERT(j1 <= 2*n || j2 <= 2*n);
 
     /*
         1 array of length 2*size for mulmod_2expp1.
@@ -151,59 +223,79 @@ void _fmpz_mat_mul_truncate_sqrt2(
     FLINT_ASSERT(j2 > 0);
     FLINT_ASSERT(j1 + j2 - 1 <= 4*n);
 
-    /* trunc must be greater than 2n and even */
     trunc = j1 + j2 - 1;
     trunc = FLINT_MAX(trunc, 2*n + 1);
-    trunc += (trunc & 1);
+    if (use_mfa)
+    {
+        sqrt = UWORD(1) << (depth/2);
+        trunc = (trunc + 2*sqrt - 1) & (-2*sqrt);
+    }
+    else
+    {
+        sqrt = 1;
+        trunc = (trunc + 1) & -UWORD(2);
+    }
 
-    /* the coefficients don't come out of the fft normalized ? */
+    FLINT_ASSERT(trunc > 2*n);
+    FLINT_ASSERT(trunc % (2*sqrt) == 0);
+
     for (i = 0; i < M; i++)
     for (j = 0; j < K; j++)
     {
-        fft_truncate_sqrt2(Acoeffs + (i*K + j)*4*n, n, w, &t1, &t2, &t3, trunc);
-        for (l = 0; l < trunc; l++)
-            mpn_normmod_2expp1(Acoeffs[(i*K + j)*4*n + l], limbs);
+        _either_fft_or_mfa(Acoeffs + (i*K + j)*4*n, n, w,
+                            &t1, &t2, &t3, sqrt, depth, trunc, limbs, use_mfa);
     }
 
     for (i = 0; i < K; i++)
     for (j = 0; j < N; j++)
     {
-        fft_truncate_sqrt2(Bcoeffs + (i*N + j)*4*n, n, w, &t1, &t2, &t3, trunc);
-        for (l = 0; l < trunc; l++)
-            mpn_normmod_2expp1(Bcoeffs[(i*N + j)*4*n + l], limbs);
+        _either_fft_or_mfa(Bcoeffs + (i*N + j)*4*n, n, w,
+                            &t1, &t2, &t3, sqrt, depth, trunc, limbs, use_mfa);
     }
 
     /* pointwise dot products for C[i,j] */
     for (i = 0; i < M; i++)
     for (j = 0; j < N; j++)
     {
-        for (l = 0; l < trunc; l++)
+        if (use_mfa)
         {
-            mp_limb_t* c = Ccoeffs[l];
+            ulong trunc2, rs, s, u;
 
-            h = 0;
-            do {
-                mp_limb_t* a = Acoeffs[(i*K + h)*4*n + l];
-                mp_limb_t* b = Bcoeffs[(h*N + j)*4*n + l];
-                if (h == 0)
+            for (l = 0; l < 2*n; l++)
+            {
+                _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
+                                 Bcoeffs + (0*N + j)*4*n + l, N*4*n,
+                     K, limbs, t, temp);
+            }
+
+            /* second half is out of order */
+            trunc2 = (trunc - 2*n)/sqrt;
+            for (s = 0; s < trunc2; s++)
+            {
+                rs = n_revbin(s, depth - depth/2 + 1);
+                for (u = 0; u < sqrt; u++)
                 {
-                    c[limbs] = flint_mpn_mulmod_2expp1_basecase(c, a, b,
-                                             2*a[limbs] + b[limbs], n*w, temp);
-                }
-                else
-                {
-                    t[limbs] = flint_mpn_mulmod_2expp1_basecase(t, a, b,
-                                             2*a[limbs] + b[limbs], n*w, temp);
+                    l = 2*n + rs*sqrt + u;
 
-                    c[limbs] += t[limbs];
-                    c[limbs] += mpn_add_n(c, c, t, limbs);
-
-                    mpn_normmod_2expp1(c, limbs);
+                    _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
+                                     Bcoeffs + (0*N + j)*4*n + l, N*4*n,
+                         K, limbs, t, temp);
                 }
-            } while (++h < K);
+            }
+
+            ifft_mfa_truncate_sqrt2(Ccoeffs, n, w, &t1, &t2, &t3, sqrt, trunc);
         }
+        else
+        {
+            for (l = 0; l < trunc; l++)
+            {
+                _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
+                                 Bcoeffs + (0*N + j)*4*n + l, N*4*n,
+                     K, limbs, t, temp);
+            }
 
-        ifft_truncate_sqrt2(Ccoeffs, n, w, &t1, &t2, &t3, trunc);
+            ifft_truncate_sqrt2(Ccoeffs, n, w, &t1, &t2, &t3, trunc);
+        }
 
         /* pointwise scalar division by 4*n */
         for (l = 0; l < trunc; l++)
@@ -225,7 +317,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
     just like mpn_mul_main but
         bits = (n*w - (depth + 1))/2;
     is replaced by
-        bits = (n*w - (depth + Kbits))/2;
+        bits = (n*w - (depth + 1 + FLINT_CLOG2(k)))/2;
 */
 void _fmpz_mat_mul_fft(
    fmpz_mat_t C,
@@ -233,17 +325,18 @@ void _fmpz_mat_mul_fft(
    const fmpz_mat_t B, slong bbits)
 {
     slong K = fmpz_mat_ncols(A);
-    slong Kbits = FLINT_BIT_COUNT(K);
+    slong clgK = FLINT_CLOG2(K);
     slong /*off, */depth = 6;
     slong w = 1;
     slong n = WORD(1) << depth;
-    ulong bits = (n*w - (depth + Kbits))/2;
+    ulong bits = (n*w - (depth + 1 + clgK))/2;
     ulong bits1 = FLINT_MAX(abits, WORD(2000));
     ulong bits2 = FLINT_MAX(bbits, WORD(2000));
     /* when viewed as eval of poly at x=2^bits, the max length of the entries */
     slong j1 = (bits1 + bits - 1)/bits;
     /* ditto for B */
     slong j2 = (bits2 + bits - 1)/bits;
+    int use_mfa;
 
     FLINT_ASSERT(j1 + j2 - 1 > 2*n);
 
@@ -261,7 +354,7 @@ void _fmpz_mat_mul_fft(
             n *= 2;
         }
 
-        bits = (n*w - (depth + Kbits))/2;
+        bits = (n*w - (depth + 1 + clgK))/2;
         j1 = (bits1 + bits - 1)/bits;
         j2 = (bits2 + bits - 1)/bits;
     }
@@ -287,29 +380,33 @@ void _fmpz_mat_mul_fft(
             /* see if a smaller w will work */
             do {
                 w -= wadj;
-                bits = (n*w - (depth + Kbits))/2;
+                bits = (n*w - (depth + 1 + clgK))/2;
                 j1 = (bits1 + bits - 1)/bits;
                 j2 = (bits2 + bits - 1)/bits;
             } while (j1 + j2 - 1 <= 4*n && w > wadj);
             w += wadj;
         }
 
-        bits = (n*w - (depth + Kbits))/2;
-        j1 = (bits1 + bits - 1)/bits;
-        j2 = (bits2 + bits - 1)/bits;
-
-        _fmpz_mat_mul_truncate_sqrt2(C, A, abits, B, bbits, depth, w, j1, j2);
+        use_mfa = 0;
     }
     else
     {
+#if 0
+    this does not work either
         if (j1 + j2 - 1 <= 3*n)
         {
             depth--;
             w *= 3;
         }
-
-        _fmpz_mat_mul_mfa_truncate_sqrt2(C, A, abits, B, bbits, depth, w);
+#endif
+        use_mfa = 1;
     }
+
+    bits = (n*w - (depth + 1 + clgK))/2;
+    j1 = (bits1 + bits - 1)/bits;
+    j2 = (bits2 + bits - 1)/bits;
+
+    _fmpz_mat_mul_truncate_sqrt2(C, A, abits, B, bbits, depth, w, j1, j2, use_mfa);
 }
 
 void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)

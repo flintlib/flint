@@ -382,7 +382,8 @@ Matrix Fourier Transforms
     matrix fourier algorithm is used for the left and right FFTs. The total 
     transform length is `4n` where ``n = 2^depth`` so that the left and
     right transforms are both length `2n`. We require ``trunc > 2*n`` and
-    that ``trunc`` is divisible by ``2*n1`` (explained below).
+    that ``trunc`` is divisible by ``2*n1`` (explained below). The coefficients
+    are produced in an order different from ``fft_truncate_sqrt2``.
 
     The matrix fourier algorithm, which is applied to each transform of length
     `2n`, works as follows. We set ``n1`` to a power of 2 about the square
