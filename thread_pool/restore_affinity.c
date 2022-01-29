@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+#include <sched.h>
+
 #include "thread_pool.h"
 
 int thread_pool_restore_affinity(thread_pool_t T)
@@ -23,14 +26,14 @@ int thread_pool_restore_affinity(thread_pool_t T)
     for (i = 0; i < T->length; i++)
     {
         errorno = pthread_setaffinity_np(D[i].pth, sizeof(cpu_set_t),
-                                                        &T->original_affinity);
+                                            (cpu_set_t *)T->original_affinity);
         if (errorno != 0)
             return errorno;
     }
 
     /* restore affinity for main thread */
     errorno = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t),
-                                                        &T->original_affinity);
+                                        (cpu_set_t *)T->original_affinity);
     if (errorno != 0)
         return errorno;
 #endif

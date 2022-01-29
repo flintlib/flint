@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+#include <sched.h>
+
 #include "thread_pool.h"
 
 /*

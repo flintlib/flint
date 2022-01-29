@@ -12,14 +12,6 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
-/* for some reason this define needs to be outside of the next if */
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#if FLINT_USES_CPUSET
-#include <sched.h>
-#endif
-
 #include "flint.h"
 
 #if FLINT_USES_PTHREAD
@@ -52,7 +44,7 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 typedef struct
 {
 #if FLINT_USES_CPUSET && FLINT_USES_PTHREAD
-    cpu_set_t original_affinity;
+    void * original_affinity;
 #endif
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;

@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+#include <sched.h>
+
 #include "thread_pool.h"
 
 thread_pool_t global_thread_pool;
@@ -73,10 +76,11 @@ void thread_pool_init(thread_pool_t T, slong size)
     T->length = size;
 
 #if FLINT_USES_CPUSET && FLINT_USES_PTHREAD
+    T->original_affinity = flint_malloc(sizeof(cpu_set_t));
     if (0 != pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t),
-                                                        &T->original_affinity))
+                                        (cpu_set_t *)T->original_affinity))
     {
-        CPU_ZERO(&T->original_affinity);
+        CPU_ZERO((cpu_set_t *)T->original_affinity);
     }
 #endif
 
