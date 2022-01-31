@@ -209,7 +209,7 @@ int fmpz_poly_pfrac_precompute(
             I->bits[i] = 1;
     }
 
-    fmpz_set_ui(I->p, UWORD(1) << (FLINT_BITS - 2));
+    fmpz_set_ui(I->p, UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX));
 
 next_p:
 

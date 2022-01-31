@@ -121,12 +121,12 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
     bits1 = FLINT_ABS(bits1);
     bits2 = FLINT_ABS(bits2);
 
-    if (bits1 <= FLINT_BITS - 2 && bits2 <= FLINT_BITS - 2 &&
+    if (bits1 <= SMALL_FMPZ_BITCOUNT_MAX && bits2 <= SMALL_FMPZ_BITCOUNT_MAX &&
         (len2 < 50 || (4 * len2 >= 3 * n && n < 150 + bits1 + bits2)))
     {
         rbits = bits1 + bits2 + FLINT_BIT_COUNT(len2);
 
-        if (rbits <= FLINT_BITS - 2)
+        if (rbits <= SMALL_FMPZ_BITCOUNT_MAX)
         {
             _fmpz_poly_mullow_tiny1(res, poly1, len1, poly2, len2, n);
             return;

@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
         flint_randinit(randstate);
 
-        fmpz_init_set_ui(p, UWORD(1) << (FLINT_BITS - 2));
+        fmpz_init_set_ui(p, UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX));
         fmpz_nextprime(p, p, 1);
 
         fq_nmod_ctx_init(ctx, p, 6, "a");

@@ -28,7 +28,7 @@ fmpz_mul_2exp_old(fmpz_t f, const fmpz_t g, ulong exp)
         {
             fmpz_set_si(f, 0);
         }
-        else if (bits + exp <= FLINT_BITS - 2)  /* result will fit in small */
+        else if (bits + exp <= SMALL_FMPZ_BITCOUNT_MAX)  /* result will fit in small */
         {
             fmpz_set_si(f, d << exp);
         }

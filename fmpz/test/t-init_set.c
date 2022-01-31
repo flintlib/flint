@@ -33,7 +33,7 @@ main(void)
         fmpz_t a, b;
 
         fmpz_init(a);
-        fmpz_randtest(a, state, FLINT_BITS - 2);
+        fmpz_randtest(a, state, SMALL_FMPZ_BITCOUNT_MAX);
         fmpz_init_set(b, a);
 
         result = fmpz_equal(a, b);

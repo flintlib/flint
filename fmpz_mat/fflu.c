@@ -23,7 +23,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
     ulong p1h, p1l, p2h, p2l, uden = 0, dinv = 0, quo;
     ulong FLINT_SET_BUT_UNUSED(rem);
     slong mbits = fmpz_mat_max_bits(A);
-    int small = FLINT_ABS(mbits) <= FLINT_BITS - 2;
+    int small = FLINT_ABS(mbits) <= SMALL_FMPZ_BITCOUNT_MAX;
     int dsgn = 0, sgn, den1 = 0, work_to_do;
 
     if (fmpz_mat_is_empty(A))
@@ -151,7 +151,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
             count_leading_zeros(norm, uden);
             invert_limb(dinv, uden << norm);
 
-            if (fmpz_sizeinbase(den, 2) > FLINT_BITS - 2)
+            if (fmpz_sizeinbase(den, 2) > SMALL_FMPZ_BITCOUNT_MAX)
                 small = 0;
         }
 

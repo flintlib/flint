@@ -40,7 +40,7 @@ main(void)
         fmpz_t a;
 
         fmpz_init(a);
-        fmpz_randtest(a, state, FLINT_BITS - 2);
+        fmpz_randtest(a, state, SMALL_FMPZ_BITCOUNT_MAX);
 
         _fmpz_promote_val(a);
         _fmpz_demote_val(a);

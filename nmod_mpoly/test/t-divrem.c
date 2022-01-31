@@ -46,9 +46,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        exp_bits = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
+        exp_bits = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 1;
+        exp_bits1 = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 1;
+        exp_bits2 = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 1;
 
         for (j = 0; j < 4; j++)
         {

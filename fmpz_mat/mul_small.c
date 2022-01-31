@@ -360,7 +360,7 @@ void _fmpz_mat_mul_small_internal(
     mainarg.Brows = B->rows;
     mainarg.BL = TMP_ARRAY_ALLOC(n*k_blk_ct*k_blk_sz, slong);
 
-    if (Cbits <= FLINT_BITS - 2)
+    if (Cbits <= SMALL_FMPZ_BITCOUNT_MAX)
         mainarg.words = 1;
     else if (Cbits <= 2*FLINT_BITS - 1)
         mainarg.words = 2;

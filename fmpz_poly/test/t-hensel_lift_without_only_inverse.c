@@ -80,13 +80,13 @@ main(void)
             length = n_randint(state, 200) + 2;  
             do { fmpz_poly_randtest(F_poly2, state, length, bits); } 
             while (F_poly2->length < 2);
-            fmpz_set_ui(F_poly2->coeffs, n_randbits(state, FLINT_MIN(bits, FLINT_BITS - 2)));
+            fmpz_set_ui(F_poly2->coeffs, n_randbits(state, FLINT_MIN(bits, SMALL_FMPZ_BITCOUNT_MAX)));
             fmpz_set_ui(F_poly2->coeffs + F_poly2->length - 1, 1);
 
             length = n_randint(state, 200) + 2;  
             do { fmpz_poly_randtest(F_poly3, state, length, bits); } 
             while (F_poly3->length < 2);
-            fmpz_set_ui(F_poly3->coeffs, n_randbits(state, FLINT_MIN(bits, FLINT_BITS - 2)));
+            fmpz_set_ui(F_poly3->coeffs, n_randbits(state, FLINT_MIN(bits, SMALL_FMPZ_BITCOUNT_MAX)));
             fmpz_set_ui(F_poly3->coeffs + F_poly3->length - 1, 1);
 
             fmpz_poly_mul(F_poly, F_poly2, F_poly3);

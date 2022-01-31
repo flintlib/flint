@@ -33,7 +33,7 @@ main(void)
         flint_bitcnt_t exp_bits1, exp_bits2, bits;
         mp_limb_t modulus;
 
-        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
         nmod_mpoly_init(f, ctx);

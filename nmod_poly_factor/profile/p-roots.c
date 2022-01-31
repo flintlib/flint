@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
         nmod_poly_factor_t r;
         flint_rand_t state;
         timeit_t timer;
-        ulong p = n_nextprime(UWORD(1) << (FLINT_BITS - 2), 1);
+        ulong p = n_nextprime(UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX), 1);
 
         flint_randinit(state);
 

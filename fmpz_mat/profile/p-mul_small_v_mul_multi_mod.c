@@ -48,10 +48,10 @@ int main(void)
         min2 = 10000000000;
         max2 = 0;
 
-        for (Abits = FLINT_BITS/2; Abits <= FLINT_BITS - 2; Abits += FLINT_BITS)
-        for (Bbits = Abits; Bbits <= FLINT_BITS - 2; Bbits += 16)
+        for (Abits = FLINT_BITS/2; Abits <= SMALL_FMPZ_BITCOUNT_MAX; Abits += FLINT_BITS)
+        for (Bbits = Abits; Bbits <= SMALL_FMPZ_BITCOUNT_MAX; Bbits += 16)
         {
-            if (FLINT_BIT_COUNT(dim) + Abits + Bbits <= FLINT_BITS - 2)
+            if (FLINT_BIT_COUNT(dim) + Abits + Bbits <= SMALL_FMPZ_BITCOUNT_MAX)
                 continue;
 
             fmpz_mat_randtest(A, state, Abits);

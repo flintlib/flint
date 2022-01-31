@@ -95,7 +95,7 @@ _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
     bits = FLINT_ABS(bits);
     out_bits = bits + n + 1;
 
-    if (out_bits <= FLINT_BITS - 2)
+    if (out_bits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
         for (i = n - 2; i >= 0; i--)
             for (j = i; j < n - 1; j++)

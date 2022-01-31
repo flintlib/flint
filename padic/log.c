@@ -46,7 +46,7 @@
 
 slong _padic_log_bound(slong v, slong N, const fmpz_t prime)
 {
-    if (N >= (WORD(1) << (FLINT_BITS - 2)))
+    if (N >= (WORD(1) << (SMALL_FMPZ_BITCOUNT_MAX)))
     {
         flint_printf("Exception (_padic_log_bound).  N = %wd is too large.\n", N);
         flint_abort();

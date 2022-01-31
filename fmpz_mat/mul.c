@@ -197,7 +197,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 #endif
 
-    if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
+    if (abits <= SMALL_FMPZ_BITCOUNT_MAX && bbits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
         /*
             A and B are small fmpz's: strassen is effective at large dimension
@@ -209,7 +209,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         /* first take care of small cases */
         if (ar < 9 || ar + br < 20)
         {
-            if (cbits <= FLINT_BITS - 2)
+            if (cbits <= SMALL_FMPZ_BITCOUNT_MAX)
                 _fmpz_mat_mul_small_1(C, A, B);
             else if (cbits <= 2*FLINT_BITS - 1)
                 _fmpz_mat_mul_small_2a(C, A, B);
@@ -224,13 +224,13 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
             /* do more mul_small with more threads */
             limit = 300*flint_get_num_threads();
 
-            if (cbits <= FLINT_BITS - 2 && dim - 1000 > limit)
+            if (cbits <= SMALL_FMPZ_BITCOUNT_MAX && dim - 1000 > limit)
             {
                 /* strassen avoids big fmpz intermediates */
                 fmpz_mat_mul_strassen(C, A, B);
                 return;
             }
-            else if (cbits > FLINT_BITS - 2 && dim - 4000 > limit)
+            else if (cbits > SMALL_FMPZ_BITCOUNT_MAX && dim - 4000 > limit)
             {
                 _fmpz_mat_mul_multi_mod(C, A, B, sign, cbits);
                 return;

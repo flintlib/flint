@@ -35,7 +35,7 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
         {
             fmpz_set_ui(f, u1);
         }
-        else if (exp * bits <= FLINT_BITS - 2)
+        else if (exp * bits <= SMALL_FMPZ_BITCOUNT_MAX)
         {
             fmpz_set_ui(f, n_pow(u1, exp));
         }

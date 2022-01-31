@@ -15,11 +15,11 @@ void fmpz_setbit(fmpz_t f, ulong i)
 {
     if (!COEFF_IS_MPZ(*f))
     {
-        if (i < FLINT_BITS - 2)
+        if (i < SMALL_FMPZ_BITCOUNT_MAX)
         {
             *f |= (WORD(1) << i);
         }
-        else  /* i >= FLINT_BITS - 2 */
+        else  /* i >= SMALL_FMPZ_BITCOUNT_MAX */
         {
             __mpz_struct *ptr = _fmpz_promote_val(f);
 

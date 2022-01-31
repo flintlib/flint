@@ -74,7 +74,7 @@ main(void)
 
         padic_t a, b, c;
 
-        prime = n_randprime(state, 2 + n_randint(state, FLINT_BITS - 2), 0);
+        prime = n_randprime(state, 2 + n_randint(state, SMALL_FMPZ_BITCOUNT_MAX), 0);
         fmpz_init_set_ui(p, prime);
         N = n_randint(state, PADIC_TEST_PREC_MAX);
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);

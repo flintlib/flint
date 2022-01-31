@@ -26,7 +26,7 @@ void sample_xgcd_small(void * arg, ulong count)
     fmpz_init(b);
     
     fmpz_init(nmax);
-    fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS - 2);
+    fmpz_set_d_2exp(nmax, 1.0, SMALL_FMPZ_BITCOUNT_MAX);
 
     prof_start();
     for (int ix = 0; ix < count; ix++)
@@ -128,7 +128,7 @@ void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
     fmpz_init(b);
     
     fmpz_init(nmax);
-    fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS - 2);
+    fmpz_set_d_2exp(nmax, 1.0, SMALL_FMPZ_BITCOUNT_MAX);
 
     prof_start();
     for (int ix = 0; ix < count; ix++)

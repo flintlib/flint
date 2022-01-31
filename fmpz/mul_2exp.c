@@ -29,14 +29,14 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     c1abs = FLINT_ABS(c1);
     c1bits = FLINT_BIT_COUNT(c1abs);
 
-    if (c1bits + exp <= FLINT_BITS - 2)  /* Result fits inside a small fmpz */
+    if (c1bits + exp <= SMALL_FMPZ_BITCOUNT_MAX)  /* Result fits inside a small fmpz */
     {
         if (COEFF_IS_MPZ(*f))
             _fmpz_clear_mpz(*f);
 
         *f = c1 << exp;
     }
-    else if (c1bits <= FLINT_BITS - 2)   /* g is small */
+    else if (c1bits <= SMALL_FMPZ_BITCOUNT_MAX)   /* g is small */
     {
         ulong expred = exp % GMP_NUMB_BITS;
         int alloc = 1 + (FLINT_BITS != GMP_NUMB_BITS) + exp / GMP_NUMB_BITS

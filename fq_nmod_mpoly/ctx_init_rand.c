@@ -27,7 +27,7 @@ void fq_nmod_mpoly_ctx_init_rand(fq_nmod_mpoly_ctx_t ctx, flint_rand_t state,
     {
         p = n_randlimb(state);
         p |= UWORD(1) << (FLINT_BITS - 1);
-        p &= ~(UWORD(1) << (FLINT_BITS - 2));
+        p &= ~(UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX));
     }
     else
     {
