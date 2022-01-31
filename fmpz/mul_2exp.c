@@ -67,30 +67,12 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         if (tmp <= 0)
         {
             limbs[alloc - 1] = c1abs << expred;
-#if FLINT_BITS != GMP_LIMB_BITS
-            return;
-#endif
         }
-#if FLINT_BITS == GMP_LIMB_BITS
         else
         {
             limbs[alloc - 1] = c1abs >> (FLINT_BITS - expred);
             limbs[alloc - 2] = c1abs << expred;
         }
-#else   /* FLINT_BITS == 2 * GMP_LIMB_BITS */
-        tmp -= GMP_LIMB_BITS;
-        if (tmp <= 0)
-        {
-            ulong * haha = (ulong *) (limbs + alloc - 2);
-            *haha = c1abs << expred;
-        }
-        else
-        {
-            ulong * haha = (ulong *) (limbs + alloc - 3);
-            *haha = c1abs << expred;
-            limbs[alloc - 1] = c1abs >> tmp;
-        }
-#endif
     }
     else                                /* g is large */
     {
