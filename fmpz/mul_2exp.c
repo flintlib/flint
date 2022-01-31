@@ -38,9 +38,9 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     }
     else if (c1bits <= SMALL_FMPZ_BITCOUNT_MAX)   /* g is small */
     {
-        ulong expred = exp % GMP_NUMB_BITS;
-        int alloc = 1 + (FLINT_BITS != GMP_NUMB_BITS) + exp / GMP_NUMB_BITS
-            + ((c1bits + expred) > GMP_NUMB_BITS);
+        ulong expred = exp % GMP_LIMB_BITS;
+        int alloc = 1 + (FLINT_BITS != GMP_LIMB_BITS) + exp / GMP_LIMB_BITS
+            + ((c1bits + expred) > GMP_LIMB_BITS);
         mp_limb_t * limbs;
         slong tmp;
 
@@ -63,22 +63,22 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         mf->_mp_size = (c1 > 0) ? alloc : -alloc;
         memset(limbs, 0, sizeof(mp_limb_t) * (alloc - 1));
 
-        tmp = (slong) (c1bits + expred) - GMP_NUMB_BITS;
+        tmp = (slong) (c1bits + expred) - GMP_LIMB_BITS;
         if (tmp <= 0)
         {
             limbs[alloc - 1] = c1abs << expred;
-#if FLINT_BITS != GMP_NUMB_BITS
+#if FLINT_BITS != GMP_LIMB_BITS
             return;
 #endif
         }
-#if FLINT_BITS == GMP_NUMB_BITS
+#if FLINT_BITS == GMP_LIMB_BITS
         else
         {
             limbs[alloc - 1] = c1abs >> (FLINT_BITS - expred);
             limbs[alloc - 2] = c1abs << expred;
         }
-#else   /* FLINT_BITS == 2 * GMP_NUMB_BITS */
-        tmp -= GMP_NUMB_BITS;
+#else   /* FLINT_BITS == 2 * GMP_LIMB_BITS */
+        tmp -= GMP_LIMB_BITS;
         if (tmp <= 0)
         {
             ulong * haha = (ulong *) (limbs + alloc - 2);
@@ -102,7 +102,7 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
              * reallocating them. */
             mf = _fmpz_new_mpz();
             *f = PTR_TO_COEFF(mf);
-            _mpz_realloc(mf, FLINT_ABS(mg->_mp_size) + exp / GMP_NUMB_BITS + 1);
+            _mpz_realloc(mf, FLINT_ABS(mg->_mp_size) + exp / GMP_LIMB_BITS + 1);
         }
         else
             mf = COEFF_TO_PTR(*f);
