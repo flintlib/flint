@@ -61,7 +61,7 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         }
         limbs = mf->_mp_d;
         mf->_mp_size = (c1 > 0) ? alloc : -alloc;
-        memset(limbs, 0, sizeof(mp_limb_t) * (alloc - 1));
+        memset(limbs, 0, sizeof(mp_limb_t) * alloc);
 
         tmp = (slong) (c1bits + expred) - GMP_LIMB_BITS;
         if (tmp <= 0)
