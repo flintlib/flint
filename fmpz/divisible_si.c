@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -14,22 +15,23 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int fmpz_divisible_si(const fmpz_t x, slong p)
+int
+fmpz_divisible_si(const fmpz_t f, slong g)
 {
-    fmpz y = *x;
+    slong c = *f;
 
-    if (y == WORD(0))
+    if (c == WORD(0))
     {
         return 1;
     }
 
-    if (!COEFF_IS_MPZ(y))
+    if (!COEFF_IS_MPZ(c))
     {
-        return !(y % p);
+        return !(c % g);
     }
     else
     {
-        return flint_mpz_divisible_ui_p(COEFF_TO_PTR(y), p);
+        return flint_mpz_divisible_ui_p(COEFF_TO_PTR(c), FLINT_ABS(g));
     }
 }
 
