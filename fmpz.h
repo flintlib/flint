@@ -623,7 +623,13 @@ FLINT_DLL void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
 FLINT_DLL ulong fmpz_fdiv_ui(const fmpz_t g, ulong h);
 
-FLINT_DLL ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
+FMPZ_INLINE ulong
+fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
+{
+    h = fmpz_fdiv_ui(g, h);
+    fmpz_set_ui(f, h);
+    return h;
+}
 
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 

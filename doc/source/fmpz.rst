@@ -790,13 +790,13 @@ Basic arithmetic
 
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Returns the remainder of `g` divided by `h` such that the remainder is
+    Sets `f` to the remainder of `g` divided by `h` such that the remainder is
     positive. Assumes that `h` is not zero.
 
-.. function:: ulong fmpz_mod_ui(const fmpz_t g, ulong h)
+.. function:: ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
 
-    Returns the remainder of `g` divided by `h` such that the remainder is
-    positive. Raises an exception if `h` is zero.
+    Sets `f` to the remainder of `g` divided by `h` such that the remainder is
+    positive and also returns this value. Raises an exception if `h` is zero.
 
 .. function:: void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
