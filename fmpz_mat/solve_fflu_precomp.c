@@ -50,8 +50,8 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
     ulong FLINT_SET_BUT_UNUSED(rem);
     slong fbits = fmpz_mat_max_bits(FFLU);
     slong bbits = fmpz_mat_max_bits(B);
-    int small = FLINT_ABS(fbits) <= FLINT_BITS - 2
-             && FLINT_ABS(bbits) <= FLINT_BITS - 2;
+    int small = FLINT_ABS(fbits) <= SMALL_FMPZ_BITCOUNT_MAX
+             && FLINT_ABS(bbits) <= SMALL_FMPZ_BITCOUNT_MAX;
     int sgn, dsgn = 0, den1 = 0, work_to_do, flag = 1;
     fmpz_mat_t Xx;
     fmpz * diag;

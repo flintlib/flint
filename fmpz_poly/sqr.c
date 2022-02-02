@@ -113,11 +113,11 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, slong len)
     bits = _fmpz_vec_max_bits(poly, len);
     bits = FLINT_ABS(bits);
 
-    if (bits <= FLINT_BITS - 2 && len < 50 + 3 * bits)
+    if (bits <= SMALL_FMPZ_BITCOUNT_MAX && len < 50 + 3 * bits)
     {
         rbits = 2 * bits + FLINT_BIT_COUNT(len);
 
-        if (rbits <= FLINT_BITS - 2)
+        if (rbits <= SMALL_FMPZ_BITCOUNT_MAX)
         {
             _fmpz_poly_sqr_tiny1(res, poly, len);
             return;

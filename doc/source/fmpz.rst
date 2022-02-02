@@ -690,6 +690,8 @@ Basic arithmetic
 
     Sets `f` to `g \times 2^e`.
 
+    Note: Assumes that ``e + FLINT_BITS`` does not overflow.
+
 .. function:: void fmpz_one_2exp(fmpz_t f, ulong e)
 
     Sets `f` to `2^e`.

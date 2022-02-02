@@ -443,7 +443,7 @@ slong _fmpz_mpoly_mulsub_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_allo
     /* whether input coeffs are small, thus output coeffs fit in three words */
     FLINT_ASSERT(ends[0] >= startidx);
     FLINT_ASSERT(S->coeff_bits == FLINT_ABS(_fmpz_vec_max_bits(Ccoeff, Clen)));
-    small = S->coeff_bits <= FLINT_BITS - 2
+    small = S->coeff_bits <= SMALL_FMPZ_BITCOUNT_MAX
             && _fmpz_mpoly_fits_small(Bcoeff, Blen)
             && FLINT_ABS(_fmpz_vec_max_bits(Dcoeff, Dlen)) < 3*FLINT_BITS - 3;
 
@@ -731,7 +731,7 @@ slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
     /* whether input coeffs are small, thus output coeffs fit in three words */
     FLINT_ASSERT(ends[0] >= startidx);
     FLINT_ASSERT(S->coeff_bits == FLINT_ABS(_fmpz_vec_max_bits(Ccoeff, Clen)));
-    small = S->coeff_bits <= FLINT_BITS - 2
+    small = S->coeff_bits <= SMALL_FMPZ_BITCOUNT_MAX
             && _fmpz_mpoly_fits_small(Bcoeff, Blen)
             && FLINT_ABS(_fmpz_vec_max_bits(Dcoeff, Dlen)) < 3*FLINT_BITS - 3;
 
@@ -949,9 +949,9 @@ slong _fmpz_mpoly_divides_stripe1(
 
     /* whether intermediate computations A - Q*B will fit in three words */
     /* allow one bit for sign, one bit for subtraction NOT QUITE */
-    small = S->coeff_bits <= FLINT_BITS - 2
+    small = S->coeff_bits <= SMALL_FMPZ_BITCOUNT_MAX
          && FLINT_ABS(Acoeffbits) <= (S->coeff_bits
-                                     + FLINT_BIT_COUNT(Blen) + FLINT_BITS - 2);
+                                     + FLINT_BIT_COUNT(Blen) + SMALL_FMPZ_BITCOUNT_MAX);
 
     next_loc = Blen + 4;   /* something bigger than heap can ever be */
 
@@ -1288,9 +1288,9 @@ slong _fmpz_mpoly_divides_stripe(
 
     /* whether intermediate computations A - Q*B will fit in three words */
     /* allow one bit for sign, one bit for subtraction NOT QUITE */
-    small = S->coeff_bits <= FLINT_BITS - 2
+    small = S->coeff_bits <= SMALL_FMPZ_BITCOUNT_MAX
          && FLINT_ABS(Acoeffbits) <= (S->coeff_bits
-                                     + FLINT_BIT_COUNT(Blen) + FLINT_BITS - 2);
+                                     + FLINT_BIT_COUNT(Blen) + SMALL_FMPZ_BITCOUNT_MAX);
 
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);

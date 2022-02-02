@@ -738,7 +738,7 @@ int fmpz_mpoly_factor_irred_zippel(
 
     alpha_count = 0;
     alpha_bits = 10;
-    p = UWORD(1) << (FLINT_BITS - 2);
+    p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
 
 next_alpha:
 

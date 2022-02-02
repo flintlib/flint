@@ -20,7 +20,7 @@ void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     if (!COEFF_IS_MPZ(d))  /* g is small */
     {
-        fmpz_set_si(f, d>>FLINT_MIN(exp, FLINT_BITS - 2));
+        fmpz_set_si(f, d>>FLINT_MIN(exp, SMALL_FMPZ_BITCOUNT_MAX));
     }
     else  /*g is large */
     {

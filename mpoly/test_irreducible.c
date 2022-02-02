@@ -550,7 +550,7 @@ static int convex_hull_is_indecomposable(
     }
 
     /*
-        since |V[i]| < 2^(FLINT_BITS - 3), all |E[i]| < 2^(FLINT_BITS - 2) and
+        since |V[i]| < 2^(FLINT_BITS - 3), all |E[i]| < 2^(SMALL_FMPZ_BITCOUNT_MAX) and
         no addition V[i] + E[j] will overflow
     */
     prevx = V[0].x;

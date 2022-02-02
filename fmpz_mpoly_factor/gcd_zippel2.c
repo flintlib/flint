@@ -1658,7 +1658,7 @@ int fmpz_mpolyl_gcd_zippel2(
     fmpz_mpoly_degrees_si(Bdegs, B, ctx);
 
     GdegboundXY = FLINT_MIN(A->exps[0], B->exps[0]);
-    p_sp = UWORD(1) << (FLINT_BITS - 2);
+    p_sp = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     for (point_try_count = 0; point_try_count < 10; point_try_count++)
     {
         p_sp = n_nextprime(p_sp, 1);
@@ -2186,7 +2186,7 @@ pick_bma_prime:
     FLINT_ASSERT(0 <= which_check && which_check <= 2);
     fmpz_set(Hmodulus, p);
 
-    p_sp = UWORD(1) << (FLINT_BITS - 2);
+    p_sp = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
 
 pick_zip_prime:
 

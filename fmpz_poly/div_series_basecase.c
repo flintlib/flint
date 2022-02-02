@@ -104,7 +104,7 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
 
         for (i = 1; i < n; i++)
         {
-            if (i >= nsmall || Qbits > FLINT_BITS - 2 || Bbits[i] > FLINT_BITS - 2)
+            if (i >= nsmall || Qbits > SMALL_FMPZ_BITCOUNT_MAX || Bbits[i] > SMALL_FMPZ_BITCOUNT_MAX)
             {
                 /* Can't use fast code. */
                 bits = WORD_MAX;

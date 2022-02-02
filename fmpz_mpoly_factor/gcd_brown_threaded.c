@@ -806,7 +806,7 @@ int fmpz_mpolyl_gcd_brown_threaded_pool(
     splitbase->A = A;
     splitbase->B = B;
     splitbase->ctx = ctx;
-    splitbase->p = UWORD(1) << (FLINT_BITS - 2);
+    splitbase->p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     splitbase->I = I;
 
 #if FLINT_USES_PTHREAD

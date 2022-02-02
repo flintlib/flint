@@ -50,8 +50,8 @@ int main(void)
         fmpz_mat_init(C, m, n);
         fmpz_mat_init(D, m, n);
 
-        fmpz_mat_randtest(A, state, n_randint(state, FLINT_BITS - 2) + 1);
-        fmpz_mat_randtest(B, state, n_randint(state, FLINT_BITS - 2) + 1);
+        fmpz_mat_randtest(A, state, n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 1);
+        fmpz_mat_randtest(B, state, n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 1);
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
         fmpz_mat_randtest(D, state, n_randint(state, 200) + 1);
 

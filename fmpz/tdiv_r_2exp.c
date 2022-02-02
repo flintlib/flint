@@ -22,12 +22,12 @@ void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     {
         if (d >= 0)
         {
-            fmpz_set_ui(f, exp < (FLINT_BITS - 2) ? d & ((WORD(1) << exp) - 1) : d);
+            fmpz_set_ui(f, exp < (SMALL_FMPZ_BITCOUNT_MAX) ? d & ((WORD(1) << exp) - 1) : d);
         }
         else
         {
             d = -d;
-            fmpz_neg_ui(f, exp < (FLINT_BITS - 2) ? d & ((WORD(1) << exp) - 1) : d);
+            fmpz_neg_ui(f, exp < (SMALL_FMPZ_BITCOUNT_MAX) ? d & ((WORD(1) << exp) - 1) : d);
         }
     }
     else  /*g is large */

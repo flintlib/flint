@@ -27,7 +27,7 @@ void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
         __mpz_struct *res_mpz = _fmpz_promote(res);
         mpz_nextprime(res_mpz, COEFF_TO_PTR(*n));
     }
-    else if (FLINT_BIT_COUNT(*n) < FLINT_BITS - 2)
+    else if (FLINT_BIT_COUNT(*n) < SMALL_FMPZ_BITCOUNT_MAX)
     {
         /* n and res will both be small */
         _fmpz_demote(res);

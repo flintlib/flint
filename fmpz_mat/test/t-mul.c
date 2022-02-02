@@ -77,7 +77,7 @@ int main(void)
             flint_abort();
         }
 
-        if (bits <= FLINT_BITS - 2)
+        if (bits <= SMALL_FMPZ_BITCOUNT_MAX)
         {
             _fmpz_mat_mul_small_1(C, A, B);
 
@@ -93,7 +93,7 @@ int main(void)
             }
         }
 
-        if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2 && bits <= 2 * FLINT_BITS - 1)
+        if (abits <= SMALL_FMPZ_BITCOUNT_MAX && bbits <= SMALL_FMPZ_BITCOUNT_MAX && bits <= 2 * FLINT_BITS - 1)
         {
             _fmpz_mat_mul_small_2a(C, A, B);
 
@@ -109,7 +109,7 @@ int main(void)
             }
         }
 
-        if (abits <= FLINT_BITS - 2 && bbits <= FLINT_BITS - 2)
+        if (abits <= SMALL_FMPZ_BITCOUNT_MAX && bbits <= SMALL_FMPZ_BITCOUNT_MAX)
         {
             _fmpz_mat_mul_small_2b(C, A, B);
 

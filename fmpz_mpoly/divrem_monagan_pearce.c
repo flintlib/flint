@@ -67,8 +67,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     bits2 = _fmpz_vec_max_bits(poly2, len2);
     bits3 = _fmpz_vec_max_bits(poly3, len3);
     /* allow one bit for sign, one bit for subtraction */
-    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
-          && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + SMALL_FMPZ_BITCOUNT_MAX)
+          && FLINT_ABS(bits3) <= SMALL_FMPZ_BITCOUNT_MAX;
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
@@ -392,8 +392,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
     bits2 = _fmpz_vec_max_bits(poly2, len2);
     bits3 = _fmpz_vec_max_bits(poly3, len3);
     /* allow one bit for sign, one bit for subtraction */
-    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
-         && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + SMALL_FMPZ_BITCOUNT_MAX)
+         && FLINT_ABS(bits3) <= SMALL_FMPZ_BITCOUNT_MAX;
 
 
     /* alloc array of heap nodes which can be chained together */

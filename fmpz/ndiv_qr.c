@@ -76,7 +76,7 @@ fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
         _fmpz_demote(r);
 
         if (FLINT_ABS(*b) == 1) /* avoid overflow in case */
-        {                       /* a = 2^(FLINT_BITS - 2) */
+        {                       /* a = 2^(SMALL_FMPZ_BITCOUNT_MAX) */
             fmpz_set_si(q, A * FLINT_SGN(B));
             fmpz_zero(r);
             return;

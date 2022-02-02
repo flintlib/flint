@@ -69,10 +69,10 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
    /* compute bound on poly2 - q*poly3 assuming quotient remains small */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
-   /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
+   /* we assume a bound of SMALL_FMPZ_BITCOUNT_MAX for coefficients of the quotient */
    bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3) - 2;
 
-   small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+   small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= SMALL_FMPZ_BITCOUNT_MAX;
    bits1 += 2; /* incr. so poly2 - q*poly3 doesn't overflow and for sign */
  
    /* input coeffs small and intermediate computations fit two words */
@@ -510,10 +510,10 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
    
    /* bound poly2 coeffs and check input/output coeffs likely small */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
-   /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
+   /* we assume a bound of SMALL_FMPZ_BITCOUNT_MAX for coefficients of the quotient */
    bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3) - 2;
 
-   small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+   small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= SMALL_FMPZ_BITCOUNT_MAX;
 
    /* alloc space for copy of coeff/chunk of poly2 */
 
@@ -687,7 +687,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
 
                /* check the quotient didn't have large coefficients */
                if (FLINT_ABS(_fmpz_vec_max_bits((*polyq) + len,
-                                                      n1[i])) > FLINT_BITS - 2)
+                                                      n1[i])) > SMALL_FMPZ_BITCOUNT_MAX)
                {
                   for (j = 0; j < len; j++)
                      _fmpz_demote((*polyq) + j);

@@ -53,8 +53,8 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     bits2 = _fmpz_vec_max_bits(poly2, len2);
     bits3 = _fmpz_vec_max_bits(poly3, len3);
     /* allow one bit for sign, one bit for subtraction */
-    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
-         && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + SMALL_FMPZ_BITCOUNT_MAX)
+         && FLINT_ABS(bits3) <= SMALL_FMPZ_BITCOUNT_MAX;
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
@@ -220,7 +220,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
+                if ((qq & (WORD(3) << (SMALL_FMPZ_BITCOUNT_MAX))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
                     p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
@@ -332,8 +332,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     bits2 = _fmpz_vec_max_bits(poly2, len2);
     bits3 = _fmpz_vec_max_bits(poly3, len3);
     /* allow one bit for sign, one bit for subtraction */
-    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
-          && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + SMALL_FMPZ_BITCOUNT_MAX)
+          && FLINT_ABS(bits3) <= SMALL_FMPZ_BITCOUNT_MAX;
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
@@ -540,7 +540,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
+                if ((qq & (WORD(3) << (SMALL_FMPZ_BITCOUNT_MAX))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
                     p1[k] = (qq^(ds^lc_sign)) - (ds^lc_sign);

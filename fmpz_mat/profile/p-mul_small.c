@@ -55,8 +55,8 @@ int main(void)
         old_mint = 10000000000;
         old_maxt = 0;
 
-        for (Abits = 14; Abits <= FLINT_BITS - 2; Abits += 16)
-        for (Bbits = Abits; Bbits <= FLINT_BITS - 2; Bbits += 16)
+        for (Abits = 14; Abits <= SMALL_FMPZ_BITCOUNT_MAX; Abits += 16)
+        for (Bbits = Abits; Bbits <= SMALL_FMPZ_BITCOUNT_MAX; Bbits += 16)
         {
             fmpz_mat_randtest(A, state, Abits);
             fmpz_mat_randtest(B, state, Bbits);
@@ -120,8 +120,8 @@ int main(void)
         old_mint = 10000000000;
         old_maxt = 0;
 
-        for (Abits = 14; Abits <= FLINT_BITS - 2; Abits += 8)
-        for (Bbits = Abits; Bbits <= FLINT_BITS - 2; Bbits += 8)
+        for (Abits = 14; Abits <= SMALL_FMPZ_BITCOUNT_MAX; Abits += 8)
+        for (Bbits = Abits; Bbits <= SMALL_FMPZ_BITCOUNT_MAX; Bbits += 8)
         {
             fmpz_mat_randtest(A, state, Abits);
             fmpz_mat_randtest(B, state, Bbits);

@@ -15,7 +15,7 @@
 
 void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 {
-    if (bits <= FLINT_BITS - 2)
+    if (bits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
         _fmpz_demote(f);
         *f = n_randprime(state, bits, proved);

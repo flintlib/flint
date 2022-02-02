@@ -121,12 +121,12 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
     bits = _fmpz_vec_max_bits(poly, len);
     bits = FLINT_ABS(bits);
 
-    if (bits <= FLINT_BITS - 2 &&
+    if (bits <= SMALL_FMPZ_BITCOUNT_MAX &&
         (len < 50 + 2 * bits || (4 * len >= 3 * n && n < 140 + 6 * bits)))
     {
         rbits = 2 * bits + FLINT_BIT_COUNT(len);
 
-        if (rbits <= FLINT_BITS - 2)
+        if (rbits <= SMALL_FMPZ_BITCOUNT_MAX)
         {
             _fmpz_poly_sqrlow_tiny1(res, poly, len, n);
             return;

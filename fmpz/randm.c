@@ -23,7 +23,7 @@ fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
     flint_bitcnt_t bits = fmpz_bits(m);
     int sgn = fmpz_sgn(m);
 
-    if (bits <= FLINT_BITS - 2)
+    if (bits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
         _fmpz_demote(f);
         *f =  (sgn >= 0) ? n_randint(state, *m) : - n_randint(state, -(*m));

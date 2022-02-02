@@ -65,13 +65,16 @@ typedef struct
    void * address;
 } fmpz_block_header_s;
 
+/* The largest bit count for an fmpz to be small */
+#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
+
 /* maximum positive value a small coefficient can have */
-#define COEFF_MAX ((WORD(1) << (FLINT_BITS - 2)) - WORD(1))
+#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
 
 /* minimum negative value a small coefficient can have */
-#define COEFF_MIN (-((WORD(1) << (FLINT_BITS - 2)) - WORD(1)))
+#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
 
-#define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == WORD(1))  /* is x a pointer not an integer */
+#define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))  /* is x a pointer not an integer */
 
 FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
 

@@ -37,7 +37,7 @@ main(void)
         slong n, max_bound;
         mp_limb_t modulus;
 
-        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
         nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
 
@@ -100,7 +100,7 @@ main(void)
         slong n, max_bound;
         mp_limb_t modulus;
 
-        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
         nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
 
@@ -158,7 +158,7 @@ main(void)
         slong n, max_bound;
         mp_limb_t modulus;
 
-        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
         nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
 

@@ -27,7 +27,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
     else
         sign = ((((mp_limb_t) 1) << (FLINT_BITS - 1)) & arr[limbs - 1]);
 
-    if (bits <= FLINT_BITS - 2)  /* fits into a small coeff */
+    if (bits <= SMALL_FMPZ_BITCOUNT_MAX)  /* fits into a small coeff */
     {
         _fmpz_demote(coeff);
 
@@ -150,7 +150,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
     ulong rem_bits = (shift + bits) % FLINT_BITS;
     mp_limb_t mask;
 
-    if (bits <= FLINT_BITS - 2)  /* fits into a small coeff */
+    if (bits <= SMALL_FMPZ_BITCOUNT_MAX)  /* fits into a small coeff */
     {
         _fmpz_demote(coeff);
 

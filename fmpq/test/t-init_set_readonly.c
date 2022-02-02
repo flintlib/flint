@@ -34,7 +34,7 @@ int main(void)
         mpq_t z;
 
         fmpq_init(f);
-        fmpq_randtest(f, state, FLINT_BITS - 2);
+        fmpq_randtest(f, state, SMALL_FMPZ_BITCOUNT_MAX);
 
         mpq_init(z);
         fmpq_get_mpq(z, f);
@@ -56,7 +56,7 @@ int main(void)
         mpq_t z;
 
         fmpq_init(f);
-        fmpq_randtest(f, state, FLINT_BITS - 2);
+        fmpq_randtest(f, state, SMALL_FMPZ_BITCOUNT_MAX);
 
         mpq_init(z);
         fmpq_get_mpq(z, f);

@@ -56,7 +56,7 @@ static int _is_proved_not_square(
 next_p:
 
     if (*p >= UWORD_MAX_PRIME)
-        *p = UWORD(1) << (FLINT_BITS - 2);
+        *p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     *p = n_nextprime(*p, 1);
     nmod_init(&mod, *p);
 
@@ -116,7 +116,7 @@ slong _fmpz_mpoly_sqrt_heap1(
     ulong acc_sm[3], acc_sm2[3], pp[3];
     int lt_divides, q_rest_small;
     flint_rand_t heuristic_state;
-    mp_limb_t heuristic_p = UWORD(1) << (FLINT_BITS - 2);
+    mp_limb_t heuristic_p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     int heuristic_count = 0;
     ulong lc_abs = 0; /* 2*sqrt(lc) if it fits in ulong, otherwise 0 */
     ulong lc_norm = 0;
@@ -564,7 +564,7 @@ slong _fmpz_mpoly_sqrt_heap(
     ulong acc_sm[3], acc_sm2[3], pp[3];
     int halves, use_heap, lt_divides, q_rest_small;
     flint_rand_t heuristic_state;
-    mp_limb_t heuristic_p = UWORD(1) << (FLINT_BITS - 2);
+    mp_limb_t heuristic_p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     int heuristic_count = 0;
     ulong lc_abs = 0; /* 2*sqrt(lc) if it fits in ulong, otherwise 0 */
     ulong lc_norm = 0;

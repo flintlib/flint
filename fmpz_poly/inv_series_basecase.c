@@ -81,7 +81,7 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
         for (i = 1; i < n; i++)
         {
-            if (i >= nsmall || Qinvbits > FLINT_BITS - 2 || Qbits[i] > FLINT_BITS - 2)
+            if (i >= nsmall || Qinvbits > SMALL_FMPZ_BITCOUNT_MAX || Qbits[i] > SMALL_FMPZ_BITCOUNT_MAX)
             {
                 /* Can't use fast code. */
                 bits = WORD_MAX;
