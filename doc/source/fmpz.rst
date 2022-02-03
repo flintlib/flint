@@ -117,11 +117,7 @@ Memory management
 
 .. function:: void fmpz_init_set(fmpz_t f, const fmpz_t g)
 
-    Initialises `f` and sets it to the value of `g`.
-
 .. function:: void fmpz_init_set_ui(fmpz_t f, ulong g)
-
-    Initialises `f` and sets it to the value of `g`.
 
 .. function:: void fmpz_init_set_si(fmpz_t f, slong g)
 
@@ -596,13 +592,7 @@ Comparison
 
 .. function:: int fmpz_cmp(const fmpz_t f, const fmpz_t g)
 
-    Returns a negative value if `f < g`, positive value if `g < f`, 
-    otherwise returns `0`.
-
 .. function:: int fmpz_cmp_ui(const fmpz_t f, ulong g)
-
-    Returns a negative value if `f < g`, positive value if `g < f`, 
-    otherwise returns `0`.
 
 .. function:: int fmpz_cmp_si(const fmpz_t f, slong g)
 
@@ -621,11 +611,7 @@ Comparison
 
 .. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
-    Returns `1` if `f` is equal to `g`, otherwise returns `0`.
-
 .. function:: int fmpz_equal_ui(const fmpz_t f, ulong g)
-
-    Returns `1` if `f` is equal to `g`, otherwise returns `0`.
 
 .. function:: int fmpz_equal_si(const fmpz_t f, slong g)
 
@@ -718,138 +704,67 @@ Basic arithmetic
 
 .. function:: void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the quotient of `g` by `h`, rounding up towards
-    infinity and `s` to the remainder.  If `h` is `0` an exception
-    is raised.
-
-.. function:: void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-    Sets `f` to the quotient of `g` by `h`, rounding up towards
-    infinity.  If `h` is `0` an exception is raised.
-
-.. function:: void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to the quotient of `g` by `h`, rounding up towards
-    infinity.  If `h` is `0` an exception is raised.
-
-.. function:: void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
-
-    Sets `f` to the quotient of `g` by `h`, rounding up towards
-    infinity.  If `h` is `0` an exception is raised.
-
-.. function:: void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
-
-    Sets `f` to the quotient of `g` by ``2^exp``, rounding up towards
-    infinity. 
-
-.. function:: void fmpz_cdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
-
-    Sets `f` to the remainder of `g` upon division by ``2^exp``, 
-    where the remainder is non-positive.
-
-.. function:: ulong fmpz_cdiv_ui(const fmpz_t g, ulong h)
-
-    Returns the negative of the remainder from dividing `g`
-    by `h`, rounding towards minus infinity. If `h` is `0` an exception is
-    raised.
-
-.. function:: void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
-
-    Sets `f` to `g` divided by ``2^exp``, rounding down 
-    towards minus infinity.
-
-.. function:: void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-    Sets `f` to the quotient of `g` by `h`, rounding down towards
-    minus infinity.  If `h` is `0` an exception is raised.
-
-.. function:: void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Set `f` to the quotient of `g` by `h`, rounding down towards
-    minus infinity.  If `h` is `0` an exception is raised.
-
-.. function:: void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
-
-    Set `f` to the quotient of `g` by `h`, rounding down towards
-    minus infinity.  If `h` is `0` an exception is raised.
-
 .. function:: void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
-
-    Sets `f` to the quotient of `g` by `h`, rounding down towards
-    minus infinity and `s` to the remainder.  If `h` is `0` an exception 
-    is raised.
-
-.. function:: void fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-    Sets `f` to the remainder from dividing `g` by `h` and rounding
-    the quotient down towards minus infinity. If `h` is `0` an exception 
-    is raised.
-
-.. function:: void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
-
-    Sets `f` to the remainder of `g` upon division by ``2^exp``, 
-    where the remainder is non-negative.
-
-.. function:: ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
-
-    Returns the remainder of `g` modulo `x` where `x` is an
-    ``ulong``, without changing `g`.  If `x` is `0` an
-    exception will result.
-
-.. function:: void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-    Sets `f` to the quotient of `g` by `h`, rounding down towards
-    zero.  If `h` is `0` an exception is raised.
 
 .. function:: void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the quotient of `g` by `h`, rounding down towards
-    zero and `s` to the remainder.  If `h` is `0` an exception 
-    is raised.
+.. function:: void fmpz_ndiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
+
+.. function:: void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+.. function:: void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+.. function:: void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+.. function:: void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
+
+.. function:: void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
 .. function:: void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
-    Set `f` to the quotient of `g` by `h`, rounding down towards
-    zero.  If `h` is `0` an exception is raised.
+.. function:: void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
+
+.. function:: void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
 .. function:: void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
-    Set `f` to the quotient of `g` by `h`, rounding down towards
-    zero.  If `h` is `0` an exception is raised.
+.. function:: void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
-.. function:: void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
-
-    Sets `f` to the remainder of `g` upon division by ``2^exp``,
-    where the remainder has the same sign as `g`.
-
-.. function:: ulong fmpz_tdiv_ui(const fmpz_t g, ulong h)
-
-    Returns the absolute value of the remainder from dividing `g`
-    by `h`, rounding towards zero. If `h` is `0` an exception is
-    raised.
+.. function:: void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
 .. function:: void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
-    Sets `f` to `g` divided by ``2^exp``, rounding down towards
-    zero.
+.. function:: void fmpz_fdiv_r(fmpz_t s, const fmpz_t g, const fmpz_t h)
 
-.. function:: void fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+.. function:: void fmpz_cdiv_r_2exp(fmpz_t s, const fmpz_t g, ulong exp)
 
-    Sets `q` to the quotient of `a` by `b`, rounding towards the nearest
-    integer where ties rounds towards zero and sets `r` to the remainder.
-    If `b` is `0` an exception is raised.
+.. function:: void fmpz_fdiv_r_2exp(fmpz_t s, const fmpz_t g, ulong exp)
+
+.. function:: void fmpz_tdiv_r_2exp(fmpz_t s, const fmpz_t g, ulong exp)
+
+    Sets `f` to the quotient of `g` by `h` and/or `s` to the remainder. For the
+    ``2exp`` functions, ``g = 2^exp``. `If `h` is `0` an exception is raised.
+
+    Rounding is made in the following way:
+
+    * ``fdiv`` rounds the quotient via floor rounding.
+    * ``cdiv`` rounds the quotient via ceil rounding.
+    * ``tdiv`` rounds the quotient via truncation, i.e. rounding towards zero.
+    * ``ndiv`` rounds the quotient such that the remainder has the smallest
+      absolute value. In case of ties, it rounds the quotient towards zero.
+
+.. function:: ulong fmpz_cdiv_ui(const fmpz_t g, ulong h)
+
+.. function:: ulong fmpz_fdiv_ui(const fmpz_t g, ulong h)
+
+.. function:: ulong fmpz_tdiv_ui(const fmpz_t g, ulong h)
+
+   Returns the absolute value remainder of `g` divided by `h`, following the
+   convention of rounding as seen above. If `h` is zero an exception is raised.
 
 .. function:: void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the quotient of `g` and `h`, assuming that the
-    division is exact, i.e.\ `g` is a multiple of `h`.  If `h` 
-    is `0` an exception is raised.
-
 .. function:: void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to the quotient of `g` and `h`, assuming that the
-    division is exact, i.e.\ `g` is a multiple of `h`.  If `h` 
-    is `0` an exception is raised.
 
 .. function:: void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
@@ -865,26 +780,25 @@ Basic arithmetic
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
-    Returns `1` if there is an integer `q` with `f = q g` and `0` if not.
+.. function:: int fmpz_divisible_si(const fmpz_t f, slong g)
+
+    Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
+    none.
 
 .. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
 
     Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
     quotient. Otherwise returns `0` and sets `q` to `0`.
 
-.. function:: int fmpz_divisible_si(const fmpz_t f, slong g)
-
-    Returns whether `f` is divisible by `g > 0`.
-
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the remainder of `g` divided by `h`.  The remainder
-    is always taken to be positive.
+    Sets `f` to the remainder of `g` divided by `h` such that the remainder is
+    positive. Assumes that `h` is not zero.
 
-.. function:: ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
+.. function:: ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
 
-    Sets `f` to `g` reduced modulo `x` where `x` is an 
-    ``ulong``.  If `x` is `0` an exception will result.
+    Sets `f` to the remainder of `g` divided by `h` such that the remainder is
+    positive and also returns this value. Raises an exception if `h` is zero.
 
 .. function:: void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -911,19 +825,14 @@ Basic arithmetic
 
 .. function:: void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets `f` to `g^x` where `x` is an ``ulong``.  If 
-    `x` is `0` and `g` is `0`, then `f` will be set to `1`.
+    Sets `f` to `g^x`.  Defines `0^0 = 1`.
 
 .. function:: int fmpz_pow_fmpz(fmpz_t f, const fmpz_t g, const fmpz_t x)
 
-    Set `f` to `g^x`. Return `1` for success and `0` for failure.
-    The function throws only if `x` is negative.
+    Sets `f` to `g^x`. Defines `0^0 = 1`. Return `1` for success and `0` for
+    failure. The function throws only if `x` is negative.
 
 .. function:: void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
-
-    Sets `f` to `g^e \bmod{m}`.  If `e = 0`, sets `f` to `1`.
-
-    Assumes that `m \neq 0`, raises an ``abort`` signal otherwise.
 
 .. function:: void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 

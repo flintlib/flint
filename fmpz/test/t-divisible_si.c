@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,14 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
-#include <limits.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
 #include "fmpz.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -40,16 +36,13 @@ main(void)
         fmpz_init(b);
         mpz_init(d);
 
-        a = z_randtest(state);
-        if (a == WORD_MIN)
-            a = 1;
-        a = FLINT_ABS(a) + 1;
+        a = z_randtest_not_zero(state);
         fmpz_randtest(b, state, 200);
 
         fmpz_get_mpz(d, b);
 
         e = fmpz_divisible_si(b, a);
-        f = flint_mpz_divisible_ui_p(d, a);
+        f = flint_mpz_divisible_ui_p(d, FLINT_ABS(a));
 
         result = (e == f);
         if (!result)
@@ -75,17 +68,14 @@ main(void)
         fmpz_init(b);
         mpz_init(d);
 
-        a = z_randtest(state);
-        if (a == WORD_MIN)
-            a = 1;
-        a = FLINT_ABS(a) + 1;
+        a = z_randtest_not_zero(state);
         fmpz_randtest(b, state, 200);
-        fmpz_mul_ui(b, b, a);
+        fmpz_mul_si(b, b, a);
 
         fmpz_get_mpz(d, b);
 
         e = fmpz_divisible_si(b, a);
-        f = flint_mpz_divisible_ui_p(d, a);
+        f = flint_mpz_divisible_ui_p(d, FLINT_ABS(a));
 
         result = (e == f && e == 1);
         if (!result)
@@ -105,4 +95,3 @@ main(void)
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
-
