@@ -34,38 +34,42 @@ int main()
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
         nvars = ctx->minfo->nvars;
 
-        fmpz_mpoly_init(F, ctx);
-        fmpz_mpoly_init(G, ctx);
-        fmpz_mpoly_init(x, ctx);
-        fmpz_mpoly_init(t, ctx);
-
-        fmpz_mpoly_randtest_bound(F, state, 10, 100, 100, ctx);
-        fmpz_poly_randtest(f, state, 10, 100);
-
-        i = n_randint(state, nvars);
-        fmpz_mpoly_set_gen_fmpz_poly(F, i, f, ctx);
-
-        fmpz_mpoly_gen(x, i, ctx);
-        for (j = 0; j < f->length; j++)
+        if (nvars >= 1)
         {
-            fmpz_mpoly_pow_ui(t, x, j, ctx);
-            fmpz_mpoly_scalar_mul_fmpz(t, t, f->coeffs + j, ctx);
-            fmpz_mpoly_add(G, G, t, ctx);
-        }
+            fmpz_mpoly_init(F, ctx);
+            fmpz_mpoly_init(G, ctx);
+            fmpz_mpoly_init(x, ctx);
+            fmpz_mpoly_init(t, ctx);
 
-        if (!fmpz_mpoly_equal(F, G, ctx))
-        {
-            flint_printf("FAIL\n");
-            fmpz_mpoly_print_pretty(F, NULL, ctx); flint_printf("\n\n");
-            fmpz_mpoly_print_pretty(G, NULL, ctx); flint_printf("\n\n");
-            flint_abort();
+            fmpz_mpoly_randtest_bound(F, state, 10, 100, 100, ctx);
+            fmpz_poly_randtest(f, state, 10, 100);
+
+            i = n_randint(state, nvars);
+            fmpz_mpoly_set_gen_fmpz_poly(F, i, f, ctx);
+
+            fmpz_mpoly_gen(x, i, ctx);
+            for (j = 0; j < f->length; j++)
+            {
+                fmpz_mpoly_pow_ui(t, x, j, ctx);
+                fmpz_mpoly_scalar_mul_fmpz(t, t, f->coeffs + j, ctx);
+                fmpz_mpoly_add(G, G, t, ctx);
+            }
+
+            if (!fmpz_mpoly_equal(F, G, ctx))
+            {
+                flint_printf("FAIL\n");
+                fmpz_mpoly_print_pretty(F, NULL, ctx); flint_printf("\n\n");
+                fmpz_mpoly_print_pretty(G, NULL, ctx); flint_printf("\n\n");
+                flint_abort();
+            }
+
+            fmpz_mpoly_clear(F, ctx);
+            fmpz_mpoly_clear(G, ctx);
+            fmpz_mpoly_clear(x, ctx);
+            fmpz_mpoly_clear(t, ctx);
         }
 
         fmpz_poly_clear(f);
-        fmpz_mpoly_clear(F, ctx);
-        fmpz_mpoly_clear(G, ctx);
-        fmpz_mpoly_clear(x, ctx);
-        fmpz_mpoly_clear(t, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 
