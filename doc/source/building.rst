@@ -46,6 +46,8 @@ where they should be placed by passing ``--prefix=path`` to configure, where
 ``path`` is the directory under which the ``lib`` and ``include`` directories
 exist into which you wish to place the FLINT files when it is installed.
 
+
+
 TLS, reentrancy and single mode
 -------------------------------------------------------------------------------
 
@@ -65,7 +67,45 @@ If you wish to select the single mode, pass the ``--single`` option to
 configure, though note that this is the default. The reentrant mode is selected
 by passing the option ``--reentrant`` to configure.
 
-ABI and architecture support
+
+
+Architecture support
+-------------------------------------------------------------------------------
+
+In some cases, it is necessary to override the CPU/OS defaults. This can be
+done by passing ``--build=cpu-vendor-os`` to configure, for which 
+
+The choices for OS include ``Linux``, ``MINGW32``, ``MINGW64``, ``CYGWIN32``,
+``CYGWIN64``, ``Darwin``, ``FreeBSD``, ``OpenBSD``, ``SunOS`` and numerous other
+operating systems.
+
+The choices for vendor is not used, and can be passed as whatever. This is to be
+somewhat compatible with GMP's configure settings.
+
+The available choices for the CPU is
+
+- ``x86_64``,
+- ``x86``,
+- ``arm``,
+- ``aarch64`` (also known as ``arm64``),
+- ``ia64``,
+- ``sparc``,
+- ``sparc64``,
+- ``ppc``,
+- ``ppc64``,
+- as well as a specific choice of processors in either family ``x86_64``,
+  ``x86``, ``arm`` and ``aarch64``. These include, but are not limited to,
+  architectures such as ``i386``, ``haswell``, ``k6``, ``athlon64``, ``zen2``,
+  ``armv5`` and ``armv8.7-a``. This is specified in order to set the ``-march``
+  flag for the compiler. For specifics, please see the configuration file to see
+  which architectures we support.
+
+Other CPU types are unrecognised and FLINT will build with generic code on those
+machines.
+
+
+
+ABI
 -------------------------------------------------------------------------------
 
 On some systems, e.g. Sparc and some Macs, more than one ABI is available.
@@ -76,19 +116,10 @@ configure.
 To build on MinGW64 it is necessary to pass ``ABI=64`` to configure, as FLINT
 is otherwise unable to distinguish it from MinGW32.
 
-In some cases, it is necessary to override the CPU/OS defaults. This can be
-done by passing ``--build=cpu-os`` to configure.
-
-The available choices for CPU include ``x86_64``, ``x86``, ``ia64``, ``sparc``,
-``sparc64``, ``ppc``, ``ppc64``. Other CPU types are unrecognised and FLINT
-will build with generic code on those machines.
-
-The choices for OS include ``Linux``, ``MINGW32``, ``MINGW64``, ``CYGWIN32``,
-``CYGWIN64``, ``Darwin``, ``FreeBSD``, ``SunOS`` and numerous other operating
-systems.
-
 It is also possible to override the default CC, AR and CFLAGS used by FLINT by
 passing ``CC=full_path_to_compiler``, etc., to FLINT's configure.
+
+
 
 C++ wrapper
 -------------------------------------------------------------------------------
@@ -100,6 +131,8 @@ The ``C++`` wrapper is always available, but tests will only run if
 this option is selected. It is disabled by default (``--disable-cxx``)
 because some ``C++`` compilers internally segfault when compiling the
 tests, or exhaust memory due to the complexity of the ``C++`` code.
+
+
 
 Building, testing, installing and using FLINT
 -------------------------------------------------------------------------------
@@ -180,6 +213,8 @@ If your system supports parallel builds, FLINT will build in parallel, e.g:
 
 On some systems, parallel builds appear to be available but buggy.
 
+
+
 Testing a single module or file
 -------------------------------------------------------------------------------
 
@@ -200,6 +235,8 @@ separated test list) after chosen module name followed by the colon, e.g.:
     make check MOD=ulong_extras:clog,factor,is_prime
     make check MOD="fft fmpz_mat:add_sub,charpoly fq_vec:add"
 
+
+
 Assertion checking
 -------------------------------------------------------------------------------
 
@@ -207,6 +244,8 @@ FLINT has an assert system. If you want a debug build you can pass
 ``--enable-assert`` to configure. However, this will slow FLINT considerably,
 so asserts should not be enabled (``--disable-assert``, the default) for
 deployment.
+
+
 
 Exceptions
 -------------------------------------------------------------------------------
@@ -220,6 +259,8 @@ At the end, all of FLINT's exceptions call ``abort()`` to terminate
 the program. Using ``flint_set_abort(void (*abort_func)(void))``, the
 user can install a function that will be called instead. Similar
 to the exceptions, this should be regarded as experimental.
+
+
 
 Building FLINT2 with Microsoft Visual Studio using solution files
 -------------------------------------------------------------------------------
@@ -316,5 +357,3 @@ you need to use FLINT2 are placed in the directories:
 - ``dll\<Win32|x64>\<Debug|Release>``
 
 depending on the version(s) that have been built.
-
-
