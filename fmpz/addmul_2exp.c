@@ -11,7 +11,6 @@
 
 #include <string.h>
 #include <gmp.h>
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
@@ -53,16 +52,7 @@ fmpz_addmul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
                         *f = (f1 >= 0) ? x1 : -x1;
                     }
                     else
-                    {
-smallmpz:
-                        mf = _fmpz_new_mpz();
-                        *f = PTR_TO_COEFF(mf);
-                        mf->_mp_d[0] = x1;
-                        mf->_mp_d[1] = x2;
-                        mf->_mp_size = 1 + (x2 != 0);
-                        if (g1 < 0)
-                            mf->_mp_size = -mf->_mp_size;
-                    }
+                        goto smallmpz;
                 }
                 else
                 {
@@ -103,7 +93,16 @@ smallmpz:
                     if (x2 == 0 && x1 <= COEFF_MAX)
                         *f = (g1 >= 0) ? x1 : -x1;
                     else
-                        goto smallmpz;
+                    {
+smallmpz:
+                        mf = _fmpz_new_mpz();
+                        *f = PTR_TO_COEFF(mf);
+                        mf->_mp_d[0] = x1;
+                        mf->_mp_d[1] = x2;
+                        mf->_mp_size = 1 + (x2 != 0);
+                        if (g1 < 0)
+                            mf->_mp_size = -mf->_mp_size;
+                    }
                 }
                 else
                 {
@@ -158,20 +157,65 @@ smallmpz:
                 mpn_sub_1(mreslimbs, mreslimbs, abssz, absx); /* No borrow */
 
             /* Set size */
-            mres->_mp_size
-                = abssz - (mreslimbs[abssz - 1] == 0)
-                - (mreslimbs[abssz - 1] == 0 && mreslimbs[abssz - 2] == 0);
-            if (mf->_mp_size < 0)
+            mres->_mp_size = abssz - 1 - (mreslimbs[abssz - 1] == 0);
+            if (mf->_mp_size < 0) /* If g's size was negative */
                 mres->_mp_size = -mres->_mp_size;
         }
     }
-    else
+    else /* f is large */
     {
-        if (!COEFF_IS_MPZ(g1)) /* f is large, g is small */
+        mp_limb_t * glimbs, * flimbs;
+        mp_size_t maxsz, fsz, fabssz, gsz, gabssz;
+        ulong tmpsh[8];
+        ulong absg;
+        ulong pxe = FLINT_BITS - exp;
+
+        mf = COEFF_TO_PTR(f1);
+
+        /* Get information on g */
+        if (!COEFF_IS_MPZ(g1)) /* g is small */
         {
+            absg = FLINT_ABS(g1);
+            glimbs = &absg;
+            gsz = (g1 >= 0) ? 1 : -1;
+            gabssz = limbshift + 2;
         }
-        else /* both large */
+        else /* g is large */
         {
+            __mpz_struct * mg = COEFF_TO_PTR(g1);
+            glimbs = mg->_mp_d;
+            gsz = mg->_mp_size;
+            gabssz = FLINT_ABS(gsz) + limbshift + 1;
+        }
+
+        /* Get information on f */
+        fsz = mf->_mp_size;
+        fabssz = FLINT_ABS(fsz);
+
+        /* Allocate enough size for f */
+        maxsz = FLINT_MAX(gabssz, fabssz) + 1;
+        if (mf->_mp_alloc < maxsz)
+        {
+            /* Allocation size is always greater or equal to the limb size, so
+             * if this passes, we know that f < 2^{exp} g */
+            mf->_mp_d = flint_realloc(mf->_mp_d, sizeof(mp_limb_t) * maxsz);
+            mf->_mp_alloc = maxsz;
+        }
+        flimbs = mf->_mp_d;
+
+        /* Check sign */
+        if ((fsz ^ gsz) >= 0) /* Same sign; perform addition. */
+        {
+            /* Possibly add limbs who "overlap" */
+
+            /* Possibly set some none-overlapping limbs to zeros via memset */
+
+            /* Possibly setting some upper limbs to (parts of) g via memmove
+             * and then shifting them */
+        }
+        else /* Different sign; perform subtraction. */
+        {
+            
         }
     }
 }
