@@ -179,6 +179,12 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         mpz_t t;
         __mpz_struct *bptr;
         
+        if (fmpz_is_even(p))
+            return 0;
+
+        if (fmpz_is_square(p))
+            return 0;
+
         bptr = _fmpz_promote_val(b);
 
         mpz_init(t);

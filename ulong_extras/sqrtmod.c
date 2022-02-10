@@ -47,6 +47,12 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
         return 0;
     }
 
+    if (n_is_square(p)) /* modulus is a square */
+       return 0;
+   
+    if ((p & 1) == 0) /* modulus is even */
+       return 0;
+
     pinv = n_preinvert_limb(p);
 
     if (n_jacobi_unsigned(a, p) == -1)
