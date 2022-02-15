@@ -16,8 +16,6 @@ fmpz
 * [maybe] figure out how to write robust test code for fmpz_read (which reads
   from stdin), perhaps using a pipe
 
-* Inline or create inline versions of core fmpz functions.
-
 * [maybe] Avoid the double allocation of both an mpz struct and limb data,
   having an fmpz point directly to a combined structure. This would require
   writing replacements for most mpz functions.
@@ -61,7 +59,7 @@ ulong_extras
 long_extras
 -----------
 
-* write and use z_gcd and z_invert in fmpz_gcd and fmpz_invert, respectively
+* write and use z_invert in fmpz_invert
 
 
 fmpz_vec
