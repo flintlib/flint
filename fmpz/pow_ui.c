@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,51 +11,73 @@
 */
 
 #include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
 fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
 {
-    fmpz c1;
+    slong g1 = *g;
+    slong u1;
+    ulong bits;
 
-    if (exp == WORD(0))
+    u1 = FLINT_ABS(*g);
+    bits = FLINT_BIT_COUNT(u1);
+
+    if (exp * bits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
-        fmpz_one(f);
-        return;
+        if (bits == 0)
+            exp = (exp != 0);
+
+L1:     /* Fits in small fmpz, even if exp == 0 and g is big */
+        u1 = 1;
+        for (; exp != 0; exp--)
+            u1 *= g1;
+L2:     if (COEFF_IS_MPZ(*f))
+            _fmpz_clear_mpz(*f);
+        *f = u1;
     }
-
-    c1 = *g;
-
-    if (!COEFF_IS_MPZ(c1))      /* g is small */
+    else if (u1 == 1)
     {
-        ulong u1 = FLINT_ABS(c1);
-        ulong bits = FLINT_BIT_COUNT(u1);
-        if (u1 <= UWORD(1))
+        exp &= 1;
+        goto L1;
+    }
+    else if (bits <= SMALL_FMPZ_BITCOUNT_MAX) /* g is small */
+    {
+        __mpz_struct mg = {1, 1, NULL};
+        __mpz_struct * mf;
+
+        mg._mp_d = (mp_limb_t *) &u1;
+        if (g1 < 0)
+            mg._mp_size = -1;
+
+        if (!COEFF_IS_MPZ(*f))
         {
-            fmpz_set_ui(f, u1);
-        }
-        else if (exp * bits <= SMALL_FMPZ_BITCOUNT_MAX)
-        {
-            fmpz_set_ui(f, n_pow(u1, exp));
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
         }
         else
         {
-            __mpz_struct * mf = _fmpz_promote_val(f);
-
-            flint_mpz_set_ui(mf, u1);
-            flint_mpz_pow_ui(mf, mf, exp);
-            _fmpz_demote_val(f);    /* may actually fit into a small after all */
+            mf = COEFF_TO_PTR(*f);
         }
 
-        if ((c1 < WORD(0)) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
-            fmpz_neg(f, f);
+        flint_mpz_pow_ui(mf, &mg, exp);
+        if ((mf->_mp_size == 1 || mf->_mp_size == -1) && mf->_mp_d[0] <= COEFF_MAX)
+        {
+            g1 = *f;
+            *f = (mf->_mp_size > 0) ? mf->_mp_d[0] : -mf->_mp_d[0];
+            _fmpz_clear_mpz(g1);
+        }
     }
-    else
+    else /* g is large and exp > 0 */
     {
-        __mpz_struct * mf = _fmpz_promote_val(f);
-        flint_mpz_pow_ui(mf, COEFF_TO_PTR(c1), exp);
-        /* no need to demote as it can't get smaller */
+        __mpz_struct * mf;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
+        }
+        else
+            mf = COEFF_TO_PTR(*f);
+        flint_mpz_pow_ui(mf, COEFF_TO_PTR(g1), exp);
     }
 }
