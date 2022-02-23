@@ -110,13 +110,17 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
         mf = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(mf);
     }
+    flimbs = mf->_mp_d;
 
     if (mf->_mp_alloc < (gabssz + 1))
     {
         mf->_mp_d = realloc(mf->_mp_d, sizeof(mp_limb_t) * (gabssz + 1));
         mf->_mp_alloc = gabssz + 1;
+        /* If f and g are aliased, then we need to change glimbs as well. */
+        if (flimbs == glimbs)
+            glimbs = mf->_mp_d;
+        flimbs = mf->_mp_d;
     }
-    flimbs = mf->_mp_d;
 
     flimbs[gabssz] = mpn_add_1(flimbs, glimbs, gabssz, x);
     mf->_mp_size = gabssz + flimbs[gabssz];
@@ -191,6 +195,8 @@ L1:         if (x <= COEFF_MAX)
     {
         if (mf->_mp_alloc < gabssz)
         {
+            /* If f and g cannot be aliased here, since allocation size is
+             * always greater than the size's absolute value */
             mf->_mp_d = flimbs = realloc(mf->_mp_d, sizeof(mp_limb_t) * gabssz);
             mf->_mp_alloc = gabssz;
         }
