@@ -26,28 +26,18 @@ environment:
       ARCH: 32
     - COMPILER: cl
       ARCH: 64
-    - COMPILER: gcc
-      ARCH: 32
-    - COMPILER: gcc
-      ARCH: 64
 
 install:
-  - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\mingw%ARCH%\bin;%PATH%"
-  - if [%COMPILER%]==[gcc] set "CMAKE_PREFIX_PATH=C:\msys64\mingw%ARCH%"
-  - if [%COMPILER%]==[gcc] del /F /Q "C:\Program Files\Git\usr\bin\sh.exe"
-#  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-mpfr
-#  - if [%COMPILER%]==[gcc] if [%ARCH%]==[32] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-i686-gcc mingw-w64-i686-mpfr
-  
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_64%"
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_32%"
-  - if [%COMPILER%]==[cl] set "LIB=%CONDA_INSTALL_LOCN%\Library\lib;%LIB%"
-  - if [%COMPILER%]==[cl] set "CPATH=%CONDA_INSTALL_LOCN%\Library\include;%CPATH%"
-  - if [%COMPILER%]==[cl] call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] call "%VCVARSALL%" x64
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
-  - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
-  - if [%COMPILER%]==[cl] conda install --yes --quiet mpir=3.0.0 mpfr=4.* pthreads-win32 ninja
-  - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
+  - if [%ARCH%]==[64] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_64%"
+  - if [%ARCH%]==[32] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_32%"
+  - set "LIB=%CONDA_INSTALL_LOCN%\Library\lib;%LIB%"
+  - set "CPATH=%CONDA_INSTALL_LOCN%\Library\include;%CPATH%"
+  - call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
+  - if [%ARCH%]==[64] call "%VCVARSALL%" x64
+  - if [%ARCH%]==[32] call "%VCVARSALL%" x86
+  - conda config --add channels conda-forge --force
+  - conda install --yes --quiet mpir=3.0.0 mpfr=4.* pthreads-win32 ninja
+  - set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
   - echo int flint_test_multiplier(){return 1;} > test_helpers.c
   - cat test_helpers.c
 
@@ -55,14 +45,10 @@ before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
   
   - cd build
-  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
-  - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 build_script:
   - cmake --build . -- -j2
 
 test_script:
   - ctest -j3 --output-on-failure --timeout 600
-
-#on_finish:
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

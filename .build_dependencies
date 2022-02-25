@@ -1,32 +1,103 @@
-#! /bin/sh
+#!/bin/sh
 
 mkdir -p local
 
-git clone https://github.com/yasm/yasm
-cd yasm
-git checkout v1.3.0
-./autogen.sh
-./configure ABI=$ABI --prefix=${LOCAL}
+echo \
+"##################################################
+# GMP
+##################################################"
+
+echo "Downloading..."
+wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully downloaded."
+    echo ""
+else
+    echo "Failed downloading."
+    exit 1
+fi
+
+tar -xf gmp-6.2.1.tar.xz
+cd gmp-6.2.1
+
+echo "Configuring..."
+./configure --prefix=${LOCAL} > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully configured."
+    echo ""
+else
+    echo "Failed configuring."
+    exit 1
+fi
+
+echo "Building..."
 ${MAKE} > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully built."
+    echo
+else
+    echo "Failed building."
+    exit 1
+fi
+
+echo "Installing..."
 ${MAKE} install > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully installed."
+    echo ""
+else
+    echo "Failed installing."
+    exit 1
+fi
 cd ..
 
-wget http://mpir.org/mpir-3.0.0.tar.bz2
-tar -xf mpir-3.0.0.tar.bz2
+echo \
+"##################################################
+# MPFR
+##################################################"
 
-cd mpir-3.0.0
-./configure ABI=$ABI --enable-gmpcompat --prefix=${LOCAL} --with-yasm=${LOCAL}/bin/yasm
-${MAKE} > /dev/null 2>&1
-${MAKE} install > /dev/null 2>&1
-cd ..
+echo "Downloading..."
+wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2 > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully downloaded."
+    echo ""
+else
+    echo "Failed downloading."
+    exit 1
+fi
 
-wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
 tar -xf mpfr-4.0.0.tar.bz2
 cd mpfr-4.0.0
-./configure ABI=$ABI --with-gmp=${LOCAL} --prefix=${LOCAL}
+
+echo "Configuring..."
+./configure --with-gmp=${LOCAL} --prefix=${LOCAL} > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully configured."
+    echo ""
+else
+    echo "Failed configuring."
+    exit 1
+fi
+
+echo "Building..."
 ${MAKE} > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully built."
+    echo ""
+else
+    echo "Failed building."
+    exit 1
+fi
+
+echo "Installing..."
 ${MAKE} install > /dev/null 2>&1
+if [ $? = 0 ]; then
+    echo "Successfully installed."
+    echo ""
+else
+    echo "Failed installing."
+    exit 1
+fi
 cd ..
 
 echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
-
