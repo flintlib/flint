@@ -1,0 +1,347 @@
+name: CI
+
+
+on: [push, pull_request]
+
+
+jobs:
+  ##############################################################################
+  # ubuntu with gcc
+  ##############################################################################
+  ubuntu-gcc:
+    name: Ubuntu GCC
+
+    runs-on: ubuntu-latest
+
+    env:
+      MAKE: "make -j"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: "-Wall"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          gcc --version
+          make --version
+
+      - name: "Build dependencies"
+        run: |
+          ./.build_dependencies
+
+      - name: "Configure"
+        run: |
+          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL}
+
+      - name: "Compile"
+        run: |
+          $MAKE
+          ldd libflint.so
+
+      - name: "Check"
+        run: |
+          $MAKE check
+
+
+
+  ##############################################################################
+  # macos with gcc
+  ##############################################################################
+  macos-gcc:
+    name: macOS GCC
+
+    runs-on: macos-latest
+
+    env:
+      MAKE: "make -j"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: "-Wall"
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          brew install gcc
+          brew install make
+          gcc --version
+          make --version
+
+      - name: "Build dependencies"
+        run: |
+          ./.build_dependencies
+
+      - name: "Configure"
+        run: |
+          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
+
+      - name: "Compile"
+        run: |
+          $MAKE
+          # Next line is there to check dependencies. But it does not work at
+          # its current state.
+          # otool -L libflint.so
+
+      - name: "Check"
+        run: |
+          $MAKE check
+
+
+
+  # NOTE: Cygwin is paaaaiinfully slow. Let's not this as it is not advised to
+  # be used by MPFR.
+
+  ##############################################################################
+  ## cygwin with gcc
+  ##############################################################################
+  #cygwin-gcc:
+  #  name: Cygwin GCC
+
+  #  runs-on: windows-2019
+
+  #  defaults:
+  #    run:
+  #      shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
+
+  #  env:
+  #    MAKE: "make -j"
+  #    REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
+  #    LOCAL: /cygdrive/d/a/flint2/flint2/local
+  #    LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+  #    CFLAGS: "-Wall -D _WIN64"
+  #    EXTRA_OPTIONS: "--disable-static --enable-shared"
+
+  #  steps:
+  #    - uses: actions/checkout@v2
+
+  #    - name: "Set up Cygwin"
+  #      uses: gap-actions/setup-cygwin@v1
+  #      with:
+  #        EXTRA_PKGS_TO_INSTALL: "ldd,dos2unix"
+
+  #    - name: "Setup"
+  #      run: |
+  #        gcc --version
+  #        make --version
+
+  #    - name: "Build dependencies"
+  #      run: |
+  #        cd ${REPO}
+  #        dos2unix .build_dependencies
+  #        ./.build_dependencies
+
+  #    - name: "Configure"
+  #      run: |
+  #        cd ${REPO}
+  #        dos2unix configure
+  #        ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+  #            --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
+
+  #    - name: "Compile"
+  #      run: |
+  #        cd ${REPO}
+  #        $MAKE
+
+  #    - name: "Check"
+  #      run: |
+  #        cd ${REPO}
+  #        $MAKE check
+
+
+
+  #############################################################################
+  # ubuntu with clang
+  #############################################################################
+  ubuntu-clang:
+    name: Ubuntu Clang
+
+    runs-on: ubuntu-latest
+
+    env:
+      MAKE: "make -j"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: "-Wall"
+      CC: "clang"
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          clang --version
+          make --version
+
+      - name: "Build dependencies"
+        run: |
+          ./.build_dependencies
+
+      - name: "Configure"
+        run: |
+          ./configure CFLAGS="${CFLAGS}" CC=${CC} --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
+
+      - name: "Compile"
+        run: |
+          $MAKE
+          ldd libflint.so
+
+      - name: "Check"
+        run: |
+          $MAKE check
+
+
+
+  #############################################################################
+  # ubuntu with gcc and cmake (no checks)
+  #############################################################################
+  ubuntu-cmake-gcc:
+    name: Ubuntu GCC via CMake
+
+    runs-on: ubuntu-latest
+
+    env:
+      MAKE: "make -j"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: "-Wall"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          sudo apt install cmake
+          gcc --version
+          make --version
+          cmake --version
+
+      - name: "Build dependencies"
+        run: |
+          ./.build_dependencies
+
+      - name: "Configure"
+        run: |
+          mkdir build
+          cd build
+          cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
+              -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
+
+      - name: "Compile"
+        run: |
+          cd build
+          $MAKE
+          ldd lib/libflint.so
+
+
+
+  #############################################################################
+  # mingw with gcc
+  #############################################################################
+  mingw64-gcc:
+    name: MinGW GCC
+
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          gcc --version
+          cmake --version
+        shell: bash
+
+      - name: "Configure"
+        run: |
+          mkdir -p build
+          echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
+          cd build
+          cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON \
+                                    -DCMAKE_BUILD_TYPE=Release ..
+        shell: bash
+
+      - name: "Compile"
+        run: |
+          cd build
+          cmake --build . -- -j4
+        shell: bash
+
+      - name: "Check"
+        run: |
+          cd build
+          ctest -j4 --output-on-failure --timeout 300
+        shell: bash
+
+
+
+  ##############################################################################
+  # nemo
+  ##############################################################################
+  nemo:
+    name: Nemo.jl
+
+    runs-on: ubuntu-latest
+
+    env:
+      MAKE: "make -j"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: ""
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          sudo apt install sed
+          gcc --version
+          make --version
+          julia --version
+
+      - name: "Build dependencies"
+        run: |
+          ./.build_dependencies
+
+      - name: "Configure"
+        run: |
+          # Make sure that we output an soname which corresponds to FLINT_JLL's
+          # soname
+          wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
+          FLINT_JLL_VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
+          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
+          FLINT_JLL_MAJOR=$(echo $FLINT_JLL_SONAME | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
+          FLINT_JLL_MINOR=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
+          FLINT_JLL_PATCH=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
+          sed -i "s/^\(FLINT_MAJOR=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure
+          sed -i "s/^\(FLINT_MINOR=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure
+          sed -i "s/^\(FLINT_PATCH=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure
+
+          # Now we can create the makefile
+          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL} --prefix=${LOCAL} ${EXTRA_OPTIONS}
+
+      - name: "Compile and install"
+        run: |
+          $MAKE
+          $MAKE install
+
+      - name: "Set up Nemo.jl"
+        run: |
+          # Override FLINT_jll's libflint with ours
+          julia -e "import Pkg; Pkg.add(\"Nemo\");"
+          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
+          touch ~/.julia/packages/Nemo/*/src/Nemo.jl
+          julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
+
+      - name: "Check Nemo.jl"
+        run: |
+          julia -e "import Pkg; Pkg.test(\"Nemo\")"
