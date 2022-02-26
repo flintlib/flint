@@ -14,7 +14,7 @@
 #include "profiler.h"
 #include "fmpz.h"
 
-#define ntests 1000
+#define ntests 10
 
 void
 fmpz_pow_ui_old(fmpz_t f, const fmpz_t g, ulong exp)
@@ -73,10 +73,10 @@ sample_new(void * arg, ulong count)
     fmpz_init(res);
     fmpz_init(a);
    
-    for (ix = 0; ix < count; ix++)
+    for (ix = 0; ix < 10000 * count; ix++)
     {
         fmpz_randtest(a, state, bits);
-        b = n_randint(state, 30);
+        b = n_randint(state, 40);
 
         prof_start();
         for (jx = 0; jx < ntests; jx++)
@@ -101,10 +101,10 @@ sample_old(void * arg, ulong count)
     fmpz_init(res);
     fmpz_init(a);
    
-    for (ix = 0; ix < count; ix++)
+    for (ix = 0; ix < 10000 * count; ix++)
     {
         fmpz_randtest(a, state, bits);
-        b = n_randint(state, 30);
+        b = n_randint(state, 40);
 
         prof_start();
         for (jx = 0; jx < ntests; jx++)
@@ -123,7 +123,7 @@ main(void)
     double minnew, maxnew, minold, maxold;
     int bits;
 
-    for (bits = 5; bits <= 150; bits += 5)
+    for (bits = 5; bits <= 250; bits += 5)
     {
         prof_repeat(&minnew, &maxnew, sample_new, &bits);
         prof_repeat(&minold, &maxold, sample_old, &bits);

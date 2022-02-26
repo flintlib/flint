@@ -13,6 +13,13 @@
 #include <gmp.h>
 #include "fmpz.h"
 
+static void
+__fmpz_pow_ui_abort(void)
+{
+    printf("Exception (fmpz_pow_ui). Too large exponent.\n");
+    flint_abort();
+}
+
 void
 fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
 {
@@ -25,11 +32,13 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
 
     if (exp * bits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
-        if (bits == 0)
+        if (__GMP_UNLIKELY(bits == 0))
             exp = (exp != 0);
+        else if (__GMP_UNLIKELY(exp > (UWORD_MAX / SMALL_FMPZ_BITCOUNT_MAX)))
+            __fmpz_pow_ui_abort();
 
-L1:     /* Fits in small fmpz, even if exp == 0 and g is big */
-        u1 = 1;
+        /* Fits in small fmpz, even if exp == 0 and g is big */
+L1:     u1 = 1;
         for (; exp != 0; exp--)
             u1 *= g1;
 L2:     if (COEFF_IS_MPZ(*f))
