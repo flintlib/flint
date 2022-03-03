@@ -65,10 +65,10 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
     mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     Qlen = 0;
-   
+
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = Blen;
-   
+
     /* insert (-1, 0, Aexps[0]) into heap */
     x = chain + 0;
     x->i = -WORD(1);
@@ -81,7 +81,7 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
     /* precompute leading cofficient info */
     n_fq_inv(lc_minus_inv, Bcoeffs + d*0, fqctx);
     _n_fq_neg(lc_minus_inv, lc_minus_inv, d, fqctx->mod);
-   
+
     while (heap_len > 1)
     {
         _fq_nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc, d,
@@ -317,7 +317,7 @@ void fq_nmod_mpoly_div_monagan_pearce(
             flint_free(Bexps);
         Bexps = (ulong *) flint_malloc(N*B->length*sizeof(ulong));
         mpoly_repack_monomials(Bexps, Qbits, B->exps, B->bits, B->length, ctx->minfo);
-        freeBexps = 1; 
+        freeBexps = 1;
     }
 
     /* deal with aliasing */

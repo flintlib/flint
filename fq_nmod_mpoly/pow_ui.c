@@ -64,7 +64,7 @@ int fq_nmod_mpoly_pow_ui(
     exp_bits = _fmpz_vec_max_bits(maxBfields, ctx->minfo->nfields);
     exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
     fq_nmod_mpoly_fit_length_reset_bits(A, 1, exp_bits, ctx);
-    
+
     n_fq_pow_ui(A->coeffs, B->coeffs, k, ctx->fqctx);
     mpoly_pack_vec_fmpz(A->exps + 0, maxBfields, exp_bits, ctx->minfo->nfields, 1);
     _fq_nmod_mpoly_set_length(A, 1, ctx);

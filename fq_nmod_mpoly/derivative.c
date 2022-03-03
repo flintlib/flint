@@ -119,7 +119,7 @@ void fq_nmod_mpoly_derivative(
 
         len1 = _fq_nmod_mpoly_derivative_mp(poly1->coeffs, poly1->exps,
                                   poly2->coeffs, poly2->exps, poly2->length,
-                                   bits, N, offset,        oneexp, ctx->fqctx);        
+                                   bits, N, offset,        oneexp, ctx->fqctx);
     }
 
     _fq_nmod_mpoly_set_length(poly1, len1, ctx);
