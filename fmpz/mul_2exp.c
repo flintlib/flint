@@ -41,7 +41,6 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         ulong expred = exp % FLINT_BITS;
         int alloc = 1 + exp / FLINT_BITS + ((c1bits + expred) > FLINT_BITS);
         mp_limb_t * limbs;
-        slong tmp;
 
         /* Ensure enough limbs are allocated for f */
         if (!COEFF_IS_MPZ(*f))
