@@ -225,10 +225,9 @@ L1:         if (x <= COEFF_MAX) /* Fits in small fmpz */
             /* Upper limb is zero and lower limb fits inside a small fmpz.
              * Therefore we set f to +/- flimbs[0] and clear the mpz associated
              * to f. */
-            fmpz tmp = *f;
-            *f = (gsz > 0) ? flimbs[0] : -flimbs[0];
-            _fmpz_clear_mpz(tmp); /* Must clear afterwards to not clear flimbs
-                                     used above */
+            slong tmp = flimbs[0]; /* We will clear this mpz, so save first. */
+            _fmpz_clear_mpz(*f);
+            *f = (gsz > 0) ? tmp : -tmp;
         }
     }
     else
