@@ -44,7 +44,7 @@ fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
                 *f = g1;
                 return;
             }
-nocarry:    sz = 1; /* No carry, but result is not a small fmpz */
+nocarry:    sz = 1; /* No carry, but result does not fit in small fmpz */
 carry:      if (COEFF_IS_MPZ(f1))
                 mf = COEFF_TO_PTR(f1);
             else
@@ -54,17 +54,17 @@ carry:      if (COEFF_IS_MPZ(f1))
             }
             mf->_mp_size = sz;
             mf->_mp_d[0] = g1;
-            mf->_mp_d[1] = 1;
+            mf->_mp_d[1] = 1; /* Set carry (not used if sz = 1) */
         }
-        else
+        else /* g < 0 */
         {
             g1 += x;
             if (((slong) x) >= 0 && g1 <= COEFF_MAX)
             {
-                /* x's top bit not set, g1 < 0, and so we can interpret result
-                 * as slong. By earlier checking, it is not larger than
-                 * COEFF_MAX, and so it must be a small fmpz since x is
-                 * positive. */
+                /* If x > 0 does not have its top bit set
+                 * and COEFF_MIN <= g < 0, we can interpret x + g as a slong.
+                 * So if the result in g1 is smaller than COEFF_MAX, it is a
+                 * small fmpz. */
                 if (COEFF_IS_MPZ(f1))
                     _fmpz_clear_mpz(f1);
                 *f = g1;
@@ -72,13 +72,21 @@ carry:      if (COEFF_IS_MPZ(f1))
             }
             else
             {
-                /* If top bit is set in x, the result is going to be positive
-                 * and cannot fit in a small fmpz. */
+                /* 1) If top bit is set in x, the result is going to be positive
+                 *    but will be larger than COEFF_MAX since
+                 *
+                 *          x + g  >=  (2^63) - (2^62 - 1)  =  2^62 + 1.
+                 *
+                 *    However, it will be contained in one limb since g < 0.
+                 *
+                 * 2) If top bit is not set, then result is larger than
+                 *    COEFF_MAX, and so it cannot be a small fmpz. However, it
+                 *    must fit in one limb since
+                 *
+                 *          x + g  <=  (2^63 - 1) + (-1)  =  2^63 - 2,
+                 *
+                 *    which is contained in one limb. */
 
-                /* On the other hand, if x's top bit is not set, we can
-                 * interpret the result as a slong as g1 is negative. If g1 + x
-                 * is larger than COEFF_MAX, then it must be converted to an
-                 * mpz. */
                 goto nocarry;
             }
         }
@@ -96,6 +104,7 @@ carry:      if (COEFF_IS_MPZ(f1))
     }
 }
 
+/* "Add" two number with same sign. Decide sign from g. */
 static void
 _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 {
@@ -103,6 +112,7 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
     mp_limb_t * flimbs;
     mp_size_t gabssz = FLINT_ABS(gsz);
 
+    /* Promote f as it is guaranteed to be large */
     if (COEFF_IS_MPZ(*f))
         mf = COEFF_TO_PTR(*f);
     else
@@ -112,22 +122,31 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
     }
     flimbs = mf->_mp_d;
 
-    if (mf->_mp_alloc < (gabssz + 1))
+    if (mf->_mp_alloc < (gabssz + 1)) /* Ensure result fits */
     {
         mf->_mp_d = realloc(mf->_mp_d, sizeof(mp_limb_t) * (gabssz + 1));
         mf->_mp_alloc = gabssz + 1;
+
         /* If f and g are aliased, then we need to change glimbs as well. */
         if (flimbs == glimbs)
             glimbs = mf->_mp_d;
         flimbs = mf->_mp_d;
     }
 
+    /* Use GMP to calculate result */
     flimbs[gabssz] = mpn_add_1(flimbs, glimbs, gabssz, x);
+
+    /* flimbs[gabssz] is the carry from mpn_add_1,
+     * and so gabssz + flimbs[gabssz] is valid to determine the size of f */
     mf->_mp_size = gabssz + flimbs[gabssz];
     if (gsz < 0)
+    {
+        /* g and x has same sign. If g is negative, we negate the result */
         mf->_mp_size = -mf->_mp_size;
+    }
 }
 
+/* Subtract two limbs (they have different sign) and decide the sign via g. */
 static void
 _fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 {
@@ -135,18 +154,20 @@ _fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
     mp_limb_t * flimbs;
     mp_size_t gabssz = FLINT_ABS(gsz);
 
+    /* If size of g is 1, we have a higher probability of the result being
+     * small. */
     if (gabssz == 1)
     {
-        if (x <= glimbs[0])
+        if (x <= glimbs[0]) /* Result is zero or has the same sign as g */
         {
             x = glimbs[0] - x;
-L1:         if (x <= COEFF_MAX)
+L1:         if (x <= COEFF_MAX) /* Fits in small fmpz */
             {
                 if (COEFF_IS_MPZ(*f))
                     _fmpz_clear_mpz(*f);
-                *f = (gsz > 0) ? x : -x;
+                *f = (gsz > 0) ? x : -x; /* With consideration of sign */
             }
-            else
+            else /* Does not fit in small fmpz */
             {
                 if (COEFF_IS_MPZ(*f))
                     mf = COEFF_TO_PTR(*f);
@@ -156,18 +177,22 @@ L1:         if (x <= COEFF_MAX)
                     *f = PTR_TO_COEFF(mf);
                 }
                 mf->_mp_d[0] = x;
-                mf->_mp_size = gsz;
+                mf->_mp_size = gsz; /* Sign of f is the same as for g */
             }
         }
-        else
+        else /* |x| > |g|, which implies f has opposite sign of g */
         {
+            /* Set x to the absolute value of |g - x|. By switching sign of
+             * gsz, we can reuse the code above. */
             x -= glimbs[0];
-            gsz = -gsz; /* Sign change */
-            goto L1; /* Reuse code above */
+            gsz = -gsz;
+            goto L1;
         }
         return;
     }
 
+    /* As g has more than one limb, it is a very high probability that result
+     * does not fit inside small fmpz. */
     if (COEFF_IS_MPZ(*f))
         mf = COEFF_TO_PTR(*f);
     else
@@ -179,30 +204,52 @@ L1:         if (x <= COEFF_MAX)
 
     if (gabssz == 2)
     {
+        /* Special case. Can result in a small fmpz, but as |g| > |x| the sign
+         * cannot change. */
         sub_ddmmss(flimbs[1], flimbs[0], glimbs[1], glimbs[0], 0, x);
         if (flimbs[1] != 0)
+        {
+            /* Most likely: upper limb not zero, so we just have set the sign
+             * of f to g's. */
             mf->_mp_size = gsz;
+        }
         else if (flimbs[0] > COEFF_MAX)
+        {
+            /* Still very likely: Upper limb is zero but lower limb does not
+             * fit inside a small fmpz. Sign is the same as for g, but the
+             * absolute value of the size is one. */
             mf->_mp_size = (gsz > 0) ? 1 : -1;
+        }
         else
         {
+            /* Upper limb is zero and lower limb fits inside a small fmpz.
+             * Therefore we set f to +/- flimbs[0] and clear the mpz associated
+             * to f. */
             fmpz tmp = *f;
             *f = (gsz > 0) ? flimbs[0] : -flimbs[0];
-            _fmpz_clear_mpz(tmp);
+            _fmpz_clear_mpz(tmp); /* Must clear afterwards to not clear flimbs
+                                     used above */
         }
     }
     else
     {
-        if (mf->_mp_alloc < gabssz)
+        /* As the absolute value of g's size is larger than 2, the result won't
+         * fit inside a small fmpz. */
+        if (mf->_mp_alloc < gabssz) /* Ensure result fits */
         {
-            /* If f and g cannot be aliased here, since allocation size is
-             * always greater than the size's absolute value */
+            /* The allocation size of g is always larger than the absolute value
+             * of g. Therefore, if f's allocation size is smaller than g's
+             * size, they cannot be aliased. */
             mf->_mp_d = flimbs = realloc(mf->_mp_d, sizeof(mp_limb_t) * gabssz);
             mf->_mp_alloc = gabssz;
         }
-        mpn_sub_1(flimbs, glimbs, gabssz, x);
+
+        mpn_sub_1(flimbs, glimbs, gabssz, x); /* Subtract via GMP */
+
+        /* If last limb is zero, we have to set f's absolute size to one less
+         * than g's. */
         mf->_mp_size = gabssz - (flimbs[gabssz - 1] == 0);
-        if (gsz < 0)
+        if (gsz < 0) /* If g is negative, then f is negative as well. */
             mf->_mp_size = -mf->_mp_size;
     }
 }
@@ -219,12 +266,11 @@ fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
         mp_size_t sz = -2;
         if (g1 <= 0)
         {
-            {   /* "add" with jump if carry */
-                ulong tmp = -g1;
-                g1 = x - g1; /* g <-- |x| + |g| */
-                if (((ulong) g1) < tmp)
-                    goto carry;
-            }
+            /* "add" with jump if carry */
+            g1 = x - g1; /* g1 = x + |g| */
+            if (((ulong) g1) < x)
+                goto carry;
+
             if (((ulong) g1) <= COEFF_MAX)
             {
                 if (COEFF_IS_MPZ(f1))
@@ -242,28 +288,39 @@ carry:      if (COEFF_IS_MPZ(f1))
             }
             mf->_mp_size = sz;
             mf->_mp_d[0] = g1;
-            mf->_mp_d[1] = 1;
+            mf->_mp_d[1] = 1; /* Set carry (not used if sz = -1) */
         }
         else
         {
-            g1 = x - g1;
+            g1 = x - g1; /* -(g - x) */
             if (((slong) x) >= 0 && g1 <= COEFF_MAX)
             {
-                /* x's top bit not set, g1 > 0, and so we can interpret the
-                 * result as slong. And since it is smaller than COEFF_MAX, it
-                 * is a small fmpz. */
+                /* If x > 0 does not have its top bit set
+                 * and 0 < g <= COEFF_MAX, we can interpret x - g as a slong.
+                 * So if the result in g1 is smaller than COEFF_MAX, it is a
+                 * small fmpz. */
                 if (COEFF_IS_MPZ(f1))
                     _fmpz_clear_mpz(f1);
-                *f = -g1;
+                *f = -g1; /* g - x = -(x - g) */
                 return;
             }
             else
             {
-                /* If top bit is set in x, the result is going to be positive
-                 * and cannot fit in a small fmpz. */
+                /* 1) If top bit is set in x, the result is going to be negative
+                 *    but will be larger than COEFF_MAX since
+                 *
+                 *          x - g  >=  2^63 - (2^62 - 1)  =  2^62 + 1.
+                 *
+                 *    However, it will be contained in one limb since g > 0.
+                 *
+                 * 2) If top bit is not set, then result is smaller than
+                 *    COEFF_MIN, and so it cannot be a small fmpz. However, it
+                 *    must fit in one limb since
+                 *
+                 *          x - g  <=  (2^63 - 1) - 1  =  2^63 - 2,
+                 *
+                 *    which is contained in one limb. */
 
-                /* On the other hand, if x's top bit is not set, but g1 is
-                 * larger than COEFF_MAX, then it must be an mpz. */
                 goto nocarry;
             }
         }
