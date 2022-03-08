@@ -1,54 +1,51 @@
 #include "gr.h"
 
-#define TIMEIT_PRINT2(__timer, __reps) \
-    flint_printf("cpu/wall(s): %g %g", \
-        __timer->cpu*0.001/__reps, __timer->wall*0.001 / __reps);
-
-#define TIMEIT_REPEAT(__timer, __reps) \
-    do \
-    { \
-        slong __timeit_k; \
-        __reps = 1; \
-        while (1) \
-        { \
-            timeit_start(__timer); \
-            for (__timeit_k = 0; __timeit_k < __reps; __timeit_k++) \
-            {
-
-#define TIMEIT_END_REPEAT(__timer, __reps) \
-            } \
-            timeit_stop(__timer); \
-            if (__timer->cpu >= 100) \
-                break; \
-            __reps *= 10; \
-        } \
-    } while (0);
-
-#define TIMEIT_START \
-    do { \
-        timeit_t __timer; slong __reps; \
-        TIMEIT_REPEAT(__timer, __reps)
-
-#define TIMEIT_STOP \
-        TIMEIT_END_REPEAT(__timer, __reps) \
-        TIMEIT_PRINT(__timer, __reps) \
-    } while (0);
-
-#define TIMEIT_ONCE_START \
-    do \
-    { \
-      timeit_t __timer; \
-      timeit_start(__timer); \
-      do { \
-
-#define TIMEIT_ONCE_STOP \
-      } while (0); \
-      timeit_stop(__timer); \
-      TIMEIT_PRINT(__timer, 1) \
-    } while (0); \
-
-
 typedef int ((*gr_test_function)(gr_ctx_t, flint_rand_t, int));
+
+int
+gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int verbose)
+{
+    int status;
+    GR_TMP_START;
+    gr_ptr a, b, c, d, e;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(a, R);
+    status |= gr_randtest(a, state, NULL, R);
+    GR_TMP_CLEAR1(a, R);
+
+    GR_TMP_INIT2(a, b, R);
+    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(b, state, NULL, R);
+    GR_TMP_CLEAR2(a, b, R);
+
+    GR_TMP_INIT3(a, b, c, R);
+    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(b, state, NULL, R);
+    status |= gr_randtest(c, state, NULL, R);
+    GR_TMP_CLEAR3(a, b, c, R);
+
+    GR_TMP_INIT4(a, b, c, d, R);
+    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(b, state, NULL, R);
+    status |= gr_randtest(c, state, NULL, R);
+    status |= gr_randtest(d, state, NULL, R);
+    GR_TMP_CLEAR4(a, b, c, d, R);
+
+    GR_TMP_INIT5(a, b, c, d, e, R);
+    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(b, state, NULL, R);
+    status |= gr_randtest(c, state, NULL, R);
+    status |= gr_randtest(d, state, NULL, R);
+    status |= gr_randtest(e, state, NULL, R);
+    GR_TMP_CLEAR5(a, b, c, d, e, R);
+
+    GR_TMP_END;
+
+    return status;
+}
+
 
 int
 gr_test_add_associativity(gr_ctx_t R, flint_rand_t state, int verbose)
@@ -746,7 +743,7 @@ int
 gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, aliasing, equal;
-    slong len;
+    slong i, len;
     GR_TMP_START;
     gr_ptr x, y, xy1, xy2;
 
@@ -785,7 +782,11 @@ gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int verbose)
             status |= _gr_vec_add(xy1, x, y, len, R);
     }
 
-    status |= gr_generic_vec_add(xy2, x, y, len, R);
+    for (i = 0; i < len; i++)
+        status |= gr_add(GR_ENTRY(xy2, i, R->sizeof_elem),
+                         GR_ENTRY(x, i, R->sizeof_elem),
+                         GR_ENTRY(y, i, R->sizeof_elem), R);
+
     status |= _gr_vec_equal(&equal, xy1, xy2, len, R);
 
     if (status == GR_SUCCESS && !equal)
@@ -929,6 +930,9 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
 
     flint_randinit(state);
+
+
+    gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters);
 
     gr_test_iter(R, state, "add: associativity", gr_test_add_associativity, iters);
     gr_test_iter(R, state, "add: commutativity", gr_test_add_commutativity, iters);
