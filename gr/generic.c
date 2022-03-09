@@ -520,7 +520,7 @@ gr_method_tab_init(gr_method_tab_t * methods, gr_method_tab_input * tab)
 {
     slong i;
 
-    methods->methods = flint_malloc(sizeof(void *) * GR_METHOD_TAB_SIZE);
+    methods->methods = flint_malloc(sizeof(gr_funcptr) * GR_METHOD_TAB_SIZE);
 
     for (i = 0; i < GR_METHOD_TAB_SIZE; i++)
         methods->methods[i] = (gr_funcptr) gr_not_implemented;
@@ -549,111 +549,36 @@ gr_method_tab_init(gr_method_tab_t * methods, gr_method_tab_input * tab)
     }
 }
 
-
-
-/* todo: thread safe */
-int _matrix_methods2_initialized = 0;
-gr_method_tab_t _matrix_methods2;
-
-gr_method_tab_input matrix_methods2[] =
-{
-    {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
-    {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
-    {GR_METHOD_RANDTEST,    (gr_funcptr) matrix_randtest},
-    {GR_METHOD_WRITE,       (gr_funcptr) matrix_write},
-    {GR_METHOD_ZERO,        (gr_funcptr) matrix_zero},
-    {GR_METHOD_ONE,         (gr_funcptr) matrix_one},
-    {GR_METHOD_EQUAL,       (gr_funcptr) matrix_equal},
-    {GR_METHOD_SET,         (gr_funcptr) matrix_set},
-    {GR_METHOD_NEG,         (gr_funcptr) matrix_neg},
-    {GR_METHOD_ADD,         (gr_funcptr) matrix_add},
-    {GR_METHOD_SUB,         (gr_funcptr) matrix_sub},
-    {GR_METHOD_MUL,         (gr_funcptr) matrix_mul},
-    {0,                     (gr_funcptr) NULL},
-};
-
-/* rename: gr_ctx_init_gr_mat */
 void
-gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+gr_method_tab_init_static(gr_method_tab_t * methods, gr_funcptr * static_tab, gr_method_tab_input * tab)
 {
-    ctx->flags = 0;
-    ctx->sizeof_elem = sizeof(gr_mat_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(matrix_ctx_t));
-    ((matrix_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
-    ((matrix_ctx_t *) ctx->elem_ctx)->n = n;
+    slong i;
 
-    if (!_matrix_methods2_initialized)
+    methods->methods = static_tab;
+
+    for (i = 0; i < GR_METHOD_TAB_SIZE; i++)
+        methods->methods[i] = (gr_funcptr) gr_not_implemented;
+
+    /* Assign generic methods as fallbacks */
+    for (i = 0; ; i++)
     {
-        gr_method_tab_init(&_matrix_methods2, matrix_methods2);
-        _matrix_methods2_initialized = 1;
+        if (gr_generic_methods[i].function == NULL)
+            break;
+
+        if (gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
+            abort();
+
+        methods->methods[gr_generic_methods[i].index] = gr_generic_methods[i].function;
     }
 
-    ctx->methods2 = &_matrix_methods2;
-
-    ctx->debug_string = "matrix ring";
-}
-
-void
-gr_ctx_clear_matrix(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
-}
-
-
-
-/* todo: thread safe */
-int _nmod8_methods2_initialized = 0;
-gr_method_tab_t _nmod8_methods2;
-
-gr_method_tab_input nmod8_methods2[] =
-{
-    {GR_METHOD_INIT,            (gr_funcptr) nmod8_init},
-    {GR_METHOD_CLEAR,           (gr_funcptr) nmod8_clear},
-    {GR_METHOD_SWAP,            (gr_funcptr) nmod8_swap},
-    {GR_METHOD_RANDTEST,        (gr_funcptr) nmod8_randtest},
-    {GR_METHOD_WRITE,           (gr_funcptr) nmod8_write},
-    {GR_METHOD_ZERO,            (gr_funcptr) nmod8_zero},
-    {GR_METHOD_ONE,             (gr_funcptr) nmod8_one},
-    {GR_METHOD_IS_ZERO,         (gr_funcptr) nmod8_is_zero},
-    {GR_METHOD_IS_ONE,          (gr_funcptr) nmod8_is_one},
-    {GR_METHOD_EQUAL,           (gr_funcptr) nmod8_equal},
-    {GR_METHOD_SET,             (gr_funcptr) nmod8_set},
-    {GR_METHOD_SET_SI,          (gr_funcptr) nmod8_set_si},
-    {GR_METHOD_NEG,             (gr_funcptr) nmod8_neg},
-    {GR_METHOD_ADD,             (gr_funcptr) nmod8_add},
-    {GR_METHOD_ADD_SI,          (gr_funcptr) nmod8_add_si},
-    {GR_METHOD_SUB,             (gr_funcptr) nmod8_sub},
-    {GR_METHOD_MUL,             (gr_funcptr) nmod8_mul},
-    {GR_METHOD_MUL_SI,          (gr_funcptr) nmod8_mul_si},
-    {GR_METHOD_DIV,             (gr_funcptr) nmod8_div},
-    {GR_METHOD_DIV_SI,          (gr_funcptr) nmod8_div_si},
-    {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
-    {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
-    {0,                         (gr_funcptr) NULL},
-};
-
-
-void
-gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
-{
-    ctx->flags = GR_COMMUTATIVE_RING;
-    ctx->sizeof_elem = sizeof(nmod8_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(nmod_t));  /* This could be something more interesting */
-    nmod_init(ctx->elem_ctx, n);
-
-    if (!_nmod8_methods2_initialized)
+    for (i = 0; ; i++)
     {
-        gr_method_tab_init(&_nmod8_methods2, nmod8_methods2);
-        _nmod8_methods2_initialized = 1;
+        if (tab[i].function == NULL)
+            break;
+
+        if (tab[i].index >= GR_METHOD_TAB_SIZE)
+            abort();
+
+        methods->methods[tab[i].index] = tab[i].function;
     }
-
-    ctx->methods2 = &_nmod8_methods2;
-
-    ctx->debug_string = "nmod8 ring";
-}
-
-void
-gr_ctx_clear_nmod8(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
 }

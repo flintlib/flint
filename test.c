@@ -978,6 +978,10 @@ int main()
     gr_ctx_init_matrix(MZn, Zn, 10);
     gr_test_ring(MZn, 10);
 
+    /* todo: ctx cleanup method */
+    gr_ctx_clear_nmod8(Zn);
+    gr_ctx_clear_matrix(MZn);
+
     flint_cleanup();
     return 0;
 }
