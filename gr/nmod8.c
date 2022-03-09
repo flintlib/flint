@@ -187,12 +187,20 @@ nmod8_is_invertible(int * res, const nmod8_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+nmod8_ctx_clear(gr_ctx_t ctx)
+{
+    flint_free(ctx->elem_ctx);
+    return GR_SUCCESS;
+}
+
 int _nmod8_methods2_initialized = 0;
 gr_static_method_table _nmod8_static_table;
 gr_method_tab_t _nmod8_methods2;
 
 gr_method_tab_input nmod8_methods2[] =
 {
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) nmod8_ctx_clear},
     {GR_METHOD_INIT,            (gr_funcptr) nmod8_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) nmod8_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) nmod8_swap},
@@ -235,10 +243,4 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
     ctx->methods2 = &_nmod8_methods2;
 
     ctx->debug_string = "nmod8 ring";
-}
-
-void
-gr_ctx_clear_nmod8(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
 }

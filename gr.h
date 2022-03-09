@@ -134,6 +134,8 @@ GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 
 typedef enum
 {
+    GR_METHOD_CTX_CLEAR,
+
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
     GR_METHOD_SWAP,
@@ -263,6 +265,7 @@ typedef gr_ctx_struct gr_ctx_t[1];
 
 /* Typedefs for method function pointers. */
 
+typedef int ((*gr_method_ctx)(gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, const void * options, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
@@ -292,6 +295,7 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 
 /* Macros to retrieve methods (with correct call signature) from context object. */
 
+#define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_SWAP_OP(ctx, NAME) (((gr_method_swap_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
@@ -321,6 +325,7 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 
 /* Wrappers to call methods. */
 
+GR_INLINE int gr_ctx_clear(gr_ctx_t ctx) { return GR_CTX_OP(ctx, CTX_CLEAR)(ctx); }
 GR_INLINE int gr_init(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, INIT)(res, ctx); }
 GR_INLINE int gr_clear(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { return GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
@@ -582,8 +587,6 @@ typedef gr_poly_struct gr_poly_t[1];
 
 
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
-void gr_ctx_clear_nmod8(gr_ctx_t ctx);
-
 
 
 /* Matrix ring to test */
@@ -678,7 +681,6 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 #define matrix_set_si gr_not_implemented
 
 void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
-void gr_ctx_clear_matrix(gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

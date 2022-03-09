@@ -387,7 +387,12 @@ gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ct
     return status;
 }
 
-
+int
+matrix_ctx_clear(gr_ctx_t ctx)
+{
+    flint_free(ctx->elem_ctx);
+    return GR_SUCCESS;
+}
 
 /* todo: thread safe */
 int _matrix_methods2_initialized = 0;
@@ -396,6 +401,7 @@ gr_method_tab_t _matrix_methods2;
 
 gr_method_tab_input matrix_methods2[] =
 {
+    {GR_METHOD_CTX_CLEAR,   (gr_funcptr) matrix_ctx_clear},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_RANDTEST,    (gr_funcptr) matrix_randtest},
@@ -430,10 +436,4 @@ gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
     ctx->methods2 = &_matrix_methods2;
 
     ctx->debug_string = "matrix ring";
-}
-
-void
-gr_ctx_clear_matrix(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
 }

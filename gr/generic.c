@@ -490,9 +490,17 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
     return status;
 }
 
+int
+gr_generic_ctx_clear(gr_ctx_t ctx)
+{
+    return GR_SUCCESS;
+}
+
 /* Generic method implementations */
 const gr_method_tab_input gr_generic_methods[] =
 {
+    {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
+
     {GR_METHOD_POW_SI,                  (gr_funcptr) gr_generic_pow_si},
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},
 
