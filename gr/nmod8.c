@@ -231,6 +231,8 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
 {
     ctx->flags = GR_COMMUTATIVE_RING;
     ctx->sizeof_elem = sizeof(nmod8_struct);
+    ctx->size_limit = WORD_MAX;
+
     ctx->elem_ctx = flint_malloc(sizeof(nmod_t));  /* This could be something more interesting */
     nmod_init(ctx->elem_ctx, n);
 

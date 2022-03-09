@@ -424,6 +424,8 @@ gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
     ctx->flags = 0;
     ctx->sizeof_elem = sizeof(gr_mat_struct);
     ctx->elem_ctx = flint_malloc(sizeof(matrix_ctx_t));
+    ctx->size_limit = WORD_MAX;
+
     ((matrix_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
     ((matrix_ctx_t *) ctx->elem_ctx)->n = n;
 

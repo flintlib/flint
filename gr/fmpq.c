@@ -180,11 +180,10 @@ _gr_fmpq_is_invertible(int * res, const fmpq_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* todo: systematic size solution for test code */
 int
 _gr_fmpq_pow_ui(fmpq_t res, const fmpq_t x, ulong exp, const gr_ctx_t ctx)
 {
-    if (exp > 1000)
+    if (exp > (ulong) WORD_MAX || exp >= ctx->size_limit)  /* todo: systematic size solution for test code */
     {
         return GR_UNABLE;
     }
@@ -231,6 +230,7 @@ gr_ctx_init_fmpq(gr_ctx_t ctx)
     ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
     ctx->sizeof_elem = sizeof(fmpq);
     ctx->elem_ctx = NULL;
+    ctx->size_limit = WORD_MAX;
 
     if (!_fmpq_methods2_initialized)
     {

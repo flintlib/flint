@@ -263,6 +263,7 @@ typedef struct
     void * elem_ctx;
     char * debug_string;
     gr_method_tab_t * methods2;
+    slong size_limit;
 }
 gr_ctx_struct;
 

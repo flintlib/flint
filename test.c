@@ -974,6 +974,7 @@ int main()
     gr_ctx_t Zn;
 
     gr_ctx_init_fmpq(QQ);
+    QQ->size_limit = 1000;
     gr_test_ring(QQ, 1000);
     gr_ctx_clear(QQ);
 
