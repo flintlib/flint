@@ -969,8 +969,13 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
 int main()
 {
+    gr_ctx_t QQ;
     gr_ctx_t MZn;
     gr_ctx_t Zn;
+
+    gr_ctx_init_fmpq(QQ);
+    gr_test_ring(QQ, 1000);
+    gr_ctx_clear(QQ);
 
     gr_ctx_init_nmod8(Zn, 107);
     gr_test_ring(Zn, 1000);

@@ -99,6 +99,12 @@ gr_stream_write_free(gr_stream_t out, char * s)
     flint_free(s);
 }
 
+GR_INLINE void
+gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x)
+{
+    gr_stream_write_free(out, fmpz_get_str(NULL, 10, x));
+}
+
 /*
 All functions implement error handling and return a status code.
 
@@ -573,6 +579,12 @@ int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t 
 int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
+/* Some base rings */
+
+
+void gr_ctx_init_fmpq(gr_ctx_t ctx);
+void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
+
 /* Todo: generic polynomials */
 
 typedef struct
@@ -584,9 +596,6 @@ typedef struct
 gr_poly_struct;
 
 typedef gr_poly_struct gr_poly_t[1];
-
-
-void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 
 
 /* Matrix ring to test */
