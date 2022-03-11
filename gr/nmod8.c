@@ -83,7 +83,7 @@ int
 nmod8_set_fmpz(nmod8_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     nmod_t mod = NMOD8_CTX(ctx);
-    res[0] = fmpz_get_nmod(v, NMOD8_CTX(ctx));
+    res[0] = fmpz_get_nmod(v, mod);
     return GR_SUCCESS;
 }
 

@@ -94,7 +94,7 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
     fmpz_randtest(zy, state, 100);
     fmpq_randtest(qy, state, 100);
 
-    for (which = 0; which < 1; which++)
+    for (which = 0; which < 4; which++)
     {
         gr_randtest(x, state, NULL, R);
         gr_randtest(y, state, NULL, R);
@@ -509,6 +509,15 @@ gr_test_sub_aliasing(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     return gr_test_binary_op_aliasing(R, gr_sub, state, verbose);
 }
+
+int
+gr_test_sub_type_variants(gr_ctx_t R, flint_rand_t state, int verbose)
+{
+    return gr_test_binary_op_type_variants(R,
+        gr_sub, gr_sub_ui, gr_sub_si, gr_sub_fmpz, gr_sub_fmpq,
+            state, verbose);
+}
+
 
 int
 gr_test_mul_associativity(gr_ctx_t R, flint_rand_t state, int verbose)
@@ -1160,6 +1169,7 @@ gr_test_ring(gr_ctx_t R, slong iters)
     gr_test_iter(R, state, "sub: aliasing", gr_test_sub_aliasing, iters);
 
     gr_test_iter(R, state, "add: ui/si/fmpz/fmpq", gr_test_add_type_variants, iters);
+    gr_test_iter(R, state, "sub: ui/si/fmpz/fmpq", gr_test_sub_type_variants, iters);
 
     gr_test_iter(R, state, "mul: associativity", gr_test_mul_associativity, iters);
     if ((R-> flags & GR_COMMUTATIVE_RING) == GR_COMMUTATIVE_RING)
@@ -1210,10 +1220,16 @@ int main()
 
     gr_ctx_init_nmod8(Zn, 107);
     gr_test_ring(Zn, 1000);
+
     gr_ctx_init_matrix(MZn, Zn, 10);
     gr_test_ring(MZn, 10);
-    gr_ctx_clear(Zn);
     gr_ctx_clear(MZn);
+
+    gr_ctx_init_matrix(MZn, Zn, 4);
+    gr_test_ring(MZn, 1000);
+    gr_ctx_clear(MZn);
+
+    gr_ctx_clear(Zn);
 
     flint_cleanup();
     return 0;

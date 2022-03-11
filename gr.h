@@ -613,6 +613,10 @@ int gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
 int gr_mat_one(gr_mat_t res, gr_ctx_t ctx);
 int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
+int gr_mat_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx);
+int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
+int gr_mat_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx);
+int gr_mat_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx);
 int gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
@@ -692,6 +696,30 @@ GR_INLINE int
 matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_set(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
+matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
+{
+    return gr_mat_set_si(res, v, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
+matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
+{
+    return gr_mat_set_ui(res, v, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
+matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
+{
+    return gr_mat_set_fmpz(res, v, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
+matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
+{
+    return gr_mat_set_fmpq(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
 GR_INLINE int

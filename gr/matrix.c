@@ -216,8 +216,86 @@ gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
 
     status = gr_mat_zero(res, ctx);
 
-    for (i = 0; i < FLINT_MIN(r, c); i++)
-        status |= gr_set_si(GR_MAT_ENTRY(res, i, i, sz), v, ctx);
+    if (r > 0 && c > 0)
+    {
+        status |= gr_set_si(GR_MAT_ENTRY(res, 0, 0, sz), v, ctx);
+
+        for (i = 1; i < FLINT_MIN(r, c); i++)
+            status |= gr_set(GR_MAT_ENTRY(res, i, i, sz),
+                            GR_MAT_ENTRY(res, 0, 0, sz), ctx);
+    }
+
+    return status;
+}
+
+int
+gr_mat_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
+{
+    int status;
+    slong i, r, c, sz;
+
+    r = gr_mat_nrows(res, ctx);
+    c = gr_mat_ncols(res, ctx);
+    sz = ctx->sizeof_elem;
+
+    status = gr_mat_zero(res, ctx);
+
+    if (r > 0 && c > 0)
+    {
+        status |= gr_set_ui(GR_MAT_ENTRY(res, 0, 0, sz), v, ctx);
+
+        for (i = 1; i < FLINT_MIN(r, c); i++)
+            status |= gr_set(GR_MAT_ENTRY(res, i, i, sz),
+                            GR_MAT_ENTRY(res, 0, 0, sz), ctx);
+    }
+
+    return status;
+}
+
+int
+gr_mat_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
+{
+    int status;
+    slong i, r, c, sz;
+
+    r = gr_mat_nrows(res, ctx);
+    c = gr_mat_ncols(res, ctx);
+    sz = ctx->sizeof_elem;
+
+    status = gr_mat_zero(res, ctx);
+
+    if (r > 0 && c > 0)
+    {
+        status |= gr_set_fmpz(GR_MAT_ENTRY(res, 0, 0, sz), v, ctx);
+
+        for (i = 1; i < FLINT_MIN(r, c); i++)
+            status |= gr_set(GR_MAT_ENTRY(res, i, i, sz),
+                            GR_MAT_ENTRY(res, 0, 0, sz), ctx);
+    }
+
+    return status;
+}
+
+int
+gr_mat_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
+{
+    int status;
+    slong i, r, c, sz;
+
+    r = gr_mat_nrows(res, ctx);
+    c = gr_mat_ncols(res, ctx);
+    sz = ctx->sizeof_elem;
+
+    status = gr_mat_zero(res, ctx);
+
+    if (r > 0 && c > 0)
+    {
+        status |= gr_set_fmpq(GR_MAT_ENTRY(res, 0, 0, sz), v, ctx);
+
+        for (i = 1; i < FLINT_MIN(r, c); i++)
+            status |= gr_set(GR_MAT_ENTRY(res, i, i, sz),
+                            GR_MAT_ENTRY(res, 0, 0, sz), ctx);
+    }
 
     return status;
 }
@@ -492,6 +570,10 @@ gr_method_tab_input matrix_methods2[] =
     {GR_METHOD_IS_ONE,      (gr_funcptr) matrix_is_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) matrix_equal},
     {GR_METHOD_SET,         (gr_funcptr) matrix_set},
+    {GR_METHOD_SET_UI,      (gr_funcptr) matrix_set_ui},
+    {GR_METHOD_SET_SI,      (gr_funcptr) matrix_set_si},
+    {GR_METHOD_SET_FMPZ,    (gr_funcptr) matrix_set_fmpz},
+    {GR_METHOD_SET_FMPQ,    (gr_funcptr) matrix_set_fmpq},
     {GR_METHOD_NEG,         (gr_funcptr) matrix_neg},
     {GR_METHOD_ADD,         (gr_funcptr) matrix_add},
     {GR_METHOD_SUB,         (gr_funcptr) matrix_sub},

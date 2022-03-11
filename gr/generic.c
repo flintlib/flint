@@ -2,6 +2,30 @@
 
 /* Generic arithmetic functions */
 
+int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t, u;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT2(t, u, ctx);
+
+    status |= gr_set_fmpz(t, fmpq_numref(y), ctx);
+    status |= gr_set_fmpz(u, fmpq_denref(y), ctx);
+
+    if (status == GR_SUCCESS)
+        status = gr_inv(u, u, ctx);
+
+    if (status == GR_SUCCESS)
+        status = gr_mul(res, t, u, ctx);
+
+    GR_TMP_CLEAR2(t, u, ctx);
+    GR_TMP_END;
+    return status;
+}
+
 int gr_generic_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
     GR_TMP_START;
@@ -54,12 +78,57 @@ int gr_generic_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     GR_TMP_INIT1(t, ctx);
 
-    status |= gr_set_fmpq(t, x, ctx);
+    status |= gr_set_fmpq(t, y, ctx);
     if (status == GR_SUCCESS)
         status = gr_add(res, x, t, ctx);
 
     GR_TMP_CLEAR1(t, ctx);
     GR_TMP_END;
+    return status;
+}
+
+int gr_generic_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+{
+    int status;
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_neg_ui(t, y);
+    status = gr_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    int status;
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_si(t, y);
+    fmpz_neg(t, t);
+    status = gr_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    int status;
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_neg(t, y);
+    status = gr_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    int status;
+    fmpq_t t;
+    fmpq_init(t);
+    fmpq_neg(t, y);
+    status = gr_add_fmpq(res, x, t, ctx);
+    fmpq_clear(t);
     return status;
 }
 
@@ -633,10 +702,17 @@ const gr_method_tab_input gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
 
+    {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
+
     {GR_METHOD_ADD_UI,                  (gr_funcptr) gr_generic_add_ui},
     {GR_METHOD_ADD_SI,                  (gr_funcptr) gr_generic_add_si},
     {GR_METHOD_ADD_FMPZ,                (gr_funcptr) gr_generic_add_fmpz},
     {GR_METHOD_ADD_FMPQ,                (gr_funcptr) gr_generic_add_fmpq},
+
+    {GR_METHOD_SUB_UI,                  (gr_funcptr) gr_generic_sub_ui},
+    {GR_METHOD_SUB_SI,                  (gr_funcptr) gr_generic_sub_si},
+    {GR_METHOD_SUB_FMPZ,                (gr_funcptr) gr_generic_sub_fmpz},
+    {GR_METHOD_SUB_FMPQ,                (gr_funcptr) gr_generic_sub_fmpq},
 
     {GR_METHOD_POW_SI,                  (gr_funcptr) gr_generic_pow_si},
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},
