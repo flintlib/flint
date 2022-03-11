@@ -4,6 +4,9 @@ test: test.c
 	gcc -o test test.c gr/*.c $(CFLAGS)
 
 check:
+	./test
+
+valgrind:
 	valgrind ./test
 
 clean:

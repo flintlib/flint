@@ -76,6 +76,28 @@ _gr_fmpq_set_si(fmpq_t res, slong v, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpq_set_ui(fmpq_t res, ulong v, const gr_ctx_t ctx)
+{
+    fmpq_set_ui(res, v, 1);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_set_fmpz(fmpq_t res, const fmpz_t v, const gr_ctx_t ctx)
+{
+    fmpz_set(fmpq_numref(res), v);
+    fmpz_one(fmpq_denref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_set_fmpq(fmpq_t res, const fmpq_t v, const gr_ctx_t ctx)
+{
+    fmpq_set(res, v);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_is_zero(int * res, const fmpq_t x, const gr_ctx_t ctx)
 {
     res[0] = fmpq_is_zero(x);
@@ -121,6 +143,13 @@ int
 _gr_fmpq_add_si(fmpq_t res, const fmpq_t x, slong y, const gr_ctx_t ctx)
 {
     fmpq_add_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_add_ui(fmpq_t res, const fmpq_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpq_add_ui(res, x, y);
     return GR_SUCCESS;
 }
 
@@ -212,8 +241,12 @@ gr_method_tab_input fmpq_methods2[] =
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_fmpq_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fmpq_set_si},
+    {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpq_set_ui},
+    {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_set_fmpz},
+    {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpq_set_fmpq},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpq_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpq_add},
+    {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpq_add_ui},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_fmpq_add_si},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_fmpq_sub},
     {GR_METHOD_MUL,             (gr_funcptr) _gr_fmpq_mul},

@@ -55,6 +55,20 @@ gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx)
 }
 
 int
+gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
+{
+    if (mat1 != mat2)
+    {
+        gr_mat_t tmp;
+        *tmp = *mat1;
+        *mat1 = *mat2;
+        *mat2 = *tmp;
+    }
+
+    return GR_SUCCESS;
+}
+
+int
 gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
 {
     int status;
@@ -69,6 +83,71 @@ gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
         status |= _gr_vec_randtest(mat->rows[i], state, c, options, ctx);
     }
 
+    return status;
+}
+
+int
+gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    int status, equal, this_equal;
+    slong i, r, c;
+
+    status = GR_SUCCESS;
+
+    r = gr_mat_nrows(mat, ctx);
+    c = gr_mat_ncols(mat, ctx);
+
+    if (r == 0 || c == 0)
+    {
+        res[0] = 1;
+        return GR_SUCCESS;
+    }
+
+    equal = 1;
+    for (i = 0; i < r && equal; i++)
+    {
+        status |= _gr_vec_is_zero(&this_equal, mat->rows[i], c, ctx);
+        equal = equal && this_equal;
+    }
+
+    res[0] = equal;
+    return status;
+}
+
+int
+gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    int status, equal, this_equal;
+    slong i, j, r, c, sz;
+
+    status = GR_SUCCESS;
+
+    r = gr_mat_nrows(mat, ctx);
+    c = gr_mat_ncols(mat, ctx);
+
+    if (r == 0 || c == 0)
+    {
+        res[0] = 1;
+        return GR_SUCCESS;
+    }
+
+    sz = ctx->sizeof_elem;
+
+    equal = 1;
+    for (i = 0; i < r && equal; i++)
+    {
+        for (j = 0; j < c && equal; j++)
+        {
+            if (i == j)
+                status |= gr_is_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+            else
+                status |= gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+
+            equal = equal && this_equal;
+        }
+    }
+
+    res[0] = equal;
     return status;
 }
 
@@ -404,10 +483,13 @@ gr_method_tab_input matrix_methods2[] =
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) matrix_ctx_clear},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
+    {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},
     {GR_METHOD_RANDTEST,    (gr_funcptr) matrix_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) matrix_write},
     {GR_METHOD_ZERO,        (gr_funcptr) matrix_zero},
     {GR_METHOD_ONE,         (gr_funcptr) matrix_one},
+    {GR_METHOD_IS_ZERO,     (gr_funcptr) matrix_is_zero},
+    {GR_METHOD_IS_ONE,      (gr_funcptr) matrix_is_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) matrix_equal},
     {GR_METHOD_SET,         (gr_funcptr) matrix_set},
     {GR_METHOD_NEG,         (gr_funcptr) matrix_neg},
@@ -422,6 +504,10 @@ void
 gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
     ctx->flags = 0;
+
+    if (base_ring->flags & GR_FINITE_RING)
+        ctx->flags |= GR_FINITE_RING;
+
     ctx->sizeof_elem = sizeof(gr_mat_struct);
     ctx->elem_ctx = flint_malloc(sizeof(matrix_ctx_t));
     ctx->size_limit = WORD_MAX;

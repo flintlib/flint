@@ -2,11 +2,75 @@
 
 /* Generic arithmetic functions */
 
+int gr_generic_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_set_fmpz(t, y, ctx);
+
+    if (status == GR_SUCCESS)
+        status = gr_add(res, x, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    fmpz_init(t);
+    fmpz_set_ui(t, y);
+    status = gr_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    fmpz_init(t);
+    fmpz_set_si(t, y);
+    status = gr_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_set_fmpq(t, x, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_add(res, x, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+/* Generic powering */
+
 /* Assumes exp >= 2; res and tmp not not aliased with x. */
 static int
-_gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_t ctx)
+gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_t ctx)
 {
     gr_ptr R, S, T;
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     int status;
     int zeros;
     ulong bit;
@@ -35,11 +99,11 @@ _gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx
 
     bit = UWORD(1) << (FLINT_BIT_COUNT(exp) - 2);
 
-    status |= gr_mul(R, x, x, ctx);
+    status |= mul(R, x, x, ctx);
 
     if (bit & exp)
     {
-        status |= gr_mul(S, R, x, ctx);
+        status |= mul(S, R, x, ctx);
         T = R;
         R = S;
         S = T;
@@ -47,11 +111,11 @@ _gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx
 
     while (bit >>= 1)
     {
-        status |= gr_mul(S, R, R, ctx);
+        status |= mul(S, R, R, ctx);
 
         if (bit & exp)
         {
-            status |= gr_mul(R, S, x, ctx);
+            status |= mul(R, S, x, ctx);
         }
         else
         {
@@ -64,10 +128,48 @@ _gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx
     return status;
 }
 
+/* todo: optimize swaps */
+static int
+gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t, u;
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
+    int status;
+    slong i;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT2(t, u, ctx);
+
+    status |= gr_set(t, x, ctx);
+
+    for (i = fmpz_bits(exp) - 2; i >= 0; i--)
+    {
+        status |= mul(u, t, t, ctx);
+
+        if (fmpz_tstbit(exp, i))
+            status |= mul(t, u, x, ctx);
+        else
+            status |= swap(t, u, ctx);
+    }
+
+    status |= swap(res, t, ctx);
+
+    GR_TMP_CLEAR2(t, u, ctx);
+    GR_TMP_END;
+
+    return status;
+}
+
 int
 gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
 {
     int status;
+
+    if (e > (ulong) ctx->size_limit)
+        return GR_UNABLE;
 
     if (e == 0)
     {
@@ -96,13 +198,13 @@ gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
         {
             GR_TMP_INIT2(t, u, ctx);
             gr_set(u, x, ctx);
-            status = _gr_generic_pow_ui_binexp(res, t, u, e, ctx);
+            status = gr_generic_pow_ui_binexp(res, t, u, e, ctx);
             GR_TMP_CLEAR2(t, u, ctx);
         }
         else
         {
             GR_TMP_INIT1(t, ctx);
-            status = _gr_generic_pow_ui_binexp(res, t, x, e, ctx);
+            status = gr_generic_pow_ui_binexp(res, t, x, e, ctx);
             GR_TMP_CLEAR1(t, ctx);
         }
 
@@ -126,10 +228,40 @@ gr_generic_pow_si(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
         /* todo: some heuristic for when we want to invert before/after powering */
         status = gr_inv(res, x, ctx);
         if (status == GR_SUCCESS)
-            status = gr_generic_pow_ui(res, x, -e, ctx);
+            status = gr_generic_pow_ui(res, res, -e, ctx);
 
         return status;
     }
+}
+
+int
+gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
+{
+    int status;
+
+    if (fmpz_sgn(e) < 0)
+    {
+        fmpz_t f;
+        fmpz_init(f);
+        fmpz_neg(f, e);
+
+        /* todo: some heuristic for when we want to invert before/after powering */
+        status = gr_inv(res, x, ctx);
+        if (status == GR_SUCCESS)
+            status = gr_generic_pow_fmpz(res, res, f, ctx);
+
+        fmpz_clear(f);
+        return status;
+    }
+
+    if (*e == 0)
+        return gr_one(res, ctx);
+    else if (*e == 1)
+        return gr_set(res, x, ctx);
+    else if (*e == 2)
+        return gr_mul(res, x, x, ctx);
+    else
+        return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }
 
 /* Generic vector functions */
@@ -360,7 +492,7 @@ gr_generic_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ct
     status = GR_SUCCESS;
 
     equal = 1;
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len && equal; i++)
     {
         status |= gr_equal(&this_equal, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
         equal = equal && this_equal;
@@ -380,7 +512,7 @@ gr_generic_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     equal = 1;
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len && equal; i++)
     {
         status |= gr_is_zero(&this_equal, GR_ENTRY(vec, i, sz), ctx);
         equal = equal && this_equal;
@@ -501,8 +633,14 @@ const gr_method_tab_input gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
 
+    {GR_METHOD_ADD_UI,                  (gr_funcptr) gr_generic_add_ui},
+    {GR_METHOD_ADD_SI,                  (gr_funcptr) gr_generic_add_si},
+    {GR_METHOD_ADD_FMPZ,                (gr_funcptr) gr_generic_add_fmpz},
+    {GR_METHOD_ADD_FMPQ,                (gr_funcptr) gr_generic_add_fmpq},
+
     {GR_METHOD_POW_SI,                  (gr_funcptr) gr_generic_pow_si},
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},
+    {GR_METHOD_POW_FMPZ,                (gr_funcptr) gr_generic_pow_fmpz},
 
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},
     {GR_METHOD_VEC_CLEAR,               (gr_funcptr) gr_generic_vec_clear},

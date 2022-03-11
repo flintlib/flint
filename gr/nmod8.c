@@ -70,6 +70,24 @@ nmod8_set_si(nmod8_t res, slong v, const gr_ctx_t ctx)
 }
 
 int
+nmod8_set_ui(nmod8_t res, ulong v, const gr_ctx_t ctx)
+{
+    ulong t;
+    nmod_t mod = NMOD8_CTX(ctx);
+    NMOD_RED(t, v, mod);
+    res[0] = t;
+    return GR_SUCCESS;
+}
+
+int
+nmod8_set_fmpz(nmod8_t res, const fmpz_t v, const gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD8_CTX(ctx);
+    res[0] = fmpz_get_nmod(v, NMOD8_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 nmod8_is_zero(int * res, const nmod8_t x, const gr_ctx_t ctx)
 {
     res[0] = (x[0] == 0);
@@ -213,6 +231,8 @@ gr_method_tab_input nmod8_methods2[] =
     {GR_METHOD_EQUAL,           (gr_funcptr) nmod8_equal},
     {GR_METHOD_SET,             (gr_funcptr) nmod8_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) nmod8_set_si},
+    {GR_METHOD_SET_UI,          (gr_funcptr) nmod8_set_ui},
+    {GR_METHOD_SET_FMPZ,        (gr_funcptr) nmod8_set_fmpz},
     {GR_METHOD_NEG,             (gr_funcptr) nmod8_neg},
     {GR_METHOD_ADD,             (gr_funcptr) nmod8_add},
     {GR_METHOD_ADD_SI,          (gr_funcptr) nmod8_add_si},

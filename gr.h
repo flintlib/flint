@@ -162,6 +162,12 @@ typedef enum
     GR_METHOD_SET_FMPQ,
 
     GR_METHOD_GET_SI,
+    GR_METHOD_GET_UI,
+    GR_METHOD_GET_FMPZ,
+    GR_METHOD_GET_FMPQ,
+
+    GR_METHOD_IS_INTEGER,
+    GR_METHOD_IS_RATIONAL,
 
     GR_METHOD_NEG,
 
@@ -255,6 +261,7 @@ void gr_method_tab_init_static(gr_method_tab_t * methods, gr_funcptr * static_ta
 #define GR_COMMUTATIVE_RING  UWORD(1)
 #define GR_INTEGRAL_DOMAIN   UWORD(2)
 #define GR_FIELD             UWORD(4)
+#define GR_FINITE_RING       UWORD(8)
 
 typedef struct
 {
@@ -263,7 +270,7 @@ typedef struct
     void * elem_ctx;
     char * debug_string;
     gr_method_tab_t * methods2;
-    slong size_limit;
+    ulong size_limit;
 }
 gr_ctx_struct;
 
@@ -340,22 +347,52 @@ GR_INLINE int gr_randtest(gr_ptr x, flint_rand_t state, const void * options, gr
 GR_INLINE int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
 GR_INLINE int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
+
 GR_INLINE int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_SI)(res, x, ctx); }
+GR_INLINE int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_UI)(res, x, ctx); }
+GR_INLINE int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, SET_FMPZ)(res, x, ctx); }
+GR_INLINE int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPQ(ctx, SET_FMPQ)(res, x, ctx); }
+
 GR_INLINE int gr_is_zero(int * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(res, x, ctx); }
 GR_INLINE int gr_is_one(int * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ONE)(res, x, ctx); }
+
 GR_INLINE int gr_equal(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, EQUAL)(res, x, y, ctx); }
+
 GR_INLINE int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET)(res, x, ctx); }
 GR_INLINE int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NEG)(res, x, ctx); }
+
 GR_INLINE int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADD)(res, x, y, ctx); }
+GR_INLINE int gr_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, ADD_UI)(res, x, y, ctx); }
 GR_INLINE int gr_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, ADD_SI)(res, x, y, ctx); }
+GR_INLINE int gr_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, ADD_FMPZ)(res, x, y, ctx); }
+GR_INLINE int gr_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, ADD_FMPQ)(res, x, y, ctx); }
+
 GR_INLINE int gr_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SUB)(res, x, y, ctx); }
+GR_INLINE int gr_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, SUB_UI)(res, x, y, ctx); }
+GR_INLINE int gr_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, SUB_SI)(res, x, y, ctx); }
+GR_INLINE int gr_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, SUB_FMPZ)(res, x, y, ctx); }
+GR_INLINE int gr_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, SUB_FMPQ)(res, x, y, ctx); }
+
 GR_INLINE int gr_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MUL)(res, x, y, ctx); }
+GR_INLINE int gr_mul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, MUL_UI)(res, x, y, ctx); }
 GR_INLINE int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, MUL_SI)(res, x, y, ctx); }
+GR_INLINE int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ)(res, x, y, ctx); }
+GR_INLINE int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, MUL_FMPQ)(res, x, y, ctx); }
+
 GR_INLINE int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV)(res, x, y, ctx); }
+GR_INLINE int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIV_UI)(res, x, y, ctx); }
+GR_INLINE int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIV_SI)(res, x, y, ctx); }
+GR_INLINE int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, DIV_FMPZ)(res, x, y, ctx); }
+GR_INLINE int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, DIV_FMPQ)(res, x, y, ctx); }
+
 GR_INLINE int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
 GR_INLINE int gr_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INVERTIBLE)(res, x, ctx); }
+
+GR_INLINE int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POW)(res, x, y, ctx); }
 GR_INLINE int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, POW_UI)(res, x, y, ctx); }
 GR_INLINE int gr_pow_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, POW_SI)(res, x, y, ctx); }
+GR_INLINE int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, POW_FMPZ)(res, x, y, ctx); }
+GR_INLINE int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, POW_FMPQ)(res, x, y, ctx); }
 
 
 /* Macros for allocating temporary variables on the stack. */
@@ -561,15 +598,18 @@ gr_mat_struct;
 
 typedef gr_mat_struct gr_mat_t[1];
 
-#define GR_MAT_ENTRY(mat,i,j,ctx) GR_ENTRY((mat)->rows[i], j, sz)
+#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
 
 int gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
 int gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
+int gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx);
 int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx);
 int gr_mat_equal(int * res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx);
+int gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx);
+int gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
 int gr_mat_one(gr_mat_t res, gr_ctx_t ctx);
 int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
@@ -623,6 +663,12 @@ matrix_clear(gr_mat_t res, gr_ctx_t ctx)
     return gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
 }
 
+GR_INLINE int
+matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
+{
+    return gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
+}
+
 /* TODO UNIFY */
 GR_INLINE int
 matrix_write(gr_stream_t out, gr_mat_t res, gr_ctx_t ctx)
@@ -661,6 +707,18 @@ matrix_one(gr_mat_t res, gr_ctx_t ctx)
 }
 
 GR_INLINE int
+matrix_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return gr_mat_is_zero(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
+matrix_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return gr_mat_is_one(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
@@ -683,12 +741,6 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
-
-/* todo */
-#define matrix_swap gr_not_implemented
-#define matrix_is_zero gr_not_implemented
-#define matrix_is_one gr_not_implemented
-#define matrix_set_si gr_not_implemented
 
 void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
