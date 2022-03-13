@@ -93,6 +93,24 @@ gr_stream_write_si(gr_stream_t out, slong x)
 }
 
 GR_INLINE void
+gr_stream_write_ui(gr_stream_t out, ulong x)
+{
+    if (out->fp != NULL)
+    {
+        flint_fprintf(out->fp, "%wu", x);
+    }
+    else
+    {
+        char tmp[22];
+        if (sizeof(ulong) == sizeof(unsigned long))
+            sprintf(tmp, "%lu", x);
+        else
+            flint_sprintf(tmp, "%wu", x);
+        gr_stream_write(out, tmp);
+    }
+}
+
+GR_INLINE void
 gr_stream_write_free(gr_stream_t out, char * s)
 {
     gr_stream_write(out, s);
@@ -140,6 +158,7 @@ GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 
 typedef enum
 {
+    GR_METHOD_CTX_WRITE,
     GR_METHOD_CTX_CLEAR,
 
     GR_METHOD_INIT,
@@ -280,6 +299,7 @@ typedef gr_ctx_struct gr_ctx_t[1];
 /* Typedefs for method function pointers. */
 
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
+typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, const void * options, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
@@ -310,6 +330,7 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 /* Macros to retrieve methods (with correct call signature) from context object. */
 
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_SWAP_OP(ctx, NAME) (((gr_method_swap_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
@@ -340,6 +361,7 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 /* Wrappers to call methods. */
 
 GR_INLINE int gr_ctx_clear(gr_ctx_t ctx) { return GR_CTX_OP(ctx, CTX_CLEAR)(ctx); }
+GR_INLINE int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx) { return GR_CTX_STREAM(ctx, CTX_WRITE)(out, ctx); }
 GR_INLINE int gr_init(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, INIT)(res, ctx); }
 GR_INLINE int gr_clear(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { return GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
@@ -553,6 +575,26 @@ _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_c
     return status;
 }
 
+/* todo: error handling */
+GR_INLINE int
+gr_ctx_print(gr_ctx_t ctx)
+{
+    gr_stream_t out;
+    gr_stream_init_file(out, stdout);
+    gr_ctx_write(out, ctx);
+    return GR_SUCCESS;
+}
+
+GR_INLINE int
+gr_ctx_println(gr_ctx_t ctx)
+{
+    gr_stream_t out;
+    gr_stream_init_file(out, stdout);
+    gr_ctx_write(out, ctx);
+    gr_stream_write(out, "\n");
+    return GR_SUCCESS;
+}
+
 GR_INLINE int
 gr_print(gr_srcptr x, gr_ctx_t ctx)
 {
@@ -653,122 +695,6 @@ typedef struct
 matrix_ctx_t;
 
 #define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)->elem_ctx))
-
-
-GR_INLINE int
-matrix_init(gr_mat_t res, gr_ctx_t ctx)
-{
-    return gr_mat_init(res, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_clear(gr_mat_t res, gr_ctx_t ctx)
-{
-    return gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
-{
-    return gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
-
-/* TODO UNIFY */
-GR_INLINE int
-matrix_write(gr_stream_t out, gr_mat_t res, gr_ctx_t ctx)
-{
-    return gr_mat_print(res, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_randtest(gr_mat_t res, flint_rand_t state, void * options, gr_ctx_t ctx)
-{
-    return gr_mat_randtest(res, state, options, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_equal(int * equal, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-{
-    return gr_mat_equal(equal, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return gr_mat_set(res, mat, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
-{
-    return gr_mat_set_si(res, v, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
-{
-    return gr_mat_set_ui(res, v, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
-{
-    return gr_mat_set_fmpz(res, v, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
-{
-    return gr_mat_set_fmpq(res, v, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_zero(gr_mat_t res, gr_ctx_t ctx)
-{
-    return gr_mat_zero(res, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_one(gr_mat_t res, gr_ctx_t ctx)
-{
-    return gr_mat_one(res, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return gr_mat_is_zero(res, mat, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return gr_mat_is_one(res, mat, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-{
-    return gr_mat_add(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-{
-    return gr_mat_sub(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
-
-GR_INLINE int
-matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-{
-    return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
 
 void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 

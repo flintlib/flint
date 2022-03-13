@@ -613,6 +613,22 @@ gr_test_mul_aliasing(gr_ctx_t R, flint_rand_t state, int verbose)
 }
 
 int
+gr_test_mul_type_variants(gr_ctx_t R, flint_rand_t state, int verbose)
+{
+    return gr_test_binary_op_type_variants(R,
+        gr_mul, gr_mul_ui, gr_mul_si, gr_mul_fmpz, gr_mul_fmpq,
+            state, verbose);
+}
+
+int
+gr_test_div_type_variants(gr_ctx_t R, flint_rand_t state, int verbose)
+{
+    return gr_test_binary_op_type_variants(R,
+        gr_div, gr_div_ui, gr_div_si, gr_div_fmpz, gr_div_fmpq,
+            state, verbose);
+}
+
+int
 gr_test_inv_involution(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
@@ -1153,9 +1169,11 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
     timeit_start(timer);
 
-
     flint_randinit(state);
 
+    flint_printf("===============================================================================\n");
+    flint_printf("Testing "); gr_ctx_println(R);
+    flint_printf("-------------------------------------------------------------------------------\n");
 
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters);
     gr_test_iter(R, state, "swap", gr_test_swap, iters);
@@ -1170,6 +1188,8 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
     gr_test_iter(R, state, "add: ui/si/fmpz/fmpq", gr_test_add_type_variants, iters);
     gr_test_iter(R, state, "sub: ui/si/fmpz/fmpq", gr_test_sub_type_variants, iters);
+    gr_test_iter(R, state, "mul: ui/si/fmpz/fmpq", gr_test_mul_type_variants, iters);
+    gr_test_iter(R, state, "div: ui/si/fmpz/fmpq", gr_test_div_type_variants, iters);
 
     gr_test_iter(R, state, "mul: associativity", gr_test_mul_associativity, iters);
     if ((R-> flags & GR_COMMUTATIVE_RING) == GR_COMMUTATIVE_RING)
@@ -1196,7 +1216,9 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
     timeit_stop(timer);
 
-    flint_printf("Ring tests finished in %.3g cpu, %.3g wall\n\n", timer->cpu*0.001, timer->wall*0.001);
+    flint_printf("-------------------------------------------------------------------------------\n");
+    flint_printf("Tests finished in %.3g cpu, %.3g wall\n", timer->cpu*0.001, timer->wall*0.001);
+    flint_printf("===============================================================================\n\n");
 }
 
 int main()

@@ -132,6 +132,129 @@ int gr_generic_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_set_fmpz(t, y, ctx);
+
+    if (status == GR_SUCCESS)
+        status = gr_mul(res, x, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_mul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    fmpz_init(t);
+    fmpz_set_ui(t, y);
+    status = gr_mul_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    fmpz_init(t);
+    fmpz_set_si(t, y);
+    status = gr_mul_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_set_fmpq(t, y, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_mul(res, x, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_set_fmpz(t, y, ctx);
+
+    if (status == GR_SUCCESS)
+        status = gr_div(res, x, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    fmpz_init(t);
+    fmpz_set_ui(t, y);
+    status = gr_div_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    fmpz_init(t);
+    fmpz_set_si(t, y);
+    status = gr_div_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}
+
+int gr_generic_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    GR_TMP_START;
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_set_fmpq(t, y, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_div(res, x, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+
 /* Generic powering */
 
 /* Assumes exp >= 2; res and tmp not not aliased with x. */
@@ -713,6 +836,16 @@ const gr_method_tab_input gr_generic_methods[] =
     {GR_METHOD_SUB_SI,                  (gr_funcptr) gr_generic_sub_si},
     {GR_METHOD_SUB_FMPZ,                (gr_funcptr) gr_generic_sub_fmpz},
     {GR_METHOD_SUB_FMPQ,                (gr_funcptr) gr_generic_sub_fmpq},
+
+    {GR_METHOD_MUL_UI,                  (gr_funcptr) gr_generic_mul_ui},
+    {GR_METHOD_MUL_SI,                  (gr_funcptr) gr_generic_mul_si},
+    {GR_METHOD_MUL_FMPZ,                (gr_funcptr) gr_generic_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,                (gr_funcptr) gr_generic_mul_fmpq},
+
+    {GR_METHOD_DIV_UI,                  (gr_funcptr) gr_generic_div_ui},
+    {GR_METHOD_DIV_SI,                  (gr_funcptr) gr_generic_div_si},
+    {GR_METHOD_DIV_FMPZ,                (gr_funcptr) gr_generic_div_fmpz},
+    {GR_METHOD_DIV_FMPQ,                (gr_funcptr) gr_generic_div_fmpq},
 
     {GR_METHOD_POW_SI,                  (gr_funcptr) gr_generic_pow_si},
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},

@@ -6,6 +6,15 @@ typedef unsigned char nmod8_struct;
 typedef nmod8_struct nmod8_t[1];
 
 int
+nmod8_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+{
+    gr_stream_write(out, "Integers mod ");
+    gr_stream_write_ui(out, NMOD8_CTX(ctx).n);
+    gr_stream_write(out, " (nmod8)");
+    return GR_SUCCESS;
+}
+
+int
 nmod8_init(nmod8_t x, const gr_ctx_t ctx)
 {
     x[0] = 0;
@@ -218,6 +227,7 @@ gr_method_tab_t _nmod8_methods2;
 
 gr_method_tab_input nmod8_methods2[] =
 {
+    {GR_METHOD_CTX_WRITE,       (gr_funcptr) nmod8_ctx_write},
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) nmod8_ctx_clear},
     {GR_METHOD_INIT,            (gr_funcptr) nmod8_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) nmod8_clear},

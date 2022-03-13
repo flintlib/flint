@@ -1,6 +1,13 @@
 #include "gr.h"
 
 int
+_gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+{
+    gr_stream_write(out, "Rational field (fmpq)");
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_init(fmpq_t x, const gr_ctx_t ctx)
 {
     fmpq_init(x);
@@ -229,6 +236,7 @@ gr_method_tab_t _fmpq_methods2;
 
 gr_method_tab_input fmpq_methods2[] =
 {
+    {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpq_ctx_write},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpq_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpq_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpq_swap},
