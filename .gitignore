@@ -1,5 +1,7 @@
 test
 
+doc/build/*
+
 # Prerequisites
 *.d
 
