@@ -724,10 +724,18 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
     gr_randtest(xab, state, NULL, R);
     gr_randtest(xaxb, state, NULL, R);
 
-    do {
-        a = n_randtest(state);
-        b = n_randtest(state);
-    } while (a + b < a);
+    if (R->flags & GR_FINITE_RING)
+    {
+        do {
+            a = n_randtest(state);
+            b = n_randtest(state);
+        } while (a + b < a);
+    }
+    else
+    {
+        a = n_randtest(state) % 256;
+        b = n_randtest(state) % 256;
+    }
 
     status = GR_SUCCESS;
 
@@ -778,7 +786,11 @@ gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int ve
     gr_randtest(ya, state, NULL, R);
 
     y = n_randtest(state);
-    a = n_randtest(state);
+
+    if (R->flags & GR_FINITE_RING)
+        a = n_randtest(state);
+    else
+        a = n_randtest(state) % 256;
 
     status = GR_SUCCESS;
     status |= gr_pow_ui(xa, x, a, R);
@@ -832,7 +844,10 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
     gr_randtest(xa, state, NULL, R);
     gr_randtest(ya, state, NULL, R);
 
-    a = n_randtest(state);
+    if (R->flags & GR_FINITE_RING)
+        a = n_randtest(state);
+    else
+        a = n_randtest(state) % 256;
 
     status = GR_SUCCESS;
     status |= gr_pow_ui(xa, x, a, R);
@@ -881,7 +896,10 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int verbose)
     gr_randtest(x, state, NULL, R);
     gr_randtest(xa1, state, NULL, R);
 
-    a = n_randtest(state);
+    if (R->flags & GR_FINITE_RING)
+        a = n_randtest(state);
+    else
+        a = n_randtest(state) % 256;
 
     status = GR_SUCCESS;
     status |= gr_pow_ui(xa1, x, a, R);
@@ -1060,10 +1078,20 @@ gr_test_mat_mul_classical_associativity(gr_ctx_t R, flint_rand_t state, int verb
     gr_mat_t A, B, C, AB, BC, AB_C, A_BC;
     slong m, n, p, q;
 
-    m = n_randint(state, 5);
-    n = n_randint(state, 5);
-    p = n_randint(state, 5);
-    q = n_randint(state, 5);
+    if (R->flags & GR_FINITE_RING)
+    {
+        m = n_randint(state, 5);
+        n = n_randint(state, 5);
+        p = n_randint(state, 5);
+        q = n_randint(state, 5);
+    }
+    else
+    {
+        m = n_randint(state, 3);
+        n = n_randint(state, 3);
+        p = n_randint(state, 3);
+        q = n_randint(state, 3);
+    }
 
     gr_mat_init(A, m, n, R);
     gr_mat_init(B, n, p, R);
@@ -1136,7 +1164,7 @@ gr_test_iter(gr_ctx_t R, flint_rand_t state, const char * descr, gr_test_functio
 
     for (iter = 0; iter < iters; iter++)
     {
-        //flint_printf("iter %ld\n", iter);
+        /* flint_printf("iter %ld\n", iter); */
         status = func(R, state, 0);
 
         if (status == GR_SUCCESS)
@@ -1223,16 +1251,15 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
 int main()
 {
+    gr_ctx_t QQbar, QQbar_real;
     gr_ctx_t QQ;
     gr_ctx_t MQQ;
     gr_ctx_t Zn;
     gr_ctx_t MZn;
 
     gr_ctx_init_fmpq(QQ);
-
     QQ->size_limit = 1000;
     gr_test_ring(QQ, 10000);
-
     gr_ctx_init_matrix(MQQ, QQ, 4);
     MQQ->size_limit = 10;
     gr_test_ring(MQQ, 10);
@@ -1250,8 +1277,15 @@ int main()
     gr_ctx_init_matrix(MZn, Zn, 4);
     gr_test_ring(MZn, 1000);
     gr_ctx_clear(MZn);
-
     gr_ctx_clear(Zn);
+
+    gr_ctx_init_real_qqbar(QQbar_real);
+    gr_test_ring(QQbar_real, 100);
+    gr_ctx_clear(QQbar_real);
+
+    gr_ctx_init_complex_qqbar(QQbar);
+    gr_test_ring(QQbar, 100);
+    gr_ctx_clear(QQbar);
 
     flint_cleanup();
     return 0;

@@ -129,7 +129,7 @@ Functions can return a combination of the following status flags:
 .. macro:: GR_DOMAIN
 
     The result does not have a value in the domain of the target
-    ring or type, i.e. the result is undefined.
+    ring or type, i.e. the result is mathematically undefined.
     This occurs, for example, on division by zero
     or when attempting to compute the square root of a non-square.
     It also occurs when attempting to convert a too large value
@@ -210,3 +210,126 @@ When using generic methods with a known type like
 ``fmpz_t``, the usual type can of course be used.
 Users may wish to define their own union types when only some
 particular types will appear in an application.
+
+Ring constructions
+-------------------------------------------------------------------------------
+
+Builtin base rings
+...............................................................................
+
+.. function:: void gr_ctx_init_fmpq(gr_ctx_t ctx)
+
+    Initializes *ctx* to the field of rational numbers
+    `\mathbb{Q}` with elements of type :type:`fmpq`.
+
+.. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
+
+    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
+    of integers modulo *n* where
+    elements have type :type:`uint8`. We require `1 \le n \le 255`.
+
+.. function:: void gr_ctx_init_real_qqbar(gr_ctx_t ctx)
+              void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
+
+    Initializes *ctx* to the field of real or complex algebraic
+    numbers with elements of type :type:`qqbar`.
+
+
+Derived rings
+...............................................................................
+
+.. function:: void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+
+    Initializes *ctx* to the ring of densely stored *n* by *n* matrices
+    over the given *base_ring*.
+    Elements have type :type:`gr_mat_struct`.
+
+Operations
+-------------------------------------------------------------------------------
+
+.. function:: int gr_ctx_clear(gr_ctx_t ctx)
+
+.. function:: int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+
+.. function:: int gr_init(gr_ptr res, gr_ctx_t ctx)
+
+.. function:: int gr_clear(gr_ptr res, gr_ctx_t ctx)
+
+.. function:: int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
+
+.. function:: int gr_randtest(gr_ptr x, flint_rand_t state, const void * options, gr_ctx_t ctx)
+
+.. function:: int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
+              int gr_one(gr_ptr res, gr_ctx_t ctx)
+
+.. function:: int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx)
+              int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
+
+.. function:: int gr_is_zero(int * res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_is_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_equal(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+.. function:: int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+.. function:: int gr_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+.. function:: int gr_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_mul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+.. function:: int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+.. function:: int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to the multiplicative inverse of *x* in the present ring,
+    if such an element exists.
+    Returns the flag ``GR_DOMAIN`` if *x* is not invertible, or
+    ``GR_UNABLE`` if the implementation is unable to perform
+    the computation.
+
+.. function:: int gr_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to 1 if *x* has a multiplicative inverse in the present ring,
+    and sets *res* to 0 if *x* does not have a multiplicative inverse.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the computation.
+
+.. function:: int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_pow_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+    Sets *res* to the power `x ^ y`.
+    Returns the flag ``GR_DOMAIN`` if this power cannot be assigned
+    a meaningful value in the present ring, or ``GR_UNABLE`` if
+    the implementation is unable to perform the computation.
+
+    Default implementations of the powering methods support raising
+    elements to integer powers using a generic implementation of
+    exponentiation by squaring. User-defined rings
+    may override these methods with faster versions or
+    to support more general notions of exponentiation.

@@ -735,6 +735,4 @@ gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
     }
 
     ctx->methods2 = &_matrix_methods2;
-
-    ctx->debug_string = "matrix ring";
 }

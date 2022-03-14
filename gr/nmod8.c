@@ -273,6 +273,4 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
     }
 
     ctx->methods2 = &_nmod8_methods2;
-
-    ctx->debug_string = "nmod8 ring";
 }

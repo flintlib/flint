@@ -287,7 +287,6 @@ typedef struct
     ulong flags;
     ssize_t sizeof_elem;
     void * elem_ctx;
-    char * debug_string;
     gr_method_tab_t * methods2;
     ulong size_limit;
 }
@@ -671,6 +670,9 @@ int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_
 
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
+
+void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
+void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 
 /* Todo: generic polynomials */
 

@@ -1,0 +1,560 @@
+#include "qqbar.h"
+#include "fexpr.h"
+#include "gr.h"
+
+typedef struct
+{
+    int real_only;      /* field restricted to real algebraics instead of complex? */
+    slong deg_limit;    /* todo */
+    slong bits_limit;   /* todo */
+}
+gr_qqbar_ctx;
+
+#define QQBAR_CTX(ring_ctx) ((gr_qqbar_ctx *)((ring_ctx)->elem_ctx))
+
+int
+_gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+{
+    if (QQBAR_CTX(ctx)->real_only)
+        gr_stream_write(out, "Real algebraic numbers (qqbar)");
+    else
+        gr_stream_write(out, "Complex algebraic numbers (qqbar)");
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_init(qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_init(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_clear(qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_clear(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
+{
+    qqbar_t t;
+    *t = *x;
+    *x = *y;
+    *y = *t;
+    return GR_SUCCESS;
+}
+
+/* todo: limits */
+int
+_gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
+{
+    slong deg_limit, bits_limit;
+    int rcase;
+    
+    rcase = n_randint(state, 10);
+
+    if (rcase == 0)
+    {
+        deg_limit = 4;
+        bits_limit = 10;
+    }
+    else if (rcase <= 3)
+    {
+        deg_limit = 2;
+        bits_limit = 10;
+    }
+    else
+    {
+        deg_limit = 1;
+        bits_limit = 10;
+    }
+
+    if (QQBAR_CTX(ctx)->real_only)
+        qqbar_randtest_real(res, state, deg_limit, bits_limit);
+    else
+        qqbar_randtest(res, state, deg_limit, bits_limit);
+
+    return GR_SUCCESS;
+}
+
+/* todo */
+int
+_gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
+{
+    fexpr_t expr;
+    fexpr_init(expr);
+
+    qqbar_get_fexpr_root_nearest(expr, x);
+    gr_stream_write_free(out, fexpr_get_str_latex(expr, FEXPR_LATEX_SMALL));
+    fexpr_clear(expr);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_zero(qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_zero(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_one(qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_one(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_set_si(qqbar_t res, slong v, const gr_ctx_t ctx)
+{
+    qqbar_set_si(res, v);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_set_ui(qqbar_t res, ulong v, const gr_ctx_t ctx)
+{
+    qqbar_set_ui(res, v);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_set_fmpz(qqbar_t res, const fmpz_t v, const gr_ctx_t ctx)
+{
+    qqbar_set_fmpz(res, v);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_set_fmpq(qqbar_t res, const fmpq_t v, const gr_ctx_t ctx)
+{
+    qqbar_set_fmpq(res, v);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_is_zero(int * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    res[0] = qqbar_is_zero(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_is_one(int * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    res[0] = qqbar_is_one(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_equal(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    res[0] = qqbar_equal(x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_set(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_neg(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    qqbar_add(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_add_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+{
+    qqbar_add_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_add_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+{
+    qqbar_add_ui(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_add_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    qqbar_add_fmpz(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+{
+    qqbar_add_fmpq(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    qqbar_sub(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+{
+    qqbar_sub_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+{
+    qqbar_sub_ui(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    qqbar_sub_fmpz(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+{
+    qqbar_sub_fmpq(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    qqbar_mul(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+{
+    qqbar_mul_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_mul_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+{
+    qqbar_mul_ui(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_mul_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    qqbar_mul_fmpz(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+{
+    qqbar_mul_fmpq(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_inv(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (qqbar_is_zero(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_inv(res, x);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    if (qqbar_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_div(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_div_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_div_si(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_div_ui(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_div_fmpz(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+{
+    if (fmpq_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_div_fmpq(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_is_invertible(int * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    res[0] = !qqbar_is_zero(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong exp, const gr_ctx_t ctx)
+{
+    qqbar_pow_ui(res, x, exp);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_pow_si(qqbar_t res, const qqbar_t x, slong exp, const gr_ctx_t ctx)
+{
+    if (exp < 0 && qqbar_is_zero(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_pow_si(res, x, exp);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t exp, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(exp) < 0 && qqbar_is_zero(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_pow_fmpz(res, x, exp);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t exp, const gr_ctx_t ctx)
+{
+    if (fmpq_sgn(exp) < 0 && qqbar_is_zero(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_pow_fmpq(res, x, exp);
+
+        /* todo: don't compute */
+        if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(res))
+        {
+            qqbar_zero(res);
+            return GR_DOMAIN;
+        }
+        else
+        {
+            return GR_SUCCESS;
+        }
+    }
+}
+
+int
+_gr_qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t exp, const gr_ctx_t ctx)
+{
+    if (qqbar_pow(res, x, exp))
+    {
+        if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(res))
+        {
+            qqbar_zero(res);
+            return GR_DOMAIN;
+        }
+        else
+        {
+            return GR_SUCCESS;
+        }
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
+int
+_gr_qqbar_ctx_clear(gr_ctx_t ctx)
+{
+    flint_free(ctx->elem_ctx);
+    return GR_SUCCESS;
+}
+
+int _qqbar_methods2_initialized = 0;
+gr_static_method_table _qqbar_static_table;
+gr_method_tab_t _qqbar_methods2;
+
+gr_method_tab_input qqbar_methods2[] =
+{
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_qqbar_ctx_clear},
+    {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_qqbar_ctx_write},
+    {GR_METHOD_INIT,            (gr_funcptr) _gr_qqbar_init},
+
+    {GR_METHOD_CLEAR,           (gr_funcptr) _gr_qqbar_clear},
+    {GR_METHOD_SWAP,            (gr_funcptr) _gr_qqbar_swap},
+    {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_qqbar_randtest},
+    {GR_METHOD_WRITE,           (gr_funcptr) _gr_qqbar_write},
+
+    {GR_METHOD_ZERO,            (gr_funcptr) _gr_qqbar_zero},
+    {GR_METHOD_ONE,             (gr_funcptr) _gr_qqbar_one},
+    {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_qqbar_is_zero},
+    {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_qqbar_is_one},
+    {GR_METHOD_EQUAL,           (gr_funcptr) _gr_qqbar_equal},
+
+    {GR_METHOD_SET,             (gr_funcptr) _gr_qqbar_set},
+    {GR_METHOD_SET_SI,          (gr_funcptr) _gr_qqbar_set_si},
+    {GR_METHOD_SET_UI,          (gr_funcptr) _gr_qqbar_set_ui},
+    {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_qqbar_set_fmpz},
+    {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_qqbar_set_fmpq},
+
+    {GR_METHOD_NEG,             (gr_funcptr) _gr_qqbar_neg},
+
+    {GR_METHOD_ADD,             (gr_funcptr) _gr_qqbar_add},
+    {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_qqbar_add_ui},
+    {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_qqbar_add_si},
+    {GR_METHOD_ADD_FMPZ,        (gr_funcptr) _gr_qqbar_add_fmpz},
+    {GR_METHOD_ADD_FMPQ,        (gr_funcptr) _gr_qqbar_add_fmpq},
+
+    {GR_METHOD_SUB,             (gr_funcptr) _gr_qqbar_sub},
+    {GR_METHOD_SUB_UI,          (gr_funcptr) _gr_qqbar_sub_ui},
+    {GR_METHOD_SUB_SI,          (gr_funcptr) _gr_qqbar_sub_si},
+    {GR_METHOD_SUB_FMPZ,        (gr_funcptr) _gr_qqbar_sub_fmpz},
+    {GR_METHOD_SUB_FMPQ,        (gr_funcptr) _gr_qqbar_sub_fmpq},
+
+    {GR_METHOD_MUL,             (gr_funcptr) _gr_qqbar_mul},
+    {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_qqbar_mul_ui},
+    {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_qqbar_mul_si},
+    {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_qqbar_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,        (gr_funcptr) _gr_qqbar_mul_fmpq},
+
+    {GR_METHOD_DIV,             (gr_funcptr) _gr_qqbar_div},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_qqbar_div_ui},
+    {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_qqbar_div_si},
+    {GR_METHOD_DIV_FMPZ,        (gr_funcptr) _gr_qqbar_div_fmpz},
+    {GR_METHOD_DIV_FMPQ,        (gr_funcptr) _gr_qqbar_div_fmpq},
+
+    {GR_METHOD_INV,             (gr_funcptr) _gr_qqbar_inv},
+
+    {GR_METHOD_POW,             (gr_funcptr) _gr_qqbar_pow},
+    {GR_METHOD_POW_UI,          (gr_funcptr) _gr_qqbar_pow_ui},
+    {GR_METHOD_POW_SI,          (gr_funcptr) _gr_qqbar_pow_si},
+    {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_qqbar_pow_fmpz},
+    {GR_METHOD_POW_FMPQ,        (gr_funcptr) _gr_qqbar_pow_fmpq},
+
+    {0,                         (gr_funcptr) NULL},
+};
+
+void
+gr_ctx_init_real_qqbar(gr_ctx_t ctx)
+{
+    ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->sizeof_elem = sizeof(qqbar_struct);
+    ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
+    ctx->size_limit = WORD_MAX;
+
+    QQBAR_CTX(ctx)->real_only = 1;
+    QQBAR_CTX(ctx)->deg_limit = WORD_MAX;
+    QQBAR_CTX(ctx)->bits_limit = WORD_MAX;
+
+    if (!_qqbar_methods2_initialized)
+    {
+        gr_method_tab_init_static(&_qqbar_methods2, _qqbar_static_table, qqbar_methods2);
+        _qqbar_methods2_initialized = 1;
+    }
+
+    ctx->methods2 = &_qqbar_methods2;
+}
+
+void
+gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
+{
+    ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->sizeof_elem = sizeof(qqbar_struct);
+    ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
+    ctx->size_limit = WORD_MAX;
+
+    QQBAR_CTX(ctx)->real_only = 0;
+    QQBAR_CTX(ctx)->deg_limit = WORD_MAX;
+    QQBAR_CTX(ctx)->bits_limit = WORD_MAX;
+
+    if (!_qqbar_methods2_initialized)
+    {
+        gr_method_tab_init_static(&_qqbar_methods2, _qqbar_static_table, qqbar_methods2);
+        _qqbar_methods2_initialized = 1;
+    }
+
+    ctx->methods2 = &_qqbar_methods2;
+}

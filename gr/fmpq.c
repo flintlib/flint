@@ -280,5 +280,4 @@ gr_ctx_init_fmpq(gr_ctx_t ctx)
     }
 
     ctx->methods2 = &_fmpq_methods2;
-    ctx->debug_string = "fmpq ring";
 }
