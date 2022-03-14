@@ -156,7 +156,7 @@ FLINT_DLL void nmod_poly_roots(nmod_poly_factor_t r,
                                    const nmod_poly_t f, int with_multiplicity);
 
 FLINT_DLL int nmod_poly_roots_factored(nmod_poly_factor_t r,
-             const nmod_poly_t f, int with_multiplicity, const n_factor_t * n);
+             const nmod_poly_t f, int with_multiplicity, n_factor_srcptr n);
 
 /* Inlines *******************************************************************/
 

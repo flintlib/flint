@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_factor_trial(n_factor_t * factors, mp_limb_t n, ulong num_primes)
+mp_limb_t n_factor_trial(n_factor_ptr factors, mp_limb_t n, ulong num_primes)
 {
     return n_factor_trial_range(factors, n, UWORD(0), num_primes);
 }

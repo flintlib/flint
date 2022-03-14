@@ -230,7 +230,7 @@ cleanup:
 
 
 int nmod_poly_roots_factored(nmod_poly_factor_t x0,
-            const nmod_poly_t f, int with_multiplicity, const n_factor_t * fac)
+            const nmod_poly_t f, int with_multiplicity, n_factor_srcptr fac)
 {
     int success = 1;
     slong i, j, k, new_length;

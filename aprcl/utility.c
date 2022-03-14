@@ -18,8 +18,8 @@ int
 _aprcl_p_ind(aprcl_config_srcptr conf, ulong p)
 {
     int i;
-    for (i = 0; i < conf->rs.num; i++)
-        if (p == conf->rs.p[i])
+    for (i = 0; i < conf->rs->num; i++)
+        if (p == conf->rs->p[i])
             return i;
     return -1;
 }

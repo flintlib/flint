@@ -58,9 +58,9 @@ void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_ptr state)
    {
 	  do 
 	  {
-		 n_factor_init(&factors);
+		 n_factor_init(factors);
 	     n = n_randbits(state, bits);
-	  } while (n_is_probabprime(n) || (n_factor_trial(&factors, n, primes) != n));
+	  } while (n_is_probabprime(n) || (n_factor_trial(factors, n, primes) != n));
 	  ret[i] = n;
    }
       

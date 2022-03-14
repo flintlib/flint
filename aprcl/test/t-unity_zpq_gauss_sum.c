@@ -31,17 +31,17 @@ int main(void)
         unity_zpq_t gausssigma, gauss, gausspower;
         n_factor_t factors;
 
-        n_factor_init(&factors);
+        n_factor_init(factors);
 
         q = n_randprime(state, 6, 0);
         if (q == 2)
             q = 7;
 
-        n_factor(&factors, q - 1, 0);
+        n_factor(factors, q - 1, 0);
 
-        pnum = n_randint(state, factors.num);
-        p = factors.p[pnum];
-        ppow = n_randint(state, factors.exp[pnum]);
+        pnum = n_randint(state, factors->num);
+        p = factors->p[pnum];
+        ppow = n_randint(state, factors->exp[pnum]);
         if (ppow == 0)
             ppow = 1;
 

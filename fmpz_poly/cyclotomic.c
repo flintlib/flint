@@ -107,23 +107,23 @@ fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
 
     /* Write n = q * s where q is squarefree, compute the factors of q,
       and compute phi(s) which determines the degree of the polynomial. */
-    n_factor_init(&factors);
-    n_factor(&factors, n, 1);
+    n_factor_init(factors);
+    n_factor(factors, n, 1);
     s = phi = 1;
-    for (i = 0; i < factors.num; i++)
+    for (i = 0; i < factors->num; i++)
     {
-        phi *= factors.p[i] - 1;
-        while (factors.exp[i] > 1)
+        phi *= factors->p[i] - 1;
+        while (factors->exp[i] > 1)
         {
-            s *= factors.p[i];
-            factors.exp[i]--;
+            s *= factors->p[i];
+            factors->exp[i]--;
         }
     }
 
     fmpz_poly_fit_length(poly, phi * s + 1);
 
     /* Evaluate lower half of Phi_s(x) */
-    _fmpz_poly_cyclotomic(poly->coeffs, n / s, factors.p, factors.num, phi);
+    _fmpz_poly_cyclotomic(poly->coeffs, n / s, factors->p, factors->num, phi);
 
     /* Palindromic extension */
     for (i = 0; i < (phi + 1) / 2; i++)

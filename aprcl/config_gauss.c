@@ -50,8 +50,8 @@ aprcl_config_gauss_init(aprcl_config_ptr conf, const fmpz_t n)
         _aprcl_config_gauss_update(conf);
         fmpz_mul(s2, conf->s, conf->s);
     }
-    n_factor_init(&conf->rs);
-    n_factor(&conf->rs, conf->R, 1);
+    n_factor_init(conf->rs);
+    n_factor(conf->rs, conf->R, 1);
 
     conf->qs_used = NULL;  /* not used */
 
@@ -75,8 +75,8 @@ aprcl_config_gauss_init_min_R(aprcl_config_ptr conf, const fmpz_t n, ulong R)
         fmpz_mul(s2, conf->s, conf->s);
     }
 
-    n_factor_init(&conf->rs);
-    n_factor(&conf->rs, conf->R, 1);
+    n_factor_init(conf->rs);
+    n_factor(conf->rs, conf->R, 1);
 
     conf->qs_used = NULL;  /* not used */
 

@@ -73,12 +73,12 @@ double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohli
     /* just free everything and allocate again for now */
     nmod_discrete_log_pohlig_hellman_clear(L);
 
-    n_factor_init(&factors);
-    n_factor(&factors, p - 1, 1);
+    n_factor_init(factors);
+    n_factor(factors, p - 1, 1);
 
     nmod_init(&L->mod, p);
     L->entries = NULL;
-    L->num_factors = factors.num;
+    L->num_factors = factors->num;
     if (L->num_factors > 0)
     {
         L->entries = (nmod_discrete_log_pohlig_hellman_entry_struct*) flint_malloc(
@@ -91,8 +91,8 @@ double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohli
 
         Li = L->entries + i;
 
-        Li->exp = factors.exp[i];
-        Li->prime = factors.p[i];
+        Li->exp = factors->exp[i];
+        Li->prime = factors->p[i];
 
         fmpz_init(recp);
         fmpz_init(temp);

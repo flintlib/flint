@@ -29,17 +29,17 @@ _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
         return;
     }
 
-    n_factor_init(&nfac);
-    n_factor(&nfac, n, 0);
+    n_factor_init(nfac);
+    n_factor(nfac, n, 0);
 
     len = factor->num;
 
-    _fmpz_factor_fit_length(factor, len + nfac.num);
-    _fmpz_factor_set_length(factor, len + nfac.num);
+    _fmpz_factor_fit_length(factor, len + nfac->num);
+    _fmpz_factor_set_length(factor, len + nfac->num);
 
-    for (i = 0; i < nfac.num; i++)
+    for (i = 0; i < nfac->num; i++)
     {
-        fmpz_set_ui(factor->p + len + i, nfac.p[i]);
-        factor->exp[len + i] = nfac.exp[i];
+        fmpz_set_ui(factor->p + len + i, nfac->p[i]);
+        factor->exp[len + i] = nfac->exp[i];
     }
 }

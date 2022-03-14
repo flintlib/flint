@@ -88,15 +88,15 @@ int n_moebius_mu(mp_limb_t n)
     if (n % 9 == 0 || n % 25 == 0)
         return 0;
 
-    n_factor_init(&fac);
-    n_factor(&fac, n, 1);
-    for (i = 0; i < fac.num; i++)
+    n_factor_init(fac);
+    n_factor(fac, n, 1);
+    for (i = 0; i < fac->num; i++)
     {
-        if (fac.exp[i] != 1)
+        if (fac->exp[i] != 1)
             return 0;
     }
 
-    if (fac.num % 2)
+    if (fac->num % 2)
         return -1;
     else
         return 1;

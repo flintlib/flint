@@ -225,18 +225,18 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
         return;
     }
 
-    n_factor_init(&fac);
-    n_factor(&fac, k, 0);
+    n_factor_init(fac);
+    n_factor(fac, k, 0);
 
     /* Repeatedly factor A_k(n) into A_k1(n1)*A_k2(n2) with k1, k2 coprime */
-    for (i = 0; i + 1 < fac.num && prod->prefactor != 0; i++)
+    for (i = 0; i + 1 < fac->num && prod->prefactor != 0; i++)
     {
         mp_limb_t p, k1, k2, inv, n1, n2;
 
-        p = fac.p[i];
+        p = fac->p[i];
 
         /* k = 2 * k1 with k1 odd */
-        if (p == UWORD(2) && fac.exp[i] == 1)
+        if (p == UWORD(2) && fac->exp[i] == 1)
         {
             k2 = k / 2;
             inv = n_preinvert_limb(k2);
@@ -251,7 +251,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
             n = n2;
         }
         /* k = 4 * k1 with k1 odd */
-        else if (p == UWORD(2) && fac.exp[i] == 2)
+        else if (p == UWORD(2) && fac->exp[i] == 2)
         {
             k2 = k / 4;
             inv = n_preinvert_limb(k2);
@@ -271,7 +271,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
         {
             mp_limb_t d1, d2, e;
 
-            k1 = n_pow(fac.p[i], fac.exp[i]);
+            k1 = n_pow(fac->p[i], fac->exp[i]);
             k2 = k / k1;
 
             d1 = gcd24_tab[k1 % 24];
@@ -281,14 +281,14 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
             n1 = solve_n1(n, k1, k2, d1, d2, e);
             n2 = solve_n1(n, k2, k1, d2, d1, e);
             
-            trigprod_mul_prime_power(prod, k1, n1, fac.p[i], fac.exp[i]);
+            trigprod_mul_prime_power(prod, k1, n1, fac->p[i], fac->exp[i]);
             k = k2;
             n = n2;
         }
     }
 
-    if (fac.num != 0 && prod->prefactor != 0)
+    if (fac->num != 0 && prod->prefactor != 0)
         trigprod_mul_prime_power(prod, k, n,
-            fac.p[fac.num - 1], fac.exp[fac.num - 1]);
+            fac->p[fac->num - 1], fac->exp[fac->num - 1]);
 
 }

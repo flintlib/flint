@@ -46,7 +46,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
         return 0;
 
     n1 = n - 1;
-    n_factor_init(&factors);
+    n_factor_init(factors);
     limit = (mp_limb_t) pow((double)n1, 1.0/3);
 
     val = n_pow(limit, 3);
@@ -58,18 +58,18 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     }
 
 
-    cofactor = n_factor_partial(&factors, n1, limit, 1);
+    cofactor = n_factor_partial(factors, n1, limit, 1);
 
     if (cofactor != 1)                      /* check that cofactor is coprime to factors found */
     {
-        for (i = 0; i < factors.num; i++)
+        for (i = 0; i < factors->num; i++)
         {
-            if (factors.p[i] > FLINT_FACTOR_TRIAL_PRIMES_PRIME)
+            if (factors->p[i] > FLINT_FACTOR_TRIAL_PRIMES_PRIME)
             {
-                while (cofactor >= factors.p[i] && (cofactor % factors.p[i]) == 0)
+                while (cofactor >= factors->p[i] && (cofactor % factors->p[i]) == 0)
                 {
-                    factors.exp[i]++;
-                    cofactor /= factors.p[i];
+                    factors->exp[i]++;
+                    cofactor /= factors->p[i];
                 }
             }
         }
@@ -87,15 +87,15 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     }
     ninv = n_preinvert_limb(n);
     c = 1;
-    for (i = factors.num - 1; i >= 0; i--)
+    for (i = factors->num - 1; i >= 0; i--)
     {
-        mp_limb_t exp = n1 / factors.p[i];
+        mp_limb_t exp = n1 / factors->p[i];
         pass = 0;
 
         for (j = 2; j < iterations && pass == 0; j++)
         {
             b = n_powmod2_preinv(j, exp, n, ninv);
-            if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1))
+            if (n_powmod2_ui_preinv(b, factors->p[i], n, ninv) != UWORD(1))
                 return 0;
 
             b = n_submod(b, UWORD(1), n);

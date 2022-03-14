@@ -48,14 +48,14 @@ n_is_prime_power(mp_limb_t * p, mp_limb_t n)
     if (n < 2)
         return 0;
 
-    n_factor_init(&fac);
-    n_factor(&fac, n, 1);
+    n_factor_init(fac);
+    n_factor(fac, n, 1);
 
-    if (fac.num == 1)
+    if (fac->num == 1)
     {
         if (p != NULL)
-            *p = fac.p[0];
-        return fac.exp[0];
+            *p = fac->p[0];
+        return fac->exp[0];
     }
 
     return 0;

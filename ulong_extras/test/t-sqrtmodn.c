@@ -39,13 +39,13 @@ int main(void)
         if (n == 0) n = 1;
         b = n_randtest(state) % n;
         
-        n_factor_init(&fac);
-        n_factor(&fac, n, 0);
+        n_factor_init(fac);
+        n_factor(fac, n, 0);
 
         ninv = n_preinvert_limb(n);
         a = n_mulmod2_preinv(b, b, n, ninv);
 
-        num = n_sqrtmodn(&sqrt, a, &fac);
+        num = n_sqrtmodn(&sqrt, a, fac);
         
         btest = 0;
         for (i = 0; i < num; i++)
@@ -87,13 +87,13 @@ int main(void)
         bits = n_randint(state, 18) + 2;
         n = n_randtest_bits(state, bits);
         if (n == 2) n++;
-        n_factor_init(&fac);
-        n_factor(&fac, n, 0);
+        n_factor_init(fac);
+        n_factor(fac, n, 0);
 
         ninv = n_preinvert_limb(n);
         
         a = n_randtest(state) % n;
-        while (n_sqrtmodn(&sqrt, a, &fac))
+        while (n_sqrtmodn(&sqrt, a, fac))
         {
             if (n_mulmod2_preinv(sqrt[0], sqrt[0], n, ninv) != a)
             {

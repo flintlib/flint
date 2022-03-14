@@ -22,7 +22,7 @@ void test_poly(
     nmod_poly_factor_t roots,
     const nmod_poly_t f,
     int want_mult,
-    const n_factor_t * n)
+    n_factor_srcptr n)
 {
     slong i, multiplicity;
     nmod_poly_t q, qt, r;
@@ -137,8 +137,8 @@ main(void)
 
         n = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
         n = FLINT_MAX(n, UWORD(2));
-        n_factor_init(&nfac);
-        n_factor(&nfac, n, 0);
+        n_factor_init(nfac);
+        n_factor(nfac, n, 0);
 
         nmod_poly_init(f, n);
         nmod_poly_factor_init(roots);
@@ -151,14 +151,14 @@ main(void)
             nmod_poly_set_coeff_ui(f, 2, n - 1);
             nmod_poly_set_coeff_ui(f, 0, a);
 
-            if (!nmod_poly_roots_factored(roots, f, 0, &nfac))
+            if (!nmod_poly_roots_factored(roots, f, 0, nfac))
             {
                 flint_printf("FAILED:\ncheck sqrt could be calculated\n");
                 fflush(stdout);
                 flint_abort();
             }
 
-            if (roots->num != n_sqrtmodn(&sqrt, a, &nfac))
+            if (roots->num != n_sqrtmodn(&sqrt, a, nfac))
             {
                 flint_printf("FAILED:\ncheck root count against n_sqrtmodn\n");
                 fflush(stdout);
@@ -168,8 +168,8 @@ main(void)
             if (sqrt)
                 flint_free(sqrt);
 
-            test_poly(roots, f, 0, &nfac);
-            test_poly(roots, f, 1, &nfac);
+            test_poly(roots, f, 0, nfac);
+            test_poly(roots, f, 1, nfac);
         }
 
         nmod_poly_clear(f);
@@ -186,8 +186,8 @@ main(void)
         p = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
         p = FLINT_MAX(p, UWORD(2));
 
-        n_factor_init(&n);
-        n_factor(&n, p, 1);
+        n_factor_init(n);
+        n_factor(n, p, 1);
 
         nmod_poly_init(f, p);
         nmod_poly_factor_init(r);
@@ -211,9 +211,9 @@ main(void)
                 nmod_poly_clear(ff);
             }
 
-            test_poly(r, f, 0, &n);
+            test_poly(r, f, 0, n);
             if (r->num < 1000)
-                test_poly(r, f, 1, &n);
+                test_poly(r, f, 1, n);
         }
 
         nmod_poly_factor_clear(r);

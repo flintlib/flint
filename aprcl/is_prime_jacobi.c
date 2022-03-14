@@ -570,7 +570,7 @@ _aprcl_is_prime_jacobi(const fmpz_t n, aprcl_config_srcptr config)
 
         If (Lp), then lambdas_p = 1.
     */
-    lambdas = (int*) flint_malloc(sizeof(int) * config->rs.num);
+    lambdas = (int*) flint_malloc(sizeof(int) * config->rs->num);
 
     /* nmod4 = n % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
@@ -580,9 +580,9 @@ _aprcl_is_prime_jacobi(const fmpz_t n, aprcl_config_srcptr config)
             to 1 if p >= 3 and n^{p - 1} != 1 mod p^2;
             to 0 otherwise.
     */
-    for (i = 0; i < config->rs.num; i++)
+    for (i = 0; i < config->rs->num; i++)
     {
-        ulong p = config->rs.p[i];
+        ulong p = config->rs->p[i];
         if (p > 2)
         {
             fmpz_set_ui(p2, p * p);
@@ -623,11 +623,11 @@ _aprcl_is_prime_jacobi(const fmpz_t n, aprcl_config_srcptr config)
         }
 
         /* find prime factors of q - 1 */
-        n_factor_init(&q_factors);
-        n_factor(&q_factors, q - 1, 1);
+        n_factor_init(q_factors);
+        n_factor(q_factors, q - 1, 1);
 
         /* for every prime p | q - 1 */
-        for (j = 0; j < q_factors.num; j++)
+        for (j = 0; j < q_factors->num; j++)
         {
             int pind;
             slong h;
@@ -637,8 +637,8 @@ _aprcl_is_prime_jacobi(const fmpz_t n, aprcl_config_srcptr config)
             if (result == COMPOSITE)
                 break;
 
-            p = q_factors.p[j];     /* set p; p | q - 1 */
-            k = q_factors.exp[j];   /* set max k for which p^k | q - 1 */
+            p = q_factors->p[j];     /* set p; p | q - 1 */
+            k = q_factors->exp[j];   /* set max k for which p^k | q - 1 */
             r = n_pow(p, k);        /* set r = p^k */
             pind = _aprcl_p_ind(config, p);  /* find index of p in lambdas */
 
@@ -750,12 +750,12 @@ _aprcl_is_prime_jacobi(const fmpz_t n, aprcl_config_srcptr config)
     if (result == PROBABPRIME)
     {
         /* for every lambdas_p */
-        for (i = 0; i < config->rs.num; i++)
+        for (i = 0; i < config->rs->num; i++)
         {
             /* if lambdas_p == 0 need run additional test for p */
             if (lambdas[i] == 0)
             {
-                int r = _aprcl_is_prime_jacobi_additional_test(n, config->rs.p[i]);
+                int r = _aprcl_is_prime_jacobi_additional_test(n, config->rs->p[i]);
 
                 /* if r == 2 then we prove that n is composite */
                 if (r == 2)

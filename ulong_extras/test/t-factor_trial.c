@@ -29,14 +29,14 @@ int main(void)
       mp_limb_t n1, n2;
       n_factor_t factors;
 
-      n_factor_init(&factors);
+      n_factor_init(factors);
 
       n1 = n_randtest_not_zero(state);
-      n2 = n_factor_trial(&factors, n1, UWORD(10000));
+      n2 = n_factor_trial(factors, n1, UWORD(10000));
       
-      for (j = 0; j < factors.num; j++)
+      for (j = 0; j < factors->num; j++)
       {
-         n2 *= n_pow(factors.p[j], factors.exp[j]);
+         n2 *= n_pow(factors->p[j], factors->exp[j]);
       }
 
       result = (n1 == n2);

@@ -1,7 +1,27 @@
 .. _ulong-extras:
 
 **ulong_extras.h** -- arithmetic and number-theoretic functions for single-word integers
-========================================================================================
+================================================================================
+
+Types
+--------------------------------------------------------------------------------
+
+.. type:: n_factor_struct
+
+    FILL ME IN
+
+.. type:: n_factor_t
+
+    One-element array of ``n_factor_struct``.
+
+.. type:: n_factor_ptr
+
+    Pointer to ``n_factor_struct``.
+
+.. type:: n_factor_srcptr
+
+    Pointer to constant ``n_factor_struct``.
+
 
 
 Random functions 
@@ -508,7 +528,7 @@ Modular Arithmetic
     returned by the function and the location ``sqrt`` points to is set to 
     NULL. 
 
-.. function:: slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
+.. function:: slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t fac)
 
     Computes all the square roots of ``a`` modulo ``m`` given the 
     factorisation of ``m`` in ``fac``. The roots are stored in an array 
@@ -1019,11 +1039,10 @@ Factorisation
     `p` we make repeated use of :func:`n_divrem2_precomp` until division
     by `p` is no longer possible.
 
-.. function:: void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
+.. function:: void n_factor_insert(n_factor_t factors, ulong p, ulong exp)
 
     Inserts the given prime power factor ``p^exp`` into 
-    the ``n_factor_t`` ``factors``. See the documentation for 
-    :func:`n_factor_trial` for a description of the ``n_factor_t`` type. 
+    the ``n_factor_t`` ``factors``.
 
     The algorithm performs a simple search to see if `p` already 
     exists as a prime factor in the structure. If so the exponent
@@ -1033,7 +1052,7 @@ Factorisation
     There is no test code for this function other than its use by
     the various factoring functions, which have test code.
 
-.. function:: ulong n_factor_trial_range(n_factor_t * factors, ulong n, ulong start, ulong num_primes)
+.. function:: ulong n_factor_trial_range(n_factor_t factors, ulong n, ulong start, ulong num_primes)
 
     Trial factor `n` with the first ``num_primes`` primes, but
     starting at the prime with index start (counting from zero).
@@ -1062,7 +1081,7 @@ Factorisation
     :func:`n_compute_primes` are utilised with the :func:`n_remove2_precomp`
     function.
 
-.. function:: ulong n_factor_trial(n_factor_t * factors, ulong n, ulong num_primes)
+.. function:: ulong n_factor_trial(n_factor_t factors, ulong n, ulong num_primes)
 
     This function calls :func:`n_factor_trial_range`, with the value of 
     `0` for ``start``. By default this adds factors to an already existing
@@ -1119,7 +1138,7 @@ Factorisation
     If SQUFOF fails to factor `n` we return `0`, however with 
     ``iters`` large enough this should never happen.
 
-.. function:: void n_factor(n_factor_t * factors, ulong n, int proved)
+.. function:: void n_factor(n_factor_t factors, ulong n, int proved)
 
     Factors `n` with no restrictions on `n`. If the prime factors are 
     required to be checked with a primality test, one may set 
@@ -1130,9 +1149,6 @@ Factorisation
     However, in future, this flag may produce and separately check
     a primality certificate. This may be quite slow (and probably no
     less reliable in practice).
-
-    For details on the ``n_factor_t`` structure, see 
-    :func:`n_factor_trial`.
 
     This function first tries trial factoring with a number of primes
     specified by the constant ``FLINT_FACTOR_TRIAL_PRIMES``. If the 
@@ -1151,7 +1167,7 @@ Factorisation
     ``FLINT_FACTOR_SQUFOF_ITERS``. If that fails an error results and
     the program aborts. However this should not happen in practice.
 
-.. function:: ulong n_factor_trial_partial(n_factor_t * factors, ulong n, ulong * prod, ulong num_primes, ulong limit)
+.. function:: ulong n_factor_trial_partial(n_factor_t factors, ulong n, ulong * prod, ulong num_primes, ulong limit)
 
     Attempts trial factoring of `n` with the first ``num_primes primes``, 
     but stops when the product of prime factors so far exceeds ``limit``.
@@ -1181,7 +1197,7 @@ Factorisation
     :func:`n_compute_primes` are utilised with the :func:`n_remove2_precomp`
     function.
 
-.. function:: ulong n_factor_partial(n_factor_t * factors, ulong n, ulong limit, int proved)
+.. function:: ulong n_factor_partial(n_factor_t factors, ulong n, ulong limit, int proved)
 
     Factors `n`, but stops when the product of prime factors so far 
     exceeds ``limit``.
@@ -1320,7 +1336,7 @@ Primitive Roots and Discrete Logarithms
 --------------------------------------------------------------------------------
 
 
-.. function:: ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
+.. function:: ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t factors)
 
     Returns a primitive root for the multiplicative subgroup of `\mathbb{Z}/p\mathbb{Z}`
     where `p` is prime given the factorisation (``factors``) of `p - 1`.

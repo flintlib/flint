@@ -23,9 +23,9 @@ main(int argc, char** argv)
     
     for (i = 0; i < 1000; )
     {
-       n_factor_init(&fac);
+       n_factor_init(fac);
        n = n_randbits(state, bits + n_randint(state, FLINT_BITS - bits + 1));
-       cofactor = n_factor_trial(&fac, n, FLINT_FACTOR_TRIAL_PRIMES);
+       cofactor = n_factor_trial(fac, n, FLINT_FACTOR_TRIAL_PRIMES);
        if (FLINT_BIT_COUNT(cofactor) == bits && !n_is_prime(cofactor))
        {
           nums[i++] = n;
@@ -51,8 +51,8 @@ main(int argc, char** argv)
             {
                for (i = 0; i < 1000; i++)
 	       {
-	           n_factor_init(&fac);
-	           n_factor(&fac, nums[i], 0);
+	           n_factor_init(fac);
+	           n_factor(fac, nums[i], 0);
 	       }
 	    }
             prof_stop();

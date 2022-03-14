@@ -39,9 +39,6 @@ ulong_extras
 
 * add profile code for factor_trial, factor_one_line, factor_SQUFOF
 
-* [maybe] make n_factor_t an array of length 1 so it can be passed by reference
-  automatically, as per mpz_t's, etc
-
 * [enhancement] Implement a primality test which only requires factoring of
   n-1 up to n^1/3 or n^1/4
 

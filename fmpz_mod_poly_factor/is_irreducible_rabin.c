@@ -76,12 +76,12 @@ int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
             n_factor_t factors;
             slong i;
 
-            n_factor_init(&factors);
-            n_factor(&factors, n, 1);
+            n_factor_init(factors);
+            n_factor(factors, n, 1);
 
-            for (i = 0; i < factors.num; i++)
+            for (i = 0; i < factors->num; i++)
             {
-                fmpz_mod_poly_frobenius_power(a, pow, f, n / factors.p[i], ctx);
+                fmpz_mod_poly_frobenius_power(a, pow, f, n / factors->p[i], ctx);
 
                 fmpz_mod_poly_sub(a, a, x, ctx);
 

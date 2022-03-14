@@ -163,8 +163,8 @@ _aprcl_is_prime_gauss(const fmpz_t n, aprcl_config_srcptr config)
 
         If (Lp), then lambdas_p = 3.
     */
-    lambdas = (int*) flint_malloc(sizeof(int) * config->rs.num);
-    for (i = 0; i < config->rs.num; i++)
+    lambdas = (int*) flint_malloc(sizeof(int) * config->rs->num);
+    for (i = 0; i < config->rs->num; i++)
         lambdas[i] = 0;
 
     result = PROBABPRIME;
@@ -189,17 +189,17 @@ _aprcl_is_prime_gauss(const fmpz_t n, aprcl_config_srcptr config)
         }
 
         /* find prime factors of q - 1 */
-        n_factor_init(&q_factors);
-        n_factor(&q_factors, q - 1, 1);
+        n_factor_init(q_factors);
+        n_factor(q_factors, q - 1, 1);
 
         /* for every prime p | q - 1 */
-        for (j = 0; j < q_factors.num; j++)
+        for (j = 0; j < q_factors->num; j++)
         {
             int state, pind;
             ulong p;
             if (result == COMPOSITE) break;
 
-            p = q_factors.p[j];
+            p = q_factors->p[j];
 
             pind = _aprcl_p_ind(config, p);
             state = lambdas[pind];
@@ -244,7 +244,7 @@ _aprcl_is_prime_gauss(const fmpz_t n, aprcl_config_srcptr config)
             }
 
             /* for every prime power p^k | q - 1 */
-            for (k = 1; k <= q_factors.exp[j]; k++)
+            for (k = 1; k <= q_factors->exp[j]; k++)
             {
                 int unity_power;
                 ulong r;
@@ -323,7 +323,7 @@ _aprcl_is_prime_gauss(const fmpz_t n, aprcl_config_srcptr config)
         then n can be as prime or composite
     */
     if (result == PROBABPRIME)
-        for (i = 0; i < config->rs.num; i++)
+        for (i = 0; i < config->rs->num; i++)
             if (lambdas[i] != 3)
                 result = UNKNOWN;
 

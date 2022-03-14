@@ -29,16 +29,16 @@ int main(void)
       mp_limb_t n1, n2, prod, limit;
       n_factor_t factors;
 
-      n_factor_init(&factors);
+      n_factor_init(factors);
 
       n1 = n_randtest_not_zero(state);
       limit = n_sqrt(n1);
-      n2 = n_factor_partial(&factors, n1, limit, 0);
+      n2 = n_factor_partial(factors, n1, limit, 0);
       
       prod = 1;
-      for (j = 0; j < factors.num; j++)
+      for (j = 0; j < factors->num; j++)
       {
-         prod *= n_pow(factors.p[j], factors.exp[j]);
+         prod *= n_pow(factors->p[j], factors->exp[j]);
       }
 
       result = ((n1 == n2*prod) && ((prod > limit) || (n1 == 1)));

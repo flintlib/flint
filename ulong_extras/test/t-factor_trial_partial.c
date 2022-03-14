@@ -29,11 +29,11 @@ int main(void)
       mp_limb_t n1, n2, prod, limit;
       n_factor_t factors;
 
-      n_factor_init(&factors);
+      n_factor_init(factors);
 
       n1 = n_randtest_not_zero(state);
       limit = n_sqrt(n1);
-      n2 = n_factor_trial_partial(&factors, n1, &prod, UWORD(10000), limit);
+      n2 = n_factor_trial_partial(factors, n1, &prod, UWORD(10000), limit);
       
       if (n1 != n2*prod)
       {
@@ -43,9 +43,9 @@ int main(void)
          flint_abort();
       }
 
-      for (j = 0; j < factors.num; j++)
+      for (j = 0; j < factors->num; j++)
       {
-         n2 *= n_pow(factors.p[j], factors.exp[j]);
+         n2 *= n_pow(factors->p[j], factors->exp[j]);
       }
 
       result = (n1 == n2);

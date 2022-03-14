@@ -35,16 +35,16 @@ int main(void)
         n_factor_t q_factors;
         mp_ptr table;
 
-        n_factor_init(&q_factors);
+        n_factor_init(q_factors);
 
         q = n_randprime(state, 2 + n_randint(state, 4), 0);
         while (q < 3)
             q = n_randprime(state, 2 + n_randint(state, 4), 0);
 
-        n_factor(&q_factors, q - 1, 1);
-        ind = n_randint(state, q_factors.num);
-        p = q_factors.p[ind];
-        k = q_factors.exp[ind];
+        n_factor(q_factors, q - 1, 1);
+        ind = n_randint(state, q_factors->num);
+        p = q_factors->p[ind];
+        k = q_factors->exp[ind];
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
@@ -89,15 +89,15 @@ int main(void)
         n_factor_t q_factors;
         mp_ptr table;
 
-        n_factor_init(&q_factors);
+        n_factor_init(q_factors);
 
         q = n_randprime(state, 2 + n_randint(state, 4), 0);
         while (q < 3)
             q = n_randprime(state, 2 + n_randint(state, 4), 0);
 
-        n_factor(&q_factors, q - 1, 1);
+        n_factor(q_factors, q - 1, 1);
         p = 2;
-        k = q_factors.exp[0];
+        k = q_factors->exp[0];
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
@@ -142,15 +142,15 @@ int main(void)
         n_factor_t q_factors;
         mp_ptr table;
 
-        n_factor_init(&q_factors);
+        n_factor_init(q_factors);
 
         q = n_randprime(state, 2 + n_randint(state, 6), 0);
         while (q < 3)
             q = n_randprime(state, 2 + n_randint(state, 6), 0);
 
-        n_factor(&q_factors, q - 1, 1);
+        n_factor(q_factors, q - 1, 1);
         p = 2;
-        k = q_factors.exp[0];
+        k = q_factors->exp[0];
 
         if (k < 3) continue;
 

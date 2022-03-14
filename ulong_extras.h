@@ -39,7 +39,11 @@ typedef struct {
    int num;
    int exp[FLINT_MAX_FACTORS_IN_LIMB];
    ulong p[FLINT_MAX_FACTORS_IN_LIMB];
-} n_factor_t;
+} n_factor_struct;
+
+typedef n_factor_struct n_factor_t[1];
+typedef n_factor_struct * n_factor_ptr;
+typedef const n_factor_struct * n_factor_srcptr;
 
 #define FLINT_ODDPRIME_SMALL_CUTOFF 4096
 #define FLINT_NUM_PRIMES_SMALL 172
@@ -84,6 +88,8 @@ typedef struct
 n_primes_struct;
 
 typedef n_primes_struct n_primes_t[1];
+typedef n_primes_struct * n_primes_ptr;
+typedef const n_primes_struct * n_primes_srcptr;
 
 FLINT_DLL void n_primes_init(n_primes_t iter);
 
@@ -317,7 +323,7 @@ FLINT_DLL slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp);
 FLINT_DLL slong n_sqrtmod_primepow(ulong ** sqrt, ulong a, 
                                               ulong p, slong exp);
 
-FLINT_DLL slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac);
+FLINT_DLL slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_ptr fac);
 
 FLINT_DLL ulong n_gcd(ulong x, ulong y);
 
@@ -412,23 +418,23 @@ FLINT_DLL int n_remove(ulong * n, ulong p);
 FLINT_DLL int n_remove2_precomp(ulong * n, ulong p, double ppre);
 
 ULONG_EXTRAS_INLINE
-void n_factor_init(n_factor_t * factors)
+void n_factor_init(n_factor_ptr factors)
 {
     factors->num = UWORD(0);
 }
 
-FLINT_DLL void n_factor_insert(n_factor_t * factors, ulong p, ulong exp);
+FLINT_DLL void n_factor_insert(n_factor_ptr factors, ulong p, ulong exp);
 
-FLINT_DLL ulong n_factor_trial_range(n_factor_t * factors, 
+FLINT_DLL ulong n_factor_trial_range(n_factor_ptr factors, 
                          ulong n, ulong start, ulong num_primes);
 
-FLINT_DLL ulong n_factor_trial_partial(n_factor_t * factors, ulong n, 
+FLINT_DLL ulong n_factor_trial_partial(n_factor_ptr factors, ulong n, 
                 ulong * prod, ulong num_primes, ulong limit);
 
-FLINT_DLL ulong n_factor_trial(n_factor_t * factors, 
+FLINT_DLL ulong n_factor_trial(n_factor_ptr factors, 
                                   ulong n, ulong num_primes);
 
-FLINT_DLL ulong n_factor_partial(n_factor_t * factors, 
+FLINT_DLL ulong n_factor_partial(n_factor_ptr factors, 
                            ulong n, ulong limit, int proved);
 
 FLINT_DLL ulong n_factor_power235(ulong *exp, ulong n);
@@ -439,7 +445,7 @@ FLINT_DLL ulong n_factor_lehman(ulong n);
 
 FLINT_DLL ulong n_factor_SQUFOF(ulong n, ulong iters);
 
-FLINT_DLL void n_factor(n_factor_t * factors, ulong n, int proved);
+FLINT_DLL void n_factor(n_factor_ptr factors, ulong n, int proved);
 
 FLINT_DLL ulong n_factor_pp1(ulong n, ulong B1, ulong c);
 
@@ -472,7 +478,7 @@ FLINT_DLL ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv);
 
 FLINT_DLL ulong n_factorial_fast_mod2_preinv(ulong n, ulong p, ulong pinv);
 
-FLINT_DLL ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors);
+FLINT_DLL ulong n_primitive_root_prime_prefactor(ulong p, n_factor_ptr factors);
 
 FLINT_DLL ulong n_primitive_root_prime(ulong p);
 

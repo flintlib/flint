@@ -30,16 +30,16 @@ int main(void)
         unity_zp_t f, g, h;
         n_factor_t q_factors;
 
-        n_factor_init(&q_factors);
+        n_factor_init(q_factors);
 
         q = n_randprime(state, 2 + n_randint(state, 6), 0);
         while (q < 3)
             q = n_randprime(state, 2 + n_randint(state, 6), 0);
 
-        n_factor(&q_factors, q - 1, 1);
-        ind = n_randint(state, q_factors.num);
-        p = q_factors.p[ind];
-        k = q_factors.exp[ind];
+        n_factor(q_factors, q - 1, 1);
+        ind = n_randint(state, q_factors->num);
+        p = q_factors->p[ind];
+        k = q_factors->exp[ind];
         
         x = n_randint(state, n_pow(p, k));
         while (n_gcd(p, x) != 1 || x == 0)

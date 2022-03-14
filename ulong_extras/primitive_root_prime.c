@@ -14,7 +14,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
+mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_ptr factors)
 {
     slong i;
     int found;
@@ -56,10 +56,10 @@ mp_limb_t n_primitive_root_prime(mp_limb_t p)
     mp_limb_t a;
     n_factor_t factors;
 
-    n_factor_init(&factors);
-    n_factor(&factors, p - 1, 1);
+    n_factor_init(factors);
+    n_factor(factors, p - 1, 1);
     
-    a = n_primitive_root_prime_prefactor(p, &factors);
+    a = n_primitive_root_prime_prefactor(p, factors);
 
     return a;
 }

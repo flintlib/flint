@@ -83,17 +83,17 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config_ptr conf, const fmpz_t n)
         conf->qs_used[i] = 1;
 
         q = fmpz_get_ui(conf->qs->p + i);
-        n_factor_init(&q_factors);
-        n_factor(&q_factors, q - 1, 1);
+        n_factor_init(q_factors);
+        n_factor(q_factors, q - 1, 1);
 
         w[i] = 0;
 
-        for (j = 0; j < q_factors.num; j++)
+        for (j = 0; j < q_factors->num; j++)
         {
             ulong p, euler_phi;
 
-            p = q_factors.p[j];
-            euler_phi = n_pow(p, q_factors.exp[j] - 1) * (p - 1);
+            p = q_factors->p[j];
+            euler_phi = n_pow(p, q_factors->exp[j] - 1) * (p - 1);
             euler_phi = euler_phi * euler_phi;
 
             w[i] += euler_phi;
@@ -183,8 +183,8 @@ aprcl_config_jacobi_init(aprcl_config_ptr conf, const fmpz_t n)
     conf->R = aprcl_R_value(n);
     _aprcl_config_jacobi_update(conf);
 
-    n_factor_init(&conf->rs);
-    n_factor(&conf->rs, conf->R, 1);
+    n_factor_init(conf->rs);
+    n_factor(conf->rs, conf->R, 1);
 
     conf->qs_used = (int *) flint_malloc(sizeof(int) * conf->qs->num);
     _aprcl_config_jacobi_reduce_s2(conf, n);
