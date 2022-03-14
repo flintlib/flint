@@ -12,7 +12,7 @@
 #include "d_mat.h"
 
 void
-d_mat_gso(d_mat_t B, const d_mat_t A)
+d_mat_gso(d_mat_ptr B, d_mat_srcptr A)
 {
     slong i, j, k;
     int flag;

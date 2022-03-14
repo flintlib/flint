@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 void
-d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B)
+d_mat_mul_classical(d_mat_ptr C, d_mat_srcptr A, d_mat_srcptr B)
 {
     slong ar, bc, br;
     slong jj, kk, i, j, k, blocksize;

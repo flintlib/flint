@@ -88,12 +88,12 @@ FLINT_DLL void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state);
 FLINT_DLL double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong len2,
        const fmpz_mat_t B, slong k, slong j, slong exp_adj);
 
-FLINT_DLL int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
-       d_mat_t appB, int *expo, fmpz_gram_t A,
+FLINT_DLL int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_ptr mu, d_mat_ptr r, double *s,
+       d_mat_ptr appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
-FLINT_DLL int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
-       d_mat_t appB, int *expo, fmpz_gram_t A,
+FLINT_DLL int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_ptr mu, d_mat_ptr r, double *s,
+       d_mat_ptr appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
 FLINT_DLL int fmpz_lll_shift(const fmpz_mat_t B);
@@ -112,12 +112,12 @@ FLINT_DLL int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
 FLINT_DLL int fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
-FLINT_DLL int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
-       d_mat_t appB, int *expo, fmpz_gram_t A,
+FLINT_DLL int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_ptr mu, d_mat_ptr r, double *s,
+       d_mat_ptr appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
-FLINT_DLL int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
-       d_mat_t appB, int *expo, fmpz_gram_t A,
+FLINT_DLL int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_ptr mu, d_mat_ptr r, double *s,
+       d_mat_ptr appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
 /* LLL with removals  ********************************************************/

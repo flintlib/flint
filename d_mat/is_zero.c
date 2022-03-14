@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 int
-d_mat_is_zero(const d_mat_t mat)
+d_mat_is_zero(d_mat_srcptr mat)
 {
     slong j;
 

@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
+fmpz_mat_chol_d(d_mat_ptr R, const fmpz_mat_t A)
 {
     slong i, k, j, r = A->r;
 

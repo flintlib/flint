@@ -29,8 +29,8 @@
 #undef TYPE
 #endif
 
-#define FUNC_HEAD int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, \
-       d_mat_t appB, int *expo, fmpz_gram_t A, \
+#define FUNC_HEAD int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_ptr mu, d_mat_ptr r, double *s, \
+       d_mat_ptr appB, int *expo, fmpz_gram_t A, \
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 #define LIMIT kappa
 #define COMPUTE(G, I, J, C)                                         \

@@ -12,7 +12,7 @@
 #include "d_mat.h"
 
 void
-d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
+d_mat_qr(d_mat_ptr Q, d_mat_ptr R, d_mat_srcptr A)
 {
     slong i, j, k;
     int flag, orig;

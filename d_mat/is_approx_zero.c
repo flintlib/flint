@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 int
-d_mat_is_approx_zero(const d_mat_t mat, double eps)
+d_mat_is_approx_zero(d_mat_srcptr mat, double eps)
 {
     slong j;
 

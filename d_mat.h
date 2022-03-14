@@ -43,41 +43,43 @@ typedef struct
 } d_mat_struct;
 
 typedef d_mat_struct d_mat_t[1];
+typedef d_mat_struct * d_mat_ptr;
+typedef const d_mat_struct * d_mat_srcptr;
 
 #define d_mat_entry(mat,i,j) (*((mat)->rows[i] + (j)))
 
 D_MAT_INLINE
-double * d_mat_entry_ptr(const d_mat_t mat, slong i, slong j)
+double * d_mat_entry_ptr(d_mat_srcptr mat, slong i, slong j)
 {
    return mat->rows[i] + j;
 }
 
 D_MAT_INLINE
-double d_mat_get_entry(const d_mat_t mat, slong i, slong j)
+double d_mat_get_entry(d_mat_srcptr mat, slong i, slong j)
 {
    return mat->rows[i][j];
 }
 
 D_MAT_INLINE
-slong d_mat_nrows(const d_mat_t mat)
+slong d_mat_nrows(d_mat_srcptr mat)
 {
     return mat->r;
 }
 
 D_MAT_INLINE
-slong d_mat_ncols(const d_mat_t mat)
+slong d_mat_ncols(d_mat_srcptr mat)
 {
     return mat->c;
 }
 
 /* Memory management  ********************************************************/
 
-FLINT_DLL void d_mat_init(d_mat_t mat, slong rows, slong cols);
+FLINT_DLL void d_mat_init(d_mat_ptr mat, slong rows, slong cols);
 
-FLINT_DLL void d_mat_swap(d_mat_t mat1, d_mat_t mat2);
+FLINT_DLL void d_mat_swap(d_mat_ptr mat1, d_mat_ptr mat2);
 
 D_MAT_INLINE void
-d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
+d_mat_swap_entrywise(d_mat_ptr mat1, d_mat_ptr mat2)
 {
     slong i, j;
     for (i = 0; i < d_mat_nrows(mat1); i++)
@@ -89,56 +91,56 @@ d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
     }
 }
 
-FLINT_DLL void d_mat_set(d_mat_t mat1, const d_mat_t mat2);
+FLINT_DLL void d_mat_set(d_mat_ptr mat1, d_mat_srcptr mat2);
 
-FLINT_DLL void d_mat_clear(d_mat_t mat);
+FLINT_DLL void d_mat_clear(d_mat_ptr mat);
 
-FLINT_DLL int d_mat_equal(const d_mat_t mat1, const d_mat_t mat2);
+FLINT_DLL int d_mat_equal(d_mat_srcptr mat1, d_mat_srcptr mat2);
 
-FLINT_DLL int d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps);
+FLINT_DLL int d_mat_approx_equal(d_mat_srcptr mat1, d_mat_srcptr mat2, double eps);
 
-FLINT_DLL int d_mat_is_zero(const d_mat_t mat);
+FLINT_DLL int d_mat_is_zero(d_mat_srcptr mat);
 
-FLINT_DLL int d_mat_is_approx_zero(const d_mat_t mat, double eps);
+FLINT_DLL int d_mat_is_approx_zero(d_mat_srcptr mat, double eps);
 
 D_MAT_INLINE
-int d_mat_is_empty(const d_mat_t mat)
+int d_mat_is_empty(d_mat_srcptr mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
 D_MAT_INLINE
-int d_mat_is_square(const d_mat_t mat)
+int d_mat_is_square(d_mat_srcptr mat)
 {
     return (mat->r == mat->c);
 }
 
-FLINT_DLL void d_mat_zero(d_mat_t mat);
+FLINT_DLL void d_mat_zero(d_mat_ptr mat);
 
-FLINT_DLL void d_mat_one(d_mat_t mat);
+FLINT_DLL void d_mat_one(d_mat_ptr mat);
 
 
 /* Input and output  *********************************************************/
 
-FLINT_DLL void d_mat_print(const d_mat_t mat);
+FLINT_DLL void d_mat_print(d_mat_srcptr mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void d_mat_randtest(d_mat_t mat, flint_rand_t state, slong minexp,
+FLINT_DLL void d_mat_randtest(d_mat_ptr mat, flint_rand_t state, slong minexp,
                     slong maxexp);
 
 /* Transpose */
 
-FLINT_DLL void d_mat_transpose(d_mat_t B, const d_mat_t A);
+FLINT_DLL void d_mat_transpose(d_mat_ptr B, d_mat_srcptr A);
 
 /* Multiplication */
 
-FLINT_DLL void d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B);
+FLINT_DLL void d_mat_mul_classical(d_mat_ptr C, d_mat_srcptr A, d_mat_srcptr B);
 
 /* Permutations */
 
 D_MAT_INLINE
-void d_mat_swap_rows(d_mat_t mat, slong r, slong s)
+void d_mat_swap_rows(d_mat_ptr mat, slong r, slong s)
 {
     if (r != s)
     {
@@ -152,9 +154,9 @@ void d_mat_swap_rows(d_mat_t mat, slong r, slong s)
 
 /* Gram-Schmidt Orthogonalisation and QR Decomposition  ********************************************************/
 
-FLINT_DLL void d_mat_gso(d_mat_t B, const d_mat_t A);
+FLINT_DLL void d_mat_gso(d_mat_ptr B, d_mat_srcptr A);
 
-FLINT_DLL void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A);
+FLINT_DLL void d_mat_qr(d_mat_ptr Q, d_mat_ptr R, d_mat_srcptr A);
 
 #ifdef __cplusplus
 }

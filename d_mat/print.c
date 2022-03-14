@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 void
-d_mat_print(const d_mat_t mat)
+d_mat_print(d_mat_srcptr mat)
 {
     slong i, j;
 

@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 void
-d_mat_init(d_mat_t mat, slong rows, slong cols)
+d_mat_init(d_mat_ptr mat, slong rows, slong cols)
 {
     slong i;
     

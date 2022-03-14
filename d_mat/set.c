@@ -14,7 +14,7 @@
 #include "d_mat.h"
 
 void
-d_mat_set(d_mat_t mat1, const d_mat_t mat2)
+d_mat_set(d_mat_ptr mat1, d_mat_srcptr mat2)
 {
     if (mat1 != mat2)
     {

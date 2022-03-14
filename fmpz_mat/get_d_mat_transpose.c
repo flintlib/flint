@@ -13,7 +13,7 @@
 #include "fmpz_mat.h"
 
 int
-fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
+fmpz_mat_get_d_mat_transpose(d_mat_ptr B, const fmpz_mat_t A)
 {
     slong i, j;
     fmpz_t dmax;

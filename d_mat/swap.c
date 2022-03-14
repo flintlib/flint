@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 void
-d_mat_swap(d_mat_t mat1, d_mat_t mat2)
+d_mat_swap(d_mat_ptr mat1, d_mat_ptr mat2)
 {
     if (mat1 != mat2)
     {

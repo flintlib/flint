@@ -4,6 +4,22 @@
 ===============================================================================
 
 
+Types
+--------------------------------------------------------------------------------
+
+.. type:: d_mat_t
+
+    A one-element array holding an element of type ``d_mat_struct``.
+
+.. type:: d_mat_ptr
+
+    Pointer to a ``d_mat_struct``.
+
+.. type:: d_mat_srcptr
+
+    Pointer to a constant ``d_mat_struct``.
+
+
 
 Memory management
 --------------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 int
-d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps)
+d_mat_approx_equal(d_mat_srcptr mat1, d_mat_srcptr mat2, double eps)
 {
     slong j;
 
