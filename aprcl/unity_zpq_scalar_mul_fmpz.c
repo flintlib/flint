@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zpq_scalar_mul_fmpz(unity_zpq f, const unity_zpq g, const fmpz_t s)
+unity_zpq_scalar_mul_fmpz(unity_zpq_ptr f, unity_zpq_srcptr g, const fmpz_t s)
 {
     slong i;
 

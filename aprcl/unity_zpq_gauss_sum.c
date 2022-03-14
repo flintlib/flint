@@ -15,7 +15,7 @@
     Computes gauss sum for character \chi corresponding (q, p).
 */
 void
-unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p)
+unity_zpq_gauss_sum(unity_zpq_ptr f, ulong q, ulong p)
 {
     slong i, qinv, qpow, ppow, g;
 

@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h)
+unity_zp_add(unity_zp_ptr f, unity_zp_srcptr g, unity_zp_srcptr h)
 {
     FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
                             fmpz_mod_ctx_modulus(g->ctx)));

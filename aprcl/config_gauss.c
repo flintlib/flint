@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 static void
-_aprcl_config_gauss_update(aprcl_config conf)
+_aprcl_config_gauss_update(aprcl_config_ptr conf)
 {
     ulong prime = 2;
 
@@ -35,7 +35,7 @@ _aprcl_config_gauss_update(aprcl_config conf)
 }
 
 void
-aprcl_config_gauss_init(aprcl_config conf, const fmpz_t n)
+aprcl_config_gauss_init(aprcl_config_ptr conf, const fmpz_t n)
 {
     fmpz_t s2;
 
@@ -59,7 +59,7 @@ aprcl_config_gauss_init(aprcl_config conf, const fmpz_t n)
 }
 
 void
-aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+aprcl_config_gauss_init_min_R(aprcl_config_ptr conf, const fmpz_t n, ulong R)
 {
     fmpz_t s2;
 
@@ -84,7 +84,7 @@ aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 }
 
 void
-aprcl_config_gauss_clear(aprcl_config conf)
+aprcl_config_gauss_clear(aprcl_config_ptr conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

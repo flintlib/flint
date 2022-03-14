@@ -12,13 +12,13 @@
 #include "aprcl.h"
 
 void
-unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x)
+unity_zp_coeff_set_fmpz(unity_zp_ptr f, ulong ind, const fmpz_t x)
 {
     fmpz_mod_poly_set_coeff_fmpz(f->poly, ind, x, f->ctx);
 }
 
 void
-unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x)
+unity_zp_coeff_set_ui(unity_zp_ptr f, ulong ind, ulong x)
 {
     fmpz_mod_poly_set_coeff_ui(f->poly, ind, x, f->ctx);
 }

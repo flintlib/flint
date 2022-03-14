@@ -27,7 +27,7 @@ int main(void)
     {
         ulong p;
         fmpz_t n;
-        unity_zp f;
+        unity_zp_t f;
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
 

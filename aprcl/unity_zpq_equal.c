@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 int
-unity_zpq_equal(const unity_zpq f, const unity_zpq g)
+unity_zpq_equal(unity_zpq_srcptr f, unity_zpq_srcptr g)
 {
     slong i;
 

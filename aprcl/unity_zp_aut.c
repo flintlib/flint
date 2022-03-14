@@ -15,7 +15,7 @@
     Computes f such that \sigma_x(g) = f.
 */
 void
-unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
+unity_zp_aut(unity_zp_ptr f, unity_zp_srcptr g, ulong x)
 {
     ulong i, p_pow, p_pow_preinv;
     fmpz_t coeff;

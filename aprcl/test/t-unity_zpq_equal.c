@@ -27,7 +27,7 @@ int main(void)
     {
         ulong p, q;
         fmpz_t n;
-        unity_zpq f, g;
+        unity_zpq_t f, g;
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
         q = n_randprime(state, 2 + n_randint(state, 6), 0);

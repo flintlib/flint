@@ -12,11 +12,11 @@
 #include "aprcl.h"
 
 slong
-unity_zp_is_unity(unity_zp f)
+unity_zp_is_unity(unity_zp_ptr f)
 {
     ulong result;
     ulong i, p_pow;
-    unity_zp unity;
+    unity_zp_t unity;
 
     p_pow = n_pow(f->p, f->exp);
     unity_zp_init(unity, f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));

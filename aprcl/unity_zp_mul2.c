@@ -18,7 +18,7 @@
     Resulting f reduced by F_4 cyclotomic polynomial.
 */
 void
-unity_zp_mul4(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
+unity_zp_mul4(unity_zp_ptr f, unity_zp_srcptr g, unity_zp_srcptr h, fmpz_t * t)
 {
     /*
         g = (x0, x1);
@@ -60,7 +60,7 @@ unity_zp_mul4(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     Resulting f reduced by F_8 cyclotomic polynomial.
 */
 void
-unity_zp_mul8(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
+unity_zp_mul8(unity_zp_ptr f, unity_zp_srcptr g, unity_zp_srcptr h, fmpz_t * t)
 {
     /*
         g = (x0, x1, x2, x3);
@@ -141,7 +141,7 @@ unity_zp_mul8(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     Resulting f reduced by F_16 cyclotomic polynomial.
 */
 void
-unity_zp_mul16(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
+unity_zp_mul16(unity_zp_ptr f, unity_zp_srcptr g, unity_zp_srcptr h, fmpz_t * t)
 {
     int i;
 

@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zpq_copy(unity_zpq f, const unity_zpq g)
+unity_zpq_copy(unity_zpq_ptr f, unity_zpq_srcptr g)
 {
     slong i;
 

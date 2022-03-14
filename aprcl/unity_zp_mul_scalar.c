@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
+unity_zp_mul_scalar_fmpz(unity_zp_ptr f, unity_zp_srcptr g, const fmpz_t s)
 {
     FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
                             fmpz_mod_ctx_modulus(g->ctx)));
@@ -21,7 +21,7 @@ unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
 }
 
 void
-unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s)
+unity_zp_mul_scalar_ui(unity_zp_ptr f, unity_zp_srcptr g, ulong s)
 {
     FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),
                             fmpz_mod_ctx_modulus(g->ctx)));

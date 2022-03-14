@@ -18,7 +18,7 @@
     Resulting f reduced by F_11 cyclotomic polynomial.
 */
 void
-unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr11(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     int i;
 

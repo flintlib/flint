@@ -27,7 +27,7 @@ int main(void)
     {
         ulong ind, q, p, k, x;
         fmpz_t n;
-        unity_zp f, g, h;
+        unity_zp_t f, g, h;
         n_factor_t q_factors;
 
         n_factor_init(&q_factors);

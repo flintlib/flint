@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-_unity_zpq_mul_unity_p(unity_zpq f)
+_unity_zpq_mul_unity_p(unity_zpq_ptr f)
 {
     slong i;
 
@@ -24,7 +24,7 @@ _unity_zpq_mul_unity_p(unity_zpq f)
     Computes unity_zpq * \zeta_p by swapping poly coeffs.
 */
 void
-unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, slong k)
+unity_zpq_mul_unity_p_pow(unity_zpq_ptr f, unity_zpq_srcptr g, slong k)
 {
     slong i;
 

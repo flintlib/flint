@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_print(const unity_zp f)
+unity_zp_print(unity_zp_srcptr f)
 {
     flint_printf("p = %wu; exp = %wu\n", f->p, f->exp);
     fmpz_mod_poly_print(f->poly, f->ctx);

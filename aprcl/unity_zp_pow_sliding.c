@@ -12,12 +12,12 @@
 #include "aprcl.h"
 
 void
-unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
+unity_zp_pow_sliding_fmpz(unity_zp_ptr f, unity_zp_ptr g, const fmpz_t pow)
 {
     ulong h, k, value;
     slong i, j;
-    unity_zp temp;
-    unity_zp *g_powers;
+    unity_zp_t temp;
+    unity_zp_t *g_powers;
 
     fmpz_t * t;
     t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * SQUARING_SPACE);
@@ -39,7 +39,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
         g_powers store odd powers of g up to 2^k - 1;
         g_powers[(i + 1) / 2] = g^i
     */
-    g_powers = (unity_zp*) flint_malloc(sizeof(unity_zp) * (n_pow(2, k - 1) + 1));
+    g_powers = flint_malloc(sizeof(unity_zp_struct) * (n_pow(2, k - 1) + 1));
 
     /* sets g_powers[0] = 1 */
     unity_zp_init(g_powers[0], f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
@@ -112,4 +112,3 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 
     unity_zp_clear(temp);
 }
-

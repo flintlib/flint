@@ -33,7 +33,7 @@ int main(void)
     {
         ulong p;
         fmpz_t n;
-        unity_zp f, g, temp;
+        unity_zp_t f, g, temp;
 
         p = 5;
 

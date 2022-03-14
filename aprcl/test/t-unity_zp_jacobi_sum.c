@@ -31,7 +31,7 @@ int main(void)
     {
         ulong ind, q, p, k;
         fmpz_t n;
-        unity_zp f, g;
+        unity_zp_t f, g;
         n_factor_t q_factors;
         mp_ptr table;
 
@@ -85,7 +85,7 @@ int main(void)
     {
         ulong q, p, k;
         fmpz_t n;
-        unity_zp f, g;
+        unity_zp_t f, g;
         n_factor_t q_factors;
         mp_ptr table;
 
@@ -138,7 +138,7 @@ int main(void)
     {
         ulong a, b, q, p, k;
         fmpz_t n;
-        unity_zp f, g;
+        unity_zp_t f, g;
         n_factor_t q_factors;
         mp_ptr table;
 

@@ -12,10 +12,10 @@
 #include "aprcl.h"
 
 void
-unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+unity_zp_pow_fmpz(unity_zp_ptr f, unity_zp_srcptr g, const fmpz_t pow)
 {
     slong i;
-    unity_zp temp;
+    unity_zp_t temp;
 
     unity_zp_init(temp, f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
 
@@ -42,7 +42,7 @@ unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 }
 
 void
-unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow)
+unity_zp_pow_ui(unity_zp_ptr f, unity_zp_srcptr g, ulong pow)
 {
     fmpz_t p;
     fmpz_init_set_ui(p, pow);

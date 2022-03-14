@@ -31,7 +31,7 @@ int main(void)
         fmpz_mod_poly_t cyclo_poly;
         ulong p, exp;
         fmpz_t n;
-        unity_zp f, g;
+        unity_zp_t f, g;
 
         p = n_randprime(state, 2 + n_randint(state, 2), 0);
         exp = n_randint(state, 4);

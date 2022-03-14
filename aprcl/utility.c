@@ -15,7 +15,7 @@
     Returns the index of divisor p on R factors list.
 */
 int
-_aprcl_p_ind(const aprcl_config conf, ulong p)
+_aprcl_p_ind(aprcl_config_srcptr conf, ulong p)
 {
     int i;
     for (i = 0; i < conf->rs.num; i++)

@@ -12,9 +12,9 @@
 #include "aprcl.h"
 
 void
-unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
+unity_zpq_pow(unity_zpq_ptr f, unity_zpq_srcptr g, const fmpz_t pow)
 {
-    unity_zpq value;
+    unity_zpq_t value;
     fmpz_t power, rem;
 
     unity_zpq_init(value, f->q, f->p, fmpz_mod_ctx_modulus(f->ctx));
@@ -27,12 +27,12 @@ unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 
     while (fmpz_is_zero(power) == 0)
     {
-        unity_zpq temp_pow;
+        unity_zpq_t temp_pow;
 
         fmpz_fdiv_r_2exp(rem, power, 1);
         if (fmpz_is_zero(rem) == 0)
         {
-            unity_zpq temp;
+            unity_zpq_t temp;
             unity_zpq_init(temp, f->q, f->p, fmpz_mod_ctx_modulus(f->ctx));
 
             unity_zpq_mul(temp, f, value);
@@ -56,7 +56,7 @@ unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 }
 
 void
-unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)
+unity_zpq_pow_ui(unity_zpq_ptr f, unity_zpq_srcptr g, ulong pow)
 {
     fmpz_t p;
 

@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n)
+unity_zp_init(unity_zp_ptr f, ulong p, ulong exp, const fmpz_t n)
 {
     f->p = p;
     f->exp = exp;
@@ -21,7 +21,7 @@ unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n)
 }
 
 void
-unity_zp_clear(unity_zp f)
+unity_zp_clear(unity_zp_ptr f)
 {
     fmpz_mod_poly_clear(f->poly, f->ctx);
     fmpz_mod_ctx_clear(f->ctx);

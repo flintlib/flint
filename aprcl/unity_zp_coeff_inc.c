@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_coeff_inc(unity_zp f, ulong ind)
+unity_zp_coeff_inc(unity_zp_ptr f, ulong ind)
 {
     if (ind >= f->poly->length)
     {
@@ -26,7 +26,7 @@ unity_zp_coeff_inc(unity_zp f, ulong ind)
 }
 
 void
-unity_zp_coeff_dec(unity_zp f, ulong ind)
+unity_zp_coeff_dec(unity_zp_ptr f, ulong ind)
 {
     if (ind >= f->poly->length)
     {

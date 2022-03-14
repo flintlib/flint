@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_sqr(unity_zp f, const unity_zp g)
+unity_zp_sqr(unity_zp_ptr f, unity_zp_srcptr g)
 {
     if (g->poly->length == 0)
     {
@@ -29,7 +29,7 @@ unity_zp_sqr(unity_zp f, const unity_zp g)
 }
 
 void
-unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr_inplace(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     /* squaring for p^k = 4 */
     if (f->p == 2 && f->exp == 2)

@@ -18,7 +18,7 @@
     Resulting f reduced by F_3 cyclotomic polynomial.
 */
 void
-unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr3(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     /*
         g = (x0, x1);
@@ -47,7 +47,7 @@ unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t)
     Resulting f reduced by F_3 cyclotomic polynomial.
 */
 void
-unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr9(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     /*
         g = (x0, x1, x2, x3, x4, x5);

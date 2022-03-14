@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-_unity_zp_reduce_cyclotomic_divmod(unity_zp f)
+_unity_zp_reduce_cyclotomic_divmod(unity_zp_ptr f)
 {
     ulong i, j, ppow1, ppow2, cycl_pow;
 
@@ -50,7 +50,7 @@ _unity_zp_reduce_cyclotomic_divmod(unity_zp f)
 }
 
 void
-_unity_zp_reduce_cyclotomic(unity_zp f)
+_unity_zp_reduce_cyclotomic(unity_zp_ptr f)
 {
     ulong i, j, ppow, cycl_pow;
 
@@ -83,7 +83,7 @@ _unity_zp_reduce_cyclotomic(unity_zp f)
 }
 
 void
-unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g)
+unity_zp_reduce_cyclotomic(unity_zp_ptr f, unity_zp_srcptr g)
 {
     unity_zp_copy(f, g);
     _unity_zp_reduce_cyclotomic(f);

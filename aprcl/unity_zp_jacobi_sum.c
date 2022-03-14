@@ -16,7 +16,7 @@
     Computes sum \zeta_{p^k}^{a * x + b * f(x)} for x = 1, 2, ..., q - 2.
 */
 void 
-_unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
+_unity_zp_jacobi_sum_pq_general(unity_zp_ptr f, const mp_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
 {
     int i, j;
@@ -53,7 +53,7 @@ _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
     Computes sum \zeta_{p^k}^{x + f(x)} for x = 1, 2, ..., q - 2.
 */
 void
-unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
+unity_zp_jacobi_sum_pq(unity_zp_ptr f, ulong q, ulong p)
 {
     ulong k;
     mp_ptr table;
@@ -70,7 +70,7 @@ unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
     Computes sum \zeta_{p^k}^{2 * x + b * f(x)} for x = 1, 2, ..., q - 2.
 */
 void
-unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
+unity_zp_jacobi_sum_2q_one(unity_zp_ptr f, ulong q)
 {
     ulong k;
     mp_ptr table;
@@ -88,7 +88,7 @@ unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
     for x = 1, 2, ..., q - 2.
 */
 void
-unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
+unity_zp_jacobi_sum_2q_two(unity_zp_ptr f, ulong q)
 {
     ulong a, b, k;
     mp_ptr table;

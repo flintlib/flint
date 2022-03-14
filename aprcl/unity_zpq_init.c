@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
+unity_zpq_init(unity_zpq_ptr f, ulong q, ulong p, const fmpz_t n)
 {
     slong i;
 

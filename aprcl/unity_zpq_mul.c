@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h)
+unity_zpq_mul(unity_zpq_ptr f, unity_zpq_srcptr g, unity_zpq_srcptr h)
 {
     slong i, j, k;
     ulong p, q;

@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
+unity_zp_mul(unity_zp_ptr f, unity_zp_srcptr g, unity_zp_srcptr h)
 {
     slong glen, hlen;
 
@@ -43,7 +43,7 @@ unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 }
 
 void
-unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
+unity_zp_mul_inplace(unity_zp_ptr f, unity_zp_srcptr g, unity_zp_srcptr h, fmpz_t * t)
 {
     /* multiplication for p^k = 4 */
     if (f->p == 2 && f->exp == 2)

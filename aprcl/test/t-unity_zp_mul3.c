@@ -33,7 +33,7 @@ int main(void)
     {
         ulong p;
         fmpz_t n;
-        unity_zp f1, f2, g, h;
+        unity_zp_t f1, f2, g, h;
 
         p = 3;
 
@@ -92,7 +92,7 @@ int main(void)
     {
         ulong p, k;
         fmpz_t n;
-        unity_zp f1, f2, g, h;
+        unity_zp_t f1, f2, g, h;
 
         p = 3;
         k = 2;

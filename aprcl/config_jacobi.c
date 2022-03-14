@@ -67,7 +67,7 @@ aprcl_R_value(const fmpz_t n)
 }
 
 static void
-_aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
+_aprcl_config_jacobi_reduce_s2(aprcl_config_ptr conf, const fmpz_t n)
 {
     ulong i, j, q;
     double * w;
@@ -142,7 +142,7 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 }
 
 static void
-_aprcl_config_jacobi_update(aprcl_config conf)
+_aprcl_config_jacobi_update(aprcl_config_ptr conf)
 {
     ulong prime = 2;
 
@@ -176,7 +176,7 @@ _aprcl_config_jacobi_update(aprcl_config conf)
 
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 void
-aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
+aprcl_config_jacobi_init(aprcl_config_ptr conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
@@ -191,7 +191,7 @@ aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
 }
 
 void
-aprcl_config_jacobi_clear(aprcl_config conf)
+aprcl_config_jacobi_clear(aprcl_config_ptr conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

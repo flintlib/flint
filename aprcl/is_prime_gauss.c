@@ -114,7 +114,7 @@ _aprcl_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 {
     slong result;
     ulong i;
-    unity_zpq temp, gauss, gausspow, gausssigma;
+    unity_zpq_t temp, gauss, gausspow, gausssigma;
 
     unity_zpq_init(gauss, q, r, n);
     unity_zpq_init(gausssigma, q, r, n);
@@ -149,7 +149,7 @@ _aprcl_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 }
 
 primality_test_status
-_aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
+_aprcl_is_prime_gauss(const fmpz_t n, aprcl_config_srcptr config)
 {
     int *lambdas;
     ulong i, j, k, nmod4;
@@ -356,7 +356,7 @@ int
 aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
 {
     primality_test_status result;
-    aprcl_config config;
+    aprcl_config_t config;
 
     aprcl_config_gauss_init_min_R(config, n, R);
     result = _aprcl_is_prime_gauss(n, config);
@@ -373,7 +373,7 @@ aprcl_is_prime_gauss(const fmpz_t n)
 {
     ulong R;
     primality_test_status result;
-    aprcl_config config;
+    aprcl_config_t config;
 
     if (fmpz_cmp_ui(n, 2) < 0)
        return 0;

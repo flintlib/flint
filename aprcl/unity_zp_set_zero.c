@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_set_zero(unity_zp f)
+unity_zp_set_zero(unity_zp_ptr f)
 {
     fmpz_mod_poly_zero(f->poly, f->ctx);
 }

@@ -28,7 +28,7 @@ int main(void)
         int result;
         ulong p, q, pnum, ppow;
         fmpz_t n;
-        unity_zpq gausssigma, gauss, gausspower;
+        unity_zpq_t gausssigma, gauss, gausspower;
         n_factor_t factors;
 
         n_factor_init(&factors);

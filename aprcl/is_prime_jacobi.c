@@ -83,11 +83,11 @@
     algorithm (9.1.28) step 4.a in [1].
 */
 slong
-_aprcl_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
+_aprcl_is_prime_jacobi_check_pk(unity_zp_srcptr j, const fmpz_t u, ulong v)
 {
     slong h;
     ulong i, r;
-    unity_zp j0, jv, temp, aut;
+    unity_zp_t j0, jv, temp, aut;
 
     /* initialization */
     r = n_pow(j->p, j->exp);            /* r = p^k */
@@ -212,10 +212,10 @@ _aprcl_is_prime_jacobi_check_21(ulong q, const fmpz_t n)
     For details see algorithm (9.1.28) step 4.c in [1].
 */
 slong
-_aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
+_aprcl_is_prime_jacobi_check_22(unity_zp_srcptr j, const fmpz_t u, ulong v, ulong q)
 {
     slong h;
-    unity_zp j0, jv, j_pow;
+    unity_zp_t j0, jv, j_pow;
 
     /* initialization */
     unity_zp_init(j_pow, 2, 2, fmpz_mod_ctx_modulus(j->ctx));
@@ -271,12 +271,12 @@ _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong
     For details see algorithm (9.1.28) step 4.b in [1].
 */
 slong
-_aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
-        const unity_zp j2_2, const fmpz_t u, ulong v)
+_aprcl_is_prime_jacobi_check_2k(unity_zp_srcptr j, unity_zp_srcptr j2_1,
+        unity_zp_srcptr j2_2, const fmpz_t u, ulong v)
 {
     slong h;
     ulong i, r;
-    unity_zp j_j0, j0, jv, temp, aut;
+    unity_zp_t j_j0, j0, jv, temp, aut;
 
     /* initialization */
     r = n_pow(j->p, j->exp);
@@ -446,7 +446,7 @@ _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
            ulong v, k;
            slong h;
            fmpz_t u;
-           unity_zp jacobi_sum;
+           unity_zp_t jacobi_sum;
 
            fmpz_init(u);
 
@@ -536,7 +536,7 @@ _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
 }
 
 primality_test_status
-_aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
+_aprcl_is_prime_jacobi(const fmpz_t n, aprcl_config_srcptr config)
 {
     int *lambdas;
     ulong i, j, nmod4;
@@ -632,7 +632,7 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             int pind;
             slong h;
             ulong v, p, r, k;
-            unity_zp jacobi_sum, jacobi_sum2_1, jacobi_sum2_2;
+            unity_zp_t jacobi_sum, jacobi_sum2_1, jacobi_sum2_2;
 
             if (result == COMPOSITE)
                 break;
@@ -651,7 +651,7 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             fmpz_tdiv_q_ui(u, n, r);
             v = fmpz_tdiv_ui(n, r);
 
-            /* init unity_zp for jacobi sums */
+            /* init unity_zp_t for jacobi sums */
             unity_zp_init(jacobi_sum, p, k, n);
             unity_zp_init(jacobi_sum2_1, p, k, n);
             unity_zp_init(jacobi_sum2_2, p, k, n);
@@ -736,7 +736,7 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                     lambdas[pind] = 1;
             }
 
-            /* clear unity_zp for jacobi sums */
+            /* clear unity_zp_t for jacobi sums */
             unity_zp_clear(jacobi_sum);
             unity_zp_clear(jacobi_sum2_1);
             unity_zp_clear(jacobi_sum2_2);
@@ -813,7 +813,7 @@ int
 aprcl_is_prime_jacobi(const fmpz_t n)
 {
     primality_test_status result;
-    aprcl_config config;
+    aprcl_config_t config;
 
     /* 
         Choose R and s values for n and store its factorisation.

@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 slong
-unity_zpq_p_unity(const unity_zpq f)
+unity_zpq_p_unity(unity_zpq_srcptr f)
 {
     slong i;
     ulong is_punity;
@@ -34,7 +34,7 @@ unity_zpq_p_unity(const unity_zpq f)
 }
 
 int
-unity_zpq_is_p_unity(const unity_zpq f)
+unity_zpq_is_p_unity(unity_zpq_srcptr f)
 {
     if (unity_zpq_p_unity(f) != f->p)
         return 1;
@@ -43,7 +43,7 @@ unity_zpq_is_p_unity(const unity_zpq f)
 }
 
 int
-unity_zpq_is_p_unity_generator(const unity_zpq f)
+unity_zpq_is_p_unity_generator(unity_zpq_srcptr f)
 {
     slong upow = unity_zpq_p_unity(f);
 

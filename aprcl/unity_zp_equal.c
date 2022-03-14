@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 int
-unity_zp_equal(unity_zp f, unity_zp g)
+unity_zp_equal(unity_zp_ptr f, unity_zp_ptr g)
 {
     /*
         f and g can be reduced only by modylo x^{p^k} - 1,

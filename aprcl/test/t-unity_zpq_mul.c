@@ -27,7 +27,7 @@ int main(void)
     {
         ulong p, q;
         fmpz_t n;
-        unity_zpq f, g, h1, h2;
+        unity_zpq_t f, g, h1, h2;
 
         fmpz_init(n);
 

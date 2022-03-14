@@ -15,7 +15,7 @@
     Computes gauss sum for character \chi^n corresponding (q, p).
 */
 void
-unity_zpq_gauss_sum_character_pow(unity_zpq f, ulong q, ulong p, ulong pow)
+unity_zpq_gauss_sum_character_pow(unity_zpq_ptr f, ulong q, ulong p, ulong pow)
 {
     slong i, qinv, pinv, qpow, ppow, g;
 
@@ -36,7 +36,7 @@ unity_zpq_gauss_sum_character_pow(unity_zpq f, ulong q, ulong p, ulong pow)
     Computes gauss sum for character \chi^n corresponding (q, p).
 */
 void
-unity_zpq_gauss_sum_sigma_pow(unity_zpq f, ulong q, ulong p)
+unity_zpq_gauss_sum_sigma_pow(unity_zpq_ptr f, ulong q, ulong p)
 {
     ulong n;
 

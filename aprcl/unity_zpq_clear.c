@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 void
-unity_zpq_clear(unity_zpq f)
+unity_zpq_clear(unity_zpq_ptr f)
 {
     slong i;
 

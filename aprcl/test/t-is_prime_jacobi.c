@@ -28,7 +28,7 @@ int main(void)
     /* Test _aprcl_is_prime_jacobi_check_pk() */
     {
         ulong p, q, v, k, p_pow;
-        unity_zp j;
+        unity_zp_t j;
         fmpz_t n, u;
 
         q = 19;
@@ -81,7 +81,7 @@ int main(void)
     /* Test _aprcl_is_prime_jacobi_check_22() */
     {
         ulong p, q, v, k, p_pow;
-        unity_zp j;
+        unity_zp_t j;
         fmpz_t n, u;
 
         q = 13;
@@ -115,7 +115,7 @@ int main(void)
     /* Test _aprcl_is_prime_jacobi_check_2k() */
     {
         ulong p, q, v, k, p_pow;
-        unity_zp j, j2_1, j2_2;
+        unity_zp_t j, j2_1, j2_2;
         fmpz_t n, u;
 
         q = 41;

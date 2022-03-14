@@ -18,7 +18,7 @@
     Resulting f reduced by F_4 cyclotomic polynomial.
 */
 void
-unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr4(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     /*
         g = (x0, x1);
@@ -49,7 +49,7 @@ unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t)
     Resulting f reduced by F_8 cyclotomic polynomial.
 */
 void
-unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr8(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     /*
         g = (x0, x1, x2, x3);
@@ -107,7 +107,7 @@ unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t)
     Resulting f reduced by F_16 cyclotomic polynomial.
 */
 void
-unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
+unity_zp_sqr16(unity_zp_ptr f, unity_zp_srcptr g, fmpz_t * t)
 {
     ulong i;
 

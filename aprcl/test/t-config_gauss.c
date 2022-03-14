@@ -26,7 +26,7 @@ int main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_t n, s2;
-        aprcl_config conf;
+        aprcl_config_t conf;
 
         fmpz_init(s2);
         fmpz_init(n);
