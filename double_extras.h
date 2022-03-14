@@ -37,11 +37,11 @@
 #define D_INF HUGE_VAL
 #define D_NAN (HUGE_VAL - HUGE_VAL)
 
-FLINT_DLL double d_randtest(flint_rand_t state);
+FLINT_DLL double d_randtest(flint_rand_ptr state);
 
-FLINT_DLL double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
+FLINT_DLL double d_randtest_signed(flint_rand_ptr state, slong minexp, slong maxexp);
 
-FLINT_DLL double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
+FLINT_DLL double d_randtest_special(flint_rand_ptr state, slong minexp, slong maxexp);
 
 DOUBLE_EXTRAS_INLINE
 double d_polyval(const double * poly, int len, double x)

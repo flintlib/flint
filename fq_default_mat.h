@@ -896,7 +896,7 @@ int fq_default_mat_print_pretty(const fq_default_mat_t mat,
 /* Random matrix generation  *************************************************/
 
 FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
-                                flint_rand_t state, const fq_default_ctx_t ctx)
+                                flint_rand_ptr state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -921,7 +921,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
 }
 
 FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
-                    flint_rand_t state, slong rank, const fq_default_ctx_t ctx)
+                    flint_rand_ptr state, slong rank, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -948,7 +948,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
 
 FQ_DEFAULT_MAT_INLINE
 void fq_default_mat_randops(fq_default_mat_t mat,
-                   slong count, flint_rand_t state, const fq_default_ctx_t ctx)
+                   slong count, flint_rand_ptr state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -974,7 +974,7 @@ void fq_default_mat_randops(fq_default_mat_t mat,
 
 FQ_DEFAULT_MAT_INLINE
 void fq_default_mat_randtril(fq_default_mat_t mat,
-                      flint_rand_t state, int unit, const fq_default_ctx_t ctx)
+                      flint_rand_ptr state, int unit, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1000,7 +1000,7 @@ void fq_default_mat_randtril(fq_default_mat_t mat,
 
 FQ_DEFAULT_MAT_INLINE
 void fq_default_mat_randtriu(fq_default_mat_t mat,
-                      flint_rand_t state, int unit, const fq_default_ctx_t ctx)
+                      flint_rand_ptr state, int unit, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {

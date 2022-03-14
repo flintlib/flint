@@ -84,7 +84,7 @@ void n_fq_poly_print_pretty(
 
 void n_fq_poly_randtest(
     n_poly_t A,
-    flint_rand_t state,
+    flint_rand_ptr state,
     slong len,
     const fq_nmod_ctx_t ctx)
 {

@@ -343,35 +343,35 @@ int nmod_poly_is_gen(const nmod_poly_t poly)
 
 /* Randomisation  ************************************************************/
 
-FLINT_DLL void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
 NMOD_POLY_INLINE
-void nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len)
+void nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     do {
         nmod_poly_randtest(poly, state, len);
     } while (nmod_poly_is_zero(poly));
 }
       
-FLINT_DLL void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
-FLINT_DLL void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
-FLINT_DLL void nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
-FLINT_DLL void nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
-FLINT_DLL void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
-FLINT_DLL int nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+FLINT_DLL int nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_ptr state,
                                          slong len, slong max_attempts);
 
-FLINT_DLL void nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
-FLINT_DLL int nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+FLINT_DLL int nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_ptr state,
                                          slong len, slong max_attempts);
 
-FLINT_DLL void nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+FLINT_DLL void nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_ptr state, slong len);
 
 /* Getting and setting coefficients  *****************************************/
 
@@ -1373,7 +1373,7 @@ FLINT_DLL void _nmod_poly_product_roots_nmod_vec(mp_ptr poly,
 
 FLINT_DLL void _nmod_poly_split_rabin(nmod_poly_t a, nmod_poly_t b,
                            const nmod_poly_t f, nmod_poly_t t, nmod_poly_t t2,
-                                                       flint_rand_t randstate);
+                                                       flint_rand_ptr randstate);
 
 FLINT_DLL int nmod_poly_find_distinct_nonzero_roots(mp_limb_t * roots,
                                                           const nmod_poly_t P);

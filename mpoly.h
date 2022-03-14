@@ -88,9 +88,9 @@ typedef mpoly_ctx_struct mpoly_ctx_t[1];
 
 FLINT_DLL void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord);
 
-FLINT_DLL void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
+FLINT_DLL void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_ptr state, slong max_nvars);
 
-FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_ptr state, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
 
@@ -243,7 +243,7 @@ MPOLY_INLINE slong mpoly_rbtree_fmpz_head(const mpoly_rbtree_fmpz_t T)
 /* Orderings *****************************************************************/
 
 MPOLY_INLINE
-ordering_t mpoly_ordering_randtest(flint_rand_t state)
+ordering_t mpoly_ordering_randtest(flint_rand_ptr state)
 {
    return (ordering_t) n_randint(state, MPOLY_NUM_ORDERINGS);
 }
@@ -1475,7 +1475,7 @@ FLINT_DLL int mpoly_test_irreducible(ulong * Aexps, flint_bitcnt_t Abits,
                                             slong Alen, const mpoly_ctx_t ctx);
 
 FLINT_DLL int _mpoly_test_irreducible(slong * Aexps, slong stride, slong Alen,
-                            slong nvars, flint_rand_t state, slong tries_left);
+                            slong nvars, flint_rand_ptr state, slong tries_left);
 
 typedef struct {
     slong mvars;

@@ -17,7 +17,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
+mp_limb_t n_randtest_bits(flint_rand_ptr state, int bits)
 {
     mp_limb_t m;
     mp_limb_t n;
@@ -61,12 +61,12 @@ mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
     return n;
 }
 
-mp_limb_t n_randtest(flint_rand_t state)
+mp_limb_t n_randtest(flint_rand_ptr state)
 {
     return n_randtest_bits(state, n_randint(state, FLINT_BITS + 1));
 }
 
-mp_limb_t n_randtest_not_zero(flint_rand_t state)
+mp_limb_t n_randtest_not_zero(flint_rand_ptr state)
 {
     mp_limb_t n;
 

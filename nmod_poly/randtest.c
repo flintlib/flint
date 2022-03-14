@@ -17,7 +17,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     nmod_poly_fit_length(poly, len);
     _nmod_vec_randtest(poly->coeffs, state, len, poly->mod);
@@ -26,7 +26,7 @@ nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
 }
 
 void
-nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     nmod_poly_fit_length(poly, len);
     _nmod_vec_randtest(poly->coeffs, state, len - 1, poly->mod);
@@ -35,7 +35,7 @@ nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
 }
 
 static void
-nmod_poly_randtest_monic_sparse(nmod_poly_t poly, flint_rand_t state,
+nmod_poly_randtest_monic_sparse(nmod_poly_t poly, flint_rand_ptr state,
                                                       slong len, slong nonzero)
 {
     slong i;
@@ -50,7 +50,7 @@ nmod_poly_randtest_monic_sparse(nmod_poly_t poly, flint_rand_t state,
 }
 
 void
-nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     do {
         nmod_poly_randtest(poly, state, len);
@@ -58,7 +58,7 @@ nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 }
 
 void
-nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     do {
         nmod_poly_randtest_monic(poly, state, len);
@@ -67,7 +67,7 @@ nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong
 
 static void
 nmod_poly_randtest_monic_irreducible_sparse(nmod_poly_t poly,
-                                              flint_rand_t state, slong len)
+                                              flint_rand_ptr state, slong len)
 {
     slong i = 0;
     slong terms = 3;
@@ -82,7 +82,7 @@ nmod_poly_randtest_monic_irreducible_sparse(nmod_poly_t poly,
 }
 
 void
-nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     ulong k;
     nmod_poly_fit_length(poly, len);
@@ -95,7 +95,7 @@ nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
 }
 
 void
-nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     nmod_poly_fit_length(poly, len);
     _nmod_vec_zero(poly->coeffs, len);
@@ -108,7 +108,7 @@ nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
 }
 
 int
-nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_ptr state,
                                          slong len, slong max_attempts)
 {
     slong i = 0;
@@ -127,7 +127,7 @@ nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,
 }
 
 int
-nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_ptr state,
                                          slong len, slong max_attempts)
 {
     slong i = 0;
@@ -146,7 +146,7 @@ nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
 }
 
 void
-nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     if (len < 3)
     {

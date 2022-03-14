@@ -14,7 +14,7 @@
 #include "fq.h"
 
 void
-fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+fq_randtest(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx)
 {
     const slong d = fq_ctx_degree(ctx);
     slong i, sparse;
@@ -42,7 +42,7 @@ fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 }
 
 void
-fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+fq_randtest_dense(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx)
 {
     const slong d = fq_ctx_degree(ctx);
     slong i;
@@ -61,7 +61,7 @@ fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 }
 
 void
-fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+fq_randtest_not_zero(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx)
 {
     slong i;
 

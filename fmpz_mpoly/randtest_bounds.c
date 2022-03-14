@@ -11,7 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state,
+void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_ptr state,
                       slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                     const fmpz_mpoly_ctx_t ctx)
 {

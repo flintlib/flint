@@ -16,7 +16,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_randtest) (TEMPLATE(T, poly_t) f, flint_rand_t state,
+TEMPLATE(T, poly_randtest) (TEMPLATE(T, poly_t) f, flint_rand_ptr state,
                             slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
@@ -31,7 +31,7 @@ TEMPLATE(T, poly_randtest) (TEMPLATE(T, poly_t) f, flint_rand_t state,
 }
 
 void
-TEMPLATE(T, poly_randtest_not_zero) (TEMPLATE(T, poly_t) f, flint_rand_t state,
+TEMPLATE(T, poly_randtest_not_zero) (TEMPLATE(T, poly_t) f, flint_rand_ptr state,
                                      slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;

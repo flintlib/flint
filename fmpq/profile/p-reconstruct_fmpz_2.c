@@ -15,7 +15,7 @@
 
 
 double profile_it(
-    flint_rand_t state,
+    flint_rand_ptr state,
     slong reps,
     flint_bitcnt_t Nbits,
     flint_bitcnt_t Dbits,

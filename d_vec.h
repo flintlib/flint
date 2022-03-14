@@ -34,7 +34,7 @@ FLINT_DLL void _d_vec_clear(double * vec);
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void _d_vec_randtest(double * f, flint_rand_t state, 
+FLINT_DLL void _d_vec_randtest(double * f, flint_rand_ptr state,
                         slong len, slong minexp, slong maxexp);
 
 /*  Assignment and basic manipulation  ***************************************/

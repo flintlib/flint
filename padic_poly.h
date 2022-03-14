@@ -155,13 +155,13 @@ PADIC_POLY_INLINE slong padic_poly_val(const padic_poly_t poly)
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
+FLINT_DLL void padic_poly_randtest(padic_poly_t f, flint_rand_ptr state, 
                          slong len, const padic_ctx_t ctx);
 
-FLINT_DLL void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
+FLINT_DLL void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_ptr state,
                                   slong len, const padic_ctx_t ctx);
 
-FLINT_DLL void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
+FLINT_DLL void padic_poly_randtest_val(padic_poly_t f, flint_rand_ptr state, 
                              slong val, slong len, const padic_ctx_t ctx);
 
 /*  Assignment and basic manipulation  ***************************************/

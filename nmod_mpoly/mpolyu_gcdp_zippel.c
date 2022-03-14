@@ -186,7 +186,7 @@ cleanup:
 */
 nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
                nmod_mpolyu_t A, nmod_mpolyu_t B,  nmod_mpolyu_t f, slong var,
-          const nmod_mpoly_ctx_t ctx, flint_rand_t randstate, slong * degbound)
+          const nmod_mpoly_ctx_t ctx, flint_rand_ptr randstate, slong * degbound)
 {
     int eval_points_tried;
     nmod_gcds_ret_t success;
@@ -866,7 +866,7 @@ int nmod_mpolyu_gcdp_zippel(
     nmod_mpolyu_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     slong lastdeg;
     slong Alastdeg;

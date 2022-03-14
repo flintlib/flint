@@ -79,7 +79,7 @@ FLINT_DLL void mpfr_mat_zero(mpfr_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state);
+FLINT_DLL void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_ptr state);
 
 /* Multiplication */
 

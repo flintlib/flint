@@ -1172,17 +1172,17 @@ FLINT_DLL int fmpz_mod_mpoly_factor_lcc_wang(fmpz_mod_mpoly_struct * lc_divs,
 
 FLINT_DLL int fmpz_mod_mpoly_factor_irred_smprime_zassenhaus(
                             fmpz_mod_mpolyv_t fac, const fmpz_mod_mpoly_t A,
-                           const fmpz_mod_mpoly_ctx_t ctx, flint_rand_t state);
+                           const fmpz_mod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int fmpz_mod_mpoly_factor_irred_smprime_wang(fmpz_mod_mpolyv_t fac,
                 const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_factor_t lcAfac,
                 const fmpz_mod_mpoly_t lcA, const fmpz_mod_mpoly_ctx_t ctx,
-                                                           flint_rand_t state);
+                                                           flint_rand_ptr state);
 
 FLINT_DLL int fmpz_mod_mpoly_factor_irred_smprime_zippel(fmpz_mod_mpolyv_t fac,
                 const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_factor_t lcAfac,
                 const fmpz_mod_mpoly_t lcA, const fmpz_mod_mpoly_ctx_t ctx,
-                                                           flint_rand_t state);
+                                                           flint_rand_ptr state);
 
 /*****************************************************************************/
 
@@ -1254,7 +1254,7 @@ FLINT_DLL int fmpz_mod_polyu3_hlift(slong r, fmpz_mod_polyun_struct * BB,
 
 FLINT_DLL int fmpz_mod_mpoly_hlift_zippel(slong m, fmpz_mod_mpoly_struct * B,
      slong r, const fmpz * alpha, const fmpz_mod_mpoly_t A, const slong * degs,
-                           const fmpz_mod_mpoly_ctx_t ctx, flint_rand_t state);
+                           const fmpz_mod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int fmpz_mod_mpoly_factor_algo(fmpz_mod_mpoly_factor_t f,
                     const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx,
@@ -1320,7 +1320,7 @@ FLINT_DLL int fmpz_mod_mpolyl_gcdp_zippel(
     fmpz_mod_mpoly_t B,
     slong var,
     const fmpz_mod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 FLINT_DLL int fmpz_mod_mpolyl_gcd_zippel2_smprime(
     fmpz_mod_mpoly_t rG, const slong * rGdegs,

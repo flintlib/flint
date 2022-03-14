@@ -12,7 +12,7 @@
 #include "fmpz_mod.h"
 
 void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,
-                                   flint_rand_t state, flint_bitcnt_t max_bits)
+                                   flint_rand_ptr state, flint_bitcnt_t max_bits)
 {
     fmpz_t m;
     fmpz_init(m);
@@ -23,7 +23,7 @@ void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,
 }
 
 void fmpz_mod_ctx_init_rand_bits_prime(fmpz_mod_ctx_t ctx,
-                                   flint_rand_t state, flint_bitcnt_t max_bits)
+                                   flint_rand_ptr state, flint_bitcnt_t max_bits)
 {
     fmpz_t m;
     fmpz_init(m);

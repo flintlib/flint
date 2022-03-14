@@ -12,7 +12,7 @@
 #include "fq_nmod.h"
 
 
-void fq_nmod_rand(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+void fq_nmod_rand(fq_nmod_t rop, flint_rand_ptr state, const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
     slong i;
@@ -27,7 +27,7 @@ void fq_nmod_rand(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
 }
 
 
-void fq_nmod_rand_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+void fq_nmod_rand_not_zero(fq_nmod_t rop, flint_rand_ptr state, const fq_nmod_ctx_t ctx)
 {
     int tries = 3;
 

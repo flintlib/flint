@@ -29,7 +29,7 @@ FLINT_DLL flint_mpfr * _mpfr_vec_init(slong length, flint_bitcnt_t prec);
 
 FLINT_DLL void _mpfr_vec_clear(flint_mpfr * vec, slong length);
 
-FLINT_DLL void _mpfr_vec_randtest(flint_mpfr * f, flint_rand_t state, slong len);
+FLINT_DLL void _mpfr_vec_randtest(flint_mpfr * f, flint_rand_ptr state, slong len);
 
 FLINT_DLL void _mpfr_vec_zero(flint_mpfr * vec, slong length);
 

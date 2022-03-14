@@ -14,7 +14,7 @@
 #include "fq.h"
 
 void
-fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
+fq_ctx_randtest(fq_ctx_t ctx, flint_rand_ptr state)
 {
     fmpz_mod_poly_t modulus;
     fmpz_t p, x;

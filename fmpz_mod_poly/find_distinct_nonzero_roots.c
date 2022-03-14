@@ -20,7 +20,7 @@ void _fmpz_mod_poly_split_rabin(
     const fmpz_t halfp, /* floor((p-1)/2) */
     fmpz_mod_poly_t t,
     fmpz_mod_poly_t t2,
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     const fmpz_mod_ctx_t ctx)
 {
     FLINT_ASSERT(fmpz_mod_poly_degree(f, ctx) > 1);

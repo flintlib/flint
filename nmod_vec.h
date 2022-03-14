@@ -50,7 +50,7 @@ void _nmod_vec_clear(mp_ptr vec)
    flint_free(vec);
 }
 
-FLINT_DLL void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
+FLINT_DLL void _nmod_vec_randtest(mp_ptr vec, flint_rand_ptr state, slong len, nmod_t mod);
 
 NMOD_VEC_INLINE
 void _nmod_vec_zero(mp_ptr vec, slong len)

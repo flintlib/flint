@@ -851,7 +851,7 @@ int fmpz_mod_mpoly_hlift_zippel(
     const fmpz_mod_mpoly_t A,
     const slong * degs,
     const fmpz_mod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     flint_bitcnt_t bits = A->bits;
     int success;

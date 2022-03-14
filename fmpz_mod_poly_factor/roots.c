@@ -26,7 +26,7 @@ static void _fmpz_mod_poly_push_roots(
     fmpz_mod_poly_t t,              /* temp */
     fmpz_mod_poly_t t2,             /* more temp */
     fmpz_mod_poly_struct * stack,   /* temp of size FLINT_BITS */
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     const fmpz_mod_ctx_t ctx)
 {
     slong i, sp;

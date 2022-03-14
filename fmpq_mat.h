@@ -106,9 +106,9 @@ FLINT_DLL void fmpq_mat_print(const fmpq_mat_t mat);
 
 /* Random matrix generation **************************************************/
 
-FLINT_DLL void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
 
 /* Special matrices **********************************************************/
 

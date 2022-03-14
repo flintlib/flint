@@ -74,10 +74,10 @@ FLINT_DLL void _fmpz_vec_clear(fmpz * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
+FLINT_DLL void _fmpz_vec_randtest(fmpz * f, flint_rand_ptr state, 
                         slong len, flint_bitcnt_t bits);
 
-FLINT_DLL void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
+FLINT_DLL void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_ptr state, 
                                  slong len, flint_bitcnt_t bits);
 
 /*  Norms  *******************************************************************/

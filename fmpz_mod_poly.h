@@ -179,38 +179,38 @@ FLINT_DLL int fmpz_mod_poly_is_canonical(const fmpz_mod_poly_t A,
 
 /*  Randomisation ************************************************************/
 
-FLINT_DLL void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state,
+FLINT_DLL void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_ptr state,
                                           slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f,
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+FLINT_DLL void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,
-                            flint_rand_t state, slong len, slong max_attempts,
+                            flint_rand_ptr state, slong len, slong max_attempts,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+FLINT_DLL void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t f,
-                            flint_rand_t state, slong len, slong max_attempts,
+                            flint_rand_ptr state, slong len, slong max_attempts,
                                                      const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx);
 
 /*  Attributes ***************************************************************/
 
@@ -1399,7 +1399,7 @@ FLINT_DLL int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots,
 
 FLINT_DLL void _fmpz_mod_poly_split_rabin(fmpz_mod_poly_t a, fmpz_mod_poly_t b,
                const fmpz_mod_poly_t f, const fmpz_t halfp, fmpz_mod_poly_t t,
-         fmpz_mod_poly_t t2, flint_rand_t randstate, const fmpz_mod_ctx_t ctx);
+         fmpz_mod_poly_t t2, flint_rand_ptr randstate, const fmpz_mod_ctx_t ctx);
 
 /* Characteristic polynomial and minimal polynomial */
 

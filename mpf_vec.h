@@ -35,7 +35,7 @@ FLINT_DLL void _mpf_vec_clear(mpf * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void _mpf_vec_randtest(mpf * f, flint_rand_t state, 
+FLINT_DLL void _mpf_vec_randtest(mpf * f, flint_rand_ptr state, 
                         slong len, flint_bitcnt_t bits);
 
 /*  Assignment and basic manipulation  ***************************************/

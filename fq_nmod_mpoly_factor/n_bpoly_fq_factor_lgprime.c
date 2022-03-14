@@ -713,7 +713,7 @@ int n_fq_bpoly_factor_lgprime(
     n_tpoly_t F,
     n_bpoly_t B,
     const fq_nmod_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     slong i, r, edeg;

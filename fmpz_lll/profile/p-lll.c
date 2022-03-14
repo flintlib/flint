@@ -35,7 +35,7 @@ sample(void *arg, ulong count)
     fmpq_t delta, eta;
     fmpz_lll_t fl;
 
-    flint_rand_t rnd;
+    flint_rand_ptr rnd;
     fmpz_mat_t A, B, C, D;
     FLINT_TEST_INIT(state);
 

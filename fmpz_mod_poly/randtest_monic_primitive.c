@@ -15,7 +15,7 @@
 
 void
 fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,
-                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                       flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     fq_ctx_t fqctx;
     fq_t X;

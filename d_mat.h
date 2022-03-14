@@ -126,7 +126,7 @@ FLINT_DLL void d_mat_print(d_mat_srcptr mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void d_mat_randtest(d_mat_ptr mat, flint_rand_t state, slong minexp,
+FLINT_DLL void d_mat_randtest(d_mat_ptr mat, flint_rand_ptr state, slong minexp,
                     slong maxexp);
 
 /* Transpose */

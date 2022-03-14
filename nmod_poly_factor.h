@@ -105,7 +105,7 @@ FLINT_DLL void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
                                 const nmod_poly_t pol, slong d);
 
 FLINT_DLL int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, slong d);
+    flint_rand_ptr state, const nmod_poly_t pol, slong d);
 
 FLINT_DLL void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs);

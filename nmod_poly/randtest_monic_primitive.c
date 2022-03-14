@@ -13,7 +13,7 @@
 #include "fq_nmod.h"
 
 void
-nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_t state, slong len)
+nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_ptr state, slong len)
 {
     fq_nmod_ctx_t ctx;
     fq_nmod_t X;

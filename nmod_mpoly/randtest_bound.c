@@ -11,7 +11,7 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_t state,
+void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_ptr state,
                      slong length, ulong exp_bound, const nmod_mpoly_ctx_t ctx)
 {
     mp_limb_t p = ctx->mod.n;

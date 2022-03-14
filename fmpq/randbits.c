@@ -12,7 +12,7 @@
 #include "fmpq.h"
 
 void
-_fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
+_fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     fmpz_randbits(num, state, bits);
 
@@ -23,7 +23,7 @@ _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
     _fmpq_canonicalise(num, den);
 }
 
-void fmpq_randbits(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
+void fmpq_randbits(fmpq_t res, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     _fmpq_randbits(fmpq_numref(res), fmpq_denref(res), state, bits);
 }

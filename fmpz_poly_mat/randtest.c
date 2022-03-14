@@ -15,7 +15,7 @@
 #include "fmpz_poly_mat.h"
 
 void
-fmpz_poly_mat_randtest(fmpz_poly_mat_t A, flint_rand_t state, slong len, flint_bitcnt_t bits)
+fmpz_poly_mat_randtest(fmpz_poly_mat_t A, flint_rand_ptr state, slong len, flint_bitcnt_t bits)
 {
     slong i, j;
 

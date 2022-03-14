@@ -13,7 +13,7 @@
 
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
+void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_ptr state, slong rank)
 {
     slong i;
     fmpz * diag;

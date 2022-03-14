@@ -119,10 +119,10 @@ FLINT_DLL void nmod_poly_mat_one(nmod_poly_mat_t mat);
 
 /* Random matrices ***********************************************************/
 
-FLINT_DLL void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state,
+FLINT_DLL void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_ptr state,
                                 slong len);
 
-FLINT_DLL void nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state,
+FLINT_DLL void nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_ptr state,
                         slong len, float density);
 
 /* Windows and concatenation */

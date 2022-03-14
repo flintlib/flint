@@ -20,7 +20,7 @@
 #include "ulong_extras.h"
 
 
-mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
+mp_limb_t n_randprime(flint_rand_ptr state, ulong bits, int proved)
 {
     mp_limb_t rand;
 
@@ -53,7 +53,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
     return rand;
 }
 
-mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
+mp_limb_t n_randtest_prime(flint_rand_ptr state, int proved)
 {
     return n_randprime(state, 2 + n_randint(state, FLINT_BITS - 1), proved);
 }

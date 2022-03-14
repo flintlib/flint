@@ -17,7 +17,7 @@
 #include "fmpq_vec.h"
 
 void
-_fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
+_fmpq_vec_randtest(fmpq * f, flint_rand_ptr state, 
                    slong len, flint_bitcnt_t bits)
 {
     slong i, sparseness;

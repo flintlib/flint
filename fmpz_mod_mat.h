@@ -134,19 +134,19 @@ fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
 FLINT_DLL void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
 
 /* Random matrix generation */
-FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
+FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_ptr state);
 
-FLINT_DLL void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state,
+FLINT_DLL void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_ptr state,
                                                                    slong rank);
 
-FLINT_DLL void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state,
+FLINT_DLL void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_ptr state,
                                                                      int unit);
 
-FLINT_DLL void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_t state,
+FLINT_DLL void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_ptr state,
                                                                      int unit);
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_t state)
+void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_ptr state)
 {
     fmpz_mat_randops(mat->mat, state, count);
     _fmpz_mod_mat_reduce(mat);

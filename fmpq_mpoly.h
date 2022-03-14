@@ -51,7 +51,7 @@ void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx,
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_ctx_init_rand(fmpq_mpoly_ctx_t ctx,
-                                           flint_rand_t state, slong max_nvars)
+                                           flint_rand_ptr state, slong max_nvars)
 {
     fmpz_mpoly_ctx_init_rand(ctx->zctx, state, max_nvars);
 }
@@ -575,7 +575,7 @@ FLINT_DLL void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
 /* Random generation *********************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
+void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_ptr state,
                    slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
@@ -586,7 +586,7 @@ void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
+void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_ptr state,
                    slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
@@ -597,7 +597,7 @@ void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
+void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_ptr state,
                    slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {

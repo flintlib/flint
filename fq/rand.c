@@ -13,7 +13,7 @@
 
 
 void
-fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+fq_rand(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx)
 {
     const slong d = fq_ctx_degree(ctx);
     slong i;
@@ -29,7 +29,7 @@ fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     _fmpz_poly_normalise(rop);
 }
 
-void fq_rand_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+void fq_rand_not_zero(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx)
 {
     int tries = 3;
 

@@ -12,21 +12,21 @@
 #include "fmpz_mod_mpoly.h"
 
 void fmpz_mod_mpoly_ctx_init_rand(fmpz_mod_mpoly_ctx_t ctx,
-                    flint_rand_t state, slong max_nvars, const fmpz_t modulus)
+                    flint_rand_ptr state, slong max_nvars, const fmpz_t modulus)
 {
     mpoly_ctx_init_rand(ctx->minfo, state, max_nvars);
     fmpz_mod_ctx_init(ctx->ffinfo, modulus);
 }
 
 void fmpz_mod_mpoly_ctx_init_rand_bits(fmpz_mod_mpoly_ctx_t ctx,
-                  flint_rand_t state, slong max_nvars, flint_bitcnt_t max_bits)
+                  flint_rand_ptr state, slong max_nvars, flint_bitcnt_t max_bits)
 {
     mpoly_ctx_init_rand(ctx->minfo, state, max_nvars);
     fmpz_mod_ctx_init_rand_bits(ctx->ffinfo, state, max_bits);
 }
 
 void fmpz_mod_mpoly_ctx_init_rand_bits_prime(fmpz_mod_mpoly_ctx_t ctx,
-                  flint_rand_t state, slong max_nvars, flint_bitcnt_t max_bits)
+                  flint_rand_ptr state, slong max_nvars, flint_bitcnt_t max_bits)
 {
     mpoly_ctx_init_rand(ctx->minfo, state, max_nvars);
     fmpz_mod_ctx_init_rand_bits_prime(ctx->ffinfo, state, max_bits);

@@ -13,7 +13,7 @@
 #include "mpf_mat.h"
 
 void
-mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
+mpf_mat_randtest(mpf_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     slong r, c, i, j;
 

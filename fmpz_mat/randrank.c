@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank,
+fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_ptr state, slong rank,
                   flint_bitcnt_t bits)
 {
     slong i;

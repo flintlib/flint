@@ -17,7 +17,7 @@
 #include "ulong_extras.h"
 
 int
-fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state,
+fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_ptr state,
                   const fmpz_mod_poly_t pol, slong d, const fmpz_mod_ctx_t ctx)
 {
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);

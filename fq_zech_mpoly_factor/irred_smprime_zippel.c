@@ -873,7 +873,7 @@ int fq_zech_mpoly_hlift_zippel(
     const fq_zech_mpoly_t A,
     const slong * degs,
     const fq_zech_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     slong i;
@@ -1072,7 +1072,7 @@ int fq_zech_mpoly_factor_irred_smprime_zippel(
     const fq_zech_mpoly_factor_t lcAfac,
     const fq_zech_mpoly_t lcA,
     const fq_zech_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     int alphas_tries_remaining, alphabetas_tries_remaining, alphabetas_length;

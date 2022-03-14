@@ -16,7 +16,7 @@
 #define EXP_MINUS_64 5.42101086242752217e-20
 
 double
-d_randtest(flint_rand_t state)
+d_randtest(flint_rand_ptr state)
 {
     mp_limb_t m1, m2;
     double t;

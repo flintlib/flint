@@ -28,21 +28,25 @@ Allocation Functions
 Random Numbers
 ------------------
 
-.. type:: flint_rand_s
+.. type:: flint_rand_struct
 
     A structure holding the state of a flint pseudo random number generator.
 
 .. type:: flint_rand_t
 
-    An array of length 1 of :type:`flint_rand_s`.
+    An array of length 1 of :type:`flint_rand_struct`.
 
-.. function:: flint_rand_s * flint_rand_alloc()
+.. type:: flint_rand_ptr
+
+    Pointer to a :type:`flint_rand_struct`.
+
+.. function:: flint_rand_ptr flint_rand_alloc()
 
     Allocates a ``flint_rand_t`` object to be used like a heap-allocated
     ``flint_rand_t`` in external libraries.
     The random state is not initialised.
 
-.. function:: void flint_rand_free(flint_rand_s * state)
+.. function:: void flint_rand_free(flint_rand_ptr state)
    
     Frees a random state object as allocated using :func:`flint_rand_alloc`.
 

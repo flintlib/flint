@@ -17,7 +17,7 @@
 
 
 void
-nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
+nmod_mat_randrank(nmod_mat_t mat, flint_rand_ptr state, slong rank)
 {
     slong i;
     mp_limb_t * diag;

@@ -15,7 +15,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_randtril) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
+TEMPLATE(T, mat_randtril) (TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                            int unit, const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, struct) * e;

@@ -17,7 +17,7 @@
 
 
 void
-nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state)
+nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_ptr state)
 {
     slong c, i, j, k;
     slong m = mat->r;

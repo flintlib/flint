@@ -11,12 +11,12 @@
 
 #include "fmpz_mod.h"
 
-void fmpz_mod_rand(fmpz_t a, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_rand(fmpz_t a, flint_rand_ptr state, const fmpz_mod_ctx_t ctx)
 {
     fmpz_randm(a, state, fmpz_mod_ctx_modulus(ctx));
 }
 
-void fmpz_mod_rand_not_zero(fmpz_t a, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_rand_not_zero(fmpz_t a, flint_rand_ptr state, const fmpz_mod_ctx_t ctx)
 {
     slong i = 3;
     for (i = 0; i < 3; i++)

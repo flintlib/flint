@@ -14,7 +14,7 @@
 /* try to prove that A is not a square */
 static int _is_proved_not_square(
     int count,
-    flint_rand_t state,
+    flint_rand_ptr state,
     const mp_limb_t * Acoeffs,
     const ulong * Aexps,
     slong Alen,

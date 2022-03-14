@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "fmpq_vec.h"
 
-void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits)
+void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_ptr state, slong len, flint_bitcnt_t bits)
 {
     slong i;
     int do_again;

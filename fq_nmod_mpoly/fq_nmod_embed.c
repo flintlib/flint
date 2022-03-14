@@ -574,7 +574,7 @@ void bad_fq_nmod_embed_sm_elem_to_lg(
 bad_fq_nmod_embed_struct *
 bad_fq_nmod_mpoly_embed_chooser_init(bad_fq_nmod_mpoly_embed_chooser_t embc,
                   fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                        flint_rand_t randstate)
+                                                        flint_rand_ptr randstate)
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;
@@ -609,7 +609,7 @@ bad_fq_nmod_mpoly_embed_chooser_init(bad_fq_nmod_mpoly_embed_chooser_t embc,
 void
 bad_fq_nmod_mpoly_embed_chooser_clear(bad_fq_nmod_mpoly_embed_chooser_t embc,
                   fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                        flint_rand_t randstate)
+                                                        flint_rand_ptr randstate)
 {
     bad_fq_nmod_embed_array_clear(embc->embed, embc->m);
     fq_nmod_mpoly_ctx_clear(ectx);
@@ -620,7 +620,7 @@ bad_fq_nmod_mpoly_embed_chooser_clear(bad_fq_nmod_mpoly_embed_chooser_t embc,
 bad_fq_nmod_embed_struct *
 bad_fq_nmod_mpoly_embed_chooser_next(bad_fq_nmod_mpoly_embed_chooser_t embc,
                   fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                        flint_rand_t randstate)
+                                                        flint_rand_ptr randstate)
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;

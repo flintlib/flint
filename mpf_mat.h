@@ -104,7 +104,7 @@ FLINT_DLL void mpf_mat_print(const mpf_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void mpf_mat_randtest(mpf_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
 
 /* Multiplication */
 

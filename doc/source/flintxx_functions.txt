@@ -25,8 +25,8 @@ Rand.. cpp:functions
 
     Initialize random state.
 
-.. cpp:function:: flint_rand_t& frandxx::_data()
-.. cpp:function:: const flint_rand_t& frandxx::_data() const
+.. cpp:function:: flint_rand_ptr& frandxx::_data()
+.. cpp:function:: flint_rand_srcptr& frandxx::_data() const
 
     Obtain a reference to the underlying C random state.
 

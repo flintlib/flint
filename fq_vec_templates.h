@@ -28,7 +28,7 @@ FLINT_DLL void _TEMPLATE(T, vec_clear)(TEMPLATE(T, struct) * vec, slong len,
 
 /*  Randomisation  ***********************************************************/
 FLINT_DLL void _TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f, 
-                           flint_rand_t state, 
+                           flint_rand_ptr state, 
                            slong len, 
                            const TEMPLATE(T, ctx_t) ctx);
 

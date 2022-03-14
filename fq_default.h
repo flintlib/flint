@@ -835,7 +835,7 @@ FQ_DEFAULT_INLINE int fq_default_is_square(const fq_default_t op,
 /* Randomisation *************************************************************/
 
 FQ_DEFAULT_INLINE void fq_default_randtest(fq_default_t rop,
-		                flint_rand_t state, const fq_default_ctx_t ctx)
+		                flint_rand_ptr state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -860,7 +860,7 @@ FQ_DEFAULT_INLINE void fq_default_randtest(fq_default_t rop,
 }
 
 FQ_DEFAULT_INLINE void fq_default_randtest_not_zero(fq_default_t rop,
-		                flint_rand_t state, const fq_default_ctx_t ctx)
+		                flint_rand_ptr state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -885,7 +885,7 @@ FQ_DEFAULT_INLINE void fq_default_randtest_not_zero(fq_default_t rop,
 }
 
 FQ_DEFAULT_INLINE void fq_default_rand(fq_default_t rop,
-		                flint_rand_t state, const fq_default_ctx_t ctx)
+		                flint_rand_ptr state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -910,7 +910,7 @@ FQ_DEFAULT_INLINE void fq_default_rand(fq_default_t rop,
 }
 
 FQ_DEFAULT_INLINE void fq_default_rand_not_zero(fq_default_t rop,
-		                flint_rand_t state, const fq_default_ctx_t ctx)
+		                flint_rand_ptr state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {

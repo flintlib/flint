@@ -301,37 +301,37 @@ FLINT_DLL int nmod_mpoly_factor_lcc_wang(nmod_mpoly_struct * lc_divs,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_factor_irred_smprime_zassenhaus(nmod_mpolyv_t fac,
-         const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+         const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_medprime_zassenhaus(nmod_mpolyv_t fac,
-         const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+         const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_lgprime_zassenhaus(nmod_mpolyv_t fac,
-         const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+         const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_smprime_wang(nmod_mpolyv_t fac,
        const nmod_mpoly_t A, const nmod_mpoly_factor_t lcAfac,
-       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_medprime_wang(nmod_mpolyv_t Af,
        const nmod_mpoly_t A, const nmod_mpoly_factor_t lcAfac,
-       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_lgprime_wang(nmod_mpolyv_t Af,
        const nmod_mpoly_t A, const nmod_mpoly_factor_t lcAfac,
-       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_smprime_zippel(nmod_mpolyv_t fac,
        const nmod_mpoly_t A, const nmod_mpoly_factor_t lcAfac,
-       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_medprime_zippel(nmod_mpolyv_t Af,
        const nmod_mpoly_t A, const nmod_mpoly_factor_t lcAfac,
-       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_irred_lgprime_zippel(nmod_mpolyv_t Af,
        const nmod_mpoly_t A, const nmod_mpoly_factor_t lcAfac,
-       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+       const nmod_mpoly_t lcA, const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 /*****************************************************************************/
 
@@ -418,7 +418,7 @@ FLINT_DLL int n_polyu3_mod_hlift(slong r, n_polyun_struct * BB,  n_polyu_t A,
 
 FLINT_DLL int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
             const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
-                               const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+                               const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpoly_factor_algo(nmod_mpoly_factor_t f,
           const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx, unsigned int algo);
@@ -450,11 +450,11 @@ FLINT_DLL void _nmod_mpoly_set_n_bpoly_var1_zero(nmod_mpoly_t A,
 
 FLINT_DLL int nmod_mpolyl_gcdp_zippel_smprime(nmod_mpoly_t G, nmod_mpoly_t Abar,
                 nmod_mpoly_t Bbar, nmod_mpoly_t A, nmod_mpoly_t B, slong var,
-                               const nmod_mpoly_ctx_t ctx, flint_rand_t state);
+                               const nmod_mpoly_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL int nmod_mpolyl_gcds_zippel(nmod_mpoly_t G, const ulong * Gmarks,
         slong Gmarkslen, nmod_mpoly_t A, nmod_mpoly_t B, slong *perm,
-        slong l, slong var, const nmod_mpoly_ctx_t ctx,  flint_rand_t state,
+        slong l, slong var, const nmod_mpoly_ctx_t ctx,  flint_rand_ptr state,
                           slong * Gdegbound, n_poly_t Amarks, n_poly_t Bmarks);
 
 /* zip helpers ***************************************************************/

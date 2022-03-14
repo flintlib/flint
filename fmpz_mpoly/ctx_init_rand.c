@@ -11,7 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t ctx, flint_rand_t state, slong max_nvars)
+void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t ctx, flint_rand_ptr state, slong max_nvars)
 {
     mpoly_ctx_init_rand(ctx->minfo, state, max_nvars);
 }

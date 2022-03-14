@@ -22,7 +22,7 @@
 static int _is_proved_not_square(
     int count,
     mp_limb_t * p,
-    flint_rand_t state,
+    flint_rand_ptr state,
     const fmpz * Acoeffs,
     const ulong * Aexps,
     slong Alen,

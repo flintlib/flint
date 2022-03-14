@@ -12,7 +12,7 @@
 #include "fq_zech.h"
 
 void
-fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state)
+fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_ptr state)
 {
     fq_zech_ctx_randtest(ctx, state);
 }

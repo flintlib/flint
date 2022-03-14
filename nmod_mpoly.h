@@ -315,7 +315,7 @@ slong nmod_poly_stack_size_mpolyn(const nmod_poly_stack_t S)
 FLINT_DLL void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, 
                          slong nvars, const ordering_t ord, mp_limb_t modulus);
 
-FLINT_DLL void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_ptr state,
                                            slong max_nvars, mp_limb_t modulus);
 
 FLINT_DLL void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
@@ -748,13 +748,13 @@ FLINT_DLL void _nmod_mpoly_push_exp_ui(nmod_mpoly_t A,
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_ptr state,
                  slong length, ulong * exp_bounds, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_ptr state,
                     slong length, ulong exp_bound, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t A, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t A, flint_rand_ptr state,
                slong length, flint_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
@@ -1443,7 +1443,7 @@ FLINT_DLL void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
 
 FLINT_DLL int nmod_mpolyu_gcdm_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
                        nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B,
-                                 nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
+                                 nmod_mpoly_ctx_t ctx, flint_rand_ptr randstate);
 
 NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyu_leadcoeff(
                                    nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctx)
@@ -1696,11 +1696,11 @@ typedef enum {
 FLINT_DLL nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
                            nmod_mpolyu_t A, nmod_mpolyu_t B, nmod_mpolyu_t f,
                                         slong var, const nmod_mpoly_ctx_t ctx,
-                                     flint_rand_t randstate, slong * degbound);
+                                     flint_rand_ptr randstate, slong * degbound);
 
 FLINT_DLL int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
              nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B, slong var,
-                           const nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
+                           const nmod_mpoly_ctx_t ctx, flint_rand_ptr randstate);
 
 FLINT_DLL void nmod_mpoly_to_mpolyl_perm_deflate(
     nmod_mpoly_t A,

@@ -56,7 +56,7 @@ nmod_mat_col_to_nmod_poly_shifted(nmod_poly_t poly, nmod_mat_t mat,
 
 static void
 __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
-    flint_rand_t state, const nmod_poly_t f)
+    flint_rand_ptr state, const nmod_poly_t f)
 {
     const mp_limb_t p = nmod_poly_modulus(f);
     const slong n      = nmod_poly_degree(f);

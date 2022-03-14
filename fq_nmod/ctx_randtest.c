@@ -14,7 +14,7 @@
 #include "fq_nmod.h"
 
 void
-fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
+fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_ptr state)
 {
     nmod_poly_t modulus;
     mp_limb_t x;

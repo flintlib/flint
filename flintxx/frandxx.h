@@ -30,8 +30,8 @@ public:
     frandxx() {flint_randinit(inner);}
     ~frandxx() {flint_randclear(inner);}
 
-    flint_rand_t& _data() {return inner;}
-    const flint_rand_t& _data() const {return inner;}
+    flint_rand_ptr& _data() {return inner;}
+    flint_rand_srcptr& _data() const {return inner;}
 };
 } // flint
 

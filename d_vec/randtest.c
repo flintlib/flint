@@ -12,7 +12,7 @@
 #include "d_vec.h"
 
 void
-_d_vec_randtest(double *f, flint_rand_t state, slong len, slong minexp,
+_d_vec_randtest(double *f, flint_rand_ptr state, slong len, slong minexp,
                 slong maxexp)
 {
     slong i;

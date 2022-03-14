@@ -121,7 +121,7 @@ typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
 FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
                                             slong nvars, const ordering_t ord);
 
-FLINT_DLL void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
+FLINT_DLL void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t mctx, flint_rand_ptr state, slong max_nvars);
 
 
 FLINT_DLL void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx);
@@ -614,15 +614,15 @@ FLINT_DLL void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A,
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_ptr state,
                         slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_ptr state,
                      slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_ptr state,
                    slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
                                                    const fmpz_mpoly_ctx_t ctx);
 

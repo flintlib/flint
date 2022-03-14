@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t ctx)
+void padic_mat_randtest(padic_mat_t mat, flint_rand_ptr state, const padic_ctx_t ctx)
 {
     if (!padic_mat_is_empty(mat))
     {

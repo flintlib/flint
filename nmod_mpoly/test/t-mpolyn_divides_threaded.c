@@ -18,7 +18,7 @@ void _divides_check(
     slong ii,
     slong jj,
     const char * name,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     int divides, ndivides;
     nmod_mpoly_ctx_t nctx;

@@ -434,7 +434,7 @@ static void n_bpoly_mod_eval_step(
 static int fmpz_mfactor_lift_prime_power_zippel(
     slong r,
     fmpz_mpoly_struct * B,
-    flint_rand_t state,
+    flint_rand_ptr state,
     const nmod_mpoly_struct * Bp,
     const fmpz_mpoly_t A,
     const mp_limb_t * alphap,
@@ -668,7 +668,7 @@ int fmpz_mpoly_factor_irred_zippel(
     int lcAfac_irred,
     const fmpz_mpoly_t lcA,
     const fmpz_mpoly_ctx_t ctx,
-    flint_rand_t state,
+    flint_rand_ptr state,
     zassenhaus_prune_t zas)
 {
     int success, kfails_left = 4;

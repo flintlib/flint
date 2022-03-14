@@ -217,16 +217,16 @@ FLINT_DLL void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slon
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
+FLINT_DLL void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_ptr state, 
                                                 slong len, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
+FLINT_DLL void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_ptr state, 
                                                 slong len, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
+FLINT_DLL void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_ptr state,
                                                 slong len, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
+FLINT_DLL void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_ptr state,
                                                 slong len, flint_bitcnt_t bits);
 
 /*  Getting and setting coefficients  ****************************************/

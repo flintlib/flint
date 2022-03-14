@@ -15,7 +15,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
+fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_ptr state, double alpha)
 {
     const slong c = mat->c, r = mat->r, d = r;
 

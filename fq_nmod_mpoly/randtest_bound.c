@@ -13,7 +13,7 @@
 
 void fq_nmod_mpoly_randtest_bound(
     fq_nmod_mpoly_t A,
-    flint_rand_t state,
+    flint_rand_ptr state,
     slong length,
     ulong exp_bound,
     const fq_nmod_mpoly_ctx_t ctx)

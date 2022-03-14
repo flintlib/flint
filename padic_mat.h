@@ -240,7 +240,7 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, 
+FLINT_DLL void padic_mat_randtest(padic_mat_t mat, flint_rand_ptr state, 
                         const padic_ctx_t ctx);
 
 /* Transpose *****************************************************************/

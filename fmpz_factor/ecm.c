@@ -45,7 +45,7 @@ ulong n_ecm_primorial[] =
 
 int
 fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
-                flint_rand_t state, const fmpz_t n_in)
+                flint_rand_ptr state, const fmpz_t n_in)
 {
     fmpz_t sig, nm8;
     mp_limb_t P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;

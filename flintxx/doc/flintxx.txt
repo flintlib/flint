@@ -33,8 +33,8 @@ frandxx::frandxx()
 
     Initialize random state.
 
-flint_rand_t& frandxx::_data()
-const flint_rand_t& frandxx::_data() const
+flint_rand_ptr& frandxx::_data()
+flint_rand_srcptr& frandxx::_data() const
 
     Obtain a reference to the underlying C random state.
 

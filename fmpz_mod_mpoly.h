@@ -83,13 +83,13 @@ FLINT_DLL void fmpz_mod_mpoly_ctx_init(fmpz_mod_mpoly_ctx_t ctx,
                       slong nvars, const ordering_t ord, const fmpz_t modulus);
 
 FLINT_DLL void fmpz_mod_mpoly_ctx_init_rand(fmpz_mod_mpoly_ctx_t ctx,
-                    flint_rand_t state, slong max_nvars, const fmpz_t modulus);
+                    flint_rand_ptr state, slong max_nvars, const fmpz_t modulus);
 
 FLINT_DLL void fmpz_mod_mpoly_ctx_init_rand_bits_prime(fmpz_mod_mpoly_ctx_t ctx,
-                 flint_rand_t state, slong max_nvars, flint_bitcnt_t max_bits);
+                 flint_rand_ptr state, slong max_nvars, flint_bitcnt_t max_bits);
 
 FLINT_DLL void fmpz_mod_mpoly_ctx_init_rand_bits(fmpz_mod_mpoly_ctx_t ctx,
-                 flint_rand_t state, slong max_nvars, flint_bitcnt_t max_bits);
+                 flint_rand_ptr state, slong max_nvars, flint_bitcnt_t max_bits);
 
 FLINT_DLL void fmpz_mod_mpoly_ctx_clear(fmpz_mod_mpoly_ctx_t ctx);
 
@@ -563,15 +563,15 @@ FLINT_DLL void _fmpz_mod_mpoly_push_exp_ui(fmpz_mod_mpoly_t A,
 /* Random generation *********************************************************/
 
 FLINT_DLL void fmpz_mod_mpoly_randtest_bounds(fmpz_mod_mpoly_t A,
-                        flint_rand_t state, slong length, ulong * exp_bounds,
+                        flint_rand_ptr state, slong length, ulong * exp_bounds,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_randtest_bound(fmpz_mod_mpoly_t A,
-                            flint_rand_t state, slong length, ulong exp_bound,
+                            flint_rand_ptr state, slong length, ulong exp_bound,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_mpoly_randtest_bits(fmpz_mod_mpoly_t A,
-                    flint_rand_t state, slong length, flint_bitcnt_t exp_bits,
+                    flint_rand_ptr state, slong length, flint_bitcnt_t exp_bits,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 

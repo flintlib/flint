@@ -55,7 +55,7 @@ int fmpz_mpolyl_gcd_zippel(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
     const fmpz_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     flint_bitcnt_t coeffbitbound;
     flint_bitcnt_t coeffbits;

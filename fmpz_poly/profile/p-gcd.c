@@ -25,7 +25,7 @@ typedef struct
    slong bits;
 } info_t;
 
-void random_fmpz_poly(fmpz_poly_t pol, flint_rand_t state, slong bits)
+void random_fmpz_poly(fmpz_poly_t pol, flint_rand_ptr state, slong bits)
 {
    fmpz * arr;
    slong i;

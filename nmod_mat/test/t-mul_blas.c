@@ -18,7 +18,7 @@
 #include "ulong_extras.h"
 
 /* generate a worst case matrix for blas */
-void nmod_mat_randfull_half(nmod_mat_t mat, flint_rand_t state)
+void nmod_mat_randfull_half(nmod_mat_t mat, flint_rand_ptr state)
 {
     slong i, j;
     slong r = mat->r;

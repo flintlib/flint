@@ -115,13 +115,13 @@ slong fmpq_poly_length(const fmpq_poly_t poly)
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_t state, 
+FLINT_DLL void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_ptr state, 
                                                 slong len, flint_bitcnt_t bits_in);
 
-FLINT_DLL void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, 
+FLINT_DLL void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_ptr state, 
                                                 slong len, flint_bitcnt_t bits_in);
 
-FLINT_DLL void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
+FLINT_DLL void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_ptr state,
                                                 slong len, flint_bitcnt_t bits_in);
 
 /*  Assignment and basic manipulation  ***************************************/

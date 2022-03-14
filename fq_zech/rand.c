@@ -12,13 +12,13 @@
 #include "fq_zech.h"
 
 void
-fq_zech_rand(fq_zech_t rop, flint_rand_t state, const fq_zech_ctx_t ctx)
+fq_zech_rand(fq_zech_t rop, flint_rand_ptr state, const fq_zech_ctx_t ctx)
 {
     rop->value = n_urandint(state, ctx->qm1 + 1);
 }
 
 void
-fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_t state, const fq_zech_ctx_t ctx)
+fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_ptr state, const fq_zech_ctx_t ctx)
 {
     rop->value = n_urandint(state, ctx->qm1);
 }

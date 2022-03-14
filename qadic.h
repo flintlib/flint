@@ -204,27 +204,27 @@ QADIC_INLINE void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
 /* Randomisation *************************************************************/
 
 QADIC_INLINE void 
-qadic_randtest(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
+qadic_randtest(qadic_t x, flint_rand_ptr state, const qadic_ctx_t ctx)
 {
     padic_poly_randtest(x, state, qadic_ctx_degree(ctx), &ctx->pctx);
 }
 
 QADIC_INLINE void 
-qadic_randtest_not_zero(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
+qadic_randtest_not_zero(qadic_t x, flint_rand_ptr state, const qadic_ctx_t ctx)
 {
     padic_poly_randtest_not_zero(x, state, qadic_ctx_degree(ctx), 
                                  &ctx->pctx);
 }
 
 QADIC_INLINE void 
-qadic_randtest_val(qadic_t x, flint_rand_t state, slong val, 
+qadic_randtest_val(qadic_t x, flint_rand_ptr state, slong val, 
                    const qadic_ctx_t ctx)
 {
     padic_poly_randtest_val(x, state, val, qadic_ctx_degree(ctx), &ctx->pctx);
 }
 
 QADIC_INLINE void 
-qadic_randtest_int(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
+qadic_randtest_int(qadic_t x, flint_rand_ptr state, const qadic_ctx_t ctx)
 {
     const slong N = qadic_prec(x);
 

@@ -13,7 +13,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_randtest(flint_mpfr * f, flint_rand_t state, slong len)
+_mpfr_vec_randtest(flint_mpfr * f, flint_rand_ptr state, slong len)
 {
     slong i;
 

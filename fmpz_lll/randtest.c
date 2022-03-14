@@ -14,7 +14,7 @@
 #include "fmpz_lll.h"
 
 void
-fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
+fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_ptr state)
 {
     double randd, delta, eta;
     rep_type rt;

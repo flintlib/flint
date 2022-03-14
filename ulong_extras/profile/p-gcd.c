@@ -41,7 +41,7 @@ void sample(void * arg, ulong count)
    }
 }
 
-void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_t state)
+void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_ptr state)
 {
    ulong n;
    ulong i;

@@ -21,7 +21,7 @@
 #include "ulong_extras.h"
 
 void
-fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
+fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_ptr state, slong rank)
 {
     slong i;
     fmpz * diag;

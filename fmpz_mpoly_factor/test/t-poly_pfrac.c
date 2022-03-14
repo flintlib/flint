@@ -19,7 +19,7 @@ void _test_pfrac(
     fmpz_poly_pfrac_t I,
     const fmpz_poly_struct * b,
     slong r,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     slong i, j;
     int success, found_bad;

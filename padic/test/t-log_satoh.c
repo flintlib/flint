@@ -17,7 +17,7 @@
     This is important as for negative N, exp(0) is 1, which is 0 mod p^N, 
     and then log(0) does not converge.
  */
-static slong __rand_prec(flint_rand_t state, slong i)
+static slong __rand_prec(flint_rand_ptr state, slong i)
 {
     slong N;
 

@@ -131,7 +131,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_zassenhaus(
     fq_nmod_mpolyv_t Af,
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     fq_nmod_mpolyv_t eAf;
@@ -232,7 +232,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_wang(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     fq_nmod_mpoly_factor_t elcAfac;
@@ -297,7 +297,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_zippel(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     fq_nmod_mpoly_factor_t elcAfac;

@@ -17,7 +17,7 @@
 #include "ulong_extras.h"
 
 void
-fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
+fmpz_randtest_mod(fmpz_t f, flint_rand_ptr state, const fmpz_t m)
 {
     fmpz_t t;
 
@@ -36,7 +36,7 @@ fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
 }
 
 void
-fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
+fmpz_randtest_mod_signed(fmpz_t f, flint_rand_ptr state, const fmpz_t m)
 {
     /* Randomly generate m/2 when included in the range */
     if ((n_randlimb(state) % 32 == 1) && (fmpz_fdiv_ui(m, 2) == 0))

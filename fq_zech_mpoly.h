@@ -534,13 +534,13 @@ FLINT_DLL void _fq_zech_mpoly_push_exp_ui(fq_zech_mpoly_t A,
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void fq_zech_mpoly_randtest_bound(fq_zech_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fq_zech_mpoly_randtest_bound(fq_zech_mpoly_t A, flint_rand_ptr state,
                  slong length, ulong exp_bound, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_randtest_bounds(fq_zech_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fq_zech_mpoly_randtest_bounds(fq_zech_mpoly_t A, flint_rand_ptr state,
               slong length, ulong * exp_bounds, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_randtest_bits(fq_zech_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fq_zech_mpoly_randtest_bits(fq_zech_mpoly_t A, flint_rand_ptr state,
             slong length, flint_bitcnt_t exp_bits, const fq_zech_mpoly_ctx_t ctx);
 
 

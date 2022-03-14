@@ -81,7 +81,7 @@ FLINT_DLL void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta,
 
 /* Random parameter generation  **********************************************/
 
-FLINT_DLL void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state);
+FLINT_DLL void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_ptr state);
 
 /* The various Babai's  ******************************************************/
 

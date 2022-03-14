@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit)
+mp_limb_signed_t z_randint(flint_rand_ptr state, mp_limb_t limit)
 {
     mp_limb_signed_t z;
 

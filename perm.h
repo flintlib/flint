@@ -142,7 +142,7 @@ _perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 
 /* Randomisation *************************************************************/
 
-FLINT_DLL int _perm_randtest(slong * vec, slong n, flint_rand_t state);
+FLINT_DLL int _perm_randtest(slong * vec, slong n, flint_rand_ptr state);
 
 /* Parity ********************************************************************/
 

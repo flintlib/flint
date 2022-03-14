@@ -153,23 +153,23 @@ ULONG_EXTRAS_INLINE int n_sub_checked(ulong * a, ulong b, ulong c)
 
 /*****************************************************************************/
 
-FLINT_DLL ulong n_randlimb(flint_rand_t state);
+FLINT_DLL ulong n_randlimb(flint_rand_ptr state);
 
-FLINT_DLL ulong n_randint(flint_rand_t state, ulong limit);
+FLINT_DLL ulong n_randint(flint_rand_ptr state, ulong limit);
 
-FLINT_DLL ulong n_urandint(flint_rand_t state, ulong limit);
+FLINT_DLL ulong n_urandint(flint_rand_ptr state, ulong limit);
 
-FLINT_DLL ulong n_randbits(flint_rand_t state, unsigned int bits);
+FLINT_DLL ulong n_randbits(flint_rand_ptr state, unsigned int bits);
 
-FLINT_DLL ulong n_randtest_bits(flint_rand_t state, int bits);
+FLINT_DLL ulong n_randtest_bits(flint_rand_ptr state, int bits);
 
-FLINT_DLL ulong n_randtest(flint_rand_t state);
+FLINT_DLL ulong n_randtest(flint_rand_ptr state);
 
-FLINT_DLL ulong n_randtest_not_zero(flint_rand_t state);
+FLINT_DLL ulong n_randtest_not_zero(flint_rand_ptr state);
 
-FLINT_DLL ulong n_randprime(flint_rand_t state, ulong bits, int proved);
+FLINT_DLL ulong n_randprime(flint_rand_ptr state, ulong bits, int proved);
 
-FLINT_DLL ulong n_randtest_prime(flint_rand_t state, int proved);
+FLINT_DLL ulong n_randtest_prime(flint_rand_ptr state, int proved);
 
 FLINT_DLL ulong n_pow(ulong n, ulong exp);
 
@@ -452,7 +452,7 @@ FLINT_DLL int n_factor_pollard_brent_single(ulong *factor, ulong n,
                                             ulong xi, ulong normbits,
                                             ulong max_iters);
 
-FLINT_DLL int n_factor_pollard_brent(ulong *factor, flint_rand_t state, 
+FLINT_DLL int n_factor_pollard_brent(ulong *factor, flint_rand_ptr state, 
                                      ulong n_in, ulong max_tries, 
                                      ulong max_iters);
 
@@ -527,7 +527,7 @@ FLINT_DLL int n_factor_ecm_stage_II(ulong *f, ulong B1, ulong B2,
                                     ulong P, ulong n, n_ecm_t n_ecm_inf);
 
 FLINT_DLL int n_factor_ecm(ulong *f, ulong curves, ulong B1,
-                           ulong B2, flint_rand_t state, ulong n);
+                           ulong B2, flint_rand_ptr state, ulong n);
 
 FLINT_DLL mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
 

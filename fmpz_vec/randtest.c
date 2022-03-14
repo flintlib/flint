@@ -18,7 +18,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
+_fmpz_vec_randtest(fmpz * f, flint_rand_ptr state, 
                    slong len, flint_bitcnt_t bits)
 {
     slong i, sparseness;
@@ -43,7 +43,7 @@ _fmpz_vec_randtest(fmpz * f, flint_rand_t state,
 }
 
 void
-_fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
+_fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_ptr state, 
                             slong len, flint_bitcnt_t bits)
 {
     slong i, sparseness;

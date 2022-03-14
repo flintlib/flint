@@ -14,7 +14,7 @@
 #include "mpfr_mat.h"
 
 void
-mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state)
+mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_ptr state)
 {
     slong r, c, i, j;
 

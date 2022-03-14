@@ -19,7 +19,7 @@ int fmpz_mpoly_factor_irred_wang(
     int lcAfac_irred,
     const fmpz_mpoly_t lcA,
     const fmpz_mpoly_ctx_t ctx,
-    flint_rand_t state,
+    flint_rand_ptr state,
     zassenhaus_prune_t zas,
     int allow_shift)
 {

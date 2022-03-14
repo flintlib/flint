@@ -1253,7 +1253,7 @@ int static _random_check_sp(
     const fmpz_mpoly_t Gamma,
     const fmpz_mpoly_ctx_t ctx,
     nmod_t ctx_sp,
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     n_poly_polyun_stack_t St_sp)
 {
     mp_limb_t Gammaeval_sp;
@@ -1338,7 +1338,7 @@ int static _random_check_mp(
     const fmpz_mpoly_t Gamma,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_mod_ctx_t ctx_mp,
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     fmpz_mod_poly_polyun_stack_t St_mp)
 {
     int success;

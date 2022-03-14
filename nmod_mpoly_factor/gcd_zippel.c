@@ -159,7 +159,7 @@ int nmod_mpolyl_gcds_zippel(
     slong l,
     slong var,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state,
+    flint_rand_ptr state,
     slong * Gdegbound,
     n_poly_t Amarks,    /* temps */
     n_poly_t Bmarks)
@@ -495,7 +495,7 @@ static int _do_bivar_or_univar(
     nmod_mpoly_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     if (var == 1)
     {
@@ -582,7 +582,7 @@ int nmod_mpolyl_gcdp_zippel_smprime(
     nmod_mpoly_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     flint_bitcnt_t bits = A->bits;
     slong i, j, N = mpoly_words_per_exp_sp(bits, ctx->minfo);

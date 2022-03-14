@@ -251,23 +251,23 @@ int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat,
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void TEMPLATE(T, mat_randtest)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, mat_randtest)(TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                           const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                           slong rank, const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL int TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+FLINT_DLL int TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                               TEMPLATE(T, struct) * diag, slong n,
                               const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL void TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count,
-                         flint_rand_t state, const TEMPLATE(T, ctx_t) ctx);
+                         flint_rand_ptr state, const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                           int unit, const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                           int unit, const TEMPLATE(T, ctx_t) ctx);
 
 /* Norms */

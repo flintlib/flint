@@ -15,7 +15,7 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
+nmod_mat_randtril(nmod_mat_t mat, flint_rand_ptr state, int unit)
 {
     slong i, j;
 

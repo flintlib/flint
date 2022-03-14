@@ -39,7 +39,7 @@ ulong n_ecm_primorial[] =
 
 int
 n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
-             flint_rand_t state, mp_limb_t n)
+             flint_rand_ptr state, mp_limb_t n)
 {
     mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
     int i, j, ret;

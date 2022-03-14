@@ -632,7 +632,7 @@ static int convex_hull_is_indecomposable(
 
 static void z_rand_vec_primitive(
     slong * v, slong len,
-    flint_rand_t state,
+    flint_rand_ptr state,
     mp_limb_t bound)
 {
     slong i, g;
@@ -775,7 +775,7 @@ static int _test_indecomposable3(
 int _mpoly_test_irreducible(
     slong * Aexps, slong stride, slong Alen,
     slong nvars,
-    flint_rand_t state,
+    flint_rand_ptr state,
     slong tries_left)   /* what they call the "projection bound" */
 {
     int success;

@@ -198,19 +198,19 @@ FLINT_DLL bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_init(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
     fq_nmod_mpoly_ctx_t ectx,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate);
+    flint_rand_ptr randstate);
 
 FLINT_DLL void bad_fq_nmod_mpoly_embed_chooser_clear(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
     fq_nmod_mpoly_ctx_t ectx,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate);
+    flint_rand_ptr randstate);
 
 FLINT_DLL bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_next(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
     fq_nmod_mpoly_ctx_t ectx,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate);
+    flint_rand_ptr randstate);
 
 
 /* Context object ************************************************************/
@@ -222,7 +222,7 @@ FLINT_DLL void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars,
                               const ordering_t ord, const fq_nmod_ctx_t fqctx);
 
 FLINT_DLL void fq_nmod_mpoly_ctx_init_rand(fq_nmod_mpoly_ctx_t ctx,
-                                       flint_rand_t state, slong max_nvars,
+                                       flint_rand_ptr state, slong max_nvars,
                                           flint_bitcnt_t p_bits, slong deg_bound);
 
 FLINT_DLL void fq_nmod_mpoly_ctx_clear(fq_nmod_mpoly_ctx_t ctx);
@@ -664,13 +664,13 @@ FLINT_DLL void _fq_nmod_mpoly_push_exp_ui(fq_nmod_mpoly_t A,
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void fq_nmod_mpoly_randtest_bound(fq_nmod_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fq_nmod_mpoly_randtest_bound(fq_nmod_mpoly_t A, flint_rand_ptr state,
                  slong length, ulong exp_bound, const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpoly_randtest_bounds(fq_nmod_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fq_nmod_mpoly_randtest_bounds(fq_nmod_mpoly_t A, flint_rand_ptr state,
               slong length, ulong * exp_bounds, const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpoly_randtest_bits(fq_nmod_mpoly_t A, flint_rand_t state,
+FLINT_DLL void fq_nmod_mpoly_randtest_bits(fq_nmod_mpoly_t A, flint_rand_ptr state,
             slong length, flint_bitcnt_t exp_bits, const fq_nmod_mpoly_ctx_t ctx);
 
 
@@ -1200,7 +1200,7 @@ FLINT_DLL void fq_nmod_mpolyu_mul_mpoly_inplace(fq_nmod_mpolyu_t A,
 
 FLINT_DLL int fq_nmod_mpolyu_gcdm_zippel(fq_nmod_mpolyu_t G,
              fq_nmod_mpolyu_t Abar, fq_nmod_mpolyu_t Bbar,  fq_nmod_mpolyu_t A,
-          fq_nmod_mpolyu_t B, fq_nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
+          fq_nmod_mpolyu_t B, fq_nmod_mpoly_ctx_t ctx, flint_rand_ptr randstate);
 
 FQ_NMOD_MPOLY_INLINE mp_limb_t * fq_nmod_mpolyu_leadcoeff(
                        const fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctx)
@@ -1386,7 +1386,7 @@ FLINT_DLL void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
 FLINT_DLL nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
                 fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, fq_nmod_mpolyu_t f,
                                     slong var, const fq_nmod_mpoly_ctx_t ctx,
-                                     flint_rand_t randstate, slong * degbound);
+                                     flint_rand_ptr randstate, slong * degbound);
 
 FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel_univar(fq_nmod_mpolyu_t G,
             fq_nmod_mpolyu_t Abar, fq_nmod_mpolyu_t Bbar, fq_nmod_mpolyu_t A,
@@ -1398,7 +1398,7 @@ FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel_univar_no_cofactors(fq_nmod_mpolyu_t G,
 FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
               fq_nmod_mpolyu_t Abar, fq_nmod_mpolyu_t Bbar, fq_nmod_mpolyu_t A,
                   fq_nmod_mpolyu_t B, slong var, const fq_nmod_mpoly_ctx_t ctx,
-                                                       flint_rand_t randstate);
+                                                       flint_rand_ptr randstate);
 
 FLINT_DLL int fq_nmod_mpolyn_gcd_brown_smprime(fq_nmod_mpolyn_t G,
          fq_nmod_mpolyn_t Abar, fq_nmod_mpolyn_t Bbar, fq_nmod_mpolyn_t A,

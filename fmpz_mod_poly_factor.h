@@ -129,7 +129,7 @@ FLINT_DLL int fmpz_mod_poly_is_squarefree_f(fmpz_t fac,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
-                       flint_rand_t state, const fmpz_mod_poly_t pol, slong d,
+                       flint_rand_ptr state, const fmpz_mod_poly_t pol, slong d,
                                                      const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_factor_equal_deg_with_frob(

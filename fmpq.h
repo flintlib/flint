@@ -214,15 +214,15 @@ FMPQ_INLINE int fmpq_print(const fmpq_t x)
     return fmpq_fprint(stdout, x);
 }
 
-FLINT_DLL void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpq_randtest(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpq_randtest(fmpq_t res, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpq_randtest_not_zero(fmpq_t res, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpq_randbits(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpq_randbits(fmpq_t res, flint_rand_ptr state, flint_bitcnt_t bits);
 
 FLINT_DLL void _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2);
 

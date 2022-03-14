@@ -15,7 +15,7 @@
 
 #if FLINT64
 
-mp_limb_t n_randlimb(flint_rand_t state) 
+mp_limb_t n_randlimb(flint_rand_ptr state) 
 {   
     state->__randval = (state->__randval*UWORD(13282407956253574709) + UWORD(286824421));
     state->__randval2 = (state->__randval2*UWORD(7557322358563246341) + UWORD(286824421));
@@ -25,7 +25,7 @@ mp_limb_t n_randlimb(flint_rand_t state)
 
 #else
 
-mp_limb_t n_randlimb(flint_rand_t state) 
+mp_limb_t n_randlimb(flint_rand_ptr state) 
 {   
     state->__randval = (state->__randval*UWORD(1543932465) +  UWORD(1626832771));
     state->__randval2 = (state->__randval2*UWORD(2495927737) +  UWORD(1626832771));

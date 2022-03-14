@@ -17,7 +17,7 @@
     Get a user exponent "exp"' such that it can be packed into "exp_bits" bits.
     The count "exp_bits" includes the extra bits for the sign.
 */
-void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state,
+void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_ptr state,
                                   flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx)
 {
     slong j;

@@ -23,7 +23,7 @@ void _TEMPLATE(T, poly_split_rabin)(
     const fmpz_t halfq,         /* (q-1)/2  or 0 in characteristic 2 */
     TEMPLATE(T, poly_t) t,      /* temp space */
     TEMPLATE(T, poly_t) t2,     /* temp space */
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
@@ -94,7 +94,7 @@ static void _TEMPLATE(T, poly_push_roots)(
     TEMPLATE(T, poly_t) t,              /* temp */
     TEMPLATE(T, poly_t) t2,             /* more temp */
     TEMPLATE(T, poly_struct) * stack,   /* temp of size FLINT_BITS */
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, sp;

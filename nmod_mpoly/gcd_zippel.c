@@ -19,7 +19,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     nmod_mpolyu_t A,
     nmod_mpolyu_t B,
     nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     slong var = 0;
     slong Alastdeg, Blastdeg;
@@ -222,7 +222,7 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyu_t A,
     nmod_mpolyu_t B,
     nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     slong degbound;
     slong bound;

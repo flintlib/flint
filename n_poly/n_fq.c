@@ -91,7 +91,7 @@ void n_fq_print_pretty(
 
 void n_fq_randtest_not_zero(
     mp_limb_t * a,
-    flint_rand_t state,
+    flint_rand_ptr state,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);

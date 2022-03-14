@@ -21,7 +21,7 @@
 #include "mpn_extras.h"
 
 int
-fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in, 
+fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_ptr state, fmpz_t n_in, 
                           mp_limb_t max_tries, mp_limb_t max_iters)
 {
     fmpz_t fa, fy, maxa, maxy;

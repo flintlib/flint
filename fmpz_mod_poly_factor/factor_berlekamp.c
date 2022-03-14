@@ -58,7 +58,7 @@ fmpz_mat_col_to_fmpz_mod_poly_shifted(fmpz_mod_poly_t poly, fmpz_mat_t mat,
 
 static void
 __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
-         flint_rand_t state, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
+         flint_rand_ptr state, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 {
     const slong n = fmpz_mod_poly_degree(f, ctx);
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);

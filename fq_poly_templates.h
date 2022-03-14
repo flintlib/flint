@@ -96,17 +96,17 @@ TEMPLATE(T, poly_lead)(const TEMPLATE(T, poly_t) poly,
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void TEMPLATE(T, poly_randtest)(TEMPLATE(T, poly_t) f, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, poly_randtest)(TEMPLATE(T, poly_t) f, flint_rand_ptr state,
                            slong len, const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, poly_randtest_not_zero)(TEMPLATE(T, poly_t) f, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, poly_randtest_not_zero)(TEMPLATE(T, poly_t) f, flint_rand_ptr state,
                                     slong len, const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, poly_randtest_monic) (TEMPLATE(T, poly_t) f, flint_rand_t state,
+FLINT_DLL void TEMPLATE(T, poly_randtest_monic) (TEMPLATE(T, poly_t) f, flint_rand_ptr state,
                                   slong len, const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL void TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f,
-                                        flint_rand_t state, slong len,
+                                        flint_rand_ptr state, slong len,
                                         const TEMPLATE(T, ctx_t) ctx);
 
 

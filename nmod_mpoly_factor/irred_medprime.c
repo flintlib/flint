@@ -104,7 +104,7 @@ int nmod_mpoly_factor_irred_medprime_zassenhaus(
     nmod_mpolyv_t Af,
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     fq_zech_mpolyv_t eAf;
@@ -212,7 +212,7 @@ int nmod_mpoly_factor_irred_medprime_wang(
     const nmod_mpoly_factor_t lcAfac,
     const nmod_mpoly_t lcA,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     const slong n = ctx->minfo->nvars - 1;
@@ -284,7 +284,7 @@ int nmod_mpoly_factor_irred_medprime_zippel(
     const nmod_mpoly_factor_t lcAfac,
     const nmod_mpoly_t lcA,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     const slong n = ctx->minfo->nvars - 1;

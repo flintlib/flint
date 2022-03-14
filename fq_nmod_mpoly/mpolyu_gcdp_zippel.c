@@ -371,7 +371,7 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
     fq_nmod_mpolyu_t f,
     slong var,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate,
+    flint_rand_ptr randstate,
     slong * degbound)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
@@ -942,7 +942,7 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(
     fq_nmod_mpolyu_t A,
     fq_nmod_mpolyu_t B,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     slong var = 0;
     slong Alastdeg;
@@ -1180,7 +1180,7 @@ int fq_nmod_mpolyu_gcdp_zippel(
     fq_nmod_mpolyu_t B,
     slong var,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     slong lastdeg;
     slong Alastdeg;

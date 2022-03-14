@@ -125,7 +125,7 @@ int fmpz_mod_mpoly_factor_irred_smprime_zassenhaus(
     fmpz_mod_mpolyv_t fac,
     const fmpz_mod_mpoly_t A,
     const fmpz_mod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     int tries_remaining = 10;

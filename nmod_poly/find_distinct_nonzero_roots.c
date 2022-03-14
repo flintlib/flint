@@ -19,7 +19,7 @@ void _nmod_poly_split_rabin(
     const nmod_poly_t f,
     nmod_poly_t t,
     nmod_poly_t t2,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     FLINT_ASSERT(nmod_poly_degree(f) > 1);
 

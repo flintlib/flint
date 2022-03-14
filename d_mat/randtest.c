@@ -13,7 +13,7 @@
 #include "d_mat.h"
 
 void
-d_mat_randtest(d_mat_ptr mat, flint_rand_t state, slong minexp, slong maxexp)
+d_mat_randtest(d_mat_ptr mat, flint_rand_ptr state, slong minexp, slong maxexp)
 {
     slong r, c, i, j;
 

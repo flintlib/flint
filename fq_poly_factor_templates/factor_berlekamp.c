@@ -64,7 +64,7 @@ TEMPLATE(T, mat_col_to_shifted) (TEMPLATE(T, poly_t) poly,
 
 static void
 __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
-                                      flint_rand_t state,
+                                      flint_rand_ptr state,
                                       const TEMPLATE(T, poly_t) f,
                                       const TEMPLATE(T, ctx_t) ctx)
 {

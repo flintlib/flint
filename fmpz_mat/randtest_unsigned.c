@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
+fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     slong r, c, i, j;
 

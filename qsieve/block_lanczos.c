@@ -695,7 +695,7 @@ void combine_cols(slong ncols,
 }
 
 /*-----------------------------------------------------------------------*/
-uint64_t * block_lanczos(flint_rand_t state, slong nrows, 
+uint64_t * block_lanczos(flint_rand_ptr state, slong nrows, 
 			slong dense_rows, slong ncols, la_col_t *B) {
 	
 	/* Solve Bx = 0 for some nonzero x; the computed

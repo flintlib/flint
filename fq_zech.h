@@ -74,9 +74,9 @@ FLINT_DLL int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
                               const nmod_poly_t modulus,
                               const char *var);
 
-FLINT_DLL void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_ptr state);
 
-FLINT_DLL void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
@@ -200,16 +200,16 @@ FLINT_DLL int fq_zech_is_square(const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-FLINT_DLL void fq_zech_randtest(fq_zech_t rop, flint_rand_t state,
+FLINT_DLL void fq_zech_randtest(fq_zech_t rop, flint_rand_ptr state,
                       const fq_zech_ctx_t ctx);
 
-FLINT_DLL void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_t state,
+FLINT_DLL void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_ptr state,
                                const fq_zech_ctx_t ctx);
 
-FLINT_DLL void fq_zech_rand(fq_zech_t rop, flint_rand_t state,
+FLINT_DLL void fq_zech_rand(fq_zech_t rop, flint_rand_ptr state,
                                                       const fq_zech_ctx_t ctx);
 
-FLINT_DLL void fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_t state,
+FLINT_DLL void fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_ptr state,
                                                       const fq_zech_ctx_t ctx);
 
 /* Comparison ****************************************************************/

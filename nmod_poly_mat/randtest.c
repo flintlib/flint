@@ -15,7 +15,7 @@
 #include "nmod_poly_mat.h"
 
 void
-nmod_poly_mat_randtest(nmod_poly_mat_t A, flint_rand_t state, slong len)
+nmod_poly_mat_randtest(nmod_poly_mat_t A, flint_rand_ptr state, slong len)
 {
     slong i, j;
 

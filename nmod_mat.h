@@ -119,14 +119,14 @@ FLINT_DLL void nmod_mat_concat_vertical(nmod_mat_t res,
                            const nmod_mat_t mat1,  const nmod_mat_t mat2);
 
 /* Random matrix generation */
-FLINT_DLL void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
-FLINT_DLL void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
-FLINT_DLL int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
+FLINT_DLL void nmod_mat_randtest(nmod_mat_t mat, flint_rand_ptr state);
+FLINT_DLL void nmod_mat_randfull(nmod_mat_t mat, flint_rand_ptr state);
+FLINT_DLL int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_ptr state,
                  mp_srcptr diag, slong n);
-FLINT_DLL void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
-FLINT_DLL void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state);
-FLINT_DLL void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
-FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
+FLINT_DLL void nmod_mat_randrank(nmod_mat_t, flint_rand_ptr state, slong rank);
+FLINT_DLL void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_ptr state);
+FLINT_DLL void nmod_mat_randtril(nmod_mat_t mat, flint_rand_ptr state, int unit);
+FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_ptr state, int unit);
 
 
 FLINT_DLL int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat);

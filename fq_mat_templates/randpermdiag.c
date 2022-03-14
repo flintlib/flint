@@ -19,7 +19,7 @@
 #include "perm.h"
 
 int
-TEMPLATE(T, mat_randpermdiag) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
+TEMPLATE(T, mat_randpermdiag) (TEMPLATE(T, mat_t) mat, flint_rand_ptr state,
                                TEMPLATE(T, struct) * diag, slong n,
                                const TEMPLATE(T, ctx_t) ctx)
 {

@@ -18,7 +18,7 @@ int fq_nmod_mpoly_factor_irred_smprime_wang(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     int success;

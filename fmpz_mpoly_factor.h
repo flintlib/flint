@@ -324,7 +324,7 @@ FLINT_DLL int fmpz_mpolyl_gcd_brown_threaded_pool(fmpz_mpoly_t G,
 
 FLINT_DLL int fmpz_mpolyl_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
                fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                           const fmpz_mpoly_ctx_t ctx, flint_rand_t randstate);
+                           const fmpz_mpoly_ctx_t ctx, flint_rand_ptr randstate);
 
 FLINT_DLL int fmpz_mpolyl_gcd_zippel2(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
                 fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
@@ -551,12 +551,12 @@ FLINT_DLL int fmpz_mpoly_factor_irred_zassenhaus(fmpz_mpolyv_t fac,
 FLINT_DLL int fmpz_mpoly_factor_irred_wang(fmpz_mpolyv_t fac,
                       const fmpz_mpoly_t A, const fmpz_mpoly_factor_t lcAfac,
           int lcAfac_irred, const fmpz_mpoly_t lcA, const fmpz_mpoly_ctx_t ctx,
-                    flint_rand_t state, zassenhaus_prune_t Z, int allow_shift);
+                    flint_rand_ptr state, zassenhaus_prune_t Z, int allow_shift);
 
 FLINT_DLL int fmpz_mpoly_factor_irred_zippel(fmpz_mpolyv_t fac,
                     const fmpz_mpoly_t A, const fmpz_mpoly_factor_t lcAfac,
           int lcAfac_irred, const fmpz_mpoly_t lcA, const fmpz_mpoly_ctx_t ctx,
-                                     flint_rand_t state, zassenhaus_prune_t Z);
+                                     flint_rand_ptr state, zassenhaus_prune_t Z);
 
 FLINT_DLL int fmpz_mpoly_factor_irred(fmpz_mpoly_factor_t f,
                                 const fmpz_mpoly_ctx_t ctx, unsigned int algo);

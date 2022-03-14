@@ -24,7 +24,7 @@ static void _nmod_poly_push_roots(
     nmod_poly_t t,              /* temp */
     nmod_poly_t t2,             /* more temp */
     nmod_poly_struct * stack,   /* temp of size FLINT_BITS */
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     slong i, sp;
     nmod_poly_struct * a, * b;

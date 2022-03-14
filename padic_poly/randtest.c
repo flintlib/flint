@@ -16,7 +16,7 @@
 #include "flint.h"
 #include "padic_poly.h"
 
-void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
+void padic_poly_randtest_val(padic_poly_t f, flint_rand_ptr state, 
                              slong val, slong len, const padic_ctx_t ctx)
 {
     const slong N = padic_poly_prec(f);
@@ -59,7 +59,7 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
     }
 }
 
-void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
+void padic_poly_randtest(padic_poly_t f, flint_rand_ptr state, 
                          slong len, const padic_ctx_t ctx)
 {
     const slong N = padic_poly_prec(f);
@@ -87,7 +87,7 @@ void padic_poly_randtest(padic_poly_t f, flint_rand_t state,
     padic_poly_randtest_val(f, state, val, len, ctx);
 }
 
-void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state, 
+void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_ptr state, 
                                   slong len, const padic_ctx_t ctx)
 {
     slong i;

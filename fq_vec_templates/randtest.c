@@ -18,7 +18,7 @@
 
 void
 _TEMPLATE(T, vec_randtest) (TEMPLATE(T, struct) * f,
-                            flint_rand_t state,
+                            flint_rand_ptr state,
                             slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, sparseness;

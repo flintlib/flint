@@ -17,7 +17,7 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-mp_limb_signed_t z_randtest(flint_rand_t state)
+mp_limb_signed_t z_randtest(flint_rand_ptr state)
 {
     mp_limb_t m;
     mp_limb_signed_t z;
@@ -48,7 +48,7 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
     return z;
 }
 
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
+mp_limb_signed_t z_randtest_not_zero(flint_rand_ptr state)
 {
     mp_limb_signed_t z;
 

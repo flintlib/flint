@@ -11,7 +11,7 @@
 
 #include "mpoly.h"
 
-void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars)
+void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_ptr state, slong max_nvars)
 {
     ordering_t ord;
     slong nvars;

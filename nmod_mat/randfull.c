@@ -15,7 +15,7 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
+nmod_mat_randfull(nmod_mat_t mat, flint_rand_ptr state)
 {
     slong i;
 

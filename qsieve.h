@@ -423,7 +423,7 @@ FLINT_DLL uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
 
 FLINT_DLL void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols);
 
-FLINT_DLL uint64_t * block_lanczos(flint_rand_t state, slong nrows,
+FLINT_DLL uint64_t * block_lanczos(flint_rand_ptr state, slong nrows,
 			slong dense_rows, slong ncols, la_col_t *B);
 
 FLINT_DLL void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,

@@ -174,21 +174,21 @@ void fmpz_clear(fmpz_t f)
         _fmpz_clear_mpz(*f);
 }
 
-FLINT_DLL void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_randbits(fmpz_t f, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m);
+FLINT_DLL void fmpz_randm(fmpz_t f, flint_rand_ptr state, const fmpz_t m);
 
-FLINT_DLL void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_randtest(fmpz_t f, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_randtest_unsigned(fmpz_t f, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_randtest_not_zero(fmpz_t f, flint_rand_ptr state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m);
+FLINT_DLL void fmpz_randtest_mod(fmpz_t f, flint_rand_ptr state, const fmpz_t m);
 
-FLINT_DLL void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m);
+FLINT_DLL void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_ptr state, const fmpz_t m);
 
-FLINT_DLL void fmpz_randprime(fmpz_t f, flint_rand_t state, 
+FLINT_DLL void fmpz_randprime(fmpz_t f, flint_rand_ptr state, 
                               flint_bitcnt_t bits, int proved);
 
 FLINT_DLL slong fmpz_get_si(const fmpz_t f);

@@ -189,18 +189,18 @@ int fmpz_mat_read(fmpz_mat_t mat)
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2);
-FLINT_DLL void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q);
-FLINT_DLL void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q);
-FLINT_DLL void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha);
-FLINT_DLL void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, flint_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det);
-FLINT_DLL void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count);
-FLINT_DLL int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, slong n);
+FLINT_DLL void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits, flint_bitcnt_t bits2);
+FLINT_DLL void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits, ulong q);
+FLINT_DLL void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_ptr state, flint_bitcnt_t bits, ulong q);
+FLINT_DLL void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_ptr state, double alpha);
+FLINT_DLL void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_ptr state, slong rank, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_ptr state, const fmpz_t det);
+FLINT_DLL void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_ptr state, slong count);
+FLINT_DLL int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_ptr state, const fmpz * diag, slong n);
 
 /* Norms */
 
@@ -616,7 +616,7 @@ FLINT_DLL void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_minors_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
 FLINT_DLL void fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D);
-FLINT_DLL void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state);
+FLINT_DLL void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_ptr state);
 FLINT_DLL int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);

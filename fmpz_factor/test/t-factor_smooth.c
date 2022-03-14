@@ -72,7 +72,7 @@ void checkb(fmpz_t n, slong bits)
     fmpz_factor_clear(factor);
 }
 
-void randprime(fmpz_t p, flint_rand_t state, slong bits)
+void randprime(fmpz_t p, flint_rand_ptr state, slong bits)
 {
     fmpz_randbits(p, state, bits);
  

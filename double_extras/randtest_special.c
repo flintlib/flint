@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 
 double
-d_randtest_special(flint_rand_t state, slong minexp, slong maxexp)
+d_randtest_special(flint_rand_ptr state, slong minexp, slong maxexp)
 {
     double d, t;
     slong exp, kind;

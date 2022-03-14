@@ -12,7 +12,7 @@
 #include "fmpq.h"
 
 void
-_fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
+_fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     mp_limb_t x = n_randlimb(state);
 
@@ -55,12 +55,12 @@ _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
     _fmpq_canonicalise(num, den);
 }
 
-void fmpq_randtest(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
+void fmpq_randtest(fmpq_t res, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     _fmpq_randtest(fmpq_numref(res), fmpq_denref(res), state, bits);
 }
 
-void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, flint_bitcnt_t bits)
+void fmpq_randtest_not_zero(fmpq_t f, flint_rand_ptr state, flint_bitcnt_t bits)
 {
     if (bits == 0)
     {

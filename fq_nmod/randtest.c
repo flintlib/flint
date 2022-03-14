@@ -13,7 +13,7 @@
 
 #include "fq_nmod.h"
 
-void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+void fq_nmod_randtest(fq_nmod_t rop, flint_rand_ptr state, const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
     slong i, sparse;
@@ -40,7 +40,7 @@ void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx
     _nmod_poly_normalise(rop);
 }
 
-void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_ptr state, const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
     slong i;
@@ -56,7 +56,7 @@ void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx
     _nmod_poly_normalise(rop);
 }
 
-void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_ptr state, const fq_nmod_ctx_t ctx)
 {
     slong i;
 

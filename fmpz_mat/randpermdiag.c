@@ -13,7 +13,7 @@
 #include "perm.h"
 
 int
-fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
+fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_ptr state,
                       const fmpz * diag, slong n)
 {
     int parity;

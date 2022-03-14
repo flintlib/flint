@@ -67,9 +67,9 @@ FLINT_DLL void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d,
 FLINT_DLL void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,
                                    const fmpz_mod_ctx_t ctxp, const char *var);
 
-FLINT_DLL void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_ptr state);
 
-FLINT_DLL void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_ptr state);
 
 FLINT_DLL void fq_ctx_clear(fq_ctx_t ctx);
 
@@ -254,15 +254,15 @@ FLINT_DLL int fq_is_square(const fq_t op, const fq_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-FLINT_DLL void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_randtest(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_randtest_dense(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_randtest_not_zero(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_rand(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_rand_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_rand_not_zero(fq_t rop, flint_rand_ptr state, const fq_ctx_t ctx);
 
 
 /* Comparison ****************************************************************/

@@ -16,7 +16,7 @@
 #include <math.h>
 
 void
-fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
+fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_ptr state)
 {
     fmpz_t p;
     slong max_d, d;

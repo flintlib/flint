@@ -310,7 +310,7 @@ fq_default_poly_degree(const fq_default_poly_t poly,
 /*  Randomisation  ***********************************************************/
 
 FQ_DEFAULT_POLY_INLINE void fq_default_poly_randtest(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+                     flint_rand_ptr state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -336,7 +336,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_randtest(fq_default_poly_t f,
 
 FQ_DEFAULT_POLY_INLINE
 void fq_default_poly_randtest_not_zero(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+                     flint_rand_ptr state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -363,7 +363,7 @@ void fq_default_poly_randtest_not_zero(fq_default_poly_t f,
 
 FQ_DEFAULT_POLY_INLINE
 void fq_default_poly_randtest_monic(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+                     flint_rand_ptr state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -390,7 +390,7 @@ void fq_default_poly_randtest_monic(fq_default_poly_t f,
 
 FQ_DEFAULT_POLY_INLINE
 void fq_default_poly_randtest_irreducible(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+                     flint_rand_ptr state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {

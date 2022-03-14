@@ -93,7 +93,7 @@ FLINT_DLL int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in,
                                                          fmpz_t yi, fmpz_t ai, 
                                                           mp_limb_t max_iters);
 
-FLINT_DLL int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state,
+FLINT_DLL int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_ptr state,
                                         fmpz_t n, mp_limb_t max_tries, 
                                         mp_limb_t max_iters);
 /* Expansion *****************************************************************/
@@ -167,7 +167,7 @@ FLINT_DLL int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2,
                                        mp_limb_t P, mp_ptr n, ecm_t ecm_inf);
 
 FLINT_DLL int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
-                        mp_limb_t B2, flint_rand_t state, const fmpz_t n_in);
+                        mp_limb_t B2, flint_rand_ptr state, const fmpz_t n_in);
 
 /* Inlines *******************************************************************/
 

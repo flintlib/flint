@@ -16,7 +16,7 @@
 #include "perm.h"
 
 int
-nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
+nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_ptr state,
                             mp_srcptr diag, slong n)
 {
     int parity;

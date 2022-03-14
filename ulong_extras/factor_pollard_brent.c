@@ -122,7 +122,7 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
 }
 
 int
-n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, 
+n_factor_pollard_brent(mp_limb_t *factor, flint_rand_ptr state, mp_limb_t n_in, 
                         mp_limb_t max_tries, mp_limb_t max_iters)
 {
     mp_limb_t normbits, a, x, n, ninv, max;

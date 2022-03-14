@@ -11,7 +11,7 @@
 
 #include "fmpz_poly_q.h"
 
-void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
+void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_ptr state,
                           slong len1, flint_bitcnt_t bits1, 
                           slong len2, flint_bitcnt_t bits2)
 {
@@ -23,7 +23,7 @@ void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
     fmpz_poly_q_canonicalise(poly);
 }
 
-void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
+void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_ptr state, 
                                    slong len1, flint_bitcnt_t bits1, 
                                    slong len2, flint_bitcnt_t bits2)
 {

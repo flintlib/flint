@@ -179,12 +179,12 @@ FLINT_DLL void padic_reduce(padic_t rop, const padic_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-FLINT_DLL void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx);
+FLINT_DLL void padic_randtest(padic_t rop, flint_rand_ptr state, const padic_ctx_t ctx);
 
-FLINT_DLL void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
+FLINT_DLL void padic_randtest_not_zero(padic_t rop, flint_rand_ptr state, 
                              const padic_ctx_t ctx);
 
-FLINT_DLL void padic_randtest_int(padic_t rop, flint_rand_t state, 
+FLINT_DLL void padic_randtest_int(padic_t rop, flint_rand_ptr state, 
                         const padic_ctx_t ctx);
 
 /* Assignments and conversions ***********************************************/

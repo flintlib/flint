@@ -18,7 +18,7 @@ void univar_divides_check(
     slong ii,
     slong jj,
     const char * name,
-    flint_rand_t randstate)
+    flint_rand_ptr randstate)
 {
     int divides, udivides;
     fq_nmod_mpoly_ctx_t uctx;

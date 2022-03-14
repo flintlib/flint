@@ -14,7 +14,7 @@
 #include "perm.h"
 
 static void
-add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t state)
+add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_ptr state)
 {
     int neg;
     slong i, j, n, bits;
@@ -430,7 +430,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
 }
 
 void
-fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
+fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_ptr state)
 {
     slong i, j, m, n, p, r, *P, *pivots, finished;
     fmpz_t d1, d2, g, s, t;

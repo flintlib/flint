@@ -22,7 +22,7 @@ int nmod_mpoly_factor_irred_smprime_wang(
     const nmod_mpoly_factor_t lcAfac,
     const nmod_mpoly_t lcA,
     const nmod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_ptr state)
 {
     int success;
     int alphas_tries_remaining, alphabetas_tries_remaining, alphabetas_length;

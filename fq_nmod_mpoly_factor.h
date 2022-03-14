@@ -244,7 +244,7 @@ FLINT_DLL int n_fq_bpoly_factor_lgprime(
     n_tpoly_t F,
     n_bpoly_t B,
     const fq_nmod_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 /*****************************************************************************/
 
@@ -356,13 +356,13 @@ FLINT_DLL int fq_nmod_mpoly_factor_irred_smprime_zassenhaus(
     fq_nmod_mpolyv_t fac,
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 FLINT_DLL int fq_nmod_mpoly_factor_irred_lgprime_zassenhaus(
     fq_nmod_mpolyv_t fac,
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 FLINT_DLL int fq_nmod_mpoly_factor_irred_smprime_wang(
     fq_nmod_mpolyv_t fac,
@@ -370,7 +370,7 @@ FLINT_DLL int fq_nmod_mpoly_factor_irred_smprime_wang(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 FLINT_DLL int fq_nmod_mpoly_factor_irred_lgprime_wang(
     fq_nmod_mpolyv_t Af,
@@ -378,7 +378,7 @@ FLINT_DLL int fq_nmod_mpoly_factor_irred_lgprime_wang(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 FLINT_DLL int fq_nmod_mpoly_factor_irred_smprime_zippel(
     fq_nmod_mpolyv_t fac,
@@ -386,7 +386,7 @@ FLINT_DLL int fq_nmod_mpoly_factor_irred_smprime_zippel(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 FLINT_DLL int fq_nmod_mpoly_factor_irred_lgprime_zippel(
     fq_nmod_mpolyv_t Af,
@@ -394,7 +394,7 @@ FLINT_DLL int fq_nmod_mpoly_factor_irred_lgprime_zippel(
     const fq_nmod_mpoly_factor_t lcAfac,
     const fq_nmod_mpoly_t lcA,
     const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t state);
+    flint_rand_ptr state);
 
 /*****************************************************************************/
 

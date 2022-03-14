@@ -16,7 +16,7 @@
 
 void
 TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat, slong count,
-                          flint_rand_t state, const TEMPLATE(T, ctx_t) ctx)
+                          flint_rand_ptr state, const TEMPLATE(T, ctx_t) ctx)
 {
     slong c, i, j, k;
     slong m = mat->r;

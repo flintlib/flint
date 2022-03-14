@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
+fmpz_mat_randops(fmpz_mat_t mat, flint_rand_ptr state, slong count)
 {
     slong c, i, j, k;
     slong m = mat->r;

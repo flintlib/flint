@@ -734,7 +734,7 @@ FLINT_DLL int n_fq_is_canonical(
 
 FLINT_DLL void n_fq_randtest_not_zero(
     mp_limb_t * a,
-    flint_rand_t state,
+    flint_rand_ptr state,
     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL char * n_fq_get_str_pretty(
@@ -1108,7 +1108,7 @@ FLINT_DLL void n_fq_poly_set(
 
 FLINT_DLL void n_fq_poly_randtest(
     n_fq_poly_t A,
-    flint_rand_t state,
+    flint_rand_ptr state,
     slong len,
     const fq_nmod_ctx_t ctx);
 

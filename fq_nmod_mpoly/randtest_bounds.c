@@ -11,7 +11,7 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_randtest_bounds(fq_nmod_mpoly_t A, flint_rand_t state,
+void fq_nmod_mpoly_randtest_bounds(fq_nmod_mpoly_t A, flint_rand_ptr state,
                slong length, ulong * exp_bounds, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);    

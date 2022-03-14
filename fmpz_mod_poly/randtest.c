@@ -18,7 +18,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,
+void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_ptr state, slong len,
                                                       const fmpz_mod_ctx_t ctx)
 {
     slong i;
@@ -32,7 +32,7 @@ void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,
     _fmpz_mod_poly_normalise(f);
 }
 
-void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state,
+void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_ptr state,
                                            slong len, const fmpz_mod_ctx_t ctx)
 {
     slong i;
@@ -50,7 +50,7 @@ void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state,
 }
 
 static void
-fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_t state,
+fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_ptr state,
                             slong len, slong nonzero, const fmpz_mod_ctx_t ctx)
 {
     slong i;
@@ -65,7 +65,7 @@ fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_t state,
     _fmpz_mod_poly_set_length(poly, len);
 }
 
-void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_t state,
+void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_ptr state,
                                            slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
@@ -81,7 +81,7 @@ void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_t state,
 }
 
 void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
-                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                      flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -96,7 +96,7 @@ void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
 }
 
 void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
-                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                       flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -111,7 +111,7 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 
 static void
 fmpz_mod_poly_randtest_monic_irreducible_sparse(fmpz_mod_poly_t poly,
-                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                       flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     slong i = 0;
     slong terms = 3;
@@ -126,7 +126,7 @@ fmpz_mod_poly_randtest_monic_irreducible_sparse(fmpz_mod_poly_t poly,
 }
 
 void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly,
-                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                       flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     ulong k;
     fmpz_mod_poly_fit_length(poly, len, ctx);
@@ -139,7 +139,7 @@ void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly,
 }
 
 void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly,
-                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                       flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
@@ -152,7 +152,7 @@ void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly,
 }
 
 int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t poly,
-                           flint_rand_t state, slong len, slong max_attempts,
+                           flint_rand_ptr state, slong len, slong max_attempts,
                                                       const fmpz_mod_ctx_t ctx)
 {
     slong i = 0;
@@ -171,7 +171,7 @@ int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t poly,
 }
 
 int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly,
-                           flint_rand_t state, slong len, slong max_attempts,
+                           flint_rand_ptr state, slong len, slong max_attempts,
                                                       const fmpz_mod_ctx_t ctx)
 {
     slong i = 0;
@@ -190,7 +190,7 @@ int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly,
 }
 
 void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
-                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+                       flint_rand_ptr state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len < 3)
     {

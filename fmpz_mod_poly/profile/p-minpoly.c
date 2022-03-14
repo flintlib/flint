@@ -56,7 +56,7 @@
     (TIMEVAR) = ((double)timer->cpu) / (NUMEX * loops); \
 } while(0)
 
-void time_algs(double* times, flint_rand_t state,
+void time_algs(double* times, flint_rand_ptr state,
                                  const fmpz_mod_ctx_struct * primes, slong len)
 {
     fmpz_mod_poly_struct polys[NUMEX];
