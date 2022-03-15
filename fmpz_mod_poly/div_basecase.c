@@ -25,7 +25,9 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
 	TMP_START;
 	
     if (alloc)
+    {
         FMPZ_VEC_TMP_INIT(R, alloc);
+    }
 
 	if (R != A)
         _fmpz_vec_set(R + lenR, A + lenR, lenA - lenR);
@@ -56,7 +58,9 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
     }
 
     if (alloc)
+    {
         FMPZ_VEC_TMP_CLEAR(R, alloc);
+    }
 	
 	TMP_END;
 }
