@@ -150,6 +150,13 @@ _gr_qqbar_is_one(int * res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_qqbar_is_neg_one(int * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    res[0] = qqbar_is_neg_one(x);
+    return GR_SUCCESS;
+}
+
+int
 _gr_qqbar_equal(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     res[0] = qqbar_equal(x, y);
@@ -447,6 +454,45 @@ _gr_qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t exp, const gr_ctx_t ct
 }
 
 int
+_gr_qqbar_is_square(int * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (QQBAR_CTX(ctx)->real_only)
+        res[0] = (qqbar_sgn_re(x) >= 0);
+    else
+        res[0] = 1;
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_sqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (QQBAR_CTX(ctx)->real_only && qqbar_sgn_re(x) < 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_sqrt(res, x);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (qqbar_is_zero(x) || (QQBAR_CTX(ctx)->real_only && qqbar_sgn_re(x) < 0))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        qqbar_rsqrt(res, x);
+        return GR_SUCCESS;
+    }
+}
+
+int
 _gr_qqbar_ctx_clear(gr_ctx_t ctx)
 {
     flint_free(ctx->elem_ctx);
@@ -472,6 +518,7 @@ gr_method_tab_input qqbar_methods2[] =
     {GR_METHOD_ONE,             (gr_funcptr) _gr_qqbar_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_qqbar_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_qqbar_is_one},
+    {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_qqbar_is_neg_one},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_qqbar_equal},
 
     {GR_METHOD_SET,             (gr_funcptr) _gr_qqbar_set},
@@ -513,6 +560,10 @@ gr_method_tab_input qqbar_methods2[] =
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_qqbar_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_qqbar_pow_fmpz},
     {GR_METHOD_POW_FMPQ,        (gr_funcptr) _gr_qqbar_pow_fmpq},
+
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_qqbar_is_square},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_qqbar_sqrt},
+    {GR_METHOD_RSQRT,           (gr_funcptr) _gr_qqbar_rsqrt},
 
     {0,                         (gr_funcptr) NULL},
 };

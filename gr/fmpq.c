@@ -119,6 +119,13 @@ _gr_fmpq_is_one(int * res, const fmpq_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpq_is_neg_one(int * res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    res[0] = (*fmpq_numref(x) == -1) && fmpz_is_one(fmpq_denref(x));
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_equal(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     res[0] = fmpq_equal(x, y);
@@ -230,6 +237,49 @@ _gr_fmpq_pow_ui(fmpq_t res, const fmpq_t x, ulong exp, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fmpq_is_square(int * res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    res[0] = fmpz_is_square(fmpq_numref(x)) && fmpz_is_square(fmpq_denref(x));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_sqrt(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (fmpq_sgn(x) < 0)
+        return GR_DOMAIN;
+
+
+    if (fmpz_root(fmpq_numref(res), fmpq_numref(x), 2) &&
+        fmpz_root(fmpq_denref(res), fmpq_denref(x), 2))
+    {
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
+int
+_gr_fmpq_rsqrt(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (fmpq_sgn(x) <= 0)
+        return GR_DOMAIN;
+
+    if (fmpz_root(fmpq_numref(res), fmpq_numref(x), 2) &&
+        fmpz_root(fmpq_denref(res), fmpq_denref(x), 2))
+    {
+        fmpq_inv(res, res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
 int _fmpq_methods2_initialized = 0;
 gr_static_method_table _fmpq_static_table;
 gr_method_tab_t _fmpq_methods2;
@@ -246,6 +296,7 @@ gr_method_tab_input fmpq_methods2[] =
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fmpq_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpq_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpq_is_one},
+    {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpq_is_neg_one},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_fmpq_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fmpq_set_si},
@@ -262,6 +313,9 @@ gr_method_tab_input fmpq_methods2[] =
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpq_div},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpq_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_pow_ui},
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_is_square},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_sqrt},
+    {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpq_rsqrt},
     {0,                         (gr_funcptr) NULL},
 };
 

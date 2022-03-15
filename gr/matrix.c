@@ -86,6 +86,9 @@ gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
     return status;
 }
 
+/* todo: improve predicates (also for vector functions; can prove
+   inequality even if UNABLE for some elements) */
+
 int
 gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
@@ -140,6 +143,43 @@ gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
         {
             if (i == j)
                 status |= gr_is_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+            else
+                status |= gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+
+            equal = equal && this_equal;
+        }
+    }
+
+    res[0] = equal;
+    return status;
+}
+
+int
+gr_mat_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    int status, equal, this_equal;
+    slong i, j, r, c, sz;
+
+    status = GR_SUCCESS;
+
+    r = gr_mat_nrows(mat, ctx);
+    c = gr_mat_ncols(mat, ctx);
+
+    if (r == 0 || c == 0)
+    {
+        res[0] = 1;
+        return GR_SUCCESS;
+    }
+
+    sz = ctx->sizeof_elem;
+
+    equal = 1;
+    for (i = 0; i < r && equal; i++)
+    {
+        for (j = 0; j < c && equal; j++)
+        {
+            if (i == j)
+                status |= gr_is_neg_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
             else
                 status |= gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
 
@@ -658,6 +698,12 @@ matrix_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 }
 
 GR_INLINE int
+matrix_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return gr_mat_is_neg_one(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+GR_INLINE int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
@@ -699,6 +745,7 @@ gr_method_tab_input matrix_methods2[] =
     {GR_METHOD_ONE,         (gr_funcptr) matrix_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) matrix_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) matrix_is_one},
+    {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) matrix_is_neg_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) matrix_equal},
     {GR_METHOD_SET,         (gr_funcptr) matrix_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) matrix_set_ui},

@@ -2,6 +2,14 @@
 
 /* Generic arithmetic functions */
 
+int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
+{
+    int status;
+    status = gr_one(res, ctx);
+    status |= gr_neg(res, res, ctx);
+    return status;
+}
+
 int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
 {
     GR_TMP_START;
@@ -192,6 +200,58 @@ int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     GR_TMP_END;
     return status;
 }
+
+int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status, equal;
+
+    status = gr_is_one(&equal, x, ctx);
+    if (status == GR_SUCCESS && equal)
+        return gr_one(res, ctx);
+
+    status = gr_is_neg_one(&equal, x, ctx);
+    if (status == GR_SUCCESS && equal)
+        return gr_neg_one(res, ctx);
+
+    /* todo: dubious in the zero ring, if comparing with 1 above
+       somehow failed */
+    status = gr_is_zero(&equal, x, ctx);
+    if (status == GR_SUCCESS && equal)
+        return GR_DOMAIN;
+
+    return GR_UNABLE;
+}
+
+int gr_generic_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status, equal;
+
+    status = gr_is_one(&equal, x, ctx);
+    if (status == GR_SUCCESS && equal)
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    status = gr_is_neg_one(&equal, x, ctx);
+    if (status == GR_SUCCESS && equal)
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    /* todo: dubious in the zero ring, if comparing with 1 above
+       somehow failed */
+    status = gr_is_zero(&equal, x, ctx);
+    if (status == GR_SUCCESS && equal)
+    {
+        *res = 0;
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
 
 int gr_generic_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
@@ -455,6 +515,64 @@ gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
     else
         return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }
+
+int
+gr_generic_is_square(int * res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int is_zero, is_one;
+
+    if (gr_is_zero(&is_zero, x, ctx) == GR_SUCCESS && is_zero)
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    if (gr_is_one(&is_one, x, ctx) == GR_SUCCESS && is_one)
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int is_zero, is_one;
+
+    if (gr_is_zero(&is_zero, x, ctx) == GR_SUCCESS && is_zero)
+    {
+        gr_zero(res, ctx);
+        return GR_SUCCESS;
+    }
+
+    if (gr_is_one(&is_one, x, ctx) == GR_SUCCESS && is_one)
+    {
+        gr_one(res, ctx);
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int is_zero, is_one;
+
+    if (gr_is_zero(&is_zero, x, ctx) == GR_SUCCESS && is_zero)
+        return GR_DOMAIN;
+
+    if (gr_is_one(&is_one, x, ctx) == GR_SUCCESS && is_one)
+    {
+        gr_one(res, ctx);
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
 
 /* Generic vector functions */
 
@@ -825,6 +943,8 @@ const gr_method_tab_input gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
 
+    {GR_METHOD_NEG_ONE,                 (gr_funcptr) gr_generic_neg_one},
+
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
     {GR_METHOD_ADD_UI,                  (gr_funcptr) gr_generic_add_ui},
@@ -847,9 +967,16 @@ const gr_method_tab_input gr_generic_methods[] =
     {GR_METHOD_DIV_FMPZ,                (gr_funcptr) gr_generic_div_fmpz},
     {GR_METHOD_DIV_FMPQ,                (gr_funcptr) gr_generic_div_fmpq},
 
+    {GR_METHOD_IS_INVERTIBLE,           (gr_funcptr) gr_generic_is_invertible},
+    {GR_METHOD_INV,                     (gr_funcptr) gr_generic_inv},
+
     {GR_METHOD_POW_SI,                  (gr_funcptr) gr_generic_pow_si},
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},
     {GR_METHOD_POW_FMPZ,                (gr_funcptr) gr_generic_pow_fmpz},
+
+    {GR_METHOD_IS_SQUARE,               (gr_funcptr) gr_generic_is_square},
+    {GR_METHOD_SQRT,                    (gr_funcptr) gr_generic_sqrt},
+    {GR_METHOD_RSQRT,                   (gr_funcptr) gr_generic_rsqrt},
 
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},
     {GR_METHOD_VEC_CLEAR,               (gr_funcptr) gr_generic_vec_clear},

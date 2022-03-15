@@ -111,6 +111,13 @@ nmod8_is_one(int * res, const nmod8_t x, const gr_ctx_t ctx)
 }
 
 int
+nmod8_is_neg_one(int * res, const nmod8_t x, const gr_ctx_t ctx)
+{
+    res[0] = (x[0] == NMOD8_CTX(ctx).n - 1);
+    return GR_SUCCESS;
+}
+
+int
 nmod8_equal(int * res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     res[0] = (x[0] == y[0]);
@@ -238,6 +245,7 @@ gr_method_tab_input nmod8_methods2[] =
     {GR_METHOD_ONE,             (gr_funcptr) nmod8_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) nmod8_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) nmod8_is_one},
+    {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) nmod8_is_neg_one},
     {GR_METHOD_EQUAL,           (gr_funcptr) nmod8_equal},
     {GR_METHOD_SET,             (gr_funcptr) nmod8_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) nmod8_set_si},

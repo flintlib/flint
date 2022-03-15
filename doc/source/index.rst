@@ -249,32 +249,80 @@ Operations
 
 .. function:: int gr_ctx_clear(gr_ctx_t ctx)
 
+    Clears the ring context object *ctx*, freeing any memory
+    allocated by this object.
+
+    Some rings may require that no elements are cleared after calling
+    this method, and may leak memory if not all elements have
+    been cleared when calling this method.
+
+    If *ctx* is derived from a base ring, the base ring context
+    may also be required to stay alive until after this
+    method is called.
+
 .. function:: int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+
+    Writes a description of the ring *ctx* to the stream *out*.
 
 .. function:: int gr_init(gr_ptr res, gr_ctx_t ctx)
 
+    Initializes *res* to a valid variable and sets it to the
+    zero element of the ring *ctx*.
+
 .. function:: int gr_clear(gr_ptr res, gr_ctx_t ctx)
+
+    Clears *res*, freeing any memory allocated by this object.
 
 .. function:: int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
 
-.. function:: int gr_randtest(gr_ptr x, flint_rand_t state, const void * options, gr_ctx_t ctx)
+    Swaps *x* and *y* efficiently.
+
+.. function:: int gr_randtest(gr_ptr res, flint_rand_t state, const void * options, gr_ctx_t ctx)
+
+    Sets *res* to a random element of the ring.
 
 .. function:: int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
 
+    Writes a representation of *x* to the stream *out*.
+
 .. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
               int gr_one(gr_ptr res, gr_ctx_t ctx)
+              int gr_neg_one(gr_ptr res, gr_ctx_t ctx)
+
+    Sets *res* to the element 0, 1 or -1 of the ring.
 
 .. function:: int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to a copy of the element *x*.
 
 .. function:: int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx)
               int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
               int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
 
+    Sets *res* to the image of the integer or rational number *x*
+    in the ring *ctx*.
+    The *fmpq* method may return the flag ``GR_DOMAIN`` if the
+    denominator of *x* is not invertible.
+
 .. function:: int gr_is_zero(int * res, gr_srcptr x, gr_ctx_t ctx)
               int gr_is_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_is_neg_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to 1 if *x* is equal to the element 0, 1 or -1 of the
+    ring, respectively, and sets *res* to 0 otherwise.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the comparison.
 
 .. function:: int gr_equal(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to 1 if the elements *x* and *y* are equal,
+    and sets *res* to 0 otherwise.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the comparison.
+
+Arithmetic
+........................................................................
 
 .. function:: int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
@@ -296,11 +344,30 @@ Operations
               int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
+Division
+........................................................................
+
+The default implementations of the following methods check for divisors
+0, 1, -1 and otherwise return ``GR_UNABLE``.
+Particular rings should override the methods when an inversion
+or division algorithm is available.
+The base rings corresponding to
+the following types have complete algorithms
+to detect inverses and compute quotients: ``fmpq``, ``qqbar``, ``nmod8``.
+
 .. function:: int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+.. function:: int gr_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to 1 if *x* has a multiplicative inverse in the present ring
+    (i.e. if *x* is a unit),
+    and sets *res* to 0 if *x* does not have a multiplicative inverse.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the computation.
 
 .. function:: int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
@@ -310,12 +377,8 @@ Operations
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
 
-.. function:: int gr_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
-
-    Sets *res* to 1 if *x* has a multiplicative inverse in the present ring,
-    and sets *res* to 0 if *x* does not have a multiplicative inverse.
-    Returns the flag ``GR_UNABLE`` if the implementation is unable
-    to perform the computation.
+Powering
+........................................................................
 
 .. function:: int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
@@ -330,6 +393,38 @@ Operations
 
     Default implementations of the powering methods support raising
     elements to integer powers using a generic implementation of
-    exponentiation by squaring. User-defined rings
-    may override these methods with faster versions or
-    to support more general notions of exponentiation.
+    exponentiation by squaring. Particular rings
+    should override these methods with faster versions or
+    to support more general notions of exponentiation when possible.
+
+Square roots
+........................................................................
+
+The default implementations of the following methods check for the
+elements 0 and 1 and otherwise return ``GR_UNABLE``.
+Particular rings should override the methods when a square
+root algorithm is available.
+The base rings corresponding to
+the following types have complete algorithms
+to detect squares and compute square roots: ``fmpq``, ``qqbar``.
+
+In subrings of `\mathbb{C}`, it is implied that the principal
+square root is computed; in other cases (e.g. in finite fields),
+the choice of root is implementation-dependent.
+
+.. function:: int gr_is_square(int * res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to 1 if *x* is a perfect square in the present ring,
+    and sets *res* to 0 if *x* it not a perfect square.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the computation.
+
+.. function:: int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to a square root of *x* (respectively reciprocal
+    square root) in the present ring, if such an element exists.
+    Returns the flag ``GR_DOMAIN`` if *x* is not a perfect square
+    (also for zero, when computing the reciprocal square root), or
+    ``GR_UNABLE`` if the implementation is unable to perform
+    the computation.

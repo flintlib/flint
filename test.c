@@ -302,6 +302,13 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int verbose)
     if (status == GR_SUCCESS && !equal)
         status = GR_WRONG;
 
+    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_one(a, R);
+    status |= gr_neg(a, a, R);
+    status |= gr_is_neg_one(&equal, a, R);
+    if (status == GR_SUCCESS && !equal)
+        status = GR_WRONG;
+
     GR_TMP_CLEAR1(a, R);
 
     GR_TMP_END;
