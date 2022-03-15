@@ -47,13 +47,6 @@ typedef struct
 
 typedef fmpz_mat_struct fmpz_mat_t[1];
 
-/* used for column partitioning, used by van Hoeij poly factoring */
-typedef struct
-{
-   ulong col;
-   ulong hash;
-} col_hash_t;
-
 /* Element access  ********************************************************/
 
 FMPZ_MAT_INLINE
