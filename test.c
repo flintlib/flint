@@ -716,6 +716,86 @@ gr_test_inv_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
 }
 
 int
+gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int verbose)
+{
+    int status, equal;
+    GR_TMP_START;
+    gr_ptr x, y, xy, xyy;
+
+    GR_TMP_INIT4(x, y, xy, xyy, R);
+
+    gr_randtest(x, state, NULL, R);
+    gr_randtest(y, state, NULL, R);
+    gr_randtest(xy, state, NULL, R);
+    gr_randtest(xyy, state, NULL, R);
+
+    status = GR_SUCCESS;
+    status |= gr_div(xy, x, y, R);
+    status |= gr_mul(xyy, xy, y, R);
+    status |= gr_equal(&equal, x, xyy, R);
+
+    if (status == GR_SUCCESS && !equal)
+    {
+        status = GR_WRONG;
+    }
+
+    if (verbose || status == GR_WRONG)
+    {
+        printf("\n");
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("x / y = \n"); gr_println(xy, R);
+        printf("(x / y) * y = \n"); gr_println(xyy, R);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR4(x, y, xy, xyy, R);
+    GR_TMP_END;
+
+    return status;
+}
+
+int
+gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int verbose)
+{
+    int status, equal;
+    GR_TMP_START;
+    gr_ptr x, y, xy, xyy;
+
+    GR_TMP_INIT4(x, y, xy, xyy, R);
+
+    gr_randtest(x, state, NULL, R);
+    gr_randtest(y, state, NULL, R);
+    gr_randtest(xy, state, NULL, R);
+    gr_randtest(xyy, state, NULL, R);
+
+    status = GR_SUCCESS;
+    status |= gr_mul(xy, x, y, R);
+    status |= gr_div(xyy, xy, y, R);
+    status |= gr_equal(&equal, x, xyy, R);
+
+    if (status == GR_SUCCESS && !equal)
+    {
+        status = GR_WRONG;
+    }
+
+    if (verbose || status == GR_WRONG)
+    {
+        printf("\n");
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("x * y = \n"); gr_println(xy, R);
+        printf("(x * y) / y = \n"); gr_println(xyy, R);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR4(x, y, xy, xyy, R);
+    GR_TMP_END;
+
+    return status;
+}
+
+int
 gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
@@ -1231,6 +1311,9 @@ gr_test_ring(gr_ctx_t R, slong iters)
         gr_test_iter(R, state, "mul: commutativity", gr_test_mul_commutativity, iters);
     gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters);
 
+    gr_test_iter(R, state, "div: div then mul", gr_test_div_then_mul, iters);
+    gr_test_iter(R, state, "div: mul then div", gr_test_mul_then_div, iters);
+
     gr_test_iter(R, state, "inv: multiplication", gr_test_inv_multiplication, iters);
     gr_test_iter(R, state, "inv: involution", gr_test_inv_involution, iters);
 
@@ -1258,11 +1341,20 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
 int main()
 {
+    gr_ctx_t ZZ, MZZ;
     gr_ctx_t QQbar, QQbar_real;
-    gr_ctx_t QQ;
-    gr_ctx_t MQQ;
+    gr_ctx_t QQ, MQQ;
     gr_ctx_t Zn;
     gr_ctx_t MZn;
+
+    gr_ctx_init_fmpz(ZZ);
+    ZZ->size_limit = 1000;
+    gr_test_ring(ZZ, 10000);
+    gr_ctx_init_matrix(MZZ, ZZ, 4);
+    MZZ->size_limit = 10;
+    gr_test_ring(MZZ, 10);
+    gr_ctx_clear(MZZ);
+    gr_ctx_clear(ZZ);
 
     gr_ctx_init_fmpq(QQ);
     QQ->size_limit = 1000;
@@ -1270,7 +1362,6 @@ int main()
     gr_ctx_init_matrix(MQQ, QQ, 4);
     MQQ->size_limit = 10;
     gr_test_ring(MQQ, 10);
-
     gr_ctx_clear(QQ);
     gr_ctx_clear(MQQ);
 

@@ -677,6 +677,7 @@ int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_
 /* Some base rings */
 
 
+void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 

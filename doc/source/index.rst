@@ -217,6 +217,11 @@ Ring constructions
 Builtin base rings
 ...............................................................................
 
+.. function:: void gr_ctx_init_fmpz(gr_ctx_t ctx)
+
+    Initializes *ctx* to the ring of integers
+    `\mathbb{Z}` with elements of type :type:`fmpz`.
+
 .. function:: void gr_ctx_init_fmpq(gr_ctx_t ctx)
 
     Initializes *ctx* to the field of rational numbers
@@ -359,7 +364,7 @@ Particular rings should override the methods when an inversion
 or division algorithm is available.
 The base rings corresponding to
 the following types have complete algorithms
-to detect inverses and compute quotients: ``fmpq``, ``qqbar``, ``nmod8``.
+to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8``.
 
 .. function:: int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
@@ -429,7 +434,7 @@ Particular rings should override the methods when a square
 root algorithm is available.
 The base rings corresponding to
 the following types have complete algorithms
-to detect squares and compute square roots: ``fmpq``, ``qqbar``.
+to detect squares and compute square roots: ``fmpz``, ``fmpq``, ``qqbar``.
 
 In subrings of `\mathbb{C}`, it is implied that the principal
 square root is computed; in other cases (e.g. in finite fields),
