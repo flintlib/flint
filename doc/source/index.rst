@@ -249,7 +249,7 @@ Derived rings
     over the given *base_ring*.
     Elements have type :type:`gr_mat_struct`.
 
-Operations
+Context operations
 -------------------------------------------------------------------------------
 
 .. function:: int gr_ctx_clear(gr_ctx_t ctx)
@@ -269,6 +269,12 @@ Operations
 
     Writes a description of the ring *ctx* to the stream *out*.
 
+Element operations
+--------------------------------------------------------------------------------
+
+Memory management
+................................................................................
+
 .. function:: int gr_init(gr_ptr res, gr_ctx_t ctx)
 
     Initializes *res* to a valid variable and sets it to the
@@ -277,6 +283,68 @@ Operations
 .. function:: int gr_clear(gr_ptr res, gr_ctx_t ctx)
 
     Clears *res*, freeing any memory allocated by this object.
+
+The following macros support allocating temporary variables efficiently.
+Data will be allocated on the stack using ``alloca`` unless
+the size is excessive (risking stack overflow), in which case
+the implementation transparently switches to ``malloc``/``free``
+instead. The usage pattern is as follows::
+
+    {
+        gr_ptr x, y;
+        GR_TMP_START;
+
+        GR_TMP_INIT2(x1, x2, ctx);
+
+        /* do computations with x1, x2 */
+
+        GR_TMP_CLEAR2(x1, x2, ctx);
+        GR_TMP_END;
+    }
+
+Temporary allocations must be enclosed by the ``GR_TMP_START`` and
+``GR_TMP_END`` markers, which should only occur
+once in a block. In between, there
+may be multiple calls to different init macros with matching clear
+macros.
+*Warning:* never use these macros inside a loop.
+This is likely to overflow the stack, as memory will not
+be reclaimed until the function exits.
+Instead, allocate the needed space before entering
+any loops, or allocate the memory on the heap if needed.
+
+.. macro:: GR_TMP_START
+           GR_TMP_END
+
+    Markers for a block of temporary allocations.
+
+.. macro:: GR_TMP_INIT_VEC(vec, len, ctx)
+           GR_TMP_CLEAR_VEC(vec, len, ctx)
+
+    Allocates and frees a vector of *len* contiguous elements, all
+    initialized to the value 0, assigning the first element
+    to the pointer *vec*.
+
+.. macro:: GR_TMP_INIT1(x1, ctx)
+           GR_TMP_INIT2(x1, x2, ctx)
+           GR_TMP_INIT3(x1, x2, x3, ctx)
+           GR_TMP_INIT4(x1, x2, x3, x4, ctx)
+           GR_TMP_INIT5(x1, x2, x3, x4, x5, ctx)
+
+    Allocates one or several temporary elements, all
+    initialized to the value 0, assigning the elements
+    to the pointers *x1*, *x2*, etc.
+
+.. macro:: GR_TMP_CLEAR1(x1, ctx)
+           GR_TMP_CLEAR2(x1, x2, ctx)
+           GR_TMP_CLEAR3(x1, x2, x3, ctx)
+           GR_TMP_CLEAR4(x1, x2, x3, x4, ctx)
+           GR_TMP_CLEAR5(x1, x2, x3, x4, x5, ctx)
+
+    Corresponding macros to clear temporary variables.
+
+Basic functions
+................................................................................
 
 .. function:: int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
 
@@ -456,3 +524,52 @@ the choice of root is implementation-dependent.
     (also for zero, when computing the reciprocal square root), or
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
+
+Vector operations
+--------------------------------------------------------------------------------
+
+.. macro:: GR_ENTRY(vec, i, size)
+
+    Macro to access the *i*-th entry of a ``gr_ptr`` or ``gr_srcptr``
+    vector *vec*, where each element is ``size`` bytes.
+
+.. function:: int _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
+
+    Initialize *len* elements of *vec* to the value 0.
+    The pointer *vec* must already refer to allocated memory.
+
+.. function:: int _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
+
+    Clears *len* elements of *vec*.
+    This frees memory allocated by individual elements, but
+    does not free the memory allocated by *vec* itself.
+
+.. function:: int _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
+
+    Swap the entries of *vec1* and *vec2*.
+
+.. function:: int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
