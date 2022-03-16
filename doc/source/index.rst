@@ -324,6 +324,12 @@ Operations
 Arithmetic
 ........................................................................
 
+User-defined rings should supply ``neg``, ``add``, ``sub``
+and ``mul`` methods; the variants with other operand types
+have generic fallbacks that may be overridden for performance.
+The ``fmpq`` versions may return ``GR_DOMAIN`` if the denominator
+is not invertible.
+
 .. function:: int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
 .. function:: int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
@@ -361,6 +367,19 @@ to detect inverses and compute quotients: ``fmpq``, ``qqbar``, ``nmod8``.
               int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
+    Sets *res* to the quotient `x / y` if such an element exists
+    in the present ring. Returns the flag ``GR_DOMAIN`` if no such
+    quotient exists.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the computation.
+
+    When the ring is not a field, the definition of division may
+    vary depending on the ring. A ring implementation may define
+    `x / y = x y^{-1}` and return ``GR_DOMAIN`` when `y^{-1}` does not
+    exist; alternatively, it may attempt to solve the equation
+    `q y = x` (which, for example, gives the usual exact
+    division in `\mathbb{Z}`).
+
 .. function:: int gr_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
 
     Sets *res* to 1 if *x* has a multiplicative inverse in the present ring
@@ -386,10 +405,14 @@ Powering
               int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
-    Sets *res* to the power `x ^ y`.
+    Sets *res* to the power `x ^ y`, the interpretation of which
+    depends on the ring when `y \not \in \mathbb{Z}`.
     Returns the flag ``GR_DOMAIN`` if this power cannot be assigned
     a meaningful value in the present ring, or ``GR_UNABLE`` if
     the implementation is unable to perform the computation.
+
+    For subrings of `\mathbb{C}`, it is implied that the principal
+    power `x^y = \exp(y \log(x))` is computed for `x \ne 0`.
 
     Default implementations of the powering methods support raising
     elements to integer powers using a generic implementation of
