@@ -6,8 +6,8 @@ int
 gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t), flint_rand_t state, int verbose)
 {
     int status, equal, alias;
-    GR_TMP_START;
     gr_ptr x, y, xy1, xy2;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xy1, xy2, R);
 
@@ -76,12 +76,12 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
     flint_rand_t state, int verbose)
 {
     int status, equal, alias, which;
-    GR_TMP_START;
     gr_ptr x, y, xy1, xy2;
     ulong uy;
     slong sy;
     fmpz_t zy;
     fmpq_t qy;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xy1, xy2, R);
     fmpz_init(zy);
@@ -198,8 +198,8 @@ int
 gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status;
-    GR_TMP_START;
     gr_ptr a, b, c, d, e;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -242,9 +242,9 @@ int
 gr_test_swap(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status;
-    GR_TMP_START;
     gr_ptr a, b, c, d;
     int equal0, equal1, equal2, equal3, equal4;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -282,9 +282,9 @@ int
 gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status;
-    GR_TMP_START;
     gr_ptr a;
     int equal;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -320,9 +320,9 @@ int
 gr_test_add_associativity(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, z;
     gr_ptr xy, yz, xy_z, x_yz;
+    GR_TMP_START;
 
     GR_TMP_INIT3(x, y, z, R);
     GR_TMP_INIT4(xy, yz, xy_z, x_yz, R);
@@ -369,8 +369,8 @@ int
 gr_test_neg(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, xy;
+    GR_TMP_START;
 
     GR_TMP_INIT3(x, y, xy, R);
 
@@ -420,8 +420,8 @@ int
 gr_test_add_commutativity(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, xy, yx;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xy, yx, R);
 
@@ -472,8 +472,8 @@ int
 gr_test_sub_equal_neg_add(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, neg_y, x_sub_y, x_neg_y;
+    GR_TMP_START;
 
     GR_TMP_INIT5(x, y, neg_y, x_sub_y, x_neg_y, R);
 
@@ -530,9 +530,9 @@ int
 gr_test_mul_associativity(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, z;
     gr_ptr xy, yz, xy_z, x_yz;
+    GR_TMP_START;
 
     GR_TMP_INIT3(x, y, z, R);
     GR_TMP_INIT4(xy, yz, xy_z, x_yz, R);
@@ -579,8 +579,8 @@ int
 gr_test_mul_commutativity(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, xy, yx;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xy, yx, R);
 
@@ -639,8 +639,8 @@ int
 gr_test_inv_involution(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, x_inv, x_inv_inv;
+    GR_TMP_START;
 
     GR_TMP_INIT3(x, x_inv, x_inv_inv, R);
 
@@ -677,8 +677,8 @@ int
 gr_test_inv_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal1, equal2;
-    GR_TMP_START;
     gr_ptr x, x_inv, x_inv_x, x_x_inv;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, x_inv, x_inv_x, x_x_inv, R);
 
@@ -719,8 +719,8 @@ int
 gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, xy, xyy;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xy, xyy, R);
 
@@ -759,8 +759,8 @@ int
 gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     gr_ptr x, y, xy, xyy;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xy, xyy, R);
 
@@ -799,9 +799,9 @@ int
 gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     ulong a, b;
     gr_ptr x, xa, xb, xab, xaxb;
+    GR_TMP_START;
 
     GR_TMP_INIT5(x, xa, xb, xab, xaxb, R);
 
@@ -860,10 +860,10 @@ int
 gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     ulong a;
     slong y;
     gr_ptr x, xa, ya, xya, xaya;
+    GR_TMP_START;
 
     GR_TMP_INIT3(x, xa, ya, R);
     GR_TMP_INIT2(xya, xaya, R);
@@ -919,9 +919,9 @@ int
 gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     ulong a;
     gr_ptr x, y, xa, ya, xya, xaya;
+    GR_TMP_START;
 
     GR_TMP_INIT4(x, y, xa, ya, R);
     GR_TMP_INIT2(xya, xaya, R);
@@ -974,9 +974,9 @@ int
 gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     ulong a;
     gr_ptr x, xa1, xa2;
+    GR_TMP_START;
 
     GR_TMP_INIT3(x, xa1, xa2, R);
 
@@ -1020,9 +1020,9 @@ int
 gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, equal;
-    GR_TMP_START;
     fmpz_t a, b, ab;
     gr_ptr x, xa, xb, xab, xaxb;
+    GR_TMP_START;
 
     GR_TMP_INIT5(x, xa, xb, xab, xaxb, R);
 
@@ -1090,8 +1090,8 @@ gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int verbose)
 {
     int status, aliasing, equal;
     slong i, len;
-    GR_TMP_START;
     gr_ptr x, y, xy1, xy2;
+    GR_TMP_START;
 
     len = n_randint(state, 10);
 

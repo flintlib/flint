@@ -256,7 +256,7 @@ typedef enum
     GR_METHOD_VEC_DOT,
     GR_METHOD_VEC_DOT_REV,
 
-    GR_METHOD_TAB_SIZE,
+    GR_METHOD_TAB_SIZE
 }
 gr_method;
 

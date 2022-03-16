@@ -12,9 +12,9 @@ int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
 
 int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t, u;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -36,9 +36,9 @@ int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
 
 int gr_generic_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -78,9 +78,9 @@ int gr_generic_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
 
 int gr_generic_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -142,9 +142,9 @@ int gr_generic_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
 int gr_generic_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -184,9 +184,9 @@ int gr_generic_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
 
 int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -255,9 +255,9 @@ int gr_generic_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
 
 int gr_generic_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -297,9 +297,9 @@ int gr_generic_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
 
 int gr_generic_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t;
     int status;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -384,12 +384,12 @@ gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_
 static int
 gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     gr_ptr t, u;
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
     int status;
     slong i;
+    GR_TMP_START;
 
     status = GR_SUCCESS;
 
@@ -699,10 +699,10 @@ gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx
 int
 gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     int status;
     slong i, sz;
     gr_ptr t;
+    GR_TMP_START;
 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
@@ -723,10 +723,10 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
 int
 gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     int status;
     slong i, sz;
     gr_ptr t;
+    GR_TMP_START;
 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
@@ -747,10 +747,10 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
 int
 gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     int status;
     slong i, sz;
     gr_ptr t;
+    GR_TMP_START;
 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
@@ -771,10 +771,10 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
 int
 gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     int status;
     slong i, sz;
     gr_ptr t;
+    GR_TMP_START;
 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
@@ -835,10 +835,10 @@ gr_generic_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     int status;
     slong i, sz;
     gr_ptr t;
+    GR_TMP_START;
 
     if (len <= 0)
     {
@@ -885,10 +885,10 @@ gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, 
 int
 gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    GR_TMP_START;
     int status;
     slong i, sz;
     gr_ptr t;
+    GR_TMP_START;
 
     if (len <= 0)
     {
