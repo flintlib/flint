@@ -167,12 +167,14 @@ Main types
 
 .. type:: gr_ptr
 
-    Pointer to a ring element. This is an alias for ``void *``
-    so that it can be used with any C type.
+    Pointer to a ring element or array of contiguous ring elements.
+    This is an alias for ``void *`` so that it can be used with any
+    C type.
 
 .. type:: gr_srcptr
 
-    Pointer to a read-only ring element. This is an alias for
+    Pointer to a read-only ring element or read-only array of
+    contiguous ring elements. This is an alias for
     ``const void *`` so that it can be used with any C type.
 
 .. type:: gr_ctx_struct
@@ -266,8 +268,12 @@ Context operations
     method is called.
 
 .. function:: int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+              int gr_ctx_print(gr_ctx_t ctx)
+              int gr_ctx_println(gr_ctx_t ctx)
 
-    Writes a description of the ring *ctx* to the stream *out*.
+    Writes a description of the ring *ctx* to the stream *out*,
+    or prints it to *stdout*. The *println* version prints a trailing
+    newline.
 
 Element operations
 --------------------------------------------------------------------------------
@@ -307,11 +313,12 @@ Temporary allocations must be enclosed by the ``GR_TMP_START`` and
 once in a block. In between, there
 may be multiple calls to different init macros with matching clear
 macros.
-*Warning:* never use these macros inside a loop.
+*Warning:* never use these macros directly inside a loop.
 This is likely to overflow the stack, as memory will not
 be reclaimed until the function exits.
 Instead, allocate the needed space before entering
-any loops, or allocate the memory on the heap if needed.
+any loops, move the loop body to a separate function,
+or allocate the memory on the heap if needed.
 
 .. macro:: GR_TMP_START
            GR_TMP_END
@@ -355,8 +362,12 @@ Basic functions
     Sets *res* to a random element of the ring.
 
 .. function:: int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
+              int gr_print(gr_srcptr x, gr_ctx_t ctx)
+              int gr_println(gr_srcptr x, gr_ctx_t ctx)
 
-    Writes a representation of *x* to the stream *out*.
+    Writes a description of the element *x* to the stream *out*,
+    or prints it to *stdout*. The *println* version prints a trailing
+    newline.
 
 .. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
               int gr_one(gr_ptr res, gr_ctx_t ctx)
@@ -548,6 +559,8 @@ Vector operations
 
     Swap the entries of *vec1* and *vec2*.
 
+.. function:: int _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_ctx_t ctx)
+
 .. function:: int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
@@ -573,3 +586,29 @@ Vector operations
 .. function:: int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+
+Implementing rings
+--------------------------------------------------------------------------------
+
+.. type:: gr_funcptr
+
+    Typedef for a pointer to a function with signature ``int func(void)``,
+    used to represent method table entries.
+
+.. type:: gr_method
+
+    Enumeration type for indexing method tables. Enum values named
+    ``GR_METHOD_INIT``,  ``GR_METHOD_ADD_UI``, etc.
+    correspond to methods ``gr_init``, ``gr_add_ui``, etc.
+    The number of methods is given by ``GR_METHOD_TAB_SIZE``,
+    which can be used to declare static method tables.
+
+.. type:: gr_static_method_table
+
+    Typedef for an array of length ``GR_METHOD_TAB_SIZE``
+    with :type:`gr_funcptr` entries.
+
+.. function:: int gr_not_implemented(void)
+
+    This function does nothing and returns ``GR_UNABLE``. It is used
+    as a generic fallback method when no implementation is available.

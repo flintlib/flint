@@ -579,6 +579,7 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 int
 gr_generic_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
 {
+    gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT);
     int status;
     slong i, sz;
 
@@ -586,7 +587,7 @@ gr_generic_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_init(GR_ENTRY(vec, i, sz), ctx);
+        status |= init(GR_ENTRY(vec, i, sz), ctx);
 
     return status;
 }
@@ -594,6 +595,7 @@ gr_generic_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
 {
+    gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR);
     int status;
     slong i, sz;
 
@@ -601,7 +603,7 @@ gr_generic_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_clear(GR_ENTRY(vec, i, sz), ctx);
+        status |= clear(GR_ENTRY(vec, i, sz), ctx);
 
     return status;
 }
@@ -609,6 +611,7 @@ gr_generic_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
 {
+    gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
     int status;
     slong i, sz;
 
@@ -616,7 +619,7 @@ gr_generic_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_swap(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
+        status |= swap(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
 
     return status;
 }
@@ -624,6 +627,7 @@ gr_generic_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx)
 {
+    gr_method_constant_op zero = GR_CONSTANT_OP(ctx, ZERO);
     int status;
     slong i, sz;
 
@@ -631,7 +635,7 @@ gr_generic_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_zero(GR_ENTRY(vec, i, sz), ctx);
+        status |= zero(GR_ENTRY(vec, i, sz), ctx);
 
     return status;
 }
@@ -639,6 +643,7 @@ gr_generic_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
 {
+    gr_method_unary_op set = GR_UNARY_OP(ctx, SET);
     int status;
     slong i, sz;
 
@@ -646,7 +651,7 @@ gr_generic_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_set(GR_ENTRY(res, i, sz), GR_ENTRY(src, i, sz), ctx);
+        status |= set(GR_ENTRY(res, i, sz), GR_ENTRY(src, i, sz), ctx);
 
     return status;
 }
@@ -654,6 +659,7 @@ gr_generic_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
 {
+    gr_method_unary_op neg = GR_UNARY_OP(ctx, NEG);
     int status;
     slong i, sz;
 
@@ -661,7 +667,7 @@ gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_neg(GR_ENTRY(res, i, sz), GR_ENTRY(src, i, sz), ctx);
+        status |= neg(GR_ENTRY(res, i, sz), GR_ENTRY(src, i, sz), ctx);
 
     return status;
 }
@@ -669,6 +675,7 @@ gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
 int
 gr_generic_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
 {
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
     int status;
     slong i, sz;
 
@@ -676,7 +683,7 @@ gr_generic_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_add(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
+        status |= add(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
 
     return status;
 }
@@ -684,6 +691,7 @@ gr_generic_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx
 int
 gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
 {
+    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
     int status;
     slong i, sz;
 
@@ -691,7 +699,7 @@ gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx
     status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= gr_sub(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
+        status |= sub(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
 
     return status;
 }
@@ -699,6 +707,8 @@ gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx
 int
 gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
     int status;
     slong i, sz;
     gr_ptr t;
@@ -711,8 +721,8 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
 
     for (i = 0; i < len; i++)
     {
-        status |= gr_mul(t, GR_ENTRY(vec2, i, sz), c, ctx);
-        status |= gr_add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
+        status |= mul(t, GR_ENTRY(vec2, i, sz), c, ctx);
+        status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
     GR_TMP_CLEAR1(t, ctx);
@@ -723,6 +733,8 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
 int
 gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
     int status;
     slong i, sz;
     gr_ptr t;
@@ -735,8 +747,8 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
 
     for (i = 0; i < len; i++)
     {
-        status |= gr_mul(t, GR_ENTRY(vec2, i, sz), c, ctx);
-        status |= gr_sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
+        status |= mul(t, GR_ENTRY(vec2, i, sz), c, ctx);
+        status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
     GR_TMP_CLEAR1(t, ctx);
@@ -747,6 +759,8 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
 int
 gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
+    gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
     int status;
     slong i, sz;
     gr_ptr t;
@@ -759,8 +773,8 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
 
     for (i = 0; i < len; i++)
     {
-        status |= gr_mul_si(t, GR_ENTRY(vec2, i, sz), c, ctx);
-        status |= gr_add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
+        status |= mul_si(t, GR_ENTRY(vec2, i, sz), c, ctx);
+        status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
     GR_TMP_CLEAR1(t, ctx);
@@ -771,6 +785,8 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
 int
 gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
+    gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
+    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
     int status;
     slong i, sz;
     gr_ptr t;
@@ -783,8 +799,8 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
 
     for (i = 0; i < len; i++)
     {
-        status |= gr_mul_si(t, GR_ENTRY(vec2, i, sz), c, ctx);
-        status |= gr_sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
+        status |= mul_si(t, GR_ENTRY(vec2, i, sz), c, ctx);
+        status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
     GR_TMP_CLEAR1(t, ctx);
@@ -795,46 +811,71 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
 int
 gr_generic_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    int status, equal, this_equal;
+    gr_method_binary_predicate equal = GR_BINARY_PREDICATE(ctx, EQUAL);
+    int status, eq, this_eq, this_status;
     slong i, sz;
 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    equal = 1;
-    for (i = 0; i < len && equal; i++)
+    eq = 1;
+    for (i = 0; i < len; i++)
     {
-        status |= gr_equal(&this_equal, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
-        equal = equal && this_equal;
+        this_status = equal(&this_eq, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
+
+        if (this_status == GR_SUCCESS && !this_eq)
+        {
+            eq = 0;
+            status = GR_SUCCESS;
+            break;
+        }
+        else
+        {
+            status |= this_status;
+        }
     }
 
-    res[0] = equal;
+    res[0] = eq;
     return status;
 }
 
 int
 gr_generic_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 {
-    int status, equal, this_equal;
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
+    int status, eq, this_eq, this_status;
     slong i, sz;
 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    equal = 1;
-    for (i = 0; i < len && equal; i++)
+    eq = 1;
+    for (i = 0; i < len; i++)
     {
-        status |= gr_is_zero(&this_equal, GR_ENTRY(vec, i, sz), ctx);
-        equal = equal && this_equal;
+        this_status = is_zero(&this_eq, GR_ENTRY(vec, i, sz), ctx);
+
+        if (this_status == GR_SUCCESS && !this_eq)
+        {
+            eq = 0;
+            status = GR_SUCCESS;
+            break;
+        }
+        else
+        {
+            status |= this_status;
+        }
     }
 
-    res[0] = equal;
+    res[0] = eq;
     return status;
+
 }
 
 int
 gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
     int status;
     slong i, sz;
     gr_ptr t;
@@ -855,7 +896,7 @@ gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, 
 
     if (initial == NULL)
     {
-        status |= gr_mul(res, vec1, vec2, ctx);
+        status |= mul(res, vec1, vec2, ctx);
     }
     else
     {
@@ -864,14 +905,14 @@ gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, 
         else
             status |= gr_set(res, initial, ctx);
 
-        status |= gr_mul(t, vec1, vec2, ctx);
-        status |= gr_add(res, res, t, ctx);
+        status |= mul(t, vec1, vec2, ctx);
+        status |= add(res, res, t, ctx);
     }
 
     for (i = 1; i < len; i++)
     {
-        status |= gr_mul(t, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
-        status |= gr_add(res, res, t, ctx);
+        status |= mul(t, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
+        status |= add(res, res, t, ctx);
     }
 
     if (subtract)
@@ -885,6 +926,8 @@ gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, 
 int
 gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
     int status;
     slong i, sz;
     gr_ptr t;
@@ -905,7 +948,7 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
 
     if (initial == NULL)
     {
-        status |= gr_mul(res, vec1, GR_ENTRY(vec2, len - 1, sz), ctx);
+        status |= mul(res, vec1, GR_ENTRY(vec2, len - 1, sz), ctx);
     }
     else
     {
@@ -914,14 +957,14 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
         else
             status |= gr_set(res, initial, ctx);
 
-        status |= gr_mul(t, vec1, GR_ENTRY(vec2, len - 1, sz), ctx);
-        status |= gr_add(res, res, t, ctx);
+        status |= mul(t, vec1, GR_ENTRY(vec2, len - 1, sz), ctx);
+        status |= add(res, res, t, ctx);
     }
 
     for (i = 1; i < len; i++)
     {
-        status |= gr_mul(t, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, len - 1 - i, sz), ctx);
-        status |= gr_add(res, res, t, ctx);
+        status |= mul(t, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, len - 1 - i, sz), ctx);
+        status |= add(res, res, t, ctx);
     }
 
     if (subtract)

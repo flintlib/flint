@@ -86,13 +86,10 @@ gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
     return status;
 }
 
-/* todo: improve predicates (also for vector functions; can prove
-   inequality even if UNABLE for some elements) */
-
 int
 gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
-    int status, equal, this_equal;
+    int status, equal, this_status, this_equal;
     slong i, r, c;
 
     status = GR_SUCCESS;
@@ -107,10 +104,20 @@ gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
     }
 
     equal = 1;
-    for (i = 0; i < r && equal; i++)
+    for (i = 0; i < r; i++)
     {
         status |= _gr_vec_is_zero(&this_equal, mat->rows[i], c, ctx);
-        equal = equal && this_equal;
+
+        if (this_status == GR_SUCCESS && !this_equal)
+        {
+            equal = 0;
+            status = GR_SUCCESS;
+            break;
+        }
+        else
+        {
+            status |= status;
+        }
     }
 
     res[0] = equal;
@@ -120,7 +127,7 @@ gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 int
 gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
-    int status, equal, this_equal;
+    int status, equal, this_status, this_equal;
     slong i, j, r, c, sz;
 
     status = GR_SUCCESS;
@@ -137,16 +144,25 @@ gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
     sz = ctx->sizeof_elem;
 
     equal = 1;
-    for (i = 0; i < r && equal; i++)
+    for (i = 0; i < r; i++)
     {
-        for (j = 0; j < c && equal; j++)
+        for (j = 0; j < c; j++)
         {
             if (i == j)
-                status |= gr_is_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_status = gr_is_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
             else
-                status |= gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_status = gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
 
-            equal = equal && this_equal;
+            if (this_status == GR_SUCCESS && !this_equal)
+            {
+                equal = 0;
+                status = GR_SUCCESS;
+                break;
+            }
+            else
+            {
+                status |= status;
+            }
         }
     }
 
@@ -157,7 +173,7 @@ gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 int
 gr_mat_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
-    int status, equal, this_equal;
+    int status, equal, this_status, this_equal;
     slong i, j, r, c, sz;
 
     status = GR_SUCCESS;
@@ -174,16 +190,25 @@ gr_mat_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
     sz = ctx->sizeof_elem;
 
     equal = 1;
-    for (i = 0; i < r && equal; i++)
+    for (i = 0; i < r; i++)
     {
-        for (j = 0; j < c && equal; j++)
+        for (j = 0; j < c; j++)
         {
             if (i == j)
-                status |= gr_is_neg_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_status = gr_is_neg_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
             else
-                status |= gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_status = gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
 
-            equal = equal && this_equal;
+            if (this_status == GR_SUCCESS && !this_equal)
+            {
+                equal = 0;
+                status = GR_SUCCESS;
+                break;
+            }
+            else
+            {
+                status |= status;
+            }
         }
     }
 
@@ -194,7 +219,7 @@ gr_mat_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 int
 gr_mat_equal(int * res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
-    int status, equal, this_equal;
+    int status, equal, this_equal, this_status;
     slong i, r, c;
 
     status = GR_SUCCESS;
@@ -218,8 +243,18 @@ gr_mat_equal(int * res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     equal = 1;
     for (i = 0; i < r; i++)
     {
-        status |= _gr_vec_equal(&this_equal, mat1->rows[i], mat2->rows[i], c, ctx);
-        equal = equal && this_equal;
+        this_status = _gr_vec_equal(&this_equal, mat1->rows[i], mat2->rows[i], c, ctx);
+
+        if (this_status == GR_SUCCESS && !this_equal)
+        {
+            equal = 0;
+            status = GR_SUCCESS;
+            break;
+        }
+        else
+        {
+            status |= status;
+        }
     }
 
     res[0] = equal;
