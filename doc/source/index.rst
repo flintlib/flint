@@ -162,6 +162,11 @@ code (we might want to wrap such functions in asserts).
 Flags can be OR'ed and checked only at the top level of a computation
 to avoid complex control flow.
 
+.. macro:: MUST_SUCCEED(expr)
+
+    Evaluates *expr* and asserts that the return value is
+    ``GR_SUCCESS``.
+
 Main types
 -------------------------------------------------------------------------------
 
@@ -536,8 +541,11 @@ the choice of root is implementation-dependent.
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
 
-Vector operations
+Vectors
 --------------------------------------------------------------------------------
+
+Low-level vector operations
+................................................................................
 
 .. macro:: GR_ENTRY(vec, i, size)
 
@@ -586,6 +594,51 @@ Vector operations
 .. function:: int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+
+Memory-managed vectors
+................................................................................
+
+.. type:: gr_vec_struct
+
+.. type:: gr_vec_t
+
+.. function:: int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
+
+    Initializes *vec* to a vector of length *len* with elements
+    in the ring *ctx*. The length must be nonnegative.
+    All entries are set to zero.
+
+.. function:: int gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx)
+
+    Clears the vector *vec*.
+
+.. function:: gr_ptr gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
+
+    Returns a pointer to the *i*-th element in the vector *vec*,
+    indexed from zero. The index must be in bounds.
+
+.. function:: slong gr_vec_length(const gr_vec_t vec, gr_ctx_t ctx)
+
+    Returns the length of the vector *vec*.
+
+.. function:: int gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
+
+    Allocates space for at least *len* elements in the vector *vec*.
+    This does not change the size of the vector.
+
+.. function:: int gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
+
+    Resizes the vector to length *len*, which must be nonnegative.
+    The vector will be extended with zeros.
+
+.. function:: int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
+
+    Sets *res* to a copy of the vector *src*.
+
+.. function:: int gr_vec_append(gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx)
+
+    Appends the element *x* to the end of vector *vec*.
+
 
 Implementing rings
 --------------------------------------------------------------------------------

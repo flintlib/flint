@@ -123,32 +123,12 @@ gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x)
     gr_stream_write_free(out, fmpz_get_str(NULL, 10, x));
 }
 
-/*
-All functions implement error handling and return a status code.
-
-GR_SUCCESS  - The operation finished as expected.
-
-GR_DOMAIN   - Domain error: the input is not valid for this operations
-              (e.g. division by zero, square root of a non-square) or the
-              result does not fit in the range of the output type
-              (e.g. get_ui() with input >= 2^64).
-
-GR_UNABLE   - The operation could not be performed for implementation reasons
-              (e.g. too large input, missing algorithm). If this flag is
-              set, there is also potentially a domain error (but this is
-              unknown).
-
-GR_WRONG    - Test failure (used only in test code).
-
-For uniformity, all functions return a status code, even functions
-that should never fail (in which case we might throw in an assert).
-Flags can be OR'ed to avoid complex control flow.
-*/
-
 #define GR_SUCCESS 0
 #define GR_DOMAIN 1
 #define GR_UNABLE 2
 #define GR_WRONG 4
+
+#define MUST_SUCCEED(expr) assert ((expr) == GR_SUCCESS);
 
 typedef void * gr_ptr;
 typedef const void * gr_srcptr;
@@ -634,6 +614,106 @@ gr_vec_struct;
 
 typedef gr_vec_struct gr_vec_t[1];
 
+GR_INLINE int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
+{
+    vec->length = vec->alloc = len;
+
+    if (len == 0)
+    {
+        vec->entries = NULL;
+    }
+    else
+    {
+        slong sz = ctx->sizeof_elem;
+        vec->entries = flint_malloc(len * sz);
+        return _gr_vec_init(vec->entries, len, ctx);
+    }
+
+    return GR_SUCCESS;
+}
+
+GR_INLINE int gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx)
+{
+    if (vec->alloc != 0)
+    {
+        _gr_vec_clear(vec->entries, vec->alloc, ctx);
+        flint_free(vec->entries);
+    }
+
+    return GR_SUCCESS;
+}
+
+GR_INLINE gr_ptr
+gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
+{
+    return GR_ENTRY(vec->entries, i, ctx->sizeof_elem);
+}
+
+GR_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t ctx)
+{
+    return vec->length;
+}
+
+GR_INLINE int
+gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
+{
+    slong alloc = vec->alloc;
+
+    if (len > alloc)
+    {
+        slong sz = ctx->sizeof_elem;
+
+        if (len < 2 * alloc)
+            len = 2 * alloc;
+
+        vec->entries = flint_realloc(vec->entries, len * sz);
+        _gr_vec_init(GR_ENTRY(vec->entries, vec->alloc, sz), len - alloc, ctx);
+        vec->alloc = len;
+    }
+
+    return GR_SUCCESS;
+}
+
+GR_INLINE int
+gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
+{
+    if (vec->length > len)
+    {
+        _gr_vec_zero(GR_ENTRY(vec->entries, len, ctx->sizeof_elem), vec->length - len, ctx);
+    }
+    else if (vec->length < len)
+    {
+        gr_vec_fit_length(vec, len, ctx);
+        _gr_vec_zero(GR_ENTRY(vec->entries, vec->length, ctx->sizeof_elem), len - vec->length, ctx);
+    }
+
+    vec->length = len;
+    return GR_SUCCESS;
+}
+
+/* Assignment */
+
+GR_INLINE int
+gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
+{
+    if (res != src)
+    {
+        gr_vec_set_length(res, src->length, ctx);
+        _gr_vec_set(res->entries, src->entries, src->length, ctx);
+    }
+
+    return GR_SUCCESS;
+}
+
+GR_INLINE int
+gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    status |= gr_vec_fit_length(vec, vec->length + 1, ctx);
+    status |= gr_set(GR_ENTRY(vec->entries, vec->length - 1, ctx->sizeof_elem), f, ctx);
+    vec->length++;
+    return status;
+}
 
 /* Todo: generic matrices */
 

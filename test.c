@@ -1339,6 +1339,8 @@ gr_test_ring(gr_ctx_t R, slong iters)
     flint_printf("===============================================================================\n\n");
 }
 
+#include "flint/profiler.h"
+
 int main()
 {
     gr_ctx_t ZZ, MZZ;
@@ -1346,6 +1348,17 @@ int main()
     gr_ctx_t QQ, MQQ;
     gr_ctx_t Zn;
     gr_ctx_t MZn;
+
+    {
+        gr_vec_t vec;
+        gr_ctx_init_fmpz(ZZ);
+        gr_vec_init(vec, 3, ZZ);
+        gr_set_si(gr_vec_entry_ptr(vec, 2, ZZ), 5, ZZ);
+        gr_vec_set_length(vec, 2, ZZ);
+        gr_vec_set_length(vec, 4, ZZ);
+        gr_vec_clear(vec, ZZ);
+        gr_ctx_clear(ZZ);
+    }
 
     gr_ctx_init_fmpz(ZZ);
     ZZ->size_limit = 1000;
