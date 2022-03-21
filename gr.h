@@ -8,6 +8,7 @@
 #endif
 
 #include <string.h>
+#include <assert.h>
 #include "flint/flint.h"
 #include "flint/fmpz.h"
 #include "flint/fmpq.h"
@@ -34,94 +35,13 @@ gr_stream_struct;
 
 typedef gr_stream_struct gr_stream_t[1];
 
-GR_INLINE void gr_stream_init_file(gr_stream_t out, FILE * fp)
-{
-    out->fp = fp;
-    out->s = NULL;
-}
-
-GR_INLINE void gr_stream_init_str(gr_stream_t out)
-{
-    out->fp = NULL;
-    out->s = flint_malloc(16);
-    out->s[0] = '\0';
-    out->len = 0;
-    out->alloc = 16;
-}
-
-GR_INLINE void gr_stream_write(gr_stream_t out, const char * s)
-{
-    if (out->fp != NULL)
-    {
-        fprintf(out->fp, "%s", s);
-    }
-    else
-    {
-        slong len, alloc;
-
-        len = strlen(s);
-        alloc = out->len + len + 1;
-
-        if (alloc > out->alloc)
-        {
-            alloc = FLINT_MAX(alloc, out->alloc * 2);
-            out->s = realloc(out->s, alloc);
-            out->alloc = alloc;
-        }
-
-        memcpy(out->s + out->len, s, len + 1);
-        out->len += len;
-    }
-}
-
-GR_INLINE void
-gr_stream_write_si(gr_stream_t out, slong x)
-{
-    if (out->fp != NULL)
-    {
-        flint_fprintf(out->fp, "%wd", x);
-    }
-    else
-    {
-        char tmp[22];
-        if (sizeof(slong) == sizeof(long))
-            sprintf(tmp, "%ld", x);
-        else
-            flint_sprintf(tmp, "%wd", x);
-        gr_stream_write(out, tmp);
-    }
-}
-
-GR_INLINE void
-gr_stream_write_ui(gr_stream_t out, ulong x)
-{
-    if (out->fp != NULL)
-    {
-        flint_fprintf(out->fp, "%wu", x);
-    }
-    else
-    {
-        char tmp[22];
-        if (sizeof(ulong) == sizeof(unsigned long))
-            sprintf(tmp, "%lu", x);
-        else
-            flint_sprintf(tmp, "%wu", x);
-        gr_stream_write(out, tmp);
-    }
-}
-
-GR_INLINE void
-gr_stream_write_free(gr_stream_t out, char * s)
-{
-    gr_stream_write(out, s);
-    flint_free(s);
-}
-
-GR_INLINE void
-gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x)
-{
-    gr_stream_write_free(out, fmpz_get_str(NULL, 10, x));
-}
+void gr_stream_init_file(gr_stream_t out, FILE * fp);
+void gr_stream_init_str(gr_stream_t out);
+void gr_stream_write(gr_stream_t out, const char * s);
+void gr_stream_write_si(gr_stream_t out, slong x);
+void gr_stream_write_ui(gr_stream_t out, ulong x);
+void gr_stream_write_free(gr_stream_t out, char * s);
+void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
 #define GR_SUCCESS 0
 #define GR_DOMAIN 1
@@ -133,6 +53,8 @@ gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x)
 typedef void * gr_ptr;
 typedef const void * gr_srcptr;
 typedef void * gr_ctx_ptr;
+
+#define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
 
 GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 
@@ -229,6 +151,7 @@ typedef enum
     GR_METHOD_VEC_NEG,
     GR_METHOD_VEC_ADD,
     GR_METHOD_VEC_SUB,
+    GR_METHOD_VEC_SCALAR_MUL,
     GR_METHOD_VEC_SCALAR_ADDMUL,
     GR_METHOD_VEC_SCALAR_SUBMUL,
     GR_METHOD_VEC_SCALAR_ADDMUL_SI,
@@ -404,6 +327,48 @@ GR_INLINE int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_O
 GR_INLINE int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
 GR_INLINE int gr_is_square(int * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_SQUARE)(res, x, ctx); }
 
+GR_INLINE int _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_INIT)(vec, len, ctx); }
+GR_INLINE int _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
+GR_INLINE int _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_SWAP_OP(ctx, VEC_SWAP)(vec1, vec2, len, ctx); }
+GR_INLINE int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
+GR_INLINE int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
+GR_INLINE int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
+GR_INLINE int _gr_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_ADD)(res, src1, src2, len, ctx); }
+GR_INLINE int _gr_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_SUB)(res, src1, src2, len, ctx); }
+GR_INLINE int _gr_vec_scalar_mul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_MUL)(vec1, vec2, len, c, ctx); }
+GR_INLINE int _gr_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_ADDMUL)(vec1, vec2, len, c, ctx); }
+GR_INLINE int _gr_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_SUBMUL)(vec1, vec2, len, c, ctx); }
+GR_INLINE int _gr_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SCALAR_ADDMUL_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE int _gr_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SCALAR_SUBMUL_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE int _gr_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_PREDICATE(ctx, VEC_EQUAL)(res, vec1, vec2, len, ctx); }
+GR_INLINE int _gr_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(res, vec, len, ctx); }
+GR_INLINE int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT)(res, initial, subtract, vec1, vec2, len, ctx); }
+GR_INLINE int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT_REV)(res, initial, subtract, vec1, vec2, len, ctx); }
+
+/* todo: could allow overloading this as well */
+GR_INLINE int
+_gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_ctx_t ctx)
+{
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+
+    status = GR_SUCCESS;
+    for (i = 0; i < len; i++)
+    {
+        status |= gr_randtest(GR_ENTRY(res, i, sz), state, options, ctx);
+    }
+
+    return status;
+}
+
+int gr_ctx_print(gr_ctx_t ctx);
+int gr_ctx_println(gr_ctx_t ctx);
+int gr_print(gr_srcptr x, gr_ctx_t ctx);
+int gr_println(gr_srcptr x, gr_ctx_t ctx);
+int gr_ctx_get_str(char ** s, gr_ctx_t ctx);
+int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 /* Macros for allocating temporary variables on the stack. */
 /* todo: use vector init functions when provided */
@@ -526,236 +491,7 @@ GR_INLINE int gr_is_square(int * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNA
         clear(x5, (ctx)); \
     } while (0)
 
-#define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
-
-GR_INLINE int _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_INIT)(vec, len, ctx); }
-GR_INLINE int _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
-GR_INLINE int _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_SWAP_OP(ctx, VEC_SWAP)(vec1, vec2, len, ctx); }
-GR_INLINE int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
-GR_INLINE int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
-GR_INLINE int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
-GR_INLINE int _gr_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_ADD)(res, src1, src2, len, ctx); }
-GR_INLINE int _gr_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_SUB)(res, src1, src2, len, ctx); }
-GR_INLINE int _gr_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_ADDMUL)(vec1, vec2, len, c, ctx); }
-GR_INLINE int _gr_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_SUBMUL)(vec1, vec2, len, c, ctx); }
-GR_INLINE int _gr_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SCALAR_ADDMUL_SI)(vec1, vec2, len, c, ctx); }
-GR_INLINE int _gr_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SCALAR_SUBMUL_SI)(vec1, vec2, len, c, ctx); }
-GR_INLINE int _gr_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_PREDICATE(ctx, VEC_EQUAL)(res, vec1, vec2, len, ctx); }
-GR_INLINE int _gr_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(res, vec, len, ctx); }
-GR_INLINE int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT)(res, initial, subtract, vec1, vec2, len, ctx); }
-GR_INLINE int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT_REV)(res, initial, subtract, vec1, vec2, len, ctx); }
-
-/* todo: could allow overloading this as well */
-GR_INLINE int
-_gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_ctx_t ctx)
-{
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-
-    status = GR_SUCCESS;
-    for (i = 0; i < len; i++)
-    {
-        status |= gr_randtest(GR_ENTRY(res, i, sz), state, options, ctx);
-    }
-
-    return status;
-}
-
-/* todo: error handling */
-GR_INLINE int
-gr_ctx_print(gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_file(out, stdout);
-    gr_ctx_write(out, ctx);
-    return GR_SUCCESS;
-}
-
-GR_INLINE int
-gr_ctx_println(gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_file(out, stdout);
-    gr_ctx_write(out, ctx);
-    gr_stream_write(out, "\n");
-    return GR_SUCCESS;
-}
-
-GR_INLINE int
-gr_print(gr_srcptr x, gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_file(out, stdout);
-    gr_write(out, x, ctx);
-    return GR_SUCCESS;
-}
-
-GR_INLINE int
-gr_println(gr_srcptr x, gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_file(out, stdout);
-    gr_write(out, x, ctx);
-    gr_stream_write(out, "\n");
-    return GR_SUCCESS;
-}
-
-/* Todo: generic vectors */
-
-typedef struct
-{
-    gr_ptr entries;
-    slong length;
-    slong alloc;
-}
-gr_vec_struct;
-
-typedef gr_vec_struct gr_vec_t[1];
-
-GR_INLINE int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
-{
-    vec->length = vec->alloc = len;
-
-    if (len == 0)
-    {
-        vec->entries = NULL;
-    }
-    else
-    {
-        slong sz = ctx->sizeof_elem;
-        vec->entries = flint_malloc(len * sz);
-        return _gr_vec_init(vec->entries, len, ctx);
-    }
-
-    return GR_SUCCESS;
-}
-
-GR_INLINE int gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx)
-{
-    if (vec->alloc != 0)
-    {
-        _gr_vec_clear(vec->entries, vec->alloc, ctx);
-        flint_free(vec->entries);
-    }
-
-    return GR_SUCCESS;
-}
-
-GR_INLINE gr_ptr
-gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
-{
-    return GR_ENTRY(vec->entries, i, ctx->sizeof_elem);
-}
-
-GR_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t ctx)
-{
-    return vec->length;
-}
-
-GR_INLINE int
-gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
-{
-    slong alloc = vec->alloc;
-
-    if (len > alloc)
-    {
-        slong sz = ctx->sizeof_elem;
-
-        if (len < 2 * alloc)
-            len = 2 * alloc;
-
-        vec->entries = flint_realloc(vec->entries, len * sz);
-        _gr_vec_init(GR_ENTRY(vec->entries, vec->alloc, sz), len - alloc, ctx);
-        vec->alloc = len;
-    }
-
-    return GR_SUCCESS;
-}
-
-GR_INLINE int
-gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
-{
-    if (vec->length > len)
-    {
-        _gr_vec_zero(GR_ENTRY(vec->entries, len, ctx->sizeof_elem), vec->length - len, ctx);
-    }
-    else if (vec->length < len)
-    {
-        gr_vec_fit_length(vec, len, ctx);
-        _gr_vec_zero(GR_ENTRY(vec->entries, vec->length, ctx->sizeof_elem), len - vec->length, ctx);
-    }
-
-    vec->length = len;
-    return GR_SUCCESS;
-}
-
-/* Assignment */
-
-GR_INLINE int
-gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
-{
-    if (res != src)
-    {
-        gr_vec_set_length(res, src->length, ctx);
-        _gr_vec_set(res->entries, src->entries, src->length, ctx);
-    }
-
-    return GR_SUCCESS;
-}
-
-GR_INLINE int
-gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx)
-{
-    int status = GR_SUCCESS;
-    status |= gr_vec_fit_length(vec, vec->length + 1, ctx);
-    status |= gr_set(GR_ENTRY(vec->entries, vec->length - 1, ctx->sizeof_elem), f, ctx);
-    vec->length++;
-    return status;
-}
-
-/* Todo: generic matrices */
-
-typedef struct
-{
-    gr_ptr entries;
-    slong r;
-    slong c;
-    gr_ptr * rows;
-}
-gr_mat_struct;
-
-typedef gr_mat_struct gr_mat_t[1];
-
-#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
-#define gr_mat_nrows(mat, ctx) ((mat)->r)
-#define gr_mat_ncols(mat, ctx) ((mat)->c)
-
-int gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
-int gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx);
-int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx);
-int gr_mat_equal(int * res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
-int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx);
-int gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
-int gr_mat_one(gr_mat_t res, gr_ctx_t ctx);
-int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx);
-int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
-int gr_mat_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx);
-int gr_mat_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx);
-int gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
-int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
-int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
-int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
-
 /* Some base rings */
-
 
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
@@ -764,20 +500,20 @@ void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 
-/* Todo: generic polynomials */
+/* Generic polynomial ring */
 
 typedef struct
 {
-    gr_ptr coeffs;
-    slong length;
-    slong alloc;
+    gr_ctx_struct * base_ring;
 }
-gr_poly_struct;
+polynomial_ctx_t;
 
-typedef gr_poly_struct gr_poly_t[1];
+#define POLYNOMIAL_CTX(ring_ctx) ((polynomial_ctx_t *)((ring_ctx)->elem_ctx))
+#define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
+void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring);
 
-/* Matrix ring to test */
+/* Generic matrix ring */
 
 typedef struct
 {

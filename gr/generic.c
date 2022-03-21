@@ -2,6 +2,48 @@
 
 /* Generic arithmetic functions */
 
+int gr_generic_is_zero(int * res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_START;
+
+    GR_TMP_INIT1(t, ctx);
+    status = gr_zero(t, ctx);
+    status |= gr_equal(res, x, t, ctx);
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_is_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_START;
+
+    GR_TMP_INIT1(t, ctx);
+    status = gr_one(t, ctx);
+    status |= gr_equal(res, x, t, ctx);
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_is_neg_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_START;
+
+    GR_TMP_INIT1(t, ctx);
+    status = gr_neg_one(t, ctx);
+    status |= gr_equal(res, x, t, ctx);
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
 int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
 {
     int status;
@@ -705,6 +747,22 @@ gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx
 }
 
 int
+gr_generic_vec_scalar_mul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+{
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= mul(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
+
+    return status;
+}
+
+int
 gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
@@ -988,6 +1046,10 @@ const gr_method_tab_input gr_generic_methods[] =
 
     {GR_METHOD_NEG_ONE,                 (gr_funcptr) gr_generic_neg_one},
 
+    {GR_METHOD_IS_ZERO,                 (gr_funcptr) gr_generic_is_zero},
+    {GR_METHOD_IS_ONE,                  (gr_funcptr) gr_generic_is_one},
+    {GR_METHOD_IS_NEG_ONE,              (gr_funcptr) gr_generic_is_neg_one},
+
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
     {GR_METHOD_ADD_UI,                  (gr_funcptr) gr_generic_add_ui},
@@ -1029,6 +1091,7 @@ const gr_method_tab_input gr_generic_methods[] =
     {GR_METHOD_VEC_NEG,                 (gr_funcptr) gr_generic_vec_neg},
     {GR_METHOD_VEC_ADD,                 (gr_funcptr) gr_generic_vec_add},
     {GR_METHOD_VEC_SUB,                 (gr_funcptr) gr_generic_vec_sub},
+    {GR_METHOD_VEC_SCALAR_MUL,          (gr_funcptr) gr_generic_vec_scalar_mul},
     {GR_METHOD_VEC_SCALAR_ADDMUL,       (gr_funcptr) gr_generic_vec_scalar_addmul},
     {GR_METHOD_VEC_SCALAR_SUBMUL,       (gr_funcptr) gr_generic_vec_scalar_submul},
     {GR_METHOD_VEC_SCALAR_ADDMUL_SI,    (gr_funcptr) gr_generic_vec_scalar_addmul_si},

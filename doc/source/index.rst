@@ -275,10 +275,13 @@ Context operations
 .. function:: int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx)
               int gr_ctx_print(gr_ctx_t ctx)
               int gr_ctx_println(gr_ctx_t ctx)
+              int gr_ctx_get_str(char ** s, gr_ctx_t ctx)
 
     Writes a description of the ring *ctx* to the stream *out*,
-    or prints it to *stdout*. The *println* version prints a trailing
-    newline.
+    prints it to *stdout*, or sets *s* to a pointer to
+    a heap-allocated string of the description (the user must free
+    the string with ``flint_free``).
+    The *println* version prints a trailing newline.
 
 Element operations
 --------------------------------------------------------------------------------
@@ -369,10 +372,13 @@ Basic functions
 .. function:: int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
               int gr_print(gr_srcptr x, gr_ctx_t ctx)
               int gr_println(gr_srcptr x, gr_ctx_t ctx)
+              int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx)
 
     Writes a description of the element *x* to the stream *out*,
-    or prints it to *stdout*. The *println* version prints a trailing
-    newline.
+    or prints it to *stdout*, or sets *s* to a pointer to
+    a heap-allocated string of the description (the user must free
+    the string with ``flint_free``). The *println* version prints a
+    trailing newline.
 
 .. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
               int gr_one(gr_ptr res, gr_ctx_t ctx)

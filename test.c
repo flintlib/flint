@@ -1,4 +1,7 @@
 #include "gr.h"
+#include "gr_vec.h"
+#include "gr_mat.h"
+#include "gr_poly.h"
 
 typedef int ((*gr_test_function)(gr_ctx_t, flint_rand_t, int));
 
@@ -1043,8 +1046,8 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
     }
     else
     {
-        fmpz_randtest(a, state, 8);
-        fmpz_randtest(b, state, 8);
+        fmpz_randtest(a, state, 6);
+        fmpz_randtest(b, state, 6);
     }
 
     fmpz_add(ab, a, b);
@@ -1345,9 +1348,92 @@ int main()
 {
     gr_ctx_t ZZ, MZZ;
     gr_ctx_t QQbar, QQbar_real;
-    gr_ctx_t QQ, MQQ;
+    gr_ctx_t QQ, MQQ, QQx;
     gr_ctx_t Zn;
     gr_ctx_t MZn;
+
+    {
+        gr_poly_t poly;
+        int eq, status;
+
+        gr_ctx_init_fmpq(QQ);
+        gr_ctx_init_polynomial(QQx, QQ);
+
+/*
+        gr_init(poly, QQx);
+        gr_one(poly, QQx);
+
+        gr_one(poly, QQx);
+        gr_println(poly, QQx);
+        status = gr_is_one(&eq, poly, QQx);
+        printf("%d %d\n", status, eq);
+
+        gr_zero(poly, QQx);
+        gr_println(poly, QQx);
+        status = gr_is_zero(&eq, poly, QQx);
+        printf("%d %d\n", status, eq);
+
+        gr_neg_one(poly, QQx);
+        gr_println(poly, QQx);
+        status = gr_is_neg_one(&eq, poly, QQx);
+        printf("%d %d\n", status, eq);
+
+
+        return 0;
+*/
+
+        QQx->size_limit = 10;
+
+        gr_test_ring(QQx, 1000);
+        gr_ctx_clear(QQ);
+        gr_ctx_clear(QQx);
+    }
+
+
+/*
+    {
+        gr_ctx_init_fmpz(ZZ);
+        gr_ctx_init_matrix(MZZ, ZZ, 5);
+        char * s1, * s2;
+
+        MUST_SUCCEED(gr_ctx_get_str(&s1, ZZ));
+        MUST_SUCCEED(gr_ctx_get_str(&s2, MZZ));
+
+        printf("%s\n%s\n", s1, s2);
+    }
+*/
+
+    if (0)
+    {
+        gr_mat_t mat;
+        gr_poly_t poly;
+
+        flint_rand_t state;
+        flint_randinit(state);
+
+        gr_ctx_init_fmpz(ZZ);
+        gr_ctx_init_matrix(MZZ, ZZ, 8);
+
+        gr_init(mat, MZZ);
+        gr_randtest(mat, state, NULL, MZZ);
+        gr_println(mat, MZZ);
+
+        gr_poly_init(poly, ZZ);
+        TIMEIT_START
+        gr_mat_charpoly_berkowitz(poly, mat, ZZ);
+        TIMEIT_STOP
+
+        fmpz_poly_print_pretty((fmpz_poly_struct *) poly, "x"); printf("\n");
+        gr_poly_zero(poly, ZZ);
+
+        TIMEIT_START
+        fmpz_mat_charpoly_berkowitz((fmpz_poly_struct *) poly, (fmpz_mat_struct *) mat);
+        TIMEIT_STOP
+
+        fmpz_poly_print_pretty((fmpz_poly_struct *) poly, "x"); printf("\n");
+
+        return 0;
+    }
 
     {
         gr_vec_t vec;
@@ -1359,6 +1445,7 @@ int main()
         gr_vec_clear(vec, ZZ);
         gr_ctx_clear(ZZ);
     }
+
 
     gr_ctx_init_fmpz(ZZ);
     ZZ->size_limit = 1000;

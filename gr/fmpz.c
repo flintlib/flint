@@ -277,6 +277,80 @@ _gr_fmpz_rsqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            fmpz_zero(res);
+        else
+            fmpz_set(res, initial);
+        return GR_SUCCESS;
+    }
+
+    if (initial == NULL)
+    {
+        fmpz_mul(res, vec1, vec2);
+    }
+    else
+    {
+        if (subtract)
+            fmpz_neg(res, initial);
+        else
+            fmpz_set(res, initial);
+
+        fmpz_addmul(res, vec1, vec2);
+    }
+
+    for (i = 1; i < len; i++)
+        fmpz_addmul(res, vec1 + i, vec2 + i);
+
+    if (subtract)
+        fmpz_neg(res, res);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            fmpz_zero(res);
+        else
+            fmpz_set(res, initial);
+        return GR_SUCCESS;
+    }
+
+    if (initial == NULL)
+    {
+        fmpz_mul(res, vec1, vec2 + len - 1);
+    }
+    else
+    {
+        if (subtract)
+            fmpz_neg(res, initial);
+        else
+            fmpz_set(res, initial);
+
+        fmpz_addmul(res, vec1, vec2 + len - 1);
+    }
+
+    for (i = 1; i < len; i++)
+        fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
+
+    if (subtract)
+        fmpz_neg(res, res);
+
+    return GR_SUCCESS;
+}
+
 int _fmpz_methods2_initialized = 0;
 gr_static_method_table _fmpz_static_table;
 gr_method_tab_t _fmpz_methods2;
@@ -313,6 +387,8 @@ gr_method_tab_input fmpz_methods2[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_rsqrt},
+    {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
+    {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {0,                         (gr_funcptr) NULL},
 };
 

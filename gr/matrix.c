@@ -1,6 +1,7 @@
 /* Matrices over generic rings */
 
 #include "gr.h"
+#include "gr_mat.h"
 
 int
 gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
@@ -511,9 +512,8 @@ gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return status;
 }
 
-/* todo: use stream */
 int
-gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
 {
     int status;
     slong r, c;
@@ -525,26 +525,34 @@ gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
     c = gr_mat_ncols(mat, ctx);
 
     status = GR_SUCCESS;
-    flint_printf("[");
+    gr_stream_write(out, "[");
 
     for (i = 0; i < r; i++)
     {
-        flint_printf("[");
+        gr_stream_write(out, "[");
 
         for (j = 0; j < c; j++)
         {
-            status |= gr_print(GR_MAT_ENTRY(mat, i, j, sz), ctx);
+            status |= gr_write(out, GR_MAT_ENTRY(mat, i, j, sz), ctx);
             if (j < c - 1)
-                flint_printf(", ");
+                gr_stream_write(out, ", ");
         }
 
         if (i < r - 1)
-            flint_printf("],\n");
+            gr_stream_write(out, "],\n");
         else
-            flint_printf("]");
+            gr_stream_write(out, "]");
     }
-    flint_printf("]\n");
+    gr_stream_write(out, "]\n");
     return status;
+}
+
+int
+gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
+{
+    gr_stream_t out;
+    gr_stream_init_file(out, stdout);
+    return gr_mat_write(out, mat, ctx);
 }
 
 int
@@ -863,7 +871,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     return status;
 }
 
-GR_INLINE int
+int
 matrix_init(gr_mat_t res, gr_ctx_t ctx)
 {
     return gr_mat_init(res, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->base_ring);
@@ -891,116 +899,115 @@ matrix_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-GR_INLINE int
+int
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
     return gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-/* TODO UNIFY */
-GR_INLINE int
-matrix_write(gr_stream_t out, gr_mat_t res, gr_ctx_t ctx)
+int
+matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 {
-    return gr_mat_print(res, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_write(out, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_randtest(gr_mat_t res, flint_rand_t state, void * options, gr_ctx_t ctx)
 {
     return gr_mat_randtest(res, state, options, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_equal(int * equal, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_equal(equal, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_set(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
 {
     return gr_mat_set_si(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
 {
     return gr_mat_set_ui(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
 {
     return gr_mat_set_fmpz(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     return gr_mat_set_fmpq(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_zero(gr_mat_t res, gr_ctx_t ctx)
 {
     return gr_mat_zero(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_one(gr_mat_t res, gr_ctx_t ctx)
 {
     return gr_mat_one(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_zero(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_one(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_neg_one(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_add(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_sub(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-GR_INLINE int
+int
 matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
