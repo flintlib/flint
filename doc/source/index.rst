@@ -502,7 +502,7 @@ to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8
     `q y = x` (which, for example, gives the usual exact
     division in `\mathbb{Z}`).
 
-.. function:: truth gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
+.. function:: truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
 
     Returns whether *x* has a multiplicative inverse in the present ring,
     i.e. whether *x* is a unit.
