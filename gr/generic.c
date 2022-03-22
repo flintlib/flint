@@ -446,10 +446,10 @@ gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t c
         if (fmpz_tstbit(exp, i))
             status |= mul(t, u, x, ctx);
         else
-            status |= swap(t, u, ctx);
+            swap(t, u, ctx);
     }
 
-    status |= swap(res, t, ctx);
+    swap(res, t, ctx);
 
     GR_TMP_CLEAR2(t, u, ctx);
     GR_TMP_END;
@@ -618,52 +618,40 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
 /* Generic vector functions */
 
-int
+void
 gr_generic_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
 {
-    gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT);
-    int status;
+    gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT);
     slong i, sz;
 
     sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= init(GR_ENTRY(vec, i, sz), ctx);
-
-    return status;
+        init(GR_ENTRY(vec, i, sz), ctx);
 }
 
-int
+void
 gr_generic_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
 {
-    gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR);
-    int status;
+    gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR);
     slong i, sz;
 
     sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= clear(GR_ENTRY(vec, i, sz), ctx);
-
-    return status;
+        clear(GR_ENTRY(vec, i, sz), ctx);
 }
 
-int
+void
 gr_generic_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
 {
     gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
-    int status;
     slong i, sz;
 
     sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
 
     for (i = 0; i < len; i++)
-        status |= swap(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
-
-    return status;
+        swap(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
 }
 
 int

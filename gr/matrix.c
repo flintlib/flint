@@ -453,9 +453,7 @@ gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < r; i++)
-    {
-        status |= _gr_vec_swap(mat1->rows[i], mat2->rows[i], c, ctx);
-    }
+        _gr_vec_swap(mat1->rows[i], mat2->rows[i], c, ctx);
 
     return status;
 }
@@ -871,10 +869,10 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     return status;
 }
 
-int
+void
 matrix_init(gr_mat_t res, gr_ctx_t ctx)
 {
-    return gr_mat_init(res, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->base_ring);
+    gr_mat_init(res, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->base_ring);
 }
 
 
@@ -899,16 +897,16 @@ matrix_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
-    return gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
+    gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+void
 matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 {
-    return gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
+    gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
 int

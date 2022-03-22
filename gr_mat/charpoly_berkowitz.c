@@ -71,7 +71,7 @@ _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
 
         /* Shift all coefficients up by one */
         for (i = n; i > 0; i--)
-            status |= gr_swap(GR_ENTRY(cp, i, sz), GR_ENTRY(cp, (i - 1), sz), ctx);
+            gr_swap(GR_ENTRY(cp, i, sz), GR_ENTRY(cp, (i - 1), sz), ctx);
 
         status |= gr_one(cp, ctx);
         status |= _gr_poly_reverse(cp, cp, n + 1, n + 1, ctx);

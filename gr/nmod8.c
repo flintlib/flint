@@ -5,36 +5,32 @@
 typedef unsigned char nmod8_struct;
 typedef nmod8_struct nmod8_t[1];
 
-int
+void
 nmod8_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Integers mod ");
     gr_stream_write_ui(out, NMOD8_CTX(ctx).n);
     gr_stream_write(out, " (nmod8)");
-    return GR_SUCCESS;
 }
 
-int
+void
 nmod8_init(nmod8_t x, const gr_ctx_t ctx)
 {
     x[0] = 0;
-    return GR_SUCCESS;
 }
 
-int
+void
 nmod8_clear(nmod8_t x, const gr_ctx_t ctx)
 {
-    return GR_SUCCESS;
 }
 
-int
+void
 nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t ctx)
 {
     nmod8_t t;
     *t = *x;
     *x = *y;
     *y = *t;
-    return GR_SUCCESS;
 }
 
 int

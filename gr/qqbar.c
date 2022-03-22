@@ -22,28 +22,25 @@ _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 _gr_qqbar_init(qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_init(x);
-    return GR_SUCCESS;
 }
 
-int
+void
 _gr_qqbar_clear(qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_clear(x);
-    return GR_SUCCESS;
 }
 
-int
+void
 _gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
 {
     qqbar_t t;
     *t = *x;
     *x = *y;
     *y = *t;
-    return GR_SUCCESS;
 }
 
 /* todo: limits */

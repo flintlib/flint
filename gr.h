@@ -16,9 +16,39 @@
 #include "flint/ulong_extras.h"
 #include "flint/profiler.h"
 
+/* for truth_t */
+#include "calcium.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
+
+GR_INLINE truth_t truth_and(truth_t x, truth_t y)
+{
+    if (x == T_FALSE || x == T_FALSE)
+        return T_FALSE;
+    if (x == T_TRUE && y == T_TRUE)
+        return T_TRUE;
+    return T_UNKNOWN;
+}
+
+GR_INLINE truth_t truth_or(truth_t x, truth_t y)
+{
+    if (x == T_TRUE || x == T_TRUE)
+        return T_TRUE;
+    if (x == T_FALSE && y == T_FALSE)
+        return T_FALSE;
+    return T_UNKNOWN;
+}
+
+GR_INLINE truth_t truth_not(truth_t x)
+{
+    if (x == T_TRUE)
+        return T_FALSE;
+    if (x == T_FALSE)
+        return T_TRUE;
+    return T_UNKNOWN;
+}
 
 typedef int (*gr_funcptr)(void);
 
@@ -72,6 +102,7 @@ typedef enum
     GR_METHOD_ZERO,
     GR_METHOD_ONE,
     GR_METHOD_NEG_ONE,
+
     GR_METHOD_IS_ZERO,
     GR_METHOD_IS_ONE,
     GR_METHOD_IS_NEG_ONE,
@@ -203,12 +234,13 @@ typedef gr_ctx_struct gr_ctx_t[1];
 
 /* Typedefs for method function pointers. */
 
+typedef void ((*gr_method_init_clear_op)(gr_ptr, gr_ctx_ptr));
+typedef void ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, const void * options, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
-typedef int ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_si)(gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_ui)(gr_ptr, ulong, gr_ctx_ptr));
@@ -222,8 +254,10 @@ typedef int ((*gr_method_binary_op_fmpz)(gr_ptr, gr_srcptr, const fmpz_t, gr_ctx
 typedef int ((*gr_method_binary_op_fmpq)(gr_ptr, gr_srcptr, const fmpq_t, gr_ctx_ptr));
 typedef int ((*gr_method_unary_predicate)(int *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_predicate)(int *, gr_srcptr, gr_srcptr, gr_ctx_ptr));
+
+typedef void ((*gr_method_vec_init_clear_op)(gr_ptr, slong, gr_ctx_ptr));
+typedef void ((*gr_method_vec_swap_op)(gr_ptr, gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_constant_op)(gr_ptr, slong, gr_ctx_ptr));
-typedef int ((*gr_method_vec_swap_op)(gr_ptr, gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_vec_op)(gr_ptr, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_scalar_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_ptr));
@@ -238,6 +272,7 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 #define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+#define GR_INIT_CLEAR_OP(ctx, NAME) (((gr_method_init_clear_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_SWAP_OP(ctx, NAME) (((gr_method_swap_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_CONSTANT_OP(ctx, NAME) (((gr_method_constant_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP(ctx, NAME) (((gr_method_unary_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
@@ -253,8 +288,10 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 #define GR_BINARY_OP_FMPQ(ctx, NAME) (((gr_method_binary_op_fmpq *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_PREDICATE(ctx, NAME) (((gr_method_unary_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_PREDICATE(ctx, NAME) (((gr_method_binary_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_CONSTANT_OP(ctx, NAME) (((gr_method_vec_constant_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+
+#define GR_VEC_INIT_CLEAR_OP(ctx, NAME) (((gr_method_vec_init_clear_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_SWAP_OP(ctx, NAME) (((gr_method_vec_swap_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_CONSTANT_OP(ctx, NAME) (((gr_method_vec_constant_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_OP(ctx, NAME) (((gr_method_vec_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_VEC_OP(ctx, NAME) (((gr_method_vec_vec_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_SCALAR_OP(ctx, NAME) (((gr_method_vec_scalar_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
@@ -267,9 +304,11 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 
 GR_INLINE int gr_ctx_clear(gr_ctx_t ctx) { return GR_CTX_OP(ctx, CTX_CLEAR)(ctx); }
 GR_INLINE int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx) { return GR_CTX_STREAM(ctx, CTX_WRITE)(out, ctx); }
-GR_INLINE int gr_init(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, INIT)(res, ctx); }
-GR_INLINE int gr_clear(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, CLEAR)(res, ctx); }
-GR_INLINE int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { return GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
+
+GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
+GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
+GR_INLINE void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
+
 GR_INLINE int gr_randtest(gr_ptr x, flint_rand_t state, const void * options, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, options, ctx); }
 GR_INLINE int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
@@ -327,9 +366,10 @@ GR_INLINE int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_O
 GR_INLINE int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
 GR_INLINE int gr_is_square(int * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_SQUARE)(res, x, ctx); }
 
-GR_INLINE int _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_INIT)(vec, len, ctx); }
-GR_INLINE int _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
-GR_INLINE int _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_SWAP_OP(ctx, VEC_SWAP)(vec1, vec2, len, ctx); }
+GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
+GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
+GR_INLINE void _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx) { GR_VEC_SWAP_OP(ctx, VEC_SWAP)(vec1, vec2, len, ctx); }
+
 GR_INLINE int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
 GR_INLINE int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
 GR_INLINE int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
@@ -379,7 +419,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_INIT_VEC(vec, len, ctx) \
     do { \
-        gr_method_vec_constant_op vec_init = GR_VEC_CONSTANT_OP(ctx, VEC_INIT); \
+        gr_method_vec_init_clear_op vec_init = GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         (vec) = (gr_ptr) GR_TMP_ALLOC((len) * _gr_elem_size); \
         vec_init((vec), (len), (ctx)); \
@@ -387,13 +427,13 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_CLEAR_VEC(vec, len, ctx) \
     do { \
-        gr_method_vec_constant_op vec_clear = GR_VEC_CONSTANT_OP(ctx, VEC_CLEAR); \
+        gr_method_vec_init_clear_op vec_clear = GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR); \
         vec_clear((vec), (len), (ctx)); \
     } while (0)
 
 #define GR_TMP_INIT1(x1, ctx) \
     do { \
-        gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT); \
+        gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         x1 = (gr_ptr) GR_TMP_ALLOC(1 * _gr_elem_size); \
         init(x1, (ctx)); \
@@ -401,7 +441,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_INIT2(x1, x2, ctx) \
     do { \
-        gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT); \
+        gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         x1 = (gr_ptr) GR_TMP_ALLOC(2 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
@@ -411,7 +451,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_INIT3(x1, x2, x3, ctx) \
     do { \
-        gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT); \
+        gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         x1 = (gr_ptr) GR_TMP_ALLOC(3 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
@@ -423,7 +463,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_INIT4(x1, x2, x3, x4, ctx) \
     do { \
-        gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT); \
+        gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         x1 = (gr_ptr) GR_TMP_ALLOC(4 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
@@ -437,7 +477,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_INIT5(x1, x2, x3, x4, x5, ctx) \
     do { \
-        gr_method_constant_op init = GR_CONSTANT_OP(ctx, INIT); \
+        gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         x1 = (gr_ptr) GR_TMP_ALLOC(5 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
@@ -453,20 +493,20 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_CLEAR1(x1, ctx) \
     do { \
-        gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR); \
+        gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR); \
         clear(x1, (ctx)); \
     } while (0)
 
 #define GR_TMP_CLEAR2(x1, x2, ctx) \
     do { \
-        gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR); \
+        gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR); \
         clear(x1, (ctx)); \
         clear(x2, (ctx)); \
     } while (0)
 
 #define GR_TMP_CLEAR3(x1, x2, x3, ctx) \
     do { \
-        gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR); \
+        gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR); \
         clear(x1, (ctx)); \
         clear(x2, (ctx)); \
         clear(x3, (ctx)); \
@@ -474,7 +514,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_CLEAR4(x1, x2, x3, x4, ctx) \
     do { \
-        gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR); \
+        gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR); \
         clear(x1, (ctx)); \
         clear(x2, (ctx)); \
         clear(x3, (ctx)); \
@@ -483,7 +523,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 #define GR_TMP_CLEAR5(x1, x2, x3, x4, x5, ctx) \
     do { \
-        gr_method_constant_op clear = GR_CONSTANT_OP(ctx, CLEAR); \
+        gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR); \
         clear(x1, (ctx)); \
         clear(x2, (ctx)); \
         clear(x3, (ctx)); \
@@ -505,6 +545,7 @@ void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 typedef struct
 {
     gr_ctx_struct * base_ring;
+    slong degree_limit;
 }
 polynomial_ctx_t;
 

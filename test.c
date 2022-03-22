@@ -257,15 +257,15 @@ gr_test_swap(gr_ctx_t R, flint_rand_t state, int verbose)
     status |= gr_randtest(b, state, NULL, R);
     status |= gr_set(c, a, R);
     status |= gr_set(d, b, R);
+    gr_swap(a, a, R);
 
-    status |= gr_swap(a, a, R);
     status |= gr_equal(&equal0, a, c, R);
 
-    status |= gr_swap(a, b, R);
+    gr_swap(a, b, R);
     status |= gr_equal(&equal1, b, c, R);
     status |= gr_equal(&equal2, a, d, R);
 
-    status |= gr_swap(a, b, R);
+    gr_swap(a, b, R);
     status |= gr_equal(&equal3, a, c, R);
     status |= gr_equal(&equal4, b, d, R);
 
@@ -1353,13 +1353,12 @@ int main()
     gr_ctx_t MZn;
 
     {
-        gr_poly_t poly;
-        int eq, status;
-
         gr_ctx_init_fmpq(QQ);
         gr_ctx_init_polynomial(QQx, QQ);
 
 /*
+        gr_poly_t poly;
+        int eq, status;
         gr_init(poly, QQx);
         gr_one(poly, QQx);
 
@@ -1378,11 +1377,12 @@ int main()
         status = gr_is_neg_one(&eq, poly, QQx);
         printf("%d %d\n", status, eq);
 
-
         return 0;
 */
 
         QQx->size_limit = 10;
+
+        POLYNOMIAL_CTX(QQx)->degree_limit = 20;
 
         gr_test_ring(QQx, 1000);
         gr_ctx_clear(QQ);
@@ -1406,7 +1406,7 @@ int main()
     if (0)
     {
         gr_mat_t mat;
-        gr_poly_t poly;
+        gr_poly_t poly, poly2;
 
         flint_rand_t state;
         flint_randinit(state);
@@ -1419,8 +1419,12 @@ int main()
         gr_println(mat, MZZ);
 
         gr_poly_init(poly, ZZ);
+        gr_poly_init(poly2, ZZ);
         TIMEIT_START
         gr_mat_charpoly_berkowitz(poly, mat, ZZ);
+        TIMEIT_STOP
+        TIMEIT_START
+        gr_poly_add(poly2, poly, poly, ZZ);
         TIMEIT_STOP
 
         fmpz_poly_print_pretty((fmpz_poly_struct *) poly, "x"); printf("\n");
@@ -1429,6 +1433,10 @@ int main()
         TIMEIT_START
         fmpz_mat_charpoly_berkowitz((fmpz_poly_struct *) poly, (fmpz_mat_struct *) mat);
         TIMEIT_STOP
+        TIMEIT_START
+        fmpz_poly_add((fmpz_poly_struct *) poly2, (fmpz_poly_struct *) poly, (fmpz_poly_struct *) poly);
+        TIMEIT_STOP
+
 
         fmpz_poly_print_pretty((fmpz_poly_struct *) poly, "x"); printf("\n");
 

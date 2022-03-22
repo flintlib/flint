@@ -3,10 +3,10 @@
 #include "gr.h"
 #include "gr_poly.h"
 
-int
+void
 polynomial_init(gr_poly_t res, gr_ctx_t ctx)
 {
-    return gr_poly_init(res, POLYNOMIAL_ELEM_CTX(ctx));
+    gr_poly_init(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -23,16 +23,16 @@ polynomial_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 polynomial_clear(gr_poly_t res, gr_ctx_t ctx)
 {
-    return gr_poly_clear(res, POLYNOMIAL_ELEM_CTX(ctx));
+    gr_poly_clear(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+void
 polynomial_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 {
-    return gr_poly_swap(poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
+    gr_poly_swap(poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 int
@@ -144,6 +144,13 @@ polynomial_sub(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
 int
 polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
+    if (POLYNOMIAL_CTX(ctx)->degree_limit != WORD_MAX)
+    {
+        if (poly1->length != 0 && poly2->length != 0 &&
+            poly1->length + poly2->length > POLYNOMIAL_CTX(ctx)->degree_limit)
+            return GR_UNABLE;
+    }
+
     return gr_poly_mul(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
@@ -197,6 +204,7 @@ gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
     ctx->size_limit = WORD_MAX;
 
     ((polynomial_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
+    ((polynomial_ctx_t *) ctx->elem_ctx)->degree_limit = WORD_MAX;
 
     if (!_polynomial_methods2_initialized)
     {

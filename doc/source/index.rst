@@ -157,8 +157,12 @@ Functions can return a combination of the following status flags:
 When the status code is any other value than ``GR_SUCCESS``, any
 output variables may be set to meaningless values.
 
-For uniformity, even functions that should never fail return a status
-code (we might want to wrap such functions in asserts).
+For uniformity, most operations return a status code, even operations
+that are not typically expected to fail (we might want to wrap
+such functions in asserts).
+Functions that do not return a status code include pure "container"
+operations like ``init``, ``clear`` and ``swap``.
+
 Flags can be OR'ed and checked only at the top level of a computation
 to avoid complex control flow.
 
@@ -289,14 +293,18 @@ Element operations
 Memory management
 ................................................................................
 
-.. function:: int gr_init(gr_ptr res, gr_ctx_t ctx)
+.. function:: void gr_init(gr_ptr res, gr_ctx_t ctx)
 
     Initializes *res* to a valid variable and sets it to the
     zero element of the ring *ctx*.
 
-.. function:: int gr_clear(gr_ptr res, gr_ctx_t ctx)
+.. function:: void gr_clear(gr_ptr res, gr_ctx_t ctx)
 
     Clears *res*, freeing any memory allocated by this object.
+
+.. function:: void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
+
+    Swaps *x* and *y* efficiently.
 
 The following macros support allocating temporary variables efficiently.
 Data will be allocated on the stack using ``alloca`` unless
@@ -360,10 +368,6 @@ or allocate the memory on the heap if needed.
 
 Basic functions
 ................................................................................
-
-.. function:: int gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
-
-    Swaps *x* and *y* efficiently.
 
 .. function:: int gr_randtest(gr_ptr res, flint_rand_t state, const void * options, gr_ctx_t ctx)
 
@@ -558,18 +562,18 @@ Low-level vector operations
     Macro to access the *i*-th entry of a ``gr_ptr`` or ``gr_srcptr``
     vector *vec*, where each element is ``size`` bytes.
 
-.. function:: int _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
+.. function:: void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx)
 
     Initialize *len* elements of *vec* to the value 0.
     The pointer *vec* must already refer to allocated memory.
 
-.. function:: int _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
+.. function:: void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx)
 
     Clears *len* elements of *vec*.
     This frees memory allocated by individual elements, but
     does not free the memory allocated by *vec* itself.
 
-.. function:: int _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
+.. function:: void _gr_vec_swap(gr_ptr vec1, gr_ptr vec2, slong len, gr_ctx_t ctx)
 
     Swap the entries of *vec1* and *vec2*.
 

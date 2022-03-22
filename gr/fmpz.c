@@ -7,28 +7,25 @@ _gr_fmpz_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 _gr_fmpz_init(fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_init(x);
-    return GR_SUCCESS;
 }
 
-int
+void
 _gr_fmpz_clear(fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_clear(x);
-    return GR_SUCCESS;
 }
 
-int
+void
 _gr_fmpz_swap(fmpz_t x, fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_t t;
     *t = *x;
     *x = *y;
     *y = *t;
-    return GR_SUCCESS;
 }
 
 /* todo: limits */

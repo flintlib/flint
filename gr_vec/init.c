@@ -12,7 +12,7 @@ int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
     {
         slong sz = ctx->sizeof_elem;
         vec->entries = flint_malloc(len * sz);
-        return _gr_vec_init(vec->entries, len, ctx);
+        _gr_vec_init(vec->entries, len, ctx);
     }
 
     return GR_SUCCESS;
