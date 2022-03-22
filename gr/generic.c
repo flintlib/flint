@@ -2,46 +2,56 @@
 
 /* Generic arithmetic functions */
 
-int gr_generic_is_zero(int * res, gr_srcptr x, gr_ctx_t ctx)
+truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx)
 {
     gr_ptr t;
-    int status;
+    truth_t eq;
     GR_TMP_START;
 
     GR_TMP_INIT1(t, ctx);
-    status = gr_zero(t, ctx);
-    status |= gr_equal(res, x, t, ctx);
+    eq = gr_equal(x, t, ctx);
     GR_TMP_CLEAR1(t, ctx);
     GR_TMP_END;
-    return status;
+
+    return eq;
 }
 
-int gr_generic_is_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx)
 {
     gr_ptr t;
-    int status;
+    truth_t eq;
     GR_TMP_START;
 
     GR_TMP_INIT1(t, ctx);
-    status = gr_one(t, ctx);
-    status |= gr_equal(res, x, t, ctx);
+
+    if (gr_one(t, ctx) == GR_SUCCESS)
+        eq = gr_equal(x, t, ctx);
+    else
+        eq = T_UNKNOWN;
+
     GR_TMP_CLEAR1(t, ctx);
     GR_TMP_END;
-    return status;
+
+    return eq;
 }
 
-int gr_generic_is_neg_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
 {
     gr_ptr t;
-    int status;
+    truth_t eq;
     GR_TMP_START;
 
     GR_TMP_INIT1(t, ctx);
-    status = gr_neg_one(t, ctx);
-    status |= gr_equal(res, x, t, ctx);
+
+    if (gr_neg_one(t, ctx) == GR_SUCCESS)
+        eq = gr_equal(x, t, ctx);
+    else
+        eq = T_UNKNOWN;
+
     GR_TMP_CLEAR1(t, ctx);
     GR_TMP_END;
-    return status;
+
+    return eq;
 }
 
 int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
@@ -245,53 +255,34 @@ int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
 int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
-    int status, equal;
-
-    status = gr_is_one(&equal, x, ctx);
-    if (status == GR_SUCCESS && equal)
+    if (gr_is_one(x, ctx) == T_TRUE)
         return gr_one(res, ctx);
 
-    status = gr_is_neg_one(&equal, x, ctx);
-    if (status == GR_SUCCESS && equal)
+    if (gr_is_neg_one(x, ctx) == T_TRUE)
         return gr_neg_one(res, ctx);
 
     /* todo: dubious in the zero ring, if comparing with 1 above
        somehow failed */
-    status = gr_is_zero(&equal, x, ctx);
-    if (status == GR_SUCCESS && equal)
+    if (gr_is_zero(x, ctx) == T_TRUE)
         return GR_DOMAIN;
 
     return GR_UNABLE;
 }
 
-int gr_generic_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
+truth_t gr_generic_is_invertible(gr_srcptr x, gr_ctx_t ctx)
 {
-    int status, equal;
+    if (gr_is_one(x, ctx) == T_TRUE)
+        return T_TRUE;
 
-    status = gr_is_one(&equal, x, ctx);
-    if (status == GR_SUCCESS && equal)
-    {
-        *res = 1;
-        return GR_SUCCESS;
-    }
-
-    status = gr_is_neg_one(&equal, x, ctx);
-    if (status == GR_SUCCESS && equal)
-    {
-        *res = 1;
-        return GR_SUCCESS;
-    }
+    if (gr_is_neg_one(x, ctx) == T_TRUE)
+        return T_TRUE;
 
     /* todo: dubious in the zero ring, if comparing with 1 above
        somehow failed */
-    status = gr_is_zero(&equal, x, ctx);
-    if (status == GR_SUCCESS && equal)
-    {
-        *res = 0;
-        return GR_SUCCESS;
-    }
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return T_FALSE;
 
-    return GR_UNABLE;
+    return T_UNKNOWN;
 }
 
 
@@ -558,22 +549,14 @@ gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
         return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }
 
-int
-gr_generic_is_square(int * res, gr_srcptr x, gr_ctx_t ctx)
+truth_t
+gr_generic_is_square(gr_srcptr x, gr_ctx_t ctx)
 {
-    int is_zero, is_one;
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return T_TRUE;
 
-    if (gr_is_zero(&is_zero, x, ctx) == GR_SUCCESS && is_zero)
-    {
-        *res = 1;
-        return GR_SUCCESS;
-    }
-
-    if (gr_is_one(&is_one, x, ctx) == GR_SUCCESS && is_one)
-    {
-        *res = 1;
-        return GR_SUCCESS;
-    }
+    if (gr_is_one(x, ctx) == T_TRUE)
+        return T_TRUE;
 
     return GR_UNABLE;
 }
@@ -581,15 +564,13 @@ gr_generic_is_square(int * res, gr_srcptr x, gr_ctx_t ctx)
 int
 gr_generic_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
-    int is_zero, is_one;
-
-    if (gr_is_zero(&is_zero, x, ctx) == GR_SUCCESS && is_zero)
+    if (gr_is_zero(x, ctx) == T_TRUE)
     {
         gr_zero(res, ctx);
         return GR_SUCCESS;
     }
 
-    if (gr_is_one(&is_one, x, ctx) == GR_SUCCESS && is_one)
+    if (gr_is_one(x, ctx) == T_TRUE)
     {
         gr_one(res, ctx);
         return GR_SUCCESS;
@@ -601,12 +582,10 @@ gr_generic_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 int
 gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
-    int is_zero, is_one;
-
-    if (gr_is_zero(&is_zero, x, ctx) == GR_SUCCESS && is_zero)
+    if (gr_is_zero(x, ctx) == T_TRUE)
         return GR_DOMAIN;
 
-    if (gr_is_one(&is_one, x, ctx) == GR_SUCCESS && is_one)
+    if (gr_is_one(x, ctx) == T_TRUE)
     {
         gr_one(res, ctx);
         return GR_SUCCESS;
@@ -854,67 +833,54 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     return status;
 }
 
-int
-gr_generic_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+truth_t
+gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     gr_method_binary_predicate equal = GR_BINARY_PREDICATE(ctx, EQUAL);
-    int status, eq, this_eq, this_status;
+    truth_t eq, this_eq;
     slong i, sz;
 
     sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
 
-    eq = 1;
+    eq = T_TRUE;
+
     for (i = 0; i < len; i++)
     {
-        this_status = equal(&this_eq, GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
+        this_eq = equal(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), ctx);
 
-        if (this_status == GR_SUCCESS && !this_eq)
-        {
-            eq = 0;
-            status = GR_SUCCESS;
-            break;
-        }
-        else
-        {
-            status |= this_status;
-        }
+        if (this_eq == T_FALSE)
+            return T_FALSE;
+
+        if (this_eq == T_UNKNOWN)
+            eq = T_UNKNOWN;
     }
 
-    res[0] = eq;
-    return status;
+    return eq;
 }
 
 int
-gr_generic_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
 {
     gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
-    int status, eq, this_eq, this_status;
+    truth_t eq, this_eq;
     slong i, sz;
 
     sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
 
-    eq = 1;
+    eq = T_TRUE;
+
     for (i = 0; i < len; i++)
     {
-        this_status = is_zero(&this_eq, GR_ENTRY(vec, i, sz), ctx);
+        this_eq = is_zero(GR_ENTRY(vec, i, sz), ctx);
 
-        if (this_status == GR_SUCCESS && !this_eq)
-        {
-            eq = 0;
-            status = GR_SUCCESS;
-            break;
-        }
-        else
-        {
-            status |= this_status;
-        }
+        if (this_eq == T_FALSE)
+            return T_FALSE;
+
+        if (this_eq == T_UNKNOWN)
+            eq = T_UNKNOWN;
     }
 
-    res[0] = eq;
-    return status;
-
+    return eq;
 }
 
 int

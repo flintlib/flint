@@ -87,143 +87,113 @@ gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
     return status;
 }
 
-int
-gr_mat_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+truth_t
+gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    int status, equal, this_status, this_equal;
+    truth_t eq, this_eq;
     slong i, r, c;
 
-    status = GR_SUCCESS;
-
     r = gr_mat_nrows(mat, ctx);
     c = gr_mat_ncols(mat, ctx);
 
     if (r == 0 || c == 0)
-    {
-        res[0] = 1;
-        return GR_SUCCESS;
-    }
+        return T_TRUE;
 
-    equal = 1;
+    eq = T_TRUE;
+
     for (i = 0; i < r; i++)
     {
-        this_status = _gr_vec_is_zero(&this_equal, mat->rows[i], c, ctx);
+        this_eq = _gr_vec_is_zero(mat->rows[i], c, ctx);
 
-        if (this_status == GR_SUCCESS && !this_equal)
-        {
-            equal = 0;
-            status = GR_SUCCESS;
-            break;
-        }
-        else
-        {
-            status |= status;
-        }
+        if (this_eq == T_FALSE)
+            return T_FALSE;
+
+        if (this_eq == T_UNKNOWN)
+            eq = T_UNKNOWN;
     }
 
-    res[0] = equal;
-    return status;
+    return eq;
 }
 
-int
-gr_mat_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+truth_t
+gr_mat_is_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    int status, equal, this_status, this_equal;
+    truth_t eq, this_eq;
     slong i, j, r, c, sz;
-
-    status = GR_SUCCESS;
 
     r = gr_mat_nrows(mat, ctx);
     c = gr_mat_ncols(mat, ctx);
 
     if (r == 0 || c == 0)
-    {
-        res[0] = 1;
-        return GR_SUCCESS;
-    }
+        return T_TRUE;
 
     sz = ctx->sizeof_elem;
 
-    equal = 1;
+    eq = T_TRUE;
+
     for (i = 0; i < r; i++)
     {
+        /* todo: use vector functions */
         for (j = 0; j < c; j++)
         {
             if (i == j)
-                this_status = gr_is_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_eq = gr_is_one(GR_MAT_ENTRY(mat, i, j, sz), ctx);
             else
-                this_status = gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_eq = gr_is_zero(GR_MAT_ENTRY(mat, i, j, sz), ctx);
 
-            if (this_status == GR_SUCCESS && !this_equal)
-            {
-                equal = 0;
-                status = GR_SUCCESS;
-                break;
-            }
-            else
-            {
-                status |= status;
-            }
+            if (this_eq == T_FALSE)
+                return T_FALSE;
+
+            if (this_eq == T_UNKNOWN)
+                eq = T_UNKNOWN;
         }
     }
 
-    res[0] = equal;
-    return status;
+    return eq;
 }
 
-int
-gr_mat_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+truth_t
+gr_mat_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    int status, equal, this_status, this_equal;
+    truth_t eq, this_eq;
     slong i, j, r, c, sz;
-
-    status = GR_SUCCESS;
 
     r = gr_mat_nrows(mat, ctx);
     c = gr_mat_ncols(mat, ctx);
 
     if (r == 0 || c == 0)
-    {
-        res[0] = 1;
-        return GR_SUCCESS;
-    }
+        return T_TRUE;
 
     sz = ctx->sizeof_elem;
 
-    equal = 1;
+    eq = T_TRUE;
+
     for (i = 0; i < r; i++)
     {
+        /* todo: use vector functions */
         for (j = 0; j < c; j++)
         {
             if (i == j)
-                this_status = gr_is_neg_one(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_eq = gr_is_neg_one(GR_MAT_ENTRY(mat, i, j, sz), ctx);
             else
-                this_status = gr_is_zero(&this_equal, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+                this_eq = gr_is_zero(GR_MAT_ENTRY(mat, i, j, sz), ctx);
 
-            if (this_status == GR_SUCCESS && !this_equal)
-            {
-                equal = 0;
-                status = GR_SUCCESS;
-                break;
-            }
-            else
-            {
-                status |= status;
-            }
+            if (this_eq == T_FALSE)
+                return T_FALSE;
+
+            if (this_eq == T_UNKNOWN)
+                eq = T_UNKNOWN;
         }
     }
 
-    res[0] = equal;
-    return status;
+    return eq;
 }
 
-int
-gr_mat_equal(int * res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+truth_t
+gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
-    int status, equal, this_equal, this_status;
+    truth_t eq, this_eq;
     slong i, r, c;
-
-    status = GR_SUCCESS;
 
     r = gr_mat_nrows(mat1, ctx);
     c = gr_mat_ncols(mat1, ctx);
@@ -231,35 +201,26 @@ gr_mat_equal(int * res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     if (r != gr_mat_nrows(mat2, ctx) ||
         c != gr_mat_ncols(mat2, ctx))
     {
-        res[0] = 0;
-        return GR_SUCCESS;
+        return T_FALSE;
     }
 
     if (r == 0 || c == 0)
-    {
-        res[0] = 1;
-        return GR_SUCCESS;
-    }
+        return T_TRUE;
 
-    equal = 1;
+    eq = T_TRUE;
+
     for (i = 0; i < r; i++)
     {
-        this_status = _gr_vec_equal(&this_equal, mat1->rows[i], mat2->rows[i], c, ctx);
+        this_eq = _gr_vec_equal(mat1->rows[i], mat2->rows[i], c, ctx);
 
-        if (this_status == GR_SUCCESS && !this_equal)
-        {
-            equal = 0;
-            status = GR_SUCCESS;
-            break;
-        }
-        else
-        {
-            status |= status;
-        }
+        if (this_eq == T_FALSE)
+            return T_FALSE;
+
+        if (this_eq == T_UNKNOWN)
+            eq = T_UNKNOWN;
     }
 
-    res[0] = equal;
-    return status;
+    return eq;
 }
 
 int
@@ -662,11 +623,11 @@ gr_cmp_repr(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 }
 
 int
-ca_mat_find_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
+gr_mat_find_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
 {
     slong best_row, i;
-    int is_zero, status;
     int unknown;
+    truth_t is_zero;
     slong sz;
 
     if (end_row <= start_row)
@@ -715,11 +676,11 @@ ca_mat_find_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_ro
 
     for (i = start_row; i < end_row; i++)
     {
-        status = gr_is_zero(&is_zero, GR_MAT_ENTRY(mat, i, column, sz), ctx);
+        is_zero = gr_is_zero(GR_MAT_ENTRY(mat, i, column, sz), ctx);
 
-        if (status == GR_SUCCESS)
+        if (is_zero != T_UNKNOWN)
         {
-            if (!is_zero)
+            if (is_zero == T_FALSE)
             {
                 if (best_row == -1 || gr_cmp_repr(GR_MAT_ENTRY(mat, i, column, sz), GR_MAT_ENTRY(mat, best_row, column, sz), ctx) < 0)
                 {
@@ -812,7 +773,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
 
     while (row < m && col < n)
     {
-        pivot_status = ca_mat_find_pivot(&r, LU, row, m, col, ctx);
+        pivot_status = gr_mat_find_pivot(&r, LU, row, m, col, ctx);
 
         /* We don't know whether there is a nonzero pivot element,
            so we can't determine the rank. */
@@ -921,10 +882,10 @@ matrix_randtest(gr_mat_t res, flint_rand_t state, void * options, gr_ctx_t ctx)
     return gr_mat_randtest(res, state, options, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
-matrix_equal(int * equal, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+truth_t
+matrix_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
-    return gr_mat_equal(equal, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_equal(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
 int
@@ -969,22 +930,22 @@ matrix_one(gr_mat_t res, gr_ctx_t ctx)
     return gr_mat_one(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
-matrix_is_zero(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+truth_t
+matrix_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    return gr_mat_is_zero(res, mat, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_is_zero(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
-matrix_is_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+truth_t
+matrix_is_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    return gr_mat_is_one(res, mat, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_is_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
-matrix_is_neg_one(int * res, const gr_mat_t mat, gr_ctx_t ctx)
+truth_t
+matrix_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    return gr_mat_is_neg_one(res, mat, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_is_neg_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
 int

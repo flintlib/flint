@@ -7,28 +7,25 @@ _gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 _gr_fmpq_init(fmpq_t x, const gr_ctx_t ctx)
 {
     fmpq_init(x);
-    return GR_SUCCESS;
 }
 
-int
+void
 _gr_fmpq_clear(fmpq_t x, const gr_ctx_t ctx)
 {
     fmpq_clear(x);
-    return GR_SUCCESS;
 }
 
-int
+void
 _gr_fmpq_swap(fmpq_t x, fmpq_t y, const gr_ctx_t ctx)
 {
     fmpq_t t;
     *t = *x;
     *x = *y;
     *y = *t;
-    return GR_SUCCESS;
 }
 
 /* todo: limits */
@@ -104,32 +101,28 @@ _gr_fmpq_set_fmpq(fmpq_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_fmpq_is_zero(int * res, const fmpq_t x, const gr_ctx_t ctx)
+truth_t
+_gr_fmpq_is_zero(const fmpq_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpq_is_zero(x);
-    return GR_SUCCESS;
+    return fmpq_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_fmpq_is_one(int * res, const fmpq_t x, const gr_ctx_t ctx)
+truth_t
+_gr_fmpq_is_one(const fmpq_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpq_is_one(x);
-    return GR_SUCCESS;
+    return fmpq_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_fmpq_is_neg_one(int * res, const fmpq_t x, const gr_ctx_t ctx)
+truth_t
+_gr_fmpq_is_neg_one(const fmpq_t x, const gr_ctx_t ctx)
 {
-    res[0] = (*fmpq_numref(x) == -1) && fmpz_is_one(fmpq_denref(x));
-    return GR_SUCCESS;
+    return ((*fmpq_numref(x) == -1) && fmpz_is_one(fmpq_denref(x))) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_fmpq_equal(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
+truth_t
+_gr_fmpq_equal(const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
-    res[0] = fmpq_equal(x, y);
-    return GR_SUCCESS;
+    return fmpq_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int
@@ -217,10 +210,9 @@ _gr_fmpq_div(fmpq_t res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_is_invertible(int * res, const fmpq_t x, const gr_ctx_t ctx)
+_gr_fmpq_is_invertible(const fmpq_t x, const gr_ctx_t ctx)
 {
-    res[0] = !fmpq_is_zero(x);
-    return GR_SUCCESS;
+    return (!fmpq_is_zero(x)) ? T_TRUE : T_FALSE;
 }
 
 int
@@ -238,10 +230,9 @@ _gr_fmpq_pow_ui(fmpq_t res, const fmpq_t x, ulong exp, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_is_square(int * res, const fmpq_t x, const gr_ctx_t ctx)
+_gr_fmpq_is_square(const fmpq_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpz_is_square(fmpq_numref(x)) && fmpz_is_square(fmpq_denref(x));
-    return GR_SUCCESS;
+    return (fmpz_is_square(fmpq_numref(x)) && fmpz_is_square(fmpq_denref(x))) ? T_TRUE : T_FALSE;
 }
 
 int

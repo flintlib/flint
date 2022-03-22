@@ -89,7 +89,6 @@ Possible applications
   By specializing methods at runtime for rings with different parameters,
   it should even be possible to improve performance in some cases.
 
-
 Error handling
 -------------------------------------------------------------------------------
 
@@ -160,8 +159,13 @@ output variables may be set to meaningless values.
 For uniformity, most operations return a status code, even operations
 that are not typically expected to fail (we might want to wrap
 such functions in asserts).
-Functions that do not return a status code include pure "container"
-operations like ``init``, ``clear`` and ``swap``.
+
+* Pure "container" operations like ``init``, ``clear`` and ``swap``
+  do not return a status code.
+
+* Pure predicate functions (see below)
+  return ``T_TRUE`` / ``T_FALSE`` / ``T_UNKNOWN``
+  instead of computing a separate boolean value and error code.
 
 Flags can be OR'ed and checked only at the top level of a computation
 to avoid complex control flow.
@@ -170,6 +174,30 @@ to avoid complex control flow.
 
     Evaluates *expr* and asserts that the return value is
     ``GR_SUCCESS``.
+
+Ring predicates
+-------------------------------------------------------------------------------
+
+We use the following type (borrowed from Calcium) instead of a C int
+to represent boolean results, allowing the possibility
+that the value is not computable:
+
+.. enum:: truth_t
+
+    Represents one of the following truth values:
+
+    .. macro:: T_TRUE
+
+    .. macro:: T_FALSE
+
+    .. macro:: T_UNKNOWN
+
+    Warning: the constants ``T_TRUE`` and ``T_FALSE`` do not correspond to 1 and 0.
+    It is erroneous to write, for example ``!t`` if ``t`` is a 
+    :type:`truth_t`. One should instead write ``t != T_TRUE``, ``t == T_FALSE``,
+    etc. depending on whether the unknown case should be included
+    or excluded.
+
 
 Main types
 -------------------------------------------------------------------------------
@@ -404,21 +432,16 @@ Basic functions
     The *fmpq* method may return the flag ``GR_DOMAIN`` if the
     denominator of *x* is not invertible.
 
-.. function:: int gr_is_zero(int * res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_is_one(int * res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_is_neg_one(int * res, gr_srcptr x, gr_ctx_t ctx)
+.. function:: truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx)
+              truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx)
+              truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
 
-    Sets *res* to 1 if *x* is equal to the element 0, 1 or -1 of the
-    ring, respectively, and sets *res* to 0 otherwise.
-    Returns the flag ``GR_UNABLE`` if the implementation is unable
-    to perform the comparison.
+    Returns whether *x* is equal to the element 0, 1 or -1 of the
+    ring, respectively.
 
-.. function:: int gr_equal(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+.. function:: int gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
-    Sets *res* to 1 if the elements *x* and *y* are equal,
-    and sets *res* to 0 otherwise.
-    Returns the flag ``GR_UNABLE`` if the implementation is unable
-    to perform the comparison.
+    Returns whether the elements *x* and *y* are equal.
 
 Arithmetic
 ........................................................................
@@ -479,13 +502,10 @@ to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8
     `q y = x` (which, for example, gives the usual exact
     division in `\mathbb{Z}`).
 
-.. function:: int gr_is_invertible(int * res, gr_srcptr x, gr_ctx_t ctx)
+.. function:: truth gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
 
-    Sets *res* to 1 if *x* has a multiplicative inverse in the present ring
-    (i.e. if *x* is a unit),
-    and sets *res* to 0 if *x* does not have a multiplicative inverse.
-    Returns the flag ``GR_UNABLE`` if the implementation is unable
-    to perform the computation.
+    Returns whether *x* has a multiplicative inverse in the present ring,
+    i.e. whether *x* is a unit.
 
 .. function:: int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
@@ -534,12 +554,9 @@ In subrings of `\mathbb{C}`, it is implied that the principal
 square root is computed; in other cases (e.g. in finite fields),
 the choice of root is implementation-dependent.
 
-.. function:: int gr_is_square(int * res, gr_srcptr x, gr_ctx_t ctx)
+.. function:: truth_t gr_is_square(gr_srcptr x, gr_ctx_t ctx)
 
-    Sets *res* to 1 if *x* is a perfect square in the present ring,
-    and sets *res* to 0 if *x* it not a perfect square.
-    Returns the flag ``GR_UNABLE`` if the implementation is unable
-    to perform the computation.
+    Returns whether *x* is a perfect square in the present ring.
 
 .. function:: int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
@@ -597,9 +614,9 @@ Low-level vector operations
 
 .. function:: int _gr_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 
-.. function:: int _gr_vec_equal(int * res, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+.. function:: truth_t _gr_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
-.. function:: int _gr_vec_is_zero(int * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+.. function:: truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 

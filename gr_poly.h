@@ -72,8 +72,8 @@ int gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx);
 
 int gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx);
 
-int _gr_poly_equal(int * res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
-int gr_poly_equal(int * res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
+truth_t _gr_poly_equal(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
+truth_t gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
 
 int gr_poly_neg(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx);
 

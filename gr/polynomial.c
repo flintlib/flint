@@ -47,10 +47,10 @@ polynomial_randtest(gr_poly_t res, flint_rand_t state, void * options, gr_ctx_t 
     return gr_poly_randtest(res, state, n_randint(state, 5), POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
-polynomial_equal(int * equal, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
+truth_t
+polynomial_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
-    return gr_poly_equal(equal, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
+    return gr_poly_equal(poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 int
@@ -104,22 +104,22 @@ polynomial_neg_one(gr_poly_t res, gr_ctx_t ctx)
 }
 
 /*
-int
-polynomial_is_zero(int * res, const gr_poly_t mat, gr_ctx_t ctx)
+truth_t
+polynomial_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
 {
-    return gr_poly_is_zero(res, mat, POLYNOMIAL_ELEM_CTX(ctx));
+    return gr_poly_is_zero(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
-polynomial_is_one(int * res, const gr_poly_t mat, gr_ctx_t ctx)
+truth_t
+polynomial_is_one(const gr_poly_t poly, gr_ctx_t ctx)
 {
-    return gr_poly_is_one(res, mat, POLYNOMIAL_ELEM_CTX(ctx));
+    return gr_poly_is_one(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
-polynomial_is_neg_one(int * res, const gr_poly_t mat, gr_ctx_t ctx)
+truth_t
+polynomial_is_neg_one(const gr_poly_t poly, gr_ctx_t ctx)
 {
-    return gr_poly_is_neg_one(res, mat, POLYNOMIAL_ELEM_CTX(ctx));
+    return gr_poly_is_neg_one(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 */
 

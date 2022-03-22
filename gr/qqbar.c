@@ -132,32 +132,28 @@ _gr_qqbar_set_fmpq(qqbar_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_qqbar_is_zero(int * res, const qqbar_t x, const gr_ctx_t ctx)
+truth_t
+_gr_qqbar_is_zero(const qqbar_t x, const gr_ctx_t ctx)
 {
-    res[0] = qqbar_is_zero(x);
-    return GR_SUCCESS;
+    return qqbar_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_qqbar_is_one(int * res, const qqbar_t x, const gr_ctx_t ctx)
+truth_t
+_gr_qqbar_is_one(const qqbar_t x, const gr_ctx_t ctx)
 {
-    res[0] = qqbar_is_one(x);
-    return GR_SUCCESS;
+    return qqbar_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_qqbar_is_neg_one(int * res, const qqbar_t x, const gr_ctx_t ctx)
+truth_t
+_gr_qqbar_is_neg_one(const qqbar_t x, const gr_ctx_t ctx)
 {
-    res[0] = qqbar_is_neg_one(x);
-    return GR_SUCCESS;
+    return qqbar_is_neg_one(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_qqbar_equal(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+truth_t
+_gr_qqbar_equal(const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
-    res[0] = qqbar_equal(x, y);
-    return GR_SUCCESS;
+    return qqbar_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int

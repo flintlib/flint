@@ -92,32 +92,28 @@ nmod8_set_fmpz(nmod8_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-nmod8_is_zero(int * res, const nmod8_t x, const gr_ctx_t ctx)
+truth_t
+nmod8_is_zero(const nmod8_t x, const gr_ctx_t ctx)
 {
-    res[0] = (x[0] == 0);
-    return GR_SUCCESS;
+    return (x[0] == 0) ? T_TRUE : T_FALSE;
 }
 
-int
-nmod8_is_one(int * res, const nmod8_t x, const gr_ctx_t ctx)
+truth_t
+nmod8_is_one(const nmod8_t x, const gr_ctx_t ctx)
 {
-    res[0] = (x[0] == (NMOD8_CTX(ctx).n != 1));
-    return GR_SUCCESS;
+    return (x[0] == (NMOD8_CTX(ctx).n != 1)) ? T_TRUE : T_FALSE;
 }
 
-int
-nmod8_is_neg_one(int * res, const nmod8_t x, const gr_ctx_t ctx)
+truth_t
+nmod8_is_neg_one(const nmod8_t x, const gr_ctx_t ctx)
 {
-    res[0] = (x[0] == NMOD8_CTX(ctx).n - 1);
-    return GR_SUCCESS;
+    return (x[0] == NMOD8_CTX(ctx).n - 1) ? T_TRUE : T_FALSE;
 }
 
-int
-nmod8_equal(int * res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
+truth_t
+nmod8_equal(const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
-    res[0] = (x[0] == y[0]);
-    return GR_SUCCESS;
+    return (x[0] == y[0]) ? T_TRUE : T_FALSE;
 }
 
 int
@@ -208,13 +204,12 @@ nmod8_div_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
     return nmod8_div(res, x, t, ctx);
 }
 
-int
-nmod8_is_invertible(int * res, const nmod8_t x, const gr_ctx_t ctx)
+truth_t
+nmod8_is_invertible(const nmod8_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
     g = n_gcdinv(&r, x[0], NMOD8_CTX(ctx).n);
-    res[0] = (g == 1);
-    return GR_SUCCESS;
+    return (g == 1) ? T_TRUE : T_FALSE;
 }
 
 int

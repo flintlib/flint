@@ -100,32 +100,28 @@ _gr_fmpz_set_fmpq(fmpz_t res, const fmpq_t v, const gr_ctx_t ctx)
     }
 }
 
-int
-_gr_fmpz_is_zero(int * res, const fmpz_t x, const gr_ctx_t ctx)
+truth_t
+_gr_fmpz_is_zero(const fmpz_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpz_is_zero(x);
-    return GR_SUCCESS;
+    return fmpz_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_fmpz_is_one(int * res, const fmpz_t x, const gr_ctx_t ctx)
+truth_t
+_gr_fmpz_is_one(const fmpz_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpz_is_one(x);
-    return GR_SUCCESS;
+    return fmpz_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_fmpz_is_neg_one(int * res, const fmpz_t x, const gr_ctx_t ctx)
+truth_t
+_gr_fmpz_is_neg_one(const fmpz_t x, const gr_ctx_t ctx)
 {
-    res[0] = (*x == -1);
-    return GR_SUCCESS;
+    return (*x == -1) ? T_TRUE : T_FALSE;
 }
 
-int
-_gr_fmpz_equal(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+truth_t
+_gr_fmpz_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
-    res[0] = fmpz_equal(x, y);
-    return GR_SUCCESS;
+    return fmpz_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int
@@ -214,11 +210,10 @@ _gr_fmpz_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+truth_t
 _gr_fmpz_is_invertible(int * res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpz_is_pm1(x);
-    return GR_SUCCESS;
+    return fmpz_is_pm1(x) ? T_TRUE : T_FALSE;
 }
 
 /* todo: overload pow_fmpz? */
@@ -240,8 +235,7 @@ _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
 int
 _gr_fmpz_is_square(int * res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    res[0] = fmpz_is_square(x);
-    return GR_SUCCESS;
+    return fmpz_is_square(x) ? T_TRUE : T_FALSE;
 }
 
 int
