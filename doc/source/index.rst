@@ -253,7 +253,7 @@ particular types will appear in an application.
 Ring constructions
 -------------------------------------------------------------------------------
 
-Builtin base rings
+Base rings
 ...............................................................................
 
 .. function:: void gr_ctx_init_fmpz(gr_ctx_t ctx)
@@ -276,7 +276,12 @@ Builtin base rings
               void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 
     Initializes *ctx* to the field of real or complex algebraic
-    numbers with elements of type :type:`qqbar`.
+    numbers with elements of type :type:`qqbar_t`.
+
+.. function:: void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
+
+    Initializes *ctx* to the field of real numbers represented
+    by balls of type :type:`arb_t`.
 
 
 Derived rings
@@ -284,9 +289,15 @@ Derived rings
 
 .. function:: void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 
-    Initializes *ctx* to the ring of densely stored *n* by *n* matrices
+    Initializes *ctx* to a ring of densely stored *n* by *n* matrices
     over the given *base_ring*.
     Elements have type :type:`gr_mat_struct`.
+
+.. function:: void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
+
+    Initializes *ctx* to a ring of densely stored univariate polynomials
+    over the given *base_ring*.
+    Elements have type :type:`gr_poly_struct`.
 
 Context operations
 -------------------------------------------------------------------------------
@@ -439,7 +450,7 @@ Basic functions
     Returns whether *x* is equal to the element 0, 1 or -1 of the
     ring, respectively.
 
-.. function:: int gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+.. function:: truth_t gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
     Returns whether the elements *x* and *y* are equal.
 

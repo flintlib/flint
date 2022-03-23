@@ -555,6 +555,8 @@ void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 
+void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
+
 /* Generic polynomial ring */
 
 typedef struct

@@ -359,11 +359,10 @@ _gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
     }
 }
 
-int
-_gr_qqbar_is_invertible(int * res, const qqbar_t x, const gr_ctx_t ctx)
+truth_t
+_gr_qqbar_is_invertible(const qqbar_t x, const gr_ctx_t ctx)
 {
-    res[0] = !qqbar_is_zero(x);
-    return GR_SUCCESS;
+    return !qqbar_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
 int
@@ -446,15 +445,13 @@ _gr_qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t exp, const gr_ctx_t ct
     }
 }
 
-int
-_gr_qqbar_is_square(int * res, const qqbar_t x, const gr_ctx_t ctx)
+truth_t
+_gr_qqbar_is_square(const qqbar_t x, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->real_only)
-        res[0] = (qqbar_sgn_re(x) >= 0);
+        return (qqbar_sgn_re(x) >= 0) ? T_TRUE : T_FALSE;
     else
-        res[0] = 1;
-
-    return GR_SUCCESS;
+        return T_TRUE;
 }
 
 int

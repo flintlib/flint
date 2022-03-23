@@ -210,7 +210,7 @@ _gr_fmpq_div(fmpq_t res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+truth_t
 _gr_fmpq_is_invertible(const fmpq_t x, const gr_ctx_t ctx)
 {
     return (!fmpq_is_zero(x)) ? T_TRUE : T_FALSE;
@@ -230,7 +230,7 @@ _gr_fmpq_pow_ui(fmpq_t res, const fmpq_t x, ulong exp, const gr_ctx_t ctx)
     }
 }
 
-int
+truth_t
 _gr_fmpq_is_square(const fmpq_t x, const gr_ctx_t ctx)
 {
     return (fmpz_is_square(fmpq_numref(x)) && fmpz_is_square(fmpq_denref(x))) ? T_TRUE : T_FALSE;

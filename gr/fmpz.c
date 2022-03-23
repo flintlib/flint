@@ -233,7 +233,7 @@ _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
     }
 }
 
-int
+truth_t
 _gr_fmpz_is_square(int * res, const fmpz_t x, const gr_ctx_t ctx)
 {
     return fmpz_is_square(x) ? T_TRUE : T_FALSE;
