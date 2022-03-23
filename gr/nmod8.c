@@ -213,6 +213,102 @@ nmod8_is_invertible(const nmod8_t x, const gr_ctx_t ctx)
 }
 
 int
+_nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    ulong n, s;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            nmod8_zero(res, ctx);
+        else
+            nmod8_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    n = NMOD8_CTX(ctx).n;
+
+    if (initial == NULL)
+    {
+        s = 0;
+    }
+    else
+    {
+        if (subtract)
+            s = (n - initial[0]);
+        else
+            s = initial[0];
+    }
+
+    for (i = 0; i + 4 < len; i += 4)
+    {
+        s += (ulong) vec1[i    ] * (ulong) vec2[i];
+        s += (ulong) vec1[i + 1] * (ulong) vec2[i + 1];
+        s += (ulong) vec1[i + 2] * (ulong) vec2[i + 2];
+        s += (ulong) vec1[i + 3] * (ulong) vec2[i + 3];
+    }
+
+    for ( ; i < len; i++)
+        s += (ulong) vec1[i] * (ulong) vec2[i];
+
+    nmod8_set_ui(res, s, ctx);
+
+    if (subtract && res[0] != 0)
+        res[0] = (n - res[0]);
+
+    return GR_SUCCESS;
+}
+
+int
+_nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    ulong n, s;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            nmod8_zero(res, ctx);
+        else
+            nmod8_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    n = NMOD8_CTX(ctx).n;
+
+    if (initial == NULL)
+    {
+        s = 0;
+    }
+    else
+    {
+        if (subtract)
+            s = (n - initial[0]);
+        else
+            s = initial[0];
+    }
+
+    for (i = 0; i + 4 < len; i += 4)
+    {
+        s += (ulong) vec1[i    ] * (ulong) vec2[len - 1 - i];
+        s += (ulong) vec1[i + 1] * (ulong) vec2[len - 1 - i - 1];
+        s += (ulong) vec1[i + 2] * (ulong) vec2[len - 1 - i - 2];
+        s += (ulong) vec1[i + 3] * (ulong) vec2[len - 1 - i - 3];
+    }
+
+    for ( ; i < len; i++)
+        s += (ulong) vec1[i] * (ulong) vec2[len - 1 - i];
+
+    nmod8_set_ui(res, s, ctx);
+
+    if (subtract && res[0] != 0)
+        res[0] = (n - res[0]);
+
+    return GR_SUCCESS;
+}
+
+int
 nmod8_ctx_clear(gr_ctx_t ctx)
 {
     flint_free(ctx->elem_ctx);
@@ -252,6 +348,8 @@ gr_method_tab_input nmod8_methods2[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) nmod8_div_si},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
+    {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod8_vec_dot},
+    {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
     {0,                         (gr_funcptr) NULL},
 };
 

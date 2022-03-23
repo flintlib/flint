@@ -2,7 +2,7 @@
 
 
 int
-_gr_poly_mullow(gr_ptr res,
+_gr_poly_mullow_generic(gr_ptr res,
     gr_srcptr poly1, slong len1,
     gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
 {

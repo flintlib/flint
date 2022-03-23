@@ -18,6 +18,10 @@ _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx)
             gr_zero(GR_ENTRY(poly->coeffs, i, sz), ctx);
             i--;
         }
+        else
+        {
+            break;
+        }
     }
 
     poly->length = i + 1;

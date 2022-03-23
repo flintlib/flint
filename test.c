@@ -1326,11 +1326,34 @@ gr_test_ring(gr_ctx_t R, slong iters)
 
 int main()
 {
-    gr_ctx_t ZZ, MZZ;
+    gr_ctx_t ZZ, MZZ, ZZx;
     gr_ctx_t QQbar, QQbar_real;
     gr_ctx_t QQ, MQQ, QQx;
-    gr_ctx_t Zn;
+    gr_ctx_t Zn, Znx;
     gr_ctx_t MZn;
+
+    gr_ctx_init_nmod8(Zn, 33);
+    gr_ctx_init_polynomial(Znx, Zn);
+    Znx->size_limit = 1000;
+    gr_test_ring(Znx, 1000);
+    gr_ctx_clear(Znx);
+    gr_ctx_clear(Zn);
+
+    gr_ctx_init_fmpz(ZZ);
+    gr_ctx_init_polynomial(ZZx, ZZ);
+    ZZ->size_limit = 1000;
+    ZZx->size_limit = 100;
+    gr_test_ring(ZZx, 1000);
+    gr_ctx_clear(ZZx);
+    gr_ctx_clear(ZZ);
+
+    gr_ctx_init_fmpq(QQ);
+    gr_ctx_init_polynomial(QQx, QQ);
+    QQ->size_limit = 1000;
+    QQx->size_limit = 30;
+    gr_test_ring(QQx, 1000);
+    gr_ctx_clear(QQx);
+    gr_ctx_clear(QQ);
 
     if (0)
     {

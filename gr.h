@@ -190,6 +190,9 @@ typedef enum
     GR_METHOD_VEC_DOT,
     GR_METHOD_VEC_DOT_REV,
 
+    /* Polynomial methods */
+    GR_METHOD_POLY_MULLOW,
+
     GR_METHOD_TAB_SIZE
 }
 gr_method;
@@ -266,6 +269,9 @@ typedef truth_t ((*gr_method_vec_predicate)(gr_srcptr, slong, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_vec_predicate)(gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 
+typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
+
+
 /* Macros to retrieve methods (with correct call signature) from context object. */
 
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
@@ -299,6 +305,9 @@ typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcpt
 #define GR_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_vec_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+
+#define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+
 
 /* Wrappers to call methods. */
 
@@ -384,6 +393,12 @@ GR_INLINE truth_t _gr_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ct
 GR_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(vec, len, ctx); }
 GR_INLINE int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT)(res, initial, subtract, vec1, vec2, len, ctx); }
 GR_INLINE int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT_REV)(res, initial, subtract, vec1, vec2, len, ctx); }
+
+GR_INLINE int
+_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+{
+    return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx);
+}
 
 /* todo: could allow overloading this as well */
 GR_INLINE int

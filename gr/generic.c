@@ -1,4 +1,6 @@
 #include "gr.h"
+#include "gr_mat.h"
+#include "gr_poly.h"
 
 /* Generic arithmetic functions */
 
@@ -1054,6 +1056,9 @@ const gr_method_tab_input gr_generic_methods[] =
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},
     {GR_METHOD_VEC_DOT,                 (gr_funcptr) gr_generic_vec_dot},
     {GR_METHOD_VEC_DOT_REV,             (gr_funcptr) gr_generic_vec_dot_rev},
+
+    {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},
+
     {0,                                 (gr_funcptr) NULL},
 };
 

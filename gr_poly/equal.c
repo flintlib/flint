@@ -11,7 +11,8 @@ _gr_poly_equal(gr_srcptr poly1, slong len1,
     if (len1 == len2 || eq == T_FALSE)
         return eq;
 
-    eq2 = _gr_vec_is_zero(GR_ENTRY(poly1, len2, sz), len2 - len1, ctx);
+    eq2 = _gr_vec_is_zero(GR_ENTRY(poly1, len2, sz), len1 - len2, ctx);
+
     return truth_and(eq, eq2);
 }
 
