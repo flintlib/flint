@@ -16,11 +16,10 @@ int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 polynomial_ctx_clear(gr_ctx_t ctx)
 {
     flint_free(ctx->elem_ctx);
-    return GR_SUCCESS;
 }
 
 void

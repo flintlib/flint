@@ -1,6 +1,6 @@
 #include "gr_vec.h"
 
-int
+void
 gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
 {
     slong alloc = vec->alloc;
@@ -16,6 +16,4 @@ gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
         _gr_vec_init(GR_ENTRY(vec->entries, vec->alloc, sz), len - alloc, ctx);
         vec->alloc = len;
     }
-
-    return GR_SUCCESS;
 }

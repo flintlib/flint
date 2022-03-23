@@ -30,9 +30,9 @@ typedef gr_mat_struct gr_mat_t[1];
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
 
-int gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
-int gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx);
+void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
+void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
+void gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx);
 int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx);
 truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx);

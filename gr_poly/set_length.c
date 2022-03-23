@@ -1,6 +1,6 @@
 #include "gr_poly.h"
 
-int
+void
 _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
 {
     if (poly->length > len)
@@ -9,5 +9,4 @@ _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
     }
 
     poly->length = len;
-    return GR_SUCCESS;
 }

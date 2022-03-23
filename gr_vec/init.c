@@ -1,6 +1,6 @@
 #include "gr_vec.h"
 
-int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
+void gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
 {
     vec->length = vec->alloc = len;
 
@@ -14,6 +14,4 @@ int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
         vec->entries = flint_malloc(len * sz);
         _gr_vec_init(vec->entries, len, ctx);
     }
-
-    return GR_SUCCESS;
 }

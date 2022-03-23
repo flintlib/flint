@@ -24,9 +24,9 @@ gr_poly_struct;
 
 typedef gr_poly_struct gr_poly_t[1];
 
-int gr_poly_init(gr_poly_t poly, gr_ctx_t ctx);
-int gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx);
-int gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx);
+void gr_poly_init(gr_poly_t poly, gr_ctx_t ctx);
+void gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx);
+void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx);
 
 GR_POLY_INLINE gr_ptr
 gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
@@ -39,18 +39,17 @@ GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
     return poly->length;
 }
 
-GR_POLY_INLINE int
+GR_POLY_INLINE void
 gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 {
     gr_poly_struct t = *poly1;
     *poly1 = *poly2;
     *poly2 = t;
-    return GR_SUCCESS;
 }
 
-int gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx);
-int _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx);
-int _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx);
+void gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx);
+void _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx);
+void _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx);
 
 int gr_poly_set(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx);
 

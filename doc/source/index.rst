@@ -629,13 +629,13 @@ Memory-managed vectors
 
 .. type:: gr_vec_t
 
-.. function:: int gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
+.. function:: void gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx)
 
     Initializes *vec* to a vector of length *len* with elements
     in the ring *ctx*. The length must be nonnegative.
     All entries are set to zero.
 
-.. function:: int gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx)
+.. function:: void gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx)
 
     Clears the vector *vec*.
 
@@ -648,12 +648,12 @@ Memory-managed vectors
 
     Returns the length of the vector *vec*.
 
-.. function:: int gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
+.. function:: void gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
 
     Allocates space for at least *len* elements in the vector *vec*.
     This does not change the size of the vector.
 
-.. function:: int gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
+.. function:: void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
 
     Resizes the vector to length *len*, which must be nonnegative.
     The vector will be extended with zeros.

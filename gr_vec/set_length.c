@@ -1,6 +1,6 @@
 #include "gr_vec.h"
 
-int
+void
 gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
 {
     if (vec->length > len)
@@ -14,5 +14,4 @@ gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx)
     }
 
     vec->length = len;
-    return GR_SUCCESS;
 }

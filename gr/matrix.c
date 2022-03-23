@@ -3,7 +3,7 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-int
+void
 gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 {
     slong i, sz;
@@ -33,11 +33,9 @@ gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 
     mat->r = rows;
     mat->c = cols;
-
-    return GR_SUCCESS;
 }
 
-int
+void
 gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx)
 {
     if (mat->entries != NULL)
@@ -51,11 +49,9 @@ gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx)
     {
         flint_free(mat->rows);
     }
-
-    return GR_SUCCESS;
 }
 
-int
+void
 gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 {
     if (mat1 != mat2)
@@ -65,8 +61,6 @@ gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
         *mat1 = *mat2;
         *mat2 = *tmp;
     }
-
-    return GR_SUCCESS;
 }
 
 int
@@ -538,10 +532,10 @@ gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ct
     if (A == C || B == C)
     {
         gr_mat_t T;
-        status |= gr_mat_init(T, ar, bc, ctx);
+        gr_mat_init(T, ar, bc, ctx);
         status |= gr_mat_mul_classical(T, A, B, ctx);
         status |= gr_mat_swap_entrywise(T, C, ctx);
-        status |= gr_mat_clear(T, ctx);
+        gr_mat_clear(T, ctx);
         return status;
     }
 
@@ -851,11 +845,10 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 matrix_ctx_clear(gr_ctx_t ctx)
 {
     flint_free(ctx->elem_ctx);
-    return GR_SUCCESS;
 }
 
 void

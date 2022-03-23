@@ -40,5 +40,7 @@ gr_poly_reverse(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
     gr_poly_fit_length(res, n, ctx);
     _gr_poly_reverse(res->coeffs, poly->coeffs, len, n, ctx);
     _gr_poly_set_length(res, n, ctx);
-    return _gr_poly_normalise(res, ctx);
+    _gr_poly_normalise(res, ctx);
+
+    return GR_SUCCESS;
 }
