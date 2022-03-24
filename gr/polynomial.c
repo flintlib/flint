@@ -198,6 +198,8 @@ gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
     if (base_ring->flags & GR_COMMUTATIVE_RING)
         ctx->flags |= GR_COMMUTATIVE_RING;
 
+    ctx->which_ring = GR_WHICH_RING_CUSTOM;
+
     ctx->sizeof_elem = sizeof(gr_poly_struct);
     ctx->elem_ctx = flint_malloc(sizeof(polynomial_ctx_t));
     ctx->size_limit = WORD_MAX;

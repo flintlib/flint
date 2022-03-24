@@ -199,6 +199,7 @@ gr_method;
 
 typedef gr_funcptr gr_static_method_table[GR_METHOD_TAB_SIZE];
 
+/* todo: avoid double pointer indirection */
 typedef struct
 {
     gr_funcptr * methods;
@@ -215,16 +216,28 @@ gr_method_tab_input;
 void gr_method_tab_init(gr_method_tab_t * methods, gr_method_tab_input * tab);
 void gr_method_tab_init_static(gr_method_tab_t * methods, gr_funcptr * static_tab, gr_method_tab_input * tab);
 
-/* Flags. These are not cumulative. (?) */
+/* Ring propery flags. These are not cumulative. (?) */
 
 #define GR_COMMUTATIVE_RING  UWORD(1)
 #define GR_INTEGRAL_DOMAIN   UWORD(2)
 #define GR_FIELD             UWORD(4)
 #define GR_FINITE_RING       UWORD(8)
 
+/* Identify specific rings/fields. */
+
+#define GR_WHICH_RING_CUSTOM             0
+#define GR_WHICH_RING_ZZ                 1
+#define GR_WHICH_RING_ZZ_MOD             2
+#define GR_WHICH_RING_QQ                 3
+#define GR_WHICH_RING_RR                 4
+#define GR_WHICH_RING_CC                 5
+#define GR_WHICH_RING_RR_ALGEBRAIC       6
+#define GR_WHICH_RING_CC_ALGEBRAIC       7
+
 typedef struct
 {
     ulong flags;
+    ulong which_ring;
     ssize_t sizeof_elem;
     void * elem_ctx;
     gr_method_tab_t * methods2;

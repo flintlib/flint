@@ -587,6 +587,7 @@ void
 gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
 {
     ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->which_ring = GR_WHICH_RING_CC;
     ctx->sizeof_elem = sizeof(acb_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_acb_ctx));
     ctx->size_limit = WORD_MAX;

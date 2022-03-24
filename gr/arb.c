@@ -579,6 +579,7 @@ void
 gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
 {
     ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->which_ring = GR_WHICH_RING_RR;
     ctx->sizeof_elem = sizeof(arb_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_arb_ctx));
     ctx->size_limit = WORD_MAX;

@@ -814,8 +814,8 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
     }
     else
     {
-        a = n_randtest(state) % 256;
-        b = n_randtest(state) % 256;
+        a = n_randtest(state) % 20;
+        b = n_randtest(state) % 20;
     }
 
     status = GR_SUCCESS;
@@ -870,7 +870,7 @@ gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int ve
     if (R->flags & GR_FINITE_RING)
         a = n_randtest(state);
     else
-        a = n_randtest(state) % 256;
+        a = n_randtest(state) % 20;
 
     status = GR_SUCCESS;
     status |= gr_pow_ui(xa, x, a, R);
@@ -925,7 +925,7 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
     if (R->flags & GR_FINITE_RING)
         a = n_randtest(state);
     else
-        a = n_randtest(state) % 256;
+        a = n_randtest(state) % 20;
 
     status = GR_SUCCESS;
     status |= gr_pow_ui(xa, x, a, R);
@@ -975,7 +975,7 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int verbose)
     if (R->flags & GR_FINITE_RING)
         a = n_randtest(state);
     else
-        a = n_randtest(state) % 256;
+        a = n_randtest(state) % 20;
 
     status = GR_SUCCESS;
     status |= gr_pow_ui(xa1, x, a, R);
@@ -1030,8 +1030,8 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
     }
     else
     {
-        fmpz_randtest(a, state, 6);
-        fmpz_randtest(b, state, 6);
+        fmpz_randtest(a, state, 4);
+        fmpz_randtest(b, state, 4);
     }
 
     fmpz_add(ab, a, b);
@@ -1333,6 +1333,23 @@ int main()
     gr_ctx_t QQ, MQQ, QQx;
     gr_ctx_t Zn, Znx;
     gr_ctx_t MZn;
+
+    gr_ctx_init_real_ca(RR);
+    gr_test_ring(RR, 1000);
+    gr_ctx_clear(RR);
+
+    gr_ctx_init_complex_ca(CC);
+    gr_test_ring(CC, 1000);
+    gr_ctx_clear(CC);
+
+    gr_ctx_init_real_algebraic_ca(QQbar_real);
+    gr_test_ring(QQbar_real, 1000);
+    gr_ctx_clear(QQbar_real);
+
+    gr_ctx_init_complex_algebraic_ca(QQbar);
+    gr_test_ring(QQbar, 1000);
+    gr_ctx_clear(QQbar);
+
 
     gr_ctx_init_real_arb(RR, 64);
     gr_ctx_init_polynomial(RRx, RR);

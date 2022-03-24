@@ -4,6 +4,7 @@
 
 typedef struct
 {
+    /* todo: use which_ring */
     int real_only;      /* field restricted to real algebraics instead of complex? */
     slong deg_limit;    /* todo */
     slong bits_limit;   /* todo */
@@ -563,6 +564,7 @@ void
 gr_ctx_init_real_qqbar(gr_ctx_t ctx)
 {
     ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->which_ring = GR_WHICH_RING_RR_ALGEBRAIC;
     ctx->sizeof_elem = sizeof(qqbar_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
     ctx->size_limit = WORD_MAX;
@@ -584,6 +586,7 @@ void
 gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 {
     ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->which_ring = GR_WHICH_RING_CC_ALGEBRAIC;
     ctx->sizeof_elem = sizeof(qqbar_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
     ctx->size_limit = WORD_MAX;

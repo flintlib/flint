@@ -436,6 +436,7 @@ void
 gr_ctx_init_fmpq(gr_ctx_t ctx)
 {
     ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->which_ring = GR_WHICH_RING_QQ;
     ctx->sizeof_elem = sizeof(fmpq);
     ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;
