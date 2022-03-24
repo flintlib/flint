@@ -422,6 +422,7 @@ gr_method_tab_input fmpq_methods2[] =
     {GR_METHOD_MUL,             (gr_funcptr) _gr_fmpq_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fmpq_mul_si},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpq_div},
+    {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpq_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_pow_ui},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_is_square},

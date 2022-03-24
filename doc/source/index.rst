@@ -279,10 +279,11 @@ Base rings
     numbers with elements of type :type:`qqbar_t`.
 
 .. function:: void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
+              void gr_ctx_init_real_acb(gr_ctx_t ctx, slong prec)
 
-    Initializes *ctx* to the field of real numbers represented
-    by balls of type :type:`arb_t`.
-
+    Initializes *ctx* to the field of real or complex
+    numbers represented by balls or boxes of type :type:`arb_t`
+    and  :type:`acb_t`.
 
 Derived rings
 ...............................................................................

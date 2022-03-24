@@ -556,6 +556,7 @@ void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 
 void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
+void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);
 
 /* Generic polynomial ring */
 

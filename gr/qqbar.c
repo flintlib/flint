@@ -543,6 +543,7 @@ gr_method_tab_input qqbar_methods2[] =
     {GR_METHOD_DIV_FMPZ,        (gr_funcptr) _gr_qqbar_div_fmpz},
     {GR_METHOD_DIV_FMPQ,        (gr_funcptr) _gr_qqbar_div_fmpq},
 
+    {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_qqbar_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_qqbar_inv},
 
     {GR_METHOD_POW,             (gr_funcptr) _gr_qqbar_pow},

@@ -1,4 +1,5 @@
 #include "arb.h"
+#include "arb_poly.h"
 #include "gr.h"
 
 typedef struct
@@ -431,6 +432,10 @@ _gr_arb_pow(arb_t res, const arb_t x, const arb_t exp, const gr_ctx_t ctx)
         arb_pow(res, x, exp, ARB_CTX_PREC(ctx));
         return GR_SUCCESS;
     }
+    else if (arb_is_zero(x) && arb_is_negative(exp))
+    {
+        return GR_DOMAIN;
+    }
     else if (arb_is_negative(x) && !arb_contains_int(exp))
     {
         return GR_DOMAIN;
@@ -555,6 +560,7 @@ gr_method_tab_input arb_methods2[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_arb_div_si},
     {GR_METHOD_DIV_FMPZ,        (gr_funcptr) _gr_arb_div_fmpz},
     {GR_METHOD_INV,             (gr_funcptr) _gr_arb_inv},
+    {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_arb_is_invertible},
     {GR_METHOD_POW,             (gr_funcptr) _gr_arb_pow},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_arb_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_arb_pow_si},
