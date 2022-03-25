@@ -58,7 +58,6 @@ polynomial_set(gr_poly_t res, const gr_poly_t mat, gr_ctx_t ctx)
     return gr_poly_set(res, mat, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-/*
 int
 polynomial_set_si(gr_poly_t res, slong v, gr_ctx_t ctx)
 {
@@ -82,7 +81,6 @@ polynomial_set_fmpq(gr_poly_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     return gr_poly_set_fmpq(res, v, POLYNOMIAL_ELEM_CTX(ctx));
 }
-*/
 
 int
 polynomial_zero(gr_poly_t res, gr_ctx_t ctx)
@@ -177,12 +175,10 @@ gr_method_tab_input polynomial_methods2[] =
 */
     {GR_METHOD_EQUAL,       (gr_funcptr) polynomial_equal},
     {GR_METHOD_SET,         (gr_funcptr) polynomial_set},
-/*
     {GR_METHOD_SET_UI,      (gr_funcptr) polynomial_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) polynomial_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) polynomial_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) polynomial_set_fmpq},
-*/
     {GR_METHOD_NEG,         (gr_funcptr) polynomial_neg},
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},

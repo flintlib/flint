@@ -1,0 +1,94 @@
+#include "gr_poly.h"
+
+int
+gr_poly_set_scalar(gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+    {
+        gr_poly_zero(poly, ctx);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        gr_poly_fit_length(poly, 1, ctx);
+        gr_set(poly->coeffs, x, ctx);
+        _gr_poly_set_length(poly, 1, ctx);
+        return GR_SUCCESS;
+    }
+}
+
+int
+gr_poly_set_si(gr_poly_t poly, slong x, gr_ctx_t ctx)
+{
+    if (x == 0)
+    {
+        gr_poly_zero(poly, ctx);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        gr_poly_fit_length(poly, 1, ctx);
+        status = gr_set_si(poly->coeffs, x, ctx);
+        _gr_poly_set_length(poly, 1, ctx);
+        _gr_poly_normalise(poly, ctx);
+        return status;
+    }
+}
+
+int
+gr_poly_set_ui(gr_poly_t poly, slong x, gr_ctx_t ctx)
+{
+    if (x == 0)
+    {
+        gr_poly_zero(poly, ctx);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        gr_poly_fit_length(poly, 1, ctx);
+        status = gr_set_ui(poly->coeffs, x, ctx);
+        _gr_poly_set_length(poly, 1, ctx);
+        _gr_poly_normalise(poly, ctx);
+        return status;
+    }
+}
+
+int
+gr_poly_set_fmpz(gr_poly_t poly, const fmpz_t x, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(x))
+    {
+        gr_poly_zero(poly, ctx);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        gr_poly_fit_length(poly, 1, ctx);
+        status = gr_set_fmpz(poly->coeffs, x, ctx);
+        _gr_poly_set_length(poly, 1, ctx);
+        _gr_poly_normalise(poly, ctx);
+        return status;
+    }
+}
+
+int
+gr_poly_set_fmpq(gr_poly_t poly, const fmpq_t x, gr_ctx_t ctx)
+{
+    if (fmpq_is_zero(x))
+    {
+        gr_poly_zero(poly, ctx);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        gr_poly_fit_length(poly, 1, ctx);
+        status = gr_set_fmpq(poly->coeffs, x, ctx);
+        _gr_poly_set_length(poly, 1, ctx);
+        _gr_poly_normalise(poly, ctx);
+        return status;
+    }
+}
