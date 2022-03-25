@@ -1,5 +1,7 @@
 test
 
+Makefile
+build/*
 doc/build/*
 
 # Prerequisites
