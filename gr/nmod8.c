@@ -328,11 +328,11 @@ nmod8_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _nmod8_methods2_initialized = 0;
-gr_static_method_table _nmod8_static_table;
-gr_method_tab_t _nmod8_methods2;
+int _nmod8_methods_initialized = 0;
 
-gr_method_tab_input nmod8_methods2[] =
+gr_static_method_table _nmod8_methods;
+
+gr_method_tab_input _nmod8_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) nmod8_ctx_write},
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) nmod8_ctx_clear},
@@ -379,11 +379,11 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
     ctx->elem_ctx = flint_malloc(sizeof(nmod_t));  /* This could be something more interesting */
     nmod_init(ctx->elem_ctx, n);
 
-    if (!_nmod8_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_nmod8_methods2, _nmod8_static_table, nmod8_methods2);
-        _nmod8_methods2_initialized = 1;
-    }
+    ctx->methods = _nmod8_methods;
 
-    ctx->methods2 = &_nmod8_methods2;
+    if (!_nmod8_methods_initialized)
+    {
+        gr_method_tab_init(_nmod8_methods, _nmod8_methods_input);
+        _nmod8_methods_initialized = 1;
+    }
 }

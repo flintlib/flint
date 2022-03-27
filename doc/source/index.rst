@@ -736,3 +736,14 @@ Implementing rings
 
     This function does nothing and returns ``GR_UNABLE``. It is used
     as a generic fallback method when no implementation is available.
+
+.. type:: gr_method_tab_input
+
+    Typedef representing a (index, function pointer) pair.
+
+.. function:: void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
+
+    Initializes the method table *methods*. This first inserts
+    default and generic methods in all slots, and then overwrites
+    with the specialized methods listed in *tab*.
+

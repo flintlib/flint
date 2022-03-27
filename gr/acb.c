@@ -540,11 +540,11 @@ _gr_acb_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _acb_methods2_initialized = 0;
-gr_static_method_table _acb_static_table;
-gr_method_tab_t _acb_methods2;
+int _acb_methods_initialized = 0;
 
-gr_method_tab_input acb_methods2[] =
+gr_static_method_table _acb_methods;
+
+gr_method_tab_input _acb_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_acb_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_acb_ctx_write},
@@ -613,11 +613,11 @@ gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
 
     ACB_CTX_PREC(ctx) = prec;
 
-    if (!_acb_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_acb_methods2, _acb_static_table, acb_methods2);
-        _acb_methods2_initialized = 1;
-    }
+    ctx->methods = _acb_methods;
 
-    ctx->methods2 = &_acb_methods2;
+    if (!_acb_methods_initialized)
+    {
+        gr_method_tab_init(_acb_methods, _acb_methods_input);
+        _acb_methods_initialized = 1;
+    }
 }

@@ -532,11 +532,11 @@ _gr_arb_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _arb_methods2_initialized = 0;
-gr_static_method_table _arb_static_table;
-gr_method_tab_t _arb_methods2;
+int _arb_methods_initialized = 0;
 
-gr_method_tab_input arb_methods2[] =
+gr_static_method_table _arb_methods;
+
+gr_method_tab_input _arb_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_arb_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_arb_ctx_write},
@@ -605,11 +605,11 @@ gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
 
     ARB_CTX_PREC(ctx) = prec;
 
-    if (!_arb_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_arb_methods2, _arb_static_table, arb_methods2);
-        _arb_methods2_initialized = 1;
-    }
+    ctx->methods = _arb_methods;
 
-    ctx->methods2 = &_arb_methods2;
+    if (!_arb_methods_initialized)
+    {
+        gr_method_tab_init(_arb_methods, _arb_methods_input);
+        _arb_methods_initialized = 1;
+    }
 }

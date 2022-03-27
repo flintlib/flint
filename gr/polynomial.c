@@ -151,12 +151,11 @@ polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
     return gr_poly_mul(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-/* todo: thread safe */
-int _polynomial_methods2_initialized = 0;
-gr_static_method_table _polynomial_static_table;
-gr_method_tab_t _polynomial_methods2;
+int _gr_poly_methods_initialized = 0;
 
-gr_method_tab_input polynomial_methods2[] =
+gr_static_method_table _gr_poly_methods;
+
+gr_method_tab_input _gr_poly_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) polynomial_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) polynomial_ctx_clear},
@@ -203,11 +202,11 @@ gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
     ((polynomial_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
     ((polynomial_ctx_t *) ctx->elem_ctx)->degree_limit = WORD_MAX;
 
-    if (!_polynomial_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_polynomial_methods2, _polynomial_static_table, polynomial_methods2);
-        _polynomial_methods2_initialized = 1;
-    }
+    ctx->methods = _gr_poly_methods;
 
-    ctx->methods2 = &_polynomial_methods2;
+    if (!_gr_poly_methods_initialized)
+    {
+        gr_method_tab_init(_gr_poly_methods, _gr_poly_methods_input);
+        _gr_poly_methods_initialized = 1;
+    }
 }

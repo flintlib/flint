@@ -202,13 +202,6 @@ gr_method;
 
 typedef gr_funcptr gr_static_method_table[GR_METHOD_TAB_SIZE];
 
-/* todo: avoid double pointer indirection */
-typedef struct
-{
-    gr_funcptr * methods;
-}
-gr_method_tab_t;
-
 typedef struct
 {
     gr_method index;
@@ -216,8 +209,7 @@ typedef struct
 }
 gr_method_tab_input;
 
-void gr_method_tab_init(gr_method_tab_t * methods, gr_method_tab_input * tab);
-void gr_method_tab_init_static(gr_method_tab_t * methods, gr_funcptr * static_tab, gr_method_tab_input * tab);
+void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 
 /* Ring propery flags. These are not cumulative. (?) */
 
@@ -243,7 +235,7 @@ typedef struct
     ulong which_ring;
     ssize_t sizeof_elem;
     void * elem_ctx;
-    gr_method_tab_t * methods2;
+    gr_funcptr * methods;
     ulong size_limit;
 }
 gr_ctx_struct;
@@ -290,39 +282,39 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 
 /* Macros to retrieve methods (with correct call signature) from context object. */
 
-#define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_INIT_CLEAR_OP(ctx, NAME) (((gr_method_init_clear_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_SWAP_OP(ctx, NAME) (((gr_method_swap_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_CONSTANT_OP(ctx, NAME) (((gr_method_constant_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_OP(ctx, NAME) (((gr_method_unary_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_OP_SI(ctx, NAME) (((gr_method_unary_op_si *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_OP_UI(ctx, NAME) (((gr_method_unary_op_ui *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_OP_FMPZ(ctx, NAME) (((gr_method_unary_op_fmpz *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_OP_FMPQ(ctx, NAME) (((gr_method_unary_op_fmpq *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_OP_GET_SI(ctx, NAME) (((gr_method_unary_op_get_si *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_BINARY_OP_SI(ctx, NAME) (((gr_method_binary_op_si *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_BINARY_OP_UI(ctx, NAME) (((gr_method_binary_op_ui *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_BINARY_OP_FMPZ(ctx, NAME) (((gr_method_binary_op_fmpz *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_BINARY_OP_FMPQ(ctx, NAME) (((gr_method_binary_op_fmpq *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_PREDICATE(ctx, NAME) (((gr_method_unary_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_BINARY_PREDICATE(ctx, NAME) (((gr_method_binary_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_INIT_CLEAR_OP(ctx, NAME) (((gr_method_init_clear_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_SWAP_OP(ctx, NAME) (((gr_method_swap_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CONSTANT_OP(ctx, NAME) (((gr_method_constant_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP(ctx, NAME) (((gr_method_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_SI(ctx, NAME) (((gr_method_unary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_UI(ctx, NAME) (((gr_method_unary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_FMPZ(ctx, NAME) (((gr_method_unary_op_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_FMPQ(ctx, NAME) (((gr_method_unary_op_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_GET_SI(ctx, NAME) (((gr_method_unary_op_get_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_OP_SI(ctx, NAME) (((gr_method_binary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_OP_UI(ctx, NAME) (((gr_method_binary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_OP_FMPZ(ctx, NAME) (((gr_method_binary_op_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_OP_FMPQ(ctx, NAME) (((gr_method_binary_op_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_PREDICATE(ctx, NAME) (((gr_method_unary_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_PREDICATE(ctx, NAME) (((gr_method_binary_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 
-#define GR_VEC_INIT_CLEAR_OP(ctx, NAME) (((gr_method_vec_init_clear_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_SWAP_OP(ctx, NAME) (((gr_method_vec_swap_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_CONSTANT_OP(ctx, NAME) (((gr_method_vec_constant_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_OP(ctx, NAME) (((gr_method_vec_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_VEC_OP(ctx, NAME) (((gr_method_vec_vec_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_SCALAR_OP(ctx, NAME) (((gr_method_vec_scalar_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_SCALAR_OP_SI(ctx, NAME) (((gr_method_vec_scalar_op_si *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_vec_predicate *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
-#define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_INIT_CLEAR_OP(ctx, NAME) (((gr_method_vec_init_clear_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SWAP_OP(ctx, NAME) (((gr_method_vec_swap_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_CONSTANT_OP(ctx, NAME) (((gr_method_vec_constant_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_OP(ctx, NAME) (((gr_method_vec_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_VEC_OP(ctx, NAME) (((gr_method_vec_vec_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SCALAR_OP(ctx, NAME) (((gr_method_vec_scalar_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SCALAR_OP_SI(ctx, NAME) (((gr_method_vec_scalar_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_vec_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
-#define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods2->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
 
 /* Wrappers to call methods. */

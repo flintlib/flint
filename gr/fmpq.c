@@ -391,11 +391,11 @@ _gr_fmpq_poly_mullow(fmpq * res,
     }
 }
 
-int _fmpq_methods2_initialized = 0;
-gr_static_method_table _fmpq_static_table;
-gr_method_tab_t _fmpq_methods2;
+int _fmpq_methods_initialized = 0;
 
-gr_method_tab_input fmpq_methods2[] =
+gr_static_method_table _fmpq_methods;
+
+gr_method_tab_input _fmpq_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpq_ctx_write},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpq_init},
@@ -441,11 +441,11 @@ gr_ctx_init_fmpq(gr_ctx_t ctx)
     ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;
 
-    if (!_fmpq_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_fmpq_methods2, _fmpq_static_table, fmpq_methods2);
-        _fmpq_methods2_initialized = 1;
-    }
+    ctx->methods = _fmpq_methods;
 
-    ctx->methods2 = &_fmpq_methods2;
+    if (!_fmpq_methods_initialized)
+    {
+        gr_method_tab_init(_fmpq_methods, _fmpq_methods_input);
+        _fmpq_methods_initialized = 1;
+    }
 }

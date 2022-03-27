@@ -356,11 +356,11 @@ _gr_fmpz_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
-int _fmpz_methods2_initialized = 0;
-gr_static_method_table _fmpz_static_table;
-gr_method_tab_t _fmpz_methods2;
+int _fmpz_methods_initialized = 0;
 
-gr_method_tab_input fmpz_methods2[] =
+gr_static_method_table _fmpz_methods;
+
+gr_method_tab_input _fmpz_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpz_ctx_write},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_init},
@@ -408,11 +408,11 @@ gr_ctx_init_fmpz(gr_ctx_t ctx)
     ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;
 
-    if (!_fmpz_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_fmpz_methods2, _fmpz_static_table, fmpz_methods2);
-        _fmpz_methods2_initialized = 1;
-    }
+    ctx->methods = _fmpz_methods;
 
-    ctx->methods2 = &_fmpz_methods2;
+    if (!_fmpz_methods_initialized)
+    {
+        gr_method_tab_init(_fmpz_methods, _fmpz_methods_input);
+        _fmpz_methods_initialized = 1;
+    }
 }

@@ -533,11 +533,11 @@ _gr_ca_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _ca_methods2_initialized = 0;
-gr_static_method_table _ca_static_table;
-gr_method_tab_t _ca_methods2;
+int _ca_methods_initialized = 0;
 
-gr_method_tab_input ca_methods2[] =
+gr_static_method_table _ca_methods;
+
+gr_method_tab_input _ca_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_ca_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_ca_ctx_write},
@@ -614,13 +614,13 @@ _gr_ctx_init_ca(gr_ctx_t ctx, int which_ring)
 
     ca_ctx_init(GR_CA_CTX(ctx));
 
-    if (!_ca_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_ca_methods2, _ca_static_table, ca_methods2);
-        _ca_methods2_initialized = 1;
-    }
+    ctx->methods = _ca_methods;
 
-    ctx->methods2 = &_ca_methods2;
+    if (!_ca_methods_initialized)
+    {
+        gr_method_tab_init(_ca_methods, _ca_methods_input);
+        _ca_methods_initialized = 1;
+    }
 }
 
 void

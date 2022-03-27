@@ -490,11 +490,11 @@ _gr_qqbar_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _qqbar_methods2_initialized = 0;
-gr_static_method_table _qqbar_static_table;
-gr_method_tab_t _qqbar_methods2;
+int _qqbar_methods_initialized = 0;
 
-gr_method_tab_input qqbar_methods2[] =
+gr_static_method_table _qqbar_methods;
+
+gr_method_tab_input _qqbar_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_qqbar_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_qqbar_ctx_write},
@@ -573,13 +573,13 @@ gr_ctx_init_real_qqbar(gr_ctx_t ctx)
     QQBAR_CTX(ctx)->deg_limit = WORD_MAX;
     QQBAR_CTX(ctx)->bits_limit = WORD_MAX;
 
-    if (!_qqbar_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_qqbar_methods2, _qqbar_static_table, qqbar_methods2);
-        _qqbar_methods2_initialized = 1;
-    }
+    ctx->methods = _qqbar_methods;
 
-    ctx->methods2 = &_qqbar_methods2;
+    if (!_qqbar_methods_initialized)
+    {
+        gr_method_tab_init(_qqbar_methods, _qqbar_methods_input);
+        _qqbar_methods_initialized = 1;
+    }
 }
 
 void
@@ -595,11 +595,11 @@ gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
     QQBAR_CTX(ctx)->deg_limit = WORD_MAX;
     QQBAR_CTX(ctx)->bits_limit = WORD_MAX;
 
-    if (!_qqbar_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_qqbar_methods2, _qqbar_static_table, qqbar_methods2);
-        _qqbar_methods2_initialized = 1;
-    }
+    ctx->methods = _qqbar_methods;
 
-    ctx->methods2 = &_qqbar_methods2;
+    if (!_qqbar_methods_initialized)
+    {
+        gr_method_tab_init(_qqbar_methods, _qqbar_methods_input);
+        _qqbar_methods_initialized = 1;
+    }
 }

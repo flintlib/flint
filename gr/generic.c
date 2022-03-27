@@ -1008,7 +1008,7 @@ gr_generic_ctx_clear(gr_ctx_t ctx)
 }
 
 /* Generic method implementations */
-const gr_method_tab_input gr_generic_methods[] =
+const gr_method_tab_input _gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
 
@@ -1075,25 +1075,23 @@ const gr_method_tab_input gr_generic_methods[] =
 };
 
 void
-gr_method_tab_init(gr_method_tab_t * methods, gr_method_tab_input * tab)
+gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
 {
     slong i;
 
-    methods->methods = flint_malloc(sizeof(gr_funcptr) * GR_METHOD_TAB_SIZE);
-
     for (i = 0; i < GR_METHOD_TAB_SIZE; i++)
-        methods->methods[i] = (gr_funcptr) gr_not_implemented;
+        methods[i] = (gr_funcptr) gr_not_implemented;
 
     /* Assign generic methods as fallbacks */
     for (i = 0; ; i++)
     {
-        if (gr_generic_methods[i].function == NULL)
+        if (_gr_generic_methods[i].function == NULL)
             break;
 
-        if (gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
+        if (_gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
             abort();
 
-        methods->methods[gr_generic_methods[i].index] = gr_generic_methods[i].function;
+        methods[_gr_generic_methods[i].index] = _gr_generic_methods[i].function;
     }
 
     for (i = 0; ; i++)
@@ -1104,40 +1102,6 @@ gr_method_tab_init(gr_method_tab_t * methods, gr_method_tab_input * tab)
         if (tab[i].index >= GR_METHOD_TAB_SIZE)
             abort();
 
-        methods->methods[tab[i].index] = tab[i].function;
-    }
-}
-
-void
-gr_method_tab_init_static(gr_method_tab_t * methods, gr_funcptr * static_tab, gr_method_tab_input * tab)
-{
-    slong i;
-
-    methods->methods = static_tab;
-
-    for (i = 0; i < GR_METHOD_TAB_SIZE; i++)
-        methods->methods[i] = (gr_funcptr) gr_not_implemented;
-
-    /* Assign generic methods as fallbacks */
-    for (i = 0; ; i++)
-    {
-        if (gr_generic_methods[i].function == NULL)
-            break;
-
-        if (gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
-            abort();
-
-        methods->methods[gr_generic_methods[i].index] = gr_generic_methods[i].function;
-    }
-
-    for (i = 0; ; i++)
-    {
-        if (tab[i].function == NULL)
-            break;
-
-        if (tab[i].index >= GR_METHOD_TAB_SIZE)
-            abort();
-
-        methods->methods[tab[i].index] = tab[i].function;
+        methods[tab[i].index] = tab[i].function;
     }
 }

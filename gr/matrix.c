@@ -965,12 +965,11 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-/* todo: thread safe */
-int _matrix_methods2_initialized = 0;
-gr_static_method_table _matrix_static_table;
-gr_method_tab_t _matrix_methods2;
+int _gr_mat_methods_initialized = 0;
 
-gr_method_tab_input matrix_methods2[] =
+gr_static_method_table _gr_mat_methods;
+
+gr_method_tab_input _gr_mat_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) matrix_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) matrix_ctx_clear},
@@ -1015,11 +1014,11 @@ gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
     ((matrix_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
     ((matrix_ctx_t *) ctx->elem_ctx)->n = n;
 
-    if (!_matrix_methods2_initialized)
-    {
-        gr_method_tab_init_static(&_matrix_methods2, _matrix_static_table, matrix_methods2);
-        _matrix_methods2_initialized = 1;
-    }
+    ctx->methods = _gr_mat_methods;
 
-    ctx->methods2 = &_matrix_methods2;
+    if (!_gr_mat_methods_initialized)
+    {
+        gr_method_tab_init(_gr_mat_methods, _gr_mat_methods_input);
+        _gr_mat_methods_initialized = 1;
+    }
 }
