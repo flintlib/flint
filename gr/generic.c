@@ -255,6 +255,16 @@ int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    return gr_add(res, x, x, ctx);
+}
+
+int gr_generic_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    return gr_mul(res, x, x, ctx);
+}
+
 int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_one(x, ctx) == T_TRUE)
@@ -357,6 +367,7 @@ static int
 gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_t ctx)
 {
     gr_ptr R, S, T;
+    gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     int status;
     int zeros;
@@ -386,7 +397,7 @@ gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_
 
     bit = UWORD(1) << (FLINT_BIT_COUNT(exp) - 2);
 
-    status |= mul(R, x, x, ctx);
+    status |= sqr(R, x, ctx);
 
     if (bit & exp)
     {
@@ -398,7 +409,7 @@ gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_
 
     while (bit >>= 1)
     {
-        status |= mul(S, R, R, ctx);
+        status |= sqr(S, R, ctx);
 
         if (bit & exp)
         {
@@ -421,6 +432,7 @@ gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t c
 {
     gr_ptr t, u;
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
     gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
     int status;
     slong i;
@@ -434,7 +446,7 @@ gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t c
 
     for (i = fmpz_bits(exp) - 2; i >= 0; i--)
     {
-        status |= mul(u, t, t, ctx);
+        status |= sqr(u, t, ctx);
 
         if (fmpz_tstbit(exp, i))
             status |= mul(t, u, x, ctx);
@@ -468,12 +480,12 @@ gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
     }
     else if (e == 2)
     {
-        return gr_mul(res, x, x, ctx);
+        return gr_sqr(res, x, ctx);
     }
     else if (e == 4)
     {
-        status = gr_mul(res, x, x, ctx);
-        status |= gr_mul(res, res, res, ctx);
+        status = gr_sqr(res, x, ctx);
+        status |= gr_sqr(res, res, ctx);
         return status;
     }
     else
@@ -546,7 +558,7 @@ gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
     else if (*e == 1)
         return gr_set(res, x, ctx);
     else if (*e == 2)
-        return gr_mul(res, x, x, ctx);
+        return gr_sqr(res, x, ctx);
     else
         return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }

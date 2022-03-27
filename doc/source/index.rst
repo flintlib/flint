@@ -476,11 +476,15 @@ is not invertible.
 
 .. function:: int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
+    Sets *res* to `-x`.
+
 .. function:: int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+    Sets *res* to `x + y`.
 
 .. function:: int gr_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
@@ -488,11 +492,29 @@ is not invertible.
               int gr_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
+    Sets *res* to `x - y`.
+
 .. function:: int gr_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_mul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+    Sets *res* to `x \cdot y`.
+
+.. function:: int gr_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to `2x`. The default implementation adds *x*
+    to itself.
+
+.. function:: int gr_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to `x ^ 2`. The default implementation multiplies *x*
+    with itself.
+
+Iterated arithmetic operations are best performed using vector
+functions.
+See in particular :func:`_gr_vec_dot` and :func:`_gr_vec_dot_rev`.
 
 Division
 ........................................................................

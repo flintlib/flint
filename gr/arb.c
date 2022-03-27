@@ -247,6 +247,20 @@ _gr_arb_mul_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_mul_two(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_mul_2exp_si(res, x, 1);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_sqr(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_sqr(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_arb_inv(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_zero(x))
@@ -555,6 +569,8 @@ gr_method_tab_input arb_methods2[] =
     {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_arb_mul_ui},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_arb_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_arb_mul_fmpz},
+    {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_arb_mul_two},
+    {GR_METHOD_SQR,             (gr_funcptr) _gr_arb_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_arb_div},
     {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_arb_div_ui},
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_arb_div_si},

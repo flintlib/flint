@@ -29,9 +29,9 @@ _gr_poly_mullow_generic(gr_ptr res,
 
         /* todo: double, square, addmul */
 
-        status |= gr_mul(res, poly1, poly1, ctx);
+        status |= gr_sqr(res, poly1, ctx);
         status |= gr_mul(GR_ENTRY(res, 1, sz), poly1, GR_ENTRY(poly1, 1, sz), ctx);
-        status |= gr_mul_ui(GR_ENTRY(res, 1, sz), GR_ENTRY(res, 1, sz), 2, ctx);
+        status |= gr_mul_two(GR_ENTRY(res, 1, sz), GR_ENTRY(res, 1, sz), ctx);
 
         for (i = 2; i < FLINT_MIN(n, 2 * len1 - 3); i++)
         {
@@ -39,20 +39,20 @@ _gr_poly_mullow_generic(gr_ptr res,
             stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
 
             status |= _gr_vec_dot_rev(GR_ENTRY(res, i, sz), NULL, 0, GR_ENTRY(poly1, start, sz), GR_ENTRY(poly1, i - stop, sz), stop - start + 1, ctx);
-            status |= gr_mul_ui(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), 2, ctx);
+            status |= gr_mul_two(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), ctx);
 
-            if (i % 2 == 0 && i / 2 < len1) /* should be addmul */
+            if (i % 2 == 0 && i / 2 < len1) /* should be addmul, or rather addsqr */
                 status |= _gr_vec_dot(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), 0, GR_ENTRY(poly1, i / 2, sz), GR_ENTRY(poly1, i / 2, sz), 1, ctx);
         }
 
         if (len1 > 2 && n >= 2 * len1 - 2)
         {
             status |= gr_mul(GR_ENTRY(res, 2 * len1 - 3, sz), GR_ENTRY(poly1, len1 - 1, sz), GR_ENTRY(poly1, len1 - 2, sz), ctx);
-            status |= gr_mul_ui(GR_ENTRY(res, 2 * len1 - 3, sz), GR_ENTRY(res, 2 * len1 - 3, sz), 2, ctx);
+            status |= gr_mul_two(GR_ENTRY(res, 2 * len1 - 3, sz), GR_ENTRY(res, 2 * len1 - 3, sz), ctx);
         }
 
         if (n >= 2 * len1 - 1)
-            status |= gr_mul(GR_ENTRY(res, 2 * len1 - 2, sz), GR_ENTRY(poly1, len1 - 1, sz), GR_ENTRY(poly1, len1 - 1, sz), ctx);
+            status |= gr_sqr(GR_ENTRY(res, 2 * len1 - 2, sz), GR_ENTRY(poly1, len1 - 1, sz), ctx);
 
         return status;
     }
