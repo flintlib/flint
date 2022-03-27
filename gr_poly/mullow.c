@@ -52,7 +52,7 @@ _gr_poly_mullow_generic(gr_ptr res,
         }
 
         if (n >= 2 * len1 - 1)
-            gr_mul(GR_ENTRY(res, 2 * len1 - 2, sz), GR_ENTRY(poly1, len1 - 1, sz), GR_ENTRY(poly1, len1 - 1, sz), ctx);
+            status |= gr_mul(GR_ENTRY(res, 2 * len1 - 2, sz), GR_ENTRY(poly1, len1 - 1, sz), GR_ENTRY(poly1, len1 - 1, sz), ctx);
 
         return status;
     }
