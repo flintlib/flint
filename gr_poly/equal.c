@@ -1,13 +1,13 @@
 #include "gr_poly.h"
 
 truth_t
-_gr_poly_equal(gr_srcptr poly1, slong len1,
-        gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+_gr_poly_equal(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
     truth_t eq, eq2;
     slong sz = ctx->sizeof_elem;
 
     eq = _gr_vec_equal(poly1, poly2, len2, ctx);
+
     if (len1 == len2 || eq == T_FALSE)
         return eq;
 

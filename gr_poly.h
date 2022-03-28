@@ -112,6 +112,13 @@ int gr_poly_evaluate_horner(gr_ptr res, const gr_poly_t poly, gr_srcptr x, gr_ct
 int _gr_poly_evaluate(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx);
 int gr_poly_evaluate(gr_ptr res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);
 
+int _gr_poly_taylor_shift_horner(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
+int gr_poly_taylor_shift_horner(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
+
+int _gr_poly_taylor_shift(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
+int gr_poly_taylor_shift(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
+
+
 #ifdef __cplusplus
 }
 #endif
