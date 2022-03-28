@@ -2,7 +2,7 @@
 
 /* todo: use vector functions when overlap behavior is guaranteed? */
 int
-_gr_poly_taylor_shift_horner(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
+_gr_poly_taylor_shift_horner(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     int status;
     slong i, j;
@@ -19,7 +19,7 @@ _gr_poly_taylor_shift_horner(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr
 
         for (i = len - 2; i >= 0; i--)
             for (j = i; j < len - 1; j++)
-                status |= add(GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j + 1, sz), ctx);
+                status |= add(GR_ENTRY(res, j, sz), GR_ENTRY(res, j, sz), GR_ENTRY(res, j + 1, sz), ctx);
     }
     else if (gr_is_neg_one(c, ctx) == T_TRUE)
     {
@@ -27,7 +27,7 @@ _gr_poly_taylor_shift_horner(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr
 
         for (i = len - 2; i >= 0; i--)
             for (j = i; j < len - 1; j++)
-                status |= sub(GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j + 1, sz), ctx);
+                status |= sub(GR_ENTRY(res, j, sz), GR_ENTRY(res, j, sz), GR_ENTRY(res, j + 1, sz), ctx);
     }
     else if (gr_is_zero(c, ctx) != T_TRUE)
     {
@@ -36,7 +36,7 @@ _gr_poly_taylor_shift_horner(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr
 
         for (i = len - 2; i >= 0; i--)
             for (j = i; j < len - 1; j++)
-                status |= addmul(GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j + 1, sz), c, ctx);
+                status |= addmul(GR_ENTRY(res, j, sz), GR_ENTRY(res, j + 1, sz), c, ctx);
     }
 
     return status;

@@ -429,7 +429,10 @@ _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_c
     status = GR_SUCCESS;
     for (i = 0; i < len; i++)
     {
-        status |= gr_randtest(GR_ENTRY(res, i, sz), state, options, ctx);
+        if (n_randint(state, 2))
+            status |= gr_zero(GR_ENTRY(res, i, sz), ctx);
+        else
+            status |= gr_randtest(GR_ENTRY(res, i, sz), state, options, ctx);
     }
 
     return status;

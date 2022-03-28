@@ -2,7 +2,7 @@
 
 /* todo: divconquer, convolution algorithms */
 int
-_gr_poly_taylor_shift(gr_ptr res, gr_ptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
+_gr_poly_taylor_shift(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     return _gr_poly_taylor_shift_horner(res, poly, len, c, ctx);
 }
