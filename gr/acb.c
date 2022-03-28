@@ -283,6 +283,20 @@ _gr_acb_mul_fmpz(acb_t res, const acb_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_addmul(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    acb_addmul(res, x, y, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_submul(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    acb_submul(res, x, y, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_mul_two(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     acb_mul_2exp_si(res, x, 1);
@@ -577,6 +591,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_acb_mul_ui},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_acb_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_acb_mul_fmpz},
+    {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_acb_addmul},
+    {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_acb_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_acb_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_acb_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_acb_div},

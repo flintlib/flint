@@ -255,6 +255,42 @@ int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_START;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_mul(t, x, y, ctx);
+    status |= gr_add(res, res, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
+int gr_generic_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_START;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT1(t, ctx);
+
+    status |= gr_mul(t, x, y, ctx);
+    status |= gr_sub(res, res, t, ctx);
+
+    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_END;
+    return status;
+}
+
 int gr_generic_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     return gr_add(res, x, x, ctx);
@@ -1034,6 +1070,12 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MUL_SI,                  (gr_funcptr) gr_generic_mul_si},
     {GR_METHOD_MUL_FMPZ,                (gr_funcptr) gr_generic_mul_fmpz},
     {GR_METHOD_MUL_FMPQ,                (gr_funcptr) gr_generic_mul_fmpq},
+
+    {GR_METHOD_ADDMUL,                  (gr_funcptr) gr_generic_addmul},
+    {GR_METHOD_SUBMUL,                  (gr_funcptr) gr_generic_submul},
+
+    {GR_METHOD_MUL_TWO,                 (gr_funcptr) gr_generic_mul_two},
+    {GR_METHOD_SQR,                     (gr_funcptr) gr_generic_sqr},
 
     {GR_METHOD_DIV_UI,                  (gr_funcptr) gr_generic_div_ui},
     {GR_METHOD_DIV_SI,                  (gr_funcptr) gr_generic_div_si},

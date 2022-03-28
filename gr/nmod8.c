@@ -167,6 +167,24 @@ nmod8_mul_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
     return nmod8_mul(res, x, t, ctx);
 }
 
+int
+nmod8_addmul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
+{
+    ulong r = res[0];
+    NMOD_ADDMUL(r, x[0], y[0], NMOD8_CTX(ctx));
+    res[0] = r;
+    return GR_SUCCESS;
+}
+
+int
+nmod8_submul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
+{
+    ulong r = res[0];
+    ulong t = nmod_neg(y[0], NMOD8_CTX(ctx));
+    NMOD_ADDMUL(r, x[0], t, NMOD8_CTX(ctx));
+    res[0] = r;
+    return GR_SUCCESS;
+}
 
 int
 nmod8_mul_two(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
@@ -357,6 +375,8 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_SUB,             (gr_funcptr) nmod8_sub},
     {GR_METHOD_MUL,             (gr_funcptr) nmod8_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) nmod8_mul_si},
+    {GR_METHOD_ADDMUL,          (gr_funcptr) nmod8_addmul},
+    {GR_METHOD_SUBMUL,          (gr_funcptr) nmod8_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) nmod8_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) nmod8_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) nmod8_div},

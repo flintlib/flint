@@ -256,6 +256,11 @@ Ring constructions
 Base rings
 ...............................................................................
 
+.. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random ring. This will currently
+    only generate base rings.
+
 .. function:: void gr_ctx_init_fmpz(gr_ctx_t ctx)
 
     Initializes *ctx* to the ring of integers
@@ -501,6 +506,14 @@ is not invertible.
               int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     Sets *res* to `x \cdot y`.
+
+.. function:: int gr_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to `\mathrm{res } + x \cdot y` or
+    `\mathrm{res } - x \cdot y`. Rings may override the default
+    implementation to perform this operation in one step without
+    allocating a temporary variable.
 
 .. function:: int gr_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 

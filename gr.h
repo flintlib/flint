@@ -143,6 +143,9 @@ typedef enum
     GR_METHOD_MUL_FMPZ,
     GR_METHOD_MUL_FMPQ,
 
+    GR_METHOD_ADDMUL,
+    GR_METHOD_SUBMUL,
+
     GR_METHOD_MUL_TWO,
     GR_METHOD_SQR,
 
@@ -364,6 +367,9 @@ GR_INLINE int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return
 GR_INLINE int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ)(res, x, y, ctx); }
 GR_INLINE int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, MUL_FMPQ)(res, x, y, ctx); }
 
+GR_INLINE int gr_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADDMUL)(res, x, y, ctx); }
+GR_INLINE int gr_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SUBMUL)(res, x, y, ctx); }
+
 GR_INLINE int gr_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MUL_TWO)(res, x, ctx); }
 GR_INLINE int gr_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQR)(res, x, ctx); }
 
@@ -559,6 +565,8 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 /* Some base rings */
 
+void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
+
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
@@ -568,6 +576,11 @@ void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 
 void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);
+
+void gr_ctx_init_real_ca(gr_ctx_t ctx);
+void gr_ctx_init_complex_ca(gr_ctx_t ctx);
+void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
+void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
 
 /* Generic polynomial ring */
 

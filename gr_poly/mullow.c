@@ -41,8 +41,8 @@ _gr_poly_mullow_generic(gr_ptr res,
             status |= _gr_vec_dot_rev(GR_ENTRY(res, i, sz), NULL, 0, GR_ENTRY(poly1, start, sz), GR_ENTRY(poly1, i - stop, sz), stop - start + 1, ctx);
             status |= gr_mul_two(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), ctx);
 
-            if (i % 2 == 0 && i / 2 < len1) /* should be addmul, or rather addsqr */
-                status |= _gr_vec_dot(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), 0, GR_ENTRY(poly1, i / 2, sz), GR_ENTRY(poly1, i / 2, sz), 1, ctx);
+            if (i % 2 == 0 && i / 2 < len1)   /* should be addsqr? */
+                status |= gr_addmul(GR_ENTRY(res, i, sz), GR_ENTRY(poly1, i / 2, sz), GR_ENTRY(poly1, i / 2, sz), ctx);
         }
 
         if (len1 > 2 && n >= 2 * len1 - 2)
