@@ -39,7 +39,6 @@ int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx);
 truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_one(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx);
-int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
 int gr_mat_one(gr_mat_t res, gr_ctx_t ctx);
 int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx);

@@ -201,7 +201,7 @@ Base rings
               void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
 
     Initializes *ctx* to the field of real or complex
-    numbers represented by balls or boxes of type :type:`arb_t`
+    numbers represented by elements of type :type:`arb_t`
     and  :type:`acb_t`.
 
 .. function:: void gr_ctx_init_real_ca(gr_ctx_t ctx)

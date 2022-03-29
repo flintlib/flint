@@ -22,6 +22,7 @@ Contents
    :maxdepth: 2
 
    gr.rst
+   gr_mat.rst
    gr_poly.rst
 
 

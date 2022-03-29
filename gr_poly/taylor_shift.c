@@ -1,10 +1,13 @@
 #include "gr_poly.h"
 
-/* todo: divconquer, convolution algorithms */
+/* todo: algorithm selection */
 int
 _gr_poly_taylor_shift(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
-    return _gr_poly_taylor_shift_horner(res, poly, len, c, ctx);
+    if (len <= 20)
+        return _gr_poly_taylor_shift_horner(res, poly, len, c, ctx);
+    else
+        return _gr_poly_taylor_shift_divconquer(res, poly, len, c, ctx);
 }
 
 int

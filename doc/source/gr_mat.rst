@@ -1,0 +1,127 @@
+.. _gr-mat:
+
+**gr_mat.h** -- dense matrices over generic rings
+===============================================================================
+
+A :type:`gr_mat_t` represents a matrix implemented as a dense
+array of entries in a generic ring *R*.
+
+In this module, the context object ``ctx`` always represents the
+coefficient ring *R* unless otherwise stated.
+Creating a context object representing a matrix
+space only becomes necessary when one
+wants to manipulate matrices using generic ring methods
+like ``gr_add`` instead of the designated matrix
+methods like ``gr_mat_add``.
+
+Type compatibility
+-------------------------------------------------------------------------------
+
+The ``gr_mat`` type has the same data layout as most
+Flint, Arb and Calcium matrix types.
+Methods in this module can therefore be mixed freely with
+methods in the corresponding Flint, Arb and Calcium modules
+when the underlying coefficient type is the same.
+
+It is not directly compatible with the ``nmod_mat`` type
+(modulus data is stored as part of the matrix object).
+
+Types, macros and constants
+-------------------------------------------------------------------------------
+
+.. type:: gr_mat_struct
+
+.. type:: gr_mat_t
+
+    Contains a pointer to an array of coefficients (``entries``), the
+    number of rows (``r``), the number of columns (``c``),
+    and an array to pointers marking the start of each row (``rows``).
+
+    A ``gr_mat_t`` is defined as an array of length one of type
+    ``gr_mat_struct``, permitting a ``gr_mat_t`` to
+    be passed by reference.
+
+Basic operations
+-------------------------------------------------------------------------------
+
+.. macro:: GR_MAT_ENTRY(mat, i, j, sz)
+
+    Macro to access the entry at row *i* and column *j* of the
+    matrix *mat* whose entries have size *sz* bytes.
+
+.. macro:: gr_mat_nrows(mat, ctx)
+
+    Macro accessing the number of rows of *mat*.
+
+.. macro:: gr_mat_ncols(mat, ctx)
+
+    Macro accessing the number of columns of *mat*.
+
+.. function:: int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Prints *mat* to standard output.
+
+.. function:: void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
+
+    Initializes *mat* to a matrix with the given number of rows and
+    columns.
+
+.. function:: void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx)
+
+    Clears the matrix.
+
+.. function:: void gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
+
+    Swaps *mat1* and *mat12* efficiently.
+
+.. function:: int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Performs a deep swap of *mat1* and *mat2*, swapping the individual
+    entries rather than the top-level structures.
+
+.. function:: int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
+
+    Sets *mat* to a random matrix.
+
+.. function:: truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Returns whether *mat1* and *mat2* are equal.
+
+.. function:: truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
+              truth_t gr_mat_is_one(const gr_mat_t mat, gr_ctx_t ctx)
+              truth_t gr_mat_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* respectively is the zero matrix or
+    the scalar matrix with 1 or -1 on the main diagonal.
+
+.. function:: int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx)
+
+    Sets *res* to the zero matrix.
+
+.. function:: int gr_mat_one(gr_mat_t res, gr_ctx_t ctx)
+
+    Sets *res* to the scalar matrix with 1 on the main diagonal
+    and zero elsewhere.
+
+.. function:: int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the value of *mat*.
+
+.. function:: int gr_mat_set_ui(gr_mat_t res, ulong c, gr_ctx_t ctx)
+              int gr_mat_set_si(gr_mat_t res, slong c, gr_ctx_t ctx)
+              int gr_mat_set_fmpz(gr_mat_t res, const fmpz_t c, gr_ctx_t ctx)
+              int gr_mat_set_fmpq(gr_mat_t res, const fmpq_t c, gr_ctx_t ctx)
+
+    Set *res* to the scalar matrix with *c* on the main diagonal
+    and zero elsewhere.
+
+Arithmetic
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+.. function:: int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+.. function:: int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+.. function:: int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
