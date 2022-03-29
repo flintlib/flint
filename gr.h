@@ -12,15 +12,20 @@
 #include "flint/flint.h"
 #include "flint/fmpz.h"
 #include "flint/fmpq.h"
-#include "flint/nmod_vec.h"
-#include "flint/ulong_extras.h"
-#include "flint/profiler.h"
-
-/* for truth_t */
-#include "calcium.h"
 
 #ifdef __cplusplus
  extern "C" {
+#endif
+
+#ifndef CALCIUM_H
+
+typedef enum
+{
+    T_TRUE,
+    T_FALSE,
+    T_UNKNOWN
+} truth_t;
+
 #endif
 
 GR_INLINE truth_t truth_and(truth_t x, truth_t y)

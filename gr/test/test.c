@@ -1,3 +1,5 @@
+#include "flint/profiler.h"
+
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_mat.h"

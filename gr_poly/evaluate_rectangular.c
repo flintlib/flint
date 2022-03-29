@@ -3,7 +3,7 @@
 /* todo: move out */
 /* todo: alternative algorithm */
 int
-_gr_vec_set_powers(gr_ptr xs, arb_srcptr x, slong len, gr_ctx_t ctx)
+_gr_vec_set_powers(gr_ptr xs, gr_srcptr x, slong len, gr_ctx_t ctx)
 {
     int status;
     slong i, sz = ctx->sizeof_elem;
