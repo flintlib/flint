@@ -13,8 +13,6 @@
 
 #include "gr_poly.h"
 
-/* todo: ensure tested */
-
 /* compose by poly2 = a*x^n + c, no aliasing; n >= 1 */
 int
 _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
