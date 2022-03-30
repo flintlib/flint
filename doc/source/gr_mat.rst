@@ -14,6 +14,10 @@ wants to manipulate matrices using generic ring methods
 like ``gr_add`` instead of the designated matrix
 methods like ``gr_mat_add``.
 
+Warning: matrix functions generally assume that input as well
+as output operands have compatible shapes.
+Shape errors are not usually handled (this may change).
+
 Type compatibility
 -------------------------------------------------------------------------------
 
@@ -57,14 +61,6 @@ Basic operations
 
     Macro accessing the number of columns of *mat*.
 
-.. function:: int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
-
-    Write *mat* to the stream *out*.
-
-.. function:: int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
-
-    Prints *mat* to standard output.
-
 .. function:: void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 
     Initializes *mat* to a matrix with the given number of rows and
@@ -73,6 +69,17 @@ Basic operations
 .. function:: void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx)
 
     Clears the matrix.
+
+.. function:: void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx)
+
+    Initializes *window* to a window matrix into the submatrix of *mat*
+    starting at the corner at row *r1* and column *c1* (inclusive) and ending
+    at row *r2* and column *c2* (exclusive).
+    The indices must be within bounds.
+
+.. function:: void gr_mat_window_clear(gr_mat_t window, gr_ctx_t ctx)
+
+    Frees the window matrix.
 
 .. function:: void gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 
@@ -83,9 +90,31 @@ Basic operations
     Performs a deep swap of *mat1* and *mat2*, swapping the individual
     entries rather than the top-level structures.
 
+.. function:: int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Write *mat* to the stream *out*.
+
+.. function:: int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Prints *mat* to standard output.
+
 .. function:: int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
 
     Sets *mat* to a random matrix.
+
+.. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is an empty matrix, having either zero
+    rows or zero column. This predicate is always decidable (even if
+    the underlying ring is not computable), returning
+    ``T_TRUE`` or ``T_FALSE``.
+
+.. function:: truth_t gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is a square matrix, having the same number
+    of rows as columns (not the same thing as being a perfect square!).
+    This predicate is always decidable (even if the underlying ring
+    is not computable), returning ``T_TRUE`` or ``T_FALSE``.
 
 .. function:: truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
@@ -129,7 +158,10 @@ Arithmetic
 
 .. function:: int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
-.. function:: int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+.. function:: int gr_mat_mul_classical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+              int gr_mat_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+.. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
 .. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
               int gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
@@ -151,13 +183,13 @@ Characteristic polynomial
 Special matrices
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int gr_mat_ones(gr_mat_t res, gr_ctx_t ctx)
 
-    Sets all entries in *mat* to one.
+    Sets all entries in *res* to one.
 
-.. function:: int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx)
+.. function:: int gr_mat_pascal(gr_mat_t res, int triangular, gr_ctx_t ctx)
 
-    Sets *mat* to a Pascal matrix, whose entries are binomial coefficients.
+    Sets *res* to a Pascal matrix, whose entries are binomial coefficients.
     If *triangular* is 0, constructs a full symmetric matrix
     with the rows of Pascal's triangle as successive antidiagonals.
     If *triangular* is 1, constructs the upper triangular matrix with
@@ -165,9 +197,9 @@ Special matrices
     constructs the lower triangular matrix with the rows of Pascal's
     triangle as rows.
 
-.. function:: int gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx)
+.. function:: int gr_mat_stirling(gr_mat_t res, int kind, gr_ctx_t ctx)
 
-    Sets *mat* to a Stirling matrix, whose entries are Stirling numbers.
+    Sets *res* to a Stirling matrix, whose entries are Stirling numbers.
     If *kind* is 0, the entries are set to the unsigned Stirling numbers
     of the first kind. If *kind* is 1, the entries are set to the signed
     Stirling numbers of the first kind. If *kind* is 2, the entries are
@@ -175,4 +207,5 @@ Special matrices
 
 .. function:: int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx)
 
-    Sets *mat* to the Hilbert matrix, which has entries `A_{i,j} = 1/(i+j+1)`.
+    Sets *res* to the Hilbert matrix, which has entries `1/(i+j+1)`
+    for `i, j \ge 0`.

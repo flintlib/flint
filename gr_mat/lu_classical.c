@@ -134,12 +134,6 @@ gr_mat_find_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_ro
     }
 }
 
-int
-gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return gr_mat_nrows(mat, ctx) == 0 || gr_mat_ncols(mat, ctx) == 0;
-}
-
 void
 _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
@@ -171,7 +165,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     int pivot_status;
     GR_TMP_START;
 
-    if (gr_mat_is_empty(A, ctx))
+    if (gr_mat_is_empty(A, ctx) == T_TRUE)
     {
         *res_rank = 0;
         return GR_SUCCESS;

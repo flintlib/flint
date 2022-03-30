@@ -45,6 +45,14 @@ gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
     }
 }
 
+void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
+
+GR_MAT_INLINE void
+gr_mat_window_clear(gr_mat_t window, gr_ctx_t ctx)
+{
+    flint_free(window->rows);
+}
+
 int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx);
 
 GR_INLINE int
@@ -56,10 +64,24 @@ gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
 }
 
 int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx);
+
+GR_INLINE truth_t
+gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return ((mat->r == 0) || (mat->c == 0)) ? T_TRUE : T_FALSE;
+}
+
+GR_INLINE truth_t
+gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return (mat->r == mat->c) ? T_TRUE : T_FALSE;
+}
+
 truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_one(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx);
+
 int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx);
 int gr_mat_one(gr_mat_t res, gr_ctx_t ctx);
 int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
@@ -81,6 +103,14 @@ int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t
 int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
 
 int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+int gr_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+
+/* todo */
+GR_INLINE int
+gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return gr_mat_mul(res, mat, mat, ctx);
+}
 
 int gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, int full_rank_check, gr_ctx_t ctx);
 
@@ -88,6 +118,7 @@ int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx);
 int gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx);
 int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx);
+/* todo: hadamard, dft, dct */
 
 int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx);
