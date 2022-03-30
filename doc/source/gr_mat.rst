@@ -57,6 +57,10 @@ Basic operations
 
     Macro accessing the number of columns of *mat*.
 
+.. function:: int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Write *mat* to the stream *out*.
+
 .. function:: int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
 
     Prints *mat* to standard output.
@@ -126,10 +130,21 @@ Arithmetic
 
 .. function:: int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
+LU decomposition
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int full_rank_check, gr_ctx_t ctx)
+
+Characteristic polynomial
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
 Special matrices
 -------------------------------------------------------------------------------
 
-.. function:: void gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx)
 
     Sets all entries in *mat* to one.
 
