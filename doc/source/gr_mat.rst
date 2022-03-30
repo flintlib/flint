@@ -125,3 +125,32 @@ Arithmetic
 .. function:: int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
 .. function:: int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+Special matrices
+-------------------------------------------------------------------------------
+
+.. function:: void gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets all entries in *mat* to one.
+
+.. function:: int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx)
+
+    Sets *mat* to a Pascal matrix, whose entries are binomial coefficients.
+    If *triangular* is 0, constructs a full symmetric matrix
+    with the rows of Pascal's triangle as successive antidiagonals.
+    If *triangular* is 1, constructs the upper triangular matrix with
+    the rows of Pascal's triangle as columns, and if *triangular* is -1,
+    constructs the lower triangular matrix with the rows of Pascal's
+    triangle as rows.
+
+.. function:: int gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx)
+
+    Sets *mat* to a Stirling matrix, whose entries are Stirling numbers.
+    If *kind* is 0, the entries are set to the unsigned Stirling numbers
+    of the first kind. If *kind* is 1, the entries are set to the signed
+    Stirling numbers of the first kind. If *kind* is 2, the entries are
+    set to the Stirling numbers of the second kind.
+
+.. function:: int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *mat* to the Hilbert matrix, which has entries `A_{i,j} = 1/(i+j+1)`.

@@ -52,6 +52,11 @@ int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t 
 int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
+int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);
+int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx);
+int gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx);
+int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif
