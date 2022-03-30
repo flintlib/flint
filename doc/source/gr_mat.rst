@@ -111,7 +111,8 @@ Basic operations
 
     Sets *res* to the value of *mat*.
 
-.. function:: int gr_mat_set_ui(gr_mat_t res, ulong c, gr_ctx_t ctx)
+.. function:: int gr_mat_set_scalar(gr_mat_t res, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_set_ui(gr_mat_t res, ulong c, gr_ctx_t ctx)
               int gr_mat_set_si(gr_mat_t res, slong c, gr_ctx_t ctx)
               int gr_mat_set_fmpz(gr_mat_t res, const fmpz_t c, gr_ctx_t ctx)
               int gr_mat_set_fmpq(gr_mat_t res, const fmpq_t c, gr_ctx_t ctx)
@@ -129,6 +130,12 @@ Arithmetic
 .. function:: int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
 .. function:: int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+.. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_mul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
 
 LU decomposition
 -------------------------------------------------------------------------------
