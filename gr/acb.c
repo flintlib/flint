@@ -525,6 +525,37 @@ _gr_acb_rsqrt(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_abs(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_abs(acb_realref(res), x, ACB_CTX_PREC(ctx));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_conj(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_conj(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_re(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_set(acb_realref(res), acb_realref(x));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_im(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_set(acb_imagref(res), acb_imagref(x));
+    arb_zero(acb_realref(res));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_vec_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr vec1, acb_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     acb_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ACB_CTX_PREC(ctx));
@@ -609,6 +640,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_acb_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_acb_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_acb_rsqrt},
+    {GR_METHOD_ABS,             (gr_funcptr) _gr_acb_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) _gr_acb_conj},
+    {GR_METHOD_RE,              (gr_funcptr) _gr_acb_re},
+    {GR_METHOD_IM,              (gr_funcptr) _gr_acb_im},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},

@@ -298,6 +298,13 @@ _gr_fmpz_rsqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_abs(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpz_abs(res, x);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -425,6 +432,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_rsqrt},
+    {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpz_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},

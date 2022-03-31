@@ -539,6 +539,19 @@ the choice of root is implementation-dependent.
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
 
+Complex parts
+--------------------------------------------------------------------------------
+
+.. function:: int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    These methods may return the flag ``GR_DOMAIN`` (or ``GR_UNABLE``)
+    when the ring is not a subring of the real or complex numbers.
+
 Vectors
 --------------------------------------------------------------------------------
 

@@ -272,7 +272,19 @@ _gr_fmpq_rsqrt(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fmpq_abs(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpq_abs(res, x);
+    return GR_SUCCESS;
+}
 
+int
+_gr_fmpq_im(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpq_zero(res);
+    return GR_SUCCESS;
+}
 
 static int
 _fmpq_vec_is_fmpz_vec(const fmpq * vec, slong len)
@@ -428,6 +440,10 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpq_rsqrt},
+    {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpq_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpq_set},
+    {GR_METHOD_RE,              (gr_funcptr) _gr_fmpq_set},
+    {GR_METHOD_IM,              (gr_funcptr) _gr_fmpq_im},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
     {0,                         (gr_funcptr) NULL},
 };

@@ -484,6 +484,38 @@ _gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_abs(res, x);
+    return GR_SUCCESS;
+}
+
+/* todo: exploit when we know that the field is real */
+int
+_gr_qqbar_conj(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_conj(res, x);
+    return GR_SUCCESS;
+}
+
+/* todo: exploit when we know that the field is real */
+int
+_gr_qqbar_re(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_re(res, x);
+    return GR_SUCCESS;
+}
+
+/* todo: exploit when we know that the field is real */
+int
+_gr_qqbar_im(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_im(res, x);
+    return GR_SUCCESS;
+}
+
+/* todo: exploit when we know that the field is real */
+int
 _gr_qqbar_ctx_clear(gr_ctx_t ctx)
 {
     flint_free(ctx->elem_ctx);
@@ -556,6 +588,11 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_qqbar_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_qqbar_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_qqbar_rsqrt},
+
+    {GR_METHOD_ABS,             (gr_funcptr) _gr_qqbar_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) _gr_qqbar_conj},
+    {GR_METHOD_RE,              (gr_funcptr) _gr_qqbar_re},
+    {GR_METHOD_IM,              (gr_funcptr) _gr_qqbar_im},
 
     {0,                         (gr_funcptr) NULL},
 };

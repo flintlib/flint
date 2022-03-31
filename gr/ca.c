@@ -526,6 +526,52 @@ _gr_ca_rsqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_ca_abs(ca_t res, const ca_t x, const gr_ctx_t ctx)
+{
+    ca_abs(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_conj(ca_t res, const ca_t x, const gr_ctx_t ctx)
+{
+    ca_conj(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+/* todo: exploit when we know that the field is real */
+int
+_gr_ca_re(ca_t res, const ca_t x, const gr_ctx_t ctx)
+{
+    ca_re(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+/* todo: exploit when we know that the field is real */
+int
+_gr_ca_im(ca_t res, const ca_t x, const gr_ctx_t ctx)
+{
+    ca_im(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_ca_ctx_clear(gr_ctx_t ctx)
 {
     ca_ctx_clear(GR_CA_CTX(ctx));
@@ -599,6 +645,11 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_ca_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_ca_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_ca_rsqrt},
+
+    {GR_METHOD_ABS,             (gr_funcptr) _gr_ca_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) _gr_ca_conj},
+    {GR_METHOD_RE,              (gr_funcptr) _gr_ca_re},
+    {GR_METHOD_IM,              (gr_funcptr) _gr_ca_im},
 
     {0,                         (gr_funcptr) NULL},
 };

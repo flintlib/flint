@@ -197,7 +197,7 @@ Characteristic polynomial
     size of the matrix. The
     underscore method assumes that *res* is a preallocated
     array of `n + 1` coefficients.
-    The *inplace* version destroys the input matrix.
+    The *inplace* version overwrites the input matrix.
 
     This method requires divisions and can therefore fail when the
     ring is not a field, but will sometimes succeed anywyay. It
@@ -212,16 +212,19 @@ Hessenberg form
 
     Returns whether *mat* is in upper Hessenberg form.
 
-.. function:: int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_hessenberg_householder(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
     Sets *res* to an upper Hessenberg form of *mat*.
-    Uses Gaussian elimination.
+    The *gauss* version uses Gaussian elimination.
+    The *householder* version uses Householder reflections.
 
-    This method requires divisions and can therefore fail when the
-    ring is not a field, but will sometimes succeed anywyay. It
-    also requires testing for zero. It returns
-    the ``GR_UNABLE`` or ``GR_DOMAIN`` flag when an impossible division
-    is encountered or when a comparison cannot be performed.
+    These methods require divisions and zero testing
+    and can therefore fail (returning ``GR_UNABLE`` or ``GR_DOMAIN``)
+    when the ring is not a field.
+    The *householder* version additionally requires complex
+    conjugation and the ability to compute square roots.
 
 Special matrices
 -------------------------------------------------------------------------------

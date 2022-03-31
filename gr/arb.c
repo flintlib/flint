@@ -517,6 +517,27 @@ _gr_arb_rsqrt(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_abs(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_abs(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_conj(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_set(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_im(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_zero(res);
+    return GR_SUCCESS;
+}
+
+int
 _gr_arb_vec_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr vec1, arb_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     arb_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ARB_CTX_PREC(ctx));
@@ -601,6 +622,10 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_arb_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_arb_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_arb_rsqrt},
+    {GR_METHOD_ABS,             (gr_funcptr) _gr_arb_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) _gr_arb_conj},
+    {GR_METHOD_RE,              (gr_funcptr) _gr_arb_set},
+    {GR_METHOD_IM,              (gr_funcptr) _gr_arb_im},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},

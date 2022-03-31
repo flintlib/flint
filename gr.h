@@ -179,8 +179,16 @@ typedef enum
     GR_METHOD_SQRT,
     GR_METHOD_RSQRT,
 
-    GR_METHOD_EXP,
-    GR_METHOD_LOG,
+    GR_METHOD_EXP, /* todo: implement */
+    GR_METHOD_LOG, /* todo: implement */
+
+    /* todo: test the following */
+    GR_METHOD_ABS,
+    GR_METHOD_CONJ,
+    GR_METHOD_RE,
+    GR_METHOD_IM,
+    GR_METHOD_SGN,  /* todo: implement */
+    GR_METHOD_CSGN, /* todo: implement */
 
     /* Vector methods */
     GR_METHOD_VEC_INIT,
@@ -396,6 +404,13 @@ GR_INLINE int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 GR_INLINE int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQRT)(res, x, ctx); }
 GR_INLINE int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
 GR_INLINE truth_t gr_is_square(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_SQUARE)(x, ctx); }
+
+GR_INLINE int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ABS)(res, x, ctx); }
+GR_INLINE int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CONJ)(res, x, ctx); }
+GR_INLINE int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RE)(res, x, ctx); }
+GR_INLINE int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, IM)(res, x, ctx); }
+GR_INLINE int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SGN)(res, x, ctx); }
+GR_INLINE int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CSGN)(res, x, ctx); }
 
 GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
 GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
