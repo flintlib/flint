@@ -205,6 +205,13 @@ Characteristic polynomial
     the ``GR_UNABLE`` or ``GR_DOMAIN`` flag when an impossible division
     is encountered or when a comparison cannot be performed.
 
+.. function:: int _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_hessenberg(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the characteristic polynomial of the square matrix
+    *mat*, which is assumed to be in Hessenberg form (this is
+    currently not checked).
+
 Hessenberg form
 -------------------------------------------------------------------------------
 
