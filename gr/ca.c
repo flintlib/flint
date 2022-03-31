@@ -44,7 +44,7 @@ _gr_ca_swap(ca_t x, ca_t y, const gr_ctx_t ctx)
 int
 _gr_ca_randtest(ca_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
 {
-    ca_randtest(res, state, 3, 10, GR_CA_CTX(ctx));
+    ca_randtest(res, state, 2, 10, GR_CA_CTX(ctx));
 
     if (ctx->which_ring == GR_WHICH_RING_RR)
     {

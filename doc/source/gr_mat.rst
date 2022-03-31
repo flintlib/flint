@@ -200,9 +200,28 @@ Characteristic polynomial
     The *inplace* version destroys the input matrix.
 
     This method requires divisions and can therefore fail when the
-    ring is not a field, but will sometimes succeed anywyay. It returns
+    ring is not a field, but will sometimes succeed anywyay. It
+    also requires testing for zero. It returns
     the ``GR_UNABLE`` or ``GR_DOMAIN`` flag when an impossible division
-    is encountered.
+    is encountered or when a comparison cannot be performed.
+
+Hessenberg form
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_mat_is_hessenberg(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is in upper Hessenberg form.
+
+.. function:: int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to an upper Hessenberg form of *mat*.
+    Uses Gaussian elimination.
+
+    This method requires divisions and can therefore fail when the
+    ring is not a field, but will sometimes succeed anywyay. It
+    also requires testing for zero. It returns
+    the ``GR_UNABLE`` or ``GR_DOMAIN`` flag when an impossible division
+    is encountered or when a comparison cannot be performed.
 
 Special matrices
 -------------------------------------------------------------------------------

@@ -127,6 +127,9 @@ int _gr_mat_charpoly_danilevsky_inplace(gr_ptr res, gr_mat_t mat, gr_ctx_t ctx);
 int _gr_mat_charpoly_danilevsky(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_charpoly_danilevsky(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx);
 
+int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
+truth_t gr_mat_is_hessenberg(const gr_mat_t mat, gr_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif
