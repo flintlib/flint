@@ -85,10 +85,14 @@ _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
 
 int gr_mat_charpoly_berkowitz(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
 {
+    int status;
+
     if (mat->r != mat->c)
         return GR_DOMAIN;
 
     gr_poly_fit_length(cp, mat->r + 1, ctx);
     _gr_poly_set_length(cp, mat->r + 1, ctx);
-    return _gr_mat_charpoly_berkowitz(cp->coeffs, mat, ctx);
+    status = _gr_mat_charpoly_berkowitz(cp->coeffs, mat, ctx);
+    _gr_poly_normalise(cp, ctx);   /* only needed for the zero ring */
+    return status;
 }

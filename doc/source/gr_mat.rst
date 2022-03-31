@@ -180,6 +180,30 @@ Characteristic polynomial
 .. function:: int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
+    Sets *res* to the characteristic polynomial of the square matrix
+    *mat*, computed using the division-free Berkowitz algorithm.
+    The number of operations is `O(n^4)` where *n* is the
+    size of the matrix. The
+    underscore method assumes that *res* is a preallocated
+    array of `n + 1` coefficients.
+
+.. function:: int _gr_mat_charpoly_danilevsky_inplace(gr_ptr res, gr_mat_t mat, gr_ctx_t ctx)
+              int _gr_mat_charpoly_danilevsky(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_danilevsky(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the characteristic polynomial of the square matrix
+    *mat*, computed using the Danilevsky algorithm.
+    The number of operations is `O(n^3)` where *n* is the
+    size of the matrix. The
+    underscore method assumes that *res* is a preallocated
+    array of `n + 1` coefficients.
+    The *inplace* version destroys the input matrix.
+
+    This method requires divisions and can therefore fail when the
+    ring is not a field, but will sometimes succeed anywyay. It returns
+    the ``GR_UNABLE`` or ``GR_DOMAIN`` flag when an impossible division
+    is encountered.
+
 Special matrices
 -------------------------------------------------------------------------------
 
