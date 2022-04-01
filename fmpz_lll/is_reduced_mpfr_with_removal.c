@@ -997,6 +997,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                             : fmpz_mat_is_reduced_gram(B, fl->delta, fl->eta)))
     {
         flint_printf("!!!fmpz_lll_is_reduced_mpfr_with_removal is returning the wrong answer!!!\n");
+        fflush(stdout);
         flint_abort();
     }
 
