@@ -31,7 +31,7 @@ main(void)
     fflush(stdout);
 
     /* test zeros */
-    {
+    if (0) {
         fmpz_mat_init(mat, 4, 4);
 
         fmpz_set_si(fmpz_mat_entry(mat, 0, 0),  584067842);
@@ -50,6 +50,11 @@ main(void)
         fmpz_set_si(fmpz_mat_entry(mat, 3, 1), -496760141);
         fmpz_set_si(fmpz_mat_entry(mat, 3, 2), -347212699);
         fmpz_set_si(fmpz_mat_entry(mat, 3, 3),   42835143);
+
+flint_printf("mat: ");
+fmpz_mat_print_pretty(mat);
+flint_printf("\n");
+
 
         fl->delta = 0.99;
         fl->eta = 0.51;
