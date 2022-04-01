@@ -30,47 +30,6 @@ main(void)
     flint_printf("lll....");
     fflush(stdout);
 
-    /* test zeros */
-    if (0) {
-        fmpz_mat_init(mat, 4, 4);
-
-        fmpz_set_si(fmpz_mat_entry(mat, 0, 0),  584067842);
-        fmpz_set_si(fmpz_mat_entry(mat, 0, 1),          0);
-        fmpz_set_si(fmpz_mat_entry(mat, 0, 2),   24573982);
-        fmpz_set_si(fmpz_mat_entry(mat, 0, 3),  521334123);
-        fmpz_set_si(fmpz_mat_entry(mat, 1, 0),          0);
-        fmpz_set_si(fmpz_mat_entry(mat, 1, 1), -584067842);
-        fmpz_set_si(fmpz_mat_entry(mat, 1, 2), -434026422);
-        fmpz_set_si(fmpz_mat_entry(mat, 1, 3), -496760141);
-        fmpz_set_si(fmpz_mat_entry(mat, 2, 0),   24573982);
-        fmpz_set_si(fmpz_mat_entry(mat, 2, 1), -434026422);
-        fmpz_set_si(fmpz_mat_entry(mat, 2, 2), -321495282);
-        fmpz_set_si(fmpz_mat_entry(mat, 2, 3), -347212699);
-        fmpz_set_si(fmpz_mat_entry(mat, 3, 0),  521334123);
-        fmpz_set_si(fmpz_mat_entry(mat, 3, 1), -496760141);
-        fmpz_set_si(fmpz_mat_entry(mat, 3, 2), -347212699);
-        fmpz_set_si(fmpz_mat_entry(mat, 3, 3),   42835143);
-
-flint_printf("mat: ");
-fmpz_mat_print_pretty(mat);
-flint_printf("\n");
-
-
-        fl->delta = 0.99;
-        fl->eta = 0.51;
-        fl->rt = GRAM;
-        fl->gt = EXACT;
-
-        for (i = 0; i < 1; i++)
-        {
-            fmpz_mat_init_set(mat2, mat);
-            fmpz_lll(mat2, NULL, fl);
-            fmpz_mat_clear(mat2);
-        }
-
-        fmpz_mat_clear(mat);
-    }
-
     /* test using NTRU like matrices */
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
