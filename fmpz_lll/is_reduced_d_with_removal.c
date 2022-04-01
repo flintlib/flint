@@ -519,6 +519,16 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                         d_mat_entry(R, i, j) * d_mat_entry(R, i, j);
                 }
             }
+
+            if (d_mat_entry(R, j, j) <= 0)
+            {
+                /* going to take sqrt and then divide by it */
+                d_mat_clear(A);
+                d_mat_clear(R);
+                d_mat_clear(V);
+                return 0;
+            }
+
             d_mat_entry(R, j, j) = sqrt(d_mat_entry(R, j, j));
         }
 

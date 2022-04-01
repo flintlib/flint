@@ -559,6 +559,16 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                              tmp, MPFR_RNDN);
                 }
             }
+
+            if (mpfr_sgn(mpfr_mat_entry(R, j, j)) <= 0)
+            {
+                /* going to take sqrt and then divide by it */
+                mpfr_mat_clear(A);
+                mpfr_mat_clear(R);
+                mpfr_mat_clear(V);
+                return 0;
+            }
+
             mpfr_sqrt(mpfr_mat_entry(R, j, j), mpfr_mat_entry(R, j, j),
                       MPFR_RNDN);
         }
