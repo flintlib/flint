@@ -174,6 +174,11 @@ LU decomposition
 
 .. function:: int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int full_rank_check, gr_ctx_t ctx)
 
+Determinant and trace
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
@@ -211,6 +216,19 @@ Characteristic polynomial
     Sets *res* to the characteristic polynomial of the square matrix
     *mat*, which is assumed to be in Hessenberg form (this is
     currently not checked).
+
+.. function:: int _gr_mat_charpoly_faddeev(gr_ptr res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_faddeev(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the characteristic polynomial of the square matrix
+    *mat*, computed using the Faddeev-LeVerrier algorithm.
+    If the optional output argument *adj* is not *NULL*, it is
+    set to the adjugate matrix, which is computed free of charge.
+
+    This method requires exact divisions by small integers and can
+    therefore fail (returning the ``GR_UNABLE`` or ``GR_DOMAIN`` flags)
+    in finite characteristic or when the underlying ring does
+    not implement a division algorithm.
 
 Hessenberg form
 -------------------------------------------------------------------------------

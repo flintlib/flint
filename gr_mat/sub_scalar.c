@@ -34,9 +34,9 @@ gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
             {
                 /* todo: vectorize */
                 if (i == j)
-                    status |= gr_sub(GR_MAT_ENTRY(res, i, j, sz), GR_MAT_ENTRY(res, i, j, sz), x, ctx);
+                    status |= gr_sub(GR_MAT_ENTRY(res, i, j, sz), GR_MAT_ENTRY(mat, i, j, sz), x, ctx);
                 else
-                    status |= gr_set(GR_MAT_ENTRY(res, i, j, sz), GR_MAT_ENTRY(res, i, j, sz), ctx);
+                    status |= gr_set(GR_MAT_ENTRY(res, i, j, sz), GR_MAT_ENTRY(mat, i, j, sz), ctx);
             }
         }
     }
