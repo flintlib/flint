@@ -149,6 +149,8 @@ Basic operations
     Set *res* to the scalar matrix with *c* on the main diagonal
     and zero elsewhere.
 
+.. function:: int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
+
 Arithmetic
 -------------------------------------------------------------------------------
 
@@ -219,11 +221,19 @@ Characteristic polynomial
 
 .. function:: int _gr_mat_charpoly_faddeev(gr_ptr res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_faddeev(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+              int _gr_mat_charpoly_faddeev_bsgs(gr_ptr res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_faddeev_bsgs(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
 
     Sets *res* to the characteristic polynomial of the square matrix
     *mat*, computed using the Faddeev-LeVerrier algorithm.
     If the optional output argument *adj* is not *NULL*, it is
     set to the adjugate matrix, which is computed free of charge.
+
+    The *bsgs* version uses a baby-step giant-step strategy,
+    also known as the Preparata-Sarwate algorithm.
+    This reduces the complexity from `O(n^4)` to `O(n^{3.5})` operations
+    at the cost of requiring `n^{0.5}` temporary matrices to be
+    stored.
 
     This method requires exact divisions by small integers and can
     therefore fail (returning the ``GR_UNABLE`` or ``GR_DOMAIN`` flags)
