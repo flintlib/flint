@@ -992,5 +992,13 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         mpfr_mat_clear(bound);
         mpfr_clears(s, norm, ti, tj, tmp, mpfr_gs_B, NULL);
     }
+
+    if (!(fl->rt == Z_BASIS ? fmpz_mat_is_reduced(B, fl->delta, fl->eta)
+                            : fmpz_mat_is_reduced_gram(B, fl->delta, fl->eta)))
+    {
+        flint_printf("!!!fmpz_lll_is_reduced_mpfr_with_removal is returning the wrong answer!!!\n");
+        flint_abort();
+    }
+
     return 1;
 }
