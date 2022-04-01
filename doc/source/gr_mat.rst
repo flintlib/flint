@@ -181,6 +181,30 @@ Determinant and trace
 
 .. function:: int gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
 
+Solving
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+
+    Solves the lower triangular system `LX = B` or the upper triangular system
+    `UX = B`, respectively. Division by the the diagonal entries must
+    be possible; if not a division fails, ``GR_DOMAIN`` is returned
+    even if the system is solvable.
+    If *unit* is set, the main diagonal of *L* or *U*
+    is taken to consist of all ones, and in that case the actual entries on
+    the diagonal are not read at all and can contain other data.
+
+    The *classical* versions perform the computations iteratively while the
+    *recursive* versions perform the computations in a block recursive
+    way to benefit from fast matrix multiplication. The default versions
+    choose an algorithm automatically.
+
+
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
@@ -235,7 +259,7 @@ Characteristic polynomial
     at the cost of requiring `n^{0.5}` temporary matrices to be
     stored.
 
-    This method requires exact divisions by small integers and can
+    This method requires divisions by small integers and can
     therefore fail (returning the ``GR_UNABLE`` or ``GR_DOMAIN`` flags)
     in finite characteristic or when the underlying ring does
     not implement a division algorithm.
