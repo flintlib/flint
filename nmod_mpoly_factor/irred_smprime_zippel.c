@@ -62,22 +62,22 @@ int nmod_mpoly_factor_irred_smprime_zippel(
 
     degs    = (slong *) flint_malloc((n + 1)*sizeof(slong));
     degeval = (slong *) flint_malloc((n + 1)*sizeof(slong));
-	alpha   = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
+    alpha   = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
     alphabetas = (n_poly_struct *) flint_malloc(n*sizeof(n_poly_struct));
     Aevals  = (nmod_mpoly_struct *) flint_malloc(n*sizeof(nmod_mpoly_struct));
-	for (i = 0; i < n; i++)
+    for (i = 0; i < n; i++)
     {
         n_poly_init(alphabetas + i);
-		nmod_mpoly_init(Aevals + i, ctx);
+        nmod_mpoly_init(Aevals + i, ctx);
     }
     nmod_mpolyv_init(tfac, ctx);
-	nmod_mpoly_init(t, ctx);
+    nmod_mpoly_init(t, ctx);
 
     /* init done */
 
     alphabetas_length = 2;
     alphas_tries_remaining = 10;
-	nmod_mpoly_degrees_si(degs, A, ctx);
+    nmod_mpoly_degrees_si(degs, A, ctx);
 
     k = 0;
     for (i = 0; i <= n; i++)
@@ -93,34 +93,34 @@ int nmod_mpoly_factor_irred_smprime_zippel(
 next_alpha:
 
     if (--alphas_tries_remaining < 0)
-	{
-		success = 0;
+    {
+        success = 0;
         goto cleanup;
-	}
+    }
 
     for (i = 0; i < n; i++)
         alpha[i] = n_urandint(state, ctx->mod.n - 1) + 1;
 
     /* ensure degrees do not drop under evaluation */
-	for (i = n - 1; i >= 0; i--)
-	{
-		nmod_mpoly_evaluate_one_ui(Aevals + i,
+    for (i = n - 1; i >= 0; i--)
+    {
+        nmod_mpoly_evaluate_one_ui(Aevals + i,
                         i == n - 1 ? A : Aevals + i + 1, i + 1, alpha[i], ctx);
-		nmod_mpoly_degrees_si(degeval, Aevals + i, ctx);
-		for (j = 0; j <= i; j++)
-			if (degeval[j] != degs[j])
-				goto next_alpha;
-	}
+        nmod_mpoly_degrees_si(degeval, Aevals + i, ctx);
+        for (j = 0; j <= i; j++)
+            if (degeval[j] != degs[j])
+                goto next_alpha;
+    }
 
     /* make sure univar is squarefree */
-	nmod_mpoly_derivative(t, Aevals + 0, 0, ctx);
-	if (!nmod_mpoly_gcd(t, t, Aevals + 0, ctx))
+    nmod_mpoly_derivative(t, Aevals + 0, 0, ctx);
+    if (!nmod_mpoly_gcd(t, t, Aevals + 0, ctx))
     {
         success = -1;
         goto cleanup;
     }
-	if (!nmod_mpoly_is_one(t, ctx))
-		goto next_alpha;
+    if (!nmod_mpoly_is_one(t, ctx))
+        goto next_alpha;
 
     alphabetas_tries_remaining = 2 + alphabetas_length;
 
@@ -314,9 +314,9 @@ cleanup:
     n_tpoly_clear(Abfp);
     n_bpoly_clear(Ab);
 
-	for (i = 0; i < n; i++)
+    for (i = 0; i < n; i++)
     {
-		nmod_mpoly_clear(Aevals + i, ctx);
+        nmod_mpoly_clear(Aevals + i, ctx);
         n_poly_clear(alphabetas + i);
     }
     flint_free(alphabetas);
@@ -345,5 +345,5 @@ cleanup:
     }
 #endif
 
-	return success;
+    return success;
 }

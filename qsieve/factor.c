@@ -48,7 +48,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     mp_limb_t small_factor, delta;
     ulong expt = 0;
     unsigned char * sieve;
-    slong ncols, nrows, i, j = 0, count, relation = 0, num_primes;
+    slong ncols, nrows, i, j = 0, count, num_primes;
     uint64_t * nullrows = NULL;
     uint64_t mask;
     flint_rand_t state;
@@ -236,7 +236,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
         do
         {           
-            relation += qsieve_collect_relations(qs_inf, sieve);
+            qsieve_collect_relations(qs_inf, sieve);
                 
             qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
@@ -424,7 +424,6 @@ found_small_factor:
         }
 
         qsieve_linalg_realloc(qs_inf);
-        relation = 0;
     }
 
     /**************************************************************************

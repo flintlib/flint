@@ -33,7 +33,7 @@ jobs:
 
       - name: "Configure"
         run: |
-          ./configure CFLAGS=${CFLAGS} --with-gmp=${LOCAL} \
+          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
               --with-mpfr=${LOCAL}
 
       - name: "Compile"
@@ -60,6 +60,7 @@ jobs:
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
       - uses: actions/checkout@v2
@@ -77,8 +78,8 @@ jobs:
 
       - name: "Configure"
         run: |
-          ./configure CFLAGS=${CFLAGS} --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL}
+          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
@@ -93,61 +94,64 @@ jobs:
 
 
 
-  #############################################################################
-  # cygwin with gcc
-  #############################################################################
-  cygwin-gcc:
-    name: Cygwin GCC
+  # NOTE: Cygwin is paaaaiinfully slow. Let's not this as it is not advised to
+  # be used by MPFR.
 
-    runs-on: windows-2019
+  ##############################################################################
+  ## cygwin with gcc
+  ##############################################################################
+  #cygwin-gcc:
+  #  name: Cygwin GCC
 
-    defaults:
-      run:
-        shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
+  #  runs-on: windows-2019
 
-    env:
-      MAKE: "make -j"
-      REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
-      LOCAL: /usr
-      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
-      CFLAGS: "-Wall"
+  #  defaults:
+  #    run:
+  #      shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
-    steps:
-      - uses: actions/checkout@v2
+  #  env:
+  #    MAKE: "make -j"
+  #    REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
+  #    LOCAL: /cygdrive/d/a/flint2/flint2/local
+  #    LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+  #    CFLAGS: "-Wall -D _WIN64"
+  #    EXTRA_OPTIONS: "--disable-static --enable-shared"
 
-      - name: "Set up Cygwin"
-        uses: gap-actions/setup-cygwin@v1
-        with:
-          EXTRA_PKGS_TO_INSTALL: "ldd,dos2unix"
+  #  steps:
+  #    - uses: actions/checkout@v2
 
-      - name: "Setup"
-        run: |
-          gcc --version
-          make --version
+  #    - name: "Set up Cygwin"
+  #      uses: gap-actions/setup-cygwin@v1
+  #      with:
+  #        EXTRA_PKGS_TO_INSTALL: "ldd,dos2unix"
 
-      # No need to build dependencies as GAP's cygwin installation includes both
-      # GMP and MPFR.
+  #    - name: "Setup"
+  #      run: |
+  #        gcc --version
+  #        make --version
 
-      - name: "Configure"
-        run: |
-          cd ${REPO}
-          dos2unix configure
-          ./configure CFLAGS=${CFLAGS} --disable-static --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL}
+  #    - name: "Build dependencies"
+  #      run: |
+  #        cd ${REPO}
+  #        dos2unix .build_dependencies
+  #        ./.build_dependencies
 
-          # This line is used in .build_dependencies, which we do not call on
-          # Cygwin.
-          echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
+  #    - name: "Configure"
+  #      run: |
+  #        cd ${REPO}
+  #        dos2unix configure
+  #        ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+  #            --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
 
-      - name: "Compile"
-        run: |
-          cd ${REPO}
-          $MAKE
+  #    - name: "Compile"
+  #      run: |
+  #        cd ${REPO}
+  #        $MAKE
 
-      - name: "Check"
-        run: |
-          cd ${REPO}
-          $MAKE check
+  #    - name: "Check"
+  #      run: |
+  #        cd ${REPO}
+  #        $MAKE check
 
 
 
@@ -165,13 +169,13 @@ jobs:
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
       CC: "clang"
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
       - uses: actions/checkout@v2
 
       - name: "Setup"
         run: |
-          sudo apt install clang
           clang --version
           make --version
 
@@ -181,8 +185,8 @@ jobs:
 
       - name: "Configure"
         run: |
-          ./configure CFLAGS=${CFLAGS} CC=${CC} --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL}
+          ./configure CFLAGS="${CFLAGS}" CC=${CC} --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
@@ -275,3 +279,69 @@ jobs:
           cd build
           ctest -j4 --output-on-failure --timeout 300
         shell: bash
+
+
+
+  ##############################################################################
+  # nemo
+  ##############################################################################
+  nemo:
+    name: Nemo.jl
+
+    runs-on: ubuntu-latest
+
+    env:
+      MAKE: "make -j"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: ""
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Setup"
+        run: |
+          sudo apt install sed
+          gcc --version
+          make --version
+          julia --version
+
+      - name: "Build dependencies"
+        run: |
+          ./.build_dependencies
+
+      - name: "Configure"
+        run: |
+          # Make sure that we output an soname which corresponds to FLINT_JLL's
+          # soname
+          wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
+          FLINT_JLL_VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
+          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
+          FLINT_JLL_MAJOR=$(echo $FLINT_JLL_SONAME | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
+          FLINT_JLL_MINOR=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
+          FLINT_JLL_PATCH=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
+          sed -i "s/^\(FLINT_MAJOR=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure
+          sed -i "s/^\(FLINT_MINOR=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure
+          sed -i "s/^\(FLINT_PATCH=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure
+
+          # Now we can create the makefile
+          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
+              --with-mpfr=${LOCAL} --prefix=${LOCAL} ${EXTRA_OPTIONS}
+
+      - name: "Compile and install"
+        run: |
+          $MAKE
+          $MAKE install
+
+      - name: "Set up Nemo.jl"
+        run: |
+          # Override FLINT_jll's libflint with ours
+          julia -e "import Pkg; Pkg.add(\"Nemo\");"
+          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
+          touch ~/.julia/packages/Nemo/*/src/Nemo.jl
+          julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
+
+      - name: "Check Nemo.jl"
+        run: |
+          julia -e "import Pkg; Pkg.test(\"Nemo\")"

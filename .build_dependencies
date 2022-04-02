@@ -8,12 +8,13 @@ echo \
 ##################################################"
 
 echo "Downloading..."
-wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz > /dev/null 2>&1
+wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully downloaded."
     echo ""
 else
     echo "Failed downloading."
+    cat out.log
     exit 1
 fi
 
@@ -21,32 +22,35 @@ tar -xf gmp-6.2.1.tar.xz
 cd gmp-6.2.1
 
 echo "Configuring..."
-./configure --prefix=${LOCAL} > /dev/null 2>&1
+./configure --prefix=${LOCAL} --enable-shared --disable-static > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully configured."
     echo ""
 else
     echo "Failed configuring."
+    cat out.log
     exit 1
 fi
 
 echo "Building..."
-${MAKE} > /dev/null 2>&1
+${MAKE} > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully built."
     echo
 else
     echo "Failed building."
+    cat out.log
     exit 1
 fi
 
 echo "Installing..."
-${MAKE} install > /dev/null 2>&1
+${MAKE} install > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully installed."
     echo ""
 else
     echo "Failed installing."
+    cat out.log
     exit 1
 fi
 cd ..
@@ -57,12 +61,13 @@ echo \
 ##################################################"
 
 echo "Downloading..."
-wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2 > /dev/null 2>&1
+wget https://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2 > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully downloaded."
     echo ""
 else
     echo "Failed downloading."
+    cat out.log
     exit 1
 fi
 
@@ -70,32 +75,36 @@ tar -xf mpfr-4.0.0.tar.bz2
 cd mpfr-4.0.0
 
 echo "Configuring..."
-./configure --with-gmp=${LOCAL} --prefix=${LOCAL} > /dev/null 2>&1
+./configure --with-gmp=${LOCAL} --prefix=${LOCAL} --enable-shared \
+    --disable-static > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully configured."
     echo ""
 else
     echo "Failed configuring."
+    cat out.log
     exit 1
 fi
 
 echo "Building..."
-${MAKE} > /dev/null 2>&1
+${MAKE} > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully built."
     echo ""
 else
     echo "Failed building."
+    cat out.log
     exit 1
 fi
 
 echo "Installing..."
-${MAKE} install > /dev/null 2>&1
+${MAKE} install > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully installed."
     echo ""
 else
     echo "Failed installing."
+    cat out.log
     exit 1
 fi
 cd ..

@@ -119,9 +119,9 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) t;
 
-        TEMPLATE(T, init)(t, ctx);
-
         TEMPLATE(T, ctx_randtest)(ctx, state);
+
+        TEMPLATE(T, init)(t, ctx);
 
         TEMPLATE(T, poly_init)(a, ctx);
         TEMPLATE(T, poly_init)(b, ctx);
