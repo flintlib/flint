@@ -147,55 +147,55 @@ int fmpz_mod_mpoly_factor_irred_smprime_zassenhaus(
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
     subset = FLINT_ARRAY_ALLOC(4, slong);
-	alphas = _fmpz_vec_init(n);
+    alphas = _fmpz_vec_init(n);
     Aevals = FLINT_ARRAY_ALLOC(n, fmpz_mod_mpoly_struct);
     deg     = FLINT_ARRAY_ALLOC(n + 1, slong);
     degeval = FLINT_ARRAY_ALLOC(n + 1, slong);
-	for (i = 0; i < n; i++)
-		fmpz_mod_mpoly_init(Aevals + i, ctx);
+    for (i = 0; i < n; i++)
+        fmpz_mod_mpoly_init(Aevals + i, ctx);
     fmpz_mod_mpolyv_init(pfac, ctx);
     fmpz_mod_mpolyv_init(qfac, ctx);
     fmpz_mod_mpolyv_init(tfac, ctx);
     fmpz_mod_mpolyv_init(dfac, ctx);
-	fmpz_mod_mpoly_init(t, ctx);
-	fmpz_mod_mpoly_init(p, ctx);
-	fmpz_mod_mpoly_init(q, ctx);
+    fmpz_mod_mpoly_init(t, ctx);
+    fmpz_mod_mpoly_init(p, ctx);
+    fmpz_mod_mpoly_init(q, ctx);
     fmpz_mod_poly_init(c, ctx->ffinfo);
     fmpz_mod_bpoly_init(B, ctx->ffinfo);
     fmpz_mod_tpoly_init(F, ctx->ffinfo);
 
-	fmpz_mod_mpoly_degrees_si(deg, A, ctx);
+    fmpz_mod_mpoly_degrees_si(deg, A, ctx);
 
 next_alpha:
 
     if (--tries_remaining < 0)
-	{
-		success = 0;
+    {
+        success = 0;
         goto cleanup;
-	}
+    }
 
     for (i = 0; i < n; i++)
         fmpz_mod_rand_not_zero(alphas + i, state, ctx->ffinfo);
 
     /* ensure degrees do not drop under evaluation */
-	for (i = n - 1; i >= 0; i--)
-	{
-		fmpz_mod_mpoly_evaluate_one_fmpz(Aevals + i, i == n - 1 ? A :
+    for (i = n - 1; i >= 0; i--)
+    {
+        fmpz_mod_mpoly_evaluate_one_fmpz(Aevals + i, i == n - 1 ? A :
                                        Aevals + i + 1, i + 1, alphas + i, ctx);
         fmpz_mod_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
-		fmpz_mod_mpoly_degrees_si(degeval, Aevals + i, ctx);
-		for (j = 0; j <= i; j++)
-			if (degeval[j] != deg[j])
-				goto next_alpha;
-	}
+        fmpz_mod_mpoly_degrees_si(degeval, Aevals + i, ctx);
+        for (j = 0; j <= i; j++)
+            if (degeval[j] != deg[j])
+                goto next_alpha;
+    }
 
     /* make sure univar is squarefree */
-	fmpz_mod_mpoly_derivative(t, Aevals + 0, 0, ctx);
-	success = fmpz_mod_mpoly_gcd(t, t, Aevals + 0, ctx);
+    fmpz_mod_mpoly_derivative(t, Aevals + 0, 0, ctx);
+    success = fmpz_mod_mpoly_gcd(t, t, Aevals + 0, ctx);
     if (!success)
         goto cleanup;
     if (!fmpz_mod_mpoly_is_one(t, ctx))
-		goto next_alpha;
+        goto next_alpha;
 
     /* make evaluations primitive */
     for (i = n - 1; i > 0; i--)
@@ -245,8 +245,8 @@ next_alpha:
             fmpz_mod_mpolyv_fit_length(fac, 1, ctx);
             fac->length = 1;
             fmpz_mod_mpoly_set(fac->coeffs + 0, A, ctx);
-		    success = 1;
-		    goto cleanup;
+            success = 1;
+            goto cleanup;
         }
 
         success = _try_lift(qfac, q, pfac, p, m, alphas, n, ctx);
@@ -267,8 +267,8 @@ next_alpha:
             fmpz_mod_mpolyv_fit_length(fac, 1, ctx);
             fac->length = 1;
             fmpz_mod_mpoly_set(fac->coeffs + 0, A, ctx);
-		    success = 1;
-		    goto cleanup;
+            success = 1;
+            goto cleanup;
         }
 
         qfac->length = 0;
@@ -353,10 +353,10 @@ next_alpha:
 
 cleanup: 
 
-	flint_free(subset);
-	_fmpz_vec_clear(alphas, n);
-	for (i = 0; i < n; i++)
-		fmpz_mod_mpoly_clear(Aevals + i, ctx);
+    flint_free(subset);
+    _fmpz_vec_clear(alphas, n);
+    for (i = 0; i < n; i++)
+        fmpz_mod_mpoly_clear(Aevals + i, ctx);
     flint_free(Aevals);
     flint_free(deg);
     flint_free(degeval);
@@ -383,5 +383,5 @@ cleanup:
     }
 #endif
 
-	return success;
+    return success;
 }

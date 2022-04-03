@@ -38,7 +38,7 @@ main(void)
         nmod_poly_factor_t res;
         mp_limb_t modulus, lead = 1;
         slong length, num, i, j;
-        ulong exp[5], prod1;
+        ulong exp[5];
 
         modulus = n_randtest_prime(state, 0);
 
@@ -60,7 +60,6 @@ main(void)
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
 
         exp[0] = n_randint(state, 30) + 1;
-        prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
             nmod_poly_mul(pol1, pol1, poly);
 
@@ -80,7 +79,6 @@ main(void)
             while ((!nmod_poly_is_irreducible(poly)) ||
                 (poly->length < 2) || (rem->length == 0));
             exp[i] = n_randint(state, 30) + 1;
-            prod1 *= exp[i];
 
             for (j = 0; j < exp[i]; j++)
                 nmod_poly_mul(pol1, pol1, poly);
@@ -144,7 +142,7 @@ main(void)
         nmod_poly_factor_t res, res2;
         mp_limb_t modulus;
         slong length, num, i, j;
-        slong exp[5], prod1;
+        slong exp[5];
         ulong inflation;
         int found;
 
@@ -173,7 +171,6 @@ main(void)
         nmod_poly_inflate(poly, poly, inflation);
 
         exp[0] = n_randint(state, 6) + 1;
-        prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
             nmod_poly_mul(pol1, pol1, poly);
 
@@ -193,7 +190,6 @@ main(void)
             while ((!nmod_poly_is_irreducible(poly)) ||
                 (poly->length < 2) || (rem->length == 0));
             exp[i] = n_randint(state, 6) + 1;
-            prod1 *= exp[i];
             nmod_poly_inflate(poly, poly, inflation);
 
             for (j = 0; j < exp[i]; j++)
