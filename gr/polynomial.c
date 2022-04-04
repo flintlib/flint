@@ -22,6 +22,18 @@ polynomial_ctx_clear(gr_ctx_t ctx)
     flint_free(ctx->elem_ctx);
 }
 
+truth_t
+polynomial_ctx_is_commutative_ring(gr_ctx_t ctx)
+{
+    return gr_ctx_is_commutative_ring(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
+polynomial_ctx_is_integral_domain(gr_ctx_t ctx)
+{
+    return gr_ctx_is_integral_domain(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
 void
 polynomial_clear(gr_poly_t res, gr_ctx_t ctx)
 {
@@ -159,6 +171,11 @@ gr_method_tab_input _gr_poly_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) polynomial_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) polynomial_ctx_clear},
+
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) polynomial_ctx_is_commutative_ring},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) polynomial_ctx_is_integral_domain},
+    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
+
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) polynomial_swap},

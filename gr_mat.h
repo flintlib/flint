@@ -132,6 +132,10 @@ int gr_mat_det_lu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 
+int gr_mat_rank_lu(slong * rank, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_rank_fflu(slong * rank, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_rank(slong * rank, const gr_mat_t A, gr_ctx_t ctx);
+
 int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx);
 int gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx);

@@ -98,6 +98,10 @@ typedef enum
     GR_METHOD_CTX_WRITE,
     GR_METHOD_CTX_CLEAR,
 
+    GR_METHOD_CTX_IS_COMMUTATIVE_RING,
+    GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,
+    GR_METHOD_CTX_IS_FIELD,
+
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
     GR_METHOD_SWAP,
@@ -264,6 +268,7 @@ typedef gr_ctx_struct gr_ctx_t[1];
 typedef void ((*gr_method_init_clear_op)(gr_ptr, gr_ctx_ptr));
 typedef void ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
+typedef truth_t ((*gr_method_ctx_predicate)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
@@ -300,6 +305,7 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_PREDICATE(ctx, NAME) (((gr_method_ctx_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_INIT_CLEAR_OP(ctx, NAME) (((gr_method_init_clear_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -337,6 +343,10 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 
 GR_INLINE int gr_ctx_clear(gr_ctx_t ctx) { return GR_CTX_OP(ctx, CTX_CLEAR)(ctx); }
 GR_INLINE int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx) { return GR_CTX_STREAM(ctx, CTX_WRITE)(out, ctx); }
+
+GR_INLINE int gr_ctx_is_commutative_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_COMMUTATIVE_RING)(ctx); }
+GR_INLINE int gr_ctx_is_integral_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_INTEGRAL_DOMAIN)(ctx); }
+GR_INLINE int gr_ctx_is_field(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FIELD)(ctx); }
 
 GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
@@ -585,6 +595,12 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
         clear(x4, (ctx)); \
         clear(x5, (ctx)); \
     } while (0)
+
+/* Some generic implementations */
+
+truth_t gr_generic_ctx_predicate(gr_ctx_t ctx);
+truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx);
+truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 
 /* Some base rings */
 

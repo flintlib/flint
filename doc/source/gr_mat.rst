@@ -270,6 +270,21 @@ Determinant and trace
     the square matrix *mat*.
     If the matrix is not square, ``GR_DOMAIN`` is returned.
 
+Rank
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_rank_fflu(slong * rank, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_rank_lu(slong * rank, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_rank(slong * rank, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the rank of *mat*.
+    The default method returns ``GR_DOMAIN`` if the element ring
+    is not an integral domain, in which case the usual rank is
+    not well-defined. The *fflu* and *lu* variants currently do
+    not check the element domain, and simply return this flag if they
+    encounter an impossible inverse in the execution of the
+    respective algorithms.
+
 Solving
 -------------------------------------------------------------------------------
 

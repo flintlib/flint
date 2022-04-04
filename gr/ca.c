@@ -587,6 +587,10 @@ gr_method_tab_input _ca_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_ca_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_ca_ctx_write},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_true},
+
     {GR_METHOD_INIT,            (gr_funcptr) _gr_ca_init},
 
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_ca_clear},

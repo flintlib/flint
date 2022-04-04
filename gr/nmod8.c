@@ -13,6 +13,14 @@ nmod8_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     gr_stream_write(out, " (nmod8)");
 }
 
+/* todo: n_is_prime is fast, but this should still be cached
+   or use a fixed table lookup */
+truth_t
+nmod8_ctx_is_field(const gr_ctx_t ctx)
+{
+    return n_is_prime(NMOD8_CTX(ctx).n) ? T_TRUE : T_FALSE;
+}
+
 void
 nmod8_init(nmod8_t x, const gr_ctx_t ctx)
 {
@@ -354,6 +362,9 @@ gr_method_tab_input _nmod8_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) nmod8_ctx_write},
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) nmod8_ctx_clear},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) nmod8_ctx_is_field},
+    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) nmod8_ctx_is_field},
     {GR_METHOD_INIT,            (gr_funcptr) nmod8_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) nmod8_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) nmod8_swap},

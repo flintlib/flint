@@ -2,6 +2,23 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+/* Generic context predicates */
+
+truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
+{
+    return T_UNKNOWN;
+}
+
+truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx)
+{
+    return T_TRUE;
+}
+
+truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
+{
+    return T_FALSE;
+}
+
 /* Generic arithmetic functions */
 
 truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx)
@@ -1047,6 +1064,10 @@ gr_generic_ctx_clear(gr_ctx_t ctx)
 const gr_method_tab_input _gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
+
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
 
     {GR_METHOD_NEG_ONE,                 (gr_funcptr) gr_generic_neg_one},
 
