@@ -8,6 +8,7 @@
 #endif
 
 #include "flint/fmpz_mat.h"
+#include "flint/fmpq_mat.h"
 #include "gr.h"
 #include "gr_poly.h"
 
@@ -63,7 +64,8 @@ gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_write(out, mat, ctx);
 }
 
-int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx);
+int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx);
+int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx);
 
 GR_INLINE truth_t
 gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
@@ -90,6 +92,10 @@ int gr_mat_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx);
 int gr_mat_set_si(gr_mat_t res, slong v, gr_ctx_t ctx);
 int gr_mat_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx);
 int gr_mat_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx);
+
+int gr_mat_set_fmpz_mat(gr_mat_t res, const fmpz_mat_t mat, gr_ctx_t ctx);
+int gr_mat_set_fmpq_mat(gr_mat_t res, const fmpq_mat_t mat, gr_ctx_t ctx);
+
 int gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
@@ -112,7 +118,19 @@ gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_mul(res, mat, mat, ctx);
 }
 
-int gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, int full_rank_check, gr_ctx_t ctx);
+int gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx);
+
+int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
+int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
+int gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
+
+int gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
+
+int gr_mat_det_bareiss(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_det_lu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 
 int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx);

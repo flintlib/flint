@@ -14,9 +14,19 @@ wants to manipulate matrices using generic ring methods
 like ``gr_add`` instead of the designated matrix
 methods like ``gr_mat_add``.
 
-Warning: matrix functions generally assume that input as well
-as output operands have compatible shapes.
-Shape errors are not usually handled (this may change).
+Warnings
+-------------------------------------------------------------------------------
+
+* Matrix functions generally assume that input as well
+  as output operands have compatible shapes.
+  Shape errors are not usually handled (this may change).
+* Some operations (like rank, LU factorization) generally only make
+  sense when the base ring is an integral domain.
+  Typically the algorithms designed for integral domains also work
+  over non-integral domains as long as all inversions of nonzero
+  elements succeed. If an inversion fails, the algorithm will return
+  the ``GR_DOMAIN`` or ``GR_UNABLE`` flag.
+  This might not yet be entirely consistent.
 
 Type compatibility
 -------------------------------------------------------------------------------
@@ -98,10 +108,6 @@ Basic operations
 
     Prints *mat* to standard output.
 
-.. function:: int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, void * options, gr_ctx_t ctx)
-
-    Sets *mat* to a random matrix.
-
 .. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
 
     Returns whether *mat* is an empty matrix, having either zero
@@ -137,6 +143,8 @@ Basic operations
     and zero elsewhere.
 
 .. function:: int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_set_fmpz_mat(gr_mat_t res, const fmpz_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_set_fmpq_mat(gr_mat_t res, const fmpq_mat_t mat, gr_ctx_t ctx)
 
     Sets *res* to the value of *mat*.
 
@@ -171,15 +179,96 @@ Arithmetic
               int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
               int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
 
-LU decomposition
+Gaussian elimination
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int full_rank_check, gr_ctx_t ctx)
+.. function:: int gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
+
+    Attempts to find a nonzero element in column number *column*
+    of the matrix *mat* in a row between *start_row* (inclusive)
+    and *end_row* (exclusive).
+    On success, sets ``pivot_row`` to the row index and returns
+    ``GR_SUCCESS``. If no nonzero pivot element exists, returns ``GR_DOMAIN``.
+    If no nonzero pivot element exists and zero-testing fails for some
+    element, returns the flag ``GR_UNABLE``.
+
+    This function may be destructive: any elements that are nontrivially
+    zero but can be certified zero may be overwritten by exact zeros.
+
+.. function:: int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+              int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+              int gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+
+    Computes a generalized LU decomposition `A = PLU` of a given
+    matrix *A*, writing the rank of *A* to *rank*.
+
+    If *A* is a nonsingular square matrix, *LU* will be set to
+    a unit diagonal lower triangular matrix *L* and an upper
+    triangular matrix *U* (the diagonal of *L* will not be stored
+    explicitly).
+
+    If *A* is an arbitrary matrix of rank *r*, *U* will be in row
+    echelon form having *r* nonzero rows, and *L* will be lower
+    triangular but truncated to *r* columns, having implicit ones on
+    the *r* first entries of the main diagonal. All other entries will
+    be zero.
+
+    If a nonzero value for ``rank_check`` is passed, the function
+    will abandon the output matrix in an undefined state and set
+    the rank to 0 if *A* is detected to be rank-deficient.
+    This currently only does
+
+    The algorithm can fail if it fails to certify that a pivot
+    element is zero or nonzero, in which case the correct rank
+    cannot be determined. It can also fail if a pivot element
+    is not invertible. In these cases the ``GR_UNABLE`` and/or
+    ``GR_DOMAIN`` flags will be returned. On failure,
+    the data in the output variables
+    ``rank``, ``P`` and ``LU`` will be meaningless.
+
+    The *classical* version uses iterative Gaussian elimination.
+    The *recursive* version uses a block recursive algorithm
+    to take advantage of fast matrix multiplication.
+
+.. function:: int gr_mat_fflu(slong * rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+
+    Similar to :func:`gr_mat_lu`, but computes a fraction-free
+    LU decomposition using the Bareiss algorithm.
+    The denominator is written to *den*.
 
 Determinant and trace
 -------------------------------------------------------------------------------
 
+.. function:: int gr_mat_det_bareiss(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_det_lu(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_det(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the determinant of the square matrix *mat*.
+    Various algorithms are available:
+
+    * The *berkowitz* version uses the division-free Berkowitz algorithm
+      performing `O(n^4)` operations. Since no zero tests are required, it
+      is guaranteed to succeed if the ring arithmetic succeeds.
+
+    * The *cofactor* version performs cofactor expansion. This is currently
+      only supported for matrices up to size 4, and for larger
+      matrices returns the ``GR_UNABLE`` flag.
+
+    * The *lu* and *bareiss* versions use rational LU decomposition
+      and fraction-free LU decomposition (Bareiss algorithm) respectively,
+      requiring `O(n^3)` operations. These algorithms can fail if zero
+      certification or inversion fails, in which case the ``GR_UNABLE``
+      flag is returned.
+
+    If the matrix is not square, ``GR_DOMAIN`` is returned.
+
 .. function:: int gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the trace (sum of entries on the main diagonal) of
+    the square matrix *mat*.
+    If the matrix is not square, ``GR_DOMAIN`` is returned.
 
 Solving
 -------------------------------------------------------------------------------
@@ -284,6 +373,19 @@ Hessenberg form
     when the ring is not a field.
     The *householder* version additionally requires complex
     conjugation and the ability to compute square roots.
+
+Random matrices
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
+
+    Sets *res* to a random matrix. The distribution is nonuniform.
+
+.. function:: int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
+
+    Randomises *mat* in-place by performing elementary row or column
+    operations. More precisely, at most *count* random additions or
+    subtractions of distinct rows and columns will be performed.
 
 Special matrices
 -------------------------------------------------------------------------------

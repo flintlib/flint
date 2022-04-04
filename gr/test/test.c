@@ -16,8 +16,8 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
 
     GR_TMP_INIT4(x, y, xy1, xy2, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
 
     status = GR_SUCCESS;
     status |= gr_op(xy1, x, y, R);
@@ -99,10 +99,10 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
 
     for (which = 0; which < 4; which++)
     {
-        gr_randtest(x, state, NULL, R);
-        gr_randtest(y, state, NULL, R);
-        gr_randtest(xy1, state, NULL, R);
-        gr_randtest(xy2, state, NULL, R);
+        gr_randtest(x, state, R);
+        gr_randtest(y, state, R);
+        gr_randtest(xy1, state, R);
+        gr_randtest(xy2, state, R);
 
         status = GR_SUCCESS;
         alias = n_randint(state, 2);
@@ -203,33 +203,33 @@ gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int verbose)
     status = GR_SUCCESS;
 
     GR_TMP_INIT1(a, R);
-    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(a, state, R);
     GR_TMP_CLEAR1(a, R);
 
     GR_TMP_INIT2(a, b, R);
-    status |= gr_randtest(a, state, NULL, R);
-    status |= gr_randtest(b, state, NULL, R);
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
     GR_TMP_CLEAR2(a, b, R);
 
     GR_TMP_INIT3(a, b, c, R);
-    status |= gr_randtest(a, state, NULL, R);
-    status |= gr_randtest(b, state, NULL, R);
-    status |= gr_randtest(c, state, NULL, R);
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
+    status |= gr_randtest(c, state, R);
     GR_TMP_CLEAR3(a, b, c, R);
 
     GR_TMP_INIT4(a, b, c, d, R);
-    status |= gr_randtest(a, state, NULL, R);
-    status |= gr_randtest(b, state, NULL, R);
-    status |= gr_randtest(c, state, NULL, R);
-    status |= gr_randtest(d, state, NULL, R);
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
+    status |= gr_randtest(c, state, R);
+    status |= gr_randtest(d, state, R);
     GR_TMP_CLEAR4(a, b, c, d, R);
 
     GR_TMP_INIT5(a, b, c, d, e, R);
-    status |= gr_randtest(a, state, NULL, R);
-    status |= gr_randtest(b, state, NULL, R);
-    status |= gr_randtest(c, state, NULL, R);
-    status |= gr_randtest(d, state, NULL, R);
-    status |= gr_randtest(e, state, NULL, R);
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
+    status |= gr_randtest(c, state, R);
+    status |= gr_randtest(d, state, R);
+    status |= gr_randtest(e, state, R);
     GR_TMP_CLEAR5(a, b, c, d, e, R);
 
     GR_TMP_END;
@@ -249,8 +249,8 @@ gr_test_swap(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT4(a, b, c, d, R);
 
-    status |= gr_randtest(a, state, NULL, R);
-    status |= gr_randtest(b, state, NULL, R);
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
     status |= gr_set(c, a, R);
     status |= gr_set(d, b, R);
     gr_swap(a, a, R);
@@ -292,19 +292,19 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT1(a, R);
 
-    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(a, state, R);
     status |= gr_zero(a, R);
     equal = gr_is_zero(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
         status = GR_WRONG;
 
-    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(a, state, R);
     status |= gr_one(a, R);
     equal = gr_is_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
         status = GR_WRONG;
 
-    status |= gr_randtest(a, state, NULL, R);
+    status |= gr_randtest(a, state, R);
     status |= gr_one(a, R);
     status |= gr_neg(a, a, R);
     equal = gr_is_neg_one(a, R);
@@ -329,11 +329,11 @@ gr_test_add_associativity(gr_ctx_t R, flint_rand_t state, int verbose)
     GR_TMP_INIT3(x, y, z, R);
     GR_TMP_INIT4(xy, yz, xy_z, x_yz, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(z, state, NULL, R);
-    gr_randtest(xy, state, NULL, R);
-    gr_randtest(yz, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(z, state, R);
+    gr_randtest(xy, state, R);
+    gr_randtest(yz, state, R);
 
     status = GR_SUCCESS;
     status |= gr_add(xy, x, y, R);
@@ -375,9 +375,9 @@ gr_test_neg(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT3(x, y, xy, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(xy, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(xy, state, R);
 
     status = GR_SUCCESS;
 
@@ -426,8 +426,8 @@ gr_test_add_commutativity(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT4(x, y, xy, yx, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
 
     status = GR_SUCCESS;
     status |= gr_add(xy, x, y, R);
@@ -477,11 +477,11 @@ gr_test_sub_equal_neg_add(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT5(x, y, neg_y, x_sub_y, x_neg_y, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(neg_y, state, NULL, R);
-    gr_randtest(x_sub_y, state, NULL, R);
-    gr_randtest(x_neg_y, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(neg_y, state, R);
+    gr_randtest(x_sub_y, state, R);
+    gr_randtest(x_neg_y, state, R);
 
     status = GR_SUCCESS;
     status |= gr_sub(x_sub_y, x, y, R);
@@ -536,11 +536,11 @@ gr_test_mul_associativity(gr_ctx_t R, flint_rand_t state, int verbose)
     GR_TMP_INIT3(x, y, z, R);
     GR_TMP_INIT4(xy, yz, xy_z, x_yz, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(z, state, NULL, R);
-    gr_randtest(xy, state, NULL, R);
-    gr_randtest(yz, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(z, state, R);
+    gr_randtest(xy, state, R);
+    gr_randtest(yz, state, R);
 
     status = GR_SUCCESS;
     status |= gr_mul(xy, x, y, R);
@@ -582,8 +582,8 @@ gr_test_mul_commutativity(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT4(x, y, xy, yx, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
 
     status = GR_SUCCESS;
     status |= gr_mul(xy, x, y, R);
@@ -641,9 +641,9 @@ gr_test_inv_involution(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT3(x, x_inv, x_inv_inv, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(x_inv, state, NULL, R);
-    gr_randtest(x_inv_inv, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(x_inv, state, R);
+    gr_randtest(x_inv_inv, state, R);
 
     status = GR_SUCCESS;
     status |= gr_inv(x_inv, x, R);
@@ -679,10 +679,10 @@ gr_test_inv_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT4(x, x_inv, x_inv_x, x_x_inv, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(x_inv, state, NULL, R);
-    gr_randtest(x_inv_x, state, NULL, R);
-    gr_randtest(x_x_inv, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(x_inv, state, R);
+    gr_randtest(x_inv_x, state, R);
+    gr_randtest(x_x_inv, state, R);
 
     /* todo: split status */
     status = GR_SUCCESS;
@@ -722,10 +722,10 @@ gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT4(x, y, xy, xyy, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(xy, state, NULL, R);
-    gr_randtest(xyy, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(xy, state, R);
+    gr_randtest(xyy, state, R);
 
     status = GR_SUCCESS;
     status |= gr_div(xy, x, y, R);
@@ -761,10 +761,10 @@ gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT4(x, y, xy, xyy, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(xy, state, NULL, R);
-    gr_randtest(xyy, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(xy, state, R);
+    gr_randtest(xyy, state, R);
 
     status = GR_SUCCESS;
     status |= gr_mul(xy, x, y, R);
@@ -801,11 +801,11 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT5(x, xa, xb, xab, xaxb, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(xa, state, NULL, R);
-    gr_randtest(xb, state, NULL, R);
-    gr_randtest(xab, state, NULL, R);
-    gr_randtest(xaxb, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(xa, state, R);
+    gr_randtest(xb, state, R);
+    gr_randtest(xab, state, R);
+    gr_randtest(xaxb, state, R);
 
     if (R->flags & GR_FINITE_RING)
     {
@@ -863,9 +863,9 @@ gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int ve
     GR_TMP_INIT3(x, xa, ya, R);
     GR_TMP_INIT2(xya, xaya, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(xa, state, NULL, R);
-    gr_randtest(ya, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(xa, state, R);
+    gr_randtest(ya, state, R);
 
     y = n_randtest(state);
 
@@ -919,10 +919,10 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int verbose)
     GR_TMP_INIT4(x, y, xa, ya, R);
     GR_TMP_INIT2(xya, xaya, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(y, state, NULL, R);
-    gr_randtest(xa, state, NULL, R);
-    gr_randtest(ya, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(y, state, R);
+    gr_randtest(xa, state, R);
+    gr_randtest(ya, state, R);
 
     if (R->flags & GR_FINITE_RING)
         a = n_randtest(state);
@@ -971,8 +971,8 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int verbose)
 
     GR_TMP_INIT3(x, xa1, xa2, R);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(xa1, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(xa1, state, R);
 
     if (R->flags & GR_FINITE_RING)
         a = n_randtest(state);
@@ -1019,11 +1019,11 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int verbose)
     fmpz_init(b);
     fmpz_init(ab);
 
-    gr_randtest(x, state, NULL, R);
-    gr_randtest(xa, state, NULL, R);
-    gr_randtest(xb, state, NULL, R);
-    gr_randtest(xab, state, NULL, R);
-    gr_randtest(xaxb, state, NULL, R);
+    gr_randtest(x, state, R);
+    gr_randtest(xa, state, R);
+    gr_randtest(xb, state, R);
+    gr_randtest(xab, state, R);
+    gr_randtest(xaxb, state, R);
 
     if (R->flags & GR_FINITE_RING)
     {
@@ -1088,11 +1088,11 @@ gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int verbose)
     GR_TMP_INIT_VEC(xy1, len, R);
     GR_TMP_INIT_VEC(xy2, len, R);
 
-    _gr_vec_randtest(x, state, len, NULL, R);
+    _gr_vec_randtest(x, state, len, R);
 
-    _gr_vec_randtest(y, state, len, NULL, R);
-    _gr_vec_randtest(xy1, state, len, NULL, R);
-    _gr_vec_randtest(xy2, state, len, NULL, R);
+    _gr_vec_randtest(y, state, len, R);
+    _gr_vec_randtest(xy1, state, len, R);
+    _gr_vec_randtest(xy2, state, len, R);
 
     status = GR_SUCCESS;
 
@@ -1174,13 +1174,13 @@ gr_test_mat_mul_classical_associativity(gr_ctx_t R, flint_rand_t state, int verb
     gr_mat_init(AB_C, m, q, R);
     gr_mat_init(A_BC, m, q, R);
 
-    gr_mat_randtest(A, state, NULL, R);
-    gr_mat_randtest(B, state, NULL, R);
-    gr_mat_randtest(C, state, NULL, R);
-    gr_mat_randtest(AB, state, NULL, R);
-    gr_mat_randtest(BC, state, NULL, R);
-    gr_mat_randtest(AB_C, state, NULL, R);
-    gr_mat_randtest(A_BC, state, NULL, R);
+    gr_mat_randtest(A, state, R);
+    gr_mat_randtest(B, state, R);
+    gr_mat_randtest(C, state, R);
+    gr_mat_randtest(AB, state, R);
+    gr_mat_randtest(BC, state, R);
+    gr_mat_randtest(AB_C, state, R);
+    gr_mat_randtest(A_BC, state, R);
 
     status = GR_SUCCESS;
     status |= gr_mat_mul_classical(AB, A, B, R);
@@ -1462,7 +1462,7 @@ int main()
         gr_ctx_init_matrix(MZZ, ZZ, 8);
 
         gr_init(mat, MZZ);
-        gr_randtest(mat, state, NULL, MZZ);
+        gr_randtest(mat, state, MZZ);
         gr_println(mat, MZZ);
 
         gr_poly_init(poly, ZZ);

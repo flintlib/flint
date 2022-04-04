@@ -33,11 +33,11 @@ _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 }
 
 int
-gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
     gr_ptr d, e;
     gr_ptr * a;
-    slong i, j, m, n, r, rank, row, col, sz;
+    slong i, j, k, m, n, r, rank, row, col, sz;
     int status;
     int pivot_status;
     GR_TMP_START;
@@ -45,7 +45,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     if (gr_mat_is_empty(A, ctx) == T_TRUE)
     {
         *res_rank = 0;
-        return GR_SUCCESS;
+        return gr_one(den, ctx);
     }
 
     GR_TMP_INIT2(d, e, ctx);
@@ -57,6 +57,8 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     gr_mat_set(LU, A, ctx);
 
     a = LU->rows;
+
+#define ENTRY(i, j) GR_ENTRY(a[i], j, sz)
 
     rank = row = col = 0;
     for (i = 0; i < m; i++)
@@ -101,24 +103,48 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
         if (r != row)
             _gr_mat_swap_rows(LU, P, row, r, ctx);
 
-        /* Must be able to invert pivot element. */
+        /* Todo: when the pivot element is invertible, make
+           use of that property.
         status |= gr_inv(d, GR_ENTRY(a[row], col, sz), ctx);
         if (status != GR_SUCCESS)
             break;
+        */
 
         for (j = row + 1; j < m; j++)
         {
-            status |= gr_mul(e, GR_ENTRY(a[j], col, sz), d, ctx);
+/*
+            status |= gr_mul(e, ENTRY(j, col), d, ctx);
             status |= gr_neg(e, e, ctx);
-            status |= _gr_vec_scalar_addmul(GR_ENTRY(a[j], col + 1, sz), GR_ENTRY(a[row], col + 1, sz), n - col - 1, e, ctx);
-            status |= gr_zero(GR_ENTRY(a[j], col, sz), ctx);
-            status |= gr_neg(GR_ENTRY(a[j], rank - 1, sz), e, ctx);
+            status |= _gr_vec_scalar_addmul(ENTRY(j, col + 1), ENTRY(row, col + 1), n - col - 1, e, ctx);
+            status |= gr_zero(ENTRY(j, col), ctx);
+            status |= gr_neg(ENTRY(j, rank - 1), e, ctx);
+*/
+
+
+            for (k = col + 1; k < n; k++)
+            {
+                status |= gr_mul(ENTRY(j, k), ENTRY(j, k), ENTRY(row, col), ctx);
+                status |= gr_mul(e, ENTRY(j, col), ENTRY(row, k), ctx);
+                status |= gr_sub(ENTRY(j, k), ENTRY(j, k), e, ctx);
+
+                if (row > 0)
+                {
+                    /* todo: should be divexact */
+                    status |= gr_div(ENTRY(j, k), ENTRY(j, k), d, ctx);
+
+                    if (status != GR_SUCCESS)
+                        goto cleanup;
+                }
+            }
+
         }
 
+        status |= gr_set(den, ENTRY(row, col), ctx);
         row++;
         col++;
     }
 
+cleanup:
     GR_TMP_CLEAR2(d, e, ctx);
     GR_TMP_END;
 

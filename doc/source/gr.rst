@@ -338,9 +338,12 @@ or allocate the memory on the heap if needed.
 Basic functions
 ................................................................................
 
-.. function:: int gr_randtest(gr_ptr res, flint_rand_t state, const void * options, gr_ctx_t ctx)
+.. function:: int gr_randtest(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
 
     Sets *res* to a random element of the ring.
+    The distribution is determined by the ring implementation.
+    This normally generates elements non-uniformly to trigger
+    corner cases in test code with increased probability.
 
 .. function:: int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
               int gr_print(gr_srcptr x, gr_ctx_t ctx)
@@ -578,7 +581,7 @@ Low-level vector operations
 
     Swap the entries of *vec1* and *vec2*.
 
-.. function:: int _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_ctx_t ctx)
+.. function:: int _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx)
 

@@ -31,7 +31,7 @@ _gr_fmpq_swap(fmpq_t x, fmpq_t y, const gr_ctx_t ctx)
 
 /* todo: limits */
 int
-_gr_fmpq_randtest(fmpq_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
+_gr_fmpq_randtest(fmpq_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     switch (n_randint(state, 4))
     {

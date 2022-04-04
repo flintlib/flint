@@ -266,7 +266,7 @@ typedef void ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
-typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, const void * options, gr_ctx_ptr));
+typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_si)(gr_ptr, slong, gr_ctx_ptr));
@@ -342,7 +342,7 @@ GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(r
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
 
-GR_INLINE int gr_randtest(gr_ptr x, flint_rand_t state, const void * options, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, options, ctx); }
+GR_INLINE int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
 GR_INLINE int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
@@ -439,7 +439,7 @@ _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong 
 
 /* todo: could allow overloading this as well */
 GR_INLINE int
-_gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_ctx_t ctx)
+_gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx)
 {
     int status;
     slong i, sz;
@@ -452,7 +452,7 @@ _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, void * options, gr_c
         if (n_randint(state, 2))
             status |= gr_zero(GR_ENTRY(res, i, sz), ctx);
         else
-            status |= gr_randtest(GR_ENTRY(res, i, sz), state, options, ctx);
+            status |= gr_randtest(GR_ENTRY(res, i, sz), state, ctx);
     }
 
     return status;

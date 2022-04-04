@@ -11,20 +11,21 @@
 
 #include "gr_mat.h"
 
-/* todo: want to try different algorithms here */
 int
-gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
+gr_mat_set_fmpq_mat(gr_mat_t res, const fmpq_mat_t mat, gr_ctx_t ctx)
 {
-    int status;
-    slong i, r, c;
+    slong i, j;
+    slong m = mat->r;
+    slong n = mat->c;
+    slong sz = ctx->sizeof_elem;
+    int status = GR_SUCCESS;
 
-    r = gr_mat_nrows(mat, ctx);
-    c = gr_mat_ncols(mat, ctx);
-
-    status = GR_SUCCESS;
-    for (i = 0; i < r; i++)
+    for (i = 0; i < m; i++)
     {
-        status |= _gr_vec_randtest(mat->rows[i], state, c, ctx);
+        for (j = 0; j < n; j++)
+        {
+            status |= gr_set_fmpq(GR_MAT_ENTRY(res, i, j, sz), fmpq_mat_entry(mat, i, j), ctx);
+        }
     }
 
     return status;

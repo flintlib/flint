@@ -11,21 +11,12 @@
 
 #include "gr_mat.h"
 
-/* todo: want to try different algorithms here */
+/* todo: algorithm selection */
 int
-gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
+gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
-    int status;
-    slong i, r, c;
-
-    r = gr_mat_nrows(mat, ctx);
-    c = gr_mat_ncols(mat, ctx);
-
-    status = GR_SUCCESS;
-    for (i = 0; i < r; i++)
-    {
-        status |= _gr_vec_randtest(mat->rows[i], state, c, ctx);
-    }
-
-    return status;
+    if (A->r <= 4)
+        return gr_mat_det_cofactor(res, A, ctx);
+    else
+        return gr_mat_det_berkowitz(res, A, ctx);
 }

@@ -34,7 +34,7 @@ nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t ctx)
 }
 
 int
-nmod8_randtest(nmod8_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
+nmod8_randtest(nmod8_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     res[0] = n_randtest(state) % NMOD8_CTX(ctx).n;
     return GR_SUCCESS;
@@ -57,7 +57,7 @@ nmod8_zero(nmod8_t x, const gr_ctx_t ctx)
 int
 nmod8_one(nmod8_t x, const gr_ctx_t ctx)
 {
-    x[0] = (NMOD8_CTX(ctx).n != 0);
+    x[0] = (NMOD8_CTX(ctx).n != 1);
     return GR_SUCCESS;
 }
 

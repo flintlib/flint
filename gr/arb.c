@@ -42,7 +42,7 @@ _gr_arb_swap(arb_t x, arb_t y, const gr_ctx_t ctx)
 
 /* todo: limits */
 int
-_gr_arb_randtest(arb_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
+_gr_arb_randtest(arb_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     arb_randtest(res, state, ARB_CTX_PREC(ctx), 10);
     return GR_SUCCESS;

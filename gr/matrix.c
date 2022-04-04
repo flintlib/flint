@@ -48,9 +48,9 @@ matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 }
 
 int
-matrix_randtest(gr_mat_t res, flint_rand_t state, void * options, gr_ctx_t ctx)
+matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    return gr_mat_randtest(res, state, options, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_randtest(res, state, MATRIX_CTX(ctx)->base_ring);
 }
 
 truth_t

@@ -11,21 +11,25 @@
 
 #include "gr_mat.h"
 
-/* todo: want to try different algorithms here */
 int
-gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
+gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
-    int status;
-    slong i, r, c;
+    gr_ptr t;
+    slong n;
+    int status = GR_SUCCESS;
+    GR_TMP_START;
 
-    r = gr_mat_nrows(mat, ctx);
-    c = gr_mat_ncols(mat, ctx);
+    n = A->r;
 
-    status = GR_SUCCESS;
-    for (i = 0; i < r; i++)
-    {
-        status |= _gr_vec_randtest(mat->rows[i], state, c, ctx);
-    }
+    GR_TMP_INIT_VEC(t, n + 1, ctx);
+
+    status |= _gr_mat_charpoly_berkowitz(t, A, ctx);
+    gr_swap(res, t, ctx);
+    if (n % 2)
+        status |= gr_neg(res, res, ctx);
+
+    GR_TMP_CLEAR_VEC(t, n + 1, ctx);
+    GR_TMP_END;
 
     return status;
 }

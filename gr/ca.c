@@ -42,7 +42,7 @@ _gr_ca_swap(ca_t x, ca_t y, const gr_ctx_t ctx)
 /* todo: limits */
 /* todo: faster real/algebraic constructions */
 int
-_gr_ca_randtest(ca_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
+_gr_ca_randtest(ca_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     ca_randtest(res, state, 2, 10, GR_CA_CTX(ctx));
 

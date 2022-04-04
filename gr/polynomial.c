@@ -41,7 +41,7 @@ polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
 }
 
 int
-polynomial_randtest(gr_poly_t res, flint_rand_t state, void * options, gr_ctx_t ctx)
+polynomial_randtest(gr_poly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     return gr_poly_randtest(res, state, n_randint(state, 5), POLYNOMIAL_ELEM_CTX(ctx));
 }

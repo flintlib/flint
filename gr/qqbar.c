@@ -46,7 +46,7 @@ _gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
 
 /* todo: limits */
 int
-_gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const void * options, const gr_ctx_t ctx)
+_gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     slong deg_limit, bits_limit;
     int rcase;
