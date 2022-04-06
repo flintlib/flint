@@ -470,7 +470,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                      MPFR_RNDD);
             mpfr_mul_d(ti, tmp, fl->eta, MPFR_RNDD);
             mpfr_sqr(tmp, tmp, MPFR_RNDD);
-            if (i >= newd && mpfr_less_p(tmp, mpfr_gs_B))
+            if (i >= newd && !mpfr_greaterequal_p(tmp, mpfr_gs_B))
             {
                 mpfr_mat_clear(R);
                 mpfr_mat_clear(bound);
@@ -481,7 +481,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             {
                 mpfr_abs(tmp, mpfr_mat_entry(R, i, j), MPFR_RNDU);
                 mpfr_add(tj, tmp, mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                if (i < newd && mpfr_greater_p(tj, ti))
+                if (i < newd && !mpfr_lessequal_p(tj, ti))
                 {
                     mpfr_mat_clear(R);
                     mpfr_mat_clear(bound);
@@ -501,7 +501,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             mpfr_neg(s, s, MPFR_RNDD);
             mpfr_sqrt(tmp, s, MPFR_RNDU);
             mpfr_mul(s, tmp, ti, MPFR_RNDU);
-            if (i < newd && mpfr_greater_p(s, tj))
+            if (i < newd && !mpfr_lessequal_p(s, tj))
             {
                 mpfr_mat_clear(R);
                 mpfr_mat_clear(bound);
@@ -512,7 +512,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         mpfr_sub(tmp, mpfr_mat_entry(R, i, i), mpfr_mat_entry(bound, i, i),
                  MPFR_RNDD);
         mpfr_sqr(tmp, tmp, MPFR_RNDD);
-        if (i >= newd && mpfr_less_p(tmp, mpfr_gs_B))
+        if (i >= newd && !mpfr_greaterequal_p(tmp, mpfr_gs_B))
         {
             mpfr_mat_clear(R);
             mpfr_mat_clear(bound);
@@ -938,7 +938,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                      MPFR_RNDD);
             mpfr_mul_d(ti, tmp, fl->eta, MPFR_RNDD);
             mpfr_sqr(tmp, tmp, MPFR_RNDD);
-            if (i >= newd && mpfr_less_p(tmp, mpfr_gs_B))
+            if (i >= newd && !mpfr_greaterequal_p(tmp, mpfr_gs_B))
             {
                 mpfr_mat_clear(R);
                 mpfr_mat_clear(bound);
@@ -949,7 +949,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             {
                 mpfr_abs(tmp, mpfr_mat_entry(R, i, j), MPFR_RNDU);
                 mpfr_add(tj, tmp, mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                if (i < newd && mpfr_greater_p(tj, ti))
+                if (i < newd && !mpfr_lessequal_p(tj, ti))
                 {
                     mpfr_mat_clear(R);
                     mpfr_mat_clear(bound);
@@ -969,7 +969,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             mpfr_neg(s, s, MPFR_RNDD);
             mpfr_sqrt(tmp, s, MPFR_RNDU);
             mpfr_mul(s, tmp, ti, MPFR_RNDU);
-            if (i < newd && mpfr_greater_p(s, tj))
+            if (i < newd && !mpfr_lessequal_p(s, tj))
             {
                 mpfr_mat_clear(R);
                 mpfr_mat_clear(bound);
@@ -980,7 +980,7 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         mpfr_sub(tmp, mpfr_mat_entry(R, i, i), mpfr_mat_entry(bound, i, i),
                  MPFR_RNDD);
         mpfr_sqr(tmp, tmp, MPFR_RNDD);
-        if (i >= newd && mpfr_less_p(tmp, mpfr_gs_B))
+        if (i >= newd && !mpfr_greaterequal_p(tmp, mpfr_gs_B))
         {
             mpfr_mat_clear(R);
             mpfr_mat_clear(bound);
