@@ -262,75 +262,26 @@ LLL-reducedness
 --------------------------------------------------------------------------------
 
 These programs implement ideas from the paper [Villard2007]_.
+See https://arxiv.org/abs/cs/0701183 for the algorithm of Villard.
 
 .. function:: int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
+              int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
+              int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd)
+              int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
-    Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
-    (``fl->delta``, ``fl->eta``), and otherwise returns zero. The
-    function is mainly intended to be used for testing purposes. It will not
-    always work, but if it does the result is guaranteed.
-
-    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
-
-.. function:: int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
-
-    Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
-    (``fl->delta``, ``fl->eta``), and otherwise returns zero. The
-    ``mpfr`` variables used have their precision set to be exactly
-    ``prec`` bits. The function is mainly intended to be used for testing
-    purposes. It will not always work, but if it does the result is guaranteed.
-
-    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
+    A non-zero return indicates the matrix is definitely reduced, that is, that
+    * :func:`fmpz_mat_is_reduced` or :func:`fmpz_mat_is_reduced_gram` (for the first two)
+    * :func:`fmpz_mat_is_reduced_with_removal` or :func:`fmpz_mat_is_reduced_gram_with_removal` (for the last two)
+    return non-zero. A zero return value is inconclusive.
+    The `_d` variants are performed in machine precision, while the `_mpfr` uses a precision of `prec` bits.
 
 .. function:: int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
+              int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
-    Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
-    (``fl->delta``, ``fl->eta``), and otherwise returns zero. The
-    ``mpfr`` variables used, if any, have their precision set to be exactly
-    ``prec`` bits. The function is mainly intended to be used for testing
-    purposes. It first tests for LLL reducedness using
-    :func:`fmpz_lll_is_reduced_d`, followed by
-    :func:`fmpz_lll_is_reduced_mpfr` and finally calls
-    :func:`fmpz_mat_is_reduced` or :func:`fmpz_mat_is_reduced_gram`
-    (depending on the type of input as determined by ``fl->rt``), if
-    required.
-
-.. function:: int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd)
-
-    Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
-    (``fl->delta``, ``fl->eta``) and the squared Gram-Schmidt length of
-    each `i`th vector (where `i` \ge ``newd``) is greater than ``gs_B``,
-    and otherwise returns zero. The function is mainly intended to be used for
-    testing purposes. It will not always work, but if it does the result is
-    guaranteed.
-
-    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
-
-.. function:: int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
-
-    Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
-    (``fl->delta``, ``fl->eta``) and the squared Gram-Schmidt length of
-    each `i`th vector (where `i` \ge ``newd``) is greater than ``gs_B``,
-    and otherwise returns zero. The ``mpfr`` variables used have their
-    precision set to be exactly ``prec`` bits. The function is mainly
-    intended to be used for testing purposes. It will not always work, but if
-    it does the result is guaranteed.
-
-    Uses the algorithm of Villard (see https://arxiv.org/abs/cs/0701183 ).
-
-.. function:: int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
-
-    Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
-    (``fl->delta``, ``fl->eta``) and the squared Gram-Schmidt length of
-    each `i`th vector (where `i` \ge ``newd``) is greater than ``gs_B``,
-    and otherwise returns zero. The ``mpfr`` variables used, if any, have
-    their precision set to be exactly ``prec`` bits. The function is mainly
-    intended to be used for testing purposes. It first tests for LLL
-    reducedness using :func:`fmpz_lll_is_reduced_d_with_removal`, followed by
-    :func:`fmpz_lll_is_reduced_mpfr_with_removal` and finally calls
-    :func:`fmpz_mat_is_reduced_with_removal` or
-    :func:`fmpz_mat_is_reduced_gram_with_removal` (depending on the type of
-    input as determined by ``fl->rt``), if required.
+    The return from these functions is always conclusive: the functions
+    * :func:`fmpz_mat_is_reduced` or :func:`fmpz_mat_is_reduced_gram`
+    * :func:`fmpz_mat_is_reduced_with_removal` or :func:`fmpz_mat_is_reduced_gram_with_removal`
+    are optimzied by calling the above heuristics first and returning right away if they give a conclusive answer.
 
 
 Modified ULLL

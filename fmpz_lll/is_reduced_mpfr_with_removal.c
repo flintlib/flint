@@ -992,5 +992,10 @@ fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         mpfr_mat_clear(bound);
         mpfr_clears(s, norm, ti, tj, tmp, mpfr_gs_B, NULL);
     }
+
+    FLINT_ASSERT((fl->rt == Z_BASIS
+          ? fmpz_mat_is_reduced_with_removal(B, fl->delta, fl->eta, gs_B, newd)
+          : fmpz_mat_is_reduced_gram_with_removal(B, fl->delta, fl->eta, gs_B, newd)));
+
     return 1;
 }

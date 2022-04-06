@@ -888,6 +888,11 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         d_mat_clear(bound);
         fesetround(rounding_direction);
     }
+
+    FLINT_ASSERT((fl->rt == Z_BASIS
+          ? fmpz_mat_is_reduced_with_removal(B, fl->delta, fl->eta, gs_B, newd)
+          : fmpz_mat_is_reduced_gram_with_removal(B, fl->delta, fl->eta, gs_B, newd)));
+
     return 1;
 #else
     return 0;
