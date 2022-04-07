@@ -180,6 +180,12 @@ Arithmetic
               int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
               int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
 
+.. function:: int _gr_mat_gr_poly_evaluate(gr_mat_t res, gr_srcptr poly, slong len, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t poly, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the matrix obtained by evaluating the
+    scalar polynomial *poly* with matrix argument *mat*.
+
 Gaussian elimination
 -------------------------------------------------------------------------------
 
@@ -217,7 +223,7 @@ Gaussian elimination
     If a nonzero value for ``rank_check`` is passed, the function
     will abandon the output matrix in an undefined state and set
     the rank to 0 if *A* is detected to be rank-deficient.
-    This currently only does
+    This currently only works as expected for square matrices.
 
     The algorithm can fail if it fails to certify that a pivot
     element is zero or nonzero, in which case the correct rank
@@ -281,7 +287,6 @@ Solving
     If *A* is not invertible over the fraction field, returns
     ``GR_DOMAIN`` even if the system has a solution.
 
-
 Determinant and trace
 -------------------------------------------------------------------------------
 
@@ -316,6 +321,7 @@ Determinant and trace
     the square matrix *mat*.
     If the matrix is not square, ``GR_DOMAIN`` is returned.
 
+
 Rank
 -------------------------------------------------------------------------------
 
@@ -331,6 +337,27 @@ Rank
     encounter an impossible inverse in the execution of the
     respective algorithms.
 
+
+Inverse and adjugate
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_adjugate_cofactor(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_adjugate(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *adj* to the adjugate matrix of *mat*, simultaneously
+    setting *det* to the determinant of *mat*. We have
+    `\operatorname{adj}(A) A = A \operatorname{adj}(A) = \det(A) I`,
+    and `A^{-1} = \operatorname{adj}(A) / \det(A)` when *A*
+    is invertible.
+
+    The *cofactor* version uses cofactor expansion, requiring the
+    evaluation of `n^2` determinants.
+    The *charpoly* version computes and then evaluates the
+    characteristic polynomial, requiring `O(n^{1/2})`
+    matrix multiplications plus `O(n^3)` or `O(n^4)` operations
+    for the characteristic polynomial itself depending on the
+    algorithm used.
 
 Characteristic polynomial
 -------------------------------------------------------------------------------

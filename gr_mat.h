@@ -119,6 +119,9 @@ gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_mul(res, mat, mat, ctx);
 }
 
+int _gr_mat_gr_poly_evaluate(gr_mat_t y, gr_srcptr poly, slong len, const gr_mat_t x, gr_ctx_t ctx);
+int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t f, const gr_mat_t a, gr_ctx_t ctx);
+
 int gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx);
 
 int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
@@ -142,6 +145,10 @@ int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det_lu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+
+int gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_adjugate_cofactor(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);
+int gr_mat_adjugate(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);
 
 int gr_mat_rank_lu(slong * rank, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_rank_fflu(slong * rank, const gr_mat_t A, gr_ctx_t ctx);
@@ -180,6 +187,9 @@ int gr_mat_charpoly_faddeev_bsgs(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat
 
 int _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_charpoly_hessenberg(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx);
+
+int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
+int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx);
 
 int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
