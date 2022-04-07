@@ -131,6 +131,13 @@ Varieties of LLL
 --------------------------------------------------------------------------------
 
 These programs implement ideas from the book chapter [Stehle2010]_.
+The list of function here that are heuristic in nature and may return with `B`
+unreduced - that is to say, not do their job - includes (but is not necessarily limited to):
+    * :func:`fmpz_lll_d`
+    * :func:`fmpz_lll_d_heuristic`
+    * :func:`fmpz_lll_d_heuristic_with_removal`
+    * :func:`fmpz_lll_d_with_removal`
+    * :func:`fmpz_lll_d_with_removal_knapsack`
 
 .. function:: int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
