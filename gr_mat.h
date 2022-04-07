@@ -146,6 +146,8 @@ int gr_mat_det_lu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 
+int gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
+
 int gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_adjugate_cofactor(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);
 int gr_mat_adjugate(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);

@@ -143,6 +143,13 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
+int
+matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return gr_mat_inv(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+
 int _gr_mat_methods_initialized = 0;
 
 gr_static_method_table _gr_mat_methods;
@@ -171,6 +178,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) matrix_add},
     {GR_METHOD_SUB,         (gr_funcptr) matrix_sub},
     {GR_METHOD_MUL,         (gr_funcptr) matrix_mul},
+    {GR_METHOD_INV,         (gr_funcptr) matrix_inv},
     {0,                     (gr_funcptr) NULL},
 };
 

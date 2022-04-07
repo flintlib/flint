@@ -341,6 +341,19 @@ Rank
 Inverse and adjugate
 -------------------------------------------------------------------------------
 
+.. function:: int gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the inverse of *mat*, computed by solving
+    `A A^{-1} = I`.
+
+    Returns ``GR_DOMAIN`` if it can be determined that *mat* is not
+    invertible over the present ring (warning: this may not work
+    over non-integral domains). If invertibility cannot be proved,
+    returns ``GR_UNABLE``.
+
+    To compute the inverse over the fraction field, one may use
+    :func:`gr_mat_solve_den` or :func:`gr_mat_adjugate`.
+
 .. function:: int gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_adjugate_cofactor(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_adjugate(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)

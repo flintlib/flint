@@ -11,6 +11,7 @@
 
 #include "gr_mat.h"
 
+/* todo: solve_adjugate for n <= 4 */
 /* todo: algorithm selection */
 int
 gr_mat_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
