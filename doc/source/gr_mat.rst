@@ -337,6 +337,39 @@ Rank
     encounter an impossible inverse in the execution of the
     respective algorithms.
 
+Row echelon form
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_rref_lu(slong * rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_rref_fflu(slong * rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_rref(slong * rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
+
+    Sets *R* to the reduced row echelon form of *A*, also setting
+    *rank* to its rank.
+
+.. function:: int gr_mat_rref_den_fflu(slong * rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_rref_den(slong * rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, gr_ctx_t ctx)
+
+    Like *rref*, but computes the reduced row echelon multiplied
+    by a common (not necessarily minimal) denominator which is written
+    to *den*. This can be used to compute the rref over an integral
+    domain which is not a field.
+
+Nullspace
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
+
+    Sets *X* to a basis for the (right) nullspace of *A*.
+    On success, the output matrix will be resized to the correct
+    number of columns.
+
+    The basis is not guaranteed to be presented in a
+    canonical or minimal form.
+
+    If the ring is not a field, this is implied to compute a nullspace
+    basis over the fraction field. The result may be meaningless
+    if the ring is not an integral domain.
 
 Inverse and adjugate
 -------------------------------------------------------------------------------

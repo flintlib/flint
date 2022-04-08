@@ -48,6 +48,9 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
         return gr_one(den, ctx);
     }
 
+    if (gr_ctx_is_integral_domain(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     GR_TMP_INIT2(d, e, ctx);
 
     m = gr_mat_nrows(A, ctx);
