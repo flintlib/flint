@@ -6,7 +6,7 @@
 generic-rings documentation
 =========================================
 
-These module provide a plain C implementation of generic rings
+These modules provide a plain C implementation of generic rings
 intended for use with Flint, Antic, Arb and Calcium.
 The idea is to support fully generic recursive constructions of rings
 (polynomials, fractions, power series, matrices, etc.) over arbitrary
