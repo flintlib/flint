@@ -40,14 +40,12 @@ _gr_mat_det_2x2(gr_ptr det, const gr_mat_t A, gr_ctx_t ctx)
     int status = GR_SUCCESS;
     gr_ptr t;
     slong sz = ctx->sizeof_elem;
-    GR_TMP_START;
 
     GR_TMP_INIT1(t, ctx);
 
     status |= gr_fmms(det, t, E(0,0), E(1,1), E(0,1), E(1,0), ctx);
 
     GR_TMP_CLEAR1(t, ctx);
-    GR_TMP_END;
 
     return status;
 }
@@ -58,7 +56,6 @@ _gr_mat_det_cofactor_3x3(gr_ptr det, const gr_mat_t A, gr_ctx_t ctx)
     int status = GR_SUCCESS;
     gr_ptr t, u;
     slong sz = ctx->sizeof_elem;
-    GR_TMP_START;
 
     GR_TMP_INIT2(t, u, ctx);
 
@@ -72,7 +69,6 @@ _gr_mat_det_cofactor_3x3(gr_ptr det, const gr_mat_t A, gr_ctx_t ctx)
     status |= _gr_addmul(det, u, t, E(0,0), ctx);
 
     GR_TMP_CLEAR2(t, u, ctx);
-    GR_TMP_END;
 
     return status;
 }
@@ -83,7 +79,6 @@ _gr_mat_det_cofactor_4x4(gr_ptr det, const gr_mat_t A, gr_ctx_t ctx)
     int status = GR_SUCCESS;
     gr_ptr a, b, t;
     slong sz = ctx->sizeof_elem;
-    GR_TMP_START;
 
     GR_TMP_INIT3(a, b, t, ctx);
 
@@ -112,7 +107,6 @@ _gr_mat_det_cofactor_4x4(gr_ptr det, const gr_mat_t A, gr_ctx_t ctx)
     status |= _gr_addmul(det, t, a, b, ctx);
 
     GR_TMP_CLEAR3(a, b, t, ctx);
-    GR_TMP_END;
 
     return status;
 }

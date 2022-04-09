@@ -292,32 +292,22 @@ instead. The usage pattern is as follows::
 
     {
         gr_ptr x, y;
-        GR_TMP_START;
-
         GR_TMP_INIT2(x1, x2, ctx);
 
         /* do computations with x1, x2 */
 
         GR_TMP_CLEAR2(x1, x2, ctx);
-        GR_TMP_END;
     }
 
-Temporary allocations must be enclosed by the ``GR_TMP_START`` and
-``GR_TMP_END`` markers, which should only occur
-once in a block. In between, there
-may be multiple calls to different init macros with matching clear
-macros.
+Init and clear macros must match exactly, as variables may be
+allocated contiguously in a block.
+
 *Warning:* never use these macros directly inside a loop.
 This is likely to overflow the stack, as memory will not
 be reclaimed until the function exits.
 Instead, allocate the needed space before entering
 any loops, move the loop body to a separate function,
 or allocate the memory on the heap if needed.
-
-.. macro:: GR_TMP_START
-           GR_TMP_END
-
-    Markers for a block of temporary allocations.
 
 .. macro:: GR_TMP_INIT_VEC(vec, len, ctx)
            GR_TMP_CLEAR_VEC(vec, len, ctx)

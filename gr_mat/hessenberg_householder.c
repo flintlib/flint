@@ -23,7 +23,6 @@ gr_mat_hessenberg_householder(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     slong i, j, k;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    GR_TMP_START;  /* xxx */
 
     n = mat->r;
     if (n != mat->c)

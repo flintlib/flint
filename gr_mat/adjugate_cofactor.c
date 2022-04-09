@@ -40,7 +40,6 @@ gr_mat_adjugate_cofactor(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ct
     if (n == 2)
     {
         gr_ptr t, u;
-        GR_TMP_START;
         GR_TMP_INIT2(t, u, ctx);
         status |= gr_mul(t, GR_MAT_ENTRY(A, 0, 0, sz), GR_MAT_ENTRY(A, 1, 1, sz), ctx);
         status |= gr_mul(u, GR_MAT_ENTRY(A, 0, 1, sz), GR_MAT_ENTRY(A, 1, 0, sz), ctx);

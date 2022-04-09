@@ -24,7 +24,6 @@ _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     slong i, m;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    GR_TMP_START;
 
     n = mat->r;
 
@@ -67,7 +66,6 @@ _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     gr_poly_clear(v, ctx);
 
     GR_TMP_CLEAR2(t, u, ctx);
-    GR_TMP_END;
 
     return status;
 }

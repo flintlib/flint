@@ -476,11 +476,12 @@ int gr_ctx_get_str(char ** s, gr_ctx_t ctx);
 int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 
 /* Macros for allocating temporary variables on the stack. */
-/* todo: use vector init functions when provided */
+/* todo: use vector init/clear functions when provided */
 
-#define GR_TMP_START TMP_INIT; TMP_START;
-#define GR_TMP_ALLOC TMP_ALLOC
-#define GR_TMP_END TMP_END
+#define GR_TMP_VEC_ALLOC_MAX_STACK 1024
+#define GR_TMP_ALLOC(size) ((size <= GR_TMP_VEC_ALLOC_MAX_STACK) ? alloca(size) : flint_malloc(size))
+#define GR_TMP_FREE(ptr, size) do { if (size > GR_TMP_VEC_ALLOC_MAX_STACK) flint_free(ptr); } while (0)
+#define GR_TMP_ALLOC_SMALL(size) alloca(size)
 
 #define GR_TMP_INIT_VEC(vec, len, ctx) \
     do { \
@@ -493,14 +494,16 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 #define GR_TMP_CLEAR_VEC(vec, len, ctx) \
     do { \
         gr_method_vec_init_clear_op vec_clear = GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR); \
+        ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
         vec_clear((vec), (len), (ctx)); \
+        GR_TMP_FREE(vec, (len) * _gr_elem_size); \
     } while (0)
 
 #define GR_TMP_INIT1(x1, ctx) \
     do { \
         gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
-        x1 = (gr_ptr) GR_TMP_ALLOC(1 * _gr_elem_size); \
+        x1 = (gr_ptr) GR_TMP_ALLOC_SMALL(1 * _gr_elem_size); \
         init(x1, (ctx)); \
     } while (0)
 
@@ -508,7 +511,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
     do { \
         gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
-        x1 = (gr_ptr) GR_TMP_ALLOC(2 * _gr_elem_size); \
+        x1 = (gr_ptr) GR_TMP_ALLOC_SMALL(2 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
         init(x1, (ctx)); \
         init(x2, (ctx)); \
@@ -518,7 +521,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
     do { \
         gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
-        x1 = (gr_ptr) GR_TMP_ALLOC(3 * _gr_elem_size); \
+        x1 = (gr_ptr) GR_TMP_ALLOC_SMALL(3 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
         x3 = (gr_ptr) ((char *) x2 + _gr_elem_size); \
         init(x1, (ctx)); \
@@ -530,7 +533,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
     do { \
         gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
-        x1 = (gr_ptr) GR_TMP_ALLOC(4 * _gr_elem_size); \
+        x1 = (gr_ptr) GR_TMP_ALLOC_SMALL(4 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
         x3 = (gr_ptr) ((char *) x2 + _gr_elem_size); \
         x4 = (gr_ptr) ((char *) x3 + _gr_elem_size); \
@@ -544,7 +547,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
     do { \
         gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
-        x1 = (gr_ptr) GR_TMP_ALLOC(5 * _gr_elem_size); \
+        x1 = (gr_ptr) GR_TMP_ALLOC_SMALL(5 * _gr_elem_size); \
         x2 = (gr_ptr) ((char *) x1 + _gr_elem_size); \
         x3 = (gr_ptr) ((char *) x2 + _gr_elem_size); \
         x4 = (gr_ptr) ((char *) x3 + _gr_elem_size); \

@@ -49,7 +49,6 @@ _gr_poly_evaluate_rectangular(gr_ptr y, gr_srcptr poly,
         slong i, m, r;
         gr_ptr xs;
         gr_ptr s, t, c;
-        GR_TMP_START;
 
         m = n_sqrt(len) + 1;
         r = (len + m - 1) / m;
@@ -72,7 +71,6 @@ _gr_poly_evaluate_rectangular(gr_ptr y, gr_srcptr poly,
         GR_TMP_CLEAR_VEC(xs, m + 1, ctx);
         GR_TMP_CLEAR3(s, t, c, ctx);
 
-        GR_TMP_END;
         return status;
     }
 }

@@ -58,7 +58,6 @@ _gr_poly_inv_series(gr_ptr Qinv,
         {
             slong Qnlen, Wlen, W2len;
             gr_ptr W;
-            GR_TMP_START;
 
             GR_TMP_INIT_VEC(W, len, ctx);
 
@@ -76,7 +75,6 @@ _gr_poly_inv_series(gr_ptr Qinv,
             NEWTON_END
 
             GR_TMP_CLEAR_VEC(W, len, ctx);
-            GR_TMP_END;
         }
     }
 

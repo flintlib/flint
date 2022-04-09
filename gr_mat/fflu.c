@@ -40,7 +40,6 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
     slong i, j, k, m, n, r, rank, row, col, sz;
     int status;
     int pivot_status;
-    GR_TMP_START;
 
     if (gr_mat_is_empty(A, ctx) == T_TRUE)
     {
@@ -149,7 +148,6 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
 
 cleanup:
     GR_TMP_CLEAR2(d, e, ctx);
-    GR_TMP_END;
 
     *res_rank = rank;
     return status;

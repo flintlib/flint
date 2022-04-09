@@ -31,7 +31,6 @@ gr_mat_rank_fflu(slong * rank, const gr_mat_t A, gr_ctx_t ctx)
     }
     else
     {
-        GR_TMP_START;
         GR_TMP_INIT1(den, ctx);
 
         gr_mat_init(T, n, m, ctx);
@@ -43,7 +42,6 @@ gr_mat_rank_fflu(slong * rank, const gr_mat_t A, gr_ctx_t ctx)
         _perm_clear(P);
 
         GR_TMP_CLEAR1(den, ctx);
-        GR_TMP_END;
 
         if (status != GR_SUCCESS)
             status |= GR_UNABLE;

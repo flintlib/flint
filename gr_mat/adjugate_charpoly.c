@@ -30,7 +30,6 @@ gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ct
     }
     else
     {
-        GR_TMP_START;
         GR_TMP_INIT_VEC(pol, n + 1, ctx);
 
         status |= _gr_mat_charpoly(pol, A, ctx);
@@ -47,7 +46,6 @@ gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ct
             status |= gr_mat_neg(adj, adj, ctx);
 
         GR_TMP_CLEAR_VEC(pol, n + 1, ctx);
-        GR_TMP_END;
     }
 
     return status;

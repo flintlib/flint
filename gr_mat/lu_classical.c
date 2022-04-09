@@ -40,7 +40,6 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     slong i, j, m, n, r, rank, row, col, sz;
     int status;
     int pivot_status;
-    GR_TMP_START;
 
     if (gr_mat_is_empty(A, ctx) == T_TRUE)
     {
@@ -120,7 +119,6 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     }
 
     GR_TMP_CLEAR2(d, e, ctx);
-    GR_TMP_END;
 
     *res_rank = rank;
     return status;

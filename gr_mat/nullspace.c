@@ -23,7 +23,6 @@ gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
     slong sz = ctx->sizeof_elem;
     gr_ptr den;
     int with_den;
-    GR_TMP_START;
 
     m = gr_mat_nrows(A, ctx);
     n = gr_mat_ncols(A, ctx);
@@ -127,7 +126,6 @@ cleanup:
     gr_mat_clear(tmp, ctx);
 
     GR_TMP_CLEAR1(den, ctx);
-    GR_TMP_END;
 
     return status;
 }

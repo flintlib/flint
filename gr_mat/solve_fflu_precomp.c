@@ -51,8 +51,6 @@ gr_mat_solve_fflu_precomp(gr_mat_t X, const slong * perm,
     }
 
     {
-        GR_TMP_START;
-
         GR_TMP_INIT1(t, ctx);
 
         /* todo: use submul */
@@ -89,7 +87,6 @@ gr_mat_solve_fflu_precomp(gr_mat_t X, const slong * perm,
         /* status |= gr_mat_div_scalar(X, X, den, ctx); */
 
         GR_TMP_CLEAR1(t, ctx);
-        GR_TMP_END;
     }
 
     return status;

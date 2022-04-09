@@ -17,7 +17,6 @@ gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
     gr_ptr t;
     slong n;
     int status = GR_SUCCESS;
-    GR_TMP_START;
 
     n = A->r;
 
@@ -29,7 +28,6 @@ gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
         status |= gr_neg(res, res, ctx);
 
     GR_TMP_CLEAR_VEC(t, n + 1, ctx);
-    GR_TMP_END;
 
     return status;
 }

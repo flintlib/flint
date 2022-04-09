@@ -21,7 +21,6 @@ _gr_poly_taylor_shift_divconquer(gr_ptr res, gr_srcptr poly, slong len, gr_srcpt
 
     {
         gr_ptr t;
-        GR_TMP_START;
 
         GR_TMP_INIT_VEC(t, 2, ctx);
 
@@ -30,7 +29,6 @@ _gr_poly_taylor_shift_divconquer(gr_ptr res, gr_srcptr poly, slong len, gr_srcpt
         status |= _gr_poly_compose_divconquer(res, res, len, t, 2, ctx);
 
         GR_TMP_CLEAR_VEC(t, 2, ctx);
-        GR_TMP_END;
 
         return status;
     }

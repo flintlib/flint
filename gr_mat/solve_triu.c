@@ -21,7 +21,6 @@ gr_mat_solve_triu_classical(gr_mat_t X,
     gr_ptr s;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    GR_TMP_START;
 
     n = U->r;
     m = B->c;
@@ -54,8 +53,6 @@ gr_mat_solve_triu_classical(gr_mat_t X,
 cleanup:
     flint_free(tmp);
     GR_TMP_CLEAR1(s, ctx);
-
-    GR_TMP_END;
 
     return status;
 }

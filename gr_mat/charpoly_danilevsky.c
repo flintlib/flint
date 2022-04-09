@@ -33,7 +33,6 @@ _gr_mat_charpoly_danilevsky_inplace(gr_ptr p, gr_mat_t A, gr_ctx_t ctx)
     slong sz = ctx->sizeof_elem;
     int have_addmul;
     int status = GR_SUCCESS;
-    GR_TMP_START; /* xxx */
 
 #define MAT_ENTRY(i, j) GR_MAT_ENTRY(A, i, j, sz)
 #define POL_ENTRY(i) GR_ENTRY(p, i, sz)
@@ -225,8 +224,6 @@ cleanup:
     GR_TMP_CLEAR_VEC(V, n_input, ctx);
     GR_TMP_CLEAR_VEC(W, n_input, ctx);
     GR_TMP_CLEAR_VEC(T, n_input, ctx);
-
-    GR_TMP_END;
 
     return status;
 }

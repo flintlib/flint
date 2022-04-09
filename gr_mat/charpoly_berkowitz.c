@@ -30,7 +30,6 @@ _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
     {
         slong i, k, t, sz;
         gr_ptr a, A, s;
-        GR_TMP_START;
 
         sz = ctx->sizeof_elem;
 
@@ -77,7 +76,6 @@ _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
         status |= _gr_poly_reverse(cp, cp, n + 1, n + 1, ctx);
 
         GR_TMP_CLEAR_VEC(a, n * n, ctx);
-        GR_TMP_END;
     }
 
     return status;

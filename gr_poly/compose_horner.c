@@ -41,7 +41,6 @@ _gr_poly_compose_horner(gr_ptr res,
         slong i = len1 - 1, lenr = len2;
         slong sz = ctx->sizeof_elem;
         gr_ptr t, t1, t2;
-        GR_TMP_START;
 
         GR_TMP_INIT_VEC(t, alloc, ctx);
 
@@ -77,7 +76,6 @@ _gr_poly_compose_horner(gr_ptr res,
         }
 
         GR_TMP_CLEAR_VEC(t, alloc, ctx);
-        GR_TMP_END;
 
         return status;
     }

@@ -27,7 +27,6 @@ _gr_poly_evaluate_horner(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, 
         slong i = len - 1;
         slong sz = ctx->sizeof_elem;
         gr_ptr t, u;
-        GR_TMP_START;
 
         GR_TMP_INIT2(t, u, ctx);
 
@@ -42,7 +41,6 @@ _gr_poly_evaluate_horner(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, 
         gr_swap(res, u, ctx);
 
         GR_TMP_CLEAR2(t, u, ctx);
-        GR_TMP_END;
 
         return status;
     }

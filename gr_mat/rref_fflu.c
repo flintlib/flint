@@ -48,7 +48,6 @@ _gr_mat_rref_fflu(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, in
     if (rank > 1)
     {
         gr_ptr t, u;
-        GR_TMP_START;
 
         GR_TMP_INIT2(t, u, ctx);
 
@@ -131,7 +130,6 @@ _gr_mat_rref_fflu(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, in
 cleanup1:
         flint_free(pivots);
         GR_TMP_CLEAR2(t, u, ctx);
-        GR_TMP_END;
     }
     else if (rank == 1 && divided && gr_is_one(den, ctx) != T_TRUE)
     {
@@ -155,10 +153,8 @@ gr_mat_rref_fflu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
 {
     int status;
     gr_ptr den;
-    GR_TMP_START;
     GR_TMP_INIT1(den, ctx);
     status = _gr_mat_rref_fflu(res_rank, R, den, A, 1, ctx);
     GR_TMP_CLEAR1(den, ctx);
-    GR_TMP_END;
     return status;
 }
