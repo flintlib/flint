@@ -169,6 +169,7 @@ int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx);
 int gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx);
 int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx);
+int gr_mat_hadamard(gr_mat_t mat, gr_ctx_t ctx);
 /* todo: hadamard, dft, dct */
 
 int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx);

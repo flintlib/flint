@@ -523,7 +523,26 @@ Special matrices
     Stirling numbers of the first kind. If *kind* is 2, the entries are
     set to the Stirling numbers of the second kind.
 
-.. function:: int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int gr_mat_hilbert(gr_mat_t res, gr_ctx_t ctx)
 
     Sets *res* to the Hilbert matrix, which has entries `1/(i+j+1)`
     for `i, j \ge 0`.
+
+.. function:: int gr_mat_hadamard(gr_mat_t res, gr_ctx_t ctx)
+
+    If possible, sets *res* to a Hadamard matrix of the provided size
+    and returns ``GR_SUCCESS``. Returns ``GR_DOMAIN``
+    if no Hadamard matrix of the given size exists,
+    and ``GR_UNABLE`` if the implementation does
+    not know how to construct a Hadamard matrix of the given
+    size.
+
+    A Hadamard matrix of size *n* can only exist if *n* is 0, 1, 2,
+    or a multiple of 4. It is not known whether a
+    Hadamard matrix exists for every size that is a multiple of 4.
+    This function uses the Paley construction, which
+    succeeds for all *n* of the form `n = 2^e` or `n = 2^e (q + 1)` where
+    *q* is an odd prime power. Orders *n* for which Hadamard matrices are
+    known to exist but for which this construction fails are
+    92, 116, 156, ... (OEIS A046116).
+
