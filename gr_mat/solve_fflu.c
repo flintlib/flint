@@ -19,7 +19,7 @@ gr_mat_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     gr_ptr den;
     slong m;
 
-    GR_TMP_INIT1(den, ctx);
+    GR_TMP_INIT(den, ctx);
 
     status = gr_mat_solve_den_fflu(X, den, A, B, ctx);
 
@@ -31,7 +31,7 @@ gr_mat_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
             status |= gr_mat_div_scalar(X, X, den, ctx);
     }
 
-    GR_TMP_CLEAR1(den, ctx);
+    GR_TMP_CLEAR(den, ctx);
 
     return status;
 }

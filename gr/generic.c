@@ -26,9 +26,9 @@ truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx)
     gr_ptr t;
     truth_t eq;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
     eq = gr_equal(x, t, ctx);
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
 
     return eq;
 }
@@ -38,14 +38,14 @@ truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx)
     gr_ptr t;
     truth_t eq;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     if (gr_one(t, ctx) == GR_SUCCESS)
         eq = gr_equal(x, t, ctx);
     else
         eq = T_UNKNOWN;
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
 
     return eq;
 }
@@ -55,14 +55,14 @@ truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
     gr_ptr t;
     truth_t eq;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     if (gr_neg_one(t, ctx) == GR_SUCCESS)
         eq = gr_equal(x, t, ctx);
     else
         eq = T_UNKNOWN;
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
 
     return eq;
 }
@@ -104,14 +104,14 @@ int gr_generic_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_set_fmpz(t, y, ctx);
 
     if (status == GR_SUCCESS)
         status = gr_add(res, x, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -144,13 +144,13 @@ int gr_generic_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_set_fmpq(t, y, ctx);
     if (status == GR_SUCCESS)
         status = gr_add(res, x, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -206,14 +206,14 @@ int gr_generic_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_set_fmpz(t, y, ctx);
 
     if (status == GR_SUCCESS)
         status = gr_mul(res, x, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -246,13 +246,13 @@ int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_set_fmpq(t, y, ctx);
     if (status == GR_SUCCESS)
         status = gr_mul(res, x, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -263,12 +263,12 @@ int gr_generic_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_mul(t, x, y, ctx);
     status |= gr_add(res, res, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -279,12 +279,12 @@ int gr_generic_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_mul(t, x, y, ctx);
     status |= gr_sub(res, res, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -338,14 +338,14 @@ int gr_generic_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_set_fmpz(t, y, ctx);
 
     if (status == GR_SUCCESS)
         status = gr_div(res, x, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -378,13 +378,13 @@ int gr_generic_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_set_fmpq(t, y, ctx);
     if (status == GR_SUCCESS)
         status = gr_div(res, x, t, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -528,9 +528,9 @@ gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
         }
         else
         {
-            GR_TMP_INIT1(t, ctx);
+            GR_TMP_INIT(t, ctx);
             status = gr_generic_pow_ui_binexp(res, t, x, e, ctx);
-            GR_TMP_CLEAR1(t, ctx);
+            GR_TMP_CLEAR(t, ctx);
         }
 
         return status;
@@ -780,7 +780,7 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     for (i = 0; i < len; i++)
     {
@@ -788,7 +788,7 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
         status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -804,7 +804,7 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     for (i = 0; i < len; i++)
     {
@@ -812,7 +812,7 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
         status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -828,7 +828,7 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     for (i = 0; i < len; i++)
     {
@@ -836,7 +836,7 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
         status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -852,7 +852,7 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     for (i = 0; i < len; i++)
     {
@@ -860,7 +860,7 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
         status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -934,7 +934,7 @@ gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, 
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     if (initial == NULL)
     {
@@ -960,7 +960,7 @@ gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, 
     if (subtract)
         status |= gr_neg(res, res, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -984,7 +984,7 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     if (initial == NULL)
     {
@@ -1010,7 +1010,7 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
     if (subtract)
         status |= gr_neg(res, res, ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
 
     return status;
 }

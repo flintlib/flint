@@ -41,11 +41,11 @@ _gr_mat_det_2x2(gr_ptr det, const gr_mat_t A, gr_ctx_t ctx)
     gr_ptr t;
     slong sz = ctx->sizeof_elem;
 
-    GR_TMP_INIT1(t, ctx);
+    GR_TMP_INIT(t, ctx);
 
     status |= gr_fmms(det, t, E(0,0), E(1,1), E(0,1), E(1,0), ctx);
 
-    GR_TMP_CLEAR1(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
 
     return status;
 }

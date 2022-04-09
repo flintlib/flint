@@ -39,7 +39,7 @@ _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
         else
         {
             gr_ptr t;
-            GR_TMP_INIT1(t, ctx);
+            GR_TMP_INIT(t, ctx);
 
             status |= gr_set(t, a, ctx);
 
@@ -50,7 +50,7 @@ _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
                     status |= gr_mul(t, t, a, ctx);
             }
 
-            GR_TMP_CLEAR1(t, ctx);
+            GR_TMP_CLEAR(t, ctx);
         }
     }
 

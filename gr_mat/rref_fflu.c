@@ -153,8 +153,8 @@ gr_mat_rref_fflu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
 {
     int status;
     gr_ptr den;
-    GR_TMP_INIT1(den, ctx);
+    GR_TMP_INIT(den, ctx);
     status = _gr_mat_rref_fflu(res_rank, R, den, A, 1, ctx);
-    GR_TMP_CLEAR1(den, ctx);
+    GR_TMP_CLEAR(den, ctx);
     return status;
 }

@@ -51,7 +51,7 @@ gr_mat_solve_fflu_precomp(gr_mat_t X, const slong * perm,
     }
 
     {
-        GR_TMP_INIT1(t, ctx);
+        GR_TMP_INIT(t, ctx);
 
         /* todo: use submul */
         /* todo: use divexact? */
@@ -86,7 +86,7 @@ gr_mat_solve_fflu_precomp(gr_mat_t X, const slong * perm,
 
         /* status |= gr_mat_div_scalar(X, X, den, ctx); */
 
-        GR_TMP_CLEAR1(t, ctx);
+        GR_TMP_CLEAR(t, ctx);
     }
 
     return status;

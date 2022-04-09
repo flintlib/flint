@@ -197,9 +197,9 @@ gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int verbose)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(a, R);
+    GR_TMP_INIT(a, R);
     status |= gr_randtest(a, state, R);
-    GR_TMP_CLEAR1(a, R);
+    GR_TMP_CLEAR(a, R);
 
     GR_TMP_INIT2(a, b, R);
     status |= gr_randtest(a, state, R);
@@ -279,7 +279,7 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int verbose)
 
     status = GR_SUCCESS;
 
-    GR_TMP_INIT1(a, R);
+    GR_TMP_INIT(a, R);
 
     status |= gr_randtest(a, state, R);
     status |= gr_zero(a, R);
@@ -300,7 +300,7 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int verbose)
     if (status == GR_SUCCESS && equal == T_FALSE)
         status = GR_WRONG;
 
-    GR_TMP_CLEAR1(a, R);
+    GR_TMP_CLEAR(a, R);
 
     return status;
 }

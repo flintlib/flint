@@ -499,7 +499,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
         GR_TMP_FREE(vec, (len) * _gr_elem_size); \
     } while (0)
 
-#define GR_TMP_INIT1(x1, ctx) \
+#define GR_TMP_INIT(x1, ctx) \
     do { \
         gr_method_init_clear_op init = GR_INIT_CLEAR_OP(ctx, INIT); \
         ssize_t _gr_elem_size = (ctx)->sizeof_elem; \
@@ -559,7 +559,7 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
         init(x5, (ctx)); \
     } while (0)
 
-#define GR_TMP_CLEAR1(x1, ctx) \
+#define GR_TMP_CLEAR(x1, ctx) \
     do { \
         gr_method_init_clear_op clear = GR_INIT_CLEAR_OP(ctx, CLEAR); \
         clear(x1, (ctx)); \

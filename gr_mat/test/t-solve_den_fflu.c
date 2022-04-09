@@ -50,7 +50,7 @@ int main()
         gr_mat_init(AX, n, c, ctx);
         gr_mat_init(Bden, n, c, ctx);
 
-        GR_TMP_INIT1(den, ctx);
+        GR_TMP_INIT(den, ctx);
 
         status |= gr_mat_randtest(A, state, ctx);
         status |= gr_mat_randtest(X, state, ctx);
@@ -79,7 +79,7 @@ int main()
             gr_ptr det;
             int status2;
 
-            GR_TMP_INIT1(det, ctx);
+            GR_TMP_INIT(det, ctx);
             status2 = gr_mat_det_berkowitz(det, A, ctx);
 
             if (status2 == GR_SUCCESS && gr_is_invertible(det, ctx) == T_TRUE)
@@ -91,14 +91,14 @@ int main()
                 flint_abort();
             }
 
-            GR_TMP_CLEAR1(det, ctx);
+            GR_TMP_CLEAR(det, ctx);
         }
 
         count_success += (status == GR_SUCCESS);
         count_domain += ((status & GR_DOMAIN) != 0);
         count_unable += ((status & GR_UNABLE) != 0);
 
-        GR_TMP_CLEAR1(den, ctx);
+        GR_TMP_CLEAR(den, ctx);
         gr_mat_clear(A, ctx);
         gr_mat_clear(B, ctx);
         gr_mat_clear(X, ctx);

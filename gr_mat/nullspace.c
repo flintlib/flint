@@ -30,7 +30,7 @@ gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
     p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
     gr_mat_init(tmp, m, n, ctx);
 
-    GR_TMP_INIT1(den, ctx);
+    GR_TMP_INIT(den, ctx);
 
     with_den = gr_ctx_is_field(ctx) == T_FALSE && gr_ctx_is_integral_domain(ctx) == T_TRUE;
 
@@ -125,7 +125,7 @@ cleanup:
     flint_free(p);
     gr_mat_clear(tmp, ctx);
 
-    GR_TMP_CLEAR1(den, ctx);
+    GR_TMP_CLEAR(den, ctx);
 
     return status;
 }

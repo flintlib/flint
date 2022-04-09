@@ -58,7 +58,7 @@ int main()
         gr_mat_init(B, r, c, ctx);
         gr_mat_init(R, r, c, ctx);
         gr_mat_init(R2, r, c, ctx);
-        GR_TMP_INIT1(den, ctx);
+        GR_TMP_INIT(den, ctx);
 
         status |= gr_mat_randtest(A, state, ctx);
         status |= gr_mat_set(B, A, ctx);
@@ -95,7 +95,7 @@ int main()
         gr_mat_clear(B, ctx);
         gr_mat_clear(R, ctx);
         gr_mat_clear(R2, ctx);
-        GR_TMP_CLEAR1(den, ctx);
+        GR_TMP_CLEAR(den, ctx);
 
         gr_ctx_clear(ctx);
     }

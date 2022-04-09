@@ -316,7 +316,7 @@ or allocate the memory on the heap if needed.
     initialized to the value 0, assigning the first element
     to the pointer *vec*.
 
-.. macro:: GR_TMP_INIT1(x1, ctx)
+.. macro:: GR_TMP_INIT(x1, ctx)
            GR_TMP_INIT2(x1, x2, ctx)
            GR_TMP_INIT3(x1, x2, x3, ctx)
            GR_TMP_INIT4(x1, x2, x3, x4, ctx)
@@ -326,7 +326,7 @@ or allocate the memory on the heap if needed.
     initialized to the value 0, assigning the elements
     to the pointers *x1*, *x2*, etc.
 
-.. macro:: GR_TMP_CLEAR1(x1, ctx)
+.. macro:: GR_TMP_CLEAR(x1, ctx)
            GR_TMP_CLEAR2(x1, x2, ctx)
            GR_TMP_CLEAR3(x1, x2, x3, ctx)
            GR_TMP_CLEAR4(x1, x2, x3, x4, ctx)

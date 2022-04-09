@@ -25,7 +25,7 @@ gr_mat_solve_triu_classical(gr_mat_t X,
     n = U->r;
     m = B->c;
 
-    GR_TMP_INIT1(s, ctx);
+    GR_TMP_INIT(s, ctx);
     tmp = flint_malloc(sz * n);
 
     for (i = 0; i < m; i++)
@@ -52,7 +52,7 @@ gr_mat_solve_triu_classical(gr_mat_t X,
 
 cleanup:
     flint_free(tmp);
-    GR_TMP_CLEAR1(s, ctx);
+    GR_TMP_CLEAR(s, ctx);
 
     return status;
 }
