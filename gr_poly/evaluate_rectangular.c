@@ -1,30 +1,5 @@
 #include "gr_poly.h"
 
-/* todo: move out */
-/* todo: alternative algorithm */
-int
-_gr_vec_set_powers(gr_ptr xs, gr_srcptr x, slong len, gr_ctx_t ctx)
-{
-    int status;
-    slong i, sz = ctx->sizeof_elem;
-
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-    {
-        if (i == 0)
-            status |= gr_one(GR_ENTRY(xs, i, sz), ctx);
-        else if (i == 1)
-            status |= gr_set(GR_ENTRY(xs, i, sz), x, ctx);
-        else if (i % 2 == 0)
-            status |= gr_sqr(GR_ENTRY(xs, i, sz), GR_ENTRY(xs, i / 2, sz), ctx);
-        else
-            status |= gr_mul(GR_ENTRY(xs, i, sz), GR_ENTRY(xs, i - 1, sz), x, ctx);
-    }
-
-    return status;
-}
-
 int
 _gr_poly_evaluate_rectangular(gr_ptr y, gr_srcptr poly,
     slong len, gr_srcptr x, gr_ctx_t ctx)

@@ -424,12 +424,26 @@ is not invertible.
     Sets *res* to `x \cdot y`.
 
 .. function:: int gr_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-              int gr_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_addmul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_addmul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_addmul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_addmul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
-    Sets *res* to `\mathrm{res } + x \cdot y` or
-    `\mathrm{res } - x \cdot y`. Rings may override the default
+    Sets *res* to `\mathrm{res } + x \cdot y`.
+    Rings may override the default
     implementation to perform this operation in one step without
-    allocating a temporary variable.
+    allocating a temporary variable, without intermediate rounding, etc.
+
+.. function:: int gr_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_submul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_submul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_submul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_submul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+    Sets *res* to `\mathrm{res } - x \cdot y`.
+    Rings may override the default
+    implementation to perform this operation in one step without
+    allocating a temporary variable, without intermediate rounding, etc.
 
 .. function:: int gr_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
@@ -445,10 +459,21 @@ Iterated arithmetic operations are best performed using vector
 functions.
 See in particular :func:`_gr_vec_dot` and :func:`_gr_vec_dot_rev`.
 
+.. function:: int _gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
+              int _gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
+              int _gr_fmpz_poly_evaluate(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fmpz_poly_evaluate(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to the value of the integer polynomial *f* evaluated
+    at the argument *x*.
+
 .. function:: int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx)
 
-    Sets *res* to value of the polynomial *f* (with corresponding context
-    object *mctx*) evaluated at the vector of arguments in *x*.
+    Sets *res* to value of the multivariate polynomial *f* (with
+    corresponding context object *mctx*) evaluated at the vector
+    of arguments in *x*.
 
 Division
 ........................................................................
@@ -612,6 +637,14 @@ Low-level vector operations
 .. function:: int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 
 Memory-managed vectors
 ................................................................................

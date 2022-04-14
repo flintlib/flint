@@ -272,6 +272,70 @@ int gr_generic_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_addmul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_ui(t, x, y, ctx);
+    status |= gr_add(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_addmul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_si(t, x, y, ctx);
+    status |= gr_add(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_addmul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_fmpz(t, x, y, ctx);
+    status |= gr_add(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_addmul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_fmpq(t, x, y, ctx);
+    status |= gr_add(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
 int gr_generic_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -282,6 +346,70 @@ int gr_generic_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     GR_TMP_INIT(t, ctx);
 
     status |= gr_mul(t, x, y, ctx);
+    status |= gr_sub(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_submul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_ui(t, x, y, ctx);
+    status |= gr_sub(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_submul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_si(t, x, y, ctx);
+    status |= gr_sub(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_submul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_fmpz(t, x, y, ctx);
+    status |= gr_sub(res, res, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_submul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_mul_fmpq(t, x, y, ctx);
     status |= gr_sub(res, res, t, ctx);
 
     GR_TMP_CLEAR(t, ctx);
@@ -1016,6 +1144,181 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
 }
 
 int
+gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_op_ui mul_ui = GR_BINARY_OP_UI(ctx, MUL_UI);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            return gr_zero(res, ctx);
+        else
+            return gr_set(res, initial, ctx);
+    }
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    if (initial == NULL)
+    {
+        status |= mul_ui(res, vec1, vec2[0], ctx);
+    }
+    else
+    {
+        if (subtract)
+            status |= gr_neg(res, initial, ctx);
+        else
+            status |= gr_set(res, initial, ctx);
+
+        status |= mul_ui(t, vec1, vec2[0], ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        status |= mul_ui(t, GR_ENTRY(vec1, i, sz), vec2[i], ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    if (subtract)
+        status |= gr_neg(res, res, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int
+gr_generic_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            return gr_zero(res, ctx);
+        else
+            return gr_set(res, initial, ctx);
+    }
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    if (initial == NULL)
+    {
+        status |= mul_si(res, vec1, vec2[0], ctx);
+    }
+    else
+    {
+        if (subtract)
+            status |= gr_neg(res, initial, ctx);
+        else
+            status |= gr_set(res, initial, ctx);
+
+        status |= mul_si(t, vec1, vec2[0], ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        status |= mul_si(t, GR_ENTRY(vec1, i, sz), vec2[i], ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    if (subtract)
+        status |= gr_neg(res, res, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int
+gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_op_fmpz mul_fmpz = GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            return gr_zero(res, ctx);
+        else
+            return gr_set(res, initial, ctx);
+    }
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    if (initial == NULL)
+    {
+        status |= mul_fmpz(res, vec1, vec2, ctx);
+    }
+    else
+    {
+        if (subtract)
+            status |= gr_neg(res, initial, ctx);
+        else
+            status |= gr_set(res, initial, ctx);
+
+        status |= mul_fmpz(t, vec1, vec2, ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        status |= mul_fmpz(t, GR_ENTRY(vec1, i, sz), vec2 + i, ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    if (subtract)
+        status |= gr_neg(res, res, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+/* todo: when to multiply repeatedly by x vs squaring? */
+int
+gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
+    int status = GR_SUCCESS;
+    slong i;
+    slong sz = ctx->sizeof_elem;;
+
+    for (i = 0; i < len; i++)
+    {
+        if (i == 0)
+            status |= gr_one(GR_ENTRY(res, i, sz), ctx);
+        else if (i == 1)
+            status |= gr_set(GR_ENTRY(res, i, sz), x, ctx);
+        else if (i % 2 == 0)
+            status |= sqr(GR_ENTRY(res, i, sz), GR_ENTRY(res, i / 2, sz), ctx);
+        else
+            status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
+    }
+
+    return status;
+}
+
+int
 gr_generic_ctx_clear(gr_ctx_t ctx)
 {
     return GR_SUCCESS;
@@ -1054,7 +1357,16 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MUL_FMPQ,                (gr_funcptr) gr_generic_mul_fmpq},
 
     {GR_METHOD_ADDMUL,                  (gr_funcptr) gr_generic_addmul},
+    {GR_METHOD_ADDMUL_UI,               (gr_funcptr) gr_generic_addmul_ui},
+    {GR_METHOD_ADDMUL_SI,               (gr_funcptr) gr_generic_addmul_si},
+    {GR_METHOD_ADDMUL_FMPZ,             (gr_funcptr) gr_generic_addmul_fmpz},
+    {GR_METHOD_ADDMUL_FMPQ,             (gr_funcptr) gr_generic_addmul_fmpq},
+
     {GR_METHOD_SUBMUL,                  (gr_funcptr) gr_generic_submul},
+    {GR_METHOD_SUBMUL_UI,               (gr_funcptr) gr_generic_submul_ui},
+    {GR_METHOD_SUBMUL_SI,               (gr_funcptr) gr_generic_submul_si},
+    {GR_METHOD_SUBMUL_FMPZ,             (gr_funcptr) gr_generic_submul_fmpz},
+    {GR_METHOD_SUBMUL_FMPQ,             (gr_funcptr) gr_generic_submul_fmpq},
 
     {GR_METHOD_MUL_TWO,                 (gr_funcptr) gr_generic_mul_two},
     {GR_METHOD_SQR,                     (gr_funcptr) gr_generic_sqr},
@@ -1090,8 +1402,14 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_SCALAR_SUBMUL_SI,    (gr_funcptr) gr_generic_vec_scalar_submul_si},
     {GR_METHOD_VEC_EQUAL,               (gr_funcptr) gr_generic_vec_equal},
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},
+
     {GR_METHOD_VEC_DOT,                 (gr_funcptr) gr_generic_vec_dot},
     {GR_METHOD_VEC_DOT_REV,             (gr_funcptr) gr_generic_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_UI,              (gr_funcptr) gr_generic_vec_dot_ui},
+    {GR_METHOD_VEC_DOT_SI,              (gr_funcptr) gr_generic_vec_dot_si},
+    {GR_METHOD_VEC_DOT_FMPZ,            (gr_funcptr) gr_generic_vec_dot_fmpz},
+
+    {GR_METHOD_VEC_SET_POWERS,          (gr_funcptr) gr_generic_vec_set_powers},
 
     {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},
 
