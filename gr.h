@@ -12,6 +12,9 @@
 #include "flint/flint.h"
 #include "flint/fmpz.h"
 #include "flint/fmpq.h"
+#include "flint/fmpz_poly.h"
+#include "flint/fmpq_poly.h"
+#include "flint/fmpz_mpoly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -446,6 +449,9 @@ _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong 
 {
     return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx);
 }
+
+/* some useful generic functions, currently not overloadable */
+int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 
 /* todo: could allow overloading this as well */
 GR_INLINE int
