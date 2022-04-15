@@ -1413,6 +1413,9 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},
 
+    {GR_METHOD_MAT_MUL,                 (gr_funcptr) gr_mat_mul_generic},
+
+
     {0,                                 (gr_funcptr) NULL},
 };
 

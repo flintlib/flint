@@ -1,4 +1,6 @@
 #include "ca.h"
+#include "ca_mat.h"
+#include "ca_poly.h"
 #include "fexpr.h"
 #include "gr.h"
 
@@ -572,6 +574,22 @@ _gr_ca_im(ca_t res, const ca_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_ca_poly_mullow(ca_ptr res,
+    ca_srcptr poly1, slong len1,
+    ca_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    _ca_poly_mullow(res, poly1, len1, poly2, len2, n, GR_CA_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_mat_mul(ca_mat_t res, const ca_mat_t x, const ca_mat_t y, gr_ctx_t ctx)
+{
+    ca_mat_mul(res, x, y, GR_CA_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_ca_ctx_clear(gr_ctx_t ctx)
 {
     ca_ctx_clear(GR_CA_CTX(ctx));
@@ -654,6 +672,9 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_ca_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_ca_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_ca_im},
+
+    {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},
 
     {0,                         (gr_funcptr) NULL},
 };

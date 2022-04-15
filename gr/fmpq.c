@@ -1,5 +1,6 @@
 #include "gr.h"
 #include "flint/fmpq_poly.h"
+#include "flint/fmpq_mat.h"
 
 int
 _gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -403,6 +404,13 @@ _gr_fmpq_poly_mullow(fmpq * res,
     }
 }
 
+int
+_gr_fmpq_mat_mul(fmpq_mat_t res, const fmpq_mat_t x, const fmpq_mat_t y, gr_ctx_t ctx)
+{
+    fmpq_mat_mul(res, x, y);
+    return GR_SUCCESS;
+}
+
 int _fmpq_methods_initialized = 0;
 
 gr_static_method_table _fmpq_methods;
@@ -448,6 +456,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpq_im},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},
     {0,                         (gr_funcptr) NULL},
 };
 

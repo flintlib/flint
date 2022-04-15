@@ -235,6 +235,9 @@ typedef enum
     /* Polynomial methods */
     GR_METHOD_POLY_MULLOW,
 
+    /* Matrix methods */
+    GR_METHOD_MAT_MUL,
+
     GR_METHOD_TAB_SIZE
 }
 gr_method;
