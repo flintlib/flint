@@ -124,13 +124,12 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 
     if (mf->_mp_alloc < (gabssz + 1)) /* Ensure result fits */
     {
-        mf->_mp_d = flint_realloc(mf->_mp_d, sizeof(mp_limb_t) * (gabssz + 1));
-        mf->_mp_alloc = gabssz + 1;
+        mp_limb_t * tmp = flimbs;
+        flimbs = _mpz_realloc(mf, gabssz + 1);
 
         /* If f and g are aliased, then we need to change glimbs as well. */
-        if (flimbs == glimbs)
-            glimbs = mf->_mp_d;
-        flimbs = mf->_mp_d;
+        if (tmp == glimbs)
+            glimbs = flimbs;
     }
 
     /* Use GMP to calculate result */
@@ -239,8 +238,7 @@ L1:         if (x <= COEFF_MAX) /* Fits in small fmpz */
             /* The allocation size of g is always larger than the absolute value
              * of g. Therefore, if f's allocation size is smaller than g's
              * size, they cannot be aliased. */
-            mf->_mp_d = flimbs = flint_realloc(mf->_mp_d, sizeof(mp_limb_t) * gabssz);
-            mf->_mp_alloc = gabssz;
+            flimbs = _mpz_realloc(mf, gabssz);
         }
 
         mpn_sub_1(flimbs, glimbs, gabssz, x); /* Subtract via GMP */
