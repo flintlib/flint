@@ -840,7 +840,7 @@ again:
             slong lox = Aexps[i*stride + 0];
             slong loy = Aexps[i*stride + 1];
 
-            if (FLINT_MIN(lox, loy) <= -WORD(1) << (FLINT_BITS - 3) ||
+            if (FLINT_MIN(lox, loy) <= -(WORD(1) << (FLINT_BITS - 3)) ||
                 FLINT_MAX(lox, loy) >= WORD(1) << (FLINT_BITS - 3))
             {
                 success = 0;
@@ -880,8 +880,8 @@ again:
             points[i].x = x0;
             points[i].y = y0;
 
-            if (points[i].x <= -WORD(1) << (FLINT_BITS - 3) ||
-                points[i].y <= -WORD(1) << (FLINT_BITS - 3) ||
+            if (points[i].x <= -(WORD(1) << (FLINT_BITS - 3)) ||
+                points[i].y <= -(WORD(1) << (FLINT_BITS - 3)) ||
                 points[i].x >= WORD(1) << (FLINT_BITS - 3) ||
                 points[i].y >= WORD(1) << (FLINT_BITS - 3))
             {

@@ -42,7 +42,7 @@ void test_poly(
             flint_abort();
         }
 
-        if (!TEMPLATE(T, is_one)(roots->poly[i].coeffs + 1, ctx) != 0)
+        if (TEMPLATE(T, is_one)(roots->poly[i].coeffs + 1, ctx) == 0)
         {
             flint_printf("FAILED:\ncheck root is monic\n");
             fflush(stdout);

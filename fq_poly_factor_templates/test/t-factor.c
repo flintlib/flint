@@ -36,7 +36,7 @@ main(void)
         TEMPLATE(T, t) randlead;
         TEMPLATE(T, t) lead;
         slong length, num, i, j;
-        ulong exp[5], prod1;
+        ulong exp[5];
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
@@ -56,7 +56,6 @@ main(void)
         TEMPLATE(T, poly_randtest_irreducible) (poly, state, length, ctx);
 
         exp[0] = n_randint(state, 3) + 1;
-        prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
             TEMPLATE(T, poly_mul) (pol1, pol1, poly, ctx);
 
@@ -73,7 +72,6 @@ main(void)
             while ((poly->length < 2) || (rem->length == 0));
 
             exp[i] = n_randint(state, 3) + 1;
-            prod1 *= exp[i];
 
             for (j = 0; j < exp[i]; j++)
                 TEMPLATE(T, poly_mul) (pol1, pol1, poly, ctx);
@@ -155,7 +153,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) lead;
         slong length, num, i, j;
-        slong exp[5], prod1;
+        slong exp[5];
         ulong inflation;
         int found;
 
@@ -176,7 +174,6 @@ main(void)
         TEMPLATE(T, poly_inflate) (poly, poly, inflation, ctx);
 
         exp[0] = n_randint(state, 6) + 1;
-        prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
             TEMPLATE(T, poly_mul) (pol1, pol1, poly, ctx);
 
@@ -192,7 +189,6 @@ main(void)
             }
             while ((poly->length < 2) || (rem->length == 0));
             exp[i] = n_randint(state, 6) + 1;
-            prod1 *= exp[i];
             TEMPLATE(T, poly_inflate) (poly, poly, inflation, ctx);
 
             for (j = 0; j < exp[i]; j++)
