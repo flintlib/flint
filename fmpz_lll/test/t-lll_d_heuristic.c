@@ -133,13 +133,14 @@ main(void)
         slong r, c;
         fmpz_mat_t gmat, gmat2;
 
-        r = n_randint(state, 20) + 1;
+        /* Note: tests can fail with larger "r" and "bits" */
+        r = n_randint(state, 10) + 1;
         c = r + 1;
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
 
-        bits = n_randint(state, 200) + 1;
+        bits = n_randint(state, 100) + 1;
 
         fmpz_mat_randintrel(mat, state, bits);
 

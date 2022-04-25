@@ -1357,26 +1357,20 @@ LLL
 
 
 .. function:: int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
+              int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
 
     Returns a non-zero value if the basis ``A`` is LLL-reduced with factor
-    (``delta``, ``eta``), and otherwise returns zero. The function is
-    mainly intended to be used for testing purposes in the ``fmpz_lll``
-    module.
-
-.. function:: int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
-
-    Returns a non-zero value if the basis with Gram matrix ``A`` is
-    LLL-reduced with factor (``delta``, ``eta``), and otherwise returns
-    zero. The function is mainly intended to be used for testing purposes in
-    the ``fmpz_lll`` module.
+    (``delta``, ``eta``), and otherwise returns zero.
+    The second version assumes ``A`` is the Gram matrix of the basis.
 
 .. function:: int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd)
+              int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd)
 
     Returns a non-zero value if the basis ``A`` is LLL-reduced with factor
-    (``delta``, ``eta``) and the squared Gram-Schmidt length of each
-    `i`-th vector (where `i \ge` ``newd``) is greater than ``gs_B``, and
-    otherwise returns zero. The function is mainly intended to be used for
-    testing purposes in the ``fmpz_lll`` module.
+    (``delta``, ``eta``) for each of the first ``newd`` vectors and the squared
+    Gram-Schmidt length of each of the remaining `i`-th vectors
+    (where `i \ge` ``newd``) is greater than ``gs_B``, and otherwise returns zero.
+    The second version assumes ``A`` is the Gram matrix of the basis.
 
 
 Classical LLL

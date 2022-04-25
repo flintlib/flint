@@ -130,7 +130,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             }
             norm = FLINT_MAX(norm, s);
         }
-        if (norm >= 1)
+        if (!(norm < 1))
         {
             d_mat_clear(A);
             d_mat_clear(R);
@@ -380,7 +380,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             }
             norm = FLINT_MAX(norm, s);
         }
-        if (norm >= 1)
+        if (!(norm < 1))
         {
             d_mat_clear(R);
             d_mat_clear(bound);
@@ -416,7 +416,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             for (j = i + 1; j < n; j++)
             {
                 tj = fabs(d_mat_entry(R, i, j)) + d_mat_entry(bound, i, j);
-                if (tj > ti)
+                if (!(tj <= ti))
                 {
                     d_mat_clear(R);
                     d_mat_clear(bound);
@@ -438,7 +438,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             s = -s;
             fesetround(FE_UPWARD);
             s = sqrt(s) * ti;
-            if (s > tj)
+            if (!(s <= tj))
             {
                 d_mat_clear(R);
                 d_mat_clear(bound);
@@ -499,6 +499,16 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                         d_mat_entry(R, i, j) * d_mat_entry(R, i, j);
                 }
             }
+
+            if (!(d_mat_entry(R, j, j) > 0))
+            {
+                /* going to take sqrt and then divide by it */
+                d_mat_clear(A);
+                d_mat_clear(R);
+                d_mat_clear(V);
+                return 0;
+            }
+
             d_mat_entry(R, j, j) = sqrt(d_mat_entry(R, j, j));
         }
 
@@ -546,7 +556,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             }
             norm = FLINT_MAX(norm, s);
         }
-        if (norm >= 1)
+        if (!(norm < 1))
         {
             d_mat_clear(A);
             d_mat_clear(R);
@@ -768,7 +778,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             }
             norm = FLINT_MAX(norm, s);
         }
-        if (norm >= 1)
+        if (!(norm < 1))
         {
             d_mat_clear(R);
             d_mat_clear(bound);
@@ -804,7 +814,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             for (j = i + 1; j < n; j++)
             {
                 tj = fabs(d_mat_entry(R, i, j)) + d_mat_entry(bound, i, j);
-                if (tj > ti)
+                if (!(tj <= ti))
                 {
                     d_mat_clear(R);
                     d_mat_clear(bound);
@@ -826,7 +836,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             s = -s;
             fesetround(FE_UPWARD);
             s = sqrt(s) * ti;
-            if (s > tj)
+            if (!(s <= tj))
             {
                 d_mat_clear(R);
                 d_mat_clear(bound);
@@ -839,6 +849,11 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         d_mat_clear(bound);
         fesetround(rounding_direction);
     }
+
+    FLINT_ASSERT((fl->rt == Z_BASIS
+                        ? fmpz_mat_is_reduced(B, fl->delta, fl->eta)
+                        : fmpz_mat_is_reduced_gram(B, fl->delta, fl->eta)));
+
     return 1;
 #else
     return 0;

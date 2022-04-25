@@ -29,12 +29,13 @@ want_mpfr(const fmpz_mat_t A)
 int
 fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 {
-    return ((fmpz_lll_is_reduced_d(B, fl)
-             || (want_mpfr(B) && fmpz_lll_is_reduced_mpfr(B, fl, prec))
-            )
-            || ((fl->rt == Z_BASIS) ?
-                fmpz_mat_is_reduced(B, fl->delta,
-                                    fl->eta) : fmpz_mat_is_reduced_gram(B,
-                                                                        fl->delta,
-                                                                        fl->eta)));
+    if (fmpz_lll_is_reduced_d(B, fl))
+        return 1;
+
+    if (want_mpfr(B) && fmpz_lll_is_reduced_mpfr(B, fl, prec))
+        return 1;
+
+    return (fl->rt == Z_BASIS) ?
+                fmpz_mat_is_reduced(B, fl->delta, fl->eta) :
+                fmpz_mat_is_reduced_gram(B, fl->delta, fl->eta);
 }
