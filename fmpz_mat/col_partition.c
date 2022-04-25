@@ -14,32 +14,41 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-/*
-   cheap hash of all columns of M
-*/
-void fmpz_mat_col_hash(col_hash_t * col_h, fmpz_mat_t M)
+typedef struct
 {
-   ulong i, j, hash;
+   ulong col;
+   ulong hash;
+} col_hash_struct;
 
-   for (i = 0; i < M->c; i++)
-   {
-      col_h[i].col = i;
-      hash = 0;
-	 
-      for (j = 0; j < M->r; j++)
-      {
-         hash ^= fmpz_get_ui(M->rows[j] + i);
-         hash = (hash << 1) + (hash >> (FLINT_BITS - 1));
-      }
+typedef col_hash_struct * col_hash_ptr;
+typedef const col_hash_struct * col_hash_srcptr;
 
-      col_h[i].hash = hash;
-   }
+/* cheap hash of all columns of M */
+void
+fmpz_mat_col_hash(col_hash_ptr col_h, fmpz_mat_t M)
+{
+    ulong i, j, hash;
+
+    for (i = 0; i < M->c; i++)
+    {
+        col_h[i].col = i;
+        hash = 0;
+
+        for (j = 0; j < M->r; j++)
+        {
+            hash ^= fmpz_get_ui(M->rows[j] + i);
+            hash = (hash << 1) + (hash >> (FLINT_BITS - 1));
+        }
+
+        col_h[i].hash = hash;
+    }
 }
 
-int fmpz_mat_col_hash_compare(const void * a, const void * b)
+int
+fmpz_mat_col_hash_compare(const void * a, const void * b)
 {
-   col_hash_t * col_a = (col_hash_t *) a;
-   col_hash_t * col_b = (col_hash_t *) b;
+   col_hash_srcptr col_a = a;
+   col_hash_srcptr col_b = b;
 
    if (col_a->hash == col_b->hash)
       return 0;
@@ -47,72 +56,73 @@ int fmpz_mat_col_hash_compare(const void * a, const void * b)
    return 2*(col_a->hash > col_b->hash) - 1;
 }
 
-int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
+int
+fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
 {
-   slong start = 0, new_start = 0, upto = 1, p = 0, i, count;
-   ulong hash;
-   col_hash_t * col_h;
-   TMP_INIT;
+    slong start = 0, new_start = 0, upto = 1, p = 0, i, count;
+    ulong hash;
+    col_hash_ptr col_h;
+    TMP_INIT;
 
-   TMP_START;
-   col_h = (col_hash_t *) TMP_ALLOC(sizeof(col_hash_t)*M->c);
+    TMP_START;
+    col_h = TMP_ALLOC(sizeof(col_hash_struct) * M->c);
 
-   fmpz_mat_col_hash(col_h, M);
-   
-   qsort(col_h, M->c, sizeof(col_hash_t), fmpz_mat_col_hash_compare);
-   
-   if (short_circuit)
-   {
-      hash = col_h[0].hash;
-      count = 1;
+    fmpz_mat_col_hash(col_h, M);
 
-      for (i = 1; i < M->c; i++)
-      {
-         if (col_h[i].hash != hash)
-         {
-            count++;
-            hash = col_h[i].hash;
-         }
-      }
+    qsort(col_h, M->c, sizeof(col_hash_struct), fmpz_mat_col_hash_compare);
 
-      if (count > M->r)
-         goto cleanup;
-   }
+    if (short_circuit)
+    {
+        hash = col_h[0].hash;
+        count = 1;
 
-   for (i = 0; i < M->c; i++)
-      part[i] = -WORD(1);
-
-   while (start < M->c)
-   {
-      new_start = start;
-      p++;
-
-      if (short_circuit && p > M->r) 
-      {
-         p = 0; /* too many partitions */
-         goto cleanup;
-      }
-
-      part[col_h[start].col] = p;
-
-      for (upto = start + 1; upto < M->c && col_h[upto].hash == col_h[start].hash; upto++)
-      {
-         if (part[col_h[upto].col] == -WORD(1))
-         {
-            if (!fmpz_mat_col_equal(M, col_h[start].col, col_h[upto].col))
+        for (i = 1; i < M->c; i++)
+        {
+            if (col_h[i].hash != hash)
             {
-               if (new_start == start)
-                  new_start = upto;
-            } else
-               part[col_h[upto].col] = p;
-         }
-      }
+                count++;
+                hash = col_h[i].hash;
+            }
+        }
 
-      start = start == new_start ? upto : new_start;
-   }
+        if (count > M->r)
+            goto cleanup;
+    }
+
+    for (i = 0; i < M->c; i++)
+        part[i] = -WORD(1);
+
+    while (start < M->c)
+    {
+        new_start = start;
+        p++;
+
+        if (short_circuit && p > M->r)
+        {
+            p = 0; /* too many partitions */
+            goto cleanup;
+        }
+
+        part[col_h[start].col] = p;
+
+        for (upto = start + 1; upto < M->c && col_h[upto].hash == col_h[start].hash; upto++)
+        {
+            if (part[col_h[upto].col] == -WORD(1))
+            {
+                if (!fmpz_mat_col_equal(M, col_h[start].col, col_h[upto].col))
+                {
+                    if (new_start == start)
+                        new_start = upto;
+                } else
+                    part[col_h[upto].col] = p;
+            }
+        }
+
+        start = start == new_start ? upto : new_start;
+    }
 
 cleanup:
-   TMP_END;
+    TMP_END;
 
-   return p;
+    return p;
 }
