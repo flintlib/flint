@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2007 David Howden
-    Copyright (C) 2007, 2008, 2009, 2010 William Hart
+    Copyright (C) 2007, 2008, 2009, 2010, 2022 William Hart
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
 

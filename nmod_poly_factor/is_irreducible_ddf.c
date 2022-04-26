@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Martin Lee
-    Copyright (C) 2020 William Hart
+    Copyright (C) 2020, 2022 William Hart
 
     This file is part of FLINT.
 

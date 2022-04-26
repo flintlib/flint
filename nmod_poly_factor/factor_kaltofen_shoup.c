@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2012 Lina Kulakova
-
+    Copyright (C) 2022 William Hart
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under

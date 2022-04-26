@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013, 2014 Martin Lee
-    Copyright (C) 2020 William Hart
+    Copyright (C) 2020, 2022 William Hart
 
     This file is part of FLINT.
 
@@ -150,7 +150,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
 }
 
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong * const *degs)
+                                   const nmod_poly_t poly, slong * const * degs)
 {
     nmod_poly_t f, g, v, vinv, tmp, II;
     nmod_poly_struct * h, * H, * I, * scratch;
