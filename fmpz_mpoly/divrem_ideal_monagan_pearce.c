@@ -16,6 +16,19 @@
 #include "fmpz_mpoly.h"
 #include "longlong.h"
 
+/* ensure rounding is towards -\infty like fmpz_fdiv_qr */
+#define fdiv_qrnnd(qxx, rxx, nhixx, nloxx, dxx)        \
+   do {                                                \
+      slong __dxx = (dxx);                             \
+      sdiv_qrnnd(qxx, rxx, nhixx, nloxx, dxx);         \
+      if (((slong) (rxx) < 0 && (slong) (dxx) > 0) ||  \
+          ((slong) (rxx) > 0 && (slong) (dxx) < 0))    \
+      {                                                \
+         (rxx) += __dxx;                               \
+         (qxx)--;                                      \
+      }                                                \
+   } while (0)
+
 /*
    As for divrem_monagan_pearce1 except that an array of divisor polynomials is
    passed and an array of quotient polynomials is returned. These are not in
@@ -222,7 +235,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                         {
                             slong r1;
                             slong tq;
-                            sdiv_qrnnd(tq, r1, c[1], c[0], mb[w]);
+                            fdiv_qrnnd(tq, r1, c[1], c[0], mb[w]);
                             if (tq > COEFF_MAX || tq < COEFF_MIN)
                             {
                                 small = 0;
@@ -568,7 +581,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                         {
                             slong r1;
                             slong tq;
-                            sdiv_qrnnd(tq, r1, c[1], c[0], mb[w]);
+                            fdiv_qrnnd(tq, r1, c[1], c[0], mb[w]);
                             if (tq > COEFF_MAX || tq < COEFF_MIN)
                             {
                                 small = 0;
