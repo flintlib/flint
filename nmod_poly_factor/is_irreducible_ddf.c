@@ -23,7 +23,7 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {
 
     nmod_poly_t f, v, vinv, tmp;
-    nmod_poly_t *h, *H, *I;
+    nmod_poly_struct * h, * H, * I;
     nmod_mat_t HH;
     slong i, j, l, m, n, d;
     double beta;
@@ -46,7 +46,8 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     nmod_poly_init_preinv(vinv, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(tmp, poly->mod.n, poly->mod.ninv);
 
-    if (!(h = flint_malloc((2*m + l + 1)*sizeof(nmod_poly_struct))))
+    if (!(h = (nmod_poly_struct *) 
+               flint_malloc((2*m + l + 1)*sizeof(nmod_poly_struct))))
     {
         flint_printf("Exception (nmod_poly_is_irreducible_ddf):\n");
         flint_printf("Not enough memory.\n");
@@ -57,66 +58,66 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     I = H + m;
 
     for (i = 0; i < 2*m + l + 1; i++)
-        nmod_poly_init_mod(h[i], poly->mod);
+        nmod_poly_init_mod(h + i, poly->mod);
 
     nmod_poly_make_monic(v, poly);
 
     nmod_poly_reverse(vinv, v, v->length);
     nmod_poly_inv_series(vinv, vinv, v->length);
 
-    /* compute baby steps: h[i]=x^{p^i}mod v */
-    nmod_poly_set_coeff_ui(h[0], 1, 1);
-    nmod_poly_powmod_x_ui_preinv(h[1], poly->mod.n, v, vinv);
+    /* compute baby steps: h[i] = x^{p^i}mod v */
+    nmod_poly_set_coeff_ui(h + 0, 1, 1);
+    nmod_poly_powmod_x_ui_preinv(h + 1, poly->mod.n, v, vinv);
 
     if (FLINT_BIT_COUNT(poly->mod.n) > ((n_sqrt(v->length - 1) + 1)*3)/4)
     {
         for (i = 1; i < FLINT_BIT_COUNT (l); i++)
-            nmod_poly_compose_mod_brent_kung_vec_preinv(*(h + 1 +
-                            (1 << (i - 1))), *(h + 1), (1 << (i - 1)),
-                            (1 << (i - 1)), *(h + (1 << (i - 1))), v, vinv);
+            nmod_poly_compose_mod_brent_kung_vec_preinv(h + 1 +
+                            (1 << (i - 1)), h + 1, (1 << (i - 1)),
+                            (1 << (i - 1)), h + (1 << (i - 1)), v, vinv);
 
-        nmod_poly_compose_mod_brent_kung_vec_preinv(*(h + 1 + (1 << (i - 1))),
-                            *(h + 1), (1 << (i - 1)), l - (1 << (i - 1)),
-						    *(h + (1 << (i - 1))), v, vinv);
+        nmod_poly_compose_mod_brent_kung_vec_preinv(h + 1 + (1 << (i - 1)),
+                            h + 1, (1 << (i - 1)), l - (1 << (i - 1)),
+						    h + (1 << (i - 1)), v, vinv);
     }
     else
     {
         for (i = 2; i < l + 1; i++)
         {
-            nmod_poly_init_preinv(h[i], poly->mod.n, poly->mod.ninv);
+            nmod_poly_init_preinv(h + i, poly->mod.n, poly->mod.ninv);
 
-            nmod_poly_powmod_ui_binexp_preinv(h[i], h[i - 1], poly->mod.n,
+            nmod_poly_powmod_ui_binexp_preinv(h + i, h + i - 1, poly->mod.n,
                                               v, vinv);
         }
     }
 
     /* compute coarse distinct-degree factorisation */
-    nmod_poly_set(H[0], h[l]);
+    nmod_poly_set(H + 0, h + l);
     nmod_mat_init(HH, n_sqrt(v->length - 1) + 1, v->length - 1, poly->mod.n);
-    nmod_poly_precompute_matrix(HH, H[0], v, vinv);
+    nmod_poly_precompute_matrix(HH, H + 0, v, vinv);
 
     d = 1;
     for (j = 0; j < m; j++)
     {
-        /* compute giant steps: H[j]=x^{p^(lj)}mod s */
+        /* compute giant steps: H[j] = x^{p^(lj)}mod s */
         if (j > 0)
-            nmod_poly_compose_mod_brent_kung_precomp_preinv(H[j], H[j - 1], HH,
+            nmod_poly_compose_mod_brent_kung_precomp_preinv(H + j, H + j - 1, HH,
                                                             v, vinv);
         /* compute interval polynomials */
-        nmod_poly_set_coeff_ui(I[j], 0, 1);
+        nmod_poly_set_coeff_ui(I + j, 0, 1);
 
         for (i = l - 1; i >= 0 && 2*d <= v->length - 1; i--, d++)
         {
-            nmod_poly_rem(tmp, h[i], v);
-            nmod_poly_sub(tmp, H[j], tmp);
-            nmod_poly_mulmod_preinv (I[j], tmp, I[j], v, vinv);
+            nmod_poly_rem(tmp, h + i, v);
+            nmod_poly_sub(tmp, H + j, tmp);
+            nmod_poly_mulmod_preinv (I + j, tmp, I + j, v, vinv);
         }
 
         /* compute F_j=f^{[j*l+1]} * ... * f^{[j*l+l]} */
         /* F_j is stored on the place of I_j */
-        nmod_poly_gcd(I[j], v, I[j]);
+        nmod_poly_gcd(I + j, v, I + j);
 
-        if (I[j]->length > 1)
+        if (I[j].length > 1)
         {
             result = 0;
             break;
@@ -131,12 +132,12 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     nmod_mat_clear (HH);
 
     for (i = 0; i < l + 1; i++)
-        nmod_poly_clear(h[i]);
+        nmod_poly_clear(h + i);
 
     for (i = 0; i < m; i++)
     {
-        nmod_poly_clear(H[i]);
-        nmod_poly_clear(I[i]);
+        nmod_poly_clear(H + i);
+        nmod_poly_clear(I + i);
     }
 
     flint_free (h);
