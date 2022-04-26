@@ -44,6 +44,12 @@ void thread_pool_clear(thread_pool_t T)
     {
         flint_free(D);
     }
+#if FLINT_USES_CPUSET && FLINT_USES_PTHREAD
+    if (T->original_affinity != NULL) {
+        flint_free(T->original_affinity);
+        T->original_affinity = NULL;
+    }
+#endif
 #if FLINT_USES_PTHREAD
     pthread_mutex_unlock(&T->mutex);
     pthread_mutex_destroy(&T->mutex);
