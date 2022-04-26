@@ -41,9 +41,9 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     /* Step 1, look at f', if it is zero then we are done since f = h(x)^p
        for some particular h(x), clearly f(x) = sum a_k x^kp, k <= deg(f) */
 
-    nmod_poly_init(g_1, p);
-    nmod_poly_init(f_d, p);
-    nmod_poly_init(g, p);
+    nmod_poly_init_mod(g_1, f->mod);
+    nmod_poly_init_mod(f_d, f->mod);
+    nmod_poly_init_mod(g, f->mod);
 
     nmod_poly_derivative(f_d, f);
 
@@ -53,7 +53,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         nmod_poly_factor_t new_res;
         nmod_poly_t h;
 
-        nmod_poly_init(h, p);
+        nmod_poly_init_mod(h, f->mod);
 
         for (i = 0; i <= deg/p; i++) /* this will be an integer since f'=0 */
         {
@@ -78,8 +78,8 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
         i = 1;
 
-        nmod_poly_init(h, p);
-        nmod_poly_init(z, p);
+        nmod_poly_init_mod(h, f->mod);
+        nmod_poly_init_mod(z, f->mod);
 
         /* Case 2 */
         while (!nmod_poly_is_one(g_1)) 
@@ -113,7 +113,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
             nmod_poly_t g_p; /* g^(1/p) */
             nmod_poly_factor_t new_res_2;
 
-            nmod_poly_init(g_p, p);
+            nmod_poly_init_mod(g_p, f->mod);
 
             for (i = 0; i <= nmod_poly_degree(g)/p; i++)
                 nmod_poly_set_coeff_ui(g_p, i, nmod_poly_get_coeff_ui(g, i*p));

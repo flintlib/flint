@@ -77,8 +77,8 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     }
 
     /* Step 1, we compute x^p mod f in F_p[X]/<f> */
-    nmod_poly_init(x, p);
-    nmod_poly_init(x_p, p);
+    nmod_poly_init_mod(x, f->mod);
+    nmod_poly_init_mod(x_p, f->mod);
 
     nmod_poly_set_coeff_ui(x, 1, 1);
     nmod_poly_powmod_ui_binexp(x_p, x, p, f);
@@ -86,8 +86,8 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
     /* Step 2, compute the matrix for the Berlekamp Map */
     nmod_mat_init(matrix, n, n, p);
-    nmod_poly_init(x_pi, p);
-    nmod_poly_init(x_pi2, p);
+    nmod_poly_init_mod(x_pi, f->mod);
+    nmod_poly_init_mod(x_pi2, f->mod);
 
     nmod_poly_set_coeff_ui(x_pi, 0, 1);
 
@@ -123,7 +123,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
     for (i = 1; i < nullity; i++)
     {
-        nmod_poly_init(basis[i], p);
+        nmod_poly_init_mod(basis[i], f->mod);
 
         while (nmod_mat_entry(matrix, row, col))
         {
@@ -153,10 +153,10 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
         /* Generate random linear combinations */
         nmod_poly_t factor, b, power, g;
 
-        nmod_poly_init(factor, p);
-        nmod_poly_init(b, p);
-        nmod_poly_init(power, p);
-        nmod_poly_init(g, p);
+        nmod_poly_init_mod(factor, f->mod);
+        nmod_poly_init_mod(b, f->mod);
+        nmod_poly_init_mod(power, f->mod);
+        nmod_poly_init_mod(g, f->mod);
 
         while (1)
         {
@@ -210,7 +210,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
         __nmod_poly_factor_berlekamp(fac1, state, g);
 
-        nmod_poly_init(Q, p);
+        nmod_poly_init_mod(Q, f->mod);
 
         nmod_poly_div(Q, f, g);
 

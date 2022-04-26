@@ -41,10 +41,10 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     m = ceil(0.5*n/l);
 
     /* initialization */
-    nmod_poly_init_preinv(f, poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(vinv, poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(tmp, poly->mod.n, poly->mod.ninv);
+    nmod_poly_init_mod(f, poly->mod);
+    nmod_poly_init_mod(v, poly->mod);
+    nmod_poly_init_mod(vinv, poly->mod);
+    nmod_poly_init_mod(tmp, poly->mod);
 
     if (!(h = (nmod_poly_struct *) 
                flint_malloc((2*m + l + 1)*sizeof(nmod_poly_struct))))
@@ -84,7 +84,7 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     {
         for (i = 2; i < l + 1; i++)
         {
-            nmod_poly_init_preinv(h + i, poly->mod.n, poly->mod.ninv);
+            nmod_poly_init_mod(h + i, poly->mod);
 
             nmod_poly_powmod_ui_binexp_preinv(h + i, h + i - 1, poly->mod.n,
                                               v, vinv);

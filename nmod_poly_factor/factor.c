@@ -55,7 +55,7 @@ __nmod_poly_factor(nmod_poly_factor_t result,
 
     leading_coeff = *nmod_poly_lead(input);
 
-    nmod_poly_init_preinv(monic_input, input->mod.n, input->mod.ninv);
+    nmod_poly_init_mod(monic_input, input->mod);
     nmod_poly_make_monic(monic_input, input);
 
     if (len == 2)
@@ -111,7 +111,7 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
         nmod_poly_t def;
         mp_limb_t leading_coeff;
 
-        nmod_poly_init_preinv(def, input->mod.n, input->mod.ninv);
+        nmod_poly_init_mod(def, input->mod);
 
         nmod_poly_deflate(def, input, deflation);
         nmod_poly_factor_init(def_res);
@@ -124,7 +124,7 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
             /* Inflate */
             nmod_poly_t pol;
 
-            nmod_poly_init_preinv(pol, input->mod.n, input->mod.ninv);
+            nmod_poly_init_mod(pol, input->mod);
 
             nmod_poly_inflate(pol, def_res->p + i, deflation);
 

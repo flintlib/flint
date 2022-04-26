@@ -33,7 +33,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
         flint_abort();
     }
 
-    nmod_poly_init_preinv(a, pol->mod.n, pol->mod.ninv);
+    nmod_poly_init_mod(a, pol->mod);
 
     do
     {
@@ -48,8 +48,8 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
         return 1;
     }
 
-    nmod_poly_init_preinv(b, pol->mod.n, pol->mod.ninv);
-    nmod_poly_init_preinv(polinv, pol->mod.n, pol->mod.ninv);
+    nmod_poly_init_mod(b, pol->mod);
+    nmod_poly_init_mod(polinv, pol->mod);
 
     nmod_poly_reverse(polinv, pol, pol->length);
     nmod_poly_inv_series(polinv, polinv, polinv->length);
@@ -69,7 +69,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     {
         /* compute b = (a^{2^{d-1}}+a^{2^{d-2}}+...+a^4+a^2+a) rem pol */
         nmod_poly_rem(b, a, pol);
-        nmod_poly_init_preinv(c, pol->mod.n, pol->mod.ninv);
+        nmod_poly_init_mod(c, pol->mod);
         nmod_poly_set(c, b);
 
         for (i = 1; i < d; i++)

@@ -28,7 +28,7 @@ nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
         nmod_poly_t f, g;
         flint_rand_t state;
 
-        nmod_poly_init_preinv(f, pol->mod.n, pol->mod.ninv);
+        nmod_poly_init_mod(f, pol->mod);
 
         flint_randinit(state);
 
@@ -37,7 +37,7 @@ nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
 
         flint_randclear(state);
 
-        nmod_poly_init_preinv(g, pol->mod.n, pol->mod.ninv);
+        nmod_poly_init_mod(g, pol->mod);
         nmod_poly_div(g, pol, f);
 
         nmod_poly_factor_equal_deg(factors, f, d);

@@ -20,7 +20,7 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     slong i, j, k, l, res_num, dist_deg_num;
     slong * degs;
 
-    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
+    nmod_poly_init_mod(v, poly->mod);
 
     nmod_poly_make_monic(v, poly);
     
