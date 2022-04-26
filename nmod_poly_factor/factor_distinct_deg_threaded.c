@@ -38,7 +38,10 @@ _nmod_poly_precompute_matrix_worker(void * arg_ptr)
     n = poly2->length - 1;
     m = n_sqrt(n) + 1;
 
-    A->rows[0][0] = UWORD(1);
+    for (i = 1; i < n; i++)
+        A->rows[0][i] = 0;
+    A->rows[0][0] = 1;
+
     _nmod_vec_set(A->rows[1], poly1->coeffs, n);
 
     for (i = 2; i < m; i++)
@@ -128,7 +131,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
     nmod_t mod = v->mod;
     mp_ptr tmp = arg.tmp;
     
-    res->coeffs[0] = UWORD(1);
+    res->coeffs[0] = 1;
 
     for (k = m - 1; k >= 0; k--)
     {
