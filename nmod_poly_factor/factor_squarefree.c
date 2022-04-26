@@ -44,6 +44,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     nmod_poly_init(g_1, p);
     nmod_poly_init(f_d, p);
     nmod_poly_init(g, p);
+
     nmod_poly_derivative(f_d, f);
 
     /* Case 1 */
@@ -54,9 +55,9 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
         nmod_poly_init(h, p);
 
-        for (i = 0; i <= deg / p; i++) /* this will be an integer since f'=0 */
+        for (i = 0; i <= deg/p; i++) /* this will be an integer since f'=0 */
         {
-            nmod_poly_set_coeff_ui(h, i, nmod_poly_get_coeff_ui(f, i * p));
+            nmod_poly_set_coeff_ui(h, i, nmod_poly_get_coeff_ui(f, i*p));
         }
         
         /* Now run square-free on h, and return it to the pth power */
@@ -68,8 +69,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         nmod_poly_factor_concat(res, new_res);
         nmod_poly_clear(h);
         nmod_poly_factor_clear(new_res);
-   }
-   else 
+   } else 
    { 
         nmod_poly_t h, z;
 
@@ -115,7 +115,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
             nmod_poly_init(g_p, p);
 
-            for (i = 0; i <= nmod_poly_degree(g) / p; i++)
+            for (i = 0; i <= nmod_poly_degree(g)/p; i++)
                 nmod_poly_set_coeff_ui(g_p, i, nmod_poly_get_coeff_ui(g, i*p));
 
             nmod_poly_factor_init(new_res_2);

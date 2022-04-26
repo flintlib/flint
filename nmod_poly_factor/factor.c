@@ -73,9 +73,11 @@ __nmod_poly_factor(nmod_poly_factor_t result,
     for (i = 0; i < sqfree_factors->num; i++)
     {
         nmod_poly_factor_init(factors);
+
         __nmod_poly_factor1(factors, sqfree_factors->p + i, algorithm);
         nmod_poly_factor_pow(factors, sqfree_factors->exp[i]);
         nmod_poly_factor_concat(result, factors);
+
         nmod_poly_factor_clear(factors);
     }
 
@@ -110,16 +112,20 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
         mp_limb_t leading_coeff;
 
         nmod_poly_init_preinv(def, input->mod.n, input->mod.ninv);
+
         nmod_poly_deflate(def, input, deflation);
         nmod_poly_factor_init(def_res);
         leading_coeff = __nmod_poly_factor(def_res, def, algorithm);
+
         nmod_poly_clear(def);
 
         for (i = 0; i < def_res->num; i++)
         {
             /* Inflate */
             nmod_poly_t pol;
+
             nmod_poly_init_preinv(pol, input->mod.n, input->mod.ninv);
+
             nmod_poly_inflate(pol, def_res->p + i, deflation);
 
             /* Factor inflation */
@@ -128,16 +134,21 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
             else
             {
                 nmod_poly_factor_t t;
+
                 nmod_poly_factor_init(t);
+
                 __nmod_poly_factor(t, pol, algorithm);
                 nmod_poly_factor_pow(t, def_res->exp[i]);
                 nmod_poly_factor_concat(result, t);
+
                 nmod_poly_factor_clear(t);
             }
+
             nmod_poly_clear(pol);
         }
 
         nmod_poly_factor_clear(def_res);
+
         return leading_coeff;  
     }
 }

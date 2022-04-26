@@ -49,8 +49,7 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
             for (j = num; j < res->num; j++)
                 res->exp[j] = nmod_poly_remove(v, res->p + j);
         }
-    }
-    while (v->length >= 2*i + 3);
+    } while (v->length >= 2*i + 3);
 
     if (v->length > 1)
         nmod_poly_factor_insert(res, v, 1);

@@ -16,13 +16,9 @@
 
 #include <math.h>
 #include <pthread.h>
-
 #undef ulong
-
 #include <gmp.h>
-
 #define ulong mp_limb_t
-
 #include "nmod_poly.h"
 
 void
@@ -92,7 +88,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     t = _nmod_vec_init(n);
 
     /* Set rows of B to the segments of poly1 */
-    for (i = 0; i < poly1->length / m; i++)
+    for (i = 0; i < poly1->length/m; i++)
         _nmod_vec_set(B->rows[i], poly1->coeffs + i * m, m);
 
     _nmod_vec_set(B->rows[i], poly1->coeffs + i * m, poly1->length % m);
@@ -182,9 +178,9 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
         return;
     }
 
-    beta = 0.5 * (1. - (log(2) / log(n)));
+    beta = 0.5 * (1. - log(2)/log(n));
     l = ceil(pow(n, beta));
-    m = ceil(0.5 * n / l);
+    m = ceil(0.5*n/l);
 
     /* initialization */
     nmod_poly_init_mod(f, poly->mod);
@@ -235,27 +231,20 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     {
         for (i = 1; i < FLINT_BIT_COUNT(l); i++)
             nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(h + 1 +
-                                                        (1 << (i - 1)),
-                                                        h + 1,
-                                                        1 << (i - 1),
-                                                        1 << (i - 1),
-                                                        h + (1 << (i - 1)),
-                                                        v, vinv,
-                                                        threads, num_threads);
+                                   (1 << (i - 1)), h + 1, 1 << (i - 1),
+                                   1 << (i - 1), h + (1 << (i - 1)),
+                                   v, vinv, threads, num_threads);
 
         nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(h + 1 +
-                                                    (1 << (i - 1)),
-                                                    h + 1,
-                                                    1 << (i - 1),
-                                                    l - (1 << (i - 1)),
-                                                    h + (1 << (i - 1)),
-                                                    v, vinv,
-                                                    threads, num_threads);
+                                   (1 << (i - 1)), h + 1, 1 << (i - 1),
+                                   l - (1 << (i - 1)), h + (1 << (i - 1)),
+                                   v, vinv, threads, num_threads);
     } else
     {
         for (i = 2; i < l + 1; i++)
         {
             nmod_poly_init_mod(h + i, poly->mod);
+
             nmod_poly_powmod_ui_binexp_preinv(h + i, h + i - 1, poly->mod.n,
                                                                       v, vinv);
         }
@@ -382,7 +371,8 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
             for (i = 1; i < c1; i++)
             {
                 thread_pool_wake(global_thread_pool, threads[i - 1], 0,
-        _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
+                  _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker,
+                                                                    &args2[i]);
             }
 
             _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args2[0]);
@@ -498,7 +488,8 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
             for (i = 1; i < c2; i++)
             {
                 thread_pool_wake(global_thread_pool, threads[i - 1], 0,
-        _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
+                    _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker,
+                                                                    &args2[i]);
             }
 
             _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args2[0]);

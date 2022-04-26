@@ -32,7 +32,8 @@ nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
 
         flint_randinit(state);
 
-        while (!nmod_poly_factor_equal_deg_prob(f, state, pol, d)) {};
+        while (!nmod_poly_factor_equal_deg_prob(f, state, pol, d))
+           ;
 
         flint_randclear(state);
 
