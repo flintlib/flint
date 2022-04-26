@@ -256,9 +256,6 @@ int fmpq_poly_is_gen(const fmpq_poly_t op)
     return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0)) && (*(op->den) == WORD(1));
 }
 
-/* Deprecated */
-#define fmpq_poly_is_x fmpq_poly_is_gen
-
 /*  Addition and subtraction  ************************************************/
 
 FLINT_DLL void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 

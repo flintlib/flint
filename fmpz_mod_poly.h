@@ -260,9 +260,6 @@ int fmpz_mod_poly_is_unit(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx)
     return (op->length == 1) && fmpz_mod_is_invertible(op->coeffs + 0, ctx);
 }
 
-/* Deprecated */
-#define fmpz_mod_poly_is_x fmpz_mod_poly_is_gen
-
 /*  Assignment and basic manipulation ****************************************/
 
 FLINT_DLL void fmpz_mod_poly_set(fmpz_mod_poly_t poly1,

@@ -321,8 +321,6 @@ FLINT_DLL slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac);
 
 FLINT_DLL ulong n_gcd(ulong x, ulong y);
 
-#define n_gcd_full n_gcd
-
 FLINT_DLL ulong n_xgcd(ulong * a, ulong * b, ulong x, ulong y);
 
 FLINT_DLL ulong n_gcdinv(ulong * a, ulong x, ulong y);

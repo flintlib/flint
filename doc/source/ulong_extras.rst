@@ -323,13 +323,6 @@ Greatest common divisor
 
     This function wraps GMP's ``mpn_gcd_1``.
 
-.. function:: ulong n_gcd_full(ulong x, ulong y)
-
-    Returns the greatest common divisor `g` of `x` and `y`.
-    No assumptions are made about `x` and `y`.
-
-    This function is deprecated.
-
 .. function:: ulong n_gcdinv(ulong * a, ulong x, ulong y)
 
     Returns the greatest common divisor `g` of `x` and `y` and computes 
