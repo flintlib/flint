@@ -23,10 +23,10 @@ using namespace flint;
 int main(int argc, char* argv[])
 {
     fmpzxx n(7);
-    fmpz_mod_polyxx x(n);
+    fmpz_modxx_ctx p(n);
+    fmpz_mod_polyxx x(p);
     x.set_coeff(3, 5);
     x.set_coeff(0, 6);
-
     print(x);flint_printf("\n");
     print(x.sqr());flint_printf("\n");
 

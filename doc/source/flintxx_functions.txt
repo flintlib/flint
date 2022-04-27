@@ -3125,12 +3125,12 @@ Polynomials over integers mod `n` (``fmpz_mod_poly``)
 
 .. cpp:function:: Fmpz_mod_poly_expr::unary operation() const
 
-    The following una.. cpp:functions are made available as member functions:
+    The following unary functions are made available as member functions:
     ``derivative``, ``integral``, ``make_monic``, ``sqr``.
 
 .. cpp:function:: Fmpz_mod_poly_expr::binary operation() const
 
-    The following bina.. cpp:functions are made available as member functions:\\
+    The following binary cpp:functions are made available as member functions:\\
     ``compose_divconquer``, ``compose_horner``, ``div_basecase``,\\
     ``div_divconquer``, ``div_newton``, ``divrem``,\\
     ``divrem_basecase``, ``divrem_divconquer``,\\
@@ -3176,8 +3176,9 @@ Input and output
 Memory management
 -------------------------------------------------------------------------------
 
-.. cpp:function:: fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n)
-.. cpp:function:: fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n, slong alloc)
+.. cpp:function:: fmpz_modxx_ctx(Fmpz_expr n)
+.. cpp:function:: fmpz_mod_polyxx::fmpz_mod_polyxx(fmpz_modxx_ctx n)
+.. cpp:function:: fmpz_mod_polyxx::fmpz_mod_polyxx(fmpz_modxx_ctx n, slong alloc)
 
 .. cpp:function:: void Fmpz_mod_poly_target realloc(slong alloc)
 .. cpp:function:: void Fmpz_mod_poly_target::fit_length(slong len)
@@ -4155,7 +4156,7 @@ Legendre polynomials
 .. cpp:function:: Fmpz_poly_expr chebyshev_t_polynomial(T:is_unsigned_integer)
 .. cpp:function:: Fmpz_poly_expr chebyshev_u_polynomial(T:is_unsigned_integer)
 
-Multiplicati.. cpp:functions
+Multiplicative functions
 -------------------------------------------------------------------------------
 
 .. cpp:function:: Fmpz_expr euler_phi(Fmpz_expr)
