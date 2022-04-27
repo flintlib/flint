@@ -47,6 +47,12 @@ FLINT_DLL void _fmpq_vec_sort(fmpq * vec, slong len);
 
 FLINT_DLL void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len);
 
+FLINT_DLL void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den,
+                                                    const fmpq * a, slong len);
+
+FLINT_DLL void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den,
+                                                    const fmpq * a, slong len);
+
 /*  Dot product  **************************************************/
 
 FLINT_DLL void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len);

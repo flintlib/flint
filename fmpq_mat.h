@@ -205,6 +205,30 @@ FLINT_DLL void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A,
 FLINT_DLL void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
     const fmpq_mat_t B);
 
+FLINT_DLL void fmpq_mat_mul_fmpq_vec(fmpq * c, const fmpq_mat_t A,
+                                                   const fmpq * b, slong blen);
+
+FLINT_DLL void fmpq_mat_mul_fmpz_vec(fmpq* c, const fmpq_mat_t A,
+                                                   const fmpz * b, slong blen);
+
+FLINT_DLL void fmpq_mat_mul_fmpq_vec_ptr(fmpq * const * c, const fmpq_mat_t A,
+                                           const fmpq * const * b, slong blen);
+
+FLINT_DLL void fmpq_mat_mul_fmpz_vec_ptr(fmpq * const * c, const fmpq_mat_t A,
+                                           const fmpz * const * b, slong blen);
+
+FLINT_DLL void fmpq_mat_fmpq_vec_mul(fmpq* c, const fmpq* a, slong alen,
+                                                           const fmpq_mat_t B);
+
+FLINT_DLL void fmpq_mat_fmpz_vec_mul(fmpq * c, const fmpz * a, slong alen,
+                                                           const fmpq_mat_t B);
+
+FLINT_DLL void fmpq_mat_fmpq_vec_mul_ptr(fmpq * const * c,
+                       const fmpq * const * a, slong alen, const fmpq_mat_t B);
+
+FLINT_DLL void fmpq_mat_fmpz_vec_mul_ptr(fmpq * const * c,
+                       const fmpz * const * a, slong alen, const fmpq_mat_t B);
+
 /* Kronecker product *********************************************************/
 
 FLINT_DLL void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);

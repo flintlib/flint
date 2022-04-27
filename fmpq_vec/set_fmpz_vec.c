@@ -16,11 +16,6 @@ void
 _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len)
 {
     slong i;
-    fmpz_t one;
-    fmpz_init_set_ui(one, 1);
-
     for (i = 0; i < len; i++)
-        fmpq_set_fmpz_frac(res + i, vec + i, one);
-
-    fmpz_clear(one);
+        fmpq_set_fmpz(res + i, vec + i);
 }
