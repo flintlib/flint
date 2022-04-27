@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 
 void
-fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
+fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac)
 {
     slong i;
 
@@ -52,7 +52,7 @@ fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
 }
 
 void
-fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
 {
     fmpz_factor_t fac;
 
@@ -64,7 +64,7 @@ fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     fmpz_factor_init(fac);
     fmpz_factor(fac, n);
-    fmpz_factor_divisor_sigma(res, fac, k);
+    fmpz_factor_divisor_sigma(res, k, fac);
     fmpz_factor_clear(fac);
 }
 

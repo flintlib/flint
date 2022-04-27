@@ -388,7 +388,7 @@ Multiplicative functions
 
 .. function:: void arith_euler_phi(fmpz_t res, const fmpz_t n)
               int arith_moebius_mu(const fmpz_t n)
-              void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+              void arith_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
 
     These are aliases for the functions in the fmpz module.
 

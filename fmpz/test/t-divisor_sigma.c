@@ -18,7 +18,7 @@
 #include "ulong_extras.h"
 #include "arith.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+void fmpz_sigma_naive(fmpz_t x, ulong k, ulong n)
 {
     slong i = 0;
 
@@ -60,8 +60,8 @@ int main(void)
         for (k = 0; k < 10; k++)
         {
             fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
+            fmpz_divisor_sigma(a, k, m);
+            fmpz_sigma_naive(b, k, n);
             if (!fmpz_equal(a, b))
             {
                 flint_printf("FAIL:\n");

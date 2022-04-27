@@ -110,7 +110,7 @@ FLINT_DLL void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac);
 
 FLINT_DLL int fmpz_factor_moebius_mu(const fmpz_factor_t fac);
 
-FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
+FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac);
 
 /* ECM Factoring functions ***************************************************/
 
