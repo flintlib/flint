@@ -66,7 +66,7 @@ fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den,
     
     fmpz_mat_init_set(LU, A);
     rank = fmpz_mat_fflu(LU, den, perm, LU, 0);
-
+    
     result = !fmpz_is_zero(den) && fmpz_mat_solve_fflu_precomp(X, perm, LU, B);
 
     if (result)
@@ -78,25 +78,25 @@ fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den,
            fmpz_mat_neg(X, X);
         }
 
-    if (rank < n)
-	{
-        _fmpz_mat_window_with_perm_init(Ap, perm, A, rank);
-        _fmpz_mat_window_with_perm_init(Bp, perm, B, rank);
+        if (rank < n)
+	    {
+           _fmpz_mat_window_with_perm_init(Ap, perm, A, rank);
+           _fmpz_mat_window_with_perm_init(Bp, perm, B, rank);
 
-	    fmpz_mat_init(P1, fmpz_mat_nrows(Ap), fmpz_mat_ncols(X));
-        fmpz_mat_init(P2, fmpz_mat_nrows(Bp), fmpz_mat_ncols(Bp));
+	       fmpz_mat_init(P1, fmpz_mat_nrows(Ap), fmpz_mat_ncols(X));
+           fmpz_mat_init(P2, fmpz_mat_nrows(Bp), fmpz_mat_ncols(Bp));
 
-	    fmpz_mat_mul(P1, Ap, X);
-        fmpz_mat_scalar_mul_fmpz(P2, Bp, den);
+	       fmpz_mat_mul(P1, Ap, X);
+           fmpz_mat_scalar_mul_fmpz(P2, Bp, den);
 
-	    result = fmpz_mat_equal(P1, P2);
+	       result = fmpz_mat_equal(P1, P2);
 
-        fmpz_mat_clear(P1);
-        fmpz_mat_clear(P2);
+           fmpz_mat_clear(P1);
+           fmpz_mat_clear(P2);
 
-	    _fmpz_mat_window_with_perm_clear(Ap);
-	   _fmpz_mat_window_with_perm_clear(Bp);
-	}
+	       _fmpz_mat_window_with_perm_clear(Ap);
+	       _fmpz_mat_window_with_perm_clear(Bp);
+        }
     } else
         fmpz_zero(den);
 

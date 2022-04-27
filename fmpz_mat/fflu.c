@@ -26,11 +26,11 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
     int small = FLINT_ABS(mbits) <= SMALL_FMPZ_BITCOUNT_MAX;
     int dsgn = 0, sgn, den1 = 0, work_to_do;
 
+    /* we set den in case matrix has no pivots */
+    fmpz_one(den);
+
     if (fmpz_mat_is_empty(A))
-    {
-        fmpz_one(den);
         return 0;
-    }
 
     fmpz_mat_set(B, A);
     m = B->r;
