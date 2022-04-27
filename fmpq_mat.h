@@ -323,6 +323,9 @@ FLINT_DLL int fmpq_mat_can_solve_fraction_free(fmpq_mat_t X,
 FLINT_DLL int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
 FLINT_DLL int fmpq_mat_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
+FLINT_DLL int
+fmpq_mat_can_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+
 /* Inverse *******************************************************************/
 
 FLINT_DLL int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
