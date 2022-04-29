@@ -21,13 +21,13 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
     const slong alloc = (R == NULL) ? lenA : 0;
     slong lenR = lenB - 1, iQ;
     TMP_INIT;
-	
-	TMP_START;
-	
+
+    TMP_START;
+
     if (alloc)
         FMPZ_VEC_TMP_INIT(R, alloc);
 
-	if (R != A)
+    if (R != A)
         _fmpz_vec_set(R + lenR, A + lenR, lenA - lenR);
 
     for (iQ = lenA - lenB; iQ >= 0; iQ--)
@@ -44,7 +44,7 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
             _fmpz_vec_scalar_submul_fmpz(R + lenA - lenR - 1, B, lenR, Q + iQ);
         }
         if (iQ > 0)
-			fmpz_mod(R + lenA - 2, R + lenA - 2, p);
+            fmpz_mod(R + lenA - 2, R + lenA - 2, p);
 
         if (lenR - 1 >= iQ)
         {
@@ -57,12 +57,12 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
 
     if (alloc)
         FMPZ_VEC_TMP_CLEAR(R, alloc);
-	
-	TMP_END;
+
+    TMP_END;
 }
 
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
-                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+                            const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     fmpz *q;
@@ -102,7 +102,7 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     }
 
     _fmpz_mod_poly_div_basecase(q, NULL, A->coeffs, lenA,
-                             B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
+            B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
 
     if (Q == A || Q == B)
     {
@@ -118,4 +118,3 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
 
     fmpz_clear(invB);
 }
-
