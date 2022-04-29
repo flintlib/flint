@@ -230,7 +230,7 @@ uninstall:
 build:
 	mkdir -p build
 
-build/CPimport.h: qadic/CPimport.txt build
+build/CPimport.h: qadic/CPimport.txt | build
 	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
 
 build/%.lo: %.c $(HEADERS) | build
