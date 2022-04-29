@@ -33,10 +33,10 @@ int main(void)
         slong a = z_randtest(state);
         slong n = z_randtest(state);
 
-        if (n_randlimb(state) & 1)
+        if (n_randlimb(state) & 1 && a != WORD_MIN)
             a = -a;
 
-        if (n_randlimb(state) & 1)
+        if (n_randlimb(state) & 1 && n != WORD_MIN)
             n = -n;
 
         flint_mpz_set_si(aa, a);
