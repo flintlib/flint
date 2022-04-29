@@ -17,5 +17,5 @@ fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c)
     if (c > 0)
         fmpz_mat_scalar_submul_ui(B, A, c);
     else
-        fmpz_mat_scalar_addmul_ui(B, A, -c);
+        fmpz_mat_scalar_addmul_ui(B, A, -((ulong) c));
 }

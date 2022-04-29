@@ -30,7 +30,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong boundary_limit_bit = FLINT_BITS - bits;
 
-        mp_limb_t mask = (WORD(1) << bits) - WORD(1);
+        mp_limb_t mask = (UWORD(1) << bits) - UWORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -80,7 +80,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 2 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (WORD(1) << (bits - FLINT_BITS)) - WORD(1);
+        mp_limb_t mask = (UWORD(1) << (bits - FLINT_BITS)) - UWORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -136,7 +136,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 3 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (WORD(1) << (bits - 2 * FLINT_BITS)) - WORD(1);
+        mp_limb_t mask = (UWORD(1) << (bits - 2 * FLINT_BITS)) - UWORD(1);
 
         for (i = 0; i < len; i++)
         {

@@ -59,7 +59,7 @@ void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c)
       fmpz_poly_set(res, poly);
 
       if (c < 0)
-         fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, -c);
+         fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, -((ulong) c));
       else
          fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, c);
 
@@ -76,7 +76,7 @@ void fmpz_poly_si_sub(fmpz_poly_t res, slong c, const fmpz_poly_t poly)
         fmpz_poly_neg(res, poly);
 
         if (c < 0)
-            fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, -c);
+            fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, -((ulong) c));
          else
             fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, c);
 

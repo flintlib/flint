@@ -24,5 +24,5 @@ _fmpz_vec_scalar_addmul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
             fmpz_addmul_ui(vec1 + i, vec2 + i, c);
     else
         for (i = 0; i < len2; i++)
-            fmpz_submul_ui(vec1 + i, vec2 + i, -c);
+            fmpz_submul_ui(vec1 + i, vec2 + i, -((ulong) c));
 }
