@@ -231,7 +231,7 @@ build:
 	mkdir -p build
 
 build/CPimport.h: qadic/CPimport.txt | build
-	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
+	$(AT)cp $< $@
 
 build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;

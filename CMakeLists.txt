@@ -107,24 +107,7 @@ foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
     list(APPEND HEADERS ${TEMP})
 endforeach ()
 
-execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} -c 
-"
-from os.path import join
-
-with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
-    with open('CPimport.h.in', 'w+') as fout:
-        while True:
-            l = fin.readline()
-            if not l:
-                break
-            l = l.replace(' ', ',')
-            l = l.replace('\\n', ',\\n')
-            fout.writelines([l])
-"
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/qadic/CPimport.txt ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
 
 # Setup for flint-config.h
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
