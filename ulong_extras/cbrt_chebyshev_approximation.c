@@ -73,7 +73,6 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
     const int mantissa_bits = 52;
     const mp_limb_t bias_hex = 0x3FE0000000000000;      
     const int bias = 1022;
-    alias.double_val = (double)n;
 #else
     const mp_limb_t upper_limit = 1625;         /* 1625 < (2^32)^(1/3) */
     const mp_limb_t expo_mask = 0x7F800000;     /* exponent bits in float */
@@ -82,6 +81,14 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
     const int mantissa_bits = 23;
     const mp_limb_t bias_hex = 0x3F000000;      
     const int bias = 126;
+#endif
+
+    if (n == 0)
+        return (mp_limb_t) 0;
+
+#ifdef FLINT64
+    alias.double_val = (double)n;
+#else
     alias.double_val = (float)n;
 #endif
 
