@@ -62,14 +62,14 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
          limbs = size_j - 1;
          bits = FLINT_BIT_COUNT(coeff[size_j - 1]); 
          if (bits == FLINT_BITS) mask = WORD(0);
-         else mask = WORD(-1) - ((WORD(1)<<bits) - 1);  
+         else mask = WORD(-1) - (slong) ((UWORD(1) << bits) - 1);
       } else if (size_j == limbs + 1) /* coeff is same size as prev biggest */
       {
          if (coeff[size_j - 1] & mask) /* see if we have more bits than before */
          {
             bits = FLINT_BIT_COUNT(coeff[size_j - 1]);   
             if (bits == FLINT_BITS) mask = WORD(0);
-            else mask = WORD(-1) - ((WORD(1)<<bits) - 1);
+            else mask = WORD(-1) - (slong) ((UWORD(1) << bits) - 1);
          }
       }
       
