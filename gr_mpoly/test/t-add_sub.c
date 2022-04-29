@@ -60,6 +60,12 @@ main(void)
             status |= gr_mpoly_add(h, g, f, mctx, cctx);
             status |= gr_mpoly_sub(k, h, g, mctx, cctx);
 
+            if (status == GR_SUCCESS)
+            {
+                gr_mpoly_assert_canonical(h, mctx, cctx);
+                gr_mpoly_assert_canonical(k, mctx, cctx);
+            }
+
             if (status == GR_SUCCESS && gr_mpoly_equal(f, k, mctx, cctx) == T_FALSE)
             {
                 flint_printf("FAIL: Check (f + g) - g = f\n");

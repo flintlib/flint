@@ -69,8 +69,19 @@ main(void)
             else
                 status |= gr_mpoly_mul_johnson(k1, k1, f, mctx, cctx);
 
+            if (status == GR_SUCCESS)
+                gr_mpoly_assert_canonical(k1, mctx, cctx);
+
             status |= gr_mpoly_mul_johnson(k2, f, g, mctx, cctx);
+
+            if (status == GR_SUCCESS)
+                gr_mpoly_assert_canonical(k2, mctx, cctx);
+
             status |= gr_mpoly_mul_johnson(t, f, h, mctx, cctx);
+
+            if (status == GR_SUCCESS)
+                gr_mpoly_assert_canonical(t, mctx, cctx);
+
             status |= gr_mpoly_add(k2, k2, t, mctx, cctx);
 
             if (status == GR_SUCCESS && gr_mpoly_equal(k1, k2, mctx, cctx) == T_FALSE)

@@ -165,6 +165,10 @@ int gr_mpoly_combine_like_terms(
     gr_mpoly_t A,
     const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
+truth_t gr_mpoly_is_canonical(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+void gr_mpoly_assert_canonical(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
 /* Random generation */
 
 int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx, gr_ctx_t cctx);
