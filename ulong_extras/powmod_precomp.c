@@ -42,7 +42,7 @@ n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
     if (exp < 0)
     {
         a = n_invmod(a, n);
-        exp = -exp;
+        exp = -((ulong) exp);
     }
 
     return n_powmod_ui_precomp(a, exp, n, npre);

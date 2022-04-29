@@ -51,7 +51,7 @@ int main(void)
       flint_mpz_set_ui(d_m, d);
       if (exp < WORD(0))
       {
-         flint_mpz_powm_ui(r2_m, a_m, -exp, d_m);
+         flint_mpz_powm_ui(r2_m, a_m, -((ulong) exp), d_m);
          mpz_invert(r2_m, r2_m, d_m);
       } else
          flint_mpz_powm_ui(r2_m, a_m, exp, d_m);      

@@ -58,7 +58,7 @@ typedef struct
 
 #define NMOD_RED(r, a, mod) \
    do { \
-      NMOD_RED2(r, 0, a, mod); \
+      NMOD_RED2(r, UWORD(0), a, mod); \
    } while (0)
 
 #define NMOD2_RED2(r, a_hi, a_lo, mod) \

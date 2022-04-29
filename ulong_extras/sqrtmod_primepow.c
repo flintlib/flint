@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,11 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#include <stdlib.h>
-#undef ulong
-#define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -63,7 +59,8 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
     if (r) /* a is odd */
     {
         mp_limb_t roots[2];
-        slong i, ex, pow;
+        slong i, ex;
+        ulong pow;
 
         if ((a & 7) != 1) /* check square root exists */
         {
@@ -111,7 +108,8 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         return 4;        
     } else /* a is even */
     {
-        slong i, k, num, pow;
+        slong i, k, num;
+        ulong pow;
         
         for (k = 2; k <= exp; k++) /* find highest power of 2 dividing a */
         {
