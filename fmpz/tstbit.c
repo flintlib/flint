@@ -17,7 +17,7 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
     {
         if (i < FLINT_BITS)
         {
-            return ((WORD(1) << i) & *f) != 0;
+            return ((UWORD(1) << i) & *f) != 0;
         }
         else  /* i >= FLINT_BITS */
         {

@@ -54,7 +54,7 @@ void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong x)
         mpz_ptr pF = _fmpz_promote_val(f);
 
         if (x < 0)
-            flint_mpz_addmul_ui(pF, pG, -x);
+            flint_mpz_addmul_ui(pF, pG, -((ulong) x));
         else
             flint_mpz_submul_ui(pF, pG, x);
 
