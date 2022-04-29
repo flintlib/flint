@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include <limits.h>
+#include "flint.h"
 
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
@@ -157,7 +158,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
      overflow.	After this exp can of course be reduced to anywhere within
      the {ptr,size} region without underflow.  */
   if ((unsigned long) (FLINT_BITS * size)
-		> (unsigned long) (LONG_MAX - exp))
+		> (unsigned long) (((unsigned long) LONG_MAX) - ((unsigned long) exp)))
     {
 	goto ieee_infinity;
 
