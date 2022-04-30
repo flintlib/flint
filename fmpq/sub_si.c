@@ -30,7 +30,7 @@ _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
         if (r >= 0)
            fmpz_sub_ui(rnum, p, r);
         else
-           fmpz_add_ui(rnum, p, -r);
+           fmpz_add_ui(rnum, p, -((ulong) r));
 
         fmpz_set(rden, q);
         return;

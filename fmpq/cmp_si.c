@@ -35,7 +35,7 @@ _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c)
     bp = fmpz_bits(p);
     bq = fmpz_bits(q);
 
-    d = -c;
+    d = -((ulong) c);
 
     if (c != d) /* check for SLONG_MIN */
     {
