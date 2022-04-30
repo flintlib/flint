@@ -22,6 +22,7 @@ void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps,
     TMP_INIT;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
+    FLINT_ASSERT(bits != 0);
 
     N = mpoly_words_per_exp_sp(bits, mctx);
 
