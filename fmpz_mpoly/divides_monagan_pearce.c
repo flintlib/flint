@@ -220,7 +220,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                if ((qq & (WORD(3) << (SMALL_FMPZ_BITCOUNT_MAX))) == WORD(0))
+                if (((ulong) qq & (UWORD(3) << (SMALL_FMPZ_BITCOUNT_MAX))) == UWORD(0))
                 {
                     _fmpz_demote(p1 + k);
                     p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
@@ -540,7 +540,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                if ((qq & (WORD(3) << (SMALL_FMPZ_BITCOUNT_MAX))) == WORD(0))
+                if (((ulong) qq & (UWORD(3) << (SMALL_FMPZ_BITCOUNT_MAX))) == UWORD(0))
                 {
                     _fmpz_demote(p1 + k);
                     p1[k] = (qq^(ds^lc_sign)) - (ds^lc_sign);
