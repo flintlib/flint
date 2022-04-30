@@ -715,6 +715,9 @@ void mpoly_monomial_set_extra(ulong * exp2, const ulong * exp3,
 MPOLY_INLINE
 void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
 {
+    if (N == 0 || len == 0)
+        return;
+
     memcpy(exp1, exp2, N*len*sizeof(ulong));
 }
 
