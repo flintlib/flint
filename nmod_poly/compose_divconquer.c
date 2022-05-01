@@ -180,7 +180,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, slong len1,
         }
         if ((n & WORD(1)))
         {
-            flint_mpn_copyi(h[i], h[2*i], hlen[2*i]);
+            FLINT_MPN_COPYI(h[i], h[2*i], hlen[2*i]);
             hlen[i] = hlen[2*i];
         }
         

@@ -23,7 +23,7 @@ void fmpz_mod_poly_set_coeff_si(fmpz_mod_poly_t poly, slong n, slong x,
 
     if (n + 1 > poly->length)
     {
-        flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+        FLINT_MPN_ZERO((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
         poly->length = n + 1;
     }
 

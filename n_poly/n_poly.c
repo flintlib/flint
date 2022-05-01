@@ -86,7 +86,7 @@ void n_poly_set_coeff(n_poly_t poly, slong j, ulong c)
     }
     else if (c != 0) /* extend polynomial */
     {
-        flint_mpn_zero(poly->coeffs + poly->length, j - poly->length);
+        FLINT_MPN_ZERO(poly->coeffs + poly->length, j - poly->length);
         poly->coeffs[j] = c;
         poly->length = j + 1;
     }

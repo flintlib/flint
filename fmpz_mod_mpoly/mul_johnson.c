@@ -91,7 +91,7 @@ void _fmpz_mod_mpoly_mul_johnson1(
             acc_d = acc->_mp_d;
             t_d = t->_mp_d;
 
-            flint_mpn_zero(acc_d, 2*n+1);
+            FLINT_MPN_ZERO(acc_d, 2*n+1);
             do {
                 x = _mpoly_heap_pop1(heap, &heap_len, cmpmask);
                 do {
@@ -300,7 +300,7 @@ void _fmpz_mod_mpoly_mul_johnson(
             acc_d = acc->_mp_d;
             t_d = t->_mp_d;
 
-            flint_mpn_zero(acc_d, 2*n+1);
+            FLINT_MPN_ZERO(acc_d, 2*n+1);
             do {
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);

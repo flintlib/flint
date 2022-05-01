@@ -45,7 +45,7 @@ _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
 
     if (bits <= FLINT_BITS)
     {
-        flint_mpn_zero(res, len1 + len2 - 1);
+        FLINT_MPN_ZERO(res, len1 + len2 - 1);
 
         if (squaring)
         {

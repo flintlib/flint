@@ -60,7 +60,7 @@ main(void)
             for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
             {
                 jj[i] = ptr;
-                flint_mpn_copyi(jj[i], ii[i], size);
+                FLINT_MPN_COPYI(jj[i], ii[i], size);
             }
    
             fft_truncate_sqrt2(ii, n, w, &t1, &t2, &s1, trunc);

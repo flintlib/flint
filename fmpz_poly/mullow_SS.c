@@ -85,13 +85,13 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     /* put coefficients into FFT vecs */
     bits1 = _fmpz_vec_get_fft(ii, input1, limbs, len1);
     for (i = len1; i < 4*n; i++)
-        flint_mpn_zero(ii[i], limbs + 1);
+        FLINT_MPN_ZERO(ii[i], limbs + 1);
 
     if (input1 != input2) 
     {
         bits2 = _fmpz_vec_get_fft(jj, input2, limbs, len2);
         for (i = len2; i < 4*n; i++)
-            flint_mpn_zero(jj[i], limbs + 1);
+            FLINT_MPN_ZERO(jj[i], limbs + 1);
     }
     else bits2 = bits1;
 

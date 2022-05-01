@@ -16,8 +16,8 @@
 
 void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, slong len, slong k)
 {
-    flint_mpn_copyd(res + k, poly, len);
-    flint_mpn_zero(res, k);
+    FLINT_MPN_COPYD(res + k, poly, len);
+    FLINT_MPN_ZERO(res, k);
 }
 
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)

@@ -140,7 +140,7 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
                to reallocate the output. */
             t->_mp_d = TMP_ALLOC(sizeof(mp_limb_t) * cn);
             t->_mp_size = t->_mp_alloc = cn;
-            flint_mpn_copyi(t->_mp_d, cp->_mp_d, cn);
+            FLINT_MPN_COPYI(t->_mp_d, cp->_mp_d, cn);
 
             mpz_gcd(rp, ap, bp);
             if (mpz_cmpabs_ui(rp, 1) != 0)

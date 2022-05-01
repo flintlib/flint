@@ -201,7 +201,7 @@ main(void)
         {
             nmod_poly_fit_length(res + j, c->length - 1);
             _nmod_poly_set_length(res + j, c->length - 1);
-            flint_mpn_zero(res[j].coeffs, c->length - 1);
+            FLINT_MPN_ZERO(res[j].coeffs, c->length - 1);
 
 	    args1[j].A        = B;
             args1[j].res      = res + j;

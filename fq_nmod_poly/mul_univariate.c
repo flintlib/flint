@@ -35,11 +35,11 @@ _fq_nmod_poly_mul_univariate_no_pad (fq_nmod_struct * rop,
     cop1 = (mp_limb_t *) flint_malloc(clen1*sizeof(mp_limb_t));
     for (i = 0; i < len1 - 1; i++)
     {
-        flint_mpn_copyi(cop1 + pfqlen*i, (op1 + i)->coeffs, (op1 + i)->length);
-        flint_mpn_zero(cop1 + pfqlen*i + (op1 + i)->length, pfqlen - (op1 + i)->length);
+        FLINT_MPN_COPYI(cop1 + pfqlen*i, (op1 + i)->coeffs, (op1 + i)->length);
+        FLINT_MPN_ZERO(cop1 + pfqlen*i + (op1 + i)->length, pfqlen - (op1 + i)->length);
     }
     {
-        flint_mpn_copyi(cop1 + pfqlen*i, (op1 + i)->coeffs, (op1 + i)->length);
+        FLINT_MPN_COPYI(cop1 + pfqlen*i, (op1 + i)->coeffs, (op1 + i)->length);
     }
 
     if (op2 != op1)
@@ -47,11 +47,11 @@ _fq_nmod_poly_mul_univariate_no_pad (fq_nmod_struct * rop,
         cop2 = (mp_limb_t *) flint_malloc(clen2*sizeof(mp_limb_t));
         for (i = 0; i < len2 - 1; i++)
         {
-            flint_mpn_copyi(cop2 + pfqlen*i, (op2 + i)->coeffs,(op2 + i)->length);
-            flint_mpn_zero(cop2 + pfqlen*i + (op2 + i)->length, pfqlen - (op2 + i)->length);
+            FLINT_MPN_COPYI(cop2 + pfqlen*i, (op2 + i)->coeffs,(op2 + i)->length);
+            FLINT_MPN_ZERO(cop2 + pfqlen*i + (op2 + i)->length, pfqlen - (op2 + i)->length);
         }
         {
-            flint_mpn_copyi(cop2 + pfqlen*i, (op2 + i)->coeffs, (op2 + i)->length);
+            FLINT_MPN_COPYI(cop2 + pfqlen*i, (op2 + i)->coeffs, (op2 + i)->length);
         }
     }
     else
@@ -73,7 +73,7 @@ _fq_nmod_poly_mul_univariate_no_pad (fq_nmod_struct * rop,
         while (len && (*(crop + pfqlen*i + len - 1) == UWORD(0))) len--;
         nmod_poly_fit_length(rop + i, len);
         (rop + i)->length = len;
-        flint_mpn_copyi((rop + i)->coeffs, crop + pfqlen*i, len);
+        FLINT_MPN_COPYI((rop + i)->coeffs, crop + pfqlen*i, len);
     }
     {
         len = lrlen;
@@ -85,7 +85,7 @@ _fq_nmod_poly_mul_univariate_no_pad (fq_nmod_struct * rop,
         }
         nmod_poly_fit_length(rop + i, len);
         (rop + i)->length = len;
-        flint_mpn_copyi((rop + i)->coeffs, crop + pfqlen*i, len);
+        FLINT_MPN_COPYI((rop + i)->coeffs, crop + pfqlen*i, len);
     }
 
     flint_free(cop1);

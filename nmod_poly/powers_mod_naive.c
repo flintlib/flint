@@ -37,14 +37,14 @@ _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f, slong flen, slong 
         res[0][0] = 1;
 
     if (glen > 2)
-       flint_mpn_zero(res[0] + 1, glen - 2);
+       FLINT_MPN_ZERO(res[0] + 1, glen - 2);
     
     if (n == 1)
        return;
 
     /* f^1 = f */
     _nmod_vec_set(res[1], f, flen);
-    flint_mpn_zero(res[1] + flen, glen - flen - 1);
+    FLINT_MPN_ZERO(res[1] + flen, glen - flen - 1);
 
     if (n == 2)
        return;

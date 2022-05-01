@@ -98,7 +98,7 @@ _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f,
             res[0][0] = 1;
 
         if (glen > 2)
-            flint_mpn_zero(res[0] + 1, glen - 2);
+            FLINT_MPN_ZERO(res[0] + 1, glen - 2);
 
         return;
     }

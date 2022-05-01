@@ -20,9 +20,9 @@ nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t
     slong r2 = mat2->r;
 
     for (i = 0; i < r1; i++)
-    	flint_mpn_copyi(res->rows[i], mat1->rows[i], c1);
+    	FLINT_MPN_COPYI(res->rows[i], mat1->rows[i], c1);
 
     for (i = 0; i < r2; i++)
-    	flint_mpn_copyi(res->rows[i + r1], mat2->rows[i], c1);
+    	FLINT_MPN_COPYI(res->rows[i + r1], mat2->rows[i], c1);
 
 }

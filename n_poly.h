@@ -218,7 +218,7 @@ N_POLY_INLINE
 void n_poly_set(n_poly_t A, const n_poly_t B)
 {
     n_poly_fit_length(A, B->length);
-    flint_mpn_copyi(A->coeffs, B->coeffs, B->length);
+    FLINT_MPN_COPYI(A->coeffs, B->coeffs, B->length);
     A->length = B->length;
 }
 
@@ -333,7 +333,7 @@ void n_poly_set_coeff_nonzero(n_poly_t A, slong j, ulong c)
     if (j >= A->length)
     {
         n_poly_fit_length(A, j + 1);
-        flint_mpn_zero(A->coeffs + A->length, j - A->length);
+        FLINT_MPN_ZERO(A->coeffs + A->length, j - A->length);
         A->length = j + 1;
     }
     A->coeffs[j] = c;
@@ -347,7 +347,7 @@ N_POLY_INLINE
 void n_poly_set_nmod_poly(n_poly_t a, const nmod_poly_t b)
 {
     n_poly_fit_length(a, b->length);
-    flint_mpn_copyi(a->coeffs, b->coeffs, b->length);
+    FLINT_MPN_COPYI(a->coeffs, b->coeffs, b->length);
     a->length = b->length;
 }
 
@@ -355,7 +355,7 @@ N_POLY_INLINE
 void nmod_poly_set_n_poly(nmod_poly_t a, const n_poly_t b)
 {
     nmod_poly_fit_length(a, b->length);
-    flint_mpn_copyi(a->coeffs, b->coeffs, b->length);
+    FLINT_MPN_COPYI(a->coeffs, b->coeffs, b->length);
     a->length = b->length;
 }
 

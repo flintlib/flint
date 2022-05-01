@@ -68,43 +68,6 @@
 
 
 /*
- * mpn macros
- */
-#define flint_mpn_zero(xxx, nnn)                \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = 0; ixxx < (nnn); ixxx++)    \
-            (xxx)[ixxx] = UWORD(0);             \
-    } while (0)
-
-#define flint_mpn_copyi(xxx, yyy, nnn)          \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = 0; ixxx < (nnn); ixxx++)    \
-            (xxx)[ixxx] = (yyy)[ixxx];          \
-    } while (0)
-
-#define flint_mpn_copyd(xxx, yyy, nnn)          \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
-            (xxx)[ixxx] = (yyy)[ixxx];          \
-    } while (0)
-
-#define flint_mpn_store(xxx, nnn, yyy)          \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = 0; ixxx < nnn; ixxx++)      \
-        (xxx)[ixxx] = yyy;                      \
-    } while (0)
-
-
-
-/*
  * Newton iteration macros
  */
 #define FLINT_NEWTON_INIT(from, to)                     \

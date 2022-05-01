@@ -98,7 +98,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
             if (0 > (slong) ptr[1])
                mpn_neg(p, ptr, 2);
             else
-               flint_mpn_copyi(p, ptr, 2);
+               FLINT_MPN_COPYI(p, ptr, 2);
 
             /* not exact quotient monomial, thus remainder monomial */
             if (!mpoly_monomial_divides_tight(i, max3, prods, num))
@@ -214,7 +214,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
             if (0 > (slong) ptr[2])
                mpn_neg(p, ptr, 3);
             else
-               flint_mpn_copyi(p, ptr, 3);
+               FLINT_MPN_COPYI(p, ptr, 3);
 
             /* not exact quotient monomial, thus remainder monomial */
             if (!mpoly_monomial_divides_tight(i, max3, prods, num))

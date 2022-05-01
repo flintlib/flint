@@ -46,15 +46,15 @@ void _n_fq_poly_mullow_(
     cop1 = n_poly_stack_vec_init(St, clen1);
     for (i = 0; i < len1; i++)
     {
-        flint_mpn_copyi(cop1 + pfqlen*i, op1 + d*i, d);
-        flint_mpn_zero(cop1 + pfqlen*i + d, pfqlen - d);
+        FLINT_MPN_COPYI(cop1 + pfqlen*i, op1 + d*i, d);
+        FLINT_MPN_ZERO(cop1 + pfqlen*i + d, pfqlen - d);
     }
 
     cop2 = n_poly_stack_vec_init(St, clen2);
     for (i = 0; i < len2; i++)
     {
-        flint_mpn_copyi(cop2 + pfqlen*i, op2 + d*i, d);
-        flint_mpn_zero(cop2 + pfqlen*i + d, pfqlen - d);
+        FLINT_MPN_COPYI(cop2 + pfqlen*i, op2 + d*i, d);
+        FLINT_MPN_ZERO(cop2 + pfqlen*i + d, pfqlen - d);
     }
 
     crop = n_poly_stack_vec_init(St, cmlen);

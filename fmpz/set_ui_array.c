@@ -36,6 +36,6 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
         if (mpz->_mp_alloc < size)
             mpz_realloc2(mpz, FLINT_BITS * size);
         mpz->_mp_size = size;
-        flint_mpn_copyi(mpz->_mp_d, in, size);
+        FLINT_MPN_COPYI(mpz->_mp_d, in, size);
     }
 }

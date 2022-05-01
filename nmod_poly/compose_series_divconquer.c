@@ -136,7 +136,7 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, slong len1,
         if ((n & WORD(1)))
         {
             hlen[i] = FLINT_MIN(N, hlen[2*i]);
-            flint_mpn_copyi(h[i], h[2*i], hlen[i]);
+            FLINT_MPN_COPYI(h[i], h[2*i], hlen[i]);
         }
         
         _nmod_poly_mullow(temp, pow, powlen, pow, powlen, 

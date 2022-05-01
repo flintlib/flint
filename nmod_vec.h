@@ -55,7 +55,7 @@ FLINT_DLL void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmo
 NMOD_VEC_INLINE
 void _nmod_vec_zero(mp_ptr vec, slong len)
 {
-   flint_mpn_zero(vec, len);
+   FLINT_MPN_ZERO(vec, len);
 }
 
 FLINT_DLL flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
@@ -63,7 +63,7 @@ FLINT_DLL flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
 NMOD_VEC_INLINE
 void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
 {
-   flint_mpn_copyi(res, vec, len);
+   FLINT_MPN_COPYI(res, vec, len);
 }
 
 NMOD_VEC_INLINE

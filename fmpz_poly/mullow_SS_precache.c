@@ -73,7 +73,7 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     pre->bits2 = _fmpz_vec_get_fft(pre->jj, poly2->coeffs,
                                                         pre->limbs, pre->len2);
     for (i = pre->len2; i < 4*pre->n; i++)
-        flint_mpn_zero(pre->jj[i], size);
+        FLINT_MPN_ZERO(pre->jj[i], size);
 
     pre->bits2 = FLINT_ABS(pre->bits2);
 
@@ -139,7 +139,7 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
     /* put coefficients into FFT vecs */
     _fmpz_vec_get_fft(ii, input1, pre->limbs, len1);
     for (i = len1; i < 4*pre->n; i++)
-        flint_mpn_zero(ii[i], size);
+        FLINT_MPN_ZERO(ii[i], size);
 
     fft_convolution_precache(ii, pre->jj, pre->loglen - 2, pre->limbs,
                                                       len_out, t1, t2, s1, tt);

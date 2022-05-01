@@ -68,7 +68,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     if (normbits)
         mpn_lshift(n, temp, n_size, normbits);
     else
-        flint_mpn_copyi(n, temp, n_size);
+        FLINT_MPN_COPYI(n, temp, n_size);
 
     flint_mpn_preinvn(ninv, n, n_size);
 
@@ -125,9 +125,9 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
         else
         {
             temp = COEFF_TO_PTR(*fy)->_mp_d;
-            flint_mpn_copyi(y, temp, n_size);
+            FLINT_MPN_COPYI(y, temp, n_size);
             temp = COEFF_TO_PTR(*fa)->_mp_d;
-            flint_mpn_copyi(a, temp, n_size);
+            FLINT_MPN_COPYI(a, temp, n_size);
         }
 
         ret = flint_mpn_factor_pollard_brent_single(fac->_mp_d, n, ninv, a, y, n_size, normbits, max_iters);

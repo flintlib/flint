@@ -405,7 +405,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
             Hc = _nmod_mpolyu_get_coeff(H, pack_exp3(0, x, z), ctx);
             nmod_mpoly_fit_length(Hc, n, ctx);
             old_len = Hc->length;
-            flint_mpn_copyi(Hc->coeffs + old_len, p, n);
+            FLINT_MPN_COPYI(Hc->coeffs + old_len, p, n);
             for (j = 0; j < n; j++)
                 mpoly_monomial_set(Hc->exps + N*(old_len + j), Bexps + N*ind[j], N);
 
@@ -497,7 +497,7 @@ static void n_polyu3_add_zip_limit1(
             Zexps[Zi] = Aexps[Ai] + ai;
             n_poly_fit_length(Zcoeffs + Zi, fit_length);
             Zcoeffs[Zi].length = cur_length;
-            flint_mpn_zero(Zcoeffs[Zi].coeffs, cur_length);
+            FLINT_MPN_ZERO(Zcoeffs[Zi].coeffs, cur_length);
             goto in_both;            
         }
         else if (Aexps[Ai] + ai < Zexps[Zi])
@@ -542,7 +542,7 @@ static void n_polyu3_add_zip_limit1(
         Zexps[Zi] = Aexps[Ai] + ai;
         n_poly_fit_length(Zcoeffs + Zi, fit_length);
         Zcoeffs[Zi].length = cur_length;
-        flint_mpn_zero(Zcoeffs[Zi].coeffs, cur_length);
+        FLINT_MPN_ZERO(Zcoeffs[Zi].coeffs, cur_length);
         FLINT_ASSERT(cur_length == Zcoeffs[Zi].length);
         FLINT_ASSERT(cur_length + 1 <= Zcoeffs[Zi].alloc);
         Zcoeffs[Zi].coeffs[cur_length] = Acoeffs[Ai].coeffs[ai];

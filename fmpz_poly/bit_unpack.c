@@ -87,7 +87,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
     len = (fmpz_bits(f) + bit_size - 1) / bit_size;
 
     mpz_init2(tmp, bit_size*len);
-    flint_mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    FLINT_MPN_ZERO(tmp->_mp_d, tmp->_mp_alloc);
     fmpz_get_mpz(tmp, f);
 
     fmpz_poly_fit_length(poly, len);
@@ -120,7 +120,7 @@ fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
     mpz_init2(tmp, bit_size*len);
 
     /* TODO: avoid all this wastefulness */
-    flint_mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    FLINT_MPN_ZERO(tmp->_mp_d, tmp->_mp_alloc);
     fmpz_get_mpz(tmp, f);
 
     fmpz_poly_fit_length(poly, len + 1);

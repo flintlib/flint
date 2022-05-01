@@ -32,7 +32,7 @@ void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length,
             fmpz_mpoly_realloc(A, FLINT_MAX(new_length, 2*A->alloc), ctx);
 
         /* must zero out the new coeffs/exps past the old end */
-        flint_mpn_zero(A->exps + N*old_length, N*(new_length - old_length));
+        FLINT_MPN_ZERO(A->exps + N*old_length, N*(new_length - old_length));
         _fmpz_vec_zero(A->coeffs + old_length, new_length - old_length);
     }
 

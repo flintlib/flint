@@ -49,7 +49,7 @@ _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1,
 
     if (bits <= FLINT_BITS)
     {
-        flint_mpn_zero(res, n);
+        FLINT_MPN_ZERO(res, n);
 
         if (squaring)
         {

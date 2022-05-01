@@ -92,7 +92,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
         {
             c = 0;
             xp[0] = 1;
-            flint_mpn_zero(xp + 1, n - 1);
+            FLINT_MPN_ZERO(xp + 1, n - 1);
         }
     }
 

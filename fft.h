@@ -61,7 +61,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t 
         t = (mp_ptr) flint_malloc(n * sizeof(mp_limb_t));
         ret = mpn_sub_n(t, x, y, n);
         ret += 2 * mpn_add_n(s, x, y, n);
-        flint_mpn_copyi(d, t, n);
+        FLINT_MPN_COPYI(d, t, n);
         flint_free(t);
         return ret;
     }
@@ -95,7 +95,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t 
 #define random_fermat(nn, state, limbs) \
    do { \
       if (n_randint(state, 10) == 0) { \
-         flint_mpn_zero(nn, limbs); \
+         FLINT_MPN_ZERO(nn, limbs); \
          nn[limbs] = 1; \
       } else { \
          if (n_randint(state, 2) == 0) \

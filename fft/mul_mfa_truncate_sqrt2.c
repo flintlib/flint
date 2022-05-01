@@ -79,7 +79,7 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
 
    j1 = fft_split_bits(ii, i1, n1, bits1, limbs);
    for (j = j1 ; j < 4*n; j++)
-      flint_mpn_zero(ii[j], limbs + 1);
+      FLINT_MPN_ZERO(ii[j], limbs + 1);
    
    fft_mfa_truncate_sqrt2_outer(ii, n, w, t1, t2, s1, sqrt, trunc);
    
@@ -87,7 +87,7 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    {
       j2 = fft_split_bits(jj, i2, n2, bits1, limbs);
       for (j = j2 ; j < 4*n; j++)
-         flint_mpn_zero(jj[j], limbs + 1);
+         FLINT_MPN_ZERO(jj[j], limbs + 1);
 
       fft_mfa_truncate_sqrt2_outer(jj, n, w, t1, t2, s1, sqrt, trunc);
    } else j2 = j1;
@@ -95,7 +95,7 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    fft_mfa_truncate_sqrt2_inner(ii, jj, n, w, t1, t2, s1, sqrt, trunc, tt);
    ifft_mfa_truncate_sqrt2_outer(ii, n, w, t1, t2, s1, sqrt, trunc);
        
-   flint_mpn_zero(r1, r_limbs);
+   FLINT_MPN_ZERO(r1, r_limbs);
    fft_combine_bits(r1, ii, j1 + j2 - 1, bits1, limbs, r_limbs);
      
    flint_free(ii);

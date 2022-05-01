@@ -58,8 +58,8 @@ _split_limbs_worker(void * arg_ptr)
         {
            skip = i*coeff_limbs;
 
-           flint_mpn_zero(poly[i], output_limbs + 1);
-           flint_mpn_copyi(poly[i], limbs + skip, coeff_limbs);
+           FLINT_MPN_ZERO(poly[i], output_limbs + 1);
+           FLINT_MPN_COPYI(poly[i], limbs + skip, coeff_limbs);
         }
     }
 }
@@ -120,10 +120,10 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
     skip = i*coeff_limbs;
    
     if (i < length) 
-        flint_mpn_zero(poly[i], output_limbs + 1);
+        FLINT_MPN_ZERO(poly[i], output_limbs + 1);
    
     if (total_limbs > skip) 
-        flint_mpn_copyi(poly[i], limbs + skip, total_limbs - skip);
+        FLINT_MPN_COPYI(poly[i], limbs + skip, total_limbs - skip);
    
     return length;
 }
@@ -175,14 +175,14 @@ _split_bits_worker(void * arg_ptr)
 
         for ( ; i < end; i++)
         {
-            flint_mpn_zero(poly[i], output_limbs + 1);
+            FLINT_MPN_ZERO(poly[i], output_limbs + 1);
       
             limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
             shift_bits = (i*top_bits) % FLINT_BITS;
 
             if (!shift_bits)
             {
-                flint_mpn_copyi(poly[i], limb_ptr, coeff_limbs);
+                FLINT_MPN_COPYI(poly[i], limb_ptr, coeff_limbs);
                 poly[i][coeff_limbs - 1] &= mask;
                 limb_ptr += (coeff_limbs - 1);
                 shift_bits += top_bits;
@@ -275,12 +275,12 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
     shift_bits = (i*top_bits) % FLINT_BITS;
 
-    flint_mpn_zero(poly[i], output_limbs + 1);
+    FLINT_MPN_ZERO(poly[i], output_limbs + 1);
    
     limbs_left = total_limbs - (limb_ptr - limbs);
    
     if (!shift_bits)
-        flint_mpn_copyi(poly[i], limb_ptr, limbs_left);
+        FLINT_MPN_COPYI(poly[i], limb_ptr, limbs_left);
     else
         mpn_rshift(poly[i], limb_ptr, limbs_left, shift_bits);                   
      

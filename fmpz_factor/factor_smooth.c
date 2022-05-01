@@ -112,7 +112,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     /* Create a temporary copy to be mutated */
     TMP_START;
     xd = TMP_ALLOC(xsize * sizeof(mp_limb_t));
-    flint_mpn_copyi(xd, xsrc->_mp_d, xsize);
+    FLINT_MPN_COPYI(xd, xsrc->_mp_d, xsize);
 
     /* Factor out powers of two */
     xsize = flint_mpn_remove_2exp(xd, xsize, &exp);
@@ -181,7 +181,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
         fmpz_init2(n2, xsize);
         
         data = _fmpz_promote(n2);
-        flint_mpn_copyi(data->_mp_d, xd, xsize);
+        FLINT_MPN_COPYI(data->_mp_d, xd, xsize);
         data->_mp_size = xsize;
 
         if (proved != -1 && _is_prime(n2, proved))

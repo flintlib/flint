@@ -101,7 +101,7 @@ void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits,
                 if (mpz->_mp_alloc < words_per_field)
                     mpz_realloc2(mpz, bits);
                 mpz->_mp_size = size;
-                flint_mpn_copyi(mpz->_mp_d, exp2, size);
+                FLINT_MPN_COPYI(mpz->_mp_d, exp2, size);
             }
             exp1++;
         }

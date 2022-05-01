@@ -34,7 +34,7 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    m = FLINT_MIN(s1, s2);
    
    /* this many output limbs will be zero */
-   flint_mpn_zero(arrayg, m);
+   FLINT_MPN_ZERO(arrayg, m);
 
    /* set in1 to shifted array1 */
    if (temp != NULL)
@@ -42,7 +42,7 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    else
       in1 = flint_malloc(len1*sizeof(mp_limb_t));
    if (b1 == 0)
-      flint_mpn_copyi(in1, array1 + s1, len1);
+      FLINT_MPN_COPYI(in1, array1 + s1, len1);
    else
       mpn_rshift(in1, array1 + s1, len1, b1);
    len1 -= (in1[len1 - 1] == 0); 
@@ -53,7 +53,7 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    else
       in2 = flint_malloc(len2*sizeof(mp_limb_t));
    if (b2 == 0)
-      flint_mpn_copyi(in2, array2 + s2, len2);
+      FLINT_MPN_COPYI(in2, array2 + s2, len2);
    else
       mpn_rshift(in2, array2 + s2, len2, b2);
    len2 -= (in2[len2 - 1] == 0); 

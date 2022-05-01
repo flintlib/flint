@@ -87,8 +87,8 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
 
     if (len1 <= len)
     {
-        flint_mpn_copyi(ptr1, poly1->coeffs, len1);
-        flint_mpn_zero(ptr1 + len1, len - len1);
+        FLINT_MPN_COPYI(ptr1, poly1->coeffs, len1);
+        FLINT_MPN_ZERO(ptr1 + len1, len - len1);
     } else
     {
         _nmod_poly_rem(ptr1, poly1->coeffs, len1, poly2->coeffs, len2, A->mod);

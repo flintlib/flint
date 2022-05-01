@@ -190,7 +190,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
             n_poly_fit_length(H->coeffs + Hi, n);
             zip_length = FLINT_MAX(zip_length, n);
             H->coeffs[Hi].length = n;
-            flint_mpn_copyi(H->coeffs[Hi].coeffs, p, n);
+            FLINT_MPN_COPYI(H->coeffs[Hi].coeffs, p, n);
             n_poly_mod_product_roots_nmod_vec(M->coeffs + Hi, p, n, ctx->mod);
             Hi++;
         }

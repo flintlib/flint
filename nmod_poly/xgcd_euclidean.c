@@ -18,9 +18,9 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
                                mp_srcptr A, slong lenA, 
                                mp_srcptr B, slong lenB, nmod_t mod)
 {
-    flint_mpn_zero(G, lenB);
-    flint_mpn_zero(S, lenB - 1);
-    flint_mpn_zero(T, lenA - 1);
+    FLINT_MPN_ZERO(G, lenB);
+    FLINT_MPN_ZERO(S, lenB - 1);
+    FLINT_MPN_ZERO(T, lenA - 1);
 
     if (lenB == 1)
     {

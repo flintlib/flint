@@ -716,7 +716,7 @@ static void fq_nmod_polyu3_add_zip_limit1(
             Zexps[Zi] = Aexps[Ai] + ai;
             n_poly_fit_length(Zcoeffs + Zi, d*fit_length);
             Zcoeffs[Zi].length = cur_length;
-            flint_mpn_zero(Zcoeffs[Zi].coeffs, d*cur_length);
+            FLINT_MPN_ZERO(Zcoeffs[Zi].coeffs, d*cur_length);
             goto in_both;            
         }
         else if (Aexps[Ai] + ai < Zexps[Zi])
@@ -761,7 +761,7 @@ static void fq_nmod_polyu3_add_zip_limit1(
         Zexps[Zi] = Aexps[Ai] + ai;
         n_poly_fit_length(Zcoeffs + Zi, d*fit_length);
         Zcoeffs[Zi].length = cur_length;
-        flint_mpn_zero(Zcoeffs[Zi].coeffs, d*cur_length);
+        FLINT_MPN_ZERO(Zcoeffs[Zi].coeffs, d*cur_length);
         FLINT_ASSERT(cur_length == Zcoeffs[Zi].length);
         FLINT_ASSERT(d*(cur_length + 1) <= Zcoeffs[Zi].alloc);
         _n_fq_set(Zcoeffs[Zi].coeffs + d*cur_length, Acoeffs[Ai].coeffs + d*ai, d);

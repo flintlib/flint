@@ -170,7 +170,7 @@ void n_fq_poly_set_coeff_n_fq(
     }
     else if (!_n_fq_is_zero(c, d)) /* extend polynomial */
     {
-        flint_mpn_zero(A->coeffs + d*A->length, d*(j - A->length));
+        FLINT_MPN_ZERO(A->coeffs + d*A->length, d*(j - A->length));
         _n_fq_set(A->coeffs + d*j, c, d);
         A->length = j + 1;
     }
@@ -198,7 +198,7 @@ void n_fq_poly_set_coeff_fq_nmod(
     }
     else if (!fq_nmod_is_zero(c, ctx))
     {
-        flint_mpn_zero(A->coeffs + d*A->length, d*(j - A->length));
+        FLINT_MPN_ZERO(A->coeffs + d*A->length, d*(j - A->length));
         n_fq_set_fq_nmod(A->coeffs + d*j, c, ctx);
         A->length = j + 1;
     }
@@ -313,7 +313,7 @@ void n_fq_poly_shift_right(
     else
     {
         n_poly_fit_length(A, d*(B->length - n));
-        flint_mpn_copyi(A->coeffs, B->coeffs + d*n, d*(B->length - n));
+        FLINT_MPN_COPYI(A->coeffs, B->coeffs + d*n, d*(B->length - n));
         A->length = B->length - n;
     }
 }
@@ -337,8 +337,8 @@ void n_fq_poly_shift_left(
     else
     {
         n_poly_fit_length(A, d*(B->length + n));
-        flint_mpn_copyd(A->coeffs + d*n, B->coeffs, d*B->length);
-        flint_mpn_zero(A->coeffs, d*n);
+        FLINT_MPN_COPYD(A->coeffs + d*n, B->coeffs, d*B->length);
+        FLINT_MPN_ZERO(A->coeffs, d*n);
         A->length = B->length + n;
     }
 }
@@ -610,8 +610,8 @@ void n_fq_poly_shift_left_scalar_submul(
 
     Acoeffs = A->coeffs;
 
-    flint_mpn_copyd(Acoeffs + d*k, Acoeffs, d*Alen);
-    flint_mpn_zero(Acoeffs, d*k);
+    FLINT_MPN_COPYD(Acoeffs + d*k, Acoeffs, d*Alen);
+    FLINT_MPN_ZERO(Acoeffs, d*k);
 
     for (i = 0; i < A->length; i++)
     {

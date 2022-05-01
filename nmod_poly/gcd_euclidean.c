@@ -45,7 +45,7 @@ slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA,
     {
         if (lenR1 == 0)
         {
-            flint_mpn_copyi(G, B, lenB);
+            FLINT_MPN_COPYI(G, B, lenB);
             _nmod_vec_clear(F);
             return lenB;
         }
@@ -75,7 +75,7 @@ slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA,
     {
         lenG = lenR1;
         if (steps % 3 != 1)
-            flint_mpn_copyi(G, R1, lenR1);
+            FLINT_MPN_COPYI(G, R1, lenR1);
     }
 
     _nmod_vec_clear(F);

@@ -411,7 +411,7 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
         else
             __sub(b2, lenb2, T0, lenT0, b2, lenb2);
 
-        flint_mpn_zero(b2 + lenb2, m + lenb3 - lenb2);
+        FLINT_MPN_ZERO(b2 + lenb2, m + lenb3 - lenb2);
 
         __attach_shift(b4, lenb4, b2, lenb2, m);
         __add(b4, lenb4, b4, lenb4, b3, lenb3);
@@ -426,7 +426,7 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
         else
             __sub(a2, lena2, a2, lena2, T0, lenT0);
 
-        flint_mpn_zero(a2 + lena2, m + lena3 - lena2);
+        FLINT_MPN_ZERO(a2 + lena2, m + lena3 - lena2);
         __attach_shift(a4, lena4, a2, lena2, m);
         __add(a4, lena4, a4, lena4, a3, lena3);
         lena2 = FLINT_MAX(m + lena3, lena2);
@@ -540,7 +540,7 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
             else
                 __sub(B, *lenB, T0, lenT0, B, *lenB);
 
-            flint_mpn_zero(B + *lenB, k + lenb3 - *lenB);
+            FLINT_MPN_ZERO(B + *lenB, k + lenb3 - *lenB);
             __attach_shift(b4, lenb4, B, *lenB, k);
             __add(b4, lenb4, b4, lenb4, b3, lenb3);
             *lenB = FLINT_MAX(k + lenb3, *lenB);
@@ -554,7 +554,7 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
             else
                 __sub(A, *lenA, A, *lenA, T0, lenT0);
 
-            flint_mpn_zero(A + *lenA, k + lena3 - *lenA);
+            FLINT_MPN_ZERO(A + *lenA, k + lena3 - *lenA);
             __attach_shift(a4, lena4, A, *lenA, k);
             __add(a4, lena4, a4, lena4, a3, lena3);
             *lenA = FLINT_MAX(k + lena3, *lenA);

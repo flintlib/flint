@@ -32,7 +32,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
    TMP_START;
 
    rowm = (ulong *) TMP_ALLOC(n*sizeof(ulong)*limbs);
-   flint_mpn_zero(rowm, n*limbs);
+   FLINT_MPN_ZERO(rowm, n*limbs);
 
    for (i = 0, j = 0; i < n; i++, j += limbs)
       rowm[j] = A[m][i];

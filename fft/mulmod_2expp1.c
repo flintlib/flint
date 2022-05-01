@@ -78,7 +78,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    
    j = fft_split_bits(ii, i1, r_limbs, bits1, limbs);
    for ( ; j < 2*n; j++)
-      flint_mpn_zero(ii[j], limbs + 1);
+      FLINT_MPN_ZERO(ii[j], limbs + 1);
 
    for (i = 0; i < 2*n; i++)
       ii0[i] = ii[i][0];
@@ -91,7 +91,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    {
       j = fft_split_bits(jj, i2, r_limbs, bits1, limbs);
       for ( ; j < 2*n; j++)
-         flint_mpn_zero(jj[j], limbs + 1);
+         FLINT_MPN_ZERO(jj[j], limbs + 1);
    
       for (i = 0; i < 2*n; i++)
          jj0[i] = jj[i][0];
@@ -124,7 +124,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
       if (cy2) r[j]++;
    }
    
-   flint_mpn_zero(r1, r_limbs + 1);
+   FLINT_MPN_ZERO(r1, r_limbs + 1);
    fft_combine_bits(r1, ii, 2*n - 1, bits1, limbs + 1, r_limbs + 1);
    
    /* 

@@ -224,7 +224,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                         if (0 > (slong) c[2])
                             mpn_neg(d, c, 3);
                         else
-                            flint_mpn_copyi(d, c, 3);
+                            FLINT_MPN_COPYI(d, c, 3);
 
                         if (d[2] != 0 || ub[w] <= d[1] ||
                           (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
@@ -570,7 +570,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                         if (0 > (slong) c[2])
                             mpn_neg(d, c, 3);
                         else
-                            flint_mpn_copyi(d, c, 3);
+                            FLINT_MPN_COPYI(d, c, 3);
 
                         if (d[2] != 0 || ub[w] <= d[1] ||
                           (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */

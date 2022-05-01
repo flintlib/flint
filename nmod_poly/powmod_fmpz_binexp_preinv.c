@@ -155,8 +155,8 @@ nmod_poly_powmod_fmpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
     {
         p = _nmod_vec_init(trunc);
 
-        flint_mpn_copyi(p, poly->coeffs, len);
-        flint_mpn_zero(p + len, trunc - len);
+        FLINT_MPN_COPYI(p, poly->coeffs, len);
+        FLINT_MPN_ZERO(p + len, trunc - len);
 
         pcopy = 1;
     } else

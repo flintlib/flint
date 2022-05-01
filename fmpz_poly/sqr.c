@@ -49,7 +49,7 @@ void _fmpz_poly_sqr_tiny2(fmpz * res, const fmpz * poly, slong len)
 
     tmp = TMP_ALLOC(2 * (2 * len - 1) * sizeof(mp_limb_t));
 
-    flint_mpn_zero(tmp, 2 * (2 * len - 1));
+    FLINT_MPN_ZERO(tmp, 2 * (2 * len - 1));
 
     for (i = 0; i < len; i++)
     {

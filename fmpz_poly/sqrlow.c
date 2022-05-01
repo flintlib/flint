@@ -52,7 +52,7 @@ void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
 
     tmp = TMP_ALLOC(2 * n * sizeof(mp_limb_t));
 
-    flint_mpn_zero(tmp, 2 * n);
+    FLINT_MPN_ZERO(tmp, 2 * n);
 
     for (i = 0; i < len; i++)
     {
@@ -154,7 +154,7 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
         copy = flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len; i++)
             copy[i] = poly[i];
-        flint_mpn_zero((mp_ptr) copy + len, n - len);
+        FLINT_MPN_ZERO((mp_ptr) copy + len, n - len);
 
         _fmpz_poly_sqrlow_karatsuba_n(res, copy, n);
 

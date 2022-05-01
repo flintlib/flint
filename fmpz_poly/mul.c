@@ -49,7 +49,7 @@ _fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
 
     tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(mp_limb_t));
 
-    flint_mpn_zero(tmp, 2 * (len1 + len2 - 1));
+    FLINT_MPN_ZERO(tmp, 2 * (len1 + len2 - 1));
 
     for (i = 0; i < len1; i++)
     {

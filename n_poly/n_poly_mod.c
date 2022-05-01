@@ -835,8 +835,8 @@ void n_poly_mod_shift_left_scalar_addmul(n_poly_t A, slong k, mp_limb_t c,
 
     Acoeffs = A->coeffs;
 
-    flint_mpn_copyd(Acoeffs + k, Acoeffs, Alen);
-    flint_mpn_zero(Acoeffs, k);
+    FLINT_MPN_COPYD(Acoeffs + k, Acoeffs, Alen);
+    FLINT_MPN_ZERO(Acoeffs, k);
 
     for (i = 0; i < A->length; i++)
         Acoeffs[i] = nmod_addmul(Acoeffs[i], c, Acoeffs[i + k], ctx);

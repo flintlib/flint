@@ -44,7 +44,7 @@ _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
     T = _nmod_vec_init(lenT + lenQ);
     Q = T + lenT;
 
-    flint_mpn_zero (res, lenf - 1);
+    FLINT_MPN_ZERO (res, lenf - 1);
     res[0] = 1;
 
     l = z_sizeinbase (lenf - 1, 2) - 2;

@@ -16,7 +16,7 @@
 
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, slong len, slong k)
 {
-    flint_mpn_copyi(res, poly + k, len);
+    FLINT_MPN_COPYI(res, poly + k, len);
 }
 
 void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, slong k)

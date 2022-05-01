@@ -38,7 +38,7 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)
         if (c == 0) return;
         else
         {
-            flint_mpn_zero(poly->coeffs + poly->length, j - poly->length);
+            FLINT_MPN_ZERO(poly->coeffs + poly->length, j - poly->length);
 
             poly->coeffs[j] = c;
             poly->length = j + 1;

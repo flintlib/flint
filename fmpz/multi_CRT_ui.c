@@ -61,7 +61,7 @@ void fmpz_multi_CRT_ui(
 
             ad = FLINT_MPZ_REALLOC(az, s + 2);
 
-            flint_mpn_zero(ad, s + 2);
+            FLINT_MPN_ZERO(ad, s + 2);
             hi = lo = 0;
 
             for ( ; i < j; md += s, l++, i++)
@@ -81,7 +81,7 @@ void fmpz_multi_CRT_ui(
         {
             ad = FLINT_MPZ_REALLOC(az, s + 2);
 
-            flint_mpn_zero(ad, s + 2);
+            FLINT_MPN_ZERO(ad, s + 2);
 
             for ( ; i < j; md += s, i++)
             {

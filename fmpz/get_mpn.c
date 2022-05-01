@@ -32,7 +32,7 @@ fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
     else
     {
         temp = COEFF_TO_PTR(*n_in)->_mp_d;
-        flint_mpn_copyi(*n, temp, n_size);
+        FLINT_MPN_COPYI(*n, temp, n_size);
         return n_size;
     }
 }

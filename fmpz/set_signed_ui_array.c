@@ -45,7 +45,7 @@ void fmpz_set_signed_ui_array(fmpz_t f, const ulong * c, slong n)
 
         if (csign == 0)
         {
-            flint_mpn_copyi(zd, c, n);
+            FLINT_MPN_COPYI(zd, c, n);
             z->_mp_size = n;
         }
         else

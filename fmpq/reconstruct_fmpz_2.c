@@ -430,8 +430,8 @@ int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
     }
 
     /* m12 is supposed to be zero-extended to the length of m11 (= m_len) */
-    flint_mpn_zero(m11, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
-    flint_mpn_zero(m12, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    FLINT_MPN_ZERO(m11, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    FLINT_MPN_ZERO(m12, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
     /* m11 = 1, m12 = 0 */
     m_len = 1;
     m11[0] = 1;
@@ -512,8 +512,8 @@ again:
     /* copy (Q, R) to (A, B) */
     Alen = Qlen;
     Blen = Rlen;
-    flint_mpn_copyi(A, Q, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
-    flint_mpn_copyi(B, R, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    FLINT_MPN_COPYI(A, Q, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    FLINT_MPN_COPYI(B, R, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
 
     /* multiply first row of m by h, use R for temp */
     mdet *= h->det;
@@ -522,7 +522,7 @@ again:
     ex2 = mpn_mul_1(m12, m12, m_len, h->_22);
     ex3 = mpn_addmul_1(m12, m11, m_len, h->_12);
     add_ssaaaa(m12[m_len + 1], m12[m_len], 0, ex2, 0, ex3);
-    flint_mpn_copyi(m11, R, m_len);
+    FLINT_MPN_COPYI(m11, R, m_len);
     add_ssaaaa(m11[m_len + 1], m11[m_len], 0, ex0, 0, ex1);
     m_len += (m11[m_len + 1] != 0) ? 2 : (m11[m_len] != 0);
 
@@ -552,8 +552,8 @@ gauss:
     MPN_NORM(R, Rlen);
     Alen = Blen;
     Blen = Rlen;
-    flint_mpn_copyi(A, B, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
-    flint_mpn_copyi(B, R, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    FLINT_MPN_COPYI(A, B, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    FLINT_MPN_COPYI(B, R, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
 
     /* (m11, m12) = (m12 + Q*m11, m11), use R for temp */
     mdet *= -1;
@@ -563,8 +563,8 @@ gauss:
     ex0 = mpn_add_n(R, R, m12, m_len);
     R[m_len] = ex0;
     m_len += ex0;
-    flint_mpn_copyi(m12, m11, m_len);
-    flint_mpn_copyi(m11, R, m_len);
+    FLINT_MPN_COPYI(m12, m11, m_len);
+    FLINT_MPN_COPYI(m11, R, m_len);
 
     /* see if further A > N >= B */
     if (Blen > n_len || (Blen == n_len && mpn_cmp(B, n_ptr, n_len) > 0))

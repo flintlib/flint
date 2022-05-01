@@ -53,7 +53,7 @@ main(void)
 		if (i < len1)
 		   random_fermat(ii[i], state, limbs);
 		else
-                    flint_mpn_zero(ii[i], size);
+                    FLINT_MPN_ZERO(ii[i], size);
             }
             t1 = ptr;
             t2 = t1 + size;
@@ -68,7 +68,7 @@ main(void)
                 if (i < len2)
 		    random_fermat(jj[i], state, limbs);
                 else
-                    flint_mpn_zero(jj[i], size);
+                    FLINT_MPN_ZERO(jj[i], size);
             }
 
             for (i = 0; i < 4*n; i++)
@@ -81,14 +81,14 @@ main(void)
             for (i = 0, ptr = (mp_limb_t *) ii2 + 4*n; i < 4*n; i++, ptr += size)
             {
                 ii2[i] = ptr;
-                flint_mpn_copyi(ii2[i], ii[i], size);
+                FLINT_MPN_COPYI(ii2[i], ii[i], size);
             }
 
             jj2 = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
             for (i = 0, ptr = (mp_limb_t *) jj2 + 4*n; i < 4*n; i++, ptr += size)
             {
                 jj2[i] = ptr;
-                flint_mpn_copyi(jj2[i], jj[i], size);
+                FLINT_MPN_COPYI(jj2[i], jj[i], size);
             }
 
 	    fft_precache(jj, depth, limbs, trunc, &t1, &t2, &s1);

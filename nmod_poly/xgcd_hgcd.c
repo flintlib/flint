@@ -222,8 +222,8 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
         }
         _nmod_vec_clear(q);
     }
-    flint_mpn_zero(S + lenS, lenB - 1 - lenS);
-    flint_mpn_zero(T + lenT, lenA - 1 - lenT);
+    FLINT_MPN_ZERO(S + lenS, lenB - 1 - lenS);
+    FLINT_MPN_ZERO(T + lenT, lenA - 1 - lenT);
 
     return lenG;
 }

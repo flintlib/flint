@@ -24,7 +24,7 @@ void fmpz_mod_mpoly_resize(fmpz_mod_mpoly_t A, slong new_length,
         fmpz_mod_mpoly_fit_length(A, new_length, ctx);
 
         /* must zero out the new coeffs/exps past the old end */
-        flint_mpn_zero(A->exps + N*old_length, N*(new_length - old_length));
+        FLINT_MPN_ZERO(A->exps + N*old_length, N*(new_length - old_length));
         _fmpz_vec_zero(A->coeffs + old_length, new_length - old_length);
     }
     else if (new_length < old_length)

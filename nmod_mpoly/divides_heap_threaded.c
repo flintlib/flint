@@ -569,7 +569,7 @@ static void _nmod_mpoly_mulsub_stripe1(
     {
         _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
                                &Aexp, &A->exps_alloc, 1, Alen + Dlen - Di);
-        flint_mpn_copyi(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+        FLINT_MPN_COPYI(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
         mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);
         Alen += Dlen - Di;
     }
@@ -813,7 +813,7 @@ static void _nmod_mpoly_mulsub_stripe(
     {
         _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
                                &Aexp, &A->exps_alloc, N, Alen + Dlen - Di);
-        flint_mpn_copyi(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+        FLINT_MPN_COPYI(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
         mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
         Alen += Dlen - Di;
     }

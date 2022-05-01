@@ -58,8 +58,8 @@ nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     if (h_len < n)
     {
         h_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(h_coeffs, h->coeffs, h_len);
-        flint_mpn_zero(h_coeffs + h_len, n - h_len);
+        FLINT_MPN_COPYI(h_coeffs, h->coeffs, h_len);
+        FLINT_MPN_ZERO(h_coeffs + h_len, n - h_len);
     }
     else
         h_coeffs = h->coeffs;

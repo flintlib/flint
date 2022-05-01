@@ -46,3 +46,4 @@ build
 flint2
 .DS_Store
 longlong.h
+gmpcompat.h

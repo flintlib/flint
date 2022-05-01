@@ -37,10 +37,10 @@ void nmod_mpoly_scalar_mul_nmod_invertible(
         A->length = B->length;
 
         N = mpoly_words_per_exp(B->bits, ctx->minfo);
-        flint_mpn_copyi(A->exps, B->exps, N*B->length);
+        FLINT_MPN_COPYI(A->exps, B->exps, N*B->length);
         if (c == UWORD(1))
         {
-            flint_mpn_copyi(A->coeffs, B->coeffs, B->length);
+            FLINT_MPN_COPYI(A->coeffs, B->coeffs, B->length);
             return;
         }
     }

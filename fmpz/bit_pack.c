@@ -35,7 +35,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
 
             /* com remaining limbs */
             if (limbs > 1)
-                flint_mpn_store(arr + 1, limbs - 1, ~(mp_limb_t) 0);
+                FLINT_MPN_STORE(arr + 1, limbs - 1, ~(mp_limb_t) 0);
 
             /* com remaining bits */
             if (limbs)
@@ -112,7 +112,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         {
             /* com any additional limbs */
             if (limbs > size)
-                flint_mpn_store(arr + size, limbs - size, ~(mp_limb_t) 0);
+                FLINT_MPN_STORE(arr + size, limbs - size, ~(mp_limb_t) 0);
 
             /* com remaining bits */
             if (rem_bits)
@@ -156,7 +156,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
                     arr[size++] = cy;
             }
             else
-                flint_mpn_copyi(arr, ptr->_mp_d, size);
+                FLINT_MPN_COPYI(arr, ptr->_mp_d, size);
 
             /* deal with - borrow */
             if (borrow)

@@ -29,7 +29,7 @@ void nmod_mpoly_resize(
 
         /* must zero out the new coeffs/exps past the old end */
         N = mpoly_words_per_exp(A->bits, ctx->minfo);
-        flint_mpn_zero(A->exps + N*old_length, N*(new_length - old_length));
+        FLINT_MPN_ZERO(A->exps + N*old_length, N*(new_length - old_length));
         _nmod_vec_zero(A->coeffs + old_length, new_length - old_length);
     }
 

@@ -135,7 +135,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
 
     for (k = m - 1; k >= 0; k--)
     {
-        flint_mpn_zero(tmp, v->length - 1);
+        FLINT_MPN_ZERO(tmp, v->length - 1);
 
         if (baby[k].length < v->length)
             _nmod_vec_set(tmp, baby[k].coeffs, baby[k].length);
@@ -339,7 +339,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 if (scratch[i].length < v->length - 1)
                 {
                     nmod_poly_fit_length(scratch + i, v->length - 1);
-                    flint_mpn_zero(scratch[i].coeffs + scratch[i].length,
+                    FLINT_MPN_ZERO(scratch[i].coeffs + scratch[i].length,
                                    v->length - 1 - scratch[i].length);
                     _nmod_poly_set_length(scratch + i, v->length - 1);
                 }
@@ -362,7 +362,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
             {
                 nmod_poly_fit_length(H + num_threads + 1 + i, v->length - 1);
                 _nmod_poly_set_length(H + num_threads + 1 + i, v->length - 1);
-                flint_mpn_zero(H[num_threads + 1 + i].coeffs, v->length - 1);
+                FLINT_MPN_ZERO(H[num_threads + 1 + i].coeffs, v->length - 1);
 
                 args2[i].A        = HH + i;
                 args2[i].res      = H + num_threads + i + 1;
@@ -392,7 +392,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
             {
                 nmod_poly_fit_length(I + num_threads + i + 1, v->length - 1);
                 _nmod_poly_set_length(I + num_threads + i + 1, v->length - 1);
-                flint_mpn_zero(I[num_threads + i + 1].coeffs, v->length - 1);
+                FLINT_MPN_ZERO(I[num_threads + i + 1].coeffs, v->length - 1);
                 
                 args3[i].baby = h;
                 args3[i].H    = H + num_threads + i + 1;
@@ -478,7 +478,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                                                 v->length - 1);
                 _nmod_poly_set_length(H + j*(num_threads + 1) + i,
                                                                 v->length - 1);
-                flint_mpn_zero(H[j*(num_threads + 1) + i].coeffs,
+                FLINT_MPN_ZERO(H[j*(num_threads + 1) + i].coeffs,
                                                                 v->length - 1);
 
                 args2[i].A        = HH + i;
@@ -510,7 +510,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                                                 v->length - 1);
                 _nmod_poly_set_length(I + j*(num_threads + 1) + i,
                                                                 v->length - 1);
-                flint_mpn_zero(I[j*(num_threads + 1) + i].coeffs,
+                FLINT_MPN_ZERO(I[j*(num_threads + 1) + i].coeffs,
                                                                 v->length - 1);
                 args3[i].baby = h;
                 args3[i].H    = H + j*(num_threads + 1) + i;

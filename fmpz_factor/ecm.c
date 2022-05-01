@@ -86,7 +86,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         if (ecm_inf->normbits)
            mpn_lshift(n, mptr->_mp_d, n_size, ecm_inf->normbits);
         else
-           flint_mpn_copyi(n, mptr->_mp_d, n_size);
+           FLINT_MPN_COPYI(n, mptr->_mp_d, n_size);
     }
 
     flint_mpn_preinvn(ecm_inf->ninv, n, n_size);
@@ -202,7 +202,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                     mpsig[mptr->_mp_size] = cy;
             } else
             {
-                flint_mpn_copyi(mpsig, mptr->_mp_d, mptr->_mp_size);
+                FLINT_MPN_COPYI(mpsig, mptr->_mp_d, mptr->_mp_size);
             }
         }
 

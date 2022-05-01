@@ -103,7 +103,7 @@ _factor_trial_tree_init(void)
 	        {
 	            mpn_copyi(_factor_trial_tree[m + 1] + i,
 	                                         _factor_trial_tree[m] + i, n);
-                flint_mpn_zero(_factor_trial_tree[m + 1] + i + n, n);
+                FLINT_MPN_ZERO(_factor_trial_tree[m + 1] + i + n, n);
 	        }
 	    }
 

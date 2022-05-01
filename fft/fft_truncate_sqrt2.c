@@ -40,7 +40,7 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
    /* multiply by 2^{wn/2} */
    y = limbs/2;
    
-   flint_mpn_copyi(temp + y, t, limbs - y);
+   FLINT_MPN_COPYI(temp + y, t, limbs - y);
    temp[limbs] = 0;
    if (y) cy = mpn_neg_n(temp, t + limbs - y, y);
    mpn_addmod_2expp1_1(temp + y, limbs - y, -t[limbs]);

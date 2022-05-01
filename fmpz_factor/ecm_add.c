@@ -32,15 +32,15 @@ fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2,
 
     if (flint_mpn_zero_p(z1, ecm_inf->n_size))
     {
-        flint_mpn_copyi(x, x2, ecm_inf->n_size);
-        flint_mpn_copyi(z, z2, ecm_inf->n_size);
+        FLINT_MPN_COPYI(x, x2, ecm_inf->n_size);
+        FLINT_MPN_COPYI(z, z2, ecm_inf->n_size);
         return;
     }
 
     if (flint_mpn_zero_p(z2, ecm_inf->n_size))
     {
-        flint_mpn_copyi(x, x1, ecm_inf->n_size);
-        flint_mpn_copyi(z, z1, ecm_inf->n_size);
+        FLINT_MPN_COPYI(x, x1, ecm_inf->n_size);
+        FLINT_MPN_COPYI(z, z1, ecm_inf->n_size);
         return;
     }
 

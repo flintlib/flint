@@ -526,7 +526,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             if (0 > (slong) ptr[1])
                mpn_neg(p, ptr, 2);
             else
-               flint_mpn_copyi(p, ptr, 2);
+               FLINT_MPN_COPYI(p, ptr, 2);
 
             /* check quotient won't overflow a word */
             if (u3 <= p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
@@ -615,7 +615,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             if (0 > (slong) ptr[2])
                mpn_neg(p, ptr, 3);
             else
-               flint_mpn_copyi(p, ptr, 3);
+               FLINT_MPN_COPYI(p, ptr, 3);
 
             /* check quotient won't overflow a word */
             if (p[2] > 0 || u3 <= p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */

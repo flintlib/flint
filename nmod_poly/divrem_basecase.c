@@ -27,7 +27,7 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
     mp_ptr ptrQ = Q - lenB + 1;
     mp_ptr R1 = W;
     
-    flint_mpn_copyi(R1, A, lenA);
+    FLINT_MPN_COPYI(R1, A, lenA);
 
     for (iR = lenA - 1; iR >= lenB - 1; iR--)
     {
