@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
-#undef ulong
-#include "flint.h"
 #include "ulong_extras.h"
 
 int n_is_perfect_power235(mp_limb_t n)

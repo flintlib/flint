@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 mp_limb_t n_factor_lehman(mp_limb_t n)

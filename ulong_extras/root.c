@@ -11,12 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
-#undef ulong
-#define ulong mp_limb_t
-#include "flint.h"
 #include "ulong_extras.h"
     
 /* A table of precomputed inverses of values from 1 to 64  
