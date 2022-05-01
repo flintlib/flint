@@ -16,6 +16,13 @@
 #include "fmpz_poly.h"
 #include "mpn_extras.h"
 
+#if !defined(__MPIR_VERSION)
+#define USE_GMP_DIV_Q 1
+void __gmpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
+#else
+#define USE_GMP_DIV_Q 0
+#endif
+
 /* 
    Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
@@ -30,16 +37,27 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
 	else 
    {
       mp_size_t tlimbs;
+      mp_ptr temp;
       __mpz_struct * mgc = COEFF_TO_PTR(*gc);
+      TMP_INIT;
+
+      TMP_START;
       
-      mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
+#if USE_GMP_DIV_Q
+      temp = TMP_ALLOC((2 * limbsg + 1) * sizeof(mp_limb_t));
+#else
+      temp = TMP_ALLOC(limbsg * sizeof(mp_limb_t));
+#endif
       flint_mpn_copyi(temp, arrayg, limbsg);
-      
+
+#if USE_GMP_DIV_Q
+      __gmpn_div_q(arrayg, temp, limbsg, mgc->_mp_d, mgc->_mp_size, temp + limbsg);
+#else
       mpn_tdiv_q(arrayg, temp, limbsg, mgc->_mp_d, mgc->_mp_size);
-      tlimbs = limbsg - mgc->_mp_size + 1;
-      tlimbs -= (arrayg[tlimbs - 1] == 0);
+#endif
+      tlimbs = limbsg - mgc->_mp_size + (arrayg[tlimbs - 1] != 0);
       
-      flint_free(temp);
+      TMP_END;
       return tlimbs;
    } 
 }
