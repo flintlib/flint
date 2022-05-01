@@ -750,6 +750,39 @@ else
 fi
 rm -f build/test-cpu_set_t.c
 
+# test if slong equals lont int
+mkdir -p build
+rm -f build/test-slongeqlongint > /dev/null 2>&1
+MSG="Testing if slong equals long int..."
+echo -n "${MSG}"
+echo -n "${MSG}" >> config.log
+echo "\
+int main(void)
+{ 
+#if defined(_WIN64) || defined(__mips64)
+    return 0;
+#else
+    return 1;
+#endif
+}\
+" > build/test-slongeqlongint.c
+$CC build/test-slongeqlongint.c -o build/test-slongeqlongint
+./build/test-slongeqlongint
+if [ $? -eq 1 ]; then
+   echo "yes"
+   echo "yes" >> config.log
+   CONFID_SLONGEQLONGINT="#define SLONGEQLONGINT 1"
+   cp gmpcompat-slongeqlongint.in gmpcompat.h
+else
+   echo "no"
+   echo "no" >> config.log
+   CONFID_SLONGEQLONGINT="#define SLONGEQLONGINT 0"
+   cp gmpcompat-else.in gmpcompat.h
+fi
+rm -f build/test-slongeqlongint build/test-slongeqlongint.c
+
+
+
 
 #external modules
 
