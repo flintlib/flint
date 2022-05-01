@@ -10,8 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp) 

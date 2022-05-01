@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* P (x : z) = 2 * P1 (x0 : z0)  */
