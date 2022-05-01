@@ -1,0 +1,220 @@
+#define FLINT_KNOW_STRONG_ORDER 0
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)      \
+  __asm__ ("adds %3,%7,%11\n\tadcs %2,%6,%10\n\tadcs %1,%5,%9\n\tadc %0,%4,%8"\
+       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)),                        \
+         "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)),                        \
+         "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)),                        \
+         "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
+  __asm__ ("adds %2,%5,%8\n\tadcs %1,%4,%7\n\tadc %0,%3,%6"                   \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
+         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "cc")
+
+#define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
+  __asm__ ("subs %2,%5,%8\n\tsbcs %1,%4,%7\n\tsbc %0,%3,%6"                   \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
+         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "cc")
+
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
+  __asm__ ("adds %1,%3,%5\n\tadc %0,%2,%4"               \
+       : "=r" (sh), "=&r" (sl)                           \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
+         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "cc")
+
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)               \
+  __asm__ ("subs %1,%3,%5\n\tsbc %0,%2,%4"               \
+       : "=r" (sh), "=&r" (sl)                           \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
+         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "cc")
+
+#define umul_ppmm(xh, xl, a, b) \
+  __asm__ ("mul %0,%2,%3\numulh %1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#define smul_ppmm(xh, xl, a, b) \
+  __asm__ ("mul %0,%2,%3\nsmulh %1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#define __ll_B ((mp_limb_t) 1 << (GMP_LIMB_BITS / 2))
+#define __ll_lowpart(t) ((mp_limb_t) (t) & (__ll_B - 1))
+#define __ll_highpart(t) ((mp_limb_t) (t) >> (GMP_LIMB_BITS / 2))
+#define __highbit (~(mp_limb_t)0 ^ ((~(mp_limb_t)0) >> 1))
+
+#define udiv_qrnnd_int(q, r, n1, n0, d)                     \
+    do                                                      \
+    {                                                       \
+        mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;  \
+        FLINT_ASSERT ((d) != 0);                            \
+        FLINT_ASSERT ((n1) < (d));                          \
+        __d1 = __ll_highpart (d);                           \
+        __d0 = __ll_lowpart (d);                            \
+        __q1 = (n1) / __d1;                                 \
+        __r1 = (n1) - __q1 * __d1;                          \
+        __m = __q1 * __d0;                                  \
+        __r1 = __r1 * __ll_B | __ll_highpart (n0);          \
+        if (__r1 < __m)                                     \
+        {                                                   \
+            __q1--, __r1 += (d);                            \
+            if (__r1 >= (d)) /* i.e. we didn't get carry when adding to __r1 */ \
+                if (__r1 < __m)                             \
+                    __q1--, __r1 += (d);                    \
+        }                                                   \
+        __r1 -= __m;                                        \
+        __q0 = __r1 / __d1;                                 \
+        __r0 = __r1  - __q0 * __d1;                         \
+        __m = __q0 * __d0;                                  \
+        __r0 = __r0 * __ll_B | __ll_lowpart (n0);           \
+        if (__r0 < __m)                                     \
+        {                                                   \
+            __q0--, __r0 += (d);                            \
+            if (__r0 >= (d))                                \
+                if (__r0 < __m)                             \
+                    __q0--, __r0 += (d);                    \
+        }                                                   \
+        __r0 -= __m;                                        \
+        (q) = __q1 * __ll_B | __q0;                         \
+        (r) = __r0;                                         \
+    } while (0)
+
+#define udiv_qrnnd(q, r, n1, n0, d)                  \
+    do {                                             \
+       mp_limb_t __norm;                             \
+       count_leading_zeros(__norm, (d));             \
+       if (__norm)                                   \
+       {                                             \
+           udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (GMP_LIMB_BITS - __norm)), (n0) << __norm, (d) << __norm); \
+          (r) = ((mp_limb_t) (r) >> __norm);         \
+       } else                                        \
+          udiv_qrnnd_int((q), (r), (n1), (n0), (d)); \
+    } while (0)
+
+#define sdiv_qrnnd(q, r, n1, n0, d)         \
+  do {                                      \
+    mp_limb_t __n1, __n0, __d;              \
+    mp_limb_t __q, __r;                     \
+    unsigned int __sgn_n = 0, __sgn_d = 0;  \
+    if ((n1) & __highbit)                   \
+    {                                       \
+       __n0 = -(n0);                        \
+       __n1 = ~(n1) + (__n0 == 0);          \
+       __sgn_n = ~__sgn_n;                  \
+    } else                                  \
+    {                                       \
+      __n0 = (n0);                          \
+      __n1 = (n1);                          \
+    }                                       \
+    if ((d) & __highbit)                    \
+    {                                       \
+        __d = -(d);                         \
+        __sgn_d = ~__sgn_d;                 \
+    } else                                  \
+    {                                       \
+        __d = (d);                          \
+    }                                       \
+    udiv_qrnnd(__q, __r, __n1, __n0, __d);  \
+    q = (__sgn_n == __sgn_d) ? __q : -__q;  \
+    r = (__sgn_n == 0) ? __r : -__r;        \
+  } while (0)
+
+#define udiv_qrnnd_preinv(q, r, nh, nl, d, di)               \
+  do {                                                       \
+    mp_limb_t _n2, _n10, _nmask, _nadj, _q1;                 \
+    mp_limb_t _xh, _xl;                                      \
+    _n2 = (nh);                                              \
+    _n10 = (nl);                                             \
+    _nmask = (mp_limb_signed_t) (_n10) >> (FLINT_BITS - 1);  \
+    _nadj = _n10 + (_nmask & (d));                           \
+    umul_ppmm (_xh, _xl, di, _n2 - _nmask);                  \
+    add_ssaaaa (_xh, _xl, _xh, _xl, _n2, _nadj);             \
+    _q1 = ~_xh;                                              \
+    umul_ppmm (_xh, _xl, _q1, d);                            \
+    add_ssaaaa (_xh, _xl, _xh, _xl, nh, nl);                 \
+    _xh -= (d);                 /* xh = 0 or -1 */           \
+    (r) = _xl + ((d) & _xh);                                 \
+    (q) = _xh - _q1;                                         \
+  } while (0)
+
+#ifdef _LONG_LONG_LIMB
+#define count_leading_zeros(count,x)            \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_clzll (x);              \
+  } while (0)
+#else
+#define count_leading_zeros(count,x)            \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_clzl (x);               \
+  } while (0)
+#endif
+
+#ifdef _LONG_LONG_LIMB
+#define count_trailing_zeros(count,x)           \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_ctzll (x);              \
+  } while (0)
+#else
+#define count_trailing_zeros(count,x)           \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_ctzl (x);               \
+  } while (0)
+#endif
+
+#define byte_swap(n)                                                             \
+  do {                                                                           \
+      /* swap adjacent bytes */                                                  \
+      n = (((n & 0xff00ff00ff00ff00) >> 8) | ((n & 0x00ff00ff00ff00ff) << 8));   \
+      /* swap adjacent words */                                                  \
+      n = (((n & 0xffff0000ffff0000) >> 16) | ((n & 0x0000ffff0000ffff) << 16)); \
+      /* swap adjacent double words */                                           \
+      n = ((n >> 32) | (n << 32));                                               \
+  } while (0)
+
+/* rec_word_tab[i] = div(2^19 - 3*2^8, 2^8 + i) */
+static const int rec_word_tab[256] = {
+   2045, 2037, 2029, 2021, 2013, 2005, 1998, 1990, 1983, 1975, 1968, 1960, 1953, 1946, 1938, 1931,
+   1924, 1917, 1910, 1903, 1896, 1889, 1883, 1876, 1869, 1863, 1856, 1849, 1843, 1836, 1830, 1824,
+   1817, 1811, 1805, 1799, 1792, 1786, 1780, 1774, 1768, 1762, 1756, 1750, 1745, 1739, 1733, 1727,
+   1722, 1716, 1710, 1705, 1699, 1694, 1688, 1683, 1677, 1672, 1667, 1661, 1656, 1651, 1646, 1641,
+   1636, 1630, 1625, 1620, 1615, 1610, 1605, 1600, 1596, 1591, 1586, 1581, 1576, 1572, 1567, 1562,
+   1558, 1553, 1548, 1544, 1539, 1535, 1530, 1526, 1521, 1517, 1513, 1508, 1504, 1500, 1495, 1491,
+   1487, 1483, 1478, 1474, 1470, 1466, 1462, 1458, 1454, 1450, 1446, 1442, 1438, 1434, 1430, 1426,
+   1422, 1418, 1414, 1411, 1407, 1403, 1399, 1396, 1392, 1388, 1384, 1381, 1377, 1374, 1370, 1366,
+   1363, 1359, 1356, 1352, 1349, 1345, 1342, 1338, 1335, 1332, 1328, 1325, 1322, 1318, 1315, 1312,
+   1308, 1305, 1302, 1299, 1295, 1292, 1289, 1286, 1283, 1280, 1276, 1273, 1270, 1267, 1264, 1261,
+   1258, 1255, 1252, 1249, 1246, 1243, 1240, 1237, 1234, 1231, 1228, 1226, 1223, 1220, 1217, 1214,
+   1211, 1209, 1206, 1203, 1200, 1197, 1195, 1192, 1189, 1187, 1184, 1181, 1179, 1176, 1173, 1171,
+   1168, 1165, 1163, 1160, 1158, 1155, 1153, 1150, 1148, 1145, 1143, 1140, 1138, 1135, 1133, 1130,
+   1128, 1125, 1123, 1121, 1118, 1116, 1113, 1111, 1109, 1106, 1104, 1102, 1099, 1097, 1095, 1092,
+   1090, 1088, 1086, 1083, 1081, 1079, 1077, 1074, 1072, 1070, 1068, 1066, 1064, 1061, 1059, 1057,
+   1055, 1053, 1051, 1049, 1047, 1044, 1042, 1040, 1038, 1036, 1034, 1032, 1030, 1028, 1026, 1024
+};
+
+#define invert_limb(dinv, d)                                      \
+   do {                                                           \
+      mp_limb_t _v0, _v2, _d40, _e, _m0;                          \
+      FLINT_ASSERT(((d) & (UWORD(1)<<(GMP_LIMB_BITS - 1))) != 0); \
+      _d40 = ((d) >> 24) + 1;                                     \
+      _v0 = rec_word_tab[((d) >> 55) & 0xFF];                     \
+      _v0 = (_v0 << 11) - ((_v0*_v0*_d40) >> 40) - 1;             \
+      _v2 = ((_v0*((((mp_limb_t) 1) << 60) - _v0*_d40)) >> 47);   \
+      _v2 += (_v0 << 13);                                         \
+      _e = -_v2*((d) >> 1);                                       \
+      _m0 = -((d) & (mp_limb_t) 1);                               \
+      _e -= ((_v2 - (_v2 >> 1)) & _m0);                           \
+      umul_ppmm(_v0, _d40, _v2, _e);                              \
+      _v2 = (_v2 << 31) + (_v0 >> 1);                             \
+      umul_ppmm(_v0, _d40, _v2, (d));                             \
+      add_ssaaaa(_v0, _d40, _v0, _d40, (mp_limb_t) 0, (d));       \
+      (dinv) = _v2 - (_v0 + (d));                                 \
+   } while (0)

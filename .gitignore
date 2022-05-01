@@ -45,3 +45,4 @@ build.vc12
 build
 flint2
 .DS_Store
+longlong.h

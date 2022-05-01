@@ -782,6 +782,21 @@ fi
 rm -f build/test-slongeqlongint build/test-slongeqlongint.c
 
 
+# create longlong.h
+# FIXME when the pull request about changing configure gets merged.
+cat longlong-pre.in > longlong.h
+if [ "${MACHINE}" = "x86_64" ]; then
+    cat longlong-64bit_x86.in >> longlong.h
+elif [ "${MACHINE}" = "x86" ]; then
+    cat longlong-32bit_x86.in >> longlong.h
+elif [ "${MACHINE}" = "aarch64" ]; then
+    # this code will not get actuvated until the PR gets merged
+    cat longlong-64bit_arm.in >> longlong.h
+else
+    cat longlong-else.in >> longlong.h
+fi
+cat longlong-post.in >> longlong.h
+
 
 
 #external modules
