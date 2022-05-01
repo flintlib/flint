@@ -250,21 +250,6 @@ void flint_rand_free(flint_rand_s * state)
     flint_free(state);
 }
 
-#if FLINT_USES_GC
-#define FLINT_GC_INIT() GC_init()
-#else
-#define FLINT_GC_INIT()
-#endif
-
-#define FLINT_TEST_INIT(xxx) \
-   flint_rand_t xxx; \
-   FLINT_GC_INIT(); \
-   flint_randinit(xxx)
-
-#define FLINT_TEST_CLEANUP(xxx) \
-   flint_randclear(xxx); \
-   flint_cleanup_master();
-
 /*
   We define this here as there is no mpfr.h
  */
@@ -293,51 +278,9 @@ typedef __mpfr_struct flint_mpfr;
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
-#define FLINT_ABS(x) ((slong)(x) < 0 ? -((ulong) (x)) : (ulong) (x))
+#define FLINT_ABS(x) ((slong)(x) < 0 ? -(x) : (x))
 #define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 #define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
-
-#define MP_PTR_SWAP(x, y) \
-    do { \
-        mp_limb_t * __txxx; \
-        __txxx = x; \
-        x = y; \
-        y = __txxx; \
-    } while (0)
-
-#define SLONG_SWAP(A, B)    \
-    do {                    \
-        slong __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
-
-#define ULONG_SWAP(A, B)    \
-    do {                    \
-        ulong __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
-
-#define MP_LIMB_SWAP(A, B)      \
-    do {                        \
-        mp_limb_t __t_m_p_ = A; \
-        A = B;                  \
-        B = __t_m_p_;           \
-    } while (0)
-
-#define DOUBLE_SWAP(A, B)    \
-    do {                     \
-        double __t_m_p_ = A; \
-        A = B;               \
-        B = __t_m_p_;        \
-    } while (0)
-
-#define r_shift(in, shift) \
-    ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
-
-#define l_shift(in, shift) \
-    ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
 FLINT_DLL extern const unsigned char __flint_clz_tab[128];
@@ -356,122 +299,47 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 
 #define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
 
-#define flint_mpn_zero(xxx, nnn) \
-    do \
-    { \
-        slong ixxx; \
-        for (ixxx = 0; ixxx < (nnn); ixxx++) \
-            (xxx)[ixxx] = UWORD(0); \
-    } while (0)
-
-#define flint_mpn_copyi(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < (nnn); ixxx++) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
-
-#define flint_mpn_copyd(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
-
-#define flint_mpn_store(xxx, nnn, yyy) \
-   do \
-   { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < nnn; ixxx++) \
-         (xxx)[ixxx] = yyy; \
-   } while (0)
-
 /* common usage of flint_malloc */
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
 #define FLINT_ARRAY_REALLOC(p, n, T) (T *) flint_realloc(p, (n)*sizeof(T))
 
 /* temporary allocation */
-#define TMP_INIT \
-   typedef struct __tmp_struct { \
-      void * block; \
-      struct __tmp_struct * next; \
-   } __tmp_t; \
-   __tmp_t * __tmp_root; \
-   __tmp_t * __tpx
+#define TMP_INIT                    \
+    typedef struct __tmp_struct     \
+    {                               \
+        void * block;               \
+        struct __tmp_struct * next; \
+    } __tmp_t;                      \
+    __tmp_t * __tmp_root;           \
+    __tmp_t * __tpx
 
-#define TMP_START \
-   __tmp_root = NULL
+#define TMP_START                   \
+    __tmp_root = NULL
 
 #if FLINT_WANT_ASSERT
-#define TMP_ALLOC(size) \
-   (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
-       __tpx->next = __tmp_root, \
-       __tmp_root = __tpx, \
-       __tpx->block = flint_malloc(size))
+#define TMP_ALLOC(size)                             \
+    (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)),   \
+     __tpx->next = __tmp_root,                      \
+     __tmp_root = __tpx,                            \
+     __tpx->block = flint_malloc(size))
 #else
-#define TMP_ALLOC(size) \
-   (((size) > 8192) ? \
+#define TMP_ALLOC(size)                             \
+   (((size) > 8192) ?                               \
       (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
-       __tpx->next = __tmp_root, \
-       __tmp_root = __tpx, \
-       __tpx->block = flint_malloc(size)) : \
+       __tpx->next = __tmp_root,                    \
+       __tmp_root = __tpx,                          \
+       __tpx->block = flint_malloc(size)) :         \
       alloca(size))
 #endif
 
 #define TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC((n)*sizeof(T))
 
-#define TMP_END \
-   while (__tmp_root) { \
-      flint_free(__tmp_root->block); \
-      __tmp_root = __tmp_root->next; \
-   }
-
-/* compatibility between gmp and mpir */
-#ifndef mpn_com_n
-#define mpn_com_n mpn_com
-#endif
-
-#ifndef mpn_neg_n
-#define mpn_neg_n mpn_neg
-#endif
-
-#ifndef mpn_tdiv_q
-/* substitute for mpir's mpn_tdiv_q */
-static __inline__ void
-mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
-{
-    mp_ptr _scratch;
-    TMP_INIT;
-    TMP_START;
-    _scratch = (mp_ptr) TMP_ALLOC(dn * sizeof(mp_limb_t));
-    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
-    TMP_END;
-}
-#endif
-
-/* Newton iteration macros */
-#define FLINT_NEWTON_INIT(from, to) \
-    { \
-        slong __steps[FLINT_BITS], __i, __from, __to; \
-        __steps[__i = 0] = __to = (to); \
-        __from = (from); \
-        while (__to > __from) \
-            __steps[++__i] = (__to = (__to + 1) / 2); \
-
-#define FLINT_NEWTON_BASECASE(bc_to) { slong bc_to = __to;
-
-#define FLINT_NEWTON_END_BASECASE }
-
-#define FLINT_NEWTON_LOOP(step_from, step_to) \
-        { \
-            for (__i--; __i >= 0; __i--) \
-            { \
-                slong step_from = __steps[__i+1]; \
-                slong step_to = __steps[__i]; \
-
-#define FLINT_NEWTON_END_LOOP }}
-
-#define FLINT_NEWTON_END }
+#define TMP_END                         \
+    while (__tmp_root)                  \
+    {                                   \
+        flint_free(__tmp_root->block);  \
+        __tmp_root = __tmp_root->next;  \
+    }
 
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
