@@ -9,14 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef GMP_COMPAT_H
+#define GMP_COMPAT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
 #include <limits.h>
 #include "flint.h"
-
-#ifndef GMP_COMPAT_H
-#define GMP_COMPAT_H
 
 #define FLINT_MPZ_REALLOC(z, len)       \
     ((len) > ((z)->_mp_alloc)           \
