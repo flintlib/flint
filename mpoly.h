@@ -63,29 +63,6 @@ MPOLY_INLINE slong mpoly_divide_threads(slong n, double la, double lb)
 }
 
 
-typedef enum {
-    ORD_LEX,
-    ORD_DEGLEX,
-    ORD_DEGREVLEX
-} ordering_t;
-
-#define MPOLY_NUM_ORDERINGS 3
-
-/* context *******************************************************************/
-
-typedef struct
-{
-    slong nvars;    /* number of variables */
-    slong nfields;  /* number of fields in exponent vector */
-    ordering_t ord; /* monomial ordering */
-    int deg;        /* is ord a degree ordering? */
-    int rev;        /* is ord a reversed ordering? */
-    slong lut_words_per_exp[FLINT_BITS];
-    unsigned char lut_fix_bits[FLINT_BITS]; /* FLINT_BITS < 256 */
-} mpoly_ctx_struct;
-
-typedef mpoly_ctx_struct mpoly_ctx_t[1];
-
 FLINT_DLL void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord);
 
 FLINT_DLL void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);

@@ -93,16 +93,6 @@ slong NMOD_DIVREM_DC_ITCH(slong lenB, nmod_t mod)
 
 typedef struct
 {
-    mp_ptr coeffs;
-    slong alloc;
-    slong length;
-    nmod_t mod;
-} nmod_poly_struct;
-
-typedef nmod_poly_struct nmod_poly_t[1];
-
-typedef struct
-{
    mp_limb_t res;
    mp_limb_t lc;
    slong len0;

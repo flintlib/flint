@@ -32,29 +32,6 @@
 extern "C" {
 #endif
 
-typedef fmpz_poly_t fq_t;
-typedef fmpz_poly_struct fq_struct;
-
-typedef struct
-{
-    fmpz_mod_ctx_t ctxp;
-
-    int sparse_modulus;
-    int is_conway; /* whether field was initialized with the Flint Conway tables  (assures primitivity) */
-
-    fmpz *a;
-    slong *j;
-    slong len;
-
-    fmpz_mod_poly_t modulus;
-    fmpz_mod_poly_t inv;
-
-    char *var;
-}
-fq_ctx_struct;
-
-typedef fq_ctx_struct fq_ctx_t[1];
-
 FLINT_DLL void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d,
                                                               const char *var);
 

@@ -36,17 +36,6 @@
  extern "C" {
 #endif
 
-typedef union fq_default_mat_struct
-{
-    fq_mat_t fq;
-    fq_nmod_mat_t fq_nmod;
-    fq_zech_mat_t fq_zech;
-    nmod_mat_t nmod;
-    fmpz_mod_mat_t fmpz_mod;
-} fq_default_mat_struct;
-
-typedef fq_default_mat_struct fq_default_mat_t[1];
-
 /* Memory management  ********************************************************/
 
 FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,

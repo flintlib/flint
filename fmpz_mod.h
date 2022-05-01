@@ -49,17 +49,6 @@
     A special case for the multiplication for 3-word shows no signs of
     diminishing returns, but it is not implemented currently.
 */
-typedef struct fmpz_mod_ctx {
-    fmpz_t n;
-    void (* add_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
-    void (* sub_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
-    void (* mul_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
-    nmod_t mod;
-    ulong n_limbs[3];
-    ulong ninv_limbs[3];
-} fmpz_mod_ctx_struct;
-typedef fmpz_mod_ctx_struct fmpz_mod_ctx_t[1];
-
 FLINT_DLL void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n);
 
 FLINT_DLL void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n);

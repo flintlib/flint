@@ -34,16 +34,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-    double * entries;
-    slong r;
-    slong c;
-    double ** rows;
-} d_mat_struct;
-
-typedef d_mat_struct d_mat_t[1];
-
 #define d_mat_entry(mat,i,j) (*((mat)->rows[i] + (j)))
 
 D_MAT_INLINE

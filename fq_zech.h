@@ -27,33 +27,6 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    mp_limb_t value;
-} fq_zech_struct;
-
-typedef fq_zech_struct fq_zech_t[1];
-
-typedef struct
-{
-    mp_limb_t qm1;              /* q - 1 */
-    mp_limb_t qm1o2;            /* (q - 1) / 2 or 1 when p == 2 */
-    mp_limb_t qm1opm1;          /* (q - 1) / (p - 1) */
-    mp_limb_t p;
-    double ppre;
-    mp_limb_t prime_root;       /* primitive root for prime subfield */
-    mp_limb_t *zech_log_table;
-    mp_limb_t *prime_field_table;
-    mp_limb_t *eval_table;
-
-    fq_nmod_ctx_struct *fq_nmod_ctx;
-    int owns_fq_nmod_ctx;
-    int is_conway; /* whether field was generated using Flint Conway tables (assures primitivity) */
-
-} fq_zech_ctx_struct;
-
-typedef fq_zech_ctx_struct fq_zech_ctx_t[1];
-
 FLINT_DLL void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
 FLINT_DLL int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);

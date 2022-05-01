@@ -17,18 +17,6 @@
 extern "C" {
 #endif
 
-/*  Type definitions *********************************************************/
-
-typedef struct
-{
-    TEMPLATE(T, struct) *coeffs;
-    slong alloc;
-    slong length;
-}
-TEMPLATE(T, poly_struct);
-
-typedef TEMPLATE(T, poly_struct) TEMPLATE(T, poly_t)[1];
-
 /*  Memory management ********************************************************/
 
 FLINT_DLL void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);

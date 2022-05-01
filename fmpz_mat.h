@@ -37,16 +37,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-    fmpz * entries;
-    slong r;
-    slong c;
-    fmpz ** rows;
-} fmpz_mat_struct;
-
-typedef fmpz_mat_struct fmpz_mat_t[1];
-
 /* Element access  ********************************************************/
 
 FMPZ_MAT_INLINE

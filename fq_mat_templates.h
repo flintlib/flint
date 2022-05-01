@@ -21,16 +21,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-    TEMPLATE(T, struct) * entries;
-    slong r;
-    slong c;
-    TEMPLATE(T, struct) ** rows;
-} TEMPLATE(T, mat_struct);
-
-typedef TEMPLATE(T, mat_struct) TEMPLATE(T, mat_t)[1];
-
 /* Memory management  ********************************************************/
 
 FLINT_DLL void TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong cols,

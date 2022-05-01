@@ -25,17 +25,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-    int sign;
-    fmpz * p;
-    ulong * exp;
-    slong alloc;
-    slong num;
-} fmpz_factor_struct;
-
-typedef fmpz_factor_struct fmpz_factor_t[1];
-
 /* Utility functions *********************************************************/
 
 FLINT_DLL void fmpz_factor_init(fmpz_factor_t factor);

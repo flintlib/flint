@@ -29,19 +29,6 @@
  extern "C" {
 #endif
 
-/* Types *********************************************************************/
-
-typedef struct
-{
-    nmod_poly_struct * entries;
-    slong r;
-    slong c;
-    nmod_poly_struct ** rows;
-    mp_limb_t modulus;
-} nmod_poly_mat_struct;
-
-typedef nmod_poly_mat_struct nmod_poly_mat_t[1];
-
 NMOD_POLY_MAT_INLINE
 nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, slong i, slong j)
 {

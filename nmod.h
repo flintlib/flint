@@ -34,14 +34,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-   mp_limb_t n;
-   mp_limb_t ninv;
-   flint_bitcnt_t norm;
-} nmod_t;
-
-
 #define NMOD_RED2(r, a_hi, a_lo, mod) \
    do { \
       mp_limb_t q0xx, q1xx, r1xx; \

@@ -41,28 +41,6 @@
 
 #define SIZE_RED_FAILURE_THRESH 5
 
-typedef enum
-{
-    GRAM,
-    Z_BASIS
-} rep_type;
-
-typedef enum
-{
-    APPROX,
-    EXACT
-} gram_type;
-
-typedef struct
-{
-    double delta;
-    double eta;
-    rep_type rt;
-    gram_type gt;
-} fmpz_lll_struct;
-
-typedef fmpz_lll_struct fmpz_lll_t[1];
-
 typedef union
 {
     d_mat_t appSP;

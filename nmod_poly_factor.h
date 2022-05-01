@@ -41,14 +41,6 @@
 
 typedef struct
 {
-    nmod_poly_struct *p;
-    slong *exp;
-    slong num;
-    slong alloc;
-} nmod_poly_factor_struct;
-
-typedef struct
-{
     nmod_poly_struct * baby;
     nmod_poly_struct * res;
     nmod_poly_struct * H;
@@ -60,8 +52,6 @@ typedef struct
 nmod_poly_interval_poly_arg_t;
 
 /* Factoring  ****************************************************************/
-
-typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
 
 FLINT_DLL void nmod_poly_factor_init(nmod_poly_factor_t fac);
 

@@ -34,16 +34,6 @@
 
 /*****************************************************************************/
 
-typedef struct {
-    fq_nmod_t constant;
-    fq_nmod_mpoly_struct * poly;
-    fmpz * exp;
-    slong num;
-    slong alloc;
-} fq_nmod_mpoly_factor_struct;
-
-typedef fq_nmod_mpoly_factor_struct fq_nmod_mpoly_factor_t[1];
-
 FLINT_DLL void fq_nmod_mpoly_factor_init(fq_nmod_mpoly_factor_t f,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 

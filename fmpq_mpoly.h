@@ -35,13 +35,6 @@
 
 /* Context object ************************************************************/
 
-typedef struct
-{
-    fmpz_mpoly_ctx_t zctx;
-} fmpq_mpoly_ctx_struct;
-
-typedef fmpq_mpoly_ctx_struct fmpq_mpoly_ctx_t[1];
-
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, 
                                             slong nvars, const ordering_t ord)

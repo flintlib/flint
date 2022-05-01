@@ -43,35 +43,6 @@
  extern "C" {
 #endif
 
-/*  Type definitions *********************************************************/
-
-/*
-    context object for fq_nmod_mpoly
-*/
-typedef struct
-{
-    mpoly_ctx_t minfo;
-    fq_nmod_ctx_t fqctx;
-} fq_nmod_mpoly_ctx_struct;
-
-typedef fq_nmod_mpoly_ctx_struct fq_nmod_mpoly_ctx_t[1];
-
-/*
-    fq_nmod_mpoly_t
-    sparse multivariates with fq_nmod coefficients
-*/
-typedef struct {
-    mp_limb_t * coeffs;
-    ulong * exps;
-    slong length;
-    flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
-    slong exps_alloc;       /* abs size in ulong units */
-} fq_nmod_mpoly_struct;
-
-typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
-
-
 /* Internal type definitions *************************************************/
 
 /*

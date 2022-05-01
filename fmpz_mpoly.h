@@ -40,33 +40,6 @@
  extern "C" {
 #endif
 
-/* Type definitions **********************************************************/
-
-/*
-    context object for fmpz_mpoly
-*/
-typedef struct
-{
-    mpoly_ctx_t minfo;
-} fmpz_mpoly_ctx_struct;
-
-typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
-
-/*
-    fmpz_mpoly_t
-    sparse multivariates with fmpz coeffs
-*/
-typedef struct
-{
-   fmpz * coeffs; /* alloc fmpzs */
-   ulong * exps;
-   slong alloc;
-   slong length;
-   flint_bitcnt_t bits;     /* number of bits per exponent */
-} fmpz_mpoly_struct;
-
-typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
-
 FMPZ_MPOLY_INLINE
 fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i,
                                                     const fmpz_mpoly_ctx_t ctx)

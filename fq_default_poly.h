@@ -33,20 +33,6 @@
 extern "C" {
 #endif
 
-/*  Type definitions *********************************************************/
-
-typedef union fq_default_poly_struct
-{
-    fq_poly_t fq;
-    fq_nmod_poly_t fq_nmod;
-    fq_zech_poly_t fq_zech;
-    nmod_poly_t nmod;
-    fmpz_mod_poly_t fmpz_mod;
-}
-fq_default_poly_struct;
-
-typedef fq_default_poly_struct fq_default_poly_t[1];
-
 /*  Memory management ********************************************************/
 
 FQ_DEFAULT_POLY_INLINE void fq_default_poly_init(fq_default_poly_t poly,

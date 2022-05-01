@@ -42,14 +42,6 @@
 #define PADIC_TEST_PREC_MIN WORD(-100)
 #define PADIC_TEST_PREC_MAX  WORD(100)
 
-typedef struct {
-    fmpz u;
-    slong v;
-    slong N;
-} padic_struct;
-
-typedef padic_struct padic_t[1];
-
 #define padic_val(x)   ((x)->v)
 #define padic_prec(x)  ((x)->N)
 
@@ -70,29 +62,6 @@ slong padic_get_prec(const padic_t x)
 {
    return x->N;
 }
-
-enum padic_print_mode
-{
-    PADIC_TERSE, 
-    PADIC_SERIES, 
-    PADIC_VAL_UNIT
-};
-
-typedef struct {
-
-    fmpz_t p;
-
-    double pinv;
-
-    fmpz *pow;
-    slong min;
-    slong max;
-
-    enum padic_print_mode mode;
-
-} padic_ctx_struct;
-
-typedef padic_ctx_struct padic_ctx_t[1];
 
 typedef struct {
     slong n;

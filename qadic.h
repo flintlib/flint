@@ -41,10 +41,6 @@
 
 /* Data types and context ****************************************************/
 
-typedef padic_poly_t qadic_t;
-
-typedef padic_poly_struct qadic_struct;
-
 QADIC_INLINE slong qadic_val(const qadic_t op)
 {
     return padic_poly_val(op);
@@ -54,20 +50,6 @@ QADIC_INLINE slong qadic_prec(const qadic_t op)
 {
     return padic_poly_prec(op);
 }
-
-typedef struct
-{
-    padic_ctx_struct pctx;
-
-    fmpz *a;
-    slong *j;
-    slong len;
-
-    char *var;
-}
-qadic_ctx_struct;
-
-typedef qadic_ctx_struct qadic_ctx_t[1];
 
 FLINT_DLL void qadic_ctx_init_conway(qadic_ctx_t ctx, 
                            const fmpz_t p, slong d, slong min, slong max, 

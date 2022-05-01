@@ -44,35 +44,6 @@
 #endif
 
 
-/* Type definitions **********************************************************/
-
-/*
-    context object for nmod_mpoly
-*/
-typedef struct
-{
-    mpoly_ctx_t minfo;
-    nmod_t mod;
-} nmod_mpoly_ctx_struct;
-
-typedef nmod_mpoly_ctx_struct nmod_mpoly_ctx_t[1];
-
-/*
-    nmod_mpoly_t
-    sparse multivariates with nmod coeffs
-*/
-typedef struct
-{
-    mp_limb_t * coeffs;
-    ulong * exps;
-    slong length;
-    flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
-    slong exps_alloc;       /* abs size in ulong units */
-} nmod_mpoly_struct;
-
-typedef nmod_mpoly_struct nmod_mpoly_t[1];
-
 NMOD_MPOLY_INLINE
 mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -95,7 +66,6 @@ evil_const_cast_nmod_poly_to_n_poly(const nmod_poly_struct * a)
 {
     return (const n_poly_struct *) a;
 }
-
 
 /*
     nmod_mpoly_univar_t

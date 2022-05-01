@@ -36,28 +36,6 @@ typedef struct
 
 typedef _aprcl_config aprcl_config[1];
 
-/* Z[unity_root_q, unity_root_p]/(n) struct */
-typedef struct
-{
-    fmpz_mod_poly_t *polys;
-    ulong p;
-    ulong q;
-    fmpz_mod_ctx_t ctx;
-} _unity_zpq;
-
-typedef _unity_zpq unity_zpq[1];
-
-/* Z[unity_root]/(n) struct */
-typedef struct
-{
-    fmpz_mod_poly_t poly;
-    ulong p;
-    ulong exp;
-    fmpz_mod_ctx_t ctx;
-} _unity_zp;
-
-typedef _unity_zp unity_zp[1];
-
 /* Primality test status */
 typedef enum
 {

@@ -46,15 +46,6 @@
 
 typedef struct
 {
-    fmpz * coeffs;
-    slong alloc;
-    slong length;
-} fmpz_mod_poly_struct;
-
-typedef fmpz_mod_poly_struct fmpz_mod_poly_t[1];
-
-typedef struct
-{
    fmpz_t res;
    fmpz_t lc;
    slong len0;

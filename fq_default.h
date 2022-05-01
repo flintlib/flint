@@ -37,38 +37,6 @@
 extern "C" {
 #endif
 
-typedef union fq_default_struct
-{
-    fq_t fq;
-    fq_nmod_t fq_nmod;
-    fq_zech_t fq_zech;
-    ulong nmod;
-    fmpz_t fmpz_mod;
-} fq_default_struct;
-
-typedef fq_default_struct fq_default_t[1];
-
-typedef struct
-{
-    int type;
-    union ctx
-    {
-        fq_ctx_t fq;
-        fq_nmod_ctx_t fq_nmod;
-        fq_zech_ctx_t fq_zech;
-        struct {
-            nmod_t mod;
-            mp_limb_t a;    /* minpoly is x - a */
-        } nmod;
-        struct {
-            fmpz_mod_ctx_t mod;
-            fmpz_t a;       /* minpoly is x - a */
-        } fmpz_mod;
-    } ctx;
-} fq_default_ctx_struct;
-
-typedef fq_default_ctx_struct fq_default_ctx_t[1];
-
 FQ_DEFAULT_INLINE void fq_default_ctx_init_type(fq_default_ctx_t ctx,
                             const fmpz_t p, slong d, const char *var, int type)
 {

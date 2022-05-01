@@ -38,19 +38,6 @@
 #endif
 
 
-/*  Type definitions  ********************************************************/
-
-typedef struct
-{
-    fmpz *coeffs;
-    slong alloc;
-    slong length;
-    slong val;
-    slong N;
-} padic_poly_struct;
-
-typedef padic_poly_struct padic_poly_t[1];
-
 /*  Helper functions  ********************************************************/
 
 /*

@@ -34,20 +34,6 @@
 extern "C" {
 #endif
 
-/*  Type definitions *********************************************************/
-
-typedef union fq_default_poly_factor_struct
-{
-    fq_poly_factor_t fq;
-    fq_nmod_poly_factor_t fq_nmod;
-    fq_zech_poly_factor_t fq_zech;
-    nmod_poly_factor_t nmod;
-    fmpz_mod_poly_factor_t fmpz_mod;
-} fq_default_poly_factor_struct;
-
-typedef fq_default_poly_factor_struct fq_default_poly_factor_t[1];
-
-
 FQ_DEFAULT_POLY_FACTOR_INLINE
 void fq_default_poly_factor_init(fq_default_poly_factor_t fac,
                                                     const fq_default_ctx_t ctx)

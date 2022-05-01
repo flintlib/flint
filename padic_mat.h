@@ -36,15 +36,6 @@
 #endif
 
 
-typedef struct
-{
-    fmpz_mat_struct mat;
-    slong val;
-    slong N;
-} padic_mat_struct;
-
-typedef padic_mat_struct padic_mat_t[1];
-
 /* Macros  *******************************************************************/
 
 PADIC_MAT_INLINE
