@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -13,9 +12,10 @@
 #include "fmpz.h"
 
 void
-_fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
+_fmpz_vec_demote(fmpz * vec, slong len)
 {
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_fdiv_q_ui(vec1 + i, vec2 + i, c);
+    vec += len;
+    len = -len;
+    for (; len != 0; len++)
+       _fmpz_demote(vec + len); 
 }

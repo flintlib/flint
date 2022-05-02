@@ -11,7 +11,7 @@
 */
 
 #include <math.h>
-#include "fmpz_vec.h"
+#include "fmpz.h"
 
 slong
 _fmpz_vec_get_d_vec_2exp(double *appv, const fmpz * vec, slong len)

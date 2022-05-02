@@ -21,16 +21,28 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz.h"
+#include "fmpz-conversions.h"
 #include "fmpz_vec.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define FMPZ_POLY_INV_NEWTON_CUTOFF 32
 #define FMPZ_POLY_SQRT_DIVCONQUER_CUTOFF 16
 #define FMPZ_POLY_SQRTREM_DIVCONQUER_CUTOFF 16
+
+/* to avoid including fmpz.h */
+#define FMPZ_IS_ZERO(inp)   (*(inp) == 0)
+#define FMPZ_IS_ONE(inp)    (*(inp) == 1)
+#define FMPZ_EQUAL(f, g)                    \
+    ((f) == (g)                             \
+     ? 1                                    \
+     : (!COEFF_IS_MPZ(*(f))                  \
+        ? *(f) == *(g)                      \
+        : (!COEFF_IS_MPZ(*(g))               \
+            ? 0                             \
+            : mpz_cmp(COEFF_TO_PTR(*(f)), COEFF_TO_PTR(*(g))) == 0)))
 
 /*  Type definitions *********************************************************/
 
@@ -74,9 +86,7 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
 {
     if (poly->length > newlen)
     {
-        slong i;
-        for (i = newlen; i < poly->length; i++)
-           _fmpz_demote(poly->coeffs + i); 
+        _fmpz_vec_demote(poly->coeffs + newlen, poly->length - newlen);
     }
     poly->length = newlen;
 }
@@ -175,9 +185,7 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
 {
     if (poly->length > newlen)
     {
-        slong i;
-        for (i = newlen; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i);
+        _fmpz_vec_demote(poly->coeffs + newlen, poly->length - newlen);
         poly->length = newlen;
         _fmpz_poly_normalise(poly);
     }  
@@ -230,9 +238,9 @@ FLINT_DLL int fmpz_poly_equal_trunc(const fmpz_poly_t poly1,
     ((poly)->length == 0)
 
 FMPZ_POLY_INLINE
-int _fmpz_poly_is_one(const fmpz *poly, slong len)
+int _fmpz_poly_is_one(const fmpz * poly, slong len)
 {
-    return (len > 0 && fmpz_is_one(poly) 
+    return (len > 0 && FMPZ_IS_ONE(poly)
                     && _fmpz_vec_is_zero(poly + 1, len - 1));
 }
 
@@ -257,8 +265,8 @@ int fmpz_poly_is_gen(const fmpz_poly_t op)
 FMPZ_POLY_INLINE
 int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
 {
-	return ((poly->length == 0) && fmpz_is_zero(c)) ||
-        ((poly->length == 1) && fmpz_equal(poly->coeffs, c));
+	return ((poly->length == 0) && FMPZ_IS_ZERO(c)) ||
+        ((poly->length == 1) && FMPZ_EQUAL(poly->coeffs, c));
 }
 
 /*  Addition and subtraction  ************************************************/
@@ -382,7 +390,6 @@ void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1,
         _fmpz_vec_scalar_smod_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
         _fmpz_poly_set_length(poly1, poly2->length);
         _fmpz_poly_normalise(poly1);
-
     }
 }
 
@@ -1206,7 +1213,7 @@ FMPZ_POLY_INLINE slong _fmpz_poly_hamming_weight(const fmpz * a, slong len)
 {
     slong i, sum = 0;
     for (i = 0; i < len; i++)
-        sum += !fmpz_is_zero(a + i);
+        sum += !FMPZ_IS_ZERO(a + i);
     return sum;
 }
 

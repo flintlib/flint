@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
+#include "fmpz.h"
 
 void
 _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t in)

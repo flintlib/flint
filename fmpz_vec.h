@@ -69,6 +69,8 @@ FLINT_DLL fmpz * _fmpz_vec_init(slong len);
 
 FLINT_DLL void _fmpz_vec_clear(fmpz * vec, slong len);
 
+FLINT_DLL void _fmpz_vec_demote(fmpz * vec, slong len);
+
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 

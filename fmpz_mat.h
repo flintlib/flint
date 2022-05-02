@@ -19,19 +19,7 @@
 #define FMPZ_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "nmod_mat.h"
-#include "d_mat.h"
-#include "mpf_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -67,11 +55,10 @@ FLINT_DLL void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
 FMPZ_MAT_INLINE void
 fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2)
 {
-    slong i, j;
+    slong i;
 
     for (i = 0; i < fmpz_mat_nrows(mat1); i++)
-        for (j = 0; j < fmpz_mat_ncols(mat1); j++)
-            fmpz_swap(fmpz_mat_entry(mat2, i, j), fmpz_mat_entry(mat1, i, j));
+        _fmpz_vec_swap(mat1->rows[i], mat2->rows[i], fmpz_mat_ncols(mat1));
 }
 
 FLINT_DLL void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
@@ -88,32 +75,12 @@ fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
     return _fmpz_vec_is_zero(mat->rows[i], mat->c);
 }
 
-FMPZ_MAT_INLINE
-int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n)
-{
-   slong i;
-
-   for (i = 0; i < M->r; i++)
-   {
-      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
-         return 0;
-   }
-
-   return 1;
-}
+FLINT_DLL int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n);
 
 FMPZ_MAT_INLINE
 int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
 {
-   slong i;
-
-   for (i = 0; i < M->c; i++)
-   {
-      if (!fmpz_equal(M->rows[m] + i, M->rows[n] + i))
-         return 0;
-   }
-
-   return 1;
+   return _fmpz_vec_equal(M->rows[m], M->rows[n], M->c);
 }
 
 FMPZ_MAT_INLINE
@@ -330,56 +297,9 @@ void fmpz_mat_invert_rows(fmpz_mat_t mat, slong * perm)
         fmpz_mat_swap_rows(mat, perm, i, mat->r - i - 1);
 }
 
-FMPZ_MAT_INLINE
-void fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s)
-{
-    if (r != s && !fmpz_mat_is_empty(mat))
-    {
-        slong t;
+FLINT_DLL void fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s);
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-       for (t = 0; t < mat->r; t++)
-       {
-           fmpz_swap(fmpz_mat_entry(mat, t, r), fmpz_mat_entry(mat, t, s));
-       }
-    }
-}
-
-FMPZ_MAT_INLINE
-void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm)
-{
-    if (!fmpz_mat_is_empty(mat))
-    {
-        slong t;
-        slong i;
-        slong c = mat->c;
-        slong k = mat->c/2;
-
-        if (perm)
-        {
-            for (i =0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i];
-                perm[c - i] = t;
-            }
-        }
-
-        for (t = 0; t < mat->r; t++)
-        {
-            for (i = 0; i < k; i++)
-            {
-                fmpz_swap(fmpz_mat_entry(mat, t, i), fmpz_mat_entry(mat, t, c - i - 1));
-            }
-        }
-    }
-}
+FLINT_DLL void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm);
 
 /* Gaussian elimination *****************************************************/
 
@@ -437,8 +357,6 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 /* Transforms */
 
 FLINT_DLL void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
-
-#include "fmpz_poly.h"
 
 /* Characteristic polynomial ************************************************/
 
@@ -576,15 +494,20 @@ FLINT_DLL void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
-FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres,
-    const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
-
 FLINT_DLL void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
 
-
+/* FIXME: Remove void when fmpz_comb_t and fmpz_comb_temp_t have been dealt
+ * with. */
+FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres,
+    const fmpz_mat_t mat, const void * comb, void * temp);
 FLINT_DLL void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
     nmod_mat_t * const residues, slong nres,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
+    const void * comb, void * temp, int sign);
+/* FLINT_DLL void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, */
+/*     nmod_mat_t * const residues, slong nres, */
+/*     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign); */
+/* FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, */
+/*     const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp); */
 
 FLINT_DLL void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);

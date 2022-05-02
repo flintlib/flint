@@ -9,14 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
-    const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
+    const fmpz_mat_t mat, const void * comb_void, void * temp_void)
 {
     slong i, j, k;
     mp_ptr r;
+    const fmpz_comb_struct * comb = comb_void;
+    fmpz_comb_temp_struct * temp = temp_void;
 
     r = _nmod_vec_init(nres);
 

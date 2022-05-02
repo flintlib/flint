@@ -31,23 +31,12 @@
 
 typedef struct
 {
-   mp_ptr dinv;
-   slong n;
-   flint_bitcnt_t norm;
-} fmpz_preinvn_struct;
-
-typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
-
-typedef struct
-{
    int count;
 #if FLINT_USES_PTHREAD
    pthread_t thread;
 #endif
    void * address;
 } fmpz_block_header_s;
-
-#define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))  /* is x a pointer not an integer */
 
 FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
 

@@ -120,6 +120,17 @@ typedef d_mat_struct d_mat_t[1];
 
 typedef struct
 {
+    mpf_ptr entries;
+    slong r;
+    slong c;
+    flint_bitcnt_t prec;
+    mpf_ptr * rows;
+} mpf_mat_struct;
+
+typedef mpf_mat_struct mpf_mat_t[1];
+
+typedef struct
+{
    mp_limb_t n;
    mp_limb_t ninv;
    flint_bitcnt_t norm;
@@ -149,6 +160,15 @@ typedef nmod_mat_struct nmod_mat_t[1];
 
 typedef slong fmpz;
 typedef fmpz fmpz_t[1];
+
+typedef struct
+{
+   mp_ptr dinv;
+   slong n;
+   flint_bitcnt_t norm;
+} fmpz_preinvn_struct;
+
+typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
 typedef struct
 {
@@ -783,6 +803,10 @@ typedef struct
 } n_poly_struct;
 
 typedef n_poly_struct n_poly_t[1];
+
+
+
+
 
 
 

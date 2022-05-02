@@ -25,17 +25,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-    mpf_ptr entries;
-    slong r;
-    slong c;
-    flint_bitcnt_t prec;
-    mpf_ptr * rows;
-} mpf_mat_struct;
-
-typedef mpf_mat_struct mpf_mat_t[1];
-
 MPF_MAT_INLINE
 mpf_ptr mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
 {

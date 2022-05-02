@@ -12,6 +12,7 @@
 
 #include "mpn_extras.h"
 #include "fmpz.h"
+#include "nmod_vec.h"
 #include "aprcl.h"
 
 int fmpz_is_prime(const fmpz_t n)

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
+#include "fmpz.h"
 
 /*
     set sumabs = bit_count(sum of absolute values of coefficients);

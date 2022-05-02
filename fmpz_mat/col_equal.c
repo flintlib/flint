@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,10 +11,16 @@
 
 #include "fmpz.h"
 
-void
-_fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
+int
+fmpz_mat_col_equal(const fmpz_mat_t M, slong m, slong n)
 {
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_fdiv_q_ui(vec1 + i, vec2 + i, c);
+   slong i;
+
+   for (i = 0; i < M->r; i++)
+   {
+      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
+         return 0;
+   }
+
+   return 1;
 }

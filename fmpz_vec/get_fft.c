@@ -9,13 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fft.h"
 
 slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
                        const fmpz * coeffs_m, slong l, slong length)
@@ -75,7 +69,7 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
       
       if (signed_c) /* write out FFT coefficient, ensuring sign is correct */
       {
-         mpn_neg_n(coeffs_f[i], coeff, size_j); 
+         mpn_neg(coeffs_f[i], coeff, size_j); 
          FLINT_MPN_STORE(coeffs_f[i] + size_j, size_f - size_j, WORD(-1)); 
       } else
       {
