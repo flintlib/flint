@@ -137,6 +137,9 @@ truth_t gr_mpoly_is_zero(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cc
     return _gr_vec_is_zero(A->coeffs, A->length, cctx);
 }
 
+int gr_mpoly_gen(gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
 truth_t gr_mpoly_equal(const gr_mpoly_t A, const gr_mpoly_t B, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
 /* Container operations */
