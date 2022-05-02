@@ -10,7 +10,7 @@
 */
 
 #include "n_poly.h"
-#include "fq_nmod_mpoly_factor.h"
+#include "fq_nmod.h"
 
 
 /* g is in Fq[gen(1)] */

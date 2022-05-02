@@ -10,12 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
-
 
 void
 _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)

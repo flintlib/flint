@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat.h"
+#include "flint.h"
 
 void
 d_mat_clear(d_mat_t mat)

@@ -11,7 +11,7 @@
 */
 
 #include <math.h>
-#include "ulong_extras.h"
+#include "flint.h"
 
 mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
 {
@@ -42,7 +42,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    {
       double x = sqrt((double) n);
       mp_limb_t y = (mp_limb_t) (x + 0.5);
-      if (n == n_pow(y, 2))
+      if (n == y * y)
       {
          *exp = 2;
          return y;
@@ -53,7 +53,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    {
       double x = pow((double) n, 1.0 / 3.0);
       mp_limb_t y = (mp_limb_t) (x + 0.5);
-      if (n == n_pow(y, 3))
+      if (n == y * y * y)
       {
          *exp = 3;
          return y;
@@ -64,7 +64,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    {
       double x = pow((double) n, 1.0 / 5.0);
       mp_limb_t y = (mp_limb_t) (x + 0.5);
-      if (n == n_pow(y, 5))
+      if (n == y * y * y * y * y)
       {
          *exp = 5;
          return y;

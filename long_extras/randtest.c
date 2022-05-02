@@ -9,13 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-#include <gmp.h>
-
-#include "flint.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
 
 mp_limb_signed_t z_randtest(flint_rand_t state)
 {

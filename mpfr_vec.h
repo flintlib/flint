@@ -18,41 +18,39 @@
 #define MPFR_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
+#include "flint.h"
 #include <mpfr.h> 
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-FLINT_DLL flint_mpfr * _mpfr_vec_init(slong length, flint_bitcnt_t prec);
+#if MPFR_VERSION_MAJOR < 3
+#error MPFR 3.0.0 or later is required
+#endif
 
-FLINT_DLL void _mpfr_vec_clear(flint_mpfr * vec, slong length);
+FLINT_DLL mpfr_ptr _mpfr_vec_init(slong length, flint_bitcnt_t prec);
 
-FLINT_DLL void _mpfr_vec_randtest(flint_mpfr * f, flint_rand_t state, slong len);
+FLINT_DLL void _mpfr_vec_clear(mpfr_ptr vec, slong length);
 
-FLINT_DLL void _mpfr_vec_zero(flint_mpfr * vec, slong length);
+FLINT_DLL void _mpfr_vec_randtest(mpfr_ptr f, flint_rand_t state, slong len);
 
-FLINT_DLL void _mpfr_vec_set(flint_mpfr * vec1, const flint_mpfr * vec2, slong length);
+FLINT_DLL void _mpfr_vec_zero(mpfr_ptr vec, slong length);
 
-FLINT_DLL int _mpfr_vec_equal(const flint_mpfr * vec1, const flint_mpfr * vec2, slong len);
+FLINT_DLL void _mpfr_vec_set(mpfr_ptr vec1, mpfr_srcptr vec2, slong length);
 
-FLINT_DLL void _mpfr_vec_add(flint_mpfr * res, const flint_mpfr * vec1, const flint_mpfr * vec2, slong length);
+FLINT_DLL int _mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len);
 
-FLINT_DLL void _mpfr_vec_scalar_mul_2exp(flint_mpfr * res, const flint_mpfr * vec, slong length, flint_bitcnt_t exp);
+FLINT_DLL void _mpfr_vec_add(mpfr_ptr res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
 
-FLINT_DLL void _mpfr_vec_scalar_mul_mpfr(flint_mpfr * res, const flint_mpfr * vec, slong length, mpfr_t c);
+FLINT_DLL void _mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp);
 
-FLINT_DLL void _mpfr_vec_scalar_product(mpfr_t res, const flint_mpfr * vec1, const flint_mpfr * vec2, slong length);
+FLINT_DLL void _mpfr_vec_scalar_mul_mpfr(mpfr_ptr res, mpfr_srcptr vec, slong length, mpfr_t c);
+
+FLINT_DLL void _mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-
-
-
-

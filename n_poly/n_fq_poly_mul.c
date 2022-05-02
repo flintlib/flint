@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "fq_nmod_poly.h"
 
 
 void _n_fq_poly_mul_(

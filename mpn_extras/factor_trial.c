@@ -9,14 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
-
 
 int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop)
 {

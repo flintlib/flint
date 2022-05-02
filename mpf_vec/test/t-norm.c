@@ -28,7 +28,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpf *a;
+        mpf_ptra;
         mpf_t res1, res2, res3;
         slong len = n_randint(state, 100);
         if (!len)

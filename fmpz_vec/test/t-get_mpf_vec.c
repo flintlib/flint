@@ -33,7 +33,7 @@ main(void)
     {
         int result;
         fmpz *a;
-        mpf *d1, *d2;
+        mpf_ptrd1, *d2;
         slong bits, len;
 
         len = n_randint(state, 100);

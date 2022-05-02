@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint.h"
 
 /* Coefficients of Chebyshev's approximation polynomial (deg 2) {c0, c1, c2}
    splitting 0.5 to 1 into 8 equal intervals 

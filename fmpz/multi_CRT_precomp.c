@@ -11,7 +11,6 @@
 
 #include "fmpz.h"
 
-
 void _fmpz_multi_CRT_precomp(
     fmpz * outputs,
     const fmpz_multi_CRT_t P,
@@ -107,4 +106,3 @@ void fmpz_multi_CRT_precomp(
 
     TMP_END;
 }
-

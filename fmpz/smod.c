@@ -13,7 +13,6 @@
 
 #include "fmpz.h"
 
-
 /* r = a mod m  with various options for the range of r */
 void _fmpz_smod(
     fmpz_t r,

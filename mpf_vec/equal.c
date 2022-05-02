@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
 int
-_mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len)
+_mpf_vec_equal(mpf_srcptr vec1, mpf_srcptr vec2, slong len)
 {
     slong i;
     if (vec1 == vec2)

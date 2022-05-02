@@ -11,7 +11,6 @@
 
 #include "n_poly.h"
 
-
 int n_fq_bpoly_is_canonical(const n_fq_bpoly_t A, const fq_nmod_ctx_t ctx)
 {
     slong i;
@@ -115,7 +114,7 @@ void n_fq_bpoly_get_coeff_n_fq(
     const fq_nmod_ctx_t ctx)
 {
     if (e0 >= A->length)
-        _n_fq_zero(c, fq_nmod_ctx_degree(ctx));
+        _n_fq_zero(c, FQ_NMOD_CTX_DEGREE(ctx));
     else
         n_fq_poly_get_coeff_n_fq(c, A->coeffs + e0, e1, ctx);
 }
@@ -153,7 +152,7 @@ void n_fq_bpoly_get_coeff_fq_nmod(
     const fq_nmod_ctx_t ctx)
 {
     if (e0 >= A->length)
-        fq_nmod_zero(c, ctx);
+        FQ_NMOD_ZERO(c, ctx);
     else
         n_fq_poly_get_coeff_fq_nmod(c, A->coeffs + e0, e1, ctx);
 }
@@ -178,7 +177,7 @@ void n_fq_bpoly_set_n_fq_poly_gen0(
     const n_fq_poly_t B,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
     n_bpoly_fit_length(A, B->length);
     for (i = 0; i < B->length; i++)
@@ -227,7 +226,7 @@ void n_fq_bpoly_scalar_mul_n_fq(
     const mp_limb_t * c,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
 
     if (_n_fq_is_zero(c, d))

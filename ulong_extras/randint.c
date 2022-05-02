@@ -14,8 +14,10 @@
 
 ulong n_randint(flint_rand_t state, ulong limit) 
 {
-    if (limit == UWORD(0)) return n_randlimb(state);
-    else return n_randlimb(state) % limit;
+    if (limit == UWORD(0))
+        return n_randlimb(state);
+    else
+        return n_randlimb(state) % limit;
 }
 
 mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit) 

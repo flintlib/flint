@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include <math.h>
+#include "double_extras.h"
 
 double
 _d_vec_dot_heuristic(const double *vec1, const double *vec2, slong len2,

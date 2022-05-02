@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_factor.h"
 
 void
 fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac)

@@ -9,11 +9,7 @@
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
-#include "nmod_vec.h"
 
 flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 {

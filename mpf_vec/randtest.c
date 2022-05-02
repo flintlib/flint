@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
 void
-_mpf_vec_randtest(mpf * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
+_mpf_vec_randtest(mpf_ptr f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     slong i;
 

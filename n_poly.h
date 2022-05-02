@@ -18,29 +18,13 @@
 #define N_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
+#include "flint.h"
+#include "nmod.h"
 #include "nmod_poly.h"
-#include "fq_nmod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/* arrays of ulong */
-typedef struct
-{
-    mp_limb_t * coeffs;
-    slong alloc;
-    slong length;
-} n_poly_struct;
-
-typedef n_poly_struct n_poly_t[1];
 
 typedef n_poly_struct n_fq_poly_struct;
 
@@ -155,6 +139,27 @@ typedef n_poly_polyun_stack_struct n_poly_polyun_stack_t[1];
 
 
 /*****************************************************************************/
+
+/* define the following macros to avoid including fq_nmod.h */
+#define FQ_NMOD_CTX_DEGREE(ctx)                     \
+    (ctx->modulus->length - 1)
+
+#define FQ_NMOD_ZERO(rop, ctx)                      \
+    nmod_poly_zero(rop)
+
+#define FQ_NMOD_IS_ZERO(rop, ctx)                   \
+    nmod_poly_is_zero(rop)
+
+#define FQ_NMOD_INIT(rop, ctx)                      \
+    nmod_poly_init2_preinv(rop, ctx->mod.n,         \
+            ctx->mod.ninv, FQ_NMOD_CTX_DEGREE(ctx))
+
+#define FQ_NMOD_CTX_ORDER(f, ctx)                   \
+    do                                              \
+    {                                               \
+        fmpz_set(f, (&((ctx)->p)));                 \
+        fmpz_pow_ui(f, f, FQ_NMOD_CTX_DEGREE(ctx)); \
+    } while (0)
 
 N_POLY_INLINE
 void n_poly_init(n_poly_t A)
@@ -658,7 +663,7 @@ int _n_fq_is_ui(const mp_limb_t * a, slong d)
 N_POLY_INLINE
 int n_fq_is_one(const mp_limb_t * a, const fq_nmod_ctx_t ctx)
 {
-    return _n_fq_is_one(a, fq_nmod_ctx_degree(ctx));
+    return _n_fq_is_one(a, FQ_NMOD_CTX_DEGREE(ctx));
 }
 
 N_POLY_INLINE
@@ -704,7 +709,9 @@ void _n_fq_swap(
 {
     slong i = 0;
     do {
-        MP_LIMB_SWAP(a[i], b[i]);
+        mp_limb_t tmp = a[i];
+        a[i] = b[i];
+        b[i] = tmp;
         i++;
     } while (i < d);
 }
@@ -783,7 +790,7 @@ void n_fq_add(
     const mp_limb_t * c,    /* length d */
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     FLINT_ASSERT(d > 0);
     _nmod_vec_add(a, b, c, d, ctx->modulus->mod);
 }
@@ -807,7 +814,7 @@ void n_fq_sub(
     const mp_limb_t * c,    /* length d */
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     FLINT_ASSERT(d > 0);
     _nmod_vec_sub(a, b, c, d, ctx->modulus->mod);
 }
@@ -888,7 +895,7 @@ void _n_fq_reduce2(
     const fq_nmod_ctx_t ctx,
     mp_limb_t * t)          /* length 2d */
 {
-    slong blen = 2*fq_nmod_ctx_degree(ctx) - 1;
+    slong blen = 2*FQ_NMOD_CTX_DEGREE(ctx) - 1;
 
     FLINT_ASSERT(a != b);
 
@@ -908,7 +915,7 @@ void _n_fq_mul(
     const fq_nmod_ctx_t ctx,
     mp_limb_t * t)          /* length 4d */
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     _n_fq_mul2(t, b, c, ctx);
     _n_fq_reduce2(a, t, ctx, t + 2*d);
 }
@@ -922,7 +929,7 @@ void _n_fq_addmul(
     const fq_nmod_ctx_t ctx,
     mp_limb_t * t)          /* length 4d */
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     _n_fq_mul2(t, c, e, ctx);
     _nmod_vec_add(t, t, b, d, ctx->mod);
     _n_fq_reduce2(a, t, ctx, t + 2*d);
@@ -1075,7 +1082,7 @@ FLINT_DLL void _n_fq_poly_one(n_fq_poly_t A, slong d);
 N_POLY_INLINE
 void n_fq_poly_one(n_fq_poly_t A, const fq_nmod_ctx_t ctx)
 {
-    _n_fq_poly_one(A, fq_nmod_ctx_degree(ctx));
+    _n_fq_poly_one(A, FQ_NMOD_CTX_DEGREE(ctx));
 }
 
 FLINT_DLL int n_fq_poly_is_one(n_fq_poly_t A, const fq_nmod_ctx_t ctx);

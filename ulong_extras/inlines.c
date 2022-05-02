@@ -10,5 +10,3 @@
 */
 
 #define ULONG_EXTRAS_INLINES_C
-
-#include "ulong_extras.h"

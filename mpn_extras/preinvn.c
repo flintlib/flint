@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
-#include "longlong.h"
-#include "mpn_extras.h"
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
 {

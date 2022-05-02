@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint.h"
 
 /* return (x|y)*(-1)^tstbit(r,1) */
 int _n_jacobi_unsigned(mp_limb_t x, mp_limb_t y, unsigned int r)

@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "fmpz.h"
 
 /* hold positive and negative powers of b */
 void n_fq_pow_cache_start_n_fq(
@@ -19,7 +20,7 @@ void n_fq_pow_cache_start_n_fq(
     n_poly_t neg,       /* b^-0, b^-1, b^-2, ..., b^-50 */
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     n_poly_fit_length(pos, d*2);
     pos->length = 2;
     _n_fq_one(pos->coeffs + d*0, d);
@@ -35,7 +36,7 @@ void n_fq_pow_cache_start_fq_nmod(
     n_poly_t neg,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     n_poly_fit_length(pos, d*2);
     pos->length = 2;
     _n_fq_one(pos->coeffs + d*0, d);
@@ -54,7 +55,7 @@ static void n_fq_pow_cache_mulpow_ui_array_bin(
     const fq_nmod_ctx_t ctx,
     mp_limb_t * tmp)    /* size d*N_FQ_MUL_ITCH */
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     const mp_limb_t * s = a; /* source */
     slong ei = 0, i = 0;
     mp_limb_t e = (ei < elen) ? elimbs[ei] : 0;
@@ -136,7 +137,7 @@ void n_fq_pow_cache_mulpow_ui(
     n_poly_t neg,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i = pos->length;
     int a_in_fp = _n_fq_is_ui(a, d);
 
@@ -188,7 +189,7 @@ void n_fq_pow_cache_mulpow_neg_ui(
     n_poly_t neg,
     const fq_nmod_ctx_t ctx)
 {
-    slong i, d = fq_nmod_ctx_degree(ctx);
+    slong i, d = FQ_NMOD_CTX_DEGREE(ctx);
     mp_limb_t * tmp;
     fmpz_t f;
 
@@ -248,7 +249,7 @@ void n_fq_pow_cache_mulpow_fmpz(
     n_poly_t neg,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     fmpz_t t;
 
     FLINT_ASSERT(pos->length >= 2);
@@ -269,7 +270,7 @@ void n_fq_pow_cache_mulpow_fmpz(
     }
 
     fmpz_init(t);
-    fq_nmod_ctx_order(t, ctx);
+    FQ_NMOD_CTX_ORDER(t, ctx);
     fmpz_sub_ui(t, t, 1);
     fmpz_mod(t, e, t);
 

@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "flint.h"
-#include "nmod_poly.h"
 
 char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
 {

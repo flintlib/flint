@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "flint.h"
 
 int
-_d_vec_is_zero(const double *vec, slong len)
+_d_vec_is_zero(const double * vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)

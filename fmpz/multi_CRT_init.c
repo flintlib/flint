@@ -11,7 +11,6 @@
 
 #include "fmpz.h"
 
-
 void fmpz_multi_CRT_init(fmpz_multi_CRT_t P)
 {
     P->prog = NULL;
@@ -27,4 +26,3 @@ void fmpz_multi_CRT_init(fmpz_multi_CRT_t P)
     P->good = 0;
     fmpz_init(P->final_modulus);
 }
-

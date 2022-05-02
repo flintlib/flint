@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "flint.h"
 
 void
-_d_vec_clear(double *vec)
+_d_vec_clear(double * vec)
 {
     flint_free(vec);
 }

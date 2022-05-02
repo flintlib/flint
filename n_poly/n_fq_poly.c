@@ -10,7 +10,7 @@
 */
 
 #include "n_poly.h"
-#include "nmod_vec.h"
+#include "fq_nmod_poly.h"
 
 int n_fq_poly_is_canonical(const n_poly_t A, const fq_nmod_ctx_t ctx)
 {

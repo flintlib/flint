@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
+#include "flint-impl.h"
 #include "flint.h"
-#include "mpn_extras.h"
 
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  
    needs (tp,2n) temp space, everything reduced mod 2^b 
@@ -75,7 +74,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
         }
         else
         {
-            c = mpn_neg_n(xp, yp, n);
+            c = mpn_neg(xp, yp, n);
             c = mpn_add_1 (xp, xp, n, c);
             xp[n - 1] &= GMP_NUMB_MASK >> k;
         }
@@ -84,7 +83,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
     {
         if (cz == 0)
 	     {
-            c = mpn_neg_n(xp, zp, n);
+            c = mpn_neg(xp, zp, n);
             c = mpn_add_1(xp, xp, n, c);
             xp[n - 1] &= GMP_NUMB_MASK >> k;
         }

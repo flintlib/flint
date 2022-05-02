@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include "nmod.h"
 #include "nmod_poly.h"
 
 int _nmod_poly_invmod(mp_limb_t *A, 

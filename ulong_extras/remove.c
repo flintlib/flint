@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint.h"
 
 int
 n_remove(mp_limb_t * n, mp_limb_t p)

@@ -98,6 +98,12 @@
     }
 
 
+/*
+ * misc
+ */
+#define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
+
+
 
 /*
  * garbage collection and test initializer and cleanup

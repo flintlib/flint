@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat.h"
+#include "d_vec.h"
 
 void
 d_mat_set(d_mat_t mat1, const d_mat_t mat2)

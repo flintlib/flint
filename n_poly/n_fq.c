@@ -10,7 +10,7 @@
 */
 
 #include "n_poly.h"
-#include "nmod_vec.h"
+#include "fq_nmod.h"
 
 #define MAC(h, m, l, a, b)                          \
 {                                                   \

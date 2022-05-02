@@ -11,10 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "flint.h"
 
 void
-_d_vec_zero(double *vec, slong len)
+_d_vec_zero(double * vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)

@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "fq_nmod_poly.h"
 
 
 slong _n_fq_poly_gcd_euclidean_inplace_(    

@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, 

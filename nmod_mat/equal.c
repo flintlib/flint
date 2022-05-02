@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
 
 int
 nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)

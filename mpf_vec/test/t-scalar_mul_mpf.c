@@ -34,7 +34,7 @@ main(void)
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpf *a, *b;
+        mpf_ptra, *b;
         mpf_t n;
         slong len = n_randint(state, 100);
         mpf_init(n);
@@ -68,7 +68,7 @@ main(void)
     /* Check that n (a + b) == na + nb */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpf *a, *b, *lhs, *rhs;
+        mpf_ptra, *b, *lhs, *rhs;
         mpf_t n;
         slong len = n_randint(state, 100);
         mpf_init(n);
@@ -110,7 +110,7 @@ main(void)
     /* Check that n2 * (n1 a) == (n1 * n2) a */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpf *a, *b;
+        mpf_ptra, *b;
         mpf_t n1, n2, n;
         slong len = n_randint(state, 100);
         mpf_init(n1);

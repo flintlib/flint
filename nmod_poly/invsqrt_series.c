@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "nmod_poly.h"
 #include "ulong_extras.h"
+#include "nmod_poly.h"
 
 static void 
 __nmod_poly_invsqrt_series_prealloc(mp_ptr g, 

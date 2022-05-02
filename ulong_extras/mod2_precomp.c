@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint.h"
 
 mp_limb_t
 n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)

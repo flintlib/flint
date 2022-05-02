@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 #define NMOD_POLY_NEWTON_EXP_CUTOFF 4000

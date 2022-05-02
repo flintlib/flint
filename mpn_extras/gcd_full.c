@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "mpn_extras.h"
 
 mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, 
                                mp_srcptr array1, mp_size_t limbs1,

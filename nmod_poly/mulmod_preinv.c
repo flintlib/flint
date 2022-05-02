@@ -10,19 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,

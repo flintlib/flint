@@ -21,19 +21,8 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "nmod_poly.h"
-#include "fmpq.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -1451,7 +1440,4 @@ FLINT_DLL void fmpz_poly_eulerian_polynomial(fmpz_poly_t poly, ulong n);
 }
 #endif
 
-#include "fmpz_poly_factor.h"
-
 #endif
-

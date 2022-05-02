@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "fmpz.h"
-
 
 static void _fmpz_multi_CRT_fit_length(fmpz_multi_CRT_t P, slong k)
 {
@@ -275,4 +275,3 @@ done:
 
     return P->good;
 }
-

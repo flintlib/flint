@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint.h"
 
 mp_limb_t
 n_cbrt_binary_search(mp_limb_t x)

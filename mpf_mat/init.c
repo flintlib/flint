@@ -10,9 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "mpf_mat.h"
 
 void
@@ -22,8 +19,8 @@ mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec)
     if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
         slong i;
-        mat->entries = (mpf *) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(mpf));
-        mat->rows = (mpf **) flint_malloc(rows * sizeof(mpf *));    /* Initialise rows */
+        mat->entries = (mpf_ptr) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(__mpf_struct));
+        mat->rows = (mpf_ptr *) flint_malloc(rows * sizeof(mpf_ptr));    /* Initialise rows */
 
         for (i = 0; i < rows * cols; i++)
             mpf_init2(mat->entries + i, prec);

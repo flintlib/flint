@@ -20,15 +20,7 @@
 #define D_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
 #include "flint.h"
-#include "d_vec.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -75,7 +67,11 @@ d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
        double * row1 = mat1->rows[i];
        double * row2 = mat2->rows[i];
        for (j = 0; j < d_mat_ncols(mat1); j++)
-          DOUBLE_SWAP(row1[j], row2[j]);
+       {
+           double tmp = row1[j];
+           row1[j] = row2[j];
+           row2[j] = tmp;
+       }
     }
 }
 

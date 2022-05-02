@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
 {

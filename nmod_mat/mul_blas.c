@@ -7,11 +7,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
-#include "thread_support.h"
-
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
+#include "nmod_mat.h"
+#include "thread_support.h"
 #include "cblas.h"
 
 /*
@@ -709,6 +708,8 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 }
 
 #else
+
+#include "flint.h"
 
 int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {

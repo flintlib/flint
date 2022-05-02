@@ -9,8 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include <mpfr.h>
-#include "ulong_extras.h"
+
+#if MPFR_VERSION_MAJOR < 3
+#error MPFR 3.0.0 or later is required
+#endif
 
 /* return ceil(log_b(2^n)) */
 ulong n_clog_2exp(ulong n, ulong b)

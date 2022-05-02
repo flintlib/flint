@@ -22,9 +22,9 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "nmod.h"
 #include "nmod_poly.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
@@ -423,6 +423,12 @@ FLINT_DLL void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit
 
 FLINT_DLL void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
+
+/* Miscellaneous *************************************************************/
+
+FLINT_DLL int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
+
+FLINT_DLL void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
 
 /* Inlines *******************************************************************/
 

@@ -18,7 +18,7 @@ void n_fq_poly_sub(
     const n_fq_poly_t C,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
     slong Blen = B->length;
     slong Clen = C->length;

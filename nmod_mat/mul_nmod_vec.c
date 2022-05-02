@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
+#include "nmod.h"
+#include "nmod_vec.h"
 
 void nmod_mat_mul_nmod_vec(
     mp_limb_t * c,

@@ -11,10 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
 void
-_mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec)
+_mpf_vec_norm2(mpf_t res, mpf_srcptr vec, slong len, flint_bitcnt_t prec)
 {
     slong i;
     mpf_t tmp;

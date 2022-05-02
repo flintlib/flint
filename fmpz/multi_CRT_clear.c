@@ -11,7 +11,6 @@
 
 #include "fmpz.h"
 
-
 void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P)
 {
     slong i;
@@ -29,4 +28,3 @@ void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P)
     flint_free(P->fracmoduli);
     fmpz_clear(P->final_modulus);
 }
-

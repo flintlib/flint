@@ -31,7 +31,7 @@ main(void)
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpf *a, *b, *c;
+        mpf_ptra, *b, *c;
         slong len = n_randint(state, 100);
 
         a = _mpf_vec_init(len, 200);
@@ -59,7 +59,7 @@ main(void)
     /* Check aliasing of b and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpf *a, *b, *c;
+        mpf_ptra, *b, *c;
         slong len = n_randint(state, 100);
 
         a = _mpf_vec_init(len, 200);

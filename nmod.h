@@ -19,14 +19,6 @@
 #define NMOD_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "longlong.h"
 #include "ulong_extras.h"
 #include "flint.h"
 
@@ -34,19 +26,26 @@
  extern "C" {
 #endif
 
-#define NMOD_RED2(r, a_hi, a_lo, mod) \
-   do { \
-      mp_limb_t q0xx, q1xx, r1xx; \
-      const mp_limb_t u1xx = ((a_hi)<<(mod).norm) + r_shift((a_lo), FLINT_BITS - (mod).norm);	\
-      const mp_limb_t u0xx = ((a_lo)<<(mod).norm); \
-      const mp_limb_t nxx = ((mod).n<<(mod).norm); \
-      umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx); \
-      add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx); \
-      r1xx = (u0xx - (q1xx + 1)*nxx); \
-      if (r1xx > q0xx) r1xx += nxx; \
-      if (r1xx < nxx) r = (r1xx>>(mod).norm); \
-      else r = ((r1xx - nxx)>>(mod).norm); \
-   } while (0)
+#define NMOD_RED2(r, a_hi, a_lo, mod)                                   \
+    do                                                                  \
+    {                                                                   \
+        mp_limb_t q0xx, q1xx, r1xx;                                     \
+        const mp_limb_t u1xx = ((a_hi)<<(mod).norm)                     \
+            + ((mod.norm == 0)                                          \
+                    ? UWORD(0)                                          \
+                    : (mp_limb_t) (a_lo) >> (FLINT_BITS - (mod).norm)); \
+        const mp_limb_t u0xx = ((a_lo)<<(mod).norm);                    \
+        const mp_limb_t nxx = ((mod).n<<(mod).norm);                    \
+        umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx);                        \
+        add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx);                 \
+        r1xx = (u0xx - (q1xx + 1)*nxx);                                 \
+        if (r1xx > q0xx)                                                \
+            r1xx += nxx;                                                \
+        if (r1xx < nxx)                                                 \
+            r = (r1xx>>(mod).norm);                                     \
+        else                                                            \
+            r = ((r1xx - nxx)>>(mod).norm);                             \
+    } while (0)
 
 #define NMOD_RED(r, a, mod) \
    do { \

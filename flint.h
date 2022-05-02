@@ -63,14 +63,10 @@
                          __FLINT_VERSION_PATCHLEVEL)
 
 /*
-   Check mpir and mpfr version numbers
+   Check GMP/MPIR version numbers
 */
 #if __GNU_MP_VERSION < 5
 #error GMP 5.0.0 or MPIR 2.6.0 or later are required
-#endif
-
-#if MPFR_VERSION_MAJOR < 3
-#error MPFR 3.0.0 or later is required
 #endif
 
 /*
@@ -93,7 +89,6 @@ extern char flint_version[];
     #define FLINT_D_BITS 31
 #endif
 
-
 /*##############################################################################
 # external type definitions
 ##############################################################################*/
@@ -102,11 +97,6 @@ extern char flint_version[];
 #define slong mp_limb_signed_t
 
 #define flint_bitcnt_t ulong
-
-/*
-  We define this here as there is no mpfr.h
- */
-typedef __mpfr_struct flint_mpfr;
 
 typedef struct
 {
@@ -785,24 +775,14 @@ typedef struct
 
 typedef fmpz_lll_struct fmpz_lll_t[1];
 
+typedef struct
+{
+    mp_limb_t * coeffs;
+    slong alloc;
+    slong length;
+} n_poly_struct;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+typedef n_poly_struct n_poly_t[1];
 
 
 
@@ -863,6 +843,16 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 #define WORD_MIN LONG_MIN
 #endif
 #endif
+
+/* The largest bit count for an fmpz to be small */
+#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
+
+/* maximum positive value a small coefficient can have */
+#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
+
+/* minimum negative value a small coefficient can have */
+#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
+
 
 #if FLINT_USES_TLS
 #if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9

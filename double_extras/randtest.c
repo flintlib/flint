@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
 #include "ulong_extras.h"
 
 #define EXP_MINUS_32 2.3283064365386962891e-10

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint-impl.h"
+#include "flint.h"
 
 /* 
    Method of Niels Moller and Torbjorn Granlund, see "Improved Division by

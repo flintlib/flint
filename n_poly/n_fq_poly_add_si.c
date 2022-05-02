@@ -18,7 +18,7 @@ void n_fq_poly_add_si(
     slong c,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
 
     if (A != B)
         n_fq_poly_set(A, B, ctx);

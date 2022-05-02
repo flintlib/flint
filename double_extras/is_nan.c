@@ -10,8 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
-
 int
 d_is_nan(double x)
 {

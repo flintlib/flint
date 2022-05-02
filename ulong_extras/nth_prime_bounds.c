@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint.h"
 
 
-void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
+void n_nth_prime_bounds(mp_limb_t * lo, mp_limb_t * hi, ulong n)
 {
     int bits, ll;
     double llo, lhi;

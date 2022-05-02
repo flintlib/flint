@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 /*
     Assumes that p is an odd prime, and that 0 <= a < p.

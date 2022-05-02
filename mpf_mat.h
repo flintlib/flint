@@ -19,9 +19,7 @@
 #define MPF_MAT_INLINE static __inline__
 #endif
 
-#include <math.h>
-#include <stdio.h>
-#include "mpf_vec.h"
+#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -29,17 +27,17 @@
 
 typedef struct
 {
-    mpf * entries;
+    mpf_ptr entries;
     slong r;
     slong c;
     flint_bitcnt_t prec;
-    mpf ** rows;
+    mpf_ptr * rows;
 } mpf_mat_struct;
 
 typedef mpf_mat_struct mpf_mat_t[1];
 
 MPF_MAT_INLINE
-mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
+mpf_ptr mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
 {
    return mat->rows[i] + j;
 }
@@ -117,7 +115,7 @@ mpf_mat_swap_rows(mpf_mat_t mat, slong r, slong s)
 {
     if (r != s)
     {
-        mpf * u;
+        mpf_ptr u;
 
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];

@@ -18,11 +18,15 @@
 #define MPFR_MAT_INLINE static __inline__
 #endif
 
-#include <gmp.h>
-#include <mpfr.h> 
+#include "flint.h"
+#include <mpfr.h>
 
 #ifdef __cplusplus
  extern "C" {
+#endif
+
+#if MPFR_VERSION_MAJOR < 3
+#error MPFR 3.0.0 or later is required
 #endif
 
 typedef struct

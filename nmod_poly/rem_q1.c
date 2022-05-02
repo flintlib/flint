@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
+#include "nmod.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 void _nmod_poly_rem_q1(mp_ptr R, 
                        mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,

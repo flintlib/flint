@@ -13,19 +13,23 @@
 
 void fmpz_complement(fmpz_t r, const fmpz_t f)
 {
-    if (!COEFF_IS_MPZ(*f)) /* f is small */
+    if (!COEFF_IS_MPZ(*f))
     {
-	slong res = ~(*f);
-	fmpz_set_si(r, res);
-    } else /* f is big */
+        slong res = ~(*f);
+        fmpz_set_si(r, res);
+    }
+    else
     {
-        if(r != f) { /* not aliased */
+        if (r != f) /* not aliased */
+        {
             __mpz_struct *ptr, *ptr2;
             ptr = _fmpz_promote(r);
             ptr2 = COEFF_TO_PTR(*f);
             mpz_com(ptr, ptr2);
             _fmpz_demote_val(r);
-        } else { /* alaised */
+        }
+        else /* aliased */
+        {
             fmpz_t tmp;
             __mpz_struct *ptr, *ptr2;
             fmpz_init(tmp);

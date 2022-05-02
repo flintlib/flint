@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include <math.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)

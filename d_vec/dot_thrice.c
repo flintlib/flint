@@ -11,11 +11,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
+#include "double_extras.h"
 #include "d_vec.h"
 
 double
-_d_vec_dot_thrice(const double *vec1, const double *vec2, slong len2,
-                  double *err)
+_d_vec_dot_thrice(const double * vec1, const double * vec2, slong len2,
+                  double * err)
 {
     int i, j;
     double p, h, a1, a2, b1, b2, c, res = 0, g;

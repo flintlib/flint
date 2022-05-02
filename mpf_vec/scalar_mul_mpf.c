@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
 void
-_mpf_vec_scalar_mul_mpf(mpf * res, const mpf * vec, slong len, mpf_t c)
+_mpf_vec_scalar_mul_mpf(mpf_ptr res, mpf_srcptr vec, slong len, mpf_t c)
 {
     slong i;
     for (i = 0; i < len; i++)

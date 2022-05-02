@@ -10,14 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
-mpf *
+mpf_ptr
 _mpf_vec_init(slong len, flint_bitcnt_t prec)
 {
     slong i;
-
-    mpf *vec = (mpf *) flint_malloc(len * sizeof(mpf));
+    mpf_ptr vec = flint_malloc(len * sizeof(__mpf_struct));
 
     for (i = 0; i < len; i++)
         mpf_init2(vec + i, prec);

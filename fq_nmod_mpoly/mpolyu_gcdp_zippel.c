@@ -12,46 +12,6 @@
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
-{
-    slong i;
-    slong deg = nmod_poly_degree(fqctx->modulus);
-
-    for (i = 0; i < deg; i++)
-    {
-        ulong c = nmod_poly_get_coeff_ui(alpha, i);
-        c += UWORD(1);
-        if (c < fqctx->mod.n)
-        {
-            nmod_poly_set_coeff_ui(alpha, i, c);
-            return 1;
-        }
-        nmod_poly_set_coeff_ui(alpha, i, 0);
-    }
-
-    return 0;
-}
-
-void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
-{
-    slong i;
-    slong deg = fqctx->modulus->length - 1;
-
-    for (i = 0; i < deg; i++) {
-        ulong c = nmod_poly_get_coeff_ui(alpha, i);
-        c += UWORD(1);
-        if (c < fqctx->mod.n) {
-            nmod_poly_set_coeff_ui(alpha, i, c);
-            return;
-        }
-        nmod_poly_set_coeff_ui(alpha, i, UWORD(0));
-    }
-
-    /* we hit zero, so skip to 1 */
-    nmod_poly_set_coeff_ui(alpha, 0, UWORD(1));
-}
-
-
 /*
     Assuming that "A" depends only on the main variable,
     convert it to a poly "a".

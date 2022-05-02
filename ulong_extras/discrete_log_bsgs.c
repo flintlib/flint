@@ -11,7 +11,6 @@
 */
 
 #include <math.h>
-
 #include "ulong_extras.h"
 
 typedef struct apow {

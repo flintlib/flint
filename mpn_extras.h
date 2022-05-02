@@ -18,10 +18,7 @@
 #define MPN_EXTRAS_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -44,8 +41,6 @@
         (an) = (bn);           \
         (bn) = __tn;           \
     } while (0)
-
-#define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.

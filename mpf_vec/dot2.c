@@ -13,7 +13,7 @@
 #include "mpf_vec.h"
 
 int
-_mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
+_mpf_vec_dot2(mpf_t res, mpf_srcptr vec1, mpf_srcptr vec2, slong len2,
               flint_bitcnt_t prec)
 {
     slong i;

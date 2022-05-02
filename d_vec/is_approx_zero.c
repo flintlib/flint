@@ -10,10 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include <math.h>
+#include "flint.h"
 
 int
-_d_vec_is_approx_zero(const double *vec, slong len, double eps)
+_d_vec_is_approx_zero(const double * vec, slong len, double eps)
 {
     slong i;
     for (i = 0; i < len; i++)

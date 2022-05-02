@@ -19,8 +19,6 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 
 #if defined(_WIN64) || defined(__mips64)

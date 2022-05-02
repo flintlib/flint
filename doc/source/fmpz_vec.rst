@@ -167,7 +167,7 @@ Conversions
     entries so that all the doubles in ``appv`` have a maximum absolute
     value of 1.0.
 
-.. function:: void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
+.. function:: void _fmpz_vec_get_mpf_vec(mpf_ptr appv, const fmpz * vec, slong len)
 
     Export the array of ``len`` entries starting at the pointer ``vec``
     to an array of mpfs ``appv``.

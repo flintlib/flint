@@ -12,12 +12,6 @@
 
 #define NMOD_MAT_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "nmod_mat.h"
 
 void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)

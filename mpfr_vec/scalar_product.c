@@ -9,15 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
 #include "flint.h"
-#include "mpfr_vec.h"
+#include "mpfr.h"
 
 void
-_mpfr_vec_scalar_product(mpfr_t res, const flint_mpfr * vec1,
-                         const flint_mpfr * vec2, slong length)
+_mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1,
+                         mpfr_srcptr vec2, slong length)
 {
     slong i;
     mpfr_t tmp;

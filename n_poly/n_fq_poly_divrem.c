@@ -25,7 +25,7 @@ void _n_fq_poly_rem_basecase_(
     n_poly_stack_t St)
 {
     slong i;
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     mp_limb_t * tmp = n_poly_stack_vec_init(St, d*(3 + N_FQ_POLY_DIVREM_BASECASE_ITCH));
     mp_limb_t * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
@@ -86,7 +86,7 @@ void _n_fq_poly_divrem_basecase_(
     n_poly_stack_t St)
 {
     slong i;
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     mp_limb_t * tmp = n_poly_stack_vec_init(St, d*(1 + N_FQ_POLY_DIVREM_BASECASE_ITCH));
     mp_limb_t * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
@@ -151,7 +151,7 @@ void _n_fq_poly_divrem_divconquer_recursive_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
 
     if (lenB <= N_FQ_POLY_DIVREM_DIVCONQUER_CUTOFF)
     {
@@ -214,7 +214,7 @@ static void __n_fq_poly_divrem_divconquer_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
 
     FLINT_ASSERT(Q != A && Q != B);
     FLINT_ASSERT(R != A && R != B);
@@ -264,7 +264,7 @@ void _n_fq_poly_divrem_divconquer_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
 
     if (lenA <= 2*lenB - 1)
     {
@@ -306,7 +306,7 @@ void n_fq_poly_divrem_divconquer_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     const slong lenA = A->length;
     const slong lenB = B->length;
     const slong lenQ = lenA - lenB + 1;

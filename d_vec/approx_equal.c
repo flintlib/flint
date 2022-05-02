@@ -11,10 +11,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include <math.h>
+#include "flint.h"
 
 int
-_d_vec_approx_equal(const double *vec1, const double *vec2, slong len,
+_d_vec_approx_equal(const double * vec1, const double * vec2, slong len,
                     double eps)
 {
     slong i;

@@ -18,15 +18,7 @@
 #define ARITH_INLINE static __inline__
 #endif
 
-#include <gmp.h>
-#include <mpfr.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpq.h"
-#include "double_extras.h"
 
 #ifdef __cplusplus
  extern "C" {

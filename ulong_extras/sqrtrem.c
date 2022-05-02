@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "ulong_extras.h"
+#include "flint.h"
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
 {

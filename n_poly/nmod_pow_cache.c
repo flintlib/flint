@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "fmpz.h"
 
 /* hold positive and negative powers of b */
 void nmod_pow_cache_start(

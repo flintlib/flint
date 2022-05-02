@@ -18,7 +18,7 @@ static void _n_fq_poly_taylor_shift_horner_n_fq(
     slong n,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i, j;
     mp_limb_t * p = FLINT_ARRAY_ALLOC(d, mp_limb_t);
 
@@ -41,7 +41,7 @@ void n_fq_bpoly_taylor_shift_gen1_fq_nmod(
     const fq_nmod_t c_,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
     mp_limb_t * c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
 
@@ -58,12 +58,12 @@ void n_fq_bpoly_taylor_shift_gen0_fq_nmod(
     const fq_nmod_t alpha,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong n, i, j;
     mp_limb_t * c;
     n_poly_t t;
 
-    if (fq_nmod_is_zero(alpha, ctx))
+    if (FQ_NMOD_IS_ZERO(alpha, ctx))
         return;
 
     c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
@@ -93,7 +93,7 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
     const mp_limb_t * alpha,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i, j, n = A->length;
     mp_limb_t * tmp, * c, * alphainv;
     TMP_INIT;

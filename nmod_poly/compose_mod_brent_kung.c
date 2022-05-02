@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
 
 void
 _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr poly1, slong len1, 

@@ -29,7 +29,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        mpf *a;
+        mpf_ptra;
         slong j, length = n_randint(state, 100);
         mp_prec_t prec = n_randint(state, 200) + 2;
 

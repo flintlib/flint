@@ -1350,10 +1350,6 @@ FQ_NMOD_MPOLY_INLINE n_poly_struct * fq_nmod_mpolyun_leadcoeff_poly(
 
 /*** gcd *********************************************************************/
 
-FLINT_DLL int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
-
-FLINT_DLL void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
-
 FLINT_DLL nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
                 fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, fq_nmod_mpolyu_t f,
                                     slong var, const fq_nmod_mpoly_ctx_t ctx,

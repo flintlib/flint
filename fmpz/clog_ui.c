@@ -11,10 +11,8 @@
 */
 
 #include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 slong
 fmpz_clog_ui(const fmpz_t n, ulong b)

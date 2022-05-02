@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
-#include "mpn_extras.h"
-
 
 void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
 {

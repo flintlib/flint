@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
+_fmpz_vec_get_mpf_vec(mpf_ptr appv, const fmpz * vec, slong len)
 {
     slong i;
 

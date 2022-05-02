@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
-
 
 static int flint_mpn_cmp2abs(mp_srcptr x, slong xn, mp_srcptr a, slong an)
 {

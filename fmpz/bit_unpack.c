@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 
 int
@@ -105,7 +103,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
                 p[l - 1] += ((~(mp_limb_t) 0) << b);
 
             /* negate */
-            mpn_com_n(p, p, l);
+            mpn_com(p, p, l);
             if (!borrow)
                 mpn_add_1(p, p, l, 1);
 

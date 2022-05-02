@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat.h"
+#include "d_vec.h"
 
 int
 d_mat_is_approx_zero(const d_mat_t mat, double eps)

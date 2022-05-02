@@ -39,7 +39,7 @@ Basic assignment and manipulation
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
-.. function:: mpf * mpf_mat_entry(const mpf_mat_t * mat, slong i, slong j)
+.. function:: mpf_ptr mpf_mat_entry(const mpf_mat_t * mat, slong i, slong j)
 
     Returns a reference to the entry of ``mat`` at row `i` and column `j`.
     Both `i` and `j` must not exceed the dimensions of the matrix.

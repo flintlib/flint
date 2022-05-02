@@ -31,7 +31,7 @@ FUNC_HEAD
         int kappa, kappa2, d, n, i, j, zeros, kappamax;
         mpf_mat_t mu, r, appB;
         fmpz_gram_t A;
-        mpf *s, *mutmp, *appBtmp, *appSPtmp;
+        mpf_ptrs, *mutmp, *appBtmp, *appSPtmp;
         mpf_t ctt, tmp, rtmp;
         int *alpha;
         fmpz *Btmp;
@@ -324,7 +324,7 @@ FUNC_HEAD
         int kappa, kappa2, d, n, i, j, zeros, kappamax, update_b = 1;
         mpf_mat_t mu, r;
         fmpz_gram_t A;
-        mpf *s, *mutmp;
+        mpf_ptrs, *mutmp;
         mpf_t ctt, tmp, rtmp;
         int *alpha;
         fmpz *Btmp;

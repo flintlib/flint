@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
 
 void
 nmod_mat_solve_triu_recursive(nmod_mat_t X,

@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
+#include <math.h>
 
 double
 d_log2(double x)

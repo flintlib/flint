@@ -11,7 +11,6 @@
 */
 
 #include "fmpz.h"
-#include "ulong_extras.h"
 
 int fmpz_equal_si(const fmpz_t f, slong g)
 {

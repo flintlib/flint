@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
+#include "nmod.h"
 
 void
 _nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op, slong n, ulong w,

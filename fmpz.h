@@ -18,17 +18,7 @@
 #define FMPZ_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
 #include "flint.h"
-#include "nmod_vec.h"
 #include "fmpz-conversions.h"
 
 #if FLINT_USES_PTHREAD
@@ -38,11 +28,6 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-typedef gmp_randstate_t fmpz_randstate_t;
-
-extern __mpz_struct * fmpz_arr;
-extern gmp_randstate_t fmpz_randstate;
 
 typedef struct
 {
@@ -61,15 +46,6 @@ typedef struct
 #endif
    void * address;
 } fmpz_block_header_s;
-
-/* The largest bit count for an fmpz to be small */
-#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
-
-/* maximum positive value a small coefficient can have */
-#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
-
-/* minimum negative value a small coefficient can have */
-#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
 
 #define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))  /* is x a pointer not an integer */
 
@@ -1104,7 +1080,4 @@ FLINT_DLL void __fmpz_neg(fmpz_t f1, const fmpz_t f2);
 }
 #endif
 
-#include "fmpz_factor.h"
-
 #endif
-

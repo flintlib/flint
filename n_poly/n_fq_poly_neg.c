@@ -17,7 +17,7 @@ void n_fq_poly_neg(
     const n_poly_t B,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong Blen = B->length;
 
     n_poly_fit_length(A, d*Blen);

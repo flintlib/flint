@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
 void
-_mpf_vec_sub(mpf * res, const mpf * vec1, const mpf * vec2, slong len2)
+_mpf_vec_sub(mpf_ptr res, mpf_srcptr vec1, mpf_srcptr vec2, slong len2)
 {
     slong i;
     for (i = 0; i < len2; i++)

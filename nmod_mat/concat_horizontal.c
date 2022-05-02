@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
+#include "flint.h"
 
 void
 nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
@@ -24,6 +24,4 @@ nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat
     	FLINT_MPN_COPYI(res->rows[i], mat1->rows[i], c1);
     	FLINT_MPN_COPYI(res->rows[i] + c1, mat2->rows[i], c2);
     }
-
-
 }

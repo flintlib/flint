@@ -10,8 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
-#include "flint.h"
 #include "ulong_extras.h"
 
 int _perm_randtest(slong *vec, slong n, flint_rand_t state)

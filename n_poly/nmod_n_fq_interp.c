@@ -794,7 +794,7 @@ void nmod_eval_interp_to_coeffs_n_fq_poly(
     nmod_eval_interp_t E,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong l = nmod_eval_interp_eval_length(E);
 
     if (v->length == 0)
@@ -816,7 +816,7 @@ void nmod_eval_interp_from_coeffs_n_fq_poly(
     nmod_eval_interp_t E,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong l = nmod_eval_interp_eval_length(E);
 
     if (a->length == 0)
@@ -954,7 +954,7 @@ void n_fq_evals_add_inplace(
     slong len,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
 
     if (b->length == 0)
         return;
@@ -981,7 +981,7 @@ void n_fq_evals_mul(
     slong len,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
     mp_limb_t * tmp;
     TMP_INIT;
@@ -1014,7 +1014,7 @@ void n_fq_evals_addmul(
     slong len,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
     mp_limb_t * tmp;
     TMP_INIT;
@@ -1050,7 +1050,7 @@ void n_fq_evals_fmma(
     slong len,
     const fq_nmod_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
     mp_limb_t * tmp, * t;
     TMP_INIT;

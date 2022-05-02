@@ -10,9 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 
 void

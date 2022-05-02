@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
+#include "nmod.h"
 #include "nmod_poly.h"
+#include "nmod_mat.h"
 
 void
 _nmod_mat_charpoly_berkowitz(mp_ptr cp, const nmod_mat_t mat, nmod_t mod)

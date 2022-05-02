@@ -9,14 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
 #include "flint.h"
-#include "mpfr_vec.h"
+#include "mpfr.h"
 
 void
-_mpfr_vec_scalar_mul_2exp(flint_mpfr * res, const flint_mpfr * vec, slong length, flint_bitcnt_t exp)
+_mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp)
 {
     slong i;
     for (i = 0; i < length; i++)

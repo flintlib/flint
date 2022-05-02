@@ -10,6 +10,11 @@
 */
 
 #include "n_poly.h"
+#if FLINT_WANT_ASSERT
+#include "fq_nmod_poly.h"
+#else
+#include "fq_nmod.h"
+#endif
 
 
 void _n_fq_poly_mullow_(

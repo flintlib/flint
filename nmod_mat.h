@@ -20,18 +20,8 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "longlong.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "fmpz.h"
+#include "nmod_vec.h"
 #include "thread_support.h"
 
 #ifdef __cplusplus
@@ -88,10 +78,14 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
     slong i, j;
     for (i = 0; i < nmod_mat_nrows(mat1); i++)
     {
-       mp_limb_t * row1 = mat1->rows[i];
-       mp_limb_t * row2 = mat2->rows[i];
-       for (j = 0; j < nmod_mat_ncols(mat1); j++)
-          MP_LIMB_SWAP(row1[j], row2[j]);
+        mp_limb_t * row1 = mat1->rows[i];
+        mp_limb_t * row2 = mat2->rows[i];
+        for (j = 0; j < nmod_mat_ncols(mat1); j++)
+        {
+            mp_limb_t tmp = row1[j];
+            row1[j] = row2[j];
+            row2[j] = tmp;
+        }
     }
 }
 

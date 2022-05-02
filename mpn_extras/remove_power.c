@@ -9,12 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
-
 
 mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                       mp_ptr p, mp_size_t psize, ulong *exp)

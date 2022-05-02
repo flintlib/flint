@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "mpn_extras.h"
 
 /*
     Try to compute y = a1*x1 - a2*x2 where x1 and x2 both have n > 0 limbs.

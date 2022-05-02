@@ -9,15 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "longlong.h"
 #include "mpn_extras.h"
-
-#if !defined(_MSC_VER)
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#endif
 
 mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
                                  mp_srcptr b, mp_size_t n, mp_limb_t dinv)
@@ -44,7 +36,3 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
 
    return ret;
 }
-
-#if !defined(_MSC_VER)
-#pragma GCC diagnostic warning "-Wunused-variable"
-#endif

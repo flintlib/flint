@@ -33,7 +33,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         int result;
-        mpf *a;
+        mpf_ptra;
         slong len = n_randint(state, 100);
 
         a = _mpf_vec_init(len, 200);

@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "flint.h"
 
 void
-_mpf_vec_set(mpf * vec1, const mpf * vec2, slong len)
+_mpf_vec_set(mpf_ptr vec1, mpf_srcptr vec2, slong len)
 {
     if (vec1 != vec2)
     {

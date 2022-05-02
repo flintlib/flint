@@ -11,12 +11,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#include "nmod.h"
 #include "fmpz.h"
-#include "nmod_vec.h"
 #include "fmpz_vec.h"
+
+/* TODO: Remove fmpz_poly as it is not necessary here. Simply replace with
+ * fmpz_vec. */
 #include "fmpz_poly.h"
 
 /* The better mpn_addmul_1 is, the larger FMPZ_CRT_UI_CUTOFF can be. */

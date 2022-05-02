@@ -22,18 +22,7 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
 #include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "thread_support.h"
 
 #ifdef __cplusplus
@@ -1517,7 +1506,5 @@ NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
 #ifdef __cplusplus
     }
 #endif
-
-#include "nmod_poly_factor.h"
 
 #endif

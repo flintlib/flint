@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
-#include "fmpz.h"
 #include <math.h>
+#include "nmod.h"
+#include "fmpz.h"
 
 
 static int nmod_discrete_log_pohlig_hellman_table_entry_struct_cmp(
