@@ -203,6 +203,17 @@ int gr_mpoly_mul_johnson(
         return gr_mpoly_zero(poly1, mctx, cctx);
     }
 
+    if (poly3->length == 1)
+    {
+        return gr_mpoly_mul_monomial(poly1, poly2, poly3, mctx, cctx);
+    }
+
+    /* todo: could have a version of mul_monomial for the noncommutative case */
+    if (poly2->length == 1 && gr_ctx_is_commutative_ring(cctx) == T_TRUE)
+    {
+        return gr_mpoly_mul_monomial(poly1, poly3, poly2, mctx, cctx);
+    }
+
     TMP_START;
 
     max_fields2 = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));

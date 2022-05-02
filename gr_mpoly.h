@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2016-2017 William Hart
     Copyright (C) 2017-2020 Daniel Schultz
+    Copyright (C) 2022 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -82,6 +83,8 @@ void _gr_mpoly_fit_length(
 
 void gr_mpoly_fit_length(gr_mpoly_t A, slong len, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
+void gr_mpoly_fit_bits(gr_mpoly_t A, flint_bitcnt_t bits, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
 void gr_mpoly_fit_length_fit_bits(
     gr_mpoly_t A,
     slong len,
@@ -138,35 +141,13 @@ truth_t gr_mpoly_equal(const gr_mpoly_t A, const gr_mpoly_t B, const mpoly_ctx_t
 
 /* Container operations */
 
-void _gr_mpoly_push_exp_ui(
-    gr_mpoly_t A,
-    const ulong * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
-int gr_mpoly_push_term_scalar_ui(gr_mpoly_t A,
-    gr_srcptr c,
-    const ulong * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
-void _gr_mpoly_push_exp_fmpz(
-    gr_mpoly_t A,
-    const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
-int gr_mpoly_push_term_scalar_fmpz(
-    gr_mpoly_t A,
-    gr_srcptr c,
-    const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
+void _gr_mpoly_push_exp_ui(gr_mpoly_t A, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_push_term_scalar_ui(gr_mpoly_t A, gr_srcptr c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+void _gr_mpoly_push_exp_fmpz(gr_mpoly_t A, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_push_term_scalar_fmpz(gr_mpoly_t A, gr_srcptr c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 void gr_mpoly_sort_terms(gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
-int gr_mpoly_combine_like_terms(
-    gr_mpoly_t A,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
+int gr_mpoly_combine_like_terms(gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 truth_t gr_mpoly_is_canonical(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-
 void gr_mpoly_assert_canonical(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
 /* Random generation */
@@ -175,11 +156,25 @@ int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint
 
 /* Input and output */
 
-int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
-                             const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
-int gr_mpoly_print_pretty(const gr_mpoly_t A,
-                             const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+/* Coefficient/exponent access */
+
+int gr_mpoly_get_coeff_scalar_fmpz(gr_ptr c, const gr_mpoly_t A, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_get_coeff_scalar_ui(gr_ptr c, const gr_mpoly_t A, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+int gr_mpoly_set_coeff_scalar_fmpz(gr_mpoly_t A, gr_srcptr c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_ui_fmpz(gr_mpoly_t A, ulong c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_si_fmpz(gr_mpoly_t A, slong c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_fmpz_fmpz(gr_mpoly_t A, const fmpz_t c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_fmpq_fmpz(gr_mpoly_t A, const fmpq_t c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+int gr_mpoly_set_coeff_scalar_ui(gr_mpoly_t poly, gr_srcptr c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_ui_ui(gr_mpoly_t A, ulong c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_si_ui(gr_mpoly_t A, slong c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_fmpz_ui(gr_mpoly_t A, const fmpz_t c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_set_coeff_fmpq_ui(gr_mpoly_t A, const fmpq_t c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
 /* Arithmetic */
 
@@ -189,6 +184,13 @@ int gr_mpoly_sub(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpo
 
 int gr_mpoly_mul(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 int gr_mpoly_mul_johnson(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_mul_monomial(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+int gr_mpoly_mul_scalar(gr_mpoly_t A, const gr_mpoly_t B, gr_srcptr c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_mul_ui(gr_mpoly_t A, const gr_mpoly_t B, ulong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_mul_fmpz(gr_mpoly_t A, const gr_mpoly_t B, const fmpz_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+int gr_mpoly_mul_fmpq(gr_mpoly_t A, const gr_mpoly_t B, const fmpq_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
 #ifdef __cplusplus
 }
