@@ -1314,58 +1314,6 @@ FLINT_DLL void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
                                 const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, slong N);
 
-/* Some functions for backwards compatibility */
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1,
-                               const fmpz_poly_t poly2, const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_scalar_mul_fmpz(poly1, poly2, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1,
-                               const fmpz_poly_t poly2, const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_scalar_divexact_fmpz(poly1, poly2, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1,
-                               const fmpz_poly_t poly2, const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_scalar_fdiv_fmpz(poly1, poly2, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_set_coeff_mpz(fmpz_poly_t poly, slong n,
-    const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_set_coeff_fmpz(poly, n, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_get_coeff_mpz(mpz_t x, const fmpz_poly_t poly, slong n)
-{
-    fmpz_t t;
-    fmpz_init(t);
-    fmpz_poly_get_coeff_fmpz(t, poly, n);
-    fmpz_get_mpz(x, t);
-    fmpz_clear(t);
-}
-
 /* Roots */
 
 FLINT_DLL void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len);
