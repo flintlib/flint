@@ -71,10 +71,7 @@ int nmod_mpolyn_divides(
     for (i = 0; i < B->length; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = B->length;
@@ -291,10 +288,7 @@ int _nmod_mpolyn_divides(
     for (i = 0; i < B->length; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = B->length;

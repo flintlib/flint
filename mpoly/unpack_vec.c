@@ -14,7 +14,7 @@
 void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                      slong nfields, slong len)
 {
-    if (bits <= FLINT_BITS)
+    if (bits < FLINT_BITS)
     {
         slong i, j, shift;
         ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -55,7 +55,7 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, flint_bitcnt_t bits,
 void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                       slong nfields, slong len)
 {
-    if (bits <= FLINT_BITS)
+    if (bits < FLINT_BITS)
     {
         slong i, j, shift;
         ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);

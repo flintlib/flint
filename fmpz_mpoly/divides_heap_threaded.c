@@ -972,10 +972,7 @@ slong _fmpz_mpoly_divides_stripe1(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     Qlen = WORD(0);
 
