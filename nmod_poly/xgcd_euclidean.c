@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T, 
                                mp_srcptr A, slong lenA, 
@@ -42,7 +43,7 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
 
         if (lenR == 0)
         {
-            _nmod_vec_set(G, B, lenB);
+            _NMOD_VEC_SET(G, B, lenB);
             T[0] = 1;
             lenG = lenB;
         }
@@ -58,7 +59,7 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
             V3 = V1 + lenB;
 
             lenU = 0;
-            _nmod_vec_set(D, B, lenB);
+            _NMOD_VEC_SET(D, B, lenB);
             lenD = lenB;
             V1[0] = 1;
             lenV1 = 1;
@@ -98,8 +99,8 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
 
             } while (lenV3 != 0);
 
-            _nmod_vec_set(G, D, lenD);
-            _nmod_vec_set(S, U, lenU);
+            _NMOD_VEC_SET(G, D, lenD);
+            _NMOD_VEC_SET(S, U, lenU);
 
             {
                 lenQ = lenA + lenU - 1;

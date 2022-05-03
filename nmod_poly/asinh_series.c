@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)

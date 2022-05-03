@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "nmod.h"
 #include "nmod_mat.h"
 
@@ -204,7 +205,7 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
         }
         else
         {
-          _nmod_vec_set(extra_row, r[col], m);
+          _NMOD_VEC_SET(extra_row, r[col], m);
         }
 
         for (row = col + 1; row < m; row++)

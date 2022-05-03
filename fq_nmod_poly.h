@@ -22,7 +22,6 @@
 #define FQ_NMOD_POLY_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "templates.h"
 #include "fq_nmod_vec.h"
 #include "fq_nmod_mat.h"

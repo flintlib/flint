@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /* Assumes poly1 and poly2 are not length 0. */
 void

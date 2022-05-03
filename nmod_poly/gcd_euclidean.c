@@ -11,6 +11,7 @@
 
 #include "mpn_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA, 
                                         mp_srcptr B, slong lenB, nmod_t mod)

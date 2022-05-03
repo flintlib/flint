@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
@@ -31,7 +32,7 @@ _nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
     if (Qlen == 1)
     {
         _nmod_vec_scalar_mul_nmod(Qinv, P, Plen, q, mod);
-        _nmod_vec_zero(Qinv + Plen, n - Plen);
+        _NMOD_VEC_ZERO(Qinv + Plen, n - Plen);
     }
     else
     {

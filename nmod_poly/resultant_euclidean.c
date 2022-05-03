@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 mp_limb_t 
 _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1, 
@@ -50,8 +51,8 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
         v = w + len1;
         r = v + len1;
 
-        _nmod_vec_set(u, poly1, len1);
-        _nmod_vec_set(v, poly2, len2);
+        _NMOD_VEC_SET(u, poly1, len1);
+        _NMOD_VEC_SET(v, poly2, len2);
         l1 = len1;
         l2 = len2;
 

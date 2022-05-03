@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "nmod_vec.h"
 
 void
@@ -23,5 +24,5 @@ nmod_mat_zero(nmod_mat_t mat)
         return;
 
     for (i = 0; i < m; i++)
-        _nmod_vec_zero(mat->rows[i], n);
+        _NMOD_VEC_ZERO(mat->rows[i], n);
 }

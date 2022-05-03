@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /*
     compute f^0, f^1, ..., f^(n-1) mod g, where g has length glen and f is
@@ -39,7 +40,7 @@ _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f, slong flen, slong 
        return;
 
     /* f^1 = f */
-    _nmod_vec_set(res[1], f, flen);
+    _NMOD_VEC_SET(res[1], f, flen);
     FLINT_MPN_ZERO(res[1] + flen, glen - flen - 1);
 
     if (n == 2)

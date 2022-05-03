@@ -18,6 +18,7 @@
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "thread_support.h"
+#include "flint-impl.h"
 
 typedef struct
 {
@@ -67,7 +68,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
         if (j >= arg.len2)
             return;
 
-        _nmod_vec_set(res[j].coeffs, C->rows[(j + 1)*k - 1], n);
+        _NMOD_VEC_SET(res[j].coeffs, C->rows[(j + 1)*k - 1], n);
 
         if (n == 1) /* special case, constant polynomials */
         {    
@@ -127,9 +128,9 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
         len1 = polys[j].length;
 
         for (i = 0; i < len1 / m; i++)
-            _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m, m);
+            _NMOD_VEC_SET(B->rows[i + j * k], polys[j].coeffs + i * m, m);
             
-        _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m,
+        _NMOD_VEC_SET(B->rows[i + j * k], polys[j].coeffs + i * m,
                       len1 % m);
     }
 

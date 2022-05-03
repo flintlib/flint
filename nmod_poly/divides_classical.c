@@ -113,7 +113,7 @@ int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA,
     res = _nmod_poly_mullow_classical_check(A, Q, lenQ, B, lenB - 1, mod);
 		    
     if (!res)
-        _nmod_vec_zero(Q, lenQ);
+        _NMOD_VEC_ZERO(Q, lenQ);
 
     TMP_END;
 

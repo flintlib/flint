@@ -11,6 +11,7 @@
 
 #include "mpn_extras.h"
 #include "ulong_extras.h"
+#include "flint-impl.h"
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
 #include <pthread.h>

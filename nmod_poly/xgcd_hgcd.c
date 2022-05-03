@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /*
     We define a whole bunch of macros here which essentially provide 
@@ -23,7 +24,7 @@
 
 #define __set(B, lenB, A, lenA)      \
 do {                                 \
-    _nmod_vec_set((B), (A), (lenA)); \
+    _NMOD_VEC_SET((B), (A), (lenA)); \
     (lenB) = (lenA);                 \
 } while (0)
 
@@ -68,7 +69,7 @@ do {                                                                \
     }                                                               \
     else                                                            \
     {                                                               \
-        _nmod_vec_set((R), (A), (lenA));                            \
+        _NMOD_VEC_SET((R), (A), (lenA));                            \
         (lenQ) = 0;                                                 \
         (lenR) = (lenA);                                            \
     }                                                               \
@@ -145,11 +146,11 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
             if (sgnR > 0)
             {
                 _nmod_vec_neg(S, R[1], lenR[1], mod);
-                _nmod_vec_set(T, R[0], lenR[0]);
+                _NMOD_VEC_SET(T, R[0], lenR[0]);
             }
             else
             {
-                _nmod_vec_set(S, R[1], lenR[1]);
+                _NMOD_VEC_SET(S, R[1], lenR[1]);
                 _nmod_vec_neg(T, R[0], lenR[0], mod);
             }
             lenS = lenR[1];

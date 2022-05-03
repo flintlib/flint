@@ -166,10 +166,7 @@ nmod_mat_det_howell(const nmod_mat_t A)
     slong dim = A->r;
 
     if (dim != A->c)
-    {
-        flint_printf("Exception (nmod_mat_det_howell). Non-square matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square matrix in nmod_mat_det_howell\n");
 
     nmod_mat_init_set(tmp, A);
     det = _nmod_mat_det_howell(tmp);

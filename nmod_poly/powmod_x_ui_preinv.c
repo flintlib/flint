@@ -14,6 +14,7 @@
 
 #include "long_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_powmod_x_ui_preinv(mp_ptr res, ulong e, mp_srcptr f, slong lenf,

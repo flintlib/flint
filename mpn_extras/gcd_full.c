@@ -10,7 +10,7 @@
 */
 
 #include "flint.h"
-#include "gmpcompat.h"
+#include "flint-impl.h"
 
 mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, 
                                mp_srcptr array1, mp_size_t limbs1,

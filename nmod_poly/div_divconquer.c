@@ -12,6 +12,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 static void
 __nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA, 
@@ -77,7 +78,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
         V = R + (lenB - 1);
 
         shift = lenA - n;
-        _nmod_vec_set(S, A + shift, n);
+        _NMOD_VEC_SET(S, A + shift, n);
 
         while (lenA >= n)
         {
@@ -85,7 +86,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
             _nmod_poly_divrem_divconquer_recursive(Q + shift, T, R, V, S, B, lenB, mod);
             next = FLINT_MIN(lenB, shift);
             _nmod_vec_sub_dec(S + next, S, T, lenB - 1, mod);
-            _nmod_vec_set(S, A + shift - next, next);
+            _NMOD_VEC_SET(S, A + shift - next, next);
             lenA -= lenB;
         }
 

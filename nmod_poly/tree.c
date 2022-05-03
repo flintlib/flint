@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 mp_ptr * _nmod_poly_tree_alloc(slong len)
 {
@@ -101,6 +102,6 @@ _nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, slong len, nmod_t mod)
         if (left > pow)
             _nmod_poly_mul(pb, pa, pow + 1, pa + pow + 1, left - pow + 1, mod);
         else if (left > 0)
-            _nmod_vec_set(pb, pa, left + 1);
+            _NMOD_VEC_SET(pb, pa, left + 1);
     }
 }

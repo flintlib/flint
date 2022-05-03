@@ -9,6 +9,32 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+#include "flint-impl.h"
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
@@ -20,7 +46,7 @@ _nmod_mat_charpoly_berkowitz(mp_ptr cp, const nmod_mat_t mat, nmod_t mod)
 
     if (mod.n == 1)
     {
-        _nmod_vec_zero(cp, n + 1);
+        _NMOD_VEC_ZERO(cp, n + 1);
     }
     else if (n == 0)
     {
@@ -52,7 +78,7 @@ _nmod_mat_charpoly_berkowitz(mp_ptr cp, const nmod_mat_t mat, nmod_t mod)
 
         nlimbs = _nmod_vec_dot_bound_limbs(n, mod);
 
-        _nmod_vec_zero(cp, n + 1);
+        _NMOD_VEC_ZERO(cp, n + 1);
         cp[0] = nmod_neg(nmod_mat_entry(mat, 0, 0), mod);
 
         for (t = 1; t < n; t++)
@@ -98,13 +124,9 @@ _nmod_mat_charpoly_berkowitz(mp_ptr cp, const nmod_mat_t mat, nmod_t mod)
 void nmod_mat_charpoly_berkowitz(nmod_poly_t cp, const nmod_mat_t mat)
 {
     if (mat->r != mat->c)
-    {
-        flint_printf("Exception (nmod_mat_charpoly_berkowitz).  Non-square matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square matrix in nmod_mat_charpoly_berkowitz\n");
 
     nmod_poly_fit_length(cp, mat->r + 1);
     _nmod_poly_set_length(cp, mat->r + 1);
     _nmod_mat_charpoly_berkowitz(cp->coeffs, mat, mat->mod);
 }
-

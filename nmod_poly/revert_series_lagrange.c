@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
@@ -29,7 +30,7 @@ _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     T = _nmod_vec_init(n - 1);
 
     _nmod_poly_inv_series(R, Q + 1, n - 1, n - 1, mod);
-    _nmod_vec_set(S, R, n - 1);
+    _NMOD_VEC_SET(S, R, n - 1);
 
     for (i = 2; i < n; i++)
     {

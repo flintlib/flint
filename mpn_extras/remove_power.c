@@ -10,6 +10,7 @@
 */
 
 #include "mpn_extras.h"
+#include "flint-impl.h"
 
 mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                       mp_ptr p, mp_size_t psize, ulong *exp)

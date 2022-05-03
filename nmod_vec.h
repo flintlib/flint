@@ -20,7 +20,6 @@
 #endif
 
 #include "flint.h"
-#include "gmpcompat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,19 +45,24 @@ void _nmod_vec_clear(mp_ptr vec)
 
 FLINT_DLL void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 
-NMOD_VEC_INLINE
-void _nmod_vec_zero(mp_ptr vec, slong len)
-{
-   FLINT_MPN_ZERO(vec, len);
-}
+#define _NMOD_VEC_SET(res, vec, len)    FLINT_MPN_COPYI(res, vec, len)
+#define _NMOD_VEC_ZERO(vec, len)        FLINT_MPN_ZERO(vec, len)
+
+/* FIXME: Write these two functions. These are currently commented as the user
+ * should not be able to access flint-impl.h. */
+/* NMOD_VEC_INLINE */
+/* void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len) */
+/* { */
+/*    FLINT_MPN_COPYI(res, vec, len); */
+/* } */
+
+/* NMOD_VEC_INLINE */
+/* void _nmod_vec_zero(mp_ptr vec, slong len) */
+/* { */
+/*    FLINT_MPN_ZERO(vec, len); */
+/* } */
 
 FLINT_DLL flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
-
-NMOD_VEC_INLINE
-void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
-{
-   FLINT_MPN_COPYI(res, vec, len);
-}
 
 NMOD_VEC_INLINE
 void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)

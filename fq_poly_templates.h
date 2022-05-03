@@ -1183,6 +1183,23 @@ FLINT_DLL void TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(
 
 /*  Input and output  ********************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int _TEMPLATE(T, poly_fprint_pretty)(FILE *file,
                                  const TEMPLATE(T, struct) *poly, slong len,
                                  const char *x,
@@ -1230,6 +1247,7 @@ TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly,
 {
     return TEMPLATE(T, poly_fprint_pretty)(stdout, poly, x, ctx);
 }
+#endif
 
 FLINT_DLL char * _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len,
                                   const char *x,
@@ -1261,10 +1279,7 @@ void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
    TEMPLATE(T, mat_set) (A, M, ctx);
 
    if (A->r != A->c)
-   {
-       flint_printf("Exception (fq_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
-   }
+       flint_throw(FLINT_ERROR, "Non-square matrix in " TEMPLATE_STR(T) "mat_charpoly\n");
 
    TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
 

@@ -12,6 +12,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 static 
 void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
@@ -90,7 +91,7 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
         T = W + (lenB - 1);
         V = T + n;
 
-        _nmod_vec_set(S, A, lenA);
+        _NMOD_VEC_SET(S, A, lenA);
 
         while (lenA >= n)
         {
@@ -103,10 +104,10 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
         if (lenA >= lenB)
         {
             __nmod_poly_divrem_divconquer(Q, T, S, lenA, B, lenB, mod);
-            _nmod_vec_set(S, T, lenA);
+            _NMOD_VEC_SET(S, T, lenA);
         }
 
-        _nmod_vec_set(R, S, lenB - 1);
+        _NMOD_VEC_SET(R, S, lenB - 1);
         _nmod_vec_clear(S);
     }
 }

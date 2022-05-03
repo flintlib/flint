@@ -53,7 +53,7 @@ _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
 
     if (hlen < 2)
     {
-        _nmod_vec_zero(f + 1, n - 1);
+        _NMOD_VEC_ZERO(f + 1, n - 1);
         return;
     }
 

@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "n_poly.h"
-
+#include "flint-impl.h"
 
 void n_bpoly_clear(n_bpoly_t A)
 {
@@ -74,17 +75,17 @@ void n_bpoly_print_pretty(
             continue;
 
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
 
         first = 0;
 
-        flint_printf("(");
+        printf("(");
         n_poly_print_pretty(A->coeffs + i, yvar);
-        flint_printf(")*%s^%wd", xvar, i);
+        printf(")*%s^" WORD_FMT "d", xvar, i);
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 

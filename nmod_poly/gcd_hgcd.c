@@ -12,10 +12,11 @@
 
 #include "mpn_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 #define __set(B, lenB, A, lenA)      \
 do {                                 \
-    _nmod_vec_set((B), (A), (lenA)); \
+    _NMOD_VEC_SET((B), (A), (lenA)); \
     (lenB) = (lenA);                 \
 } while (0)
 
@@ -29,7 +30,7 @@ do {                                                        \
     }                                                       \
     else                                                    \
     {                                                       \
-        _nmod_vec_set((R), (A), (lenA));                    \
+        _NMOD_VEC_SET((R), (A), (lenA));                    \
         (lenR) = (lenA);                                    \
     }                                                       \
 } while (0)

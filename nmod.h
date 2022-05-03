@@ -47,23 +47,23 @@
             r = ((r1xx - nxx)>>(mod).norm);                             \
     } while (0)
 
-#define NMOD_RED(r, a, mod) \
-   do { \
-      NMOD_RED2(r, UWORD(0), a, mod); \
+#define NMOD_RED(r, a, mod)             \
+   do {                                 \
+      NMOD_RED2(r, UWORD(0), a, mod);   \
    } while (0)
 
-#define NMOD2_RED2(r, a_hi, a_lo, mod) \
-    do { \
-       mp_limb_t v_hi;	\
-       NMOD_RED(v_hi, a_hi, mod); \
-       NMOD_RED2(r, v_hi, a_lo, mod); \
+#define NMOD2_RED2(r, a_hi, a_lo, mod)  \
+    do {                                \
+       mp_limb_t v_hi;	                \
+       NMOD_RED(v_hi, a_hi, mod);       \
+       NMOD_RED2(r, v_hi, a_lo, mod);   \
     } while (0)
 
 #define NMOD_RED3(r, a_hi, a_me, a_lo, mod) \
-    do { \
-       mp_limb_t v_hi;	\
-       NMOD_RED2(v_hi, a_hi, a_me, mod); \
-       NMOD_RED2(r, v_hi, a_lo, mod); \
+    do {                                    \
+       mp_limb_t v_hi;	                    \
+       NMOD_RED2(v_hi, a_hi, a_me, mod);    \
+       NMOD_RED2(r, v_hi, a_lo, mod);       \
     } while (0)
 
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))

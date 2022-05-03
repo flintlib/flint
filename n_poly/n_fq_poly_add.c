@@ -11,7 +11,6 @@
 
 #include "n_poly.h"
 
-
 void n_fq_poly_add(
     n_fq_poly_t A,
     const n_fq_poly_t B,
@@ -27,7 +26,7 @@ void n_fq_poly_add(
         n_poly_fit_length(A, d*Blen);
         _nmod_vec_add(A->coeffs, B->coeffs, C->coeffs, d*Clen, ctx->mod);
         if (A != B)
-            _nmod_vec_set(A->coeffs + d*Clen, B->coeffs + d*Clen, d*(Blen - Clen));
+            _NMOD_VEC_SET(A->coeffs + d*Clen, B->coeffs + d*Clen, d*(Blen - Clen));
         A->length = Blen;
     }
     else if (Blen < Clen)
@@ -35,7 +34,7 @@ void n_fq_poly_add(
         n_poly_fit_length(A, d*Clen);
         _nmod_vec_add(A->coeffs, B->coeffs, C->coeffs, d*Blen, ctx->mod);
         if (A != C)
-            _nmod_vec_set(A->coeffs + d*Blen, C->coeffs + d*Blen, d*(Clen - Blen));
+            _NMOD_VEC_SET(A->coeffs + d*Blen, C->coeffs + d*Blen, d*(Clen - Blen));
         A->length = Clen;
     }
     else

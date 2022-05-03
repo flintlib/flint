@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_compose_mod(mp_ptr res,

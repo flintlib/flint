@@ -15,6 +15,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly, 
@@ -53,7 +54,7 @@ _nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly,
     T = _nmod_vec_init(lenT + lenQ);
     Q = T + lenT;
 
-    _nmod_vec_set(res, poly, lenf - 1);
+    _NMOD_VEC_SET(res, poly, lenf - 1);
 
     bits = fmpz_sizeinbase(e, 2);
 

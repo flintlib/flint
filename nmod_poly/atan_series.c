@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /* todo: handle short h */
 void

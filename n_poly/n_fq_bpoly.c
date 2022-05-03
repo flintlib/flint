@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "n_poly.h"
+#include "flint-impl.h"
 
 int n_fq_bpoly_is_canonical(const n_fq_bpoly_t A, const fq_nmod_ctx_t ctx)
 {
@@ -49,17 +51,17 @@ void n_fq_bpoly_print_pretty(
             continue;
 
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
 
         first = 0;
 
-        flint_printf("(");
+        printf("(");
         n_fq_poly_print_pretty(A->coeffs + i, yvar, ctx);
-        flint_printf(")*%s^%wd", xvar, i);
+        printf(")*%s^" WORD_FMT "d", xvar, i);
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 

@@ -12,6 +12,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 static void 
 __nmod_poly_invsqrt_series_prealloc(mp_ptr g, 
@@ -36,7 +37,7 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
 
     __nmod_poly_invsqrt_series_prealloc(g, h, t, u, m, mod);
 
-    _nmod_vec_zero(g + m, n - m);
+    _NMOD_VEC_ZERO(g + m, n - m);
 
     _nmod_poly_mul(t, g, m, g, m, mod);
     if (2*m - 1 < n)

@@ -14,6 +14,7 @@
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /*
     We define a whole bunch of macros here which essentially provide 
@@ -36,7 +37,7 @@ do {                                           \
 
 #define __set(B, lenB, A, lenA)      \
 do {                                 \
-    _nmod_vec_set((B), (A), (lenA)); \
+    _NMOD_VEC_SET((B), (A), (lenA)); \
     (lenB) = (lenA);                 \
 } while (0)
 
@@ -83,7 +84,7 @@ do {                                                                \
     }                                                               \
     else                                                            \
     {                                                               \
-        _nmod_vec_set((R), (A), (lenA));                            \
+        _NMOD_VEC_SET((R), (A), (lenA));                            \
         (lenQ) = 0;                                                 \
         (lenR) = (lenA);                                            \
     }                                                               \

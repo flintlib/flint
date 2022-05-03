@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
@@ -42,7 +43,7 @@ _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
         w[i] = n_invmod(w[i], mod.n);
     }
 
-    _nmod_vec_zero(poly, n);
+    _NMOD_VEC_ZERO(poly, n);
 
     for (i = 0; i < n; i++)
     {

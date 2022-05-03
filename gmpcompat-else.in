@@ -19,45 +19,6 @@
         ? (mp_ptr) _mpz_realloc(z, len) \
         : ((z)->_mp_d))
 
-#define FLINT_MPZ_PTR_SWAP(a, b)    \
-  do {                              \
-    mpz_ptr __tmp = (a);            \
-    (a) = (b);                      \
-    (b) = __tmp;                    \
-  } while (0)
-
-#define FLINT_MPN_ZERO(xxx, nnn)                \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = 0; ixxx < (nnn); ixxx++)    \
-            (xxx)[ixxx] = UWORD(0);             \
-    } while (0)
-
-#define FLINT_MPN_COPYI(xxx, yyy, nnn)          \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = 0; ixxx < (nnn); ixxx++)    \
-            (xxx)[ixxx] = (yyy)[ixxx];          \
-    } while (0)
-
-#define FLINT_MPN_COPYD(xxx, yyy, nnn)          \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
-            (xxx)[ixxx] = (yyy)[ixxx];          \
-    } while (0)
-
-#define FLINT_MPN_STORE(xxx, nnn, yyy)          \
-    do                                          \
-    {                                           \
-        slong ixxx;                             \
-        for (ixxx = 0; ixxx < nnn; ixxx++)      \
-        (xxx)[ixxx] = yyy;                      \
-    } while (0)
-
 /* mpn_get_d -- limbs to double conversion.
 
    THE FUNCTIONS IN THIS FILE ARE FOR INTERNAL USE ONLY.  THEY'RE ALMOST

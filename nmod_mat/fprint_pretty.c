@@ -10,7 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "ulong_extras.h"
+#include "flint-impl.h"
 
 int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
 {
@@ -18,7 +20,8 @@ int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
     int z, width;
     char fmt[FLINT_BITS + 5];
 
-    z = flint_fprintf(file, "<%wd x %wd integer matrix mod %wu>\n",
+    z = fprintf(file,
+        "<" WORD_FMT "d x " WORD_FMT "d integer matrix mod " WORD_FMT "u>\n",
                                                    mat->r, mat->c, mat->mod.n);
     if (z <= 0)
         return z;
@@ -28,31 +31,31 @@ int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
 
     width = n_sizeinbase(mat->mod.n, 10);
 
-    z = flint_sprintf(fmt, "%%%dwu", width);
+    z = sprintf(fmt, "%d", width);
     if (z <= 0)
         return z;
 
     for (i = 0; i < mat->r; i++)
     {
-        z = flint_printf("[");
+        z = printf("[");
         if (z <= 0)
             return z;
 
         for (j = 0; j < mat->c; j++)
         {
-            z = flint_printf(fmt, mat->rows[i][j]);
+            z = printf(fmt, mat->rows[i][j]);
             if (z <= 0)
                 return z;
 
             if (j + 1 < mat->c)
             {
-                z = flint_printf(" ");
+                z = printf(" ");
                 if (z <= 0)
                     return z;
             }
         }
 
-        flint_printf("]\n");
+        printf("]\n");
         if (z <= 0)
             return z;
     }

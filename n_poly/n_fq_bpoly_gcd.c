@@ -195,7 +195,7 @@ void n_fq_bpoly_interp_lift_2psm_poly(
 
     for (i = 0; i < Tlen; i++)
     {
-        _nmod_vec_zero(u, 2*d);
+        _NMOD_VEC_ZERO(u, 2*d);
 
         if (i < Alen && i < Blen)
         {
@@ -347,7 +347,7 @@ int n_fq_bpoly_interp_crt_2psm_poly(
         if (i < Flen)
             n_fq_poly_eval2p_pow(u + d*0, u + d*1, Fcoeffs + i, alphapow, d, mod);
         else
-            _nmod_vec_zero(u, 2*d);
+            _NMOD_VEC_ZERO(u, 2*d);
 
         if (i < Alen)
             _nmod_vec_sub(u + d*0, u + d*0, Acoeffs + d*i, d, mod);

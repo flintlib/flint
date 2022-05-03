@@ -18,12 +18,42 @@
 #define N_POLY_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "nmod.h"
 #include "nmod_poly.h"
+
+/* TODO: Remove this inclusion. It should not be visible to the user. */
+#include "flint-impl.h"
 
 #ifdef __cplusplus
  extern "C" {
+#endif
+
+/* Currently defined here to avoid inclusion of nmod.h */
+#ifndef NMOD_RED
+#define NMOD_RED2(r, a_hi, a_lo, mod)                                   \
+    do                                                                  \
+    {                                                                   \
+        mp_limb_t q0xx, q1xx, r1xx;                                     \
+        const mp_limb_t u1xx = ((a_hi)<<(mod).norm)                     \
+            + ((mod.norm == 0)                                          \
+                    ? UWORD(0)                                          \
+                    : (mp_limb_t) (a_lo) >> (FLINT_BITS - (mod).norm)); \
+        const mp_limb_t u0xx = ((a_lo)<<(mod).norm);                    \
+        const mp_limb_t nxx = ((mod).n<<(mod).norm);                    \
+        umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx);                        \
+        add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx);                 \
+        r1xx = (u0xx - (q1xx + 1)*nxx);                                 \
+        if (r1xx > q0xx)                                                \
+            r1xx += nxx;                                                \
+        if (r1xx < nxx)                                                 \
+            r = (r1xx>>(mod).norm);                                     \
+        else                                                            \
+            r = ((r1xx - nxx)>>(mod).norm);                             \
+    } while (0)
+
+#define NMOD_RED(r, a, mod)             \
+   do {                                 \
+      NMOD_RED2(r, UWORD(0), a, mod);   \
+   } while (0)
 #endif
 
 typedef n_poly_struct n_fq_poly_struct;
@@ -748,10 +778,28 @@ FLINT_DLL char * n_fq_get_str_pretty(
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int n_fq_fprint_pretty(
     FILE * file,
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
+#endif
 
 FLINT_DLL void n_fq_print_pretty(
     const mp_limb_t * a,

@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B, ulong x)
 {
@@ -22,7 +23,7 @@ void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B, ulong x)
     nmod_poly_fit_length(A, Blen);
 
     if (Blen > Alen)
-        _nmod_vec_zero(A->coeffs + Alen, Blen - Alen);
+        _NMOD_VEC_ZERO(A->coeffs + Alen, Blen - Alen);
 
     _nmod_vec_scalar_addmul_nmod(A->coeffs, B->coeffs, Blen, x, A->mod);
     _nmod_poly_set_length(A, FLINT_MAX(Alen, Blen));

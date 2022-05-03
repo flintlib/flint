@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_compose_mod_horner(mp_ptr res,

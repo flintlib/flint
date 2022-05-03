@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,17 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint-impl.h"
-#include "nmod_vec.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
 
 void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
 {
-    slong i;
-
-    if (B == A || A->c == 0)
-        return;
-
-    for (i = 0; i < A->r; i++)
-        _NMOD_VEC_SET(B->rows[i], A->rows[i], A->c);
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_mod_ui(d, c, res->mod.n);
+    nmod_mat_scalar_mul(res, M, fmpz_get_ui(d));
+    fmpz_clear(d);
 }

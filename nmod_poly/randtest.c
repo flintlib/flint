@@ -13,6 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
+#include "flint-impl.h"
 
 void
 nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
@@ -39,7 +40,7 @@ nmod_poly_randtest_monic_sparse(nmod_poly_t poly, flint_rand_t state,
     slong i;
 
     nmod_poly_fit_length(poly, len);
-    _nmod_vec_zero(poly->coeffs, len);
+    _NMOD_VEC_ZERO(poly->coeffs, len);
     poly->coeffs[0] = n_randtest(state) % poly->mod.n;
     for (i = 1; i < nonzero; i++)
        poly->coeffs[n_randint(state, len - 1) + 1] = n_randtest(state) % poly->mod.n;
@@ -84,7 +85,7 @@ nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
 {
     ulong k;
     nmod_poly_fit_length(poly, len);
-    _nmod_vec_zero(poly->coeffs, len);
+    _NMOD_VEC_ZERO(poly->coeffs, len);
     poly->coeffs[0] = n_randtest(state) % poly->mod.n;
     poly->coeffs[len - 1] = 1;
     k = (n_randtest(state) % (len - 2)) + 1;
@@ -96,7 +97,7 @@ void
 nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
 {
     nmod_poly_fit_length(poly, len);
-    _nmod_vec_zero(poly->coeffs, len);
+    _NMOD_VEC_ZERO(poly->coeffs, len);
     poly->coeffs[0] = n_randtest(state) % poly->mod.n;
     poly->coeffs[1] = n_randtest(state) % poly->mod.n;
     poly->coeffs[2] = n_randtest(state) % poly->mod.n;

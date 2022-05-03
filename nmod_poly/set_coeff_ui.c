@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)
 {
@@ -31,9 +32,11 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)
             poly->length--;
             _nmod_poly_normalise(poly);
         }
-    } else /* extend polynomial */
+    }
+    else /* extend polynomial */
     {
-        if (c == 0) return;
+        if (c == 0)
+            return;
         else
         {
             FLINT_MPN_ZERO(poly->coeffs + poly->length, j - poly->length);

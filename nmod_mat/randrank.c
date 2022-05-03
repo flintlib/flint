@@ -19,10 +19,7 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
     mp_limb_t * diag;
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
-    {
-        flint_printf("Exception (nmod_mat_randrank). Impossible rank.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Impossible rand in nmod_mat_randrank\n");
 
     diag = _nmod_vec_init(rank);
     

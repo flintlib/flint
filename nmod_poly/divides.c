@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, 
                                            mp_srcptr B, slong lenB, nmod_t mod)
@@ -25,38 +26,38 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
 
     if (lenA < 2*lenB - 1)
     {
-	slong offset = 0;
+        slong offset = 0;
         mp_ptr P;
 
-	P = (mp_ptr) _nmod_vec_init(2*lenQ - 1);
+        P = (mp_ptr) _nmod_vec_init(2*lenQ - 1);
 
-	_nmod_vec_zero(R, lenB - 1);
+        _NMOD_VEC_ZERO(R, lenB - 1);
 
-	_nmod_poly_div(Q, A, lenA, B, lenB, mod);
+        _nmod_poly_div(Q, A, lenA, B, lenB, mod);
 
         while (offset < lenB - 1)
         {
             if (offset + 2*lenQ - 1 < lenB)
             {
                 _nmod_poly_mul(P, B + offset, lenQ, Q, lenQ, mod);
-	        _nmod_poly_add(R + offset, R + offset, 2*lenQ - 1, P, 2*lenQ - 1, mod);
+                _nmod_poly_add(R + offset, R + offset, 2*lenQ - 1, P, 2*lenQ - 1, mod);
             } else
             {
                 _nmod_poly_mullow(P, Q, lenQ, B + offset, lenQ, lenB - offset - 1, mod);
                 _nmod_poly_add(R + offset, R + offset, lenB - offset - 1, P, lenB - offset - 1, mod);
             }
 
-	    for (i = 0; i < FLINT_MIN(lenQ, lenB - offset - 1); i++)
+            for (i = 0; i < FLINT_MIN(lenQ, lenB - offset - 1); i++)
             {
                 if (R[offset + i] != A[offset + i])
-		{
+                {
                     res = 0;
-		    break;
-	        }
+                    break;
+                }
             }
 
-	    offset += lenQ;
-	}
+            offset += lenQ;
+        }
 
         _nmod_vec_clear(P);
     } else
@@ -68,7 +69,7 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
             if (R[i] != 0)
             {
                 res = 0;
-	        break;
+                break;
             }
         }
     }
@@ -76,7 +77,7 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
     _nmod_vec_clear(R);
 
     if (res == 0)
-	_nmod_vec_zero(Q, lenQ);
+        _NMOD_VEC_ZERO(Q, lenQ);
 
     return res;
 }
@@ -94,7 +95,7 @@ int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
     if (lenB == 0 || lenA < lenB)
     {
         nmod_poly_zero(Q);
-	return lenA == 0;
+        return lenA == 0;
     }
 
     if (Q == A || Q == B)
@@ -115,7 +116,7 @@ int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
         nmod_poly_swap(tQ, Q);
         nmod_poly_clear(tQ);
     }
-    
+
     Q->length = lenA - lenB + 1;
     _nmod_poly_normalise(Q);
 

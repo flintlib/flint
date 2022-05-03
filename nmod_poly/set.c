@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,17 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_poly.h"
 #include "flint-impl.h"
-#include "nmod_vec.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
 {
-    slong i;
-
-    if (B == A || A->c == 0)
-        return;
-
-    for (i = 0; i < A->r; i++)
-        _NMOD_VEC_SET(B->rows[i], A->rows[i], A->c);
+    if (a != b)
+    {
+        nmod_poly_fit_length(a, b->length);
+        FLINT_MPN_COPYI(a->coeffs, b->coeffs, b->length);
+        a->length = b->length;
+    }
 }

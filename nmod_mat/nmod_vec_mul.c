@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "nmod_mat.h"
 
 /* TODO try delaying the reductions */
@@ -28,7 +29,7 @@ void nmod_mat_nmod_vec_mul(
     if (len > 0)
         _nmod_vec_scalar_mul_nmod(c, B->rows[0], ncols, a[0], B->mod);
     else
-        _nmod_vec_zero(c, ncols);
+        _NMOD_VEC_ZERO(c, ncols);
 
     for (i = 1; i < len; i++)
         _nmod_vec_scalar_addmul_nmod(c, B->rows[i], ncols, a[i], B->mod);

@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "n_poly.h"
 #include "fq_nmod.h"
+#include "flint-impl.h"
 
 #define MAC(h, m, l, a, b)                          \
 {                                                   \
@@ -63,21 +65,21 @@ int n_fq_fprint_pretty(
             continue;
 
         if (!first)
-            flint_fprintf(file, "+");
+            fprintf(file, "+");
 
         first = 0;
-        flint_fprintf(file, "%wu", a[i]);
+        fprintf(file, WORD_FMT "u", a[i]);
 
         if (i > 0)
         {
-            flint_fprintf(file, "*%s", ctx->var);
+            fprintf(file, "*%s", ctx->var);
             if (i > 1)
-                flint_fprintf(file, "^%wd", i);
+                fprintf(file, "^" WORD_FMT "d", i);
         }
     }
 
     if (first)
-        flint_fprintf(file, "0");
+        fprintf(file, "0");
 
     return 1;
 }
@@ -199,7 +201,7 @@ void n_fq_add_si(
     slong d = fq_nmod_ctx_degree(ctx);
 
     if (a != b)
-        _nmod_vec_set(a, b, d);
+        _NMOD_VEC_SET(a, b, d);
 
     if (c < 0)
     {
@@ -796,7 +798,7 @@ void _n_fq_inv(
     else if (blen == 1)
     {
         a[0] = n_invmod(b[0], ctx->mod.n);
-        _nmod_vec_zero(a + 1, d - 1);
+        _NMOD_VEC_ZERO(a + 1, d - 1);
     }
     else
     {

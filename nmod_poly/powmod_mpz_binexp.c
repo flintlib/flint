@@ -13,7 +13,8 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
-
+#include "flint-impl.h"
+#include "gmpcompat.h"
 
 static __inline__ mp_limb_t 
 n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
@@ -64,7 +65,7 @@ _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, mpz_srcptr e,
     T = _nmod_vec_init(lenT + lenQ);
     Q = T + lenT;
 
-    _nmod_vec_set(res, poly, lenf - 1);
+    _NMOD_VEC_SET(res, poly, lenf - 1);
 
     for (i = mpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {

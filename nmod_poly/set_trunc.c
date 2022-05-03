@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n)
@@ -27,7 +28,7 @@ nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n)
             rlen--;
 
         nmod_poly_fit_length(res, rlen);
-        _nmod_vec_set(res->coeffs, poly->coeffs, rlen);
+        _NMOD_VEC_SET(res->coeffs, poly->coeffs, rlen);
         _nmod_poly_set_length(res, rlen);
     }
 }

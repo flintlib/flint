@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1, 
@@ -49,7 +50,7 @@ _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1,
             _nmod_poly_add(res, t, lenr, poly1 + i, 1, mod);
         }
 
-        _nmod_vec_zero(res + lenr, n - lenr);
+        _NMOD_VEC_ZERO(res + lenr, n - lenr);
         _nmod_vec_clear(t);
     }
 }

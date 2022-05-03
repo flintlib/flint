@@ -9,6 +9,33 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+#include <stdio.h>
+#include "flint-impl.h"
 #include "n_poly.h"
 #include "fq_nmod_poly.h"
 
@@ -68,17 +95,17 @@ void n_fq_poly_print_pretty(
             continue;
 
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
 
         first = 0;
 
-        flint_printf("(");
+        printf("(");
         n_fq_print_pretty(A->coeffs + d*i, ctx);
-        flint_printf(")*%s^%wd", x, i);
+        printf(")*%s^" WORD_FMT "d", x, i);
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 
@@ -262,7 +289,7 @@ void n_fq_poly_set(
         return;
 
     n_poly_fit_length(A, d*B->length);
-    _nmod_vec_set(A->coeffs, B->coeffs, d*B->length);
+    _NMOD_VEC_SET(A->coeffs, B->coeffs, d*B->length);
     A->length = B->length;
 }
 
@@ -274,7 +301,7 @@ void n_fq_poly_set_n_fq(
     slong d = fq_nmod_ctx_degree(ctx);
 
     n_poly_fit_length(A, d);
-    _nmod_vec_set(A->coeffs, c, d);
+    _NMOD_VEC_SET(A->coeffs, c, d);
     A->length = 1;
     _n_fq_poly_normalise(A, d);
 }
@@ -424,7 +451,7 @@ void n_fq_poly_eval_pow(
         }
     }
 
-    _nmod_vec_zero(t, 6*d);
+    _NMOD_VEC_ZERO(t, 6*d);
 
     switch (_n_fq_dot_lazy_size(Plen, ctx))
     {
@@ -566,7 +593,7 @@ void n_fq_poly_scalar_addmul_n_fq(
         for (i = 0; i < Clen; i++)
             _n_fq_addmul(Acoeffs + d*i, Bcoeffs + d*i, Ccoeffs + d*i, s, ctx, t);
         if (A != B)
-            _nmod_vec_set(Acoeffs + d*Clen, Bcoeffs + d*Clen, d*(Blen - Clen));
+            _NMOD_VEC_SET(Acoeffs + d*Clen, Bcoeffs + d*Clen, d*(Blen - Clen));
         A->length = Blen;
     }
     else if (Blen < Clen)

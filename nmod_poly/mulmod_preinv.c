@@ -11,6 +11,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
                             mp_srcptr poly2, slong len2, mp_srcptr f,
@@ -64,7 +65,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
         if (f == res)
         {
             fcoeffs = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * lenf);
-            _nmod_vec_set(fcoeffs, f->coeffs, lenf);
+            _NMOD_VEC_SET(fcoeffs, f->coeffs, lenf);
         } else
             fcoeffs = f->coeffs;
 

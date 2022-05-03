@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /* Assumes poly1 and poly2 are not length 0. */
 void
@@ -20,7 +21,7 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
 {
     slong m, n;
 
-    _nmod_vec_zero(res, start);
+    _NMOD_VEC_ZERO(res, start);
 
     if (len1 == 1)              /* Special case if the length of both inputs is 1 */
     {

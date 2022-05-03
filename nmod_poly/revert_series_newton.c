@@ -12,6 +12,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 #define FLINT_REVERSE_NEWTON_CUTOFF 15
 
@@ -38,7 +39,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
         a[++i] = (k = (k + 1) / 2);
 
     _nmod_poly_revert_series_lagrange(Qinv, Q, k, mod);
-    _nmod_vec_zero(Qinv + k, n - k);
+    _NMOD_VEC_ZERO(Qinv + k, n - k);
 
     for (i--; i >= 0; i--)
     {

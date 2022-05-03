@@ -13,6 +13,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly, 
@@ -34,7 +35,7 @@ _nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly,
     T = _nmod_vec_init(lenT + lenQ);
     Q = T + lenT;
 
-    _nmod_vec_set(res, poly, lenf - 1);
+    _NMOD_VEC_SET(res, poly, lenf - 1);
 
     for (i = ((int) FLINT_BIT_COUNT(e) - 2); i >= 0; i--)
     {

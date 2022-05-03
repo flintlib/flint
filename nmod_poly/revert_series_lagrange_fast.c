@@ -12,7 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
-
+#include "flint-impl.h"
 
 /* pointer to (x/Q)^i */
 #define Ri(ii) (R + (n-1)*((ii)-1))
@@ -41,7 +41,7 @@ _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv,
     for (i = 2; i < m; i++)
         Qinv[i] = nmod_div(Ri(i)[i-1], i, mod);
 
-    _nmod_vec_set(S, Ri(m), n - 1);
+    _NMOD_VEC_SET(S, Ri(m), n - 1);
 
     for (i = m; i < n; i += m)
     {

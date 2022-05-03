@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod)
@@ -19,7 +20,7 @@ _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod)
     if (flen == 1)
     {
         res[0] = 1;
-        _nmod_vec_zero(res + 1, n - 1);
+        _NMOD_VEC_ZERO(res + 1, n - 1);
     }
     else
     {

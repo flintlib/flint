@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
@@ -28,7 +29,7 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     m = (n + 1) / 2;
 
     _nmod_poly_tan_series(g, h, m, mod);
-    _nmod_vec_zero(g + m, n - m);
+    _NMOD_VEC_ZERO(g + m, n - m);
 
     t = _nmod_vec_init(n);
     u = _nmod_vec_init(n);

@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /* This gives some speedup for small lengths. */
 static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,
@@ -38,7 +39,7 @@ _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
             vs[0] = _nmod_poly_evaluate_nmod(poly, plen,
                 nmod_neg(tree[0][0], mod), mod);
         else if (len != 0 && plen == 0)
-            _nmod_vec_zero(vs, len);
+            _NMOD_VEC_ZERO(vs, len);
         else if (len != 0 && plen == 1)
             for (i = 0; i < len; i++)
                 vs[i] = poly[0];
@@ -89,14 +90,14 @@ _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
             _nmod_poly_rem(pc + pow, pb, left, pa + pow + 1, left - pow + 1, mod);
         }
         else if (left > 0)
-            _nmod_vec_set(pc, pb, left);
+            _NMOD_VEC_SET(pc, pb, left);
 
         swap = t;
         t = u;
         u = swap;
     }
 
-    _nmod_vec_set(vs, t, len);
+    _NMOD_VEC_SET(vs, t, len);
     _nmod_vec_clear(t);
     _nmod_vec_clear(u);
 }

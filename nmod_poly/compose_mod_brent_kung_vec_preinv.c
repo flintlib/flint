@@ -14,6 +14,7 @@
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
@@ -44,9 +45,9 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
         len1 = (polys + j)->length;
 
         for (i = 0; i < len1/m; i++)
-            _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, m);
+            _NMOD_VEC_SET(B->rows[i + j*k], (polys + j)->coeffs + i*m, m);
         
-        _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, len1%m);
+        _NMOD_VEC_SET(B->rows[i + j*k], (polys + j)->coeffs + i*m, len1%m);
     }
 
     /* Set rows of A to powers of last element of polys */
@@ -68,7 +69,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     
     for (j = 0; j < len2; j++)
     {
-        _nmod_vec_set((res + j)->coeffs, C->rows[(j + 1)*k - 1], n);
+        _NMOD_VEC_SET((res + j)->coeffs, C->rows[(j + 1)*k - 1], n);
 
         if (n == 1)
         {

@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
@@ -19,7 +20,7 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
     slong j, k, rlen;
     mp_limb_t a;
 
-    _nmod_vec_zero(res, n);
+    _NMOD_VEC_ZERO(res, n);
 
     if (power >= n)
         return;

@@ -12,6 +12,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /*
     See fmpz_poly/compose_divconquer.c

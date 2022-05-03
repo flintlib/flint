@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
@@ -31,7 +32,7 @@ do {                                                        \
     }                                                       \
     else                                                    \
     {                                                       \
-        _nmod_vec_set((R), (A), (lenA));                    \
+        _NMOD_VEC_SET((R), (A), (lenA));                    \
         (lenR) = (lenA);                                    \
     }                                                       \
 } while (0)

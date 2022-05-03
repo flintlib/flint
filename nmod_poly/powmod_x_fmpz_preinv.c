@@ -16,6 +16,7 @@
 #include "long_extras.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "n_poly.h"
-
 
 int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod)
 {

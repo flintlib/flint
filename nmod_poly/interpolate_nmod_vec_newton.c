@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 
 static void
@@ -68,7 +69,7 @@ _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
     }
     else
     {
-        _nmod_vec_set(poly, ys, n);
+        _NMOD_VEC_SET(poly, ys, n);
         _interpolate_newton(poly, xs, n, mod);
         while (n > 0 && !poly[n-1]) n--;
         _newton_to_monomial(poly, xs, n, mod);

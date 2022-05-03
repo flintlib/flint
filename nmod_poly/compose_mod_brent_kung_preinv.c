@@ -14,6 +14,7 @@
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
@@ -52,9 +53,9 @@ _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1/m; i++)
-        _nmod_vec_set(B->rows[i], poly1 + i*m, m);
+        _NMOD_VEC_SET(B->rows[i], poly1 + i*m, m);
 
-    _nmod_vec_set(B->rows[i], poly1 + i*m, len1%m);
+    _NMOD_VEC_SET(B->rows[i], poly1 + i*m, len1%m);
 
     /* Set rows of A to powers of poly2 */
     _nmod_poly_powers_mod_preinv_naive(A->rows, poly2, n,
@@ -63,7 +64,7 @@ _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
     nmod_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
-    _nmod_vec_set(res, C->rows[m - 1], n);
+    _NMOD_VEC_SET(res, C->rows[m - 1], n);
     _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, poly2, n,
                                            poly3, len3, poly3inv, len3inv,mod);
 

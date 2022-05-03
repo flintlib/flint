@@ -11,6 +11,7 @@
 */
 
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)

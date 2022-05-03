@@ -13,6 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
+#include "flint-impl.h"
 
 /* Assumes len > 0, bits > 0. */
 void

@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_sinh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
