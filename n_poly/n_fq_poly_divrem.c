@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "n_poly.h"
-
 
 #define N_FQ_POLY_DIVREM_BASECASE_ITCH \
     FLINT_MAX(FLINT_MAX(4, N_FQ_MUL_ITCH), 2 + (N_FQ_REDUCE_ITCH))
@@ -33,7 +33,7 @@ void _n_fq_poly_rem_basecase_(
     mp_limb_t * q1 = q0 + d;
 
     if (A != AA)
-        _nmod_vec_set(A, AA, d*Alen);
+        _NMOD_VEC_SET(A, AA, d*Alen);
 
     while (Alen - Blen > 3 && Blen > 1)
     {
@@ -55,7 +55,7 @@ void _n_fq_poly_rem_basecase_(
         }
 
         Alen -= 2;
-        _nmod_vec_zero(A + d*Alen, 2*d);
+        _NMOD_VEC_ZERO(A + d*Alen, 2*d);
     }
 
     while (Alen - Blen >= 0)
@@ -69,7 +69,7 @@ void _n_fq_poly_rem_basecase_(
         }
 
         Alen -= 1;
-        _nmod_vec_zero(A + d*Alen, 1*d);
+        _NMOD_VEC_ZERO(A + d*Alen, 1*d);
     }
 
     n_poly_stack_vec_clear(St);
@@ -92,7 +92,7 @@ void _n_fq_poly_divrem_basecase_(
     mp_limb_t * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
 
     if (A != AA)
-        _nmod_vec_set(A, AA, d*Alen);
+        _NMOD_VEC_SET(A, AA, d*Alen);
 
     while (Alen - Blen > 3 && Blen > 1)
     {
@@ -119,7 +119,7 @@ void _n_fq_poly_divrem_basecase_(
         _nmod_vec_neg(q0, q0, 2*d, mod); /* q0 and q1 */
 
         Alen -= 2;
-        _nmod_vec_zero(A + d*Alen, 2*d);
+        _NMOD_VEC_ZERO(A + d*Alen, 2*d);
     }
 
     while (Alen - Blen >= 0)
@@ -135,7 +135,7 @@ void _n_fq_poly_divrem_basecase_(
         }
 
         Alen -= 1;
-        _nmod_vec_zero(A + d*Alen, 1*d);
+        _NMOD_VEC_ZERO(A + d*Alen, 1*d);
     }
 
     n_poly_stack_vec_clear(St);
@@ -155,13 +155,13 @@ void _n_fq_poly_divrem_divconquer_recursive_(
 
     if (lenB <= N_FQ_POLY_DIVREM_DIVCONQUER_CUTOFF)
     {
-        _nmod_vec_zero(BQ, d*(lenB - 1));
-        _nmod_vec_set(BQ + d*(lenB - 1), A + d*(lenB - 1), d*lenB);
+        _NMOD_VEC_ZERO(BQ, d*(lenB - 1));
+        _NMOD_VEC_SET(BQ + d*(lenB - 1), A + d*(lenB - 1), d*lenB);
 
         _n_fq_poly_divrem_basecase_(Q, BQ, BQ, 2*lenB - 1, B, lenB, invB, ctx, St);
 
         _nmod_vec_neg(BQ, BQ, d*(lenB - 1), ctx->mod);
-        _nmod_vec_set(BQ + d*(lenB - 1), A + d*(lenB - 1), d*lenB);
+        _NMOD_VEC_SET(BQ + d*(lenB - 1), A + d*(lenB - 1), d*lenB);
     }
     else
     {
@@ -275,7 +275,7 @@ void _n_fq_poly_divrem_divconquer_(
         slong shift, n = 2*lenB - 1;
         mp_limb_t * QB, * W;
 
-        _nmod_vec_set(R, A, d*lenA);
+        _NMOD_VEC_SET(R, A, d*lenA);
         W = n_poly_stack_vec_init(St, d*2*n);
         QB = W + d*n;
 

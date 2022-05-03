@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "n_poly.h"
 #include "mpn_extras.h"
-
 
 int n_poly_mod_is_canonical(const n_poly_t A, nmod_t mod)
 {
@@ -253,10 +253,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
     len2 = poly2->length;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_mulmod\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {
@@ -269,7 +266,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
         if (f == res)
         {
             fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
-            _nmod_vec_set(fcoeffs, f->coeffs, lenf);
+            _NMOD_VEC_SET(fcoeffs, f->coeffs, lenf);
         }
         else
             fcoeffs = f->coeffs;
@@ -308,10 +305,7 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
             return;
         }
         else
-        {                                                                                
-            flint_printf("Exception (n_poly_mod_div). Division by zero.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_DIVZERO, "n_poly_mod_div\n");
     }
 
     A_len = A->length;
@@ -351,10 +345,8 @@ void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
     mp_ptr r;
 
     if (lenB == 0)
-    {
-        flint_printf("Exception (nmod_poly_rem). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_rem\n");
+
     if (lenA < lenB)
     {
         n_poly_set(R, A);
@@ -401,10 +393,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
             return;
         }
         else
-        {
-            flint_printf("Exception (n_poly_mod_divrem). Division by zero.");
-            flint_abort();
-        }
+            flint_throw(FLINT_DIVZERO, "n_poly_mod_divrem");
     }
 
     if (lenA < lenB)
@@ -464,10 +453,8 @@ int n_poly_mod_invmod(n_poly_t A, const n_poly_t B, const n_poly_t P, nmod_t ctx
     int ans;
 
     if (lenP < 2)
-    {
-        printf("Exception (nmod_poly_invmod). lenP < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenP < 2 in nmod_poly_invmod\n");
+
     if (lenB == 0)
     {
         n_poly_zero(A);
@@ -700,10 +687,7 @@ void n_poly_mod_mulmod_preinv(
     len2 = poly2->length;
 
     if (lenf <= len1 || lenf <= len2)
-    {
-        flint_printf("n_poly_mod_mulmod_preinv: Input is larger than modulus.");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Input is larger than modulus in n_poly_mod_mulmod_preinv\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {
@@ -716,7 +700,7 @@ void n_poly_mod_mulmod_preinv(
         if (f == res)
         {
             fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
-            _nmod_vec_set(fcoeffs, f->coeffs, lenf);
+            _NMOD_VEC_SET(fcoeffs, f->coeffs, lenf);
         }
         else
         {
@@ -747,9 +731,7 @@ void n_poly_mod_inv_series(n_poly_t Qinv, const n_poly_t Q, slong n, nmod_t ctx)
     Qlen = FLINT_MIN(Qlen, n);
 
     if (Qlen == 0)
-    {
-        flint_throw(FLINT_ERROR, "n_poly_mod_inv_series_newton: Division by zero.");
-    }
+        flint_throw(FLINT_DIVZERO, "n_poly_mod_inv_series_newton\n");
 
     if (Qinv != Q)
     {
@@ -777,10 +759,7 @@ void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A, const n_poly_t B,
     slong Alen = A->length;
 
     if (order < 1 || Blen == 0 || B->coeffs[0] == 0)
-    {
-        flint_printf("Exception (n_poly_div_series). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "n_poly_div_series\n");
 
     if (Alen == 0)
     {

@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "flint-impl.h"
 #include "n_poly.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
 
 int n_poly_is_canonical(const n_poly_t A)
 {
@@ -55,13 +55,13 @@ void n_poly_print_pretty(const n_poly_t A, const char * x)
         if (i < A->length - 1 && A->coeffs[i] == 0)
             continue;
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
         first = 0;
-        flint_printf("%wu*%s^%wd", A->coeffs[i], x, i);
+        printf(WORD_FMT "u*%s^" WORD_FMT "d", A->coeffs[i], x, i);
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 void n_poly_set_coeff(n_poly_t poly, slong j, ulong c)

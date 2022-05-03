@@ -18,7 +18,6 @@
 #define FMPZ_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "fmpz_mini.h"
 #include "gmpcompat.h"
 
@@ -44,8 +43,6 @@ FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
 FLINT_DLL void _fmpz_cleanup_mpz_content(void);
 
 FLINT_DLL void _fmpz_cleanup(void);
-
-FLINT_DLL __mpz_struct * _fmpz_promote(fmpz_t f);
 
 FLINT_DLL __mpz_struct * _fmpz_promote_val(fmpz_t f);
 
@@ -124,10 +121,6 @@ FLINT_DLL void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz
 
 FLINT_DLL void fmpz_randprime(fmpz_t f, flint_rand_t state, 
                               flint_bitcnt_t bits, int proved);
-
-FLINT_DLL slong fmpz_get_si(const fmpz_t f);
-
-FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
 
 FLINT_DLL mp_limb_t fmpz_get_nmod(const fmpz_t f, nmod_t mod);
 
@@ -286,15 +279,11 @@ FLINT_DLL void fmpz_clear_readonly(fmpz_t f);
 
 FLINT_DLL int fmpz_abs_fits_ui(const fmpz_t f);
 
-FLINT_DLL int fmpz_fits_si(const fmpz_t f);
-
 FMPZ_INLINE
 int fmpz_is_pm1(const fmpz_t f)
 {
    return (*f == 1 || *f == -1);
 }
-
-FLINT_DLL void fmpz_set(fmpz_t f, const fmpz_t g);
 
 FLINT_DLL int fmpz_equal_si(const fmpz_t f, slong g);
 
@@ -330,17 +319,6 @@ FLINT_DLL size_t fmpz_out_raw(FILE * fout, const fmpz_t x);
 FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
 FLINT_DLL char * fmpz_get_str(char * str, int b, const fmpz_t f);
-
-FMPZ_INLINE
-void fmpz_swap(fmpz_t f, fmpz_t g)
-{
-    if (f != g)  /* swapping required */
-    {
-        fmpz t = *f;
-        *f = *g;
-        *g = t;
-    }
-}
 
 FLINT_DLL int fmpz_cmp(const fmpz_t f, const fmpz_t g);
 

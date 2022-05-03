@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "flint-impl.h"
 
 int
 fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,

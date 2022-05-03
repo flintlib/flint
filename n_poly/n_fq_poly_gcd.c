@@ -12,7 +12,6 @@
 #include "n_poly.h"
 #include "fq_nmod_poly.h"
 
-
 slong _n_fq_poly_gcd_euclidean_inplace_(    
     mp_limb_t * A, slong Alen,
     mp_limb_t * B, slong Blen,
@@ -170,8 +169,8 @@ void n_fq_poly_gcd_(
     a = n_poly_stack_vec_init(St, d*A->length + 1);
     b = n_poly_stack_vec_init(St, d*B->length + 1);
 
-    _nmod_vec_set(a, A->coeffs, d*A->length);
-    _nmod_vec_set(b, B->coeffs, d*B->length);
+    _NMOD_VEC_SET(a, A->coeffs, d*A->length);
+    _NMOD_VEC_SET(b, B->coeffs, d*B->length);
 
     n = _n_fq_poly_gcd_euclidean_inplace_(a, A->length, b, B->length, ctx, t);
 
@@ -179,13 +178,13 @@ void n_fq_poly_gcd_(
     {
         n = -n - 1;
         n_poly_fit_length(G, d*n);
-        _nmod_vec_set(G->coeffs, b, d*n);
+        _NMOD_VEC_SET(G->coeffs, b, d*n);
         G->length = n;
     }
     else
     {
         n_poly_fit_length(G, d*n);
-        _nmod_vec_set(G->coeffs, a, d*n);
+        _NMOD_VEC_SET(G->coeffs, a, d*n);
         G->length = n;
     }
 

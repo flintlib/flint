@@ -20,6 +20,7 @@
 #endif
 
 #include "flint.h"
+#include "fmpz_mini.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod.h"
 
@@ -123,7 +124,8 @@ fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
 
 FLINT_DLL void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
 
-/* Random matrix generation */
+/* Random matrix generation ***************************************************/
+
 FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
 
 FLINT_DLL void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state,
@@ -142,7 +144,7 @@ void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_t state)
     _fmpz_mod_mat_reduce(mat);
 }
 
-/* Windows and concatenation */
+/* Windows and concatenation **************************************************/
 
 FLINT_DLL void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
                               slong r1, slong c1, slong r2, slong c2);
@@ -165,7 +167,25 @@ void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
     fmpz_mat_concat_vertical(res->mat, mat1->mat, mat2->mat);
 }
 
-/* Input/output */
+/* I/O ************************************************************************/
+
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat)
 {
@@ -189,8 +209,10 @@ void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat)
 {
     fmpz_mat_print_pretty(mat->mat);
 }
+#endif
 
-/* Comparison */
+/* Comparison *****************************************************************/
+
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
 {
@@ -256,9 +278,11 @@ FLINT_DLL void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat
 
 FLINT_DLL void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
+#ifdef THREAD_POOL_H
 FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D,
       const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B,
                       int op, thread_pool_handle * threads, slong num_threads);
+#endif
 
 FLINT_DLL void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
                                const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
@@ -377,4 +401,3 @@ FLINT_DLL void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong 
 #endif
 
 #endif
-

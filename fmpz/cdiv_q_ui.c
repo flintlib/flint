@@ -19,10 +19,7 @@ fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     ulong c2 = h;
 
     if (h == 0)
-    {
-        flint_printf("Exception: division by zero in fmpz_cdiv_q_ui\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_cdiv_q_ui\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

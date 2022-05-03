@@ -10,7 +10,7 @@
 */
 
 #include "thread_pool.h"
-
+#include "thread_support.h"
 
 void thread_pool_clear(thread_pool_t T)
 {

@@ -19,20 +19,7 @@
 #define MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "string.h"
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpz-conversions.h"
 #include "thread_pool.h"
 
 #ifdef __cplusplus
@@ -220,11 +207,13 @@ MPOLY_INLINE slong mpoly_rbtree_fmpz_head(const mpoly_rbtree_fmpz_t T)
 
 /* Orderings *****************************************************************/
 
+#ifdef ULONG_EXTRAS_H
 MPOLY_INLINE
 ordering_t mpoly_ordering_randtest(flint_rand_t state)
 {
    return (ordering_t) n_randint(state, MPOLY_NUM_ORDERINGS);
 }
+#endif
 
 MPOLY_INLINE
 int mpoly_ordering_isdeg(const mpoly_ctx_t mctx)
@@ -238,6 +227,23 @@ int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
    return mctx->ord == ORD_DEGREVLEX;
 }
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 MPOLY_INLINE
 void mpoly_ordering_print(ordering_t ord)
 {
@@ -256,6 +262,7 @@ void mpoly_ordering_print(ordering_t ord)
       printf("Unknown ordering in mpoly_ordering_print.");
    }
 }
+#endif
 
 /*  Monomials ****************************************************************/
 
@@ -690,6 +697,23 @@ void mpoly_monomial_set_extra(ulong * exp2, const ulong * exp3,
     }
 }
 
+#if defined (MEMCPY)                    \
+  || defined (H_STRING)                 \
+  || defined (_H_STRING)                \
+  || defined (_STRING_H)                \
+  || defined (_STRING_H_)               \
+  || defined (__STRING_H)               \
+  || defined (__STRING_H__)             \
+  || defined (_STRINGT_INCLUDED)        \
+  || defined (__dj_include_string_h_)   \
+  || defined (_MEMCPY_DEFINED)          \
+  || defined (__STRING__)               \
+  || defined (_MSL_STRING_H)            \
+  || defined (_STRING_H_INCLUDED)       \
+  || defined (_ISO_STRING_ISO_H)        \
+  || defined (__STRING_LOADED)          \
+  || defined (_STRING)                  \
+  || defined (__DEFINED_MEMCPY)
 MPOLY_INLINE
 void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
 {
@@ -698,6 +722,7 @@ void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
 
     memcpy(exp1, exp2, N*len*sizeof(ulong));
 }
+#endif
 
 MPOLY_INLINE
 void mpoly_monomial_swap(ulong * exp2, ulong * exp3, slong N)

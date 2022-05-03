@@ -88,9 +88,9 @@
 
 /* include FLINT headers ******************************************************/
 
+#include "flint-config.h"
 #include "flint-types.h"
 #include "longlong.h"
-#include "flint-config.h"
 #include "exception.h"
 
 #if FLINT_USES_GC

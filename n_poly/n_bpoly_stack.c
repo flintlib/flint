@@ -11,7 +11,6 @@
 
 #include "n_poly.h"
 
-
 void n_bpoly_stack_init(n_bpoly_stack_t S)
 {
     S->alloc = 0;

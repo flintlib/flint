@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "fmpz.h"
 
 int

@@ -11,13 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#if FLINT_USES_PTHREAD
-#include <pthread.h>
-#endif
+#include "thread_support.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
-#include "thread_support.h"
 #include "flint-impl.h"
 
 typedef struct

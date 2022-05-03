@@ -12,7 +12,6 @@
 #include "n_poly.h"
 #include "fq_nmod.h"
 
-
 /* g is in Fq[gen(1)] */
 static void n_fq_bpoly_content_var0(
     n_fq_poly_t g,

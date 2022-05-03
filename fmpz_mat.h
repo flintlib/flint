@@ -113,6 +113,23 @@ FLINT_DLL void fmpz_mat_concat_vertical(fmpz_mat_t res,
 
 /* Input and output  *********************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);
 
 FLINT_DLL int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat);
@@ -136,6 +153,7 @@ int fmpz_mat_read(fmpz_mat_t mat)
 {
     return fmpz_mat_fread(stdin, mat);
 }
+#endif
 
 /* Random matrix generation  *************************************************/
 
@@ -379,10 +397,7 @@ FMPZ_MAT_INLINE
 void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
-   {
-       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
-   }
+       flint_throw(FLINT_ERROR, "Non-square matrix in nmod_mat_charpoly\n");
 
    fmpz_mat_charpoly_modular(cp, mat);
 }
@@ -403,10 +418,7 @@ FMPZ_MAT_INLINE
 void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
-   {
-       flint_printf("Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
-       flint_abort();
-   }
+       flint_throw(FLINT_ERROR, "Non-square matrix in fmpz_mat_minpoly\n");
 
    fmpz_mat_minpoly_modular(cp, mat);
 }

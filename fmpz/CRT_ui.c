@@ -56,10 +56,7 @@ void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     c = n_invmod(c, m2);
 
     if (c == 0)
-    {
-        flint_printf("Exception (fmpz_CRT_ui). m1 not invertible modulo m2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "m1 not invertible modulo m2 in fmpz_CRT_ui\n");
 
     fmpz_init(m1m2);
     fmpz_mul_ui(m1m2, m1, m2);

@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 mp_limb_t
 fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)

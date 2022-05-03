@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* NOTE: Assumes to be called along with flint.h. */
+/* NOTE: Assumes that flint.h has been called. */
 
 #ifndef FLINT_TYPES_H
 #define FLINT_TYPES_H

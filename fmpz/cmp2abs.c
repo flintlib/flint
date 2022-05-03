@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 #include "mpn_extras.h"
 
 static int flint_mpn_cmp2abs(mp_srcptr x, slong xn, mp_srcptr a, slong an)

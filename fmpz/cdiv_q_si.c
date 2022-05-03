@@ -18,10 +18,7 @@ fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
     slong c2 = h;
 
     if (h == 0)
-    {
-        flint_printf("Exception (fmpz_cdiv_q_si). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_cdiv_q_si\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

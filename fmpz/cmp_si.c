@@ -11,6 +11,8 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#include "gmpcompat.h"
 
 int
 fmpz_cmp_si(const fmpz_t f, slong g)

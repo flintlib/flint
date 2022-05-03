@@ -21,6 +21,7 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
+#include "fmpz_mini.h"
 #include "fmpz_vec.h"
 
 #ifdef __cplusplus
@@ -30,18 +31,6 @@ extern "C" {
 #define FMPZ_POLY_INV_NEWTON_CUTOFF 32
 #define FMPZ_POLY_SQRT_DIVCONQUER_CUTOFF 16
 #define FMPZ_POLY_SQRTREM_DIVCONQUER_CUTOFF 16
-
-/* to avoid including fmpz.h */
-#define FMPZ_IS_ZERO(inp)   (*(inp) == 0)
-#define FMPZ_IS_ONE(inp)    (*(inp) == 1)
-#define FMPZ_EQUAL(f, g)                    \
-    ((f) == (g)                             \
-     ? 1                                    \
-     : (!COEFF_IS_MPZ(*(f))                  \
-        ? *(f) == *(g)                      \
-        : (!COEFF_IS_MPZ(*(g))               \
-            ? 0                             \
-            : mpz_cmp(COEFF_TO_PTR(*(f)), COEFF_TO_PTR(*(g))) == 0)))
 
 /*  Type definitions *********************************************************/
 
@@ -247,7 +236,7 @@ FLINT_DLL int fmpz_poly_equal_trunc(const fmpz_poly_t poly1,
 FMPZ_POLY_INLINE
 int _fmpz_poly_is_one(const fmpz * poly, slong len)
 {
-    return (len > 0 && FMPZ_IS_ONE(poly)
+    return (len > 0 && fmpz_is_one(poly)
                     && _fmpz_vec_is_zero(poly + 1, len - 1));
 }
 
@@ -272,8 +261,8 @@ int fmpz_poly_is_gen(const fmpz_poly_t op)
 FMPZ_POLY_INLINE
 int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
 {
-	return ((poly->length == 0) && FMPZ_IS_ZERO(c)) ||
-        ((poly->length == 1) && FMPZ_EQUAL(poly->coeffs, c));
+	return ((poly->length == 0) && fmpz_is_zero(c)) ||
+        ((poly->length == 1) && fmpz_equal(poly->coeffs, c));
 }
 
 /*  Addition and subtraction  ************************************************/
@@ -1146,6 +1135,24 @@ FLINT_DLL void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, s
 FLINT_DLL void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly);
 
 /*  Input and output  ********************************************************/
+
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
@@ -1213,6 +1220,7 @@ void fmpz_poly_debug(const fmpz_poly_t poly)
     flint_printf(")");
     fflush(stdout);
 }
+#endif
 
 /* Norms *********************************************************************/
 
@@ -1220,7 +1228,7 @@ FMPZ_POLY_INLINE slong _fmpz_poly_hamming_weight(const fmpz * a, slong len)
 {
     slong i, sum = 0;
     for (i = 0; i < len; i++)
-        sum += !FMPZ_IS_ZERO(a + i);
+        sum += !fmpz_is_zero(a + i);
     return sum;
 }
 

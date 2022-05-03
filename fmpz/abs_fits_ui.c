@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 int
 fmpz_abs_fits_ui(const fmpz_t f)

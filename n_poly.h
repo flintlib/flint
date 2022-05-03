@@ -56,6 +56,28 @@
    } while (0)
 #endif
 
+/* define the following macros to avoid including fq_nmod.h */
+#define FQ_NMOD_CTX_DEGREE(ctx)                     \
+    (ctx->modulus->length - 1)
+
+#define FQ_NMOD_ZERO(rop, ctx)                      \
+    nmod_poly_zero(rop)
+
+#define FQ_NMOD_IS_ZERO(rop, ctx)                   \
+    nmod_poly_is_zero(rop)
+
+#define FQ_NMOD_INIT(rop, ctx)                      \
+    nmod_poly_init2_preinv(rop, ctx->mod.n,         \
+            ctx->mod.ninv, FQ_NMOD_CTX_DEGREE(ctx))
+
+#define FQ_NMOD_CTX_ORDER(f, ctx)                   \
+    do                                              \
+    {                                               \
+        fmpz_set(f, (&((ctx)->p)));                 \
+        fmpz_pow_ui(f, f, FQ_NMOD_CTX_DEGREE(ctx)); \
+    } while (0)
+
+
 typedef n_poly_struct n_fq_poly_struct;
 
 typedef n_poly_t n_fq_poly_t;
@@ -169,27 +191,6 @@ typedef n_poly_polyun_stack_struct n_poly_polyun_stack_t[1];
 
 
 /*****************************************************************************/
-
-/* define the following macros to avoid including fq_nmod.h */
-#define FQ_NMOD_CTX_DEGREE(ctx)                     \
-    (ctx->modulus->length - 1)
-
-#define FQ_NMOD_ZERO(rop, ctx)                      \
-    nmod_poly_zero(rop)
-
-#define FQ_NMOD_IS_ZERO(rop, ctx)                   \
-    nmod_poly_is_zero(rop)
-
-#define FQ_NMOD_INIT(rop, ctx)                      \
-    nmod_poly_init2_preinv(rop, ctx->mod.n,         \
-            ctx->mod.ninv, FQ_NMOD_CTX_DEGREE(ctx))
-
-#define FQ_NMOD_CTX_ORDER(f, ctx)                   \
-    do                                              \
-    {                                               \
-        fmpz_set(f, (&((ctx)->p)));                 \
-        fmpz_pow_ui(f, f, FQ_NMOD_CTX_DEGREE(ctx)); \
-    } while (0)
 
 N_POLY_INLINE
 void n_poly_init(n_poly_t A)

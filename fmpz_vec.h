@@ -96,6 +96,23 @@ FLINT_DLL slong _fmpz_vec_height_index(const fmpz * vec, slong len);
 
 /*  Input and output  ********************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len);
 
 FMPZ_VEC_INLINE
@@ -111,6 +128,7 @@ int _fmpz_vec_read(fmpz ** vec, slong * len)
 {
     return _fmpz_vec_fread(stdin, vec, len);
 }
+#endif
 
 /*  Conversions  *************************************************************/
 

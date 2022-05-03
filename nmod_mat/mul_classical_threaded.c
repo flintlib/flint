@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
 #include "thread_support.h"
+#include "nmod.h"
+#include "nmod_mat.h"
 
 #define FLINT_MUL_CLASSICAL_CACHE_SIZE 32768 /* size of L1 cache in words */
 

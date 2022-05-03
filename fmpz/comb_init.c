@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "flint-impl.h"
 
 /* TODO: Remove fmpz_poly as it is not necessary here. Simply replace with
  * fmpz_vec. */

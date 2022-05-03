@@ -10,6 +10,8 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#include "gmpcompat.h"
 
 int
 fmpz_cmp_ui(const fmpz_t f, ulong g)

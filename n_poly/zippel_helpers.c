@@ -9,6 +9,32 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+#include "flint-impl.h"
 #include "n_poly.h"
 #include "fq_nmod_poly.h"
 
@@ -405,7 +431,7 @@ int _n_fqp_zip_vand_solve(
         _n_fq_zero(T, d);
         _n_fq_zero(S, d);
 
-        _nmod_vec_zero(V_p, 3*d);
+        _NMOD_VEC_ZERO(V_p, 3*d);
         T_p = S_p = 0;
         r_p = monomials[i];
         for (j = mlength; j > 0; j--)
@@ -445,7 +471,7 @@ int _n_fqp_zip_vand_solve(
 
     for (i = mlength; i < elength; i++)
     {
-        _nmod_vec_zero(V_p, 3*d);
+        _NMOD_VEC_ZERO(V_p, 3*d);
         S_p = 0;
         for (j = 0; j < mlength; j++)
         {

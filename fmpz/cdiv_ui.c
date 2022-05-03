@@ -10,6 +10,8 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#include "gmpcompat.h"
 
 ulong
 fmpz_cdiv_ui(const fmpz_t g, ulong h)
@@ -18,10 +20,7 @@ fmpz_cdiv_ui(const fmpz_t g, ulong h)
     ulong r;
 
     if (h == UWORD(0))
-    {
-        flint_printf("Exception (fmpz_cdiv_ui). Division by 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_cdiv_ui\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

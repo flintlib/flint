@@ -35,8 +35,8 @@
 # endif
 #endif
 
-#include "nmod_poly.h"
 #include "flint-impl.h"
+#include "nmod_poly.h"
 
 void
 _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, 

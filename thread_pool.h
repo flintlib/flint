@@ -38,6 +38,7 @@ typedef struct
     volatile int working;
     volatile int exit;
 } thread_pool_entry_struct;
+
 typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
@@ -51,7 +52,9 @@ typedef struct
     thread_pool_entry_struct * tdata;
     slong length;
 } thread_pool_struct;
+
 typedef thread_pool_struct thread_pool_t[1];
+
 typedef int thread_pool_handle;
 
 FLINT_DLL extern thread_pool_t global_thread_pool;

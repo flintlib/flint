@@ -23,7 +23,6 @@
 #endif
 
 #include "nmod_vec.h"
-#include "thread_support.h"
 
 #ifdef __cplusplus
     extern "C" {
@@ -700,10 +699,12 @@ FLINT_DLL void _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f,
 FLINT_DLL void nmod_poly_powers_mod_naive(nmod_poly_struct * res,
                             const nmod_poly_t f, slong n, const nmod_poly_t g);
 
+#ifdef THREAD_POOL_H
 FLINT_DLL void _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res,
 	       mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen,
 			    mp_srcptr ginv, slong ginvlen, const nmod_t mod,
                               thread_pool_handle * threads, slong num_threads);
+#endif
 
 FLINT_DLL void
 _nmod_poly_powers_mod_preinv_threaded(mp_ptr * res, mp_srcptr f,
@@ -1061,6 +1062,7 @@ FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * re
 
 FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr);
 
+#ifdef THREAD_POOL_H
 FLINT_DLL void
 nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
            const nmod_poly_struct * polys, slong len1, slong n,
@@ -1073,6 +1075,7 @@ FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
                  slong lenpolys, slong l, mp_srcptr g, slong glen,
                  mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv,
                  nmod_t mod, thread_pool_handle * threads, slong num_threads);
+#endif
 
 FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,

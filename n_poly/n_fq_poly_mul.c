@@ -12,7 +12,6 @@
 #include "n_poly.h"
 #include "fq_nmod_poly.h"
 
-
 void _n_fq_poly_mul_(
     mp_limb_t * A,  /* length d*(Blen + Clen - 1) */
     const mp_limb_t * B, slong Blen,
@@ -66,8 +65,8 @@ void _n_fq_poly_mul_(
         xB = n_poly_stack_vec_init(St, xBlen);
         for (i = 0; i < Blen; i++)
         {
-            _nmod_vec_set(xB + (2*d-1)*i, B + d*i, d);
-            _nmod_vec_zero(xB + (2*d-1)*i + d, d-1);
+            _NMOD_VEC_SET(xB + (2*d-1)*i, B + d*i, d);
+            _NMOD_VEC_ZERO(xB + (2*d-1)*i + d, d-1);
         }
         while (xBlen > 0 && xB[xBlen - 1] == 0)
             xBlen -= 1;
@@ -76,8 +75,8 @@ void _n_fq_poly_mul_(
         xC = n_poly_stack_vec_init(St, xClen);
         for (i = 0; i < Clen; i++)
         {
-            _nmod_vec_set(xC + (2*d-1)*i, C + d*i, d);
-            _nmod_vec_zero(xC + (2*d-1)*i + d, d-1);
+            _NMOD_VEC_SET(xC + (2*d-1)*i, C + d*i, d);
+            _NMOD_VEC_ZERO(xC + (2*d-1)*i + d, d-1);
         }
         while (xClen > 0 && xC[xClen - 1] == 0)
             xClen -= 1;

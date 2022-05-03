@@ -18,26 +18,9 @@
 #define NMOD_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "nmod.h"
+#include "fmpz_mini.h"
 #include "mpoly.h"
-#include "fq_nmod_poly.h"
-#include "thread_pool.h"
-#include "n_poly.h"
-
 
 #ifdef __cplusplus
  extern "C" {
@@ -413,6 +396,23 @@ FLINT_DLL int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str,
 FLINT_DLL char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int nmod_mpoly_fprint_pretty(FILE * file, 
             const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
 
@@ -422,6 +422,7 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t A,
 {
    return nmod_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
+#endif
 
 
 /*  Basic manipulation *******************************************************/
@@ -1624,9 +1625,11 @@ NMOD_MPOLY_INLINE n_poly_struct * nmod_mpolyun_leadcoeff_poly(
 FLINT_DLL int mpoly_gcd_get_use_first(slong rGdeg, slong Adeg, slong Bdeg,
                                                                slong gammadeg);
 
+#ifdef N_POLY_H
 FLINT_DLL int nmod_mpoly_gcd_get_use_new(slong rGdeg, slong Adeg, slong Bdeg,
              slong gammadeg, slong degxAB, slong degyAB, slong numABgamma,
              const n_polyun_t G, const n_polyun_t Abar, const n_polyun_t Bbar);
+#endif
 
 FLINT_DLL void nmod_mpolyu_setform_mpolyun(nmod_mpolyu_t A, nmod_mpolyun_t B,
                                                    const nmod_mpoly_ctx_t ctx);
@@ -1730,9 +1733,11 @@ FLINT_DLL void _nmod_mpoly_monomial_evals_cache(n_poly_t E,
                     const mp_limb_t * betas, slong start, slong stop,
                                           const mpoly_ctx_t mctx, nmod_t mod);
 
+#ifdef N_POLY_H
 FLINT_DLL void _nmod_mpoly_monomial_evals2_cache(n_polyun_t E,
           const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
           const mp_limb_t * betas, slong m, const mpoly_ctx_t ctx, nmod_t mod);
+#endif
 
 /* interp ********************************************************************/
 
@@ -1752,12 +1757,14 @@ FLINT_DLL int nmod_mpolyn_interp_crt_2sm_poly(slong * lastdeg_,
                              const n_poly_t B, const n_poly_t modulus,
                                n_poly_t alphapow,  const nmod_mpoly_ctx_t ctx);
 
+#ifdef N_POLY_H
 FLINT_DLL void nmod_mpolyn_interp_lift_sm_bpoly(nmod_mpolyn_t F,
                                       n_bpoly_t A, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyn_interp_crt_sm_bpoly(slong * lastdeg,
             nmod_mpolyn_t F, nmod_mpolyn_t T, n_bpoly_t A, n_poly_t modulus,
                                 n_poly_t alphapow, const nmod_mpoly_ctx_t ctx);
+#endif
 
 FLINT_DLL void nmod_mpolyn_interp_reduce_2sm_mpolyn(nmod_mpolyn_t E,
                             nmod_mpolyn_t F, nmod_mpolyn_t A, slong var,
@@ -1835,6 +1842,23 @@ FLINT_DLL void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B,
    test that r is a valid remainder upon division by g
    this means that no monomial of r is divisible by lm(g)
 */
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 NMOD_MPOLY_INLINE
 void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -1847,7 +1871,7 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
    N = mpoly_words_per_exp(bits, ctx->minfo);
 
    if (g->length == 0 )
-      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
+      flint_throw(FLINT_DIVZERO, "remainder test");
 
    if (r->length == 0 )
       return;
@@ -1872,9 +1896,9 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
 
         if (divides)
         {
-            flint_printf("nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            printf("nmod_mpoly_remainder_strongtest FAILED i = " WORD_FMT "d\n", i);
+            printf("rem ");nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
+            printf("den ");nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
             flint_abort();
         }
     }
@@ -1882,11 +1906,10 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
    flint_free(rexp);
    flint_free(gexp);
 }
-
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

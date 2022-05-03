@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "n_poly.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
 #include "mpoly.h"
 
 void n_polyu_clear(n_polyu_t A)
@@ -67,7 +66,7 @@ void n_polyu3_print_pretty(
         if (!first)
             printf(" + ");
         first = 0;
-        flint_printf("%wu*%s^%wu*%s^%wu*%s^%wu",
+        printf(WORD_FMT "u*%s^" WORD_FMT "u*%s^" WORD_FMT "u*%s^" WORD_FMT "u",
             A->coeffs[i],
             var0, extract_exp(A->exps[i], 2, 3),
             var1, extract_exp(A->exps[i], 1, 3),
@@ -75,7 +74,7 @@ void n_polyu3_print_pretty(
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 void n_polyu3_degrees(

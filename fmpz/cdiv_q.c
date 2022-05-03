@@ -19,10 +19,7 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     fmpz c2 = *h;
 
     if (fmpz_is_zero(h))
-    {
-        flint_printf("Exception (fmpz_cdiv_q). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_cdiv_q\n");
 
     if (!COEFF_IS_MPZ(c1))  /* g is small */
     {

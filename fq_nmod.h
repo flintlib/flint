@@ -392,7 +392,6 @@ void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print_pretty(op, ctx->var);
 }
-
 #endif
 
 FLINT_DLL char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx);

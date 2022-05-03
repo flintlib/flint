@@ -11,7 +11,6 @@
 
 #include "n_poly.h"
 
-
 void n_fq_poly_neg(
     n_poly_t A,
     const n_poly_t B,

@@ -21,7 +21,6 @@
 #endif
 
 #include "nmod_vec.h"
-#include "thread_support.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -125,8 +124,7 @@ FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
   || defined (__STDIO_LOADED)       \
   || defined (_STDIO)               \
   || defined (__DEFINED_FILE)
-
-FLINT_DLL int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat);
+FLINT_DLL int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat);
 
 NMOD_MAT_INLINE void nmod_mat_print_pretty(const nmod_mat_t mat)
 {
@@ -138,11 +136,10 @@ NMOD_MAT_INLINE int nmod_mat_print(const nmod_mat_t mat)
     return nmod_mat_fprint_pretty(stdout, mat);
 }
 
-NMOD_MAT_INLINE int nmod_mat_fprint(FILE* f, const nmod_mat_t mat)
+NMOD_MAT_INLINE int nmod_mat_fprint(FILE * f, const nmod_mat_t mat)
 {
     return nmod_mat_fprint_pretty(f, mat);
 }
-
 #endif
 
 FLINT_DLL int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
@@ -196,10 +193,12 @@ FLINT_DLL int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat
 
 FLINT_DLL void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
+#ifdef THREAD_POOL_H
 FLINT_DLL void
 _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
 		            const nmod_mat_t A, const nmod_mat_t B, int op,
 			      thread_pool_handle * threads, slong num_threads);
+#endif
 
 FLINT_DLL void nmod_mat_mul_classical_threaded(nmod_mat_t C,
 		                       const nmod_mat_t A, const nmod_mat_t B);

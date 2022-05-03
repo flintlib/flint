@@ -12,8 +12,6 @@
 #include "n_poly.h"
 #if FLINT_WANT_ASSERT
 #include "fq_nmod_poly.h"
-#else
-#include "fq_nmod.h"
 #endif
 
 
@@ -25,7 +23,7 @@ void _n_fq_poly_mullow_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     const slong fqlen = ctx->modulus->length - 1;
     const slong pfqlen = 2*fqlen - 1;
     const nmod_t mod = ctx->mod;
@@ -40,7 +38,7 @@ void _n_fq_poly_mullow_(
 
     if (len1 < 1 || len2 < 1)
     {
-        _nmod_vec_zero(rop, d*n);
+        _NMOD_VEC_ZERO(rop, d*n);
         return;
     }
 
@@ -89,7 +87,7 @@ void n_fq_poly_mullow_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
-    slong d = fq_nmod_ctx_degree(ctx);
+    slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong Blen = B->length;
     slong Clen = C->length;
     const slong m = FLINT_MIN(order, Blen + Clen - 1);

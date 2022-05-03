@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "flint-impl.h"
 
 /* deprecated functions *****************************************************/
 

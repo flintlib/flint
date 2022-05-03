@@ -54,6 +54,8 @@ void _fmpz_demote(fmpz_t f)
     }
 }
 
+FLINT_DLL __mpz_struct * _fmpz_promote(fmpz_t f);
+
 FMPZ_MINI_INLINE
 void fmpz_zero(fmpz_t f)
 {
@@ -83,6 +85,25 @@ int fmpz_is_one(const fmpz_t f)
 }
 
 FLINT_DLL int fmpz_equal(const fmpz_t f, const fmpz_t g);
+
+FLINT_DLL void fmpz_set(fmpz_t f, const fmpz_t g);
+
+FMPZ_MINI_INLINE
+void fmpz_swap(fmpz_t f, fmpz_t g)
+{
+    if (f != g)  /* swapping required */
+    {
+        fmpz t = *f;
+        *f = *g;
+        *g = t;
+    }
+}
+
+FLINT_DLL slong fmpz_get_si(const fmpz_t f);
+
+FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
+
+FLINT_DLL int fmpz_fits_si(const fmpz_t f);
 
 #ifdef __cplusplus
 }

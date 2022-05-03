@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
-
+#include <stdio.h>
+#include "flint-impl.h"
+#include "n_poly.h"
+#include "mpoly.h"
 
 int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod)
 {
@@ -72,15 +72,15 @@ void n_polyu1n_print_pretty(
     for (i = 0; i < A->length; i++)
     {
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
         first = 0;
-        flint_printf("(");
+        printf("(");
         n_poly_print_pretty(A->coeffs + i, varlast);
-        flint_printf(")*%s^%wu", var0, A->exps[i]);
+        printf(")*%s^" WORD_FMT "u", var0, A->exps[i]);
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 void n_polyu2n_print_pretty(
@@ -95,17 +95,17 @@ void n_polyu2n_print_pretty(
     for (i = 0; i < A->length; i++)
     {
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
         first = 0;
-        flint_printf("(");
+        printf("(");
         n_poly_print_pretty(A->coeffs + i, varlast);
-        flint_printf(")*%s^%wu*%s^%wu",
+        printf(")*%s^" WORD_FMT "u*%s^" WORD_FMT "u",
             var0, extract_exp(A->exps[i], 1, 2),
             var1, extract_exp(A->exps[i], 0, 2));
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 void n_polyu3n_print_pretty(
@@ -121,18 +121,18 @@ void n_polyu3n_print_pretty(
     for (i = 0; i < A->length; i++)
     {
         if (!first)
-            flint_printf(" + ");
+            printf(" + ");
         first = 0;
-        flint_printf("(");
+        printf("(");
         n_poly_print_pretty(A->coeffs + i, varlast);
-        flint_printf(")*%s^%wu*%s^%wu*%s^%wu",
+        printf(")*%s^" WORD_FMT "u*%s^" WORD_FMT "u*%s^" WORD_FMT "u",
             var0, extract_exp(A->exps[i], 2, 3),
             var1, extract_exp(A->exps[i], 1, 3),
             var2, extract_exp(A->exps[i], 0, 3));
     }
 
     if (first)
-        flint_printf("0");
+        printf("0");
 }
 
 
