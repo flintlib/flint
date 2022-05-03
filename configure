@@ -703,22 +703,32 @@ else
 fi
 rm -f build/test-fenv.h
 
+#endianness configuration
+
 CONFIG_BIG_ENDIAN="#define FLINT_BIG_ENDIAN 0"
 
 mkdir -p build
 MSG="Testing big endian..."
 printf "%s" "$MSG"
 printf "%s" "MSG" >> config.log
-echo "int main(int argc, char ** argv){ union { unsigned int i; char c[4]; } be_int = {0x01020304}; return be_int.c[0] == 1; }" > build/test-endian.c
+cat > build/test-endian.c << EOF
+__attribute__ ((used)) unsigned short ascii_mm[] = { 0x4249, 0x4765, 0x6E44, 0x6961, 0x6E53, 0x7953, 0 };
+__attribute__ ((used)) unsigned short ascii_ii[] = { 0x694C, 0x5454, 0x656C, 0x6E45, 0x6944, 0x6E61, 0 };
+const char * _ascii() { char* s = (char*) ascii_mm; s = (char*) ascii_ii; return s; }
+int main() { _ascii (); return 0; }
+EOF
 $CC build/test-endian.c -o ./build/test-endian > /dev/null 2>&1
-build/test-endian > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-  printf "%s\n" "no"
-  echo "no" >> config.log
+if cat build/test-endian | grep BIGenDianSyS >/dev/null; then
+    printf "%s\n" "yes"
+    echo "yes" >> config.log
+    CONFIG_BIG_ENDIAN="#define FLINT_BIG_ENDIAN 1"
+elif cat build/test-endian | grep LiTTleEnDian >/dev/null; then
+    printf "%s\n" "no"
+    echo "no" >> config.log
 else
-  printf "%s\n" "yes"
-  echo "yes" >> config.log
-  CONFIG_BIG_ENDIAN="#define FLINT_BIG_ENDIAN 1"
+    echo "Unknown endianness"
+    echo "unknown" >> config.log
+    exit 1
 fi
 rm -f build/test-endian{,.c}
 
