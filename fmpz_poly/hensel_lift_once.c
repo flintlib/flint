@@ -11,9 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz_poly.h"
-#include "nmod_poly.h"
 
 void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
                                 const fmpz_poly_t f, 

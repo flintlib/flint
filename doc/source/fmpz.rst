@@ -231,6 +231,12 @@ Conversion
     Sets the value of `x` from `f`, rounded toward the given
     direction ``rnd``.
 
+.. note::
+    To use this function, include the FLINT-header ``mpfr_extras.h``. We have
+    chosen to define this function in a separate header file as the majority of
+    FLINT is independent of MPFR, which then allows us to not include MPFR into
+    ``fmpz.h``.
+
 .. function:: double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns `f` as a normalized ``double`` along with a `2`-exponent 
@@ -241,7 +247,7 @@ Conversion
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
 
-.. function:: int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+.. function:: int fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
 
     Sets the ``mp_ptr`` `n` to the same value as `n_{in}`. Returned
     integer is number of limbs allocated to `n`, minimum number of limbs
@@ -322,13 +328,13 @@ Conversion
     where `X = 2^{FLINT\_BITS}`, sets the corresponding elements of ``out``
     so that this is true. It is assumed that ``n > 0``.
 
-.. function::void fmpz_get_signed_ui_array(ulong * out, slong n, const fmpz_t in)
+.. function:: void fmpz_get_signed_ui_array(ulong * out, slong n, const fmpz_t in)
 
     Retrieves the value of `in` modulo `2^{n * FLINT\_BITS}` and puts the `n`
     words of the result in ``out[0], ..., out[n-1]``. This will give a signed
     two's complement representation of `in` (assuming `in` doesn't overflow the array).
 
-.. function::void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t in)
+.. function:: void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t in)
 
     Retrieves the value of `in` modulo `2^{2 * FLINT\_BITS}` and puts the high
     and low words into ``*hi`` and ``*lo`` respectively.
@@ -449,7 +455,7 @@ Input and output
     ``scanf`` from the standard library and ``mpz_inp_str`` 
     from MPIR.
 
-.. function:: size_t fmpz_inp_raw( fmpz_t x, FILE *fin )
+.. function:: size_t fmpz_inp_raw( fmpz_t x, FILE * fin )
 
     Reads a multiprecision integer from the stream ``file``.  The
     format is raw binary format write by :func:`fmpz_out_raw`. 
@@ -488,7 +494,7 @@ Input and output
     ``flint_printf`` from the standard library and ``mpz_out_str`` 
     from MPIR.
 
-.. function:: size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
+.. function:: size_t fmpz_out_raw(FILE * fout, const fmpz_t x)
 
     Writes the value `x` to ``file``.
     The value is written in raw binary format. The integer is written in 

@@ -10,7 +10,7 @@
 */
 
 #include "flint.h"
-
+#include "gmpcompat.h"
 
 mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
 {

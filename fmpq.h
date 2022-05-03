@@ -19,21 +19,10 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#include <mpfr.h>
-#define ulong mp_limb_t
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define fmpq_numref(__x) (&(__x)->num)
@@ -173,7 +162,9 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
 FLINT_DLL double fmpq_get_d(const fmpq_t a);
 
+#ifdef __MPFR_H
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
+#endif
 
 FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
 
@@ -191,6 +182,23 @@ FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t
 
 FLINT_DLL char * fmpq_get_str(char * str, int b, const fmpq_t x);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL int fmpq_fprint(FILE * file, const fmpq_t x);
@@ -204,6 +212,7 @@ FMPQ_INLINE int fmpq_print(const fmpq_t x)
 {
     return fmpq_fprint(stdout, x);
 }
+#endif
 
 FLINT_DLL void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits);
 
@@ -407,14 +416,6 @@ FLINT_DLL void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 FLINT_DLL void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
 FLINT_DLL void fmpq_harmonic_ui(fmpq_t x, ulong n);
-
-FLINT_DLL fmpq * _fmpq_vec_init(slong len);
-
-FMPQ_INLINE
-void _fmpq_vec_clear(fmpq * vec, slong len)
-{
-    _fmpz_vec_clear((fmpz *) vec, 2 * len);
-}
 
 /*********************** 2x2 integer matrix **********************************/
 

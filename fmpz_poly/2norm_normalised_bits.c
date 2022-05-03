@@ -12,16 +12,17 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-flint_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
+flint_bitcnt_t
+_fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
 {
-   fmpz_t norm;
-   flint_bitcnt_t bits;
-   fmpz_init(norm);
+    fmpz_t norm;
+    flint_bitcnt_t bits;
+    fmpz_init(norm);
 
-	_fmpz_poly_2norm(norm, poly, len);
+    _fmpz_poly_2norm(norm, poly, len);
 
-	bits = fmpz_bits(norm);
-	fmpz_clear(norm);
-   
-   return bits - fmpz_bits(poly + len - 1) + 1;
+    bits = fmpz_bits(norm);
+    fmpz_clear(norm);
+
+    return bits - fmpz_bits(poly + len - 1) + 1;
 }

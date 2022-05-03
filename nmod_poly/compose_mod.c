@@ -34,10 +34,7 @@ nmod_poly_compose_mod(nmod_poly_t res,
     mp_ptr ptr2;
 
     if (len3 == 0)
-    {
-        flint_printf("Exception (nmod_poly_compose_mod). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_compose_mod\n");
 
     if (len1 == 0 || len3 == 1)
     {

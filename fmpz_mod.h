@@ -18,23 +18,14 @@
 #define FMPZ_MOD_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
 #include "flint.h"
-#include "nmod_vec.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-
 
 #ifdef __cplusplus
  extern "C" {
+#endif
+
+#ifndef FMPZ_IS_ONE
+#define FMPZ_IS_ONE(f)  (*(f) == 1)
 #endif
 
 /* all of the data we need to do arithmetic mod n ****************************/
@@ -86,14 +77,14 @@ FLINT_DLL void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n);
 
 FLINT_DLL void fmpz_mod_ctx_set_modulus_ui(fmpz_mod_ctx_t ctx, ulong n);
 
-FLINT_DLL int fmpz_mod_is_canonical(const fmpz_t a,  const fmpz_mod_ctx_t ctx);
+FLINT_DLL int fmpz_mod_is_canonical(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_assert_canonical(const fmpz_t a,
                                                      const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_INLINE int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_is_one(a) || fmpz_is_one(ctx->n);
+    return FMPZ_IS_ONE(a) || FMPZ_IS_ONE(ctx->n);
 }
 
 FLINT_DLL int fmpz_mod_equal_fmpz(const fmpz_t a, const fmpz_t b,

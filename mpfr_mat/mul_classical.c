@@ -35,11 +35,7 @@ mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B,
     }
 
     if (C->r != ar || C->c != bc)
-    {
-        flint_printf
-            ("Exception (mpfr_mat_mul_classical). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in mpfr_mat_mul_classical\n");
 
     if (br == 0)
     {

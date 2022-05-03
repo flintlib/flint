@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 slong 
 fmpz_get_si(const fmpz_t f)

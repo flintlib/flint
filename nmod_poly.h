@@ -370,6 +370,26 @@ FLINT_DLL char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x
 
 FLINT_DLL int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+
+#include "flint-impl.h"
+
 FLINT_DLL int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 
 NMOD_POLY_INLINE
@@ -393,16 +413,16 @@ int nmod_poly_print(const nmod_poly_t a)
     size_t r;
     slong i;
 
-    r = flint_printf("%wd %wu", a->length, a->mod.n);
+    r = printf(WORD_FMT "d " WORD_FMT "u", a->length, a->mod.n);
 
     if (a->length == 0)
         return r;
     else
         if (r > 0)
-            r = flint_printf(" ");
+            r = printf(" ");
 
     for (i = 0; (r > 0) && (i < a->length); i++)
-        r = flint_printf(" %wu", a->coeffs[i]);
+        r = printf(" " WORD_FMT "u", a->coeffs[i]);
 
     return (int) r;
 }
@@ -418,6 +438,7 @@ int nmod_poly_read(nmod_poly_t poly)
 {
     return nmod_poly_fread(stdin, poly);
 }
+#endif
 
 /* Shifting  *****************************************************************/
 

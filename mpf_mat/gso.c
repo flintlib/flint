@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "mpf_mat.h"
+#include "gmpcompat.h"
 
 void
 mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
@@ -21,10 +22,7 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
     flint_bitcnt_t exp;
 
     if (B->r != A->r || B->c != A->c)
-    {
-        flint_printf("Exception (mpf_mat_gso). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in mpf_mat_gso\n");
 
     if (B == A)
     {

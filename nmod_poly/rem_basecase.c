@@ -10,8 +10,34 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void _nmod_poly_rem_basecase_1(mp_ptr R, mp_ptr W,
                                mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
@@ -144,10 +170,8 @@ nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
     TMP_INIT;
 
     if (lenB == 0)
-    {
-        flint_printf("Exception (nmod_poly_rem_basecase). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_rem_basecase\n");
+
     if (lenA < lenB)
     {
         nmod_poly_set(R, A);

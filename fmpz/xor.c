@@ -13,41 +13,43 @@
 
 void fmpz_xor(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
-        fmpz c1,c2;
-        c1 = *g;
-        c2 = *h;
-        if(!COEFF_IS_MPZ(c1))
+    fmpz c1, c2;
+    c1 = *g;
+    c2 = *h;
+    if (!COEFF_IS_MPZ(c1))
+    {
+        if (!COEFF_IS_MPZ(c2)) /* both inputs are small */
         {
-            if(!COEFF_IS_MPZ(c2)) /* both inputs are small */
-            {
-                fmpz_set_si(f, c1 ^ c2);
-            } else /* g is small, h is large */
-            {
-                mpz_t tmp;
-                __mpz_struct * mpz3 = _fmpz_promote(f);
-                flint_mpz_init_set_si(tmp, c1);
-                mpz_xor(mpz3, COEFF_TO_PTR(c2), tmp);
-                _fmpz_demote_val(f);
-                mpz_clear(tmp);
-            }
-        } else
-        {
-            if(!COEFF_IS_MPZ(c2)) /* g is large, h is small */
-            {
-                mpz_t tmp;
-                __mpz_struct *mpz3 = _fmpz_promote(f);
-                flint_mpz_init_set_si(tmp, c2);
-                mpz_xor(mpz3, COEFF_TO_PTR(c1), tmp);
-                _fmpz_demote_val(f);
-                mpz_clear(tmp);
-            } else /* g and h are large */
-            {
-                __mpz_struct * mpz3 = _fmpz_promote(f);
-                __mpz_struct * mpz1 = COEFF_TO_PTR(c1);
-                __mpz_struct * mpz2 = COEFF_TO_PTR(c2);
-                mpz_xor(mpz3, mpz1, mpz2);
-                _fmpz_demote_val(f);
-            }
+            fmpz_set_si(f, c1 ^ c2);
         }
+        else /* g is small, h is large */
+        {
+            mpz_t tmp;
+            __mpz_struct * mpz3 = _fmpz_promote(f);
+            flint_mpz_init_set_si(tmp, c1);
+            mpz_xor(mpz3, COEFF_TO_PTR(c2), tmp);
+            _fmpz_demote_val(f);
+            mpz_clear(tmp);
+        }
+    }
+    else
+    {
+        if (!COEFF_IS_MPZ(c2)) /* g is large, h is small */
+        {
+            mpz_t tmp;
+            __mpz_struct *mpz3 = _fmpz_promote(f);
+            flint_mpz_init_set_si(tmp, c2);
+            mpz_xor(mpz3, COEFF_TO_PTR(c1), tmp);
+            _fmpz_demote_val(f);
+            mpz_clear(tmp);
+        }
+        else /* g and h are large */
+        {
+            __mpz_struct * mpz3 = _fmpz_promote(f);
+            __mpz_struct * mpz1 = COEFF_TO_PTR(c1);
+            __mpz_struct * mpz2 = COEFF_TO_PTR(c2);
+            mpz_xor(mpz3, mpz1, mpz2);
+            _fmpz_demote_val(f);
+        }
+    }
 }
-

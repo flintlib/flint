@@ -20,18 +20,7 @@
 #define FMPZ_POLY_FACTOR_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "nmod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {

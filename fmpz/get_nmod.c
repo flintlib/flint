@@ -10,7 +10,6 @@
 */
 
 #include "nmod.h"
-#include "fmpz.h"
 
 mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
 {

@@ -10,8 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "thread_pool.h"
 #include "thread_support.h"
 
 /* Automatically initialised to zero when threads are started */
@@ -33,7 +31,7 @@ void flint_set_num_threads(int num_threads)
         if (!thread_pool_set_size(global_thread_pool, num_threads - 1))
         {
             flint_throw(FLINT_ERROR,
-               "flint_set_num_threads called while global thread pool in use");
+               "flint_set_num_threads called while global thread pool in use\n");
         }
     }
     else

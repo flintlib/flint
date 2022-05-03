@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 {

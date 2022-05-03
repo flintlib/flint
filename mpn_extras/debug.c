@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "flint.h"
+#include "flint-impl.h"
 
 void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
 {
@@ -17,16 +19,16 @@ void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
     char byte[9];
     byte[8] = 0;
 
-    flint_printf("\n");
+    printf("\n");
     for (i = 0; i < xsize; i++)
     {
-        flint_printf("DIGIT %3d/%wd: ", i, xsize);
+        printf("DIGIT %3d/" WORD_FMT "d: ", i, xsize);
         for (j = 0; j < FLINT_BITS; j++)
         {
             byte[j % 8] = (x[i] & (UWORD(1)<<j)) ? '1' : '0';
             if (j % 8 == 7)
-                flint_printf("%s ", byte);
+                printf("%s ", byte);
         }
-        flint_printf(" (%wu)\n", x[i]);
+        printf(" (" WORD_FMT "u)\n", x[i]);
     }
 }

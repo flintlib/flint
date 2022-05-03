@@ -68,67 +68,6 @@ FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
     fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
 }
 
-/* TODO */
-FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
-{
-    int r;
-    slong i, k;
-
-    r = flint_fprintf(file, "p = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_fprint(file, fq_nmod_ctx_prime(ctx));
-    if (r <= 0)
-        return r;
-
-    r = flint_fprintf(file, "\nd = %wd\nf(X) = ", ctx->j[ctx->len - 1]);
-    if (r <= 0)
-        return r;
-
-    r = flint_fprintf(file, "%wu", ctx->a[0]);
-    if (r <= 0)
-        return r;
-
-    for (k = 1; k < ctx->len; k++)
-    {
-        i = ctx->j[k];
-        r = flint_fprintf(file, " + ");
-        if (r <= 0)
-            return r;
-
-        if (ctx->a[k] == UWORD(1))
-        {
-            if (i == 1)
-                r = flint_fprintf(file, "X");
-            else
-                r = flint_fprintf(file, "X^%wd", i);
-            if (r <= 0)
-                return r;
-        }
-        else
-        {
-            r = flint_fprintf(file, "%wu", ctx->a[k]);
-            if (r <= 0)
-                return r;
-
-            if (i == 1)
-                r = flint_fprintf(file, "*X");
-            else
-                r = flint_fprintf(file, "*X^%wd", i);
-            if (r <= 0)
-                return r;
-        }
-    }
-    r = flint_fprintf(file, "\n");
-    return r;
-}
-
-FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
-{
-    fq_nmod_ctx_fprint(stdout, ctx);
-}
-
 /* Memory managment  *********************************************************/
 
 FQ_NMOD_INLINE void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
@@ -371,6 +310,87 @@ FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 
 /* Output ********************************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+
+#include "flint-impl.h"
+
+/* TODO */
+FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
+{
+    int r;
+    slong i, k;
+
+    r = fprintf(file, "p = ");
+    if (r <= 0)
+        return r;
+
+    r = fmpz_fprint(file, fq_nmod_ctx_prime(ctx));
+    if (r <= 0)
+        return r;
+
+    r = fprintf(file, "\nd = " WORD_FMT "d\nf(X) = ", ctx->j[ctx->len - 1]);
+    if (r <= 0)
+        return r;
+
+    r = fprintf(file, WORD_FMT "u", ctx->a[0]);
+    if (r <= 0)
+        return r;
+
+    for (k = 1; k < ctx->len; k++)
+    {
+        i = ctx->j[k];
+        r = fprintf(file, " + ");
+        if (r <= 0)
+            return r;
+
+        if (ctx->a[k] == UWORD(1))
+        {
+            if (i == 1)
+                r = fprintf(file, "X");
+            else
+                r = fprintf(file, "X^" WORD_FMT "d", i);
+            if (r <= 0)
+                return r;
+        }
+        else
+        {
+            r = fprintf(file, WORD_FMT "u", ctx->a[k]);
+            if (r <= 0)
+                return r;
+
+            if (i == 1)
+                r = fprintf(file, "*X");
+            else
+                r = fprintf(file, "*X^" WORD_FMT "d", i);
+            if (r <= 0)
+                return r;
+        }
+    }
+    r = fprintf(file, "\n");
+    return r;
+}
+
+FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
+{
+    fq_nmod_ctx_fprint(stdout, ctx);
+}
+
 FQ_NMOD_INLINE 
 int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
@@ -394,6 +414,8 @@ void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print_pretty(op, ctx->var);
 }
+
+#endif
 
 FLINT_DLL char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 

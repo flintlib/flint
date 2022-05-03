@@ -11,8 +11,10 @@
 */
 
 #include <string.h>
+#include <stdio.h>
 #include <math.h>
 #include "flint.h"
+#include "flint-impl.h"
 
 char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
 {
@@ -32,7 +34,7 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
     {
         size = (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[0])) + 1;
         buf = (char *) flint_malloc(size);
-        flint_sprintf(buf, "%wu", poly->coeffs[0]);
+        sprintf(buf, WORD_FMT "u", poly->coeffs[0]);
         return buf;
     }
 
@@ -51,10 +53,10 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
         switch (poly->coeffs[1])
         {
             case UWORD(1):
-                ptr += flint_sprintf(ptr, "%s", x);
+                ptr += sprintf(ptr, "%s", x);
                 break;
             default:
-                ptr += flint_sprintf(ptr, "%wu*%s", poly->coeffs[1], x);
+                ptr += sprintf(ptr, WORD_FMT "u*%s", poly->coeffs[1], x);
         }
         --i;
     }
@@ -63,10 +65,10 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
         switch (poly->coeffs[i])
         {
             case UWORD(1):
-                ptr += flint_sprintf(ptr, "%s^%wd", x, i);
+                ptr += sprintf(ptr, "%s^" WORD_FMT "d", x, i);
                 break;
             default:
-                ptr += flint_sprintf(ptr, "%wu*%s^%wd", poly->coeffs[i], x, i);
+                ptr += sprintf(ptr, WORD_FMT "u*%s^" WORD_FMT "d", poly->coeffs[i], x, i);
         }
         --i;
     }
@@ -77,10 +79,10 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
             case UWORD(0):
                 break;
             case UWORD(1):
-                ptr += flint_sprintf(ptr, "+%s^%wd", x, i);
+                ptr += sprintf(ptr, "+%s^" WORD_FMT "d", x, i);
                 break;
             default:
-                ptr += flint_sprintf(ptr, "+%wu*%s^%wd", poly->coeffs[i], x, i);
+                ptr += sprintf(ptr, "+" WORD_FMT "u*%s^" WORD_FMT "d", poly->coeffs[i], x, i);
         }
         
     }
@@ -91,15 +93,15 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
             case UWORD(0):
                 break;
             case UWORD(1):
-                ptr += flint_sprintf(ptr, "+%s", x);
+                ptr += sprintf(ptr, "+%s", x);
                 break;
             default:
-                ptr += flint_sprintf(ptr, "+%wu*%s", poly->coeffs[1], x);
+                ptr += sprintf(ptr, "+" WORD_FMT "u*%s", poly->coeffs[1], x);
         }
     }
     {
         if (poly->coeffs[0] != UWORD(0))
-            ptr += flint_sprintf(ptr, "+%wu", poly->coeffs[0]);
+            ptr += sprintf(ptr, "+" WORD_FMT "u", poly->coeffs[0]);
     }
 
     return buf;

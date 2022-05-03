@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "mpf_mat.h"
+#include "gmpcompat.h"
 
 void
 mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
@@ -21,10 +22,7 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
     flint_bitcnt_t exp;
 
     if (Q->r != A->r || Q->c != A->c || R->r != A->c || R->c != A->c)
-    {
-        flint_printf("Exception (mpf_mat_qr). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in mpf_mat_qr\n");
 
     if (Q == A)
     {

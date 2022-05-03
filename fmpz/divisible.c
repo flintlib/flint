@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 int fmpz_divisible(const fmpz_t x, const fmpz_t p)
 {

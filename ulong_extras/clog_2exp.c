@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include <mpfr.h>
+#include "flint.h"
+#include "gmpcompat.h"
 
 #if MPFR_VERSION_MAJOR < 3
 #error MPFR 3.0.0 or later is required

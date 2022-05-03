@@ -37,10 +37,8 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
     const slong lenA = A->length, lenB = B->length;
 
     if (lenB < 2)
-    {
-        printf("Exception (nmod_poly_gcdinv). lenB < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenB < 2 in nmod_poly_gcdinv\n");
+
     if (lenA >= lenB)
     {
         nmod_poly_t T;

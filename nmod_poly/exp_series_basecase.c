@@ -9,9 +9,35 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
 #include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
@@ -60,10 +86,7 @@ nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n)
     slong hlen = h->length;
 
     if (hlen > 0 && h->coeffs[0] != 0)
-    {
-        flint_printf("Exception (nmod_poly_exp_series_basecase). Constant term != 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 0 in nmod_poly_exp_series_basecase\n");
 
     if (n <= 1 || hlen <= 1)
     {

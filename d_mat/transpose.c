@@ -19,11 +19,7 @@ d_mat_transpose(d_mat_t B, const d_mat_t A)
     blocksize = 64 / sizeof(double);
 
     if (B->r != A->c || B->c != A->r)
-    {
-        flint_printf
-            ("Exception (d_mat_transpose). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in d_mat_transpose\n");
 
     if (B == A)
     {

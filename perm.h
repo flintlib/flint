@@ -33,10 +33,7 @@ PERM_INLINE slong * _perm_init(slong n)
     vec = (slong *) flint_malloc(n * sizeof(slong));
 
     if (!vec)
-    {
-        flint_printf("ERROR (_perm_init).\n\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ALLOC, "Could not allocate in _perm_init\n");
 
     for (i = 0; i < n; i++)
         vec[i] = i;
@@ -88,10 +85,7 @@ PERM_INLINE void
         slong *t = (slong *) flint_malloc(n * sizeof(slong));
 
         if (!t)
-        {
-            flint_printf("ERROR (_perm_inv).\n\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ALLOC, "Could not allocate in _perm_inv\n");
 
         for (i = 0; i < n; i++)
             t[i] = vec[i];
@@ -142,16 +136,36 @@ FLINT_DLL int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+
+#include "flint-impl.h"
+
 PERM_INLINE  int _long_vec_print(const slong * vec, slong len)
 {
     slong i;
 
-    flint_printf("%wd", len);
+    printf(WORD_FMT "d", len);
     if (len > 0)
     {
-        flint_printf(" ");
+        printf(" ");
         for (i = 0; i < len; i++)
-            flint_printf(" %wd", vec[i]);
+            printf(" " WORD_FMT "d", vec[i]);
     }
 
     return 1;
@@ -161,16 +175,17 @@ PERM_INLINE int _perm_print(const slong * vec, slong n)
 {
     slong i;
 
-    flint_printf("%wd", n);
+    printf(WORD_FMT "d", n);
     if (n > 0)
     {
-        flint_printf(" ");
+        printf(" ");
         for (i = 0; i < n; i++)
-            flint_printf(" %wd", vec[i]);
+            printf(" " WORD_FMT "d", vec[i]);
     }
 
     return 1;
 }
+#endif
 
 #ifdef __cplusplus
 }

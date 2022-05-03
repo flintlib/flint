@@ -18,10 +18,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
     mp_limb_t rand;
 
     if (bits < 2)
-    {
-        flint_printf("Exception in n_randprime: attempt to generate prime < 2!\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DOMERR, "attempt to generate prime < 2\n");
 
     if (bits == FLINT_BITS)
     {

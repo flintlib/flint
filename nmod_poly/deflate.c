@@ -18,10 +18,7 @@ nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
     slong res_length, i;
 
     if (deflation == 0)
-    {
-        flint_printf("Exception (nmod_poly_deflate). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_deflate\n");
 
     if (input->length <= 1 || deflation == 1)
     {

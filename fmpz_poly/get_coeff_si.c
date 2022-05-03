@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 slong
 fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)

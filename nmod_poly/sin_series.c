@@ -38,10 +38,7 @@ nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     slong h_len = h->length;
 
     if (h_len > 0 && h->coeffs[0] != UWORD(0))
-    {
-        flint_printf("Exception (nmod_poly_sin_series). Constant term != 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Requires constant term 0 in nmod_poly_sqrt_series\n");
 
     if (h_len == 1 || n < 2)
     {

@@ -19,6 +19,7 @@
 #endif
 
 #include "flint.h"
+#include "gmpcompat.h"
 
 #ifdef __cplusplus
  extern "C" {

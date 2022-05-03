@@ -274,22 +274,11 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     for (i = 0; i < len1; i++)
     {
         if (polys[i].length >= len2)
-        {
-            flint_printf
-                ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "Degree of first polynomial must be smaller than the modulus in nmod_poly_compose_mod_brent_kung_vec_preinv_threaded\n");
     }
 
     if (n > len1)
-    {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-             "n is larger than the length of polys\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "n is larger than the length of polys in nmod_poly_compose_mod_brent_kung_vec_preinv_threaded\n");
 
     if (n == 0)
         return;

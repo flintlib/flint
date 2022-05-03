@@ -48,16 +48,10 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
     len2 = poly2->length;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (nmod_poly_mulmod_preinv). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_mulmod_preinv\n");
 
     if (lenf <= len1 || lenf <= len2)
-    {
-        flint_printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Input larger than modulus in nmod_poly_mulmod_preinv\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {

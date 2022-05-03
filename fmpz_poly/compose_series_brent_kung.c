@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 

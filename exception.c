@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,8 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx
+#include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#undef ulong
 #include "flint.h"
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
@@ -21,7 +25,7 @@ pthread_mutex_t abort_func_lock;
 
 void __flint_set_abort_init()
 {
-   pthread_mutex_init(&abort_func_lock, NULL);
+    pthread_mutex_init(&abort_func_lock, NULL);
 }
 #endif
 
@@ -34,7 +38,7 @@ void flint_set_abort(FLINT_NORETURN void (*func)(void))
     pthread_mutex_lock(&abort_func_lock);
 #endif
 
-  abort_func = func;
+    abort_func = func;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_unlock(&abort_func_lock);
@@ -48,37 +52,40 @@ FLINT_NORETURN void flint_abort()
 
 void flint_throw(flint_err_t exc, const char * msg, ...)
 {
-    va_list ap;
-
-    va_start(ap, msg);
-
-    flint_printf("Flint exception (");
-
+    printf("Flint exception (");
     switch (exc)
     {
         case FLINT_ERROR:
-            flint_printf("General error");
+            printf("General error");
+            break;
+        case FLINT_ALLOC:
+            printf("Allocation error");
+            break;
+        case FLINT_MEMMGR:
+            printf("Memory manager error");
             break;
         case FLINT_IMPINV:
-            flint_printf("Impossible inverse");
+            printf("Impossible inverse");
             break;
         case FLINT_DOMERR:
-            flint_printf("Domain error");
+            printf("Domain error");
             break;
         case FLINT_DIVZERO:
-            flint_printf("Divide by zero");
+            printf("Divide by zero");
+            break;
+        case FLINT_EXPOF:
+            printf("Exponent overflow");
             break;
         case FLINT_INEXACT:
-            flint_printf("Inexact");
+            printf("Inexact");
             break;
         default:
-            flint_printf("Unknown exception");
-     }
+            printf("Unknown exception");
+    }
+    printf("):  ");
 
-     printf("):\n    ");
+    printf(msg);
+    fflush(stdout);
 
-     flint_vprintf(msg, ap);
-     va_end(ap);
-
-     flint_abort();
+    flint_abort();
 }

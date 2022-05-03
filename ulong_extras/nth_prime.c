@@ -14,10 +14,7 @@
 mp_limb_t n_nth_prime(ulong n)
 {
     if (n == 0)
-    {
-        flint_printf("Exception (n_nth_prime). n_nth_prime(0) is undefined.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DOMERR, "n_nth_prime(0) is undefined");
 
     return n_primes_arr_readonly(n)[n-1];
 }

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "mpn_extras.h"
-#include "fmpz.h"
 
 static int flint_mpn_cmp2abs(mp_srcptr x, slong xn, mp_srcptr a, slong an)
 {
@@ -81,4 +81,3 @@ int fmpz_cmp2abs(const fmpz_t a, const fmpz_t b)
         }
     }
 }
-

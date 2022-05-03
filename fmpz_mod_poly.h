@@ -19,15 +19,6 @@
 #define FMPZ_MOD_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mat.h"
@@ -138,12 +129,7 @@ FMPZ_MOD_POLY_INLINE
 void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, slong len)
 {
     if (poly->length > len)
-    {
-        slong i;
-
-        for (i = len; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i); 
-    }
+        _fmpz_vec_demote(poly->coeffs + len, poly->length - len);
     poly->length = len;
 }
 
@@ -152,10 +138,7 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_
 {
     if (poly->length > len)
     {
-        slong i;
-
-        for (i = len; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i);
+        _fmpz_vec_demote(poly->coeffs + len, poly->length - len);
         poly->length = len;
         _fmpz_mod_poly_normalise(poly);
     }  
@@ -1493,7 +1476,4 @@ FLINT_DLL void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, const fmpz_t c,
 }
 #endif
 
-#include "fmpz_mod_poly_factor.h"
-
 #endif
-

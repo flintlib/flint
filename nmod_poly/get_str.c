@@ -11,7 +11,9 @@
 */
 
 #include <math.h>
+#include <stdio.h>
 #include "flint.h"
+#include "flint-impl.h"
 
 char * nmod_poly_get_str(const nmod_poly_t poly)
 {
@@ -33,13 +35,13 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
     }
 
     buf = (char *) flint_malloc(size);  
-    ptr = buf + flint_sprintf(buf, "%wd %wu", poly->length, poly->mod.n);
+    ptr = buf + sprintf(buf, WORD_FMT "d " WORD_FMT "u", poly->length, poly->mod.n);
    
     if (poly->length)
-        ptr += flint_sprintf(ptr, " ");
+        ptr += sprintf(ptr, " ");
 
     for (i = 0; i < poly->length; i++)
-        ptr += flint_sprintf(ptr, " %wu", poly->coeffs[i]);
+        ptr += sprintf(ptr, " " WORD_FMT "u", poly->coeffs[i]);
    
     return buf;
 }

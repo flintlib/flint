@@ -128,11 +128,9 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
             nmod_poly_set(Q, A);
             nmod_poly_zero(R);
             return;
-        } else
-        {
-            flint_printf("Exception (nmod_poly_divrem_divconquer). Division by zero.\n");
-            flint_abort();
         }
+        else
+            flint_throw(FLINT_DIVZERO, "nmod_poly_divrem_divconquer\n");
     }
 
     if (lenA < lenB)

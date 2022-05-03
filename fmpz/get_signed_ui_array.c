@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
 {

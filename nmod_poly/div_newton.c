@@ -47,11 +47,9 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
         {
             nmod_poly_set(Q, A);
             return;
-        } else
-        {
-            flint_printf("Exception (nmod_poly_div_newton). Division by zero.\n");
-            flint_abort();
         }
+        else
+            flint_throw(FLINT_DIVZERO, "nmod_poly_div_newton\n");
     }
 
     if (lenA < lenB)

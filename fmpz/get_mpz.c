@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 void
 fmpz_get_mpz(mpz_t x, const fmpz_t f)

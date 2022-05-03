@@ -45,10 +45,7 @@ nmod_poly_mulmod(nmod_poly_t res,
     len2 = poly2->length;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_mulmod\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {

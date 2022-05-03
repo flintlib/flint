@@ -69,10 +69,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
     mp_ptr * res_arr;
     
     if (nmod_poly_length(g) == 0)
-    {
-        flint_printf("Exception (nmod_poly_powers_mod_naive). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_powers_mod_naive\n");
 
     if (nmod_poly_length(f) == 0 || nmod_poly_length(g) == 1)
     {

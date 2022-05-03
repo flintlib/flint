@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 ulong
 fmpz_fdiv_ui(const fmpz_t g, ulong h)

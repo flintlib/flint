@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "flint.h"
 #include "fmpz.h"
 
 int

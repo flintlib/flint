@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "mpf_mat.h"
 
 void
@@ -17,17 +18,17 @@ mpf_mat_print(const mpf_mat_t mat)
 {
     slong i, j;
 
-    flint_printf("[");
+    printf("[");
     for (i = 0; i < mat->r; i++)
     {
-        flint_printf("[");
+        printf("[");
         for (j = 0; j < mat->c; j++)
         {
             mpf_out_str(stdout, 10, 0, mpf_mat_entry(mat, i, j));
             if (j < mat->c - 1)
-                flint_printf(" ");
+                printf(" ");
         }
-        flint_printf("]\n");
+        printf("]\n");
     }
-    flint_printf("]\n");
+    printf("]\n");
 }

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "d_mat.h"
 
 void
@@ -17,17 +18,17 @@ d_mat_print(const d_mat_t mat)
 {
     slong i, j;
 
-    flint_printf("[");
+    printf("[");
     for (i = 0; i < mat->r; i++)
     {
-        flint_printf("[");
+        printf("[");
         for (j = 0; j < mat->c; j++)
         {
-            flint_printf("%E", d_mat_entry(mat, i, j));
+            printf("%E", d_mat_entry(mat, i, j));
             if (j < mat->c - 1)
-                flint_printf(" ");
+                printf(" ");
         }
-        flint_printf("]\n");
+        printf("]\n");
     }
-    flint_printf("]\n");
+    printf("]\n");
 }

@@ -67,16 +67,10 @@ void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     nmod_poly_t t1;
 
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
-    {
-        flint_printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_invsqrt\n");
 
     if (h->coeffs[0] != UWORD(1))
-    {
-        flint_printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in nmod_poly_invsqrt_series\n");
 
     if (hlen < n)
     {

@@ -11,6 +11,7 @@
 */
 
 #include "flint.h"
+#include "gmpcompat.h"
 
 int
 _mpf_vec_is_zero(mpf_srcptr vec, slong len)

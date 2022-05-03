@@ -9,13 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
+#include "nmod.h"
+#include "nmod_poly.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
-#include "mpn_extras.h"
-
 
 void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)

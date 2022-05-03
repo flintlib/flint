@@ -38,10 +38,7 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
     slong flen = f->length;
 
     if (flen < 1 || f->coeffs[0] != UWORD(1))
-    {
-        flint_printf("Exception (nmod_poly_log_series). Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in nmod_poly_log_series\n");
 
     if (flen == 1 || n < 2)
     {

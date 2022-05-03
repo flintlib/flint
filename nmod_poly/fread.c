@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "nmod_poly.h"
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
@@ -17,7 +18,7 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
     slong i, length;
     mp_limb_t n;
 
-    if (flint_fscanf(f, "%wd %wu", &length, &n) != 2)
+    if (fscanf(f, WORD_FMT "d " WORD_FMT "u", &length, &n) != 2)
         return 0;
     
     nmod_poly_clear(poly);
@@ -27,7 +28,7 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
     
     for (i = 0; i < length; i++)
     {
-        if (!flint_fscanf(f, "%wu", &poly->coeffs[i]))
+        if (!fscanf(f, WORD_FMT "u", &poly->coeffs[i]))
         {
             poly->length = i;
             return 0;

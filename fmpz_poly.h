@@ -21,7 +21,6 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz-conversions.h"
 #include "fmpz_vec.h"
 
 #ifdef __cplusplus
@@ -77,7 +76,15 @@ FLINT_DLL void fmpz_poly_realloc(fmpz_poly_t poly, slong alloc);
 
 FLINT_DLL void fmpz_poly_fit_length(fmpz_poly_t poly, slong len);
 
-FLINT_DLL void fmpz_poly_clear(fmpz_poly_t poly);
+FMPZ_POLY_INLINE
+void fmpz_poly_clear(fmpz_poly_t poly)
+{
+    if (poly->coeffs)
+    {
+        _fmpz_vec_demote(poly->coeffs, poly->alloc);
+        flint_free(poly->coeffs);
+    }
+}
 
 FLINT_DLL void _fmpz_poly_normalise(fmpz_poly_t poly);
 

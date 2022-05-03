@@ -70,11 +70,7 @@ nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
                                     ulong power, slong n)
 {
     if (power == 0)
-    {
-        flint_printf("Exception (nmod_poly_log_series_monomial_ui). \n"
-               "Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in nmod_poly_log_series_monomial_ui\n");
 
     if (coeff != UWORD(1))
         coeff = n_mod2_preinv(coeff, res->mod.n, res->mod.ninv);

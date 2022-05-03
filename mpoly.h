@@ -39,6 +39,7 @@
  extern "C" {
 #endif
 
+#define MPOLY_NUM_ORDERINGS 3
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,16 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_vec.h"
 
 void
-fmpz_poly_clear(fmpz_poly_t poly)
+_fmpq_vec_clear(fmpq * vec, slong len)
 {
-    if (poly->coeffs)
-    {
-        slong i;
-        for (i = 0; i < poly->alloc; i++)
-            _fmpz_demote(poly->coeffs + i);
-        flint_free(poly->coeffs);
-    }
+    _fmpz_vec_clear((fmpz *) vec, 2 * len);
 }

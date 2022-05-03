@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#undef ulong
+#define ulong ulongxx
 #include <stdarg.h>
+#include <string.h>
+#undef ulong
 #include "flint.h"
+#include "flint-io.h"
+#include "flint-impl.h"
 
 int flint_fprintf(FILE * f, const char * str, ...)
 {

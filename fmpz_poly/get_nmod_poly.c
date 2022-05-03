@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "nmod_poly.h"
 
 void

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "hashmap.h"
 
 void hashmap1_init(hashmap1_t h)
@@ -102,9 +101,7 @@ void hashmap1_insert(ulong key, void * value, hashmap1_t h)
 
       if (loc == -WORD(1))
       {
-         /* should never be reached */
-         flint_printf("Rehashing unsuccessful\n");
-         flint_abort();
+         flint_throw(FLINT_ERROR, "Rehashing unsuccessful\n");
       }
    }
 

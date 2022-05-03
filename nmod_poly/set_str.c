@@ -11,6 +11,7 @@
 */
 
 #include <string.h>
+#include <stdio.h>
 #include "nmod_poly.h"
 
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)
@@ -19,7 +20,7 @@ int nmod_poly_set_str(nmod_poly_t poly, const char * s)
     slong i, length;
     mp_limb_t n;
 
-    if (flint_sscanf(s, "%wd %wu", &length, &n) != 2)
+    if (sscanf(s, WORD_FMT "d " WORD_FMT "u", &length, &n) != 2)
         return 0;
       
     /* jump past length (n will be skipped in first loop iter)  */
@@ -34,7 +35,7 @@ int nmod_poly_set_str(nmod_poly_t poly, const char * s)
         s += strcspn(s, whitespace); /* jump to next whitespace */
         s += strspn(s, whitespace); /* skip whitespace */
       
-        if (!flint_sscanf(s, "%wu", &poly->coeffs[i]))
+        if (!sscanf(s, WORD_FMT "u", &poly->coeffs[i]))
         {
             poly->length = i;
             return 0;

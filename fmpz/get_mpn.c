@@ -12,7 +12,7 @@
 #include "fmpz.h"
 
 int
-fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
 {
     mp_limb_t n_size;
     mp_ptr temp;

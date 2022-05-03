@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 mp_limb_t
 fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)

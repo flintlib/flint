@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "flint.h"
+#include "flint-impl.h"
 
 int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
 {
@@ -24,7 +26,7 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
     }
     else if (a->length == 1)
     {
-        r = flint_fprintf(f, "%wu", a->coeffs[0]);
+        r = fprintf(f, WORD_FMT "u", a->coeffs[0]);
         return r;
     }
 
@@ -37,10 +39,10 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
             case UWORD(0):
                 break;
             case UWORD(1):
-                r = flint_fprintf(f, "%s", x);
+                r = fprintf(f, "%s", x);
                 break;
             default:
-                r = flint_fprintf(f, "%wu*%s", a->coeffs[1], x);
+                r = fprintf(f, WORD_FMT "u*%s", a->coeffs[1], x);
         }
         --i;
     }
@@ -51,10 +53,10 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
             case UWORD(0):
                 break;
             case UWORD(1):
-                r = flint_fprintf(f, "%s^%wd", x, i);
+                r = fprintf(f, "%s^" WORD_FMT "d", x, i);
                 break;
             default:
-                r = flint_fprintf(f, "%wu*%s^%wd", a->coeffs[i], x, i);
+                r = fprintf(f, WORD_FMT "u*%s^" WORD_FMT "d", a->coeffs[i], x, i);
         }
         --i;
     }
@@ -65,10 +67,10 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
             case UWORD(0):
                 break;
             case UWORD(1):
-                r = flint_fprintf(f, "+%s^%wd", x, i);
+                r = fprintf(f, "+%s^" WORD_FMT "d", x, i);
                 break;
             default:
-                r = flint_fprintf(f, "+%wu*%s^%wd", a->coeffs[i], x, i);
+                r = fprintf(f, "+" WORD_FMT "u*%s^" WORD_FMT "d", a->coeffs[i], x, i);
         }
     }
     if (r > 0 && i == 1)
@@ -78,16 +80,16 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
             case UWORD(0):
                 break;
             case UWORD(1):
-                r = flint_fprintf(f, "+%s", x);
+                r = fprintf(f, "+%s", x);
                 break;
             default:
-                r = flint_fprintf(f, "+%wu*%s", a->coeffs[1], x);
+                r = fprintf(f, "+" WORD_FMT "u*%s", a->coeffs[1], x);
         }
     }
     if (r > 0)
     {
         if (a->coeffs[0] != UWORD(0))
-            r = flint_fprintf(f, "+%wu", a->coeffs[0]);
+            r = fprintf(f, "+" WORD_FMT "u", a->coeffs[0]);
     }
 
     return (int) r;

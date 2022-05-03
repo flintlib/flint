@@ -34,17 +34,6 @@ static slong n_factor_pp1_table[][3] = {
       x = (c << norm);           \
    } while (0)
 
-void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
-{
-   if (norm)
-   {
-      x >>= norm;
-      y >>= norm;
-   } 
-
-   flint_printf("[%wu, %wu]", x, y);
-}
-
 #define n_pp1_2k(x, y, n, ninv, x0, norm)       \
    do {                                         \
       const mp_limb_t two = (UWORD(2) << norm);      \

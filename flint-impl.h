@@ -12,6 +12,20 @@
 #ifndef FLINT_IMPL_H
 #define FLINT_IMPL_H
 
+/* printing */
+#if defined(_WIN64) || defined(__mips64)
+#if defined(__MINGW64__)
+#define WORD_FMT "%I64"
+#define WORD_WIDTH_FMT "%*I64"
+#else
+#define WORD_FMT "%ll"
+#define WORD_WIDTH_FMT "%*ll"
+#endif
+#else
+#define WORD_FMT "%l"
+#define WORD_WIDTH_FMT "%*l"
+#endif
+
 /*
  * elementary functions
  */
@@ -122,6 +136,51 @@
 #define FLINT_TEST_CLEANUP(xxx) \
    flint_randclear(xxx);        \
    flint_cleanup_master();
+
+
+/* common usage of flint_malloc */
+#define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
+#define FLINT_ARRAY_REALLOC(p, n, T) (T *) flint_realloc(p, (n)*sizeof(T))
+
+
+/* temporary allocation
+ * NOTE: Requires user to include alloca */
+#define TMP_INIT                    \
+    typedef struct __tmp_struct     \
+    {                               \
+        void * block;               \
+        struct __tmp_struct * next; \
+    } __tmp_t;                      \
+    __tmp_t * __tmp_root;           \
+    __tmp_t * __tpx
+
+#define TMP_START                   \
+    __tmp_root = NULL
+
+#if FLINT_WANT_ASSERT
+#define TMP_ALLOC(size)                             \
+    (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)),   \
+     __tpx->next = __tmp_root,                      \
+     __tmp_root = __tpx,                            \
+     __tpx->block = flint_malloc(size))
+#else
+#define TMP_ALLOC(size)                             \
+   (((size) > 8192) ?                               \
+      (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
+       __tpx->next = __tmp_root,                    \
+       __tmp_root = __tpx,                          \
+       __tpx->block = flint_malloc(size)) :         \
+      alloca(size))
+#endif
+
+#define TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC((n)*sizeof(T))
+
+#define TMP_END                         \
+    while (__tmp_root)                  \
+    {                                   \
+        flint_free(__tmp_root->block);  \
+        __tmp_root = __tmp_root->next;  \
+    }
 
 
 #endif

@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 /*
 typedef struct {
@@ -119,10 +121,10 @@ void nmod_berlekamp_massey_print(
 {
     slong i;
     nmod_poly_print_pretty(B->V1, "#");
-    flint_printf(",");
+    printf(",");
     for (i = 0; i < B->points->length; i++)
     {
-        flint_printf(" %wu", B->points->coeffs[i]);
+        printf(" " WORD_FMT "u", B->points->coeffs[i]);
     }
 }
 

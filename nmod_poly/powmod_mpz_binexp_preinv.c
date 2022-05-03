@@ -98,10 +98,7 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
     int pcopy = 0;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (nmod_poly_powmod_mpz_binexp_preinv). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_powmod_mpz_binexp_preinv\n");
 
     if (lenf == 1)
     {
@@ -110,10 +107,7 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
     }
 
     if (mpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (nmod_poly_powmod_mpz_binexp_preinv). Negative exp not implemented.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Negative exponent in nmod_poly_powmod_mpz_binexp not implemented\n");
 
     if (len >= lenf)
     {

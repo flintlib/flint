@@ -12,8 +12,6 @@
 #ifndef FLINT_PROFILER_H
 #define FLINT_PROFILER_H
 
-#include "flint.h"
-
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <time.h>
@@ -49,6 +47,8 @@ FLINT_DLL int gettimeofday(struct timeval * p, void * tz);
 #endif
 #undef ulong
 #define ulong mp_limb_t
+
+#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -261,4 +261,3 @@ FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, vo
 #endif
 
 #endif
-

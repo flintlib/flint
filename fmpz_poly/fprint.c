@@ -10,14 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <gmp.h>
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 
 int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len)
 {

@@ -63,16 +63,10 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
     mp_ptr ptr1;
 
     if (len2 == 0)
-    {
-        flint_printf("Exception (nmod_poly_precompute_matrix). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_precompute_matrix\n");
 
     if (A->r != m || A->c != len)
-    {
-        flint_printf("Exception (nmod_poly_precompute_matrix). Wrong dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Wrong dimensions in nmod_poly_precompute_matrix\n");
 
     if (len2 == 1)
     {
@@ -170,17 +164,10 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     slong len = len3 - 1;
 
     if (len3 == 0)
-    {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_precomp_preinv). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_precompute_matrix\n");
 
     if (len1 >= len3)
-    {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_precomp_preinv). The degree of the \n"
-               "first polynomial must be smaller than that of the modulus.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Degree of first polynomial must be smaller than the modulus in nmod_poly_compose_mod_brent_kung_precomp_preinv\n");
 
     if (len1 == 0 || len3 == 1)
     {

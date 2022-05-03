@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "ulong_extras.h"
 
 mp_limb_t flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001, 
@@ -41,12 +42,11 @@ int n_is_prime_pseudosquare(mp_limb_t n)
     const mp_limb_t * primes;
     const double * inverses;
 
-    if (n < UWORD(2)) return 0;
+    if (n < UWORD(2))
+        return 0;
 
     if ((n & UWORD(1)) == UWORD(0))
-    {
         return (n == UWORD(2));
-    }
 
     primes = n_primes_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
     inverses = n_prime_inverses_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
@@ -55,9 +55,11 @@ int n_is_prime_pseudosquare(mp_limb_t n)
     {
         double ppre;
         p = primes[i];
-        if (p*p > n) return 1;
+        if (p*p > n)
+            return 1;
         ppre = inverses[i];
-        if (!n_mod2_precomp(n, p, ppre)) return 0;
+        if (!n_mod2_precomp(n, p, ppre))
+            return 0;
     }
 
     B  = primes[FLINT_PSEUDOSQUARES_CUTOFF];
@@ -74,20 +76,23 @@ int n_is_prime_pseudosquare(mp_limb_t n)
     for (j = 0; j <= i; j++)
     {
         mp_limb_t mod = n_powmod2(primes[j], exp, n);
-        if ((mod != UWORD(1)) && (mod != n - 1)) return 0;
-        if (mod == n - 1) m1 = 1;
+        if ((mod != UWORD(1)) && (mod != n - 1))
+            return 0;
+        if (mod == n - 1)
+            m1 = 1;
     }
 
     mod8 = n % 8;
 
-    if ((mod8 == 3) || (mod8 == 7)) return 1;
+    if ((mod8 == 3) || (mod8 == 7))
+        return 1;
 
     if (mod8 == 5)
     {
         mp_limb_t mod = n_powmod2(UWORD(2), exp, n);
-        if (mod == n - 1) return 1;
-        flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        flint_abort();
+        if (mod == n - 1)
+            return 1;
+        flint_throw(FLINT_ERROR, "Whoah, " WORD_FMT "u is a probable prime, but not prime, please report!!\n", n);
     }
     else
     {
@@ -95,16 +100,11 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         for (j = i + 1; j < FLINT_NUM_PSEUDOSQUARES + 1; j++)
         {
             mp_limb_t mod = n_powmod2(primes[j], exp, n);
-            if (mod == n - 1) return 1;
+            if (mod == n - 1)
+                return 1;
             if (mod != 1)
-            {
-                flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-                flint_abort();
-            }
+                flint_throw(FLINT_ERROR, "Whoah, " WORD_FMT "u is a probable prime, but not prime, please report!!\n", n);
         }
-        flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Whoah, " WORD_FMT "u is a probable prime, but not prime, please report!!\n", n);
     }
-
-    return 0;  /* not reached, but silence the compiler */
 }

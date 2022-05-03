@@ -19,7 +19,7 @@
 #endif
 
 #include "flint.h"
-#include <mpfr.h> 
+#include "mpfr.h"
 
 #ifdef __cplusplus
  extern "C" {

@@ -9,8 +9,34 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "flint-impl.h"
 
 void
 _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
@@ -19,10 +45,10 @@ _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
 {
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     slong len, coeff = A_len - B_len;
-    
+
     mp_ptr R1 = W;
     mp_srcptr Btop = B + B_len - 1;
-    
+
     FLINT_MPN_COPYI(R1, A + B_len - 1, A_len - B_len + 1);
 
     while (coeff >= 0)
@@ -64,7 +90,7 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     mp_ptr B2, R2;
     mp_srcptr Btop;
-    
+
     B2 = W;
     for (i = 0; i < B_len - 1; i++)
     {
@@ -81,7 +107,7 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
     }
 
     coeff = A_len - B_len;
-    
+
     while (coeff >= 0)
     {
         mp_limb_t r_coeff;
@@ -94,7 +120,7 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
             if (coeff >= 0)
                 r_coeff =
                     n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n,
-                                    mod.ninv);
+                            mod.ninv);
         }
 
         if (coeff >= 0)
@@ -118,15 +144,15 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
 
 void
 _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
-                             mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
-                             nmod_t mod)
+        mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
+        nmod_t mod)
 {
     slong coeff, i, len;
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     mp_limb_t r_coeff;
     mp_ptr B3, R3;
     mp_srcptr Btop;
-    
+
     B3 = W;
     for (i = 0; i < B_len - 1; i++)
     {
@@ -145,12 +171,12 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
     }
 
     coeff = A_len - B_len;
-    
+
     while (coeff >= 0)
     {
         r_coeff =
             n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],
-                             R3[3 * coeff], mod.n, mod.ninv);
+                    R3[3 * coeff], mod.n, mod.ninv);
 
         while (coeff >= 0 && r_coeff == WORD(0))
         {
@@ -158,7 +184,7 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
             if (coeff >= 0)
                 r_coeff =
                     n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],
-                                     R3[3 * coeff], mod.n, mod.ninv);
+                            R3[3 * coeff], mod.n, mod.ninv);
         }
 
         if (coeff >= 0)
@@ -182,8 +208,8 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
 
 void
 _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W,
-                           mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
-                           nmod_t mod)
+        mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
+        nmod_t mod)
 {
     slong bits =
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(A_len - B_len + 1);
@@ -198,7 +224,7 @@ _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W,
 
 void
 nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
-                          const nmod_poly_t B)
+        const nmod_poly_t B)
 {
     mp_ptr Q_coeffs, W;
     nmod_poly_t t1;
@@ -211,13 +237,11 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     {
         if (nmod_poly_modulus(B) == 1)
         {
-           nmod_poly_set(Q, A);
-           return;
-        } else
-        {
-	   flint_printf("Exception (nmod_poly_div_basecase). Division by zero.\n");
-           flint_abort();
+            nmod_poly_set(Q, A);
+            return;
         }
+        else
+            flint_throw(FLINT_DIVZERO, "nmod_poly_div_basecase\n");
     }
 
     Alen = A->length;
@@ -232,7 +256,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     if (Q == A || Q == B)
     {
         nmod_poly_init2_preinv(t1, B->mod.n, B->mod.ninv,
-                               Alen - Blen + 1);
+                Alen - Blen + 1);
         Q_coeffs = t1->coeffs;
     }
     else
@@ -243,16 +267,16 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
 
     TMP_START;
     W = TMP_ALLOC(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod)*sizeof(mp_limb_t));
-    
+
     _nmod_poly_div_basecase(Q_coeffs, W, A->coeffs, Alen,
-                               B->coeffs, Blen, B->mod);
+            B->coeffs, Blen, B->mod);
 
     if (Q == A || Q == B)
     {
         nmod_poly_swap(Q, t1);
         nmod_poly_clear(t1);
     }
-    
+
     Q->length = Alen - Blen + 1;
 
     TMP_END;

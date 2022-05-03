@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "ulong_extras.h"
 
 static void
@@ -70,10 +71,7 @@ n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
     odd_len = len / 2;
 
     if (a < 3 || b < a || len > FLINT_SIEVE_SIZE)
-    {
-        flint_printf("invalid sieve range %wu,%wu!\n", a, b);
-        flint_abort();
-    }
+        flint_throw(FLINT_DOMERR, "invalid sieve range " WORD_FMT "u," WORD_FMT "u\n", a, b);
 
     bound = n_sqrt(b) + 1;
 

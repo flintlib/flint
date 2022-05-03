@@ -10,12 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
 #include "profiler.h"
+#include "flint-io.h"
 
 #if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
 	                    (GMP_LIMB_BITS == 32 && (defined (__i386__) || \

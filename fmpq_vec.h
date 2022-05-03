@@ -18,8 +18,6 @@
 #define FMPQ_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
-#include "fmpq.h"
 #include "flint.h"
 
 #ifdef __cplusplus
@@ -28,8 +26,9 @@
 
 /*  Memory management  *******************************************************/
 
-/* _fmpq_vec_init and _fmpq_vec_clear are declared in fmpq.h for backward
-   compatibility */
+FLINT_DLL fmpq * _fmpq_vec_init(slong len);
+
+FLINT_DLL void _fmpq_vec_clear(fmpq * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 

@@ -12,6 +12,7 @@
 */
 
 #include "flint.h"
+#include "gmpcompat.h"
 
 void
 _mpf_vec_norm(mpf_t res, mpf_srcptr vec, slong len)

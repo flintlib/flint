@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
 
 #if FLINT64   /* 2^53 */
 #define DOUBLE_MAX WORD(9007199254740992)

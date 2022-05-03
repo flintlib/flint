@@ -64,10 +64,7 @@ nmod_poly_powmod_ui_binexp(nmod_poly_t res,
     int pcopy = 0;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (nmod_poly_powmod_ui_binexp). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "nmod_poly_powmod_ui_binexp\n");
 
     if (lenf == 1)
     {                                                                                             nmod_poly_zero(res);

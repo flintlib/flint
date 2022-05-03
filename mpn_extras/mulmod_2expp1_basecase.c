@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint-impl.h"
 #include "flint.h"
+#include "flint-impl.h"
+#include "gmpcompat.h"
 
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  
    needs (tp,2n) temp space, everything reduced mod 2^b 

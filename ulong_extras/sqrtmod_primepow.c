@@ -195,10 +195,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
     slong i, num;
 
     if (exp < 0)
-    {
-        flint_printf("Exception (n_sqrtmod_primepow). exp must be non-negative.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DOMERR, "exp must be non-negative for n_sqrtmod_primepow\n");
 
     if (exp == 0) /* special case, sqrt of 0 mod 1 */
     {

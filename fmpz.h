@@ -19,14 +19,15 @@
 #endif
 
 #include "flint.h"
-#include "fmpz-conversions.h"
+#include "fmpz_mini.h"
+#include "gmpcompat.h"
 
 #if FLINT_USES_PTHREAD
 #include <pthread.h>
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct
@@ -40,8 +41,6 @@ typedef struct
 
 FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
 
-FLINT_DLL void _fmpz_clear_mpz(fmpz f);
-
 FLINT_DLL void _fmpz_cleanup_mpz_content(void);
 
 FLINT_DLL void _fmpz_cleanup(void);
@@ -50,31 +49,11 @@ FLINT_DLL __mpz_struct * _fmpz_promote(fmpz_t f);
 
 FLINT_DLL __mpz_struct * _fmpz_promote_val(fmpz_t f);
 
-FMPZ_INLINE
-void _fmpz_demote(fmpz_t f)
-{
-    /* 
-       warning, if fmpz_demote changes, fmpz_zero must
-       also be changed to match
-    */
-    if (COEFF_IS_MPZ(*f)) 
-    {
-        _fmpz_clear_mpz(*f);
-        (*f) = WORD(0);
-    }
-}
-
 FLINT_DLL void _fmpz_demote_val(fmpz_t f);
 
 FLINT_DLL void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z);
 
 FLINT_DLL void _fmpz_clear_readonly_mpz(mpz_t);
-
-FMPZ_INLINE
-void fmpz_init(fmpz_t f)
-{
-	(*f) = WORD(0);
-}
 
 FLINT_DLL void fmpz_init2(fmpz_t f, ulong limbs);
 
@@ -127,13 +106,6 @@ void fmpz_init_set_si(fmpz_t f, slong g)
         *f = PTR_TO_COEFF(ptr);
         flint_mpz_set_si(ptr, g);
     }
-}
-
-FMPZ_INLINE
-void fmpz_clear(fmpz_t f)
-{
-    if (COEFF_IS_MPZ(*f))
-        _fmpz_clear_mpz(*f);
 }
 
 FLINT_DLL void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
@@ -296,9 +268,11 @@ FLINT_DLL void fmpz_get_mpf(mpf_t x, const fmpz_t f);
 
 FLINT_DLL void fmpz_set_mpf(fmpz_t f, const mpf_t x);
 
-FLINT_DLL void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
-
 FLINT_DLL int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in);
+
+#ifdef __MPFR_H
+FLINT_DLL void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
+#endif
 
 FLINT_DLL int fmpz_set_str(fmpz_t f, const char * str, int b);
 
@@ -315,36 +289,6 @@ FLINT_DLL int fmpz_abs_fits_ui(const fmpz_t f);
 FLINT_DLL int fmpz_fits_si(const fmpz_t f);
 
 FMPZ_INLINE
-void fmpz_zero(fmpz_t f)
-{
-   if (COEFF_IS_MPZ(*f))
-      _fmpz_clear_mpz(*f);
-   *f = WORD(0);
-}
-
-FMPZ_INLINE 
-void fmpz_one(fmpz_t f)
-{
-    if (COEFF_IS_MPZ(*f)) 
-    {
-        _fmpz_clear_mpz(*f);
-	}
-    *f = WORD(1);
-}
-
-FMPZ_INLINE
-int fmpz_is_zero(const fmpz_t f)
-{
-   return (*f == 0);
-}
-
-FMPZ_INLINE
-int fmpz_is_one(const fmpz_t f)
-{
-   return (*f == 1);
-}
-
-FMPZ_INLINE
 int fmpz_is_pm1(const fmpz_t f)
 {
    return (*f == 1 || *f == -1);
@@ -352,23 +296,36 @@ int fmpz_is_pm1(const fmpz_t f)
 
 FLINT_DLL void fmpz_set(fmpz_t f, const fmpz_t g);
 
-FLINT_DLL int fmpz_equal(const fmpz_t f, const fmpz_t g);
-
 FLINT_DLL int fmpz_equal_si(const fmpz_t f, slong g);
 
 FLINT_DLL int fmpz_equal_ui(const fmpz_t f, ulong g);
 
 FLINT_DLL int fmpz_read(fmpz_t f);
 
-FLINT_DLL int fmpz_fread(FILE * file, fmpz_t f);
-
-FLINT_DLL size_t fmpz_inp_raw( fmpz_t x, FILE *fin );
-
 FLINT_DLL int fmpz_print(const fmpz_t x);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+FLINT_DLL int fmpz_fread(FILE * file, fmpz_t f);
+FLINT_DLL size_t fmpz_inp_raw(fmpz_t x, FILE * fin);
 FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
-
-FLINT_DLL size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
+FLINT_DLL size_t fmpz_out_raw(FILE * fout, const fmpz_t x);
+#endif
 
 FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 

@@ -24,7 +24,6 @@ Inc.
    N.B: This file has been adapted from code found in GMP 4.2.1.
 */
 
-#include "flint.h"
 #include "longlong.h"
 
 #ifdef NEED_CLZ_TAB

@@ -113,11 +113,9 @@ nmod_poly_div_divconquer(nmod_poly_t Q,
         {
             nmod_poly_set(Q, A);
             return;
-        } else
-        {
-            flint_printf("Exception (nmod_poly_div_divconquer). Division by zero.\n");
-            flint_abort();
         }
+        else
+            flint_throw(FLINT_DIVZERO, "nmod_poly_div_divconquer\n");
     }
 
     Alen = A->length;

@@ -13,14 +13,17 @@
 #if defined(_WIN64) || defined(__mips64)
 #include <stdint.h> /* to enable mpfr_set_sj in mpfr.h */
 #endif
+
 #if defined( _WIN64) && defined( _MSC_MPIR_VERSION ) && __MPIR_RELEASE >= 20700
 #  if defined( _MSC_VER ) && _MSC_VER >= 1600
 #    include <stdint.h>
-#    include <mpfr.h>
+#    include "mpfr.h"
 #    define mpfr_set_si mpfr_set_sj
 #  endif
 #endif
-#include "fmpz.h"
+
+#include "flint.h"
+#include "mpfr.h"
 
 void
 fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)

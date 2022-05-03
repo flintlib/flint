@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "fmpz.h"
+#include "flint.h"
 
 double
 fmpz_dlog(const fmpz_t x)

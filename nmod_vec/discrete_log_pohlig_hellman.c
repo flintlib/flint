@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include <stdlib.h>
 #include "nmod.h"
 #include "fmpz.h"
 

@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 int
 fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
