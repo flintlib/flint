@@ -19,7 +19,11 @@
 #endif
 
 #include "flint.h"
-#include "gmpcompat.h"
+#ifdef LONGSLONG
+# define flint_mpz_divisible_ui_p mpz_divisible_ui_p
+#else
+# include "gmpcompat.h"
+#endif
 
 #ifdef __cplusplus
  extern "C" {

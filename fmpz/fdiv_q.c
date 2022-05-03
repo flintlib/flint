@@ -11,6 +11,12 @@
 */
 
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_cdiv_q_ui mpz_cdiv_q_ui
+# define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
@@ -19,10 +25,7 @@ fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     fmpz c2 = *h;
 
     if (fmpz_is_zero(h))
-    {
-        flint_printf("Exception (fmpz_fdiv_q). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_fdiv_q\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

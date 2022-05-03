@@ -84,7 +84,7 @@ set(TEMPLATE_DIRS
 set(SOURCES
     printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c
     memory_manager.c version.c profiler.c thread_support.c exception.c
-    hashmap.c inlines.c fmpz/fmpz.c
+    hashmap.c fmpz/fmpz.c
 )
 
 if (MSVC)

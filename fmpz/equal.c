@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g)
 {

@@ -11,6 +11,12 @@
 */
 
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui
+# define flint_mpz_cdiv_q_ui mpz_cdiv_q_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)

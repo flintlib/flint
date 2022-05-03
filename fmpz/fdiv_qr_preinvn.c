@@ -10,8 +10,39 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras.h"
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+#include "flint-impl.h"
 #include "fmpz.h"
+#include "mpn_extras.h"
+#ifdef LONGSLONG
+# define flint_mpz_sub_ui mpz_sub_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 /* these functions were adapted from similar functions in an old version of GMP */
 void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
@@ -132,10 +163,7 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
     fmpz c2 = *h;
 
     if (fmpz_is_zero(h))
-    {
-        flint_printf("Exception (fmpz_fdiv_q). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_fdiv_q\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

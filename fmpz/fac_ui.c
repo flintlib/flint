@@ -9,7 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_fac_ui mpz_fac_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 #if FLINT64
 #define FLINT_NUM_TINY_FACTORIALS 21

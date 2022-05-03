@@ -11,16 +11,18 @@
 */
 
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_divexact_ui mpz_divexact_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 {
     fmpz c1 = *g;
 
     if (h == 0)
-    {
-        flint_printf("Exception (fmpz_divexact_ui). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_divexact_ui\n");
 
     if (!COEFF_IS_MPZ(c1))  /* g is small */
     {

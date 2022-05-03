@@ -13,6 +13,7 @@
 #define FLINT_IO_H
 
 #include <stdio.h>
+#include <stdarg.h>
 #include "flint-config.h"
 
 #ifdef __cplusplus

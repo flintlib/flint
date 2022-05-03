@@ -40,7 +40,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
              flint_rand_t state, mp_limb_t n)
 {
     mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
-    int i, j, ret;
+    slong i, j, ret;
     n_ecm_t n_ecm_inf;
 
     const mp_limb_t *prime_array;

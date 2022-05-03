@@ -11,6 +11,11 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_tdiv_q_ui mpz_tdiv_q_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 int
 fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)

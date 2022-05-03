@@ -9,7 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_bin_uiui mpz_bin_uiui
+#else
+# include "gmpcompat.h"
+#endif
 
 /* TODO: speedup for small n,k */
 void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k)

@@ -12,7 +12,11 @@
 
 #include "flint.h"
 #include "fmpz-conversions.h"
-#include "gmpcompat.h"
+#ifdef LONGSLONG
+# define flint_mpz_cmp_si mpz_cmp_si
+#else
+# include "gmpcompat.h"
+#endif
 
 int
 fmpz_cmp_si(const fmpz_t f, slong g)

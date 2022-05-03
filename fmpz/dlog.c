@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 double
 fmpz_dlog(const fmpz_t x)

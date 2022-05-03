@@ -14,7 +14,13 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
-#include "gmpcompat.h"
+#ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
+# define flint_mpz_get_ui mpz_get_ui
+# define flint_mpz_get_si mpz_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 static __inline__ mp_limb_t 
 n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)

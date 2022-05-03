@@ -19,7 +19,6 @@
 #endif
 
 #include "fmpz_mini.h"
-#include "gmpcompat.h"
 
 #if FLINT_USES_PTHREAD
 #include <pthread.h>
@@ -38,15 +37,9 @@ typedef struct
    void * address;
 } fmpz_block_header_s;
 
-FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
-
 FLINT_DLL void _fmpz_cleanup_mpz_content(void);
 
 FLINT_DLL void _fmpz_cleanup(void);
-
-FLINT_DLL __mpz_struct * _fmpz_promote_val(fmpz_t f);
-
-FLINT_DLL void _fmpz_demote_val(fmpz_t f);
 
 FLINT_DLL void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z);
 
@@ -68,40 +61,6 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
         mpz_set(ptr, COEFF_TO_PTR(*g));
-    }
-}
-
-FMPZ_INLINE
-void fmpz_init_set_ui(fmpz_t f, ulong g)
-{
-    if (g <= COEFF_MAX)
-    {
-        *f = g;
-    }
-    else
-    {
-        __mpz_struct *ptr;
-
-        ptr = _fmpz_new_mpz();
-        *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_ui(ptr, g);
-    }
-}
-
-FMPZ_INLINE
-void fmpz_init_set_si(fmpz_t f, slong g)
-{
-    if (COEFF_MIN <= g && g <= COEFF_MAX)
-    {
-        *f = g;
-    }
-    else
-    {
-        __mpz_struct *ptr;
-
-        ptr = _fmpz_new_mpz();
-        *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_si(ptr, g);
     }
 }
 
@@ -137,52 +96,6 @@ fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
         __mpz_struct * mpz = COEFF_TO_PTR(*f);
         *low = mpz->_mp_d[0];
         *hi  = mpz->_mp_size == 2 ? mpz->_mp_d[1] : 0;
-    }
-}
-
-FMPZ_INLINE void
-fmpz_set_si(fmpz_t f, slong val)
-{
-    if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
-    {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_si(mpz_coeff, val);
-    }
-    else
-    {
-        _fmpz_demote(f);
-        *f = val;               /* val is small */
-    }
-}
-
-FMPZ_INLINE void
-fmpz_set_ui(fmpz_t f, ulong val)
-{
-    if (val > COEFF_MAX)        /* val is large */
-    {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_ui(mpz_coeff, val);
-    }
-    else
-    {
-        _fmpz_demote(f);
-        *f = val;               /* val is small */
-    }
-}
-
-FMPZ_INLINE void
-fmpz_neg_ui(fmpz_t f, ulong val)
-{
-    if (val > COEFF_MAX)
-    {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_ui(mpz_coeff, val);
-        mpz_neg(mpz_coeff, mpz_coeff);
-    }
-    else
-    {
-        _fmpz_demote(f);
-        *f = -(slong) val;
     }
 }
 

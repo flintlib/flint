@@ -10,6 +10,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+# define flint_mpz_divisible_ui_p mpz_divisible_ui_p
+#else
+# include "gmpcompat.h"
+#endif
 
 int fmpz_divisible(const fmpz_t x, const fmpz_t p)
 {

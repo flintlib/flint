@@ -11,7 +11,12 @@
 
 #include <mpfr.h>
 #include "flint.h"
-#include "gmpcompat.h"
+#ifdef LONGSLONG
+# define flint_mpz_get_ui mpz_get_ui
+# define flint_mpz_set_ui mpz_set_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 #if MPFR_VERSION_MAJOR < 3
 #error MPFR 3.0.0 or later is required

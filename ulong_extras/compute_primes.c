@@ -50,7 +50,7 @@ void n_compute_primes_init()
 void
 n_compute_primes(ulong num_primes)
 {
-    int i, m;
+    slong i, m;
     ulong num_computed;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
