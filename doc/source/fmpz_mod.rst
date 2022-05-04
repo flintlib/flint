@@ -31,6 +31,15 @@ Context object
 
     Reconfigure ``ctx`` for arithmetic modulo ``n``.
 
+
+Conversions
+-----------------------------------------------------------------------------------------------------------------------
+
+.. function:: void fmpz_mod_set_fmpz(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
+
+    Set ``a`` to ``b`` after reduction modulo the modulus.
+
+
 Arithmetic
 --------------------------------------------------------------------------------
 
