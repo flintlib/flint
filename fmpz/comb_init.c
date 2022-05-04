@@ -30,7 +30,7 @@
 #define FMPZ_MOD_UI_CUTOFF 75
 
 /* minimal number of basecase chunks in which to partition */
-#define FMPZ_CRT_UI_MULTIPLE_CUTOFF 8
+#define FMPZ_CRT_UI_MULTIPLE_CUTOFF 4
 #define FMPZ_MOD_UI_MULTIPLE_CUTOFF 4
 
 
