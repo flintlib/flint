@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 ulong
 fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, slong n)

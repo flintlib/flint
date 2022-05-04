@@ -11,6 +11,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+# define flint_mpf_set_si mpf_set_si
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_get_mpf(mpf_t x, const fmpz_t f)

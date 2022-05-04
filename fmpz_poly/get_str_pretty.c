@@ -9,9 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
 #include <math.h>
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
 #include "fmpz.h"
+#include "flint-impl.h"
 
 char *
 _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
@@ -54,13 +62,13 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
     else if (poly[i] == WORD(-1))
         str[off++] = '-';
     else if (!COEFF_IS_MPZ(poly[i]))
-        off += flint_sprintf(str + off, "%wd*", poly[i]);
+        off += sprintf(str + off, WORD_FMT "d*", poly[i]);
     else
         off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
     if (i > 1)
-        off += flint_sprintf(str + off, "%s^%wd", x, i);
+        off += sprintf(str + off, "%s^" WORD_FMT "d", x, i);
     else
-        off += flint_sprintf(str + off, "%s", x);
+        off += sprintf(str + off, "%s", x);
 
     for (--i; i > 0; --i)
     {
@@ -73,14 +81,14 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
         if (poly[i] != WORD(1) && poly[i] != WORD(-1))
         {
             if (!COEFF_IS_MPZ(poly[i]))
-                off += flint_sprintf(str + off, "%wd*", poly[i]);
+                off += sprintf(str + off, WORD_FMT "d*", poly[i]);
             else
                 off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
         }
         if (i > 1)
-            off += flint_sprintf(str + off, "%s^%wd", x, i);
+            off += sprintf(str + off, "%s^" WORD_FMT "d", x, i);
         else
-            off += flint_sprintf(str + off, "%s", x);
+            off += sprintf(str + off, "%s", x);
     }
 
     if (poly[i] != WORD(0))
@@ -88,7 +96,7 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
         if (fmpz_sgn(poly + i) > 0)
             str[off++] = '+';
         if (!COEFF_IS_MPZ(poly[i]))
-            off += flint_sprintf(str + off, "%wd", poly[i]);
+            off += sprintf(str + off, WORD_FMT "d", poly[i]);
         else
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
     }

@@ -11,6 +11,7 @@
 */
 
 #include "fmpz.h"
+#include "flint-impl.h"
 
 /*
     Given an array of limbs "c" representing a integer mod 2^(FLINT_BITS*n),

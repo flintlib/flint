@@ -10,6 +10,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+# define flint_mpz_tdiv_ui mpz_tdiv_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 ulong
 fmpz_tdiv_ui(const fmpz_t g, ulong h)
@@ -17,10 +23,7 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
     fmpz c1 = *g;
 
     if (h == UWORD(0))
-    {
-        flint_printf("Exception (fmpz_tdiv_ui). Division by 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_tdiv_ui\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

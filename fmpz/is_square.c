@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz-conversions.h"
 
 int
 fmpz_is_square(const fmpz_t x)

@@ -11,7 +11,7 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 #if FLINT64
 #define LARGEST_ULONG_PRIMORIAL 52

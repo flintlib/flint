@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 flint_bitcnt_t fmpz_val2(const fmpz_t x)
 {

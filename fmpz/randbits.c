@@ -11,7 +11,7 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 void
 fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)

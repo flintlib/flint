@@ -10,7 +10,6 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 /* quotient of absolute value, rounded up */
 static __inline__ void
@@ -71,4 +70,3 @@ fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 {
     _fmpz_poly_bound_roots(bound, poly->coeffs, poly->length);
 }
-

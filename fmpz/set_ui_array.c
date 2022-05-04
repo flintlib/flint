@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "flint-impl.h"
 
 /*
     Given an array of limbs "in" representing a non negative integer,

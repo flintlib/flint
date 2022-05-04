@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "flint.h"
+#include "fmpz-conversions.h"
 
 slong
 _fmpz_vec_max_bits(const fmpz * vec, slong len)

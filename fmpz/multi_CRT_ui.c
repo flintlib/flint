@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "fmpz.h"
@@ -21,7 +22,6 @@ do {                                    \
     umul_ppmm(p1, p0, a, b);            \
     add_ssaaaa(h, l, h, l, p1, p0);     \
 } while (0)
-
 
 void fmpz_multi_CRT_ui(
     fmpz_t b,

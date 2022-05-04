@@ -22,9 +22,12 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
-#include "fmpz_mod_poly.h"
-#include "fmpz_mod_mat.h"
 #include "ulong_extras.h"
+/* TODO: Remove the following inclusions */
+#include "fmpz.h"
+#include "fmpz_mod.h"
+#include "fmpz_vec.h"
+#include "fmpz_mod_poly.h"
 
 /* Data types and context ****************************************************/
 
@@ -70,11 +73,29 @@ FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
     fmpz_pow_ui(f, fq_ctx_prime(ctx), fq_ctx_degree(ctx));
 }
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+#include "flint-impl.h"
 FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 {
     int r;
 
-    r = flint_fprintf(file, "p = ");
+    r = fprintf(file, "p = ");
     if (r <= 0)
         return r;
 
@@ -82,11 +103,11 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "\nd = %wd\n", fq_ctx_degree(ctx));
+    r = fprintf(file, "\nd = " WORD_FMT "d\n", fq_ctx_degree(ctx));
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "f(X) = ");
+    r = fprintf(file, "f(X) = ");
     if (r <= 0)
         return r;
 
@@ -94,7 +115,7 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "\n");
+    r = fprintf(file, "\n");
 
     return r;
 }
@@ -103,7 +124,7 @@ FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 {
     fq_ctx_fprint(stdout, ctx);
 }
-
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -303,12 +324,12 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
 {
     if (ctx->modulus->length == 2)
     {
-	fmpz_poly_fit_length(rop, 1);
+        fmpz_poly_fit_length(rop, 1);
         fmpz_invmod(rop->coeffs, ctx->modulus->coeffs + 1, fq_ctx_prime(ctx));
         fmpz_neg(rop->coeffs, rop->coeffs);
         fmpz_mul(rop->coeffs, rop->coeffs, ctx->modulus->coeffs);
         fmpz_mod(rop->coeffs, rop->coeffs, fq_ctx_prime(ctx));
-	_fmpz_poly_set_length(rop, !fmpz_is_zero(rop->coeffs));
+        _fmpz_poly_set_length(rop, !fmpz_is_zero(rop->coeffs));
     }
     else
     {
@@ -332,6 +353,23 @@ FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b,
 
 /* Output ********************************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FQ_INLINE
 int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
@@ -355,6 +393,7 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_print_pretty(op, ctx->var);
 }
+#endif
 
 FLINT_DLL char * fq_get_str(const fq_t op, const fq_ctx_t ctx);
 

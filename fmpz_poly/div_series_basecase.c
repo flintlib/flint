@@ -11,6 +11,32 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+#include "flint-impl.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
@@ -21,11 +47,7 @@ fmpz_divexact_checked(fmpz_t Q, const fmpz_t A, const fmpz_t B)
     fmpz_init(r);
     fmpz_fdiv_qr(Q, r, A, B);
     if (!fmpz_is_zero(r))
-    {
-        fmpz_clear(r);
-        flint_printf("Not an exact division\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Division not exact in _fmpz_poly_div_series_basecase\n");
     /* no need to clear r */
 }
 
@@ -240,10 +262,7 @@ void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-    {
-        flint_printf("Exception (fmpz_poly_div_series_basecase). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_div_series_basecase\n");
 
     if (Alen == 0)
     {

@@ -42,10 +42,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-    {
-        flint_printf("Exception (fmpz_poly_div_series). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_div_series\n");
 
     if (Alen == 0)
     {

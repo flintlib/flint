@@ -9,8 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#ifdef LONGSLONG
+# define flint_mpz_get_si mpz_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
 {
@@ -30,10 +36,8 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
         return 0;
     }
     if (!mpz_fits_slong_p(t))
-    {
-        flint_printf("Exception (_fmpz_vec_fread). Length does not fit into a slong.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Length does not fit into a slong _fmpz_vec_fread\n");
+
     if (alloc)
     {
         *len = flint_mpz_get_si(t);

@@ -10,7 +10,7 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_tdiv_q_ui mpz_tdiv_q_ui
 #else

@@ -46,10 +46,7 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
    }
 
    if (!fmpz_is_one(d))
-   {
-      flint_printf("Exception (fmpz_poly_divlow_smodp). Impossible inverse.\n");
-      flint_abort();
-   }
+        flint_throw(FLINT_IMPINV, "fmpz_poly_divides\n");
 
    for (k = 0; k < n; i++, k++)
    {

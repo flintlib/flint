@@ -10,7 +10,7 @@
 */
 
 #include "flint-impl.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 int
 fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,

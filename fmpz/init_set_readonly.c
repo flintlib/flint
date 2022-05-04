@@ -30,4 +30,3 @@ void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
         *f = WORD(0);
     }
 }
-

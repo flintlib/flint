@@ -10,7 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
+# define flint_mpz_sub_ui mpz_sub_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 {
@@ -45,4 +51,3 @@ void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         _fmpz_demote_val(f);  /* division may make value small */
     }
 }
-

@@ -28,10 +28,7 @@ void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
 
    fmpz_gcdinv(d, cinv, g->coeffs + len_g - 1, p);
    if (!fmpz_is_one(d))
-   {
-      flint_printf("Exception (fmpz_poly_divhigh_smodp). Impossible inverse.\n");
-      flint_abort();
-   }
+       flint_throw(FLINT_IMPINV, "fmpz_poly_divhigh_smodp\n");
 
    for (k = n - 1, i = f->length - len_g; k >= 0; i--, k--)
    {

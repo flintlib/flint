@@ -10,6 +10,11 @@
 */
 
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_submul_ui mpz_submul_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)

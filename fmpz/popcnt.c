@@ -10,6 +10,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+#define flint_mpz_cmp_si mpz_cmp_si
+#else
+#include "gmpcompat.h"
+#endif
 
 #ifdef FLINT_USES_POPCNT
 static __inline__ flint_bitcnt_t shortCount(slong val)

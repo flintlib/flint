@@ -353,15 +353,11 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
     fmpz_poly_clear(M);
     fmpz_poly_clear(Mm);
-
     return;
 
 bad_moduli:
-
     flint_throw(FLINT_ERROR, "fmpz_comb_init: moduli are not pairwise prime");
 
 zero_moduli:
-
     flint_throw(FLINT_ERROR, "fmpz_comb_init: moduli are not nonzero");
 }
-

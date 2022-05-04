@@ -12,6 +12,14 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_congruent_ui_p mpz_congruent_ui_p
+# define flint_mpz_add_ui mpz_add_ui
+# define flint_mpz_sub_ui mpz_sub_ui
+# define flint_mpz_cmp_ui mpz_cmp_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 /*
     Assumes that p is an odd prime, and that 0 <= a < p.

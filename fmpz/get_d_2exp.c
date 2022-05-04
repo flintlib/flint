@@ -11,6 +11,8 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#include "gmpcompat.h"
 
 double
 fmpz_get_d_2exp(slong *exp, const fmpz_t f)

@@ -23,6 +23,7 @@
 #endif
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 #include "mpfr.h"
 
 void

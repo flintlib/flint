@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 {

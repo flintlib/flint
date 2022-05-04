@@ -10,7 +10,12 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_fdiv_ui mpz_fdiv_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 ulong
 z_gcdinv(ulong * inv, slong a, ulong b)
@@ -36,10 +41,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
     int val;
 
     if (fmpz_is_zero(h))
-    {
-        flint_printf("Exception (fmpz_invmod). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_invmod\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,19 +10,11 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fq_nmod.h"
 
-flint_bitcnt_t
-_fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
+void
+fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
 {
-    fmpz_t norm;
-    flint_bitcnt_t bits;
-    fmpz_init(norm);
-
-    _fmpz_poly_2norm(norm, poly, len);
-
-    bits = fmpz_bits(norm);
-    fmpz_clear(norm);
-
-    return bits - fmpz_bits(poly + len - 1) + 1;
+    fmpz_set(f, fq_nmod_ctx_prime(ctx));
+    fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
 }

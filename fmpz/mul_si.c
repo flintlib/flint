@@ -11,6 +11,11 @@
 */
 
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_mul_si mpz_mul_si
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)

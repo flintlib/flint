@@ -10,6 +10,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+# define flint_mpz_get_ui mpz_get_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 ulong
 fmpz_get_ui(const fmpz_t f)

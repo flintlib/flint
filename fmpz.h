@@ -190,8 +190,6 @@ FLINT_DLL void fmpz_init_set_readonly(fmpz_t f, const mpz_t z);
 
 FLINT_DLL void fmpz_clear_readonly(fmpz_t f);
 
-FLINT_DLL int fmpz_abs_fits_ui(const fmpz_t f);
-
 FMPZ_INLINE
 int fmpz_is_pm1(const fmpz_t f)
 {
@@ -233,12 +231,6 @@ FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
 FLINT_DLL char * fmpz_get_str(char * str, int b, const fmpz_t f);
 
-FLINT_DLL int fmpz_cmp(const fmpz_t f, const fmpz_t g);
-
-FLINT_DLL int fmpz_cmp_ui(const fmpz_t f, ulong g);
-
-FLINT_DLL int fmpz_cmp_si(const fmpz_t f, slong g);
-
 FLINT_DLL int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
 FLINT_DLL int fmpz_cmp2abs(const fmpz_t f, const fmpz_t g);
@@ -269,32 +261,7 @@ int fmpz_is_odd(const fmpz_t f)
     }
 }
 
-FLINT_DLL mp_size_t fmpz_size(const fmpz_t f);
-
-FLINT_DLL int fmpz_sgn(const fmpz_t f);
-
-FLINT_DLL flint_bitcnt_t fmpz_bits(const fmpz_t f);
-
 FLINT_DLL flint_bitcnt_t fmpz_val2(const fmpz_t x);
-
-FMPZ_INLINE void
-fmpz_neg(fmpz_t f1, const fmpz_t f2)
-{
-    if (!COEFF_IS_MPZ(*f2))     /* coeff is small */
-    {
-        fmpz t = -*f2;          /* Need to save value in case of aliasing */
-        _fmpz_demote(f1);
-        *f1 = t;
-    }
-    else                        /* coeff is large */
-    {
-        /* No need to retain value in promotion, as if aliased, both already large */
-        __mpz_struct *mpz_res = _fmpz_promote(f1);
-        mpz_neg(mpz_res, COEFF_TO_PTR(*f2));
-    }
-}
-
-FLINT_DLL void fmpz_abs(fmpz_t f1, const fmpz_t f2);
 
 FLINT_DLL void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h);
 

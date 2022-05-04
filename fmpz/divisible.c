@@ -23,36 +23,23 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
     fmpz q = *p;
 
     if (y == WORD(0))
-    {
         return 1;
-    }
 
     if (q == WORD(0))
-    {
         return 0;
-    }
 
     if (!COEFF_IS_MPZ(y))
     {
         if (!COEFF_IS_MPZ(q))
-        {
             return !(y % q);
-        }
         else
-        {
             return 0;
-        }
     }
     else
     {
         if (!COEFF_IS_MPZ(q))
-        {
             return flint_mpz_divisible_ui_p(COEFF_TO_PTR(y), FLINT_ABS(q));
-        }
         else
-        {
             return mpz_divisible_p(COEFF_TO_PTR(y), COEFF_TO_PTR(q));
-        }
     }
 }
-

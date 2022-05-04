@@ -320,10 +320,8 @@ fmpz_poly_gcd_modular(fmpz_poly_t res, const fmpz_poly_t poly1,
             _fmpz_poly_gcd_modular(res->coeffs, poly1->coeffs, len1,
                                     poly2->coeffs, len2);
      
-    
             _fmpz_poly_set_length(res, len2);
             _fmpz_poly_normalise(res);
         }
     }
 }
-

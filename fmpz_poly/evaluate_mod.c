@@ -12,7 +12,6 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_limb_t a, 
                                   mp_limb_t n, mp_limb_t ninv)

@@ -423,24 +423,34 @@ FLINT_DLL
 void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
                                TEMPLATE(T, t) d, const TEMPLATE(T, ctx_t) ctx);
 
-/* Characteristic polynomial *************************************************/
+/* Characteristic polynomial ************************************************/
 
-/* this prototype really lives in fq_poly_templates.h 
- * FQ_MAT_TEMPLATES_INLINE
- * void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p, 
- *                          TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
- * {
- *   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
- * }
- */
+FLINT_DLL 
+void TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
+                      const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
-/* Minimal polynomial ********************************************************/
+FQ_MAT_TEMPLATES_INLINE
+void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
+                       const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx)
+{
+   TEMPLATE(T, mat_t) A;
 
-/* this prototype really lives in fq_poly_templates.h 
- * FLINT_DLL 
- * void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p, 
- *                   const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
- */
+   TEMPLATE(T, mat_init) (A, M->r, M->c, ctx);
+   TEMPLATE(T, mat_set) (A, M, ctx);
+
+   if (A->r != A->c)
+       flint_throw(FLINT_ERROR, "Non-square matrix in " TEMPLATE_STR(T) "mat_charpoly\n");
+
+   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+
+   TEMPLATE(T, mat_clear) (A, ctx);
+}
+
+/* Minimal polynomial ************************************************/
+
+FLINT_DLL 
+void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p, 
+                      const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
 
 #ifdef __cplusplus
 }

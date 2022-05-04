@@ -20,6 +20,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 #if defined(_WIN64) || defined(__mips64)
 
@@ -73,4 +74,3 @@ int fmpz_fits_si(const fmpz_t f)
 #endif
     }
 }
-

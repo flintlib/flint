@@ -10,7 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpf_fits_slong_p mpf_fits_slong_p
+# define flint_mpf_get_si mpf_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_set_mpf(fmpz_t f, const mpf_t x)

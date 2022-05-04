@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include <stdlib.h>
+#include "fmpz_mini.h"
 
 #ifndef __compar_fn_t
 #if defined(_MSC_VER)

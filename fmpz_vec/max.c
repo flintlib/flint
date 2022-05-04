@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 /* vec1 = pointwise max of vec1 and vec2 */
 void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len)

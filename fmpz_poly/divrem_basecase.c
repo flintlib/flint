@@ -70,16 +70,11 @@ fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     fmpz *q, *r;
     
     if (B->length == 0)
-    {
-        flint_printf("Exception (fmpz_poly_divrem_basecase). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_divrem_basecase\n");
+
     if (Q == R)
-    {
-        flint_printf("Exception (fmpz_poly_divrem_basecase). \n"
-               "Output arguments Q and R may not be aliased.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Aliasing between Q and R is not allowed in fmpz_poly_divrem_basecase\n");
+
     if (A->length < B->length)
     {
         fmpz_poly_set(R, A);

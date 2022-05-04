@@ -10,15 +10,12 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 {
     if (fmpz_sgn(g) < 0)
-    {
-        flint_printf("Exception (fmpz_sqrt). g is negative.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "g is negative in fmpz_sqrt\n");
     
     if (!COEFF_IS_MPZ(*g))
         fmpz_set_ui(f, n_sqrt(*g));

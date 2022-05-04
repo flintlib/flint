@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 
 int 
@@ -25,4 +26,3 @@ fmpz_fread(FILE * file, fmpz_t f)
 
     return (r > 0) ? 1 : 0;
 }
-

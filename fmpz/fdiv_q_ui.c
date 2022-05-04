@@ -10,7 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
@@ -19,10 +24,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     ulong c2 = h;
 
     if (h == 0)
-    {
-        flint_printf("Exception (fmpz_fdiv_q_ui). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_fdiv_q_ui\n");
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {

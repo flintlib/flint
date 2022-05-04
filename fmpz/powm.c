@@ -11,13 +11,18 @@
 */
 
 #include "fmpz.h"
+#ifdef LONGSLONG
+#define flint_mpz_init_set_si mpz_init_set_si
+#define flint_mpz_init_set_ui mpz_init_set_ui
+#else
+#include "gmpcompat.h"
+#endif
 
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 {
     if (fmpz_sgn(m) <= 0)
     {
-        flint_throw(FLINT_ERROR, "Exception in fmpz_powm: "
-                                                  "Modulus is less than 1.\n");
+        flint_throw(FLINT_ERROR, "Modulus is less than 1 in fmpz_powm\n");
     }
     else if (!COEFF_IS_MPZ(*e))  /* e is small */
     {
@@ -32,8 +37,7 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
             if (!fmpz_invmod(g_inv, g, m))
             {
                 fmpz_clear(g_inv);
-                flint_throw(FLINT_ERROR, "Exception in fmpz_powm: "
-                                                 "Base is not invertible.\n");
+                flint_throw(FLINT_ERROR, "Base not invertible in fmpz_powm\n");
             }
             else
             {

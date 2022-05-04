@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 void
 _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, slong len2)

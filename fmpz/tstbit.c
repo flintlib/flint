@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 int fmpz_tstbit(const fmpz_t f, ulong i)
 {

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "flint-impl.h"
 
 int
 fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)

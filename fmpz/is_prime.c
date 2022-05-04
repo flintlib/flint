@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "mpn_extras.h"
 #include "fmpz.h"
 #include "nmod_vec.h"
@@ -283,9 +284,9 @@ int fmpz_is_prime(const fmpz_t n)
       this fallback here */
    if (res < 0)
    {
-      flint_printf("Exception in fmpz_is_prime: failed to prove ");
+      printf("Flint exception (General error): fmpz_is_prime failed to prove that ");
       fmpz_print(n);
-      flint_printf(" prime or composite\n");
+      printf("is a prime or composite\n");
       flint_abort();
    }
 

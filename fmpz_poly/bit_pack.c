@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "flint-impl.h"
 
 void
 _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len,

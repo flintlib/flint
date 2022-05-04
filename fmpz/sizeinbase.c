@@ -11,6 +11,7 @@
 
 #include "flint.h"
 #include "long_extras.h"
+#include "fmpz-conversions.h"
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
 {

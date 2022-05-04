@@ -10,6 +10,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+# define flint_mpz_get_si mpz_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 slong 
 fmpz_get_si(const fmpz_t f)

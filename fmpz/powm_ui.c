@@ -12,14 +12,18 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_init_set_ui mpz_init_set_ui
+# define flint_mpz_init_set_si mpz_init_set_si
+# define flint_mpz_powm_ui mpz_powm_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 {
     if (fmpz_sgn(m) <= 0)
-    {
-        flint_printf("Exception (fmpz_powm_ui). Modulus is less than 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Modulus is less than 1 in fmpz_powm_ui\n");
 
     if (fmpz_is_one(m))
     {

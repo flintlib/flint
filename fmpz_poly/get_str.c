@@ -10,7 +10,9 @@
 */
 
 #include <math.h>
+#include <stdio.h>
 #include "fmpz.h"
+#include "flint-impl.h"
 
 char *
 _fmpz_poly_get_str(const fmpz * poly, slong len)
@@ -34,11 +36,11 @@ _fmpz_poly_get_str(const fmpz * poly, slong len)
     strbase = (char *) flint_malloc(bound * sizeof(char));
     str = strbase;
 
-    str += flint_sprintf(str, "%wd ", len);
+    str += sprintf(str, WORD_FMT "d ", len);
     do
     {
         if (!COEFF_IS_MPZ(*poly))
-            str += flint_sprintf(str, " %wd", *poly);
+            str += sprintf(str, " " WORD_FMT "d", *poly);
         else
             str += gmp_sprintf(str, " %Zd", COEFF_TO_PTR(*poly));
     } while (poly++, --len);

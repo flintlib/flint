@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "flint-impl.h"
 
 slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
                        const fmpz * coeffs_m, slong l, slong length)

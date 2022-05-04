@@ -22,7 +22,6 @@
 
 
 #include "fq.h"
-#include "fq_vec.h"
 
 /* Cutoff between classical and recursive triangular solving */
 #define FQ_MAT_SOLVE_TRI_ROWS_CUTOFF 64

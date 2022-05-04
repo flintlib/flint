@@ -10,7 +10,7 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #include "fmpz_factor.h"
 
 int
@@ -41,4 +41,3 @@ fmpz_moebius_mu(const fmpz_t n)
 
     return mu;
 }
-

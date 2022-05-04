@@ -9,12 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "flint.h"
+#include "flint-impl.h"
+#include "fmpz-conversions.h"
 
 int fmpz_print(const fmpz_t x)
 {
 	if (!COEFF_IS_MPZ(*x)) 
-        return flint_printf("%wd", *x);
+        return printf(WORD_FMT "d", *x);
 	else 
         return (int) mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
 }

@@ -10,6 +10,12 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#ifdef LONGSLONG
+# define flint_mpz_init_set_si mpz_init_set_si
+#else
+# include "gmpcompat.h"
+#endif
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 {
@@ -35,4 +41,3 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
     return str;
 }
-

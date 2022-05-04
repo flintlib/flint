@@ -11,6 +11,11 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_pow_ui mpz_pow_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)

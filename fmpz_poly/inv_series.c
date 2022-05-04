@@ -28,10 +28,7 @@ fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
     Qlen = FLINT_MIN(Qlen, n);
 
     if (Qlen == 0)
-    {
-        flint_printf("Exception (fmpz_poly_inv_series). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_inv_series\n");
 
     if (Qinv != Q)
     {

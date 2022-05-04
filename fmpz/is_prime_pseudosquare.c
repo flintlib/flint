@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -201,10 +202,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
    }      
 #endif
    else
-   {
-      flint_printf("Exception (fmpz_set_pseudosquare). Index too large.\n");
-      flint_abort();
-   }
+      flint_throw(FLINT_ERROR, "Index too large in fmpz_set_pseudosquare\n");
 }
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n)
@@ -290,9 +288,10 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
            ret = 1;
            goto cleanup;
         }
-        flint_printf("Whoah, ");
+        printf("Whoah, ");
         fmpz_print(n);
-        flint_printf("is a probable prime, but not prime, please report!!\n");
+        printf("is a probable prime, but not prime, please report!!\n");
+        fflush(stdout);
         flint_abort();
     }
     else
@@ -314,15 +313,17 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
             }
             if (!fmpz_is_one(mod))
             {
-                flint_printf("Whoah, ");
+                printf("Whoah, ");
                 fmpz_print(n);
-                flint_printf("is a probable prime, but not prime, please report!!\n");
+                printf("is a probable prime, but not prime, please report!!\n");
+                fflush(stdout);
                 flint_abort();
             }
         }
-        flint_printf("Whoah, ");
+        printf("Whoah, ");
         fmpz_print(n);
-        flint_printf("is a probable prime, but not prime, please report!!\n");
+        printf("is a probable prime, but not prime, please report!!\n");
+        fflush(stdout);
         flint_abort();
     }
 

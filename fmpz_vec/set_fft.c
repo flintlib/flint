@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#include "flint-impl.h"
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
                           const mp_ptr * coeffs_f, slong limbs, slong sign)

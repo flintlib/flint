@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_cdiv_q_ui mpz_cdiv_q_ui
 # define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui

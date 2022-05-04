@@ -10,7 +10,14 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_divisible_ui_p mpz_divisible_ui_p
+# define flint_mpz_init_set_ui mpz_init_set_ui
+# define flint_mpz_divexact_ui mpz_divexact_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 {
@@ -102,10 +109,7 @@ slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
     double finv;
 
     if ((fmpz_sgn(f) <= 0) || fmpz_is_one(f))
-    {
-        flint_printf("Exception (fmpz_remove). factor f <= 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "factor f <= 1 in fmpz_remove\n");
 
     if (rop == f)
     {

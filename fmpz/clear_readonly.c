@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 void fmpz_clear_readonly(fmpz_t f)
 {
@@ -22,4 +22,3 @@ void fmpz_clear_readonly(fmpz_t f)
         *f = WORD(0);
     }
 }
-

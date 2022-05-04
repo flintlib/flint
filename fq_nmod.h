@@ -22,9 +22,9 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "fmpz_mini.h"
 #include "nmod.h"
 #include "nmod_poly.h"
-#include "fmpz.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
@@ -62,11 +62,7 @@ FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 
 #define fq_nmod_ctx_prime(ctx)  (&((ctx)->p))
 
-FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
-{
-    fmpz_set(f, fq_nmod_ctx_prime(ctx));
-    fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
-}
+FLINT_DLL void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx);
 
 /* Memory managment  *********************************************************/
 
@@ -218,15 +214,7 @@ FQ_NMOD_INLINE void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op,
     nmod_poly_set(rop, op);
 }
 
-FQ_NMOD_INLINE void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx)
-{
-    fmpz_t rx;
-    fmpz_init(rx);
-    fmpz_mod(rx, x, fq_nmod_ctx_prime(ctx));
-    nmod_poly_zero(rop);
-    nmod_poly_set_coeff_ui(rop, 0, fmpz_get_ui(rx));
-    fmpz_clear(rx);
-}
+FLINT_DLL void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx);
 
 FQ_NMOD_INLINE void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx)
 {
@@ -305,64 +293,7 @@ FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
   || defined (__STDIO_LOADED)       \
   || defined (_STDIO)               \
   || defined (__DEFINED_FILE)
-
-#include "flint-impl.h"
-
-/* TODO */
-FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
-{
-    int r;
-    slong i, k;
-
-    r = fprintf(file, "p = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_fprint(file, fq_nmod_ctx_prime(ctx));
-    if (r <= 0)
-        return r;
-
-    r = fprintf(file, "\nd = " WORD_FMT "d\nf(X) = ", ctx->j[ctx->len - 1]);
-    if (r <= 0)
-        return r;
-
-    r = fprintf(file, WORD_FMT "u", ctx->a[0]);
-    if (r <= 0)
-        return r;
-
-    for (k = 1; k < ctx->len; k++)
-    {
-        i = ctx->j[k];
-        r = fprintf(file, " + ");
-        if (r <= 0)
-            return r;
-
-        if (ctx->a[k] == UWORD(1))
-        {
-            if (i == 1)
-                r = fprintf(file, "X");
-            else
-                r = fprintf(file, "X^" WORD_FMT "d", i);
-            if (r <= 0)
-                return r;
-        }
-        else
-        {
-            r = fprintf(file, WORD_FMT "u", ctx->a[k]);
-            if (r <= 0)
-                return r;
-
-            if (i == 1)
-                r = fprintf(file, "*X");
-            else
-                r = fprintf(file, "*X^" WORD_FMT "d", i);
-            if (r <= 0)
-                return r;
-        }
-    }
-    r = fprintf(file, "\n");
-    return r;
-}
+FLINT_DLL int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx);
 
 FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
 {
@@ -450,4 +381,3 @@ FLINT_DLL void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx);
 #endif
 
 #endif
-

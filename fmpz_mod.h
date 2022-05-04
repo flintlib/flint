@@ -19,6 +19,7 @@
 #endif
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 #ifdef __cplusplus
  extern "C" {

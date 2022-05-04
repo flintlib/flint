@@ -19,22 +19,9 @@
 #define FMPZ_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "mpoly.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mod.h"
-#include "n_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -184,7 +171,6 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
    }
 }
 
-
 /* Input/output **************************************************************/
 
 FLINT_DLL int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t A, const char * str,
@@ -197,6 +183,23 @@ FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
 FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
@@ -218,7 +221,7 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
 {
    return fmpz_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
-
+#endif
 
 /*  Basic manipulation *******************************************************/
 
@@ -1438,6 +1441,24 @@ void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
 
 ******************************************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+#include "flint-impl.h"
 /*
    test that r is a valid remainder upon division by g
    this means that if c*x^a is a term of r and x^a is divisible by the leading
@@ -1480,9 +1501,11 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
         if (divides && fmpz_cmpabs(g->coeffs + 0, r->coeffs + i) <= 0)
         {
-            flint_printf("fmpz_mpoly_remainder_test FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            printf("fmpz_mpoly_remainder_test FAILED i = " WORD_FMT "d\nrem ", i);
+            fmpz_mpoly_print_pretty(r, NULL, ctx);
+            printf("\n\nden ");
+            fmpz_mpoly_print_pretty(g, NULL, ctx);
+            printf("\n\n");
             flint_abort();
         }
     }
@@ -1533,9 +1556,11 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
         if (divides)
         {
-            flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            printf("fmpz_mpoly_remainder_strongtest FAILED i = " WORD_FMT "d\nrem ", i);
+            fmpz_mpoly_print_pretty(r, NULL, ctx);
+            printf("\n\nden ");
+            fmpz_mpoly_print_pretty(g, NULL, ctx);
+            printf("\n\n");
             flint_abort();
         }
     }
@@ -1543,6 +1568,7 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
     flint_free(rexp);
     flint_free(gexp);
 }
+#endif
 
 #ifdef __cplusplus
 }

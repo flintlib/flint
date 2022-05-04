@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
 
 void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
 {

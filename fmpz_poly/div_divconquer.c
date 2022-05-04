@@ -116,10 +116,7 @@ fmpz_poly_div_divconquer(fmpz_poly_t Q,
     fmpz *q;
 
     if (lenB == 0)
-    {
-        flint_printf("Exception (fmpz_poly_div_divconquer). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_div_divconquer\n");
 
     if (lenA < lenB)
     {

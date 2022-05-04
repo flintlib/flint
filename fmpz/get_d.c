@@ -10,6 +10,8 @@
 */
 
 #include "flint.h"
+#include "fmpz-conversions.h"
+#include "gmpcompat.h"
 
 #if FLINT64   /* 2^53 */
 #define DOUBLE_MAX WORD(9007199254740992)

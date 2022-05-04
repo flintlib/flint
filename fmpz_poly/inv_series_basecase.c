@@ -9,6 +9,33 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   if _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    ifdef __DECC
+#     define alloca(x) __ALLOCA(x)
+#    else
+#     ifdef BSD
+#      include <stdlib.h>
+#     else
+#      error Could not find alloca
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+#include "flint-impl.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
@@ -200,10 +227,7 @@ fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
     Qlen = FLINT_MIN(Qlen, n);
 
     if (Qlen == 0)
-    {
-        flint_printf("Exception (fmpz_poly_inv_series_basecase). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_inv_series_basecase\n");
 
     if (Qinv != Q)
     {

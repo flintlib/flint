@@ -26,3 +26,18 @@ fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 {
     _fmpz_poly_2norm(res, poly->coeffs, poly->length);
 }
+
+flint_bitcnt_t
+_fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
+{
+    fmpz_t norm;
+    flint_bitcnt_t bits;
+    fmpz_init(norm);
+
+    _fmpz_poly_2norm(norm, poly, len);
+
+    bits = fmpz_bits(norm);
+    fmpz_clear(norm);
+
+    return bits - fmpz_bits(poly + len - 1) + 1;
+}

@@ -9,7 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_add_ui mpz_add_ui
+# define flint_mpz_sub_ui mpz_sub_ui
+# define flint_mpz_ui_sub mpz_ui_sub
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)

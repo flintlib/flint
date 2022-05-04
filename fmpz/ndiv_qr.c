@@ -61,10 +61,7 @@ fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
     slong B = *b;
 
     if (fmpz_is_zero(b))
-    {
-        flint_printf("Exception: division by zero in fmpz_ndiv_qr\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_ndiv_qr\n");
 
     if (!COEFF_IS_MPZ(A) && !COEFF_IS_MPZ(B))
     {

@@ -10,7 +10,8 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#include "flint-impl.h"
 
 int
 fmpz_root(fmpz_t r, const fmpz_t f, slong n)
@@ -18,10 +19,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     fmpz c = *f;
     
     if (n <= 0)
-    {
-        flint_printf("Exception (fmpz_root). Unable to take %wd-th root.\n", n);
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Unable to take " WORD_FMT "d-th root in fmpz_root\n", n);
 
     if (n == 1)
     {
@@ -37,15 +35,13 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
         if (n == 2)
         {
             if (sgn)
-            {
-                flint_printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
-                flint_abort();
-            }
+                flint_throw(FLINT_ERROR, "Unable to take square root of negative value\n", n);
 
             root = n_sqrtrem(&rem, c);
             fmpz_set_ui(r, root);
             return rem == 0;
-        } else if (n == 3)
+        }
+        else if (n == 3)
         {
             if (sgn)
                 c = -c;
@@ -53,23 +49,22 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
             root = n_cbrtrem(&rem, c);
             fmpz_set_si(r, sgn ? -root : root);
             return rem == 0;
-        } else /* n > 3 */
+        }
+        else /* n > 3 */
         {
             if (sgn)
             {
                 if ((n & 1) == 0) /* even root */
-                {
-                    flint_printf("Exception (fmpz_root). Unable to take %wd-th root of negative value.\n", n);
-                    flint_abort();
-                } else /* odd */
-                    c = -c;
+                    flint_throw(FLINT_ERROR, "Unable to take " WORD_FMT "d-th root of a negative value\n", n);
+                c = -c;
             }
             
             root = n_rootrem(&rem, c, n);
             fmpz_set_si(r, sgn ? -root : root);
             return rem == 0;
         }
-    } else /* f is large */
+    }
+    else /* f is large */
     {
         __mpz_struct * mpz2 = COEFF_TO_PTR(c);
         __mpz_struct * mpz1 = _fmpz_promote(r);

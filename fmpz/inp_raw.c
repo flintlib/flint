@@ -9,18 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 
-size_t fmpz_inp_raw( fmpz_t x, FILE *fin ) 
+size_t fmpz_inp_raw(fmpz_t x, FILE * fin) 
 {
     mpz_t v;
     size_t size;
 
-    mpz_init( v );
-    size = mpz_inp_raw( v, fin );
-    fmpz_set_mpz( x, v );
-    mpz_clear( v );
+    mpz_init(v);
+    size = mpz_inp_raw(v, fin);
+    fmpz_set_mpz(x, v);
+    mpz_clear(v);
 
     return size;
 }
-

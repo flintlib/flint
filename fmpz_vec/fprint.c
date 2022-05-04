@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "flint-impl.h"
 #include "fmpz.h"
 
 /*
@@ -30,7 +32,7 @@ int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len)
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%li", len);
+    r = fprintf(file, WORD_FMT "d", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

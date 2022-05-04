@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #include "fmpz_poly.h"
 
 void
@@ -78,4 +78,3 @@ fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
         }
     }
 }
-

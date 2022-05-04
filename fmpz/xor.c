@@ -9,7 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_init_set_si mpz_init_set_si
+#else
+# include "gmpcompat.h"
+#endif
 
 void fmpz_xor(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {

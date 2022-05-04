@@ -9,10 +9,31 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#ifndef strcmp
+# ifdef __GNUC__
+#  define strcmp __builtin_strcmp
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strcpy
+# ifdef __GNUC__
+#  define strcpy __builtin_strcpy
+# else
+#  include <string.h>
+# endif
+#endif
+#include <stdio.h>
 #include <ctype.h>
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "flint-impl.h"
+
+#ifdef LONGSLONG
+# define flint_mpz_get_si mpz_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 static __inline__
 int is_varsymbol0(char c)

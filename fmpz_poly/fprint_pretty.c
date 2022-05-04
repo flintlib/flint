@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "flint-impl.h"
 
 int _fmpz_poly_fprint_pretty(FILE * file, 
                              const fmpz * poly, slong len, const char * x)
@@ -35,24 +37,24 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     {
         if (*(poly + 1) == WORD(1))
         {
-            r = flint_fprintf(file, "%s", x);
+            r = fprintf(file, "%s", x);
         }
         else if (*(poly + 1) == WORD(-1))
         {
-            r = flint_fprintf(file, "-%s", x);
+            r = fprintf(file, "-%s", x);
         }
         else
         {
             r = fmpz_fprint(file, poly + 1);
             if (r > 0)
-                r = flint_fprintf(file, "*%s", x);
+                r = fprintf(file, "*%s", x);
         }
         
         if (r > 0)
         {
             if (fmpz_sgn(poly + 0) > 0)
             {
-                r = flint_fprintf(file, "+");
+                r = fprintf(file, "+");
                 if (r > 0)
                     r = fmpz_fprint(file, poly + 0);
             }
@@ -68,14 +70,14 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     r = 1;
     {
         if (*(poly + i) == 1)
-           r = flint_fprintf(file, "%s^%wd", x, i);
+           r = fprintf(file, "%s^" WORD_FMT "d", x, i);
         else if (*(poly + i) == -1)
-           r = flint_fprintf(file, "-%s^%wd", x, i);
+           r = fprintf(file, "-%s^" WORD_FMT "d", x, i);
         else
         {
            r = fmpz_fprint(file, poly + i);
            if (r > 0)
-              r = flint_fprintf(file, "*%s^%wd", x, i);
+              r = fprintf(file, "*%s^" WORD_FMT "d", x, i);
         }
         --i;
     }
@@ -86,9 +88,9 @@ int _fmpz_poly_fprint_pretty(FILE * file,
             continue;
 
         if (*(poly + i) == 1)
-            r = flint_fprintf(file, "+%s^%wd", x, i);
+            r = fprintf(file, "+%s^" WORD_FMT "d", x, i);
         else if (*(poly + i) == -1)
-            r = flint_fprintf(file, "-%s^%wd", x, i);
+            r = fprintf(file, "-%s^" WORD_FMT "d", x, i);
         else
         {
             if (fmpz_sgn(poly + i) > 0)
@@ -99,7 +101,7 @@ int _fmpz_poly_fprint_pretty(FILE * file,
             if (r > 0)
                 r = fmpz_fprint(file, poly + i);
             if (r > 0)
-                r = flint_fprintf(file, "*%s^%wd", x, i);
+                r = fprintf(file, "*%s^" WORD_FMT "d", x, i);
         }
     }
 
@@ -165,4 +167,3 @@ int fmpz_poly_fprint_pretty(FILE * file,
 {
     return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
 }
-

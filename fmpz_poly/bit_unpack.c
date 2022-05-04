@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "flint-impl.h"
 
 int
 _fmpz_poly_bit_unpack(fmpz * poly, slong len,
@@ -71,10 +72,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
     mpz_t tmp;
 
     if (fmpz_sgn(f) < 0)
-    {
-        flint_printf("Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Recieved f < 0 in fmpz_poly_bit_unpack_unsigned\n");
 
     if (bit_size == 0 || fmpz_is_zero(f))
     {

@@ -45,10 +45,7 @@ slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
         fmpz_mod(t, fmpz_poly_lead(f), P);
 
         if (fmpz_invmod(t, t, P) == 0)
-        {
-            flint_printf("Exception (fmpz_poly_continue_hensel_lift).\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "fmpz_poly_continue_hensel_lift\n");
 
         fmpz_poly_scalar_mul_fmpz(monic_f, f, t);
         fmpz_poly_scalar_mod_fmpz(monic_f, monic_f, P);

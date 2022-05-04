@@ -11,6 +11,11 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
+#ifdef LONGSLONG
+# define flint_mpz_init_set_ui mpz_init_set_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
 {

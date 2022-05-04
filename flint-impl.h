@@ -222,4 +222,9 @@
         (xxx)[ixxx] = yyy;                      \
     } while (0)
 
+#define FLINT_MPZ_REALLOC(z, len)       \
+    ((len) > ((z)->_mp_alloc)           \
+        ? (mp_ptr) _mpz_realloc(z, len) \
+        : ((z)->_mp_d))
+
 #endif

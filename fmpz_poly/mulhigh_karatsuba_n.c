@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include <gmp.h>
-#include "flint.h"
+#ifndef memcpy
+# ifdef __GNUC__
+#  define memcpy __builtin_memcpy
+# else
+#  include <string.h>
+# endif
+#endif
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
