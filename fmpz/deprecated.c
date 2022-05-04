@@ -11,19 +11,17 @@
 
 #include "fmpz.h"
 
-/* deprecated functions *****************************************************/
-
-void fmpz_multi_crt_init(fmpz_multi_crt_t P)
+void fmpz_deprecated_multi_crt_init(fmpz_multi_crt_t P)
 {
     fmpz_multi_CRT_init(P);
 }
 
-void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
+void fmpz_deprecated_multi_crt_clear(fmpz_multi_crt_t P)
 {
     fmpz_multi_CRT_clear(P);
 }
 
-int fmpz_multi_crt_precompute(
+int fmpz_deprecated_multi_crt_precompute(
     fmpz_multi_crt_t P,
     const fmpz * moduli,
     slong len)
@@ -31,7 +29,7 @@ int fmpz_multi_crt_precompute(
     return fmpz_multi_CRT_precompute(P, moduli, len);
 }
 
-int fmpz_multi_crt_precompute_p(
+int fmpz_deprecated_multi_crt_precompute_p(
     fmpz_multi_crt_t P,
     const fmpz * const * moduli,
     slong len)
@@ -50,7 +48,7 @@ int fmpz_multi_crt_precompute_p(
     return success;
 }
 
-void fmpz_multi_crt_precomp(
+void fmpz_deprecated_multi_crt_precomp(
     fmpz_t output,
     const fmpz_multi_crt_t P,
     const fmpz * inputs)
@@ -58,7 +56,7 @@ void fmpz_multi_crt_precomp(
     fmpz_multi_CRT_precomp(output, P, inputs, 1);
 }
 
-void fmpz_multi_crt_precomp_p(
+void fmpz_deprecated_multi_crt_precomp_p(
     fmpz_t output,
     const fmpz_multi_crt_t P,
     const fmpz * const * inputs)
@@ -74,7 +72,7 @@ void fmpz_multi_crt_precomp_p(
     flint_free(ins);
 }
 
-int fmpz_multi_crt(
+int fmpz_deprecated_multi_crt(
     fmpz_t output,
     const fmpz * moduli,
     const fmpz * values,
@@ -83,7 +81,7 @@ int fmpz_multi_crt(
     return fmpz_multi_CRT(output, moduli, values, len, 1);
 }
 
-void _fmpz_multi_crt_run(
+void _fmpz_deprecated_multi_crt_run(
     fmpz * outputs,
     const fmpz_multi_crt_t P,
     const fmpz * inputs)
@@ -91,7 +89,12 @@ void _fmpz_multi_crt_run(
     _fmpz_multi_CRT_precomp(outputs, P, inputs, 1);
 }
 
-void _fmpz_multi_crt_run_p(
+slong _fmpz_deprecated_multi_crt_local_size(const fmpz_multi_crt_t CRT)
+{
+    return CRT->localsize;
+}
+
+void _fmpz_deprecated_multi_crt_run_p(
     fmpz * outputs,
     const fmpz_multi_crt_t P,
     const fmpz * const * inputs)

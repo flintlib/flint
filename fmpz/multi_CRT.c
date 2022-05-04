@@ -21,7 +21,7 @@ int fmpz_multi_CRT(
 {
     int success;
     slong i;
-    fmpz_multi_crt_t P;
+    fmpz_multi_CRT_t P;
     fmpz * out;
     TMP_INIT;
 
