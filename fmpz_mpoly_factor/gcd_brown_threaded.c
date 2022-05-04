@@ -339,7 +339,7 @@ static void _find_edge(
 }
 
 static slong _fmpz_mpoly_crt(
-    const fmpz_multi_crt_t P,
+    const fmpz_multi_CRT_t P,
     _joinworker_arg_struct * S,
     fmpz_mpoly_struct * const * B,
     slong count,
@@ -353,17 +353,22 @@ static slong _fmpz_mpoly_crt(
     slong Ai;
     slong j, k;
     slong * start, * stop;
+    fmpz * ins;
     fmpz_t zero, max, sum;
     fmpz_mpoly_t A;
     const ulong * exp_left = S->left_exp;
     const ulong * exp_right = S->right_exp;
     TMP_INIT;
 
+    FLINT_ASSERT(count > 0);
+    FLINT_ASSERT(count == P->moduli_count);
+
     *A = *S->poly;
 
     TMP_START;
 
-    start = (slong *) TMP_ALLOC(2*count*sizeof(slong));
+    ins = TMP_ARRAY_ALLOC(count, fmpz);
+    start = TMP_ARRAY_ALLOC(2*count, slong);
     stop = start + count;
 
     for (k = 0; k < count; k++)
@@ -471,7 +476,12 @@ static slong _fmpz_mpoly_crt(
             }
         }
 
-        _fmpz_multi_crt_run_p(output, P, (const fmpz * const *) input);
+        k = 0;
+        do {
+            ins[k] = *input[k];
+        } while (++k < count);
+
+        _fmpz_multi_CRT_precomp(output, P, ins, 1);
         fmpz_swap(A->coeffs + Ai, output + 0);
         cmp = fmpz_sgn(A->coeffs + Ai);
         if (cmp != 0)
@@ -509,7 +519,7 @@ typedef struct
     pthread_mutex_t mutex;
 #endif
     const fmpz_mpoly_ctx_struct * ctx;
-    fmpz_multi_crt_t CRT;
+    fmpz_multi_CRT_t CRT;
     fmpz_mpoly_struct ** gptrs, ** abarptrs, ** bbarptrs;
     fmpz_mpoly_struct * G, * Abar, * Bbar;
     _joinworker_arg_struct * chunks;
@@ -533,7 +543,7 @@ static void _joinworker(void * varg)
     _joinbase_struct * base = arg->base;
     fmpz ** input;
     fmpz * output;
-    slong i, ls = _fmpz_multi_crt_local_size(base->CRT);
+    slong i, ls = base->CRT->localsize;
     TMP_INIT;
 
     TMP_START;
@@ -738,7 +748,7 @@ int fmpz_mpolyl_gcd_brown_threaded_pool(
     fmpz maxcoeff_Gs_Abars_Bbars[3];
     fmpz sumcoeff_Gs_Abars_Bbars[3];
     fmpz_t cA, cB, cG, cAbar, cBbar;
-    fmpz ** mptrs;
+    fmpz * moduli;
     fmpz_mpoly_struct ** gptrs, ** abarptrs, ** bbarptrs;
     fmpq * qvec;
     _splitworker_arg_struct * splitargs;
@@ -782,16 +792,11 @@ int fmpz_mpolyl_gcd_brown_threaded_pool(
         if compute_split is jumped back to, there could be as many as
         num_threads + 1 images that need to be joined.
     */
-    gptrs = (fmpz_mpoly_struct **) flint_malloc(
-                                (num_threads + 1)*sizeof(fmpz_mpoly_struct *));
-    abarptrs = (fmpz_mpoly_struct **) flint_malloc(
-                                (num_threads + 1)*sizeof(fmpz_mpoly_struct *));
-    bbarptrs = (fmpz_mpoly_struct **) flint_malloc(
-                                (num_threads + 1)*sizeof(fmpz_mpoly_struct *));
-    mptrs = (fmpz **) flint_malloc((num_threads + 1)*sizeof(fmpz *));
-
-    splitargs = (_splitworker_arg_struct *) flint_malloc(
-                                  num_threads*sizeof(_splitworker_arg_struct));
+    gptrs = FLINT_ARRAY_ALLOC(num_threads + 1, fmpz_mpoly_struct *);
+    abarptrs = FLINT_ARRAY_ALLOC(num_threads + 1, fmpz_mpoly_struct *);
+    bbarptrs =FLINT_ARRAY_ALLOC(num_threads + 1, fmpz_mpoly_struct *);
+    moduli = FLINT_ARRAY_ALLOC(num_threads + 1, fmpz); /* shallow copies */
+    splitargs = FLINT_ARRAY_ALLOC(num_threads, _splitworker_arg_struct);
     for (i = 0; i < num_threads; i++)
     {
         fmpz_mpoly_init3(splitargs[i].G, 0, bits, ctx);
@@ -912,7 +917,7 @@ compute_split:
         gptrs[num_images] = G;
         abarptrs[num_images] = Abar;
         bbarptrs[num_images] = Bbar;
-        mptrs[num_images] = modulus;
+        moduli[num_images] = *modulus;
         num_images++;
     }
 
@@ -922,7 +927,7 @@ compute_split:
         gptrs[num_images] = splitargs[i].G;
         abarptrs[num_images] = splitargs[i].Abar;
         bbarptrs[num_images] = splitargs[i].Bbar;
-        mptrs[num_images] = splitargs[i].modulus;
+        moduli[num_images] = *splitargs[i].modulus;
         num_images++;
         i++;
     }
@@ -949,7 +954,7 @@ compute_split:
             gptrs[num_images] = splitargs[i].G;
             abarptrs[num_images] = splitargs[i].Abar;
             bbarptrs[num_images] = splitargs[i].Bbar;
-            mptrs[num_images] = splitargs[i].modulus;
+            moduli[num_images] = *splitargs[i].modulus;
             num_images++;
         }
         FLINT_ASSERT(num_images <= num_master_threads + 1);
@@ -957,9 +962,8 @@ compute_split:
 
     /* now must join ptrs[0], ..., ptrs[num_images-1] where num_images > 0 */
     FLINT_ASSERT(num_images > 0);
-    fmpz_multi_crt_init(joinbase->CRT);
-    success = fmpz_multi_crt_precompute_p(joinbase->CRT,
-                                     (const fmpz * const *) mptrs, num_images);
+    fmpz_multi_CRT_init(joinbase->CRT);
+    success = fmpz_multi_CRT_precompute(joinbase->CRT, moduli, num_images);
     FLINT_ASSERT(success);
 
     joinbase->num_images = num_images;
@@ -1100,7 +1104,7 @@ compute_split:
 #endif
     
     /* free join data */
-    fmpz_multi_crt_clear(joinbase->CRT);
+    fmpz_multi_CRT_clear(joinbase->CRT);
     for (i = 0; i < joinbase->chunks_length; i++)
     {
         fmpz_mpoly_clear(joinbase->chunks[i].poly, ctx);
@@ -1111,12 +1115,10 @@ compute_split:
     flint_free(joinbase->chunks);
     flint_free(joinargs);
 
-    /* update modulus - modulus could be one of the mptrs */
+    /* update modulus - modulus could be one of the moduli[i] */
     fmpz_one(temp);
     for (i = 0; i < num_images; i++)
-    {
-        fmpz_mul(temp, temp, mptrs[i]);
-    }
+        fmpz_mul(temp, temp, moduli + i);
     fmpz_swap(modulus, temp);
 
     for (i = 1; i < 3; i++)
@@ -1169,7 +1171,7 @@ cleanup_split:
     flint_free(gptrs);
     flint_free(abarptrs);
     flint_free(bbarptrs);
-    flint_free(mptrs);
+    flint_free(moduli); /* they were just shallow copies */
     flint_free(splitargs);
 
     _fmpq_vec_clear(qvec, num_threads);

@@ -85,7 +85,7 @@ doit:
 
 void fmpz_multi_CRT_precomp(
     fmpz_t output,
-    const fmpz_multi_crt_t P,
+    const fmpz_multi_CRT_t P,
     const fmpz * inputs,
     int sign)
 {
