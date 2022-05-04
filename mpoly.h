@@ -412,15 +412,17 @@ void mpoly_monomial_madd_fmpz(ulong * exp1, const ulong * exp2,
     }
 }
 
+/* mask with high bit set in each field of exponent vector */
 MPOLY_INLINE
 ulong mpoly_overflow_mask_sp(flint_bitcnt_t bits)
 {
-    slong i;
+    flint_bitcnt_t i;
     ulong mask = 0;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-    for (i = 0; i < FLINT_BITS/bits; i++)
+    mask = (UWORD(1) << (bits - 1));
+    for (i = bits; i < FLINT_BITS; i += bits)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
     return mask;

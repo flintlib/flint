@@ -40,9 +40,7 @@ int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
 
     N = mpoly_words_per_exp(bits, zctx->minfo);
 
-    mask = 0; /* mask will be unused if bits > FLINT_BITS*/
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);

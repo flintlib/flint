@@ -1492,9 +1492,10 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
    mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
 
-   /* mask with high bit set in each field of exponent vector */
-   for (i = 0; i < FLINT_BITS/bits; i++)
-      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    if (bits <= FLINT_BITS)
+        mask = mpoly_overflow_mask_sp(bits);
+    else
+        mask = 0;
 
     for (i = 0; i < r->length; i++)
     {
@@ -1545,9 +1546,10 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
     mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
     mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
 
-    /* mask with high bit set in each field of exponent vector */
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    if (bits <= FLINT_BITS)
+        mask = mpoly_overflow_mask_sp(bits);
+    else
+        mask = 0;
 
     for (i = 0; i < r->length; i++)
     {

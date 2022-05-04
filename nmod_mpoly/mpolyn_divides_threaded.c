@@ -949,10 +949,7 @@ static slong _nmod_mpolyn_divides_stripe1(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     Qlen = WORD(0);
 
@@ -1195,10 +1192,7 @@ static slong _nmod_mpolyn_divides_stripe(
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    /* mask with high bit set in each word of each field of exponent vector */
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     Qlen = WORD(0);
 
@@ -1524,19 +1518,13 @@ static void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_le
 static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
 {
     divides_heap_base_struct * H = W->H;
-    slong i;
     slong N = H->N;
     nmod_mpolyn_struct * C = L->polyC;
     slong q_prev_length;
-    ulong mask;
     const nmod_mpolyn_struct * B = H->polyB;
     const nmod_mpolyn_struct * A = H->polyA;
     nmod_mpolyn_ts_struct * Q = H->polyQ;
     nmod_mpolyn_struct * T2 = W->polyT2;
-
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/H->bits; i++)
-        mask = (mask << H->bits) + (UWORD(1) << (H->bits - 1));
 
     /* return if this section has already finished processing */
     if (L->mq < 0)
@@ -1834,9 +1822,7 @@ int nmod_mpolyn_divides_threaded_pool(
 
     mpoly_monomial_add(texps, qexps + N*0, B->exps + N*1, N);
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     k = 1;
     while (k < A->length && mpoly_monomial_gt(A->exps + N*k, texps, N, cmpmask))

@@ -19,9 +19,7 @@ int mpoly_monomials_overflow_test(ulong * exps, slong len, flint_bitcnt_t bits,
 
     if (bits <= FLINT_BITS)
     {
-        ulong mask = 0;
-        for (i = 0; i < FLINT_BITS/bits; i++)
-            mask = (mask << bits) + (UWORD(1) << (bits - 1));
+        ulong mask = mpoly_overflow_mask_sp(bits);
 
         for (i = 0; i < len; i++)
             if (mpoly_monomial_overflows(exps + i*N, N, mask))

@@ -26,9 +26,7 @@ void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
 
     N = mpoly_words_per_exp_sp(bits, mctx);
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    mask = mpoly_overflow_mask_sp(bits);
 
     TMP_START;
 
@@ -66,9 +64,7 @@ void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
     {
         if (bits <= FLINT_BITS)
         {
-            mask = 0;
-            for (i = 0; i < FLINT_BITS/bits; i++)
-                mask = (mask << bits) + (UWORD(1) << (bits - 1));
+            mask = mpoly_overflow_mask_sp(bits);
 
             for (i = 0; i < len - 1; i++)
                 mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);

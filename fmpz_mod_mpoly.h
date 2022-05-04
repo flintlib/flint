@@ -1071,7 +1071,10 @@ void fmpz_mod_mpoly_remainder_strongtest(const fmpz_mod_mpoly_t r,
     mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
     mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
 
-    mask = (bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(bits) : 0;
+    if (bits <= FLINT_BITS)
+        mask = mpoly_overflow_mask_sp(bits);
+    else
+        mask = 0;
 
     for (i = 0; i < r->length; i++)
     {
