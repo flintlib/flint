@@ -18,15 +18,6 @@
 #define FMPZ_POLY_Q_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
@@ -166,4 +157,3 @@ FLINT_DLL int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x);
 #endif
 
 #endif
-

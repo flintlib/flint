@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void
@@ -58,10 +54,7 @@ _fmpq_poly_asin_series(fmpz * g, fmpz_t gden,
 void fmpq_poly_asin_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (poly->length && !fmpz_is_zero(poly->coeffs))
-    {
-        flint_printf("Exception (fmpq_poly_asin_series). Constant term != 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 0 in fmpq_poly_asin_series\n");
 
     if (poly->length == 0 || n < 2)
     {

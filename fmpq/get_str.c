@@ -20,10 +20,7 @@ char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
         str = flint_malloc(fmpz_sizeinbase(num, b) + fmpz_sizeinbase(den, b) + 3);
 
         if (str == NULL)
-        {
-            flint_printf("Exception (_fmpq_get_str). Not enough memory.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ALLOC, "_fmpq_get_str\n");
     }
 
     fmpz_get_str(str, b, num);
@@ -46,4 +43,3 @@ char * fmpq_get_str(char * str, int b, const fmpq_t f)
 {
     return _fmpq_get_str(str, b, fmpq_numref(f), fmpq_denref(f));
 }
-

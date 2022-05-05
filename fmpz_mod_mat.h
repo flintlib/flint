@@ -19,10 +19,8 @@
 #define FMPZ_MOD_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "fmpz_mini.h"
 #include "fmpz_mat.h"
-#include "fmpz_mod.h"
 
 #ifdef __cplusplus
  extern "C" {

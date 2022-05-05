@@ -11,7 +11,6 @@
 
 #include "fmpq.h"
 
-
 void _fmpz_mat22_init(_fmpz_mat22_t M)
 {
     fmpz_init(M->_11);
@@ -21,7 +20,6 @@ void _fmpz_mat22_init(_fmpz_mat22_t M)
     M->det = 0;
 }
 
-
 void _fmpz_mat22_clear(_fmpz_mat22_t M)
 {
     fmpz_clear(M->_11);
@@ -29,7 +27,6 @@ void _fmpz_mat22_clear(_fmpz_mat22_t M)
     fmpz_clear(M->_21);
     fmpz_clear(M->_22);
 }
-
 
 void _fmpz_mat22_one(_fmpz_mat22_t M)
 {
@@ -40,7 +37,6 @@ void _fmpz_mat22_one(_fmpz_mat22_t M)
     M->det = 1;
 }
 
-
 int _fmpz_mat22_is_one(_fmpz_mat22_t M)
 {
     return fmpz_is_one(M->_11)
@@ -48,7 +44,6 @@ int _fmpz_mat22_is_one(_fmpz_mat22_t M)
         && fmpz_is_zero(M->_21)
         && fmpz_is_one(M->_22);
 }
-
 
 flint_bitcnt_t _fmpz_mat22_bits(const _fmpz_mat22_t N)
 {
@@ -85,7 +80,6 @@ void _fmpz_mat22_rmul(_fmpz_mat22_t M, const _fmpz_mat22_t N)
     fmpz_clear(d);
 }
 
-
 /* M = M*N */
 void _fmpz_mat22_rmul_ui(_fmpz_mat22_t M, const _ui_mat22_t N)
 {
@@ -109,7 +103,6 @@ void _fmpz_mat22_rmul_ui(_fmpz_mat22_t M, const _ui_mat22_t N)
 
     fmpz_clear(a);
 }
-
 
 /* M = M*N^-1 */
 void _fmpz_mat22_rmul_inv_ui(_fmpz_mat22_t M, const _ui_mat22_t N)
@@ -177,4 +170,3 @@ void _fmpz_mat22_lmul_elem(_fmpz_mat22_t M, const fmpz_t q)
     fmpz_swap(M->_12, M->_22);
     M->det *= -1;
 }
-

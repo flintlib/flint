@@ -10,15 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
 #include "ulong_extras.h"
+#include "fmpq.h"
+#include "fmpq_poly.h"
+#include "fmpq_mat.h"
 
 static void
 _fmpq_mat_get_row(fmpz * rnum, fmpz_t den, fmpq_mat_t A, slong i)
@@ -160,11 +155,7 @@ fmpq_poly_compose_series_brent_kung(fmpq_poly_t res,
     slong lenr;
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
-    {
-        flint_printf("Exception (fmpq_poly_compose_series_brent_kung). \n"
-               "Inner polynomial must have zero constant term.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Inner polynomial must have zero constant term in fmpq_poly_compose_series_brent_kung\n");
 
     if (len1 == 0 || n == 0)
     {

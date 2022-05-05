@@ -24,4 +24,3 @@ void fmpz_mod_mat_submul(fmpz_mod_mat_t D,
     fmpz_mod_mat_sub(D, C, tmp);
     fmpz_mod_mat_clear(tmp);
 }
-

@@ -11,13 +11,6 @@
 
 #define FMPQ_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 void fmpq_numerator(fmpz_t n, const fmpq_t q)
@@ -44,4 +37,3 @@ int fmpq_equal_fmpz(fmpq_t q, fmpz_t n)
 {
    return fmpz_equal(fmpq_numref(q), n) && q->den == WORD(1);
 }
-

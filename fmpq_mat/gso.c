@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void
@@ -18,10 +19,7 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
     fmpq_t num, den, mu;
 
     if (B->r != A->r || B->c != A->c)
-    {
-        flint_printf("Exception (fmpq_mat_gso). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in fmpq_mat_gso\n");
 
     if (B == A)
     {

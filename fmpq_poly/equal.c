@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
@@ -21,4 +17,3 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
         && (fmpz_equal(poly1->den, poly2->den))
         && (_fmpz_vec_equal(poly1->coeffs, poly2->coeffs, poly1->length));
 }
-

@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
@@ -91,15 +87,10 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     slong lenA, lenB, lenQ, lenR;
 
     if (fmpq_poly_is_zero(poly2))
-    {
-        flint_printf("Exception (fmpq_poly_divrem). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_poly_divrem\n");
+
     if (Q == R)
-    {
-        flint_printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "Output arguments aliased in fmpq_poly_divrem\n");
     
     /* Deal with the various other cases of aliasing. */
     if (R == poly1 || R == poly2)

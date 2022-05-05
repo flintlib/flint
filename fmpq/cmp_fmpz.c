@@ -11,7 +11,6 @@
 
 #include "fmpq.h"
 
-
 int _fmpq_cmp_fmpz(const fmpz_t p, const fmpz_t q, const fmpz_t r)
 {
     int s1, s2, res;
@@ -55,9 +54,7 @@ int _fmpq_cmp_fmpz(const fmpz_t p, const fmpz_t q, const fmpz_t r)
     return res;
 }
 
-
 int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
 {
     return _fmpq_cmp_fmpz(fmpq_numref(x), fmpq_denref(x), y);
 }
-

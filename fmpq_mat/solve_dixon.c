@@ -10,8 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
+/* But I want to use fast multiplication... :-( */
 #define USE_SLOW_MULTIPLICATION 1
 
 int
@@ -165,10 +169,7 @@ fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X,
     mp_limb_t p;
 
     if (!fmpz_mat_is_square(A))
-    {
-        flint_printf("Exception (fmpz_mat_solve_fmpz_mat_dixon). Non-square system matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square system matrix in fmpz_mat_solve_fmpz_mat_dixon\n");
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
         return 1;

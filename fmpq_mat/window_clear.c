@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat.h"
+#include "flint.h"
 
 void
 fmpq_mat_window_clear(fmpq_mat_t window)

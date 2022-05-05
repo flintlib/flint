@@ -58,10 +58,7 @@ void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat)
    slong n = mat->r;
 
    if (mat->r != mat->c)
-   {
-       flint_printf("Exception (fmpq_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
-   }
+       flint_throw(FLINT_ERROR, "Non-square matrix in fmpq_mat_charpoly\n");
 
    fmpq_poly_fit_length(pol, n + 1);
    _fmpq_poly_set_length(pol, n + 1);

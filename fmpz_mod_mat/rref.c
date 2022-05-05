@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz_mat.h"
 
 slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat)
 {

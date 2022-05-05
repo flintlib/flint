@@ -11,7 +11,6 @@
 
 #include "fmpq.h"
 
-
 void _fmpq_set_cfrac_divconquer(_fmpz_mat22_t M, const fmpz * c, slong n)
 {
     _fmpz_mat22_one(M);
@@ -33,7 +32,6 @@ void _fmpq_set_cfrac_divconquer(_fmpz_mat22_t M, const fmpz * c, slong n)
     }
 }
 
-
 void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 {
     _fmpz_mat22_t M;
@@ -44,4 +42,3 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
     _fmpz_mat22_clear(M);
     FLINT_ASSERT(n <= 0 || fmpq_is_canonical(x));
 }
-

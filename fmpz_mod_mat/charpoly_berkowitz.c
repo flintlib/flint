@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mod_vec.h"
-#include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_mat.h"
 
 void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
                                                       const fmpz_mod_ctx_t ctx)
@@ -102,10 +103,7 @@ void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,
                             const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     if (!fmpz_mod_mat_is_square(mat))
-    {
-        flint_printf("Exception (fmpz_mod_mat_charpoly_berkowitz). Non-square matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square matrix in fmpz_mod_mat_charpoly_berkowitz\n");
 
     fmpz_mod_poly_fit_length(cp, fmpz_mod_mat_nrows(mat) + 1, ctx);
     _fmpz_mod_mat_charpoly_berkowitz(cp->coeffs, mat, ctx);

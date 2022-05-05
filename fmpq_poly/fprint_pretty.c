@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
-
+#include "flint-impl.h"
+#include "fmpz.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 /*
@@ -62,21 +63,21 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     {
         if (__fmpq_is_one(poly + 1, den))
         {
-            flint_fprintf(file, "%s", x);
+            fprintf(file, "%s", x);
         }
         else if (__fmpq_is_pm1(poly + 1, den))
         {
-            flint_fprintf(file, "-%s", x);
+            fprintf(file, "-%s", x);
         }
         else
         {
             __fmpq_fprint(poly + 1, den);
-            flint_fprintf(file, "*%s", x);
+            fprintf(file, "*%s", x);
         }
         
         if (fmpz_sgn(poly + 0) > 0)
         {
-            flint_fprintf(file, "+");
+            fprintf(file, "+");
             __fmpq_fprint(poly + 0, den);
         }
         else if (fmpz_sgn(poly + 0) < 0)
@@ -89,7 +90,7 @@ int _fmpq_poly_fprint_pretty(FILE * file,
         slong i = len - 1;  /* i >= 2 */
         {
             if (__fmpq_is_one(poly + i, den))
-               flint_fprintf(file, "%s^%wd", x, i);
+               fprintf(file, "%s^" WORD_FMT "d", x, i);
             else if (__fmpq_is_pm1(poly + i, den))
                flint_fprintf(file, "-%s^%wd", x, i);
             else

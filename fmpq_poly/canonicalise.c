@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)
@@ -51,4 +47,3 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
     _fmpq_poly_normalise(poly);
     _fmpq_poly_canonicalise(poly->coeffs, poly->den, poly->length);
 }
-

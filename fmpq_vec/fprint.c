@@ -9,14 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_vec.h"
+#include <stdio.h>
+#include "fmpq.h"
+#include "flint-impl.h"
 
 int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
 {
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%li", len);
+    r = fprintf(file, WORD_FMT "d", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

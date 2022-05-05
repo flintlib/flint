@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz_mini.h"
+#include "fmpz_mat.h"
 
 void fmpz_mod_mat_clear(fmpz_mod_mat_t mat)
 {

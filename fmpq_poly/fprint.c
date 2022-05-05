@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <gmp.h>
-
-#include "flint.h"
+#include "flint-impl.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
 
 /*
     Recall the return value conventions for fputc (of type int) 
@@ -42,7 +37,7 @@ _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
     fmpz_init(d);
     fmpz_init(g);
 
-    r = flint_fprintf(file, "%li", len);
+    r = fprintf(file, WORD_FMT "d", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

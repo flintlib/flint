@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
@@ -16,10 +17,7 @@ void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
     slong i, j, k;
 
     if (A == C || B == C)
-    {
-        flint_printf("Exception (fmpq_mat_mul_direct). Aliasing not implemented.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Aliasing not implemented in fmpq_mat_mul_direct\n");
 
     if (A->c == 0)
     {

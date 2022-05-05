@@ -47,10 +47,7 @@ _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
 void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
     if (fmpq_is_zero(op2))
-    {
-        flint_printf("Exception (fmpq_div). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_div\n");
 
     _fmpq_div(fmpq_numref(res), fmpq_denref(res),
               fmpq_numref(op1), fmpq_denref(op1),

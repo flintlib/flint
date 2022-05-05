@@ -10,7 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpq.h"
+#ifdef LONGSLONG
+# define flint_mpz_fdiv_ui mpz_fdiv_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 static ulong _fmpz_gcd_ui(const fmpz_t g, ulong h)
 {

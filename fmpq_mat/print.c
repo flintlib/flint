@@ -9,24 +9,27 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "flint-impl.h"
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_print(const fmpq_mat_t mat)
 {
     slong i, j;
 
-    flint_printf("<%wd x %wd matrix over Q>\n", mat->r, mat->c);
+    printf("<" WORD_FMT "d x " WORD_FMT "d matrix over Q>\n", mat->r, mat->c);
 
     for (i = 0; i < mat->r; i++)
     {
-        flint_printf("[");
+        printf("[");
         for (j = 0; j < mat->c; j++)
         {
             fmpq_print(fmpq_mat_entry(mat, i, j));
             if (j + 1 < mat->c)
-                flint_printf(", ");
+                printf(", ");
         }
-        flint_printf("]\n");
+        printf("]\n");
     }
-    flint_printf("\n");
+    printf("\n");
 }

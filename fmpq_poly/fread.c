@@ -10,11 +10,12 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
+#ifdef LONGSLONG
+# define flint_mpz_get_si mpz_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
 {
@@ -31,10 +32,8 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
         return 0;
     }
     if (!mpz_fits_slong_p(t))
-    {
-        flint_printf("Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Length does not fit into a slong in fmpz_poly_fread\n");
+
     len = flint_mpz_get_si(t);
     mpz_clear(t);
 

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mini.h"
 #include "fmpq_mat.h"
 
 int fmpq_mat_is_integral(const fmpq_mat_t mat)

@@ -11,7 +11,6 @@
 
 #include "fmpq.h"
 
-
 void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
                                         const fmpz_t l_num, const fmpz_t l_den,
                                         const fmpz_t r_num, const fmpz_t r_den)
@@ -116,4 +115,3 @@ void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r)
                                fmpq_numref(l), fmpq_denref(l));
     }
 }
-

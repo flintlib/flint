@@ -12,7 +12,6 @@
 
 #include "fmpq.h"
 
-
 int _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m)
 {
     fmpz_t N;
@@ -33,4 +32,3 @@ int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
 {
     return _fmpq_reconstruct_fmpz(fmpq_numref(res), fmpq_denref(res), a, m);
 }
-

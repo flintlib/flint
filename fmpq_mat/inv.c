@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)

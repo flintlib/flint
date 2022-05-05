@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void
@@ -86,11 +82,7 @@ fmpq_poly_compose_series_horner(fmpq_poly_t res,
     slong lenr;
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
-    {
-        flint_printf("Exception (fmpq_poly_compose_series_horner). Inner polynomial \n"
-               "must have zero constant term.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Inner polynomial must have zero constant term in fmpq_poly_compose_series_horner\n");
 
     if (len1 == 0 || n == 0)
     {

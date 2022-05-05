@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
+#include "fmpq.h"
 #include "fmpz_poly.h"
-#include "fmpq_poly.h"
 
 void 
 _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
@@ -43,4 +41,3 @@ fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, const fmpz_t a)
     _fmpq_poly_evaluate_fmpz(fmpq_numref(res), fmpq_denref(res), 
                              poly->coeffs, poly->den, poly->length, a);
 }
-

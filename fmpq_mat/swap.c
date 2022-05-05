@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat.h"
+#include "flint.h"
 
 void
 fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)

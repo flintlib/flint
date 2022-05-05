@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
@@ -75,10 +71,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
     slong lenA, lenB, lenQ;
 
     if (fmpq_poly_is_zero(poly2))
-    {
-        flint_printf("Exception (fmpq_poly_div). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_poly_div\n");
 
     if (poly1->length < poly2->length)
     {

@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpq_poly.h"
 
 int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, 
                            const fmpz * poly2, const fmpz_t den2, slong len2, slong n)

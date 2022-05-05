@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_vec.h"
+#include <stdlib.h>
+#include "fmpq.h"
 
 typedef int(*__compar_fn_t) (const void *, const void *);
 void _fmpq_vec_sort(fmpq * vec, slong len)

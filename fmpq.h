@@ -19,7 +19,7 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
-/* TODO: Remove fmpz.h as a dependency. */
+/* TODO: Try to reduce this dependency to fmpz_mini.h */
 #include "fmpz.h"
 
 #ifdef __cplusplus

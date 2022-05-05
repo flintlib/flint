@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
+#include "ulong_extras.h"
 #include "fmpq.h"
-#include "fmpq_vec.h"
 
 void
 _fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
@@ -40,4 +36,3 @@ _fmpq_vec_randtest(fmpq * f, flint_rand_t state,
         }
     }
 }
-

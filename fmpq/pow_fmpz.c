@@ -20,7 +20,7 @@ int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
         e_sgn = fmpz_sgn(e);
 
         if (e_sgn < 0)
-            flint_throw(FLINT_ERROR, "Division by zero in fmpq_pow_fmpz");
+            flint_throw(FLINT_DIVZERO, "fmpq_pow_fmpz\n");
 
         fmpz_set_si(fmpq_numref(a), e_sgn == 0 ? 1 : 0);
         fmpz_one(fmpq_denref(a));

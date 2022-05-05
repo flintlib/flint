@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpq.h"
 #include "fmpq_vec.h"
 
 void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits)
@@ -19,10 +20,7 @@ void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, f
 
     /* if 2^bits < len we are too likely to have collision */
     if (4 * n_sizeinbase(len, 2) > bits)
-    {
-        fprintf(stderr, "ERROR (_fmpq_vec_randtest_uniq_sorted): bits too small\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "bits too small in _fmpq_vec_randtest_uniq_sorted\n");
 
     _fmpq_vec_randtest(vec, state, len, bits);
     if (len <= 1) return;

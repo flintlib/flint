@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_vec.h"
+#include "fmpz_mini.h"
+#include "fmpq.h"
 
 void
 _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len)

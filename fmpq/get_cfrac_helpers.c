@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "longlong.h"
-#include "fmpq.h"
-#include "fmpz_poly.h"
+#include "flint-impl.h"
 #include "mpn_extras.h"
+#include "fmpq.h"
 
 /* enable for debug printing of various types */
 #if 0

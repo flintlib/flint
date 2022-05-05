@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpq.h"
 
 void
@@ -63,10 +64,7 @@ void fmpq_randtest(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, flint_bitcnt_t bits)
 {
     if (bits == 0)
-    {
-        flint_printf("Exception (fmpq_randtest_not_zero). bits == 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "bits == 0 in fmpq_randtest_not_zero\n");
 
     do {
         fmpq_randtest(f, state, bits);

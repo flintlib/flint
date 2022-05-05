@@ -10,6 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
 mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
@@ -149,10 +153,7 @@ fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
     mp_limb_t p;
 
     if (!fmpz_mat_is_square(A))
-    {
-        flint_printf("Exception (fmpq_mat_solve_fmpz_mat_multi_mod). Non-square system matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square system matrix in fmpq_mat_solve_fmpz_mat_multi_mod\n");
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
         return 1;

@@ -9,25 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
+#include <stdio.h>
+#include "flint-impl.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
 
 int fmpq_poly_debug(const fmpq_poly_t poly)
 {
     slong i;
 
-    flint_printf("{alloc: %wd, length: %wd, coeffs:", poly->alloc, poly->length);
+    printf("{alloc: " WORD_FMT "d, length: " WORD_FMT "d, coeffs:", poly->alloc, poly->length);
     for (i = 0; i < poly->alloc; i++)
     {
-        flint_printf(" ");
+        printf(" ");
         fmpz_print(poly->coeffs + i);
     }
-    flint_printf(", den: ");
+    printf(", den: ");
     fmpz_print(poly->den);
-    flint_printf("}");
+    printf("}");
 
     return 1;
 }

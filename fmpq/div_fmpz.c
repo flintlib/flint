@@ -16,10 +16,7 @@ void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
     fmpz_t y;
 
     if (fmpz_is_zero(x))
-    {
-        flint_printf("Exception (fmpq_div_fmpz). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_div_fmpz\n");
 
     if (!COEFF_IS_MPZ(*fmpq_numref(op)) && !COEFF_IS_MPZ(*fmpq_denref(op)) && !COEFF_IS_MPZ(*x))
     {

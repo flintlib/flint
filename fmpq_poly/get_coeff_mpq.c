@@ -10,11 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpq_poly.h"
+#ifdef LONGSLONG
+# define flint_mpq_set_si mpq_set_si
+#else
+# include "gmpcompat.h"
+#endif
 
 void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n)
 {

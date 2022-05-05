@@ -10,6 +10,7 @@
 */
 
 #include "fmpq.h"
+#include "flint-impl.h"
 
 /*
     after initialization one may:

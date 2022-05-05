@@ -11,9 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpq.h"
-#include "fmpq_vec.h"
 
 fmpq *
 _fmpq_vec_init(slong len)

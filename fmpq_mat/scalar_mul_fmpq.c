@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz, 2018 Martin Raum
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2018 Martin Raum
 
     This file is part of FLINT.
 
@@ -9,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, 

@@ -10,6 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
 static int
@@ -224,10 +228,7 @@ fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
     int res;
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
-    {
-        flint_printf("Exception (fmpq_mat_can_solve_fmpz_mat_multi_mod). Incompatible matrix dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible matrix dimensions in fmpq_mat_can_solve_fmpz_mat_multi_mod\n");
 
     if (A->r == 0)
     {
@@ -259,10 +260,7 @@ int fmpq_mat_can_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_ma
     int success;
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
-    {
-        flint_printf("Exception (fmpq_mat_can_solve_multi_mod). Incompatible matrix dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible matrix dimensions in fmpq_mat_can_solve_multi_mod\n");
     
     if (A->r == 0)
     {
