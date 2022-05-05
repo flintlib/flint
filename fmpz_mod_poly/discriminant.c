@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void
@@ -62,4 +59,3 @@ void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f,
     else
        _fmpz_mod_poly_discriminant(d, f->coeffs, len, fmpz_mod_ctx_modulus(ctx));
 }
-

@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
@@ -20,10 +16,7 @@ fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
                            const fmpz_t x)
 {
     if (fmpz_is_zero(x))
-    {
-        flint_printf("Exception (fmpz_poly_scalar_tdiv_fmpz). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_scalar_tdiv_fmpz\n");
 
     if (poly2->length == 0)
     {

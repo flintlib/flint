@@ -9,13 +9,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx
-#include <string.h>
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strcspn
+# ifdef __GNUC__
+#  define strcspn __builtin_strcspn
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strncpy
+# ifdef __GNUC__
+#  define strncpy __builtin_strncpy
+# else
+#  include <string.h>
+# endif
+#endif
+#include <stdio.h>
 #include <stdarg.h>
-#undef ulong
 #include "flint.h"
-#include "flint-io.h"
 #include "flint-impl.h"
 
 int flint_sscanf(const char * s, const char * str, ...)

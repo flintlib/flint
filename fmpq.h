@@ -19,6 +19,7 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
+/* TODO: Remove fmpz.h as a dependency. */
 #include "fmpz.h"
 
 #ifdef __cplusplus

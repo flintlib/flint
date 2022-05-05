@@ -10,11 +10,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include <stdio.h>
-#include "flint.h"
-#include "fmpz_mod_poly.h"
+#include "flint-impl.h"
 #include "fmpz.h"
+#include "fmpz_mod_poly.h"
 
 int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx)
 {
@@ -26,7 +25,7 @@ int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx)
 
     poly->length = 0;
 
-    if (flint_fscanf(f, "%wd", &length) != 1)
+    if (fscanf(f, WORD_FMT "d", &length) != 1)
         goto cleanup;
 
     if (!fmpz_fread(f, coeff))
@@ -58,4 +57,3 @@ cleanup:
 
     return success;
 }
-

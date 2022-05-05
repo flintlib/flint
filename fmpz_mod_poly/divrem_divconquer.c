@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 static void
@@ -141,10 +137,7 @@ fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
             return;
         }
         else
-        {
-            flint_printf("Exception (fmpz_mod_poly_div_basecase). Division by zero.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_div_basecase\n");
     }
 
     if (lenA < lenB)

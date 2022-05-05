@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "fmpq.h"
+#include "fmpz_mat.h"
 
 void
 fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
@@ -45,11 +45,7 @@ fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
             fmpz_mul(t, d, fmpz_mat_entry(X, i, 0));
             fmpz_fdiv_qr(u, t, t, mod);
             if (!_fmpq_reconstruct_fmpz(u, v, t, mod))
-            {
-                flint_printf("Exception (fmpz_mat_det_divisor): "
-                       "Rational reconstruction failed.\n");
-                flint_abort();
-            }
+                flint_throw(FLINT_ERROR, "Rational reconstruction failed in fmpz_mat_det_divisor\n");
 
             fmpz_mul(d, v, d);
         }

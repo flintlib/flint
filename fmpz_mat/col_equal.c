@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 int
 fmpz_mat_col_equal(const fmpz_mat_t M, slong m, slong n)

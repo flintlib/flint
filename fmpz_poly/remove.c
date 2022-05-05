@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
@@ -23,21 +21,15 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
     slong i;
 
     if (poly2->length == 0)
-    {
-        flint_printf("Exception (fmpz_poly_remove). Division by zero.\n");
-	flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_remove\n");
 
     if (poly2->length == 1 && fmpz_is_pm1(poly2->coeffs + 0))
-    {
-        flint_printf("Exception (fmpz_poly_remove). Divisor must not be a unit.\n");
-	flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Divisor must not be a unit in fmpz_poly_remove\n");
 
     if (poly2->length > poly1->length)
     {
         fmpz_poly_set(res, poly1);
-	return 0;
+        return 0;
     }
 
     fmpz_init(p1sum);
@@ -48,20 +40,20 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
         fmpz_add(p1sum, p1sum, poly1->coeffs + i);
 
     for (i = 0; i < poly2->length; i++)
-	fmpz_add(p2sum, p2sum, poly2->coeffs + i);
+        fmpz_add(p2sum, p2sum, poly2->coeffs + i);
 
     fmpz_abs(p1sum, p1sum);
     fmpz_abs(p2sum, p2sum);
 
     if (fmpz_is_zero(p2sum))
     {
-	if (!fmpz_is_zero(p1sum))
+        if (!fmpz_is_zero(p1sum))
         {
-	    fmpz_poly_set(res, poly1);
-	    i = 0;
-	    goto cleanup;
-	} else
-	    i = (poly1->length - 1)/(poly2->length - 1);
+            fmpz_poly_set(res, poly1);
+            i = 0;
+            goto cleanup;
+        } else
+            i = (poly1->length - 1)/(poly2->length - 1);
     } else if (fmpz_is_zero(p1sum) || fmpz_is_one(p2sum))
         i = (poly1->length - 1)/(poly2->length - 1);
     else
@@ -73,22 +65,22 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
         fmpz_poly_init(p);
 
         fmpz_poly_pow(p, poly2, i);
-    
+
         while (i > 0 && !fmpz_poly_divides(q, poly1, p))
         {
-	    fmpz_poly_div(p, p, poly2);
-	    i--;
+            fmpz_poly_div(p, p, poly2);
+            i--;
         }
 
         if (i == 0)
-	   fmpz_poly_set(res, poly1);
-	else
-	   fmpz_poly_set(res, q);
+            fmpz_poly_set(res, poly1);
+        else
+            fmpz_poly_set(res, q);
 
         fmpz_poly_clear(p);
-	fmpz_poly_clear(q);
+        fmpz_poly_clear(q);
     } else
-	fmpz_poly_set(res, poly1);
+        fmpz_poly_set(res, poly1);
 
 cleanup:
 

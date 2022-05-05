@@ -12,6 +12,8 @@
 */
 
 #include <math.h>
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
@@ -23,10 +25,7 @@ fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
     fmpz_t tmp;
 
     if (c != r)
-    {
-        flint_printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square matrix in fmpz_mat_ajtai\n");
 
     fmpz_init(tmp);
 

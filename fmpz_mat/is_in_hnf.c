@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mini.h"
 #include "fmpz_mat.h"
 
 int fmpz_mat_is_in_hnf(const fmpz_mat_t A)

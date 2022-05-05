@@ -21,6 +21,8 @@
 #endif
 
 #include "fmpz_mini.h"
+/* TODO: Remove the following inclusion. It is only needed for the inlining of
+ * fmpq_poly_get_numerator. */
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus

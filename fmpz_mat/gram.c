@@ -9,18 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 {
 	slong i, j, k;
 	
-	if(B->r != A->r || B->c != A->r) {
-		flint_printf("Exception (fmpz_mat_gram). Incompatible dimensions.\n");
-		flint_abort();
-	}
+	if (B->r != A->r || B->c != A->r)
+		flint_throw(FLINT_ERROR, "Incompatible dimensions in fmpz_mat_gram\n");
 	
-	if(B == A) {
+	if (B == A)
+    {
 		fmpz_mat_t t;
 		fmpz_mat_init(t, B->r, B->c);
 		fmpz_mat_gram(t, A);
@@ -29,18 +29,22 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 		return;
 	}
 	
-	if(A->c == 0) {
+	if (A->c == 0)
+    {
 		fmpz_mat_zero(B);
 		return;
 	}
 	
-	for(i = 0; i < B->r; i++) {
-		for(j = 0; j < B->c; j++) {
+	for (i = 0; i < B->r; i++)
+    {
+		for (j = 0; j < B->c; j++)
+        {
 			fmpz_mul(fmpz_mat_entry(B, i, j),
 					 fmpz_mat_entry(A, i, 0),
 					 fmpz_mat_entry(A, j, 0));
 					 
-			for (k = 1; k < A->c; k++) {
+			for (k = 1; k < A->c; k++)
+            {
                 fmpz_addmul(fmpz_mat_entry(B, i, j),
                             fmpz_mat_entry(A, i, k),
                             fmpz_mat_entry(A, j, k));

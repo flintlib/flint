@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz.h"
 
 void
 fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
@@ -21,10 +21,7 @@ fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
     slong i, j;
 
     if (c != r + 1)
-    {
-        flint_printf("Exception (fmpz_mat_randintrel).  c != r + 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "c != r + 1 in fmpz_mat_randintrel\n");
 
     for (i = 0; i < r; i++)
     {

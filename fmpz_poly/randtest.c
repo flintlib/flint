@@ -9,13 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
-#include "ulong_extras.h"
 
 void
 fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
@@ -42,10 +36,7 @@ fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
                             slong len, flint_bitcnt_t bits)
 {
     if ((bits == 0) || (len == 0))
-    {
-        flint_printf("Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "bits or len is zero in fmpz_poly_randtest_not_zero\n");
 
     fmpz_poly_randtest(f, state, len, bits);
     if (fmpz_poly_is_zero(f))

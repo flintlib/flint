@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "flint-impl.h"
 
 void
 _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong n)

@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void 
@@ -29,7 +29,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
 
        if (!fmpz_is_one(d)) /* check for invertibility */
        {
-           printf("Exception (fmpz_mod_poly_div_series). Impossible inverse.");
+           flint_throw(FLINT_IMPINV, "fmpz_mod_poly_div_series\n");
                
            fmpz_clear(u);
            fmpz_clear(d);
@@ -111,10 +111,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_div_series). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_div_series\n");
 
     if (Alen == 0)
     {

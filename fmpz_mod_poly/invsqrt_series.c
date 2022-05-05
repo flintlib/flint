@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_mod_poly.h"
-#include "fmpz_mod_vec.h"
 #include "fmpz.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_vec.h"
+#include "fmpz_mod_poly.h"
 
 static void 
 __fmpz_mod_poly_invsqrt_series_prealloc(fmpz * g, 
@@ -75,16 +73,10 @@ void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, sl
     fmpz_mod_poly_t t1;
 
     if (n == 0 || h->length == 0 || fmpz_is_zero(h->coeffs + 0))
-    {
-        flint_printf("Exception (fmpz_mod_poly_invsqrt). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_invsqrt\n");
 
     if (!fmpz_is_one(h->coeffs + 0))
-    {
-        flint_printf("Exception (fmpz_mod_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in fmpz_mod_poly_invsqrt_series\n");
 
     if (hlen < n)
     {

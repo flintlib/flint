@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len, 
@@ -181,8 +177,5 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         }
     }
     else
-    {
-        flint_printf("Exception (fmpz_poly_addchains). Powering via chains not implemented for e > 148.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Powering via chains not implemented for e > 148 in fmpz_poly_addchains\n");
 }

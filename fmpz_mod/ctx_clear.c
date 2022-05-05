@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz_mini.h"
 
 void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx)
 {

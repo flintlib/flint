@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc,

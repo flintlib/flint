@@ -19,10 +19,9 @@
 #define FMPZ_MOD_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz_poly.h"
+#include "fmpz_mini.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod.h"
-#include "fmpz_mat.h"
-#include "fmpz_mod_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -273,12 +272,14 @@ FLINT_DLL void fmpz_mod_poly_gen(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 FLINT_DLL void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly,
 
                                    slong i, slong j, const fmpz_mod_ctx_t ctx);
+#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE
 ulong fmpz_mod_poly_deflation(const fmpz_mod_poly_t input,
                                                     const fmpz_mod_ctx_t ctx)
 {
     return _fmpz_poly_deflation(input->coeffs, input->length);
 }
+#endif
 
 FLINT_DLL void fmpz_mod_poly_deflate(fmpz_mod_poly_t result,
        const fmpz_mod_poly_t input, ulong deflation, const fmpz_mod_ctx_t ctx);
@@ -288,22 +289,8 @@ FLINT_DLL void fmpz_mod_poly_inflate(fmpz_mod_poly_t result,
 
 /*  Conversion ***************************************************************/
 
-FMPZ_MOD_POLY_INLINE 
-void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong x, const fmpz_mod_ctx_t ctx)
-{
-    if (x == 0)
-    {
-        fmpz_mod_poly_zero(f, ctx);
-    }
-    else
-    {
-        fmpz_mod_poly_fit_length(f, 1, ctx);
-        _fmpz_mod_poly_set_length(f, 1);
-        fmpz_set_ui(f->coeffs, x);
-        fmpz_mod(f->coeffs, f->coeffs, fmpz_mod_ctx_modulus(ctx));
-        _fmpz_mod_poly_normalise(f);
-    }
-}
+FLINT_DLL void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong x,
+                                                    const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t poly, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
@@ -322,6 +309,7 @@ FLINT_DLL void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f,
 
 /*  Comparison ***************************************************************/
 
+#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE 
 int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1, 
                         const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
@@ -337,6 +325,7 @@ int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1,
     return fmpz_poly_equal_trunc((fmpz_poly_struct *) poly1, 
                            (fmpz_poly_struct *) poly2, n);
 }
+#endif
 
 FMPZ_MOD_POLY_INLINE 
 int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
@@ -365,25 +354,11 @@ void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly,
         fmpz_zero(x);
 }
 
-FMPZ_MOD_POLY_INLINE void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly,
-                             slong n, const mpz_t x, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_mod_poly_set_coeff_fmpz(poly, n, t, ctx);
-    fmpz_clear_readonly(t);
-}
+FLINT_DLL void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n,
+                                    const mpz_t x, const fmpz_mod_ctx_t ctx);
 
-FMPZ_MOD_POLY_INLINE void fmpz_mod_poly_get_coeff_mpz(mpz_t x,
-                 const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_t t;
-    fmpz_init(t);
-    fmpz_mod_poly_get_coeff_fmpz(t, poly, n, ctx);
-    fmpz_get_mpz(x, t);
-    fmpz_clear(t);
-}
-
+FLINT_DLL void fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly,
+                                            slong n, const fmpz_mod_ctx_t ctx);
 
 /*  Shifting *****************************************************************/
 
@@ -570,10 +545,12 @@ FLINT_DLL void fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
                     const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g,
                                                      const fmpz_mod_ctx_t ctx);
 
+#ifdef THREAD_POOL_H
 FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res,
        const fmpz * f, slong flen, slong n, const fmpz * g, slong glen,
                           const fmpz * ginv, slong ginvlen, const fmpz_t p,
 	                      thread_pool_handle * threads, slong num_threads);
+#endif
 
 FLINT_DLL void fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
                     const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g,
@@ -1250,6 +1227,7 @@ FLINT_DLL void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(
       slong len1,slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
                       const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx);
 
+#ifdef THREAD_POOL_H
 FLINT_DLL void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
              const fmpz_mod_poly_struct * polys, slong lenpolys, slong l,
              const fmpz * g, slong glen, const fmpz * poly, slong len,
@@ -1261,6 +1239,7 @@ FLINT_DLL void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmp
             const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
             const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx,
                               thread_pool_handle * threads, slong num_threads);
+#endif
 
 FLINT_DLL void
 fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res,
@@ -1270,12 +1249,14 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
 
 /* Norms *********************************************************************/
 
+#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE
 slong fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A,
                                                      const fmpz_mod_ctx_t ctx)
 {
     return _fmpz_poly_hamming_weight(A->coeffs, A->length);
 }
+#endif
 
 /*  Radix conversion *********************************************************/
 
@@ -1308,6 +1289,7 @@ FLINT_DLL void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly
 
 /*  Input and output *********************************************************/
 
+#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE
 char * fmpz_mod_poly_get_str(const fmpz_mod_poly_t poly,
                                                       const fmpz_mod_ctx_t ctx)
@@ -1321,8 +1303,25 @@ char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
 {
     return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
 }
+#endif
 
-
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p);
 
@@ -1332,12 +1331,14 @@ FLINT_DLL int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly,
 FLINT_DLL int fmpz_mod_poly_fread(FILE * file, fmpz_mod_poly_t poly,
                                                            fmpz_mod_ctx_t ctx);
 
+#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE 
 int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly,
                                       const char * x, const fmpz_mod_ctx_t ctx)
 {
     return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
 }
+#endif
 
 FMPZ_MOD_POLY_INLINE 
 int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p)
@@ -1351,11 +1352,14 @@ int fmpz_mod_poly_print(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
     return fmpz_mod_poly_fprint(stdout, poly, ctx);
 }
 
+#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE
 int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx)
 {
     return fmpz_mod_poly_fprint_pretty(stdout, poly, x, ctx);
 }
+#endif
+#endif
 
 /* Products *****************************************************************/
 

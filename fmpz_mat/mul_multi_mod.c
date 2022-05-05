@@ -10,8 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
-
+#include "flint-impl.h"
+#include "thread_support.h"
 
 typedef struct {
     slong m;
@@ -34,7 +39,6 @@ typedef struct {
     mp_ptr primes;
     int sign;
 } _worker_arg;
-
 
 static void _mod_worker(void * varg)
 {

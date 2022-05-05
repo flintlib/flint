@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
 /*
@@ -101,10 +104,10 @@ void fmpz_mod_berlekamp_massey_print(
 {
     slong i;
     fmpz_mod_poly_print_pretty(B->V1, "#", ctx);
-    flint_printf(",");
+    printf(",");
     for (i = 0; i < B->points->length; i++)
     {
-        flint_printf(" ");
+        printf(" ");
         fmpz_print(B->points->coeffs + i);
     }
 }

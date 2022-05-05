@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A, 
@@ -50,10 +50,8 @@ int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
     int ans;
 
     if (lenP < 2)
-    {
-        flint_printf("Exception (fmpz_mod_poly_invmod). lenP < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenP < 2 in fmpz_mod_poly_invmod\n");
+
     if (lenB == 0)
     {
         fmpz_mod_poly_zero(A, ctx);

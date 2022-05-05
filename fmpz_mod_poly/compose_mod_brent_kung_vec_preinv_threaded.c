@@ -12,13 +12,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "thread_support.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_mat.h"
-#include "ulong_extras.h"
-#include "thread_support.h"
 
 typedef struct
 {
@@ -278,22 +276,11 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
     for (i = 0; i < len1; i++)
     {
         if (polys[i].length >= len2)
-        {
-            flint_printf
-                ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "Degree of first polynomial must be smaller than modulus in fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded\n");
     }
 
     if (n > len1)
-    {
-        flint_printf
-            ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-             "n is larger than the length of polys\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "n is larger than the length of polys in fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded\n");
 
     if (n == 0)
         return;

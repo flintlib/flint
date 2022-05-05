@@ -128,6 +128,7 @@ FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 
 /* Memory managment  *********************************************************/
 
+#ifdef FMPZ_POLY_H
 FQ_INLINE void fq_init(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_init(rop);
@@ -142,6 +143,7 @@ FQ_INLINE void fq_clear(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_clear(rop);
 }
+#endif
 
 FQ_INLINE 
 void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
@@ -200,12 +202,14 @@ FQ_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
         _fq_dense_reduce(R, lenR, ctx);    
 }
 
+#ifdef FMPZ_POLY_H
 FQ_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 {
     _fq_reduce(rop->coeffs, rop->length, ctx);
     rop->length = FLINT_MIN(rop->length, ctx->modulus->length - 1);
     _fmpz_poly_normalise(rop);
 }
+#endif
 
 /* Basic arithmetic **********************************************************/
 
@@ -265,6 +269,7 @@ FLINT_DLL void fq_rand_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx
 
 /* Comparison ****************************************************************/
 
+#ifdef FMPZ_POLY_H
 FQ_INLINE int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
     return fmpz_poly_equal(op1, op2);
@@ -279,9 +284,11 @@ FQ_INLINE int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_one(op);
 }
+#endif
 
 /* Assignments and conversions ***********************************************/
 
+#ifdef FMPZ_POLY_H
 FQ_INLINE void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     fmpz_poly_set(rop, op);
@@ -338,6 +345,7 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
         fmpz_poly_set_coeff_ui(rop, 1, 1);
     }
 }
+#endif
 
 FLINT_DLL int fq_get_fmpz(fmpz_t a, const fq_t b, const fq_ctx_t ctx);
 

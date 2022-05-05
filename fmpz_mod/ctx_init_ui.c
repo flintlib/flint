@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mini.h"
 #include "fmpz_mod.h"
 
 void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n)

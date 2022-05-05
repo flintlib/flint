@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
 void _quadratic(fmpz_poly_t p, flint_rand_t state, flint_bitcnt_t bits)
 {
@@ -71,10 +73,7 @@ void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong le
 {
 
     if (len <= 0)
-    {
-        fprintf(stderr, "ERROR (fmpz_poly_randtest_no_real_root): got non-positive length\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Got non-positive length in fmpz_poly_randtest_no_real_root\n");
     else if (len < 3)
     {
         fmpz_poly_one(p);

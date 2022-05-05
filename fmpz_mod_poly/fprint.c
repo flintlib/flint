@@ -10,8 +10,7 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
-
+#include "flint-impl.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
@@ -21,7 +20,7 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%wd ", len);
+    r = fprintf(file, WORD_FMT "d ", len);
     if (r <= 0)
         return r;
 
@@ -32,13 +31,13 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
     if (len == 0)
         return r;
 
-    r = flint_fprintf(file, " ");
+    r = fprintf(file, " ");
     if (r <= 0)
         return r;
 
     for (i = 0; (r > 0) && (i < len); i++)
     {
-        r = flint_fprintf(file, " ");
+        r = fprintf(file, " ");
         if (r <= 0)
             return r;
         r = fmpz_fprint(file, poly + i);

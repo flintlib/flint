@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_mod_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA, 
@@ -34,41 +31,43 @@ int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
 
     if (lenA < 2*lenB - 1)
     {
-	slong offset = 0;
+        slong offset = 0;
         fmpz * P;
 
-	P = (fmpz *) _fmpz_vec_init(2*lenQ - 1);
+        P = (fmpz *) _fmpz_vec_init(2*lenQ - 1);
 
-	_fmpz_vec_zero(R, lenB - 1);
+        _fmpz_vec_zero(R, lenB - 1);
 
-	_fmpz_mod_poly_div(Q, A, lenA, B, lenB, invB, p);
+        _fmpz_mod_poly_div(Q, A, lenA, B, lenB, invB, p);
 
         while (offset < lenB - 1)
         {
             if (offset + 2*lenQ - 1 < lenB)
             {
                 _fmpz_mod_poly_mul(P, B + offset, lenQ, Q, lenQ, p);
-	        _fmpz_mod_poly_add(R + offset, R + offset, 2*lenQ - 1, P, 2*lenQ - 1, p);
-            } else
+                _fmpz_mod_poly_add(R + offset, R + offset, 2*lenQ - 1, P, 2*lenQ - 1, p);
+            }
+            else
             {
                 _fmpz_mod_poly_mullow(P, Q, lenQ, B + offset, lenQ, p, lenB - offset - 1);
                 _fmpz_mod_poly_add(R + offset, R + offset, lenB - offset - 1, P, lenB - offset - 1, p);
             }
 
-	    for (i = 0; i < FLINT_MIN(lenQ, lenB - offset - 1); i++)
+            for (i = 0; i < FLINT_MIN(lenQ, lenB - offset - 1); i++)
             {
                 if (!fmpz_equal(R + offset + i, A + offset + i))
-		{
+                {
                     res = 0;
-		    break;
-	        }
+                    break;
+                }
             }
 
-	    offset += lenQ;
-	}
+            offset += lenQ;
+        }
 
         _fmpz_vec_clear(P, 2*lenQ - 1);
-    } else
+    }
+    else
     {
         _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
 
@@ -77,7 +76,7 @@ int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
             if (!fmpz_is_zero(R + i))
             {
                 res = 0;
-	        break;
+                break;
             }
         }
     }
@@ -87,13 +86,13 @@ int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
     _fmpz_vec_clear(R, lenB - 1);
 
     if (res == 0)
-	_fmpz_vec_zero(Q, lenQ);
+        _fmpz_vec_zero(Q, lenQ);
 
     return res;
 }
 
 int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
-                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+        const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_t tQ;
     fmpz * q;
@@ -106,7 +105,7 @@ int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     if (lenB == 0 || lenA < lenB)
     {
         fmpz_mod_poly_zero(Q, ctx);
-	return lenA == 0;
+        return lenA == 0;
     }
 
     if (Q == A || Q == B)
@@ -127,7 +126,7 @@ int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
         fmpz_mod_poly_swap(tQ, Q, ctx);
         fmpz_mod_poly_clear(tQ, ctx);
     }
-    
+
     _fmpz_mod_poly_set_length(Q, lenA - lenB + 1);
     _fmpz_mod_poly_normalise(Q);
 

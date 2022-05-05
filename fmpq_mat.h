@@ -18,12 +18,26 @@
 #define FMPQ_MAT_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq_poly.h"
-#include "fmpq.h"
+
+/* Define the following to avoid including fmpq.h which includes fmpz.h. */
+#ifndef FMPQ_H
+# define fmpq_numref(__x) (&(__x)->num)
+# define fmpq_denref(__y) (&(__y)->den)
+# define fmpz_swap(op1, op2)    \
+    if (op1 != op2)             \
+    {                           \
+        fmpz tmp = *op1;        \
+        *op1 = *op2;            \
+        *op2 = tmp;             \
+    }
+# define fmpq_swap(op1, op2)                            \
+    do                                                  \
+    {                                                   \
+        fmpz_swap(fmpq_numref(op1), fmpq_numref(op2));  \
+        fmpz_swap(fmpq_denref(op1), fmpq_denref(op2));  \
+    } while (0)
+#endif
 
 #ifdef __cplusplus
  extern "C" {

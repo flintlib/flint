@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_mod_poly.h"
 
 void
 _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
@@ -74,10 +72,7 @@ void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
     fmpz * ptr2;
 
     if (len3 == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_horner). Division by zero \n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_compose_mod_horner\n");
 
     if (len1 == 0 || len3 == 1)
     {

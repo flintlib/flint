@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
@@ -51,11 +50,7 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     }
 
     if (lenB == 0)
-    {
-        fmpz_clear(invB);
-	    flint_printf("Exception (fmpz_mod_poly_divrem_f). Division by zero.\n");
-        flint_abort();
-    }
+	    flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_divrem_f\n");
 
     if (lenA < lenB)
     {

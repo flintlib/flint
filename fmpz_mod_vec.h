@@ -18,9 +18,7 @@
 #define FMPZ_MOD_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz_mod.h"
 
 #ifdef __cplusplus
  extern "C" {

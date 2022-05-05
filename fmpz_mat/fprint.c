@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "flint-impl.h"
 
 /*
     The macros xxx_putc, xxx_flint_printf, and xxx_fmpz_print are provided 
@@ -22,19 +25,20 @@
     The macros are undef'd at the end of the file.
  */
 
-#define xxx_putc(c)        \
-do {                       \
-    z = fputc((c), file);  \
-    if (z <= 0)            \
-        return z;          \
-} while (0)
+#define xxx_putc(c)             \
+    do                          \
+    {                           \
+        z = fputc((c), file);   \
+        if (z <= 0)             \
+            return z;           \
+    } while (0)
 
-#define xxx_flint_printf()                       \
-do {                                       \
-    z = flint_fprintf(file, "%li %li  ", r, c);  \
-    if (z <= 0)                            \
-        return z;                          \
-} while (0)
+#define xxx_flint_printf()      \
+    do {                        \
+        z = fprintf(file, WORD_FMT "d " WORD_FMT "d  ", r, c);  \
+        if (z <= 0)             \
+            return z;           \
+    } while (0)
 
 #define xxx_fmpz_print(f)        \
 do {                             \

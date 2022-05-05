@@ -42,4 +42,3 @@ void fmpz_mod_poly_inflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input,
         result->length = res_length;
     }
 }
-

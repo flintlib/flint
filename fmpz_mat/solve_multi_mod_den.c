@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 

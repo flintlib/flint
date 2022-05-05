@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 
 /*
     compute f^0, f^1, ..., f^(n-1) mod g, where g has length glen and f is
@@ -81,10 +77,7 @@ fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
     fmpz ** res_arr;
     
     if (fmpz_mod_poly_length(g, ctx) == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_powers_mod_naive). Divide by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_powers_mod_naive\n");
 
     if (fmpz_mod_poly_length(f, ctx) == 0 || fmpz_mod_poly_length(g, ctx) == 1)
     {

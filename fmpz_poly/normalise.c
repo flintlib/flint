@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 
 void
 _fmpz_poly_normalise(fmpz_poly_t poly)

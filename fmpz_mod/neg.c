@@ -9,7 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz.h"
+
+#if FLINT_WANT_ASSERT
+# include "fmpz_mod.h"
+#endif
 
 void fmpz_mod_neg(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 {

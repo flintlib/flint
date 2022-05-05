@@ -13,19 +13,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void
@@ -83,12 +71,7 @@ fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
     int qcopy = 0;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp_preinv)."
-                     "Divide by zero.\n");
-        flint_abort();
-    }
-
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_powmod_fmpz_binexp_preinv\n");
 
     if (lenf == 1)
     {
@@ -97,11 +80,7 @@ fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
     }
 
     if (fmpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp_preinv)."
-                     "Negative exp not implemented\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Negative exp not implemented in fmpz_mod_poly_powmod_fmpz_binexp_preinv\n");
 
     if (len >= lenf)
     {

@@ -11,19 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
@@ -63,16 +50,10 @@ fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     len2 = poly2->length;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_mulmod_preinv). Divide by zero\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_mulmod_preinv\n");
 
     if (lenf <= len1 || lenf <= len2)
-    {
-        flint_printf("Exception (fmpz_mod_poly_mulmod_preinv). Input larger than modulus.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Input larger than modulus in fmpz_mod_poly_mulmod_preinv\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {

@@ -17,10 +17,7 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
     slong dim = A->r;
 
     if (dim != A->c)
-    {
-        flint_printf("Exception (fmpz_mat_det). Non-square matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square matrix in fmpz_mat_det\n");
 
     if (dim < 5)
         fmpz_mat_det_cofactor(det, A);

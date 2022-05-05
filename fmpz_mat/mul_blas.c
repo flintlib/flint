@@ -9,20 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdint.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "ulong_extras.h"
-#include "n_poly.h"
-#include "mpn_extras.h"
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
 #include "cblas.h"
-
+#include "thread_support.h"
+#include "flint-impl.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "nmod.h"
 
 typedef struct {
     slong m;

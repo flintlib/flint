@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
+#include "fmpz_mini.h"
 #include "fmpz_mat.h"
 
 void
@@ -43,4 +45,3 @@ fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D)
         }
     }
 }
-    

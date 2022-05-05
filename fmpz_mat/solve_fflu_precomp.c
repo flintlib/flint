@@ -10,7 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "flint-impl.h"
 
 #define XX(ii,jj) fmpz_mat_entry(X,(ii),(jj))
 #define XXx(ii,jj) fmpz_mat_entry(Xx,(ii),(jj))

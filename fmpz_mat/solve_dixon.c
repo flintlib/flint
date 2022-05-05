@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 mp_limb_t
@@ -212,10 +215,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     mp_limb_t p;
 
     if (!fmpz_mat_is_square(A))
-    {
-        flint_printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square system matrix in fmpz_mat_solve_dixon\n");
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
         return 1;

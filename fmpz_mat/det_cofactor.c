@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 #define E(i,j) fmpz_mat_entry(A, i, j)
@@ -81,7 +82,6 @@ fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
         case 3:  _fmpz_mat_det_cofactor_3x3(det, A);     break;
         case 4:  _fmpz_mat_det_cofactor_4x4(det, A);     break;
         default:
-            flint_printf("Exception (fmpz_mat_det_cofactor). dim > 4 not implemented.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "dim > 4 not implemented in fmpz_mat_det_cofactor");
     }
 }

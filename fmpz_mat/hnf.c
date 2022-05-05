@@ -43,7 +43,8 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
        
     if (m < cutoff)
         fmpz_mat_hnf_classical(H, A);
-    else {
+    else
+    {
         flint_rand_t state;
 
         flint_randinit(state);

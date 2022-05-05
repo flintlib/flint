@@ -9,10 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "fmpz.h"
 #include "fmpz_mat.h"
+#ifdef LONGSLONG
+# define flint_mpz_get_si mpz_get_si
+#else
+# include "gmpcompat.h"
+#endif
 
 int 
-fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
+fmpz_mat_fread(FILE * file, fmpz_mat_t mat)
 {
     slong r, c, i, j;
     int byte_count;
@@ -28,11 +35,8 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     }
     
     if (!mpz_fits_slong_p(t))
-    {
-        flint_printf("Exception (fmpz_mat_fread). "
-               "Number of rows does not fit into a slong.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Number of rows does not fit into a slong in fmpz_mat_fread\n");
+
     r = flint_mpz_get_si(t);
 
     /* second number in file should be column dimension */
@@ -44,11 +48,8 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     }
     
     if (!mpz_fits_slong_p(t))
-    {
-        flint_printf("Exception (fmpz_mat_fread). "
-               "Number of columns does not fit into a slong.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Number of columns does not fit into a slong in fmpz_mat_fread\n");
+
     c = flint_mpz_get_si(t);
     mpz_clear(t);
     
@@ -59,11 +60,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
         fmpz_mat_init(mat,r,c);
     }
     else if (mat->r != r || mat->c != c)
-    {
-        flint_printf("Exception (fmpz_mat_fread). \n"
-               "Dimensions are non-zero and do not match input dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Dimensions are non-zero and do not match input dimensions in fmpz_mat_fread\n");
 
     for (i = 0; i < r; i++)
     {

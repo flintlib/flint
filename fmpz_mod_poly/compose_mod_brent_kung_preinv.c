@@ -12,12 +12,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "fmpz_mat.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
+#include "fmpz_mod_poly.h"
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
@@ -104,19 +102,10 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
     fmpz_t inv3;
 
     if (len3 == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung preinv)."
-                     "Division by zero\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_compose_mod_brent_kung_preinv\n");
 
     if (len1 >= len3)
-    {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung_preinv)."
-               "The degree of the first polynomial must be smaller than that of the "
-               " modulus\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Degree of first polynomial must be smaller than modulus in fmpz_mod_poly_compose_mod_brent_kung_preinv\n");
 
     if (len1 == 0 || len3 == 1)
     {

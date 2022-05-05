@@ -9,8 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "longlong.h"
+#ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
+# define flint_mpz_addmul_ui mpz_addmul_ui
+# define flint_mpz_submul_ui mpz_submul_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,

@@ -13,10 +13,9 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz_mod_poly.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod_poly.h"
 
 slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
                                   const fmpz* seq, slong len, const fmpz_t p)

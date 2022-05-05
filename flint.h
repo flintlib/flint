@@ -167,6 +167,38 @@ FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 #define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)
 #define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
 
+/* I/O ************************************************************************/
+
+/* We do not want to load stdio.h by default. The user should have as much
+ * freedom as possible. */
+#if defined (H_STDIO)               \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+FLINT_DLL int parse_fmt(int * floating, const char * fmt);
+
+FLINT_DLL int flint_printf(const char * str, ...);
+FLINT_DLL int flint_vprintf(const char * str, va_list ap);
+FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...);
+FLINT_DLL int flint_sprintf(char * s, const char * str, ...);
+
+FLINT_DLL int flint_scanf(const char * str, ...);
+FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...);
+FLINT_DLL int flint_sscanf(const char * s, const char * str, ...);
+#endif
+
 /* memory handling ************************************************************/
 
 FLINT_DLL void * flint_malloc(size_t size);

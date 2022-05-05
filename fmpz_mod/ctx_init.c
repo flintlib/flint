@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_mod.h"
 
 void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
@@ -16,10 +18,7 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
     flint_bitcnt_t bits;
 
     if  (fmpz_sgn(n) <= 0)
-    {
-        flint_throw(FLINT_ERROR, "Exception in fmpz_mod_ctx_init: "
-                                                    "Modulus is nonpositive.");
-    }
+        flint_throw(FLINT_ERROR, "Modulus is nonpositive in fmpz_mod_ctx_init\n");
 
     /* prepare for general case */
     fmpz_init_set(ctx->n, n);

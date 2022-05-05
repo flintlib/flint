@@ -15,7 +15,7 @@
 
 void
 fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
-    const fmpz_mat_t mat, const void * comb_void, void * temp_void)
+    const fmpz_mat_t mat, const fmpz_comb_t comb_void, fmpz_comb_temp_t temp_void)
 {
     slong i, j, k;
     mp_ptr r;

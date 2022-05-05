@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mini.h"
 
 void
 fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
@@ -18,10 +18,7 @@ fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
     slong i, j;
 
     if (B->r != A->c || B->c != A->r)
-    {
-        flint_printf("Exception (fmpz_mat_transpose). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in fmpz_mat_transpose\n");
 
     if (A == B)  /* In-place, guaranteed to be square */
     {

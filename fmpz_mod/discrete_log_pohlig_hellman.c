@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
 #include <math.h>
+#include <stdlib.h>
+#include "fmpz.h"
+#include "fmpz_factor.h"
+#include "fmpz_mod.h"
 
 /*
     Assumption on fmpz_mod_discrete_log_pohlig_hellman_t:

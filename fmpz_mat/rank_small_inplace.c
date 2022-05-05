@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mini.h"
 #include "fmpz_mat.h"
-#include "perm.h"
-#include "longlong.h"
 
 #define E(j,k) fmpz_mat_entry(B,j,k)
 

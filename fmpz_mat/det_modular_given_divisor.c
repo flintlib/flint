@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "ulong_extras.h"
 
 /* Enable to exercise corner cases */
 #define DEBUG_USE_SMALL_PRIMES 0

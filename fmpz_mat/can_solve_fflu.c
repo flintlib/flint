@@ -10,8 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "perm.h"
+#include "fmpz_mini.h"
+#include "fmpz_mat.h"
 
 void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
 		                               const fmpz_mat_t A, slong start)

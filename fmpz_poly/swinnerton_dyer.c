@@ -10,6 +10,8 @@
 */
 
 #include <math.h>
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 
 /* Bound coefficients using (x + u)^(2^n) and the binomial

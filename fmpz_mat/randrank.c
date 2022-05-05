@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
@@ -19,10 +20,7 @@ fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank,
     fmpz * diag;
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
-    {
-        flint_printf("Exception (fmpz_mat_randrank). Impossible rank.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Impossible rank in fmpz_mat_randrank\n");
 
     diag = _fmpz_vec_init(rank);
     for (i = 0; i < rank; i++)

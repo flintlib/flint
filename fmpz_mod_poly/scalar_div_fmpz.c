@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, 
@@ -31,10 +28,7 @@ void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
        fmpz_gcdinv(g, xinv, x, p);
 
     if (!fmpz_is_one(g))
-    {
-        flint_printf("Exception (_fmpz_mod_poly_scalar_div_fmpz). Impossible inverse.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "_fmpz_mod_poly_scalar_div_fmpz\n");
 
     _fmpz_vec_scalar_mul_fmpz(res, poly, len, xinv);
     _fmpz_vec_scalar_mod_fmpz(res, res, len, p);
@@ -55,10 +49,7 @@ void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res,
             return;
         }
         else
-        {
-            flint_printf("Exception (fmpz_mod_poly_scalar_div_fmpz). Division by zero.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_scalar_div_fmpz\n");
     }
 
     fmpz_mod_poly_fit_length(res, poly->length, ctx);

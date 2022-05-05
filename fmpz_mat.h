@@ -508,18 +508,14 @@ FLINT_DLL void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
 FLINT_DLL void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
 
-/* FIXME: Remove void when fmpz_comb_t and fmpz_comb_temp_t have been dealt
- * with. */
+#ifdef FMPZ_H
 FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres,
-    const fmpz_mat_t mat, const void * comb, void * temp);
+    const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
+
 FLINT_DLL void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
     nmod_mat_t * const residues, slong nres,
-    const void * comb, void * temp, int sign);
-/* FLINT_DLL void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, */
-/*     nmod_mat_t * const residues, slong nres, */
-/*     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign); */
-/* FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, */
-/*     const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp); */
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
+#endif
 
 FLINT_DLL void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);

@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz.h"
+#if FLINT_WANT_ASSERT
+# include "fmpz_mod.h"
+#endif
 
 /*
     An entry of {a, b, c, d, e, f, g, h} gives a prime

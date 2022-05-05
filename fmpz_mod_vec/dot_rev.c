@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
 
 void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a,
 		           const fmpz * b, slong len, const fmpz_mod_ctx_t ctx)

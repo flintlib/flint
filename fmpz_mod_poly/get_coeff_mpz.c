@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
 #include "fmpz.h"
-#include "fmpz_mat.h"
+#include "fmpz_mod_poly.h"
 
 void
-fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
+fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly, slong n,
+                                                    const fmpz_mod_ctx_t ctx)
 {
-    slong i, j;
-
-    for (i = 0; i < Amod->r; i++)
-        for (j = 0; j < Amod->c; j++)
-            fmpz_set_ui(fmpz_mat_entry(A, i, j), nmod_mat_entry(Amod, i, j));
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_mod_poly_get_coeff_fmpz(t, poly, n, ctx);
+    fmpz_get_mpz(x, t);
+    fmpz_clear(t);
 }

@@ -10,8 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "flint-impl.h"
 
 static void 
 __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 
@@ -286,16 +287,11 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     fmpz *q, *r;
 
     if (B->length == 0)
-    {
-        flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_pseudo_divrem_divconquer\n");
+
     if (Q == R)
-    {
-        flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). \n"
-               "Output arguments Q and R may not be aliased.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Output arguments Q and R may not be aliased in fmpz_poly_pseudo_divrem_divconquer\n");
+
     if (A->length < B->length)
     {
         fmpz_poly_zero(Q);
@@ -346,4 +342,3 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     else
         _fmpz_poly_set_length(R, lenr);
 }
-

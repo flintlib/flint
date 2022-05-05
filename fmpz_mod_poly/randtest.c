@@ -11,12 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,
                                                       const fmpz_mod_ctx_t ctx)
@@ -69,10 +67,7 @@ void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_t state,
                                            slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "len == 0 in fmpz_mod_poly_randtest_irreducible\n");
 
     do {
         fmpz_mod_poly_randtest(f, state, len, ctx);
@@ -84,10 +79,7 @@ void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_randtest_monic_irreducible). len == 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "len == 0 in fmpz_mod_poly_randtest_monic_irreducible\n");
 
     do {
         fmpz_mod_poly_randtest_monic(f, state, len, ctx);
@@ -99,10 +91,7 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
                        flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
 {
     if (len == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "len == 0 in fmpz_mod_poly_randtest_not_zero\n");
 
     do {
         fmpz_mod_poly_randtest(f, state, len, ctx);

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "flint.h"
 
 void
 fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)

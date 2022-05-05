@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,14 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPZ_MAT_INLINES_C
-
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_mat.h"
+#include "fmpz_mod_poly.h"
+
+void
+fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n, const mpz_t x,
+                                                    const fmpz_mod_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_mod_poly_set_coeff_fmpz(poly, n, t, ctx);
+    fmpz_clear_readonly(t);
+}

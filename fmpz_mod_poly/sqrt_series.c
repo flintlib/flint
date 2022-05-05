@@ -10,14 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
-
 
 void
 _fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong n, fmpz_mod_ctx_t mod)
@@ -38,16 +32,10 @@ fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, f
     hlen = h->length;
 
     if (n == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_sqrt_series). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_sqrt_series\n");
 
     if (h->length == 0 || !fmpz_is_one(h->coeffs + 0))
-    {
-        flint_printf("Exception (fmpz_mod_poly_sqrt_series). Requires constant term 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Requires constant term 1 in fmpz_mod_poly_sqrt_series\n");
 
     if (hlen < n)
     {

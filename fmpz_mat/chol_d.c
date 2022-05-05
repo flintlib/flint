@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
+#include "d_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
@@ -17,11 +20,7 @@ fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
     slong i, k, j, r = A->r;
 
     if (A->r != A->c || R->r != A->r || R->c != A->c)
-    {
-        flint_printf
-            ("Exception (fmpz_mat_chol_d). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in fmpz_mat_chol_d\n");
 
     if (A->r == 0)
     {
@@ -41,10 +40,8 @@ fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
                 d_mat_entry(R, i, j) =
                     sqrt(fmpz_get_d(fmpz_mat_entry(A, i, i)) - s);
             else
-                d_mat_entry(R, i, j) =
-                    (fmpz_get_d(fmpz_mat_entry(A, i, j)) - s) / d_mat_entry(R,
-                                                                            j,
-                                                                            j);
+                d_mat_entry(R, i, j) = (fmpz_get_d(fmpz_mat_entry(A, i, j)) - s)
+                                                         / d_mat_entry(R, j, j);
         }
     }
 }

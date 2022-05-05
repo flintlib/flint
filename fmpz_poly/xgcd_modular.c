@@ -10,12 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
+#include "nmod.h"
+#include "nmod_poly.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
-#include "mpn_extras.h"
+#include "flint-impl.h"
 
 void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
                              const fmpz * poly1, slong len1, 
@@ -49,7 +48,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     T1 = B + len2;
     T2 = T1 + (len1 + len2 - 1);
 
-    _nmod_vec_zero(S, len2 + len1); /* S = T = 0 */
+    _NMOD_VEC_ZERO(S, len2 + len1); /* S = T = 0 */
 
     first = 1;
 

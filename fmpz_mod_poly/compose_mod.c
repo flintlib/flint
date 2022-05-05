@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 
 void
 _fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
@@ -41,11 +38,7 @@ fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     fmpz * ptr2;
 
     if (len3 == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod)."
-                     "Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_compose_mod\n");
 
     if (len1 == 0 || len3 == 1)
     {

@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
@@ -25,10 +28,7 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
     c = n_invmod(c, m2);
 
     if (c == 0)
-    {
-        flint_printf("Exception (fmpz_mat_CRT_ui). m1 not invertible modulo m2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "fmpz_mat_CRT_ui\n");
 
     fmpz_init(m1m2);
     fmpz_mul_ui(m1m2, m1, m2);

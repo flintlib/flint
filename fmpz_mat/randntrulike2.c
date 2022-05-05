@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 
 void
 fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
@@ -22,10 +23,7 @@ fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, 
     fmpz *h;
 
     if ((c != r) || (c != 2 * d))
-    {
-        flint_printf("Exception (fmpz_mat_randntrulike2). Ill-formed matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Ill-formed matrix in fmpz_mat_randntrulike2\n");
 
     h = _fmpz_vec_init(d);
 

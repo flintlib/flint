@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
@@ -40,11 +38,7 @@ void
 fmpz_poly_power_sums_naive(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 {
     if (poly->length == 0)
-    {
-        flint_printf
-            ("Exception (fmpz_poly_power_sums_naive). Zero polynomial.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Zero polynomial in fmpz_poly_power_sums_naive\n");
     else if (n <= 0 || poly->length == 1)
     {
         fmpz_poly_zero(res);

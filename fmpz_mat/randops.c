@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 
 void
 fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)

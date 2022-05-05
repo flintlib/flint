@@ -10,7 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "flint-impl.h"
 
 #define FLINT_REVERSE_NEWTON_CUTOFF 10
 
@@ -59,11 +61,7 @@ fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
     slong Qlen = Q->length;
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
-    {
-        flint_printf("Exception (fmpz_poly_revert_series_newton). Input must have \n"
-               "zero constant term and +1 or -1 as coefficient of x^1\n.");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Input must have zero constant term and +1 or -1 as coefficient of x^1 in fmpz_poly_revert_series_newton\n");
 
     if (Qinv != Q)
     {

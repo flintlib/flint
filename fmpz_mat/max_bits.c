@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_vec.h"
 
 slong
 fmpz_mat_max_bits(const fmpz_mat_t mat)

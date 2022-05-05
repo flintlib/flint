@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mini.h"
 #include "fmpz_mat.h"
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void

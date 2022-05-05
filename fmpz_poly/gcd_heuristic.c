@@ -78,7 +78,7 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
 #else
       mpn_tdiv_q(arrayg, temp, limbsg, mgc->_mp_d, mgc->_mp_size);
 #endif
-      tlimbs = limbsg - mgc->_mp_size + (arrayg[tlimbs - 1] != 0);
+      tlimbs = limbsg - mgc->_mp_size + (arrayg[limbsg - 1] != 0);
       
       TMP_END;
       return tlimbs;

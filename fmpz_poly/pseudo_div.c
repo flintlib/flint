@@ -9,11 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, slong lenA, 
@@ -31,10 +26,8 @@ void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A,
     fmpz * q;
 
     if (B->length == 0)
-    {
-        flint_printf("Exception (fmpz_poly_pseudo_div). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_pseudo_div\n");
+
     if (A->length < B->length)
     {
         fmpz_poly_zero(Q);

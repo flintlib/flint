@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
-
 
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len)
 {
@@ -140,10 +140,7 @@ slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
     slong n_pos = 0;
 
     if (fmpz_poly_is_zero(pol))
-    {
-        printf("ERROR (fmpz_poly_num_real_roots_sturm): zero polynomial\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "zero polynomial in fmpz_poly_num_real_roots_sturm\n");
 
     for (i = 0; (i < pol->length) && fmpz_is_zero(pol->coeffs + i); i++);
     len = pol->length - i;

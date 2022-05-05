@@ -13,21 +13,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 
 void
 _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
@@ -83,11 +70,7 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
     int qcopy = 0;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_powmod_ui_binexp_preinv)."
-                     "Divide by zero\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_powmod_ui_binexp_preinv\n");
 
     if (lenf == 1)
     {

@@ -10,9 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
 #include "perm.h"
+#include "ulong_extras.h"
+#include "nmod_mat.h"
+#include "fmpz_mini.h"
+#include "fmpz_mat.h"
 
 slong
 fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
@@ -72,11 +74,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         /* solve B*E2 = den*C */
         fmpz_mat_init(E2, rank, n - rank);
         if (!fmpz_mat_solve(E2, den, B, C))
-        {
-            flint_printf("Exception (fmpz_mat_rref_mul). "
-                         "Singular input matrix for solve.");
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "Singular input matrix for solve in fmpz_mat_rref_mul\n");
 
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);

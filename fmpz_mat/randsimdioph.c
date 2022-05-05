@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
@@ -21,10 +22,7 @@ fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, f
     slong i, j;
 
     if (c != r)
-    {
-        flint_printf("Exception (fmpz_mat_randsimdioph). Ill-formed matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Ill-formed matrix in fmpz_mat_randsimdioph\n");
 
     fmpz_one(mat->rows[0]);
     fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);

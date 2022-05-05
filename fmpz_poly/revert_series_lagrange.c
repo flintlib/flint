@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
@@ -54,11 +55,7 @@ fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     slong Qlen = Q->length;
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
-    {
-        flint_printf("Exception (fmpz_poly_revert_series_lagrange). Input must have \n"
-               "zero constant term and +1 or -1 as coefficient of x^1\n.");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Input must have zero constant term and +1 or -1 as coefficient of x^1 in fmpz_poly_revert_series_lagrange\n");
 
     if (Qinv != Q)
     {

@@ -18,16 +18,7 @@
 #define FFT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
 #include "flint.h"
-#include "mpn_extras.h"
 
 #if HAVE_OPENMP
 #include <omp.h> /* must come after flint.h */
@@ -47,6 +38,9 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #else
 
+/* TODO: Don't inline this. Else, we need to include flint-impl.h, which the
+ * user should not see. */
+#include "flint-impl.h"
 FFT_INLINE
 mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
@@ -284,4 +278,3 @@ FLINT_DLL void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj,
 #endif
 
 #endif
-

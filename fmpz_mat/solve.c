@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mat.h"
-#include "perm.h"
 
 int
 fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,

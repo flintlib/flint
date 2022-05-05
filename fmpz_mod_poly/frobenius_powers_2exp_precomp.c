@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_frobenius_powers_2exp_precomp(
@@ -23,26 +19,26 @@ void fmpz_mod_poly_frobenius_powers_2exp_precomp(
 
     if (m == 0)
     {
-       pow->len = 0;
+        pow->len = 0;
 
-       return;
+        return;
     }
 
     l = FLINT_CLOG2(m);
     if ((WORD(1) << l) == m)
-       l++;
+        l++;
 
     pow->pow = (fmpz_mod_poly_struct *) flint_malloc(l*sizeof(fmpz_mod_poly_struct));
 
     for (i = 0; i < l; i++)
-       fmpz_mod_poly_init(pow->pow + i, ctx);
+        fmpz_mod_poly_init(pow->pow + i, ctx);
 
     pow->len = l;
 
-   fmpz_mod_poly_powmod_x_fmpz_preinv(pow->pow + 0,
-                                      fmpz_mod_ctx_modulus(ctx), f, finv, ctx);
+    fmpz_mod_poly_powmod_x_fmpz_preinv(pow->pow + 0,
+            fmpz_mod_ctx_modulus(ctx), f, finv, ctx);
 
     for (i = 1; i < l; i++)
-       fmpz_mod_poly_compose_mod(pow->pow + i, pow->pow + i - 1,
-                                                     pow->pow + i - 1, f, ctx);
+        fmpz_mod_poly_compose_mod(pow->pow + i, pow->pow + i - 1,
+                pow->pow + i - 1, f, ctx);
 }

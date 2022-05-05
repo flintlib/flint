@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fq_nmod.h"
 
@@ -75,11 +77,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     q = fmpz_mat_nrows(Q);
 
     if (!(d = n_is_prime_power(&p, q)) || q % 2 == 0)
-    {
-        printf("Exception (fmpz_mat_jacobsthal). Not an odd prime power.\n");
-        flint_abort();
-        p = 0; /* not reached, but silence compiler warning */
-    }
+        flint_throw(FLINT_ERROR, "Not an odd prime power in fmpz_mat_jacobsthal\n");
 
     fmpz_init_set_ui(pp, p);
     fq_nmod_ctx_init(ctx, pp, d, "x");
@@ -256,4 +254,3 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
     return 1;
 }
-

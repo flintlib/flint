@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -73,10 +70,7 @@ fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     slong rlen;
 
     if (len != 2)
-    {
-        flint_printf("Exception (fmpz_poly_pow_binomial). poly->length not equal to 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "poly->length not equal to 2 in fmpz_poly_pow_binomial\n");
 
     if (e < UWORD(3))
     {

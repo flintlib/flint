@@ -11,15 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_scalar_addmul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                             slong x)
+fmpz_poly_scalar_addmul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
 {
     if (x != 0 && !fmpz_poly_is_zero(poly2))
     {

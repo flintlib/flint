@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
@@ -50,10 +49,8 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     const slong lenA = A->length, lenB = B->length;
 
     if (lenB < 2)
-    {
-        flint_printf("Exception (fmpz_mod_poly_gcdinv). lenB < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenB < 2 in fmpz_mod_poly_gcdinv\n");
+
     if (lenA >= lenB)
     {
         fmpz_mod_poly_t T;

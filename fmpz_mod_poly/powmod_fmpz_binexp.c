@@ -12,10 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void
@@ -74,10 +71,7 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
     int qcopy = 0;
 
     if (lenf == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). Divide by zero\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_powmod_fmpz_binexp\n");
 
     if (lenf == 1)
     {
@@ -86,10 +80,7 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
     }
 
     if (fmpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). negative exp not implemented\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Negative exp not implemented in fmpz_mod_poly_powmod_fmpz_binexp\n");
 
     if (len >= lenf)
     {

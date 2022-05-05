@@ -10,11 +10,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef strncmp
+# ifdef __GNUC__
+#  define strncmp __builtin_strncmp
+# else
+#  include <string.h>
+# endif
+#endif
 #include <math.h>
 #include <float.h>
-#include <string.h>
+#include <stdio.h>
 #include "profiler.h"
-#include "flint-io.h"
+#include "flint-impl.h"
 
 #if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
 	                    (GMP_LIMB_BITS == 32 && (defined (__i386__) || \
@@ -115,26 +122,25 @@ void get_memory_usage(meminfo_t meminfo)
 
         if (strncmp(line, "VmSize:", 7) == 0)
         {
-            flint_sscanf(line, "VmSize: %wu kB\n", &result);
+            sscanf(line, "VmSize: " WORD_FMT "u kB\n", &result);
             meminfo->size = result;
         }
         else if (strncmp(line, "VmPeak:", 7) == 0)
         {
-            flint_sscanf(line, "VmPeak: %wu kB\n", &result);
+            sscanf(line, "VmPeak: " WORD_FMT "u kB\n", &result);
             meminfo->peak = result;
         }
         else if (strncmp(line, "VmHWM:", 6) == 0)
         {
-            flint_sscanf(line, "VmHWM: %wu kB\n", &result);
+            sscanf(line, "VmHWM: " WORD_FMT "u kB\n", &result);
             meminfo->hwm = result;
         }
         else if (strncmp(line, "VmRSS:", 6) == 0)
         {
-            flint_sscanf(line, "VmRSS: %wu kB\n", &result);
+            sscanf(line, "VmRSS: " WORD_FMT "u kB\n", &result);
             meminfo->rss = result;
         }
     }
 
     fclose(file);
 }
-

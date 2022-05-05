@@ -11,18 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
@@ -61,10 +50,7 @@ void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
             return;
         }
         else
-        {
-            flint_printf("Exception (fmpz_mod_poly_div_newton_n_preinv). Division by zero.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_div_newton_n_preinv\n");
     }
 
     if (lenA < lenB)
@@ -74,10 +60,7 @@ void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
     }
 
     if (lenA > 2 * lenB - 2)
-    {
-        flint_printf("Exception (fmpz_mod_poly_div_newton_n_preinv).\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "fmpz_mod_poly_div_newton_n_preinv\n");
 
     if (Q == A || Q == B || Q == Binv)
     {

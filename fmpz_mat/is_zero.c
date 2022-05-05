@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_vec.h"
 
 int
 fmpz_mat_is_zero(const fmpz_mat_t mat)
