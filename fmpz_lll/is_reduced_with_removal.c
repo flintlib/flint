@@ -13,21 +13,6 @@
 
 #include "fmpz_lll.h"
 
-static int
-want_mpfr(const fmpz_mat_t A, const fmpz_t b)
-{
-    slong bits, bits2;
-
-    bits = fmpz_mat_max_bits(A);
-    bits = FLINT_ABS(bits);
-    bits2 = fmpz_bits(b);
-    bits = FLINT_MAX(bits, bits2);
-
-    /* highest double exponent is 1023; use mpfr when products in
-       is_reduced_d could possibly have overflowed */
-    return bits > 512 - 32;
-}
-
 int
 fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                  const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
@@ -38,8 +23,7 @@ fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
     if (fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd))
         return 1;
 
-    if (want_mpfr(B, gs_B) &&
-        fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B, newd, prec))
+    if (fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B, newd, prec))
         return 1;
 
     return (fl->rt == Z_BASIS) ?
