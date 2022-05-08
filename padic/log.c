@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "padic.h"
+#include "flint-impl.h"
 #include "ulong_extras.h"
+#include "padic.h"
 
 /*
     Assumes that $1 \leq v$ or $2 \leq v$ as $p$ is even 
@@ -47,10 +45,7 @@
 slong _padic_log_bound(slong v, slong N, const fmpz_t prime)
 {
     if (N >= (WORD(1) << (SMALL_FMPZ_BITCOUNT_MAX)))
-    {
-        flint_printf("Exception (_padic_log_bound).  N = %wd is too large.\n", N);
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "N = " WORD_FMT "d is too large in _padic_log_bound\n", N);
 
     if (fmpz_fits_si(prime))
     {
@@ -145,4 +140,3 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
-

@@ -18,7 +18,7 @@
 int main(int argc, char* argv[])
 {
     n_primes_t iter;
-    mp_limb_t p, N;
+    ulong p, N;
 
     if (argc < 2)
     {

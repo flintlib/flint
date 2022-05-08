@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
+#include <stdio.h>
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "qadic.h"
-#include "padic.h"
 
 int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v, 
     const qadic_ctx_t ctx)
@@ -60,10 +60,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
                 break;
 
         if (i < len)
-        {
-            flint_printf("ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "u < 0 in SERIES mode in qadic_fprint_pretty\n");
 
         x = _fmpz_vec_init(len);
         d = _fmpz_vec_init(len);
@@ -87,7 +84,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
                     fputc('*', file);
                     fmpz_fprint(file, p);
                     if (j + v != 1)
-                        flint_fprintf(file, "^%wd", j + v);
+                        fprintf(file, "^" WORD_FMT "d", j + v);
                 }
             }
 
@@ -102,7 +99,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
 
             if (!_fmpz_vec_is_zero(d, len))
             {
-                flint_fprintf(file, " + ");
+                fprintf(file, " + ");
                 fputc('(', file);
                 _fmpz_poly_fprint_pretty(file, d, len, ctx->var);
                 fputc(')', file);
@@ -111,7 +108,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
                     fputc('*', file);
                     fmpz_fprint(file, p);
                     if (j + v != 1)
-                        flint_fprintf(file, "^%wd", j + v);
+                        fprintf(file, "^" WORD_FMT "d", j + v);
                 }
             }
         }
@@ -139,14 +136,11 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
             fputc(')', file);
             fputc('*', file);
             fmpz_fprint(file, p);
-            flint_fprintf(file, "^%wd", v);
+            fprintf(file, "^" WORD_FMT "d", v);
         }
     }
     else
-    {
-        flint_printf("Exception (qadic_fprint_pretty).  Unknown print mode.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Unknown print mode in qadic_fprint_pretty\n");
 
     return 1;
 }
@@ -155,4 +149,3 @@ int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx)
 {
     return _qadic_fprint_pretty(file, op->coeffs, op->length, op->val, ctx);
 }
-

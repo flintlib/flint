@@ -104,7 +104,7 @@ fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
         copy = flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len; i++)
             copy[i] = poly->coeffs[i];
-        FLINT_MPN_ZERO((mp_ptr) copy + len, n - len);
+        FLINT_MPN_ZERO((ulong_ptr) copy + len, n - len);
         clear = 1;
     }
 

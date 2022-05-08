@@ -21,11 +21,11 @@
 
 #define mock_mulmod_preinvn(rxx, axx, bxx, nnn, nxx, ninv, norm)    \
    do {                                                             \
-      mp_ptr __t;                                                   \
+      ulong_ptr __t;                                                   \
       TMP_INIT;                                                     \
                                                                     \
       TMP_START;                                                    \
-      __t = TMP_ALLOC(3*(nnn)*sizeof(mp_limb_t));                   \
+      __t = TMP_ALLOC(3*(nnn)*sizeof(ulong));                   \
                                                                     \
       mpn_mul_n(__t, axx, bxx, nnn);                                \
       if (norm)                                                     \
@@ -53,7 +53,7 @@ void sample(void * arg, ulong count)
     gmp_randstate_t st;
     FLINT_TEST_INIT(state);
 
-    mp_ptr dinv;
+    ulong_ptr dinv;
     flint_bitcnt_t norm;
     
     mpz_init(a);
@@ -82,10 +82,10 @@ void sample(void * arg, ulong count)
        mpz_mul_2exp(b, b, norm);
        mpz_mul_2exp(d, d, norm);
 
-       dinv = flint_malloc(size*sizeof(mp_limb_t));
+       dinv = flint_malloc(size*sizeof(ulong));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
-       r2->_mp_d = flint_malloc(size*sizeof(mp_limb_t));
+       r2->_mp_d = flint_malloc(size*sizeof(ulong));
        
        prof_start();
        if (algo == 1)

@@ -17,9 +17,9 @@
 #include "fmpz_poly.h"
 #include "fft.h"
 
-void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
-                              slong limbs, slong trunc, mp_limb_t ** t1, 
-                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+void fft_convolution(ulong ** ii, ulong ** jj, slong depth, 
+                              slong limbs, slong trunc, ulong ** t1, 
+                          ulong ** t2, ulong ** s1, ulong ** tt)
 {
    slong n = (WORD(1)<<depth), j;
    slong w = (limbs*FLINT_BITS)/n;
@@ -65,9 +65,9 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
 }
 
 /* less optimal version of the above, for test code only */
-void fft_convolution_basic(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
-                              slong limbs, slong trunc, mp_limb_t ** t1, 
-                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+void fft_convolution_basic(ulong ** ii, ulong ** jj, slong depth, 
+                              slong limbs, slong trunc, ulong ** t1, 
+                          ulong ** t2, ulong ** s1, ulong ** tt)
 {
    slong n = (WORD(1)<<depth), j, s, t, u, trunc2;
    slong w = (limbs*FLINT_BITS)/n;

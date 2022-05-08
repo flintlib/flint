@@ -13,13 +13,13 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA, 
-                                        mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_gcd_euclidean(ulong_ptr G, ulong_srcptr A, slong lenA, 
+                                        ulong_srcptr B, slong lenB, nmod_t mod)
 {
     slong steps;
     slong lenR1, lenR2 = 0, lenG = 0;
 
-    mp_ptr F, R1, R2, R3 = G, T;
+    ulong_ptr F, R1, R2, R3 = G, T;
     
     if (lenB == 1)
     {
@@ -93,7 +93,7 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     {
         slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
-        mp_ptr g;
+        ulong_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {

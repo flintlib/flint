@@ -195,11 +195,11 @@ Conversion
 
     See ``fmpz_set_str``, ``fmpz_set_ui`` and ``fmpz_set_si``.
 
-.. cpp:function:: void Fmpz_target::set_ui_smod(mp_limb_t x, mv_limb_t m)
+.. cpp:function:: void Fmpz_target::set_ui_smod(ulong x, mv_limb_t m)
 
-.. cpp:function:: void Fmpz_target::set_uiui(mp_limb_t x, mv_limb_t m)
+.. cpp:function:: void Fmpz_target::set_uiui(ulong x, mv_limb_t m)
 
-.. cpp:function:: void Fmpz_target::neg_uiui(mp_limb_t x, mv_limb_t m)
+.. cpp:function:: void Fmpz_target::neg_uiui(ulong x, mv_limb_t m)
 
 Input and output
 -------------------------------------------------------------------------------
@@ -382,12 +382,12 @@ Bit packing and unpacking
 Beware that argument orders are different relative to the C interface, to
 facilitate default arguments.
 
-.. cpp:function:: static Fmpz_expr fmpzxx::bit_unpack(const vector<mp_limb_t>& v, mp_bitcnt_t bits, mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
-.. cpp:function:: static Fmpz_expr fmpzxx::bit_unpack_unsigned(const vector<mp_limb_t>& v, mp_bitcnt_t bits, mp_bitcnt_t shift = 0)
+.. cpp:function:: static Fmpz_expr fmpzxx::bit_unpack(const vector<ulong>& v, mp_bitcnt_t bits, mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+.. cpp:function:: static Fmpz_expr fmpzxx::bit_unpack_unsigned(const vector<ulong>& v, mp_bitcnt_t bits, mp_bitcnt_t shift = 0)
 
     Unpack an ``fmpzxx`` from ``v``.
 
-.. cpp:function:: bool bit_pack(std::vector<mp_limb_t>& v, mp_bitcnt_t bits, Fmpz_expr, mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+.. cpp:function:: bool bit_pack(std::vector<ulong>& v, mp_bitcnt_t bits, Fmpz_expr, mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
 
     Pack an ``fmpzxx`` to ``v``. The vector ``v`` is required to be of
     sufficient size.
@@ -412,7 +412,7 @@ Chinese remaindering
 
     See ``fmpz_CRT_ui``.
 
-.. cpp:function:: fmpz_combxx::fmpz_combxx(const std::vector<mp_limb_t>& primes)
+.. cpp:function:: fmpz_combxx::fmpz_combxx(const std::vector<ulong>& primes)
 
     The class ``fmpz_combxx`` wraps both ``fmpz_comb_t`` and
     ``fmpz_comb_temp_t``. The argument ``primes`` is the vector of moduli
@@ -420,13 +420,13 @@ Chinese remaindering
     ``fmpz_combxx``. Note that the internal ``fmpz_comb_temp_t``
     structure may be modified even on constant instances of ``fmpz_combxx``.
 
-.. cpp:function:: void multi_mod(std::vector<mp_limb_t>& out, Fmpz_expr in, const fmpz_combxx& comb)
+.. cpp:function:: void multi_mod(std::vector<ulong>& out, Fmpz_expr in, const fmpz_combxx& comb)
 
     Reduce ``in`` modulo the primes stored in ``comb``, and store the
     results in ``out``. The vector ``out`` must have sufficient size, and
     its size will not be changed.
 
-.. cpp:function:: Fmpz_expr multi_CRT(const std::vector<mp_limb_t>& residues, const fmpz_combxx comb, bool sign)
+.. cpp:function:: Fmpz_expr multi_CRT(const std::vector<ulong>& residues, const fmpz_combxx comb, bool sign)
 
     Reconstruct an integer from its residues. See ``fmpz_multi_CRT_ui``.
 
@@ -662,7 +662,7 @@ reduced with respect to differing moduli.
     See ``fmpz_mat_CRT_ui``.
 
 .. cpp:function:: nmod_mat_vector::nmod_mat_vector(slong rows, slong cols,
-        const std::vector<mp_limb_t>& primes)
+        const std::vector<ulong>& primes)
 
     Initialize a vector of matrices with dimensions given by ``rows``,
     ``cols`` and moduli given by ``primes``.
@@ -687,8 +687,8 @@ reduced with respect to differing moduli.
     the results. Use precomputed data in ``comp``.
     See ``fmpz_mat_multi_mod_ui_precomp``.
 
-.. cpp:function:: nmod_mat_vector multi_mod(Fmpz_mat_expr m, const std::vector<mp_limb_t>& primes)
-.. cpp:function:: nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m, const std::vector<mp_limb_t>& primes, const fmpz_combxx& comb)
+.. cpp:function:: nmod_mat_vector multi_mod(Fmpz_mat_expr m, const std::vector<ulong>& primes)
+.. cpp:function:: nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m, const std::vector<ulong>& primes, const fmpz_combxx& comb)
 
     Convenien.. cpp:functions combining the allocation of memory and modular
     reduction.
@@ -1141,7 +1141,7 @@ followi.. cpp:functions are provided.
 .. cpp:function:: Fmpz_expr evaluate_horner(Fmpz_poly_expr, Fmpz_expr)
 .. cpp:function:: Fmpz_expr evaluate_divconquer(Fmpz_poly_expr, Fmpz_expr)
 
-.. cpp:function:: mp_limb_t evaluate_mod(Fmpz_poly_expr p, mp_limb_t x, mp_limb_t n)
+.. cpp:function:: ulong evaluate_mod(Fmpz_poly_expr p, ulong x, ulong n)
 
 Interpolation
 -------------------------------------------------------------------------------
@@ -2192,15 +2192,15 @@ Solving
 Integers mod `n` (``nmod``)
 ===============================================================================
 
-The class ``nmodxx`` encapsulates the use of ``mp_limb_t`` together with
+The class ``nmodxx`` encapsulates the use of ``ulong`` together with
 ``nmod_t`` for doing arithmetic modulo a word-sized integer. It is defined
 in ``nmod_vecxx.h``.
 
 The C++ equivalent to ``nmod_t`` is ``nmodxx_ctx``. There is a reference
 version ``nmodxx_ctx_srcref``.
 
-The C++ equivalent to ``mp_limb_t`` in this context is ``nmodxx``.
-Immediate ``nmodxx`` expressions store both an ``mp_limb_t`` and an
+The C++ equivalent to ``ulong`` in this context is ``nmodxx``.
+Immediate ``nmodxx`` expressions store both an ``ulong`` and an
 ``nmodxx_ctx_srcref``.
 
 The most common ways to construct ``nmodxx`` are using the static member
@@ -2208,7 +2208,7 @@ functions ``nmodxx::red`` and ``nmodxx::make_nored``. For convenience,
 ``operator%`` is overloaded with right hand side ``nmodxx_ctx`` (or
 ``nmodxx_ctx_srcref``) to call ``nmodxx::red``.
 
-Just like when ``mp_limb_t`` is passed to ``nmod_t`` operations, the
+Just like when ``ulong`` is passed to ``nmod_t`` operations, the
 limb stored in ``nmodxx`` is assumed to be reduced, and under this
 assumption, all computations yield reduced data.
 
@@ -2218,7 +2218,7 @@ so that all contexts are interchangeable.
 Miscellaneous
 -------------------------------------------------------------------------------
 
-.. cpp:function:: explicit nmodxx_ctx::nmodxx_ctx(mp_limb_t n)
+.. cpp:function:: explicit nmodxx_ctx::nmodxx_ctx(ulong n)
 
     Initialise a new context for operations modulo $n$.
 
@@ -2235,8 +2235,8 @@ Miscellaneous
 
     Obtain a reference to the underlying ``nmod_t``.
 
-.. cpp:function:: mp_limb_t nmodxx_ctx::n() const
-.. cpp:function:: mp_limb_t nmodxx_ctx_srcref::n() const
+.. cpp:function:: ulong nmodxx_ctx::n() const
+.. cpp:function:: ulong nmodxx_ctx_srcref::n() const
 
     Obtain the modulus stored in this context.
 
@@ -2244,18 +2244,18 @@ Miscellaneous
 
     Initialise an ``nmodxx`` to zero.
 
-.. cpp:function:: static nmodxx nmodxx::make_nored(mp_limb_t n, nmodxx_ctx_srcref ctx)
+.. cpp:function:: static nmodxx nmodxx::make_nored(ulong n, nmodxx_ctx_srcref ctx)
 
     Initialise an ``nmodxx`` to $n$, performing no reductions.
 
-.. cpp:function:: static nmodxx nmodxx::red(mp_limb_t n, nmodxx_ctx_srcref ctx)
+.. cpp:function:: static nmodxx nmodxx::red(ulong n, nmodxx_ctx_srcref ctx)
 .. cpp:function:: static nmodxx nmodxx::red(Fmpz_expr n, nmodxx_ctx_srcref ctx)
 .. cpp:function:: static nmodxx nmodxx::red(Fmpq_expr n, nmodxx_ctx_srcref ctx)
 
     Initialise an ``nmodxx`` to the reduction of $n$.
 
-.. cpp:function:: static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
-.. cpp:function:: static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)
+.. cpp:function:: static nmodxx_ref nmodxx_ref::make(ulong& l, nmodxx_ctx_srcref c)
+.. cpp:function:: static nmodxx_srcref nmodxx_srcref::make(const ulong&, nmodxx_ctx_srcref)
 
     Obtain a flintxx reference object pointing to ``l``, which is
     interpreted as a limb reduced modulo ``c``.
@@ -2264,7 +2264,7 @@ Miscellaneous
 
     Reduce the stored limb.
 
-.. cpp:function:: void Nmod_target::set_nored(mp_limb_t n)
+.. cpp:function:: void Nmod_target::set_nored(ulong n)
 
     Set the stored limb to $n$.
 
@@ -2272,7 +2272,7 @@ Miscellaneous
 
     Convert self into a string of the form "a mod b".
 
-.. cpp:function:: mp_limb_t Nmod_expr::to<mp_limb_t>() const
+.. cpp:function:: ulong Nmod_expr::to<ulong>() const
 
     Obtain the stored limb.
 
@@ -2389,13 +2389,13 @@ Conversion
 
 .. cpp:function:: static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, nmodxx_ctx_srcref)
 .. cpp:function:: static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, nmodxx_ctx_srcref)
-.. cpp:function:: static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, mp_limb_t)
-.. cpp:function:: static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, mp_limb_t)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, ulong)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, ulong)
 
     See ``fmpz_poly_get_nmod_poly``.
 
 .. cpp:function:: static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
-.. cpp:function:: static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::from_ground(ulong e, nmodxx_ctx_srcref c)
 
     Consider $e \in \mathbf{Z}/n\mathbf{Z}$ as an element of
     $\mathbf{Z}/n\mathbf{Z}[X]$.
@@ -2411,8 +2411,8 @@ Input and output
 Memory management
 -------------------------------------------------------------------------------
 
-.. cpp:function:: nmod_polyxx::nmod_polyxx(mp_limb_t modulus)
-.. cpp:function:: nmod_polyxx::nmod_polyxx(mp_limb_t modulus, slong alloc)
+.. cpp:function:: nmod_polyxx::nmod_polyxx(ulong modulus)
+.. cpp:function:: nmod_polyxx::nmod_polyxx(ulong modulus, slong alloc)
 .. cpp:function:: nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx)
 .. cpp:function:: nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
 
@@ -2426,8 +2426,8 @@ Memory management
     with this modulus, then ``nmod_poly_set_str`` is called. Raises
     ``flint_exception`` if the string is malformed.
 
-.. cpp:function:: static nmod_polyxx nmod_polyxx::zero(mp_limb_t n)
-.. cpp:function:: static nmod_polyxx nmod_polyxx::one(mp_limb_t n)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::zero(ulong n)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::one(ulong n)
 
 .. cpp:function:: void Nmod_poly_target realloc(slong alloc)
 .. cpp:function:: void Nmod_poly_target::fit_length(slong len)
@@ -2439,7 +2439,7 @@ Polynomial properties
 .. cpp:function:: slong Nmod_poly_expr::length() const
 .. cpp:function:: slong Nmod_poly_expr::degree() const
 .. cpp:function:: slong Nmod_poly_expr::max_bits() const
-.. cpp:function:: mp_limb_t Nmod_poly_expr::modulus() const
+.. cpp:function:: ulong Nmod_poly_expr::modulus() const
 
 Assignment and basic manipulation
 -------------------------------------------------------------------------------
@@ -2455,15 +2455,15 @@ Randomisation
 
 .. cpp:function:: void Nmod_target::set_randtest(frandxx& state, slong len)
 .. cpp:function:: void Nmod_target::set_randtest_irreducible(frandxx& state, slong len)
-.. cpp:function:: static nmod_polyxx nmod_polyxx::randtest(mp_limb_t n, frandxx& state, slong len)
-.. cpp:function:: static nmod_polyxx nmod_polyxx::randtest_irreducible(mp_limb_t n, frandxx& state, slong len)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::randtest(ulong n, frandxx& state, slong len)
+.. cpp:function:: static nmod_polyxx nmod_polyxx::randtest_irreducible(ulong n, frandxx& state, slong len)
 
 Getting and setting coefficients
 -------------------------------------------------------------------------------
 
 .. cpp:function:: Nmodxx_expr Nmod_poly_expr::get_coeff(slong n) const
 .. cpp:function:: void Nmod_target::set_coeff(slong i, Nmodxx_expr)
-.. cpp:function:: void Nmod_target::set_coeff(slong i, mp_limb_t)
+.. cpp:function:: void Nmod_target::set_coeff(slong i, ulong)
 
 Input and output
 -------------------------------------------------------------------------------
@@ -2792,7 +2792,7 @@ subexpressions never creates new aliases.
 Conversion
 -------------------------------------------------------------------------------
 
-.. cpp:function:: static nmod_matxx::reduce(Fmpz_mat_expr, mp_limb_t modulus)
+.. cpp:function:: static nmod_matxx::reduce(Fmpz_mat_expr, ulong modulus)
 
     See ``fmpz_mat_get_nmod_mat``.
 
@@ -2804,7 +2804,7 @@ Input and output
 Memory management
 -------------------------------------------------------------------------------
 
-.. cpp:function:: nmod_matxx::nmod_matxx(slong m, slong n, mp_limb_t modulus)
+.. cpp:function:: nmod_matxx::nmod_matxx(slong m, slong n, ulong modulus)
 
     See ``nmod_mat_init``.
 
@@ -2825,10 +2825,10 @@ Basic properties and manipulation
 .. cpp:function:: bool Nmod_mat_expr::is_zero() const
 .. cpp:function:: bool Nmod_mat_expr::is_empty() const
 .. cpp:function:: bool Nmod_mat_expr::is_square() const
-.. cpp:function:: mp_limb_t Nmod_mat_expr::modulus() const
+.. cpp:function:: ulong Nmod_mat_expr::modulus() const
 
 .. cpp:function:: void Nmod_mat_target::set_zero()
-.. cpp:function:: static nmod_matxx nmod_matxx::zero(slong rows, slong cols, mp_limb_t modulus)
+.. cpp:function:: static nmod_matxx nmod_matxx::zero(slong rows, slong cols, ulong modulus)
 
     See ``nmod_mat_zero``.
 
@@ -2843,11 +2843,11 @@ Random matrix generation
 
     See ``nmod_mat_randtest`` etc.
 
-.. cpp:function:: static nmod_matxx nmod_matxx::randtest(slong rows, slong cols, mp_limb_t M, frandxx&)
-.. cpp:function:: static nmod_matxx nmod_matxx::randfull(slong rows, slong cols, mp_limb_t M, frandxx&)
-.. cpp:function:: static nmod_matxx nmod_matxx::randrank(slong rows, slong cols, mp_limb_t M, frandxx&, slong rank)
-.. cpp:function:: static nmod_matxx nmod_matxx::randtril(slong rows, slong cols, mp_limb_t M, frandxx&, bool unit)
-.. cpp:function:: static nmod_matxx nmod_matxx::randtriu(slong rows, slong cols, mp_limb_t M, frandxx&, bool unit)
+.. cpp:function:: static nmod_matxx nmod_matxx::randtest(slong rows, slong cols, ulong M, frandxx&)
+.. cpp:function:: static nmod_matxx nmod_matxx::randfull(slong rows, slong cols, ulong M, frandxx&)
+.. cpp:function:: static nmod_matxx nmod_matxx::randrank(slong rows, slong cols, ulong M, frandxx&, slong rank)
+.. cpp:function:: static nmod_matxx nmod_matxx::randtril(slong rows, slong cols, ulong M, frandxx&, bool unit)
+.. cpp:function:: static nmod_matxx nmod_matxx::randtriu(slong rows, slong cols, ulong M, frandxx&, bool unit)
 
     Static versions of the above.
 
@@ -2993,7 +2993,7 @@ Input and output
 Memory management
 -------------------------------------------------------------------------------
 
-.. cpp:function:: nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
+.. cpp:function:: nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, ulong modulus)
 
     See ``nmod_poly_mat_init``.
 
@@ -3007,8 +3007,8 @@ Basic assignment and manipulation
 Standard matrices
 -------------------------------------------------------------------------------
 
-.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::zero(slong rows, slong cols, mp_limb_t n)
-.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::one(slong rows, slong cols, mp_limb_t n)
+.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::zero(slong rows, slong cols, ulong n)
+.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::one(slong rows, slong cols, ulong n)
 .. cpp:function:: void Nmod_poly_mat_target::set_zero()
 .. cpp:function:: void Nmod_poly_mat_target::set_one()
 
@@ -3017,8 +3017,8 @@ Random matrix generation
 
 .. cpp:function:: void Nmod_poly_mat_target::set_randtest(frandxx&, slong)
 .. cpp:function:: void Nmod_poly_mat_target::set_randtest_sparse(frandxx&, slong, float)
-.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::randtest(slong rows, slong cols, mp_limb_t n, slong len)
-.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::randtest_sparse(slong rows, slong cols, mp_limb_t n, slong len, float density)
+.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::randtest(slong rows, slong cols, ulong n, slong len)
+.. cpp:function:: static nmod_poly_matxx nmod_poly_matxx::randtest_sparse(slong rows, slong cols, ulong n, slong len, float density)
 
     See ``nmod_poly_mat_randtest`` etc.
 
@@ -3036,7 +3036,7 @@ Basic comparison and properties
 .. cpp:function:: bool Nmod_poly_mat_expr::is_one() const
 .. cpp:function:: bool Nmod_poly_mat_expr::is_empty() const
 .. cpp:function:: bool Nmod_poly_mat_expr::is_square() const
-.. cpp:function:: mp_limb_t Nmod_poly_mat_expr::modulus() const
+.. cpp:function:: ulong Nmod_poly_mat_expr::modulus() const
 
 Norms
 -------------------------------------------------------------------------------

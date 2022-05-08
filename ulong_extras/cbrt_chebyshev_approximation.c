@@ -41,11 +41,11 @@ static const float coeff[16][3] = {{0.445434042, 0.864136635, -0.335205926},    
                                    {0.540672371, 0.586548233, -0.127254189},    /* [0.90625, 0.93750]  */
                                    {0.546715310, 0.573654340, -0.120376066},    /* [0.93750, 0.96875]  */
                                    {0.552627494, 0.561446514, -0.114074068}};   /* [0.96875, 1.00000]  */
-mp_limb_t
-n_cbrt_chebyshev_approx(mp_limb_t n)
+ulong
+n_cbrt_chebyshev_approx(ulong n)
 {
     typedef union { 
-        mp_limb_t  uword_val;
+        ulong  uword_val;
 #ifdef FLINT64
         double     double_val;
 #else
@@ -55,31 +55,31 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
 
     int rem, mul;
     double factor, root, dec, dec2;
-    mp_limb_t ret, expo, table_index;
+    ulong ret, expo, table_index;
     uni alias;
 
     /* upper_limit is the max cube root possible for one word */
 
 #ifdef FLINT64
-    const mp_limb_t upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
-    const mp_limb_t expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
-    const mp_limb_t mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
-    const mp_limb_t table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
+    const ulong upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
+    const ulong expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
+    const ulong mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
+    const ulong table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
     const int mantissa_bits = 52;
-    const mp_limb_t bias_hex = 0x3FE0000000000000;      
+    const ulong bias_hex = 0x3FE0000000000000;      
     const int bias = 1022;
 #else
-    const mp_limb_t upper_limit = 1625;         /* 1625 < (2^32)^(1/3) */
-    const mp_limb_t expo_mask = 0x7F800000;     /* exponent bits in float */
-    const mp_limb_t mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
-    const mp_limb_t table_mask = 0x00780000;    /* first 4 bits of mantissa */
+    const ulong upper_limit = 1625;         /* 1625 < (2^32)^(1/3) */
+    const ulong expo_mask = 0x7F800000;     /* exponent bits in float */
+    const ulong mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
+    const ulong table_mask = 0x00780000;    /* first 4 bits of mantissa */
     const int mantissa_bits = 23;
-    const mp_limb_t bias_hex = 0x3F000000;      
+    const ulong bias_hex = 0x3F000000;      
     const int bias = 126;
 #endif
 
     if (n == 0)
-        return (mp_limb_t) 0;
+        return (ulong) 0;
 
 #ifdef FLINT64
     alias.double_val = (double)n;

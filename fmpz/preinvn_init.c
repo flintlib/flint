@@ -17,7 +17,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 {
     ulong c = *f;
     flint_bitcnt_t norm;
-    mp_ptr t;
+    ulong_ptr t;
 
     if (c == 0)
     {
@@ -25,7 +25,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
     }
     else if (!COEFF_IS_MPZ(c)) /* c is small */
     {
-        inv->dinv = flint_malloc(sizeof(mp_limb_t));
+        inv->dinv = flint_malloc(sizeof(ulong));
         if (((slong) c) < 0)
             c = -c;
 
@@ -33,18 +33,18 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
         if (norm)
             c <<= norm;
 
-        flint_mpn_preinvn(inv->dinv, (mp_ptr) &c, 1);
+        flint_mpn_preinvn(inv->dinv, (ulong_ptr) &c, 1);
         inv->n = 1;
     }
     else /* c is big */
     {
         __mpz_struct * mc = COEFF_TO_PTR(c);
         slong size = FLINT_ABS(mc->_mp_size);
-        inv->dinv = flint_malloc(size*sizeof(mp_limb_t));
+        inv->dinv = flint_malloc(size*sizeof(ulong));
         count_leading_zeros(norm, mc->_mp_d[size - 1]);
         if (norm) 
         {
-            t = flint_malloc(size*sizeof(mp_limb_t));
+            t = flint_malloc(size*sizeof(ulong));
             mpn_lshift(t, mc->_mp_d, size, norm);
         }
         else

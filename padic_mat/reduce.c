@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "padic_mat.h"
 
 void _padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
@@ -47,4 +46,3 @@ void padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
     _padic_mat_canonicalise(mat, ctx);
     _padic_mat_reduce(mat, ctx);
 }
-

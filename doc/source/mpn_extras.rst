@@ -21,12 +21,12 @@ Utility functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
+.. function:: void flint_mpn_debug(ulong_srcptr x, mp_size_t xsize)
 
     Prints debug information about ``(x, xsize)`` to ``stdout``. 
     In particular, this will print binary representations of all the limbs.
 
-.. function:: int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
+.. function:: int flint_mpn_zero_p(ulong_srcptr x, mp_size_t xsize)
 
     Returns `1` if all limbs of ``(x, xsize)`` are zero, otherwise `0`.
 
@@ -35,7 +35,7 @@ Multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n)
+.. function:: mp_size_t flint_mpn_fmms1(ulong_ptr y, ulong a1, ulong_srcptr x1, ulong a2, ulong_srcptr x2, mp_size_t n)
 
     Given not-necessarily-normalized `x_1` and `x_2` of length `n > 0` and output `y` of length `n`, try to compute `y = a_1*x_1 - a_2*x_2`.
     Return the normalized length of `y` if `y \ge 0` and `y` fits into `n` limbs. Otherwise, return `-1`.
@@ -49,21 +49,21 @@ Divisibility
 .. function:: int flint_mpn_divisible_1_p(x, xsize, d)
 
     Expression determining whether ``(x, xsize)`` is divisible by the
-    ``mp_limb_t d`` which is assumed to be odd-valued and at least~`3`.
+    ``ulong d`` which is assumed to be odd-valued and at least~`3`.
 
     This function is implemented as a macro.
 
-.. function:: mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
+.. function:: mp_size_t flint_mpn_divexact_1(ulong_ptr x, mp_size_t xsize, ulong d)
 
     Divides `x` once by a known single-limb divisor, returns the new size.
 
-.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
+.. function:: mp_size_t flint_mpn_remove_2exp(ulong_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
 
     Divides ``(x, xsize)`` by `2^n` where `n` is the number of trailing 
     zero bits in `x`. The new size of `x` is returned, and `n` is stored in 
     the bits argument. `x` may not be zero.
 
-.. function:: mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp)
+.. function:: mp_size_t flint_mpn_remove_power_ascending(ulong_ptr x, mp_size_t xsize, ulong_ptr p, mp_size_t psize, ulong *exp)
 
     Divides ``(x, xsize)`` by the largest power `n` of ``(p, psize)`` 
     that is an exact divisor of `x`. The new size of `x` is returned, and 
@@ -75,14 +75,14 @@ Divisibility
     large powers. Because of its high overhead, it should not be used as
     the first stage of trial division.
 
-.. function:: int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop)
+.. function:: int flint_mpn_factor_trial(ulong_srcptr x, mp_size_t xsize, slong start, slong stop)
 
     Searches for a factor of ``(x, xsize)`` among the primes in positions 
     ``start, ..., stop-1`` of ``flint_primes``. Returns `i` if 
     ``flint_primes[i]`` is a factor, otherwise returns `0` if no factor 
     is found. It is assumed that ``start >= 1``.
 
-.. function:: int flint_mpn_factor_trial_tree(slong * factors, mp_srcptr x, mp_size_t xsize, slong num_primes)
+.. function:: int flint_mpn_factor_trial_tree(slong * factors, ulong_srcptr x, mp_size_t xsize, slong num_primes)
 
     Searches for a factor of ``(x, xsize)`` among the primes in positions
     approximately in the range ``0, ..., num_primes - 1`` of ``flint_primes``.
@@ -100,7 +100,7 @@ Division
 --------------------------------------------------------------------------------
 
 
-.. function:: int flint_mpn_divides(mp_ptr q, mp_srcptr array1, mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
+.. function:: int flint_mpn_divides(ulong_ptr q, ulong_srcptr array1, mp_size_t limbs1, ulong_srcptr arrayg, mp_size_t limbsg, ulong_ptr temp)
 
     If ``(arrayg, limbsg)`` divides ``(array1, limbs1)`` then
     ``(q, limbs1 - limbsg + 1)`` is set to the quotient and 1 is 
@@ -109,13 +109,13 @@ Division
 
     Assumes limbs1 ``limbs1 >= limbsg > 0``.
 
-.. function:: mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
+.. function:: ulong flint_mpn_preinv1(ulong d, ulong d2)
 
     Computes a precomputed inverse from the leading two limbs of the
     divisor ``b, n`` to be used with the ``preinv1`` functions.
     We require the most significant bit of ``b, n`` to be 1.
 
-.. function:: mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv)
+.. function:: ulong flint_mpn_divrem_preinv1(ulong_ptr q, ulong_ptr a, mp_size_t m, ulong_srcptr b, mp_size_t n, ulong dinv)
 
     Divide ``a, m`` by ``b, n``, returning the high limb of the 
     quotient (which will either be 0 or 1), storing the remainder in-place 
@@ -124,7 +124,7 @@ Division
     ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
     ``flint_mpn_preinv1``. We also require ``m >= n >= 2``.
 
-.. function:: void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm)
+.. function:: void flint_mpn_mulmod_preinv1(ulong_ptr r, ulong_srcptr a, ulong_srcptr b, mp_size_t n, ulong_srcptr d, ulong dinv, ulong norm)
 
     Given a normalised integer `d` with precomputed inverse ``dinv`` 
     provided by ``flint_mpn_preinv1``, computes `ab \pmod{d}` and
@@ -139,7 +139,7 @@ Division
     We require `a` and `b` to be reduced modulo `n` before calling the
     function. 
 
-.. function:: void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
+.. function:: void flint_mpn_preinvn(ulong_ptr dinv, ulong_srcptr d, mp_size_t n)
 
     Compute an `n` limb precomputed inverse ``dinv`` of the `n` limb
     integer `d`.
@@ -147,7 +147,7 @@ Division
     We require that `d` is normalised, i.e. with the most significant
     bit of the most significant limb set.
 
-.. function:: void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+.. function:: void flint_mpn_mod_preinvn(ulong_ptr r, ulong_srcptr a, mp_size_t m, ulong_srcptr d, mp_size_t n, ulong_srcptr dinv)
 
     Given a normalised integer `d` of `n` limbs, with precomputed inverse
     ``dinv`` provided by ``flint_mpn_preinvn`` and integer `a` of `m`
@@ -159,7 +159,7 @@ Division
 
     Note that this function is not always as fast as ordinary division.
 
-.. function:: mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+.. function:: ulong flint_mpn_divrem_preinvn(ulong_ptr q, ulong_ptr r, ulong_srcptr a, mp_size_t m, ulong_srcptr d, mp_size_t n, ulong_srcptr dinv)
 
     Given a normalised integer `d` with precomputed inverse ``dinv`` 
     provided by ``flint_mpn_preinvn``, computes the quotient of `a` by `d` 
@@ -172,7 +172,7 @@ Division
 
     Note that this function is not always as fast as ordinary division.
 
-.. function:: void flint_mpn_mulmod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+.. function:: void flint_mpn_mulmod_preinvn(ulong_ptr r, ulong_srcptr a, ulong_srcptr b, mp_size_t n, ulong_srcptr d, ulong_srcptr dinv, ulong norm)
 
     Given a normalised integer `d` with precomputed inverse ``dinv`` 
     provided by ``flint_mpn_preinvn``, computes `ab \pmod{d}` and
@@ -194,7 +194,7 @@ GCD
 --------------------------------------------------------------------------------
 
 
-.. function:: mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2, mp_ptr temp)
+.. function:: mp_size_t flint_mpn_gcd_full2(ulong_ptr arrayg, ulong_ptr array1, mp_size_t limbs1, ulong_ptr array2, mp_size_t limbs2, ulong_ptr temp)
 
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
         ``(array2, limbs2)``.
@@ -206,7 +206,7 @@ GCD
     space, or ``NULL`` must be passed to ``temp`` if the function should
     allocate its own space.
 
-.. function:: mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
+.. function:: mp_size_t flint_mpn_gcd_full(ulong_ptr arrayg, ulong_ptr array1, mp_size_t limbs1, ulong_ptr array2, mp_size_t limbs2)
 
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
     ``(array2, limbs2)``. 
@@ -219,7 +219,7 @@ Random Number Generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+.. function:: void flint_mpn_rrandom(ulong *rp, gmp_randstate_t state, mp_size_t n)
 
     Generates a random number with ``n`` limbs and stores 
     it on ``rp``. The number it generates will tend to have
@@ -229,7 +229,7 @@ Random Number Generation
     numbers have proven to be more likely to trigger corner-case bugs.
     
 
-.. function:: void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
+.. function:: void flint_mpn_urandomb(ulong *rp, gmp_randstate_t state, flint_bitcnt_t n)
 
     Generates a uniform random number ``n`` bits and stores 
     it on ``rp``.

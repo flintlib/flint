@@ -32,7 +32,7 @@ fmpz_get_d(const fmpz_t f)
     }
     else if (!COEFF_IS_MPZ(c))
     {
-        mp_limb_t d;
+        ulong d;
 
         if (c > 0)
         {

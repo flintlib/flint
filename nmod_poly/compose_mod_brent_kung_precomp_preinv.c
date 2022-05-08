@@ -20,7 +20,7 @@ void
 _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
                                    const nmod_poly_t f)
 {
-    mp_ptr tmp1;
+    ulong_ptr tmp1;
     slong n = f->length - 1;
     slong i, m = n_sqrt(n) + 1;
 
@@ -38,8 +38,8 @@ _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
 }
 
 void
-_nmod_poly_precompute_matrix(nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
-                     slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod)
+_nmod_poly_precompute_matrix(nmod_mat_t A, ulong_srcptr poly1, ulong_srcptr poly2,
+                     slong len2, ulong_srcptr poly2inv, slong len2inv, nmod_t mod)
 {
     /* Set rows of A to powers of poly1 */
     slong n, m;
@@ -61,7 +61,7 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
     slong len = len2 - 1;
     slong m = n_sqrt(len) + 1;
 
-    mp_ptr ptr1;
+    ulong_ptr ptr1;
 
     if (len2 == 0)
         flint_throw(FLINT_DIVZERO, "nmod_poly_precompute_matrix\n");
@@ -93,12 +93,12 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
 }
 
 void
-_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
-                  slong len1, const nmod_mat_t A, mp_srcptr poly3, slong len3,
-                                 mp_srcptr poly3inv, slong len3inv, nmod_t mod)
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(ulong_ptr res, ulong_srcptr poly1,
+                  slong len1, const nmod_mat_t A, ulong_srcptr poly3, slong len3,
+                                 ulong_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t B, C;
-    mp_ptr t, h;
+    ulong_ptr t, h;
     slong i, n, m;
 
     n = len3 - 1;

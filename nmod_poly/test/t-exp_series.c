@@ -33,7 +33,7 @@ main(void)
         nmod_poly_t A, B, AB, expA, expB, expAB, S;
         slong n;
         slong N = 100;
-        mp_limb_t mod;
+        ulong mod;
 
         /* Make sure to workout the Newton code */
         if (n_randint(state, 100) == 1)
@@ -101,7 +101,7 @@ main(void)
     {
         nmod_poly_t A, B;
         slong n;
-        mp_limb_t mod;
+        ulong mod;
         mod = n_randtest_prime(state, 0);
  
         if (i < 30)

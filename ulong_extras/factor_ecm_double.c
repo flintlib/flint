@@ -23,10 +23,10 @@
 /* a24 = (a + 2) / 4 mod n */
 
 void
-n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0,
-                    mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_double(ulong_ptr x, ulong_ptr z, ulong x0, ulong z0,
+                    ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t u, v, w;
+    ulong u, v, w;
 
     if (z0 == 0)
     {

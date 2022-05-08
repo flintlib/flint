@@ -10,7 +10,6 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 double _fmpz_poly_evaluate_horner_d(const fmpz * poly, slong n, double d)
 {

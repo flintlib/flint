@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "padic.h"
 
 void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
@@ -91,10 +92,7 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_val(op) < 0)
-    {
-        flint_printf("Exception (padic_teichmuller).  op is not a p-adic integer.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "op is not a p-adic integer in padic_teichmuller\n");
 
     if (padic_is_zero(op) || padic_val(op) > 0 || padic_prec(rop) <= 0)
     {
@@ -106,4 +104,3 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         padic_val(rop) = 0;
     }
 }
-

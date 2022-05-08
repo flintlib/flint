@@ -11,11 +11,11 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
+ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 {
     slong i;
     int found;
-    mp_limb_t result, a, pm1;
+    ulong result, a, pm1;
     double pinv;
 
     if (p == 2)
@@ -46,9 +46,9 @@ mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
     flint_throw(FLINT_ERROR, "n_primitive_root_prime_prefactor could not find root\n");
 }
 
-mp_limb_t n_primitive_root_prime(mp_limb_t p)
+ulong n_primitive_root_prime(ulong p)
 {
-    mp_limb_t a;
+    ulong a;
     n_factor_t factors;
 
     n_factor_init(&factors);

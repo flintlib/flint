@@ -90,7 +90,7 @@ do {                                                                \
     }                                                               \
 } while (0)
 
-static __inline__ void __mat_one(mp_ptr *M, slong *lenM)
+static __inline__ void __mat_one(ulong_ptr *M, slong *lenM)
 {
     M[0][0] = WORD(1);
     M[3][0] = WORD(1);
@@ -110,8 +110,8 @@ static __inline__ void __mat_one(mp_ptr *M, slong *lenM)
     polynomial products involved.
  */
 
-static void __mat_mul_classical(mp_ptr *C, slong *lenC, 
-    mp_ptr *A, slong *lenA, mp_ptr *B, slong *lenB, mp_ptr T, nmod_t mod)
+static void __mat_mul_classical(ulong_ptr *C, slong *lenC, 
+    ulong_ptr *A, slong *lenA, ulong_ptr *B, slong *lenB, ulong_ptr T, nmod_t mod)
 {
     slong lenT;
 
@@ -142,8 +142,8 @@ static void __mat_mul_classical(mp_ptr *C, slong *lenC,
     polynomial products involved.
  */
 
-static void __mat_mul_strassen(mp_ptr *C, slong *lenC, 
-    mp_ptr *A, slong *lenA, mp_ptr *B, slong *lenB, mp_ptr T0, mp_ptr T1, 
+static void __mat_mul_strassen(ulong_ptr *C, slong *lenC, 
+    ulong_ptr *A, slong *lenA, ulong_ptr *B, slong *lenB, ulong_ptr T0, ulong_ptr T1, 
     nmod_t mod)
 {
     slong lenT0, lenT1;
@@ -190,8 +190,8 @@ static void __mat_mul_strassen(mp_ptr *C, slong *lenC,
     polynomial products involved.
  */
 
-static void __mat_mul(mp_ptr *C, slong *lenC, 
-    mp_ptr *A, slong *lenA, mp_ptr *B, slong *lenB, mp_ptr T0, mp_ptr T1, 
+static void __mat_mul(ulong_ptr *C, slong *lenC, 
+    ulong_ptr *A, slong *lenA, ulong_ptr *B, slong *lenB, ulong_ptr T0, ulong_ptr T1, 
     nmod_t mod)
 {
     slong min = lenA[0];
@@ -233,10 +233,10 @@ static void __mat_mul(mp_ptr *C, slong *lenC,
     least (lena + 1)/2.
  */
 
-slong _nmod_poly_hgcd_recursive_iter(mp_ptr *M, slong *lenM, 
-    mp_ptr *A, slong *lenA, mp_ptr *B, slong *lenB, 
-    mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
-    mp_ptr Q, mp_ptr *T, mp_ptr *t, nmod_t mod, nmod_poly_res_t res)
+slong _nmod_poly_hgcd_recursive_iter(ulong_ptr *M, slong *lenM, 
+    ulong_ptr *A, slong *lenA, ulong_ptr *B, slong *lenB, 
+    ulong_srcptr a, slong lena, ulong_srcptr b, slong lenb, 
+    ulong_ptr Q, ulong_ptr *T, ulong_ptr *t, nmod_t mod, nmod_poly_res_t res)
 {
     const slong m = lena / 2;
     slong sgn = 1;
@@ -318,10 +318,10 @@ slong _nmod_poly_hgcd_recursive_iter(mp_ptr *M, slong *lenM,
     resultant.
  */
 
-slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM, 
-    mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, 
-    mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
-    mp_ptr P, nmod_t mod, int flag, nmod_poly_res_t res)
+slong _nmod_poly_hgcd_recursive(ulong_ptr *M, slong *lenM, 
+    ulong_ptr A, slong *lenA, ulong_ptr B, slong *lenB, 
+    ulong_srcptr a, slong lena, ulong_srcptr b, slong lenb, 
+    ulong_ptr P, nmod_t mod, int flag, nmod_poly_res_t res)
 {
     const slong m = lena / 2;
 
@@ -339,14 +339,14 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
     else
     {
         /* Readonly pointers */
-        mp_ptr a0, b0, s, t, a4, b4, c0, d0;
+        ulong_ptr a0, b0, s, t, a4, b4, c0, d0;
         slong lena0, lenb0, lens, lent, lena4, lenb4, lenc0, lend0;
 
         /* Pointers to independently allocated memory */
-        mp_ptr a2, b2, a3, b3, q, d, T0, T1;
+        ulong_ptr a2, b2, a3, b3, q, d, T0, T1;
         slong lena2, lenb2, lena3, lenb3, lenq, lend, lenT0;
 
-        mp_ptr R[4], S[4];
+        ulong_ptr R[4], S[4];
         slong lenR[4], lenS[4];
         slong sgnR, sgnS;
 
@@ -370,8 +370,8 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
 
         P += 6 * lena + 10 * (lena + 1)/2;
 
-        __attach_shift(a0, lena0, (mp_ptr) a, lena, m);
-        __attach_shift(b0, lenb0, (mp_ptr) b, lenb, m);
+        __attach_shift(a0, lena0, (ulong_ptr) a, lena, m);
+        __attach_shift(b0, lenb0, (ulong_ptr) b, lenb, m);
 
         if (res)
         {
@@ -397,8 +397,8 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
            res->len1 += m;
         }
 
-        __attach_truncate(s, lens, (mp_ptr) a, lena, m);
-        __attach_truncate(t, lent, (mp_ptr) b, lenb, m);
+        __attach_truncate(s, lens, (ulong_ptr) a, lena, m);
+        __attach_truncate(t, lent, (ulong_ptr) b, lenb, m);
 
         __mul(b2, lenb2, R[2], lenR[2], s, lens);
         __mul(T0, lenT0, R[0], lenR[0], t, lent);
@@ -578,14 +578,14 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
     XXX: Currently supports aliasing between {A,a} and {B,b}.
  */
 
-slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM, 
-                     mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, 
-                     mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
+slong _nmod_poly_hgcd(ulong_ptr *M, slong *lenM, 
+                     ulong_ptr A, slong *lenA, ulong_ptr B, slong *lenB, 
+                     ulong_srcptr a, slong lena, ulong_srcptr b, slong lenb, 
                      nmod_t mod)
 {
     const slong lenW = 22 * lena + 16 * (FLINT_CLOG2(lena) + 1);
     slong sgnM;
-    mp_ptr W;
+    ulong_ptr W;
     
     W = _nmod_vec_init(lenW);
 
@@ -688,7 +688,7 @@ slong nmod_poly_hgcd(
     nmod_poly_t A, nmod_poly_t B,
     const nmod_poly_t a, const nmod_poly_t b)
 {
-    mp_limb_t * M[4];
+    ulong * M[4];
     slong lenM[4];
     slong sgnM;
 

@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 
 
-void check(mp_limb_t n, int s1, int s2)
+void check(ulong n, int s1, int s2)
 {
     if (s1 != s2)
     {

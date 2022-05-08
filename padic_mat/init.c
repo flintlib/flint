@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "padic_mat.h"
 
 void padic_mat_init(padic_mat_t A, slong r, slong c)
@@ -25,4 +24,3 @@ void padic_mat_init2(padic_mat_t A, slong r, slong c, slong prec)
     A->val = 0;
     A->N   = prec;
 }
-

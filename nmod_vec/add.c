@@ -11,8 +11,8 @@
 
 #include "nmod.h"
 
-void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
-                   mp_srcptr vec2, slong len, nmod_t mod)
+void _nmod_vec_add(ulong_ptr res, ulong_srcptr vec1, 
+                   ulong_srcptr vec2, slong len, nmod_t mod)
 {
     slong i;
 

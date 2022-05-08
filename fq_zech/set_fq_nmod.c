@@ -16,7 +16,7 @@
 void
 fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op, const fq_zech_ctx_t ctx)
 {
-    mp_limb_t i;
+    ulong i;
     fq_zech_t t;
     fq_zech_zero(rop, ctx);
     for (i = 0; i < op->length; i++)

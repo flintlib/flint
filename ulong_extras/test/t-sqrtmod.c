@@ -23,7 +23,7 @@ int main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random integers */
     {
-        mp_limb_t a, b, p, pinv;
+        ulong a, b, p, pinv;
 
         p = n_randtest_prime(state, 0);
         a = n_randtest(state) % p;
@@ -45,7 +45,7 @@ int main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares */
     {
-        mp_limb_t a, b, p, pinv;
+        ulong a, b, p, pinv;
 
         p = n_randtest_prime(state, 0);
 

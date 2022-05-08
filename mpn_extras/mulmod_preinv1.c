@@ -11,13 +11,13 @@
 
 #include "mpn_extras.h"
 
-void flint_mpn_mulmod_preinv1(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
-        mp_srcptr d, mp_limb_t dinv, ulong norm)
+void flint_mpn_mulmod_preinv1(ulong_ptr r, 
+        ulong_srcptr a, ulong_srcptr b, mp_size_t n, 
+        ulong_srcptr d, ulong dinv, ulong norm)
 {
-   mp_limb_t q;
-   mp_limb_t ts[150];
-   mp_ptr t;
+   ulong q;
+   ulong ts[150];
+   ulong_ptr t;
    slong i;
 
    FLINT_ASSERT(n > 0);
@@ -25,7 +25,7 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
    if (n <= 30)
       t = ts;
    else
-      t = flint_malloc(5*n*sizeof(mp_limb_t));
+      t = flint_malloc(5*n*sizeof(ulong));
 
    if (a == b)
       mpn_sqr(t, a, n);

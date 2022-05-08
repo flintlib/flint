@@ -26,8 +26,8 @@
 */
 
 void 
-fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2,
-                    mp_ptr z2, mp_ptr x0, mp_ptr z0, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_add(ulong_ptr x, ulong_ptr z, ulong_ptr x1, ulong_ptr z1, ulong_ptr x2,
+                    ulong_ptr z2, ulong_ptr x0, ulong_ptr z0, ulong_ptr n, ecm_t ecm_inf)
 {
 
     if (flint_mpn_zero_p(z1, ecm_inf->n_size))

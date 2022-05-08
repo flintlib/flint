@@ -29,7 +29,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n, max_bound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, -UWORD(2)) + UWORD(2);
         nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
@@ -90,7 +90,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n, max_bound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, -UWORD(2)) + UWORD(2);
         nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
@@ -146,7 +146,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n, max_bound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, -UWORD(2)) + UWORD(2);
         nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);

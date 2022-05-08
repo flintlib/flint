@@ -13,8 +13,8 @@
 #include "flint.h"
 #include "fft.h"
       
-void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
-                    mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
+void fft_negacyclic(ulong ** ii, mp_size_t n, flint_bitcnt_t w, 
+                    ulong ** t1, ulong ** t2, ulong ** temp)
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/FLINT_BITS;

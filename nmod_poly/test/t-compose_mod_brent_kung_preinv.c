@@ -20,7 +20,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_poly.h"
@@ -38,7 +38,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d, e;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -83,7 +83,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -124,7 +124,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -165,7 +165,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -206,7 +206,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);

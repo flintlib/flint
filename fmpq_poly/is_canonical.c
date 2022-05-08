@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
+#include "fmpz_poly.h"
 
 int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len)
 {
@@ -47,4 +43,3 @@ int fmpq_poly_is_canonical(const fmpq_poly_t poly)
 {
     return _fmpq_poly_is_canonical(poly->coeffs, poly->den, poly->length);
 }
-

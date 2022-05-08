@@ -12,9 +12,9 @@
 
 #include "flint.h"
 
-mp_limb_t n_flog(mp_limb_t n, mp_limb_t b)
+ulong n_flog(ulong n, ulong b)
 {
-    mp_limb_t r, p, phi;
+    ulong r, p, phi;
 
     r = 0;
     p = 1;

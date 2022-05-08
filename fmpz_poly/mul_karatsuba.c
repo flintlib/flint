@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "ulong_extras.h"
+#include "fmpz_mini.h"
+#include "fmpz_poly_mini.h"
 
 /*
    Implements karatsuba multiplication. There is no basecase crossover, so 

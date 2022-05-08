@@ -88,8 +88,8 @@ do {                                                        \
     }                                                       \
 } while (0)
 
-slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
-                          mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, 
+slong _nmod_poly_xgcd_hgcd(ulong_ptr G, ulong_ptr S, ulong_ptr T, 
+                          ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB, 
                           nmod_t mod)
 {
 	const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
@@ -107,8 +107,8 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
     }
     else
     {
-        mp_ptr q = _nmod_vec_init(lenA + lenB);
-        mp_ptr r = q + lenA;
+        ulong_ptr q = _nmod_vec_init(lenA + lenB);
+        ulong_ptr r = q + lenA;
 
         slong lenq, lenr;
 
@@ -123,7 +123,7 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
         }
         else
         {
-            mp_ptr h, j, v, w, R[4], X;
+            ulong_ptr h, j, v, w, R[4], X;
             slong lenh, lenj, lenv, lenw, lenR[4];
             int sgnR;
 
@@ -176,7 +176,7 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
 
                 if (lenj < cutoff)
                 {
-                    mp_ptr u0 = R[0], u1 = R[1];
+                    ulong_ptr u0 = R[0], u1 = R[1];
                     slong lenu0 = lenr - 1, lenu1 = lenj - 1;
 
                     lenG = _nmod_poly_xgcd_euclidean(G, u0, u1, j, lenj, r, lenr, mod);
@@ -236,7 +236,7 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     else  /* lenA >= lenB >= 0 */
     {
         const slong lenA = A->length, lenB = B->length;
-        mp_limb_t inv;
+        ulong inv;
 
         if (lenA == 0)  /* lenA = lenB = 0 */
         {
@@ -262,7 +262,7 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else  /* lenA >= lenB >= 2 */
         {
-            mp_ptr g, s, t;
+            ulong_ptr g, s, t;
             slong lenG;
 
             if (G == A || G == B)

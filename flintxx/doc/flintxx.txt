@@ -215,11 +215,11 @@ Fmpz_target Fmpz_target::operator=(T:is_integer)
 
     See \code{fmpz_set_str}, \code{fmpz_set_ui} and \code{fmpz_set_si}.
 
-void Fmpz_target::set_ui_smod(mp_limb_t x, mv_limb_t m)
+void Fmpz_target::set_ui_smod(ulong x, mv_limb_t m)
 
-void Fmpz_target::set_uiui(mp_limb_t x, mv_limb_t m)
+void Fmpz_target::set_uiui(ulong x, mv_limb_t m)
 
-void Fmpz_target::neg_uiui(mp_limb_t x, mv_limb_t m)
+void Fmpz_target::neg_uiui(ulong x, mv_limb_t m)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Input and output
@@ -408,15 +408,15 @@ Fmpz_expr negmod(Fmpz_expr, Fmpz_expr)
     facilitate default arguments.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static Fmpz_expr fmpzxx::bit_unpack(const vector<mp_limb_t>& v,
+static Fmpz_expr fmpzxx::bit_unpack(const vector<ulong>& v,
             mp_bitcnt_t bits, mp_bitcnt_t shift = 0,
             int negate = 0, bool borrow = false)
-static Fmpz_expr fmpzxx::bit_unpack_unsigned(const vector<mp_limb_t>& v,
+static Fmpz_expr fmpzxx::bit_unpack_unsigned(const vector<ulong>& v,
             mp_bitcnt_t bits, mp_bitcnt_t shift = 0)
 
     Unpack an \code{fmpzxx} from \code{v}.
 
-bool bit_pack(std::vector<mp_limb_t>& v, mp_bitcnt_t bits, Fmpz_expr,
+bool bit_pack(std::vector<ulong>& v, mp_bitcnt_t bits, Fmpz_expr,
             mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
 
     Pack an \code{fmpzxx} to \code{v}. The vector \code{v} is required to be of
@@ -446,7 +446,7 @@ Fmpz_expr CRT(Fmpz_expr, Fmpz_expr, T:is_unsigned_integer,
 
     See \code{fmpz_CRT_ui}.
 
-fmpz_combxx::fmpz_combxx(const std::vector<mp_limb_t>& primes)
+fmpz_combxx::fmpz_combxx(const std::vector<ulong>& primes)
 
     The class \code{fmpz_combxx} wraps both \code{fmpz_comb_t} and
     \code{fmpz_comb_temp_t}. The argument \code{primes} is the vector of moduli
@@ -454,14 +454,14 @@ fmpz_combxx::fmpz_combxx(const std::vector<mp_limb_t>& primes)
     \code{fmpz_combxx}. Note that the internal \code{fmpz_comb_temp_t}
     structure may be modified even on constant instances of \code{fmpz_combxx}.
 
-void multi_mod(std::vector<mp_limb_t>& out, Fmpz_expr in, const fmpz_combxx&
+void multi_mod(std::vector<ulong>& out, Fmpz_expr in, const fmpz_combxx&
         comb)
 
     Reduce \code{in} modulo the primes stored in \code{comb}, and store the
     results in \code{out}. The vector \code{out} must have sufficient size, and
     its size will not be changed.
 
-Fmpz_expr multi_CRT(const std::vector<mp_limb_t>& residues, const fmpz_combxx
+Fmpz_expr multi_CRT(const std::vector<ulong>& residues, const fmpz_combxx
         comb, bool sign)
 
     Reconstruct an integer from its residues. See \code{fmpz_multi_CRT_ui}.
@@ -731,7 +731,7 @@ Fmpz_mat_expr CRT(Fmpz_mat_expr, Fmpz_expr, Nmod_mat_expr, bool)
     See \code{fmpz_mat_CRT_ui}.
 
 nmod_mat_vector::nmod_mat_vector(slong rows, slong cols,
-        const std::vector<mp_limb_t>& primes)
+        const std::vector<ulong>& primes)
 
     Initialize a vector of matrices with dimensions given by \code{rows},
     \code{cols} and moduli given by \code{primes}.
@@ -757,10 +757,10 @@ void nmod_mat_vector::set_multi_mod_precomp(Fmpz_mat_expr m,
     the results. Use precomputed data in \code{comp}.
     See \code{fmpz_mat_multi_mod_ui_precomp}.
 
-nmod_mat_vector multi_mod(Fmpz_mat_expr m, const std::vector<mp_limb_t>&
+nmod_mat_vector multi_mod(Fmpz_mat_expr m, const std::vector<ulong>&
         primes)
 nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m,
-        const std::vector<mp_limb_t>& primes, const fmpz_combxx& comb)
+        const std::vector<ulong>& primes, const fmpz_combxx& comb)
 
     Convenience functions combining the allocation of memory and modular
     reduction.
@@ -1271,7 +1271,7 @@ Fmpz_vec_expr evaluate(Fmpz_poly_expr, Fmpz_vec_expr)
 Fmpz_expr evaluate_horner(Fmpz_poly_expr, Fmpz_expr)
 Fmpz_expr evaluate_divconquer(Fmpz_poly_expr, Fmpz_expr)
 
-mp_limb_t evaluate_mod(Fmpz_poly_expr p, mp_limb_t x, mp_limb_t n)
+ulong evaluate_mod(Fmpz_poly_expr p, ulong x, ulong n)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Interpolation
@@ -2468,7 +2468,7 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
 
     nmodxx
 
-    The class \code{nmodxx} encapsulates the use of \code{mp_limb_t} together
+    The class \code{nmodxx} encapsulates the use of \code{ulong} together
     with \code{nmod_t} for doing arithmetic modulo a word-sized integer. It is
     defined in \code{nmod_vecxx.h}.
 
@@ -2476,8 +2476,8 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
     reference version\\
     \code{nmodxx_ctx_srcref}.
 
-    The C++ equivalent to \code{mp_limb_t} in this context is \code{nmodxx}.
-    Immediate \code{nmodxx} expressions store both an \code{mp_limb_t} and an
+    The C++ equivalent to \code{ulong} in this context is \code{nmodxx}.
+    Immediate \code{nmodxx} expressions store both an \code{ulong} and an
     \code{nmodxx_ctx_srcref}.
 
     The most common ways to construct \code{nmodxx} are using the static member
@@ -2485,7 +2485,7 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
     convenience, \code{operator%} is overloaded with right hand side
     \code{nmodxx_ctx} (or \code{nmodxx_ctx_srcref}) to call \code{nmodxx::red}.
 
-    Just like when \code{mp_limb_t} is passed to \code{nmod_t} operations, the
+    Just like when \code{ulong} is passed to \code{nmod_t} operations, the
     limb stored in \code{nmodxx} is assumed to be reduced, and under this
     assumption, all computations yield reduced data.
 
@@ -2494,7 +2494,7 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
 
 *******************************************************************************
 
-explicit nmodxx_ctx::nmodxx_ctx(mp_limb_t n)
+explicit nmodxx_ctx::nmodxx_ctx(ulong n)
 
     Initialise a new context for operations modulo $n$.
 
@@ -2511,8 +2511,8 @@ const nmod_t& nmodxx_ctx_srcref::_nmod() const
 
     Obtain a reference to the underlying \code{nmod_t}.
 
-mp_limb_t nmodxx_ctx::n() const
-mp_limb_t nmodxx_ctx_srcref::n() const
+ulong nmodxx_ctx::n() const
+ulong nmodxx_ctx_srcref::n() const
 
     Obtain the modulus stored in this context.
 
@@ -2520,18 +2520,18 @@ nmodxx::nmodxx(nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to zero.
 
-static nmodxx nmodxx::make_nored(mp_limb_t n, nmodxx_ctx_srcref ctx)
+static nmodxx nmodxx::make_nored(ulong n, nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to $n$, performing no reductions.
 
-static nmodxx nmodxx::red(mp_limb_t n, nmodxx_ctx_srcref ctx)
+static nmodxx nmodxx::red(ulong n, nmodxx_ctx_srcref ctx)
 static nmodxx nmodxx::red(Fmpz_expr n, nmodxx_ctx_srcref ctx)
 static nmodxx nmodxx::red(Fmpq_expr n, nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to the reduction of $n$.
 
-static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
-static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)
+static nmodxx_ref nmodxx_ref::make(ulong& l, nmodxx_ctx_srcref c)
+static nmodxx_srcref nmodxx_srcref::make(const ulong&, nmodxx_ctx_srcref)
 
     Obtain a flintxx reference object pointing to \code{l}, which is
     interpreted as a limb reduced modulo \code{c}.
@@ -2540,7 +2540,7 @@ void Nmod_target::reduce()
 
     Reduce the stored limb.
 
-void Nmod_target::set_nored(mp_limb_t n)
+void Nmod_target::set_nored(ulong n)
 
     Set the stored limb to $n$.
 
@@ -2548,7 +2548,7 @@ std::string Nmod_expr::to_string() const
 
     Convert self into a string of the form ``a mod b''.
 
-mp_limb_t Nmod_expr::to<mp_limb_t>() const
+ulong Nmod_expr::to<ulong>() const
 
     Obtain the stored limb.
 
@@ -2671,13 +2671,13 @@ Nmod_poly_target Nmod_poly_target::operator=(const char*)
 
 static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, nmodxx_ctx_srcref)
 static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, nmodxx_ctx_srcref)
-static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, mp_limb_t)
-static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, mp_limb_t)
+static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, ulong)
+static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, ulong)
 
     See \code{fmpz_poly_get_nmod_poly}.
 
 static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
-static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
+static nmod_polyxx nmod_polyxx::from_ground(ulong e, nmodxx_ctx_srcref c)
 
     Consider $e \in \mathbf{Z}/n\mathbf{Z}$ as an element of
     $\mathbf{Z}/n\mathbf{Z}[X]$.
@@ -2695,8 +2695,8 @@ read(FILE*, Nmod_poly_target)
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-nmod_polyxx::nmod_polyxx(mp_limb_t modulus)
-nmod_polyxx::nmod_polyxx(mp_limb_t modulus, slong alloc)
+nmod_polyxx::nmod_polyxx(ulong modulus)
+nmod_polyxx::nmod_polyxx(ulong modulus, slong alloc)
 nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx)
 nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
 
@@ -2710,8 +2710,8 @@ nmod_polyxx::nmod_polyxx(const char* str)
     with this modulus, then \code{nmod_poly_set_str} is called. Raises
     \code{flint_exception} if the string is malformed.
 
-static nmod_polyxx nmod_polyxx::zero(mp_limb_t n)
-static nmod_polyxx nmod_polyxx::one(mp_limb_t n)
+static nmod_polyxx nmod_polyxx::zero(ulong n)
+static nmod_polyxx nmod_polyxx::one(ulong n)
 
 void Nmod_poly_target realloc(slong alloc)
 void Nmod_poly_target::fit_length(slong len)
@@ -2724,7 +2724,7 @@ void Nmod_poly_target::_normalise()
 sslong Nmod_poly_expr::length() const
 sslong Nmod_poly_expr::degree() const
 sslong Nmod_poly_expr::max_bits() const
-mp_limb_t Nmod_poly_expr::modulus() const
+ulong Nmod_poly_expr::modulus() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Assignment and basic manipulation
@@ -2742,9 +2742,9 @@ Nmod_poly_expr reverse(Nmod_poly_expr, T:fits_into_slong)
 
 void Nmod_target::set_randtest(frandxx& state, slong len)
 void Nmod_target::set_randtest_irreducible(frandxx& state, slong len)
-static nmod_polyxx nmod_polyxx::randtest(mp_limb_t n,
+static nmod_polyxx nmod_polyxx::randtest(ulong n,
     frandxx& state, slong len)
-static nmod_polyxx nmod_polyxx::randtest_irreducible(mp_limb_t n,
+static nmod_polyxx nmod_polyxx::randtest_irreducible(ulong n,
     frandxx& state, slong len)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2753,7 +2753,7 @@ static nmod_polyxx nmod_polyxx::randtest_irreducible(mp_limb_t n,
 
 Nmodxx_expr Nmod_poly_expr::get_coeff(slong n) const
 void Nmod_target::set_coeff(slong i, Nmodxx_expr)
-void Nmod_target::set_coeff(slong i, mp_limb_t)
+void Nmod_target::set_coeff(slong i, ulong)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Input and output
@@ -3130,7 +3130,7 @@ Nmod_mat_expr operator-(Nmod_mat_expr)
     Conversion
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static nmod_matxx::reduce(Fmpz_mat_expr, mp_limb_t modulus)
+static nmod_matxx::reduce(Fmpz_mat_expr, ulong modulus)
 
     See \code{fmpz_mat_get_nmod_mat}.
 
@@ -3144,7 +3144,7 @@ int print(Nmod_mat_expr)
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-nmod_matxx::nmod_matxx(slong m, slong n, mp_limb_t modulus)
+nmod_matxx::nmod_matxx(slong m, slong n, ulong modulus)
 
     See \code{nmod_mat_init}.
 
@@ -3166,10 +3166,10 @@ sslong Nmod_mat_expr::cols() const
 bool Nmod_mat_expr::is_zero() const
 bool Nmod_mat_expr::is_empty() const
 bool Nmod_mat_expr::is_square() const
-mp_limb_t Nmod_mat_expr::modulus() const
+ulong Nmod_mat_expr::modulus() const
 
 void Nmod_mat_target::set_zero()
-static nmod_matxx nmod_matxx::zero(slong rows, slong cols, mp_limb_t modulus)
+static nmod_matxx nmod_matxx::zero(slong rows, slong cols, ulong modulus)
 
     See \code{nmod_mat_zero}.
 
@@ -3185,15 +3185,15 @@ void Nmod_mat_target::set_randtriu(frandxx&, bool unit)
 
     See \code{nmod_mat_randtest} etc.
 
-static nmod_matxx nmod_matxx::randtest(slong rows, slong cols, mp_limb_t M,
+static nmod_matxx nmod_matxx::randtest(slong rows, slong cols, ulong M,
         frandxx&)
-static nmod_matxx nmod_matxx::randfull(slong rows, slong cols, mp_limb_t M,
+static nmod_matxx nmod_matxx::randfull(slong rows, slong cols, ulong M,
         frandxx&)
-static nmod_matxx nmod_matxx::randrank(slong rows, slong cols, mp_limb_t M,
+static nmod_matxx nmod_matxx::randrank(slong rows, slong cols, ulong M,
         frandxx&, slong rank)
-static nmod_matxx nmod_matxx::randtril(slong rows, slong cols, mp_limb_t M,
+static nmod_matxx nmod_matxx::randtril(slong rows, slong cols, ulong M,
         frandxx&, bool unit)
-static nmod_matxx nmod_matxx::randtriu(slong rows, slong cols, mp_limb_t M,
+static nmod_matxx nmod_matxx::randtriu(slong rows, slong cols, ulong M,
         frandxx&, bool unit)
 
     Static versions of the above.
@@ -3356,7 +3356,7 @@ int print_pretty(Nmod_poly_mat_expr, const char*)
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
+nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, ulong modulus)
 
     See \code{nmod_poly_mat_init}.
 
@@ -3373,9 +3373,9 @@ nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 static nmod_poly_matxx nmod_poly_matxx::zero(slong rows, slong cols,
-    mp_limb_t n)
+    ulong n)
 static nmod_poly_matxx nmod_poly_matxx::one(slong rows, slong cols,
-    mp_limb_t n)
+    ulong n)
 void Nmod_poly_mat_target::set_zero()
 void Nmod_poly_mat_target::set_one()
 
@@ -3386,9 +3386,9 @@ void Nmod_poly_mat_target::set_one()
 void Nmod_poly_mat_target::set_randtest(frandxx&, slong)
 void Nmod_poly_mat_target::set_randtest_sparse(frandxx&, slong, float)
 static nmod_poly_matxx nmod_poly_matxx::randtest(slong rows, slong cols,
-        mp_limb_t n, slong len)
+        ulong n, slong len)
 static nmod_poly_matxx nmod_poly_matxx::randtest_sparse(slong rows, slong cols,
-        mp_limb_t n, slong len, float density)
+        ulong n, slong len, float density)
 
     See \code{nmod_poly_mat_randtest} etc.
 
@@ -3407,7 +3407,7 @@ bool Nmod_poly_mat_expr::is_zero() const
 bool Nmod_poly_mat_expr::is_one() const
 bool Nmod_poly_mat_expr::is_empty() const
 bool Nmod_poly_mat_expr::is_square() const
-mp_limb_t Nmod_poly_mat_expr::modulus() const
+ulong Nmod_poly_mat_expr::modulus() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Norms

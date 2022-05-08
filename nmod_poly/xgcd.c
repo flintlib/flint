@@ -14,8 +14,8 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-slong _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
-                     mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_xgcd(ulong_ptr G, ulong_ptr S, ulong_ptr T, 
+                     ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB, nmod_t mod)
 {
     const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
@@ -37,7 +37,7 @@ nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     else  /* lenA >= lenB >= 0 */
     {
         const slong lenA = A->length, lenB = B->length;
-        mp_limb_t inv;
+        ulong inv;
 
         if (lenA == 0)  /* lenA = lenB = 0 */
         {
@@ -63,7 +63,7 @@ nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else  /* lenA >= lenB >= 2 */
         {
-            mp_ptr g, s, t;
+            ulong_ptr g, s, t;
             slong lenG;
 
             if (G == A || G == B)

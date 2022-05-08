@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)

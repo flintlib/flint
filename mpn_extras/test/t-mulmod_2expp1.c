@@ -23,8 +23,8 @@ int main(void)
     ulong xn, yn, b, zn, c, dn;
     gmp_randstate_t rands;
     int k, cc;
-    mp_limb_t xp[10000], dp[10000], qp[10000], yp[10000];
-    mp_limb_t rp[10000], zp[10000], tp[10000], tb;
+    ulong xp[10000], dp[10000], qp[10000], yp[10000];
+    ulong rp[10000], zp[10000], tp[10000], tb;
     int result = 1;
     
     FLINT_TEST_INIT(state);

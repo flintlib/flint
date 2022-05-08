@@ -32,7 +32,7 @@ main(void)
         nmod_poly_t q, qinv, prod;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -73,7 +73,7 @@ main(void)
         nmod_poly_t q, qinv;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

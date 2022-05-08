@@ -26,7 +26,7 @@ int main(void)
     {
         n_primes_t iter;
         slong i;
-        mp_limb_t p, q;
+        ulong p, q;
 
         n_primes_init(iter);
         q = 0;
@@ -51,7 +51,7 @@ int main(void)
     for (n = 0; n < 10; n++)
     {
         n_primes_t iter;
-        mp_limb_t s, p, r;
+        ulong s, p, r;
 
         const unsigned int primepi[10] = {
             0, 4, 25, 168, 1229, 9592, 78498, 664579, 5761455, 50847534

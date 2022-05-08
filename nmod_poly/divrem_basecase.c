@@ -35,19 +35,20 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
 void
-_nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
-                             mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+_nmod_poly_divrem_basecase_1(ulong_ptr Q, ulong_ptr R, ulong_ptr W,
+                             ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,
                              nmod_t mod)
 {
-    const mp_limb_t invL = n_invmod(B[lenB - 1], mod.n);
+    const ulong invL = n_invmod(B[lenB - 1], mod.n);
     slong iR;
-    mp_ptr ptrQ = Q - lenB + 1;
-    mp_ptr R1 = W;
+    ulong_ptr ptrQ = Q - lenB + 1;
+    ulong_ptr R1 = W;
     
     FLINT_MPN_COPYI(R1, A, lenA);
 
@@ -63,7 +64,7 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
 
             if (lenB > 1)
             {
-                const mp_limb_t c = n_negmod(ptrQ[iR], mod.n);
+                const ulong c = n_negmod(ptrQ[iR], mod.n);
                 mpn_addmul_1(R1 + iR - lenB + 1, B, lenB - 1, c);
             }
         }
@@ -74,13 +75,13 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
 }
 
 void
-_nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
-                             mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+_nmod_poly_divrem_basecase_2(ulong_ptr Q, ulong_ptr R, ulong_ptr W,
+                             ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,
                              nmod_t mod)
 {
-    const mp_limb_t invL = n_invmod(B[lenB - 1], mod.n);
+    const ulong invL = n_invmod(B[lenB - 1], mod.n);
     slong iR, i;
-    mp_ptr B2 = W, R2 = W + 2*(lenB - 1), ptrQ = Q - lenB + 1;
+    ulong_ptr B2 = W, R2 = W + 2*(lenB - 1), ptrQ = Q - lenB + 1;
 
     for (i = 0; i < lenB - 1; i++)
     {
@@ -95,7 +96,7 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
 
     for (iR = lenA - 1; iR >= lenB - 1; )
     {
-        mp_limb_t r = 
+        ulong r = 
             n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n, mod.ninv);
 
         while ((iR + 1 >= lenB) && (r == WORD(0)))
@@ -112,7 +113,7 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
 
             if (lenB > 1)
             {
-                const mp_limb_t c = n_negmod(ptrQ[iR], mod.n);
+                const ulong c = n_negmod(ptrQ[iR], mod.n);
                 mpn_addmul_1(R2 + 2 * (iR - lenB + 1), B2, 2 * lenB - 2, c);
             }
             iR--;
@@ -124,13 +125,13 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
 }
 
 void
-_nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
-                             mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+_nmod_poly_divrem_basecase_3(ulong_ptr Q, ulong_ptr R, ulong_ptr W,
+                             ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,
                              nmod_t mod)
 {
-    const mp_limb_t invL = n_invmod(B[lenB - 1], mod.n);
+    const ulong invL = n_invmod(B[lenB - 1], mod.n);
     slong iR, i;
-    mp_ptr B3 = W, R3 = W + 3*(lenB - 1), ptrQ = Q - lenB + 1;
+    ulong_ptr B3 = W, R3 = W + 3*(lenB - 1), ptrQ = Q - lenB + 1;
 
     for (i = 0; i < lenB - 1; i++)
     {
@@ -147,7 +148,7 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
 
     for (iR = lenA - 1; iR >= lenB - 1; )
     {
-        mp_limb_t r =
+        ulong r =
             n_lll_mod_preinv(R3[3 * iR + 2], R3[3 * iR + 1],
                              R3[3 * iR], mod.n, mod.ninv);
 
@@ -165,7 +166,7 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
 
             if (lenB > 1)
             {
-                const mp_limb_t c = n_negmod(ptrQ[iR], mod.n);
+                const ulong c = n_negmod(ptrQ[iR], mod.n);
                 mpn_addmul_1(R3 + 3 * (iR - lenB + 1), B3, 3 * lenB - 3, c);
             }
             iR--;
@@ -178,8 +179,8 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
 }
 
 void
-_nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
-                           mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+_nmod_poly_divrem_basecase(ulong_ptr Q, ulong_ptr R, ulong_ptr W,
+                           ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,
                            nmod_t mod)
 {
     const slong bits =
@@ -198,7 +199,7 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
                           const nmod_poly_t B)
 {
     const slong lenA = A->length, lenB = B->length;
-    mp_ptr Q_coeffs, R_coeffs, W;
+    ulong_ptr Q_coeffs, R_coeffs, W;
     nmod_poly_t t1, t2;
     TMP_INIT;
 
@@ -244,7 +245,7 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     }
 
     TMP_START;
-    W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, A->mod)*sizeof(mp_limb_t));
+    W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, A->mod)*sizeof(ulong));
     
     _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, lenA,
                                B->coeffs, lenB, B->mod);

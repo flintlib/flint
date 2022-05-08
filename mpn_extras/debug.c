@@ -10,10 +10,10 @@
 */
 
 #include <stdio.h>
-#include "flint.h"
+#include "mpn_extras.h"
 #include "flint-impl.h"
 
-void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
+void flint_mpn_debug(ulong_srcptr x, mp_size_t xsize)
 {
     int i, j;
     char byte[9];

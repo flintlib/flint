@@ -24,7 +24,7 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
     if (!COEFF_IS_MPZ(c2)) /* c2 is small */
     {
-        mp_limb_t th, tl;
+        ulong th, tl;
 
         /* limb by limb multiply (assembly for most CPU's) */
         smul_ppmm(th, tl, c2, x);

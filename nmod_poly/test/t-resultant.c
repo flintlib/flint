@@ -30,8 +30,8 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g;
-        mp_limb_t x, y;
-        mp_limb_t n;
+        ulong x, y;
+        ulong n;
 
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
@@ -69,8 +69,8 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, h;
-        mp_limb_t x, y, z;
-        mp_limb_t n;
+        ulong x, y, z;
+        ulong n;
 
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));

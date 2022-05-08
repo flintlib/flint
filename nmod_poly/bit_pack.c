@@ -10,18 +10,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint-impl.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 
 /* Assumes length > 0, bits > 0. */
 void
-_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, flint_bitcnt_t bits)
+_nmod_poly_bit_pack(ulong_ptr res, ulong_srcptr poly, slong len, flint_bitcnt_t bits)
 {
     slong i;
     ulong current_bit = 0, current_limb = 0;
     ulong total_limbs = (len * bits - 1) / FLINT_BITS + 1;
-    mp_limb_t temp_lower, temp_upper;
+    ulong temp_lower, temp_upper;
 
     res[0] = WORD(0);
 
@@ -127,7 +128,7 @@ nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
                    flint_bitcnt_t bit_size)
 {
     slong len, limbs;
-    __mpz_struct * mpz;
+    mpz_mock_ptr mpz;
     slong i;
 
     len = nmod_poly_length(poly);
@@ -139,7 +140,7 @@ nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
     }
 
     mpz = _fmpz_promote(f);
-    mpz_realloc2(mpz, len * bit_size);
+    mpz_realloc2((mpz_ptr) mpz, len * bit_size);
 
     limbs = (len * bit_size - 1) / FLINT_BITS + 1;
 

@@ -14,10 +14,10 @@
 static slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
-    mp_limb_t hi, lo;
+    ulong hi, lo;
     umul_ppmm(hi, lo, poly_len - 1, exp);
     add_ssaaaa(hi, lo, hi, lo, 0, 1);
-    if (hi != 0 || lo > (mp_limb_t) WORD_MAX)
+    if (hi != 0 || lo > (ulong) WORD_MAX)
         return trunc;
     return FLINT_MIN((slong) lo, trunc);
 }
@@ -59,7 +59,7 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
 
     if (n == 1 || (len <= MAX_BASECASE && n * cbc <= FLINT_BITS))
     {
-        mp_limb_t v[MAX_BASECASE];
+        ulong v[MAX_BASECASE];
         slong i, j;
 
         if (which == 1)

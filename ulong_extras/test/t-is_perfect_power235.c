@@ -15,7 +15,7 @@ int main(void)
 {
    int i, result;
    ulong bits;
-   mp_limb_t d;
+   ulong d;
    FLINT_TEST_INIT(state);
    
    flint_printf("is_perfect_power235....");

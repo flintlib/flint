@@ -14,8 +14,8 @@
 #include "fft.h"
 #include "ulong_extras.h"
 
-void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
-                        mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
+void mul_mfa_truncate_sqrt2(ulong_ptr r1, ulong_srcptr i1, mp_size_t n1,
+                        ulong_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 {
    mp_size_t n = (UWORD(1)<<depth);
    flint_bitcnt_t bits1 = (n*w - (depth+1))/2; 
@@ -30,8 +30,8 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    
    mp_size_t i, j, trunc;
 
-   mp_limb_t ** ii, ** jj, * ptr;
-   mp_limb_t ** s1, ** t1, ** t2, ** tt;
+   ulong ** ii, ** jj, * ptr;
+   ulong ** s1, ** t1, ** t2, ** tt;
 
    int N;
 
@@ -40,16 +40,16 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    TMP_START;
 
    N = flint_get_num_threads();
-   ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(mp_limb_t));
-   for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
+   ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(ulong));
+   for (i = 0, ptr = (ulong *) ii + 4*n; i < 4*n; i++, ptr += size) 
    {
       ii[i] = ptr;
    }
 
-   s1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   t1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   t2 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   tt = TMP_ALLOC(N*sizeof(mp_limb_t *));
+   s1 = TMP_ALLOC(N*sizeof(ulong *));
+   t1 = TMP_ALLOC(N*sizeof(ulong *));
+   t2 = TMP_ALLOC(N*sizeof(ulong *));
+   tt = TMP_ALLOC(N*sizeof(ulong *));
 
    s1[0] = ptr;
    t1[0] = s1[0] + size*N;
@@ -66,8 +66,8 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
 
    if (i1 != i2)
    {
-      jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-      for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
+      jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
+      for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size) 
       {
          jj[i] = ptr;
       }

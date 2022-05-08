@@ -22,9 +22,9 @@
 */
 
 void 
-fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
+fmpz_factor_ecm_addmod(ulong_ptr a, ulong_ptr b, ulong_ptr c, ulong_ptr n, ulong n_size)
 {
-	mp_limb_t cy;
+	ulong cy;
 
     cy = mpn_add_n(a, b, c, n_size);
 

@@ -14,7 +14,7 @@ BUILD_DIRS= ulong_extras													\
 			thread_pool														\
 							mpfr_vec						mpfr_mat		\
 							mpf_vec							mpf_mat			\
-			nmod			nmod_vec		nmod_poly		nmod_mat		\
+							nmod_vec		nmod_poly		nmod_mat		\
 											n_poly							\
 			fmpz			fmpz_vec		fmpz_poly		fmpz_mat		\
 			fmpz_mod		fmpz_mod_vec	fmpz_mod_poly	fmpz_mod_mat	\
@@ -44,10 +44,13 @@ TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
 
 export
 
-SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c exception.c hashmap.c
+SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c 		\
+		  memory_manager.c version.c profiler.c thread_support.c exception.c	\
+		  hashmap.c rand.c
+
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h thread_support.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h nmod.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h thread_support.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))

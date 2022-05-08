@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void _fmpz_poly_resultant_modular_div(fmpz_t res, 
         const fmpz * poly1, slong len1, 
@@ -25,8 +25,8 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus, div, la, lb;
     fmpz * A, * B, * lead_A, * lead_B;
-    mp_ptr a, b, rarr, parr;
-    mp_limb_t p, d;
+    ulong_ptr a, b, rarr, parr;
+    ulong p, d;
     nmod_t mod;
 
     if (fmpz_is_zero(divisor))

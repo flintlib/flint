@@ -30,8 +30,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P, Q;
-        mp_ptr x, y;
-        mp_limb_t mod;
+        ulong_ptr x, y;
+        ulong mod;
         slong j, n, npoints;
 
         mod = n_randtest_prime(state, 0);

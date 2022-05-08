@@ -12,13 +12,13 @@
 #include "fmpz.h"
 #include "flint-impl.h"
 
-slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
+slong _fmpz_vec_get_fft(ulong ** coeffs_f, 
                        const fmpz * coeffs_m, slong l, slong length)
 {
    slong size_f = l + 1;
-   mp_limb_t * coeff;
+   ulong * coeff;
 
-   mp_limb_t mask = WORD(-1);
+   ulong mask = WORD(-1);
    slong bits = 0, limbs = 0, size_j, i, c;
    int sign = 1, signed_c;
    
@@ -35,9 +35,9 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
 			{
 				signed_c = 1;
 				c = -c;
-				coeff = (mp_limb_t *) &c;
+				coeff = (ulong *) &c;
 			} else
-				coeff = (mp_limb_t *) coeffs_m;
+				coeff = (ulong *) coeffs_m;
 		} else /* coeff is an mpz_t */
 		{
 			__mpz_struct * mc = COEFF_TO_PTR(c);

@@ -13,11 +13,11 @@
 #include "ulong_extras.h"
 
 n_pair_t
-fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
+fchain_precomp(ulong m, ulong n, double npre)
 {
     n_pair_t current = {0, 0}, old;
     int length;
-    mp_limb_t power, xy;
+    ulong power, xy;
 
     old.x = UWORD(2);
     old.y = n - UWORD(3);
@@ -52,11 +52,11 @@ fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
 }
 
 n_pair_t
-fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
+fchain2_preinv(ulong m, ulong n, ulong ninv)
 {
     n_pair_t current = {0, 0}, old;
     int length;
-    mp_limb_t power, xy;
+    ulong power, xy;
 
     old.x = UWORD(2);
     old.y = n - UWORD(3);
@@ -91,12 +91,12 @@ fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
 }
 
 int
-n_is_probabprime_fibonacci(mp_limb_t n)
+n_is_probabprime_fibonacci(ulong n)
 {
-    mp_limb_t m;
+    ulong m;
     n_pair_t V;
 
-    if (FLINT_ABS((mp_limb_signed_t) n) <= UWORD(3))
+    if (FLINT_ABS((slong) n) <= UWORD(3))
     {
         if (n >= UWORD(2))
             return 1;
@@ -116,7 +116,7 @@ n_is_probabprime_fibonacci(mp_limb_t n)
     }
     else
     {
-        mp_limb_t ninv = n_preinvert_limb(n);
+        ulong ninv = n_preinvert_limb(n);
 
         V = fchain2_preinv(m, n, ninv);
         return (n_mulmod2_preinv(n - UWORD(3), V.x, n, ninv) ==

@@ -9,13 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 
-void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
+void flint_mpn_preinvn(ulong_ptr dinv, ulong_srcptr d, mp_size_t n)
 {
-   mp_ptr q, r, d1;
+   ulong_ptr q, r, d1;
    
-   d1 = flint_malloc(n*sizeof(mp_limb_t));
+   d1 = flint_malloc(n*sizeof(ulong));
    if (mpn_add_1(d1, d, n, 1)) /* check for d + 1 == 0 */
    {
       mpn_zero(dinv, n);
@@ -23,8 +23,8 @@ void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
       return;
    }
 
-   r = flint_malloc((2*n + 1)*sizeof(mp_limb_t));
-   q = flint_malloc((n + 2)*sizeof(mp_limb_t));
+   r = flint_malloc((2*n + 1)*sizeof(ulong));
+   q = flint_malloc((n + 2)*sizeof(ulong));
  
    mpn_zero(r, 2*n);
    r[2*n] = 1;

@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_mod_poly.h"
+#include "fmpz_poly.h"
 #include "qadic.h"
 
 /*
@@ -138,10 +137,7 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     const slong N = qadic_prec(rop);
 
     if (op->val < 0)
-    {
-        flint_printf("Exception (qadic_teichmuller).  val(op) is negative.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "val(op) is negative in qadic_teichmuller\n");
 
     if (qadic_is_zero(op) || op->val > 0 || N <= 0)
     {

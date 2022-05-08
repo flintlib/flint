@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "padic_poly.h"
 #include "padic_mat.h"
 
 static void 
@@ -114,4 +112,3 @@ void _padic_mat_canonicalise(padic_mat_t A, const padic_ctx_t ctx)
                                    &(A->val), *(ctx->p));
     }
 }
-

@@ -11,10 +11,10 @@
 
 #include "ulong_extras.h"
 
-void check(ulong n, mp_limb_t ans)
+void check(ulong n, ulong ans)
 {
     int ok, reasonable;
-    mp_limb_t lo, hi;
+    ulong lo, hi;
     n_nth_prime_bounds(&lo, &hi, n);
 
     ok = lo <= ans && ans <= hi;

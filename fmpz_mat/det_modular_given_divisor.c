@@ -18,10 +18,10 @@
 #define DEBUG_USE_SMALL_PRIMES 0
 
 
-static mp_limb_t
-next_good_prime(const fmpz_t d, mp_limb_t p)
+static ulong
+next_good_prime(const fmpz_t d, ulong p)
 {
-    mp_limb_t r = 0;
+    ulong r = 0;
 
     while (r == 0)
     {
@@ -38,7 +38,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     const fmpz_t d, int proved)
 {
     fmpz_t bound, prod, stable_prod, x, xnew;
-    mp_limb_t p, xmod;
+    ulong p, xmod;
     nmod_mat_t Amod;
     slong n = A->r;
 

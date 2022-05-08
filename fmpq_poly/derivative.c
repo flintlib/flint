@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 

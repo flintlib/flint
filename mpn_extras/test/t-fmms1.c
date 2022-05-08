@@ -19,7 +19,7 @@ int main(void)
 {
     slong i, j;
     fmpz_t X1, X2, Y, T;
-    mp_limb_t * y, a1, * x1, a2, * x2;
+    ulong * y, a1, * x1, a2, * x2;
     mp_size_t yn, n;
     
     FLINT_TEST_INIT(state);
@@ -36,9 +36,9 @@ int main(void)
     {
         n = n_randint(state, 100) + 1;
 
-        x1 = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
-        x2 = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
-        y = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
+        x1 = (ulong *) flint_malloc(n*sizeof(ulong));
+        x2 = (ulong *) flint_malloc(n*sizeof(ulong));
+        y = (ulong *) flint_malloc(n*sizeof(ulong));
 
         a1 = n_randtest(state);
         a2 = n_randtest(state);

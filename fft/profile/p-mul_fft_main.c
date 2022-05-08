@@ -34,11 +34,11 @@ main(void)
     {
        mp_size_t int_limbs = 1000000;
        mp_size_t j;
-       mp_limb_t * i1, *i2, *r1, *r2;
+       ulong * i1, *i2, *r1, *r2;
         
        flint_printf("bits = %wd\n", int_limbs*FLINT_BITS);
        
-       i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
+       i1 = flint_malloc(6*int_limbs*sizeof(ulong));
        i2 = i1 + int_limbs;
        r1 = i2 + int_limbs;
        r2 = r1 + 2*int_limbs;

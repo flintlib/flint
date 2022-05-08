@@ -13,8 +13,8 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_compose_mod(mp_ptr res,
-    mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
+_nmod_poly_compose_mod(ulong_ptr res,
+    ulong_srcptr f, slong lenf, ulong_srcptr g, ulong_srcptr h, slong lenh, nmod_t mod)
 {
     if (lenh < 8 || lenf >= lenh)
         _nmod_poly_compose_mod_horner(res, f, lenf, g, h, lenh, mod);
@@ -32,7 +32,7 @@ nmod_poly_compose_mod(nmod_poly_t res,
     slong len3 = poly3->length;
     slong len = len3 - 1;
 
-    mp_ptr ptr2;
+    ulong_ptr ptr2;
 
     if (len3 == 0)
         flint_throw(FLINT_DIVZERO, "nmod_poly_compose_mod\n");

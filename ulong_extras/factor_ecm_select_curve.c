@@ -34,18 +34,19 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "flint-impl.h"
 #include "ulong_extras.h"
 
 int
-n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_select_curve(ulong_ptr f, ulong sig, ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t u, v, w, t, hi, lo;
-    mp_ptr a;
+    ulong u, v, w, t, hi, lo;
+    ulong_ptr a;
     TMP_INIT;
 
     TMP_START;
-    a = TMP_ALLOC(2 * sizeof(mp_limb_t));
+    a = TMP_ALLOC(2 * sizeof(ulong));
 
     u = sig;
 

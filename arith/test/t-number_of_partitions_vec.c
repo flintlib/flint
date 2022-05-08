@@ -23,7 +23,7 @@
 int main(void)
 {
     fmpz * p;
-    mp_ptr pmod;
+    ulong_ptr pmod;
     slong k, n;
 
     const slong maxn = 1000;

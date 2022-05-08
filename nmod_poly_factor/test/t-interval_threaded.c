@@ -21,7 +21,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_poly.h"
@@ -44,7 +44,7 @@ main(void)
         nmod_poly_t a, b, c, cinv, d;
 	nmod_poly_struct * tmp;
 	nmod_poly_struct * e;
-        mp_limb_t modulus;
+        ulong modulus;
         slong j, num_threads, l;
         nmod_poly_interval_poly_arg_t * args1;
         thread_pool_handle * threads;

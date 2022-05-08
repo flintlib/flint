@@ -12,7 +12,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_power_sums_to_poly(mp_ptr res, mp_srcptr poly, slong len,
+_nmod_poly_power_sums_to_poly(ulong_ptr res, ulong_srcptr poly, slong len,
                               nmod_t mod)
 {
     if (mod.n <= 12 || poly[0] <= 10)

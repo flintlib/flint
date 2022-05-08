@@ -64,13 +64,13 @@ void _fmpz_poly_sqr_tiny1(fmpz * res, const fmpz * poly, slong len)
 void _fmpz_poly_sqr_tiny2(fmpz * res, const fmpz * poly, slong len)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    ulong_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * (2 * len - 1) * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * (2 * len - 1) * sizeof(ulong));
 
     FLINT_MPN_ZERO(tmp, 2 * (2 * len - 1));
 

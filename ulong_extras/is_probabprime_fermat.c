@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 int
-n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
+n_is_probabprime_fermat(ulong n, ulong i)
 {
     if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
         return (n_powmod(i, n - 1, n) == UWORD(1));

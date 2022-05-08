@@ -22,7 +22,7 @@ int main(void)
     int i, result;
     mpz_t a, d, q1, q2, r1, r2;
     gmp_randstate_t st;
-    mp_ptr dinv;
+    ulong_ptr dinv;
     mp_size_t size, size2;
     flint_bitcnt_t norm;
     
@@ -59,12 +59,12 @@ int main(void)
 
        /* allocate space */
        q2->_mp_size = size2 - size + 1;  
-       q2->_mp_d = flint_malloc(q2->_mp_size*sizeof(mp_limb_t));
+       q2->_mp_d = flint_malloc(q2->_mp_size*sizeof(ulong));
        
        /* reduce a mod d */
        mpz_fdiv_qr(q1, r1, a, d);
        
-       dinv = flint_malloc(size*sizeof(mp_limb_t));
+       dinv = flint_malloc(size*sizeof(ulong));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
        q2->_mp_d[q2->_mp_size - 1] = flint_mpn_divrem_preinvn(q2->_mp_d, a->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv); 
@@ -115,15 +115,15 @@ int main(void)
 
        /* allocate space */
        q2->_mp_size = size2 - size + 1;  
-       q2->_mp_d = flint_malloc(q2->_mp_size*sizeof(mp_limb_t));
+       q2->_mp_d = flint_malloc(q2->_mp_size*sizeof(ulong));
        
        r2->_mp_size = size2;  
-       r2->_mp_d = flint_malloc(r2->_mp_size*sizeof(mp_limb_t));
+       r2->_mp_d = flint_malloc(r2->_mp_size*sizeof(ulong));
        
        /* reduce a mod d */
        mpz_fdiv_qr(q1, r1, a, d);
        
-       dinv = flint_malloc(size*sizeof(mp_limb_t));
+       dinv = flint_malloc(size*sizeof(ulong));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
        q2->_mp_d[q2->_mp_size - 1] = flint_mpn_divrem_preinvn(q2->_mp_d, r2->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv); 

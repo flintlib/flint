@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 
 slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)

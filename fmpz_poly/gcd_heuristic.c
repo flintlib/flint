@@ -41,7 +41,7 @@
 
 #if !defined(__MPIR_VERSION)
 #define USE_GMP_DIV_Q 1
-void __gmpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
+void __gmpn_div_q(ulong_ptr, ulong_srcptr, mp_size_t, ulong_srcptr, mp_size_t, ulong_ptr);
 #else
 #define USE_GMP_DIV_Q 0
 #endif
@@ -50,7 +50,7 @@ void __gmpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
    Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
 */
-mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
+mp_size_t flint_mpn_tdiv_q_fmpz_inplace(ulong_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
 {
    if (fmpz_size(gc) == 1) 
    {
@@ -60,16 +60,16 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
 	else 
    {
       mp_size_t tlimbs;
-      mp_ptr temp;
+      ulong_ptr temp;
       __mpz_struct * mgc = COEFF_TO_PTR(*gc);
       TMP_INIT;
 
       TMP_START;
       
 #if USE_GMP_DIV_Q
-      temp = TMP_ALLOC((2 * limbsg + 1) * sizeof(mp_limb_t));
+      temp = TMP_ALLOC((2 * limbsg + 1) * sizeof(ulong));
 #else
-      temp = TMP_ALLOC(limbsg * sizeof(mp_limb_t));
+      temp = TMP_ALLOC(limbsg * sizeof(ulong));
 #endif
       FLINT_MPN_COPYI(temp, arrayg, limbsg);
 
@@ -118,7 +118,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    slong sign1, sign2, glen, qlen, qlen2;
 	fmpz_t ac, bc, d, gc;
    fmpz * A, * B, * G, * Q, * t;
-   mp_ptr array1, array2, arrayg, q, temp;
+   ulong_ptr array1, array2, arrayg, q, temp;
    int divides;
 
    fmpz_init(ac);
@@ -126,8 +126,8 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    fmpz_init(d);
    
 	/* compute gcd of content of poly1 and poly2 */
-   _fmpz_poly_content(ac, poly1, len1);
-   _fmpz_poly_content(bc, poly2, len2);
+   _fmpz_vec_content(ac, poly1, len1);
+   _fmpz_vec_content(bc, poly2, len2);
    fmpz_gcd(d, ac, bc);
 
    /* special case, one of the polys is a constant */
@@ -202,9 +202,9 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    /* allocate space to pack into */
    limbs1 = (pack_bits*len1 - 1)/FLINT_BITS + 1;
    limbs2 = (pack_bits*len2 - 1)/FLINT_BITS + 1;
-	array1 = flint_calloc(limbs1, sizeof(mp_limb_t));
-   array2 = flint_calloc(limbs2, sizeof(mp_limb_t));
-   arrayg = flint_calloc(limbs2, sizeof(mp_limb_t));
+	array1 = flint_calloc(limbs1, sizeof(ulong));
+   array2 = flint_calloc(limbs2, sizeof(ulong));
+   arrayg = flint_calloc(limbs2, sizeof(ulong));
    
    /* pack first poly and normalise */
    sign1 = (slong) fmpz_sgn(A + len1 - 1);
@@ -238,7 +238,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    
 	/* divide by any content */
    fmpz_init(gc);
-	_fmpz_poly_content(gc, G, glen);
+	_fmpz_vec_content(gc, G, glen);
 
    if (!fmpz_is_one(gc)) 
       limbsg = flint_mpn_tdiv_q_fmpz_inplace(arrayg, limbsg, gc);
@@ -249,8 +249,8 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    qlimbs2 = limbs2 - limbsg + 1;
    qlen2 = FLINT_MIN(len2, (qlimbs2*FLINT_BITS)/pack_bits + 1);
    qlimbs = (FLINT_MAX(qlen, qlen2)*pack_bits - 1)/FLINT_BITS + 1;
-   q = flint_calloc(qlimbs, sizeof(mp_limb_t));
-   temp = flint_malloc(limbsg*sizeof(mp_limb_t));
+   q = flint_calloc(qlimbs, sizeof(ulong));
+   temp = flint_malloc(limbsg*sizeof(ulong));
 	divides = 0;
 
    if (flint_mpn_divides(q, array1, limbs1, arrayg, limbsg, temp)) 

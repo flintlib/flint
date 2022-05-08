@@ -10,8 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "gmpcompat.h"
+#include "mpf_vec.h"
+#ifdef LONGSLONG
+# define flint_mpf_cmp_ui mpf_cmp_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 int
 _mpf_vec_is_zero(mpf_srcptr vec, slong len)

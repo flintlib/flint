@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void
@@ -51,10 +52,7 @@ fmpq_poly_sinh_cosh_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t
     }
 
     if (!fmpz_is_zero(poly->coeffs))
-    {
-        flint_printf("Exception (fmpq_poly_sinh_cosh_series). Constant term != 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 0 in fmpq_poly_sinh_cosh_series\n");
 
     fmpq_poly_fit_length(res1, n);
     fmpq_poly_fit_length(res2, n);

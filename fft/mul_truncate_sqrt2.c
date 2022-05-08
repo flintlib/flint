@@ -14,8 +14,8 @@
 #include "fft.h"
 #include "mpn_extras.h"
 
-void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1, 
-                        mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
+void mul_truncate_sqrt2(ulong_ptr r1, ulong_srcptr i1, mp_size_t n1, 
+                        ulong_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 {
    mp_size_t n = (UWORD(1)<<depth);
    flint_bitcnt_t bits1 = (n*w - (depth+1))/2; 
@@ -29,11 +29,11 @@ void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    
    mp_size_t i, j, trunc;
 
-   mp_limb_t ** ii, ** jj, * t1, * t2, * s1, * tt, * ptr;
-   mp_limb_t c;
+   ulong ** ii, ** jj, * t1, * t2, * s1, * tt, * ptr;
+   ulong c;
    
-   ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
-   for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
+   ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(ulong));
+   for (i = 0, ptr = (ulong *) ii + 4*n; i < 4*n; i++, ptr += size) 
    {
       ii[i] = ptr;
    }
@@ -44,8 +44,8 @@ void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    
    if (i1 != i2)
    {
-      jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-      for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
+      jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
+      for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size) 
       {
          jj[i] = ptr;
       }

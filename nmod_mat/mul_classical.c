@@ -20,11 +20,11 @@ with op = -1, computes D = C - A*B
 */
 
 static __inline__ void
-_nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
-    mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+_nmod_mat_addmul_basic_op(ulong_ptr * D, ulong_ptr * const C, ulong_ptr * const A,
+    ulong_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
     slong i, j;
-    mp_limb_t c;
+    ulong c;
 
     for (i = 0; i < m; i++)
     {
@@ -43,14 +43,14 @@ _nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
 }
 
 static __inline__ void
-_nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
-    const mp_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+_nmod_mat_addmul_transpose_op(ulong_ptr * D, const ulong_ptr * C, const ulong_ptr * A,
+    const ulong_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
-    mp_ptr tmp;
-    mp_limb_t c;
+    ulong_ptr tmp;
+    ulong c;
     slong i, j;
 
-    tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
+    tmp = flint_malloc(sizeof(ulong) * k * n);
 
     for (i = 0; i < k; i++)
         for (j = 0; j < n; j++)
@@ -76,15 +76,15 @@ _nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
 
 /* requires nlimbs = 1 */
 void
-_nmod_mat_addmul_packed_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
-    const mp_ptr * B, slong M, slong N, slong K, int op, nmod_t mod, int nlimbs)
+_nmod_mat_addmul_packed_op(ulong_ptr * D, const ulong_ptr * C, const ulong_ptr * A,
+    const ulong_ptr * B, slong M, slong N, slong K, int op, nmod_t mod, int nlimbs)
 {
     slong i, j, k;
     slong Kpack;
     int pack, pack_bits;
-    mp_limb_t c, d, mask;
-    mp_ptr tmp;
-    mp_ptr Aptr, Tptr;
+    ulong c, d, mask;
+    ulong_ptr tmp;
+    ulong_ptr Aptr, Tptr;
 
     /* bound unreduced entry */
     c = N * (mod.n-1) * (mod.n-1);

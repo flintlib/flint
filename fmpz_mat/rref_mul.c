@@ -20,7 +20,7 @@ slong
 fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
     nmod_mat_t Amod;
-    mp_limb_t p;
+    ulong p;
     slong i, j, m, n, rank, * pivs, * P;
     fmpz_mat_t B, C, D, E, E2, F, FD;
 

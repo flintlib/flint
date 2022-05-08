@@ -130,7 +130,7 @@ union ieee_double_extract
 #endif
 
 static __inline__
-double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
+double flint_mpn_get_d (ulong_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 {
   FLINT_ASSERT (size >= 0);
   FLINT_ASSERT (size == 0 || ptr[size-1] != 0);
@@ -159,7 +159,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 
     {
       union ieee_double_extract	 u;
-      mp_limb_t	 m0, m1, m2, rmask;
+      ulong	 m0, m1, m2, rmask;
       int	 lshift, rshift;
 
       m0 = ptr[size-1];			    /* high limb */
@@ -252,7 +252,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
    do { \
-      (xxx)->_mp_d = (mp_ptr) &(yyy); \
+      (xxx)->_mp_d = (ulong_ptr) &(yyy); \
       if ((yyy) > 0) \
          (xxx)->_mp_size = 1; \
    }while (0)
@@ -260,7 +260,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 #define FLINT_MOCK_MPZ_SI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
    do { \
-      (xxx)->_mp_d = (mp_ptr) &(yyy); \
+      (xxx)->_mp_d = (ulong_ptr) &(yyy); \
       if ((yyy) < 0) (xxx)->_mp_size = -1, (yyy) = -(yyy); \
       else (xxx)->_mp_size = (yyy) != 0; \
    } while (0)
@@ -279,7 +279,7 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
       (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (ulong_ptr) flint_malloc(sizeof(ulong));
       r->_mp_alloc = 1;
    }
 
@@ -299,7 +299,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
       (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (ulong_ptr) flint_malloc(sizeof(ulong));
       r->_mp_alloc = 1;
    }
 
@@ -310,7 +310,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
 static __inline__
 void flint_mpz_init_set_si(mpz_ptr r, slong s)
 {
-   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (ulong_ptr) flint_malloc(sizeof(ulong));
    r->_mp_alloc = 1;
 
    if (s < 0) {
@@ -325,7 +325,7 @@ void flint_mpz_init_set_si(mpz_ptr r, slong s)
 static __inline__
 void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
 {
-   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (ulong_ptr) flint_malloc(sizeof(ulong));
    r->_mp_alloc = 1;
 
    r->_mp_d[0] = u; 
@@ -784,9 +784,9 @@ static __inline__
 void flint_mpf_set_si (mpf_ptr dest, slong val)
 {
   mp_size_t size;
-  mp_limb_t vl;
+  ulong vl;
 
-  vl = (mp_limb_t) (val >= 0 ? val : -val);
+  vl = (ulong) (val >= 0 ? val : -val);
 
   dest->_mp_d[0] = vl;
   size = vl != 0;
@@ -858,8 +858,8 @@ slong flint_mpf_get_si (mpf_srcptr f)
 {
   mp_exp_t exp;
   mp_size_t size, abs_size;
-  mp_srcptr fp;
-  mp_limb_t fl;
+  ulong_srcptr fp;
+  ulong fl;
 
   exp = f->_mp_exp;
   size = f->_mp_size;
@@ -908,10 +908,10 @@ MA 02110-1301, USA. */
 static __inline__
 int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
 {
-  mp_srcptr up;
+  ulong_srcptr up;
   mp_size_t usize;
   mp_exp_t uexp;
-  mp_limb_t ulimb;
+  ulong ulimb;
 
   uexp = u->_mp_exp;
   usize = u->_mp_size;
@@ -974,9 +974,9 @@ static __inline__
 int flint_mpf_fits_slong_p(mpf_srcptr f)
 {
   mp_size_t  fs, fn;
-  mp_srcptr  fp;
+  ulong_srcptr  fp;
   mp_exp_t   exp;
-  mp_limb_t  fl;
+  ulong  fl;
 
   fs = f->_mp_size;
   if (fs == 0)
@@ -996,7 +996,7 @@ int flint_mpf_fits_slong_p(mpf_srcptr f)
   else
     return 0;
 
-  return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
+  return fl <= (fs >= 0 ? (ulong) WORD_MAX : - (ulong) WORD_MIN);
 }
 
 #else
@@ -1087,7 +1087,7 @@ static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 {
   mp_size_t size, abs_size;
-  mp_limb_t * ptr;
+  ulong * ptr;
   int cnt;
   slong exp;
 

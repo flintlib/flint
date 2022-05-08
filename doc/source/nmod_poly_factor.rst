@@ -89,7 +89,7 @@ Factorisation
     Returns 1 if the polynomial ``f`` is irreducible, otherwise returns 0.
     Uses Rabin irreducibility test.
 
-.. function:: int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod)
+.. function:: int _nmod_poly_is_squarefree(ulong_srcptr f, slong len, nmod_t mod)
 
     Returns 1 if ``(f, len)`` is squarefree, and 0 otherwise. As a
     special case, the zero polynomial is not considered squarefree.
@@ -153,7 +153,7 @@ Factorisation
     step. If :func:`flint_get_num_threads` is greater than one
     :func:`nmod_poly_factor_distinct_deg_threaded` is used.
 
-.. function:: mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
+.. function:: ulong nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a general polynomial ``f`` into monic irreducible factors
     and returns the leading coefficient of ``f``, or 0 if ``f``
@@ -164,7 +164,7 @@ Factorisation
     square-free factorisation, and finally runs Berlekamp on all the
     individual square-free factors.
 
-.. function:: mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
+.. function:: ulong nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a general polynomial ``f`` into monic irreducible factors
     and returns the leading coefficient of ``f``, or 0 if ``f``
@@ -175,7 +175,7 @@ Factorisation
     square-free factorisation, and finally runs Cantor-Zassenhaus on all the
     individual square-free factors.
 
-.. function:: mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t res, const nmod_poly_t f)
+.. function:: ulong nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a general polynomial ``f`` into monic irreducible factors
     and returns the leading coefficient of ``f``, or 0 if ``f``
@@ -186,7 +186,7 @@ Factorisation
     square-free factorisation, and finally runs Kaltofen-Shoup on all the
     individual square-free factors.
 
-.. function:: mp_limb_t nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t f)
+.. function:: ulong nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a general polynomial ``f`` into monic irreducible factors
     and returns the leading coefficient of ``f``, or 0 if ``f``

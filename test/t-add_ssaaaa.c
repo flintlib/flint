@@ -26,7 +26,7 @@ int main(void)
 
    for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t sh1, sl1, sh2, sl2, ah1, al1, ah2, al2;
+      ulong sh1, sl1, sh2, sl2, ah1, al1, ah2, al2;
 
       ah1 = n_randtest(state);
       al1 = n_randtest(state);

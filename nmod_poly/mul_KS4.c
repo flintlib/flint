@@ -35,6 +35,7 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
@@ -43,16 +44,16 @@
    2^(-b) and -2^(-b).
 */
 void
-_nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
-                  mp_srcptr op2, slong n2, nmod_t mod)
+_nmod_poly_mul_KS4(ulong_ptr res, ulong_srcptr op1, slong n1,
+                  ulong_srcptr op2, slong n2, nmod_t mod)
 {
    int sqr, v3m_neg;
    ulong bits, b, w, a1, a2, a3;
    slong n1o, n1e, n2o, n2e, n3o, n3e, n3, k1, k2, k3;
-   mp_ptr v1_buf0, v2_buf0, v1_buf1, v2_buf1, v1_buf2, v2_buf2, v1_buf3, v2_buf3, v1_buf4, v2_buf4;
-   mp_ptr v1on, v1en, v1pn, v1mn, v2on, v2en, v2pn, v2mn, v3on, v3en, v3pn, v3mn;
-   mp_ptr v1or, v1er, v1pr, v1mr, v2or, v2er, v2pr, v2mr, v3or, v3er, v3pr, v3mr;
-   mp_ptr z, zn, zr;
+   ulong_ptr v1_buf0, v2_buf0, v1_buf1, v2_buf1, v1_buf2, v2_buf2, v1_buf3, v2_buf3, v1_buf4, v2_buf4;
+   ulong_ptr v1on, v1en, v1pn, v1mn, v2on, v2en, v2pn, v2mn, v3on, v3en, v3pn, v3mn;
+   ulong_ptr v1or, v1er, v1pr, v1mr, v2or, v2er, v2pr, v2mr, v3or, v3er, v3pr, v3mr;
+   ulong_ptr z, zn, zr;
    TMP_INIT;
 
    if (n2 == 1)
@@ -106,7 +107,7 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
    k3 = k1 + k2;
 
    /* allocate space */
-   v1_buf0 = TMP_ALLOC(sizeof(mp_limb_t) * 5 * k3); /* k1 limbs */
+   v1_buf0 = TMP_ALLOC(sizeof(ulong) * 5 * k3); /* k1 limbs */
    v2_buf0 = v1_buf0 + k1;         /* k2 limbs */
    v1_buf1 = v2_buf0 + k2;         /* k1 limbs */
    v2_buf1 = v1_buf1 + k1;         /* k2 limbs */
@@ -148,7 +149,7 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
    v3er = v1_buf2;
    v3or = v1_buf3;
    
-   z = TMP_ALLOC(sizeof(mp_limb_t) * 2*w*(n3e + 1));
+   z = TMP_ALLOC(sizeof(ulong) * 2*w*(n3e + 1));
    zn = z;
    zr = z + w*(n3e + 1);
 

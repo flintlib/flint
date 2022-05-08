@@ -24,7 +24,7 @@ main(void)
     nmod_mat_t A, x, b, Ax;
     slong i, m, r;
     int solved;
-    mp_limb_t mod;
+    ulong mod;
     FLINT_TEST_INIT(state);
     
 

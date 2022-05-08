@@ -21,7 +21,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly
     slong i, j, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, shift, off;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
     slong * degrees;
     slong * offs;
@@ -120,7 +120,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly
     slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, off;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
     fmpz * degrees;
     slong * offs;

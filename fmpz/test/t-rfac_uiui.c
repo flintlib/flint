@@ -31,7 +31,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t xa, r1, r2, r1r2, r3;
-        mp_limb_t x;
+        ulong x;
         ulong a, b;
 
         fmpz_init(xa);

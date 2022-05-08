@@ -115,7 +115,7 @@ n_primes_next(n_primes_t iter)
 
 FLINT_DLL extern const unsigned int flint_primes_small[];
 
-extern FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
+extern FLINT_TLS_PREFIX ulong_ptr _flint_primes[FLINT_BITS];
 extern FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
 extern FLINT_TLS_PREFIX int _flint_primes_used;
 
@@ -123,12 +123,12 @@ FLINT_DLL void n_compute_primes(ulong num_primes);
 
 FLINT_DLL void n_cleanup_primes(void);
 
-FLINT_DLL const ulong * n_primes_arr_readonly(ulong n);
+FLINT_DLL ulong_srcptr n_primes_arr_readonly(ulong n);
 FLINT_DLL const double * n_prime_inverses_arr_readonly(ulong n);
 
 /* Checked arithmetic ********************************************************/
 
-ULONG_EXTRAS_INLINE int n_mul_checked(ulong * a, ulong b, ulong c)
+ULONG_EXTRAS_INLINE int n_mul_checked(ulong_ptr a, ulong b, ulong c)
 {
 	ulong ahi, alo;
 	umul_ppmm(ahi, alo, b, c);
@@ -136,14 +136,14 @@ ULONG_EXTRAS_INLINE int n_mul_checked(ulong * a, ulong b, ulong c)
 	return 0 != ahi;
 }
 
-ULONG_EXTRAS_INLINE int n_add_checked(ulong * a, ulong b, ulong c)
+ULONG_EXTRAS_INLINE int n_add_checked(ulong_ptr a, ulong b, ulong c)
 {
     int of = b + c < b;
     *a = b + c;
     return of;
 }
 
-ULONG_EXTRAS_INLINE int n_sub_checked(ulong * a, ulong b, ulong c)
+ULONG_EXTRAS_INLINE int n_sub_checked(ulong_ptr a, ulong b, ulong c)
 {
     int of = b < c;
     *a = b - c;
@@ -199,10 +199,10 @@ FLINT_DLL ulong n_mod_precomp(ulong a, ulong n, double ninv);
 
 FLINT_DLL ulong n_mod2_precomp(ulong a, ulong n, double ninv);
 
-FLINT_DLL ulong n_divrem2_precomp(ulong * q, ulong a, 
+FLINT_DLL ulong n_divrem2_precomp(ulong_ptr q, ulong a, 
                                            ulong n, double npre);
 
-FLINT_DLL ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
+FLINT_DLL ulong n_divrem2_preinv(ulong_ptr q, ulong a, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
 
@@ -311,18 +311,18 @@ ulong n_negmod(ulong x, ulong n)
 
 FLINT_DLL ulong n_sqrtmod(ulong a, ulong p);
 
-FLINT_DLL slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp); 
+FLINT_DLL slong n_sqrtmod_2pow(ulong_ptr* sqrt, ulong a, slong exp); 
 
-FLINT_DLL slong n_sqrtmod_primepow(ulong ** sqrt, ulong a, 
+FLINT_DLL slong n_sqrtmod_primepow(ulong_ptr* sqrt, ulong a, 
                                               ulong p, slong exp);
 
-FLINT_DLL slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac);
+FLINT_DLL slong n_sqrtmodn(ulong_ptr* sqrt, ulong a, n_factor_t * fac);
 
 FLINT_DLL ulong n_gcd(ulong x, ulong y);
 
-FLINT_DLL ulong n_xgcd(ulong * a, ulong * b, ulong x, ulong y);
+FLINT_DLL ulong n_xgcd(ulong_ptr a, ulong_ptr b, ulong x, ulong y);
 
-FLINT_DLL ulong n_gcdinv(ulong * a, ulong x, ulong y);
+FLINT_DLL ulong n_gcdinv(ulong_ptr a, ulong x, ulong y);
 
 ULONG_EXTRAS_INLINE
 ulong n_invmod(ulong x, ulong y)
@@ -348,7 +348,7 @@ FLINT_DLL int _n_jacobi_unsigned(ulong x, ulong y, unsigned int r);
 
 FLINT_DLL ulong n_sqrt(ulong a);
 
-FLINT_DLL ulong n_sqrtrem(ulong * r, ulong a);
+FLINT_DLL ulong n_sqrtrem(ulong_ptr r, ulong a);
 
 FLINT_DLL int n_is_square(ulong x);
 
@@ -366,9 +366,9 @@ FLINT_DLL ulong n_cbrtrem(ulong* remainder, ulong n);
 
 FLINT_DLL int n_is_perfect_power235(ulong n);
 
-FLINT_DLL int n_is_perfect_power(ulong * root, ulong n);
+FLINT_DLL int n_is_perfect_power(ulong_ptr root, ulong n);
 
-FLINT_DLL int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p);
+FLINT_DLL int n_divides(ulong_ptr q, ulong n, ulong p);
 
 FLINT_DLL int n_is_oddprime_small(ulong n);
 
@@ -398,15 +398,15 @@ FLINT_DLL int n_is_prime(ulong n);
 
 FLINT_DLL ulong n_nth_prime(ulong n);
 
-FLINT_DLL void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n);
+FLINT_DLL void n_nth_prime_bounds(ulong_ptr lo, ulong_ptr hi, ulong n);
 
 FLINT_DLL ulong n_prime_pi(ulong n);
 
-FLINT_DLL void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
+FLINT_DLL void n_prime_pi_bounds(ulong_ptr lo, ulong_ptr hi, ulong n);
 
-FLINT_DLL int n_remove(ulong * n, ulong p);
+FLINT_DLL int n_remove(ulong_ptr n, ulong p);
 
-FLINT_DLL int n_remove2_precomp(ulong * n, ulong p, double ppre);
+FLINT_DLL int n_remove2_precomp(ulong_ptr n, ulong p, double ppre);
 
 ULONG_EXTRAS_INLINE
 void n_factor_init(n_factor_t * factors)
@@ -420,7 +420,7 @@ FLINT_DLL ulong n_factor_trial_range(n_factor_t * factors,
                          ulong n, ulong start, ulong num_primes);
 
 FLINT_DLL ulong n_factor_trial_partial(n_factor_t * factors, ulong n, 
-                ulong * prod, ulong num_primes, ulong limit);
+                ulong_ptr prod, ulong num_primes, ulong limit);
 
 FLINT_DLL ulong n_factor_trial(n_factor_t * factors, 
                                   ulong n, ulong num_primes);
@@ -428,7 +428,7 @@ FLINT_DLL ulong n_factor_trial(n_factor_t * factors,
 FLINT_DLL ulong n_factor_partial(n_factor_t * factors, 
                            ulong n, ulong limit, int proved);
 
-FLINT_DLL ulong n_factor_power235(ulong *exp, ulong n);
+FLINT_DLL ulong n_factor_power235(ulong_ptr exp, ulong n);
 
 FLINT_DLL ulong n_factor_one_line(ulong n, ulong iters);
 
@@ -444,12 +444,12 @@ FLINT_DLL ulong n_factor_pp1_wrapper(ulong n);
 
 FLINT_DLL void n_factor_pp1_table_insert(slong bits, slong B1, slong count);
 
-FLINT_DLL int n_factor_pollard_brent_single(ulong *factor, ulong n, 
+FLINT_DLL int n_factor_pollard_brent_single(ulong_ptr factor, ulong n, 
                                             ulong ninv, ulong ai, 
                                             ulong xi, ulong normbits,
                                             ulong max_iters);
 
-FLINT_DLL int n_factor_pollard_brent(ulong *factor, flint_rand_t state, 
+FLINT_DLL int n_factor_pollard_brent(ulong_ptr factor, flint_rand_t state, 
                                      ulong n_in, ulong max_tries, 
                                      ulong max_iters);
 
@@ -500,38 +500,38 @@ typedef struct n_ecm_s {
 
 typedef n_ecm_s n_ecm_t[1];
 
-FLINT_DLL void n_factor_ecm_double(ulong *x, ulong *z, ulong x0,
+FLINT_DLL void n_factor_ecm_double(ulong_ptr x, ulong_ptr z, ulong x0,
                                    ulong z0, ulong n, n_ecm_t n_ecm_inf);
 
-FLINT_DLL void n_factor_ecm_add(ulong *x, ulong *z, ulong x1,
+FLINT_DLL void n_factor_ecm_add(ulong_ptr x, ulong_ptr z, ulong x1,
                                 ulong z1, ulong x2, ulong z2, 
                                 ulong x0, ulong z0, ulong n, 
                                 n_ecm_t n_ecm_inf);
 
-FLINT_DLL void n_factor_ecm_mul_montgomery_ladder(ulong *x, ulong *z,
+FLINT_DLL void n_factor_ecm_mul_montgomery_ladder(ulong_ptr x, ulong_ptr z,
                                                   ulong x0, ulong z0,
                                                   ulong k, ulong n, 
                                                   n_ecm_t n_ecm_inf);
 
-FLINT_DLL int n_factor_ecm_select_curve(ulong *f, ulong sig, ulong n,
+FLINT_DLL int n_factor_ecm_select_curve(ulong_ptr f, ulong sig, ulong n,
                                         n_ecm_t n_ecm_inf);
 
-FLINT_DLL int n_factor_ecm_stage_I(ulong *f, const ulong *prime_array,
+FLINT_DLL int n_factor_ecm_stage_I(ulong_ptr f, ulong_srcptr prime_array,
                                    ulong num, ulong B1, ulong n,
                                    n_ecm_t n_ecm_inf);
 
-FLINT_DLL int n_factor_ecm_stage_II(ulong *f, ulong B1, ulong B2,
+FLINT_DLL int n_factor_ecm_stage_II(ulong_ptr f, ulong B1, ulong B2,
                                     ulong P, ulong n, n_ecm_t n_ecm_inf);
 
-FLINT_DLL int n_factor_ecm(ulong *f, ulong curves, ulong B1,
+FLINT_DLL int n_factor_ecm(ulong_ptr f, ulong curves, ulong B1,
                            ulong B2, flint_rand_t state, ulong n);
 
-FLINT_DLL mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
+FLINT_DLL ulong n_mulmod_precomp_shoup(ulong w, ulong p);
 
-ULONG_EXTRAS_INLINE mp_limb_t
-n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+ULONG_EXTRAS_INLINE ulong
+n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
 {
-   mp_limb_t q, r, p_hi, p_lo;
+   ulong q, r, p_hi, p_lo;
 
    umul_ppmm(p_hi, p_lo, w_precomp, t);
    q = p_hi;

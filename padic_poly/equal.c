@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic_poly.h"
+#include "fmpz_vec.h"
 
 int padic_poly_equal(const padic_poly_t f, const padic_poly_t g)
 {
@@ -25,4 +25,3 @@ int padic_poly_equal(const padic_poly_t f, const padic_poly_t g)
 
     return _fmpz_vec_equal(f->coeffs, g->coeffs, f->length);
 }
-

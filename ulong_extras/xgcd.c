@@ -12,7 +12,7 @@
 #include "flint.h"
 
 ulong
-n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
+n_xgcd(ulong_ptr a, ulong_ptr b, ulong x, ulong y)
 {
     slong u1, u2, v1, v2, t1, t2;
     ulong u3, v3, quot, rem, d;

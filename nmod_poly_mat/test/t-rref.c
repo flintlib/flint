@@ -77,7 +77,7 @@ main(void)
         slong *perm;
         float density;
         int equal;
-        mp_limb_t p;
+        ulong p;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);

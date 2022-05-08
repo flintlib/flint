@@ -34,23 +34,23 @@
 # endif
 #endif
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "flint-impl.h"
 
 /* 
    TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
 */  
 
-void flint_mpn_mulmod_preinvn(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
-        mp_srcptr d, mp_srcptr dinv, ulong norm)
+void flint_mpn_mulmod_preinvn(ulong_ptr r, 
+        ulong_srcptr a, ulong_srcptr b, mp_size_t n, 
+        ulong_srcptr d, ulong_srcptr dinv, ulong norm)
 {
-   mp_limb_t cy, p1, p2, b0, b1;
-   mp_ptr t;
+   ulong cy, p1, p2, b0, b1;
+   ulong_ptr t;
    TMP_INIT;
 
    TMP_START;
-   t = TMP_ALLOC(5*n*sizeof(mp_limb_t));
+   t = TMP_ALLOC(5*n*sizeof(ulong));
 
    if (n == 2)
    {

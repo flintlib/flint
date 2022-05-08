@@ -11,10 +11,10 @@
 
 #include "flint.h"
 
-mp_limb_t
-n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
+ulong
+n_divrem2_precomp(ulong_ptr q, ulong a, ulong n, double npre)
 {
-    mp_limb_t quot;
+    ulong quot;
     slong rem;
 
     if (a < n)
@@ -23,7 +23,7 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
         return a;
     }
 
-    if ((mp_limb_signed_t) n < WORD(0))
+    if ((slong) n < WORD(0))
     {
         (*q) = UWORD(1);
         return a - n;
@@ -39,10 +39,10 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
         rem = a - quot * n;
     }
 
-    if (rem < (mp_limb_signed_t) (-n))
-        quot -= (mp_limb_t) ((double) (-rem) * npre);
+    if (rem < (slong) (-n))
+        quot -= (ulong) ((double) (-rem) * npre);
     else if (rem >= (slong) n)
-        quot += (mp_limb_t) ((double) rem * npre);
+        quot += (ulong) ((double) rem * npre);
     else if (rem < WORD(0))
     {
         (*q) = quot - 1;

@@ -11,7 +11,7 @@
 
 #include "fmpz_poly.h"
 
-static const mp_limb_t known_values[] =
+static const ulong known_values[] =
 {
     UWORD(2147483629),
     UWORD(1073742093),
@@ -29,7 +29,7 @@ static const mp_limb_t known_values[] =
 int main()
 {
     fmpz_poly_t S;
-    mp_limb_t r;
+    ulong r;
     slong n;
 
     FLINT_TEST_INIT(state);

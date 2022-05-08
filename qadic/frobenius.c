@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 #include "qadic.h"
 
 /*
@@ -344,4 +344,3 @@ void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t c
         _padic_poly_normalise(rop);
     }
 }
-

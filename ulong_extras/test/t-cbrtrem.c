@@ -22,7 +22,7 @@ int main(void)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, i, j;
+        ulong a, b, c, i, j;
         mpz_t e, f, g;
 
         mpz_init(e);

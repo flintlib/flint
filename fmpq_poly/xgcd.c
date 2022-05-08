@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -127,10 +123,7 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
                     const fmpq_poly_t A, const fmpq_poly_t B)
 {
     if (G == S || G == T || S == T)
-    {
-        flint_printf("Exception (fmpq_poly_xgcd). Output arguments aliased.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Output arguments aliased in fmpq_poly_xgcd\n");
 
     if (A->length < B->length)
     {
@@ -231,4 +224,3 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
        }
     }
 }
-

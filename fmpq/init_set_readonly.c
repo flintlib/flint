@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 
 void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)
@@ -16,4 +17,3 @@ void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)
     fmpz_init_set_readonly(fmpq_numref(f), mpq_numref(z));
     fmpz_init_set_readonly(fmpq_denref(f), mpq_denref(z));
 }
-

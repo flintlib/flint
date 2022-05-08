@@ -12,7 +12,7 @@
 
 #include "ulong_extras.h"
 
-int n_is_perfect_power(ulong * root, ulong n)
+int n_is_perfect_power(ulong_ptr root, ulong n)
 {
     static unsigned char mod63[63] = {7,7,4,0,5,4,0,5,6,5,4,4,0,4,4,0,5,4,5,4,
                               4,0,5,4,0,5,4,6,7,4,0,4,4,0,4,6,7,5,4,0,4,4,0,5,

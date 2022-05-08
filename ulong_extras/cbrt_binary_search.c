@@ -13,10 +13,10 @@
 
 #include "flint.h"
 
-mp_limb_t
-n_cbrt_binary_search(mp_limb_t x)
+ulong
+n_cbrt_binary_search(ulong x)
 {
-    mp_limb_t low, high, mid, p, upper_limit;
+    ulong low, high, mid, p, upper_limit;
 
     /* upper_limit is the max cube root possible for one word */
 

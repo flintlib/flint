@@ -11,8 +11,8 @@
 
 #include "nmod_poly.h"
 
-slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA, 
-                              mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_gcd(ulong_ptr G, ulong_srcptr A, slong lenA, 
+                              ulong_srcptr B, slong lenB, nmod_t mod)
 {
     const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
@@ -34,7 +34,7 @@ void nmod_poly_gcd(nmod_poly_t G,
     {
         slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
-        mp_ptr g;
+        ulong_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {

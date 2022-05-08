@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 

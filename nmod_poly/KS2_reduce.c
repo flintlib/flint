@@ -13,7 +13,7 @@
 #include "nmod.h"
 
 void
-_nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op, slong n, ulong w,
+_nmod_poly_KS2_reduce(ulong_ptr res, slong s, ulong_srcptr op, slong n, ulong w,
                      nmod_t mod)
 {
    if (w == 1)
@@ -37,8 +37,8 @@ _nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op, slong n, ulong w,
    Same as _nmod_poly_KS2_recover_reduce(), but requires 0 < 2 * b <= FLINT_BITS
 */
 void
-_nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
-                          mp_srcptr op2, slong n, ulong b,
+_nmod_poly_KS2_recover_reduce1(ulong_ptr res, slong s, ulong_srcptr op1,
+                          ulong_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
    ulong mask = (UWORD(1) << b) - 1;
@@ -75,8 +75,8 @@ _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
    FLINT_BITS < 2 * b < 2*FLINT_BITS
 */
 void
-_nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
-                          mp_srcptr op2, slong n, ulong b,
+_nmod_poly_KS2_recover_reduce2(ulong_ptr res, slong s, ulong_srcptr op1,
+                          ulong_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
    /*
@@ -117,8 +117,8 @@ _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
    Same as _nmod_poly_KS2_recover_reduce(), but requires b == FLINT_BITS
 */
 void
-_nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
-                          mp_srcptr op2, slong n, ulong b,
+_nmod_poly_KS2_recover_reduce2b(ulong_ptr res, slong s, ulong_srcptr op1,
+                          ulong_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
    /*
@@ -155,8 +155,8 @@ _nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
    2 * FLINT_BITS < 2 * b <= 3 * FLINT_BITS.
 */
 void
-_nmod_poly_KS2_recover_reduce3(mp_ptr res, slong s, mp_srcptr op1,
-                          mp_srcptr op2, slong n, ulong b,
+_nmod_poly_KS2_recover_reduce3(ulong_ptr res, slong s, ulong_srcptr op1,
+                          ulong_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
    /* 
@@ -212,8 +212,8 @@ _nmod_poly_KS2_recover_reduce3(mp_ptr res, slong s, mp_srcptr op1,
    Dispatches to one of the above routines depending on b.
 */
 void
-_nmod_poly_KS2_recover_reduce(mp_ptr res, slong s, mp_srcptr op1,
-                          mp_srcptr op2, slong n, ulong b,
+_nmod_poly_KS2_recover_reduce(ulong_ptr res, slong s, ulong_srcptr op1,
+                          ulong_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
    if (2 * b <= FLINT_BITS)

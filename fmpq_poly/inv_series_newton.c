@@ -10,12 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "flint-impl.h"
 #include "fmpz_poly.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 #define FMPQ_POLY_INV_NEWTON_CUTOFF 24
@@ -120,10 +117,7 @@ fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
     Qlen = FLINT_MIN(Qlen, n);
 
     if (Qlen == 0)
-    {
-        flint_printf("Exception (fmpq_poly_inv_series_newton). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_poly_inv_series_newton\n");
 
     if (Qinv != Q)
     {

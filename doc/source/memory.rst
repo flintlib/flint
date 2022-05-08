@@ -47,7 +47,7 @@ allocate two different arrays.
     void myfun(void)
     {
        /* other variable declarations */
-       mp_ptr a, b;
+       ulong_ptr a, b;
        TMP_INIT;
     
        /* arbitrary code*/
@@ -56,8 +56,8 @@ allocate two different arrays.
     
        /* arbitrary code */
     
-       a = TMP_ALLOC(32*sizeof(mp_limb_t));
-       b = TMP_ALLOC(64*sizeof(mp_limb_t));
+       a = TMP_ALLOC(32*sizeof(ulong));
+       b = TMP_ALLOC(64*sizeof(ulong));
     
        /* arbitrary code */
     

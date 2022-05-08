@@ -22,14 +22,14 @@
 */
 
 void
-fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
+fmpz_factor_ecm_submod(ulong_ptr x, ulong_ptr a, ulong_ptr b, ulong_ptr n, ulong n_size)
 {
-    mp_ptr temp;
+    ulong_ptr temp;
 
     TMP_INIT;
 
     TMP_START;
-    temp = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    temp = TMP_ALLOC(n_size * sizeof(ulong));
 
     if (mpn_cmp(a, b, n_size) > 0)
         mpn_sub_n(x, a, b, n_size);

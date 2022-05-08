@@ -64,13 +64,13 @@ _fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    ulong_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(ulong));
 
     FLINT_MPN_ZERO(tmp, 2 * (len1 + len2 - 1));
 

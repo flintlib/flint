@@ -26,4 +26,3 @@ void padic_poly_get_coeff_padic(padic_t x, const padic_poly_t f, slong n,
         padic_zero(x);
     }
 }
-

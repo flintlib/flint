@@ -14,9 +14,9 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_cosh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_cosh_series(ulong_ptr f, ulong_srcptr h, slong n, nmod_t mod)
 {
-    mp_ptr g = _nmod_vec_init(n);
+    ulong_ptr g = _nmod_vec_init(n);
     _nmod_poly_exp_expinv_series(f, g, h, n, n, mod);
     _nmod_vec_add(f, f, g, n, mod);
     _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(UWORD(2), mod.n), mod);
@@ -26,7 +26,7 @@ _nmod_poly_cosh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
 void
 nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
-    mp_ptr g_coeffs, h_coeffs;
+    ulong_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
     slong h_len;
     

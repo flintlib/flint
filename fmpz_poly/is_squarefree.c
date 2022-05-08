@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 int _fmpz_poly_is_squarefree(const fmpz * poly, slong len)

@@ -22,21 +22,21 @@
 /* Also selects initial point Q0 [x0 :: z0]  (z0 = 1) */
 
 int
-fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_select_curve(ulong_ptr f, ulong_ptr sig, ulong_ptr n, ecm_t ecm_inf)
 {
     mp_size_t sz, cy;
     mp_size_t invlimbs, gcdlimbs;
-    mp_ptr temp, tempv, tempn, tempi, tempf;
+    ulong_ptr temp, tempv, tempn, tempi, tempf;
     int ret;
 
     TMP_INIT;
 
     TMP_START;
-    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
-    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
+    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
+    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
+    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
+    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
+    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
 
     mpn_zero(tempn, ecm_inf->n_size);
     mpn_zero(tempv, ecm_inf->n_size);

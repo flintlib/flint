@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 
 int
@@ -30,4 +31,3 @@ int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
 {
     return _fmpq_mod_fmpz(res, fmpq_numref(x), fmpq_denref(x), mod);
 }
-

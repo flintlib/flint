@@ -28,7 +28,7 @@ int main(void)
 
         for (k = 0; k < 100; k++)
         {
-            mp_limb_t p, q;
+            ulong p, q;
 
             q = n_randtest(state) % UWORD(1000000000);
 

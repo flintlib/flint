@@ -42,11 +42,11 @@ main(void)
        flint_bitcnt_t bits = 2*n*bits1;
        mp_size_t int_limbs = ((mp_size_t)(truncation*bits))/FLINT_BITS;
        mp_size_t j;
-       mp_limb_t * i1, *i2, *r1, *r2;
+       ulong * i1, *i2, *r1, *r2;
         
        flint_printf("limbs = %wd\n", int_limbs);
        
-       i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
+       i1 = flint_malloc(6*int_limbs*sizeof(ulong));
        i2 = i1 + int_limbs;
        r1 = i2 + int_limbs;
        r2 = r1 + 2*int_limbs;

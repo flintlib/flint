@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 void
-nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv)
+nmod_poly_init_preinv(nmod_poly_t poly, ulong n, ulong ninv)
 {
     poly->coeffs = NULL;
 
@@ -26,7 +26,7 @@ nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv)
 }
 
 void
-nmod_poly_init(nmod_poly_t poly, mp_limb_t n)
+nmod_poly_init(nmod_poly_t poly, ulong n)
 {
     nmod_poly_init_preinv(poly, n, n_preinvert_limb(n));
 }

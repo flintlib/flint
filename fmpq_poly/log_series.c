@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
@@ -49,10 +46,7 @@ fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
     slong flen = f->length;
 
     if (flen < 1 || !fmpz_equal(f->coeffs, f->den))
-    {
-        flint_printf("Exception (fmpq_poly_log_series). Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in fmpq_poly_log_series\n");
 
     if (flen == 1 || n < 2)
     {

@@ -9,17 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 
 /*
     Try to compute y = a1*x1 - a2*x2 where x1 and x2 both have n > 0 limbs.
     If y is negative or does not fit into n limbs, the return is -1. Otherwise,
     the return is the size of y.
 */
-mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
-                                    mp_limb_t a2, mp_srcptr x2, mp_size_t n)
+mp_size_t flint_mpn_fmms1(ulong_ptr y, ulong a1, ulong_srcptr x1,
+                                    ulong a2, ulong_srcptr x2, mp_size_t n)
 {
-    mp_limb_t h0, h1;
+    ulong h0, h1;
 
     FLINT_ASSERT(n > 0);
     h0 =    mpn_mul_1(y, x1, n, a1);

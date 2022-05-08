@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_q.h"
+#include "fmpz_poly.h"
 
 void fmpz_poly_q_clear(fmpz_poly_q_t rop)
 {
@@ -26,4 +26,3 @@ void fmpz_poly_q_clear(fmpz_poly_q_t rop)
         rop->den = NULL;
     }
 }
-

@@ -12,9 +12,9 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
+void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
-    mp_limb_t  *q, *r;
+    ulong  *q, *r;
 
     if (lenR < ctx->modulus->length)
     {

@@ -10,15 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 
 void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state, 
                         slong len, flint_bitcnt_t bits)
@@ -100,13 +95,9 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
                                  slong len, flint_bitcnt_t bits)
 {
     if ((bits == 0) | (len == 0))
-    {
-        flint_printf("Exception (fmpq_poly_randtest_not_zeo). bits == 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "bits == 0 in fmpq_poly_randtest_not_zero\n");
 
     fmpq_poly_randtest(f, state, len, bits);
     if (f->length == 0) 
         fmpq_poly_set_ui(f, 1);
 }
-

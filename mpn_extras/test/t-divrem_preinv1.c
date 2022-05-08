@@ -21,7 +21,7 @@ int main(void)
     int i, result;
     mpz_t a, a2, b, q, r, q2;
     gmp_randstate_t st;
-    mp_limb_t d1, d2, inv;
+    ulong d1, d2, inv;
     slong s1, s2;
     
     FLINT_TEST_INIT(state);
@@ -52,7 +52,7 @@ int main(void)
        mpz_set(a2, a);
        
        /* normalise b */
-       b->_mp_d[b->_mp_size - 1] |= ((mp_limb_t) 1 << (GMP_LIMB_BITS - 1));
+       b->_mp_d[b->_mp_size - 1] |= ((ulong) 1 << (GMP_LIMB_BITS - 1));
 
        d1 = b->_mp_d[b->_mp_size - 1];
        d2 = b->_mp_d[b->_mp_size - 2];
@@ -61,7 +61,7 @@ int main(void)
 
        inv = flint_mpn_preinv1(d1, d2);
 
-       q2->_mp_d = flint_malloc((s1 - s2 + 1)*sizeof(mp_limb_t));
+       q2->_mp_d = flint_malloc((s1 - s2 + 1)*sizeof(ulong));
        
        q2->_mp_d[s1 - s2] = flint_mpn_divrem_preinv1(q2->_mp_d, a2->_mp_d, a2->_mp_size, b->_mp_d, b->_mp_size, inv); 
 

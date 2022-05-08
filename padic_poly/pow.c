@@ -72,4 +72,3 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
         _padic_poly_normalise(rop);
     }
 }
-

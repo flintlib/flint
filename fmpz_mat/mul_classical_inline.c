@@ -29,9 +29,9 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     fmpz a, b;
     mpz_t t;
 
-    mp_limb_t au, bu;
-    mp_limb_t pos[3];
-    mp_limb_t neg[3];
+    ulong au, bu;
+    ulong pos[3];
+    ulong neg[3];
 
     ar = A->r;
     br = B->r;

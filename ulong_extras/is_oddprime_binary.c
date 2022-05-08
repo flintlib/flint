@@ -13,10 +13,10 @@
 
 #include "ulong_extras.h"
     
-int n_is_oddprime_binary(mp_limb_t n) 
+int n_is_oddprime_binary(ulong n) 
 {
     ulong diff, prime_lo, prime_hi;
-    const mp_limb_t * primes;
+    ulong_srcptr primes;
 
     n_prime_pi_bounds(&prime_lo, &prime_hi, n);
     primes = n_primes_arr_readonly(prime_hi + 1);

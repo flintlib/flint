@@ -13,14 +13,14 @@
 #include "ulong_extras.h"
 
 int
-n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
-                      mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_stage_II(ulong_ptr f, ulong B1, ulong B2, ulong P,
+                      ulong n, n_ecm_t n_ecm_inf)
 {
     
-    mp_limb_t g, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
-    mp_limb_t mmin, mmax, maxj, Q0x2, Q0z2;
+    ulong g, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
+    ulong mmin, mmax, maxj, Q0x2, Q0z2;
     int i, j, ret;
-    mp_ptr arrx, arrz;
+    ulong_ptr arrx, arrz;
 
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */

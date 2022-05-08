@@ -20,7 +20,7 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, dinv, r = 0, norm;
+   ulong n, d, dinv, r = 0, norm;
    double dpre;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;
@@ -29,8 +29,8 @@ void sample(void * arg, ulong count)
    FLINT_TEST_INIT(state);
    
       
-   mp_ptr arr  = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
-   mp_ptr arr2 = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
+   ulong_ptr arr  = (ulong_ptr) flint_malloc(1024*sizeof(ulong));
+   ulong_ptr arr2 = (ulong_ptr) flint_malloc(1024*sizeof(ulong));
       
    for (i = 0; i < count; i++)
    {

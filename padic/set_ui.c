@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "padic.h"
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
@@ -41,4 +42,3 @@ void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
         _padic_reduce(rop, ctx);
     }
 }
-

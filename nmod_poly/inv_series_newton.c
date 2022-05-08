@@ -20,7 +20,7 @@
         _nmod_poly_mullow(z, y, yn, x, xn, nn, mod); \
 
 void
-_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_newton(ulong_ptr Qinv, ulong_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
     slong cutoff;
 
@@ -38,11 +38,11 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod
     else
     {
         slong *a, i, m, Qnlen, Wlen, W2len;
-        mp_ptr W;
+        ulong_ptr W;
 
         for (i = 1; (WORD(1) << i) < n; i++) ;
 
-        W = flint_malloc(n * sizeof(mp_limb_t) + i * sizeof(slong));
+        W = flint_malloc(n * sizeof(ulong) + i * sizeof(slong));
         a = (slong *) (W + n);
 
         a[i = 0] = n;

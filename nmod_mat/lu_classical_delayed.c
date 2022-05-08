@@ -38,7 +38,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-static mp_limb_t
+static ulong
 nmod_set_uiuiui(ulong s2, ulong s1, ulong s0, nmod_t mod)
 {
     NMOD_RED(s2, s2, mod);
@@ -49,10 +49,10 @@ nmod_set_uiuiui(ulong s2, ulong s1, ulong s0, nmod_t mod)
 slong
 nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
 {
-    mp_limb_t d, e, f, **a;
+    ulong d, e, f, **a;
     nmod_t mod;
     slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
-    mp_ptr tmp_ptr;
+    ulong_ptr tulong_ptr;
 
     nrows = A->r;
     ncols = A->c;
@@ -97,9 +97,9 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
         /* swap rows */
         if (pivot_row != row)
         {
-            tmp_ptr = a[pivot_row];
+            tulong_ptr = a[pivot_row];
             a[pivot_row] = a[row];
-            a[row] = tmp_ptr;
+            a[row] = tulong_ptr;
 
             tmp_index = P[pivot_row];
             P[pivot_row] = P[row];
@@ -122,7 +122,7 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
 
             for (j = col + 1; j + 4 < ncols; j += 4)
             {
-                mp_limb_t x0, x1, x2, x3;
+                ulong x0, x1, x2, x3;
                 x0 = a[row][j + 0];
                 x1 = a[row][j + 1];
                 x2 = a[row][j + 2];
@@ -149,11 +149,11 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
 slong
 nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 {
-    mp_limb_t d, e, f, **a;
+    ulong d, e, f, **a;
     nmod_t mod;
     slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
-    mp_ptr tmp_ptr;
-    mp_ptr b;
+    ulong_ptr tulong_ptr;
+    ulong_ptr b;
     TMP_INIT;
 
     nrows = A->r;
@@ -167,7 +167,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
         P[i] = i;
 
     TMP_START;
-    b = TMP_ALLOC(2 * sizeof(mp_limb_t) * nrows * ncols);
+    b = TMP_ALLOC(2 * sizeof(ulong) * nrows * ncols);
 
 #define UNREDUCED_LO(ii, jj) b[2 * ((ii) * ncols + jj)]
 #define UNREDUCED_HI(ii, jj) b[2 * ((ii) * ncols + jj) + 1]
@@ -214,9 +214,9 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
         /* swap rows */
         if (pivot_row != row)
         {
-            tmp_ptr = a[pivot_row];
+            tulong_ptr = a[pivot_row];
             a[pivot_row] = a[row];
-            a[row] = tmp_ptr;
+            a[row] = tulong_ptr;
 
             tmp_index = P[pivot_row];
             P[pivot_row] = P[row];
@@ -225,7 +225,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
             /* swap rows in unreduced submatrix, and reduce new pivot row */
             for (j = col + 1; j < ncols; j++)
             {
-                mp_limb_t hi, lo;
+                ulong hi, lo;
                 lo = UNREDUCED_LO(row, j);
                 hi = UNREDUCED_HI(row, j);
                 NMOD2_RED2(a[row][j], UNREDUCED_HI(pivot_row, j), UNREDUCED_LO(pivot_row, j), mod);
@@ -253,7 +253,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
             {
                 for (j = col + 1; j + 4 < ncols; j += 4)
                 {
-                    mp_limb_t x0, x1, x2, x3;
+                    ulong x0, x1, x2, x3;
                     x0 = a[row][j + 0] * f;
                     x1 = a[row][j + 1] * f;
                     x2 = a[row][j + 2] * f;
@@ -270,7 +270,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 
                 for ( ; j < ncols; j++)
                 {
-                    mp_limb_t hi, lo;
+                    ulong hi, lo;
                     hi = 0;
                     lo = a[row][j] * f;
                     add_ssaaaa(UNREDUCED_HI(i, j), UNREDUCED_LO(i, j),
@@ -281,7 +281,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
             {
                 for (j = col + 1; j + 4 < ncols; j += 4)
                 {
-                    mp_limb_t x0, x1, x2, x3, h0, h1, h2, h3;
+                    ulong x0, x1, x2, x3, h0, h1, h2, h3;
                     umul_ppmm(h0, x0, a[row][j + 0], f);
                     umul_ppmm(h1, x1, a[row][j + 1], f);
                     umul_ppmm(h2, x2, a[row][j + 2], f);
@@ -298,7 +298,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 
                 for ( ; j < ncols; j++)
                 {
-                    mp_limb_t hi, lo;
+                    ulong hi, lo;
                     umul_ppmm(hi, lo, a[row][j], f);
                     add_ssaaaa(UNREDUCED_HI(i, j), UNREDUCED_LO(i, j),
                                UNREDUCED_HI(i, j), UNREDUCED_LO(i, j), hi, lo);
@@ -319,11 +319,11 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 slong
 nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
 {
-    mp_limb_t d, e, f, **a;
+    ulong d, e, f, **a;
     nmod_t mod;
     slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
-    mp_ptr tmp_ptr;
-    mp_ptr b;
+    ulong_ptr tulong_ptr;
+    ulong_ptr b;
     TMP_INIT;
 
     nrows = A->r;
@@ -337,7 +337,7 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
         P[i] = i;
 
     TMP_START;
-    b = TMP_ALLOC(3 * sizeof(mp_limb_t) * nrows * ncols);
+    b = TMP_ALLOC(3 * sizeof(ulong) * nrows * ncols);
 
 #define UNREDUCED3_L0(ii, jj) b[3 * ((ii) * ncols + jj)]
 #define UNREDUCED3_L1(ii, jj) b[3 * ((ii) * ncols + jj) + 1]
@@ -388,9 +388,9 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
         /* swap rows */
         if (pivot_row != row)
         {
-            tmp_ptr = a[pivot_row];
+            tulong_ptr = a[pivot_row];
             a[pivot_row] = a[row];
-            a[row] = tmp_ptr;
+            a[row] = tulong_ptr;
 
             tmp_index = P[pivot_row];
             P[pivot_row] = P[row];
@@ -399,7 +399,7 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
             /* swap rows in unreduced submatrix, and reduce new pivot row */
             for (j = col + 1; j < ncols; j++)
             {
-                mp_limb_t t2, t1, t0;
+                ulong t2, t1, t0;
                 t0 = UNREDUCED3_L0(row, j);
                 t1 = UNREDUCED3_L1(row, j);
                 t2 = UNREDUCED3_L2(row, j);
@@ -433,7 +433,7 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
 
             for (j = col + 1; j < ncols; j++)
             {
-                mp_limb_t hi, lo;
+                ulong hi, lo;
                 umul_ppmm(hi, lo, a[row][j], f);
                 add_sssaaaaaa(UNREDUCED3_L2(i, j), UNREDUCED3_L1(i, j), UNREDUCED3_L0(i, j),
                               UNREDUCED3_L2(i, j), UNREDUCED3_L1(i, j), UNREDUCED3_L0(i, j),

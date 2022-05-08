@@ -38,13 +38,13 @@ main(void)
             mp_size_t limbs = (n*w)/GMP_LIMB_BITS;
             mp_size_t size = limbs + 1;
             mp_size_t i;
-            mp_limb_t * ptr;
-            mp_limb_t ** ii, ** jj, *t1, *t2;
+            ulong * ptr;
+            ulong ** ii, ** jj, *t1, *t2;
         
             trunc = 2*((trunc + 1)/2);
 
-            ii = flint_malloc((2*(n + n*size) + 2*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size) 
+            ii = flint_malloc((2*(n + n*size) + 2*size)*sizeof(ulong));
+            for (i = 0, ptr = (ulong *) ii + 2*n; i < 2*n; i++, ptr += size) 
             {
                 ii[i] = ptr;
                 random_fermat(ii[i], state, limbs);
@@ -55,8 +55,8 @@ main(void)
             for (i = 0; i < 2*n; i++)
                mpn_normmod_2expp1(ii[i], limbs);
     
-            jj = flint_malloc(2*(n + n*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
+            jj = flint_malloc(2*(n + n*size)*sizeof(ulong));
+            for (i = 0, ptr = (ulong *) jj + 2*n; i < 2*n; i++, ptr += size) 
             {
                 jj[i] = ptr;
                 FLINT_MPN_COPYI(jj[i], ii[i], size);

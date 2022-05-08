@@ -31,9 +31,9 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n;
+        ulong n;
         ulong bits;
-        mp_ptr mpn;
+        ulong_ptr mpn;
 
         do
         {
@@ -49,7 +49,7 @@ main(void)
         } while (a->length == 0);
 
         mpn =
-            flint_malloc(sizeof(mp_limb_t) *
+            flint_malloc(sizeof(ulong) *
                    ((bits * a->length - 1) / FLINT_BITS + 1));
 
         _nmod_poly_bit_pack(mpn, a->coeffs, a->length, bits);
@@ -77,7 +77,7 @@ main(void)
         fmpz_t f;
         nmod_poly_t A, B;
         slong b;
-        mp_limb_t n;
+        ulong n;
 
         do
         {

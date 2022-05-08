@@ -17,4 +17,3 @@ void padic_set_si(padic_t rop, slong op, const padic_ctx_t ctx)
     padic_val(rop) = 0;
     padic_reduce(rop, ctx);
 }
-

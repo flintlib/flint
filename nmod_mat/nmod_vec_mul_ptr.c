@@ -38,20 +38,20 @@
 #include "nmod_mat.h"
 
 void nmod_mat_nmod_vec_mul_ptr(
-    mp_limb_t * const * c,
-    const mp_limb_t * const * a, slong alen,
+    ulong * const * c,
+    const ulong * const * a, slong alen,
     const nmod_mat_t B)
 {
     slong i;
     slong len = FLINT_MIN(B->r, alen);
     slong ncols = B->c;
-    mp_limb_t * aa, * cc;
+    ulong * aa, * cc;
     TMP_INIT;
 
     TMP_START;
 
-    aa = TMP_ARRAY_ALLOC(len, mp_limb_t);
-    cc = TMP_ARRAY_ALLOC(ncols, mp_limb_t);
+    aa = TMP_ARRAY_ALLOC(len, ulong);
+    cc = TMP_ARRAY_ALLOC(ncols, ulong);
 
     for (i = 0; i < len; i++)
         aa[i] = a[i][0];

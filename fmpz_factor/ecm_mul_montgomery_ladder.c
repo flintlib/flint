@@ -19,11 +19,11 @@
 /* tstbit uses 0 based indexing */
 
 void
-fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
-                                      mp_limb_t k, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_mul_montgomery_ladder(ulong_ptr x, ulong_ptr z, ulong_ptr x0, ulong_ptr z0,
+                                      ulong k, ulong_ptr n, ecm_t ecm_inf)
 {
-    mp_ptr x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
-    mp_limb_t len;
+    ulong_ptr x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
+    ulong len;
 
     TMP_INIT;
 
@@ -42,10 +42,10 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
     }
     
     TMP_START;
-    x1 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    z1 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    x2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    z2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    x1 = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
+    z1 = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
+    x2 = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
+    z2 = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
 
 
     FLINT_MPN_COPYI(x1, x0, ecm_inf->n_size);    /* Q <- P0 */

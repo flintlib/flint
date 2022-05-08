@@ -91,7 +91,7 @@ int qsieve_is_relation(qs_t qs_inf, relation_t a)
 /*
     Write partial or full relation to file
 */
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly)
+void qsieve_write_to_file(qs_t qs_inf, ulong prime, fmpz_t Y, qs_poly_t poly)
 {
     slong i;
     char * str = NULL;
@@ -131,11 +131,11 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly
    return a pointer to location of 'prime' in table if it exists else
    create an entry for it and return pointer to that
 */
-hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
+hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime)
 {
-    mp_limb_t offset, first_offset;
+    ulong offset, first_offset;
     hash_t * entry;
-    mp_limb_t * hash_table =  qs_inf->hash_table;
+    ulong * hash_table =  qs_inf->hash_table;
     hash_t * table = qs_inf->table;
     slong table_size = qs_inf->table_size;
 
@@ -179,7 +179,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
    add prime to hashtable, increase size of table if neccessary
    and increment count for the added prime
 */
-void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
+void qsieve_add_to_hashtable(qs_t qs_inf, ulong prime)
 {
     hash_t * entry;
  
@@ -486,9 +486,9 @@ int qsieve_process_relation(qs_t qs_inf)
     slong i, num_relations = 0, num_relations2, full = 0;
     slong rel_list_length;
     slong rlist_length;
-    mp_limb_t prime;
+    ulong prime;
     hash_t * entry;
-    mp_limb_t * hash_table = qs_inf->hash_table;
+    ulong * hash_table = qs_inf->hash_table;
     slong rel_size = 50000;
     relation_t * rel_list = (relation_t *) flint_malloc(rel_size * sizeof(relation_t));
     relation_t * rlist;
@@ -533,7 +533,7 @@ int qsieve_process_relation(qs_t qs_inf)
 #endif
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
-    memset(hash_table, 0, (1 << 20) * sizeof(mp_limb_t));
+    memset(hash_table, 0, (1 << 20) * sizeof(ulong));
     qs_inf->vertices = 0;
 
     rlist_length = 0;

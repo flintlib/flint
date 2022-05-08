@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_power_sums(mp_ptr res, mp_srcptr poly, slong len, slong n,
+_nmod_poly_power_sums(ulong_ptr res, ulong_srcptr poly, slong len, slong n,
                       nmod_t mod)
 {
     if (10 * n >= len + 75)

@@ -33,7 +33,7 @@ main(void)
         nmod_mpoly_t f, g, h, k1, k2, t1, t2;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
@@ -102,7 +102,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
         flint_bitcnt_t exp_bound, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
@@ -166,7 +166,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
         flint_bitcnt_t exp_bound, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;

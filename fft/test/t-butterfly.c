@@ -50,7 +50,7 @@ main(void)
 {
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
-    mp_limb_t * nn1, * nn2, * r1, * r2;
+    ulong * nn1, * nn2, * r1, * r2;
    
     FLINT_TEST_INIT(state);
 
@@ -81,10 +81,10 @@ main(void)
 
                 for (c = 0; c < n; c++)
                 {
-                    nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn1 = flint_malloc((limbs + 1)*sizeof(ulong));
+                    nn2 = flint_malloc((limbs + 1)*sizeof(ulong));
+                    r1 = flint_malloc((limbs + 1)*sizeof(ulong));
+                    r2 = flint_malloc((limbs + 1)*sizeof(ulong));
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
                      
@@ -145,10 +145,10 @@ main(void)
 
                 for (c = 0; c < n; c++)
                 {
-                    nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn1 = flint_malloc((limbs + 1)*sizeof(ulong));
+                    nn2 = flint_malloc((limbs + 1)*sizeof(ulong));
+                    r1 = flint_malloc((limbs + 1)*sizeof(ulong));
+                    r2 = flint_malloc((limbs + 1)*sizeof(ulong));
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
                      

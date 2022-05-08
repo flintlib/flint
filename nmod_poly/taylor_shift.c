@@ -12,7 +12,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, slong len, nmod_t mod)
+_nmod_poly_taylor_shift(ulong_ptr poly, ulong c, slong len, nmod_t mod)
 {
     if (len < 100 || len > mod.n)
         _nmod_poly_taylor_shift_horner(poly, c, len, mod);
@@ -23,7 +23,7 @@ _nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, slong len, nmod_t mod)
 }
 
 void
-nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c)
+nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, ulong c)
 {
     if (f != g)
         nmod_poly_set(g, f);

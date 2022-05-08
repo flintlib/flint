@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpf_vec.h"
 
 int
 _mpf_vec_equal(mpf_srcptr vec1, mpf_srcptr vec2, slong len)

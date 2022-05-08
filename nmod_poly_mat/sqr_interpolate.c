@@ -21,10 +21,10 @@ nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A)
 
     nmod_mat_t *C_mod, *A_mod;
 
-    mp_ptr xs;
-    mp_ptr tt, uu;
-    mp_ptr * tree;
-    mp_ptr weights;
+    ulong_ptr xs;
+    ulong_ptr tt, uu;
+    ulong_ptr * tree;
+    ulong_ptr weights;
     nmod_t mod;
 
     if (A->c == 0)

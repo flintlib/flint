@@ -13,11 +13,11 @@
 #include "flint.h"
 #include "fft.h"
 
-void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
-   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
+void ifft_butterfly_sqrt2(ulong * s, ulong * t, ulong * i1, 
+   ulong * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, ulong * temp)
 {
    flint_bitcnt_t wn = limbs*FLINT_BITS;
-   mp_limb_t cy = 0;
+   ulong cy = 0;
    mp_size_t j = i/2, k = w/2;
    mp_size_t y2, y;
    mp_size_t b1;
@@ -57,8 +57,8 @@ void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
    butterfly_rshB(s, t, i1, i2, limbs, 0, limbs - y2);
 }
 
-void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
-            mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
+void ifft_truncate_sqrt2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, 
+            ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t trunc)
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/FLINT_BITS;

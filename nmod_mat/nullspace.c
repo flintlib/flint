@@ -64,7 +64,7 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
         {
             for (j = 0; j < rank; j++)
             {
-                mp_limb_t c = nmod_mat_entry(tmp, j, nonpivots[i]);
+                ulong c = nmod_mat_entry(tmp, j, nonpivots[i]);
                 nmod_mat_entry(X, pivots[j], i) = nmod_neg(c, A->mod);
             }
 

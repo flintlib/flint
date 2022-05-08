@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
@@ -207,4 +208,3 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return 1;
     }
 }
-

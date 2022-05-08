@@ -14,9 +14,9 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_sqrt_series(ulong_ptr g, ulong_srcptr h, slong n, nmod_t mod)
 {
-    mp_ptr t = _nmod_vec_init(n);
+    ulong_ptr t = _nmod_vec_init(n);
     _nmod_poly_invsqrt_series(t, h, n, mod);
     _nmod_poly_mullow(g, t, n, h, n, n, mod);
     _nmod_vec_clear(t);
@@ -25,7 +25,7 @@ _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 void
 nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
-    mp_ptr g_coeffs, h_coeffs;
+    ulong_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
     slong hlen;
     

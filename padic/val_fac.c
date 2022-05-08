@@ -53,10 +53,7 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
     fmpz_t s, t;
 
     if (fmpz_sgn(op) < 0)
-    {
-        flint_printf("Exception (padic_val_fac).  op is negative.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "op is negative in padic_val_fac\n");
 
     fmpz_init(s);
     fmpz_init_set(t, op);
@@ -73,4 +70,3 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
     fmpz_clear(s);
     fmpz_clear(t);
 }
-

@@ -22,7 +22,7 @@ int main(void)
     int i, result;
     mpz_t a, b, d, r1, r2;
     gmp_randstate_t st;
-    mp_ptr dinv;
+    ulong_ptr dinv;
     mp_size_t size, size_d;
     flint_bitcnt_t norm;
     
@@ -63,10 +63,10 @@ int main(void)
        mpz_mul_2exp(b, b, norm);
        mpz_mul_2exp(d, d, norm);
 
-       dinv = flint_malloc(size_d*sizeof(mp_limb_t));
+       dinv = flint_malloc(size_d*sizeof(ulong));
        flint_mpn_preinvn(dinv, d->_mp_d, size_d);
 
-       r2->_mp_d = flint_malloc(size_d*sizeof(mp_limb_t));
+       r2->_mp_d = flint_malloc(size_d*sizeof(ulong));
        
        flint_mpn_mulmod_preinvn(r2->_mp_d, a->_mp_d, b->_mp_d, size_d, d->_mp_d, dinv, norm); 
 

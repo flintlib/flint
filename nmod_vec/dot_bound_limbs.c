@@ -14,7 +14,7 @@
 int
 _nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
 {
-    mp_limb_t t2, t1, t0, u1, u0;
+    ulong t2, t1, t0, u1, u0;
 
     umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
     umul_ppmm(t2, t1, t1, len);

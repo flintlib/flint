@@ -38,8 +38,8 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA, 
-                              mp_srcptr B, slong lenB, nmod_t mod)
+void _nmod_poly_rem(ulong_ptr R, ulong_srcptr A, slong lenA, 
+                              ulong_srcptr B, slong lenB, nmod_t mod)
 {
     TMP_INIT;
 
@@ -49,17 +49,17 @@ void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
     }
     else if (lenA < NMOD_DIVREM_DIVCONQUER_CUTOFF)
     {
-        mp_ptr W;
+        ulong_ptr W;
         
         TMP_START;
-        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
+        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(ulong));
 
         _nmod_poly_rem_basecase(R, W, A, lenA, B, lenB, mod);
         TMP_END;
     }
     else
     {
-        mp_ptr Q = _nmod_vec_init(lenA - lenB + 1);
+        ulong_ptr Q = _nmod_vec_init(lenA - lenB + 1);
 
         _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
         _nmod_vec_clear(Q);
@@ -70,7 +70,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 {
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tR;
-    mp_ptr r;
+    ulong_ptr r;
 
     if (lenB == 0)
         flint_throw(FLINT_DIVZERO, "nmod_poly_rem\n");

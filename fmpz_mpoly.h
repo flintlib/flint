@@ -695,8 +695,8 @@ FLINT_DLL int _fmpz_pow_fmpz_is_not_feasible(flint_bitcnt_t bbits, const fmpz_t 
 FLINT_DLL int fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
                               fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL mp_limb_t fmpz_mpoly_evaluate_all_nmod(const fmpz_mpoly_t A,
-           const mp_limb_t * alphas, const fmpz_mpoly_ctx_t ctx, nmod_t fpctx);
+FLINT_DLL ulong fmpz_mpoly_evaluate_all_nmod(const fmpz_mpoly_t A,
+           const ulong * alphas, const fmpz_mpoly_ctx_t ctx, nmod_t fpctx);
 
 FLINT_DLL void fmpz_mpoly_evaluate_all_fmpz_mod(fmpz_t ev,
                         const fmpz_mpoly_t A, const fmpz * alphas,

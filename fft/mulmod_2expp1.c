@@ -19,7 +19,7 @@
 
 static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM] = MULMOD_TAB;
 
-void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_size_t m)
+void fft_naive_convolution_1(ulong * r, ulong * ii, ulong * jj, mp_size_t m)
 {
    mp_size_t i, j;
 
@@ -36,7 +36,7 @@ void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_s
    }
 }
 
-void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
+void _fft_mulmod_2expp1(ulong * r1, ulong * i1, ulong * i2, 
                  mp_size_t r_limbs, flint_bitcnt_t depth, flint_bitcnt_t w)
 {
    mp_size_t n = (UWORD(1)<<depth);
@@ -46,12 +46,12 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    mp_size_t size = limbs + 1;
    mp_size_t i, j, ll;
 
-   mp_limb_t * ptr;
-   mp_limb_t ** ii, ** jj, *tt, *t1, *t2, *s1, *r, *ii0, *jj0;
-   mp_limb_t c;
+   ulong * ptr;
+   ulong ** ii, ** jj, *tt, *t1, *t2, *s1, *r, *ii0, *jj0;
+   ulong c;
    
-   ii = flint_malloc((2*(n + n*size) + 4*n + 5*size)*sizeof(mp_limb_t));
-   for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size) 
+   ii = flint_malloc((2*(n + n*size) + 4*n + 5*size)*sizeof(ulong));
+   for (i = 0, ptr = (ulong *) ii + 2*n; i < 2*n; i++, ptr += size) 
    {
       ii[i] = ptr;
    }
@@ -64,8 +64,8 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    
    if (i1 != i2)
    {
-      jj = flint_malloc((2*(n + n*size) + 2*n)*sizeof(mp_limb_t));
-      for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
+      jj = flint_malloc((2*(n + n*size) + 2*n)*sizeof(ulong));
+      for (i = 0, ptr = (ulong *) jj + 2*n; i < 2*n; i++, ptr += size) 
       {
          jj[i] = ptr;
       }
@@ -112,7 +112,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
 
    for (j = 0; j < 2*n; j++)
    {
-      mp_limb_t t, cy2;
+      ulong t, cy2;
       
       mpn_div_2expmod_2expp1(ii[j], ii[j], limbs, depth + 1);
       mpn_normmod_2expp1(ii[j], limbs);
@@ -161,8 +161,8 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    if (i1 != i2) flint_free(jj);
 }
 
-void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
-                           mp_size_t n, mp_size_t w, mp_limb_t * tt)
+void fft_mulmod_2expp1(ulong * r, ulong * i1, ulong * i2, 
+                           mp_size_t n, mp_size_t w, ulong * tt)
 {
    mp_size_t bits = n*w;
    mp_size_t limbs = bits/FLINT_BITS;
@@ -170,7 +170,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    mp_size_t w1, off;
 
-   mp_limb_t c = 2*i1[limbs] + i2[limbs];
+   ulong c = 2*i1[limbs] + i2[limbs];
       
    if (c & 1)
    {

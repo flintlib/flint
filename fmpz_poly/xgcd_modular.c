@@ -20,10 +20,10 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
                              const fmpz * poly1, slong len1, 
                              const fmpz * poly2, slong len2)
 {
-    mp_ptr G, S, T, A, B, T1, T2;
+    ulong_ptr G, S, T, A, B, T1, T2;
     fmpz_t prod;
     int stabilised = 0, first;
-    mp_limb_t p;
+    ulong p;
     flint_bitcnt_t s_bits = 0, t_bits = 0;
 
     /* Compute resultant of input polys */
@@ -54,7 +54,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
     for (;;) 
     {
-        mp_limb_t R;
+        ulong R;
         nmod_t mod;
 
         /* Get next prime */
@@ -96,7 +96,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
         if (!stabilised) /* Need to keep computing xgcds mod p */
         {
-            mp_limb_t RGinv;
+            ulong RGinv;
 
             /* Compute xgcd mod p */
             _nmod_poly_xgcd(G, S, T, A, len1, B, len2, mod);

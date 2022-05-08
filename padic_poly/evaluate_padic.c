@@ -171,4 +171,3 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
                                    padic_unit(x), padic_val(x), ctx);
     }
 }
-

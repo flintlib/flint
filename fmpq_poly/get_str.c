@@ -9,14 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
-#include <gmp.h>
-#include "flint.h"
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#include <stdio.h>
+#include "flint-impl.h"
 #include "fmpz.h"
-#include "fmpq_poly.h"
 
 char * fmpq_poly_get_str(const fmpq_poly_t poly)
 {
@@ -58,7 +61,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
     mpq_init(q);
     str = (char *) flint_malloc(len * sizeof(char));
     
-    j = flint_sprintf(str, "%li", poly->length);
+    j = sprintf(str, WORD_FMT "d", poly->length);
     str[j++] = ' ';
     for (i = 0; i < poly->length; i++)
     {

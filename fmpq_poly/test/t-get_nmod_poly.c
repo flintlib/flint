@@ -34,7 +34,7 @@ main(void)
         fmpq_poly_t A;
         nmod_poly_t M, M2;
         slong length;
-        mp_limb_t mod;
+        ulong mod;
 
         length = n_randint(state, 50);
 
@@ -69,7 +69,7 @@ main(void)
         fmpq_poly_t A;
         nmod_poly_t M, M2;
         slong length;
-        mp_limb_t mod;
+        ulong mod;
         ulong lead;
 
         length = n_randint(state, 50);

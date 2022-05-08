@@ -134,17 +134,17 @@ Memory management
 
     Clears the element ``rop``.
 
-.. function:: void _fq_nmod_sparse_reduce(mp_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_sparse_reduce(ulong_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.
 
-.. function:: void _fq_nmod_dense_reduce(mp_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_dense_reduce(ulong_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx`` using Newton division.
 
-.. function:: void _fq_nmod_reduce(mp_ptr r, slong lenR, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_reduce(ulong_ptr r, slong lenR, const fq_nmod_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.  Does either sparse or dense reduction
@@ -201,7 +201,7 @@ Basic arithmetic
     Sets ``rop`` to the square of ``op``,
     reducing the output in the given context.
 
-.. function:: void _fq_nmod_inv(mp_ptr * rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_inv(ulong_ptr * rop, ulong_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, d)`` to the inverse of the non-zero element
     ``(op, len)``.
@@ -216,7 +216,7 @@ Basic arithmetic
      of ``ctx``.  If ``op`` is not invertible, then ``f`` is
      set to a factor of the modulus; otherwise, it is set to one.
 
-.. function:: void _fq_nmod_pow(mp_ptr * rop, mp_srcptr * op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_pow(ulong_ptr * rop, ulong_srcptr * op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
@@ -435,7 +435,7 @@ Special functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_nmod_trace(fmpz_t rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_trace(fmpz_t rop, ulong_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the trace of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -451,7 +451,7 @@ Special functions
     `a` is equal to `\sum_{i=0}^{d-1} \Sigma^i (a)`, where `d =
     \log_{p} q`.
 
-.. function:: void _fq_nmod_norm(fmpz_t rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_norm(fmpz_t rop, ulong_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the norm of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -469,7 +469,7 @@ Special functions
 
     Algorithm selection is automatic depending on the input.
 
-.. function:: void _fq_nmod_frobenius(mp_ptr * rop, mp_srcptr * op, slong len, slong e, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_frobenius(ulong_ptr * rop, ulong_srcptr * op, slong len, slong e, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, 2d-1)`` to the image of ``(op, len)`` under the
     Frobenius operator raised to the e-th power, assuming that neither

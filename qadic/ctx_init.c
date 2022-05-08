@@ -11,14 +11,22 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "fmpz_vec.h"
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strcpy
+# ifdef __GNUC__
+#  define strcpy __builtin_strcpy
+# else
+#  include <string.h>
+# endif
+#endif
 #include "fmpz_mod_poly.h"
-#include "padic.h"
 #include "qadic.h"
-
 
 extern int flint_conway_polynomials [];
 
@@ -131,4 +139,3 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     fmpz_mod_poly_clear(poly, ctxp);
     fmpz_mod_ctx_clear(ctxp);
 }
-

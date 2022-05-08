@@ -24,7 +24,7 @@ int nmod_mpolyn_gcd_brown_smprime_bivar(
 {
     int success;
     slong bound;
-    mp_limb_t alpha, temp, gammaevalp, gammaevalm;
+    ulong alpha, temp, gammaevalp, gammaevalm;
     n_poly_struct * Aevalp, * Bevalp, * Gevalp, * Abarevalp, * Bbarevalp;
     n_poly_struct * Aevalm, * Bevalm, * Gevalm, * Abarevalm, * Bbarevalm;
     nmod_mpolyn_struct * T;
@@ -334,7 +334,7 @@ int nmod_mpolyn_gcd_brown_smprime(
     slong bound;
     slong upper_limit;
     slong offset, shift;
-    mp_limb_t alpha, temp, gammaevalp, gammaevalm;
+    ulong alpha, temp, gammaevalp, gammaevalm;
     nmod_mpolyn_struct * Aevalp, * Bevalp, * Gevalp, * Abarevalp, * Bbarevalp;
     nmod_mpolyn_struct * Aevalm, * Bevalm, * Gevalm, * Abarevalm, * Bbarevalm;
     nmod_mpolyn_struct * T1, * T2;

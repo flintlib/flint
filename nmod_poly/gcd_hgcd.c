@@ -41,14 +41,14 @@ do {                                                        \
     nmod_poly_gcd_hgcd() should rely on this.
  */
 
-slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA, 
-                                   mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_gcd_hgcd(ulong_ptr G, ulong_srcptr A, slong lenA, 
+                                   ulong_srcptr B, slong lenB, nmod_t mod)
 {
     const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    mp_ptr J = _nmod_vec_init(2 * lenB);
-    mp_ptr R = J + lenB;
+    ulong_ptr J = _nmod_vec_init(2 * lenB);
+    ulong_ptr R = J + lenB;
 
     slong lenG, lenJ, lenR;
 
@@ -96,7 +96,7 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G,
     {
         slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
-        mp_ptr g;
+        ulong_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {

@@ -24,8 +24,8 @@
 */
 void _nmod_mpoly_mul_heap_part1(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong Clen,
     slong * start,
     slong * end,
     slong * hind,
@@ -42,8 +42,8 @@ void _nmod_mpoly_mul_heap_part1(
     slong * store, * store_base;
     slong Alen;
     ulong * Aexp = A->exps;
-    mp_limb_t * Acoeff = A->coeffs;
-    mp_limb_t acc0, acc1, acc2, pp0, pp1;
+    ulong * Acoeff = A->coeffs;
+    ulong acc0, acc1, acc2, pp0, pp1;
 
     FLINT_ASSERT(S->N == 1);
 
@@ -164,8 +164,8 @@ void _nmod_mpoly_mul_heap_part1(
 
 void _nmod_mpoly_mul_heap_part(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong Clen,
     slong * start,
     slong * end,
     slong * hind,
@@ -186,7 +186,7 @@ void _nmod_mpoly_mul_heap_part(
     slong * store, * store_base;
     slong Alen;
     ulong * Aexp = A->exps;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     ulong acc0, acc1, acc2, pp0, pp1;
 
     /* tmp allocs from S->big_mem */
@@ -351,12 +351,12 @@ typedef struct
     slong nthreads;
     slong ndivs;
     const nmod_mpoly_ctx_struct * ctx;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
-    const mp_limb_t * Bcoeff;
+    const ulong * Bcoeff;
     const ulong * Bexp;
     slong Blen;
-    const mp_limb_t * Ccoeff;
+    const ulong * Ccoeff;
     const ulong * Cexp;
     slong Clen;
     slong N;
@@ -579,7 +579,7 @@ static void _join_worker(void * varg)
         FLINT_ASSERT(divs[i].A->exps != NULL);
 
         memcpy(base->Acoeff + divs[i].Aoffset, divs[i].A->coeffs,
-                                          divs[i].A->length*sizeof(mp_limb_t));
+                                          divs[i].A->length*sizeof(ulong));
 
         memcpy(base->Aexp + N*divs[i].Aoffset, divs[i].A->exps,
                                             N*divs[i].A->length*sizeof(ulong));
@@ -591,8 +591,8 @@ static void _join_worker(void * varg)
 
 void _nmod_mpoly_mul_heap_threaded(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong Clen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,

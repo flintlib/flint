@@ -22,7 +22,7 @@ void sample(void * arg, ulong count)
    BPSW_t * params = (BPSW_t *) arg;
    ulong bits = params->bits;
    ulong i;
-   mp_limb_t n, d, r, norm;
+   ulong n, d, r, norm;
    double dpre;
    FLINT_TEST_INIT(state);
    

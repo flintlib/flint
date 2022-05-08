@@ -16,12 +16,12 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-static mp_limb_t
+static ulong
 refimpl(slong * exp, const fmpz_t x, int bits)
 {
     fmpz_t t;
     slong xbits;
-    mp_limb_t m;
+    ulong m;
 
     xbits = fmpz_bits(x);
 
@@ -57,7 +57,7 @@ main(void)
         fmpz_t x;
         slong bits;
         slong exp, yexp;
-        mp_limb_t yman, man;
+        ulong yman, man;
 
         fmpz_init(x);
         fmpz_randtest_not_zero(x, state, 1 + n_randint(state, 400));

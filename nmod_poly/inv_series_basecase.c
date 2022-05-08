@@ -14,9 +14,9 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_basecase(ulong_ptr Qinv, ulong_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    mp_limb_t q;
+    ulong q;
 
     Qlen = FLINT_MIN(Qlen, n);
 
@@ -32,7 +32,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nm
     {
         slong i, j, l;
         int nlimbs;
-        mp_limb_t s;
+        ulong s;
 
         nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
 

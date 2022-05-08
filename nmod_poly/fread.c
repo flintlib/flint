@@ -16,7 +16,7 @@
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {
     slong i, length;
-    mp_limb_t n;
+    ulong n;
 
     if (fscanf(f, WORD_FMT "d " WORD_FMT "u", &length, &n) != 2)
         return 0;

@@ -57,7 +57,7 @@ public:
     {
         return tools::find_nmodxx_ctx(*this);
     }
-    mp_limb_t modulus() const {return estimate_ctx().n();}
+    ulong modulus() const {return estimate_ctx().n();}
 
     template<class Expr>
     static evaluated_t create_temporary_rowscols(
@@ -70,23 +70,23 @@ public:
     FLINTXX_DEFINE_FORWARD_STATIC(from_ground)
 
     static nmod_poly_matxx_expression randtest(slong rows, slong cols,
-            mp_limb_t M, frandxx& state, slong len)
+            ulong M, frandxx& state, slong len)
     {
         nmod_poly_matxx_expression res(rows, cols, M);
         res.set_randtest(state, len);
         return res;
     }
     static nmod_poly_matxx_expression randtest_sparse(slong rows, slong cols,
-            mp_limb_t M, frandxx& state, slong len, float density)
+            ulong M, frandxx& state, slong len, float density)
     {
         nmod_poly_matxx_expression res(rows, cols, M);
         res.set_randtest_sparse(state, len, density);
         return res;
     }
 
-    static nmod_poly_matxx_expression zero(slong rows, slong cols, mp_limb_t n)
+    static nmod_poly_matxx_expression zero(slong rows, slong cols, ulong n)
         {return nmod_poly_matxx_expression(rows, cols, n);}
-    static nmod_poly_matxx_expression one(slong rows, slong cols, mp_limb_t n)
+    static nmod_poly_matxx_expression one(slong rows, slong cols, ulong n)
     {
         nmod_poly_matxx_expression res(rows, cols, n);
         res.set_one();
@@ -207,7 +207,7 @@ struct nmod_poly_mat_data
 
     nmod_poly_mat_t inner;
 
-    nmod_poly_mat_data(slong m, slong n, mp_limb_t modulus)
+    nmod_poly_mat_data(slong m, slong n, ulong modulus)
     {
         nmod_poly_mat_init(inner, m, n, modulus);
     }

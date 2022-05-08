@@ -15,7 +15,7 @@
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {
     mpz_t z, x, y, r;
-    mp_limb_t p;
+    ulong p;
     slong prec, powprec, yexp, shift;
 
     mpz_init(x);

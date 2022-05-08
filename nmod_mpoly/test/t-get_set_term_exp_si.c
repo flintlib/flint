@@ -31,7 +31,7 @@ main(void)
         nmod_mpoly_t f;
         slong nvars, len, index;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpf_vec.h"
 
 void
 _mpf_vec_randtest(mpf_ptr f, flint_rand_t state, slong len, flint_bitcnt_t bits)
@@ -19,5 +19,5 @@ _mpf_vec_randtest(mpf_ptr f, flint_rand_t state, slong len, flint_bitcnt_t bits)
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < len; i++)
-        mpf_urandomb(f + i, state->gmp_state, bits);
+        mpf_urandomb(f + i, (__gmp_randstate_struct *) state->gmp_state, bits);
 }

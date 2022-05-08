@@ -11,20 +11,9 @@
 
 #define PADIC_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "padic.h"
 
 void padic_get_unit(fmpz_t f, padic_t p)
 {
    fmpz_set(f, padic_unit(p));
 }
-
-

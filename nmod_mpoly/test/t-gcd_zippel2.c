@@ -116,7 +116,7 @@ main(void)
         slong len, len1, len2;
         ulong degbound;
         ulong * degbounds, * degbounds1, * degbounds2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

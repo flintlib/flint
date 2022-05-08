@@ -24,8 +24,8 @@
 */
 
 void
-fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
-                       mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_double(ulong_ptr x, ulong_ptr z, ulong_ptr x0, ulong_ptr z0,
+                       ulong_ptr n, ecm_t ecm_inf)
 {
     if (flint_mpn_zero_p(z0, ecm_inf->n_size))
     {

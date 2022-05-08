@@ -10,64 +10,64 @@
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
   __asm__ ("addq %11,%q3\n\tadcq %9,%q2\n\tadcq %7,%q1\n\tadcq %5,%q0"    \
        : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "1"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "2"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "3"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))                 \
+       : "0"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "1"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "2"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "3"  ((ulong)(a0)), "rme" ((ulong)(b0)))                 \
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
        : "=r" (sh), "=&r" (sm), "=&r" (sl)                  \
-       : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
-         "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
-         "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
+       : "0"  ((ulong)(ah)), "rme" ((ulong)(bh)),  \
+         "1"  ((ulong)(am)), "rme" ((ulong)(bm)),  \
+         "2"  ((ulong)(al)), "rme" ((ulong)(bl)))  \
 
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
   __asm__ ("subq %8,%q2\n\tsbbq %6,%q1\n\tsbbq %4,%q0"     \
        : "=r" (dh), "=&r" (dm), "=&r" (dl)                  \
-       : "0"  ((mp_limb_t)(mh)), "rme" ((mp_limb_t)(sh)),  \
-         "1"  ((mp_limb_t)(mm)), "rme" ((mp_limb_t)(sm)),  \
-         "2"  ((mp_limb_t)(ml)), "rme" ((mp_limb_t)(sl)))  \
+       : "0"  ((ulong)(mh)), "rme" ((ulong)(sh)),  \
+         "1"  ((ulong)(mm)), "rme" ((ulong)(sm)),  \
+         "2"  ((ulong)(ml)), "rme" ((ulong)(sl)))  \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                 \
   __asm__ ("addq %5,%q1\n\tadcq %3,%q0"                    \
        : "=r" (sh), "=&r" (sl)                             \
-       : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
-         "%1" ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))
+       : "0"  ((ulong)(ah)), "rme" ((ulong)(bh)),  \
+         "%1" ((ulong)(al)), "rme" ((ulong)(bl)))
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl)                \
   __asm__ ("subq %5,%q1\n\tsbbq %3,%q0"                   \
        : "=r" (sh), "=&r" (sl)                            \
-       : "0" ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
-         "1" ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))
+       : "0" ((ulong)(ah)), "rme" ((ulong)(bh)),  \
+         "1" ((ulong)(al)), "rme" ((ulong)(bl)))
 
 #define umul_ppmm(w1, w0, u, v)                         \
   __asm__ ("mulq %3"                                    \
        : "=a" (w0), "=d" (w1)                           \
-       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+       : "%0" ((ulong)(u)), "rm" ((ulong)(v)))
 
 #define smul_ppmm(w1, w0, u, v)                         \
   __asm__ ("imulq %3"                                   \
        : "=a" (w0), "=d" (w1)                           \
-       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+       : "%0" ((ulong)(u)), "rm" ((ulong)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
   __asm__ volatile ("divq %4"                                                            \
        : "=a" (q), "=d" (r)                                                     \
-       : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+       : "0" ((ulong)(n0)), "1" ((ulong)(n1)), "rm" ((ulong)(dx)))
 
 #define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
   __asm__ volatile ("idivq %4"                                                           \
        : "=a" (q), "=d" (r)                                                     \
-       : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+       : "0" ((ulong)(n0)), "1" ((ulong)(n1)), "rm" ((ulong)(dx)))
 
-/* bsrq destination must be a 64-bit register, hence mp_limb_t for __cbtmp. */
+/* bsrq destination must be a 64-bit register, hence ulong for __cbtmp. */
 #define count_leading_zeros(count, x)                                 \
   do {                                                                \
-    mp_limb_t __cbtmp;                                                \
+    ulong __cbtmp;                                                \
     FLINT_ASSERT ((x) != 0);                                          \
-    __asm__ ("bsrq %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));  \
-    (count) = __cbtmp ^ (mp_limb_t) 63;                               \
+    __asm__ ("bsrq %1,%0" : "=r" (__cbtmp) : "rm" ((ulong)(x)));  \
+    (count) = __cbtmp ^ (ulong) 63;                               \
   } while (0)
 
 /* bsfq destination must be a 64-bit register, "%q0" forces this in case
@@ -75,7 +75,7 @@
 #define count_trailing_zeros(count, x)                               \
   do {                                                               \
     FLINT_ASSERT ((x) != 0);                                         \
-    __asm__ ("bsfq %1,%q0" : "=r" (count) : "rm" ((mp_limb_t)(x)));  \
+    __asm__ ("bsfq %1,%q0" : "=r" (count) : "rm" ((ulong)(x)));  \
   } while (0)
 
 #define byte_swap(x)                                                 \
@@ -96,69 +96,69 @@
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
   __asm__ ("addl %11,%k3\n\tadcl %9,%k2\n\tadcl %7,%k1\n\tadcl %5,%k0"    \
        : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a3)), "g" ((mp_limb_t)(b3)),                   \
-         "1"  ((mp_limb_t)(a2)), "g" ((mp_limb_t)(b2)),                   \
-         "2"  ((mp_limb_t)(a1)), "g" ((mp_limb_t)(b1)),                   \
-         "3"  ((mp_limb_t)(a0)), "g" ((mp_limb_t)(b0)))                   \
+       : "0"  ((ulong)(a3)), "g" ((ulong)(b3)),                   \
+         "1"  ((ulong)(a2)), "g" ((ulong)(b2)),                   \
+         "2"  ((ulong)(a1)), "g" ((ulong)(b1)),                   \
+         "3"  ((ulong)(a0)), "g" ((ulong)(b0)))                   \
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \
        : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
-       : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),    \
-         "1"  ((mp_limb_t)(am)), "g" ((mp_limb_t)(bm)),    \
-         "2"  ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))    \
+       : "0"  ((ulong)(ah)), "g" ((ulong)(bh)),    \
+         "1"  ((ulong)(am)), "g" ((ulong)(bm)),    \
+         "2"  ((ulong)(al)), "g" ((ulong)(bl)))    \
 
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
   __asm__ ("subl %8,%k2\n\tsbbl %6,%k1\n\tsbbl %4,%k0"     \
        : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
-       : "0"  ((mp_limb_t)(mh)), "g" ((mp_limb_t)(sh)),    \
-         "1"  ((mp_limb_t)(mm)), "g" ((mp_limb_t)(sm)),    \
-         "2"  ((mp_limb_t)(ml)), "g" ((mp_limb_t)(sl)))    \
+       : "0"  ((ulong)(mh)), "g" ((ulong)(sh)),    \
+         "1"  ((ulong)(mm)), "g" ((ulong)(sm)),    \
+         "2"  ((ulong)(ml)), "g" ((ulong)(sl)))    \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
   __asm__ ("addl %5,%k1\n\tadcl %3,%k0"                  \
        : "=r" (sh), "=&r" (sl)                           \
-       : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),  \
-         "%1" ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))
+       : "0"  ((ulong)(ah)), "g" ((ulong)(bh)),  \
+         "%1" ((ulong)(al)), "g" ((ulong)(bl)))
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl)              \
   __asm__ ("subl %5,%k1\n\tsbbl %3,%k0"                 \
        : "=r" (sh), "=&r" (sl)                          \
-       : "0" ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),  \
-         "1" ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))
+       : "0" ((ulong)(ah)), "g" ((ulong)(bh)),  \
+         "1" ((ulong)(al)), "g" ((ulong)(bl)))
 
 #define umul_ppmm(w1, w0, u, v)                         \
   __asm__ ("mull %3"                                    \
        : "=a" (w0), "=d" (w1)                           \
-       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+       : "%0" ((ulong)(u)), "rm" ((ulong)(v)))
 
 #define smul_ppmm(w1, w0, u, v)                         \
   __asm__ ("imull %3"                                   \
        : "=a" (w0), "=d" (w1)                           \
-       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+       : "%0" ((ulong)(u)), "rm" ((ulong)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
   __asm__ volatile ("divl %4"                                                            \
        : "=a" (q), "=d" (r)                                                     \
-       : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+       : "0" ((ulong)(n0)), "1" ((ulong)(n1)), "rm" ((ulong)(dx)))
 
 #define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
   __asm__ volatile ("idivl %4"                                                           \
        : "=a" (q), "=d" (r)                                                     \
-       : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+       : "0" ((ulong)(n0)), "1" ((ulong)(n1)), "rm" ((ulong)(dx)))
 
 #define count_leading_zeros(count, x)                                 \
   do {                                                                \
-    mp_limb_t __cbtmp;                                                \
+    ulong __cbtmp;                                                \
     FLINT_ASSERT ((x) != 0);                                          \
-    __asm__ ("bsrl %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));  \
-    (count) = __cbtmp ^ (mp_limb_t) 31;                               \
+    __asm__ ("bsrl %1,%0" : "=r" (__cbtmp) : "rm" ((ulong)(x)));  \
+    (count) = __cbtmp ^ (ulong) 31;                               \
   } while (0)
 
 #define count_trailing_zeros(count, x)                              \
   do {                                                              \
     FLINT_ASSERT ((x) != 0);                                        \
-    __asm__ ("bsfl %1,%0" : "=r" (count) : "rm" ((mp_limb_t)(x)));  \
+    __asm__ ("bsfl %1,%0" : "=r" (count) : "rm" ((ulong)(x)));  \
   } while (0)
 
 #define byte_swap(x)                                                 \
@@ -177,7 +177,7 @@
    register, which takes an extra cycle.  */
 #define sub_ddmmss(sh, sl, ah, al, bh, bl)      \
   do {                                          \
-    mp_limb_t __x;                              \
+    ulong __x;                              \
     __x = (al) - (bl);                          \
     if ((al) < (bl))                            \
       (sh) = (ah) - (bh) - 1;                   \
@@ -188,7 +188,7 @@
 
 #define count_trailing_zeros(count, x)			   \
   do {									               \
-    mp_limb_t __ctz_x = (x);		   		      \
+    ulong __ctz_x = (x);		   		      \
     __asm__ ("popcnt %0 = %1"						   \
 	     : "=r" (count)						         \
 	     : "r" ((__ctz_x-1) & ~__ctz_x));		   \
@@ -287,38 +287,38 @@
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
   __asm__ ("adds %1,%3,%5\n\tadc %0,%2,%4"               \
        : "=r" (sh), "=&r" (sl)                           \
-       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
-         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "r"  ((ulong)(ah)), "r" ((ulong)(al)),  \
+         "r" ((ulong)(bh)), "rI" ((ulong)(bl))   \
        : "cc")
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
   __asm__ ("adds %2,%5,%8\n\tadcs %1,%4,%7\n\tadc %0,%3,%6"                   \
        : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
-       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
-         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "r"  ((ulong)(ah)), "r" ((ulong)(am)), "r" ((ulong)(al)),\
+         "r" ((ulong)(bh)), "r" ((ulong)(bm)), "rI" ((ulong)(bl)) \
        : "cc")
 
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)      \
   __asm__ ("adds %3,%7,%11\n\tadcs %2,%6,%10\n\tadcs %1,%5,%9\n\tadc %0,%4,%8"\
        : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)),                        \
-         "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)),                        \
-         "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)),                        \
-         "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a3)), "r" ((ulong)(a2)),                        \
+         "r" ((ulong)(a1)), "r" ((ulong)(a0)),                        \
+         "r" ((ulong)(b3)), "r" ((ulong)(b2)),                        \
+         "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl)               \
   __asm__ ("subs %1,%3,%5\n\tsbc %0,%2,%4"               \
        : "=r" (sh), "=&r" (sl)                           \
-       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
-         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "r"  ((ulong)(ah)), "r" ((ulong)(al)),  \
+         "r" ((ulong)(bh)), "rI" ((ulong)(bl))   \
        : "cc")
 
 #define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
   __asm__ ("subs %2,%5,%8\n\tsbcs %1,%4,%7\n\tsbc %0,%3,%6"                   \
        : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
-       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
-         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "r"  ((ulong)(ah)), "r" ((ulong)(am)), "r" ((ulong)(al)),\
+         "r" ((ulong)(bh)), "r" ((ulong)(bm)), "rI" ((ulong)(bl)) \
        : "cc")
 
 #endif
@@ -327,10 +327,10 @@
 #if !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
 
 #define __BITS4 (GMP_LIMB_BITS/4)
-#define __ll_B ((mp_limb_t) 1 << (GMP_LIMB_BITS / 2))
-#define __ll_lowpart(t) ((mp_limb_t) (t) & (__ll_B - 1))
-#define __ll_highpart(t) ((mp_limb_t) (t) >> (GMP_LIMB_BITS / 2))
-#define __highbit (~(mp_limb_t)0 ^ ((~(mp_limb_t)0) >> 1))
+#define __ll_B ((ulong) 1 << (GMP_LIMB_BITS / 2))
+#define __ll_lowpart(t) ((ulong) (t) & (__ll_B - 1))
+#define __ll_highpart(t) ((ulong) (t) >> (GMP_LIMB_BITS / 2))
+#define __highbit (~(ulong)0 ^ ((~(ulong)0) >> 1))
 
 #ifndef NEED_CLZ_TAB
 #define NEED_CLZ_TAB
@@ -342,19 +342,19 @@
 
 #define umul_ppmm(w1, w0, u, v)				 \
   do {									          \
-    mp_limb_t __x0, __x1, __x2, __x3;		 \
-    mp_limb_t __ul, __vl, __uh, __vh;		 \
-    mp_limb_t __u = (u), __v = (v);			 \
+    ulong __x0, __x1, __x2, __x3;		 \
+    ulong __ul, __vl, __uh, __vh;		 \
+    ulong __u = (u), __v = (v);			 \
 									                \
     __ul = __ll_lowpart (__u);				 \
     __uh = __ll_highpart (__u);				 \
     __vl = __ll_lowpart (__v);				 \
     __vh = __ll_highpart (__v);				 \
 									                \
-    __x0 = (mp_limb_t) __ul * __vl;			 \
-    __x1 = (mp_limb_t) __ul * __vh;			 \
-    __x2 = (mp_limb_t) __uh * __vl;			 \
-    __x3 = (mp_limb_t) __uh * __vh;			 \
+    __x0 = (ulong) __ul * __vl;			 \
+    __x1 = (ulong) __ul * __vh;			 \
+    __x2 = (ulong) __uh * __vl;			 \
+    __x3 = (ulong) __uh * __vh;			 \
 									                \
     __x1 += __ll_highpart (__x0);/* this can't give carry */            \
     __x1 += __x2;		/* but this indeed can */		                     \
@@ -374,7 +374,7 @@
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
   do {									          \
-    mp_limb_t __x;								 \
+    ulong __x;								 \
     __x = (al) + (bl);							 \
     (sh) = (ah) + (bh) + (__x < (al));		 \
     (sl) = __x;								    \
@@ -387,18 +387,18 @@
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
   do {                                                              \
-    mp_limb_t __t, __u;                                             \
-    add_ssaaaa(__t, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
-    add_ssaaaa(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
+    ulong __t, __u;                                             \
+    add_ssaaaa(__t, sl, (ulong) 0, al, (ulong) 0, bl);      \
+    add_ssaaaa(__u, sm, (ulong) 0, am, (ulong) 0, bm);      \
     add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
 
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)       \
   do {                                                                         \
-    mp_limb_t __tt;                                                            \
-    add_sssaaaaaa(__tt, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
+    ulong __tt;                                                            \
+    add_sssaaaaaa(__tt, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0); \
     add_ssaaaa(s3, s2, a3, a2, b3, b2);                                        \
-    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __tt);                           \
+    add_ssaaaa(s3, s2, s3, s2, (ulong) 0, __tt);                           \
   } while (0)
 
 #endif
@@ -410,7 +410,7 @@
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
   do {									          \
-    mp_limb_t __x;								 \
+    ulong __x;								 \
     __x = (al) - (bl);							 \
     (sh) = (ah) - (bh) - ((al) < (bl));    \
     (sl) = __x;								    \
@@ -422,9 +422,9 @@
 #if !defined(__arm64__)
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)           \
   do {                                                              \
-    mp_limb_t __t, __u;                                             \
-    sub_ddmmss(__t, dl, (mp_limb_t) 0, ml, (mp_limb_t) 0, sl);      \
-    sub_ddmmss(__u, dm, (mp_limb_t) 0, mm, (mp_limb_t) 0, sm);      \
+    ulong __t, __u;                                             \
+    sub_ddmmss(__t, dl, (ulong) 0, ml, (ulong) 0, sl);      \
+    sub_ddmmss(__u, dm, (ulong) 0, mm, (ulong) 0, sm);      \
     sub_ddmmss(dh, dm, (mh) - (sh), dm, -__u, -__t);                \
   } while (0)
 #endif
@@ -465,7 +465,7 @@
 
 #define udiv_qrnnd_int(q, r, n1, n0, d)                                \
   do {									                                      \
-    mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;			        \
+    ulong __d1, __d0, __q1, __q0, __r1, __r0, __m;			        \
 									                                            \
     FLINT_ASSERT ((d) != 0);							                       \
     FLINT_ASSERT ((n1) < (d));						                       \
@@ -506,14 +506,14 @@
 #ifndef count_leading_zeros
 #define count_leading_zeros(count, x)                        \
   do {									                            \
-    mp_limb_t __xr = (x);							                \
-    mp_limb_t __a;								                   \
+    ulong __xr = (x);							                \
+    ulong __a;								                   \
 									                                  \
     if (GMP_LIMB_BITS == 32)						       \
       {									                            \
-	__a = __xr < ((mp_limb_t) 1 << 2*__BITS4)				       \
-	  ? (__xr < ((mp_limb_t) 1 << __BITS4) ? 1 : __BITS4 + 1) \
-	  : (__xr < ((mp_limb_t) 1 << 3*__BITS4) ? 2*__BITS4 + 1	 \
+	__a = __xr < ((ulong) 1 << 2*__BITS4)				       \
+	  ? (__xr < ((ulong) 1 << __BITS4) ? 1 : __BITS4 + 1) \
+	  : (__xr < ((ulong) 1 << 3*__BITS4) ? 2*__BITS4 + 1	 \
 	  : 3*__BITS4 + 1);						                      \
       }									                            \
     else								                               \
@@ -533,8 +533,8 @@
 #ifndef count_trailing_zeros
 #define count_trailing_zeros(count, x)                 \
   do {									                      \
-    mp_limb_t __ctz_x = (x);						          \
-    mp_limb_t __ctz_c;							             \
+    ulong __ctz_x = (x);						          \
+    ulong __ctz_c;							             \
     FLINT_ASSERT (__ctz_x != 0);						       \
     count_leading_zeros (__ctz_c, __ctz_x & -__ctz_x); \
     (count) = GMP_LIMB_BITS - 1 - __ctz_c;	 \
@@ -545,20 +545,20 @@
 
 #define udiv_qrnnd(q, r, n1, n0, d)                  \
     do {                                             \
-       mp_limb_t __norm;                             \
+       ulong __norm;                             \
        count_leading_zeros(__norm, (d));             \
        if (__norm)                                   \
        {                                             \
            udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (GMP_LIMB_BITS - __norm)), (n0) << __norm, (d) << __norm); \
-          (r) = ((mp_limb_t) (r) >> __norm);         \
+          (r) = ((ulong) (r) >> __norm);         \
        } else                                        \
           udiv_qrnnd_int((q), (r), (n1), (n0), (d)); \
     } while (0)
 
 #define sdiv_qrnnd(q, r, n1, n0, d)         \
   do {                                      \
-    mp_limb_t __n1, __n0, __d;              \
-    mp_limb_t __q, __r;                     \
+    ulong __n1, __n0, __d;              \
+    ulong __q, __r;                     \
     unsigned int __sgn_n = 0, __sgn_d = 0;  \
     if ((n1) & __highbit)                   \
     {                                       \
@@ -617,8 +617,8 @@
 
 #define smul_ppmm(w1, w0, u, v)                         \
   do {                                                  \
-    mp_limb_t __w1;                                     \
-    mp_limb_t __xm0 = (u), __xm1 = (v);                 \
+    ulong __w1;                                     \
+    ulong __xm0 = (u), __xm1 = (v);                 \
     umul_ppmm (__w1, w0, __xm0, __xm1);                 \
     (w1) = __w1 - (-(__xm0 >> (FLINT_BITS-1)) & __xm1)  \
         - (-(__xm1 >> (FLINT_BITS-1)) & __xm0);         \
@@ -668,7 +668,7 @@ static const int rec_word_tab[512] = {
 
 #define invert_limb(dinv, d)                                      \
    do {                                                           \
-      mp_limb_t _v0, _v1, _v2, _d21, _e, _m0;                     \
+      ulong _v0, _v1, _v2, _d21, _e, _m0;                     \
       FLINT_ASSERT(((d) & (UWORD(1)<<(GMP_LIMB_BITS - 1))) != 0); \
       _v0 = rec_word_tab[((d) >> 22) & 0x1FF];                    \
       _d21 = ((d) >> 11) + 1;                                     \
@@ -676,12 +676,12 @@ static const int rec_word_tab[512] = {
       umul_ppmm(_v1, _e, _m0, _d21);                              \
       _v1 = (_v0 << 4) - _v1 - 1;                                 \
       _e = -_v1*((d) >> 1);                                       \
-      _m0 = -((d) & (mp_limb_t) 1);                               \
+      _m0 = -((d) & (ulong) 1);                               \
       _e -= ((_v1 - (_v1 >> 1)) & _m0);                           \
       umul_ppmm(_v2, _m0, _v1, _e);                               \
       _v2 = (_v1 << 15) + (_v2 >> 1);                             \
       umul_ppmm(_v0, _d21, _v2, (d));                             \
-      add_ssaaaa(_v0, _d21, _v0, _d21, (mp_limb_t) 0, (d));       \
+      add_ssaaaa(_v0, _d21, _v0, _d21, (ulong) 0, (d));       \
       (dinv) = _v2 - (_v0 + (d));                                 \
    } while(0)
 
@@ -709,20 +709,20 @@ static const int rec_word_tab[256] = {
 
 #define invert_limb(dinv, d)                                      \
    do {                                                           \
-      mp_limb_t _v0, _v2, _d40, _e, _m0;                          \
+      ulong _v0, _v2, _d40, _e, _m0;                          \
       FLINT_ASSERT(((d) & (UWORD(1)<<(GMP_LIMB_BITS - 1))) != 0); \
       _d40 = ((d) >> 24) + 1;                                     \
       _v0 = rec_word_tab[((d) >> 55) & 0xFF];                     \
       _v0 = (_v0 << 11) - ((_v0*_v0*_d40) >> 40) - 1;             \
-      _v2 = ((_v0*((((mp_limb_t) 1) << 60) - _v0*_d40)) >> 47);   \
+      _v2 = ((_v0*((((ulong) 1) << 60) - _v0*_d40)) >> 47);   \
       _v2 += (_v0 << 13);                                         \
       _e = -_v2*((d) >> 1);                                       \
-      _m0 = -((d) & (mp_limb_t) 1);                               \
+      _m0 = -((d) & (ulong) 1);                               \
       _e -= ((_v2 - (_v2 >> 1)) & _m0);                           \
       umul_ppmm(_v0, _d40, _v2, _e);                              \
       _v2 = (_v2 << 31) + (_v0 >> 1);                             \
       umul_ppmm(_v0, _d40, _v2, (d));                             \
-      add_ssaaaa(_v0, _d40, _v0, _d40, (mp_limb_t) 0, (d));       \
+      add_ssaaaa(_v0, _d40, _v0, _d40, (ulong) 0, (d));       \
       (dinv) = _v2 - (_v0 + (d));                                 \
    } while (0)
 
@@ -735,8 +735,8 @@ static const int rec_word_tab[256] = {
 #if 1
 #define udiv_qrnnd_preinv(q, r, nh, nl, d, di)               \
   do {                                                       \
-    mp_limb_t _n2, _n10, _nmask, _nadj, _q1;                 \
-    mp_limb_t _xh, _xl;                                      \
+    ulong _n2, _n10, _nmask, _nadj, _q1;                 \
+    ulong _xh, _xl;                                      \
     _n2 = (nh);                                              \
     _n10 = (nl);                                             \
     _nmask = (mp_limb_signed_t) (_n10) >> (FLINT_BITS - 1);  \
@@ -757,8 +757,8 @@ static const int rec_word_tab[256] = {
 #else
 #define udiv_qrnnd_preinv(q, r, nh, nl, d, di)          \
   do {                                                  \
-    mp_limb_t _q, _ql, _r;                              \
-    mp_limb_t _xh, _xl;                                 \
+    ulong _q, _ql, _r;                              \
+    ulong _xh, _xl;                                 \
     FLINT_ASSERT ((d) != 0);                            \
     umul_ppmm (_q, _ql, (nh), (di));                    \
     _q += (nh); /* Compensate, di is 2^64 too small */  \

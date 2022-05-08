@@ -20,7 +20,7 @@ ulong n_randint(flint_rand_t state, ulong limit)
         return n_randlimb(state) % limit;
 }
 
-mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit) 
+ulong n_urandint(flint_rand_t state, ulong limit) 
 {
     if ((limit & (limit - 1)) == 0)
     {
@@ -28,8 +28,8 @@ mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit)
     }
     else
     {
-        const mp_limb_t rand_max = UWORD_MAX;
-        mp_limb_t bucket_size, num_of_buckets, rand_within_range;
+        const ulong rand_max = UWORD_MAX;
+        ulong bucket_size, num_of_buckets, rand_within_range;
 
         bucket_size = 1 + (rand_max - limit + 1)/limit;
         num_of_buckets = bucket_size*limit;

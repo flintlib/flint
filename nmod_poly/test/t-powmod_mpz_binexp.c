@@ -32,7 +32,7 @@ main(void)
     for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
         mpz_t expz;
 
@@ -75,7 +75,7 @@ main(void)
     for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
         mpz_t expz;
 
@@ -118,7 +118,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, res2, t, f;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
         mpz_t expz;
 

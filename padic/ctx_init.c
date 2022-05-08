@@ -9,16 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 
 void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max, 
                     enum padic_print_mode mode)
 {
     if (!(0 <= min && min <= max))
-    {
-        flint_printf("Exception (padic_ctx_init).  Require 0 <= min <= max.");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "padic_ctx_init require 0 <= min <= max\n");
 
     fmpz_init_set(ctx->p, p);
 
@@ -46,4 +45,3 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,
 
     ctx->mode = mode;
 }
-

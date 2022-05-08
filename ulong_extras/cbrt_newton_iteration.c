@@ -13,19 +13,19 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t
-n_cbrt_newton_iteration(mp_limb_t n)
+ulong
+n_cbrt_newton_iteration(ulong n)
 {
     int iter, bits;
-    mp_limb_t ret;
+    ulong ret;
     double val, x, xsq, dx;
 
     /* upper_limit is the max cube root possible for one word */
 
 #ifdef FLINT64
-    const mp_limb_t upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
+    const ulong upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #else
-    const mp_limb_t  upper_limit = 1625;    /* 1625 < (2^32)^(1/3) */
+    const ulong  upper_limit = 1625;    /* 1625 < (2^32)^(1/3) */
 #endif
     
     val = (double)n;
@@ -33,7 +33,7 @@ n_cbrt_newton_iteration(mp_limb_t n)
     if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
         iter = 1;
     else
-        iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
+        iter = 2;       /* 2 gives us a precise enough answer for any ulong */
     
     x = n_cbrt_estimate((double)n);         /* initial estimate */
 

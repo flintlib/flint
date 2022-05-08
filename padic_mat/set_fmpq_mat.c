@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
+#include "fmpq.h"
+#include "fmpq_mat.h"
 #include "padic_mat.h"
 
 void padic_mat_set_fmpq_mat(padic_mat_t B, 
@@ -77,4 +77,3 @@ void padic_mat_set_fmpq_mat(padic_mat_t B,
         fmpz_clear(t);
     }
 }
-

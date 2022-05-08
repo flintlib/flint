@@ -18,7 +18,7 @@
 #include <pthread.h>
 #undef ulong
 #include <gmp.h>
-#define ulong mp_limb_t
+#define ulong ulong
 #include "nmod_poly.h"
 
 void
@@ -56,7 +56,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     nmod_poly_compose_mod_precomp_preinv_arg_t arg =
                    *((nmod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
     nmod_mat_t B, C;
-    mp_ptr t, h;
+    ulong_ptr t, h;
     slong i, n, m;
     nmod_poly_struct * res = arg.res;
     nmod_poly_struct * poly1 = arg.poly1;
@@ -129,7 +129,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
     nmod_poly_struct * vinv = arg.vinv;
     nmod_poly_struct * baby = arg.baby;
     nmod_t mod = v->mod;
-    mp_ptr tmp = arg.tmp;
+    ulong_ptr tmp = arg.tmp;
     
     res->coeffs[0] = 1;
 

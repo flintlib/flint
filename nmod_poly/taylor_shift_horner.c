@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_taylor_shift_horner(mp_ptr poly, mp_limb_t c, slong n, nmod_t mod)
+_nmod_poly_taylor_shift_horner(ulong_ptr poly, ulong c, slong n, nmod_t mod)
 {
     slong i, j;
 
@@ -38,7 +38,7 @@ _nmod_poly_taylor_shift_horner(mp_ptr poly, mp_limb_t c, slong n, nmod_t mod)
 }
 
 void
-nmod_poly_taylor_shift_horner(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c)
+nmod_poly_taylor_shift_horner(nmod_poly_t g, const nmod_poly_t f, ulong c)
 {
     if (f != g)
         nmod_poly_set(g, f);

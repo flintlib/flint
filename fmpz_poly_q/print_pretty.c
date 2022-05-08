@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
-
 #include "fmpz_poly_q.h"
 
 int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x)
@@ -19,7 +17,7 @@ int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x)
     char *str;
 
     str = fmpz_poly_q_get_str_pretty(op, x);
-    flint_printf("%s", str);
+    printf("%s", str);
     flint_free(str);
 
     return 1;

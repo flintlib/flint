@@ -12,6 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
@@ -23,8 +24,8 @@
 # include "gmpcompat.h"
 #endif
 
-static __inline__ mp_limb_t
-n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
+static __inline__ ulong
+n_powmod2_mpz(ulong a, mpz_srcptr exp, ulong n, ulong ninv)
 {
     if (mpz_fits_slong_p(exp))
     {
@@ -33,7 +34,7 @@ n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
     else
     {
         mpz_t t, m;
-        mp_limb_t y;
+        ulong y;
 
         mpz_init(t);
         mpz_init(m);
@@ -53,10 +54,10 @@ n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
 }
 
 void
-_nmod_poly_powmod_mpz_binexp_preinv(mp_ptr res, mp_srcptr poly, mpz_srcptr e,
-            mp_srcptr f, slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+_nmod_poly_powmod_mpz_binexp_preinv(ulong_ptr res, ulong_srcptr poly, mpz_srcptr e,
+            ulong_srcptr f, slong lenf, ulong_srcptr finv, slong lenfinv, nmod_t mod)
 {
-    mp_ptr T, Q;
+    ulong_ptr T, Q;
     slong lenT, lenQ;
     slong i;
 
@@ -98,7 +99,7 @@ void
 nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
                      mpz_srcptr e, const nmod_poly_t f, const nmod_poly_t finv)
 {
-    mp_ptr p;
+    ulong_ptr p;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;

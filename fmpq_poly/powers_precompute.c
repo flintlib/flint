@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -58,10 +55,7 @@ void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv,
                                                           fmpq_poly_t poly)
 {
     if (poly->length == 0)
-    {
-        flint_printf("Exception (fmpz_poly_powers_precompute). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_powers_precompute\n");
 
     pinv->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(poly), 
                                          fmpq_poly_denref(poly), poly->length);

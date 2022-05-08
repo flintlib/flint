@@ -33,7 +33,7 @@ main(void)
         nmod_poly_t a, b, c;
         slong j, n;
 
-        mp_limb_t m = n_randtest_not_zero(state);
+        ulong m = n_randtest_not_zero(state);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);

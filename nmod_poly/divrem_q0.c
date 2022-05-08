@@ -12,10 +12,10 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, 
-                          mp_srcptr A, mp_srcptr B, slong lenA, nmod_t mod)
+void _nmod_poly_divrem_q0(ulong_ptr Q, ulong_ptr R, 
+                          ulong_srcptr A, ulong_srcptr B, slong lenA, nmod_t mod)
 {
-    const mp_limb_t invL = (B[lenA-1] == 1) ? 1 : n_invmod(B[lenA-1], mod.n);
+    const ulong invL = (B[lenA-1] == 1) ? 1 : n_invmod(B[lenA-1], mod.n);
 
     if (lenA == 1)
     {

@@ -13,7 +13,7 @@
 
 #include "fq_nmod.h"
 
-void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len,
+void _fq_nmod_inv(ulong *rop, const ulong *op, slong len,
                   const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
@@ -39,7 +39,7 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
     else
     {
         const slong d = fq_nmod_ctx_degree(ctx);
-        mp_limb_t *t;
+        ulong *t;
 
         if (rop == op)
         {

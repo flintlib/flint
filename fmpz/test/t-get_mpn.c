@@ -22,7 +22,7 @@ int main()
 
     fmpz_t a, b, mmin;
     int i, j, k;
-    mp_ptr mpna;
+    ulong_ptr mpna;
     FLINT_TEST_INIT(state);
 
     flint_printf("get_mpn....");

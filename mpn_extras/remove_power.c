@@ -12,13 +12,13 @@
 #include "mpn_extras.h"
 #include "flint-impl.h"
 
-mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
-                                      mp_ptr p, mp_size_t psize, ulong *exp)
+mp_size_t flint_mpn_remove_power_ascending(ulong_ptr x, mp_size_t xsize,
+                                      ulong_ptr p, mp_size_t psize, ulong *exp)
 {
     int i, maxi;
-    mp_ptr div;
-    mp_ptr rem;
-    mp_ptr square[FLINT_BITS];
+    ulong_ptr div;
+    ulong_ptr rem;
+    ulong_ptr square[FLINT_BITS];
     mp_size_t square_size[FLINT_BITS];
     mp_size_t sqsize;
 
@@ -33,8 +33,8 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
 
     /* Most likely less memory will be needed, but this way we
        avoid reallocations */
-    div = flint_malloc(sizeof(mp_limb_t) * xsize);
-    rem = flint_malloc(sizeof(mp_limb_t) * xsize);
+    div = flint_malloc(sizeof(ulong) * xsize);
+    rem = flint_malloc(sizeof(ulong) * xsize);
 
     /* Remove ascending powers */
     for (i = 0; i < FLINT_BITS && xsize >= square_size[i]; i++)
@@ -57,7 +57,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
         if (sqsize - 1 > xsize)
             break;
         maxi = i + 1;
-        square[i + 1] = flint_malloc(sizeof(mp_limb_t) * sqsize);
+        square[i + 1] = flint_malloc(sizeof(ulong) * sqsize);
         mpn_sqr(square[i + 1], square[i], square_size[i]);
         if (square[i + 1][sqsize - 1] == 0)
             sqsize -= 1;

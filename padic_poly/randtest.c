@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "flint.h"
+#include "ulong_extras.h"
 #include "padic_poly.h"
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
@@ -93,10 +90,7 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
     slong i;
 
     if (len == 0)
-    {
-        flint_printf("Exception (padic_poly_randtest_not_zero).  len == 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "len == 0 in padic_poly_randtest_not_zero\n");
 
     padic_poly_randtest(f, state, len, ctx);
     for (i = 0; !padic_poly_is_zero(f) && (i < 10); i++)
@@ -110,4 +104,3 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
         f->val = f->N - 1;
     }
 }
-

@@ -46,7 +46,7 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(c1))  /* c1 is small */
     {
-        mp_limb_t prod[2];
+        ulong prod[2];
         ulong uc1 = FLINT_ABS(c1);
 
         umul_ppmm(prod[1], prod[0], uc1, x);  /* compute product */

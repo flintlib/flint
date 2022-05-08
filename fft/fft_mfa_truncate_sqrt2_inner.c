@@ -24,11 +24,11 @@ typedef struct
     mp_size_t limbs;
     flint_bitcnt_t depth;
     flint_bitcnt_t w;
-    mp_limb_t ** ii;
-    mp_limb_t ** jj;
-    mp_limb_t ** t1;
-    mp_limb_t ** t2;
-    mp_limb_t * tt;
+    ulong ** ii;
+    ulong ** jj;
+    ulong ** t1;
+    ulong ** t2;
+    ulong * tt;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
@@ -46,11 +46,11 @@ _fft_inner1_worker(void * arg_ptr)
     mp_size_t limbs = arg.limbs;
     flint_bitcnt_t depth = arg.depth;
     flint_bitcnt_t w = arg.w;
-    mp_limb_t ** ii = arg.ii;
-    mp_limb_t ** jj = arg.jj;
-    mp_limb_t ** t1 = arg.t1;
-    mp_limb_t ** t2 = arg.t2;
-    mp_limb_t * tt = arg.tt;
+    ulong ** ii = arg.ii;
+    ulong ** jj = arg.jj;
+    ulong ** t1 = arg.t1;
+    ulong ** t2 = arg.t2;
+    ulong * tt = arg.tt;
     mp_size_t i, j, s, end;
 
     while (1)
@@ -95,11 +95,11 @@ _fft_inner2_worker(void * arg_ptr)
     mp_size_t n = arg.n;
     mp_size_t limbs = arg.limbs;
     flint_bitcnt_t w = arg.w;
-    mp_limb_t ** ii = arg.ii;
-    mp_limb_t ** jj = arg.jj;
-    mp_limb_t ** t1 = arg.t1;
-    mp_limb_t ** t2 = arg.t2;
-    mp_limb_t * tt = arg.tt;
+    ulong ** ii = arg.ii;
+    ulong ** jj = arg.jj;
+    ulong ** t1 = arg.t1;
+    ulong ** t2 = arg.t2;
+    ulong * tt = arg.tt;
     mp_size_t i, j, end;
 
     while (1)
@@ -134,9 +134,9 @@ _fft_inner2_worker(void * arg_ptr)
     }
 }
 
-void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, 
-                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
-                  mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
+void fft_mfa_truncate_sqrt2_inner(ulong ** ii, ulong ** jj, mp_size_t n, 
+                   flint_bitcnt_t w, ulong ** t1, ulong ** t2, 
+                  ulong ** temp, mp_size_t n1, mp_size_t trunc, ulong ** tt)
 {
     mp_size_t i, shared_i = 0;
     mp_size_t n2 = (2*n)/n1;

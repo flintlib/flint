@@ -24,4 +24,3 @@ void padic_init2(padic_t rop, slong N)
     padic_val(rop)  = 0;
     padic_prec(rop) = N;
 }
-

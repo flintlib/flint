@@ -9,7 +9,7 @@ Portable FLINT types
 For platform independence, FLINT provides two types ``ulong``
 and ``slong`` to replace ``unsigned long`` and ``long``
 respectively. These are guaranteed to be the same size as GMP's
-``mp_limb_t`` and ``mp_limb_signed_t`` types, respectively.
+``ulong`` and ``mp_limb_signed_t`` types, respectively.
 
 A full list of types provided by FLINT is available in
 ``code_conventions.txt`` in the top-level source tree.

@@ -12,11 +12,11 @@
 #include <math.h>
 #include "flint.h"
 
-mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
+ulong n_sqrtrem(ulong_ptr r, ulong a)
 {
-    mp_limb_t is;
+    ulong is;
 
-    is = (mp_limb_t) sqrt((double) a);
+    is = (ulong) sqrt((double) a);
 
     is -= (is*is > a);
 #if FLINT64

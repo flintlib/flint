@@ -33,7 +33,7 @@ static void nmod_mpoly_evals(
     ulong * Amin_exp,
     ulong * Amax_exp,
     ulong * Astride,
-    mp_limb_t * alpha,
+    ulong * alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -44,7 +44,7 @@ static void nmod_mpoly_evals(
     ulong * varexps;
     ulong varexp;
     slong total_degree, lo, hi;
-    mp_limb_t meval, t;
+    ulong meval, t;
     n_poly_struct * caches;
 
     offsets = FLINT_ARRAY_ALLOC(2*nvars, slong);
@@ -252,8 +252,8 @@ static void nmod_mpoly_evals_lgprime(
     ulong varexp, lo, hi;
     slong total_degree;
     n_poly_struct * caches;
-    mp_limb_t * t = FLINT_ARRAY_ALLOC(2*d, mp_limb_t);
-    mp_limb_t * meval = t + d;
+    ulong * t = FLINT_ARRAY_ALLOC(2*d, ulong);
+    ulong * meval = t + d;
 
     offsets = FLINT_ARRAY_ALLOC(2*nvars, slong);
     shifts = offsets + nvars;
@@ -346,7 +346,7 @@ static void _set_estimates(
     slong i, j;
     n_poly_t Geval;
     n_poly_struct * Aevals, * Bevals;
-    mp_limb_t * alpha;
+    ulong * alpha;
     flint_rand_t state;
     slong ignore_limit;
     int * ignore;
@@ -354,7 +354,7 @@ static void _set_estimates(
     flint_randinit(state);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
-    alpha  = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
+    alpha  = FLINT_ARRAY_ALLOC(nvars, ulong);
     Aevals = FLINT_ARRAY_ALLOC(nvars, n_poly_struct);
     Bevals = FLINT_ARRAY_ALLOC(nvars, n_poly_struct);
 
@@ -841,7 +841,7 @@ static int _try_monomial_cofactors(
     slong NA, NG;
     slong nvars = ctx->minfo->nvars;
     fmpz * Abarexps, * Bbarexps, * Texps;
-    mp_limb_t a0, b0, a0inv;
+    ulong a0, b0, a0inv;
     nmod_mpoly_t T;
     flint_bitcnt_t Gbits = FLINT_MIN(A->bits, B->bits);
     flint_bitcnt_t Abarbits = A->bits;

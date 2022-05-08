@@ -11,7 +11,7 @@
 
 #include "nmod.h"
 
-void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, slong len, nmod_t mod)
+void _nmod_vec_neg(ulong_ptr res, ulong_srcptr vec, slong len, nmod_t mod)
 {
     slong i;
     for (i = 0 ; i < len; i++)

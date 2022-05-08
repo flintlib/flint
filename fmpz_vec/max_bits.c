@@ -16,7 +16,7 @@ slong
 _fmpz_vec_max_bits(const fmpz * vec, slong len)
 {
     slong i, sign, max_limbs;
-    mp_limb_t max_limb;
+    ulong max_limb;
     mp_size_t limbs;
 
     sign = 1;

@@ -32,4 +32,3 @@ void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         _padic_reduce(rop, ctx);
     }
 }
-

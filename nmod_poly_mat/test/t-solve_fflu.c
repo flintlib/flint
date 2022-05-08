@@ -33,7 +33,7 @@ main(void)
         slong n, m, deg;
         float density;
         int solved;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         n = n_randint(state, 15);

@@ -18,21 +18,8 @@
 #define QADIC_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
 #include "ulong_extras.h"
-#include "padic.h"
+#include "fmpz_vec.h"
 #include "padic_poly.h"
 
 #ifdef __cplusplus
@@ -64,37 +51,6 @@ FLINT_DLL void qadic_ctx_clear(qadic_ctx_t ctx);
 QADIC_INLINE slong qadic_ctx_degree(const qadic_ctx_t ctx)
 {
     return ctx->j[ctx->len - 1];
-}
-
-QADIC_INLINE void qadic_ctx_print(const qadic_ctx_t ctx)
-{
-    slong i, k;
-
-    flint_printf("p    = "), fmpz_print((&ctx->pctx)->p), flint_printf("\n");
-    flint_printf("d    = %wd\n", ctx->j[ctx->len - 1]);
-    flint_printf("f(X) = ");
-    fmpz_print(ctx->a + 0);
-    for (k = 1; k < ctx->len; k++)
-    {
-        i = ctx->j[k];
-        flint_printf(" + ");
-        if (fmpz_is_one(ctx->a + k))
-        {
-            if (i == 1)
-                flint_printf("X");
-            else
-                flint_printf("X^%wd", i);
-        }
-        else
-        {
-            fmpz_print(ctx->a + k);
-            if (i == 1)
-                flint_printf("*X");
-            else
-                flint_printf("*X^%wd", i);
-        }
-    }
-    flint_printf("\n");
 }
 
 /* Memory management *********************************************************/
@@ -433,6 +389,23 @@ FLINT_DLL int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
 
 QADIC_INLINE int 
@@ -446,9 +419,40 @@ QADIC_INLINE int qadic_debug(const qadic_t op)
     return padic_poly_debug(op);
 }
 
+QADIC_INLINE void qadic_ctx_print(const qadic_ctx_t ctx)
+{
+    slong i, k;
+
+    printf("p    = "), fmpz_print((&ctx->pctx)->p), printf("\n");
+    printf("d    = " WORD_FMT "d\n", ctx->j[ctx->len - 1]);
+    printf("f(X) = "); fmpz_print(ctx->a + 0);
+    for (k = 1; k < ctx->len; k++)
+    {
+        i = ctx->j[k];
+        printf(" + ");
+        if (fmpz_is_one(ctx->a + k))
+        {
+            if (i == 1)
+                printf("X");
+            else
+                printf("X^" WORD_FMT "d", i);
+        }
+        else
+        {
+            fmpz_print(ctx->a + k);
+            if (i == 1)
+                printf("*X");
+            else
+                printf("*X^" WORD_FMT "d", i);
+        }
+    }
+    printf("\n");
+}
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

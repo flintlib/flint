@@ -29,8 +29,8 @@ main(void)
         flint_bitcnt_t exp_bits;
         ulong * exp, * exp2;
         slong len, nvars;
-        mp_limb_t c, c2;
-        mp_limb_t modulus;
+        ulong c, c2;
+        ulong modulus;
 
         modulus = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
         nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);

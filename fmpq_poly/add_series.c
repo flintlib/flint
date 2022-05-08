@@ -11,6 +11,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_add_series_can(fmpz * rpoly, fmpz_t rden, 

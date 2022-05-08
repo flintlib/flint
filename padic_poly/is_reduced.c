@@ -51,4 +51,3 @@ int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx)
 {
     return _padic_poly_is_reduced(op->coeffs, op->val, op->length, op->N, ctx);
 }
-

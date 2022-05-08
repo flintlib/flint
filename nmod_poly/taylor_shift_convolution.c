@@ -14,11 +14,11 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_taylor_shift_convolution(mp_ptr p, mp_limb_t c, slong len, nmod_t mod)
+_nmod_poly_taylor_shift_convolution(ulong_ptr p, ulong c, slong len, nmod_t mod)
 {
     slong i, n = len - 1;
-    mp_limb_t f, d;
-    mp_ptr t, u;
+    ulong f, d;
+    ulong_ptr t, u;
 
     if (c == 0 || len <= 1)
         return;
@@ -72,7 +72,7 @@ _nmod_poly_taylor_shift_convolution(mp_ptr p, mp_limb_t c, slong len, nmod_t mod
 
 void
 nmod_poly_taylor_shift_convolution(nmod_poly_t g, const nmod_poly_t f,
-    mp_limb_t c)
+    ulong c)
 {
     if (f != g)
         nmod_poly_set(g, f);

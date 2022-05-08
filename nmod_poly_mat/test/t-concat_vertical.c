@@ -31,7 +31,7 @@ int main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r1, r2, c1;
-        mp_limb_t mod;
+        ulong mod;
 
         r1 = n_randint(state, 10);
         r2 = n_randint(state, 10);

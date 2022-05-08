@@ -9,12 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
-#include "fmpq_poly.h"
 
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
 {

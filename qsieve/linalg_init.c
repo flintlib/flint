@@ -53,7 +53,7 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->num_cycles = 0;
 
     qs_inf->table_size = 10000;
-    qs_inf->hash_table = flint_calloc((1 << 20), sizeof(mp_limb_t));
+    qs_inf->hash_table = flint_calloc((1 << 20), sizeof(ulong));
     qs_inf->table = flint_malloc(qs_inf->table_size * sizeof(hash_t));
 }
 
@@ -107,5 +107,5 @@ void qsieve_linalg_realloc(qs_t qs_inf)
     qs_inf->components = 1;
     qs_inf->num_cycles = 0;
 
-    memset(qs_inf->hash_table, 0, (1 << 20)*sizeof(mp_limb_t));
+    memset(qs_inf->hash_table, 0, (1 << 20)*sizeof(ulong));
 }

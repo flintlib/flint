@@ -22,4 +22,3 @@ int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
 {
     return _fmpz_vec_fprint(file, poly->coeffs, poly->length);
 }
-

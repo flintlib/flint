@@ -10,11 +10,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "fmpz_vec.h"
-#include "padic.h"
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strcpy
+# ifdef __GNUC__
+#  define strcpy __builtin_strcpy
+# else
+#  include <string.h>
+# endif
+#endif
+#include "flint-impl.h"
 #include "qadic.h"
 
 int flint_conway_polynomials [] = {
@@ -29,11 +39,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     unsigned int position;
 
     if (fmpz_cmp_ui(p, 109987) > 0)
-    {
-        flint_printf("Exception (qadic_ctx_init_conway).  Conway polynomials \n");
-        flint_printf("are only available for primes up to 109987.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "qadic_ctx_init_conway is only available for primes up to 109987\n");
 
     for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
     {
@@ -86,8 +92,5 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
         }
     }
 
-    flint_printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
-    flint_printf("(p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
-    flint_abort();
+    flint_throw(FLINT_ERROR, "The polynomial for (p,d) = (" WORD_FMT "d," WORD_FMT "d) is not present in the database for qadic_ctx_init_conway\n", *p, d);
 }
-

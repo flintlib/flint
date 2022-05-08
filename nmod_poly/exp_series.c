@@ -16,10 +16,10 @@
 
 /* c_k x^k -> c_k x^k / (m+k) */
 void
-_nmod_poly_integral_offset(mp_ptr res, mp_srcptr poly, slong len, slong m, nmod_t mod)
+_nmod_poly_integral_offset(ulong_ptr res, ulong_srcptr poly, slong len, slong m, nmod_t mod)
 {
     slong k;
-    mp_limb_t t;
+    ulong t;
 
     t = 1;
     for (k = len - 1; k >= 0; k--)
@@ -40,12 +40,12 @@ _nmod_poly_integral_offset(mp_ptr res, mp_srcptr poly, slong len, slong m, nmod_
 }
 
 void
-_nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
-    mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_series_newton(ulong_ptr f, ulong_ptr g,
+    ulong_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     slong a[FLINT_BITS];
     slong i, m, l, r;
-    mp_ptr t, hprime;
+    ulong_ptr t, hprime;
     int inverse;
 
     /* If g is provided, we compute g = exp(-h), and we can use g as
@@ -102,7 +102,7 @@ _nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
 }
 
 void
-_nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_series(ulong_ptr f, ulong_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     hlen = FLINT_MIN(hlen, n);
 
@@ -115,7 +115,7 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 }
 
 void 
-_nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_expinv_series(ulong_ptr f, ulong_ptr g, ulong_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     hlen = FLINT_MIN(hlen, n);
 

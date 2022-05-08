@@ -32,7 +32,7 @@ void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];
-        FLINT_MPN_ZERO((mp_ptr) Qcopy + i, n - i);
+        FLINT_MPN_ZERO((ulong_ptr) Qcopy + i, n - i);
         Qalloc = 1;
     }
 

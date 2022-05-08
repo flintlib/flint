@@ -12,9 +12,9 @@
 #include "fq_nmod_mpoly.h"
 
 static slong _fq_nmod_mpoly_derivative(
-    mp_limb_t * Acoeff,
+    ulong * Acoeff,
     ulong * Aexp,
-    const mp_limb_t * Bcoeff,
+    const ulong * Bcoeff,
     const ulong * Bexp,
     slong Blen,
     flint_bitcnt_t bits,
@@ -48,9 +48,9 @@ static slong _fq_nmod_mpoly_derivative(
 
 
 static slong _fq_nmod_mpoly_derivative_mp(
-    mp_limb_t * Acoeff,
+    ulong * Acoeff,
     ulong * Aexp,
-    const mp_limb_t * Bcoeff,
+    const ulong * Bcoeff,
     const ulong * Bexp,
     slong Blen,
     flint_bitcnt_t bits,

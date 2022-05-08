@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 
-mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
+ulong flint_mpn_preinv1(ulong d1, ulong d2)
 {
-   mp_limb_t q, r[2], p[2], cy;
+   ulong q, r[2], p[2], cy;
    
    if (d2 + 1 == 0 && d1 + 1 == 0)
       return 0;

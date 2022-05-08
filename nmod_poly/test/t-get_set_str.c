@@ -30,7 +30,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero(state);
+        ulong n = n_randtest_not_zero(state);
         char * str;
 
         nmod_poly_init(a, n);

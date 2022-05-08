@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "qadic.h"
 
 /*
@@ -93,10 +94,7 @@ void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         w = _fmpz_vec_ord_p(y, op->length, p);
 
         if ((w < 2 && *p == WORD(2)) || w < 1)
-        {
-            flint_printf("ERROR (qadic_norm_analytic).  w = %wd.\n", w);
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "w = " WORD_FMT "d in qadic_norm_analytic\n", w);
 
         _qadic_norm_analytic(padic_unit(rop), y, w, op->length,
                              ctx->a, ctx->j, ctx->len, p, N - d * op->val);
@@ -105,4 +103,3 @@ void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         _fmpz_vec_clear(y, op->length);
     }
 }
-

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_submul_ui mpz_submul_ui
 #else
@@ -33,7 +33,7 @@ fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(c1))      /* c1 is small */
     {
-        mp_limb_t prod[2];
+        ulong prod[2];
         ulong uc1 = FLINT_ABS(c1);
 
         __mpz_struct * mf;

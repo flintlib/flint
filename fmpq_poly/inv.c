@@ -9,19 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq_poly.h"
 
 void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     if (poly2->length != 1)
-    {
-        flint_printf("Exception (fmpq_poly_inv). poly2 is not invertible.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "poly2 is not invertible in fmpq_poly_inv\n");
     
     if (poly1 == poly2)
     {

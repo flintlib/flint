@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 #include "flint-impl.h"
 
@@ -58,7 +59,7 @@ void _fmpq_cfrac_list_fit_length(_fmpq_cfrac_list_t v, slong len)
 
         v->array = (fmpz *) flint_realloc(v->array, len * sizeof(fmpz));
         FLINT_ASSERT(len > v->alloc);
-        FLINT_MPN_ZERO((mp_ptr) (v->array + v->alloc), len - v->alloc);
+        FLINT_MPN_ZERO((ulong_ptr) (v->array + v->alloc), len - v->alloc);
     }
     else
     {

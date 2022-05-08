@@ -36,14 +36,14 @@ ulong n_ecm_primorial[] =
 #endif
 
 int
-n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
-             flint_rand_t state, mp_limb_t n)
+n_factor_ecm(ulong_ptr f, ulong curves, ulong B1, ulong B2,
+             flint_rand_t state, ulong n)
 {
-    mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
+    ulong P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
     slong i, j, ret;
     n_ecm_t n_ecm_inf;
 
-    const mp_limb_t *prime_array;
+    ulong_srcptr prime_array;
 
     count_leading_zeros(n_ecm_inf->normbits, n);
     n <<= n_ecm_inf->normbits;

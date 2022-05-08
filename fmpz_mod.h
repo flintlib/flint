@@ -70,7 +70,7 @@ void fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
     {
         m->_mp_size = 1;
         m->_mp_alloc = 1;
-        m->_mp_d = (mp_ptr) p;
+        m->_mp_d = (ulong_ptr) p;
     }
 }
 

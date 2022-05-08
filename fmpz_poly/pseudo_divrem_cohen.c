@@ -10,7 +10,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void
 _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 

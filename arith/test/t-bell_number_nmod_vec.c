@@ -19,7 +19,7 @@
 
 int main(void)
 {
-    mp_ptr b1, b2, b3;
+    ulong_ptr b1, b2, b3;
     slong n;
 
     const slong maxn = 3000;
@@ -36,7 +36,7 @@ int main(void)
     for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
     {
         nmod_t mod;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randtest_not_zero(state);
         nmod_init(&mod, p);

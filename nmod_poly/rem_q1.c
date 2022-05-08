@@ -12,12 +12,12 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_rem_q1(mp_ptr R, 
-                       mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+void _nmod_poly_rem_q1(ulong_ptr R, 
+                       ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,
                        nmod_t mod)
 {
     slong i;
-    mp_limb_t invL, t, q0, q1, t1, t0, s1, s0;
+    ulong invL, t, q0, q1, t1, t0, s1, s0;
 
     FLINT_ASSERT(lenA == lenB + 1);
     invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);

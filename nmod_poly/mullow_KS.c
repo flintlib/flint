@@ -39,11 +39,11 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
-            mp_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod)
+_nmod_poly_mullow_KS(ulong_ptr out, ulong_srcptr in1, slong len1,
+            ulong_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod)
 {
     slong limbs1, limbs2;
-    mp_ptr tmp, mpn1, mpn2, res;
+    ulong_ptr tmp, mpn1, mpn2, res;
     int squaring;
     TMP_INIT;
 
@@ -73,7 +73,7 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
     limbs2 = (len2 * bits - 1) / FLINT_BITS + 1;
 
     TMP_START;
-    tmp = TMP_ALLOC(sizeof(mp_limb_t) * (limbs1 + limbs2 + limbs1 + (squaring ? 0 : limbs2)));
+    tmp = TMP_ALLOC(sizeof(ulong) * (limbs1 + limbs2 + limbs1 + (squaring ? 0 : limbs2)));
     res = tmp;
     mpn1 = tmp + limbs1 + limbs2;
     mpn2 = squaring ? mpn1 : (mpn1 + limbs1);

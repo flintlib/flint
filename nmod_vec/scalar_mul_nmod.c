@@ -13,8 +13,8 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_scalar_mul_nmod_fullword(mp_ptr res, mp_srcptr vec, 
-                               slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_mul_nmod_fullword(ulong_ptr res, ulong_srcptr vec, 
+                               slong len, ulong c, nmod_t mod)
 {
     slong i;
 
@@ -22,8 +22,8 @@ void _nmod_vec_scalar_mul_nmod_fullword(mp_ptr res, mp_srcptr vec,
         NMOD_MUL_FULLWORD(res[i], vec[i], c, mod);
 }
 
-void _nmod_vec_scalar_mul_nmod_generic(mp_ptr res, mp_srcptr vec, 
-                               slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_mul_nmod_generic(ulong_ptr res, ulong_srcptr vec, 
+                               slong len, ulong c, nmod_t mod)
 {
     slong i;
 
@@ -31,8 +31,8 @@ void _nmod_vec_scalar_mul_nmod_generic(mp_ptr res, mp_srcptr vec,
         NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
 }
 
-void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-                               slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_mul_nmod(ulong_ptr res, ulong_srcptr vec, 
+                               slong len, ulong c, nmod_t mod)
 {
     if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);

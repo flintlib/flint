@@ -14,7 +14,7 @@
 
 void
 nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X,
-                                          const nmod_mat_t Y, const mp_limb_t b)
+                                          const nmod_mat_t Y, const ulong b)
 {
     slong i, j;
 

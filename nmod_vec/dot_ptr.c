@@ -12,11 +12,11 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-mp_limb_t
-_nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
+ulong
+_nmod_vec_dot_ptr(ulong_srcptr vec1, const ulong_ptr * vec2, slong offset,
                             slong len, nmod_t mod, int nlimbs)
 {
-    mp_limb_t res;
+    ulong res;
     slong i;
     NMOD_VEC_DOT(res, i, len, vec1[i], vec2[i][offset], mod, nlimbs);
     return res;

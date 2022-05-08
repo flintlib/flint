@@ -40,7 +40,7 @@ test_init()
 void
 test_manipulation()
 {
-    mp_limb_t M = 31;
+    ulong M = 31;
     nmod_polyxx p(M), q(M);
     nmodxx_ctx_srcref ctx = p.estimate_ctx();
     p.set_coeff(5, 17 + M);
@@ -64,7 +64,7 @@ test_manipulation()
 void
 test_assignment()
 {
-    mp_limb_t M = 31;
+    ulong M = 31;
     nmod_polyxx p(M), q(M);
     p.set_coeff(0, 1);
     tassert(p != q);
@@ -94,7 +94,7 @@ test_conversion()
 void
 test_arithmetic()
 {
-    mp_limb_t M = 31;
+    ulong M = 31;
     nmod_polyxx g(M), h(M);
     nmodxx_ctx_srcref ctx = g.estimate_ctx();
     g.set_coeff(0, 17); h.set_coeff(0, 15);
@@ -156,7 +156,7 @@ test_arithmetic()
 void
 test_functions()
 {
-    mp_limb_t M = 31;
+    ulong M = 31;
     nmod_polyxx g(M);
     nmodxx_ctx_srcref ctx = g.estimate_ctx();
 
@@ -308,7 +308,7 @@ test_functions()
     f = nmod_polyxx::product_roots(xs);
     tassert(f.degree() == xs.size());
     for(int i = 0;i < xs.size();++i)
-        tassert(f(nmodxx::red(i, ctx)).to<mp_limb_t>() == 0);
+        tassert(f(nmodxx::red(i, ctx)).to<ulong>() == 0);
 
     res = "2 31  0 1";
     tassert(f.inflate(5u) == f(res.pow(5u)));
@@ -326,7 +326,7 @@ void
 test_transcendental_functions()
 {
     frandxx state;
-    mp_limb_t M = 1031; // prime
+    ulong M = 1031; // prime
     nmod_polyxx f(M);
     nmodxx_ctx_srcref ctx = f.estimate_ctx();
     fmpq_polyxx lift = fmpq_polyxx::randtest(state, 10, 9);
@@ -392,7 +392,7 @@ bool equiv_fac(const nmod_poly_factorxx& fac1, const nmod_poly_factorxx& fac2)
 void
 test_factoring()
 {
-    mp_limb_t M = 1031;
+    ulong M = 1031;
     nmod_polyxx f(M), g(M);
     frandxx state;
     f.set_randtest_irreducible(state, 4); f = f.make_monic();
@@ -440,11 +440,11 @@ test_factoring()
 void
 test_reduction_reconstruction()
 {
-    std::vector<mp_limb_t> primes;
+    std::vector<ulong> primes;
     primes.push_back(1031);
     primes.push_back(1033);
     primes.push_back(1039);
-    mp_limb_t M = primes[0];
+    ulong M = primes[0];
     nmodxx_ctx ctx(M);
 
     frandxx rand;
@@ -474,7 +474,7 @@ void
 test_randomisation()
 {
     frandxx state1, state2;
-    mp_limb_t N = 1031;
+    ulong N = 1031;
     nmod_polyxx p(N);
     p.set_randtest(state1, 7);
     tassert(p == nmod_polyxx::randtest(N, state2, 7));

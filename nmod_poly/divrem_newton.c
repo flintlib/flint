@@ -11,8 +11,8 @@
 
 #include "nmod_poly.h"
 
-void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
-                              mp_srcptr B, slong lenB, nmod_t mod)
+void _nmod_poly_divrem_newton(ulong_ptr Q, ulong_ptr R, ulong_srcptr A, slong lenA, 
+                              ulong_srcptr B, slong lenB, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
     
@@ -33,7 +33,7 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
                              const nmod_poly_t A, const nmod_poly_t B)
 {
     const slong lenA = A->length, lenB = B->length;
-    mp_ptr q, r;
+    ulong_ptr q, r;
 
     if (lenB == 0)
     {

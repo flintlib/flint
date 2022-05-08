@@ -10,7 +10,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void
 _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1, 
@@ -36,8 +36,8 @@ _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
         A = W = _fmpz_vec_init(alloc);
         B = W + len1;
 
-        _fmpz_poly_content(a, poly1, len1);
-        _fmpz_poly_content(b, poly2, len2);
+        _fmpz_vec_content(a, poly1, len1);
+        _fmpz_vec_content(b, poly2, len2);
         _fmpz_vec_scalar_divexact_fmpz(A, poly1, len1, a);
         _fmpz_vec_scalar_divexact_fmpz(B, poly2, len2, b);
 

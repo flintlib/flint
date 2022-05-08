@@ -555,13 +555,13 @@ test_crt()
 {
     frandxx rand;
     fmpzxx x = fmpzxx::randtest_unsigned(rand, 25);
-    std::vector<mp_limb_t> primes;
+    std::vector<ulong> primes;
     primes.push_back(1031);
     primes.push_back(1033);
     primes.push_back(1039);
 
     fmpz_combxx comb(primes);
-    std::vector<mp_limb_t> residues(primes.size());
+    std::vector<ulong> residues(primes.size());
     multi_mod(residues, x, comb);
 
     fmpzxx prod(1);

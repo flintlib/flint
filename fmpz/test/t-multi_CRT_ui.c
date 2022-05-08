@@ -22,10 +22,10 @@
 int main()
 {
     fmpz_t input, temp, prod;
-    mp_limb_t * output;
+    ulong * output;
     slong i, j, k;
     flint_bitcnt_t bits1, bits2, bits;
-    mp_limb_t * primes;
+    ulong * primes;
     fmpz * primes2;
     slong num_primes;
     fmpz_comb_t comb;
@@ -45,8 +45,8 @@ int main()
         fmpz_init(temp);
         fmpz_init(input);
         fmpz_init(prod);
-        output = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
-        primes = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+        output = FLINT_ARRAY_ALLOC(num_primes, ulong);
+        primes = FLINT_ARRAY_ALLOC(num_primes, ulong);
         primes2 = _fmpz_vec_init(num_primes);
 
 try_again:

@@ -31,7 +31,7 @@ main(void)
     {
         nmod_poly_mat_t A, B;
         nmod_mat_t a, b, c;
-        mp_limb_t x, mod;
+        ulong x, mod;
         slong m, n, deg;
 
         mod = n_randtest_prime(state, 0);
@@ -80,7 +80,7 @@ main(void)
     {
         nmod_poly_mat_t A, B;
         slong m, n, deg;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 20);

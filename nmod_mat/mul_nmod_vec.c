@@ -13,9 +13,9 @@
 #include "nmod_vec.h"
 
 void nmod_mat_mul_nmod_vec(
-    mp_limb_t * c,
+    ulong * c,
     const nmod_mat_t A,
-    const mp_limb_t * b, slong blen)
+    const ulong * b, slong blen)
 {
     nmod_t mod = A->mod;
     slong i, j;
@@ -24,7 +24,7 @@ void nmod_mat_mul_nmod_vec(
 
     for (i = A->r - 1; i >= 0; i--)
     {
-        const mp_limb_t * Ai = A->rows[i];
+        const ulong * Ai = A->rows[i];
         NMOD_VEC_DOT(c[i], j, len, Ai[j], b[j], mod, nlimbs);
     }
 }

@@ -17,10 +17,10 @@
 /* Implementation of the stage I of ECM */
 
 int
-fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
-                        mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_stage_I(ulong_ptr f, const ulong *prime_array, ulong num,
+                        ulong B1, ulong_ptr n, ecm_t ecm_inf)
 {
-    mp_limb_t times;
+    ulong times;
     mp_size_t sz, gcdlimbs;
     int i, j, p;
 

@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-void check(mp_limb_t n, ulong ans)
+void check(ulong n, ulong ans)
 {
     int ok, reasonable;
     ulong lo, hi;

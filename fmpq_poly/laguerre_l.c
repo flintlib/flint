@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_laguerre_l(fmpz * coeffs, fmpz_t den, ulong n)
@@ -56,4 +57,3 @@ fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n)
     _fmpq_poly_laguerre_l(poly->coeffs, poly->den, n);
     _fmpq_poly_set_length(poly, n + 1);
 }
-

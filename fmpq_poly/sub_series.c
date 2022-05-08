@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_sub_series_can(fmpz * rpoly, fmpz_t rden, 
@@ -209,4 +207,3 @@ void fmpq_poly_sub_series(fmpq_poly_t res, const fmpq_poly_t poly1,
 {
    fmpq_poly_sub_series_can(res, poly1, poly2, n, 1);
 }
-

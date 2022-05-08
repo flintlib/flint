@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "padic.h"
 
 /*
@@ -225,4 +226,3 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     return _padic_sqrt(padic_unit(rop), 
                        padic_unit(op), ctx->p, padic_prec(rop) - padic_val(rop));
 }
-

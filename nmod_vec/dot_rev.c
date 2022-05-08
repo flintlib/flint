@@ -12,18 +12,18 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-static mp_limb_t
-nmod_fmma(mp_limb_t a, mp_limb_t b, mp_limb_t c, mp_limb_t d, nmod_t mod)
+static ulong
+nmod_fmma(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
 {
     a = nmod_mul(a, b, mod);
     NMOD_ADDMUL(a, c, d, mod);
     return a;
 }
 
-mp_limb_t
-_nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2, slong len, nmod_t mod, int nlimbs)
+ulong
+_nmod_vec_dot_rev(ulong_srcptr vec1, ulong_srcptr vec2, slong len, nmod_t mod, int nlimbs)
 {
-    mp_limb_t res;
+    ulong res;
     slong i;
 
     if (len <= 2 && nlimbs >= 2)

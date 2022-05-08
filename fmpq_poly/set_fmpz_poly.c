@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -29,4 +26,3 @@ void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
         fmpz_one(rop->den);
     }
 }
-

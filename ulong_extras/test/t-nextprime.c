@@ -15,8 +15,8 @@
 
 int main(void)
 {
-    mp_limb_t n;
-    mp_limb_t res1, res2;
+    ulong n;
+    ulong res1, res2;
     slong rep;
     mpz_t mpz_n;
     FLINT_TEST_INIT(state);

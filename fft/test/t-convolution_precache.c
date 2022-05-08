@@ -39,15 +39,15 @@ main(void)
             mp_size_t limbs = (n*w)/GMP_LIMB_BITS;
             mp_size_t size = limbs + 1;
             mp_size_t i, len1, len2;
-            mp_limb_t * ptr;
-            mp_limb_t ** ii, ** jj, ** ii2, ** jj2, * t1, * t2, * s1, * tt;
+            ulong * ptr;
+            ulong ** ii, ** jj, ** ii2, ** jj2, * t1, * t2, * s1, * tt;
         
             trunc = 2*n1*((trunc + 2*n1 - 1)/(2*n1));
             len1 = n_randint(state, trunc);
 	    len2 = trunc - len1 + 1;
 
-            ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
+            ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(ulong));
+            for (i = 0, ptr = (ulong *) ii + 4*n; i < 4*n; i++, ptr += size) 
             {
                 ii[i] = ptr;
 		if (i < len1)
@@ -60,8 +60,8 @@ main(void)
             s1 = t2 + size;
             tt = s1 + size;
 
-            jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size)
+            jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
+            for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size)
             {
                 jj[i] = ptr;
 
@@ -77,15 +77,15 @@ main(void)
                mpn_normmod_2expp1(jj[i], limbs);
             }
 
-            ii2 = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) ii2 + 4*n; i < 4*n; i++, ptr += size)
+            ii2 = flint_malloc(4*(n + n*size)*sizeof(ulong));
+            for (i = 0, ptr = (ulong *) ii2 + 4*n; i < 4*n; i++, ptr += size)
             {
                 ii2[i] = ptr;
                 FLINT_MPN_COPYI(ii2[i], ii[i], size);
             }
 
-            jj2 = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) jj2 + 4*n; i < 4*n; i++, ptr += size)
+            jj2 = flint_malloc(4*(n + n*size)*sizeof(ulong));
+            for (i = 0, ptr = (ulong *) jj2 + 4*n; i < 4*n; i++, ptr += size)
             {
                 jj2[i] = ptr;
                 FLINT_MPN_COPYI(jj2[i], jj[i], size);

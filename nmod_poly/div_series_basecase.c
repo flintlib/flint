@@ -14,13 +14,13 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
-                                mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_div_series_basecase(ulong_ptr Qinv, ulong_srcptr P, slong Plen,
+                                ulong_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    mp_limb_t q;
+    ulong q;
     slong i, j, l;
     int nlimbs;
-    mp_limb_t s;
+    ulong s;
 
     Plen = FLINT_MIN(Plen, n);
     Qlen = FLINT_MIN(Qlen, n);

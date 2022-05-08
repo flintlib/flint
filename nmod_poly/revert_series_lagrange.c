@@ -15,10 +15,10 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
+_nmod_poly_revert_series_lagrange(ulong_ptr Qinv, ulong_srcptr Q, slong n, nmod_t mod)
 {
     slong i;
-    mp_ptr R, S, T, tmp;
+    ulong_ptr R, S, T, tmp;
 
     if (n >= 1) Qinv[0] = UWORD(0);
     if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
@@ -48,7 +48,7 @@ void
 nmod_poly_revert_series_lagrange(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, slong n)
 {
-    mp_ptr Qinv_coeffs, Q_coeffs;
+    ulong_ptr Qinv_coeffs, Q_coeffs;
     nmod_poly_t t1;
     slong Qlen;
     

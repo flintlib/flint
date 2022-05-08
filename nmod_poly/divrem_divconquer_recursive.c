@@ -14,13 +14,13 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
-                          mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_divrem_divconquer_recursive(ulong_ptr Q, ulong_ptr BQ, ulong_ptr W, ulong_ptr V,
+                          ulong_srcptr A, ulong_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenB <= NMOD_DIVREM_DIVCONQUER_CUTOFF)
     {
-        mp_ptr t = V;
-        mp_ptr w = t + 2*lenB - 1;
+        ulong_ptr t = V;
+        ulong_ptr w = t + 2*lenB - 1;
         
         FLINT_MPN_COPYI(t + lenB - 1, A + lenB - 1, lenB);
         FLINT_MPN_ZERO(t, lenB - 1);
@@ -35,22 +35,22 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
         const slong n2 = lenB / 2;
         const slong n1 = lenB - n2;
 
-        mp_ptr W1 = W;
-        mp_ptr W2 = W + n2;
+        ulong_ptr W1 = W;
+        ulong_ptr W2 = W + n2;
 
-        mp_srcptr p1 = A + 2 * n2;
-        mp_srcptr p2;
-        mp_srcptr d1 = B + n2;
-        mp_srcptr d2 = B;
-        mp_srcptr d3 = B + n1;
-        mp_srcptr d4 = B;
+        ulong_srcptr p1 = A + 2 * n2;
+        ulong_srcptr p2;
+        ulong_srcptr d1 = B + n2;
+        ulong_srcptr d2 = B;
+        ulong_srcptr d3 = B + n1;
+        ulong_srcptr d4 = B;
 
-        mp_ptr q1   = Q + n2;
-        mp_ptr q2   = Q;
-        mp_ptr dq1  = BQ + n2;
-        mp_ptr d1q1 = BQ + n2 - (n1 - 1);
+        ulong_ptr q1   = Q + n2;
+        ulong_ptr q2   = Q;
+        ulong_ptr dq1  = BQ + n2;
+        ulong_ptr d1q1 = BQ + n2 - (n1 - 1);
 
-        mp_ptr d2q1, d3q2, d4q2, t;
+        ulong_ptr d2q1, d3q2, d4q2, t;
 
         /* 
            Set q1 to p1 div d1, a 2 n1 - 1 by n1 division so q1 ends up 

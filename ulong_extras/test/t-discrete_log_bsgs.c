@@ -23,7 +23,7 @@ int main(void)
 
     for (i = 0; i < 1000; i++)
     {
-        mp_limb_t p, root, b, d, result;
+        ulong p, root, b, d, result;
         double pinv;
         
         p = n_randprime(state, 26, 1);

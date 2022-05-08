@@ -20,7 +20,7 @@ int main(void)
 {
     int i, result;
     mpz_t a, b, c, g, s;
-    mp_ptr temp;
+    ulong_ptr temp;
     gmp_randstate_t st;
     FLINT_TEST_INIT(state);
     
@@ -50,8 +50,8 @@ int main(void)
 
        mpz_mul(c, a, b);
        
-       g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(mp_limb_t));
-       temp = flint_malloc(b->_mp_size * sizeof(mp_limb_t));
+       g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(ulong));
+       temp = flint_malloc(b->_mp_size * sizeof(ulong));
 
        result = flint_mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
        g->_mp_size = c->_mp_size - b->_mp_size + 1;
@@ -91,8 +91,8 @@ int main(void)
        mpz_mul(c, a, b);
        mpz_add(c, c, s);
 
-       g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(mp_limb_t));
-       temp = flint_malloc(b->_mp_size * sizeof(mp_limb_t));
+       g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(ulong));
+       temp = flint_malloc(b->_mp_size * sizeof(ulong));
 
        result = !flint_mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
        

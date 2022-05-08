@@ -13,18 +13,18 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n)
+nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n)
 {
     slong i;
 
     if (rows != 0)
-        mat->rows = (mp_limb_t **) flint_malloc(rows * sizeof(mp_limb_t *));
+        mat->rows = (ulong **) flint_malloc(rows * sizeof(ulong *));
     else
         mat->rows = NULL;
 
     if (rows != 0 && cols != 0)
     {
-        mat->entries = (mp_limb_t *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(mp_limb_t));
+        mat->entries = (ulong *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(ulong));
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;

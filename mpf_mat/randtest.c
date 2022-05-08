@@ -24,5 +24,5 @@ mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            mpf_urandomb(mpf_mat_entry(mat, i, j), state->gmp_state, bits);
+            mpf_urandomb(mpf_mat_entry(mat, i, j), (__gmp_randstate_struct *) state->gmp_state, bits);
 }

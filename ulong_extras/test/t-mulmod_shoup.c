@@ -25,7 +25,7 @@ int main(void)
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t a, b, d, r1, r2, q, p1, p2, w_pr;
+      ulong a, b, d, r1, r2, q, p1, p2, w_pr;
       
       d = n_randtest_not_zero(state) / 2 + 1;
       a = n_randtest(state) % d;

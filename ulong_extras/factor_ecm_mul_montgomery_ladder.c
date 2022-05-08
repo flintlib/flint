@@ -14,10 +14,10 @@
 /* P (x0 : z0) <- kP using Montgomery ladder algorithm */
 
 void
-n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0,
-                                   mp_limb_t k, mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_mul_montgomery_ladder(ulong_ptr x, ulong_ptr z, ulong x0, ulong z0,
+                                   ulong k, ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t x1, z1, x2, z2, len;      /* Q (x1 : z1), P (x2 : z2) */
+    ulong x1, z1, x2, z2, len;      /* Q (x1 : z1), P (x2 : z2) */
 
     if (k == 0)
     {

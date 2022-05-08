@@ -14,7 +14,7 @@
 void nmod_mpoly_randtest_bits(nmod_mpoly_t A, flint_rand_t state,
                 slong length, flint_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx)
 {
-    mp_limb_t p = ctx->mod.n;
+    ulong p = ctx->mod.n;
     slong i, j, nvars = ctx->minfo->nvars;
     fmpz * exp;
     TMP_INIT;

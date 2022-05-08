@@ -39,17 +39,17 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, 
-                                  mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_div(ulong_ptr Q, ulong_srcptr A, slong lenA, 
+                                  ulong_srcptr B, slong lenB, nmod_t mod)
 {
     TMP_INIT;
     
     if (lenB < 15)
     {
-        mp_ptr W;
+        ulong_ptr W;
         
         TMP_START;
-        W = TMP_ALLOC(NMOD_DIV_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
+        W = TMP_ALLOC(NMOD_DIV_BC_ITCH(lenA, lenB, mod)*sizeof(ulong));
         _nmod_poly_div_basecase(Q, W, A, lenA, B, lenB, mod);
         TMP_END;
     }
@@ -64,7 +64,7 @@ nmod_poly_div(nmod_poly_t Q,
                  const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ;
-    mp_ptr q;
+    ulong_ptr q;
     slong A_len, B_len;
 
     B_len = B->length;

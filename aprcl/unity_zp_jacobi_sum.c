@@ -16,7 +16,7 @@
     Computes sum \zeta_{p^k}^{a * x + b * f(x)} for x = 1, 2, ..., q - 2.
 */
 void 
-_unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
+_unity_zp_jacobi_sum_pq_general(unity_zp f, const ulong_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
 {
     int i, j;
@@ -56,7 +56,7 @@ void
 unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
 {
     ulong k;
-    mp_ptr table;
+    ulong_ptr table;
 
     table = aprcl_f_table(q);
     k = aprcl_p_power_in_q(q - 1, p);
@@ -73,7 +73,7 @@ void
 unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
 {
     ulong k;
-    mp_ptr table;
+    ulong_ptr table;
 
     table = aprcl_f_table(q);
     k = aprcl_p_power_in_q(q - 1, 2);
@@ -91,7 +91,7 @@ void
 unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 {
     ulong a, b, k;
-    mp_ptr table;
+    ulong_ptr table;
 
     table = aprcl_f_table(q);
     k = aprcl_p_power_in_q(q - 1, 2);

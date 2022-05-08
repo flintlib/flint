@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
 #include "flint-impl.h"
+#include "fmpz_poly.h"
 
 void
 fmpz_poly_realloc(fmpz_poly_t poly, slong alloc)
@@ -28,7 +28,7 @@ fmpz_poly_realloc(fmpz_poly_t poly, slong alloc)
 
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
-            FLINT_MPN_ZERO((mp_ptr) (poly->coeffs + poly->alloc),
+            FLINT_MPN_ZERO((ulong_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
     }
     else                        /* Nothing allocated already so do it now */

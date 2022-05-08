@@ -30,4 +30,3 @@ int padic_poly_is_canonical(const padic_poly_t op, const padic_ctx_t ctx)
 {
     return _padic_poly_is_canonical(op->coeffs, op->val, op->length, ctx);
 }
-

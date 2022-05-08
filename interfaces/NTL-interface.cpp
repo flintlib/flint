@@ -25,11 +25,11 @@
 #include "NTL-interface.h"
 
 #define ZZ_SIZE(p) (((slong *) (p))[1])
-#define ZZ_DATA(p) ((mp_limb_t *) (((slong *) (p)) + 2))
+#define ZZ_DATA(p) ((ulong *) (((slong *) (p)) + 2))
 
 NTL_CLIENT
 
-static void fmpz_set_limbs(fmpz_t f, mp_srcptr x, mp_size_t limbs)
+static void fmpz_set_limbs(fmpz_t f, ulong_srcptr x, mp_size_t limbs)
 {
     if (limbs == 0)
         fmpz_zero(f);
@@ -39,7 +39,7 @@ static void fmpz_set_limbs(fmpz_t f, mp_srcptr x, mp_size_t limbs)
     {
         __mpz_struct *mf = _fmpz_promote(f);
 
-        mpz_import(mf, limbs, -1, sizeof(mp_limb_t), 0, 0, x);
+        mpz_import(mf, limbs, -1, sizeof(ulong), 0, 0, x);
     }
 }
 
@@ -52,7 +52,7 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
     else
     {
         const mp_size_t lw = op.size();
-        const mp_limb_t *xp = ZZ_DATA(x);
+        const ulong *xp = ZZ_DATA(x);
 
         fmpz_set_limbs(rop, xp, lw);
 
@@ -73,7 +73,7 @@ void fmpz_set_zz_p(fmpz_t rop, const zz_p& op)
 
 void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
 {
-   mp_limb_t *xp;
+   ulong *xp;
    _ntl_gbigint *x = &rop.rep;
    slong lw = fmpz_size(op);
    fmpz c = *op;

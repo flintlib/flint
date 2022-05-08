@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
@@ -22,4 +20,3 @@ void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
     _fmpq_poly_set_length(poly, 1);
     _fmpq_poly_normalise(poly);
 }
-

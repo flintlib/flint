@@ -23,11 +23,11 @@ with op = -1, computes D = C - A*B
 */
 
 static __inline__ void
-_nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
-    mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+_nmod_mat_addmul_basic_op(ulong_ptr * D, ulong_ptr * const C, ulong_ptr * const A,
+    ulong_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
     slong i, j;
-    mp_limb_t c;
+    ulong c;
 
     for (i = 0; i < m; i++)
     {
@@ -54,10 +54,10 @@ typedef struct
     slong m;
     slong n;
     slong nlimbs;
-    const mp_ptr * A;
-    const mp_ptr * C;
-    mp_ptr * D;
-    mp_ptr tmp;
+    const ulong_ptr * A;
+    const ulong_ptr * C;
+    ulong_ptr * D;
+    ulong_ptr tmp;
     nmod_t mod;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
@@ -75,13 +75,13 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
     slong m = arg.m;
     slong n = arg.n;
     slong nlimbs = arg.nlimbs;
-    const mp_ptr * A = arg.A;
-    const mp_ptr * C = arg.C;
-    mp_ptr * D = arg.D;
-    mp_ptr tmp = arg.tmp;
+    const ulong_ptr * A = arg.A;
+    const ulong_ptr * C = arg.C;
+    ulong_ptr * D = arg.D;
+    ulong_ptr tmp = arg.tmp;
     nmod_t mod = arg.mod;
     int op = arg.op;
-    mp_limb_t c;
+    ulong c;
     
     while (1)
     {
@@ -126,12 +126,12 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
 }
 
 static __inline__ void
-_nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
-                            const mp_ptr * A, const mp_ptr * B, slong m,
+_nmod_mat_addmul_transpose_threaded_pool_op(ulong_ptr * D, const ulong_ptr * C,
+                            const ulong_ptr * A, const ulong_ptr * B, slong m,
                           slong k, slong n, int op, nmod_t mod, int nlimbs,
                                thread_pool_handle * threads, slong num_threads)
 {
-    mp_ptr tmp;
+    ulong_ptr tmp;
     slong i, j, block;
     slong shared_i = 0, shared_j = 0;
     nmod_mat_transpose_arg_t * args;
@@ -139,7 +139,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
     pthread_mutex_t mutex;
 #endif
 
-    tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
+    tmp = flint_malloc(sizeof(ulong) * k * n);
 	    
     /* transpose B */
     for (i = 0; i < k; i++)
@@ -209,12 +209,12 @@ typedef struct
     slong K;
     slong N;
     slong Kpack;
-    const mp_ptr * A;
-    const mp_ptr * C;
-    mp_ptr * D;
-    mp_ptr tmp;
+    const ulong_ptr * A;
+    const ulong_ptr * C;
+    ulong_ptr * D;
+    ulong_ptr tmp;
     nmod_t mod;
-    mp_limb_t mask;
+    ulong mask;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
@@ -233,17 +233,17 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
     slong K = arg.K;
     slong N = arg.N;
     slong Kpack = arg.Kpack;
-    const mp_ptr * A = arg.A;
-    const mp_ptr * C = arg.C;
-    mp_ptr * D = arg.D;
-    mp_ptr tmp = arg.tmp;
+    const ulong_ptr * A = arg.A;
+    const ulong_ptr * C = arg.C;
+    ulong_ptr * D = arg.D;
+    ulong_ptr tmp = arg.tmp;
     nmod_t mod = arg.mod;
-    mp_limb_t mask = arg.mask;
+    ulong mask = arg.mask;
     int pack = arg.pack;
     int pack_bits = arg.pack_bits;
     int op = arg.op;
-    mp_limb_t c, d;
-    mp_ptr Aptr, Tptr;
+    ulong c, d;
+    ulong_ptr Aptr, Tptr;
     
     while (1)
     {
@@ -312,16 +312,16 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
 
 /* requires nlimbs = 1 */
 void
-_nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
-      const mp_ptr * C, const mp_ptr * A, const mp_ptr * B,
+_nmod_mat_addmul_packed_threaded_pool_op(ulong_ptr * D,
+      const ulong_ptr * C, const ulong_ptr * A, const ulong_ptr * B,
           slong M, slong N, slong K, int op, nmod_t mod, int nlimbs,
                                thread_pool_handle * threads, slong num_threads)
 {
     slong i, j, k;
     slong Kpack, block;
     int pack, pack_bits;
-    mp_limb_t c, mask;
-    mp_ptr tmp;
+    ulong c, mask;
+    ulong_ptr tmp;
     slong shared_i = 0, shared_j = 0;
     nmod_mat_packed_arg_t * args;
 #if FLINT_USES_PTHREAD

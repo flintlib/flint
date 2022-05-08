@@ -14,11 +14,11 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
+_nmod_poly_log_series_monomial_ui(ulong_ptr res, ulong coeff, ulong power,
                                         slong n, nmod_t mod)
 {
     slong j, k, rlen;
-    mp_limb_t a;
+    ulong a;
 
     _NMOD_VEC_ZERO(res, n);
 
@@ -67,7 +67,7 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
 }
 
 void
-nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+nmod_poly_log_series_monomial_ui(nmod_poly_t res, ulong coeff,
                                     ulong power, slong n)
 {
     if (power == 0)

@@ -12,7 +12,7 @@
 
 #include "ulong_extras.h"
 
-int n_is_prime(mp_limb_t n)
+int n_is_prime(ulong n)
 {
     /* flint's "BPSW" checked against Feitsma and Galway's database [1, 2] 
        up to 2^64 by Dana Jacobsen.

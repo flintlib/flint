@@ -13,9 +13,9 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, slong len, nmod_t mod)
+_nmod_poly_interpolation_weights(ulong_ptr w, const ulong_ptr * tree, slong len, nmod_t mod)
 {
-    mp_ptr tmp;
+    ulong_ptr tmp;
     slong i, n, height;
 
     if (len == 0)
@@ -44,10 +44,10 @@ _nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, slong len, nmod_
 }
 
 void
-_nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
-    const mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_fast_precomp(ulong_ptr poly, ulong_srcptr ys,
+    const ulong_ptr * tree, ulong_srcptr weights, slong len, nmod_t mod)
 {
-    mp_ptr t, u, pa, pb;
+    ulong_ptr t, u, pa, pb;
     slong i, pow, left;
 
     if (len == 0)
@@ -91,11 +91,11 @@ _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
 
 
 void
-_nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, slong len, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_fast(ulong_ptr poly,
+                            ulong_srcptr xs, ulong_srcptr ys, slong len, nmod_t mod)
 {
-    mp_ptr * tree;
-    mp_ptr w;
+    ulong_ptr * tree;
+    ulong_ptr w;
 
     tree = _nmod_poly_tree_alloc(len);
     _nmod_poly_tree_build(tree, xs, len, mod);
@@ -111,7 +111,7 @@ _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, slong n)
+                                    ulong_srcptr xs, ulong_srcptr ys, slong n)
 {
     if (n == 0)
     {

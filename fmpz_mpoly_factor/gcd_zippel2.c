@@ -72,7 +72,7 @@ static void mpoly2_nmod_monomial_evals(
     slong start, stop, i, j, k, n;
     slong e0, e1;
     slong nvars = mctx->nvars;
-    mp_limb_t * p;
+    ulong * p;
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong * off, * shift;
@@ -142,7 +142,7 @@ static void mpoly_nmod_monomial_evals(
     nmod_t fpctx)
 {
     slong i, k;
-    mp_limb_t * p;
+    ulong * p;
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong * off, * shift;
@@ -247,7 +247,7 @@ static void fmpz_mpoly_fmpz_mod_coeffs(
     _fmpz_mod_vec_set_fmpz_vec(EH->coeffs, Acoeffs, Alen, fpctx);
 }
 
-mp_limb_t n_poly_mod_zip_eval_cur_inc_coeff(
+ulong n_poly_mod_zip_eval_cur_inc_coeff(
     n_poly_t Acur,
     n_poly_t Ainc,
     n_poly_t Acoeff,
@@ -278,7 +278,7 @@ static void n_polyun_mod_zip_eval_cur_inc_coeff(
 {
     slong i, Ei;
     slong e0, e1;
-    mp_limb_t c;
+    ulong c;
     n_poly_struct * Ec;
 
     FLINT_ASSERT(Acur->length > 0);
@@ -373,7 +373,7 @@ static void fmpz_mpoly2_eval_fmpz_mod(
 */
 
 void nmod_mpoly_bma_interpolate_alpha_powers(
-    mp_limb_t * out,
+    ulong * out,
     ulong w,
     slong m,
     const mpoly_bma_interpolate_ctx_t Ictx,
@@ -667,8 +667,8 @@ static int _nmod_mpoly_bma_get_fmpz_mpoly2(
     slong i, j, t;
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     ulong new_exp, this_exp;
-    mp_limb_t * values, * roots;
-    mp_limb_t T, S, V, V0, V1, V2, p0, p1, r;
+    ulong * values, * roots;
+    ulong T, S, V, V0, V1, V2, p0, p1, r;
 
     FLINT_ASSERT(mctx->ord == ORD_LEX);
 
@@ -1245,7 +1245,7 @@ int static _random_check_sp(
     n_polyun_t Geval_sp,
     n_polyun_t Abareval_sp,
     n_polyun_t Bbareval_sp,
-    mp_limb_t * alphas_sp,
+    ulong * alphas_sp,
     n_poly_struct * alpha_caches_sp,
     const fmpz_mpoly_t H, n_poly_t Hmarks,
     const fmpz_mpoly_t A, n_poly_t Amarks, ulong Abidegree,
@@ -1256,7 +1256,7 @@ int static _random_check_sp(
     flint_rand_t randstate,
     n_poly_polyun_stack_t St_sp)
 {
-    mp_limb_t Gammaeval_sp;
+    ulong Gammaeval_sp;
     int success;
     int point_try_count;
     slong i;
@@ -1416,7 +1416,7 @@ int static _random_check_mp(
         1:  success
 */
 static int zip_solve(
-    mp_limb_t * Acoeffs,
+    ulong * Acoeffs,
     n_polyun_t Z,
     n_polyun_t H,
     n_polyun_t M,
@@ -1462,7 +1462,7 @@ int _fmpz_vec_crt_nmod(
     flint_bitcnt_t * maxbits_,
     fmpz * a,
     fmpz_t am,
-    mp_limb_t * b,
+    ulong * b,
     slong len,
     nmod_t mod)
 {
@@ -1527,9 +1527,9 @@ int fmpz_mpolyl_gcd_zippel2(
     n_poly_t Gammacur_sp, Gammainc_sp, Gammacoeff_sp;
     n_polyun_t Acur_sp, Ainc_sp, Acoeff_sp;
     n_polyun_t Bcur_sp, Binc_sp, Bcoeff_sp;
-    mp_limb_t p_sp, sshift_sp, last_unlucky_sshift_plus_1_sp, image_count_sp;
-    mp_limb_t Gammaeval_sp;
-    mp_limb_t * alphas_sp;
+    ulong p_sp, sshift_sp, last_unlucky_sshift_plus_1_sp, image_count_sp;
+    ulong Gammaeval_sp;
+    ulong * alphas_sp;
     n_poly_struct * alpha_caches_sp;
     /* misc */
     n_polyun_t HH, MH, ZH;
@@ -1642,7 +1642,7 @@ int fmpz_mpolyl_gcd_zippel2(
     n_polyun_init(Binc_sp);
     n_polyun_init(Bcoeff_sp);
 
-    alphas_sp = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
+    alphas_sp = FLINT_ARRAY_ALLOC(nvars, ulong);
     alpha_caches_sp = FLINT_ARRAY_ALLOC(3*nvars, n_poly_struct);
     for (i = 0; i < 3*nvars; i++)
         n_poly_init(alpha_caches_sp + i);

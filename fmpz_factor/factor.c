@@ -20,9 +20,9 @@ void
 fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 {
     ulong exp;
-    mp_limb_t p;
+    ulong p;
     __mpz_struct * xsrc;
-    mp_ptr xd;
+    ulong_ptr xd;
     mp_size_t xsize;
     slong found;
     slong trial_start, trial_stop;
@@ -58,7 +58,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     /* Create a temporary copy to be mutated */
     TMP_START;
-    xd = TMP_ALLOC(xsize * sizeof(mp_limb_t));
+    xd = TMP_ALLOC(xsize * sizeof(ulong));
     FLINT_MPN_COPYI(xd, xsrc->_mp_d, xsize);
 
     /* Factor out powers of two */

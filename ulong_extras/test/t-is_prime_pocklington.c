@@ -15,7 +15,7 @@ int main(void)
 {
    int i, result;
    ulong count = 0;
-   mp_limb_t d;
+   ulong d;
    mpz_t d_m;
    FLINT_TEST_INIT(state);
    

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "padic_mat.h"
 
 int padic_mat_is_zero(const padic_mat_t A)
@@ -23,4 +22,3 @@ int padic_mat_is_zero(const padic_mat_t A)
         return 0;
     }
 }
-

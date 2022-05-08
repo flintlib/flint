@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-
-#include "fmpz.h"
-#include "padic_poly.h"
+#include "flint.h"
 
 void padic_poly_fit_length(padic_poly_t poly, slong len)
 {
@@ -25,7 +22,7 @@ void padic_poly_fit_length(padic_poly_t poly, slong len)
         if (poly->alloc)           /* Realloc */
         {
             poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, len * sizeof(fmpz));
-            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc), len - poly->alloc);
+            mpn_zero((ulong_ptr) (poly->coeffs + poly->alloc), len - poly->alloc);
         }
         else                       /* Nothing allocated already so do it now */
         {
@@ -35,4 +32,3 @@ void padic_poly_fit_length(padic_poly_t poly, slong len)
         poly->alloc = len;
     }
 }
-

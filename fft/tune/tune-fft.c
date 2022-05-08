@@ -53,12 +53,12 @@ main(void)
 
             flint_bitcnt_t b1 = len1*bits1, b2 = len2*bits1;
             mp_size_t n1, n2;
-            mp_limb_t * i1, *i2, *r1;
+            ulong * i1, *i2, *r1;
    
             n1 = (b1 - 1)/FLINT_BITS + 1;
             n2 = (b2 - 1)/FLINT_BITS + 1;
                     
-            i1 = flint_malloc(2*(n1 + n2)*sizeof(mp_limb_t));
+            i1 = flint_malloc(2*(n1 + n2)*sizeof(ulong));
             i2 = i1 + n1;
             r1 = i2 + n2;
    
@@ -111,12 +111,12 @@ main(void)
             mp_size_t n = (UWORD(1)<<depth);
             flint_bitcnt_t bits = n*w;
             mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
-            mp_limb_t * i1, * i2, * r1, * tt;
+            ulong * i1, * i2, * r1, * tt;
         
             if (depth <= 21) iters = 32*((mp_size_t) 1 << (21 - depth));
             else iters = FLINT_MAX(32/((mp_size_t) 1 << (depth - 21)), 1);
 
-            i1 = flint_malloc(6*(int_limbs+1)*sizeof(mp_limb_t));
+            i1 = flint_malloc(6*(int_limbs+1)*sizeof(ulong));
             i2 = i1 + int_limbs + 1;
             r1 = i2 + int_limbs + 1;
             tt = r1 + 2*(int_limbs + 1);
@@ -172,7 +172,7 @@ main(void)
     
     flint_printf("#define FFT_N_NUM %wd\n\n", 2*(depth - 12) + 1);
     
-    flint_printf("#define FFT_MULMOD_2EXPP1_CUTOFF %wd\n\n", ((mp_limb_t) 1 << best_d)*best_w/(2*FLINT_BITS));
+    flint_printf("#define FFT_MULMOD_2EXPP1_CUTOFF %wd\n\n", ((ulong) 1 << best_d)*best_w/(2*FLINT_BITS));
     
     flint_randclear(state);
     

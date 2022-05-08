@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-int n_sizeinbase(mp_limb_t n, int base)
+int n_sizeinbase(ulong n, int base)
 {
     if (n == 0)
         return 1;

@@ -69,7 +69,7 @@ public:
     {
         return tools::find_nmodxx_ctx(*this);
     }
-    mp_limb_t modulus() const {return estimate_ctx().n();}
+    ulong modulus() const {return estimate_ctx().n();}
 
     template<class Expr>
     static evaluated_t create_temporary_rowscols(
@@ -81,7 +81,7 @@ public:
 
     template<class Fmpz_mat>
     static nmod_matxx_expression reduce(const Fmpz_mat& mat,
-            mp_limb_t modulus,
+            ulong modulus,
             typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
     {
         nmod_matxx_expression res(mat.rows(), mat.cols(), modulus);
@@ -89,35 +89,35 @@ public:
         return res;
     }
 
-    static nmod_matxx_expression randtest(slong rows, slong cols, mp_limb_t n,
+    static nmod_matxx_expression randtest(slong rows, slong cols, ulong n,
             frandxx& state)
     {
         nmod_matxx_expression res(rows, cols, n);
         res.set_randtest(state);
         return res;
     }
-    static nmod_matxx_expression randfull(slong rows, slong cols, mp_limb_t n,
+    static nmod_matxx_expression randfull(slong rows, slong cols, ulong n,
             frandxx& state)
     {
         nmod_matxx_expression res(rows, cols, n);
         res.set_randfull(state);
         return res;
     }
-    static nmod_matxx_expression randrank(slong rows, slong cols, mp_limb_t n,
+    static nmod_matxx_expression randrank(slong rows, slong cols, ulong n,
             frandxx& state, slong rank)
     {
         nmod_matxx_expression res(rows, cols, n);
         res.set_randrank(state, rank);
         return res;
     }
-    static nmod_matxx_expression randtril(slong rows, slong cols, mp_limb_t n,
+    static nmod_matxx_expression randtril(slong rows, slong cols, ulong n,
             frandxx& state, bool unit)
     {
         nmod_matxx_expression res(rows, cols, n);
         res.set_randtril(state, unit);
         return res;
     }
-    static nmod_matxx_expression randtriu(slong rows, slong cols, mp_limb_t n,
+    static nmod_matxx_expression randtriu(slong rows, slong cols, ulong n,
             frandxx& state,
             bool unit)
     {
@@ -127,7 +127,7 @@ public:
     }
 
     template<class Vec>
-    static nmod_matxx_expression randpermdiag(slong rows, slong cols, mp_limb_t n,
+    static nmod_matxx_expression randpermdiag(slong rows, slong cols, ulong n,
             frandxx& state, const Vec& v)
     {
         nmod_matxx_expression res(rows, cols, n);
@@ -135,7 +135,7 @@ public:
         return res;
     }
 
-    static nmod_matxx_expression zero(slong rows, slong cols, mp_limb_t n)
+    static nmod_matxx_expression zero(slong rows, slong cols, ulong n)
         {return nmod_matxx_expression(rows, cols, n);}
 
     // these only make sense with targets
@@ -265,7 +265,7 @@ struct nmod_mat_data
 
     nmod_mat_t inner;
 
-    nmod_mat_data(slong m, slong n, mp_limb_t modulus)
+    nmod_mat_data(slong m, slong n, ulong modulus)
     {
         nmod_mat_init(inner, m, n, modulus);
     }
@@ -424,7 +424,7 @@ private:
 
 public:
     ~nmod_mat_vector() {clear();}
-    nmod_mat_vector(slong rows, slong cols, const std::vector<mp_limb_t>& primes)
+    nmod_mat_vector(slong rows, slong cols, const std::vector<ulong>& primes)
     {
         size_ = primes.size();
         data = new nmod_mat_t[primes.size()];
@@ -493,7 +493,7 @@ public:
 
 template<class Fmpz_mat>
 inline nmod_mat_vector multi_mod(const Fmpz_mat& m,
-        const std::vector<mp_limb_t>& primes,
+        const std::vector<ulong>& primes,
         typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
 {
     nmod_mat_vector res(m.rows(), m.cols(), primes);
@@ -502,7 +502,7 @@ inline nmod_mat_vector multi_mod(const Fmpz_mat& m,
 }
 template<class Fmpz_mat>
 inline nmod_mat_vector multi_mod_precomp(const Fmpz_mat& m,
-        const std::vector<mp_limb_t>& primes,
+        const std::vector<ulong>& primes,
         const fmpz_combxx& comb,
         typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
 {

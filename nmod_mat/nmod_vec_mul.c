@@ -14,8 +14,8 @@
 
 /* TODO try delaying the reductions */
 void nmod_mat_nmod_vec_mul(
-    mp_limb_t * c,
-    const mp_limb_t * a, slong alen,
+    ulong * c,
+    const ulong * a, slong alen,
     const nmod_mat_t B)
 {
     slong i;

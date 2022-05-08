@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1, 
@@ -27,21 +25,15 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
     len2 = poly2->length;
 
     if (len2 == 0)
-    {
-        flint_printf("Exception (fmpq_poly_remove). Division by zero.\n");
-	flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_poly_remove\n");
 
     if (len2 == 1)
-    {
-        flint_printf("Exception (fmpq_poly_remove). Divisor must not be a unit.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Divisor must not be a unit in fmpq_poly_remove\n");
 
     if (len2 > len1)
     {
-    	fmpq_poly_set(q, poly1);
-	return 0;
+        fmpq_poly_set(q, poly1);
+        return 0;
     }
 
     fmpq_poly_init(qpoly);
@@ -88,12 +80,12 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
 
     while (i > 0 && !fmpq_poly_divides(qpoly, p1, pow))
     {
-	fmpq_poly_div(pow, pow, p2);
-	i--;
+        fmpq_poly_div(pow, pow, p2);
+        i--;
     }
 
     if (i == 0)
-       fmpq_poly_set(q, poly1);
+        fmpq_poly_set(q, poly1);
     else
     {
         fmpq_pow_si(c2, c2, i);
@@ -103,7 +95,6 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
     }
 
 cleanup:
-
     fmpz_clear(qsum);
     fmpz_clear(p1sum);
     fmpz_clear(p2sum);
@@ -116,4 +107,3 @@ cleanup:
 
     return i;
 }
-

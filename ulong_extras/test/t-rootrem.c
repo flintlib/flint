@@ -14,7 +14,7 @@
 int main(void)
 {
    int i, result;
-   mp_limb_t upper_limit;
+   ulong upper_limit;
 
    FLINT_TEST_INIT(state);
    
@@ -31,7 +31,7 @@ int main(void)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, val, j;
+        ulong a, b, c, d, val, j;
         mpz_t e, f, g, h;
 
         mpz_init(e);
@@ -74,7 +74,7 @@ int main(void)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, max_pow, base;
+        ulong a, b, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
         max_pow = n_flog(UWORD_MAX, base);    
@@ -103,7 +103,7 @@ int main(void)
    
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, max_pow, base;
+        ulong a, b, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
         max_pow = n_flog(UWORD_MAX, base);    
@@ -132,7 +132,7 @@ int main(void)
    
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, j, val, max_pow, base;
+        ulong a, b, c, d, j, val, max_pow, base;
         mpz_t e, f, g, h;
 
         mpz_init(e);

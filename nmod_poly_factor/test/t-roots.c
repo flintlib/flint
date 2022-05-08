@@ -96,7 +96,7 @@ main(void)
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t f;
         nmod_poly_factor_t r;
 

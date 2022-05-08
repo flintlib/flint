@@ -15,9 +15,9 @@
 
 
 static void
-_interpolate_newton(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
+_interpolate_newton(ulong_ptr ys, ulong_srcptr xs, slong n, nmod_t mod)
 {
-    mp_limb_t p, q, t;
+    ulong p, q, t;
     slong i, j;
 
     for (i = 1; i < n; i++)
@@ -36,9 +36,9 @@ _interpolate_newton(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
 }
 
 static void
-_newton_to_monomial(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
+_newton_to_monomial(ulong_ptr ys, ulong_srcptr xs, slong n, nmod_t mod)
 {
-    mp_limb_t t;
+    ulong t;
     slong i, j;
 
     for (i = n - 2; i >= 0; i--)
@@ -60,8 +60,8 @@ _newton_to_monomial(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
 }
 
 void
-_nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
-    mp_srcptr ys, slong n, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_newton(ulong_ptr poly, ulong_srcptr xs,
+    ulong_srcptr ys, slong n, nmod_t mod)
 {
     if (n == 1)
     {
@@ -78,7 +78,7 @@ _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
 
 void
 nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, slong n)
+                                    ulong_srcptr xs, ulong_srcptr ys, slong n)
 {
     if (n == 0)
     {

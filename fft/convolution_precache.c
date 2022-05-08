@@ -17,8 +17,8 @@
 #include "fmpz_poly.h"
 #include "fft.h"
 
-void fft_precache(mp_limb_t ** jj, slong depth, slong limbs, slong trunc,
-                             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1)
+void fft_precache(ulong ** jj, slong depth, slong limbs, slong trunc,
+                             ulong ** t1, ulong ** t2, ulong ** s1)
 {
    slong n = (WORD(1)<<depth);
    slong w = (limbs*FLINT_BITS)/n;
@@ -57,9 +57,9 @@ void fft_precache(mp_limb_t ** jj, slong depth, slong limbs, slong trunc,
    }
 }
 
-void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
-                              slong limbs, slong trunc, mp_limb_t ** t1, 
-                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+void fft_convolution_precache(ulong ** ii, ulong ** jj, slong depth, 
+                              slong limbs, slong trunc, ulong ** t1, 
+                          ulong ** t2, ulong ** s1, ulong ** tt)
 {
    slong n = (WORD(1)<<depth), j, s, t, u, trunc2;
    slong w = (limbs*FLINT_BITS)/n;

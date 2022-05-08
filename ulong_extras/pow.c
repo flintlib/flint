@@ -12,10 +12,10 @@
 
 #include "flint.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+ulong n_pow(ulong n, ulong exp)
 {
    ulong i;
-   mp_limb_t res;
+   ulong res;
 
    res = UWORD(1);
    for (i = 0; i < exp; i++)

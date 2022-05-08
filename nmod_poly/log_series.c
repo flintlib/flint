@@ -13,7 +13,7 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod)
+_nmod_poly_log_series(ulong_ptr res, ulong_srcptr f, slong flen, slong n, nmod_t mod)
 {
     flen = FLINT_MIN(flen, n);
 
@@ -24,7 +24,7 @@ _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod)
     }
     else
     {
-        mp_ptr tmp = _nmod_vec_init(2 * n);
+        ulong_ptr tmp = _nmod_vec_init(2 * n);
         _nmod_poly_derivative(tmp, f, flen, mod);
         _nmod_poly_div_series(tmp + n, tmp, flen - 1, f,
             FLINT_MIN(flen, n - 1), n - 1, mod);

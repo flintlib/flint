@@ -18,6 +18,7 @@
 #define MPN_EXTRAS_INLINE static __inline__
 #endif
 
+#include "gmp.h"
 #include "flint.h"
 #ifdef LONGSLONG
 # define flint_mpz_divisible_ui_p mpz_divisible_ui_p
@@ -37,7 +38,7 @@
 
 #define MPN_SWAP(a, an, b, bn) \
     do {                       \
-        mp_ptr __t;            \
+        ulong_ptr __t;            \
         mp_size_t __tn;        \
         __t = (a);             \
         (a) = (b);             \
@@ -61,8 +62,8 @@
 
 
 /* Not defined in gmp.h
-mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
-                                 mp_limb_t divisor);
+ulong  __gmpn_modexact_1_odd(ulong_srcptr src, mp_size_t size,
+                                 ulong divisor);
 #define mpn_modexact_1_odd __gmpn_modexact_1_odd
 */
 
@@ -70,17 +71,17 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 #define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
 #else
 MPN_EXTRAS_INLINE int
-flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+flint_mpn_divisible_1_p(ulong_srcptr x, mp_size_t xsize, ulong d)
 {
     __mpz_struct s;
     s._mp_size = xsize;
-    s._mp_d = (mp_ptr) x;
+    s._mp_d = (ulong_ptr) x;
     return flint_mpz_divisible_ui_p(&s, d);
 }
 #endif
 
 MPN_EXTRAS_INLINE
-int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
+int flint_mpn_zero_p(ulong_srcptr x, mp_size_t xsize)
 {
     slong i;
     for (i = 0; i < xsize; i++)
@@ -92,7 +93,7 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 }
 
 MPN_EXTRAS_INLINE
-mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
+mp_size_t flint_mpn_divexact_1(ulong_ptr x, mp_size_t xsize, ulong d)
 {
     mpn_divrem_1(x, 0, x, xsize, d);
     if (x[xsize - 1] == UWORD(0))
@@ -100,68 +101,68 @@ mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
     return xsize;
 }
 
-FLINT_DLL void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
+FLINT_DLL void flint_mpn_debug(ulong_srcptr x, mp_size_t xsize);
 
-FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize,
+FLINT_DLL mp_size_t flint_mpn_remove_2exp(ulong_ptr x, mp_size_t xsize,
 		                                      flint_bitcnt_t *bits);
 
-FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x,
-		    mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp);
+FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(ulong_ptr x,
+		    mp_size_t xsize, ulong_ptr p, mp_size_t psize, ulong *exp);
 
-FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize,
+FLINT_DLL int flint_mpn_factor_trial(ulong_srcptr x, mp_size_t xsize,
 		                                   slong start, slong stop);
 
 FLINT_DLL int flint_mpn_factor_trial_tree(slong * factors,
-                            mp_srcptr x, mp_size_t xsize, slong num_primes);
+                            ulong_srcptr x, mp_size_t xsize, slong num_primes);
 
-FLINT_DLL mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
-                                      mp_limb_t a2, mp_srcptr x2, mp_size_t n);
+FLINT_DLL mp_size_t flint_mpn_fmms1(ulong_ptr y, ulong a1, ulong_srcptr x1,
+                                      ulong a2, ulong_srcptr x2, mp_size_t n);
 
-FLINT_DLL int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
-         mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
+FLINT_DLL int flint_mpn_divides(ulong_ptr q, ulong_srcptr array1, 
+         mp_size_t limbs1, ulong_srcptr arrayg, mp_size_t limbsg, ulong_ptr temp);
 
-FLINT_DLL mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
-		                 mp_srcptr array1, mp_size_t limbs1,
-			   mp_srcptr array2, mp_size_t limbs2, mp_ptr temp);
+FLINT_DLL mp_size_t flint_mpn_gcd_full2(ulong_ptr arrayg,
+		                 ulong_srcptr array1, mp_size_t limbs1,
+			   ulong_srcptr array2, mp_size_t limbs2, ulong_ptr temp);
 
-FLINT_DLL mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
-    mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2);
+FLINT_DLL mp_size_t flint_mpn_gcd_full(ulong_ptr arrayg, 
+    ulong_srcptr array1, mp_size_t limbs1, ulong_srcptr array2, mp_size_t limbs2);
 
-FLINT_DLL mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
+FLINT_DLL ulong flint_mpn_preinv1(ulong d, ulong d2);
 
-FLINT_DLL mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
-           mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
+FLINT_DLL ulong flint_mpn_divrem_preinv1(ulong_ptr q, ulong_ptr a, 
+           mp_size_t m, ulong_srcptr b, mp_size_t n, ulong dinv);
 
 #define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
    do { \
-      mp_limb_t __q2, __q3, __q4; \
+      ulong __q2, __q3, __q4; \
       umul_ppmm((q), __q2, (a_hi), (dinv)); \
       umul_ppmm(__q3, __q4, (a_lo), (dinv)); \
       add_ssaaaa((q), __q2, (q), __q2, 0, __q3); \
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)
 
-FLINT_DLL void flint_mpn_mulmod_preinv1(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
-        mp_srcptr d, mp_limb_t dinv, ulong norm);
+FLINT_DLL void flint_mpn_mulmod_preinv1(ulong_ptr r, 
+        ulong_srcptr a, ulong_srcptr b, mp_size_t n, 
+        ulong_srcptr d, ulong dinv, ulong norm);
 
-FLINT_DLL void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
+FLINT_DLL void flint_mpn_preinvn(ulong_ptr dinv, ulong_srcptr d, mp_size_t n);
 
-FLINT_DLL void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
-                                     mp_srcptr d, mp_size_t n, mp_srcptr dinv);
+FLINT_DLL void flint_mpn_mod_preinvn(ulong_ptr r, ulong_srcptr a, mp_size_t m, 
+                                     ulong_srcptr d, mp_size_t n, ulong_srcptr dinv);
 
-FLINT_DLL mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, 
-                                     mp_srcptr d, mp_size_t n, mp_srcptr dinv);
+FLINT_DLL ulong flint_mpn_divrem_preinvn(ulong_ptr q, ulong_ptr r, ulong_srcptr a, mp_size_t m, 
+                                     ulong_srcptr d, mp_size_t n, ulong_srcptr dinv);
 
-FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
-        mp_srcptr d, mp_srcptr dinv, ulong norm);
+FLINT_DLL void flint_mpn_mulmod_preinvn(ulong_ptr r, 
+        ulong_srcptr a, ulong_srcptr b, mp_size_t n, 
+        ulong_srcptr d, ulong_srcptr dinv, ulong norm);
 
-FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
-    int c, flint_bitcnt_t b, mp_ptr tp);
+FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(ulong_ptr xp, ulong_srcptr yp, ulong_srcptr zp, 
+    int c, flint_bitcnt_t b, ulong_ptr tp);
 
 MPN_EXTRAS_INLINE
-void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+void flint_mpn_rrandom(ulong *rp, gmp_randstate_t state, mp_size_t n)
 {
   __mpz_struct str;
   str._mp_d = rp;
@@ -171,7 +172,7 @@ void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 }
 
 MPN_EXTRAS_INLINE
-void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
+void flint_mpn_urandomb(ulong *rp, gmp_randstate_t state, flint_bitcnt_t n)
 {
   __mpz_struct str;
   str._mp_d = rp;
@@ -192,7 +193,7 @@ void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
 
 #define eudiv_qrnd(q, r, n, d, t)           \
 do {                                        \
-    mp_limb_t t##q, t##a = n, t##b = d;     \
+    ulong t##q, t##a = n, t##b = d;     \
                                             \
     FLINT_ASSERT(t##a > t##b);              \
     FLINT_ASSERT(t##b > 0);                 \
@@ -216,8 +217,8 @@ t##quotient_found:                          \
 
 #define eudiv_qqrnnd(q1, q0, r0, n1, n0, d0, t)         \
 do {                                                    \
-    mp_limb_t t##a1 = n1, t##a0 = n0, t##b0 = d0;       \
-    mp_limb_t t##q1, t##q0, t##r0, t##u;                \
+    ulong t##a1 = n1, t##a0 = n0, t##b0 = d0;       \
+    ulong t##q1, t##q0, t##r0, t##u;                \
                                                         \
     FLINT_ASSERT(t##a1 > 0 || t##a0 > t##b0);           \
                                                         \
@@ -233,8 +234,8 @@ do {                                                    \
 #define eudiv_qrrnndd(q0, r1, r0, n1, n0, d1, d0, t)                        \
 do {                                                                        \
     int t##i;                                                               \
-    mp_limb_t t##a1 = n1, t##a0 = n0, t##b1 = d1, t##b0 = d0;               \
-    mp_limb_t t##r1, t##r0, t##u2, t##u1, t##u0, t##q, t##v1, t##v0;        \
+    ulong t##a1 = n1, t##a0 = n0, t##b1 = d1, t##b0 = d0;               \
+    ulong t##r1, t##r0, t##u2, t##u1, t##u0, t##q, t##v1, t##v0;        \
                                                                             \
     FLINT_ASSERT(t##a1 != 0);                                               \
     FLINT_ASSERT(t##b1 != 0);                                               \
@@ -259,7 +260,7 @@ t##subtract:                                                                \
     if (t##r1 != 0)                                                         \
     {                                                                       \
         int t##ncnt, t##dcnt;                                               \
-        mp_limb_t t##qq = 0;                                                \
+        ulong t##qq = 0;                                                \
                                                                             \
         count_leading_zeros(t##ncnt, t##r1);                                \
         count_leading_zeros(t##dcnt, t##b1);                                \

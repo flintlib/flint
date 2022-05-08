@@ -12,7 +12,7 @@
 #include "flint.h"
 
 ulong
-n_gcdinv(ulong * s, ulong x, ulong y)
+n_gcdinv(ulong_ptr s, ulong x, ulong y)
 {
     slong v1, v2, t2;
     ulong d, r, quot, rem;

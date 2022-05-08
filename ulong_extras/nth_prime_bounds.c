@@ -12,7 +12,7 @@
 #include "flint.h"
 
 
-void n_nth_prime_bounds(mp_limb_t * lo, mp_limb_t * hi, ulong n)
+void n_nth_prime_bounds(ulong_ptr lo, ulong_ptr hi, ulong n)
 {
     int bits, ll;
     double llo, lhi;
@@ -28,6 +28,6 @@ void n_nth_prime_bounds(mp_limb_t * lo, mp_limb_t * hi, ulong n)
     else if (n < 528491312) ll = 2;
     else                    ll = 3;
 
-    *lo = (mp_limb_t) (n * (llo + ll - 1));
-    *hi = (mp_limb_t) (n * (lhi + (ll+1) - (n >= 15985 ? 0.9427 : 0.0)));
+    *lo = (ulong) (n * (llo + ll - 1));
+    *hi = (ulong) (n * (lhi + (ll+1) - (n >= 15985 ? 0.9427 : 0.0)));
 }

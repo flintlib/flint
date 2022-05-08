@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_nth_prime(ulong n)
+ulong n_nth_prime(ulong n)
 {
     if (n == 0)
         flint_throw(FLINT_DOMERR, "n_nth_prime(0) is undefined");

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
@@ -101,12 +101,9 @@ void
 fmpq_poly_power_sums(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (poly->length == 0)
-    {
-        flint_printf
-            ("Exception (fmpq_poly_power_sums_naive). Zero polynomial.\n");
-        flint_abort();
-    }
-    else if (n <= 0 || poly->length == 1)
+        flint_throw(FLINT_ERROR, "Zero polynomial in fmpq_poly_power_sums_naive\n");
+
+    if (n <= 0 || poly->length == 1)
     {
         fmpq_poly_zero(res);
         return;

@@ -9,10 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
 #include "fmpz_poly_q.h"
 
 /**
@@ -39,11 +42,6 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
     denstr = fmpz_poly_get_str_pretty(op->den, x);
     
     str = flint_malloc(strlen(numstr) + strlen(denstr) + 6);
-    if (!str)
-    {
-        flint_printf("Exception (fmpz_poly_q_get_str_pretty). Memory allocation failed.\n");
-        flint_abort();
-    }
     
     i = 0;
     if (fmpz_poly_degree(op->num) > 0)

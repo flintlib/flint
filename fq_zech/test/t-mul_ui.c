@@ -32,7 +32,7 @@ main(void)
 
         for (i = 0; i < 200; i++)
         {
-            mp_limb_t x;
+            ulong x;
             fq_nmod_t aa, bb;
             fq_zech_t a, b, c;
 
@@ -79,7 +79,7 @@ main(void)
 
         for (i = 0; i < 200; i++)
         {
-            mp_limb_t x;
+            ulong x;
             fq_nmod_t aa, bb;
             fq_zech_t a, b;
 

@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpf_vec.h"
 
 void
 _mpf_vec_clear(mpf_ptr vec, slong len)

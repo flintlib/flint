@@ -64,13 +64,13 @@ _fmpz_poly_mullow_tiny2(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2, slong n)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    ulong_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * n * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * n * sizeof(ulong));
 
     FLINT_MPN_ZERO(tmp, 2 * n);
 
@@ -181,7 +181,7 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
             copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
             for (i = 0; i < len1; i++)
                 copy1[i] = poly1[i];
-            FLINT_MPN_ZERO((mp_ptr) copy1 + len1, n - len1);
+            FLINT_MPN_ZERO((ulong_ptr) copy1 + len1, n - len1);
             clear |= 1;
         }
 
@@ -192,7 +192,7 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
             copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
             for (i = 0; i < len2; i++)
                 copy2[i] = poly2[i];
-            FLINT_MPN_ZERO((mp_ptr) copy2 + len2, n - len2);
+            FLINT_MPN_ZERO((ulong_ptr) copy2 + len2, n - len2);
             clear |= 2;
         }
 

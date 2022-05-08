@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 void 
@@ -24,4 +22,3 @@ fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
     fmpq_poly_scalar_mul_fmpz(rop, op, f);
     fmpz_clear_readonly(f);
 }
-

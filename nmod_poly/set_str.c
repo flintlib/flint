@@ -18,7 +18,7 @@ int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 {
     const char * whitespace = " \t\n\r";
     slong i, length;
-    mp_limb_t n;
+    ulong n;
 
     if (sscanf(s, WORD_FMT "d " WORD_FMT "u", &length, &n) != 2)
         return 0;

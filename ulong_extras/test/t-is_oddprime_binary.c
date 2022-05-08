@@ -23,7 +23,7 @@ int main(void)
    
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
-      mp_limb_t d;
+      ulong d;
       mpz_t d_m;
       
       mpz_init(d_m);
@@ -52,7 +52,7 @@ int main(void)
          
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
    {
-      mp_limb_t d;
+      ulong d;
       mpz_t d_m;
       
       mpz_init(d_m);

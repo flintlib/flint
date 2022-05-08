@@ -35,7 +35,7 @@ FLINT_DLL void fmpz_factor_print(const fmpz_factor_t factor);
 FLINT_DLL void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
 
 FLINT_DLL void _fmpz_factor_append_ui(fmpz_factor_t factor,
-                                                       mp_limb_t p, ulong exp);
+                                                       ulong p, ulong exp);
 
 FLINT_DLL void _fmpz_factor_append(fmpz_factor_t factor,
                                                     const fmpz_t p, ulong exp);
@@ -48,7 +48,7 @@ FLINT_DLL void _fmpz_factor_concat(fmpz_factor_t factor1,
 /* Factoring *****************************************************************/
 
 FLINT_DLL void _fmpz_factor_extend_factor_ui(fmpz_factor_t factor,
-		                                                  mp_limb_t n);
+		                                                  ulong n);
 
 FLINT_DLL int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
                                        ulong start, ulong num_primes);
@@ -70,20 +70,20 @@ FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
 
 FLINT_DLL void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f);
 
-FLINT_DLL void flint_mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, 
-		            mp_limb_t n_size, mp_ptr ninv, mp_limb_t normbits);
+FLINT_DLL void flint_mpn_sqr_and_add_a(ulong_ptr y, ulong_ptr a, ulong_ptr n, 
+		            ulong n_size, ulong_ptr ninv, ulong normbits);
 
-FLINT_DLL int flint_mpn_factor_pollard_brent_single(mp_ptr factor,
-            mp_ptr n, mp_ptr ninv, mp_ptr a, mp_ptr y, mp_limb_t n_size, 
-                                      mp_limb_t normbits, mp_limb_t max_iters);
+FLINT_DLL int flint_mpn_factor_pollard_brent_single(ulong_ptr factor,
+            ulong_ptr n, ulong_ptr ninv, ulong_ptr a, ulong_ptr y, ulong n_size, 
+                                      ulong normbits, ulong max_iters);
 
 FLINT_DLL int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, 
                                                          fmpz_t yi, fmpz_t ai, 
-                                                          mp_limb_t max_iters);
+                                                          ulong max_iters);
 
 FLINT_DLL int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state,
-                                        fmpz_t n, mp_limb_t max_tries, 
-                                        mp_limb_t max_iters);
+                                        fmpz_t n, ulong max_tries, 
+                                        ulong max_iters);
 /* Expansion *****************************************************************/
 
 FLINT_DLL void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
@@ -104,58 +104,58 @@ FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_
 
 typedef struct ecm_s {
 
-    mp_ptr t, u, v, w;  /* temp variables */
-    mp_ptr x, z;    /* the coordinates */
-    mp_ptr a24;     /* value (a + 2)/4 */
-    mp_ptr ninv;    /* invere of n */
-    mp_ptr one;     /* one shifted */
+    ulong_ptr t, u, v, w;  /* temp variables */
+    ulong_ptr x, z;    /* the coordinates */
+    ulong_ptr a24;     /* value (a + 2)/4 */
+    ulong_ptr ninv;    /* invere of n */
+    ulong_ptr one;     /* one shifted */
 
     unsigned char *GCD_table; /* checks whether baby step int is
                            coprime to Primorial or not */
 
     unsigned char **prime_table;
 
-    mp_limb_t n_size;
-    mp_limb_t normbits;
+    ulong n_size;
+    ulong normbits;
 
 } ecm_s;
 
 typedef ecm_s ecm_t[1];
 
-FLINT_DLL void fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz);
+FLINT_DLL void fmpz_factor_ecm_init(ecm_t ecm_inf, ulong sz);
 
 FLINT_DLL void fmpz_factor_ecm_clear(ecm_t ecm_inf);
 
-FLINT_DLL void fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n,
-                                     mp_limb_t n_size);
+FLINT_DLL void fmpz_factor_ecm_addmod(ulong_ptr a, ulong_ptr b, ulong_ptr c, ulong_ptr n,
+                                     ulong n_size);
 
-FLINT_DLL void fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n,
-                                     mp_limb_t n_size);
+FLINT_DLL void fmpz_factor_ecm_submod(ulong_ptr x, ulong_ptr a, ulong_ptr b, ulong_ptr n,
+                                     ulong n_size);
 
-FLINT_DLL void fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
-                                      mp_ptr n, ecm_t ecm_inf);
+FLINT_DLL void fmpz_factor_ecm_double(ulong_ptr x, ulong_ptr z, ulong_ptr x0, ulong_ptr z0,
+                                      ulong_ptr n, ecm_t ecm_inf);
 
-FLINT_DLL void fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1,
-                                   mp_ptr x2, mp_ptr z2, mp_ptr x0, mp_ptr z0,
-                                   mp_ptr n, ecm_t ecm_inf);
+FLINT_DLL void fmpz_factor_ecm_add(ulong_ptr x, ulong_ptr z, ulong_ptr x1, ulong_ptr z1,
+                                   ulong_ptr x2, ulong_ptr z2, ulong_ptr x0, ulong_ptr z0,
+                                   ulong_ptr n, ecm_t ecm_inf);
 
-FLINT_DLL void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z,
-                                                     mp_ptr x0, mp_ptr z0,
-                                                     mp_limb_t k, mp_ptr n,
+FLINT_DLL void fmpz_factor_ecm_mul_montgomery_ladder(ulong_ptr x, ulong_ptr z,
+                                                     ulong_ptr x0, ulong_ptr z0,
+                                                     ulong k, ulong_ptr n,
                                                      ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm_select_curve(mp_ptr f,
-		                          mp_ptr sig, mp_ptr n, ecm_t ecm_inf);
+FLINT_DLL int fmpz_factor_ecm_select_curve(ulong_ptr f,
+		                          ulong_ptr sig, ulong_ptr n, ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array,
-                                      mp_limb_t num, mp_limb_t B1, mp_ptr n, 
+FLINT_DLL int fmpz_factor_ecm_stage_I(ulong_ptr f, const ulong *prime_array,
+                                      ulong num, ulong B1, ulong_ptr n, 
                                       ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2,
-                                       mp_limb_t P, mp_ptr n, ecm_t ecm_inf);
+FLINT_DLL int fmpz_factor_ecm_stage_II(ulong_ptr f, ulong B1, ulong B2,
+                                       ulong P, ulong_ptr n, ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
-                        mp_limb_t B2, flint_rand_t state, const fmpz_t n_in);
+FLINT_DLL int fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1,
+                        ulong B2, flint_rand_t state, const fmpz_t n_in);
 
 /* Inlines *******************************************************************/
 

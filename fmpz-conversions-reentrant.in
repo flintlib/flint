@@ -5,7 +5,7 @@
 #define PTR_TO_COEFF(x) ((slong) (((ulong) (x) >> 2) | (UWORD(1) << (FLINT_BITS - 2))))
 
 /* turns an fmpz into a pointer to an mpz */
-#define COEFF_TO_PTR(x) ((__mpz_struct *) (((ulong)x) << 2))
+#define COEFF_TO_PTR(x) ((mpz_mock_ptr) (((ulong)x) << 2))
 
 /* is x a pointer not an integer */
 #define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))

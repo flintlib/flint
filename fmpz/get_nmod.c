@@ -12,10 +12,10 @@
 #include "nmod.h"
 #include "fmpz-conversions.h"
 
-mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
+ulong fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
 {
     fmpz A = *aa;
-    mp_limb_t r, SA, UA;
+    ulong r, SA, UA;
 
     if (!COEFF_IS_MPZ(A))
     {
@@ -26,7 +26,7 @@ mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
     else
     {
         mpz_srcptr a = COEFF_TO_PTR(A);
-        mp_srcptr ad = a->_mp_d;
+        ulong_srcptr ad = a->_mp_d;
         slong an = a->_mp_size;
 
         if (an < 0)

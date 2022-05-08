@@ -35,7 +35,7 @@ main(void)
     {
         nmod_poly_t a, b, c, g;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -84,7 +84,7 @@ main(void)
     {
         nmod_poly_t a, b, g;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -119,7 +119,7 @@ main(void)
     {
         nmod_poly_t a, b, g;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

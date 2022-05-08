@@ -20,7 +20,7 @@ static pthread_once_t _factor_trial_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t _factor_trial_lock;
 #endif
 
-FLINT_TLS_PREFIX mp_ptr _factor_trial_tree[16 - (FLINT_BITS/32)];
+FLINT_TLS_PREFIX ulong_ptr _factor_trial_tree[16 - (FLINT_BITS/32)];
 FLINT_TLS_PREFIX int _factor_trial_tree_initialised = 0;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
@@ -44,7 +44,7 @@ void
 _factor_trial_tree_init(void)
 {
     slong i, j, k, m, n;
-    const mp_limb_t * primes;
+    const ulong * primes;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_once(&_factor_trial_initialised, _tree_mutex_init);
@@ -64,8 +64,8 @@ _factor_trial_tree_init(void)
 	    */
         for (i = 0; i < 13 - (FLINT_BITS/32); i++)
 	    {
-	        _factor_trial_tree[i] = (mp_ptr)
-		        flint_malloc(4096/(FLINT_BITS/16)*sizeof(mp_limb_t));
+	        _factor_trial_tree[i] = (ulong_ptr)
+		        flint_malloc(4096/(FLINT_BITS/16)*sizeof(ulong));
         }
 
 	    /* initialise products in first layer of tree */
@@ -112,12 +112,12 @@ _factor_trial_tree_init(void)
 }
 
 int flint_mpn_factor_trial_tree(slong * factors,
-		                mp_srcptr x, mp_size_t xsize, slong num_primes)
+		                ulong_srcptr x, mp_size_t xsize, slong num_primes)
 {
     slong i, j, m, n, n2, nmax;
-    const mp_limb_t * primes;
-    mp_ptr gtemp; /* temporary space for recursive gcd's */
-    mp_ptr temp; /* temporary space for flint_mpn_gcd_full2 */
+    const ulong * primes;
+    ulong_ptr gtemp; /* temporary space for recursive gcd's */
+    ulong_ptr temp; /* temporary space for flint_mpn_gcd_full2 */
     slong rlimbs[13 - (FLINT_BITS/32)]; /* gcd lengths at each level */
     slong idx[13 - (FLINT_BITS/32)]; /* indexes of entries at each level */
     slong offset; /* offset into gtemp */
@@ -129,8 +129,8 @@ int flint_mpn_factor_trial_tree(slong * factors,
 
     primes = n_primes_arr_readonly(num_primes);
 
-    gtemp = (mp_ptr)
-	    flint_malloc((3*4096/(FLINT_BITS/16) + xsize)*sizeof(mp_limb_t)); 
+    gtemp = (ulong_ptr)
+	    flint_malloc((3*4096/(FLINT_BITS/16) + xsize)*sizeof(ulong)); 
     temp = gtemp + 2*4096/(FLINT_BITS/16);
 
     /* compute gcd of x with top level in tree */

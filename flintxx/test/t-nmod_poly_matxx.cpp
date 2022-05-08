@@ -20,7 +20,7 @@ using namespace flint;
 void
 test_init()
 {
-    mp_limb_t M = 1039;
+    ulong M = 1039;
     nmod_poly_matxx A(3, 4, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
     tassert(ctx.n() == M);
@@ -60,7 +60,7 @@ bool has_explicit_temporaries(const Expr&)
 void
 test_arithmetic()
 {
-    mp_limb_t M = 1039;
+    ulong M = 1039;
     nmod_poly_matxx A(10, 10, M);
     nmod_poly_matxx v(10, 1, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
@@ -123,7 +123,7 @@ test_arithmetic()
 void
 test_functions()
 {
-    mp_limb_t M = 1031;
+    ulong M = 1031;
     nmod_poly_matxx A(2, 3, M), B(2, 2, M), empty(0, 15, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
     B.at(0, 0) = nmod_polyxx::from_ground(1, ctx);
@@ -201,7 +201,7 @@ void
 test_randomisation()
 {
     frandxx rand, rand2;
-    mp_limb_t M = 1031;
+    ulong M = 1031;
     nmod_poly_matxx A(2, 2, M);
 
     A.set_randtest(rand, 17);

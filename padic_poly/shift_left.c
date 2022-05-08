@@ -9,16 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "padic_poly.h"
 
 void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, slong n, 
                            const padic_ctx_t ctx)
 {
     if (rop->N < op->N)
-    {
-        flint_printf("Exception (padic_poly_shift_left).  rop->N < op->N.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "rop->N < op->N in padic_poly_shift_left\n");
 
     if (n == 0)
     {

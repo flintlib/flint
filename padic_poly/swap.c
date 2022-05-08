@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic_poly.h"
+#include "flint.h"
 
 void padic_poly_swap(padic_poly_t poly1, padic_poly_t poly2)
 {
@@ -39,4 +39,3 @@ void padic_poly_swap(padic_poly_t poly1, padic_poly_t poly2)
         poly2->coeffs = c;
     }
 }
-

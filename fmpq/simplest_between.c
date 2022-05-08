@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 
 void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,

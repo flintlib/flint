@@ -12,7 +12,7 @@
 #include "arith.h"
 
 void
-arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
+arith_bell_number_nmod_vec_recursive(ulong_ptr b, slong n, nmod_t mod)
 {
     if (mod.n == 1 || n == 0)
     {
@@ -27,12 +27,12 @@ arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
     if (n >= 3)
     {
         slong i, k;
-        mp_ptr t;
+        ulong_ptr t;
         TMP_INIT;
         TMP_START;
 
         n -= 1;
-        t = TMP_ALLOC(n * sizeof(mp_limb_t));
+        t = TMP_ALLOC(n * sizeof(ulong));
         t[0] = 1;
 
         for (i = 1; i < n; i++)

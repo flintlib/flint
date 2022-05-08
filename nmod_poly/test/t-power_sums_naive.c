@@ -18,7 +18,7 @@ int
 main(void)
 {
     int l, result;
-    mp_limb_t i, j, k, tot;
+    ulong i, j, k, tot;
 
     FLINT_TEST_INIT(state);
 
@@ -30,7 +30,7 @@ main(void)
         for (j = 0; j < 4; j++)
             for (k = 0; k < 4; k++)
             {
-                mp_limb_t n;
+                ulong n;
                 nmod_t mod;
                 nmod_poly_t a, b, c, d;
 
@@ -109,7 +109,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t n;
+        ulong n;
 
         do{
             n = n_randtest_prime(state, 1);
@@ -156,7 +156,7 @@ main(void)
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t n;
+        ulong n;
 
         do{
             n = n_randtest_prime(state, 1);

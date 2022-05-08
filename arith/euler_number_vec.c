@@ -14,9 +14,9 @@
 
 /* Computes length-m vector containing |E_{2k}| */
 static void
-__euler_number_vec_mod_p(mp_ptr res, mp_ptr tmp, slong m, nmod_t mod)
+__euler_number_vec_mod_p(ulong_ptr res, ulong_ptr tmp, slong m, nmod_t mod)
 {
-    mp_limb_t fac, c;
+    ulong fac, c;
     slong k;
 
     /* Divide by factorials */
@@ -46,10 +46,10 @@ void __euler_number_vec_multi_mod(fmpz * res, slong n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
-    mp_limb_t * primes;
-    mp_limb_t * residues;
-    mp_ptr * polys;
-    mp_ptr temppoly;
+    ulong * primes;
+    ulong * residues;
+    ulong_ptr * polys;
+    ulong_ptr temppoly;
     nmod_t mod;
     slong i, j, k, m, num_primes, num_primes_k, resolution;
     flint_bitcnt_t size, prime_bits;
@@ -66,9 +66,9 @@ void __euler_number_vec_multi_mod(fmpz * res, slong n)
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
-    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
-    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
-    polys = flint_malloc(num_primes * sizeof(mp_ptr));
+    primes = flint_malloc(num_primes * sizeof(ulong));
+    residues = flint_malloc(num_primes * sizeof(ulong));
+    polys = flint_malloc(num_primes * sizeof(ulong_ptr));
 
     /* Compute Euler numbers mod p */
     primes[0] = n_nextprime(UWORD(1)<<prime_bits, 0);

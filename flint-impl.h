@@ -45,7 +45,7 @@
  */
 #define MP_PTR_SWAP(x, y)   \
     do {                    \
-        mp_limb_t * __txxx; \
+        ulong * __txxx; \
         __txxx = x;         \
         x = y;              \
         y = __txxx;         \
@@ -67,7 +67,7 @@
 
 #define MP_LIMB_SWAP(A, B)      \
     do {                        \
-        mp_limb_t __t_m_p_ = A; \
+        ulong __t_m_p_ = A; \
         A = B;                  \
         B = __t_m_p_;           \
     } while (0)
@@ -185,7 +185,7 @@
 
 #define FLINT_MPZ_PTR_SWAP(a, b)    \
   do {                              \
-    mpz_ptr __tmp = (a);            \
+    mpz_mock_ptr __tmp = (a);       \
     (a) = (b);                      \
     (b) = __tmp;                    \
   } while (0)
@@ -224,7 +224,7 @@
 
 #define FLINT_MPZ_REALLOC(z, len)       \
     ((len) > ((z)->_mp_alloc)           \
-        ? (mp_ptr) _mpz_realloc(z, len) \
+        ? (ulong_ptr) _mpz_realloc(z, len) \
         : ((z)->_mp_d))
 
 #endif

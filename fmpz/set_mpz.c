@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_get_ui mpz_get_ui
 #else

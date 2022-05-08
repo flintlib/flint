@@ -31,7 +31,7 @@ main(void)
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t c;
+        ulong c;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
@@ -126,10 +127,7 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
     const slong N = qadic_prec(x);
 
     if (qadic_is_zero(y))
-    {
-        flint_printf("Exception (qadic_inv).  Zero is not invertible.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "Zero is not invertible in qadic_inv\n");
 
     /*
         If y = u p^v has negative valuation with N <= -v then the 
@@ -172,4 +170,3 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
         _padic_poly_normalise(x);
     }
 }
-

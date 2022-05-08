@@ -11,7 +11,6 @@
 */
 
 #include "padic.h"
-#include "ulong_extras.h"
 
 static void
 _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T, 
@@ -207,4 +206,3 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
-

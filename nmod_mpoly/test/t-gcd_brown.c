@@ -146,7 +146,7 @@ main(void)
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);
@@ -194,7 +194,7 @@ main(void)
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
         slong n, degbound;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "padic_mat.h"
 
 void padic_mat_scalar_div_fmpz(padic_mat_t B, 
@@ -22,10 +21,7 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
     }
 
     if (fmpz_is_zero(c))
-    {
-        flint_printf("ERROR (padic_mat_scalar_div_fmpz).  c is zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "padic_mat_scalar_div_fmpz\n");
 
     if (padic_mat_is_zero(A))
     {
@@ -56,4 +52,3 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
         fmpz_clear(d);
     }
 }
-

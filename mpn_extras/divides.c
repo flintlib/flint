@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 
 int
-flint_mpn_divides(mp_ptr q, mp_srcptr array1, mp_size_t limbs1,
-                    mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
+flint_mpn_divides(ulong_ptr q, ulong_srcptr array1, mp_size_t limbs1,
+                    ulong_srcptr arrayg, mp_size_t limbsg, ulong_ptr temp)
 {
    mpn_tdiv_qr(q, temp, 0, array1, limbs1, arrayg, limbsg);
 

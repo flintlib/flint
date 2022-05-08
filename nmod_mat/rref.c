@@ -113,7 +113,7 @@ nmod_mat_rref(nmod_mat_t A)
 
     if (A->r == 1)
     {
-        mp_limb_t c, cinv;
+        ulong c, cinv;
         slong i, j;
         slong r = 0;
 

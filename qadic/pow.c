@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
@@ -112,10 +113,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
     const slong N = qadic_prec(x);
 
     if (fmpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (qadic_pow).  e < 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "e < 0 in qadic_pow\n");
 
     if (fmpz_is_zero(e))
     {
@@ -181,4 +179,3 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
         fmpz_clear(val);
     }
 }
-

@@ -13,10 +13,10 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+ulong
+n_cbrtrem(ulong* remainder, ulong n)
 {
-    mp_limb_t base;
+    ulong base;
     
     if (!n)
     {

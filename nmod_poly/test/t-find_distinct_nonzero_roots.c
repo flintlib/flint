@@ -26,7 +26,7 @@ main(void)
     {
         int highdegreefactor;
         nmod_poly_t a, b, r;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randtest_prime(state, 1);
 

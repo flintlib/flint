@@ -30,7 +30,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
     else
     {
         slong Alen;
-        mp_limb_t mod = nmod_poly_mat_modulus(A);
+        ulong mod = nmod_poly_mat_modulus(A);
 
         Alen = nmod_poly_mat_max_length(A);
 

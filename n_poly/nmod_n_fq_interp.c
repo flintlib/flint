@@ -45,7 +45,7 @@
 
 #define MAC(h, m, l, a, b)                          \
 {                                                   \
-    mp_limb_t p1, p0;                               \
+    ulong p1, p0;                               \
     umul_ppmm(p1, p0, a, b);                        \
     add_sssaaaaaa(h, m, l, h, m, l, 0, p1, p0);     \
 }
@@ -56,13 +56,13 @@
 /* p = 1 mod 4 */
 
 static slong _find_eval_points4(
-    mp_limb_t * list,
+    ulong * list,
     slong d,
     nmod_t ctx)
 {
     slong i, len;
-    mp_limb_t p = ctx.n;
-    mp_limb_t n;
+    ulong p = ctx.n;
+    ulong n;
 
     FLINT_ASSERT(d > 0);
     FLINT_ASSERT((p & UWORD(3)) == 1);
@@ -73,7 +73,7 @@ static slong _find_eval_points4(
     for (n = 2; len < d && n <= (p - 1)/2; n++)
     {
         int ok = 1;
-        mp_limb_t mn2 = p - nmod_mul(n, n, ctx);
+        ulong mn2 = p - nmod_mul(n, n, ctx);
         for (i = 0; ok && i < len; i++)
             ok = (nmod_mul(list[i], list[i], ctx) != mn2);
         if (ok)
@@ -83,17 +83,17 @@ static slong _find_eval_points4(
 }
 
 static int _fill_matrices4(
-    mp_limb_t * M,          /* length d by 4d */
-    mp_limb_t * Q,          /* length d by 4d+1 */
+    ulong * M,          /* length d by 4d */
+    ulong * Q,          /* length d by 4d+1 */
     slong d,
     nmod_t ctx)
 {
     slong i, j;
     n_poly_t g, h;
-    mp_limb_t * list;
-    mp_limb_t g0i, c;
+    ulong * list;
+    ulong g0i, c;
 
-    list = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    list = FLINT_ARRAY_ALLOC(d, ulong);
     if (d != _find_eval_points4(list, d, ctx))
     {
         flint_free(list);
@@ -134,12 +134,12 @@ static int _fill_matrices4(
 
 
 static void _from_coeffs4(
-    mp_limb_t * v,          /* length 4d+1 */
-    const mp_limb_t * a,
+    ulong * v,          /* length 4d+1 */
+    const ulong * a,
     slong alen,
-    const mp_limb_t * M,    /* length d by 4d */
+    const ulong * M,    /* length d by 4d */
     slong d,
-    mp_limb_t w,
+    ulong w,
     nmod_t ctx)
 {
     slong i, j;
@@ -149,7 +149,7 @@ static void _from_coeffs4(
 
     if (alen <= 1)
     {
-        mp_limb_t t = (alen == 1) ? a[0] : 0;
+        ulong t = (alen == 1) ? a[0] : 0;
         for (i = 0; i < 4*d+1; i++)
             v[i] = t;
         return;
@@ -158,11 +158,11 @@ static void _from_coeffs4(
     v[0] = a[0];
     for (i = 0; i < d; i++)
     {
-        mp_limb_t t1, t2, t3, t4;
-        mp_limb_t c1h, c1m, c1;
-        mp_limb_t c2h, c2m, c2;
-        mp_limb_t c3h, c3m, c3;
-        mp_limb_t c4h, c4m, c4;
+        ulong t1, t2, t3, t4;
+        ulong c1h, c1m, c1;
+        ulong c2h, c2m, c2;
+        ulong c3h, c3m, c3;
+        ulong c4h, c4m, c4;
         c1h = c1m = c1 = 0;
         c2h = c2m = c2 = 0;
         c3h = c3m = c3 = 0;
@@ -204,17 +204,17 @@ static void _from_coeffs4(
 
 
 static void _from_coeffs4_n_fq(
-    mp_limb_t * v,          /* length 4d+1 */
-    const mp_limb_t * a,
+    ulong * v,          /* length 4d+1 */
+    const ulong * a,
     slong alen,
-    const mp_limb_t * M_,    /* length d by 4d */
+    const ulong * M_,    /* length d by 4d */
     slong D,
-    mp_limb_t w,
+    ulong w,
     slong d,
     nmod_t ctx)
 {
     slong i, j, k;
-    const mp_limb_t * Mrow;
+    const ulong * Mrow;
 
     FLINT_ASSERT(0 <= alen);
     FLINT_ASSERT(alen <= 1 + 4*D);
@@ -241,11 +241,11 @@ static void _from_coeffs4_n_fq(
         Mrow = M_;
         for (i = 0; i < D; i++)
         {
-            mp_limb_t t1, t2, t3, t4;
-            mp_limb_t c1h, c1m, c1;
-            mp_limb_t c2h, c2m, c2;
-            mp_limb_t c3h, c3m, c3;
-            mp_limb_t c4h, c4m, c4;
+            ulong t1, t2, t3, t4;
+            ulong c1h, c1m, c1;
+            ulong c2h, c2m, c2;
+            ulong c3h, c3m, c3;
+            ulong c4h, c4m, c4;
             c1h = c1m = c1 = 0;
             c2h = c2m = c2 = 0;
             c3h = c3m = c3 = 0;
@@ -287,12 +287,12 @@ static void _from_coeffs4_n_fq(
 }
 
 static void _to_coeffs4(
-    mp_limb_t * a,          /* length 4d+1 */
-    const mp_limb_t * v,    /* length 4d+1 */
-    mp_limb_t * t,          /* length 4d   */
-    const mp_limb_t * Q,    /* length d by 4d+1 */
+    ulong * a,          /* length 4d+1 */
+    const ulong * v,    /* length 4d+1 */
+    ulong * t,          /* length 4d   */
+    const ulong * Q,    /* length d by 4d+1 */
     slong d,
-    mp_limb_t w,
+    ulong w,
     nmod_t ctx)
 {
     slong i, j;
@@ -301,10 +301,10 @@ static void _to_coeffs4(
 
     for (i = 0; i < d; i++)
     {
-        mp_limb_t t2 = nmod_add(v[1+4*i+0], v[1+4*i+2], ctx);
-        mp_limb_t t1 = nmod_sub(v[1+4*i+0], v[1+4*i+2], ctx);
-        mp_limb_t t3 = nmod_add(v[1+4*i+1], v[1+4*i+3], ctx);
-        mp_limb_t t4 = nmod_mul(nmod_sub(v[1+4*i+1], v[1+4*i+3], ctx), w, ctx);
+        ulong t2 = nmod_add(v[1+4*i+0], v[1+4*i+2], ctx);
+        ulong t1 = nmod_sub(v[1+4*i+0], v[1+4*i+2], ctx);
+        ulong t3 = nmod_add(v[1+4*i+1], v[1+4*i+3], ctx);
+        ulong t4 = nmod_mul(nmod_sub(v[1+4*i+1], v[1+4*i+3], ctx), w, ctx);
         t[4*i+0] = nmod_sub(t1, t4, ctx);
         t[4*i+1] = nmod_sub(t2, t3, ctx);
         t[4*i+2] = nmod_add(t1, t4, ctx);
@@ -313,10 +313,10 @@ static void _to_coeffs4(
 
     for (i = 0; i < d; i++)
     {
-        mp_limb_t c1h, c1m, c1;
-        mp_limb_t c2h, c2m, c2;
-        mp_limb_t c3h, c3m, c3;
-        mp_limb_t c4h, c4m, c4;
+        ulong c1h, c1m, c1;
+        ulong c2h, c2m, c2;
+        ulong c3h, c3m, c3;
+        ulong c4h, c4m, c4;
         c1h = c1m = c1 = 0;
         c2h = c2m = c2 = 0;
         c3h = c3m = c3 = 0;
@@ -340,17 +340,17 @@ static void _to_coeffs4(
 }
 
 static void _to_coeffs4_n_fq(
-    mp_limb_t * a,          /* length 4D+1 */
-    const mp_limb_t * v,    /* length 4D+1 */
-    mp_limb_t * t,          /* length 4D   */
-    const mp_limb_t * Q_,   /* length D by 4D+1 */
+    ulong * a,          /* length 4D+1 */
+    const ulong * v,    /* length 4D+1 */
+    ulong * t,          /* length 4D   */
+    const ulong * Q_,   /* length D by 4D+1 */
     slong D,
-    mp_limb_t w,
+    ulong w,
     slong d,
     nmod_t ctx)
 {
     slong i, j, k;
-    const mp_limb_t * Qrow;
+    const ulong * Qrow;
 
     _n_fq_set(a + d*0, v + d*0, d);
 
@@ -359,10 +359,10 @@ static void _to_coeffs4_n_fq(
 
         for (i = 0; i < D; i++)
         {
-            mp_limb_t t2 = nmod_add(v[d*(1+4*i+0)+k], v[d*(1+4*i+2)+k], ctx);
-            mp_limb_t t1 = nmod_sub(v[d*(1+4*i+0)+k], v[d*(1+4*i+2)+k], ctx);
-            mp_limb_t t3 = nmod_add(v[d*(1+4*i+1)+k], v[d*(1+4*i+3)+k], ctx);
-            mp_limb_t t4 = nmod_mul(nmod_sub(v[d*(1+4*i+1)+k], v[d*(1+4*i+3)+k], ctx), w, ctx);
+            ulong t2 = nmod_add(v[d*(1+4*i+0)+k], v[d*(1+4*i+2)+k], ctx);
+            ulong t1 = nmod_sub(v[d*(1+4*i+0)+k], v[d*(1+4*i+2)+k], ctx);
+            ulong t3 = nmod_add(v[d*(1+4*i+1)+k], v[d*(1+4*i+3)+k], ctx);
+            ulong t4 = nmod_mul(nmod_sub(v[d*(1+4*i+1)+k], v[d*(1+4*i+3)+k], ctx), w, ctx);
             t[4*i+0] = nmod_sub(t1, t4, ctx);
             t[4*i+1] = nmod_sub(t2, t3, ctx);
             t[4*i+2] = nmod_add(t1, t4, ctx);
@@ -372,10 +372,10 @@ static void _to_coeffs4_n_fq(
         Qrow = Q_;
         for (i = 0; i < D; i++)
         {
-            mp_limb_t c1h, c1m, c1;
-            mp_limb_t c2h, c2m, c2;
-            mp_limb_t c3h, c3m, c3;
-            mp_limb_t c4h, c4m, c4;
+            ulong c1h, c1m, c1;
+            ulong c2h, c2m, c2;
+            ulong c3h, c3m, c3;
+            ulong c4h, c4m, c4;
             c1h = c1m = c1 = 0;
             c2h = c2m = c2 = 0;
             c3h = c3m = c3 = 0;
@@ -401,14 +401,14 @@ static void _to_coeffs4_n_fq(
 
 
 static int _fill_matrices2(
-    mp_limb_t * M,          /* length d by 2d */
-    mp_limb_t * Q,          /* length d by 2d+1 */
+    ulong * M,          /* length d by 2d */
+    ulong * Q,          /* length d by 2d+1 */
     slong d,
     nmod_t ctx)
 {
     slong i, j;
     n_poly_t g, h;
-    mp_limb_t g0i, c;
+    ulong g0i, c;
 
     if (2*d >= ctx.n)
         return 0;
@@ -446,10 +446,10 @@ static int _fill_matrices2(
 
 
 static void _from_coeffs2(
-    mp_limb_t * v,          /* length 2d+1 */
-    const mp_limb_t * a,    /* length alen <= 2d+1 */
+    ulong * v,          /* length 2d+1 */
+    const ulong * a,    /* length alen <= 2d+1 */
     slong alen,
-    const mp_limb_t * M,    /* length d by 2d */
+    const ulong * M,    /* length d by 2d */
     slong d,
     nmod_t ctx)
 {
@@ -460,7 +460,7 @@ static void _from_coeffs2(
 
     if (alen <= 1)
     {
-        mp_limb_t t = (alen == 1) ? a[0] : 0;
+        ulong t = (alen == 1) ? a[0] : 0;
         for (i = 0; i < 2*d+1; i++)
             v[i] = t;
         return;
@@ -469,8 +469,8 @@ static void _from_coeffs2(
     v[0] = a[0];
     for (i = 0; i < d; i++)
     {
-        mp_limb_t c1h, c1m, c1;
-        mp_limb_t c2h, c2m, c2;
+        ulong c1h, c1m, c1;
+        ulong c2h, c2m, c2;
         c1h = c1m = c1 = 0;
         c2h = c2m = c2 = 0;
 
@@ -497,16 +497,16 @@ static void _from_coeffs2(
 }
 
 static void _from_coeffs2_n_fq(
-    mp_limb_t * v,          /* length 4D+1 */
-    const mp_limb_t * a,    /* length alen <= 2D+1 */
+    ulong * v,          /* length 4D+1 */
+    const ulong * a,    /* length alen <= 2D+1 */
     slong alen,
-    const mp_limb_t * M_,    /* length D by 4D */
+    const ulong * M_,    /* length D by 4D */
     slong D,
     slong d,
     nmod_t ctx)
 {
     slong i, j, k;
-    const mp_limb_t * Mrow;
+    const ulong * Mrow;
 
     FLINT_ASSERT(0 <= alen);
     FLINT_ASSERT(alen <= 1 + 2*D);
@@ -533,8 +533,8 @@ static void _from_coeffs2_n_fq(
         Mrow = M_;
         for (i = 0; i < D; i++)
         {
-            mp_limb_t c1h, c1m, c1;
-            mp_limb_t c2h, c2m, c2;
+            ulong c1h, c1m, c1;
+            ulong c2h, c2m, c2;
             c1h = c1m = c1 = 0;
             c2h = c2m = c2 = 0;
 
@@ -563,10 +563,10 @@ static void _from_coeffs2_n_fq(
 
 
 static void _to_coeffs2(
-    mp_limb_t * a,          /* length 2d+1 */
-    const mp_limb_t * v,    /* length 2d+1 */
-    mp_limb_t * t,          /* length 2d   */
-    const mp_limb_t * Q,    /* length d by 2d+1 */
+    ulong * a,          /* length 2d+1 */
+    const ulong * v,    /* length 2d+1 */
+    ulong * t,          /* length 2d   */
+    const ulong * Q,    /* length d by 2d+1 */
     slong d,
     nmod_t ctx)
 {
@@ -582,8 +582,8 @@ static void _to_coeffs2(
 
     for (i = 0; i < d; i++)
     {
-        mp_limb_t c1h, c1m, c1;
-        mp_limb_t c2h, c2m, c2;
+        ulong c1h, c1m, c1;
+        ulong c2h, c2m, c2;
         c1h = c1m = c1 = 0;
         c2h = c2m = c2 = 0;
         umul_ppmm(c2m, c2, Q[0], v[0]);
@@ -601,16 +601,16 @@ static void _to_coeffs2(
 }
 
 static void _to_coeffs2_n_fq(
-    mp_limb_t * a,          /* length 2d+1 */
-    const mp_limb_t * v,    /* length 2d+1 */
-    mp_limb_t * t,          /* length 2d   */
-    const mp_limb_t * Q_,    /* length d by 2d+1 */
+    ulong * a,          /* length 2d+1 */
+    const ulong * v,    /* length 2d+1 */
+    ulong * t,          /* length 2d   */
+    const ulong * Q_,    /* length d by 2d+1 */
     slong D,
     slong d,
     nmod_t ctx)
 {
     slong i, j, k;
-    const mp_limb_t * Qrow;
+    const ulong * Qrow;
 
     _n_fq_set(a + d*0, v + d*0, d);
 
@@ -625,8 +625,8 @@ static void _to_coeffs2_n_fq(
         Qrow = Q_;
         for (i = 0; i < D; i++)
         {
-            mp_limb_t c1h, c1m, c1;
-            mp_limb_t c2h, c2m, c2;
+            ulong c1h, c1m, c1;
+            ulong c2h, c2m, c2;
             c1h = c1m = c1 = 0;
             c2h = c2m = c2 = 0;
             umul_ppmm(c2m, c2, Qrow[0], v[d*0+k]);
@@ -669,7 +669,7 @@ int nmod_eval_interp_set_degree_modulus(
     nmod_t ctx)
 {
     slong d, new_alloc;
-    mp_limb_t p = ctx.n;
+    ulong p = ctx.n;
 
     FLINT_ASSERT(deg >= 0);
 
@@ -684,9 +684,9 @@ int nmod_eval_interp_set_degree_modulus(
         new_alloc = d*(4*d) + 4*d + d*(4*d + 1);
 
         if (E->alloc > 0)
-            E->array = flint_realloc(E->array, new_alloc*sizeof(mp_limb_t));
+            E->array = flint_realloc(E->array, new_alloc*sizeof(ulong));
         else
-            E->array = flint_malloc(new_alloc*sizeof(mp_limb_t));
+            E->array = flint_malloc(new_alloc*sizeof(ulong));
 
         E->radix = 4;
         E->alloc = new_alloc;
@@ -706,9 +706,9 @@ int nmod_eval_interp_set_degree_modulus(
         new_alloc = d*(2*d) + 2*d + d*(2*d + 1);
 
         if (E->alloc > 0)
-            E->array = flint_realloc(E->array, new_alloc*sizeof(mp_limb_t));
+            E->array = flint_realloc(E->array, new_alloc*sizeof(ulong));
         else
-            E->array = flint_malloc(new_alloc*sizeof(mp_limb_t));
+            E->array = flint_malloc(new_alloc*sizeof(ulong));
 
         E->radix = 2;
         E->alloc = new_alloc;
@@ -723,8 +723,8 @@ int nmod_eval_interp_set_degree_modulus(
 }
 
 static void nmod_eval_interp_to_coeffs(
-    mp_limb_t * a,
-    const mp_limb_t * v,
+    ulong * a,
+    const ulong * v,
     nmod_eval_interp_t E,
     nmod_t ctx)
 {
@@ -735,8 +735,8 @@ static void nmod_eval_interp_to_coeffs(
 }
 
 static void nmod_eval_interp_from_coeffs(
-    mp_limb_t * v,
-    const mp_limb_t * a,
+    ulong * v,
+    const ulong * a,
     slong alen,
     nmod_eval_interp_t E,
     nmod_t ctx)
@@ -748,8 +748,8 @@ static void nmod_eval_interp_from_coeffs(
 }
 
 static void nmod_eval_interp_to_coeffs_n_fq(
-    mp_limb_t * a,
-    const mp_limb_t * v,
+    ulong * a,
+    const ulong * v,
     nmod_eval_interp_t E,
     slong d,
     nmod_t ctx)
@@ -761,8 +761,8 @@ static void nmod_eval_interp_to_coeffs_n_fq(
 }
 
 static void nmod_eval_interp_from_coeffs_n_fq(
-    mp_limb_t * v,
-    const mp_limb_t * a,
+    ulong * v,
+    const ulong * a,
     slong alen,
     nmod_eval_interp_t E,
     slong d,
@@ -964,7 +964,7 @@ void nmod_evals_fmma(
 
     for (i = 0; i < len; i++)
     {
-        mp_limb_t t = nmod_mul(b->coeffs[i], c->coeffs[i], ctx);
+        ulong t = nmod_mul(b->coeffs[i], c->coeffs[i], ctx);
         NMOD_ADDMUL(t, d->coeffs[i], e->coeffs[i], ctx);
         a->coeffs[i] = t;
     }
@@ -1010,7 +1010,7 @@ void n_fq_evals_mul(
 {
     slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
-    mp_limb_t * tmp;
+    ulong * tmp;
     TMP_INIT;
 
     if (b->length == 0 || c->length == 0)
@@ -1023,7 +1023,7 @@ void n_fq_evals_mul(
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(ulong));
 
     for (i = 0; i < len; i++)
         _n_fq_mul(a->coeffs + d*i, b->coeffs + d*i, c->coeffs + d*i, ctx, tmp);
@@ -1043,7 +1043,7 @@ void n_fq_evals_addmul(
 {
     slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
-    mp_limb_t * tmp;
+    ulong * tmp;
     TMP_INIT;
 
     if (b->length == 0 || c->length == 0)
@@ -1057,7 +1057,7 @@ void n_fq_evals_addmul(
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(ulong));
 
     for (i = 0; i < len; i++)
         _n_fq_addmul(a->coeffs + d*i, a->coeffs + d*i,
@@ -1079,7 +1079,7 @@ void n_fq_evals_fmma(
 {
     slong d = FQ_NMOD_CTX_DEGREE(ctx);
     slong i;
-    mp_limb_t * tmp, * t;
+    ulong * tmp, * t;
     TMP_INIT;
 
     if (b->length == 0 || c->length == 0)
@@ -1098,7 +1098,7 @@ void n_fq_evals_fmma(
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*(1 + N_FQ_MUL_ITCH)*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*(1 + N_FQ_MUL_ITCH)*sizeof(ulong));
     t = tmp + d*N_FQ_MUL_ITCH;
 
     for (i = 0; i < len; i++)

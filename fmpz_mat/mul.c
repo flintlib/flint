@@ -51,7 +51,7 @@ void _fmpz_mat_mul_small_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
     {
         for (j = 0; j < bc; j++)
         {
-            mp_limb_t hi, lo, shi, slo;
+            ulong hi, lo, shi, slo;
             slong x, y;
 
             shi = slo = 0;
@@ -83,7 +83,7 @@ void _fmpz_mat_mul_small_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
     {
         for (j = 0; j < bc; j++)
         {
-            mp_limb_t hi, lo, shi, smid, slo;
+            ulong hi, lo, shi, smid, slo;
             slong x, y;
 
             shi = smid = slo = 0;

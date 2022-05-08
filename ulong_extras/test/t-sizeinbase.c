@@ -14,7 +14,7 @@
 
 int main(void)
 {
-    mp_limb_t n;
+    ulong n;
     int base, size1, size2;
     slong rep;
     mpz_t t;

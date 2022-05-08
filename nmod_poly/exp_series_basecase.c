@@ -40,12 +40,12 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
+_nmod_poly_exp_series_basecase(ulong_ptr f, ulong_srcptr h,
                                     slong hlen, slong n, nmod_t mod)
 {
     slong j, k, l;
-    mp_ptr a;
-    mp_limb_t s;
+    ulong_ptr a;
+    ulong s;
     int nlimbs;
     TMP_INIT;
 
@@ -63,7 +63,7 @@ _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
     f[1] = h[1];
 
     TMP_START;
-    a = TMP_ALLOC(FLINT_MIN(n, hlen) * sizeof(mp_limb_t));
+    a = TMP_ALLOC(FLINT_MIN(n, hlen) * sizeof(ulong));
 
     for (k = 1; k < FLINT_MIN(n, hlen); k++)
         a[k] = n_mulmod2_preinv(h[k], k, mod.n, mod.ninv);

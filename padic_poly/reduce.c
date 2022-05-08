@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "padic_poly.h"
 
 void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)

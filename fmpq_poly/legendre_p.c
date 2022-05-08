@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq_poly.h"
 
 static __inline__ void __legendre_denom(fmpz_t den, ulong n)
@@ -82,4 +83,3 @@ fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
     _fmpq_poly_legendre_p(poly->coeffs, poly->den, n);
     _fmpq_poly_set_length(poly, n + 1);
 }
-

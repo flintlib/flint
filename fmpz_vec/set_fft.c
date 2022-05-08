@@ -13,10 +13,10 @@
 #include "flint-impl.h"
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                          const mp_ptr * coeffs_f, slong limbs, slong sign)
+                          const ulong_ptr * coeffs_f, slong limbs, slong sign)
 {
     slong i, size;
-    mp_limb_t * data;
+    ulong * data;
     __mpz_struct * mcoeffs_m;
 
     if (sign)

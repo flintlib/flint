@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 /* Use a lookup table for small n. We skip 53, 59 and 61, as the
    coefficients do not fit in 16 bits. */

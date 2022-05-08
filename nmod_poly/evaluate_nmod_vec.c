@@ -12,8 +12,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, slong len,
-    mp_srcptr xs, slong n, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec(ulong_ptr ys, ulong_srcptr coeffs, slong len,
+    ulong_srcptr xs, slong n, nmod_t mod)
 {
     if (len < 32)
         _nmod_poly_evaluate_nmod_vec_iter(ys, coeffs, len, xs, n, mod);
@@ -22,8 +22,8 @@ _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, slong len,
 }
 
 void
-nmod_poly_evaluate_nmod_vec(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_evaluate_nmod_vec(ulong_ptr ys,
+        const nmod_poly_t poly, ulong_srcptr xs, slong n)
 {
     _nmod_poly_evaluate_nmod_vec(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);

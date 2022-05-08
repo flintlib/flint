@@ -13,9 +13,9 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
+ulong n_randprime(flint_rand_t state, ulong bits, int proved)
 {
-    mp_limb_t rand;
+    ulong rand;
 
     if (bits < 2)
         flint_throw(FLINT_DOMERR, "attempt to generate prime < 2\n");
@@ -43,7 +43,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
     return rand;
 }
 
-mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
+ulong n_randtest_prime(flint_rand_t state, int proved)
 {
     return n_randprime(state, 2 + n_randint(state, FLINT_BITS - 1), proved);
 }

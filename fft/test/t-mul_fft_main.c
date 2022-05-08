@@ -45,7 +45,7 @@ main(void)
                flint_bitcnt_t b1 = len1*bits1, b2;
                mp_size_t n1, n2;
                mp_size_t j;
-               mp_limb_t * i1, *i2, *r1, *r2;
+               ulong * i1, *i2, *r1, *r2;
 
                if (len2 <= 0)
                   len2 = 2*n + n_randint(state, 2*n) + 1;
@@ -65,7 +65,7 @@ main(void)
                   b2 = tb;
                }
 
-               i1 = flint_malloc(3*(n1 + n2)*sizeof(mp_limb_t));
+               i1 = flint_malloc(3*(n1 + n2)*sizeof(ulong));
                i2 = i1 + n1;
                r1 = i2 + n2;
                r2 = r1 + n1 + n2;

@@ -41,15 +41,15 @@ do {                                                        \
     XXX: Currently supports aliasing between {A,a} and {B,b}.
  */
 
-slong _nmod_poly_hgcd_res(mp_ptr *M, slong *lenM, 
-                     mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, 
-                     mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
-                     nmod_t mod, mp_limb_t * r)
+slong _nmod_poly_hgcd_res(ulong_ptr *M, slong *lenM, 
+                     ulong_ptr A, slong *lenA, ulong_ptr B, slong *lenB, 
+                     ulong_srcptr a, slong lena, ulong_srcptr b, slong lenb, 
+                     nmod_t mod, ulong * r)
 {
     const slong lenW = 22 * lena + 16 * (FLINT_CLOG2(lena) + 1);
     slong sgnM;
     nmod_poly_res_t res;
-    mp_ptr W;
+    ulong_ptr W;
 
     res->res = *r;
     res->lc = b[lenb - 1];
@@ -105,20 +105,20 @@ slong _nmod_poly_hgcd_res(mp_ptr *M, slong *lenM,
     nmod_poly_resultant_hgcd() should rely on this.
  */
 
-mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA, 
-                               mp_srcptr B, slong lenB, nmod_t mod)
+ulong _nmod_poly_resultant_hgcd(ulong_srcptr A, slong lenA, 
+                               ulong_srcptr B, slong lenB, nmod_t mod)
 {
     const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    mp_ptr G = _nmod_vec_init(FLINT_MIN(lenA, lenB));
-    mp_ptr J = _nmod_vec_init(2 * lenB);
-    mp_ptr R = J + lenB;
-    mp_limb_t res = 1;
+    ulong_ptr G = _nmod_vec_init(FLINT_MIN(lenA, lenB));
+    ulong_ptr J = _nmod_vec_init(2 * lenB);
+    ulong_ptr R = J + lenB;
+    ulong res = 1;
 
     slong lenG, lenJ, lenR;
 
-    mp_limb_t lc = B[lenB - 1];
+    ulong lc = B[lenB - 1];
 
     __rem(R, lenR, A, lenA, B, lenB);
 
@@ -168,7 +168,7 @@ mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA,
 
             if (lenJ < cutoff)
             {
-                mp_limb_t r = _nmod_poly_resultant_euclidean(J, lenJ, R, lenR, mod);
+                ulong r = _nmod_poly_resultant_euclidean(J, lenJ, R, lenR, mod);
 
                 res = n_mulmod2_preinv(res, r, mod.n, mod.ninv);
 
@@ -185,9 +185,9 @@ mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA,
     return res;
 }
 
-mp_limb_t nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B)
+ulong nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B)
 {
-    mp_limb_t res;
+    ulong res;
 
     if (A->length == 0 || B->length == 0) 
     {

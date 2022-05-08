@@ -19,7 +19,7 @@
 */
 
 ulong
-n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
+n_divrem2_preinv(ulong_ptr q, ulong a, ulong n, ulong ninv)
 {
     ulong norm, q1, q0, r;
 

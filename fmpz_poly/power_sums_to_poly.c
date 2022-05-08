@@ -10,7 +10,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void
 _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)

@@ -26,7 +26,7 @@ int main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong len, q, p, g;
-        mp_ptr table;
+        ulong_ptr table;
 
         len = n_randint(state, 16);
         while (len < 2)

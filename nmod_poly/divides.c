@@ -12,10 +12,10 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, 
-                                           mp_srcptr B, slong lenB, nmod_t mod)
+int _nmod_poly_divides(ulong_ptr Q, ulong_srcptr A, slong lenA, 
+                                           ulong_srcptr B, slong lenB, nmod_t mod)
 {    
-    mp_ptr R;
+    ulong_ptr R;
     slong i, lenQ = lenA - lenB + 1;
     int res = 1;
 
@@ -27,9 +27,9 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
     if (lenA < 2*lenB - 1)
     {
         slong offset = 0;
-        mp_ptr P;
+        ulong_ptr P;
 
-        P = (mp_ptr) _nmod_vec_init(2*lenQ - 1);
+        P = (ulong_ptr) _nmod_vec_init(2*lenQ - 1);
 
         _NMOD_VEC_ZERO(R, lenB - 1);
 
@@ -85,7 +85,7 @@ int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
 int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ;
-    mp_ptr q;
+    ulong_ptr q;
     slong lenA, lenB;
     int res;
 

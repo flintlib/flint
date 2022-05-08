@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)

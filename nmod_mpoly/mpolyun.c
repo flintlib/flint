@@ -271,7 +271,7 @@ void nmod_mpolyun_set_mod(nmod_mpolyun_t A, const nmod_t mod)
 
 void nmod_mpolyn_scalar_mul_nmod(
     nmod_mpolyn_t A,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -285,7 +285,7 @@ void nmod_mpolyn_scalar_mul_nmod(
 
 void nmod_mpolyun_scalar_mul_nmod(
     nmod_mpolyun_t A,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -791,7 +791,7 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
     slong i, j, h, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps, * tAexp, * tAgexp;
@@ -850,7 +850,7 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
                                    &Aexp, &A->exps_alloc, NA, Alen + h);
             for (h--; h >= 0; h--)
             {
-                mp_limb_t c = (Bc->coeffs + j)->coeffs[h];
+                ulong c = (Bc->coeffs + j)->coeffs[h];
                 if (c == 0)
                     continue;
                 mpoly_monomial_madd(Aexp + NA*Alen, tAexp, h, tAgexp, NA);
@@ -882,7 +882,7 @@ void nmod_mpoly_from_mpolyn_perm_inflate(
     slong i, h, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * Bexps;
     ulong * Aexps, * tAexp, * tAgexp;
@@ -932,7 +932,7 @@ void nmod_mpoly_from_mpolyn_perm_inflate(
                                &Aexp, &A->exps_alloc, NA, Alen + h);
         for (h--; h >= 0; h--)
         {
-            mp_limb_t c = (B->coeffs + i)->coeffs[h];
+            ulong c = (B->coeffs + i)->coeffs[h];
             if (c == 0)
                 continue;
             mpoly_monomial_madd(Aexp + NA*Alen, tAexp, h, tAgexp, NA);
@@ -1054,7 +1054,7 @@ void nmod_mpoly_cvtfrom_mpolyn(
     {
         for (j = B->coeffs[i].length - 1; j >= 0; j--)
         {
-            mp_limb_t c = B->coeffs[i].coeffs[j];
+            ulong c = B->coeffs[i].coeffs[j];
             if (c == 0)
                 continue;
 

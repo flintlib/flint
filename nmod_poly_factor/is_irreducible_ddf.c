@@ -16,7 +16,7 @@
 #include <math.h>
 #undef ulong
 #include <gmp.h>
-#define ulong mp_limb_t
+#define ulong ulong
 #include "nmod_poly.h"
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)

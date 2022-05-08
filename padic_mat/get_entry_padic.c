@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "padic_mat.h"
 
 void padic_mat_get_entry_padic(padic_t rop, 
@@ -20,4 +19,3 @@ void padic_mat_get_entry_padic(padic_t rop,
     padic_val(rop) = padic_mat_val(op);
     padic_reduce(rop, ctx);
 }
-

@@ -12,7 +12,7 @@
 
 #include <math.h>
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 /* Naive double+exponent arithmetic; not designed to deal with
    underflow/overflow. */

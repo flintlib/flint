@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 
 void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)

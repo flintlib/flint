@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 #include "qadic.h"
 
 /*
@@ -80,4 +82,3 @@ void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
             fmpz_clear(pN);
     }
 }
-

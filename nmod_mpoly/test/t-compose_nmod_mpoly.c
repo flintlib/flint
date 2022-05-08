@@ -104,7 +104,7 @@ main(void)
         slong nvarsB, nvarsAC;
         slong len;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -200,7 +200,7 @@ main(void)
         nmod_mpoly_struct ** vals1;
         nmod_mpoly_t f, g, g1, g2;
         nmod_mpoly_ctx_t ctx;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -270,13 +270,13 @@ main(void)
         nmod_mpoly_ctx_t ctx1, ctx2;
         nmod_mpoly_t f, g, g1, g2;
         nmod_mpoly_struct ** vals1;
-        mp_limb_t fe, ge;
-        mp_limb_t * vals2, * vals3;
+        ulong fe, ge;
+        ulong * vals2, * vals3;
         slong nvars1, nvars2;
         slong len1, len2;
         slong exp_bound1;
         flint_bitcnt_t exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -307,13 +307,13 @@ main(void)
             nmod_mpoly_randtest_bound(vals1[v], state, len2, exp_bits2, ctx2);
         }
 
-        vals2 = (mp_limb_t *) flint_malloc(nvars2*sizeof(mp_limb_t));
+        vals2 = (ulong *) flint_malloc(nvars2*sizeof(ulong));
         for (v = 0; v < nvars2; v++)
         {
             vals2[v] = n_randlimb(state);
         }
 
-        vals3 = (mp_limb_t *) flint_malloc(nvars1*sizeof(mp_limb_t));
+        vals3 = (ulong *) flint_malloc(nvars1*sizeof(ulong));
         for (v = 0; v < nvars1; v++)
         {
             vals3[v] = nmod_mpoly_evaluate_all_ui(vals1[v], vals2, ctx2);
@@ -372,11 +372,11 @@ main(void)
         nmod_mpoly_ctx_t ctx1, ctx2;
         nmod_mpoly_t f, g, g1, g2;
         nmod_mpoly_struct ** vals1;
-        mp_limb_t * vals2;
+        ulong * vals2;
         slong nvars1;
         slong len1;
         flint_bitcnt_t exp_bits1;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -396,7 +396,7 @@ main(void)
 
         vals1 = (nmod_mpoly_struct **) flint_malloc(nvars1
                                                 * sizeof(nmod_mpoly_struct *));
-        vals2 = (mp_limb_t *) flint_malloc(nvars1*sizeof(mp_limb_t));
+        vals2 = (ulong *) flint_malloc(nvars1*sizeof(ulong));
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (nmod_mpoly_struct *) flint_malloc(

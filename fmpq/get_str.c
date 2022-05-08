@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq.h"
 
 char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)

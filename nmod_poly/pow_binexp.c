@@ -14,13 +14,13 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod)
+_nmod_poly_pow_binexp(ulong_ptr res, ulong_srcptr poly, slong len, ulong e, nmod_t mod)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
     slong alloc = (slong) e * (len - 1) + 1;
-    mp_ptr v = _nmod_vec_init(alloc);
-    mp_ptr R, S, T;
+    ulong_ptr v = _nmod_vec_init(alloc);
+    ulong_ptr R, S, T;
 
     /*
        Set bits to the bitmask with a 1 one place lower than the msb of e

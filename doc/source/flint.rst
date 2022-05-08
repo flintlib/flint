@@ -36,24 +36,13 @@ Random Numbers
 
     An array of length 1 of :type:`flint_rand_s`.
 
-.. function:: flint_rand_s * flint_rand_alloc()
-
-    Allocates a ``flint_rand_t`` object to be used like a heap-allocated
-    ``flint_rand_t`` in external libraries.
-    The random state is not initialised.
-
-.. function:: void flint_rand_free(flint_rand_s * state)
-   
-    Frees a random state object as allocated using :func:`flint_rand_alloc`.
-
-
 .. function:: void flint_randinit(flint_rand_t state)
 
     Initialize a :type:`flint_rand_t`.
 
 .. function:: void flint_randclear(flint_rand_t state)
 
-    Free all memory allocated by :func:`flint_rand_init`.
+    Free all memory allocated by :func:`flint_randinit`.
 
 Thread functions
 -----------------------
@@ -119,7 +108,7 @@ Input/Output
 
     These are equivalent to the standard library functions ``printf``,
     ``vprintf``, ``fprintf``, and ``sprintf`` with an additional length modifier
-    "w" for use with an :type:`mp_limb_t` type. This modifier can be used with
+    "w" for use with an :type:`ulong` type. This modifier can be used with
     format specifiers "d", "x", or "u", thereby outputting the limb as a signed
     decimal, hexadecimal, or unsigned decimal integer.
 
@@ -130,4 +119,4 @@ Input/Output
 
      These are equivalent to the standard library functions ``scanf``,
      ``fscanf``, and ``sscanf`` with an additional length modifier "w" for
-     reading an :type:`mp_limb_t` type.
+     reading an :type:`ulong` type.

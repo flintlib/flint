@@ -11,7 +11,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 int
 _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,

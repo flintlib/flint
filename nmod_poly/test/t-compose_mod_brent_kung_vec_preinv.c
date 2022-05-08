@@ -20,7 +20,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_poly.h"
@@ -38,7 +38,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, ainv, b, c;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
         slong j, k, l;
         nmod_poly_struct * pow, * res;
 

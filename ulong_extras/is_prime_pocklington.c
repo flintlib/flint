@@ -15,10 +15,10 @@
 #include "ulong_extras.h"
 
 int
-n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+n_is_prime_pocklington(ulong n, ulong iterations)
 {
     int i, j, pass;
-    mp_limb_t n1, cofactor, b, c, ninv, limit, F, Fsq, det, rootn, val, c1, c2, upper_limit;
+    ulong n1, cofactor, b, c, ninv, limit, F, Fsq, det, rootn, val, c1, c2, upper_limit;
     n_factor_t factors;
     c = 0;
 
@@ -41,7 +41,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
     n1 = n - 1;
     n_factor_init(&factors);
-    limit = (mp_limb_t) pow((double)n1, 1.0/3);
+    limit = (ulong) pow((double)n1, 1.0/3);
 
     val = n_pow(limit, 3);
 
@@ -83,7 +83,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     c = 1;
     for (i = factors.num - 1; i >= 0; i--)
     {
-        mp_limb_t exp = n1 / factors.p[i];
+        ulong exp = n1 / factors.p[i];
         pass = 0;
 
         for (j = 2; j < iterations && pass == 0; j++)

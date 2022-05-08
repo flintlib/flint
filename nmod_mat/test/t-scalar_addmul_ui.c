@@ -16,7 +16,7 @@ int
 main(void)
 {
     slong m, n, mod, rep;
-    mp_limb_t x;
+    ulong x;
     FLINT_TEST_INIT(state);
     
     flint_printf("scalar_addmul_ui....");

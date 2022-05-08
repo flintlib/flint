@@ -131,8 +131,8 @@ main(void)
     {
         nmod_poly_t f;
         nmod_poly_factor_t roots;
-        mp_limb_t a, n;
-        mp_limb_t * sqrt;
+        ulong a, n;
+        ulong * sqrt;
         n_factor_t nfac;
 
         n = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);

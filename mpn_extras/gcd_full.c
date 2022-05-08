@@ -9,16 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "flint-impl.h"
 
-mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, 
-                               mp_srcptr array1, mp_size_t limbs1,
-		               mp_srcptr array2, mp_size_t limbs2, mp_ptr temp)
+mp_size_t flint_mpn_gcd_full2(ulong_ptr arrayg, 
+                               ulong_srcptr array1, mp_size_t limbs1,
+		               ulong_srcptr array2, mp_size_t limbs2, ulong_ptr temp)
 {
    mp_size_t s1 = 0, s2 = 0, m, b1, b2, mb, len1, len2, leng;
-   mp_ptr in1, in2;
-   mp_limb_t cy;
+   ulong_ptr in1, in2;
+   ulong cy;
 
    /* find maximum power of 2 dividing inputs */
    b1 = mpn_scan1(array1 + s1, 0);
@@ -37,7 +37,7 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    if (temp != NULL)
       in1 = temp;
    else
-      in1 = flint_malloc(len1*sizeof(mp_limb_t));
+      in1 = flint_malloc(len1*sizeof(ulong));
    if (b1 == 0)
       FLINT_MPN_COPYI(in1, array1 + s1, len1);
    else
@@ -48,7 +48,7 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    if (temp != NULL)
       in2 = temp + len1;
    else
-      in2 = flint_malloc(len2*sizeof(mp_limb_t));
+      in2 = flint_malloc(len2*sizeof(ulong));
    if (b2 == 0)
       FLINT_MPN_COPYI(in2, array2 + s2, len2);
    else
@@ -80,8 +80,8 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    return m + leng;
 }
 
-mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
-        mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2)
+mp_size_t flint_mpn_gcd_full(ulong_ptr arrayg,
+        ulong_srcptr array1, mp_size_t limbs1, ulong_srcptr array2, mp_size_t limbs2)
 {
    return flint_mpn_gcd_full2(arrayg, array1, limbs1, array2, limbs2, NULL);
 }

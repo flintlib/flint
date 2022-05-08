@@ -14,7 +14,7 @@
 int main(void)
 {
     int i, j, k, result, fails;
-    mp_limb_t prime1, prime2, prod, f, mod;
+    ulong prime1, prime2, prod, f, mod;
     FLINT_TEST_INIT(state);
 
     fails = 0;

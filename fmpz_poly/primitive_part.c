@@ -9,14 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_mini.h"
+#include "fmpz_poly_mini.h"
 
 void
 _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, slong len)
 {
     fmpz_t x;
     fmpz_init(x);
-    _fmpz_poly_content(x, poly, len);
+    _fmpz_vec_content(x, poly, len);
     if (fmpz_sgn(poly + (len - 1)) < 0)
         fmpz_neg(x, x);
     _fmpz_vec_scalar_divexact_fmpz(res, poly, len, x);

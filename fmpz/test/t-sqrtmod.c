@@ -30,7 +30,7 @@ int main(void)
     {
         int ans;
         fmpz_t a, b, c, p;
-        mp_limb_t prime;
+        ulong prime;
 
         prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);
@@ -70,7 +70,7 @@ int main(void)
     {
         int ans;
         fmpz_t a, b, c, d, p;
-        mp_limb_t prime;
+        ulong prime;
 
         prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);

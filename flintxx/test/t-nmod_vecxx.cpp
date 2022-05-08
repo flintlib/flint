@@ -50,7 +50,7 @@ test_conversion()
 {
     nmodxx_ctx c(31);
     nmodxx a = nmodxx::red(65, c);
-    tassert(a.to<mp_limb_t>() == a._limb());
+    tassert(a.to<ulong>() == a._limb());
     tassert(a.to_string() == "3 mod 31");
 }
 

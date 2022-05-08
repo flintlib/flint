@@ -13,8 +13,8 @@
 #include "flint.h"
 #include "fft.h"
       
-void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
-                    mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+void ifft_truncate1(ulong ** ii, mp_size_t n, flint_bitcnt_t w, 
+                    ulong ** t1, ulong ** t2, mp_size_t trunc)
 {
     mp_size_t i;
     mp_size_t limbs = (w*n)/FLINT_BITS;
@@ -64,8 +64,8 @@ void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
     }
 }
 
-void ifft_truncate(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
-                   mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+void ifft_truncate(ulong ** ii, mp_size_t n, flint_bitcnt_t w, 
+                   ulong ** t1, ulong ** t2, mp_size_t trunc)
 {
     mp_size_t i;
     mp_size_t limbs = (w*n)/GMP_LIMB_BITS;

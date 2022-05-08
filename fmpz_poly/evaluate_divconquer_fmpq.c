@@ -11,7 +11,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 #include "fmpq.h"
 
 void 

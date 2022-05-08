@@ -21,9 +21,6 @@
 #endif
 
 #include "fmpz_mini.h"
-/* TODO: Remove the following inclusion. It is only needed for the inlining of
- * fmpq_poly_get_numerator. */
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -63,13 +60,7 @@ FLINT_DLL void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 #define fmpq_poly_denref(poly)  ((poly)->den)
 
-FMPQ_POLY_INLINE void
-fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
-{
-    fmpz_poly_fit_length(res, poly->length);
-    _fmpz_vec_set(res->coeffs, poly->coeffs, poly->length);
-    _fmpz_poly_set_length(res, poly->length);
-}
+void fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly);
 
 FMPQ_POLY_INLINE void
 fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)

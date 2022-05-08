@@ -9,7 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly_q.h"
+#ifdef LONGSLONG
+# define flint_mpz_cmp_si mpz_cmp_si
+#else
+# include "gmpcompat.h"
+#endif
 
 int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 {

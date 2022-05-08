@@ -19,4 +19,3 @@ fmpq_mat_can_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
     else
         return fmpq_mat_can_solve_multi_mod(X, A, B);
 }
-

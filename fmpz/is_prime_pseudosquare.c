@@ -14,7 +14,7 @@
 #include "fmpz.h"
 
 #ifndef FLINT64          
-mp_limb_t flint_fmpz_pseudosquares[][3] = 
+ulong flint_fmpz_pseudosquares[][3] = 
 {
    { 17, 0, 0 },
    { 73, 0, 0 },
@@ -92,7 +92,7 @@ mp_limb_t flint_fmpz_pseudosquares[][3] =
    { 1411295841u, 761797252u, 229581u } 
 };
 #else
-mp_limb_t flint_fmpz_pseudosquares[][2] = 
+ulong flint_fmpz_pseudosquares[][2] = 
 {
    { 17, 0 },
    { 73, 0 },
@@ -208,10 +208,10 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
 int fmpz_is_prime_pseudosquare(const fmpz_t n)
 {
     unsigned int i, j, m1;
-    mp_limb_t p, B, mod8;
+    ulong p, B, mod8;
     fmpz_t NB, f, exp, mod, nm1;
     int ret;
-    const mp_limb_t * primes;
+    const ulong * primes;
 
     ret = -1; /* silence compiler warning (not set when aborting) */
 

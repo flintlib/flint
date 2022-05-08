@@ -81,11 +81,11 @@ static void fq_nmod_mpoly_set_eval_helper3(
     ulong y, x, z;
     slong yoff, xoff, zoff, * off;
     slong yshift, xshift, zshift, * shift;
-    mp_limb_t * p;
+    ulong * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
     const ulong * Aexps = A->exps;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -191,11 +191,11 @@ static void fq_nmod_mpoly_set_evalp_helper3(
     ulong y, x, z;
     slong yoff, xoff, zoff, * off;
     slong yshift, xshift, zshift, * shift;
-    mp_limb_t * p;
+    ulong * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
     const ulong * Aexps = A->exps;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -308,13 +308,13 @@ static slong fq_nmod_mpoly_set_eval_helper_and_zip_form3(
     slong i, j, k, n;
     slong * off, * shift;
     ulong y, x, z;
-    mp_limb_t * p;
+    ulong * p;
     fq_nmod_mpoly_struct * Hc;
     slong old_len, zip_length = 0;
     flint_bitcnt_t bits = B->bits;
     slong Blen = B->length;
     const ulong * Bexps = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -465,13 +465,13 @@ static slong fq_nmod_mpoly_set_evalp_helper_and_zip_form3(
     slong i, j, k, n;
     slong * off, * shift;
     ulong y, x, z;
-    mp_limb_t * p;
+    ulong * p;
     fq_nmod_mpoly_struct * Hc;
     slong old_len, zip_length = 0;
     flint_bitcnt_t bits = B->bits;
     slong Blen = B->length;
     const ulong * Bexps = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -615,7 +615,7 @@ static void fq_nmod_polyu_eval_step(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong Ai, Ei, n;
-    mp_limb_t * p;
+    ulong * p;
 
     n_polyu_fit_length(E, d*A->length);
 
@@ -643,7 +643,7 @@ static void fq_nmod_polyu_evalp_step(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong Ai, Ei, n;
-    mp_limb_t * p;
+    ulong * p;
 
     n_polyu_fit_length(E, d*A->length);
 
@@ -830,7 +830,7 @@ static int fq_nmod_mpoly_from_zip(
     slong zvar = 1;
     ulong x, y, z;
     flint_bitcnt_t bits = B->bits;
-    mp_limb_t * Bcoeffs;
+    ulong * Bcoeffs;
     ulong * Bexps;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -929,7 +929,7 @@ static int fq_nmod_mpoly_from_zipp(
     slong zvar = 1;
     ulong x, y, z;
     flint_bitcnt_t bits = B->bits;
-    mp_limb_t * Bcoeffs;
+    ulong * Bcoeffs;
     ulong * Bexps;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);

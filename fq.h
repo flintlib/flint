@@ -22,12 +22,7 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-/* TODO: Remove the following inclusions */
-#include "fmpz.h"
-#include "fmpz_mod.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_poly_mini.h"
 
 /* Data types and context ****************************************************/
 
@@ -63,6 +58,10 @@ FQ_INLINE slong fq_ctx_degree(const fq_ctx_t ctx)
     return ctx->modulus->length - 1;
 }
 
+#ifndef FMPZ_MOD_H
+# define fmpz_mod_ctx_modulus(ctx) (ctx)->n
+#endif
+
 FQ_INLINE const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
 {
     return fmpz_mod_ctx_modulus(ctx->ctxp);
@@ -90,7 +89,10 @@ FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
   || defined (__STDIO_LOADED)       \
   || defined (_STDIO)               \
   || defined (__DEFINED_FILE)
+
 #include "flint-impl.h"
+#include "fmpz_mod_poly.h"
+
 FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 {
     int r;
@@ -128,7 +130,6 @@ FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 
 /* Memory managment  *********************************************************/
 
-#ifdef FMPZ_POLY_H
 FQ_INLINE void fq_init(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_init(rop);
@@ -143,57 +144,9 @@ FQ_INLINE void fq_clear(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_clear(rop);
 }
-#endif
 
-FQ_INLINE 
-void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
-{
-    const slong d = ctx->j[ctx->len - 1];
-
-    FMPZ_VEC_NORM(R, lenR);
-
-    if (lenR > d)
-    {
-        slong i, k;
-
-        for (i = lenR - 1; i >= d; i--)
-        {
-            for (k = ctx->len - 2; k >= 0; k--)
-            {
-                fmpz_submul(R + ctx->j[k] + i - d, R + i, ctx->a + k);
-            }
-            fmpz_zero(R + i);
-        }
-    }
-
-    _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), fq_ctx_prime(ctx));
-}
-
-FQ_INLINE void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
-{
-    fmpz  *q, *r;
-
-    if (lenR < ctx->modulus->length)
-    {
-        _fmpz_vec_scalar_mod_fmpz(R, R, lenR, fq_ctx_prime(ctx));
-        return;
-    }
-    
-    q = _fmpz_vec_init(lenR - ctx->modulus->length + 1);
-    r = _fmpz_vec_init(ctx->modulus->length - 1);
-
-    _fmpz_mod_poly_divrem_newton_n_preinv(q, r, R, lenR, 
-                                        ctx->modulus->coeffs, ctx->modulus->length,
-                                        ctx->inv->coeffs, ctx->inv->length,
-                                        fq_ctx_prime(ctx));
-
-    _fmpz_vec_set(R, r, ctx->modulus->length - 1);
-    _fmpz_vec_clear(q, lenR - ctx->modulus->length + 1);
-    _fmpz_vec_clear(r, ctx->modulus->length - 1);
-
-}
-
-
+FLINT_DLL void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx);
+FLINT_DLL void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx);
 FQ_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
 {
     if (ctx->sparse_modulus)
@@ -202,49 +155,34 @@ FQ_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
         _fq_dense_reduce(R, lenR, ctx);    
 }
 
-#ifdef FMPZ_POLY_H
 FQ_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 {
     _fq_reduce(rop->coeffs, rop->length, ctx);
     rop->length = FLINT_MIN(rop->length, ctx->modulus->length - 1);
     _fmpz_poly_normalise(rop);
 }
-#endif
 
 /* Basic arithmetic **********************************************************/
 
-FLINT_DLL void fq_add(fq_t rop, const fq_t op1,
-		                           const fq_t op2, const fq_ctx_t ctx);
-
-FLINT_DLL void fq_sub(fq_t rop, const fq_t op1,
-		                           const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_mul(fq_t rop, const fq_t op1,
-		                           const fq_t op2, const fq_ctx_t ctx);
-
-FLINT_DLL void fq_mul_fmpz(fq_t rop, const fq_t op,
-		                           const fmpz_t x, const fq_ctx_t ctx);
-
+FLINT_DLL void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
 FLINT_DLL void fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx);
-
 FLINT_DLL void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-FLINT_DLL void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
-             const fq_ctx_t ctx);
-
-FLINT_DLL void fq_pow(fq_t rop, const fq_t op1,
-		                           const fmpz_t e, const fq_ctx_t ctx);
-
-FLINT_DLL void fq_pow_ui(fq_t rop, const fq_t op,
-		                            const ulong e, const fq_ctx_t ctx);
+FLINT_DLL void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fq_ctx_t ctx);
+FLINT_DLL void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
+FLINT_DLL void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
 
 /* Roots *********************************************************************/
 
@@ -266,10 +204,8 @@ FLINT_DLL void fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_rand_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
-
 /* Comparison ****************************************************************/
 
-#ifdef FMPZ_POLY_H
 FQ_INLINE int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
     return fmpz_poly_equal(op1, op2);
@@ -284,11 +220,9 @@ FQ_INLINE int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_one(op);
 }
-#endif
 
 /* Assignments and conversions ***********************************************/
 
-#ifdef FMPZ_POLY_H
 FQ_INLINE void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     fmpz_poly_set(rop, op);
@@ -345,19 +279,13 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
         fmpz_poly_set_coeff_ui(rop, 1, 1);
     }
 }
-#endif
 
 FLINT_DLL int fq_get_fmpz(fmpz_t a, const fq_t b, const fq_ctx_t ctx);
-
 FLINT_DLL void fq_get_fmpz_poly(fmpz_poly_t a, const fq_t b, const fq_ctx_t ctx);
+FLINT_DLL void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b, const fq_ctx_t ctx);
 
 FLINT_DLL void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx);
-
-FLINT_DLL void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b,
-                                                           const fq_ctx_t ctx);
-
-FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b,
-                                                           const fq_ctx_t ctx);
+FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx);
 
 /* Output ********************************************************************/
 
@@ -401,35 +329,28 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_print_pretty(op, ctx->var);
 }
-#endif
 
 FLINT_DLL char * fq_get_str(const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL char * fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx);
+#endif
 
 /* Special functions *********************************************************/
 
 FLINT_DLL void _fq_trace(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
-
 FLINT_DLL void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
-FLINT_DLL void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
-                   const fq_ctx_t ctx);
-
+FLINT_DLL void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, const fq_ctx_t ctx);
 FLINT_DLL void fq_frobenius(fq_t rop, const fq_t op, slong e, const fq_ctx_t ctx);
 
 FLINT_DLL void _fq_norm(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
-
 FLINT_DLL void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
-
 
 /* Bit packing ******************************************************/
 
-FLINT_DLL void fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size,
-            const fq_ctx_t ctx);
+FLINT_DLL void fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size, const fq_ctx_t ctx);
 
-FLINT_DLL void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
-              const fq_ctx_t ctx);
+FLINT_DLL void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_ctx_t ctx);
 
 /* Inlines *******************************************************************/
 
@@ -452,4 +373,3 @@ FLINT_DLL void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx);
 #endif
 
 #endif
-

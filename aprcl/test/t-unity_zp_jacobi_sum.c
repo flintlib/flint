@@ -33,7 +33,7 @@ int main(void)
         fmpz_t n;
         unity_zp f, g;
         n_factor_t q_factors;
-        mp_ptr table;
+        ulong_ptr table;
 
         n_factor_init(&q_factors);
 
@@ -87,7 +87,7 @@ int main(void)
         fmpz_t n;
         unity_zp f, g;
         n_factor_t q_factors;
-        mp_ptr table;
+        ulong_ptr table;
 
         n_factor_init(&q_factors);
 
@@ -140,7 +140,7 @@ int main(void)
         fmpz_t n;
         unity_zp f, g;
         n_factor_t q_factors;
-        mp_ptr table;
+        ulong_ptr table;
 
         n_factor_init(&q_factors);
 

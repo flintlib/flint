@@ -94,4 +94,3 @@ FLINT_DLL void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mp
 #endif
 
 #endif
-

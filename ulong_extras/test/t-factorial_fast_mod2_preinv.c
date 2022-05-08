@@ -12,10 +12,10 @@
 #include "ulong_extras.h"
 
 
-static mp_limb_t
-n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
+static ulong
+n_factorial_mod2_foolproof(ulong n, ulong p, ulong pinv)
 {
-    mp_limb_t prod = UWORD(1) % p;
+    ulong prod = UWORD(1) % p;
 
     while (n)
     {
@@ -28,7 +28,7 @@ n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 
 int main(void)
 {
-    mp_limb_t n;
+    ulong n;
     int j;
 
     FLINT_TEST_INIT(state);    
@@ -38,7 +38,7 @@ int main(void)
 
     for (n = 0; n < 100 * flint_test_multiplier(); n++)
     {
-        mp_limb_t p, pinv, x, y;
+        ulong p, pinv, x, y;
 
         for (j = 0; j < 10; j++)
         {

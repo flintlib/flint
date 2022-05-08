@@ -10,12 +10,13 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpq.h"
 
 void
 _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
 {
-    mp_limb_t x = n_randlimb(state);
+    ulong x = n_randlimb(state);
 
     fmpz_randtest(num, state, bits);
 

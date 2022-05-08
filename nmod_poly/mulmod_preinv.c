@@ -13,11 +13,11 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
-                            mp_srcptr poly2, slong len2, mp_srcptr f,
-                            slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+void _nmod_poly_mulmod_preinv(ulong_ptr res, ulong_srcptr poly1, slong len1,
+                            ulong_srcptr poly2, slong len2, ulong_srcptr f,
+                            slong lenf, ulong_srcptr finv, slong lenfinv, nmod_t mod)
 {
-    mp_ptr T, Q;
+    ulong_ptr T, Q;
     slong lenT, lenQ;
 
     lenT = len1 + len2 - 1;
@@ -42,7 +42,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
                         const nmod_poly_t finv)
 {
     slong len1, len2, lenf;
-    mp_ptr fcoeffs;
+    ulong_ptr fcoeffs;
 
     lenf = f->length;
     len1 = poly1->length;
@@ -64,7 +64,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
     {
         if (f == res)
         {
-            fcoeffs = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * lenf);
+            fcoeffs = (ulong_ptr) flint_malloc(sizeof(ulong) * lenf);
             _NMOD_VEC_SET(fcoeffs, f->coeffs, lenf);
         } else
             fcoeffs = f->coeffs;

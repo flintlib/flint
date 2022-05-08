@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "flint-impl.h"
 
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  
@@ -18,11 +18,11 @@
    NOTE: 2n is not the same as 2b rounded up to nearest limb
 */
 static __inline__ int
-flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
-    flint_bitcnt_t b, mp_ptr tp)
+flint_mpn_mulmod_2expp1_internal(ulong_ptr xp, ulong_srcptr yp, ulong_srcptr zp,
+    flint_bitcnt_t b, ulong_ptr tp)
 {
     mp_size_t n, k;
-    mp_limb_t c;
+    ulong c;
 
     n = BITS_TO_LIMBS(b);
     k = GMP_NUMB_BITS * n - b;
@@ -42,7 +42,7 @@ flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     c = mpn_sublsh_nc (xp, tp, tp + n, n, k, c);
 #else
     {
-        mp_limb_t c1;
+        ulong c1;
         c1 = mpn_lshift (tp + n, tp + n, n, k);
         tp[n] |= c >> (GMP_NUMB_BITS - k);
         c = mpn_sub_n (xp, tp, tp + n, n) + c1;
@@ -55,8 +55,8 @@ flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
 
 /* c is the top bits of the inputs, must be fully reduced */
 int
-flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
-    flint_bitcnt_t b, mp_ptr tp)
+flint_mpn_mulmod_2expp1_basecase (ulong_ptr xp, ulong_srcptr yp, ulong_srcptr zp, int c,
+    flint_bitcnt_t b, ulong_ptr tp)
 {
     int cy, cz;
     mp_size_t n, k;

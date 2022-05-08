@@ -9,10 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
+#include "ulong_extras.h"
+#include "nmod.h"
+#include "nmod_poly.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_poly.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, 
@@ -51,7 +53,7 @@ void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden,
         slong lenG = len2;
 	ulong p;
         nmod_t mod;
-	mp_ptr pp1, pp2, gp;
+	ulong_ptr pp1, pp2, gp;
 
         fmpz_init(c1);
         fmpz_init(c2);
@@ -178,4 +180,3 @@ void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
         }
     }
 }
-

@@ -19,27 +19,10 @@
 #define FLINT_INLINE static __inline__
 #endif
 
-/* include GMP ****************************************************************/
+/* read configuration *********************************************************/
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include "gmp.h"
-#undef ulong
-
-#if __GNU_MP_VERSION < 5
-#error GMP 5.0.0 or MPIR 2.6.0 or later are required
-#endif
-
-/* handle number of bits ******************************************************/
-
-#if GMP_LIMB_BITS == 64
-#define FLINT_BITS 64
-#define FLINT_D_BITS 53
-#define FLINT64 1
-#else
-#define FLINT_BITS 32
-#define FLINT_D_BITS 31
-#endif
+#include <stddef.h>
+#include "flint-config.h"
 
 /* keywords *******************************************************************/
 
@@ -88,7 +71,6 @@
 
 /* include FLINT headers ******************************************************/
 
-#include "flint-config.h"
 #include "flint-types.h"
 #include "longlong.h"
 #include "exception.h"
@@ -122,20 +104,22 @@ extern char flint_version[];
 #if defined(_WIN64) || defined(__mips64)
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULLONG_MAX
-#define UWORD_MIN ULLONG_MIN
-#define WORD_MAX LLONG_MAX
-#define WORD_MIN LLONG_MIN
-#endif
 #else
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
+#endif
+
 #ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULONG_MAX
-#define UWORD_MIN ULONG_MIN
-#define WORD_MAX LONG_MAX
-#define WORD_MIN LONG_MIN
+#ifdef FLINT64
+#define UWORD_MAX   UWORD(18446744073709551615)
+#define UWORD_MIN   UWORD(0)
+#define WORD_MAX    WORD(9223372036854775807)
+#define WORD_MIN    WORD(0x8000000000000000)
+#else
+#define UWORD_MAX   UWORD(4294967295)
+#define UWORD_MIN   UWORD(0)
+#define WORD_MAX    WORD(2147483647)
+#define WORD_MIN    WORD(0x80000000)
 #endif
 #endif
 
@@ -185,8 +169,8 @@ FLINT_DLL extern const unsigned char __flint_clz_tab[128];
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
 FLINT_DLL int flint_printf(const char * str, ...);
@@ -197,6 +181,7 @@ FLINT_DLL int flint_sprintf(char * s, const char * str, ...);
 FLINT_DLL int flint_scanf(const char * str, ...);
 FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...);
 FLINT_DLL int flint_sscanf(const char * s, const char * str, ...);
+
 #endif
 
 /* memory handling ************************************************************/
@@ -225,10 +210,7 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 
     umul_ppmm(hi, lo, (ulong) x, (ulong) y);
     if (hi != 0 || lo > WORD_MAX)
-    {
-        flint_throw(FLINT_ALLOC,
-            "Overflow when allocating space for an %wd x %wd object.\n", x, y);
-    }
+        flint_throw(FLINT_ALLOC, "Overflow when allocating space for an %wd x %wd object.\n", x, y);
 
     return lo;
 }
@@ -237,9 +219,9 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 
 /* Beware when using the unsigned return value in signed arithmetic */
 static __inline__
-mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
+ulong FLINT_BIT_COUNT(ulong x)
 {
-   mp_limb_t zeros = FLINT_BITS;
+   ulong zeros = FLINT_BITS;
    if (x) count_leading_zeros(zeros, x);
    return FLINT_BITS - zeros;
 }
@@ -271,6 +253,10 @@ void flint_randinit(flint_rand_t state)
 #endif
 }
 
+FLINT_DLL void _flint_rand_init_gmp(flint_rand_t state);
+
+FLINT_DLL void flint_randclear(flint_rand_t state);
+
 FLINT_INLINE
 void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
 {
@@ -283,36 +269,6 @@ void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
 {
    *seed1 = state->__randval;
    *seed2 = state->__randval2;
-}
-
-
-FLINT_INLINE
-void _flint_rand_init_gmp(flint_rand_t state)
-{
-    if (!state->gmp_init)
-    {
-        gmp_randinit_default(state->gmp_state);
-        state->gmp_init = 1;
-    }
-}
-
-FLINT_INLINE
-void flint_randclear(flint_rand_t state)
-{
-    if (state->gmp_init)
-        gmp_randclear(state->gmp_state);
-}
-
-FLINT_INLINE
-flint_rand_s * flint_rand_alloc(void)
-{
-    return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
-}
-
-FLINT_INLINE
-void flint_rand_free(flint_rand_s * state)
-{
-    flint_free(state);
 }
 
 #ifdef __cplusplus

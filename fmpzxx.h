@@ -109,15 +109,15 @@ public:
     }
 
     // TODO would these make more sense static?
-    void set_ui_smod(mp_limb_t x, mp_limb_t m)
+    void set_ui_smod(ulong x, ulong m)
     {
         fmpz_set_ui_smod(this->_fmpz(), x, m);
     }
-    void set_uiui(mp_limb_t hi, mp_limb_t lo)
+    void set_uiui(ulong hi, ulong lo)
     {
         fmpz_set_uiui(this->_fmpz(), hi, lo);
     }
-    void neg_uiui(mp_limb_t hi, mp_limb_t lo)
+    void neg_uiui(ulong hi, ulong lo)
     {
         fmpz_neg_uiui(this->_fmpz(), hi, lo);
     }
@@ -583,7 +583,7 @@ sgn(const Fmpz& a)
 }
 
 template<class Fmpz>
-inline bool bit_pack(std::vector<mp_limb_t>& arr, flint_bitcnt_t bits,
+inline bool bit_pack(std::vector<ulong>& arr, flint_bitcnt_t bits,
         const Fmpz& coeff, flint_bitcnt_t shift = 0, int negate = 0,
         bool borrow = false,
         typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
@@ -713,7 +713,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_op, rdetail::fmpzxx_triple,
 
 namespace rdetail {
 template<class T> struct is_mplimb_t_vec
-    : mp::equal_types<T, std::vector<mp_limb_t> > { };
+    : mp::equal_types<T, std::vector<ulong> > { };
 }
 FLINT_DEFINE_FIVEARY_EXPR_COND5(fmpzxx_bit_unpack_op, rdetail::bool_fmpzxx_pair,
         rdetail::is_mplimb_t_vec, traits::fits_into_flint_bitcnt_t,
@@ -758,7 +758,7 @@ private:
     fmpz_combxx(const fmpz_combxx&);
 
 public:
-    fmpz_combxx(const std::vector<mp_limb_t>& v)
+    fmpz_combxx(const std::vector<ulong>& v)
     {
         fmpz_comb_init(comb, &v.front(), v.size());
         fmpz_comb_temp_init(tmp, comb);
@@ -777,7 +777,7 @@ public:
 // TODO make lazy somehow?
 template<class Fmpz>
 inline typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type
-multi_mod(std::vector<mp_limb_t>& out, const Fmpz& in, const fmpz_combxx& comb)
+multi_mod(std::vector<ulong>& out, const Fmpz& in, const fmpz_combxx& comb)
 {
     fmpz_multi_mod_ui(&out.front(), in.evaluate()._fmpz(),
             comb._comb(), comb._temp());
@@ -789,7 +789,7 @@ FLINT_DEFINE_FIVEARY_EXPR_COND5(CRT_op, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
         fmpz_CRT_ui(to._fmpz(), e1._fmpz(), e2._fmpz(), e3, e4, e5))
 
 FLINT_DEFINE_THREEARY_EXPR(multi_CRT_op, fmpzxx,
-        std::vector<mp_limb_t>, fmpz_combxx, bool,
+        std::vector<ulong>, fmpz_combxx, bool,
         fmpz_multi_CRT_ui(to._fmpz(), &e1.front(), e2._comb(), e2._temp(), e3))
 } // rules
 } // flint

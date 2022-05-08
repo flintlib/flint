@@ -13,7 +13,7 @@
 #include <math.h>
 #include "flint.h"
 
-mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
+ulong n_factor_power235(ulong_ptr exp, ulong n)
 {
    static char mod63[63] = {7,7,4,0,5,4,0,5,6,5,4,4,0,4,4,0,5,4,5,4,4,0,
                             5,4,0,5,4,6,7,4,0,4,4,0,4,6,7,5,4,0,4,4,0,5,
@@ -41,7 +41,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    if (t & 1) 
    {
       double x = sqrt((double) n);
-      mp_limb_t y = (mp_limb_t) (x + 0.5);
+      ulong y = (ulong) (x + 0.5);
       if (n == y * y)
       {
          *exp = 2;
@@ -52,7 +52,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    if (t & 2) 
    {
       double x = pow((double) n, 1.0 / 3.0);
-      mp_limb_t y = (mp_limb_t) (x + 0.5);
+      ulong y = (ulong) (x + 0.5);
       if (n == y * y * y)
       {
          *exp = 3;
@@ -63,7 +63,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    if (t & 4) 
    {
       double x = pow((double) n, 1.0 / 5.0);
-      mp_limb_t y = (mp_limb_t) (x + 0.5);
+      ulong y = (ulong) (x + 0.5);
       if (n == y * y * y * y * y)
       {
          *exp = 5;

@@ -68,15 +68,15 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 		                                        slong bits, int proved)
 {
     ulong exp;
-    mp_limb_t p;
+    ulong p;
     __mpz_struct * xsrc;
-    mp_ptr xd;
+    ulong_ptr xd;
     mp_size_t xsize;
     slong found;
     slong trial_stop;
     slong * idx;
     slong i, b, bits2, istride;
-    const mp_limb_t * primes;
+    const ulong * primes;
     int ret = 0;
 
     TMP_INIT;
@@ -111,7 +111,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
     /* Create a temporary copy to be mutated */
     TMP_START;
-    xd = TMP_ALLOC(xsize * sizeof(mp_limb_t));
+    xd = TMP_ALLOC(xsize * sizeof(ulong));
     FLINT_MPN_COPYI(xd, xsrc->_mp_d, xsize);
 
     /* Factor out powers of two */

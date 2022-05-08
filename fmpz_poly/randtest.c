@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void
 fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 

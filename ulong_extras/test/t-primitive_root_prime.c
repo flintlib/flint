@@ -22,7 +22,7 @@ int main(void)
     for (i = 0; i < 100; i++)
     {
         n_factor_t factors;
-        mp_limb_t p, root;
+        ulong p, root;
         double pinv;
         
         n_factor_init(&factors);

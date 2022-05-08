@@ -33,17 +33,17 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         mp_size_t total_limbs = n_randint(state, 1000) + 1;
-        mp_limb_t * in = flint_malloc(total_limbs*sizeof(mp_limb_t));
-        mp_limb_t * out = flint_calloc(total_limbs, sizeof(mp_limb_t));
+        ulong * in = flint_malloc(total_limbs*sizeof(ulong));
+        ulong * out = flint_calloc(total_limbs, sizeof(ulong));
         
         flint_bitcnt_t bits = n_randint(state, 200) + 1;
         mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
         slong length = (total_limbs*FLINT_BITS - 1)/bits + 1;
         
-        mp_limb_t ** poly;
-        poly = flint_malloc(length*sizeof(mp_limb_t *));
+        ulong ** poly;
+        poly = flint_malloc(length*sizeof(ulong *));
         for (j = 0; j < length; j++)
-           poly[j] = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+           poly[j] = flint_malloc((limbs + 1)*sizeof(ulong));
 
         flint_mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
 

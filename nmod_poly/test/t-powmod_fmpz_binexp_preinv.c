@@ -21,7 +21,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_vec.h"
@@ -41,7 +41,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         fmpz_t exp;
 
 	fmpz_init(exp);
@@ -90,7 +90,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         fmpz_t exp;
 
         fmpz_init(exp);
@@ -139,7 +139,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         fmpz_t exp;
 
         fmpz_init(exp);
@@ -189,7 +189,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, res2, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         fmpz_t exp;
 
 	fmpz_init(exp);

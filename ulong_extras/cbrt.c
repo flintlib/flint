@@ -13,12 +13,12 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t
-n_cbrt(mp_limb_t n)
+ulong
+n_cbrt(ulong n)
 {
     int bits;
     double val, x, xcub, num, den;
-    mp_limb_t ret, upper_limit;
+    ulong ret, upper_limit;
 
     /* Taking care of smaller roots */
 

@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "fft.h"
 
-void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
+void mpn_normmod_2expp1(ulong * t, mp_size_t limbs)
 {
    mp_limb_signed_t hi = t[limbs];
    

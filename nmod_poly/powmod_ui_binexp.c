@@ -16,10 +16,10 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly, 
-                                ulong e, mp_srcptr f, slong lenf, nmod_t mod)
+_nmod_poly_powmod_ui_binexp(ulong_ptr res, ulong_srcptr poly, 
+                                ulong e, ulong_srcptr f, slong lenf, nmod_t mod)
 {
-    mp_ptr T, Q;
+    ulong_ptr T, Q;
     slong lenT, lenQ;
     int i;
 
@@ -58,7 +58,7 @@ nmod_poly_powmod_ui_binexp(nmod_poly_t res,
                            const nmod_poly_t poly, ulong e,
                            const nmod_poly_t f)
 {
-    mp_ptr p;
+    ulong_ptr p;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;

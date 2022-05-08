@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len)
@@ -29,10 +28,10 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * 
     lenA = len;
     lenB = len - 1;
 
-    _fmpz_poly_content(a, pol, lenA);
+    _fmpz_vec_content(a, pol, lenA);
     _fmpz_vec_scalar_divexact_fmpz(A, pol, lenA, a);
     _fmpz_poly_derivative(B, A, lenA);
-    _fmpz_poly_content(b, B, lenB);
+    _fmpz_vec_content(b, B, lenB);
     _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
 
     fmpz_one(g);

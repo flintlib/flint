@@ -29,8 +29,8 @@ possible the following primitive datatype should be used:
     | bit counts, multiprecision             | mp_bitcnt_t                 |
     | byte counts (strings)                  | size_t                      |
     | limb counts in multiprecision integers | mp_size_t                   |
-    | limbs (unsigned/signed)                | mp_limb_t/ mp_limb_signed_t |
-    | mp_limb_t arrays                       | mp_ptr/ mp_srcptr           |
+    | limbs (unsigned/signed)                | ulong/ mp_limb_signed_t |
+    | ulong arrays                       | ulong_ptr/ ulong_srcptr           |
     | ui/ si function constants              | ulong/ slong                |
     | exponents (unsigned/signed)            | ulong/ slong                |
     | polynomial lengths                     | slong                       |
@@ -42,9 +42,9 @@ The typical definitions of these in terms of primitive types are:
 
     | mp_bitcnt_t   | ulong, or ulong long                                 |
     | mp_size_t     | long, or long long                                   |
-    | mp_limb_t     | ulong, or ulong long                                 |
-    | mp_ptr        | mp_limb_t *                                          |
-    | mp_srcptr     | const mp_limb_t *                                    |
+    | ulong     | ulong, or ulong long                                 |
+    | ulong_ptr        | ulong *                                          |
+    | ulong_srcptr     | const ulong *                                    |
     | slong         | long or long long                                    |
     | ulong         | ulong or ulong long                                  |
 

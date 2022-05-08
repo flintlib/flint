@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include <stdio.h>
 #include "padic_mat.h"
 
 int padic_mat_fprint_pretty(FILE * file, 
@@ -46,4 +46,3 @@ int padic_mat_fprint_pretty(FILE * file,
 
     return 1;
 }
-

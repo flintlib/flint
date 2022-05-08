@@ -10,12 +10,13 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpq.h"
 
 void
 _fmpq_mul_small(fmpz_t rnum, fmpz_t rden, slong op1num, ulong op1den, slong op2num, ulong op2den)
 {
-    mp_limb_t hi, lo, denhi, denlo;
+    ulong hi, lo, denhi, denlo;
     int neg;
 
     if (op1num == 0 || op2num == 0)

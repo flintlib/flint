@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpq.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void

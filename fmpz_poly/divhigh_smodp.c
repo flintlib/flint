@@ -10,7 +10,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
                                   const fmpz_poly_t g, const fmpz_t p, slong n)

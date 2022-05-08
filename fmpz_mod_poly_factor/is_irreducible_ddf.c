@@ -20,7 +20,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "fmpz_mod_poly.h"
 

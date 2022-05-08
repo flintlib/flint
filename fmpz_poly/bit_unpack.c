@@ -10,12 +10,12 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 #include "flint-impl.h"
 
 int
 _fmpz_poly_bit_unpack(fmpz * poly, slong len,
-                      mp_srcptr arr, flint_bitcnt_t bit_size, int negate)
+                      ulong_srcptr arr, flint_bitcnt_t bit_size, int negate)
 {
     flint_bitcnt_t bits = 0;
     mp_size_t limbs = 0;
@@ -43,7 +43,7 @@ _fmpz_poly_bit_unpack(fmpz * poly, slong len,
 
 void
 _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len,
-                               mp_srcptr arr, flint_bitcnt_t bit_size)
+                               ulong_srcptr arr, flint_bitcnt_t bit_size)
 {
     flint_bitcnt_t bits = 0;
     mp_size_t limbs = 0;

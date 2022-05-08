@@ -15,8 +15,8 @@
 #include "flint-impl.h"
 
 static void
-__nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA, 
-                             mp_srcptr B, slong lenB, nmod_t mod)
+__nmod_poly_div_divconquer(ulong_ptr Q, ulong_srcptr A, slong lenA, 
+                             ulong_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -27,11 +27,11 @@ __nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
         const slong n1 = lenA - lenB + 1;
         const slong n2 = lenB - n1;
 
-        mp_srcptr p1 = A + n2;
-        mp_srcptr d1 = B + n2;
+        ulong_srcptr p1 = A + n2;
+        ulong_srcptr d1 = B + n2;
         
-        mp_ptr V = _nmod_vec_init(n1 - 1 + NMOD_DIVREM_DC_ITCH(n1, mod));
-        mp_ptr W = V + NMOD_DIVREM_DC_ITCH(n1, mod);
+        ulong_ptr V = _nmod_vec_init(n1 - 1 + NMOD_DIVREM_DC_ITCH(n1, mod));
+        ulong_ptr W = V + NMOD_DIVREM_DC_ITCH(n1, mod);
 
         _nmod_poly_div_divconquer_recursive(Q, W, V, p1, d1, n1, mod);
 
@@ -39,8 +39,8 @@ __nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
     }
     else  /* lenA = 2 * lenB - 1 */
     {
-        mp_ptr V = _nmod_vec_init(lenB - 1 + NMOD_DIVREM_DC_ITCH(lenB, mod));
-        mp_ptr W = V + NMOD_DIVREM_DC_ITCH(lenB, mod);
+        ulong_ptr V = _nmod_vec_init(lenB - 1 + NMOD_DIVREM_DC_ITCH(lenB, mod));
+        ulong_ptr W = V + NMOD_DIVREM_DC_ITCH(lenB, mod);
  
         _nmod_poly_div_divconquer_recursive(Q, W, V, A, B, lenB, mod);
         
@@ -51,7 +51,7 @@ __nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
 
 /* needed due to partial overlap */
 static void
-_nmod_vec_sub_dec(mp_ptr a, mp_srcptr b, mp_srcptr c, slong n, nmod_t mod)
+_nmod_vec_sub_dec(ulong_ptr a, ulong_srcptr b, ulong_srcptr c, slong n, nmod_t mod)
 {
     slong i;
 
@@ -60,8 +60,8 @@ _nmod_vec_sub_dec(mp_ptr a, mp_srcptr b, mp_srcptr c, slong n, nmod_t mod)
 }
 
 void
-_nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
-                             mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_div_divconquer(ulong_ptr Q, ulong_srcptr A, slong lenA,
+                             ulong_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA <= 2 * lenB - 1)
     {
@@ -69,7 +69,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
     }
     else  /* lenA > 2 * lenB - 1 */
     {
-        mp_ptr S, T, V, R;
+        ulong_ptr S, T, V, R;
         slong shift, next, n = 2 * lenB - 1;
 
         S = _nmod_vec_init(2 * n + (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod));
@@ -103,7 +103,7 @@ nmod_poly_div_divconquer(nmod_poly_t Q,
                             const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ;
-    mp_ptr q;
+    ulong_ptr q;
     slong Alen, Blen;
 
     Blen = B->length;

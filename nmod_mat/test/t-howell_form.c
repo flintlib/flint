@@ -25,8 +25,8 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     slong i, j, r;
     int numberpivots = 0;
     int prevrowzero = 0;
-    mp_ptr extra_row;
-    mp_limb_t g;
+    ulong_ptr extra_row;
+    ulong g;
 
     if (nmod_mat_is_zero(A))
         return 1;
@@ -159,11 +159,11 @@ main(void)
     for (i = 0; i < 10000*flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, D;
-        mp_limb_t mod;
+        ulong mod;
         slong j, k, m, n, r1, r2;
         slong *perm;
         int equal;
-        mp_limb_t c;
+        ulong c;
 
         mod = n_randtest_not_zero(state);
 

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 static __inline__ ulong rfac(ulong x, ulong b)
 {

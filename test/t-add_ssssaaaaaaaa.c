@@ -23,7 +23,7 @@ int main(void)
 
     for (i = 0; i < 1000000; i++)
     {
-        mp_limb_t s[4], t[4], a[4], b[4];
+        ulong s[4], t[4], a[4], b[4];
 
         for (j = 0; j < 4; j++)
         {

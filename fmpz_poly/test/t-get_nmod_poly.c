@@ -33,7 +33,7 @@ main(void)
         fmpz_poly_t A;
         nmod_poly_t M, M2;
         slong length;
-        mp_limb_t mod;
+        ulong mod;
 
         length = n_randint(state, 50);
 

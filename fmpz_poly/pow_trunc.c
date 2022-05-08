@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "flint-impl.h"
 
@@ -146,7 +145,7 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong n)
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];
-        FLINT_MPN_ZERO((mp_ptr) copy + poly->length, n - poly->length);
+        FLINT_MPN_ZERO((ulong_ptr) copy + poly->length, n - poly->length);
         clear = 1;
     }
 

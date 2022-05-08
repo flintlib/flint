@@ -30,7 +30,7 @@ main(void)
     {
         slong len;
         nmod_t mod;
-        mp_limb_t m;
+        ulong m;
         int limbs1, limbs2;
         mpz_t t;
 

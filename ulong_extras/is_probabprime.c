@@ -19,15 +19,15 @@
     Currently it acts as such all the way up to 2^64.
 */
 
-int n_is_probabprime(mp_limb_t n)
+int n_is_probabprime(ulong n)
 {
-    mp_limb_t d;
+    ulong d;
     unsigned int norm;
     int isprime;
 #if FLINT64
     double npre;
 #else
-    mp_limb_t ninv;
+    ulong ninv;
 #endif
 
     if (n <= UWORD(1)) return 0;

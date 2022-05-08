@@ -12,18 +12,18 @@
 #include "flint-impl.h"
 #include "ulong_extras.h"
 
-static int is_prime(mp_limb_t n, int proved)
+static int is_prime(ulong n, int proved)
 {
     return proved ? n_is_prime(n) : n_is_probabprime(n);
 }
 
-void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
+void n_factor(n_factor_t * factors, ulong n, int proved)
 {
     ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
     ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
     ulong factors_left;
     ulong exp;
-    mp_limb_t cofactor, factor, cutoff;
+    ulong cofactor, factor, cutoff;
 
     cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
     if (cofactor == UWORD(1))

@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "flint-impl.h"
+#include "fmpz_poly.h"
 
 #define FLINT_REVERSE_NEWTON_CUTOFF 10
 

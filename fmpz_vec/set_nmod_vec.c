@@ -12,7 +12,7 @@
 #include "fmpz.h"
 
 void
-_fmpz_vec_set_nmod_vec(fmpz * res, mp_srcptr poly, slong len, nmod_t mod)
+_fmpz_vec_set_nmod_vec(fmpz * res, ulong_srcptr poly, slong len, nmod_t mod)
 {
     slong i;
         

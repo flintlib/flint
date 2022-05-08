@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len, 

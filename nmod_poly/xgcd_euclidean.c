@@ -15,9 +15,9 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T, 
-                               mp_srcptr A, slong lenA, 
-                               mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_xgcd_euclidean(ulong_ptr G, ulong_ptr S, ulong_ptr T, 
+                               ulong_srcptr A, slong lenA, 
+                               ulong_srcptr B, slong lenB, nmod_t mod)
 {
     FLINT_MPN_ZERO(G, lenB);
     FLINT_MPN_ZERO(S, lenB - 1);
@@ -31,7 +31,7 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
     }
     else
     {
-        mp_ptr Q, R;
+        ulong_ptr Q, R;
         slong lenQ, lenR, lenG;
 
         Q = _nmod_vec_init(2 * lenA);
@@ -49,7 +49,7 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
         }
         else
         {
-            mp_ptr D, U, V1, V3, W;
+            ulong_ptr D, U, V1, V3, W;
             slong lenD, lenU, lenV1, lenV3, lenW;
 
             W  = _nmod_vec_init(FLINT_MAX(5 * lenB, lenA + lenB));
@@ -84,7 +84,7 @@ slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
 
                 MPN_SWAP(U, lenU, V1, lenV1);
                 {
-                    mp_ptr __t;
+                    ulong_ptr __t;
                     slong __tn;
 
                     __t = D;
@@ -132,7 +132,7 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     else  /* lenA >= lenB >= 0 */
     {
         const slong lenA = A->length, lenB = B->length;
-        mp_limb_t inv;
+        ulong inv;
 
         if (lenA == 0)  /* lenA = lenB = 0 */
         {
@@ -158,7 +158,7 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else  /* lenA >= lenB >= 2 */
         {
-            mp_ptr g, s, t;
+            ulong_ptr g, s, t;
             slong lenG;
 
             if (G == A || G == B)

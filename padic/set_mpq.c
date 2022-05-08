@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "padic.h"
 
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
@@ -20,4 +21,3 @@ void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
     padic_set_fmpq(rop, t, ctx);
     fmpq_clear(t);
 }
-

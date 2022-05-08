@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-    mp_limb_t * primes;
-    mp_limb_t * residues;
+    ulong * primes;
+    ulong * residues;
 
     slong num_primes;
 
@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
 
     fmpz_set_str(x, argv[1], 10);
 
-    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
-    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
+    primes = flint_malloc(num_primes * sizeof(ulong));
+    residues = flint_malloc(num_primes * sizeof(ulong));
 
     primes[0] = 2;
     for (i = 1; i < num_primes; i++)

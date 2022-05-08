@@ -31,7 +31,7 @@ main(void)
     {
         nmod_poly_t poly1, poly, q, r, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead;
+        ulong modulus, lead;
         slong i, j, length, num;
         slong exp[5];
 

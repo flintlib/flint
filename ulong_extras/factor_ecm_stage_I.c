@@ -12,10 +12,10 @@
 #include "ulong_extras.h"
 
 int
-n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
-                     mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_stage_I(ulong_ptr f, ulong_srcptr prime_array, ulong num,
+                     ulong B1, ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t times;
+    ulong times;
     int i, j, p;
 
     for (i = 0; i < num; i++)

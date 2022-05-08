@@ -15,7 +15,7 @@ static int _hlift_quartic2(
     slong m,
     nmod_mpoly_struct * f,
     slong r,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const nmod_mpoly_t A,
     const slong * degs,
     const nmod_mpoly_ctx_t ctx)
@@ -139,7 +139,7 @@ static int _hlift_quartic(
     slong m,
     nmod_mpoly_struct * f,
     slong r,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const nmod_mpoly_t A,
     const slong * degs,
     const nmod_mpoly_ctx_t ctx)
@@ -319,7 +319,7 @@ static int _hlift_quintic(
     slong m,
     nmod_mpoly_struct * f,
     slong r,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const nmod_mpoly_t A,
     const slong * degs,
     const nmod_mpoly_ctx_t ctx)
@@ -424,7 +424,7 @@ int nmod_mpoly_hlift(
     slong m,
     nmod_mpoly_struct * f, /* length r */
     slong r,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const nmod_mpoly_t A,
     const slong * degs,
     const nmod_mpoly_ctx_t ctx)

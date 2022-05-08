@@ -8,7 +8,7 @@ Split/combine FFT coefficients
 --------------------------------------------------------------------------------
 
 
-.. function:: mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs, mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
+.. function:: mp_size_t fft_split_limbs(ulong ** poly, ulong_srcptr limbs, mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 
     Split an integer ``(limbs, total_limbs)`` into coefficients of length
     ``coeff_limbs`` limbs and store as the coefficients of ``poly``
@@ -18,7 +18,7 @@ Split/combine FFT coefficients
     is returned by the function and any coefficients beyond this point are
     not touched.
 
-.. function:: mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs, mp_size_t total_limbs, flint_bitcnt_t bits, mp_size_t output_limbs)
+.. function:: mp_size_t fft_split_bits(ulong ** poly, ulong_srcptr limbs, mp_size_t total_limbs, flint_bitcnt_t bits, mp_size_t output_limbs)
 
     Split an integer ``(limbs, total_limbs)`` into coefficients of the 
     given number of ``bits`` and store as the coefficients of ``poly`` 
@@ -28,7 +28,7 @@ Split/combine FFT coefficients
     is returned by the function and any coefficients beyond this point are 
     not touched. 
 
-.. function:: void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
+.. function:: void fft_combine_limbs(ulong * res, ulong ** poly, slong length, mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 
     Evaluate the polynomial ``poly`` of the given ``length`` at 
     ``B^coeff_limbs``, where ``B = 2^FLINT_BITS``, and add the 
@@ -40,7 +40,7 @@ Split/combine FFT coefficients
     If the integer is initially zero the result will just be the evaluation 
     of the polynomial.
 
-.. function:: void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, flint_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
+.. function:: void fft_combine_bits(ulong * res, ulong ** poly, slong length, flint_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 
     Evaluate the polynomial ``poly`` of the given ``length`` at
     ``2^bits`` and add the result to the integer
@@ -55,7 +55,7 @@ Test helper functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
+.. function:: void fermat_to_mpz(mpz_t m, ulong * i, mp_size_t limbs)
 
     Convert the Fermat number ``(i, limbs)`` modulo ``B^limbs + 1`` to
     an ``mpz_t m``. Assumes ``m`` has been initialised. This function 
@@ -66,20 +66,20 @@ Arithmetic modulo a generalised Fermat number
 --------------------------------------------------------------------------------
 
 
-.. function:: void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
+.. function:: void mpn_addmod_2expp1_1(ulong * r, mp_size_t limbs, mp_limb_signed_t c)
 
     Adds the signed limb ``c`` to the generalised Fermat number ``r``
     modulo ``B^limbs + 1``. The compiler should be able to inline
     this for the case that there is no overflow from the first limb.
 
-.. function:: void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
+.. function:: void mpn_normmod_2expp1(ulong * t, mp_size_t limbs)
 
     Given ``t`` a signed integer of ``limbs + 1`` limbs in twos
     complement format, reduce ``t`` to the corresponding value modulo the
     generalised Fermat number ``B^limbs + 1``, where
     ``B = 2^FLINT_BITS``.
 
-.. function:: void mpn_mul_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flint_bitcnt_t d)
+.. function:: void mpn_mul_2expmod_2expp1(ulong * t, ulong * i1, mp_size_t limbs, flint_bitcnt_t d)
 
     Given ``i1`` a signed integer of ``limbs + 1`` limbs in twos
     complement format reduced modulo ``B^limbs + 1`` up to some
@@ -87,7 +87,7 @@ Arithmetic modulo a generalised Fermat number
     necessarily be fully reduced. The number of bits ``d`` must be
     nonnegative and less than ``FLINT_BITS``. Aliasing is permitted.
 
-.. function:: void mpn_div_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flint_bitcnt_t d)
+.. function:: void mpn_div_2expmod_2expp1(ulong * t, ulong * i1, mp_size_t limbs, flint_bitcnt_t d)
 
     Given ``i1`` a signed integer of ``limbs + 1`` limbs in twos
     complement format reduced modulo ``B^limbs + 1`` up to some
@@ -101,21 +101,21 @@ Generic butterflies
 --------------------------------------------------------------------------------
 
 
-.. function:: void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
+.. function:: void fft_adjust(ulong * r, ulong * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 
     Set ``r`` to ``i1`` times `z^i` modulo ``B^limbs + 1`` where
     `z` corresponds to multiplication by `2^w`. This can be thought of as part
     of a butterfly operation. We require `0 \leq i < n` where `nw =`
     ``limbs*FLINT_BITS``. Aliasing is not supported.
 
-.. function:: void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
+.. function:: void fft_adjust_sqrt2(ulong * r, ulong * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, ulong * temp)
 
     Set ``r`` to ``i1`` times `z^i` modulo ``B^limbs + 1`` where
     `z` corresponds to multiplication by `\sqrt{2}^w`. This can be thought of
     as part of a butterfly operation. We require `0 \leq i < 2*n` and odd
     where `nw =` ``limbs*FLINT_BITS``.
 
-.. function:: void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+.. function:: void butterfly_lshB(ulong * t, ulong * u, ulong * i1, ulong * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
     We are given two integers ``i1`` and ``i2`` modulo
     ``B^limbs + 1`` which are not necessarily normalised. We compute
@@ -123,7 +123,7 @@ Generic butterflies
     between inputs and outputs is not permitted. We require ``x`` and
     ``y`` to be less than ``limbs`` and nonnegative.
 
-.. function:: void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+.. function:: void butterfly_rshB(ulong * t, ulong * u, ulong * i1, ulong * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
     We are given two integers ``i1`` and ``i2`` modulo
     ``B^limbs + 1`` which are not necessarily normalised. We compute
@@ -136,21 +136,21 @@ Radix 2 transforms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
+.. function:: void fft_butterfly(ulong * s, ulong * t, ulong * i1, ulong * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 
     Set ``s = i1 + i2``, ``t = z1^i*(i1 - i2)`` modulo
     ``B^limbs + 1`` where ``z1 = exp(Pi*I/n)`` corresponds to
     multiplication by `2^w`. Requires `0 \leq i < n` where `nw =`
     ``limbs*FLINT_BITS``.
 
-.. function:: void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
+.. function:: void ifft_butterfly(ulong * s, ulong * t, ulong * i1, ulong * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 
     Set ``s = i1 + z1^i*i2``, ``t = i1 -  z1^i*i2`` modulo
     ``B^limbs + 1`` where\\ ``z1 = exp(-Pi*I/n)`` corresponds to
     division by `2^w`. Requires `0 \leq i < 2n` where `nw =`
     ``limbs*FLINT_BITS``.
 
-.. function:: void fft_radix2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+.. function:: void fft_radix2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2)
 
     The radix 2 DIF FFT works as follows:
 
@@ -188,7 +188,7 @@ Radix 2 transforms
     We require `nw` to be at least 64 and the two temporary space pointers to
     point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void fft_truncate(mp_limb_t ** ii,  mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+.. function:: void fft_truncate(ulong ** ii,  mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t trunc)
 
     As for ``fft_radix2`` except that only the first ``trunc``
     coefficients of the output are computed and the input is regarded as
@@ -197,13 +197,13 @@ Radix 2 transforms
     space, but their value is irrelevant. The value of ``trunc`` must be
     divisible by 2.
 
-.. function:: void fft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+.. function:: void fft_truncate1(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t trunc)
 
     As for ``fft_radix2`` except that only the first ``trunc``
     coefficients of the output are computed. The transform still needs all
     `2n` input coefficients to be specified.
 
-.. function:: void ifft_radix2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+.. function:: void ifft_radix2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2)
 
     The radix 2 DIF IFFT works as follows:
 
@@ -239,7 +239,7 @@ Radix 2 transforms
     We require `nw` to be at least 64 and the two temporary space pointers
     to point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void ifft_truncate(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+.. function:: void ifft_truncate(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t trunc)
 
     As for ``ifft_radix2`` except that the output is assumed to have
     zeros from coefficient trunc onwards and only the first trunc
@@ -261,7 +261,7 @@ Radix 2 transforms
     up to ``trunc`` being careful to note that this involves doubling the
     coefficients from ``trunc - n`` up to ``n``.
 
-.. function:: void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+.. function:: void ifft_truncate1(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t trunc)
 
     Computes the first ``trunc`` coefficients of the radix 2 inverse
     transform assuming the first ``trunc`` coefficients are given and that
@@ -272,7 +272,7 @@ Radix 2 transforms
     coefficients from ``trunc`` onwards after the inverse transform are
     not inferred to be zero but the supplied values.
 
-.. function:: void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
+.. function:: void fft_butterfly_sqrt2(ulong * s, ulong * t, ulong * i1, ulong * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, ulong * temp)
 
     Let `w = 2k + 1`, `i = 2j + 1`. Set ``s = i1 + i2``, 
     ``t = z1^i*(i1 - i2)`` modulo ``B^limbs + 1`` where 
@@ -286,7 +286,7 @@ Radix 2 transforms
     We first multiply by ``2^(j + ik + wn/4)`` then multiply by an
     additional ``2^(nw/2)`` and subtract.
 
-.. function:: void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
+.. function:: void ifft_butterfly_sqrt2(ulong * s, ulong * t, ulong * i1, ulong * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, ulong * temp)
 
     Let `w = 2k + 1`, `i = 2j + 1`. Set ``s = i1 + z1^i*i2``,
     ``t = i1 - z1^i*i2`` modulo ``B^limbs + 1`` where 
@@ -306,7 +306,7 @@ Radix 2 transforms
     We first multiply by ``2^(2*wn - j - ik - 1 + wn/4)`` then multiply by 
     an additional ``2^(nw/2)`` and subtract.
 
-.. function:: void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
+.. function:: void fft_truncate_sqrt2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t trunc)
 
     As per ``fft_truncate`` except that the transform is twice the usual 
     length, i.e. length `4n` rather than `2n`. This is achieved by making use 
@@ -316,7 +316,7 @@ Radix 2 transforms
     We require `nw` to be at least 64 and the three temporary space pointers 
     to point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
+.. function:: void ifft_truncate_sqrt2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t trunc)
 
     As per ``ifft_truncate`` except that the transform is twice the usual
     length, i.e. length `4n` instead of `2n`. This is achieved by making use 
@@ -331,7 +331,7 @@ Matrix Fourier Transforms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
+.. function:: void fft_butterfly_twiddle(ulong * u, ulong * v, ulong * s, ulong * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
 
     Set ``u = 2^b1*(s + t)``, ``v = 2^b2*(s - t)`` modulo 
     ``B^limbs + 1``. This is used to compute 
@@ -340,7 +340,7 @@ Matrix Fourier Transforms
     with additional twiddles by ``z1^rc`` for row `r` and column `c` of the 
     matrix of coefficients. Aliasing is not allowed.
 
-.. function:: void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
+.. function:: void ifft_butterfly_twiddle(ulong * u, ulong * v, ulong * s, ulong * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
 
     Set ``u = s/2^b1 + t/2^b1)``, ``v = s/2^b1 - t/2^b1`` modulo 
     ``B^limbs + 1``. This is used to compute 
@@ -350,7 +350,7 @@ Matrix Fourier Transforms
     by ``z1^(-rc)`` for row `r` and column `c` of the matrix of 
     coefficients. Aliasing is not allowed.
 
-.. function:: void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
+.. function:: void fft_radix2_twiddle(ulong ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
 
     As for ``fft_radix2`` except that the coefficients are spaced by 
     ``is`` in the array ``ii`` and an additional twist by ``z^c*i``
@@ -358,7 +358,7 @@ Matrix Fourier Transforms
     ``rs`` as one moves from one coefficient to the next. Here ``z`` 
     corresponds to multiplication by ``2^ws``. 
 
-.. function:: void ifft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
+.. function:: void ifft_radix2_twiddle(ulong ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
 
     As for ``ifft_radix2`` except that the coefficients are spaced by 
     ``is`` in the array ``ii`` and an additional twist by 
@@ -366,17 +366,17 @@ Matrix Fourier Transforms
     and increases by ``rs`` as one moves from one coefficient to the next. 
     Here ``z`` corresponds to multiplication by ``2^ws``. 
 
-.. function:: void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
+.. function:: void fft_truncate1_twiddle(ulong ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 
     As per ``fft_radix2_twiddle`` except that the transform is truncated 
     as per\\ ``fft_truncate1``.
 
-.. function:: void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
+.. function:: void ifft_truncate1_twiddle(ulong ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 
     As per ``ifft_radix2_twiddle`` except that the transform is truncated
     as per\\ ``ifft_truncate1``.
 
-.. function:: void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+.. function:: void fft_mfa_truncate_sqrt2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc)
 
     This is as per the ``fft_truncate_sqrt2`` function except that the 
     matrix fourier algorithm is used for the left and right FFTs. The total 
@@ -418,7 +418,7 @@ Matrix Fourier Transforms
     We require `nw` to be at least 64 and the three temporary space pointers 
     to point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+.. function:: void ifft_mfa_truncate_sqrt2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc)
 
     This is as per the ``ifft_truncate_sqrt2`` function except that the 
     matrix fourier algorithm is used for the left and right IFFTs. The total 
@@ -436,16 +436,16 @@ Matrix Fourier Transforms
     We require `nw` to be at least 64 and the three temporary space pointers 
     to point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+.. function:: void fft_mfa_truncate_sqrt2_outer(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc)
 
     Just the outer layers of ``fft_mfa_truncate_sqrt2``.
 
-.. function:: void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
+.. function:: void fft_mfa_truncate_sqrt2_inner(ulong ** ii, ulong ** jj, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc, ulong * tt)
 
     The inner layers of ``fft_mfa_truncate_sqrt2`` and 
     ``ifft_mfa_truncate_sqrt2`` combined with pointwise mults.
 
-.. function:: void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+.. function:: void ifft_mfa_truncate_sqrt2_outer(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc)
 
     The outer layers of ``ifft_mfa_truncate_sqrt2`` combined with
     normalisation.
@@ -455,7 +455,7 @@ Negacyclic multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
+.. function:: void fft_negacyclic(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp)
 
     As per ``fft_radix2`` except that it performs a sqrt2 negacyclic 
     transform of length `2n`. This is the same as the radix 2 transform 
@@ -465,7 +465,7 @@ Negacyclic multiplication
     We require `nw` to be at least 64 and the two temporary space pointers to
     point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
+.. function:: void ifft_negacyclic(ulong ** ii, mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2, ulong ** temp)
 
     As per ``ifft_radix2`` except that it performs a sqrt2 negacyclic 
     inverse transform of length `2n`. This is the same as the radix 2 inverse
@@ -475,13 +475,13 @@ Negacyclic multiplication
     We require `nw` to be at least 64 and the two temporary space pointers to
     point to blocks of size ``n*w + FLINT_BITS`` bits.
 
-.. function:: void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_size_t m)
+.. function:: void fft_naive_convolution_1(ulong * r, ulong * ii, ulong * jj, mp_size_t m)
 
     Performs a naive negacyclic convolution of ``ii`` with ``jj``, 
     both of length `m` and sets `r` to the result. This is essentially 
     multiplication of polynomials modulo `x^m + 1`.
 
-.. function:: void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, mp_size_t r_limbs, flint_bitcnt_t depth, flint_bitcnt_t w)
+.. function:: void _fft_mulmod_2expp1(ulong * r1, ulong * i1, ulong * i2, mp_size_t r_limbs, flint_bitcnt_t depth, flint_bitcnt_t w)
 
     Multiply ``i1`` by ``i2`` modulo ``B^r_limbs + 1`` where 
     ``r_limbs = nw/FLINT_BITS`` with ``n = 2^depth``. Uses the 
@@ -496,7 +496,7 @@ Negacyclic multiplication
     necessary to make this adjustment if 
     ``limbs > FFT_MULMOD_2EXPP1_CUTOFF``.
 
-.. function:: void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, mp_size_t n, mp_size_t w, mp_limb_t * tt)
+.. function:: void fft_mulmod_2expp1(ulong * r, ulong * i1, ulong * i2, mp_size_t n, mp_size_t w, ulong * tt)
 
     As per ``_fft_mulmod_2expp1`` but with a tuned cutoff below which more 
     classical methods are used for the convolution. The temporary space is 
@@ -510,7 +510,7 @@ Integer multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
+.. function:: void mul_truncate_sqrt2(ulong_ptr r1, ulong_srcptr i1, mp_size_t n1, ulong_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 
     Integer multiplication using the radix 2 truncated sqrt2 transforms. 
 
@@ -525,7 +525,7 @@ Integer multiplication
 
     If ``n = 2^depth`` then we require `nw` to be at least 64.
 
-.. function:: void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
+.. function:: void mul_mfa_truncate_sqrt2(ulong_ptr r1, ulong_srcptr i1, mp_size_t n1, ulong_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 
     As for ``mul_truncate_sqrt2`` except that the cache friendly matrix
     fourier algorithm is used.
@@ -533,7 +533,7 @@ Integer multiplication
     If ``n = 2^depth`` then we require `nw` to be at least 64. Here we
     also require `w` to be `2^i` for some `i \geq 0`. 
 
-.. function:: void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2)
+.. function:: void flint_mpn_mul_fft_main(ulong_ptr r1, ulong_srcptr i1, mp_size_t n1, ulong_srcptr i2, mp_size_t n2)
 
     The main integer multiplication routine. Sets ``(r1, n1 + n2)`` to
     ``(i1, n1)`` times ``(i2, n2)``. We require ``n1 >= n2 > 0``.
@@ -543,7 +543,7 @@ Convolution
 --------------------------------------------------------------------------------
 
 
-.. function:: void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt)
+.. function:: void fft_convolution(ulong ** ii, ulong ** jj, slong depth, slong limbs, slong trunc, ulong ** t1, ulong ** t2, ulong ** s1, ulong * tt)
 
     Perform an FFT convolution of ``ii`` with ``jj``, both of length 
     ``4*n`` where ``n = 2^depth``. Assume that all but the first 
@@ -557,12 +557,12 @@ FFT Precaching
 -------------------------------------------------------------------------------
 
 
-.. function:: void fft_precache(mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1)
+.. function:: void fft_precache(ulong ** jj, slong depth, slong limbs, slong trunc, ulong ** t1, ulong ** t2, ulong ** s1)
 
     Precompute the FFT of ``jj`` for use with precache functions. The
     parameters are as for ``fft_convolution``.
     
-.. function:: void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+.. function:: void fft_convolution_precache(ulong ** ii, ulong ** jj, slong depth, slong limbs, slong trunc, ulong ** t1, ulong ** t2, ulong ** s1, ulong ** tt)
 
     As per ``fft_convolution`` except that it is assumed ``fft_precache`` has
     been called on ``jj`` with the same parameters. This will then run faster

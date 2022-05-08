@@ -9,11 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 /* counts zero bits in the binary representation of e */
 static int
-n_zerobits(mp_limb_t e)
+n_zerobits(ulong e)
 {
     int zeros = 0;
 
@@ -29,10 +32,10 @@ n_zerobits(mp_limb_t e)
 static slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
-    mp_limb_t hi, lo;
+    ulong hi, lo;
     umul_ppmm(hi, lo, poly_len - 1, exp);
     add_ssaaaa(hi, lo, hi, lo, 0, 1);
-    if (hi != 0 || lo > (mp_limb_t) WORD_MAX)
+    if (hi != 0 || lo > (ulong) WORD_MAX)
         return trunc;
     return FLINT_MIN((slong) lo, trunc);
 }

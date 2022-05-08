@@ -20,5 +20,5 @@ _mpfr_vec_randtest(mpfr_ptr f, flint_rand_t state, slong len)
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < len; i++)
-        mpfr_urandomb(f + i, state->gmp_state);
+        mpfr_urandomb(f + i, (__gmp_randstate_struct *) state->gmp_state);
 }

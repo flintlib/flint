@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_q.h"
+#include "flint.h"
 
 void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2)
 {

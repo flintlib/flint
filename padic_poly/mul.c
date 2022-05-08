@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "padic_poly.h"
 
 void _padic_poly_mul(fmpz *rop, slong *rval, slong N, 
@@ -74,4 +75,3 @@ void padic_poly_mul(padic_poly_t f,
         _padic_poly_normalise(f);
     }
 }
-

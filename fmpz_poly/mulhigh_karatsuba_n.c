@@ -16,7 +16,6 @@
 #  include <string.h>
 # endif
 #endif
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,

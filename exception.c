@@ -59,7 +59,7 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
             printf("General error");
             break;
         case FLINT_ALLOC:
-            printf("Allocation error");
+            printf("Allocation failed");
             break;
         case FLINT_MEMMGR:
             printf("Memory manager error");

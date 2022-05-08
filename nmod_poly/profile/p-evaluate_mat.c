@@ -33,7 +33,7 @@ main()
     int result;
     nmod_mat_t A, B, C;
     nmod_poly_t poly;
-    mp_limb_t n = n_randtest_not_zero(state);
+    ulong n = n_randtest_not_zero(state);
     clock_t horner_begin, paterson_begin;
     double horner_time, paterson_time;
 

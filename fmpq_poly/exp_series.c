@@ -38,6 +38,7 @@
 #include "flint-impl.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
@@ -130,7 +131,7 @@ void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
 {
     slong k;
     ulong v, c, d;
-    mp_ptr divisors;
+    ulong_ptr divisors;
     fmpz_t t, u;
     TMP_INIT;
 

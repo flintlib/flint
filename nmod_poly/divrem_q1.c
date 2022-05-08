@@ -9,14 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, 
-                          mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+void _nmod_poly_divrem_q1(ulong_ptr Q, ulong_ptr R, 
+                          ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,
                           nmod_t mod)
 {
-    const mp_limb_t invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
+    const ulong invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
 
     if (lenB == 1)
     {
@@ -24,7 +25,7 @@ void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R,
     }
     else
     {
-        mp_limb_t t;
+        ulong t;
 
         Q[1] = n_mulmod2_preinv(A[lenA-1], invL, mod.n, mod.ninv);
         t = n_mulmod2_preinv(Q[1], B[lenB-2], mod.n, mod.ninv);

@@ -20,7 +20,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
 {
     slong nz;
     int i, j;
-    mp_limb_t inv;
+    ulong inv;
 
     fmpz_init(fq_nmod_ctx_prime(ctx));
     fmpz_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
@@ -41,7 +41,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
 
     ctx->len = nz;
     ctx->a = _nmod_vec_init(ctx->len);
-    ctx->j = flint_malloc(ctx->len * sizeof(mp_limb_t));
+    ctx->j = flint_malloc(ctx->len * sizeof(ulong));
 
     inv = n_invmod(modulus->coeffs[modulus->length - 1], ctx->mod.n);
 

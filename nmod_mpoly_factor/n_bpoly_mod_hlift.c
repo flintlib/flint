@@ -15,7 +15,7 @@ int n_bpoly_mod_hlift2_cubic(
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_t B0,
     n_bpoly_t B1,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     nmod_eval_interp_t E,
@@ -199,7 +199,7 @@ int n_bpoly_mod_hlift2(
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_t B0,
     n_bpoly_t B1,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     n_poly_bpoly_stack_t St)
@@ -330,7 +330,7 @@ int n_bpoly_mod_hlift_cubic(
     slong r,
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_struct * B,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     nmod_eval_interp_t E,
@@ -573,7 +573,7 @@ int n_bpoly_mod_hlift(
     slong r,
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_struct * B,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     n_poly_bpoly_stack_t St)

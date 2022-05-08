@@ -12,11 +12,11 @@
 
 #include "nmod_poly.h"
 
-void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong lenA, 
-                                     mp_srcptr B, slong lenB, nmod_t mod)
+void _nmod_poly_div_newton(ulong_ptr Q, ulong_srcptr A, slong lenA, 
+                                     ulong_srcptr B, slong lenB, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
-    mp_ptr Arev, Brev;
+    ulong_ptr Arev, Brev;
 
     Arev = _nmod_vec_init(lenQ + FLINT_MIN(lenB, lenQ));
     Brev = Arev + lenQ;
@@ -39,7 +39,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
 
-    mp_ptr q;
+    ulong_ptr q;
 
     if (lenB == 0)
     {
@@ -60,7 +60,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Q == A || Q == B)
     {
-        q = flint_malloc(lenQ * sizeof(mp_limb_t));
+        q = flint_malloc(lenQ * sizeof(ulong));
     }
     else
     {

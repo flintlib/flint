@@ -35,7 +35,7 @@ main(void)
 {
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, m2a, m2b, mn1;
-    mp_limb_t * nn1, * r1;
+    ulong * nn1, * r1;
    
     FLINT_TEST_INIT(state);
 
@@ -65,8 +65,8 @@ main(void)
                 {
                     set_p(p, n, w);
                     
-                    nn1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
-                    r1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
+                    nn1 = flint_malloc((limbs+1)*sizeof(ulong));
+                    r1 = flint_malloc((limbs+1)*sizeof(ulong));
 
                     random_fermat(nn1, state, limbs); 
                     fermat_to_mpz(mn1, nn1, limbs);

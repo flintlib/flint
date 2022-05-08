@@ -31,7 +31,7 @@ main(void)
     {
         nmod_poly_t a, b, q, r, q2;
 
-        mp_limb_t n;
+        ulong n;
         do
         {
             n = n_randtest_not_zero(state);
@@ -75,7 +75,7 @@ main(void)
     {
         nmod_poly_t a, b, q;
 
-        mp_limb_t n;
+        ulong n;
         do
         {
             n = n_randtest(state);
@@ -115,7 +115,7 @@ main(void)
     {
         nmod_poly_t a, b, q;
 
-        mp_limb_t n;
+        ulong n;
         do
         {
             n = n_randtest(state);

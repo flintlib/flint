@@ -13,11 +13,11 @@
 #include "ulong_extras.h"
 
 n_pair_t
-lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
+lchain_precomp(ulong m, ulong a, ulong n, double npre)
 {
     n_pair_t current = {0, 0}, old;
     int length, i;
-    mp_limb_t power, xy, xx, yy;
+    ulong power, xy, xx, yy;
 
     old.x = UWORD(2);
     old.y = a;
@@ -50,11 +50,11 @@ lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
 }
 
 n_pair_t
-lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+lchain2_preinv(ulong m, ulong a, ulong n, ulong ninv)
 {
     n_pair_t current = {0, 0}, old;
     int length, i;
-    mp_limb_t power, xy, xx, yy;
+    ulong power, xy, xx, yy;
 
     old.x = UWORD(2);
     old.y = a;
@@ -87,17 +87,17 @@ lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 }
 
 int
-n_is_probabprime_lucas(mp_limb_t n)
+n_is_probabprime_lucas(ulong n)
 {
     int i, D, Q;
-    mp_limb_t A;
-    mp_limb_t left, right;
+    ulong A;
+    ulong left, right;
     n_pair_t V;
 
     D = 0;
     Q = 0;
 
-    if (((n % 2) == 0) || (FLINT_ABS((mp_limb_signed_t) n) <= 2))
+    if (((n % 2) == 0) || (FLINT_ABS((slong) n) <= 2))
     {
         return (n == UWORD(2));
     }
@@ -157,7 +157,7 @@ n_is_probabprime_lucas(mp_limb_t n)
     }
     else
     {
-        mp_limb_t ninv = n_preinvert_limb(n);
+        ulong ninv = n_preinvert_limb(n);
         V = lchain2_preinv(n + 1, A, n, ninv);
 
         left = n_mulmod_precomp(A, V.x, n, ninv);

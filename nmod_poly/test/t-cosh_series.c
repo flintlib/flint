@@ -32,7 +32,7 @@ main(void)
     {
         nmod_poly_t A, coshA, sinhA, B, C, one;
         slong n;
-        mp_limb_t mod;
+        ulong mod;
 
         do { mod = n_randtest_prime(state, 0); } while (mod == 2);
         n = 1 + n_randtest(state) % 100;
@@ -82,7 +82,7 @@ main(void)
     {
         nmod_poly_t A, B;
         slong n;
-        mp_limb_t mod;
+        ulong mod;
         do { mod = n_randtest_prime(state, 0); } while (mod == 2);
         n = n_randtest(state) % 50;
         n = FLINT_MIN(n, mod);

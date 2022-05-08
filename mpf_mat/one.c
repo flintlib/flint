@@ -11,7 +11,11 @@
 */
 
 #include "mpf_mat.h"
-#include "gmpcompat.h"
+#ifdef LONGSLONG
+# define flint_mpf_set_ui mpf_set_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 mpf_mat_one(mpf_mat_t mat)

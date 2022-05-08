@@ -31,8 +31,8 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P, Q, tmp;
-        mp_ptr x;
-        mp_limb_t mod;
+        ulong_ptr x;
+        ulong mod;
         slong j, n;
 
         n = n_randint(state, 100);

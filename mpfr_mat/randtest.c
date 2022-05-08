@@ -24,5 +24,5 @@ mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state)
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            mpfr_urandomb(mpfr_mat_entry(mat, i, j), state->gmp_state);
+            mpfr_urandomb(mpfr_mat_entry(mat, i, j), (__gmp_randstate_struct *) state->gmp_state);
 }

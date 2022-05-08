@@ -9,14 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
-#include <gmp.h>
-#include "flint.h"
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#include <stdio.h>
+#include "flint-impl.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
+#ifdef LONGSLONG
+# define flint_mpq_cmp_si mpq_cmp_si
+#else
+# include "gmpcompat.h"
+#endif
 
 char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len, 
                                  const char *var)
@@ -152,9 +161,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             str[j++] = '*';
         }
     }
-    j += flint_sprintf(str + j, "%s", var);
+    j += sprintf(str + j, "%s", var);
     str[j++] = '^';
-    j += flint_sprintf(str + j, "%li", len - 1);
+    j += sprintf(str + j, WORD_FMT "d", len - 1);
     
     i = len - 1;
     while (i)
@@ -184,11 +193,11 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         if (i > 0)
         {
             str[j++] = '*';
-            j += flint_sprintf(str + j, "%s", var);
+            j += sprintf(str + j, "%s", var);
             if (i > 1)
             {
                 str[j++] = '^';
-                j += flint_sprintf(str + j, "%li", i);
+                j += sprintf(str + j, WORD_FMT "d", i);
             }
         }
     }
@@ -203,4 +212,3 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
     return _fmpq_poly_get_str_pretty(poly->coeffs, poly->den, poly->length, 
                                      var);
 }
-

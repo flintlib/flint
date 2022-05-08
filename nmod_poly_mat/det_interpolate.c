@@ -21,7 +21,7 @@ nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
     slong i, l, n, len;
 
     nmod_mat_t X;
-    mp_ptr x, d;
+    ulong_ptr x, d;
 
     n = A->r;
 

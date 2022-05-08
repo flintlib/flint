@@ -16,10 +16,10 @@
 
 /* WARNING: relies on GCC's handling of >> as arithmetic shift right */
 
-void mpn_div_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flint_bitcnt_t d)
+void mpn_div_2expmod_2expp1(ulong * t, ulong * i1, mp_size_t limbs, flint_bitcnt_t d)
 {
-   mp_limb_t lo;
-   mp_limb_t * ptr;
+   ulong lo;
+   ulong * ptr;
    mp_limb_signed_t hi;
    
    if (d == 0)
@@ -32,6 +32,6 @@ void mpn_div_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flin
       lo = mpn_rshift(t, i1, limbs + 1, d);
       t[limbs] = (hi >> d);
       ptr = t + limbs - 1;
-      sub_ddmmss(ptr[1], ptr[0], ptr[1], ptr[0], (mp_limb_t) 0, lo);
+      sub_ddmmss(ptr[1], ptr[0], ptr[1], ptr[0], (ulong) 0, lo);
    }
 }

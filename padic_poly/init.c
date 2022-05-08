@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "padic_poly.h"
+#include "padic.h"
 
 void padic_poly_init(padic_poly_t poly)
 {
@@ -33,4 +29,3 @@ void padic_poly_init2(padic_poly_t poly, slong alloc, slong prec)
     poly->val    = 0;
     poly->N      = prec;
 }
-

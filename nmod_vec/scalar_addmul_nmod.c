@@ -12,11 +12,11 @@
 
 #include "nmod.h"
 
-void _nmod_vec_scalar_addmul_nmod_fullword(mp_ptr res, mp_srcptr vec, 
-				             slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_addmul_nmod_fullword(ulong_ptr res, ulong_srcptr vec, 
+				             slong len, ulong c, nmod_t mod)
 {
     slong i;
-    mp_limb_t t;
+    ulong t;
 
     for (i = 0; i < len; i++)
     {
@@ -25,11 +25,11 @@ void _nmod_vec_scalar_addmul_nmod_fullword(mp_ptr res, mp_srcptr vec,
     }
 }
 
-void _nmod_vec_scalar_addmul_nmod_generic(mp_ptr res, mp_srcptr vec, 
-				             slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_addmul_nmod_generic(ulong_ptr res, ulong_srcptr vec, 
+				             slong len, ulong c, nmod_t mod)
 {
     slong i;
-    mp_limb_t t;
+    ulong t;
 
     for (i = 0; i < len; i++)
     {
@@ -38,11 +38,11 @@ void _nmod_vec_scalar_addmul_nmod_generic(mp_ptr res, mp_srcptr vec,
     }
 }
 
-void _nmod_vec_scalar_addmul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
-				             slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_addmul_nmod_shoup(ulong_ptr res, ulong_srcptr vec, 
+				             slong len, ulong c, nmod_t mod)
 {
     slong i;
-    mp_limb_t t, cinv;
+    ulong t, cinv;
 
     cinv = n_mulmod_precomp_shoup(c, mod.n);
 
@@ -53,8 +53,8 @@ void _nmod_vec_scalar_addmul_nmod_shoup(mp_ptr res, mp_srcptr vec,
     }
 }
 
-void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				             slong len, mp_limb_t c, nmod_t mod)
+void _nmod_vec_scalar_addmul_nmod(ulong_ptr res, ulong_srcptr vec, 
+				             slong len, ulong c, nmod_t mod)
 {
     if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_addmul_nmod_fullword(res, vec, len, c, mod);

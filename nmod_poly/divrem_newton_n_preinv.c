@@ -12,9 +12,9 @@
 
 #include "nmod_poly.h"
 
-void _nmod_poly_divrem_newton_n_preinv(mp_ptr Q, mp_ptr R, mp_srcptr A,
-                                        slong lenA, mp_srcptr B, slong lenB,
-                                       mp_srcptr Binv, slong lenBinv, nmod_t mod)
+void _nmod_poly_divrem_newton_n_preinv(ulong_ptr Q, ulong_ptr R, ulong_srcptr A,
+                                        slong lenA, ulong_srcptr B, slong lenB,
+                                       ulong_srcptr Binv, slong lenBinv, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
 
@@ -42,7 +42,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
                                       const nmod_poly_t Binv)
 {
     const slong lenA = A->length, lenB = B->length, lenBinv = Binv->length;
-    mp_ptr q, r;
+    ulong_ptr q, r;
 
     if (lenB == 0)
     {

@@ -11,10 +11,10 @@
 
 #include "fmpz.h"
 #include "fmpq.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
-FLINT_DLL void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
-                                        const fmpq * xs, slong n)
+void
+_fmpz_poly_product_roots_fmpq_vec(fmpz * poly, const fmpq * xs, slong n)
 {
     if (n == 0)
     {
@@ -57,8 +57,8 @@ FLINT_DLL void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
     }
 }
 
-void fmpz_poly_product_roots_fmpq_vec(fmpz_poly_t poly,
-                                        const fmpq * xs, slong n)
+void
+fmpz_poly_product_roots_fmpq_vec(fmpz_poly_t poly, const fmpq * xs, slong n)
 {
     fmpz_poly_fit_length(poly, n + 1);
     _fmpz_poly_product_roots_fmpq_vec(poly->coeffs, xs, n);

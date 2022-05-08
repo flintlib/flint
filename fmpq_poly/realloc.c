@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "flint-impl.h"
 #include "fmpq_poly.h"
 
 void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
@@ -38,7 +35,7 @@ void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (poly->alloc < alloc)
         {
-            FLINT_MPN_ZERO((mp_ptr) (poly->coeffs + poly->alloc), alloc - poly->alloc);
+            FLINT_MPN_ZERO((ulong_ptr) (poly->coeffs + poly->alloc), alloc - poly->alloc);
         }
     }
     else  /* Nothing allocated, do it now */
@@ -48,4 +45,3 @@ void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
     
     poly->alloc = alloc;
 }
-

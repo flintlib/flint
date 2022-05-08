@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
-                                mp_srcptr B, slong Blen, slong n, nmod_t mod)
+_nmod_poly_div_series(ulong_ptr Q, ulong_srcptr A, slong Alen,
+                                ulong_srcptr B, slong Blen, slong n, nmod_t mod)
 {
     Blen = FLINT_MIN(Blen, n);
 
@@ -24,7 +24,7 @@ _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
     }
     else
     {
-        mp_ptr Binv = _nmod_vec_init(n);
+        ulong_ptr Binv = _nmod_vec_init(n);
 
         _nmod_poly_inv_series(Binv, B, Blen, n, mod);
         _nmod_poly_mullow(Q, Binv, n, A, FLINT_MIN(n, Alen), n, mod);

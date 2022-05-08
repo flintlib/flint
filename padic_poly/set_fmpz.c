@@ -21,4 +21,3 @@ void padic_poly_set_fmpz(padic_poly_t poly, const fmpz_t x,
     padic_poly_set_padic(poly, y, ctx);
     padic_clear(y);
 }
-

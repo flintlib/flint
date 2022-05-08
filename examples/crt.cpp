@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     fmpzxx y(0);
     fmpzxx prod(1);
 
-    mp_limb_t prime = 0;
+    ulong prime = 0;
     for (unsigned i = 0; bits(prod) < bit_bound; i++)
     {
         prime = n_nextprime(prime, 0);

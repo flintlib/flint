@@ -12,7 +12,7 @@
 #include "flint-impl.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
+ulong n_randbits(flint_rand_t state, unsigned int bits)
 {
    if (bits == 0)
        return UWORD(0);

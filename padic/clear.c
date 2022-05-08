@@ -15,4 +15,3 @@ void padic_clear(padic_t rop)
 {
     fmpz_clear(padic_unit(rop));
 }
-

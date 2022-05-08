@@ -16,14 +16,14 @@
 
 #define MAC(h, m, l, a, b)                          \
 {                                                   \
-    mp_limb_t p1, p0;                               \
+    ulong p1, p0;                               \
     umul_ppmm(p1, p0, a, b);                        \
     add_sssaaaaaa(h, m, l, h, m, l, 0, p1, p0);     \
 }
 
 #define MAC3(h, m, l, a, b)                         \
 {                                                   \
-    mp_limb_t p1, p0;                               \
+    ulong p1, p0;                               \
     umul_ppmm(p1, p0, a, b);                        \
     add_sssaaaaaa(h, m, l, h, m, l, 0, p1, p0);     \
 }
@@ -31,13 +31,13 @@
 
 #define MAC2(h, l, a, b)            \
 {                                   \
-    mp_limb_t p1, p0;               \
+    ulong p1, p0;               \
     umul_ppmm(p1, p0, a, b);        \
     add_ssaaaa(h, l, h, l, p1, p0); \
 }
 
 char * n_fq_get_str_pretty(
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     char * s;
@@ -51,7 +51,7 @@ char * n_fq_get_str_pretty(
 
 int n_fq_fprint_pretty(
     FILE * file,
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -85,14 +85,14 @@ int n_fq_fprint_pretty(
 }
 
 void n_fq_print_pretty(
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     n_fq_fprint_pretty(stdout, a, ctx);
 }
 
 void n_fq_randtest_not_zero(
-    mp_limb_t * a,
+    ulong * a,
     flint_rand_t state,
     const fq_nmod_ctx_t ctx)
 {
@@ -106,7 +106,7 @@ void n_fq_randtest_not_zero(
 
 void n_fq_get_fq_nmod(
     fq_nmod_t a,
-    const mp_limb_t * b,
+    const ulong * b,
     const fq_nmod_ctx_t ctx)
 {
     slong i;
@@ -122,7 +122,7 @@ void n_fq_get_fq_nmod(
 }
 
 void n_fq_set_fq_nmod(
-    mp_limb_t * a,
+    ulong * a,
     const fq_nmod_t b,
     const fq_nmod_ctx_t ctx)
 {
@@ -136,7 +136,7 @@ void n_fq_set_fq_nmod(
 
 void n_fq_get_n_poly(
     n_poly_t a,
-    const mp_limb_t * b,
+    const ulong * b,
     const fq_nmod_ctx_t ctx)
 {
     slong i;
@@ -152,8 +152,8 @@ void n_fq_get_n_poly(
 }
 
 void _n_fq_set_n_poly(
-    mp_limb_t * a,
-    const mp_limb_t * bcoeffs, slong blen,
+    ulong * a,
+    const ulong * bcoeffs, slong blen,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -174,7 +174,7 @@ void _n_fq_set_n_poly(
 
 
 void n_fq_gen(
-    mp_limb_t * a,
+    ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     slong i, d = fq_nmod_ctx_degree(ctx);
@@ -193,8 +193,8 @@ void n_fq_gen(
 }
 
 void n_fq_add_si(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     slong c,
     const fq_nmod_ctx_t ctx)
 {
@@ -220,7 +220,7 @@ void n_fq_add_si(
 }
 
 int n_fq_equal_fq_nmod(
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_t b,
     const fq_nmod_ctx_t ctx)
 {
@@ -228,7 +228,7 @@ int n_fq_equal_fq_nmod(
     FLINT_ASSERT(b->length <= d);
     for (i = 0; i < d; i++)
     {
-        mp_limb_t c = (i >= b->length) ? 0 : b->coeffs[i];
+        ulong c = (i >= b->length) ? 0 : b->coeffs[i];
         if (a[i] != c)
             return 0;
     }
@@ -236,8 +236,8 @@ int n_fq_equal_fq_nmod(
 }
 
 void n_fq_add_fq_nmod(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     const fq_nmod_t c,
     const fq_nmod_ctx_t ctx)
 {
@@ -257,8 +257,8 @@ void n_fq_add_fq_nmod(
 
 
 void n_fq_sub_fq_nmod(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     const fq_nmod_t c,
     const fq_nmod_ctx_t ctx)
 {
@@ -278,11 +278,11 @@ void n_fq_sub_fq_nmod(
 
 
 void _n_fq_reduce(
-    mp_limb_t * a,
-    mp_limb_t * b,
+    ulong * a,
+    ulong * b,
     slong blen,
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * t)  /* length 2d */
+    ulong * t)  /* length 2d */
 {
     slong i, j, k, deg = ctx->modulus->length - 1;
     slong d = ctx->j[ctx->len - 1];
@@ -325,13 +325,13 @@ void _n_fq_reduce(
                                           ctx->inv->coeffs, ctx->inv->length,
                                           ctx->mod);
 */
-        mp_limb_t * Q = t;
-        mp_limb_t * R = a;
-        const mp_limb_t * A = b;
+        ulong * Q = t;
+        ulong * R = a;
+        const ulong * A = b;
         slong lenA = blen;
-        const mp_limb_t * B = ctx->modulus->coeffs;
+        const ulong * B = ctx->modulus->coeffs;
         slong lenB = deg + 1;
-        const mp_limb_t * Binv = ctx->inv->coeffs;
+        const ulong * Binv = ctx->inv->coeffs;
         slong lenBinv = ctx->inv->length;
 
         const slong lenQ = lenA - lenB + 1;
@@ -352,7 +352,7 @@ void _n_fq_reduce(
         {
             for (i = 0; i < lenQ; i++)
             {
-                mp_limb_t t2 = 0, t1 = 0, t0 = 0;
+                ulong t2 = 0, t1 = 0, t0 = 0;
                 j = FLINT_MAX(0, i - lenBinv + 1);
                 umul_ppmm(t1, t0, A[lenA - 1 - j], Binv[i - j]);
                 for (j++; j <= i; j++)
@@ -362,7 +362,7 @@ void _n_fq_reduce(
 
             for (i = 0; i < deg; i++)
             {
-                mp_limb_t t2 = 0, t1 = 0, t0 = 0;
+                ulong t2 = 0, t1 = 0, t0 = 0;
                 for (j = FLINT_MAX(0, i - lenQ + 1); j <= i; j++)
                     MAC(t2, t1, t0, B[j], Q[i - j]);
                 NMOD_RED3(t0, t2, t1, t0, ctx->mod);
@@ -371,7 +371,7 @@ void _n_fq_reduce(
         }
         else
         {
-            mp_ptr Arev = t + d;
+            ulong_ptr Arev = t + d;
             _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
             _nmod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx->mod);
             _nmod_poly_reverse(Q, Q, lenQ, lenQ);
@@ -384,11 +384,11 @@ void _n_fq_reduce(
 }
 
 void _n_fq_madd2(
-    mp_limb_t * a,          /* length 2d */
-    const mp_limb_t * b,    /* length d */
-    const mp_limb_t * c,    /* length d */
+    ulong * a,          /* length 2d */
+    const ulong * b,    /* length d */
+    const ulong * c,    /* length d */
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * t)          /* length 2d */
+    ulong * t)          /* length 2d */
 {
     slong d = ctx->modulus->length - 1;
     FLINT_ASSERT(d > 0);
@@ -397,8 +397,8 @@ void _n_fq_madd2(
         slong i, j;
         for (i = 0; i + 1 < d; i++)
         {
-            mp_limb_t t2 = 0, t1 = 0, t0 = 0;
-            mp_limb_t s2 = 0, s1 = 0, s0 = 0;
+            ulong t2 = 0, t1 = 0, t0 = 0;
+            ulong s2 = 0, s1 = 0, s0 = 0;
             umul_ppmm(t1, t0, b[i], c[0]);
             umul_ppmm(s1, s0, b[d - 1], c[d - 1 - i]);
 
@@ -415,7 +415,7 @@ void _n_fq_madd2(
         }
 
         {
-            mp_limb_t t2 = 0, t1 = 0, t0 = 0;
+            ulong t2 = 0, t1 = 0, t0 = 0;
             umul_ppmm(t1, t0, b[d - 1], c[0]);
             add_ssaaaa(t1, t0, t1, t0, 0, a[d - 1]);
             for (j = 1; j < d; j++)
@@ -433,9 +433,9 @@ void _n_fq_madd2(
 }
 
 void _n_fq_mul2(
-    mp_limb_t * a,          /* length 2d */
-    const mp_limb_t * b,    /* length d */
-    const mp_limb_t * c,    /* length d */
+    ulong * a,          /* length 2d */
+    const ulong * b,    /* length d */
+    const ulong * c,    /* length d */
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -445,8 +445,8 @@ void _n_fq_mul2(
         slong i, j;
         for (i = 0; i + 1 < d; i++)
         {
-            mp_limb_t t2 = 0, t1 = 0, t0 = 0;
-            mp_limb_t s2 = 0, s1 = 0, s0 = 0;
+            ulong t2 = 0, t1 = 0, t0 = 0;
+            ulong s2 = 0, s1 = 0, s0 = 0;
             umul_ppmm(t1, t0, b[i], c[0]);
             umul_ppmm(s1, s0, b[d - 1], c[d - 1 - i]);
             for (j = 1; j <= i; j++)
@@ -459,7 +459,7 @@ void _n_fq_mul2(
         }
 
         {
-            mp_limb_t t2 = 0, t1 = 0, t0 = 0;
+            ulong t2 = 0, t1 = 0, t0 = 0;
             umul_ppmm(t1, t0, b[d - 1], c[0]);
             for (j = 1; j < d; j++)
             {
@@ -482,7 +482,7 @@ int _n_fq_dot_lazy_size(
 {
     ulong t[4];
     slong d = fq_nmod_ctx_degree(ctx);
-    mp_limb_t p = ctx->mod.n;
+    ulong p = ctx->mod.n;
 
     if (d > 30 || p < 2 || len < 0)
         return 0;
@@ -502,7 +502,7 @@ int _n_fq_dot_lazy_size(
 
 
 void _n_fq_reduce2_lazy1(
-    mp_limb_t * a, /* length 6d, 2d used */
+    ulong * a, /* length 6d, 2d used */
     slong d,
     nmod_t ctx)
 {
@@ -512,17 +512,17 @@ void _n_fq_reduce2_lazy1(
 }
 
 void _n_fq_madd2_lazy1(
-    mp_limb_t * a,       /* length 6d, 2d used */
-    const mp_limb_t * b, /* length d */
-    const mp_limb_t * c, /* length d */
+    ulong * a,       /* length 6d, 2d used */
+    const ulong * b, /* length d */
+    const ulong * c, /* length d */
     slong d)
 {
     slong i, j;
 
     for (i = 0; i + 1 < d; i++)
     {
-        mp_limb_t t0 = 0;
-        mp_limb_t s0 = 0;
+        ulong t0 = 0;
+        ulong s0 = 0;
         t0 = a[i + 0];
         s0 = a[(2*d - 2 - i) + 0];
         t0 += b[i]*c[0];
@@ -537,7 +537,7 @@ void _n_fq_madd2_lazy1(
     }
 
     {
-        mp_limb_t t0 = 0;
+        ulong t0 = 0;
         t0 = a[(d - 1) + 0];
         t0 += b[d - 1]*c[0];
         for (j = 1; j < d; j++)
@@ -550,17 +550,17 @@ void _n_fq_madd2_lazy1(
 
 
 void _n_fq_mul2_lazy1(
-    mp_limb_t * a,       /* length 6d, 2d used */
-    const mp_limb_t * b, /* length d */
-    const mp_limb_t * c, /* length d */
+    ulong * a,       /* length 6d, 2d used */
+    const ulong * b, /* length d */
+    const ulong * c, /* length d */
     slong d)
 {
     slong i,j;
 
     for (i = 0; i + 1 < d; i++)
     {
-        mp_limb_t t0 = 0;
-        mp_limb_t s0 = 0;
+        ulong t0 = 0;
+        ulong s0 = 0;
         t0 = b[i]*c[0];
         s0 = b[d - 1]*c[d - 1 - i];
         for (j = 1; j <= i; j++)
@@ -573,7 +573,7 @@ void _n_fq_mul2_lazy1(
     }
 
     {
-        mp_limb_t t0 = 0;
+        ulong t0 = 0;
         t0 = b[d - 1]*c[0];
         for (j = 1; j < d; j++)
         {
@@ -585,7 +585,7 @@ void _n_fq_mul2_lazy1(
 
 
 void _n_fq_reduce2_lazy2(
-    mp_limb_t * a, /* length 6d, 4d used */
+    ulong * a, /* length 6d, 4d used */
     slong d,
     nmod_t ctx)
 {
@@ -595,17 +595,17 @@ void _n_fq_reduce2_lazy2(
 }
 
 void _n_fq_madd2_lazy2(
-    mp_limb_t * a,       /* length 6d, 4d used */
-    const mp_limb_t * b, /* length d */
-    const mp_limb_t * c, /* length d */
+    ulong * a,       /* length 6d, 4d used */
+    const ulong * b, /* length d */
+    const ulong * c, /* length d */
     slong d)
 {
     slong i,j;
 
     for (i = 0; i + 1 < d; i++)
     {
-        mp_limb_t t1 = 0, t0 = 0;
-        mp_limb_t s1 = 0, s0 = 0;
+        ulong t1 = 0, t0 = 0;
+        ulong s1 = 0, s0 = 0;
         t0 = a[2*i + 0];
         t1 = a[2*i + 1];
         s0 = a[2*(2*d - 2 - i) + 0];
@@ -624,7 +624,7 @@ void _n_fq_madd2_lazy2(
     }
 
     {
-        mp_limb_t t1 = 0, t0 = 0;
+        ulong t1 = 0, t0 = 0;
         t0 = a[2*(d - 1) + 0];
         t1 = a[2*(d - 1) + 1];
         MAC2(t1, t0, b[d - 1], c[0]);
@@ -639,17 +639,17 @@ void _n_fq_madd2_lazy2(
 
 
 void _n_fq_mul2_lazy2(
-    mp_limb_t * a,       /* length 6d */
-    const mp_limb_t * b, /* length d */
-    const mp_limb_t * c, /* length d */
+    ulong * a,       /* length 6d */
+    const ulong * b, /* length d */
+    const ulong * c, /* length d */
     slong d)
 {
     slong i,j;
 
     for (i = 0; i + 1 < d; i++)
     {
-        mp_limb_t t1 = 0, t0 = 0;
-        mp_limb_t s1 = 0, s0 = 0;
+        ulong t1 = 0, t0 = 0;
+        ulong s1 = 0, s0 = 0;
         umul_ppmm(t1, t0, b[i], c[0]);
         umul_ppmm(s1, s0, b[d - 1], c[d - 1 - i]);
         for (j = 1; j <= i; j++)
@@ -664,7 +664,7 @@ void _n_fq_mul2_lazy2(
     }
 
     {
-        mp_limb_t t1 = 0, t0 = 0;
+        ulong t1 = 0, t0 = 0;
         umul_ppmm(t1, t0, b[d - 1], c[0]);
         for (j = 1; j < d; j++)
         {
@@ -677,7 +677,7 @@ void _n_fq_mul2_lazy2(
 
 
 void _n_fq_reduce2_lazy3(
-    mp_limb_t * a, /* length 6d */
+    ulong * a, /* length 6d */
     slong d,
     nmod_t ctx)
 {
@@ -687,17 +687,17 @@ void _n_fq_reduce2_lazy3(
 }
 
 void _n_fq_madd2_lazy3(
-    mp_limb_t * a,       /* length 6d */
-    const mp_limb_t * b, /* length d */
-    const mp_limb_t * c, /* length d */
+    ulong * a,       /* length 6d */
+    const ulong * b, /* length d */
+    const ulong * c, /* length d */
     slong d)
 {
     slong i,j;
 
     for (i = 0; i + 1 < d; i++)
     {
-        mp_limb_t t2 = 0, t1 = 0, t0 = 0;
-        mp_limb_t s2 = 0, s1 = 0, s0 = 0;
+        ulong t2 = 0, t1 = 0, t0 = 0;
+        ulong s2 = 0, s1 = 0, s0 = 0;
         t0 = a[3*i + 0];
         t1 = a[3*i + 1];
         t2 = a[3*i + 2];
@@ -720,7 +720,7 @@ void _n_fq_madd2_lazy3(
     }
 
     {
-        mp_limb_t t2 = 0, t1 = 0, t0 = 0;
+        ulong t2 = 0, t1 = 0, t0 = 0;
         t0 = a[3*(d - 1) + 0];
         t1 = a[3*(d - 1) + 1];
         t2 = a[3*(d - 1) + 2];
@@ -737,17 +737,17 @@ void _n_fq_madd2_lazy3(
 
 
 void _n_fq_mul2_lazy3(
-    mp_limb_t * a,       /* length 6d */
-    const mp_limb_t * b, /* length d */
-    const mp_limb_t * c, /* length d */
+    ulong * a,       /* length 6d */
+    const ulong * b, /* length d */
+    const ulong * c, /* length d */
     slong d)
 {
     slong i,j;
 
     for (i = 0; i + 1 < d; i++)
     {
-        mp_limb_t t2 = 0, t1 = 0, t0 = 0;
-        mp_limb_t s2 = 0, s1 = 0, s0 = 0;
+        ulong t2 = 0, t1 = 0, t0 = 0;
+        ulong s2 = 0, s1 = 0, s0 = 0;
         umul_ppmm(t1, t0, b[i], c[0]);
         umul_ppmm(s1, s0, b[d - 1], c[d - 1 - i]);
         for (j = 1; j <= i; j++)
@@ -764,7 +764,7 @@ void _n_fq_mul2_lazy3(
     }
 
     {
-        mp_limb_t t2 = 0, t1 = 0, t0 = 0;
+        ulong t2 = 0, t1 = 0, t0 = 0;
         umul_ppmm(t1, t0, b[d - 1], c[0]);
         for (j = 1; j < d; j++)
         {
@@ -779,10 +779,10 @@ void _n_fq_mul2_lazy3(
 
 /***************************************************************************/
 void _n_fq_inv(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * t) /* length d */
+    ulong * t) /* length d */
 {
     slong d = ctx->modulus->length - 1;
     slong blen = d;
@@ -815,9 +815,9 @@ void _n_fq_inv(
 }
 
 void n_fq_mul(
-    mp_limb_t * a,
-    const mp_limb_t * b,
-    const mp_limb_t * c,
+    ulong * a,
+    const ulong * b,
+    const ulong * c,
     const fq_nmod_ctx_t ctx)
 {
     fq_nmod_t A, B, C;
@@ -834,21 +834,21 @@ void n_fq_mul(
 }
 
 void n_fq_addmul(
-    mp_limb_t * a,
-    const mp_limb_t * b,
-    const mp_limb_t * c,
-    const mp_limb_t * d,
+    ulong * a,
+    const ulong * b,
+    const ulong * c,
+    const ulong * d,
     const fq_nmod_ctx_t ctx)
 {
-    mp_limb_t * t = FLINT_ARRAY_ALLOC(fq_nmod_ctx_degree(ctx), mp_limb_t);
+    ulong * t = FLINT_ARRAY_ALLOC(fq_nmod_ctx_degree(ctx), ulong);
     n_fq_mul(t, c, d, ctx);
     n_fq_add(a, b, t, ctx);
     flint_free(t);
 }
 
 void n_fq_mul_fq_nmod(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     const fq_nmod_t C,
     const fq_nmod_ctx_t ctx)
 {
@@ -863,8 +863,8 @@ void n_fq_mul_fq_nmod(
 }
 
 void n_fq_inv(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     const fq_nmod_ctx_t ctx)
 {
     fq_nmod_t A, B;
@@ -878,8 +878,8 @@ void n_fq_inv(
 }
 
 void _n_fq_pow_ui(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     ulong e,
     const fq_nmod_ctx_t ctx)
 {
@@ -894,8 +894,8 @@ void _n_fq_pow_ui(
 }
 
 void n_fq_pow_fmpz(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     const fmpz_t e,
     const fq_nmod_ctx_t ctx)
 {
@@ -910,8 +910,8 @@ void n_fq_pow_fmpz(
 }
 
 void n_fq_pow_ui(
-    mp_limb_t * a,
-    const mp_limb_t * b,
+    ulong * a,
+    const ulong * b,
     ulong e,
     const fq_nmod_ctx_t ctx)
 {
@@ -926,7 +926,7 @@ void n_fq_pow_ui(
 }
 
 int n_fq_is_canonical(
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     slong i, d = fq_nmod_ctx_degree(ctx);

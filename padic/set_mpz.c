@@ -20,4 +20,3 @@ void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
     padic_set_fmpz(rop, t, ctx);
     fmpz_clear(t);
 }
-

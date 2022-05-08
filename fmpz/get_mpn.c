@@ -9,17 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #include "flint-impl.h"
 
 int
-fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
+fmpz_get_mpn(ulong_ptr * n, fmpz_t n_in)
 {
-    mp_limb_t n_size;
-    mp_ptr temp;
+    ulong n_size;
+    ulong_ptr temp;
 
     n_size = fmpz_size(n_in);
-    *n = flint_malloc(n_size * sizeof(mp_limb_t));
+    *n = flint_malloc(n_size * sizeof(ulong));
 
     if (n_size <= 1)
     {

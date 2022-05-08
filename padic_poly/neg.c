@@ -47,4 +47,3 @@ void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
             fmpz_clear(pow);
     }
 }
-

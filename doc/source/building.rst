@@ -156,7 +156,7 @@ machine, you can do the following in your code:
     #include <stdio.h>
     // other system headers
     #undef ulong
-    #define ulong mp_limb_t
+    #define ulong ulong
 
 This prevents FLINT's definition of ``ulong`` interfering with your system
 headers.

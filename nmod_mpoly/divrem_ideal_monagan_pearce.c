@@ -20,7 +20,7 @@
 int _nmod_mpoly_divrem_ideal_monagan_pearce1(
     nmod_mpoly_struct ** Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
     nmod_mpoly_struct * const * Bs, ulong * const * Bexps, slong Blen,
     flint_bitcnt_t bits,
     const nmod_mpoly_ctx_t ctx,
@@ -35,13 +35,13 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
     mpoly_nheap_t ** chains;
     slong ** hinds;
     mpoly_nheap_t * x;
-    mp_limb_t * r_coeff = R->coeffs;
+    ulong * r_coeff = R->coeffs;
     ulong * r_exp = R->exps;
     slong r_len;
     ulong exp, texp;
     ulong mask;
     slong * q_len, * s;
-    mp_limb_t * lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong * lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     TMP_START;
@@ -83,7 +83,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
     HEAP_ASSIGN(heap[1], Aexps[0], x);
 
     /* precompute leading coeff info */
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(Blen*sizeof(mp_limb_t));
+    lc_minus_inv = (ulong *) TMP_ALLOC(Blen*sizeof(ulong));
     for (w = 0; w < Blen; w++)
         lc_minus_inv[w] = ctx->mod.n - nmod_inv(Bs[w]->coeffs[0], ctx->mod);
 
@@ -242,7 +242,7 @@ exp_overflow:
 int _nmod_mpoly_divrem_ideal_monagan_pearce(
     nmod_mpoly_struct ** Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
     nmod_mpoly_struct * const * Bs, ulong * const * Bexps, slong Blen,
     slong N,
     flint_bitcnt_t bits,
@@ -258,7 +258,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
     mpoly_nheap_t ** chains;
     slong ** hinds;
     mpoly_nheap_t * x;
-    mp_limb_t * r_coeff = R->coeffs;
+    ulong * r_coeff = R->coeffs;
     ulong * r_exp = R->exps;
     slong r_len;
     ulong * exp, * exps, * texp;
@@ -266,7 +266,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
     slong exp_next;
     ulong mask;
     slong * q_len, * s;
-    mp_limb_t * lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong * lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     if (N == 1)
@@ -323,7 +323,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
     mpoly_monomial_set(heap[1].exp, Aexps, N);
 
     /* precompute leading coeff info */
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(Blen*sizeof(mp_limb_t));
+    lc_minus_inv = (ulong *) TMP_ALLOC(Blen*sizeof(ulong));
     for (w = 0; w < Blen; w++)
         lc_minus_inv[w] = ctx->mod.n - nmod_inv(Bs[w]->coeffs[0], ctx->mod);
 

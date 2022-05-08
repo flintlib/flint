@@ -13,10 +13,10 @@
 #include "flint.h"
 #include "fft.h"
 
-void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
-                       mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+void butterfly_rshB(ulong * t, ulong * u, ulong * i1, 
+                       ulong * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 {
-   mp_limb_t cy, cy1, cy2, cy3;
+   ulong cy, cy1, cy2, cy3;
 
    if (x == 0)
    {

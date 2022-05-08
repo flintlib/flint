@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 #include "fmpz_poly.h"
 
 void
@@ -21,7 +21,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1,
     {
         fmpz_t c;
         fmpz_init(c);
-        _fmpz_poly_content(c, poly1, len1);
+        _fmpz_vec_content(c, poly1, len1);
         fmpz_gcd(res, c, poly2);
         fmpz_clear(c);
     }
@@ -42,8 +42,8 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1,
 
         lenA = len1;
         lenB = len2;
-        _fmpz_poly_content(a, poly1, lenA);
-        _fmpz_poly_content(b, poly2, lenB);
+        _fmpz_vec_content(a, poly1, lenA);
+        _fmpz_vec_content(b, poly2, lenB);
         _fmpz_vec_scalar_divexact_fmpz(A, poly1, lenA, a);
         _fmpz_vec_scalar_divexact_fmpz(B, poly2, lenB, b);
 
@@ -94,7 +94,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1,
         }
         else
         {
-            _fmpz_poly_content(b, B, lenB);
+            _fmpz_vec_content(b, B, lenB);
             _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
             if (fmpz_sgn(B + (lenB - 1)) < 0)
                 fmpz_neg(d, d);

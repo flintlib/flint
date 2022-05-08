@@ -21,11 +21,11 @@
 */
 
 void 
-n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1, 
-                 mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0,
-                 mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_add(ulong_ptr x, ulong_ptr z, ulong x1, ulong z1, 
+                 ulong x2, ulong z2, ulong x0, ulong z0,
+                 ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t u, v, w;
+    ulong u, v, w;
 
     if (z1 == 0)
     {

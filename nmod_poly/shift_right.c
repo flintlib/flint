@@ -12,7 +12,7 @@
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
-void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, slong len, slong k)
+void _nmod_poly_shift_right(ulong_ptr res, ulong_srcptr poly, slong len, slong k)
 {
     FLINT_MPN_COPYI(res, poly + k, len);
 }

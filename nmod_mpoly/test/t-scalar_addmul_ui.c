@@ -26,7 +26,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -51,7 +51,7 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            mp_limb_t c = n_randlimb(state);
+            ulong c = n_randlimb(state);
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
             nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);

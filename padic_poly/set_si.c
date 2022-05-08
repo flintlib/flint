@@ -20,4 +20,3 @@ void padic_poly_set_si(padic_poly_t poly, slong x, const padic_ctx_t ctx)
     padic_poly_set_padic(poly, y, ctx);
     padic_clear(y);
 }
-

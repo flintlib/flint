@@ -25,7 +25,7 @@ main(void)
     /* Check that the different version coincide and aliasing in nmod_poly_power_sums */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n;
+        ulong n;
         nmod_poly_t a, b, c, d, e;
 
         do{

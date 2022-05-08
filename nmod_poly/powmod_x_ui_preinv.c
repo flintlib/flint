@@ -17,10 +17,10 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_powmod_x_ui_preinv(mp_ptr res, ulong e, mp_srcptr f, slong lenf,
-                                     mp_srcptr finv, slong lenfinv, nmod_t mod)
+_nmod_poly_powmod_x_ui_preinv(ulong_ptr res, ulong e, ulong_srcptr f, slong lenf,
+                                     ulong_srcptr finv, slong lenfinv, nmod_t mod)
 {
-    mp_ptr T, Q;
+    ulong_ptr T, Q;
     slong lenT, lenQ, window;
     int i, l, c;
 

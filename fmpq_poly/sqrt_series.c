@@ -10,14 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
-
 
 void 
 _fmpq_poly_sqrt_series(fmpz * rpoly, fmpz_t rden, 
@@ -36,10 +30,7 @@ _fmpq_poly_sqrt_series(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (poly->length < 1 || !fmpz_equal(poly->coeffs, poly->den))
-    {
-        flint_printf("Exception (fmpq_poly_sqrt_series). Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in fmpq_poly_sqrt_series\n");
 
     if (n < 1)
     {

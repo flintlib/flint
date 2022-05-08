@@ -11,13 +11,13 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * prod, ulong num_primes, mp_limb_t limit)
+ulong n_factor_trial_partial(n_factor_t * factors, ulong n, ulong_ptr prod, ulong num_primes, ulong limit)
 {
    unsigned int exp;
-   mp_limb_t p;
+   ulong p;
    double ppre;
    ulong i;
-   const mp_limb_t * primes;
+   ulong_srcptr primes;
    const double * inverses;
 
    (*prod) = 1;

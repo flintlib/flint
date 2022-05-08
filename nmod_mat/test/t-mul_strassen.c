@@ -30,7 +30,7 @@ main(void)
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t mod = n_randtest_not_zero(state);
+        ulong mod = n_randtest_not_zero(state);
 
         slong m, k, n;
 

@@ -55,7 +55,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     int nm = (inv->norm != 0);
     TMP_INIT;
 
-    mp_ptr qp, rp, ap, dp, tp, sp;
+    ulong_ptr qp, rp, ap, dp, tp, sp;
 
     if (r->_mp_alloc < usize1 + nm)
         mpz_realloc2(r, (usize1 + nm)*FLINT_BITS);

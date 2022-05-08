@@ -39,8 +39,8 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
-                                  mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_divrem(ulong_ptr Q, ulong_ptr R, ulong_srcptr A, slong lenA, 
+                                  ulong_srcptr B, slong lenB, nmod_t mod)
 {
     TMP_INIT;
     
@@ -50,10 +50,10 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
         _nmod_poly_divrem_q1(Q, R, A, lenA, B, lenB, mod);
     else if (lenB < 15)
     {
-        mp_ptr W;
+        ulong_ptr W;
         
         TMP_START;
-        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
+        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(ulong));
         _nmod_poly_divrem_basecase(Q, R, W, A, lenA, B, lenB, mod);
         TMP_END;
     }
@@ -68,7 +68,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
 {
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tQ, tR;
-    mp_ptr q, r;
+    ulong_ptr q, r;
     
     if (lenB == 0)
     {

@@ -18,10 +18,8 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong 
     if (FLINT_ABS(x) <= 1)
     {
         if (x == 0)
-        {
-            flint_printf("Exception (fmpz_poly_q_scalar_div_si). Division by zero.\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_DIVZERO, "fmpz_poly_q_scalar_div_si\n");
+
         if (x == 1)
             fmpz_poly_q_set(rop, op);
         else

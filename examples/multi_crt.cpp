@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
     fmpzxx x(argv[1]);
 
-    std::vector<mp_limb_t> primes(num_primes), residues(num_primes);
+    std::vector<ulong> primes(num_primes), residues(num_primes);
     primes[0] = 2;
     for (unsigned i = 1; i < num_primes; i++)
         primes[i] = n_nextprime(primes[i-1], 0);

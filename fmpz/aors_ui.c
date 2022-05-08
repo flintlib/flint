@@ -13,10 +13,10 @@
 #include "fmpz_mini.h"
 
 static void
-_fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x);
+_fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x);
 
 static void
-_fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x);
+_fmpz_sub_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x);
 
 void
 fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
@@ -94,7 +94,7 @@ carry:      if (COEFF_IS_MPZ(f1))
     {
         __mpz_struct * mg = COEFF_TO_PTR(g1);
         mp_size_t gsz = mg->_mp_size;
-        mp_limb_t * glimbs = mg->_mp_d;
+        ulong * glimbs = mg->_mp_d;
 
         if (gsz > 0)
             _fmpz_add_mpn_1(f, glimbs, gsz, x);
@@ -105,10 +105,10 @@ carry:      if (COEFF_IS_MPZ(f1))
 
 /* "Add" two number with same sign. Decide sign from g. */
 static void
-_fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
+_fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x)
 {
     __mpz_struct * mf;
-    mp_limb_t * flimbs;
+    ulong * flimbs;
     mp_size_t gabssz = FLINT_ABS(gsz);
 
     /* Promote f as it is guaranteed to be large */
@@ -123,7 +123,7 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 
     if (mf->_mp_alloc < (gabssz + 1)) /* Ensure result fits */
     {
-        mp_limb_t * tmp = flimbs;
+        ulong * tmp = flimbs;
         flimbs = _mpz_realloc(mf, gabssz + 1);
 
         /* If f and g are aliased, then we need to change glimbs as well. */
@@ -146,10 +146,10 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 
 /* Subtract two limbs (they have different sign) and decide the sign via g. */
 static void
-_fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
+_fmpz_sub_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x)
 {
     __mpz_struct * mf;
-    mp_limb_t * flimbs;
+    ulong * flimbs;
     mp_size_t gabssz = FLINT_ABS(gsz);
 
     /* If size of g is 1, we have a higher probability of the result being
@@ -325,7 +325,7 @@ carry:      if (COEFF_IS_MPZ(f1))
     {
         __mpz_struct * mg = COEFF_TO_PTR(g1);
         mp_size_t gsz = mg->_mp_size;
-        mp_limb_t * glimbs = mg->_mp_d;
+        ulong * glimbs = mg->_mp_d;
 
         if (gsz > 0)
             _fmpz_sub_mpn_1(f, glimbs, gsz, x);

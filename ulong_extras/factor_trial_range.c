@@ -11,13 +11,13 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_factor_trial_range(n_factor_t * factors, mp_limb_t n, ulong start, ulong num_primes)
+ulong n_factor_trial_range(n_factor_t * factors, ulong n, ulong start, ulong num_primes)
 {
    unsigned int exp;
-   mp_limb_t p;
+   ulong p;
    double ppre;
    ulong i;
-   const mp_limb_t * primes;
+   ulong_srcptr primes;
    const double * inverses;
 
    primes = n_primes_arr_readonly(num_primes);

@@ -17,12 +17,12 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
-                  slong len1, mp_srcptr poly2, mp_srcptr poly3, slong len3,
-                                 mp_srcptr poly3inv, slong len3inv, nmod_t mod)
+_nmod_poly_compose_mod_brent_kung_preinv(ulong_ptr res, ulong_srcptr poly1,
+                  slong len1, ulong_srcptr poly2, ulong_srcptr poly3, slong len3,
+                                 ulong_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t A, B, C;
-    mp_ptr t, h;
+    ulong_ptr t, h;
     slong i, n, m;
 
     n = len3 - 1;
@@ -93,7 +93,7 @@ nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
     slong len3 = poly3->length;
     slong len = len3 - 1;
 
-    mp_ptr ptr2;
+    ulong_ptr ptr2;
 
     if (len3 == 0)
         flint_throw(FLINT_DIVZERO, "nmod_poly_compose_mod_brent_kung_preinv\n");

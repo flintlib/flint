@@ -109,7 +109,7 @@ int n_fq_bpoly_equal(
 
 
 void n_fq_bpoly_get_coeff_n_fq(
-    mp_limb_t * c,
+    ulong * c,
     const n_bpoly_t A,
     slong e0,
     slong e1,
@@ -125,7 +125,7 @@ void n_fq_bpoly_set_coeff_n_fq(
     n_bpoly_t A,
     slong e0,
     slong e1,
-    const mp_limb_t * c,
+    const ulong * c,
     const fq_nmod_ctx_t ctx)
 {
     slong i;
@@ -225,7 +225,7 @@ void n_fq_bpoly_derivative_gen0(
 
 void n_fq_bpoly_scalar_mul_n_fq(
     n_fq_bpoly_t A,
-    const mp_limb_t * c,
+    const ulong * c,
     const fq_nmod_ctx_t ctx)
 {
     slong d = FQ_NMOD_CTX_DEGREE(ctx);

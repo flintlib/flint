@@ -11,7 +11,7 @@
 
 #include "arith.h"
 
-mp_limb_t
+ulong
 nmod_set_ui(ulong x, nmod_t mod)
 {
     if (x < mod.n)
@@ -22,7 +22,7 @@ nmod_set_ui(ulong x, nmod_t mod)
 }
 
 static void
-bsplit_nmod(mp_ptr R, mp_ptr Q, slong a, slong b, nmod_t mod)
+bsplit_nmod(ulong_ptr R, ulong_ptr Q, slong a, slong b, nmod_t mod)
 {
     if (b - a == 1)
     {
@@ -34,7 +34,7 @@ bsplit_nmod(mp_ptr R, mp_ptr Q, slong a, slong b, nmod_t mod)
     else
     {
         slong m, len1, len2;
-        mp_ptr R1, R2, Q1, Q2;
+        ulong_ptr R1, R2, Q1, Q2;
         m = a + (b - a) / 2;
 
         len1 = (m - a) + 1;
@@ -57,9 +57,9 @@ bsplit_nmod(mp_ptr R, mp_ptr Q, slong a, slong b, nmod_t mod)
 }
 
 void
-arith_bell_number_nmod_vec_ogf(mp_ptr res, slong len, nmod_t mod)
+arith_bell_number_nmod_vec_ogf(ulong_ptr res, slong len, nmod_t mod)
 {
-    mp_ptr R, Q;
+    ulong_ptr R, Q;
 
     if (len <= 2 || mod.n == 1)
     {

@@ -526,7 +526,7 @@ main(void)
         fmpz_mod_mpoly_ctx_t ctx;
         fmpz_mod_mpoly_t a, b, g, abar, bbar, t1, t2;
         slong len, len1, len2;
-        mp_limb_t exp_bound, exp_bound1, exp_bound2;
+        ulong exp_bound, exp_bound1, exp_bound2;
 
         fmpz_mod_mpoly_ctx_init_rand_bits_prime(ctx, state, 10, 150);
 
@@ -631,7 +631,7 @@ main(void)
     {
         fmpz_mod_mpoly_ctx_t ctx;
         fmpz_mod_mpoly_t a, b, g, abar, bbar, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         slong len, len1, len2;
         slong degbound;
@@ -845,7 +845,7 @@ main(void)
     {
         fmpz_mod_mpoly_ctx_t ctx;
         fmpz_mod_mpoly_t a, b, g, abar, bbar, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         slong len1, len2, len3, len4;
         ulong degbounds1[4];

@@ -19,7 +19,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_vec.h"
@@ -40,7 +40,7 @@ main(void)
     {
         nmod_poly_t poly, poly2, poly3;
         nmod_poly_factor_t factors;
-        mp_limb_t modulus;
+        ulong modulus;
         slong length, length2;
         int result = 1;
 

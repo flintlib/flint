@@ -23,7 +23,7 @@ main(void)
 {
     nmod_mat_t A;
     slong i, m, n, d, r;
-    mp_limb_t mod;
+    ulong mod;
     FLINT_TEST_INIT(state);
     
 

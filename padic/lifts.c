@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 slong * _padic_lifts_exps(slong *n, slong N)
 {
@@ -59,4 +59,3 @@ void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
         fmpz_clear(t);
     }
 }
-

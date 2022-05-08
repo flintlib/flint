@@ -10,7 +10,7 @@
 */
 
 /* This is an interface intended for basic fmpz functionality as it reduces the
- * header size by about 80 %. */
+ * header size by a substantially. */
 
 #ifndef FMPZ_MINI_H
 #define FMPZ_MINI_H
@@ -23,12 +23,6 @@
 
 #include "flint.h"
 #include "fmpz-conversions.h"
-#ifdef LONGSLONG
-# define flint_mpz_set_si mpz_set_si
-# define flint_mpz_set_ui mpz_set_ui
-#else
-# include "gmpcompat.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +38,7 @@ void fmpz_init(fmpz_t f)
 
 FLINT_DLL void _fmpz_clear_mpz(fmpz f);
 
-FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
+FLINT_DLL mpz_mock_ptr _fmpz_new_mpz(void);
 
 FMPZ_MINI_INLINE
 void fmpz_clear(fmpz_t f)
@@ -63,11 +57,11 @@ void _fmpz_demote(fmpz_t f)
     }
 }
 
-FLINT_DLL __mpz_struct * _fmpz_promote_val(fmpz_t f);
+FLINT_DLL mpz_mock_ptr _fmpz_promote_val(fmpz_t f);
 
 FLINT_DLL void _fmpz_demote_val(fmpz_t f);
 
-FLINT_DLL __mpz_struct * _fmpz_promote(fmpz_t f);
+FLINT_DLL mpz_mock_ptr _fmpz_promote(fmpz_t f);
 
 FMPZ_MINI_INLINE
 void fmpz_init_set_ui(fmpz_t f, ulong g)
@@ -78,10 +72,11 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
     }
     else
     {
-        __mpz_struct * ptr;
+        mpz_mock_ptr ptr;
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_ui(ptr, g);
+        ptr->_mp_size = 1;
+        ptr->_mp_d[0] = g;
     }
 }
 
@@ -94,10 +89,19 @@ void fmpz_init_set_si(fmpz_t f, slong g)
     }
     else
     {
-        __mpz_struct * ptr;
+        mpz_mock_ptr ptr;
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_si(ptr, g);
+        if (g < 0)
+        {
+            ptr->_mp_size = -1;
+            ptr->_mp_d[0] = -g;
+        }
+        else
+        {
+            ptr->_mp_size = 1;
+            ptr->_mp_d[0] = g;
+        }
     }
 }
 
@@ -131,53 +135,71 @@ int fmpz_is_one(const fmpz_t f)
     return (*f == 1);
 }
 
+FMPZ_MINI_INLINE
+int fmpz_is_pm1(const fmpz_t f)
+{
+   return (*f == 1 || *f == -1);
+}
+
 FLINT_DLL int fmpz_equal(const fmpz_t f, const fmpz_t g);
+FLINT_DLL int fmpz_equal_si(const fmpz_t f, slong g);
+FLINT_DLL int fmpz_equal_ui(const fmpz_t f, ulong g);
 
 FLINT_DLL void fmpz_set(fmpz_t f, const fmpz_t g);
 
 FMPZ_MINI_INLINE void
-fmpz_set_si(fmpz_t f, slong val)
+fmpz_set_si(fmpz_t f, slong g)
 {
-    if (val < COEFF_MIN || val > COEFF_MAX)
+    if (g < COEFF_MIN || g > COEFF_MAX)
     {
-        __mpz_struct * mf = _fmpz_promote(f);
-        flint_mpz_set_si(mf, val);
+        mpz_mock_ptr mf = _fmpz_promote(f);
+        if (g < 0)
+        {
+            mf->_mp_size = -1;
+            mf->_mp_d[0] = -g;
+        }
+        else
+        {
+            mf->_mp_size = 1;
+            mf->_mp_d[0] = g;
+        }
     }
     else
     {
         _fmpz_demote(f);
-        *f = val;
+        *f = g;
     }
 }
 
 FMPZ_MINI_INLINE void
-fmpz_set_ui(fmpz_t f, ulong val)
+fmpz_set_ui(fmpz_t f, ulong g)
 {
-    if (val > COEFF_MAX)
+    if (g > COEFF_MAX)
     {
-        __mpz_struct * mf = _fmpz_promote(f);
-        flint_mpz_set_ui(mf, val);
+        mpz_mock_ptr mf = _fmpz_promote(f);
+        mf->_mp_size = 1;
+        mf->_mp_d[0] = g;
     }
     else
     {
         _fmpz_demote(f);
-        *f = val;
+        *f = g;
     }
 }
 
 FMPZ_MINI_INLINE void
-fmpz_neg_ui(fmpz_t f, ulong val)
+fmpz_neg_ui(fmpz_t f, ulong g)
 {
-    if (val > COEFF_MAX)
+    if (g > COEFF_MAX)
     {
-        __mpz_struct * mf = _fmpz_promote(f);
-        flint_mpz_set_ui(mf, val);
-        mpz_neg(mf, mf);
+        mpz_mock_ptr mf = _fmpz_promote(f);
+        mf->_mp_size = -1;
+        mf->_mp_d[0] = g;
     }
     else
     {
         _fmpz_demote(f);
-        *f = -(slong) val;
+        *f = -(slong) g;
     }
 }
 
@@ -197,21 +219,41 @@ FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
 
 FLINT_DLL void fmpz_abs(fmpz_t f1, const fmpz_t f2);
 
-FMPZ_MINI_INLINE void
-fmpz_neg(fmpz_t f1, const fmpz_t f2)
+FLINT_DLL void fmpz_neg(fmpz_t f1, const fmpz_t f2);
+
+FLINT_DLL void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x);
+
+FLINT_DLL void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x);
+
+FMPZ_MINI_INLINE
+void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
 {
-    if (!COEFF_IS_MPZ(*f2))
-    {
-        fmpz t = -*f2;
-        _fmpz_demote(f1);
-        *f1 = t;
-    }
+    if (x >= 0)
+        fmpz_add_ui(f, g, (ulong) x);
     else
-    {
-        __mpz_struct *mpz_res = _fmpz_promote(f1);
-        mpz_neg(mpz_res, COEFF_TO_PTR(*f2));
-    }
+        fmpz_sub_ui(f, g, (ulong) -x);
 }
+
+FMPZ_MINI_INLINE
+void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    if (x >= 0)
+        fmpz_sub_ui(f, g, (ulong) x);
+    else
+        fmpz_add_ui(f, g, (ulong) -x);
+}
+
+FLINT_DLL void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);
+FLINT_DLL void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x);
+
+FLINT_DLL void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
+
+FLINT_DLL void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h);
+FLINT_DLL void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 /* comparison *****************************************************************/
 
@@ -219,13 +261,31 @@ FLINT_DLL int fmpz_cmp(const fmpz_t f, const fmpz_t g);
 FLINT_DLL int fmpz_cmp_ui(const fmpz_t f, ulong g);
 FLINT_DLL int fmpz_cmp_si(const fmpz_t f, slong g);
 
-FLINT_DLL int fmpz_sgn(const fmpz_t f);
+FMPZ_MINI_INLINE
+int fmpz_sgn(const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+        return FLINT_SGN(*f);
+    else
+    {
+        mpz_mock_ptr mf = COEFF_TO_PTR(*f);
+        return (mf->_mp_size > 0) ? 1 : -1;
+    }
+}
 
 FLINT_DLL int fmpz_fits_si(const fmpz_t f);
 FLINT_DLL int fmpz_abs_fits_ui(const fmpz_t f);
 
-FLINT_DLL mp_size_t fmpz_size(const fmpz_t f);
+FLINT_DLL mp_mock_size_t fmpz_size(const fmpz_t f);
 FLINT_DLL flint_bitcnt_t fmpz_bits(const fmpz_t f);
+
+/* miscellaneous **************************************************************/
+
+FLINT_DLL void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+FLINT_DLL int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 #ifdef __cplusplus
 }

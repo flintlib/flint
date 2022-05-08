@@ -29,7 +29,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -86,7 +86,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n;
 
@@ -151,7 +151,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -214,7 +214,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n;
 
@@ -273,7 +273,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -336,7 +336,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n;
 

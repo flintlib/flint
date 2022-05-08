@@ -3,18 +3,18 @@
 **qsieve.h** -- Quadratic sieve
 ================================================================================
 
-.. function:: mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
+.. function:: ulong qsieve_knuth_schroeppel(qs_t qs_inf)
 
     Return the Knuth-Schroeppel multiplier for the `n`, integer to be factored
     based upon the Knuth-Schroeppel function.
 
-.. function:: mp_limb_t qsieve_primes_init(qs_t qs_inf)
+.. function:: ulong qsieve_primes_init(qs_t qs_inf)
 
     Compute the factor base prime along with there inverse for `kn`, where `k` 
     is Knuth-Schroeppel multiplier and `n` is the integer to be factored. It
     also computes the square root of `kn` modulo factor base primes.
 
-.. function:: mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta)
+.. function:: ulong qsieve_primes_increment(qs_t qs_inf, ulong delta)
 
     It increase the number of factor base primes by amount 'delta' and 
     calculate inverse of those primes along with the square root of `kn` modulo
@@ -91,7 +91,7 @@
     Call for initialization of polynomial, sieving, and scanning of sieve
     for all the possible polynomials for particular hypercube i.e. `A`.
 
-.. function:: void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
+.. function:: void qsieve_write_to_file(qs_t qs_inf, ulong prime, fmpz_t Y)
 
     Write a relation to the file. Format is as follows,
     first write large prime, in case of full relation it is 1, then write exponent
@@ -99,12 +99,12 @@
     factor base and their exponent and at last value of `Q(x)` for particular relation.
     each relation is written in new line.
 
-.. function:: hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
+.. function:: hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime)
 
     Return the pointer to the location of 'prime' is hash table if it exist, else
     create and entry for it in hash table and return pointer to that.
 
-.. function:: void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
+.. function:: void qsieve_add_to_hashtable(qs_t qs_inf, ulong prime)
     
     Add 'prime' to the hast table.
 

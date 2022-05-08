@@ -18,7 +18,7 @@ int nmod_mpoly_pfrac_init(
     slong r,
     slong w,
     const nmod_mpoly_struct * betas,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     int success = 1;

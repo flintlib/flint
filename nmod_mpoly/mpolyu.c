@@ -370,7 +370,7 @@ void nmod_mpoly_from_mpolyu_perm_inflate(
     slong i, j, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps;
@@ -686,7 +686,7 @@ void nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     slong i, j, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps;
@@ -765,7 +765,7 @@ void nmod_mpolyu_shift_left(nmod_mpolyu_t A, ulong s)
     }
 }
 
-void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
+void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, ulong c,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -836,7 +836,7 @@ void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
     k = 0;
     for (i = nmod_poly_length(a) - 1; i >= 0; i--)
     {
-        mp_limb_t c = nmod_poly_get_coeff_ui(a, i);
+        ulong c = nmod_poly_get_coeff_ui(a, i);
         if (c != UWORD(0))
         {
             A->coeffs[k] = c;
@@ -893,7 +893,7 @@ void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
     k = 0;
     for (i = nmod_poly_length(a) - 1; i >= 0; i--)
     {
-        mp_limb_t c = nmod_poly_get_coeff_ui(a, i);
+        ulong c = nmod_poly_get_coeff_ui(a, i);
         if (c != UWORD(0))
         {
             nmod_mpolyu_fit_length(A, k + 1, ctx);

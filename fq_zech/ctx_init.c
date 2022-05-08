@@ -116,8 +116,8 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     fq_nmod_t r, gen;
     slong up, q;
     fmpz_t result, order;
-    mp_limb_t j, nz, result_ui;
-    mp_limb_t *n_reverse_table;
+    ulong j, nz, result_ui;
+    ulong *n_reverse_table;
 
     ctx->fq_nmod_ctx = fq_nmod_ctx;
     ctx->owns_fq_nmod_ctx = 0;
@@ -160,10 +160,10 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     ctx->prime_root = (fq_nmod_ctx_degree(fq_nmod_ctx) & 1) ? 
         ctx->p - fq_nmod_ctx->a[0] : fq_nmod_ctx->a[0];
 
-    ctx->zech_log_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
-    ctx->prime_field_table = (mp_limb_t *) flint_malloc(up * sizeof(mp_limb_t));
-    n_reverse_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
-    ctx->eval_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
+    ctx->zech_log_table = (ulong *) flint_malloc(q * sizeof(ulong));
+    ctx->prime_field_table = (ulong *) flint_malloc(up * sizeof(ulong));
+    n_reverse_table = (ulong *) flint_malloc(q * sizeof(ulong));
+    ctx->eval_table = (ulong *) flint_malloc(q * sizeof(ulong));
 
     ctx->zech_log_table[ctx->qm1] = 0;
     ctx->prime_field_table[0] = ctx->qm1;

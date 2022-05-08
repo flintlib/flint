@@ -30,7 +30,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, X, B, Y;
-        mp_limb_t m;
+        ulong m;
         slong rows, cols;
         int unit;
 

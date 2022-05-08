@@ -34,20 +34,21 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
 void
-_nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
-                             mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
+_nmod_poly_div_basecase_1(ulong_ptr Q, ulong_ptr W,
+                             ulong_srcptr A, slong A_len, ulong_srcptr B, slong B_len,
                              nmod_t mod)
 {
-    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
+    ulong lead_inv = n_invmod(B[B_len - 1], mod.n);
     slong len, coeff = A_len - B_len;
 
-    mp_ptr R1 = W;
-    mp_srcptr Btop = B + B_len - 1;
+    ulong_ptr R1 = W;
+    ulong_srcptr Btop = B + B_len - 1;
 
     FLINT_MPN_COPYI(R1, A + B_len - 1, A_len - B_len + 1);
 
@@ -64,7 +65,7 @@ _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
 
         if (coeff >= 0)
         {
-            mp_limb_t c, * R_sub;
+            ulong c, * R_sub;
 
             Q[coeff] =
                 n_mulmod2_preinv(R1[coeff], lead_inv, mod.n, mod.ninv);
@@ -82,14 +83,14 @@ _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
 }
 
 void
-_nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
-                             mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
+_nmod_poly_div_basecase_2(ulong_ptr Q, ulong_ptr W,
+                             ulong_srcptr A, slong A_len, ulong_srcptr B, slong B_len,
                              nmod_t mod)
 {
     slong coeff, i, len;
-    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-    mp_ptr B2, R2;
-    mp_srcptr Btop;
+    ulong lead_inv = n_invmod(B[B_len - 1], mod.n);
+    ulong_ptr B2, R2;
+    ulong_srcptr Btop;
 
     B2 = W;
     for (i = 0; i < B_len - 1; i++)
@@ -110,7 +111,7 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
 
     while (coeff >= 0)
     {
-        mp_limb_t r_coeff;
+        ulong r_coeff;
         r_coeff =
             n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n, mod.ninv);
 
@@ -125,7 +126,7 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
 
         if (coeff >= 0)
         {
-            mp_limb_t c, * R_sub;
+            ulong c, * R_sub;
 
             Q[coeff] =
                 n_mulmod2_preinv(r_coeff, lead_inv, mod.n, mod.ninv);
@@ -143,15 +144,15 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
 }
 
 void
-_nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
-        mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
+_nmod_poly_div_basecase_3(ulong_ptr Q, ulong_ptr W,
+        ulong_srcptr A, slong A_len, ulong_srcptr B, slong B_len,
         nmod_t mod)
 {
     slong coeff, i, len;
-    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-    mp_limb_t r_coeff;
-    mp_ptr B3, R3;
-    mp_srcptr Btop;
+    ulong lead_inv = n_invmod(B[B_len - 1], mod.n);
+    ulong r_coeff;
+    ulong_ptr B3, R3;
+    ulong_srcptr Btop;
 
     B3 = W;
     for (i = 0; i < B_len - 1; i++)
@@ -189,7 +190,7 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
 
         if (coeff >= 0)
         {
-            mp_limb_t c, * R_sub;
+            ulong c, * R_sub;
 
             Q[coeff] =
                 n_mulmod2_preinv(r_coeff, lead_inv, mod.n, mod.ninv);
@@ -207,8 +208,8 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
 }
 
 void
-_nmod_poly_div_basecase(mp_ptr Q, mp_ptr W,
-        mp_srcptr A, slong A_len, mp_srcptr B, slong B_len,
+_nmod_poly_div_basecase(ulong_ptr Q, ulong_ptr W,
+        ulong_srcptr A, slong A_len, ulong_srcptr B, slong B_len,
         nmod_t mod)
 {
     slong bits =
@@ -226,7 +227,7 @@ void
 nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
         const nmod_poly_t B)
 {
-    mp_ptr Q_coeffs, W;
+    ulong_ptr Q_coeffs, W;
     nmod_poly_t t1;
     slong Alen, Blen;
     TMP_INIT;
@@ -266,7 +267,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     }
 
     TMP_START;
-    W = TMP_ALLOC(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod)*sizeof(mp_limb_t));
+    W = TMP_ALLOC(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod)*sizeof(ulong));
 
     _nmod_poly_div_basecase(Q_coeffs, W, A->coeffs, Alen,
             B->coeffs, Blen, B->mod);

@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
-#include "padic.h"
+#include <stdio.h>
 #include "long_extras.h"
+#include "flint-impl.h"
+#include "fmpq.h"
+#include "padic.h"
 
 char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_print_mode mode)
 {
@@ -72,11 +73,6 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
                      + 5) + 1;
 
             str = flint_malloc(b);
-            if (!str)
-            {
-                flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
-                flint_abort();
-            }
         }
 
         s = str;
@@ -103,7 +99,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
                     fmpz_get_str(s, 10, p);
                     while (*++s != '\0') ;
                     *s++ = '^';
-                    flint_sprintf(s, "%wd", j + v);
+                    sprintf(s, WORD_FMT "d", j + v);
                     while (*++s != '\0') ;
                 }
                 else
@@ -135,7 +131,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
                     fmpz_get_str(s, 10, p);
                     while (*++s != '\0') ;
                     *s++ = '^';
-                    flint_sprintf(s, "%wd", j + v);
+                    sprintf(s, WORD_FMT "d", j + v);
                     while (*++s != '\0') ;
                 }
                 else
@@ -160,11 +156,6 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
                    + z_sizeinbase(v, 10) + 4;
 
             str = flint_malloc(b);
-            if (!str)
-            {
-                flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
-                flint_abort();
-            }
         }
 
         if (v == 0)
@@ -190,7 +181,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
             fmpz_get_str(s, 10, p);
             while (*++s != '\0') ;
             *s++ = '^';
-            flint_sprintf(s, "%wd", v);
+            sprintf(s, WORD_FMT "d", v);
         }
     }
 
@@ -201,4 +192,3 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
 {
     return _padic_get_str(str, op, ctx->p, ctx->mode);
 }
-

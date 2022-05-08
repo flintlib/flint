@@ -20,18 +20,64 @@ extern "C" {
 
 /* elementary data types ******************************************************/
 
-#define ulong mp_limb_t
-#define slong mp_limb_signed_t
-#define flint_bitcnt_t ulong
+#ifdef LONGSLONG
+typedef long unsigned int       ulong;
+typedef long int                slong;
+#else
+typedef long long unsigned int  ulong;
+typedef long long int           slong;
+#endif
 
-/* random types ***************************************************************/
+typedef ulong * ulong_ptr;
+typedef const ulong * ulong_srcptr;
+
+typedef slong * slong_ptr;
+typedef const slong * slong_srcptr;
+
+typedef ulong flint_bitcnt_t;
+
+/* mock GMP types  *****************************************************/
+
+#ifdef LONGSIZE
+typedef long int    mp_mock_size_t;
+#else
+typedef int         mp_mock_size_t;
+#endif
 
 typedef struct
 {
-    gmp_randstate_t gmp_state;
+    int _mp_alloc;
+    int _mp_size;
+    ulong *_mp_d;
+} __mpz_mock_struct;
+typedef __mpz_mock_struct mpz_mock_t[1];
+typedef __mpz_mock_struct * mpz_mock_ptr;
+typedef const __mpz_mock_struct * mpz_mock_srcptr;
+
+typedef enum
+{
+    GMP_MOCK_RAND_ALG_DEFAULT = 0,
+    GMP_MOCK_RAND_ALG_LC = GMP_MOCK_RAND_ALG_DEFAULT
+} gmp_mock_randalg_t;
+
+typedef struct
+{
+    mpz_mock_t _mp_seed;
+    gmp_mock_randalg_t _mp_alg;
+    union {
+        void *_mp_lc;
+    } _mp_algdata;
+} __gmp_mock_randstate_struct;
+typedef __gmp_mock_randstate_struct gmp_mock_randstate_t[1];
+
+/* pseudo-random numbers ******************************************************/
+
+typedef struct
+{
+    gmp_mock_randstate_t gmp_state;
     int gmp_init;
-    mp_limb_t __randval;
-    mp_limb_t __randval2;
+    ulong __randval;
+    ulong __randval2;
 } flint_rand_s;
 typedef flint_rand_s flint_rand_t[1];
 
@@ -46,30 +92,18 @@ typedef struct
 } d_mat_struct;
 typedef d_mat_struct d_mat_t[1];
 
-/* matrices of GMP floating-points ********************************************/
-
-typedef struct
-{
-    mpf_ptr entries;
-    slong r;
-    slong c;
-    flint_bitcnt_t prec;
-    mpf_ptr * rows;
-} mpf_mat_struct;
-typedef mpf_mat_struct mpf_mat_t[1];
-
 /* modular arithmetic (word-size) *********************************************/
 
 typedef struct
 {
-   mp_limb_t n;
-   mp_limb_t ninv;
+   ulong n;
+   ulong ninv;
    flint_bitcnt_t norm;
 } nmod_t;
 
 typedef struct
 {
-    mp_ptr coeffs;
+    ulong * coeffs;
     slong alloc;
     slong length;
     nmod_t mod;
@@ -78,10 +112,10 @@ typedef nmod_poly_struct nmod_poly_t[1];
 
 typedef struct
 {
-    mp_limb_t * entries;
+    ulong * entries;
     slong r;
     slong c;
-    mp_limb_t ** rows;
+    ulong ** rows;
     nmod_t mod;
 }
 nmod_mat_struct;
@@ -94,7 +128,7 @@ typedef fmpz fmpz_t[1];
 
 typedef struct
 {
-   mp_ptr dinv;
+   ulong * dinv;
    slong n;
    flint_bitcnt_t norm;
 } fmpz_preinvn_struct;
@@ -288,7 +322,7 @@ typedef struct
     nmod_t mod;
     int sparse_modulus;
     int is_conway;
-    mp_limb_t * a;
+    ulong * a;
     slong * j;
     slong len;
     nmod_poly_t modulus;
@@ -316,21 +350,21 @@ typedef fq_nmod_mat_struct fq_nmod_mat_t[1];
 
 typedef struct
 {
-    mp_limb_t value;
+    ulong value;
 } fq_zech_struct;
 typedef fq_zech_struct fq_zech_t[1];
 
 typedef struct
 {
-    mp_limb_t qm1;              /* q - 1 */
-    mp_limb_t qm1o2;            /* (q - 1) / 2 or 1 when p == 2 */
-    mp_limb_t qm1opm1;          /* (q - 1) / (p - 1) */
-    mp_limb_t p;
+    ulong qm1;              /* q - 1 */
+    ulong qm1o2;            /* (q - 1) / 2 or 1 when p == 2 */
+    ulong qm1opm1;          /* (q - 1) / (p - 1) */
+    ulong p;
     double ppre;
-    mp_limb_t prime_root;       /* primitive root for prime subfield */
-    mp_limb_t * zech_log_table;
-    mp_limb_t * prime_field_table;
-    mp_limb_t * eval_table;
+    ulong prime_root;       /* primitive root for prime subfield */
+    ulong * zech_log_table;
+    ulong * prime_field_table;
+    ulong * eval_table;
     fq_nmod_ctx_struct * fq_nmod_ctx;
     int owns_fq_nmod_ctx;
     int is_conway;
@@ -374,7 +408,7 @@ typedef struct
         fq_zech_ctx_t fq_zech;
         struct {
             nmod_t mod;
-            mp_limb_t a;    /* minpoly is x - a */
+            ulong a;    /* minpoly is x - a */
         } nmod;
         struct {
             fmpz_mod_ctx_t mod;
@@ -413,7 +447,7 @@ typedef struct
     slong r;
     slong c;
     nmod_poly_struct ** rows;
-    mp_limb_t modulus;
+    ulong modulus;
 } nmod_poly_mat_struct;
 typedef nmod_poly_mat_struct nmod_poly_mat_t[1];
 
@@ -530,11 +564,11 @@ typedef nmod_mpoly_ctx_struct nmod_mpoly_ctx_t[1];
 
 typedef struct
 {
-    mp_limb_t * coeffs;
+    ulong * coeffs;
     ulong * exps;
     slong length;
     flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
+    slong coeffs_alloc;     /* abs size in ulong units */
     slong exps_alloc;       /* abs size in ulong units */
 } nmod_mpoly_struct;
 typedef nmod_mpoly_struct nmod_mpoly_t[1];
@@ -568,7 +602,7 @@ typedef struct
     ulong * exps;
     slong length;
     flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
+    slong coeffs_alloc;     /* abs size in ulong units */
     slong exps_alloc;       /* abs size in ulong units */
 } fmpz_mod_mpoly_struct;
 typedef fmpz_mod_mpoly_struct fmpz_mod_mpoly_t[1];
@@ -587,11 +621,11 @@ typedef struct
 typedef fq_nmod_mpoly_ctx_struct fq_nmod_mpoly_ctx_t[1];
 
 typedef struct {
-    mp_limb_t * coeffs;
+    ulong * coeffs;
     ulong * exps;
     slong length;
     flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
+    slong coeffs_alloc;     /* abs size in ulong units */
     slong exps_alloc;       /* abs size in ulong units */
 } fq_nmod_mpoly_struct;
 typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
@@ -617,7 +651,7 @@ typedef fq_zech_mpoly_struct fq_zech_mpoly_t[1];
 
 typedef struct
 {
-    mp_limb_t constant;
+    ulong constant;
     nmod_mpoly_struct * poly;
     fmpz * exp;
     slong num;
@@ -691,7 +725,7 @@ typedef fmpz_lll_struct fmpz_lll_t[1];
 
 typedef struct
 {
-    mp_limb_t * coeffs;
+    ulong * coeffs;
     slong alloc;
     slong length;
 } n_poly_struct;

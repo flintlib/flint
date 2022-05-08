@@ -20,8 +20,8 @@ int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
     {
         if (!COEFF_IS_MPZ(*g)) 
         {
-            mp_limb_t uf = FLINT_ABS(*f);
-            mp_limb_t ug = FLINT_ABS(*g);
+            ulong uf = FLINT_ABS(*f);
+            ulong ug = FLINT_ABS(*g);
             
             return (uf < ug ? -1 : (uf > ug));
         }

@@ -28,8 +28,8 @@ _fmpz_factor_fit_length(fmpz_factor_t factor, slong len)
 
         if (len > factor->alloc)
         {
-            FLINT_MPN_ZERO((mp_ptr)(factor->p + factor->alloc), len-factor->alloc);
-            FLINT_MPN_ZERO((mp_ptr)(factor->exp + factor->alloc), len-factor->alloc);
+            FLINT_MPN_ZERO((ulong_ptr)(factor->p + factor->alloc), len-factor->alloc);
+            FLINT_MPN_ZERO((ulong_ptr)(factor->exp + factor->alloc), len-factor->alloc);
         }
 
         factor->alloc = len;

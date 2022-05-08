@@ -12,14 +12,14 @@
 
 #include "ulong_extras.h"
 
-slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp) 
+slong n_sqrtmod_2pow(ulong_ptr* sqrt, ulong a, slong exp) 
 {
-    mp_limb_t r = (a & 1);
-    mp_limb_t * s;
+    ulong r = (a & 1);
+    ulong_ptr s;
 
     if (exp == 0) /* special case for sqrt of 0 mod 1 */
     {
-        *sqrt = flint_malloc(sizeof(mp_limb_t));
+        *sqrt = flint_malloc(sizeof(ulong));
         (*sqrt)[0] = 0;
 
         return 1;
@@ -27,7 +27,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 
     if (exp == 1) /* special case mod 2 */
     {
-        *sqrt = flint_malloc(sizeof(mp_limb_t));
+        *sqrt = flint_malloc(sizeof(ulong));
 
         if (r) (*sqrt)[0] = 1;
         else (*sqrt)[0] = 0;
@@ -41,7 +41,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         
         if (r < 2) /* 0, 1 mod 4 */
         {
-           *sqrt = flint_malloc(sizeof(mp_limb_t)*2);
+           *sqrt = flint_malloc(sizeof(ulong)*2);
 
            (*sqrt)[0] = r;
            (*sqrt)[1] = r + 2;
@@ -56,7 +56,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 
     if (r) /* a is odd */
     {
-        mp_limb_t roots[2];
+        ulong roots[2];
         slong i, ex;
         ulong pow;
 
@@ -96,7 +96,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
             roots[i] = r;
         }
 
-        *sqrt = flint_malloc(sizeof(mp_limb_t)*4);
+        *sqrt = flint_malloc(sizeof(ulong)*4);
 
         (*sqrt)[0] = roots[0]; /* write out both pairs of roots */
         (*sqrt)[1] = pow - roots[0];
@@ -120,7 +120,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         {
            a = (UWORD(1)<<(exp - k/2));
            num = (UWORD(1)<<(k/2));
-           s = flint_malloc(num*sizeof(mp_limb_t));
+           s = flint_malloc(num*sizeof(ulong));
            for (i = 0; i < num; i++)
                s[i] = i*a;
 
@@ -155,14 +155,14 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 
         if (num == 1) /* one root */
         {
-           s = flint_realloc(s, a*sizeof(mp_limb_t));
+           s = flint_realloc(s, a*sizeof(ulong));
 
            for (i = 1; i < a; i++)
               s[i] = s[i - 1] + r;
 
         } else if (num == 2) /* two roots */
         {
-           s = flint_realloc(s, 2*a*sizeof(mp_limb_t));
+           s = flint_realloc(s, 2*a*sizeof(ulong));
 
            for (i = 1; i < a; i++)
            {
@@ -171,7 +171,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
            }
         } else /* num == 4, i.e. four roots */
         {
-           s = flint_realloc(s, 4*a*sizeof(mp_limb_t));
+           s = flint_realloc(s, 4*a*sizeof(ulong));
 
            for (i = 1; i < a; i++)
            {
@@ -188,10 +188,10 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
     }
 }
 
-slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp) 
+slong n_sqrtmod_primepow(ulong_ptr* sqrt, ulong a, ulong p, slong exp) 
 {
-    mp_limb_t r, ex, pow, k, a1, pinv, powinv;
-    mp_limb_t * s;
+    ulong r, ex, pow, k, a1, pinv, powinv;
+    ulong_ptr s;
     slong i, num;
 
     if (exp < 0)
@@ -199,7 +199,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
     if (exp == 0) /* special case, sqrt of 0 mod 1 */
     {
-        *sqrt = flint_malloc(sizeof(mp_limb_t));
+        *sqrt = flint_malloc(sizeof(ulong));
         (*sqrt)[0] = 0;
 
         return 1;
@@ -218,7 +218,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
             return 0;
         }
 
-        *sqrt = flint_malloc(sizeof(mp_limb_t)*(1 + (r != 0)));
+        *sqrt = flint_malloc(sizeof(ulong)*(1 + (r != 0)));
         (*sqrt)[0] = r;
         if (r) (*sqrt)[1] = p - r;
        
@@ -256,7 +256,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
             r += k*pow;
         }
 
-        *sqrt = flint_malloc(sizeof(mp_limb_t)*2);
+        *sqrt = flint_malloc(sizeof(ulong)*2);
         (*sqrt)[0] = r;
         (*sqrt)[1] = pow - r;
 
@@ -265,7 +265,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
     {
         for (k = 1, pow = p; k < exp; k++) /* find highest power of p dividing a */
         {
-            mp_limb_t pow2 = pow * p;
+            ulong pow2 = pow * p;
 
             if (a % pow2 != 0)
                 break;
@@ -277,7 +277,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
         {
            a = n_pow(p, exp - k/2);
            num = n_pow(p, k/2);
-           s = flint_malloc(num*sizeof(mp_limb_t));
+           s = flint_malloc(num*sizeof(ulong));
            for (i = 0; i < num; i++)
                s[i] = i*a;
 
@@ -308,7 +308,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
         s[0] *= a; /* multiply roots by p^(k/2) */
         s[1] *= a;
         
-        s = flint_realloc(s, 2*a*sizeof(mp_limb_t));
+        s = flint_realloc(s, 2*a*sizeof(ulong));
 
         for (i = 1; i < a; i++) 
         {

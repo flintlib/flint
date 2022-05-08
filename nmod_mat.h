@@ -29,13 +29,13 @@
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
 
 NMOD_MAT_INLINE
-mp_limb_t nmod_mat_get_entry(const nmod_mat_t mat, slong i, slong j)
+ulong nmod_mat_get_entry(const nmod_mat_t mat, slong i, slong j)
 {
    return mat->rows[i][j];
 }
 
 NMOD_MAT_INLINE
-mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
+ulong * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
 {
    return mat->rows[i] + j;
 }
@@ -55,7 +55,7 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
 }
 
 NMOD_MAT_INLINE
-void _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
+void _nmod_mat_set_mod(nmod_mat_t mat, ulong n)
 {
     mat->mod.n = n;
     count_leading_zeros(mat->mod.norm, n);
@@ -63,7 +63,7 @@ void _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
 }
 
 /* Memory management */
-FLINT_DLL void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n);
+FLINT_DLL void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n);
 FLINT_DLL void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 FLINT_DLL void nmod_mat_clear(nmod_mat_t mat);
 FLINT_DLL void nmod_mat_one(nmod_mat_t mat);
@@ -76,11 +76,11 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
     slong i, j;
     for (i = 0; i < nmod_mat_nrows(mat1); i++)
     {
-        mp_limb_t * row1 = mat1->rows[i];
-        mp_limb_t * row2 = mat2->rows[i];
+        ulong * row1 = mat1->rows[i];
+        ulong * row2 = mat2->rows[i];
         for (j = 0; j < nmod_mat_ncols(mat1); j++)
         {
-            mp_limb_t tmp = row1[j];
+            ulong tmp = row1[j];
             row1[j] = row2[j];
             row2[j] = tmp;
         }
@@ -101,7 +101,7 @@ FLINT_DLL void nmod_mat_concat_vertical(nmod_mat_t res,
 FLINT_DLL void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 FLINT_DLL void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 FLINT_DLL int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
-                 mp_srcptr diag, slong n);
+                 ulong_srcptr diag, slong n);
 FLINT_DLL void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
 FLINT_DLL void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state);
 FLINT_DLL void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -180,9 +180,9 @@ FLINT_DLL void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
-FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
+FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c);
 FLINT_DLL void nmod_mat_scalar_addmul_ui(nmod_mat_t dest,
-                       const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
+                       const nmod_mat_t X, const nmod_mat_t Y, const ulong b);
 FLINT_DLL void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c);
 
 /* Matrix multiplication */
@@ -213,17 +213,17 @@ FLINT_DLL void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
 FLINT_DLL void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
-FLINT_DLL void nmod_mat_mul_nmod_vec(mp_limb_t * c, const nmod_mat_t A,
-                                              const mp_limb_t * b, slong blen);
+FLINT_DLL void nmod_mat_mul_nmod_vec(ulong * c, const nmod_mat_t A,
+                                              const ulong * b, slong blen);
 
-FLINT_DLL void nmod_mat_mul_nmod_vec_ptr(mp_limb_t * const * c,
-                  const nmod_mat_t A, const mp_limb_t * const * b, slong blen);
+FLINT_DLL void nmod_mat_mul_nmod_vec_ptr(ulong * const * c,
+                  const nmod_mat_t A, const ulong * const * b, slong blen);
 
-FLINT_DLL void nmod_mat_nmod_vec_mul(mp_limb_t * c, const mp_limb_t * a,
+FLINT_DLL void nmod_mat_nmod_vec_mul(ulong * c, const ulong * a,
                                                slong alen, const nmod_mat_t B);
 
-FLINT_DLL void nmod_mat_nmod_vec_mul_ptr(mp_limb_t * const * c,
-                  const mp_limb_t * const * a, slong alen, const nmod_mat_t B);
+FLINT_DLL void nmod_mat_nmod_vec_mul_ptr(ulong * const * c,
+                  const ulong * const * a, slong alen, const nmod_mat_t B);
 
 /* Exponent */
 
@@ -232,15 +232,15 @@ FLINT_DLL void nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow);
 
 /* Trace */
 
-FLINT_DLL mp_limb_t nmod_mat_trace(const nmod_mat_t mat);
+FLINT_DLL ulong nmod_mat_trace(const nmod_mat_t mat);
 
 /* Determinant */
 
-FLINT_DLL mp_limb_t _nmod_mat_det(nmod_mat_t A);
-FLINT_DLL mp_limb_t nmod_mat_det(const nmod_mat_t A);
+FLINT_DLL ulong _nmod_mat_det(nmod_mat_t A);
+FLINT_DLL ulong nmod_mat_det(const nmod_mat_t A);
 
-FLINT_DLL mp_limb_t _nmod_mat_det_howell(nmod_mat_t A);
-FLINT_DLL mp_limb_t nmod_mat_det_howell(const nmod_mat_t A);
+FLINT_DLL ulong _nmod_mat_det_howell(nmod_mat_t A);
+FLINT_DLL ulong nmod_mat_det_howell(const nmod_mat_t A);
 
 /* Rank */
 
@@ -257,7 +257,7 @@ void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !nmod_mat_is_empty(mat))
     {
-        mp_limb_t * u;
+        ulong * u;
         slong t;
 
         if (perm)
@@ -298,7 +298,7 @@ void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
 
         for (t = 0; t < mat->r; t++)
         {
-            mp_limb_t c = mat->rows[t][r];
+            ulong c = mat->rows[t][r];
             mat->rows[t][r] = mat->rows[t][s];
             mat->rows[t][s] = c;
         }
@@ -314,7 +314,7 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
         slong i;
         slong c = mat->c;
         slong k = mat->c/2;
-        mp_limb_t e;
+        ulong e;
 
         if (perm)
         {
@@ -360,7 +360,7 @@ FLINT_DLL slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 /* Nonsingular solving */
 
 FLINT_DLL int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
-FLINT_DLL int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
+FLINT_DLL int nmod_mat_solve_vec(ulong_ptr x, const nmod_mat_t A, ulong_srcptr b);
 
 /* Solving */
 
@@ -424,7 +424,7 @@ FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* Inlines *******************************************************************/
 
-FLINT_DLL void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
+FLINT_DLL void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, ulong x);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_ctx_init_deg(fq_nmod_mpoly_ctx_t ctx, slong nvars,
-                                  const ordering_t ord, mp_limb_t p, slong deg)
+                                  const ordering_t ord, ulong p, slong deg)
 {
     fmpz_t P;
     mpoly_ctx_init(ctx->minfo, nvars, ord);

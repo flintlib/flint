@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2021 Albin Ahlbäck, Fredrik Johansson
+    Copyright (C) 2021 Albin Ahlbäck
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 

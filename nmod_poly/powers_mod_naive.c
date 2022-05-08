@@ -21,8 +21,8 @@
     {ginv, ginvlen} must be set to the power series inverse of the reverse of g
 */
 void
-_nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f, slong flen, slong n,
-         mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod)
+_nmod_poly_powers_mod_preinv_naive(ulong_ptr * res, ulong_srcptr f, slong flen, slong n,
+         ulong_srcptr g, slong glen, ulong_srcptr ginv, slong ginvlen, const nmod_t mod)
 {
     slong i;
     
@@ -67,7 +67,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
     slong i;
 
     nmod_poly_t ginv;
-    mp_ptr * res_arr;
+    ulong_ptr * res_arr;
     
     if (nmod_poly_length(g) == 0)
         flint_throw(FLINT_DIVZERO, "nmod_poly_powers_mod_naive\n");
@@ -99,7 +99,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
         return;
     }
 
-    res_arr = (mp_ptr *) flint_malloc(n*sizeof(mp_ptr));
+    res_arr = (ulong_ptr *) flint_malloc(n*sizeof(ulong_ptr));
     nmod_poly_init_mod(ginv, g->mod);
 
     for (i = 0; i < n; i++)

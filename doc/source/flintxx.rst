@@ -219,7 +219,7 @@ constructor functions. Typical examples are
 ``nmod_polyxx::reduce(mplimbarg, nmodctxarg)``. The former takes an (expression
 template evaluating to) ``fmpzxx`` and returns an ``fmpz_polyxx`` representing
 the constant polynomial with value the ``fmpzxx``. The latter takes an argument
-of type ``mp_limb_t`` and one of type ``nmodxx_ctx_srcref`` (essentially a
+of type ``ulong`` and one of type ``nmodxx_ctx_srcref`` (essentially a
 word-sized modulus) and returns an ``nmod_polyxx`` representing the constant
 polynomial obtained by reducing ``mplimbarg``.
 

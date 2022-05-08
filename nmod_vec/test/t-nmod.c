@@ -30,7 +30,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t m, a, b, c;
+        ulong m, a, b, c;
         mpz_t x, y, z;
 
         m = n_randtest_not_zero(state);
@@ -67,7 +67,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t m, a, b, c;
+        ulong m, a, b, c;
         mpz_t x, y, z;
 
         m = n_randtest_not_zero(state);
@@ -104,7 +104,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t m, a, b, c;
+        ulong m, a, b, c;
         mpz_t x, y, z;
 
         m = n_randtest_not_zero(state);
@@ -141,7 +141,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t m, a, b, c;
+        ulong m, a, b, c;
         mpz_t x, y, z;
 
         m = n_randtest_prime(state, 0);
@@ -181,7 +181,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t m, b, c;
+        ulong m, b, c;
         mpz_t y, z;
 
         m = n_randtest_prime(state, 0);
@@ -215,7 +215,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t m, b, c;
+        ulong m, b, c;
         mpz_t y, z;
         ulong exp;
 

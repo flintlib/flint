@@ -19,6 +19,7 @@
 #define MPF_VEC_INLINE static __inline__
 #endif
 
+#include "gmp.h"
 #include "flint.h"
 
 #ifdef __cplusplus

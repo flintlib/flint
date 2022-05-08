@@ -37,7 +37,7 @@ main(void)
     {
         nmod_poly_t poly1, poly, q, r, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead;
+        ulong modulus, lead;
         slong i, length, num;
         slong *degs;
         slong num_of_deg[MAX_DEG + 1];

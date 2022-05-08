@@ -15,13 +15,13 @@
 #include "flint-impl.h"
 
 static void 
-__nmod_poly_invsqrt_series_prealloc(mp_ptr g, 
-                                    mp_srcptr h, mp_ptr t, mp_ptr u,
+__nmod_poly_invsqrt_series_prealloc(ulong_ptr g, 
+                                    ulong_srcptr h, ulong_ptr t, ulong_ptr u,
                                     slong n, nmod_t mod)
 {
     const int alloc = (t == NULL);
     const slong m    = (n + 1) / 2;
-    mp_limb_t c;
+    ulong c;
 
     if (n == 1)
     {
@@ -56,7 +56,7 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
     }
 }
 
-void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+void _nmod_poly_invsqrt_series(ulong_ptr g, ulong_srcptr h, slong n, nmod_t mod)
 {
     __nmod_poly_invsqrt_series_prealloc(g, h, NULL, NULL, n, mod);
 }
@@ -64,7 +64,7 @@ void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
     const slong hlen = h->length;
-    mp_ptr g_coeffs, h_coeffs;
+    ulong_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
 
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)

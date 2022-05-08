@@ -10,11 +10,11 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_mini.h"
+#include "fmpz_poly_mini.h"
 
 void
-_fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
+_fmpz_poly_cyclotomic(fmpz * a, ulong n, ulong_ptr factors,
                                         slong num_factors, ulong phi)
 {
     slong i, k;

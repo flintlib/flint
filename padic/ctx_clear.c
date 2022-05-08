@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "fmpz_mini.h"
+#include "fmpz_vec.h"
 
 void padic_ctx_clear(padic_ctx_t ctx)
 {
@@ -20,4 +21,3 @@ void padic_ctx_clear(padic_ctx_t ctx)
         _fmpz_vec_clear(ctx->pow, ctx->max - ctx->min);
     }
 }
-

@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "fft.h"
 
-void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
+void fermat_to_mpz(mpz_t m, ulong * i, mp_size_t limbs)
 {
    mp_limb_signed_t hi;
    

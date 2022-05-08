@@ -12,7 +12,7 @@
 #define ulong ulongxx /* interferes with system includes */
 #include <string.h>
 #undef ulong
-#define ulong mp_limb_t
+#define ulong ulong
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -45,14 +45,14 @@ ulong pp1_primorial[9] =
 #define num_primorials 9
 #endif
 
-void pp1_set(mp_ptr x1, mp_ptr y1, 
-              mp_srcptr x2, mp_srcptr y2, mp_size_t nn)
+void pp1_set(ulong_ptr x1, ulong_ptr y1, 
+              ulong_srcptr x2, ulong_srcptr y2, mp_size_t nn)
 {
    FLINT_MPN_COPYI(x1, x2, nn);
    FLINT_MPN_COPYI(y1, y2, nn);
 }
 
-void pp1_set_ui(mp_ptr x, mp_size_t nn, ulong norm, ulong c)
+void pp1_set_ui(ulong_ptr x, mp_size_t nn, ulong norm, ulong c)
 {
    mpn_zero(x, nn);
    x[0] = (c << norm);
@@ -60,10 +60,10 @@ void pp1_set_ui(mp_ptr x, mp_size_t nn, ulong norm, ulong c)
       x[1] = (c >> (FLINT_BITS - norm));
 }
 
-void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
+void pp1_print(ulong_srcptr x, ulong_srcptr y, mp_size_t nn, ulong norm)
 {
-   mp_ptr tx = flint_malloc(nn*sizeof(mp_limb_t));
-   mp_ptr ty = flint_malloc(nn*sizeof(mp_limb_t));
+   ulong_ptr tx = flint_malloc(nn*sizeof(ulong));
+   ulong_ptr ty = flint_malloc(nn*sizeof(ulong));
 
    if (norm)
    {
@@ -81,8 +81,8 @@ void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
    flint_free(ty);
 }
 
-void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
-            mp_srcptr ninv, mp_srcptr x0, ulong norm)
+void pp1_2k(ulong_ptr x, ulong_ptr y, mp_size_t nn, ulong_srcptr n, 
+            ulong_srcptr ninv, ulong_srcptr x0, ulong norm)
 {
    pp1_mulmod(y, y, x, nn, n, ninv, norm);
    if (mpn_sub_n(y, y, x0, nn))
@@ -93,8 +93,8 @@ void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n,
       mpn_add_n(x, x, n, nn);
 }
 
-void pp1_2kp1(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
-              mp_srcptr ninv, mp_srcptr x0, ulong norm)
+void pp1_2kp1(ulong_ptr x, ulong_ptr y, mp_size_t nn, ulong_srcptr n, 
+              ulong_srcptr ninv, ulong_srcptr x0, ulong norm)
 {
    pp1_mulmod(x, x, y, nn, n, ninv, norm);
    if (mpn_sub_n(x, x, x0, nn))
@@ -105,15 +105,15 @@ void pp1_2kp1(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n,
       mpn_add_n(y, y, n, nn);
 }
 
-void pp1_pow_ui(mp_ptr x, mp_ptr y, mp_size_t nn, 
-                ulong exp, mp_srcptr n, mp_srcptr ninv, ulong norm)
+void pp1_pow_ui(ulong_ptr x, ulong_ptr y, mp_size_t nn, 
+                ulong exp, ulong_srcptr n, ulong_srcptr ninv, ulong norm)
 {
-   mp_limb_t t[30];
-   mp_ptr x0 = t;
+   ulong t[30];
+   ulong_ptr x0 = t;
    ulong bit = ((UWORD(1) << FLINT_BIT_COUNT(exp)) >> 2);
 
    if (nn > 30)
-      x0 = flint_malloc(nn*sizeof(mp_limb_t));
+      x0 = flint_malloc(nn*sizeof(ulong));
    FLINT_MPN_COPYI(x0, x, nn);
 
    pp1_mulmod(y, x, x, nn, n, ninv, norm);
@@ -134,13 +134,13 @@ void pp1_pow_ui(mp_ptr x, mp_ptr y, mp_size_t nn,
       flint_free(x0);
 }
 
-mp_size_t pp1_factor(mp_ptr factor, mp_srcptr n,
-                     mp_srcptr x, mp_size_t nn, ulong norm)
+mp_size_t pp1_factor(ulong_ptr factor, ulong_srcptr n,
+                     ulong_srcptr x, mp_size_t nn, ulong norm)
 {
    mp_size_t ret = 0, xn = nn;
    
-   mp_ptr n2 = flint_malloc(nn*sizeof(mp_limb_t));
-   mp_ptr x2 = flint_malloc(nn*sizeof(mp_limb_t));
+   ulong_ptr n2 = flint_malloc(nn*sizeof(ulong));
+   ulong_ptr x2 = flint_malloc(nn*sizeof(ulong));
 
    if (norm)
       mpn_rshift(n2, n, nn, norm);
@@ -170,8 +170,8 @@ cleanup:
    return ret;
 }
 
-mp_size_t pp1_find_power(mp_ptr factor, mp_ptr x, mp_ptr y, mp_size_t nn, 
-                          ulong p, mp_srcptr n, mp_srcptr ninv, ulong norm)
+mp_size_t pp1_find_power(ulong_ptr factor, ulong_ptr x, ulong_ptr y, mp_size_t nn, 
+                          ulong p, ulong_srcptr n, ulong_srcptr ninv, ulong norm)
 {
    mp_size_t ret;
    
@@ -189,7 +189,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    slong i, j;
    int ret = 0;
    mp_size_t nn = fmpz_size(n_in), r;
-   mp_ptr x, y, oldx, oldy, n, ninv, factor, ptr_0, ptr_1, ptr_2, ptr_k;
+   ulong_ptr x, y, oldx, oldy, n, ninv, factor, ptr_0, ptr_1, ptr_2, ptr_k;
    ulong pr, oldpr, sqrt, bits0, norm;
    n_primes_t iter;
 
@@ -208,13 +208,13 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    sqrt = n_sqrt(B1);
    bits0 = FLINT_BIT_COUNT(B1);
 
-   x      = flint_malloc(nn*sizeof(mp_limb_t));
-   y      = flint_malloc(nn*sizeof(mp_limb_t));
-   oldx   = flint_malloc(nn*sizeof(mp_limb_t));
-   oldy   = flint_malloc(nn*sizeof(mp_limb_t));
-   n      = flint_malloc(nn*sizeof(mp_limb_t));
-   ninv   = flint_malloc(nn*sizeof(mp_limb_t));
-   factor = flint_malloc(nn*sizeof(mp_limb_t));
+   x      = flint_malloc(nn*sizeof(ulong));
+   y      = flint_malloc(nn*sizeof(ulong));
+   oldx   = flint_malloc(nn*sizeof(ulong));
+   oldy   = flint_malloc(nn*sizeof(ulong));
+   n      = flint_malloc(nn*sizeof(ulong));
+   ninv   = flint_malloc(nn*sizeof(ulong));
+   factor = flint_malloc(nn*sizeof(ulong));
       
    if (nn == 1)
    {
@@ -223,7 +223,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       n[0] <<= norm;
    } else
    {
-      mp_ptr np = COEFF_TO_PTR(*n_in)->_mp_d;
+      ulong_ptr np = COEFF_TO_PTR(*n_in)->_mp_d;
       count_leading_zeros(norm, np[nn - 1]);
       if (norm)
          mpn_lshift(n, np, nn, norm);
@@ -301,7 +301,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       int num;
       char * sieve = flint_malloc(32768);
       slong * sieve_index = flint_malloc(32768*sizeof(slong));
-      mp_ptr diff = flint_malloc(16384*nn*sizeof(mp_limb_t));
+      ulong_ptr diff = flint_malloc(16384*nn*sizeof(ulong));
       ulong offset[15], num_roots;
       slong k, index = 0, s;
       fmpz * roots, * roots2, * evals;

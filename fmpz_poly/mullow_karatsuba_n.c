@@ -10,12 +10,7 @@
 */
 
 #include "flint-impl.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
-
-void 
-_fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
-                                 const fmpz * pol2, fmpz * temp, slong len);
 
 /*
    Multiplication using truncated karatsuba.
@@ -118,7 +113,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
         copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len1; i++)
             copy1[i] = poly1->coeffs[i];
-        FLINT_MPN_ZERO((mp_ptr) copy1 + len1, n - len1);
+        FLINT_MPN_ZERO((ulong_ptr) copy1 + len1, n - len1);
         clear |= 1;
     }
 
@@ -129,7 +124,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
         copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len2; i++)
             copy2[i] = poly2->coeffs[i];
-        FLINT_MPN_ZERO((mp_ptr) copy2 + len2, n - len2);
+        FLINT_MPN_ZERO((ulong_ptr) copy2 + len2, n - len2);
         clear |= 2;
     }
 

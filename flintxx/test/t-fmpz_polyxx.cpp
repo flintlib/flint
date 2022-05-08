@@ -400,7 +400,7 @@ test_factoring()
 void
 test_hensel()
 {
-    mp_limb_t pl = 1031;
+    ulong pl = 1031;
     frandxx state;
     nmod_polyxx gl(nmod_polyxx::randtest_irreducible(pl, state, 5).make_monic());
     nmod_polyxx hl(nmod_polyxx::randtest_irreducible(pl, state, 6).make_monic());

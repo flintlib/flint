@@ -18,20 +18,8 @@
 #define PADIC_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
+/* TODO: Reduce to fmpz_mini.h, not necessary with fmpz. */
 #include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -89,12 +77,7 @@ int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
     {
         slong l = (slong) e;
         if (l < 0)
-        {
-            flint_printf("Exception (_padic_ctx_pow_ui). Power too large.\n");
-            flint_printf("e = %wu\n", e);
-            flint_printf("l = %wd\n", l);
-            flint_abort();
-        }
+            flint_throw(FLINT_EXPOF, "_padic_ctx_pow_ui");
 
         fmpz_init(rop);
         fmpz_pow_ui(rop, ctx->p, e);
@@ -111,12 +94,7 @@ void padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
     {
         slong l = (slong) e;
         if (l < 0)
-        {
-            flint_printf("Exception (padic_ctx_pow_ui). Power too large.\n");
-            flint_printf("e = %wu\n", e);
-            flint_printf("l = %wd\n", l);
-            flint_abort();
-        }
+            flint_throw(FLINT_EXPOF, "_padic_ctx_pow_ui");
 
         fmpz_pow_ui(rop, ctx->p, e);
     }
@@ -313,6 +291,24 @@ FLINT_DLL char * _padic_get_str(char * str, const padic_t op, const fmpz_t p, en
 
 FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
+#include "flint-impl.h"
 FLINT_DLL int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
 
 FLINT_DLL int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
@@ -330,14 +326,14 @@ PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 PADIC_INLINE void padic_debug(const padic_t op)
 {
-    flint_printf("(");
+    printf("(");
     fmpz_print(padic_unit(op)); 
-    flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
+    printf(" " WORD_FMT "d " WORD_FMT "d)", padic_val(op), padic_prec(op));
 }
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

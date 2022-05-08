@@ -14,9 +14,9 @@
 
 /* todo: handle short h */
 void
-_nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_atan_series(ulong_ptr g, ulong_srcptr h, slong n, nmod_t mod)
 {
-    mp_ptr t, u;
+    ulong_ptr t, u;
 
     t = _nmod_vec_init(n);
     u = _nmod_vec_init(n);
@@ -34,7 +34,7 @@ _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 void
 nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
-    mp_ptr h_coeffs;
+    ulong_ptr h_coeffs;
     slong h_len = h->length;
 
     if (h_len > 0 && h->coeffs[0] != UWORD(0))

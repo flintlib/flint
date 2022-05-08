@@ -10,9 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
+#include "flint-impl.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
@@ -28,7 +26,7 @@ void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, slong n, const fmpz_t x)
     {
         fmpq_poly_fit_length(poly, n + 1);
         _fmpq_poly_set_length(poly, n + 1);
-        FLINT_MPN_ZERO((mp_ptr) poly->coeffs + len, (n + 1) - len);
+        FLINT_MPN_ZERO((ulong_ptr) poly->coeffs + len, (n + 1) - len);
     }
     
     if (*poly->den == WORD(1))

@@ -10,7 +10,6 @@
 */
 
 #include "fmpq_poly.h"
-
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_sub_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)

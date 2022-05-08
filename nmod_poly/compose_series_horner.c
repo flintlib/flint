@@ -15,8 +15,8 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1, 
-                            mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+_nmod_poly_compose_series_horner(ulong_ptr res, ulong_srcptr poly1, slong len1, 
+                            ulong_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     if (n == 1)
     {
@@ -27,7 +27,7 @@ _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1,
         slong i = len1 - 1;
         slong lenr;
 
-        mp_ptr t = _nmod_vec_init(n);
+        ulong_ptr t = _nmod_vec_init(n);
 
         lenr = len2;
         _nmod_vec_scalar_mul_nmod(res, poly2, len2, poly1[i], mod);

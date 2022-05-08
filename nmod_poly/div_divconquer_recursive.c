@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
-                          mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_div_divconquer_recursive(ulong_ptr Q, ulong_ptr W, ulong_ptr V,
+                          ulong_srcptr A, ulong_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenB <= NMOD_DIV_DIVCONQUER_CUTOFF)
     {
@@ -25,20 +25,20 @@ _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
         const slong n2 = lenB / 2;
         const slong n1 = lenB - n2;
 
-        mp_ptr W1 = W;
-        mp_ptr W2 = W + n2;
+        ulong_ptr W1 = W;
+        ulong_ptr W2 = W + n2;
 
-        mp_srcptr p1 = A + 2 * n2;
-        mp_srcptr p2;
-        mp_srcptr d1 = B + n2;
-        mp_srcptr d2 = B;
-        mp_srcptr d3 = B + n1;
+        ulong_srcptr p1 = A + 2 * n2;
+        ulong_srcptr p2;
+        ulong_srcptr d1 = B + n2;
+        ulong_srcptr d2 = B;
+        ulong_srcptr d3 = B + n1;
         
-        mp_ptr q1   = Q + n2;
-        mp_ptr q2   = Q;
-        mp_ptr d1q1 = q2 + n2 - (n1 - 1);
+        ulong_ptr q1   = Q + n2;
+        ulong_ptr q2   = Q;
+        ulong_ptr d1q1 = q2 + n2 - (n1 - 1);
 
-        mp_ptr d2q1, t;
+        ulong_ptr d2q1, t;
 
         /* 
            Set q1 to p1 div d1, a 2 n1 - 1 by n1 division so q1 ends up 

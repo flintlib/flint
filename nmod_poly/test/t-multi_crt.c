@@ -24,7 +24,7 @@ main(void)
     {
         nmod_poly_multi_crt_t P;
         nmod_poly_struct ** moduli, ** inputs, * outputs;
-        mp_limb_t modulus = 1009;
+        ulong modulus = 1009;
         slong moduli_count = 1000;
 
         moduli = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
@@ -88,7 +88,7 @@ main(void)
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct ** moduli, ** inputs;
         nmod_poly_t output;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -212,7 +212,7 @@ main(void)
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct * moduli, * inputs;
         nmod_poly_t output;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -327,7 +327,7 @@ main(void)
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct * moduli, * inputs;
         nmod_poly_t output;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

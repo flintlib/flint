@@ -20,8 +20,8 @@ typedef struct
     slong num;
     mp_size_t coeff_limbs;
     mp_size_t output_limbs;
-    mp_srcptr limbs;
-    mp_limb_t ** poly;
+    ulong_srcptr limbs;
+    ulong ** poly;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
@@ -36,8 +36,8 @@ _split_limbs_worker(void * arg_ptr)
     mp_size_t skip;
     mp_size_t coeff_limbs = arg.coeff_limbs;
     mp_size_t output_limbs = arg.output_limbs;
-    mp_srcptr limbs = arg.limbs;
-    mp_limb_t ** poly = arg.poly;
+    ulong_srcptr limbs = arg.limbs;
+    ulong ** poly = arg.poly;
     mp_size_t i, end;
 
     while (1)
@@ -64,7 +64,7 @@ _split_limbs_worker(void * arg_ptr)
     }
 }
 
-mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs, 
+mp_size_t fft_split_limbs(ulong ** poly, ulong_srcptr limbs, 
           mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 {
     mp_size_t i, shared_i = 0, skip, length = (total_limbs - 1)/coeff_limbs + 1;
@@ -134,10 +134,10 @@ typedef struct
     slong length;
     mp_size_t coeff_limbs;
     mp_size_t output_limbs;
-    mp_srcptr limbs;
+    ulong_srcptr limbs;
     flint_bitcnt_t top_bits;
-    mp_limb_t mask;
-    mp_limb_t ** poly;
+    ulong mask;
+    ulong ** poly;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
@@ -151,12 +151,12 @@ _split_bits_worker(void * arg_ptr)
     slong length = arg.length;
     mp_size_t coeff_limbs = arg.coeff_limbs;
     mp_size_t output_limbs = arg.output_limbs;
-    mp_srcptr limbs = arg.limbs;
+    ulong_srcptr limbs = arg.limbs;
     flint_bitcnt_t top_bits = arg.top_bits;
-    mp_limb_t mask = arg.mask;
-    mp_limb_t ** poly = arg.poly;
+    ulong mask = arg.mask;
+    ulong ** poly = arg.poly;
     flint_bitcnt_t shift_bits;
-    mp_srcptr limb_ptr;
+    ulong_srcptr limb_ptr;
     mp_size_t i, end;
 
     while (1)
@@ -206,14 +206,14 @@ _split_bits_worker(void * arg_ptr)
     }
 }
 
-mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs, 
+mp_size_t fft_split_bits(ulong ** poly, ulong_srcptr limbs, 
                mp_size_t total_limbs, flint_bitcnt_t bits, mp_size_t output_limbs)
 {
     mp_size_t i, shared_i = 0, coeff_limbs, limbs_left;
     mp_size_t length = (FLINT_BITS*total_limbs - 1)/bits + 1;
     flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
-    mp_srcptr limb_ptr;
-    mp_limb_t mask;
+    ulong_srcptr limb_ptr;
+    ulong mask;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif

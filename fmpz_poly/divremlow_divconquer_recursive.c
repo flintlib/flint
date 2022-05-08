@@ -10,7 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mini.h"
 #include "fmpz_poly.h"
 
 #define FLINT_DIVREMLOW_DIVCONQUER_CUTOFF  16

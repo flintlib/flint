@@ -20,9 +20,9 @@ int
 fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong num_primes)
 {
     ulong exp;
-    mp_limb_t p;
+    ulong p;
     mpz_t x;
-    mp_ptr xd;
+    ulong_ptr xd;
     mp_size_t xsize;
     slong found;
     slong trial_start, trial_stop;

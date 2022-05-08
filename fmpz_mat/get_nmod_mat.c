@@ -16,7 +16,7 @@ void
 fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 {
     slong i, j;
-    mp_limb_t m = Amod->mod.n;
+    ulong m = Amod->mod.n;
 
     if (fmpz_mat_is_square(A))
     {

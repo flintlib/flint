@@ -12,8 +12,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, slong len,
-    mp_srcptr xs, slong n, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec_iter(ulong_ptr ys, ulong_srcptr coeffs, slong len,
+    ulong_srcptr xs, slong n, nmod_t mod)
 {
     slong i;
     for (i = 0; i < n; i++)
@@ -21,8 +21,8 @@ _nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, slong len,
 }
 
 void
-nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_evaluate_nmod_vec_iter(ulong_ptr ys,
+        const nmod_poly_t poly, ulong_srcptr xs, slong n)
 {
     _nmod_poly_evaluate_nmod_vec_iter(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);

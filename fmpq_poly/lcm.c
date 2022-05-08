@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -121,4 +117,3 @@ void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B)
     _fmpq_poly_set_length(L, lenL);
     _fmpq_poly_normalise(L);
 }
-

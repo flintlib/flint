@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
+#include "fmpq_mat.h"
 #include "padic_mat.h"
 
 void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
@@ -46,4 +48,3 @@ void padic_mat_get_fmpq_mat(fmpq_mat_t B,
         }
     }
 }
-

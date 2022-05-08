@@ -19,8 +19,7 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
-/* TODO: Try to reduce this dependency to fmpz_mini.h */
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,17 +148,9 @@ FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
 FLINT_DLL int fmpq_set_str(fmpq_t res, const char * str, int base);
 
-FMPQ_INLINE void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
-{
-    fmpz_set_mpz(fmpq_numref(dest), mpq_numref(src));
-    fmpz_set_mpz(fmpq_denref(dest), mpq_denref(src));
-}
+FLINT_DLL void fmpq_set_mpq(fmpq_t dest, const mpq_t src);
 
-FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
-{
-    fmpz_get_mpz(mpq_numref(dest), fmpq_numref(src));
-    fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
-}
+FLINT_DLL void fmpq_get_mpq(mpq_t dest, const fmpq_t src);
 
 FLINT_DLL double fmpq_get_d(const fmpq_t a);
 
@@ -428,7 +419,7 @@ typedef struct {
 typedef _fmpz_mat22_struct _fmpz_mat22_t[1];
 
 typedef struct {
-    mp_limb_t _11, _12, _21, _22;
+    ulong _11, _12, _21, _22;
     int det;    /* ditto */
 } _ui_mat22_struct;
 

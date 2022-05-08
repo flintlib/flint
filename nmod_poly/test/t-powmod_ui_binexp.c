@@ -32,7 +32,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
 
         n = n_randtest_prime(state, 0);
@@ -73,7 +73,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
 
         n = n_randtest_prime(state, 0);
@@ -114,7 +114,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, res2, t, f;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
         int j;
 

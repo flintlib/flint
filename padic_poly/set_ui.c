@@ -20,4 +20,3 @@ void padic_poly_set_ui(padic_poly_t poly, ulong x, const padic_ctx_t ctx)
     padic_poly_set_padic(poly, y, ctx);
     padic_clear(y);
 }
-

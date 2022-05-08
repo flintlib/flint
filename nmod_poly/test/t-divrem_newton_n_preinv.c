@@ -20,7 +20,7 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_poly.h"
@@ -41,7 +41,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r, test;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -92,7 +92,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -139,7 +139,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -186,7 +186,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -234,7 +234,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -281,7 +281,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -328,7 +328,7 @@ main(void)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

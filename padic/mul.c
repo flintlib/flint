@@ -27,4 +27,3 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
         _padic_reduce(rop, ctx);
     }
 }
-

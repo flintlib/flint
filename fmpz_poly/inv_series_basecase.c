@@ -36,7 +36,7 @@
 
 #include "flint-impl.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void
 _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
@@ -148,7 +148,7 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
                 }
                 else if (bits <= 2 * FLINT_BITS - 1)
                 {
-                    mp_limb_t hi, lo, shi, slo;
+                    ulong hi, lo, shi, slo;
                     slong x, y;
 
                     shi = slo = 0;
@@ -169,7 +169,7 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
                 }
                 else
                 {
-                    mp_limb_t hi, lo, cy, shh, shi, slo;
+                    ulong hi, lo, cy, shh, shi, slo;
                     slong x, y;
 
                     shh = shi = slo = 0;

@@ -35,6 +35,7 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
 
@@ -42,15 +43,15 @@
    Multiplication/squaring using Kronecker substitution at 2^b and -2^b.
 */
 void
-_nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
-                  mp_srcptr op2, slong n2, nmod_t mod)
+_nmod_poly_mul_KS2(ulong_ptr res, ulong_srcptr op1, slong n1,
+                  ulong_srcptr op2, slong n2, nmod_t mod)
 {
    int sqr, v3m_neg;
    ulong bits, b, w;
    slong n1o, n1e, n2o, n2e, n3o, n3e, n3, k1, k2, k3;
-   mp_ptr v1_buf0, v2_buf0, v1_buf1, v2_buf1, v1_buf2, v2_buf2;
-   mp_ptr v1o, v1e, v1p, v1m, v2o, v2e, v2p, v2m, v3o, v3e, v3p, v3m;
-   mp_ptr z;
+   ulong_ptr v1_buf0, v2_buf0, v1_buf1, v2_buf1, v1_buf2, v2_buf2;
+   ulong_ptr v1o, v1e, v1p, v1m, v2o, v2e, v2p, v2m, v3o, v3e, v3p, v3m;
+   ulong_ptr z;
    TMP_INIT;
 
    if (n2 == 1)
@@ -101,7 +102,7 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    k3 = k1 + k2;
 
    /* allocate space */
-   v1_buf0 = TMP_ALLOC(sizeof(mp_limb_t) * 3 * k3); /* k1 limbs */
+   v1_buf0 = TMP_ALLOC(sizeof(ulong) * 3 * k3); /* k1 limbs */
    v2_buf0 = v1_buf0 + k1;         /* k2 limbs */
    v1_buf1 = v2_buf0 + k2;         /* k1 limbs */
    v2_buf1 = v1_buf1 + k1;         /* k2 limbs */
@@ -125,7 +126,7 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    v3e = v1_buf2;
    v3o = v1_buf0;
    
-   z = TMP_ALLOC(sizeof(mp_limb_t) * w * n3e);
+   z = TMP_ALLOC(sizeof(ulong) * w * n3e);
    
    if (!sqr)
    {

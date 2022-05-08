@@ -26,7 +26,7 @@ int main(void)
 
    for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t d, nh, nl, q, r, ph, pl;
+      ulong d, nh, nl, q, r, ph, pl;
 
       do 
       {

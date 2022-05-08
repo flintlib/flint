@@ -34,22 +34,22 @@
 # endif
 #endif
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "flint-impl.h"
 
 /* 
    TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
 */  
 
-mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t m,
-                          mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+ulong flint_mpn_divrem_preinvn(ulong_ptr qp, ulong_ptr rp, ulong_srcptr ap, mp_size_t m,
+                          ulong_srcptr d, mp_size_t n, ulong_srcptr dinv)
 {
-   mp_limb_t cy, hi = 0;
-   mp_ptr t, q, r, a;
+   ulong cy, hi = 0;
+   ulong_ptr t, q, r, a;
    mp_size_t size;
    TMP_INIT;
 
-   a = (mp_ptr) ap + m - 2*n;
+   a = (ulong_ptr) ap + m - 2*n;
    r = rp + m - 2*n;
 
    /* check if top n limbs of a exceed d */
@@ -63,7 +63,7 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
    q = qp + m - 2*n;
 
    TMP_START;
-   t = TMP_ALLOC(2*n*sizeof(mp_limb_t));
+   t = TMP_ALLOC(2*n*sizeof(ulong));
 
    /* 2n by n division */
    while (m >= 2*n)

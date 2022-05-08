@@ -921,8 +921,8 @@ FLINT_DEFINE_SIXARY_EXPR_COND6(hensel_lift_only_inverse_op,
 // immediate functions
 // TODO make lazy when we have nmod class
 template<class Poly>
-inline typename mp::enable_all_fmpz_polyxx<mp_limb_t, Poly>::type
-evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)
+inline typename mp::enable_all_fmpz_polyxx<ulong, Poly>::type
+evaluate_mod(const Poly& p, ulong x, ulong n)
 {
     return fmpz_poly_evaluate_mod(p.evaluate()._poly(), x, n);
 }

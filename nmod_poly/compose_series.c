@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, 
-                            mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+_nmod_poly_compose_series(ulong_ptr res, ulong_srcptr poly1, slong len1, 
+                            ulong_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     if (len1 < 24 || len2 < 8)
         _nmod_poly_compose_series_horner(res, poly1, len1,

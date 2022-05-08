@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpf_vec.h"
 
 void
 _mpf_vec_add(mpf_ptr res, mpf_srcptr vec1, mpf_srcptr vec2, slong len2)

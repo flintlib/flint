@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq_poly.h"
+#include "fmpz_mini.h"
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 {
@@ -34,4 +31,3 @@ void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
     
     fmpz_swap(poly1->den, poly2->den);
 }
-

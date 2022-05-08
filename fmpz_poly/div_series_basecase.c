@@ -164,7 +164,7 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
                 }
                 else if (bits <= 2 * FLINT_BITS - 1)
                 {
-                    mp_limb_t hi, lo, shi, slo;
+                    ulong hi, lo, shi, slo;
                     slong x, y;
 
                     shi = slo = 0;
@@ -182,7 +182,7 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
                 }
                 else
                 {
-                    mp_limb_t hi, lo, cy, shh, shi, slo;
+                    ulong hi, lo, cy, shh, shi, slo;
                     slong x, y;
 
                     shh = shi = slo = 0;
@@ -287,4 +287,3 @@ void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
     _fmpz_poly_set_length(Q, n);
     _fmpz_poly_normalise(Q);
 }
-

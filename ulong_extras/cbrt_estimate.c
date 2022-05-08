@@ -29,10 +29,10 @@ n_cbrt_estimate(double a)
     ulong n, hi, lo;
 
 #ifdef FLINT64
-    const mp_limb_t mul_factor = UWORD(6148914691236517205);
+    const ulong mul_factor = UWORD(6148914691236517205);
     slong s = UWORD(4607182418800017408);      /* ((1 << 10) - 1) << 52 */
 #else
-    const mp_limb_t mul_factor = UWORD(1431655765);
+    const ulong mul_factor = UWORD(1431655765);
     slong s = UWORD(1065353216);               /* ((1 << 7) - 1 << 23)  */
 #endif
 

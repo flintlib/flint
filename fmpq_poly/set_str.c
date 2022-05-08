@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2018 Vincent Delecroix
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2018 Vincent Delecroix
 
     This file is part of FLINT.
 
@@ -10,15 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 int
@@ -100,9 +93,8 @@ fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
         fmpq_poly_zero(poly);
         return -1;
     }
-    errno = 0;
     len = strtol(str, &endptr, 10);
-    if (errno || len < 0 || (len > 0 && *endptr == '\0'))
+    if (len < 0 || (len > 0 && *endptr == '\0'))
     {
         fmpq_poly_zero(poly);
         return -1;

@@ -62,7 +62,7 @@ main(void)
         nmod_berlekamp_massey_init(B2, 2);
         for (j = 0; j < 10; j++)
         {
-            mp_limb_t p;
+            ulong p;
 
             p = n_randtest_prime(state, 1);
 

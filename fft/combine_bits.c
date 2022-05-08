@@ -14,7 +14,7 @@
 #include "flint.h"
 #include "fft.h"
 
-void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, 
+void fft_combine_limbs(ulong * res, ulong ** poly, slong length, 
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    mp_size_t skip, i;
@@ -32,12 +32,12 @@ void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length,
    }  
 }
 
-void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, 
+void fft_combine_bits(ulong * res, ulong ** poly, slong length, 
                   flint_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
    mp_size_t coeff_limbs, i;
-   mp_limb_t * temp, * limb_ptr, * end;
+   ulong * temp, * limb_ptr, * end;
    
    if (top_bits == 0)
    {
@@ -46,7 +46,7 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length,
    }
    
    coeff_limbs = (bits/FLINT_BITS) + 1;
-   temp = flint_malloc((output_limbs + 1)*sizeof(mp_limb_t));
+   temp = flint_malloc((output_limbs + 1)*sizeof(ulong));
    shift_bits = 0;
    limb_ptr = res;
    end = res + total_limbs;

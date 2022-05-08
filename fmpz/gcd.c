@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 void
 fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
@@ -40,7 +40,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
 
             u2 = FLINT_ABS(c2);
-            fmpz_set_ui(f, mpn_gcd_1((mp_srcptr) &u2, (mp_size_t) 1, u1));
+            fmpz_set_ui(f, mpn_gcd_1((ulong_srcptr) &u2, (mp_size_t) 1, u1));
         }
         else                    /* but h is large */
         {

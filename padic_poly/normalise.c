@@ -11,7 +11,6 @@
 */
 
 #include "fmpz_vec.h"
-#include "padic_poly.h"
 
 void _padic_poly_normalise(padic_poly_t poly)
 {
@@ -21,4 +20,3 @@ void _padic_poly_normalise(padic_poly_t poly)
 
     poly->length = len;
 }
-

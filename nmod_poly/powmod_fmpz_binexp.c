@@ -18,10 +18,10 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly, 
-                                  fmpz_t e, mp_srcptr f, slong lenf, nmod_t mod)
+_nmod_poly_powmod_fmpz_binexp(ulong_ptr res, ulong_srcptr poly, 
+                                  fmpz_t e, ulong_srcptr f, slong lenf, nmod_t mod)
 {
-    mp_ptr T, Q;
+    ulong_ptr T, Q;
     slong lenT, lenQ;
     slong bits, i;
 
@@ -80,7 +80,7 @@ void
 nmod_poly_powmod_fmpz_binexp(nmod_poly_t res, 
                          const nmod_poly_t poly, fmpz_t e, const nmod_poly_t f)
 {
-    mp_ptr p;
+    ulong_ptr p;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;

@@ -82,11 +82,11 @@ typedef struct {
     slong Astoprow;
     slong Bstartrow;
     slong Bstoprow;
-    mp_limb_t ctxn;
+    ulong ctxn;
     float * dA;
     float * dB;
-    mp_limb_t ** Arows;
-    mp_limb_t ** Brows;
+    ulong ** Arows;
+    ulong ** Brows;
 } _lift_sp_worker_arg_struct;
 
 void _lift_sp_worker(void * arg_ptr)
@@ -98,11 +98,11 @@ void _lift_sp_worker(void * arg_ptr)
     slong Astoprow = arg->Astoprow;
     slong Bstartrow = arg->Bstartrow;
     slong Bstoprow = arg->Bstoprow;
-    mp_limb_t ctxn = arg->ctxn;
+    ulong ctxn = arg->ctxn;
     float * dA = arg->dA;
     float * dB = arg->dB;
-    mp_limb_t ** Arows = arg->Arows;
-    mp_limb_t ** Brows = arg->Brows;
+    ulong ** Arows = arg->Arows;
+    ulong ** Brows = arg->Brows;
     slong i;
 
     for (i = Astartrow; i < Astoprow; i++)
@@ -117,9 +117,9 @@ typedef struct {
     slong Cstartrow;
     slong Cstoprow;
     nmod_t * ctx;
-    mp_limb_t shift;
+    ulong shift;
     float * dC;
-    mp_limb_t ** Crows;
+    ulong ** Crows;
 } _reduce_sp_worker_arg_struct;
 
 void _reduce_sp_worker(void * arg_ptr)
@@ -129,9 +129,9 @@ void _reduce_sp_worker(void * arg_ptr)
     slong Cstartrow = arg->Cstartrow;
     slong Cstoprow = arg->Cstoprow;
     nmod_t ctx = *arg->ctx;
-    mp_limb_t shift = arg->shift;
+    ulong shift = arg->shift;
     float * dC = arg->dC;
-    mp_limb_t ** Crows = arg->Crows;
+    ulong ** Crows = arg->Crows;
     slong i, j;
 
     for (i = Cstartrow; i < Cstoprow; i++)
@@ -139,7 +139,7 @@ void _reduce_sp_worker(void * arg_ptr)
         for (j = 0; j < n; j++)
         {
             slong a = (slong) dC[i*n + j];
-            mp_limb_t b = (a < 0) ? a + shift : a;
+            ulong b = (a < 0) ? a + shift : a;
             NMOD_RED(Crows[i][j], b, ctx);
         }
     }
@@ -250,7 +250,7 @@ static void _lift_vec_crt(double * a, ulong * b, slong len, nmod_t ctx)
     slong i;
     for (i = 0; i < len; i++)
     {
-        mp_limb_t bn;
+        ulong bn;
         NMOD_RED(bn, b[i], ctx);
         a[i] = (int)(bn - (ctx.n & FLINT_SIGN_EXT(ctx.n/2 - bn)));
     }
@@ -267,8 +267,8 @@ typedef struct {
     nmod_t crtmod;
     double * dA;
     double * dB;
-    mp_limb_t ** Arows;
-    mp_limb_t ** Brows;
+    ulong ** Arows;
+    ulong ** Brows;
 } _lift_crt_worker_arg_struct;
 
 void _lift_crt_worker(void * arg_ptr)
@@ -283,8 +283,8 @@ void _lift_crt_worker(void * arg_ptr)
     nmod_t crtmod = arg->crtmod;
     double * dA = arg->dA;
     double * dB = arg->dB;
-    mp_limb_t ** Arows = arg->Arows;
-    mp_limb_t ** Brows = arg->Brows;
+    ulong ** Arows = arg->Arows;
+    ulong ** Brows = arg->Brows;
     slong i;
 
     for (i = Astartrow; i < Astoprow; i++)
@@ -303,7 +303,7 @@ typedef struct {
     nmod_t * crtmod;
     nmod_t * ctx;
     double * dC;
-    mp_limb_t ** Crows;
+    ulong ** Crows;
 } _reduce_crt_worker_arg_struct;
 
 void _reduce_crt_worker(void * arg_ptr)
@@ -318,10 +318,10 @@ void _reduce_crt_worker(void * arg_ptr)
     nmod_t ctx = *arg->ctx;
     ulong s, t, hi, lo, reshi, reslo;
     slong crtnum = arg->crtnum;
-    mp_limb_t ** Crows = arg->Crows;
+    ulong ** Crows = arg->Crows;
     nmod_t crtmod[MAX_CRT_NUM];
-    mp_limb_t q[MAX_CRT_NUM], v[MAX_CRT_NUM], u[MAX_CRT_NUM];
-    mp_limb_t shifts[MAX_CRT_NUM], pmodinv[MAX_CRT_NUM*MAX_CRT_NUM];
+    ulong q[MAX_CRT_NUM], v[MAX_CRT_NUM], u[MAX_CRT_NUM];
+    ulong shifts[MAX_CRT_NUM], pmodinv[MAX_CRT_NUM*MAX_CRT_NUM];
 
     for (i = 0; i < crtnum; i++)
         crtmod[i] = arg->crtmod[i];
@@ -360,7 +360,7 @@ void _reduce_crt_worker(void * arg_ptr)
             for (pi = 0; pi < crtnum; pi++)
             {
                 slong a = (slong) dC[i*n + j + pi*m*n];
-                mp_limb_t b = (a < 0) ? a + shifts[pi] : a;
+                ulong b = (a < 0) ? a + shifts[pi] : a;
                 NMOD_RED(u[pi], b, crtmod[pi]);
             }
 
@@ -531,11 +531,11 @@ typedef struct {
     slong Astoprow;
     slong Bstartrow;
     slong Bstoprow;
-    mp_limb_t ctxn;
+    ulong ctxn;
     double * dA;
     double * dB;
-    mp_limb_t ** Arows;
-    mp_limb_t ** Brows;
+    ulong ** Arows;
+    ulong ** Brows;
 } _lift_dp_worker_arg_struct;
 
 void _lift_dp_worker(void * arg_ptr)
@@ -547,11 +547,11 @@ void _lift_dp_worker(void * arg_ptr)
     slong Astoprow = arg->Astoprow;
     slong Bstartrow = arg->Bstartrow;
     slong Bstoprow = arg->Bstoprow;
-    mp_limb_t ctxn = arg->ctxn;
+    ulong ctxn = arg->ctxn;
     double * dA = arg->dA;
     double * dB = arg->dB;
-    mp_limb_t ** Arows = arg->Arows;
-    mp_limb_t ** Brows = arg->Brows;
+    ulong ** Arows = arg->Arows;
+    ulong ** Brows = arg->Brows;
     slong i;
 
     for (i = Astartrow; i < Astoprow; i++)
@@ -566,9 +566,9 @@ typedef struct {
     slong Cstartrow;
     slong Cstoprow;
     nmod_t * ctx;
-    mp_limb_t shift;
+    ulong shift;
     double * dC;
-    mp_limb_t ** Crows;
+    ulong ** Crows;
 } _reduce_dp_worker_arg_struct;
 
 void _reduce_dp_worker(void * arg_ptr)
@@ -578,9 +578,9 @@ void _reduce_dp_worker(void * arg_ptr)
     slong Cstartrow = arg->Cstartrow;
     slong Cstoprow = arg->Cstoprow;
     nmod_t ctx = *arg->ctx;
-    mp_limb_t shift = arg->shift;
+    ulong shift = arg->shift;
     double * dC = arg->dC;
-    mp_limb_t ** Crows = arg->Crows;
+    ulong ** Crows = arg->Crows;
     slong i, j;
 
     for (i = Cstartrow; i < Cstoprow; i++)
@@ -588,7 +588,7 @@ void _reduce_dp_worker(void * arg_ptr)
         for (j = 0; j < n; j++)
         {
             slong a = (slong) dC[i*n + j];
-            mp_limb_t b = (a < 0) ? a + shift : a;
+            ulong b = (a < 0) ? a + shift : a;
             NMOD_RED(Crows[i][j], b, ctx);
         }
     }

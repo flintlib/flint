@@ -23,7 +23,7 @@
 #include <stdio.h>
 #undef ulong
 #include <gmp.h>
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "nmod_mpoly.h"
 #include "n_poly.h"
@@ -203,7 +203,7 @@ FLINT_DLL void _nmod_mpoly_set_lead0(
 FLINT_DLL slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen);
 
 FLINT_DLL void _n_poly_vec_mul_nmod_intertible(n_poly_struct * A,
-                                          slong Alen, mp_limb_t c, nmod_t ctx);
+                                          slong Alen, ulong c, nmod_t ctx);
 
 FLINT_DLL void _n_poly_vec_mod_mul_poly(n_poly_struct * A, slong Alen,
                                            const n_poly_t g, const nmod_t ctx);
@@ -326,7 +326,7 @@ FLINT_DLL int nmod_mpoly_factor_irred_lgprime_zippel(nmod_mpolyv_t Af,
 /*****************************************************************************/
 
 FLINT_DLL void nmod_mpoly_compression_do(nmod_mpoly_t L,
-                 const nmod_mpoly_ctx_t Lctx, mp_limb_t * Acoeffs, slong Alen,
+                 const nmod_mpoly_ctx_t Lctx, ulong * Acoeffs, slong Alen,
                                                         mpoly_compression_t M);
 
 FLINT_DLL void nmod_mpoly_compression_undo(nmod_mpoly_t A,
@@ -372,7 +372,7 @@ typedef nmod_mpoly_pfrac_struct nmod_mpoly_pfrac_t[1];
 
 FLINT_DLL int nmod_mpoly_pfrac_init(nmod_mpoly_pfrac_t I, flint_bitcnt_t bits,
                          slong l, slong r, const nmod_mpoly_struct * betas, 
-                          const mp_limb_t * alpha, const nmod_mpoly_ctx_t ctx);
+                          const ulong * alpha, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_pfrac_clear(nmod_mpoly_pfrac_t I,
                                                    const nmod_mpoly_ctx_t ctx);
@@ -381,33 +381,33 @@ FLINT_DLL int nmod_mpoly_pfrac(slong r, nmod_mpoly_t t, const slong * deg,
                              nmod_mpoly_pfrac_t I, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_hlift(slong m, nmod_mpoly_struct * f, slong r,
-            const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
+            const ulong * alpha, const nmod_mpoly_t A, const slong * degs,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int n_bpoly_mod_pfrac(slong r, n_bpoly_struct * C,
             slong * C_deg1_bound, n_bpoly_t A, n_bpoly_struct * B, nmod_t mod);
 
 FLINT_DLL int n_bpoly_mod_hlift2(n_bpoly_t A, n_bpoly_t B0, n_bpoly_t B1,
-                              mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                              ulong alpha, slong degree_inner, nmod_t mod,
                                                       n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_bpoly_mod_hlift2_cubic(n_bpoly_t A, n_bpoly_t B0, n_bpoly_t B1,
-                               mp_limb_t alpha, slong degree_inner, nmod_t ctx,
+                               ulong alpha, slong degree_inner, nmod_t ctx,
                                 nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_bpoly_mod_hlift(slong r, n_bpoly_t A, n_bpoly_struct * B,
-                              mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                              ulong alpha, slong degree_inner, nmod_t mod,
                                                       n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_bpoly_mod_hlift_cubic(slong r, n_bpoly_t A, n_bpoly_struct * B,
-                               mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                               ulong alpha, slong degree_inner, nmod_t mod,
                                 nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 FLINT_DLL int n_polyu3_mod_hlift(slong r, n_polyun_struct * BB,  n_polyu_t A,
-           n_polyu_struct * B, mp_limb_t beta, slong degree_inner, nmod_t ctx);
+           n_polyu_struct * B, ulong beta, slong degree_inner, nmod_t ctx);
 
 FLINT_DLL int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
-            const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
+            const ulong * alpha, const nmod_mpoly_t A, const slong * degs,
                                const nmod_mpoly_ctx_t ctx, flint_rand_t state);
 
 FLINT_DLL int nmod_mpoly_factor_algo(nmod_mpoly_factor_t f,
@@ -424,7 +424,7 @@ FLINT_DLL int nmod_mpoly_factor_zippel(nmod_mpoly_factor_t f,
 
 FLINT_DLL int _nmod_mpoly_evaluate_rest_n_poly(n_poly_struct * E,
     slong * starts, slong * ends, slong * stops, ulong * es,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen, slong var,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen, slong var,
     const n_poly_struct * alphas, const slong * offsets, const slong * shifts,
                                  slong N, ulong mask, slong nvars, nmod_t ctx);
 

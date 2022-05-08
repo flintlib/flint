@@ -13,7 +13,7 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
+nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
 {
     if (c == UWORD(0))
     {
@@ -30,7 +30,7 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
     else if (A->r * A->c > 10 && A->mod.n < UWORD_HALF)
     {
         slong i, j;
-        mp_limb_t w_pr = n_mulmod_precomp_shoup(c, A->mod.n);
+        ulong w_pr = n_mulmod_precomp_shoup(c, A->mod.n);
 
         for (i = 0; i < A->r; i++)
             for (j = 0; j < A->c; j++)

@@ -23,10 +23,10 @@ int main(void)
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t a, b, d, r1, r2, p1, p2, dinv;
+      ulong a, b, d, r1, r2, p1, p2, dinv;
       double dpre;
 
-      mp_limb_t bits = n_randint(state, FLINT_D_BITS) + 1;
+      ulong bits = n_randint(state, FLINT_D_BITS) + 1;
       d = n_randtest_bits(state, bits);
       a = n_randtest(state) % d;
       b = n_randtest(state) % d;

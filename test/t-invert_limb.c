@@ -15,7 +15,7 @@
 
 #define invert_limb_naive(ninv, n)                    \
    do {                                               \
-      mp_limb_t dummy;                                \
+      ulong dummy;                                \
       udiv_qrnnd (ninv, dummy, ~(n), ~(WORD(0)), n);  \
    } while (0)
 
@@ -29,7 +29,7 @@ int main(void)
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t n, ninv1, ninv2;
+      ulong n, ninv1, ninv2;
 
       n = n_randtest(state);
       n |= (UWORD(1) << (FLINT_BITS - 1));

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "ulong_extras.h"
 #include "padic_mat.h"
 
 void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t ctx)
@@ -51,4 +51,3 @@ void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t c
         _padic_mat_canonicalise(mat, ctx);
     }
 }
-

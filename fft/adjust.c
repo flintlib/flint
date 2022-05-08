@@ -13,10 +13,10 @@
 #include "flint.h"
 #include "fft.h"
       
-void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
+void fft_adjust(ulong * r, ulong * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 {
    flint_bitcnt_t b1;
-   mp_limb_t cy;
+   ulong cy;
    mp_size_t x;
 
    b1 = i*w;

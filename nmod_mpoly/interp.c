@@ -20,16 +20,16 @@
 
 
 void _nmod_poly_eval2_pow(
-    mp_limb_t * vp,
-    mp_limb_t * vm,
+    ulong * vp,
+    ulong * vm,
     n_poly_t P, 
     n_poly_t alphapow,
     nmod_t fctx)
 {
-    mp_limb_t * Pcoeffs = P->coeffs;
+    ulong * Pcoeffs = P->coeffs;
     slong Plen = P->length;
-    mp_limb_t * alpha_powers = alphapow->coeffs;
-    mp_limb_t p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
+    ulong * alpha_powers = alphapow->coeffs;
+    ulong p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
     slong k;
 
     a0 = a1 = a2 = UWORD(0);
@@ -82,7 +82,7 @@ void nmod_mpolyn_interp_reduce_2sm_poly(
     n_poly_t alphapow,
     const nmod_mpoly_ctx_t ctx)
 {
-    mp_limb_t u, v;
+    ulong u, v;
     slong Ai, Alen, k;
     n_poly_struct * Acoeff;
     ulong * Aexp;
@@ -111,14 +111,14 @@ void nmod_mpolyn_interp_lift_2sm_poly(
     nmod_mpolyn_t F,
     const n_poly_t A,
     const n_poly_t B,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong lastdeg = -WORD(1);
-    mp_limb_t u, v, d0, d1, Avalue, Bvalue;
+    ulong u, v, d0, d1, Avalue, Bvalue;
     slong Fi, Aexp, Bexp;
-    mp_limb_t * Acoeff = A->coeffs;
-    mp_limb_t * Bcoeff = B->coeffs;
+    ulong * Acoeff = A->coeffs;
+    ulong * Bcoeff = B->coeffs;
     n_poly_struct * Fcoeff;
     ulong * Fexp;
     slong e;
@@ -206,12 +206,12 @@ int nmod_mpolyn_interp_crt_2sm_poly(
     const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0, Finc;
-    mp_limb_t alpha = n_poly_get_coeff(alphapow, 1);
+    ulong alpha = n_poly_get_coeff(alphapow, 1);
     slong lastdeg = -WORD(1);
-    mp_limb_t u, v, FvalueA, FvalueB;
+    ulong u, v, FvalueA, FvalueB;
     slong Fi, Toff, Aexp, Bexp, e, fexp;
-    mp_limb_t * Acoeff = A->coeffs;
-    mp_limb_t * Bcoeff = B->coeffs;
+    ulong * Acoeff = A->coeffs;
+    ulong * Bcoeff = B->coeffs;
     slong Flen = F->length;
     n_poly_struct * Fcoeff = F->coeffs;
     ulong * Fexp = F->exps;
@@ -400,7 +400,7 @@ int nmod_mpolyn_interp_crt_sm_bpoly(
     n_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t v;
+    ulong v;
     ulong Fexpi, mask;
 
     mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
@@ -532,13 +532,13 @@ void nmod_mpolyn_interp_reduce_sm_mpolyn(
     nmod_mpolyn_t E,
     nmod_mpolyn_t A,
     slong var,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     slong offset, shift, k;
     ulong mask;
-    mp_limb_t v;
+    ulong v;
     n_poly_struct * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
     slong Alen = A->length;
@@ -655,7 +655,7 @@ int nmod_mpolyn_interp_crt_sm_mpolyn(
     nmod_mpolyn_t A,
     slong var,
     n_poly_t modulus,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
@@ -663,7 +663,7 @@ int nmod_mpolyn_interp_crt_sm_mpolyn(
     slong lastdeg = -WORD(1);
     slong offset, shift;
     slong vi;
-    mp_limb_t v;
+    ulong v;
     n_poly_t tp;
     n_poly_struct * Tcoeff;
     ulong * Texp;
@@ -802,7 +802,7 @@ void nmod_mpolyn_interp_reduce_2sm_mpolyn(
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
     slong offset, shift, k;
     ulong mask;
-    mp_limb_t e, f;
+    ulong e, f;
     n_poly_struct * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
     slong Alen = A->length;
@@ -890,7 +890,7 @@ void nmod_mpolyn_interp_lift_2sm_mpolyn(
     nmod_mpolyn_t A,
     nmod_mpolyn_t B,
     slong var,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
@@ -909,9 +909,9 @@ void nmod_mpolyn_interp_lift_2sm_mpolyn(
     slong Blen = B->length;
     ulong * Bexp = B->exps;
     slong Bi, bi;
-    mp_limb_t u, v, Avalue, Bvalue, FvalueA, FvalueB;
+    ulong u, v, Avalue, Bvalue, FvalueA, FvalueB;
     int cmp;
-    mp_limb_t d0 = n_invmod(alpha + alpha, ctx->mod.n);
+    ulong d0 = n_invmod(alpha + alpha, ctx->mod.n);
 
     n_poly_init(tp);
     n_poly_init(zero);
@@ -1054,9 +1054,9 @@ int nmod_mpolyn_interp_crt_2sm_mpolyn(
     ulong * Bexp = B->exps;
     slong Bi, bi;
     n_poly_struct * Fvalue;
-    mp_limb_t u, v, Avalue, Bvalue, FvalueA, FvalueB;
+    ulong u, v, Avalue, Bvalue, FvalueA, FvalueB;
     int texp_set, cmp;
-    mp_limb_t alpha = n_poly_get_coeff(alphapow, 1);
+    ulong alpha = n_poly_get_coeff(alphapow, 1);
 
 #if FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alpha, ctx->mod);
@@ -1237,7 +1237,7 @@ int nmod_mpolyn_interp_crt_2sm_mpolyn(
 void nmod_mpolyn_interp_reduce_sm_mpoly(
     nmod_mpoly_t B,
     nmod_mpolyn_t A,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i, N, k;
@@ -1262,7 +1262,7 @@ void nmod_mpolyn_interp_reduce_sm_mpoly(
 void nmod_mpolyun_interp_reduce_sm_mpolyu(
     nmod_mpolyu_t B,
     nmod_mpolyun_t A,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i, k;
@@ -1288,7 +1288,7 @@ void nmod_mpolyn_interp_lift_sm_mpoly(
 {
     slong i, N;
     n_poly_struct * Acoeff;
-    mp_limb_t * Bcoeff;
+    ulong * Bcoeff;
     ulong * Aexp, * Bexp;
     slong Blen;
 
@@ -1340,18 +1340,18 @@ int nmod_mpolyn_interp_crt_sm_mpoly(
     nmod_mpolyn_t T,
     nmod_mpoly_t A,
     n_poly_t modulus,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong i, j, k;
     slong N;
-    mp_limb_t v;
+    ulong v;
     flint_bitcnt_t bits = A->bits;
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_poly_struct * Fcoeff = F->coeffs;
     n_poly_struct * Tcoeff;
     n_poly_t tp;
@@ -1455,7 +1455,7 @@ int nmod_mpolyun_interp_crt_sm_mpolyu(
     nmod_mpolyun_t T,
     nmod_mpolyu_t A,
     n_poly_t modulus,
-    mp_limb_t alpha,
+    ulong alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
@@ -1559,8 +1559,8 @@ int nmod_mpolyn_interp_mcrt_sm_mpoly(
     slong lastdeg = -1;
     int changed = 0;
     slong i;
-    mp_limb_t v;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong v;
+    ulong * Acoeff = A->coeffs;
     slong Flen = F->length;
 
     FLINT_ASSERT(Flen == A->length);

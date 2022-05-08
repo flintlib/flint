@@ -550,17 +550,17 @@ DEFINE_FUNC(test_fmpz_polyxx_divrem_4,
 }
 
 DEFINE_FUNC(test_nmodxx_1,
-        (mp_limb_t& to, mp_limb_t a_, mp_limb_t b_, nmod_t nm))
+        (ulong& to, ulong a_, ulong b_, nmod_t nm))
 {
     nmodxx_ctx_srcref ctx = nmodxx_ctx_srcref::make(nm);
     nmodxx a = nmodxx::make_nored(a_, ctx);
     nmodxx b = nmodxx::make_nored(b_, ctx);
-    to = inv((a + b) * (a * b)).to<mp_limb_t>();
+    to = inv((a + b) * (a * b)).to<ulong>();
 }
 DEFINE_FUNC(test_nmodxx_2,
-        (mp_limb_t& to, mp_limb_t a, mp_limb_t b, nmod_t nm))
+        (ulong& to, ulong a, ulong b, nmod_t nm))
 {
-    mp_limb_t tmp1, tmp2;
+    ulong tmp1, tmp2;
     tmp1 = nmod_add(a, b, nm);
     tmp2 = nmod_mul(a, b, nm);
     tmp1 = nmod_mul(tmp1, tmp2, nm);

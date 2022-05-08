@@ -132,25 +132,25 @@ Conversions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, slong len, nmod_t mod)
+.. function:: void _fmpz_vec_get_nmod_vec(ulong_ptr res, const fmpz * poly, slong len, nmod_t mod)
 
     Reduce the coefficients of ``(poly, len)`` modulo the given
     modulus and set ``(res, len)`` to the result.
 
-.. function:: void _fmpz_vec_set_nmod_vec(fmpz * res, mp_srcptr poly, slong len, nmod_t mod)
+.. function:: void _fmpz_vec_set_nmod_vec(fmpz * res, ulong_srcptr poly, slong len, nmod_t mod)
 
     Set the coefficients of ``(res, len)`` to the symmetric modulus
     of the coefficients of ``(poly, len)``, i.e. convert the given
     coefficients modulo the given modulus `n` to their signed integer
     representatives in the range `[-n/2, n/2)`.
 
-.. function:: slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)
+.. function:: slong _fmpz_vec_get_fft(ulong ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)
 
     Convert the vector of coeffs ``coeffs_m`` to an fft vector 
     ``coeffs_f`` of the given ``length`` with ``l`` limbs per
     coefficient with an additional limb for overflow. 
 
-.. function:: void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length, const mp_ptr * coeffs_f, slong limbs, slong sign)
+.. function:: void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length, const ulong_ptr * coeffs_f, slong limbs, slong sign)
 
     Convert an fft vector ``coeffs_f`` of the given ``length`` 
     to a vector of ``fmpz``'s. Each is assumed to be the given 
@@ -377,11 +377,11 @@ Reduction mod `p`
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
+.. function:: void _fmpz_vec_scalar_mod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`.
 
-.. function:: void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
+.. function:: void _fmpz_vec_scalar_smod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`, choosing 
     the unique representative in `(-p/2, p/2]`.

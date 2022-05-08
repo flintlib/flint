@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "padic.h"
 
 #define n    (S->n)
@@ -87,10 +88,7 @@ void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op))
-    {
-        flint_printf("Exception (padic_inv).  Zero is not invertible.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "Zero is not invertible in padic_inv\n");
 
     /*
         If x = u p^v has negative valuation with N <= -v then the 
@@ -108,4 +106,3 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         padic_val(rop) = - padic_val(op);
     }
 }
-

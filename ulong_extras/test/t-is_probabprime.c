@@ -14,7 +14,7 @@
 int main(void)
 {
    int i, result;
-   mp_limb_t d;
+   ulong d;
    mpz_t d_m;
    slong pow;
    ulong bits;

@@ -15,7 +15,7 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
+_nmod_poly_pow_trunc(ulong_ptr res, ulong_srcptr poly, 
                                        ulong e, slong trunc, nmod_t mod)
 {
     _nmod_poly_pow_trunc_binexp(res, poly, e, trunc, mod);
@@ -26,7 +26,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
                            const nmod_poly_t poly, ulong e, slong trunc)
 {
     const slong len = poly->length;
-    mp_ptr p;
+    ulong_ptr p;
     int pcopy = 0;
 
     if (len < 2 || e < UWORD(3) || trunc == 0)

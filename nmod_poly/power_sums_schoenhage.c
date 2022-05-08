@@ -12,12 +12,12 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_power_sums_schoenhage(mp_ptr res, mp_srcptr poly, slong len,
+_nmod_poly_power_sums_schoenhage(ulong_ptr res, ulong_srcptr poly, slong len,
                                  slong n, nmod_t mod)
 {
-    mp_ptr a, b;
+    ulong_ptr a, b;
 
-    a = (mp_ptr) flint_malloc((2 * len - 1) * sizeof(mp_limb_t));
+    a = (ulong_ptr) flint_malloc((2 * len - 1) * sizeof(ulong));
     b = a + len;
 
     _nmod_poly_reverse(a, poly, len, len);

@@ -33,7 +33,7 @@ main(void)
         fmpz_mat_t A;
         nmod_mat_t M, M2;
         slong rows, cols;
-        mp_limb_t mod;
+        ulong mod;
 
         rows = n_randint(state, 50);
         cols = n_randint(state, 50);

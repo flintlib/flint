@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len,
+_nmod_poly_power_sums_to_poly_naive(ulong_ptr res, ulong_srcptr poly, slong len,
                                     nmod_t mod)
 {
     slong i, k;

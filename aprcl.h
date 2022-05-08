@@ -246,10 +246,10 @@ FLINT_DLL void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
 FLINT_DLL void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 
 /* Jacobi sum computation. */
-FLINT_DLL mp_ptr aprcl_f_table(const ulong q);
+FLINT_DLL ulong_ptr aprcl_f_table(const ulong q);
 
 FLINT_DLL void _unity_zp_jacobi_sum_pq_general(unity_zp f,
-        const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
+        const ulong_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
 
 FLINT_DLL void unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p);
 

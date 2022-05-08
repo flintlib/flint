@@ -70,7 +70,7 @@ fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
     fq_nmod_ctx_order(f, ctx->fq_nmod_ctx);
 }
 
-FQ_ZECH_INLINE mp_limb_t
+FQ_ZECH_INLINE ulong
 fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
     return ctx->qm1 + 1;
@@ -116,7 +116,7 @@ fq_zech_clear(fq_zech_t rop, const fq_zech_ctx_t ctx)
 FQ_ZECH_INLINE void
 fq_zech_reduce(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
-    mp_limb_t order = fq_zech_ctx_order_ui(ctx);
+    ulong order = fq_zech_ctx_order_ui(ctx);
     if (rop->value >= order)
     {
         rop->value -= order;

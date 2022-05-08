@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, 
@@ -89,10 +86,7 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
 {
     if (fmpq_is_zero(c))
-    {
-        flint_printf("Exception (fmpq_poly_scalar_div_fmpq). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpq_poly_scalar_div_fmpq\n");
 
     if (fmpq_poly_is_zero(op))
     {

@@ -39,7 +39,7 @@ int main(void)
         slong len, prev_len;
         fmpz * vb1, * vb2;
         fmpz_t b;
-        mp_ptr vnb, vnr;
+        ulong_ptr vnb, vnr;
         slong n, iter;
         ulong nb;
         nmod_t mod;

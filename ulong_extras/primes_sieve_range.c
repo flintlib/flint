@@ -13,9 +13,9 @@
 #include "ulong_extras.h"
 
 static void
-mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)
+mark(char * sieve, ulong a, slong len, ulong p)
 {
-    mp_limb_t t;
+    ulong t;
 
     t = p * p;
     if (t >= a)
@@ -37,11 +37,11 @@ mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)
 }
 
 void
-n_sieve_odd(char * sieve, ulong n, mp_limb_t a,
-    unsigned int * sieve_primes, mp_limb_t bound)
+n_sieve_odd(char * sieve, ulong n, ulong a,
+    unsigned int * sieve_primes, ulong bound)
 {
     slong i;
-    mp_limb_t p;
+    ulong p;
 
     for (i = 0; i < n / 2; i++)
         sieve[i] = 1;
@@ -58,9 +58,9 @@ n_sieve_odd(char * sieve, ulong n, mp_limb_t a,
 }
 
 void
-n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
+n_primes_sieve_range(n_primes_t iter, ulong a, ulong b)
 {
-    mp_limb_t bound;
+    ulong bound;
     ulong len, odd_len;
 
     /* a and b must be odd */

@@ -21,4 +21,3 @@ void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
             fmpq_add(fmpq_mat_entry(mat, i, j), 
                      fmpq_mat_entry(mat1, i, j), fmpq_mat_entry(mat2, i, j));
 }
-

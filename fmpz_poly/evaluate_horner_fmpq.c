@@ -11,7 +11,6 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpq.h"
 
 void

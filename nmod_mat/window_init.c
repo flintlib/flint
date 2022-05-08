@@ -22,7 +22,7 @@ nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
     window->entries = NULL;
 
     if (r2 > r1)
-        window->rows = (mp_limb_t **) flint_malloc((r2 - r1) * sizeof(mp_limb_t *));
+        window->rows = (ulong **) flint_malloc((r2 - r1) * sizeof(ulong *));
     else
         window->rows = NULL;
 

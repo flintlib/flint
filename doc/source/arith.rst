@@ -148,7 +148,7 @@ Bell numbers
     running in time `O(n^2 \log^{O(1)} n)`. The default version
     chooses an algorithm automatically.
 
-.. function:: mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod)
+.. function:: ulong arith_bell_number_nmod(ulong n, nmod_t mod)
 
     Computes the Bell number `B_n` modulo an integer given by ``mod``.
 
@@ -168,10 +168,10 @@ Bell numbers
     calling ``arith_bell_number_nmod_vec`` and reading the last
     coefficient.
 
-.. function:: void arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod)
-              void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
-              void arith_bell_number_nmod_vec_ogf(mp_ptr b, slong n, nmod_t mod)
-              int arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod)
+.. function:: void arith_bell_number_nmod_vec(ulong_ptr b, slong n, nmod_t mod)
+              void arith_bell_number_nmod_vec_recursive(ulong_ptr b, slong n, nmod_t mod)
+              void arith_bell_number_nmod_vec_ogf(ulong_ptr b, slong n, nmod_t mod)
+              int arith_bell_number_nmod_vec_series(ulong_ptr b, slong n, nmod_t mod)
 
     Sets `b` to the vector of Bell numbers `B_0, B_1, \ldots, B_{n-1}`
     inclusive modulo an integer given by ``mod``.
@@ -513,13 +513,13 @@ Number of partitions
     Computes first ``len`` values of the partition function `p(n)`
     starting with `p(0)`. Uses inversion of Euler's pentagonal series.
 
-.. function:: void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod)
+.. function:: void arith_number_of_partitions_nmod_vec(ulong_ptr res, slong len, nmod_t mod)
 
     Computes first ``len`` values of the partition function `p(n)`
     starting with `p(0)`, modulo the modulus defined by ``mod``.
     Uses inversion of Euler's pentagonal series.
 
-.. function:: void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
+.. function:: void arith_hrr_expsum_factored(trig_prod_t prod, ulong k, ulong n)
 
     Symbolically evaluates the exponential sum
 

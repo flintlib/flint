@@ -11,7 +11,11 @@
 */
 
 #include "mpf_vec.h"
-#include "gmpcompat.h"
+#ifdef LONGSLONG
+# define flint_mpf_set_ui mpf_set_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 int
 _mpf_vec_dot2(mpf_t res, mpf_srcptr vec1, mpf_srcptr vec2, slong len2,

@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-
-#include "fmpz.h"
-#include "padic_poly.h"
+#include "fmpz_mini.h"
 
 void padic_poly_clear(padic_poly_t poly)
 {

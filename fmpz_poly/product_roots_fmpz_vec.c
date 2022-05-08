@@ -10,7 +10,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 
 void
 _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n)

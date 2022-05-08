@@ -32,7 +32,7 @@ main(void)
         fmpz_t a, b;
         flint_bitcnt_t bits = n_randint(state, 300) + 1;
         ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accomodate shift */
-        mp_ptr arr = (mp_ptr) flint_calloc(space, sizeof(mp_limb_t));
+        ulong_ptr arr = (ulong_ptr) flint_calloc(space, sizeof(ulong));
         flint_bitcnt_t shift = n_randint(state, FLINT_BITS);
         int negate = (int) -n_randint(state, 2);
 
@@ -67,7 +67,7 @@ main(void)
         fmpz_t a, b;
         flint_bitcnt_t bits = n_randint(state, 300) + 1;
         ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accomodate shift */
-        mp_ptr arr = (mp_ptr) flint_calloc(space, sizeof(mp_limb_t));
+        ulong_ptr arr = (ulong_ptr) flint_calloc(space, sizeof(ulong));
         flint_bitcnt_t shift = n_randint(state, FLINT_BITS);
 
         fmpz_init(a);

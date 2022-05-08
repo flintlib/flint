@@ -20,7 +20,7 @@ using namespace flint;
 void
 test_init()
 {
-    mp_limb_t M = 1039;
+    ulong M = 1039;
     nmod_matxx A(3, 4, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
     tassert(ctx.n() == M);
@@ -52,7 +52,7 @@ bool has_explicit_temporaries(const Expr&)
 void
 test_arithmetic()
 {
-    mp_limb_t M = 1039;
+    ulong M = 1039;
     nmod_matxx A(10, 10, M);
     nmod_matxx v(10, 1, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
@@ -101,7 +101,7 @@ test_arithmetic()
 void
 test_functions()
 {
-    mp_limb_t M = 1031;
+    ulong M = 1031;
     nmod_matxx A(2, 3, M), B(2, 2, M), empty(0, 15, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
     B.at(0, 0) = nmodxx::red(1, ctx);
@@ -171,7 +171,7 @@ void
 test_randomisation()
 {
     frandxx rand;
-    mp_limb_t M = 1031;
+    ulong M = 1031;
     nmod_matxx A(2, 2, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
 
@@ -219,11 +219,11 @@ test_randomisation()
 void
 test_reduction_reconstruction()
 {
-    std::vector<mp_limb_t> primes;
+    std::vector<ulong> primes;
     primes.push_back(1031);
     primes.push_back(1033);
     primes.push_back(1039);
-    mp_limb_t M = primes[0];
+    ulong M = primes[0];
 
     frandxx rand;
     fmpz_matxx A(5, 7);A.set_randtest(rand, 8);

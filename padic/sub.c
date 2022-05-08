@@ -101,4 +101,3 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
         }
     }
 }
-

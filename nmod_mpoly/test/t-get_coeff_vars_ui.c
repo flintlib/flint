@@ -59,7 +59,7 @@ main(void)
         slong vars[1];
         ulong exps[1];
         slong var1;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));
         nvars = 1 + n_randint(state, 20);
@@ -122,7 +122,7 @@ main(void)
         slong vars[2];
         ulong exps[2];
         slong var1, var2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));
         nvars = 2 + n_randint(state, 20);

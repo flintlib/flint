@@ -22,7 +22,7 @@ int main(void)
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
-      mp_limb_t n1, n2;
+      ulong n1, n2;
 
       do
       {
@@ -47,7 +47,7 @@ int main(void)
    
    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test random products of two primes */
    {
-      mp_limb_t n1, n2, n3, n, limit;
+      ulong n1, n2, n3, n, limit;
 
 #if FLINT64
       limit = UWORD(100000000) - UWORD(100);

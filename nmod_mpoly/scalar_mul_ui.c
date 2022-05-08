@@ -17,7 +17,7 @@
 void nmod_mpoly_scalar_mul_nmod_invertible(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(c != 0);
@@ -55,13 +55,13 @@ void nmod_mpoly_scalar_mul_nmod_invertible(
 void nmod_mpoly_scalar_mul_nmod_general(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i, N;
     slong Alen, Blen;
     ulong * Aexp, * Bexp;
-    mp_limb_t * Acoeff, * Bcoeff;
+    ulong * Acoeff, * Bcoeff;
 
     FLINT_ASSERT(c < ctx->mod.n);
 

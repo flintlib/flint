@@ -42,11 +42,11 @@ private:
 
 public:
     const nmod_t& _nmod() const {return nmod;}
-    explicit nmodxx_ctx(mp_limb_t n) {nmod_init(&nmod, n);}
+    explicit nmodxx_ctx(ulong n) {nmod_init(&nmod, n);}
     // no destruction necessary
 
     bool operator==(const nmodxx_ctx& o) const {return nmod.n == o.nmod.n;}
-    mp_limb_t n() const {return nmod.n;}
+    ulong n() const {return nmod.n;}
 };
 
 class nmodxx_ctx_srcref
@@ -64,7 +64,7 @@ public:
         {return nmodxx_ctx_srcref(nm);}
 
     bool operator==(const nmodxx_ctx_srcref& o) const {return nmod.n == o.nmod.n;}
-    mp_limb_t n() const {return nmod.n;}
+    ulong n() const {return nmod.n;}
 };
 
 namespace detail {
@@ -83,11 +83,11 @@ public:
     FLINTXX_DEFINE_C_REF(nmodxx_expression, detail::nmodxx_fake_c_type, _limb)
 
     // static functions for nmodxx
-    static nmodxx_expression make_nored(mp_limb_t n, nmodxx_ctx_srcref c)
+    static nmodxx_expression make_nored(ulong n, nmodxx_ctx_srcref c)
     {
         return nmodxx_expression(Data::make_nored(n, c));
     }
-    static nmodxx_expression red(mp_limb_t n, nmodxx_ctx_srcref c)
+    static nmodxx_expression red(ulong n, nmodxx_ctx_srcref c)
     {
         nmodxx_expression res = make_nored(n, c);
         res.reduce();
@@ -98,14 +98,14 @@ public:
         traits::is_fmpzxx<Fmpz>, nmodxx_expression>::type red(
                 const Fmpz& n, nmodxx_ctx_srcref c)
     {
-        return make_nored((n % c.n()).template to<mp_limb_t>(), c);
+        return make_nored((n % c.n()).template to<ulong>(), c);
     }
     template<class Fmpq>
     static typename mp::enable_if<
         traits::is_fmpqxx<Fmpq>, nmodxx_expression>::type red(
                 const Fmpq& n, nmodxx_ctx_srcref c)
     {
-        return make_nored((n % fmpzxx(c.n())).template to<mp_limb_t>(), c);
+        return make_nored((n % fmpzxx(c.n())).template to<ulong>(), c);
     }
     // TODO more
 
@@ -113,7 +113,7 @@ public:
     nmodxx_ctx_srcref _ctx() const {return this->_data().ctx;}
     const nmod_t& _nmod() const {return this->_data().ctx._nmod();}
     void reduce() {NMOD_RED(_limb(), _limb(), _nmod());}
-    void set_nored(mp_limb_t n) {this->_data().inner = n;}
+    void set_nored(ulong n) {this->_data().inner = n;}
 
     nmodxx_ctx_srcref estimate_ctx() const;
 
@@ -143,21 +143,21 @@ struct ref_data<Nmod, detail::nmodxx_fake_c_type>
     typedef void IS_REF_OR_CREF;
     typedef Nmod wrapped_t;
 
-    typedef mp_limb_t& data_ref_t;
-    typedef const mp_limb_t& data_srcref_t;
+    typedef ulong& data_ref_t;
+    typedef const ulong& data_srcref_t;
 
-    mp_limb_t& inner;
+    ulong& inner;
     nmodxx_ctx_srcref ctx;
 
     ref_data(Nmod& o) : inner(o._data().inner), ctx(o._data().ctx) {}
 
-    static ref_data make(mp_limb_t& f, nmodxx_ctx_srcref ctx)
+    static ref_data make(ulong& f, nmodxx_ctx_srcref ctx)
     {
         return ref_data(f, ctx);
     }
 
 private:
-    ref_data(mp_limb_t& fp, nmodxx_ctx_srcref c) : inner(fp), ctx(c) {}
+    ref_data(ulong& fp, nmodxx_ctx_srcref c) : inner(fp), ctx(c) {}
 };
 
 template<class Nmod, class Ref>
@@ -166,40 +166,40 @@ struct srcref_data<Nmod, Ref, detail::nmodxx_fake_c_type>
     typedef void IS_REF_OR_CREF;
     typedef Nmod wrapped_t;
 
-    typedef const mp_limb_t& data_ref_t;
-    typedef const mp_limb_t& data_srcref_t;
+    typedef const ulong& data_ref_t;
+    typedef const ulong& data_srcref_t;
 
-    const mp_limb_t& inner;
+    const ulong& inner;
     nmodxx_ctx_srcref ctx;
 
     srcref_data(const Nmod& o) : inner(o._data().inner), ctx(o._data().ctx) {}
     srcref_data(Ref o) : inner(o._data().inner) {}
 
-    static srcref_data make(const mp_limb_t& f, nmodxx_ctx_srcref ctx)
+    static srcref_data make(const ulong& f, nmodxx_ctx_srcref ctx)
     {
         return srcref_data(f, ctx);
     }
 
 private:
-    srcref_data(const mp_limb_t& fp, nmodxx_ctx_srcref c) : inner(fp), ctx(c) {}
+    srcref_data(const ulong& fp, nmodxx_ctx_srcref c) : inner(fp), ctx(c) {}
 };
 } // flint_classes
 namespace detail {
 struct nmodxx_data
 {
     nmodxx_ctx_srcref ctx;
-    mp_limb_t inner;
-    typedef mp_limb_t& data_ref_t;
-    typedef const mp_limb_t& data_srcref_t;
+    ulong inner;
+    typedef ulong& data_ref_t;
+    typedef const ulong& data_srcref_t;
 
     nmodxx_data(nmodxx_ctx_srcref c) : ctx(c), inner(0) {}
 
 private:
-    nmodxx_data(mp_limb_t n, nmodxx_ctx_srcref c)
+    nmodxx_data(ulong n, nmodxx_ctx_srcref c)
         : ctx(c), inner(n) {}
 
 public:
-    static nmodxx_data make_nored(mp_limb_t n, nmodxx_ctx_srcref c)
+    static nmodxx_data make_nored(ulong n, nmodxx_ctx_srcref c)
     {
         return nmodxx_data(n, c);
     }
@@ -286,7 +286,7 @@ NMODXX_DEFINE_INSTANTIATE_TEMPORARIES(nmodxx)
 
 FLINTXX_DEFINE_EQUALS(nmodxx, e1._limb() == e2._limb())
 
-FLINT_DEFINE_GET_COND(conversion, mp_limb_t, NMODXX_COND_S, from._limb())
+FLINT_DEFINE_GET_COND(conversion, ulong, NMODXX_COND_S, from._limb())
 
 template<class Nmod>
 struct to_string<Nmod, typename mp::enable_if< NMODXX_COND_S<Nmod> >::type>
@@ -329,7 +329,7 @@ namespace detail {
 struct nmod_vector_data
 {
     slong size;
-    mp_limb_t* array;
+    ulong* array;
     nmodxx_ctx_srcref ctx;
 
     nmod_vector_data(slong n, nmodxx_ctx_srcref c)
@@ -348,7 +348,7 @@ struct nmod_vector_data
 };
 
 struct nmod_vector_traits
-    : wrapped_vector_traits<nmodxx, slong, nmodxx_ref, nmodxx_srcref, mp_limb_t>
+    : wrapped_vector_traits<nmodxx, slong, nmodxx_ref, nmodxx_srcref, ulong>
 {
     template<class Expr>
     static typename Expr::evaluated_t create_temporary(const Expr& e)

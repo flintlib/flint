@@ -51,7 +51,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     }
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
     {
-        mp_limb_t c0, c1;
+        ulong c0, c1;
         ctx->type = FQ_DEFAULT_NMOD;
         nmod_init(&ctx->ctx.nmod.mod, fmpz_get_ui(p));
         c0 = fmpz_get_ui(modulus->coeffs + 0);

@@ -43,7 +43,7 @@ _fq_nmod_unrank(fq_nmod_t x, ulong r, const fq_nmod_ctx_t ctx)
 }
 
 static int
-n_is_prime_power(mp_limb_t * p, mp_limb_t n)
+n_is_prime_power(ulong * p, ulong n)
 {
     n_factor_t fac;
 
@@ -129,7 +129,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
 /* 2 -- n = 2^v * 2*(p^e + 1) */
 /* 3 -- n = 2^v */
 static int
-paley_construction(mp_limb_t * q, mp_limb_t n)
+paley_construction(ulong * q, ulong n)
 {
     int i, v;
 
@@ -171,7 +171,7 @@ int
 fmpz_mat_hadamard(fmpz_mat_t A)
 {
     slong n, m, i, j;
-    mp_limb_t q;
+    ulong q;
     int kind;
 
     n = fmpz_mat_nrows(A);

@@ -11,10 +11,10 @@
 
 #include "mpn_extras.h"
 
-mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
-                                 mp_srcptr b, mp_size_t n, mp_limb_t dinv)
+ulong flint_mpn_divrem_preinv1(ulong_ptr q, ulong_ptr a, mp_size_t m, 
+                                 ulong_srcptr b, mp_size_t n, ulong dinv)
 {
-   mp_limb_t ret;
+   ulong ret;
    mp_size_t i;
 
    /* ensure { a + i, n } < { b, n } */

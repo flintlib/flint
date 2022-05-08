@@ -124,7 +124,7 @@ Context Management
 
      Sets `f` to be the size of the finite field.
 
-.. function:: mp_limb_t fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
+.. function:: ulong fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 
      Returns the size of the finite field.
 
@@ -166,17 +166,17 @@ Memory management
 
     Clears the element ``rop``.
 
-.. function:: void _fq_zech_sparse_reduce(mp_ptr R, slong lenR, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_sparse_reduce(ulong_ptr R, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.
 
-.. function:: void _fq_zech_dense_reduce(mp_ptr R, slong lenR, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_dense_reduce(ulong_ptr R, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx`` using Newton division.
 
-.. function:: void _fq_zech_reduce(mp_ptr r, slong lenR, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_reduce(ulong_ptr r, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.  Does either sparse or dense reduction
@@ -238,7 +238,7 @@ Basic arithmetic
     Sets ``rop`` to the quotient of ``op1`` and ``op2``,
     reducing the output in the given context.
 
-.. function:: void _fq_zech_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_inv(ulong_ptr *rop, ulong_srcptr *op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, d)`` to the inverse of the non-zero element
     ``(op, len)``.
@@ -253,7 +253,7 @@ Basic arithmetic
      of ``ctx`` and sets ``f`` to one.  Since the modulus for
      ``ctx`` is always irreducible, ``op`` is always invertible.
 
-.. function:: void _fq_zech_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_pow(ulong_ptr *rop, ulong_srcptr *op, slong len, const fmpz_t e, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.

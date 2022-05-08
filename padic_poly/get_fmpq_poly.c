@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
-#include "padic_poly.h"
 
 /*
     Assumes that len > 0.
@@ -66,4 +67,3 @@ void padic_poly_get_fmpq_poly(fmpq_poly_t rop,
         _fmpq_poly_set_length(rop, len);
     }
 }
-

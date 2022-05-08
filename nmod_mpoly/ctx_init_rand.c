@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state,
-                                            slong max_nvars, mp_limb_t modulus)
+                                            slong max_nvars, ulong modulus)
 {
     mpoly_ctx_init_rand(ctx->minfo, state, max_nvars);
     nmod_init(&ctx->mod, modulus);

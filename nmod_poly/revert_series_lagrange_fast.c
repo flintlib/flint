@@ -18,11 +18,11 @@
 #define Ri(ii) (R + (n-1)*((ii)-1))
 
 void
-_nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv,
-                                            mp_srcptr Q, slong n, nmod_t mod)
+_nmod_poly_revert_series_lagrange_fast(ulong_ptr Qinv,
+                                            ulong_srcptr Q, slong n, nmod_t mod)
 {
     slong i, j, k, m;
-    mp_ptr R, S, T, tmp;
+    ulong_ptr R, S, T, tmp;
 
     if (n >= 1) Qinv[0] = UWORD(0);
     if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
@@ -48,7 +48,7 @@ _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv,
         Qinv[i] = nmod_div(S[i-1], i, mod);
         for (j = 1; j < m && i + j < n; j++)
         {
-            mp_limb_t s;
+            ulong s;
             int nlimbs = _nmod_vec_dot_bound_limbs(i + j, mod);
             NMOD_VEC_DOT(s, k, i + j, S[k], Ri(j)[i+j-1-k], mod, nlimbs);
             Qinv[i+j] = nmod_div(s, i+j, mod);
@@ -70,7 +70,7 @@ void
 nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, slong n)
 {
-    mp_ptr Qinv_coeffs, Q_coeffs;
+    ulong_ptr Qinv_coeffs, Q_coeffs;
     nmod_poly_t t1;
     slong Qlen;
     

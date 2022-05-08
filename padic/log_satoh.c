@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "padic.h"
 #include "ulong_extras.h"
+#include "padic.h"
 
 void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 {

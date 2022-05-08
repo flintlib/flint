@@ -12,7 +12,7 @@
 #include "flint-impl.h"
 #include "ulong_extras.h"
 
-mp_limb_t flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001, 
+ulong flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001, 
           53881, 87481, 117049, 515761, 1083289, 3206641, 3818929, 9257329, 
           22000801, 48473881, 48473881, 175244281, 427733329, 427733329, 
           898716289u, 2805544681u, 2805544681u, 2805544681u
@@ -35,11 +35,11 @@ mp_limb_t flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001,
 #define FLINT_NUM_PSEUDOSQUARES 25
 #endif
 
-int n_is_prime_pseudosquare(mp_limb_t n)
+int n_is_prime_pseudosquare(ulong n)
 {
     unsigned int i, j, m1;
-    mp_limb_t p, B, NB, exp, mod8;
-    const mp_limb_t * primes;
+    ulong p, B, NB, exp, mod8;
+    ulong_srcptr primes;
     const double * inverses;
 
     if (n < UWORD(2))
@@ -75,7 +75,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 
     for (j = 0; j <= i; j++)
     {
-        mp_limb_t mod = n_powmod2(primes[j], exp, n);
+        ulong mod = n_powmod2(primes[j], exp, n);
         if ((mod != UWORD(1)) && (mod != n - 1))
             return 0;
         if (mod == n - 1)
@@ -89,7 +89,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 
     if (mod8 == 5)
     {
-        mp_limb_t mod = n_powmod2(UWORD(2), exp, n);
+        ulong mod = n_powmod2(UWORD(2), exp, n);
         if (mod == n - 1)
             return 1;
         flint_throw(FLINT_ERROR, "Whoah, " WORD_FMT "u is a probable prime, but not prime, please report!!\n", n);
@@ -99,7 +99,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         if (m1) return 1;
         for (j = i + 1; j < FLINT_NUM_PSEUDOSQUARES + 1; j++)
         {
-            mp_limb_t mod = n_powmod2(primes[j], exp, n);
+            ulong mod = n_powmod2(primes[j], exp, n);
             if (mod == n - 1)
                 return 1;
             if (mod != 1)

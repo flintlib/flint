@@ -21,9 +21,9 @@ int main(void)
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t a, d, r1, r2, bits;
+      ulong a, d, r1, r2, bits;
       mpz_t a_m, d_m, r2_m;
-      mp_limb_t exp;
+      ulong exp;
       double dpre;
 
       mpz_init(a_m);
@@ -64,7 +64,7 @@ int main(void)
    /* check 0^0 = 1 */
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t bits, d, r;
+      ulong bits, d, r;
       double dpre;
 
       bits = n_randint(state, FLINT_D_BITS) + 1;

@@ -512,7 +512,7 @@ Modular Arithmetic
     ``m`` then 0 is returned by the function and the location ``sqrt`` 
     points to is set to NULL. 
 
-.. function:: mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+.. function:: ulong n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
 
     Returns `w t \bmod{p}` given a precomputed scaled approximation of `w / p` 
     computed by :func:`n_mulmod_precomp_shoup`. The value of `p` should be 
@@ -520,7 +520,7 @@ Modular Arithmetic
     Works faster than :func:`n_mulmod2_preinv` if `w` fixed and `t` from array
     (for example, scalar multiplication of vector).
 
-.. function:: mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
+.. function:: ulong n_mulmod_precomp_shoup(ulong w, ulong p)
 
     Returns `w'`, scaled approximation of `w / p`. `w'`  is equal to the integer 
     part of `w * 2^{\mathtt{FLINT\_BITS}} / p`.
@@ -529,7 +529,7 @@ Modular Arithmetic
 Divisibility testing
 --------------------------------------------------------------------------------
 
-.. function:: int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p)
+.. function:: int n_divides(ulong * q, ulong n, ulong p)
 
    Returns ``1`` if ``p`` divides ``n`` and sets ``q`` to the quotient,
    otherwise return ``0`` and sets ``q`` to ``0``.
@@ -1215,7 +1215,7 @@ Factorisation
     the time for ``n_factor`` on numbers that reach the ``n_factor_pp1``
     stage, i.e. after trial factoring and one line factoring.
 
-.. function:: int n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits, mp_limb_t max_iters)
+.. function:: int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters)
 
     Pollard Rho algorithm (with Brent modification) for integer factorization. 
     Assumes that the `n` is not prime. `factor` is set as the factor if found. 
@@ -1234,7 +1234,7 @@ Factorisation
     suggested by Richard Brent in the paper, available at
     https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
-.. function:: int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, mp_limb_t max_tries, mp_limb_t max_iters)
+.. function:: int n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters)
 
     Pollard Rho algorithm, modified as suggested by Richard Brent. Makes a call to 
     :func:`n_factor_pollard_brent_single`. The input parameters ai and xi for
@@ -1336,11 +1336,11 @@ Primitive Roots and Discrete Logarithms
 
 
 
-Elliptic curve method for factorization of ``mp_limb_t``
+Elliptic curve method for factorization of ``ulong``
 --------------------------------------------------------------------------------
 
 
-.. function:: void n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: void n_factor_ecm_double(ulong *x, ulong *z, ulong x0, ulong z0, ulong n, n_ecm_t n_ecm_inf)
 
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
@@ -1352,7 +1352,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     This group doubling is valid only for points expressed in
     Montgomery projective coordinates.
 
-.. function:: void n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1, mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: void n_factor_ecm_add(ulong *x, ulong *z, ulong x1, ulong z1, ulong x2, ulong z2, ulong x0, ulong z0, ulong n, n_ecm_t n_ecm_inf)
               
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
@@ -1360,7 +1360,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     This group doubling is valid only for points expressed in
     Montgomery projective coordinates.
 
-.. function:: void n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, mp_limb_t k, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: void n_factor_ecm_mul_montgomery_ladder(ulong *x, ulong *z, ulong x0, ulong z0, ulong k, ulong n, n_ecm_t n_ecm_inf)
 
     Montgomery ladder algorithm for scalar multiplication of elliptic points. 
 
@@ -1368,7 +1368,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     Valid only for points expressed in Montgomery projective coordinates.
 
-.. function:: int n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sigma, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: int n_factor_ecm_select_curve(ulong *f, ulong sigma, ulong n, n_ecm_t n_ecm_inf)
 
     Selects a random elliptic curve given a random integer ``sigma``,
     according to Suyama's parameterization. If the factor is found while
@@ -1383,7 +1383,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     The curve selected is of Montgomery form, the points selected satisfy the
     curve and are projective coordinates.
 
-.. function:: int n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num, mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: int n_factor_ecm_stage_I(ulong *f, const ulong *prime_array, ulong num, ulong B1, ulong n, n_ecm_t n_ecm_inf)
 
     Stage\ I implementation of the ECM algorithm.
 
@@ -1393,7 +1393,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     If the factor is found, `1` is returned, otherwise `0`.
 
-.. function:: int n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: int n_factor_ecm_stage_II(ulong *f, ulong B1, ulong B2, ulong P, ulong n, n_ecm_t n_ecm_inf)
 
     Stage\ II implementation of the ECM algorithm.
 
@@ -1403,10 +1403,10 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     If the factor is found, `1` is returned, otherwise `0`.
 
-.. function:: int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, mp_limb_t n)
+.. function:: int n_factor_ecm(ulong *f, ulong curves, ulong B1, ulong B2, flint_rand_t state, ulong n)
 
     Outer wrapper function for the ECM algorithm. It factors `n` which
-    must fit into a ``mp_limb_t``.
+    must fit into a ``ulong``.
 
     The function calls stage\ I and\ II, and
     the precomputations (builds ``prime_array`` for stage\ I,

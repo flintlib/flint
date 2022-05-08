@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, 
@@ -17,10 +18,7 @@ void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop,
     fmpz_t num, den;
 
     if (mpz_sgn(mpq_numref(x)) == 0)
-    {
-        flint_printf("Exception (fmpz_poly_q_scalar_div_mpq). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_q_scalar_div_mpq\n");
 
     fmpz_init(num);
     fmpz_init(den);

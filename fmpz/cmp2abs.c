@@ -13,9 +13,9 @@
 #include "fmpz-conversions.h"
 #include "mpn_extras.h"
 
-static int flint_mpn_cmp2abs(mp_srcptr x, slong xn, mp_srcptr a, slong an)
+static int flint_mpn_cmp2abs(ulong_srcptr x, slong xn, ulong_srcptr a, slong an)
 {
-    mp_limb_t xhi, ahi;
+    ulong xhi, ahi;
 
     FLINT_ASSERT(an >= 0);
     FLINT_ASSERT(xn >= 0);
@@ -53,11 +53,11 @@ int fmpz_cmp2abs(const fmpz_t a, const fmpz_t b)
 {
     if (!COEFF_IS_MPZ(*b))
     {
-        mp_limb_t ub = FLINT_ABS(*b);
+        ulong ub = FLINT_ABS(*b);
 
         if (!COEFF_IS_MPZ(*a))
         {
-            mp_limb_t ua = FLINT_ABS(*a);
+            ulong ua = FLINT_ABS(*a);
             return ua < 2*ub ? -1 : ua > 2*ub ? 1 : 0;
         }
         else

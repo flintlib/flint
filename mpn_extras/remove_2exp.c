@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "flint-impl.h"
 
-mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
+mp_size_t flint_mpn_remove_2exp(ulong_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
 {
     mp_size_t shift_limbs, reduced_size;
     flint_bitcnt_t shift_bits;

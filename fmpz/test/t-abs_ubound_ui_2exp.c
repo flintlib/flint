@@ -33,7 +33,7 @@ main(void)
         fmpz_t x, y;
         slong bits, yexp;
         slong exp;
-        mp_limb_t man;
+        ulong man;
 
         fmpz_init(x);
         fmpz_init(y);

@@ -22,7 +22,7 @@ int main(void)
    /* test random values */
    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t n, p, q;
+      ulong n, p, q;
       int flag;
 
       int nbits = n_randint(state, FLINT_BITS + 1);
@@ -47,7 +47,7 @@ int main(void)
    /* test known divisible values */
    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t n, p, q, s;
+      ulong n, p, q, s;
       int flag;
 
       int pbits = n_randint(state, FLINT_BITS + 1);

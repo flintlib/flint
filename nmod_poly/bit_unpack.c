@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
@@ -17,18 +18,18 @@
 
 /* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
+_nmod_poly_bit_unpack(ulong_ptr res, slong len, ulong_srcptr mpn, flint_bitcnt_t bits,
                       nmod_t mod)
 {
     slong i;
     ulong current_bit = 0, current_limb = 0;
-    mp_limb_t temp_lower, temp_upper, temp_upper2;
+    ulong temp_lower, temp_upper, temp_upper2;
 
     if (bits < FLINT_BITS)
     {
         ulong boundary_limit_bit = FLINT_BITS - bits;
 
-        mp_limb_t mask = (UWORD(1) << bits) - UWORD(1);
+        ulong mask = (UWORD(1) << bits) - UWORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -78,7 +79,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 2 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (UWORD(1) << (bits - FLINT_BITS)) - UWORD(1);
+        ulong mask = (UWORD(1) << (bits - FLINT_BITS)) - UWORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -134,7 +135,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 3 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (UWORD(1) << (bits - 2 * FLINT_BITS)) - UWORD(1);
+        ulong mask = (UWORD(1) << (bits - 2 * FLINT_BITS)) - UWORD(1);
 
         for (i = 0; i < len; i++)
         {

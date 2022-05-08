@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "padic_poly.h"
 
 int padic_poly_get_fmpz_poly(fmpz_poly_t rop, const padic_poly_t op, 
@@ -46,4 +47,3 @@ int padic_poly_get_fmpz_poly(fmpz_poly_t rop, const padic_poly_t op,
 
     return 1;
 }
-

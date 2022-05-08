@@ -66,13 +66,13 @@ void _fmpz_poly_sqrlow_tiny1(fmpz * res, const fmpz * poly, slong len, slong n)
 void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    ulong_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * n * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * n * sizeof(ulong));
 
     FLINT_MPN_ZERO(tmp, 2 * n);
 
@@ -176,7 +176,7 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
         copy = flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len; i++)
             copy[i] = poly[i];
-        FLINT_MPN_ZERO((mp_ptr) copy + len, n - len);
+        FLINT_MPN_ZERO((ulong_ptr) copy + len, n - len);
 
         _fmpz_poly_sqrlow_karatsuba_n(res, copy, n);
 

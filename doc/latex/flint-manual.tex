@@ -595,7 +595,7 @@ your machine, you can do the following in your code:
 #include <stdio.h>
 // other system headers
 #undef ulong
-#define ulong mp_limb_t
+#define ulong ulong
 \end{lstlisting}
 
 This prevents FLINT's definition of \code{ulong} interfering with
@@ -1070,7 +1070,7 @@ allocate two different arrays.
 void myfun(void)
 {
    /* other variable declarations */
-   mp_ptr a, b;
+   ulong_ptr a, b;
    TMP_INIT;
 
    /* arbitrary code*/
@@ -1079,8 +1079,8 @@ void myfun(void)
 
    /* arbitrary code */
 
-   a = TMP_ALLOC(32*sizeof(mp_limb_t));
-   b = TMP_ALLOC(64*sizeof(mp_limb_t));
+   a = TMP_ALLOC(32*sizeof(ulong));
+   b = TMP_ALLOC(64*sizeof(ulong));
 
    /* arbitrary code */
 
@@ -1099,7 +1099,7 @@ can exhaust the stack causing a stack overflow.
 For platform independence, FLINT provides two types \code{ulong}
 and \code{slong} to replace \code{unsigned long} and \code{long}
 respectively. These are guaranteed to be the same size as GMP's
-\code{mp_limb_t} and \code{mp_limb_signed_t} types, respectively.
+\code{ulong} and \code{mp_limb_signed_t} types, respectively.
 
 A full list of types provided by FLINT is available in
 \code{code_conventions.txt} in the top-level source tree.
@@ -1688,7 +1688,7 @@ a fixed modulus $n$. The \code{nmod_poly} module provides routines for
 memory management, basic arithmetic and some higher level functions
 such as GCD, etc.
 
-Each coefficient of an \code{nmod_poly_t} is of type \code{mp_limb_t}
+Each coefficient of an \code{nmod_poly_t} is of type \code{ulong}
 and represents an integer reduced modulo the fixed modulus $n$.
 
 Unless otherwise specified, all functions in this section permit aliasing
@@ -1784,7 +1784,7 @@ This  permits passing parameters of type \code{nmod_mat_t}
 by reference.
 
 An \code{nmod_mat_t} internally consists of a single array of
-\code{mp_limb_t}'s, representing a dense matrix in row-major order.
+\code{ulong}'s, representing a dense matrix in row-major order.
 This array is only directly indexed during memory allocation and
 deallocation. A separate array holds pointers to the start of each
 row, and is used for all indexing. This allows the rows of a matrix
@@ -2094,7 +2094,7 @@ for the multiplicative group of the finite field.  In particular, we
 use a root of $f(x)$, where $f(X) \in \mathbf{F}_p[X]$ is a monic,
 irreducible polynomial of degree~$n$, as a polynomial in
 $\mathbf{F}_p[X]$ of degree less than $n$.  The underlying data
-structure is just an \code{mp_limb_t}.
+structure is just an \code{ulong}.
 
 The default choice for $f(X)$ is the Conway polynomial for the pair
 $(p,n)$.  Frank Luebeck's data base of Conway polynomials is made
@@ -2104,7 +2104,7 @@ be chosen for $f(X)$.  Additionally, the user is able to supply their
 own $f(X)$.
 
 We required that the order of the field fits inside of an
-\code{mp_limb_t}; however, it is recommended that $p^n < 2^{20}$ due
+\code{ulong}; however, it is recommended that $p^n < 2^{20}$ due
 to the time and memory needed to compute the Zech logarithm table.
 
 \input{input/fq_zech.tex}
@@ -2267,9 +2267,9 @@ The module includes functions for square roots, factorisation and
 primality testing. Almost all the functions in this module are highly
 developed and extremely well optimised.
 
-The basic type is the \code{mp_limb_t} as defined by MPIR. Functions
+The basic type is the \code{ulong} as defined by MPIR. Functions
 which take a precomputed inverse either have the suffix \code{preinv}
-and take an \code{mp_limb_t} precomputed inverse as computed by
+and take an \code{ulong} precomputed inverse as computed by
 \code{n_preinvert_limb} or have the suffix \code{_precomp} and accept
 a \code{double} precomputed inverse as computed by
 \code{n_precompute_inverse}.
@@ -2295,7 +2295,7 @@ inverse, where $a = 12345678, b = 87654321$ and $n = 111111111$.
 #include <stdio.h>
 #include "ulong_extras.h"
 ...
-mp_limb_t r, a, b, n, ninv;
+ulong r, a, b, n, ninv;
 
 a = UWORD(12345678);
 b = UWORD(87654321);
@@ -2584,7 +2584,7 @@ functions. Typical examples are
 \code{nmod_polyxx::reduce(mplimbarg, nmodctxarg)}. The former takes an
 (expression template evaluating to) \code{fmpzxx} and returns an
 \code{fmpz_polyxx} representing the constant polynomial with value the
-\code{fmpzxx}. The latter takes an argument of type \code{mp_limb_t} and one of
+\code{fmpzxx}. The latter takes an argument of type \code{ulong} and one of
 type \code{nmodxx_ctx_srcref} (essentially a word-sized modulus) and returns an
 \code{nmod_polyxx} representing the constant polynomial obtained by reducing
 \code{mplimbarg}.

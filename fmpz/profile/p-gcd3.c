@@ -125,7 +125,7 @@ fmpz_gcd3_old(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
             /* It would be more efficient to allocate temporary space for
                gcd(a, b), but we can't be sure that mpz_gcd never attempts
                to reallocate the output. */
-            t->_mp_d = TMP_ALLOC(sizeof(mp_limb_t) * cn);
+            t->_mp_d = TMP_ALLOC(sizeof(ulong) * cn);
             t->_mp_size = t->_mp_alloc = cn;
             FLINT_MPN_COPYI(t->_mp_d, cp->_mp_d, cn);
 

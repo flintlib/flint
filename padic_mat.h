@@ -18,17 +18,7 @@
 #define PADIC_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
+#include "fmpz_mat.h" /* TODO: Remove this */
 #include "padic.h"
 
 #ifdef __cplusplus
@@ -211,6 +201,23 @@ FLINT_DLL int padic_mat_is_zero(const padic_mat_t A);
 
 /* Input and output  *********************************************************/
 
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)
 FLINT_DLL int padic_mat_fprint(FILE * file, 
                      const padic_mat_t A, const padic_ctx_t ctx);
 
@@ -228,6 +235,7 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 {
     return padic_mat_fprint_pretty(stdout, A, ctx);
 }
+#endif
 
 /* Random matrix generation  *************************************************/
 
@@ -283,4 +291,3 @@ FLINT_DLL void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat
 #endif
 
 #endif
-

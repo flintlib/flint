@@ -10,10 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq_poly.h"
+#include "fmpz_mini.h"
 
 void _fmpq_poly_set_length(fmpq_poly_t poly, slong len)
 {
@@ -22,4 +19,3 @@ void _fmpq_poly_set_length(fmpq_poly_t poly, slong len)
         _fmpz_demote(poly->coeffs + i);
     poly->length = len;
 }
-

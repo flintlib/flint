@@ -31,7 +31,7 @@ main(void)
     {
         nmod_poly_t poly, poly2, poly3;
         nmod_poly_factor_t factors;
-        mp_limb_t modulus;
+        ulong modulus;
         slong length, length2;
         int result = 1;
 

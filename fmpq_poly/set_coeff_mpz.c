@@ -10,9 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
@@ -24,4 +21,3 @@ void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, slong n, const mpz_t x)
     fmpq_poly_set_coeff_fmpz(poly, n, f);
     fmpz_clear_readonly(f);
 }
-

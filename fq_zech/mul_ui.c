@@ -12,10 +12,10 @@
 #include "fq_zech.h"
 
 void
-fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, mp_limb_t x,
+fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, ulong x,
                const fq_zech_ctx_t ctx)
 {
-    mp_limb_t b;
+    ulong b;
 
     if (x == 0 || fq_zech_is_zero(op, ctx))
     {

@@ -35,7 +35,7 @@ main(void)
         fmpz_t mod;
         fmpz_mat_t A, B, C;
         nmod_mat_t Amod[1000];
-        mp_limb_t primes[1000];
+        ulong primes[1000];
 
         bits = n_randint(state, 500) + 1;
         rows = n_randint(state, 10);

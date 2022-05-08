@@ -15,7 +15,7 @@ void
 fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
                  const fq_zech_ctx_t ctx)
 {
-    mp_limb_t ux;
+    ulong ux;
     fmpz_t y;
 
     fmpz_init(y);

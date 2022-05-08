@@ -12,8 +12,8 @@
 
 #include "nmod_poly.h"
 
-void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
-                             mp_srcptr poly2, slong len2, nmod_t mod)
+void _nmod_poly_mul(ulong_ptr res, ulong_srcptr poly1, slong len1, 
+                             ulong_srcptr poly2, slong len2, nmod_t mod)
 {
     slong bits, cutoff_len;
 

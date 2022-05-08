@@ -30,8 +30,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t c = n_randint(state, n);
+        ulong n = n_randtest_not_zero(state);
+        ulong c = n_randint(state, n);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -58,8 +58,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, d1, d2;
-        mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t c = n_randint(state, n);
+        ulong n = n_randtest_not_zero(state);
+        ulong c = n_randint(state, n);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

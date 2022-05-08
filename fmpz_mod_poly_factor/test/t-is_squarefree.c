@@ -34,7 +34,7 @@ main(void)
     {
         fmpz_mod_poly_t poly, Q, R, t;
         fmpz_t modulus;
-        mp_limb_t mod;
+        ulong mod;
         slong i, num_factors, exp, max_exp;
         int v, result;
 

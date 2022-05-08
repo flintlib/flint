@@ -82,7 +82,7 @@ FQ_NMOD_INLINE void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 }
 
 FQ_NMOD_INLINE 
-void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
+void _fq_nmod_sparse_reduce(ulong *R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     slong i, k;
     const slong d = ctx->j[ctx->len - 1];
@@ -102,9 +102,9 @@ void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
     }
 }
 
-FLINT_DLL void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx);
+FLINT_DLL void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx);
 
-FQ_NMOD_INLINE void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
+FQ_NMOD_INLINE void _fq_nmod_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     if (ctx->sparse_modulus)
         _fq_nmod_sparse_reduce(R, lenR, ctx);
@@ -152,7 +152,7 @@ FLINT_DLL void fq_nmod_sqr(fq_nmod_t rop,
 FLINT_DLL void fq_nmod_inv(fq_nmod_t rop,
                                  const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op,
+FLINT_DLL void _fq_nmod_pow(ulong *rop, const ulong *op,
                            slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1,
@@ -218,7 +218,7 @@ FLINT_DLL void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx
 
 FQ_NMOD_INLINE void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx)
 {
-    mp_limb_t rx = x < 0 ? -x : x;
+    ulong rx = x < 0 ? -x : x;
     rx =  n_mod2_preinv(rx, ctx->mod.n, ctx->mod.ninv);
     if (x < 0)
         rx = ctx->mod.n - rx;
@@ -331,17 +331,17 @@ FLINT_DLL char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t 
 
 /* Special functions *********************************************************/
 
-FLINT_DLL void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, slong len, 
+FLINT_DLL void _fq_nmod_trace(fmpz_t rop, const ulong *op, slong len, 
                     const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e, 
+FLINT_DLL void _fq_nmod_frobenius(ulong *rop, const ulong *op, slong len, slong e, 
                         const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, slong len, 
+FLINT_DLL void _fq_nmod_norm(fmpz_t rop, const ulong *op, slong len, 
                    const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);

@@ -13,7 +13,7 @@
 
 #if FLINT64
 /* n < 10^16 that pass base 2, 3, 7, 61 and 24251 sprp test */
-mp_limb_t composites[] = {
+ulong composites[] = {
     UWORD(669094855201), UWORD(1052516956501), UWORD(2007193456621),
     UWORD(2744715551581), UWORD(9542968210729), UWORD(17699592963781),
     UWORD(19671510288601), UWORD(24983920772821), UWORD(24984938689453),
@@ -61,7 +61,7 @@ mp_limb_t composites[] = {
 int main(void)
 {
    int i, result;
-   mp_limb_t d;
+   ulong d;
    mpz_t d_m;
    slong pow;
    ulong bits;
@@ -141,7 +141,7 @@ int main(void)
    }
 
 #if FLINT64
-   for (i = 0; i < sizeof(composites) / sizeof(mp_limb_t); i++)
+   for (i = 0; i < sizeof(composites) / sizeof(ulong); i++)
    {
       d = composites[i];
 

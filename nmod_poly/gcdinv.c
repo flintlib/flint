@@ -14,12 +14,12 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
-                        const mp_limb_t *A, slong lenA,
-                        const mp_limb_t *B, slong lenB, 
+slong _nmod_poly_gcdinv(ulong *G, ulong *S, 
+                        const ulong *A, slong lenA,
+                        const ulong *B, slong lenB, 
                         const nmod_t mod)
 {
-    mp_limb_t *T;
+    ulong *T;
     slong ans;
 
     T = _nmod_vec_init(lenA - 1);
@@ -58,7 +58,7 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
     } 
     else
     {
-        mp_limb_t *g, *s;
+        ulong *g, *s;
         slong lenG;
 
         if (G == A || G == B)
@@ -104,7 +104,7 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
 
         if (nmod_poly_lead(G)[0] != WORD(1))
         {
-            mp_limb_t inv;
+            ulong inv;
 
             inv = n_invmod(nmod_poly_lead(G)[0], A->mod.n);
             nmod_poly_scalar_mul_nmod(G, G, inv);

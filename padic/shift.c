@@ -24,4 +24,3 @@ void padic_shift(padic_t rop, const padic_t op, slong v, const padic_ctx_t ctx)
         _padic_reduce(rop, ctx);
     }
 }
-

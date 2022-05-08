@@ -29,7 +29,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, fp, gp, hp, t1, t2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         slong idx;
@@ -121,7 +121,7 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, fp, gp, t1, t2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         slong idx;

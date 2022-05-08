@@ -23,7 +23,7 @@ int main(void)
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
-      mp_limb_t n1, n2, orig_n;
+      ulong n1, n2, orig_n;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2;
       ulong j;
@@ -60,7 +60,7 @@ int main(void)
          
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test perfect powers */
    {
-      mp_limb_t n1, n2, orig_n, base;
+      ulong n1, n2, orig_n, base;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2, exp;
       ulong j;

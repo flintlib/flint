@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 int
-n_is_probabprime_BPSW(mp_limb_t n)
+n_is_probabprime_BPSW(ulong n)
 {
     if (n <= UWORD(1))
         return 0;
@@ -34,7 +34,7 @@ n_is_probabprime_BPSW(mp_limb_t n)
     }
     else
     {
-        mp_limb_t d;
+        ulong d;
 
         d = n - UWORD(1);
         while ((d & UWORD(1)) == UWORD(0))
@@ -48,7 +48,7 @@ n_is_probabprime_BPSW(mp_limb_t n)
         }
         else
         {
-            mp_limb_t ninv = n_preinvert_limb(n);
+            ulong ninv = n_preinvert_limb(n);
             if (n_is_strong_probabprime2_preinv(n, ninv, WORD(2), d) == 0)
                 return 0;
         }

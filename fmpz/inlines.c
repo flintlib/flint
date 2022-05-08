@@ -11,7 +11,7 @@
 
 #define FMPZ_INLINES_C
 
-#include "fmpz.h"
+#include "fmpz_mini.h"
  
 fmpz * __new_fmpz()
 {

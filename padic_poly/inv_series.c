@@ -24,16 +24,10 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     int Qalloc;
 
     if (Q->length == 0 || fmpz_is_zero(Q->coeffs + 0))
-    {
-        flint_printf("Exception (padic_poly_inv_series):  Constant term is zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term is zero in padic_poly_inv_series\n");
+
     if (fmpz_divisible(Q->coeffs + 0, ctx->p))
-    {
-        flint_printf("Exception (padic_poly_inv_series):\n");
-        flint_printf("Valuation of constant term is not minimal.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Valuation of constant term is not minimal in padic_poly_inv_series\n");
 
     if (- Q->val >= Qinv->N)
     {
@@ -53,7 +47,7 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];
-        mpn_zero((mp_ptr) Qcopy + i, n - i);
+        mpn_zero((ulong_ptr) Qcopy + i, n - i);
         Qalloc = 1;
     }
 
@@ -91,4 +85,3 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     if (Qalloc)
         flint_free(Qcopy);
 }
-

@@ -17,7 +17,7 @@ void
 fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
 {
     nmod_poly_t modulus;
-    mp_limb_t x;
+    ulong x;
     fmpz_t p;
     slong d;
 

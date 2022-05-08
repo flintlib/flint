@@ -14,10 +14,10 @@
 #include "ulong_extras.h"
 #include "fft.h"
 
-void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, 
-   mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
+void ifft_butterfly_twiddle(ulong * u, ulong * v, 
+   ulong * s, ulong * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
 {
-   mp_limb_t nw = limbs*FLINT_BITS;
+   ulong nw = limbs*FLINT_BITS;
    mp_size_t x, y;
    int negate1 = 0;
    int negate2 = 0;
@@ -45,8 +45,8 @@ void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
    butterfly_rshB(u, v, s, t, limbs, x, y);
 }
 
-void ifft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
-        mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+void ifft_radix2_twiddle(ulong ** ii, mp_size_t is,
+        mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2,
                             mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
 {
    mp_size_t i;
@@ -77,8 +77,8 @@ void ifft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
    }
 }
 
-void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
-        mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+void ifft_truncate1_twiddle(ulong ** ii, mp_size_t is,
+        mp_size_t n, flint_bitcnt_t w, ulong ** t1, ulong ** t2,
            mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 {
    mp_size_t i;
@@ -129,8 +129,8 @@ void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
    }
 }
 
-void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
-   mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+void ifft_mfa_truncate_sqrt2(ulong ** ii, mp_size_t n, flint_bitcnt_t w, 
+   ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc)
 {
    mp_size_t i, j, s;
    mp_size_t n2 = (2*n)/n1;
@@ -257,10 +257,10 @@ typedef struct
     flint_bitcnt_t depth;
     flint_bitcnt_t depth2;
     flint_bitcnt_t w;
-    mp_limb_t ** ii;
-    mp_limb_t ** t1;
-    mp_limb_t ** t2;
-    mp_limb_t * temp;
+    ulong ** ii;
+    ulong ** t1;
+    ulong ** t2;
+    ulong * temp;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
@@ -275,9 +275,9 @@ _ifft_outer1_worker(void * arg_ptr)
     mp_size_t n2 = arg.n2;
     flint_bitcnt_t depth = arg.depth;
     flint_bitcnt_t w = arg.w;
-    mp_limb_t ** ii = arg.ii;
-    mp_limb_t ** t1 = arg.t1;
-    mp_limb_t ** t2 = arg.t2;
+    ulong ** ii = arg.ii;
+    ulong ** t1 = arg.t1;
+    ulong ** t2 = arg.t2;
     mp_size_t i, j, end;
 
     while (1)
@@ -324,10 +324,10 @@ _ifft_outer2_worker(void * arg_ptr)
     flint_bitcnt_t depth = arg.depth;
     flint_bitcnt_t depth2 = arg.depth2;
     flint_bitcnt_t w = arg.w;
-    mp_limb_t ** ii = arg.ii;
-    mp_limb_t ** t1 = arg.t1;
-    mp_limb_t ** t2 = arg.t2;
-    mp_limb_t * temp = arg.temp;
+    ulong ** ii = arg.ii;
+    ulong ** t1 = arg.t1;
+    ulong ** t2 = arg.t2;
+    ulong * temp = arg.temp;
     mp_size_t i, j, end;
 
     while (1)
@@ -415,8 +415,8 @@ _ifft_outer2_worker(void * arg_ptr)
     }
 }
 
-void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
-   mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+void ifft_mfa_truncate_sqrt2_outer(ulong ** ii, mp_size_t n, flint_bitcnt_t w, 
+   ulong ** t1, ulong ** t2, ulong ** temp, mp_size_t n1, mp_size_t trunc)
 {
     mp_size_t i, shared_i = 0;
     mp_size_t n2 = (2*n)/n1;

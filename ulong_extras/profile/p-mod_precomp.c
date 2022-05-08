@@ -14,10 +14,10 @@
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, r, norm, bits;
+   ulong n, d, r, norm, bits;
    double dpre;
    ulong i;
-   mp_ptr array = (mp_ptr) flint_malloc(1000*sizeof(mp_limb_t));
+   ulong_ptr array = (ulong_ptr) flint_malloc(1000*sizeof(ulong));
    FLINT_TEST_INIT(state);
    
    

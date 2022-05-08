@@ -14,12 +14,12 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
+_nmod_poly_exp_series_monomial_ui(ulong_ptr res, ulong coeff, ulong power,
                                         slong n, nmod_t mod)
 {
     slong k, r;
-    mp_limb_t rfac;
-    mp_limb_t a;
+    ulong rfac;
+    ulong a;
 
     r = (n - 1) / power;
     rfac = n_factorial_mod2_preinv(r, mod.n, mod.ninv);
@@ -59,7 +59,7 @@ _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
 }
 
 void
-nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+nmod_poly_exp_series_monomial_ui(nmod_poly_t res, ulong coeff,
                                     ulong power, slong n)
 {
     if (n == 0)

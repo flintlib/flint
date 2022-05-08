@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, 
-                               mp_srcptr poly2, slong len2, nmod_t mod)
+_nmod_poly_compose(ulong_ptr res, ulong_srcptr poly1, slong len1, 
+                               ulong_srcptr poly2, slong len2, nmod_t mod)
 {
     if (len1 == 1)
         res[0] = poly1[0];

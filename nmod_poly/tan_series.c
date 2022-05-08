@@ -13,10 +13,10 @@
 #include "flint-impl.h"
 
 void
-_nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_tan_series(ulong_ptr g, ulong_srcptr h, slong n, nmod_t mod)
 {
     slong m;
-    mp_ptr t, u;
+    ulong_ptr t, u;
 
     if (n <= 3)
     {
@@ -49,7 +49,7 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 void
 nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
-    mp_ptr g_coeffs, h_coeffs;
+    ulong_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
     slong h_len;
     

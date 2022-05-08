@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_poly.h"
-
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_div(fmpz_poly_q_t rop, 
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 {
     if (fmpz_poly_q_is_zero(op2))
-    {
-        flint_printf("Exception (fmpz_poly_q_div). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, "fmpz_poly_q_div\n");
+
     if (fmpz_poly_q_is_zero(op1))
     {
         fmpz_poly_q_zero(rop);
@@ -120,4 +116,3 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
         fmpz_poly_neg(rop->den, rop->den);
     }
 }
-

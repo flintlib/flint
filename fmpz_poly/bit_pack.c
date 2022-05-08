@@ -10,11 +10,11 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
 #include "flint-impl.h"
 
 void
-_fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len,
+_fmpz_poly_bit_pack(ulong_ptr arr, const fmpz * poly, slong len,
                     flint_bitcnt_t bit_size, int negate)
 {
     flint_bitcnt_t bits = 0;

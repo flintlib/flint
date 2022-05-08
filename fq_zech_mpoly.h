@@ -24,7 +24,7 @@
 #undef ulong
 
 #include <gmp.h>
-#define ulong mp_limb_t
+#define ulong ulong
 
 #include "flint.h"
 #include "nmod_vec.h"
@@ -128,7 +128,7 @@ typedef fq_zech_mpoly_geobucket_struct fq_zech_mpoly_geobucket_t[1];
 /* Context object ************************************************************/
 
 FLINT_DLL void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
-                                 const ordering_t ord, mp_limb_t p, slong deg);
+                                 const ordering_t ord, ulong p, slong deg);
 
 FLINT_DLL void fq_zech_mpoly_ctx_init(fq_zech_mpoly_ctx_t ctx, slong nvars,
                               const ordering_t ord, const fq_zech_ctx_t fqctx);

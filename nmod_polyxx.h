@@ -138,16 +138,16 @@ public:
     FLINTXX_DEFINE_FORWARD_STATIC(from_ground)
     FLINTXX_DEFINE_FORWARD_STATIC(reduce)
 
-    static nmod_polyxx_expression zero(mp_limb_t n)
+    static nmod_polyxx_expression zero(ulong n)
         {return nmod_polyxx_expression(n);}
-    static nmod_polyxx_expression one(mp_limb_t n)
+    static nmod_polyxx_expression one(ulong n)
     {
         nmod_polyxx_expression res(n);
         res.set_one();
         return res;
     }
 
-    static nmod_polyxx_expression randtest(mp_limb_t n,
+    static nmod_polyxx_expression randtest(ulong n,
             frandxx& state, slong len)
     {
         nmod_polyxx_expression res(n);
@@ -155,7 +155,7 @@ public:
         return res;
     }
 
-    static nmod_polyxx_expression randtest_irreducible(mp_limb_t n,
+    static nmod_polyxx_expression randtest_irreducible(ulong n,
             frandxx& state, slong len)
     {
         nmod_polyxx_expression res(n);
@@ -179,7 +179,7 @@ public:
     set_coeff(slong j, const Nmod& c)
     {
         // TODO this does not need reduction
-        nmod_poly_set_coeff_ui(_poly(), j, c.template to<mp_limb_t>());
+        nmod_poly_set_coeff_ui(_poly(), j, c.template to<ulong>());
     }
     void truncate(slong n) {nmod_poly_truncate(_poly(), n);}
 
@@ -196,7 +196,7 @@ public:
 
     // These work on any expression without evaluation
     nmodxx_ctx_srcref estimate_ctx() const;
-    mp_limb_t modulus() const {return estimate_ctx().n();}
+    ulong modulus() const {return estimate_ctx().n();}
 
     evaluated_t create_temporary() const
     {
@@ -329,12 +329,12 @@ struct nmod_poly_data
     typedef nmod_poly_t& data_ref_t;
     typedef const nmod_poly_t& data_srcref_t;
 
-    nmod_poly_data(mp_limb_t n) {nmod_poly_init(inner, n);}
+    nmod_poly_data(ulong n) {nmod_poly_init(inner, n);}
     nmod_poly_data(nmodxx_ctx_srcref c)
     {
         nmod_poly_init_preinv(inner, c.n(), c._nmod().ninv);
     }
-    nmod_poly_data(mp_limb_t n, slong alloc) {nmod_poly_init2(inner, n, alloc);}
+    nmod_poly_data(ulong n, slong alloc) {nmod_poly_init2(inner, n, alloc);}
     nmod_poly_data(nmodxx_ctx_srcref c, slong alloc)
     {
         nmod_poly_init2_preinv(inner, c.n(), c._nmod().ninv, alloc);
@@ -357,7 +357,7 @@ struct nmod_poly_data
 
     nmod_poly_data(const char* str)
     {
-        mp_limb_t n;slong length;
+        ulong n;slong length;
         execution_check(flint_sscanf(str, "%wd %wu", &length, &n) == 2
             && (nmod_poly_init2(inner, n, length), nmod_poly_set_str(inner, str)),
                 "construct from string", "nmod_polyxx");
@@ -368,10 +368,10 @@ struct nmod_poly_data
             typename mp::enable_if<traits::is_nmodxx<Nmod> >::type* = 0)
     {
         nmod_poly_data res(x.estimate_ctx());
-        nmod_poly_set_coeff_ui(res.inner, 0, x.template to<mp_limb_t>());
+        nmod_poly_set_coeff_ui(res.inner, 0, x.template to<ulong>());
         return res;
     }
-    static nmod_poly_data from_ground(mp_limb_t x, nmodxx_ctx_srcref c)
+    static nmod_poly_data from_ground(ulong x, nmodxx_ctx_srcref c)
     {
         nmod_poly_data res(c);
         nmod_poly_set_coeff_ui(res.inner, 0, x);
@@ -388,7 +388,7 @@ struct nmod_poly_data
         return res;
     }
     template<class Fmpz_poly>
-    static nmod_poly_data reduce(const Fmpz_poly& p, mp_limb_t m,
+    static nmod_poly_data reduce(const Fmpz_poly& p, ulong m,
             typename mp::enable_if<traits::is_fmpz_polyxx<Fmpz_poly> >::type* = 0)
     {
         nmod_poly_data res(m);
@@ -403,7 +403,7 @@ struct nmod_poly_data
         nmod_poly_data res(c, p.length());
         for(slong i = 0;i < p.length();++i)
             nmod_poly_set_coeff_ui(res. inner, i,
-                    nmodxx::red(p.get_coeff(i), c).template to<mp_limb_t>());
+                    nmodxx::red(p.get_coeff(i), c).template to<ulong>());
         return res;
     }
     template<class Fmpq_poly>
@@ -413,7 +413,7 @@ struct nmod_poly_data
         return reduce_(p.evaluate(), c);
     }
     template<class Fmpq_poly>
-    static nmod_poly_data reduce(const Fmpq_poly& p, mp_limb_t m,
+    static nmod_poly_data reduce(const Fmpq_poly& p, ulong m,
             typename mp::enable_if<traits::is_fmpq_polyxx<Fmpq_poly> >::type* = 0)
     {
         return reduce_(p.evaluate(), nmodxx_ctx(m));
