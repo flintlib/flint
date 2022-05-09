@@ -181,6 +181,8 @@ nmod_poly_factor(nmod_poly_factor_t result, const nmod_poly_t input)
     unsigned int bits = FLINT_BIT_COUNT (p);
     slong n = nmod_poly_degree(input);
 
+    result->num = 0;
+
     if (n < 10 + 50 / bits)
         return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
     else
