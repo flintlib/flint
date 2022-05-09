@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "long_extras.h"
 #include "fmpz-conversions.h"
@@ -20,6 +21,5 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b)
     if (!COEFF_IS_MPZ(d))
         return z_sizeinbase(d, b);
     else
-        return mpz_sizeinbase(COEFF_TO_PTR(d), b);
+        return mpz_sizeinbase((mpz_ptr) COEFF_TO_PTR(d), b);
 }
-

@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "gmp.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #ifdef LONGSLONG
@@ -70,4 +71,3 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
 
     return 1;
 }
-

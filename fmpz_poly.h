@@ -1023,8 +1023,7 @@ FLINT_DLL void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t pol
 
 /*  Input and output  ********************************************************/
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)              \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -1038,8 +1037,10 @@ FLINT_DLL void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t pol
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
+#include "flint-impl.h"
+
 FLINT_DLL int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
@@ -1093,18 +1094,18 @@ int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
 FMPZ_POLY_INLINE
 void fmpz_poly_debug(const fmpz_poly_t poly)
 {
-    flint_printf("(alloc = %wd, length = %wd, vec = ", poly->alloc, poly->length);
+    printf("(alloc = " WORD_FMT "d, length = " WORD_FMT "d, vec = ", poly->alloc, poly->length);
     if (poly->coeffs)
     {
-        flint_printf("{");
+        printf("{");
         _fmpz_vec_print(poly->coeffs, poly->alloc);
-        flint_printf("}");
+        printf("}");
     }
     else
     {
-        flint_printf("NULL");
+        printf("NULL");
     }
-    flint_printf(")");
+    printf(")");
     fflush(stdout);
 }
 #endif

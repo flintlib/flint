@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 
@@ -27,7 +28,6 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
     }
     else
     {
-        return mpz_tstbit(COEFF_TO_PTR(*f), i);
+        return mpz_tstbit((mpz_ptr) COEFF_TO_PTR(*f), i);
     }
 }
-

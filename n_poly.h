@@ -28,7 +28,7 @@
 #endif
 
 /* Currently defined here to avoid inclusion of nmod.h */
-#ifndef NMOD_RED
+#ifndef NMOD_H
 #define NMOD_RED2(r, a_hi, a_lo, mod)                                   \
     do                                                                  \
     {                                                                   \
@@ -2113,4 +2113,3 @@ slong n_polyun_stack_size(const n_polyun_stack_t S)
 #endif
 
 #endif
-

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
@@ -27,8 +28,8 @@ void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     }
     else  /*g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);  /* g is already large */
-        mpz_tdiv_q_2exp(mf, COEFF_TO_PTR(d), exp);
+        mpz_mock_ptr mf = _fmpz_promote(f);  /* g is already large */
+        mpz_tdiv_q_2exp((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(d), exp);
         _fmpz_demote_val(f);  /* division may make value small */
     }
 }

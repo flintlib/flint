@@ -18,6 +18,7 @@
 # include "gmpcompat.h"
 #endif
 
+/* NOTE: If this is changed, change the same in submul_ui.c */
 FMPZ_INLINE
 void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {

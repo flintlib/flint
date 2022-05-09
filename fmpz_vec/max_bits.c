@@ -17,7 +17,7 @@ _fmpz_vec_max_bits(const fmpz * vec, slong len)
 {
     slong i, sign, max_limbs;
     ulong max_limb;
-    mp_size_t limbs;
+    mp_mock_size_t limbs;
 
     sign = 1;
     max_limb = 0;
@@ -51,7 +51,7 @@ bignum:
 
         if (COEFF_IS_MPZ(c))
         {
-            __mpz_struct * z = COEFF_TO_PTR(c);
+            mpz_mock_ptr z = COEFF_TO_PTR(c);
             limbs = z->_mp_size;
 
             if (limbs < 0)

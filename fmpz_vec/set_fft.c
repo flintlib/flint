@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #include "flint-impl.h"
 
@@ -16,15 +17,15 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
                           const ulong_ptr * coeffs_f, slong limbs, slong sign)
 {
     slong i, size;
-    ulong * data;
-    __mpz_struct * mcoeffs_m;
+    ulong_ptr data;
+    mpz_mock_ptr mcoeffs_m;
 
     if (sign)
     {
         for (i = 0; i < length; i++)
         {
             mcoeffs_m = _fmpz_promote(coeffs_m);
-            data = FLINT_MPZ_REALLOC(mcoeffs_m, limbs);
+            data = FLINT_MPZ_REALLOC((mpz_ptr) mcoeffs_m, limbs);
 
 			if ((coeffs_f[i][limbs - 1] >> (FLINT_BITS - 1)) || coeffs_f[i][limbs])
             {
@@ -52,7 +53,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
         for (i = 0; i < length; i++)
         {
             mcoeffs_m = _fmpz_promote(coeffs_m);
-            data = FLINT_MPZ_REALLOC(mcoeffs_m, limbs);
+            data = FLINT_MPZ_REALLOC((mpz_ptr) mcoeffs_m, limbs);
             FLINT_MPN_COPYI(data, coeffs_f[i], limbs); 
             size = limbs;
             while ((size) && (data[size - 1] == WORD(0))) size--; /* normalise */

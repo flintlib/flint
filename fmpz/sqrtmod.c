@@ -10,9 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
 # define flint_mpz_congruent_ui_p mpz_congruent_ui_p
 # define flint_mpz_add_ui mpz_add_ui
 # define flint_mpz_sub_ui mpz_sub_ui
@@ -183,7 +185,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
     {
         int ans;
         mpz_t t;
-        __mpz_struct *bptr;
+        mpz_mock_ptr bptr;
         
         if (fmpz_is_even(p))
             return 0;
@@ -194,8 +196,8 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         bptr = _fmpz_promote_val(b);
 
         mpz_init(t);
-        ans = _fmpz_sqrtmod(t, bptr, COEFF_TO_PTR(*p));
-        mpz_swap(bptr, t);
+        ans = _fmpz_sqrtmod(t, (mpz_ptr) bptr, (mpz_ptr) COEFF_TO_PTR(*p));
+        mpz_swap((mpz_ptr) bptr, t);
         mpz_clear(t);
 
         _fmpz_demote_val(b);
@@ -203,4 +205,3 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         return ans;
     }
 }
-

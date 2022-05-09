@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 
@@ -25,12 +26,12 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
     }
     else
     {
-        __mpz_struct * r_mpz_ptr, * f_mpz_ptr;
+        mpz_mock_ptr mr, mf;
         _fmpz_promote(f); /* must not hang on to pointer whilst promoting */
-        r_mpz_ptr = _fmpz_promote(r);
-		f_mpz_ptr = COEFF_TO_PTR(*f);
+        mr = _fmpz_promote(r);
+		mf = COEFF_TO_PTR(*f);
 
-        mpz_sqrtrem(f_mpz_ptr, r_mpz_ptr, COEFF_TO_PTR(*g));
+        mpz_sqrtrem((mpz_ptr) mf, (mpz_ptr) mr, (mpz_ptr) COEFF_TO_PTR(*g));
         _fmpz_demote_val(f);
         _fmpz_demote_val(r);
     }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_submul_ui mpz_submul_ui
@@ -36,7 +37,7 @@ fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
         ulong prod[2];
         ulong uc1 = FLINT_ABS(c1);
 
-        __mpz_struct * mf;
+        mpz_mock_ptr mf;
         mpz_t temp;
 
         umul_ppmm(prod[1], prod[0], uc1, x);    /* compute product */
@@ -73,13 +74,13 @@ fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
         /* set up a temporary, cheap mpz_t to contain prod */
         temp->_mp_d = prod;
         temp->_mp_size = (c1 < WORD(0) ? -2 : 2);
-        mpz_sub(mf, mf, temp);
+        mpz_sub((mpz_ptr) mf, (mpz_ptr) mf, temp);
         _fmpz_demote_val(f);    /* cancellation may have occurred */
     }
     else                        /* c1 is large */
     {
-        __mpz_struct * mf = _fmpz_promote_val(f);
-        flint_mpz_submul_ui(mf, COEFF_TO_PTR(c1), x);
+        mpz_mock_ptr mf = _fmpz_promote_val(f);
+        flint_mpz_submul_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), x);
         _fmpz_demote_val(f);    /* cancellation may have occurred */
     }
 }

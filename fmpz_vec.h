@@ -85,7 +85,7 @@ FLINT_DLL slong _fmpz_vec_max_bits(const fmpz * vec, slong len);
 
 FLINT_DLL slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len);
 
-FLINT_DLL void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
+FLINT_DLL void _fmpz_vec_sum_max_bits(slong_ptr sumabs, slong_ptr maxabs,
                                             const fmpz * coeffs, slong length);
 
 FLINT_DLL mp_mock_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len);
@@ -121,10 +121,10 @@ int _fmpz_vec_print(const fmpz * vec, slong len)
     return _fmpz_vec_fprint(stdout, vec, len);
 }
 
-FLINT_DLL int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len);
+FLINT_DLL int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong_ptr len);
 
 FMPZ_VEC_INLINE
-int _fmpz_vec_read(fmpz ** vec, slong * len)
+int _fmpz_vec_read(fmpz ** vec, slong_ptr len)
 {
     return _fmpz_vec_fread(stdin, vec, len);
 }
@@ -132,13 +132,12 @@ int _fmpz_vec_read(fmpz ** vec, slong * len)
 
 /*  Conversions  *************************************************************/
 
-FLINT_DLL void _fmpz_vec_set_nmod_vec(fmpz * res, 
-                                       ulong_srcptr poly, slong len, nmod_t mod);
+FLINT_DLL void _fmpz_vec_set_nmod_vec(fmpz * res, ulong_srcptr poly, slong len, nmod_t mod);
 
 FLINT_DLL void _fmpz_vec_get_nmod_vec(ulong_ptr res, 
                                     const fmpz * poly, slong len, nmod_t mod);
 
-FLINT_DLL slong _fmpz_vec_get_fft(ulong ** coeffs_f, 
+FLINT_DLL slong _fmpz_vec_get_fft(ulong_ptr * coeffs_f, 
                                  const fmpz * coeffs_m, slong l, slong length);
 
 FLINT_DLL void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
@@ -160,8 +159,7 @@ FLINT_DLL void _fmpz_vec_zero(fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, slong len2);
 
-FLINT_DLL void _fmpz_vec_scalar_abs(fmpz * vec1, 
-                                                const fmpz * vec2, slong len2);
+FLINT_DLL void _fmpz_vec_scalar_abs(fmpz * vec1, const fmpz * vec2, slong len2);
 
 /*  Comparison  **************************************************************/
 

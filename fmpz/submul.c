@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 
 void
@@ -34,8 +35,8 @@ fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* both g and h are large */
         {
-            __mpz_struct * mf = _fmpz_promote_val(f);
-            mpz_submul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_mock_ptr mf = _fmpz_promote_val(f);
+            mpz_submul((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* cancellation may have occurred */
         }
     }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void
@@ -62,30 +63,30 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         mpz_t mf;
         ulong tf = FLINT_ABS(*f);
 
-        mf->_mp_d = (ulong *) &tf;
-        mf->_mp_size  = fmpz_sgn(f);
+        mf->_mp_d = &tf;
+        mf->_mp_size = fmpz_sgn(f);
 
         _fmpz_promote(d);
         _fmpz_promote(a);
         _fmpz_promote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
-                   mf, COEFF_TO_PTR(*g));
+        mpz_gcdext((mpz_ptr) COEFF_TO_PTR(*d), (mpz_ptr) COEFF_TO_PTR(*a), (mpz_ptr) COEFF_TO_PTR(*b),
+                   mf, (mpz_ptr) COEFF_TO_PTR(*g));
     }
     else if (!COEFF_IS_MPZ(*g))  /* only g is small */
     {
         mpz_t mg;
         ulong tg = FLINT_ABS(*g);
 
-        mg->_mp_d = (ulong *) &tg;
-        mg->_mp_size  = fmpz_sgn(g);
+        mg->_mp_d = &tg;
+        mg->_mp_size = fmpz_sgn(g);
 
         _fmpz_promote(d);
         _fmpz_promote(a);
         _fmpz_promote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
-                   COEFF_TO_PTR(*f), mg);
+        mpz_gcdext((mpz_ptr) COEFF_TO_PTR(*d), (mpz_ptr) COEFF_TO_PTR(*a), (mpz_ptr) COEFF_TO_PTR(*b),
+                   (mpz_ptr) COEFF_TO_PTR(*f), mg);
     }
     else /* both are big */
     {
@@ -93,8 +94,8 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         _fmpz_promote(a);
         _fmpz_promote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
-                   COEFF_TO_PTR(*f), COEFF_TO_PTR(*g));
+        mpz_gcdext((mpz_ptr) COEFF_TO_PTR(*d), (mpz_ptr) COEFF_TO_PTR(*a), (mpz_ptr) COEFF_TO_PTR(*b),
+                   (mpz_ptr) COEFF_TO_PTR(*f), (mpz_ptr) COEFF_TO_PTR(*g));
     }
 
     _fmpz_demote_val(d);

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_add_ui mpz_add_ui
@@ -32,15 +33,15 @@ fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* g is small, h is large */
         {
-            __mpz_struct *mpz3 = _fmpz_promote(f);  /* g is saved and h is large */
-            __mpz_struct *mpz2 = COEFF_TO_PTR(c2);
+            mpz_mock_ptr mpz3 = _fmpz_promote(f);  /* g is saved and h is large */
+            mpz_mock_ptr mpz2 = COEFF_TO_PTR(c2);
             if (c1 < WORD(0))
             {
-                flint_mpz_add_ui(mpz3, mpz2, -c1);
-                mpz_neg(mpz3, mpz3);
+                flint_mpz_add_ui((mpz_ptr) mpz3, (mpz_ptr) mpz2, -c1);
+                mpz_neg((mpz_ptr) mpz3, (mpz_ptr) mpz3);
             }
             else
-                flint_mpz_ui_sub(mpz3, c1, mpz2);
+                flint_mpz_ui_sub((mpz_ptr) mpz3, c1, (mpz_ptr) mpz2);
             _fmpz_demote_val(f);    /* may have cancelled */
         }
     }
@@ -48,20 +49,20 @@ fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* g is large, h is small */
         {
-            __mpz_struct *mpz3 = _fmpz_promote(f);  /* h is saved and g is large */
-            __mpz_struct *mpz1 = COEFF_TO_PTR(c1);
+            mpz_mock_ptr mpz3 = _fmpz_promote(f);  /* h is saved and g is large */
+            mpz_mock_ptr mpz1 = COEFF_TO_PTR(c1);
             if (c2 < WORD(0))
-                flint_mpz_add_ui(mpz3, mpz1, -c2);
+                flint_mpz_add_ui((mpz_ptr) mpz3, (mpz_ptr) mpz1, -c2);
             else
-                flint_mpz_sub_ui(mpz3, mpz1, c2);
+                flint_mpz_sub_ui((mpz_ptr) mpz3, (mpz_ptr) mpz1, c2);
             _fmpz_demote_val(f);    /* may have cancelled */
         }
         else                    /* g and h are large */
         {
-            __mpz_struct *mpz3 = _fmpz_promote(f);  /* aliasing means f is already large */
-            __mpz_struct *mpz1 = COEFF_TO_PTR(c1);
-            __mpz_struct *mpz2 = COEFF_TO_PTR(c2);
-            mpz_sub(mpz3, mpz1, mpz2);
+            mpz_mock_ptr mpz3 = _fmpz_promote(f);  /* aliasing means f is already large */
+            mpz_mock_ptr mpz1 = COEFF_TO_PTR(c1);
+            mpz_mock_ptr mpz2 = COEFF_TO_PTR(c2);
+            mpz_sub((mpz_ptr) mpz3, (mpz_ptr) mpz1, (mpz_ptr) mpz2);
             _fmpz_demote_val(f);    /* may have cancelled */
         }
     }

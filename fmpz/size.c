@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 
-mp_size_t
+mp_mock_size_t
 fmpz_size(const fmpz_t f)
 {
     fmpz d = *f;
@@ -22,5 +23,5 @@ fmpz_size(const fmpz_t f)
     if (!COEFF_IS_MPZ(d))
         return 1;
     else
-        return mpz_size(COEFF_TO_PTR(d));
+        return mpz_size((mpz_ptr) COEFF_TO_PTR(d));
 }

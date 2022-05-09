@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -36,6 +37,6 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
     }
     else                        /* g is large */
     {
-        return flint_mpz_tdiv_ui(COEFF_TO_PTR(c1), h);
+        return flint_mpz_tdiv_ui((mpz_ptr) COEFF_TO_PTR(c1), h);
     }
 }
