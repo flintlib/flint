@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_fac_ui mpz_fac_ui
@@ -38,5 +39,5 @@ void fmpz_fac_ui(fmpz_t f, ulong n)
     if (n < FLINT_NUM_TINY_FACTORIALS)
         fmpz_set_ui(f, flint_tiny_factorials[n]);
     else
-        flint_mpz_fac_ui(_fmpz_promote(f), n);
+        flint_mpz_fac_ui((mpz_ptr) _fmpz_promote(f), n);
 }

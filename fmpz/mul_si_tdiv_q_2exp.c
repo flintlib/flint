@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_mul_si mpz_mul_si
@@ -67,21 +68,21 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        }
        else /* result takes two limbs */
        {
-           __mpz_struct * mf = _fmpz_promote(f);
+           mpz_mock_ptr mf = _fmpz_promote(f);
 
            /* two limbs, least significant first, native endian, no
 nails, stored in prod */
-           mpz_import(mf, 2, -1, sizeof(ulong), 0, 0, prod);
+           mpz_import((mpz_ptr) mf, 2, -1, sizeof(ulong), 0, 0, prod);
            if ((c2 ^ x) < WORD(0))
-               mpz_neg(mf, mf);
+               mpz_neg((mpz_ptr) mf, (mpz_ptr) mf);
        }
    }
    else /* c2 is large */
    {
-       __mpz_struct * mf = _fmpz_promote(f); /* ok without val as
+       mpz_mock_ptr mf = _fmpz_promote(f); /* ok without val as
             if aliased both are large */
-       flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
-       mpz_tdiv_q_2exp(mf, mf, exp);
+       flint_mpz_mul_si((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c2), x);
+       mpz_tdiv_q_2exp((mpz_ptr) mf, (mpz_ptr) mf, exp);
        _fmpz_demote_val(f);  /* value may be small */
    }
 }

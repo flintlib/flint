@@ -11,7 +11,14 @@
 
 #define FMPZ_INLINES_C
 
+#include "gmp.h"
 #include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_set_si mpz_set_si
+# define flint_mpz_set_ui mpz_set_ui
+#else
+# include "gmpcompat.h"
+#endif
  
 fmpz * __new_fmpz()
 {
@@ -28,8 +35,8 @@ void __fmpz_set_si(fmpz_t f, slong val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_si(mpz_coeff, val);
+        mpz_mock_ptr mpz_coeff = _fmpz_promote(f);
+        flint_mpz_set_si((mpz_ptr) mpz_coeff, val);
     }
     else
     {
@@ -42,8 +49,8 @@ void __fmpz_set_ui(fmpz_t f, ulong val)
 {
     if (val > COEFF_MAX)        /* val is large */
     {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_ui(mpz_coeff, val);
+        mpz_mock_ptr mpz_coeff = _fmpz_promote(f);
+        flint_mpz_set_ui((mpz_ptr) mpz_coeff, val);
     }
     else
     {
@@ -65,11 +72,9 @@ void __fmpz_init_set_ui(fmpz_t f, ulong g)
     }
     else
     {
-        __mpz_struct *ptr;
-
-        ptr = _fmpz_new_mpz();
+        mpz_mock_ptr ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_ui(ptr, g);
+        flint_mpz_set_ui((mpz_ptr) ptr, g);
     }
 }
 
@@ -116,11 +121,9 @@ void __fmpz_init_set(fmpz_t f, const fmpz_t g)
     }
     else
     {
-        __mpz_struct *ptr;
-
-        ptr = _fmpz_new_mpz();
+        mpz_mock_ptr ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        mpz_set(ptr, COEFF_TO_PTR(*g));
+        mpz_set((mpz_ptr) ptr, (mpz_ptr) COEFF_TO_PTR(*g));
     }
 }
 
@@ -135,7 +138,7 @@ void __fmpz_neg(fmpz_t f1, const fmpz_t f2)
     else                        /* coeff is large */
     {
         /* No need to retain value in promotion, as if aliased, both already large */
-        __mpz_struct * mf1 = _fmpz_promote(f1);
-        mpz_neg(mf1, COEFF_TO_PTR(*f2));
+        mpz_mock_ptr mf1 = _fmpz_promote(f1);
+        mpz_neg((mpz_ptr) mf1, (mpz_ptr) COEFF_TO_PTR(*f2));
     }
 }

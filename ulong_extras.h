@@ -331,7 +331,7 @@ ulong n_invmod(ulong x, ulong y)
 
    g = n_gcdinv(&r, x, y);
    if (g != 1)
-      flint_throw(FLINT_IMPINV, "Cannot invert modulo %wd*%wd\n", g, g/y);
+      flint_throw(FLINT_IMPINV, "Cannot invert modulo in n_invmod\n");
 
    return r;
 }
@@ -535,7 +535,6 @@ n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
 
    umul_ppmm(p_hi, p_lo, w_precomp, t);
    q = p_hi;
-
    
    r = w * t;
    r -= q * p;

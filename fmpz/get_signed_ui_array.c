@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 
@@ -27,7 +28,7 @@ void fmpz_get_signed_ui_array(ulong * r, slong n, const fmpz_t x)
     }
     else
     {
-        __mpz_struct * p = COEFF_TO_PTR(*x);
+        mpz_mock_ptr p = COEFF_TO_PTR(*x);
         neg = p->_mp_size < 0;
         sz = FLINT_ABS(p->_mp_size);
 
@@ -41,4 +42,3 @@ void fmpz_get_signed_ui_array(ulong * r, slong n, const fmpz_t x)
     if (neg)
         mpn_neg(r, r, n);
 }
-

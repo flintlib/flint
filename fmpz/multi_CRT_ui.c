@@ -38,7 +38,7 @@ void fmpz_multi_CRT_ui(
     fmpz * A = CT->A;
     slong * offsets = C->crt_offsets;
     const ulong * md = C->packed_multipliers;
-    mpz_ptr az;
+    mpz_mock_ptr az;
     ulong * ad;
     ulong hi, lo, t;
 
@@ -56,7 +56,7 @@ void fmpz_multi_CRT_ui(
             */
             s = -s - 1;
 
-            ad = FLINT_MPZ_REALLOC(az, s + 2);
+            ad = FLINT_MPZ_REALLOC((mpz_ptr) az, s + 2);
 
             FLINT_MPN_ZERO(ad, s + 2);
             hi = lo = 0;
@@ -76,7 +76,7 @@ void fmpz_multi_CRT_ui(
         }
         else
         {
-            ad = FLINT_MPZ_REALLOC(az, s + 2);
+            ad = FLINT_MPZ_REALLOC((mpz_ptr) az, s + 2);
 
             FLINT_MPN_ZERO(ad, s + 2);
 
@@ -131,4 +131,3 @@ void fmpz_multi_CRT_ui(
     _fmpz_multi_CRT_precomp(T, C->crt_P, A, sign);
     fmpz_swap(T + 0, b);
 }
-

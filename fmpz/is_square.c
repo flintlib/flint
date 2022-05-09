@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz-conversions.h"
 
@@ -25,5 +26,5 @@ fmpz_is_square(const fmpz_t x)
         return n_is_square(c);
     }
     else
-        return mpz_perfect_square_p(COEFF_TO_PTR(c));
+        return mpz_perfect_square_p((mpz_ptr) COEFF_TO_PTR(c));
 }

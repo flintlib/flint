@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_fib_ui mpz_fib_ui
@@ -52,5 +53,5 @@ void fmpz_fib_ui(fmpz_t f, ulong n)
     if (n < NUM_SMALL_FIB)
         fmpz_set_ui(f, small_fib[n]);
     else
-        flint_mpz_fib_ui(_fmpz_promote(f), n);
+        flint_mpz_fib_ui((mpz_ptr) _fmpz_promote(f), n);
 }

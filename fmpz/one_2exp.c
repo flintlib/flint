@@ -9,7 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
+#ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
+#else
+# include "gmpcompat.h"
+#endif
 
 void
 fmpz_one_2exp(fmpz_t x, ulong e)
@@ -20,8 +26,8 @@ fmpz_one_2exp(fmpz_t x, ulong e)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(x);
-        flint_mpz_set_ui(z, 1);
-        mpz_mul_2exp(z, z, e);
+        mpz_mock_ptr z = _fmpz_promote(x);
+        flint_mpz_set_ui((mpz_ptr) z, 1);
+        mpz_mul_2exp((mpz_ptr) z, (mpz_ptr) z, e);
     }
 }

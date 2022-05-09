@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void
@@ -40,12 +41,12 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
 
             u2 = FLINT_ABS(c2);
-            fmpz_set_ui(f, mpn_gcd_1((ulong_srcptr) &u2, (mp_size_t) 1, u1));
+            fmpz_set_ui(f, mpn_gcd_1((ulong_srcptr) &u2, (mp_mock_size_t) 1, u1));
         }
         else                    /* but h is large */
         {
-            __mpz_struct * mpzc2 = COEFF_TO_PTR(c2);
-            mp_size_t size = mpzc2->_mp_size;
+            mpz_mock_ptr mpzc2 = COEFF_TO_PTR(c2);
+            mp_mock_size_t size = mpzc2->_mp_size;
             /* The sign is stored in the size of an mpz, and gcd_1 only takes
              * positive integers. */
             fmpz_set_ui(f, mpn_gcd_1(mpzc2->_mp_d, FLINT_ABS(size), u1));
@@ -56,8 +57,8 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))  /* but h is small */
         {
             ulong u2;
-            __mpz_struct * mpzc1;
-            mp_size_t size;
+            mpz_mock_ptr mpzc1;
+            mp_mock_size_t size;
 
             if (c2 == 0)
             {
@@ -74,8 +75,8 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             /* TODO: Change to mpn_gcd in order to save some calculations that
              * have already been already made. */
-            __mpz_struct * mf = _fmpz_promote(f);
-            mpz_gcd(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_mock_ptr mf = _fmpz_promote(f);
+            mpz_gcd((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);
         }
     }

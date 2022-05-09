@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void fmpz_setbit(fmpz_t f, ulong i)
@@ -21,17 +22,17 @@ void fmpz_setbit(fmpz_t f, ulong i)
         }
         else  /* i >= SMALL_FMPZ_BITCOUNT_MAX */
         {
-            __mpz_struct *ptr = _fmpz_promote_val(f);
+            mpz_mock_ptr ptr = _fmpz_promote_val(f);
 
-            mpz_setbit(ptr, i);
+            mpz_setbit((mpz_ptr) ptr, i);
             _fmpz_demote_val(f);
         }
     }
     else
     {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
+        mpz_mock_ptr ptr = COEFF_TO_PTR(*f);
 
-        mpz_setbit(ptr, i);
+        mpz_setbit((mpz_ptr) ptr, i);
 
         _fmpz_demote_val(f);
     }

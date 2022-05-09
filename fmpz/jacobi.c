@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
-#include "flint.h"
 #include "fmpz.h"
 
 int
@@ -25,7 +25,7 @@ fmpz_jacobi(const fmpz_t a, const fmpz_t p)
         return n_jacobi(d, c);
 
     if (COEFF_IS_MPZ(c) && COEFF_IS_MPZ(d))
-        return mpz_jacobi(COEFF_TO_PTR(d), COEFF_TO_PTR(c));
+        return mpz_jacobi((mpz_ptr) COEFF_TO_PTR(d), (mpz_ptr) COEFF_TO_PTR(c));
 
     if (d == 0)
         return 0; /* a is zero and p is large */

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #include "gmpcompat.h"
@@ -37,14 +38,14 @@ fmpz_get_d_2exp(slong *exp, const fmpz_t f)
     else
     {
 #if defined(__MPIR_VERSION) && __MPIR_VERSION <= 2
-       return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
+       return mpz_get_d_2exp(exp, (mpz_ptr) COEFF_TO_PTR(d));
 #elif defined(__MPIR_RELEASE) && __MPIR_RELEASE > 30000
        double m;
-       *exp = mpz_get_2exp_d(&m, COEFF_TO_PTR(d));
+       *exp = mpz_get_2exp_d(&m, (mpz_ptr) COEFF_TO_PTR(d));
        return m;
 #else
        long exp2;
-       double m = mpz_get_d_2exp(&exp2, COEFF_TO_PTR(d));
+       double m = mpz_get_d_2exp(&exp2, (mpz_ptr) COEFF_TO_PTR(d));
        *exp = exp2;
        return m;
 #endif

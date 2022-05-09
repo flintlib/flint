@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 #if FLINT64   /* 2^53 */
@@ -30,8 +31,8 @@ fmpz_set_d(fmpz_t f, double c)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(f);
-        mpz_set_d(z, c);
+        mpz_mock_ptr z = _fmpz_promote(f);
+        mpz_set_d((mpz_ptr) z, c);
         _fmpz_demote_val(f);
     }
 }

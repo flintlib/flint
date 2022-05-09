@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "nmod.h"
 #include "fmpz-conversions.h"
 
@@ -25,7 +26,7 @@ ulong fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
     }
     else
     {
-        mpz_srcptr a = COEFF_TO_PTR(A);
+        mpz_mock_ptr a = COEFF_TO_PTR(A);
         ulong_srcptr ad = a->_mp_d;
         slong an = a->_mp_size;
 

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 
 void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)

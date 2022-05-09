@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint-impl.h"
 #include "fmpz_mini.h"
 
@@ -85,7 +86,7 @@ fmpz_bit_pack(ulong_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         }
         else
         {
-            __mpz_struct * ptr = COEFF_TO_PTR(c);
+            mpz_mock_ptr ptr = COEFF_TO_PTR(c);
             size = FLINT_ABS(ptr->_mp_size);
 
             /* complement coefficient into arr */
@@ -144,7 +145,7 @@ fmpz_bit_pack(ulong_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         }
         else
         {
-            __mpz_struct *ptr = COEFF_TO_PTR(c);
+            mpz_mock_ptr ptr = COEFF_TO_PTR(c);
             size = FLINT_ABS(ptr->_mp_size);
 
             /* shift into place */

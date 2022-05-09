@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_mul_si mpz_mul_si
@@ -20,7 +21,7 @@
 void
 fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
-    __mpz_struct * mf;
+    mpz_mock_ptr mf;
     fmpz c1 = *g;
     fmpz c2 = *h;
 
@@ -36,7 +37,7 @@ fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         else if (c1 != 0)
         {
             mf = _fmpz_promote(f);
-            flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), c1);
+            flint_mpz_mul_si((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c2), c1);
             return;
         }
     }
@@ -64,7 +65,7 @@ fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
     }
 
     if (!COEFF_IS_MPZ(c2))
-        flint_mpz_mul_si(mf, COEFF_TO_PTR(c1), c2);
+        flint_mpz_mul_si((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), c2);
     else
-        mpz_mul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+        mpz_mul((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
 }

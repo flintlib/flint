@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void fmpz_clrbit(fmpz_t f, ulong i)
@@ -23,10 +24,9 @@ void fmpz_clrbit(fmpz_t f, ulong i)
     }
     else
     {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
+        mpz_mock_ptr mf = COEFF_TO_PTR(*f);
 
-        mpz_clrbit(ptr, i);
+        mpz_clrbit((mpz_ptr) mf, i);
         _fmpz_demote_val(f);
     }
 }
-

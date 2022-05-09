@@ -27,7 +27,7 @@ fmpz_is_probabprime(const fmpz_t n)
     }
     else
     {
-        __mpz_struct * z;
+        mpz_mock_ptr z;
         ulong_ptr d;
         slong size, bits, trial_primes;
 

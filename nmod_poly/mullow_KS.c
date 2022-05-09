@@ -35,6 +35,7 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "nmod_poly.h"
 #include "flint-impl.h"
 

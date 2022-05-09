@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void
@@ -16,9 +17,9 @@ fmpz_init2(fmpz_t f, ulong limbs)
 {
     if (limbs)
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_mock_ptr mf = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(mf);
-        _mpz_realloc(mf, limbs);
+        _mpz_realloc((mpz_ptr) mf, limbs);
     }
     else
     {

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 
@@ -16,6 +17,8 @@ flint_bitcnt_t fmpz_bits(const fmpz_t f)
 {
     fmpz d = *f;
 
-    if (!COEFF_IS_MPZ(d)) return FLINT_BIT_COUNT(FLINT_ABS(d));
-    else return mpz_sizeinbase(COEFF_TO_PTR(d), 2);
+    if (!COEFF_IS_MPZ(d))
+        return FLINT_BIT_COUNT(FLINT_ABS(d));
+    else
+        return mpz_sizeinbase((mpz_ptr) COEFF_TO_PTR(d), 2);
 }

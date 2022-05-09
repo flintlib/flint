@@ -174,8 +174,7 @@ FLINT_DLL int fmpz_read(fmpz_t f);
 
 FLINT_DLL int fmpz_print(const fmpz_t x);
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -189,8 +188,7 @@ FLINT_DLL int fmpz_print(const fmpz_t x);
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
 FLINT_DLL int fmpz_fread(FILE * file, fmpz_t f);
 FLINT_DLL size_t fmpz_inp_raw(fmpz_t x, FILE * fin);
 FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
@@ -238,6 +236,33 @@ FLINT_DLL flint_bitcnt_t fmpz_val2(const fmpz_t x);
 FLINT_DLL void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 FLINT_DLL void fmpz_one_2exp(fmpz_t f, ulong exp);
+
+/* FMPZ_INLINE */
+/* void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0) */
+/* { */
+/*     ulong d[2]; */
+/*     mpz_t c; */
+/*     d[0] = c0; */
+/*     d[1] = c1; */
+/*     c->_mp_d = d; */
+/*     c->_mp_alloc = 2; */
+/*     c->_mp_size = d[1] != 0 ? 2 : d[0] != 0; */
+/*     mpz_add(a, b, c); */
+/* } */
+
+/* FMPZ_INLINE */
+/* void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0) */
+/* { */
+/*     ulong d[3]; */
+/*     mpz_t c; */
+/*     d[0] = c0; */
+/*     d[1] = c1; */
+/*     d[2] = c2; */
+/*     c->_mp_d = d; */
+/*     c->_mp_alloc = 3; */
+/*     c->_mp_size = d[2] != 0 ? 3 : d[1] != 0 ? 2 : d[0] != 0; */
+/*     mpz_add(a, b, c); */
+/* } */
 
 FLINT_DLL void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x);
 

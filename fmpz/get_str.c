@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -34,9 +35,9 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
     else
     {
         if (!str) {
-          str = flint_malloc(mpz_sizeinbase (COEFF_TO_PTR(*f), b) + 2);
+          str = flint_malloc(mpz_sizeinbase((mpz_ptr) COEFF_TO_PTR(*f), b) + 2);
         }
-        str = mpz_get_str(str, b, COEFF_TO_PTR(*f));
+        str = mpz_get_str(str, b, (mpz_ptr) COEFF_TO_PTR(*f));
     }
 
     return str;

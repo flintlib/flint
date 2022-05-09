@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -20,10 +21,10 @@
 #ifdef FLINT_USES_POPCNT
 static __inline__ flint_bitcnt_t shortCount(slong val)
 {
-#if defined(_WIN64) || defined(__mips64)
-    return __builtin_popcountll(val);  
-#else
+#ifdef LONGSLONG
     return __builtin_popcountl(val);
+#else
+    return __builtin_popcountll(val);  
 #endif
 }
 #else
@@ -40,21 +41,18 @@ static __inline__ flint_bitcnt_t shortCount(slong val)
 
 flint_bitcnt_t fmpz_popcnt(const fmpz_t c)
 {
-    fmpz c1;
-    c1 = *c;
-    if (!COEFF_IS_MPZ(c1))
-    {
-        if (*c < 0)
-            return 0;
-        else
-            return shortCount(*c);
-    }
+    fmpz c1 = *c;
+
+    if (c1 < 0)
+        return 0;
+    else if (!COEFF_IS_MPZ(c1))
+        return shortCount(c1);
     else
     {
-        __mpz_struct *t = COEFF_TO_PTR(c1);
-        if (flint_mpz_cmp_si(t, 0) < 0)
+        mpz_mock_ptr t = COEFF_TO_PTR(c1);
+        if (flint_mpz_cmp_si((mpz_ptr) t, 0) < 0)
             return 0;
         else
-            return mpz_popcount(t);
+            return mpz_popcount((mpz_ptr) t);
     }
 }

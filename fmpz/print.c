@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "gmp.h"
 #include "flint.h"
 #include "flint-impl.h"
 #include "fmpz-conversions.h"
@@ -19,6 +20,5 @@ int fmpz_print(const fmpz_t x)
 	if (!COEFF_IS_MPZ(*x)) 
         return printf(WORD_FMT "d", *x);
 	else 
-        return (int) mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
+        return (int) mpz_out_str(stdout, 10, (mpz_ptr) COEFF_TO_PTR(*x));
 }
-

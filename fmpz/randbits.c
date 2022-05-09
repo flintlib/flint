@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 
@@ -25,13 +26,13 @@ fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
     }
     else
     {
-        __mpz_struct *mf = _fmpz_promote(f);
+        mpz_mock_ptr mf = _fmpz_promote(f);
         _flint_rand_init_gmp(state);
-        mpz_urandomb(mf, state->gmp_state, bits);
-        mpz_setbit(mf, bits - 1);
+        mpz_urandomb((mpz_ptr) mf, (__gmp_randstate_struct *) state->gmp_state, bits);
+        mpz_setbit((mpz_ptr) mf, bits - 1);
 
         if (n_randint(state, 2))
-            mpz_neg(mf, mf);
+            mpz_neg((mpz_ptr) mf, (mpz_ptr) mf);
 
         _fmpz_demote_val(f);
     }

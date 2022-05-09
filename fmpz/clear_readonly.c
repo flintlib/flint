@@ -9,15 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void fmpz_clear_readonly(fmpz_t f)
 {
     if (COEFF_IS_MPZ(*f))
     {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
+        mpz_mock_ptr mf = COEFF_TO_PTR(*f);
 
-        mpz_init(ptr);
+        mpz_init((mpz_ptr) mf);
         _fmpz_clear_mpz(*f);
         *f = WORD(0);
     }

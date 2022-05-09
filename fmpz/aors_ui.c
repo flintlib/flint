@@ -10,24 +10,25 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 static void
-_fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x);
+_fmpz_add_mpn_1(fmpz_t f, ulong_srcptr glimbs, mp_mock_size_t gsz, ulong x);
 
 static void
-_fmpz_sub_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x);
+_fmpz_sub_mpn_1(fmpz_t f, ulong_srcptr glimbs, mp_mock_size_t gsz, ulong x);
 
 void
 fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
 {
-    __mpz_struct * mf;
+    mpz_mock_ptr mf;
     slong g1 = *g;
     slong f1 = *f;
 
     if (!COEFF_IS_MPZ(g1))  /* g is small */
     {
-        mp_size_t sz = 2;
+        mp_mock_size_t sz = 2;
         if (g1 >= 0)
         {
             {   /* add with jump if carry */
@@ -92,9 +93,9 @@ carry:      if (COEFF_IS_MPZ(f1))
     }
     else
     {
-        __mpz_struct * mg = COEFF_TO_PTR(g1);
-        mp_size_t gsz = mg->_mp_size;
-        ulong * glimbs = mg->_mp_d;
+        mpz_mock_ptr mg = COEFF_TO_PTR(g1);
+        mp_mock_size_t gsz = mg->_mp_size;
+        ulong_ptr glimbs = mg->_mp_d;
 
         if (gsz > 0)
             _fmpz_add_mpn_1(f, glimbs, gsz, x);
@@ -105,11 +106,11 @@ carry:      if (COEFF_IS_MPZ(f1))
 
 /* "Add" two number with same sign. Decide sign from g. */
 static void
-_fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x)
+_fmpz_add_mpn_1(fmpz_t f, ulong_srcptr glimbs, mp_mock_size_t gsz, ulong x)
 {
-    __mpz_struct * mf;
-    ulong * flimbs;
-    mp_size_t gabssz = FLINT_ABS(gsz);
+    mpz_mock_ptr mf;
+    ulong_ptr flimbs;
+    mp_mock_size_t gabssz = FLINT_ABS(gsz);
 
     /* Promote f as it is guaranteed to be large */
     if (COEFF_IS_MPZ(*f))
@@ -123,8 +124,8 @@ _fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x)
 
     if (mf->_mp_alloc < (gabssz + 1)) /* Ensure result fits */
     {
-        ulong * tmp = flimbs;
-        flimbs = _mpz_realloc(mf, gabssz + 1);
+        ulong_ptr tmp = flimbs;
+        flimbs = _mpz_realloc((mpz_ptr) mf, gabssz + 1);
 
         /* If f and g are aliased, then we need to change glimbs as well. */
         if (tmp == glimbs)
@@ -146,11 +147,11 @@ _fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x)
 
 /* Subtract two limbs (they have different sign) and decide the sign via g. */
 static void
-_fmpz_sub_mpn_1(fmpz_t f, const ulong * glimbs, mp_size_t gsz, ulong x)
+_fmpz_sub_mpn_1(fmpz_t f, ulong_srcptr glimbs, mp_mock_size_t gsz, ulong x)
 {
-    __mpz_struct * mf;
-    ulong * flimbs;
-    mp_size_t gabssz = FLINT_ABS(gsz);
+    mpz_mock_ptr mf;
+    ulong_ptr flimbs;
+    mp_mock_size_t gabssz = FLINT_ABS(gsz);
 
     /* If size of g is 1, we have a higher probability of the result being
      * small. */
@@ -237,7 +238,7 @@ L1:         if (x <= COEFF_MAX) /* Fits in small fmpz */
             /* The allocation size of g is always larger than the absolute value
              * of g. Therefore, if f's allocation size is smaller than g's
              * size, they cannot be aliased. */
-            flimbs = _mpz_realloc(mf, gabssz);
+            flimbs = _mpz_realloc((mpz_ptr) mf, gabssz);
         }
 
         mpn_sub_1(flimbs, glimbs, gabssz, x); /* Subtract via GMP */
@@ -253,13 +254,13 @@ L1:         if (x <= COEFF_MAX) /* Fits in small fmpz */
 void
 fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
 {
-    __mpz_struct * mf;
+    mpz_mock_ptr mf;
     slong g1 = *g;
     slong f1 = *f;
 
     if (!COEFF_IS_MPZ(g1))  /* g is small */
     {
-        mp_size_t sz = -2;
+        mp_mock_size_t sz = -2;
         if (g1 <= 0)
         {
             /* "add" with jump if carry */
@@ -323,9 +324,9 @@ carry:      if (COEFF_IS_MPZ(f1))
     }
     else
     {
-        __mpz_struct * mg = COEFF_TO_PTR(g1);
-        mp_size_t gsz = mg->_mp_size;
-        ulong * glimbs = mg->_mp_d;
+        mpz_mock_ptr mg = COEFF_TO_PTR(g1);
+        mp_mock_size_t gsz = mg->_mp_size;
+        ulong_ptr glimbs = mg->_mp_d;
 
         if (gsz > 0)
             _fmpz_sub_mpn_1(f, glimbs, gsz, x);

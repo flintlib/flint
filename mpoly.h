@@ -26,6 +26,16 @@
  extern "C" {
 #endif
 
+/* Define some functions here in order to not having to include gmp.h */
+#ifndef __GMP_H__
+FLINT_DLL ulong __gmpn_add_n(ulong_ptr, ulong_srcptr, ulong_srcptr, mp_mock_size_t);
+FLINT_DLL ulong __gmpn_sub_n(ulong_ptr, ulong_srcptr, ulong_srcptr, mp_mock_size_t);
+FLINT_DLL ulong __gmpn_addmul_1(ulong_ptr, ulong_srcptr, mp_mock_size_t, ulong);
+FLINT_DLL ulong __gmpn_submul_1(ulong_ptr, ulong_srcptr, mp_mock_size_t, ulong);
+FLINT_DLL ulong __gmpn_rshift(ulong_ptr, ulong_srcptr, mp_mock_size_t, unsigned int);
+FLINT_DLL ulong __gmpn_mul_1(ulong_ptr, ulong_srcptr, mp_mock_size_t, ulong);
+#endif
+
 #define MPOLY_NUM_ORDERINGS 3
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
@@ -227,8 +237,7 @@ int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
    return mctx->ord == ORD_DEGREVLEX;
 }
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)              \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -242,8 +251,8 @@ int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
 MPOLY_INLINE
 void mpoly_ordering_print(ordering_t ord)
 {
@@ -262,6 +271,7 @@ void mpoly_ordering_print(ordering_t ord)
       printf("Unknown ordering in mpoly_ordering_print.");
    }
 }
+
 #endif
 
 /*  Monomials ****************************************************************/
@@ -287,7 +297,7 @@ MPOLY_INLINE
 void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
 {
-    mpn_add_n(exp_ptr, exp2, exp3, N);
+    __gmpn_add_n(exp_ptr, exp2, exp3, N);
 }
 
 MPOLY_INLINE
@@ -303,7 +313,7 @@ MPOLY_INLINE
 void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
 {
-    mpn_sub_n(exp_ptr, exp2, exp3, N);
+    __gmpn_sub_n(exp_ptr, exp2, exp3, N);
 }
 
 MPOLY_INLINE
@@ -322,14 +332,14 @@ void mpoly_monomial_madd_mp(ulong * exp1, const ulong * exp2, ulong scalar,
     slong i;
     for (i = 0; i < N; i++)
         exp1[i] = exp2[i];
-    mpn_addmul_1(exp1, exp3, N, scalar);
+    __gmpn_addmul_1(exp1, exp3, N, scalar);
 }
 
 MPOLY_INLINE
 void mpoly_monomial_madd_inplace_mp(ulong * exp12, ulong scalar,
                                                    const ulong * exp3, slong N)
 {
-    mpn_addmul_1(exp12, exp3, N, scalar);
+    __gmpn_addmul_1(exp12, exp3, N, scalar);
 }
 
 MPOLY_INLINE
@@ -349,7 +359,7 @@ void mpoly_monomial_msub_mp(ulong * exp1, const ulong * exp2, ulong scalar,
     for (i = 0; i < N; i++)
         exp1[i] = exp2[i];
     FLINT_ASSERT(N > 0);
-    mpn_submul_1(exp1, exp3, N, scalar);
+    __gmpn_submul_1(exp1, exp3, N, scalar);
 }
 
 MPOLY_INLINE
@@ -364,7 +374,7 @@ void mpoly_monomial_msub_ui_array(ulong * exp1, const ulong * exp2,
     for (i = 0; i < scalar_limbs; i++)
     {
         FLINT_ASSERT(N > i);
-        mpn_submul_1(exp1 + i, exp3, N - i, scalar[i]);
+        __gmpn_submul_1(exp1 + i, exp3, N - i, scalar[i]);
     }
 }
 
@@ -378,7 +388,7 @@ void mpoly_monomial_madd_ui_array(ulong * exp1, const ulong * exp2,
         exp1[i] = exp2[i];
     FLINT_ASSERT(scalar_limbs <= N);
     for (i = 0; i < scalar_limbs; i++)
-        mpn_addmul_1(exp1 + i, exp3, N - i, scalar[i]);
+        __gmpn_addmul_1(exp1 + i, exp3, N - i, scalar[i]);
 }
 
 MPOLY_INLINE
@@ -387,9 +397,9 @@ void mpoly_monomial_madd_fmpz(ulong * exp1, const ulong * exp2,
 {
     if (COEFF_IS_MPZ(*scalar))
     {
-        __mpz_struct * mpz = COEFF_TO_PTR(*scalar);
+        mpz_mock_ptr mscalar = COEFF_TO_PTR(*scalar);
         mpoly_monomial_madd_ui_array(exp1, exp2,
-                                           mpz->_mp_d, mpz->_mp_size, exp3, N);
+                                   mscalar->_mp_d, mscalar->_mp_size, exp3, N);
     }
     else
     {
@@ -565,7 +575,7 @@ int mpoly_monomial_halves(ulong * exp_ptr, const ulong * exp2,
    slong i;
    ulong bw;
 
-   bw = mpn_rshift(exp_ptr, exp2, N, 1);
+   bw = __gmpn_rshift(exp_ptr, exp2, N, 1);
 
    if (bw != 0)
       return 0;
@@ -585,7 +595,7 @@ int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
 {
     slong i;
 
-    mpn_sub_n(exp_ptr, exp2, exp3, N);
+    __gmpn_sub_n(exp_ptr, exp2, exp3, N);
 
     i = bits/FLINT_BITS - 1;
     do {
@@ -604,7 +614,7 @@ int mpoly_monomial_halves_mp(ulong * exp_ptr, const ulong * exp2,
    slong i;
    ulong bw;
 
-   bw = mpn_rshift(exp_ptr, exp2, N, 1);
+   bw = __gmpn_rshift(exp_ptr, exp2, N, 1);
 
    if (bw != 0)
       return 0;
@@ -749,7 +759,7 @@ MPOLY_INLINE
 void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c)
 {
     FLINT_ASSERT(N > 0);
-    mpn_mul_1(exp2, exp3, N, c);
+    __gmpn_mul_1(exp2, exp3, N, c);
 }
 
 FLINT_DLL void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,

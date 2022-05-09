@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 
@@ -25,11 +26,14 @@ int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
             
             return (uf < ug ? -1 : (uf > ug));
         }
-        else return -1;
+        else
+            return -1;
     }
     else 
     {
-        if (!COEFF_IS_MPZ(*g)) return 1;  /* f is large, so if g isn't... */
-        else return mpz_cmpabs(COEFF_TO_PTR(*f), COEFF_TO_PTR(*g)); 
+        if (!COEFF_IS_MPZ(*g))
+            return 1;  /* f is large, so if g isn't... */
+        else
+            return mpz_cmpabs((mpz_ptr) COEFF_TO_PTR(*f), (mpz_ptr) COEFF_TO_PTR(*g)); 
     }
 }

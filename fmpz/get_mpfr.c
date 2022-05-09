@@ -36,5 +36,5 @@ fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
         mpfr_set_si(x, *f, rnd);    /* set x to small value */
 #endif
     else
-        mpfr_set_z(x, COEFF_TO_PTR(*f), rnd);   /* set x to large value */
+        mpfr_set_z(x, (mpz_ptr) COEFF_TO_PTR(*f), rnd);   /* set x to large value */
 }

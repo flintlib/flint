@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
@@ -51,19 +52,19 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
     }
     else  /* x is large */
     {
-        __mpz_struct *z = COEFF_TO_PTR(y);
+        mpz_mock_ptr z = COEFF_TO_PTR(y);
 
         if (!COEFF_IS_MPZ(q))  /* f is small */
         {
-            if (!flint_mpz_divisible_ui_p(z, q))
+            if (!flint_mpz_divisible_ui_p((mpz_ptr) z, q))
             {
                 return 0;
             }
             else
             {
-                flint_mpz_divexact_ui(z, z, q);
+                flint_mpz_divexact_ui((mpz_ptr) z, (mpz_ptr) z, q);
 
-                if (!flint_mpz_divisible_ui_p(z, q))
+                if (!flint_mpz_divisible_ui_p((mpz_ptr) z, q))
                 {
                     _fmpz_demote_val(x);
                     return 1;
@@ -73,9 +74,9 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
                     mpz_t r;
                     slong e;
 
-                    flint_mpz_divexact_ui(z, z, q);
+                    flint_mpz_divexact_ui((mpz_ptr) z, (mpz_ptr) z, q);
                     flint_mpz_init_set_ui(r, q);
-                    e = 2 + mpz_remove(z, z, r);
+                    e = 2 + mpz_remove((mpz_ptr) z, (mpz_ptr) z, r);
                     mpz_clear(r);
                     _fmpz_demote_val(x);
 
@@ -85,9 +86,9 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
         }
         else  /* f is large */
         {
-            __mpz_struct *r = COEFF_TO_PTR(q);
+            mpz_mock_ptr r = COEFF_TO_PTR(q);
 
-            if (!mpz_divisible_p(z, r))
+            if (!mpz_divisible_p((mpz_ptr) z, (mpz_ptr) r))
             {
                 return 0;
             }
@@ -95,8 +96,8 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
             {
                 slong e;
 
-                mpz_divexact(z, z, r);
-                e = 1 + mpz_remove(z, z, r);
+                mpz_divexact((mpz_ptr) z, (mpz_ptr) z, (mpz_ptr) r);
+                e = 1 + mpz_remove((mpz_ptr) z, (mpz_ptr) z, (mpz_ptr) r);
                 _fmpz_demote_val(x);
                 return e;
             }
@@ -129,4 +130,3 @@ slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
     fmpz_set(rop, op);
     return _fmpz_remove(rop, f, finv);
 }
-

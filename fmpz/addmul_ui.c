@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_addmul_ui mpz_addmul_ui
@@ -80,18 +81,18 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
            or will be big in the end
          */
         {
-            __mpz_struct * mf = _fmpz_promote_val(f);
-            mpz_t temp;  /* set up a temporary, cheap mpz_t to contain prod */
+            mpz_mock_ptr mf = _fmpz_promote_val(f);
+            mpz_mock_t temp;  /* set up a temporary, cheap mpz_t to contain prod */
             temp->_mp_d = prod;
             temp->_mp_size = (c1 < WORD(0) ? -2 : 2);
-            mpz_add(mf, mf, temp);
+            mpz_add((mpz_ptr) mf, (mpz_ptr) mf, (mpz_ptr) temp);
             _fmpz_demote_val(f);  /* cancellation may have occurred */
         }
     }
     else  /* c1 is large */
     {
-        __mpz_struct * mf = _fmpz_promote_val(f);
-        flint_mpz_addmul_ui(mf, COEFF_TO_PTR(c1), x);
+        mpz_mock_ptr mf = _fmpz_promote_val(f);
+        flint_mpz_addmul_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), x);
         _fmpz_demote_val(f);  /* cancellation may have occurred */
     }
 }

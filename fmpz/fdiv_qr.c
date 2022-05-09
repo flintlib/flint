@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_cdiv_qr_ui mpz_cdiv_qr_ui
@@ -63,7 +64,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf, * ms;
+        mpz_mock_ptr mf, ms;
 
         _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
         ms = _fmpz_promote(s);
@@ -73,17 +74,17 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
         {
             if (c2 > 0)         /* h > 0 */
             {
-                flint_mpz_fdiv_qr_ui(mf, ms, COEFF_TO_PTR(c1), c2);
+                flint_mpz_fdiv_qr_ui((mpz_ptr) mf, (mpz_ptr) ms, (mpz_ptr) COEFF_TO_PTR(c1), c2);
             }
             else
             {
-                flint_mpz_cdiv_qr_ui(mf, ms, COEFF_TO_PTR(c1), -c2);
-                mpz_neg(mf, mf);
+                flint_mpz_cdiv_qr_ui((mpz_ptr) mf, (mpz_ptr) ms, (mpz_ptr) COEFF_TO_PTR(c1), -c2);
+                mpz_neg((mpz_ptr) mf, (mpz_ptr) mf);
             }
         }
         else                    /* both are large */
         {
-            mpz_fdiv_qr(mf, ms, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_fdiv_qr((mpz_ptr) mf, (mpz_ptr) ms, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
         }
         _fmpz_demote_val(f);    /* division by h may result in small value */
         _fmpz_demote_val(s);    /* division by h may result in small value */

@@ -88,7 +88,7 @@ FLINT_DLL slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len);
 FLINT_DLL void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
                                             const fmpz * coeffs, slong length);
 
-FLINT_DLL mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len);
+FLINT_DLL mp_mock_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_height(fmpz_t height, const fmpz * vec, slong len);
 
@@ -146,7 +146,9 @@ FLINT_DLL void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 
 FLINT_DLL slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len);
 
+#ifdef __GMP_H__
 FLINT_DLL void _fmpz_vec_get_mpf_vec(mpf_ptr appv, const fmpz * vec, slong len);
+#endif
 
 /*  Assignment and basic manipulation  ***************************************/
 

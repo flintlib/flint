@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
@@ -62,8 +63,8 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* h is large and g is small */
         {
-            __mpz_struct temp;  /* put g into a temporary mpz_t */
-            __mpz_struct * mf;
+            __mpz_mock_struct temp;  /* put g into a temporary mpz_t */
+            mpz_mock_ptr mf;
 
             if (c1 < WORD(0))
             {
@@ -80,7 +81,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
 
             mf = _fmpz_promote(f);
-            val = mpz_invert(mf, &temp, COEFF_TO_PTR(c2));
+            val = mpz_invert((mpz_ptr) mf, (mpz_ptr) &temp, (mpz_ptr) COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* inverse mod h may result in small value */
 
             return val;
@@ -100,7 +101,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
             /* reduce g mod h first */
 
-            r = flint_mpz_fdiv_ui(COEFF_TO_PTR(c1), c2);
+            r = flint_mpz_fdiv_ui((mpz_ptr) COEFF_TO_PTR(c1), c2);
 
             gcd = z_gcdinv(&inv, r, c2);
 
@@ -108,8 +109,8 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* both are large */
         {
-            __mpz_struct * mf = _fmpz_promote(f);
-            val = mpz_invert(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_mock_ptr mf = _fmpz_promote(f);
+            val = mpz_invert((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* reduction mod h may result in small value */
 
             return val;

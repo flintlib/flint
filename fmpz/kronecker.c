@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "long_extras.h"
 #include "fmpz.h"
 
@@ -23,7 +24,7 @@ int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
         return z_kronecker(A, N);
 
     if (COEFF_IS_MPZ(A) && COEFF_IS_MPZ(N))
-        return mpz_kronecker(COEFF_TO_PTR(A), COEFF_TO_PTR(N));
+        return mpz_kronecker((mpz_ptr) COEFF_TO_PTR(A), (mpz_ptr) COEFF_TO_PTR(N));
 
     flint_mpz_init_set_readonly(aa, a);
     flint_mpz_init_set_readonly(nn, n);

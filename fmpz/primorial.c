@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 
@@ -54,10 +55,10 @@ const ulong ULONG_PRIMORIALS[] =
 
 #define PROD_LIMBS_DIRECT_CUTOFF 50
 
-mp_size_t mpn_prod_limbs_direct(ulong * result, const ulong * factors,
-    mp_size_t n)
+static mp_size_t
+mpn_prod_limbs_direct(ulong_ptr result, ulong_srcptr factors, mp_mock_size_t n)
 {
-    mp_size_t k, len;
+    mp_mock_size_t k, len;
     ulong top;
     if (n < 1)
     {
@@ -78,10 +79,11 @@ mp_size_t mpn_prod_limbs_direct(ulong * result, const ulong * factors,
     return len;
 }
 
-mp_size_t mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
-                             const ulong * factors, mp_size_t n, ulong bits)
+static mp_mock_size_t
+mpn_prod_limbs_balanced(ulong_ptr result, ulong_ptr scratch,
+                        ulong_srcptr factors, mp_mock_size_t n, ulong bits)
 {
-    mp_size_t an, bn, alen, blen, len;
+    mp_mock_size_t an, bn, alen, blen, len;
     ulong top;
 
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
@@ -111,11 +113,11 @@ mp_size_t mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
     bits must be set to some bound on the bit size of the entries
     in factors. If no bound is known, simply use FLINT_BITS.
 */
-mp_size_t mpn_prod_limbs(ulong * result, const ulong * factors,
-    mp_size_t n, ulong bits)
+static mp_size_t
+mpn_prod_limbs(ulong_ptr result, ulong_srcptr factors, mp_mock_size_t n, ulong bits)
 {
     mp_size_t len, limbs;
-    ulong * scratch;
+    ulong_ptr scratch;
     
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
@@ -132,10 +134,10 @@ mp_size_t mpn_prod_limbs(ulong * result, const ulong * factors,
 void
 fmpz_primorial(fmpz_t res, ulong n)
 {
-    mp_size_t len, pi;
+    mp_mock_size_t len, pi;
     ulong bits;
-    __mpz_struct * mres;
-    const ulong * primes;
+    mpz_mock_ptr mres;
+    ulong_srcptr primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
     {
@@ -152,9 +154,8 @@ fmpz_primorial(fmpz_t res, ulong n)
     bits = FLINT_BIT_COUNT(primes[pi - 1]);
     
     mres = _fmpz_promote(res);
-    mpz_realloc2(mres, pi*bits);
+    mpz_realloc2((mpz_ptr) mres, pi*bits);
     
     len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
     mres->_mp_size = len;
 }
-

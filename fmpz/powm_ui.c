@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
@@ -61,11 +62,11 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
             }
             else  /* g is large */
             {
-                __mpz_struct *ptr = _fmpz_promote(f);
+                mpz_mock_ptr ptr = _fmpz_promote(f);
                 mpz_t m3;
 
                 flint_mpz_init_set_ui(m3, m2);
-                flint_mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, m3);
+                flint_mpz_powm_ui((mpz_ptr) ptr, (mpz_ptr) COEFF_TO_PTR(g2), e, m3);
                 mpz_clear(m3);
 
                 _fmpz_demote_val(f);
@@ -75,20 +76,20 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
         {
             if (!COEFF_IS_MPZ(g2))  /* g is small */
             {
-                __mpz_struct *ptr = _fmpz_promote(f);
+                mpz_mock_ptr ptr = _fmpz_promote(f);
                 mpz_t g3;
 
                 flint_mpz_init_set_si(g3, g2);
-                flint_mpz_powm_ui(ptr, g3, e, COEFF_TO_PTR(m2));
+                flint_mpz_powm_ui((mpz_ptr) ptr, g3, e, (mpz_ptr) COEFF_TO_PTR(m2));
                 mpz_clear(g3);
 
                 _fmpz_demote_val(f);
             }
             else  /* g is large */
             {
-               __mpz_struct *ptr = _fmpz_promote(f);
+                mpz_mock_ptr ptr = _fmpz_promote(f);
 
-                flint_mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, COEFF_TO_PTR(m2));
+                flint_mpz_powm_ui((mpz_ptr) ptr, (mpz_ptr) COEFF_TO_PTR(g2), e, (mpz_ptr) COEFF_TO_PTR(m2));
 
                 _fmpz_demote_val(f);
             }

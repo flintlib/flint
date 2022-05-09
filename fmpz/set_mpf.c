@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpf_fits_slong_p mpf_fits_slong_p
@@ -34,7 +35,7 @@ fmpz_set_mpf(fmpz_t f, const mpf_t x)
     }
     else
     {
-        __mpz_struct *z = _fmpz_promote(f);
-        mpz_set_f(z, x);
+        mpz_mock_ptr z = _fmpz_promote(f);
+        mpz_set_f((mpz_ptr) z, x);
     }
 }

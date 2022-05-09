@@ -23,7 +23,7 @@ void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x)
     }
     else
     {
-        __mpz_struct * p = COEFF_TO_PTR(*x);
+        mpz_mock_ptr p = COEFF_TO_PTR(*x);
         s = -(ulong)(p->_mp_size < 0);
         r0 = p->_mp_d[0];
         if (p->_mp_size > 1 || p->_mp_size < -1)
@@ -37,4 +37,3 @@ void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x)
     *lo = r0;
     *hi = r1;
 }
-

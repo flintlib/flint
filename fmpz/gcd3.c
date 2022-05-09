@@ -35,6 +35,7 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "flint-impl.h"
 #include "fmpz_mini.h"
 
@@ -65,14 +66,14 @@ _fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
                 }
                 else
                 {
-                    __mpz_struct * mb = COEFF_TO_PTR(*b);
+                    mpz_mock_ptr mb = COEFF_TO_PTR(*b);
                     c = mpn_gcd_1(mb->_mp_d, FLINT_ABS(mb->_mp_size), c);
                 }
             }
         }
         else
         {
-            __mpz_struct * ma = COEFF_TO_PTR(*a);
+            mpz_mock_ptr ma = COEFF_TO_PTR(*a);
 
             if (!COEFF_IS_MPZ(*b))
             {
@@ -118,8 +119,8 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
     else
     {
         /* Three-way mpz_gcd. */
-        __mpz_struct *rp, *ap, *bp, *cp, *tp;
-        mp_size_t an, bn, cn, mn;
+        mpz_mock_ptr rp, ap, bp, cp, tp;
+        mp_mock_size_t an, bn, cn, mn;
 
         /* If res is small, it cannot be aliased with a, b, c, so promoting is fine. */
         rp = _fmpz_promote(res);
@@ -165,17 +166,17 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
             t->_mp_size = t->_mp_alloc = cn;
             FLINT_MPN_COPYI(t->_mp_d, cp->_mp_d, cn);
 
-            mpz_gcd(rp, ap, bp);
-            if (mpz_cmpabs_ui(rp, 1) != 0)
-                mpz_gcd(rp, rp, t);
+            mpz_gcd((mpz_ptr) rp, (mpz_ptr) ap, (mpz_ptr) bp);
+            if (mpz_cmpabs_ui((mpz_ptr) rp, 1) != 0)
+                mpz_gcd((mpz_ptr) rp, (mpz_ptr) rp, t);
 
             TMP_END;
         }
         else
         {
-            mpz_gcd(rp, ap, bp);
-            if (mpz_cmpabs_ui(rp, 1) != 0)
-                mpz_gcd(rp, rp, cp);
+            mpz_gcd((mpz_ptr) rp, (mpz_ptr) ap, (mpz_ptr) bp);
+            if (mpz_cmpabs_ui((mpz_ptr) rp, 1) != 0)
+                mpz_gcd((mpz_ptr) rp, (mpz_ptr) rp, (mpz_ptr) cp);
         }
 
         /* The result may be small */

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #include "flint-impl.h"
 
@@ -33,10 +34,9 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
     }
     else
     {
-        __mpz_struct * mpz = _fmpz_promote(out);
-        if (mpz->_mp_alloc < size)
-            mpz_realloc2(mpz, FLINT_BITS * size);
-        mpz->_mp_size = size;
-        FLINT_MPN_COPYI(mpz->_mp_d, in, size);
+        mpz_mock_ptr mout = _fmpz_promote(out);
+        if (mout->_mp_alloc < size)
+            mpz_realloc2((mpz_ptr) mout, FLINT_BITS * size);
+        FLINT_MPN_COPYI(mout->_mp_d, in, mout->_mp_size);
     }
 }

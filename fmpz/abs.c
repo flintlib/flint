@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void
@@ -25,7 +26,7 @@ fmpz_abs(fmpz_t f1, const fmpz_t f2)
     else  /* coeff is large */
     {
         /* No need to retain value in promotion, as if aliased, both already large */
-        __mpz_struct * mf1 = _fmpz_promote(f1);
-        mpz_abs(mf1, COEFF_TO_PTR(*f2));
+        mpz_mock_ptr mf1 = _fmpz_promote(f1);
+        mpz_abs((mpz_ptr) mf1, (mpz_ptr) COEFF_TO_PTR(*f2));
     }
 }

@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
 # define flint_mpz_get_ui mpz_get_ui
 #else
 # include "gmpcompat.h"
@@ -39,14 +41,14 @@ fmpz_set_mpz(fmpz_t f, const mpz_t x)
         }
         else                    /* x is large but one limb */
         {
-            __mpz_struct * mf = _fmpz_promote(f);
-            flint_mpz_set_ui(mf, uval);
-            mpz_neg(mf, mf);
+            mpz_mock_ptr mf = _fmpz_promote(f);
+            flint_mpz_set_ui((mpz_ptr) mf, uval);
+            mpz_neg((mpz_ptr) mf, (mpz_ptr) mf);
         }
     }
     else                        /* x is more than one limb */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
-        mpz_set(mf, x);
+        mpz_mock_ptr mf = _fmpz_promote(f);
+        mpz_set((mpz_ptr) mf, x);
     }
 }

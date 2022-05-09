@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 
 void
@@ -33,9 +34,9 @@ fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(r);
+        mpz_mock_ptr z = _fmpz_promote(r);
         if (z->_mp_alloc < 3)
-            mpz_realloc2(z, 3 * FLINT_BITS);
+            mpz_realloc2((mpz_ptr) z, 3 * FLINT_BITS);
         z->_mp_d[0] = lo;
         z->_mp_d[1] = mid;
         z->_mp_d[2] = hi;

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -22,5 +23,5 @@ int fmpz_equal_si(const fmpz_t f, slong g)
 {
     fmpz c = *f;
 
-    return !COEFF_IS_MPZ(c) ? (c == g) : !flint_mpz_cmp_si(COEFF_TO_PTR(c), g);
+    return !COEFF_IS_MPZ(c) ? (c == g) : !flint_mpz_cmp_si((mpz_ptr) COEFF_TO_PTR(c), g);
 }

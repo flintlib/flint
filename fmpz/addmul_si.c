@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_addmul_ui mpz_addmul_ui
@@ -16,6 +17,21 @@
 #else
 # include "gmpcompat.h"
 #endif
+
+FMPZ_INLINE
+void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    ulong c2 = FLINT_SIGN_EXT(c1);
+    mpz_t c;
+    sub_ddmmss(d[1], d[0], c2^c1, c2^c0, c2, c2);
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    if (c2 != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
 
 void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
 {
@@ -45,21 +61,20 @@ void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
         }
         else
         {
-            mpz_ptr pF = COEFF_TO_PTR(F);
-            flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            mpz_mock_ptr pF = COEFF_TO_PTR(F);
+            flint_mpz_add_signed_uiui((mpz_ptr) pF, (mpz_ptr) pF, p1, p0);
         }
     }
     else
     {
-        mpz_ptr pG = COEFF_TO_PTR(G);
-        mpz_ptr pF = _fmpz_promote_val(f);
+        mpz_mock_ptr pG = COEFF_TO_PTR(G);
+        mpz_mock_ptr pF = _fmpz_promote_val(f);
 
         if (x < 0)
-            flint_mpz_submul_ui(pF, pG, -((ulong) x));
+            flint_mpz_submul_ui((mpz_ptr) pF, (mpz_ptr) pG, -((ulong) x));
         else
-            flint_mpz_addmul_ui(pF, pG, x);
+            flint_mpz_addmul_ui((mpz_ptr) pF, (mpz_ptr) pG, x);
 
         _fmpz_demote_val(f);
     }
 }
-

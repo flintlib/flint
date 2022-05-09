@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #include "gmpcompat.h"
@@ -46,5 +47,5 @@ fmpz_get_d(const fmpz_t f)
         }
     }
     else
-        return mpz_get_d(COEFF_TO_PTR(c));
+        return mpz_get_d((mpz_ptr) COEFF_TO_PTR(c));
 }

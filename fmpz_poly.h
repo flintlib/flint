@@ -78,7 +78,9 @@ void fmpz_poly_attach_shift(fmpz_poly_t trunc, const fmpz_poly_t poly, slong n)
  
 /*  Assignment and basic manipulation  ***************************************/
 
+#ifdef __GMP_H__
 FLINT_DLL void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c);
+#endif
 
 FLINT_DLL int _fmpz_poly_set_str(fmpz * poly, const char * str);
 
@@ -853,9 +855,9 @@ FLINT_DLL void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 FLINT_DLL void fmpz_poly_evaluate_fmpq(fmpq_t res,
                                           const fmpz_poly_t f, const fmpq_t a);
 
-
-FLINT_DLL void fmpz_poly_evaluate_mpq(mpq_t res,
-                                           const fmpz_poly_t f, const mpq_t a);
+#ifdef __GMP_H__
+FLINT_DLL void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
+#endif
 
 FLINT_DLL ulong _fmpz_poly_evaluate_mod(const fmpz * poly, slong len,
                                      ulong a, ulong n, ulong ninv);

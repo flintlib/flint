@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void
@@ -24,7 +25,7 @@ fmpz_set(fmpz_t f, const fmpz_t g)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
-        mpz_set(mf, COEFF_TO_PTR(*g));
+        mpz_mock_ptr mf = _fmpz_promote(f);
+        mpz_set((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(*g));
     }
 }

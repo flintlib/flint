@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 #include "flint-impl.h"
@@ -66,10 +67,10 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     }
     else /* f is large */
     {
-        __mpz_struct * mpz2 = COEFF_TO_PTR(c);
-        __mpz_struct * mpz1 = _fmpz_promote(r);
+        mpz_mock_ptr mpz2 = COEFF_TO_PTR(c);
+        mpz_mock_ptr mpz1 = _fmpz_promote(r);
             
-        int exact = mpz_root(mpz1, mpz2, n);
+        int exact = mpz_root((mpz_ptr) mpz1, (mpz_ptr) mpz2, n);
         _fmpz_demote_val(r); /* root may be small */
 
         return exact;

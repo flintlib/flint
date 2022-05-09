@@ -19,6 +19,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 
@@ -68,9 +69,9 @@ int fmpz_fits_si(const fmpz_t f)
     else
     {
 #if defined(_WIN64) || defined(__mips64)
-       return flint_mpz_fits_si_p(COEFF_TO_PTR(*f));
+       return flint_mpz_fits_si_p((mpz_ptr) COEFF_TO_PTR(*f));
 #else
-       return mpz_fits_slong_p(COEFF_TO_PTR(*f));
+       return mpz_fits_slong_p((mpz_ptr) COEFF_TO_PTR(*f));
 #endif
     }
 }

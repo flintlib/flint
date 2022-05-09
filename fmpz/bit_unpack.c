@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #include "flint-impl.h"
 
@@ -44,7 +45,7 @@ fmpz_bit_unpack(fmpz_t coeff, ulong_srcptr arr, flint_bitcnt_t shift,
             (*coeff) += ((~(ulong) 0) << bits);
 
         /* determine whether we need to return a borrow */
-        sign = (*coeff < (mp_limb_signed_t) 0 ? (ulong) 1 : (ulong) 0);
+        sign = (*coeff < (slong) 0 ? (ulong) 1 : (ulong) 0);
 
         /* deal with borrow */
         if (borrow)
@@ -66,7 +67,7 @@ fmpz_bit_unpack(fmpz_t coeff, ulong_srcptr arr, flint_bitcnt_t shift,
     }
     else  /* large coefficient */
     {
-        __mpz_struct * mcoeff;
+        mpz_mock_ptr mcoeff;
         ulong * p;
         ulong l, b;
         
@@ -77,7 +78,7 @@ fmpz_bit_unpack(fmpz_t coeff, ulong_srcptr arr, flint_bitcnt_t shift,
         b = bits % FLINT_BITS;
 
         /* allocate space for l limbs only */
-        mpz_realloc(mcoeff, l);
+        mpz_realloc((mpz_ptr) mcoeff, l);
         p = mcoeff->_mp_d;
 
         /* shift in l limbs */
@@ -132,7 +133,7 @@ fmpz_bit_unpack(fmpz_t coeff, ulong_srcptr arr, flint_bitcnt_t shift,
 
         /* negate if required */
         if (negate)
-            mpz_neg(mcoeff, mcoeff);
+            mpz_neg((mpz_ptr) mcoeff, (mpz_ptr) mcoeff);
 
         /* coeff may fit in a small */
         _fmpz_demote_val(coeff);
@@ -164,8 +165,8 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, ulong_srcptr arr,
     }
     else  /* large coefficient */
     {
-        __mpz_struct * mcoeff;
-        ulong * p;
+        mpz_mock_ptr mcoeff;
+        ulong_ptr p;
         ulong l, b;
 
         mcoeff = _fmpz_promote(coeff);
@@ -175,7 +176,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, ulong_srcptr arr,
         b = bits % FLINT_BITS;
 
         /* allocate space for l limbs only */
-        mpz_realloc(mcoeff, l);
+        mpz_realloc((mpz_ptr) mcoeff, l);
         p = mcoeff->_mp_d;
 
         /* shift in l limbs */

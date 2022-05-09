@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_fdiv_r_ui mpz_fdiv_r_ui
@@ -58,22 +59,22 @@ fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_mock_ptr mf = _fmpz_promote(f);
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
             if (c2 > 0)         /* h > 0 */
             {
-                flint_mpz_fdiv_r_ui(mf, COEFF_TO_PTR(c1), c2);
+                flint_mpz_fdiv_r_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), c2);
             }
             else
             {
-                flint_mpz_cdiv_r_ui(mf, COEFF_TO_PTR(c1), -c2);
+                flint_mpz_cdiv_r_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), -c2);
             }
         }
         else                    /* both are large */
         {
-            mpz_fdiv_r(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            mpz_fdiv_r((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
         }
         _fmpz_demote_val(f);    /* division by h may result in small value */
     }

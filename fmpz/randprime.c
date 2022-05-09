@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -26,13 +27,13 @@ void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int prove
          * but it has different semantics from n_randbits,
          * and in particular may return integers with fewer bits.
          */
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_mock_ptr mf = _fmpz_promote(f);
         _flint_rand_init_gmp(state);
 
         do
         {
-            mpz_urandomb(mf, state->gmp_state, bits - 1);
-            mpz_setbit(mf, bits - 1);
+            mpz_urandomb((mpz_ptr) mf, (__gmp_randstate_struct *) state->gmp_state, bits - 1);
+            mpz_setbit((mpz_ptr) mf, bits - 1);
 
             fmpz_nextprime(f, f, proved);
         } while (fmpz_bits(f) != bits);

@@ -28,7 +28,7 @@ void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in)
         size++;
     } else
     {
-        __mpz_struct * mpz = COEFF_TO_PTR(*in);
+        mpz_mock_ptr mpz = COEFF_TO_PTR(*in);
         FLINT_ASSERT(mpz->_mp_size <= out_len);
         while (size < mpz->_mp_size)
             *out++ = mpz->_mp_d[size++];

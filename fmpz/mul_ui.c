@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_mul_ui mpz_mul_ui
@@ -36,7 +37,7 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
     }
     else                        /* c2 is large */
     {
-        __mpz_struct * mf;
+        mpz_mock_ptr mf;
         if (!COEFF_IS_MPZ(*f))
         {
             if (x == 0)
@@ -60,6 +61,6 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
             mf = COEFF_TO_PTR(*f);
         }
 
-        flint_mpz_mul_ui(mf, COEFF_TO_PTR(c2), x);
+        flint_mpz_mul_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c2), x);
     }
 }

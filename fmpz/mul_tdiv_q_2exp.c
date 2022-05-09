@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpz_mul_si mpz_mul_si
@@ -21,7 +22,7 @@ void
 fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
 {
     fmpz c1, c2;
-    __mpz_struct * mf;
+    mpz_mock_ptr mf;
 
     c1 = *g;
 
@@ -42,10 +43,10 @@ fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
     mf = _fmpz_promote(f); /* h is saved, g is already large */
 
     if (!COEFF_IS_MPZ(c2))      /* g is large, h is small */
-        flint_mpz_mul_si(mf, COEFF_TO_PTR(c1), c2);
+        flint_mpz_mul_si((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), c2);
     else                        /* c1 and c2 are large */
-        mpz_mul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+        mpz_mul((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
 
-    mpz_tdiv_q_2exp(mf, mf, exp);
+    mpz_tdiv_q_2exp((mpz_ptr) mf, (mpz_ptr) mf, exp);
     _fmpz_demote_val(f);  /* division may make value small */
 }

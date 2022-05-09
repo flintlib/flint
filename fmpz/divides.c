@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
@@ -27,9 +28,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     if (fmpz_is_zero(h))
     {
         res = fmpz_is_zero(g);
-
         fmpz_zero(q);
-
         return res;
     }
 
@@ -60,15 +59,13 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
         else                    /* h is large and g is small */
         {
             res = fmpz_is_zero(g);
-
             fmpz_zero(q);
-
             return res;
         }
     }
     else                        /* g is large */
     {
-        __mpz_struct * mq = _fmpz_promote(q);
+        mpz_mock_ptr mq = _fmpz_promote(q);
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
@@ -80,8 +77,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
                 negate ^= 1;
             }
 
-            r = flint_mpz_tdiv_q_ui(mq, COEFF_TO_PTR(c1), c2);
-
+            r = flint_mpz_tdiv_q_ui((mpz_ptr) mq, (mpz_ptr) COEFF_TO_PTR(c1), c2);
             res = (r == 0);
         }
         else                    /* both are large */
@@ -90,16 +86,13 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
             mq  = _fmpz_promote(q);
 
             mpz_init(r);
-
-            mpz_tdiv_qr(mq, r, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
-
+            mpz_tdiv_qr((mpz_ptr) mq, r, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2));
             res = mpz_sgn(r) == 0;
-
             mpz_clear(r);
         }
 
         if (!res)
-            mpz_set_ui(mq, 0);
+            mpz_set_ui((mpz_ptr) mq, 0);
 
         _fmpz_demote_val(q);
 

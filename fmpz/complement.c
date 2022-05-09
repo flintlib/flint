@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void fmpz_complement(fmpz_t r, const fmpz_t f)
@@ -22,24 +23,23 @@ void fmpz_complement(fmpz_t r, const fmpz_t f)
     {
         if (r != f) /* not aliased */
         {
-            __mpz_struct *ptr, *ptr2;
-            ptr = _fmpz_promote(r);
-            ptr2 = COEFF_TO_PTR(*f);
-            mpz_com(ptr, ptr2);
+            mpz_mock_ptr mr, mf;
+            mr = _fmpz_promote(r);
+            mf = COEFF_TO_PTR(*f);
+            mpz_com((mpz_ptr) mr, (mpz_ptr) mf);
             _fmpz_demote_val(r);
         }
         else /* aliased */
         {
             fmpz_t tmp;
-            __mpz_struct *ptr, *ptr2;
+            mpz_mock_ptr mtmp, mf;
             fmpz_init(tmp);
-            ptr = _fmpz_promote(tmp);
-            ptr2 = COEFF_TO_PTR(*f);
-            mpz_com(ptr, ptr2);
+            mtmp = _fmpz_promote(tmp);
+            mf = COEFF_TO_PTR(*f);
+            mpz_com((mpz_ptr) mtmp, (mpz_ptr) mf);
             _fmpz_demote_val(tmp);
-            fmpz_set(r,tmp);
+            fmpz_set(r, tmp);
             fmpz_clear(tmp);
         }
     }
 }
-

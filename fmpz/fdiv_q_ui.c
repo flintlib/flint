@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 # define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui
@@ -45,9 +46,9 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_mock_ptr mf = _fmpz_promote(f);
 
-        flint_mpz_fdiv_q_ui(mf, COEFF_TO_PTR(c1), c2);
+        flint_mpz_fdiv_q_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), c2);
         _fmpz_demote_val(f);    /* division by h may result in small value */
     }
 }

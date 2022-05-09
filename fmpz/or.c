@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
 #define flint_mpz_init_set_si mpz_init_set_si
@@ -30,9 +31,9 @@ void fmpz_or(fmpz_t f, const fmpz_t g, const fmpz_t h)
         else
         {
             mpz_t tmp;
-            __mpz_struct * mpz3 = _fmpz_promote(f);
-            flint_mpz_init_set_si(tmp,c1);
-            mpz_ior(mpz3, COEFF_TO_PTR(c2), tmp);
+            mpz_mock_ptr mpz3 = _fmpz_promote(f);
+            flint_mpz_init_set_si(tmp, c1);
+            mpz_ior((mpz_ptr) mpz3, (mpz_ptr) COEFF_TO_PTR(c2), tmp);
             _fmpz_demote_val(f);
             mpz_clear(tmp);
         }
@@ -42,17 +43,17 @@ void fmpz_or(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))
         {
             mpz_t tmp;
-            __mpz_struct *mpz3 = _fmpz_promote(f);
-            flint_mpz_init_set_si(tmp,c2);
-            mpz_ior(mpz3, COEFF_TO_PTR(c1), tmp);
+            mpz_mock_ptr mpz3 = _fmpz_promote(f);
+            flint_mpz_init_set_si(tmp, c2);
+            mpz_ior((mpz_ptr) mpz3, (mpz_ptr) COEFF_TO_PTR(c1), tmp);
             mpz_clear(tmp);
         }
         else
         {
-            __mpz_struct * mpz3 = _fmpz_promote(f);
-            __mpz_struct * mpz1 = COEFF_TO_PTR(c1);
-            __mpz_struct * mpz2 = COEFF_TO_PTR(c2);
-            mpz_ior(mpz3, mpz1, mpz2);
+            mpz_mock_ptr mpz3 = _fmpz_promote(f);
+            mpz_mock_ptr mpz1 = COEFF_TO_PTR(c1);
+            mpz_mock_ptr mpz2 = COEFF_TO_PTR(c2);
+            mpz_ior((mpz_ptr) mpz3, (mpz_ptr) mpz1, (mpz_ptr) mpz2);
         }
     }
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz_mini.h"
 
 void
@@ -28,7 +29,7 @@ fmpz_gcd_ui(fmpz_t res, const fmpz_t a, ulong b)
     }
     else
     {
-        __mpz_struct * ma = COEFF_TO_PTR(*a);
+        mpz_mock_ptr ma = COEFF_TO_PTR(*a);
         fmpz_set_ui(res, mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), b));
     }
 }

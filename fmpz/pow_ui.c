@@ -9,9 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 #ifdef LONGSLONG
+# define flint_mpz_set_ui mpz_set_ui
 # define flint_mpz_pow_ui mpz_pow_ui
 #else
 # include "gmpcompat.h"
@@ -44,10 +46,10 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
         }
         else
         {
-            __mpz_struct * mf = _fmpz_promote_val(f);
+            mpz_mock_ptr mf = _fmpz_promote_val(f);
 
-            flint_mpz_set_ui(mf, u1);
-            flint_mpz_pow_ui(mf, mf, exp);
+            flint_mpz_set_ui((mpz_ptr) mf, u1);
+            flint_mpz_pow_ui((mpz_ptr) mf, (mpz_ptr) mf, exp);
             _fmpz_demote_val(f);    /* may actually fit into a small after all */
         }
 
@@ -56,8 +58,8 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
     }
     else
     {
-        __mpz_struct * mf = _fmpz_promote_val(f);
-        flint_mpz_pow_ui(mf, COEFF_TO_PTR(c1), exp);
+        mpz_mock_ptr mf = _fmpz_promote_val(f);
+        flint_mpz_pow_ui((mpz_ptr) mf, (mpz_ptr) COEFF_TO_PTR(c1), exp);
         /* no need to demote as it can't get smaller */
     }
 }

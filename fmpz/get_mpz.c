@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -23,5 +24,5 @@ fmpz_get_mpz(mpz_t x, const fmpz_t f)
     if (!COEFF_IS_MPZ(*f))
         flint_mpz_set_si(x, *f);      /* set x to small value */
     else
-        mpz_set(x, COEFF_TO_PTR(*f));   /* set x to large value */
+        mpz_set(x, (mpz_ptr) COEFF_TO_PTR(*f));   /* set x to large value */
 }

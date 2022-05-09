@@ -21,11 +21,14 @@
 #include <atomic.h>
 #endif
 
-#include <stdlib.h>
-
-#include <gmp.h>
-#include "flint.h"
+#include "gmp.h"
 #include "fmpz.h"
+
+#ifdef LONGSLONG
+# define flint_mpz_set_si mpz_set_si
+#else
+# include "gmpcompat.h"
+#endif
 
 /* Always free larger mpz's to avoid wasting too much heap space */
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64
@@ -35,7 +38,7 @@
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64
 
-FLINT_TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
+FLINT_TLS_PREFIX mpz_mock_ptr * mpz_free_arr = NULL;
 FLINT_TLS_PREFIX ulong mpz_free_num = 0;
 FLINT_TLS_PREFIX ulong mpz_free_alloc = 0;
 
@@ -63,7 +66,7 @@ void * flint_align_ptr(void * ptr, slong size)
     return (void *)((mask & (slong) ptr) + size);
 }
 
-__mpz_struct * _fmpz_new_mpz(void)
+mpz_mock_ptr _fmpz_new_mpz(void)
 {
     if (mpz_free_num == 0) /* allocate more mpz's */
     {
@@ -87,23 +90,23 @@ __mpz_struct * _fmpz_new_mpz(void)
         ((fmpz_block_header_s *) ptr)->thread = pthread_self();
 #endif
         /* how many __mpz_structs worth are dedicated to header, per page */
-        skip = (sizeof(fmpz_block_header_s) - 1)/sizeof(__mpz_struct) + 1;
+        skip = (sizeof(fmpz_block_header_s) - 1)/sizeof(__mpz_mock_struct) + 1;
 
         /* total number of number of __mpz_structs worth per page */
-        num = flint_page_size/sizeof(__mpz_struct);
+        num = flint_page_size/sizeof(__mpz_mock_struct);
 
         flint_mpz_structs_per_block = PAGES_PER_BLOCK*(num - skip);
 
         for (i = 0; i < PAGES_PER_BLOCK; i++)
         {
-            __mpz_struct * page_ptr = (__mpz_struct *)((slong) aligned_ptr + i*flint_page_size);
+            mpz_mock_ptr page_ptr = (mpz_mock_ptr) ((slong) aligned_ptr + i*flint_page_size);
 
             /* set pointer in each page to start of entire block */
             ((fmpz_block_header_s *) page_ptr)->address = ptr;
 
             for (j = skip; j < num; j++)
             {
-                mpz_init2(page_ptr + j, 2*FLINT_BITS);
+                mpz_init2((mpz_ptr) page_ptr + j, 2*FLINT_BITS);
 
                 /*
                    Cannot be lifted from loop due to possibility of
@@ -112,7 +115,7 @@ __mpz_struct * _fmpz_new_mpz(void)
                 if (mpz_free_num >= mpz_free_alloc)
                 {
                     mpz_free_alloc = FLINT_MAX(mpz_free_num + 1, mpz_free_alloc * 2);
-                    mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
+                    mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_mock_ptr));
                 }
 
                 mpz_free_arr[mpz_free_num++] = page_ptr + j;
@@ -125,7 +128,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 
 void _fmpz_clear_mpz(fmpz f)
 {
-    __mpz_struct * ptr = COEFF_TO_PTR(f);
+    mpz_mock_ptr ptr = COEFF_TO_PTR(f);
 
     /* check free count for block is zero, else this mpz came from a thread */
     fmpz_block_header_s * header_ptr = (fmpz_block_header_s *)((slong) ptr & flint_page_mask);
@@ -141,7 +144,7 @@ void _fmpz_clear_mpz(fmpz f)
     {
         int new_count;
 
-        mpz_clear(ptr);
+        mpz_clear((mpz_ptr) ptr);
 
 #if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && FLINT_USES_PTHREAD
        new_count = __atomic_add_fetch(&(header_ptr->count), 1, __ATOMIC_SEQ_CST);
@@ -156,12 +159,12 @@ void _fmpz_clear_mpz(fmpz f)
     } else
     {
         if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-            mpz_realloc2(ptr, 2*FLINT_BITS);
+            mpz_realloc2((mpz_ptr) ptr, 2*FLINT_BITS);
 
         if (mpz_free_num == mpz_free_alloc)
         {
             mpz_free_alloc = FLINT_MAX(64, mpz_free_alloc * 2);
-            mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
+            mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_mock_ptr));
         }
 
         mpz_free_arr[mpz_free_num++] = ptr;
@@ -177,7 +180,7 @@ void _fmpz_cleanup_mpz_content(void)
        int new_count;
        fmpz_block_header_s * ptr;
 
-       mpz_clear(mpz_free_arr[i]);
+       mpz_clear((mpz_ptr) mpz_free_arr[i]);
 
        /* update count of cleared mpz's for block */
        ptr = (fmpz_block_header_s *)((slong) mpz_free_arr[i] & ~(flint_page_size - 1));
@@ -205,11 +208,11 @@ void _fmpz_cleanup(void)
     mpz_free_arr = NULL;
 }
 
-__mpz_struct * _fmpz_promote(fmpz_t f)
+mpz_mock_ptr _fmpz_promote(fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f)) /* f is small so promote it first */
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_mock_ptr mf = _fmpz_new_mpz();
         (*f) = PTR_TO_COEFF(mf);
         return mf;
     }
@@ -217,14 +220,14 @@ __mpz_struct * _fmpz_promote(fmpz_t f)
         return COEFF_TO_PTR(*f);
 }
 
-__mpz_struct * _fmpz_promote_val(fmpz_t f)
+mpz_mock_ptr _fmpz_promote_val(fmpz_t f)
 {
     fmpz c = (*f);
     if (!COEFF_IS_MPZ(c)) /* f is small so promote it */
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_mock_ptr mf = _fmpz_new_mpz();
         (*f) = PTR_TO_COEFF(mf);
-        flint_mpz_set_si(mf, c);
+        flint_mpz_set_si((mpz_ptr) mf, c);
         return mf;
     }
     else /* f is large already, just return the pointer */
@@ -233,7 +236,7 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f)
 {
-    __mpz_struct * mf = COEFF_TO_PTR(*f);
+    mpz_mock_ptr mf = COEFF_TO_PTR(*f);
     int size = mf->_mp_size;
 
     if (size == 1 || size == -1)
@@ -257,12 +260,12 @@ void _fmpz_demote_val(fmpz_t f)
 
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
-   __mpz_struct *ptr;
+   mpz_mock_ptr ptr;
    *f = WORD(0);
    ptr = _fmpz_promote(f);
 
-   mpz_clear(ptr);
-   *ptr = *z;
+   mpz_clear((mpz_ptr) ptr);
+   *ptr = *((mpz_mock_ptr) z);
 }
 
 void _fmpz_clear_readonly_mpz(mpz_t z)

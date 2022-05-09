@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -29,5 +30,5 @@ fmpz_divisible_si(const fmpz_t f, slong g)
     if (!COEFF_IS_MPZ(c))
         return !(c % g);
     else
-        return flint_mpz_divisible_ui_p(COEFF_TO_PTR(c), FLINT_ABS(g));
+        return flint_mpz_divisible_ui_p((mpz_ptr) COEFF_TO_PTR(c), FLINT_ABS(g));
 }

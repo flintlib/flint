@@ -11,6 +11,7 @@
 */
 
 #include <stdio.h>
+#include "gmp.h"
 #include "fmpz.h"
 
 int 

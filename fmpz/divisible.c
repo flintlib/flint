@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "flint.h"
 #include "fmpz-conversions.h"
 #ifdef LONGSLONG
@@ -38,8 +39,8 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
     else
     {
         if (!COEFF_IS_MPZ(q))
-            return flint_mpz_divisible_ui_p(COEFF_TO_PTR(y), FLINT_ABS(q));
+            return flint_mpz_divisible_ui_p((mpz_ptr) COEFF_TO_PTR(y), FLINT_ABS(q));
         else
-            return mpz_divisible_p(COEFF_TO_PTR(y), COEFF_TO_PTR(q));
+            return mpz_divisible_p((mpz_ptr) COEFF_TO_PTR(y), (mpz_ptr) COEFF_TO_PTR(q));
     }
 }

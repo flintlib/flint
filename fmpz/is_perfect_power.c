@@ -41,6 +41,7 @@ MA 02110-1301, USA. */
    arithmetic for computing possible roots. 
 */
 
+#include "gmp.h"
 #include "ulong_extras.h"
 #include "fmpz_mini.h"
 
@@ -61,242 +62,243 @@ static const unsigned short primes[] =
 
 int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
 {
-   ulong prime, n, n2, rem;
-   mpz_t u2, q;
-   int exact, exp2, sgn = fmpz_sgn(f);
-   slong i, uns, usize = fmpz_size(f);
-   __mpz_struct * u, * r;
+    ulong prime, n, n2, rem;
+    mpz_t u2, q;
+    int exact, exp2, sgn = fmpz_sgn(f);
+    slong i, uns, usize = fmpz_size(f);
+    mpz_mock_ptr u, r;
 
-   if (usize == 0)
-   {
-      fmpz_zero(root);
-      return 2;			/* consider 0 a perfect square */
-   }
-
-   if (usize == 1)
-   {
-      ulong r = 0;
-      ulong r2;
-      ulong n = fmpz_get_ui(f);
- 
-      int exp = n_is_perfect_power(&r, n);
-
-      /* get higest exponent */
-      while (r > 1 && (exp2 = n_is_perfect_power(&r2, r)) != 0)
-      {
-         exp *= exp2;
-         r = r2;
-      }
-
-      if (exp == 0)
-         return 0;
-      else if (sgn < 0 && (exp & 1) == 0)
-      {
-         while ((exp & 1) == 0)
-         {
-            r = r*r;
-            exp >>= 1;
-         }
-         if (exp == 1 && n != 1)
-            return 0;
-         else
-         {
-            fmpz_set_si(root, -r);
-            return exp;
-         }
-      } else
-      {
-         fmpz_set_ui(root, r);
-         if (sgn < 0)
-            fmpz_neg(root, root);
-         return exp;
-      }
-   }
-
-   u = COEFF_TO_PTR(*f);
-   usize = u->_mp_size;
-
-   n2 = mpz_scan1(u, 0);
-
-   if (n2 == 1)
-      return 0;			/* 2 divides exactly once */
-
-   if (n2 > 1 && (n2 & (n2 - 1)) == 0 && usize < 0)
-      return 0;			/* 2 has power of two  multiplicity with negative u */
-
-   uns = FLINT_ABS(usize) - n2/FLINT_BITS;
-   mpz_init2(q, FLINT_BITS*uns);
-   mpz_init2(u2, FLINT_BITS*uns);
-
-   mpz_tdiv_q_2exp(u2, u, n2);
-
-   if (n_is_prime(n2))
-      goto n2prime;
-
-   for (i = 1; primes[i] != 0; i++)
-   {
-      prime = primes[i];
-
-      if (mpz_divisible_ui_p(u2, prime))	/* divisible by this prime? */
-      {
-         rem = mpz_tdiv_q_ui(q, u2, prime*prime);
-
-	 if (rem != 0)
-	 {
-	    mpz_clear(q);
-            mpz_clear(u2);
-	    return 0;		/* prime divides exactly once, reject */
-	 }
-
-	 mpz_swap(q, u2);
-	 for (n = 2; ; )
-	 {
-	    rem = mpz_tdiv_q_ui(q, u2, prime);
-	    if (rem != 0)
-		break;
-	    mpz_swap (q, u2);
-	    n++;
-	 }
-
-	 if ((n & (n - 1)) == 0 && usize < 0)
-	 {
-	     mpz_clear(q);
-             mpz_clear(u2);
-	     return 0;		/* power of two multiplicity with negative U, reject */
-	 }
-
-	 n2 = n_gcd(n2, n);
-	 if (n2 == 1)
-	 {
-	    mpz_clear(q);
-            mpz_clear(u2);
-	    return 0;		/* we have multiplicity 1 of some factor */
-	 }
-
-	 if (mpz_cmpabs_ui(u2, 1) == 0)
-	 {
-	    mpz_clear(q);
-            mpz_clear(u2);
-	    
-            if (usize < 0)
-            {
-               if ((n2 & (n2 - 1)) == 0)
-                  return 0;        /* factoring completed; not consistent power */
-                
-               while ((n2 & 1) == 0)
-                  n2 >>= 1;
-            }
-	    
-            r = _fmpz_promote(root);
-            mpz_root(r, u, n2);
-            _fmpz_demote_val(root);
-	    return n2;        /* factoring completed; consistent power */
-	 }
-         
-         /* 
-            as soon as n2 becomes a prime number, stop factoring
-	    either we have u=x^n2 or u is not a perfect power
-         */
-         if (n_is_prime(n2))
-	    goto n2prime;
-      }
-   }
-
-   if (n2 == 0)
-   {
-      /* we found no factors above; have to check all values of n */
-      ulong nth;
-
-      for (nth = usize < 0 ? 3 : 2; ; nth++)
-      {
-         if (!n_is_prime(nth))
-	    continue;
-
-	  exact = mpz_root(q, u2, nth);
-
-	  if (exact)
-	  {
-             r = _fmpz_promote(root);
-             mpz_set(r, q);
-             _fmpz_demote_val(root);
-	     mpz_clear(q);
-             mpz_clear(u2);
-             return nth;
-	  }
-
-	  if (mpz_cmpabs_ui(q, SMALLEST_OMITTED_PRIME) < 0)
-	  {
-	     mpz_clear(q);
-             mpz_clear(u2);
-	     return 0;
-          }
-       }
-    } else
+    if (usize == 0)
     {
-       unsigned long int nth;
+        fmpz_zero(root);
+        return 2;			/* consider 0 a perfect square */
+    }
 
-       /* 
-          we found some factors above and we just need to consider values of n
-	  that divide n2
-       */
+    if (usize == 1)
+    {
+        ulong r = 0;
+        ulong r2;
+        ulong n = fmpz_get_ui(f);
 
-       for (nth = usize < 0 ? 3 : 2; nth <= n2; nth++)
-       {
-          if (!n_is_prime(nth))
-	     continue;
+        int exp = n_is_perfect_power(&r, n);
 
-	  if (n2 % nth != 0)
-	     continue;
+        /* get higest exponent */
+        while (r > 1 && (exp2 = n_is_perfect_power(&r2, r)) != 0)
+        {
+            exp *= exp2;
+            r = r2;
+        }
 
-	  exact = mpz_root(q, u, nth);
+        if (exp == 0)
+            return 0;
+        else if (sgn < 0 && (exp & 1) == 0)
+        {
+            while ((exp & 1) == 0)
+            {
+                r = r*r;
+                exp >>= 1;
+            }
+            if (exp == 1 && n != 1)
+                return 0;
+            else
+            {
+                fmpz_set_si(root, -r);
+                return exp;
+            }
+        } else
+        {
+            fmpz_set_ui(root, r);
+            if (sgn < 0)
+                fmpz_neg(root, root);
+            return exp;
+        }
+    }
 
-	  if (exact)
-	  {
-	     r = _fmpz_promote(root);
-             mpz_set(r, q);
-             _fmpz_demote_val(root);
-	     mpz_clear(q);
-             mpz_clear(u2);
-	     return nth;
-	  }
-	  
-          if (mpz_cmpabs_ui(q, SMALLEST_OMITTED_PRIME) < 0)
-	  {
-	     mpz_clear(q);
-             mpz_clear(u2);
-	     return 0;
-	  }
-      }
+    u = COEFF_TO_PTR(*f);
+    usize = u->_mp_size;
 
-      mpz_clear(q);
-      mpz_clear(u2);
-      return 0;
-   }
-   
+    n2 = mpz_scan1((mpz_ptr) u, 0);
+
+    if (n2 == 1)
+        return 0;			/* 2 divides exactly once */
+
+    if (n2 > 1 && (n2 & (n2 - 1)) == 0 && usize < 0)
+        return 0;			/* 2 has power of two  multiplicity with negative u */
+
+    uns = FLINT_ABS(usize) - n2/FLINT_BITS;
+    mpz_init2(q, FLINT_BITS*uns);
+    mpz_init2(u2, FLINT_BITS*uns);
+
+    mpz_tdiv_q_2exp(u2, (mpz_ptr) u, n2);
+
+    if (n_is_prime(n2))
+        goto n2prime;
+
+    for (i = 1; primes[i] != 0; i++)
+    {
+        prime = primes[i];
+
+        if (mpz_divisible_ui_p(u2, prime))	/* divisible by this prime? */
+        {
+            rem = mpz_tdiv_q_ui(q, u2, prime*prime);
+
+            if (rem != 0)
+            {
+                mpz_clear(q);
+                mpz_clear(u2);
+                return 0;		/* prime divides exactly once, reject */
+            }
+
+            mpz_swap(q, u2);
+            for (n = 2; ; )
+            {
+                rem = mpz_tdiv_q_ui(q, u2, prime);
+                if (rem != 0)
+                    break;
+                mpz_swap (q, u2);
+                n++;
+            }
+
+            if ((n & (n - 1)) == 0 && usize < 0)
+            {
+                mpz_clear(q);
+                mpz_clear(u2);
+                return 0;		/* power of two multiplicity with negative U, reject */
+            }
+
+            n2 = n_gcd(n2, n);
+            if (n2 == 1)
+            {
+                mpz_clear(q);
+                mpz_clear(u2);
+                return 0;		/* we have multiplicity 1 of some factor */
+            }
+
+            if (mpz_cmpabs_ui(u2, 1) == 0)
+            {
+                mpz_clear(q);
+                mpz_clear(u2);
+
+                if (usize < 0)
+                {
+                    if ((n2 & (n2 - 1)) == 0)
+                        return 0;        /* factoring completed; not consistent power */
+
+                    while ((n2 & 1) == 0)
+                        n2 >>= 1;
+                }
+
+                r = _fmpz_promote(root);
+                mpz_root((mpz_ptr) r, (mpz_ptr) u, n2);
+                _fmpz_demote_val(root);
+                return n2;        /* factoring completed; consistent power */
+            }
+
+            /* 
+               as soon as n2 becomes a prime number, stop factoring
+               either we have u=x^n2 or u is not a perfect power
+               */
+            if (n_is_prime(n2))
+                goto n2prime;
+        }
+    }
+
+    if (n2 == 0)
+    {
+        /* we found no factors above; have to check all values of n */
+        ulong nth;
+
+        for (nth = usize < 0 ? 3 : 2; ; nth++)
+        {
+            if (!n_is_prime(nth))
+                continue;
+
+            exact = mpz_root(q, u2, nth);
+
+            if (exact)
+            {
+                r = _fmpz_promote(root);
+                mpz_set((mpz_ptr) r, q);
+                _fmpz_demote_val(root);
+                mpz_clear(q);
+                mpz_clear(u2);
+                return nth;
+            }
+
+            if (mpz_cmpabs_ui(q, SMALLEST_OMITTED_PRIME) < 0)
+            {
+                mpz_clear(q);
+                mpz_clear(u2);
+                return 0;
+            }
+        }
+    }
+    else
+    {
+        unsigned long int nth;
+
+        /* 
+           we found some factors above and we just need to consider values of n
+           that divide n2
+           */
+
+        for (nth = usize < 0 ? 3 : 2; nth <= n2; nth++)
+        {
+            if (!n_is_prime(nth))
+                continue;
+
+            if (n2 % nth != 0)
+                continue;
+
+            exact = mpz_root(q, (mpz_ptr) u, nth);
+
+            if (exact)
+            {
+                r = _fmpz_promote(root);
+                mpz_set((mpz_ptr) r, q);
+                _fmpz_demote_val(root);
+                mpz_clear(q);
+                mpz_clear(u2);
+                return nth;
+            }
+
+            if (mpz_cmpabs_ui(q, SMALLEST_OMITTED_PRIME) < 0)
+            {
+                mpz_clear(q);
+                mpz_clear(u2);
+                return 0;
+            }
+        }
+
+        mpz_clear(q);
+        mpz_clear(u2);
+        return 0;
+    }
+
 n2prime:
 
-   if (n2 == 2 && usize < 0)
-   {
-      mpz_clear(q);
-      mpz_clear(u2);
-      return 0;
-   }
-   
-   exact = mpz_root(q, u, n2);
- 
-   if (exact)
-   {
-      r = _fmpz_promote(root);
-      mpz_set(r, q);
-      _fmpz_demote_val(root);
-      mpz_clear(q);
-      mpz_clear(u2);
-      return n2;
-   } else
-   {
-      mpz_clear(q);
-      mpz_clear(u2);
-      return 0;
-   }
-}
+    if (n2 == 2 && usize < 0)
+    {
+        mpz_clear(q);
+        mpz_clear(u2);
+        return 0;
+    }
 
+    exact = mpz_root(q, (mpz_ptr) u, n2);
+
+    if (exact)
+    {
+        r = _fmpz_promote(root);
+        mpz_set((mpz_ptr) r, q);
+        _fmpz_demote_val(root);
+        mpz_clear(q);
+        mpz_clear(u2);
+        return n2;
+    }
+    else
+    {
+        mpz_clear(q);
+        mpz_clear(u2);
+        return 0;
+    }
+}

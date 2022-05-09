@@ -35,6 +35,7 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "flint-impl.h"
 #include "fmpz.h"
 #include "mpn_extras.h"
@@ -190,7 +191,7 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
     }
     else /* g is large */
     {
-        __mpz_struct * mf, * ms;
+        mpz_mock_ptr mf, ms;
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
             fmpz_fdiv_qr(f, s, g, h);
@@ -198,9 +199,9 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
         {
             _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
             ms = _fmpz_promote(s);
-            mf  = COEFF_TO_PTR(*f);
+            mf = COEFF_TO_PTR(*f);
 
-            _mpz_fdiv_qr_preinvn(mf, ms, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), inv);
+            _mpz_fdiv_qr_preinvn((mpz_ptr) mf, (mpz_ptr) ms, (mpz_ptr) COEFF_TO_PTR(c1), (mpz_ptr) COEFF_TO_PTR(c2), inv);
 
             _fmpz_demote_val(f);    /* division by h may result in small value */
             _fmpz_demote_val(s);    /* division by h may result in small value */
