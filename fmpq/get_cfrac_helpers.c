@@ -474,11 +474,11 @@ static void _lehmer_exact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int flags,
     if (!COEFF_IS_MPZ(*xa) || !COEFF_IS_MPZ(*xb))
         return;
 
-    xn = COEFF_TO_PTR(*xa);
-    xd = COEFF_TO_PTR(*xb);
+    xn = (mpz_ptr) COEFF_TO_PTR(*xa);
+    xd = (mpz_ptr) COEFF_TO_PTR(*xb);
 
-    yn = _fmpz_promote(ya);
-    yd = _fmpz_promote(yb);
+    yn = (mpz_ptr) _fmpz_promote(ya);
+    yd = (mpz_ptr) _fmpz_promote(yb);
 
 
     /* fit everything to xn_len */
@@ -625,15 +625,15 @@ static void _lehmer_inexact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
         return;
     }
 
-    xln = COEFF_TO_PTR(*x->left_num);
-    xld = COEFF_TO_PTR(*x->left_den);
-    xrn = COEFF_TO_PTR(*x->right_num);
-    xrd = COEFF_TO_PTR(*x->right_den);
+    xln = (mpz_ptr) COEFF_TO_PTR(*x->left_num);
+    xld = (mpz_ptr) COEFF_TO_PTR(*x->left_den);
+    xrn = (mpz_ptr) COEFF_TO_PTR(*x->right_num);
+    xrd = (mpz_ptr) COEFF_TO_PTR(*x->right_den);
 
-    yln = _fmpz_promote(y->left_num);
-    yld = _fmpz_promote(y->left_den);
-    yrn = _fmpz_promote(y->right_num);
-    yrd = _fmpz_promote(y->right_den);
+    yln = (mpz_ptr) _fmpz_promote(y->left_num);
+    yld = (mpz_ptr) _fmpz_promote(y->left_den);
+    yrn = (mpz_ptr) _fmpz_promote(y->right_num);
+    yrd = (mpz_ptr) _fmpz_promote(y->right_den);
 
     /* fit everything to max(xln_len) */
     nl = xln->_mp_size;

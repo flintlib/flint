@@ -34,6 +34,7 @@
 # endif
 #endif
 
+#include "gmp.h"
 #include "flint-impl.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"

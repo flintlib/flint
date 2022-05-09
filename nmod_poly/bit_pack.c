@@ -12,7 +12,7 @@
 
 #include "gmp.h"
 #include "flint-impl.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "fmpz.h"
 
 /* Assumes length > 0, bits > 0. */

@@ -10,7 +10,7 @@
 */
 
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void _nmod_poly_derivative(ulong_ptr x_prime, ulong_srcptr x, slong len, nmod_t mod)
 {

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
@@ -18,13 +19,13 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
    slong i, j;
    fmpz * old_entries = M->entries;
 
-   M->entries = (fmpz *) flint_realloc(M->entries, r*c*sizeof(fmpz));
+   M->entries = flint_realloc(M->entries, r*c*sizeof(fmpz));
 
-   mpn_zero((ulong_ptr) M->entries + M->r*M->c, r*c - M->r*M->c);
+   FLINT_MPN_ZERO(M->entries + M->r*M->c, r*c - M->r*M->c);
 
    if (r != M->r) /* we will have an extra row and column */
    {
-      M->rows = (fmpz **) flint_realloc(M->rows, r*sizeof(fmpz *));
+      M->rows = flint_realloc(M->rows, r*sizeof(fmpz *));
 
       for (i = r - 1; i >= 1; i--)
       {

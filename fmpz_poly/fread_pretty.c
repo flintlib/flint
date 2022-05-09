@@ -25,11 +25,13 @@
 #endif
 #include <stdio.h>
 #include <ctype.h>
+#include "gmp.h"
 #include "fmpz.h"
 #include "fmpz_poly_mini.h"
 #include "flint-impl.h"
 
 #ifdef LONGSLONG
+# define flint_mpz_set_si mpz_set_si
 # define flint_mpz_get_si mpz_get_si
 #else
 # include "gmpcompat.h"

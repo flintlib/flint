@@ -23,7 +23,7 @@
 #endif
 
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 #ifdef __cplusplus
     extern "C" {

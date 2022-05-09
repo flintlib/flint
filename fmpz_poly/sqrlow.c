@@ -112,7 +112,7 @@ void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
         lo = tmp[2 * i];
         hi = tmp[2 * i + 1];
 
-        if (((mp_limb_signed_t) hi) >= 0)
+        if (((slong) hi) >= 0)
         {
             fmpz_set_uiui(res + i, hi, lo);
         }
@@ -129,7 +129,7 @@ void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
 
 void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
 {
-    mp_size_t limbs;
+    mp_mock_size_t limbs;
     slong bits, rbits;
 
     len = FLINT_MIN(len, n);

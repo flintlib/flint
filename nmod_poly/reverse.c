@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void _nmod_poly_reverse(ulong_ptr output, ulong_srcptr input, slong len, slong m)
 {

@@ -11,7 +11,8 @@
 */
 
 #include <stdio.h>
-#include "nmod_poly.h"
+#include "flint-impl.h"
+#include "nmod_poly_mini.h"
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {

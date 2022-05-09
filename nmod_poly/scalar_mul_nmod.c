@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, ulong c)

@@ -18,6 +18,7 @@
 #  include <string.h>
 # endif
 #endif
+#include "gmp.h"
 #include "fmpz.h"
 #include "flint-impl.h"
 

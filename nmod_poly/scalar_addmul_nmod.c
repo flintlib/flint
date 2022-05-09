@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "flint-impl.h"
 
 void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B, ulong x)

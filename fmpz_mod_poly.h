@@ -354,11 +354,13 @@ void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly,
         fmpz_zero(x);
 }
 
+#ifdef __GMP_H__
 FLINT_DLL void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n,
                                     const mpz_t x, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly,
                                             slong n, const fmpz_mod_ctx_t ctx);
+#endif
 
 /*  Shifting *****************************************************************/
 

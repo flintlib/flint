@@ -38,7 +38,7 @@ void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x)
         fmpz_init(c);
 
         fmpz_zero(poly->coeffs + n);
-        _fmpz_poly_content(c, poly->coeffs, len);
+        _fmpz_vec_content(c, poly->coeffs, len);
         _fmpz_vec_scalar_mul_fmpz(poly->coeffs, poly->coeffs, len, fmpq_denref(x));
         fmpz_mul(c, c, fmpq_denref(x));
 

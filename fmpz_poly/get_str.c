@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include "gmp.h"
 #include "fmpz.h"
 #include "flint-impl.h"
 

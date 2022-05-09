@@ -12,7 +12,7 @@
 
 #include "gmp.h"
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "fmpz.h"
 #include "flint-impl.h"
 

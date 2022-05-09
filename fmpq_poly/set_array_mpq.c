@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 #ifdef LONGSLONG
@@ -32,7 +33,7 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
 
     for (i = 0; i < n; i++)
     {
-        __mpz_struct *ptr = _fmpz_promote(poly + i);
+        mpz_ptr ptr = (mpz_ptr) _fmpz_promote(poly + i);
 
         mpz_divexact(t, d, mpq_denref(a[i]));
         mpz_mul(ptr, mpq_numref(a[i]), t);

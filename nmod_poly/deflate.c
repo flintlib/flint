@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)

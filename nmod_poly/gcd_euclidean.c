@@ -10,7 +10,7 @@
 */
 
 #include "mpn_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "flint-impl.h"
 
 slong _nmod_poly_gcd_euclidean(ulong_ptr G, ulong_srcptr A, slong lenA, 

@@ -36,7 +36,7 @@
 
 #include "ulong_extras.h"
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "flint-impl.h"
 
 void

@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void nmod_poly_add_series(nmod_poly_t res, 
             const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)

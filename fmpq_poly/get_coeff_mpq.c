@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #ifdef LONGSLONG
 # define flint_mpq_set_si mpq_set_si

@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 _nmod_poly_product_roots_nmod_vec(ulong_ptr poly, ulong_srcptr xs, slong n, nmod_t mod)

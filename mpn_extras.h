@@ -101,6 +101,71 @@ mp_size_t flint_mpn_divexact_1(ulong_ptr x, mp_size_t xsize, ulong d)
     return xsize;
 }
 
+#if defined(__MPIR_VERSION)
+
+#if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
+#define mpn_sumdiff_n __MPN(sumdiff_n)
+extern
+ulong mpn_sumdiff_n(ulong_ptr, ulong_ptr, ulong_srcptr, ulong_srcptr, mp_mock_size_t);
+#endif
+
+#else
+
+/* TODO: Don't inline this. Else, we need to include flint-impl.h, which the
+ * user should not see. */
+#include "flint-impl.h"
+MPN_EXTRAS_INLINE
+ulong mpn_sumdiff_n(ulong_ptr s, ulong_ptr d, ulong_srcptr x, ulong_srcptr y, mp_mock_size_t n)
+{
+    ulong ret;
+    ulong_ptr t;
+
+    if (n == 0)
+        return 0;
+
+    if ((s == x && d == y) || (s == y && d == x))
+    {
+        t = (ulong_ptr) flint_malloc(n * sizeof(ulong));
+        ret = mpn_sub_n(t, x, y, n);
+        ret += 2 * mpn_add_n(s, x, y, n);
+        FLINT_MPN_COPYI(d, t, n);
+        flint_free(t);
+        return ret;
+    }
+
+    if (s == x || s == y)
+    {
+        ret = mpn_sub_n(d, x, y, n);
+        ret += 2 * mpn_add_n(s, x, y, n);
+        return ret;
+    }
+
+    ret = 2 * mpn_add_n(s, x, y, n);
+    ret += mpn_sub_n(d, x, y, n);
+    return ret;
+}
+
+#endif
+
+/* I do not think this should be inlined as mpn_add_1 and mpn_sub_1 is usually
+ * inlined. */
+MPN_EXTRAS_INLINE
+void mpn_addmod_2expp1_1(ulong * r, mp_mock_size_t limbs, slong c)
+{
+   ulong sum = r[0] + c;
+
+   /* check if adding c would cause a carry to propagate */
+   if ((slong)(sum ^ r[0]) >= 0)
+      r[0] = sum;
+   else
+   {
+      if (c >= 0)
+          mpn_add_1(r, r, limbs + 1, c);
+      else
+          mpn_sub_1(r, r, limbs + 1, -c);
+   }
+}
+
 FLINT_DLL void flint_mpn_debug(ulong_srcptr x, mp_size_t xsize);
 
 FLINT_DLL mp_size_t flint_mpn_remove_2exp(ulong_ptr x, mp_size_t xsize,

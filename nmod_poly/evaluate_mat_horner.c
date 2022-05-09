@@ -10,7 +10,7 @@
 */
 
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "nmod_mat.h"
 
 void

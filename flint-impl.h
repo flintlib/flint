@@ -185,7 +185,7 @@
 
 #define FLINT_MPZ_PTR_SWAP(a, b)    \
   do {                              \
-    mpz_mock_ptr __tmp = (a);       \
+    mpz_ptr __tmp = (a);            \
     (a) = (b);                      \
     (b) = __tmp;                    \
   } while (0)

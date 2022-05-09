@@ -16,6 +16,7 @@
 #  include <string.h>
 # endif
 #endif
+#include "fmpz_poly.h"
 #include "fmpz_poly_q.h"
 
 /**

@@ -18,7 +18,7 @@
 #define N_POLY_INLINE static __inline__
 #endif
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 /* TODO: Remove this inclusion. It should not be visible to the user. */
 #include "flint-impl.h"
@@ -477,7 +477,6 @@ void n_poly_mod_add(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
 
 FLINT_DLL void n_poly_mod_add_ui(n_poly_t res, const n_poly_t poly, ulong c, nmod_t ctx);
 
-
 N_POLY_INLINE
 void n_poly_mod_sub(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
 {
@@ -488,13 +487,7 @@ void n_poly_mod_sub(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
     _n_poly_normalise(A);
 }
 
-N_POLY_INLINE
-void n_poly_mod_product_roots_nmod_vec(n_poly_t A, ulong_srcptr r, slong n, nmod_t mod)
-{
-    n_poly_fit_length(A, n + 1);
-    A->length = n + 1;
-    _nmod_poly_product_roots_nmod_vec(A->coeffs, r, n, mod);
-}
+FLINT_DLL void n_poly_mod_product_roots_nmod_vec(n_poly_t A, ulong_srcptr r, slong n, nmod_t mod);
 
 FLINT_DLL void n_poly_mod_shift_left_scalar_addmul(n_poly_t A, slong k,
                                                       ulong c, nmod_t mod);

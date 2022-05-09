@@ -11,7 +11,7 @@
 */
 
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "flint-impl.h"
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)

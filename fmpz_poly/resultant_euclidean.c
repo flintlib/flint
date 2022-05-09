@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_poly_mini.h"
+#include "fmpz_poly.h"
 
 void
 _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1, 

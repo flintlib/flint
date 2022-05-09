@@ -11,7 +11,7 @@
 */
 
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 _nmod_poly_sub(ulong_ptr res, ulong_srcptr poly1, slong len1, ulong_srcptr poly2,

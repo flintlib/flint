@@ -11,7 +11,7 @@
 */
 
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "nmod_poly_factor.h"
 #include "flint-impl.h"
 

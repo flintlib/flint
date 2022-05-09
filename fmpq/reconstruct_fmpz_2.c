@@ -643,8 +643,8 @@ static int _lehmer(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N,
         return -1;
     }
 
-    a = COEFF_TO_PTR(*A);
-    b = COEFF_TO_PTR(*B);
+    a = (mpz_ptr) COEFF_TO_PTR(*A);
+    b = (mpz_ptr) COEFF_TO_PTR(*B);
 
     if (COEFF_IS_MPZ(*N))
     {
@@ -666,8 +666,8 @@ static int _lehmer(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N,
         return -1;
     }
 
-    s = _fmpz_promote(S);
-    t = _fmpz_promote(T);
+    s = (mpz_ptr) _fmpz_promote(S);
+    t = (mpz_ptr) _fmpz_promote(T);
 
     /* fit everything to length a->_mp_size */
     a_len = a->_mp_size;

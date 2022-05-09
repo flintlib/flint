@@ -16,7 +16,7 @@
 void _fmpq_poly_content(fmpq_t res, const fmpz * poly, 
                         const fmpz_t den, slong len)
 {
-    _fmpz_poly_content(fmpq_numref(res), poly, len);
+    _fmpz_vec_content(fmpq_numref(res), poly, len);
     fmpz_set(fmpq_denref(res), den);
 }
 

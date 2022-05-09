@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "flint-impl.h"
 
 void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)

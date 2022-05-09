@@ -10,7 +10,7 @@
 */
 
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void _nmod_poly_rem_q1(ulong_ptr R, 
                        ulong_srcptr A, slong lenA, ulong_srcptr B, slong lenB,

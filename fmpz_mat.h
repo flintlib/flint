@@ -556,7 +556,9 @@ FLINT_DLL int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
 
+#if defined(__GMP_H__) && defined(MPF_MAT_H)
 FLINT_DLL void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
+#endif
 
 /* Cholesky Decomposition ****************************************************/
 

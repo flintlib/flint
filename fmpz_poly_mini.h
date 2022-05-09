@@ -112,6 +112,8 @@ int fmpz_poly_is_one(const fmpz_poly_t op)
 
 /* operations *****************************************************************/
 
+FLINT_DLL void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
+
 FLINT_DLL void _fmpz_poly_add(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2);
 FLINT_DLL void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 

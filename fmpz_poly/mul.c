@@ -101,7 +101,7 @@ _fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
         lo = tmp[2 * i];
         hi = tmp[2 * i + 1];
 
-        if (((mp_limb_signed_t) hi) >= 0)
+        if (((slong) hi) >= 0)
         {
             fmpz_set_uiui(res + i, hi, lo);
         }
@@ -120,7 +120,7 @@ void
 _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
-    mp_size_t limbs1, limbs2;
+    mp_mock_size_t limbs1, limbs2;
     slong bits1, bits2, rbits;
 
     if (len2 == 1)

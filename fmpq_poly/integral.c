@@ -33,6 +33,7 @@
 #  endif
 # endif
 #endif
+#include "gmp.h"
 #include "flint-impl.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -40,7 +41,7 @@
 
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
 {
-    __mpz_struct * z = COEFF_TO_PTR(*g);
+    mpz_mock_ptr z = COEFF_TO_PTR(*g);
 
     return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
 }

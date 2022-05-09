@@ -10,7 +10,7 @@
 */
 
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 _nmod_poly_taylor_shift_horner(ulong_ptr poly, ulong c, slong n, nmod_t mod)

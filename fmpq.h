@@ -148,9 +148,10 @@ FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
 FLINT_DLL int fmpq_set_str(fmpq_t res, const char * str, int base);
 
+#ifdef __GMP_H__
 FLINT_DLL void fmpq_set_mpq(fmpq_t dest, const mpq_t src);
-
 FLINT_DLL void fmpq_get_mpq(mpq_t dest, const fmpq_t src);
+#endif
 
 FLINT_DLL double fmpq_get_d(const fmpq_t a);
 
@@ -158,17 +159,18 @@ FLINT_DLL double fmpq_get_d(const fmpq_t a);
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 #endif
 
+#ifdef __GMP_H__
 FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
 
 FLINT_DLL void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
-
 FLINT_DLL void flint_mpq_clear_readonly(mpq_t z);
 
 FLINT_DLL void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
 
-FLINT_DLL void fmpq_clear_readonly(fmpq_t f);
-
 FLINT_DLL void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den);
+#endif
+
+FLINT_DLL void fmpq_clear_readonly(fmpq_t f);
 
 FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 

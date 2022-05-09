@@ -23,8 +23,8 @@ int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
 
     fmpz_init(c1);
     fmpz_init(c2);
-    _fmpz_poly_content(c1, poly1, len1);
-    _fmpz_poly_content(c2, poly2, len2);
+    _fmpz_vec_content(c1, poly1, len1);
+    _fmpz_vec_content(c2, poly2, len2);
     
     if (!fmpz_is_one(c1))
     {

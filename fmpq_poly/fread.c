@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "gmp.h"
 #include "fmpq_poly.h"
 #ifdef LONGSLONG
 # define flint_mpz_get_si mpz_get_si

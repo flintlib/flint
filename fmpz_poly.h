@@ -188,8 +188,6 @@ FLINT_DLL void fmpz_poly_add_series(fmpz_poly_t res, const fmpz_poly_t poly1,
 FLINT_DLL void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1,
                                              const fmpz_poly_t poly2, slong n);
 
-FLINT_DLL void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
-
 FLINT_DLL void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
 FLINT_DLL void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
 FLINT_DLL void fmpz_poly_si_sub(fmpz_poly_t res, slong c, const fmpz_poly_t poly);

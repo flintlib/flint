@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_q.h"
 #ifdef LONGSLONG
 # define flint_mpz_cmp_si mpz_cmp_si

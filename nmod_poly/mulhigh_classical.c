@@ -11,7 +11,7 @@
 
 #include "gmp.h"
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 #include "flint-impl.h"
 
 /* Assumes poly1 and poly2 are not length 0. */

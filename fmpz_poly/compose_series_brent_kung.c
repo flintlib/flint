@@ -18,7 +18,7 @@ _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, slong len1,
                                       const fmpz * poly2, slong len2, slong n)
 {
     fmpz_mat_t A, B, C;
-    fmpz *t, *h;
+    fmpz * t, * h;
     slong i, m;
 
     if (n == 1)

@@ -61,7 +61,7 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(ulong_ptr arrayg, mp_size_t limbsg, fmpz
    {
       mp_size_t tlimbs;
       ulong_ptr temp;
-      __mpz_struct * mgc = COEFF_TO_PTR(*gc);
+      mpz_mock_ptr mgc = COEFF_TO_PTR(*gc);
       TMP_INIT;
 
       TMP_START;

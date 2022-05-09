@@ -10,7 +10,7 @@
 */
 
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 _nmod_poly_power_sums_to_poly_naive(ulong_ptr res, ulong_srcptr poly, slong len,

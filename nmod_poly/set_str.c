@@ -12,7 +12,8 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "nmod_poly.h"
+#include "flint-impl.h"
+#include "nmod_poly_mini.h"
 
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 {

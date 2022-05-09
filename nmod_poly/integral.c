@@ -10,7 +10,7 @@
 */
 
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void _nmod_poly_integral(ulong_ptr res, ulong_srcptr poly, slong len, nmod_t mod)
 {

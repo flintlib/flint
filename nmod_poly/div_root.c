@@ -10,7 +10,7 @@
 */
 
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 ulong
 _nmod_poly_div_root(ulong_ptr Q, ulong_srcptr A, slong len, ulong c, nmod_t mod)

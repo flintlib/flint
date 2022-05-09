@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #ifdef LONGSLONG
@@ -74,21 +75,21 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
                     else
                     {
                         if (a >= 0)
-                            flint_mpz_addmul_ui(t, COEFF_TO_PTR(b), a);
+                            flint_mpz_addmul_ui(t, (mpz_ptr) COEFF_TO_PTR(b), a);
                         else
-                            flint_mpz_submul_ui(t, COEFF_TO_PTR(b), -a);
+                            flint_mpz_submul_ui(t, (mpz_ptr) COEFF_TO_PTR(b), -a);
                     }
                 }
                 else if (!COEFF_IS_MPZ(b))  /* b is small */
                 {
                     if (b >= 0)
-                        flint_mpz_addmul_ui(t, COEFF_TO_PTR(a), b);
+                        flint_mpz_addmul_ui(t, (mpz_ptr) COEFF_TO_PTR(a), b);
                     else
-                        flint_mpz_submul_ui(t, COEFF_TO_PTR(a), -b);
+                        flint_mpz_submul_ui(t, (mpz_ptr) COEFF_TO_PTR(a), -b);
                 }
                 else
                 {
-                    mpz_addmul(t, COEFF_TO_PTR(a), COEFF_TO_PTR(b));
+                    mpz_addmul(t, (mpz_ptr) COEFF_TO_PTR(a), (mpz_ptr) COEFF_TO_PTR(b));
                 }
             }
 

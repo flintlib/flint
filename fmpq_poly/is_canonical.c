@@ -26,7 +26,7 @@ int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len)
             return 0;
 
         fmpz_init(c);
-        _fmpz_poly_content(c, poly, len);
+        _fmpz_vec_content(c, poly, len);
         fmpz_gcd(c, c, den);
         ans = (*c == WORD(1));
         fmpz_clear(c);

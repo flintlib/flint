@@ -26,7 +26,7 @@ fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)
         return mpfr_set_ui(r, 0, rnd);
 
     if (COEFF_IS_MPZ(p))
-        mpq._mp_num = *COEFF_TO_PTR(p);
+        mpq._mp_num = *((mpz_ptr) COEFF_TO_PTR(p));
     else
     {
         pp = FLINT_ABS(p);
@@ -36,7 +36,7 @@ fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)
     }
 
     if (COEFF_IS_MPZ(q))
-        mpq._mp_den = *COEFF_TO_PTR(q);
+        mpq._mp_den = *((mpz_ptr) COEFF_TO_PTR(q));
     else
     {
         qq = q;

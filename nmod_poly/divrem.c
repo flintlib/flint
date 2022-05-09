@@ -129,4 +129,3 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
 
     _nmod_poly_normalise(R);
 }
-

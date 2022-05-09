@@ -58,13 +58,14 @@ FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
     return ctx->n;
 }
 
+#ifdef __GMP_H__
 FMPZ_MOD_INLINE
 void fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
 {
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);
     if (COEFF_IS_MPZ(*p))
     {
-        *m = *COEFF_TO_PTR(*p);
+        *m = *((mpz_ptr) COEFF_TO_PTR(*p));
     }
     else
     {
@@ -73,6 +74,7 @@ void fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
         m->_mp_d = (ulong_ptr) p;
     }
 }
+#endif
 
 FLINT_DLL void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n);
 

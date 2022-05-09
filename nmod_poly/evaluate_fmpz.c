@@ -11,7 +11,7 @@
 */
 
 #include "fmpz.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 /* TODO: Add a divconquer method */
 

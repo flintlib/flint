@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 void
 _nmod_poly_add(ulong_ptr res, ulong_srcptr poly1, slong len1, ulong_srcptr poly2,

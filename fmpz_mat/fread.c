@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "gmp.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #ifdef LONGSLONG

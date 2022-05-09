@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmp.h"
 #include "fmpz.h"
 
 void flint_mpq_clear_readonly(mpq_t z)
@@ -16,4 +17,3 @@ void flint_mpq_clear_readonly(mpq_t z)
     flint_mpz_clear_readonly(mpq_numref(z));
     flint_mpz_clear_readonly(mpq_denref(z));
 }
-
