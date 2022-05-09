@@ -1404,7 +1404,6 @@ got_alpha:
 
     /* note the constant term of Aeval can be zero */
 
-    local_fac_tmp->num = 0;
     nmod_poly_factor(local_fac_tmp, Aeval);
     r = local_fac_tmp->num;
 
