@@ -1239,7 +1239,6 @@ got_alpha:
 
     /* note the constant term of Aeval can be zero */
 
-    local_fac->num = 0;
     fq_nmod_poly_factor(local_fac, Alc, Aeval, ctx);
     r = local_fac->num;
 

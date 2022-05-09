@@ -208,6 +208,8 @@ TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
     flint_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime) (ctx));
     slong n = TEMPLATE(T, poly_degree) (input, ctx);
 
+    result->num = 0;
+
     if (n < 10 + 50 / bits)
         __TEMPLATE(T, poly_factor_deflation) (result, leading_coeff, input,
                                               ZASSENHAUS, ctx);

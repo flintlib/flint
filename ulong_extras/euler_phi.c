@@ -26,7 +26,7 @@ mp_limb_t n_euler_phi(mp_limb_t n)
 
     phi = UWORD(1);
     for (i = 0; i < fac.num; i++)
-        phi *= (fac.p[i]-1) * n_pow(fac.p[i], fac.exp[i]-1);
+        phi *= (fac.p[i] - 1) * n_pow(fac.p[i], fac.exp[i] - 1);
 
     return phi;
 }

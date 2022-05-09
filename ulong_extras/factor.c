@@ -31,6 +31,8 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
    ulong exp;
    mp_limb_t cofactor, factor, cutoff;
 
+   factors->num = 0;
+
    cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
    if (cofactor == UWORD(1)) return;
    if (is_prime(cofactor, proved)) 

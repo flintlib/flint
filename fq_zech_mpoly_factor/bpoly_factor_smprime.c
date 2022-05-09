@@ -769,7 +769,6 @@ got_alpha:
 
     /* note the constant term of Aeval can be zero */
 
-    local_fac->num = 0; /* stupid */
     fq_zech_poly_factor(local_fac, Alc, Aeval, ctx);
     r = local_fac->num;
 

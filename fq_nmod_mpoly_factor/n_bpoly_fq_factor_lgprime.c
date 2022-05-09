@@ -802,7 +802,6 @@ got_alpha:
     if (Beval->length != Blenx)
         goto next_alpha;
 
-    local_fac->num = 0; /* stupid */
     fq_nmod_poly_factor(local_fac, Blc, Beval, ectx_mock->fqctx);
 
     r = local_fac->num;
