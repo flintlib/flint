@@ -834,7 +834,6 @@ got_alpha:
         goto next_alpha;
 
     fmpz_one(&Bevalfac->c);
-    Bevalfac->num = 0;
     fmpz_poly_factor(Bevalfac, Beval);
 
     /* if multiple factors, get new alpha */
