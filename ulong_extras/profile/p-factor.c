@@ -26,9 +26,7 @@ typedef struct
 void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
-   flint_bitcnt_t bits = params->bits;
-   ulong i, j, res, primes = (WORD(1)<<(bits/3))/10 + 1;
-   n_factor_t factors;
+   ulong i, j;
    mp_limb_t n2;
    
    for (i = 0; i < count; i++)

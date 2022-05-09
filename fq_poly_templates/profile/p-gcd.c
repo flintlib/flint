@@ -29,8 +29,6 @@ main(int argc, char** argv)
     slong d, len;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, poly_t) a, b, c, g;
-    slong i;
-    double beta;
 
     double s[nalgs];
     

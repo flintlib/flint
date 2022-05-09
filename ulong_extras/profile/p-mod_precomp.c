@@ -17,7 +17,7 @@
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, r, norm, bits;
+   mp_limb_t d, bits;
    double dpre;
    ulong i;
    mp_ptr array = (mp_ptr) flint_malloc(1000*sizeof(mp_limb_t));
@@ -40,7 +40,7 @@ void sample(void * arg, ulong count)
       prof_start();
       for (j = 0; j < 1000; j++)
       {
-         r = n_mod_precomp(array[j], d, dpre);  
+         array[j] = n_mod_precomp(array[j], d, dpre);  
       }
       prof_stop();
    }

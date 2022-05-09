@@ -57,7 +57,6 @@ main(int argc, char** argv)
 
     fmpz_poly_init(fpoly);
     nmod_poly_init(nmod, fmpz_get_ui(p));
-    fmpz_mod_poly_get_fmpz_poly(fpoly, ctx->modulus);
     fmpz_poly_get_nmod_poly(nmod, fpoly);
     
     fq_nmod_ctx_init_modulus(ctxn, nmod, "a");

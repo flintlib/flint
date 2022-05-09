@@ -76,7 +76,7 @@ main(void)
     {
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
         {
-            int c, n, reps = 0;
+            int n, reps = 0;
             slong s = WORD(0);
             
             for (n = 0; n < ncases; n++)

@@ -23,7 +23,7 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, dinv, r = 0, norm;
+   mp_limb_t d, dinv, r = 0;
    double dpre;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;
@@ -115,7 +115,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-   double min1, min2, min3, min4, min5, max;
+   double min2, min4, min5, max;
    info_t info;
    int i;
 

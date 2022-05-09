@@ -20,7 +20,7 @@ int
 main(void)
 {
     flint_bitcnt_t depth, w;
-    mp_size_t iters, j;
+    mp_size_t iters;
     double truncation;
 
     FLINT_TEST_INIT(state);

@@ -23,8 +23,7 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, dinv, r = 0, norm;
-   double dpre;
+   mp_limb_t d, dinv, r = 0;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;
    ulong type = info->type;
@@ -46,7 +45,7 @@ void sample(void * arg, ulong count)
       for (j = 0; j < 1024; j++)
       {
          arr[j] = n_randbits(state, FLINT_BITS);
-         arr2[j] = n_randint(state, n);
+         arr2[j] = n_randint(state, d);
       }
 
 	  switch (type)
@@ -74,7 +73,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-   double min1, min2, min3, min4, min5, max;
+   double min1, max;
    info_t info;
    int i;
 

@@ -17,7 +17,7 @@
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t a, b, d, r, norm, dinv;
+   mp_limb_t a, d, dinv;
    mp_ptr array = (mp_ptr) flint_malloc(1000*sizeof(mp_limb_t));
    ulong i;
    FLINT_TEST_INIT(state);
@@ -39,7 +39,7 @@ void sample(void * arg, ulong count)
       prof_start();
       for (j = 0; j < 1000; j++)
       {
-         r = n_mulmod2_preinv(a, array[j], d, dinv);
+         array[j] = n_mulmod2_preinv(a, array[j], d, dinv);
       }
       prof_stop();
    }

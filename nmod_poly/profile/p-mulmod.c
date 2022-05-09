@@ -108,7 +108,7 @@ int main(void)
         if (i == 0)
           info.s= info.n+1;
         else if (i== 1)
-          info.s= info.n+ ((1<<k+1)-(1<<k))/2*i;
+          info.s= info.n+ ((1<<(k+1))-(1<<k))/2*i;
         else if (i== 2)
           info.s= info.n*2-1;
       scale = 1;

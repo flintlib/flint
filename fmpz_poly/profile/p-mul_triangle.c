@@ -89,6 +89,11 @@ main(void)
     {
         slong s[nalgs], sum;
         
+        s[0] = 0;
+        s[1] = 0;
+        s[2] = 0;
+        sum = 0;
+
         for (bits = bitslo, i = 0; bits <= bitshi; bits *= bitsh, i++)
         {
             int c, n, reps = 0, none = 0;

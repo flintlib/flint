@@ -16,8 +16,6 @@
 
 void p_is_prime_repeat(fmpz_t n)
 {
-    int i;
-
     TIMEIT_START
     if (aprcl_is_prime(n) == 0)
     {
@@ -29,7 +27,6 @@ void p_is_prime_repeat(fmpz_t n)
 
 int main(void)
 {
-    const int len = 5;
     FLINT_TEST_INIT(state);
 
     /*
@@ -43,7 +40,6 @@ int main(void)
 
     /* 350 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -59,7 +55,6 @@ int main(void)
 
     /* 400 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -76,7 +71,6 @@ int main(void)
 
     /* 450 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -92,7 +86,6 @@ int main(void)
 
     /* 500 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -108,7 +101,6 @@ int main(void)
 
     /* 550 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -125,7 +117,6 @@ int main(void)
 
     /* 600 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -141,7 +132,6 @@ int main(void)
 
     /* 650 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -157,7 +147,6 @@ int main(void)
 
     /* 700 digits prime */
     {
-        int i;
         fmpz_t n1, n2;
 
         fmpz_init(n1);
@@ -181,7 +170,6 @@ int main(void)
 
     /* 750 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -198,7 +186,6 @@ int main(void)
 
     /* 800 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -216,7 +203,6 @@ int main(void)
 
     /* 850 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -232,7 +218,6 @@ int main(void)
 
     /* 900 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -249,7 +234,6 @@ int main(void)
 
     /* 950 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -266,7 +250,6 @@ int main(void)
 
     /* 1000 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -282,7 +265,6 @@ int main(void)
 
     /* 1100 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -298,7 +280,6 @@ int main(void)
 
     /* 1200 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -315,7 +296,6 @@ int main(void)
 
     /* 1300 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -331,7 +311,6 @@ int main(void)
 
     /* 1400 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -348,7 +327,6 @@ int main(void)
 
     /* 1500 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -365,7 +343,6 @@ int main(void)
 
     /* 1600 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -382,7 +359,6 @@ int main(void)
 
     /* 1700 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -398,7 +374,6 @@ int main(void)
 
     /* 1800 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -414,7 +389,6 @@ int main(void)
 
     /* 1900 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);
@@ -431,7 +405,6 @@ int main(void)
 
     /* 2000 digits prime */
     {
-        int i;
         fmpz_t n;
 
         fmpz_init(n);

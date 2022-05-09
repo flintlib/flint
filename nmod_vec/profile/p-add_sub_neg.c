@@ -24,7 +24,7 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, r = 0;
+   mp_limb_t n;
    nmod_t mod;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;

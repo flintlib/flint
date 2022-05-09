@@ -22,11 +22,8 @@
 int
 main()
 {
-    timeit_t t0;
-
-    slong i;
     fmpz_t p;
-    slong d,cpu,wall;
+    slong d;
     fq_ctx_t ctx;
     fq_t a,b,c;
 
@@ -43,8 +40,6 @@ main()
 
     fq_randtest_not_zero(a,state,ctx);
     fq_randtest_not_zero(b,state,ctx);
-
-    flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , cpu , wall );
 
     FLINT_TEST_CLEANUP(state);
 
