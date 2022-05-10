@@ -11,6 +11,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "padic.h"
 

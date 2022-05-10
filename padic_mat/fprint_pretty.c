@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "padic.h"
 #include "padic_mat.h"
 
 int padic_mat_fprint_pretty(FILE * file, 

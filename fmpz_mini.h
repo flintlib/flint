@@ -281,11 +281,18 @@ FLINT_DLL flint_bitcnt_t fmpz_bits(const fmpz_t f);
 
 /* miscellaneous **************************************************************/
 
+FLINT_DLL int fmpz_divisible(const fmpz_t f, const fmpz_t g);
+
 FLINT_DLL void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+/* NOTE: Only for padic.h and padic_poly.h. Hopefully there is a way to remove
+ * this from here. */
+FLINT_DLL slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
+FLINT_DLL slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
 
 #ifdef __cplusplus
 }

@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "padic.h"
 
 void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
@@ -105,4 +106,3 @@ int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
-

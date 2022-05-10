@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_poly.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_neg(padic_poly_t f, const padic_poly_t g, 

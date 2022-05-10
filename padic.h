@@ -18,8 +18,7 @@
 #define PADIC_INLINE static __inline__
 #endif
 
-/* TODO: Reduce to fmpz_mini.h, not necessary with fmpz. */
-#include "fmpz.h"
+#include "fmpz_mini.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -143,20 +142,18 @@ FLINT_DLL void padic_set_si(padic_t rop, slong op, const padic_ctx_t ctx);
 FLINT_DLL void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx);
-
-FLINT_DLL void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx);
-
-FLINT_DLL void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
-
-FLINT_DLL void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
-
 FLINT_DLL void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
+FLINT_DLL void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx);
 FLINT_DLL void padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
+#ifdef __GMP_H__
+FLINT_DLL void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
 FLINT_DLL void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
+FLINT_DLL void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
 FLINT_DLL void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
+#endif
 
 PADIC_INLINE void padic_swap(padic_t op1, padic_t op2)
 {
@@ -291,8 +288,7 @@ FLINT_DLL char * _padic_get_str(char * str, const padic_t op, const fmpz_t p, en
 
 FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -306,9 +302,10 @@ FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t c
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
 #include "flint-impl.h"
+
 FLINT_DLL int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
 
 FLINT_DLL int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
@@ -324,12 +321,8 @@ PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
     return padic_fprint(stdout, op, ctx);
 }
 
-PADIC_INLINE void padic_debug(const padic_t op)
-{
-    printf("(");
-    fmpz_print(padic_unit(op)); 
-    printf(" " WORD_FMT "d " WORD_FMT "d)", padic_val(op), padic_prec(op));
-}
+FLINT_DLL void padic_debug(const padic_t op);
+
 #endif
 
 #ifdef __cplusplus

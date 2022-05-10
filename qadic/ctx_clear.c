@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qadic.h"
+#include "fmpz_vec.h"
+#include "padic.h"
 
 void qadic_ctx_clear(qadic_ctx_t ctx)
 {

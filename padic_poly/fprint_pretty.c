@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include "flint-impl.h"
+#include "fmpz.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 int _padic_poly_fprint_pretty(FILE * file,

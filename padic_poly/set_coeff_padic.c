@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
 #include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x, 
@@ -29,7 +31,7 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
 
     if (n + 1 > poly->length)
     {
-        mpn_zero((ulong_ptr) (poly->coeffs + poly->length), n - poly->length);
+        FLINT_MPN_ZERO(poly->coeffs + poly->length, n - poly->length);
         poly->length = n + 1;
     }
 

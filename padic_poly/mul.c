@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly_mini.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void _padic_poly_mul(fmpz *rop, slong *rval, slong N, 

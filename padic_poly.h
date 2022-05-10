@@ -18,7 +18,7 @@
 #define PADIC_POLY_INLINE static __inline__
 #endif
 
-#include "padic.h"
+#include "fmpz_mini.h"
 
 #ifdef __cplusplus
  extern "C" {

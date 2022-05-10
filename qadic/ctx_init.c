@@ -26,7 +26,7 @@
 # endif
 #endif
 #include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "padic.h"
 
 extern int flint_conway_polynomials [];
 

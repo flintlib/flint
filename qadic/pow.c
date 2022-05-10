@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_poly.h"
-#include "fmpz_mod_poly.h"
 #include "qadic.h"
 
 void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 

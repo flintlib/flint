@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "padic.h"
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)

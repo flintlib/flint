@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "padic.h"
 
 #define PADIC_RANDTEST_TRIES  10

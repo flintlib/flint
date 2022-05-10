@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "padic.h"
 
@@ -195,4 +196,3 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
-

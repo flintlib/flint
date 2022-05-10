@@ -18,8 +18,7 @@
 #define PADIC_MAT_INLINE static __inline__
 #endif
 
-#include "fmpz_mat.h" /* TODO: Remove this */
-#include "padic.h"
+#include "fmpz_mini.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -81,80 +80,24 @@ FLINT_DLL void _padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
 
+#define FMPZ_MAT_IS_EMPTY(mat) ((mat->r == 0) || (mat->c == 0))
+#define FMPZ_MAT_IS_SQUARE(mat) (mat->r == mat->c)
+
 PADIC_MAT_INLINE int
 padic_mat_is_empty(const padic_mat_t A)
 {
-    return fmpz_mat_is_empty(padic_mat(A));
+    return FMPZ_MAT_IS_EMPTY(padic_mat(A));
 }
 
 PADIC_MAT_INLINE int
 padic_mat_is_square(const padic_mat_t A)
 {
-    return fmpz_mat_is_square(padic_mat(A));
+    return FMPZ_MAT_IS_SQUARE(padic_mat(A));
 }
 
-PADIC_MAT_INLINE int 
-padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx)
-{
-    if (fmpz_mat_is_zero(padic_mat(A)))
-    {
-        return (padic_mat_val(A) == 0);
-    }
-    else
-    {
-        slong i, j;
-        int canonical = 0;
+FLINT_DLL int padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx);
 
-        for (i = 0; i < padic_mat(A)->r; i++)
-            for (j = 0; j < padic_mat(A)->c; j++)
-                if (!fmpz_divisible(padic_mat_entry(A, i, j), ctx->p))
-                    canonical = 1;
-        return canonical;
-    }
-}
-
-PADIC_MAT_INLINE int 
-padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
-{
-    if (padic_mat_is_empty(A))
-    {
-        return 1;
-    }
-    else if (fmpz_mat_is_zero(padic_mat(A)))
-    {
-        return (padic_mat_val(A) == 0);
-    }
-    else if (padic_mat_is_canonical(A, ctx))
-    {
-        const slong v = padic_mat_val(A);
-        const slong N = padic_mat_prec(A);
-
-        if (v >= N)
-        {
-            return 0;
-        }
-        else
-        {
-            slong i, j;
-            fmpz_t pN;
-            int reduced = 1;
-            int alloc = _padic_ctx_pow_ui(pN, N - v, ctx);
-
-            for (i = 0; (i < padic_mat_nrows(A)) && reduced; i++)
-                for (j = 0; (j < padic_mat_ncols(A)) && reduced; j++)
-                    reduced = (fmpz_cmp(padic_mat_entry(A, i, j), pN) < 0);
-
-            if (alloc)
-                fmpz_clear(pN);
-
-            return reduced;
-        }
-    }
-    else
-    {
-        return 0;
-    }
-}
+FLINT_DLL int padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Basic assignment **********************************************************/
 
@@ -201,8 +144,7 @@ FLINT_DLL int padic_mat_is_zero(const padic_mat_t A);
 
 /* Input and output  *********************************************************/
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -216,8 +158,8 @@ FLINT_DLL int padic_mat_is_zero(const padic_mat_t A);
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
 FLINT_DLL int padic_mat_fprint(FILE * file, 
                      const padic_mat_t A, const padic_ctx_t ctx);
 
@@ -235,6 +177,7 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 {
     return padic_mat_fprint_pretty(stdout, A, ctx);
 }
+
 #endif
 
 /* Random matrix generation  *************************************************/

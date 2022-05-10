@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "flint-impl.h"
+#include "fmpz.h"
 #include "fmpq.h"
 #include "padic_mat.h"
 

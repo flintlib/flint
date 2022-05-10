@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "padic.h"
 
 ulong padic_val_fac_ui_2(ulong N)

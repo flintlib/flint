@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "long_extras.h"
 #include "flint-impl.h"
+#include "fmpz.h"
 #include "fmpq.h"
 #include "padic.h"
 

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_set(padic_poly_t poly1, 

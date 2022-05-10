@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x)
@@ -45,7 +46,7 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong 
         else
         {
             fmpz_poly_neg(rop->num, op->num);
-            fmpz_poly_scalar_mul_ui(rop->den, op->den, - ((ulong) x));
+            fmpz_poly_scalar_mul_ui(rop->den, op->den, -((ulong) x));
         }
         fmpz_clear(cont);
         return;

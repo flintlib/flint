@@ -370,12 +370,6 @@ FLINT_DLL int fmpz_kronecker(const fmpz_t a, const fmpz_t n);
 FLINT_DLL void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride,
                fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n);
 
-FLINT_DLL slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
-
-FLINT_DLL slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
-
-FLINT_DLL int fmpz_divisible(const fmpz_t f, const fmpz_t g);
-
 FLINT_DLL int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL int fmpz_divisible_si(const fmpz_t f, slong g);

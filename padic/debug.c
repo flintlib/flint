@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -9,11 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define PADIC_INLINES_C
-
+#include <stdio.h>
+#include "flint-impl.h"
+#include "fmpz.h"
 #include "padic.h"
 
-void padic_get_unit(fmpz_t f, padic_t p)
+void
+padic_debug(const padic_t op)
 {
-   fmpz_set(f, padic_unit(p));
+    printf("(");
+    fmpz_print(padic_unit(op)); 
+    printf(" " WORD_FMT "d " WORD_FMT "d)", padic_val(op), padic_prec(op));
 }

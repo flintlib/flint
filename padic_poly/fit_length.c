@@ -11,6 +11,7 @@
 */
 
 #include "flint.h"
+#include "flint-impl.h"
 
 void padic_poly_fit_length(padic_poly_t poly, slong len)
 {
@@ -22,7 +23,7 @@ void padic_poly_fit_length(padic_poly_t poly, slong len)
         if (poly->alloc)           /* Realloc */
         {
             poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, len * sizeof(fmpz));
-            mpn_zero((ulong_ptr) (poly->coeffs + poly->alloc), len - poly->alloc);
+            FLINT_MPN_ZERO(poly->coeffs + poly->alloc, len - poly->alloc);
         }
         else                       /* Nothing allocated already so do it now */
         {

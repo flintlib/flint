@@ -25,9 +25,10 @@
 # endif
 #endif
 #include "flint-impl.h"
-#include "qadic.h"
+#include "fmpz_vec.h"
+#include "padic.h"
 
-int flint_conway_polynomials [] = {
+int flint_conway_polynomials[] = {
 #include "CPimport.h"
   0
 };

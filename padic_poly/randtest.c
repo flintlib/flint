@@ -11,6 +11,8 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 

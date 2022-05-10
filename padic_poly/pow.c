@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_poly.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void _padic_poly_pow(fmpz *rop, slong *rval, slong N, 

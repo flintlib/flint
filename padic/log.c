@@ -11,6 +11,7 @@
 
 #include "flint-impl.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "padic.h"
 
 /*

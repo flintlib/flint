@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 /*

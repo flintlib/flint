@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 

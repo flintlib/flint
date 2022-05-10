@@ -23,4 +23,3 @@ int padic_mat_equal(const padic_mat_t A, const padic_mat_t B)
         return 0;
     }
 }
-

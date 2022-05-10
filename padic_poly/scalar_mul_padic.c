@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N, 
@@ -56,4 +57,3 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
                                      op->coeffs, op->val, op->length, c, ctx);
     }
 }
-

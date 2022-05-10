@@ -10,6 +10,8 @@
 */
 
 #include <stdio.h>
+#include "flint-impl.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 int _padic_poly_fprint(FILE * file, const fmpz * poly, slong val, slong len,
