@@ -14,7 +14,7 @@
 #include "fft.h"
 
 /* negation mod 2^(FLINT_BITS*limbs) + 1 assuming normalized input */
-void mpn_negmod_2expp1(mp_limb_t* z, mp_limb_t* a, mp_size_t limbs)
+void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs)
 {
     if (a[limbs] != 0)
     {

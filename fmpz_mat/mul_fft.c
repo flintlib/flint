@@ -98,7 +98,7 @@ static mp_limb_t fft_combine_bits_signed(
     TMP_END;
 
     FLINT_ASSERT(f == 0 || f == 1);
-    return f;   
+    return f;
 }
 
 /*
@@ -465,7 +465,7 @@ coefficients bounded in absolute value by
     k*2^(depth+1)*2^(2*bits)
 
 We want this to be less than 2^(n*w) in the unsigned case and less than
-2^(n*w)/2 in the signed case.     
+2^(n*w)/2 in the signed case.
 */
 void _fmpz_mat_mul_fft(
     fmpz_mat_t C,
