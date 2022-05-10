@@ -91,5 +91,4 @@ TEMPLATE(T, poly_compose_horner) (TEMPLATE(T, poly_t) rop,
     }
 }
 
-
 #endif

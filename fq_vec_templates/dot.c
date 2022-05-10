@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, vec_dot) (TEMPLATE(T, t) res,
                        const TEMPLATE(T, struct) * vec1,

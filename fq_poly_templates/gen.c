@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_gen) (TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx)
 {

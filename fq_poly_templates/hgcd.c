@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 /*
     We define a whole bunch of macros here which essentially provide 
     the TEMPLATE(T, poly) functionality as far as the setting of coefficient 

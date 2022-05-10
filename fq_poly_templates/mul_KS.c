@@ -13,6 +13,8 @@
 
 #ifdef T
 
+#include "fmpz_poly.h"
+
 void
 _TEMPLATE(T, poly_mul_KS) (TEMPLATE(T, struct) * rop,
                            const TEMPLATE(T, struct) * op1, slong len1,

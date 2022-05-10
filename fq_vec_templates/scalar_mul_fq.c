@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * poly1,
                                   const TEMPLATE(T, struct) * poly2,
@@ -26,6 +24,5 @@ _TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * poly1,
         TEMPLATE(T, mul) (poly1 + i, poly2 + i, x, ctx);
     }
 }
-
 
 #endif

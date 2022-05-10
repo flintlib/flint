@@ -19,8 +19,7 @@ TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
     slong i;
 
     if (rows != 0)
-        mat->rows = (TEMPLATE(T, struct) **) flint_malloc(rows
-			                       * sizeof(TEMPLATE(T, struct) *));
+        mat->rows = flint_malloc(rows * sizeof(TEMPLATE(T, struct) *));
     else
         mat->rows = NULL;
 
@@ -28,8 +27,7 @@ TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
     {
         slong j;
 
-	mat->entries = (TEMPLATE(T, struct) *) flint_malloc(flint_mul_sizes(rows, cols)
-                                                * sizeof(TEMPLATE(T, struct)));
+        mat->entries = flint_malloc(flint_mul_sizes(rows, cols) * sizeof(TEMPLATE(T, struct)));
 
         for (i = 0; i < rows; i++)
         {
@@ -43,11 +41,11 @@ TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
     else
     {
         mat->entries = NULL;
-	if (rows != 0)
-	{
+        if (rows != 0)
+        {
             for (i = 0; i < rows; i++)
                 mat->rows[i] = NULL;
-	}
+        }
     }
 
     mat->r = rows;

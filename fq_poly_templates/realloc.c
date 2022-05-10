@@ -29,10 +29,7 @@ TEMPLATE(T, poly_realloc) (TEMPLATE(T, poly_t) poly, slong alloc,
         for (i = alloc; i < poly->alloc; i++)
             TEMPLATE(T, clear) (poly->coeffs + i, ctx);
 
-        poly->coeffs =
-            (TEMPLATE(T, struct) *) flint_realloc(poly->coeffs,
-                                                  alloc *
-                                                  sizeof(TEMPLATE(T, struct)));
+        poly->coeffs = flint_realloc(poly->coeffs, alloc * sizeof(TEMPLATE(T, struct)));
 
         for (i = poly->alloc; i < alloc; i++)
             TEMPLATE(T, init) (poly->coeffs + i, ctx);
@@ -42,9 +39,7 @@ TEMPLATE(T, poly_realloc) (TEMPLATE(T, poly_t) poly, slong alloc,
     }
     else                        /* Nothing allocated already so do it now */
     {
-        poly->coeffs =
-            (TEMPLATE(T, struct) *) flint_malloc(alloc *
-                                                 sizeof(TEMPLATE(T, struct)));
+        poly->coeffs = flint_malloc(alloc * sizeof(TEMPLATE(T, struct)));
 
         for (i = 0; i < alloc; i++)
             TEMPLATE(T, init) (poly->coeffs + i, ctx);

@@ -159,5 +159,4 @@ TEMPLATE(T, poly_powmod_fmpz_binexp_preinv) (TEMPLATE(T, poly_t) res,
     _TEMPLATE(T, poly_normalise) (res, ctx);
 }
 
-
 #endif

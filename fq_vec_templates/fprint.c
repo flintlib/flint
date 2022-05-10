@@ -13,9 +13,7 @@
 
 #ifdef T
 
-#include <stdio.h>
 #include "flint-impl.h"
-#include "templates.h"
 
 /*
     Recall the return value conventions for fputc (of type int) 
@@ -51,6 +49,5 @@ int _TEMPLATE(T, vec_fprint) (FILE * file,
 
     return r;
 }
-
 
 #endif

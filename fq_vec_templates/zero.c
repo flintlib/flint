@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, vec_zero) (TEMPLATE(T, struct) * vec,
                         slong len, const TEMPLATE(T, ctx_t) ctx)

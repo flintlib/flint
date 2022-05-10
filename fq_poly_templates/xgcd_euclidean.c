@@ -15,12 +15,12 @@
 
 slong
 _TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, struct) * G,
-                                   TEMPLATE(T, struct) * S,
-                                   TEMPLATE(T, struct) * T,
-                                   const TEMPLATE(T, struct) * A, slong lenA,
-                                   const TEMPLATE(T, struct) * B, slong lenB,
-                                   const TEMPLATE(T, t) invB,
-                                   const TEMPLATE(T, ctx_t) ctx)
+                                    TEMPLATE(T, struct) * S,
+                                    TEMPLATE(T, struct) * T,
+                                    const TEMPLATE(T, struct) * A, slong lenA,
+                                    const TEMPLATE(T, struct) * B, slong lenB,
+                                    const TEMPLATE(T, t) invB,
+                                    const TEMPLATE(T, ctx_t) ctx)
 {
     _TEMPLATE(T, vec_zero) (G, lenB, ctx);
     _TEMPLATE(T, vec_zero) (S, lenB - 1, ctx);
@@ -131,10 +131,10 @@ _TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, struct) * G,
 
 void
 TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
-                                  TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
-                                  const TEMPLATE(T, poly_t) A,
-                                  const TEMPLATE(T, poly_t) B,
-                                  const TEMPLATE(T, ctx_t) ctx)
+                                TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                                const TEMPLATE(T, poly_t) A,
+                                const TEMPLATE(T, poly_t) B,
+                                const TEMPLATE(T, ctx_t) ctx)
 {
     if (A->length < B->length)
     {
@@ -201,29 +201,29 @@ TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
 
             TEMPLATE(T, inv) (inv, TEMPLATE(T, poly_lead) (B, ctx), ctx);
             lenG = _TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, A->coeffs, lenA,
-                                                      B->coeffs, lenB, inv,
-                                                      ctx);
+                    B->coeffs, lenB, inv,
+                    ctx);
 
             if (G == A || G == B)
             {
                 _TEMPLATE(T, vec_clear) (G->coeffs, G->alloc, ctx);
                 G->coeffs = g;
                 G->alloc = FLINT_MIN(lenA, lenB);
-		G->length = G->alloc;
+                G->length = G->alloc;
             }
             if (S == A || S == B)
             {
                 _TEMPLATE(T, vec_clear) (S->coeffs, S->alloc, ctx);
                 S->coeffs = s;
                 S->alloc = lenB;
-		S->length = S->alloc;
+                S->length = S->alloc;
             }
             if (T == A || T == B)
             {
                 _TEMPLATE(T, vec_clear) (T->coeffs, T->alloc, ctx);
                 T->coeffs = t;
                 T->alloc = lenA;
-		T->length = T->alloc;
+                T->length = T->alloc;
             }
 
             _TEMPLATE(T, poly_set_length) (G, lenG, ctx);

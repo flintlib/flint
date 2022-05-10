@@ -31,5 +31,4 @@ TEMPLATE(T, mat_concat_vertical) (TEMPLATE(T, mat_t) res,
     }
 }
 
-
 #endif

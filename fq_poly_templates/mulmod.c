@@ -93,5 +93,4 @@ TEMPLATE(T, poly_mulmod) (TEMPLATE(T, poly_t) res,
     }
 }
 
-
 #endif

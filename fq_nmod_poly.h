@@ -22,7 +22,7 @@
 #define FQ_NMOD_POLY_INLINE static __inline__
 #endif
 
-#include "fq_nmod_vec.h"
+#include "fq_nmod_poly_mini.h"
 
 #define FQ_NMOD_POLY_DIVREM_DIVCONQUER_CUTOFF  16
 #define FQ_NMOD_COMPOSE_MOD_LENH_CUTOFF 6
@@ -34,7 +34,6 @@
 #define FQ_NMOD_POLY_HGCD_CUTOFF 25
 #define FQ_NMOD_POLY_SMALL_GCD_CUTOFF 110
 #define FQ_NMOD_POLY_GCD_CUTOFF 120
-
 
 #ifdef T
 #undef T

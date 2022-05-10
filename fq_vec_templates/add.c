@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, vec_add) (TEMPLATE(T, struct) * res,
                        const TEMPLATE(T, struct) * vec1,
@@ -24,6 +22,5 @@ _TEMPLATE(T, vec_add) (TEMPLATE(T, struct) * res,
     for (i = 0; i < len2; i++)
         TEMPLATE(T, add) (res + i, vec1 + i, vec2 + i, ctx);
 }
-
 
 #endif

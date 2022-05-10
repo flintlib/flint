@@ -13,7 +13,7 @@
 
 #ifdef T
 
-#include "ulong_extras.h"
+#include "ulong_extras_mini.h"
 
 void
 _TEMPLATE(T, poly_compose_mod_brent_kung) (

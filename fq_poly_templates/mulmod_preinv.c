@@ -126,5 +126,4 @@ TEMPLATE(T, poly_mulmod_preinv) (TEMPLATE(T, poly_t) res,
     }
 }
 
-
 #endif

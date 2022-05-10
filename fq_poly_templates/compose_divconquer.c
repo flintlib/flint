@@ -37,7 +37,7 @@ _TEMPLATE(T, poly_compose_divconquer) (
 
     /* Initialisation */
 
-    hlen = (slong *) flint_malloc(((len1 + 1) / 2) * sizeof(slong));
+    hlen = flint_malloc(((len1 + 1) / 2) * sizeof(slong));
 
     k = FLINT_CLOG2(len1) - 1;
 
@@ -55,8 +55,7 @@ _TEMPLATE(T, poly_compose_divconquer) (
         alloc += hlen[i];
 
     v = _TEMPLATE(T, vec_init) (alloc + 2 * powlen, ctx);
-    h = (TEMPLATE(T, struct) **) flint_malloc(((len1 + 1) / 2) *
-                                              sizeof(TEMPLATE(T, struct) *));
+    h = flint_malloc(((len1 + 1) / 2) * sizeof(TEMPLATE(T, struct) *));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
     {

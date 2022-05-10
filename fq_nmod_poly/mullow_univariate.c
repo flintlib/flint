@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_poly.h"
+#include "flint-impl.h"
+#include "nmod_poly.h"
+#include "fq_nmod_poly_mini.h"
 
 void
 _fq_nmod_poly_mullow_univariate (fq_nmod_struct * rop,
@@ -110,4 +112,3 @@ fq_nmod_poly_mullow_univariate (fq_nmod_poly_t rop,
         _fq_nmod_poly_normalise(rop, ctx);
     }
 }
-

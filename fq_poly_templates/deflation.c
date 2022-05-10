@@ -13,7 +13,7 @@
 
 #ifdef T
 
-#include "ulong_extras.h"
+#include "ulong_extras_mini.h"
 
 ulong
 TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,

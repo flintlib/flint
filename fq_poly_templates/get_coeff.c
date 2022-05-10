@@ -14,8 +14,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_get_coeff) (TEMPLATE(T, t) x, const TEMPLATE(T, poly_t) poly,
                              slong n, const TEMPLATE(T, ctx_t) ctx)

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE3(T, poly_evaluate, T) (TEMPLATE(T, t) rop,
                                  const TEMPLATE(T, struct) * op, slong len,

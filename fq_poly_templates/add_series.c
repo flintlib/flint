@@ -37,5 +37,4 @@ TEMPLATE(T, poly_add_series) (TEMPLATE(T, poly_t) res,
     _TEMPLATE(T, poly_normalise) (res, ctx);
 }
 
-
 #endif

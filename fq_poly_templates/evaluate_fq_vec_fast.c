@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)
     (TEMPLATE(T, struct) * vs,

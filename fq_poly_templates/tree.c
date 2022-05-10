@@ -107,7 +107,8 @@ _TEMPLATE(T, poly_tree_build)(TEMPLATE(T, poly_struct) ** tree,
                                    ctx);
             _TEMPLATE(T, poly_set_length)(pb, pa->length + (pa + 1)->length - 1,
                                           ctx);
-        } else if (left > 0)
+        }
+        else if (left > 0)
             TEMPLATE(T, poly_set)(pb, pa, ctx);
     }
 }

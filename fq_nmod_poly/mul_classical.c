@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_poly.h"
+#include "fq_nmod_poly_mini.h"
 
 void
 _fq_nmod_poly_mul_classical(fq_nmod_struct * rop,
@@ -86,4 +86,3 @@ fq_nmod_poly_mul_classical(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
 
     _fq_nmod_poly_set_length(rop, len, ctx);
 }
-
