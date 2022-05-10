@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod.h"
 
 void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)

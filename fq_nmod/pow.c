@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
+#include "fmpz.h"
 #include "fq_nmod.h"
 
 void _fq_nmod_pow(ulong *rop, const ulong *op, slong len, const fmpz_t e, 
@@ -20,12 +22,12 @@ void _fq_nmod_pow(ulong *rop, const ulong *op, slong len, const fmpz_t e,
     if (fmpz_is_zero(e))
     {
         rop[0] = WORD(1);
-        _nmod_vec_zero(rop + 1, 2 * d - 1 - 1);
+        _NMOD_VEC_ZERO(rop + 1, 2 * d - 1 - 1);
     }
     else if (fmpz_is_one(e))
     {
-        _nmod_vec_set(rop, op, len);
-        _nmod_vec_zero(rop + len, 2 * d - 1 - len);
+        _NMOD_VEC_SET(rop, op, len);
+        _NMOD_VEC_ZERO(rop + len, 2 * d - 1 - len);
     }
     else
     {
@@ -33,8 +35,8 @@ void _fq_nmod_pow(ulong *rop, const ulong *op, slong len, const fmpz_t e,
         ulong *v = _nmod_vec_init(2 * d - 1);
         ulong *R, *S, *T;
 
-        _nmod_vec_zero(v, 2 * d - 1);
-        _nmod_vec_zero(rop, 2 * d - 1);
+        _NMOD_VEC_ZERO(v, 2 * d - 1);
+        _NMOD_VEC_ZERO(rop, 2 * d - 1);
 
         /*
            Set bits to the bitmask with a 1 one place lower than the msb of e
@@ -110,10 +112,7 @@ void _fq_nmod_pow(ulong *rop, const ulong *op, slong len, const fmpz_t e,
 void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmod_ctx_t ctx)
 {
     if (fmpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (fq_nmod_pow).  e < 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "e < 0 in fq_nmod_pow\n");
 
     if (fmpz_is_zero(e))
     {
@@ -171,7 +170,6 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
         _nmod_poly_normalise(rop);
     }
 }
-
 
 /* TODO: Move into separate function / optimize */
 void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op, const ulong e, const fq_nmod_ctx_t ctx)

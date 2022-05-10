@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 
 void nmod_mat_charpoly(nmod_poly_t cp, const nmod_mat_t mat)

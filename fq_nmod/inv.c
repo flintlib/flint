@@ -11,6 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
+#include "nmod_poly.h"
 #include "fq_nmod.h"
 
 void _fq_nmod_inv(ulong *rop, const ulong *op, slong len,
@@ -21,7 +23,7 @@ void _fq_nmod_inv(ulong *rop, const ulong *op, slong len,
     if (len == 1)
     {
         rop[0] = n_invmod(op[0], ctx->mod.n);
-        _nmod_vec_zero(rop + 1, d - 1);
+        _NMOD_VEC_ZERO(rop + 1, d - 1);
     }
     else
     {
@@ -32,10 +34,7 @@ void _fq_nmod_inv(ulong *rop, const ulong *op, slong len,
 void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     if (fq_nmod_is_zero(op, ctx))
-    {
-        flint_printf("Exception (fq_nmod_inv).  Zero is not invertible.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "Zero is not invertible in fq_nmod_inv\n");
     else
     {
         const slong d = fq_nmod_ctx_degree(ctx);

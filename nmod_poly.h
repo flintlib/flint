@@ -219,8 +219,6 @@ ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, slong j)
     return (j >= poly->length) ? 0 : poly->coeffs[j];
 }
 
-FLINT_DLL void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c);
-
 /* Input and output  *********************************************************/
 
 FLINT_DLL char * nmod_poly_get_str(const nmod_poly_t poly);

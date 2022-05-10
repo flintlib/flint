@@ -11,9 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "fq_nmod.h"
 
 /* from qadic/ctx_init_conway.c */
@@ -66,18 +63,11 @@ void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
 {
     int result;
     if (fmpz_cmp_ui(p, 109987) > 0)
-    {
-        flint_printf("Exception (fq_nmod_ctx_init_conway).  Conway polynomials \n");
-        flint_printf("are only available for primes up to 109987.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "fq_nmod_ctx_init_conway is only available for primes up to 109987\n");
 
     result = _fq_nmod_ctx_init_conway(ctx, p, d, var);
-    if (!result) {
-        flint_printf("Exception (fq_nmod_ctx_init_conway).  The polynomial for \n(p,d) = (");
-        fmpz_print(p), flint_printf(",%wd) is not present in the database.\n", d);
-        flint_abort();
-    }
+    if (!result)
+        flint_throw(FLINT_ERROR, "The Conway polynomial is not present in the database for fq_nmod_ctx_init_conway\n");
 
     ctx->is_conway = 1;
 }

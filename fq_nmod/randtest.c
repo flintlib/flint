@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fq_nmod.h"
 
 void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
@@ -67,4 +68,3 @@ void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_
     if (fq_nmod_is_zero(rop, ctx))
         fq_nmod_one(rop, ctx);
 }
-

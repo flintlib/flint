@@ -35,6 +35,7 @@
 #endif
 
 #include "flint-impl.h"
+#include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"

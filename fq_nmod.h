@@ -24,7 +24,7 @@
 
 #include "fmpz_mini.h"
 #include "nmod.h"
-#include "nmod_poly.h"
+#include "nmod_poly_mini.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
@@ -276,8 +276,7 @@ FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 
 /* Output ********************************************************************/
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -291,8 +290,10 @@ FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
+#include "nmod_poly.h"
+
 FLINT_DLL int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx);
 
 FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
@@ -323,6 +324,7 @@ void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print_pretty(op, ctx->var);
 }
+
 #endif
 
 FLINT_DLL char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx);

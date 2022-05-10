@@ -11,7 +11,9 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include "ulong_extras.h"
 #include "nmod.h"
+#include "nmod_discrete_log_pohlig_hellman.h"
 #include "fmpz.h"
 
 

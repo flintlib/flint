@@ -20,7 +20,7 @@
 #define FQ_NMOD_VEC_INLINE static __inline__
 #endif
 
-#include "fq_nmod.h"
+#include "flint.h"
 
 #define FQ_NMOD_VEC_NORM(vec, i, ctx)                    \
 do {                                                \

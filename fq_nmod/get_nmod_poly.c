@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod.h"
+#include "nmod_poly_mini.h"
 
 void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b,
                                                        const fq_nmod_ctx_t ctx)

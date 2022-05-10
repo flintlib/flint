@@ -33,6 +33,4 @@ void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx)
     _NMOD_VEC_SET(R, r, ctx->modulus->length - 1);
     _nmod_vec_clear(q);
     _nmod_vec_clear(r);
-
 }
-

@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "flint-impl.h"
 #include "mpn_extras.h"
 #include "nmod.h"
@@ -216,4 +217,3 @@ ulong nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B)
 
 #undef __set
 #undef __rem
-

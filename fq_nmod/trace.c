@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-impl.h"
+#include "ulong_extras.h"
 #include "fq_nmod.h"
 
 void _fq_nmod_trace(fmpz_t rop2, const ulong *op, slong len, 
@@ -21,7 +23,7 @@ void _fq_nmod_trace(fmpz_t rop2, const ulong *op, slong len,
     ulong *t, rop;
 
     t = _nmod_vec_init(d);
-    _nmod_vec_zero(t, d);
+    _NMOD_VEC_ZERO(t, d);
 
     t[0] = n_mod2_preinv(d, ctx->mod.n, ctx->mod.ninv);
 
@@ -68,4 +70,3 @@ void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     _fq_nmod_trace(rop, op->coeffs, op->length, ctx);
 }
-

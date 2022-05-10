@@ -12,8 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_poly.h"
 #include "fq_nmod.h"
-#include "nmod_mat.h"
 
 /*
     This computes the norm on $\mathbf{F}_q$.
@@ -71,4 +71,3 @@ void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
         _fq_nmod_norm(rop, op->coeffs, op->length, ctx); 
     }
 }
-

@@ -107,8 +107,7 @@ FLINT_DLL void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state)
 FLINT_DLL void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -122,8 +121,8 @@ FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
 FLINT_DLL int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat);
 
 NMOD_MAT_INLINE void nmod_mat_print_pretty(const nmod_mat_t mat)
@@ -140,6 +139,7 @@ NMOD_MAT_INLINE int nmod_mat_fprint(FILE * f, const nmod_mat_t mat)
 {
     return nmod_mat_fprint_pretty(f, mat);
 }
+
 #endif
 
 FLINT_DLL int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);

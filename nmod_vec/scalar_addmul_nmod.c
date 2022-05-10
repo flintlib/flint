@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod.h"
 
 void _nmod_vec_scalar_addmul_nmod_fullword(ulong_ptr res, ulong_srcptr vec, 

@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
                  const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx)

@@ -20,7 +20,8 @@ void _nmod_vec_add(ulong_ptr res, ulong_srcptr vec1,
     {
         for (i = 0 ; i < len; i++)
         res[i] = _nmod_add(vec1[i], vec2[i], mod);
-    } else
+    }
+    else
     {
         for (i = 0 ; i < len; i++)
         res[i] = nmod_add(vec1[i], vec2[i], mod);

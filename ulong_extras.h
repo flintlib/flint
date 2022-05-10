@@ -21,10 +21,10 @@
 #define ULONG_EXTRAS_INLINE static __inline__
 #endif
 
-#include "flint.h"
+#include "ulong_extras_mini.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct pair_s
@@ -184,17 +184,6 @@ double n_precompute_inverse(ulong n)
    return (double) 1 / (double) n;
 }
 
-ULONG_EXTRAS_INLINE
-ulong n_preinvert_limb(ulong n)
-{
-   ulong norm, ninv;
-
-   count_leading_zeros(norm, n);
-   invert_limb(ninv, n << norm);
-
-   return ninv;
-}
-
 FLINT_DLL ulong n_mod_precomp(ulong a, ulong n, double ninv);
 
 FLINT_DLL ulong n_mod2_precomp(ulong a, ulong n, double ninv);
@@ -206,27 +195,11 @@ FLINT_DLL ulong n_divrem2_preinv(ulong_ptr q, ulong a, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
 
-FLINT_DLL ulong n_mod2_preinv(ulong a, ulong n, ulong ninv);
-
-FLINT_DLL ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, 
-                                        ulong n, ulong ninv);
-
 FLINT_DLL ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, 
                         ulong a_lo, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_mulmod_precomp(ulong a, ulong b, 
                                            ulong n, double ninv);
-
-ULONG_EXTRAS_INLINE
-ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
-{
-    ulong p1, p2;
-
-    FLINT_ASSERT(n != 0);
-
-    umul_ppmm(p1, p2, a, b);
-    return n_ll_mod_preinv(p1, p2, n, ninv);
-}
 
 ULONG_EXTRAS_INLINE
 ulong n_mulmod2(ulong a, ulong b, ulong n)
@@ -263,8 +236,6 @@ FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp,
 */
 FLINT_DLL ulong n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv);
 
-FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv);
-
 FLINT_DLL ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n, 
                                                        ulong ninv, ulong norm);
 
@@ -291,16 +262,6 @@ ulong n_addmod(ulong x, ulong y, ulong n)
 }
 
 ULONG_EXTRAS_INLINE
-ulong n_submod(ulong x, ulong y, ulong n)
-{
-    FLINT_ASSERT(x < n);
-    FLINT_ASSERT(y < n);
-    FLINT_ASSERT(n != 0);
-
-    return (y > x ? x - y + n : x - y);
-}
-
-ULONG_EXTRAS_INLINE
 ulong n_negmod(ulong x, ulong n)
 {
     FLINT_ASSERT(x < n);
@@ -318,23 +279,7 @@ FLINT_DLL slong n_sqrtmod_primepow(ulong_ptr* sqrt, ulong a,
 
 FLINT_DLL slong n_sqrtmodn(ulong_ptr* sqrt, ulong a, n_factor_t * fac);
 
-FLINT_DLL ulong n_gcd(ulong x, ulong y);
-
 FLINT_DLL ulong n_xgcd(ulong_ptr a, ulong_ptr b, ulong x, ulong y);
-
-FLINT_DLL ulong n_gcdinv(ulong_ptr a, ulong x, ulong y);
-
-ULONG_EXTRAS_INLINE
-ulong n_invmod(ulong x, ulong y)
-{
-   ulong r, g;
-
-   g = n_gcdinv(&r, x, y);
-   if (g != 1)
-      flint_throw(FLINT_IMPINV, "Cannot invert modulo in n_invmod\n");
-
-   return r;
-}
 
 FLINT_DLL ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2);
 
@@ -345,8 +290,6 @@ FLINT_DLL int n_jacobi(slong x, ulong y);
 FLINT_DLL int n_jacobi_unsigned(ulong x, ulong y);
 
 FLINT_DLL int _n_jacobi_unsigned(ulong x, ulong y, unsigned int r);
-
-FLINT_DLL ulong n_sqrt(ulong a);
 
 FLINT_DLL ulong n_sqrtrem(ulong_ptr r, ulong a);
 

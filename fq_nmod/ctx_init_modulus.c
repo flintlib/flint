@@ -9,9 +9,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strcpy
+# ifdef __GNUC__
+#  define strcpy __builtin_strcpy
+# else
+#  include <string.h>
+# endif
+#endif
+#include "nmod_poly.h"
 #include "fq_nmod.h"
 
 void

@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 int
 TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
                              const TEMPLATE(T, ctx_t) ctx)

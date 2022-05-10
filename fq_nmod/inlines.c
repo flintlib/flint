@@ -11,15 +11,6 @@
 
 #define FQ_NMOD_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fq_nmod.h"
 
 void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx)

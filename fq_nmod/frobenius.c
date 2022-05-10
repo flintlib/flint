@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "flint-impl.h"
+#include "nmod_vec.h"
 #include "fq_nmod.h"
 
 /*
@@ -25,8 +26,8 @@ void _fq_nmod_frobenius(ulong *rop, const ulong *op, slong len, slong e,
 
     if (len == 1)  /* op is in Fp, not just Fq */
     {
-        _nmod_vec_set(rop, op, len);
-        _nmod_vec_zero(rop + len, (2*d - 1)  - len);
+        _NMOD_VEC_SET(rop, op, len);
+        _NMOD_VEC_ZERO(rop + len, (2*d - 1)  - len);
     }
     else
     {
@@ -85,4 +86,3 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
         _nmod_poly_normalise(rop);
     }
 }
-

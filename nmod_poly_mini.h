@@ -70,6 +70,8 @@ void _nmod_poly_normalise(nmod_poly_t poly)
 
 FLINT_DLL void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b);
 
+FLINT_DLL void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c);
+
 NMOD_POLY_MINI_INLINE
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {

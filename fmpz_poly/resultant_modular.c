@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
@@ -157,4 +158,3 @@ fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
             fmpz_neg(res, res);
    }
 }
-
