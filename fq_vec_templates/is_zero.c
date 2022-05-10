@@ -25,5 +25,4 @@ _TEMPLATE(T, vec_is_zero) (const TEMPLATE(T, struct) * vec, slong len,
     return 1;
 }
 
-
 #endif

@@ -22,6 +22,7 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "fmpz_mini.h"
 #include "fmpz_poly_mini.h"
 
 /* Data types and context ****************************************************/
@@ -72,8 +73,7 @@ FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
     fmpz_pow_ui(f, fq_ctx_prime(ctx), fq_ctx_degree(ctx));
 }
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -87,45 +87,15 @@ FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
 
-#include "flint-impl.h"
-#include "fmpz_mod_poly.h"
-
-FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
-{
-    int r;
-
-    r = fprintf(file, "p = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_fprint(file, fq_ctx_prime(ctx));
-    if (r <= 0)
-        return r;
-
-    r = fprintf(file, "\nd = " WORD_FMT "d\n", fq_ctx_degree(ctx));
-    if (r <= 0)
-        return r;
-
-    r = fprintf(file, "f(X) = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_mod_poly_fprint_pretty(file, ctx->modulus, "X", ctx->ctxp);
-    if (r <= 0)
-        return r;
-
-    r = fprintf(file, "\n");
-
-    return r;
-}
+FLINT_DLL int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx);
 
 FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 {
     fq_ctx_fprint(stdout, ctx);
 }
+
 #endif
 
 /* Memory managment  *********************************************************/
@@ -306,6 +276,9 @@ FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ct
   || defined (__STDIO_LOADED)       \
   || defined (_STDIO)               \
   || defined (__DEFINED_FILE)
+
+#include "fmpz_poly.h"
+
 FQ_INLINE
 int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
@@ -333,6 +306,7 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 FLINT_DLL char * fq_get_str(const fq_t op, const fq_ctx_t ctx);
 
 FLINT_DLL char * fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx);
+
 #endif
 
 /* Special functions *********************************************************/

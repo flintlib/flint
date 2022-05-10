@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_add) (TEMPLATE(T, mat_t) res,
                       const TEMPLATE(T, mat_t) mat1,
@@ -29,6 +27,5 @@ TEMPLATE(T, mat_add) (TEMPLATE(T, mat_t) res,
         _TEMPLATE(T, vec_add) (res->rows[i], mat1->rows[i], mat2->rows[i],
                                res->c, ctx);
 }
-
 
 #endif

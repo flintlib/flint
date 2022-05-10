@@ -11,7 +11,8 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 
 void
 _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (
@@ -141,18 +142,10 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (TEMPLATE(T, poly_t) res,
     flint_bitcnt_t bits;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod_fmpz_sliding_preinv", T);
-        flint_printf(": divide by zero\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_powmod_fmpz_sliding_preinv\n");
 
     if (fmpz_sgn(e) < 0)
-    {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod_fmpz_sliding_preinv:", T);
-        flint_printf(" negative exp not implemented\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Negative exp not implemented in " TEMPLATE_STR(T) "_poly_powmod_fmpz_sliding_preinv\n");
 
     if (len >= lenf)
     {

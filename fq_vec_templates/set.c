@@ -24,5 +24,4 @@ _TEMPLATE(T, vec_set) (TEMPLATE(T, struct) * vec1,
         TEMPLATE(T, set) (vec1 + i, vec2 + i, ctx);
 }
 
-
 #endif

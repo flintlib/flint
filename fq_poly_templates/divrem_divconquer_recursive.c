@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_divrem_divconquer_recursive) (
     TEMPLATE(T, struct) * Q,
@@ -129,6 +127,5 @@ _TEMPLATE(T, poly_divrem_divconquer_recursive) (
          */
     }
 }
-
 
 #endif

@@ -12,10 +12,15 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <string.h>
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
 #include <math.h>
+#include "flint-impl.h"
 
 char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
                                          slong len, const char *x,
@@ -38,7 +43,7 @@ char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
         return TEMPLATE(T, get_str_pretty) (poly, ctx);
     }
 
-    coeffstrs = (char **)flint_malloc(len * sizeof(char *));
+    coeffstrs = flint_malloc(len * sizeof(char *));
 
     nz = 0;
     bound = 1;
@@ -59,12 +64,12 @@ char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
     {
     }
     else
-        off += flint_sprintf(str + off, "(%s)*", coeffstrs[i]);
+        off += sprintf(str + off, "(%s)*", coeffstrs[i]);
 
     if (i > 1)
-        off += flint_sprintf(str + off, "%s^%wd", x, i);
+        off += sprintf(str + off, "%s^" WORD_FMT "d", x, i);
     else
-        off += flint_sprintf(str + off, "%s", x);
+        off += sprintf(str + off, "%s", x);
 
     for (--i; i > 0; --i)
     {
@@ -72,21 +77,21 @@ char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
             continue;
         if (!TEMPLATE(T, is_one) (poly + i, ctx))
         {
-            off += flint_sprintf(str + off, "+(%s)*", coeffstrs[i]);
+            off += sprintf(str + off, "+(%s)*", coeffstrs[i]);
         }
         else
         {
-            off += flint_sprintf(str + off, "+");
+            off += sprintf(str + off, "+");
         }
         if (i > 1)
-            off += flint_sprintf(str + off, "%s^%wd", x, i);
+            off += sprintf(str + off, "%s^" WORD_FMT "d", x, i);
         else
-            off += flint_sprintf(str + off, "%s", x);
+            off += sprintf(str + off, "%s", x);
     }
 
     if (!TEMPLATE(T, is_zero) (poly + i, ctx))
     {
-        off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
+        off += sprintf(str + off, "+(%s)", coeffstrs[i]);
     }
 
     for (i = 0; i < len; i++)
@@ -107,6 +112,5 @@ char *TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, poly_t) poly,
     return _TEMPLATE(T, poly_get_str_pretty) (poly->coeffs, poly->length, x,
                                               ctx);
 }
-
 
 #endif

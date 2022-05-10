@@ -11,11 +11,10 @@
 
 #ifdef T
 
-#include "templates.h"
-
-FLINT_DLL void TEMPLATE(T, poly_set_fmpz_mod_poly)(TEMPLATE(T, poly_t) rop,
-                                                   const fmpz_mod_poly_t op,
-                                                   const TEMPLATE(T, ctx_t) ctx)
+void
+TEMPLATE(T, poly_set_fmpz_mod_poly)(TEMPLATE(T, poly_t) rop,
+                                    const fmpz_mod_poly_t op,
+                                    const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, len = op->length;
 
@@ -25,6 +24,5 @@ FLINT_DLL void TEMPLATE(T, poly_set_fmpz_mod_poly)(TEMPLATE(T, poly_t) rop,
     for (i = 0; i < len; i++)
         TEMPLATE(T, set_fmpz)(rop->coeffs + i, op->coeffs + i, ctx);
 }
-
 
 #endif

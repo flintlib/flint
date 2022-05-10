@@ -10,7 +10,7 @@
 */
 
 #include "fq.h"
-#include "fq_mat.h"
+#include "fq_mat_mini.h"
 
 slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L, 
                                          slong m, const fq_ctx_t ctx)
@@ -62,4 +62,3 @@ slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L,
    
    return res;
 }
-

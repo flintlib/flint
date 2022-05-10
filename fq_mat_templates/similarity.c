@@ -10,7 +10,6 @@
 */
 
 #ifdef T
-#include "templates.h"
 
 void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
                                 TEMPLATE(T, t) d, const TEMPLATE(T, ctx_t) ctx)

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 int
 _TEMPLATE(T, poly_divides) (
     TEMPLATE(T, struct) * Q,
@@ -42,10 +40,7 @@ TEMPLATE(T, poly_divides) (TEMPLATE(T, poly_t) Q,
                            const TEMPLATE(T, ctx_t) ctx)
 {
     if (TEMPLATE(T, poly_is_zero) (B, ctx))
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_divides).  B is zero.\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_divides\n");
 
     if (TEMPLATE(T, poly_is_zero) (A, ctx))
     {
@@ -93,6 +88,5 @@ TEMPLATE(T, poly_divides) (TEMPLATE(T, poly_t) Q,
         return ans;
     }
 }
-
 
 #endif

@@ -11,12 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 void
 _TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, struct) * res,
                                      const TEMPLATE(T, struct) * poly, ulong e,
@@ -77,11 +71,7 @@ TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, poly_t) res,
     int qcopy = 0;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF
-            ("Exception: %s_poly_powmod_ui_binexp: divide by zero\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_powmod_ui_binexp\n");
 
     if (len >= lenf)
     {

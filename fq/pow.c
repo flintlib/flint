@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fq.h"
 
 void
@@ -111,10 +113,7 @@ void
 fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
 {
     if (fmpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (fq_pow).  e < 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "e < 0 in fq_pow\n");
 
     if (fmpz_is_zero(e))
     {

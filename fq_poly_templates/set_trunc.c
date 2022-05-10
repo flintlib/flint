@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_set_trunc) (TEMPLATE(T, poly_t) poly1, TEMPLATE(T, poly_t) poly2, slong len,
                             const TEMPLATE(T, ctx_t) ctx)
@@ -35,6 +33,5 @@ TEMPLATE(T, poly_set_trunc) (TEMPLATE(T, poly_t) poly1, TEMPLATE(T, poly_t) poly
         _TEMPLATE(T, poly_normalise) (poly1, ctx);
     }
 }
-
 
 #endif

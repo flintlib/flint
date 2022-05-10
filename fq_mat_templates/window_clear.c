@@ -1,8 +1,8 @@
 /*
     Copyright (C) 2008, 2009 William Hart.
-    Copyright (C) 2008, Richard Howell-Peak
-    Copyright (C) 2008, Martin Albrecht
-    Copyright (C) 2010, Fredrik Johansson
+    Copyright (C) 2008 Richard Howell-Peak
+    Copyright (C) 2008 Martin Albrecht
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -14,8 +14,6 @@
 */
 
 #ifdef T
-
-#include "templates.h"
 
 void
 TEMPLATE(T, mat_window_clear) (TEMPLATE(T, mat_t) window,

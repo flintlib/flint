@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void TEMPLATE(T, mat_mul_vec)(TEMPLATE(T, struct) * c,
                                     const TEMPLATE(T, mat_t) A,
                                     const TEMPLATE(T, struct) * b, slong blen,

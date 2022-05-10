@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_randtest_monic) (TEMPLATE(T, poly_t) f, flint_rand_t state,
                                   slong len, const TEMPLATE(T, ctx_t) ctx)
@@ -30,6 +28,5 @@ TEMPLATE(T, poly_randtest_monic) (TEMPLATE(T, poly_t) f, flint_rand_t state,
     _TEMPLATE(T, poly_set_length) (f, len, ctx);
     _TEMPLATE(T, poly_normalise) (f, ctx);
 }
-
 
 #endif

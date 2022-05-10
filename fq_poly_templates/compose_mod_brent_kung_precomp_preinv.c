@@ -13,10 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <gmp.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 void
@@ -78,18 +74,10 @@ TEMPLATE(T, poly_precompute_matrix) (TEMPLATE(T, mat_t) A,
     TEMPLATE(T, struct) * ptr1;
 
     if (len2 == 0)
-    {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_precompute_matrix\n");
 
     if (A->r != m || A->c != len)
-    {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung). Wrong dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Wrong dimensions in " TEMPLATE_STR(T) "_poly_precompute_matrix\n");
 
     if (len2 == 1)
     {
@@ -202,22 +190,10 @@ TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv) (
     slong len = len3 - 1;
 
     if (len3 == 0)
-    {
-        TEMPLATE_PRINTF
-            ("Exception (%s_poly_compose_mod_brent_kung). Division by zero.\n",
-             T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_compose_mod_brent_kung_precomp_preinv\n");
 
     if (len1 >= len3)
-    {
-        TEMPLATE_PRINTF
-            ("Exception (%s_poly_compose_brent_kung). The degree of the \n",
-             T);
-        flint_printf
-            ("first polynomial must be smaller than that of the modulus.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Degree of first polynomial must be smaller than modulus in " TEMPLATE_STR(T) "_poly_compose_mod_brent_kung_precomp_preinv\n");
 
     if (len1 == 0 || len3 == 1)
     {

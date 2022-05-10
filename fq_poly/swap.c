@@ -11,9 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
-
-
+#include "flint.h"
+#include "templates.h"
 
 #ifdef T
 #undef T

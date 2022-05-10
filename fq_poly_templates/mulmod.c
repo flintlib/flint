@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_mulmod) (TEMPLATE(T, struct) * res,
                            const TEMPLATE(T, struct) * poly1, slong len1,
@@ -61,10 +59,7 @@ TEMPLATE(T, poly_mulmod) (TEMPLATE(T, poly_t) res,
     len2 = poly2->length;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF("Exception: %s_poly_mulmod: divide by zero\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_mulmod\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {

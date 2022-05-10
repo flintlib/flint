@@ -64,5 +64,4 @@ TEMPLATE3(T, poly_evaluate, T) (TEMPLATE(T, t) rop,
     }
 }
 
-
 #endif

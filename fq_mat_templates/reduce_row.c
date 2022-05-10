@@ -10,7 +10,6 @@
 */
 
 #ifdef T
-#include "templates.h"
 
 slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L, 
                                          slong m, const TEMPLATE(T, ctx_t) ctx)

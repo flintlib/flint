@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_submul) (TEMPLATE(T, mat_t) D,
                          const TEMPLATE(T, mat_t) C,
@@ -27,6 +25,5 @@ TEMPLATE(T, mat_submul) (TEMPLATE(T, mat_t) D,
     TEMPLATE(T, mat_sub) (D, C, tmp, ctx);
     TEMPLATE(T, mat_clear) (tmp, ctx);
 }
-
 
 #endif

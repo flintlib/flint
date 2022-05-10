@@ -9,11 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
+#ifndef strcpy
+# ifdef __GNUC__
+#  define strcpy __builtin_strcpy
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
 
-#include "fq.h"
-#include "fq_poly.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 
 void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,
                                     const fmpz_mod_ctx_t ctxp, const char *var)

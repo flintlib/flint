@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007, David Howden.
+    Copyright (C) 2007 David Howden.
     Copyright (C) 2010 William Hart
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
@@ -12,9 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
-
-
+#include "fq_poly_mini.h"
 
 #ifdef T
 #undef T

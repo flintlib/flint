@@ -54,5 +54,4 @@ TEMPLATE(T, poly_equal_trunc) (const TEMPLATE(T, poly_t) op1,
     return 1;
 }
 
-
 #endif

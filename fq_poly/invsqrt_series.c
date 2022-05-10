@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_vec.h"
 #include "fq_poly.h"
-
 
 #ifdef T
 #undef T

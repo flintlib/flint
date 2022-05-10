@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 /*
     TODO:  When op has only one non-zero term, this 
     function would omit the parentheses.
@@ -44,11 +42,11 @@ _TEMPLATE(T, poly_fprint_pretty) (FILE * file,
     else if (len == 2)
     {
         if (TEMPLATE(T, is_one) (poly + 1, ctx))
-            flint_fprintf(file, "%s", x);
+            fprintf(file, "%s", x);
         else
         {
             __TEMPLATE(T, print) (file, poly + 1, ctx);
-            flint_fprintf(file, "*%s", x);
+            fprintf(file, "*%s", x);
         }
         if (!TEMPLATE(T, is_zero) (poly + 0, ctx))
         {
@@ -62,11 +60,11 @@ _TEMPLATE(T, poly_fprint_pretty) (FILE * file,
 
         {
             if (TEMPLATE(T, is_one) (poly + i, ctx))
-                flint_fprintf(file, "%s^%wd", x, i);
+                fprintf(file, "%s^" WORD_FMT "d", x, i);
             else
             {
                 __TEMPLATE(T, print) (file, poly + i, ctx);
-                flint_fprintf(file, "*%s^%wd", x, i);
+                fprintf(file, "*%s^" WORD_FMT "d", x, i);
             }
             --i;
         }
@@ -77,12 +75,12 @@ _TEMPLATE(T, poly_fprint_pretty) (FILE * file,
                 continue;
 
             if (TEMPLATE(T, is_one) (poly + i, ctx))
-                flint_fprintf(file, "+%s^%wd", x, i);
+                fprintf(file, "+%s^" WORD_FMT "d", x, i);
             else
             {
                 fputc('+', file);
                 __TEMPLATE(T, print) (file, poly + i, ctx);
-                flint_fprintf(file, "*%s^%wd", x, i);
+                fprintf(file, "*%s^" WORD_FMT "d", x, i);
             }
         }
 
@@ -118,6 +116,5 @@ TEMPLATE(T, poly_fprint_pretty) (FILE * file, const TEMPLATE(T, poly_t) poly,
     return _TEMPLATE(T, poly_fprint_pretty) (file, poly->coeffs, poly->length,
                                              x, ctx);
 }
-
 
 #endif

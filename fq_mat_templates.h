@@ -12,20 +12,13 @@
 
 #ifdef T
 
-#include "flint.h"
 #include "templates.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Memory management  ********************************************************/
-
-FLINT_DLL void TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong cols,
-                      const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) src,
-                          const TEMPLATE(T, ctx_t) ctx);
 
 FQ_MAT_TEMPLATES_INLINE slong
 TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat ,
@@ -39,12 +32,6 @@ TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
                        const TEMPLATE(T, ctx_t) ctx)
 {
     return mat->c;
-}
-
-FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
-TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
-{
-    return mat->rows[i] + j;
 }
 
 FQ_MAT_TEMPLATES_INLINE void
@@ -69,11 +56,6 @@ TEMPLATE(T, mat_swap_entrywise)(TEMPLATE(T, mat_t) mat1,
             TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat2, i, j),
 			      TEMPLATE(T, mat_entry)(mat1, i, j), ctx);
 }
-
-FLINT_DLL void TEMPLATE(T, mat_set)(TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
-                     const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void TEMPLATE(T, mat_clear)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1,
                        const TEMPLATE(T, mat_t) mat2,
@@ -179,12 +161,6 @@ TEMPLATE(T, mat_invert_cols)(TEMPLATE(T, mat_t) mat, slong * perm, const TEMPLAT
         }
     }
 }
-
-/* Assignment  ***************************************************************/
-
-FLINT_DLL void TEMPLATE(T, mat_zero)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void TEMPLATE(T, mat_one)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
 /* Conversions ***************************************************************/
 
@@ -306,11 +282,6 @@ FLINT_DLL void TEMPLATE(T, mat_submul)(TEMPLATE(T, mat_t) D,
 
 /* Multiplication */
 
-FLINT_DLL void TEMPLATE(T, mat_mul)(TEMPLATE(T, mat_t) C,
-                     const TEMPLATE(T, mat_t) A,
-                     const TEMPLATE(T, mat_t) B,
-                     const TEMPLATE(T, ctx_t) ctx);
-
 FLINT_DLL void TEMPLATE(T, mat_mul_classical)(TEMPLATE(T, mat_t) C,
                                const TEMPLATE(T, mat_t) A,
                                const TEMPLATE(T, mat_t) B,
@@ -404,18 +375,6 @@ FLINT_DLL void TEMPLATE(T, mat_vec_mul_ptr)(TEMPLATE(T, struct) * const * c,
                             const TEMPLATE(T, struct) * const * a, slong alen,
                             const TEMPLATE(T, mat_t) B,
                             const TEMPLATE(T, ctx_t) ctx);
-
-/* Nonsingular solving *******************************************************/
-
-FLINT_DLL int TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X,
-               const TEMPLATE(T, mat_t A), const TEMPLATE(T, mat_t) C,
-                                                 const TEMPLATE(T, ctx_t) ctx);
-
-/* Solving *******************************************************************/
-
-FLINT_DLL int TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X,
-                const TEMPLATE(T, mat_t) A, const TEMPLATE(T, mat_t) B,
-                                                 const TEMPLATE(T, ctx_t) ctx);
 
 /* Transforms ****************************************************************/
 

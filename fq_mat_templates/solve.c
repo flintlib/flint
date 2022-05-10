@@ -10,7 +10,6 @@
 */
 
 #ifdef T
-#include "templates.h"
 
 int
 TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,

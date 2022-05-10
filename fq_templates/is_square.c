@@ -11,6 +11,7 @@
 
 #ifdef T
 
+#include "fmpz.h"
 #include "templates.h"
 
 int TEMPLATE(T, is_square)(const TEMPLATE(T, t) op,

@@ -11,7 +11,8 @@
 
 #ifdef T
 
-#include "templates.h"
+#define NMOD_MAT_ENTRY(mat, i, j)    \
+    ((mat)->rows)[i][j]
 
 void
 TEMPLATE(T, mat_set_nmod_mat) (TEMPLATE(T, mat_t) mat1,
@@ -26,7 +27,7 @@ TEMPLATE(T, mat_set_nmod_mat) (TEMPLATE(T, mat_t) mat1,
     {
         for (j = 0; j < mat1->c; j++)
         {
-            TEMPLATE(T, set_ui)(t, nmod_mat_entry(mat2, i, j), ctx);
+            TEMPLATE(T, set_ui)(t, NMOD_MAT_ENTRY(mat2, i, j), ctx);
             TEMPLATE(T, mat_entry_set)(mat1, i, j, t, ctx);
         }
     }

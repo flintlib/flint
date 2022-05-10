@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 int TEMPLATE(T, mat_equal) (const TEMPLATE(T, mat_t) mat1,
                             const TEMPLATE(T, mat_t) mat2,
                             const TEMPLATE(T, ctx_t) ctx)
@@ -39,6 +37,5 @@ int TEMPLATE(T, mat_equal) (const TEMPLATE(T, mat_t) mat1,
 
     return 1;
 }
-
 
 #endif

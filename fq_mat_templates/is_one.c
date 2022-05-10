@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 int
 TEMPLATE(T, mat_is_one) (const TEMPLATE(T, mat_t) mat,
                           const TEMPLATE(T, ctx_t) ctx)

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 static void 
 _TEMPLATE(T, poly_invsqrt_series_prealloc)(TEMPLATE(T, struct) * g, 
                         const TEMPLATE(T, struct) * h, TEMPLATE(T, struct) * t,
@@ -86,16 +84,10 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
     TEMPLATE(T, poly_t) t1;
 
     if (n == 0 || h->length == 0 || TEMPLATE(T, is_zero)(h->coeffs + 0, ctx))
-    {
-        flint_printf("Exception (fq_poly_invsqrt). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_invsqrt_series\n");
 
     if (!TEMPLATE(T, is_one)(h->coeffs + 0, ctx))
-    {
-        flint_printf("Exception (fq_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Constant term != 1 in " TEMPLATE_STR(T) "_poly_invsqrt_series\n");
 
     if (hlen < n)
     {
@@ -133,4 +125,3 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
 }
 
 #endif
-

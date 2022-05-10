@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 int
 TEMPLATE(T, mat_is_zero) (const TEMPLATE(T, mat_t) mat,
                           const TEMPLATE(T, ctx_t) ctx)
@@ -31,6 +29,5 @@ TEMPLATE(T, mat_is_zero) (const TEMPLATE(T, mat_t) mat,
 
     return 1;
 }
-
 
 #endif

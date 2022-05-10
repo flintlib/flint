@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,13 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FQ_POLY_INLINES_C
+#include "fq_vec.h"
+#include "fq_poly_mini.h"
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "fq_poly.h"
+#ifdef T
+#undef T
+#endif
 
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/rem.c"
+#undef CAP_T
+#undef T

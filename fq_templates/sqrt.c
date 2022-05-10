@@ -11,6 +11,7 @@
 
 #ifdef T
 
+#include "fmpz.h"
 #include "templates.h"
 
 int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,

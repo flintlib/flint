@@ -1324,6 +1324,9 @@ char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
   || defined (__STDIO_LOADED)       \
   || defined (_STDIO)               \
   || defined (__DEFINED_FILE)
+
+#include "fmpz_poly.h"
+
 FLINT_DLL int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p);
 
@@ -1333,14 +1336,12 @@ FLINT_DLL int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly,
 FLINT_DLL int fmpz_mod_poly_fread(FILE * file, fmpz_mod_poly_t poly,
                                                            fmpz_mod_ctx_t ctx);
 
-#ifdef FMPZ_POLY_H
 FMPZ_MOD_POLY_INLINE 
 int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly,
                                       const char * x, const fmpz_mod_ctx_t ctx)
 {
     return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
 }
-#endif
 
 FMPZ_MOD_POLY_INLINE 
 int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p)

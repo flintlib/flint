@@ -13,11 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 void
 _TEMPLATE(T, poly_compose_mod_horner) (
     TEMPLATE(T, struct) * res,
@@ -82,11 +77,7 @@ TEMPLATE(T, poly_compose_mod_horner) (TEMPLATE(T, poly_t) res,
     TEMPLATE(T, struct) * ptr2;
 
     if (len3 == 0)
-    {
-        TEMPLATE_PRINTF
-            ("Exception: division by zero in %s_poly_compose_mod_horner\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_compose_mod_horner\n");
 
     if (len1 == 0 || len3 == 1)
     {
@@ -135,6 +126,5 @@ TEMPLATE(T, poly_compose_mod_horner) (TEMPLATE(T, poly_t) res,
 
     _TEMPLATE(T, vec_clear) (ptr2, vec_len, ctx);
 }
-
 
 #endif

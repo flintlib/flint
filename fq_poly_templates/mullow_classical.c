@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_mullow_classical) (
     TEMPLATE(T, struct) * rop,

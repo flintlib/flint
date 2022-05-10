@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_inflate) (TEMPLATE(T, poly_t) result,
                            const TEMPLATE(T, poly_t) input, ulong inflation,
@@ -51,6 +49,5 @@ TEMPLATE(T, poly_inflate) (TEMPLATE(T, poly_t) result,
         result->length = res_length;
     }
 }
-
 
 #endif

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_solve_tril_classical) (TEMPLATE(T, mat_t) X,
                                        const TEMPLATE(T, mat_t) L,
@@ -62,6 +60,5 @@ TEMPLATE(T, mat_solve_tril_classical) (TEMPLATE(T, mat_t) X,
     if (!unit)
         _TEMPLATE(T, vec_clear) (inv, n, ctx);
 }
-
 
 #endif

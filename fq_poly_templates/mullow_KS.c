@@ -13,7 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
 #include "fmpz_poly.h"
 
 void

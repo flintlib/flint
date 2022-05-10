@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_mul) (TEMPLATE(T, struct) * rop,
                         const TEMPLATE(T, struct) * op1, slong len1,
@@ -71,6 +69,5 @@ TEMPLATE(T, poly_mul) (TEMPLATE(T, poly_t) rop,
 
     _TEMPLATE(T, poly_set_length) (rop, rlen, ctx);
 }
-
 
 #endif

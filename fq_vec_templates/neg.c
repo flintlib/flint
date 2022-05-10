@@ -24,5 +24,4 @@ _TEMPLATE(T, vec_neg) (TEMPLATE(T, struct) * vec1,
         TEMPLATE(T, neg) (vec1 + i, vec2 + i, ctx);
 }
 
-
 #endif

@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void 
 _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct) * A, slong Alen,
     const TEMPLATE(T, struct) * B, slong Blen, slong n, const TEMPLATE(T, ctx_t) ctx)
@@ -104,10 +102,7 @@ void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-    {
-        flint_printf("Exception (fq_poly_div_series). Division by zero.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_div_series\n");
 
     if (Alen == 0)
     {

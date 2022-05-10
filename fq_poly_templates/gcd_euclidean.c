@@ -13,10 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <stdlib.h>
-
 slong
 _TEMPLATE(T, poly_gcd_euclidean) (TEMPLATE(T, struct) * G,
                                   const TEMPLATE(T, struct) * A, slong lenA,
@@ -146,6 +142,5 @@ TEMPLATE(T, poly_gcd_euclidean) (TEMPLATE(T, poly_t) G,
         }
     }
 }
-
 
 #endif

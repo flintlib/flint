@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 #define FQ_POLY_INV_NEWTON_CUTOFF  64
 
 void
@@ -117,6 +115,5 @@ TEMPLATE(T, poly_inv_series_newton) (TEMPLATE(T, poly_t) Qinv,
         _TEMPLATE(T, vec_clear) (Qcopy, n, ctx);
     TEMPLATE(T, clear) (cinv, ctx);
 }
-
 
 #endif

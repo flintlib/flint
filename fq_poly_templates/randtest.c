@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_randtest) (TEMPLATE(T, poly_t) f, flint_rand_t state,
                             slong len, const TEMPLATE(T, ctx_t) ctx)
@@ -37,11 +35,7 @@ TEMPLATE(T, poly_randtest_not_zero) (TEMPLATE(T, poly_t) f, flint_rand_t state,
     slong i;
 
     if (len == 0)
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_randtest_not_zero).  len = 0.\n",
-                        T);
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "len = 0 in " TEMPLATE_STR(T) "_poly_randtest_not_zero\n");
 
     TEMPLATE(T, poly_randtest) (f, state, len, ctx);
     for (i = 0; (i < 10) && TEMPLATE(T, poly_is_zero) (f, ctx); i++)
@@ -49,6 +43,5 @@ TEMPLATE(T, poly_randtest_not_zero) (TEMPLATE(T, poly_t) f, flint_rand_t state,
     if (TEMPLATE(T, poly_is_zero) (f, ctx))
         TEMPLATE(T, poly_one) (f, ctx);
 }
-
 
 #endif

@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_divrem_newton_n_preinv) (
     TEMPLATE(T, struct) * Q,
@@ -52,12 +50,7 @@ TEMPLATE(T, poly_divrem_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
     TEMPLATE(T, struct) * q, *r;
 
     if (lenB == 0)
-    {
-        TEMPLATE_PRINTF
-            ("Exception (%s_poly_divrem_newton_n_preinv). Division by zero.\n",
-             T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_divrem_newton_n_preinv\n");
 
     if (lenA < lenB)
     {
@@ -67,9 +60,7 @@ TEMPLATE(T, poly_divrem_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
     }
 
     if (lenA > 2 * lenB - 2)
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_divrem_newton_n_preinv).\n", T);
-    }
+        flint_throw(FLINT_ERROR, TEMPLATE_STR(T) "_poly_divrem_newton_n_preinv\n");
 
     if (Q == A || Q == B || Q == Binv)
     {
@@ -111,6 +102,5 @@ TEMPLATE(T, poly_divrem_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
 
     _TEMPLATE(T, poly_normalise) (R, ctx);
 }
-
 
 #endif

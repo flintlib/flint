@@ -33,5 +33,4 @@ _TEMPLATE3(T, vec_scalar_addmul, T) (TEMPLATE(T, struct) * poly1,
     TEMPLATE(T, clear) (y, ctx);
 }
 
-
 #endif

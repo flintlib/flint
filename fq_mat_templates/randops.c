@@ -12,7 +12,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "ulong_extras.h"
 
 void
 TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat, slong count,
@@ -56,6 +56,5 @@ TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat, slong count,
         }
     }
 }
-
 
 #endif

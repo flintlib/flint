@@ -22,5 +22,4 @@ TEMPLATE(T, poly_gen) (TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx)
     _TEMPLATE(T, poly_set_length) (f, 2, ctx);
 }
 
-
 #endif

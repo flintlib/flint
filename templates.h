@@ -33,7 +33,7 @@
 #define __TEMPLATE4(X,Y,Z,A) __CAT4(X,Y,Z,A)
 
 #define TEMPLATE_STR(x)   #x
-#define TEMPLATE_PRINT(x) flint_printf("%s", TEMPLATE_STR(x));
-#define TEMPLATE_PRINTF(s, x) flint_printf(s, TEMPLATE_STR(x));
+#define TEMPLATE_PRINT(x) printf("%s", TEMPLATE_STR(x));
+#define TEMPLATE_PRINTF(s, x) printf(s, TEMPLATE_STR(x));
 
 #endif

@@ -12,11 +12,8 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "flint-impl.h"
 
-#include <stdio.h>
-#include <gmp.h>
-#include "fmpz.h"
 int
 _TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, struct) * poly,
                            slong len, const TEMPLATE(T, ctx_t) ctx)
@@ -24,7 +21,7 @@ _TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, struct) * poly,
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%wd ", len);
+    r = fprintf(file, WORD_FMT "d ", len);
     if (r <= 0)
         return r;
 
@@ -33,7 +30,7 @@ _TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, struct) * poly,
 
     for (i = 0; (r > 0) && (i < len); i++)
     {
-        r = flint_fprintf(file, " ");
+        r = fprintf(file, " ");
         if (r <= 0)
             return r;
         r = TEMPLATE(T, fprint) (file, poly + i, ctx);
@@ -50,6 +47,5 @@ TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, poly_t) poly,
 {
     return _TEMPLATE(T, poly_fprint) (file, poly->coeffs, poly->length, ctx);
 }
-
 
 #endif

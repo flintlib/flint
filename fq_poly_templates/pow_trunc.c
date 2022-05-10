@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, struct) * res,
 		      const TEMPLATE(T, struct) *  poly, ulong e,
@@ -39,18 +37,18 @@ TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res,
         {
             TEMPLATE(T, poly_fit_length) (res, 1, ctx);
             TEMPLATE(T, pow_ui) (res->coeffs + 0, poly->coeffs + 0, e, ctx);
-	    _TEMPLATE(T, poly_set_length) (res, 1, ctx);
+            _TEMPLATE(T, poly_set_length) (res, 1, ctx);
             _TEMPLATE(T, poly_normalise) (res, ctx);
         }
         else if (e == UWORD(0))
         {
             TEMPLATE(T, t) c;
-	    TEMPLATE(T, init) (c, ctx);
-	    TEMPLATE(T, set_ui) (c, 1, ctx);
-	    TEMPLATE(T, poly_set_coeff) (res, 0, c, ctx);
+            TEMPLATE(T, init) (c, ctx);
+            TEMPLATE(T, set_ui) (c, 1, ctx);
+            TEMPLATE(T, poly_set_coeff) (res, 0, c, ctx);
             _TEMPLATE(T, poly_set_length) (res, 1, ctx);
             _TEMPLATE(T, poly_normalise) (res, ctx);
-	    TEMPLATE(T, clear) (c, ctx);
+            TEMPLATE(T, clear) (c, ctx);
         }
         else if (e == UWORD(1))
         {
@@ -66,10 +64,11 @@ TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res,
     if (poly->length < trunc)
     {
         p = _TEMPLATE(T, vec_init) (trunc, ctx);
-	_TEMPLATE(T, vec_set) (p, poly->coeffs, poly->length, ctx);
-	_TEMPLATE(T, vec_zero) (p + poly->length, trunc - poly->length, ctx);
+        _TEMPLATE(T, vec_set) (p, poly->coeffs, poly->length, ctx);
+        _TEMPLATE(T, vec_zero) (p + poly->length, trunc - poly->length, ctx);
         pcopy = 1;
-    } else
+    }
+    else
         p = poly->coeffs;
 
     if (res != poly || pcopy)
@@ -94,4 +93,3 @@ TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res,
 }
 
 #endif
-

@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_normalise) (TEMPLATE(T, poly_t) poly,
                               const TEMPLATE(T, ctx_t) ctx)
@@ -35,6 +33,5 @@ _TEMPLATE(T, poly_normalise2) (const TEMPLATE(T, struct) * poly,
          i--) ;
     (*length) = i + 1;
 }
-
 
 #endif

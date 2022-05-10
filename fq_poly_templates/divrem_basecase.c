@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_divrem_basecase) (TEMPLATE(T, struct) * Q,
                                     TEMPLATE(T, struct) * R,
@@ -107,6 +105,5 @@ TEMPLATE(T, poly_divrem_basecase) (TEMPLATE(T, poly_t) Q,
 
     TEMPLATE(T, clear) (invB, ctx);
 }
-
 
 #endif

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, TEMPLATE(poly_set, T)) (TEMPLATE(T, poly_t) poly,
                                     const TEMPLATE(T, t) c,
@@ -30,6 +28,5 @@ TEMPLATE(T, TEMPLATE(poly_set, T)) (TEMPLATE(T, poly_t) poly,
         _TEMPLATE(T, poly_set_length) (poly, 1, ctx);
     }
 }
-
 
 #endif

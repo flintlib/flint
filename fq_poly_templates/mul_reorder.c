@@ -12,7 +12,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "fmpz_poly.h"
 
 /*
     Include routines for vectors over \code{fmpz_poly_struct}, 
@@ -223,6 +223,5 @@ TEMPLATE(T, poly_mul_reorder) (TEMPLATE(T, poly_t) rop,
         _TEMPLATE(T, poly_set_length) (rop, len, ctx);
     }
 }
-
 
 #endif

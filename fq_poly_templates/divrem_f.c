@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_divrem_f) (TEMPLATE(T, t) f,
                              TEMPLATE(T, struct) * Q, TEMPLATE(T, struct) * R,

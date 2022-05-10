@@ -12,8 +12,7 @@
 */
 
 #include <stdio.h>
-#include <string.h>
-
+#include "fmpz_mod_poly.h"
 #include "fq.h"
 
 /* from qadic/ctx_init_conway.c */
@@ -69,20 +68,11 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     int result;
     if (fmpz_cmp_ui(p, 109987) > 0)
-    {
-        flint_printf("Exception (fq_ctx_init_conway).  Conway polynomials \n");
-        flint_printf("are only available for primes up to 109987.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Conway polynomials are only available for primes up to 109987 in fq_ctx_init_conway\n");
 
     result = _fq_ctx_init_conway(ctx, p, d, var);
     if (!result)
-    {
-        flint_printf
-            ("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
-        fmpz_print(p);
-        flint_printf(",%wd) is not present in the database.\n", d);
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Polynomial not present in database in fq_ctx_init_conway\n", d);
+
     ctx->is_conway = 1;
 }

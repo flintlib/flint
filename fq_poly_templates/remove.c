@@ -15,8 +15,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 ulong
 TEMPLATE(T, poly_remove) (TEMPLATE(T, poly_t) f, const TEMPLATE(T, poly_t) g,
                           const TEMPLATE(T, ctx_t) ctx)
@@ -44,6 +42,5 @@ TEMPLATE(T, poly_remove) (TEMPLATE(T, poly_t) f, const TEMPLATE(T, poly_t) g,
 
     return i;
 }
-
 
 #endif

@@ -13,11 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <stdlib.h>
-#include "mpn_extras.h"
-
 #define __set(B, lenB, A, lenA)                     \
 do {                                                \
     _TEMPLATE(T, vec_set)((B), (A), (lenA), ctx);   \

@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_div_basecase) (TEMPLATE(T, struct) * Q,
                                  TEMPLATE(T, struct) * R,

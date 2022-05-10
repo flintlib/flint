@@ -11,11 +11,8 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "fmpz.h"
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 void
 _TEMPLATE(T, poly_powmod_fmpz_binexp) (
     TEMPLATE(T, struct) * res,
@@ -79,19 +76,10 @@ TEMPLATE(T, poly_powmod_fmpz_binexp) (TEMPLATE(T, poly_t) res,
     int qcopy = 0;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF
-            ("Exception: %s_poly_powmod_fmpz_binexp: divide by zero\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_powmod_fmpz_binexp\n");
 
     if (fmpz_sgn(e) < 0)
-    {
-        TEMPLATE_PRINTF
-            ("Exception: %s_poly_powmod_fmpz_binexp: negative exp not implemented\n",
-             T);
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Negative exp not implemented in " TEMPLATE_STR(T) "_poly_powmod_fmpz_binexp\n");
 
     if (len >= lenf)
     {

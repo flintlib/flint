@@ -12,7 +12,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "fmpz_mini.h"
 #include "fmpz_mat.h"
 
 void
@@ -82,6 +82,5 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
 
     fmpz_clear(beta);
 }
-
 
 #endif

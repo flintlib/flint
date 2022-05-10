@@ -10,7 +10,6 @@
 */
 
 #ifdef T
-#include "templates.h"
 
 int
 TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,

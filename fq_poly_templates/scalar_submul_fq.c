@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE3(T, poly_scalar_submul, T) (TEMPLATE(T, struct) * rop,
                                       const TEMPLATE(T, struct) * op, slong len,
@@ -51,20 +49,18 @@ TEMPLATE3(T, poly_scalar_submul, T) (TEMPLATE(T, poly_t) rop,
                                      const TEMPLATE(T, t) x,
                                      const TEMPLATE(T, ctx_t) ctx)
 {
-    if (!
-        (TEMPLATE(T, is_zero) (x, ctx) || TEMPLATE(T, poly_is_zero) (op, ctx)))
+    if (!(TEMPLATE(T, is_zero) (x, ctx) || TEMPLATE(T, poly_is_zero) (op, ctx)))
     {
         TEMPLATE(T, poly_fit_length) (rop, op->length, ctx);
         if (op->length > rop->length)
             _TEMPLATE(T, vec_zero) (rop->coeffs + rop->length,
-			            op->length - rop->length, ctx);
+                    op->length - rop->length, ctx);
         _TEMPLATE3(T, poly_scalar_submul, T) (rop->coeffs, op->coeffs,
-                                              op->length, x, ctx);
+                op->length, x, ctx);
         _TEMPLATE(T, poly_set_length) (rop, FLINT_MAX(rop->length, op->length),
-                                       ctx);
+                ctx);
         _TEMPLATE(T, poly_normalise) (rop, ctx);
     }
 }
-
 
 #endif

@@ -24,5 +24,4 @@ _TEMPLATE(T, vec_init) (slong len, const TEMPLATE(T, ctx_t) ctx)
     return v;
 }
 
-
 #endif

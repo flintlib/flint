@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
 		                            const TEMPLATE(T, mat_t) mat1,
@@ -31,6 +29,5 @@ TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
           _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
    }
 }
-
 
 #endif

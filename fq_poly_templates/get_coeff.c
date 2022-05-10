@@ -26,5 +26,4 @@ TEMPLATE(T, poly_get_coeff) (TEMPLATE(T, t) x, const TEMPLATE(T, poly_t) poly,
         TEMPLATE(T, zero) (x, ctx);
 }
 
-
 #endif

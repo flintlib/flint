@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, TEMPLATE(poly_scalar_div, T)) (TEMPLATE(T, struct) * rop,
                                             const TEMPLATE(T, struct) * op,
@@ -34,10 +32,8 @@ TEMPLATE(T, TEMPLATE(poly_scalar_div, T)) (TEMPLATE(T, poly_t) rop,
                                            const TEMPLATE(T, ctx_t) ctx)
 {
     if (TEMPLATE(T, is_zero) (x, ctx))
-    {
-       flint_printf("Exception (fq_poly_scalar_div) Division by zero");
-       flint_abort();
-    }
+       flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_scalar_div");
+
     if (TEMPLATE(T, poly_is_zero) (op, ctx))
     {
         TEMPLATE(T, poly_zero) (rop, ctx);
@@ -50,6 +46,5 @@ TEMPLATE(T, TEMPLATE(poly_scalar_div, T)) (TEMPLATE(T, poly_t) rop,
         _TEMPLATE(T, poly_set_length) (rop, op->length, ctx);
     }
 }
-
 
 #endif

@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_add_series) (TEMPLATE(T, poly_t) res,
                        const TEMPLATE(T, poly_t) poly1,

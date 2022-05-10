@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_randtest) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
                            const TEMPLATE(T, ctx_t) ctx)
@@ -27,6 +25,5 @@ TEMPLATE(T, mat_randtest) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
         for (j = 0; j < c; j++)
             TEMPLATE(T, randtest) (mat->rows[i] + j, state, ctx);
 }
-
 
 #endif

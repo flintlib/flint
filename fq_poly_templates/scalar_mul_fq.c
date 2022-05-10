@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (TEMPLATE(T, struct) * rop,
                                             const TEMPLATE(T, struct) * op,
@@ -45,6 +43,5 @@ TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (TEMPLATE(T, poly_t) rop,
         _TEMPLATE(T, poly_set_length) (rop, op->length, ctx);
     }
 }
-
 
 #endif

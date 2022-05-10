@@ -13,7 +13,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "ulong_extras.h"
 
 void
 _TEMPLATE(T, poly_compose_mod_brent_kung) (
@@ -40,8 +40,7 @@ _TEMPLATE(T, poly_compose_mod_brent_kung) (
 
     if (len3 == 2)
     {
-        _TEMPLATE(T, TEMPLATE(poly_evaluate, T)) (res, poly1, len1, poly2,
-                                                  ctx);
+        _TEMPLATE(T, TEMPLATE(poly_evaluate, T)) (res, poly1, len1, poly2, ctx);
         return;
     }
 
@@ -110,20 +109,10 @@ TEMPLATE(T, poly_compose_mod_brent_kung) (TEMPLATE(T, poly_t) res,
     TEMPLATE(T, t) inv3;
 
     if (len3 == 0)
-    {
-        flint_printf("Exception: division by zero in");
-        TEMPLATE_PRINTF("%s_poly_compose_mod_brent_kung\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_compose_mod_brent_kung\n");
 
     if (len1 >= len3)
-    {
-        TEMPLATE_PRINTF
-            ("Exception: %s_poly_compose_brent_kung: the degree of the", T);
-        flint_printf
-            (" first polynomial must be smaller than that of the modulus\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Degree of first polynomial must be smaller than modulus in " TEMPLATE_STR(T) "_poly_compose_mod_brent_kung\n");
 
     if (len1 == 0 || len3 == 1)
     {
@@ -173,6 +162,5 @@ TEMPLATE(T, poly_compose_mod_brent_kung) (TEMPLATE(T, poly_t) res,
 
     _TEMPLATE(T, vec_clear) (ptr2, vec_len, ctx);
 }
-
 
 #endif

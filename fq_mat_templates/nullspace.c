@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 slong
 TEMPLATE(T, mat_nullspace) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
                             const TEMPLATE(T, ctx_t) ctx)

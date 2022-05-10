@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007, David Howden.
+    Copyright (C) 2007 David Howden.
     Copyright (C) 2010 William Hart
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
@@ -13,8 +13,6 @@
 */
 
 #ifdef T
-
-#include "templates.h"
 
 void
 _TEMPLATE(T, poly_make_monic) (TEMPLATE(T, struct) * rop,
@@ -43,6 +41,5 @@ TEMPLATE(T, poly_make_monic) (TEMPLATE(T, poly_t) rop,
     _TEMPLATE(T, poly_make_monic) (rop->coeffs, op->coeffs, op->length, ctx);
     _TEMPLATE(T, poly_set_length) (rop, op->length, ctx);
 }
-
 
 #endif

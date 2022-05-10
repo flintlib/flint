@@ -10,14 +10,38 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strcspn
+# ifdef __GNUC__
+#  define strcspn __builtin_strcspn
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strncpy
+# ifdef __GNUC__
+#  define strncpy __builtin_strncpy
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef strspn
+# ifdef __GNUC__
+#  define strspn __builtin_strspn
+# else
+#  include <string.h>
+# endif
+#endif
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <ctype.h>
-#undef ulong
 #include "flint.h"
 #include "flint-impl.h"
 

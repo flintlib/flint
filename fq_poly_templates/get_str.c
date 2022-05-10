@@ -12,10 +12,15 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <string.h>
+#ifndef strlen
+# ifdef __GNUC__
+#  define strlen __builtin_strlen
+# else
+#  include <string.h>
+# endif
+#endif
 #include <math.h>
+#include "flint-impl.h"
 
 char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
                                   const TEMPLATE(T, ctx_t) ctx)
@@ -26,13 +31,13 @@ char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
 
     if (len == 0)
     {
-        str = (char *)flint_malloc(2 * sizeof(char));
+        str = flint_malloc(2 * sizeof(char));
         str[0] = '0';
         str[1] = '\0';
         return str;
     }
 
-    coeffstrs = (char **)flint_malloc(len * sizeof(char *));
+    coeffstrs = flint_malloc(len * sizeof(char *));
 
     nz = 0;
     bound = (slong) (ceil(log10((double)(len + 1)))) + 2;
@@ -53,16 +58,16 @@ char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
     str = (char *)flint_malloc(bound * sizeof(char));
     off = 0;
 
-    off += flint_sprintf(str + off, "%wd ", len);
+    off += sprintf(str + off, WORD_FMT "d ", len);
     for (i = 0; i < len; i++)
     {
         if (TEMPLATE(T, is_zero) (poly + i, ctx))
         {
-            off += flint_sprintf(str + off, " 0");
+            off += sprintf(str + off, " 0");
         }
         else
         {
-            off += flint_sprintf(str + off, " %s", coeffstrs[i]);
+            off += sprintf(str + off, " %s", coeffstrs[i]);
             flint_free(coeffstrs[i]);
         }
     }
@@ -77,6 +82,5 @@ char *TEMPLATE(T, poly_get_str) (const TEMPLATE(T, poly_t) poly,
 {
     return _TEMPLATE(T, poly_get_str) (poly->coeffs, poly->length, ctx);
 }
-
 
 #endif

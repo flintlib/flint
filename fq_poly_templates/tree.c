@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 TEMPLATE(T, poly_struct) **
 _TEMPLATE(T, poly_tree_alloc)(slong len, const TEMPLATE(T, ctx_t) ctx)
 {
@@ -113,6 +111,5 @@ _TEMPLATE(T, poly_tree_build)(TEMPLATE(T, poly_struct) ** tree,
             TEMPLATE(T, poly_set)(pb, pa, ctx);
     }
 }
-
 
 #endif

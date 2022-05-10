@@ -11,10 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include "ulong_extras.h"
-
 void TEMPLATE(T, poly_add_si)(
     TEMPLATE(T, poly_t a),
     const TEMPLATE(T, poly_t) b,

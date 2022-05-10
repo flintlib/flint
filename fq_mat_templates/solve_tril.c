@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_solve_tril) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) L,
                              const TEMPLATE(T, mat_t) B, int unit,
@@ -29,6 +27,5 @@ TEMPLATE(T, mat_solve_tril) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) L,
         TEMPLATE(T, mat_solve_tril_recursive) (X, L, B, unit, ctx);
     }
 }
-
 
 #endif

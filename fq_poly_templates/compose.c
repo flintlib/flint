@@ -71,5 +71,4 @@ TEMPLATE(T, poly_compose) (TEMPLATE(T, poly_t) rop,
     }
 }
 
-
 #endif

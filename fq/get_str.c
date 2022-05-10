@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fmpz_poly.h"
 
 char *
 fq_get_str(const fq_t op, const fq_ctx_t ctx)

@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_set) (TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
                       const TEMPLATE(T, ctx_t) ctx)
@@ -29,6 +27,5 @@ TEMPLATE(T, mat_set) (TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
                                        ctx);
     }
 }
-
 
 #endif

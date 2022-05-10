@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
+#include "fmpz.h"
 #include "fq.h"
 
 void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)

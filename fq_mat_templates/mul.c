@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_mul) (TEMPLATE(T, mat_t) C,
                       const TEMPLATE(T, mat_t) A,
@@ -33,6 +31,5 @@ TEMPLATE(T, mat_mul) (TEMPLATE(T, mat_t) C,
     else
         TEMPLATE(T, mat_mul_classical) (C, A, B, ctx);
 }
-
 
 #endif

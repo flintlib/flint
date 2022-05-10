@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_realloc) (TEMPLATE(T, poly_t) poly, slong alloc,
                            const TEMPLATE(T, ctx_t) ctx)
@@ -53,6 +51,5 @@ TEMPLATE(T, poly_realloc) (TEMPLATE(T, poly_t) poly, slong alloc,
     }
     poly->alloc = alloc;
 }
-
 
 #endif

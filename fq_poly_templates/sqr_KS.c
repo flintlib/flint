@@ -13,7 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
 #include "fmpz_poly.h"
 
 void
@@ -76,6 +75,5 @@ TEMPLATE(T, poly_sqr_KS) (TEMPLATE(T, poly_t) rop,
         _TEMPLATE(T, poly_set_length) (rop, len, ctx);
     }
 }
-
 
 #endif

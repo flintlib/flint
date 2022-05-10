@@ -39,5 +39,4 @@ TEMPLATE4(T, poly_evaluate, T, vec)(TEMPLATE(T, struct) * ys,
                                          xs, n, ctx);
 }
 
-
 #endif

@@ -14,8 +14,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_mulmod_preinv) (
     TEMPLATE(T, struct) * res,
@@ -72,10 +70,7 @@ TEMPLATE(T, poly_mulmod_preinv) (TEMPLATE(T, poly_t) res,
     len2 = poly2->length;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_mulmod). Divide by zero.\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_mulmod_preinv\n");
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {

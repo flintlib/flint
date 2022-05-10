@@ -12,10 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <stdio.h>
-
 static void
 _apply_permutation(slong * AP,
                    TEMPLATE(T, mat_t) A, slong * P, slong n, slong offset)
@@ -135,6 +131,5 @@ TEMPLATE(T, mat_lu_recursive) (slong * P,
 
     return r1 + r2;
 }
-
 
 #endif

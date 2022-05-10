@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void TEMPLATE(T, mat_zero) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, j;
@@ -22,6 +20,5 @@ void TEMPLATE(T, mat_zero) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
         for (j = 0; j < A->c; j++)
             TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, i, j), ctx);
 }
-
 
 #endif

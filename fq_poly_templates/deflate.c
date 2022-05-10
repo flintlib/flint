@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_deflate) (TEMPLATE(T, poly_t) result,
                            const TEMPLATE(T, poly_t) input, ulong deflation,
@@ -23,10 +21,7 @@ TEMPLATE(T, poly_deflate) (TEMPLATE(T, poly_t) result,
     slong res_length, i;
 
     if (deflation == 0)
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_deflate). Division by zero.\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_deflate\n");
 
     if (input->length <= 1 || deflation == 1)
     {
@@ -42,6 +37,5 @@ TEMPLATE(T, poly_deflate) (TEMPLATE(T, poly_t) result,
 
     result->length = res_length;
 }
-
 
 #endif

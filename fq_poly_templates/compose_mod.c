@@ -13,11 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 void
 _TEMPLATE(T, poly_compose_mod) (TEMPLATE(T, struct) * res,
                                 const TEMPLATE(T, struct) * f, slong lenf,
@@ -49,11 +44,7 @@ TEMPLATE(T, poly_compose_mod) (TEMPLATE(T, poly_t) res,
     TEMPLATE(T, struct) * ptr2;
 
     if (len3 == 0)
-    {
-        TEMPLATE_PRINTF("Exception: division by zero in %s_poly_compose_mod\n",
-                        T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_compose_mod\n");
 
     if (len1 == 0 || len3 == 1)
     {

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_compose_divconquer) (
     TEMPLATE(T, struct) * rop,
@@ -184,6 +182,5 @@ TEMPLATE(T, poly_compose_divconquer) (TEMPLATE(T, poly_t) rop,
         TEMPLATE(T, poly_clear) (t, ctx);
     }
 }
-
 
 #endif

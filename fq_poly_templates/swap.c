@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_swap) (TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
                         const TEMPLATE(T, ctx_t) ctx)
@@ -37,6 +35,5 @@ TEMPLATE(T, poly_swap) (TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
         op2->coeffs = temp_c;
     }
 }
-
 
 #endif

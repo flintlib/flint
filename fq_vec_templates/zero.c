@@ -23,5 +23,4 @@ _TEMPLATE(T, vec_zero) (TEMPLATE(T, struct) * vec,
         TEMPLATE(T, zero) (vec + i, ctx);
 }
 
-
 #endif

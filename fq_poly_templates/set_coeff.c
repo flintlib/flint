@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_set_coeff) (TEMPLATE(T, poly_t) poly, slong n,
                              const TEMPLATE(T, t) x,
@@ -46,6 +44,5 @@ TEMPLATE(T, poly_set_coeff) (TEMPLATE(T, poly_t) poly, slong n,
 
     TEMPLATE(T, set) (poly->coeffs + n, x, ctx);
 }
-
 
 #endif

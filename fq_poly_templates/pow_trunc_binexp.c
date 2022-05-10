@@ -12,8 +12,6 @@
 
 #ifdef T
 	
-#include "templates.h"
-	
 void
 _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
                               const TEMPLATE(T, struct) * poly, ulong e,

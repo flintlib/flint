@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,14 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_mat.h"
+#ifndef FQ_MAT_MINI_H
+#define FQ_MAT_MINI_H
 
-#ifdef T
-#undef T
+#ifdef FQ_MAT_MINI_INLINES_C
+#define FQ_MAT_MINI_TEMPLATES_INLINE FLINT_DLL
+#define FQ_MAT_MINI_INLINE FLINT_DLL
+#else
+#define FQ_MAT_MINI_TEMPLATES_INLINE static __inline__
+#define FQ_MAT_MINI_INLINE static __inline__
 #endif
+
+#include "flint.h"
 
 #define T fq
 #define CAP_T FQ
-#include "fq_mat_templates/init_set.c"
+#include "fq_mat_mini_templates.h"
 #undef CAP_T
 #undef T
+
+#endif

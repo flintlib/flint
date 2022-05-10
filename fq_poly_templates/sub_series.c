@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, poly_sub_series) (TEMPLATE(T, poly_t) res,
                        const TEMPLATE(T, poly_t) poly1,
@@ -38,6 +36,5 @@ TEMPLATE(T, poly_sub_series) (TEMPLATE(T, poly_t) res,
     _TEMPLATE(T, poly_set_length) (res, max, ctx);
     _TEMPLATE(T, poly_normalise) (res, ctx);
 }
-
 
 #endif

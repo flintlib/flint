@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_derivative) (TEMPLATE(T, struct) * rop,
                                const TEMPLATE(T, struct) * op, slong len,
@@ -44,6 +42,5 @@ TEMPLATE(T, poly_derivative) (TEMPLATE(T, poly_t) rop,
         _TEMPLATE(T, poly_normalise) (rop, ctx);
     }
 }
-
 
 #endif

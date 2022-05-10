@@ -11,7 +11,8 @@
 
 #ifdef T
 
-#include "templates.h"
+#define FMPZ_MOD_MAT_ENTRY(modmat, i, j)  \
+   ((modmat)->mat->rows)[i] + j
 
 void
 TEMPLATE(T, mat_set_fmpz_mod_mat) (TEMPLATE(T, mat_t) mat1,
@@ -26,7 +27,7 @@ TEMPLATE(T, mat_set_fmpz_mod_mat) (TEMPLATE(T, mat_t) mat1,
     {
         for (j = 0; j < mat1->c; j++)
         {
-            TEMPLATE(T, set_fmpz)(t, fmpz_mod_mat_entry(mat2, i, j), ctx);
+            TEMPLATE(T, set_fmpz)(t, FMPZ_MOD_MAT_ENTRY(mat2, i, j), ctx);
             TEMPLATE(T, mat_entry_set)(mat1, i, j, t, ctx);
         }
     }

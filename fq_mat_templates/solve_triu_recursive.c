@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_solve_triu_recursive) (TEMPLATE(T, mat_t) X,
                                        const TEMPLATE(T, mat_t) U,
@@ -57,6 +55,5 @@ TEMPLATE(T, mat_solve_triu_recursive) (TEMPLATE(T, mat_t) X,
     TEMPLATE(T, mat_window_clear) (XX, ctx);
     TEMPLATE(T, mat_window_clear) (XY, ctx);
 }
-
 
 #endif

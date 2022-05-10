@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 slong
 _TEMPLATE(T, poly_hamming_weight) (const TEMPLATE(T, struct) * op, slong len,
                                    const TEMPLATE(T, ctx_t) ctx)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010, 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -12,10 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
-#include "flint.h"
-#include "ulong_extras.h"
 #include "perm.h"
 
 int
@@ -43,6 +39,5 @@ TEMPLATE(T, mat_randpermdiag) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
 
     return parity;
 }
-
 
 #endif

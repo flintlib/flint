@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
                        const TEMPLATE(T, ctx_t) ctx)
@@ -55,6 +53,5 @@ TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
     mat->r = rows;
     mat->c = cols;
 }
-
 
 #endif

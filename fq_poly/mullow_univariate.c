@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
+#include "fmpz_poly.h"
+#include "fq_poly_mini.h"
 
 void
 _fq_poly_mullow_univariate (fq_struct * rop,
@@ -109,4 +110,3 @@ fq_poly_mullow_univariate (fq_poly_t rop,
         _fq_poly_normalise(rop, ctx);
     }
 }
-

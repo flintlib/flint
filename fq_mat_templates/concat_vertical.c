@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "fmpz_mat.h"
-
 void
 TEMPLATE(T, mat_concat_vertical) (TEMPLATE(T, mat_t) res,
 		                            const TEMPLATE(T, mat_t) mat1,

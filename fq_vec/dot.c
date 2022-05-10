@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_vec.h"
+#include "fmpz_poly.h"
+#include "fq.h"
 
 void _fq_vec_dot(fq_t res, const fq_struct * vec1,
          const fq_struct * vec2, slong len2, const fq_ctx_t ctx)

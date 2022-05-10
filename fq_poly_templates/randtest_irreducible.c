@@ -11,7 +11,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "fmpz.h"
 
 void
 TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f,
@@ -57,9 +57,7 @@ TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f,
                 restart = 1;
                 break;
             }
-            TEMPLATE(T, poly_compose_mod_brent_kung_preinv) (xqi, xqi, xq, f,
-                                                             finv, ctx);
-
+            TEMPLATE(T, poly_compose_mod_brent_kung_preinv) (xqi, xqi, xq, f, finv, ctx);
         }
         if (!restart)
         {
@@ -74,6 +72,5 @@ TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f,
     TEMPLATE(T, poly_clear) (finv, ctx);
     fmpz_clear(q);
 }
-
 
 #endif

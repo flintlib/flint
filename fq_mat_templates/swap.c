@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 TEMPLATE(T, mat_swap) (TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
                        const TEMPLATE(T, ctx_t) ctx)
@@ -27,6 +25,5 @@ TEMPLATE(T, mat_swap) (TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
         *mat2 = tmp;
     }
 }
-
 
 #endif

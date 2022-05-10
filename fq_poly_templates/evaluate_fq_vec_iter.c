@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys,
                                           const TEMPLATE(T, struct) * coeffs, slong len,
@@ -35,6 +33,5 @@ TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys,
     _TEMPLATE4(T, poly_evaluate, T, vec_iter)(ys, poly->coeffs, poly->length,
                                               xs, n, ctx);
 }
-
 
 #endif

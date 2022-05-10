@@ -13,8 +13,8 @@
 
 #ifdef T
 
+#include "ulong_extras.h"
 #include "templates.h"
-
 
 void
 _TEMPLATE(T, vec_randtest) (TEMPLATE(T, struct) * f,

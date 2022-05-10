@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 slong
 _TEMPLATE(T, poly_gcd) (TEMPLATE(T, struct)*G,
                         const TEMPLATE(T, struct) * A, slong lenA,

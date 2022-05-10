@@ -11,7 +11,6 @@
 
 #ifdef T
 
-#include "flint.h"
 #include "templates.h"
 
 #ifdef __cplusplus
@@ -35,8 +34,7 @@ FLINT_DLL void _TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f,
 
 /*  Input and output  ********************************************************/
 
-#if defined (FILE)                  \
-  || defined (H_STDIO)              \
+#if defined (H_STDIO)               \
   || defined (_H_STDIO)             \
   || defined (_STDIO_H)             \
   || defined (_STDIO_H_)            \
@@ -50,8 +48,8 @@ FLINT_DLL void _TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f,
   || defined (_STDIO_H_INCLUDED)    \
   || defined (_ISO_STDIO_ISO_H)     \
   || defined (__STDIO_LOADED)       \
-  || defined (_STDIO)               \
-  || defined (__DEFINED_FILE)
+  || defined (_STDIO)
+
 FLINT_DLL int _TEMPLATE(T, vec_fprint)(FILE * file,
                              const TEMPLATE(T, struct) * vec,
                              slong len,
@@ -63,6 +61,7 @@ int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
 {
     return _TEMPLATE(T, vec_fprint)(stdout, vec, len, ctx);
 }
+
 #endif
 
 /*  Conversions  *************************************************************/

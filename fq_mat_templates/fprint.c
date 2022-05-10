@@ -12,7 +12,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "flint-impl.h"
 
 /*
     The macros xxx_putc, xxx_printf, and xxx_T_print are provided as
@@ -35,7 +35,7 @@ do {                       \
 
 #define xxx_printf()                       \
 do {                                       \
-    z = flint_fprintf(file, WORD_FMT "d " WORD_FMT "d  ", r, c);  \
+    z = fprintf(file, WORD_FMT "d " WORD_FMT "d  ", r, c);  \
     if (z <= 0)                            \
         return z;                          \
 } while (0)
@@ -103,9 +103,5 @@ int TEMPLATE(T, mat_fprint_pretty) (FILE * file, const TEMPLATE(T, mat_t) mat,
 
     return z;
 }
-
-#undef xxx_putc
-#undef xxx_printf
-#undef xxx_T_print
 
 #endif

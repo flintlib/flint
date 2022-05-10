@@ -11,8 +11,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_powmod_ui_binexp_preinv) (
     TEMPLATE(T, struct) * res,
@@ -74,10 +72,7 @@ TEMPLATE(T, poly_powmod_ui_binexp_preinv) (TEMPLATE(T, poly_t) res,
     int qcopy = 0;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod: divide by zero\n", T);
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_powmod_ui_binexp_preinv\n");
 
     if (len >= lenf)
     {

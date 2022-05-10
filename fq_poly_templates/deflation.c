@@ -13,7 +13,7 @@
 
 #ifdef T
 
-#include "templates.h"
+#include "ulong_extras.h"
 
 ulong
 TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
@@ -45,6 +45,5 @@ TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
 
     return deflation;
 }
-
 
 #endif

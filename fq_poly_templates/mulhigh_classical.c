@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 /* Assumes op1 and op2 are not length 0. */
 void
 _TEMPLATE(T, poly_mulhigh_classical) (
@@ -105,6 +103,5 @@ TEMPLATE(T, poly_mulhigh_classical) (TEMPLATE(T, poly_t) rop,
     _TEMPLATE(T, poly_set_length) (rop, len_out, ctx);
     _TEMPLATE(T, poly_normalise) (rop, ctx);
 }
-
 
 #endif

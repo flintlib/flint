@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 static __inline__
 int _TEMPLATE(T, poly_sqrt_2)(TEMPLATE(T, struct) * s,
                    const TEMPLATE(T, struct) * p, slong len, TEMPLATE(T, ctx_t) ctx)
@@ -155,4 +153,3 @@ TEMPLATE(T, poly_sqrt)(TEMPLATE(T, poly_t) b, const TEMPLATE(T, poly_t) a, TEMPL
 }
 
 #endif
-

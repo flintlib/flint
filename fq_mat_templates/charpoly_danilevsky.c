@@ -10,7 +10,6 @@
 */
 
 #ifdef T
-#include "templates.h"
 
 void
 TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p, 

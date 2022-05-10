@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_vec.h"
+#include <stdio.h> /* needed to activate printing function in fq.h */
+#include "fq.h"
 
 #ifdef T
 #undef T

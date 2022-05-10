@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_sqr_classical) (TEMPLATE(T, struct) * rop,
                                   const TEMPLATE(T, struct) * op, slong len,
@@ -83,6 +81,5 @@ TEMPLATE(T, poly_sqr_classical) (TEMPLATE(T, poly_t) rop,
 
     _TEMPLATE(T, poly_set_length) (rop, len, ctx);
 }
-
 
 #endif

@@ -12,8 +12,8 @@
 
 #ifdef T
 
-#include "templates.h"
 #include "long_extras.h"
+#include "fmpz.h"
 
 void
 _TEMPLATE(T, poly_powmod_x_fmpz_preinv) (
@@ -107,18 +107,10 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv) (TEMPLATE(T, poly_t) res,
     TEMPLATE(T, poly_t) tmp;
 
     if (lenf == 0)
-    {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod_x_preinv:", T);
-        flint_printf(" divide by zero\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DIVZERO, TEMPLATE_STR(T) "_poly_powmod_x_fmpz_preinv\n");
 
     if (fmpz_sgn(e) < 0)
-    {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod_x_preinv: ", T);
-        flint_printf(" negative exp not implemented\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Negative exp not implemented in " TEMPLATE_STR(T) "_poly_powmod_x_fmpz_preinv\n");
 
     if (lenf == 1)
     {

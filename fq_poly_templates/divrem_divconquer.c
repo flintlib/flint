@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 static void
 __TEMPLATE(T, poly_divrem_divconquer) (TEMPLATE(T, struct) * Q,
                                        TEMPLATE(T, struct) * R,
@@ -194,6 +192,5 @@ TEMPLATE(T, poly_divrem_divconquer) (TEMPLATE(T, poly_t) Q,
 
     TEMPLATE(T, clear) (invB, ctx);
 }
-
 
 #endif
