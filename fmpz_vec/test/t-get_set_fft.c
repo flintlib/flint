@@ -52,6 +52,9 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, bits);
 
+        fmpz_one(a + 0);
+        fmpz_mul_2exp(a + 0, a + 0, FLINT_BITS*limbs - 1);
+
         bt = _fmpz_vec_get_fft(ii, a, limbs, len);
         for (i = 0; i < len; i++)
            mpn_normmod_2expp1(ii[i], limbs);

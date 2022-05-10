@@ -152,11 +152,13 @@ Conversions
 
 .. function:: void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length, const mp_ptr * coeffs_f, slong limbs, slong sign)
 
-    Convert an fft vector ``coeffs_f`` of the given ``length`` 
-    to a vector of ``fmpz``'s. Each is assumed to be the given 
+    Convert an fft vector ``coeffs_f`` of fully reduced Fermat numbers of the
+    given ``length`` to a vector of ``fmpz``'s. Each is assumed to be the given 
     number of limbs in length with an additional limb for overflow. If the 
-    output coefficients are to be signed then set ``sign``, 
-    otherwise clear it. 
+    output coefficients are to be signed then set ``sign``, otherwise clear it.
+    The resulting ``fmpz``s will be in the range `[-n,n]` in the signed case 
+    and in the range `[0,2n]` in the unsigned case where
+    ``n = 2^(FLINT_BITS*limbs - 1)``.
 
 .. function:: slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len)
 
