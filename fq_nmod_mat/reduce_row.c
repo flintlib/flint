@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fq_nmod.h"
-#include "fq_nmod_mat.h"
+#include "fq_nmod_mat_mini.h"
 
 slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
                                          slong m, const fq_nmod_ctx_t ctx)
@@ -28,7 +27,7 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
    fq_nmod_init(h, ctx);
    fmpz_init(mz);
    fmpz_init(rz);
-   mvec = (fmpz *) _fmpz_vec_init(n);
+   mvec = _fmpz_vec_init(n);
 
    for (i = 0; i < n; i++)
       fq_nmod_bit_pack(mvec + i, fq_nmod_mat_entry(A, m, i), bits, ctx);

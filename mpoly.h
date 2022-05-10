@@ -27,6 +27,8 @@
 #endif
 
 /* Define some functions here in order to not having to include gmp.h */
+/* TODO: This needs to be done in some other way, otherwise I think the compiler
+ * will complain about multiple declarations. */
 #ifndef __GMP_H__
 FLINT_DLL ulong __gmpn_add_n(ulong_ptr, ulong_srcptr, ulong_srcptr, mp_mock_size_t);
 FLINT_DLL ulong __gmpn_sub_n(ulong_ptr, ulong_srcptr, ulong_srcptr, mp_mock_size_t);

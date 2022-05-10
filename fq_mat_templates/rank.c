@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 slong
 TEMPLATE(T, mat_rank) (const TEMPLATE(T, mat_t) A,
                        const TEMPLATE(T, ctx_t) ctx)
