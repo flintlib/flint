@@ -82,7 +82,7 @@ operating systems.
 The choices for vendor is not used, and can be passed as whatever. This is to be
 somewhat compatible with GMP's configure settings.
 
-The available choices for the CPU is
+The available choices for the CPU are
 
 - ``x86_64``,
 - ``x86``,
