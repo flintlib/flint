@@ -256,7 +256,7 @@ FLINT_DLL void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
 
 FLINT_DLL void _fmpz_mat_mul_fft(fmpz_mat_t C,
                                     const fmpz_mat_t A, slong abits,
-                                    const fmpz_mat_t B, slong bbits);
+                                    const fmpz_mat_t B, slong bbits, int sign);
 
 FLINT_DLL void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 

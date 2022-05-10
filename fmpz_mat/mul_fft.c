@@ -13,41 +13,169 @@
 #include "fft.h"
 #include "fft_tuning.h"
 
-mp_size_t fft_split_bits_fmpz(
+/*
+    fft coeffs are mod m = 2^(FLINT_BITS*limbs) + 1.
+    Viewing these coefficients as in the signed range (-m/2, m/2):
+        set the mpn z to the twos complement evaluation at 2^bits.
+    The lower zn limbs are written to z and the lowest bit of the
+    nominal zn^th limb in the twos complement representation is returned.
+
+    The behaviour of this function does NOT depend on the initial value of z.
+*/
+static mp_limb_t fft_combine_bits_signed(
+    mp_limb_t * z,
+    mp_limb_t ** a, mp_size_t alen,
+    flint_bitcnt_t bits,
+    mp_size_t limbs,
+    mp_size_t zn)
+{
+    mp_size_t i, zout;
+    mp_limb_t * t;
+    mp_limb_t f;
+    TMP_INIT;
+
+    FLINT_ASSERT(bits > 1);
+
+    TMP_START;
+
+    t = TMP_ARRAY_ALLOC((limbs + 1), mp_limb_t);
+
+    f = 0;
+    zout = 0;
+
+    for (i = 0; i < alen; i++)
+    {
+        /* add the i^th coeffs a[i] */
+        mp_limb_t q = (bits*i)/FLINT_BITS;
+        mp_limb_t r = (bits*i)%FLINT_BITS;
+        mp_limb_t s;
+        mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
+
+        if (a[i][limbs] | (a[i][limbs - 1] > halflimb))
+        {
+            mpn_sub_1(t, a[i], limbs, UWORD(1));
+            s = 1;
+        }
+        else
+        {
+            mpn_copyi(t, a[i], limbs);
+            s = 0;
+        }
+
+        t[limbs] = -s;
+
+        /*
+            t[0] ... t[limbs] is now the twos complement signed version of a[i]
+            and the shift occures without overflow
+        */
+
+        if (r != 0)
+            mpn_lshift(t, t, limbs + 1, r);
+
+        if (q < zn)
+        {
+            size_t new_zout = FLINT_MIN(zn, q + limbs + 1);
+            FLINT_ASSERT(new_zout >= zout);
+
+            while (zout < new_zout)
+                z[zout++] = -f;
+
+            FLINT_ASSERT(new_zout > q);
+            f ^= s;
+            f ^= mpn_add_n(z + q, z + q, t, new_zout - q);
+        }
+        else
+        {
+            if (q == zn)
+                f ^= t[0]&1;
+            break;
+        }
+    }
+
+    while (zout < zn)
+        z[zout++] = -f;
+
+    TMP_END;
+
+    FLINT_ASSERT(f == 0 || f == 1);
+    return f;   
+}
+
+/*
+    Split into coefficients from |x| evaluated at 2^bits,
+    and do a negmod on each coefficient for x < 0.
+*/
+static mp_size_t fft_split_bits_fmpz(
     mp_limb_t ** poly,
     const fmpz_t x,
     flint_bitcnt_t bits,
-    mp_size_t output_limbs)
+    mp_size_t limbs)
 {
-    FLINT_ASSERT(fmpz_sgn(x) >= 0);
+    mp_size_t len;
+    int x_is_neg;
+
     if (COEFF_IS_MPZ(*x))
     {
-        return fft_split_bits(poly, COEFF_TO_PTR(*x)->_mp_d,
-                               COEFF_TO_PTR(*x)->_mp_size, bits, output_limbs);
+        mp_size_t s = COEFF_TO_PTR(*x)->_mp_size;
+        x_is_neg = s < 0;
+        len = fft_split_bits(poly, COEFF_TO_PTR(*x)->_mp_d,
+                             x_is_neg ? -s : s, bits, limbs);
     }
     else if (!fmpz_is_zero(x))
     {
-        return fft_split_bits(poly, (mp_limb_t*) x, 1, bits, output_limbs);
+        mp_limb_t ux;
+        x_is_neg = *x < 0;
+        ux = x_is_neg ? -*x : *x;
+        len = fft_split_bits(poly, &ux, 1, bits, limbs);
     }
     else
     {
-        return 0;
+        len = 0;
     }
+
+    if (x_is_neg)
+    {
+        mp_size_t i;
+        for (i = 0; i < len; i++)
+            mpn_negmod_2expp1(poly[i], poly[i], limbs);
+    }
+
+    return len;
 }
 
-void fft_combine_bits_fmpz(
+static void fft_combine_bits_fmpz(
     fmpz_t x,
     mp_limb_t ** poly, slong length,
     flint_bitcnt_t bits,
-    mp_size_t output_limbs,
-    mp_size_t total_limbs)
+    mp_size_t limbs,
+    mp_size_t total_limbs,
+    int sign)
 {
     __mpz_struct * mx = _fmpz_promote(x);
     mp_limb_t * d = FLINT_MPZ_REALLOC(mx, total_limbs);
-    flint_mpn_zero(d, total_limbs);
-    fft_combine_bits(d, poly, length, bits, output_limbs, total_limbs);
-    MPN_NORM(d, total_limbs);
-    mx->_mp_size = total_limbs;
+    if (sign)
+    {
+        if (fft_combine_bits_signed(d, poly, length, bits, limbs, total_limbs))
+        {
+            mpn_neg_n(d, d, total_limbs);
+            MPN_NORM(d, total_limbs);
+            /* total_limbs should have started high enough to prevent d = 0 here */
+            FLINT_ASSERT(total_limbs > 0);
+            mx->_mp_size = -total_limbs;
+        }
+        else
+        {
+            MPN_NORM(d, total_limbs);
+            mx->_mp_size = total_limbs;
+        }
+    }
+    else
+    {
+        flint_mpn_zero(d, total_limbs);
+        fft_combine_bits(d, poly, length, bits, limbs, total_limbs);
+        MPN_NORM(d, total_limbs);
+        mx->_mp_size = total_limbs;
+    }
     _fmpz_demote_val(x);
 }
 
@@ -137,15 +265,17 @@ void _fmpz_mat_mul_truncate_sqrt2(
     flint_bitcnt_t depth,
     flint_bitcnt_t w,
     slong j1, slong j2,
-    const int use_mfa)
+    const int use_mfa,
+    const int sign)
 {
     slong M = fmpz_mat_nrows(A);
     slong K = fmpz_mat_ncols(A);
     slong N = fmpz_mat_ncols(B);
-    slong clgK = FLINT_CLOG2(K);
+    slong clgK = FLINT_CLOG2(K) + sign;
     slong n = WORD(1) << depth;
     ulong trunc, sqrt;
     ulong bits1 = (n*w - (depth + 1 + clgK))/2;
+/* This bound on Climbs is also ok with the original clgK = FLINT_CLOG2(K) */
     slong Climbs = (Abits + Bbits + clgK + FLINT_BITS - 1)/FLINT_BITS;
     slong limbs = (n*w)/FLINT_BITS;
     slong size = limbs + 1;
@@ -305,7 +435,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
         }
 
         fft_combine_bits_fmpz(fmpz_mat_entry(C, i, j), Ccoeffs,
-                                            j1 + j2 - 1, bits1, limbs, Climbs);
+                                      j1 + j2 - 1, bits1, limbs, Climbs, sign);
     }
 
     flint_free(temp);
@@ -313,19 +443,38 @@ void _fmpz_mat_mul_truncate_sqrt2(
 }
 
 /*
-    only works for nonnegative input!!!
+For nonnegative input:
     just like mpn_mul_main but
         bits = (n*w - (depth + 1))/2;
     is replaced by
         bits = (n*w - (depth + 1 + FLINT_CLOG2(k)))/2;
+
+    the inputs are viewed a polynomials evaluated at 2^bits, with
+        all coeffs in [0, 2^bits)
+
+For general input:
+    the inputs are viewed a polynomials evaluated at 2^bits, either with
+        all coeffs in [0, 2^bits), or
+        all coeffs in (-2^bits, 0]
+
+    (Balancing as (-2^(bits-1), 2^(bits-1)] hardly seems worth the effort.)
+
+In either case, the product of the matrices of these polynomials has
+coefficients bounded in absolute value by
+
+    k*2^(depth+1)*2^(2*bits)
+
+We want this to be less than 2^(n*w) in the unsigned case and less than
+2^(n*w)/2 in the signed case.     
 */
 void _fmpz_mat_mul_fft(
-   fmpz_mat_t C,
-   const fmpz_mat_t A, slong abits,
-   const fmpz_mat_t B, slong bbits)
+    fmpz_mat_t C,
+    const fmpz_mat_t A, slong abits,
+    const fmpz_mat_t B, slong bbits,
+    int sign)
 {
     slong K = fmpz_mat_ncols(A);
-    slong clgK = FLINT_CLOG2(K);
+    slong clgK = FLINT_CLOG2(K) + sign;
     slong /*off, */depth = 6;
     slong w = 1;
     slong n = WORD(1) << depth;
@@ -338,6 +487,9 @@ void _fmpz_mat_mul_fft(
     slong j2 = (bits2 + bits - 1)/bits;
     int use_mfa;
 
+    FLINT_ASSERT(sign == 0 || sign == 1);
+    FLINT_ASSERT(abits > 0);
+    FLINT_ASSERT(bbits > 0);
     FLINT_ASSERT(j1 + j2 - 1 > 2*n);
 
     /* find initial n, w */
@@ -364,14 +516,6 @@ void _fmpz_mat_mul_fft(
         slong wadj = 1;
 
         /* adjust n and w */
-#if 0
-    this does not work because it can decrease n past j1 + j2 - 1 <= 4*n
-
-        off = fft_tuning_table[depth - 6][w - 1];
-        depth -= off;
-        n = WORD(1) << depth;
-        w *= WORD(1) << (2*off);
-#endif
         if (depth < 6)
             wadj = WORD(1) << (6 - depth);
 
@@ -391,14 +535,6 @@ void _fmpz_mat_mul_fft(
     }
     else
     {
-#if 0
-    this does not work either
-        if (j1 + j2 - 1 <= 3*n)
-        {
-            depth--;
-            w *= 3;
-        }
-#endif
         use_mfa = 1;
     }
 
@@ -406,7 +542,8 @@ void _fmpz_mat_mul_fft(
     j1 = (bits1 + bits - 1)/bits;
     j2 = (bits2 + bits - 1)/bits;
 
-    _fmpz_mat_mul_truncate_sqrt2(C, A, abits, B, bbits, depth, w, j1, j2, use_mfa);
+    _fmpz_mat_mul_truncate_sqrt2(C, A, abits, B, bbits, depth, w, j1, j2,
+                                                                use_mfa, sign);
 }
 
 void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
@@ -447,14 +584,6 @@ void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         return;
     }
 
-    if (sign)
-    {
-        flint_printf("not implemented for sign\n");
-        flint_abort();
-    }
-    else
-    {
-        _fmpz_mat_mul_fft(C, A, abits, B, bbits);
-    }
+    _fmpz_mat_mul_fft(C, A, abits, B, bbits, sign);
 }
 

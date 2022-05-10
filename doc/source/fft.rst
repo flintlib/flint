@@ -66,6 +66,12 @@ Arithmetic modulo a generalised Fermat number
 --------------------------------------------------------------------------------
 
 
+.. function:: void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs);
+
+    Set ``z`` to the negation of the Fermat number `a` modulo ``B^limbs + 1``.
+    The input ``a`` is expected to be fully reduced, and the output is fully reduced.
+    Aliasing is permitted.
+
 .. function:: void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
 
     Adds the signed limb ``c`` to the generalised Fermat number ``r``

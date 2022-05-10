@@ -41,8 +41,8 @@ int main(void)
         fmpz_mat_init(D, m, n);
 
         do {
-            fmpz_mat_randtest_unsigned(A, state, n_randint(state, 99999) + 1);
-            fmpz_mat_randtest_unsigned(B, state, n_randint(state, 99999) + 1);
+            fmpz_mat_randtest(A, state, n_randint(state, 99999) + 1);
+            fmpz_mat_randtest(B, state, n_randint(state, 99999) + 1);
         } while (fmpz_mat_is_zero(A) || fmpz_mat_is_zero(B));
 
         fmpz_mat_randtest(C, state, n_randint(state, 2000) + 1);
