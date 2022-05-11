@@ -69,7 +69,6 @@ flint_printf("\n--- fib(1+2^%wd)/fib(2^%wd) (numerator bits = %wu) ---\n", i, i,
         }
         flint_printf("new: %wd  (new/gcd: %f)\n", timer->wall, (double)(timer->wall)/(double)(gcd_time));
 
-
         fmpz_fib_ui(fmpq_numref(r), (1 << i) + 1);
         fmpz_fib_ui(fmpq_denref(r), (1 << i));
         fmpz_fib_ui(fmpq_numref(l), (1 << i) + 2);
@@ -89,7 +88,7 @@ flint_printf("\n--- fib(1+2^%wd)/fib(2^%wd) (numerator bits = %wu) ---\n", i, i,
         }
         flint_printf("bet: %wd  (bet/gcd: %f)\n", timer->wall, (double)(timer->wall)/(double)(gcd_time));
 
-/* too slow
+#if 0
         timeit_start(timer);
         n2 = fmpq_get_cfrac_naive(c2, r, x, bound);
         timeit_stop(timer);
@@ -100,7 +99,7 @@ flint_printf("\n--- fib(1+2^%wd)/fib(2^%wd) (numerator bits = %wu) ---\n", i, i,
         }
 
         flint_printf("old: %wd\n", timer->wall);
-*/
+#endif
         _fmpz_vec_clear(c1, bound);
         _fmpz_vec_clear(c2, bound);
         fmpq_clear(x);

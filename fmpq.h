@@ -453,6 +453,12 @@ FLINT_DLL flint_bitcnt_t _fmpz_mat22_bits(const _fmpz_mat22_t N);
 
 FLINT_DLL void _fmpz_mat22_rmul(_fmpz_mat22_t M, const _fmpz_mat22_t N);
 
+FLINT_DLL void _fmpz_mat22_addmul_inv_vec(fmpz_t ya, fmpz_t yb,
+                                        _fmpz_mat22_t N, fmpz_t xa, fmpz_t xb);
+
+FLINT_DLL void _fmpz_mat22_addmul_inv_mat(fmpz_t A11, fmpz_t A12, fmpz_t A21, fmpz_t A22,
+              _fmpz_mat22_t M, fmpz_t B11, fmpz_t B12, fmpz_t B21, fmpz_t B22);
+
 FLINT_DLL void _fmpz_mat22_rmul_ui(_fmpz_mat22_t M, const _ui_mat22_t N);
 
 FLINT_DLL void _fmpz_mat22_rmul_inv_ui(_fmpz_mat22_t M, const _ui_mat22_t N);
