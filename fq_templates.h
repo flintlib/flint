@@ -38,7 +38,6 @@ FLINT_DLL void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
                                          const TEMPLATE(T, ctx_t) ctx);
 #endif
 
-
 FQ_TEMPLATES_INLINE
 int TEMPLATE(T, is_primitive)(const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx)
 {

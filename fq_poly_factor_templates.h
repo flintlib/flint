@@ -13,6 +13,8 @@
 
 #ifdef T
 
+#include "templates.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

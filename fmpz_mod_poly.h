@@ -22,6 +22,7 @@
 #include "fmpz_mini.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_poly_mini.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -85,32 +86,11 @@ fmpz_mod_poly_compose_mod_precomp_preinv_arg_t;
 
 /*  Initialisation and memory management *************************************/
 
-FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
-{
-    poly->coeffs = NULL;
-    poly->alloc  = 0;
-    poly->length = 0;
-}
-
 FLINT_DLL void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL void fmpz_mod_poly_clear(fmpz_mod_poly_t poly,
                                                      const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc,
                                                      const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len);
-
-FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len,
-                                                      const fmpz_mod_ctx_t ctx)
-{
-    _fmpz_mod_poly_fit_length(poly, len);
-}
-
 
 /*  Normalisation and truncation *********************************************/
 
@@ -250,10 +230,7 @@ void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1,
 FLINT_DLL void _fmpz_mod_poly_reverse(fmpz * res, const fmpz * poly,
                                                            slong len, slong n);
 
-FLINT_DLL void fmpz_mod_poly_reverse(fmpz_mod_poly_t res,
-                const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE 
+FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_zero(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
    _fmpz_mod_poly_set_length(poly, 0);
@@ -744,9 +721,6 @@ FLINT_DLL int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
 FLINT_DLL void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
                                  const fmpz_t cinv, const fmpz_t p);
 
-FLINT_DLL void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
-                   const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
-
 FLINT_DLL void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
                    const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
 
@@ -755,13 +729,6 @@ _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n,
                                  const fmpz_t cinv, const fmpz_t p)
 {
    _fmpz_mod_poly_inv_series_newton(Qinv, Q, n, cinv, p);
-}
-
-FMPZ_MOD_POLY_INLINE void 
-fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q,
-                                             slong n, const fmpz_mod_ctx_t ctx)
-{
-   fmpz_mod_poly_inv_series_newton(Qinv, Q, n, ctx);
 }
 
 FMPZ_MOD_POLY_INLINE void 
@@ -1084,9 +1051,6 @@ FLINT_DLL void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f,
 FLINT_DLL void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, 
                                const fmpz_t p);
  
-FLINT_DLL void fmpz_mod_poly_derivative(fmpz_mod_poly_t res,
-                         const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
-
 /*  Evaluation  **************************************************************/
 
 FLINT_DLL void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, 

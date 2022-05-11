@@ -20,7 +20,7 @@
 #define FQ_POLY_MINI_TEMPLATES_INLINE static __inline__
 #endif
 
-#include "fq.h"
+#include "fq_mini.h"
 
 #ifdef T
 #undef T

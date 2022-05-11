@@ -67,8 +67,6 @@ FLINT_DLL void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz
 FLINT_DLL void fmpz_randprime(fmpz_t f, flint_rand_t state, 
                               flint_bitcnt_t bits, int proved);
 
-FLINT_DLL ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod);
-
 FMPZ_INLINE void
 fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f)
 {
@@ -182,7 +180,6 @@ FLINT_DLL int fmpz_print(const fmpz_t x);
   || defined (__STDIO_H__)          \
   || defined (_STDIO_INCLUDED)      \
   || defined (__dj_include_stdio_h_)\
-  || defined (_FILE_DEFINED)        \
   || defined (__STDIO__)            \
   || defined (_MSL_STDIO_H)         \
   || defined (_STDIO_H_INCLUDED)    \
@@ -194,8 +191,6 @@ FLINT_DLL size_t fmpz_inp_raw(fmpz_t x, FILE * fin);
 FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
 FLINT_DLL size_t fmpz_out_raw(FILE * fout, const fmpz_t x);
 #endif
-
-FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
 FLINT_DLL char * fmpz_get_str(char * str, int b, const fmpz_t f);
 
@@ -311,8 +306,6 @@ FLINT_DLL slong fmpz_flog(const fmpz_t x, const fmpz_t b);
 FLINT_DLL slong fmpz_flog_ui(const fmpz_t x, ulong b);
 FLINT_DLL slong fmpz_clog(const fmpz_t x, const fmpz_t b);
 FLINT_DLL slong fmpz_clog_ui(const fmpz_t x, ulong b);
-
-FLINT_DLL int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 
 FLINT_DLL void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 
@@ -757,16 +750,6 @@ FLINT_DLL void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 FLINT_DLL int fmpz_moebius_mu(const fmpz_t n);
 
 FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n);
-
-/* Functions that should be in ulong extras */
-
-FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp,
-                                                          ulong n, ulong ninv);
-
-FMPZ_INLINE ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
-{
-    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
-}
 
 /* Inlines *******************************************************************/
 

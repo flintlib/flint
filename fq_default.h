@@ -19,11 +19,13 @@
 #define FQ_DEFAULT_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "ulong_extras_mini.h"
+#include "fmpz_mod.h"
 #include "fq.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
+#include "nmod_poly.h"
+#include "fmpz_mod_poly.h"
 
 #define FQ_DEFAULT_FQ_ZECH  1
 #define FQ_DEFAULT_FQ_NMOD  2
@@ -199,6 +201,21 @@ FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
     }
 }
 
+#if defined (H_STDIO)               \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)
+
 FQ_DEFAULT_INLINE int fq_default_ctx_fprint(FILE * file,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -256,6 +273,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_print(const fq_default_ctx_t ctx)
     }
 }
 
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -1209,10 +1227,7 @@ FQ_DEFAULT_INLINE void fq_default_get_nmod_poly(nmod_poly_t poly,
         poly->coeffs[0] = op->nmod;
     }
     else
-    {
-        flint_printf("Impossible conversion\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Impossible conversion in fq_default_get_nmod_poly\n");
 }
 
 FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
@@ -1231,10 +1246,7 @@ FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
         op->nmod = nmod_poly_evaluate_nmod(poly, ctx->ctx.nmod.a);
     }    
     else
-    {
-        flint_printf("Impossible conversion\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Impossible conversion in fq_default_set_nmod_poly\n");
 }
 
 FQ_DEFAULT_INLINE int fq_default_get_fmpz(fmpz_t z, const fq_default_t op,
@@ -1312,13 +1324,27 @@ FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,
     {
         fmpz_mod_ctx_t mod_ctx;
         fmpz_mod_ctx_init(mod_ctx, fq_ctx_prime(ctx->ctx.fq));
-        fmpz_mod_poly_get_coeff_fmpz(c,
-		                  (fmpz_mod_poly_struct *) op->fq, n, mod_ctx);
+        fmpz_mod_poly_get_coeff_fmpz(c, (fmpz_mod_poly_struct *) op->fq, n, mod_ctx);
         fmpz_mod_ctx_clear(mod_ctx);
     }
 }
 
 /* Output ********************************************************************/
+
+#if defined (H_STDIO)               \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)
 
 FQ_DEFAULT_INLINE
 int fq_default_fprint(FILE * file, const fq_default_t op,
@@ -1481,6 +1507,8 @@ FQ_DEFAULT_INLINE char * fq_default_get_str_pretty(const fq_default_t op,
         return fq_get_str_pretty(op->fq, ctx->ctx.fq);
     }
 }
+
+#endif
 
 /* Special functions *********************************************************/
 

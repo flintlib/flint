@@ -190,11 +190,12 @@ ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod)
 {
     return n_powmod2_ui_preinv(a, exp, mod.n, mod.ninv);
 }
-/*
-This function is in fmpz.h
 
-FMPZ_INLINE ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
-*/
+NMOD_INLINE ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
+{
+    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
+}
+
 
 NMOD_INLINE
 void nmod_init(nmod_t * mod, ulong n)

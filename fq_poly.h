@@ -22,6 +22,7 @@
 #define FQ_POLY_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "fq_mini.h"
 #include "fq_poly_mini.h"
 
 #define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16

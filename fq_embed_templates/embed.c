@@ -12,8 +12,6 @@
 #ifdef T
 #ifdef B
 
-#include "templates.h"
-
 void TEMPLATE(T, embed_gens)(TEMPLATE(T, t) gen_sub,
                              TEMPLATE(T, t) gen_sup,
                              TEMPLATE(B, poly_t) minpoly,

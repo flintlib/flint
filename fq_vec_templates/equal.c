@@ -28,5 +28,4 @@ _TEMPLATE(T, vec_equal) (const TEMPLATE(T, struct) * vec1,
     return 1;
 }
 
-
 #endif

@@ -50,6 +50,8 @@ FLINT_DLL void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t st
 
 FLINT_DLL void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
+/* NOTE: If any of the following four definitions change, the corresponding
+ * macros in fq_zech.h has to be changed. */
 FQ_NMOD_INLINE const nmod_poly_struct* fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus;
@@ -62,7 +64,11 @@ FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 
 #define fq_nmod_ctx_prime(ctx)  (&((ctx)->p))
 
-FLINT_DLL void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx);
+FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
+{
+    fmpz_set(f, fq_nmod_ctx_prime(ctx));
+    fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
+}
 
 /* Memory managment  *********************************************************/
 

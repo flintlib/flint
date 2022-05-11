@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "flint.h"
+#include "ulong_extras.h"
+#include "nmod_poly.h"
+#include "fq_nmod.h"
 #include "fq_zech.h"
 
 void
@@ -49,11 +48,12 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
     if (!result)
     {
         flint_free(fq_nmod_ctx);
-	ctx->is_conway = 0;
+        ctx->is_conway = 0;
         return result;
-    } else
+    }
+    else
         ctx->is_conway = 1;
-    
+
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
     return result;
@@ -126,10 +126,7 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     fq_nmod_ctx_order(order, fq_nmod_ctx);
 
     if (fmpz_bits(order) > FLINT_BITS)
-    {
-        flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Requires q < 2^FLINT_BITS\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Requires q < 2^FLINT_BITS in fq_zech_ctx_init_fq_nmod_ctx\n");
 
     q = fmpz_get_ui(order);
     up = fmpz_get_ui(fq_nmod_ctx_prime(fq_nmod_ctx));
@@ -222,8 +219,5 @@ void
 fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
 {
     if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx))
-    {
-        flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Polynomial is not primitive.\n");
-	flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Polynomial is not primitive in fq_zech_ctx_init_fq_nmod_ctx\n");
 }

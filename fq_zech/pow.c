@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fq_zech.h"
 
 void
@@ -16,10 +17,8 @@ fq_zech_pow(fq_zech_t rop, const fq_zech_t op, const fmpz_t e,
             const fq_zech_ctx_t ctx)
 {
     if (fmpz_sgn(e) < 0)
-    {
-        flint_printf("Exception (fq_zech_pow).  e < 0.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "e < 0 in fq_zech_pow\n");
+
     if (fmpz_is_zero(e))
     {
         fq_zech_one(rop, ctx);

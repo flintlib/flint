@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, poly_mul_classical) (TEMPLATE(T, struct) * rop,
                                   const TEMPLATE(T, struct) * op1, slong len1,

@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "fq_zech.h"
 
 void
 fq_zech_inv(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     if (fq_zech_is_zero(op, ctx))
-    {
-        flint_printf("Exception (fq_inv).  Zero is not invertible.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_IMPINV, "Zero is not invertible in fq_zech_inv\n");
+
     if (fq_zech_is_one(op, ctx))
     {
         fq_zech_one(rop, ctx);

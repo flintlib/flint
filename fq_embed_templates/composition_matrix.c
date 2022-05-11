@@ -12,8 +12,6 @@
 #ifdef T
 #ifdef B
 
-#include "templates.h"
-
 /* The naming of these macros is an abuse */
 #define __nmod_poly_get_coeff(p, i) ((p)->coeffs[(i)])
 #define __fmpz_mod_poly_get_coeff(p, i) ((p)->coeffs + (i))

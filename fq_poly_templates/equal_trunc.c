@@ -13,8 +13,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 int
 TEMPLATE(T, poly_equal_trunc) (const TEMPLATE(T, poly_t) op1,
                          const TEMPLATE(T, poly_t) op2,

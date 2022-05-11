@@ -20,7 +20,7 @@
 #define FQ_ZECH_VEC_INLINE static __inline__
 #endif
 
-#include "fq_zech.h"
+#include "flint.h"
 
 #define FQ_ZECH_VEC_NORM(vec, i, ctx)                    \
 do {                                                \

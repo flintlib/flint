@@ -9,13 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech.h"
+#include <stdio.h>
+#include "flint-impl.h"
+#include "ulong_extras.h"
 
 char *
 fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     slong num_chars = op->value == 0 ? 1 : n_clog(op->value + 1, 10);
     char *s = flint_malloc((num_chars + 1)* sizeof(char));
-    flint_sprintf(s, "%wd", op->value);
+    sprintf(s, WORD_FMT "d", op->value);
     return s;
 }

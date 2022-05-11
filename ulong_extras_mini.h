@@ -41,6 +41,8 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
+FLINT_DLL ulong n_sqrtmod(ulong a, ulong p);
+
 ULONG_EXTRAS_MINI_INLINE
 ulong n_submod(ulong x, ulong y, ulong n)
 {
@@ -78,6 +80,9 @@ ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
 }
 
 FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv);
+FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv);
+
+FLINT_DLL ulong n_randint(flint_rand_t state, ulong limit);
 
 #ifdef __cplusplus
 }

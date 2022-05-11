@@ -154,8 +154,6 @@ ULONG_EXTRAS_INLINE int n_sub_checked(ulong_ptr a, ulong b, ulong c)
 
 FLINT_DLL ulong n_randlimb(flint_rand_t state);
 
-FLINT_DLL ulong n_randint(flint_rand_t state, ulong limit);
-
 FLINT_DLL ulong n_urandint(flint_rand_t state, ulong limit);
 
 FLINT_DLL ulong n_randbits(flint_rand_t state, unsigned int bits);
@@ -228,12 +226,6 @@ ulong n_powmod(ulong a, slong exp, ulong n)
    return n_powmod_precomp(a, exp, n, npre);
 }
 
-/*
-This function is in fmpz.h
-
-FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp,
-                                                          ulong n, ulong ninv);
-*/
 FLINT_DLL ulong n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n, 
@@ -269,8 +261,6 @@ ulong n_negmod(ulong x, ulong n)
 
     return n_submod(0, x, n);
 }
-
-FLINT_DLL ulong n_sqrtmod(ulong a, ulong p);
 
 FLINT_DLL slong n_sqrtmod_2pow(ulong_ptr* sqrt, ulong a, slong exp); 
 

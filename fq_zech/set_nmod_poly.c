@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-
 #include "fq_zech.h"
 
 void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,

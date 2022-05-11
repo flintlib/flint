@@ -23,5 +23,4 @@ TEMPLATE(T, mat_window_clear) (TEMPLATE(T, mat_t) window,
         flint_free(window->rows);
 }
 
-
 #endif

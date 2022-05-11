@@ -68,7 +68,7 @@ void TEMPLATE(T, embed_composition_matrix)(TEMPLATE(B, mat_t) matrix,
                                      const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, embed_composition_matrix_sub)(matrix, gen, ctx, 
-                                        TEMPLATE(T, ctx_degree(ctx)));
+                                        TEMPLATE(CAP_T, CTX_DEGREE(ctx)));
 }
 
 FLINT_DLL void TEMPLATE(T, embed_mul_matrix)(TEMPLATE(B, mat_t) matrix,

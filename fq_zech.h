@@ -14,18 +14,36 @@
 
 #ifdef FQ_ZECH_INLINES_C
 #define FQ_ZECH_INLINE FLINT_DLL
-/* #define FQ_TEMPLATES_INLINE FLINT_DLL */
+#define FQ_TEMPLATES_INLINE FLINT_DLL
 #else
 #define FQ_ZECH_INLINE static __inline__
-/* #define FQ_TEMPLATES_INLINE static __inline__ */
+#define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
-#include "fq_nmod.h"
+#include "fmpz_mini.h"
 
-/* Data types and context ****************************************************/
+/* Avoid including fq_nmod.h for these simple definitions */
+#define FQ_NMOD_CTX_MODULUS(ctx)    \
+    ((ctx)->modulus)
+
+#define FQ_NMOD_CTX_DEGREE(ctx)     \
+    ((ctx)->modulus->length - 1)
+
+#define FQ_NMOD_CTX_PRIME(ctx)      \
+    (&((ctx)->p))
+
+#define FQ_NMOD_CTX_ORDER(f, ctx)                   \
+    do                                              \
+    {                                               \
+        fmpz_set(f, FQ_NMOD_CTX_PRIME(ctx));        \
+        fmpz_pow_ui(f, f, FQ_NMOD_CTX_DEGREE(ctx)); \
+    } while (0)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Data types and context ****************************************************/
 
 FLINT_DLL void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
@@ -55,19 +73,19 @@ FLINT_DLL void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE const nmod_poly_struct* fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
 {
-    return fq_nmod_ctx_modulus(ctx->fq_nmod_ctx);
+    return FQ_NMOD_CTX_MODULUS(ctx->fq_nmod_ctx);
 }
 
 FQ_ZECH_INLINE slong
 fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
 {
-    return fq_nmod_ctx_degree(ctx->fq_nmod_ctx);
+    return FQ_NMOD_CTX_DEGREE(ctx->fq_nmod_ctx);
 }
 
 FQ_ZECH_INLINE void
 fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
 {
-    fq_nmod_ctx_order(f, ctx->fq_nmod_ctx);
+    FQ_NMOD_CTX_ORDER(f, ctx->fq_nmod_ctx);
 }
 
 FQ_ZECH_INLINE ulong
@@ -76,13 +94,30 @@ fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
     return ctx->qm1 + 1;
 }
 
-#define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
+#define fq_zech_ctx_prime(ctx)  FQ_NMOD_CTX_PRIME(ctx->fq_nmod_ctx)
+
+#if defined (H_STDIO)               \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)
+
+#include "fq_nmod.h"
 
 FQ_ZECH_INLINE int
 fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
 {
     int r;
-    r = flint_fprintf(file, "Zech Representation:\n");
+    r = fprintf(file, "Zech Representation:\n");
     if (r <= 0)
         return r;
     return fq_nmod_ctx_fprint(file, ctx->fq_nmod_ctx);
@@ -93,6 +128,8 @@ fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 {
     fq_zech_ctx_fprint(stdout, ctx);
 }
+
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -278,10 +315,28 @@ FLINT_DLL void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
 
 
 /* Output ********************************************************************/
+
+#if defined (H_STDIO)               \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)
+
+#include "flint-impl.h"
+
 FQ_ZECH_INLINE int
 fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    return flint_fprintf(file, "%s^%wd", ctx->fq_nmod_ctx->var, op->value);
+    return fprintf(file, "%s^" WORD_FMT "d", ctx->fq_nmod_ctx->var, op->value);
 }
 
 FQ_ZECH_INLINE void
@@ -293,7 +348,7 @@ fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 FQ_ZECH_INLINE int
 fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    return flint_fprintf(file, "%wd", op->value);
+    return fprintf(file, WORD_FMT "d", op->value);
 }
 
 FQ_ZECH_INLINE void
@@ -301,6 +356,7 @@ fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     fq_zech_fprint(stdout, op, ctx);
 }
+#endif
 
 FLINT_DLL char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
 

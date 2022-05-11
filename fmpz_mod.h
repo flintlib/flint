@@ -19,15 +19,12 @@
 #endif
 
 #include "flint.h"
-#include "fmpz-conversions.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#ifndef FMPZ_IS_ONE
 #define FMPZ_IS_ONE(f)  (*(f) == 1)
-#endif
 
 /* all of the data we need to do arithmetic mod n ****************************/
 
@@ -59,6 +56,9 @@ FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
 }
 
 #ifdef __GMP_H__
+
+#include "fmpz-conversions.h"
+
 FMPZ_MOD_INLINE
 void fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
 {
@@ -74,6 +74,7 @@ void fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
         m->_mp_d = (ulong_ptr) p;
     }
 }
+
 #endif
 
 FLINT_DLL void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n);
@@ -201,8 +202,7 @@ FLINT_DLL void fmpz_mod_mul_si(fmpz_t a, const fmpz_t b, slong c,
 
 FLINT_DLL int fmpz_mod_is_invertible(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_inv(fmpz_t a, const fmpz_t b,
-                                                     const fmpz_mod_ctx_t ctx);
+FLINT_DLL void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
@@ -219,58 +219,7 @@ FLINT_DLL void fmpz_mod_rand(fmpz_t a, flint_rand_t state,
 FLINT_DLL void fmpz_mod_rand_not_zero(fmpz_t a, flint_rand_t state,
                                                      const fmpz_mod_ctx_t ctx);
 
-/* discrete logs a la Pohlig - Hellman ***************************************/
-
-typedef struct {
-    fmpz_t gammapow;
-    ulong cm;
-} fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct;
-
-typedef struct {
-    slong exp;
-    ulong prime;
-    fmpz_t gamma;
-    fmpz_t gammainv;
-    fmpz_t startingbeta;
-    fmpz_t co;
-    fmpz_t startinge;
-    fmpz_t idem;
-    ulong cbound;
-    ulong dbound;
-    fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct * table; /* length cbound */
-} fmpz_mod_discrete_log_pohlig_hellman_entry_struct;
-
-typedef struct {
-    fmpz_mod_ctx_t fpctx;
-    fmpz_t pm1;      /* p - 1 */
-    fmpz_t alpha;    /* p.r. of p */
-    fmpz_t alphainv;
-    slong num_factors;  /* factors of p - 1*/
-    fmpz_mod_discrete_log_pohlig_hellman_entry_struct * entries;
-} fmpz_mod_discrete_log_pohlig_hellman_struct;
-typedef fmpz_mod_discrete_log_pohlig_hellman_struct fmpz_mod_discrete_log_pohlig_hellman_t[1];
-
-FLINT_DLL void fmpz_mod_discrete_log_pohlig_hellman_init(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L);
-
-FLINT_DLL void fmpz_mod_discrete_log_pohlig_hellman_clear(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L);
-
-FLINT_DLL double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L,
-                    const fmpz_t p);
-
-FLINT_DLL void fmpz_mod_discrete_log_pohlig_hellman_run(
-                    fmpz_t x,
-                    const fmpz_mod_discrete_log_pohlig_hellman_t L,
-                    const fmpz_t y);
-
-FMPZ_MOD_INLINE const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L)
-{
-    return L->alpha;
-}
-
+/* FIXME: This doesn't belong here. */
 FLINT_DLL int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b);
 
 

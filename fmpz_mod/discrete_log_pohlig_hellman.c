@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_discrete_log_pohlig_hellman.h"
 
 /*
     Assumption on fmpz_mod_discrete_log_pohlig_hellman_t:
@@ -413,6 +414,4 @@ cleanup_and_throw:
     flint_throw(FLINT_ERROR, "Exception in fmpz_mod_discrete_log_pohlig_"
                                           "hellman_run: Could not find log.");
     return;
-
-
 }

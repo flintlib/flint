@@ -20,6 +20,9 @@
 #define FQ_POLY_FACTOR_INLINE static __inline__
 #endif
 
+#include "ulong_extras_mini.h"
+#include "fq_mini.h"
+
 FQ_POLY_FACTOR_INLINE
 int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
 {
@@ -27,7 +30,7 @@ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
     fmpz_t q;
     fmpz_init(q);
     fq_ctx_order(q, ctx);
-    if ( fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
+    if (fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
         result = 1;
     else
         result = 0;

@@ -12,8 +12,6 @@
 
 #ifdef T
 
-#include "templates.h"
-
 void
 _TEMPLATE(T, vec_neg) (TEMPLATE(T, struct) * vec1,
                        const TEMPLATE(T, struct) * vec2,

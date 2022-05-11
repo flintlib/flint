@@ -278,6 +278,7 @@ FLINT_DLL int fmpz_abs_fits_ui(const fmpz_t f);
 
 FLINT_DLL mp_mock_size_t fmpz_size(const fmpz_t f);
 FLINT_DLL flint_bitcnt_t fmpz_bits(const fmpz_t f);
+FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
 /* miscellaneous **************************************************************/
 
@@ -293,6 +294,10 @@ FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
  * this from here. */
 FLINT_DLL slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
 FLINT_DLL slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
+
+/* NOTE: Only here for mpoly-stuff. */
+FLINT_DLL ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod);
+FLINT_DLL int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 
 #ifdef __cplusplus
 }
