@@ -13,37 +13,12 @@
 #ifndef FMPZ_MAT_H
 #define FMPZ_MAT_H
 
-#ifdef FMPZ_MAT_INLINES_C
-#define FMPZ_MAT_INLINE FLINT_DLL
-#else
-#define FMPZ_MAT_INLINE static __inline__
-#endif
-
 #include "fmpz_vec.h"
+#include "fmpz_mat_mini.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/* Element access  ********************************************************/
-
-FMPZ_MAT_INLINE
-fmpz * fmpz_mat_entry(const fmpz_mat_t mat, slong i, slong j)
-{
-   return mat->rows[i] + j;
-}
-
-FMPZ_MAT_INLINE
-slong fmpz_mat_nrows(const fmpz_mat_t mat)
-{
-   return mat->r;
-}
-
-FMPZ_MAT_INLINE
-slong fmpz_mat_ncols(const fmpz_mat_t mat)
-{
-   return mat->c;
-}
 
 /* Memory management  ********************************************************/
 
@@ -61,12 +36,7 @@ fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2)
         _fmpz_vec_swap(mat1->rows[i], mat2->rows[i], fmpz_mat_ncols(mat1));
 }
 
-FLINT_DLL void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 FLINT_DLL void fmpz_mat_clear(fmpz_mat_t mat);
-
-FLINT_DLL int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2);
-FLINT_DLL int fmpz_mat_is_zero(const fmpz_mat_t mat);
-FLINT_DLL int fmpz_mat_is_one(const fmpz_mat_t mat);
 
 FMPZ_MAT_INLINE
 int
@@ -83,33 +53,12 @@ int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
    return _fmpz_vec_equal(M->rows[m], M->rows[n], M->c);
 }
 
-FMPZ_MAT_INLINE
-int fmpz_mat_is_empty(const fmpz_mat_t mat)
-{
-    return (mat->r == 0) || (mat->c == 0);
-}
-
-FMPZ_MAT_INLINE
-int fmpz_mat_is_square(const fmpz_mat_t mat)
-{
-    return (mat->r == mat->c);
-}
-
-FLINT_DLL void fmpz_mat_zero(fmpz_mat_t mat);
-FLINT_DLL void fmpz_mat_one(fmpz_mat_t mat);
-
 /* Windows and concatenation */
 
 FLINT_DLL void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
     slong c1, slong r2, slong c2);
 
 FLINT_DLL void fmpz_mat_window_clear(fmpz_mat_t window);
-
-FLINT_DLL void fmpz_mat_concat_horizontal(fmpz_mat_t res,
-                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
-
-FLINT_DLL void fmpz_mat_concat_vertical(fmpz_mat_t res,
-                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
 
 /* Input and output  *********************************************************/
 
@@ -167,7 +116,6 @@ FLINT_DLL void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_
 FLINT_DLL void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha);
 FLINT_DLL void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, flint_bitcnt_t bits);
 FLINT_DLL void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det);
-FLINT_DLL void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count);
 FLINT_DLL int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, slong n);
 
 /* Norms */

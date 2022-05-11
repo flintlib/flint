@@ -18,7 +18,7 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-#include "nmod_vec.h"
+#include "nmod_vec_mini.h"
 
 #ifdef __cplusplus
 extern "C" {

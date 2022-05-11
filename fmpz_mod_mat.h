@@ -20,10 +20,10 @@
 #endif
 
 #include "fmpz_mini.h"
-#include "fmpz_mat.h"
+#include "fmpz_mat_mini.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10

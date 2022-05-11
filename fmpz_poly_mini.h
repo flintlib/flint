@@ -18,7 +18,7 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz_vec.h"
+#include "fmpz_vec_mini.h"
 
 #ifdef __cplusplus
 extern "C" {

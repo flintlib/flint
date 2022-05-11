@@ -250,39 +250,8 @@ FLINT_DLL void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t p
 FLINT_DLL void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
                            ulong exp);
 
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
-                               const fmpz_poly_t poly2, const fmpz_t x)
-{
-    if (poly2->length == 0)
-    {
-        fmpz_poly_zero(poly1);
-    }
-    else
-    {
-        fmpz_poly_fit_length(poly1, poly2->length);
-        _fmpz_vec_scalar_mod_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
-        _fmpz_poly_set_length(poly1, poly2->length);
-        _fmpz_poly_normalise(poly1);
-    }
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1, 
-                                const fmpz_poly_t poly2, const fmpz_t x)
-{
-    if (poly2->length == 0)
-    {
-        fmpz_poly_zero(poly1);
-    }
-    else
-    {
-        fmpz_poly_fit_length(poly1, poly2->length);
-        _fmpz_vec_scalar_smod_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
-        _fmpz_poly_set_length(poly1, poly2->length);
-        _fmpz_poly_normalise(poly1);
-    }
-}
+FLINT_DLL void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x);
+FLINT_DLL void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x);
 
 FLINT_DLL slong _fmpz_poly_remove_content_2exp(fmpz * pol, slong len);
 

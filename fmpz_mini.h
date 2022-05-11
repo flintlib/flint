@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* This is an interface intended for basic fmpz functionality as it reduces the
- * header size by a substantially. */
-
 #ifndef FMPZ_MINI_H
 #define FMPZ_MINI_H
 

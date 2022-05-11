@@ -13,16 +13,10 @@
 #ifndef FMPZ_VEC_H
 #define FMPZ_VEC_H
 
-#ifdef FMPZ_VEC_INLINES_C
-#define FMPZ_VEC_INLINE FLINT_DLL
-#else
-#define FMPZ_VEC_INLINE static __inline__
-#endif
-
-#include "flint.h"
+#include "fmpz_vec_mini.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define FMPZ_VEC_NORM(vec, i)          \
@@ -69,8 +63,6 @@ FLINT_DLL fmpz * _fmpz_vec_init(slong len);
 
 FLINT_DLL void _fmpz_vec_clear(fmpz * vec, slong len);
 
-FLINT_DLL void _fmpz_vec_demote(fmpz * vec, slong len);
-
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
@@ -81,16 +73,10 @@ FLINT_DLL void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state,
 
 /*  Norms  *******************************************************************/
 
-FLINT_DLL slong _fmpz_vec_max_bits(const fmpz * vec, slong len);
-
 FLINT_DLL slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_sum_max_bits(slong_ptr sumabs, slong_ptr maxabs,
                                             const fmpz * coeffs, slong length);
-
-FLINT_DLL mp_mock_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len);
-
-FLINT_DLL void _fmpz_vec_height(fmpz_t height, const fmpz * vec, slong len);
 
 FLINT_DLL slong _fmpz_vec_height_index(const fmpz * vec, slong len);
 
@@ -164,8 +150,6 @@ FLINT_DLL void _fmpz_vec_scalar_abs(fmpz * vec1, const fmpz * vec2, slong len2);
 /*  Comparison  **************************************************************/
 
 FLINT_DLL int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len);
-
-FLINT_DLL int _fmpz_vec_is_zero(const fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
                                                                      slong len);
@@ -271,8 +255,6 @@ FLINT_DLL void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, 
 FLINT_DLL void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p);
 
 /*  Gaussian content  ********************************************************/
-
-FLINT_DLL void _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp);
 

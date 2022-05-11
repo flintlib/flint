@@ -72,4 +72,3 @@ FLINT_DLL double _d_vec_dot_thrice(const double * vec1, const double * vec2, slo
 #endif
 
 #endif
-
