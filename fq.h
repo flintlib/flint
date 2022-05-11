@@ -14,14 +14,6 @@
 #ifndef FQ_H
 #define FQ_H
 
-#ifdef FQ_INLINES_C
-#define FQ_INLINE FLINT_DLL
-#define FQ_TEMPLATES_INLINE FLINT_DLL
-#else
-#define FQ_INLINE static __inline__
-#define FQ_TEMPLATES_INLINE static __inline__
-#endif
-
 #include "fq_mini.h"
 
 /* Data types and context ****************************************************/

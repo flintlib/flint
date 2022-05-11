@@ -12,10 +12,10 @@
 #ifndef ULONG_EXTRAS_MINI_H
 #define ULONG_EXTRAS_MINI_H
 
-#ifdef ULONG_EXTRAS_MINI_INLINES_C
-#define ULONG_EXTRAS_MINI_INLINE FLINT_DLL
+#ifdef ULONG_EXTRAS_INLINES_C
+#define ULONG_EXTRAS_INLINE FLINT_DLL
 #else
-#define ULONG_EXTRAS_MINI_INLINE static __inline__
+#define ULONG_EXTRAS_INLINE static __inline__
 #endif
 
 #include "flint.h"
@@ -29,7 +29,7 @@ FLINT_DLL ulong n_sqrt(ulong a);
 FLINT_DLL ulong n_gcd(ulong x, ulong y);
 FLINT_DLL ulong n_gcdinv(ulong_ptr a, ulong x, ulong y);
 
-ULONG_EXTRAS_MINI_INLINE
+ULONG_EXTRAS_INLINE
 ulong n_invmod(ulong x, ulong y)
 {
    ulong r, g;
@@ -43,7 +43,7 @@ ulong n_invmod(ulong x, ulong y)
 
 FLINT_DLL ulong n_sqrtmod(ulong a, ulong p);
 
-ULONG_EXTRAS_MINI_INLINE
+ULONG_EXTRAS_INLINE
 ulong n_submod(ulong x, ulong y, ulong n)
 {
     FLINT_ASSERT(x < n);
@@ -53,7 +53,7 @@ ulong n_submod(ulong x, ulong y, ulong n)
     return (y > x ? x - y + n : x - y);
 }
 
-ULONG_EXTRAS_MINI_INLINE
+ULONG_EXTRAS_INLINE
 ulong n_preinvert_limb(ulong n)
 {
    ulong norm, ninv;
@@ -68,7 +68,7 @@ FLINT_DLL ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_mod2_preinv(ulong a, ulong n, ulong ninv);
 
-ULONG_EXTRAS_MINI_INLINE
+ULONG_EXTRAS_INLINE
 ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
 {
     ulong p1, p2;

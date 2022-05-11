@@ -30,7 +30,7 @@ FLINT_DLL void TEMPLATE(T, poly_clear)(TEMPLATE(T, poly_t) poly,
 FLINT_DLL void TEMPLATE(T, poly_fit_length)(TEMPLATE(T, poly_t) poly, slong len,
                              const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_MINI_TEMPLATES_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
                               const TEMPLATE(T, ctx_t) ctx)
 {
@@ -53,7 +53,7 @@ FLINT_DLL void TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, slong n,
                                  const TEMPLATE(T, t) x,
                                  const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_MINI_TEMPLATES_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len,
                         const TEMPLATE(T, ctx_t) ctx)
 {
@@ -63,7 +63,7 @@ _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len,
         TEMPLATE(T, zero)(rop + i, ctx);
 }
 
-FQ_POLY_MINI_TEMPLATES_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_zero)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
 {
     _TEMPLATE(T, poly_set_length)(poly, 0, ctx);
@@ -93,21 +93,21 @@ FLINT_DLL void TEMPLATE(T, poly_make_monic)(TEMPLATE(T, poly_t) rop,
 
 /* parameters *****************************************************************/
 
-FQ_POLY_MINI_TEMPLATES_INLINE slong
+FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_length)(const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length;
 }
 
-FQ_POLY_MINI_TEMPLATES_INLINE slong
+FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_degree)(const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length - 1;
 }
 
-FQ_POLY_MINI_TEMPLATES_INLINE TEMPLATE(T, struct) *
+FQ_POLY_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, poly_lead)(const TEMPLATE(T, poly_t) poly,
                        const TEMPLATE(T, ctx_t) ctx)
 {
@@ -116,7 +116,7 @@ TEMPLATE(T, poly_lead)(const TEMPLATE(T, poly_t) poly,
 
 /* comparisons ****************************************************************/
 
-FQ_POLY_MINI_TEMPLATES_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
                           const TEMPLATE(T, ctx_t) ctx)
 {
@@ -175,7 +175,7 @@ FLINT_DLL void TEMPLATE(T, poly_divrem_divconquer)(TEMPLATE(T, poly_t) Q,
                                     const TEMPLATE(T, poly_t) B,
                                     const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_MINI_TEMPLATES_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_divrem)(TEMPLATE(T, struct) *Q, TEMPLATE(T, struct) *R,
                           const TEMPLATE(T, struct) *A, slong lenA,
                           const TEMPLATE(T, struct) *B, slong lenB,
@@ -185,7 +185,7 @@ _TEMPLATE(T, poly_divrem)(TEMPLATE(T, struct) *Q, TEMPLATE(T, struct) *R,
     _TEMPLATE(T, poly_divrem_divconquer)(Q, R, A, lenA, B, lenB, invB, ctx);
 }
 
-FQ_POLY_MINI_TEMPLATES_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_divrem)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
                          const TEMPLATE(T, poly_t) A,
                          const TEMPLATE(T, poly_t) B,
@@ -200,7 +200,7 @@ FLINT_DLL void _TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R,
                                 const TEMPLATE(T, t) invB,
                                 const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_MINI_TEMPLATES_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_rem)(TEMPLATE(T, poly_t) R,
                       const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                       const TEMPLATE(T, ctx_t) ctx)

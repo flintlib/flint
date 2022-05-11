@@ -12,10 +12,10 @@
 #ifndef NMOD_POLY_MINI_H
 #define NMOD_POLY_MINI_H
 
-#ifdef NMOD_POLY_MINI_INLINES_C
-#define NMOD_POLY_MINI_INLINE FLINT_DLL
+#ifdef NMOD_POLY_INLINES_C
+#define NMOD_POLY_INLINE FLINT_DLL
 #else
-#define NMOD_POLY_MINI_INLINE static __inline__
+#define NMOD_POLY_INLINE static __inline__
 #endif
 
 #include "nmod_vec.h"
@@ -38,7 +38,7 @@ FLINT_DLL void nmod_poly_clear(nmod_poly_t poly);
 
 FLINT_DLL void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void nmod_poly_init_mod(nmod_poly_t poly, const nmod_t mod)
 {
     poly->coeffs = NULL;
@@ -47,19 +47,19 @@ void nmod_poly_init_mod(nmod_poly_t poly, const nmod_t mod)
     poly->mod = mod;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void nmod_poly_set_mod(nmod_poly_t poly, const nmod_t mod)
 {
     poly->mod = mod;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void _nmod_poly_set_length(nmod_poly_t poly, slong len)
 {
     poly->length = len;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
     while (poly->length && (poly->coeffs[poly->length - 1] == WORD(0)))
@@ -72,7 +72,7 @@ FLINT_DLL void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b);
 
 FLINT_DLL void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c);
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {
     slong t;
@@ -91,13 +91,13 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
     poly2->coeffs = tp;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void nmod_poly_zero(nmod_poly_t res)
 {
     res->length = 0;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void nmod_poly_one(nmod_poly_t res)
 {
     nmod_poly_fit_length(res, 1);
@@ -105,7 +105,7 @@ void nmod_poly_one(nmod_poly_t res)
     res->coeffs[0] = 1;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 void nmod_poly_truncate(nmod_poly_t poly, slong len)
 {
     if (poly->length > len)
@@ -117,19 +117,19 @@ void nmod_poly_truncate(nmod_poly_t poly, slong len)
 
 /* parameters ***********************************************************/
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 slong nmod_poly_length(const nmod_poly_t poly)
 {
     return poly->length;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 slong nmod_poly_degree(const nmod_poly_t poly)
 {
     return poly->length - 1;
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 ulong nmod_poly_modulus(const nmod_poly_t poly)
 {
     return poly->mod.n;
@@ -137,19 +137,19 @@ ulong nmod_poly_modulus(const nmod_poly_t poly)
 
 /* comparison ***********************************************************/
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 int nmod_poly_is_zero(const nmod_poly_t poly)
 {
     return (poly->length == 0);
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 int nmod_poly_is_one(const nmod_poly_t poly)
 {
     return (poly->mod.n == 0) || (poly->length == 1 && poly->coeffs[0] == 1);
 }
 
-NMOD_POLY_MINI_INLINE
+NMOD_POLY_INLINE
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 {
     if (a->length != b->length)

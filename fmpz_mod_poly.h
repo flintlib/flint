@@ -13,12 +13,6 @@
 #ifndef FMPZ_MOD_POLY_H
 #define FMPZ_MOD_POLY_H
 
-#ifdef FMPZ_MOD_POLY_INLINES_C
-#define FMPZ_MOD_POLY_INLINE FLINT_DLL
-#else
-#define FMPZ_MOD_POLY_INLINE static __inline__
-#endif
-
 #include "fmpz_mini.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"

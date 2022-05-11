@@ -12,12 +12,12 @@
 #ifndef FQ_MINI_H
 #define FQ_MINI_H
 
-#ifdef FQ_MINI_INLINES_C
-#define FQ_MINI_INLINE FLINT_DLL
-#define FQ_MINI_TEMPLATES_INLINE FLINT_DLL
+#ifdef FQ_INLINES_C
+#define FQ_INLINE FLINT_DLL
+#define FQ_TEMPLATES_INLINE FLINT_DLL
 #else
-#define FQ_MINI_INLINE static __inline__
-#define FQ_MINI_TEMPLATES_INLINE static __inline__
+#define FQ_INLINE static __inline__
+#define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
 #include "fmpz_mini.h"
@@ -34,7 +34,7 @@ extern "C" {
 
 FLINT_DLL void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx);
 FLINT_DLL void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx);
-FQ_MINI_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
+FQ_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
 {
     if (ctx->sparse_modulus)
         _fq_sparse_reduce(R, lenR, ctx);
@@ -42,7 +42,7 @@ FQ_MINI_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
         _fq_dense_reduce(R, lenR, ctx);    
 }
 
-FQ_MINI_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
+FQ_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 {
     _fq_reduce(rop->coeffs, rop->length, ctx);
     rop->length = FLINT_MIN(rop->length, ctx->modulus->length - 1);
@@ -51,62 +51,62 @@ FQ_MINI_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 
 /* parameters *****************************************************************/
 
-FQ_MINI_INLINE const fmpz_mod_poly_struct* fq_ctx_modulus(const fq_ctx_t ctx)
+FQ_INLINE const fmpz_mod_poly_struct* fq_ctx_modulus(const fq_ctx_t ctx)
 {
     return ctx->modulus;
 }
 
-FQ_MINI_INLINE slong fq_ctx_degree(const fq_ctx_t ctx)
+FQ_INLINE slong fq_ctx_degree(const fq_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
 }
 
-FQ_MINI_INLINE const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+FQ_INLINE const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
 {
     return FMPZ_MOD_CTX_MODULUS(ctx->ctxp);
 }
 
-FQ_MINI_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
+FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
 {
     fmpz_pow_ui(f, fq_ctx_prime(ctx), fq_ctx_degree(ctx));
 }
 
 /* assignment *****************************************************************/
 
-FQ_MINI_INLINE void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+FQ_INLINE void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     fmpz_poly_set(rop, op);
 }
 
-FQ_MINI_INLINE void fq_set_fmpz(fq_t rop, const fmpz_t x, const fq_ctx_t ctx)
+FQ_INLINE void fq_set_fmpz(fq_t rop, const fmpz_t x, const fq_ctx_t ctx)
 {
     fmpz_poly_set_fmpz(rop, x);
     fq_reduce(rop, ctx);
 }
 
-FQ_MINI_INLINE void fq_zero(fq_t rop, const fq_ctx_t ctx)
+FQ_INLINE void fq_zero(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_zero(rop);
 }
 
-FQ_MINI_INLINE void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t ctx)
+FQ_INLINE void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t ctx)
 {
     fmpz_poly_swap(op1, op2);
 }
 
 /* comparison *****************************************************************/
 
-FQ_MINI_INLINE int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+FQ_INLINE int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
     return fmpz_poly_equal(op1, op2);
 }
 
-FQ_MINI_INLINE int fq_is_zero(const fq_t op, const fq_ctx_t ctx)
+FQ_INLINE int fq_is_zero(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_zero(op);
 }
 
-FQ_MINI_INLINE int fq_is_one(const fq_t op, const fq_ctx_t ctx)
+FQ_INLINE int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_one(op);
 }

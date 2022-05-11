@@ -12,14 +12,6 @@
 #ifndef FQ_ZECH_MAT_H
 #define FQ_ZECH_MAT_H
 
-#ifdef FQ_ZECH_MAT_INLINES_C
-#define FQ_MAT_TEMPLATES_INLINE FLINT_DLL
-#define FQ_ZECH_MAT_INLINE FLINT_DLL
-#else
-#define FQ_MAT_TEMPLATES_INLINE static __inline__
-#define FQ_ZECH_MAT_INLINE static __inline__
-#endif
-
 #include "fq_zech.h"
 #include "fq_zech_mat_mini.h"
 

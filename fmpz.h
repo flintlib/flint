@@ -12,12 +12,6 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
-#ifdef FMPZ_INLINES_C
-#define FMPZ_INLINE FLINT_DLL
-#else
-#define FMPZ_INLINE static __inline__
-#endif
-
 #include "fmpz_mini.h"
 
 #if FLINT_USES_PTHREAD
@@ -266,10 +260,6 @@ FLINT_DLL void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong x);
 FLINT_DLL void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 FLINT_DLL void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x);
-
-FLINT_DLL void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h);
-
-FLINT_DLL void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b,
                                    const fmpz_t c, const fmpz_t d);

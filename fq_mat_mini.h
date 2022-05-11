@@ -12,12 +12,12 @@
 #ifndef FQ_MAT_MINI_H
 #define FQ_MAT_MINI_H
 
-#ifdef FQ_MAT_MINI_INLINES_C
-#define FQ_MAT_MINI_TEMPLATES_INLINE FLINT_DLL
-#define FQ_MAT_MINI_INLINE FLINT_DLL
+#ifdef FQ_MAT_INLINES_C
+#define FQ_MAT_TEMPLATES_INLINE FLINT_DLL
+#define FQ_MAT_INLINE FLINT_DLL
 #else
-#define FQ_MAT_MINI_TEMPLATES_INLINE static __inline__
-#define FQ_MAT_MINI_INLINE static __inline__
+#define FQ_MAT_TEMPLATES_INLINE static __inline__
+#define FQ_MAT_INLINE static __inline__
 #endif
 
 #include "flint.h"

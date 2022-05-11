@@ -15,12 +15,6 @@
 #ifndef FMPZ_POLY_H
 #define FMPZ_POLY_H
 
-#ifdef FMPZ_POLY_INLINES_C
-#define FMPZ_POLY_INLINE FLINT_DLL
-#else
-#define FMPZ_POLY_INLINE static __inline__
-#endif
-
 #include "fmpz_mini.h"
 #include "fmpz_poly_mini.h"
 

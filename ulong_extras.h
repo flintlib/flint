@@ -15,12 +15,6 @@
 #ifndef ULONG_EXTRAS_H
 #define ULONG_EXTRAS_H
 
-#ifdef ULONG_EXTRAS_INLINES_C
-#define ULONG_EXTRAS_INLINE FLINT_DLL
-#else
-#define ULONG_EXTRAS_INLINE static __inline__
-#endif
-
 #include "ulong_extras_mini.h"
 
 #ifdef __cplusplus

@@ -12,14 +12,6 @@
 #ifndef FQ_NMOD_MAT_H
 #define FQ_NMOD_MAT_H
 
-#ifdef FQ_NMOD_MAT_INLINES_C
-#define FQ_MAT_TEMPLATES_INLINE FLINT_DLL
-#define FQ_NMOD_MAT_INLINE FLINT_DLL
-#else
-#define FQ_MAT_TEMPLATES_INLINE static __inline__
-#define FQ_NMOD_MAT_INLINE static __inline__
-#endif
-
 #include "fq_nmod.h"
 #include "fq_nmod_mat_mini.h"
 

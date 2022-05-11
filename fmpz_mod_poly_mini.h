@@ -12,10 +12,10 @@
 #ifndef FMPZ_MOD_POLY_MINI_H
 #define FMPZ_MOD_POLY_MINI_H
 
-#ifdef FMPZ_MOD_POLY_MINI_INLINES_C
-#define FMPZ_MOD_POLY_MINI_INLINE FLINT_DLL
+#ifdef FMPZ_MOD_POLY_INLINES_C
+#define FMPZ_MOD_POLY_INLINE FLINT_DLL
 #else
-#define FMPZ_MOD_POLY_MINI_INLINE static __inline__
+#define FMPZ_MOD_POLY_INLINE static __inline__
 #endif
 
 #include "flint.h"
@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-FMPZ_MOD_POLY_MINI_INLINE
+FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 {
     poly->coeffs = NULL;
@@ -35,7 +35,7 @@ void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 FLINT_DLL void fmpz_mod_poly_clear(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len);
-FMPZ_MOD_POLY_MINI_INLINE
+FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_t ctx)
 {
     _fmpz_mod_poly_fit_length(poly, len);
@@ -52,7 +52,7 @@ FLINT_DLL void fmpz_mod_poly_derivative(fmpz_mod_poly_t res,
 FLINT_DLL void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
                    const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
 
-FMPZ_MOD_POLY_MINI_INLINE void 
+FMPZ_MOD_POLY_INLINE void 
 fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q,
                                              slong n, const fmpz_mod_ctx_t ctx)
 {

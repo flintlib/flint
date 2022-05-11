@@ -16,12 +16,6 @@
 #ifndef NMOD_POLY_H
 #define NMOD_POLY_H
 
-#ifdef NMOD_POLY_INLINES_C
-#define NMOD_POLY_INLINE FLINT_DLL
-#else
-#define NMOD_POLY_INLINE static __inline__
-#endif
-
 #include "nmod_poly_mini.h"
 
 #ifdef __cplusplus

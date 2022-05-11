@@ -22,7 +22,7 @@ FLINT_DLL void TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong c
 
 FLINT_DLL void TEMPLATE(T, mat_clear)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
 
-FQ_MAT_MINI_TEMPLATES_INLINE TEMPLATE(T, struct) *
+FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
 {
     return mat->rows[i] + j;
@@ -33,7 +33,7 @@ TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
 FLINT_DLL void TEMPLATE(T, mat_set)(TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
                      const TEMPLATE(T, ctx_t) ctx);
 
-FQ_MAT_MINI_TEMPLATES_INLINE
+FQ_MAT_TEMPLATES_INLINE
 void
 TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) src,
                           const TEMPLATE(T, ctx_t) ctx)

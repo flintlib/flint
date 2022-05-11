@@ -18,9 +18,8 @@
 #define QADIC_INLINE static __inline__
 #endif
 
-/* TODO: Reduce these inclusions */
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "ulong_extras_mini.h"
+#include "fmpz_mini.h"
 #include "fmpz_vec.h"
 #include "padic.h"
 #include "padic_poly.h"
@@ -215,9 +214,9 @@ QADIC_INLINE void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
     else
     {
         padic_poly_fit_length(x, 1);
-	fmpz_neg(x->coeffs + 0, ctx->a + 0);
-	_padic_poly_set_length(x, 1);
-	x->val = 0;
+        fmpz_neg(x->coeffs + 0, ctx->a + 0);
+        _padic_poly_set_length(x, 1);
+        x->val = 0;
     }
 }
 

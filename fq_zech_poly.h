@@ -14,14 +14,6 @@
 #ifndef FQ_ZECH_POLY_H
 #define FQ_ZECH_POLY_H
 
-#ifdef FQ_ZECH_POLY_INLINES_C
-#define FQ_ZECH_POLY_INLINE FLINT_DLL
-#define FQ_POLY_TEMPLATES_INLINE FLINT_DLL
-#else
-#define FQ_ZECH_POLY_INLINE static __inline__
-#define FQ_POLY_TEMPLATES_INLINE static __inline__
-#endif
-
 #include "fq_zech_poly_mini.h"
 
 #define FQ_ZECH_POLY_DIVREM_DIVCONQUER_CUTOFF  16
