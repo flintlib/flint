@@ -718,11 +718,11 @@ const char * _ascii() { char* s = (char*) ascii_mm; s = (char*) ascii_ii; return
 int main() { _ascii (); return 0; }
 EOF
 $CC build/test-endian.c -o ./build/test-endian > /dev/null 2>&1
-if cat build/test-endian | grep BIGenDianSyS >/dev/null; then
+if grep -q BIGenDianSyS build/test-endian >/dev/null; then
     printf "%s\n" "yes"
     echo "yes" >> config.log
     CONFIG_BIG_ENDIAN="#define FLINT_BIG_ENDIAN 1"
-elif cat build/test-endian | grep LiTTleEnDian >/dev/null; then
+elif grep -q LiTTleEnDian build/test-endian >/dev/null; then
     printf "%s\n" "no"
     echo "no" >> config.log
 else
