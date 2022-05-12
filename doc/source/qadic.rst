@@ -299,6 +299,16 @@ Basic arithmetic
     given context whenever `e = 0`.
 
 
+Square root
+--------------------------------------------------------------------------------
+
+
+.. function:: int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Return ``1`` if the input is a square (to input precision). If so, set
+    ``rop`` to a square root (truncated to output precision).
+
+
 Special functions
 --------------------------------------------------------------------------------
 
