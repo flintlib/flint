@@ -66,6 +66,12 @@ Arithmetic modulo a generalised Fermat number
 --------------------------------------------------------------------------------
 
 
+.. function:: void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs);
+
+    Set ``z`` to the negation of the Fermat number `a` modulo ``B^limbs + 1``.
+    The input ``a`` is expected to be fully reduced, and the output is fully reduced.
+    Aliasing is permitted.
+
 .. function:: void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
 
     Adds the signed limb ``c`` to the generalised Fermat number ``r``
@@ -382,7 +388,8 @@ Matrix Fourier Transforms
     matrix fourier algorithm is used for the left and right FFTs. The total 
     transform length is `4n` where ``n = 2^depth`` so that the left and
     right transforms are both length `2n`. We require ``trunc > 2*n`` and
-    that ``trunc`` is divisible by ``2*n1`` (explained below).
+    that ``trunc`` is divisible by ``2*n1`` (explained below). The coefficients
+    are produced in an order different from ``fft_truncate_sqrt2``.
 
     The matrix fourier algorithm, which is applied to each transform of length
     `2n`, works as follows. We set ``n1`` to a power of 2 about the square

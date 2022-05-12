@@ -540,6 +540,10 @@ Matrix multiplication
     Dimensions must be compatible for matrix multiplication. No aliasing is allowed.
     This function currently will fail if the matrices are empty, their dimensions are too large, or their max bits size is over one million bits.
 
+.. function:: void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Aliasing is allowed.
+
 .. function:: void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets ``B`` to the square of the matrix ``A``, which must be

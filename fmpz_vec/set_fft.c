@@ -26,12 +26,14 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 
     if (sign)
     {
+        mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
+
         for (i = 0; i < length; i++)
         {
             mcoeffs_m = _fmpz_promote(coeffs_m);
             data = FLINT_MPZ_REALLOC(mcoeffs_m, limbs);
 
-			if ((coeffs_f[i][limbs - 1] >> (FLINT_BITS - 1)) || coeffs_f[i][limbs])
+			if ((coeffs_f[i][limbs - 1] > halflimb) || coeffs_f[i][limbs])
             {
                 mpn_neg_n(data, coeffs_f[i], limbs);
                 mpn_add_1(data, data, limbs, WORD(1));

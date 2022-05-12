@@ -48,7 +48,6 @@ static void _fmpq_ball_print(const _fmpq_ball_t x)
 }
 #endif
 
-
 #if FLINT_WANT_ASSERT
 
 static int _fmpq_ball_is_ordered(const _fmpq_ball_t x)
@@ -838,21 +837,7 @@ static void _hgcd_step(
 
     fmpz_mul_2exp(ya, ya, shift);
     fmpz_mul_2exp(yb, yb, shift);
-    if (N->det == 1)
-    {
-        fmpz_addmul(ya, N->_22, xa);
-        fmpz_submul(ya, N->_12, xb);
-        fmpz_addmul(yb, N->_11, xb);
-        fmpz_submul(yb, N->_21, xa);
-    }
-    else
-    {
-        FLINT_ASSERT(N->det == -1);
-        fmpz_addmul(ya, N->_12, xb);
-        fmpz_submul(ya, N->_22, xa);
-        fmpz_addmul(yb, N->_21, xa);
-        fmpz_submul(yb, N->_11, xb);
-    }
+    _fmpz_mat22_addmul_inv_vec(ya, yb, N, xa, xb);
     fmpz_swap(xa, ya);
     fmpz_swap(xb, yb);
     _fmpz_mat22_rmul(M, N);
@@ -1133,21 +1118,7 @@ split:
         fmpz_fdiv_r_2exp(r, x->left_den, k);
         fmpz_mul_2exp(x->left_num, y->left_num, k);
         fmpz_mul_2exp(x->left_den, y->left_den, k);
-        if (N->det == 1)
-        {
-            fmpz_addmul(x->left_num, N->_22, q);
-            fmpz_submul(x->left_num, N->_12, r);
-            fmpz_addmul(x->left_den, N->_11, r);
-            fmpz_submul(x->left_den, N->_21, q);
-        }
-        else
-        {
-            FLINT_ASSERT(N->det == -1);
-            fmpz_addmul(x->left_num, N->_12, r);
-            fmpz_submul(x->left_num, N->_22, q);
-            fmpz_addmul(x->left_den, N->_21, q);
-            fmpz_submul(x->left_den, N->_11, r);
-        }
+        _fmpz_mat22_addmul_inv_vec(x->left_num, x->left_den, N, q, r);
     }
     else
     {
@@ -1170,67 +1141,34 @@ split:
             _fmpq_ball_apply_mat22_inv(y, N, x)
             _fmpq_ball_swap(x, y)
         */
-        if (N->det == 1)
+
+        fmpz_one(r);
+        fmpz_mul_2exp(r, r, k);
+        fmpz_fdiv_r_2exp(q, x->left_den, k);
+        fmpz_sub(x->left_den, q, r);
+        fmpz_fdiv_r_2exp(x->left_num, x->left_num, k);
+        fmpz_fdiv_r_2exp(q, x->right_num, k);
+        fmpz_sub(x->right_num, q, r);
+        fmpz_fdiv_r_2exp(x->right_den, x->right_den, k);
+
+        fmpz_mul_2exp(y->left_num, y->left_num, k);
+        fmpz_mul_2exp(y->left_den, y->left_den, k);
+        fmpz_mul_2exp(y->right_num, y->right_num, k);
+        fmpz_mul_2exp(y->right_den, y->right_den, k);
+
+        if (N->det == -1)
         {
-            fmpz_one(r);
-            fmpz_mul_2exp(r, r, k);
-            fmpz_fdiv_r_2exp(q, x->left_den, k);
-            fmpz_sub(r, r, q);
-            fmpz_fdiv_r_2exp(q, x->left_num, k);
-
-            fmpz_mul_2exp(x->left_num, y->left_num, k);
-            fmpz_addmul(x->left_num, q, N->_22);
-            fmpz_addmul(x->left_num, r, N->_12);
-            fmpz_mul_2exp(x->left_den, y->left_den, k);
-            fmpz_submul(x->left_den, q, N->_21);
-            fmpz_submul(x->left_den, r, N->_11);
-
-            fmpz_one(q);
-            fmpz_mul_2exp(q, q, k);
-            fmpz_fdiv_r_2exp(r, x->right_num, k);
-            fmpz_sub(q, q, r);
-            fmpz_fdiv_r_2exp(r, x->right_den, k);
-
-            fmpz_mul_2exp(x->right_num, y->right_num, k);
-            fmpz_submul(x->right_num, q, N->_22);
-            fmpz_submul(x->right_num, r, N->_12);
-            fmpz_mul_2exp(x->right_den, y->right_den, k);
-            fmpz_addmul(x->right_den, q, N->_21);
-            fmpz_addmul(x->right_den, r, N->_11);
-        }
-        else
-        {
-            FLINT_ASSERT(N->det == -1);
-
-            fmpz_one(r);
-            fmpz_mul_2exp(r, r, k);
-            fmpz_fdiv_r_2exp(q, x->left_den, k);
-            fmpz_sub(r, r, q);
-            fmpz_fdiv_r_2exp(q, x->left_num, k);
-
-            fmpz_mul_2exp(x->left_num, y->right_num, k);
-            fmpz_submul(x->left_num, q, N->_22);
-            fmpz_submul(x->left_num, r, N->_12);
-            fmpz_mul_2exp(x->left_den, y->right_den, k);
-            fmpz_addmul(x->left_den, q, N->_21);
-            fmpz_addmul(x->left_den, r, N->_11);
-
-            fmpz_one(q);
-            fmpz_mul_2exp(q, q, k);
-            fmpz_fdiv_r_2exp(r, x->right_num, k);
-            fmpz_sub(q, q, r);
-            fmpz_fdiv_r_2exp(r, x->right_den, k);
-
-            fmpz_mul_2exp(x->right_num, y->left_num, k);
-            fmpz_addmul(x->right_num, q, N->_22);
-            fmpz_addmul(x->right_num, r, N->_12);
-            fmpz_mul_2exp(x->right_den, y->left_den, k);
-            fmpz_submul(x->right_den, q, N->_21);
-            fmpz_submul(x->right_den, r, N->_11);
-
             fmpz_swap(x->right_num, x->left_num);
             fmpz_swap(x->right_den, x->left_den);
         }
+
+        _fmpz_mat22_addmul_inv_mat(y->left_num, y->right_num, y->left_den, y->right_den,
+                                N, x->left_num, x->right_num, x->left_den, x->right_den);
+
+        fmpz_swap(x->left_num, y->left_num);
+        fmpz_swap(x->left_den, y->left_den);
+        fmpz_swap(x->right_num, y->right_num);
+        fmpz_swap(x->right_den, y->right_den);
     }
 
     FLINT_ASSERT(_fmpq_ball_gt_one(x));

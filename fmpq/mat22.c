@@ -10,7 +10,7 @@
 */
 
 #include "fmpq.h"
-
+#include "fmpz_mat.h"
 
 void _fmpz_mat22_init(_fmpz_mat22_t M)
 {
@@ -78,11 +78,40 @@ void _fmpz_mat22_rmul(_fmpz_mat22_t M, const _fmpz_mat22_t N)
     fmpz_swap(M->_12, b);
     fmpz_swap(M->_21, c);
     fmpz_swap(M->_22, d);
-    M->det *= N->det;
     fmpz_clear(a);
     fmpz_clear(b);
     fmpz_clear(c);
     fmpz_clear(d);
+
+    M->det *= N->det;
+}
+
+/* (ya, yb) += N^-1*(xa, xb). xa and xb may be clobbered */
+void _fmpz_mat22_addmul_inv_vec(fmpz_t ya, fmpz_t yb, _fmpz_mat22_t N, fmpz_t xa, fmpz_t xb)
+{
+    if (N->det == 1)
+    {
+        fmpz_addmul(ya, N->_22, xa);
+        fmpz_submul(ya, N->_12, xb);
+        fmpz_addmul(yb, N->_11, xb);
+        fmpz_submul(yb, N->_21, xa);
+    }
+    else
+    {
+        FLINT_ASSERT(N->det == -1);
+        fmpz_addmul(ya, N->_12, xb);
+        fmpz_submul(ya, N->_22, xa);
+        fmpz_addmul(yb, N->_21, xa);
+        fmpz_submul(yb, N->_11, xb);
+    }
+}
+
+/* A += N^-1*B */
+void _fmpz_mat22_addmul_inv_mat(fmpz_t A11, fmpz_t A12, fmpz_t A21, fmpz_t A22,
+               _fmpz_mat22_t N, fmpz_t B11, fmpz_t B12, fmpz_t B21, fmpz_t B22)
+{
+    _fmpz_mat22_addmul_inv_vec(A11, A21, N, B11, B21);
+    _fmpz_mat22_addmul_inv_vec(A12, A22, N, B12, B22);
 }
 
 
