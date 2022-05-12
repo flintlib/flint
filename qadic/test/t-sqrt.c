@@ -136,8 +136,8 @@ int main(void)
         slong deg, N;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b, c;
+        int ans, ans2;
+        qadic_t a, b, c, c2;
 
         deg = n_randint(state, 10) + 1;
         N = 1;
@@ -146,11 +146,13 @@ int main(void)
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
+        qadic_init2(c2, 0);
 
         qadic_randtest_val(b, state, 0, ctx);
         qadic_mul(a, b, b, ctx);
 
         ans = qadic_sqrt(c, a, ctx);
+        ans2 = qadic_sqrt(c2, a, ctx);
         if (ans)
         {
             qadic_t d, e;
@@ -177,6 +179,14 @@ int main(void)
                 flint_abort();
             }
 
+            result = (ans == ans2);
+            if (!result)
+            {
+                flint_printf("FAIL (zero output precision, random squares over finite field)\n\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
             qadic_clear(d);
             qadic_clear(e);
         }
@@ -196,6 +206,7 @@ int main(void)
         qadic_clear(a);
         qadic_clear(b);
         qadic_clear(c);
+        qadic_clear(c2);
 
         qadic_ctx_clear(ctx);
     }
@@ -207,8 +218,8 @@ int main(void)
         slong d, N;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b;
+        int ans, ans2;
+        qadic_t a, b, b2;
 
         d = n_randint(state, 10) + 1;
         N = 1;
@@ -217,10 +228,21 @@ int main(void)
 
         qadic_init2(a, N);
         qadic_init2(b, N);
+        qadic_init2(b2, 0);
 
         qadic_randtest_val(a, state, 0, ctx);
 
         ans = qadic_sqrt(b, a, ctx);
+        ans2 = qadic_sqrt(b2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (zero output precision, random elements):\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         if (ans)
         {
             qadic_t c, d;
@@ -252,6 +274,7 @@ int main(void)
 
         qadic_clear(a);
         qadic_clear(b);
+        qadic_clear(b2);
 
         qadic_ctx_clear(ctx);
     }
@@ -260,27 +283,38 @@ int main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
-        slong deg, N;
+        slong deg, N, N2;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b, c;
+        int ans, ans2;
+        qadic_t a, b, c, c2;
 
         deg = n_randint(state, 10) + 1;
         /* N >= 3 */
         N = n_randint(state, 50) + 3;
-
+        N2 = FLINT_MAX(n_randint(state, N), 3);
         qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "X", PADIC_SERIES);
 
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
+        qadic_init2(c2, N2);
 
         qadic_randtest_val(b, state, 0, ctx);
         qadic_randtest_int(b, state, ctx);
         qadic_mul(a, b, b, ctx);
 
         ans = qadic_sqrt(c, a, ctx);
+        ans2 = qadic_sqrt(c2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (output prec lower than input prec, random squares):\n\n");
+            fflush(stdout);
+            flint_abort();            
+        }
+
         if (ans)
         {
             qadic_t d, e, u, v, w;
@@ -336,6 +370,7 @@ int main(void)
         qadic_clear(a);
         qadic_clear(b);
         qadic_clear(c);
+        qadic_clear(c2);
 
         qadic_ctx_clear(ctx);
     }
@@ -344,23 +379,35 @@ int main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
-        slong d, N;
+        slong d, N, N2;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b;
+        int ans, ans2;
+        qadic_t a, b, b2;
 
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
+        N2 = N - n_randint(state, 10);
 
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
 
         qadic_init2(a, N);
         qadic_init2(b, N);
+        qadic_init2(b2, N2);
 
         qadic_randtest(a, state, ctx);
 
         ans = qadic_sqrt(b, a, ctx);
+        ans2 = qadic_sqrt(b2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (output prec lower than input prec, random elements):\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         if (ans)
         {
             qadic_t c, d;
@@ -392,6 +439,7 @@ int main(void)
 
         qadic_clear(a);
         qadic_clear(b);
+        qadic_clear(b2);
 
         qadic_ctx_clear(ctx);
     }
@@ -454,8 +502,8 @@ int main(void)
         slong deg, N, q;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b, c;
+        int ans, ans2;
+        qadic_t a, b, c, c2;
 
         q = 2;
         while (q == 2)
@@ -468,11 +516,22 @@ int main(void)
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
+        qadic_init2(c2, 0);
 
         qadic_randtest_val(b, state, 0, ctx);
         qadic_mul(a, b, b, ctx);
 
         ans = qadic_sqrt(c, a, ctx);
+        ans2 = qadic_sqrt(c2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (output prec lower than input prec, random squares over finite field):\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+     
         if (ans)
         {
             qadic_t d, e;
@@ -517,6 +576,7 @@ int main(void)
         qadic_clear(a);
         qadic_clear(b);
         qadic_clear(c);
+        qadic_clear(c2);
 
         fmpz_clear(p);
         qadic_ctx_clear(ctx);
@@ -529,8 +589,8 @@ int main(void)
         slong d, N, q;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b;
+        int ans, ans2;
+        qadic_t a, b, b2;
 
         q = 2;
         while (q == 2)
@@ -543,10 +603,21 @@ int main(void)
 
         qadic_init2(a, N);
         qadic_init2(b, N);
+        qadic_init2(b2, 0);
 
         qadic_randtest_val(a, state, 0, ctx);
 
         ans = qadic_sqrt(b, a, ctx);
+        ans2 = qadic_sqrt(b2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (output prec lower than input prec, random elements over finite field):\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         if (ans)
         {
             qadic_t c, d;
@@ -578,6 +649,7 @@ int main(void)
 
         qadic_clear(a);
         qadic_clear(b);
+        qadic_clear(b2);
 
         fmpz_clear(p);
         qadic_ctx_clear(ctx);
@@ -587,11 +659,11 @@ int main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
-        slong deg, N, q;
+        slong deg, N, N2, q;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b, c;
+        int ans, ans2;
+        qadic_t a, b, c, c2;
 
         q = 2;
         while (q == 2)
@@ -599,15 +671,27 @@ int main(void)
         fmpz_init_set_ui(p, q);
         deg = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
+        N2 = N - n_randint(state, 10);
         qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "X", PADIC_SERIES);
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
+        qadic_init2(c2, N2);
 
         qadic_randtest_val(b, state, 0, ctx); /* XXX */
         qadic_mul(a, b, b, ctx);
 
         ans = qadic_sqrt(c, a, ctx);
+        ans2 = qadic_sqrt(c2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (output prec lower than input prec, random squares):\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         if (ans)
         {
             qadic_t d, e;
@@ -652,6 +736,7 @@ int main(void)
         qadic_clear(a);
         qadic_clear(b);
         qadic_clear(c);
+        qadic_clear(c2);
 
         fmpz_clear(p);
         qadic_ctx_clear(ctx);
@@ -661,11 +746,11 @@ int main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
-        slong d, N, q;
+        slong d, N, N2, q;
         qadic_ctx_t ctx;
 
-        int ans;
-        qadic_t a, b;
+        int ans, ans2;
+        qadic_t a, b, b2;
 
         q = 2;
         while (q == 2)
@@ -673,15 +758,27 @@ int main(void)
         fmpz_init_set_ui(p, q);
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
+        N2 = N - n_randint(state, 10);
 
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
 
         qadic_init2(a, N);
         qadic_init2(b, N);
+        qadic_init2(b2, N2);
 
         qadic_randtest(a, state, ctx);
 
         ans = qadic_sqrt(b, a, ctx);
+        ans2 = qadic_sqrt(b2, a, ctx);
+
+        result = (ans == ans2);
+        if (!result)
+        {
+            flint_printf("FAIL (output prec lower than input prec, random elements):\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         if (ans)
         {
             qadic_t c, d;
@@ -713,6 +810,7 @@ int main(void)
 
         qadic_clear(a);
         qadic_clear(b);
+        qadic_clear(b2);
 
         fmpz_clear(p);
         qadic_ctx_clear(ctx);

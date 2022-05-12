@@ -779,9 +779,10 @@ int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
 
 int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const fmpz *p = (&ctx->pctx)->p;
-    const slong d  = qadic_ctx_degree(ctx);
-    const slong N  = qadic_prec(rop);
+    const fmpz *p   = (&ctx->pctx)->p;
+    const slong d   = qadic_ctx_degree(ctx);
+    const slong N   = qadic_prec(rop);
+    const slong vop = qadic_val(op);
 
     fmpz *t;
     int ans;
@@ -798,39 +799,42 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     rop->val = op->val / 2;
 
-    /*
-        FIXME:  In this case, we don't actually 
-        check whether the element is a square!
-     */
-    if (rop->val >= N)
-    {
-        qadic_zero(rop);
-        return 1;
-    }
-
     if (rop == op)
     {
-        t = _fmpz_vec_init(2 * d - 1);
+        t = _fmpz_vec_init(2*d - 1);
     }
     else
     {
-        padic_poly_fit_length(rop, 2 * d - 1);
+        padic_poly_fit_length(rop, 2*d - 1);
         t = rop->coeffs;
     }
 
-    ans = _qadic_sqrt(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, N - rop->val);
+    if (rop->val >= N) /* must check square even if rop prec will be <= valuation */
+    {
+        slong prec = FLINT_MIN(qadic_prec(op) - vop, 1 + (fmpz_cmp_ui(p, 2) == 0));
+        ans = prec <= 0 ? 1 : _qadic_sqrt(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, prec);
+    }
+    else
+        ans = _qadic_sqrt(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, N - rop->val);
 
     if (rop == op)
     {
         _fmpz_vec_clear(rop->coeffs, rop->alloc);
+
         rop->coeffs = t;
         rop->alloc  = 2 * d - 1;
         rop->length = d;
     }
-    _padic_poly_set_length(rop, d);
-    _padic_poly_normalise(rop);
-    if (padic_poly_length(rop) == 0)
-        padic_poly_val(rop) = 0;
+   
+    if (rop->val >= N)
+        qadic_zero(rop);
+    else
+    {
+        _padic_poly_set_length(rop, d);
+        _padic_poly_normalise(rop);
+        if (padic_poly_length(rop) == 0)
+            padic_poly_val(rop) = 0;
+    }
 
     return ans;
 }
