@@ -58,10 +58,19 @@ void __flint_get_memory_functions(void *(**alloc_func) (size_t),
                              void *(**realloc_func) (void *, size_t),
                              void (**free_func) (void *))
 {
+#if FLINT_REENTRANT && !FLINT_USES_TLS
+    pthread_once(&alloc_func_init, __flint_set_memory_functions_init);
+    pthread_mutex_lock(&alloc_func_lock);
+#endif
+
     *alloc_func = __flint_allocate_func;
     *calloc_func = __flint_callocate_func;
     *realloc_func = __flint_reallocate_func;
     *free_func = __flint_free_func;
+
+#if FLINT_REENTRANT && !FLINT_USES_TLS
+    pthread_mutex_unlock(&alloc_func_lock);
+#endif
 }
 
 void __flint_set_memory_functions(void *(*alloc_func) (size_t),
