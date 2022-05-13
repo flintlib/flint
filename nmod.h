@@ -112,6 +112,23 @@ typedef struct
         (res) = rxx; \
     } while (0)
 
+NMOD_INLINE mp_limb_t nmod_set_ui(ulong x, nmod_t mod)
+{
+    if (x < mod.n)
+        return x;
+
+    NMOD_RED(x, x, mod);
+    return x;
+}
+
+NMOD_INLINE
+mp_limb_t nmod_set_si(slong x, nmod_t mod)
+{
+    ulong res = FLINT_ABS(x);
+    NMOD_RED(res, res, mod);
+    return (res == 0 || x > 0) ? res : mod.n - res;
+}
+
 NMOD_INLINE
 mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
