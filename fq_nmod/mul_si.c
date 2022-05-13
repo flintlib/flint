@@ -13,10 +13,5 @@
 
 void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx)
 {
-    mp_limb_t rx = x < 0 ? -x : x;
-    
-    nmod_poly_scalar_mul_nmod(rop, op, rx);
-    
-    if (x < 0)
-        nmod_poly_neg(rop, rop);
+    nmod_poly_scalar_mul_nmod(rop, op, nmod_set_si(x, ctx->mod));
 }

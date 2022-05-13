@@ -11,16 +11,6 @@
 
 #include "arith.h"
 
-mp_limb_t
-nmod_set_ui(ulong x, nmod_t mod)
-{
-    if (x < mod.n)
-        return x;
-
-    NMOD_RED(x, x, mod);
-    return x;
-}
-
 static void
 bsplit_nmod(mp_ptr R, mp_ptr Q, slong a, slong b, nmod_t mod)
 {
