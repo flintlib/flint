@@ -30,6 +30,10 @@ override this behaviour by calling ``__flint_set_memory_functions``
 passing the ``malloc``, ``realloc``, ``calloc`` and ``free`` function
 pointers as parameters (see ``flint.h`` for the exact prototype).
 
+The current memory functions can be returned in a similar manner by calling
+``__flint_get_memory_functions`` passing the address of pointers in which
+the function pointers can be stored.
+
 Temporary allocation
 -------------------------------------------------------------------------------
 

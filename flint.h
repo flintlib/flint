@@ -101,6 +101,10 @@ FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
 
+FLINT_DLL void __flint_get_memory_functions(void *(**alloc_func) (size_t),
+     void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
+                                                              void (**free_func) (void *));
+
 #ifdef __GNUC__
 #define FLINT_NORETURN __attribute__ ((noreturn))
 #else
