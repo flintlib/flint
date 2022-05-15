@@ -69,7 +69,7 @@ set(BUILD_DIRS
     fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
     fq_default fq_default_mat fq_default_poly fq_default_poly_factor
-    thread_pool fmpz_mod fmpz_mod_vec n_poly
+    thread_pool thread_support fmpz_mod fmpz_mod_vec n_poly
     mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly fmpz_mod_mpoly 
     fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor fmpz_mod_mpoly_factor 
     fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor 
@@ -83,7 +83,7 @@ set(TEMPLATE_DIRS
 
 set(SOURCES
     printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c
-    memory_manager.c version.c profiler.c thread_support.c exception.c
+    memory_manager.c version.c profiler.c exception.c
     hashmap.c inlines.c fmpz/fmpz.c
 )
 
