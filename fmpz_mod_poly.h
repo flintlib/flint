@@ -41,7 +41,7 @@
 #define FMPZ_MOD_POLY_GCD_CUTOFF  256       /* GCD:  Euclidean -> HGCD          */
 
 #define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64 /* Inv series newton: Basecase -> Newton */
-
+#define FMPZ_MOD_POLY_DIV_DIVCONQUER_CUTOFF 
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -641,6 +641,17 @@ FLINT_DLL void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 FLINT_DLL void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                                      const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mod_poly_div_divconquer_recursive(fmpz * Q, fmpz * W,
+                                  const fmpz * A, const fmpz * B, slong lenB,
+                                             const fmpz_t invB, const fmpz_t p);
+
+FLINT_DLL void _fmpz_mod_poly_div_divconquer(fmpz * Q,
+  const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB,
+                                                                const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_poly_div_divconquer(fmpz_mod_poly_t Q,
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
                                     const fmpz* B, slong lenB, const fmpz* Binv,
