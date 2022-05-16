@@ -26,6 +26,7 @@ void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
         {
             nmod_poly_fit_length(res, 1);
             nmod_poly_set_coeff_ui(res, 0, c);
+            nmod_poly_neg(res, res);
             _nmod_poly_set_length(res, 1);
         }
     }
