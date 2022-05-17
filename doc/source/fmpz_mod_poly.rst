@@ -770,6 +770,22 @@ Division
     ``lenB`` coefficients and that ``W`` be temporary space of size
     ``2*lenB ``. 
 
+.. function:: void _fmpz_mod_poly_div_newton(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t p)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
+
+    Assumes that the leading coefficient of `B` is a unit modulo `p`.
+
+    Reverses the polynomials, divides the resulting series using Newton
+    iteration, then reverses the result.
+
+.. function:: void fmpz_mod_poly_div_newton(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
+    of `B` is a unit.
+
 .. function:: void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with

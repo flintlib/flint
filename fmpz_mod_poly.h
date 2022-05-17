@@ -653,16 +653,22 @@ FLINT_DLL void _fmpz_mod_poly_div_divconquer(fmpz * Q,
 FLINT_DLL void fmpz_mod_poly_div_divconquer(fmpz_mod_poly_t Q,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
-                                    const fmpz* B, slong lenB, const fmpz* Binv,
+FLINT_DLL void _fmpz_mod_poly_div_newton(fmpz * Q, const fmpz * A, slong lenA,
+                                    const fmpz * B, slong lenB, const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_poly_div_newton(fmpz_mod_poly_t Q,
+   const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A,
+                      slong lenA, const fmpz* B, slong lenB, const fmpz* Binv,
                                     slong lenBinv, const fmpz_t mod);
 
 FLINT_DLL void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                          const fmpz_mod_poly_t Binv, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
-                            slong lenA, const fmpz* B, slong lenB,
+FLINT_DLL void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R,
+             const fmpz* A, slong lenA, const fmpz* B, slong lenB,
                             const fmpz* Binv, slong lenBinv, const fmpz_t mod);
 
 FLINT_DLL void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q,
