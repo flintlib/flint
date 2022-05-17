@@ -716,6 +716,27 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz_mod_poly_divrem_divconquer(Q, R, A, B, ctx);
 }
 
+FMPZ_MOD_POLY_INLINE
+void _fmpz_mod_poly_div(fmpz *Q,
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                           const fmpz_t invB, const fmpz_t p)
+{
+    if (lenA - lenB + 1 < 8)
+    {
+       fmpz * R = _fmpz_vec_init(lenA);
+       _fmpz_mod_poly_div_basecase(Q, R, A, lenA, B, lenB, invB, p);
+       _fmpz_vec_clear(R, lenA);
+    } else
+       _fmpz_mod_poly_div_divconquer(Q, A, lenA, B, lenB, invB, p);
+}
+
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                              const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_mod_poly_div_divconquer(Q, A, B, ctx);
+}
+
 FLINT_DLL void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
                              const fmpz *A, slong lenA, 
                              const fmpz *B, slong lenB, const fmpz_t p);
@@ -755,26 +776,6 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
     fmpz_mod_poly_init(Q, ctx);
     fmpz_mod_poly_divrem(Q, R, A, B, ctx);
     fmpz_mod_poly_clear(Q, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE
-void _fmpz_mod_poly_div(fmpz *Q,
-                           const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-                           const fmpz_t invB, const fmpz_t p)
-{
-    fmpz * R = (fmpz *) _fmpz_vec_init(lenA);
-    _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
-    _fmpz_vec_clear(R, lenA);
-}
-
-FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
-                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_poly_t R;
-    fmpz_mod_poly_init(R, ctx);
-    fmpz_mod_poly_divrem(Q, R, A, B, ctx);
-    fmpz_mod_poly_clear(R, ctx);
 }
 
 FMPZ_MOD_POLY_INLINE

@@ -880,6 +880,19 @@ Division
     Assumes that `B` is non-zero and that the leading coefficient
     of `B` is invertible modulo `p`.
 
+.. function:: void _fmpz_mod_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t p)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
+
+    Assumes that the leading coefficient of `B` is a unit modulo `p`.
+
+.. function:: void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
+    of `B` is a unit.
+
 .. function:: void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that

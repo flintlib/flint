@@ -132,6 +132,12 @@ fmpz_mod_poly_div_divconquer(fmpz_mod_poly_t Q,
         return;
     }
 
+    if (Q->length < 8)
+    {
+        fmpz_mod_poly_div_basecase(Q, A, B, ctx);
+        return;
+    }
+
     fmpz_init(invB);
     fmpz_invmod(invB, fmpz_mod_poly_lead(B, ctx), fmpz_mod_ctx_modulus(ctx));
 
