@@ -154,8 +154,20 @@ FLINT_FORCE_INLINE vec1d vec1d_blendv(vec1d a, vec1d b, vec1d c) {
 }
 
 /* [0,n] -> [-n/2, n/2] */
-FLINT_FORCE_INLINE vec1d vec1d_reduce_0n_to_pmhn(vec1d a, vec1d n, vec1d halfn) {
+FLINT_FORCE_INLINE vec1d vec1d_reduce_0n_to_pmhn(vec1d a, vec1d n) {
+    vec1d halfn = 0.5*n;
     return a > halfn ? a - n : a;
+}
+
+FLINT_FORCE_INLINE vec1d vec1d_reduce_pm1n_to_pmhn(vec1d a, vec1d n) {
+    vec1d t = a + n;
+    vec1d halfn = 0.5*n;
+    if (a > halfn)
+        return a - n;
+    else if (t < halfn)
+        return t;
+    else
+        return a;
 }
 
 /* vec4 *****************************************************/
@@ -344,11 +356,13 @@ FLINT_FORCE_INLINE vec4d vec4d_cmp_gt(vec4d a, vec4d b) {
     return _mm256_cmp_pd(a, b, _CMP_GT_OQ);
 }
 
-FLINT_FORCE_INLINE vec4d vec4d_reduce_0n_to_pmhn(vec4d a, vec4d n, vec4d halfn) {
+FLINT_FORCE_INLINE vec4d vec4d_reduce_0n_to_pmhn(vec4d a, vec4d n) {
+    vec4d halfn = vec4d_half(n);
     return vec4d_blendv(a, vec4d_sub(a, n), vec4d_cmp_gt(a, halfn));
 }
 
-FLINT_FORCE_INLINE vec4d vec4d_reduce_pm1n_to_pmhn(vec4d a, vec4d n, vec4d halfn) {
+FLINT_FORCE_INLINE vec4d vec4d_reduce_pm1n_to_pmhn(vec4d a, vec4d n) {
+    vec4d halfn = vec4d_half(n);
     vec4d t = vec4d_blendv(n, vec4d_neg(n), a);
     a = vec4d_blendv(a, vec4d_sub(a, t), vec4d_cmp_gt(vec4d_abs(a), halfn));
     return a;
@@ -507,11 +521,11 @@ EXTEND_VEC_DEF2(vec4d, vec8d, _min)
 EXTEND_VEC_DEF2(vec4d, vec8d, _max)
 EXTEND_VEC_DEF2(vec4d, vec8d, _mul)
 EXTEND_VEC_DEF2(vec4d, vec8d, _div)
+EXTEND_VEC_DEF2(vec4d, vec8d, _reduce_pm1n_to_pmhn)
 EXTEND_VEC_DEF2(vec4d, vec8d, _reduce_pm1no_to_0n)
 EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_to_pm1n)
 EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_to_pm1no)
 EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_to_0n)
-EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_pm1n_to_pmhn)
 EXTEND_VEC_DEF3(vec4d, vec8d, _fmadd)
 EXTEND_VEC_DEF3(vec4d, vec8d, _fmsub)
 EXTEND_VEC_DEF3(vec4d, vec8d, _fnmadd)

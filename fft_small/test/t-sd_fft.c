@@ -1,5 +1,5 @@
 /* 
-    Copyright (C) 2009, 2011 William Hart
+    Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -128,7 +128,7 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
             for (int check_reps = 0; check_reps < 3; check_reps++)
             {
                 i = n_randint(state, trunc);
-                double m = vec1d_reduce_0n_to_pmhn(nmod_pow_ui(2, L, Q->mod), Q->p, Q->p*0.5);
+                double m = vec1d_reduce_0n_to_pmhn(nmod_pow_ui(2, L, Q->mod), Q->p);
                 if (!vec1d_same_mod(sd_fft_ctx_get_index(Q, i),
                         vec1d_mulmod2(X[i], m, Q->p, Q->pinv), Q->p, Q->pinv))
                 {
@@ -146,6 +146,7 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
 
     for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 7; ii++)
         flint_printf("%c", '\b');
+    fflush(stdout);
 }
 
 

@@ -71,6 +71,16 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
     return a;
 }
 
+FLINT_INLINE ulong n_clog2(ulong x) {
+    if (x <= 2)
+        return x == 2;
+
+   ulong zeros = FLINT_BITS;
+   count_leading_zeros(zeros, x - 1);
+   return FLINT_BITS - zeros;
+}
+
+
 
 FLINT_DLL void* flint_aligned_alloc(ulong alignment, ulong size);
 

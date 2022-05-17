@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
@@ -37,6 +37,7 @@
 
 /****************** inverse butterfly with truncation ************************/
 
+/* the legal functions must be implemented */
 #define DEFINE_IT(nn, zz, ff) \
 static void CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)( \
     const sd_fft_ctx_t Q, \
@@ -75,7 +76,7 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
     vec4d w = vec4d_set_d(Q->w2s[j]);
-    vec4d c = vec4d_set_d(2.0);
+    vec4d c = vec4d_set_d(2);
     ulong i = 0; do {
         vec4d u0, u1;
         u0 = vec4d_load(X0 + i);
@@ -97,7 +98,7 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
     vec4d w = vec4d_set_d(Q->w2s[j]);
-    vec4d c = vec4d_set_d(2.0);
+    vec4d c = vec4d_set_d(2);
     ulong i = 0; do {
         vec4d u0, u1;
         u0 = vec4d_load(X0 + i);
@@ -411,6 +412,7 @@ void sd_ifft_base_0(const sd_fft_ctx_t Q, ulong I, ulong j)
 
 /***************** inverse butterfy with truncation **************************/
 
+/* the legal function are opt-in but print an annoying message if missing */
 #define DEFINE_IT(nn, zz, ff) \
 static int CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)( \
     const sd_fft_ctx_t Q, \
@@ -441,31 +443,18 @@ DEFINE_IT(0,2,1)
 DEFINE_IT(0,3,0)
 DEFINE_IT(0,3,1)
 DEFINE_IT(0,4,0)
-DEFINE_IT(0,4,1)
-DEFINE_IT(1,1,0)
-DEFINE_IT(1,1,1)
 DEFINE_IT(1,2,0)
 DEFINE_IT(1,2,1)
 DEFINE_IT(1,3,0)
 DEFINE_IT(1,3,1)
-DEFINE_IT(1,4,0)
-DEFINE_IT(1,4,1)
 DEFINE_IT(2,1,0)
 DEFINE_IT(2,1,1)
-DEFINE_IT(2,2,0)
-DEFINE_IT(2,2,1)
 DEFINE_IT(2,3,0)
 DEFINE_IT(2,3,1)
-DEFINE_IT(2,4,0)
-DEFINE_IT(2,4,1)
 DEFINE_IT(3,1,0)
 DEFINE_IT(3,1,1)
 DEFINE_IT(3,2,0)
 DEFINE_IT(3,2,1)
-DEFINE_IT(3,3,0)
-DEFINE_IT(3,3,1)
-DEFINE_IT(3,4,0)
-DEFINE_IT(3,4,1)
 DEFINE_IT(4,1,0)
 DEFINE_IT(4,1,1)
 DEFINE_IT(4,2,0)
@@ -475,6 +464,520 @@ DEFINE_IT(4,3,1)
 DEFINE_IT(4,4,0)
 DEFINE_IT(4,4,1)
 #undef DEFINE_IT
+
+/*
+k = 2, n = 3, z = 4, f = true
+[      -r + 1           r + 1         2   r*w^3]
+[        2//w           -2//w         0    -w^2]
+[(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
+[          -r               r         1   r*w^3]
+*/
+static int radix_4_moth_inv_trunc_block_3_4_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
+    vec4d f0 = vec4d_set_d(Q->w2s[1]);              /* r */
+    vec4d f1 = vec4d_set_d(twoW);                   /* 2*w^-1 */
+    vec4d f2 = vec4d_set_d(2);
+    vec4d f3 = vec4d_set_d(W2);                     /* -w^-2 */
+    vec4d fr = vec4d_set_d(-Q->w2s[2*j+1]);         /* -r*w */
+    vec4d fq = vec4d_set_d(-Q->w2s[j]);             /* -w^2 */
+    vec4d fp_ = vec4d_mulmod2(fr, fq, n, ninv);
+    vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);   /* r*w^3 */
+    ulong i = 0; do {
+        vec4d a, b, c, d, u, v, p, q, r;
+        a = vec4d_load(X0+i);
+        b = vec4d_load(X1+i);
+        c = vec4d_load(X2+i);
+        d = vec4d_load(X3+i);
+        u = vec4d_add(a, b);
+        v = vec4d_sub(a, b);
+        p = vec4d_mulmod2(d, fp, n, ninv);
+        q = vec4d_mulmod2(d, fq, n, ninv);
+        r = vec4d_mulmod2(d, fr, n, ninv);
+        c = vec4d_reduce_to_pm1n(c, n, ninv);
+        u = vec4d_reduce_to_pm1n(u, n, ninv);
+        b = vec4d_mulmod2(v, f1, n, ninv);
+        v = vec4d_mulmod2(v, f0, n, ninv);
+        d = vec4d_sub(c, v);
+        c = vec4d_fmsub(f2, c, v);
+        a = vec4d_add(c, u);
+        c = vec4d_sub(c, u);
+        c = vec4d_mulmod2(c, f3, n, ninv);
+        vec4d_store(X0+i, vec4d_add(a, p));
+        vec4d_store(X1+i, vec4d_add(b, q));
+        vec4d_store(X2+i, vec4d_add(c, r));
+        vec4d_store(X3+i, vec4d_add(d, p));
+    } while (i += 4, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 3, z = 4, f = false
+[      -r + 1           r + 1         2   r*w^3]
+[        2//w           -2//w         0    -w^2]
+[(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
+*/
+static int radix_4_moth_inv_trunc_block_3_4_0(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
+    vec4d f0 = vec4d_set_d(Q->w2s[1]);              /* r */
+    vec4d f1 = vec4d_set_d(twoW);                   /* 2*w^-1 */
+    vec4d f2 = vec4d_set_d(2);
+    vec4d f3 = vec4d_set_d(W2);                     /* -w^-2 */
+    vec4d fr = vec4d_set_d(Q->w2s[2*j+1]);          /* r*w */
+    vec4d fq = vec4d_set_d(Q->w2s[j]);              /* w^2 */
+    vec4d fp_ = vec4d_mulmod2(fr, fq, n, ninv);
+    vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);   /* r*w^3 */
+    ulong i = 0; do {
+        vec4d a, b, c, d, u, v, p, q, r;
+        a = vec4d_load(X0+i);
+        b = vec4d_load(X1+i);
+        c = vec4d_load(X2+i);
+        d = vec4d_load(X3+i);
+        u = vec4d_add(a, b);
+        v = vec4d_sub(a, b);
+        p = vec4d_mulmod2(d, fp, n, ninv);
+        q = vec4d_mulmod2(d, fq, n, ninv);
+        r = vec4d_mulmod2(d, fr, n, ninv);
+        c = vec4d_reduce_to_pm1n(c, n, ninv);
+        u = vec4d_reduce_to_pm1n(u, n, ninv);
+        b = vec4d_mulmod2(v, f1, n, ninv);
+        v = vec4d_mulmod2(v, f0, n, ninv);
+        c = vec4d_fmsub(f2, c, v);
+        a = vec4d_add(c, u);
+        c = vec4d_sub(c, u);
+        c = vec4d_mulmod2(c, f3, n, ninv);
+        a = vec4d_add(a, p);
+        b = vec4d_sub(b, q);
+        c = vec4d_sub(c, r);
+        vec4d_store(X0+i, a);
+        vec4d_store(X1+i, b);
+        vec4d_store(X2+i, c);
+    } while (i += 4, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 3, z = 3, f = true
+[      -r + 1           r + 1         2]
+[        2//w           -2//w         0]
+[(r + 1)//w^2   (-r + 1)//w^2   -2//w^2]
+[          -r               r         1]
+
+    {x0, x1, x3, x4} = {        -r*(x0 - x1) + (x0 + x1) + 2*x2,
+                        2*w^-1*(x0 - x1),
+                         -w^-2*(-r*(x0 - x1) - (x0 + x1) + 2*x2),
+                                -r*(x0 - x1)             +   x2  }
+*/
+static int radix_4_moth_inv_trunc_block_3_3_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
+    vec8d f0 = vec8d_set_d(Q->w2s[1]);  /* r */
+    vec8d f1 = vec8d_set_d(twoW);       /* 2*w^-1 */
+    vec8d f2 = vec8d_set_d(2);
+    vec8d f3 = vec8d_set_d(W2);         /* -w^-2 */
+    ulong i = 0; do {
+        vec8d a, b, c, u, v;
+        a = vec8d_load(X0+i);
+        b = vec8d_load(X1+i);
+        c = vec8d_load(X2+i);
+        v = vec8d_sub(a, b);
+        vec8d_store(X1+i, vec8d_mulmod2(v, f1, n, ninv));
+        c = vec8d_reduce_to_pm1n(c, n, ninv);
+        v = vec8d_mulmod2(v, f0, n, ninv);
+        vec8d_store(X3+i, vec8d_sub(c, v));
+        u = vec8d_reduce_to_pm1n(vec8d_add(a, b), n, ninv);
+        c = vec8d_fmsub(f2, c, v);
+        a = vec8d_add(c, u);
+        c = vec8d_sub(c, u);
+        c = vec8d_mulmod2(c, f3, n, ninv);
+        vec8d_store(X0+i, a);
+        vec8d_store(X2+i, c);
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 3, z = 3, f = false
+[      -r + 1           r + 1         2]
+[        2//w           -2//w         0]
+[(r + 1)//w^2   (-r + 1)//w^2   -2//w^2]
+
+    {x0, x1, x3} = {        -r*(x0 - x1) + (x0 + x1) + 2*x2,
+                    2*w^-1*(x0 - x1),
+                     -w^-2*(-r*(x0 - x1) - (x0 + x1) + 2*x2)}
+
+                 = {        2*x2 - r*v0 + u0,
+                    2*w^-1*v0,
+                     -w^-2*(2*x2 - r*v0 - u0)}
+*/
+static int radix_4_moth_inv_trunc_block_3_3_0(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
+    vec8d f0 = vec8d_set_d(Q->w2s[1]);  /* r */
+    vec8d f1 = vec8d_set_d(twoW);       /* 2*w^-1 */
+    vec8d f2 = vec8d_set_d(2);
+    vec8d f3 = vec8d_set_d(W2);         /* -w^-2 */
+    ulong i = 0; do {
+        vec8d a, b, c, u, v;
+        a = vec8d_load(X0+i);
+        b = vec8d_load(X1+i);
+        c = vec8d_load(X2+i);
+        v = vec8d_sub(a, b);
+        vec8d_store(X1+i, vec8d_mulmod2(v, f1, n, ninv));
+        c = vec8d_reduce_to_pm1n(c, n, ninv);
+        v = vec8d_mulmod2(v, f0, n, ninv);
+        u = vec8d_add(a, b);
+        u = vec8d_reduce_to_pm1n(u, n, ninv);
+        c = vec8d_fmsub(f2, c, v);
+        a = vec8d_add(c, u);
+        c = vec8d_sub(c, u);
+        c = vec8d_mulmod2(c, f3, n, ninv);
+        vec8d_store(X0+i, a);
+        vec8d_store(X2+i, c);
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 2, z = 4, f = true
+[            2                2        -w^2             0]
+[         2//w            -2//w           0          -w^2]
+[1//2*r + 1//2   -1//2*r + 1//2   -1//2*w^2   -1//2*r*w^3]
+*/
+static int radix_4_moth_inv_trunc_block_2_4_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    double W = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
+    double rw3 = vec1d_mulmod2(Q->w2s[j], Q->w2s[2*j+1], Q->p, Q->pinv);
+    vec4d f0 = vec4d_set_d(2);
+    vec4d f1 = vec4d_set_d(twoW);                                   /* 2*w^-1 */
+    vec4d f2 = vec4d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));           /* 1/2 */
+    vec4d f3 = vec4d_set_d(Q->w2s[1]);                              /* r */
+    vec4d f4 = vec4d_set_d(Q->w2s[j]);                              /* w^2 */
+    vec4d f5 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(rw3, Q->p));   /* r*w^3 */
+    ulong i = 0; do {
+        vec4d a, b, u, v, s, t, g, h, p, q, r;
+        u = vec4d_load(X0+i);
+        v = vec4d_load(X1+i);
+        a = vec4d_load(X2+i);
+        b = vec4d_load(X3+i);
+        p = vec4d_mulmod2(a, f4, n, ninv);
+        q = vec4d_mulmod2(b, f4, n, ninv);
+        r = vec4d_mulmod2(b, f5, n, ninv);
+        s = vec4d_add(u, v);
+        s = vec4d_reduce_to_pm1n(s, n, ninv);
+        t = vec4d_sub(u, v);
+        g = vec4d_mulmod2(s, f0, n, ninv);
+        h = vec4d_mulmod2(t, f1, n, ninv);
+        t = vec4d_mulmod2(t, f3, n, ninv);
+        vec4d_store(X0+i, vec4d_sub(g, p));
+        vec4d_store(X1+i, vec4d_sub(h, q));
+        u = vec4d_add(s, t);
+        v = vec4d_add(p, r);
+        u = vec4d_sub(u, v);
+        u = vec4d_mulmod2(u, f2, n, ninv);
+        vec4d_store(X2+i, u);
+    } while (i += 4, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 2, z = 4, f = false
+[   2       2   -w^2      0]
+[2//w   -2//w      0   -w^2]
+*/
+static int radix_4_moth_inv_trunc_block_2_4_0(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    double W = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    vec8d w2 = vec8d_set_d(Q->w2s[j]);
+    vec8d twowi = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));
+    ulong i = 0; do {
+        vec8d a, b, c, d, u, v;
+        a = vec8d_load(X0+i);
+        b = vec8d_load(X1+i);
+        c = vec8d_load(X2+i);
+        d = vec8d_load(X3+i);
+        c = vec8d_mulmod2(c, w2, n, ninv);
+        d = vec8d_mulmod2(d, w2, n, ninv);
+        u = vec8d_add(a, b);
+        v = vec8d_sub(a, b);
+        u = vec8d_add(u, u);
+        u = vec8d_reduce_to_pm1n(u, n, ninv);
+        v = vec8d_mulmod2(v, twowi, n, ninv);
+        u = vec8d_sub(u, c);
+        v = vec8d_sub(v, d);
+        vec8d_store(X0+i, u);
+        vec8d_store(X1+i, v);
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 2, z = 2, f = true
+[            2                2]
+[         2//w            -2//w]
+[1//2*r + 1//2   -1//2*r + 1//2]
+
+{x0, x1, x2} = {2*(x0 + x1), 2*w^-1*(x0 - x1), (x0+x1)/2 + (x0-x1)*i/2}
+*/
+static int radix_4_moth_inv_trunc_block_2_2_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    double W = (j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
+    double har = vec1d_mulmod2(Q->w2s[1], ha, Q->p, Q->pinv);
+    vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));  /* 2/w */
+    vec8d c2 = vec8d_set_d(ha);                                     /* 1/2 */
+    vec8d c3 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(har, Q->p));   /* r/2 */
+    ulong i = 0; do {
+        vec8d u, v, s, t;
+        u = vec8d_load(X0+i);
+        v = vec8d_load(X1+i);
+        s = vec8d_add(u, v);
+        t = vec8d_sub(u, v);
+        u = vec8d_add(s, s);
+        u = vec8d_reduce_to_pm1n(u, n, ninv);
+        v = vec8d_mulmod2(t, c1, n, ninv);
+        s = vec8d_mulmod2(s, c2, n, ninv);
+        t = vec8d_mulmod2(t, c3, n, ninv);
+        s = vec8d_add(s, t);
+        vec8d_store(X0+i, u);
+        vec8d_store(X1+i, v);
+        vec8d_store(X2+i, s);
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 2, z = 2, f = 0
+
+{x0, x1} = {2*(x0 + x1), 2*w^-1*(x0 - x1)}
+*/
+static int radix_4_moth_inv_trunc_block_2_2_0(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    double W = (j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    vec8d c0 = vec8d_set_d(2);
+    vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));
+    ulong i = 0; do {
+        vec8d u, v, s, t;
+        u = vec8d_load(X0+i);
+        v = vec8d_load(X1+i);
+        s = vec8d_add(u, v);
+        t = vec8d_sub(u, v);
+        u = vec8d_mulmod2(s, c0, n, ninv);
+        v = vec8d_mulmod2(t, c1, n, ninv);
+        vec8d_store(X0+i, u);
+        vec8d_store(X1+i, v);
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+
+/*
+k = 2, n = 1, z = 4, f = true
+[4        -w   -w^2        -w^3]
+[1   -1//2*w      0   -1//2*w^3]
+*/
+static int radix_4_moth_inv_trunc_block_1_4_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec4d f2 = vec4d_set_d(2);
+    vec4d w2 = vec4d_set_d(Q->w2s[j]);
+    double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
+    vec4d wo2 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod2(Q->w2s[2*j], ha, Q->p, Q->pinv), Q->p));
+    ulong i = 0; do {
+        vec4d a, b, c, d, u;
+        a = vec4d_load(X0+i);
+        a = vec4d_reduce_to_pm1n(a, n, ninv);
+        b = vec4d_load(X1+i);
+        c = vec4d_load(X2+i);
+        d = vec4d_load(X3+i);
+        c = vec4d_mulmod2(c, w2, n, ninv);
+        d = vec4d_mulmod2(d, w2, n, ninv);
+        b = vec4d_add(b, d);
+        b = vec4d_mulmod2(b, wo2, n, ninv);
+        u = vec4d_fmsub(f2, a, b);
+        b = vec4d_sub(a, b);
+        a = vec4d_reduce_to_pm1n(vec4d_add(u, u), n, ninv);
+        a = vec4d_sub(a, c);
+        vec4d_store(X0+i, a);
+        vec4d_store(X1+i, b);
+    } while (i += 4, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 1, z = 4, f = false
+[4   -w   -w^2   -w^3]
+*/
+static int radix_4_moth_inv_trunc_block_1_4_0(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d f1 = vec8d_set_d(4.0);
+    vec8d w2 = vec8d_set_d(Q->w2s[j]);
+    vec8d w  = vec8d_set_d(Q->w2s[2*j]);
+    ulong i = 0; do {
+        vec8d a, b, c, d;
+        a = vec8d_load(X0+i);
+        b = vec8d_load(X1+i);
+        c = vec8d_load(X2+i);
+        d = vec8d_load(X3+i);
+        a = vec8d_mul(a, f1);
+        d = vec8d_mulmod2(d, w, n, ninv);
+        a = vec8d_reduce_to_pm1n(a, n, ninv);
+        b = vec8d_mulmod2(b, w, n, ninv);
+        a = vec8d_sub(a, b);
+        c = vec8d_add(c, d);
+        c = vec8d_mulmod2(c, w2, n, ninv);
+        a = vec8d_sub(a, c);
+        vec8d_store(X0+i, a);
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 1, z = 1, f = true
+[4]
+[1]
+*/
+static int radix_4_moth_inv_trunc_block_1_1_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d f = vec8d_set_d(4.0);
+    ulong i = 0; do {
+        vec8d a, b;
+        a = vec8d_load(X0+i);
+        b = vec8d_mul(f, a);
+        vec8d_store(X0+i, vec8d_reduce_to_pm1n(b, n, ninv));
+        vec8d_store(X1+i, vec8d_reduce_to_pm1n(a, n, ninv));
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 1, z = 1, f = false
+[4]
+*/
+static int radix_4_moth_inv_trunc_block_1_1_0(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d f = vec8d_set_d(4.0);
+    ulong i = 0; do {
+        vec8d a, b;
+        a = vec8d_load(X0+i);
+        b = vec8d_mul(f, a);
+        vec8d_store(X0+i, vec8d_reduce_to_pm1n(b, n, ninv));
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
+
+/*
+k = 2, n = 0, z = 4, f = true
+[1//4   1//4*w   1//4*w^2   1//4*w^3]
+*/
+static int radix_4_moth_inv_trunc_block_0_4_1(
+    const sd_fft_ctx_t Q,
+    double* X0, double* X1, double* X2, double* X3,
+    ulong j, ulong jm)
+{
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d one4th = vec8d_set_d(vec1d_fnmadd(0.25, Q->p, 0.25));
+    vec8d w = vec8d_set_d(Q->w2s[2*j]);
+    vec8d w2 = vec8d_set_d(Q->w2s[j]);
+    ulong i = 0; do {
+        vec8d a, b, c, d;
+        a = vec8d_load(X0+i);
+        b = vec8d_load(X1+i);
+        c = vec8d_load(X2+i);
+        d = vec8d_load(X3+i);
+        b = vec8d_mulmod2(b, w, n, ninv);
+        d = vec8d_mulmod2(d, w, n, ninv);
+        a = vec8d_add(a, b);
+        c = vec8d_add(c, d);
+        c = vec8d_mulmod2(c, w2, n, ninv);
+        a = vec8d_add(a, c);
+        vec8d_store(X0+i, vec8d_mulmod2(a, one4th, n, ninv));
+    } while (i += 8, i < BLK_SZ);
+    FLINT_ASSERT(i == BLK_SZ);
+    return 1;
+}
 
 /************************ the recursive stuff ********************************/
 
@@ -729,7 +1232,6 @@ void sd_ifft_trunc(
         if (n > 3) sd_ifft_base_0(Q, I+S*3, 4*j+3);
         sd_ifft_trunc_block(Q, I, S, 2, j, z, n, f);
         if (f) sd_ifft_trunc(Q, I + S*n, S, 0, 4*j+n, 1, 0, f);
-        
     }
     else if (k == 1)
     {
