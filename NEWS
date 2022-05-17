@@ -1310,3 +1310,6 @@ v 2.6.3 -- 12 Aug 2020
  * Fix bug in nmod_mpoly_factor (returned 0 for some factorisations)
  * Fix some documentation build errors and some doc formatting issues
 
+2.8.5 -- 25 Apr 2022
+
+ * Fix a serious bug in LLL
