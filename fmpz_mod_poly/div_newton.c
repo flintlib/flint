@@ -85,7 +85,7 @@ void fmpz_mod_poly_div_newton(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
         Q->coeffs = q;
         Q->alloc  = lenQ;
-    }
-
-    _fmpz_mod_poly_set_length(Q, lenQ);
+        Q->length = lenQ;
+    } else
+        _fmpz_mod_poly_set_length(Q, lenQ);
 }
