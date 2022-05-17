@@ -70,7 +70,9 @@ Flint threading interface documentation to see the exact specification.
 Functional parallel programming helpers
 ---------------------------------------
 
-The following are defined in ``thread_support.h``
+The following convenience function are defined in ``thread_support.h``.
+They are currently experimental, and
+the interfaces might change in a future version.
 
 .. type:: void (* do_func_t)(slong i, void * args)
 
