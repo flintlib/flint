@@ -317,13 +317,18 @@ jobs:
           # soname
           wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
           FLINT_JLL_VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
-          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
-          FLINT_JLL_MAJOR=$(echo $FLINT_JLL_SONAME | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
-          FLINT_JLL_MINOR=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
-          FLINT_JLL_PATCH=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
-          sed -i "s/^\(FLINT_MAJOR=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure
-          sed -i "s/^\(FLINT_MINOR=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure
-          sed -i "s/^\(FLINT_PATCH=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure
+          FLINT_JLL_SONAME=$(grep "${FLINT_JLL_VERSION} => " configure | sed "s/# ${FLINT_JLL_VERSION} => \([0-9\.]\+\)/\1/")
+          FLINT_JLL_MAJOR=$(echo ${FLINT_JLL_SONAME} | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
+          FLINT_JLL_MINOR=$(echo ${FLINT_JLL_SONAME} | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
+          FLINT_JLL_PATCH=$(echo ${FLINT_JLL_SONAME} | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
+          echo "FLINT_JLL_VERSION=${FLINT_JLL_VERSION}"
+          echo "FLINT_JLL_SONAME=${FLINT_JLL_SONAME}"
+          echo "FLINT_JLL_MAJOR=${FLINT_JLL_MAJOR}"
+          echo "FLINT_JLL_MINOR=${FLINT_JLL_MINOR}"
+          echo "FLINT_JLL_PATCH=${FLINT_JLL_PATCH}"
+          sed -i "s/^\(FLINT_MAJOR=\)[0-9]\+/\1${FLINT_JLL_MAJOR}/" configure
+          sed -i "s/^\(FLINT_MINOR=\)[0-9]\+/\1${FLINT_JLL_MINOR}/" configure
+          sed -i "s/^\(FLINT_PATCH=\)[0-9]\+/\1${FLINT_JLL_PATCH}/" configure
 
           # Now we can create the makefile
           ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
@@ -331,8 +336,8 @@ jobs:
 
       - name: "Compile and install"
         run: |
-          $MAKE
-          $MAKE install
+          ${MAKE}
+          ${MAKE} install
 
       - name: "Set up Nemo.jl"
         run: |
