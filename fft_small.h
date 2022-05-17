@@ -57,13 +57,17 @@ FLINT_INLINE ulong n_round_up(ulong a, ulong b)
     return n_cdiv(a, b)*b;
 }
 
-FLINT_INLINE ulong n_saturate_bits(ulong a) /* needs a better name */
+/* 0 -> 0, 1 -> 1, [2,3] -> 3, [4,7] -> 7, [8,15] -> 15, ... */
+FLINT_INLINE ulong n_next_pow2m1(ulong a)
 {
     a |= a >> 1;
     a |= a >> 2;
     a |= a >> 4;
     a |= a >> 8;
     a |= a >> 16;
+#if FLINT64
+    a |= a >> 32;
+#endif
     return a;
 }
 
@@ -123,6 +127,7 @@ FLINT_INLINE double sd_fft_ctx_get_index(const sd_fft_ctx_t Q, ulong i)
     return sd_fft_ctx_blk_index(Q, i/BLK_SZ)[i%BLK_SZ];
 }
 
+/* slightly-worse-than-bit-reversed order */
 FLINT_INLINE double sd_fft_ctx_get_fft_index(const sd_fft_ctx_t Q, ulong i)
 {
     ulong j = i&(BLK_SZ-16);
@@ -145,15 +150,7 @@ FLINT_DLL void sd_fft_trunc_block(const sd_fft_ctx_t Q, ulong I, ulong S, ulong 
 FLINT_DLL void sd_fft_trunc(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-void sd_ifft_trunc(
-    const sd_fft_ctx_t Q,
-    ulong I, // starting index
-    ulong S, // stride
-    ulong k, // transform length 2^(k + LG_BLK_SZ)
-    ulong j,
-    ulong z,   // actual trunc is z*BLK_SZ
-    ulong n,   // actual trunc is n*BLK_SZ
-    int f);
+void sd_ifft_trunc(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
 
 /* sd_fft_ctx.c */
 FLINT_DLL void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);

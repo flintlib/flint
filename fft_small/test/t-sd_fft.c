@@ -117,7 +117,6 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
                 }
             }
 
-#if 0
             /* output of ifft_trunc is supposed to be 2^L*input */
             ulong trunc = n_round_up(1 + n_randint(state, Xn), Q->blk_sz);
             for (i = 0; i < trunc; i++)
@@ -133,13 +132,12 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
                 if (!vec1d_same_mod(sd_fft_ctx_get_index(Q, i),
                         vec1d_mulmod2(X[i], m, Q->p, Q->pinv), Q->p, Q->pinv))
                 {
-                    flint_printf("FAIL: fft error at index %wu\n"
-                                           "trunc: %wu\n", i, trunc);
+                    flint_printf("FAIL: ifft error at index %wu\n"
+                                      "trunc: %wu\ndepth: %wu\n", i, trunc, L);
                     fflush(stdout);
                     flint_abort();
                 }
             }
-#endif
         }
 
         flint_free(sd_fft_ctx_release_data(Q));
@@ -161,7 +159,7 @@ int main(void)
     {
         sd_fft_ctx_t Q;
         sd_fft_ctx_init_prime(Q, UWORD(0x0003f00000000001));
-        test_v2_fft(Q, 14, 20, 20, state);
+        test_v2_fft(Q, 10, 20, 20, state);
         sd_fft_ctx_clear(Q);
     }
 

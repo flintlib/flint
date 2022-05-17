@@ -25,7 +25,7 @@
 #include "templates.h"
 
 #define FLINT_INLINE static __inline__
-#define FLINT_FORCE_INLINE __attribute__((always_inline)) __inline__
+#define FLINT_FORCE_INLINE static __attribute__((always_inline)) __inline__
 
 #define UNLIKELY(x) __builtin_expect((x),0)
 #define LIKELY(x)   __builtin_expect((x),1)
@@ -306,6 +306,8 @@ FLINT_FORCE_INLINE vec4d CAT6(vec4d, permute, i0, i1, i2, i3)(vec4d a) { \
 }
 #endif
 DEFINE_IT(0,2,1,3)
+DEFINE_IT(3,1,2,0)
+DEFINE_IT(3,2,1,0)
 #undef DEFINE_IT
 
 /* permute2_i0_i1(a):  return {v[i0], v[i1]}
