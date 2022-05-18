@@ -536,7 +536,7 @@ void sd_fft_trunc(
     if (k == 2)
     {
         sd_fft_trunc_block(Q, I, S, 2, j, itrunc, otrunc);
-        sd_fft_base(Q, I+S*0, 4*j+0);
+                        sd_fft_base(Q, I+S*0, 4*j+0);
         if (otrunc > 1) sd_fft_base(Q, I+S*1, 4*j+1);
         if (otrunc > 2) sd_fft_base(Q, I+S*2, 4*j+2);
         if (otrunc > 3) sd_fft_base(Q, I+S*3, 4*j+3);
@@ -544,7 +544,7 @@ void sd_fft_trunc(
     else if (k == 1)
     {
         sd_fft_trunc_block(Q, I, S, 1, j, itrunc, otrunc);
-        sd_fft_base(Q, I+S*0, 2*j+0);
+                        sd_fft_base(Q, I+S*0, 2*j+0);
         if (otrunc > 1) sd_fft_base(Q, I+S*1, 2*j+1);
     }
     else
@@ -555,6 +555,7 @@ void sd_fft_trunc(
 
 #undef RADIX_2_FORWARD_PARAM
 #undef RADIX_2_FORWARD_MOTH
+#undef RADIX_2_FORWARD_MOTH_TRUNC_2_1
 #undef RADIX_4_FORWARD_PARAM
 #undef RADIX_4_FORWARD_MOTH
 

@@ -51,6 +51,12 @@ typedef __m256d vec4d;
 typedef struct {__m256d e1, e2;} vec8d;
 
 
+/* the max native size for this platform */
+#define NATIVE 4
+#define vecNATIVEd vec4d
+
+
+
 /* vec1 **************************************************/
 
 FLINT_FORCE_INLINE vec1d vec1d_load(const double* a) {
@@ -91,6 +97,10 @@ FLINT_FORCE_INLINE vec1d vec1d_round(vec1d a) {
 
 FLINT_FORCE_INLINE vec1d vec1d_zero() {
     return 0.0;
+}
+
+FLINT_FORCE_INLINE vec1d vec1d_one() {
+    return 1.0;
 }
 
 FLINT_FORCE_INLINE vec1d vec1d_add(vec1d a, vec1d b) {
@@ -214,6 +224,10 @@ FLINT_FORCE_INLINE vec4d vec4d_round(vec4d a) {
 
 FLINT_FORCE_INLINE vec4d vec4d_zero() {
     return _mm256_setzero_pd();
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_one() {
+    return vec4d_set_d(1);
 }
 
 FLINT_FORCE_INLINE vec4d vec4d_add(vec4d a, vec4d b) {
