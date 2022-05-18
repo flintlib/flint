@@ -298,7 +298,7 @@ flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsp
             thread_limit = flint_get_num_threads();
 
         nt = thread_limit;
-        nw = flint_request_threads(&threads, 2); /* request one extra worker */
+        nw = flint_request_threads(&threads, FLINT_MIN(nt, 2)); /* request one extra worker */
 
         if (nw == 0)
         {
@@ -308,6 +308,8 @@ flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsp
         else
         {
             flint_parallel_binary_splitting_t right_args;
+
+            FLINT_ASSERT(nt >= 2);
 
             nw_save = flint_set_num_workers(nt - nt / 2 - 1);
 
