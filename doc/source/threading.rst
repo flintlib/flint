@@ -23,6 +23,6 @@ Many core algorithms such as the FFT (for large integer and polynomial
 operations, including some factoring algorithms), integer factoring and
 multivariate polynomial algorithms are threaded in FLINT.
 
-Please refer to `code_conventions.txt` for some preliminary guidance on how to
+Please refer to ``code_conventions.txt`` for some preliminary guidance on how to
 write threaded functions in FLINT.
 
