@@ -68,7 +68,11 @@ do {                                        \
 
 /*  Memory management  *******************************************************/
 
-FLINT_DLL fmpz * _fmpz_vec_init(slong len);
+FMPZ_VEC_INLINE
+fmpz * _fmpz_vec_init(slong len)
+{
+    return (fmpz *) flint_calloc(len, sizeof(fmpz));
+}
 
 FLINT_DLL void _fmpz_vec_clear(fmpz * vec, slong len);
 
