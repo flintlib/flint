@@ -1310,3 +1310,32 @@ v 2.6.3 -- 12 Aug 2020
  * Fix bug in nmod_mpoly_factor (returned 0 for some factorisations)
  * Fix some documentation build errors and some doc formatting issues
 
+2.8.5 -- 25 Apr 2022
+
+ * Fix a serious bug in LLL
+
+2.9.0 -- ?? May 2022
+
+ * Add fmpz_mod_poly_div function
+ * Add _flint_get_memory function
+ * Add Eulerian polynomials
+ * Support "multivariate" polynomials with zero variables
+ * Improve Stirling numbers of both kinds
+ * Speed up numerous fmpz functions for small inputs
+ * Improve Bell numbers
+ * Speedups to nmod arithmetic
+ * Improve nmod_mat LU decomposition
+ * Fully separate nmod module from nmod_vec
+ * Speed up Hermite polynomials
+ * Add n-th derivative for Z[x] and Q[x]
+ * Improve fq_default module (nmod is now used where optimal)
+ * Add sqrt functions for numerous polynomial/series modules and finite fields
+ * Add FFT matrix multiplication
+ * Improve CI
+ * Improve LLL for general use
+ * Add matrix-vector products over Q
+ * Add can_solve function for fmpq_mat, handling non-square/singular matrices
+ * Document fmpz_mod_vec module
+ * Fix and document qadic_sqrt function
+ * Add parallel programming helpers
+

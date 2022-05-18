@@ -164,6 +164,12 @@ FMPQ_INLINE int fmpq_equal_si(fmpq_t q, slong n)
     return fmpz_equal_si(fmpq_numref(q), n) && q->den == WORD(1);
 }
 
+FMPQ_INLINE void fmpq_set_fmpz(fmpq_t q, const fmpz_t n)
+{
+    fmpz_set(fmpq_numref(q), n);
+    fmpz_one(fmpq_denref(q));
+}
+
 FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
 FLINT_DLL int fmpq_set_str(fmpq_t res, const char * str, int base);
