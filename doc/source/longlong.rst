@@ -75,32 +75,7 @@ Auxiliary asm macros
 
 .. macro:: invert_limb(invxl, xl)
 
-    Computes an approximate inverse ``invxl`` of the limb ``xl``, 
-    with an implicit leading~`1`. More formally it computes::
-
-        invxl = (B^2 - B*x - 1)/x = (B^2 - 1)/x - B
-
-    Note that `x` must be normalised, i.e.\ with msb set. This inverse 
-    makes use of the following theorem of Torbjorn Granlund and Peter 
-    Montgomery~[Lemma~8.1][GraMon1994]_:
-
-    Let `d` be normalised, `d < B`, i.e.\ it fits in a word, and suppose 
-    that `m d < B^2 \leq (m+1) d`. Let `0 \leq n \leq B d - 1`.  Write 
-    `n = n_2 B + n_1 B/2 + n_0` with `n_1 = 0` or `1` and `n_0 < B/2`. 
-    Suppose `q_1 B + q_0 = n_2 B + (n_2 + n_1) (m - B) + n_1 (d-B/2) + n_0`
-    and `0 \leq q_0 < B`. Then `0 \leq q_1 < B` and `0 \leq n - q_1 d < 2 d`.
-
-    In the theorem, `m` is the inverse of `d`. If we let 
-    ``m = invxl + B`` and `d = x` we have `m d = B^2 - 1 < B^2` and 
-    `(m+1) x = B^2 + d - 1 \geq B^2`.
-
-    The theorem is often applied as follows: note that `n_0` and `n_1 (d-B/2)` 
-    are both less than `B/2`. Also note that `n_1 (m-B) < B`. Thus the sum of 
-    all these terms contributes at most `1` to `q_1`. We are left with 
-    `n_2 B + n_2 (m-B)`. But note that `(m-B)` is precisely our precomputed 
-    inverse ``invxl``. If we write `q_1 B + q_0 = n_2 B + n_2 (m-B)`, 
-    then from the theorem, we have `0 \leq n - q_1 d < 3 d`, i.e.\ the 
-    quotient is out by at most `2` and is always either correct or too small.
+    Deprecated: see :func:`n_preinvert_limb_prenorm`.
 
 .. macro:: udiv_qrnnd_preinv(q, r, nh, nl, d, di)
 
