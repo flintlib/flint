@@ -53,7 +53,7 @@ static const unsigned short rec_word_tab[512] = {
    16628, 16611, 16595, 16578, 16562, 16546, 16529, 16513, 16497, 16481, 16464, 16448, 16432, 16416, 16400, 16384
 };
 
-#define invert_limb(dinv, d)                                      \
+#define _invert_limb(dinv, d)                                      \
    do {                                                           \
       mp_limb_t _v0, _v1, _v2, _d21, _e, _m0;                     \
       FLINT_ASSERT(((d) & (UWORD(1)<<(FLINT_BITS - 1))) != 0); \
@@ -94,7 +94,7 @@ static const unsigned short rec_word_tab[256] = {
    1055, 1053, 1051, 1049, 1047, 1044, 1042, 1040, 1038, 1036, 1034, 1032, 1030, 1028, 1026, 1024
 };
 
-#define invert_limb(dinv, d)                                      \
+#define _invert_limb(dinv, d)                                      \
    do {                                                           \
       mp_limb_t _v0, _v2, _d40, _e, _m0;                          \
       FLINT_ASSERT(((d) & (UWORD(1)<<(FLINT_BITS - 1))) != 0); \
@@ -120,7 +120,7 @@ ulong n_preinvert_limb(ulong n)
    ulong norm, ninv;
 
    count_leading_zeros(norm, n);
-   invert_limb(ninv, n << norm);
+   _invert_limb(ninv, n << norm);
 
    return ninv;
 }
@@ -129,7 +129,7 @@ ulong n_preinvert_limb_prenorm(ulong n)
 {
    ulong ninv;
 
-   invert_limb(ninv, n);
+   _invert_limb(ninv, n);
 
    return ninv;
 }
