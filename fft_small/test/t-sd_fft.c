@@ -55,7 +55,7 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
     ulong dgs1 = n_sizeinbase(maxL, 10);
     ulong dgs2 = n_sizeinbase(ireps + irepmul*maxL, 10);
 
-    flint_printf("fft ");
+    flint_printf(" fft ");
     flint_print_d_fixed(0, dgs1);
     flint_printf(".");
     flint_print_d_fixed(0, dgs2);
@@ -78,10 +78,10 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
         ulong nreps = ireps + irepmul*L;
         for (ulong rep = 0; rep < nreps; rep++)
         {
-            for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 7; ii++)
+            for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 8; ii++)
                 flint_printf("%c", '\b');
 
-            flint_printf("fft ");
+            flint_printf(" fft ");
             flint_print_d_fixed(L, dgs1);
             flint_printf(".");
             flint_print_d_fixed(1+rep, dgs2);
@@ -144,7 +144,7 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
         flint_free(X);
     }
 
-    for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 7; ii++)
+    for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 8; ii++)
         flint_printf("%c", '\b');
     fflush(stdout);
 }

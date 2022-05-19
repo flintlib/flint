@@ -46,7 +46,7 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
 
     ulong dgs = n_sizeinbase(nreps, 10);
 
-    flint_printf("mul ");
+    flint_printf(" mul ");
     flint_print_d_fixed(0, dgs);
     flint_printf("/");
     flint_print_d_fixed(nreps, dgs);
@@ -67,11 +67,11 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
             d[i] = n_randlimb(state);
         }
 
-        for (ulong ii = 0; ii < 2*dgs + 5; ii++)
+        for (ulong ii = 0; ii < 2*dgs + 6; ii++)
             flint_printf("%c", '\b');
         fflush(stdout);
 
-        flint_printf("mul ");
+        flint_printf(" mul ");
         flint_print_d_fixed(1+rep, dgs);
         flint_printf("/");
         flint_print_d_fixed(nreps, dgs);
@@ -97,7 +97,7 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
     flint_free(c);
     flint_free(d);
 
-    for (ulong ii = 0; ii < 2*dgs + 5; ii++)
+    for (ulong ii = 0; ii < 2*dgs + 6; ii++)
         flint_printf("%c", '\b');
     fflush(stdout);
 }

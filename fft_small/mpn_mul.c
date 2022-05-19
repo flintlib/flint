@@ -84,20 +84,27 @@ void crt_data_clear(crt_data_t C)
 }
 
 /* return mpn of length C->coeff_len */
-ulong* crt_data_co_prime(const crt_data_t C, ulong i)
+FLINT_FORCE_INLINE ulong* crt_data_co_prime(const crt_data_t C, ulong i)
 {
     FLINT_ASSERT(i < C->nprimes);
     return C->data + i*C->coeff_len;
 }
 
+FLINT_FORCE_INLINE ulong* _crt_data_co_prime(const crt_data_t C, ulong i, ulong n)
+{
+    FLINT_ASSERT(i < C->nprimes);
+    FLINT_ASSERT(n == C->coeff_len);
+    return C->data + i*n;
+}
+
 /* return mpn of length C->coeff_len */
-ulong* crt_data_prod_primes(const crt_data_t C)
+FLINT_FORCE_INLINE ulong* crt_data_prod_primes(const crt_data_t C)
 {
     return C->data + C->nprimes*C->coeff_len;
 }
 
 /* the reduction of co_prime mod the i^th prime */
-ulong* crt_data_co_prime_red(const crt_data_t C, ulong i)
+FLINT_FORCE_INLINE ulong* crt_data_co_prime_red(const crt_data_t C, ulong i)
 {
     FLINT_ASSERT(i < C->nprimes);
     return C->data + C->nprimes*C->coeff_len + C->coeff_len + i;
@@ -342,6 +349,8 @@ DEFINE_IT(8,188)
 #undef aindex
 
 
+/* seems all version of gcc generate worse code if the intrinsics are used */
+#if 1
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
@@ -371,6 +380,18 @@ DEFINE_IT(8,188)
          "4"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
          "5"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
          "6"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+
+#define add_ssssssssaaaaaaaaaaaaaaaa(s7,s6,s5,s4,s3,s2,s1,s0, a7,a6,a5,a4,a3,a2,a1,a0, b7,b6,b5,b4,b3,b2,b1,b0)  \
+  __asm__ ("addq %23,%q7\nadcq %21,%q6\nadcq %19,%q5\n\tadcq %17,%q4\n\tadcq %15,%q3\n\tadcq %13,%q2\n\tadcq %11,%q1\n\tadcq %9,%q0"    \
+       : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
+       : "0"  ((mp_limb_t)(a7)), "rme" ((mp_limb_t)(b7)),                 \
+         "1"  ((mp_limb_t)(a6)), "rme" ((mp_limb_t)(b6)),                 \
+         "2"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
+         "3"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
+         "4"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
+         "5"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
+         "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
+         "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
 
 
 #define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
@@ -410,6 +431,18 @@ DEFINE_IT(8,188)
          "4"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
          "5"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
          "6"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+
+#define sub_ddddddddmmmmmmmmssssssss(s7,s6,s5,s4,s3,s2,s1,s0, a7,a6,a5,a4,a3,a2,a1,a0, b7,b6,b5,b4,b3,b2,b1,b0)  \
+  __asm__ ("subq %23,%q7\nsbbq %21,%q6\nsbbq %19,%q5\n\tsbbq %17,%q4\n\tsbbq %15,%q3\n\tsbbq %13,%q2\n\tsbbq %11,%q1\n\tsbbq %9,%q0"    \
+       : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
+       : "0"  ((mp_limb_t)(a7)), "rme" ((mp_limb_t)(b7)),                 \
+         "1"  ((mp_limb_t)(a6)), "rme" ((mp_limb_t)(b6)),                 \
+         "2"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
+         "3"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
+         "4"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
+         "5"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
+         "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
+         "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
 
 FLINT_FORCE_INLINE void multi_add_2(ulong z[], const ulong a[])
 {
@@ -454,6 +487,12 @@ FLINT_FORCE_INLINE void multi_add_7(ulong z[], const ulong a[])
                               a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
 }
 
+FLINT_FORCE_INLINE void multi_add_8(ulong z[], const ulong a[])
+{
+    add_ssssssssaaaaaaaaaaaaaaaa(z[7],z[6],z[5],z[4],z[3],z[2],z[1],z[0],
+                                 z[7],z[6],z[5],z[4],z[3],z[2],z[1],z[0],
+                                 a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
+}
 
 FLINT_FORCE_INLINE void multi_sub_2(ulong z[], const ulong a[])
 {
@@ -497,6 +536,14 @@ FLINT_FORCE_INLINE void multi_sub_7(ulong z[], const ulong a[])
                               a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
 }
 
+FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[])
+{
+    sub_ddddddddmmmmmmmmssssssss(z[7],z[6],z[5],z[4],z[3],z[2],z[1],z[0],
+                                 z[7],z[6],z[5],z[4],z[3],z[2],z[1],z[0],
+                                 a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
+}
+
+#else
 
 FLINT_FORCE_INLINE ulong _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
@@ -519,19 +566,30 @@ FLINT_FORCE_INLINE ulong _subborrow_ulong(unsigned char cf, ulong x, ulong y, ul
 }
 
 
-FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[])
-{
-    unsigned char cf = 0;
-    for (ulong i = 0; i < 8; i++)
-        cf = _subborrow_ulong(cf, z[i], a[i], &z[i]);
+#define DEFINE_IT(n) \
+FLINT_FORCE_INLINE void CAT(multi_sub, n)(ulong z[], const ulong a[]) \
+{ \
+    unsigned char cf = 0; \
+    for (ulong i = 0; i < n; i++) \
+        cf = _subborrow_ulong(cf, z[i], a[i], &z[i]); \
+} \
+FLINT_FORCE_INLINE void CAT(multi_add, n)(ulong z[], const ulong a[]) \
+{ \
+    unsigned char cf = 0; \
+    for (ulong i = 0; i < n; i++) \
+        cf = _addcarry_ulong(cf, z[i], a[i], &z[i]); \
 }
 
-FLINT_FORCE_INLINE void multi_add_8(ulong z[], const ulong a[])
-{
-    unsigned char cf = 0;
-    for (ulong i = 0; i < 8; i++)
-        cf = _addcarry_ulong(cf, z[i], a[i], &z[i]);
-}
+DEFINE_IT(2)
+DEFINE_IT(3)
+DEFINE_IT(4)
+DEFINE_IT(5)
+DEFINE_IT(6)
+DEFINE_IT(7)
+DEFINE_IT(8)
+#undef DEFINE_IT
+
+#endif
 
 
 FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
@@ -549,74 +607,74 @@ FLINT_FORCE_INLINE void _madd(ulong* hi, ulong* lo, ulong y, ulong x)
     *hi = (ulong) (p >> 64);
 }
 
-#define DEFINE_IT(n, m, first) \
-FLINT_FORCE_INLINE void CAT4(_big_addmul, n, m, first)(ulong r[], ulong t[], ulong C[], ulong y) \
+#define DEFINE_IT(n, m) \
+FLINT_FORCE_INLINE void CAT3(_big_mul, n, m)(ulong r[], ulong t[], ulong C[], ulong y) \
 { \
     for (ulong k = 0; k < n; k += 2) \
     { \
         if (k + 1 < n) \
         { \
             FLINT_ASSERT(k < m); \
-            if (first) \
-                _mul(&r[k+1],&r[k+0], C[k+0], y); \
-            else \
-                _madd(&r[k+1],&r[k+0], C[k+0], y); \
+            _mul(&r[k+1],&r[k+0], C[k+0], y); \
         } \
         else \
         { \
             FLINT_ASSERT(k + 1 == n); \
             if (k < m) \
-            { \
-                if (first) \
-                    r[k+0] = C[k+0]*y; \
-                else \
-                    r[k+0] += C[k+0]*y; \
-            } \
+                r[k+0] = C[k+0]*y; \
             else \
-            { \
-                if (first) \
-                    r[k+0] = 0; \
-            } \
+                r[k+0] = 0; \
         } \
  \
         if (k + 2 < n) \
         { \
             FLINT_ASSERT(k + 1 < m); \
-            if (first) \
-                _mul(&t[k+2],&t[k+1], C[k+1], y); \
-            else \
-                _madd(&t[k+2],&t[k+1], C[k+1], y); \
+            _mul(&t[k+2],&t[k+1], C[k+1], y); \
         } \
         else if (k + 1 < n) \
         { \
             if (k + 1 < m) \
-            { \
-                if (first) \
-                    t[k+1] = C[k+1]*y; \
-                else \
-                    t[k+1] += C[k+1]*y; \
-            } \
+                t[k+1] = C[k+1]*y; \
             else \
-            { \
-                if (first) \
-                    t[k+1] = 0; \
-            } \
+                t[k+1] = 0; \
+        } \
+    } \
+} \
+FLINT_FORCE_INLINE void CAT3(_big_addmul, n, m)(ulong r[], ulong t[], ulong C[], ulong y) \
+{ \
+    for (ulong k = 0; k < n; k += 2) \
+    { \
+        if (k + 1 < n) \
+        { \
+            FLINT_ASSERT(k < m); \
+            _madd(&r[k+1],&r[k+0], C[k+0], y); \
+        } \
+        else \
+        { \
+            FLINT_ASSERT(k + 1 == n); \
+            if (k < m) \
+                r[k+0] += C[k+0]*y; \
+        } \
+ \
+        if (k + 2 < n) \
+        { \
+            FLINT_ASSERT(k + 1 < m); \
+            _madd(&t[k+2],&t[k+1], C[k+1], y); \
+        } \
+        else if (k + 1 < n) \
+        { \
+            if (k + 1 < m) \
+                t[k+1] += C[k+1]*y; \
         } \
     } \
 }
 
-DEFINE_IT(3, 2, 0)
-DEFINE_IT(3, 2, 1)
-DEFINE_IT(4, 3, 0)
-DEFINE_IT(4, 3, 1)
-DEFINE_IT(4, 4, 0)
-DEFINE_IT(4, 4, 1)
-DEFINE_IT(5, 4, 0)
-DEFINE_IT(5, 4, 1)
-DEFINE_IT(6, 5, 0)
-DEFINE_IT(6, 5, 1)
-DEFINE_IT(7, 6, 0)
-DEFINE_IT(7, 6, 1)
+DEFINE_IT(3, 2)
+DEFINE_IT(4, 3)
+DEFINE_IT(4, 4)
+DEFINE_IT(5, 4)
+DEFINE_IT(6, 5)
+DEFINE_IT(7, 6)
 #undef DEFINE_IT
 
 
@@ -649,13 +707,29 @@ DEFINE_IT(8, 7)
 #undef DEFINE_IT
 
 
-#define DEFINE_IT(n, easy, n_plus_1) \
-FLINT_FORCE_INLINE void CAT3(_add_to_answer, n, easy)(ulong z[], ulong r[], ulong zn, ulong toff, ulong tshift) \
+#define DEFINE_IT(n, n_plus_1) \
+FLINT_FORCE_INLINE void CAT(_add_to_answer_easy, n)(ulong z[], ulong r[], ulong zn, ulong toff, ulong tshift) \
 { \
     FLINT_ASSERT(zn > toff); \
     if (tshift == 0) \
     { \
-        if (easy || zn - toff >= n) \
+        CAT(multi_add, n)(z + toff, r); \
+    } \
+    else \
+    { \
+        r[n] = r[n-1] >> (64-tshift); \
+        for (ulong k = n; k >= 2; k--) \
+            r[k-1] = (r[k-1] << (tshift)) | (r[k-2] >> (64-tshift)); \
+        r[0] =  r[0] << (tshift); \
+        CAT(multi_add, n_plus_1)(z + toff, r); \
+    } \
+} \
+FLINT_FORCE_INLINE void CAT(_add_to_answer_hard, n)(ulong z[], ulong r[], ulong zn, ulong toff, ulong tshift) \
+{ \
+    FLINT_ASSERT(zn > toff); \
+    if (tshift == 0) \
+    { \
+        if (zn - toff >= n) \
         { \
             CAT(multi_add, n)(z + toff, r); \
             return; \
@@ -667,29 +741,67 @@ FLINT_FORCE_INLINE void CAT3(_add_to_answer, n, easy)(ulong z[], ulong r[], ulon
         for (ulong k = n; k >= 2; k--) \
             r[k-1] = (r[k-1] << (tshift)) | (r[k-2] >> (64-tshift)); \
         r[0] =  r[0] << (tshift); \
-        if (easy || zn - toff > n) \
+        if (zn - toff > n) \
         { \
             CAT(multi_add, n_plus_1)(z + toff, r); \
             return; \
         } \
     } \
-    zn -= toff; \
-    mpn_add_n(z + toff, z + toff, r, zn); \
+    FLINT_ASSERT(zn - toff <= n); \
+    mpn_add_n(z + toff, z + toff, r, zn - toff); \
 }
 
-DEFINE_IT(3, 0, 4)
-DEFINE_IT(3, 1, 4)
-DEFINE_IT(4, 0, 5)
-DEFINE_IT(4, 1, 5)
-DEFINE_IT(5, 0, 6)
-DEFINE_IT(5, 1, 6)
-DEFINE_IT(6, 0, 7)
-DEFINE_IT(6, 1, 7)
-DEFINE_IT(7, 0, 8)
-DEFINE_IT(7, 1, 8)
+DEFINE_IT(3, 4)
+DEFINE_IT(4, 5)
+DEFINE_IT(5, 6)
+DEFINE_IT(6, 7)
+DEFINE_IT(7, 8)
 #undef DEFINE_IT
 
+static void _convert_block(sd_fft_ctx_struct* Rffts, ulong* Xs, ulong np, ulong I)
+{
+    for (ulong l = 0; l < np; l++)
+    {
+        vec4d p = vec4d_set_d(Rffts[l].p);
+        vec4d pinv = vec4d_set_d(Rffts[l].pinv);
+        double* x = sd_fft_ctx_blk_index(Rffts + l, I);
+        for (ulong j = 0; j < BLK_SZ; j += 4*VEC_SZ)
+        {
+            vec4d x0, x1, x2, x3;
+            vec4ui y0, y1, y2, y3;
+            x0 = vec4d_load(x + j + 0*VEC_SZ);
+            x1 = vec4d_load(x + j + 1*VEC_SZ);
+            x2 = vec4d_load(x + j + 2*VEC_SZ);
+            x3 = vec4d_load(x + j + 3*VEC_SZ);
+            x0 = vec4d_reduce_to_0n(x0, p, pinv);
+            x1 = vec4d_reduce_to_0n(x1, p, pinv);
+            x2 = vec4d_reduce_to_0n(x2, p, pinv);
+            x3 = vec4d_reduce_to_0n(x3, p, pinv);
+            y0 = vec4d_convert_limited_vec4ui(x0);
+            y1 = vec4d_convert_limited_vec4ui(x1);
+            y2 = vec4d_convert_limited_vec4ui(x2);
+            y3 = vec4d_convert_limited_vec4ui(x3);
+            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 0*VEC_SZ, y0);
+            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1);
+            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2);
+            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3);
+        }
+    }
+}
 
+/*
+    The "n" here is the limb count Rcrts[np-1].coeff_len, which is big enough
+    to hold (product of primes)*(number of primes), so it can hold the
+    intermediate dot products f[0]*x[0] + ... + f[np-1]*x[np-1]. The x[i] are
+    single limb and the f[i] are of length "m". The number of primes is "np".
+
+    The coefficient of X^i, 0 <= i < zlen needs to be reconstructed and added
+    to the answer mpn (z, zn). This involves the limbs
+
+       z[floor(i*bits/64)] ... z[floor(i*bits/64)+n]
+
+    so is easy if floor(i*bits/64)+n < zn
+*/
 #define DEFINE_IT(NP, N, M) \
 static void CAT4(mpn_from_ffts, NP, N, M)( \
     ulong* z, ulong zn, ulong zlen, \
@@ -700,9 +812,6 @@ static void CAT4(mpn_from_ffts, NP, N, M)( \
     ulong np = NP; \
     ulong n = N; \
     ulong m = M; \
- \
-    ulong r[N + 1]; \
-    ulong t[N + 1]; \
  \
     FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
  \
@@ -721,7 +830,6 @@ static void CAT4(mpn_from_ffts, NP, N, M)( \
  \
     ulong i = 0; \
  \
-    /* easy if zn-n > floor(i*bits/64) */ \
     ulong end_easy = (zn >= n+1 ? zn - (n+1) : (ulong)(0))*FLINT_BITS/bits; \
  \
     ulong Xs[BLK_SZ*NP]; \
@@ -730,73 +838,41 @@ static void CAT4(mpn_from_ffts, NP, N, M)( \
  \
     for (; i < end_easy; i += BLK_SZ) \
     { \
-        ulong I = i/BLK_SZ; \
- \
-        for (ulong l = 0; l < np; l++) \
-        { \
-            vec4d p = vec4d_set_d(Rffts[l].p); \
-            vec4d pinv = vec4d_set_d(Rffts[l].pinv); \
-            double* x = sd_fft_ctx_blk_index(Rffts + l, I); \
-            for (ulong j = 0; j < BLK_SZ; j += 4*VEC_SZ) \
-            { \
-                vec4d x0, x1, x2, x3; \
-                vec4ui y0, y1, y2, y3; \
-                x0 = vec4d_load(x + j + 0*VEC_SZ); \
-                x1 = vec4d_load(x + j + 1*VEC_SZ); \
-                x2 = vec4d_load(x + j + 2*VEC_SZ); \
-                x3 = vec4d_load(x + j + 3*VEC_SZ); \
-                x0 = vec4d_reduce_to_0n(x0, p, pinv); \
-                x1 = vec4d_reduce_to_0n(x1, p, pinv); \
-                x2 = vec4d_reduce_to_0n(x2, p, pinv); \
-                x3 = vec4d_reduce_to_0n(x3, p, pinv); \
-/*flint_printf("x: ");\
-vec4_print(x0);\
-vec4_print(x1);\
-vec4_print(x2);\
-vec4_print(x3);\
-flint_printf("\n");*/\
-                y0 = vec4d_convert_limited_vec4ui(x0); \
-                y1 = vec4d_convert_limited_vec4ui(x1); \
-                y2 = vec4d_convert_limited_vec4ui(x2); \
-                y3 = vec4d_convert_limited_vec4ui(x3); \
-                vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 0*VEC_SZ, y0); \
-                vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1); \
-                vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2); \
-                vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3); \
-            } \
-        } \
+        _convert_block(Rffts, Xs, np, i/BLK_SZ); \
  \
         for (ulong j = 0; j < BLK_SZ; j += 1) \
         { \
+            ulong r[N + 1]; \
+            ulong t[N + 1]; \
             ulong l = 0; \
-            CAT4(_big_addmul, N, M, 1)(r, t, crt_data_co_prime(Rcrts + np - 1, l), Xs[l*BLK_SZ + j]); \
+ \
+            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
             for (l++; l < np; l++) \
-                CAT4(_big_addmul, N, M, 0)(r, t, crt_data_co_prime(Rcrts + np - 1, l), Xs[l*BLK_SZ + j]); \
+                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
  \
             CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
  \
-/*flint_printf("r:");\
-for (ulong iii = 0; iii < n; iii++)\
-    flint_printf(" %016wx", r[iii]);\
-flint_printf("\n"); */\
             ulong toff = ((i+j)*bits)/FLINT_BITS; \
             ulong tshift = ((i+j)*bits)%FLINT_BITS; \
  \
             FLINT_ASSERT(zn > n + toff); \
  \
-            CAT3(_add_to_answer, N, 1)(z, r, zn, toff, tshift); \
+            CAT(_add_to_answer_easy, N)(z, r, zn, toff, tshift); \
         } \
     } \
  \
     for (; i < zlen; i++) \
     { \
-        for (ulong l = 0; l < np; l++) \
+        ulong r[N + 1]; \
+        ulong t[N + 1]; \
+        ulong l = 0; \
+        ulong x = vec1d_reduce_to_0n(sd_fft_ctx_get_index(Rffts + l, i), Rffts[l].p, Rffts[l].pinv); \
+ \
+        CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
+        for (l++; l < np; l++) \
         { \
-            ulong x = vec1d_reduce_to_0n(sd_fft_ctx_get_index(Rffts + l, i), Rffts[l].p, Rffts[l].pinv); \
-            if (l == 0) \
-                CAT4(_big_addmul, N, M, 1)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
-            else \
-                CAT4(_big_addmul, N, M, 0)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
+            x = vec1d_reduce_to_0n(sd_fft_ctx_get_index(Rffts + l, i), Rffts[l].p, Rffts[l].pinv); \
+            CAT3(_big_addmul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
         } \
  \
         CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
@@ -807,7 +883,7 @@ flint_printf("\n"); */\
         if (toff >= zn) \
             break; \
  \
-        CAT3(_add_to_answer,N, 0)(z, r, zn, toff, tshift); \
+        CAT(_add_to_answer_hard, N)(z, r, zn, toff, tshift); \
     } \
 } \
 
@@ -907,7 +983,6 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     R->profiles[i].np        = np_; \
     R->profiles[i].bits      = bits_; \
     R->profiles[i].bn_bound  = crt_data_find_bound(R->crts + np_ - 1, bits_); \
-flint_printf("bound: %wu\n", R->profiles[i].bn_bound); \
     R->profiles[i].to_ffts   = CAT3(mpn_to_ffts, np_, bits_); \
     R->profiles[i].from_ffts = CAT4(mpn_from_ffts, np_, n, m); \
     R->profiles_size = i + 1;
@@ -1130,7 +1205,7 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong 
     FLINT_ASSERT(flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts+np-1),
                                   R->crts[np-1].coeff_len, blen, 2*bits) >= 0);
 
-#define TIME_THIS 1
+#define TIME_THIS 0
 
 #if TIME_THIS
 timeit_t timer, timer_overall;
