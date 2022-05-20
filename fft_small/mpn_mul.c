@@ -210,7 +210,7 @@ flint_printf("{%f, %f, %f, %f}", x[0], x[1], x[2], x[3]);
         X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
 \
     for (ulong l = 0; l < np; l++) \
-        sd_fft_ctx_set_index(Rffts + l, d + l*dstride, i+ir, X[l/VEC_SZ][l%VEC_SZ]); \
+        sd_fft_ctx_set_index(d + l*dstride, i+ir, X[l/VEC_SZ][l%VEC_SZ]); \
 }
 
 /* The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride */
@@ -302,12 +302,12 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
             X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
  \
         for (ulong l = 0; l < np; l++) \
-            sd_fft_ctx_set_index(Rffts + l, d + l*dstride, i, X[l/VEC_SZ][l%VEC_SZ]); \
+            sd_fft_ctx_set_index(d + l*dstride, i, X[l/VEC_SZ][l%VEC_SZ]); \
     } \
  \
     for (ulong l = 0; l < np; l++) \
         for (ulong j = i; j < atrunc; j++) \
-            sd_fft_ctx_set_index(Rffts + l, d + l*dstride, j, 0.0); \
+            sd_fft_ctx_set_index(d + l*dstride, j, 0.0); \
 }
 
 DEFINE_IT(4, 64)
@@ -770,7 +770,7 @@ static void _convert_block(
     {
         vec4d p = vec4d_set_d(Rffts[l].p);
         vec4d pinv = vec4d_set_d(Rffts[l].pinv);
-        double* x = sd_fft_ctx_blk_index(Rffts + l, d + l*dstride, I);
+        double* x = sd_fft_ctx_blk_index(d + l*dstride, I);
         ulong j = 0; do {
             vec4d x0, x1, x2, x3;
             vec4ui y0, y1, y2, y3;
@@ -874,13 +874,13 @@ static void CAT4(mpn_from_ffts, NP, N, M)( \
         ulong r[N + 1]; \
         ulong t[N + 1]; \
         ulong l = 0; \
-        double xx = sd_fft_ctx_get_index(Rffts + l, d + l*dstride, i); \
+        double xx = sd_fft_ctx_get_index(d + l*dstride, i); \
         ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
  \
         CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
         for (l++; l < np; l++) \
         { \
-            xx = sd_fft_ctx_get_index(Rffts + l, d + l*dstride, i); \
+            xx = sd_fft_ctx_get_index(d + l*dstride, i); \
             x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
             CAT3(_big_addmul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
         } \
@@ -1166,7 +1166,12 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
 }
 
 /* pointwise mul of a with b and m */
-void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q, double* a, const double* b, ulong mm)
+void sd_fft_ctx_point_mul(
+    const sd_fft_ctx_t Q,
+    double* a,
+    const double* b,
+    ulong mm,
+    ulong depth)
 {
     double m = mm;
     if (m > 0.5*Q->p)
@@ -1175,10 +1180,10 @@ void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q, double* a, const double* b, ulon
     vec8d M = vec8d_set_d(m);
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    for (ulong I = 0; I < n_pow2(Q->depth - LG_BLK_SZ); I++)
+    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
     {
-        double* ax = a + sd_fft_ctx_blk_offset(Q, I);
-        const double* bx = b + sd_fft_ctx_blk_offset(Q, I);
+        double* ax = a + sd_fft_ctx_blk_offset(I);
+        const double* bx = b + sd_fft_ctx_blk_offset(I);
         ulong j = 0; do {
             vec8d x0, x1, b0, b1;
             x0 = vec8d_load(ax+j+0);
@@ -1223,13 +1228,13 @@ flint_printf("\n------------ zn = %wu, bits = %wu, np = %wu -------------\n", zn
 #endif
 
     for (ulong l = 0; l < np; l++)
-        sd_fft_ctx_set_depth(R->ffts + l, depth);
+        sd_fft_ctx_fit_depth(R->ffts + l, depth);
 
 #if TIME_THIS
 timeit_start(timer_overall);
 #endif
 
-    ulong stride = sd_fft_ctx_data_size(R->ffts + 0);
+    ulong stride = sd_fft_ctx_data_size(depth);
     double* abuf = (double*) mpn_ctx_fit_buffer(R, 2*np*stride*sizeof(double));
     double* bbuf = abuf + np*stride;
     const vec4d* two_pow = mpn_ctx_two_pow_table(R, bits+5, np);
@@ -1253,17 +1258,18 @@ timeit_start(timer);
 
 	for (ulong l = 0; l < np; l++)
     {
-        sd_fft_ctx_fft_trunc(R->ffts + l, bbuf + l*stride, btrunc, ztrunc);
-        sd_fft_ctx_fft_trunc(R->ffts + l, abuf + l*stride, atrunc, ztrunc);
+        sd_fft_ctx_fft_trunc(R->ffts + l, bbuf + l*stride, depth, btrunc, ztrunc);
+        sd_fft_ctx_fft_trunc(R->ffts + l, abuf + l*stride, depth, atrunc, ztrunc);
         ulong t1, thi, tlo;
         ulong cop = *crt_data_co_prime_red(R->crts + np - 1, l);
         thi = cop >> (FLINT_BITS - depth);
         tlo = cop << (depth);
         NMOD_RED2(t1, thi, tlo, R->ffts[l].mod);
         t1 = nmod_inv(t1, R->ffts[l].mod);
-        sd_fft_ctx_point_mul(R->ffts + l, abuf + l*stride, bbuf + l*stride, t1);
-        sd_fft_ctx_ifft_trunc(R->ffts + l, abuf + l*stride, ztrunc);
+        sd_fft_ctx_point_mul(R->ffts + l, abuf + l*stride, bbuf + l*stride, t1, depth);
+        sd_fft_ctx_ifft_trunc(R->ffts + l, abuf + l*stride, depth, ztrunc);
     }
+
 #if TIME_THIS
 timeit_stop(timer);
 if (timer->wall > 5)

@@ -35,6 +35,11 @@ void flint_aligned_free(void* p)
     free(p);
 }
 
+void sd_fft_ctx_clear(sd_fft_ctx_t Q)
+{
+    flint_aligned_free(Q->w2s);
+}
+
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 {
     Q->blk_sz = BLK_SZ;
@@ -59,7 +64,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     }
 }
 
-void sd_fft_ctx_fit_wtab(sd_fft_ctx_t Q, ulong k)
+void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k)
 {
     ulong N = n_pow2(Q->wtab_depth);
     double* oldw2s = Q->w2s;
@@ -92,13 +97,3 @@ void sd_fft_ctx_fit_wtab(sd_fft_ctx_t Q, ulong k)
     }
 }
 
-void sd_fft_ctx_set_depth(sd_fft_ctx_t Q, ulong l)
-{
-    Q->depth = l;
-    if (l < LG_BLK_SZ)
-    {
-        flint_printf("depth %wu should be at least %d\n", l, LG_BLK_SZ);
-        flint_abort();
-    }
-    sd_fft_ctx_fit_wtab(Q, l);
-}

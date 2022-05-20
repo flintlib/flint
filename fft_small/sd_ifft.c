@@ -40,7 +40,7 @@
 /* the legal functions must be implemented */
 #define DEFINE_IT(nn, zz, ff) \
 static void CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)( \
-    const sd_fft_ctx_t Q, \
+    const sd_fft_lctx_t Q, \
     ulong j, \
     double* X0, double* X1) \
 { \
@@ -69,7 +69,7 @@ DEFINE_IT(2,2,1)
 
 /* {x0, x1} = {2*x0 - w*x1, x0 - w*x1} */
 static void radix_2_moth_inv_trunc_block_1_2_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j,
     double* X0, double* X1)
 {
@@ -91,7 +91,7 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
 
 /* {x0} = {2*x0 - w*x1} */
 static void radix_2_moth_inv_trunc_block_1_2_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j,
     double* X0, double* X1)
 {
@@ -112,7 +112,7 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
 
 /* {x0, x1} = {2*x0, x0} */
 static void radix_2_moth_inv_trunc_block_1_1_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j,
     double* X0, double* X1)
 {
@@ -130,7 +130,7 @@ static void radix_2_moth_inv_trunc_block_1_1_1(
 
 /* {x0} = {2*x0} */
 static void radix_2_moth_inv_trunc_block_1_1_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j,
     double* X0, double* X1)
 {
@@ -147,7 +147,7 @@ static void radix_2_moth_inv_trunc_block_1_1_0(
 
 /* {x0} = {(x0 + w*x1)/2} */
 static void radix_2_moth_inv_trunc_block_0_2_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j,
     double* X0, double* X1)
 {
@@ -168,7 +168,7 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
 
 /* {x0} = {(x0)/2} */
 static void radix_2_moth_inv_trunc_block_0_1_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j,
     double* X0, double* X1)
 {
@@ -244,27 +244,27 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
 #if 0
 /* length 1 */
 FLINT_FORCE_INLINE void
-sd_ifft_basecase_0_0(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
+sd_ifft_basecase_0_0(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
 {
     FLINT_ASSERT(0 == (j == 0));
 }
 
 FLINT_FORCE_INLINE void
-sd_ifft_basecase_0_1(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
+sd_ifft_basecase_0_1(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
 {
     FLINT_ASSERT(1 == (j == 0));
 }
 
 /* length 2 */
 FLINT_FORCE_INLINE void
-sd_ifft_basecase_1_0(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
+sd_ifft_basecase_1_0(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
 {
     RADIX_2_REVERSE_PARAM(vec1d, Q, j)
     RADIX_2_REVERSE_MOTH(vec1d, X+0, X+1);
 }
 
 FLINT_FORCE_INLINE void
-sd_ifft_basecase_1_1(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
+sd_ifft_basecase_1_1(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
 {
     RADIX_2_REVERSE_PARAM(vec1d, Q, j)
     RADIX_2_REVERSE_MOTH(vec1d, X+0, X+1);
@@ -272,14 +272,14 @@ sd_ifft_basecase_1_1(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
 
 /* length 4 */
 FLINT_FORCE_INLINE void
-sd_ifft_basecase_2_0(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
+sd_ifft_basecase_2_0(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
 {
     RADIX_4_REVERSE_PARAM_SURE(vec1d, Q, j, jm, 0)
     RADIX_4_REVERSE_MOTH(vec1d, X+0, X+1, X+2, X+3);
 }
 
 FLINT_FORCE_INLINE void
-sd_ifft_basecase_2_1(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
+sd_ifft_basecase_2_1(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
 {
     RADIX_4_REVERSE_PARAM_SURE(vec1d, Q, j, jm, 1)
     RADIX_4_REVERSE_MOTH(vec1d, X+0, X+1, X+2, X+3);
@@ -289,7 +289,7 @@ sd_ifft_basecase_2_1(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm)
 /* length 16 */
 #define DEFINE_IT(j_is_0) \
 FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
-    const sd_fft_ctx_t Q, double* X, ulong j, ulong jm) \
+    const sd_fft_lctx_t Q, double* X, ulong j, ulong jm) \
 { \
     vec4d n    = vec4d_set_d(Q->p); \
     vec4d ninv = vec4d_set_d(Q->pinv); \
@@ -366,7 +366,7 @@ DEFINE_IT(1)
 
 /* use with N = M-2 and M >= 6 */
 #define EXTEND_BASECASE(N, M, j_is_0) \
-void CAT3(sd_ifft_basecase, M, j_is_0)(const sd_fft_ctx_t Q, double* X, ulong j, ulong jm) \
+void CAT3(sd_ifft_basecase, M, j_is_0)(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm) \
 { \
     ulong l = n_pow2(M - 2); \
     FLINT_ASSERT(j_is_0 == (j == 0)); \
@@ -391,10 +391,10 @@ EXTEND_BASECASE(6, 8, 1)
 #undef EXTEND_BASECASE
 
 /* parameter 1: j can be zero */
-void sd_ifft_base_1(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
+void sd_ifft_base_1(const sd_fft_lctx_t Q, double* d, ulong I, ulong j)
 {
     ulong jm = j^(n_next_pow2m1(j)>>1);
-    double* x = sd_fft_ctx_blk_index(Q, d, I);
+    double* x = sd_fft_ctx_blk_index(d, I);
     if (j == 0)
         sd_ifft_basecase_8_1(Q, x, j, jm);
     else
@@ -402,10 +402,10 @@ void sd_ifft_base_1(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
 }
 
 /* parameter 0: j cannot be zero */
-void sd_ifft_base_0(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
+void sd_ifft_base_0(const sd_fft_lctx_t Q, double* d, ulong I, ulong j)
 {
     ulong jm = j^(n_next_pow2m1(j)>>1);
-    double* x = sd_fft_ctx_blk_index(Q, d, I);
+    double* x = sd_fft_ctx_blk_index(d, I);
     FLINT_ASSERT(j != 0);
     sd_ifft_basecase_8_0(Q, x, j, jm);
 }
@@ -415,7 +415,7 @@ void sd_ifft_base_0(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
 /* the legal function are opt-in but print an annoying message if missing */
 #define DEFINE_IT(nn, zz, ff) \
 static int CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)( \
-    const sd_fft_ctx_t Q, \
+    const sd_fft_lctx_t Q, \
     ulong j, ulong jm, \
     double* X0, double* X1, double* X2, double* X3) \
 { \
@@ -472,7 +472,7 @@ k = 2, n = 3, z = 4, f = true
 [          -r               r         1   r*w^3]
 */
 static int radix_4_moth_inv_trunc_block_3_4_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -525,7 +525,7 @@ k = 2, n = 3, z = 4, f = false
 [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
 */
 static int radix_4_moth_inv_trunc_block_3_4_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -585,7 +585,7 @@ k = 2, n = 3, z = 3, f = true
                                 -r*(x0 - x1)             +   x2  }
 */
 static int radix_4_moth_inv_trunc_block_3_3_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -635,7 +635,7 @@ k = 2, n = 3, z = 3, f = false
                      -w^-2*(2*x2 - r*v0 - u0)}
 */
 static int radix_4_moth_inv_trunc_block_3_3_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -677,7 +677,7 @@ k = 2, n = 2, z = 4, f = true
 [1//2*r + 1//2   -1//2*r + 1//2   -1//2*w^2   -1//2*r*w^3]
 */
 static int radix_4_moth_inv_trunc_block_2_4_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -725,7 +725,7 @@ k = 2, n = 2, z = 4, f = false
 [2//w   -2//w      0   -w^2]
 */
 static int radix_4_moth_inv_trunc_block_2_4_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -765,7 +765,7 @@ k = 2, n = 2, z = 2, f = true
 {x0, x1, x2} = {2*(x0 + x1), 2*w^-1*(x0 - x1), (x0+x1)/2 + (x0-x1)*i/2}
 */
 static int radix_4_moth_inv_trunc_block_2_2_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -803,7 +803,7 @@ k = 2, n = 2, z = 2, f = 0
 {x0, x1} = {2*(x0 + x1), 2*w^-1*(x0 - x1)}
 */
 static int radix_4_moth_inv_trunc_block_2_2_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -834,7 +834,7 @@ k = 2, n = 1, z = 4, f = true
 [1   -1//2*w      0   -1//2*w^3]
 */
 static int radix_4_moth_inv_trunc_block_1_4_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -871,7 +871,7 @@ k = 2, n = 1, z = 4, f = false
 [4   -w   -w^2   -w^3]
 */
 static int radix_4_moth_inv_trunc_block_1_4_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -906,7 +906,7 @@ k = 2, n = 1, z = 1, f = true
 [1]
 */
 static int radix_4_moth_inv_trunc_block_1_1_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -929,7 +929,7 @@ k = 2, n = 1, z = 1, f = false
 [4]
 */
 static int radix_4_moth_inv_trunc_block_1_1_0(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -951,7 +951,7 @@ k = 2, n = 0, z = 4, f = true
 [1//4   1//4*w   1//4*w^2   1//4*w^3]
 */
 static int radix_4_moth_inv_trunc_block_0_4_1(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     ulong j, ulong jm,
     double* X0, double* X1, double* X2, double* X3)
 {
@@ -981,7 +981,7 @@ static int radix_4_moth_inv_trunc_block_0_4_1(
 /************************ the recursive stuff ********************************/
 
 void sd_ifft_main_block(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
@@ -1012,10 +1012,10 @@ void sd_ifft_main_block(
 
     if (k == 2)
     {
-        double* X0 = sd_fft_ctx_blk_index(Q, d, I + S*0);
-        double* X1 = sd_fft_ctx_blk_index(Q, d, I + S*1);
-        double* X2 = sd_fft_ctx_blk_index(Q, d, I + S*2);
-        double* X3 = sd_fft_ctx_blk_index(Q, d, I + S*3);
+        double* X0 = sd_fft_ctx_blk_index(d, I + S*0);
+        double* X1 = sd_fft_ctx_blk_index(d, I + S*1);
+        double* X2 = sd_fft_ctx_blk_index(d, I + S*2);
+        double* X3 = sd_fft_ctx_blk_index(d, I + S*3);
         RADIX_4_REVERSE_PARAM(vec8d, Q, j, jm, 1)
         ulong i = 0; do {
             RADIX_4_REVERSE_MOTH(vec8d, X0+i, X1+i, X2+i, X3+i);
@@ -1023,8 +1023,8 @@ void sd_ifft_main_block(
     }
     else if (k == 1)
     {
-        double* X0 = sd_fft_ctx_blk_index(Q, d, I + S*0);
-        double* X1 = sd_fft_ctx_blk_index(Q, d, I + S*1);
+        double* X0 = sd_fft_ctx_blk_index(d, I + S*0);
+        double* X1 = sd_fft_ctx_blk_index(d, I + S*1);
         RADIX_2_REVERSE_PARAM(vec8d, Q, j)
         ulong i = 0; do {
             RADIX_2_REVERSE_MOTH(vec8d, X0+i, X1+i);
@@ -1033,7 +1033,7 @@ void sd_ifft_main_block(
 }
 
 void sd_ifft_main(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
@@ -1081,7 +1081,7 @@ void sd_ifft_main(
 }
 
 void sd_ifft_trunc_block(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
@@ -1106,7 +1106,7 @@ void sd_ifft_trunc_block(
     {
 #define IT(nn, zz, ff) CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)
 #define LOOKUP_IT(nn, zz, ff) tab[(ulong)(ff) + 2*((zz)-1 + 4*(nn))]
-        static int (*tab[5*4*2])(const sd_fft_ctx_t, ulong, ulong, double*, double*, double*, double*) =
+        static int (*tab[5*4*2])(const sd_fft_lctx_t, ulong, ulong, double*, double*, double*, double*) =
             {IT(0,1,0),IT(0,1,1), IT(0,2,0),IT(0,2,1), IT(0,3,0),IT(0,3,1), IT(0,4,0),IT(0,4,1),
              IT(1,1,0),IT(1,1,1), IT(1,2,0),IT(1,2,1), IT(1,3,0),IT(1,3,1), IT(1,4,0),IT(1,4,1),
              IT(2,1,0),IT(2,1,1), IT(2,2,0),IT(2,2,1), IT(2,3,0),IT(2,3,1), IT(2,4,0),IT(2,4,1),
@@ -1114,10 +1114,10 @@ void sd_ifft_trunc_block(
              IT(4,1,0),IT(4,1,1), IT(4,2,0),IT(4,2,1), IT(4,3,0),IT(4,3,1), IT(4,4,0),IT(4,4,1)};
 
         ulong jm = j^(n_next_pow2m1(j)>>1);
-        if (LOOKUP_IT(n,z,f)(Q, j, jm, sd_fft_ctx_blk_index(Q, d, I + S*0),
-                                       sd_fft_ctx_blk_index(Q, d, I + S*1),
-                                       sd_fft_ctx_blk_index(Q, d, I + S*2),
-                                       sd_fft_ctx_blk_index(Q, d, I + S*3)))
+        if (LOOKUP_IT(n,z,f)(Q, j, jm, sd_fft_ctx_blk_index(d, I + S*0),
+                                       sd_fft_ctx_blk_index(d, I + S*1),
+                                       sd_fft_ctx_blk_index(d, I + S*2),
+                                       sd_fft_ctx_blk_index(d, I + S*3)))
         {
             return;
         }
@@ -1163,13 +1163,13 @@ void sd_ifft_trunc_block(
     {
 #define IT(nn, zz, ff) CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)
 #define LOOKUP_IT(nn, zz, ff) tab[(ulong)(ff) + 2*((zz)-1 + 2*(nn))]
-        static void (*tab[3*2*2])(const sd_fft_ctx_t, ulong, double*, double*) =
+        static void (*tab[3*2*2])(const sd_fft_lctx_t, ulong, double*, double*) =
             {IT(0,1,0),IT(0,1,1), IT(0,2,0),IT(0,2,1),
              IT(1,1,0),IT(1,1,1), IT(1,2,0),IT(1,2,1),
              IT(2,1,0),IT(2,1,1), IT(2,2,0),IT(2,2,1)};
 
-        LOOKUP_IT(n,z,f)(Q, j, sd_fft_ctx_blk_index(Q, d, I + S*0),
-                               sd_fft_ctx_blk_index(Q, d, I + S*1));
+        LOOKUP_IT(n,z,f)(Q, j, sd_fft_ctx_blk_index(d, I + S*0),
+                               sd_fft_ctx_blk_index(d, I + S*1));
         return;
 #undef LOOKUP_IT
 #undef IT
@@ -1178,7 +1178,7 @@ void sd_ifft_trunc_block(
 
 
 void sd_ifft_trunc(
-    const sd_fft_ctx_t Q,
+    const sd_fft_lctx_t Q,
     double* d,
     ulong I, // starting index
     ulong S, // stride
