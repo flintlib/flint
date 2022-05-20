@@ -790,7 +790,7 @@ static void _convert_block(
             vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1);
             vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2);
             vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3);
-        } while (j += 4*VEC_SZ, j < BLK_SZ)
+        } while (j += 4*VEC_SZ, j < BLK_SZ);
         FLINT_ASSERT(j == BLK_SZ);
     }
 }

@@ -37,63 +37,117 @@ void flint_aligned_free(void* p)
 
 void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 {
-    flint_aligned_free(Q->w2s);
+    ulong k;
+    flint_aligned_free(Q->w2tab[0]);
+    for (k = SD_FFT_CTX_INIT_DEPTH; k < FLINT_BITS; k++)
+        flint_aligned_free(Q->w2tab[k]);
 }
 
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 {
+    ulong N, i, k, l;
+    double* t;
+    double n, ninv;
+
     Q->blk_sz = BLK_SZ;
     Q->p = pp;
     Q->pinv = 1.0/Q->p;
     nmod_init(&Q->mod, pp);
     Q->primitive_root = n_primitive_root_prime(pp);
 
-    /* fill wtab to a depth of 10 (512 entries: 1, e(1/4), e(1/8), e(3/8), ...) */
-    Q->wtab_depth = 10;
-    ulong N = n_pow2(Q->wtab_depth-1);
+    n = Q->p;
+    ninv = Q->pinv;
 
-    Q->w2s = (double*)flint_aligned_alloc(4096, n_round_up(N*sizeof(double), 4096));
+    /*
+        fill wtab to a depth of SD_FFT_CTX_INIT_DEPTH:
+        2^(SD_FFT_CTX_INIT_DEPTH-1) entries: 1, e(1/4), e(1/8), e(3/8), ...
 
-    ulong w = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>Q->wtab_depth, Q->mod);
-    ulong wi = 1;
-    for (ulong j = 0; j < N; j++)
+        Q->w2tab[j] is itself a table of length 2^(j-1) containing 2^(j+1) st
+        roots of unity.
+    */
+    N = n_pow2(SD_FFT_CTX_INIT_DEPTH - 1);
+    t = (double*) flint_aligned_alloc(4096, n_round_up(N*sizeof(double), 4096));
+
+    Q->w2tab[0] = t;
+    t[0] = 1;
+    for (k = 1, l = 1; k < SD_FFT_CTX_INIT_DEPTH; k++, l *= 2)
     {
-        ulong jr = n_revbin(j, Q->wtab_depth)/2;
-        Q->w2s[jr] = vec1d_reduce_0n_to_pmhn(wi, Q->p);
-        wi = nmod_mul(wi, w, Q->mod);
+        ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+        double w = vec1d_set_d(vec1d_reduce_0n_to_pmhn(ww, n));
+        double* curr = t + l;
+        Q->w2tab[k] = curr;
+        i = 0; do {
+            vec1d x = vec1d_load(t + i);
+            x = vec1d_mulmod2(x, w, n, ninv);
+            x = vec1d_reduce_pm1n_to_pmhn(x, n);
+            vec1d_store(curr + i, x);
+        } while (i += 1, i < l);
     }
+
+    Q->w2tab_depth = k;
+
+    /* the rest of the tables are uninitialized */
+    for ( ; k < FLINT_BITS; k++)
+        Q->w2tab[k] = NULL;
+
+#if FLINT_WANT_ASSERT
+    for (k = 1; k < SD_FFT_CTX_INIT_DEPTH; k++)
+    {
+        ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+        for (i = 0; i < n_pow2(k-1); i++)
+        {
+            ulong www = nmod_pow_ui(ww, n_revbin(i+n_pow2(k-1), k), Q->mod);
+            FLINT_ASSERT(Q->w2tab[k][i] == vec1d_reduce_0n_to_pmhn(www, n));
+        }
+    }
+#endif
 }
 
-void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k)
+void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
 {
-    ulong N = n_pow2(Q->wtab_depth);
-    double* oldw2s = Q->w2s;
-
-    FLINT_ASSERT(oldw2s != NULL);
-
-    if (Q->wtab_depth >= k)
-        return;
-
-    Q->w2s = (double*) flint_aligned_alloc(4096, n_pow2(k)*sizeof(double));
-    memcpy(Q->w2s, oldw2s, N/2*sizeof(double));
-    flint_aligned_free(oldw2s);
-
-    while (Q->wtab_depth < k)
+    ulong k = Q->w2tab_depth;
+    while (k < depth)
     {
-        slong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(Q->wtab_depth+1), Q->mod);
-        vec8d w = vec8d_set_d(vec1d_reduce_0n_to_pmhn(ww, Q->p));
+        ulong i, j, l, off;
+        ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+        vec8d w    = vec8d_set_d(vec1d_reduce_0n_to_pmhn(ww, Q->p));
         vec8d n    = vec8d_set_d(Q->p);
         vec8d ninv = vec8d_set_d(Q->pinv);
-        double* wptr = Q->w2s;
-        ulong i = 0; do {
-            vec8d x = vec8d_load_aligned(wptr + i);
-            x = vec8d_mulmod2(x, w, n, ninv);
-            x = vec8d_reduce_pm1n_to_pmhn(x, n);
-            vec8d_store_aligned(wptr + N/2 + i, x);
-        } while (i += 8, i < N/2);
-        FLINT_ASSERT(i == N/2);
-        Q->wtab_depth++;
-        N *= 2;
+        ulong N = n_pow2(k - 1);
+        double* curr = (double*) flint_aligned_alloc(4096, n_round_up(N*sizeof(double), 4096));
+        double* t = Q->w2tab[0];
+        Q->w2tab[k] = curr;
+
+        /* The first few tables are stored consecutively, so vec8 is ok. */
+        off = 0;
+        l = n_pow2(SD_FFT_CTX_INIT_DEPTH - 1);
+        for (j = SD_FFT_CTX_INIT_DEPTH - 1; j < k; j++)
+        {
+            i = 0; do {
+                vec8d x = vec8d_load_aligned(t + i);
+                x = vec8d_mulmod2(x, w, n, ninv);
+                x = vec8d_reduce_pm1n_to_pmhn(x, n);
+                vec8d_store_aligned(curr + off + i, x);
+            } while (i += 8, i < l);
+            FLINT_ASSERT(i == l);
+            t = Q->w2tab[j + 1];
+            l += off;
+            off = l;
+        }
+
+#if FLINT_WANT_ASSERT
+        {
+            ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+            for (i = 0; i < n_pow2(k-1); i++)
+            {
+                ulong www = nmod_pow_ui(ww, n_revbin(i+n_pow2(k-1), k), Q->mod);
+                FLINT_ASSERT(Q->w2tab[k][i] == vec1d_reduce_0n_to_pmhn(www, Q->p));
+            }
+        }
+#endif
+
+        k++;
+        Q->w2tab_depth = k;
     }
 }
 

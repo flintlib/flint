@@ -18,7 +18,7 @@
     W := -w^-1
 */
 #define RADIX_2_REVERSE_PARAM(V, Q, j) \
-    V W = V##_set_d((UNLIKELY((j) == 0)) ? -Q->w2s[0] : Q->w2s[(j)^(n_next_pow2m1(j)>>1)]); \
+    V W = V##_set_d((UNLIKELY((j) == 0)) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, (j)^(n_next_pow2m1(j)>>1))); \
     V n    = V##_set_d(Q->p); \
     V ninv = V##_set_d(Q->pinv);
 
@@ -75,7 +75,7 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d w = vec4d_set_d(Q->w2s[j]);
+    vec4d w = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
     vec4d c = vec4d_set_d(2);
     ulong i = 0; do {
         vec4d u0, u1;
@@ -97,7 +97,7 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d w = vec4d_set_d(Q->w2s[j]);
+    vec4d w = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
     vec4d c = vec4d_set_d(2);
     ulong i = 0; do {
         vec4d u0, u1;
@@ -153,7 +153,7 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d w = vec4d_set_d(Q->w2s[j]);
+    vec4d w = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
     vec4d c = vec4d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));
     ulong i = 0; do {
         vec4d u0, u1;
@@ -195,17 +195,17 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
 */
 #define RADIX_4_REVERSE_PARAM(V, Q, j, jm, j_can_be_0) \
     FLINT_ASSERT((j) == 0 || (jm) == ((j)^(n_next_pow2m1(j)>>1))); \
-    V W  = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ? -Q->w2s[0] : Q->w2s[2*(jm)+1]); \
-    V W2 = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ? -Q->w2s[0] : Q->w2s[(jm)]); \
-    V IW = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ?  Q->w2s[1] : Q->w2s[2*(jm)]); \
+    V W  = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*(jm)+1)); \
+    V W2 = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, (jm))); \
+    V IW = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ?  sd_fft_lctx_w2s(Q, 1) : sd_fft_lctx_w2s(Q, 2*(jm))); \
     V n    = V##_set_d(Q->p); \
     V ninv = V##_set_d(Q->pinv); \
 
 #define RADIX_4_REVERSE_PARAM_SURE(V, Q, j, jm, j_is_0) \
     FLINT_ASSERT((j) == 0 || (jm) == ((j)^(n_next_pow2m1(j)>>1))); \
-    V W  = V##_set_d((j_is_0) ? -Q->w2s[0] : Q->w2s[2*(jm)+1]); \
-    V W2 = V##_set_d((j_is_0) ? -Q->w2s[0] : Q->w2s[(jm)]); \
-    V IW = V##_set_d((j_is_0) ?  Q->w2s[1] : Q->w2s[2*(jm)]); \
+    V W  = V##_set_d((j_is_0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*(jm)+1)); \
+    V W2 = V##_set_d((j_is_0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, (jm))); \
+    V IW = V##_set_d((j_is_0) ?  sd_fft_lctx_w2s(Q, 1) : sd_fft_lctx_w2s(Q, 2*(jm))); \
     V n    = V##_set_d(Q->p); \
     V ninv = V##_set_d(Q->pinv); \
 
@@ -305,20 +305,20 @@ FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
  \
     if (j_is_0) \
     { \
-        W  = vec4d_set_d4(-Q->w2s[0], Q->w2s[3], Q->w2s[7], Q->w2s[5]); \
-        IW = vec4d_set_d4( Q->w2s[1], Q->w2s[2], Q->w2s[6], Q->w2s[4]); \
-        W2 = vec4d_set_d4(-Q->w2s[0], Q->w2s[1], Q->w2s[3], Q->w2s[2]); \
+        W  = vec4d_set_d4(-sd_fft_lctx_w2s(Q, 0), sd_fft_lctx_w2s(Q, 3), sd_fft_lctx_w2s(Q, 7), sd_fft_lctx_w2s(Q, 5)); \
+        IW = vec4d_set_d4( sd_fft_lctx_w2s(Q, 1), sd_fft_lctx_w2s(Q, 2), sd_fft_lctx_w2s(Q, 6), sd_fft_lctx_w2s(Q, 4)); \
+        W2 = vec4d_set_d4(-sd_fft_lctx_w2s(Q, 0), sd_fft_lctx_w2s(Q, 1), sd_fft_lctx_w2s(Q, 3), sd_fft_lctx_w2s(Q, 2)); \
     } \
     else \
     { \
-        W2 = vec4d_load_aligned(Q->w2s + 4*jm); /* a b c d */ \
-        W2 = vec4d_permute_3_2_1_0(W2);         /* d c b a */ \
-        u = vec4d_load_aligned(Q->w2s + 8*jm);  /* 0 1 2 3 */ \
-        v = vec4d_load_aligned(Q->w2s + 8*jm+4);/* 4 5 6 7 */ \
-        W  = vec4d_unpackhi(u, v);              /* 1 5 3 7 */ \
-        IW = vec4d_unpacklo(u, v);              /* 0 4 2 6 */ \
-        W  = vec4d_permute_3_1_2_0(W);          /* 7 5 3 1 */ \
-        IW = vec4d_permute_3_1_2_0(IW);         /* 6 4 2 0 */ \
+        W2 = vec4d_set_d4(sd_fft_lctx_w2s(Q, 4*jm+0),sd_fft_lctx_w2s(Q, 4*jm+1), sd_fft_lctx_w2s(Q, 4*jm+2), sd_fft_lctx_w2s(Q, 4*jm+3));  /*a b c d */ \
+        W2 = vec4d_permute_3_2_1_0(W2);          /*d c b a */ \
+        u = vec4d_set_d4(sd_fft_lctx_w2s(Q, 8*jm+0),sd_fft_lctx_w2s(Q, 8*jm+1), sd_fft_lctx_w2s(Q, 8*jm+2), sd_fft_lctx_w2s(Q, 8*jm+3));   /*0 1 2 3 */ \
+        v = vec4d_set_d4(sd_fft_lctx_w2s(Q, 8*jm+4),sd_fft_lctx_w2s(Q, 8*jm+5), sd_fft_lctx_w2s(Q, 8*jm+6), sd_fft_lctx_w2s(Q, 8*jm+7));   /*4 5 6 7 */ \
+        W  = vec4d_unpackhi(u, v);               /*1 5 3 7 */ \
+        IW = vec4d_unpacklo(u, v);               /*0 4 2 6 */ \
+        W  = vec4d_permute_3_1_2_0(W);           /*7 5 3 1 */ \
+        IW = vec4d_permute_3_1_2_0(IW);          /*6 4 2 0 */ \
     } \
  \
     y0 = vec4d_add(x0, x1); \
@@ -337,9 +337,9 @@ FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
  \
     VEC4D_TRANSPOSE(x0, x1, x2, x3, x0, x1, x2, x3); \
  \
-    W  = vec4d_set_d(j_is_0 ? -Q->w2s[0] : Q->w2s[2*jm+1]); \
-    IW = vec4d_set_d(j_is_0 ?  Q->w2s[1] : Q->w2s[2*jm+0]); \
-    W2 = vec4d_set_d(j_is_0 ? -Q->w2s[0] : Q->w2s[jm]); \
+    W  = vec4d_set_d(j_is_0 ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1)); \
+    IW = vec4d_set_d(j_is_0 ?  sd_fft_lctx_w2s(Q, 1) : sd_fft_lctx_w2s(Q, 2*jm+0)); \
+    W2 = vec4d_set_d(j_is_0 ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm)); \
     y0 = vec4d_add(x0, x1); \
     y1 = vec4d_add(x2, x3); \
     y2 = vec4d_sub(x0, x1); \
@@ -478,15 +478,15 @@ static int radix_4_moth_inv_trunc_block_3_4_1(
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
-    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec4d f0 = vec4d_set_d(Q->w2s[1]);              /* r */
+    vec4d f0 = vec4d_set_d(sd_fft_lctx_w2s(Q, 1));              /* r */
     vec4d f1 = vec4d_set_d(twoW);                   /* 2*w^-1 */
     vec4d f2 = vec4d_set_d(2);
     vec4d f3 = vec4d_set_d(W2);                     /* -w^-2 */
-    vec4d fr = vec4d_set_d(-Q->w2s[2*j+1]);         /* -r*w */
-    vec4d fq = vec4d_set_d(-Q->w2s[j]);             /* -w^2 */
+    vec4d fr = vec4d_set_d(-sd_fft_lctx_w2s(Q, 2*j+1));         /* -r*w */
+    vec4d fq = vec4d_set_d(-sd_fft_lctx_w2s(Q, j));             /* -w^2 */
     vec4d fp_ = vec4d_mulmod2(fr, fq, n, ninv);
     vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);   /* r*w^3 */
     ulong i = 0; do {
@@ -531,15 +531,15 @@ static int radix_4_moth_inv_trunc_block_3_4_0(
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
-    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec4d f0 = vec4d_set_d(Q->w2s[1]);              /* r */
+    vec4d f0 = vec4d_set_d(sd_fft_lctx_w2s(Q, 1));              /* r */
     vec4d f1 = vec4d_set_d(twoW);                   /* 2*w^-1 */
     vec4d f2 = vec4d_set_d(2);
     vec4d f3 = vec4d_set_d(W2);                     /* -w^-2 */
-    vec4d fr = vec4d_set_d(Q->w2s[2*j+1]);          /* r*w */
-    vec4d fq = vec4d_set_d(Q->w2s[j]);              /* w^2 */
+    vec4d fr = vec4d_set_d(sd_fft_lctx_w2s(Q, 2*j+1));          /* r*w */
+    vec4d fq = vec4d_set_d(sd_fft_lctx_w2s(Q, j));              /* w^2 */
     vec4d fp_ = vec4d_mulmod2(fr, fq, n, ninv);
     vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);   /* r*w^3 */
     ulong i = 0; do {
@@ -591,10 +591,10 @@ static int radix_4_moth_inv_trunc_block_3_3_1(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
-    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec8d f0 = vec8d_set_d(Q->w2s[1]);  /* r */
+    vec8d f0 = vec8d_set_d(sd_fft_lctx_w2s(Q, 1));  /* r */
     vec8d f1 = vec8d_set_d(twoW);       /* 2*w^-1 */
     vec8d f2 = vec8d_set_d(2);
     vec8d f3 = vec8d_set_d(W2);         /* -w^-2 */
@@ -641,10 +641,10 @@ static int radix_4_moth_inv_trunc_block_3_3_0(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
-    double W2 = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[jm];
+    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec8d f0 = vec8d_set_d(Q->w2s[1]);  /* r */
+    vec8d f0 = vec8d_set_d(sd_fft_lctx_w2s(Q, 1));  /* r */
     vec8d f1 = vec8d_set_d(twoW);       /* 2*w^-1 */
     vec8d f2 = vec8d_set_d(2);
     vec8d f3 = vec8d_set_d(W2);         /* -w^-2 */
@@ -683,14 +683,14 @@ static int radix_4_moth_inv_trunc_block_2_4_1(
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    double W = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    double rw3 = vec1d_mulmod2(Q->w2s[j], Q->w2s[2*j+1], Q->p, Q->pinv);
+    double rw3 = vec1d_mulmod2(sd_fft_lctx_w2s(Q, j), sd_fft_lctx_w2s(Q, 2*j+1), Q->p, Q->pinv);
     vec4d f0 = vec4d_set_d(2);
     vec4d f1 = vec4d_set_d(twoW);                                   /* 2*w^-1 */
     vec4d f2 = vec4d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));           /* 1/2 */
-    vec4d f3 = vec4d_set_d(Q->w2s[1]);                              /* r */
-    vec4d f4 = vec4d_set_d(Q->w2s[j]);                              /* w^2 */
+    vec4d f3 = vec4d_set_d(sd_fft_lctx_w2s(Q, 1));                              /* r */
+    vec4d f4 = vec4d_set_d(sd_fft_lctx_w2s(Q, j));                              /* w^2 */
     vec4d f5 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(rw3, Q->p));   /* r*w^3 */
     ulong i = 0; do {
         vec4d a, b, u, v, s, t, g, h, p, q, r;
@@ -731,8 +731,8 @@ static int radix_4_moth_inv_trunc_block_2_4_0(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W = UNLIKELY(j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
-    vec8d w2 = vec8d_set_d(Q->w2s[j]);
+    double W = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    vec8d w2 = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
     vec8d twowi = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));
     ulong i = 0; do {
         vec8d a, b, c, d, u, v;
@@ -771,9 +771,9 @@ static int radix_4_moth_inv_trunc_block_2_2_1(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W = (j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W = (j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
     double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
-    double har = vec1d_mulmod2(Q->w2s[1], ha, Q->p, Q->pinv);
+    double har = vec1d_mulmod2(sd_fft_lctx_w2s(Q, 1), ha, Q->p, Q->pinv);
     vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));  /* 2/w */
     vec8d c2 = vec8d_set_d(ha);                                     /* 1/2 */
     vec8d c3 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(har, Q->p));   /* r/2 */
@@ -809,7 +809,7 @@ static int radix_4_moth_inv_trunc_block_2_2_0(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W = (j == 0) ? -Q->w2s[0] : Q->w2s[2*jm+1];
+    double W = (j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
     vec8d c0 = vec8d_set_d(2);
     vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));
     ulong i = 0; do {
@@ -841,9 +841,9 @@ static int radix_4_moth_inv_trunc_block_1_4_1(
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
     vec4d f2 = vec4d_set_d(2);
-    vec4d w2 = vec4d_set_d(Q->w2s[j]);
+    vec4d w2 = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
     double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
-    vec4d wo2 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod2(Q->w2s[2*j], ha, Q->p, Q->pinv), Q->p));
+    vec4d wo2 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod2(sd_fft_lctx_w2s(Q, 2*j), ha, Q->p, Q->pinv), Q->p));
     ulong i = 0; do {
         vec4d a, b, c, d, u;
         a = vec4d_load(X0+i);
@@ -878,8 +878,8 @@ static int radix_4_moth_inv_trunc_block_1_4_0(
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     vec8d f1 = vec8d_set_d(4.0);
-    vec8d w2 = vec8d_set_d(Q->w2s[j]);
-    vec8d w  = vec8d_set_d(Q->w2s[2*j]);
+    vec8d w2 = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d w  = vec8d_set_d(sd_fft_lctx_w2s(Q, 2*j));
     ulong i = 0; do {
         vec8d a, b, c, d;
         a = vec8d_load(X0+i);
@@ -958,8 +958,8 @@ static int radix_4_moth_inv_trunc_block_0_4_1(
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     vec8d one4th = vec8d_set_d(vec1d_fnmadd(0.25, Q->p, 0.25));
-    vec8d w = vec8d_set_d(Q->w2s[2*j]);
-    vec8d w2 = vec8d_set_d(Q->w2s[j]);
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, 2*j));
+    vec8d w2 = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
     ulong i = 0; do {
         vec8d a, b, c, d;
         a = vec8d_load(X0+i);

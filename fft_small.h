@@ -106,14 +106,7 @@ FLINT_DLL void* flint_aligned_alloc(ulong alignment, ulong size);
 FLINT_DLL void flint_aligned_free(void* p);
 
 /*
-    Currently the twiddle factors must be contained in one big table "w2s".
-    This does not play nicely with resizing of this table: if one thread is
-    using a table of size of, say 2^k, and another thread needs a table of size
-    2^(k+1), we always have to allocate a brand new table of size 2^(k+1) and
-    we either have to block the second thread until the first is done or
-    be willing to store both of these pointers in some complicated thread safe
-    data structure. A better solution would be to have an array of 50 pointers
-    to sub-tables of sizes, 1,2,4,8,...
+    The twiddle factors are split across FLINT_BITS tables:
 
         [0] = {e(1)}                                original index 0
         [1] = {e(1/4)}                              original index 1
@@ -122,9 +115,18 @@ FLINT_DLL void flint_aligned_free(void* p);
         ...
 
     The unallocated ones start out as NULL, and once they are filled in, they
-    never have to move.
-    However, this complicates random access into the original table.
+    never have to move. This simplifies thread safe enlargement but complicates
+    random access into the original table. If j is the index into the original
+    table, the new indicies are
+
+        [j_bits][j_r]  where j_bits = nbits(j), j_r = j - 2^(j_bits-1)
+
+    with the special case j_bits = j_r = 0 for j = 0.
+    The first SD_FFT_CTX_INIT_DEPTH tables are stored consecutively to ease the
+    lookup of small indices, which must currently be at least 4.
 */
+
+#define SD_FFT_CTX_INIT_DEPTH 10
 
 /* This context is the one expected to sit in a global position */
 typedef struct {
@@ -133,21 +135,17 @@ typedef struct {
     nmod_t mod;
     ulong primitive_root;
     ulong blk_sz;
-    double* w2s;    /* TODO */
-    ulong wtab_depth;
+    volatile ulong w2tab_depth;
+    double* w2tab[FLINT_BITS];
 } sd_fft_ctx_struct;
 
 typedef sd_fft_ctx_struct sd_fft_ctx_t[1];
 
-/*
-    The local context is expected to be copied and passed to the actual
-    calculations. The w2s is currently simply copied from the non-local contex,
-    but this is not thread safe.
-*/
+/* The local context is expected to be copied and passed to the calculations. */
 typedef struct {
     double p;
     double pinv;
-    const double* w2s;  /* TODO */
+    const double* w2tab[50];
 } sd_fft_lctx_struct;
 
 typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
@@ -189,14 +187,10 @@ FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 }
 
 /* sd_fft.c */
-FLINT_DLL void sd_fft_base(const sd_fft_lctx_t Q, double* d, ulong I, ulong j);
-FLINT_DLL void sd_fft_main_block(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j);
-FLINT_DLL void sd_fft_main(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j);
-FLINT_DLL void sd_fft_trunc_block(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 FLINT_DLL void sd_fft_trunc(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-void sd_ifft_trunc(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+FLINT_DLL void sd_ifft_trunc(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
 
 /* sd_fft_ctx.c */
 FLINT_DLL void sd_fft_ctx_clear(sd_fft_ctx_t Q);
@@ -212,7 +206,8 @@ FLINT_INLINE void sd_fft_ctx_fft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, u
     sd_fft_lctx_t QL;
     QL->p = Q->p;
     QL->pinv = Q->pinv;
-    QL->w2s = Q->w2s;
+    for (int i = 0; i < 50; i++)
+        QL->w2tab[i] = Q->w2tab[i];
     sd_fft_trunc(QL, d, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
 }
 
@@ -224,10 +219,27 @@ FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, 
     sd_fft_lctx_t QL;
     QL->p = Q->p;
     QL->pinv = Q->pinv;
-    QL->w2s = Q->w2s;
+    for (int i = 0; i < 50; i++)
+        QL->w2tab[i] = Q->w2tab[i];
     sd_ifft_trunc(QL, d, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
 }
 
+FLINT_INLINE double sd_fft_lctx_w2s(const sd_fft_lctx_t Q, ulong j)
+{
+    if (j == 0)
+        return Q->w2tab[0][0];
+    ulong n = n_nbits(j);
+    return Q->w2tab[n][j-n_pow2(n-1)];
+}
+
+
+FLINT_INLINE double sd_fft_ctx_w2s(const sd_fft_ctx_t Q, ulong j)
+{
+    if (j == 0)
+        return Q->w2tab[0][0];
+    ulong n = n_nbits(j);
+    return Q->w2tab[n][j-n_pow2(n-1)];
+}
 
 typedef struct {
     ulong prime;
