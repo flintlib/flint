@@ -106,7 +106,6 @@ FLINT_DLL void* flint_aligned_alloc(ulong alignment, ulong size);
 FLINT_DLL void flint_aligned_free(void* p);
 
 typedef struct {
-    double* data;
     double p;
     double pinv;
     nmod_t mod;
@@ -129,41 +128,29 @@ FLINT_INLINE ulong sd_fft_ctx_data_size(const sd_fft_ctx_t Q)
     return sd_fft_ctx_blk_offset(Q, n_pow2(Q->depth - LG_BLK_SZ));
 }
 
-FLINT_INLINE void sd_fft_ctx_set_data(sd_fft_ctx_t Q, double* d)
+FLINT_INLINE double* sd_fft_ctx_blk_index(const sd_fft_ctx_t Q, double* d, ulong I)
 {
-    Q->data = d;
+    return d + sd_fft_ctx_blk_offset(Q, I);
 }
 
-FLINT_INLINE double* sd_fft_ctx_release_data(sd_fft_ctx_t Q)
+FLINT_INLINE void sd_fft_ctx_set_index(const sd_fft_ctx_t Q, double* d, ulong i, double x)
 {
-    double* d = Q->data;
-    Q->data = NULL;
-    return d;
+    sd_fft_ctx_blk_index(Q, d, i/BLK_SZ)[i%BLK_SZ] = x;
 }
 
-FLINT_INLINE double* sd_fft_ctx_blk_index(const sd_fft_ctx_t Q, ulong I)
+FLINT_INLINE double sd_fft_ctx_get_index(const sd_fft_ctx_t Q, double* d, ulong i)
 {
-    return Q->data + sd_fft_ctx_blk_offset(Q, I);
-}
-
-FLINT_INLINE void sd_fft_ctx_set_index(const sd_fft_ctx_t Q, ulong i, double x)
-{
-    sd_fft_ctx_blk_index(Q, i/BLK_SZ)[i%BLK_SZ] = x;
-}
-
-FLINT_INLINE double sd_fft_ctx_get_index(const sd_fft_ctx_t Q, ulong i)
-{
-    return sd_fft_ctx_blk_index(Q, i/BLK_SZ)[i%BLK_SZ];
+    return sd_fft_ctx_blk_index(Q, d, i/BLK_SZ)[i%BLK_SZ];
 }
 
 /* slightly-worse-than-bit-reversed order */
-FLINT_INLINE double sd_fft_ctx_get_fft_index(const sd_fft_ctx_t Q, ulong i)
+FLINT_INLINE double sd_fft_ctx_get_fft_index(const sd_fft_ctx_t Q, double* d, ulong i)
 {
     ulong j = i&(BLK_SZ-16);
-    FLINT_ASSERT(BLK_SZ >= 32);
+    FLINT_ASSERT(BLK_SZ >= 16);
     j |= (i&3)<<2;
     j |= ((i>>2)&3);
-    return sd_fft_ctx_blk_index(Q, i/BLK_SZ)[j];
+    return sd_fft_ctx_blk_index(Q, d, i/BLK_SZ)[j];
 }
 
 FLINT_INLINE void sd_fft_ctx_clear(sd_fft_ctx_t Q)
@@ -172,31 +159,31 @@ FLINT_INLINE void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 }
 
 /* sd_fft.c */
-FLINT_DLL void sd_fft_base(const sd_fft_ctx_t Q, ulong I, ulong j);
-FLINT_DLL void sd_fft_main_block(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j);
-FLINT_DLL void sd_fft_main(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j);
-FLINT_DLL void sd_fft_trunc_block(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
-FLINT_DLL void sd_fft_trunc(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+FLINT_DLL void sd_fft_base(const sd_fft_ctx_t Q, double* d, ulong I, ulong j);
+FLINT_DLL void sd_fft_main_block(const sd_fft_ctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j);
+FLINT_DLL void sd_fft_main(const sd_fft_ctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j);
+FLINT_DLL void sd_fft_trunc_block(const sd_fft_ctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+FLINT_DLL void sd_fft_trunc(const sd_fft_ctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-void sd_ifft_trunc(const sd_fft_ctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+void sd_ifft_trunc(const sd_fft_ctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
 
 /* sd_fft_ctx.c */
 FLINT_DLL void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
 FLINT_DLL void sd_fft_ctx_fit_wtab(sd_fft_ctx_t Q, ulong k);
 FLINT_DLL void sd_fft_ctx_set_depth(sd_fft_ctx_t Q, ulong l);
 
-FLINT_INLINE void sd_fft_ctx_fft_trunc(const sd_fft_ctx_t Q, ulong itrunc, ulong otrunc)
+FLINT_INLINE void sd_fft_ctx_fft_trunc(const sd_fft_ctx_t Q, double* d, ulong itrunc, ulong otrunc)
 {
     FLINT_ASSERT(itrunc % BLK_SZ == 0);
     FLINT_ASSERT(otrunc % BLK_SZ == 0);
-    sd_fft_trunc(Q, 0, 1, Q->depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
+    sd_fft_trunc(Q, d, 0, 1, Q->depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
 }
 
-FLINT_INLINE void sd_fft_ctx_ifft_trunc(const sd_fft_ctx_t Q, ulong trunc)
+FLINT_INLINE void sd_fft_ctx_ifft_trunc(const sd_fft_ctx_t Q, double* d, ulong trunc)
 {
     FLINT_ASSERT(trunc % BLK_SZ == 0);
-    sd_ifft_trunc(Q, 0, 1, Q->depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
+    sd_ifft_trunc(Q, d, 0, 1, Q->depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
 }
 
 
@@ -210,13 +197,13 @@ typedef struct {
 typedef crt_data_struct crt_data_t[1];
 
 typedef void (*to_ffts_func)(
-        sd_fft_ctx_struct* Qffts,
+        sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
         const ulong* a_, ulong an_, ulong atrunc,
         const vec4d* two_pow);
 
 typedef void (*from_ffts_func)(
         ulong* z, ulong zn, ulong zlen,
-        sd_fft_ctx_struct* Qffts,
+        sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
         crt_data_struct* Qcrts,
         ulong bits);
 

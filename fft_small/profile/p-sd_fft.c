@@ -101,7 +101,7 @@ void profile_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL)
         ulong sz;
         sd_fft_ctx_set_depth(Q, L);
         sz = sd_fft_ctx_data_size(Q)*sizeof(double);
-        sd_fft_ctx_set_data(Q, flint_aligned_alloc(4096, n_round_up(sz, 4096)));
+        double* data = flint_aligned_alloc(4096, n_round_up(sz, 4096));
 
         // do 1/2*2^L < otrunc <= 2^L
         ulong otrunc = n_pow2(L-1);
@@ -111,18 +111,18 @@ void profile_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL)
             otrunc = n_min(otrunc, n_pow2(L));
             ulong itrunc = n_round_up(otrunc/2, Q->blk_sz);
             for (ulong i = 0; i < n_pow2(L); i++)
-                sd_fft_ctx_set_index(Q, i, 0);
+                sd_fft_ctx_set_index(Q, data, i, 0);
             ulong nreps = 1 + 300000000/(otrunc*n_clog2(otrunc));
 
             timeit_start(timer);
             for (ulong i = 0; i < nreps; i++)
-                sd_fft_ctx_fft_trunc(Q, itrunc, otrunc);
+                sd_fft_ctx_fft_trunc(Q, data, itrunc, otrunc);
             timeit_stop(timer);
             fft_time = timer->wall;
 
             timeit_start(timer);
             for (ulong i = 0; i < nreps; i++)
-                sd_fft_ctx_ifft_trunc(Q, otrunc);
+                sd_fft_ctx_ifft_trunc(Q, data, otrunc);
             timeit_stop(timer);
             ifft_time = timer->wall;
 
@@ -130,7 +130,7 @@ void profile_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL)
                         fft_time/nreps, ifft_time/nreps);
         }
 
-        flint_free(sd_fft_ctx_release_data(Q));
+        flint_free(data);
     }
 }
 

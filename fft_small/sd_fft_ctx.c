@@ -38,7 +38,6 @@ void flint_aligned_free(void* p)
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 {
     Q->blk_sz = BLK_SZ;
-    Q->data = NULL;
     Q->p = pp;
     Q->pinv = 1.0/Q->p;
     nmod_init(&Q->mod, pp);

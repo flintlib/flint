@@ -39,7 +39,7 @@ int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e)
     else
     {
         b0 = b << r;
-        b1 = b >> (64 - r);
+        b1 = b >> (FLINT_BITS - r);
     }
 
     //      check words [q+2,infty)
@@ -210,12 +210,13 @@ flint_printf("{%f, %f, %f, %f}", x[0], x[1], x[2], x[3]);
         X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
 \
     for (ulong l = 0; l < np; l++) \
-        sd_fft_ctx_set_index(Rffts + l, i+ir, X[l/VEC_SZ][l%VEC_SZ]); \
+        sd_fft_ctx_set_index(Rffts + l, d + l*dstride, i+ir, X[l/VEC_SZ][l%VEC_SZ]); \
 }
 
+/* The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride */
 #define DEFINE_IT(NP, BITS) \
 static void CAT3(mpn_to_ffts, NP, BITS)( \
-    sd_fft_ctx_struct* Rffts, \
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
     const ulong* a_, ulong an_, ulong atrunc, \
     const vec4d* two_pow) \
 { \
@@ -301,12 +302,12 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
             X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
  \
         for (ulong l = 0; l < np; l++) \
-            sd_fft_ctx_set_index(Rffts + l, i, X[l/VEC_SZ][l%VEC_SZ]); \
+            sd_fft_ctx_set_index(Rffts + l, d + l*dstride, i, X[l/VEC_SZ][l%VEC_SZ]); \
     } \
  \
     for (ulong l = 0; l < np; l++) \
         for (ulong j = i; j < atrunc; j++) \
-            sd_fft_ctx_set_index(Rffts + l, j, 0.0); \
+            sd_fft_ctx_set_index(Rffts + l, d + l*dstride, j, 0.0); \
 }
 
 DEFINE_IT(4, 64)
@@ -758,15 +759,19 @@ DEFINE_IT(6, 7)
 DEFINE_IT(7, 8)
 #undef DEFINE_IT
 
-static void _convert_block(sd_fft_ctx_struct* Rffts, ulong* Xs, ulong np, ulong I)
+/* transpose a block */
+static void _convert_block(
+    ulong* Xs,
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
+    ulong np,
+    ulong I)
 {
     for (ulong l = 0; l < np; l++)
     {
         vec4d p = vec4d_set_d(Rffts[l].p);
         vec4d pinv = vec4d_set_d(Rffts[l].pinv);
-        double* x = sd_fft_ctx_blk_index(Rffts + l, I);
-        for (ulong j = 0; j < BLK_SZ; j += 4*VEC_SZ)
-        {
+        double* x = sd_fft_ctx_blk_index(Rffts + l, d + l*dstride, I);
+        ulong j = 0; do {
             vec4d x0, x1, x2, x3;
             vec4ui y0, y1, y2, y3;
             x0 = vec4d_load(x + j + 0*VEC_SZ);
@@ -785,7 +790,8 @@ static void _convert_block(sd_fft_ctx_struct* Rffts, ulong* Xs, ulong np, ulong 
             vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1);
             vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2);
             vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3);
-        }
+        } while (j += 4*VEC_SZ, j < BLK_SZ)
+        FLINT_ASSERT(j == BLK_SZ);
     }
 }
 
@@ -800,12 +806,14 @@ static void _convert_block(sd_fft_ctx_struct* Rffts, ulong* Xs, ulong np, ulong 
 
        z[floor(i*bits/64)] ... z[floor(i*bits/64)+n]
 
-    so is easy if floor(i*bits/64)+n < zn
+    so is easy if floor(i*bits/64)+n < zn.
+
+    The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride
 */
 #define DEFINE_IT(NP, N, M) \
 static void CAT4(mpn_from_ffts, NP, N, M)( \
     ulong* z, ulong zn, ulong zlen, \
-    sd_fft_ctx_struct* Rffts, \
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
     crt_data_struct* Rcrts, \
     ulong bits) \
 { \
@@ -838,7 +846,7 @@ static void CAT4(mpn_from_ffts, NP, N, M)( \
  \
     for (; i < end_easy; i += BLK_SZ) \
     { \
-        _convert_block(Rffts, Xs, np, i/BLK_SZ); \
+        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ); \
  \
         for (ulong j = 0; j < BLK_SZ; j += 1) \
         { \
@@ -866,12 +874,14 @@ static void CAT4(mpn_from_ffts, NP, N, M)( \
         ulong r[N + 1]; \
         ulong t[N + 1]; \
         ulong l = 0; \
-        ulong x = vec1d_reduce_to_0n(sd_fft_ctx_get_index(Rffts + l, i), Rffts[l].p, Rffts[l].pinv); \
+        double xx = sd_fft_ctx_get_index(Rffts + l, d + l*dstride, i); \
+        ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
  \
         CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
         for (l++; l < np; l++) \
         { \
-            x = vec1d_reduce_to_0n(sd_fft_ctx_get_index(Rffts + l, i), Rffts[l].p, Rffts[l].pinv); \
+            xx = sd_fft_ctx_get_index(Rffts + l, d + l*dstride, i); \
+            x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
             CAT3(_big_addmul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
         } \
  \
@@ -1073,7 +1083,7 @@ const vec4d* mpn_ctx_two_pow_table(mpn_ctx_t R, ulong len, ulong np)
         d[i*nvs+l] = vec4d_fnmadd(q, p, vec4d_add(t, t));
     }
 
-    flint_free(ps);
+    flint_aligned_free(ps);
 
     return d;
 }
@@ -1155,8 +1165,8 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
     return R->buffer;
 }
 
-/* pointwise mul of self with b and m */
-void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q, const double* b, ulong mm)
+/* pointwise mul of a with b and m */
+void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q, double* a, const double* b, ulong mm)
 {
     double m = mm;
     if (m > 0.5*Q->p)
@@ -1167,20 +1177,20 @@ void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q, const double* b, ulong mm)
     vec8d ninv = vec8d_set_d(Q->pinv);
     for (ulong I = 0; I < n_pow2(Q->depth - LG_BLK_SZ); I++)
     {
-        double* x = sd_fft_ctx_blk_index(Q, I);
+        double* ax = a + sd_fft_ctx_blk_offset(Q, I);
         const double* bx = b + sd_fft_ctx_blk_offset(Q, I);
         ulong j = 0; do {
             vec8d x0, x1, b0, b1;
-            x0 = vec8d_load(x+j+0);
-            x1 = vec8d_load(x+j+8);
+            x0 = vec8d_load(ax+j+0);
+            x1 = vec8d_load(ax+j+8);
             b0 = vec8d_load(bx+j+0);
             b1 = vec8d_load(bx+j+8);
             x0 = vec8d_mulmod2(x0, M, n, ninv);
             x1 = vec8d_mulmod2(x1, M, n, ninv);
             x0 = vec8d_mulmod2(x0, b0, n, ninv);
             x1 = vec8d_mulmod2(x1, b1, n, ninv);
-            vec8d_store(x+j+0, x0);
-            vec8d_store(x+j+8, x1);
+            vec8d_store(ax+j+0, x0);
+            vec8d_store(ax+j+8, x1);
         } while (j += 16, j < BLK_SZ);
     }
 }
@@ -1219,23 +1229,17 @@ flint_printf("\n------------ zn = %wu, bits = %wu, np = %wu -------------\n", zn
 timeit_start(timer_overall);
 #endif
 
-    ulong fft_data_size = sd_fft_ctx_data_size(R->ffts + 0);
-    double* abuf = (double*) mpn_ctx_fit_buffer(R, 2*np*fft_data_size*sizeof(double));
-    double* bbuf = abuf + np*fft_data_size;
+    ulong stride = sd_fft_ctx_data_size(R->ffts + 0);
+    double* abuf = (double*) mpn_ctx_fit_buffer(R, 2*np*stride*sizeof(double));
+    double* bbuf = abuf + np*stride;
     const vec4d* two_pow = mpn_ctx_two_pow_table(R, bits+5, np);
 
 #if TIME_THIS
 timeit_start(timer);
 #endif
 
-
-	for (ulong l = 0; l < np; l++)
-        sd_fft_ctx_set_data(R->ffts + l, abuf + l*fft_data_size);
-    P->to_ffts(R->ffts, a, an, atrunc, two_pow);
-
-	for (ulong l = 0; l < np; l++)
-        sd_fft_ctx_set_data(R->ffts + l, bbuf + l*fft_data_size);
-    P->to_ffts(R->ffts, b, bn, btrunc, two_pow);
+    P->to_ffts(R->ffts, abuf, stride, a, an, atrunc, two_pow);
+    P->to_ffts(R->ffts, bbuf, stride, b, bn, btrunc, two_pow);
 
 #if TIME_THIS
 timeit_stop(timer);
@@ -1249,17 +1253,16 @@ timeit_start(timer);
 
 	for (ulong l = 0; l < np; l++)
     {
-        sd_fft_ctx_fft_trunc(R->ffts + l, btrunc, ztrunc);
-        sd_fft_ctx_set_data(R->ffts + l, abuf + l*fft_data_size);
-        sd_fft_ctx_fft_trunc(R->ffts + l, atrunc, ztrunc);
+        sd_fft_ctx_fft_trunc(R->ffts + l, bbuf + l*stride, btrunc, ztrunc);
+        sd_fft_ctx_fft_trunc(R->ffts + l, abuf + l*stride, atrunc, ztrunc);
         ulong t1, thi, tlo;
         ulong cop = *crt_data_co_prime_red(R->crts + np - 1, l);
         thi = cop >> (FLINT_BITS - depth);
         tlo = cop << (depth);
         NMOD_RED2(t1, thi, tlo, R->ffts[l].mod);
         t1 = nmod_inv(t1, R->ffts[l].mod);
-        sd_fft_ctx_point_mul(R->ffts + l, bbuf + l*fft_data_size, t1);
-        sd_fft_ctx_ifft_trunc(R->ffts + l, ztrunc);
+        sd_fft_ctx_point_mul(R->ffts + l, abuf + l*stride, bbuf + l*stride, t1);
+        sd_fft_ctx_ifft_trunc(R->ffts + l, abuf + l*stride, ztrunc);
     }
 #if TIME_THIS
 timeit_stop(timer);
@@ -1271,7 +1274,7 @@ flint_printf("fft: %wd\n", timer->wall);
 timeit_start(timer);
 #endif
 
-    P->from_ffts(z, zn, zlen, R->ffts, R->crts, bits);
+    P->from_ffts(z, zn, zlen, R->ffts, abuf, stride, R->crts, bits);
 
 #if TIME_THIS
 timeit_stop(timer);

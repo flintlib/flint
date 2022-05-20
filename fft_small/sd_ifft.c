@@ -41,8 +41,8 @@
 #define DEFINE_IT(nn, zz, ff) \
 static void CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)( \
     const sd_fft_ctx_t Q, \
-    double* X0, double* X1, \
-    ulong j) \
+    ulong j, \
+    double* X0, double* X1) \
 { \
     int l = 2; \
     flint_printf("function l = %d, n = %d, z = %d, f = %d", l, nn, zz, ff); \
@@ -70,8 +70,8 @@ DEFINE_IT(2,2,1)
 /* {x0, x1} = {2*x0 - w*x1, x0 - w*x1} */
 static void radix_2_moth_inv_trunc_block_1_2_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1,
-    ulong j)
+    ulong j,
+    double* X0, double* X1)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -92,8 +92,8 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
 /* {x0} = {2*x0 - w*x1} */
 static void radix_2_moth_inv_trunc_block_1_2_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1,
-    ulong j)
+    ulong j,
+    double* X0, double* X1)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -113,8 +113,8 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
 /* {x0, x1} = {2*x0, x0} */
 static void radix_2_moth_inv_trunc_block_1_1_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1,
-    ulong j)
+    ulong j,
+    double* X0, double* X1)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -131,8 +131,8 @@ static void radix_2_moth_inv_trunc_block_1_1_1(
 /* {x0} = {2*x0} */
 static void radix_2_moth_inv_trunc_block_1_1_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1,
-    ulong j)
+    ulong j,
+    double* X0, double* X1)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -148,8 +148,8 @@ static void radix_2_moth_inv_trunc_block_1_1_0(
 /* {x0} = {(x0 + w*x1)/2} */
 static void radix_2_moth_inv_trunc_block_0_2_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1,
-    ulong j)
+    ulong j,
+    double* X0, double* X1)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -169,8 +169,8 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
 /* {x0} = {(x0)/2} */
 static void radix_2_moth_inv_trunc_block_0_1_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1,
-    ulong j)
+    ulong j,
+    double* X0, double* X1)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -391,10 +391,10 @@ EXTEND_BASECASE(6, 8, 1)
 #undef EXTEND_BASECASE
 
 /* parameter 1: j can be zero */
-void sd_ifft_base_1(const sd_fft_ctx_t Q, ulong I, ulong j)
+void sd_ifft_base_1(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
 {
     ulong jm = j^(n_next_pow2m1(j)>>1);
-    double* x = sd_fft_ctx_blk_index(Q, I);
+    double* x = sd_fft_ctx_blk_index(Q, d, I);
     if (j == 0)
         sd_ifft_basecase_8_1(Q, x, j, jm);
     else
@@ -402,10 +402,10 @@ void sd_ifft_base_1(const sd_fft_ctx_t Q, ulong I, ulong j)
 }
 
 /* parameter 0: j cannot be zero */
-void sd_ifft_base_0(const sd_fft_ctx_t Q, ulong I, ulong j)
+void sd_ifft_base_0(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
 {
     ulong jm = j^(n_next_pow2m1(j)>>1);
-    double* x = sd_fft_ctx_blk_index(Q, I);
+    double* x = sd_fft_ctx_blk_index(Q, d, I);
     FLINT_ASSERT(j != 0);
     sd_ifft_basecase_8_0(Q, x, j, jm);
 }
@@ -416,9 +416,8 @@ void sd_ifft_base_0(const sd_fft_ctx_t Q, ulong I, ulong j)
 #define DEFINE_IT(nn, zz, ff) \
 static int CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)( \
     const sd_fft_ctx_t Q, \
-    double* X0, double* X1, double* X2, double* X3, \
-    ulong j, \
-    ulong jm) \
+    ulong j, ulong jm, \
+    double* X0, double* X1, double* X2, double* X3) \
 { \
     int l = 4; \
     flint_printf("function l = %d, n = %d, z = %d, f = %d", l, nn, zz, ff); \
@@ -474,8 +473,8 @@ k = 2, n = 3, z = 4, f = true
 */
 static int radix_4_moth_inv_trunc_block_3_4_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -527,8 +526,8 @@ k = 2, n = 3, z = 4, f = false
 */
 static int radix_4_moth_inv_trunc_block_3_4_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -587,8 +586,8 @@ k = 2, n = 3, z = 3, f = true
 */
 static int radix_4_moth_inv_trunc_block_3_3_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -637,8 +636,8 @@ k = 2, n = 3, z = 3, f = false
 */
 static int radix_4_moth_inv_trunc_block_3_3_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -679,8 +678,8 @@ k = 2, n = 2, z = 4, f = true
 */
 static int radix_4_moth_inv_trunc_block_2_4_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -727,8 +726,8 @@ k = 2, n = 2, z = 4, f = false
 */
 static int radix_4_moth_inv_trunc_block_2_4_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -767,8 +766,8 @@ k = 2, n = 2, z = 2, f = true
 */
 static int radix_4_moth_inv_trunc_block_2_2_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -805,8 +804,8 @@ k = 2, n = 2, z = 2, f = 0
 */
 static int radix_4_moth_inv_trunc_block_2_2_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -836,8 +835,8 @@ k = 2, n = 1, z = 4, f = true
 */
 static int radix_4_moth_inv_trunc_block_1_4_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
@@ -873,8 +872,8 @@ k = 2, n = 1, z = 4, f = false
 */
 static int radix_4_moth_inv_trunc_block_1_4_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -908,8 +907,8 @@ k = 2, n = 1, z = 1, f = true
 */
 static int radix_4_moth_inv_trunc_block_1_1_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -931,8 +930,8 @@ k = 2, n = 1, z = 1, f = false
 */
 static int radix_4_moth_inv_trunc_block_1_1_0(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -953,8 +952,8 @@ k = 2, n = 0, z = 4, f = true
 */
 static int radix_4_moth_inv_trunc_block_0_4_1(
     const sd_fft_ctx_t Q,
-    double* X0, double* X1, double* X2, double* X3,
-    ulong j, ulong jm)
+    ulong j, ulong jm,
+    double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
@@ -983,6 +982,7 @@ static int radix_4_moth_inv_trunc_block_0_4_1(
 
 void sd_ifft_main_block(
     const sd_fft_ctx_t Q,
+    double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
     ulong k, /* BLK_SZ transforms each of length 2^k */
@@ -996,13 +996,13 @@ void sd_ifft_main_block(
         /* row ffts */
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_ifft_main_block(Q, I + (b<<k2)*S, S, k2, (j<<k1) + b);
+            sd_ifft_main_block(Q, d, I + (b<<k2)*S, S, k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         /* column ffts */
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_ifft_main_block(Q, I + a*S, S<<k2, k1, j);
+            sd_ifft_main_block(Q, d, I + a*S, S<<k2, k1, j);
         } while (a++, a < l2);
 
         return;
@@ -1012,10 +1012,10 @@ void sd_ifft_main_block(
 
     if (k == 2)
     {
-        double* X0 = sd_fft_ctx_blk_index(Q, I + S*0);
-        double* X1 = sd_fft_ctx_blk_index(Q, I + S*1);
-        double* X2 = sd_fft_ctx_blk_index(Q, I + S*2);
-        double* X3 = sd_fft_ctx_blk_index(Q, I + S*3);
+        double* X0 = sd_fft_ctx_blk_index(Q, d, I + S*0);
+        double* X1 = sd_fft_ctx_blk_index(Q, d, I + S*1);
+        double* X2 = sd_fft_ctx_blk_index(Q, d, I + S*2);
+        double* X3 = sd_fft_ctx_blk_index(Q, d, I + S*3);
         RADIX_4_REVERSE_PARAM(vec8d, Q, j, jm, 1)
         ulong i = 0; do {
             RADIX_4_REVERSE_MOTH(vec8d, X0+i, X1+i, X2+i, X3+i);
@@ -1023,8 +1023,8 @@ void sd_ifft_main_block(
     }
     else if (k == 1)
     {
-        double* X0 = sd_fft_ctx_blk_index(Q, I + S*0);
-        double* X1 = sd_fft_ctx_blk_index(Q, I + S*1);
+        double* X0 = sd_fft_ctx_blk_index(Q, d, I + S*0);
+        double* X1 = sd_fft_ctx_blk_index(Q, d, I + S*1);
         RADIX_2_REVERSE_PARAM(vec8d, Q, j)
         ulong i = 0; do {
             RADIX_2_REVERSE_MOTH(vec8d, X0+i, X1+i);
@@ -1034,6 +1034,7 @@ void sd_ifft_main_block(
 
 void sd_ifft_main(
     const sd_fft_ctx_t Q,
+    double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
     ulong k, /* transform length BLK_SZ*2^k */
@@ -1046,12 +1047,12 @@ void sd_ifft_main(
 
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_ifft_main(Q, I + b*(S<<k2), S, k2, (j<<k1) + b);
+            sd_ifft_main(Q, d, I + b*(S<<k2), S, k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_ifft_main_block(Q, I + a*S, S<<k2, k1, j);
+            sd_ifft_main_block(Q, d, I + a*S, S<<k2, k1, j);
         } while (a++, a < l2);
 
         return;
@@ -1060,27 +1061,28 @@ void sd_ifft_main(
     if (k == 2)
     {
         /* k1 = 2; k2 = 0 */
-        sd_ifft_base_1(Q, I+S*0, 4*j+0);
-        sd_ifft_base_0(Q, I+S*1, 4*j+1);
-        sd_ifft_base_0(Q, I+S*2, 4*j+2);
-        sd_ifft_base_0(Q, I+S*3, 4*j+3);
-        sd_ifft_main_block(Q, I, S, 2, j);
+        sd_ifft_base_1(Q, d, I + S*0, 4*j+0);
+        sd_ifft_base_0(Q, d, I + S*1, 4*j+1);
+        sd_ifft_base_0(Q, d, I + S*2, 4*j+2);
+        sd_ifft_base_0(Q, d, I + S*3, 4*j+3);
+        sd_ifft_main_block(Q, d, I, S, 2, j);
     }
     else if (k == 1)
     {
         /* k1 = 1; k2 = 0 */
-        sd_ifft_base_1(Q, I+S*0, 2*j+0);
-        sd_ifft_base_0(Q, I+S*1, 2*j+1);
-        sd_ifft_main_block(Q, I, S, 1, j);
+        sd_ifft_base_1(Q, d, I + S*0, 2*j+0);
+        sd_ifft_base_0(Q, d, I + S*1, 2*j+1);
+        sd_ifft_main_block(Q, d, I, S, 1, j);
     }
     else
     {
-        sd_ifft_base_1(Q, I, j);
+        sd_ifft_base_1(Q, d, I, j);
     }
 }
 
 void sd_ifft_trunc_block(
     const sd_fft_ctx_t Q,
+    double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
     ulong k, /* BLK_SZ transforms each of length 2^k */
@@ -1096,7 +1098,7 @@ void sd_ifft_trunc_block(
 
     if (!f && z == n && n == n_pow2(k))
     {
-        sd_ifft_main_block(Q, I, S, k, j);
+        sd_ifft_main_block(Q, d, I, S, k, j);
         return;
     }
 
@@ -1104,7 +1106,7 @@ void sd_ifft_trunc_block(
     {
 #define IT(nn, zz, ff) CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)
 #define LOOKUP_IT(nn, zz, ff) tab[(ulong)(ff) + 2*((zz)-1 + 4*(nn))]
-        static int (*tab[5*4*2])(const sd_fft_ctx_t, double*, double*, double*, double*, ulong, ulong) =
+        static int (*tab[5*4*2])(const sd_fft_ctx_t, ulong, ulong, double*, double*, double*, double*) =
             {IT(0,1,0),IT(0,1,1), IT(0,2,0),IT(0,2,1), IT(0,3,0),IT(0,3,1), IT(0,4,0),IT(0,4,1),
              IT(1,1,0),IT(1,1,1), IT(1,2,0),IT(1,2,1), IT(1,3,0),IT(1,3,1), IT(1,4,0),IT(1,4,1),
              IT(2,1,0),IT(2,1,1), IT(2,2,0),IT(2,2,1), IT(2,3,0),IT(2,3,1), IT(2,4,0),IT(2,4,1),
@@ -1112,10 +1114,10 @@ void sd_ifft_trunc_block(
              IT(4,1,0),IT(4,1,1), IT(4,2,0),IT(4,2,1), IT(4,3,0),IT(4,3,1), IT(4,4,0),IT(4,4,1)};
 
         ulong jm = j^(n_next_pow2m1(j)>>1);
-        if (LOOKUP_IT(n,z,f)(Q, sd_fft_ctx_blk_index(Q, I+S*0),
-                                sd_fft_ctx_blk_index(Q, I+S*1),
-                                sd_fft_ctx_blk_index(Q, I+S*2),
-                                sd_fft_ctx_blk_index(Q, I+S*3), j, jm))
+        if (LOOKUP_IT(n,z,f)(Q, j, jm, sd_fft_ctx_blk_index(Q, d, I + S*0),
+                                       sd_fft_ctx_blk_index(Q, d, I + S*1),
+                                       sd_fft_ctx_blk_index(Q, d, I + S*2),
+                                       sd_fft_ctx_blk_index(Q, d, I + S*3)))
         {
             return;
         }
@@ -1140,19 +1142,19 @@ void sd_ifft_trunc_block(
 
         /* complete rows */
         for (ulong b = 0; b < n1; b++)
-            sd_ifft_main_block(Q, I + b*(S << k2), S, k2, (j << k1) + b);
+            sd_ifft_main_block(Q, d, I + b*(S << k2), S, k2, (j << k1) + b);
 
         /* rightmost columns */
         for (ulong a = n2; a < z2p; a++)
-            sd_ifft_trunc_block(Q, I + a*S, S << k2, k1, j, z1 + (a < mp), n1, fp);
+            sd_ifft_trunc_block(Q, d, I + a*S, S << k2, k1, j, z1 + (a < mp), n1, fp);
 
         /* last partial row */
         if (fp)
-            sd_ifft_trunc_block(Q, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2, f);
+            sd_ifft_trunc_block(Q, d, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2, f);
 
         /* leftmost columns */
         for (ulong a = 0; a < n2; a++)
-            sd_ifft_trunc_block(Q, I + a*S, S << k2, k1, j, z1 + (a < m), n1 + 1, 0);
+            sd_ifft_trunc_block(Q, d, I + a*S, S << k2, k1, j, z1 + (a < m), n1 + 1, 0);
 
         return;
     }
@@ -1161,13 +1163,13 @@ void sd_ifft_trunc_block(
     {
 #define IT(nn, zz, ff) CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)
 #define LOOKUP_IT(nn, zz, ff) tab[(ulong)(ff) + 2*((zz)-1 + 2*(nn))]
-        static void (*tab[3*2*2])(const sd_fft_ctx_t, double*, double*, ulong) =
+        static void (*tab[3*2*2])(const sd_fft_ctx_t, ulong, double*, double*) =
             {IT(0,1,0),IT(0,1,1), IT(0,2,0),IT(0,2,1),
              IT(1,1,0),IT(1,1,1), IT(1,2,0),IT(1,2,1),
              IT(2,1,0),IT(2,1,1), IT(2,2,0),IT(2,2,1)};
 
-        LOOKUP_IT(n,z,f)(Q, sd_fft_ctx_blk_index(Q, I+S*0),
-                            sd_fft_ctx_blk_index(Q, I+S*1), j);
+        LOOKUP_IT(n,z,f)(Q, j, sd_fft_ctx_blk_index(Q, d, I + S*0),
+                               sd_fft_ctx_blk_index(Q, d, I + S*1));
         return;
 #undef LOOKUP_IT
 #undef IT
@@ -1177,6 +1179,7 @@ void sd_ifft_trunc_block(
 
 void sd_ifft_trunc(
     const sd_fft_ctx_t Q,
+    double* d,
     ulong I, // starting index
     ulong S, // stride
     ulong k, // transform length 2^(k + LG_BLK_SZ)
@@ -1207,43 +1210,43 @@ void sd_ifft_trunc(
 
         /* complete rows */
         for (ulong b = 0; b < n1; b++)
-            sd_ifft_main(Q, I + b*(S << k2), S, k2, (j << k1) + b);
+            sd_ifft_main(Q, d, I + b*(S << k2), S, k2, (j << k1) + b);
 
         /* rightmost columns */
         for (ulong a = n2; a < z2p; a++)
-            sd_ifft_trunc_block(Q, I + a*S, S << k2, k1, j, z1 + (a < mp), n1, fp);
+            sd_ifft_trunc_block(Q, d, I + a*S, S << k2, k1, j, z1 + (a < mp), n1, fp);
 
         /* last partial row */
         if (fp)
-            sd_ifft_trunc(Q, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2, f);
+            sd_ifft_trunc(Q, d, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2, f);
 
         /* leftmost columns */
         for (ulong a = 0; a < n2; a++)
-            sd_ifft_trunc_block(Q, I + a*S, S << k2, k1, j, z1 + (a < m), n1 + 1, 0);
+            sd_ifft_trunc_block(Q, d, I + a*S, S << k2, k1, j, z1 + (a < m), n1 + 1, 0);
 
         return;
     }
 
     if (k == 2)
     {
-                   sd_ifft_base_1(Q, I+S*0, 4*j+0);
-        if (n > 1) sd_ifft_base_0(Q, I+S*1, 4*j+1);
-        if (n > 2) sd_ifft_base_0(Q, I+S*2, 4*j+2);
-        if (n > 3) sd_ifft_base_0(Q, I+S*3, 4*j+3);
-        sd_ifft_trunc_block(Q, I, S, 2, j, z, n, f);
-        if (f) sd_ifft_trunc(Q, I + S*n, S, 0, 4*j+n, 1, 0, f);
+                   sd_ifft_base_1(Q, d, I + S*0, 4*j+0);
+        if (n > 1) sd_ifft_base_0(Q, d, I + S*1, 4*j+1);
+        if (n > 2) sd_ifft_base_0(Q, d, I + S*2, 4*j+2);
+        if (n > 3) sd_ifft_base_0(Q, d, I + S*3, 4*j+3);
+        sd_ifft_trunc_block(Q, d, I, S, 2, j, z, n, f);
+        if (f) sd_ifft_trunc(Q, d, I + S*n, S, 0, 4*j+n, 1, 0, f);
     }
     else if (k == 1)
     {
-                   sd_ifft_base_1(Q, I+S*0, 2*j+0);
-        if (n > 1) sd_ifft_base_0(Q, I+S*1, 2*j+1);
-        sd_ifft_trunc_block(Q, I, S, 1, j, z, n, f);
-        if (f) sd_ifft_trunc(Q, I + S*n, S, 0, 2*j+n, 1, 0, f);
+                   sd_ifft_base_1(Q, d, I + S*0, 2*j+0);
+        if (n > 1) sd_ifft_base_0(Q, d, I + S*1, 2*j+1);
+        sd_ifft_trunc_block(Q, d, I, S, 1, j, z, n, f);
+        if (f) sd_ifft_trunc(Q, d, I + S*n, S, 0, 2*j+n, 1, 0, f);
     }
     else
     {
         FLINT_ASSERT(!f);
-        sd_ifft_base_1(Q, I, j);
+        sd_ifft_base_1(Q, d, I, j);
     }
 }
 

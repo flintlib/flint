@@ -90,7 +90,7 @@ void profile_mul(
             double total_time = 0;
             double max_time = 0;
             double min_time = 1.0e100;
-            for (ulong an = (cn+1)/2; an <= 3*cn/4; an += 1+an/12)
+            for (ulong an = (cn+1)/2; an <= (cn+1)/2/*3*cn/4*/; an += 1+an/12)
             {
                 ulong bn = cn - an;
                 if (!(bn <= an && an < cn))
@@ -108,7 +108,7 @@ void profile_mul(
                     precomp = (double)timer->wall;
                     nprecomp_samples++;
                 }
-                ulong nreps = 1 + 20000000/(cn*n_clog2(cn));
+                ulong nreps = 1 + 0*20000000/(cn*n_clog2(cn));
                 timeit_start(timer);
                 for (ulong rep = 0; rep < nreps; rep++)
                     mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
@@ -250,10 +250,11 @@ void profile_mul_gmp(
 
 /*
 some notes on precomp:
-    (1) the global twiddle factors need to be precomputed 
-    (2) when the big buffer for temp space needs to reallocated, the accesses
-        to the new space all incur page faults. These occur out of order in the
-        beginning of the calculation and contribute noticably to the run time.
+
+(1) the global twiddle factors need to be precomputed
+(2) when the big buffer for temp space needs to be reallocated, the accesses
+    to the new space all incur page faults. These occur out of order in the
+    beginning of the calculation and contribute noticably to the run time.
 
 Therefore, there is a penalty for the first run of a computation of a certain
 size. If the data comes out like
@@ -278,10 +279,11 @@ int main(void)
 {
     mpn_ctx_t R;
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
-    profile_mul(R, 15, 31, 0, 1);
+    profile_mul(R, 29, 30, 0, 1);
     mpn_ctx_clear(R);
-flint_printf(" --- gmp --- ");
+/*
+flint_printf(" --- gmp --- \n");
     profile_mul_gmp(15, 31, 0, 0);
-
+*/
     return 0;
 }
