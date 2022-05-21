@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpfr.h"
 #include "fmpz_lll.h"
 #include "mpfr_vec.h"
 #include "mpfr_mat.h"

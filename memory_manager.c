@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "flint.h"
+#include "mpfr.h"
 #include "thread_pool.h"
 
 #if FLINT_USES_GC

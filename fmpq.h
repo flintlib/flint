@@ -25,7 +25,6 @@
 #undef ulong
 
 #include <gmp.h>
-#include <mpfr.h>
 #define ulong mp_limb_t
 #include "flint.h"
 #include "fmpz.h"
@@ -188,7 +187,9 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
 FLINT_DLL double fmpq_get_d(const fmpq_t a);
 
+#ifdef __MPFR_H
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
+#endif
 
 FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
 

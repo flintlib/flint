@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "mpfr.h"
 #include "arith.h"
 
 /* This nice round number precisely fits on 32 bits */

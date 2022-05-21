@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpfr.h"
 #include "arith.h"
 
 void _arith_euler_number_zeta(fmpz_t res, ulong n)

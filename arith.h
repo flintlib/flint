@@ -19,7 +19,6 @@
 #endif
 
 #include <gmp.h>
-#include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -34,7 +33,9 @@
 
 /* MPFR extras ***************************************************************/
 
+#ifdef __MPFR_H
 FLINT_DLL void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
+#endif
 
 /* Various arithmetic functions **********************************************/
 
@@ -221,7 +222,9 @@ FLINT_DLL extern const unsigned int partitions_lookup[128];
 
 FLINT_DLL void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod);
 FLINT_DLL void arith_number_of_partitions_vec(fmpz * res, slong len);
+#ifdef __MPFR_H
 FLINT_DLL void arith_number_of_partitions_mpfr(mpfr_t x, ulong n);
+#endif
 FLINT_DLL void arith_number_of_partitions(fmpz_t x, ulong n);
 
 /* Number of sums of squares representations *********************************/

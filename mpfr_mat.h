@@ -18,7 +18,7 @@
 #define MPFR_MAT_INLINE static __inline__
 #endif
 
-#include <gmp.h>
+#include "flint.h"
 #include <mpfr.h> 
 
 #ifdef __cplusplus

@@ -18,12 +18,18 @@
 #define MPFR_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
+#include "flint.h"
 #include <mpfr.h> 
+
+#if MPFR_VERSION_MAJOR < 3
+#error MPFR 3.0.0 or later is required
+#endif
 
 #ifdef __cplusplus
  extern "C" {
 #endif
+
+typedef __mpfr_struct flint_mpfr;
 
 FLINT_DLL flint_mpfr * _mpfr_vec_init(slong length, flint_bitcnt_t prec);
 
