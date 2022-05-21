@@ -16,7 +16,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_set(flint_mpfr * vec1, const flint_mpfr * vec2, slong length)
+_mpfr_vec_set(mpfr_ptr vec1, mpfr_srcptr vec2, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)

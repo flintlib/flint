@@ -16,7 +16,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_zero(flint_mpfr * vec, slong length)
+_mpfr_vec_zero(mpfr_ptr vec, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)

@@ -14,7 +14,7 @@
 #include "mpfr_vec.h"
 
 int
-_mpfr_vec_equal(const flint_mpfr * vec1, const flint_mpfr * vec2, slong len)
+_mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len)
 {
     slong i;
     if (vec1 == vec2)
