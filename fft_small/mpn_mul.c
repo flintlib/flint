@@ -1158,7 +1158,7 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
     if (n > R->buffer_alloc)
     {
         flint_aligned_free(R->buffer);
-        n = n_round_up(n, 4096);
+        n = n_round_up(n_max(n, R->buffer_alloc*17/16), 4096);
         R->buffer = flint_aligned_alloc(4096, n);
         R->buffer_alloc = n;
     }

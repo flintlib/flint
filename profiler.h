@@ -96,6 +96,24 @@ void timeit_stop(timeit_t t)
     t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
 }
 
+static __inline__
+void timeit_start_us(timeit_t t)
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall = - tv.tv_sec * 1000000 - tv.tv_usec;
+}
+
+
+static __inline__
+void timeit_stop_us(timeit_t t)
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall += tv.tv_sec * 1000000 + tv.tv_usec;
+}
+
+
 /******************************************************************************
 
     Timer based on the x86 cycle counter

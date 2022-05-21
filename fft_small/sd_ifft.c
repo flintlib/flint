@@ -17,12 +17,29 @@
     2*a1 = w^-1*(b0 - b1)
     W := -w^-1
 */
-#define RADIX_2_REVERSE_PARAM(V, Q, j) \
-    V W = V##_set_d((UNLIKELY((j) == 0)) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, (j)^(n_next_pow2m1(j)>>1))); \
+#define RADIX_2_REVERSE_PARAM_J_IS_Z(V, Q) \
     V n    = V##_set_d(Q->p); \
     V ninv = V##_set_d(Q->pinv);
 
-#define RADIX_2_REVERSE_MOTH(V, X0, X1) \
+#define RADIX_2_REVERSE_MOTH_J_IS_Z(V, X0, X1) \
+{ \
+    V x0, x1, y0, y1; \
+    x0 = V##_load(X0); \
+    x1 = V##_load(X1); \
+    y0 = V##_add(x0, x1); \
+    y1 = V##_sub(x0, x1); \
+    y0 = V##_reduce_to_pm1n(y0, n, ninv); \
+    y1 = V##_reduce_to_pm1n(y1, n, ninv); \
+    V##_store(X0, y0); \
+    V##_store(X1, y1); \
+}
+
+#define RADIX_2_REVERSE_PARAM_J_IS_NZ(V, Q, j_mr, j_bits) \
+    V W = V##_set_d(Q->w2tab[j_bits][j_mr]); \
+    V n    = V##_set_d(Q->p); \
+    V ninv = V##_set_d(Q->pinv);
+
+#define RADIX_2_REVERSE_MOTH_J_IS_NZ(V, X0, X1) \
 { \
     V x0, x1, y0, y1; \
     x0 = V##_load(X0); \
@@ -73,19 +90,22 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
     ulong j,
     double* X0, double* X1)
 {
-    vec4d n    = vec4d_set_d(Q->p);
-    vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d w = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
-    vec4d c = vec4d_set_d(2);
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d c = vec8d_set_d(2);
     ulong i = 0; do {
-        vec4d u0, u1;
-        u0 = vec4d_load(X0 + i);
-        u1 = vec4d_load(X1 + i);
-        u0 = vec4d_reduce_to_pm1n(u0, n, ninv);
-        u1 = vec4d_mulmod2(u1, w, n, ninv);
-        vec4d_store(X0 + i, vec4d_fmsub(c, u0, u1));
-        vec4d_store(X1 + i, vec4d_sub(u0, u1));
-    } while (i += 4, i < BLK_SZ);
+        vec8d a, b, u, v;
+        a = vec8d_load(X0 + i);
+        b = vec8d_load(X1 + i);
+        b = vec8d_mulmod2(b, w, n, ninv);
+        u = vec8d_fmsub(c, a, b);
+        v = vec8d_sub(a, b);
+        u = vec8d_reduce_to_pm1n(u, n, ninv);
+        v = vec8d_reduce_to_pm1n(v, n, ninv);
+        vec8d_store(X0 + i, u);
+        vec8d_store(X1 + i, v);
+    } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }
 
@@ -95,18 +115,19 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
     ulong j,
     double* X0, double* X1)
 {
-    vec4d n    = vec4d_set_d(Q->p);
-    vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d w = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
-    vec4d c = vec4d_set_d(2);
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d c = vec8d_set_d(2);
     ulong i = 0; do {
-        vec4d u0, u1;
-        u0 = vec4d_load(X0 + i);
-        u1 = vec4d_load(X1 + i);
-        u0 = vec4d_reduce_to_pm1n(u0, n, ninv);
-        u1 = vec4d_mulmod2(u1, w, n, ninv);
-        vec4d_store(X0 + i, vec4d_fmsub(c, u0, u1));
-    } while (i += 4, i < BLK_SZ);
+        vec8d a, b, u;
+        a = vec8d_load(X0 + i);
+        b = vec8d_load(X1 + i);
+        b = vec8d_mulmod2(b, w, n, ninv);
+        u = vec8d_fmsub(c, a, b);
+        u = vec8d_reduce_to_pm1n(u, n, ninv);
+        vec8d_store(X0 + i, u);
+    } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }
 
@@ -116,15 +137,16 @@ static void radix_2_moth_inv_trunc_block_1_1_1(
     ulong j,
     double* X0, double* X1)
 {
-    vec4d n    = vec4d_set_d(Q->p);
-    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
     ulong i = 0; do {
-        vec4d u0;
-        u0 = vec4d_load(X0 + i);
-        u0 = vec4d_reduce_to_pm1n(u0, n, ninv);
-        vec4d_store(X0 + i, vec4d_add(u0, u0));
-        vec4d_store(X1 + i, u0);
-    } while (i += 4, i < BLK_SZ);
+        vec8d a, u;
+        a = vec8d_load(X0 + i);
+        u = vec8d_add(a, a);
+        u = vec8d_reduce_to_pm1n(u, n, ninv);
+        vec8d_store(X0 + i, u);
+        vec8d_store(X1 + i, a);
+    } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }
 
@@ -134,14 +156,15 @@ static void radix_2_moth_inv_trunc_block_1_1_0(
     ulong j,
     double* X0, double* X1)
 {
-    vec4d n    = vec4d_set_d(Q->p);
-    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
     ulong i = 0; do {
-        vec4d u0;
-        u0 = vec4d_load(X0 + i);
-        u0 = vec4d_reduce_to_pm1n(u0, n, ninv);
-        vec4d_store(X0 + i, vec4d_add(u0, u0));
-    } while (i += 4, i < BLK_SZ);
+        vec8d a;
+        a = vec8d_load(X0 + i);
+        a = vec8d_add(a, a);
+        a = vec8d_reduce_to_pm1n(a, n, ninv);
+        vec8d_store(X0 + i, a);
+    } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }
 
@@ -151,20 +174,22 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
     ulong j,
     double* X0, double* X1)
 {
-    vec4d n    = vec4d_set_d(Q->p);
-    vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d w = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
-    vec4d c = vec4d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d c = vec8d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));
     ulong i = 0; do {
-        vec4d u0, u1;
-        u0 = vec4d_load(X0 + i);
-        u1 = vec4d_load(X1 + i);
-        u1 = vec4d_mulmod2(u1, w, n, ninv);
-        u0 = vec4d_mulmod2(vec4d_add(u0, u1), c, n, ninv);
-        vec4d_store(X0 + i, u0);
-    } while (i += 4, i < BLK_SZ);
+        vec8d a, b;
+        a = vec8d_load(X0 + i);
+        b = vec8d_load(X1 + i);
+        b = vec8d_mulmod2(b, w, n, ninv);
+        a = vec8d_add(a, b);
+        a = vec8d_mulmod2(a, c, n, ninv);
+        vec8d_store(X0 + i, a);
+    } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }
+
 
 /* {x0} = {(x0)/2} */
 static void radix_2_moth_inv_trunc_block_0_1_1(
@@ -172,14 +197,14 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     ulong j,
     double* X0, double* X1)
 {
-    vec4d n    = vec4d_set_d(Q->p);
-    vec4d ninv = vec4d_set_d(Q->pinv);
-    vec4d c = vec4d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    vec8d c = vec8d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));
     ulong i = 0; do {
-        vec4d u0;
-        u0 = vec4d_load(X0 + i);
-        u0 = vec4d_mulmod2(u0, c, n, ninv);
-        vec4d_store(X0 + i, u0);
+        vec8d a;
+        a = vec8d_load(X0 + i);
+        a = vec8d_mulmod2(a, c, n, ninv);
+        vec8d_store(X0 + i, a);
     } while (i += 4, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }
@@ -193,23 +218,40 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     W2 := -w^-2
     IW := i*w^-1
 */
-#define RADIX_4_REVERSE_PARAM(V, Q, j, jm, j_can_be_0) \
-    FLINT_ASSERT((j) == 0 || (jm) == ((j)^(n_next_pow2m1(j)>>1))); \
-    V W  = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*(jm)+1)); \
-    V W2 = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, (jm))); \
-    V IW = V##_set_d(((j_can_be_0) && UNLIKELY((j) == 0)) ?  sd_fft_lctx_w2s(Q, 1) : sd_fft_lctx_w2s(Q, 2*(jm))); \
+#define RADIX_4_REVERSE_PARAM_J_IS_Z(V, Q) \
+    V IW = V##_set_d(Q->w2tab[0][1]); \
     V n    = V##_set_d(Q->p); \
     V ninv = V##_set_d(Q->pinv); \
 
-#define RADIX_4_REVERSE_PARAM_SURE(V, Q, j, jm, j_is_0) \
-    FLINT_ASSERT((j) == 0 || (jm) == ((j)^(n_next_pow2m1(j)>>1))); \
-    V W  = V##_set_d((j_is_0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*(jm)+1)); \
-    V W2 = V##_set_d((j_is_0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, (jm))); \
-    V IW = V##_set_d((j_is_0) ?  sd_fft_lctx_w2s(Q, 1) : sd_fft_lctx_w2s(Q, 2*(jm))); \
+#define RADIX_4_REVERSE_MOTH_J_IS_Z(V, X0, X1, X2, X3) \
+{ \
+    V x0, x1, x2, x3, y0, y1, y2, y3; \
+    x0 = V##_load(X0); \
+    x1 = V##_load(X1); \
+    x2 = V##_load(X2); \
+    x3 = V##_load(X3); \
+    y0 = V##_add(x0, x1); \
+    y1 = V##_add(x2, x3); \
+    y2 = V##_sub(x0, x1); \
+    y3 = V##_sub(x2, x3); \
+    y0 = V##_reduce_to_pm1n(y0, n, ninv); \
+    y1 = V##_reduce_to_pm1n(y1, n, ninv); \
+    y2 = V##_reduce_to_pm1n(y2, n, ninv); \
+    y3 = V##_mulmod2(y3, IW, n, ninv); \
+    V##_store(X0, V##_add(y0, y1)); \
+    V##_store(X2, V##_sub(y0, y1)); \
+    V##_store(X1, V##_sub(y2, y3)); \
+    V##_store(X3, V##_add(y2, y3)); \
+}
+
+#define RADIX_4_REVERSE_PARAM_J_IS_NZ(V, Q, j_mr, j_bits) \
+    V W  = V##_set_d(Q->w2tab[1+j_bits][2*j_mr+1]); \
+    V W2 = V##_set_d(Q->w2tab[0+j_bits][j_mr]); \
+    V IW = V##_set_d(Q->w2tab[1+j_bits][2*j_mr+0]); \
     V n    = V##_set_d(Q->p); \
     V ninv = V##_set_d(Q->pinv); \
 
-#define RADIX_4_REVERSE_MOTH(V, X0, X1, X2, X3) \
+#define RADIX_4_REVERSE_MOTH_J_IS_NZ(V, X0, X1, X2, X3) \
 { \
     V x0, x1, x2, x3, y0, y1, y2, y3; \
     x0 = V##_load(X0); \
@@ -235,68 +277,18 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     V##_store(X3, x3); \
 }
 
-/* second parameter is the bool j == 0 */
-
 /*
-    These functions are disabled because the ifft expects input in
+    The basecases below 4 are disabled because the ifft expects input in
     slightly-worse-than-bit-reversed order as in basecase_4.
 */
-#if 0
-/* length 1 */
-FLINT_FORCE_INLINE void
-sd_ifft_basecase_0_0(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
-{
-    FLINT_ASSERT(0 == (j == 0));
-}
-
-FLINT_FORCE_INLINE void
-sd_ifft_basecase_0_1(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
-{
-    FLINT_ASSERT(1 == (j == 0));
-}
-
-/* length 2 */
-FLINT_FORCE_INLINE void
-sd_ifft_basecase_1_0(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
-{
-    RADIX_2_REVERSE_PARAM(vec1d, Q, j)
-    RADIX_2_REVERSE_MOTH(vec1d, X+0, X+1);
-}
-
-FLINT_FORCE_INLINE void
-sd_ifft_basecase_1_1(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
-{
-    RADIX_2_REVERSE_PARAM(vec1d, Q, j)
-    RADIX_2_REVERSE_MOTH(vec1d, X+0, X+1);
-}
-
-/* length 4 */
-FLINT_FORCE_INLINE void
-sd_ifft_basecase_2_0(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
-{
-    RADIX_4_REVERSE_PARAM_SURE(vec1d, Q, j, jm, 0)
-    RADIX_4_REVERSE_MOTH(vec1d, X+0, X+1, X+2, X+3);
-}
-
-FLINT_FORCE_INLINE void
-sd_ifft_basecase_2_1(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm)
-{
-    RADIX_4_REVERSE_PARAM_SURE(vec1d, Q, j, jm, 1)
-    RADIX_4_REVERSE_MOTH(vec1d, X+0, X+1, X+2, X+3);
-}
-#endif
-
-/* length 16 */
 #define DEFINE_IT(j_is_0) \
 FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
-    const sd_fft_lctx_t Q, double* X, ulong j, ulong jm) \
+    const sd_fft_lctx_t Q, double* X, ulong j_mr, ulong j_bits) \
 { \
     vec4d n    = vec4d_set_d(Q->p); \
     vec4d ninv = vec4d_set_d(Q->pinv); \
     vec4d W, W2, IW, u, v; \
     vec4d x0, x1, x2, x3, y0, y1, y2, y3; \
-    FLINT_ASSERT(j_is_0 == (j == 0)); \
-    FLINT_ASSERT(j == 0 || jm == (j^(n_next_pow2m1(j)>>1))); \
  \
     x0 = vec4d_load(X + 0); \
     x1 = vec4d_load(X + 4); \
@@ -305,20 +297,18 @@ FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
  \
     if (j_is_0) \
     { \
-        W  = vec4d_set_d4(-sd_fft_lctx_w2s(Q, 0), sd_fft_lctx_w2s(Q, 3), sd_fft_lctx_w2s(Q, 7), sd_fft_lctx_w2s(Q, 5)); \
-        IW = vec4d_set_d4( sd_fft_lctx_w2s(Q, 1), sd_fft_lctx_w2s(Q, 2), sd_fft_lctx_w2s(Q, 6), sd_fft_lctx_w2s(Q, 4)); \
-        W2 = vec4d_set_d4(-sd_fft_lctx_w2s(Q, 0), sd_fft_lctx_w2s(Q, 1), sd_fft_lctx_w2s(Q, 3), sd_fft_lctx_w2s(Q, 2)); \
+        W  = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[0][3], Q->w2tab[0][7], Q->w2tab[0][5]); \
+        IW = vec4d_set_d4( Q->w2tab[0][1], Q->w2tab[0][2], Q->w2tab[0][6], Q->w2tab[0][4]); \
+        W2 = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[0][1], Q->w2tab[0][3], Q->w2tab[0][2]); \
     } \
     else \
     { \
-        W2 = vec4d_set_d4(sd_fft_lctx_w2s(Q, 4*jm+0),sd_fft_lctx_w2s(Q, 4*jm+1), sd_fft_lctx_w2s(Q, 4*jm+2), sd_fft_lctx_w2s(Q, 4*jm+3));  /*a b c d */ \
-        W2 = vec4d_permute_3_2_1_0(W2);          /*d c b a */ \
-        u = vec4d_set_d4(sd_fft_lctx_w2s(Q, 8*jm+0),sd_fft_lctx_w2s(Q, 8*jm+1), sd_fft_lctx_w2s(Q, 8*jm+2), sd_fft_lctx_w2s(Q, 8*jm+3));   /*0 1 2 3 */ \
-        v = vec4d_set_d4(sd_fft_lctx_w2s(Q, 8*jm+4),sd_fft_lctx_w2s(Q, 8*jm+5), sd_fft_lctx_w2s(Q, 8*jm+6), sd_fft_lctx_w2s(Q, 8*jm+7));   /*4 5 6 7 */ \
-        W  = vec4d_unpackhi(u, v);               /*1 5 3 7 */ \
-        IW = vec4d_unpacklo(u, v);               /*0 4 2 6 */ \
-        W  = vec4d_permute_3_1_2_0(W);           /*7 5 3 1 */ \
-        IW = vec4d_permute_3_1_2_0(IW);          /*6 4 2 0 */ \
+        W2 = vec4d_load_aligned(Q->w2tab[2+j_bits] + 4*j_mr);   /* a b c d */ \
+        W2 = vec4d_permute_3_2_1_0(W2);                         /* d c b a */ \
+        u = vec4d_load_aligned(Q->w2tab[3+j_bits] + 8*j_mr+0);  /* 0 1 2 3 */ \
+        v = vec4d_load_aligned(Q->w2tab[3+j_bits] + 8*j_mr+4);  /* 4 5 6 7 */ \
+        W  = vec4d_permute_3_1_2_0(vec4d_unpackhi(u, v));       /* 7 5 3 1 */ \
+        IW = vec4d_permute_3_1_2_0(vec4d_unpacklo(u, v));       /* 6 4 2 0 */ \
     } \
  \
     y0 = vec4d_add(x0, x1); \
@@ -337,26 +327,45 @@ FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
  \
     VEC4D_TRANSPOSE(x0, x1, x2, x3, x0, x1, x2, x3); \
  \
-    W  = vec4d_set_d(j_is_0 ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1)); \
-    IW = vec4d_set_d(j_is_0 ?  sd_fft_lctx_w2s(Q, 1) : sd_fft_lctx_w2s(Q, 2*jm+0)); \
-    W2 = vec4d_set_d(j_is_0 ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm)); \
-    y0 = vec4d_add(x0, x1); \
-    y1 = vec4d_add(x2, x3); \
-    y2 = vec4d_sub(x0, x1); \
-    y3 = vec4d_sub(x3, x2); \
-    y2 = vec4d_mulmod2(y2, W, n, ninv); \
-    y3 = vec4d_mulmod2(y3, IW, n, ninv); \
-    x0 = vec4d_add(y0, y1); \
-    x1 = vec4d_sub(y3, y2); \
-    x2 = vec4d_sub(y1, y0); \
-    x3 = vec4d_add(y3, y2); \
-    x0 = vec4d_reduce_to_pm1n(x0, n, ninv); \
-    x2 = vec4d_mulmod2(x2, W2, n, ninv); \
-    x3 = vec4d_mulmod2(x3, W2, n, ninv); \
-    vec4d_store(X+0, x0); \
-    vec4d_store(X+4, x1); \
-    vec4d_store(X+8, x2); \
-    vec4d_store(X+12, x3); \
+    if (j_is_0) \
+    { \
+        IW = vec4d_set_d(Q->w2tab[0][1]); \
+        y0 = vec4d_add(x0, x1); \
+        y1 = vec4d_add(x2, x3); \
+        y2 = vec4d_sub(x0, x1); \
+        y3 = vec4d_sub(x2, x3); \
+        y0 = vec4d_reduce_to_pm1n(y0, n, ninv); \
+        y1 = vec4d_reduce_to_pm1n(y1, n, ninv); \
+        y2 = vec4d_reduce_to_pm1n(y2, n, ninv); \
+        y3 = vec4d_mulmod2(y3, IW, n, ninv); \
+        vec4d_store(X+0, vec4d_add(y0, y1)); \
+        vec4d_store(X+8, vec4d_sub(y0, y1)); \
+        vec4d_store(X+4, vec4d_sub(y2, y3)); \
+        vec4d_store(X+12, vec4d_add(y2, y3)); \
+    } \
+    else \
+    { \
+        W  = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+1]); \
+        IW = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+0]); \
+        W2 = vec4d_set_d(Q->w2tab[0+j_bits][j_mr]); \
+        y0 = vec4d_add(x0, x1); \
+        y1 = vec4d_add(x2, x3); \
+        y2 = vec4d_sub(x0, x1); \
+        y3 = vec4d_sub(x3, x2); \
+        y2 = vec4d_mulmod2(y2, W, n, ninv); \
+        y3 = vec4d_mulmod2(y3, IW, n, ninv); \
+        x0 = vec4d_add(y0, y1); \
+        x1 = vec4d_sub(y3, y2); \
+        x2 = vec4d_sub(y1, y0); \
+        x3 = vec4d_add(y3, y2); \
+        x0 = vec4d_reduce_to_pm1n(x0, n, ninv); \
+        x2 = vec4d_mulmod2(x2, W2, n, ninv); \
+        x3 = vec4d_mulmod2(x3, W2, n, ninv); \
+        vec4d_store(X+0, x0); \
+        vec4d_store(X+4, x1); \
+        vec4d_store(X+8, x2); \
+        vec4d_store(X+12, x3); \
+    } \
 }
 
 DEFINE_IT(0)
@@ -365,104 +374,97 @@ DEFINE_IT(1)
 
 
 /* use with N = M-2 and M >= 6 */
-#define EXTEND_BASECASE(N, M, j_is_0) \
-void CAT3(sd_ifft_basecase, M, j_is_0)(const sd_fft_lctx_t Q, double* X, ulong j, ulong jm) \
+#define EXTEND_BASECASE(N, M) \
+void CAT3(sd_ifft_basecase, M, 1)(const sd_fft_lctx_t Q, double* X, ulong j_mr, ulong j_bits) \
 { \
     ulong l = n_pow2(M - 2); \
-    FLINT_ASSERT(j_is_0 == (j == 0)); \
-    FLINT_ASSERT(j == 0 || jm == (j^(n_next_pow2m1(j)>>1))); \
-    CAT3(sd_ifft_basecase, N, j_is_0)(Q, X+0*l, 4*j+0, j_is_0 ? 0 : 4*jm+3); \
-    CAT3(sd_ifft_basecase, N, 0     )(Q, X+1*l, 4*j+1, j_is_0 ? 1 : 4*jm+2); \
-    CAT3(sd_ifft_basecase, N, 0     )(Q, X+2*l, 4*j+2, j_is_0 ? 3 : 4*jm+1); \
-    CAT3(sd_ifft_basecase, N, 0     )(Q, X+3*l, 4*j+3, j_is_0 ? 2 : 4*jm+0); \
+    FLINT_ASSERT(j_bits == 0); \
+    CAT3(sd_ifft_basecase, N, 1)(Q, X+0*l, 0, 0); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+1*l, 0, 1); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+2*l, 1, 2); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+3*l, 0, 2); \
     { \
-        RADIX_4_REVERSE_PARAM_SURE(vec8d, Q, j, jm, j_is_0) \
+        RADIX_4_REVERSE_PARAM_J_IS_Z(vec8d, Q) \
         ulong i = 0; do { \
-            RADIX_4_REVERSE_MOTH(vec8d, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
+            RADIX_4_REVERSE_MOTH_J_IS_Z(vec8d, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
+        } while (i += 8, i < l); \
+        FLINT_ASSERT(i == l); \
+    } \
+} \
+void CAT3(sd_ifft_basecase, M, 0)(const sd_fft_lctx_t Q, double* X, ulong j_mr, ulong j_bits) \
+{ \
+    ulong l = n_pow2(M - 2); \
+    FLINT_ASSERT(j_bits != 0); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+0*l, 4*j_mr+3, 2+j_bits); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+1*l, 4*j_mr+2, 2+j_bits); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+2*l, 4*j_mr+1, 2+j_bits); \
+    CAT3(sd_ifft_basecase, N, 0)(Q, X+3*l, 4*j_mr+0, 2+j_bits); \
+    { \
+        RADIX_4_REVERSE_PARAM_J_IS_NZ(vec8d, Q, j_mr, j_bits) \
+        ulong i = 0; do { \
+            RADIX_4_REVERSE_MOTH_J_IS_NZ(vec8d, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
         } while (i += 8, i < l); \
         FLINT_ASSERT(i == l); \
     } \
 }
 
-EXTEND_BASECASE(4, 6, 0)
-EXTEND_BASECASE(4, 6, 1)
-EXTEND_BASECASE(6, 8, 0)
-EXTEND_BASECASE(6, 8, 1)
+EXTEND_BASECASE(4, 6)
+EXTEND_BASECASE(6, 8)
 #undef EXTEND_BASECASE
 
 /* parameter 1: j can be zero */
 void sd_ifft_base_1(const sd_fft_lctx_t Q, double* d, ulong I, ulong j)
 {
-    ulong jm = j^(n_next_pow2m1(j)>>1);
+    ulong j_bits = n_nbits(j);
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     double* x = sd_fft_ctx_blk_index(d, I);
     if (j == 0)
-        sd_ifft_basecase_8_1(Q, x, j, jm);
+        sd_ifft_basecase_8_1(Q, x, j_mr, j_bits);
     else
-        sd_ifft_basecase_8_0(Q, x, j, jm);
+        sd_ifft_basecase_8_0(Q, x, j_mr, j_bits);
 }
 
 /* parameter 0: j cannot be zero */
 void sd_ifft_base_0(const sd_fft_lctx_t Q, double* d, ulong I, ulong j)
 {
-    ulong jm = j^(n_next_pow2m1(j)>>1);
+    ulong j_bits = n_nbits(j);
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     double* x = sd_fft_ctx_blk_index(d, I);
     FLINT_ASSERT(j != 0);
-    sd_ifft_basecase_8_0(Q, x, j, jm);
+    sd_ifft_basecase_8_0(Q, x, j_mr, j_bits);
 }
 
 /***************** inverse butterfy with truncation **************************/
 
-/* the legal function are opt-in but print an annoying message if missing */
-#define DEFINE_IT(nn, zz, ff) \
-static int CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)( \
-    const sd_fft_lctx_t Q, \
-    ulong j, ulong jm, \
-    double* X0, double* X1, double* X2, double* X3) \
-{ \
-    int l = 4; \
-    flint_printf("function l = %d, n = %d, z = %d, f = %d", l, nn, zz, ff); \
-    if (1 <= zz && zz <= 4 && nn <= zz && 1 <= nn+ff && nn+ff <= l) \
-    { \
-        flint_printf(" is not implemented\n"); \
-        fflush(stdout); \
-    } \
-    else \
-    { \
-        flint_printf(" does not exist and should not be called\n"); \
-        fflush(stdout); \
-        flint_abort(); \
-    } \
-    return 0; \
-}
+/* the legal function are opt-in, and illegal/unimplemented are NULL */
 
-DEFINE_IT(0,1,0)
-DEFINE_IT(0,1,1)
-DEFINE_IT(0,2,0)
-DEFINE_IT(0,2,1)
-DEFINE_IT(0,3,0)
-DEFINE_IT(0,3,1)
-DEFINE_IT(0,4,0)
-DEFINE_IT(1,2,0)
-DEFINE_IT(1,2,1)
-DEFINE_IT(1,3,0)
-DEFINE_IT(1,3,1)
-DEFINE_IT(2,1,0)
-DEFINE_IT(2,1,1)
-DEFINE_IT(2,3,0)
-DEFINE_IT(2,3,1)
-DEFINE_IT(3,1,0)
-DEFINE_IT(3,1,1)
-DEFINE_IT(3,2,0)
-DEFINE_IT(3,2,1)
-DEFINE_IT(4,1,0)
-DEFINE_IT(4,1,1)
-DEFINE_IT(4,2,0)
-DEFINE_IT(4,2,1)
-DEFINE_IT(4,3,0)
-DEFINE_IT(4,3,1)
-DEFINE_IT(4,4,0)
-DEFINE_IT(4,4,1)
-#undef DEFINE_IT
+#define radix_4_moth_inv_trunc_block_0_1_0 NULL
+#define radix_4_moth_inv_trunc_block_0_1_1 NULL
+#define radix_4_moth_inv_trunc_block_0_2_0 NULL
+#define radix_4_moth_inv_trunc_block_0_2_1 NULL
+#define radix_4_moth_inv_trunc_block_0_3_0 NULL
+#define radix_4_moth_inv_trunc_block_0_3_1 NULL
+#define radix_4_moth_inv_trunc_block_0_4_0 NULL
+#define radix_4_moth_inv_trunc_block_1_2_0 NULL
+#define radix_4_moth_inv_trunc_block_1_2_1 NULL
+#define radix_4_moth_inv_trunc_block_1_3_0 NULL
+#define radix_4_moth_inv_trunc_block_1_3_1 NULL
+#define radix_4_moth_inv_trunc_block_2_1_0 NULL
+#define radix_4_moth_inv_trunc_block_2_1_1 NULL
+#define radix_4_moth_inv_trunc_block_2_3_0 NULL
+#define radix_4_moth_inv_trunc_block_2_3_1 NULL
+#define radix_4_moth_inv_trunc_block_3_1_0 NULL
+#define radix_4_moth_inv_trunc_block_3_1_1 NULL
+#define radix_4_moth_inv_trunc_block_3_2_0 NULL
+#define radix_4_moth_inv_trunc_block_3_2_1 NULL
+#define radix_4_moth_inv_trunc_block_4_1_0 NULL
+#define radix_4_moth_inv_trunc_block_4_1_1 NULL
+#define radix_4_moth_inv_trunc_block_4_2_0 NULL
+#define radix_4_moth_inv_trunc_block_4_2_1 NULL
+#define radix_4_moth_inv_trunc_block_4_3_0 NULL
+#define radix_4_moth_inv_trunc_block_4_3_1 NULL
+#define radix_4_moth_inv_trunc_block_4_4_0 NULL
+#define radix_4_moth_inv_trunc_block_4_4_1 NULL
 
 /*
 k = 2, n = 3, z = 4, f = true
@@ -471,24 +473,27 @@ k = 2, n = 3, z = 4, f = true
 [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
 [          -r               r         1   r*w^3]
 */
-static int radix_4_moth_inv_trunc_block_3_4_1(
+static void radix_4_moth_inv_trunc_block_3_4_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
-    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
+    double W  = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double W2 = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec4d f0 = vec4d_set_d(sd_fft_lctx_w2s(Q, 1));              /* r */
+    vec4d f0 = vec4d_set_d(Q->w2tab[0][1]);         /* r */
     vec4d f1 = vec4d_set_d(twoW);                   /* 2*w^-1 */
     vec4d f2 = vec4d_set_d(2);
     vec4d f3 = vec4d_set_d(W2);                     /* -w^-2 */
-    vec4d fr = vec4d_set_d(-sd_fft_lctx_w2s(Q, 2*j+1));         /* -r*w */
-    vec4d fq = vec4d_set_d(-sd_fft_lctx_w2s(Q, j));             /* -w^2 */
+    double rw = UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
+    vec4d fr = vec4d_set_d(rw);                         /* r*w */
+    vec4d fq = vec4d_set_d(Q->w2tab[0+j_bits][j_r]);    /* w^2 */
     vec4d fp_ = vec4d_mulmod2(fr, fq, n, ninv);
-    vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);   /* r*w^3 */
+    vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);       /* r*w^3 */
     ulong i = 0; do {
         vec4d a, b, c, d, u, v, p, q, r;
         a = vec4d_load(X0+i);
@@ -510,12 +515,11 @@ static int radix_4_moth_inv_trunc_block_3_4_1(
         c = vec4d_sub(c, u);
         c = vec4d_mulmod2(c, f3, n, ninv);
         vec4d_store(X0+i, vec4d_add(a, p));
-        vec4d_store(X1+i, vec4d_add(b, q));
-        vec4d_store(X2+i, vec4d_add(c, r));
+        vec4d_store(X1+i, vec4d_sub(b, q));
+        vec4d_store(X2+i, vec4d_sub(c, r));
         vec4d_store(X3+i, vec4d_add(d, p));
     } while (i += 4, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -524,24 +528,27 @@ k = 2, n = 3, z = 4, f = false
 [        2//w           -2//w         0    -w^2]
 [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
 */
-static int radix_4_moth_inv_trunc_block_3_4_0(
+static void radix_4_moth_inv_trunc_block_3_4_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
-    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
+    double W  = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double W2 = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec4d f0 = vec4d_set_d(sd_fft_lctx_w2s(Q, 1));              /* r */
+    vec4d f0 = vec4d_set_d(Q->w2tab[0][1]);         /* r */
     vec4d f1 = vec4d_set_d(twoW);                   /* 2*w^-1 */
     vec4d f2 = vec4d_set_d(2);
     vec4d f3 = vec4d_set_d(W2);                     /* -w^-2 */
-    vec4d fr = vec4d_set_d(sd_fft_lctx_w2s(Q, 2*j+1));          /* r*w */
-    vec4d fq = vec4d_set_d(sd_fft_lctx_w2s(Q, j));              /* w^2 */
+    double rw = UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
+    vec4d fr = vec4d_set_d(rw);                         /* r*w */
+    vec4d fq = vec4d_set_d(Q->w2tab[0+j_bits][j_r]);    /* w^2 */
     vec4d fp_ = vec4d_mulmod2(fr, fq, n, ninv);
-    vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);   /* r*w^3 */
+    vec4d fp = vec4d_reduce_pm1n_to_pmhn(fp_, n);       /* r*w^3 */
     ulong i = 0; do {
         vec4d a, b, c, d, u, v, p, q, r;
         a = vec4d_load(X0+i);
@@ -569,7 +576,6 @@ static int radix_4_moth_inv_trunc_block_3_4_0(
         vec4d_store(X2+i, c);
     } while (i += 4, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -584,20 +590,21 @@ k = 2, n = 3, z = 3, f = true
                          -w^-2*(-r*(x0 - x1) - (x0 + x1) + 2*x2),
                                 -r*(x0 - x1)             +   x2  }
 */
-static int radix_4_moth_inv_trunc_block_3_3_1(
+static void radix_4_moth_inv_trunc_block_3_3_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
-    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
+    double W  = (j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double W2 = (j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec8d f0 = vec8d_set_d(sd_fft_lctx_w2s(Q, 1));  /* r */
-    vec8d f1 = vec8d_set_d(twoW);       /* 2*w^-1 */
+    vec8d f0 = vec8d_set_d(Q->w2tab[0][1]);  /* r */
+    vec8d f1 = vec8d_set_d(twoW);            /* 2*w^-1 */
     vec8d f2 = vec8d_set_d(2);
-    vec8d f3 = vec8d_set_d(W2);         /* -w^-2 */
+    vec8d f3 = vec8d_set_d(W2);              /* -w^-2 */
     ulong i = 0; do {
         vec8d a, b, c, u, v;
         a = vec8d_load(X0+i);
@@ -617,7 +624,6 @@ static int radix_4_moth_inv_trunc_block_3_3_1(
         vec8d_store(X2+i, c);
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -630,24 +636,25 @@ k = 2, n = 3, z = 3, f = false
                     2*w^-1*(x0 - x1),
                      -w^-2*(-r*(x0 - x1) - (x0 + x1) + 2*x2)}
 
-                 = {        2*x2 - r*v0 + u0,
-                    2*w^-1*v0,
-                     -w^-2*(2*x2 - r*v0 - u0)}
+                 = {        2*x2 - r*v + u,
+                    2*w^-1*v,
+                     -w^-2*(2*x2 - r*v - u)}
 */
-static int radix_4_moth_inv_trunc_block_3_3_0(
+static void radix_4_moth_inv_trunc_block_3_3_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
-    double W2 = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, jm);
+    double W  = (j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double W2 = (j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    vec8d f0 = vec8d_set_d(sd_fft_lctx_w2s(Q, 1));  /* r */
-    vec8d f1 = vec8d_set_d(twoW);       /* 2*w^-1 */
+    vec8d f0 = vec8d_set_d(Q->w2tab[0][1]);  /* r */
+    vec8d f1 = vec8d_set_d(twoW);            /* 2*w^-1 */
     vec8d f2 = vec8d_set_d(2);
-    vec8d f3 = vec8d_set_d(W2);         /* -w^-2 */
+    vec8d f3 = vec8d_set_d(W2);              /* -w^-2 */
     ulong i = 0; do {
         vec8d a, b, c, u, v;
         a = vec8d_load(X0+i);
@@ -667,7 +674,6 @@ static int radix_4_moth_inv_trunc_block_3_3_0(
         vec8d_store(X2+i, c);
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -676,21 +682,25 @@ k = 2, n = 2, z = 4, f = true
 [         2//w            -2//w           0          -w^2]
 [1//2*r + 1//2   -1//2*r + 1//2   -1//2*w^2   -1//2*r*w^3]
 */
-static int radix_4_moth_inv_trunc_block_2_4_1(
+static void radix_4_moth_inv_trunc_block_2_4_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
-    double W = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double rw = UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
+    double w = Q->w2tab[j_bits][j_r];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    double rw3 = vec1d_mulmod2(sd_fft_lctx_w2s(Q, j), sd_fft_lctx_w2s(Q, 2*j+1), Q->p, Q->pinv);
+    double rw3 = vec1d_mulmod2(w, rw, Q->p, Q->pinv);
     vec4d f0 = vec4d_set_d(2);
     vec4d f1 = vec4d_set_d(twoW);                                   /* 2*w^-1 */
     vec4d f2 = vec4d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));           /* 1/2 */
-    vec4d f3 = vec4d_set_d(sd_fft_lctx_w2s(Q, 1));                              /* r */
-    vec4d f4 = vec4d_set_d(sd_fft_lctx_w2s(Q, j));                              /* w^2 */
+    vec4d f3 = vec4d_set_d(Q->w2tab[0][1]);                         /* r */
+    vec4d f4 = vec4d_set_d(w);                                      /* w^2 */
     vec4d f5 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(rw3, Q->p));   /* r*w^3 */
     ulong i = 0; do {
         vec4d a, b, u, v, s, t, g, h, p, q, r;
@@ -716,7 +726,6 @@ static int radix_4_moth_inv_trunc_block_2_4_1(
         vec4d_store(X2+i, u);
     } while (i += 4, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -724,16 +733,18 @@ k = 2, n = 2, z = 4, f = false
 [   2       2   -w^2      0]
 [2//w   -2//w      0   -w^2]
 */
-static int radix_4_moth_inv_trunc_block_2_4_0(
+static void radix_4_moth_inv_trunc_block_2_4_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W = UNLIKELY(j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
-    vec8d w2 = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
-    vec8d twowi = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));
+    double wi = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    vec8d w2 = vec8d_set_d(Q->w2tab[j_bits][j_r]);
+    vec8d twowi = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*wi, Q->p));
     ulong i = 0; do {
         vec8d a, b, c, d, u, v;
         a = vec8d_load(X0+i);
@@ -753,7 +764,6 @@ static int radix_4_moth_inv_trunc_block_2_4_0(
         vec8d_store(X1+i, v);
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -764,19 +774,19 @@ k = 2, n = 2, z = 2, f = true
 
 {x0, x1, x2} = {2*(x0 + x1), 2*w^-1*(x0 - x1), (x0+x1)/2 + (x0-x1)*i/2}
 */
-static int radix_4_moth_inv_trunc_block_2_2_1(
+static void radix_4_moth_inv_trunc_block_2_2_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W = (j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W = (j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
     double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
-    double har = vec1d_mulmod2(sd_fft_lctx_w2s(Q, 1), ha, Q->p, Q->pinv);
     vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));  /* 2/w */
     vec8d c2 = vec8d_set_d(ha);                                     /* 1/2 */
-    vec8d c3 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(har, Q->p));   /* r/2 */
+    vec8d c3 = vec8d_set_d(sd_fft_lctx_w2s(Q, 1));                  /* r */
     ulong i = 0; do {
         vec8d u, v, s, t;
         u = vec8d_load(X0+i);
@@ -786,15 +796,14 @@ static int radix_4_moth_inv_trunc_block_2_2_1(
         u = vec8d_add(s, s);
         u = vec8d_reduce_to_pm1n(u, n, ninv);
         v = vec8d_mulmod2(t, c1, n, ninv);
-        s = vec8d_mulmod2(s, c2, n, ninv);
         t = vec8d_mulmod2(t, c3, n, ninv);
         s = vec8d_add(s, t);
+        s = vec8d_mulmod2(s, c2, n, ninv);
         vec8d_store(X0+i, u);
         vec8d_store(X1+i, v);
         vec8d_store(X2+i, s);
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -802,14 +811,15 @@ k = 2, n = 2, z = 2, f = 0
 
 {x0, x1} = {2*(x0 + x1), 2*w^-1*(x0 - x1)}
 */
-static int radix_4_moth_inv_trunc_block_2_2_0(
+static void radix_4_moth_inv_trunc_block_2_2_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    double W = (j == 0) ? -sd_fft_lctx_w2s(Q, 0) : sd_fft_lctx_w2s(Q, 2*jm+1);
+    double W = (j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
     vec8d c0 = vec8d_set_d(2);
     vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));
     ulong i = 0; do {
@@ -824,7 +834,6 @@ static int radix_4_moth_inv_trunc_block_2_2_0(
         vec8d_store(X1+i, v);
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 
@@ -833,17 +842,21 @@ k = 2, n = 1, z = 4, f = true
 [4        -w   -w^2        -w^3]
 [1   -1//2*w      0   -1//2*w^3]
 */
-static int radix_4_moth_inv_trunc_block_1_4_1(
+static void radix_4_moth_inv_trunc_block_1_4_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    double W2 = Q->w2tab[j_bits][j_r];
+    double W  = UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r];
     vec4d n    = vec4d_set_d(Q->p);
     vec4d ninv = vec4d_set_d(Q->pinv);
     vec4d f2 = vec4d_set_d(2);
-    vec4d w2 = vec4d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec4d w2 = vec4d_set_d(W2);
     double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
-    vec4d wo2 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod2(sd_fft_lctx_w2s(Q, 2*j), ha, Q->p, Q->pinv), Q->p));
+    double haW = vec1d_mulmod2(W, ha, Q->p, Q->pinv);
+    vec4d wo2 = vec4d_set_d(vec1d_reduce_pm1n_to_pmhn(haW, Q->p));
     ulong i = 0; do {
         vec4d a, b, c, d, u;
         a = vec4d_load(X0+i);
@@ -863,23 +876,23 @@ static int radix_4_moth_inv_trunc_block_1_4_1(
         vec4d_store(X1+i, b);
     } while (i += 4, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
 k = 2, n = 1, z = 4, f = false
 [4   -w   -w^2   -w^3]
 */
-static int radix_4_moth_inv_trunc_block_1_4_0(
+static void radix_4_moth_inv_trunc_block_1_4_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     vec8d f1 = vec8d_set_d(4.0);
-    vec8d w2 = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
-    vec8d w  = vec8d_set_d(sd_fft_lctx_w2s(Q, 2*j));
+    vec8d w2 = vec8d_set_d(Q->w2tab[0+j_bits][j_r]);
+    vec8d w  = vec8d_set_d(UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r]);
     ulong i = 0; do {
         vec8d a, b, c, d;
         a = vec8d_load(X0+i);
@@ -897,7 +910,6 @@ static int radix_4_moth_inv_trunc_block_1_4_0(
         vec8d_store(X0+i, a);
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
@@ -905,9 +917,9 @@ k = 2, n = 1, z = 1, f = true
 [4]
 [1]
 */
-static int radix_4_moth_inv_trunc_block_1_1_1(
+static void radix_4_moth_inv_trunc_block_1_1_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
@@ -921,16 +933,15 @@ static int radix_4_moth_inv_trunc_block_1_1_1(
         vec8d_store(X1+i, vec8d_reduce_to_pm1n(a, n, ninv));
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
 k = 2, n = 1, z = 1, f = false
 [4]
 */
-static int radix_4_moth_inv_trunc_block_1_1_0(
+static void radix_4_moth_inv_trunc_block_1_1_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
     vec8d n    = vec8d_set_d(Q->p);
@@ -943,23 +954,23 @@ static int radix_4_moth_inv_trunc_block_1_1_0(
         vec8d_store(X0+i, vec8d_reduce_to_pm1n(b, n, ninv));
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /*
 k = 2, n = 0, z = 4, f = true
 [1//4   1//4*w   1//4*w^2   1//4*w^3]
 */
-static int radix_4_moth_inv_trunc_block_0_4_1(
+static void radix_4_moth_inv_trunc_block_0_4_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong jm,
+    ulong j, ulong j_bits,
     double* X0, double* X1, double* X2, double* X3)
 {
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     vec8d one4th = vec8d_set_d(vec1d_fnmadd(0.25, Q->p, 0.25));
-    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, 2*j));
-    vec8d w2 = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d w2 = vec8d_set_d(Q->w2tab[j_bits][j_r]);
+    vec8d w  = vec8d_set_d(UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r]);
     ulong i = 0; do {
         vec8d a, b, c, d;
         a = vec8d_load(X0+i);
@@ -975,7 +986,6 @@ static int radix_4_moth_inv_trunc_block_0_4_1(
         vec8d_store(X0+i, vec8d_mulmod2(a, one4th, n, ninv));
     } while (i += 8, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
-    return 1;
 }
 
 /************************ the recursive stuff ********************************/
@@ -1008,7 +1018,8 @@ void sd_ifft_main_block(
         return;
     }
 
-    ulong jm = j^(n_next_pow2m1(j)>>1);
+    ulong j_bits = n_nbits(j);
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
 
     if (k == 2)
     {
@@ -1016,19 +1027,39 @@ void sd_ifft_main_block(
         double* X1 = sd_fft_ctx_blk_index(d, I + S*1);
         double* X2 = sd_fft_ctx_blk_index(d, I + S*2);
         double* X3 = sd_fft_ctx_blk_index(d, I + S*3);
-        RADIX_4_REVERSE_PARAM(vec8d, Q, j, jm, 1)
-        ulong i = 0; do {
-            RADIX_4_REVERSE_MOTH(vec8d, X0+i, X1+i, X2+i, X3+i);
-        } while(i += 8, i < BLK_SZ);
+        if (UNLIKELY(j == 0))
+        {
+            RADIX_4_REVERSE_PARAM_J_IS_Z(vec8d, Q)
+            ulong i = 0; do {
+                RADIX_4_REVERSE_MOTH_J_IS_Z(vec8d, X0+i, X1+i, X2+i, X3+i);
+            } while(i += 8, i < BLK_SZ);
+        }
+        else
+        {
+            RADIX_4_REVERSE_PARAM_J_IS_NZ(vec8d, Q, j_mr, j_bits)
+            ulong i = 0; do {
+                RADIX_4_REVERSE_MOTH_J_IS_NZ(vec8d, X0+i, X1+i, X2+i, X3+i);
+            } while(i += 8, i < BLK_SZ);
+        }
     }
     else if (k == 1)
     {
         double* X0 = sd_fft_ctx_blk_index(d, I + S*0);
         double* X1 = sd_fft_ctx_blk_index(d, I + S*1);
-        RADIX_2_REVERSE_PARAM(vec8d, Q, j)
-        ulong i = 0; do {
-            RADIX_2_REVERSE_MOTH(vec8d, X0+i, X1+i);
-        } while (i += 8, i < BLK_SZ);
+        if (UNLIKELY(j == 0))
+        {
+            RADIX_2_REVERSE_PARAM_J_IS_Z(vec8d, Q)
+            ulong i = 0; do {
+                RADIX_2_REVERSE_MOTH_J_IS_Z(vec8d, X0+i, X1+i);
+            } while (i += 8, i < BLK_SZ);
+        }
+        else
+        {
+            RADIX_2_REVERSE_PARAM_J_IS_NZ(vec8d, Q, j_mr, j_bits)
+            ulong i = 0; do {
+                RADIX_2_REVERSE_MOTH_J_IS_NZ(vec8d, X0+i, X1+i);
+            } while (i += 8, i < BLK_SZ);
+        }
     }
 }
 
@@ -1106,19 +1137,21 @@ void sd_ifft_trunc_block(
     {
 #define IT(nn, zz, ff) CAT4(radix_4_moth_inv_trunc_block, nn, zz, ff)
 #define LOOKUP_IT(nn, zz, ff) tab[(ulong)(ff) + 2*((zz)-1 + 4*(nn))]
-        static int (*tab[5*4*2])(const sd_fft_lctx_t, ulong, ulong, double*, double*, double*, double*) =
+        static void (*tab[5*4*2])(const sd_fft_lctx_t, ulong, ulong, double*, double*, double*, double*) =
             {IT(0,1,0),IT(0,1,1), IT(0,2,0),IT(0,2,1), IT(0,3,0),IT(0,3,1), IT(0,4,0),IT(0,4,1),
              IT(1,1,0),IT(1,1,1), IT(1,2,0),IT(1,2,1), IT(1,3,0),IT(1,3,1), IT(1,4,0),IT(1,4,1),
              IT(2,1,0),IT(2,1,1), IT(2,2,0),IT(2,2,1), IT(2,3,0),IT(2,3,1), IT(2,4,0),IT(2,4,1),
              IT(3,1,0),IT(3,1,1), IT(3,2,0),IT(3,2,1), IT(3,3,0),IT(3,3,1), IT(3,4,0),IT(3,4,1),
              IT(4,1,0),IT(4,1,1), IT(4,2,0),IT(4,2,1), IT(4,3,0),IT(4,3,1), IT(4,4,0),IT(4,4,1)};
 
-        ulong jm = j^(n_next_pow2m1(j)>>1);
-        if (LOOKUP_IT(n,z,f)(Q, j, jm, sd_fft_ctx_blk_index(d, I + S*0),
-                                       sd_fft_ctx_blk_index(d, I + S*1),
-                                       sd_fft_ctx_blk_index(d, I + S*2),
-                                       sd_fft_ctx_blk_index(d, I + S*3)))
+        static void (*fxn)(const sd_fft_lctx_t, ulong, ulong, double*, double*, double*, double*);
+        fxn = LOOKUP_IT(n,z,f);
+        if (LIKELY(fxn != NULL))
         {
+            fxn(Q, j, n_nbits(j), sd_fft_ctx_blk_index(d, I + S*0),
+                                  sd_fft_ctx_blk_index(d, I + S*1),
+                                  sd_fft_ctx_blk_index(d, I + S*2),
+                                  sd_fft_ctx_blk_index(d, I + S*3));
             return;
         }
 #undef LOOKUP_IT
@@ -1163,13 +1196,13 @@ void sd_ifft_trunc_block(
     {
 #define IT(nn, zz, ff) CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)
 #define LOOKUP_IT(nn, zz, ff) tab[(ulong)(ff) + 2*((zz)-1 + 2*(nn))]
-        static void (*tab[3*2*2])(const sd_fft_lctx_t, ulong, double*, double*) =
+        static void (*tab[3*2*2*2])(const sd_fft_lctx_t, ulong, double*, double*) =
             {IT(0,1,0),IT(0,1,1), IT(0,2,0),IT(0,2,1),
              IT(1,1,0),IT(1,1,1), IT(1,2,0),IT(1,2,1),
              IT(2,1,0),IT(2,1,1), IT(2,2,0),IT(2,2,1)};
 
-        LOOKUP_IT(n,z,f)(Q, j, sd_fft_ctx_blk_index(d, I + S*0),
-                               sd_fft_ctx_blk_index(d, I + S*1));
+        LOOKUP_IT(n, z, f)(Q, j, sd_fft_ctx_blk_index(d, I + S*0),
+                                 sd_fft_ctx_blk_index(d, I + S*1));
         return;
 #undef LOOKUP_IT
 #undef IT

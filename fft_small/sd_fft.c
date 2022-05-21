@@ -203,31 +203,9 @@
 }
 
 /*
-    These functions are disabled because the fft is expected to be produced in
-    the slightly-worse-than-bit-reversed order that basecase_4 produces.
+    The basecases below 4 are disabled because the fft is expected to be
+    produced in the slightly-worse-than-bit-reversed order of basecase_4.
 */
-#if 0
-/* length 1 */
-FLINT_FORCE_INLINE void sd_fft_basecase_0(const sd_fft_lctx_t Q, double* X, ulong j)
-{
-}
-
-/* length 2 */
-FLINT_FORCE_INLINE void sd_fft_basecase_1(const sd_fft_lctx_t Q, double* X, ulong j)
-{
-    RADIX_2_FORWARD_PARAM(vec1d, Q, j)
-    RADIX_2_FORWARD_MOTH(vec1d, X+0, X+1);
-}
-
-/* length 4 */
-FLINT_FORCE_INLINE void sd_fft_basecase_2(const sd_fft_lctx_t Q, double* X, ulong j)
-{
-    RADIX_4_FORWARD_PARAM(vec1d, Q, j)
-    RADIX_4_FORWARD_MOTH(vec1d, X+0, X+1, X+2, X+3);
-}
-#endif
-
-/* length 16 */
 #define DEFINE_IT(j_is_0) \
 FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
     const sd_fft_lctx_t Q, \

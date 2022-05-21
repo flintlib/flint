@@ -102,21 +102,25 @@ void profile_mul(
                 double precomp = 0;
                 if (with_precomp)
                 {
-                    timeit_start(timer);
+                    timeit_start_us(timer);
                     mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
-                    timeit_stop(timer);
+                    timeit_stop_us(timer);
                     precomp = (double)timer->wall;
                     nprecomp_samples++;
                 }
                 ulong nreps = 1 + 20000000/(cn*n_clog2(cn));
-                timeit_start(timer);
+                timeit_start_us(timer);
                 for (ulong rep = 0; rep < nreps; rep++)
                     mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
-                timeit_stop(timer);
-                precomp -= ((double)timer->wall)/nreps;
-                max_precomp = FLINT_MAX(max_precomp, precomp*1e8/(lgcbits*cbits));
-                total_precomp += precomp*1e8/(lgcbits*cbits);
-                double time = ((double)timer->wall)*1e8/(lgcbits*cbits*nreps);
+                timeit_stop_us(timer);
+                double time = ((double)timer->wall)/nreps;
+
+                precomp -= time;
+                precomp = precomp*1e5/(lgcbits*cbits);
+                max_precomp = FLINT_MAX(max_precomp, precomp);
+                total_precomp += precomp;
+
+                time = time*1e5/(lgcbits*cbits);
                 total_time += time;
                 min_time = FLINT_MIN(min_time, time);
                 max_time = FLINT_MAX(max_time, time);
@@ -279,7 +283,11 @@ int main(void)
 {
     mpn_ctx_t R;
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
-    profile_mul(R, 14, 30, 0, 1);
+
+    /* the majority of the precomp is reallocating the temp buffer (2) */
+    mpn_ctx_fit_buffer(R, 1610620928);
+
+    profile_mul(R, 14, 31, 0, 1);
     mpn_ctx_clear(R);
 /*
 flint_printf(" --- gmp --- \n");

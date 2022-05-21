@@ -126,7 +126,7 @@ FLINT_DLL void flint_aligned_free(void* p);
     lookup of small indices, which must currently be at least 4.
 */
 
-#define SD_FFT_CTX_INIT_DEPTH 10
+#define SD_FFT_CTX_INIT_DEPTH 12
 
 /* This context is the one expected to sit in a global position */
 typedef struct {
@@ -294,6 +294,7 @@ typedef mpn_ctx_struct mpn_ctx_t[1];
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
+void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong bn);
 
 #ifdef __cplusplus
