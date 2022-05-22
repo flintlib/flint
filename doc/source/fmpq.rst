@@ -214,6 +214,9 @@ Conversion
     in direction ``rnd``. Returns the sign of the rounding,
     according to MPFR conventions.
 
+    **Note:** Requires that ``mpfr.h`` has been included before any FLINT
+    header is included.
+
 .. function:: char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
               char * fmpq_get_str(char * str, int b, const fmpq_t x)
 
