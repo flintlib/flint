@@ -224,21 +224,40 @@ FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, 
     sd_ifft_trunc(QL, d, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
 }
 
-FLINT_INLINE double sd_fft_lctx_w2s(const sd_fft_lctx_t Q, ulong j)
+/*
+    The bit reversed table is
+        w = {e(0), e(1/2), e(1/4), e(3/4), e(1/8), e(5/8), e(3/8), e(7/8), ...}
+    Only the terms of even index are explicitly stored, and they are split
+    among several tables.
+*/
+
+/* look up w[2*j] */
+FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 {
-    if (j == 0)
-        return Q->w2tab[0][0];
-    ulong n = n_nbits(j);
-    return Q->w2tab[n][j-n_pow2(n-1)];
+    ulong j_bits = n_nbits(j);
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    return Q->w2tab[j_bits][j_r];
 }
 
-
-FLINT_INLINE double sd_fft_ctx_w2s(const sd_fft_ctx_t Q, ulong j)
+/* look up -w[2*j]^-1 */
+FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 {
+    ulong j_bits = n_nbits(j);
+    ulong j_mr = n_pow2(j_bits) - 1 - j;
     if (j == 0)
-        return Q->w2tab[0][0];
-    ulong n = n_nbits(j);
-    return Q->w2tab[n][j-n_pow2(n-1)];
+        return -1.0;
+    else
+        return Q->w2tab[j_bits][j_mr];
+}
+
+/* look up w[jj] */
+FLINT_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
+{
+    ulong j = jj/2;
+    double s = (jj&1) ? -1.0 : 1.0;
+    ulong j_bits = n_nbits(j);
+    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    return s*Q->w2tab[j_bits][j_r];
 }
 
 typedef struct {

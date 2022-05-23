@@ -105,7 +105,7 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
             for (int check_reps = 0; check_reps < 3; check_reps++)
             {
                 i = n_randint(state, otrunc);
-                double point = (i&1) ? -sd_fft_ctx_w2s(Q, i/2) : sd_fft_ctx_w2s(Q, i/2);
+                double point = sd_fft_ctx_w(Q, i);
                 double y = vec1d_eval_poly_mod(X, itrunc, point, Q->p, Q->pinv);
                 if (!vec1d_same_mod(y, sd_fft_ctx_get_fft_index(data, i), Q->p, Q->pinv))
                 {

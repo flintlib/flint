@@ -15,19 +15,18 @@
 #include<stdint.h>
 #include<string.h>
 
-// cmp(a, b*2^e)
+/* cmp(a, b*2^e), a does not have to be normalized */
 int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e)
 {
     ulong q = e/FLINT_BITS;
     ulong r = e%FLINT_BITS;
     ulong x, b0, b1;
 
-    // allow one-off normalized input
-    if (a[an-1] == 0)
+    while (an > 0 && a[an-1] == 0)
         an--;
 
-    FLINT_ASSERT(an > 0);
-    FLINT_ASSERT(a[an-1] != 0);
+    if (an == 0)
+        return b != 0;
 
     // b*2^e = (b*2^r       )*2^(64*q)
     //       = (b0 + b1*2^64)*2^(64*q)
@@ -148,19 +147,6 @@ ulong crt_data_find_bound(const crt_data_t C, ulong bits)
     return bound;    
 }
 
-
-
-
-#if 0
-void profile_entry_init(profile_entry_t P, ulong np_, ulong bits_, ulong bn_bound_, to_ffts_func to_ffts_, from_ffts_func from_ffts_)
-{
-    P->np = np_;
-    P->bits = bits_;
-    P->bn_bound = bn_bound_;
-    P->to_ffts = to_ffts_;
-    P->from_ffts = from_ffts_;
-}
-#endif
 
 
 FLINT_FORCE_INLINE vec4ui vec4d_convert_limited_vec4ui(vec4d a) {
@@ -1227,9 +1213,6 @@ timeit_t timer, timer_overall;
 flint_printf("\n------------ zn = %wu, bits = %wu, np = %wu -------------\n", zn, bits, np);
 #endif
 
-    for (ulong l = 0; l < np; l++)
-        sd_fft_ctx_fit_depth(R->ffts + l, depth);
-
 #if TIME_THIS
 timeit_start(timer_overall);
 #endif
@@ -1258,6 +1241,7 @@ timeit_start(timer);
 
 	for (ulong l = 0; l < np; l++)
     {
+        sd_fft_ctx_fit_depth(R->ffts + l, depth);
         sd_fft_ctx_fft_trunc(R->ffts + l, bbuf + l*stride, depth, btrunc, ztrunc);
         sd_fft_ctx_fft_trunc(R->ffts + l, abuf + l*stride, depth, atrunc, ztrunc);
         ulong t1, thi, tlo;

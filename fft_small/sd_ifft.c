@@ -92,7 +92,7 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2(Q, j));
     vec8d c = vec8d_set_d(2);
     ulong i = 0; do {
         vec8d a, b, u, v;
@@ -117,7 +117,7 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2(Q, j));
     vec8d c = vec8d_set_d(2);
     ulong i = 0; do {
         vec8d a, b, u;
@@ -176,7 +176,7 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    vec8d w = vec8d_set_d(sd_fft_lctx_w2s(Q, j));
+    vec8d w = vec8d_set_d(sd_fft_lctx_w2(Q, j));
     vec8d c = vec8d_set_d(vec1d_fnmadd(0.5, Q->p, 0.5));
     ulong i = 0; do {
         vec8d a, b;
@@ -786,7 +786,7 @@ static void radix_4_moth_inv_trunc_block_2_2_1(
     double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
     vec8d c1 = vec8d_set_d(vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p));  /* 2/w */
     vec8d c2 = vec8d_set_d(ha);                                     /* 1/2 */
-    vec8d c3 = vec8d_set_d(sd_fft_lctx_w2s(Q, 1));                  /* r */
+    vec8d c3 = vec8d_set_d(Q->w2tab[1][0]);                         /* r */
     ulong i = 0; do {
         vec8d u, v, s, t;
         u = vec8d_load(X0+i);
