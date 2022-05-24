@@ -391,6 +391,13 @@ FLINT_FORCE_INLINE vec8d vec8d_set_d(double a) {
     return z;
 }
 
+FLINT_FORCE_INLINE vec8d vec8d_set_d8(double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7) {
+    vec4d z1 = vec4d_set_d4(a0, a1, a2, a3);
+    vec4d z2 = vec4d_set_d4(a4, a5, a6, a7);
+    vec8d z = {z1, z2};
+    return z;
+}
+
 FLINT_FORCE_INLINE vec8d vec8d_load(const double* a) {
     vec8d z = {vec4d_load(a+0), vec4d_load(a+4)};
     return z;

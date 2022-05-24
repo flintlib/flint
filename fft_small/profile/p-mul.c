@@ -108,10 +108,10 @@ void profile_mul(
                     precomp = (double)timer->wall;
                     nprecomp_samples++;
                 }
-                ulong nreps = 1 + 20000000/(cn*n_clog2(cn));
+                ulong nreps = 1 + 30000000/(cn*n_clog2(cn));
                 timeit_start_us(timer);
                 for (ulong rep = 0; rep < nreps; rep++)
-                    mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
+                    /*flint_mpn_mul_fft_main(c, a, an, b, bn);*/mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
                 timeit_stop_us(timer);
                 double time = ((double)timer->wall)/nreps;
 
@@ -187,7 +187,7 @@ void profile_mul_gmp(
             double total_time = 0;
             double max_time = 0;
             double min_time = 1.0e100;
-            for (ulong an = (cn+1)/2; an <= 3*cn/4; an += 1+an/12)
+            for (ulong an = (cn+1)/2; an <= (cn+1)/2/*3*cn/4*/; an += 1+an/12)
             {
                 ulong bn = cn - an;
                 if (!(bn <= an && an < cn))
@@ -205,7 +205,7 @@ void profile_mul_gmp(
                     precomp = (double)timer->wall;
                     nprecomp_samples++;
                 }
-                ulong nreps = 1 + 20000000/(cn*n_clog2(cn));
+                ulong nreps = 1 + 0*20000000/(cn*n_clog2(cn));
                 timeit_start(timer);
                 for (ulong rep = 0; rep < nreps; rep++)
                     mpn_mul(c, a, an, b, bn);
@@ -282,16 +282,27 @@ and at most 0.85/3 = 28.3%
 int main(void)
 {
     mpn_ctx_t R;
+    int cpu_affinities[32];
+    for (int i = 0; i < 32; i++)
+        cpu_affinities[i] = i;
+
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
 
     /* the majority of the precomp is reallocating the temp buffer (2) */
-    mpn_ctx_fit_buffer(R, 1610620928);
+//    mpn_ctx_fit_buffer(R, 1610620928);
 
+flint_printf(" --- fft_small 1 thread  --- \n");
+    flint_set_num_threads(1);
+    profile_mul(R, 14, 20, 0, 1);
+flint_printf(" --- fft_small 8 threads --- \n");
+    flint_set_num_threads(8);
     profile_mul(R, 14, 31, 0, 1);
     mpn_ctx_clear(R);
-/*
+
+#if 0
 flint_printf(" --- gmp --- \n");
-    profile_mul_gmp(15, 31, 0, 0);
-*/
+    profile_mul_gmp(30, 32, 0, 0);
+#endif
+
     return 0;
 }

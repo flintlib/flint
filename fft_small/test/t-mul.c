@@ -90,6 +90,8 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
                 flint_abort();
             }
         }
+
+        flint_set_num_threads(1 + n_randint(state, 10));
     }
 
     flint_free(a);
@@ -113,7 +115,7 @@ int main(void)
     {
         mpn_ctx_t R;
         mpn_ctx_init(R, UWORD(0x0003f00000000001));
-        test_mul(R, 10, 30000, 5000, state);
+        test_mul(R, 10, 30000, 500, state);
         mpn_ctx_clear(R);
     }
 

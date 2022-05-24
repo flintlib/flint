@@ -400,7 +400,7 @@ void sd_fft_main_block(
     ulong k, // BLK_SZ transforms each of length 2^k
     ulong j)
 {
-    if (k > 8)
+    if (k > 4)
     {
         ulong k1 = k/2;
         ulong k2 = k - k1;

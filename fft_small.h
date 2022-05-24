@@ -270,22 +270,33 @@ typedef struct {
 typedef crt_data_struct crt_data_t[1];
 
 typedef void (*to_ffts_func)(
-        sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
-        const ulong* a_, ulong an_, ulong atrunc,
-        const vec4d* two_pow);
+    sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
+    const ulong* a_, ulong an_, ulong atrunc,
+    const vec4d* two_pow,
+    ulong start_easy, ulong stop_easy,
+    ulong start_hard, ulong stop_hard);
 
 typedef void (*from_ffts_func)(
-        ulong* z, ulong zn, ulong zlen,
-        sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
-        crt_data_struct* Qcrts,
-        ulong bits);
+    ulong* z, ulong zn, ulong zlen,
+    sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
+    crt_data_struct* Qcrts,
+    ulong bits);
+
+typedef void (*new_from_ffts_func)(
+    ulong* z, ulong zn, ulong zlen,
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
+    crt_data_struct* Rcrts,
+    ulong bits,
+    ulong start_easy, ulong stop_easy,
+    ulong* overhang);
+
 
 typedef struct {
     ulong np;
     ulong bits;
     ulong bn_bound;
     to_ffts_func to_ffts;
-    from_ffts_func from_ffts;
+    new_from_ffts_func from_ffts;
 } profile_entry_struct;
 
 typedef profile_entry_struct profile_entry_t[1];
@@ -303,6 +314,7 @@ typedef struct {
     sd_fft_ctx_struct ffts[MPN_CTX_NSLOTS];
     crt_data_struct crts[MPN_CTX_NSLOTS];
     vec4dptr_with_length two_powers[MPN_CTX_NSLOTS];
+    double* two_pow_tab[MPN_CTX_NSLOTS];
     profile_entry_struct profiles[MAX_NPROFILES];
     ulong profiles_size;
     void* buffer;
