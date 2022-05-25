@@ -334,7 +334,9 @@ FLINT_DLL void fmpz_get_mpf(mpf_t x, const fmpz_t f);
 
 FLINT_DLL void fmpz_set_mpf(fmpz_t f, const mpf_t x);
 
+#ifdef __MPFR_H
 FLINT_DLL void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
+#endif
 
 FLINT_DLL int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in);
 

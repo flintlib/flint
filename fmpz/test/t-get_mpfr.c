@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <gmp.h>
+#include "mpfr.h"
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

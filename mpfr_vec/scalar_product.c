@@ -16,8 +16,8 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_scalar_product(mpfr_t res, const flint_mpfr * vec1,
-                         const flint_mpfr * vec2, slong length)
+_mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1,
+                         mpfr_srcptr vec2, slong length)
 {
     slong i;
     mpfr_t tmp;

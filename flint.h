@@ -18,7 +18,6 @@
 #include <sys/param.h> /* for BSD define */
 #endif
 #include <gmp.h>
-#include <mpfr.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h> /* for alloca on FreeBSD */
@@ -62,15 +61,8 @@
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
 
-/*
-   Check mpir and mpfr version numbers
-*/
 #if __GNU_MP_VERSION < 5
 #error GMP 5.0.0 or MPIR 2.6.0 or later are required
-#endif
-
-#if MPFR_VERSION_MAJOR < 3
-#error MPFR 3.0.0 or later is required
 #endif
 
 /*
@@ -268,11 +260,6 @@ void flint_rand_free(flint_rand_s * state)
 #define FLINT_TEST_CLEANUP(xxx) \
    flint_randclear(xxx); \
    flint_cleanup_master();
-
-/*
-  We define this here as there is no mpfr.h
- */
-typedef __mpfr_struct flint_mpfr;
 
 #if FLINT_WANT_ASSERT
 #define FLINT_ASSERT(param) assert(param)

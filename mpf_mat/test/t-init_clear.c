@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
+#include "mpfr.h"
 #include "flint.h"
 #include "mpf_mat.h"
 #include "ulong_extras.h"

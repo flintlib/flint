@@ -231,6 +231,9 @@ Conversion
     Sets the value of `x` from `f`, rounded toward the given
     direction ``rnd``.
 
+    **Note:** Requires that ``mpfr.h`` has been included before any FLINT
+    header is included.
+
 .. function:: double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns `f` as a normalized ``double`` along with a `2`-exponent 
