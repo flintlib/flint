@@ -90,7 +90,7 @@ void profile_mul(
             double total_time = 0;
             double max_time = 0;
             double min_time = 1.0e100;
-            for (ulong an = (cn+1)/2; an <= 3*cn/4; an += 1+an/12)
+            for (ulong an = (cn+1)/2; an <= 3*cn/4; an += 1+an/12) /* usually 1+an/12 */
             {
                 ulong bn = cn - an;
                 if (!(bn <= an && an < cn))
@@ -111,7 +111,7 @@ void profile_mul(
                 ulong nreps = 1 + 30000000/(cn*n_clog2(cn));
                 timeit_start_us(timer);
                 for (ulong rep = 0; rep < nreps; rep++)
-                    /*flint_mpn_mul_fft_main(c, a, an, b, bn);*/mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
+                    mpn_ctx_mpn_mul(Q, c, a, an, b, bn);
                 timeit_stop_us(timer);
                 double time = ((double)timer->wall)/nreps;
 
@@ -187,7 +187,7 @@ void profile_mul_gmp(
             double total_time = 0;
             double max_time = 0;
             double min_time = 1.0e100;
-            for (ulong an = (cn+1)/2; an <= (cn+1)/2/*3*cn/4*/; an += 1+an/12)
+            for (ulong an = (cn+1)/2; an <= 3*cn/4; an += 1+an/12)
             {
                 ulong bn = cn - an;
                 if (!(bn <= an && an < cn))
@@ -293,7 +293,8 @@ int main(void)
 
 flint_printf(" --- fft_small 1 thread  --- \n");
     flint_set_num_threads(1);
-    profile_mul(R, 14, 20, 0, 1);
+    profile_mul(R, 14, 31, 0, 1);
+
 flint_printf(" --- fft_small 8 threads --- \n");
     flint_set_num_threads(8);
     profile_mul(R, 14, 31, 0, 1);
@@ -306,3 +307,4 @@ flint_printf(" --- gmp --- \n");
 
     return 0;
 }
+

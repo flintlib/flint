@@ -159,7 +159,7 @@ int main(void)
     {
         sd_fft_ctx_t Q;
         sd_fft_ctx_init_prime(Q, UWORD(0x0003f00000000001));
-        test_v2_fft(Q, 10, 20, 20, state);
+        test_v2_fft(Q, 10, 15, 20, state);
         sd_fft_ctx_clear(Q);
     }
 

@@ -26,6 +26,7 @@
 
 #define FLINT_INLINE static __inline__
 #define FLINT_FORCE_INLINE static __attribute__((always_inline)) __inline__
+#define FLINT_STATIC_NOINLINE static __attribute__((noinline)) 
 
 #define UNLIKELY(x) __builtin_expect((x),0)
 #define LIKELY(x)   __builtin_expect((x),1)
@@ -54,6 +55,56 @@ typedef struct {__m256d e1, e2;} vec8d;
 /* the max native size for this platform */
 #define NATIVE 4
 #define vecNATIVEd vec4d
+
+FLINT_FORCE_INLINE void vec4d_print(vec4d a)
+{
+    flint_printf("{%f, %f, %f, %f}", a[0], a[1], a[2], a[3]);
+}
+
+FLINT_FORCE_INLINE void vec4ui_print(vec4ui a)
+{
+    flint_printf("[hi %016llx_%016llx_%016llx_%016llx lo]",
+        _mm256_extract_epi64(a, 3),
+        _mm256_extract_epi64(a, 2),
+        _mm256_extract_epi64(a, 1),
+        _mm256_extract_epi64(a, 0));
+}
+
+FLINT_FORCE_INLINE vec4ui vec4d_convert_limited_vec4ui(vec4d a) {
+    __m256d t = _mm256_set1_pd(0x0010000000000000);
+    return _mm256_castpd_si256(_mm256_xor_pd(_mm256_add_pd(a, t), t));
+}
+
+
+FLINT_FORCE_INLINE void vec4ui_store_unaligned(ulong* z, vec4ui a) {
+    _mm256_storeu_si256((__m256i*) z, a);
+}
+
+FLINT_FORCE_INLINE vec4d vec4ui_convert_limited_vec4d(vec4ui a) {
+    __m256d t = _mm256_set1_pd(0x0010000000000000);
+    return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
+}
+
+/* !!! the outputs are also permuted !!! */
+FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
+{
+    __m256i mask = _mm256_set1_epi32(0x43300000);
+    __m256i ak0 = _mm256_unpacklo_epi32(a, mask);
+    __m256i ak1 = _mm256_unpackhi_epi32(a, mask);
+    __m256d t = _mm256_set1_pd(0x0010000000000000);
+    vec8d z;
+    z.e1 = _mm256_sub_pd(_mm256_castsi256_pd(ak0), t);
+    z.e2 = _mm256_sub_pd(_mm256_castsi256_pd(ak1), t);
+    return z;
+}
+
+
+#define vec4ui_get_index(a, i) _mm256_extract_epi64(a, i)
+
+FLINT_FORCE_INLINE vec4ui vec4ui_set_ui4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    return _mm256_set_epi64x(a3, a2, a1, a0);
+}
+
 
 
 
