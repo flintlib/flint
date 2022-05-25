@@ -1494,15 +1494,17 @@ const profile_entry_struct* mpn_ctx_best_profile(
     ulong thread_limit = 8;
     ulong zn = an + bn;
 
-    if (zn < n_pow2(16-6))
+    if (zn < 1500)
         thread_limit = 1;
-    else if (zn < n_pow2(17-6))
+    else if (zn < 2000)
+        thread_limit = 2;
+    else if (zn < 3000)
         thread_limit = 4;
-    else if (zn < n_pow2(18-6))
+    else if (zn < 5000)
         thread_limit = 5;
-    else if (zn < n_pow2(19-6))
+    else if (zn < 9000)
         thread_limit = 6;
-    else if (zn < n_pow2(20-6))
+    else if (zn < 16000)
         thread_limit = 7;
 
     *nhandles = flint_request_threads(handles, thread_limit);

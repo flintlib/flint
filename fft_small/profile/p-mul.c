@@ -282,10 +282,11 @@ and at most 0.85/3 = 28.3%
 int main(void)
 {
     mpn_ctx_t R;
+#if 0
     int cpu_affinities[32];
     for (int i = 0; i < 32; i++)
         cpu_affinities[i] = i;
-
+#endif
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
 
     /* the majority of the precomp is reallocating the temp buffer (2) */
