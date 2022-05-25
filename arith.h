@@ -19,7 +19,7 @@
 #endif
 
 #include <gmp.h>
-#include <mpfr.h>
+#include "mpfr.h"
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"

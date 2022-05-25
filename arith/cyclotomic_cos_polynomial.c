@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "mpfr.h"
 #include "arith.h"
 
 #define MAX_32BIT 58

@@ -71,7 +71,7 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
     len1 = len / 2;
     len2 = len - len1;
 
-    nw = flint_request_threads(&threads, 2); /* request one extra worker */
+    nw = flint_request_threads(&threads, FLINT_MIN(nt, 2)); /* request one extra worker */
 
     if (len < 200 || len + bits < 2000 || nw == 0)
     {
@@ -89,6 +89,8 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
         args[1].poly = poly + len1;
         args[1].c = c;
         args[1].len = len2;
+
+        FLINT_ASSERT(nt >= 2);
 
         nw_save = flint_set_num_workers(nt - nt/2 - 1);
         

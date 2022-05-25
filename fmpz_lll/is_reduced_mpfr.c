@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpfr.h"
 #include "fmpz_lll.h"
 #include "mpfr_vec.h"
 #include "mpfr_mat.h"
@@ -23,7 +24,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
         slong i, j, k, m, n;
         mpfr_mat_t A, Q, R, V, Wu, Wd, bound, bound2, bound3, boundt, mm, rm,
             mn, rn, absR;
-        flint_mpfr *du, *dd;
+        mpfr_ptr du, dd;
         mpfr_t s, norm, ti, tj, tmp;
 
         if (B->r == 0 || B->r == 1)
@@ -508,7 +509,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
         slong i, j, k, m, n;
         mpfr_mat_t A, R, V, Wu, Wd, bound, bound2, bound3, boundt, mm, rm,
             mn, rn, absR;
-        flint_mpfr *du, *dd;
+        mpfr_ptr du, dd;
         mpfr_t s, norm, ti, tj, tmp;
 
         if (B->r == 0 || B->r == 1)

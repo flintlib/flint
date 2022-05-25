@@ -15,7 +15,7 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-flint_mpfr *
+mpfr_ptr
 _mpfr_vec_init(slong length, flint_bitcnt_t prec)
 {
     slong i;

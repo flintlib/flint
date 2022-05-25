@@ -17,7 +17,7 @@ BUILD_DIRS = aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor fq_nmod_embed \
    fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor fq_zech_embed \
    fmpz_mod_mat mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly \
-   thread_pool fmpz_mod fmpz_mod_vec fmpz_mod_mpoly fmpz_mod_mpoly_factor \
+   thread_pool thread_support fmpz_mod fmpz_mod_vec fmpz_mod_mpoly fmpz_mod_mpoly_factor \
    n_poly fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor \
    fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor fq_default \
    fq_default_poly fq_default_poly_factor fq_default_mat \
@@ -28,10 +28,10 @@ TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
 
 export
 
-SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c exception.c hashmap.c inlines.c
+SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c exception.c hashmap.c inlines.c
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h thread_support.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
@@ -82,8 +82,8 @@ distclean: clean
 	rm -f flint-config.h config.log fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
-	git archive --format tar --prefix flint-2.8.4/ origin/flint-2.8 > ../flint-2.8.4.tar; gzip ../flint-2.8.4.tar
-	git archive --format zip --prefix flint-2.8.4/ origin/flint-2.8 > ../flint-2.8.4.zip 
+	git archive --format tar --prefix flint-2.10.0/ origin/flint-2.10 > ../flint-2.10.0.tar; gzip ../flint-2.10.0.tar
+	git archive --format zip --prefix flint-2.10.0/ origin/flint-2.10 > ../flint-2.10.0.zip 
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile

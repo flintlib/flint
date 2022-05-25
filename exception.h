@@ -22,6 +22,6 @@ typedef enum
    FLINT_INEXACT /* inexact error */
 } flint_err_t;
 
-FLINT_DLL void flint_throw(flint_err_t exc, const char * msg, ...);
+FLINT_DLL FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);
 
 #endif
