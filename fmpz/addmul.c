@@ -176,16 +176,6 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 		return;
 	}
 
-    if (0)
-    {
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_mul(t, g, h);
-        fmpz_add(f, f, t);
-        fmpz_clear(t);
-        return;
-    }
-
 	/* both g and h are large */
     mf = _fmpz_promote_val(f);
     _flint_mpz_addmul_large(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), 0);
