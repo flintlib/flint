@@ -54,7 +54,7 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, slong len)
 
     arr3 = (mp_limb_t *) flint_malloc((2 * limbs) * sizeof(mp_limb_t));
 
-    mpn_sqr(arr3, arr, limbs);
+    flint_mpn_sqr(arr3, arr, limbs);
 
     if (sign)
         _fmpz_poly_bit_unpack(rop, 2 * len - 1, arr3, bits, 0);

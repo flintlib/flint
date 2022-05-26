@@ -34,6 +34,30 @@ Utility functions
 Multiplication
 --------------------------------------------------------------------------------
 
+.. function:: mp_limb_t flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
+
+    Sets ``(z, xn+yn)`` to the product of ``(x, xn)`` and ``(y, yn)``
+    and returns the top limb of the result.
+    We require `xn \ge yn \ge 1`
+    and that ``z`` is not aliased with either input operand.
+    This function uses FFT multiplication if the operands are large enough
+    and otherwise calls ``mpn_mul``.
+
+.. function:: void flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
+
+    Sets ``z`` to the product of ``(x, n)`` and ``(y, n)``.
+    We require `n \ge 1`
+    and that ``z`` is not aliased with either input operand.
+    This function uses FFT multiplication if the operands are large enough
+    and otherwise calls ``mpn_mul_n``.
+
+.. function:: void flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
+
+    Sets ``z`` to the square of ``(x, n)``.
+    We require `n \ge 1`
+    and that ``z`` is not aliased with either input operand.
+    This function uses FFT multiplication if the operands are large enough
+    and otherwise calls ``mpn_sqr``.
 
 .. function:: mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n)
 
