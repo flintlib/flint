@@ -12,46 +12,56 @@
 #ifndef FLINT_H
 #define FLINT_H
 
+/* External headers ***********************************************************/
+
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#if !defined(_MSC_VER)
-#include <sys/param.h> /* for BSD define */
-#endif
-#include <gmp.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h> /* for alloca on FreeBSD */
-#if (!defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)) || defined(__GNU__)
-/* MinGW and FreeBSD have alloca, but not alloca.h */
-#include <alloca.h>
-#endif
-#if defined(__MINGW32__)
-#include <malloc.h> /* for alloca on MinGW */
-#endif
-#include "limits.h"
-#include "longlong.h"
-#include "flint-config.h"
+#include "gmp.h"
 #undef ulong
 
-#ifdef FLINT_INLINES_C
-#define FLINT_INLINE FLINT_DLL
-#else
-#define FLINT_INLINE static __inline__
-#endif
+/* Internal headers ***********************************************************/
+
+#include "longlong.h"
+#include "flint-config.h"
 
 #if FLINT_USES_GC
-#include "gc.h"
+# include "gc.h"
 #endif
 
 #if FLINT_WANT_ASSERT
-#include <assert.h>
+# include <assert.h>
+#endif
+
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  ifdef __DECC
+#   define alloca(x) __ALLOCA(x)
+#  else
+#   ifdef _MSC_VER
+#    include <malloc.h>
+#    define alloca _alloca
+#   else
+#    if HAVE_ALLOCA_H
+#     include <alloca.h>
+#    else
+#     if defined (_AIX) || defined (_IBMR2)
+#      pragma alloca
+#     else
+#      error Could not find alloca, which is required for FLINT
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-/* flint version number */
+/* FLINT version number *******************************************************/
 
 #define __FLINT_VERSION 2
 #define __FLINT_VERSION_MINOR 10
@@ -62,17 +72,52 @@
                          __FLINT_VERSION_PATCHLEVEL)
 
 #if __GNU_MP_VERSION < 5
-#error GMP 5.0.0 or MPIR 2.6.0 or later are required
+# error GMP 5.0.0 or MPIR 2.6.0 or later are required
 #endif
+
+/* Internals ******************************************************************/
 
 /*
    We define alternative key words for "asm" and "inline", allowing
    the code to be compiled with the "-ansi" flag under GCC
  */
 #ifndef __GNUC__
-    #define __asm__     asm
-    #define __inline__  inline
+# define __asm__     asm
+# define __inline__  inline
 #endif
+
+#ifdef FLINT_INLINES_C
+# define FLINT_INLINE FLINT_DLL
+#else
+# define FLINT_INLINE static __inline__
+#endif
+
+/* If user has provided FILE, then we provide related functions. */
+#if defined (FILE)                  \
+  || defined (H_STDIO)              \
+  || defined (_H_STDIO)             \
+  || defined (_STDIO_H)             \
+  || defined (_STDIO_H_)            \
+  || defined (__STDIO_H)            \
+  || defined (__STDIO_H__)          \
+  || defined (_STDIO_INCLUDED)      \
+  || defined (__dj_include_stdio_h_)\
+  || defined (_FILE_DEFINED)        \
+  || defined (__STDIO__)            \
+  || defined (_MSL_STDIO_H)         \
+  || defined (_STDIO_H_INCLUDED)    \
+  || defined (_ISO_STDIO_ISO_H)     \
+  || defined (__STDIO_LOADED)       \
+  || defined (_STDIO)               \
+  || defined (__DEFINED_FILE)       
+# define _FLINT_HAVE_FILE 1
+#endif
+
+/* If user has provided va_list, then we provide related functions. */
+#ifdef va_start
+#define _FLINT_HAVE_VA_LIST 1
+#endif
+
 
 extern char flint_version[];
 
@@ -105,41 +150,6 @@ FLINT_DLL void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 
 FLINT_DLL FLINT_NORETURN void flint_abort(void);
 FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
-  /* flint_abort is calling abort by default
-   * if flint_set_abort is used, then instead of abort this function
-   * is called. EXPERIMENTALLY use at your own risk!
-   * May disappear in future versions.
-   */
-
-
-#if defined(_WIN64) || defined(__mips64)
-#if defined(__MINGW64__)
-#define WORD_FMT "%I64"
-#define WORD_WIDTH_FMT "%*I64"
-#else
-#define WORD_FMT "%ll"
-#define WORD_WIDTH_FMT "%*ll"
-#endif
-#define WORD(xx) (xx##LL)
-#define UWORD(xx) (xx##ULL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULLONG_MAX
-#define UWORD_MIN ULLONG_MIN
-#define WORD_MAX LLONG_MAX
-#define WORD_MIN LLONG_MIN
-#endif
-#else
-#define WORD_FMT "%l"
-#define WORD_WIDTH_FMT "%*l"
-#define WORD(xx) (xx##L)
-#define UWORD(xx) (xx##UL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULONG_MAX
-#define UWORD_MIN ULONG_MIN
-#define WORD_MAX LONG_MAX
-#define WORD_MIN LONG_MIN
-#endif
-#endif
 
 #if GMP_LIMB_BITS == 64
     #define FLINT_BITS 64
@@ -148,6 +158,35 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 #else
     #define FLINT_BITS 32
     #define FLINT_D_BITS 31
+#endif
+
+#if defined(_WIN64) || defined(__mips64)
+# if defined(__MINGW64__)
+#  define WORD_FMT "%I64"
+#  define WORD_WIDTH_FMT "%*I64"
+# else
+#  define WORD_FMT "%ll"
+#  define WORD_WIDTH_FMT "%*ll"
+# endif
+# define WORD(xx) (xx##LL)
+# define UWORD(xx) (xx##ULL)
+#else
+# define WORD_FMT "%l"
+# define WORD_WIDTH_FMT "%*l"
+# define WORD(xx) (xx##L)
+# define UWORD(xx) (xx##UL)
+#endif
+
+#ifndef FLINT_NO_WORDMAC
+# if FLINT64
+#  define UWORD_MAX UWORD(18446744073709551615)
+#  define WORD_MAX   WORD(9223372036854775807)
+# else
+#  define UWORD_MAX UWORD(4294967295)
+#  define WORD_MAX   WORD(2147483647)
+# endif
+# define UWORD_MIN UWORD(0)
+# define WORD_MIN  (-WORD_MAX - WORD(1))
 #endif
 
 #define flint_bitcnt_t ulong
@@ -270,11 +309,7 @@ void flint_rand_free(flint_rand_s * state)
 #if defined(__GNUC__)
 #define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 #define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
-#if __GNUC__ >= 4
 #define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
-#else
-#define FLINT_WARN_UNUSED
-#endif
 #else
 #define __attribute__(x)
 #define FLINT_UNUSED(x) x
@@ -467,13 +502,19 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
 FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */
-FLINT_DLL int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
-FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
-FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
-
 FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
-FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+
+FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+
+#if _FLINT_HAVE_FILE
+FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+#endif
+
+#if _FLINT_HAVE_VA_LIST
+FLINT_DLL int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
+#endif
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {
