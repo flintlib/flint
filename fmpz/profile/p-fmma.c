@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint/flint.h"
-#include "flint/fmpz.h"
-#include "flint/profiler.h"
+#include "flint.h"
+#include "fmpz.h"
+#include "profiler.h"
 
 void
 fmpz_fmma_old(fmpz_t f, const fmpz_t a, const fmpz_t b,

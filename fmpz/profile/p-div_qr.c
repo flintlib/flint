@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint/flint.h"
-#include "flint/fmpz.h"
-#include "flint/fmpz_vec.h"
-#include "flint/profiler.h"
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "profiler.h"
 
 void sample_ndiv_qr(void * arg, ulong count)
 {

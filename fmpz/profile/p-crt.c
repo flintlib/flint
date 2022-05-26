@@ -1,5 +1,5 @@
-#include "flint/fmpz.h"
-#include "flint/profiler.h"
+#include "fmpz.h"
+#include "profiler.h"
 
 void
 _fmpz_crt_combine(fmpz_t r1r2, fmpz_t m1m2, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2)
