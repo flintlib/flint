@@ -14,6 +14,10 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+/* defined in addmul.c */
+void
+_flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate);
+
 void
 fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
@@ -38,7 +42,7 @@ fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         else                    /* both g and h are large */
         {
             __mpz_struct * mf = _fmpz_promote_val(f);
-            mpz_submul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            _flint_mpz_addmul_large(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), 1);
             _fmpz_demote_val(f);    /* cancellation may have occurred */
         }
     }
