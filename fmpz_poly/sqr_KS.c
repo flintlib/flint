@@ -16,6 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpn_extras.h"
 
 void
 _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, slong len)
