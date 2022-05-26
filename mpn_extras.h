@@ -73,7 +73,7 @@
 #define FLINT_FFT_MUL_THRESHOLD 32000
 
 /* Defined in fft.h */
-void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
+FLINT_DLL void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2);
 
 MPN_EXTRAS_INLINE mp_limb_t
