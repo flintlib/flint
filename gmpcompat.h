@@ -769,7 +769,7 @@ void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 static __inline__
 void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
-   if (n >= (UWORD(1) << 32)) {
+   if (n >= (UWORD(1) << 32))
       flint_throw(FLINT_ERROR, "n too large in flint_mpz_fib_ui\n");
    
    mpz_fib_ui(r, (unsigned long) n);
