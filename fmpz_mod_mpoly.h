@@ -203,15 +203,10 @@ FLINT_DLL char * fmpz_mod_mpoly_get_str_pretty(const fmpz_mod_mpoly_t A,
 #if _FLINT_HAVE_FILE
 FLINT_DLL int fmpz_mod_mpoly_fprint_pretty(FILE * file,
     const fmpz_mod_mpoly_t A, const char ** x, const fmpz_mod_mpoly_ctx_t ctx);
-
-FMPZ_MOD_MPOLY_INLINE
-int fmpz_mod_mpoly_print_pretty(const fmpz_mod_mpoly_t A,
-                               const char ** x, const fmpz_mod_mpoly_ctx_t ctx)
-{
-   return fmpz_mod_mpoly_fprint_pretty(stdout, A, x, ctx);
-}
 #endif
 
+FLINT_DLL int fmpz_mod_mpoly_print_pretty(const fmpz_mod_mpoly_t A,
+                               const char ** x, const fmpz_mod_mpoly_ctx_t ctx);
 
 /*  Basic manipulation *******************************************************/
 
