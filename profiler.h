@@ -234,6 +234,12 @@ FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, vo
         TIMEIT_PRINT(__timer, __reps) \
     } while (0);
 
+#define TIMEIT_STOP_VALUES(tcpu, twall) \
+        TIMEIT_END_REPEAT(__timer, __reps) \
+        (tcpu) = __timer->cpu*0.001 / __reps; \
+        (twall) = __timer->wall*0.001 / __reps; \
+    } while (0);
+
 #define TIMEIT_ONCE_START \
     do \
     { \
