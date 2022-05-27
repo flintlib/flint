@@ -18,14 +18,6 @@
 #define N_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "nmod_poly.h"
 #include "fq_nmod_poly.h"
 
 #ifdef __cplusplus
@@ -741,10 +733,12 @@ FLINT_DLL char * n_fq_get_str_pretty(
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int n_fq_fprint_pretty(
     FILE * file,
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
+#endif
 
 FLINT_DLL void n_fq_print_pretty(
     const mp_limb_t * a,

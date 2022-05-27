@@ -1195,6 +1195,7 @@ FLINT_DLL void TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(
 
 /*  Input and output  ********************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _TEMPLATE(T, poly_fprint_pretty)(FILE *file,
                                  const TEMPLATE(T, struct) *poly, slong len,
                                  const char *x,
@@ -1242,6 +1243,7 @@ TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly,
 {
     return TEMPLATE(T, poly_fprint_pretty)(stdout, poly, x, ctx);
 }
+#endif
 
 FLINT_DLL char * _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len,
                                   const char *x,

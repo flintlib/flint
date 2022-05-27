@@ -18,15 +18,11 @@
 #define NMOD_POLY_MAT_INLINE static __inline__
 #endif
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Types *********************************************************************/

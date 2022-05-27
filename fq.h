@@ -23,8 +23,6 @@
 #endif
 
 #include "fmpz_mod_poly.h"
-#include "fmpz_mod_mat.h"
-#include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
 
@@ -93,11 +91,12 @@ FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
     fmpz_pow_ui(f, fq_ctx_prime(ctx), fq_ctx_degree(ctx));
 }
 
+#if _FLINT_HAVE_FILE
 FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 {
     int r;
 
-    r = flint_fprintf(file, "p = ");
+    r = fprintf(file, "p = ");
     if (r <= 0)
         return r;
 
@@ -105,11 +104,11 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "\nd = %wd\n", fq_ctx_degree(ctx));
+    r = fprintf(file, "\nd = " WORD_FMT "d\n", fq_ctx_degree(ctx));
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "f(X) = ");
+    r = fprintf(file, "f(X) = ");
     if (r <= 0)
         return r;
 
@@ -117,7 +116,7 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "\n");
+    r = fprintf(file, "\n");
 
     return r;
 }
@@ -126,7 +125,7 @@ FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 {
     fq_ctx_fprint(stdout, ctx);
 }
-
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -355,6 +354,7 @@ FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b,
 
 /* Output ********************************************************************/
 
+#if _FLINT_HAVE_FILE
 FQ_INLINE
 int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
@@ -378,6 +378,7 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_print_pretty(op, ctx->var);
 }
+#endif
 
 FLINT_DLL char * fq_get_str(const fq_t op, const fq_ctx_t ctx);
 
@@ -428,4 +429,3 @@ FLINT_DLL void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx);
 #endif
 
 #endif
-

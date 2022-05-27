@@ -9,13 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "aprcl.h"
 
 void
 unity_zp_print(const unity_zp f)
 {
-    flint_printf("p = %wu; exp = %wu\n", f->p, f->exp);
+    printf("p = " WORD_FMT "u; exp = " WORD_FMT "u\n", f->p, f->exp);
     fmpz_mod_poly_print(f->poly, f->ctx);
-    flint_printf("\n");
+    printf("\n");
 }
-

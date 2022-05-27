@@ -12,14 +12,10 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-/* External headers ***********************************************************/
-
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include "gmp.h"
 #undef ulong
-
-/* Internal headers ***********************************************************/
 
 #include "longlong.h"
 #include "flint-config.h"
@@ -175,6 +171,7 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 # define WORD_WIDTH_FMT "%*l"
 # define WORD(xx) (xx##L)
 # define UWORD(xx) (xx##UL)
+# define _FLINT_LONGSLONG
 #endif
 
 #ifndef FLINT_NO_WORDMAC
@@ -192,20 +189,19 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 #define flint_bitcnt_t ulong
 
 #if FLINT_USES_TLS
-#if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-/* GCC 4.7, 4.8 with -std=gnu11 purport to support C11 via __STDC_VERSION__ but lack _Thread_local */
-#define FLINT_TLS_PREFIX __thread
-#elif __STDC_VERSION__ >= 201112L
-#define FLINT_TLS_PREFIX _Thread_local
-#elif defined(_MSC_VER)
-#define FLINT_TLS_PREFIX __declspec(thread)
-#elif defined(__GNUC__)
-#define FLINT_TLS_PREFIX __thread
+# if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#  define FLINT_TLS_PREFIX __thread
+# elif __STDC_VERSION__ >= 201112L
+#  define FLINT_TLS_PREFIX _Thread_local
+# elif defined(_MSC_VER)
+#  define FLINT_TLS_PREFIX __declspec(thread)
+# elif defined(__GNUC__)
+#  define FLINT_TLS_PREFIX __thread
+# else
+#  error "thread local prefix defined in C11 or later"
+# endif
 #else
-#error "thread local prefix defined in C11 or later"
-#endif
-#else
-#define FLINT_TLS_PREFIX
+# define FLINT_TLS_PREFIX
 #endif
 
 FLINT_DLL int flint_get_num_threads(void);
@@ -286,9 +282,9 @@ void flint_rand_free(flint_rand_s * state)
 }
 
 #if FLINT_USES_GC
-#define FLINT_GC_INIT() GC_init()
+# define FLINT_GC_INIT() GC_init()
 #else
-#define FLINT_GC_INIT()
+# define FLINT_GC_INIT()
 #endif
 
 #define FLINT_TEST_INIT(xxx) \
@@ -301,20 +297,20 @@ void flint_rand_free(flint_rand_s * state)
    flint_cleanup_master();
 
 #if FLINT_WANT_ASSERT
-#define FLINT_ASSERT(param) assert(param)
+# define FLINT_ASSERT(param) assert(param)
 #else
-#define FLINT_ASSERT(param)
+# define FLINT_ASSERT(param)
 #endif
 
 #if defined(__GNUC__)
-#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
-#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
+# define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+# define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
+# define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 #else
-#define __attribute__(x)
-#define FLINT_UNUSED(x) x
-#define FLINT_SET_BUT_UNUSED(x) x
-#define FLINT_WARN_UNUSED
+# define __attribute__(x)
+# define FLINT_UNUSED(x) x
+# define FLINT_SET_BUT_UNUSED(x) x
+# define FLINT_WARN_UNUSED
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
@@ -429,13 +425,13 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
    __tmp_root = NULL
 
 #if FLINT_WANT_ASSERT
-#define TMP_ALLOC(size) \
+# define TMP_ALLOC(size) \
    (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
        __tmp_root = __tpx, \
        __tpx->block = flint_malloc(size))
 #else
-#define TMP_ALLOC(size) \
+# define TMP_ALLOC(size) \
    (((size) > 8192) ? \
       (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
@@ -454,11 +450,11 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 
 /* compatibility between gmp and mpir */
 #ifndef mpn_com_n
-#define mpn_com_n mpn_com
+# define mpn_com_n mpn_com
 #endif
 
 #ifndef mpn_neg_n
-#define mpn_neg_n mpn_neg
+# define mpn_neg_n mpn_neg
 #endif
 
 #ifndef mpn_tdiv_q
@@ -529,8 +525,8 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
     return lo;
 }
 
-#include "gmpcompat.h"
 #include "exception.h"
+#include "gmpcompat.h"
 
 #ifdef __cplusplus
 }

@@ -19,15 +19,8 @@
 #define FMPZ_MOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz_factor.h"
+#include "fmpz_mod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -104,29 +97,6 @@ FLINT_DLL void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
 
 FLINT_DLL void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp,
                                                      const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac, 
-                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p);
-
-FLINT_DLL int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, 
-                                    const fmpz * f, slong len, const fmpz_t p);
-
-FLINT_DLL int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int fmpz_mod_poly_is_squarefree_f(fmpz_t fac,
-                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
                        flint_rand_t state, const fmpz_mod_poly_t pol, slong d,

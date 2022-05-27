@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "fmpz.h"
+#include "fmpz_factor.h"
+#include "fmpz_mat.h"
 
 void
 fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
@@ -22,10 +23,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 
     n = mat->r;
     if (n != mat->c)
-    {
-        flint_printf("Exception (fmpz_mat_randdet). Non-square matrix.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Non-square matrix in fmpz_mat_randdet\n");
 
     if (n < 1)
         return;

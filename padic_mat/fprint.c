@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "padic_mat.h"
 
 int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
@@ -19,7 +22,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
     if (padic_mat_is_empty(A))
     {
-        flint_fprintf(file, "%wd %wd\n", r, c);
+        fprintf(file, WORD_FMT "d " WORD_FMT "d\n", r, c);
         return 1;
     }
 
@@ -31,16 +34,16 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
         fmpz_init(s);
         fmpz_init(t);
 
-        flint_fprintf(file, "%wd %wd ", r, c);
+        fprintf(file, WORD_FMT "d " WORD_FMT "d ", r, c);
 
         for (i = 0; i < r; i++)
             for (j = 0; j < c; j++)
             {
-                flint_fprintf(file, " ");
+                fprintf(file, " ");
 
                 if (fmpz_is_zero(padic_mat_entry(A, i, j)))
                 {
-                    flint_fprintf(file, "0");
+                    fprintf(file, "0");
                 }
                 else
                 {
@@ -69,10 +72,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
         fmpz_clear(t);
     }
     else if (ctx->mode == PADIC_SERIES)
-    {
-        flint_printf("ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "(_padic_mat_fprint)  Mode PADIC_SERIES not implemented yet\n");
     else if (ctx->mode == PADIC_VAL_UNIT)
     {
         slong i, j, v;
@@ -80,16 +80,16 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
         fmpz_init(t);
 
-        flint_fprintf(file, "%wd %wd ", r, c);
+        fprintf(file, WORD_FMT "d " WORD_FMT "d ", r, c);
 
         for (i = 0; i < r; i++)
             for (j = 0; j < c; j++)
             {
-                flint_fprintf(file, " ");
+                fprintf(file, " ");
 
                 if (fmpz_is_zero(padic_mat_entry(A, i, j)))
                 {
-                    flint_fprintf(file, "0");
+                    fprintf(file, "0");
                 }
                 else
                 {
@@ -103,13 +103,13 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
                     else if (v == 1)
                     {
                         fmpz_fprint(file, ctx->p);
-                        flint_fprintf(file, "*");
+                        fprintf(file, "*");
                         fmpz_fprint(file, t);
                     }
                     else
                     {
                         fmpz_fprint(file, ctx->p);
-                        flint_fprintf(file, "^%wd*", v);
+                        fprintf(file, "^" WORD_FMT "d*", v);
                         fmpz_fprint(file, t);
                     }
                 }
@@ -118,11 +118,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
         fmpz_clear(t);
     }
     else
-    {
-        flint_printf("ERROR (_padic_mat_fprint).  Unknown print mode.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "(_padic_mat_fprint)  Unknown print mode\n");
 
     return 1;
 }
-

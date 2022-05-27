@@ -18,14 +18,6 @@
 #define FMPQ_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
 #include "fmpq_poly.h"
 #include "fmpz_mpoly.h"
 
@@ -193,6 +185,7 @@ FLINT_DLL int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str,
 FLINT_DLL char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x, const fmpq_mpoly_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int fmpq_mpoly_fprint_pretty(FILE * file, 
             const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
 
@@ -202,7 +195,7 @@ int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A,
 {
     return fmpq_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
-
+#endif
 
 /*  Basic manipulation *******************************************************/
 
@@ -898,6 +891,7 @@ void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c,
 
 ******************************************************************************/
 
+#if _FLINT_HAVE_FILE
 /*
    test that r is a valid remainder upon division by g over Q
    this means that no term of r is divisible by lt(g)
@@ -908,8 +902,7 @@ void fmpq_mpoly_remainder_test(const fmpq_mpoly_t r, const fmpq_mpoly_t g,
 {
     fmpz_mpoly_remainder_strongtest(r->zpoly, g->zpoly, ctx->zctx);
 }
-
-
+#endif
 
 #ifdef __cplusplus
 }

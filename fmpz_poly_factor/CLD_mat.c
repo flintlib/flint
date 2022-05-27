@@ -10,14 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_mat.h"
-
-#include "fmpz_mod_poly.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <math.h>
+#undef ulong
+#include "fmpz_mod_poly_factor.h"
 
 slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
                               fmpz_poly_factor_t lifted_fac, fmpz_t P, ulong k)

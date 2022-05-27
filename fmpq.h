@@ -19,17 +19,8 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-
 
 #ifdef __cplusplus
  extern "C" {
@@ -207,6 +198,7 @@ FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t
 
 FLINT_DLL char * fmpq_get_str(char * str, int b, const fmpq_t x);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL int fmpq_fprint(FILE * file, const fmpq_t x);
@@ -220,6 +212,7 @@ FMPQ_INLINE int fmpq_print(const fmpq_t x)
 {
     return fmpq_fprint(stdout, x);
 }
+#endif
 
 FLINT_DLL void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits);
 

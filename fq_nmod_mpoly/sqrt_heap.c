@@ -9,6 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <math.h>
+#undef ulong
 #include "fq_nmod_mpoly.h"
 
 /* try to prove that A is not a square */

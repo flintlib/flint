@@ -19,11 +19,6 @@
 #define FQ_DEFAULT_POLY_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fq.h"
-#include "fq_nmod.h"
-#include "fq_zech.h"
 #include "fq_default.h"
 #include "fq_poly.h"
 #include "fq_nmod_poly.h"
@@ -2135,6 +2130,7 @@ void fq_default_poly_compose_mod(fq_default_poly_t res,
 
 /*  Input and output  ********************************************************/
 
+#if _FLINT_HAVE_FILE
 FQ_DEFAULT_POLY_INLINE int fq_default_poly_fprint_pretty(FILE * file,
                              const fq_default_poly_t poly, const char *x,
                                                     const fq_default_ctx_t ctx)
@@ -2240,6 +2236,7 @@ fq_default_poly_print_pretty(const fq_default_poly_t poly,
         return fq_poly_print_pretty(poly->fq, x, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_POLY_INLINE
 char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly,

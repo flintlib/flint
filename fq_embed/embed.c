@@ -10,7 +10,7 @@
 */
 
 #include "fq_embed.h"
-#include "fq_poly.h"
+#include "fq_poly_factor.h"
 
 #ifdef T
 #undef T

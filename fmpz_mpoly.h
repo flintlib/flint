@@ -19,22 +19,8 @@
 #define FMPZ_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "mpoly.h"
-#include "nmod_mpoly.h"
 #include "fmpz_mod.h"
-#include "n_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -224,6 +210,7 @@ FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
 FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
@@ -245,6 +232,7 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
 {
    return fmpz_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
+#endif
 
 
 /*  Basic manipulation *******************************************************/
@@ -1465,6 +1453,7 @@ void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
 
 ******************************************************************************/
 
+#if _FLINT_HAVE_FILE
 /*
    test that r is a valid remainder upon division by g
    this means that if c*x^a is a term of r and x^a is divisible by the leading
@@ -1572,6 +1561,7 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
     flint_free(rexp);
     flint_free(gexp);
 }
+#endif
 
 #ifdef __cplusplus
 }

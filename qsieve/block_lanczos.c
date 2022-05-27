@@ -21,6 +21,20 @@ benefit from your work.
 --------------------------------------------------------------------*/
 
 
+#ifndef memcpy
+# ifdef __GNUC__
+#  define memcpy __builtin_memcpy
+# else
+#  include <string.h>
+# endif
+#endif
+#ifndef memset
+# ifdef __GNUC__
+#  define memset __builtin_memset
+# else
+#  include <string.h>
+# endif
+#endif
 #include "qsieve.h"
 
 #define BIT(x) (((uint64_t)(1)) << (x))

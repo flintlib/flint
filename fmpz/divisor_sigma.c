@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_factor.h"
 #include "fmpz_vec.h"
 
 void

@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly_factor.h"
 #include "long_extras.h"
-
+#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_mpoly_factor.h"
 
 static slong _deflate(
     fq_nmod_mpoly_t A,

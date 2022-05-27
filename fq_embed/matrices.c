@@ -10,7 +10,6 @@
 */
 
 #include "fq_embed.h"
-#include "fq_poly.h"
 
 
 void fq_embed_mono_to_dual_matrix(fmpz_mod_mat_t res, const fq_ctx_t ctx)

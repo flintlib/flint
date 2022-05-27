@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
+#include "fmpz_factor.h"
 
 void
 fmpz_factor(fmpz_factor_t factor, const fmpz_t n)

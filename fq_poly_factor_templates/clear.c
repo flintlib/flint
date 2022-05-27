@@ -18,7 +18,6 @@
 
 #include "templates.h"
 
-#include "flint.h"
 void
 TEMPLATE(T, poly_factor_clear) (TEMPLATE(T, poly_factor_t) fac,
                                 const TEMPLATE(T, ctx_t) ctx)

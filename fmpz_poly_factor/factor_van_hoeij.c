@@ -10,10 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_mat.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <math.h>
+#undef ulong
 #include "fmpz_lll.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f, 
                                                             slong r, ulong p)

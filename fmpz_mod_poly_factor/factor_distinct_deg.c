@@ -13,17 +13,10 @@
 */
 
 #undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <math.h>
-
 #undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 /* the degrees are written as exponents of the corresponding factors */
 void fmpz_mod_poly_factor_distinct_deg_with_frob(

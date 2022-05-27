@@ -18,20 +18,7 @@
 #define PADIC_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -344,6 +331,7 @@ FLINT_DLL char * _padic_get_str(char * str, const padic_t op, const fmpz_t p, en
 
 FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
 
 FLINT_DLL int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
@@ -361,10 +349,11 @@ PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 PADIC_INLINE void padic_debug(const padic_t op)
 {
-    flint_printf("(");
+    printf("(");
     fmpz_print(padic_unit(op)); 
-    flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
+    printf(" " WORD_FMT "d " WORD_FMT "d)", padic_val(op), padic_prec(op));
 }
+#endif
 
 #ifdef __cplusplus
 }

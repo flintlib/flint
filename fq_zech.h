@@ -105,6 +105,7 @@ fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 
 #define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
 
+#if _FLINT_HAVE_FILE
 FQ_ZECH_INLINE int
 fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
 {
@@ -120,6 +121,7 @@ fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 {
     fq_zech_ctx_fprint(stdout, ctx);
 }
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -305,6 +307,8 @@ FLINT_DLL void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
 
 
 /* Output ********************************************************************/
+
+#if _FLINT_HAVE_FILE
 FQ_ZECH_INLINE int
 fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
@@ -328,6 +332,7 @@ fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     fq_zech_fprint(stdout, op, ctx);
 }
+#endif
 
 FLINT_DLL char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
 

@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 #include "qadic.h"
 
 /*

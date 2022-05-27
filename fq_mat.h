@@ -20,8 +20,6 @@
 #define FQ_MAT_INLINE static __inline__
 #endif
 
-
-#include "fq.h"
 #include "fq_vec.h"
 
 /* Cutoff between classical and recursive triangular solving */

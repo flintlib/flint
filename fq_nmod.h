@@ -23,8 +23,6 @@
 #endif
 
 #include "nmod_poly.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
@@ -92,6 +90,7 @@ FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
     fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
 }
 
+#if _FLINT_HAVE_FILE
 /* TODO */
 FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
 {
@@ -152,6 +151,7 @@ FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
 {
     fq_nmod_ctx_fprint(stdout, ctx);
 }
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -396,15 +396,16 @@ FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 /* Output ********************************************************************/
 
 FQ_NMOD_INLINE 
-int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
-{
-    return nmod_poly_fprint(file, op);
-}
-
-FQ_NMOD_INLINE 
 void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print(op);
+}
+
+#if _FLINT_HAVE_FILE
+FQ_NMOD_INLINE 
+int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+{
+    return nmod_poly_fprint(file, op);
 }
 
 FQ_NMOD_INLINE 
@@ -418,6 +419,7 @@ void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print_pretty(op, ctx->var);
 }
+#endif
 
 FLINT_DLL char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
@@ -469,4 +471,3 @@ FLINT_DLL void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx);
 #endif
 
 #endif
-

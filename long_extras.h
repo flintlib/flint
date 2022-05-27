@@ -18,9 +18,7 @@
 #define LONG_EXTRAS_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
-#include "longlong.h"
 
 #ifdef __cplusplus
  extern "C" {

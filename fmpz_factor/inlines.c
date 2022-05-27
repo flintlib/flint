@@ -11,13 +11,7 @@
 
 #define FMPZ_FACTOR_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz_factor.h"
 
 void fmpz_factor_get_fmpz(fmpz_t z, const fmpz_factor_t factor, slong i)
 {

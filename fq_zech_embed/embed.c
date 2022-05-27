@@ -10,7 +10,7 @@
 */
 
 #include "fq_zech_embed.h"
-#include "fq_zech_poly.h"
+#include "fq_zech_poly_factor.h"
 
 #ifdef T
 #undef T

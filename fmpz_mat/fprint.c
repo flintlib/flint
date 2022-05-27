@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mat.h"
 
 /*
@@ -31,7 +32,7 @@ do {                       \
 
 #define xxx_flint_printf()                       \
 do {                                       \
-    z = flint_fprintf(file, "%li %li  ", r, c);  \
+    z = fprintf(file, WORD_FMT "d " WORD_FMT "d  ", r, c);  \
     if (z <= 0)                            \
         return z;                          \
 } while (0)
@@ -94,4 +95,3 @@ int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 #undef xxx_putc
 #undef xxx_flint_printf
 #undef xxx_fmpz_print
-

@@ -11,9 +11,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifndef memset
+# ifdef __GNUC__
+#  define memset __builtin_memset
+# else
+#  include <string.h>
+# endif
+#endif
 #include "qsieve.h"
-
-#include <time.h>
 
 /*
     The actual sieving part of the quadratic sieve. This version is only run

@@ -19,18 +19,7 @@
 #define FMPZ_MOD_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpz_mod.h"
-#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 #ifdef __cplusplus
@@ -1366,7 +1355,7 @@ char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
     return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
 }
 
-
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p);
 
@@ -1384,7 +1373,7 @@ int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly,
 }
 
 FMPZ_MOD_POLY_INLINE 
-int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p)
+int _fmpz_mod_poly_print(const fmpz * poly, slong len, const fmpz_t p)
 {
     return _fmpz_mod_poly_fprint(stdout, poly, len, p);
 }
@@ -1400,6 +1389,7 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const
 {
     return fmpz_mod_poly_fprint_pretty(stdout, poly, x, ctx);
 }
+#endif
 
 /* Products *****************************************************************/
 
@@ -1516,11 +1506,33 @@ FLINT_DLL void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res,
 FLINT_DLL void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, const fmpz_t c,
                          const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
 
+/* Things that used to be in fmpz_mod_poly_factor.h ***************************/
+
+FLINT_DLL int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac, 
+                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p);
+
+FLINT_DLL int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, 
+                                    const fmpz * f, slong len, const fmpz_t p);
+
+FLINT_DLL int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_mod_poly_is_squarefree_f(fmpz_t fac,
+                            const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif
 
-#include "fmpz_mod_poly_factor.h"
-
 #endif
-
