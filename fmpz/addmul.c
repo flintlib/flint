@@ -21,7 +21,7 @@
             _mpz_realloc(z, nlimbs); \
     } while (0)
 
-/* Will not get called with x or y small */
+/* Will not get called with x or y small. */
 void
 _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 {
@@ -76,7 +76,11 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
     if (zn == 0)
     {
         /* Cannot have aliasing here, because x and y are not
-           small and therefore not 0. */
+           small and therefore not 0. We can therefore resize z
+           or write to zd without invalidating the inputs. */
+        FLINT_ASSERT(xn >= 2 || xd[0] > COEFF_MAX);
+        FLINT_ASSERT(yn >= 2 || yd[0] > COEFF_MAX);
+
         MPZ_FIT_SIZE(z, tn + 1);
         zd = z->_mp_d;
         zn = tn;

@@ -17,15 +17,8 @@
 #include "fft.h"
 #include "fmpz.h"
 
-#define MPZ_FIT_SIZE(z, nlimbs) \
-    do { \
-        if (z->_mp_alloc < nlimbs) \
-            _mpz_realloc(z, nlimbs); \
-    } while (0)
-
-
-/* this can only be called from fmpz_mul, and assumes
-   x and y are not small */
+/* This can only be called from fmpz_mul, and assumes
+   x and y are not small. */
 static void
 flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
 {
@@ -56,6 +49,12 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         yn = tn;
     }
 
+    zn = xn + yn;
+    if (z->_mp_alloc < zn)
+        _mpz_realloc(z, zn);
+    zd = z->_mp_d;
+    /* Important: read after possibly resizing z, so that the
+       pointers are valid in case of aliasing. */
     xd = x->_mp_d;
     yd = y->_mp_d;
 
@@ -65,14 +64,11 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         {
             mp_limb_t r3, r2, r1, r0;
             flint_mpn_mul_2x2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
-            zn = 4 - (r3 == 0);
-            MPZ_FIT_SIZE(z, zn);
-            zd = z->_mp_d;
             zd[0] = r0;
             zd[1] = r1;
             zd[2] = r2;
-            if (r3 != 0)
-                zd[3] = r3;
+            zd[3] = r3;
+            zn -= (r3 == 0);
             z->_mp_size = (sgn >= 0) ? zn : -zn;
             return;
         }
@@ -81,11 +77,11 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         {
             mp_limb_t hi, lo;
             umul_ppmm(hi, lo,  xd[0], yd[0]);
-            MPZ_FIT_SIZE(z, 2);
-            zd = z->_mp_d;
             zd[0] = lo;
             zd[1] = hi;
-            /* result cannot be 1 limb */
+            /* The result cannot be 1 limb, because that would
+               require a coefficient smaller than COEFF_MAX. */
+            FLINT_ASSERT(hi != 0);
             z->_mp_size = (sgn >= 0) ? 2 : -2;
             return;
         }
@@ -96,10 +92,6 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
        for this, especially since we don't need to handle aliasing. */
     if (yn == 1)
     {
-        zn = xn + yn;
-        MPZ_FIT_SIZE(z, zn);
-        zd = z->_mp_d;
-
         if (xn == 2)
         {
             mp_limb_t r2, r1, r0;
@@ -110,9 +102,6 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         }
         else
         {
-            zd = z->_mp_d;
-            xd = x->_mp_d;
-            yd = y->_mp_d;
             top = zd[xn] = mpn_mul_1(zd, xd, xn, yd[0]);
         }
 
@@ -123,9 +112,8 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
 
     TMP_START;
 
-    zn = xn + yn;
-    zd = z->_mp_d;
-
+    /* In case of aliasing, we need to copy the input so that
+       we do not overwrite it during the multiplication. */
     if (zd == xd)
     {
         mp_ptr tmp = TMP_ALLOC(xn * sizeof(mp_limb_t));
@@ -138,9 +126,6 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         flint_mpn_copyi(tmp, yd, yn);
         yd = tmp;
     }
-
-    MPZ_FIT_SIZE(z, zn);
-    zd = z->_mp_d;
 
     if (x == y)
     {
