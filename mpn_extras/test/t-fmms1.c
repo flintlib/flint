@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
-#include "flint.h"
+#include "fmpz.h"
 #include "mpn_extras.h"
 
 int main(void)

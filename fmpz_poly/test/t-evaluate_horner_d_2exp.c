@@ -11,11 +11,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <gmp.h>
 #include "mpfr.h"
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "double_extras.h"
 #include "ulong_extras.h"
 
 int

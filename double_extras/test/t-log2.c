@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
+#include <math.h>
 #include "ulong_extras.h"
 #include "double_extras.h"
 

@@ -15,7 +15,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"

@@ -12,6 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
 #include "test_helpers.h"
