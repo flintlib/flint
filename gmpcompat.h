@@ -141,7 +141,7 @@ union ieee_double_extract
 };
 #endif
 
-#if defined(_FLINT_LONGSLONG)
+#if !defined(_FLINT_LONGSLONG)
 # define __FLINT_LONG_MAX (2147483647L)
 #endif
 
