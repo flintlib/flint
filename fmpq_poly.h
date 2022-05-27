@@ -20,12 +20,8 @@
 #define FMPQ_POLY_INLINE static __inline__
 #endif
 
-#include <gmp.h>
-#include "fmpz.h"
 #include "fmpq.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
-#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -808,6 +804,7 @@ FLINT_DLL int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
 FLINT_DLL int fmpq_poly_debug(const fmpq_poly_t poly);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpq_poly_fprint(FILE * file, 
                       const fmpz * poly, const fmpz_t den, slong len);
 
@@ -852,10 +849,10 @@ int fmpq_poly_read(fmpq_poly_t poly)
 {
     return fmpq_poly_fread(stdin, poly);
 }
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <math.h>
+#undef ulong
+#include "double_extras.h"
 #include "d_mat.h"
 
 void
@@ -19,10 +24,7 @@ d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
     double t, s;
 
     if (Q->r != A->r || Q->c != A->c || R->r != A->c || R->c != A->c)
-    {
-        flint_printf("Exception (d_mat_qr). Incompatible dimensions.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Incompatible dimensions in d_mat_qr\n");
 
     if (Q == A)
     {

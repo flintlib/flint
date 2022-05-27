@@ -18,19 +18,7 @@
 #define FMPZ_MOD_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz_mod.h"
-#include "fmpz_mpoly.h"
-#include "mpoly.h"
-#include "n_poly.h"
+#include "nmod_mpoly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -212,6 +200,7 @@ FLINT_DLL int fmpz_mod_mpoly_set_str_pretty(fmpz_mod_mpoly_t A,
 FLINT_DLL char * fmpz_mod_mpoly_get_str_pretty(const fmpz_mod_mpoly_t A,
                               const char ** x, const fmpz_mod_mpoly_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int fmpz_mod_mpoly_fprint_pretty(FILE * file,
     const fmpz_mod_mpoly_t A, const char ** x, const fmpz_mod_mpoly_ctx_t ctx);
 
@@ -221,6 +210,7 @@ int fmpz_mod_mpoly_print_pretty(const fmpz_mod_mpoly_t A,
 {
    return fmpz_mod_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
+#endif
 
 
 /*  Basic manipulation *******************************************************/
@@ -1045,6 +1035,7 @@ FLINT_DLL void fmpz_mod_mpoly_from_mpolyl_perm_inflate(fmpz_mod_mpoly_t A,
 
 ******************************************************************************/
 
+#if _FLINT_HAVE_FILE
 /*
    test that r is a valid remainder upon division by g
    this means that no monomial of r is divisible by lm(g)
@@ -1097,6 +1088,7 @@ void fmpz_mod_mpoly_remainder_strongtest(const fmpz_mod_mpoly_t r,
    flint_free(rexp);
    flint_free(gexp);
 }
+#endif
 
 #ifdef __cplusplus
 }

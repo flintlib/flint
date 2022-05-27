@@ -9,6 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpz_mpoly.h"
 
 void fmpz_mpolyd_swap(fmpz_mpolyd_t A, fmpz_mpolyd_t B)

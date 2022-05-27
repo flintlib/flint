@@ -10,6 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpq.h"
 
 /*
@@ -25,7 +29,7 @@
     On failure, a negative number is returned.''
  */
 
-FLINT_DLL int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
+int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 {
     if (fmpz_is_one(den))
     {

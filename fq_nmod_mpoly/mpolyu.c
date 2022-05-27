@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "fq_nmod_mpoly.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fq_nmod_mpoly_factor.h"
-
 
 int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
                                                  const fq_nmod_mpoly_ctx_t ctx)

@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdio.h>
-#include "fmpz_mod_poly.h"
+#undef ulong
+#include "fmpz_mod_poly_factor.h"
 
 void fmpz_mod_poly_factor_print_pretty(const fmpz_mod_poly_factor_t fac,
                                     const char *var, const fmpz_mod_ctx_t ctx)
@@ -19,6 +22,6 @@ void fmpz_mod_poly_factor_print_pretty(const fmpz_mod_poly_factor_t fac,
     for (i = 0; i < fac->num; i++)
     {
         fmpz_mod_poly_print_pretty(fac->poly + i, var, ctx);
-        flint_printf(" ^ %wd\n", fac->exp[i]);
+        printf(" ^ " WORD_FMT "d\n", fac->exp[i]);
     }
 }

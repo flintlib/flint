@@ -19,18 +19,10 @@
 #define FQ_DEFAULT_MAT_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fq.h"
-#include "fq_nmod.h"
-#include "fq_zech.h"
 #include "fq_default.h"
 #include "fq_mat.h"
 #include "fq_nmod_mat.h"
 #include "fq_zech_mat.h"
-#include "nmod_mat.h"
-#include "fmpz_mod_mat.h"
-#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -787,6 +779,7 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res,
 
 /* Input and output  *********************************************************/
 
+#if _FLINT_HAVE_FILE
 FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint(FILE * file,
                         const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
@@ -890,6 +883,7 @@ int fq_default_mat_print_pretty(const fq_default_mat_t mat,
         return fq_mat_print_pretty(mat->fq, ctx->ctx.fq);
     }
 }
+#endif
 
 /* TODO: Read functions */
 

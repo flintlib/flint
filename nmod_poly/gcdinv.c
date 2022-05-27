@@ -11,8 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
@@ -38,10 +36,8 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
     const slong lenA = A->length, lenB = B->length;
 
     if (lenB < 2)
-    {
-        printf("Exception (nmod_poly_gcdinv). lenB < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenB < 2 in nmod_poly_gcdinv\n");
+
     if (lenA >= lenB)
     {
         nmod_poly_t T;

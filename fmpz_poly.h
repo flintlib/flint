@@ -21,17 +21,6 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "nmod_poly.h"
 #include "fmpq.h"
 
@@ -1162,6 +1151,8 @@ FLINT_DLL void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, s
 FLINT_DLL void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly);
 
 /*  Input and output  ********************************************************/
+
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
@@ -1229,6 +1220,7 @@ void fmpz_poly_debug(const fmpz_poly_t poly)
     flint_printf(")");
     fflush(stdout);
 }
+#endif
 
 /* Norms *********************************************************************/
 
@@ -1470,7 +1462,4 @@ FLINT_DLL void fmpz_poly_eulerian_polynomial(fmpz_poly_t poly, ulong n);
 }
 #endif
 
-#include "fmpz_poly_factor.h"
-
 #endif
-

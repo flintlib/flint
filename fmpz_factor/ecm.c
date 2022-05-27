@@ -12,10 +12,8 @@
 /* Outer wrapper for ECM 
    makes calls to stage I and stage II (one) */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz_factor.h"
 
 static
 ulong n_ecm_primorial[] =

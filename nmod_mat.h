@@ -20,17 +20,6 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "longlong.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "fmpz.h"
 #include "thread_support.h"
 
@@ -128,8 +117,8 @@ FLINT_DLL void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state)
 FLINT_DLL void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 FLINT_DLL void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
 
-
-FLINT_DLL int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat);
+#if _FLINT_HAVE_FILE
+FLINT_DLL int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat);
 
 NMOD_MAT_INLINE void nmod_mat_print_pretty(const nmod_mat_t mat)
 {
@@ -141,10 +130,11 @@ NMOD_MAT_INLINE int nmod_mat_print(const nmod_mat_t mat)
     return nmod_mat_fprint_pretty(stdout, mat);
 }
 
-NMOD_MAT_INLINE int nmod_mat_fprint(FILE* f, const nmod_mat_t mat)
+NMOD_MAT_INLINE int nmod_mat_fprint(FILE * f, const nmod_mat_t mat)
 {
     return nmod_mat_fprint_pretty(f, mat);
 }
+#endif
 
 FLINT_DLL int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 

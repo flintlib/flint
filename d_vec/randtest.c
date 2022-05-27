@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "double_extras.h"
 
 void
 _d_vec_randtest(double *f, flint_rand_t state, slong len, slong minexp,

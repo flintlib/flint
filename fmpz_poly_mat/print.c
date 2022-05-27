@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz_poly.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpz_poly_mat.h"
 
 void
@@ -19,18 +20,18 @@ fmpz_poly_mat_print(const fmpz_poly_mat_t A, const char * x)
 {
     slong i, j;
 
-    flint_printf("<%wd x %wd matrix over Z[%s]>\n", A->r, A->c, x);
+    printf("<" WORD_FMT "d x " WORD_FMT "d matrix over Z[%s]>\n", A->r, A->c, x);
 
     for (i = 0; i < A->r; i++)
     {
-        flint_printf("[");
+        printf("[");
         for (j = 0; j < A->c; j++)
         {
             fmpz_poly_print_pretty(fmpz_poly_mat_entry(A, i, j), x);
             if (j + 1 < A->c)
-                flint_printf(", ");
+                printf(", ");
         }
-        flint_printf("]\n");
+        printf("]\n");
     }
-    flint_printf("\n");
+    printf("\n");
 }

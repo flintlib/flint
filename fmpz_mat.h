@@ -19,14 +19,6 @@
 #define FMPZ_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "nmod_mat.h"
@@ -34,7 +26,7 @@
 #include "mpf_mat.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct
@@ -156,6 +148,7 @@ FLINT_DLL void fmpz_mat_concat_vertical(fmpz_mat_t res,
 
 /* Input and output  *********************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);
 
 FLINT_DLL int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat);
@@ -179,6 +172,7 @@ int fmpz_mat_read(fmpz_mat_t mat)
 {
     return fmpz_mat_fread(stdin, mat);
 }
+#endif
 
 /* Random matrix generation  *************************************************/
 

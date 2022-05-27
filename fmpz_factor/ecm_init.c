@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz_factor.h"
 
 void
 fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)

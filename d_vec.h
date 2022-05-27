@@ -18,12 +18,10 @@
 #define D_VEC_INLINE static __inline__
 #endif
 
-#include <math.h>
-#include "double_extras.h"
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /*  Memory management  *******************************************************/
@@ -74,4 +72,3 @@ FLINT_DLL double _d_vec_dot_thrice(const double * vec1, const double * vec2, slo
 #endif
 
 #endif
-

@@ -19,7 +19,6 @@
 #define FMPZ_MOD_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod.h"
 
@@ -176,6 +175,8 @@ void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
 }
 
 /* Input/output */
+
+#if _FLINT_HAVE_FILE
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat)
 {
@@ -199,6 +200,7 @@ void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat)
 {
     fmpz_mat_print_pretty(mat->mat);
 }
+#endif
 
 /* Comparison */
 FMPZ_MOD_MAT_INLINE
@@ -387,4 +389,3 @@ FLINT_DLL void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong 
 #endif
 
 #endif
-

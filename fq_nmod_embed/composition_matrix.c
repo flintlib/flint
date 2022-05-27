@@ -10,7 +10,6 @@
 */
 
 #include "fq_nmod_embed.h"
-#include "fq_nmod_poly.h"
 
 #ifdef T
 #undef T

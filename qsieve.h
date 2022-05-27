@@ -13,16 +13,12 @@
 #ifndef QSIEVE_H
 #define QSIEVE_H
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-#include "fmpz_vec.h"
+#undef ulong
+#define ulong mp_limb_t
 #include "fmpz_factor.h"
 #include "thread_support.h"
 

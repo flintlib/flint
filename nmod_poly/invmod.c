@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include "nmod_poly.h"
 
 int _nmod_poly_invmod(mp_limb_t *A, 
@@ -48,10 +47,8 @@ int nmod_poly_invmod(nmod_poly_t A,
     int ans;
 
     if (lenP < 2)
-    {
-        printf("Exception (nmod_poly_invmod). lenP < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenP < 2 in nmod_poly_invmod\n");
+
     if (lenB == 0)
     {
         nmod_poly_zero(A);
@@ -90,4 +87,3 @@ int nmod_poly_invmod(nmod_poly_t A,
     _nmod_poly_normalise(A);
     return ans;
 }
-

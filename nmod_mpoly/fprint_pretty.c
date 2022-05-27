@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_fprint_pretty(FILE * file,

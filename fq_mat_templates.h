@@ -12,9 +12,7 @@
 
 #ifdef T
 
-#include "flint.h"
 #include "templates.h"
-#include "ulong_extras.h"
 #include "fmpz_mod_mat.h"
 
 #ifdef __cplusplus
@@ -227,6 +225,7 @@ FLINT_DLL void TEMPLATE(T, mat_concat_vertical)(TEMPLATE(T, mat_t) res,
 
 /* Input and output  *********************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat,
                             const TEMPLATE(T, ctx_t) ctx);
 
@@ -246,6 +245,7 @@ int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat,
 {
     return TEMPLATE(T, mat_fprint_pretty)(stdout, mat, ctx);
 }
+#endif
 
 /* TODO: Read functions */
 

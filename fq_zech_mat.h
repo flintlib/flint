@@ -20,7 +20,6 @@
 #define FQ_ZECH_MAT_INLINE static __inline__
 #endif
 
-#include "fq_zech.h"
 #include "fq_zech_vec.h"
 
 /* Cutoff between classical and recursive triangular solving */

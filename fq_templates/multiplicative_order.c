@@ -11,6 +11,7 @@
 
 #ifdef T
 
+#include "fmpz_factor.h"
 #include "templates.h"
 
 int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,

@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "padic_mat.h"
 
 int padic_mat_fprint_pretty(FILE * file, 
@@ -46,4 +49,3 @@ int padic_mat_fprint_pretty(FILE * file,
 
     return 1;
 }
-

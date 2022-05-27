@@ -75,11 +75,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     q = fmpz_mat_nrows(Q);
 
     if (!(d = n_is_prime_power(&p, q)) || q % 2 == 0)
-    {
-        printf("Exception (fmpz_mat_jacobsthal). Not an odd prime power.\n");
-        flint_abort();
-        p = 0; /* not reached, but silence compiler warning */
-    }
+        flint_throw(FLINT_ERROR, "Not an odd prime power in fmpz_mat_jacobsthal\n");
 
     fmpz_init_set_ui(pp, p);
     fq_nmod_ctx_init(ctx, pp, d, "x");

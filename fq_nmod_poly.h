@@ -22,7 +22,6 @@
 #define FQ_NMOD_POLY_INLINE static __inline__
 #endif
 
-#include "fq_nmod.h"
 #include "fq_nmod_mat.h"
 #include "fmpz_mod_poly.h"
 
@@ -47,7 +46,5 @@
 #include "fq_poly_templates.h"
 #undef CAP_T
 #undef T
-
-#include "fq_nmod_poly_factor.h"
 
 #endif

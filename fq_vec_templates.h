@@ -11,9 +11,7 @@
 
 #ifdef T
 
-#include "flint.h"
 #include "templates.h"
-#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -35,6 +33,8 @@ FLINT_DLL void _TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f,
 /*  Norms  *******************************************************************/
 
 /*  Input and output  ********************************************************/
+
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _TEMPLATE(T, vec_fprint)(FILE * file,
                              const TEMPLATE(T, struct) * vec,
                              slong len,
@@ -46,6 +46,7 @@ int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
 {
     return _TEMPLATE(T, vec_fprint)(stdout, vec, len, ctx);
 }
+#endif
 
 /*  Conversions  *************************************************************/
 

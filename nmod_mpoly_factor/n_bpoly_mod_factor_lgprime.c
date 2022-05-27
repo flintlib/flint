@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly_factor.h"
 #include "nmod_mpoly_factor.h"
-#include "fq_nmod_mpoly_factor.h"
-
+#include "fq_nmod_poly_factor.h"
 
 static void n_bpoly_eval_fq_nmod_poly(
     fq_nmod_poly_t A,

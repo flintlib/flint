@@ -21,7 +21,6 @@
 #endif
 
 #include "fq.h"
-#include "fmpz_mod_mat.h"
 
 #define T fq
 #define B fmpz_mod

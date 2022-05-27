@@ -9,6 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpq_vec.h"
 
 int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
@@ -16,7 +20,7 @@ int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%li", len);
+    r = fprintf(file, WORD_FMT "d", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

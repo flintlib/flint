@@ -9,13 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpq_mat.h"
 
 void fmpq_mat_print(const fmpq_mat_t mat)
 {
     slong i, j;
 
-    flint_printf("<%wd x %wd matrix over Q>\n", mat->r, mat->c);
+    printf("<" WORD_FMT "d x " WORD_FMT "d matrix over Q>\n", mat->r, mat->c);
 
     for (i = 0; i < mat->r; i++)
     {

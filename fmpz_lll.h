@@ -20,12 +20,7 @@
 #define FMPZ_LLL_INLINE static __inline__
 #endif
 
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
 #include "fmpz_mat.h"
-#include "d_mat.h"
-#include "mpf_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -169,4 +164,3 @@ FLINT_DLL void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmp
 #endif
  
 #endif
-
