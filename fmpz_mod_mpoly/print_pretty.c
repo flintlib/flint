@@ -13,12 +13,18 @@
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdio.h>
 #undef ulong
-#include "fmpz_mpoly.h"
 #include "fmpz_mod_mpoly.h"
+#include "fmpz_mpoly.h"
 
 int fmpz_mod_mpoly_fprint_pretty(FILE * file, const fmpz_mod_mpoly_t A,
                                const char ** x, const fmpz_mod_mpoly_ctx_t ctx)
 {
    return _fmpz_mpoly_fprint_pretty(file, A->coeffs, A->exps,
                                             A->length, x, A->bits, ctx->minfo);
+}
+
+int fmpz_mod_mpoly_print_pretty(const fmpz_mod_mpoly_t A,
+                               const char ** x, const fmpz_mod_mpoly_ctx_t ctx)
+{
+   return fmpz_mod_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
