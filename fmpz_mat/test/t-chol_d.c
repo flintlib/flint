@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
@@ -76,5 +77,5 @@ main(void)
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
