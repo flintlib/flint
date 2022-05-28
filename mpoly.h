@@ -27,6 +27,7 @@
 #  define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #  include <string.h>
 #  undef ulong
+#  define ulong mp_limb_t
 # endif
 #endif
 #include "fmpz_mat.h"
