@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mpoly_factor.h"
-
 
 void check_it(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
 {
