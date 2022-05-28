@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_poly.h"
-
-#include <stdio.h>
 #include <stdlib.h>
-
+#include <stdio.h>
+#include "fq_zech_poly.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
 
