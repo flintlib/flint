@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mod_mpoly_factor.h"
-
 
 /* check total number of factors with multiplicity is between lower and upper */
 void check_omega(slong lower, slong upper, const fmpz_mod_mpoly_t p, const fmpz_mod_mpoly_ctx_t ctx)
