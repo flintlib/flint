@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include <stdio.h>
+#include "fmpz_factor.h"
 #include "fmpz_vec.h"
 
 void _fmpz_factor_randtest(fmpz_factor_t f, flint_rand_t state,
