@@ -12,6 +12,7 @@
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdlib.h>
+#include <time.h>
 #undef ulong
 #include "ulong_extras.h"
 #include "fmpz.h"
