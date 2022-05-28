@@ -9,12 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "fq_nmod_poly.h"
 #include "fmpz_mod_poly.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "ulong_extras.h"
 #include "long_extras.h"
 
