@@ -11,8 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "flint.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 int
 main(void)

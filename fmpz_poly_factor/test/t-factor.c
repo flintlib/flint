@@ -12,8 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "flint.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 #define LONG_FAC_TEST 0 /* run an extra long test */
 #define TEST_HARD 0 /* test hard polynomials */
