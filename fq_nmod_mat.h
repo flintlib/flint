@@ -20,7 +20,6 @@
 #define FQ_NMOD_MAT_INLINE static __inline__
 #endif
 
-#include "fq_nmod.h"
 #include "fq_nmod_vec.h"
 
 /* Cutoff between classical and recursive triangular solving */
