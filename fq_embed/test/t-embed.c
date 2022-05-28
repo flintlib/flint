@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_embed.h"
 #include "fq_poly.h"
 
@@ -29,7 +30,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "ulong_extras.h"
