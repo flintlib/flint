@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_zech_embed.h"
 #include "fq_zech_poly.h"
-
 
 #ifdef T
 #undef T
