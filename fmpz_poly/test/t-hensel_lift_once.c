@@ -11,13 +11,8 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly_factor.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly_factor.h"
 
 int
 main(void)

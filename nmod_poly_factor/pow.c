@@ -12,8 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 void
 nmod_poly_factor_pow(nmod_poly_factor_t fac, slong exp)

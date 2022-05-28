@@ -14,7 +14,7 @@
 #include <stdio.h>
 #undef ulong
 #include "fmpz_mpoly.h"
-#include "thread_pool.h"
+#include "thread_support.h"
 
 /*
     a thread safe mpoly supports three mutating operations

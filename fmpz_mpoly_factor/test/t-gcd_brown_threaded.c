@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "fmpz_mpoly_factor.h"
+#include "thread_support.h"
 
 typedef struct
 {

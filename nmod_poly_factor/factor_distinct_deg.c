@@ -15,9 +15,7 @@
 #define ulong ulongxx/* interferes with system includes */
 #include <math.h>
 #undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                   const nmod_poly_t poly, slong * const * degs)

@@ -10,22 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
 #include <stdio.h>
-#include <pthread.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly_factor.h"
+#include "thread_support.h"
 
 int
 main(void)

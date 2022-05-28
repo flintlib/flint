@@ -10,13 +10,7 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
-#include "ulong_extras.h"
-
 
 void test_poly(
     nmod_poly_factor_t roots,
