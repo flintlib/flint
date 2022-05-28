@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_default_poly_factor.h"
 #include "test_helpers.h"
 
