@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "fmpq_poly.h"
 #include "fmpz_mpoly_factor.h"
 
 
