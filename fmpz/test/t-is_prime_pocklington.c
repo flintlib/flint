@@ -10,12 +10,9 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "nmod_vec.h"
 
 int
 main(void)

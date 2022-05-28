@@ -20,6 +20,7 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
+#include "nmod_vec.h"
 #include "fmpz.h"
 #include "thread_pool.h"
 

@@ -19,7 +19,7 @@
 #endif
 
 #include "flint.h"
-#include "nmod_vec.h"
+#include "nmod.h"
 #include "fmpz-conversions.h"
 
 #if FLINT_USES_PTHREAD
