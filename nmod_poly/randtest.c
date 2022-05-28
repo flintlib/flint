@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 void
 nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)

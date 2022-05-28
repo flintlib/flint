@@ -21,8 +21,8 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-#include "nmod_poly.h"
 #include "fmpq.h"
+#include "nmod_poly_factor.h"
 
 #ifdef __cplusplus
  extern "C" {

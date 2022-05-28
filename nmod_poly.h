@@ -22,9 +22,7 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
 #include "nmod_mat.h"
-#include "thread_support.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1519,7 +1517,5 @@ NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
 #ifdef __cplusplus
 }
 #endif
-
-#include "nmod_poly_factor.h"
 
 #endif

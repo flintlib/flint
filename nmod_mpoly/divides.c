@@ -10,7 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
-#include "thread_pool.h"
+#include "thread_support.h"
 
 static int _nmod_mpoly_divides_try_dense(
     slong * Adegs,

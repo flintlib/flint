@@ -13,13 +13,10 @@
 
 #undef ulong
 #define ulong ulongxx/* interferes with system includes */
-
 #include <math.h>
-#include <pthread.h>
 #undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "nmod_poly.h"
+#include "thread_support.h"
+#include "nmod_poly_factor.h"
 
 void
 _nmod_poly_precompute_matrix_worker(void * arg_ptr)

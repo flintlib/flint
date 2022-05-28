@@ -12,8 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly_factor.h"
 
 void
 nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,

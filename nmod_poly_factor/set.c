@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
 {
