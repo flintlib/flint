@@ -143,6 +143,7 @@ typedef sd_fft_ctx_struct sd_fft_ctx_t[1];
 
 /* The local context is expected to be copied and passed to the calculations. */
 typedef struct {
+    double* data;
     double p;
     double pinv;
     const double* w2tab[50];
@@ -166,6 +167,11 @@ FLINT_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
     return d + sd_fft_ctx_blk_offset(I);
 }
 
+FLINT_INLINE double* sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I)
+{
+    return Q->data + sd_fft_ctx_blk_offset(I);
+}
+
 FLINT_INLINE void sd_fft_ctx_set_index(double* d, ulong i, double x)
 {
     sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ] = x;
@@ -187,10 +193,10 @@ FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 }
 
 /* sd_fft.c */
-FLINT_DLL void sd_fft_trunc(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+FLINT_DLL void sd_fft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-FLINT_DLL void sd_ifft_trunc(const sd_fft_lctx_t Q, double* d, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+FLINT_DLL void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
 
 /* sd_fft_ctx.c */
 FLINT_DLL void sd_fft_ctx_clear(sd_fft_ctx_t Q);
@@ -200,9 +206,9 @@ FLINT_DLL void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
 /* TODO: these should probably increment/decrement a ref count */
 FLINT_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
 {
-    sd_fft_ctx_fit_depth(Q, depth);
     L->p = Q->p;
     L->pinv = Q->pinv;
+    sd_fft_ctx_fit_depth(Q, depth);
     for (int i = 0; i < 50; i++)
         L->w2tab[i] = Q->w2tab[i];
 }
@@ -217,7 +223,8 @@ FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth,
     FLINT_ASSERT(itrunc % BLK_SZ == 0);
     FLINT_ASSERT(otrunc % BLK_SZ == 0);
     FLINT_ASSERT(Q->w2tab[depth - 1] != NULL);
-    sd_fft_trunc(Q, d, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
+    Q->data = d;
+    sd_fft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
 }
 
 FLINT_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong trunc)
@@ -225,21 +232,22 @@ FLINT_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth
     FLINT_ASSERT(depth >= LG_BLK_SZ);
     FLINT_ASSERT(trunc % BLK_SZ == 0);
     FLINT_ASSERT(Q->w2tab[depth - 1] != NULL);
-    sd_ifft_trunc(Q, d, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
+    Q->data = d;
+    sd_ifft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
 }
 
 FLINT_INLINE void sd_fft_ctx_fft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
 {
     sd_fft_lctx_t QL;
     sd_fft_lctx_init(QL, Q, depth);
-    sd_fft_trunc(QL, d, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
+    sd_fft_lctx_fft_trunc(QL, d, depth, itrunc, otrunc);
 }
 
 FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong trunc)
 {
     sd_fft_lctx_t QL;
     sd_fft_lctx_init(QL, Q, depth);
-    sd_ifft_trunc(QL, d, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
+    sd_fft_lctx_ifft_trunc(QL, d, depth, trunc);
 }
 
 /*
