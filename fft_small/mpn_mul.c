@@ -210,7 +210,7 @@ void slow_mpn_to_fft_easy(
     ulong s = BLK_SZ/8/32*bits;
 
     FLINT_ASSERT(64 < bits);
-    FLINT_ASSERT(bits <= 256);
+
     __m256i tab[256];
 
     for (ulong iq = 0; iq < iq_stop_easy; iq++)
@@ -300,7 +300,7 @@ void slow_mpn_to_fft_easy(
                 AK = tab[k];/*_mm256_i32gather_epi32((const int*)aa+k, index, 4);*/
                 AKJ = _mm256_sll_epi32(AK, _mm_set_epi32(0,0,0,32-(bits-j)));
                 ak = _vec8i32_convert_vec8d(AKJ);
-                X = vec8d_add(X, vec8d_mulmod2(ak, vec8d_set_d(two_pow[bits-32]), p, pinv));
+                X = vec8d_add(X, vec8d_mulmod2(ak, vec8d_set_d(two_pow[bits - 32]), p, pinv));
                 k++;
             }
 
@@ -408,6 +408,9 @@ void slow_mpn_to_fft(
     const uint32_t* a = (const uint32_t*)(a_);
     ulong an = 2*an_;
     ulong iq, i_stop_easy, iq_stop_easy;
+
+    /* the highest index read from two_pow is bits - 32 */
+    FLINT_ASSERT(bits - 32 < MPN_CTX_TWO_POWER_TAB_SIZE);
 
     /* if i*bits + 32 < 32*an, then the index into a is always in bounds */
     i_stop_easy = n_min(ztrunc, (32*an - 33)/bits);
@@ -575,6 +578,7 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
     ulong nvs = n_cdiv(np, VEC_SZ); \
  \
     FLINT_ASSERT(bits >= FLINT_BITS); \
+    FLINT_ASSERT(bits - 32 < MPN_CTX_TWO_POWER_TAB_SIZE); \
  \
     const uint32_t* a = (const uint32_t*)(a_); \
     ulong an = 2*an_; \
@@ -1300,18 +1304,66 @@ ulong next_fft_number(ulong p)
     return n_pow2(bits) - n_pow2(l - 1) + 1;
 }
 
-
-static void fill_two_pow_table(double* x, ulong len, double p, double pinv)
+/* fill x[i] = 2^i mod p for 0 <= i < len */
+static void fill_slow_two_pow_tab(double* x, ulong len, double p, double pinv)
 {
-    x[0] = 1;
-
+    double t = 1;
+    x[0] = t;
     for (ulong i = 1; i < len; i++)
     {
-        double t = x[i-1];
         double q = vec1d_round(vec1d_mul(t, 2*pinv));
-        x[i] = vec1d_fnmadd(q, p, vec1d_add(t, t));
+        t = vec1d_fnmadd(q, p, vec1d_add(t, t));
+        x[i] = t;
     }
 }
+
+/*
+    fill in  d[i*nvs + k/VEC_SZ][k%VEC_SZ] = 2^i mod Rffts[k].p
+    for 0 <= k < VEC_SZ*nvs and 0 <= i < len.
+*/
+static void fill_vec_two_pow_tab(
+    vec4d* x,
+    sd_fft_ctx_struct* Rffts,
+    ulong len,
+    ulong nvs)
+{
+    ulong i, l;
+    vec4d* ps;
+
+    ps = (vec4d*) flint_aligned_alloc(32, 2*nvs*sizeof(vec4d));
+    for (l = 0; l < nvs; l++)
+    {
+        /* just p */
+        ps[2*l+0] = vec4d_set_d4(Rffts[4*l+0].p,
+                                 Rffts[4*l+1].p,
+                                 Rffts[4*l+2].p,
+                                 Rffts[4*l+3].p);
+        /* 2/p */
+        ps[2*l+1] = vec4d_set_d4(Rffts[4*l+0].pinv,
+                                 Rffts[4*l+1].pinv,
+                                 Rffts[4*l+2].pinv,
+                                 Rffts[4*l+3].pinv);
+        ps[2*l+1] = vec4d_add(ps[2*l+1], ps[2*l+1]);
+    }
+
+    for (l = 0; l < nvs; l++)
+        x[0*nvs + l] = vec4d_one();
+
+    for (i = 1; i < len; i++)
+    for (l = 0; l < nvs; l++)
+    {
+        vec4d t = x[(i-1)*nvs+l];
+        vec4d p = ps[2*l+0];
+        vec4d two_over_p = ps[2*l+1];
+        vec4d q = vec4d_round(vec4d_mul(t, two_over_p));
+        x[i*nvs+l] = vec4d_fnmadd(q, p, vec4d_add(t, t));
+    }
+
+    flint_aligned_free(ps);
+}
+
+
+
 
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p)
@@ -1321,7 +1373,7 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     R->buffer = NULL;
     R->buffer_alloc = 0;
 
-    for (i = 0; i < MPN_CTX_NSLOTS; i++)
+    for (i = 0; i < MPN_CTX_NCRTS; i++)
     {
         if (i > 0)
             p = next_fft_number(p);
@@ -1369,18 +1421,39 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
                 ulong* cofac = crt_data_co_prime(R->crts + i, pi);
                 mpn_divexact_1(cofac, t, len, R->crts[pi].prime);
                 *crt_data_co_prime_red(R->crts + i, pi) =
-                                       mpn_mod_1(cofac, len, R->crts[pi].prime);
+                                      mpn_mod_1(cofac, len, R->crts[pi].prime);
             }
 
             flint_free(t);
         }
+    }
 
-        /* two_powers */
-        R->two_powers[i].data = NULL;
-        R->two_powers[i].length = 0;
+    /* powers of two for slow mod */
+    {
+        ulong len = MPN_CTX_TWO_POWER_TAB_SIZE;
+        double* x = FLINT_ARRAY_ALLOC(len*MPN_CTX_NCRTS, double);
+        R->slow_two_pow_buffer = x;
+        for (i = 0; i < MPN_CTX_NCRTS; i++)
+        {
+            R->slow_two_pow_tab[i] = x;
+            fill_slow_two_pow_tab(x, len, R->ffts[i].p, R->ffts[i].pinv);
+            x += len;
+        }
+    }
 
-        R->two_pow_tab[i] = FLINT_ARRAY_ALLOC(256, double);
-        fill_two_pow_table(R->two_pow_tab[i], 256, R->ffts[i].p, R->ffts[i].pinv);
+    /* powers of two for fast mod */
+    {
+        ulong len = MPN_CTX_TWO_POWER_TAB_SIZE;
+        ulong max_nvs = n_cdiv(MPN_CTX_NCRTS, VEC_SZ);
+        vec4d* x = (vec4d*) flint_aligned_alloc(32,
+                                    max_nvs*(max_nvs + 1)/2*len*sizeof(vec4d));
+        R->vec_two_pow_buffer = x;
+        for (ulong nvs = 1; nvs <= max_nvs; nvs++)
+        {
+            R->vec_two_pow_tab[nvs - 1] = x;
+            fill_vec_two_pow_tab(x, R->ffts, len, nvs);
+            x += nvs*len;
+        }
     }
 
     R->profiles_size = 0;
@@ -1416,144 +1489,22 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
 
 #define VEC_SZ 4
 
-const vec4d* mpn_ctx_two_pow_table(mpn_ctx_t R, ulong len, ulong np)
-{
-    ulong i, l;
-    ulong nvs = n_cdiv(np, VEC_SZ);
-
-    FLINT_ASSERT(MPN_CTX_NSLOTS >= nvs*VEC_SZ);
-
-    if (R->two_powers[nvs-1].length >= len*nvs)
-        return R->two_powers[nvs-1].data;
-
-    flint_aligned_free(R->two_powers[nvs-1].data);
-    vec4d* d = (vec4d*) flint_aligned_alloc(32, len*nvs*sizeof(vec4d));
-    R->two_powers[nvs-1].data = d;
-
-    vec4d* ps = (vec4d*) flint_aligned_alloc(32, 2*nvs*sizeof(vec4d));
-    for (l = 0; l < nvs; l++)
-    {
-        /* just p */
-        ps[2*l+0] = vec4d_set_d4(R->ffts[4*l+0].p,
-                                 R->ffts[4*l+1].p,
-                                 R->ffts[4*l+2].p,
-                                 R->ffts[4*l+3].p);
-        /* 2/p */
-        ps[2*l+1] = vec4d_set_d4(R->ffts[4*l+0].pinv,
-                                 R->ffts[4*l+1].pinv,
-                                 R->ffts[4*l+2].pinv,
-                                 R->ffts[4*l+3].pinv);
-        ps[2*l+1] = vec4d_add(ps[2*l+1], ps[2*l+1]);
-    }
-
-    for (l = 0; l < nvs; l++)
-        d[0*nvs + l] = vec4d_one();
-
-    for (i = 1; i < len; i++)
-    for (l = 0; l < nvs; l++)
-    {
-        vec4d t = d[(i-1)*nvs+l];
-        vec4d p = ps[2*l+0];
-        vec4d two_over_p = ps[2*l+1];
-        vec4d q = vec4d_round(vec4d_mul(t, two_over_p));
-        d[i*nvs+l] = vec4d_fnmadd(q, p, vec4d_add(t, t));
-    }
-
-    flint_aligned_free(ps);
-
-    return d;
-}
-
 void mpn_ctx_clear(mpn_ctx_t R)
 {
     slong i;
 
-    for (i = 0; i < MPN_CTX_NSLOTS; i++)
+    for (i = 0; i < MPN_CTX_NCRTS; i++)
     {
         sd_fft_ctx_clear(R->ffts + i);
         crt_data_clear(R->crts + i);
-        flint_aligned_free(R->two_powers[i].data);
-        flint_free(R->two_pow_tab[i]);
     }
+
+    flint_free(R->slow_two_pow_buffer);
+    flint_aligned_free(R->vec_two_pow_buffer);
 
     flint_aligned_free(R->buffer);
 }
 
-
-const profile_entry_struct* mpn_ctx_best_profile(
-    const mpn_ctx_t R,
-    thread_pool_handle** handles, slong* nhandles,
-    ulong an,
-    ulong bn)
-{
-    ulong i = 0;
-    ulong best_i = 0;
-    double best_score = 100000000.0*(an + bn);
-    ulong nthreads;
-
-    ulong thread_limit = 8;
-    ulong zn = an + bn;
-
-    if (zn < 1500)
-        thread_limit = 1;
-    else if (zn < 2000)
-        thread_limit = 2;
-    else if (zn < 3000)
-        thread_limit = 4;
-    else if (zn < 5000)
-        thread_limit = 5;
-    else if (zn < 9000)
-        thread_limit = 6;
-    else if (zn < 16000)
-        thread_limit = 7;
-
-    *nhandles = flint_request_threads(handles, thread_limit);
-    nthreads = 1 + *nhandles;
-
-find_next:
-
-    do {
-        i++;
-        if (i >= R->profiles_size)
-            return R->profiles + best_i;
-    } while (bn > R->profiles[i].bn_bound);
-
-    /* maximize R->profiles[i].bits */
-
-    FLINT_ASSERT(i < R->profiles_size);
-    FLINT_ASSERT(bn <= R->profiles[i].bn_bound);
-
-    while (i+1 < R->profiles_size &&
-           bn <= R->profiles[i+1].bn_bound &&
-           R->profiles[i+1].np == R->profiles[i].np)
-    {
-        i++;
-    }
-
-    ulong np = R->profiles[i].np;
-
-    if (np % nthreads != 0)
-        goto find_next;
-
-    ulong bits = R->profiles[i].bits;
-    ulong alen = n_cdiv(64*an, bits);
-    ulong blen = n_cdiv(64*bn, bits);
-    ulong zlen = alen + blen - 1;
-    ulong ztrunc = n_round_up(zlen, BLK_SZ);
-    ulong depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
-
-    double ratio = (double)(ztrunc)/(double)(n_pow2(depth));
-    double score = (1-0.25*ratio)*(1.0/1000000);
-    score *= np*depth;
-    score *= ztrunc;
-    if (score < best_score)
-    {
-        best_i = i;
-        best_score = score;
-    }
-
-    goto find_next;
-}
 
 typedef struct {
     thread_pool_handle* handles;
@@ -1601,7 +1552,7 @@ static void new_mpn_ctx_best_profile(
     if (UNLIKELY(bn > R->profiles[i].bn_bound))
     {
         P->np = n_max(n_min(P->nthreads, 8), 4);
-        P->bits = crt_data_find_bits(R->crts + P->np, bn);
+        P->bits = crt_data_find_bits(R->crts + P->np - 1, bn);
         P->to_ffts = NULL;
         return;
     }
@@ -1722,7 +1673,7 @@ typedef struct {
     to_ffts_func to_ffts;
     sd_fft_ctx_struct* ffts;
     ulong stride;
-    const vec4d* two_pow;
+    const vec4d* two_pow_tab;
     double* abuf;
     const ulong* a;
     ulong an;
@@ -1745,10 +1696,10 @@ void mod_worker_func(void* varg)
 {
     mod_worker_struct* X = (mod_worker_struct*) varg;
 
-    X->to_ffts(X->ffts, X->abuf, X->stride, X->a, X->an, X->atrunc, X->two_pow,
+    X->to_ffts(X->ffts, X->abuf, X->stride, X->a, X->an, X->atrunc, X->two_pow_tab,
              X->a_start_easy, X->a_stop_easy, X->a_start_hard, X->a_stop_hard);
 
-    X->to_ffts(X->ffts, X->bbuf, X->stride, X->b, X->bn, X->btrunc, X->two_pow,
+    X->to_ffts(X->ffts, X->bbuf, X->stride, X->b, X->bn, X->btrunc, X->two_pow_tab,
              X->b_start_easy, X->b_stop_easy, X->b_start_hard, X->b_stop_hard);
 }
 
@@ -1888,11 +1839,11 @@ timeit_start(timer_overall);
         ulong a_stop_easy = n_min(atrunc, (64*an - 33)/bits);
         /* if i*bits >= 64*an, then the index into a is always out of bounds */
         ulong a_stop_hard = n_min(atrunc, (64*an + bits - 1)/bits);
+        /* ditto */
         ulong b_stop_easy = n_min(btrunc, (64*bn - 33)/bits);
         ulong b_stop_hard = n_min(btrunc, (64*bn + bits - 1)/bits);
         ulong rounding = (bits%8 == 0) ? 4 : (bits%4 == 0) ? 8 : 16;
         ulong nthreads = P.nthreads;
-        const vec4d* two_pow = mpn_ctx_two_pow_table(R, P.bits + 5, P.np);
         double* bbuf;
 
         abuf = (double*) mpn_ctx_fit_buffer(R, 2*P.np*stride*sizeof(double));
@@ -1912,7 +1863,7 @@ timeit_start(timer);
             w[i].to_ffts = P.to_ffts;
             w[i].ffts = R->ffts;
             w[i].stride = stride;
-            w[i].two_pow = two_pow;
+            w[i].two_pow_tab = R->vec_two_pow_tab[n_cdiv(P.np, VEC_SZ) - 1];
             w[i].abuf = abuf;
             w[i].a = a;
             w[i].an = an,
@@ -2013,7 +1964,7 @@ timeit_start(timer);
             X->bn = bn;
             X->bbuf = bbuf + (l%nthreads)*stride;
             X->btrunc = btrunc;
-            X->two_pow_tab = R->two_pow_tab[l];
+            X->two_pow_tab = R->slow_two_pow_tab[l];
             X->next = (l + nthreads < np) ? X + nthreads : NULL;
         }
 
@@ -2064,8 +2015,8 @@ timeit_start(timer);
             X->stride = stride;
             X->crts = R->crts;
             X->bits = P.bits;
-            X->start_easy = n_round_up((l+0)*end_easy/(nthreads), BLK_SZ);
-            X->stop_easy  = n_round_up((l+1)*end_easy/(nthreads), BLK_SZ);
+            X->start_easy = n_round_up((l+0)*end_easy/nthreads, BLK_SZ);
+            X->stop_easy  = n_round_up((l+1)*end_easy/nthreads, BLK_SZ);
             X->overhang = (l + 1 == nthreads) ? NULL : overhang[l];
         }
 

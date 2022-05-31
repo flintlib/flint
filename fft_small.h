@@ -311,20 +311,30 @@ typedef struct {
 
 typedef profile_entry_struct profile_entry_t[1];
 
-#define MPN_CTX_NSLOTS 8
-#define MAX_NPROFILES 40
+#define MPN_CTX_NCRTS 8
+#define MAX_NPROFILES 20
 #define VEC_SZ 4
 
-typedef struct {
-    vec4d* data;
-    ulong length;
-} vec4dptr_with_length;
+/*
+    The tables for powers of two each have this fixed length. This has to go up
+    linearly with the max number of primes MPN_CTX_NCRTS involved in chinese
+    remaindering. This length is checked with asserts in the code.
+*/
+#define MPN_CTX_TWO_POWER_TAB_SIZE 256
 
 typedef struct {
-    sd_fft_ctx_struct ffts[MPN_CTX_NSLOTS];
-    crt_data_struct crts[MPN_CTX_NSLOTS];
-    vec4dptr_with_length two_powers[MPN_CTX_NSLOTS];
-    double* two_pow_tab[MPN_CTX_NSLOTS];
+    sd_fft_ctx_struct ffts[MPN_CTX_NCRTS];
+    crt_data_struct crts[MPN_CTX_NCRTS];
+
+    /*
+        For each table of tables of powers of two, the whole collection is held
+        in one big buffer and the table is an array of pointer into it.
+    */
+    vec4d* vec_two_pow_tab[(MPN_CTX_NCRTS + VEC_SZ - 1)/VEC_SZ];
+    vec4d* vec_two_pow_buffer;
+    double* slow_two_pow_tab[MPN_CTX_NCRTS];
+    double* slow_two_pow_buffer;
+
     profile_entry_struct profiles[MAX_NPROFILES];
     ulong profiles_size;
     void* buffer;
