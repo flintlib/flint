@@ -205,7 +205,7 @@ void profile_mul_gmp(
                     precomp = (double)timer->wall;
                     nprecomp_samples++;
                 }
-                ulong nreps = 1 + 0*20000000/(cn*n_clog2(cn));
+                ulong nreps = 1 + 20000000/(cn*n_clog2(cn));
                 timeit_start(timer);
                 for (ulong rep = 0; rep < nreps; rep++)
                     mpn_mul(c, a, an, b, bn);

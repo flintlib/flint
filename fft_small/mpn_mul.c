@@ -15,6 +15,27 @@
 #include<stdint.h>
 #include<string.h>
 
+
+FLINT_FORCE_INLINE ulong _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
+{
+    long long unsigned int _s;
+    cf = _addcarry_u64(cf, (long long unsigned int)(x),
+                           (long long unsigned int)(y),
+                           &_s);
+    *s = (ulong)(_s);
+    return cf;
+}
+
+FLINT_FORCE_INLINE ulong _subborrow_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
+{
+    long long unsigned int _s;
+    cf = _subborrow_u64(cf, (long long unsigned int)(x),
+                            (long long unsigned int)(y),
+                           &_s);
+    *s = (ulong)(_s);
+    return cf;
+}
+
 ulong flint_mpn_nbits(const ulong* a, ulong an)
 {
     while (an > 0 && a[an-1] == 0)
@@ -78,6 +99,24 @@ int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e)
 
     return 0;
 }
+
+
+unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, unsigned char cf)
+{
+    FLINT_ASSERT(zn >= an);
+    FLINT_ASSERT(an > 0);
+
+    ulong i = 0;
+    do {
+        cf = _addcarry_ulong(cf, z[i], a[i], &z[i]);
+    } while (i++, i < an);
+
+    while (i < zn && cf != 0)
+        cf = _addcarry_ulong(cf, z[i], 0, &z[i]);
+
+    return cf;    
+}
+
 
 
 void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes)
@@ -653,25 +692,7 @@ DEFINE_IT(8,192)
 #undef aindex
 
 
-FLINT_FORCE_INLINE ulong _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
-{
-    long long unsigned int _s;
-    cf = _addcarry_u64(cf, (long long unsigned int)(x),
-                           (long long unsigned int)(y),
-                           &_s);
-    *s = (ulong)(_s);
-    return cf;
-}
 
-FLINT_FORCE_INLINE ulong _subborrow_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
-{
-    long long unsigned int _s;
-    cf = _subborrow_u64(cf, (long long unsigned int)(x),
-                            (long long unsigned int)(y),
-                           &_s);
-    *s = (ulong)(_s);
-    return cf;
-}
 
 /* seems all version of gcc generate worse code if the intrinsics are used */
 #if 1
@@ -1513,11 +1534,11 @@ typedef struct {
     ulong np;
     ulong bits;
     to_ffts_func to_ffts;
-} new_profile_entry;
+} profile_entry;
 
-static void new_mpn_ctx_best_profile(
+static void mpn_ctx_best_profile(
     const mpn_ctx_t R,
-    new_profile_entry* P,
+    profile_entry* P,
     ulong an, ulong bn)
 {
     ulong i = 0;
@@ -1653,21 +1674,6 @@ void sd_fft_lctx_point_mul(
     }
 }
 
-unsigned char _addto(ulong* z, ulong zn, ulong* a, ulong an, unsigned char cf)
-{
-    FLINT_ASSERT(zn >= an);
-    FLINT_ASSERT(an > 0);
-
-    ulong i = 0;
-    do {
-        cf = _addcarry_ulong(cf, z[i], a[i], &z[i]);
-    } while (i++, i < an);
-
-    while (i < zn && cf != 0)
-        cf = _addcarry_ulong(cf, z[i], 0, &z[i]);
-
-    return cf;    
-}
 
 typedef struct {
     to_ffts_func to_ffts;
@@ -1784,6 +1790,7 @@ typedef struct {
     ulong start_easy;
     ulong stop_easy;
     ulong* overhang;
+    ulong overhang_buffer[MPN_CTX_NCRTS];
 } crt_worker_struct;
 
 void crt_worker_func(void* varg)
@@ -1799,9 +1806,17 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong 
 {
     ulong zn, alen, blen, zlen, atrunc, btrunc, ztrunc, depth, stride;
     double* abuf;
-    new_profile_entry P;
+    profile_entry P;
+    ulong sz;
+    void* worker_struct_buffer;
 
-    new_mpn_ctx_best_profile(R, &P, an, bn);
+    mpn_ctx_best_profile(R, &P, an, bn);
+
+    sz =           sizeof(mod_worker_struct)*P.nthreads;
+    sz = n_max(sz, sizeof(fft_worker_struct)*P.np);
+    sz = n_max(sz, sizeof(mod_fft_worker_struct)*P.np);
+    sz = n_max(sz, sizeof(crt_worker_struct)*P.nthreads);
+    worker_struct_buffer = flint_malloc(sz);
 
     zn = an + bn;
     alen = n_cdiv(FLINT_BITS*an, P.bits);
@@ -1811,7 +1826,7 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong 
     btrunc = n_round_up(blen, BLK_SZ);
     ztrunc = n_round_up(zlen, BLK_SZ);
     depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
-    stride = n_round_up(sd_fft_ctx_data_size(depth), 128); 
+    stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
@@ -1833,8 +1848,8 @@ timeit_start(timer_overall);
     if (P.to_ffts != NULL)
     {
         ulong bits = P.bits;
-        mod_worker_struct w[8];
-        fft_worker_struct wf[8];
+        mod_worker_struct* wm;
+        fft_worker_struct* wf;
         /* if i*bits + 32 < 64*an, then the index into a is always in bounds */
         ulong a_stop_easy = n_min(atrunc, (64*an - 33)/bits);
         /* if i*bits >= 64*an, then the index into a is always out of bounds */
@@ -1858,35 +1873,37 @@ timeit_start(timer);
         a_stop_easy &= -rounding;
         b_stop_easy &= -rounding;
 
+        wm = (mod_worker_struct*) worker_struct_buffer;
         for (ulong i = 0; i < nthreads; i++)
         {
-            w[i].to_ffts = P.to_ffts;
-            w[i].ffts = R->ffts;
-            w[i].stride = stride;
-            w[i].two_pow_tab = R->vec_two_pow_tab[n_cdiv(P.np, VEC_SZ) - 1];
-            w[i].abuf = abuf;
-            w[i].a = a;
-            w[i].an = an,
-            w[i].atrunc = atrunc;
-            w[i].bbuf = bbuf;
-            w[i].b = b;
-            w[i].bn = bn,
-            w[i].btrunc = btrunc;
-            w[i].a_start_easy = n_round_up((i+0)*a_stop_easy/nthreads, rounding);
-            w[i].a_stop_easy  = n_round_up((i+1)*a_stop_easy/nthreads, rounding);
-            w[i].b_start_easy = n_round_up((i+0)*b_stop_easy/nthreads, rounding);
-            w[i].b_stop_easy  = n_round_up((i+1)*b_stop_easy/nthreads, rounding);
+            mod_worker_struct* X = wm + i;
+            X->to_ffts = P.to_ffts;
+            X->ffts = R->ffts;
+            X->stride = stride;
+            X->two_pow_tab = R->vec_two_pow_tab[n_cdiv(P.np, VEC_SZ) - 1];
+            X->abuf = abuf;
+            X->a = a;
+            X->an = an,
+            X->atrunc = atrunc;
+            X->bbuf = bbuf;
+            X->b = b;
+            X->bn = bn,
+            X->btrunc = btrunc;
+            X->a_start_easy = n_round_up((i+0)*a_stop_easy/nthreads, rounding);
+            X->a_stop_easy  = n_round_up((i+1)*a_stop_easy/nthreads, rounding);
+            X->b_start_easy = n_round_up((i+0)*b_stop_easy/nthreads, rounding);
+            X->b_stop_easy  = n_round_up((i+1)*b_stop_easy/nthreads, rounding);
             /* only the last thread i = nthreads - 1 does the hard ends */
-            w[i].a_start_hard = (i + 1 == nthreads) ? a_stop_easy : atrunc;
-            w[i].a_stop_hard  = (i + 1 == nthreads) ? a_stop_hard : atrunc;
-            w[i].b_start_hard = (i + 1 == nthreads) ? b_stop_easy : btrunc;
-            w[i].b_stop_hard  = (i + 1 == nthreads) ? b_stop_hard : btrunc;
+            X->a_start_hard = (i + 1 == nthreads) ? a_stop_easy : atrunc;
+            X->a_stop_hard  = (i + 1 == nthreads) ? a_stop_hard : atrunc;
+            X->b_start_hard = (i + 1 == nthreads) ? b_stop_easy : btrunc;
+            X->b_stop_hard  = (i + 1 == nthreads) ? b_stop_hard : btrunc;
         }
 
         for (slong i = P.nhandles; i > 0; i--)
             thread_pool_wake(global_thread_pool, P.handles[i - 1], 0,
-                                                       mod_worker_func, w + i);
-        mod_worker_func(w + 0);
+                                                       mod_worker_func, wm + i);
+        mod_worker_func(wm + 0);
 
         for (slong i = P.nhandles; i > 0; i--)
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
@@ -1901,7 +1918,22 @@ flint_printf("    mod: %wd\n", timer->wall);
 timeit_start(timer);
 #endif
 
-        FLINT_ASSERT(np >= nthreads);
+        /*
+            current scheduling:
+                np = 5, nthreads = 3:
+                thread0: p0, p3
+                thread1: p1, p4
+                thread2: p2
+
+                np = 3, nthreads = 5:
+                thread0: p0
+                thread1: p1
+                thread2: p2
+                thread3: -
+                thread4: -
+        */
+
+        wf = (fft_worker_struct*) worker_struct_buffer;
 
         for (ulong l = 0; l < P.np; l++)
         {
@@ -1917,12 +1949,12 @@ timeit_start(timer);
             X->next = (l + nthreads < P.np) ? X + nthreads : NULL;
         }
 
-        for (slong i = P.nhandles; i > 0; i--)
+        for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
             thread_pool_wake(global_thread_pool, P.handles[i - 1], 0,
                                                       fft_worker_func, wf + i);
         fft_worker_func(wf + 0);
 
-        for (slong i = P.nhandles; i > 0; i--)
+        for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
 
 #if TIME_THIS
@@ -1933,21 +1965,18 @@ flint_printf("    fft: %wd\n", timer->wall);
     }
     else
     {
-        mod_fft_worker_struct w[8];
+        mod_fft_worker_struct* w = (mod_fft_worker_struct*) worker_struct_buffer;
         ulong bits = P.bits;
         ulong np = P.np;
         ulong nthreads = P.nthreads;
         double* bbuf;
 
         abuf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
-        bbuf = abuf + P.np*stride;
+        bbuf = abuf + np*stride;
 
 #if TIME_THIS
 timeit_start(timer);
 #endif
-
-        FLINT_ASSERT(np >= nthreads);
-
         for (ulong l = 0; l < np; l++)
         {
             mod_fft_worker_struct* X = w + l;
@@ -1968,12 +1997,12 @@ timeit_start(timer);
             X->next = (l + nthreads < np) ? X + nthreads : NULL;
         }
 
-        for (slong i = P.nhandles; i > 0; i--)
+        for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
             thread_pool_wake(global_thread_pool, P.handles[i - 1], 0,
                                                    mod_fft_worker_func, w + i);
         mod_fft_worker_func(w + 0);
 
-        for (slong i = P.nhandles; i > 0; i--)
+        for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
 
 #if TIME_THIS
@@ -1989,10 +2018,12 @@ timeit_start(timer);
 
     {
         ulong n = R->crts[P.np-1].coeff_len;
-        ulong overhang[10][8];
-        crt_worker_struct w[10];
+        crt_worker_struct* w = (crt_worker_struct*) worker_struct_buffer;
         ulong nthreads = P.nthreads;
         ulong end_easy = (zn >= n+1 ? zn - (n+1) : UWORD(0))*64/P.bits;
+
+        /* this is how must space was statically allocated in each struct */
+        FLINT_ASSERT(n <= MPN_CTX_NCRTS);
 
         end_easy &= -BLK_SZ;
 
@@ -2017,7 +2048,7 @@ timeit_start(timer);
             X->bits = P.bits;
             X->start_easy = n_round_up((l+0)*end_easy/nthreads, BLK_SZ);
             X->stop_easy  = n_round_up((l+1)*end_easy/nthreads, BLK_SZ);
-            X->overhang = (l + 1 == nthreads) ? NULL : overhang[l];
+            X->overhang = (l + 1 == nthreads) ? NULL : X->overhang_buffer;
         }
 
         for (slong i = P.nhandles; i > 0; i--)
@@ -2031,24 +2062,26 @@ timeit_start(timer);
         unsigned char cf = 0;
         for (ulong i = 1; i <= P.nhandles; i++)
         {
-            ulong word_start = w[i].start_easy*P.bits/64;
+            ulong start = w[i].start_easy*P.bits/64;
             if (i == P.nhandles)
             {
-                cf = _addto(z + word_start, zn - word_start, overhang[i-1], n, cf);
+                cf = flint_mpn_add_inplace_c(z + start, zn - start,
+                                              w[i - 1].overhang_buffer, n, cf);
             }
             else
             {
-                ulong word_stop = w[i].stop_easy*P.bits/64;
-                if (word_stop > word_start)
+                ulong stop = w[i].stop_easy*P.bits/64;
+                if (stop > start)
                 {
-                    cf = _addto(z + word_start, word_stop - word_start, overhang[i-1], n, cf);
+                    cf = flint_mpn_add_inplace_c(z + start, stop - start,
+                                              w[i - 1].overhang_buffer, n, cf);
                 }
                 else
                 {
                     for (ulong k = 0; k < n; k++)
                     {
-                        FLINT_ASSERT(overhang[i][k] == 0);
-                        overhang[i][k] = overhang[i-1][k];
+                        FLINT_ASSERT(w[i].overhang_buffer[k] == 0);
+                        w[i].overhang_buffer[k] = w[i - 1].overhang_buffer[k];
                     }
                 }
             }
@@ -2066,6 +2099,7 @@ flint_printf("      +: %wd\n", timer_overall->wall);
 
 #undef TIME_THIS
 
+    flint_free(worker_struct_buffer);
     flint_give_back_threads(P.handles, P.nhandles);
 }
 
