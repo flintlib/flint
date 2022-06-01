@@ -17,7 +17,7 @@ _gr_poly_inv_series(gr_ptr Qinv,
 
     if (Qlen == 1)
     {
-        _gr_vec_zero(GR_ENTRY(Qinv, 1, sz), len - 1, ctx);
+        status = _gr_vec_zero(GR_ENTRY(Qinv, 1, sz), len - 1, ctx);
     }
     else if (len == 2)
     {

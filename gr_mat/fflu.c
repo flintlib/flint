@@ -38,7 +38,7 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
     gr_ptr d, e;
     gr_ptr * a;
     slong i, j, k, m, n, r, rank, row, col, sz;
-    int status;
+    int status = GR_SUCCESS;
     int pivot_status;
 
     if (gr_mat_is_empty(A, ctx) == T_TRUE)
@@ -56,7 +56,7 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
     n = gr_mat_ncols(A, ctx);
     sz = ctx->sizeof_elem;
 
-    gr_mat_set(LU, A, ctx);
+    status |= gr_mat_set(LU, A, ctx);
 
     a = LU->rows;
 
@@ -68,9 +68,6 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
 
     gr_init(d, ctx);
     gr_init(e, ctx);
-
-    status = GR_SUCCESS;
-
     while (row < m && col < n)
     {
         pivot_status = gr_mat_find_nonzero_pivot(&r, LU, row, m, col, ctx);

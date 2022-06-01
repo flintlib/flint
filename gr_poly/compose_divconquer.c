@@ -96,7 +96,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
         }
     }
 
-    _gr_poly_mul(pow, poly2, len2, poly2, len2, ctx);
+    status |= _gr_poly_mul(pow, poly2, len2, poly2, len2, ctx);
     powlen = 2 * len2 - 1;
 
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)

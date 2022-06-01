@@ -650,8 +650,8 @@ gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
         if (res == x)
         {
             GR_TMP_INIT2(t, u, ctx);
-            gr_set(u, x, ctx);
-            status = gr_generic_pow_ui_binexp(res, t, u, e, ctx);
+            status = gr_set(u, x, ctx);
+            status |= gr_generic_pow_ui_binexp(res, t, u, e, ctx);
             GR_TMP_CLEAR2(t, u, ctx);
         }
         else
@@ -732,16 +732,10 @@ int
 gr_generic_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_zero(x, ctx) == T_TRUE)
-    {
-        gr_zero(res, ctx);
-        return GR_SUCCESS;
-    }
+        return gr_zero(res, ctx);
 
     if (gr_is_one(x, ctx) == T_TRUE)
-    {
-        gr_one(res, ctx);
-        return GR_SUCCESS;
-    }
+        return gr_one(res, ctx);
 
     return GR_UNABLE;
 }
@@ -753,10 +747,7 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
         return GR_DOMAIN;
 
     if (gr_is_one(x, ctx) == T_TRUE)
-    {
-        gr_one(res, ctx);
-        return GR_SUCCESS;
-    }
+        return gr_one(res, ctx);
 
     return GR_UNABLE;
 }

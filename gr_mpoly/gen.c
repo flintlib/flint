@@ -63,8 +63,12 @@ truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, g
         gr_mpoly_t t;
 
         gr_mpoly_init(t, mctx, cctx);
-        gr_mpoly_gen(t, var, mctx, cctx);
-        res = gr_mpoly_equal(A, t, mctx, cctx);
+
+        if (gr_mpoly_gen(t, var, mctx, cctx) != GR_SUCCESS)
+            res = T_UNKNOWN;
+        else
+            res = gr_mpoly_equal(A, t, mctx, cctx);
+
         gr_mpoly_clear(t, mctx, cctx);
     }
 

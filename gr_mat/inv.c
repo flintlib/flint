@@ -15,7 +15,7 @@ int
 gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     gr_mat_t T;
-    int status;
+    int status = GR_SUCCESS;
     slong n = mat->r;
 
     if (n != mat->c)
@@ -28,9 +28,9 @@ gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
         return gr_inv(res->rows[0], mat->rows[0], ctx);
 
     gr_mat_init(T, n, n, ctx);
-    gr_mat_one(T, ctx);
 
-    status = gr_mat_solve(res, mat, T, ctx);
+    status |= gr_mat_one(T, ctx);
+    status |= gr_mat_solve(res, mat, T, ctx);
 
     gr_mat_clear(T, ctx);
 

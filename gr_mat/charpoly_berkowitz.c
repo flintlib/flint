@@ -46,7 +46,7 @@ _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
                 status |= gr_set(GR_ENTRY(a, 0 * n + i, sz), GR_MAT_ENTRY(mat, i, t, sz), ctx);
             }
 
-            gr_set(A, GR_MAT_ENTRY(mat, t, t, sz), ctx);
+            status |= gr_set(A, GR_MAT_ENTRY(mat, t, t, sz), ctx);
 
             for (k = 1; k < t; k++)
             {

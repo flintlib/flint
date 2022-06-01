@@ -38,7 +38,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     gr_ptr d, e;
     gr_ptr * a;
     slong i, j, m, n, r, rank, row, col, sz;
-    int status;
+    int status = GR_SUCCESS;
     int pivot_status;
 
     if (gr_mat_is_empty(A, ctx) == T_TRUE)
@@ -53,7 +53,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     n = gr_mat_ncols(A, ctx);
     sz = ctx->sizeof_elem;
 
-    gr_mat_set(LU, A, ctx);
+    status |= gr_mat_set(LU, A, ctx);
 
     a = LU->rows;
 
@@ -63,8 +63,6 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
 
     gr_init(d, ctx);
     gr_init(e, ctx);
-
-    status = GR_SUCCESS;
 
     while (row < m && col < n)
     {
