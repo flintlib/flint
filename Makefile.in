@@ -6,22 +6,44 @@ QUIET_AR  = @echo '   ' AR  ' ' $@;
 
 AT=@
 
-BUILD_DIRS = aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
-   fmpq_poly fmpz_mat fmpz_lll mpfr_vec mpfr_mat mpf_vec mpf_mat \
-   nmod nmod_vec nmod_poly \
-   nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_vec fmpq_mat padic \
-   fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly \
-   fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve \
-   double_extras d_vec d_mat padic_poly padic_mat qadic  \
-   fq fq_vec fq_mat fq_poly fq_poly_factor fq_embed \
-   fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor fq_nmod_embed \
-   fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor fq_zech_embed \
-   fmpz_mod_mat mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly \
-   thread_pool thread_support fmpz_mod fmpz_mod_vec fmpz_mod_mpoly fmpz_mod_mpoly_factor \
-   n_poly fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor \
-   fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor fq_default \
-   fq_default_poly fq_default_poly_factor fq_default_mat \
-   $(EXTRA_BUILD_DIRS)
+BUILD_DIRS= thread_pool                     thread_support                  \
+            ulong_extras                                                    \
+            long_extras                                                     \
+            perm                                                            \
+            double_extras   d_vec           d_mat                           \
+            mpn_extras                                                      \
+            mpf_vec                         mpf_mat                         \
+            mpfr_vec                        mpfr_mat                        \
+            nmod            nmod_vec        nmod_mat        nmod_poly       \
+            fmpz            fmpz_vec        fmpz_mat        fmpz_poly       \
+            fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly   \
+            fmpq            fmpq_vec        fmpq_mat        fmpq_poly       \
+            fq              fq_vec          fq_mat          fq_poly         \
+            fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly    \
+            fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly    \
+            fq_default                      fq_default_mat  fq_default_poly \
+            fq_embed                                                        \
+            fq_nmod_embed                                                   \
+            fq_zech_embed                                                   \
+            padic                           padic_mat       padic_poly      \
+            qadic                                                           \
+                                                                            \
+            nmod_poly_factor                fmpz_factor                     \
+            fmpz_poly_factor                fmpz_mod_poly_factor            \
+            fq_poly_factor                  fq_nmod_poly_factor             \
+            fq_zech_poly_factor             fq_default_poly_factor          \
+                                                                            \
+            nmod_poly_mat                    fmpz_poly_mat                  \
+                                                                            \
+            mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly  \
+            fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly                   \
+                                                                            \
+            nmod_mpoly_factor               fmpz_mpoly_factor               \
+            fmpz_mod_mpoly_factor           fmpq_mpoly_factor               \
+            fq_nmod_mpoly_factor            fq_zech_mpoly_factor            \
+                                                                            \
+            fft             fmpz_poly_q     fmpz_lll        n_poly          \
+            arith           qsieve          aprcl           $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
    fq_poly_factor_templates fq_embed_templates fq_templates
