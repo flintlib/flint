@@ -15,7 +15,7 @@
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
+#include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 #include "mpn_extras.h"
