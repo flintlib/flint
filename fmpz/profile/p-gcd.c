@@ -11,10 +11,10 @@
 */
 
 #include <gmp.h>
-#include "flint/flint.h"
-#include "flint/ulong_extras.h"
-#include "flint/fmpz.h"
-#include "flint/profiler.h"
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "profiler.h"
 
 typedef struct
 {

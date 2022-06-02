@@ -11,8 +11,8 @@
 */
 
 #include <gmp.h>
-#include "flint/fmpz.h"
-#include "flint/profiler.h"
+#include "fmpz.h"
+#include "profiler.h"
 
 typedef struct
 {
