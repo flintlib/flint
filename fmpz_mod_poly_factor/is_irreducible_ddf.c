@@ -22,7 +22,7 @@
 
 #define ulong mp_limb_t
 
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly,
                                                       const fmpz_mod_ctx_t ctx)
