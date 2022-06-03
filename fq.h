@@ -96,7 +96,7 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 {
     int r;
 
-    r = fprintf(file, "p = ");
+    r = flint_fprintf(file, "p = ");
     if (r <= 0)
         return r;
 
@@ -104,11 +104,11 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "\nd = " WORD_FMT "d\n", fq_ctx_degree(ctx));
+    r = flint_fprintf(file, "\nd = %wd\n", fq_ctx_degree(ctx));
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "f(X) = ");
+    r = flint_fprintf(file, "f(X) = ");
     if (r <= 0)
         return r;
 
@@ -116,7 +116,7 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "\n");
+    r = flint_fprintf(file, "\n");
 
     return r;
 }

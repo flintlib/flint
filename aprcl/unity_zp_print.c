@@ -15,7 +15,8 @@
 void
 unity_zp_print(const unity_zp f)
 {
-    printf("p = " WORD_FMT "u; exp = " WORD_FMT "u\n", f->p, f->exp);
+    flint_printf("p = %wu; exp = %wu\n", f->p, f->exp);
     fmpz_mod_poly_print(f->poly, f->ctx);
-    printf("\n");
+    flint_printf("\n");
 }
+

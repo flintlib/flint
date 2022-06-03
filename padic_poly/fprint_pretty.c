@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdio.h>
-#undef ulong
 #include "padic_poly.h"
 
 int _padic_poly_fprint_pretty(FILE *file, 
@@ -41,18 +38,18 @@ int _padic_poly_fprint_pretty(FILE *file,
 
         if (padic_is_one(x))
         {
-            fprintf(file, "%s", var);
+            flint_fprintf(file, "%s", var);
         }
         else if (*(padic_unit(x)) == WORD(-1) && padic_val(x) == 0)
         {
-            fprintf(file, "-%s", var);
+            flint_fprintf(file, "-%s", var);
         }
         else
         {
             fputc('(', file);
             padic_fprint(file, x, ctx);
             fputc(')', file);
-            fprintf(file, "*%s", var);
+            flint_fprintf(file, "*%s", var);
         }
 
         fmpz_abs(padic_unit(x), poly);
@@ -80,15 +77,15 @@ int _padic_poly_fprint_pretty(FILE *file,
             _padic_canonicalise(x, ctx);
 
             if (padic_is_one(x))
-               fprintf(file, "%s^" WORD_FMT "d", var, i);
+               flint_fprintf(file, "%s^%wd", var, i);
             else if (*(padic_unit(x)) == WORD(-1) && padic_val(x) == 0)
-               fprintf(file, "-%s^" WORD_FMT "d", var, i);
+               flint_fprintf(file, "-%s^%wd", var, i);
             else
             {
                 fputc('(', file);
                 padic_fprint(file, x, ctx);
                 fputc(')', file);
-                fprintf(file, "*%s^" WORD_FMT "d", var, i);
+                flint_fprintf(file, "*%s^%wd", var, i);
             }
             --i;
         }
@@ -108,13 +105,13 @@ int _padic_poly_fprint_pretty(FILE *file,
                 fputc('-', file);
 
             if (padic_is_one(x))
-                flint_fprintf(file, "%s^" WORD_FMT "d", var, i);
+                flint_fprintf(file, "%s^%wd", var, i);
             else
             {
                 fputc('(', file);
                 padic_fprint(file, x, ctx);
                 fputc(')', file);
-                flint_fprintf(file, "*%s^" WORD_FMT "d", var, i);
+                flint_fprintf(file, "*%s^%wd", var, i);
             }
         }
 

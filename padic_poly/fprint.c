@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdio.h>
-#undef ulong
 #include "padic_poly.h"
 
 int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, 
@@ -23,21 +20,21 @@ int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len,
 
     if (len == 0)
     {
-        fprintf(file, "0");
+        flint_fprintf(file, "0");
         return 1;
     }
 
     fmpz_init(u);
 
-    fprintf(file, WORD_FMT "d ", len);
+    flint_fprintf(file, "%wd ", len);
 
     for (i = 0; i < len; i++)
     {
-        fprintf(file, " ");
+        flint_fprintf(file, " ");
 
         if (fmpz_is_zero(poly + i))
         {
-            fprintf(file, "0");
+            flint_fprintf(file, "0");
         }
         else
         {

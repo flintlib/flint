@@ -20,15 +20,15 @@
 #endif
 
 #ifndef memcpy
-# ifdef __GNUC__
-#  define memcpy __builtin_memcpy
-# else
-#  undef ulong
-#  define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#  include <string.h>
-#  undef ulong
-#  define ulong mp_limb_t
-# endif
+#ifdef __GNUC__
+#define memcpy __builtin_memcpy
+#else
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <string.h>
+#undef ulong
+#define ulong mp_limb_t
+#endif
 #endif
 #include "fmpz_mat.h"
 

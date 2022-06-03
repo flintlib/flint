@@ -334,19 +334,19 @@ FLINT_DLL void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, s
 #if _FLINT_HAVE_FILE
 PADIC_POLY_INLINE int padic_poly_debug(const padic_poly_t poly)
 {
-    printf("(alloc = " WORD_FMT "d, length = " WORD_FMT "d, val = " WORD_FMT "d, N = " WORD_FMT "d, vec = ",
+    flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ",
         poly->alloc, poly->length, poly->val, poly->N);
     if (poly->coeffs)
     {
-        printf("{");
+        flint_printf("{");
         _fmpz_vec_print(poly->coeffs, poly->alloc);
-        printf("}");
+        flint_printf("}");
     }
     else
     {
-        printf("NULL");
+        flint_printf("NULL");
     }
-    printf(")");
+    flint_printf(")");
 
     return 1;
 }

@@ -349,9 +349,9 @@ PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 PADIC_INLINE void padic_debug(const padic_t op)
 {
-    printf("(");
+    flint_printf("(");
     fmpz_print(padic_unit(op)); 
-    printf(" " WORD_FMT "d " WORD_FMT "d)", padic_val(op), padic_prec(op));
+    flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
 }
 #endif
 
