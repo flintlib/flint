@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdio.h>
-#undef ulong
 #include "nmod_poly.h"
 
 /*
@@ -122,9 +119,11 @@ void nmod_berlekamp_massey_print(
 {
     slong i;
     nmod_poly_print_pretty(B->V1, "#");
-    printf(",");
+    flint_printf(",");
     for (i = 0; i < B->points->length; i++)
-        printf(" " WORD_FMT "u", B->points->coeffs[i]);
+    {
+        flint_printf(" %wu", B->points->coeffs[i]);
+    }
 }
 
 void nmod_berlekamp_massey_add_points(

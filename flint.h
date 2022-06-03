@@ -29,28 +29,28 @@
 #endif
 
 #ifndef alloca
-# ifdef __GNUC__
-#  define alloca __builtin_alloca
-# else
-#  ifdef __DECC
-#   define alloca(x) __ALLOCA(x)
-#  else
-#   ifdef _MSC_VER
-#    include <malloc.h>
-#    define alloca _alloca
-#   else
-#    if HAVE_ALLOCA_H
-#     include <alloca.h>
-#    else
-#     if defined (_AIX) || defined (_IBMR2)
-#      pragma alloca
-#     else
-#      error Could not find alloca, which is required for FLINT
-#     endif
-#    endif
-#   endif
-#  endif
-# endif
+#ifdef __GNUC__
+#define alloca __builtin_alloca
+#else
+#ifdef __DECC
+#define alloca(x) __ALLOCA(x)
+#else
+#ifdef _MSC_VER
+#include <malloc.h>
+#define alloca _alloca
+#else
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#else
+#if defined (_AIX) || defined (_IBMR2)
+#pragma alloca
+#else
+#error Could not find alloca, which is required for FLINT
+#endif
+#endif
+#endif
+#endif
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -68,7 +68,7 @@ extern "C" {
                          __FLINT_VERSION_PATCHLEVEL)
 
 #if __GNU_MP_VERSION < 5
-# error GMP 5.0.0 or MPIR 2.6.0 or later are required
+#error GMP 5.0.0 or MPIR 2.6.0 or later are required
 #endif
 
 /* Internals ******************************************************************/
@@ -78,14 +78,14 @@ extern "C" {
    the code to be compiled with the "-ansi" flag under GCC
  */
 #ifndef __GNUC__
-# define __asm__     asm
-# define __inline__  inline
+#define __asm__     asm
+#define __inline__  inline
 #endif
 
 #ifdef FLINT_INLINES_C
-# define FLINT_INLINE FLINT_DLL
+#define FLINT_INLINE FLINT_DLL
 #else
-# define FLINT_INLINE static __inline__
+#define FLINT_INLINE static __inline__
 #endif
 
 /* If user has provided FILE, then we provide related functions. */
@@ -157,51 +157,51 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 #endif
 
 #if defined(_WIN64) || defined(__mips64)
-# if defined(__MINGW64__)
-#  define WORD_FMT "%I64"
-#  define WORD_WIDTH_FMT "%*I64"
-# else
-#  define WORD_FMT "%ll"
-#  define WORD_WIDTH_FMT "%*ll"
-# endif
-# define WORD(xx) (xx##LL)
-# define UWORD(xx) (xx##ULL)
+#if defined(__MINGW64__)
+#define WORD_FMT "%I64"
+#define WORD_WIDTH_FMT "%*I64"
 #else
-# define WORD_FMT "%l"
-# define WORD_WIDTH_FMT "%*l"
-# define WORD(xx) (xx##L)
-# define UWORD(xx) (xx##UL)
-# define _FLINT_LONGSLONG
+#define WORD_FMT "%ll"
+#define WORD_WIDTH_FMT "%*ll"
+#endif
+#define WORD(xx) (xx##LL)
+#define UWORD(xx) (xx##ULL)
+#else
+#define WORD_FMT "%l"
+#define WORD_WIDTH_FMT "%*l"
+#define WORD(xx) (xx##L)
+#define UWORD(xx) (xx##UL)
+#define _FLINT_LONGSLONG
 #endif
 
 #ifndef FLINT_NO_WORDMAC
-# if FLINT64
-#  define UWORD_MAX UWORD(18446744073709551615)
-#  define WORD_MAX   WORD(9223372036854775807)
-# else
-#  define UWORD_MAX UWORD(4294967295)
-#  define WORD_MAX   WORD(2147483647)
-# endif
-# define UWORD_MIN UWORD(0)
-# define WORD_MIN  (-WORD_MAX - WORD(1))
+#if FLINT64
+#define UWORD_MAX UWORD(18446744073709551615)
+#define WORD_MAX   WORD(9223372036854775807)
+#else
+#define UWORD_MAX UWORD(4294967295)
+#define WORD_MAX   WORD(2147483647)
+#endif
+#define UWORD_MIN UWORD(0)
+#define WORD_MIN  (-WORD_MAX - WORD(1))
 #endif
 
 #define flint_bitcnt_t ulong
 
 #if FLINT_USES_TLS
-# if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-#  define FLINT_TLS_PREFIX __thread
-# elif __STDC_VERSION__ >= 201112L
-#  define FLINT_TLS_PREFIX _Thread_local
-# elif defined(_MSC_VER)
-#  define FLINT_TLS_PREFIX __declspec(thread)
-# elif defined(__GNUC__)
-#  define FLINT_TLS_PREFIX __thread
-# else
-#  error "thread local prefix defined in C11 or later"
-# endif
+#if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#define FLINT_TLS_PREFIX __thread
+#elif __STDC_VERSION__ >= 201112L
+#define FLINT_TLS_PREFIX _Thread_local
+#elif defined(_MSC_VER)
+#define FLINT_TLS_PREFIX __declspec(thread)
+#elif defined(__GNUC__)
+#define FLINT_TLS_PREFIX __thread
 #else
-# define FLINT_TLS_PREFIX
+#error "thread local prefix defined in C11 or later"
+#endif
+#else
+#define FLINT_TLS_PREFIX
 #endif
 
 FLINT_DLL int flint_get_num_threads(void);
@@ -227,7 +227,7 @@ typedef flint_rand_s flint_rand_t[1];
 FLINT_INLINE
 void flint_randinit(flint_rand_t state)
 {
-   state->gmp_init = 0;
+    state->gmp_init = 0;
 #if FLINT64
     state->__randval = UWORD(13845646450878251009);
     state->__randval2 = UWORD(13142370077570254774);
@@ -240,15 +240,15 @@ void flint_randinit(flint_rand_t state)
 FLINT_INLINE
 void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
 {
-   state->__randval = seed1;
-   state->__randval2 = seed2;
+    state->__randval = seed1;
+    state->__randval2 = seed2;
 }
 
 FLINT_INLINE
 void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
 {
-   *seed1 = state->__randval;
-   *seed2 = state->__randval2;
+    *seed1 = state->__randval;
+    *seed2 = state->__randval2;
 }
 
 
@@ -282,35 +282,35 @@ void flint_rand_free(flint_rand_s * state)
 }
 
 #if FLINT_USES_GC
-# define FLINT_GC_INIT() GC_init()
+#define FLINT_GC_INIT() GC_init()
 #else
-# define FLINT_GC_INIT()
+#define FLINT_GC_INIT()
 #endif
 
 #define FLINT_TEST_INIT(xxx) \
-   flint_rand_t xxx; \
-   FLINT_GC_INIT(); \
-   flint_randinit(xxx)
+    flint_rand_t xxx; \
+    FLINT_GC_INIT(); \
+    flint_randinit(xxx)
 
 #define FLINT_TEST_CLEANUP(xxx) \
-   flint_randclear(xxx); \
-   flint_cleanup_master();
+    flint_randclear(xxx); \
+    flint_cleanup_master();
 
 #if FLINT_WANT_ASSERT
-# define FLINT_ASSERT(param) assert(param)
+#define FLINT_ASSERT(param) assert(param)
 #else
-# define FLINT_ASSERT(param)
+#define FLINT_ASSERT(param)
 #endif
 
 #if defined(__GNUC__)
-# define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
-# define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
-# define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
+#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
+#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 #else
-# define __attribute__(x)
-# define FLINT_UNUSED(x) x
-# define FLINT_SET_BUT_UNUSED(x) x
-# define FLINT_WARN_UNUSED
+#define __attribute__(x)
+#define FLINT_UNUSED(x) x
+#define FLINT_SET_BUT_UNUSED(x) x
+#define FLINT_WARN_UNUSED
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
@@ -387,26 +387,26 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
     } while (0)
 
 #define flint_mpn_copyi(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < (nnn); ixxx++) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
+    do { \
+        slong ixxx; \
+        for (ixxx = 0; ixxx < (nnn); ixxx++) \
+        (xxx)[ixxx] = (yyy)[ixxx]; \
+    } while (0)
 
 #define flint_mpn_copyd(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
+    do { \
+        slong ixxx; \
+        for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
+        (xxx)[ixxx] = (yyy)[ixxx]; \
+    } while (0)
 
 #define flint_mpn_store(xxx, nnn, yyy) \
-   do \
-   { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < nnn; ixxx++) \
-         (xxx)[ixxx] = yyy; \
-   } while (0)
+    do \
+    { \
+        slong ixxx; \
+        for (ixxx = 0; ixxx < nnn; ixxx++) \
+        (xxx)[ixxx] = yyy; \
+    } while (0)
 
 /* common usage of flint_malloc */
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
@@ -414,47 +414,47 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 
 /* temporary allocation */
 #define TMP_INIT \
-   typedef struct __tmp_struct { \
-      void * block; \
-      struct __tmp_struct * next; \
-   } __tmp_t; \
-   __tmp_t * __tmp_root; \
-   __tmp_t * __tpx
+    typedef struct __tmp_struct { \
+        void * block; \
+        struct __tmp_struct * next; \
+    } __tmp_t; \
+    __tmp_t * __tmp_root; \
+    __tmp_t * __tpx
 
 #define TMP_START \
-   __tmp_root = NULL
+    __tmp_root = NULL
 
 #if FLINT_WANT_ASSERT
-# define TMP_ALLOC(size) \
-   (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
-       __tpx->next = __tmp_root, \
-       __tmp_root = __tpx, \
-       __tpx->block = flint_malloc(size))
+#define TMP_ALLOC(size) \
+    (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
+         __tpx->next = __tmp_root, \
+         __tmp_root = __tpx, \
+         __tpx->block = flint_malloc(size))
 #else
-# define TMP_ALLOC(size) \
-   (((size) > 8192) ? \
-      (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
-       __tpx->next = __tmp_root, \
-       __tmp_root = __tpx, \
-       __tpx->block = flint_malloc(size)) : \
-      alloca(size))
+#define TMP_ALLOC(size) \
+    (((size) > 8192) ? \
+        (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
+         __tpx->next = __tmp_root, \
+         __tmp_root = __tpx, \
+         __tpx->block = flint_malloc(size)) : \
+         alloca(size))
 #endif
 
 #define TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC((n)*sizeof(T))
 
 #define TMP_END \
-   while (__tmp_root) { \
-      flint_free(__tmp_root->block); \
-      __tmp_root = __tmp_root->next; \
-   }
+    while (__tmp_root) { \
+        flint_free(__tmp_root->block); \
+        __tmp_root = __tmp_root->next; \
+    }
 
 /* compatibility between gmp and mpir */
 #ifndef mpn_com_n
-# define mpn_com_n mpn_com
+#define mpn_com_n mpn_com
 #endif
 
 #ifndef mpn_neg_n
-# define mpn_neg_n mpn_neg
+#define mpn_neg_n mpn_neg
 #endif
 
 #ifndef mpn_tdiv_q

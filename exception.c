@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include "flint.h"
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
@@ -53,26 +52,30 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
 
     va_start(ap, msg);
 
+    flint_printf("Flint exception (");
+
     switch (exc)
     {
         case FLINT_ERROR:
-            printf("Flint exception (General error):\n    ");
+            flint_printf("General error");
             break;
         case FLINT_IMPINV:
-            printf("Flint exception (Impossible inverse):\n    ");
+            flint_printf("Impossible inverse");
             break;
         case FLINT_DOMERR:
-            printf("Flint exception (Domain error):\n    ");
+            flint_printf("Domain error");
             break;
         case FLINT_DIVZERO:
-            printf("Flint exception (Divide by zero):\n    ");
+            flint_printf("Divide by zero");
             break;
         case FLINT_INEXACT:
-            printf("Flint exception (Inexact):\n    ");
+            flint_printf("Inexact");
             break;
         default:
-            printf("Flint exception (Unknown exception):\n    ");
+            flint_printf("Unknown exception");
      }
+
+     printf("):\n    ");
 
      flint_vprintf(msg, ap);
      va_end(ap);
