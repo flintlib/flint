@@ -37,8 +37,15 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     loglen2 = FLINT_CLOG2(len2);
     n = (WORD(1) << (loglen - 2));
 
-    size1 = _fmpz_vec_max_limbs(input1, len1); 
-    size2 = _fmpz_vec_max_limbs(input2, len2);
+    bits1 = _fmpz_vec_max_bits(input1, len1);
+
+    if (input1 == input2 && len1 == len2)
+        bits2 = bits1;
+    else
+        bits2 = _fmpz_vec_max_bits(input2, len2);
+
+    size1 = (FLINT_ABS(bits1) + FLINT_BITS - 1) / FLINT_BITS;
+    size2 = (FLINT_ABS(bits2) + FLINT_BITS - 1) / FLINT_BITS;
 
     /* Start with an upper bound on the number of bits needed */
     output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1; 
@@ -83,17 +90,16 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     } else jj = ii;
 
     /* put coefficients into FFT vecs */
-    bits1 = _fmpz_vec_get_fft(ii, input1, limbs, len1);
+    _fmpz_vec_get_fft(ii, input1, limbs, len1);
     for (i = len1; i < 4*n; i++)
         flint_mpn_zero(ii[i], limbs + 1);
 
     if (input1 != input2) 
     {
-        bits2 = _fmpz_vec_get_fft(jj, input2, limbs, len2);
+        _fmpz_vec_get_fft(jj, input2, limbs, len2);
         for (i = len2; i < 4*n; i++)
             flint_mpn_zero(jj[i], limbs + 1);
     }
-    else bits2 = bits1;
 
     if (bits1 < WORD(0) || bits2 < WORD(0)) 
     {
