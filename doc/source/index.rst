@@ -59,6 +59,7 @@ Integers
    fmpz_poly.rst
    fmpz_poly_mat.rst
    fmpz_poly_factor.rst
+   fmpz_poly_roots.rst
    fmpz_mpoly.rst
    fmpz_mpoly_factor.rst
    long_extras.rst
