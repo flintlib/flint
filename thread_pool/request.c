@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
+#include "thread_pool-impl.h"
 
 
 slong thread_pool_request(thread_pool_t T, thread_pool_handle * out,

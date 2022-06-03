@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define _GNU_SOURCE
-#include <sched.h>
 
-#include "thread_pool.h"
+#include "thread_pool-impl.h"
 
 /*
     cpus[0] is cpu number for main thread

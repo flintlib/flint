@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
+#include "thread_pool-impl.h"
 
 /*
     if f is continuous with

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
+#include "thread_pool-impl.h"
 
 /*
     given a range of jobs with numbers in [start, stop), 

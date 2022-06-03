@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,18 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool-impl.h"
+#ifndef THREAD_POOL_IMPL_H
+#define THREAD_POOL_IMPL_H
 
+#define _GNU_SOURCE
+#include <sched.h>
 
-slong thread_pool_get_size(thread_pool_t T)
-{
-    slong ret;
-#if FLINT_USES_PTHREAD
-    pthread_mutex_lock(&T->mutex);
+#include "thread_pool.h"
+
 #endif
-    ret = T->length;
-#if FLINT_USES_PTHREAD
-    pthread_mutex_unlock(&T->mutex);
-#endif
-    return ret;
-}

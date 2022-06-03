@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define _GNU_SOURCE
-#include <sched.h>
 
-#include "thread_pool.h"
+#include "thread_pool-impl.h"
 
 thread_pool_t global_thread_pool;
 int global_thread_pool_initialized = 0;

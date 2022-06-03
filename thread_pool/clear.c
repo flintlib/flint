@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
+#include "thread_pool-impl.h"
 
 
 void thread_pool_clear(thread_pool_t T)
