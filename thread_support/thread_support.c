@@ -10,9 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "thread_pool.h"
-#include "thread_support.h"
+#include "thread_support-impl.h"
 
 /* Automatically initialised to zero when threads are started */
 FLINT_TLS_PREFIX int _flint_num_workers = 0;
