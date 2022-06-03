@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 n_pair_t
 fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)

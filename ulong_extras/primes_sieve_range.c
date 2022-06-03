@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 static void
 mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)

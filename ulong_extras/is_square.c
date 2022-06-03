@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
-#define ulong mp_limb_t
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 int mod64[64] = {1,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,
                  0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,

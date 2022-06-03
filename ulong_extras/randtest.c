@@ -10,12 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-#include <gmp.h>
+#include "ulong_extras-impl.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+
 
 mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
 {

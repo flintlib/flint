@@ -10,12 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include "ulong_extras-impl.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+
 
 typedef struct apow {
     ulong k;

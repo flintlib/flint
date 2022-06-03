@@ -11,14 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#include <stdlib.h>
-#undef ulong
-#define ulong mp_limb_t
-#include "flint.h"
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 int
 n_is_prime_pocklington(mp_limb_t n, ulong iterations)

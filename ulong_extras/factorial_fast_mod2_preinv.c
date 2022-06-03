@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
+#include "ulong_extras-impl.h"
+
 
 mp_limb_t
 n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)

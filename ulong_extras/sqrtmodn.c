@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 /* compute square roots of a modulo m given factorisation of m */
 slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac) 

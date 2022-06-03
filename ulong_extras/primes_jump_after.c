@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 void
 n_primes_jump_after(n_primes_t iter, mp_limb_t n)

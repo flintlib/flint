@@ -11,19 +11,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
+#include "ulong_extras-impl.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
-#include <pthread.h>
 
 static pthread_once_t primes_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t primes_lock;

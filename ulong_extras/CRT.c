@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "ulong_extras-impl.h"
+
 
 /* TODO: improve the implementation of this function */
 ulong n_CRT(ulong A1, ulong M1, ulong A2, ulong M2)

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#include "ulong_extras-impl.h"
+
 
 mp_limb_t n_factor_trial_range(n_factor_t * factors, mp_limb_t n, ulong start, ulong num_primes)
 {
