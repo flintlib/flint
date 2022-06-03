@@ -16,6 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpn_extras.h"
 
 void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
 {
@@ -57,7 +58,7 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
 
     _fmpz_poly_bit_pack(arr_in, poly, len, bits, neg);
 
-    mpn_sqr(arr_out, arr_in, limbs);
+    flint_mpn_sqr(arr_out, arr_in, limbs);
 
     if (sign)
         _fmpz_poly_bit_unpack(res, n, arr_out, bits, 0);

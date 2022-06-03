@@ -15,6 +15,7 @@
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "mpn_extras.h"
 
 /*
    Multiplication/squaring using Kronecker substitution at 2^b, -2^b,
@@ -170,8 +171,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
             and |h(-B)| = |f1(-B)| * |f2(-B)|
          hn_neg is set if h(-B) is negative
       */
-      mpn_mul(v3pn, v1pn, k1, v2pn, k2);
-      mpn_mul(v3mn, v1mn, k1, v2mn, k2);
+      flint_mpn_mul(v3pn, v1pn, k1, v2pn, k2);
+      flint_mpn_mul(v3mn, v1mn, k1, v2mn, k2);
    }
    else
    {
@@ -193,8 +194,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
             and h(-B) = |f1(-B)|^2
          hn_neg is cleared since h(-B) is never negative
       */
-      mpn_sqr(v3pn, v1pn, k1);
-      mpn_sqr(v3mn, v1mn, k1);
+      flint_mpn_sqr(v3pn, v1pn, k1);
+      flint_mpn_sqr(v3mn, v1mn, k1);
       v3m_neg = 0;
    }
 
@@ -270,8 +271,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
                          |B^(n1-1) * f1(-1/B)| * |B^(n2-1) * f2(-1/B)|
          hr_neg is set if h(-1/B) is negative
       */
-      mpn_mul(v3pr, v1pr, k1, v2pr, k2);
-      mpn_mul(v3mr, v1mr, k1, v2mr, k2);
+      flint_mpn_mul(v3pr, v1pr, k1, v2pr, k2);
+      flint_mpn_mul(v3mr, v1mr, k1, v2mr, k2);
    }
    else
    {
@@ -295,8 +296,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
              and B^(n3-1) * h(-1/B) = |B^(n1-1) * f1(-1/B)|^2
          hr_neg is cleared since h(-1/B) is never negative
       */
-      mpn_sqr(v3pr, v1pr, k1);
-      mpn_sqr(v3mr, v1mr, k1);
+      flint_mpn_sqr(v3pr, v1pr, k1);
+      flint_mpn_sqr(v3mr, v1mr, k1);
       v3m_neg = 0;
    }
 

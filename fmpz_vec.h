@@ -124,7 +124,7 @@ FLINT_DLL void _fmpz_vec_set_nmod_vec(fmpz * res,
 FLINT_DLL void _fmpz_vec_get_nmod_vec(mp_ptr res, 
                                     const fmpz * poly, slong len, nmod_t mod);
 
-FLINT_DLL slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
+FLINT_DLL void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
                                  const fmpz * coeffs_m, slong l, slong length);
 
 FLINT_DLL void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,

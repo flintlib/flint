@@ -15,46 +15,51 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fft.h"
+#include "profiler.h"
 
-int
-main(void)
+int main(void)
 {
-    mp_size_t iters;
-    
-    FLINT_TEST_INIT(state);
+    mp_ptr r, x, y;
+    mp_size_t n;
+    slong i, nt;
+    double t, _;
 
-    flint_printf("mul_fft_main....");
-    fflush(stdout);
+    flint_printf("         n     mpn_mul    1 thread    2 threads    4 threads    8 threads\n");
 
-    
-    _flint_rand_init_gmp(state);
-
-    iters = 1;
-    
+    for (n = 1000; n <= 10000000; n *= 1.025)
     {
-       mp_size_t int_limbs = 1000000;
-       mp_size_t j;
-       mp_limb_t * i1, *i2, *r1, *r2;
-        
-       flint_printf("bits = %wd\n", int_limbs*FLINT_BITS);
-       
-       i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
-       i2 = i1 + int_limbs;
-       r1 = i2 + int_limbs;
-       r2 = r1 + 2*int_limbs;
-   
-       flint_mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-       flint_mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
-       for (j = 0; j < iters; j++)
-          //mpn_mul(r2, i1, int_limbs, i2, int_limbs);
-          flint_mpn_mul_fft_main(r1, i1, int_limbs, i2, int_limbs);
+        r = flint_malloc(2 * n * sizeof(mp_limb_t));
+        x = flint_malloc(n * sizeof(mp_limb_t));
+        y = flint_malloc(n * sizeof(mp_limb_t));
 
-       flint_free(i1);
+        for (i = 0; i < n; i++)
+        {
+            x[i] = UWORD_MAX - i - 1;
+            y[i] = UWORD_MAX - i - 2;
+        }
+
+        flint_printf("%10wd", n); fflush(stdout);
+
+        TIMEIT_START
+        mpn_mul(r, x, n, y, n);
+        TIMEIT_STOP_VALUES(_, t)
+        flint_printf("%12g", t); fflush(stdout);
+
+        for (nt = 1; nt <= 8; nt *= 2)
+        {
+            flint_set_num_threads(nt);
+            TIMEIT_START
+            flint_mpn_mul_fft_main(r, x, n, y, n);
+            TIMEIT_STOP_VALUES(_, t)
+            flint_printf("%12g", t); fflush(stdout);
+        }
+
+        flint_printf("\n");
+
+        flint_free(r);
+        flint_free(x);
+        flint_free(y);
     }
 
-    flint_randclear(state);
-    
-    flint_printf("done\n");
-    return 0;
+   return 0;
 }

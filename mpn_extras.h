@@ -44,6 +44,65 @@
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
+#define flint_mpn_mul_2x1(r2, r1, r0, a1, a0, b0)           \
+    do {                                                    \
+        mp_limb_t t1;                                       \
+        umul_ppmm(r1, r0, a0, b0);                          \
+        umul_ppmm(r2, t1, a1, b0);                          \
+        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
+    } while (0)
+
+#define flint_mpn_mul_2x2(r3, r2, r1, r0, a1, a0, b1, b0)   \
+    do {                                                    \
+        mp_limb_t t1, t2, t3;                               \
+        umul_ppmm(r1, r0, a0, b0);                          \
+        umul_ppmm(r2, t1, a1, b0);                          \
+        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
+        umul_ppmm(t1, t2, a0, b1);                          \
+        umul_ppmm(r3, t3, a1, b1);                          \
+        add_ssaaaa(r3, t1, r3, t1, 0, t3);                  \
+        add_ssaaaa(r2, r1, r2, r1, t1, t2);                 \
+        r3 += r2 < t1;                                      \
+    } while (0)
+
+/* FLINT's FFT can beat GMP below this threshold but apparently
+   not consistently. Something needs retuning? */
+#define FLINT_FFT_MUL_THRESHOLD 32000
+
+/* Defined in fft.h */
+FLINT_DLL void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
+                        mp_srcptr i2, mp_size_t n2);
+
+MPN_EXTRAS_INLINE mp_limb_t
+flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
+{
+    if (yn < FLINT_FFT_MUL_THRESHOLD)
+        return mpn_mul(z, x, xn, y, yn);
+    else
+    {
+        flint_mpn_mul_fft_main(z, x, xn, y, yn);
+        return z[xn + yn - 1];
+    }
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    if (n < FLINT_FFT_MUL_THRESHOLD)
+        mpn_mul_n(z, x, y, n);
+    else
+        flint_mpn_mul_fft_main(z, x, n, y, n);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
+{
+    if (n < FLINT_FFT_MUL_THRESHOLD)
+        mpn_sqr(z, x, n);
+    else
+        flint_mpn_mul_fft_main(z, x, n, x, n);
+}
+
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
     Note: if GMP_NAIL_BITS != 0, the rest of flint is already broken anyways.
