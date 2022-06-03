@@ -55,7 +55,8 @@ main(void)
         fmpz_one(a + 0);
         fmpz_mul_2exp(a + 0, a + 0, FLINT_BITS*limbs - 1);
 
-        bt = _fmpz_vec_get_fft(ii, a, limbs, len);
+        _fmpz_vec_get_fft(ii, a, limbs, len);
+        bt = _fmpz_vec_max_bits(a, len);
         for (i = 0; i < len; i++)
            mpn_normmod_2expp1(ii[i], limbs);
         _fmpz_vec_set_fft(b, len, ii, limbs, bt < 0);
@@ -97,7 +98,8 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest_unsigned(a, state, len, bits);
 
-        bt = _fmpz_vec_get_fft(ii, a, limbs, len);
+        _fmpz_vec_get_fft(ii, a, limbs, len);
+        bt = _fmpz_vec_max_bits(a, len);
         _fmpz_vec_set_fft(b, len, ii, limbs, bt < 0);
         
         result = (_fmpz_vec_equal(a, b, len));

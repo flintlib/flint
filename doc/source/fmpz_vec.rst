@@ -144,7 +144,7 @@ Conversions
     coefficients modulo the given modulus `n` to their signed integer
     representatives in the range `[-n/2, n/2)`.
 
-.. function:: slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)
+.. function:: void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)
 
     Convert the vector of coeffs ``coeffs_m`` to an fft vector 
     ``coeffs_f`` of the given ``length`` with ``l`` limbs per

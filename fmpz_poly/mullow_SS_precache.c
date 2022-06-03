@@ -26,6 +26,8 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     int N;
 
     pre->len2 = poly2->length;
+    pre->bits2 = _fmpz_vec_max_bits(poly2->coeffs, pre->len2);
+    pre->bits2 = FLINT_ABS(pre->bits2);
 
     len_out = len1 + pre->len2 - 1;
     pre->loglen  = FLINT_CLOG2(len_out);
@@ -33,7 +35,7 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     pre->n = (WORD(1) << (pre->loglen - 2));
     size1 = FLINT_ABS(bits1);
     size1 = (size1 + FLINT_BITS - 1)/FLINT_BITS;
-    size2 = _fmpz_vec_max_limbs(poly2->coeffs, pre->len2);
+    size2 = (pre->bits2 + FLINT_BITS - 1)/FLINT_BITS;
 
     /* Start with an upper bound on the number of bits needed */
     output_bits = FLINT_BITS*(size1 + size2) + loglen2 + 1; 
@@ -70,12 +72,9 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     }
 
     /* put coefficients into FFT vecs */
-    pre->bits2 = _fmpz_vec_get_fft(pre->jj, poly2->coeffs,
-                                                        pre->limbs, pre->len2);
+    _fmpz_vec_get_fft(pre->jj, poly2->coeffs, pre->limbs, pre->len2);
     for (i = pre->len2; i < 4*pre->n; i++)
         flint_mpn_zero(pre->jj[i], size);
-
-    pre->bits2 = FLINT_ABS(pre->bits2);
 
     /* Recompute the number of bits/limbs now that we know how large everything is */
     output_bits = bits1 + pre->bits2 + loglen2 + 1;
