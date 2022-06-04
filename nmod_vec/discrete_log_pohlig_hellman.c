@@ -9,14 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#include <stdlib.h>
-#undef ulong
-#include "nmod_vec.h"
-#include "fmpz.h"
-
+#include "nmod_vec-impl.h"
 
 static int nmod_discrete_log_pohlig_hellman_table_entry_struct_cmp(
     const nmod_discrete_log_pohlig_hellman_table_entry_struct * lhs,

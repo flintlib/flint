@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,14 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_vec-impl.h"
+#ifndef NMOD_VEC_IMPL_H
+#define NMOD_VEC_IMPL_H
 
-mp_limb_t
-_nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
-                            slong len, nmod_t mod, int nlimbs)
-{
-    mp_limb_t res;
-    slong i;
-    NMOD_VEC_DOT(res, i, len, vec1[i], vec2[i][offset], mod, nlimbs);
-    return res;
-}
+#include <stdlib.h>
+#include <math.h>
+#include "nmod_vec.h"
+#include "fmpz.h"
+
+#endif

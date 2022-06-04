@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
+#include "nmod_vec-impl.h"
 
 void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 {
