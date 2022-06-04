@@ -11,11 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "d_vec.h"
+#include "d_vec-impl.h"
 
 int
 _d_vec_approx_equal(const double *vec1, const double *vec2, slong len,

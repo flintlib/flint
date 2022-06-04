@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "d_vec-impl.h"
 
 void
 _d_vec_sub(double *res, const double *vec1, const double *vec2, slong len2)

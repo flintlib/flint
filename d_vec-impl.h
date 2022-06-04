@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,12 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec-impl.h"
+#ifndef D_VEC_IMPL_H
+#define D_VEC_IMPL_H
 
-void
-_d_vec_add(double *res, const double *vec1, const double *vec2, slong len2)
-{
-    ulong i;
-    for (i = 0; i < len2; i++)
-        res[i] = vec1[i] + vec2[i];
-}
+#include <math.h>
+#include "double_extras.h"
+#include "d_vec.h"
+
+#endif

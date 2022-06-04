@@ -11,12 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "double_extras.h"
-#include "d_vec.h"
+#include "d_vec-impl.h"
 
 double
 _d_vec_dot_heuristic(const double *vec1, const double *vec2, slong len2,

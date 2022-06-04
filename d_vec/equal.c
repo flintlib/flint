@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "d_vec-impl.h"
 
 int
 _d_vec_equal(const double *vec1, const double *vec2, slong len)

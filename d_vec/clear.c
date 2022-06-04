@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "d_vec-impl.h"
 
 void
 _d_vec_clear(double *vec)

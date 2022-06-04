@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
+#include "d_vec-impl.h"
 
 int
 _d_vec_is_zero(const double *vec, slong len)
