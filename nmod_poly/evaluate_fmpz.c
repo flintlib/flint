@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 /* TODO: Add a divconquer method */
 

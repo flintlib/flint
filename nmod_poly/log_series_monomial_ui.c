@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 void
 _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,

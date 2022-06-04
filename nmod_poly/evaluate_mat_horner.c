@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
-#include "flint.h"
-#include "nmod_mat.h"
+#include "nmod_poly-impl.h"
+
 
 void
 nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)

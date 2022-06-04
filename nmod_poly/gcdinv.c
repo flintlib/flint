@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
                         const mp_limb_t *A, slong lenA,

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
 {

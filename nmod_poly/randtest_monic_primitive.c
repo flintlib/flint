@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "fq_nmod.h"
+#include "nmod_poly-impl.h"
+
 
 void
 nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_t state, slong len)

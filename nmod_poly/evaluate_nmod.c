@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 mp_limb_t
 _nmod_poly_evaluate_nmod(mp_srcptr poly, slong len, mp_limb_t c, nmod_t mod)

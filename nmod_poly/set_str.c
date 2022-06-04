@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdio.h>
-#include <string.h>
-#include "flint.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 {

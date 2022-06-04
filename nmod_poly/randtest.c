@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly-impl.h"
+
 
 void
 nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)

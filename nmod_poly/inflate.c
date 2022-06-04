@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly-impl.h"
+
 
 void
 nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)

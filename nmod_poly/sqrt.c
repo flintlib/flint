@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 static __inline__
 int _nmod_poly_sqrt_2(mp_ptr s, mp_srcptr p, slong len)

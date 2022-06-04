@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly-impl.h"
+
 
 void
 _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod)

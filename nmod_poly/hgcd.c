@@ -11,13 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
-#include "mpn_extras.h"
+#include "nmod_poly-impl.h"
+
 
 /*
     We define a whole bunch of macros here which essentially provide 

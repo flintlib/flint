@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly-impl.h"
+
 
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
 void _nmod_poly_split_rabin(

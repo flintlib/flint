@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly-impl.h"
+
 
 void
 _nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,

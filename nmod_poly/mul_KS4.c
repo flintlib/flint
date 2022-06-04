@@ -10,12 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "mpn_extras.h"
+#include "nmod_poly-impl.h"
+
 
 /*
    Multiplication/squaring using Kronecker substitution at 2^b, -2^b,

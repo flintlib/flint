@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 void
 _nmod_poly_taylor_shift_horner(mp_ptr poly, mp_limb_t c, slong n, nmod_t mod)

@@ -12,50 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
-
-#undef ulong
-
-#include <gmp.h>
-
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-
-
-static __inline__ mp_limb_t
-n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
-{
-    if (mpz_fits_slong_p(exp))
-    {
-        return n_powmod2_preinv(a, flint_mpz_get_si(exp), n, ninv);
-    }
-    else
-    {
-        mpz_t t, m;
-        mp_limb_t y;
-
-        mpz_init(t);
-        mpz_init(m);
-
-        flint_mpz_set_ui(t, a);
-        flint_mpz_set_ui(m, n);
-
-        mpz_powm(t, t, exp, m);
-
-        y = flint_mpz_get_ui(t);
-
-        mpz_clear(t);
-        mpz_clear(m);
-
-        return y;
-    }
-}
+#include "nmod_poly-impl.h"
 
 void
 _nmod_poly_powmod_mpz_binexp_preinv(mp_ptr res, mp_srcptr poly, mpz_srcptr e,

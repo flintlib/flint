@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 int _nmod_poly_invmod(mp_limb_t *A, 
                       const mp_limb_t *B, slong lenB, 

@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, slong len, nmod_t mod)
 {

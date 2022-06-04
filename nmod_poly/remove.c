@@ -12,7 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
 {

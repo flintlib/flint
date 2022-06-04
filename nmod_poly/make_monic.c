@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 void _nmod_poly_make_monic(mp_ptr output, 
                             mp_srcptr input, slong len, nmod_t mod)

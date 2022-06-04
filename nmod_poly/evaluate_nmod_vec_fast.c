@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_poly-impl.h"
+
 
 /* This gives some speedup for small lengths. */
 static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,

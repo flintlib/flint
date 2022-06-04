@@ -13,22 +13,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
+#include "nmod_poly-impl.h"
 
-#include <stdlib.h>
 
-#undef ulong
 
-#include <gmp.h>
 
-#define ulong mp_limb_t
 
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
+
 
 void
 _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
