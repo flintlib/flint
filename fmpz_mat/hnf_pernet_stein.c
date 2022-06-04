@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
-#include "perm.h"
+#include "fmpz_mat-impl.h"
+
 
 static void
 add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t state)

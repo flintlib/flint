@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fft.h"
-#include "fft_tuning.h"
+#include "fmpz_mat-impl.h"
+
 
 /*
     fft coeffs are mod m = 2^(FLINT_BITS*limbs) + 1.

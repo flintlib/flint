@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 /*
   This is the algorithm of Kannan, Bachem, "Polynomial algorithms for computing

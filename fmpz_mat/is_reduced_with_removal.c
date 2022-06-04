@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpq_vec.h"
-#include "fmpq_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 int
 fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,

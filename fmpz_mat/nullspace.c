@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 slong
 fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 /*
     The macros xxx_putc, xxx_flint_printf, and xxx_fmpz_print are provided 

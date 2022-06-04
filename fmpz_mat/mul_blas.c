@@ -9,20 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdint.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "ulong_extras.h"
-#include "n_poly.h"
-#include "mpn_extras.h"
+#include "fmpz_mat-impl.h"
+
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
+#include <stdint.h>
 #include "cblas.h"
-
 
 typedef struct {
     slong m;
@@ -260,11 +253,11 @@ typedef struct {
     fmpz ** Crows;
     const fmpz_comb_struct * comb;
     int sign;
-} _worker_arg;
+} _worker_arg_blas;
 
 static void _mod_worker(void * arg_ptr)
 {
-    _worker_arg * arg = (_worker_arg *) arg_ptr;
+    _worker_arg_blas * arg = (_worker_arg_blas *) arg_ptr;
     slong i, j;
     slong num_primes = arg->num_primes;
     slong k = arg->k;
@@ -297,7 +290,7 @@ static void _mod_worker(void * arg_ptr)
 
 void _tod_worker(void * arg_ptr)
 {
-    _worker_arg * arg = (_worker_arg *) arg_ptr;
+    _worker_arg_blas * arg = (_worker_arg_blas *) arg_ptr;
     slong i;
     slong l = arg->l;
     slong num_primes = arg->num_primes;
@@ -322,7 +315,7 @@ void _tod_worker(void * arg_ptr)
 
 void _fromd_worker(void * arg_ptr)
 {
-    _worker_arg * arg = (_worker_arg *) arg_ptr;
+    _worker_arg_blas * arg = (_worker_arg_blas *) arg_ptr;
     slong i, j;
     slong l = arg->l;
     slong num_primes = arg->num_primes;
@@ -353,7 +346,7 @@ void _fromd_worker(void * arg_ptr)
 
 void _crt_worker(void * arg_ptr)
 {
-    _worker_arg * arg = (_worker_arg *) arg_ptr;
+    _worker_arg_blas * arg = (_worker_arg_blas *) arg_ptr;
     slong i, j, k;
     slong num_primes = arg->num_primes;
     slong n = arg->n;
@@ -464,7 +457,7 @@ int _fmpz_mat_mul_blas(
     fmpz_comb_t comb;
     thread_pool_handle * handles;
     slong num_workers;
-    _worker_arg * args;
+    _worker_arg_blas * args;
 
     FLINT_ASSERT(sign == 0 || sign == 1);
     FLINT_ASSERT(m == A->r && m == C->r);
@@ -498,7 +491,7 @@ int _fmpz_mat_mul_blas(
 
     num_workers = flint_request_threads(&handles, INT_MAX);
 
-    args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg);
+    args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg_blas);
     for (start = 0, i = 0; i <= num_workers; start = stop, i++)
     {
         args[i].l = -1;

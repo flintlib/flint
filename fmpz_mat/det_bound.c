@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 static void
 fmpz_mat_det_bound_inner(fmpz_t bound, const fmpz_mat_t A, int zero_cols)

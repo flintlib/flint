@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 /*
     Assumes that \code{mat} is an $n \times n$ matrix and sets \code{(cp,n+1)} 

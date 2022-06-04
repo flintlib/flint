@@ -11,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 static void _dot1(fmpz_t z, fmpz * a, slong * b, slong len)
 {
@@ -155,11 +155,11 @@ typedef struct {
     fmpz ** Brows;
     slong * BL;
     int words;
-} _worker_arg;
+} _worker_arg_small;
 
 static void _tr_worker(void * varg)
 {
-    _worker_arg * arg = (_worker_arg *) varg;
+    _worker_arg_small * arg = (_worker_arg_small *) varg;
     slong Bstartcol = arg->Bstartcol;
     slong Bstopcol = arg->Bstopcol;
     slong k = arg->k;
@@ -185,9 +185,9 @@ static void _tr_worker(void * varg)
     }
 }
 
-static void _mul_worker(void * varg)
+static void _mul_worker_small(void * varg)
 {
-    _worker_arg * arg = (_worker_arg *) varg;
+    _worker_arg_small * arg = (_worker_arg_small *) varg;
     slong Astartrow = arg->Astartrow;
     slong Astoprow = arg->Astoprow;
     slong n = arg->n;
@@ -315,10 +315,10 @@ void _fmpz_mat_mul_small_internal(
     slong m = fmpz_mat_nrows(A);
     slong k = fmpz_mat_nrows(B);
     slong n = fmpz_mat_ncols(B);
-    _worker_arg mainarg;
+    _worker_arg_small mainarg;
     thread_pool_handle * handles;
     slong num_workers;
-    _worker_arg * args;
+    _worker_arg_small * args;
     slong limit;
     slong k_blk_ct;
     slong k_blk_sz;
@@ -378,7 +378,7 @@ void _fmpz_mat_mul_small_internal(
 use_one_thread:
 
         _tr_worker(&mainarg);
-        _mul_worker(&mainarg);
+        _mul_worker_small(&mainarg);
 
         TMP_END;
         return;
@@ -391,7 +391,7 @@ use_one_thread:
         goto use_one_thread;
     }
 
-    args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg);
+    args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg_small);
 
     for (i = 0; i < num_workers; i++)
     {
@@ -424,8 +424,8 @@ use_one_thread:
         thread_pool_wait(global_thread_pool, handles[i]);
 
     for (i = 0; i < num_workers; i++)
-        thread_pool_wake(global_thread_pool, handles[i], 0, _mul_worker, &args[i]);
-    _mul_worker(&mainarg);
+        thread_pool_wake(global_thread_pool, handles[i], 0, _mul_worker_small, &args[i]);
+    _mul_worker_small(&mainarg);
     for (i = 0; i < num_workers; i++)
         thread_pool_wait(global_thread_pool, handles[i]);
 

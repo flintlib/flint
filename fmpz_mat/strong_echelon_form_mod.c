@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 static int
 _fmpz_mat_pivot(fmpz_mat_t A, slong start_row, slong col)

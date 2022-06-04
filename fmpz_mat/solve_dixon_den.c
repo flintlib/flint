@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 int
 fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,

@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>  /* qsort */
-#include "fmpz.h"
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 typedef struct
 {

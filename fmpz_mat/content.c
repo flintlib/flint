@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpz.h"
+#include "fmpz_mat-impl.h"
+
 
 void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
 {

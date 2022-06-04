@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpq.h"
+#include "fmpz_mat-impl.h"
+
 
 void
 fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)

@@ -11,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 /*
     There is a branchy version because the k loop takes time to warmup.
@@ -317,11 +317,11 @@ typedef struct {
     mp_limb_t * BL;
     int sign;
     int words;
-} _worker_arg;
+} _worker_arg_double_word;
 
 static void _red_worker(void * varg)
 {
-    _worker_arg * arg = (_worker_arg *) varg;
+    _worker_arg_double_word * arg = (_worker_arg_double_word *) varg;
     slong Bstartcol = arg->Bstartcol;
     slong Bstopcol = arg->Bstopcol;
     slong br = arg->br;
@@ -346,9 +346,9 @@ static void _red_worker(void * varg)
     }
 }
 
-static void _mul_worker(void * varg)
+static void _mul_worker_double_word(void * varg)
 {
-    _worker_arg * arg = (_worker_arg *) varg;
+    _worker_arg_double_word * arg = (_worker_arg_double_word *) varg;
     slong Astartrow = arg->Astartrow;
     slong Astoprow = arg->Astoprow;
     slong ac = arg->br;
@@ -424,10 +424,10 @@ FLINT_DLL void _fmpz_mat_mul_double_word_internal(
     slong ar = fmpz_mat_nrows(A);
     slong br = fmpz_mat_nrows(B);
     slong bc = fmpz_mat_ncols(B);
-    _worker_arg mainarg;
+    _worker_arg_double_word mainarg;
     thread_pool_handle * handles;
     slong num_workers;
-    _worker_arg * args;
+    _worker_arg_double_word * args;
     slong limit;
     TMP_INIT;
 
@@ -463,7 +463,7 @@ FLINT_DLL void _fmpz_mat_mul_double_word_internal(
     {
 use_one_thread:
         _red_worker(&mainarg);
-        _mul_worker(&mainarg);
+        _mul_worker_double_word(&mainarg);
         TMP_END;
         return;
     }
@@ -475,7 +475,7 @@ use_one_thread:
         goto use_one_thread;
     }
 
-    args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg);
+    args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg_double_word);
 
     for (i = 0; i < num_workers; i++)
     {
@@ -506,8 +506,8 @@ use_one_thread:
         thread_pool_wait(global_thread_pool, handles[i]);
 
     for (i = 0; i < num_workers; i++)
-        thread_pool_wake(global_thread_pool, handles[i], 0, _mul_worker, &args[i]);
-    _mul_worker(&mainarg);
+        thread_pool_wake(global_thread_pool, handles[i], 0, _mul_worker_double_word, &args[i]);
+    _mul_worker_double_word(&mainarg);
     for (i = 0; i < num_workers; i++)
         thread_pool_wait(global_thread_pool, handles[i]);
 

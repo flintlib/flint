@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 void
 _fmpz_mat_hnf_transform_naive(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)

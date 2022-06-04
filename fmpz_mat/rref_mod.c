@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
 
 #define E(j,k) fmpz_mat_entry(A,j,k)
 
@@ -82,3 +82,5 @@ fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
 
     return rank;
 }
+
+#undef E

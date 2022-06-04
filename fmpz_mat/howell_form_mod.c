@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 slong
 fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod)

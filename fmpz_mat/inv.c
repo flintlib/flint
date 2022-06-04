@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 static void
 _fmpz_mat_inv_2x2(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)

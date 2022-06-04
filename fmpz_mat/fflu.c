@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "perm.h"
-#include "longlong.h"
+#include "fmpz_mat-impl.h"
 
 #define E(j,k) fmpz_mat_entry(B,j,k)
 
@@ -161,3 +159,5 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
 
     return rank;
 }
+
+#undef E

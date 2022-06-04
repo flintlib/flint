@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
 		                 nmod_mat_t Amod, nmod_mat_t Bmod,

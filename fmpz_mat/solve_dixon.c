@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
 
 mp_limb_t
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
@@ -235,3 +235,5 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
     return p != 0;
 }
+
+#undef USE_SLOW_MULTIPLICATION

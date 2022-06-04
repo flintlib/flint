@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 void
 fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)

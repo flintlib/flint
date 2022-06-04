@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fq_nmod.h"
+#include "fmpz_mat-impl.h"
+
 
 static ulong
 _fq_nmod_rank(const fq_nmod_t x, const fq_nmod_ctx_t ctx)

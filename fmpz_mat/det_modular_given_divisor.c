@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
 
 /* Enable to exercise corner cases */
 #define DEBUG_USE_SMALL_PRIMES 0
-
 
 static mp_limb_t
 next_good_prime(const fmpz_t d, mp_limb_t p)
@@ -111,3 +110,5 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     fmpz_clear(x);
     fmpz_clear(xnew);
 }
+
+#undef DEBUG_USE_SMALL_PRIMES

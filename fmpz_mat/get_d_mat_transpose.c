@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <float.h>
-#undef ulong
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 int
 fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)

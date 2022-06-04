@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
 
 #define E(i,j) fmpz_mat_entry(A, i, j)
 
@@ -85,3 +85,5 @@ fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
             flint_abort();
     }
 }
+
+#undef E

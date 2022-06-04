@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
 
 #define AA(i,j) fmpz_mat_entry(A, i, j)
 #define BB(i,j) fmpz_mat_entry(B, i, j)
@@ -154,9 +154,9 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
         }
     }
     else
-    {
-        flint_printf("Exception (fmpz_mat_solve_cramer). dim > 3 not implemented.");
-        flint_abort();
-        return 0; /* not reached, but silence compiler warning */
-    }
+        flint_throw(FLINT_ERROR, "(fmpz_mat_solve_cramer) dim > 3 not implemented.");
 }
+
+#undef AA
+#undef BB
+#undef XX

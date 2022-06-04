@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
 
 #define E fmpz_mat_entry
 
@@ -56,3 +56,5 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 
     }
 }
+
+#undef E

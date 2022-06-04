@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 typedef struct {
     slong m;
@@ -33,12 +33,12 @@ typedef struct {
     slong num_primes;
     mp_ptr primes;
     int sign;
-} _worker_arg;
+} _worker_arg_multi_mod;
 
 
 static void _mod_worker(void * varg)
 {
-    _worker_arg * arg = (_worker_arg *) varg;
+    _worker_arg_multi_mod * arg = (_worker_arg_multi_mod *) varg;
     slong i, j, l;
     slong k = arg->k;
     slong n = arg->n;
@@ -102,7 +102,7 @@ static void _mod_worker(void * varg)
 
 static void _crt_worker(void * varg)
 {
-    _worker_arg * arg = (_worker_arg *) varg;
+    _worker_arg_multi_mod * arg = (_worker_arg_multi_mod *) varg;
     slong i, j, l;
     slong n = arg->n;
     slong Cstartrow = arg->Cstartrow;
@@ -291,8 +291,8 @@ void _fmpz_mat_mul_multi_mod(
     slong i, start, stop;
     slong m, k, n;
     flint_bitcnt_t primes_bits;
-    _worker_arg mainarg;
-    _worker_arg * args;
+    _worker_arg_multi_mod mainarg;
+    _worker_arg_multi_mod * args;
     fmpz_comb_t comb;
     slong num_workers;
     thread_pool_handle * handles;
@@ -387,7 +387,7 @@ mod_single:
             goto mod_single;
         }
 
-        args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg);
+        args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg_multi_mod);
         for (start = 0, i = 0; i < num_workers; start = stop, i++)
         {
             args[i] = mainarg;
@@ -437,7 +437,7 @@ crt_single:
             goto crt_single;
         }
 
-        args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg);
+        args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg_multi_mod);
         for (start = 0, i = 0; i < num_workers; start = stop, i++)
         {
             args[i] = mainarg;

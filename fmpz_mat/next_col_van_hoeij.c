@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_mat.h"
+#include "fmpz_mat-impl.h"
+
 
 void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 {
