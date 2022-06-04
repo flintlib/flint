@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "mpfr_vec.h"
+#include "mpfr_vec-impl.h"
 
 void
 _mpfr_vec_randtest(mpfr_ptr f, flint_rand_t state, slong len)

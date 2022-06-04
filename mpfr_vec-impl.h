@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpfr_vec-impl.h"
+#ifndef MPFR_VEC_IMPL_H
+#define MPFR_VEC_IMPL_H
 
-void
-_mpfr_vec_add(mpfr_ptr res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length)
-{
-    slong i;
-    for (i = 0; i < length; i++)
-        mpfr_add(res + i, vec1 + i, vec2 + i, GMP_RNDN);
-}
+#include "mpfr_vec.h"
+
+#endif

@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "mpfr_vec.h"
+#include "mpfr_vec-impl.h"
 
 mpfr_ptr
 _mpfr_vec_init(slong length, flint_bitcnt_t prec)

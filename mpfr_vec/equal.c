@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "mpfr_vec.h"
+#include "mpfr_vec-impl.h"
 
 int
 _mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len)

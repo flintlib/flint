@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "mpfr_vec.h"
+#include "mpfr_vec-impl.h"
 
 void
 _mpfr_vec_set(mpfr_ptr vec1, mpfr_srcptr vec2, slong length)
