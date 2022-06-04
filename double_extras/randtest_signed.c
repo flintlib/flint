@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
-#include "ulong_extras.h"
+#include "double_extras-impl.h"
 
 double
 d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)

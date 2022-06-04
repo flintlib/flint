@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,12 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define DOUBLE_EXTRAS_INLINES_C
+#ifndef DOUBLE_EXTRAS_IMPL_H
+#define DOUBLE_EXTRAS_IMPL_H
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
+#include "ulong_extras.h"
 #include "double_extras.h"
 
+#endif

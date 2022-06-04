@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
+#include "double_extras-impl.h"
 
 #define POLY(p, x) d_polyval((p), sizeof(p) / sizeof(double), (x))
 

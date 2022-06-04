@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
+#include "double_extras-impl.h"
 
 int
 d_is_nan(double x)
