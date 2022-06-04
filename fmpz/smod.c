@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 
 /* r = a mod m  with various options for the range of r */

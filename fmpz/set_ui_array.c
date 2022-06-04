@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 /*
     Given an array of limbs "in" representing a non negative integer,

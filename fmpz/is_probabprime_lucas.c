@@ -9,18 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <assert.h>
-#undef ulong
-#define ulong mp_limb_t
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz-impl.h"
+
 
 int fmpz_is_probabprime_lucas(const fmpz_t n)
 {

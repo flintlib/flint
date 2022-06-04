@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 /*
     Given an array of limbs "c" representing a integer mod 2^(FLINT_BITS*n),

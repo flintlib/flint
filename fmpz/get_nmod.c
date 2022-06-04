@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
 {

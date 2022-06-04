@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "mpn_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 {

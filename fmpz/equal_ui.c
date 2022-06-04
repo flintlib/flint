@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include "fmpz-impl.h"
+
 
 int fmpz_equal_ui(const fmpz_t f, ulong g)
 {

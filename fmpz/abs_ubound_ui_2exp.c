@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 mp_limb_t
 fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)

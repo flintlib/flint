@@ -9,18 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-
-#if FLINT64   /* 2^53 */
-#define DOUBLE_MAX 9007199254740992.0
-#define DOUBLE_MIN -9007199254740992.0
-#else
-#define DOUBLE_MAX COEFF_MAX
-#define DOUBLE_MIN COEFF_MIN
-#endif
+#include "fmpz-impl.h"
 
 void
 fmpz_set_d(fmpz_t f, double c)

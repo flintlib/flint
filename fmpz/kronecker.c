@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "long_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
 {

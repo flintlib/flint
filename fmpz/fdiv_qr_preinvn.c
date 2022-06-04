@@ -10,14 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "longlong.h"
-#include "ulong_extras.h"
-#include "mpn_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 /* these functions were adapted from similar functions in an old version of GMP */
 void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 

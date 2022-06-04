@@ -10,12 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void
 fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)

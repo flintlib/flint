@@ -9,23 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifdef __unix__
-#include <unistd.h> /* sysconf */
-#endif
-
-#if defined(_WIN32) || defined(WIN32)
-#include <windows.h> /* GetSytemInfo */
-#endif
-
-#if defined(_MSC_VER) && FLINT_USES_PTHREAD
-#include <atomic.h>
-#endif
-
-#include <stdlib.h>
-
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
 
 /* Always free larger mpz's to avoid wasting too much heap space */
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64

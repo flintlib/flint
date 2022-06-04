@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 flint_bitcnt_t fmpz_val2(const fmpz_t x)
 {

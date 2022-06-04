@@ -11,13 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "nmod_vec.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "fmpz-impl.h"
+
 
 /* The better mpn_addmul_1 is, the larger FMPZ_CRT_UI_CUTOFF can be. */
 #define FMPZ_CRT_UI_CUTOFF 50

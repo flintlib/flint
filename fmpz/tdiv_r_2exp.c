@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 {

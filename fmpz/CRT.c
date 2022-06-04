@@ -11,12 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void
 _fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2,

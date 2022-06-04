@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
 
 #if FLINT_USES_PTHREAD
-#include <pthread.h>
-
 static pthread_once_t fmpz_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t fmpz_lock;
 #endif

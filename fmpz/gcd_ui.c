@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void
 fmpz_gcd_ui(fmpz_t res, const fmpz_t a, ulong b)

@@ -9,18 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-
-#if FLINT64   /* 2^53 */
-#define DOUBLE_MAX WORD(9007199254740992)
-#define DOUBLE_MIN WORD(-9007199254740992)
-#else
-#define DOUBLE_MAX COEFF_MAX
-#define DOUBLE_MIN COEFF_MIN
-#endif
+#include "fmpz-impl.h"
 
 double
 fmpz_get_d(const fmpz_t f)

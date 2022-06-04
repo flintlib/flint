@@ -23,6 +23,8 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+#include "fmpz-impl.h"
+
 /*
   We are to determine if c is a perfect power, c = a ^ b.
   Assume c is divisible by 2^n and that codd = c/2^n is odd.
@@ -41,13 +43,6 @@ MA 02110-1301, USA. */
    arithmetic for computing possible roots. 
 */
 
-#include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h> /* for NULL */
-#undef ulong
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 
 static const unsigned short primes[] =
 {  2,  3,  5,  7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,

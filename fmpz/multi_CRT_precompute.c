@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 
 static void _fmpz_multi_CRT_fit_length(fmpz_multi_CRT_t P, slong k)
@@ -100,7 +101,7 @@ static int _fill_pfrac(
 }
 
 
-static void _fill_prog(
+static void _fill_prog_CRT(
     fmpz_multi_CRT_t P,
     slong * link,
     fmpz * v,
@@ -116,7 +117,7 @@ static void _fill_prog(
     if (link[j] >= 0)
     {
         b_idx = ++next_ret_idx;
-        _fill_prog(P, link, v, w, link[j], b_idx);
+        _fill_prog_CRT(P, link, v, w, link[j], b_idx);
     }
     else
     {
@@ -130,7 +131,7 @@ static void _fill_prog(
     if (link[j + 1] >= 0)
     {
         c_idx = ++next_ret_idx;
-        _fill_prog(P, link, v, w, link[j + 1], c_idx);
+        _fill_prog_CRT(P, link, v, w, link[j + 1], c_idx);
     }
     else
     {
@@ -247,7 +248,7 @@ int fmpz_multi_CRT_precompute(
     fmpz_one(one);
     P->good = _fill_pfrac(link, v, w, 2*r - 4, one, g, s, t);
     if (P->good)
-        _fill_prog(P, link, v, w, 2*r - 4, 0);
+        _fill_prog_CRT(P, link, v, w, 2*r - 4, 0);
 
     fmpz_clear(one);
     fmpz_clear(g);

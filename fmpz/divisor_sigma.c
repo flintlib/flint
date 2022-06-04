@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_factor.h"
-#include "fmpz_vec.h"
+#include "fmpz-impl.h"
+
 
 void
 fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac)

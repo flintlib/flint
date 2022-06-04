@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void fmpz_deprecated_multi_crt_init(fmpz_multi_crt_t P)
 {

@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "long_extras.h"
+#include "fmpz-impl.h"
+
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
 {

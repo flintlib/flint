@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz-impl.h"
+
 
 
 static void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k)
@@ -63,7 +63,7 @@ static int _fill_sort(slong * link, fmpz * v, slong j)
 }
 
 
-static void _fill_prog(
+static void _fill_prog_mod(
     fmpz_multi_mod_t P,
     slong * link,
     fmpz * v,
@@ -106,7 +106,7 @@ static void _fill_prog(
     P->length = i + 1;
 
     if (link[j + 0] >= 0)
-        _fill_prog(P, link, v, link[j + 0], b_idx);
+        _fill_prog_mod(P, link, v, link[j + 0], b_idx);
 
     i = P->length;
     FLINT_ASSERT(i < P->alloc);
@@ -116,7 +116,7 @@ static void _fill_prog(
     P->length = i + 1;
 
     if (link[j + 1] >= 0)
-        _fill_prog(P, link, v, link[j + 1], c_idx);
+        _fill_prog_mod(P, link, v, link[j + 1], c_idx);
 
     P->localsize = FLINT_MAX(P->localsize, a_idx + 1);
 }
@@ -204,7 +204,7 @@ int fmpz_multi_mod_precompute(
 
     P->good = _fill_sort(link, v, 2*r - 4);
     if (P->good)
-        _fill_prog(P, link, v, 2*r - 4, 0);
+        _fill_prog_mod(P, link, v, 2*r - 4, 0);
 
     flint_free(link);
     _fmpz_vec_clear(v, 2*r - 2);

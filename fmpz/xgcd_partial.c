@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, 
                                     fmpz_t r2, fmpz_t r1, const fmpz_t L)

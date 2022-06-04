@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include "fmpz-impl.h"
+
 
 double
 fmpz_dlog(const fmpz_t x)

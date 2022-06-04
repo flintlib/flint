@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 size_t fmpz_inp_raw(fmpz_t x, FILE * fin) 
 {

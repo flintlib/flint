@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#define ulong mp_limb_t
+#include "fmpz-impl.h"
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+
 
 int
 fmpz_root(fmpz_t r, const fmpz_t f, slong n)

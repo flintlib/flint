@@ -11,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz-impl.h"
+
 
 
 void fmpz_comb_temp_clear(fmpz_comb_temp_t CT)

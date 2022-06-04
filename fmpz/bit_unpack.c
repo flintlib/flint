@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 int
 fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,

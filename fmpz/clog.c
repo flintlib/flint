@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include "fmpz-impl.h"
+
 
 slong
 fmpz_clog(const fmpz_t n, const fmpz_t b)

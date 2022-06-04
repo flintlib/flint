@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <gmp.h>
+#include "fmpz-impl.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+
 
 void
 fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)

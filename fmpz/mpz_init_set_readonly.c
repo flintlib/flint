@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz-impl.h"
+
 
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 {

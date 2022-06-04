@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_factor.h"
+#include "fmpz-impl.h"
+
 
 int
 fmpz_factor_moebius_mu(const fmpz_factor_t fac)
