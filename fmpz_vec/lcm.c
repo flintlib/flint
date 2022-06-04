@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_vec-impl.h"
+
 
 void
 _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len)

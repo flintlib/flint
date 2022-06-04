@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,13 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec-impl.h"
+#ifndef FMPZ_VEC_IMPL_H
+#define FMPZ_VEC_IMPL_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "thread_support.h"
+#include "fmpz_vec.h"
 
-void
-_fmpz_vec_scalar_mul_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
-{
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_mul_ui(vec1 + i, vec2 + i, c);
-}
+#endif

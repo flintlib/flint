@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "fmpz_vec.h"
-#include "fft.h"
+#include "fmpz_vec-impl.h"
+
 
 static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f, 
                        const fmpz * coeffs_m, slong l, slong i)
@@ -67,10 +66,10 @@ typedef struct
     const fmpz * coeffs_m;
     slong limbs;
 }
-work_t;
+work_get_t;
 
 static void
-worker(slong i, work_t * work)
+worker_get(slong i, work_get_t * work)
 {
     _fmpz_vec_get_fft_coeff(work->coeffs_f, work->coeffs_m, work->limbs, i);
 }
@@ -78,7 +77,7 @@ worker(slong i, work_t * work)
 void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
                        const fmpz * coeffs_m, slong limbs, slong length)
 {
-    work_t work;
+    work_get_t work;
     slong max_threads;
 
     work.coeffs_f = coeffs_f;
@@ -88,5 +87,5 @@ void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
     max_threads = flint_get_num_threads();
     max_threads = FLINT_MIN(max_threads, 1e-5 * limbs * length + 1);
 
-    flint_parallel_do((do_func_t) worker, &work, length, max_threads, FLINT_PARALLEL_UNIFORM);
+    flint_parallel_do((do_func_t) worker_get, &work, length, max_threads, FLINT_PARALLEL_UNIFORM);
 }

@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_vec-impl.h"
+
 
 int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
 {

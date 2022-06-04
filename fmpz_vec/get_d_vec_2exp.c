@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "fmpz_vec.h"
+#include "fmpz_vec-impl.h"
+
 
 slong
 _fmpz_vec_get_d_vec_2exp(double *appv, const fmpz * vec, slong len)
