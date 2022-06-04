@@ -7,8 +7,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
-#include "thread_support.h"
+#include "nmod_mat-impl.h"
+
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 

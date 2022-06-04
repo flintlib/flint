@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "nmod_mat-impl.h"
+
 
 void
 nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)

@@ -9,34 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-
-static __inline__ int
-_nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
-{
-    slong j;
-    mp_ptr u;
-
-    if (nmod_mat_entry(A, start_row, col) != 0)
-        return 1;
-
-    for (j = start_row + 1; j < A->r; j++)
-    {
-        if (nmod_mat_entry(A, j, col) != 0)
-        {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
-            return -1;
-        }
-    }
-    return 0;
-}
+#include "nmod_mat-impl.h"
 
 static void
 _n_ppio(mp_ptr ppi, mp_ptr ppo, mp_limb_t a, mp_limb_t b)
@@ -83,22 +56,6 @@ _n_unit(mp_limb_t a, nmod_t N)
         d = _n_stab(s, l, N);
         return nmod_add(s, nmod_mul(d, l, N), N);
     }
-}
-
-/* test wether q*a = b mod N has a solution */
-static int
-_n_is_divisible(mp_ptr q, mp_limb_t b, mp_limb_t a, nmod_t N)
-{
-    mp_limb_t e, g;
-    g = n_gcdinv(&e, a, N.n);
-
-    if (( b % g ) == 0)
-    {
-        *q = nmod_mul(e, b/g, N);
-        return 1;
-    }
-
-    return 0;
 }
 
 void

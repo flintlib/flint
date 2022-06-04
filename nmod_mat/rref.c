@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_mat.h"
-#include "perm.h"
+#include "nmod_mat-impl.h"
+
 
 slong
 _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots, slong * P)

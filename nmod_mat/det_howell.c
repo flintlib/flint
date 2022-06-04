@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
+#include "nmod_mat-impl.h"
 
 /*
   We do no quite need the full Howell form. We just need to reduce to upper
@@ -54,31 +50,8 @@ _nmod_xgcd_unit(mp_limb_t * s, mp_limb_t * t, mp_limb_t a, mp_limb_t b, nmod_t m
    return g;
 }
 
-static __inline__ int
-_nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
-{
-    slong j;
-    mp_ptr u;
-
-    if (nmod_mat_entry(A, start_row, col) != 0)
-        return 1;
-
-    for (j = start_row + 1; j < A->r; j++)
-    {
-        if (nmod_mat_entry(A, j, col) != 0)
-        {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
-            return -1;
-        }
-    }
-    return 0;
-}
-
 /* test wether q*a = b mod N has a solution */
-static int
+int
 _n_is_divisible(mp_ptr q, mp_limb_t b, mp_limb_t a, nmod_t N)
 {
     mp_limb_t e, g;

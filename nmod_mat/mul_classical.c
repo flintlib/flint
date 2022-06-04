@@ -9,40 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
-
-/*
-with op = 0, computes D = A*B
-with op = 1, computes D = C + A*B
-with op = -1, computes D = C - A*B
-*/
-
-static __inline__ void
-_nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
-    mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
-{
-    slong i, j;
-    mp_limb_t c;
-
-    for (i = 0; i < m; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            c = _nmod_vec_dot_ptr(A[i], B, j, k, mod, nlimbs);
-
-            if (op == 1)
-                c = nmod_add(C[i][j], c, mod);
-            else if (op == -1)
-                c = nmod_sub(C[i][j], c, mod);
-
-            D[i][j] = c;
-        }
-    }
-}
+#include "nmod_mat-impl.h"
 
 static __inline__ void
 _nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,

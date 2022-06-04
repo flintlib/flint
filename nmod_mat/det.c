@@ -9,14 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-#include "perm.h"
+#include "nmod_mat-impl.h"
+
 
 static mp_limb_t
 _nmod_mat_det_2x2(mp_limb_t a, mp_limb_t b, mp_limb_t c, mp_limb_t d, nmod_t mod)
