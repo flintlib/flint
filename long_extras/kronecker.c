@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "long_extras.h"
-#include "ulong_extras.h"
+#include "long_extras-impl.h"
 
 int z_kronecker(slong a, slong n)
 {

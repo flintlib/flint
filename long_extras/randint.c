@@ -10,11 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
-#include "flint.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
+#include "long_extras-impl.h"
 
 mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit)
 {
