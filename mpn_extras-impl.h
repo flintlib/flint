@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,13 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras-impl.h"
+#ifndef MPN_EXTRAS_IMPL_H
+#define MPN_EXTRAS_IMPL_H
 
-int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
-      mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
-{
-   mpn_tdiv_qr(q, temp, 0, array1, limbs1, arrayg, limbsg);
-   while ((limbsg) && temp[limbsg - 1] == 0) limbsg--;
+#include "flint.h"
 
-   return (limbsg == 0);
-}
+#if FLINT_REENTRANT && !FLINT_USES_TLS
+#include <pthread.h>
+#endif
+
+#include "ulong_extras.h"
+#include "mpn_extras.h"
+
+#endif

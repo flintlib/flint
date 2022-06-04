@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "mpn_extras.h"
+#include "mpn_extras-impl.h"
 
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  
    needs (tp,2n) temp space, everything reduced mod 2^b 

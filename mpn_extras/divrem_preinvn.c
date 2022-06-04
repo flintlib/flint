@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "longlong.h"
-#include "mpn_extras.h"
+#include "mpn_extras-impl.h"
 
 /* 
    TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
