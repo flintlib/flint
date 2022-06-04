@@ -22,22 +22,10 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "thread_support.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
@@ -391,6 +379,7 @@ FLINT_DLL char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x
 
 FLINT_DLL int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 
 NMOD_POLY_INLINE
@@ -407,6 +396,19 @@ int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 }
 
 FLINT_DLL int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x);
+
+NMOD_POLY_INLINE
+int nmod_poly_print_pretty(const nmod_poly_t a, const char * x)
+{
+    return nmod_poly_fprint_pretty(stdout, a, x);
+}
+
+NMOD_POLY_INLINE
+int nmod_poly_read(nmod_poly_t poly)
+{
+    return nmod_poly_fread(stdin, poly);
+}
+#endif
 
 NMOD_POLY_INLINE
 int nmod_poly_print(const nmod_poly_t a)
@@ -426,18 +428,6 @@ int nmod_poly_print(const nmod_poly_t a)
         r = flint_printf(" %wu", a->coeffs[i]);
 
     return (int) r;
-}
-
-NMOD_POLY_INLINE
-int nmod_poly_print_pretty(const nmod_poly_t a, const char * x)
-{
-    return nmod_poly_fprint_pretty(stdout, a, x);
-}
-
-NMOD_POLY_INLINE
-int nmod_poly_read(nmod_poly_t poly)
-{
-    return nmod_poly_fread(stdin, poly);
 }
 
 /* Shifting  *****************************************************************/
@@ -1525,9 +1515,7 @@ NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
 }
 
 #ifdef __cplusplus
-    }
+}
 #endif
-
-#include "nmod_poly_factor.h"
 
 #endif

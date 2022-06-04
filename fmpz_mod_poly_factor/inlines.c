@@ -11,14 +11,7 @@
 
 #define FMPZ_MOD_POLY_FACTOR_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z,
                  fmpz_mod_poly_factor_t fac, slong i, const fmpz_mod_ctx_t ctx)

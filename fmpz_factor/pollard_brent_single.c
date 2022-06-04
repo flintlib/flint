@@ -16,7 +16,7 @@
 
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
+#include "fmpz_factor.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 

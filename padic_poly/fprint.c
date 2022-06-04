@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
-
 #include "padic_poly.h"
 
 int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, 

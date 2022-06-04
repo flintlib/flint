@@ -11,11 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,

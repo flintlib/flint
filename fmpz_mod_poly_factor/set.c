@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
 fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,

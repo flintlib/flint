@@ -19,16 +19,11 @@
 #define FQ_DEFAULT_POLY_FACTOR_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fq.h"
-#include "fq_nmod.h"
-#include "fq_zech.h"
-#include "fq_default.h"
-#include "fq_poly.h"
-#include "fq_nmod_poly.h"
-#include "fq_zech_poly.h"
+#include "fmpz_mod_poly_factor.h"
 #include "fq_default_poly.h"
+#include "fq_poly_factor.h"
+#include "fq_nmod_poly_factor.h"
+#include "fq_zech_poly_factor.h"
 
 #ifdef __cplusplus
 extern "C" {

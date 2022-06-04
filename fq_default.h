@@ -19,8 +19,6 @@
 #define FQ_DEFAULT_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fq.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
@@ -231,6 +229,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
     }
 }
 
+#if _FLINT_HAVE_FILE
 FQ_DEFAULT_INLINE int fq_default_ctx_fprint(FILE * file,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -287,7 +286,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_print(const fq_default_ctx_t ctx)
         fq_ctx_print(ctx->ctx.fq);
     }
 }
-
+#endif
 
 /* Memory managment  *********************************************************/
 
@@ -1352,6 +1351,7 @@ FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,
 
 /* Output ********************************************************************/
 
+#if _FLINT_HAVE_FILE
 FQ_DEFAULT_INLINE
 int fq_default_fprint(FILE * file, const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)
@@ -1453,6 +1453,7 @@ void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)
         fq_print_pretty(op->fq, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_INLINE char * fq_default_get_str(const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)

@@ -9,6 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdlib.h>
+#undef ulong
 #include "nmod_poly.h"
 
 void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t P)

@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mpoly_factor.h"
-
+#include "thread_support.h"
 
 typedef struct
 {

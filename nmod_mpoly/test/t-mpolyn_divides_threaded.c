@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "nmod_mpoly.h"
+#include "thread_support.h"
 
 void _divides_check(
     const nmod_mpoly_t A,

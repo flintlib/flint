@@ -18,19 +18,7 @@
 #define PADIC_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-#include <limits.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "fmpz.h"
-#include "fmpq.h"
 #include "padic.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 #ifdef __cplusplus
@@ -343,9 +331,10 @@ FLINT_DLL void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, s
 
 /*  Input and output  ********************************************************/
 
+#if _FLINT_HAVE_FILE
 PADIC_POLY_INLINE int padic_poly_debug(const padic_poly_t poly)
 {
-    flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ", 
+    flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ",
         poly->alloc, poly->length, poly->val, poly->N);
     if (poly->coeffs)
     {
@@ -405,6 +394,7 @@ int padic_poly_print_pretty(const padic_poly_t poly, const char *var,
 {
     return padic_poly_fprint_pretty(stdout, poly, var, ctx);
 }
+#endif
 
 /*  Testing  *****************************************************************/
 
@@ -423,4 +413,3 @@ FLINT_DLL int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx
 #endif
 
 #endif
-

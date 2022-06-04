@@ -14,11 +14,9 @@
    in the paper https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode 
    is available on page 182 of the same paper */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
 #include "mpn_extras.h"
+#include "ulong_extras.h"
+#include "fmpz_factor.h"
 
 int
 fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in, 

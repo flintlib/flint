@@ -12,6 +12,7 @@
 #ifndef DOUBLE_EXTRAS_IMPL_H
 #define DOUBLE_EXTRAS_IMPL_H
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "double_extras.h"
 

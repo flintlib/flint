@@ -19,7 +19,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fq_zech.h"
-#include "fq_zech_poly.h"
+#include "fq_zech_poly_factor.h"
 
 void fq_zech_poly_factor_get_poly(fq_zech_poly_t z,
              const fq_zech_poly_factor_t fac, slong i, const fq_zech_ctx_t ctx)

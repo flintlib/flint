@@ -10,10 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fq_nmod.h"
 #include "long_extras.h"
 

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpq_mpoly_factor.h"
 
 void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx)

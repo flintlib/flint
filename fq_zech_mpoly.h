@@ -18,26 +18,8 @@
 #define FQ_ZECH_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "mpoly.h"
-#include "fq_zech.h"
 #include "fq_zech_poly.h"
 #include "fq_nmod_mpoly.h"
-
 
 #ifdef __cplusplus
  extern "C" {
@@ -250,6 +232,7 @@ FLINT_DLL int fq_zech_mpoly_set_str_pretty(fq_zech_mpoly_t A, const char * str,
 FLINT_DLL char * fq_zech_mpoly_get_str_pretty(const fq_zech_mpoly_t A,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int fq_zech_mpoly_fprint_pretty(FILE * file, 
       const fq_zech_mpoly_t A, const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
@@ -259,7 +242,7 @@ int fq_zech_mpoly_print_pretty(const fq_zech_mpoly_t A,
 {
    return fq_zech_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
-
+#endif
 
 /*  Basic manipulation *******************************************************/
 

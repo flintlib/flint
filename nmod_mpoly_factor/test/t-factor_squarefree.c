@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "nmod_mpoly_factor.h"
-
 
 void check_it(const nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx)
 {

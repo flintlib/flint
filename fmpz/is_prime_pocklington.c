@@ -9,17 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 #undef ulong
-#define ulong mp_limb_t
-#include <gmp.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_factor.h"
 
 void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong limit)
 {

@@ -20,15 +20,7 @@
 #define D_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
 #include "flint.h"
-#include "d_vec.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -161,4 +153,3 @@ FLINT_DLL void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A);
 #endif
 
 #endif
-

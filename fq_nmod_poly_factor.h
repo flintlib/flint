@@ -20,6 +20,8 @@
 #define FQ_NMOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
+#include "fq_nmod_poly.h"
+
 FQ_NMOD_POLY_FACTOR_INLINE
 int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length)
 {

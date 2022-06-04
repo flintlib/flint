@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <string.h>
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fq_zech_mpoly.h"
 
 int fq_zech_mpoly_fprint_pretty(FILE * file, const fq_zech_mpoly_t A,

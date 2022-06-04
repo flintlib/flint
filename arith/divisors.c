@@ -10,7 +10,7 @@
 */
 
 #include "arith.h"
-#include "fmpz.h"
+#include "fmpz_factor.h"
 
 #define FLINT_NUM_TINY_DIVISORS FLINT_BITS
 

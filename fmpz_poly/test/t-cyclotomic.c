@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_poly.h"
 
 void cyclotomic_naive(fmpz_poly_t poly, ulong n)

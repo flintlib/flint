@@ -18,21 +18,6 @@
 #define QADIC_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
-#include "padic.h"
 #include "padic_poly.h"
 
 #ifdef __cplusplus
@@ -451,6 +436,7 @@ FLINT_DLL int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
 
 QADIC_INLINE int 
@@ -463,10 +449,10 @@ QADIC_INLINE int qadic_debug(const qadic_t op)
 {
     return padic_poly_debug(op);
 }
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

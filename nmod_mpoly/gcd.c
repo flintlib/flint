@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
-#include "nmod_mpoly.h"
+#include "thread_support.h"
 #include "fq_nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 #include "fq_zech_poly.h"

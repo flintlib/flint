@@ -25,6 +25,8 @@
    N.B: This file has been adapted from code found in GMP 4.2.1.
 */
 
+#include "flint.h"
+
 #ifndef FLINT_LONGLONG_H
 #define FLINT_LONGLONG_H
 

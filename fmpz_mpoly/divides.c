@@ -10,7 +10,7 @@
 */
 
 #include "fmpz_mpoly.h"
-#include "thread_pool.h"
+#include "thread_support.h"
 
 int fmpz_mpoly_divides(
     fmpz_mpoly_t Q,

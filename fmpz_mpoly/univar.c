@@ -9,13 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpz_mpoly.h"
-
 
 void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 {

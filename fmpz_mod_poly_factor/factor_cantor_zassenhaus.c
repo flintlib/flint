@@ -14,7 +14,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
                              const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)

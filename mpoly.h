@@ -19,21 +19,18 @@
 #define MPOLY_INLINE static __inline__
 #endif
 
+#ifndef memcpy
+#ifdef __GNUC__
+#define memcpy __builtin_memcpy
+#else
 #undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <string.h>
 #undef ulong
-
-#include <gmp.h>
 #define ulong mp_limb_t
-
-#include "string.h"
-#include "flint.h"
-#include "fmpz.h"
+#endif
+#endif
 #include "fmpz_mat.h"
-#include "fmpq.h"
-#include "ulong_extras.h"
-#include "thread_pool.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -260,6 +257,7 @@ int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
    return mctx->ord == ORD_DEGREVLEX;
 }
 
+#if _FLINT_HAVE_FILE
 MPOLY_INLINE
 void mpoly_ordering_print(ordering_t ord)
 {
@@ -278,6 +276,7 @@ void mpoly_ordering_print(ordering_t ord)
       printf("Unknown ordering in mpoly_ordering_print.");
    }
 }
+#endif
 
 /*  Monomials ****************************************************************/
 

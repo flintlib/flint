@@ -19,10 +19,7 @@
 #define FMPZ_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "fmpz.h"
-#include "flint.h"
-#include "mpf_vec.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -101,6 +98,7 @@ FLINT_DLL slong _fmpz_vec_height_index(const fmpz * vec, slong len);
 
 /*  Input and output  ********************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len);
 
 FMPZ_VEC_INLINE
@@ -116,6 +114,7 @@ int _fmpz_vec_read(fmpz ** vec, slong * len)
 {
     return _fmpz_vec_fread(stdin, vec, len);
 }
+#endif
 
 /*  Conversions  *************************************************************/
 
@@ -125,7 +124,7 @@ FLINT_DLL void _fmpz_vec_set_nmod_vec(fmpz * res,
 FLINT_DLL void _fmpz_vec_get_nmod_vec(mp_ptr res, 
                                     const fmpz * poly, slong len, nmod_t mod);
 
-FLINT_DLL slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
+FLINT_DLL void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
                                  const fmpz * coeffs_m, slong l, slong length);
 
 FLINT_DLL void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
@@ -133,7 +132,7 @@ FLINT_DLL void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 
 FLINT_DLL slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len);
 
-FLINT_DLL void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len);
+FLINT_DLL void _fmpz_vec_get_mpf_vec(mpf_ptr appv, const fmpz * vec, slong len);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -277,4 +276,3 @@ FLINT_DLL void _fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1,
 #endif
 
 #endif
-

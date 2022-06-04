@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 #include "thread_support.h"
 
 void

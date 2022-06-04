@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <stdio.h>
+#undef ulong
 #include "fmpz_mod_mpoly_factor.h"
-#include "mpn_extras.h"
-#include "fmpz_vec.h"
-
 
 int fmpz_mod_polyun_is_canonical(
     const fmpz_mod_polyun_t A,

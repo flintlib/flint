@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <stdio.h>
 #include "nmod_poly.h"
-#include "mpn_extras.h"
 
 /*
 typedef struct {

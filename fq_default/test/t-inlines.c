@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default.h"
-#include "test_helpers.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "fq_default.h"
+#include "test_helpers.h"
 
 int main(void)
 {

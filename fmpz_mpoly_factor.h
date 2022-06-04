@@ -18,16 +18,9 @@
 #define FMPZ_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "fmpz_mpoly.h"
-#include "fmpq_poly.h"
 #include "fmpz_poly_factor.h"
+#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 #ifdef __cplusplus
  extern "C" {

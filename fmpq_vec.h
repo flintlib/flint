@@ -18,9 +18,7 @@
 #define FMPQ_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "fmpq.h"
-#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -59,6 +57,7 @@ FLINT_DLL void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, s
 
 /*  Input and output  ********************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len);
 
 FMPQ_VEC_INLINE
@@ -66,6 +65,7 @@ int _fmpq_vec_print(const fmpq * vec, slong len)
 {
     return _fmpq_vec_fprint(stdout, vec, len);
 }
+#endif
 
 
 #ifdef __cplusplus

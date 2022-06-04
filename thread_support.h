@@ -13,7 +13,6 @@
 #ifndef THREAD_SUPPORT_H
 #define THREAD_SUPPORT_H
 
-#include "flint.h"
 #include "thread_pool.h"
 
 #ifdef __cplusplus

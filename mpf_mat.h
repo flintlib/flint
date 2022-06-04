@@ -19,8 +19,6 @@
 #define MPF_MAT_INLINE static __inline__
 #endif
 
-#include <math.h>
-#include <stdio.h>
 #include "mpf_vec.h"
 
 #ifdef __cplusplus

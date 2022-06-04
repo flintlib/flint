@@ -18,17 +18,8 @@
 #define FMPZ_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
 #include "flint.h"
-#include "nmod_vec.h"
+#include "nmod.h"
 #include "fmpz-conversions.h"
 
 #if FLINT_USES_PTHREAD
@@ -393,22 +384,19 @@ int fmpz_is_pm1(const fmpz_t f)
 FLINT_DLL void fmpz_set(fmpz_t f, const fmpz_t g);
 
 FLINT_DLL int fmpz_equal(const fmpz_t f, const fmpz_t g);
-
 FLINT_DLL int fmpz_equal_si(const fmpz_t f, slong g);
-
 FLINT_DLL int fmpz_equal_ui(const fmpz_t f, ulong g);
 
+FLINT_DLL int fmpz_print(const fmpz_t x);
 FLINT_DLL int fmpz_read(fmpz_t f);
 
+#if _FLINT_HAVE_FILE
+FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
 FLINT_DLL int fmpz_fread(FILE * file, fmpz_t f);
 
-FLINT_DLL size_t fmpz_inp_raw( fmpz_t x, FILE *fin );
-
-FLINT_DLL int fmpz_print(const fmpz_t x);
-
-FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
-
-FLINT_DLL size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
+FLINT_DLL size_t fmpz_inp_raw(fmpz_t x, FILE * fin );
+FLINT_DLL size_t fmpz_out_raw(FILE * fout, const fmpz_t x );
+#endif
 
 FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
@@ -1119,7 +1107,4 @@ FLINT_DLL void __fmpz_neg(fmpz_t f1, const fmpz_t f2);
 }
 #endif
 
-#include "fmpz_factor.h"
-
 #endif
-

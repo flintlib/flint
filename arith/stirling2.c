@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <math.h>
+#undef ulong
 #include "arith.h"
-#include "nmod_poly.h"
-#include "fmpq_poly.h"
 
 /* S(n,k) <= (1/2) binomial(n,k) * k^(n-k) */
 static slong

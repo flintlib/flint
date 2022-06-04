@@ -18,14 +18,6 @@
 #define PERM_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
 #include "flint.h"
 
 #ifdef __cplusplus
@@ -41,10 +33,7 @@ PERM_INLINE slong * _perm_init(slong n)
     vec = (slong *) flint_malloc(n * sizeof(slong));
 
     if (!vec)
-    {
-        flint_printf("ERROR (_perm_init).\n\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "_perm_init\n");
 
     for (i = 0; i < n; i++)
         vec[i] = i;
@@ -96,10 +85,7 @@ PERM_INLINE void
         slong *t = (slong *) flint_malloc(n * sizeof(slong));
 
         if (!t)
-        {
-            flint_printf("ERROR (_perm_inv).\n\n");
-            flint_abort();
-        }
+            flint_throw(FLINT_ERROR, "_perm_inv\n");
 
         for (i = 0; i < n; i++)
             t[i] = vec[i];

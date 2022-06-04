@@ -11,17 +11,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qsieve.h"
-#include "fmpz_factor.h"
-#include "thread_support.h"
-
-#include <inttypes.h>
-#define _STDC_FORMAT_MACROS
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <sys/types.h>
+#define _STDC_FORMAT_MACROS
+#include <stdlib.h>
+#undef ulong
+
+#include "fmpz_vec.h"
+#include "qsieve.h"
+
+#ifndef strcat
+# ifdef __GNUC__
+#  define strcat __builtin_strcat
+# else
+#  include <string.h>
+# endif
+#endif
+
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif

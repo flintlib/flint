@@ -12,10 +12,7 @@
 #ifndef APRCL_H
 #define APRCL_H
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_factor.h"
 #include "fmpz_mod_poly.h"
 
 #ifdef __cplusplus

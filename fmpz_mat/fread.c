@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mat.h"
 
 int 
@@ -28,11 +29,8 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     }
     
     if (!mpz_fits_slong_p(t))
-    {
-        flint_printf("Exception (fmpz_mat_fread). "
-               "Number of rows does not fit into a slong.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Number of rows does not fit into a slong in fmpz_mat_fread\n");
+
     r = flint_mpz_get_si(t);
 
     /* second number in file should be column dimension */
@@ -44,11 +42,8 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     }
     
     if (!mpz_fits_slong_p(t))
-    {
-        flint_printf("Exception (fmpz_mat_fread). "
-               "Number of columns does not fit into a slong.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "Number of columns does not fit into a slong in fmpz_mat_fread\n");
+
     c = flint_mpz_get_si(t);
     mpz_clear(t);
     

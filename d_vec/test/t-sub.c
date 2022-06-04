@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
+#include "double_extras.h"
 #include "d_vec.h"
 #include "ulong_extras.h"
 

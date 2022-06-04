@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include <stdio.h>
 #include "padic_mat.h"
 
 int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
@@ -118,10 +118,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
         fmpz_clear(t);
     }
     else
-    {
-        flint_printf("ERROR (_padic_mat_fprint).  Unknown print mode.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "(_padic_mat_fprint)  Unknown print mode\n");
 
     return 1;
 }

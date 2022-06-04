@@ -15,9 +15,6 @@
 
 #include "templates.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 /*
     Recall the return value conventions for fputc (of type int) 
 
@@ -38,7 +35,7 @@ int _TEMPLATE(T, vec_fprint) (FILE * file,
     int r;
     slong i;
 
-    r = fprintf(file, "%li", len);
+    r = fprintf(file, WORD_FMT "d", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

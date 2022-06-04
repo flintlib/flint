@@ -12,9 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include <stdio.h>
+#include "nmod_poly_factor.h"
 
 int
 main(void)

@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include <limits.h>
+#include "flint.h"
 
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
@@ -144,6 +141,10 @@ union ieee_double_extract
 };
 #endif
 
+#if !defined(_FLINT_LONGSLONG)
+# define __FLINT_LONG_MAX (2147483647L)
+#endif
+
 static __inline__
 double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 {
@@ -156,14 +157,27 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
   /* Adjust exp to a radix point just above {ptr,size}, guarding against
      overflow.	After this exp can of course be reduced to anywhere within
      the {ptr,size} region without underflow.  */
+#if defined(_FLINT_LONGSLONG)
   if ((unsigned long) (FLINT_BITS * size)
-		> (unsigned long) (LONG_MAX - exp))
+		> (unsigned long) (WORD_MAX - exp))
     {
 	goto ieee_infinity;
 
       /* generic */
-      exp = LONG_MAX;
+      exp = WORD_MAX;
     }
+#else
+      /* Minimum size of long int is 32 bits, so if slong != long int then it
+       * must be 32 bit. */
+  if ((unsigned long) (FLINT_BITS * size)
+		> (unsigned long) (__FLINT_LONG_MAX - exp))
+    {
+	goto ieee_infinity;
+
+      /* generic */
+      exp = __FLINT_LONG_MAX;
+    }
+#endif
   else
     {
       exp += FLINT_BITS * size;
@@ -262,7 +276,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
     }
 }
 
-#if WORD_MAX != LONG_MAX && !defined(__MPIR_VERSION)
+#if !defined(_FLINT_LONGSLONG) && !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
@@ -725,10 +739,8 @@ void flint_mpz_powm_ui(mpz_ptr r, mpz_srcptr b, ulong exp, mpz_srcptr mod)
 static __inline__
 void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
-   if (exp >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_pow_ui). Power too large.\n");
-      flint_abort();
-   }
+   if (exp >= (UWORD(1) << 32))
+      flint_throw(FLINT_ERROR, "Power too large in flint_mpz_pow_ui\n");
    
    mpz_pow_ui(r, b, (unsigned long) exp);
 }
@@ -736,10 +748,8 @@ void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 static __inline__
 void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 {
-   if (n >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
-      flint_abort();
-   }
+   if (n >= (UWORD(1) << 32))
+      flint_throw(FLINT_ERROR, "n too large in flint_mpz_fac_ui\n");
    
    mpz_fac_ui(r, (unsigned long) n);
 }
@@ -747,15 +757,11 @@ void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 static __inline__
 void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 {
-   if (n >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
-      flint_abort();
-   }
+   if (n >= (UWORD(1) << 32))
+      flint_throw(FLINT_ERROR, "n too large in flint_mpz_bin_uiui\n");
    
-   if (k >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
-      flint_abort();
-   }
+   if (k >= (UWORD(1) << 32))
+      flint_throw(FLINT_ERROR, "k too large in flint_mpz_bin_uiui\n");
    
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
 }
@@ -763,10 +769,8 @@ void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 static __inline__
 void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
-   if (n >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
-      flint_abort();
-   }
+   if (n >= (UWORD(1) << 32))
+      flint_throw(FLINT_ERROR, "n too large in flint_mpz_fib_ui\n");
    
    mpz_fib_ui(r, (unsigned long) n);
 }
@@ -1066,7 +1070,7 @@ int flint_mpf_fits_slong_p(mpf_srcptr f)
 
 #endif
 
-#if WORD_MAX == LONG_MAX
+#if defined(_FLINT_LONGSLONG)
 
 #define flint_mpf_get_d_2exp mpf_get_d_2exp
 

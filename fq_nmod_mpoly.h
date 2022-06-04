@@ -18,26 +18,8 @@
 #define FQ_NMOD_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "mpoly.h"
-
 #include "nmod_mpoly.h"
-#include "n_poly.h"
-
 
 #ifdef __cplusplus
  extern "C" {
@@ -333,6 +315,7 @@ FLINT_DLL int fq_nmod_mpoly_set_str_pretty(fq_nmod_mpoly_t A, const char * str,
 FLINT_DLL char * fq_nmod_mpoly_get_str_pretty(const fq_nmod_mpoly_t A,
                                const char ** x, const fq_nmod_mpoly_ctx_t ctx);
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int fq_nmod_mpoly_fprint_pretty(FILE * file, 
       const fq_nmod_mpoly_t A, const char ** x, const fq_nmod_mpoly_ctx_t ctx);
 
@@ -342,7 +325,7 @@ int fq_nmod_mpoly_print_pretty(const fq_nmod_mpoly_t A,
 {
    return fq_nmod_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
-
+#endif
 
 /*  Basic manipulation *******************************************************/
 
@@ -1649,6 +1632,7 @@ FLINT_DLL void fq_nmod_mpoly_geobucket_sub(fq_nmod_mpoly_geobucket_t B,
 
 ******************************************************************************/
 
+#if _FLINT_HAVE_FILE
 /*
    test that r is a valid remainder upon division by g
    this means that no monomial of r is divisible by lm(g)
@@ -1701,7 +1685,7 @@ void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r,
     flint_free(rexp);
     flint_free(gexp);
 }
-
+#endif
 
 #ifdef __cplusplus
 }

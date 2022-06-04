@@ -28,15 +28,9 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
        fmpz_gcdinv(d, u, B + 0, p);
 
        if (!fmpz_is_one(d)) /* check for invertibility */
-       {
-           printf("Exception (fmpz_mod_poly_div_series). Impossible inverse.");
-               
-           fmpz_clear(u);
-           fmpz_clear(d);
-               
-           flint_abort();
-       }
-    } else
+           flint_throw(FLINT_IMPINV, "_fmpz_mod_poly_div_series");
+    }
+    else
        fmpz_set_ui(u, 1);
       
     Alen = FLINT_MIN(Alen, n);
@@ -111,10 +105,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-    {
-        flint_printf("Exception (fmpz_mod_poly_div_series). Division by zero.\n");
-        flint_abort();
-    }
+           flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_div_series");
 
     if (Alen == 0)
     {

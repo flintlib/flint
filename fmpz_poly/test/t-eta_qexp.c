@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -73,6 +74,6 @@ main(void)
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 

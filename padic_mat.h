@@ -18,16 +18,6 @@
 #define PADIC_MAT_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
 #include "fmpq_mat.h"
 #include "padic.h"
 
@@ -220,6 +210,7 @@ FLINT_DLL int padic_mat_is_zero(const padic_mat_t A);
 
 /* Input and output  *********************************************************/
 
+#if _FLINT_HAVE_FILE
 FLINT_DLL int padic_mat_fprint(FILE * file, 
                      const padic_mat_t A, const padic_ctx_t ctx);
 
@@ -237,6 +228,7 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 {
     return padic_mat_fprint_pretty(stdout, A, ctx);
 }
+#endif
 
 /* Random matrix generation  *************************************************/
 
@@ -292,4 +284,3 @@ FLINT_DLL void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat
 #endif
 
 #endif
-

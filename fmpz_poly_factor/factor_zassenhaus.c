@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 #define TRACE_ZASSENHAUS 0
 

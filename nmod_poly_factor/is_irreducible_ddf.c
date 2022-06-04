@@ -15,9 +15,7 @@
 #define ulong ulongxx/* interferes with system includes */
 #include <math.h>
 #undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {

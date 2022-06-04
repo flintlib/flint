@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_nmod_mpoly.h"
-
 
 void gcd_check(
     fq_nmod_mpoly_t g,

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
+#include <stdio.h>
+#include "fmpz_factor.h"
 #include "ulong_extras.h"
 
 int main(void)

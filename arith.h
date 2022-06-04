@@ -18,18 +18,17 @@
 #define ARITH_INLINE static __inline__
 #endif
 
-#include <gmp.h>
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include "mpfr.h"
-#include "flint.h"
-#include "fmpz.h"
+#undef ulong
+#define ulong mp_limb_t
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
-#include "fmpq.h"
-#include "double_extras.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* MPFR extras ***************************************************************/

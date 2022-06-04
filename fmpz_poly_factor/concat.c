@@ -13,9 +13,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 void
 fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)

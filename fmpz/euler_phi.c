@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_factor.h"
 
 void
 fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac)
