@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
-#include "d_mat.h"
+#include "d_mat-impl.h"
 
 void
 d_mat_randtest(d_mat_t mat, flint_rand_t state, slong minexp, slong maxexp)

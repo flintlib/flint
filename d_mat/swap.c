@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat.h"
+#include "d_mat-impl.h"
 
 void
 d_mat_swap(d_mat_t mat1, d_mat_t mat2)

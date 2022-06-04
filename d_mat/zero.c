@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
-#include "d_mat.h"
+#include "d_mat-impl.h"
 
 void
 d_mat_zero(d_mat_t mat)

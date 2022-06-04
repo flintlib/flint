@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,15 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat-impl.h"
+#ifndef D_MAT_IMPL_H
+#define D_MAT_IMPL_H
 
-void
-d_mat_clear(d_mat_t mat)
-{
-    if (mat->entries)
-    {
-        flint_free(mat->entries);   /* Clean up array of entries */
-        flint_free(mat->rows);  /* Clean up row array */
-    } else if (mat->r != 0)
-	flint_free(mat->rows);
-}
+#include <math.h>
+#include "double_extras.h"
+#include "d_vec.h"
+#include "d_mat.h"
+
+#endif
