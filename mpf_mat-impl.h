@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,18 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_mat-impl.h"
+#ifndef MPF_MAT_IMPL_H
+#define MPF_MAT_IMPL_H
 
+#include <stdio.h>
+#include <math.h>
+#include "mpf_mat.h"
 
-void
-mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2)
-{
-    if (mat1 != mat2)
-    {
-        mpf_mat_struct tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
-}
+#endif

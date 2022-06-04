@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "mpf_mat.h"
+#include "mpf_mat-impl.h"
+
 
 void
 mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)

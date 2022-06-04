@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_mat.h"
+#include "mpf_mat-impl.h"
+
 
 void
 mpf_mat_zero(mpf_mat_t mat)

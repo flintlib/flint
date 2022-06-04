@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_mat.h"
+#include "mpf_mat-impl.h"
+
 
 int
 mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2,
