@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "mpf_vec-impl.h"
 
 mpf *
 _mpf_vec_init(slong len, flint_bitcnt_t prec)

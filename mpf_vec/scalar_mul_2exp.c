@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "mpf_vec-impl.h"
 
 void
 _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len,

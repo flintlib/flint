@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec-impl.h"
+#ifndef MPF_VEC_IMPL_H
+#define MPF_VEC_IMPL_H
 
-void
-_mpf_vec_sub(mpf * res, const mpf * vec1, const mpf * vec2, slong len2)
-{
-    slong i;
-    for (i = 0; i < len2; i++)
-        mpf_sub(res + i, vec1 + i, vec2 + i);
-}
+#include "mpf_vec.h"
+
+#endif

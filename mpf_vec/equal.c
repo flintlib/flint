@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "mpf_vec-impl.h"
 
 int
 _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len)

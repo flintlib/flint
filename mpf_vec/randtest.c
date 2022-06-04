@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_vec.h"
+#include "mpf_vec-impl.h"
 
 void
 _mpf_vec_randtest(mpf * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
