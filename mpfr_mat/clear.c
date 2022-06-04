@@ -9,11 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "mpfr_mat.h"
+#include "mpfr_mat-impl.h"
 
 void
 mpfr_mat_clear(mpfr_mat_t mat)

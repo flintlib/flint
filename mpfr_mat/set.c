@@ -11,9 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "mpfr_vec.h"
-#include "mpfr_mat.h"
+#include "mpfr_mat-impl.h"
 
 void
 mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2)

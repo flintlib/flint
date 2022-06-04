@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "mpfr_mat.h"
+#include "mpfr_mat-impl.h"
 
 void
 mpfr_mat_swap(mpfr_mat_t mat1, mpfr_mat_t mat2)

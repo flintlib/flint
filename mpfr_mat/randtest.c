@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "mpfr_mat.h"
+#include "mpfr_mat-impl.h"
 
 void
 mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state)

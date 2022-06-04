@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,16 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpfr_mat-impl.h"
+#ifndef MPFR_MAT_IMPL_H
+#define MPFR_MAT_IMPL_H
 
-void
-mpfr_mat_zero(mpfr_mat_t mat)
-{
-    slong i;
+#include "mpfr_vec.h"
+#include "mpfr_mat.h"
 
-    if (mat->c < 1)
-        return;
-
-    for (i = 0; i < mat->r; i++)
-        _mpfr_vec_zero(mat->rows[i], mat->c);
-}
+#endif
