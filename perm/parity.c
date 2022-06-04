@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
+#include "perm-impl.h"
 
 int
 _perm_parity(const slong *vec, slong n)
