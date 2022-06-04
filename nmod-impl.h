@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define NMOD_INLINES_C
+#ifndef NMOD_IMPL_H
+#define NMOD_IMPL_H
 
-#include "nmod-impl.h"
+#include "nmod.h"
+
+#endif
