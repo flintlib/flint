@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,17 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec-impl.h"
+#ifndef FMPZ_MOD_VEC_IMPL_H
+#define FMPZ_MOD_VEC_IMPL_H
 
+#include "fmpz_vec.h"
+#include "fmpz_mod_vec.h"
 
-void _fmpz_mod_vec_mul(
-    fmpz * A,
-    const fmpz * B,
-    const fmpz * C,
-    slong len,
-    const fmpz_mod_ctx_t ctx)
-{
-    for (len--; len >= 0; len--)
-        fmpz_mod_mul(A + len, B + len, C + len, ctx);
-}
-
+#endif
