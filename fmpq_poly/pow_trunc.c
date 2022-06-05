@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 /* counts zero bits in the binary representation of e */
 static int

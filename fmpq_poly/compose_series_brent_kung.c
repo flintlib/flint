@@ -10,15 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
-#include "ulong_extras.h"
+#include "fmpq_poly-impl.h"
+
+
 
 static void
 _fmpq_mat_get_row(fmpz * rnum, fmpz_t den, fmpq_mat_t A, slong i)

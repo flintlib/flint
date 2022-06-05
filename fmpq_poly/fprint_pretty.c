@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "fmpq_poly-impl.h"
 
-#include "fmpq_poly.h"
+
+
 
 /*
     Macro wrapping _fmpq_fprint(file, x, y), ensuring that the printed 

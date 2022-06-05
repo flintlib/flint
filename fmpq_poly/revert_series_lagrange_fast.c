@@ -10,38 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "ulong_extras.h"
+#include "fmpq_poly-impl.h"
+
+
 
 
 /* pointer to (x/Q)^i */
 #define Ri(ii) (R + (n-1)*((ii)-1))
 #define Rdeni(ii) (Rden + ii - 1)
-
-static void
-_set_vec(fmpz * rnum, fmpz_t den,
-                const fmpz * xnum, const fmpz * xden, slong len)
-{
-    slong j;
-    fmpz_t t;
-    fmpz_init(t);
-    fmpz_one(den);
-
-    for (j = 0; j < len; j++)
-        fmpz_lcm(den, den, xden + j);
-
-    for (j = 0; j < len; j++)
-    {
-        fmpz_divexact(t, den, xden + j);
-        fmpz_mul(rnum + j, xnum + j, t);
-    }
-
-    fmpz_clear(t);
-}
 
 void
 _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,

@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, 
                      fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, 

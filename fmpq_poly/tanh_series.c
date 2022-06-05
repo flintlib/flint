@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 void
 _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden, 

@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1, 

@@ -10,16 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 int
 _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)

@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 fmpq_poly_struct * 
 _fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t denB, slong len)

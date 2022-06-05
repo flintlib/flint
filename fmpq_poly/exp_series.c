@@ -10,27 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
-
-static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
-{
-    __mpz_struct * z = COEFF_TO_PTR(*g);
-
-    return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
-}
-
-static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
-{
-    if (!COEFF_IS_MPZ(*g))
-        return n_gcd(FLINT_ABS(*g), h);
-    else
-        return _fmpz_gcd_big_small(g, h);
-}
-
+#include "fmpq_poly-impl.h"
 
 /* Basecase algorithm, given a precomputed derivative of
    of the input series (Alen still refers to the length
@@ -124,7 +104,7 @@ void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
         }
         else
         {
-            c = _fmpz_gcd_small(poly + k, k + m);
+            c = _fmpz_gcd_ui(poly + k, k + m);
 
             if (c == k + m)
             {
@@ -145,7 +125,7 @@ void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
                 }
 
                 c = divisors[k];
-                d = _fmpz_gcd_small(t, c);
+                d = _fmpz_gcd_ui(t, c);
                 if (d != c)
                     fmpz_mul_ui(t, t, c / d);
             }
@@ -387,7 +367,7 @@ _fmpq_poly_exp_series(fmpz * B, fmpz_t Bden,
             fmpz_mul(B + i * d, B + (i - 1) * d, B + d);
             fmpz_mul(Bden, Bden, R);
 
-            v = _fmpz_gcd_small(B + i * d, i);
+            v = _fmpz_gcd_ui(B + i * d, i);
             fmpz_divexact_ui(B + i * d, B + i * d, v);
             fmpz_mul_ui(Bden, Bden, i / v);
             fmpz_mul_ui(R + i, R, i / v);

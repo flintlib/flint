@@ -10,15 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
+#include "fmpq_poly-impl.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
-#include "ulong_extras.h"
+
+
 
 void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state, 
                         slong len, flint_bitcnt_t bits)

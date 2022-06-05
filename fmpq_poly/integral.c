@@ -9,26 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
-
-static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
-{
-    __mpz_struct * z = COEFF_TO_PTR(*g);
-
-    return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
-}
-
-static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
-{
-    if (!COEFF_IS_MPZ(*g))
-        return n_gcd(FLINT_ABS(*g), h);
-    else
-        return _fmpz_gcd_big_small(g, h);
-}
+#include "fmpq_poly-impl.h"
 
 void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, slong len)
@@ -62,7 +43,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
         }
         else
         {
-            c = _fmpz_gcd_small(poly + k - 1, k);
+            c = _fmpz_gcd_ui(poly + k - 1, k);
 
             if (c == k)
             {
@@ -83,7 +64,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
                 }
 
                 c = divisors[k];
-                d = _fmpz_gcd_small(t, c);
+                d = _fmpz_gcd_ui(t, c);
                 if (d != c)
                     fmpz_mul_ui(t, t, c / d);
             }

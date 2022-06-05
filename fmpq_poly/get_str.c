@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 char * fmpq_poly_get_str(const fmpq_poly_t poly)
 {

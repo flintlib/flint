@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 {

@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
+
+
 
 static __inline__ void __legendre_denom(fmpz_t den, ulong n)
 {

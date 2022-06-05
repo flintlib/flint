@@ -10,14 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "fmpq_poly-impl.h"
 
 
-static void
+
+
+void
 _set_vec(fmpz * rnum, fmpz_t den,
                 const fmpz * xnum, const fmpz * xden, slong len)
 {
