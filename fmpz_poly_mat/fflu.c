@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 #define E(j,k) fmpz_poly_mat_entry(B,j,k)
 
@@ -96,3 +95,5 @@ fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, slong * perm,
     fmpz_poly_clear(t);
     return rank;
 }
+
+#undef E

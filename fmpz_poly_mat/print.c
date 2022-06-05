@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "fmpz_poly_mat.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 void
 fmpz_poly_mat_print(const fmpz_poly_mat_t A, const char * x)

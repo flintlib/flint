@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 #define E fmpz_poly_mat_entry
 
@@ -56,3 +54,5 @@ fmpz_poly_mat_sqr_classical(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 
     fmpz_poly_mat_mul_classical(B, A, A);
 }
+
+#undef E

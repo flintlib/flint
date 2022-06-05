@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_mat.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 void
 fmpz_poly_mat_concat_horizontal(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat1, const fmpz_poly_mat_t mat2)

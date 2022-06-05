@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
-#include "perm.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 #define E fmpz_poly_mat_entry
 
@@ -89,3 +85,5 @@ fmpz_poly_mat_inv(fmpz_poly_mat_t Ainv, fmpz_poly_t den,
         return result;
     }
 }
+
+#undef E

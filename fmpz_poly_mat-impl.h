@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPZ_POLY_MAT_INLINES_C
+#ifndef FMPZ_POLY_MAT_IMPL_H
+#define FMPZ_POLY_MAT_IMPL_H
 
-#include "fmpz_poly_mat-impl.h"
+#include <stdio.h>
+#include "perm.h"
+#include "fmpz_poly_mat.h"
+
+#endif

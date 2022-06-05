@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 slong
 fmpz_poly_mat_rref(fmpz_poly_mat_t R, fmpz_poly_t den, const fmpz_poly_mat_t A)

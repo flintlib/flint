@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
-#include "ulong_extras.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 void
 fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, slong len,

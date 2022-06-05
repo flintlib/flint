@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
-#include "perm.h"
+#include "fmpz_poly_mat-impl.h"
+
 
 void
 fmpz_poly_mat_det_fflu(fmpz_poly_t det, const fmpz_poly_mat_t A)
