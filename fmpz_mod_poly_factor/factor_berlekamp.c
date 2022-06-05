@@ -13,8 +13,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly_factor-impl.h"
+
 
 static void
 fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, slong col, fmpz_mod_poly_t poly)

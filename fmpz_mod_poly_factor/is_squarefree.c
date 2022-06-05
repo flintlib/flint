@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly_factor.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_poly_factor-impl.h"
 
-#include <string.h>
+
 
 int
 _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)

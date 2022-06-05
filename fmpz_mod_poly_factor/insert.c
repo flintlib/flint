@@ -13,7 +13,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly_factor-impl.h"
+
 
 void
 fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,

@@ -12,11 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly_factor-impl.h"
+
 
 /* the degrees are written as exponents of the corresponding factors */
 void fmpz_mod_poly_factor_distinct_deg_with_frob(
