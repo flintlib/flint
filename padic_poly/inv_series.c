@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n, 
                            const padic_ctx_t ctx)

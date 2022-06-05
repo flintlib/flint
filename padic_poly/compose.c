@@ -9,13 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
 
 /*
     TODO:  Move this bit of code into "padic".
  */
-static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
+void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(u))
     {

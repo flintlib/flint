@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 void padic_poly_realloc(padic_poly_t poly, slong alloc, const fmpz_t p)
 {

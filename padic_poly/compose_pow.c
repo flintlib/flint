@@ -9,33 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "padic_poly.h"
-
-/*
-    TODO:  Move this bit of code into "padic".
- */
-static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
-{
-    if (!fmpz_is_zero(u))
-    {
-        if (*v < N)
-        {
-            int alloc;
-            fmpz_t pow;
-
-            alloc = _padic_ctx_pow_ui(pow, N - *v, ctx);
-            fmpz_mod(u, u, pow);
-            if (alloc)
-                fmpz_clear(pow);
-        }
-        else
-        {
-            fmpz_zero(u);
-            *v = 0;
-        }
-    }
-}
+#include "padic_poly-impl.h"
 
 void _padic_poly_compose_pow(fmpz *rop, slong *rval, slong N, 
                              const fmpz *op, slong val, slong len, slong k, 

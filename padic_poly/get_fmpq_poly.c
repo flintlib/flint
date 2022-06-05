@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_poly.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 /*
     Assumes that len > 0.

@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 void _padic_poly_normalise(padic_poly_t poly)
 {

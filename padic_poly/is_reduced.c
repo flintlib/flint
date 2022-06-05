@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, 
                            const padic_ctx_t ctx)

@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include "padic_poly-impl.h"
 
-#include "fmpz.h"
-#include "padic_poly.h"
+
 
 void padic_poly_fit_length(padic_poly_t poly, slong len)
 {

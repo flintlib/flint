@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 void padic_poly_set_padic(padic_poly_t poly, 
                           const padic_t x, const padic_ctx_t ctx)

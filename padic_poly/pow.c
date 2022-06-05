@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 void _padic_poly_pow(fmpz *rop, slong *rval, slong N, 
                      const fmpz *op, slong val, slong len, ulong e,

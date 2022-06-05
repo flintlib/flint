@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "padic_poly-impl.h"
 
-#include "flint.h"
-#include "padic_poly.h"
+
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
                              slong val, slong len, const padic_ctx_t ctx)

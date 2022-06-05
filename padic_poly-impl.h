@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define PADIC_POLY_INLINES_C
+#ifndef PADIC_POLY_IMPL_H
+#define PADIC_POLY_IMPL_H
 
-#include "padic_poly-impl.h"
+#include <stdio.h>
+#include "fmpz_mod_poly.h"
+#include "padic_poly.h"
+
+/* Defined in compose.c */
+void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx);
+
+#endif

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
-#include "padic_poly.h"
+#include "padic_poly-impl.h"
+
 
 void padic_poly_set_fmpq_poly(padic_poly_t f, 
                               const fmpq_poly_t g, const padic_ctx_t ctx)
