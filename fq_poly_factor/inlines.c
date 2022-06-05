@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fq.h"
-#include "fq_poly_factor.h"
+#define FQ_POLY_FACTOR_INLINES_C
+
+#include "fq_poly_factor-impl.h"
 
 void fq_poly_factor_get_poly(fq_poly_t z,
                        const fq_poly_factor_t fac, slong i, const fq_ctx_t ctx)
