@@ -11,11 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <float.h>
-#undef ulong
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 #ifdef FUNC_HEAD
 #undef FUNC_HEAD
@@ -27,6 +24,6 @@
 
 #define FUNC_HEAD int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl)
 #define TYPE 0                  /* indicates removals aren't desired */
-#include "mpf2_lll.c"
+#include "fmpz_lll/mpf2_lll.c"
 #undef FUNC_HEAD
 #undef TYPE

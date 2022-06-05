@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
+
 #if FLINT_USES_FENV
 # include <fenv.h>
 #endif
-#undef ulong
 
 int
 fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)

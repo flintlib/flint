@@ -11,12 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "double_extras.h"
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 void
 fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)

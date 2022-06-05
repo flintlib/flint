@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 int
 fmpz_lll_wrapper_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U,

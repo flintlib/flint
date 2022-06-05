@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 void
 fmpz_lll_context_init_default(fmpz_lll_t fl)

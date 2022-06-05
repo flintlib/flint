@@ -11,11 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 #ifdef FUNC_HEAD
 #undef FUNC_HEAD
@@ -58,7 +55,7 @@ do {                                                                   \
     }                                                                  \
 } while (0)
 #define TYPE 2                  /* indicates early size reductions and removals are desired */
-#include "d_lll.c"
+#include "fmpz_lll/d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI
 #undef TYPE

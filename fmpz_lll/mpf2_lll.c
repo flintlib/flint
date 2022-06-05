@@ -11,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 #if defined(FUNC_HEAD) && defined(TYPE)
 #ifdef GM

@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,15 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_lll-impl.h"
+#ifndef FMPZ_LLL_IMPL_H
+#define FMPZ_LLL_IMPL_H
 
+#include <math.h>
+#include <float.h>
+#include "double_extras.h"
+#include "d_vec.h"
+#include "mpfr_vec.h"
+#include "mpfr_mat.h"
+#include "fmpz_lll.h"
 
-void
-fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta, rep_type rt,
-                      gram_type gt)
-{
-    fl->delta = delta;
-    fl->eta = eta;
-    fl->rt = rt;
-    fl->gt = gt;
-}
+#if FLINT_USES_FENV
+#include <fenv.h>
+#endif
+
+#endif

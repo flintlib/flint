@@ -11,13 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "d_vec.h"
-#include "d_mat.h"
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 #ifdef FUNC_HEAD
 #undef FUNC_HEAD
@@ -45,7 +40,7 @@ do {                                                        \
             _d_vec_dot(appB->rows[I], appB->rows[J], C);    \
 } while (0)
 #define TYPE 2
-#include "babai.c"
+#include "fmpz_lll/babai.c"
 #undef FUNC_HEAD
 #undef LIMIT
 #undef COMPUTE

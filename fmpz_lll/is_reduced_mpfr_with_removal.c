@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpfr.h"
-#include "fmpz_lll.h"
-#include "mpfr_vec.h"
-#include "mpfr_mat.h"
+#include "fmpz_lll-impl.h"
+
 
 int
 fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,

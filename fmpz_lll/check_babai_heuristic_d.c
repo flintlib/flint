@@ -11,11 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "fmpz_lll.h"
+#include "fmpz_lll-impl.h"
+
 
 #ifdef FUNC_HEAD
 #undef FUNC_HEAD
@@ -44,7 +41,7 @@ do {                                                                \
                                    B, I, J, expo[I] + expo[J]);     \
 } while (0)
 #define TYPE 1
-#include "babai.c"
+#include "fmpz_lll/babai.c"
 #undef FUNC_HEAD
 #undef LIMIT
 #undef COMPUTE
