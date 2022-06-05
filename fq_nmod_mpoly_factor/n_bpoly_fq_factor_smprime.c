@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
-#include "fq_nmod_poly_factor.h"
-#include "fq_nmod_mpoly_factor.h"
+#include "fq_nmod_mpoly_factor-impl.h"
+
 
 #define FLINT_TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC(n*sizeof(T))
 

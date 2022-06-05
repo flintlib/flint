@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,18 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly_factor-impl.h"
+#ifndef FQ_NMOD_MPOLY_FACTOR_IMPL_H
+#define FQ_NMOD_MPOLY_FACTOR_IMPL_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "long_extras.h"
+#include "fmpz_poly_factor.h"
+#include "nmod_mpoly_factor.h"
+#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_mpoly_factor.h"
 
-void fq_nmod_mpoly_factor_init(
-    fq_nmod_mpoly_factor_t f,
-    const fq_nmod_mpoly_ctx_t ctx)
-{
-    fq_nmod_init(f->constant, ctx->fqctx);
-	fq_nmod_one(f->constant, ctx->fqctx);
-    f->poly  = NULL;
-    f->exp   = NULL;
-    f->num   = 0;
-    f->alloc = 0;
-}
-
+#endif
