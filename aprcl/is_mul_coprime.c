@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 /*
     Returns 1 if gcd(x * y, n) == 1; otherwise returns 0.

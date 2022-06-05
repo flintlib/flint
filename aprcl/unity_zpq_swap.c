@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 void
 unity_zpq_swap(unity_zpq f, unity_zpq g)

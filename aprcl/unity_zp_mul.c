@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 void
 unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)

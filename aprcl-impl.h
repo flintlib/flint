@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Vladimir Glazachev
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,22 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl-impl.h"
+#ifndef APRCL_IMPL_H
+#define APRCL_IMPL_H
 
+#include <stdio.h>
+#include <math.h>
+#include "aprcl.h"
 
-void
-unity_zpq_clear(unity_zpq f)
-{
-    slong i;
-
-    for (i = 0; i < f->p; i++)
-    {
-        fmpz_mod_poly_clear(f->polys[i], f->ctx);
-    }
-
-    f->p = 0;
-    f->q = 0;
-
-    fmpz_mod_ctx_clear(f->ctx);
-    flint_free(f->polys);
-}
+#endif

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 void
 unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)

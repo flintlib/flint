@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 /*
     Input a0, a1, a2 store in t[0 .. 2] and b0, b1, b2 store in t[3 .. 5].

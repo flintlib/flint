@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 void
 unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n)

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 int
 aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)

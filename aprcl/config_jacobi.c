@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 ulong
 aprcl_R_value(const fmpz_t n)

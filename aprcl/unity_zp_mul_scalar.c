@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "aprcl-impl.h"
+
 
 void
 unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
