@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,20 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_embed-impl.h"
+#ifndef FQ_EMBED_IMPL_H
+#define FQ_EMBED_IMPL_H
 
+#include "fq_poly_factor.h"
+#include "fq_embed.h"
 
-#ifdef T
-#undef T
 #endif
-#ifdef B
-#undef B
-#endif
-
-#define T fq
-#define CAP_T FQ
-#define B fmpz_mod
-#include "fq_embed_templates/composition_matrix.c"
-#undef B
-#undef CAP_T
-#undef T

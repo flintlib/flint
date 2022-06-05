@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_embed.h"
-#include "fq_poly_factor.h"
+#include "fq_embed-impl.h"
+
 
 #ifdef T
 #undef T
@@ -26,7 +26,6 @@
 #ifdef T
 #ifdef B
 
-#include "templates.h"
 
 void fq_embed_gens(fq_t gen_sub, fq_t gen_sup, fmpz_mod_poly_t minpoly,
                              const fq_ctx_t sub_ctx,
