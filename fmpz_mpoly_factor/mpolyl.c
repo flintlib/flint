@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
+#include "fmpz_mpoly_factor-impl.h"
+
 
 void fmpz_mpoly_to_mpolyl_perm_deflate(
     fmpz_mpoly_t A,

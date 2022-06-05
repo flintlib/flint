@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
-#include "nmod_mpoly.h"
-#include "thread_pool.h"
-#include "fmpq.h"
+#include "fmpz_mpoly_factor-impl.h"
+
 
 typedef struct
 {

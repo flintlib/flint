@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
-#include "fmpz_mpoly_factor.h"
+#include "fmpz_mpoly_factor-impl.h"
+
 
 /* return an n with |gcd(A,B)|_infty < 2^n or return UWORD_MAX */
 static flint_bitcnt_t fmpz_mpoly_gcd_bitbound(
