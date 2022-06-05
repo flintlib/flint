@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FQ_DEFAULT_MAT_INLINES_C
+#ifndef FQ_DEFAULT_MAT_IMPL_H
+#define FQ_DEFAULT_MAT_IMPL_H
 
-#include "fq_default_mat-impl.h"
+#include "fq_default_mat.h"
+
+#endif
