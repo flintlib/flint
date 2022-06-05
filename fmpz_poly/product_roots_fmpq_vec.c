@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpq.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 FLINT_DLL void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
                                         const fmpq * xs, slong n)

@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "fmpz_poly-impl.h"
 
-#include "fmpz_poly.h"
+
 
 int _fmpz_poly_fprint_pretty(FILE * file, 
                              const fmpz * poly, slong len, const char * x)

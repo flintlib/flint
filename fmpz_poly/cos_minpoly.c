@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
-#include "ulong_extras.h"
+#include "fmpz_poly-impl.h"
+
 
 /* Use a lookup table for small n. We skip 53, 59 and 61, as the
    coefficients do not fit in 16 bits. */

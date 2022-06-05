@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,11 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly-impl.h"
+#ifndef FMPZ_POLY_IMPL_H
+#define FMPZ_POLY_IMPL_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <ctype.h>
+#include "thread_support.h"
+#include "fmpz_mat.h"
+#include "fmpz_poly_factor.h"
+#include "fmpz_mod_poly.h"
+#include "fft.h"
+#include "fft_tuning.h"
 
-slong
-fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)
-{
-    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : WORD(0);
-}
+#endif

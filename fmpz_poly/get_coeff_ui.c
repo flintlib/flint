@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 ulong
 fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, slong n)

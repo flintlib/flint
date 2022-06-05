@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly-impl.h"
+
 
 slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link, 
     fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 

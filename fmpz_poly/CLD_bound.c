@@ -10,13 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 #define CLD_EPS 0.00000001
 

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 void
 fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)

@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 #define MULLOW(z, x, xn, y, yn, nn) \
     if ((xn) >= (yn)) \

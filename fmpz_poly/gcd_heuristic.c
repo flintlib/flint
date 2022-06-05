@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "mpn_extras.h"
+#include "fmpz_poly-impl.h"
+
 
 /* 
    Divide (arrayg, limbsg) by the positive value gc in-place and

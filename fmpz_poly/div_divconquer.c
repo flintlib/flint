@@ -11,12 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 static int
 __fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, 

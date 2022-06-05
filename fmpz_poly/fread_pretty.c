@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <gmp.h>
+#include "fmpz_poly-impl.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+
 
 static __inline__
 int is_varsymbol0(char c)

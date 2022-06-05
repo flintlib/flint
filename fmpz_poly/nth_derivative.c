@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 void _fmpz_poly_nth_derivative(fmpz * rpoly, const fmpz * poly, ulong n, slong len)
 {

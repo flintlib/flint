@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, 
                                  const nmod_poly_factor_t fac)

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 /* Up to this order the coefficients fit inside small fmpz */
 #define SMALL_BOUND (FLINT_BITS == 64 ? 20 : 12)

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 /* Bound coefficients using (x + u)^(2^n) and the binomial
    coefficients. TODO: this is about 2x too large... */

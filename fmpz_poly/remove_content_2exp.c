@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 slong _fmpz_poly_remove_content_2exp(fmpz * pol, slong len)
 {

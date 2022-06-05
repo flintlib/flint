@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 /*
     Macro for the lift B := [{(1 - aG - bH)/p} * b mod g] p + b, 

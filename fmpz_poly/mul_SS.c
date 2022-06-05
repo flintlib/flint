@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
-#include "fft.h"
-#include "fft_tuning.h"
+#include "fmpz_poly-impl.h"
+
 
 void _fmpz_poly_mul_SS(fmpz *output, const fmpz *input1, slong len1, 
                        const fmpz *input2, slong len2)

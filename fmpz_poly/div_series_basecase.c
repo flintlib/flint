@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 static void
 fmpz_divexact_checked(fmpz_t Q, const fmpz_t A, const fmpz_t B)

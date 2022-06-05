@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 static void 
 __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 

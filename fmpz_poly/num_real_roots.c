@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 static __inline__
 slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol, slong len)

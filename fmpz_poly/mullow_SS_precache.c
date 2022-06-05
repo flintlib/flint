@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_poly.h"
-#include "fft.h"
-#include "fft_tuning.h"
-#include "flint.h"
+#include "fmpz_poly-impl.h"
+
 
 void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
                               slong len1, slong bits1, const fmpz_poly_t poly2)

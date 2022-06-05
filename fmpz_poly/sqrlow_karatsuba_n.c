@@ -10,12 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly-impl.h"
+
 
 /*
     For documentation, see fmpz_poly/mullow_karatsuba_n.c
