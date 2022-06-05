@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default.h"
+#include "fq_default-impl.h"
+
 
 void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
                          const nmod_poly_t modulus, const char * var, int type)

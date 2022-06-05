@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default.h"
+#include "fq_default-impl.h"
+
 
 void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
                 const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,

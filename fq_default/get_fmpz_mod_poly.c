@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default.h"
+#include "fq_default-impl.h"
+
 
 void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
                              const fq_default_t op, const fq_default_ctx_t ctx)
