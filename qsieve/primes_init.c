@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qsieve.h"
+#include "qsieve-impl.h"
+
 
 prime_t *
 compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)

@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "qsieve-impl.h"
+
 #ifndef memset
 # ifdef __GNUC__
 #  define memset __builtin_memset
@@ -17,7 +19,6 @@
 #  include <string.h>
 # endif
 #endif
-#include "qsieve.h"
 
 /*
     Initialise linear algebra.

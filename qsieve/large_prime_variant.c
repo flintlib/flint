@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <ctype.h>
-#include <stdlib.h>
+#include "qsieve-impl.h"
+
 #ifndef memset
 # ifdef __GNUC__
 #  define memset __builtin_memset
@@ -21,8 +19,6 @@
 #  include <string.h>
 # endif
 #endif
-#undef ulong
-#include "qsieve.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))

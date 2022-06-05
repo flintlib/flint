@@ -11,6 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "qsieve-impl.h"
+
 #ifndef memset
 # ifdef __GNUC__
 #  define memset __builtin_memset
@@ -18,7 +20,6 @@
 #  include <string.h>
 # endif
 #endif
-#include "qsieve.h"
 
 /*
     The actual sieving part of the quadratic sieve. This version is only run

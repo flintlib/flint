@@ -11,30 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <sys/types.h>
-#define _STDC_FORMAT_MACROS
-#include <stdlib.h>
-#undef ulong
-
-#include "fmpz_vec.h"
-#include "qsieve.h"
-
-#ifndef strcat
-# ifdef __GNUC__
-#  define strcat __builtin_strcat
-# else
-#  include <string.h>
-# endif
-#endif
-
-#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
-#include <unistd.h>
-#endif
-#if defined (__WIN32) && !defined(__CYGWIN__)
-#include <windows.h>
-#endif
+#include "qsieve-impl.h"
 
 int compare_facs(const void * a, const void * b)
 {

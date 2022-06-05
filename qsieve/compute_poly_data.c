@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qsieve.h"
+#include "qsieve-impl.h"
+
 
 /*
     * compute bounds for optimal A (coeff of poly f(x) = Ax^2 + 2Bx + C, where

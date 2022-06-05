@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "qsieve-impl.h"
+
 /*-------------------------------------------------------------------
 
 Optionally, please be nice and tell me if you find this source to be
@@ -35,7 +37,6 @@ benefit from your work.
 #  include <string.h>
 # endif
 #endif
-#include "qsieve.h"
 
 #define BIT(x) (((uint64_t)(1)) << (x))
 

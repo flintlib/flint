@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qsieve.h"
+#include "qsieve-impl.h"
+
 
 mp_limb_t qsieve_poly_init(qs_t qs_inf)
 {

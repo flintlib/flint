@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qsieve.h"
+#include "qsieve-impl.h"
+
 
 void qsieve_linalg_clear(qs_t qs_inf)
 {
