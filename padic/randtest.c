@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 #define PADIC_RANDTEST_TRIES  10
 

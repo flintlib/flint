@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
-#include "ulong_extras.h"
+#include "padic-impl.h"
+
 
 static void
 _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T, 

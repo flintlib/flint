@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 void padic_shift(padic_t rop, const padic_t op, slong v, const padic_ctx_t ctx)
 {

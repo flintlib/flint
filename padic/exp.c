@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 slong _padic_exp_bound(slong v, slong N, const fmpz_t p)
 {

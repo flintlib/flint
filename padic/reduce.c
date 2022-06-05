@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
 {

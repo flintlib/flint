@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "padic.h"
-#include "ulong_extras.h"
+#include "padic-impl.h"
+
 
 /*
     Assumes that $1 \leq v$ or $2 \leq v$ as $p$ is even 

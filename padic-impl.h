@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic-impl.h"
+#ifndef PADIC_IMPL_H
+#define PADIC_IMPL_H
 
+#include <stdio.h>
+#include "long_extras.h"
+#include "padic.h"
 
-void padic_clear(padic_t rop)
-{
-    fmpz_clear(padic_unit(rop));
-}
-
+#endif

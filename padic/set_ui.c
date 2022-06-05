@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 {

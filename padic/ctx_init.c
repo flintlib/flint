@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max, 
                     enum padic_print_mode mode)

@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "padic-impl.h"
+
 
 /*
     Computes the sum $1 + x + x^2 / 2$ reduced modulo $p^N$, 
