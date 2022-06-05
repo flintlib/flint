@@ -11,15 +11,7 @@
 
 #define FQ_NMOD_POLY_FACTOR_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fq_nmod.h"
-#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_poly_factor-impl.h"
 
 void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z,
              const fq_nmod_poly_factor_t fac, slong i, const fq_nmod_ctx_t ctx)
