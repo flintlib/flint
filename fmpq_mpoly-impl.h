@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,12 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly-impl.h"
+#ifndef FMPQ_MPOLY_IMPL_H
+#define FMPQ_MPOLY_IMPL_H
 
+#include <stdio.h>
+#include <string.h>
+#include "fmpq_mpoly.h"
 
-void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t A,
-              const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpq_div(A->content, B->content, c);
-    fmpz_mpoly_set(A->zpoly, B->zpoly, ctx->zctx);
-}
+#endif

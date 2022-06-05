@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 
 /* Assumes divisor polys don't alias any output polys */

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 int fmpq_mpoly_discriminant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
                                      slong var, const fmpq_mpoly_ctx_t ctx)

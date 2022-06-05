@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A,
                 const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)

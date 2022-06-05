@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 
 static void _fmpz_binpow_fmpz(fmpz_t a, const fmpz * p, const fmpz_t e)

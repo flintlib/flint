@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 /* don't do too much work if length(A) matches easy_length */
 void fmpq_mpoly_reduce_easy(

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 void _fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t qpoly,
                   const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t qctx)

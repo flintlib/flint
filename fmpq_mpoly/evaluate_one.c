@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 /* exponents of B are not multiprecision */
 static int _fmpq_mpoly_evaluate_one_fmpq_sp(

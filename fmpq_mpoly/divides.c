@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 /* return 1 if quotient is exact */
 int fmpq_mpoly_divides(fmpq_mpoly_t Q, const fmpq_mpoly_t A,

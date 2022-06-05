@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpq_mpoly-impl.h"
+
 
 void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
                                           fmpq_t C, const fmpq_mpoly_ctx_t ctx)
