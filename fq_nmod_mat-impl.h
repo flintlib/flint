@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mat-impl.h"
+#ifndef FQ_NMOD_MAT_IMPL_H
+#define FQ_NMOD_MAT_IMPL_H
 
+#include <stdio.h>
+#include "fq_nmod_mat.h"
+#include "fq_nmod_poly.h"
 
-#ifdef T
-#undef T
 #endif
-
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-#include "fq_mat_templates/set_nmod_mat.c"
-#undef CAP_T
-#undef T

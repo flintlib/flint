@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fq_nmod.h"
-#include "fq_nmod_mat.h"
+#include "fq_nmod_mat-impl.h"
+
 
 slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
                                          slong m, const fq_nmod_ctx_t ctx)
