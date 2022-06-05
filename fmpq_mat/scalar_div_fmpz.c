@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, 
                               const fmpq_mat_t op, const fmpz_t x)

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d)
 {

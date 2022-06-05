@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq_poly.h"
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat)
 {

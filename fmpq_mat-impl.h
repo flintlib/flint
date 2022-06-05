@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,18 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat-impl.h"
+#ifndef FMPQ_MAT_IMPL_H
+#define FMPQ_MAT_IMPL_H
 
+#include <stdio.h>
+#include "fmpq_vec.h"
+#include "fmpq_mat.h"
 
-void
-fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
-{
-    if (mat1 != mat2)
-    {
-        fmpq_mat_struct tmp;
+/* defined in solve_multi_mod.c */
+int
+_fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
 
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
-}
+#endif

@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 void
 fmpq_mat_init_set(fmpq_mat_t mat, const fmpq_mat_t src)

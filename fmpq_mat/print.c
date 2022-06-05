@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 void fmpq_mat_print(const fmpq_mat_t mat)
 {

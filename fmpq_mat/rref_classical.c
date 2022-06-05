@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 slong
 fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)

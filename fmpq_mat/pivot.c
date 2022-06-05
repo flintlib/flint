@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
+
 
 int
 fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c)
