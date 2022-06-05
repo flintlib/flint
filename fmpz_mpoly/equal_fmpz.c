@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t A,
                                     const fmpz_t c, const fmpz_mpoly_ctx_t ctx)

@@ -9,9 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
 
+/* avoid clash with mul_heap_threaded.c */
+#define _base_struct _mybase_struct
+#define _base_t _mybase_t
+#define _worker_arg_struct _myworker_arg_struct
 
 /*
     NOTE: this file is dirty - it assumes that a zero fmpz is zero
@@ -948,3 +951,7 @@ int fmpz_mpoly_mul_array_threaded(
     TMP_END;
     return success;
 }
+
+#undef _base_struct
+#undef _base_t
+#undef _worker_arg_struct

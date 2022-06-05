@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 void _fmpz_mpoly_fit_length(fmpz ** poly,
                               ulong ** exps, slong * alloc, slong len, slong N)

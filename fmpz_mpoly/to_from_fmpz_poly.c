@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /*
     assuming that the conversion can be done, set poly1 and poly1_shift

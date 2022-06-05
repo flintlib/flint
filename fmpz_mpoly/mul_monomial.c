@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /* TODO: decouple the exp/coeff alloc in fmpz_mpoly and move this to mpoly */
 void fmpz_mpoly_mul_monomial(

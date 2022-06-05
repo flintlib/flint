@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 mp_limb_t fmpz_mpoly_evaluate_all_nmod(
     const fmpz_mpoly_t A,

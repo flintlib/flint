@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "fmpz_mpoly.h"
-#include "thread_support.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /*
     a thread safe mpoly supports three mutating operations

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /* leave vec1 undefined but valid if division is not exact */
 int _fmpz_vec_scalar_divides_fmpz(fmpz * vec1, const fmpz * vec2,

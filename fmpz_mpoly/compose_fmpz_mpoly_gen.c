@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /* evaluate B(x_1,...,x_n) at x_i = y_c[i], y_j are vars of ctxAC */
 void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A,

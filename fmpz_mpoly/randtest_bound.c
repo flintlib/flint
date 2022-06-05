@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
                          slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,

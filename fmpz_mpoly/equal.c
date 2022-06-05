@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
                      const fmpz * poly2, const ulong * exps2, slong n, slong N)

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 void fmpz_mpoly_quasidiv(fmpz_t scale, fmpz_mpoly_t Q,
                                 const fmpz_mpoly_t A, const fmpz_mpoly_t B,

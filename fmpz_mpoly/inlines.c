@@ -11,13 +11,4 @@
 
 #define FMPZ_MPOLY_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
-
+#include "fmpz_mpoly-impl.h"

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /* evaluate B(xbar) at xbar = C */
 int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,

@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 int
 _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 

@@ -10,13 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "mpn_extras.h"
-#include "fmpz_mpoly.h"
-#include "nmod_mpoly.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /* try to prove that A is not a square */
 static int _is_proved_not_square(

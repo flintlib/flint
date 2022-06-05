@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
-#include "thread_support.h"
+#include "fmpz_mpoly-impl.h"
+
 
 int fmpz_mpoly_divides(
     fmpz_mpoly_t Q,

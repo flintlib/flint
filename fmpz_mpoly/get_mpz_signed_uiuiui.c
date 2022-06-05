@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mpoly-impl.h"
+
 
 /*
     if r is the returned mpz, then x = r + sm, where sm is a signed 3 limb integer

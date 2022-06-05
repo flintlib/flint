@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,12 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly-impl.h"
+#ifndef FMPZ_MPOLY_IMPL_H
+#define FMPZ_MPOLY_IMPL_H
 
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "thread_support.h"
+#include "long_extras.h"
+#include "mpn_extras.h"
+#include "fmpz_mod_mpoly.h"
+#include "fmpz_mpoly_factor.h"
 
-void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
-                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
-{
-    /* TODO !!! */
-    fmpz_mpoly_div_monagan_pearce(Q, A, B, ctx);
-}
+#endif
