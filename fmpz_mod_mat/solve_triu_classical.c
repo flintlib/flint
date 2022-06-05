@@ -11,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mat.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 void fmpz_mod_mat_solve_triu_classical(fmpz_mod_mat_t X,
                                        const fmpz_mod_mat_t U,

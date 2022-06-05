@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mat.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
                                                       const fmpz_mod_ctx_t ctx)

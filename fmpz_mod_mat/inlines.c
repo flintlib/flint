@@ -12,14 +12,7 @@
 
 #define FMPZ_MOD_MAT_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_mod_mat.h"
+#include "fmpz_mod_mat-impl.h"
 
 void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j)
 {

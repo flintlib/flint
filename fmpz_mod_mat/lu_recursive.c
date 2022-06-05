@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 static void _apply_permutation(slong * AP,
                    fmpz_mod_mat_t A, slong * P, slong n, slong offset)

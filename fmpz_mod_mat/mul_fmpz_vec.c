@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 void fmpz_mod_mat_mul_fmpz_vec(fmpz* c, const fmpz_mod_mat_t A,
                                                     const fmpz * b, slong blen)

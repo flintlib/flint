@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A)
 {

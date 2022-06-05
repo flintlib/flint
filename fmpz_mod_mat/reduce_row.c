@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mat.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, 
                                              slong m, const fmpz_mod_ctx_t ctx)

@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mat.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
                                                       const fmpz_mod_ctx_t ctx)

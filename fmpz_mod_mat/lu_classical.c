@@ -11,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mat.h"
+#include "fmpz_mod_mat-impl.h"
+
 
 static __inline__ int
 fmpz_mod_mat_pivot(fmpz_mod_mat_t A, slong * P, slong start_row,

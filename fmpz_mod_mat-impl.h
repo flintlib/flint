@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat-impl.h"
+#ifndef FMPZ_MOD_MAT_IMPL_H
+#define FMPZ_MOD_MAT_IMPL_H
 
+#include "thread_support.h"
+#include "fmpz_mod_vec.h"
+#include "fmpz_mod_mat.h"
+#include "fmpz_mod_poly.h"
 
-void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c)
-{
-    fmpz_t d;
-    fmpz_init(d);
-    fmpz_mod(d, c, A->mod);
-
-    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, d);
-    _fmpz_mod_mat_reduce(B);
-    fmpz_clear(d);
-}
+#endif
