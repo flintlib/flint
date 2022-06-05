@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_embed.h"
+#include "fq_zech_embed-impl.h"
+
 
 void fq_zech_embed_mul_matrix(nmod_mat_t matrix,
                         const fq_zech_t gen,
