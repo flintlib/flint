@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, slong len)
 {

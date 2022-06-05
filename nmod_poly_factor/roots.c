@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 /*
     Helper function for finding roots. The roots of a monic f are written

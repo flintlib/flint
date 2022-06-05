@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor-impl.h"
+#ifndef NMOD_POLY_FACTOR_IMPL_H
+#define NMOD_POLY_FACTOR_IMPL_H
 
+#include <stdio.h>
+#include <math.h>
+#include "thread_support.h"
+#include "long_extras.h"
+#include "mpn_extras.h"
+#include "nmod_poly_factor.h"
 
-void nmod_poly_factor_print_pretty(const nmod_poly_factor_t fac, const char *var)
-{
-    slong i;
-    for (i = 0; i < fac->num; i++)
-    {
-        nmod_poly_print_pretty(fac->p + i, var);
-        flint_printf(" ^ %wd\n", fac->exp[i]);
-    }
-}
+#endif

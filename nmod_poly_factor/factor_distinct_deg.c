@@ -11,11 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-#include <math.h>
-#undef ulong
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                   const nmod_poly_t poly, slong * const * degs)

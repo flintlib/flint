@@ -12,7 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 #define ZASSENHAUS 0
 #define BERLEKAMP 1

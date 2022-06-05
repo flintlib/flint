@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
                                      const nmod_poly_t poly)

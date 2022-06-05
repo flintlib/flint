@@ -11,7 +11,7 @@
 
 #define NMOD_POLY_FACTOR_INLINES_C
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
 
 void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i)
 {

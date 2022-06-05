@@ -11,12 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-#include <math.h>
-#undef ulong
-#include "thread_support.h"
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 void
 _nmod_poly_precompute_matrix_worker(void * arg_ptr)

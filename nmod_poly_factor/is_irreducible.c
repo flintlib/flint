@@ -14,7 +14,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 int
 nmod_poly_is_irreducible(const nmod_poly_t f)

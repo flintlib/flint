@@ -12,7 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 static void
 nmod_poly_to_nmod_mat_col(nmod_mat_t mat, slong col, nmod_poly_t poly)

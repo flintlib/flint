@@ -12,8 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 void
 nmod_poly_factor_print(const nmod_poly_factor_t fac)

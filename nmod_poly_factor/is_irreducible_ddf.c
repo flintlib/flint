@@ -11,11 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-#include <math.h>
-#undef ulong
-#include "nmod_poly_factor.h"
+#include "nmod_poly_factor-impl.h"
+
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {

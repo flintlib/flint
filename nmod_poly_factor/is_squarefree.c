@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_factor.h"
-#include "mpn_extras.h"
-#include "ulong_extras.h"
+#include "nmod_poly_factor-impl.h"
+
 
 int
 _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod)
