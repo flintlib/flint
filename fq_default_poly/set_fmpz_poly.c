@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default_poly.h"
+#include "fq_default_poly-impl.h"
 
 void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
                               const fmpz_poly_t op, const fq_default_ctx_t ctx)
