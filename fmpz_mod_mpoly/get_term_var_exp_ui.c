@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 ulong fmpz_mod_mpoly_get_term_var_exp_ui(const fmpz_mod_mpoly_t A, slong i,
                                          slong var, const fmpz_mod_mpoly_ctx_t ctx)

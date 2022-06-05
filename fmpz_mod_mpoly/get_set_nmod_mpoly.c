@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 
 void _fmpz_mod_mpoly_set_nmod_mpoly(

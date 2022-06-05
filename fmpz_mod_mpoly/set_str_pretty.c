@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 int fmpz_mod_mpoly_set_str_pretty(
     fmpz_mod_mpoly_t poly,

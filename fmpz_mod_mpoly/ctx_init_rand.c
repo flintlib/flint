@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 void fmpz_mod_mpoly_ctx_init_rand(fmpz_mod_mpoly_ctx_t ctx,
                     flint_rand_t state, slong max_nvars, const fmpz_t modulus)

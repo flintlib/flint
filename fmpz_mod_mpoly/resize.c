@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 void fmpz_mod_mpoly_resize(fmpz_mod_mpoly_t A, slong new_length,
                                                     const fmpz_mod_mpoly_ctx_t ctx)

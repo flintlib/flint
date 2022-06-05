@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
-#include "mpn_extras.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 
 void _fmpz_mod_mpoly_mul_johnson1(

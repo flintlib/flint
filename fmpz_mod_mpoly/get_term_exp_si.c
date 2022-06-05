@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 void fmpz_mod_mpoly_get_term_exp_si(slong * exp, const fmpz_mod_mpoly_t A, 
                                        slong i, const fmpz_mod_mpoly_ctx_t ctx)

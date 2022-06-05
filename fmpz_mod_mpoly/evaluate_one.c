@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 /* exponents of B are not multiprecision */
 void _fmpz_mod_mpoly_evaluate_one_fmpz_mod_sp(

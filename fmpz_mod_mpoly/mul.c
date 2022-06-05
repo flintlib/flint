@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 
 static int _try_dense(

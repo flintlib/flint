@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
-#include "long_extras.h"
+#include "fmpz_mod_mpoly-impl.h"
 
+/* avoid clash with divides_dense.c */
+#define _from_dense _myfrom_dense
 
 void _fmpz_mod_mpoly_init_dense_mock(
     fmpz_mod_poly_t D,
@@ -267,3 +268,5 @@ int fmpz_mod_mpoly_mul_dense(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B,
 
     return success;
 }
+
+#undef _from_dense

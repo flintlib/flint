@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly-impl.h"
+
 
 int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
     fmpz_mod_mpoly_struct ** Q,
