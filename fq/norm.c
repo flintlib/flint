@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 /*
     Computes the norm on $\mathbf{F}_q$.

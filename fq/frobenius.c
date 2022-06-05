@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "fq.h"
+#include "fq-impl.h"
+
 
 /*
     Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator 

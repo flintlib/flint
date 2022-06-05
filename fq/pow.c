@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 void
 _fq_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,

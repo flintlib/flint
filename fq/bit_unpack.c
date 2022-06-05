@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 void
 fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size,

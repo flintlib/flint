@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 void
 fq_ctx_clear(fq_ctx_t ctx)

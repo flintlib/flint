@@ -11,10 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
+#include "fq-impl.h"
 
-#include "fq.h"
+
 
 /* from qadic/ctx_init_conway.c */
 extern int flint_conway_polynomials [];

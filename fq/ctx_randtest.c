@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 void
 fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)

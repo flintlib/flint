@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq-impl.h"
+#ifndef FQ_IMPL_H
+#define FQ_IMPL_H
 
+#include <string.h>
+#include "fq.h"
 
-/* TODO: optimize */
-void
-fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx)
-{
-    fmpz_t exp;
-    fmpz_init_set_ui(exp, e);
-    fq_pow(rop, op, exp, ctx);
-    fmpz_clear(exp);
-}
+#endif

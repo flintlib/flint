@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 char *
 fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx)

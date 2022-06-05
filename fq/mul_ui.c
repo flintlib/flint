@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
+#include "fq-impl.h"
+
 
 void
 fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx)

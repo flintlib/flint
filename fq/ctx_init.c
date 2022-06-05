@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
+#include "fq-impl.h"
 
-#include "fq.h"
-#include "fq_poly.h"
+
 
 void
 fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
