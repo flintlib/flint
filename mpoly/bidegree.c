@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 /* deg_gen(0) and deg_gen(1) of lt(A) packed into one ulong */
 ulong _mpoly_bidegree(

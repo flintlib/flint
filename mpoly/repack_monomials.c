@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 /*
     exps2 = packed vectors to unpack

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
-#include "long_extras.h"
+#include "mpoly-impl.h"
+
 
 /*
     for f in F[y][x] of degree n - 1 in x

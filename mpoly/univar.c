@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
-#include "fmpz_mod_mpoly.h"
+#include "mpoly-impl.h"
+
 
 static void _fmpz_max(fmpz_t a, const fmpz_t b, const fmpz_t c)
 {

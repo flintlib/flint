@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 /* unfortunate function missing from fmpz_mat */
 void fmpz_mat_mul_vec(fmpz * v, const fmpz_mat_t M, fmpz * u)

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 /*
     Fill in the indices that partition A into univariate chunks.

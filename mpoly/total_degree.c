@@ -7,7 +7,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 int mpoly_total_degree_fits_si(const ulong * exps,
                         slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)

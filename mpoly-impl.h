@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,10 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly-impl.h"
+#ifndef MPOLY_IMPL_H
+#define MPOLY_IMPL_H
 
+#include <stdlib.h>
+#include <string.h>
+#include "long_extras.h"
+#include "mpoly.h"
 
-void mpoly_ctx_clear(mpoly_ctx_t mctx)
-{
-    return;
-}
+#endif

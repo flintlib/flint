@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
                      slong len, const slong * mults, slong nfields, slong bits)

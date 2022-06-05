@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 /* red-black tree with ui keys ***********************************************/
 

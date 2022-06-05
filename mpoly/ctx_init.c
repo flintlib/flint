@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
 {

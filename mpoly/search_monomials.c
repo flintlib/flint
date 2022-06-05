@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly-impl.h"
 
-#include "mpoly.h"
+
 
 /*
     a and b are arrays of packed monomials

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
        slong * next_loc, slong * heap_len, slong N, const ulong * cmpmask)

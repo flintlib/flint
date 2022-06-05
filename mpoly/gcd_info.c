@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 
 void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)

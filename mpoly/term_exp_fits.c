@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 int mpoly_term_exp_fits_ui(ulong * exps, flint_bitcnt_t bits,
                                                slong n, const mpoly_ctx_t mctx)

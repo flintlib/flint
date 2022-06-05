@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdlib.h>
-#undef ulong
-#include "long_extras.h"
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 typedef struct {
     slong x;

@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
                                       const ulong exp, slong len, ulong maskhi)

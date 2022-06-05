@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "mpoly-impl.h"
+
 
 int mpoly_monomials_overflow_test(ulong * exps, slong len, flint_bitcnt_t bits,
                                                         const mpoly_ctx_t mctx)

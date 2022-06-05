@@ -6,7 +6,8 @@
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-#include "mpoly.h"
+
+#include "mpoly-impl.h"
 
 
 void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
