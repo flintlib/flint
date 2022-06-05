@@ -11,15 +11,7 @@
 
 #define FQ_ZECH_POLY_FACTOR_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fq_zech.h"
-#include "fq_zech_poly_factor.h"
+#include "fq_zech_poly_factor-impl.h"
 
 void fq_zech_poly_factor_get_poly(fq_zech_poly_t z,
              const fq_zech_poly_factor_t fac, slong i, const fq_zech_ctx_t ctx)

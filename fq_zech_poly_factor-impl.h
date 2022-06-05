@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_poly_factor-impl.h"
+#ifndef FQ_ZECH_POLY_FACTOR_IMPL_H
+#define FQ_ZECH_POLY_FACTOR_IMPL_H
 
+#include <stdio.h>
+#include "fq_zech_poly_factor.h"
 
-#ifdef T
-#undef T
 #endif
-
-#define T fq_zech
-#define CAP_T FQ_ZECH
-#include "fq_poly_factor_templates/is_irreducible.c"
-#undef CAP_T
-#undef T
