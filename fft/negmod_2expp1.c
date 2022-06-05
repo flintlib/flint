@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
+#include "fft-impl.h"
+
 
 /* negation mod 2^(FLINT_BITS*limbs) + 1 assuming normalized input */
 void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs)

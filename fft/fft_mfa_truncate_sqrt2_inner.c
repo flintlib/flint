@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "ulong_extras.h"
-#include "fft.h"
+#include "fft-impl.h"
+
 
 typedef struct
 {

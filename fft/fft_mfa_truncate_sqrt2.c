@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "ulong_extras.h"
-#include "fft.h"
+#include "fft-impl.h"
+
       
 void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, 
     mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)

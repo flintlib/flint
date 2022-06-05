@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
+#include "fft-impl.h"
+
 
 void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
 {

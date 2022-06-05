@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
+#include "fft-impl.h"
+
       
 void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, 
             mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)

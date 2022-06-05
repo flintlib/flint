@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "stdlib.h"
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
+#include "fft-impl.h"
+
 
 void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, 
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)

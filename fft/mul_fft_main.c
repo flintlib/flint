@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
-#include "ulong_extras.h"
-#include "fft_tuning.h"
+#include "fft-impl.h"
+
 
 static int fft_tuning_table[5][2] = FFT_TAB;
 

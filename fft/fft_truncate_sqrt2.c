@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
+#include "fft-impl.h"
+
       
 void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, 
                     mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, 

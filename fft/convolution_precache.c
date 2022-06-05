@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fft.h"
+#include "fft-impl.h"
+
 
 void fft_precache(mp_limb_t ** jj, slong depth, slong limbs, slong trunc,
                              mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1)

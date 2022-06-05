@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FFT_INLINES_C
+#ifndef FFT_IMPL_H
+#define FFT_IMPL_H
 
-#include "fft-impl.h"
+#include "thread_support.h"
+#include "ulong_extras.h"
+#include "fft.h"
+#include "fft_tuning.h"
+
+#endif

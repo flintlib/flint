@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
-#include "flint.h"
-#include "fft.h"
-#include "thread_support.h"
+#include "fft-impl.h"
+
 
 typedef struct
 {
