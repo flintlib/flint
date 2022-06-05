@@ -11,9 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_mod_poly.h"
-#include "fmpz_vec.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 #define __set(B, lenB, A, lenA)      \
 do {                                 \

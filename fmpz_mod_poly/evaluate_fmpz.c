@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, 
                                   const fmpz_t a, const fmpz_t p)

@@ -12,12 +12,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "fmpz_mat.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 void
 _fmpz_mod_poly_reduce_matrix_mod_poly(fmpz_mat_t A, const fmpz_mat_t B,

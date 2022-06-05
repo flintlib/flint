@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
             const fmpz_mod_poly_t poly2, slong start, const fmpz_mod_ctx_t ctx)

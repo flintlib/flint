@@ -7,16 +7,14 @@
      (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_poly-impl.h"
+
 /******************************************************************************
 
     Authored 2016 by Daniel S. Roche; US Government work in the public domain. 
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz_mod_poly.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 
 slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
                                   const fmpz* seq, slong len, const fmpz_t p)

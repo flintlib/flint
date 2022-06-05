@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 /*
     compute f^0, f^1, ..., f^(n-1) mod g, where g has length glen and f is

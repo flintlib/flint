@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "fmpz_mod.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
 void _fmpz_mod_poly_split_rabin(

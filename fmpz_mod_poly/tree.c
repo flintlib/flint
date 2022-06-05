@@ -10,12 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len)
 {

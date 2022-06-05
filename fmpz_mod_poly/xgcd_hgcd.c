@@ -11,12 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "mpn_extras.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 /*
     We define a whole bunch of macros here which essentially provide 

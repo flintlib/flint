@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
+#include "fmpz_mod_poly-impl.h"
 
-#include <stdlib.h>
 
-#undef ulong
 
-#include <gmp.h>
 
-#define ulong mp_limb_t
 
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
+
 
 void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                               slong lenA, const fmpz* B, slong lenB,

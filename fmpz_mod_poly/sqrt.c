@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 static __inline__
 int _fmpz_mod_poly_sqrt_2(fmpz * s, const fmpz * p, slong len)

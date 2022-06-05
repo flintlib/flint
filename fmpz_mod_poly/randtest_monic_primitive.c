@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_mod_poly.h"
-#include "fq.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 void
 fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,

@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 void
 _fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, slong len, slong n)

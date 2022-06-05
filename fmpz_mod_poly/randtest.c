@@ -11,7 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly-impl.h"
+
 
 void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,
                                                       const fmpz_mod_ctx_t ctx)
