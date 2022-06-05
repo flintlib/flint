@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_embed.h"
+#include "fq_nmod_embed-impl.h"
+
 
 void fq_nmod_embed_mul_matrix(nmod_mat_t matrix,
                         const fq_nmod_t gen,

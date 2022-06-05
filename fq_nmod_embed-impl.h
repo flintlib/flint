@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,20 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_embed-impl.h"
+#ifndef FQ_NMOD_EMBED_IMPL_H
+#define FQ_NMOD_EMBED_IMPL_H
 
+#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_embed.h"
 
-#ifdef T
-#undef T
 #endif
-#ifdef B
-#undef B
-#endif
-
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-#define B nmod
-#include "fq_embed_templates/embed.c"
-#undef B
-#undef CAP_T
-#undef T
