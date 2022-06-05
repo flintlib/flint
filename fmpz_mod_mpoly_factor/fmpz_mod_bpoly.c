@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod_mpoly_factor-impl.h"
+
 
 
 int fmpz_mod_bpoly_is_canonical(const fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)

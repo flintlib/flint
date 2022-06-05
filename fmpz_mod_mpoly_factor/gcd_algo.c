@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mpoly_factor.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod_mpoly_factor-impl.h"
+
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)

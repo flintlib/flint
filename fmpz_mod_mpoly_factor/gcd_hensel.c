@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod_mpoly_factor-impl.h"
+
 
 int fmpz_mod_mpolyl_gcd_hensel_smprime(
     fmpz_mod_mpoly_t G, slong Gdeg, /* upperbound on deg_X(G) */

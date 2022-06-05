@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mpoly_factor.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod_mpoly_factor-impl.h"
+
 
 
 void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(

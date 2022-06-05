@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod_mpoly_factor-impl.h"
+
 
 int fmpz_mod_bpoly_hlift2(
     fmpz_mod_bpoly_t A, /* clobbered (shifted by alpha) */
