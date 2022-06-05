@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
-#include "fmpz_factor.h"
+#include "arith-impl.h"
+
 
 #define FLINT_NUM_TINY_DIVISORS FLINT_BITS
 

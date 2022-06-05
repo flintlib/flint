@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "arith.h"
+#include "arith-impl.h"
+
 
 /* Computes length-m vector containing |E_{2k}| */
 static void

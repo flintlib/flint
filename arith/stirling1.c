@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 static slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)

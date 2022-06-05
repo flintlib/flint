@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 #if FLINT_BITS == 64
 #define MAX_N_1LIMBS 25

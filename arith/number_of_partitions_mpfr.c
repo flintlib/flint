@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "mpfr.h"
-#include "arith.h"
+#include "arith-impl.h"
+
 
 #define DOUBLE_PREC 53
 #define PI 3.141592653589793238462643

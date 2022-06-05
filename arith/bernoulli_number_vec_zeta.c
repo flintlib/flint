@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
 {

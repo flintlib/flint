@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "arith.h"
+#include "arith-impl.h"
+
 
 double arith_euler_number_size(ulong n)
 {

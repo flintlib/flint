@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "arith.h"
+#include "arith-impl.h"
+
 
 void arith_landau_function_vec(fmpz * res, slong len)
 {

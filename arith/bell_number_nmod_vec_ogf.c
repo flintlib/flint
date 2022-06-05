@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 static void
 bsplit_nmod(mp_ptr R, mp_ptr Q, slong a, slong b, nmod_t mod)

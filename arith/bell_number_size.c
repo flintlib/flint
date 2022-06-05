@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "flint.h"
+#include "arith-impl.h"
+
 
 double
 arith_bell_number_size(ulong n)

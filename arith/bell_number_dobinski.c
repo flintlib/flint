@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "arith.h"
+#include "arith-impl.h"
 
-static void
+
+void
 _fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
 {
     if (e <= 1)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,19 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith-impl.h"
+#ifndef ARITH_IMPL_H
+#define ARITH_IMPL_H
 
+#include <math.h>
+#include "fmpz_factor.h"
+#include "arith.h"
 
-double arith_bernoulli_number_size(ulong n)
-{
-    double x;
+/* defined in bell_number_dobinski.c */
+void _fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e);
 
-    /* |B_n| < 2 */
-    if (n <= 14)
-        return 1.0;
+/* defined in bell_number_multi_mod.c */
+void divisor_table(unsigned int * tab, slong len);
 
-    x = 2 + (n + 1) * log(n + 1) * 1.44269504088897;  /* 1/log(2) */
-    x -= n * 4.0941911703612822; /* log2(2*pi*e) */
-
-    return x + 2;
-}
+#endif

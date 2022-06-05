@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_factor.h"
-#include "arith.h"
+#include "arith-impl.h"
+
 
 static void
 sum_of_two_squares(fmpz_t r, const fmpz_t n)

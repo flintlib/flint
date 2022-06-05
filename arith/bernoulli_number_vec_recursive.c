@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 static void
 __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)

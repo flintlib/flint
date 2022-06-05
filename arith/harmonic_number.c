@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
-#include "fmpq.h"
+#include "arith-impl.h"
+
 
 void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
 {

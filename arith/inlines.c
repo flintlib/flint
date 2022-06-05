@@ -11,10 +11,4 @@
 
 #define ARITH_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "arith.h"
-
+#include "arith-impl.h"

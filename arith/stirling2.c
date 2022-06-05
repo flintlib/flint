@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#undef ulong
-#include "arith.h"
+#include "arith-impl.h"
+
 
 /* S(n,k) <= (1/2) binomial(n,k) * k^(n-k) */
 static slong
@@ -222,27 +219,6 @@ arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
     _fmpz_vec_clear(t, len + 1);
     _fmpz_vec_clear(u, len);
     _fmpz_vec_clear(v, len);
-}
-
-static void
-divisor_table(unsigned int * tab, slong len)
-{
-    slong i, j;
-
-    for (i = 0; i < len; i++)
-    {
-        tab[2 * i] = 1;
-        tab[2 * i + 1] = i;
-    }
-
-    for (i = 2; i < len; i++)
-    {
-        for (j = 2; j <= i && i * j < len; j++)
-        {
-            tab[2 * i * j] = j;
-            tab[2 * i * j + 1] = i;
-        }
-    }
 }
 
 static void
@@ -468,41 +444,6 @@ stirling_2_egf(fmpz_t res, ulong n, ulong k)
     _fmpz_vec_clear(rnum, len);
     fmpz_clear(den);
     fmpz_clear(rden);
-}
-
-static void
-_fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
-{
-    if (e <= 1)
-    {
-        fmpz_set_ui(x, e == 0 ? 1 : b);
-    }
-    else if (e == 2)
-    {
-        mp_limb_t t[2];
-        umul_ppmm(t[1], t[0], b, b);
-        fmpz_set_uiui(x, t[1], t[0]);
-    }
-    else if (b <= 1)
-    {
-        fmpz_set_ui(x, b);
-    }
-    else
-    {
-        ulong bits = FLINT_BIT_COUNT(b);
-
-        if (e * bits <= FLINT_BITS)
-        {
-            fmpz_set_ui(x, n_pow(b, e));
-        }
-        else
-        {
-            __mpz_struct * z = _fmpz_promote(x);
-            flint_mpz_set_ui(z, b);
-            flint_mpz_pow_ui(z, z, e);
-            _fmpz_demote_val(x);
-        }
-    }
 }
 
 static void

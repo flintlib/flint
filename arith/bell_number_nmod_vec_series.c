@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod)
 {

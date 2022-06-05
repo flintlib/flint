@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
-#include "nmod_poly.h"
+#include "arith-impl.h"
+
 
 #define CRT_MAX_RESOLUTION 16
 

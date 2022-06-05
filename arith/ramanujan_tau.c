@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_factor.h"
-#include "arith.h"
+#include "arith-impl.h"
+
 
 void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 {

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "mpfr.h"
-#include "arith.h"
+#include "arith-impl.h"
+
 
 /* This nice round number precisely fits on 32 bits */
 #define NUMBER_OF_SMALL_PARTITIONS 128

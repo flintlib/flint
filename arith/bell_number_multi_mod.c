@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 static mp_limb_t
 arith_bell_number_nmod2(unsigned int * divtab, mp_ptr facs, mp_ptr pows, ulong n, nmod_t mod)
@@ -65,7 +66,7 @@ arith_bell_number_nmod2(unsigned int * divtab, mp_ptr facs, mp_ptr pows, ulong n
     return s;
 }
 
-static void
+void
 divisor_table(unsigned int * tab, slong len)
 {
     slong i, j;

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arith.h"
+#include "arith-impl.h"
+
 
 void
 arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)

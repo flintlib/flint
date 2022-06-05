@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "mpfr.h"
-#include "arith.h"
+#include "arith-impl.h"
+
 
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {
