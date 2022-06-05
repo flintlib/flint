@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
                             const fmpz *a, const slong *j, slong lena, 

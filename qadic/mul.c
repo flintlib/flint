@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 /*
     Forms the product of (op1,len1) and (op2,len2) modulo (a,j,lena) and pN.

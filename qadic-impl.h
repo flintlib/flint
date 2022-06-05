@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define QADIC_INLINES_C
+#ifndef QADIC_IMPL_H
+#define QADIC_IMPL_H
 
-#include "qadic-impl.h"
+#include <stdio.h>
+#include <string.h>
+#include "fmpz_mod_poly.h"
+#include "qadic.h"
+
+#endif

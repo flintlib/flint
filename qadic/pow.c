@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
                    const fmpz *a, const slong *j, slong lena, 

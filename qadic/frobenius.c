@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 /*
     Assumes that \code{len1} and \code{len2} are positive but at 

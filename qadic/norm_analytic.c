@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 /*
     Computes the norm of an element $x$ of $\mathbf{Z}_q$ via the identity 

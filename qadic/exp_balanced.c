@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 static void 
 _qadic_exp_bsplit_series(fmpz *P, fmpz_t Q, fmpz *T, 

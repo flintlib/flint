@@ -9,12 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-
-#include "nmod_mat.h"
-
-#include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "qadic-impl.h"
 
 /*
     FILE DOCUMENTATION.
@@ -113,7 +108,10 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
     fmpz *e, *f;
     nmod_mat_t A;
-    slong i, k, rk, *P;
+    slong i, k, *P;
+#if FLINT_WANT_ASSERT
+    slong rk;
+#endif
 
     e = _fmpz_vec_init(d);
     f = _fmpz_vec_init(2 * d - 1);
@@ -152,10 +150,13 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
         Consider the linear system A x = b, which we can then write as 
         LU x = Pb, hence L y = Pb and U x = y.
      */
-
+#if FLINT_WANT_ASSERT
     rk = nmod_mat_lu(P, A, 0);
+#else
+    nmod_mat_lu(P, A, 0);
+#endif
 
-    assert(rk == d-1);
+    FLINT_ASSERT(rk == d-1);
 
     /* Solve for a preimage of (op,len) ------------------------------------ */
 

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
                          const qadic_ctx_t ctx)

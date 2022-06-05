@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 /*
     Carries out the finite series evaluation for the logarithm 

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 /*
     Assumes that P, T are vectors of length 2 d - 1.

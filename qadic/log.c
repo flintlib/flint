@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
                 const fmpz *a, const slong *j, slong lena, 

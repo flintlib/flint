@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "qadic.h"
+#include "qadic-impl.h"
+
 
 int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v, 
     const qadic_ctx_t ctx)

@@ -10,12 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "fmpz_vec.h"
-#include "padic.h"
-#include "qadic.h"
+#include "qadic-impl.h"
 
 int flint_conway_polynomials [] = {
 #include "CPimport.h"
