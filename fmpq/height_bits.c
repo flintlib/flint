@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 flint_bitcnt_t
 fmpq_height_bits(const fmpq_t x)

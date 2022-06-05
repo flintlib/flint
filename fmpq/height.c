@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 void
 fmpq_height(fmpz_t height, const fmpq_t x)

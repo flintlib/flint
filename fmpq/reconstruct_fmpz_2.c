@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
-#include "mpn_extras.h"
+#include "fmpq-impl.h"
+
 
 #define FMPQ_RECONSTRUCT_ARRAY_LIMIT 12
 #define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 void fmpq_clear_readonly(fmpq_t f)
 {

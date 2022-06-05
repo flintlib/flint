@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
 {

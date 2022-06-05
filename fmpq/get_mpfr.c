@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpfr.h"
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 int
 fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)

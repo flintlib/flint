@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 #define ROT(u,v,t)   \
     do { fmpz _t = *u; *u = *v; *v = *t; *t = _t; } while (0);

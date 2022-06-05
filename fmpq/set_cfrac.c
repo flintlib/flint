@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 
 void _fmpq_set_cfrac_divconquer(_fmpz_mat22_t M, const fmpz * c, slong n)

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "gmp.h"
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den)
 {

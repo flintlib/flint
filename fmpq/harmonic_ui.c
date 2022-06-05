@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 #if FLINT_BITS == 64
 #define FMPQ_HARMONIC_UI_TAB_SIZE 47

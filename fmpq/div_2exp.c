@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 void fmpq_div_2exp(fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)
 {

@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 int
 _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c)

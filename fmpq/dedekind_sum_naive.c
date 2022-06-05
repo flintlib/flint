@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 void
 fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)

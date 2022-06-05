@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q)
 {

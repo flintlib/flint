@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 #define ONE_OVER_LOG2_PHI (1.44042009041255648 + 1e-13)
 

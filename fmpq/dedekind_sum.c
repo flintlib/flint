@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpq-impl.h"
+
 
 #define _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q) \
   do {                                             \
