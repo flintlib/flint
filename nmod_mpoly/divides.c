@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "thread_support.h"
+#include "nmod_mpoly-impl.h"
+
 
 static int _nmod_mpoly_divides_try_dense(
     slong * Adegs,

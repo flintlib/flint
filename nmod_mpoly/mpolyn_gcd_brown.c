@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "fq_nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 
 int nmod_mpolyn_gcd_brown_smprime_bivar(

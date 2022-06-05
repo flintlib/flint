@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 ulong nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A,
                                 fmpz * const * exp, const nmod_mpoly_ctx_t ctx)

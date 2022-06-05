@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
                                  const nmod_mpoly_t A, fmpz * maxAfields,

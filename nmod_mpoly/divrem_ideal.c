@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 void nmod_mpoly_divrem_ideal(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
                const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len,

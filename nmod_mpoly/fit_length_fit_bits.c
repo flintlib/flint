@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 
 void nmod_mpoly_fit_length_fit_bits(

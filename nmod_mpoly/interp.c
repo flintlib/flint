@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /*
     interp_reduce: map from Fp[x] to Fp[x]/poly(x)

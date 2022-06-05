@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 mp_limb_t _nmod_mpoly_eval_all_ui(
     const mp_limb_t * Acoeffs,

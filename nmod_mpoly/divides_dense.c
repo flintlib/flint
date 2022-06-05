@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /*
     Convert B to A if the degrees of A are <= expected_deg

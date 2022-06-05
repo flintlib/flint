@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars,
                                        const ordering_t ord, mp_limb_t modulus)

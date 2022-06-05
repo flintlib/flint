@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /*
    As for divrem_monagan_pearce1 except that an array of divisor polynomials is

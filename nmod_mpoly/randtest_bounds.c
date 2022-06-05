@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_t state,
                   slong length, ulong * exp_bounds, const nmod_mpoly_ctx_t ctx)

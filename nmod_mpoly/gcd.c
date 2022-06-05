@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "fq_nmod_mpoly.h"
-#include "nmod_mpoly_factor.h"
-#include "fq_zech_poly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)

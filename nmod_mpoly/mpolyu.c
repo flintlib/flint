@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "nmod_mpoly_factor.h"
+#include "nmod_mpoly-impl.h"
+
 
 void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
                                                     const nmod_mpoly_ctx_t ctx)

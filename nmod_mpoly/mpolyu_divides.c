@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /* A = D - B*C */
 slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,

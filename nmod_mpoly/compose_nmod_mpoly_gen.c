@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /* evaluate B(x_1,...,x_n) at x_i = y_c[i], y_j are vars of ctxAC */
 void nmod_mpoly_compose_nmod_mpoly_gen(nmod_mpoly_t A,

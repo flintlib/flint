@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
-#include "fq_zech_mpoly.h"
-#include "fq_zech_mpoly_factor.h"
+#include "nmod_mpoly-impl.h"
+
 
 /*
     in F[x_1, ..., x_n][X]:

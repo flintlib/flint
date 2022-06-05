@@ -9,15 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mpoly.h" /* for mpoly_divides_select_exps */
+#include "nmod_mpoly-impl.h"
+
 
 #define PROFILE_THIS 0
 
 #if PROFILE_THIS
 
-#include "profiler.h"
 
 typedef struct _vec_slong_struct
 {

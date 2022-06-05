@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
+#define _base_struct _mybase_struct
+#define _base_t _mybase_t
+#define _worker_arg_struct _myworker_arg_struct
 
 /* improve locality */
 #define BLOCK 128
@@ -882,3 +885,7 @@ int nmod_mpoly_mul_array_threaded(
     TMP_END;
     return success;
 }
+
+#undef _base_struct
+#undef _base_t
+#undef _worker_arg_struct

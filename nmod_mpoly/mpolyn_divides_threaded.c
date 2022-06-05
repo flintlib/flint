@@ -9,9 +9,28 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
+/* avoid clashes */
+#define _divides_heap_chunk_struct _mydivides_heap_chunk_struct
+#define divides_heap_chunk_struct mydivides_heap_chunk_struct
+#define divides_heap_chunk_t mydivides_heap_chunk_t
+
+#define divides_heap_base_struct mydivides_heap_base_struct
+#define divides_heap_base_t mydivides_heap_base_t
+
+#define _worker_arg_struct _myworker_arg_struct
+#define worker_arg_struct myworker_arg_struct
+#define worker_arg_t myworker_arg_t
+
+#define divides_heap_base_init mydivides_heap_base_init
+#define divides_heap_chunk_clear mydivides_heap_chunk_clear
+#define divides_heap_base_clear mydivides_heap_base_clear
+#define divides_heap_base_add_chunk mydivides_heap_base_add_chunk
+#define stripe_fit_length mystripe_fit_length
+#define worker_loop myworker_loop
+#define chunk_mulsub mychunk_mulsub
+#define trychunk mytrychunk
 
 typedef struct _nmod_mpolyn_stripe_struct
 {
@@ -246,7 +265,6 @@ static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
     A->length = newlength;
 }
 
-
 /*
     a chunk holds an exponent range on the dividend
 */
@@ -306,7 +324,6 @@ typedef struct _worker_arg_struct
 
 typedef worker_arg_struct worker_arg_t[1];
 
-
 static void divides_heap_base_init(divides_heap_base_t H)
 {
     H->head = NULL;
@@ -326,6 +343,7 @@ static void divides_heap_chunk_clear(divides_heap_chunk_t L, divides_heap_base_t
         nmod_mpolyn_clear(L->polyC, H->ctx);
     }
 }
+
 static int divides_heap_base_clear(nmod_mpolyn_t Q, divides_heap_base_t H)
 {
     divides_heap_chunk_struct * L = H->head;
@@ -1632,7 +1650,6 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
     return;
 }
 
-
 static void worker_loop(void * varg)
 {
     worker_arg_struct * W = (worker_arg_struct *) varg;
@@ -1886,4 +1903,22 @@ cleanup1:
     return divides;
 }
 
+#undef _divides_heap_chunk_struct
+#undef divides_heap_chunk_struct
+#undef divides_heap_chunk_t
 
+#undef divides_heap_base_struct
+#undef divides_heap_base_t
+
+#undef _worker_arg_struct
+#undef worker_arg_struct
+#undef worker_arg_t
+
+#undef divides_heap_base_init
+#undef divides_heap_chunk_clear
+#undef divides_heap_base_clear
+#undef divides_heap_base_add_chunk
+#undef stripe_fit
+#undef worker_loop
+#undef chunk_mulsub
+#undef trychunk

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,10 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly-impl.h"
+#ifndef NMOD_MPOLY_IMPL_H
+#define NMOD_MPOLY_IMPL_H
 
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "thread_support.h"
+#include "long_extras.h"
+#include "fmpz_mpoly.h"
+#include "nmod_mpoly_factor.h"
+#include "fq_nmod_mpoly_factor.h"
+#include "fq_zech_mpoly_factor.h"
 
-void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx)
-{
-    mpoly_ctx_clear(ctx->minfo);
-}
+#endif

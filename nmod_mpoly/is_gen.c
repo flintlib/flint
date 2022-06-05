@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 int nmod_mpoly_is_gen(const nmod_mpoly_t A,
                                          slong var, const nmod_mpoly_ctx_t ctx)

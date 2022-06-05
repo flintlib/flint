@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "nmod_mpoly_factor.h"
+#include "nmod_mpoly-impl.h"
+
 
 /*
     content wrt gen(0), ..., gen(num_vars-1)

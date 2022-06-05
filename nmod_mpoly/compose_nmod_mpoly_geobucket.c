@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /* evaluate B(xbar) at xbar = C */
 int nmod_mpoly_compose_nmod_mpoly_geobucket(nmod_mpoly_t A,

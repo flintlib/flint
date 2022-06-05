@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "n_poly.h"
+#include "nmod_mpoly-impl.h"
+
 
 /* exponents of B are not multiprecision */
 void _nmod_mpoly_evaluate_one_ui_sp(

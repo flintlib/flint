@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 
 int _ff_poly_pow_fmpz_is_not_feasible(slong length, const fmpz_t e)

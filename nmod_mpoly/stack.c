@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "nmod_mpoly.h"
+#include "nmod_mpoly-impl.h"
+
 
 void nmod_poly_stack_init(nmod_poly_stack_t S, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 {
