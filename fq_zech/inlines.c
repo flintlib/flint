@@ -11,16 +11,7 @@
 
 #define FQ_ZECH_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fq_zech.h"
+#include "fq_zech-impl.h"
 
 void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx)
 {

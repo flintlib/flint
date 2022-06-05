@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
+#include "fq_zech-impl.h"
 
-#include "fq_zech.h"
+
 
 void
 fq_zech_ctx_clear(fq_zech_ctx_t ctx)

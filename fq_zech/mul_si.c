@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech.h"
+#include "fq_zech-impl.h"
+
 
 void
 fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,

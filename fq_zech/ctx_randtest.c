@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech.h"
-#include "fq_nmod.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
-#include <math.h>
+#include "fq_zech-impl.h"
+
 
 void
 fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech.h"
+#include "fq_zech-impl.h"
+
 
 int fq_zech_get_fmpz(fmpz_t a, const fq_zech_t b, const fq_zech_ctx_t ctx)
 {
