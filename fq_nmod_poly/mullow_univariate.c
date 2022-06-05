@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_poly.h"
+#include "fq_nmod_poly-impl.h"
+
 
 void
 _fq_nmod_poly_mullow_univariate (fq_nmod_struct * rop,
