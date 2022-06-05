@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly_factor-impl.h"
+
 
 void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int deflation)
 {

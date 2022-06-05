@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly_factor-impl.h"
+
 
 
 /*

@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdlib.h>
-#undef ulong
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly_factor-impl.h"
+
 
 int _compare_poly_lengths(const void * a, const void * b)
 {

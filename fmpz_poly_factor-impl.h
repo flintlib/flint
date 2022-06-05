@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Tommy Hofmann 
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPZ_POLY_FACTOR_INLINES_C
+#ifndef FMPZ_POLY_FACTOR_IMPL_H
+#define FMPZ_POLY_FACTOR_IMPL_H
 
-#include "fmpz_poly_factor-impl.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "fmpz_poly_factor.h"
+#include "fmpz_lll.h"
 
-void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i)
-{
-    fmpz_poly_set(z, F->p + i);
-}
-
-void fmpz_poly_factor_get_fmpz(fmpz_t z, const fmpz_poly_factor_t F)
-{
-    fmpz_set(z, &(F->c));
-}
+#endif
