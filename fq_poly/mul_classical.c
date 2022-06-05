@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
+#include "fq_poly-impl.h"
+
 
 void
 _fq_poly_mul_classical(fq_struct * rop,

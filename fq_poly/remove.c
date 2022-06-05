@@ -13,7 +13,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
+#include "fq_poly-impl.h"
+
 
 
 
