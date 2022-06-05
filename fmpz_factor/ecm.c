@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_factor-impl.h"
+
 /* Outer wrapper for ECM 
    makes calls to stage I and stage II (one) */
 
-#include "mpn_extras.h"
-#include "fmpz_factor.h"
 
 static
 ulong n_ecm_primorial[] =

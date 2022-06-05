@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Tommy Hofmann 
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,12 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPZ_FACTOR_INLINES_C
+#ifndef FMPZ_FACTOR_IMPL_H
+#define FMPZ_FACTOR_IMPL_H
 
-#include "fmpz_factor-impl.h"
+#include <stdlib.h>
+#include <string.h>
+#include "mpn_extras.h"
+#include "fmpz_mod_poly.h"
+#include "qsieve.h"
 
-void fmpz_factor_get_fmpz(fmpz_t z, const fmpz_factor_t factor, slong i)
-{
-    fmpz_set(z, factor->p + i);
-}
-
+#endif

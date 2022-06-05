@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras.h"
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 void
 fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)

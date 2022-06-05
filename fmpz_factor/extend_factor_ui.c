@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 void
 _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)

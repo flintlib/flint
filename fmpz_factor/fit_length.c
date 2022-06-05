@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 void
 _fmpz_factor_fit_length(fmpz_factor_t factor, slong len)

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 void
 fmpz_factor_ecm_clear(ecm_t ecm_inf)

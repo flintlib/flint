@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras.h"
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 /* P (x : z) = 2 * P1 (x0 : z0)  */
 

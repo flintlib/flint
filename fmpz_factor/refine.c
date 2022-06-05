@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdlib.h>
-#undef ulong
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 
 #define fr_node_mref(x) (&(x)->m)

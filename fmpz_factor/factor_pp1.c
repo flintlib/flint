@@ -9,17 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <string.h>
-#undef ulong
-#define ulong mp_limb_t
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_factor.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "mpn_extras.h"
-#include "ulong_extras.h"
+#include "fmpz_factor-impl.h"
+
 
 #define DEBUG 0 /* turn on some trace information */
 

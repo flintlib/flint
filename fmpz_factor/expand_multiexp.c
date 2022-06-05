@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 void
 _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, const ulong * e, slong len)

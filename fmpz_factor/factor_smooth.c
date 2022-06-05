@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras.h"
-#include "fmpz_factor.h"
+#include "fmpz_factor-impl.h"
+
 
 static slong trial_cutoff[15] = {4, 4, 4, 6, 11, 18, 31, 54, 97, 172, 309, 564, 1028, 1900, 3512};
 

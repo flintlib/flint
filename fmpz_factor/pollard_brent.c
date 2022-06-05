@@ -9,14 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_factor-impl.h"
+
 /* This is an implementation of the pollard rho algorithm, with a more efficient
    cycle finding algorithm, as proposed by Richard Brent. Details can be found 
    in the paper https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode 
    is available on page 182 of the same paper */
 
-#include "mpn_extras.h"
-#include "ulong_extras.h"
-#include "fmpz_factor.h"
 
 int
 fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in, 

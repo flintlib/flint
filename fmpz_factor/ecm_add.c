@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_factor-impl.h"
+
 /* Outer wrapper for ECM 
    makes calls to stage I and stage II (two) */
 
-#include "mpn_extras.h"
-#include "fmpz_factor.h"
 
 /* P (x : z) = P1 (x1 : z1) + P2 (x2 : z2) where P0 (x0 : zo) is P - Q */
 
