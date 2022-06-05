@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_poly.h"
+#include "fmpz_poly_q-impl.h"
 
-#include "fmpz_poly_q.h"
+
 
 void fmpz_poly_q_add_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
 {

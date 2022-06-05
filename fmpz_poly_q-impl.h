@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_q-impl.h"
+#ifndef FMPZ_POLY_Q_IMPL_H
+#define FMPZ_POLY_Q_IMPL_H
 
+#include <string.h>
+#include "fmpq_poly.h"
+#include "fmpz_poly_q.h"
 
-void fmpz_poly_q_init(fmpz_poly_q_t rop)
-{
-    rop->num = flint_malloc(sizeof(fmpz_poly_struct));
-    rop->den = flint_malloc(sizeof(fmpz_poly_struct));
-    fmpz_poly_init(rop->num);
-    fmpz_poly_init(rop->den);
-    fmpz_poly_set_si(rop->den, 1);
-}
-
+#endif

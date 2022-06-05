@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "fmpz_poly_q-impl.h"
 
-#include "fmpz_poly_q.h"
+
 
 /**
  * \ingroup  StringConversions

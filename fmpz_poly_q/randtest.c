@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_q.h"
+#include "fmpz_poly_q-impl.h"
+
 
 void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
                           slong len1, flint_bitcnt_t bits1, 

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_q.h"
+#include "fmpz_poly_q-impl.h"
+
 
 void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, 
                                 const fmpz_poly_q_t op, const mpz_t x)
