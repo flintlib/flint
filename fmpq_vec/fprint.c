@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "fmpq_vec.h"
+#include "fmpq_vec-impl.h"
+
 
 int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
 {

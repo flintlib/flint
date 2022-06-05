@@ -1,7 +1,7 @@
 /*
-    Copyright (C) 2016 Vincent Delecroix
+    Copyright (C) 2022 Albin Ahlbäck
 
-    This file is part of FLINT
+    This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_vec-impl.h"
+#ifndef FMPQ_VEC_IMPL_H
+#define FMPQ_VEC_IMPL_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "fmpq_vec.h"
 
-typedef int(*__compar_fn_t) (const void *, const void *);
-void _fmpq_vec_sort(fmpq * vec, slong len)
-{
-    qsort(vec, len, sizeof(fmpq), (__compar_fn_t) fmpq_cmp);
-}
+#endif
