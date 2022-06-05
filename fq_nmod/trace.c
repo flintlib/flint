@@ -10,7 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod.h"
+#include "fq_nmod-impl.h"
+
 
 void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len, 
                     const fq_nmod_ctx_t ctx)

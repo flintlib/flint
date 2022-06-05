@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod.h"
+#include "fq_nmod-impl.h"
+
 
 void fq_nmod_get_nmod_mat(nmod_mat_t col,
                           const fq_nmod_t a,

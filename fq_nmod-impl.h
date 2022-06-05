@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod-impl.h"
+#ifndef FQ_NMOD_IMPL_H
+#define FQ_NMOD_IMPL_H
 
+#include <string.h>
+#include "fq_nmod.h"
 
-void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx)
-{
-   nmod_poly_scalar_mul_nmod(rop, op, nmod_set_ui(x, ctx->mod));
-}
+#endif

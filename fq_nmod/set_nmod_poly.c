@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod.h"
+#include "fq_nmod-impl.h"
+
 
 void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
                                                        const fq_nmod_ctx_t ctx)
