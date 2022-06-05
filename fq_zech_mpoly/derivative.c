@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
                  const fq_zech_struct * Bcoeff, const ulong * Bexp, slong Blen,

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 void _fq_zech_mpoly_fit_length(fq_zech_struct ** coeff,
                               ulong ** exps, slong * alloc, slong len, slong N,

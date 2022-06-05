@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 void fq_zech_mpoly_get_coeff_vars_ui(fq_zech_mpoly_t C, const fq_zech_mpoly_t A,
                          const slong * vars, const ulong * exps, slong length,

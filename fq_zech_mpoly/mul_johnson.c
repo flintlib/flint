@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 slong _fq_zech_mpoly_mul_johnson(
     fq_zech_struct ** coeff1, ulong ** exp1, slong * alloc,

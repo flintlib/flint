@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,14 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly-impl.h"
+#ifndef FQ_ZECH_MPOLY_IMPL_H
+#define FQ_ZECH_MPOLY_IMPL_H
 
+#include <stdio.h>
+#include "fq_zech_mpoly.h"
 
-void fq_zech_mpoly_ctx_change_modulus(fq_zech_mpoly_ctx_t ctx, slong deg)
-{
-    fmpz_t P;
-    fmpz_init_set_ui(P, fq_zech_ctx_mod(ctx->fqctx).n);
-    fq_zech_ctx_clear(ctx->fqctx);
-    fq_zech_ctx_init(ctx->fqctx, P, deg, "#");
-    fmpz_clear(P);
-}
+#endif

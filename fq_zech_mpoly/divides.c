@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 int fq_zech_mpoly_divides(fq_zech_mpoly_t Q,
                         const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,

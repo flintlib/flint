@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 /* TODO move this and make it faster */
 static int fq_zech_get_ui(ulong * res, const fq_zech_t op, const fq_zech_ctx_t ctx)

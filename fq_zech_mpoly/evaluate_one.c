@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
+#include "fq_zech_mpoly-impl.h"
+
 
 /* exponents of B are not multiprecision */
 static void _fq_zech_mpoly_evaluate_one_fq_zech_sp(
