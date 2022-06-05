@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "padic_mat.h"
+#include "padic_mat-impl.h"
+
 
 int padic_mat_equal(const padic_mat_t A, const padic_mat_t B)
 {

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "padic_mat.h"
+#include "padic_mat-impl.h"
+
 
 void _padic_mat_scalar_mul_fmpz(padic_mat_t B, 
                                 const padic_mat_t A, const fmpz_t c, 

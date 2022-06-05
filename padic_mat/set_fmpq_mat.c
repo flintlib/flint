@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
+#include "padic_mat-impl.h"
 
-#include "padic_mat.h"
+
 
 void padic_mat_set_fmpq_mat(padic_mat_t B, 
                             const fmpq_mat_t A, const padic_ctx_t ctx)

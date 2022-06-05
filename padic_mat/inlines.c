@@ -11,10 +11,4 @@
 
 #define PADIC_MAT_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "padic_mat.h"
-
+#include "padic_mat-impl.h"

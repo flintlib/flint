@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "padic_poly.h"
-#include "padic_mat.h"
+#include "padic_mat-impl.h"
+
 
 static void 
 _padic_mat_canonicalise_fmpz(fmpz *vec, slong len, slong *val, const fmpz_t p)

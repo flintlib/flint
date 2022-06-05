@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "padic_mat.h"
+#include "padic_mat-impl.h"
+
 
 int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 {

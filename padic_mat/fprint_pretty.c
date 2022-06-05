@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "padic_mat.h"
+#include "padic_mat-impl.h"
+
 
 int padic_mat_fprint_pretty(FILE * file, 
                             const padic_mat_t A, const padic_ctx_t ctx)
