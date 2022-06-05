@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
+#include "nmod_poly_mat-impl.h"
+
 
 slong
 nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)

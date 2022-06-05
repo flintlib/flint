@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
+#include "nmod_poly_mat-impl.h"
+
 
 static __inline__ void
 nmod_poly_sqr(nmod_poly_t y, const nmod_poly_t x)
@@ -62,3 +60,5 @@ nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 
     nmod_poly_mat_mul_classical(B, A, A);
 }
+
+#undef E

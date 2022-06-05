@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
-#include "perm.h"
+#include "nmod_poly_mat-impl.h"
+
 
 #define E nmod_poly_mat_entry
 
@@ -88,3 +86,5 @@ nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
         return result;
     }
 }
+
+#undef E

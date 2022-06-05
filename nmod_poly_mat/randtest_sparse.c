@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
-#include "ulong_extras.h"
+#include "nmod_poly_mat-impl.h"
+
 
 void
 nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state, slong len,

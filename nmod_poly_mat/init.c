@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
+#include "nmod_poly_mat-impl.h"
+
 
 void
 nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, mp_limb_t n)

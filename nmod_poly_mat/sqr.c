@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
+#include "nmod_poly_mat-impl.h"
+
 
 #define KS_MIN_DIM 10
 #define INTERPOLATE_MIN_DIM 80
@@ -45,3 +43,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
             nmod_poly_mat_sqr_KS(C, A);
     }
 }
+
+#undef KS_MIN_DIM
+#undef INTERPOLATE_MIN_DIM
+#undef KS_MAX_LENGTH

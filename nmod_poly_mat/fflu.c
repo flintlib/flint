@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "nmod_poly_mat.h"
+#include "nmod_poly_mat-impl.h"
+
 
 #define E(j,k) nmod_poly_mat_entry(B,j,k)
 
@@ -96,3 +95,5 @@ nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
     nmod_poly_clear(t);
     return rank;
 }
+
+#undef E

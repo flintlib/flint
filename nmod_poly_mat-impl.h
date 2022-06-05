@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_mat-impl.h"
+#ifndef NMOD_POLY_MAT_IMPL_H
+#define NMOD_POLY_MAT_IMPL_H
 
+#include "perm.h"
+#include "fmpz_mat.h"
+#include "nmod_poly_mat.h"
 
-void
-nmod_poly_mat_neg(nmod_poly_mat_t B, const nmod_poly_mat_t A)
-{
-    slong i, j;
-
-    for (i = 0; i < A->r; i++)
-        for (j = 0; j < A->c; j++)
-            nmod_poly_neg(nmod_poly_mat_entry(B, i, j),
-                          nmod_poly_mat_entry(A, i, j));
-}
+#endif

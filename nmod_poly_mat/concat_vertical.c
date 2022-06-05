@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_mat.h"
+#include "nmod_poly_mat-impl.h"
+
 
 void
 nmod_poly_mat_concat_vertical(nmod_poly_mat_t res, const nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
