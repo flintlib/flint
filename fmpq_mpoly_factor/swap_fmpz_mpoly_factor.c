@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
-#include "fmpq_mpoly_factor.h"
+#include "fmpq_mpoly_factor-impl.h"
+
 
 /* f = g*c, clobber g */
 void _fmpq_mpoly_factor_swap_fmpz_mpoly_factor(

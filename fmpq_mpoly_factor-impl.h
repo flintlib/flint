@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPQ_MPOLY_FACTOR_INLINES_C
+#ifndef FMPQ_MPOLY_FACTOR_IMPL_H
+#define FMPQ_MPOLY_FACTOR_IMPL_H
 
-#include "fmpq_mpoly_factor-impl.h"
+#include <stdlib.h>
+#include "fmpq_mpoly_factor.h"
+
+#endif

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly_factor.h"
+#include "fmpq_mpoly_factor-impl.h"
+
 
 
 int fmpq_mpoly_factor_make_integral(fmpq_mpoly_factor_t f,

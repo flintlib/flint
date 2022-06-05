@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly_factor.h"
+#include "fmpq_mpoly_factor-impl.h"
+
 
 void fmpq_mpoly_factor_fit_length(fmpq_mpoly_factor_t f, slong len,
                                                     const fmpq_mpoly_ctx_t ctx)
