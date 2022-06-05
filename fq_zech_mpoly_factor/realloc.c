@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly_factor.h"
+#include "fq_zech_mpoly_factor-impl.h"
+
 
 void fq_zech_mpoly_factor_realloc(fq_zech_mpoly_factor_t f, slong alloc,
                                                  const fq_zech_mpoly_ctx_t ctx)

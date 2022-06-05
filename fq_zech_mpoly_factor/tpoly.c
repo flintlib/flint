@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly_factor.h"
+#include "fq_zech_mpoly_factor-impl.h"
+
 
 
 void fq_zech_tpoly_fit_length(fq_zech_tpoly_t A, slong len, const fq_zech_ctx_t ctx)

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_poly_factor.h"
-#include "fq_zech_mpoly_factor.h"
+#include "fq_zech_mpoly_factor-impl.h"
+
 
 static void fq_zech_mpoly_delete_duplicate_terms(
     fq_zech_mpoly_t A,
