@@ -13,6 +13,10 @@
 #ifdef T
 
 #include "templates.h"
+#include "fq_poly_templates-impl.h"
+
+/* In case it was defined elsewhere */
+#undef __mul
 
 /*
     Include routines for vectors over \code{fmpz_poly_struct}, 
@@ -20,7 +24,7 @@
     $X$-direction.
  */
 
-static fmpz_poly_struct *
+fmpz_poly_struct *
 __vec_init(slong len)
 {
     slong i;
@@ -32,7 +36,7 @@ __vec_init(slong len)
     return v;
 }
 
-static fmpz_poly_struct *
+fmpz_poly_struct *
 __vec_init2(slong len, slong n)
 {
     slong i;
@@ -44,7 +48,7 @@ __vec_init2(slong len, slong n)
     return v;
 }
 
-static void
+void
 __vec_clear(fmpz_poly_struct * v, slong len)
 {
     slong i;
@@ -54,7 +58,7 @@ __vec_clear(fmpz_poly_struct * v, slong len)
     flint_free(v);
 }
 
-static void
+void
 __scalar_addmul(fmpz_poly_struct * rop,
                 const fmpz_poly_struct * op, slong len, const fmpz_poly_t x)
 {
@@ -83,7 +87,7 @@ __scalar_addmul(fmpz_poly_struct * rop,
     }
 }
 
-static void
+void
 __scalar_mul(fmpz_poly_struct * rop,
              const fmpz_poly_struct * op, slong len, const fmpz_poly_t x)
 {
@@ -223,6 +227,5 @@ TEMPLATE(T, poly_mul_reorder) (TEMPLATE(T, poly_t) rop,
         _TEMPLATE(T, poly_set_length) (rop, len, ctx);
     }
 }
-
 
 #endif

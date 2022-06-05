@@ -532,6 +532,13 @@ slong _TEMPLATE(T, poly_hgcd) (TEMPLATE(T, struct)**M, slong * lenM,
     return sgnM;
 }
 
-
+#undef __attach_shift
+#undef __attach_truncate
+#undef __set
+#undef __swap
+#undef __add
+#undef __sub
+#undef __mul
+#undef __divrem
 
 #endif

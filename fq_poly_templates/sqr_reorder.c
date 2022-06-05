@@ -13,98 +13,13 @@
 #ifdef T
 
 #include "templates.h"
+#include "fq_poly_templates-impl.h"
 
 /*
     Include routines for vectors over \code{fmpz_poly_struct}, 
     for use in the classical multiplication routine in the 
     $X$-direction.
  */
-
-static fmpz_poly_struct *
-__vec_init(slong len)
-{
-    slong i;
-    fmpz_poly_struct *v;
-
-    v = flint_malloc(len * sizeof(fmpz_poly_struct));
-    for (i = 0; i < len; i++)
-        fmpz_poly_init(v + i);
-    return v;
-}
-
-static fmpz_poly_struct *
-__vec_init2(slong len, slong n)
-{
-    slong i;
-    fmpz_poly_struct *v;
-
-    v = flint_malloc(len * sizeof(fmpz_poly_struct));
-    for (i = 0; i < len; i++)
-        fmpz_poly_init2(v + i, n);
-    return v;
-}
-
-static void
-__vec_clear(fmpz_poly_struct * v, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        fmpz_poly_clear(v + i);
-    flint_free(v);
-}
-
-static void
-__scalar_addmul(fmpz_poly_struct * rop,
-                const fmpz_poly_struct * op, slong len, const fmpz_poly_t x)
-{
-    slong i;
-
-    if (fmpz_poly_is_zero(x))
-    {
-        return;
-    }
-    else if (fmpz_poly_is_one(x))
-    {
-        for (i = 0; i < len; i++)
-            fmpz_poly_add(rop + i, rop + i, op + i);
-    }
-    else
-    {
-        fmpz_poly_t t;
-
-        fmpz_poly_init(t);
-        for (i = 0; i < len; i++)
-        {
-            fmpz_poly_mul(t, op + i, x);
-            fmpz_poly_add(rop + i, rop + i, t);
-        }
-        fmpz_poly_clear(t);
-    }
-}
-
-static void
-__scalar_mul(fmpz_poly_struct * rop,
-             const fmpz_poly_struct * op, slong len, const fmpz_poly_t x)
-{
-    slong i;
-
-    if (fmpz_poly_is_zero(x))
-    {
-        for (i = 0; i < len; i++)
-            fmpz_poly_zero(rop + i);
-    }
-    else if (fmpz_poly_is_one(x))
-    {
-        for (i = 0; i < len; i++)
-            fmpz_poly_set(rop + i, op + i);
-    }
-    else
-    {
-        for (i = 0; i < len; i++)
-            fmpz_poly_mul(rop + i, op + i, x);
-    }
-}
 
 static void
 __sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, slong len)
