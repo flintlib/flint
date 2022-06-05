@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
+#include "n_poly-impl.h"
+
 
 /* hold positive and negative powers of b */
 void n_fq_pow_cache_start_n_fq(

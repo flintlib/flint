@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
+#include "n_poly-impl.h"
+
 
 int n_poly_is_canonical(const n_poly_t A)
 {

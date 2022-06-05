@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <stdio.h>
-#undef ulong
-#include "mpoly.h"
-#include "n_poly.h"
+#include "n_poly-impl.h"
+
 
 void n_polyu_clear(n_polyu_t A)
 {

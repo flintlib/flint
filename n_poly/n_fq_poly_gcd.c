@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
+#include "n_poly-impl.h"
+
 
 
 slong _n_fq_poly_gcd_euclidean_inplace_(    

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
-#include "fq_nmod_mpoly_factor.h"
+#include "n_poly-impl.h"
+
 
 
 /* g is in Fq[gen(1)] */

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
+#include "n_poly-impl.h"
+
 
 
 void n_bpoly_stack_init(n_bpoly_stack_t S)
