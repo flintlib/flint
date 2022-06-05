@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "nmod_mpoly_factor-impl.h"
+
 
 void nmod_mpoly_factor_fit_length(nmod_mpoly_factor_t fac, slong len,
                                                     const nmod_mpoly_ctx_t ctx)

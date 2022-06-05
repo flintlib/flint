@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define NMOD_MPOLY_FACTOR_INLINES_C
+#ifndef NMOD_MPOLY_FACTOR_IMPL_H
+#define NMOD_MPOLY_FACTOR_IMPL_H
 
-#include "nmod_mpoly_factor-impl.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "long_extras.h"
+#include "fmpz_poly_factor.h"
+#include "fq_nmod_poly_factor.h"
+#include "nmod_mpoly_factor.h"
+#include "fq_nmod_mpoly_factor.h"
+#include "fq_zech_mpoly_factor.h"
+
+#endif

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_vec.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "nmod_mpoly_factor-impl.h"
+
 
 /* set up mock to point to the coefficients of A, which are not owned by mock */
 static void nmod_mpoly_mock_eval_coeff(

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
-#include "nmod_mpoly_factor.h"
+#include "nmod_mpoly_factor-impl.h"
+
 
 
 int nmod_mpoly_factor_lcc_wang(

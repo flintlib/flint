@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
-#include "fq_zech_mpoly_factor.h"
+#include "nmod_mpoly_factor-impl.h"
+
+/* Avoid clashes */
+#define _frob_combine _myfrob_combine
+#define _map_fac _mymap_fac
 
 static void _frob_combine(
     nmod_mpolyv_t Af,
@@ -350,3 +353,5 @@ cleanup:
     return success;
 }
 
+#undef _frob_combine
+#undef _map_fac

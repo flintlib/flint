@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "nmod_mpoly_factor-impl.h"
+
 
 
 void nmod_mpoly_get_bpoly(

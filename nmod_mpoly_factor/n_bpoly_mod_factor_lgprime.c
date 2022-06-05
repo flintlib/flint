@@ -9,9 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
-#include "fq_nmod_poly_factor.h"
+#include "nmod_mpoly_factor-impl.h"
+
+/* Avoid clashes */
+#define _hensel_lift_fac _myhensel_lift_fac
+#define _hensel_lift_inv _myhensel_lift_inv
+#define _hensel_lift_tree _myhensel_lift_tree
+#define _lattice _mylattice
+#define _zassenhaus _myzassenhaus
 
 static void n_bpoly_eval_fq_nmod_poly(
     fq_nmod_poly_t A,
@@ -931,3 +936,9 @@ cleanup:
 
     return;
 }
+
+#undef _hensel_lift_fac
+#undef _hensel_lift_inv
+#undef _hensel_lift_tree
+#undef _lattice
+#undef _zassenhaus
