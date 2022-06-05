@@ -11,10 +11,4 @@
 
 #define FQ_ZECH_MAT_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "fq_zech_mat.h"
-
+#include "fq_zech_mat-impl.h"

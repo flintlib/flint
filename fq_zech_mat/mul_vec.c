@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mat.h"
-#include "fq_zech_vec.h"
+#include "fq_zech_mat-impl.h"
+
 
 #ifdef T
 #undef T
