@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Elena Sergeicheva
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_mat-impl.h"
+#ifndef FQ_MAT_IMPL_H
+#define FQ_MAT_IMPL_H
 
+#include <stdio.h>
+#include "fq_mat.h"
+#include "fq_poly.h"
 
-#ifdef T
-#undef T
 #endif
-
-#define T fq
-#define CAP_T FQ
-#include "fq_mat_templates/concat_vertical.c"
-#undef CAP_T
-#undef T
