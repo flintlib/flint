@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
+#include "fq_nmod_mpoly-impl.h"
+
 
 static int _fq_nmod_mpoly_div_monagan_pearce(
     fq_nmod_mpoly_t Q,

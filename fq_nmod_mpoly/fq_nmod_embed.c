@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
-#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_mpoly-impl.h"
+
 
 /*
     F_q is the "small" field presented as F_p[theta]/f(theta)

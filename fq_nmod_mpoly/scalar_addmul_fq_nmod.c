@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
+#include "fq_nmod_mpoly-impl.h"
+
 
 static slong _fq_nmod_mpoly_scalar_addmul_n_fq(
     mp_limb_t * Acoeffs, ulong * Aexps,

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,12 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly-impl.h"
+#ifndef FQ_NMOD_MPOLY_IMPL_H
+#define FQ_NMOD_MPOLY_IMPL_H
 
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_mpoly_factor.h"
 
-void fq_nmod_mpoly_mul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
-                        const fq_nmod_mpoly_t C, const fq_nmod_mpoly_ctx_t ctx)
-{
-    /* nothing fancy for now */
-    fq_nmod_mpoly_mul_johnson(A, B, C, ctx);
-}
+#endif
