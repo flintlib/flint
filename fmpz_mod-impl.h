@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2022 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod-impl.h"
+#ifndef FMPZ_MOD_IMPL_H
+#define FMPZ_MOD_IMPL_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "fmpz_factor.h"
+#include "fmpz_mod.h"
 
-void fmpz_mod_neg(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
-{
-    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
-    fmpz_neg(a, b);
-    if (fmpz_sgn(a) < 0)
-    {
-        fmpz_add(a, a, ctx->n);
-    }
-    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
-}
+#endif

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz_mod-impl.h"
+
 
 /*
     An entry of {a, b, c, d, e, f, g, h} gives a prime

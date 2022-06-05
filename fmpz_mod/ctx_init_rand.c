@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz_mod-impl.h"
+
 
 void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,
                                    flint_rand_t state, flint_bitcnt_t max_bits)

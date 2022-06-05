@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz_mod-impl.h"
+
 
 void fmpz_mod_mul_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                       const fmpz_mod_ctx_t ctx)

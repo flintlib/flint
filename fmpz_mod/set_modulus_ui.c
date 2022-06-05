@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
+#include "fmpz_mod-impl.h"
+
 
 void fmpz_mod_ctx_set_modulus_ui(fmpz_mod_ctx_t ctx, ulong n)
 {

@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
-#include <math.h>
-#include <stdlib.h>
-#undef ulong
-#include "fmpz_factor.h"
-#include "fmpz_mod.h"
+#include "fmpz_mod-impl.h"
+
 
 /*
     Assumption on fmpz_mod_discrete_log_pohlig_hellman_t:
