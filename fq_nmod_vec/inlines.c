@@ -11,10 +11,4 @@
 
 #define FQ_NMOD_VEC_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "fq_nmod_vec.h"
-
+#include "fq_nmod_vec-impl.h"
