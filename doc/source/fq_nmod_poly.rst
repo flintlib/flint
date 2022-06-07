@@ -1525,6 +1525,9 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fq_nmod_poly_fprint_pretty(FILE * file, const fq_nmod_poly_t poly, const char *x, const fq_nmod_ctx_t ctx)
 
     Prints the pretty representation of ``poly`` to the stream
@@ -1533,6 +1536,8 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fq_nmod_poly_print_pretty(const fq_nmod_struct *poly, slong len, const char *x, const fq_nmod_ctx_t ctx)
 
@@ -1542,6 +1547,8 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fq_nmod_poly_print_pretty(const fq_nmod_poly_t poly, const char *x, const fq_nmod_ctx_t ctx)
 
@@ -1551,6 +1558,9 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fq_nmod_poly_fprint(FILE *file, const fq_nmod_struct *poly, slong len, const fq_nmod_ctx_t ctx)
 
     Prints the pretty representation of ``(poly, len)`` to the stream
@@ -1558,6 +1568,9 @@ Output
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fq_nmod_poly_fprint(FILE * file, const fq_nmod_poly_t poly, const fq_nmod_ctx_t ctx)
 
@@ -1567,6 +1580,8 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fq_nmod_poly_print(const fq_nmod_struct *poly, slong len, const fq_nmod_ctx_t ctx)
 
@@ -1575,6 +1590,8 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fq_nmod_poly_print(const fq_nmod_poly_t poly, const fq_nmod_ctx_t ctx)
 
@@ -1582,6 +1599,9 @@ Output
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: char * _fq_nmod_poly_get_str(const fq_nmod_struct * poly, slong len, const fq_nmod_ctx_t ctx)
 

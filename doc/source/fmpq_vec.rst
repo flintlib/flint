@@ -84,9 +84,15 @@ Input and output
     In case of success, returns a positive value. In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpq_vec_print(const fmpq * vec, slong len)
 
     Prints the vector of given length to ``stdout``.
 
     For further details, see :func:`_fmpq_vec_fprint()`.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 

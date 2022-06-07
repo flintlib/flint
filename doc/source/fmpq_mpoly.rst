@@ -99,9 +99,15 @@ Input/Output
 
     Print a string representing *A* to *file*.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx)
 
     Print a string representing *A* to ``stdout``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str, const char ** x, const fmpq_mpoly_ctx_t ctx)
 

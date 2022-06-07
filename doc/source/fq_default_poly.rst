@@ -502,6 +502,9 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 
 .. function:: int fq_default_poly_print_pretty(const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx)
 
@@ -511,6 +514,9 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fq_default_poly_fprint(FILE * file, const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 
     Prints the pretty representation of ``poly`` to the stream
@@ -519,6 +525,9 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 
 .. function:: int fq_default_poly_print(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 
@@ -526,6 +535,9 @@ Output
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: char * fq_default_poly_get_str(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 

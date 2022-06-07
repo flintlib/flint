@@ -140,6 +140,9 @@ Printing
     Pretty-prints ``mat`` to ``stdout``. A header is printed
     followed by the rows enclosed in brackets.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fq_default_mat_fprint_pretty(FILE * file, const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 
     Pretty-prints ``mat`` to ``file``. A header is printed
@@ -148,10 +151,16 @@ Printing
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_default_mat_print(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 
     Prints ``mat`` to ``stdout``. A header is printed followed
     by the rows enclosed in brackets.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fq_default_mat_fprint(FILE * file, const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 
@@ -160,6 +169,9 @@ Printing
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Window

@@ -600,6 +600,9 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx)
               int padic_print(const padic_t op, const padic_ctx_t ctx)
 
@@ -608,8 +611,14 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void padic_debug(const padic_t op)
 
     Prints debug information about ``op`` to the stream ``stdout``, 
     in the format ``"(u v N)"``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 

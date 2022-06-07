@@ -60,6 +60,9 @@ Orderings
     Print a string (either "lex", "deglex" or "degrevlex") to standard
     output, corresponding to the given ordering.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 
 Monomial arithmetic
 --------------------------------------------------------------------------------

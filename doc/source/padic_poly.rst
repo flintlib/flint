@@ -497,6 +497,9 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, const padic_ctx_t ctx)
               int padic_poly_fprint(FILE *file, const padic_poly_t poly, const padic_ctx_t ctx)
 
@@ -520,6 +523,9 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _padic_poly_print(const fmpz *poly, slong val, slong len, const padic_ctx_t ctx)
               int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
 
@@ -528,10 +534,16 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _padic_poly_fprint_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
               int padic_poly_fprint_pretty(FILE *file, const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
               int _padic_poly_print_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
               int padic_poly_print_pretty(const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Testing

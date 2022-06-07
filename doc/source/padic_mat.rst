@@ -196,6 +196,9 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
     Prints a *pretty* representation of the matrix `A` 
@@ -203,8 +206,14 @@ Input and output
 
     In the current implementation, always returns `1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int padic_mat_print(const padic_mat_t A, const padic_ctx_t ctx)
               int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Random matrix generation

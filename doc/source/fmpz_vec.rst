@@ -106,11 +106,17 @@ Input and output
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpz_vec_read(fmpz ** vec, slong * len)
 
     Reads a vector from ``stdin`` and stores it at ``*vec``.
 
     For further details, see ``_fmpz_vec_fread()``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len)
 
@@ -121,11 +127,17 @@ Input and output
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpz_vec_print(const fmpz * vec, slong len)
 
     Prints the vector of given length to ``stdout``.
 
     For further details, see ``_fmpz_vec_fprint()``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Conversions

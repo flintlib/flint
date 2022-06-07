@@ -148,6 +148,9 @@ Input and output
     bracket followed by a space separated list of coefficients followed
     by a closing square bracket.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 
 Comparison
 --------------------------------------------------------------------------------

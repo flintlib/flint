@@ -88,6 +88,9 @@ Input/Output
 
     Print a string representing *A* to *file*.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_mod_mpoly_print_pretty(const fmpz_mod_mpoly_t A, const char ** x, const fmpz_mod_mpoly_ctx_t ctx)
 
     Print a string representing *A* to ``stdout``.

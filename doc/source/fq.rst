@@ -99,9 +99,15 @@ Context Management
     Prints the context information to ``file``. Returns 1 for a
     success and a negative number for an error.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_ctx_print(const fq_ctx_t ctx)
 
     Prints the context information to ``stdout``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fq_ctx_randtest(fq_ctx_t ctx)
 
@@ -283,6 +289,9 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``stdout``.
@@ -291,6 +300,9 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
@@ -298,12 +310,18 @@ Output
     For further details on the representation used, see
     :func:`fmpz_mod_poly_fprint`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_print(const fq_t op, const fq_ctx_t ctx)
 
     Prints a representation of ``op`` to ``stdout``.
 
     For further details on the representation used, see
     :func:`fmpz_mod_poly_print`.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: char * fq_get_str(const fq_t op, const fq_ctx_t ctx)
 

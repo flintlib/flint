@@ -2970,12 +2970,18 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_poly_print(const fmpz_poly_t poly)
 
     Prints the polynomial to ``stdout``.
 
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fmpz_poly_print_pretty(const fmpz * poly, slong len, const char * x)
 
@@ -2985,6 +2991,9 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
 
     Prints the pretty representation of ``poly`` to ``stdout``,
@@ -2993,6 +3002,9 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len)
 
     Prints the polynomial ``(poly, len)`` to the stream ``file``.
@@ -3000,12 +3012,18 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
 
     Prints the polynomial to the stream ``file``.
 
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fmpz_poly_fprint_pretty(FILE * file, const fmpz * poly, slong len, char * x)
 
@@ -3015,6 +3033,9 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
 
     Prints the pretty representation of ``poly`` to the stream ``file``, 
@@ -3023,12 +3044,18 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_poly_read(fmpz_poly_t poly)
 
     Reads a polynomial from ``stdin``, storing the result in ``poly``.
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
 
@@ -3037,6 +3064,9 @@ Some examples of the ``_pretty`` representation are::
     For further details, see the documentation for the function 
     :func:`fmpz_poly_fread_pretty`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
     Reads a polynomial from the stream ``file``, storing the result 
@@ -3044,6 +3074,9 @@ Some examples of the ``_pretty`` representation are::
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
@@ -3055,6 +3088,9 @@ Some examples of the ``_pretty`` representation are::
     the file, in case of success.  Returns a non-positive value in case of 
     failure, which could either be a read error or the indicator of a 
     malformed input.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Modular reduction and reconstruction

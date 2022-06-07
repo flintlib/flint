@@ -1712,12 +1712,18 @@ Input and output
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpq_poly_print(const fmpq_poly_t poly)
 
     Prints the polynomial to ``stdout``.
 
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x)
 
@@ -1729,6 +1735,9 @@ Input and output
 
     In the current implementation always returns~`1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
 
     Prints the polynomial ``(poly, den, len)`` to the stream ``file``.
@@ -1736,12 +1745,18 @@ Input and output
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly)
 
     Prints the polynomial to the stream ``file``.
 
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz *poly, const fmpz_t den, slong len, const char * x)
 
@@ -1753,6 +1768,9 @@ Input and output
 
     In the current implementation, always returns~`1`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpq_poly_read(fmpq_poly_t poly)
 
     Reads a polynomial from ``stdin``, storing the result 
@@ -1761,6 +1779,9 @@ Input and output
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
 
     Reads a polynomial from the stream ``file``, storing the result 
@@ -1768,3 +1789,6 @@ Input and output
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.

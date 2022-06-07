@@ -594,6 +594,9 @@ Output
     part of the function's signature to allow for a later implementation to 
     return the number of characters printed or a non-positive error code.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``stdout``.
@@ -601,3 +604,6 @@ Output
     In the current implementation, always returns `1`.  The return code is 
     part of the function's signature to allow for a later implementation to 
     return the number of characters printed or a non-positive error code.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.

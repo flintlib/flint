@@ -234,6 +234,9 @@ Input and output
     In case of success, returns a positive value;  otherwise, returns 
     a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 
     Prints the given matrix to the stream ``file``.  The format is an 
@@ -245,15 +248,24 @@ Input and output
     In case of success, returns a positive value;  otherwise, returns 
     a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_mat_print(const fmpz_mat_t mat)
 
     Prints the given matrix to the stream ``stdout``.  For further 
     details, see :func:`fmpz_mat_fprint`.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
     Prints the given matrix to ``stdout``.  For further details, 
     see :func:`fmpz_mat_fprint_pretty`.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
 
@@ -265,6 +277,9 @@ Input and output
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_mat_read(fmpz_mat_t mat)
 
     Reads a matrix from ``stdin``, storing the result 
@@ -272,6 +287,9 @@ Input and output
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Comparison

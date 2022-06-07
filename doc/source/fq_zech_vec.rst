@@ -43,11 +43,17 @@ Input and output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fq_zech_vec_print(const fq_zech_struct * vec, slong len, const fq_zech_ctx_t ctx)
 
     Prints the vector of given length to ``stdout``.
 
     For further details, see ``_fq_zech_vec_fprint()``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Assignment and basic manipulation

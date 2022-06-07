@@ -452,6 +452,9 @@ Input and output
     ``scanf`` from the standard library and ``mpz_inp_str`` 
     from MPIR.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: size_t fmpz_inp_raw( fmpz_t x, FILE *fin )
 
     Reads a multiprecision integer from the stream ``file``.  The
@@ -462,6 +465,9 @@ Input and output
 
     This function calls the ``mpz_inp_raw`` function in library gmp. So that it 
     can read the raw data written by ``mpz_inp_raw`` directly.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
     
 .. function:: int fmpz_print(fmpz_t x)
 
@@ -491,6 +497,9 @@ Input and output
     ``flint_printf`` from the standard library and ``mpz_out_str`` 
     from MPIR.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
@@ -506,6 +515,9 @@ Input and output
 
     The output of this can also be read by ``mpz_inp_raw`` from GMP >= 2, 
     Since this function calls the ``mpz_inp_raw`` function in library gmp.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 

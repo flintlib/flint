@@ -133,9 +133,15 @@ Context Management
     Prints the context information to {\tt{file}}. Returns 1 for a
     success and a negative number for an error.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 
     Prints the context information to {\tt{stdout}}.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx)
 
@@ -316,6 +322,9 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``stdout``.
@@ -324,13 +333,22 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Prints a representation of ``op`` to ``stdout``.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx)
 

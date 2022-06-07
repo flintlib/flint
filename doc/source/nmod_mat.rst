@@ -138,6 +138,9 @@ Printing
         [   0    0 2607]
         [ 622    0    0]
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 
 Random matrix generation
 --------------------------------------------------------------------------------

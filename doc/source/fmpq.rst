@@ -298,6 +298,9 @@ Input and output
     In case of success, returns a positive number. In case of failure,
     returns a non-positive number.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 
     Does the same thing as ``fmpq_fprint``, but for numerator
@@ -305,6 +308,9 @@ Input and output
 
     In case of success, returns a positive number. In case of failure,
     returns a non-positive number.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpq_print(const fmpq_t x)
 
@@ -315,6 +321,9 @@ Input and output
     In case of success, returns a positive number. In case of failure,
     returns a non-positive number.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int _fmpq_print(const fmpz_t num, const fmpz_t den)
 
     Does the same thing as ``fmpq_print``, but for numerator
@@ -322,6 +331,9 @@ Input and output
 
     In case of success, returns a positive number. In case of failure,
     returns a non-positive number.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Random number generation

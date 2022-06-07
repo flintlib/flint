@@ -279,6 +279,9 @@ Input and output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
     Reads ``poly`` from the file stream ``f``. If this is a file
@@ -286,6 +289,9 @@ Input and output
     again. The format is as described for :func:`nmod_poly_print`. If a
     polynomial in the correct format is read, a positive value is returned,
     otherwise a non-positive value is returned.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
@@ -297,6 +303,9 @@ Input and output
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t poly, const char * x)
 
@@ -311,11 +320,17 @@ Input and output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int nmod_poly_read(nmod_poly_t poly)
 
     Read ``poly`` from ``stdin``. The format is as described for
     :func:`nmod_poly_print`. If a polynomial in the correct format is read, a
     positive value is returned, otherwise a non-positive value is returned.
+
+    **Note:** Requires that ``stdio.h`` has been included before any FLINT
+    header is included.
 
 
 Comparison
