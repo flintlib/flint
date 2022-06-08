@@ -15,6 +15,9 @@
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include "gmp.h"
+#ifdef __CYGWIN__
+#include <sys/types.h>
+#endif
 #undef ulong
 
 #include "longlong.h"
