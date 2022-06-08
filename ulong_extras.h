@@ -331,7 +331,7 @@ ulong n_invmod(ulong x, ulong y)
 
    g = n_gcdinv(&r, x, y);
    if (g != 1)
-      flint_throw(FLINT_IMPINV, "Cannot invert modulo %wd*%wd\n", g, g/y);
+      flint_throw(FLINT_IMPINV, "Cannot invert modulo %wd*%wd\n", g, y/g);
 
    return r;
 }
