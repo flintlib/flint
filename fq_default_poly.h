@@ -87,9 +87,9 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init2(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_init2(poly->nmod, alloc, ctx->ctx.nmod.mod.n);
+        nmod_poly_init2(poly->nmod, ctx->ctx.nmod.mod.n, alloc);
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_init2(poly->fmpz_mod, alloc, ctx->ctx.fmpz_mod.mod);
     }
