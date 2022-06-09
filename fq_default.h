@@ -304,6 +304,7 @@ FQ_DEFAULT_INLINE void fq_default_init(fq_default_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
+        rop->nmod = 0;
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
@@ -328,6 +329,7 @@ FQ_DEFAULT_INLINE void fq_default_init2(fq_default_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
+        rop->nmod = 0;
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
