@@ -1,5 +1,3 @@
-LIBDIR=lib
-
 QUIET_CC  = @echo '   ' CC  ' ' $@;
 QUIET_CXX = @echo '   ' CXX ' ' $@;
 QUIET_AR  = @echo '   ' AR  ' ' $@;
@@ -119,8 +117,10 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	-$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
 		$(LDCONFIG) -n "$(CURDIR)"; \
 	fi
-	ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME)"; \
-	ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR)"; \
+	$(AT)if [ "$(OS)" != "MINGW64" ] && [ "$(OS)" != "MINGW32" ] && [ "$(OS)" != "CYGWIN64" ] && [ "$(OS)" != "CYGWIN32" ]; then \
+	   ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME)"; \
+	   ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR)"; \
+	fi
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
@@ -202,30 +202,45 @@ endif
 
 install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/$(LIBDIR)"
+	$(AT)if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
+	   mkdir -p "$(DESTDIR)$(PREFIX)/lib"; \
+	fi
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 	   cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	   cp -a $(shell ls $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-	fi
+	   if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
+	      cp libflint.dll.a "$(DESTDIR)$(PREFIX)/lib"; \
+	   fi \
+	fi 
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+		if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
+		   cp libflint.a "$(DESTDIR)$(PREFIX)/lib"; \
+		else \
+		   cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+		fi \
 	fi
 	cp $(HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
-		cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
+	   cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
 	fi
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(OS)" = "Darwin" ] && [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		install_name_tool -id "$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
+	   install_name_tool -id "$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 
 uninstall:
 	rm -rf "$(DESTDIR)$(PREFIX)/include/flint"
 	rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)"
 	rm -rf $(shell ls $(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)*)
-	rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/libflint.a"
+	$(AT)if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
+	   rm -rf "$(DESTDIR)$(PREFIX)/lib/libflint.a"; \
+       rm -rf "$(DESTDIR)$(PREFIX)/lib/libflint.dll.a"; \
+	else \
+	   rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/libflint.a"; \
+	fi
 
 build:
 	mkdir -p build

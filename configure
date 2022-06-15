@@ -5,7 +5,7 @@
 # (C) 2012, William Hart, Jean-Pierre Flori, Thomas DuBuisson
 # (C) 2012, Jan Engelhardt
 
-PREFIX="/usr/local"
+PREFIX=
 GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 NTL_DIR="/usr/local"
@@ -443,6 +443,18 @@ case "$ARCH" in
       MACHINE="unknown";;
 esac
 
+#Default prefix
+if [ -z "$PREFIX" ]; then
+   case "$OS" in
+      MINGW64)
+         PREFIX="/mingw64";;
+      MINGW32)
+         PREFIX="/mingw32";;
+      *)
+         PREFIX="/usr/local";;
+   esac
+fi
+
 #ABI flag
 if [ "$ABI" = "32" ]; then
    ABI_FLAG="-m32"
@@ -486,13 +498,13 @@ if [ -z "$FLINT_LIB" ]; then
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -compatibility_version $FLINT_MAJOR.$FLINT_MINOR"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -current_version $FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
          ;;
-      CYGWIN* | MINGW*)
+      CYGWIN*|MINGW*)
          FLINT_LIBNAME="libflint.dll"
          FLINT_LIB="libflint-$FLINT_MAJOR.dll"
          EXTRA_SHARED_FLAGS="-static-libgcc"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -shared"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,--export-all-symbols"
-         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-soname,libflint-$FLINT_MAJOR.dll.$FLINT_MINOR.$FLINT_PATCH"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,--out-implib,libflint.dll.a"
          FLINT_DLL=1
          ;;
       android)
@@ -648,6 +660,17 @@ if [ -z "$PIC_FLAG" ]; then
          ;;
       *)
          PIC_FLAG="-fPIC";;
+   esac
+fi
+
+#libdir
+
+if [ -z "$LIBDIR" ]; then
+   case "$OS" in
+      CYGWIN*|MINGW*)
+         LIBDIR="bin";;
+      *)
+         LIBDIR="lib";;
    esac
 fi
 
@@ -851,6 +874,7 @@ echo "" >> Makefile
 echo "INCS=$INCS" >> Makefile
 echo "LIBS=$LIBS" >> Makefile
 echo "LIBS2=$LIBS2" >> Makefile
+echo "LIBDIR=$LIBDIR" >> Makefile
 echo "" >> Makefile
 echo "CC=$CC" >> Makefile
 echo "CXX=$CXX" >> Makefile
