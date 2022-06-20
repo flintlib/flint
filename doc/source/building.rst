@@ -271,7 +271,7 @@ the normal configurations for building on Windows:
 
     ``x64\Release``
 
-    ``x642\Debug``
+    ``x64\Debug``
     
 To build FLINT2 for a particular configuration requires that each of the 
 three libraries on which FLINT2 depends must have been previously built
