@@ -1314,7 +1314,7 @@ v 2.6.3 -- 12 Aug 2020
 
  * Fix a serious bug in LLL
 
-2.9.0 -- ?? May 2022
+2.9.0 -- 24 Jun 2022
 
  * Add fmpz_mod_poly_div function
  * Add _flint_get_memory function
