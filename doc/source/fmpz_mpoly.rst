@@ -15,7 +15,7 @@ Types, macros and constants
 
 .. type:: fmpz_mpoly_t
 
-    An array of length `1` of ``fmpz_mpoly_ctx_struct``.
+    An array of length `1` of ``fmpz_mpoly_struct``.
 
 .. type:: fmpz_mpoly_ctx_struct
 
@@ -23,7 +23,7 @@ Types, macros and constants
 
 .. type:: fmpz_mpoly_ctx_t
 
-    An array of length `1` of ``fmpz_mpoly_struct``.
+    An array of length `1` of ``fmpz_mpoly_ctx_struct``.
 
 
 Context object
