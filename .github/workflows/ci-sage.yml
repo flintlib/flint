@@ -42,10 +42,12 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    # Allow to run manually
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
-  DIST_PREREQ:
+  DIST_PREREQ:      tar
   # Name of this project in the Sage distribution
   SPKG:        flint
   # Sage distribution packages to build
@@ -63,8 +65,44 @@ env:
 
 jobs:
 
+  ubuntu-gcc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo apt-get install texinfo
+          ./.build_dependencies
+          ./configure CFLAGS="-Wredundant-decls" --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
+          $MAKE
+          ldd libflint.so
+          $MAKE check
+        env:
+          LOCAL: ${{ github.workspace }}/local
+          LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+          MAKE: "make -j"
+
+  ubuntu-cmake-gcc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo apt-get install texinfo
+          sudo apt-get install cmake
+          ./.build_dependencies
+          mkdir build
+          cd build
+          cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$LOCAL ..
+          $MAKE
+          ldd lib/libflint.so
+        env:
+          LOCAL: ${{ github.workspace }}/local
+          LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+          MAKE: "make -j"
+
   dist:
     runs-on: ubuntu-latest
+    needs: [ubuntu-gcc, ubuntu-cmake-gcc]
+
     steps:
       - name: Check out ${{ env.SPKG }}
         uses: actions/checkout@v2
@@ -76,10 +114,11 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get install $DIST_PREREQ
         if: env.DIST_PREREQ != ''
       - name: Run make dist, prepare upstream artifact
+        # FLINT's "make dist" is upstream-centric: it hard-codes repo tags; cannot use
         run: |
-          (cd build/pkgs/${{ env.SPKG }}/src && (cd .. && tar czf - src) > arb-git.tar.gz) \
+          (cd build/pkgs/${{ env.SPKG }}/src && ./configure && git archive --format tar --prefix flint-git/ HEAD | gzip > ${{ env.SPKG }}-git.tar.gz ) \
           && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
-          && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
+          && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=standard" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && ls -l upstream/
       - uses: actions/upload-artifact@v2
