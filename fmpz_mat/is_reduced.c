@@ -16,6 +16,7 @@
 int
 fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
 {
+    int res;
     slong i, j, k, d = A->r, n = A->c;
     fmpq_mat_t Aq, Bq, mu;
     mpq_t deltax, etax;
@@ -61,6 +62,13 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
         {
             _fmpq_vec_dot(tmp, Aq->rows[i], Bq->rows[j], n);
 
+            /* avoid division by zero (???) */
+            if (fmpq_is_zero(fmpq_mat_entry(mu, j, j)))
+            {
+                res = 0;
+                goto cleanup;
+            }
+
             fmpq_div(fmpq_mat_entry(mu, i, j), tmp, fmpq_mat_entry(mu, j, j));
 
             for (k = 0; k < n; k++)
@@ -72,36 +80,31 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
             fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
             if (fmpq_cmp(tmp, etaq) > 0)    /* check size reduction */
             {
-                fmpq_mat_clear(Aq);
-                fmpq_mat_clear(Bq);
-                fmpq_mat_clear(mu);
-                fmpq_clear(deltaq);
-                fmpq_clear(etaq);
-                fmpq_clear(tmp);
-                return 0;
+                res = 0;
+                goto cleanup;
             }
         }
         fmpq_set(tmp, deltaq);
         fmpq_submul(tmp, fmpq_mat_entry(mu, i, i - 1),
-                    fmpq_mat_entry(mu, i, i - 1));
+                         fmpq_mat_entry(mu, i, i - 1));
         fmpq_mul(tmp, tmp, fmpq_mat_entry(mu, i - 1, i - 1));
         _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), Bq->rows[i], Bq->rows[i], n);
         if (fmpq_cmp(tmp, fmpq_mat_entry(mu, i, i)) > 0)    /* check Lovasz condition */
         {
-            fmpq_mat_clear(Aq);
-            fmpq_mat_clear(Bq);
-            fmpq_mat_clear(mu);
-            fmpq_clear(deltaq);
-            fmpq_clear(etaq);
-            fmpq_clear(tmp);
-            return 0;
+            res = 0;
+            goto cleanup;
         }
     }
+
+    res = 1;
+
+cleanup:
+
     fmpq_mat_clear(Aq);
     fmpq_mat_clear(Bq);
     fmpq_mat_clear(mu);
     fmpq_clear(deltaq);
     fmpq_clear(etaq);
     fmpq_clear(tmp);
-    return 1;
+    return res;
 }

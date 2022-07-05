@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -29,6 +30,36 @@ main(void)
 
     flint_printf("lll....");
     fflush(stdout);
+
+    /* test rank deficient matrices */
+    {
+        fmpz_mat_init(mat, 3, 3);
+        fmpz_lll_context_init_default(fl);
+
+        fmpz_mat_zero(mat);
+        fmpz_lll(mat, NULL, fl);
+        if (!fmpz_mat_is_zero(mat))
+        {
+            flint_printf("FAIL: check zero matrix\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_mat_zero(mat);
+        fmpz_set_ui(fmpz_mat_entry(mat, 1, 0), 4);
+        fmpz_set_ui(fmpz_mat_entry(mat, 2, 0), 6);
+        fmpz_lll(mat, NULL, fl);
+        fmpz_abs(fmpz_mat_entry(mat, 2, 0), fmpz_mat_entry(mat, 2, 0));
+        fmpz_sub_ui(fmpz_mat_entry(mat, 2, 0), fmpz_mat_entry(mat, 2, 0), 2);
+        if (!fmpz_mat_is_zero(mat))
+        {
+            flint_printf("FAIL: check gcd(4,6)=2\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_mat_clear(mat);
+    }
 
     /* test using NTRU like matrices */
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
