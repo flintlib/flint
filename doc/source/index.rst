@@ -24,6 +24,7 @@ Contents
    gr.rst
    gr_mat.rst
    gr_poly.rst
+   gr_mpoly.rst
 
 
 Design
