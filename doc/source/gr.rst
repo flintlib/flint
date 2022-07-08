@@ -63,7 +63,7 @@ Functions can return a combination of the following status flags:
     If this flag is set, there is also potentially a domain error
     (but this is unknown).
 
-.. macro:: GR_WRONG
+.. macro:: GR_TEST_FAIL
 
     Test failure. This is only used in test code.
 
@@ -731,3 +731,10 @@ Implementing rings
     default and generic methods in all slots, and then overwrites
     with the specialized methods listed in *tab*.
 
+Testing rings
+--------------------------------------------------------------------------------
+
+.. function:: void gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
+
+    Test correctness of the ring *R*. This calls test functions for
+    various methods, each being repeated up to *iters* times.

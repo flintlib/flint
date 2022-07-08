@@ -84,7 +84,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 #define GR_SUCCESS 0
 #define GR_DOMAIN 1
 #define GR_UNABLE 2
-#define GR_WRONG 4
+#define GR_TEST_FAIL 4
 
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
@@ -708,6 +708,10 @@ matrix_ctx_t;
 #define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)->elem_ctx))
 
 void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
+
+/* Testing */
+
+void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 
 #ifdef __cplusplus
 }
