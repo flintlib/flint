@@ -3,7 +3,7 @@
 int main()
 {
     gr_ctx_t ZZ;
-    int flags = 0;
+    int flags = GR_TEST_ALWAYS_ABLE;
 
     flint_printf("fmpz....");
     fflush(stdout);

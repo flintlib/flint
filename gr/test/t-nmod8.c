@@ -3,7 +3,7 @@
 int main()
 {
     gr_ctx_t ZZn;
-    int flags = 0;
+    int flags = GR_TEST_ALWAYS_ABLE;
     ulong n;
 
     flint_printf("nmod8....");

@@ -3,7 +3,7 @@
 int main()
 {
     gr_ctx_t QQbar_real, QQbar;
-    int flags = 0;
+    int flags = GR_TEST_ALWAYS_ABLE;
 
     flint_printf("qqbar....");
     fflush(stdout);

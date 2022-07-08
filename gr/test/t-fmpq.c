@@ -3,7 +3,7 @@
 int main()
 {
     gr_ctx_t QQ;
-    int flags = 0;
+    int flags = GR_TEST_ALWAYS_ABLE;
 
     flint_printf("fmpq....");
     fflush(stdout);

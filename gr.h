@@ -711,6 +711,9 @@ void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
 /* Testing */
 
+#define GR_TEST_VERBOSE 8
+#define GR_TEST_ALWAYS_ABLE 16
+
 void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 
 #ifdef __cplusplus
