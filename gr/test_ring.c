@@ -26,23 +26,23 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
     switch (alias)
     {
         case 0:
+            status |= gr_set(xy2, x, R);
             status |= gr_op(xy1, x, y, R);
-            gr_set(xy2, x, R);
             status |= gr_op(xy2, xy2, y, R);
             break;
         case 1:
+            status |= gr_set(xy2, y, R);
             status |= gr_op(xy1, x, y, R);
-            gr_set(xy2, y, R);
-            status |= gr_op(xy2, x, y, R);
+            status |= gr_op(xy2, x, xy2, R);
             break;
         case 2:
-            gr_set(y, x, R);
+            status |= gr_set(y, x, R);
             status |= gr_op(xy1, x, y, R);
             status |= gr_op(xy2, x, x, R);
             break;
         default:
-            gr_set(y, x, R);
-            gr_set(xy2, x, R);
+            status |= gr_set(y, x, R);
+            status |= gr_set(xy2, x, R);
             status |= gr_op(xy1, x, y, R);
             status |= gr_op(xy2, xy2, xy2, R);
     }
@@ -1554,13 +1554,14 @@ gr_test_iter(gr_ctx_t R, flint_rand_t state, const char * descr, gr_test_functio
     {
         printf("%s ... ", descr);
         fflush(stdout);
-        timeit_start(timer);
     }
+
+    timeit_start(timer);
 
     for (iter = 0; iter < iters; iter++)
     {
         /* flint_printf("iter %ld\n", iter); */
-        status = func(R, state, test_flags);
+        status = func(R, state, test_flags & ~GR_TEST_VERBOSE);
 
         if (status == GR_SUCCESS)
             count_success++;
@@ -1578,9 +1579,10 @@ gr_test_iter(gr_ctx_t R, flint_rand_t state, const char * descr, gr_test_functio
         }
     }
 
+    timeit_stop(timer);
+
     if (test_flags & GR_TEST_VERBOSE)
     {
-        timeit_stop(timer);
         flint_printf("PASS   (%wd successful, %wd domain, %wd unable, 0 wrong, %.3g cpu, %.3g wall)\n",
             count_success, count_domain, count_unable, timer->cpu*0.001, timer->wall*0.001);
     }
