@@ -514,6 +514,23 @@ _gr_qqbar_im(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    if (!qqbar_is_real(x) || !qqbar_is_real(y))
+        return GR_DOMAIN;
+
+    *res = qqbar_cmp_re(x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+{
+    *res = qqbar_cmpabs(x, y);
+    return GR_SUCCESS;
+}
+
 /* todo: exploit when we know that the field is real */
 int
 _gr_qqbar_ctx_clear(gr_ctx_t ctx)
@@ -522,16 +539,16 @@ _gr_qqbar_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+truth_t
 _gr_qqbar_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
-    return ctx->which_ring == GR_WHICH_RING_CC || GR_WHICH_RING_CC_ALGEBRAIC;
+    return (ctx->which_ring == GR_WHICH_RING_CC_ALGEBRAIC) ? T_TRUE : T_FALSE;
 }
 
-int
+truth_t
 _gr_qqbar_ctx_is_ordered_ring(gr_ctx_t ctx)
 {
-    return ctx->which_ring == GR_WHICH_RING_RR || GR_WHICH_RING_RR_ALGEBRAIC;
+    return (ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC) ? T_TRUE : T_FALSE;
 }
 
 int _qqbar_methods_initialized = 0;
@@ -616,6 +633,9 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_qqbar_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_qqbar_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_qqbar_rsqrt},
+
+    {GR_METHOD_CMP,             (gr_funcptr) _gr_qqbar_cmp},
+    {GR_METHOD_CMPABS,          (gr_funcptr) _gr_qqbar_cmpabs},
 
     {GR_METHOD_ABS,             (gr_funcptr) _gr_qqbar_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_qqbar_conj},

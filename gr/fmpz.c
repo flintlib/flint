@@ -306,6 +306,28 @@ _gr_fmpz_abs(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_cmp(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    int cmp = fmpz_cmp(x, y);
+
+    if (cmp < 0) cmp = -1;
+    if (cmp > 0) cmp = 1;
+    *res = cmp;
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_cmpabs(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    int cmp = fmpz_cmpabs(x, y);
+
+    if (cmp < 0) cmp = -1;
+    if (cmp > 0) cmp = 1;
+    *res = cmp;
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -459,6 +481,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_rsqrt},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpz_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
+    {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},

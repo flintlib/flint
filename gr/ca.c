@@ -573,6 +573,28 @@ _gr_ca_im(ca_t res, const ca_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+
+#define CMP_UNDEFINED -2
+#define CMP_UNKNOWN -3
+
+int
+_ca_cmp(const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+int
+_gr_ca_cmp(int * res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
+{
+    int cmp = _ca_cmp(x, y, GR_CA_CTX(ctx));
+
+    if (cmp == CMP_UNKNOWN)
+        return GR_UNABLE;
+
+    if (cmp == CMP_UNDEFINED)
+        return GR_DOMAIN;
+
+    *res = cmp;
+    return GR_SUCCESS;
+}
+
 int
 _gr_ca_poly_mullow(ca_ptr res,
     ca_srcptr poly1, slong len1,
@@ -597,16 +619,16 @@ _gr_ca_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+truth_t
 _gr_ca_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
-    return ctx->which_ring == GR_WHICH_RING_CC || GR_WHICH_RING_CC_ALGEBRAIC;
+    return (ctx->which_ring == GR_WHICH_RING_CC || ctx->which_ring == GR_WHICH_RING_CC_ALGEBRAIC) ? T_TRUE : T_FALSE;
 }
 
-int
+truth_t
 _gr_ca_ctx_is_ordered_ring(gr_ctx_t ctx)
 {
-    return ctx->which_ring == GR_WHICH_RING_RR || GR_WHICH_RING_RR_ALGEBRAIC;
+    return (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC) ? T_TRUE : T_FALSE;
 }
 
 int _ca_methods_initialized = 0;
@@ -698,6 +720,8 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_ca_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_ca_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_ca_im},
+
+    {GR_METHOD_CMP,              (gr_funcptr) _gr_ca_cmp},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},

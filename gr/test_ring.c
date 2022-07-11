@@ -1391,6 +1391,120 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flag
 }
 
 int
+gr_test_ordered_ring_cmp(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y, z, xz, yz, zero, xy;
+    int cmp1, cmp2, cmp3;
+
+    GR_TMP_INIT5(x, y, z, xz, yz, R);
+    GR_TMP_INIT2(zero, xy, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+    GR_MUST_SUCCEED(gr_randtest(z, state, R));
+
+    /* cmp(x, y) = -cmp(y, x) */
+    status |= gr_cmp(&cmp1, x, y, R);
+    status |= gr_cmp(&cmp2, y, x, R);
+
+    if (status == GR_SUCCESS && cmp1 != -cmp2)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    /* x <= y  -->  x + z <= y + z */
+    status |= gr_add(xz, x, z, R);
+    status |= gr_add(yz, y, z, R);
+    status |= gr_cmp(&cmp1, x, y, R);
+    status |= gr_cmp(&cmp2, xz, yz, R);
+
+    if (status == GR_SUCCESS && cmp1 != cmp2)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    /* 0 <= x and 0 <= y --> 0 <= xy */
+    status |= gr_cmp(&cmp1, zero, x, R);
+    status |= gr_cmp(&cmp2, zero, y, R);
+    status |= gr_mul(xy, x, y, R);
+    status |= gr_cmp(&cmp3, zero, xy, R);
+
+    if (status == GR_SUCCESS && cmp1 <= 0 && cmp2 <= 0 && cmp3 > 0)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if (status & GR_DOMAIN && !(status & GR_UNABLE))
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("\n");
+        printf("R = "); gr_ctx_println(R);
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("z = \n"); gr_println(z, R);
+        printf("x + z = \n"); gr_println(xz, R);
+        printf("y + z = \n"); gr_println(yz, R);
+        printf("xy = \n"); gr_println(xy, R);
+        printf("cmp = %d, %d, %d\n", cmp1, cmp2, cmp3);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR5(x, y, z, xz, yz, R);
+    GR_TMP_CLEAR2(zero, xy, R);
+
+    return status;
+}
+
+int
+gr_test_ordered_ring_cmpabs(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y, ax, ay;
+    int cmp1, cmp2;
+
+    GR_TMP_INIT4(x, y, ax, ay, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    status |= gr_abs(ax, x, R);
+    status |= gr_abs(ay, y, R);
+    status |= gr_cmpabs(&cmp1, x, y, R);
+    status |= gr_cmp(&cmp2, ax, ay, R);
+
+    if (status == GR_SUCCESS && cmp1 != cmp2)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if (status & GR_DOMAIN && !(status & GR_UNABLE))
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("\n");
+        printf("R = "); gr_ctx_println(R);
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("ax = \n"); gr_println(ax, R);
+        printf("ay = \n"); gr_println(ay, R);
+        printf("cmp = %d, %d\n", cmp1, cmp2);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR4(x, y, ax, ay, R);
+
+    return status;
+}
+
+int
 gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status, aliasing;
@@ -1648,6 +1762,12 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_exponent_addition, iters, test_flags);
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
+
+    if (gr_ctx_is_ordered_ring(R) == T_TRUE)
+    {
+        gr_test_iter(R, state, "ordered_ring_cmp", gr_test_ordered_ring_cmp, iters, test_flags);
+        gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
+    }
 
     gr_test_iter(R, state, "vec_add", gr_test_vec_add, iters, test_flags);
 

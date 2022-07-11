@@ -585,7 +585,11 @@ Complex parts
 --------------------------------------------------------------------------------
 
 .. function:: int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    This method may return the flag ``GR_DOMAIN`` when the ring is
+    not an ordered ring.
+
+.. function:: int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
@@ -593,6 +597,21 @@ Complex parts
 
     These methods may return the flag ``GR_DOMAIN`` (or ``GR_UNABLE``)
     when the ring is not a subring of the real or complex numbers.
+
+Ordering methods
+--------------------------------------------------------------------------------
+
+.. function:: int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to -1, 0 or 1 according to whether *x* is less than,
+    equal or greater than the absolute value of *y*.
+    This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
+
+.. function:: int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to -1, 0 or 1 according to whether the absolute value
+    of *x* is less than, equal or greater than the absolute value of *y*.
+    This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
 Vectors
 --------------------------------------------------------------------------------
@@ -700,11 +719,6 @@ Memory-managed vectors
 
     Appends the element *x* to the end of vector *vec*.
 
-Polynomials
---------------------------------------------------------------------------------
-
-See :ref:`gr-poly`.
-
 Implementing rings
 --------------------------------------------------------------------------------
 
@@ -746,22 +760,22 @@ Required methods
 
 A context object must at minimum define the following methods for a ring:
 
-    * init
-    * clear
-    * swap
-    * randtest
-    * write
-    * zero
-    * one
-    * equal
-    * set
-    * set_si
-    * set_ui
-    * set_fmpz
-    * neg
-    * add
-    * sub
-    * mul
+* init
+* clear
+* swap
+* randtest
+* write
+* zero
+* one
+* equal
+* set
+* set_si
+* set_ui
+* set_fmpz
+* neg
+* add
+* sub
+* mul
 
 
 Testing rings

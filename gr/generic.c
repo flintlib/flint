@@ -767,6 +767,26 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+int
+gr_generic_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+int
+gr_generic_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t, u;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT2(t, u, ctx);
+    status |= gr_abs(t, x, ctx);
+    status |= gr_abs(u, y, ctx);
+    status |= gr_cmp(res, t, u, ctx);
+    GR_TMP_CLEAR2(t, u, ctx);
+
+    return status;
+}
 
 /* Generic vector functions */
 
@@ -1418,6 +1438,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_IS_SQUARE,               (gr_funcptr) gr_generic_is_square},
     {GR_METHOD_SQRT,                    (gr_funcptr) gr_generic_sqrt},
     {GR_METHOD_RSQRT,                   (gr_funcptr) gr_generic_rsqrt},
+
+    {GR_METHOD_CMP,                     (gr_funcptr) gr_generic_cmp},
+    {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},
 
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},
     {GR_METHOD_VEC_CLEAR,               (gr_funcptr) gr_generic_vec_clear},

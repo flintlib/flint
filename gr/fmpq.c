@@ -287,6 +287,41 @@ _gr_fmpq_im(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpq_cmp(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
+{
+    int cmp = fmpq_cmp(x, y);
+
+    if (cmp < 0) cmp = -1;
+    if (cmp > 0) cmp = 1;
+    *res = cmp;
+    return GR_SUCCESS;
+}
+
+/* todo: fast flint code */
+int
+_gr_fmpq_cmpabs(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
+{
+    fmpq_t t, u;
+    int cmp;
+
+    fmpq_init(t);
+    fmpq_init(u);
+
+    fmpq_abs(t, x);
+    fmpq_abs(u, y);
+
+    cmp = fmpq_cmp(t, u);
+
+    fmpq_clear(t);
+    fmpq_clear(u);
+
+    if (cmp < 0) cmp = -1;
+    if (cmp > 0) cmp = 1;
+    *res = cmp;
+    return GR_SUCCESS;
+}
+
 static int
 _fmpq_vec_is_fmpz_vec(const fmpq * vec, slong len)
 {
@@ -468,6 +503,8 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpq_im},
+    {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpq_cmp},
+    {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},
     {0,                         (gr_funcptr) NULL},
