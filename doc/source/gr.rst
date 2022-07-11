@@ -84,7 +84,7 @@ such functions in asserts).
 Flags can be OR'ed and checked only at the top level of a computation
 to avoid complex control flow.
 
-.. macro:: MUST_SUCCEED(expr)
+.. macro:: GR_MUST_SUCCEED(expr)
 
     Evaluates *expr* and asserts that the return value is
     ``GR_SUCCESS``.
@@ -730,6 +730,29 @@ Implementing rings
     Initializes the method table *methods*. This first inserts
     default and generic methods in all slots, and then overwrites
     with the specialized methods listed in *tab*.
+
+Required methods
+................................................................................
+
+A context object must at minimum define the following methods for a ring:
+
+    * init
+    * clear
+    * swap
+    * randtest
+    * write
+    * zero
+    * one
+    * equal
+    * set
+    * set_si
+    * set_ui
+    * set_fmpz
+    * neg
+    * add
+    * sub
+    * mul
+
 
 Testing rings
 --------------------------------------------------------------------------------

@@ -88,7 +88,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
-#define MUST_SUCCEED(expr) assert ((expr) == GR_SUCCESS);
+#define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_printf("GR_MUST_SUCCEED failure: %s", __FILE__); flint_abort(); } } while (0)
 
 typedef void * gr_ptr;
 typedef const void * gr_srcptr;
@@ -103,9 +103,25 @@ typedef enum
     GR_METHOD_CTX_WRITE,
     GR_METHOD_CTX_CLEAR,
 
+    /* general ring properties */
     GR_METHOD_CTX_IS_COMMUTATIVE_RING,
     GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,
     GR_METHOD_CTX_IS_FIELD,
+    GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
+    GR_METHOD_CTX_IS_FINITE,
+    GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
+    GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
+
+    /* ring properties related to orderings and norms */
+    GR_METHOD_CTX_IS_ORDERED_RING,
+
+    /* context properties represented to the representation */
+    GR_METHOD_CTX_IS_BASE_RING,         /* not constructed from another ring */
+    GR_METHOD_CTX_IS_GR_POLY_RING,
+    GR_METHOD_CTX_IS_GR_MPOLY_RING,
+    GR_METHOD_CTX_IS_GR_MAT_RING,
+    GR_METHOD_CTX_IS_EXACT,            /* we have no inexact elements */
+    GR_METHOD_CTX_IS_CANONICAL,        /* we have no non-canonical representations */
 
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
@@ -124,8 +140,8 @@ typedef enum
     GR_METHOD_EQUAL,
 
     GR_METHOD_SET,
-    GR_METHOD_SET_SI,
     GR_METHOD_SET_UI,
+    GR_METHOD_SET_SI,
     GR_METHOD_SET_FMPZ,
     GR_METHOD_SET_FMPQ,
 
@@ -140,32 +156,32 @@ typedef enum
     GR_METHOD_NEG,
 
     GR_METHOD_ADD,
-    GR_METHOD_ADD_SI,
     GR_METHOD_ADD_UI,
+    GR_METHOD_ADD_SI,
     GR_METHOD_ADD_FMPZ,
     GR_METHOD_ADD_FMPQ,
 
     GR_METHOD_SUB,
-    GR_METHOD_SUB_SI,
     GR_METHOD_SUB_UI,
+    GR_METHOD_SUB_SI,
     GR_METHOD_SUB_FMPZ,
     GR_METHOD_SUB_FMPQ,
 
     GR_METHOD_MUL,
-    GR_METHOD_MUL_SI,
     GR_METHOD_MUL_UI,
+    GR_METHOD_MUL_SI,
     GR_METHOD_MUL_FMPZ,
     GR_METHOD_MUL_FMPQ,
 
     GR_METHOD_ADDMUL,
-    GR_METHOD_ADDMUL_SI,
     GR_METHOD_ADDMUL_UI,
+    GR_METHOD_ADDMUL_SI,
     GR_METHOD_ADDMUL_FMPZ,
     GR_METHOD_ADDMUL_FMPQ,
 
     GR_METHOD_SUBMUL,
-    GR_METHOD_SUBMUL_SI,
     GR_METHOD_SUBMUL_UI,
+    GR_METHOD_SUBMUL_SI,
     GR_METHOD_SUBMUL_FMPZ,
     GR_METHOD_SUBMUL_FMPQ,
 
@@ -176,14 +192,14 @@ typedef enum
     GR_METHOD_INV,
 
     GR_METHOD_DIV,
-    GR_METHOD_DIV_SI,
     GR_METHOD_DIV_UI,
+    GR_METHOD_DIV_SI,
     GR_METHOD_DIV_FMPZ,
     GR_METHOD_DIV_FMPQ,
 
     GR_METHOD_DIVEXACT,
-    GR_METHOD_DIVEXACT_SI,
     GR_METHOD_DIVEXACT_UI,
+    GR_METHOD_DIVEXACT_SI,
     GR_METHOD_DIVEXACT_FMPZ,
     GR_METHOD_DIVEXACT_FMPQ,
 
@@ -228,8 +244,8 @@ typedef enum
     GR_METHOD_VEC_DOT,
     GR_METHOD_VEC_DOT_REV,
 
-    GR_METHOD_VEC_DOT_SI,
     GR_METHOD_VEC_DOT_UI,
+    GR_METHOD_VEC_DOT_SI,
     GR_METHOD_VEC_DOT_FMPZ,
 
     GR_METHOD_VEC_SET_POWERS,

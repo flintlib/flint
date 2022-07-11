@@ -72,7 +72,7 @@ int main()
 
         GR_TMP_INIT5(x, fx, gx, hx, y, ctx);
 
-        gr_randtest(x, state, ctx);
+        GR_MUST_SUCCEED(gr_randtest(x, state, ctx));
  
         fmpz_poly_randtest(f, state, 1 + n_randint(state, 30), 1 + n_randint(state, 100));
         fmpz_poly_randtest(g, state, 1 + n_randint(state, 30), 1 + n_randint(state, 100));

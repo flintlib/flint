@@ -81,7 +81,7 @@ gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ctx
     fmpz_mat_t A;
     fmpz_mat_init(A, mat->r, mat->c);
     fmpz_mat_randrank(A, state, rank, bits);
-    gr_mat_set_fmpz_mat(mat, A, ctx);
+    GR_MUST_SUCCEED(gr_mat_set_fmpz_mat(mat, A, ctx));
     fmpz_mat_clear(A);
 }
 

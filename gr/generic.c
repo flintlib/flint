@@ -2,7 +2,22 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
-/* Generic context predicates */
+void gr_generic_init(void) { flint_printf("ctx must implement init()\n"); flint_abort(); }
+void gr_generic_clear(void) { flint_printf("ctx must implement clear()\n"); flint_abort(); }
+void gr_generic_swap(void) { flint_printf("ctx must implement swap()\n"); flint_abort(); }
+void gr_generic_randtest(void) { flint_printf("ctx must implement randtest()\n"); flint_abort(); }
+void gr_generic_write(void) { flint_printf("ctx must implement write()\n"); flint_abort(); }
+void gr_generic_zero(void) { flint_printf("ctx must implement zero()\n"); flint_abort(); }
+void gr_generic_one(void) { flint_printf("ctx must implement one()\n"); flint_abort(); }
+void gr_generic_equal(void) { flint_printf("ctx must implement equal()\n"); flint_abort(); }
+void gr_generic_set(void) { flint_printf("ctx must implement set()\n"); flint_abort(); }
+void gr_generic_set_si(void) { flint_printf("ctx must implement set_si()\n"); flint_abort(); }
+void gr_generic_set_ui(void) { flint_printf("ctx must implement set_ui()\n"); flint_abort(); }
+void gr_generic_set_fmpz(void) { flint_printf("ctx must implement set_fmpz()\n"); flint_abort(); }
+void gr_generic_neg(void) { flint_printf("ctx must implement neg()\n"); flint_abort(); }
+void gr_generic_add(void) { flint_printf("ctx must implement add()\n"); flint_abort(); }
+void gr_generic_sub(void) { flint_printf("ctx must implement sub()\n"); flint_abort(); }
+void gr_generic_mul(void) { flint_printf("ctx must implement mul()\n"); flint_abort(); }
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
 {
@@ -1323,25 +1338,55 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,      (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_FINITE,           (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,        (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,         (gr_funcptr) gr_generic_ctx_predicate},
 
+    {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
+
+    {GR_METHOD_CTX_IS_BASE_RING,        (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_GR_POLY_RING,     (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_GR_MPOLY_RING,    (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_GR_MAT_RING,      (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_EXACT,            (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_CANONICAL,        (gr_funcptr) gr_generic_ctx_predicate},
+
+    {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
+    {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},
+    {GR_METHOD_SWAP,                    (gr_funcptr) gr_generic_swap},
+    {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
+    {GR_METHOD_WRITE,                   (gr_funcptr) gr_generic_write},
+
+    {GR_METHOD_ZERO,                    (gr_funcptr) gr_generic_zero},
+    {GR_METHOD_ONE,                     (gr_funcptr) gr_generic_one},
     {GR_METHOD_NEG_ONE,                 (gr_funcptr) gr_generic_neg_one},
 
     {GR_METHOD_IS_ZERO,                 (gr_funcptr) gr_generic_is_zero},
     {GR_METHOD_IS_ONE,                  (gr_funcptr) gr_generic_is_one},
     {GR_METHOD_IS_NEG_ONE,              (gr_funcptr) gr_generic_is_neg_one},
 
+    {GR_METHOD_EQUAL,                   (gr_funcptr) gr_generic_equal},
+
+    {GR_METHOD_SET,                     (gr_funcptr) gr_generic_set},
+    {GR_METHOD_SET_UI,                  (gr_funcptr) gr_generic_set_ui},
+    {GR_METHOD_SET_SI,                  (gr_funcptr) gr_generic_set_si},
+    {GR_METHOD_SET_FMPZ,                (gr_funcptr) gr_generic_set_fmpz},
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
+    {GR_METHOD_ADD,                     (gr_funcptr) gr_generic_add},
     {GR_METHOD_ADD_UI,                  (gr_funcptr) gr_generic_add_ui},
     {GR_METHOD_ADD_SI,                  (gr_funcptr) gr_generic_add_si},
     {GR_METHOD_ADD_FMPZ,                (gr_funcptr) gr_generic_add_fmpz},
     {GR_METHOD_ADD_FMPQ,                (gr_funcptr) gr_generic_add_fmpq},
 
+    {GR_METHOD_SUB,                     (gr_funcptr) gr_generic_sub},
     {GR_METHOD_SUB_UI,                  (gr_funcptr) gr_generic_sub_ui},
     {GR_METHOD_SUB_SI,                  (gr_funcptr) gr_generic_sub_si},
     {GR_METHOD_SUB_FMPZ,                (gr_funcptr) gr_generic_sub_fmpz},
     {GR_METHOD_SUB_FMPQ,                (gr_funcptr) gr_generic_sub_fmpq},
 
+    {GR_METHOD_MUL,                     (gr_funcptr) gr_generic_mul},
     {GR_METHOD_MUL_UI,                  (gr_funcptr) gr_generic_mul_ui},
     {GR_METHOD_MUL_SI,                  (gr_funcptr) gr_generic_mul_si},
     {GR_METHOD_MUL_FMPZ,                (gr_funcptr) gr_generic_mul_fmpz},

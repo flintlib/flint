@@ -42,7 +42,7 @@ main(void)
         len = n_randint(state, 100);
         exp_bits = n_randint(state, 200) + 2;
 
-        gr_mpoly_randtest_bits(f, state, len, exp_bits, mctx, cctx);
+        GR_MUST_SUCCEED(gr_mpoly_randtest_bits(f, state, len, exp_bits, mctx, cctx));
 
         for (j = 0; j < 10; j++)
         {
@@ -50,7 +50,7 @@ main(void)
 
             status = GR_SUCCESS;
 
-            gr_randtest(c, state, cctx);
+            GR_MUST_SUCCEED(gr_randtest(c, state, cctx));
             for (k = 0; k < mctx->nvars; k++)
                 exp[k] = n_randtest(state);
 
@@ -99,7 +99,7 @@ main(void)
         len = n_randint(state, 100);
         exp_bits = n_randint(state, 200) + 2;
 
-        gr_mpoly_randtest_bits(f, state, len, exp_bits, mctx, cctx);
+        GR_MUST_SUCCEED(gr_mpoly_randtest_bits(f, state, len, exp_bits, mctx, cctx));
 
         for (j = 0; j < 10; j++)
         {
@@ -107,7 +107,7 @@ main(void)
 
             status = GR_SUCCESS;
 
-            gr_randtest(c, state, cctx);
+            GR_MUST_SUCCEED(gr_randtest(c, state, cctx));
             _fmpz_vec_randtest(exp, state, mctx->nvars, exp_bits);
 
             status |= gr_mpoly_set_coeff_scalar_fmpz(f, c, exp, mctx, cctx);
