@@ -259,10 +259,20 @@ Context operations
 .. function:: truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx)
               truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx)
               truth_t gr_ctx_is_field(gr_ctx_t ctx)
+              truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
+              truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
 
     Returns whether the ring satisfies the respective
     mathematical property.
     The result can be ``T_UNKNOWN``.
+
+.. function:: truth_t gr_ctx_is_exact(gr_ctx_t ctx)
+
+    Returns whether the representation of elements is always exact.
+
+.. function:: truth_t gr_ctx_is_canonical(gr_ctx_t ctx)
+
+    Returns whether the representation of elements is always canonical.
 
 
 Element operations

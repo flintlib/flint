@@ -116,10 +116,6 @@ typedef enum
     GR_METHOD_CTX_IS_ORDERED_RING,
 
     /* context properties represented to the representation */
-    GR_METHOD_CTX_IS_BASE_RING,         /* not constructed from another ring */
-    GR_METHOD_CTX_IS_GR_POLY_RING,
-    GR_METHOD_CTX_IS_GR_MPOLY_RING,
-    GR_METHOD_CTX_IS_GR_MAT_RING,
     GR_METHOD_CTX_IS_EXACT,            /* we have no inexact elements */
     GR_METHOD_CTX_IS_CANONICAL,        /* we have no non-canonical representations */
 
@@ -394,12 +390,21 @@ GR_INLINE truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx) { return GR_CTX_PREDI
 GR_INLINE truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_INTEGRAL_DOMAIN)(ctx); }
 GR_INLINE truth_t gr_ctx_is_field(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FIELD)(ctx); }
 
+GR_INLINE truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_UNIQUE_FACTORIZATION_DOMAIN)(ctx); }
+GR_INLINE truth_t gr_ctx_is_finite(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FINITE)(ctx); }
+GR_INLINE truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FINITE_CHARACTERISTIC)(ctx); }
+GR_INLINE truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_ALGEBRAICALLY_CLOSED)(ctx); }
+GR_INLINE truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_ORDERED_RING)(ctx); }
+
+GR_INLINE truth_t gr_ctx_is_exact(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_EXACT)(ctx); }
+GR_INLINE truth_t gr_ctx_is_canonical(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_CANONICAL)(ctx); }
+
 GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
-GR_INLINE /* todo: warn */ int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
+GR_INLINE /* todo: warn? */ int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_neg_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_ONE)(res, ctx); }

@@ -1345,10 +1345,6 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
 
-    {GR_METHOD_CTX_IS_BASE_RING,        (gr_funcptr) gr_generic_ctx_predicate},
-    {GR_METHOD_CTX_IS_GR_POLY_RING,     (gr_funcptr) gr_generic_ctx_predicate},
-    {GR_METHOD_CTX_IS_GR_MPOLY_RING,    (gr_funcptr) gr_generic_ctx_predicate},
-    {GR_METHOD_CTX_IS_GR_MAT_RING,      (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_EXACT,            (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_CANONICAL,        (gr_funcptr) gr_generic_ctx_predicate},
 

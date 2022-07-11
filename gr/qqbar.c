@@ -522,6 +522,18 @@ _gr_qqbar_ctx_clear(gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_qqbar_ctx_is_algebraically_closed(gr_ctx_t ctx)
+{
+    return ctx->which_ring == GR_WHICH_RING_CC || GR_WHICH_RING_CC_ALGEBRAIC;
+}
+
+int
+_gr_qqbar_ctx_is_ordered_ring(gr_ctx_t ctx)
+{
+    return ctx->which_ring == GR_WHICH_RING_RR || GR_WHICH_RING_RR_ALGEBRAIC;
+}
+
 int _qqbar_methods_initialized = 0;
 
 gr_static_method_table _qqbar_methods;
@@ -533,7 +545,19 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_true},
-
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
+                                (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_FINITE,
+                                (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
+                                (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
+                                (gr_funcptr) _gr_qqbar_ctx_is_algebraically_closed},
+    {GR_METHOD_CTX_IS_ORDERED_RING,
+                                (gr_funcptr) _gr_qqbar_ctx_is_ordered_ring},
+    {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_CANONICAL,
+                                (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_qqbar_init},
 
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_qqbar_clear},
