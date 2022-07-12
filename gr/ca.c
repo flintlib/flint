@@ -732,7 +732,7 @@ gr_method_tab_input _ca_methods_input[] =
 void
 _gr_ctx_init_ca(gr_ctx_t ctx, int which_ring)
 {
-    ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->flags = 0;
     ctx->which_ring = which_ring;
     ctx->sizeof_elem = sizeof(ca_struct);
     ctx->elem_ctx = flint_malloc(sizeof(ca_ctx_struct));

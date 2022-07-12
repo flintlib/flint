@@ -493,7 +493,7 @@ gr_method_tab_input _fmpz_methods_input[] =
 void
 gr_ctx_init_fmpz(gr_ctx_t ctx)
 {
-    ctx->flags = GR_COMMUTATIVE_RING;
+    ctx->flags = 0;
     ctx->which_ring = GR_WHICH_RING_ZZ;
     ctx->sizeof_elem = sizeof(fmpz);
     ctx->elem_ctx = NULL;

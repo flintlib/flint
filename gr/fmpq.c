@@ -513,7 +513,7 @@ gr_method_tab_input _fmpq_methods_input[] =
 void
 gr_ctx_init_fmpq(gr_ctx_t ctx)
 {
-    ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->flags = 0;
     ctx->which_ring = GR_WHICH_RING_QQ;
     ctx->sizeof_elem = sizeof(fmpq);
     ctx->elem_ctx = NULL;

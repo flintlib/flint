@@ -637,9 +637,6 @@ gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
 {
     int status;
 
-    if (e > (ulong) ctx->size_limit)
-        return GR_UNABLE;
-
     if (e == 0)
     {
         return gr_one(res, ctx);

@@ -416,7 +416,7 @@ gr_method_tab_input _nmod8_methods_input[] =
 void
 gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
 {
-    ctx->flags = GR_COMMUTATIVE_RING;
+    ctx->flags = 0;
     ctx->which_ring = GR_WHICH_RING_ZZ_MOD;
     ctx->sizeof_elem = sizeof(nmod8_struct);
     ctx->size_limit = WORD_MAX;

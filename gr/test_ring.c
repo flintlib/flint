@@ -1118,7 +1118,7 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
     GR_MUST_SUCCEED(gr_randtest(xab, state, R));
     GR_MUST_SUCCEED(gr_randtest(xaxb, state, R));
 
-    if (R->flags & GR_FINITE_RING)
+    if (gr_ctx_is_finite(R) == T_TRUE)
     {
         do {
             a = n_randtest(state);
@@ -1144,7 +1144,9 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
     }
 
     if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+    {
         status = GR_TEST_FAIL;
+    }
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
@@ -1181,7 +1183,7 @@ gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int te
 
     y = n_randtest(state);
 
-    if (R->flags & GR_FINITE_RING)
+    if (gr_ctx_is_finite(R) == T_TRUE)
         a = n_randtest(state);
     else
         a = n_randtest(state) % 20;
@@ -1237,7 +1239,7 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flag
     GR_MUST_SUCCEED(gr_randtest(xa, state, R));
     GR_MUST_SUCCEED(gr_randtest(ya, state, R));
 
-    if (R->flags & GR_FINITE_RING)
+    if (gr_ctx_is_finite(R) == T_TRUE)
         a = n_randtest(state);
     else
         a = n_randtest(state) % 20;
@@ -1288,7 +1290,7 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
     GR_MUST_SUCCEED(gr_randtest(x, state, R));
     GR_MUST_SUCCEED(gr_randtest(xa1, state, R));
 
-    if (R->flags & GR_FINITE_RING)
+    if (gr_ctx_is_finite(R) == T_TRUE)
         a = n_randtest(state);
     else
         a = n_randtest(state) % 20;
@@ -1340,7 +1342,7 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flag
     GR_MUST_SUCCEED(gr_randtest(xab, state, R));
     GR_MUST_SUCCEED(gr_randtest(xaxb, state, R));
 
-    if (R->flags & GR_FINITE_RING)
+    if (gr_ctx_is_finite(R) == T_TRUE)
     {
         fmpz_randtest(a, state, 100);
         fmpz_randtest(b, state, 100);
@@ -1583,7 +1585,7 @@ gr_test_mat_mul_classical_associative(gr_ctx_t R, flint_rand_t state, int test_f
     gr_mat_t A, B, C, AB, BC, AB_C, A_BC;
     slong m, n, p, q;
 
-    if (R->flags & GR_FINITE_RING)
+    if (gr_ctx_is_finite(R) == T_TRUE)
     {
         m = n_randint(state, 5);
         n = n_randint(state, 5);

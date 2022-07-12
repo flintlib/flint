@@ -270,13 +270,6 @@ gr_method_tab_input;
 
 void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 
-/* Ring propery flags. These are not cumulative. (?) */
-
-#define GR_COMMUTATIVE_RING  UWORD(1)
-#define GR_INTEGRAL_DOMAIN   UWORD(2)
-#define GR_FIELD             UWORD(4)
-#define GR_FINITE_RING       UWORD(8)
-
 /* Identify specific rings/fields. */
 
 #define GR_WHICH_RING_CUSTOM             0

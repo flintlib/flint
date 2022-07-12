@@ -648,7 +648,7 @@ gr_method_tab_input _qqbar_methods_input[] =
 void
 gr_ctx_init_real_qqbar(gr_ctx_t ctx)
 {
-    ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->flags = 0;
     ctx->which_ring = GR_WHICH_RING_RR_ALGEBRAIC;
     ctx->sizeof_elem = sizeof(qqbar_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
@@ -670,7 +670,7 @@ gr_ctx_init_real_qqbar(gr_ctx_t ctx)
 void
 gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 {
-    ctx->flags = GR_COMMUTATIVE_RING | GR_FIELD;
+    ctx->flags = 0;
     ctx->which_ring = GR_WHICH_RING_CC_ALGEBRAIC;
     ctx->sizeof_elem = sizeof(qqbar_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
