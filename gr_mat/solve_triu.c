@@ -43,7 +43,11 @@ gr_mat_solve_triu_classical(gr_mat_t X,
                 gr_swap(GR_ENTRY(tmp, j, sz), s, ctx);
 
             if (status != GR_SUCCESS)
+            {
+                for (j = 0; j < n; j++)
+                    memcpy(GR_MAT_ENTRY(X, j, i, sz), GR_ENTRY(tmp, j, sz), sz);
                 goto cleanup;
+            }
         }
 
         for (j = 0; j < n; j++)
