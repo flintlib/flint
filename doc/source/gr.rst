@@ -306,6 +306,16 @@ Memory management
 
     Swaps *x* and *y* efficiently.
 
+.. function:: gr_ptr gr_heap_init(gr_ctx_t ctx)
+
+    Return a pointer to a single new heap-allocated element of *ctx*
+    set to 0.
+
+.. function:: void gr_heap_clear(gr_ptr x, gr_ctx_t ctx)
+
+    Free the single heap-allocated element *x* of *ctx* which should
+    have been created with :func:`gr_heap_init`.
+
 The following macros support allocating temporary variables efficiently.
 Data will be allocated on the stack using ``alloca`` unless
 the size is excessive (risking stack overflow), in which case

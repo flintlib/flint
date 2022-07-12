@@ -677,6 +677,20 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
         clear(x5, (ctx)); \
     } while (0)
 
+GR_INLINE gr_ptr gr_heap_init(gr_ctx_t ctx)
+{
+    gr_ptr ptr;
+    ptr = (gr_ptr) flint_malloc(ctx->sizeof_elem);
+    gr_init(ptr, ctx);
+    return ptr;
+}
+
+GR_INLINE void gr_heap_clear(gr_ptr x, gr_ctx_t ctx)
+{
+    gr_clear(x, ctx);
+    flint_free(x);
+}
+
 /* Some generic implementations */
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx);
