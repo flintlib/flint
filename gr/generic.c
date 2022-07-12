@@ -1390,6 +1390,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_FMPZ,                (gr_funcptr) gr_generic_set_fmpz},
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
+    {GR_METHOD_NEG,                     (gr_funcptr) gr_generic_neg},
+
     {GR_METHOD_ADD,                     (gr_funcptr) gr_generic_add},
     {GR_METHOD_ADD_UI,                  (gr_funcptr) gr_generic_add_ui},
     {GR_METHOD_ADD_SI,                  (gr_funcptr) gr_generic_add_si},

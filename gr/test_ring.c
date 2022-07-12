@@ -1708,6 +1708,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     timeit_t timer;
     flint_rand_t state;
 
+    /* test_flags |= GR_TEST_VERBOSE; */
+
     if (test_flags & GR_TEST_VERBOSE)
     {
         timeit_start(timer);

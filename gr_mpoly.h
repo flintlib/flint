@@ -137,6 +137,8 @@ truth_t gr_mpoly_is_zero(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cc
     return _gr_vec_is_zero(A->coeffs, A->length, cctx);
 }
 
+/* todo: is_one */
+
 WARN_UNUSED_RESULT int gr_mpoly_gen(gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
@@ -161,6 +163,20 @@ int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint
 
 int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 int gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+/* Constants */
+
+WARN_UNUSED_RESULT int gr_mpoly_set_scalar(gr_mpoly_t A, gr_srcptr c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_ui(gr_mpoly_t A, slong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_si(gr_mpoly_t A, slong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_fmpz(gr_mpoly_t A, const fmpz_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_fmpq(gr_mpoly_t A, const fmpq_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+GR_MPOLY_INLINE WARN_UNUSED_RESULT
+int gr_mpoly_one(gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+{
+    return gr_mpoly_set_ui(A, 1, mctx, cctx);
+}
 
 /* Coefficient/exponent access */
 

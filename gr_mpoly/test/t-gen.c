@@ -42,60 +42,66 @@ main(void)
         len = n_randint(state, 10);
         exp_bits = n_randint(state, 100) + 2;
 
-        gr_mpoly_randtest_bits(f1, state, len, exp_bits, mctx, cctx);
-        gr_mpoly_randtest_bits(f2, state, len, exp_bits, mctx, cctx);
+        status = gr_mpoly_zero(f1, mctx, cctx);
+        status = gr_mpoly_one(f2, mctx, cctx);
 
-        k1 = n_randint(state, FLINT_MAX(1, mctx->nvars));
-        k2 = n_randint(state, FLINT_MAX(1, mctx->nvars));
-
-        status = GR_SUCCESS;
-
-        status |= gr_mpoly_gen(f1, k1, mctx, cctx);
-        gr_mpoly_assert_canonical(f1, mctx, cctx);
-
-        status |= gr_mpoly_gen(f2, k2, mctx, cctx);
-        gr_mpoly_assert_canonical(f2, mctx, cctx);
-
-        eq1 = gr_mpoly_is_gen(f1, k1, mctx, cctx);
-        eq2 = gr_mpoly_is_gen(f1, -1, mctx, cctx);
-        eq3 = gr_mpoly_is_gen(f2, k2, mctx, cctx);
-        eq4 = gr_mpoly_is_gen(f2, -1, mctx, cctx);
-
-        if (status == GR_SUCCESS && (eq1 == T_FALSE || eq2 == T_FALSE || eq3 == T_FALSE || eq4 == T_FALSE))
+        if (gr_mpoly_equal(f1, f2, mctx, cctx) != T_TRUE)
         {
-            flint_printf("FAIL\n");
-            gr_ctx_println(cctx);
-            flint_printf("nvars = %wd\n", mctx->nvars);
-            flint_printf("f1 = "); gr_mpoly_print_pretty(f1, NULL, mctx, cctx); flint_printf("\n");
-            flint_printf("f2 = "); gr_mpoly_print_pretty(f2, NULL, mctx, cctx); flint_printf("\n");
-            flint_printf("k1 = %wd\n", k1);
-            flint_printf("k2 = %wd\n", k2);
-            flint_printf("eq = %d %d %d %d\n", eq1, eq2, eq3, eq4);
-            fflush(stdout);
-            flint_abort();
-        }
+            gr_mpoly_randtest_bits(f1, state, len, exp_bits, mctx, cctx);
+            gr_mpoly_randtest_bits(f2, state, len, exp_bits, mctx, cctx);
 
-        if (n_randint(state, 2))
-            status |= gr_mpoly_add(f1, f1, f2, mctx, cctx);
-        else
-            status |= gr_mpoly_mul(f1, f1, f2, mctx, cctx);
+            k1 = n_randint(state, FLINT_MAX(1, mctx->nvars));
+            k2 = n_randint(state, FLINT_MAX(1, mctx->nvars));
 
-        eq1 = gr_mpoly_is_gen(f1, k1, mctx, cctx);
-        eq2 = gr_mpoly_is_gen(f1, k2, mctx, cctx);
-        eq3 = gr_mpoly_is_gen(f1, -1, mctx, cctx);
+            status = GR_SUCCESS;
 
-        if (status == GR_SUCCESS && (eq1 == T_TRUE || eq2 == T_TRUE || eq3 == T_TRUE))
-        {
-            flint_printf("FAIL\n");
-            gr_ctx_println(cctx);
-            flint_printf("nvars = %wd\n", mctx->nvars);
-            flint_printf("f1 = "); gr_mpoly_print_pretty(f1, NULL, mctx, cctx); flint_printf("\n");
-            flint_printf("f2 = "); gr_mpoly_print_pretty(f2, NULL, mctx, cctx); flint_printf("\n");
-            flint_printf("k1 = %wd\n", k1);
-            flint_printf("k2 = %wd\n", k2);
-            flint_printf("eq = %d %d %d\n", eq1, eq2, eq3);
-            fflush(stdout);
-            flint_abort();
+            status |= gr_mpoly_gen(f1, k1, mctx, cctx);
+            gr_mpoly_assert_canonical(f1, mctx, cctx);
+
+            status |= gr_mpoly_gen(f2, k2, mctx, cctx);
+            gr_mpoly_assert_canonical(f2, mctx, cctx);
+
+            eq1 = gr_mpoly_is_gen(f1, k1, mctx, cctx);
+            eq2 = gr_mpoly_is_gen(f1, -1, mctx, cctx);
+            eq3 = gr_mpoly_is_gen(f2, k2, mctx, cctx);
+            eq4 = gr_mpoly_is_gen(f2, -1, mctx, cctx);
+
+            if (status == GR_SUCCESS && (eq1 == T_FALSE || eq2 == T_FALSE || eq3 == T_FALSE || eq4 == T_FALSE))
+            {
+                flint_printf("FAIL\n");
+                gr_ctx_println(cctx);
+                flint_printf("nvars = %wd\n", mctx->nvars);
+                flint_printf("f1 = "); gr_mpoly_print_pretty(f1, NULL, mctx, cctx); flint_printf("\n");
+                flint_printf("f2 = "); gr_mpoly_print_pretty(f2, NULL, mctx, cctx); flint_printf("\n");
+                flint_printf("k1 = %wd\n", k1);
+                flint_printf("k2 = %wd\n", k2);
+                flint_printf("eq = %d %d %d %d\n", eq1, eq2, eq3, eq4);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            if (n_randint(state, 2))
+                status |= gr_mpoly_add(f1, f1, f2, mctx, cctx);
+            else
+                status |= gr_mpoly_mul(f1, f1, f2, mctx, cctx);
+
+            eq1 = gr_mpoly_is_gen(f1, k1, mctx, cctx);
+            eq2 = gr_mpoly_is_gen(f1, k2, mctx, cctx);
+            eq3 = gr_mpoly_is_gen(f1, -1, mctx, cctx);
+
+            if (status == GR_SUCCESS && (eq1 == T_TRUE || eq2 == T_TRUE || eq3 == T_TRUE))
+            {
+                flint_printf("FAIL\n");
+                gr_ctx_println(cctx);
+                flint_printf("nvars = %wd\n", mctx->nvars);
+                flint_printf("f1 = "); gr_mpoly_print_pretty(f1, NULL, mctx, cctx); flint_printf("\n");
+                flint_printf("f2 = "); gr_mpoly_print_pretty(f2, NULL, mctx, cctx); flint_printf("\n");
+                flint_printf("k1 = %wd\n", k1);
+                flint_printf("k2 = %wd\n", k2);
+                flint_printf("eq = %d %d %d\n", eq1, eq2, eq3);
+                fflush(stdout);
+                flint_abort();
+            }
         }
 
         gr_mpoly_clear(f1, mctx, cctx);

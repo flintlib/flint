@@ -696,6 +696,8 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
 
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
+
+void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n);
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);

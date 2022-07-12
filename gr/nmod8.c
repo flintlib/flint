@@ -211,6 +211,13 @@ nmod8_inv(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
 
+    /* todo: also handle -1 fast? */
+    if (x[0] == 1)
+    {
+        res[0] = x[0];
+        return GR_SUCCESS;
+    }
+
     g = n_gcdinv(&r, x[0], NMOD8_CTX(ctx).n);
     if (g == 1)
     {

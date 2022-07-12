@@ -69,7 +69,7 @@ int main()
                 flint_abort();
             }
         }
-        else if ((status & GR_DOMAIN) && !(status & GR_UNABLE) && gr_ctx_is_integral_domain(ctx) == T_TRUE)
+        else if ((status & GR_DOMAIN) && !(status & GR_UNABLE) && gr_ctx_is_field(ctx) == T_TRUE)
         {
             gr_ptr det;
             int status2;

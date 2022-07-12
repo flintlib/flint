@@ -191,6 +191,12 @@ Base rings
     of integers modulo *n* where
     elements have type :type:`uint8`. We require `1 \le n \le 255`.
 
+.. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
+
+    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
+    of integers modulo *n* where
+    elements have type :type:`fmpz`. The modulus must be positive.
+
 .. function:: void gr_ctx_init_real_qqbar(gr_ctx_t ctx)
               void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 
