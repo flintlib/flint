@@ -3,7 +3,15 @@
 #include "flint/fmpz_mod_poly.h"
 #include "flint/fmpz_mod_mat.h"
 
-#define FMPZ_MOD_CTX(ring_ctx) (((fmpz_mod_ctx_struct *)((ring_ctx)->elem_ctx)))
+typedef struct
+{
+    fmpz_mod_ctx_struct ctx;
+    truth_t is_prime;
+}
+fmpz_mod_ctx_extended_struct;
+
+#define FMPZ_MOD_CTX(ring_ctx) (&(((fmpz_mod_ctx_extended_struct *)((ring_ctx)->elem_ctx))->ctx))
+#define FMPZ_MOD_IS_PRIME(ring_ctx) ((((fmpz_mod_ctx_extended_struct *)((ring_ctx)->elem_ctx))->is_prime))
 
 int
 _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -17,8 +25,19 @@ _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 void
 _gr_fmpz_mod_ctx_clear(gr_ctx_t ctx)
 {
-    fmpz_mod_ctx_clear(ctx->elem_ctx);
+    fmpz_mod_ctx_clear(FMPZ_MOD_CTX(ctx));
     flint_free(ctx->elem_ctx);
+}
+
+truth_t
+_gr_fmpz_mod_ctx_is_field(gr_ctx_t ctx)
+{
+/*
+    if (FMPZ_MOD_IS_PRIME(ctx) == T_UNKNOWN)
+        FMPZ_MOD_IS_PRIME(ctx) = fmpz_is_prime(FMPZ_MOD_CTX(ctx)->n) ? T_TRUE : T_FALSE;
+*/
+
+    return FMPZ_MOD_IS_PRIME(ctx);
 }
 
 void
@@ -407,13 +426,10 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpz_mod_ctx_write},
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fmpz_mod_ctx_clear},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
-/* todo: need to test primality, cache result... */
-/*
-    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
-    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) _gr_fmpz_mod_ctx_is_field},
+    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) _gr_fmpz_mod_ctx_is_field},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
-                                (gr_funcptr) gr_generic_ctx_predicate},
-*/
+                                (gr_funcptr) _gr_fmpz_mod_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
@@ -466,8 +482,9 @@ gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
     ctx->which_ring = GR_WHICH_RING_ZZ_MOD;
     ctx->sizeof_elem = sizeof(fmpz);
 
-    ctx->elem_ctx = flint_malloc(sizeof(fmpz_mod_ctx_struct));
-    fmpz_mod_ctx_init(ctx->elem_ctx, n);
+    ctx->elem_ctx = flint_malloc(sizeof(fmpz_mod_ctx_extended_struct));
+    fmpz_mod_ctx_init(FMPZ_MOD_CTX(ctx), n);
+    FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
 
     ctx->size_limit = WORD_MAX;
 
@@ -478,4 +495,10 @@ gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
         gr_method_tab_init(_fmpz_mod_methods, _fmpz_mod_methods_input);
         _fmpz_mod_methods_initialized = 1;
     }
+}
+
+void
+gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
+{
+    FMPZ_MOD_IS_PRIME(ctx) = is_prime;
 }

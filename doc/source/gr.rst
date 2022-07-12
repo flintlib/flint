@@ -197,6 +197,12 @@ Base rings
     of integers modulo *n* where
     elements have type :type:`fmpz`. The modulus must be positive.
 
+.. function:: void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
+
+    For a ring initialized with :func:`gr_ctx_init_fmpz_mod`,
+    indicate whether the modulus is prime. This can speed up
+    some computations.
+
 .. function:: void gr_ctx_init_real_qqbar(gr_ctx_t ctx)
               void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 
