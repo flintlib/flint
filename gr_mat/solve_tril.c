@@ -17,13 +17,29 @@ gr_mat_solve_tril_classical(gr_mat_t X,
         const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
 {
     slong i, j, n, m;
-    gr_ptr tmp;
+    gr_ptr tmp, inv;
     gr_ptr s;
+    int use_division = 0;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
 
     n = L->r;
     m = B->c;
+
+    if (!unit)
+    {
+        GR_TMP_INIT_VEC(inv, n, ctx);
+        for (i = 0; i < n; i++)
+        {
+            status = gr_inv(GR_ENTRY(inv, i, sz), GR_MAT_ENTRY(L, i, i, sz), ctx);
+            if (status != GR_SUCCESS)
+            {
+                use_division = 1;
+                status = GR_SUCCESS;
+                break;
+            }
+        }
+    }
 
     GR_TMP_INIT(s, ctx);
     tmp = flint_malloc(sz * n);
@@ -38,7 +54,12 @@ gr_mat_solve_tril_classical(gr_mat_t X,
             status |= _gr_vec_dot(s, GR_MAT_ENTRY(B, j, i, sz), 1, GR_MAT_ENTRY(L, j, 0, sz), tmp, j, ctx);
 
             if (!unit)
-                status |= gr_div(GR_ENTRY(tmp, j, sz), s, GR_MAT_ENTRY(L, j, j, sz), ctx);
+            {
+                if (use_division)
+                    status |= gr_div(GR_ENTRY(tmp, j, sz), s, GR_MAT_ENTRY(L, j, j, sz), ctx);
+                else
+                    status |= gr_mul(GR_ENTRY(tmp, j, sz), s, GR_ENTRY(inv, j, sz), ctx);
+            }
             else
                 gr_swap(GR_ENTRY(tmp, j, sz), s, ctx);
 
@@ -55,6 +76,11 @@ gr_mat_solve_tril_classical(gr_mat_t X,
     }
 
 cleanup:
+    if (!unit)
+    {
+        GR_TMP_CLEAR_VEC(inv, n, ctx);
+    }
+
     flint_free(tmp);
     GR_TMP_CLEAR(s, ctx);
 
