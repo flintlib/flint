@@ -280,6 +280,7 @@ void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 #define GR_WHICH_RING_CC                 5
 #define GR_WHICH_RING_RR_ALGEBRAIC       6
 #define GR_WHICH_RING_CC_ALGEBRAIC       7
+#define GR_WHICH_RING_FQ                 8
 
 typedef struct
 {
@@ -724,6 +725,8 @@ void gr_ctx_init_complex_ca(gr_ctx_t ctx);
 void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
 
+void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+
 /* Generic polynomial ring */
 
 typedef struct
@@ -750,6 +753,10 @@ matrix_ctx_t;
 #define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)->elem_ctx))
 
 void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
+
+/* Multivariate */
+
+void gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
 
 /* Testing */
 

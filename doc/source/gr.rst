@@ -203,6 +203,12 @@ Base rings
     indicate whether the modulus is prime. This can speed up
     some computations.
 
+.. function:: void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+
+    Initializes *ctx* to the finite field `\mathbb{F}_q`
+    where `q = p^d`. It is assumed (not checked) that *p* is prime.
+    The variable name *var* can be ``NULL`` to use a default.
+
 .. function:: void gr_ctx_init_real_qqbar(gr_ctx_t ctx)
               void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 

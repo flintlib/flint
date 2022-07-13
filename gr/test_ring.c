@@ -1688,6 +1688,63 @@ gr_test_integral_domain(gr_ctx_t R, flint_rand_t state, int test_flags)
     {
         printf("integral domain is not a commutative ring\n");
         printf("\n");
+        status = GR_TEST_FAIL;
+    }
+
+    GR_TMP_CLEAR3(x, y, z, R);
+
+    return status;
+}
+
+int
+gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y, z;
+
+    GR_TMP_INIT3(x, y, z, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+
+    if (gr_is_zero(x, R) == T_FALSE)
+    {
+        if (gr_is_invertible(x, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+
+        if (gr_inv(y, x, R) == GR_DOMAIN)
+        {
+            status = GR_TEST_FAIL;
+        }
+
+        if (gr_div(z, y, x, R) == GR_DOMAIN)
+        {
+            status = GR_TEST_FAIL;
+        }
+
+        if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+        {
+            printf("\n");
+            printf("x = \n"); gr_println(x, R);
+            printf("y = \n"); gr_println(y, R);
+            printf("z = \n"); gr_println(z, R);
+            printf("\n");
+        }
+    }
+
+    if (gr_ctx_is_commutative_ring(R) == T_FALSE)
+    {
+        printf("field is not a commutative ring\n");
+        printf("\n");
+        status = GR_TEST_FAIL;
+    }
+
+    if (gr_ctx_is_integral_domain(R) == T_FALSE)
+    {
+        printf("field is not an integral domain\n");
+        printf("\n");
+        status = GR_TEST_FAIL;
     }
 
     GR_TMP_CLEAR3(x, y, z, R);
@@ -1793,6 +1850,9 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     if (gr_ctx_is_integral_domain(R) == T_TRUE)
         gr_test_iter(R, state, "integral_domain", gr_test_integral_domain, iters, test_flags);
+
+    if (gr_ctx_is_field(R) == T_TRUE)
+        gr_test_iter(R, state, "field", gr_test_integral_domain, iters, test_flags);
 
     gr_test_iter(R, state, "div: distributive", gr_test_div_right_distributive, iters, test_flags);
     gr_test_iter(R, state, "div: div then mul", gr_test_div_then_mul, iters, test_flags);

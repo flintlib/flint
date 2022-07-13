@@ -4,17 +4,25 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 {
     int which = n_randint(state, 100);
 
-    if (which < 30)
+    if (which < 25)
         gr_ctx_init_fmpz(ctx);
-    else if (which < 45)
+    else if (which < 40)
         gr_ctx_init_nmod8(ctx, (n_randtest(state) % 256) || 1);
-    else if (which < 55)
+    else if (which < 50)
     {
         fmpz_t t;
         fmpz_init(t);
         fmpz_randtest_not_zero(t, state, 100);
         fmpz_abs(t, t);
         gr_ctx_init_fmpz_mod(ctx, t);
+        fmpz_clear(t);
+    }
+    else if (which < 65)
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_randprime(t, state, 2 + n_randint(state, 100), 0);
+        gr_ctx_init_fq(ctx, t, 1 + n_randint(state, 4), NULL);
         fmpz_clear(t);
     }
     else if (which < 60)
