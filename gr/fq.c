@@ -222,6 +222,81 @@ _gr_fq_sqrt(fq_t res, const fq_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_ctx_fq_prime(fmpz_t p, gr_ctx_t ctx)
+{
+    fmpz_set(p, fq_ctx_prime(FQ_CTX(ctx)));
+    return GR_SUCCESS;
+}
+
+int
+_gr_ctx_fq_degree(slong * deg, gr_ctx_t ctx)
+{
+    *deg = fq_ctx_degree(FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
+{
+    fq_ctx_order(q, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_gen(gr_ptr res, gr_ctx_t ctx)
+{
+    fq_gen(res, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
+{
+    fq_frobenius(res, x, e, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int ret;
+    ret = fq_multiplicative_order(res, x, FQ_CTX(ctx));
+
+    if (ret == 1)
+        return GR_SUCCESS;
+
+    /* todo: better solution? */
+    return GR_DOMAIN;
+}
+
+int
+_gr_fq_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+{
+    fq_norm(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+{
+    fq_trace(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+truth_t
+_gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx)
+{
+    return fq_is_primitive(x, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+int
+_gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    fq_pth_root(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_fq_poly_mullow(fq_struct * res,
     const fq_struct * poly1, slong len1,
     const fq_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -292,6 +367,18 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_div},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_sqrt},
+
+    {GR_METHOD_CTX_FQ_PRIME,            (gr_funcptr) _gr_ctx_fq_prime},
+    {GR_METHOD_CTX_FQ_DEGREE,           (gr_funcptr) _gr_ctx_fq_degree},
+    {GR_METHOD_CTX_FQ_ORDER,            (gr_funcptr) _gr_ctx_fq_order},
+    {GR_METHOD_FQ_GEN,                  (gr_funcptr) _gr_fq_gen},
+    {GR_METHOD_FQ_FROBENIUS,            (gr_funcptr) _gr_fq_frobenius},
+    {GR_METHOD_FQ_MULTIPLICATIVE_ORDER, (gr_funcptr) _gr_fq_multiplicative_order},
+    {GR_METHOD_FQ_NORM,                 (gr_funcptr) _gr_fq_norm},
+    {GR_METHOD_FQ_TRACE,                (gr_funcptr) _gr_fq_trace},
+    {GR_METHOD_FQ_IS_PRIMITIVE,         (gr_funcptr) _gr_fq_is_primitive},
+    {GR_METHOD_FQ_PTH_ROOT,             (gr_funcptr) _gr_fq_pth_root},
+
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_mat_mul},
     {0,                         (gr_funcptr) NULL},

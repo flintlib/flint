@@ -646,6 +646,29 @@ Ordering methods
     of *x* is less than, equal or greater than the absolute value of *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
+Finite field methods
+--------------------------------------------------------------------------------
+
+.. function:: int gr_ctx_fq_prime(fmpz_t p, gr_ctx_t ctx)
+
+.. function:: int gr_ctx_fq_degree(slong * deg, gr_ctx_t ctx)
+
+.. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
+
+.. function:: int gr_fq_gen(gr_ptr res, gr_ctx_t ctx)
+
+.. function:: int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
+
+.. function:: int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_fq_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_fq_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
 Vectors
 --------------------------------------------------------------------------------
 

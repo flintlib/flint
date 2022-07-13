@@ -223,6 +223,18 @@ typedef enum
     GR_METHOD_CMP,
     GR_METHOD_CMPABS,
 
+    /* Finite field methods */
+    GR_METHOD_CTX_FQ_PRIME,
+    GR_METHOD_CTX_FQ_DEGREE,
+    GR_METHOD_CTX_FQ_ORDER,
+    GR_METHOD_FQ_GEN,
+    GR_METHOD_FQ_FROBENIUS,
+    GR_METHOD_FQ_MULTIPLICATIVE_ORDER,
+    GR_METHOD_FQ_NORM,
+    GR_METHOD_FQ_TRACE,
+    GR_METHOD_FQ_IS_PRIMITIVE,
+    GR_METHOD_FQ_PTH_ROOT,
+
     /* Vector methods */
     GR_METHOD_VEC_INIT,
     GR_METHOD_VEC_CLEAR,
@@ -310,11 +322,14 @@ typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_constant_op_get_si)(slong *, gr_ctx_ptr));
+typedef int ((*gr_method_constant_op_get_fmpz)(fmpz_t, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_si)(gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_ui)(gr_ptr, ulong, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_fmpz)(gr_ptr, const fmpz_t, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_fmpq)(gr_ptr, const fmpq_t, gr_ctx_ptr));
+typedef int ((*gr_method_unary_op_get_fmpz)(fmpz_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_si)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_ui)(gr_ptr, gr_srcptr, ulong, gr_ctx_ptr));
@@ -351,11 +366,14 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_INIT_CLEAR_OP(ctx, NAME) (((gr_method_init_clear_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SWAP_OP(ctx, NAME) (((gr_method_swap_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CONSTANT_OP(ctx, NAME) (((gr_method_constant_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CONSTANT_OP_GET_SI(ctx, NAME) (((gr_method_constant_op_get_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CONSTANT_OP_GET_FMPZ(ctx, NAME) (((gr_method_constant_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP(ctx, NAME) (((gr_method_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_SI(ctx, NAME) (((gr_method_unary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_UI(ctx, NAME) (((gr_method_unary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_FMPZ(ctx, NAME) (((gr_method_unary_op_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_FMPQ(ctx, NAME) (((gr_method_unary_op_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_GET_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_SI(ctx, NAME) (((gr_method_binary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_UI(ctx, NAME) (((gr_method_binary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -485,6 +503,18 @@ GR_INLINE WARN_UNUSED_RESULT int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) 
 
 GR_INLINE WARN_UNUSED_RESULT int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMP)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMPABS)(res, x, y, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_order(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_ORDER)(res, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_fq_gen(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, FQ_GEN)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, FQ_FROBENIUS)(res, x, e, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_MULTIPLICATIVE_ORDER)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_fq_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_NORM)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_fq_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_TRACE)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, FQ_IS_PRIMITIVE)(x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FQ_PTH_ROOT)(res, x, ctx); }
 
 GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
 GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
