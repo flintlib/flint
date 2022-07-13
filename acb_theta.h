@@ -3,7 +3,11 @@
 #define ACB_MODULAR_H
 
 #include <stdio.h>
+#include "flint/fmpz_mat.h"
+#include "arb.h"
 #include "acb.h"
+#include "arb_mat.h"
+#include "acb_mat.h"
 
 /* #ifdef __cplusplus
 extern "C" {
@@ -11,8 +15,7 @@ extern "C" {
 
 
 /* General comments:
-   - Throughout, the matrix tau is assumed to be square of size g
-   - In case a computation fails, output values are set to the full complex plane, according to conventions in acb_modular.h
+   - In case a computation fails, output values are set to NaNs if possible, otherwise abort
    - A suffix sqr indicates that we compute squares of theta values
    - A suffix proj indicates that we compute theta values up to common scaling, and derivatives of those
    - A suffix half indicates that theta values are taken at tau/2
@@ -25,47 +28,89 @@ extern "C" {
    - Mixed algorithm is guaranteed to be uniform quasi-linear time on the Siegel fundamental domain if g <= 2
    - Vector lengths for theta values are 2^g in general, 2^(2g) in case of _all
    - Elements of the modular group Sp_2g(ZZ) are encoded as fmpz_mat's
-   - Output values (not marked 'const') are always assumed to be initialized, with correct lengths in case of vectors
-   - Naive algorithms are based on sums over ellipsoids. They accept an 'enum' argument, for optimization in case many values are needed for a given tau (may be NULL)
-   - 
 */
+
 
 /* Argument reduction */
 
 void acb_theta_reduce_tau(fmpz_mat_t m, acb_mat_t tau, slong prec);
 
 
+/* Ellipsoids for naive algorithms */
+
+struct arb_eld_struct
+{
+  slong dim;
+  slong ambient_dim;
+  slong* last_coords;
+  arb_struct* offset;
+  arb_struct normsqr;
+  
+  arb_struct ctr;
+  arb_struct rad;
+  slong min, mid, max, step;
+  struct arb_eld_struct* rchildren;
+  slong nr;
+  struct arb_eld_struct* lchildren;
+  slong nl;
+  slong nb_pts;
+};
+
+typedef struct arb_eld_struct arb_eld_t[1];
+
+#define arb_eld_dim(E) ((E)->dim)
+#define arb_eld_ambient_dim(E) ((E)->ambient_dim)
+#define arb_eld_coord(E, k) ((E)->last_coords[(k) - arb_eld_dim(E)])
+#define arb_eld_offset(E) ((E)->offset)
+#define arb_eld_normsqr(E) (&(E)->normsqr)
+#define arb_eld_ctr(E) (&(E)->ctr)
+#define arb_eld_rad(E) (&(E)->rad)
+#define arb_eld_min(E) ((E)->min)
+#define arb_eld_mid(E) ((E)->mid)
+#define arb_eld_max(E) ((E)->max)
+#define arb_eld_step(E) ((E)->step)
+#define arb_eld_rchild(E, k) (&(E)->rchildren[(k)])
+#define arb_eld_lchild(E, k) (&(E)->lchildren[(k)])
+#define arb_eld_nr(E) ((E)->nr)
+#define arb_eld_nl(E) ((E)->nl)
+#define arb_eld_nb_pts(E) ((E)->nb_pts)
+
+void arb_eld_init(arb_eld_t E, slong d, slong g);
+
+void arb_eld_clear(arb_eld_t E);
+
+void arb_eld_init_children(arb_eld_t E, slong nr, slong nl);
+
+void arb_eld_interval(slong* nmin, slong* nmid, slong* nmax,
+		      const arb_t ctr, const arb_t rad, int a, slong prec);
+
+void arb_eld_next_normsqr(arb_t next_normsqr, const arb_t normsqr, const arb_t gamma,
+			  const arb_t ctr, slong k, slong prec);
+
+void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
+		  arb_srcptr offset, slong* last_coords, ulong a, slong prec);
+
+void arb_eld_points(slong* pts, const arb_eld_t E);
+
+
 /* Naive algorithms */
 
-void acb_theta_tail_ubound(arb_t B, const arb_t R, const arb_mat_t Y, slong p, slong g, slong prec);
+void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p, slong prec);
 
-void acb_theta_naive_radius(arb_t R, const arb_mat_t Y, const acb_t tau, slong p, const arb_t epsilon, slong prec);
+void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p, const arf_t epsilon, slong prec);
 
-/* Todo: define a structure for easy ellipsoid enumeration */
 
-typedef struct
-{
-  arb_mat_struct Y;
-}
-acb_theta_enum_struct;
+void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
-typedef acb_theta_enum_t acb_theta_enum_struct[1];
+void acb_theta_const_naive(acb_ptr th, const acb_mat_t tau, slong prec);
 
-void acb_theta_enum_init(acb_theta_enum_t en);
+void acb_theta_all_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
-/* Init, clear, set, get lattice vectors in some ordering, addition chains? */
+void acb_theta_const_all_naive(acb_ptr th, const acb_mat_t tau, slong prec);
 
-void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, const acb_theta_enum_t en, slong prec);
+void acb_theta_ind_naive(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec);
 
-void acb_theta_const_naive(acb_ptr th, const acb_mat_t tau, const acb_theta_enum_t en, slong prec);
-
-void acb_theta_all_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, const acb_theta_enum_t en, slong prec);
-
-void acb_theta_const_all_naive(acb_ptr th, const acb_mat_t tau, const acb_theta_enum_t en, slong prec);
-
-void acb_theta_ind_naive(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, const acb_theta_enum_t en, slong prec);
-
-void acb_theta_const_ind_naive(acb_t th, ulong ab, const acb_mat_t tau, const acb_theta_enum_t en, slong prec);
+void acb_theta_const_ind_naive(acb_t th, ulong ab, const acb_mat_t tau, slong prec);
 
 
 slong acb_theta_nb_partials(slong ord, slong nvars);
@@ -75,9 +120,9 @@ void acb_theta_partial(slong* tup, slong k, slong ord, slong nvars);
 slong acb_theta_partial_index(slong* tup, slong ord, slong nvars);
 
 
-void acb_theta_jet_naive(acb_mat_struct* th, acb_srcptr z, const acb_mat_t tau, const acb_theta_enum_t en, slong ord, slong prec);
+void acb_theta_jet_naive(acb_mat_struct* th, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
 
-void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau, const acb_theta_enum_t en, slong ord, slong prec);
+void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau, slong ord, slong prec);
 
 
 /* AGM algorithms */
