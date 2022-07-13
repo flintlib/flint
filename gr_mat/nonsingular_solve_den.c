@@ -14,7 +14,7 @@
 
 /* todo: algorithm selection */
 int
-gr_mat_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+gr_mat_nonsingular_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    return gr_mat_solve_den_fflu(X, den, A, B, ctx);
+    return gr_mat_nonsingular_solve_den_fflu(X, den, A, B, ctx);
 }

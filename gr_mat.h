@@ -138,15 +138,15 @@ WARN_UNUSED_RESULT int gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_
 
 WARN_UNUSED_RESULT int gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_solve_fflu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_lu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_fflu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_det_bareiss(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
@@ -182,13 +182,13 @@ WARN_UNUSED_RESULT int gr_mat_hadamard(gr_mat_t mat, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 

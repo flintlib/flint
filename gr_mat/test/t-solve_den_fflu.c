@@ -56,7 +56,7 @@ int main()
         status |= gr_mat_randtest(X, state, ctx);
         status |= gr_mat_randtest(B, state, ctx);
 
-        status |= gr_mat_solve_den_fflu(X, den, A, B, ctx);
+        status |= gr_mat_nonsingular_solve_den_fflu(X, den, A, B, ctx);
 
         if (status == GR_SUCCESS)
         {

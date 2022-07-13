@@ -13,7 +13,7 @@
 #include "gr_mat.h"
 
 int
-gr_mat_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+gr_mat_nonsingular_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     slong rank, n, m, *perm;
@@ -28,12 +28,12 @@ gr_mat_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B
     perm = _perm_init(n);
     gr_mat_init(LU, n, n, ctx);
 
-    status = gr_mat_fflu(&rank, perm, LU, den, A, 1, ctx);
+    status = gr_mat_lu(&rank, perm, LU, A, 1, ctx);
 
     if (status == GR_SUCCESS && rank == n)
     {
         if (m != 0)
-            status |= gr_mat_solve_fflu_precomp(X, perm, LU, B, ctx);
+            status |= gr_mat_nonsingular_solve_lu_precomp(X, perm, LU, B, ctx);
     }
     else
     {

@@ -294,6 +294,10 @@ gr_ctx_struct;
 
 typedef gr_ctx_struct gr_ctx_t[1];
 
+GR_INLINE slong gr_ctx_sizeof_elem(gr_ctx_t ctx)
+{
+    return ctx->sizeof_elem;
+}
 
 /* Typedefs for method function pointers. */
 

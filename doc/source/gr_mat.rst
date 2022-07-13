@@ -251,12 +251,12 @@ Gaussian elimination
 Solving
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
-              int gr_mat_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
-              int gr_mat_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
-              int gr_mat_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
-              int gr_mat_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
-              int gr_mat_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+.. function:: int gr_mat_nonsingular_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
 
     Solves the lower triangular system `LX = B` or the upper triangular system
     `UX = B`, respectively. Division by the the diagonal entries must
@@ -271,20 +271,20 @@ Solving
     way to benefit from fast matrix multiplication. The default versions
     choose an algorithm automatically.
 
-.. function:: int gr_mat_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+.. function:: int gr_mat_nonsingular_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
-    Solves `AX = B`. If *A* is not invertible, currently
+    Solves `AX = B`. If *A* is not invertible,
     returns ``GR_DOMAIN`` even if the system has a solution.
 
-.. function:: int gr_mat_solve_fflu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_solve_lu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)
+.. function:: int gr_mat_nonsingular_solve_fflu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)
 
     Solves `AX = B` given a precomputed FFLU or LU factorization of *A*.
 
-.. function:: int gr_mat_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+.. function:: int gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     Solves `AX = B` over the fraction field of the present ring
     (assumed to be an integral domain), returning `X` with
@@ -390,7 +390,7 @@ Inverse and adjugate
     returns ``GR_UNABLE``.
 
     To compute the inverse over the fraction field, one may use
-    :func:`gr_mat_solve_den` or :func:`gr_mat_adjugate`.
+    :func:`gr_mat_nonsingular_solve_den` or :func:`gr_mat_adjugate`.
 
 .. function:: int gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_adjugate_cofactor(gr_mat_t adj, gr_ptr det, const gr_mat_t mat, gr_ctx_t ctx)

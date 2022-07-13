@@ -13,7 +13,7 @@
 
 /* todo: check that dimensions are compatible */
 int
-gr_mat_solve_lu_precomp(gr_mat_t X, const slong * perm,
+gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slong * perm,
     const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
@@ -50,8 +50,8 @@ gr_mat_solve_lu_precomp(gr_mat_t X, const slong * perm,
     }
 
     /* todo: inline for small n? */
-    status |= gr_mat_solve_tril(X, A, X, 1, ctx);
-    status |= gr_mat_solve_triu(X, A, X, 0, ctx);
+    status |= gr_mat_nonsingular_solve_tril(X, A, X, 1, ctx);
+    status |= gr_mat_nonsingular_solve_triu(X, A, X, 0, ctx);
 
     return status;
 }

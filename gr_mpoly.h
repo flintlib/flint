@@ -137,8 +137,6 @@ truth_t gr_mpoly_is_zero(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cc
     return _gr_vec_is_zero(A->coeffs, A->length, cctx);
 }
 
-/* todo: is_one */
-
 WARN_UNUSED_RESULT int gr_mpoly_gen(gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
@@ -176,6 +174,19 @@ GR_MPOLY_INLINE WARN_UNUSED_RESULT
 int gr_mpoly_one(gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx)
 {
     return gr_mpoly_set_ui(A, 1, mctx, cctx);
+}
+
+/* todo: efficient version */
+GR_MPOLY_INLINE
+truth_t gr_mpoly_is_one(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+{
+    gr_mpoly_t t;
+    truth_t res = T_UNKNOWN;
+    gr_mpoly_init(t, mctx, cctx);
+    if (gr_mpoly_one(t, mctx, cctx) == GR_SUCCESS)
+        res = gr_mpoly_equal(A, t, mctx, cctx);
+    gr_mpoly_clear(t, mctx, cctx);
+    return res;
 }
 
 /* Coefficient/exponent access */

@@ -1655,6 +1655,46 @@ gr_test_mat_mul_classical_associative(gr_ctx_t R, flint_rand_t state, int test_f
     return status;
 }
 
+int
+gr_test_integral_domain(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y, z;
+
+    GR_TMP_INIT3(x, y, z, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+    status |= gr_mul(z, x, y, R);
+
+    if (status == GR_SUCCESS && gr_is_zero(x, R) == T_FALSE && gr_is_zero(y, R) == T_FALSE && gr_is_zero(z, R) == T_TRUE)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("\n");
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("z = \n"); gr_println(z, R);
+        printf("\n");
+    }
+
+    if (gr_ctx_is_commutative_ring(R) == T_FALSE)
+    {
+        printf("integral domain is not a commutative ring\n");
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR3(x, y, z, R);
+
+    return status;
+}
+
 void
 gr_test_iter(gr_ctx_t R, flint_rand_t state, const char * descr, gr_test_function func, slong iters, int test_flags)
 {
@@ -1750,6 +1790,9 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters, test_flags);
     gr_test_iter(R, state, "mul: left distributive", gr_test_mul_left_distributive, iters, test_flags);
     gr_test_iter(R, state, "mul: right distributive", gr_test_mul_right_distributive, iters, test_flags);
+
+    if (gr_ctx_is_integral_domain(R) == T_TRUE)
+        gr_test_iter(R, state, "integral_domain", gr_test_integral_domain, iters, test_flags);
 
     gr_test_iter(R, state, "div: distributive", gr_test_div_right_distributive, iters, test_flags);
     gr_test_iter(R, state, "div: div then mul", gr_test_div_then_mul, iters, test_flags);

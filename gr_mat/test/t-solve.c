@@ -52,7 +52,7 @@ int main()
         status |= gr_mat_randtest(X, state, ctx);
         status |= gr_mat_randtest(B, state, ctx);
 
-        status |= gr_mat_solve(X, A, B, ctx);
+        status |= gr_mat_nonsingular_solve(X, A, B, ctx);
 
         if (status == GR_SUCCESS)
         {

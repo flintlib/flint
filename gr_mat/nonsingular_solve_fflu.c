@@ -13,7 +13,7 @@
 #include "gr_mat.h"
 
 int
-gr_mat_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+gr_mat_nonsingular_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     int status;
     gr_ptr den;
@@ -21,7 +21,7 @@ gr_mat_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     GR_TMP_INIT(den, ctx);
 
-    status = gr_mat_solve_den_fflu(X, den, A, B, ctx);
+    status = gr_mat_nonsingular_solve_den_fflu(X, den, A, B, ctx);
 
     m = gr_mat_ncols(X, ctx);
 

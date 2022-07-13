@@ -107,7 +107,7 @@ gr_mat_rref_lu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
         for (j = 0; j < rank; j++)
             status |= gr_set(GR_MAT_ENTRY(V, j, i, sz), GR_MAT_ENTRY(R, j, nonpivots[i], sz), ctx);
 
-    status |= gr_mat_solve_triu(V, U, V, 0, ctx);
+    status |= gr_mat_nonsingular_solve_triu(V, U, V, 0, ctx);
 
     /* Clear pivot columns */
     for (i = 0; i < rank; i++)

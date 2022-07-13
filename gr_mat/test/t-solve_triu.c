@@ -79,12 +79,12 @@ int main()
         /* Check Y = A^(-1) * (A * X) = X */
         if (n_randint(state, 2))
         {
-            status |= gr_mat_solve_triu(Y, A, B, unit, ctx);
+            status |= gr_mat_nonsingular_solve_triu(Y, A, B, unit, ctx);
         }
         else
         {
             status |= gr_mat_set(Y, B, ctx);
-            status |= gr_mat_solve_triu(Y, A, Y, unit, ctx);
+            status |= gr_mat_nonsingular_solve_triu(Y, A, Y, unit, ctx);
         }
 
         if (status == GR_SUCCESS && gr_mat_equal(Y, X, ctx) == T_FALSE)
