@@ -756,6 +756,8 @@ void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
 
 void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 
 /* Generic polynomial ring */
 

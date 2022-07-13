@@ -307,7 +307,6 @@ _gr_fq_poly_mullow(fq_struct * res,
         _fq_poly_mullow(res, poly2, len2, poly1, len1, n, FQ_CTX(ctx));
 
     return GR_SUCCESS;
-
 }
 
 int

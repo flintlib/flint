@@ -204,10 +204,17 @@ Base rings
     some computations.
 
 .. function:: void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+              void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+              void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initializes *ctx* to the finite field `\mathbb{F}_q`
     where `q = p^d`. It is assumed (not checked) that *p* is prime.
     The variable name *var* can be ``NULL`` to use a default.
+
+    The corresponding element types are ``fq_t``, ``fq_nmod_t``, ``fq_zech_t``.
+    The ``fq_nmod`` context requires `p < 2^{64}` while ``fq_zech``
+    requires `q < 2^{64}` (and in practice a much smaller value
+    than this).
 
 .. function:: void gr_ctx_init_real_qqbar(gr_ctx_t ctx)
               void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
