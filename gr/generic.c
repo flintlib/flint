@@ -516,18 +516,28 @@ int gr_generic_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
 
 int gr_generic_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 {
-    gr_ptr t;
+    fmpq_t t;
     int status;
 
-    status = GR_SUCCESS;
+    if (fmpq_is_zero(y))   /* for non-rings? */
+    {
+        gr_ptr t;
+        status = GR_SUCCESS;
 
-    GR_TMP_INIT(t, ctx);
+        GR_TMP_INIT(t, ctx);
 
-    status |= gr_set_fmpq(t, y, ctx);
-    if (status == GR_SUCCESS)
-        status = gr_div(res, x, t, ctx);
+        status |= gr_set_fmpq(t, y, ctx);
+        if (status == GR_SUCCESS)
+            status = gr_div(res, x, t, ctx);
 
-    GR_TMP_CLEAR(t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+
+    fmpq_init(t);
+    fmpq_inv(t, y);
+    status = gr_mul_fmpq(res, x, t, ctx);
+    fmpq_clear(t);
     return status;
 }
 
