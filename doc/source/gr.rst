@@ -286,7 +286,8 @@ Context operations
     the string with ``flint_free``).
     The *println* version prints a trailing newline.
 
-.. function:: truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx)
+.. function:: truth_t gr_ctx_is_ring(gr_ctx_t ctx)
+              truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx)
               truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx)
               truth_t gr_ctx_is_field(gr_ctx_t ctx)
               truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)

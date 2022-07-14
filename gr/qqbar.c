@@ -77,16 +77,50 @@ _gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* todo */
+/* todo: different styles */
+
+
+void
+qqbar_get_decimal_root_nearest(char ** re_s, char ** im_s, const qqbar_t x, slong default_digits);
+
 int
 _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
 {
-    fexpr_t expr;
-    fexpr_init(expr);
+    char *re_s, *im_s;
 
-    qqbar_get_fexpr_root_nearest(expr, x);
-    gr_stream_write_free(out, fexpr_get_str_latex(expr, FEXPR_LATEX_SMALL));
-    fexpr_clear(expr);
+    if (qqbar_is_rational(x))
+    {
+        fmpq_t t;
+        fmpq_init(t);
+        qqbar_get_fmpq(t, x);
+        gr_stream_write_fmpz(out, fmpq_numref(t));
+        if (!fmpz_is_one(fmpq_denref(t)))
+        {
+            gr_stream_write(out, "/");
+            gr_stream_write_fmpz(out, fmpq_denref(t));
+        }
+        fmpq_clear(t);
+    }
+    else
+    {
+        qqbar_get_decimal_root_nearest(&re_s, &im_s, x, 6);
+
+        gr_stream_write(out, "Root a = ");
+
+        if (re_s != NULL)
+        {
+            gr_stream_write_free(out, re_s);
+        }
+
+        if (im_s != NULL)
+        {
+            gr_stream_write(out, " + ");
+            gr_stream_write_free(out, im_s);
+            gr_stream_write(out, "i");
+        }
+        gr_stream_write(out, " of ");
+        gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
+    }
 
     return GR_SUCCESS;
 }
