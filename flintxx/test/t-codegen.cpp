@@ -808,7 +808,7 @@ main(int argc, char** argv)
         test_poly();
         test_nmod();
     }
-    catch(skippable_exception e)
+    catch (const skippable_exception& e)
     {
         std::cout << "SKIP (" << e.what() << ")\n";
         return 0;
