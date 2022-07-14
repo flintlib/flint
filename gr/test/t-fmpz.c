@@ -10,7 +10,7 @@ int main()
 
     gr_ctx_init_fmpz(ZZ);
     ZZ->size_limit = 1000;
-    gr_test_ring(ZZ, 10000, flags);
+    gr_test_ring(ZZ, 100000, flags);
 
     {
         fmpz * a, *b;

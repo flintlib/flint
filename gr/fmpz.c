@@ -169,9 +169,30 @@ _gr_fmpz_sub(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_sub_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    fmpz_sub_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpz_sub_ui(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_mul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_mul(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpz_mul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
@@ -246,8 +267,6 @@ _gr_fmpz_is_invertible(const fmpz_t x, const gr_ctx_t ctx)
     return fmpz_is_pm1(x) ? T_TRUE : T_FALSE;
 }
 
-/* todo: overload pow_fmpz? */
-
 int
 _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
 {
@@ -259,6 +278,51 @@ _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
     {
         fmpz_pow_ui(res, x, exp);
         return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpz_pow_si(fmpz_t res, const fmpz_t x, slong exp, const gr_ctx_t ctx)
+{
+    if (exp < 0)
+    {
+        if (exp == -1 && fmpz_is_pm1(x))
+        {
+            fmpz_set(res, x);
+            return GR_SUCCESS;
+        }
+
+        return GR_DOMAIN;
+    }
+    else
+    {
+        return _gr_fmpz_pow_ui(res, x, exp, ctx);
+    }
+}
+
+int
+_gr_fmpz_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*exp))
+    {
+        return _gr_fmpz_pow_si(res, x, *exp, ctx);
+    }
+    else if (fmpz_is_pm1(x))
+    {
+        if (fmpz_is_one(x) || fmpz_is_even(exp))
+            fmpz_one(res);
+        else
+            fmpz_set_si(res, -1);
+        return GR_SUCCESS;
+    }
+    else if (fmpz_is_zero(x) && fmpz_sgn(exp) > 0)
+    {
+        fmpz_zero(res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
     }
 }
 
@@ -465,9 +529,15 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpz_add_ui},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_fmpz_add_si},
+    {GR_METHOD_ADD_FMPZ,        (gr_funcptr) _gr_fmpz_add},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_fmpz_sub},
+    {GR_METHOD_SUB_UI,          (gr_funcptr) _gr_fmpz_sub_ui},
+    {GR_METHOD_SUB_SI,          (gr_funcptr) _gr_fmpz_sub_si},
+    {GR_METHOD_SUB_FMPZ,        (gr_funcptr) _gr_fmpz_sub},
     {GR_METHOD_MUL,             (gr_funcptr) _gr_fmpz_mul},
+    {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_fmpz_mul_ui},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fmpz_mul_si},
+    {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fmpz_mul},
     {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_fmpz_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_fmpz_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mul_two},
@@ -476,6 +546,9 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_pow_ui},
+    {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpz_pow_si},
+    {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_pow_fmpz},
+    {GR_METHOD_POW,             (gr_funcptr) _gr_fmpz_pow_fmpz},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_rsqrt},

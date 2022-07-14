@@ -231,6 +231,123 @@ _gr_fmpq_pow_ui(fmpq_t res, const fmpq_t x, ulong exp, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fmpq_pow_si(fmpq_t res, const fmpq_t x, slong exp, const gr_ctx_t ctx)
+{
+    if (fmpq_is_one(x))
+    {
+        fmpq_one(res);
+        return GR_SUCCESS;
+    }
+    else if (fmpz_equal_si(fmpq_numref(x), -1) && fmpz_is_one(fmpq_denref(x)))
+    {
+        if (exp % 2)
+            fmpq_set_si(res, -1, 1);
+        else
+            fmpq_one(res);
+        return GR_SUCCESS;
+    }
+    else if (fmpq_is_zero(x))
+    {
+        if (exp > 0)
+        {
+            fmpq_zero(res);
+            return GR_SUCCESS;
+        }
+        else
+        {
+            return GR_DOMAIN;
+        }
+    }
+    else
+    {
+        fmpq_pow_si(res, x, exp);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpq_pow_fmpz(fmpq_t res, const fmpq_t x, const fmpz_t exp, const gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*exp))
+    {
+        return _gr_fmpq_pow_si(res, x, *exp, ctx);
+    }
+    else if (fmpq_is_one(x))
+    {
+        fmpq_one(res);
+        return GR_SUCCESS;
+    }
+    else if (fmpz_equal_si(fmpq_numref(x), -1) && fmpz_is_one(fmpq_denref(x)))
+    {
+        if (fmpz_is_odd(exp))
+            fmpq_set_si(res, -1, 1);
+        else
+            fmpq_one(res);
+        return GR_SUCCESS;
+    }
+    else if (fmpq_is_zero(x))
+    {
+        if (fmpz_sgn(exp) > 0)
+        {
+            fmpq_zero(res);
+            return GR_SUCCESS;
+        }
+        else
+        {
+            return GR_DOMAIN;
+        }
+    }
+    else
+    {
+        return GR_UNABLE;
+    }
+}
+
+/* TODO: exploit fmpz_root return value in qqbar nth root as well */
+int
+_gr_fmpq_pow_fmpq(fmpq_t res, const fmpq_t x, const fmpq_t exp, const gr_ctx_t ctx)
+{
+    if (fmpz_is_one(fmpq_denref(exp)))
+    {
+        return _gr_fmpq_pow_fmpz(res, x, fmpq_numref(exp), ctx);
+    }
+    else if (fmpq_is_one(x) || fmpq_is_zero(exp))
+    {
+        return _gr_fmpq_one(res, ctx);
+    }
+    else if (fmpq_is_zero(x))
+    {
+        if (fmpq_sgn(exp) > 0)
+            return _gr_fmpq_zero(res, ctx);
+        else
+            return GR_DOMAIN;
+    }
+    else if (COEFF_IS_MPZ(*fmpq_denref(exp)))
+    {
+        return GR_UNABLE;
+    }
+    else
+    {
+        int status;
+        ulong n;
+
+        fmpq_t t;
+        fmpq_init(t);
+
+        n = *fmpq_denref(exp);
+
+        if (fmpz_root(fmpq_numref(t), fmpq_numref(x), n) && fmpz_root(fmpq_denref(t), fmpq_denref(x), n))
+            status = _gr_fmpq_pow_fmpz(res, t, fmpq_numref(exp), ctx);
+        else
+            status = GR_DOMAIN;
+
+        fmpq_clear(t);
+        return status;
+    }
+}
+
+
 truth_t
 _gr_fmpq_is_square(const fmpq_t x, const gr_ctx_t ctx)
 {
@@ -496,6 +613,10 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpq_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_pow_ui},
+    {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpq_pow_ui},
+    {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpq_pow_fmpz},
+    {GR_METHOD_POW_FMPQ,        (gr_funcptr) _gr_fmpq_pow_fmpq},
+    {GR_METHOD_POW,             (gr_funcptr) _gr_fmpq_pow_fmpq},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpq_rsqrt},
