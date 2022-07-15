@@ -101,11 +101,11 @@ void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p, sl
 
 void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p, const arf_t epsilon, slong prec);
 
-slong acb_theta_naive_newprec(slong prec, slong dist, slong max_dist, slong step);
-
+slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist,
+			      slong step, slong ord);
 
 /* Precomputations for naive algorithms */
-/* Fot this to work, we assume that step is 1 or 2 and constant among ellipsoid layers */
+/* For this to work, we assume that step is 1 or 2 and constant among ellipsoid layers */
 
 typedef struct
 {
@@ -133,7 +133,60 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
 			   const arb_eld_t E, slong prec);
 
 
+/* Generic code for naive algorithms */
+
+/* All naive algorithms enumerate points in ellipsoids and arrive at a
+   point where an exponential term is computed. What to do with it is
+   encoded in a function of the form:
+
+   void acb_theta_worker(acb_ptr th, const acb_t term, slong* coords, slong g,
+                         ulong ab, slong ord, slong prec, slong fullprec)
+
+   (all arguments of various theta_naive functions). Then, function
+   pointers allows us to factor the code. */
+
+typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
+					 ulong, slong, slong, slong);
+
+/* Comments on input:
+   - E is an ellipsoid of dim 1
+   - each exponential term is of the form cofactor * lin^k * (some k^2-power);
+     last factor is precomputed in D
+   - prec is the current relative precision for this slice
+   - rest of the data is passed on to the worker. */
+
+void acb_theta_naive_worker_dim1(acb_ptr th,
+				 const arb_eld_t E, const arb_theta_precomp_t D,
+				 const acb_t lin, const acb_t cofactor,
+				 ulong ab, slong ord, slong prec, slong fullprec,
+				 acb_theta_naive_worker_t worker_dim0);
+
+/* Comments on input:
+   - (k,j)-th entry of lin_powers is \exp(\pi i n_j tau_{k,j}/4) for k <= d, j > d
+   - entries of lin_powers with j > d are const, others can be modified for recursion
+   - k-th entry of exp_z is \exp(\pi i z_k)
+   - cofactor is the common part for all exponential terms in current slice
+   - rest of the data is passed on recursively as given, except that prec is adjusted 
+     depending on chosen slice
+   In case dim=1, fall back to worker_dim1
+*/
+
+void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
+				const arb_eld_t E, const acb_theta_precomp_t D,
+				acb_srcptr exp_z, const acb_t cofactor,
+				ulong ab, slong ord, slong prec, slong fullprec,
+				acb_theta_naive_worker_t worker_dim0);
+
+
 /* Naive algorithms */
+
+void acb_mat_get_real(arb_mat_t re, const acb_mat_t tau);
+
+void acb_mat_get_imag(arb_mat_t im, const acb_mat_t tau);
+
+#define ARB_ELD_DEFAULT_PREC 50
+#define ACB_THETA_NAIVE_EPS_2EXP 10
+#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.0
 
 void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
