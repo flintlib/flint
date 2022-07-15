@@ -1,3 +1,4 @@
+#include "qqbar.h"
 #include "gr.h"
 #include "flint/fmpz_poly.h"
 #include "flint/fmpz_mat.h"
@@ -100,6 +101,40 @@ _gr_fmpz_set_fmpq(fmpz_t res, const fmpq_t v, const gr_ctx_t ctx)
     {
         return GR_DOMAIN;
     }
+}
+
+int
+_gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+{
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_FMPZ:
+            fmpz_set(res, x);
+            return GR_SUCCESS;
+
+        case GR_CTX_FMPQ:
+            return _gr_fmpz_set_fmpq(res, x, ctx);
+
+        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
+        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+            if (qqbar_is_integer(x))
+            {
+                qqbar_get_fmpz(res, x);
+                return GR_SUCCESS;
+            }
+            return GR_DOMAIN;
+    }
+
+    return GR_UNABLE;
+}
+
+int
+_gr_fmpz_set_str(fmpz_t res, const char * x, const gr_ctx_t ctx)
+{
+    if (fmpz_set_str(res, x, 10))
+        return GR_DOMAIN;
+
+    return GR_SUCCESS;
 }
 
 truth_t
@@ -525,6 +560,9 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpz_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpz_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpz_set_fmpq},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpz_set_other},
+    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpz_set_str},
+    {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpz_add_ui},
@@ -567,7 +605,7 @@ void
 gr_ctx_init_fmpz(gr_ctx_t ctx)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_ZZ;
+    ctx->which_ring = GR_CTX_FMPZ;
     ctx->sizeof_elem = sizeof(fmpz);
     ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;

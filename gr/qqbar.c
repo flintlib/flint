@@ -199,6 +199,30 @@ _gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+{
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_FMPZ:
+            qqbar_set_fmpz(res, x);
+            return GR_SUCCESS;
+
+        case GR_CTX_FMPQ:
+            qqbar_set_fmpq(res, x);
+            return GR_SUCCESS;
+
+        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
+        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+            if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR && !qqbar_is_real(x))
+                return GR_DOMAIN;
+            qqbar_set(res, x);
+            return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
+int
 _gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_neg(res, x);
@@ -576,13 +600,13 @@ _gr_qqbar_ctx_clear(gr_ctx_t ctx)
 truth_t
 _gr_qqbar_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
-    return (ctx->which_ring == GR_WHICH_RING_CC_ALGEBRAIC) ? T_TRUE : T_FALSE;
+    return (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_QQBAR) ? T_TRUE : T_FALSE;
 }
 
 truth_t
 _gr_qqbar_ctx_is_ordered_ring(gr_ctx_t ctx)
 {
-    return (ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC) ? T_TRUE : T_FALSE;
+    return (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR) ? T_TRUE : T_FALSE;
 }
 
 int _qqbar_methods_initialized = 0;
@@ -628,6 +652,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_qqbar_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_qqbar_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_qqbar_set_fmpq},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_qqbar_set_other},
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_qqbar_neg},
 
@@ -683,7 +708,7 @@ void
 gr_ctx_init_real_qqbar(gr_ctx_t ctx)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_RR_ALGEBRAIC;
+    ctx->which_ring = GR_CTX_REAL_ALGEBRAIC_QQBAR;
     ctx->sizeof_elem = sizeof(qqbar_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
     ctx->size_limit = WORD_MAX;
@@ -705,7 +730,7 @@ void
 gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_CC_ALGEBRAIC;
+    ctx->which_ring = GR_CTX_COMPLEX_ALGEBRAIC_QQBAR;
     ctx->sizeof_elem = sizeof(qqbar_struct);
     ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
     ctx->size_limit = WORD_MAX;

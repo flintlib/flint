@@ -92,6 +92,7 @@ libflint.fmpz_get_str.restype = ctypes.c_void_p
 libgr.gr_heap_init.argtypes = (ctypes.POINTER(gr_ctx_struct),)
 libgr.gr_heap_init.restype = ctypes.c_void_p
 
+libgr.gr_set_str.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
@@ -163,6 +164,17 @@ class gr_elem:
                         if status & GR_UNABLE: raise NotImplementedError()
                         if status & GR_DOMAIN: raise ValueError()
                     libflint.fmpz_clear(nref)
+            elif isinstance(val, gr_elem):
+                #c = libgr.gr_ctx_cmp_coercion(self._ctx, other._ctx)
+                status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                if status:
+                    if status & GR_UNABLE: raise NotImplementedError()
+                    if status & GR_DOMAIN: raise ValueError()
+            elif typ is str:
+                status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
+                if status:
+                    if status & GR_UNABLE: raise NotImplementedError()
+                    if status & GR_DOMAIN: raise ValueError()
             else:
                 raise NotImplementedError(f"unable to create {type(self)} from {type(val)}")
 
@@ -185,14 +197,18 @@ class gr_elem:
     def _binary_op(self, other, op, rstr):
         elem_type = type(self)
         other_type = type(other)
-        if type(self) is not type(other):
-            raise ValueError("different types!")
-            #try:
-            #    other = qqbar(other)
-            #except TypeError:
-            #    return NotImplemented
-        if self._ctx_python is not other._ctx_python:
-            raise NotImplementedError("different contexts")
+        if elem_type is not other_type:
+            if not isinstance(other, gr_elem):
+                other = self.parent()(other)
+            elif not isinstance(self, gr_elem):
+                self = other.parent()(self)
+            elif self._ctx_python is not other._ctx_python:
+                c = libgr.gr_ctx_cmp_coercion(self._ctx, other._ctx)
+                if c >= 0:
+                    other = self.parent()(other)
+                else:
+                    self = other.parent()(self)
+            elem_type = type(self)
         res = elem_type(None, self._ctx_python)
         status = op(res._ref, self._ref, other._ref, self._ctx)
         if status:
@@ -242,21 +258,32 @@ class gr_elem:
     def __add__(self, other):
         return self._binary_op(self, other, libgr.gr_add, "x + y")
 
+    def __radd__(self, other):
+        return self._binary_op(other, self, libgr.gr_add, "x + y")
+
     def __sub__(self, other):
         return self._binary_op(self, other, libgr.gr_sub, "x - y")
+
+    def __rsub__(self, other):
+        return self._binary_op(other, self, libgr.gr_sub, "x - y")
 
     def __mul__(self, other):
         return self._binary_op(self, other, libgr.gr_mul, "x * y")
 
+    def __rmul__(self, other):
+        return self._binary_op(other, self, libgr.gr_mul, "x * y")
+
     def __truediv__(self, other):
         return self._binary_op(self, other, libgr.gr_div, "x / y")
 
+    def __rtruediv__(self, other):
+        return self._binary_op(other, self, libgr.gr_div, "x / y")
+
     def __pow__(self, other):
-        """
-        >>> ZZ(3) ** ZZ(2)
-        9
-        """
         return self._binary_op(self, other, libgr.gr_pow, "x ** y")
+
+    def __rpow__(self, other):
+        return self._binary_op(other, self, libgr.gr_pow, "x ** y")
 
 
 class fmpz(gr_elem):
@@ -308,6 +335,14 @@ def test_all():
     assert abs(QQ(-5)) == QQ(5)
     assert QQ(8) ** (QQ(1) / QQ(3)) == QQ(2)
     assert raises(lambda: QQ(2) ** (QQ(1) / QQ(3)), ValueError)
+
+    assert QQ(1) + 2 == QQ(3)
+    assert 2 + QQ(1) == QQ(3)
+    assert QQ(1) + ZZ(5) == QQ(6)
+    assert (QQ(1) + ZZ(5)).parent() is QQ
+    assert raises(lambda: ZZ(1) / 2, ValueError)
+    assert raises(lambda: (-1) ** (QQ(1) / 2), ValueError)
+    assert ((-1) ** (QQbar(1) / 2)) ** 2 == QQbar(-1)
 
 if __name__ == "__main__":
     from time import time

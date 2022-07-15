@@ -187,7 +187,7 @@ void
 gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_CUSTOM;
+    ctx->which_ring = GR_CTX_GR_MAT;
     ctx->sizeof_elem = sizeof(gr_mat_struct);
     ctx->elem_ctx = flint_malloc(sizeof(matrix_ctx_t));
     ctx->size_limit = WORD_MAX;

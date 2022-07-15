@@ -417,7 +417,7 @@ void
 gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_ZZ_MOD;
+    ctx->which_ring = GR_CTX_NMOD8;
     ctx->sizeof_elem = sizeof(nmod8_struct);
     ctx->size_limit = WORD_MAX;
 

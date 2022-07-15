@@ -387,7 +387,7 @@ void
 gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_FQ;
+    ctx->which_ring = GR_CTX_FQ;
     ctx->sizeof_elem = sizeof(fq_struct);
     ctx->elem_ctx = flint_malloc(sizeof(fq_ctx_struct));
     ctx->size_limit = WORD_MAX;

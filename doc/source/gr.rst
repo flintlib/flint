@@ -305,6 +305,13 @@ Context operations
 
     Returns whether the representation of elements is always canonical.
 
+Coercions
+...............................................................................
+
+.. function:: int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2)
+
+    Returns 1 if coercing elements into *ctx1* is more meaningful,
+    and returns -1 otherwise.
 
 Element operations
 --------------------------------------------------------------------------------
@@ -425,6 +432,18 @@ Basic functions
     in the ring *ctx*.
     The *fmpq* method may return the flag ``GR_DOMAIN`` if the
     denominator of *x* is not invertible.
+
+.. function:: int gr_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+
+    Sets *res* to the element *x* of the structure *x_ctx* which
+    may be different from *ctx*. This returns the ``GR_DOMAIN`` flag
+    if *x* is not an element of *ctx* or cannot be converted
+    unambiguously to *ctx*.  The ``GR_UNABLE`` flag is returned
+    if the conversion is not implemented.
+
+.. function:: int gr_set_str(gr_ptr res, const char * x, gr_ctx_t ctx)
+
+    Sets *res* to the string description in *x*.
 
 .. function:: truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx)
               truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx)

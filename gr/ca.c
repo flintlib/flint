@@ -9,11 +9,11 @@
 int
 _gr_ca_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_WHICH_RING_RR)
+    if (ctx->which_ring == GR_CTX_RR_CA)
         gr_stream_write(out, "Real numbers (ca)");
-    else if (ctx->which_ring == GR_WHICH_RING_CC)
+    else if (ctx->which_ring == GR_CTX_CC_CA)
         gr_stream_write(out, "Complex numbers (ca)");
-    else if (ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
         gr_stream_write(out, "Real algebraic numbers (ca)");
     else
         gr_stream_write(out, "Complex algebraic numbers (ca)");
@@ -48,14 +48,14 @@ _gr_ca_randtest(ca_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     ca_randtest(res, state, 2, 10, GR_CA_CTX(ctx));
 
-    if (ctx->which_ring == GR_WHICH_RING_RR)
+    if (ctx->which_ring == GR_CTX_RR_CA)
     {
         if (ca_check_is_real(res, GR_CA_CTX(ctx)) != T_TRUE)
         {
             ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
         }
     }
-    else if (ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
         if (ca_check_is_real(res, GR_CA_CTX(ctx)) != T_TRUE ||
             ca_check_is_algebraic(res, GR_CA_CTX(ctx)) != T_TRUE)
@@ -63,7 +63,7 @@ _gr_ca_randtest(ca_t res, flint_rand_t state, const gr_ctx_t ctx)
             ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
         }
     }
-    else if (ctx->which_ring == GR_WHICH_RING_CC_ALGEBRAIC)
+    else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
     {
         if (ca_check_is_algebraic(res, GR_CA_CTX(ctx)) != T_TRUE)
         {
@@ -397,7 +397,7 @@ _gr_ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t exp, const gr_ctx_t ctx)
 {
     ca_pow_fmpq(res, x, exp, GR_CA_CTX(ctx));
 
-    if (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    if (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
         truth_t real;
 
@@ -424,7 +424,7 @@ _gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, const gr_ctx_t ctx)
 {
     ca_pow(res, x, exp, GR_CA_CTX(ctx));
 
-    if (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    if (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
         truth_t real;
 
@@ -437,7 +437,7 @@ _gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, const gr_ctx_t ctx)
             return GR_DOMAIN;
     }
 
-    if (ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC || ctx->which_ring == GR_WHICH_RING_CC_ALGEBRAIC)
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
     {
         truth_t algebraic;
 
@@ -462,7 +462,7 @@ _gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, const gr_ctx_t ctx)
 truth_t
 _gr_ca_is_square(const ca_t x, const gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    if (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
         return truth_not(ca_check_is_negative_real(x, GR_CA_CTX(ctx)));
     }
@@ -477,7 +477,7 @@ _gr_ca_sqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
 {
     ca_sqrt(res, x, GR_CA_CTX(ctx));
 
-    if (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    if (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
         truth_t real;
 
@@ -505,7 +505,7 @@ _gr_ca_rsqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
     ca_sqrt(res, x, GR_CA_CTX(ctx));
     ca_inv(res, res, GR_CA_CTX(ctx));
 
-    if (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC)
+    if (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
         truth_t real;
 
@@ -622,13 +622,13 @@ _gr_ca_ctx_clear(gr_ctx_t ctx)
 truth_t
 _gr_ca_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
-    return (ctx->which_ring == GR_WHICH_RING_CC || ctx->which_ring == GR_WHICH_RING_CC_ALGEBRAIC) ? T_TRUE : T_FALSE;
+    return (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA) ? T_TRUE : T_FALSE;
 }
 
 truth_t
 _gr_ca_ctx_is_ordered_ring(gr_ctx_t ctx)
 {
-    return (ctx->which_ring == GR_WHICH_RING_RR || ctx->which_ring == GR_WHICH_RING_RR_ALGEBRAIC) ? T_TRUE : T_FALSE;
+    return (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA) ? T_TRUE : T_FALSE;
 }
 
 int _ca_methods_initialized = 0;
@@ -752,23 +752,23 @@ _gr_ctx_init_ca(gr_ctx_t ctx, int which_ring)
 void
 gr_ctx_init_real_ca(gr_ctx_t ctx)
 {
-    _gr_ctx_init_ca(ctx, GR_WHICH_RING_RR);
+    _gr_ctx_init_ca(ctx, GR_CTX_RR_CA);
 }
 
 void
 gr_ctx_init_complex_ca(gr_ctx_t ctx)
 {
-    _gr_ctx_init_ca(ctx, GR_WHICH_RING_CC);
+    _gr_ctx_init_ca(ctx, GR_CTX_CC_CA);
 }
 
 void
 gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx)
 {
-    _gr_ctx_init_ca(ctx, GR_WHICH_RING_RR_ALGEBRAIC);
+    _gr_ctx_init_ca(ctx, GR_CTX_REAL_ALGEBRAIC_CA);
 }
 
 void
 gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx)
 {
-    _gr_ctx_init_ca(ctx, GR_WHICH_RING_CC_ALGEBRAIC);
+    _gr_ctx_init_ca(ctx, GR_CTX_COMPLEX_ALGEBRAIC_CA);
 }

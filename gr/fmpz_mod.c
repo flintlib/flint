@@ -479,7 +479,7 @@ void
 gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 {
     ctx->flags = 0;
-    ctx->which_ring = GR_WHICH_RING_ZZ_MOD;
+    ctx->which_ring = GR_CTX_FMPZ_MOD;
     ctx->sizeof_elem = sizeof(fmpz);
 
     ctx->elem_ctx = flint_malloc(sizeof(fmpz_mod_ctx_extended_struct));

@@ -4,6 +4,8 @@ Makefile
 build/*
 doc/build/*
 
+python/__pycache__/*
+
 # Prerequisites
 *.d
 

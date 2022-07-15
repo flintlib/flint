@@ -141,6 +141,8 @@ typedef enum
     GR_METHOD_SET_SI,
     GR_METHOD_SET_FMPZ,
     GR_METHOD_SET_FMPQ,
+    GR_METHOD_SET_OTHER,
+    GR_METHOD_SET_STR,
 
     GR_METHOD_GET_SI,
     GR_METHOD_GET_UI,
@@ -285,15 +287,37 @@ void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 
 /* Identify specific rings/fields. */
 
-#define GR_WHICH_RING_CUSTOM             0
-#define GR_WHICH_RING_ZZ                 1
-#define GR_WHICH_RING_ZZ_MOD             2
-#define GR_WHICH_RING_QQ                 3
-#define GR_WHICH_RING_RR                 4
-#define GR_WHICH_RING_CC                 5
-#define GR_WHICH_RING_RR_ALGEBRAIC       6
-#define GR_WHICH_RING_CC_ALGEBRAIC       7
-#define GR_WHICH_RING_FQ                 8
+typedef enum
+{
+    GR_CTX_FMPZ,
+    GR_CTX_FMPQ,
+
+    GR_CTX_FMPZ_MOD,
+    GR_CTX_NMOD8,
+
+    GR_CTX_FQ,
+    GR_CTX_FQ_NMOD,
+    GR_CTX_FQ_ZECH,
+
+    GR_CTX_REAL_ALGEBRAIC_QQBAR,
+    GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
+
+    GR_CTX_REAL_ALGEBRAIC_CA,
+    GR_CTX_COMPLEX_ALGEBRAIC_CA,
+
+    GR_CTX_RR_CA,
+    GR_CTX_CC_CA,
+
+    GR_CTX_RR_ARB,
+    GR_CTX_CC_ACB,
+
+    GR_CTX_GR_POLY,
+    GR_CTX_GR_MPOLY,
+    GR_CTX_GR_MAT,
+
+    GR_CTX_WHICH_STRUCTURE_TAB_SIZE
+}
+gr_which_structure;
 
 typedef struct
 {
@@ -330,6 +354,8 @@ typedef int ((*gr_method_unary_op_si)(gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_ui)(gr_ptr, ulong, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_fmpz)(gr_ptr, const fmpz_t, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_fmpq)(gr_ptr, const fmpq_t, gr_ctx_ptr));
+typedef int ((*gr_method_unary_op_other)(gr_ptr, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_unary_op_str)(gr_ptr, const char *, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpz)(fmpz_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_si)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
@@ -374,6 +400,8 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_UNARY_OP_UI(ctx, NAME) (((gr_method_unary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_FMPZ(ctx, NAME) (((gr_method_unary_op_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_FMPQ(ctx, NAME) (((gr_method_unary_op_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_OTHER(ctx, NAME) (((gr_method_unary_op_other *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_STR(ctx, NAME) (((gr_method_unary_op_str *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_SI(ctx, NAME) (((gr_method_binary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -430,10 +458,13 @@ GR_INLINE WARN_UNUSED_RESULT int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_C
 GR_INLINE WARN_UNUSED_RESULT int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_neg_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_ONE)(res, ctx); }
 
+GR_INLINE WARN_UNUSED_RESULT int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_SI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_UI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, SET_FMPZ)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPQ(ctx, SET_FMPQ)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx) { return GR_UNARY_OP_OTHER(ctx, SET_OTHER)(res, x, x_ctx, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_set_str(gr_ptr res, const char * x, gr_ctx_t ctx) { return GR_UNARY_OP_STR(ctx, SET_STR)(res, x, ctx); }
 
 GR_INLINE truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(x, ctx); }
 GR_INLINE truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ONE)(x, ctx); }
@@ -441,7 +472,6 @@ GR_INLINE truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PRE
 
 GR_INLINE truth_t gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NEG)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADD)(res, x, y, ctx); }
@@ -791,6 +821,15 @@ void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 /* Multivariate */
 
 void gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
+
+/* Coercions */
+
+GR_INLINE int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2)
+{
+    if (ctx1->which_ring <= ctx2->which_ring)
+        return -1;
+    return 1;
+}
 
 /* Testing */
 
