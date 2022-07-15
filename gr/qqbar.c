@@ -114,8 +114,25 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
 
         if (im_s != NULL)
         {
-            gr_stream_write(out, " + ");
-            gr_stream_write_free(out, im_s);
+            if (re_s != NULL)
+            {
+                if (im_s[0] == '-')
+                {
+                    gr_stream_write(out, " - ");
+                    gr_stream_write(out, im_s + 1);
+                    flint_free(im_s);
+                }
+                else
+                {
+                    gr_stream_write(out, " + ");
+                    gr_stream_write_free(out, im_s);
+                }
+            }
+            else
+            {
+                gr_stream_write_free(out, im_s);
+            }
+
             gr_stream_write(out, "i");
         }
         gr_stream_write(out, " of ");

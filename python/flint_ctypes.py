@@ -94,6 +94,8 @@ libgr.gr_heap_init.restype = ctypes.c_void_p
 
 libgr.gr_set_str.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
@@ -194,7 +196,7 @@ class gr_elem:
             libflint.flint_free(arr)
 
     @staticmethod
-    def _binary_op(self, other, op, rstr):
+    def _binary_coercion(self, other):
         elem_type = type(self)
         other_type = type(other)
         if elem_type is not other_type:
@@ -208,13 +210,25 @@ class gr_elem:
                     other = self.parent()(other)
                 else:
                     self = other.parent()(self)
-            elem_type = type(self)
-        res = elem_type(None, self._ctx_python)
+        return self, other
+
+    @staticmethod
+    def _binary_op(self, other, op, rstr):
+        self, other = gr_elem._binary_coercion(self, other)
+        res = type(self)(None, self._ctx_python)
         status = op(res._ref, self._ref, other._ref, self._ctx)
         if status:
             if status & GR_UNABLE: raise NotImplementedError(f"{rstr} is not implemented for x = {self}, y = {other} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
         return res
+
+    @staticmethod
+    def _binary_predicate(self, other, op, rstr):
+        self, other = gr_elem._binary_coercion(self, other)
+        truth = op(self._ref, other._ref, self._ctx)
+        if truth == T_TRUE: return True
+        if truth == T_FALSE: return False
+        raise Undecidable(f"{rstr} cannot be decided for x = {self}, y = {other} over {self.parent()}")
 
     @staticmethod
     def _unary_op(self, op, rstr):
@@ -227,24 +241,31 @@ class gr_elem:
         return res
 
     def __eq__(self, other):
-        if type(self) is type(other):
-            if self._ctx_python is not other._ctx_python:
-                raise NotImplementedError("different contexts")
-            truth = libgr.gr_equal(self._ref, other._ref, self._ctx)
-            if truth == T_TRUE: return True
-            if truth == T_FALSE: return False
-            raise Undecidable(f"x == y cannot be decided for x = {self}, y = {other} over {self.parent()}")
-        raise NotImplementedError("== is not supported for these types")
+        return self._binary_predicate(self, other, libgr.gr_equal, "x == y")
 
     def __ne__(self, other):
-        if type(self) is type(other):
-            if self._ctx_python is not other._ctx_python:
-                raise NotImplementedError("different contexts")
-            truth = libgr.gr_equal(self._ref, other._ref, self._ctx)
-            if truth == T_TRUE: return False
-            if truth == T_FALSE: return True
-            raise Undecidable(f"x != y cannot be decided for x = {self}, y = {other} over {self.parent()}")
-        raise NotImplementedError("!= is not supported for these types")
+        return self._binary_predicate(self, other, libgr.gr_not_equal, "x != y")
+
+    def _cmp(self, other):
+        self, other = gr_elem._binary_coercion(self, other)
+        c = (ctypes.c_int * 1)()
+        status = libgr.gr_cmp(c, self._ref, other._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise Undecidable(f"unable to compare x = {self} and y = {other} in {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"ordering not defined for x = {self} and y = {other} in {self.parent()}")
+        return c[0]
+
+    def __lt__(self, other):
+        return gr_elem._cmp(self, other) < 0
+
+    def __le__(self, other):
+        return gr_elem._cmp(self, other) <= 0
+
+    def __gt__(self, other):
+        return gr_elem._cmp(self, other) > 0
+
+    def __ge__(self, other):
+        return gr_elem._cmp(self, other) >= 0
 
     def __neg__(self):
         return self._unary_op(self, libgr.gr_neg, "-x")
@@ -321,6 +342,10 @@ def test_all():
     assert x * y == ZZ(-23)
     assert -x == ZZ(-23)
 
+    assert ZZ(3) != 4
+    assert ZZ(3) <= 5
+    assert ZZ(3) > 2
+
     x = QQ(-10000000000000000000075) / QQ(3)
     assert str(x) == "-10000000000000000000075/3"
     assert x.parent() is QQ
@@ -331,6 +356,12 @@ def test_all():
     xy = x ** y
     assert (xy ** QQbar(3)) == QQbar(-2)
     assert str(xy) == "Root a = 0.629961 + 1.09112i of a^3+2"
+    i = QQbar(-1) ** (QQ(1)/2)
+    assert str(i) == 'Root a = 1.00000i of a^2+1'
+    assert str(-i) == 'Root a = -1.00000i of a^2+1'
+    assert str(1-i) == 'Root a = 1.00000 - 1.00000i of a^2-2*a+2'
+    assert raises(lambda: i > 0, ValueError)
+    assert QQ(-3)/2 < i**2 < QQ(1)/2
 
     assert abs(QQ(-5)) == QQ(5)
     assert QQ(8) ** (QQ(1) / QQ(3)) == QQ(2)
