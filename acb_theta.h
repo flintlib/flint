@@ -156,7 +156,7 @@ typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
    - rest of the data is passed on to the worker. */
 
 void acb_theta_naive_worker_dim1(acb_ptr th,
-				 const arb_eld_t E, const arb_theta_precomp_t D,
+				 const arb_eld_t E, const acb_theta_precomp_t D,
 				 const acb_t lin, const acb_t cofactor,
 				 ulong ab, slong ord, slong prec, slong fullprec,
 				 acb_theta_naive_worker_t worker_dim0);

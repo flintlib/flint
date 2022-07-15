@@ -90,7 +90,7 @@ void acb_theta_const_ind_naive(acb_t th, ulong ab, const acb_mat_t tau, slong pr
   slong k;
 
   arb_eld_init(E, g, g);
-  acb_theta_precomp_init(D);
+  acb_theta_precomp_init(D, g);
   arf_init(epsilon);
   acb_mat_init(lin_powers, g, g);
   exp_z = _acb_vec_init(g);
@@ -98,7 +98,7 @@ void acb_theta_const_ind_naive(acb_t th, ulong ab, const acb_mat_t tau, slong pr
 
   set_precomp(E, D, epsilon, ab, tau, prec);
 
-  acb_mat_copy(lin_powers, acb_theta_precomp_exp_mat(D));
+  acb_mat_set(lin_powers, acb_theta_precomp_exp_mat(D));
   for (k = 0; k < g; k++) acb_one(&exp_z[k]);
   acb_one(cofactor);
   fullprec = prec + ceil(ACB_THETA_NAIVE_FULLPREC_ADDLOG * n_flog(1 + arb_eld_nb_pts(E), 2));

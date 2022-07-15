@@ -6,11 +6,11 @@
    Each term is: cofactor * lin^k * x^(k^2), and square
    powers of x are precomputed.
 */
-static void worker_dim_1(acb_ptr th,
-			 const arb_eld_t E, const arb_theta_precomp_t D,
-			 const acb_t lin, const acb_t cofactor,
-			 ulong ab, slong ord, slong prec, slong fullprec,
-			 acb_theta_naive_worker_t worker_dim0)
+void acb_theta_naive_worker_dim1(acb_ptr th,
+				 const arb_eld_t E, const acb_theta_precomp_t D,
+				 const acb_t lin, const acb_t cofactor,
+				 ulong ab, slong ord, slong prec, slong fullprec,
+				 acb_theta_naive_worker_t worker_dim0)
 {
   acb_t start, diff, aff, term;
   slong* coords;
