@@ -54,6 +54,7 @@ struct arb_eld_struct
   struct arb_eld_struct* lchildren;
   slong nl;
   slong nb_pts;
+  slong* box;
 };
 
 typedef struct arb_eld_struct arb_eld_t[1];
@@ -74,6 +75,7 @@ typedef struct arb_eld_struct arb_eld_t[1];
 #define arb_eld_nr(E) ((E)->nr)
 #define arb_eld_nl(E) ((E)->nl)
 #define arb_eld_nb_pts(E) ((E)->nb_pts)
+#define arb_eld_box(E, k) ((E)->box[(k)-1])
 
 void arb_eld_init(arb_eld_t E, slong d, slong g);
 
@@ -93,12 +95,45 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
 void arb_eld_points(slong* pts, const arb_eld_t E);
 
 
-/* Naive algorithms */
+/* Choice of radii and precisions in naive algorithms */
 
 void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p, slong prec);
 
 void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p, const arf_t epsilon, slong prec);
 
+slong acb_theta_naive_newprec(slong prec, slong dist, slong max_dist, slong step);
+
+
+/* Precomputations for naive algorithms */
+/* Fot this to work, we assume that step is 1 or 2 and constant among ellipsoid layers */
+
+typedef struct
+{
+  slong g;
+  acb_mat_struct exp_mat;
+  slong* box;
+  slong step;
+  slong* indices;
+  acb_ptr sqr_powers;
+  slong nb;
+} acb_theta_precomp_struct;
+
+typedef acb_theta_precomp_struct acb_theta_precomp_t[1];
+
+#define acb_theta_precomp_g(D) ((D)->g)
+#define acb_theta_precomp_exp_mat(D) (&(D)->exp_mat)
+#define acb_theta_precomp_box(D, k) ((D)->box[(k)-1])
+#define acb_theta_precomp_sqr_pow(D, k, i) (&(D)->sqr_powers[(i) + (D)->indices[(k)-1]])
+
+void acb_theta_precomp_init(acb_theta_precomp_t D, slong g);
+
+void acb_theta_precomp_clear(acb_theta_precomp_t D);
+
+void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
+			   const arb_eld_t E, slong prec);
+
+
+/* Naive algorithms */
 
 void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 

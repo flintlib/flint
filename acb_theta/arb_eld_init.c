@@ -15,5 +15,6 @@ void arb_eld_init(arb_eld_t E, slong d, slong g)
   arb_eld_nr(E) = 0;
   E->lchildren = NULL;
   arb_eld_nl(E) = 0;
+  E->box = flint_malloc(d * sizeof(slong));
 }
 

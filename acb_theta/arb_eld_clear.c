@@ -22,5 +22,6 @@ void arb_eld_clear(arb_eld_t E)
   _arb_vec_clear(arb_eld_offset(E), arb_eld_dim(E));
   arb_clear(arb_eld_normsqr(E));
   arb_clear(arb_eld_rad(E));
-  arb_clear(arb_eld_ctr(E));  
+  arb_clear(arb_eld_ctr(E));
+  flint_free(E->box);
 }

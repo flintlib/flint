@@ -2,6 +2,130 @@
 
 #include "acb_theta.h"
 
+/* Work in dimension 1: add partial exponential sum into th, with two
+   multiplications per term only, at just the necessary precision.
+   Each term is: cofactor * (to_lin_power)^k * x^(k^2), and square
+   powers of x are precomputed
+*/
+static void worker_dim_1(acb_t th, const arb_eld_t E, acb_srcptr sqr_powers_precomp,
+			 const acb_t to_lin_power, const acb_t cofactor, slong prec,
+			 slong fullprec)
+{
+  acb_t start, diff, lin, term, sum;
+  slong min = arb_eld_min(E);
+  slong mid = arb_eld_mid(E);
+  slong max = arb_eld_max(E);
+  slong step = arb_eld_step(E);
+  slong newprec;
+  slong k;
+
+  if (arb_eld_nb_pts(E) == 0) {return;}
+
+  acb_init(start);
+  acb_init(diff);
+  acb_init(lin);
+  acb_init(term);
+  acb_init(sum);
+
+  acb_zero(sum);
+  acb_pow_si(start, to_lin_power, mid, prec);
+  acb_pow_si(diff, to_lin_power, step, prec);
+  
+  acb_set(lin, start);
+  for (k = mid; k <= max; k += step)
+    {
+      newprec = acb_theta_naive_newprec(prec, k-mid, max-mid, step);
+      acb_mul(term, lin, &sqr_powers_precomp[FLINT_ABS(k)/step], newprec);
+      acb_add(sum, sum, term, prec);
+      if (k < max) acb_mul(lin, lin, diff, newprec);
+    }
+
+  acb_set(lin, start);
+  acb_inv(diff, diff, prec);
+  for (k = mid - step; k >= min; k -= step)
+    {
+      newprec = acb_theta_naive_newprec(prec, mid-k, mid-min, step);      
+      acb_mul(lin, lin, diff, newprec);
+      acb_mul(term, lin, &sqr_powers_precomp[FLINT_ABS(k)/step], newprec);
+      acb_add(sum, sum, term, prec);
+    }
+
+  acb_mul(sum, sum, cofactor, prec);
+  acb_add(th, th, sum, fullprec);
+
+  acb_clear(start);
+  acb_clear(diff);
+  acb_clear(lin);
+  acb_clear(term);
+  acb_clear(sum);  
+}
+
+/* Recursive worker in dimension d: entries (i,j) of lin_powers for
+   j>d are considered const
+*/   
+static void worker_rec(acb_t th, acb_mat_t lin_powers,
+		       const arb_eld_t E, acb_srcptr sqr_powers_precomp,
+		       const acb_mat_t exp_mat, const acb_t cofactor,
+		       slong prec, slong fullprec)
+{
+  slong d = arb_eld_dim(E);
+  slong g = arb_eld_ambient_dim(E);
+  slong nr = arb_eld_nr(E);
+  slong nl = arb_eld_nl(E);
+  slong min = arb_eld_min(E);
+  slong mid = arb_eld_mid(E);
+  slong max = arb_eld_max(E);
+  slong step = arb_eld_step(E);
+  acb_t start_cf, diff_cf, new_cf;
+  acb_ptr start_lin_powers, diff_lin_powers;
+  slong newprec;
+  slong k;
+
+  if (arb_eld_nb_pts(E) == 0) {return;}
+
+  acb_init(start_cf);
+  acb_init(diff_cf);
+  acb_init(new_cf);
+  start_lin_powers = _acb_vec_init(d-1);
+  diff_lin_powers = _acb_vec_init(d-1);
+  
+  /* Set up things for new cofactor */
+  acb_one(diff_cf);
+  for (k = d+1; k <= g; k++)
+    {
+      acb_mul(diff_cf, diff_cf, acb_mat_entry(lin_powers, d-1, k-1), prec);
+    }
+  acb_pow_si(start_cf, diff_cf, mid, prec);
+  acb_mul(start_cf, start_cf, cofactor, prec);
+  acb_pow_si(diff_cf, diff_cf, step, prec);
+
+  /* Set up things to update entries (k,d) of lin_powers, k < d */
+  for (k = 1; k < d; k++)
+    {
+      acb_pow_si(&diff_lin_powers[k-1], acb_mat_entry(exp_mat, k-1, d-1), step, prec);
+      acb_pow_si(&start_lin_powers[k-1], acb_mat_entry(exp_mat, k-1, d-1), mid, prec);
+    }
+
+  /* Loop over children */
+  for (k = 1; k < d; k++) acb_set(acb_mat_entry(lin_powers, k-1, d-1), &start_lin_powers[k-1]);
+  acb_set(new_cf, start_cf);
+  
+  for (k = 0; k < nr; k++)
+    {
+      worker_rec(th, lin_powers, arb_eld_rchild(E,k), 
+      
+      if (d == 2) worker_dim_1(th, arb_eld_rchild(E, k), sqr_powers_precomp,
+			       
+    }
+
+  for (k = 0; k < nl; k++)
+    {
+
+    }
+
+  
+}
+
 /* Given an ellipsoid slice of dimension d, 
    - enumerate lattice slices of dimension d-1 contained in it,
    - gather the corresponding partial sums of exponentials,
@@ -17,6 +141,7 @@
    - prec_th: precision for theta series computations
    - prec_R: precision for ellipsoid computations, << prec_th, hopefully negligible
 */
+
 static void
 recursive_worker(acb_t th,
 		 ulong ab,
