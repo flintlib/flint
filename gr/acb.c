@@ -1,6 +1,7 @@
 #include "acb.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
+#include "qqbar.h"
 #include "gr.h"
 
 typedef struct
@@ -54,7 +55,7 @@ int
 _gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
 {
     slong digits = ACB_CTX_PREC(ctx) * 0.30102999566398 + 1;
-    int flags = 0;
+    int flags = 0 /* ARB_STR_NO_RADIUS */;
 
     if (arb_is_zero(acb_imagref(x)))
     {
@@ -67,9 +68,8 @@ _gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
     }
     else
     {
-        gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
-
         gr_stream_write(out, "(");
+        gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
 
         if ((arb_is_exact(acb_imagref(x)) || (flags & ARB_STR_NO_RADIUS))
                 && arf_sgn(arb_midref(acb_imagref(x))) < 0)
@@ -135,6 +135,35 @@ _gr_acb_set_fmpq(acb_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     acb_set_fmpq(res, v, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
+}
+
+int 
+_gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
+
+int
+_gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+{
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_FMPZ:
+            return _gr_acb_set_fmpz(res, x, ctx);
+
+        case GR_CTX_FMPQ:
+            return _gr_acb_set_fmpq(res, x, ctx);
+
+        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
+        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+            qqbar_get_acb(res, x, ACB_CTX_PREC(ctx));
+            return GR_SUCCESS;
+
+        case GR_CTX_RR_CA:
+        case GR_CTX_REAL_ALGEBRAIC_CA:
+        case GR_CTX_CC_CA:
+        case GR_CTX_COMPLEX_ALGEBRAIC_CA:
+            return _gr_ca_get_acb_with_prec(res, x, x_ctx, ACB_CTX_PREC(ctx));
+    }
+
+    return GR_UNABLE;
 }
 
 truth_t
@@ -551,8 +580,74 @@ _gr_acb_re(acb_t res, const acb_t x, const gr_ctx_t ctx)
 int
 _gr_acb_im(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
-    arb_set(acb_imagref(res), acb_imagref(x));
-    arb_zero(acb_realref(res));
+    arb_set(acb_realref(res), acb_imagref(x));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_sgn(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_sgn(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_csgn(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_csgn(acb_realref(res), x);
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_exp(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_exp(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_log(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_contains_zero(x))
+    {
+        if (acb_is_zero(x))
+            return GR_DOMAIN;
+        return GR_UNABLE;
+    }
+
+    acb_log(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_sin(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_sin(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_cos(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_cos(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_atan(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (!arb_is_zero(acb_imagref(x)) && arb_contains_zero(acb_realref(x)))
+    {
+        if (arb_is_zero(acb_realref(x)) && (arb_is_one(acb_imagref(x)) || arb_equal_si(acb_imagref(x), -1)))
+            return GR_DOMAIN;
+
+        if (arb_contains_si(acb_imagref(x), 1) || arb_contains_si(acb_imagref(x), -1))
+            return GR_UNABLE;
+    }
+
+    acb_atan(res, x, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
@@ -635,6 +730,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_acb_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_acb_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_acb_set_fmpq},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acb_set_other},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_acb_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_acb_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_acb_add_ui},
@@ -670,6 +766,13 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_acb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_acb_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_acb_im},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_acb_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) _gr_acb_csgn},
+    {GR_METHOD_EXP,             (gr_funcptr) _gr_acb_exp},
+    {GR_METHOD_LOG,             (gr_funcptr) _gr_acb_log},
+    {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},
+    {GR_METHOD_COS,             (gr_funcptr) _gr_acb_cos},
+    {GR_METHOD_ATAN,            (gr_funcptr) _gr_acb_atan},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},

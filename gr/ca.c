@@ -21,19 +21,31 @@ _gr_ca_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 }
 
 void
-_gr_ca_init(ca_t x, const gr_ctx_t ctx)
+gr_ctx_ca_set_option(gr_ctx_t ctx, slong option, slong value)
+{
+    ca_ctx_set_option(GR_CA_CTX(ctx), option, value);
+}
+
+slong
+gr_ctx_ca_get_option(gr_ctx_t ctx, slong option)
+{
+    return ca_ctx_get_option(GR_CA_CTX(ctx), option);
+}
+
+void
+_gr_ca_init(ca_t x, gr_ctx_t ctx)
 {
     ca_init(x, GR_CA_CTX(ctx));
 }
 
 void
-_gr_ca_clear(ca_t x, const gr_ctx_t ctx)
+_gr_ca_clear(ca_t x, gr_ctx_t ctx)
 {
     ca_clear(x, GR_CA_CTX(ctx));
 }
 
 void
-_gr_ca_swap(ca_t x, ca_t y, const gr_ctx_t ctx)
+_gr_ca_swap(ca_t x, ca_t y, gr_ctx_t ctx)
 {
     ca_t t;
     *t = *x;
@@ -44,7 +56,7 @@ _gr_ca_swap(ca_t x, ca_t y, const gr_ctx_t ctx)
 /* todo: limits */
 /* todo: faster real/algebraic constructions */
 int
-_gr_ca_randtest(ca_t res, flint_rand_t state, const gr_ctx_t ctx)
+_gr_ca_randtest(ca_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     ca_randtest(res, state, 2, 10, GR_CA_CTX(ctx));
 
@@ -76,199 +88,360 @@ _gr_ca_randtest(ca_t res, flint_rand_t state, const gr_ctx_t ctx)
 
 /* todo */
 int
-_gr_ca_write(gr_stream_t out, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_write(gr_stream_t out, const ca_t x, gr_ctx_t ctx)
 {
     gr_stream_write_free(out, ca_get_str(x, GR_CA_CTX(ctx)));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_zero(ca_t x, const gr_ctx_t ctx)
+_gr_ca_zero(ca_t x, gr_ctx_t ctx)
 {
     ca_zero(x, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_one(ca_t x, const gr_ctx_t ctx)
+_gr_ca_one(ca_t x, gr_ctx_t ctx)
 {
     ca_one(x, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_set_si(ca_t res, slong v, const gr_ctx_t ctx)
+_gr_ca_set_si(ca_t res, slong v, gr_ctx_t ctx)
 {
     ca_set_si(res, v, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_set_ui(ca_t res, ulong v, const gr_ctx_t ctx)
+_gr_ca_set_ui(ca_t res, ulong v, gr_ctx_t ctx)
 {
     ca_set_ui(res, v, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_set_fmpz(ca_t res, const fmpz_t v, const gr_ctx_t ctx)
+_gr_ca_set_fmpz(ca_t res, const fmpz_t v, gr_ctx_t ctx)
 {
     ca_set_fmpz(res, v, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_set_fmpq(ca_t res, const fmpq_t v, const gr_ctx_t ctx)
+_gr_ca_set_fmpq(ca_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     ca_set_fmpq(res, v, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
+int
+_gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    slong target = ctx->which_ring;
+
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_FMPZ:
+            ca_set_fmpz(res, x, GR_CA_CTX(ctx));
+            return GR_SUCCESS;
+
+        case GR_CTX_FMPQ:
+            ca_set_fmpq(res, x, GR_CA_CTX(ctx));
+            return GR_SUCCESS;
+
+        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
+            ca_set_qqbar(res, x, GR_CA_CTX(ctx));
+            return GR_SUCCESS;
+
+        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+            if (target == GR_CTX_CC_CA ||
+                target == GR_CTX_COMPLEX_ALGEBRAIC_CA ||
+                qqbar_is_real(x))
+            {
+                ca_set_qqbar(res, x, GR_CA_CTX(ctx));
+                return GR_SUCCESS;
+            }
+            else
+            {
+                return GR_DOMAIN;
+            }
+
+        case GR_CTX_REAL_ALGEBRAIC_CA:
+            ca_transfer(res, GR_CA_CTX(ctx), x, GR_CA_CTX(x_ctx));
+            return GR_SUCCESS;
+
+        case GR_CTX_COMPLEX_ALGEBRAIC_CA:
+            {
+                truth_t ok = T_UNKNOWN;
+
+                if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+                {
+                    ok = T_TRUE;
+                }
+                else if (target == GR_CTX_RR_CA)
+                {
+                    ok = ca_check_is_real(x, GR_CA_CTX(x_ctx));
+                }
+                else if (target == GR_CTX_REAL_ALGEBRAIC_CA)
+                {
+                    ok = truth_and(ca_check_is_algebraic(x, GR_CA_CTX(x_ctx)), ca_check_is_real(x, GR_CA_CTX(x_ctx)));
+                }
+
+                if (ok == T_TRUE)
+                {
+                    ca_transfer(res, GR_CA_CTX(ctx), x, GR_CA_CTX(x_ctx));
+                    return GR_SUCCESS;
+                }
+
+                return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+            }
+
+        case GR_CTX_RR_CA:
+            {
+                truth_t ok = T_UNKNOWN;
+
+                if (target == GR_CTX_RR_CA || target == GR_CTX_CC_CA)
+                {
+                    ok = T_TRUE;
+                }
+                else if (target == GR_CTX_REAL_ALGEBRAIC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+                {
+                    ok = ca_check_is_algebraic(x, GR_CA_CTX(x_ctx));
+                }
+
+                if (ok == T_TRUE)
+                {
+                    ca_transfer(res, GR_CA_CTX(ctx), x, GR_CA_CTX(x_ctx));
+                    return GR_SUCCESS;
+                }
+
+                return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+            }
+
+        case GR_CTX_CC_CA:
+            {
+                truth_t ok = T_UNKNOWN;
+
+                if (ctx->which_ring == GR_CTX_CC_CA)
+                {
+                    ok = T_TRUE;
+                }
+                else if (ctx->which_ring == GR_CTX_RR_CA)
+                {
+                    ok = ca_check_is_real(x, GR_CA_CTX(x_ctx));
+                }
+                else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+                {
+                    ok = ca_check_is_algebraic(x, GR_CA_CTX(x_ctx));
+                }
+                else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
+                {
+                    ok = truth_and(ca_check_is_algebraic(x, GR_CA_CTX(x_ctx)), ca_check_is_real(x, GR_CA_CTX(x_ctx)));
+                }
+
+                if (ok == T_TRUE)
+                {
+                    ca_transfer(res, GR_CA_CTX(ctx), x, GR_CA_CTX(x_ctx));
+                    return GR_SUCCESS;
+                }
+
+                return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+            }
+    }
+
+    return GR_UNABLE;
+}
+
+int 
+_gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
+{
+    int status = GR_UNABLE;
+    truth_t ok;
+
+    acb_t t;
+    acb_init(t);
+
+    /* todo: when to use accurate_parts? */
+    ca_get_acb(t, x, prec, GR_CA_CTX(x_ctx));
+
+    if (x_ctx->which_ring == GR_CTX_RR_CA || x_ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        (arb_is_zero(acb_imagref(t)) && arb_is_finite(acb_realref(t))))
+    {
+        status = GR_SUCCESS;
+    }
+    else
+    {
+        ok = ca_check_is_real(x, GR_CA_CTX(x_ctx));
+
+        if (ok == T_TRUE)
+            status = GR_SUCCESS;
+        else
+            status = (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+
+    if (status == GR_SUCCESS)
+        arb_set_round(res, acb_realref(t), prec);
+
+    acb_clear(t);
+    return status;
+}
+
+int 
+_gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
+{
+    /* todo: when to use accurate_parts? */
+    ca_get_acb(res, x, prec, GR_CA_CTX(x_ctx));
+    acb_set_round(res, res, prec);
+    return GR_SUCCESS;
+}
+
 truth_t
-_gr_ca_is_zero(const ca_t x, const gr_ctx_t ctx)
+_gr_ca_is_zero(const ca_t x, gr_ctx_t ctx)
 {
     return ca_check_is_zero(x, GR_CA_CTX(ctx));
 }
 
 truth_t
-_gr_ca_is_one(const ca_t x, const gr_ctx_t ctx)
+_gr_ca_is_one(const ca_t x, gr_ctx_t ctx)
 {
     return ca_check_is_one(x, GR_CA_CTX(ctx));
 }
 
 truth_t
-_gr_ca_is_neg_one(const ca_t x, const gr_ctx_t ctx)
+_gr_ca_is_neg_one(const ca_t x, gr_ctx_t ctx)
 {
     return ca_check_is_neg_one(x, GR_CA_CTX(ctx));
 }
 
 truth_t
-_gr_ca_equal(const ca_t x, const ca_t y, const gr_ctx_t ctx)
+_gr_ca_equal(const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     return ca_check_equal(x, y, GR_CA_CTX(ctx));
 }
 
 int
-_gr_ca_set(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_set(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_set(res, x, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_neg(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_neg(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_neg(res, x, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_add(ca_t res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
+_gr_ca_add(ca_t res, const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     ca_add(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_add_si(ca_t res, const ca_t x, slong y, const gr_ctx_t ctx)
+_gr_ca_add_si(ca_t res, const ca_t x, slong y, gr_ctx_t ctx)
 {
     ca_add_si(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_add_ui(ca_t res, const ca_t x, ulong y, const gr_ctx_t ctx)
+_gr_ca_add_ui(ca_t res, const ca_t x, ulong y, gr_ctx_t ctx)
 {
     ca_add_ui(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_add_fmpz(ca_t res, const ca_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_ca_add_fmpz(ca_t res, const ca_t x, const fmpz_t y, gr_ctx_t ctx)
 {
     ca_add_fmpz(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_add_fmpq(ca_t res, const ca_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_ca_add_fmpq(ca_t res, const ca_t x, const fmpq_t y, gr_ctx_t ctx)
 {
     ca_add_fmpq(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_sub(ca_t res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
+_gr_ca_sub(ca_t res, const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     ca_sub(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_sub_si(ca_t res, const ca_t x, slong y, const gr_ctx_t ctx)
+_gr_ca_sub_si(ca_t res, const ca_t x, slong y, gr_ctx_t ctx)
 {
     ca_sub_si(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_sub_ui(ca_t res, const ca_t x, ulong y, const gr_ctx_t ctx)
+_gr_ca_sub_ui(ca_t res, const ca_t x, ulong y, gr_ctx_t ctx)
 {
     ca_sub_ui(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_sub_fmpz(ca_t res, const ca_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_ca_sub_fmpz(ca_t res, const ca_t x, const fmpz_t y, gr_ctx_t ctx)
 {
     ca_sub_fmpz(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_sub_fmpq(ca_t res, const ca_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_ca_sub_fmpq(ca_t res, const ca_t x, const fmpq_t y, gr_ctx_t ctx)
 {
     ca_sub_fmpq(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_mul(ca_t res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
+_gr_ca_mul(ca_t res, const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     ca_mul(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_mul_si(ca_t res, const ca_t x, slong y, const gr_ctx_t ctx)
+_gr_ca_mul_si(ca_t res, const ca_t x, slong y, gr_ctx_t ctx)
 {
     ca_mul_si(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_mul_ui(ca_t res, const ca_t x, ulong y, const gr_ctx_t ctx)
+_gr_ca_mul_ui(ca_t res, const ca_t x, ulong y, gr_ctx_t ctx)
 {
     ca_mul_ui(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_mul_fmpz(ca_t res, const ca_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_ca_mul_fmpz(ca_t res, const ca_t x, const fmpz_t y, gr_ctx_t ctx)
 {
     ca_mul_fmpz(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, gr_ctx_t ctx)
 {
     ca_mul_fmpq(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_inv(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_inv(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_inv(res, x, GR_CA_CTX(ctx));
 
@@ -282,7 +455,7 @@ _gr_ca_inv(ca_t res, const ca_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_div(ca_t res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
+_gr_ca_div(ca_t res, const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     ca_div(res, x, y, GR_CA_CTX(ctx));
 
@@ -296,7 +469,7 @@ _gr_ca_div(ca_t res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_div_si(ca_t res, const ca_t x, slong y, const gr_ctx_t ctx)
+_gr_ca_div_si(ca_t res, const ca_t x, slong y, gr_ctx_t ctx)
 {
     if (y == 0)
     {
@@ -310,7 +483,7 @@ _gr_ca_div_si(ca_t res, const ca_t x, slong y, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_div_ui(ca_t res, const ca_t x, ulong y, const gr_ctx_t ctx)
+_gr_ca_div_ui(ca_t res, const ca_t x, ulong y, gr_ctx_t ctx)
 {
     if (y == 0)
     {
@@ -324,7 +497,7 @@ _gr_ca_div_ui(ca_t res, const ca_t x, ulong y, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
     {
@@ -338,7 +511,7 @@ _gr_ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, gr_ctx_t ctx)
 {
     if (fmpq_is_zero(y))
     {
@@ -352,20 +525,20 @@ _gr_ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_ca_is_invertible(const ca_t x, const gr_ctx_t ctx)
+_gr_ca_is_invertible(const ca_t x, gr_ctx_t ctx)
 {
     return truth_not(ca_check_is_zero(x, GR_CA_CTX(ctx)));
 }
 
 int
-_gr_ca_pow_ui(ca_t res, const ca_t x, ulong exp, const gr_ctx_t ctx)
+_gr_ca_pow_ui(ca_t res, const ca_t x, ulong exp, gr_ctx_t ctx)
 {
     ca_pow_ui(res, x, exp, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_ca_pow_si(ca_t res, const ca_t x, slong exp, const gr_ctx_t ctx)
+_gr_ca_pow_si(ca_t res, const ca_t x, slong exp, gr_ctx_t ctx)
 {
     ca_pow_si(res, x, exp, GR_CA_CTX(ctx));
 
@@ -379,7 +552,7 @@ _gr_ca_pow_si(ca_t res, const ca_t x, slong exp, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t exp, const gr_ctx_t ctx)
+_gr_ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t exp, gr_ctx_t ctx)
 {
     ca_pow_fmpz(res, x, exp, GR_CA_CTX(ctx));
 
@@ -393,7 +566,7 @@ _gr_ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t exp, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t exp, const gr_ctx_t ctx)
+_gr_ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t exp, gr_ctx_t ctx)
 {
     ca_pow_fmpq(res, x, exp, GR_CA_CTX(ctx));
 
@@ -420,7 +593,7 @@ _gr_ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t exp, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, const gr_ctx_t ctx)
+_gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, gr_ctx_t ctx)
 {
     ca_pow(res, x, exp, GR_CA_CTX(ctx));
 
@@ -460,7 +633,7 @@ _gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_ca_is_square(const ca_t x, const gr_ctx_t ctx)
+_gr_ca_is_square(const ca_t x, gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
     {
@@ -473,7 +646,7 @@ _gr_ca_is_square(const ca_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_sqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_sqrt(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_sqrt(res, x, GR_CA_CTX(ctx));
 
@@ -500,7 +673,7 @@ _gr_ca_sqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_rsqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_rsqrt(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_sqrt(res, x, GR_CA_CTX(ctx));
     ca_inv(res, res, GR_CA_CTX(ctx));
@@ -528,7 +701,7 @@ _gr_ca_rsqrt(ca_t res, const ca_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_abs(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_abs(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_abs(res, x, GR_CA_CTX(ctx));
 
@@ -539,7 +712,7 @@ _gr_ca_abs(ca_t res, const ca_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_conj(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_conj(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_conj(res, x, GR_CA_CTX(ctx));
 
@@ -551,7 +724,7 @@ _gr_ca_conj(ca_t res, const ca_t x, const gr_ctx_t ctx)
 
 /* todo: exploit when we know that the field is real */
 int
-_gr_ca_re(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_re(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_re(res, x, GR_CA_CTX(ctx));
 
@@ -563,9 +736,31 @@ _gr_ca_re(ca_t res, const ca_t x, const gr_ctx_t ctx)
 
 /* todo: exploit when we know that the field is real */
 int
-_gr_ca_im(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_im(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_im(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_sgn(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_sgn(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_csgn(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_csgn(res, x, GR_CA_CTX(ctx));
 
     if (ca_is_unknown(res, GR_CA_CTX(ctx)))
         return GR_UNABLE;
@@ -581,7 +776,7 @@ int
 _ca_cmp(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 int
-_gr_ca_cmp(int * res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
+_gr_ca_cmp(int * res, const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     int cmp = _ca_cmp(x, y, GR_CA_CTX(ctx));
 
@@ -593,6 +788,67 @@ _gr_ca_cmp(int * res, const ca_t x, const ca_t y, const gr_ctx_t ctx)
 
     *res = cmp;
     return GR_SUCCESS;
+}
+
+int
+_gr_ca_exp(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || 
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_one(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_exp(res, x, GR_CA_CTX(ctx));
+
+        if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+            return GR_UNABLE;
+
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_ca_log(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || 
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_one(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_log(res, x, GR_CA_CTX(ctx));
+
+        if (ctx->which_ring == GR_CTX_RR_CA)
+        {
+            truth_t ok = ca_check_is_real(res, GR_CA_CTX(ctx));
+
+            if (ok == T_TRUE)
+                return GR_SUCCESS;
+
+            return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+        }
+
+        if (ca_check_is_infinity(res, GR_CA_CTX(ctx)) == T_TRUE)
+            return GR_DOMAIN;
+
+        if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+            return GR_UNABLE;
+
+        return GR_SUCCESS;
+    }
 }
 
 int
@@ -676,6 +932,7 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_ca_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_ca_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_ca_set_fmpq},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_ca_set_other},
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_ca_neg},
 
@@ -720,8 +977,13 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_ca_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_ca_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_ca_im},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_ca_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) _gr_ca_csgn},
 
     {GR_METHOD_CMP,              (gr_funcptr) _gr_ca_cmp},
+
+    {GR_METHOD_EXP,             (gr_funcptr) _gr_ca_exp},
+    {GR_METHOD_LOG,             (gr_funcptr) _gr_ca_log},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},

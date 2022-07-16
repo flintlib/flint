@@ -39,9 +39,9 @@ class fmpz_poly_struct(ctypes.Structure):
 
 class fmpq_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
-                ('den', ctypes.c_long),
                 ('alloc', ctypes.c_long),
-                ('length', ctypes.c_long)]
+                ('length', ctypes.c_long),
+                ('den', ctypes.c_long)]
 
 class arb_struct(ctypes.Structure):
     _fields_ = [('data', ctypes.c_long * 6)]
@@ -60,6 +60,12 @@ class qqbar_struct(ctypes.Structure):
 
 class ca_struct(ctypes.Structure):
     _fields_ = [('data', ctypes.c_long * 5)]
+
+class gr_poly_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('alloc', ctypes.c_long),
+                ('length', ctypes.c_long)]
+
 
 # todo: efficiently
 def fmpz_to_python_int(xref):
@@ -98,6 +104,12 @@ libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c
 libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+
+_add_methods = [libgr.gr_add, libgr.gr_add_ui, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_fmpq]
+_sub_methods = [libgr.gr_sub, libgr.gr_sub_ui, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_fmpq]
+_mul_methods = [libgr.gr_mul, libgr.gr_mul_ui, libgr.gr_mul_si, libgr.gr_mul_fmpz, libgr.gr_mul_fmpq]
+_div_methods = [libgr.gr_div, libgr.gr_div_ui, libgr.gr_div_si, libgr.gr_div_fmpz, libgr.gr_div_fmpq]
+_pow_methods = [libgr.gr_pow, libgr.gr_pow_ui, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_fmpq]
 
 _gr_logic = 0
 
@@ -255,6 +267,20 @@ class gr_elem:
         return res
 
     @staticmethod
+    def _binary_op2(self, other, ops, rstr):
+        if type(other) is int and -sys.maxsize <= other <= sys.maxsize:
+            res = type(self)(None, self._ctx_python)
+            status = ops[2](res._ref, self._ref, other, self._ctx)
+        else:
+            self, other = gr_elem._binary_coercion(self, other)
+            res = type(self)(None, self._ctx_python)
+            status = ops[0](res._ref, self._ref, other._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"{rstr} is not implemented for x = {self}, y = {other} over {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
+        return res
+
+    @staticmethod
     def _binary_predicate(self, other, op, rstr):
         self, other = gr_elem._binary_coercion(self, other)
         truth = op(self._ref, other._ref, self._ctx)
@@ -270,7 +296,7 @@ class gr_elem:
         res = elem_type(None, self._ctx_python)
         status = op(res._ref, self._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"{rstr} is not implemented for x = {self} over {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"{rstr} cannot be computed for x = {self} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
         return res
 
@@ -335,11 +361,46 @@ class gr_elem:
         return self._binary_op(other, self, libgr.gr_div, "x / y")
 
     def __pow__(self, other):
-        return self._binary_op(self, other, libgr.gr_pow, "x ** y")
+        return self._binary_op2(self, other, _pow_methods, "x ** y")
 
     def __rpow__(self, other):
-        return self._binary_op(other, self, libgr.gr_pow, "x ** y")
+        return self._binary_op2(other, self, _pow_methods, "x ** y")
 
+    def sqrt(self):
+        return self._unary_op(self, libgr.gr_sqrt, "sqrt(x)")
+
+    def abs(self):
+        return self._unary_op(self, libgr.gr_abs, "abs(x)")
+
+    def conj(self):
+        return self._unary_op(self, libgr.gr_conj, "conj(x)")
+
+    def re(self):
+        return self._unary_op(self, libgr.gr_re, "re(x)")
+
+    def im(self):
+        return self._unary_op(self, libgr.gr_im, "im(x)")
+
+    def sgn(self):
+        return self._unary_op(self, libgr.gr_sgn, "sgn(x)")
+
+    def csgn(self):
+        return self._unary_op(self, libgr.gr_csgn, "csgn(x)")
+
+    def exp(self):
+        return self._unary_op(self, libgr.gr_exp, "exp(x)")
+
+    def log(self):
+        return self._unary_op(self, libgr.gr_log, "log(x)")
+
+    def sin(self):
+        return self._unary_op(self, libgr.gr_sin, "sin(x)")
+
+    def cos(self):
+        return self._unary_op(self, libgr.gr_cos, "cos(x)")
+
+    def atan(self):
+        return self._unary_op(self, libgr.gr_atan, "atan(x)")
 
 
 class IntegerRing_fmpz(gr_ctx):
@@ -383,36 +444,80 @@ class RealField_arb(gr_arb_ctx):
         libgr.gr_ctx_init_real_arb(self._ref, prec)
         self._elem_type = arb
 
-
 class ComplexField_acb(gr_arb_ctx):
     def __init__(self, prec=53):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_complex_acb(self._ref, prec)
         self._elem_type = acb
 
-class RealAlgebraicField_ca(gr_ctx):
-    def __init__(self):
+_ca_options = [
+    "verbose",
+    "print_flags",
+    "mpoly_ord",
+    "prec_limit",
+    "qqbar_deg_limit",
+    "low_prec",
+    "smooth_limit",
+    "lll_prec",
+    "pow_limit",
+    "use_gb",
+    "gb_length_limit",
+    "gb_poly_length_limit",
+    "gb_poly_bits_limit",
+    "vieta_limit",
+    "trig_form"]
+
+class gr_ctx_ca(gr_ctx):
+
+    def _set_options(self, kwargs):
+        for w in kwargs:
+            i = _ca_options.index(w)
+            if i == -1:
+                raise ValueError(f"unknown option {w}")
+            libgr.gr_ctx_ca_set_option(self._ref, i, kwargs[w])
+
+    def options(self):
+        opts = {_ca_options[i] : libgr.gr_ctx_ca_get_option(self._ref, i) for i in range(len(_ca_options))}
+        return opts
+
+class RealAlgebraicField_ca(gr_ctx_ca):
+    def __init__(self, **kwargs):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_real_algebraic_ca(self._ref)
         self._elem_type = ca
+        self._set_options(kwargs)
 
-class ComplexAlgebraicField_ca(gr_ctx):
-    def __init__(self):
+class ComplexAlgebraicField_ca(gr_ctx_ca):
+    def __init__(self, **kwargs):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_complex_algebraic_ca(self._ref)
         self._elem_type = ca
+        self._set_options(kwargs)
 
-class RealField_ca(gr_ctx):
-    def __init__(self):
+class RealField_ca(gr_ctx_ca):
+    def __init__(self, **kwargs):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_real_ca(self._ref)
         self._elem_type = ca
+        self._set_options(kwargs)
 
-class ComplexField_ca(gr_ctx):
-    def __init__(self):
+class ComplexField_ca(gr_ctx_ca):
+    def __init__(self, **kwargs):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_complex_ca(self._ref)
         self._elem_type = ca
+        self._set_options(kwargs)
+
+
+class PolynomialRing_gr_poly(gr_ctx):
+    def __init__(self, coefficient_ring):
+        assert isinstance(coefficient_ring, gr_ctx)
+        if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
+            raise ValueError("coefficient structure must be a ring")
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_polynomial(self._ref, coefficient_ring._ref)
+        self._coefficient_ring = coefficient_ring
+        self._elem_type = gr_poly
 
 
 class fmpz(gr_elem):
@@ -437,12 +542,46 @@ class arb(gr_elem):
 class acb(gr_elem):
     _struct_type = acb_struct
 
+class gr_poly(gr_elem):
+    _struct_type = gr_poly_struct
+
+    def __init__(self, val=None, context=None):
+        # todo: also iterables
+        if isinstance(val, (list, tuple)):
+            gr_elem.__init__(self, None, context)
+            coefficient_ring = self.parent()._coefficient_ring
+            val = [coefficient_ring(c) for c in val]
+            for i in range(len(val)):
+                status = libgr.gr_poly_set_coeff_scalar(self._ref, i, val[i]._ref, coefficient_ring._ref)
+                if status:
+                    raise NotImplementedError
+        else:
+            gr_elem.__init__(self, val, context)
+
+    def __len__(self):
+        return self._data.length
+
+    def __getitem__(self, i):
+        n = len(self)
+        R = self.parent()._coefficient_ring
+        c = R()
+        status = libgr.gr_poly_get_coeff_scalar(c._ref, self._ref, i, R._ref)
+        if status:
+            raise NotImplementedError
+        return c
+
+
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
 AA = RealAlgebraicField_qqbar()
 QQbar = ComplexAlgebraicField_qqbar()
 RR_arb = RealField_arb()
 CC_acb = ComplexField_acb()
+RR_ca = RealField_ca()
+CC_ca = ComplexField_ca()
+
+ZZx = PolynomialRing_gr_poly(ZZ)
+
 
 
 def test_all():
@@ -477,11 +616,11 @@ def test_all():
     assert x.parent() is QQbar
     xy = x ** y
     assert (xy ** QQbar(3)) == QQbar(-2)
-    assert str(xy) == "Root a = 0.629961 + 1.09112i of a^3+2"
+    assert str(xy) == "Root a = 0.629961 + 1.09112*I of a^3+2"
     i = QQbar(-1) ** (QQ(1)/2)
-    assert str(i) == 'Root a = 1.00000i of a^2+1'
-    assert str(-i) == 'Root a = -1.00000i of a^2+1'
-    assert str(1-i) == 'Root a = 1.00000 - 1.00000i of a^2-2*a+2'
+    assert str(i) == 'Root a = 1.00000*I of a^2+1'
+    assert str(-i) == 'Root a = -1.00000*I of a^2+1'
+    assert str(1-i) == 'Root a = 1.00000 - 1.00000*I of a^2-2*a+2'
     assert raises(lambda: i > 0, ValueError)
     assert QQ(-3)/2 < i**2 < QQ(1)/2
 

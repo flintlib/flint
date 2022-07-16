@@ -212,9 +212,6 @@ typedef enum
     GR_METHOD_SQRT,
     GR_METHOD_RSQRT,
 
-    GR_METHOD_EXP, /* todo: implement */
-    GR_METHOD_LOG, /* todo: implement */
-
     /* todo: test the following */
     GR_METHOD_ABS,
     GR_METHOD_CONJ,
@@ -225,6 +222,12 @@ typedef enum
 
     GR_METHOD_CMP,
     GR_METHOD_CMPABS,
+
+    GR_METHOD_EXP,
+    GR_METHOD_LOG,
+    GR_METHOD_SIN,
+    GR_METHOD_COS,
+    GR_METHOD_ATAN,
 
     /* Finite field methods */
     GR_METHOD_CTX_FQ_PRIME,
@@ -536,6 +539,12 @@ GR_INLINE WARN_UNUSED_RESULT int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) 
 
 GR_INLINE WARN_UNUSED_RESULT int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMP)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMPABS)(res, x, y, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, EXP)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SIN)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COS)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ATAN)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }

@@ -405,6 +405,20 @@ _gr_fmpz_abs(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_im(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpz_zero(res);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_sgn(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpz_set_si(res, fmpz_sgn(x));
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_cmp(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     int cmp = fmpz_cmp(x, y);
@@ -592,6 +606,10 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_rsqrt},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpz_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_RE,              (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_IM,              (gr_funcptr) _gr_fmpz_im},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_fmpz_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},

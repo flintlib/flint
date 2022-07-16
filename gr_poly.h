@@ -90,6 +90,8 @@ WARN_UNUSED_RESULT int gr_poly_set_coeff_ui(gr_poly_t poly, slong n, ulong x, gr
 WARN_UNUSED_RESULT int gr_poly_set_coeff_fmpz(gr_poly_t poly, slong n, const fmpz_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_coeff_fmpq(gr_poly_t poly, slong n, const fmpq_t x, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_poly_get_coeff_scalar(gr_ptr res, const gr_poly_t poly, slong n, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_poly_neg(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_add(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);

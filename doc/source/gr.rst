@@ -303,6 +303,10 @@ Base rings
     or complex algebraic numbers represented by elements of type
     :type:`ca_t`.
 
+.. function:: void gr_ctx_ca_set_option(gr_ctx_t ctx, slong option, slong value)
+              slong gr_ctx_ca_get_option(gr_ctx_t ctx, slong option)
+
+    Sets or retrieves options of a Calcium context object.
 
 Derived rings
 ...............................................................................
@@ -737,6 +741,15 @@ Ordering methods
     Sets *res* to -1, 0 or 1 according to whether the absolute value
     of *x* is less than, equal or greater than the absolute value of *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
+
+Transcendental functions
+........................................................................
+
+.. function:: int gr_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
 Finite field methods
 ........................................................................

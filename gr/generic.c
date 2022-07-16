@@ -795,6 +795,52 @@ gr_generic_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return status;
 }
 
+int
+gr_generic_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_one(res, ctx);
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_one(x, ctx) == T_TRUE)
+        return gr_zero(res, ctx);
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_zero(res, ctx);
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_one(res, ctx);
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_zero(res, ctx);
+
+    return GR_UNABLE;
+}
+
+
 /* Generic vector functions */
 
 void
@@ -1452,6 +1498,12 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CMP,                     (gr_funcptr) gr_generic_cmp},
     {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},
 
+    {GR_METHOD_EXP,                     (gr_funcptr) gr_generic_exp},
+    {GR_METHOD_LOG,                     (gr_funcptr) gr_generic_log},
+    {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
+    {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
+    {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
+ 
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},
     {GR_METHOD_VEC_CLEAR,               (gr_funcptr) gr_generic_vec_clear},
     {GR_METHOD_VEC_SWAP,                (gr_funcptr) gr_generic_vec_swap},

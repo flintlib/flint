@@ -436,6 +436,13 @@ _gr_fmpq_im(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpq_sgn(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpq_set_si(res, fmpq_sgn(x), 1);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_cmp(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     int cmp = fmpq_cmp(x, y);
@@ -656,6 +663,8 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpq_im},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_fmpq_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpq_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpq_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},

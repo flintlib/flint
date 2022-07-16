@@ -1,6 +1,7 @@
 #include "arb.h"
 #include "arb_poly.h"
 #include "arb_mat.h"
+#include "qqbar.h"
 #include "gr.h"
 
 typedef struct
@@ -112,6 +113,45 @@ _gr_arb_set_fmpq(arb_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     arb_set_fmpq(res, v, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
+}
+
+int 
+_gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
+
+int
+_gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+{
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_FMPZ:
+            return _gr_arb_set_fmpz(res, x, ctx);
+
+        case GR_CTX_FMPQ:
+            return _gr_arb_set_fmpq(res, x, ctx);
+
+        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
+            qqbar_get_arb(res, x, ARB_CTX_PREC(ctx));
+            return GR_SUCCESS;
+
+        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+            if (qqbar_is_real(x))
+            {
+                qqbar_get_arb(res, x, ARB_CTX_PREC(ctx));
+                return GR_SUCCESS;
+            }
+            else
+            {
+                return GR_DOMAIN;
+            }
+
+        case GR_CTX_RR_CA:
+        case GR_CTX_REAL_ALGEBRAIC_CA:
+        case GR_CTX_CC_CA:
+        case GR_CTX_COMPLEX_ALGEBRAIC_CA:
+            return _gr_ca_get_arb_with_prec(res, x, x_ctx, ARB_CTX_PREC(ctx));
+    }
+
+    return GR_UNABLE;
 }
 
 truth_t
@@ -552,6 +592,13 @@ _gr_arb_im(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_sgn(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_sgn(res, x);
+    return GR_SUCCESS;
+}
+
+int
 _gr_arb_cmp(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if ((arb_is_exact(x) && arb_is_exact(y)) || !arb_overlaps(x, y))
@@ -581,6 +628,49 @@ _gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
         ARF_NEG(arb_midref(u));
 
     return _gr_arb_cmp(res, t, u, ctx);
+}
+
+int
+_gr_arb_exp(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_exp(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_log(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_positive(x))
+    {
+        arb_log(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (arb_is_nonpositive(x))
+        return GR_DOMAIN;
+
+    return GR_UNABLE;
+}
+
+int
+_gr_arb_sin(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_sin(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_cos(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_cos(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_atan(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_atan(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
 }
 
 int
@@ -660,6 +750,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_arb_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_arb_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_arb_set_fmpq},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_arb_set_other},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_arb_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_arb_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_arb_add_ui},
@@ -695,8 +786,15 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_arb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_arb_set},
     {GR_METHOD_IM,              (gr_funcptr) _gr_arb_im},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_arb_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) _gr_arb_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_arb_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_arb_cmpabs},
+    {GR_METHOD_EXP,             (gr_funcptr) _gr_arb_exp},
+    {GR_METHOD_LOG,             (gr_funcptr) _gr_arb_log},
+    {GR_METHOD_SIN,             (gr_funcptr) _gr_arb_sin},
+    {GR_METHOD_COS,             (gr_funcptr) _gr_arb_cos},
+    {GR_METHOD_ATAN,            (gr_funcptr) _gr_arb_atan},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},

@@ -133,7 +133,7 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
                 gr_stream_write_free(out, im_s);
             }
 
-            gr_stream_write(out, "i");
+            gr_stream_write(out, "*I");
         }
         gr_stream_write(out, " of ");
         gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
@@ -590,6 +590,20 @@ _gr_qqbar_im(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_qqbar_sgn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_sgn(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_csgn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_set_si(res, qqbar_csgn(x));
+    return GR_SUCCESS;
+}
+
+int
 _gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     if (!qqbar_is_real(x) || !qqbar_is_real(y))
@@ -717,6 +731,8 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_qqbar_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_qqbar_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_qqbar_im},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_qqbar_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) _gr_qqbar_csgn},
 
     {0,                         (gr_funcptr) NULL},
 };
