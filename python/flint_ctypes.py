@@ -99,36 +99,69 @@ libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctype
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
+_gr_logic = 0
+
+class LogicContext(object):
+    """
+    Handle the result of predicates (experimental):
+
+        >>> a = (RR_arb(1) / 3) * 3
+        >>> a
+        [1.00000000000000 +/- 3.89e-16]
+        >>> with strict_logic:
+        ...     a == 1
+        ...
+        Traceback (most recent call last):
+          ...
+        Undecidable: x == y cannot be decided for x = [1.00000000000000 +/- 3.89e-16], y = 1.000000000000000 over Real numbers (arb, prec = 53)
+        >>> with pessimistic_logic:
+        ...     a == 1
+        ...
+        False
+        >>> with optimistic_logic:
+        ...     a == 1
+        ...
+        True
+    """
+
+    def __init__(self, value):
+        self.logic = value
+    def __enter__(self):
+        global _gr_logic
+        self.original = _gr_logic
+        _gr_logic = self.logic
+    def __exit__(self, type, value, traceback):
+        global _gr_logic
+        _gr_logic = self.original
+
+strict_logic = LogicContext(0)
+pessimistic_logic = LogicContext(-1)
+optimistic_logic = LogicContext(1)
+
+
 class gr_ctx:
 
-    def __init__(self, which, **kwargs):
+    def __init__(self):
         self._data = gr_ctx_struct()
         self._ref = ctypes.byref(self._data)
-        if which == "ZZ":
-            libgr.gr_ctx_init_fmpz(self._ref)
-            self._elem_type = fmpz
-        elif which == "QQ":
-            libgr.gr_ctx_init_fmpq(self._ref)
-            self._elem_type = fmpq
-        elif which == "QQbar":
-            libgr.gr_ctx_init_complex_qqbar(self._ref)
-            self._elem_type = qqbar
-        self._str = self._repr()
+        self._str = None
 
     def _repr(self):
-        arr = ctypes.c_char_p()
-        if libgr.gr_ctx_get_str(ctypes.byref(arr), self._ref) != GR_SUCCESS:
-            raise NotImplementedError
-        try:
-            return ctypes.cast(arr, ctypes.c_char_p).value.decode("ascii")
-        finally:
-            libflint.flint_free(arr)
+        if self._str is None:
+            arr = ctypes.c_char_p()
+            if libgr.gr_ctx_get_str(ctypes.byref(arr), self._ref) != GR_SUCCESS:
+                raise NotImplementedError
+            try:
+                self._str = ctypes.cast(arr, ctypes.c_char_p).value.decode("ascii")
+            finally:
+                libflint.flint_free(arr)
+        return self._str
 
     def __call__(self, value=None):
         return self._elem_type(value, self)
 
     def __repr__(self):
-        return self._str
+        return self._repr()
 
     def __del__(self):
         # todo: refcounting
@@ -167,7 +200,6 @@ class gr_elem:
                         if status & GR_DOMAIN: raise ValueError()
                     libflint.fmpz_clear(nref)
             elif isinstance(val, gr_elem):
-                #c = libgr.gr_ctx_cmp_coercion(self._ctx, other._ctx)
                 status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
                 if status:
                     if status & GR_UNABLE: raise NotImplementedError()
@@ -228,6 +260,8 @@ class gr_elem:
         truth = op(self._ref, other._ref, self._ctx)
         if truth == T_TRUE: return True
         if truth == T_FALSE: return False
+        if _gr_logic == 1: return True
+        if _gr_logic == -1: return False
         raise Undecidable(f"{rstr} cannot be decided for x = {self}, y = {other} over {self.parent()}")
 
     @staticmethod
@@ -307,11 +341,79 @@ class gr_elem:
         return self._binary_op(other, self, libgr.gr_pow, "x ** y")
 
 
+
+class IntegerRing_fmpz(gr_ctx):
+    def __init__(self):
+        print("initai")
+        gr_ctx.__init__(self)
+        print("call...")
+        libgr.gr_ctx_init_fmpz(self._ref)
+        print("end call...")
+        self._elem_type = fmpz
+
+class RationalField_fmpq(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpq(self._ref)
+        self._elem_type = fmpq
+
+class ComplexAlgebraicField_qqbar(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_complex_qqbar(self._ref)
+        self._elem_type = qqbar
+
+class RealAlgebraicField_qqbar(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_real_qqbar(self._ref)
+        self._elem_type = qqbar
+
+class RealField_arb(gr_ctx):
+    def __init__(self, prec=53):
+        gr_ctx.__init__(self)
+        assert prec >= 2
+        libgr.gr_ctx_init_real_arb(self._ref, prec)
+        self._elem_type = arb
+
+class ComplexField_acb(gr_ctx):
+    def __init__(self, prec=53):
+        gr_ctx.__init__(self)
+        assert prec >= 2
+        libgr.gr_ctx_init_complex_acb(self._ref, prec)
+        self._elem_type = acb
+
+class RealAlgebraicField_ca(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_real_algebraic_ca(self._ref)
+        self._elem_type = ca
+
+class ComplexAlgebraicField_ca(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_complex_algebraic_ca(self._ref)
+        self._elem_type = ca
+
+class RealField_ca(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_real_ca(self._ref)
+        self._elem_type = ca
+
+class ComplexField_ca(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_complex_ca(self._ref)
+        self._elem_type = ca
+
+
 class fmpz(gr_elem):
     _struct_type = fmpz_struct
 
     def __int__(self):
         return fmpz_to_python_int(self._ref)
+
 
 class fmpq(gr_elem):
     _struct_type = fmpq_struct
@@ -319,9 +421,22 @@ class fmpq(gr_elem):
 class qqbar(gr_elem):
     _struct_type = qqbar_struct
 
-ZZ = gr_ctx("ZZ")
-QQ = gr_ctx("QQ")
-QQbar = gr_ctx("QQbar")
+class ca(gr_elem):
+    _struct_type = ca_struct
+
+class arb(gr_elem):
+    _struct_type = arb_struct
+
+class acb(gr_elem):
+    _struct_type = acb_struct
+
+ZZ = IntegerRing_fmpz()
+QQ = RationalField_fmpq()
+AA = RealAlgebraicField_qqbar()
+QQbar = ComplexAlgebraicField_qqbar()
+RR_arb = RealField_arb()
+CC_acb = ComplexField_acb()
+
 
 def test_all():
 
