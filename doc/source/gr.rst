@@ -1,31 +1,128 @@
 .. _gr:
 
-**gr.h** -- generic rings
+**gr.h** -- generic structures and their elements
 ===============================================================================
 
-Error handling
+Introduction
 -------------------------------------------------------------------------------
 
-To implement computations over a ring `R`,
-it is sometimes convenient to extend the ring to a set
-`R' = R \cup \{ \text{undefined}, \text{unknown} \}`.
-An *undefined* (error) value allows us to extend partial functions
-to total functions.
-Alternatively,
-we could use some arbitrary default value in `R`,
-say `\text{undefined} = 0`; this is often done in
-formal theorem provers,
-but it may be undesirable in a regular programming
-environment as it makes it harder to detect bugs.
-An *unknown* value is useful in cases where a result
-may exist in principle but cannot be computed.
+Parents and elements
+...............................................................................
 
-Ideally, we would represent `R'` as a type-level extension of `R`,
-but this tricky in C since we would either have to
+To work with an element `x \in R` of a particular mathematical
+structure *R*, we use a context object to represent *R*
+(the "parent" of `x`). Elements are passed around as pointers.
+Note:
+
+* Parents are not stored as part of the elements; the user must
+  track the context objects for all variables.
+* Operations are strictly type-stable:
+  elements only change parent when performing an explicit conversion.
+
+The structure *R* will typically be a *ring*, but the framework supports
+general
+objects (including groups, monoids, and sets without any particular
+structure whatsoever). We use these terms in a strict mathematical
+sense: a "ring" must exactly satisfy the ring axioms.
+It can have inexact *representations*, but this inexactness
+must be handled rigorously.
+
+To give an idea of how the interface works, this example program
+computes `3^{100}` in the ring of integers and prints the value::
+
+    #include "gr.h"
+
+    int main()
+    {
+        int status;
+        gr_ctx_t ZZ:             /* a parent (context object) */
+        gr_ptr x;                /* an element */
+
+        gr_ctx_init_fmpz(ZZ);    /* ZZ = ring of integers with fmpz_t elements */
+        GR_TMP_INIT(x, ctx)      /* allocate element on the stack */
+
+        status = gr_set_ui(x, 3, ctx);           /* x = 3 */
+        status |= gr_pow_ui(x, x, 100, ctx);     /* x = x ^ 100 */
+        status |= gr_println(x, ctx);
+
+        GR_TMP_CLEAR(x, ctx)
+        gr_ctx_clear(ZZ);
+
+        return status;
+    }
+
+Parent and element types
+...............................................................................
+
+.. type:: gr_ptr
+
+    Pointer to a ring element or array of contiguous ring elements.
+    This is an alias for ``void *`` so that it can be used with any
+    C type.
+
+.. type:: gr_srcptr
+
+    Pointer to a read-only ring element or read-only array of
+    contiguous ring elements. This is an alias for
+    ``const void *`` so that it can be used with any C type.
+
+.. type:: gr_ctx_struct
+
+.. type:: gr_ctx_t
+
+    A context object representing a mathematical structure *R*.
+    It contains the following data:
+
+    * The size (number of bytes) of each element.
+    * A pointer to a method table.
+    * Optionally a pointer to data defining parameters of the ring
+      (e.g. modulus of a residue ring; element ring and dimensions
+      of a matrix ring; precision of an inexact ring).
+
+    A :type:`gr_ctx_t` is defined as an array of length one of type
+    :type:`gr_ctx_struct`, permitting a :type:`gr_ctx_t` to be
+    passed by reference.
+    Context objects are not normally passed as ``const`` in order
+    to allow storing mutable caches, additional
+    debugging information, etc.
+
+.. type:: gr_ctx_ptr
+
+    Pointer to a context object.
+
+There is no type to represent a single generic element
+as a struct since we do not know the size of a generic element at
+compile time.
+Memory for single elements can either be allocated on the stack
+with the special macros provided below, or as usual with ``malloc``.
+Methods can also be used with particular C types like ``fmpz_t``
+when the user knows the type.
+Users may wish to define their own union types when only some
+particular types will appear in an application.
+
+Error handling
+...............................................................................
+
+To compute over a structure `R`, it is useful to conceptually extend
+to a larger set `R' = R \cup \{ \text{undefined}, \text{unknown} \}`.
+
+* Adding an *undefined* (error) value allows us to extend partial functions
+  to total functions.
+* An *unknown* value is useful in cases where a result
+  may exist in principle but cannot be computed.
+
+An alternative to having an *undefined* value
+is to choose some arbitrary default value in `R`,
+say `\text{undefined} = 0` in a ring. This is often done in
+proof assistants, but in a regular programming environment,
+we typically want some way to detect domain errors.
+
+Representing `R'` as a type-level extension of `R` is tricky in C
+since we would either have to
 wrap elements in a larger structure
 or reserve bit patterns in each type for special values.
 In any case, it is useful to assume in low-level code
-that ring elements really represent ring elements
+that elements *really represent elements of the intended structure*
 so that there are fewer special cases to handle.
 We also need some form of error handling for conversions
 to standard C types.
@@ -70,9 +167,29 @@ Functions can return a combination of the following status flags:
 When the status code is any other value than ``GR_SUCCESS``, any
 output variables may be set to meaningless values.
 
+C functions that return a status code are marked with the
+``WARN_UNUSED_RESULT`` attribute. This allows compilers to
+emit warnings when the status code is ignored.
+
+Flags can be OR'ed and checked only at the top level of a computation
+to avoid complex control flow::
+
+    status = GR_SUCCESS;
+    gr |= gr_add(res, a, b, ctx);
+    gr |= gr_pow_ui(res, res, 2, ctx);
+    ...
+
+If we do not care about recovering from *undefined*/*unknown* results,
+the following macro is useful:
+
+.. macro:: GR_MUST_SUCCEED(expr)
+
+    Evaluates *expr* and asserts that the return value is
+    ``GR_SUCCESS``. On failure, calls ``flint_abort()``.
+
 For uniformity, most operations return a status code, even operations
-that are not typically expected to fail (we might want to wrap
-such functions in asserts).
+that are not typically expected to fail. Exceptions include the
+following:
 
 * Pure "container" operations like ``init``, ``clear`` and ``swap``
   do not return a status code.
@@ -81,16 +198,9 @@ such functions in asserts).
   return ``T_TRUE`` / ``T_FALSE`` / ``T_UNKNOWN``
   instead of computing a separate boolean value and error code.
 
-Flags can be OR'ed and checked only at the top level of a computation
-to avoid complex control flow.
 
-.. macro:: GR_MUST_SUCCEED(expr)
-
-    Evaluates *expr* and asserts that the return value is
-    ``GR_SUCCESS``.
-
-Ring predicates
--------------------------------------------------------------------------------
+Predicates
+...............................................................................
 
 We use the following type (borrowed from Calcium) instead of a C int
 to represent boolean results, allowing the possibility
@@ -112,57 +222,6 @@ that the value is not computable:
     etc. depending on whether the unknown case should be included
     or excluded.
 
-
-Main types
--------------------------------------------------------------------------------
-
-.. type:: gr_ptr
-
-    Pointer to a ring element or array of contiguous ring elements.
-    This is an alias for ``void *`` so that it can be used with any
-    C type.
-
-.. type:: gr_srcptr
-
-    Pointer to a read-only ring element or read-only array of
-    contiguous ring elements. This is an alias for
-    ``const void *`` so that it can be used with any C type.
-
-.. type:: gr_ctx_struct
-
-.. type:: gr_ctx_t
-
-    A context object representing a mathematical ring *R*.
-    It contains the following data:
-
-    * Flags describing useful properties of the ring.
-    * The size (number of bytes) of each element.
-    * A pointer to a method table.
-    * Optionally a pointer to data defining parameters of the ring
-      (e.g. modulus of a residue ring; element ring and dimensions
-      of a matrix ring; precision of an inexact ring).
-
-    A :type:`gr_ctx_t` is defined as an array of length one of type
-    :type:`gr_ctx_struct`, permitting a :type:`gr_ctx_t` to be
-    passed by reference.
-    Context objects are not normally passed as ``const`` in order
-    to allow storing mutable caches, additional
-    debugging information, etc.
-
-.. type:: gr_ctx_ptr
-
-    Pointer to a context object.
-
-Observe that there is no type to represent a single generic element
-as a struct since we do not know the size of a generic element at
-compile time.
-Memory for single elements can either be allocated on the stack
-with the special macros provided below, or as usual with ``malloc``.
-
-When using generic methods with a known type like
-``fmpz_t``, the usual type can of course be used.
-Users may wish to define their own union types when only some
-particular types will appear in an application.
 
 Ring constructions
 -------------------------------------------------------------------------------
@@ -228,6 +287,12 @@ Base rings
     Initializes *ctx* to the field of real or complex
     numbers represented by elements of type :type:`arb_t`
     and  :type:`acb_t`.
+
+.. function:: void gr_ctx_arb_set_prec(gr_ctx_t ctx, slong prec)
+              slong gr_ctx_arb_get_prec(gr_ctx_t ctx)
+
+    Sets or retrieves the bit precision of *ctx* which must be
+    an Arb context (this is currently not checked).
 
 .. function:: void gr_ctx_init_real_ca(gr_ctx_t ctx)
               void gr_ctx_init_complex_ca(gr_ctx_t ctx)
@@ -641,8 +706,8 @@ the choice of root is implementation-dependent.
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
 
-Complex parts
---------------------------------------------------------------------------------
+Complex methods
+........................................................................
 
 .. function:: int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
@@ -659,7 +724,7 @@ Complex parts
     when the ring is not a subring of the real or complex numbers.
 
 Ordering methods
---------------------------------------------------------------------------------
+........................................................................
 
 .. function:: int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
@@ -674,7 +739,7 @@ Ordering methods
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
 Finite field methods
---------------------------------------------------------------------------------
+........................................................................
 
 .. function:: int gr_ctx_fq_prime(fmpz_t p, gr_ctx_t ctx)
 

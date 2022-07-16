@@ -686,8 +686,7 @@ gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
     ctx->elem_ctx = flint_malloc(sizeof(gr_acb_ctx));
     ctx->size_limit = WORD_MAX;
 
-    if (prec < 2 || prec > WORD_MAX / 4)
-        abort();
+    gr_ctx_arb_set_prec(ctx, prec);
 
     ACB_CTX_PREC(ctx) = prec;
 

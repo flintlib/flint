@@ -11,6 +11,19 @@ gr_arb_ctx;
 
 #define ARB_CTX_PREC(ring_ctx) (((gr_arb_ctx *)((ring_ctx)->elem_ctx))->prec)
 
+void gr_ctx_arb_set_prec(gr_ctx_t ctx, slong prec)
+{
+    prec = FLINT_MAX(prec, 2);
+    prec = FLINT_MIN(prec, WORD_MAX / 8);
+
+    ARB_CTX_PREC(ctx) = prec;
+}
+
+slong gr_ctx_arb_get_prec(gr_ctx_t ctx)
+{
+    return ARB_CTX_PREC(ctx);
+}
+
 int
 _gr_arb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -700,10 +713,7 @@ gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
     ctx->elem_ctx = flint_malloc(sizeof(gr_arb_ctx));
     ctx->size_limit = WORD_MAX;
 
-    if (prec < 2 || prec > WORD_MAX / 4)
-        abort();
-
-    ARB_CTX_PREC(ctx) = prec;
+    gr_ctx_arb_set_prec(ctx, prec);
 
     ctx->methods = _arb_methods;
 

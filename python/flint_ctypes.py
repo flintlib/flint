@@ -344,11 +344,8 @@ class gr_elem:
 
 class IntegerRing_fmpz(gr_ctx):
     def __init__(self):
-        print("initai")
         gr_ctx.__init__(self)
-        print("call...")
         libgr.gr_ctx_init_fmpz(self._ref)
-        print("end call...")
         self._elem_type = fmpz
 
 class RationalField_fmpq(gr_ctx):
@@ -369,17 +366,27 @@ class RealAlgebraicField_qqbar(gr_ctx):
         libgr.gr_ctx_init_real_qqbar(self._ref)
         self._elem_type = qqbar
 
-class RealField_arb(gr_ctx):
+class gr_arb_ctx(gr_ctx):
+
+    @property
+    def prec(self):
+        return libgr.gr_ctx_arb_get_prec(self._ref)
+
+    @prec.setter
+    def prec(self, prec):
+        libgr.gr_ctx_arb_set_prec(self._ref, prec)
+
+
+class RealField_arb(gr_arb_ctx):
     def __init__(self, prec=53):
         gr_ctx.__init__(self)
-        assert prec >= 2
         libgr.gr_ctx_init_real_arb(self._ref, prec)
         self._elem_type = arb
 
-class ComplexField_acb(gr_ctx):
+
+class ComplexField_acb(gr_arb_ctx):
     def __init__(self, prec=53):
         gr_ctx.__init__(self)
-        assert prec >= 2
         libgr.gr_ctx_init_complex_acb(self._ref, prec)
         self._elem_type = acb
 

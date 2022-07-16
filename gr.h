@@ -783,6 +783,10 @@ void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);
 
+void gr_ctx_arb_set_prec(gr_ctx_t ctx, slong prec);
+slong gr_ctx_arb_get_prec(gr_ctx_t ctx);
+
+
 void gr_ctx_init_real_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_ca(gr_ctx_t ctx);
 void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
