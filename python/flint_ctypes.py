@@ -25,6 +25,13 @@ GR_UNABLE = 2
 c_slong = ctypes.c_long
 c_ulong = ctypes.c_ulong
 
+class flint_rand_struct(ctypes.Structure):
+    # todo: use the real size
+    _fields_ = [('data', c_slong * 16)]
+
+_flint_rand = flint_rand_struct()
+libflint.flint_randinit(ctypes.byref(_flint_rand))
+
 class fmpz_struct(ctypes.Structure):
     _fields_ = [('val', c_slong)]
 
@@ -65,6 +72,10 @@ class gr_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', ctypes.c_long),
                 ('length', ctypes.c_long)]
+
+class psl2z_struct(ctypes.Structure):
+    _fields_ = [('a', ctypes.c_long), ('b', ctypes.c_long),
+                ('c', ctypes.c_long), ('d', ctypes.c_long)]
 
 
 # todo: efficiently
@@ -177,8 +188,8 @@ class gr_ctx:
                 libflint.flint_free(arr)
         return self._str
 
-    def __call__(self, value=None):
-        return self._elem_type(value, self)
+    def __call__(self, value=None, random=False):
+        return self._elem_type(value, self, random)
 
     def __repr__(self):
         return self._repr()
@@ -190,7 +201,7 @@ class gr_ctx:
 
 class gr_elem:
 
-    def __init__(self, val=None, context=None):
+    def __init__(self, val=None, context=None, random=False):
         assert context is not None
         if context is None:
             raise ValueError("a context object is needed")
@@ -231,6 +242,8 @@ class gr_elem:
                     if status & GR_DOMAIN: raise ValueError()
             else:
                 raise NotImplementedError(f"unable to create {type(self)} from {type(val)}")
+        elif random:
+            libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
 
     def __del__(self):
         libgr.gr_clear(self._ref, self._ctx)
@@ -553,7 +566,7 @@ class acb(gr_elem):
 class gr_poly(gr_elem):
     _struct_type = gr_poly_struct
 
-    def __init__(self, val=None, context=None):
+    def __init__(self, val=None, context=None, random=False):
         # todo: also iterables
         if isinstance(val, (list, tuple)):
             gr_elem.__init__(self, None, context)
@@ -565,6 +578,9 @@ class gr_poly(gr_elem):
                     raise NotImplementedError
         else:
             gr_elem.__init__(self, val, context)
+            # todo: refactor
+            if random:
+                libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
 
     def __len__(self):
         return self._data.length
@@ -577,6 +593,28 @@ class gr_poly(gr_elem):
         if status:
             raise NotImplementedError
         return c
+
+
+class ModularGroup_psl2z(gr_ctx_ca):
+    def __init__(self, **kwargs):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_psl2z(self._ref)
+        self._elem_type = psl2z
+
+    # todo: C function
+    def generators(self):
+        S = self()
+        T = self()
+        S._data.a = 0
+        S._data.b = -1
+        S._data.c = 1
+        S._data.d = 0
+        T._data.b = 1
+        return (S, T)
+
+class psl2z(gr_elem):
+    _struct_type = psl2z_struct
+
 
 
 ZZ = IntegerRing_fmpz()
@@ -595,6 +633,7 @@ CCx_ca = PolynomialRing_gr_poly(CC_ca)
 RRx = RRx_arb = PolynomialRing_gr_poly(RR_arb)
 CCx = CCx_acb = PolynomialRing_gr_poly(CC_acb)
 
+PSL2Z = ModularGroup_psl2z()
 
 
 def test_all():

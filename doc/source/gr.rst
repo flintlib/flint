@@ -226,6 +226,14 @@ that the value is not computable:
 Ring constructions
 -------------------------------------------------------------------------------
 
+Groups
+...............................................................................
+
+.. function:: void gr_ctx_init_psl2z(gr_ctx_t ctx)
+
+    Initializes *ctx* to the modular group `\text{PSL}(2, \mathbb{Z})`
+    with elements of type :type:`psl2z_t`.
+
 Base rings
 ...............................................................................
 
@@ -333,10 +341,10 @@ Context operations
 
 .. function:: int gr_ctx_clear(gr_ctx_t ctx)
 
-    Clears the ring context object *ctx*, freeing any memory
+    Clears the context object *ctx*, freeing any memory
     allocated by this object.
 
-    Some rings may require that no elements are cleared after calling
+    Some context objects may require that no elements are cleared after calling
     this method, and may leak memory if not all elements have
     been cleared when calling this method.
 
@@ -349,20 +357,24 @@ Context operations
               int gr_ctx_println(gr_ctx_t ctx)
               int gr_ctx_get_str(char ** s, gr_ctx_t ctx)
 
-    Writes a description of the ring *ctx* to the stream *out*,
+    Writes a description of the structure *ctx* to the stream *out*,
     prints it to *stdout*, or sets *s* to a pointer to
     a heap-allocated string of the description (the user must free
     the string with ``flint_free``).
     The *println* version prints a trailing newline.
 
-.. function:: truth_t gr_ctx_is_ring(gr_ctx_t ctx)
+.. function:: truth_t gr_ctx_is_finite(gr_ctx_t ctx)
+              truth_t gr_ctx_is_multiplicative_group(gr_ctx_t ctx)
+              truth_t gr_ctx_is_ring(gr_ctx_t ctx)
               truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx)
               truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx)
+              truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
               truth_t gr_ctx_is_field(gr_ctx_t ctx)
               truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
+              truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx)
               truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
 
-    Returns whether the ring satisfies the respective
+    Returns whether the structure satisfies the respective
     mathematical property.
     The result can be ``T_UNKNOWN``.
 

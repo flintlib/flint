@@ -2,6 +2,7 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+/* todo: rings only */
 void gr_generic_init(void) { flint_printf("ctx must implement init()\n"); flint_abort(); }
 void gr_generic_clear(void) { flint_printf("ctx must implement clear()\n"); flint_abort(); }
 void gr_generic_swap(void) { flint_printf("ctx must implement swap()\n"); flint_abort(); }

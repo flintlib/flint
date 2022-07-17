@@ -369,6 +369,7 @@ gr_method_tab_input _nmod8_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) nmod8_ctx_write},
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) nmod8_ctx_clear},
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) nmod8_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) nmod8_ctx_is_field},

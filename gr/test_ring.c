@@ -750,6 +750,37 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_one(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr a;
+    truth_t equal;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(a, R);
+
+    status |= gr_randtest(a, state, R);
+    status |= gr_one(a, R);
+    equal = gr_is_one(a, R);
+    if (status == GR_SUCCESS && equal == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    status |= gr_randtest(a, state, R);
+    status |= gr_one(a, R);
+    status |= gr_inv(a, a, R);
+    if (status == GR_SUCCESS && equal == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    GR_TMP_CLEAR(a, R);
+
+    return status;
+}
+
+int
 gr_test_add_associative(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_associative(R, gr_add, state, test_flags);
@@ -1882,6 +1913,9 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     flint_randinit(state);
 
+    /* if (gr_ctx_is_ring(R) != T_TRUE)
+        flint_abort(); */
+
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
     gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
     gr_test_iter(R, state, "zero_one", gr_test_zero_one, iters, test_flags);
@@ -1943,6 +1977,61 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "vec_add", gr_test_vec_add, iters, test_flags);
 
     gr_test_iter(R, state, "mat_mul_classical: associative", gr_test_mat_mul_classical_associative, iters, test_flags);
+
+    flint_randclear(state);
+
+    if (test_flags & GR_TEST_VERBOSE)
+    {
+        timeit_stop(timer);
+
+        flint_printf("-------------------------------------------------------------------------------\n");
+        flint_printf("Tests finished in %.3g cpu, %.3g wall\n", timer->cpu*0.001, timer->wall*0.001);
+        flint_printf("===============================================================================\n\n");
+    }
+}
+
+void
+gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
+{
+    timeit_t timer;
+    flint_rand_t state;
+
+    /* test_flags |= GR_TEST_VERBOSE; */
+
+    if (test_flags & GR_TEST_VERBOSE)
+    {
+        timeit_start(timer);
+
+        flint_printf("===============================================================================\n");
+        flint_printf("Testing "); gr_ctx_println(R);    
+        flint_printf("-------------------------------------------------------------------------------\n");
+    }
+
+    flint_randinit(state);
+
+    /* if (gr_ctx_is_multiplicative_group(R) != T_TRUE)
+        flint_abort(); */
+
+    gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
+    gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
+    gr_test_iter(R, state, "one", gr_test_one, iters, test_flags);
+
+    gr_test_iter(R, state, "mul: associative", gr_test_mul_associative, iters, test_flags);
+/*
+    if (gr_ctx_is_abelian_group(R) == T_TRUE)
+        gr_test_iter(R, state, "mul: commutative", gr_test_mul_commutative, iters, test_flags);
+*/
+    gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters, test_flags);
+
+    gr_test_iter(R, state, "div: div then mul", gr_test_div_then_mul, iters, test_flags);
+    gr_test_iter(R, state, "div: mul then div", gr_test_mul_then_div, iters, test_flags);
+
+    gr_test_iter(R, state, "inv: multiplication", gr_test_inv_multiplication, iters, test_flags);
+    gr_test_iter(R, state, "inv: involution", gr_test_inv_involution, iters, test_flags);
+
+    gr_test_iter(R, state, "pow_ui: exponent addition", gr_test_pow_ui_exponent_addition, iters, test_flags);
+    gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_exponent_addition, iters, test_flags);
+    gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
 
     flint_randclear(state);
 

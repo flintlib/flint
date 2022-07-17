@@ -158,6 +158,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) matrix_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) matrix_ctx_clear},
+    {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_generic_ctx_predicate_true},  /* todo: matrices over semirings? */
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},

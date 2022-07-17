@@ -123,6 +123,9 @@ typedef enum
     /* ring properties related to orderings and norms */
     GR_METHOD_CTX_IS_ORDERED_RING,
 
+    /* group properties */
+    GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP,
+
     /* context properties represented to the representation */
     GR_METHOD_CTX_IS_EXACT,            /* we have no inexact elements */
     GR_METHOD_CTX_IS_CANONICAL,        /* we have no non-canonical representations */
@@ -325,6 +328,8 @@ typedef enum
     GR_CTX_GR_MPOLY,
     GR_CTX_GR_MAT,
 
+    GR_CTX_PSL2Z,
+
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
 gr_which_structure;
@@ -454,6 +459,8 @@ GR_INLINE truth_t gr_ctx_is_finite(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, 
 GR_INLINE truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FINITE_CHARACTERISTIC)(ctx); }
 GR_INLINE truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_ALGEBRAICALLY_CLOSED)(ctx); }
 GR_INLINE truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_ORDERED_RING)(ctx); }
+
+GR_INLINE truth_t gr_ctx_is_multiplicative_group(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_MULTIPLICATIVE_GROUP)(ctx); }
 
 GR_INLINE truth_t gr_ctx_is_exact(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_EXACT)(ctx); }
 GR_INLINE truth_t gr_ctx_is_canonical(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_CANONICAL)(ctx); }
@@ -812,6 +819,10 @@ void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 
+/* Groups */
+
+void gr_ctx_init_psl2z(gr_ctx_t ctx);
+
 /* Generic polynomial ring */
 
 typedef struct
@@ -853,7 +864,9 @@ int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2);
 #define GR_TEST_VERBOSE 8
 #define GR_TEST_ALWAYS_ABLE 16
 
+/* todo: just have gr_test_structure() */
 void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
+void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags);
 
 #ifdef __cplusplus
 }

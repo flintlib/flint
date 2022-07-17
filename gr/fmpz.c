@@ -542,6 +542,7 @@ gr_static_method_table _fmpz_methods;
 gr_method_tab_input _fmpz_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpz_ctx_write},
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
