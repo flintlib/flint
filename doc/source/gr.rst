@@ -223,7 +223,7 @@ that the value is not computable:
     or excluded.
 
 
-Ring constructions
+Mathematical domains
 -------------------------------------------------------------------------------
 
 Groups
@@ -233,6 +233,15 @@ Groups
 
     Initializes *ctx* to the modular group `\text{PSL}(2, \mathbb{Z})`
     with elements of type :type:`psl2z_t`.
+
+.. function:: int gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q)
+
+    Initializes *ctx* to the Dirichlet group `G_q`
+    with elements of type :type:`dirichlet_char_t`.
+    Fails and returns ``GR_DOMAIN`` if *q* is zero.
+    Fails and returns ``GR_UNABLE`` if *q* has a prime factor
+    larger than `10^{12}`, which is currently unspported
+    by the implementation.
 
 Base rings
 ...............................................................................
@@ -316,7 +325,7 @@ Base rings
 
     Sets or retrieves options of a Calcium context object.
 
-Derived rings
+Matrices
 ...............................................................................
 
 .. function:: void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
@@ -325,11 +334,21 @@ Derived rings
     over the given *base_ring*.
     Elements have type :type:`gr_mat_struct`.
 
+Polynomial rings
+...............................................................................
+
 .. function:: void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
 
-    Initializes *ctx* to a ring of densely stored univariate polynomials
+    Initializes *ctx* to a ring of densely represented univariate polynomials
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
+
+.. function:: void gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    polynomials in *nvars* variables over the given *base_ring*,
+    with monomial ordering *ord*.
+    Elements have type :type:`gr_mpoly_struct`.
 
 Context operations
 -------------------------------------------------------------------------------
@@ -362,6 +381,9 @@ Context operations
     a heap-allocated string of the description (the user must free
     the string with ``flint_free``).
     The *println* version prints a trailing newline.
+
+Domain properties
+...............................................................................
 
 .. function:: truth_t gr_ctx_is_finite(gr_ctx_t ctx)
               truth_t gr_ctx_is_multiplicative_group(gr_ctx_t ctx)

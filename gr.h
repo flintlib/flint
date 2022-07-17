@@ -329,6 +329,7 @@ typedef enum
     GR_CTX_GR_MAT,
 
     GR_CTX_PSL2Z,
+    GR_CTX_DIRICHLET_GROUP,
 
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
@@ -822,6 +823,7 @@ void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var
 /* Groups */
 
 void gr_ctx_init_psl2z(gr_ctx_t ctx);
+int gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q);
 
 /* Generic polynomial ring */
 

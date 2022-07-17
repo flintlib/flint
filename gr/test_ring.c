@@ -1404,6 +1404,7 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flag
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         printf("\n");
+        gr_ctx_println(R);
         printf("x = \n"); gr_println(x, R);
         printf("a = "); fmpz_print(a); printf("\n");
         printf("b = "); fmpz_print(b); printf("\n");

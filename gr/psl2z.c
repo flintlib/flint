@@ -132,6 +132,7 @@ _gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* todo: should be generic. also want left division */
 int
 _gr_psl2z_div(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 {
