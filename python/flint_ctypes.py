@@ -98,6 +98,14 @@ libflint.fmpz_get_str.restype = ctypes.c_void_p
 libgr.gr_heap_init.argtypes = (ctypes.POINTER(gr_ctx_struct),)
 libgr.gr_heap_init.restype = ctypes.c_void_p
 
+libgr.gr_set_si.argtypes = (ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_add_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_sub_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_mul_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_div_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_pow_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+
+
 libgr.gr_set_str.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
@@ -248,12 +256,12 @@ class gr_elem:
                 other = self.parent()(other)
             elif not isinstance(self, gr_elem):
                 self = other.parent()(self)
-            elif self._ctx_python is not other._ctx_python:
-                c = libgr.gr_ctx_cmp_coercion(self._ctx, other._ctx)
-                if c >= 0:
-                    other = self.parent()(other)
-                else:
-                    self = other.parent()(self)
+        if self._ctx_python is not other._ctx_python:
+            c = libgr.gr_ctx_cmp_coercion(self._ctx, other._ctx)
+            if c >= 0:
+                other = self.parent()(other)
+            else:
+                self = other.parent()(self)
         return self, other
 
     @staticmethod
@@ -575,12 +583,17 @@ ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
 AA = RealAlgebraicField_qqbar()
 QQbar = ComplexAlgebraicField_qqbar()
-RR_arb = RealField_arb()
-CC_acb = ComplexField_acb()
+RR = RR_arb = RealField_arb()
+CC = CC_acb = ComplexField_acb()
 RR_ca = RealField_ca()
 CC_ca = ComplexField_ca()
 
 ZZx = PolynomialRing_gr_poly(ZZ)
+QQx = PolynomialRing_gr_poly(QQ)
+RRx_ca = PolynomialRing_gr_poly(RR_ca)
+CCx_ca = PolynomialRing_gr_poly(CC_ca)
+RRx = RRx_arb = PolynomialRing_gr_poly(RR_arb)
+CCx = CCx_acb = PolynomialRing_gr_poly(CC_acb)
 
 
 
@@ -635,6 +648,14 @@ def test_all():
     assert raises(lambda: ZZ(1) / 2, ValueError)
     assert raises(lambda: (-1) ** (QQ(1) / 2), ValueError)
     assert ((-1) ** (QQbar(1) / 2)) ** 2 == QQbar(-1)
+
+    f = ZZx([1,2,3]) + QQx([1,2])
+    assert f == ZZx([2,4,3])
+    assert f.parent() is QQx
+    assert RRx([1,QQ(2),AA(3)]) != ZZx([1,2,3,4])
+    assert RRx([1,QQ(2),AA(3),4]) == ZZx([1,2,3,4])
+    assert ZZx(3) + ZZx(2) == ZZx([5])
+    assert ZZx(3) + 2 == ZZx([5])
 
 if __name__ == "__main__":
     from time import time

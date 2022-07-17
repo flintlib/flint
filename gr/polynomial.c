@@ -3,6 +3,8 @@
 #include "gr.h"
 #include "gr_poly.h"
 
+static const char * default_var = "x";
+
 void
 polynomial_init(gr_poly_t res, gr_ctx_t ctx)
 {
@@ -19,6 +21,11 @@ int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 void
 polynomial_ctx_clear(gr_ctx_t ctx)
 {
+    if (POLYNOMIAL_CTX(ctx)->var != default_var)
+    {
+        flint_free(POLYNOMIAL_CTX(ctx)->var);
+    }
+
     flint_free(ctx->elem_ctx);
 }
 
@@ -92,6 +99,53 @@ int
 polynomial_set_fmpq(gr_poly_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     return gr_poly_set_fmpq(res, v, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    if (x_ctx == ctx)
+    {
+        return polynomial_set(res, x, ctx);
+    }
+    else if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
+    {
+        return gr_poly_set_scalar(res, x, x_ctx);
+    }
+    else if (x_ctx->which_ring == GR_CTX_GR_POLY && !strcmp(POLYNOMIAL_CTX(x_ctx)->var, POLYNOMIAL_CTX(ctx)->var))
+    {
+        int status = GR_SUCCESS;
+        slong x_sz = POLYNOMIAL_ELEM_CTX(x_ctx)->sizeof_elem;
+        slong sz = POLYNOMIAL_ELEM_CTX(ctx)->sizeof_elem;
+        slong i, len = gr_poly_length(x, POLYNOMIAL_ELEM_CTX(x_ctx));
+
+        gr_poly_fit_length(res, len, POLYNOMIAL_ELEM_CTX(ctx));
+        _gr_poly_set_length(res, len, POLYNOMIAL_ELEM_CTX(ctx));
+
+        for (i = 0; i < len; i++)
+        {
+            status |= gr_set_other(GR_ENTRY(res->coeffs, i, sz), GR_ENTRY(((const gr_poly_struct *) x)->coeffs, i, x_sz), POLYNOMIAL_ELEM_CTX(x_ctx), POLYNOMIAL_ELEM_CTX(ctx));
+        }
+
+        if (status == GR_SUCCESS)
+            _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
+        else
+            _gr_poly_set_length(res, 0, POLYNOMIAL_ELEM_CTX(ctx));
+
+        return status;
+    }
+    else
+    {
+        int status = GR_SUCCESS;
+
+        gr_poly_fit_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+        status = gr_set_other(res->coeffs, x, x_ctx, POLYNOMIAL_ELEM_CTX(ctx));
+        if (status == GR_SUCCESS)
+            _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
+        else
+            _gr_poly_set_length(res, 0, POLYNOMIAL_ELEM_CTX(ctx));
+        return status;
+    }
 }
 
 int
@@ -195,6 +249,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_SET_SI,      (gr_funcptr) polynomial_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) polynomial_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) polynomial_set_fmpq},
+    {GR_METHOD_SET_OTHER,   (gr_funcptr) polynomial_set_other},
     {GR_METHOD_NEG,         (gr_funcptr) polynomial_neg},
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
@@ -213,6 +268,7 @@ gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
 
     ((polynomial_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
     ((polynomial_ctx_t *) ctx->elem_ctx)->degree_limit = WORD_MAX;
+    ((polynomial_ctx_t *) ctx->elem_ctx)->var = (char *) default_var;
 
     ctx->methods = _gr_poly_methods;
 

@@ -33,7 +33,7 @@ typedef enum
 
 GR_INLINE truth_t truth_and(truth_t x, truth_t y)
 {
-    if (x == T_FALSE || x == T_FALSE)
+    if (x == T_FALSE || y == T_FALSE)
         return T_FALSE;
     if (x == T_TRUE && y == T_TRUE)
         return T_TRUE;
@@ -42,7 +42,7 @@ GR_INLINE truth_t truth_and(truth_t x, truth_t y)
 
 GR_INLINE truth_t truth_or(truth_t x, truth_t y)
 {
-    if (x == T_TRUE || x == T_TRUE)
+    if (x == T_TRUE || y == T_TRUE)
         return T_TRUE;
     if (x == T_FALSE && y == T_FALSE)
         return T_FALSE;
@@ -56,6 +56,13 @@ GR_INLINE truth_t truth_not(truth_t x)
     if (x == T_FALSE)
         return T_TRUE;
     return T_UNKNOWN;
+}
+
+GR_INLINE void truth_println(truth_t x)
+{
+    if (x == T_TRUE) flint_printf("T_TRUE\n");
+    if (x == T_FALSE) flint_printf("T_FALSE\n");
+    if (x == T_UNKNOWN) flint_printf("T_UNKNOWN\n");
 }
 
 typedef int (*gr_funcptr)(void);
@@ -811,6 +818,7 @@ typedef struct
 {
     gr_ctx_struct * base_ring;
     slong degree_limit;
+    char * var;
 }
 polynomial_ctx_t;
 
@@ -838,12 +846,7 @@ void gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const orde
 
 /* Coercions */
 
-GR_INLINE int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2)
-{
-    if (ctx1->which_ring <= ctx2->which_ring)
-        return -1;
-    return 1;
-}
+int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2);
 
 /* Testing */
 
