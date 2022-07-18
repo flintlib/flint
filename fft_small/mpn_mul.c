@@ -208,8 +208,6 @@ ulong crt_data_find_bits(const crt_data_t C, ulong bn)
     ulong p_nbits = flint_mpn_nbits(crt_data_prod_primes(C), C->coeff_len);
     ulong bits = n_max(66, (p_nbits - n_nbits(bn))/2);
 
-    FLINT_ASSERT(C->prod_primes_nbits > n_nbits(bn));
-
     if (bn > crt_data_find_bn_bound(C, bits))
     {
         do {
@@ -1173,7 +1171,7 @@ static void CAT(_mpn_from_ffts, NP)( \
     ulong zn_stop  = (overhang == NULL) ? zn : stop_easy*bits/64; \
  \
     FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
-    FLINT_ASSERT(start_easy <= end_easy); \
+    FLINT_ASSERT(start_easy <= stop_easy); \
  \
     if (n == m + 1) \
     { \

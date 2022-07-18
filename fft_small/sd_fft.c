@@ -12,6 +12,18 @@
 #include "fft_small.h"
 #include "machine_vectors.h"
 
+/*
+    N is supposed to be a good fit for the number of points to process per loop
+    in the radix 4 butterflies.
+
+        16x 4-wide AVX registers => N = 8
+        16x 2-wide (or 32x 1-wide) NEON registers => N = 4
+*/
+
+#define N 8
+#define VECND vec8d
+#define VECNOP(op) vec8d_##op
+
 /********************* forward butterfly **************************************
     b0 = a0 + w*a1
     b1 = a0 - w*a1
@@ -48,6 +60,11 @@
     V##_store(X1, V##_sub(x0, x1)); \
 }
 
+/* for when the V arguments above needs "evaluation" */
+#define _RADIX_2_FORWARD_PARAM_J_IS_Z(...)  RADIX_2_FORWARD_PARAM_J_IS_Z(__VA_ARGS__)
+#define _RADIX_2_FORWARD_MOTH_J_IS_Z(...)   RADIX_2_FORWARD_MOTH_J_IS_Z(__VA_ARGS__)
+#define _RADIX_2_FORWARD_PARAM_J_IS_NZ(...) RADIX_2_FORWARD_PARAM_J_IS_NZ(__VA_ARGS__)
+#define _RADIX_2_FORWARD_MOTH_J_IS_NZ(...)  RADIX_2_FORWARD_MOTH_J_IS_NZ(__VA_ARGS__)
 
 /**************** forward butterfly with truncation **************************/
 
@@ -70,6 +87,9 @@
     x1 = V##_mulmod2(x1, w, n, ninv); \
     V##_store(X0, V##_add(x0, x1)); \
 }
+
+#define _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(...)  RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(__VA_ARGS__)
+#define _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(...) RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(__VA_ARGS__)
 
 /********************* forward butterfly **************************************
     b0 = a0 + w^2*a2 +   w*(a1 + w^2*a3)
@@ -143,6 +163,12 @@
     V##_store(X3, x3); \
 }
 
+#define _RADIX_4_FORWARD_PARAM_J_IS_Z(...)  RADIX_4_FORWARD_PARAM_J_IS_Z(__VA_ARGS__)
+#define _RADIX_4_FORWARD_MOTH_J_IS_Z(...)   RADIX_4_FORWARD_MOTH_J_IS_Z(__VA_ARGS__)
+#define _RADIX_4_FORWARD_PARAM_J_IS_NZ(...) RADIX_4_FORWARD_PARAM_J_IS_NZ(__VA_ARGS__)
+#define _RADIX_4_FORWARD_MOTH_J_IS_NZ(...)  RADIX_4_FORWARD_MOTH_J_IS_NZ(__VA_ARGS__)
+
+/**************** basecase transform of size BLK_SZ **************************/
 /*
     The basecases below 4 are disabled because the fft is expected to be
     produced in the slightly-worse-than-bit-reversed order of basecase_4.
@@ -236,6 +262,9 @@ FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
     x2 = vec4d_add(y2, y3); \
     x3 = vec4d_sub(y2, y3); \
  \
+    /* another VEC4D_TRANSPOSE here would put the output in bit-reversed */ \
+    /* but this slow down is not necessary */ \
+ \
     vec4d_store(X+0, x0); \
     vec4d_store(X+4, x1); \
     vec4d_store(X+8, x2); \
@@ -246,31 +275,31 @@ DEFINE_IT(0)
 DEFINE_IT(1)
 #undef DEFINE_IT
 
-/* use with N = M-2 and M >= 6 */
-#define EXTEND_BASECASE(N, M) \
-static void CAT3(sd_fft_basecase, M, 1)(const sd_fft_lctx_t Q, double* X, ulong j_r, ulong j_bits) \
+/* use with n = m-2 and m >= 6 */
+#define EXTEND_BASECASE(n, m) \
+static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong j_r, ulong j_bits) \
 { \
-    ulong l = n_pow2(M - 2); \
-    RADIX_4_FORWARD_PARAM_J_IS_Z(vec8d, Q) \
+    ulong l = n_pow2(m - 2); \
+    _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q) \
     ulong i = 0; do { \
-        RADIX_4_FORWARD_MOTH_J_IS_Z(vec8d, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
-    } while (i += 8, i < l); \
-    CAT3(sd_fft_basecase, N, 1)(Q, X+0*l, 0, 0); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+1*l, 0, 1); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+2*l, 0, 2); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+3*l, 1, 2); \
+        _RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
+    } while (i += N, i < l); \
+    CAT3(sd_fft_basecase, n, 1)(Q, X+0*l, 0, 0); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+1*l, 0, 1); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+2*l, 0, 2); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+3*l, 1, 2); \
 } \
-static void CAT3(sd_fft_basecase, M, 0)(const sd_fft_lctx_t Q, double* X, ulong j_r, ulong j_bits) \
+static void CAT3(sd_fft_basecase, m, 0)(const sd_fft_lctx_t Q, double* X, ulong j_r, ulong j_bits) \
 { \
-    ulong l = n_pow2(M - 2); \
-    RADIX_4_FORWARD_PARAM_J_IS_NZ(vec8d, Q, j_r, j_bits) \
+    ulong l = n_pow2(m - 2); \
+    _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits) \
     ulong i = 0; do { \
-        RADIX_4_FORWARD_MOTH_J_IS_NZ(vec8d, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
-    } while (i += 8, i < l); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+0*l, 4*j_r+0, j_bits+2); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+1*l, 4*j_r+1, j_bits+2); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+2*l, 4*j_r+2, j_bits+2); \
-    CAT3(sd_fft_basecase, N, 0)(Q, X+3*l, 4*j_r+3, j_bits+2); \
+        _RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
+    } while (i += N, i < l); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+0*l, 4*j_r+0, j_bits+2); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+1*l, 4*j_r+1, j_bits+2); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+2*l, 4*j_r+2, j_bits+2); \
+    CAT3(sd_fft_basecase, n, 0)(Q, X+3*l, 4*j_r+3, j_bits+2); \
 }
 EXTEND_BASECASE(4, 6)
 EXTEND_BASECASE(6, 8)
@@ -316,64 +345,66 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
     ulong j_r, ulong j_bits, \
     double* X0, double* X1, double* X2, double* X3) \
 { \
-    RADIX_4_FORWARD_PARAM_J_IS_Z(vec8d, Q); \
+    _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q); \
     ulong i = 0; do { \
-        vec8d x0, x1, x2, x3, y0, y1, y2, y3; \
-        x0 = x1 = x2 = x3 = vec8d_zero(); \
-        if (0 < itrunc) x0 = vec8d_load(X0+i); \
-        if (0 < itrunc) x0 = vec8d_reduce_to_pm1n(x0, n, ninv); \
-        if (1 < itrunc) x1 = vec8d_load(X1+i); \
-        if (2 < itrunc) x2 = vec8d_load(X2+i); \
-        if (2 < itrunc) x2 = vec8d_reduce_to_pm1n(x2, n, ninv); \
-        if (3 < itrunc) x3 = vec8d_load(X3+i); \
-        if (3 < itrunc) x3 = vec8d_reduce_to_pm1n(x3, n, ninv); \
-        y0 = (2 < itrunc) ? vec8d_add(x0, x2) : x0; \
-        y1 = (3 < itrunc) ? vec8d_add(x1, x3) : x1; \
-        y2 = (2 < itrunc) ? vec8d_sub(x0, x2) : x0; \
-        y3 = (3 < itrunc) ? vec8d_sub(x1, x3) : x1; \
-        y1 = vec8d_reduce_to_pm1n(y1, n, ninv); \
-        y3 = vec8d_mulmod2(y3, iw, n, ninv); \
-        x0 = vec8d_add(y0, y1); \
-        x1 = vec8d_sub(y0, y1); \
-        x2 = vec8d_add(y2, y3); \
-        x3 = vec8d_sub(y2, y3); \
-        if (0 < otrunc) vec8d_store(X0+i, x0); \
-        if (1 < otrunc) vec8d_store(X1+i, x1); \
-        if (2 < otrunc) vec8d_store(X2+i, x2); \
-        if (3 < otrunc) vec8d_store(X3+i, x3); \
-    } while (i += 8, i < BLK_SZ);\
+        VECND x0, x1, x2, x3, y0, y1, y2, y3; \
+        x0 = x1 = x2 = x3 = VECNOP(zero)(); \
+        if (0 < itrunc) x0 = VECNOP(load)(X0+i); \
+        if (0 < itrunc) x0 = VECNOP(reduce_to_pm1n)(x0, n, ninv); \
+        if (1 < itrunc) x1 = VECNOP(load)(X1+i); \
+        if (2 < itrunc) x2 = VECNOP(load)(X2+i); \
+        if (2 < itrunc) x2 = VECNOP(reduce_to_pm1n)(x2, n, ninv); \
+        if (3 < itrunc) x3 = VECNOP(load)(X3+i); \
+        if (3 < itrunc) x3 = VECNOP(reduce_to_pm1n)(x3, n, ninv); \
+        y0 = (2 < itrunc) ? VECNOP(add)(x0, x2) : x0; \
+        y1 = (3 < itrunc) ? VECNOP(add)(x1, x3) : x1; \
+        y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
+        y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
+        y1 = VECNOP(reduce_to_pm1n)(y1, n, ninv); \
+        y3 = VECNOP(mulmod2)(y3, iw, n, ninv); \
+        x0 = VECNOP(add)(y0, y1); \
+        x1 = VECNOP(sub)(y0, y1); \
+        x2 = VECNOP(add)(y2, y3); \
+        x3 = VECNOP(sub)(y2, y3); \
+        if (0 < otrunc) VECNOP(store)(X0+i, x0); \
+        if (1 < otrunc) VECNOP(store)(X1+i, x1); \
+        if (2 < otrunc) VECNOP(store)(X2+i, x2); \
+        if (3 < otrunc) VECNOP(store)(X3+i, x3); \
+    } while (i += N, i < BLK_SZ); \
+    FLINT_ASSERT(i == BLK_SZ); \
 } \
 static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 0)( \
     const sd_fft_lctx_t Q, \
     ulong j_r, ulong j_bits, \
     double* X0, double* X1, double* X2, double* X3) \
 { \
-    RADIX_4_FORWARD_PARAM_J_IS_NZ(vec8d, Q, j_r, j_bits); \
+    _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits); \
     ulong i = 0; do { \
-        vec8d x0, x1, x2, x3, y0, y1, y2, y3; \
-        x0 = x1 = x2 = x3 = vec8d_zero(); \
-        if (0 < itrunc) x0 = vec8d_load(X0+i); \
-        if (0 < itrunc) x0 = vec8d_reduce_to_pm1n(x0, n, ninv); \
-        if (1 < itrunc) x1 = vec8d_load(X1+i); \
-        if (2 < itrunc) x2 = vec8d_load(X2+i); \
-        if (2 < itrunc) x2 = vec8d_mulmod2(x2, w2, n, ninv); \
-        if (3 < itrunc) x3 = vec8d_load(X3+i); \
-        if (3 < itrunc) x3 = vec8d_mulmod2(x3, w2, n, ninv); \
-        y0 = (2 < itrunc) ? vec8d_add(x0, x2) : x0; \
-        y1 = (3 < itrunc) ? vec8d_add(x1, x3) : x1; \
-        y2 = (2 < itrunc) ? vec8d_sub(x0, x2) : x0; \
-        y3 = (3 < itrunc) ? vec8d_sub(x1, x3) : x1; \
-        y1 = vec8d_mulmod2(y1, w, n, ninv); \
-        y3 = vec8d_mulmod2(y3, iw, n, ninv); \
-        x0 = vec8d_add(y0, y1); \
-        x1 = vec8d_sub(y0, y1); \
-        x2 = vec8d_add(y2, y3); \
-        x3 = vec8d_sub(y2, y3); \
-        if (0 < otrunc) vec8d_store(X0+i, x0); \
-        if (1 < otrunc) vec8d_store(X1+i, x1); \
-        if (2 < otrunc) vec8d_store(X2+i, x2); \
-        if (3 < otrunc) vec8d_store(X3+i, x3); \
-    } while (i += 8, i < BLK_SZ);\
+        VECND x0, x1, x2, x3, y0, y1, y2, y3; \
+        x0 = x1 = x2 = x3 = VECNOP(zero)(); \
+        if (0 < itrunc) x0 = VECNOP(load)(X0+i); \
+        if (0 < itrunc) x0 = VECNOP(reduce_to_pm1n)(x0, n, ninv); \
+        if (1 < itrunc) x1 = VECNOP(load)(X1+i); \
+        if (2 < itrunc) x2 = VECNOP(load)(X2+i); \
+        if (2 < itrunc) x2 = VECNOP(mulmod2)(x2, w2, n, ninv); \
+        if (3 < itrunc) x3 = VECNOP(load)(X3+i); \
+        if (3 < itrunc) x3 = VECNOP(mulmod2)(x3, w2, n, ninv); \
+        y0 = (2 < itrunc) ? VECNOP(add)(x0, x2) : x0; \
+        y1 = (3 < itrunc) ? VECNOP(add)(x1, x3) : x1; \
+        y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
+        y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
+        y1 = VECNOP(mulmod2)(y1, w, n, ninv); \
+        y3 = VECNOP(mulmod2)(y3, iw, n, ninv); \
+        x0 = VECNOP(add)(y0, y1); \
+        x1 = VECNOP(sub)(y0, y1); \
+        x2 = VECNOP(add)(y2, y3); \
+        x3 = VECNOP(sub)(y2, y3); \
+        if (0 < otrunc) VECNOP(store)(X0+i, x0); \
+        if (1 < otrunc) VECNOP(store)(X1+i, x1); \
+        if (2 < otrunc) VECNOP(store)(X2+i, x2); \
+        if (3 < otrunc) VECNOP(store)(X3+i, x3); \
+    } while (i += N, i < BLK_SZ); \
+    FLINT_ASSERT(i == BLK_SZ); \
 }
 
 DEFINE_IT(2, 1)
@@ -430,28 +461,28 @@ void sd_fft_main_block(
         /* column ffts */
         if (UNLIKELY(j_bits == 0))
         {
-            RADIX_4_FORWARD_PARAM_J_IS_Z(vec8d, Q)
+            _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong a = 0; do {
                 double* X0 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*0);
                 double* X1 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*1);
                 double* X2 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*2);
                 double* X3 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*3);
                 ulong i = 0; do {
-                    RADIX_4_FORWARD_MOTH_J_IS_Z(vec8d, X0+i, X1+i, X2+i, X3+i);
-                } while (i += 8, i < BLK_SZ);
+                    _RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i, X2+i, X3+i);
+                } while (i += N, i < BLK_SZ);
             } while (a++, a < l2);
         }
         else
         {
-            RADIX_4_FORWARD_PARAM_J_IS_NZ(vec8d, Q, j_r, j_bits)
+            _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong a = 0; do {
                 double* X0 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*0);
                 double* X1 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*1);
                 double* X2 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*2);
                 double* X3 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*3);
                 ulong i = 0; do {
-                    RADIX_4_FORWARD_MOTH_J_IS_NZ(vec8d, X0+i, X1+i, X2+i, X3+i);
-                } while (i += 8, i < BLK_SZ);
+                    _RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i, X2+i, X3+i);
+                } while (i += N, i < BLK_SZ);
             } while (a++, a < l2);
         }
 
@@ -470,17 +501,17 @@ void sd_fft_main_block(
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
         if (UNLIKELY(j_bits == 0))
         {
-            RADIX_2_FORWARD_PARAM_J_IS_Z(vec8d, Q)
+            _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
-                RADIX_2_FORWARD_MOTH_J_IS_Z(vec8d, X0+i, X1+i);
-            } while (i += 8, i < BLK_SZ);
+                _RADIX_2_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i);
+            } while (i += N, i < BLK_SZ);
         }
         else
         {
-            RADIX_2_FORWARD_PARAM_J_IS_NZ(vec8d, Q, j_r, j_bits)
+            _RADIX_2_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong i = 0; do {
-                RADIX_2_FORWARD_MOTH_J_IS_NZ(vec8d, X0+i, X1+i);
-            } while (i += 8, i < BLK_SZ);
+                _RADIX_2_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i);
+            } while (i += N, i < BLK_SZ);
         }
     }
 }
@@ -559,10 +590,10 @@ void sd_fft_trunc_block(
             for (ulong a = 0; a < otrunc; a++)
             {
                 double* X0 = sd_fft_lctx_blk_index(Q, I + S*a);
-                vec8d z = vec8d_zero();
+                VECND z = VECNOP(zero)();
                 ulong i = 0; do {
-                    vec8d_store(X0+i, z);
-                } while (i += 8, i < BLK_SZ);
+                    VECNOP(store)(X0+i, z);
+                } while (i += N, i < BLK_SZ);
             }
         }
         else
@@ -572,9 +603,9 @@ void sd_fft_trunc_block(
             {
                 double* X1 = sd_fft_lctx_blk_index(Q, I + S*a);
                 ulong i = 0; do {
-                    vec8d u = vec8d_load(X0+i);
-                    vec8d_store(X1+i, u);
-                } while (i += 8, i < BLK_SZ);
+                    VECND u = VECNOP(load)(X0+i);
+                    VECNOP(store)(X1+i, u);
+                } while (i += N, i < BLK_SZ);
             }
         }
 
@@ -644,17 +675,17 @@ void sd_fft_trunc_block(
         FLINT_ASSERT(otrunc == 1);
         if (UNLIKELY(j_bits == 0))
         {
-            RADIX_2_FORWARD_PARAM_J_IS_Z(vec8d, Q)
+            _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
-                RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(vec8d, X0 + i, X1 + i);
-            } while (i += 8, i < BLK_SZ);
+                _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(VECND, X0 + i, X1 + i);
+            } while (i += N, i < BLK_SZ);
         }
         else
         {
-            RADIX_2_FORWARD_PARAM_J_IS_NZ(vec8d, Q, j_r, j_bits)
+            _RADIX_2_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong i = 0; do {
-                RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(vec8d, X0 + i, X1 + i);
-            } while (i += 8, i < BLK_SZ);
+                _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(VECND, X0 + i, X1 + i);
+            } while (i += N, i < BLK_SZ);
         }
     }
 }
@@ -677,10 +708,10 @@ void sd_fft_trunc(
         for (ulong a = 0; a < otrunc; a++)
         {
             double* X0 = sd_fft_lctx_blk_index(Q, I + S*a);
-            vec8d z = vec8d_zero();
+            VECND z = VECNOP(zero)();
             ulong i = 0; do {
-                vec8d_store(X0 + i, z);
-            } while (i += 8, i < BLK_SZ);
+                VECNOP(store)(X0 + i, z);
+            } while (i += N, i < BLK_SZ);
         }
 
         return;
@@ -743,9 +774,23 @@ void sd_fft_trunc(
 #undef RADIX_2_FORWARD_MOTH_J_IS_NZ
 #undef RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z
 #undef RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ
-
 #undef RADIX_4_FORWARD_PARAM_J_IS_Z
 #undef RADIX_4_FORWARD_MOTH_J_IS_Z
 #undef RADIX_4_FORWARD_PARAM_J_IS_NZ
 #undef RADIX_4_FORWARD_MOTH_J_IS_NZ
 
+
+#undef _RADIX_2_FORWARD_PARAM_J_IS_Z
+#undef _RADIX_2_FORWARD_MOTH_J_IS_Z
+#undef _RADIX_2_FORWARD_PARAM_J_IS_NZ
+#undef _RADIX_2_FORWARD_MOTH_J_IS_NZ
+#undef _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z
+#undef _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ
+#undef _RADIX_4_FORWARD_PARAM_J_IS_Z
+#undef _RADIX_4_FORWARD_MOTH_J_IS_Z
+#undef _RADIX_4_FORWARD_PARAM_J_IS_NZ
+#undef _RADIX_4_FORWARD_MOTH_J_IS_NZ
+
+#undef N
+#undef VECND
+#undef VECNOP
