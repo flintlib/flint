@@ -838,7 +838,7 @@ def test_all():
             f()
         except exception:
             return True
-        raise False
+        return False
 
     x = ZZ(23)
     y = ZZ(-1)
@@ -892,6 +892,18 @@ def test_all():
     assert ZZx(3) + 2 == ZZx([5])
 
     assert ZZx(QQ(5)) == 5
+
+    M = MatrixDomain(ZZ)
+    A = M([[1,2,3],[4,5,6]])
+    assert A == M(2, 3, [1,2,3,4,5,6])
+    assert A == M(2, 3, [1,2,QQ(3),4,5,6])
+    assert MatrixSpace(ZZ, 2, 3)(A) == A
+    assert MatrixSpace(QQ, 2, 3)(A) == A
+    assert M(2, 1) == M([[0], [0]])
+    assert raises(lambda: M(2, 1, [1,2,3]), ValueError)
+    assert raises(lambda: M([[QQ(1)/3]]), ValueError)
+    assert raises(lambda: MatrixSpace(ZZ, 3, 1)(A), ValueError)
+    assert MatrixRing(QQ, 2)(M([[1, 2], [3, 4]])) ** 2 == M([[7,10],[15,22]])
 
 if __name__ == "__main__":
     from time import time
