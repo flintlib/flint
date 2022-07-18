@@ -25,6 +25,21 @@ GR_UNABLE = 2
 c_slong = ctypes.c_long
 c_ulong = ctypes.c_ulong
 
+if sys.maxsize < 2**32:
+    FLINT_BITS = 32
+else:
+    FLINT_BITS = 64
+    if ctypes.sizeof(c_slong) == 4:
+        c_slong = ctypes.c_longlong
+        c_ulong = ctypes.c_ulonglong
+        assert ctypes.sizeof(c_slong) == 8
+        assert ctypes.sizeof(c_ulong) == 8
+
+UWORD_MAX = (1<<FLINT_BITS)-1
+WORD_MAX = (1<<(FLINT_BITS-1))-1
+WORD_MIN = -(1<<(FLINT_BITS-1))
+
+
 class flint_rand_struct(ctypes.Structure):
     # todo: use the real size
     _fields_ = [('data', c_slong * 16)]
@@ -41,17 +56,17 @@ class fmpq_struct(ctypes.Structure):
 
 class fmpz_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
-                ('alloc', ctypes.c_long),
-                ('length', ctypes.c_long)]
+                ('alloc', c_slong),
+                ('length', c_slong)]
 
 class fmpq_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
-                ('alloc', ctypes.c_long),
-                ('length', ctypes.c_long),
-                ('den', ctypes.c_long)]
+                ('alloc', c_slong),
+                ('length', c_slong),
+                ('den', c_slong)]
 
 class arb_struct(ctypes.Structure):
-    _fields_ = [('data', ctypes.c_long * 6)]
+    _fields_ = [('data', c_slong * 6)]
 
 class acb_struct(ctypes.Structure):
     _fields_ = [('real', arb_struct),
@@ -59,23 +74,30 @@ class acb_struct(ctypes.Structure):
 
 class fexpr_struct(ctypes.Structure):
     _fields_ = [('data', ctypes.c_void_p),
-                ('alloc', ctypes.c_long)]
+                ('alloc', c_slong)]
 
 class qqbar_struct(ctypes.Structure):
     _fields_ = [('poly', fmpz_poly_struct),
                 ('enclosure', acb_struct)]
 
 class ca_struct(ctypes.Structure):
-    _fields_ = [('data', ctypes.c_long * 5)]
+    _fields_ = [('data', c_slong * 5)]
 
 class gr_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
-                ('alloc', ctypes.c_long),
-                ('length', ctypes.c_long)]
+                ('alloc', c_slong),
+                ('length', c_slong)]
 
 class psl2z_struct(ctypes.Structure):
-    _fields_ = [('a', ctypes.c_long), ('b', ctypes.c_long),
-                ('c', ctypes.c_long), ('d', ctypes.c_long)]
+    _fields_ = [('a', c_slong), ('b', c_slong),
+                ('c', c_slong), ('d', c_slong)]
+
+class dirichlet_char_struct(ctypes.Structure):
+    _fields_ = [('n', c_ulong),
+                ('log', ctypes.POINTER(c_ulong))]
+
+class perm_struct(ctypes.Structure):
+    _fields_ = [('entries', ctypes.POINTER(c_slong))]
 
 
 # todo: efficiently
@@ -88,7 +110,7 @@ def fmpz_to_python_int(xref):
 
 # todo
 def fmpq_set_python(cref, x):
-    assert isinstance(x, int) and -sys.maxsize <= x <= sys.maxsize
+    assert isinstance(x, int) and WORD_MIN <= x <= WORD_MAX
     libflint.fmpq_set_si(cref, x, 1)
 
 
@@ -97,7 +119,7 @@ class Undecidable(NotImplementedError):
 
 class gr_ctx_struct(ctypes.Structure):
     # todo: use the real size
-    _fields_ = [('content', ctypes.c_ulong * 64)]
+    _fields_ = [('content', c_ulong * 64)]
 
 
 libflint.flint_malloc.restype = ctypes.c_void_p
@@ -109,12 +131,12 @@ libflint.fmpz_get_str.restype = ctypes.c_void_p
 libgr.gr_heap_init.argtypes = (ctypes.POINTER(gr_ctx_struct),)
 libgr.gr_heap_init.restype = ctypes.c_void_p
 
-libgr.gr_set_si.argtypes = (ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
-libgr.gr_add_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
-libgr.gr_sub_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
-libgr.gr_mul_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
-libgr.gr_div_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
-libgr.gr_pow_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_long, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_set_si.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_add_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_sub_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_mul_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_div_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_pow_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 
 
 libgr.gr_set_str.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(gr_ctx_struct))
@@ -123,6 +145,8 @@ libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c
 libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+
+libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 
 _add_methods = [libgr.gr_add, libgr.gr_add_ui, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_fmpq]
 _sub_methods = [libgr.gr_sub, libgr.gr_sub_ui, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_fmpq]
@@ -214,8 +238,7 @@ class gr_elem:
         if val is not None:
             typ = type(val)
             if typ is int:
-                b = sys.maxsize
-                if -b <= val <= b:
+                if WORD_MIN <= val <= WORD_MAX:
                     status = libgr.gr_set_si(self._ref, val, self._ctx)
                     if status:
                         if status & GR_UNABLE: raise NotImplementedError()
@@ -289,7 +312,7 @@ class gr_elem:
 
     @staticmethod
     def _binary_op2(self, other, ops, rstr):
-        if type(other) is int and -sys.maxsize <= other <= sys.maxsize:
+        if type(other) is int and WORD_MIN <= other <= WORD_MAX:
             res = type(self)(None, self._ctx_python)
             status = ops[2](res._ref, self._ref, other, self._ctx)
         else:
@@ -533,9 +556,9 @@ class ComplexField_ca(gr_ctx_ca):
 class PolynomialRing_gr_poly(gr_ctx):
     def __init__(self, coefficient_ring):
         assert isinstance(coefficient_ring, gr_ctx)
+        gr_ctx.__init__(self)
         if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
             raise ValueError("coefficient structure must be a ring")
-        gr_ctx.__init__(self)
         libgr.gr_ctx_init_polynomial(self._ref, coefficient_ring._ref)
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_poly
@@ -616,6 +639,38 @@ class psl2z(gr_elem):
     _struct_type = psl2z_struct
 
 
+class DirichletGroup_dirichlet_char(gr_ctx_ca):
+    def __init__(self, q, **kwargs):
+        # todo: automatic range checking with ctypes int -> c_ulong cast?
+        if q <= 0:
+            raise ValueError(f"modulus must not be zero")
+        if q > UWORD_MAX:
+            raise NotImplementedError(f"only word-size moduli are supported")
+        gr_ctx.__init__(self)
+        status = libgr.gr_ctx_init_dirichlet_group(self._ref, q)
+        if status & GR_UNABLE: raise NotImplementedError(f"modulus with prime factor p > 10^12 is not currently supported")
+        if status & GR_DOMAIN: raise ValueError(f"modulus must not be zero")
+        self._elem_type = dirichlet_char
+
+class dirichlet_char(gr_elem):
+    _struct_type = dirichlet_char_struct
+
+
+class SymmetricGroup_perm(gr_ctx_ca):
+    def __init__(self, n, **kwargs):
+        # todo: automatic range checking with ctypes int -> c_ulong cast?
+        if n < 0:
+            raise ValueError(f"n must be positive")
+        if n > WORD_MAX:
+            raise NotImplementedError(f"only word-size moduli n are supported")
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_perm(self._ref, n)
+        self._elem_type = perm
+
+class perm(gr_elem):
+    _struct_type = perm_struct
+
+
 
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
@@ -633,7 +688,11 @@ CCx_ca = PolynomialRing_gr_poly(CC_ca)
 RRx = RRx_arb = PolynomialRing_gr_poly(RR_arb)
 CCx = CCx_acb = PolynomialRing_gr_poly(CC_acb)
 
-PSL2Z = ModularGroup_psl2z()
+ModularGroup = ModularGroup_psl2z
+DirichletGroup = DirichletGroup_dirichlet_char
+
+PSL2Z = ModularGroup()
+SymmetricGroup = SymmetricGroup_perm
 
 
 def test_all():

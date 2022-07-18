@@ -229,6 +229,13 @@ Mathematical domains
 Groups
 ...............................................................................
 
+.. function:: void gr_ctx_init_perm(gr_ctx_t ctx, ulong n)
+
+    Initializes *ctx* to the symmetric group `S_n` representing
+    permutations of `[0, 1, \ldots, n - 1]`.
+    Elements are currently represented as pointers (the representation
+    may change in the future).
+
 .. function:: void gr_ctx_init_psl2z(gr_ctx_t ctx)
 
     Initializes *ctx* to the modular group `\text{PSL}(2, \mathbb{Z})`

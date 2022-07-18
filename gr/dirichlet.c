@@ -43,14 +43,18 @@ _gr_dirichlet_swap(dirichlet_char_t x, dirichlet_char_t y, gr_ctx_t ctx)
     *y = t;
 }
 
-/* fixme: more useful to print number? */
-/* fixme: q = 1 */
 void
 _dirichlet_char_print(gr_stream_t out, const dirichlet_group_t G, const dirichlet_char_t x)
 {
+    gr_stream_write(out, "chi_");
+    gr_stream_write_ui(out, G->q);
+    gr_stream_write(out, "(");
+    gr_stream_write_ui(out, G->q == 1 ? 1 : x->n);
+    gr_stream_write(out, ", .)");
+/*
     slong k;
     gr_stream_write(out, "Character ");
-    gr_stream_write_ui(out, x->n);
+    gr_stream_write_ui(out, G->q == 1 ? 1 : x->n);
     gr_stream_write(out, " [");
     for (k = 0; k < G->num; k++)
     {
@@ -59,6 +63,7 @@ _dirichlet_char_print(gr_stream_t out, const dirichlet_group_t G, const dirichle
             gr_stream_write(out, ", ");
     }
     gr_stream_write(out, "]");
+*/
 }
 
 int
