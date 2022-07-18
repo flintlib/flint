@@ -14,7 +14,7 @@ int main()
 
     for (n = 0; n <= 8; n++)
     {
-        gr_ctx_init_matrix(MatZZ, ZZ, n);
+        gr_ctx_init_matrix_ring(MatZZ, ZZ, n);
         gr_test_ring(MatZZ, n <= 2 ? 100 : 10, flags);
         gr_ctx_clear(MatZZ);
     }

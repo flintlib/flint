@@ -3,24 +3,62 @@
 #include "gr.h"
 #include "gr_mat.h"
 
+/* todo: recycle storage? */
+void
+_gr_mat_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
+{
+    gr_mat_clear(mat, ctx);
+    gr_mat_init(mat, r, c, ctx);
+}
+
+/*
+typedef struct
+{
+    gr_ctx_struct * base_ring;
+    int all_sizes;
+    slong nrows;
+    slong ncols
+}
+matrix_ctx_t;
+*/
+
+/* todo: for matrix "ring", verify that element domain is a ring */
+
 void
 matrix_init(gr_mat_t res, gr_ctx_t ctx)
 {
-    gr_mat_init(res, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->n, MATRIX_CTX(ctx)->base_ring);
+    gr_mat_init(res, MATRIX_CTX(ctx)->nrows, MATRIX_CTX(ctx)->ncols, MATRIX_CTX(ctx)->base_ring);
 }
 
 int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    slong n = MATRIX_CTX(ctx)->n;
     gr_ctx_ptr elem_ctx = MATRIX_CTX(ctx)->base_ring;
 
-    gr_stream_write(out, "Ring of ");
-    gr_stream_write_si(out, n);
-    gr_stream_write(out, " x ");
-    gr_stream_write_si(out, n);
+    if (MATRIX_CTX(ctx)->all_sizes)
+    {
+        gr_stream_write(out, "Domain of ");
+    }
+    else
+    {
+        if (MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols)
+            gr_stream_write(out, "Ring of ");
+        else
+            gr_stream_write(out, "Space of ");
+
+        gr_stream_write_si(out, MATRIX_CTX(ctx)->nrows);
+        gr_stream_write(out, " x ");
+        gr_stream_write_si(out, MATRIX_CTX(ctx)->ncols);
+    }
+
     gr_stream_write(out, " matrices over ");
     gr_ctx_write(out, elem_ctx);
     return GR_SUCCESS;
+}
+
+/* todo: matrices over e.g. semirings? need to check element domain */
+truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
+{
+    return (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols) ? T_TRUE : T_FALSE;
 }
 
 void
@@ -92,12 +130,18 @@ matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
 int
 matrix_zero(gr_mat_t res, gr_ctx_t ctx)
 {
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
     return gr_mat_zero(res, MATRIX_CTX(ctx)->base_ring);
 }
 
 int
 matrix_one(gr_mat_t res, gr_ctx_t ctx)
 {
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
     return gr_mat_one(res, MATRIX_CTX(ctx)->base_ring);
 }
 
@@ -122,30 +166,72 @@ matrix_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
 int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
     return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
 int
 matrix_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
+    if (mat1->r != mat2->r || mat1->c != mat2->c)
+        return GR_DOMAIN;
+
+    if (res->r != mat1->r || res->c != mat1->c)
+        _gr_mat_resize(res, mat1->r, mat1->c, MATRIX_CTX(ctx)->base_ring);
+
     return gr_mat_add(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
 int
 matrix_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
+    if (mat1->r != mat2->r || mat1->c != mat2->c)
+        return GR_DOMAIN;
+
+    if (res->r != mat1->r || res->c != mat1->c)
+        _gr_mat_resize(res, mat1->r, mat1->c, MATRIX_CTX(ctx)->base_ring);
+
     return gr_mat_sub(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
 int
 matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
+    if (mat1->c != mat2->r)
+        return GR_DOMAIN;
+
+    if (res->r != mat1->r || res->c != mat2->c)
+    {
+        if (res == mat1 || res == mat2)
+        {
+            int status;
+            gr_mat_t tmp;
+            gr_mat_init(tmp, mat1->r, mat2->c, MATRIX_CTX(ctx)->base_ring);
+            status = matrix_mul(tmp, mat1, mat2, ctx);
+            gr_mat_swap(res, tmp, MATRIX_CTX(ctx)->base_ring);
+            gr_mat_clear(tmp, MATRIX_CTX(ctx)->base_ring);
+            return status;
+        }
+        else
+        {
+            _gr_mat_resize(res, mat1->r, mat2->c, MATRIX_CTX(ctx)->base_ring);
+        }
+    }
+
     return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
 int
 matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
+    if (mat->r != mat->c)
+        return GR_DOMAIN;
+
+    if (res->r != mat->r || res->c != mat->r)
+        _gr_mat_resize(res, mat->r, mat->r, MATRIX_CTX(ctx)->base_ring);
+
     return gr_mat_inv(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
@@ -158,7 +244,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) matrix_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) matrix_ctx_clear},
-    {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_generic_ctx_predicate_true},  /* todo: matrices over semirings? */
+    {GR_METHOD_CTX_IS_RING, (gr_funcptr) matrix_ctx_is_ring},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},
@@ -183,9 +269,8 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-/* rename: gr_ctx_init_gr_mat */
 void
-gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+_gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows, slong ncols)
 {
     ctx->flags = 0;
     ctx->which_ring = GR_CTX_GR_MAT;
@@ -193,8 +278,13 @@ gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
     ctx->elem_ctx = flint_malloc(sizeof(matrix_ctx_t));
     ctx->size_limit = WORD_MAX;
 
-    ((matrix_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
-    ((matrix_ctx_t *) ctx->elem_ctx)->n = n;
+    if (nrows < 0) flint_abort();
+    if (ncols < 0) flint_abort();
+
+    MATRIX_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
+    MATRIX_CTX(ctx)->all_sizes = all_sizes;
+    MATRIX_CTX(ctx)->nrows = nrows;
+    MATRIX_CTX(ctx)->ncols = ncols;
 
     ctx->methods = _gr_mat_methods;
 
@@ -203,4 +293,14 @@ gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
         gr_method_tab_init(_gr_mat_methods, _gr_mat_methods_input);
         _gr_mat_methods_initialized = 1;
     }
+}
+
+void gr_ctx_init_matrix_domain(gr_ctx_t ctx, gr_ctx_t base_ring)
+{
+    _gr_ctx_init_matrix(ctx, base_ring, 1, 0, 0);
+}
+
+void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong nrows, slong ncols)
+{
+    _gr_ctx_init_matrix(ctx, base_ring, 0, nrows, ncols);
 }

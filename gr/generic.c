@@ -2,7 +2,10 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+#define DEBUG_RINGS 0
+
 /* todo: rings only */
+#if DEBUG_RINGS
 void gr_generic_init(void) { flint_printf("ctx must implement init()\n"); flint_abort(); }
 void gr_generic_clear(void) { flint_printf("ctx must implement clear()\n"); flint_abort(); }
 void gr_generic_swap(void) { flint_printf("ctx must implement swap()\n"); flint_abort(); }
@@ -19,6 +22,24 @@ void gr_generic_neg(void) { flint_printf("ctx must implement neg()\n"); flint_ab
 void gr_generic_add(void) { flint_printf("ctx must implement add()\n"); flint_abort(); }
 void gr_generic_sub(void) { flint_printf("ctx must implement sub()\n"); flint_abort(); }
 void gr_generic_mul(void) { flint_printf("ctx must implement mul()\n"); flint_abort(); }
+#else
+#define gr_generic_init gr_not_implemented
+#define gr_generic_clear gr_not_implemented
+#define gr_generic_swap gr_not_implemented
+#define gr_generic_randtest gr_not_implemented
+#define gr_generic_write gr_not_implemented
+#define gr_generic_zero gr_not_implemented
+#define gr_generic_one gr_not_implemented
+#define gr_generic_equal gr_not_implemented
+#define gr_generic_set gr_not_implemented
+#define gr_generic_set_si gr_not_implemented
+#define gr_generic_set_ui gr_not_implemented
+#define gr_generic_set_fmpz gr_not_implemented
+#define gr_generic_neg gr_not_implemented
+#define gr_generic_add gr_not_implemented
+#define gr_generic_sub gr_not_implemented
+#define gr_generic_mul gr_not_implemented
+#endif
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
 {

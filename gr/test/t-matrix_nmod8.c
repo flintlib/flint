@@ -18,14 +18,14 @@ int main()
 
         for (n = 0; n <= 4; n++)
         {
-            gr_ctx_init_matrix(MatZZn, ZZn, n);
+            gr_ctx_init_matrix_ring(MatZZn, ZZn, n);
             gr_test_ring(MatZZn, n <= 2 ? 100 : 10, flags);
             gr_ctx_clear(MatZZn);
         }
 
         if (iter % 5 == 0)
         {
-            gr_ctx_init_matrix(MatZZn, ZZn, n_randint(state, 40));
+            gr_ctx_init_matrix_ring(MatZZn, ZZn, n_randint(state, 40));
             gr_test_ring(MatZZn, 10, flags);
             gr_ctx_clear(MatZZn);
         }

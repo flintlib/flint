@@ -335,10 +335,22 @@ Base rings
 Matrices
 ...............................................................................
 
-.. function:: void gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+.. function:: void gr_ctx_init_matrix_domain(gr_ctx_t ctx, gr_ctx_t base_ring)
 
-    Initializes *ctx* to a ring of densely stored *n* by *n* matrices
+    Initializes *ctx* to the domain of all matrices (of any shape)
     over the given *base_ring*.
+    Elements have type :type:`gr_mat_struct`.
+
+.. function:: void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong n, slong m)
+
+    Initializes *ctx* to the space of matrices over *base_ring*
+    with *n* rows and *m* columns.
+    Elements have type :type:`gr_mat_struct`.
+
+.. function:: void gr_ctx_init_matrix_ring(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+
+    Initializes *ctx* to the ring of matrices over *base_ring*
+    with *n* rows columns.
     Elements have type :type:`gr_mat_struct`.
 
 Polynomial rings

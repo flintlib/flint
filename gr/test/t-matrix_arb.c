@@ -13,7 +13,7 @@ int main()
 
     for (n = 0; n <= 5; n++)
     {
-        gr_ctx_init_matrix(MatRR, RR, n);
+        gr_ctx_init_matrix_ring(MatRR, RR, n);
         gr_test_ring(MatRR, n <= 2 ? 100 : 10, flags);
         gr_ctx_clear(MatRR);
     }
