@@ -62,7 +62,7 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
 	  acb_mul(dc, dc, ddc, prec);
 	}
     }
-
+  
   arb_clear(pi4);
   acb_clear(c);
   acb_clear(dc);

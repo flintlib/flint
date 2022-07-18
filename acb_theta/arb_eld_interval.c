@@ -11,7 +11,7 @@ void arb_eld_interval(slong* min, slong* mid, slong* max,
  
   if (!arb_is_finite(ctr) || !arb_is_finite(rad))
     {
-      flint_printf("(acb_theta_naive_interval) Error: infinite values\n");
+      flint_printf("(arb_eld_interval) Error: infinite values\n");
       arb_printd(ctr, 30); flint_printf("\n");
       arb_printd(rad, 30); flint_printf("\n");
       fflush(stdout);
@@ -24,7 +24,6 @@ void arb_eld_interval(slong* min, slong* mid, slong* max,
   
   arb_sub_si(x, ctr, a, prec);
   arb_mul_2exp_si(x, x, -1);
-  arb_sub(x, ctr, x, prec);
   *mid = 2*arf_get_si(arb_midref(x), ARF_RND_NEAR) + a;
 
   arb_mul_2exp_si(y, rad, -1);

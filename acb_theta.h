@@ -31,9 +31,73 @@ extern "C" {
 */
 
 
-/* Argument reduction */
+/* Extras for arb_mat's and acb_mat's */
 
-void acb_theta_reduce_tau(fmpz_mat_t m, acb_mat_t tau, slong prec);
+void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
+
+void acb_mat_get_real(arb_mat_t re, const acb_mat_t tau);
+
+void acb_mat_get_imag(arb_mat_t im, const acb_mat_t tau);
+
+void acb_mat_set_arb_arb(acb_mat_t z, const arb_mat_t re, const arb_mat_t im);
+
+void arb_mat_randtest_cho(arb_mat_t r, flint_rand_t state, slong prec, slong mag_bits);
+
+void arb_mat_randtest_sym_pos(arb_mat_t r, flint_rand_t state, slong prec, slong mag_bits);
+
+int arb_mat_is_nonsymmetric(const arb_mat_t m);
+
+void arb_mat_reduce(arb_mat_t r, fmpz_mat_t u, const arb_mat_t m, slong prec);
+
+
+/* Extras for fmpz_mat's */
+
+void fmpz_mat_get_a(fmpz_mat_t a, const fmpz_mat_t m);
+
+void fmpz_mat_get_b(fmpz_mat_t a, const fmpz_mat_t m);
+
+void fmpz_mat_get_c(fmpz_mat_t a, const fmpz_mat_t m);
+
+void fmpz_mat_get_d(fmpz_mat_t a, const fmpz_mat_t m);
+
+void fmpz_mat_set_abcd(fmpz_mat_t m,
+		       const fmpz_mat_t a, const fmpz_mat_t b,
+		       const fmpz_mat_t c, const fmpz_mat_t d);
+
+void fmpz_mat_J(fmpz_mat_t m);
+
+int fmpz_mat_is_scalar(const fmpz_mat_t m);
+
+int fmpz_mat_is_sp(const fmpz_mat_t m);
+
+int fmpz_mat_is_gsp(const fmpz_mat_t m);
+
+void fmpz_mat_diag_sp(fmpz_mat_t m, const fmpz_mat_t u);
+
+void fmpz_mat_trig_sp(fmpz_mat_t m, const fmpz_mat_t s);
+
+void fmpz_mat_randtest_sp(fmpz_mat_t m, flint_rand_t state, slong bits);
+
+void fmpz_mat_siegel_fd(fmpz_mat_t m, slong j);
+
+
+/* Siegel space */
+
+void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec);
+
+void acb_siegel_cocycle(acb_mat_t w, const fmpz_mat_t m, const acb_mat_t tau, slong prec);
+
+void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t m, const acb_mat_t tau, slong prec);
+
+int acb_siegel_is_real_reduced(const acb_mat_t tau, const arb_t tol, slong prec);
+
+int acb_siegel_not_real_reduced(const acb_mat_t tau, slong prec);
+
+void acb_siegel_reduce_real(acb_mat_t w, fmpz_mat_t u, const acb_mat_t tau, slong prec);
+
+void acb_siegel_reduce(acb_mat_t w, fmpz_mat_t m, const acb_mat_t tau, slong prec);
+
+int acb_siegel_is_in_fundamental_domain(const acb_mat_t tau, slong prec);
 
 
 /* Ellipsoids for naive algorithms */
@@ -83,7 +147,7 @@ void arb_eld_clear(arb_eld_t E);
 
 void arb_eld_init_children(arb_eld_t E, slong nr, slong nl);
 
-void arb_eld_interval(slong* nmin, slong* nmid, slong* nmax,
+void arb_eld_interval(slong* min, slong* mid, slong* max,
 		      const arb_t ctr, const arb_t rad, int a, slong prec);
 
 void arb_eld_next_normsqr(arb_t next_normsqr, const arb_t normsqr, const arb_t gamma,
@@ -94,8 +158,15 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
 
 void arb_eld_points(slong* pts, const arb_eld_t E);
 
+int arb_eld_contains(const arb_eld_t E, slong* pt);
+
 
 /* Choice of radii and precisions in naive algorithms */
+
+#define ARB_ELD_DEFAULT_PREC 50
+#define ACB_THETA_NAIVE_EPS_2EXP 0
+#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.0
+#define ACB_THETA_NAIVE_NEWPREC_MARGIN 0.9
 
 void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p, slong prec);
 
@@ -180,13 +251,8 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 
 /* Naive algorithms */
 
-void acb_mat_get_real(arb_mat_t re, const acb_mat_t tau);
-
-void acb_mat_get_imag(arb_mat_t im, const acb_mat_t tau);
-
-#define ARB_ELD_DEFAULT_PREC 50
-#define ACB_THETA_NAIVE_EPS_2EXP 10
-#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.0
+void acb_theta_naive_term(acb_t exp, const acb_mat_t tau, acb_srcptr z,
+			  ulong ab, slong* coords, slong prec);
 
 void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
