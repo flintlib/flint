@@ -31,6 +31,11 @@ typedef gr_mat_struct gr_mat_t[1];
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
 
+GR_MAT_INLINE gr_ptr gr_mat_entry_ptr(gr_mat_t mat, slong i, slong j, gr_ctx_t ctx)
+{
+    return GR_MAT_ENTRY(mat, i, j, ctx->sizeof_elem);
+}
+
 /* Generics */
 typedef int ((*gr_method_mat_binary_op)(gr_mat_t, const gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 

@@ -63,6 +63,11 @@ Basic operations
     Macro to access the entry at row *i* and column *j* of the
     matrix *mat* whose entries have size *sz* bytes.
 
+.. function:: gr_ptr gr_mat_entry_ptr(gr_mat_t mat, slong i, slong j, gr_ctx_t ctx)
+
+    Function returning a pointer to the entry at row *i* and column
+    *j* of the matrix *mat*. The indices must be in bounds.
+
 .. macro:: gr_mat_nrows(mat, ctx)
 
     Macro accessing the number of rows of *mat*.

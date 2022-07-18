@@ -141,7 +141,10 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         gr_poly_fit_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
         status = gr_set_other(res->coeffs, x, x_ctx, POLYNOMIAL_ELEM_CTX(ctx));
         if (status == GR_SUCCESS)
+        {
+            _gr_poly_set_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
             _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
+        }
         else
             _gr_poly_set_length(res, 0, POLYNOMIAL_ELEM_CTX(ctx));
         return status;

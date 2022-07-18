@@ -99,6 +99,12 @@ class dirichlet_char_struct(ctypes.Structure):
 class perm_struct(ctypes.Structure):
     _fields_ = [('entries', ctypes.POINTER(c_slong))]
 
+class gr_mat_struct(ctypes.Structure):
+    _fields_ = [('entries', ctypes.c_void_p),
+                ('r', c_slong),
+                ('c', c_slong),
+                ('rows', ctypes.c_void_p)]
+
 
 # todo: efficiently
 def fmpz_to_python_int(xref):
@@ -144,6 +150,7 @@ libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, c
 libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
+
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
@@ -168,7 +175,7 @@ class LogicContext(object):
         ...
         Traceback (most recent call last):
           ...
-        Undecidable: x == y cannot be decided for x = [1.00000000000000 +/- 3.89e-16], y = 1.000000000000000 over Real numbers (arb, prec = 53)
+        Undecidable: unable to decide x == y for x = [1.00000000000000 +/- 3.89e-16], y = 1.000000000000000 over Real numbers (arb, prec = 53)
         >>> with pessimistic_logic:
         ...     a == 1
         ...
@@ -212,8 +219,9 @@ class gr_ctx:
                 libflint.flint_free(arr)
         return self._str
 
-    def __call__(self, value=None, random=False):
-        return self._elem_type(value, self, random)
+    def __call__(self, *args, **kwargs):
+        kwargs['context'] = self
+        return self._elem_type(*args, **kwargs)
 
     def __repr__(self):
         return self._repr()
@@ -241,8 +249,8 @@ class gr_elem:
                 if WORD_MIN <= val <= WORD_MAX:
                     status = libgr.gr_set_si(self._ref, val, self._ctx)
                     if status:
-                        if status & GR_UNABLE: raise NotImplementedError()
-                        if status & GR_DOMAIN: raise ValueError()
+                        if status & GR_UNABLE: raise NotImplementedError
+                        if status & GR_DOMAIN: raise ValueError
                 else:
                     n = fmpz_struct()
                     nref = ctypes.byref(n)
@@ -250,19 +258,19 @@ class gr_elem:
                     libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
                     status = libgr.gr_set_fmpz(self._ref, nref, self._ctx)
                     if status:
-                        if status & GR_UNABLE: raise NotImplementedError()
-                        if status & GR_DOMAIN: raise ValueError()
+                        if status & GR_UNABLE: raise NotImplementedError
+                        if status & GR_DOMAIN: raise ValueError
                     libflint.fmpz_clear(nref)
             elif isinstance(val, gr_elem):
                 status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
                 if status:
-                    if status & GR_UNABLE: raise NotImplementedError()
-                    if status & GR_DOMAIN: raise ValueError()
+                    if status & GR_UNABLE: raise NotImplementedError
+                    if status & GR_DOMAIN: raise ValueError
             elif typ is str:
                 status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 if status:
-                    if status & GR_UNABLE: raise NotImplementedError()
-                    if status & GR_DOMAIN: raise ValueError()
+                    if status & GR_UNABLE: raise NotImplementedError
+                    if status & GR_DOMAIN: raise ValueError
             else:
                 raise NotImplementedError(f"unable to create {type(self)} from {type(val)}")
         elif random:
@@ -303,24 +311,24 @@ class gr_elem:
     @staticmethod
     def _binary_op(self, other, op, rstr):
         self, other = gr_elem._binary_coercion(self, other)
-        res = type(self)(None, self._ctx_python)
+        res = type(self)(context=self._ctx_python)
         status = op(res._ref, self._ref, other._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"{rstr} is not implemented for x = {self}, y = {other} over {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
         return res
 
     @staticmethod
     def _binary_op2(self, other, ops, rstr):
         if type(other) is int and WORD_MIN <= other <= WORD_MAX:
-            res = type(self)(None, self._ctx_python)
+            res = type(self)(context=self._ctx_python)
             status = ops[2](res._ref, self._ref, other, self._ctx)
         else:
             self, other = gr_elem._binary_coercion(self, other)
-            res = type(self)(None, self._ctx_python)
+            res = type(self)(context=self._ctx_python)
             status = ops[0](res._ref, self._ref, other._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"{rstr} is not implemented for x = {self}, y = {other} over {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
         return res
 
@@ -332,15 +340,15 @@ class gr_elem:
         if truth == T_FALSE: return False
         if _gr_logic == 1: return True
         if _gr_logic == -1: return False
-        raise Undecidable(f"{rstr} cannot be decided for x = {self}, y = {other} over {self.parent()}")
+        raise Undecidable(f"unable to decide {rstr} for x = {self}, y = {other} over {self.parent()}")
 
     @staticmethod
     def _unary_op(self, op, rstr):
         elem_type = type(self)
-        res = elem_type(None, self._ctx_python)
+        res = elem_type(context=self._ctx_python)
         status = op(res._ref, self._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"{rstr} cannot be computed for x = {self} over {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
         return res
 
@@ -672,6 +680,132 @@ class perm(gr_elem):
 
 
 
+class MatrixDomain(gr_ctx):
+    def __init__(self, element_ring):
+        assert isinstance(element_ring, gr_ctx)
+        gr_ctx.__init__(self)
+        if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
+            raise ValueError("element structure must be a ring")
+        libgr.gr_ctx_init_matrix_domain(self._ref, element_ring._ref)
+        self._element_ring = element_ring
+        self._elem_type = gr_mat
+
+class MatrixSpace(gr_ctx):
+    def __init__(self, element_ring, nrows, ncols):
+        assert isinstance(element_ring, gr_ctx)
+        assert 0 <= nrows <= WORD_MAX
+        assert 0 <= ncols <= WORD_MAX
+        gr_ctx.__init__(self)
+        if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
+            raise ValueError("element structure must be a ring")
+        libgr.gr_ctx_init_matrix_space(self._ref, element_ring._ref, nrows, ncols)
+        self._element_ring = element_ring
+        self._elem_type = gr_mat
+
+class MatrixRing(gr_ctx):
+    def __init__(self, element_ring, n):
+        assert isinstance(element_ring, gr_ctx)
+        assert 0 <= n <= WORD_MAX
+        gr_ctx.__init__(self)
+        if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
+            raise ValueError("element structure must be a ring")
+        libgr.gr_ctx_init_matrix_ring(self._ref, element_ring._ref, n)
+        self._element_ring = element_ring
+        self._elem_type = gr_mat
+
+
+class gr_mat(gr_elem):
+
+    _struct_type = gr_mat_struct
+
+    def __init__(self, *args, **kwargs):
+        context = kwargs['context']
+        gr_elem.__init__(self, None, context)
+        element_ring = context._element_ring
+        if kwargs.get('random'):
+            libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
+            return
+
+        if len(args) == 1:
+            val = args[0]
+            if val is not None:
+                if isinstance(val, gr_elem):
+                    status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                    if status:
+                        if status & GR_UNABLE: raise NotImplementedError
+                        if status & GR_DOMAIN: raise ValueError
+                elif isinstance(val, (list, tuple)):
+                    m = len(val)
+                    n = 0
+                    if m != 0:
+                        if not isinstance(val[0], (list, tuple)):
+                            raise TypeError("single input to gr_mat must be a list of lists")
+                        n = len(val[0])
+                        for i in range(1, m):
+                            if len(val[i]) != n:
+                                raise ValueError("input rows have different lengths")
+                    status = libgr._gr_mat_check_resize(self._ref, m, n, self._ctx)
+                    if status:
+                        if status & GR_UNABLE: raise NotImplementedError
+                        if status & GR_DOMAIN: raise ValueError("wrong matrix shape for this domain")
+                    for i in range(m):
+                        row = val[i]
+                        for j in range(n):
+                            x = element_ring(row[j])
+                            ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
+                            status = libgr.gr_set(ijptr, x._ref, x._ctx)
+                            if status:
+                                if status & GR_UNABLE: raise NotImplementedError
+                                if status & GR_DOMAIN: raise ValueError
+                else:
+                    raise NotImplementedError
+        elif len(args) in (2, 3):
+            if len(args) == 2:
+                m, n = args
+                entries = None
+            else:
+                m, n, entries = args
+                entries = list(entries)
+                if len(entries) != m*n:
+                    raise ValueError("list of entries has the wrong length")
+            status = libgr._gr_mat_check_resize(self._ref, m, n, self._ctx)
+            if status:
+                if status & GR_UNABLE: raise NotImplementedError
+                if status & GR_DOMAIN: raise ValueError("wrong matrix shape for this domain")
+            if entries is None:
+                status = libgr.gr_mat_zero(self._ref, element_ring._ref)
+                if status:
+                    if status & GR_UNABLE: raise NotImplementedError
+                    if status & GR_DOMAIN: raise ValueError
+            else:
+                for i in range(m):
+                    for j in range(n):
+                        x = element_ring(entries[i*n + j])
+                        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
+                        status = libgr.gr_set(ijptr, x._ref, x._ctx)
+                        if status:
+                            if status & GR_UNABLE: raise NotImplementedError
+                            if status & GR_DOMAIN: raise ValueError
+
+    def nrows(self):
+        return self._data.r
+
+    def ncols(self):
+        return self._data.c
+
+    def shape(self):
+        return (self._data.r, self._data.c)
+
+    #def __getitem__(self, i):
+    #    pass
+
+
+libgr.gr_mat_entry_ptr.argtypes = (ctypes.c_void_p, c_slong, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_mat_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
+
+
+
+
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
 AA = RealAlgebraicField_qqbar()
@@ -693,6 +827,8 @@ DirichletGroup = DirichletGroup_dirichlet_char
 
 PSL2Z = ModularGroup()
 SymmetricGroup = SymmetricGroup_perm
+
+
 
 
 def test_all():
@@ -754,6 +890,8 @@ def test_all():
     assert RRx([1,QQ(2),AA(3),4]) == ZZx([1,2,3,4])
     assert ZZx(3) + ZZx(2) == ZZx([5])
     assert ZZx(3) + 2 == ZZx([5])
+
+    assert ZZx(QQ(5)) == 5
 
 if __name__ == "__main__":
     from time import time
