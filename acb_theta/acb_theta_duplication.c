@@ -21,6 +21,7 @@ void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
   for (b = 0; b < nb; b++)
     {
+      acb_zero(&th2[b]);
       for (bp = 0; bp < nb; bp++)
 	{
 	  bpp = b ^ bp; /* bitwise xor */

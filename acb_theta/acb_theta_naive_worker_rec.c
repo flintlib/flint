@@ -86,7 +86,7 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 	  acb_mul(lin_cf, lin_cf, diff_cf, newprec);
 	}
       
-      acb_mul(full_cf, lin_cf, acb_theta_precomp_sqr_pow(D, d, FLINT_ABS(c)/step), newprec);
+      acb_mul(full_cf, lin_cf, acb_theta_precomp_sqr_pow(D, d-1, FLINT_ABS(c)/step), newprec);
       acb_theta_naive_worker_rec(th, lin_powers, arb_eld_rchild(E,k), D, exp_z, full_cf,
 				 ab, ord, newprec, fullprec, worker_dim0);
     }
@@ -113,8 +113,8 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 	}
       acb_mul(lin_cf, lin_cf, diff_cf, newprec);
       
-      acb_mul(full_cf, lin_cf, acb_theta_precomp_sqr_pow(D, d, FLINT_ABS(c)/step), newprec);
-      acb_theta_naive_worker_rec(th, lin_powers, arb_eld_rchild(E,k), D, exp_z, full_cf,
+      acb_mul(full_cf, lin_cf, acb_theta_precomp_sqr_pow(D, d-1, FLINT_ABS(c)/step), newprec);
+      acb_theta_naive_worker_rec(th, lin_powers, arb_eld_lchild(E,k), D, exp_z, full_cf,
 				 ab, ord, newprec, fullprec, worker_dim0);
     }
   

@@ -30,7 +30,10 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
   acb_init(term);
   coords = flint_malloc(g * sizeof(slong));
 
-  for (k = 1; k < g; k++) coords[k] = arb_eld_coord(E,k);
+  for (k = 1; k < g; k++)
+    {
+      coords[k] = arb_eld_coord(E,k);
+    }
 
   acb_pow_si(start, lin, mid, prec);
   acb_mul(start, start, cofactor, prec);

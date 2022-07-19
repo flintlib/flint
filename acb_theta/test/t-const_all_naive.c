@@ -6,20 +6,19 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("const_naive....");
+    flint_printf("const_all_naive....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Test: agrees with const_ind_naive; duplication formula */
-    for (iter = 0; iter < 50 * arb_test_multiplier(); iter++)
+    /* Test: duplication formula */
+    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
       {	
 	slong g = 1 + n_randint(state, 3);
-	slong nb = n_pow(2,g);
+	slong nb = n_pow(2, 2*g);
 	acb_mat_t tau;
 	acb_ptr th;
 	acb_ptr th_test;
-	ulong ab;
 	slong prec = 20 + n_randint(state, 500);
 	slong mag_bits = n_randint(state, 2);
 	int res;
@@ -30,44 +29,18 @@ int main()
 	th_test = _acb_vec_init(nb);
 
 	acb_siegel_randtest(tau, state, prec, mag_bits);
-	
-	for (ab = 0; ab < nb; ab++)
-	  {
-	    acb_theta_const_ind_naive(&th_test[ab], ab, tau, prec);
-	  }
-	acb_theta_const_naive(th, tau, prec);
 
 	/*
 	flint_printf("g = %wd, prec = %wd, tau_11:\n", g, prec);
 	acb_printd(acb_mat_entry(tau, 0, 0), 30); flint_printf("\n");
-	flint_printf("theta_0:\n");
-	acb_printd(&th[0], 30); flint_printf("\n");
 	fflush(stdout);
 	*/
-	
-	res = 1;
-	for (k = 0; k < nb; k++)
-	  {
-	    if (!acb_overlaps(&th[k], &th_test[k])) res = 0;
-	  }	
-	if (!res)
-	  {
-	    flint_printf("FAIL: overlap\n");
-	    flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
-	    acb_mat_printd(tau, 10);
-	    flint_printf("th[k], th_test[k]:\n");
-	    for (k = 0; k < nb; k++)
-	      {
-		acb_printd(&th[k], 10); flint_printf("\n");
-		acb_printd(&th_test[k], 10); flint_printf("\n");
-	      }
-	    fflush(stdout);
-	    flint_abort();
-	  }
-	
-	acb_theta_duplication(th_test, th, g, prec);
+
+	acb_theta_const_naive(th_test, tau, prec);
+	acb_theta_duplication_all(th_test, th_test, g, prec);
+	        
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1);	
-	acb_theta_const_naive(th, tau, prec);
+	acb_theta_const_all_naive(th, tau, prec);
 	for (k = 0; k < nb; k++) acb_sqr(&th[k], &th[k], prec);
 	
 	res = 1;

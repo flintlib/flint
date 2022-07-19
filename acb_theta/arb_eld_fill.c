@@ -23,7 +23,10 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
   arf_init(b);
 
   /* Set input data */
-  for (k = 0; k < g-d; k++) E->last_coords[k] = last_coords[k];
+  for (k = 0; k < g-d; k++)
+    {
+      E->last_coords[k] = last_coords[k];
+    }
   _arb_vec_set(arb_eld_offset(E), offset, d);
   arb_set(arb_eld_normsqr(E), normsqr);
 

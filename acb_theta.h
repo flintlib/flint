@@ -164,6 +164,7 @@ void arb_eld_points(slong* pts, const arb_eld_t E);
 
 int arb_eld_contains(const arb_eld_t E, slong* pt);
 
+void arb_eld_print(const arb_eld_t E);
 
 /* Choice of radii and precisions in naive algorithms */
 
