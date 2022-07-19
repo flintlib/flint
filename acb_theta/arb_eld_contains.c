@@ -14,6 +14,10 @@ static int arb_eld_contains_rec(const arb_eld_t E, slong* pt)
     {
       return 0;
     }
+  else if (d == 1)
+    {
+      return 1;
+    }
   else if (c >= arb_eld_mid(E))
     {
       k = (c - arb_eld_mid(E))/step;
@@ -32,13 +36,12 @@ int arb_eld_contains(const arb_eld_t E, slong* pt)
   slong d = arb_eld_dim(E);
   slong k;
 
+  if (arb_eld_nb_pts(E) == 0) return 0;
+
   for (k = d; k < g; k++)
     {
-      if (pt[k] != arb_eld_coord(E, k))
-	{
-	  return 0;
-	}
+      if (pt[k] != arb_eld_coord(E, k)) return 0;
     }
 
-  return arb_eld_contains_rec(E, pt);  
+  return arb_eld_contains_rec(E, pt);
 }

@@ -18,6 +18,9 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
   slong min, mid, max, step;
   slong d = arb_eld_dim(E);
   slong g = arb_eld_ambient_dim(E);
+  arf_t b;
+
+  arf_init(b);
 
   /* Set input data */
   for (k = 0; k < g-d; k++) E->last_coords[k] = last_coords[k];
@@ -25,8 +28,17 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
   arb_set(arb_eld_normsqr(E), normsqr);
 
   /* Compute other data */
-  arb_sqrt(arb_eld_rad(E), normsqr, prec);
-  arb_div(arb_eld_rad(E), arb_eld_rad(E), arb_mat_entry(Y,d-1,d-1), prec);
+  arb_get_ubound_arf(b, normsqr, prec);
+  arb_set_arf(arb_eld_rad(E), b);
+  if (!arb_is_positive(normsqr))
+    {
+      arb_zero(arb_eld_rad(E));
+    }
+  else
+    {
+      arb_sqrt(arb_eld_rad(E), arb_eld_rad(E), prec);
+      arb_div(arb_eld_rad(E), arb_eld_rad(E), arb_mat_entry(Y,d-1,d-1), prec);
+    }
   
   arb_div(arb_eld_ctr(E), &arb_eld_offset(E)[d-1], arb_mat_entry(Y,d-1,d-1), prec);
   arb_neg(arb_eld_ctr(E), arb_eld_ctr(E));
@@ -44,12 +56,12 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
   if (min > max)
     {
       arb_eld_nb_pts(E) = 0;
-      for (k = 1; k <= d; k++) arb_eld_box(E, k) = 0;
+      for (k = 0; k < d; k++) arb_eld_box(E, k) = 0;
     }
   else if (d == 1)
     {
       arb_eld_nb_pts(E) = (max - min)/step + 1;
-      arb_eld_box(E, 1) = FLINT_MAX(max, -min);
+      arb_eld_box(E, 0) = FLINT_MAX(max, -min);
     }
   else /* ((d > 1) && (min <= max)) */
     {  
@@ -84,8 +96,8 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
       
       /* Set children recursively */
       arb_eld_nb_pts(E) = 0;
-      arb_eld_box(E, d) = FLINT_MAX(max, -min);
-      for (k = 1; k < d; k++) arb_eld_box(E, k) = 0;
+      arb_eld_box(E, d-1) = FLINT_MAX(max, -min);
+      for (k = 0; k < d-1; k++) arb_eld_box(E, k) = 0;
       
       _arb_vec_set(next_offset, offset_mid, d-1);
       for (k = 0; k < nr; k++)
@@ -115,7 +127,7 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
 		       next_coords, a, prec);
 	  
 	  arb_eld_nb_pts(E) += arb_eld_nb_pts(arb_eld_lchild(E, k));
-	  slong_vec_max(E->box, E->box, arb_eld_rchild(E,k)->box, d-1);
+	  slong_vec_max(E->box, E->box, arb_eld_lchild(E,k)->box, d-1);
 	}
 
       arb_clear(next_normsqr);
@@ -124,4 +136,6 @@ void arb_eld_fill(arb_eld_t E, const arb_mat_t Y, const arb_t normsqr,
       _arb_vec_clear(offset_mid, d-1);
       _arb_vec_clear(next_offset, d-1);
     }
+  
+  arf_clear(b);
 }

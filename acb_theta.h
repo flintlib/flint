@@ -1,6 +1,6 @@
 
-#ifndef ACB_MODULAR_H
-#define ACB_MODULAR_H
+#ifndef ACB_THETA_H
+#define ACB_THETA_H
 
 #include <stdio.h>
 #include "flint/fmpz_mat.h"
@@ -83,7 +83,7 @@ void fmpz_mat_siegel_fd(fmpz_mat_t m, slong j);
 
 /* Siegel space */
 
-void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec);
+void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 
 void acb_siegel_cocycle(acb_mat_t w, const fmpz_mat_t m, const acb_mat_t tau, slong prec);
 
@@ -98,6 +98,10 @@ void acb_siegel_reduce_real(acb_mat_t w, fmpz_mat_t u, const acb_mat_t tau, slon
 void acb_siegel_reduce(acb_mat_t w, fmpz_mat_t m, const acb_mat_t tau, slong prec);
 
 int acb_siegel_is_in_fundamental_domain(const acb_mat_t tau, slong prec);
+
+void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
+
+void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 
 /* Ellipsoids for naive algorithms */
@@ -139,7 +143,7 @@ typedef struct arb_eld_struct arb_eld_t[1];
 #define arb_eld_nr(E) ((E)->nr)
 #define arb_eld_nl(E) ((E)->nl)
 #define arb_eld_nb_pts(E) ((E)->nb_pts)
-#define arb_eld_box(E, k) ((E)->box[(k)-1])
+#define arb_eld_box(E, k) ((E)->box[(k)])
 
 void arb_eld_init(arb_eld_t E, slong d, slong g);
 
@@ -165,8 +169,8 @@ int arb_eld_contains(const arb_eld_t E, slong* pt);
 
 #define ARB_ELD_DEFAULT_PREC 50
 #define ACB_THETA_NAIVE_EPS_2EXP 0
-#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.0
-#define ACB_THETA_NAIVE_NEWPREC_MARGIN 0.9
+#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.5
+#define ACB_THETA_NAIVE_NEWPREC_MARGIN 1.0
 
 void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p, slong prec);
 
@@ -174,6 +178,8 @@ void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p, const arf_t eps
 
 slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist,
 			      slong step, slong ord);
+
+slong acb_theta_naive_fullprec(const arb_eld_t E, slong prec);
 
 /* Precomputations for naive algorithms */
 /* For this to work, we assume that step is 1 or 2 and constant among ellipsoid layers */
@@ -193,8 +199,8 @@ typedef acb_theta_precomp_struct acb_theta_precomp_t[1];
 
 #define acb_theta_precomp_g(D) ((D)->g)
 #define acb_theta_precomp_exp_mat(D) (&(D)->exp_mat)
-#define acb_theta_precomp_box(D, k) ((D)->box[(k)-1])
-#define acb_theta_precomp_sqr_pow(D, k, i) (&(D)->sqr_powers[(i) + (D)->indices[(k)-1]])
+#define acb_theta_precomp_box(D, k) ((D)->box[(k)])
+#define acb_theta_precomp_sqr_pow(D, k, i) (&(D)->sqr_powers[(i) + (D)->indices[(k)]])
 
 void acb_theta_precomp_init(acb_theta_precomp_t D, slong g);
 
@@ -212,9 +218,7 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
 
    void acb_theta_worker(acb_ptr th, const acb_t term, slong* coords, slong g,
                          ulong ab, slong ord, slong prec, slong fullprec)
-
-   (all arguments of various theta_naive functions). Then, function
-   pointers allows us to factor the code. */
+*/
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
 					 ulong, slong, slong, slong);
@@ -254,6 +258,10 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 void acb_theta_naive_term(acb_t exp, const acb_mat_t tau, acb_srcptr z,
 			  ulong ab, slong* coords, slong prec);
 
+void acb_theta_naive_ellipsoid(arb_eld_t E, arf_t epsilon,
+			       ulong ab, int all, int unif, slong ord,
+			       acb_srcptr z, const acb_mat_t tau, slong prec);
+
 void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
 void acb_theta_const_naive(acb_ptr th, const acb_mat_t tau, slong prec);
@@ -280,6 +288,13 @@ void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau, slong o
 
 
 /* AGM algorithms */
+
+void acb_theta_borchardt_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
+
+void acb_theta_borchardt_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr sqrt_bad,
+				  slong g, slong prec);
+
+void acb_theta_borchardt_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_borchardt(acb_t r, acb_srcptr a, acb_srcptr sqrt_bad, slong nb_bad, slong g, slong prec);
 

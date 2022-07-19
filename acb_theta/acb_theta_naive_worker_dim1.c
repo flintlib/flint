@@ -30,7 +30,7 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
   acb_init(term);
   coords = flint_malloc(g * sizeof(slong));
 
-  for (k = 2; k <= g; k++) coords[k-1] = arb_eld_coord(E,k);
+  for (k = 1; k < g; k++) coords[k] = arb_eld_coord(E,k);
 
   acb_pow_si(start, lin, mid, prec);
   acb_mul(start, start, cofactor, prec);
@@ -43,7 +43,7 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
       newprec = acb_theta_naive_newprec(prec, k, k-mid, max-mid, step, ord);
       if (k > mid) acb_mul(aff, aff, diff, newprec);
       
-      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 1, FLINT_ABS(k)/step), newprec);
+      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)/step), newprec);
       worker_dim0(th, term, coords, g, ab, ord, newprec, fullprec);
     }
 
@@ -55,7 +55,7 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
       newprec = acb_theta_naive_newprec(prec, k, mid-k, mid-min, step, ord);      
       acb_mul(aff, aff, diff, newprec);
       
-      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 1, FLINT_ABS(k)/step), newprec);
+      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)/step), newprec);
       worker_dim0(th, term, coords, g, ab, ord, newprec, fullprec);      
     }
 

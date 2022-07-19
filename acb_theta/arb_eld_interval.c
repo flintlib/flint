@@ -28,7 +28,7 @@ void arb_eld_interval(slong* min, slong* mid, slong* max,
 
   arb_mul_2exp_si(y, rad, -1);
   arb_add(y, x, y, prec);
-  arb_get_ubound_arf(b, y, prec);
+  arb_get_ubound_arf(b, y, prec); /* Apparently has some issues at very low precisions? */
   *max = 2*arf_get_si(b, ARF_RND_FLOOR) + a;
 
   arb_mul_2exp_si(y, rad, -1);

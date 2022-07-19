@@ -12,7 +12,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
       {
 	slong g = 1 + n_randint(state, 4);
 	slong d = 1 + n_randint(state, g);
@@ -22,6 +22,7 @@ int main()
 	arb_ptr offset;
 	slong* last_coords;
 	ulong a = n_randint(state, n_pow(2, g));
+	ulong a_shift;
 	slong prec = ARB_ELD_DEFAULT_PREC;
 	slong mag_bits = n_randint(state, 2);
 	slong k, j;
@@ -44,9 +45,14 @@ int main()
 
 	arb_mat_randtest_cho(Y, state, prec, mag_bits);
 	arb_randtest_pos(normsqr, state, prec, mag_bits);
-	arb_mul_si(normsqr, normsqr, 1 + n_randint(state, 5), prec);
-	
-	for (k = 0; k < g-d; k++) last_coords[k] = n_randint(state, 10);
+	arb_mul_si(normsqr, normsqr, 1 + n_randint(state, 10), prec);
+
+	a_shift = a;
+	for (k = g-d-1; k >= 0; k--)
+	  {	    
+	    last_coords[k] = 2*n_randint(state, 5) + (a_shift % 2);
+	    a_shift = a_shift >> 1;
+	  }
 	for (k = 0; k < g; k++) arb_randtest_precise(&offset[k], state, prec, mag_bits);
 	
 	arb_eld_fill(E, Y, normsqr, offset, last_coords, a, prec);
@@ -55,6 +61,7 @@ int main()
 
 	/* Test:
 	   - all ellipsoid points must be within the box
+	   - all ellipsoid points must have correct last coordinates
 	   Then, generate random points:
 	   - points inside ellipsoid must appear in all_pts
 	   - points outside ellipsoid must have norm greater than normsqr
@@ -62,12 +69,24 @@ int main()
 
 	for (k = 0; k < arb_eld_nb_pts(E); k++)
 	  {
-	    res = 1;
-	    for (j = 0; j < g; j++)
+	    for (j = 0; j < d; j++)
 	      {
-		if (FLINT_ABS(all_pts[k*g+j]) > arb_eld_box(E,j+1))
+		if (FLINT_ABS(all_pts[k*g+j]) > arb_eld_box(E, j))
 		  {
 		    flint_printf("FAIL: point outside box\n");
+		    for (j = 0; j < g; j++) flint_printf("%wd ", all_pts[k*g+j]);
+		    flint_printf("\nBox:\n");
+		    for (j = 0; j < g; j++) flint_printf("%wd ", arb_eld_box(E,j));
+		    flint_printf("\n");
+		    fflush(stdout);
+		    flint_abort();
+		  }
+	      }
+	    for (j = d; j < g; j++)
+	      {
+		if (all_pts[k*g+j] != arb_eld_coord(E, j))
+		  {
+		    flint_printf("FAIL: incorrect coordinate\n");
 		    for (j = 0; j < g; j++) flint_printf("%wd ", pt[j]);
 		    fflush(stdout);
 		    flint_abort();
@@ -75,17 +94,18 @@ int main()
 	      }
 	  }
 	
-	for (try = 0; try < 100 * arb_test_multiplier(); try++)
+	for (try = 0; try < 100; try++)
 	  {
+	    a_shift = a;
 	    for (k = g-1; k >= 0; k--)
-	      {
+	      {		
 		if (k >= d) pt[k] = last_coords[k-d];
 		else
 		  {
-		    pt[k] = 2*n_randint(state, 1 + arb_eld_box(E, k+1)/2);
-		    pt[k] += a % 2;
+		    pt[k] = 2*n_randint(state, 2 + arb_eld_box(E, k)/2);
+		    pt[k] += (a_shift % 2);
 		  }
-		a = a>>1;
+		a_shift = a_shift >> 1;
 	      }
 	    if (arb_eld_contains(E, pt))
 	      {
@@ -109,12 +129,13 @@ int main()
 	    
 	    if (!arb_eld_contains(E, pt))
 	      {
-		for (k = 0; k < g; k++) arb_set_si(arb_mat_entry(vec, k, 0), pt[k]);
+		arb_mat_zero(vec);
+		for (k = 0; k < d; k++) arb_set_si(arb_mat_entry(vec, k, 0), pt[k]);
 		arb_mat_mul(vec, Y, vec, prec);
 		arb_zero(sum);
-		for (k = 0; k < g; k++)
+		for (k = 0; k < d; k++)
 		  {
-		    arb_sub(arb_mat_entry(vec, k, 0),
+		    arb_add(arb_mat_entry(vec, k, 0),
 			    arb_mat_entry(vec, k, 0), &offset[k], prec);
 		    arb_sqr(sqr, arb_mat_entry(vec, k, 0), prec);
 		    arb_add(sum, sum, sqr, prec);
@@ -123,11 +144,16 @@ int main()
 		  {
 		    flint_printf("FAIL: small point not in ellipsoid\n");
 		    for (j = 0; j < g; j++) flint_printf("%wd ", pt[j]);
-		    flint_printf("\nCholesky:");
+		    flint_printf("\nCholesky:\n");
 		    arb_mat_printd(Y, 10);
-		    flint_printf("Norm of point: "); arb_printd(sum, 10);		    
-		    flint_printf("\nUpper bound: "); arb_printd(normsqr, 10);
-		    flint_printf("\na = %wu; nb of points = %wd\n", a, arb_eld_nb_pts(E));
+		    flint_printf("Norm of point: "); arb_printd(sum, 10);
+		    flint_printf("\nCoordinates:\n");
+		    for (j = 0; j < g; j++)
+		      {
+			arb_printd(arb_mat_entry(vec, j, 0), 10); flint_printf("\n");
+		      }
+		    flint_printf("Upper bound: "); arb_printd(normsqr, 10);
+		    flint_printf("\na = %wu; total nb of points = %wd\n", a, arb_eld_nb_pts(E));
 		    flint_printf("Offset:\n");
 		    for (j = 0; j < g; j++)
 		      {

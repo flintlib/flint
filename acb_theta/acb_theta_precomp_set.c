@@ -21,15 +21,15 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
   arb_mul_2exp_si(pi4, pi4, -2);
   
   /* Set matrix of exponentials */
-  for (k = 1; k <= g; k++)
+  for (k = 0; k < g; k++)
     {
-      for (j = k; j <= g; j++)
+      for (j = k; j < g; j++)
 	{
-	  acb_mul_arb(c, acb_mat_entry(tau,k-1,j-1), pi4, prec);
+	  acb_mul_arb(c, acb_mat_entry(tau,k,j), pi4, prec);
 	  acb_mul_onei(c, c);
 	  if (k != j) acb_mul_2exp_si(c, c, 1);
 	  acb_exp(c, c, prec);
-	  acb_set(acb_mat_entry(acb_theta_precomp_exp_mat(D),k-1,j-1), c);
+	  acb_set(acb_mat_entry(acb_theta_precomp_exp_mat(D),k,j), c);
 	}
     }
 
@@ -38,19 +38,19 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
   D->step = step;
   D->indices[0] = 0;
   D->nb = 0;
-  for (k = 1; k <= g; k++)
+  for (k = 0; k < g; k++)
     {
       acb_theta_precomp_box(D, k) = arb_eld_box(E, k);
-      nb_pow = acb_theta_precomp_box(D,k) / step + 1;
-      D->indices[k] = D->indices[k-1] + nb_pow;
+      nb_pow = acb_theta_precomp_box(D, k) / step + 1;
+      if (k+1 < g) D->indices[k+1] = D->indices[k] + nb_pow;
       D->nb += nb_pow;
     }
 
   /* Init and set square powers; addition chains unnecessary */
   D->sqr_powers = _acb_vec_init(D->nb);
-  for (k = 1; k <= g; k++)
+  for (k = 0; k < g; k++)
     {
-      acb_set(ddc, acb_mat_entry(acb_theta_precomp_exp_mat(D),k-1,k-1));      
+      acb_set(ddc, acb_mat_entry(acb_theta_precomp_exp_mat(D),k,k));      
       s = acb_theta_precomp_box(D, k) % step;
       acb_pow_si(c, ddc, s, prec);
       acb_pow_si(dc, ddc, 2*s*step + step*step, prec);
