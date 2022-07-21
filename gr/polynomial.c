@@ -56,6 +56,13 @@ polynomial_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 int
 polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
 {
+    /* todo */
+    if (poly->length == 0)
+    {
+        gr_stream_write(out, "0");
+        return GR_SUCCESS;
+    }
+
     return gr_poly_write(out, poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 

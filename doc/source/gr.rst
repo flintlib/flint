@@ -332,6 +332,19 @@ Base rings
 
     Sets or retrieves options of a Calcium context object.
 
+Other base structures
+...............................................................................
+
+.. function:: void gr_ctx_init_real_float_arf(gr_ctx_t ctx, slong prec)
+
+    Initializes *ctx* to the floating-point arithmetic with elements
+    of type :type:`arf_t` and a default precision of *prec* bits.
+
+.. function:: void gr_ctx_init_complex_float_acf(gr_ctx_t ctx, slong prec)
+
+    Initializes *ctx* to the complex floating-point arithmetic with elements
+    of type :type:`acf_t` and a default precision of *prec* bits.
+
 Matrices
 ...............................................................................
 
@@ -567,6 +580,23 @@ Basic functions
 
     Sets *res* to the string description in *x*.
 
+.. function:: int gr_get_si(slong * res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *x* to the integer *x*. This returns the ``GR_DOMAIN`` flag
+    if *x* is not an integer.
+
+.. function:: int gr_set_d(gr_ptr res, double x, gr_ctx_t ctx)
+
+    Sets *res* to the value of the floating-point number *x*.
+    The interpretation of this conversion depends on the ring.
+
+.. function:: int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx)
+
+    Returns a floating-point approximation of *x*. The interpretation
+    of this conversion depends on the ring.
+
 .. function:: truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx)
               truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx)
               truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
@@ -763,13 +793,26 @@ the choice of root is implementation-dependent.
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
 
-Complex methods
+Integer and complex parts
 ........................................................................
+
+.. function:: int gr_floor(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_ceil(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_trunc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_nint(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    In the real and complex numbers, sets *res* to the integer closest
+    to *x*, respectively rounding towards minus infinity, plus infinity,
+    zero, or the nearest integer (with tie-to-even).
 
 .. function:: int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
-    This method may return the flag ``GR_DOMAIN`` when the ring is
-    not an ordered ring.
+    Sets *res* to the absolute value of *x*, which maybe defined
+    both in complex rings and in any ordered ring.
+
+.. function:: int gr_i(gr_ptr res, gr_ctx_t ctx)
+
+    Sets *res* to the imaginary unit.
 
 .. function:: int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
@@ -798,11 +841,77 @@ Ordering methods
 Transcendental functions
 ........................................................................
 
+.. function:: int gr_pi(gr_ptr res, gr_ctx_t ctx)
+
+    Sets *res* to the constant `\pi`.
+
+.. function:: int gr_euler(gr_ptr res, gr_ctx_t ctx)
+
+    Sets *res* to Euler's constant `\gamma`.
+
 .. function:: int gr_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_expm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+              int gr_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sec(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_exp_pi_i(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cos_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin_cos_pi(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+              int gr_tan_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cot_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sinc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sinc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cosh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sinh_cosh(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+              int gr_tanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_coth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_asin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atan2(gr_ptr res, gr_srcptr y, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_asec(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acsc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_asin_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acos_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atan_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acot_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_asec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acsc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_asinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acosh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acoth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_asech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acsch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_erf(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_gamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_lgamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_rgamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_digamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
 Finite field methods
 ........................................................................

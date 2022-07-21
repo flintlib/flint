@@ -166,6 +166,60 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+/* xxx: assumes that ctx are not read */
+int _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx);
+int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
+int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
+
+int
+_gr_acb_get_fmpz(fmpz_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (!acb_is_int(x))
+    {
+        if (acb_contains_int(x))
+            return GR_UNABLE;
+        else
+            return GR_DOMAIN;
+    }
+
+    return _gr_arf_get_fmpz(res, arb_midref(acb_realref(x)), NULL);
+}
+
+int
+_gr_acb_get_si(slong * res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (!acb_is_int(x))
+    {
+        if (acb_contains_int(x))
+            return GR_UNABLE;
+        else
+            return GR_DOMAIN;
+    }
+
+    return _gr_arf_get_si(res, arb_midref(acb_realref(x)), NULL);
+}
+
+int
+_gr_acb_get_ui(ulong * res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (!acb_is_int(x))
+    {
+        if (acb_contains_int(x))
+            return GR_UNABLE;
+        else
+            return GR_DOMAIN;
+    }
+
+    return _gr_arf_get_ui(res, arb_midref(acb_realref(x)), NULL);
+}
+
+int
+_gr_acb_get_d(double * res, const acb_t x, const gr_ctx_t ctx)
+{
+    *res = arf_get_d(arb_midref(acb_realref(x)), ARF_RND_NEAR);
+    return GR_SUCCESS;
+}
+
 truth_t
 _gr_acb_is_zero(const acb_t x, const gr_ctx_t ctx)
 {
@@ -554,6 +608,39 @@ _gr_acb_rsqrt(acb_t res, const acb_t x, const gr_ctx_t ctx)
     }
 }
 
+int _arb_trunc(arb_t res, const arb_t x, slong prec);
+int _arb_nint(arb_t res, const arb_t x, slong prec);
+
+int
+_gr_acb_floor(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_floor(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_ceil(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_ceil(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_trunc(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_zero(acb_imagref(res));
+    return _arb_trunc(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+}
+
+int
+_gr_acb_nint(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_zero(acb_imagref(res));
+    return _arb_nint(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+}
+
 int
 _gr_acb_abs(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -732,6 +819,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_acb_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_acb_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acb_set_other},
+    {GR_METHOD_GET_SI,          (gr_funcptr) _gr_acb_get_si},
+    {GR_METHOD_GET_UI,          (gr_funcptr) _gr_acb_get_ui},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acb_get_fmpz},
+    {GR_METHOD_GET_D,           (gr_funcptr) _gr_acb_get_d},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_acb_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_acb_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_acb_add_ui},
@@ -763,6 +854,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_acb_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_acb_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_acb_rsqrt},
+    {GR_METHOD_FLOOR,           (gr_funcptr) _gr_acb_floor},
+    {GR_METHOD_CEIL,            (gr_funcptr) _gr_acb_ceil},
+    {GR_METHOD_TRUNC,           (gr_funcptr) _gr_acb_trunc},
+    {GR_METHOD_NINT,            (gr_funcptr) _gr_acb_nint},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_acb_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_acb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_acb_re},

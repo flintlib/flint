@@ -130,6 +130,49 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+int
+_gr_fmpq_get_ui(ulong * res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_is_one(fmpq_denref(x)))
+        return GR_DOMAIN;
+
+    if (fmpz_sgn(fmpq_numref(x)) < 0 || fmpz_cmp_ui(fmpq_numref(x), UWORD_MAX) > 0)
+        return GR_DOMAIN;
+
+    *res = fmpz_get_ui(fmpq_numref(x));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_get_si(slong * res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_is_one(fmpq_denref(x)))
+        return GR_DOMAIN;
+
+    if (!fmpz_fits_si(fmpq_numref(x)))
+        return GR_DOMAIN;
+
+    *res = fmpz_get_si(fmpq_numref(x));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_get_fmpz(fmpz_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_is_one(fmpq_denref(x)))
+        return GR_DOMAIN;
+
+    fmpz_set(res, fmpq_numref(x));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_get_d(double * res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    *res = fmpq_get_d(x);
+    return GR_SUCCESS;
+}
+
 truth_t
 _gr_fmpq_is_zero(const fmpq_t x, const gr_ctx_t ctx)
 {
@@ -422,6 +465,55 @@ _gr_fmpq_rsqrt(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpq_floor(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpz_fdiv_q(fmpq_numref(res), fmpq_numref(x), fmpq_denref(x));
+    fmpz_one(fmpq_denref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_ceil(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpz_cdiv_q(fmpq_numref(res), fmpq_numref(x), fmpq_denref(x));
+    fmpz_one(fmpq_denref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_trunc(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpz_tdiv_q(fmpq_numref(res), fmpq_numref(x), fmpq_denref(x));
+    fmpz_one(fmpq_denref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_nint(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_is_one(fmpq_denref(x)))
+    {
+        fmpq_set(res, x);
+    }
+    else
+    {
+        /* nint(x) = floor(x+0.5) - isint((2*x-1)/4) */
+        fmpq_t t;
+        fmpq_init(t);
+        fmpq_set_si(t, 1, 2);
+        fmpq_add(t, x, t);
+        fmpz_fdiv_q(fmpq_numref(res), fmpq_numref(t), fmpq_denref(t));
+
+        if (fmpz_is_one(fmpq_denref(t)) && fmpz_is_odd(fmpq_numref(t)))
+            fmpq_sub_ui(res, res, 1);
+
+        fmpq_clear(t);
+    }
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_abs(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
 {
     fmpq_abs(res, x);
@@ -642,6 +734,10 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpq_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpq_set_other},
+    {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpq_get_si},
+    {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpq_get_ui},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpq_get_fmpz},
+    {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpq_get_d},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpq_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpq_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpq_add_ui},
@@ -660,6 +756,10 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpq_rsqrt},
+    {GR_METHOD_FLOOR,           (gr_funcptr) _gr_fmpq_floor},
+    {GR_METHOD_CEIL,            (gr_funcptr) _gr_fmpq_ceil},
+    {GR_METHOD_TRUNC,           (gr_funcptr) _gr_fmpq_trunc},
+    {GR_METHOD_NINT,            (gr_funcptr) _gr_fmpq_nint},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpq_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpq_set},

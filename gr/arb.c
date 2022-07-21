@@ -115,6 +115,15 @@ _gr_arb_set_fmpq(arb_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_arb_set_str(arb_t res, const char * x, const gr_ctx_t ctx)
+{
+    if (arb_set_str(res, x, ARB_CTX_PREC(ctx)))
+        return GR_DOMAIN;
+
+    return GR_SUCCESS;
+}
+
 int 
 _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
 
@@ -152,6 +161,60 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
     }
 
     return GR_UNABLE;
+}
+
+/* xxx: assumes that ctx are not read */
+int _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx);
+int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
+int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
+
+int
+_gr_arb_get_fmpz(fmpz_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (!arb_is_int(x))
+    {
+        if (arb_contains_int(x))
+            return GR_UNABLE;
+        else
+            return GR_DOMAIN;
+    }
+
+    return _gr_arf_get_fmpz(res, arb_midref(x), NULL);
+}
+
+int
+_gr_arb_get_si(slong * res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (!arb_is_int(x))
+    {
+        if (arb_contains_int(x))
+            return GR_UNABLE;
+        else
+            return GR_DOMAIN;
+    }
+
+    return _gr_arf_get_si(res, arb_midref(x), NULL);
+}
+
+int
+_gr_arb_get_ui(ulong * res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (!arb_is_int(x))
+    {
+        if (arb_contains_int(x))
+            return GR_UNABLE;
+        else
+            return GR_DOMAIN;
+    }
+
+    return _gr_arf_get_ui(res, arb_midref(x), NULL);
+}
+
+int
+_gr_arb_get_d(double * res, const arb_t x, const gr_ctx_t ctx)
+{
+    *res = arf_get_d(arb_midref(x), ARF_RND_NEAR);
+    return GR_SUCCESS;
 }
 
 truth_t
@@ -571,6 +634,110 @@ _gr_arb_rsqrt(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_floor(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_floor(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_ceil(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_ceil(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_arb_trunc(arb_t res, const arb_t x, slong prec)
+{
+    if (arb_contains_zero(x))
+    {
+        arb_t a;
+        arb_init(a);
+
+        mag_one(arb_radref(a));
+
+        if (arb_contains(a, x))
+        {
+            arb_zero(res);
+        }
+        else
+        {
+            arb_t b;
+            arb_init(b);
+            arb_floor(a, x, prec);
+            arb_ceil(b, x, prec);
+            arb_union(res, a, b, prec);
+            arb_clear(b);
+        }
+
+        arb_clear(a);
+    }
+    else if (arf_sgn(arb_midref(x)) > 0)
+    {
+        arb_floor(res, x, prec);
+    }
+    else
+    {
+        arb_ceil(res, x, prec);
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+_arb_nint(arb_t res, const arb_t x, slong prec)
+{
+    if (arb_is_int(x))
+    {
+        arb_set(res, x);
+    }
+    else
+    {
+        arb_t t, u;
+        arb_init(t);
+        arb_init(u);
+
+        arb_set_d(t, 0.5);
+        arb_add(t, x, t, prec);
+
+        arb_mul_2exp_si(u, x, 1);
+        arb_sub_ui(u, u, 1, prec);
+        arb_mul_2exp_si(u, u, -2);
+
+        arb_floor(res, t, prec);
+
+        /* nint(x) = floor(x+0.5) - isint((2*x-1)/4) */
+
+        if (arb_is_int(u))
+        {
+            arb_sub_ui(res, res, 1, prec);
+        }
+        else if (arb_contains_int(u))
+        {
+            arf_one(arb_midref(u));
+            mag_one(arb_radref(u));
+            arb_mul_2exp_si(u, u, -1);
+            arb_sub_ui(res, res, 1, prec);
+        }
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_trunc(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    return _arb_trunc(res, x, ARB_CTX_PREC(ctx));
+}
+
+int
+_gr_arb_nint(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    return _arb_nint(res, x, ARB_CTX_PREC(ctx));
+}
+
+int
 _gr_arb_abs(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_abs(res, x);
@@ -751,7 +918,12 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_arb_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_arb_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_arb_set_fmpq},
+    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_arb_set_str},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_arb_set_other},
+    {GR_METHOD_GET_SI,          (gr_funcptr) _gr_arb_get_si},
+    {GR_METHOD_GET_UI,          (gr_funcptr) _gr_arb_get_ui},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_arb_get_fmpz},
+    {GR_METHOD_GET_D,           (gr_funcptr) _gr_arb_get_d},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_arb_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_arb_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_arb_add_ui},
@@ -783,6 +955,10 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_arb_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_arb_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_arb_rsqrt},
+    {GR_METHOD_FLOOR,           (gr_funcptr) _gr_arb_floor},
+    {GR_METHOD_CEIL,            (gr_funcptr) _gr_arb_ceil},
+    {GR_METHOD_TRUNC,           (gr_funcptr) _gr_arb_trunc},
+    {GR_METHOD_NINT,            (gr_funcptr) _gr_arb_nint},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_arb_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_arb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_arb_set},

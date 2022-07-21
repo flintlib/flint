@@ -240,6 +240,83 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx
 }
 
 int
+_gr_qqbar_get_fmpz(fmpz_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (!qqbar_is_integer(x))
+        return GR_DOMAIN;
+
+    qqbar_get_fmpz(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_get_ui(ulong * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+
+    if (!qqbar_is_integer(x))
+        return GR_DOMAIN;
+
+    fmpz_init(t);
+    qqbar_get_fmpz(t, x);
+
+    if (fmpz_sgn(t) < 0 || fmpz_cmp_ui(t, UWORD_MAX) > 0)
+    {
+        status = GR_DOMAIN;
+    }
+    else
+    {
+        *res = fmpz_get_ui(t);
+        status = GR_SUCCESS;
+    }
+
+    fmpz_clear(t);
+    return status;
+}
+
+int
+_gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+
+    if (!qqbar_is_integer(x))
+        return GR_DOMAIN;
+
+    fmpz_init(t);
+    qqbar_get_fmpz(t, x);
+
+    if (!fmpz_fits_si(t))
+    {
+        status = GR_DOMAIN;
+    }
+    else
+    {
+        *res = fmpz_get_si(t);
+        status = GR_SUCCESS;
+    }
+
+    fmpz_clear(t);
+    return status;
+}
+
+int
+_gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    arb_t t;
+
+    if (!qqbar_is_real(x))
+        return GR_DOMAIN;
+
+    arb_init(t);
+    qqbar_get_arb(t, x, 64);
+    *res = arf_get_d(arb_midref(t), ARF_RND_NEAR);
+    arb_clear(t);
+    return GR_SUCCESS;
+}
+
+int
 _gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_neg(res, x);
@@ -558,6 +635,119 @@ _gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     }
 }
 
+/* todo: could special-case rationals */
+int
+_gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (qqbar_is_integer(x))
+    {
+        qqbar_set(res, x);
+    }
+    else
+    {
+        fmpz_t n;
+        fmpz_init(n);
+        qqbar_floor(n, x);
+        qqbar_set_fmpz(res, n);
+        fmpz_clear(n);
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_ceil(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (qqbar_is_integer(x))
+    {
+        qqbar_set(res, x);
+    }
+    else
+    {
+        fmpz_t n;
+        fmpz_init(n);
+        qqbar_ceil(n, x);
+        qqbar_set_fmpz(res, n);
+        fmpz_clear(n);
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_trunc(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (qqbar_is_integer(x))
+    {
+        qqbar_set(res, x);
+    }
+    else
+    {
+        int sgn = qqbar_sgn_re(x);
+
+        if (sgn == 0)
+        {
+            qqbar_zero(res);
+        }
+        else
+        {
+            fmpz_t n;
+            fmpz_init(n);
+
+            if (sgn > 0)
+                qqbar_floor(n, x);
+            else
+                qqbar_ceil(n, x);
+
+            qqbar_set_fmpz(res, n);
+            fmpz_clear(n);
+        }
+    }
+
+    return GR_SUCCESS;
+}
+
+/* todo: fast numerical path */
+int
+_gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (qqbar_is_integer(x))
+    {
+        qqbar_set(res, x);
+    }
+    else
+    {
+        qqbar_t t;
+        fmpz_t n;
+
+        qqbar_init(t);
+        fmpz_init(n);
+
+        qqbar_set_d(t, 0.5);
+        qqbar_add(t, x, t);
+        qqbar_floor(n, t);
+
+        if (arb_contains_int(acb_realref(QQBAR_ENCLOSURE(t))))
+        {
+            qqbar_re(t, t);
+            if (qqbar_is_integer(t))
+            {
+                fmpz_t m;
+                fmpz_init(m);
+                qqbar_get_fmpz(m, t);
+                if (fmpz_is_odd(m))
+                    fmpz_sub_ui(n, n, 1);
+                fmpz_clear(m);
+            }
+        }
+
+        qqbar_set_fmpz(res, n);
+        fmpz_clear(n);
+    }
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
@@ -686,6 +876,11 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_qqbar_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_qqbar_set_other},
 
+    {GR_METHOD_GET_SI,          (gr_funcptr) _gr_qqbar_get_si},
+    {GR_METHOD_GET_UI,          (gr_funcptr) _gr_qqbar_get_ui},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_qqbar_get_fmpz},
+    {GR_METHOD_GET_D,           (gr_funcptr) _gr_qqbar_get_d},
+
     {GR_METHOD_NEG,             (gr_funcptr) _gr_qqbar_neg},
 
     {GR_METHOD_ADD,             (gr_funcptr) _gr_qqbar_add},
@@ -724,6 +919,11 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_qqbar_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_qqbar_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_qqbar_rsqrt},
+
+    {GR_METHOD_FLOOR,           (gr_funcptr) _gr_qqbar_floor},
+    {GR_METHOD_CEIL,            (gr_funcptr) _gr_qqbar_ceil},
+    {GR_METHOD_TRUNC,           (gr_funcptr) _gr_qqbar_trunc},
+    {GR_METHOD_NINT,            (gr_funcptr) _gr_qqbar_nint},
 
     {GR_METHOD_CMP,             (gr_funcptr) _gr_qqbar_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_qqbar_cmpabs},

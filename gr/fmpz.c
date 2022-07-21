@@ -137,6 +137,33 @@ _gr_fmpz_set_str(fmpz_t res, const char * x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_get_ui(ulong * res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(x) < 0 || fmpz_cmp_ui(x, UWORD_MAX) > 0)
+        return GR_DOMAIN;
+
+    *res = fmpz_get_ui(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_get_si(slong * res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_fits_si(x))
+        return GR_DOMAIN;
+
+    *res = fmpz_get_si(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_get_d(double * res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    *res = fmpz_get_d(x);
+    return GR_SUCCESS;
+}
+
 truth_t
 _gr_fmpz_is_zero(const fmpz_t x, const gr_ctx_t ctx)
 {
@@ -577,6 +604,10 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpz_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpz_set_other},
     {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpz_set_str},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpz_get_ui},
+    {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpz_get_si},
+    {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpz_get_d},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_add},
@@ -605,6 +636,10 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_rsqrt},
+    {GR_METHOD_FLOOR,           (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_CEIL,            (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_TRUNC,           (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_NINT,            (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpz_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpz_set},

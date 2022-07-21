@@ -65,6 +65,13 @@ class fmpq_poly_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('den', c_slong)]
 
+class arf_struct(ctypes.Structure):
+    _fields_ = [('data', c_slong * 4)]
+
+class acf_struct(ctypes.Structure):
+    _fields_ = [('real', arf_struct),
+                ('imag', arf_struct)]
+
 class arb_struct(ctypes.Structure):
     _fields_ = [('data', c_slong * 6)]
 
@@ -144,6 +151,7 @@ libgr.gr_mul_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.PO
 libgr.gr_div_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_pow_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 
+libgr.gr_set_d.argtypes = (ctypes.c_void_p, ctypes.c_double, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_set_str.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
@@ -245,34 +253,32 @@ class gr_elem:
         libgr.gr_init(self._ref, self._ctx)
         if val is not None:
             typ = type(val)
+            status = GR_UNABLE
             if typ is int:
                 if WORD_MIN <= val <= WORD_MAX:
                     status = libgr.gr_set_si(self._ref, val, self._ctx)
-                    if status:
-                        if status & GR_UNABLE: raise NotImplementedError
-                        if status & GR_DOMAIN: raise ValueError
                 else:
                     n = fmpz_struct()
                     nref = ctypes.byref(n)
                     libflint.fmpz_init(nref)
                     libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
                     status = libgr.gr_set_fmpz(self._ref, nref, self._ctx)
-                    if status:
-                        if status & GR_UNABLE: raise NotImplementedError
-                        if status & GR_DOMAIN: raise ValueError
                     libflint.fmpz_clear(nref)
             elif isinstance(val, gr_elem):
                 status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
-                if status:
-                    if status & GR_UNABLE: raise NotImplementedError
-                    if status & GR_DOMAIN: raise ValueError
             elif typ is str:
                 status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
-                if status:
-                    if status & GR_UNABLE: raise NotImplementedError
-                    if status & GR_DOMAIN: raise ValueError
+            elif typ is float:
+                status = libgr.gr_set_d(self._ref, val, self._ctx)
+            elif hasattr(val, "_gr_elem_"):
+                val = val._gr_elem_(context)
+                assert val.parent() is context
+                status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
             else:
                 raise NotImplementedError(f"unable to create {type(self)} from {type(val)}")
+            if status:
+                if status & GR_UNABLE: raise NotImplementedError
+                if status & GR_DOMAIN: raise ValueError
         elif random:
             libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
 
@@ -352,6 +358,16 @@ class gr_elem:
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
         return res
 
+    @staticmethod
+    def _constant(self, op, rstr):
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        status = op(res._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} in {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined in {self.parent()}")
+        return res
+
     def __eq__(self, other):
         return self._binary_predicate(self, other, libgr.gr_equal, "x == y")
 
@@ -389,10 +405,12 @@ class gr_elem:
         return self._unary_op(self, libgr.gr_abs, "abs(x)")
 
     def __add__(self, other):
-        return self._binary_op(self, other, libgr.gr_add, "x + y")
+        return self._binary_op2(self, other, _add_methods, "x + y")
 
     def __radd__(self, other):
-        return self._binary_op(other, self, libgr.gr_add, "x + y")
+        # TODO:
+        #return self._binary_op2(other, self, _add_methods, "x + y")
+        return self._binary_op2(self, other, _add_methods, "x + y")
 
     def __sub__(self, other):
         return self._binary_op(self, other, libgr.gr_sub, "x - y")
@@ -418,8 +436,46 @@ class gr_elem:
     def __rpow__(self, other):
         return self._binary_op2(other, self, _pow_methods, "x ** y")
 
+    def __index__(self):
+        n = fmpz_struct()
+        nref = ctypes.byref(n)
+        libflint.fmpz_init(nref)
+        status = libgr.gr_get_fmpz(nref, self._ref, self._ctx)
+        v = fmpz_to_python_int(nref)
+        libflint.fmpz_clear(nref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to convert x = {self} to integer in {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"x = {self} is not an integer in {self.parent()}")
+        return v
+
+    def __int__(self):
+        return self.trunc().__index__()
+
+    def __float__(self):
+        c = (ctypes.c_double * 1)()
+        status = libgr.gr_get_d(c, self._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"x = {self} is not an integer in {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"x = {self} is not a float in {self.parent()}")
+        return c[0]
+
     def sqrt(self):
         return self._unary_op(self, libgr.gr_sqrt, "sqrt(x)")
+
+    def rsqrt(self):
+        return self._unary_op(self, libgr.gr_rsqrt, "rsqrt(x)")
+
+    def floor(self):
+        return self._unary_op(self, libgr.gr_floor, "floor(x)")
+
+    def ceil(self):
+        return self._unary_op(self, libgr.gr_ceil, "ceil(x)")
+
+    def trunc(self):
+        return self._unary_op(self, libgr.gr_trunc, "trunc(x)")
+
+    def nint(self):
+        return self._unary_op(self, libgr.gr_nint, "nint(x)")
 
     def abs(self):
         return self._unary_op(self, libgr.gr_abs, "abs(x)")
@@ -439,6 +495,9 @@ class gr_elem:
     def csgn(self):
         return self._unary_op(self, libgr.gr_csgn, "csgn(x)")
 
+    def pi(self):
+        return self._constant(self, libgr.gr_pi, "pi")
+
     def exp(self):
         return self._unary_op(self, libgr.gr_exp, "exp(x)")
 
@@ -450,6 +509,18 @@ class gr_elem:
 
     def cos(self):
         return self._unary_op(self, libgr.gr_cos, "cos(x)")
+
+    def tan(self):
+        return self._unary_op(self, libgr.gr_tan, "tan(x)")
+
+    def sinh(self):
+        return self._unary_op(self, libgr.gr_sinh, "sinh(x)")
+
+    def cosh(self):
+        return self._unary_op(self, libgr.gr_cosh, "cosh(x)")
+
+    def tanh(self):
+        return self._unary_op(self, libgr.gr_tanh, "tanh(x)")
 
     def atan(self):
         return self._unary_op(self, libgr.gr_atan, "atan(x)")
@@ -575,6 +646,9 @@ class PolynomialRing_gr_poly(gr_ctx):
 class fmpz(gr_elem):
     _struct_type = fmpz_struct
 
+    def __index__(self):
+        return fmpz_to_python_int(self._ref)
+
     def __int__(self):
         return fmpz_to_python_int(self._ref)
 
@@ -593,6 +667,41 @@ class arb(gr_elem):
 
 class acb(gr_elem):
     _struct_type = acb_struct
+
+class gr_arf_ctx(gr_ctx):
+
+    @property
+    def prec(self):
+        return libgr.gr_ctx_arf_get_prec(self._ref)
+
+    @prec.setter
+    def prec(self, prec):
+        libgr.gr_ctx_arf_set_prec(self._ref, prec)
+
+
+class RealFloat_arf(gr_arf_ctx):
+    def __init__(self, prec=53):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_real_float_arf(self._ref, prec)
+        self._elem_type = arf
+
+class ComplexFloat_acb(gr_arf_ctx):
+    def __init__(self, prec=53):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_complex_float_acf(self._ref, prec)
+        self._elem_type = acf
+
+class arf(gr_elem):
+    _struct_type = arf_struct
+
+    def __hash__(self):
+        return hash(float(str(self)))
+
+class acf(gr_elem):
+    _struct_type = acf_struct
+
+
+
 
 class gr_poly(gr_elem):
     _struct_type = gr_poly_struct
@@ -796,6 +905,15 @@ class gr_mat(gr_elem):
     def shape(self):
         return (self._data.r, self._data.c)
 
+    def det(self):
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_det(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
     #def __getitem__(self, i):
     #    pass
 
@@ -805,6 +923,7 @@ libgr.gr_mat_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 
 
 
+PolynomialRing = PolynomialRing_gr_poly
 
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
@@ -814,6 +933,9 @@ RR = RR_arb = RealField_arb()
 CC = CC_acb = ComplexField_acb()
 RR_ca = RealField_ca()
 CC_ca = ComplexField_ca()
+
+RF = RealFloat_arf()
+#CF = ComplexFloat_acf()
 
 ZZx = PolynomialRing_gr_poly(ZZ)
 QQx = PolynomialRing_gr_poly(QQ)

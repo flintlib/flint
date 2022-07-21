@@ -297,6 +297,78 @@ _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
     return GR_SUCCESS;
 }
 
+int
+_gr_ca_get_fmpz(fmpz_t res, const ca_t x, gr_ctx_t ctx)
+{
+    truth_t integer;
+
+    /* todo: avoid duplicate computation */
+    integer = ca_check_is_integer(x, GR_CA_CTX(ctx));
+
+    if (integer == T_TRUE)
+        return ca_get_fmpz(res, x, GR_CA_CTX(ctx)) ? GR_SUCCESS : GR_UNABLE;
+    else if (integer == T_FALSE)
+        return GR_DOMAIN;
+    else
+        return GR_UNABLE;
+}
+
+int
+_gr_ca_get_si(slong * res, const ca_t x, gr_ctx_t ctx)
+{
+    fmpz_t n;
+    int status;
+
+    fmpz_init(n);
+    status = _gr_ca_get_fmpz(n, x, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        if (fmpz_fits_si(n))
+            *res = fmpz_get_si(n);
+        else
+            status = GR_DOMAIN;
+    }
+
+    fmpz_clear(n);
+    return status;
+}
+
+int
+_gr_ca_get_ui(ulong * res, const ca_t x, gr_ctx_t ctx)
+{
+    fmpz_t n;
+    int status;
+
+    fmpz_init(n);
+    status = _gr_ca_get_fmpz(n, x, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        if (fmpz_sgn(n) >= 0 && fmpz_cmp_ui(n, UWORD_MAX) <= 0)
+            *res = fmpz_get_ui(n);
+        else
+            status = GR_DOMAIN;
+    }
+
+    fmpz_clear(n);
+    return status;
+}
+
+int 
+_gr_ca_get_d(double * res, gr_srcptr x, gr_ctx_t ctx)
+{
+    arb_t t;
+    int status = GR_UNABLE;
+
+    arb_init(t);
+    status = _gr_ca_get_arb_with_prec(t, x, ctx, 64);
+    if (status == GR_SUCCESS)
+        *res = arf_get_d(arb_midref(t), ARF_RND_NEAR);
+    arb_clear(t);
+    return status;
+}
+
 truth_t
 _gr_ca_is_zero(const ca_t x, gr_ctx_t ctx)
 {
@@ -701,6 +773,31 @@ _gr_ca_rsqrt(ca_t res, const ca_t x, gr_ctx_t ctx)
 }
 
 int
+_gr_ca_floor(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_floor(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_ceil(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_ceil(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
+/* todo: trunc, nint in calcium */
+
+
+int
 _gr_ca_abs(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     ca_abs(res, x, GR_CA_CTX(ctx));
@@ -935,6 +1032,11 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_ca_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_ca_set_other},
 
+    {GR_METHOD_GET_SI,          (gr_funcptr) _gr_ca_get_si},
+    {GR_METHOD_GET_UI,          (gr_funcptr) _gr_ca_get_ui},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_ca_get_fmpz},
+    {GR_METHOD_GET_D,           (gr_funcptr) _gr_ca_get_d},
+
     {GR_METHOD_NEG,             (gr_funcptr) _gr_ca_neg},
 
     {GR_METHOD_ADD,             (gr_funcptr) _gr_ca_add},
@@ -973,6 +1075,9 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_ca_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_ca_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_ca_rsqrt},
+
+    {GR_METHOD_FLOOR,           (gr_funcptr) _gr_ca_floor},
+    {GR_METHOD_CEIL,            (gr_funcptr) _gr_ca_ceil},
 
     {GR_METHOD_ABS,             (gr_funcptr) _gr_ca_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_ca_conj},
