@@ -798,6 +798,32 @@ _gr_arf_tanh(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
+/* todo: configurable function to return pole */
+
+int
+_gr_arf_gamma(arf_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    if (arf_is_special(x))
+    {
+        if (arf_is_zero(x))
+            arf_pos_inf(res);
+        else if (arf_is_inf(x))
+            arf_pos_inf(res);
+        else
+            arf_nan(res);
+        return GR_SUCCESS;
+    }
+    else if (arf_sgn(x) < 0 && arf_is_int(x))
+    {
+        arf_pos_inf(res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        ARF_FUNC_VIA_ARB(res, arb_gamma, x)
+    }
+}
+
 
 /*
 int
@@ -935,6 +961,7 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_CMP,             (gr_funcptr) _gr_arf_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_arf_cmpabs},
 
+    {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
     {GR_METHOD_PI,              (gr_funcptr) _gr_arf_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_arf_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_arf_log},
@@ -947,6 +974,8 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_TANH,            (gr_funcptr) _gr_arf_tanh},
 
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arf_atan},
+
+    {GR_METHOD_GAMMA,            (gr_funcptr) _gr_arf_gamma},
 
 
 /*

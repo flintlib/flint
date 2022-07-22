@@ -749,6 +749,16 @@ _gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_qqbar_i(qqbar_t res, const gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR)
+        return GR_DOMAIN;
+
+    qqbar_i(res);
+    return GR_SUCCESS;
+}
+
+int
 _gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_abs(res, x);
@@ -928,12 +938,15 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_CMP,             (gr_funcptr) _gr_qqbar_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_qqbar_cmpabs},
 
+    {GR_METHOD_I,               (gr_funcptr) _gr_qqbar_i},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_qqbar_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_qqbar_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_qqbar_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_qqbar_im},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_qqbar_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_qqbar_csgn},
+
+    {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},
 
     {0,                         (gr_funcptr) NULL},
 };

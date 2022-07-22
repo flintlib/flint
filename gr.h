@@ -104,6 +104,7 @@ typedef void * gr_ctx_ptr;
 #define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
 
 GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
+GR_INLINE int gr_not_in_domain(void) { return GR_DOMAIN; }
 
 typedef enum
 {

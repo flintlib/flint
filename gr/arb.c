@@ -798,6 +798,13 @@ _gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_pi(arb_t res, const gr_ctx_t ctx)
+{
+    arb_const_pi(res, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_arb_exp(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_exp(res, x, ARB_CTX_PREC(ctx));
@@ -967,6 +974,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_arb_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_arb_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_arb_cmpabs},
+    {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_PI,              (gr_funcptr) _gr_arb_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_arb_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_arb_log},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_arb_sin},

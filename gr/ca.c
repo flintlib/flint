@@ -796,6 +796,20 @@ _gr_ca_ceil(ca_t res, const ca_t x, gr_ctx_t ctx)
 
 /* todo: trunc, nint in calcium */
 
+int
+_gr_ca_i(ca_t res, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_RR_CA)
+        return GR_DOMAIN;
+
+    ca_i(res, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
 
 int
 _gr_ca_abs(ca_t res, const ca_t x, gr_ctx_t ctx)
@@ -884,6 +898,21 @@ _gr_ca_cmp(int * res, const ca_t x, const ca_t y, gr_ctx_t ctx)
         return GR_DOMAIN;
 
     *res = cmp;
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_pi(ca_t res, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+        return GR_DOMAIN;
+
+    ca_pi(res, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
     return GR_SUCCESS;
 }
 
@@ -1079,6 +1108,7 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_ca_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_ca_ceil},
 
+    {GR_METHOD_I,               (gr_funcptr) _gr_ca_i},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_ca_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_ca_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_ca_re},
@@ -1088,6 +1118,7 @@ gr_method_tab_input _ca_methods_input[] =
 
     {GR_METHOD_CMP,              (gr_funcptr) _gr_ca_cmp},
 
+    {GR_METHOD_PI,              (gr_funcptr) _gr_ca_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_ca_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_ca_log},
 

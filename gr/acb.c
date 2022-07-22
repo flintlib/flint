@@ -642,6 +642,13 @@ _gr_acb_nint(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_i(acb_t res, const gr_ctx_t ctx)
+{
+    acb_onei(res);
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_abs(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     acb_abs(acb_realref(res), x, ACB_CTX_PREC(ctx));
@@ -684,6 +691,13 @@ _gr_acb_csgn(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     acb_csgn(acb_realref(res), x);
     arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_pi(acb_t res, const gr_ctx_t ctx)
+{
+    acb_const_pi(res, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
@@ -858,12 +872,14 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_acb_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_acb_trunc},
     {GR_METHOD_NINT,            (gr_funcptr) _gr_acb_nint},
+    {GR_METHOD_I,               (gr_funcptr) _gr_acb_i},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_acb_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_acb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_acb_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_acb_im},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_acb_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_acb_csgn},
+    {GR_METHOD_PI,              (gr_funcptr) _gr_acb_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acb_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acb_log},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},

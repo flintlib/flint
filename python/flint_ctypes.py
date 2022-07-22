@@ -480,6 +480,9 @@ class gr_elem:
     def abs(self):
         return self._unary_op(self, libgr.gr_abs, "abs(x)")
 
+    def i(self):
+        return self._constant(self, libgr.gr_i, "i")
+
     def conj(self):
         return self._unary_op(self, libgr.gr_conj, "conj(x)")
 
@@ -524,6 +527,9 @@ class gr_elem:
 
     def atan(self):
         return self._unary_op(self, libgr.gr_atan, "atan(x)")
+
+    def gamma(self):
+        return self._unary_op(self, libgr.gr_gamma, "gamma(x)")
 
 
 class IntegerRing_fmpz(gr_ctx):

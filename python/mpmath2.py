@@ -86,22 +86,40 @@ class RFContext(StandardBaseContext):
             return x - x == 0.0
         return False
 
+    # todo
+    def _is_real_type(ctx, x):
+        return True
+
     # todo:
     def ldexp(ctx, x, n):
         return x * ctx.R(2) ** n
 
-    def ln(ctx, x, prec=0):
-        #if prec:
-        return ctx.R(x).log()
+    def sqrt(ctx, x, prec=0):
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return x.sqrt()
 
     def log(ctx, x, prec=0):
-        #if prec:
-        return ctx.R(x).log()
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return x.log()
+
+    ln = log
 
     def exp(ctx, x, prec=0):
-        if type(x) is ctx._type and x.parent() is ctx.R:
-            return x.exp()
-        return ctx.R(x).exp()
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return x.exp()
+
+    def sin(ctx, x, prec=0):
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return x.sin()
+
+    def gamma(ctx, x, prec=0):
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return x.gamma()
 
 
     '''
@@ -292,3 +310,25 @@ class RFContext(StandardBaseContext):
 
 mp = RFContext(flint.RF, flint.QQ)
 
+sqrt = mp.sqrt
+log = mp.log
+ln = mp.ln
+sin = mp.sin
+exp = mp.exp
+gamma = mp.gamma
+
+inf = mp.inf
+quad = mp.quad
+quadosc = mp.quadosc
+diff = mp.diff
+nsum = mp.nsum
+
+"""
+from mpmath2 import *
+mp.dps = 100
+nsum(lambda n: 1/n**2, [1, inf])
+diff(lambda x: gamma(x), 1)
+quadosc(lambda x: sin(x)/x, [0, inf], omega=1)
+
+
+"""

@@ -640,6 +640,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_NINT,            (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpz_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpz_set},
