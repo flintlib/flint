@@ -28,7 +28,7 @@ _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const 
 
     Xden = _fmpz_vec_init(X->c);
     fmpz_mat_init(Xclear, X->r, X->c);
-    fmpz_mat_init(AXclear, X->r, X->c);
+    fmpz_mat_init(AXclear, B->r, B->c);
     fmpz_init(t);
 
     fmpq_mat_get_fmpz_mat_colwise(Xclear, Xden, X);
