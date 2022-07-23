@@ -325,7 +325,7 @@ matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     if (mat->r != mat->c)
         return GR_DOMAIN;
 
-    if (res->r != mat->r || res->c != mat->r)
+    if (res->r != mat->r || res->c != mat->c)
         _gr_mat_resize(res, mat->r, mat->r, MATRIX_CTX(ctx)->base_ring);
 
     return gr_mat_inv(res, mat, MATRIX_CTX(ctx)->base_ring);

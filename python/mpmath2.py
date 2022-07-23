@@ -330,5 +330,4 @@ nsum(lambda n: 1/n**2, [1, inf])
 diff(lambda x: gamma(x), 1)
 quadosc(lambda x: sin(x)/x, [0, inf], omega=1)
 
-
 """

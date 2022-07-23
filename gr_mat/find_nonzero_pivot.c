@@ -47,6 +47,8 @@ gr_cmp_repr(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return 0;
 }
 
+#include "arf.h"
+
 int
 gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
 {
@@ -57,6 +59,38 @@ gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slon
 
     if (end_row <= start_row)
         return GR_DOMAIN;
+
+/* arf_mat */
+#if 0
+    {
+        {
+            slong best_row, i;
+
+            best_row = -1;
+
+            for (i = start_row; i < end_row; i++)
+            {
+                if (!arf_is_zero(((arf_srcptr) (mat->rows[i])) + column))
+                {
+                    if (best_row == -1)
+                    {
+                        best_row = i;
+                    }
+                    /* todo: should take the radius into account */
+                    else if (arf_cmpabs(((arf_srcptr) (mat->rows[i])) + column,
+                                        ((arf_srcptr) (mat->rows[best_row])) + column) > 0)
+                    {
+                        best_row = i;
+                    }
+                }
+            }
+
+            *pivot_row = best_row;
+            return GR_SUCCESS;
+        }
+    }
+#endif
+
 
 /* todo: for ca-type rings */
 #if 0

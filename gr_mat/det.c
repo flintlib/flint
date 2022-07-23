@@ -15,6 +15,9 @@
 int
 gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
+    /* return gr_mat_det_lu(res, A, ctx); */
+    /* return gr_mat_det_bareiss(res, A, ctx); */
+
     if (A->r <= 4)
         return gr_mat_det_cofactor(res, A, ctx);
     else

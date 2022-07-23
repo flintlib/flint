@@ -97,7 +97,7 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
         return GR_DOMAIN;
     }
-    else if (x_ctx->which_ring == GR_CTX_GR_MAT && MATRIX_CTX(x_ctx)->base_ring == GR_CTX_FMPZ)
+    else if (x_ctx->which_ring == GR_CTX_GR_MAT && MATRIX_CTX(x_ctx)->base_ring->which_ring == GR_CTX_FMPZ)
     {
         slong i, j, n, c;
         const fmpz_mat_struct * mat = x;
@@ -121,6 +121,9 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 if (c != 1 || !fmpz_is_one(fmpz_mat_entry(mat, i, j)))
                     return GR_DOMAIN;
             }
+
+            if (c == 0)
+                return GR_DOMAIN;
         }
             
         for (i = 0; i < n; i++)
@@ -135,6 +138,9 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 if (c != 1)
                     return GR_DOMAIN;
             }
+
+            if (c == 0)
+                return GR_DOMAIN;
         }
 
         for (i = 0; i < n; i++)

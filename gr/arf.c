@@ -825,21 +825,21 @@ _gr_arf_gamma(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 
-/*
 int
 _gr_arf_vec_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    arf_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ARF_CTX_PREC(ctx));
+    arf_approx_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
 int
 _gr_arf_vec_dot_rev(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    arf_dot(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ARF_CTX_PREC(ctx));
+    arf_approx_dot(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
+/*
 int
 _gr_arf_poly_mullow(arf_ptr res,
     arf_srcptr poly1, slong len1,
@@ -848,14 +848,73 @@ _gr_arf_poly_mullow(arf_ptr res,
     _arf_poly_mullow(res, poly1, len1, poly2, len2, n, ARF_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
+*/
+
+#include "gr_mat.h"
+#include "arb_mat.h"
 
 int
-_gr_arf_mat_mul(arf_mat_t res, const arf_mat_t x, const arf_mat_t y, gr_ctx_t ctx)
+_gr_arf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    arf_mat_mul(res, x, y, ARF_CTX_PREC(ctx));
-    return GR_SUCCESS;
+    slong prec;
+    slong cutoff;
+
+    prec = ARF_CTX_PREC(ctx);
+
+    /* todo: detect small-integer matrices */
+    if (prec <= 2 * FLINT_BITS)
+        cutoff = 120;
+    else if (prec <= 16 * FLINT_BITS)
+        cutoff = 60;
+    else
+        cutoff = 40;
+
+    if (A->r <= cutoff || A->c <= cutoff || B->c <= cutoff)
+    {
+        return gr_mat_mul_classical(C, A, B, ctx);
+    }
+    else
+    {
+        /* todo: direct algorithm, avoiding copies */
+        arb_mat_t RC, RB, RA;
+        slong i, j;
+        arf_t zero;
+
+        arb_mat_init(RA, A->r, A->c);
+        arb_mat_init(RB, B->r, B->c);
+        arb_mat_init(RC, C->r, C->c);
+
+        arf_init(zero);
+
+        for (i = 0; i < A->r; i++)
+            for (j = 0; j < A->c; j++)
+                *arb_midref(arb_mat_entry(RA, i, j)) = ((arf_srcptr) A->rows[i])[j];
+
+        for (i = 0; i < B->r; i++)
+            for (j = 0; j < B->c; j++)
+                *arb_midref(arb_mat_entry(RB, i, j)) = ((arf_srcptr) B->rows[i])[j];
+
+        arb_mat_approx_mul(RC, RA, RB, prec);
+
+        for (i = 0; i < A->r; i++)
+            for (j = 0; j < A->c; j++)
+                *arb_midref(arb_mat_entry(RA, i, j)) = *zero;
+
+        for (i = 0; i < B->r; i++)
+            for (j = 0; j < B->c; j++)
+                *arb_midref(arb_mat_entry(RB, i, j)) = *zero;
+
+        for (i = 0; i < C->r; i++)
+            for (j = 0; j < C->c; j++)
+                arf_swap(((arf_ptr) C->rows[i]) + j, arb_midref(arb_mat_entry(RC, i, j)));
+
+        arb_mat_clear(RA);
+        arb_mat_clear(RB);
+        arb_mat_clear(RC);
+
+        return GR_SUCCESS;
+    }
 }
-*/
 
 int
 _gr_arf_ctx_clear(gr_ctx_t ctx)
@@ -978,12 +1037,13 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_GAMMA,            (gr_funcptr) _gr_arf_gamma},
 
 
-/*
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arf_vec_dot_rev},
+/*
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arf_poly_mullow},
-    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arf_mat_mul},
 */
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arf_mat_mul},
+
     {0,                         (gr_funcptr) NULL},
 };
 

@@ -78,9 +78,13 @@ _gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         psl2z_set(res, x);
         return GR_SUCCESS;
     }
-    else if (x_ctx->which_ring == GR_CTX_GR_MAT && MATRIX_CTX(x_ctx)->base_ring == GR_CTX_FMPZ)
+    else if (x_ctx->which_ring == GR_CTX_GR_MAT && MATRIX_CTX(x_ctx)->base_ring->which_ring == GR_CTX_FMPZ)
     {
         fmpz_t det;
+
+        if (fmpz_mat_nrows(x) != 2 || fmpz_mat_ncols(x) != 2)
+            return GR_DOMAIN;
+
         fmpz_init(det);
         fmpz_mat_det(det, x);
         if (fmpz_is_one(det))

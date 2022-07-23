@@ -459,6 +459,9 @@ class gr_elem:
             if status & GR_DOMAIN: raise ValueError(f"x = {self} is not a float in {self.parent()}")
         return c[0]
 
+    def inv(self):
+        return self._unary_op(self, libgr.gr_inv, "inv(x)")
+
     def sqrt(self):
         return self._unary_op(self, libgr.gr_sqrt, "sqrt(x)")
 
@@ -957,16 +960,36 @@ PSL2Z = ModularGroup()
 SymmetricGroup = SymmetricGroup_perm
 
 
+def raises(f, exception):
+    try:
+        f()
+    except exception:
+        return True
+    return False
 
+def test_perm():
+    S = SymmetricGroup(3)
+    M = MatrixDomain(ZZ)
+    A = M([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
+    assert S(A).parent() is S
+    assert S(A).inv() == S(A.inv())
+    assert raises(lambda: S(-A), ValueError)
+    assert raises(lambda: S(M([[0, 1, 0], [1, 0, 0], [0, 0, 0]])), ValueError)
+    assert raises(lambda: S(M([[0, 1, 0], [1, 0, 0], [1, 0, 0]])), ValueError)
+    assert raises(lambda: S(M([[0, 1, 0], [1, 0, 0], [0, 1, 1]])), ValueError)
+
+def test_psl2z():
+    M = MatrixDomain(ZZ)
+    A = M([[2, 1], [5, 3]])
+    a = PSL2Z(A)
+    assert a.parent() is PSL2Z
+    assert a == PSL2Z(-A)
+    assert a.inv() == PSL2Z(A.inv())
+    assert raises(lambda: PSL2Z(M([[1], [2]])), ValueError)
+    assert raises(lambda: PSL2Z(M([[1, 3, 4], [4, 5, 6]])), ValueError)
+    assert raises(lambda: PSL2Z(M([[1, 2], [3, 4]])), ValueError)
 
 def test_all():
-
-    def raises(f, exception):
-        try:
-            f()
-        except exception:
-            return True
-        return False
 
     x = ZZ(23)
     y = ZZ(-1)
