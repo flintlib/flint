@@ -161,6 +161,28 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
         case GR_CTX_CC_CA:
         case GR_CTX_COMPLEX_ALGEBRAIC_CA:
             return _gr_ca_get_acb_with_prec(res, x, x_ctx, ACB_CTX_PREC(ctx));
+
+        case GR_CTX_REAL_FLOAT_ARF:
+            if (arf_is_finite(x))
+            {
+                arb_set_arf(acb_realref(res), x);
+                arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
+                arb_zero(acb_imagref(res));
+                return GR_SUCCESS;
+            }
+            else
+            {
+                return GR_DOMAIN;
+            }
+
+        case GR_CTX_RR_ARB:
+            arb_set_round(acb_realref(res), x, ACB_CTX_PREC(ctx));
+            arb_zero(acb_imagref(res));
+            return GR_SUCCESS;
+
+        case GR_CTX_CC_ACB:
+            acb_set_round(res, x, ACB_CTX_PREC(ctx));
+            return GR_SUCCESS;
     }
 
     return GR_UNABLE;

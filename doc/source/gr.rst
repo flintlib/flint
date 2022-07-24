@@ -250,7 +250,7 @@ Groups
     larger than `10^{12}`, which is currently unspported
     by the implementation.
 
-Base rings
+Base rings and fields
 ...............................................................................
 
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
@@ -332,8 +332,20 @@ Base rings
 
     Sets or retrieves options of a Calcium context object.
 
-Other base structures
+Floating-point arithmetic
 ...............................................................................
+
+Although domains of floating-point numbers approximate
+real and complex fields, they are not rings or fields.
+Floating-point arithmetic can be used in many places where a ring
+or field is normally assumed, but predicates like "is field"
+return false.
+
+* Equality compares equality of floating-point numbers,
+  with the special rule that NaN is not equal to itself.
+* In general, the following implementations do not currently
+  guarantee correct rounding except for atomic arithmetic operations
+  (add, sub, mul, div, sqrt) on real floating-point numbers.
 
 .. function:: void gr_ctx_init_real_float_arf(gr_ctx_t ctx, slong prec)
 

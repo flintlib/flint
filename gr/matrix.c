@@ -65,10 +65,22 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* todo: matrices over e.g. semirings? need to check element domain */
 truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
 {
-    return (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols) ? T_TRUE : T_FALSE;
+    truth_t shape_ok;
+
+    shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols) ? T_TRUE : T_FALSE;
+
+    if (shape_ok == T_TRUE && MATRIX_CTX(ctx)->nrows == 0)
+        return T_TRUE;
+
+    return truth_and(shape_ok, gr_ctx_is_ring(MATRIX_CTX(ctx)->base_ring));
+}
+
+/* todo: public */
+truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
+{
+    return (MATRIX_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
 
 void

@@ -191,6 +191,43 @@ int gr_generic_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_add_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_add(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_other_add(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, x, x_ctx, ctx);
+
+    printf("other add %d\n", status);
+
+    if (status == GR_SUCCESS)
+        status = gr_add(res, t, y, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
 int gr_generic_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
 {
     int status;
@@ -235,6 +272,41 @@ int gr_generic_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     fmpq_clear(t);
     return status;
 }
+
+int gr_generic_sub_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_sub(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_other_sub(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, x, x_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_sub(res, t, y, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
 
 int gr_generic_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
@@ -288,6 +360,40 @@ int gr_generic_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     status |= gr_set_fmpq(t, y, ctx);
     if (status == GR_SUCCESS)
         status = gr_mul(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_mul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_mul(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_other_mul(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, x, x_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_mul(res, t, y, ctx);
 
     GR_TMP_CLEAR(t, ctx);
     return status;
@@ -373,6 +479,23 @@ int gr_generic_addmul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx
     return status;
 }
 
+int gr_generic_addmul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_addmul(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
 int gr_generic_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -452,6 +575,24 @@ int gr_generic_submul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx
     GR_TMP_CLEAR(t, ctx);
     return status;
 }
+
+int gr_generic_submul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_submul(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
 
 int gr_generic_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
@@ -560,6 +701,40 @@ int gr_generic_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
     fmpq_inv(t, y);
     status = gr_mul_fmpq(res, x, t, ctx);
     fmpq_clear(t);
+    return status;
+}
+
+int gr_generic_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_div(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, x, x_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_div(res, t, y, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
     return status;
 }
 
@@ -760,6 +935,41 @@ gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
         return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }
 
+int gr_generic_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_pow(res, x, t, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+int gr_generic_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_other(t, x, x_ctx, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_pow(res, t, y, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+
 truth_t
 gr_generic_is_square(gr_srcptr x, gr_ctx_t ctx)
 {
@@ -813,6 +1023,34 @@ gr_generic_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     status |= gr_abs(u, y, ctx);
     status |= gr_cmp(res, t, u, ctx);
     GR_TMP_CLEAR2(t, u, ctx);
+
+    return status;
+}
+
+int
+gr_generic_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    status |= gr_cmp(res, x, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+
+    return status;
+}
+
+int
+gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+    status |= gr_set_other(t, y, y_ctx, ctx);
+    status |= gr_cmpabs(res, x, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
 
     return status;
 }
@@ -1473,30 +1711,38 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_ADD_SI,                  (gr_funcptr) gr_generic_add_si},
     {GR_METHOD_ADD_FMPZ,                (gr_funcptr) gr_generic_add_fmpz},
     {GR_METHOD_ADD_FMPQ,                (gr_funcptr) gr_generic_add_fmpq},
+    {GR_METHOD_ADD_OTHER,               (gr_funcptr) gr_generic_add_other},
+    {GR_METHOD_OTHER_ADD,               (gr_funcptr) gr_generic_other_add},
 
     {GR_METHOD_SUB,                     (gr_funcptr) gr_generic_sub},
     {GR_METHOD_SUB_UI,                  (gr_funcptr) gr_generic_sub_ui},
     {GR_METHOD_SUB_SI,                  (gr_funcptr) gr_generic_sub_si},
     {GR_METHOD_SUB_FMPZ,                (gr_funcptr) gr_generic_sub_fmpz},
     {GR_METHOD_SUB_FMPQ,                (gr_funcptr) gr_generic_sub_fmpq},
+    {GR_METHOD_SUB_OTHER,               (gr_funcptr) gr_generic_sub_other},
+    {GR_METHOD_OTHER_SUB,               (gr_funcptr) gr_generic_other_sub},
 
     {GR_METHOD_MUL,                     (gr_funcptr) gr_generic_mul},
     {GR_METHOD_MUL_UI,                  (gr_funcptr) gr_generic_mul_ui},
     {GR_METHOD_MUL_SI,                  (gr_funcptr) gr_generic_mul_si},
     {GR_METHOD_MUL_FMPZ,                (gr_funcptr) gr_generic_mul_fmpz},
     {GR_METHOD_MUL_FMPQ,                (gr_funcptr) gr_generic_mul_fmpq},
+    {GR_METHOD_MUL_OTHER,               (gr_funcptr) gr_generic_mul_other},
+    {GR_METHOD_OTHER_MUL,               (gr_funcptr) gr_generic_other_mul},
 
     {GR_METHOD_ADDMUL,                  (gr_funcptr) gr_generic_addmul},
     {GR_METHOD_ADDMUL_UI,               (gr_funcptr) gr_generic_addmul_ui},
     {GR_METHOD_ADDMUL_SI,               (gr_funcptr) gr_generic_addmul_si},
     {GR_METHOD_ADDMUL_FMPZ,             (gr_funcptr) gr_generic_addmul_fmpz},
     {GR_METHOD_ADDMUL_FMPQ,             (gr_funcptr) gr_generic_addmul_fmpq},
+    {GR_METHOD_ADDMUL_OTHER,            (gr_funcptr) gr_generic_addmul_other},
 
     {GR_METHOD_SUBMUL,                  (gr_funcptr) gr_generic_submul},
     {GR_METHOD_SUBMUL_UI,               (gr_funcptr) gr_generic_submul_ui},
     {GR_METHOD_SUBMUL_SI,               (gr_funcptr) gr_generic_submul_si},
     {GR_METHOD_SUBMUL_FMPZ,             (gr_funcptr) gr_generic_submul_fmpz},
     {GR_METHOD_SUBMUL_FMPQ,             (gr_funcptr) gr_generic_submul_fmpq},
+    {GR_METHOD_SUBMUL_OTHER,            (gr_funcptr) gr_generic_submul_other},
 
     {GR_METHOD_MUL_TWO,                 (gr_funcptr) gr_generic_mul_two},
     {GR_METHOD_SQR,                     (gr_funcptr) gr_generic_sqr},
@@ -1505,6 +1751,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_DIV_SI,                  (gr_funcptr) gr_generic_div_si},
     {GR_METHOD_DIV_FMPZ,                (gr_funcptr) gr_generic_div_fmpz},
     {GR_METHOD_DIV_FMPQ,                (gr_funcptr) gr_generic_div_fmpq},
+    {GR_METHOD_DIV_OTHER,               (gr_funcptr) gr_generic_div_other},
+    {GR_METHOD_OTHER_DIV,               (gr_funcptr) gr_generic_other_div},
 
     {GR_METHOD_IS_INVERTIBLE,           (gr_funcptr) gr_generic_is_invertible},
     {GR_METHOD_INV,                     (gr_funcptr) gr_generic_inv},
@@ -1512,6 +1760,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POW_SI,                  (gr_funcptr) gr_generic_pow_si},
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},
     {GR_METHOD_POW_FMPZ,                (gr_funcptr) gr_generic_pow_fmpz},
+    {GR_METHOD_POW_OTHER,               (gr_funcptr) gr_generic_pow_other},
+    {GR_METHOD_OTHER_POW,               (gr_funcptr) gr_generic_other_pow},
 
     {GR_METHOD_IS_SQUARE,               (gr_funcptr) gr_generic_is_square},
     {GR_METHOD_SQRT,                    (gr_funcptr) gr_generic_sqrt},
@@ -1519,6 +1769,8 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CMP,                     (gr_funcptr) gr_generic_cmp},
     {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},
+    {GR_METHOD_CMP_OTHER,               (gr_funcptr) gr_generic_cmp_other},
+    {GR_METHOD_CMPABS_OTHER,            (gr_funcptr) gr_generic_cmpabs_other},
 
     {GR_METHOD_EXP,                     (gr_funcptr) gr_generic_exp},
     {GR_METHOD_LOG,                     (gr_funcptr) gr_generic_log},

@@ -163,11 +163,11 @@ libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 
-_add_methods = [libgr.gr_add, libgr.gr_add_ui, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_fmpq]
-_sub_methods = [libgr.gr_sub, libgr.gr_sub_ui, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_fmpq]
-_mul_methods = [libgr.gr_mul, libgr.gr_mul_ui, libgr.gr_mul_si, libgr.gr_mul_fmpz, libgr.gr_mul_fmpq]
-_div_methods = [libgr.gr_div, libgr.gr_div_ui, libgr.gr_div_si, libgr.gr_div_fmpz, libgr.gr_div_fmpq]
-_pow_methods = [libgr.gr_pow, libgr.gr_pow_ui, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_fmpq]
+_add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_other, libgr.gr_other_add]
+_sub_methods = [libgr.gr_sub, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_other, libgr.gr_other_sub]
+_mul_methods = [libgr.gr_mul, libgr.gr_mul_si, libgr.gr_mul_fmpz, libgr.gr_mul_other, libgr.gr_other_mul]
+_div_methods = [libgr.gr_div, libgr.gr_div_si, libgr.gr_div_fmpz, libgr.gr_div_other, libgr.gr_other_div]
+_pow_methods = [libgr.gr_pow, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_other, libgr.gr_other_pow]
 
 _gr_logic = 0
 
@@ -275,10 +275,10 @@ class gr_elem:
                 assert val.parent() is context
                 status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
             else:
-                raise NotImplementedError(f"unable to create {type(self)} from {type(val)}")
+                status = GR_UNABLE
             if status:
-                if status & GR_UNABLE: raise NotImplementedError
-                if status & GR_DOMAIN: raise ValueError
+                if status & GR_UNABLE: raise NotImplementedError(f"unable to create element of {self.parent()} from {val} of type {type(val)}")
+                if status & GR_DOMAIN: raise ValueError(f"{val} is not defined in {self.parent()}")
         elif random:
             libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
 
@@ -326,13 +326,46 @@ class gr_elem:
 
     @staticmethod
     def _binary_op2(self, other, ops, rstr):
-        if type(other) is int and WORD_MIN <= other <= WORD_MAX:
-            res = type(self)(context=self._ctx_python)
-            status = ops[2](res._ref, self._ref, other, self._ctx)
-        else:
-            self, other = gr_elem._binary_coercion(self, other)
+        self_type = type(self)
+        other_type = type(other)
+        if self_type is other_type and self._ctx_python is other._ctx_python:
             res = type(self)(context=self._ctx_python)
             status = ops[0](res._ref, self._ref, other._ref, self._ctx)
+        elif isinstance(self, gr_elem) and isinstance(other, gr_elem):
+            c = libgr.gr_ctx_cmp_coercion(self._ctx, other._ctx)
+            if c >= 0:
+                # other -> self
+                # print("trying", other, "into", self)
+                res = type(self)(context=self._ctx_python)
+                status = ops[3](res._ref, self._ref, other._ref, other._ctx, self._ctx)
+            else:
+                # self -> other
+                # print("trying", self, "into", other)
+                res = type(other)(context=other._ctx_python)
+                status = ops[4](res._ref, self._ref, self._ctx, other._ref, other._ctx)
+            # needed?
+            if status:
+                if c >= 0:
+                    other = self.parent()(other)
+                else:
+                    self = other.parent()(self)
+                res = type(self)(context=self._ctx_python)
+                status = ops[0](res._ref, self._ref, other._ref, self._ctx)
+        elif other_type is int:
+            if WORD_MIN <= other <= WORD_MAX:   # todo: efficient code from left also
+                res = type(self)(context=self._ctx_python)
+                status = ops[1](res._ref, self._ref, other, self._ctx)
+            else:
+                other = ZZ(other)
+                status = ops[2](res._ref, self._ref, other._ref, self._ctx)
+        elif self_type is int:
+            return other._binary_op2(ZZ(self), other, ops, rstr)
+        else:
+            if not isinstance(other, gr_elem):
+                other = self.parent()(other)
+            elif not isinstance(self, gr_elem):
+                self = other.parent()(self)
+            return self._binary_op2(self, other, ops, rstr)
         if status:
             if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
@@ -408,27 +441,25 @@ class gr_elem:
         return self._binary_op2(self, other, _add_methods, "x + y")
 
     def __radd__(self, other):
-        # TODO:
-        #return self._binary_op2(other, self, _add_methods, "x + y")
-        return self._binary_op2(self, other, _add_methods, "x + y")
+        return self._binary_op2(other, self, _add_methods, "x + y")
 
     def __sub__(self, other):
-        return self._binary_op(self, other, libgr.gr_sub, "x - y")
+        return self._binary_op2(self, other, _sub_methods, "x - y")
 
     def __rsub__(self, other):
-        return self._binary_op(other, self, libgr.gr_sub, "x - y")
+        return self._binary_op2(other, self, _sub_methods, "x - y")
 
     def __mul__(self, other):
-        return self._binary_op(self, other, libgr.gr_mul, "x * y")
+        return self._binary_op2(self, other, _mul_methods, "x * y")
 
     def __rmul__(self, other):
-        return self._binary_op(other, self, libgr.gr_mul, "x * y")
+        return self._binary_op2(other, self, _mul_methods, "x * y")
 
     def __truediv__(self, other):
-        return self._binary_op(self, other, libgr.gr_div, "x / y")
+        return self._binary_op2(self, other, _div_methods, "x / y")
 
     def __rtruediv__(self, other):
-        return self._binary_op(other, self, libgr.gr_div, "x / y")
+        return self._binary_op2(other, self, _div_methods, "x / y")
 
     def __pow__(self, other):
         return self._binary_op2(self, other, _pow_methods, "x ** y")
@@ -847,12 +878,8 @@ class gr_mat(gr_elem):
         if len(args) == 1:
             val = args[0]
             if val is not None:
-                if isinstance(val, gr_elem):
-                    status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
-                    if status:
-                        if status & GR_UNABLE: raise NotImplementedError
-                        if status & GR_DOMAIN: raise ValueError
-                elif isinstance(val, (list, tuple)):
+                status = GR_UNABLE
+                if isinstance(val, (list, tuple)):
                     m = len(val)
                     n = 0
                     if m != 0:
@@ -863,20 +890,20 @@ class gr_mat(gr_elem):
                             if len(val[i]) != n:
                                 raise ValueError("input rows have different lengths")
                     status = libgr._gr_mat_check_resize(self._ref, m, n, self._ctx)
-                    if status:
-                        if status & GR_UNABLE: raise NotImplementedError
-                        if status & GR_DOMAIN: raise ValueError("wrong matrix shape for this domain")
-                    for i in range(m):
-                        row = val[i]
-                        for j in range(n):
-                            x = element_ring(row[j])
-                            ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
-                            status = libgr.gr_set(ijptr, x._ref, x._ctx)
-                            if status:
-                                if status & GR_UNABLE: raise NotImplementedError
-                                if status & GR_DOMAIN: raise ValueError
-                else:
-                    raise NotImplementedError
+                    if not status:
+                        for i in range(m):
+                            row = val[i]
+                            for j in range(n):
+                                x = element_ring(row[j])
+                                ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
+                                status = libgr.gr_set(ijptr, x._ref, x._ctx)
+                elif libgr.gr_ctx_matrix_is_fixed_size(self._ctx) == T_TRUE:
+                    if not isinstance(val, gr_elem):
+                        val = element_ring(val)
+                    status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                if status:
+                    if status & GR_UNABLE: raise NotImplementedError
+                    if status & GR_DOMAIN: raise ValueError
         elif len(args) in (2, 3):
             if len(args) == 2:
                 m, n = args
@@ -988,6 +1015,13 @@ def test_psl2z():
     assert raises(lambda: PSL2Z(M([[1], [2]])), ValueError)
     assert raises(lambda: PSL2Z(M([[1, 3, 4], [4, 5, 6]])), ValueError)
     assert raises(lambda: PSL2Z(M([[1, 2], [3, 4]])), ValueError)
+
+def test_matrix():
+    M = MatrixRing(ZZ, 2)
+    I = M([[1, 0], [0, 1]])
+    assert M(1) == M(ZZ(1)) == I == M(2, 2, [1, 0, 0, 1])
+    assert raises(lambda: M(3, 1, [1, 2, 3]), ValueError)
+    assert 2 * I == M(2 * I) == I + I == 1 + I == I + 1
 
 def test_all():
 

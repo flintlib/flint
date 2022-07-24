@@ -30,6 +30,12 @@ polynomial_ctx_clear(gr_ctx_t ctx)
 }
 
 truth_t
+polynomial_ctx_is_ring(gr_ctx_t ctx)
+{
+    return gr_ctx_is_ring(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
 polynomial_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
     return gr_ctx_is_commutative_ring(POLYNOMIAL_ELEM_CTX(ctx));
@@ -236,7 +242,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) polynomial_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) polynomial_ctx_clear},
 
-    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},  /* todo: polys over semirings? */
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) polynomial_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) polynomial_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) polynomial_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},

@@ -41,7 +41,6 @@ _apply_permutation(slong * AP, gr_mat_t A, slong * P, slong n, slong offset)
 int
 gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
-
     slong i, j, m, n, r1, r2, n1;
     gr_mat_t A0, A1, A00, A01, A10, A11;
     slong *P1;
