@@ -219,8 +219,6 @@ int gr_generic_other_add(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, g
 
     status |= gr_set_other(t, x, x_ctx, ctx);
 
-    printf("other add %d\n", status);
-
     if (status == GR_SUCCESS)
         status = gr_add(res, t, y, ctx);
 

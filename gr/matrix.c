@@ -45,11 +45,11 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 
     if (MATRIX_CTX(ctx)->all_sizes)
     {
-        gr_stream_write(out, "Domain of ");
+        gr_stream_write(out, "Matrices (any shape) over ");
     }
     else
     {
-        if (MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols)
+        if (gr_ctx_is_ring(ctx) == T_TRUE)
             gr_stream_write(out, "Ring of ");
         else
             gr_stream_write(out, "Space of ");
@@ -58,9 +58,10 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
         gr_stream_write(out, " x ");
         gr_stream_write_si(out, MATRIX_CTX(ctx)->ncols);
         gr_stream_write(out, " ");
+
+        gr_stream_write(out, "matrices over ");
     }
 
-    gr_stream_write(out, "matrices over ");
     gr_ctx_write(out, elem_ctx);
     return GR_SUCCESS;
 }

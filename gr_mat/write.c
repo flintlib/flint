@@ -42,7 +42,7 @@ gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
         else
             gr_stream_write(out, "]");
     }
-    gr_stream_write(out, "]\n");
+    gr_stream_write(out, "]");
     return status;
 }
 

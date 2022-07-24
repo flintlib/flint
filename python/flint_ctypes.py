@@ -829,38 +829,57 @@ class perm(gr_elem):
 
 
 
-class MatrixDomain(gr_ctx):
-    def __init__(self, element_ring):
+class Mat(gr_ctx):
+    """
+    Parent class for matrix domains.
+
+    There are two kinds of matrix domains:
+
+    - Mat(R), the set of matrices of any size over the domain R.
+    - Mat(R, n, m), the set of n x m matrices over the domain R.
+      If R is a ring and n = m, then this is also a ring.
+
+    While Mat(R) may be more convenient, e.g. for representing linear
+    transformations of arbitrary dimension under a single parent,
+    fixed-shape matrix domains have advantages such as allowing
+    automatic conversion from scalars to scalar matrices of the
+    right size.
+
+        >>> Mat(ZZ)
+        Matrices (any shape) over Integer ring (fmpz)
+        >>> Mat(ZZ, 2)
+        Ring of 2 x 2 matrices over Integer ring (fmpz)
+        >>> Mat(ZZ, 2, 3)
+        Space of 2 x 3 matrices over Integer ring (fmpz)
+        >>> Mat(ZZ)([[1, 2, 3], [4, 5, 6]])
+        [[1, 2, 3],
+        [4, 5, 6]]
+        >>> Mat(ZZ, 2, 2)(5)
+        [[5, 0],
+        [0, 5]]
+
+    """
+
+    def __init__(self, element_ring, nrows=None, ncols=None):
         assert isinstance(element_ring, gr_ctx)
         gr_ctx.__init__(self)
-        if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
-            raise ValueError("element structure must be a ring")
-        libgr.gr_ctx_init_matrix_domain(self._ref, element_ring._ref)
+        if nrows is None and ncols is None:
+            libgr.gr_ctx_init_matrix_domain(self._ref, element_ring._ref)
+        else:
+            if ncols is None:
+                ncols = nrows
+            assert 0 <= nrows <= WORD_MAX
+            assert 0 <= ncols <= WORD_MAX
+            libgr.gr_ctx_init_matrix_space(self._ref, element_ring._ref, nrows, ncols)
         self._element_ring = element_ring
         self._elem_type = gr_mat
 
-class MatrixSpace(gr_ctx):
-    def __init__(self, element_ring, nrows, ncols):
-        assert isinstance(element_ring, gr_ctx)
-        assert 0 <= nrows <= WORD_MAX
-        assert 0 <= ncols <= WORD_MAX
-        gr_ctx.__init__(self)
-        if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
-            raise ValueError("element structure must be a ring")
-        libgr.gr_ctx_init_matrix_space(self._ref, element_ring._ref, nrows, ncols)
-        self._element_ring = element_ring
-        self._elem_type = gr_mat
-
-class MatrixRing(gr_ctx):
-    def __init__(self, element_ring, n):
-        assert isinstance(element_ring, gr_ctx)
-        assert 0 <= n <= WORD_MAX
-        gr_ctx.__init__(self)
-        if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
-            raise ValueError("element structure must be a ring")
-        libgr.gr_ctx_init_matrix_ring(self._ref, element_ring._ref, n)
-        self._element_ring = element_ring
-        self._elem_type = gr_mat
+def MatrixRing(element_ring, n):
+    assert isinstance(element_ring, gr_ctx)
+    assert 0 <= n <= WORD_MAX
+    if libgr.gr_ctx_is_ring(element_ring._ref) != T_TRUE:
+        raise ValueError("element structure must be a ring")
+    return Mat(element_ring, n)
 
 
 class gr_mat(gr_elem):
@@ -900,6 +919,8 @@ class gr_mat(gr_elem):
                 elif libgr.gr_ctx_matrix_is_fixed_size(self._ctx) == T_TRUE:
                     if not isinstance(val, gr_elem):
                         val = element_ring(val)
+                    status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                elif isinstance(val, gr_mat):
                     status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
                 if status:
                     if status & GR_UNABLE: raise NotImplementedError
@@ -996,7 +1017,7 @@ def raises(f, exception):
 
 def test_perm():
     S = SymmetricGroup(3)
-    M = MatrixDomain(ZZ)
+    M = Mat(ZZ)
     A = M([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
     assert S(A).parent() is S
     assert S(A).inv() == S(A.inv())
@@ -1006,7 +1027,7 @@ def test_perm():
     assert raises(lambda: S(M([[0, 1, 0], [1, 0, 0], [0, 1, 1]])), ValueError)
 
 def test_psl2z():
-    M = MatrixDomain(ZZ)
+    M = Mat(ZZ)
     A = M([[2, 1], [5, 3]])
     a = PSL2Z(A)
     assert a.parent() is PSL2Z
@@ -1017,7 +1038,7 @@ def test_psl2z():
     assert raises(lambda: PSL2Z(M([[1, 2], [3, 4]])), ValueError)
 
 def test_matrix():
-    M = MatrixRing(ZZ, 2)
+    M = Mat(ZZ, 2)
     I = M([[1, 0], [0, 1]])
     assert M(1) == M(ZZ(1)) == I == M(2, 2, [1, 0, 0, 1])
     assert raises(lambda: M(3, 1, [1, 2, 3]), ValueError)
@@ -1078,17 +1099,17 @@ def test_all():
 
     assert ZZx(QQ(5)) == 5
 
-    M = MatrixDomain(ZZ)
+    M = Mat(ZZ)
     A = M([[1,2,3],[4,5,6]])
     assert A == M(2, 3, [1,2,3,4,5,6])
     assert A == M(2, 3, [1,2,QQ(3),4,5,6])
-    assert MatrixSpace(ZZ, 2, 3)(A) == A
-    assert MatrixSpace(QQ, 2, 3)(A) == A
+    assert Mat(ZZ, 2, 3)(A) == A
+    assert Mat(QQ, 2, 3)(A) == A
     assert M(2, 1) == M([[0], [0]])
     assert raises(lambda: M(2, 1, [1,2,3]), ValueError)
     assert raises(lambda: M([[QQ(1)/3]]), ValueError)
-    assert raises(lambda: MatrixSpace(ZZ, 3, 1)(A), ValueError)
-    assert MatrixRing(QQ, 2)(M([[1, 2], [3, 4]])) ** 2 == M([[7,10],[15,22]])
+    assert raises(lambda: Mat(ZZ, 3, 1)(A), ValueError)
+    assert Mat(QQ, 2)(M([[1, 2], [3, 4]])) ** 2 == M([[7,10],[15,22]])
 
 if __name__ == "__main__":
     from time import time
