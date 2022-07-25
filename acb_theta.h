@@ -9,6 +9,7 @@
 #include "arb_mat.h"
 #include "acb_mat.h"
 
+
 /* #ifdef __cplusplus
 extern "C" {
 #endif */
@@ -23,7 +24,7 @@ extern "C" {
    - A suffix ind indicates a single theta value
    - A suffix const indicates theta constants (z=0). If not present, we compute both theta constants and regular theta values; "proj" is understood for each half independently.
    - A suffix jet indicates successive derivatives with respect to z. Return a vector of matrices as follows: one matrix per derivation order; in each of these, a row of the matrix contains partial derivatives of a fixed theta value
-   - Order of suffixes: const, half, all/ind, proj, sqr, jet, then algorithm type
+   - Order: naive/agm, all/ind, const, half,  proj, sqr, jet
    - Characteristics (a,b) are encoded as ulongs; first half is a, second half is b
 */
 
@@ -42,6 +43,8 @@ void arb_mat_randtest_cho(arb_mat_t r, flint_rand_t state, slong prec, slong mag
 void arb_mat_randtest_sym_pos(arb_mat_t r, flint_rand_t state, slong prec, slong mag_bits);
 
 int arb_mat_is_nonsymmetric(const arb_mat_t m);
+
+void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t m, slong prec);
 
 void arb_mat_reduce(arb_mat_t r, fmpz_mat_t u, const arb_mat_t m, slong prec);
 
@@ -293,40 +296,75 @@ void acb_theta_neighborhood_const(arf_t rad, arf_t bound, acb_srcptr z, const ac
 void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound, slong ord, slong prec);
 
 
-/* AGM algorithms */
+/* AGM sequences */
 
-void acb_theta_agm_sqrt_near(acb_t r, const acb_t x, const acb_t r0, slong prec);
+#define ACB_THETA_AGM_LOWPREC 20
+
+void acb_theta_agm_hadamard(acb_ptr r, acb_ptr s, slong g, slong prec);
+
+void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t r0, slong prec);
 
 void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr sqrt_bad,
-				  slong g, slong prec);
+void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr r0, slong g, slong prec);
 
 void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr sqrt_bad, slong nb_bad, slong g, slong prec);
+void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr b, acb_srcptr sqrt_a_bad, acb_srcptr sqrt_b_bad, slong nb_bad, slong g, slong prec);
+void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr r0, slong g, slong prec);
 
-void acb_theta_half_proj_agm(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, acb_srcptr z, slong prec);
+void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_const_half_proj_agm(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, slong prec);
+void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_r0, slong nb_bad,
+		   slong nb_total, slong g, slong prec);
 
-void acb_theta_all_sqr_agm(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
+void acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_r0, slong nb_bad,
+		       slong nb_total, slong g, slong prec);
 
-void acb_theta_const_all_sqr_agm(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
+
+/* Newton and convergence data */
+
+slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, const fmpz_mat_t N, slong prec);
+
+void acb_theta_agm_collect(acb_ptr all_r0, arb_t M0, arb_t minf, arb_ptr mi,
+			   slong nb_bad, const acb_mat_t tau, const fmpz_mat_t N, slong prec);
+
+void acb_theta_agm_ext_collect(acb_ptr all_r0, slong* nb_bad, slong* nb_total,
+			       arb_t rho, arb_t M0, arb_t minf,
+			       arb_ptr mi, acb_srcptr z, const acb_mat_t tau,
+			       const fmpz_mat_t N, slong prec);
+
+void acb_theta_agm_setup(fmpz_mat_struct* Ni, arb_t rho, arb_t M, arb_t Binv,
+			 const acb_mat_t tau, slong prec);
+
+void acb_theta_agm_ext_setup(fmpz_mat_struct* Ni, arb_t rho, arb_t M, arb_t Binv,
+			     acb_srcptr z, const acb_mat_t tau, slong prec);
+
+/* Ideas:
+   - attempt setup at default prec, if not, double (up to prec/4?)
+   - necessary to write generic newton?
+*/
+
+void acb_theta_agm_half_proj(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, acb_srcptr z, slong prec);
+
+void acb_theta_agm_const_half_proj(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, slong prec);
+
+void acb_theta_agm_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
+
+void acb_theta_agm_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
 
 /* Mixed naive-AGM algorithms */
 
 void acb_theta_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
 
-void acb_theta_const_all_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
+void acb_theta_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
 
 /* Conversions */
 
-void acb_theta_const_all_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
+void acb_theta_all_const_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
 void acb_theta_all_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
