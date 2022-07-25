@@ -7,7 +7,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("const_ind_naive....");
+    flint_printf("naive_ind_const....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -50,7 +50,7 @@ int main()
 	
 	for (ab = 0; ab < 4; ab++)
 	  {
-	    acb_theta_const_ind_naive(&th[ab], ab, tau, prec);
+	    acb_theta_naive_ind_const(&th[ab], ab, tau, prec);
 	  }
 	res = 1;
 	for (k = 0; k < 4; k++)

@@ -7,22 +7,22 @@
    powers of x are precomputed.
 */
 void acb_theta_naive_worker_dim1(acb_ptr th,
-				 const arb_eld_t E, const acb_theta_precomp_t D,
+				 const acb_theta_eld_t E, const acb_theta_precomp_t D,
 				 const acb_t lin, const acb_t cofactor,
 				 ulong ab, slong ord, slong prec, slong fullprec,
 				 acb_theta_naive_worker_t worker_dim0)
 {
   acb_t start, diff, aff, term;
   slong* coords;
-  slong g = arb_eld_ambient_dim(E);
-  slong min = arb_eld_min(E);
-  slong mid = arb_eld_mid(E);
-  slong max = arb_eld_max(E);
-  slong step = arb_eld_step(E);
+  slong g = acb_theta_eld_ambient_dim(E);
+  slong min = acb_theta_eld_min(E);
+  slong mid = acb_theta_eld_mid(E);
+  slong max = acb_theta_eld_max(E);
+  slong step = acb_theta_eld_step(E);
   slong newprec;
   slong k;
 
-  if (arb_eld_nb_pts(E) == 0) {return;}
+  if (acb_theta_eld_nb_pts(E) == 0) {return;}
 
   acb_init(start);
   acb_init(diff);
@@ -32,7 +32,7 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
 
   for (k = 1; k < g; k++)
     {
-      coords[k] = arb_eld_coord(E,k);
+      coords[k] = acb_theta_eld_coord(E,k);
     }
 
   acb_pow_si(start, lin, mid, prec);

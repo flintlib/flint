@@ -14,7 +14,7 @@ int main()
     for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
       {
 	int a = n_randint(state, 2);
-	slong prec = ARB_ELD_DEFAULT_PREC;
+	slong prec = ACB_THETA_ELD_DEFAULT_PREC;
 	slong mag_bits = n_randint(state, 5);
 	int guaranteed_pt = iter % 2;
 	
@@ -40,7 +40,7 @@ int main()
 	    arb_set_arf(rad, pos);
 	  }
 
-	arb_eld_interval(&min, &mid, &max, ctr, rad, a, prec);
+	acb_theta_eld_interval(&min, &mid, &max, ctr, rad, a, prec);
 	arb_set_si(tmax, max+3);
 	arb_sub(tmax, tmax, rad, prec);
 	arb_set_si(tmin, min-3);

@@ -6,12 +6,12 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("const_naive....");
+    flint_printf("naive_const....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Test: agrees with const_ind_naive; duplication formula */
+    /* Test: agrees with naive_ind_const; duplication formula */
     for (iter = 0; iter < 50 * arb_test_multiplier(); iter++)
       {	
 	slong g = 1 + n_randint(state, 3);
@@ -33,9 +33,9 @@ int main()
 	
 	for (ab = 0; ab < nb; ab++)
 	  {
-	    acb_theta_const_ind_naive(&th_test[ab], ab, tau, prec);
+	    acb_theta_naive_ind_const(&th_test[ab], ab, tau, prec);
 	  }
-	acb_theta_const_naive(th, tau, prec);
+	acb_theta_naive_const(th, tau, prec);
 
 	/*
 	flint_printf("g = %wd, prec = %wd, tau_11:\n", g, prec);
@@ -67,7 +67,7 @@ int main()
 	
 	acb_theta_duplication(th_test, th, g, prec);
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1);	
-	acb_theta_const_naive(th, tau, prec);
+	acb_theta_naive_const(th, tau, prec);
 	for (k = 0; k < nb; k++) acb_sqr(&th[k], &th[k], prec);
 	
 	res = 1;

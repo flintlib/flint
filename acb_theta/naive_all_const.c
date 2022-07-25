@@ -7,7 +7,7 @@ static void worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
   acb_t x;
   slong sgn;
   slong k;
-  ulong b, b_shift;
+  ulong a, b, b_shift;
 
   acb_init(x);
 
@@ -16,17 +16,25 @@ static void worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
   for (k = 0; k < g; k++) flint_printf(" %wd", coords[k]);
   flint_printf("\n");
   acb_printd(term, 10);
-  flint_printf("\n"); */
+  flint_printf("\n");
+  */
+
+  a = 0;
+  for (k = 0; k < g; k++)
+    {
+      a = a << 1;
+      a += ((4 + coords[k] % 4) % 4)/2;
+    }
 
   for (b = 0; b < n_pow(2,g); b++)
     {
-      b_shift = b;
+      b_shift = b;      
       sgn = 0;
       for (k = 0; k < g; k++)
 	{
 	  if (b_shift & 1)
 	    {
-	      sgn += 4 + coords[g-1-k] % 4; /* & 3 ? */
+	      sgn += 4 + (coords[g-1-k]/2) % 4;
 	    }
 	  b_shift = b_shift >> 1;
 	}
@@ -36,40 +44,46 @@ static void worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
       if (sgn == 1) acb_mul_onei(x, x);
       else if (sgn == 2) acb_neg(x, x);
       else if (sgn == 3) acb_div_onei(x, x);
-      
-      acb_add(&th[b], &th[b], x, fullprec);
+
+      ab = (a << g) + b;
+      acb_add(&th[ab], &th[ab], x, fullprec);
     }
   
   acb_clear(x);
 }
 
-void acb_theta_const_naive(acb_ptr th, const acb_mat_t tau, slong prec)
-{
-  arb_eld_t E;
+
+void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec)
+{  
+  acb_theta_eld_t E;
   acb_theta_precomp_t D;
   arf_t epsilon;
-  int all = 0;
+  int all = 1;
   int unif = 0;
   slong ord = 0;
   ulong ab = 0;
   acb_ptr z;
+  acb_mat_t tau_adj;
   acb_mat_t lin_powers;
   acb_t cofactor;
   slong fullprec;
   slong g = acb_mat_nrows(tau);
   slong k;
 
-  arb_eld_init(E, g, g);
+  acb_theta_eld_init(E, g, g);
   acb_theta_precomp_init(D, g);
   arf_init(epsilon);
   z = _acb_vec_init(g);
+  acb_mat_init(tau_adj, g, g);
   acb_mat_init(lin_powers, g, g);
   acb_init(cofactor);
 
   _acb_vec_zero(z, g);
   acb_theta_naive_ellipsoid(E, epsilon, ab, all, unif, ord, z, tau, prec);  
   fullprec = acb_theta_naive_fullprec(E, prec);
-  acb_theta_precomp_set(D, tau, E, fullprec);
+
+  acb_mat_scalar_mul_2exp_si(tau_adj, tau, -2);
+  acb_theta_precomp_set(D, tau_adj, E, fullprec);
 
   acb_mat_set(lin_powers, acb_theta_precomp_exp_mat(D));
   for (k = 0; k < g; k++) acb_one(&z[k]); /* Vector of exponentials */
@@ -82,10 +96,11 @@ void acb_theta_const_naive(acb_ptr th, const acb_mat_t tau, slong prec)
 
   for (k = 0; k < n_pow(2,g); k++) acb_add_error_arf(&th[k], epsilon);
 
-  arb_eld_clear(E);
+  acb_theta_eld_clear(E);
   acb_theta_precomp_clear(D);
   arf_clear(epsilon);
   _acb_vec_clear(z, g);
+  acb_mat_clear(tau_adj);
   acb_mat_clear(lin_powers);
-  acb_clear(cofactor);  
+  acb_clear(cofactor);
 }

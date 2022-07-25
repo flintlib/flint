@@ -3,15 +3,15 @@
 
 /* Lattice is a+2ZZ */
 
-void arb_eld_interval(slong* min, slong* mid, slong* max,
-		      const arb_t ctr, const arb_t rad, int a, slong prec)
+void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
+			    const arb_t ctr, const arb_t rad, int a, slong prec)
 {
   arb_t x, y;
   arf_t b;
  
   if (!arb_is_finite(ctr) || !arb_is_finite(rad))
     {
-      flint_printf("(arb_eld_interval) Error: infinite values\n");
+      flint_printf("acb_theta_eld_interval: Error (infinite values)\n");
       arb_printd(ctr, 30); flint_printf("\n");
       arb_printd(rad, 30); flint_printf("\n");
       fflush(stdout);

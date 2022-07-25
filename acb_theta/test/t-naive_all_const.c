@@ -6,7 +6,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("const_all_naive....");
+    flint_printf("naive_all_const....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -36,11 +36,11 @@ int main()
 	fflush(stdout);
 	*/
 
-	acb_theta_const_naive(th_test, tau, prec);
+	acb_theta_naive_const(th_test, tau, prec);
 	acb_theta_duplication_all(th_test, th_test, g, prec);
 	        
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1);	
-	acb_theta_const_all_naive(th, tau, prec);
+	acb_theta_naive_all_const(th, tau, prec);
 	for (k = 0; k < nb; k++) acb_sqr(&th[k], &th[k], prec);
 	
 	res = 1;

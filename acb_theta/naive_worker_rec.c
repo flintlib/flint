@@ -2,26 +2,26 @@
 #include "acb_theta.h"
 
 void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
-				const arb_eld_t E, const acb_theta_precomp_t D,
+				const acb_theta_eld_t E, const acb_theta_precomp_t D,
 				acb_srcptr exp_z, const acb_t cofactor,
 				ulong ab, slong ord, slong prec, slong fullprec,
 				acb_theta_naive_worker_t worker_dim0)
 {  
-  slong d = arb_eld_dim(E);
-  slong g = arb_eld_ambient_dim(E);
-  slong nr = arb_eld_nr(E);
-  slong nl = arb_eld_nl(E);
-  slong min = arb_eld_min(E);
-  slong mid = arb_eld_mid(E);
-  slong max = arb_eld_max(E);
-  slong step = arb_eld_step(E);
+  slong d = acb_theta_eld_dim(E);
+  slong g = acb_theta_eld_ambient_dim(E);
+  slong nr = acb_theta_eld_nr(E);
+  slong nl = acb_theta_eld_nl(E);
+  slong min = acb_theta_eld_min(E);
+  slong mid = acb_theta_eld_mid(E);
+  slong max = acb_theta_eld_max(E);
+  slong step = acb_theta_eld_step(E);
   acb_t start_cf, diff_cf, lin_cf, full_cf; /* Set up next cofactor */
   acb_ptr start_lin_powers, diff_lin_powers; /* Set up next lin_powers */
   slong newprec;
   slong k, j, c;
 
   /* Catch cases: no points in ellipsoid; d=1 */
-  if (arb_eld_nb_pts(E) == 0)
+  if (acb_theta_eld_nb_pts(E) == 0)
     {
       return;
     }
@@ -87,7 +87,7 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 	}
       
       acb_mul(full_cf, lin_cf, acb_theta_precomp_sqr_pow(D, d-1, FLINT_ABS(c)/step), newprec);
-      acb_theta_naive_worker_rec(th, lin_powers, arb_eld_rchild(E,k), D, exp_z, full_cf,
+      acb_theta_naive_worker_rec(th, lin_powers, acb_theta_eld_rchild(E,k), D, exp_z, full_cf,
 				 ab, ord, newprec, fullprec, worker_dim0);
     }
 
@@ -114,7 +114,7 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
       acb_mul(lin_cf, lin_cf, diff_cf, newprec);
       
       acb_mul(full_cf, lin_cf, acb_theta_precomp_sqr_pow(D, d-1, FLINT_ABS(c)/step), newprec);
-      acb_theta_naive_worker_rec(th, lin_powers, arb_eld_lchild(E,k), D, exp_z, full_cf,
+      acb_theta_naive_worker_rec(th, lin_powers, acb_theta_eld_lchild(E,k), D, exp_z, full_cf,
 				 ab, ord, newprec, fullprec, worker_dim0);
     }
   

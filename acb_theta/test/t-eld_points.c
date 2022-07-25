@@ -16,14 +16,14 @@ int main()
       {
 	slong g = 1 + n_randint(state, 4);
 	slong d = 1 + n_randint(state, g);
-	arb_eld_t E;
+	acb_theta_eld_t E;
 	arb_mat_t Y;
 	arb_t normsqr;
 	arb_ptr offset;
 	slong* last_coords;
 	ulong a = n_randint(state, n_pow(2, g));
 	ulong a_shift;
-	slong prec = ARB_ELD_DEFAULT_PREC;
+	slong prec = ACB_THETA_ELD_DEFAULT_PREC;
 	slong mag_bits = n_randint(state, 2);
 	slong k, j;
 	slong try;
@@ -33,7 +33,7 @@ int main()
 	arb_mat_t vec;
 	arb_t sqr, sum;
 	
-	arb_eld_init(E, d, g);
+	acb_theta_eld_init(E, d, g);
 	arb_mat_init(Y, g, g);
 	arb_init(normsqr);
 	offset = _arb_vec_init(g);
@@ -55,9 +55,9 @@ int main()
 	  }
 	for (k = 0; k < g; k++) arb_randtest_precise(&offset[k], state, prec, mag_bits);
 	
-	arb_eld_fill(E, Y, normsqr, offset, last_coords, a, prec);
-	all_pts = flint_malloc(arb_eld_nb_pts(E) * g * sizeof(slong));
-	arb_eld_points(all_pts, E);
+	acb_theta_eld_fill(E, Y, normsqr, offset, last_coords, a, prec);
+	all_pts = flint_malloc(acb_theta_eld_nb_pts(E) * g * sizeof(slong));
+	acb_theta_eld_points(all_pts, E);
 
 	/* Test:
 	   - all ellipsoid points must be within the box
@@ -67,16 +67,16 @@ int main()
 	   - points outside ellipsoid must have norm greater than normsqr
 	*/
 
-	for (k = 0; k < arb_eld_nb_pts(E); k++)
+	for (k = 0; k < acb_theta_eld_nb_pts(E); k++)
 	  {
 	    for (j = 0; j < d; j++)
 	      {
-		if (FLINT_ABS(all_pts[k*g+j]) > arb_eld_box(E, j))
+		if (FLINT_ABS(all_pts[k*g+j]) > acb_theta_eld_box(E, j))
 		  {
 		    flint_printf("FAIL: point outside box\n");
 		    for (j = 0; j < g; j++) flint_printf("%wd ", all_pts[k*g+j]);
 		    flint_printf("\nBox:\n");
-		    for (j = 0; j < g; j++) flint_printf("%wd ", arb_eld_box(E,j));
+		    for (j = 0; j < g; j++) flint_printf("%wd ", acb_theta_eld_box(E,j));
 		    flint_printf("\n");
 		    fflush(stdout);
 		    flint_abort();
@@ -84,7 +84,7 @@ int main()
 	      }
 	    for (j = d; j < g; j++)
 	      {
-		if (all_pts[k*g+j] != arb_eld_coord(E, j))
+		if (all_pts[k*g+j] != acb_theta_eld_coord(E, j))
 		  {
 		    flint_printf("FAIL: incorrect coordinate\n");
 		    for (j = 0; j < g; j++) flint_printf("%wd ", pt[j]);
@@ -102,14 +102,14 @@ int main()
 		if (k >= d) pt[k] = last_coords[k-d];
 		else
 		  {
-		    pt[k] = 2*n_randint(state, 2 + arb_eld_box(E, k)/2);
+		    pt[k] = 2*n_randint(state, 2 + acb_theta_eld_box(E, k)/2);
 		    pt[k] += (a_shift % 2);
 		  }
 		a_shift = a_shift >> 1;
 	      }
-	    if (arb_eld_contains(E, pt))
+	    if (acb_theta_eld_contains(E, pt))
 	      {
-		for (k = 0; k < arb_eld_nb_pts(E); k++)
+		for (k = 0; k < acb_theta_eld_nb_pts(E); k++)
 		  {
 		    res = 1;
 		    for (j = 0; j < g; j++)
@@ -127,7 +127,7 @@ int main()
 		  }
 	      }
 	    
-	    if (!arb_eld_contains(E, pt))
+	    if (!acb_theta_eld_contains(E, pt))
 	      {
 		arb_mat_zero(vec);
 		for (k = 0; k < d; k++) arb_set_si(arb_mat_entry(vec, k, 0), pt[k]);
@@ -153,14 +153,15 @@ int main()
 			arb_printd(arb_mat_entry(vec, j, 0), 10); flint_printf("\n");
 		      }
 		    flint_printf("Upper bound: "); arb_printd(normsqr, 10);
-		    flint_printf("\na = %wu; total nb of points = %wd\n", a, arb_eld_nb_pts(E));
+		    flint_printf("\na = %wu; total nb of points = %wd\n", a,
+				 acb_theta_eld_nb_pts(E));
 		    flint_printf("Offset:\n");
 		    for (j = 0; j < g; j++)
 		      {
 			arb_printd(&offset[j], 10); flint_printf("\n");
 		      }
 		    flint_printf("Points:\n");
-		    for (k = 0; k < arb_eld_nb_pts(E); k++)
+		    for (k = 0; k < acb_theta_eld_nb_pts(E); k++)
 		      {
 			for (j = 0; j < g; j++) flint_printf("%wd ", all_pts[k*g+j]);
 			flint_printf("\n");
@@ -171,7 +172,7 @@ int main()
 	      }
 	  }
 	 
-	arb_eld_clear(E);
+	acb_theta_eld_clear(E);
 	arb_mat_clear(Y);
 	arb_clear(normsqr);
 	_arb_vec_clear(offset, g);

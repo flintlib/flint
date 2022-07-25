@@ -1,7 +1,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_naive_ellipsoid(arb_eld_t E, arf_t epsilon,
+void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t epsilon,
 			       ulong ab, int all, int unif, slong ord,
 			       acb_srcptr z, const acb_mat_t tau, slong prec)
 {  
@@ -14,7 +14,7 @@ void acb_theta_naive_ellipsoid(arb_eld_t E, arf_t epsilon,
   slong* translate;
   arb_ptr offset;
   slong g = acb_mat_nrows(tau);
-  slong eld_prec = ARB_ELD_DEFAULT_PREC;
+  slong eld_prec = ACB_THETA_ELD_DEFAULT_PREC;
   int res;
   slong k;
 
@@ -83,7 +83,7 @@ void acb_theta_naive_ellipsoid(arb_eld_t E, arf_t epsilon,
 	}
     }
   
-  arb_eld_fill(E, cho, normsqr, offset, NULL, ab >> g, eld_prec);
+  acb_theta_eld_fill(E, cho, normsqr, offset, NULL, ab >> g, eld_prec);
   
   arf_clear(R);
   arb_mat_clear(im);

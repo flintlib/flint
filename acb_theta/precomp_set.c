@@ -2,7 +2,7 @@
 #include "acb_theta.h"
 
 void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
-			   const arb_eld_t E, slong prec)
+			   const acb_theta_eld_t E, slong prec)
 {
   slong g = acb_theta_precomp_g(D);
   arb_t pi4;
@@ -10,7 +10,7 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
   slong k, j, s;
   slong step, nb_pow;
 
-  if (arb_eld_nb_pts(E) == 0) return;
+  if (acb_theta_eld_nb_pts(E) == 0) return;
 
   arb_init(pi4);
   acb_init(c);
@@ -34,13 +34,13 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
     }
 
   /* Set box, steps, indices */
-  step = arb_eld_step(E);
+  step = acb_theta_eld_step(E);
   D->step = step;
   D->indices[0] = 0;
   D->nb = 0;
   for (k = 0; k < g; k++)
     {
-      acb_theta_precomp_box(D, k) = arb_eld_box(E, k);
+      acb_theta_precomp_box(D, k) = acb_theta_eld_box(E, k);
       nb_pow = acb_theta_precomp_box(D, k) / step + 1;
       if (k+1 < g) D->indices[k+1] = D->indices[k] + nb_pow;
       D->nb += nb_pow;
