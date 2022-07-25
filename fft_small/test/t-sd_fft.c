@@ -16,7 +16,7 @@ vec1d vec1d_eval_poly_mod(const vec1d* a, ulong an, const vec1d b, const vec1d n
 {
     vec1d x = a[--an];
     while (an > 0)
-        x = vec1d_add(a[--an], vec1d_mulmod2(x, b, n, ninv));
+        x = vec1d_add(a[--an], vec1d_mulmod(x, b, n, ninv));
     return vec1d_reduce_to_pm1n(x, n, ninv);
 }
 
@@ -128,7 +128,7 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
             {
                 i = n_randint(state, trunc);
                 double m = vec1d_reduce_0n_to_pmhn(nmod_pow_ui(2, L, Q->mod), Q->p);
-                double y = vec1d_mulmod2(X[i], m, Q->p, Q->pinv);
+                double y = vec1d_mulmod(X[i], m, Q->p, Q->pinv);
                 if (!vec1d_same_mod(y, sd_fft_ctx_get_index(data, i), Q->p, Q->pinv))
                 {
                     flint_printf("FAIL: ifft error at index %wu\n"

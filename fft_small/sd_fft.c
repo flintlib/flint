@@ -16,8 +16,9 @@
     N is supposed to be a good fit for the number of points to process per loop
     in the radix 4 butterflies.
 
-        16x 4-wide AVX registers => N = 8
-        16x 2-wide (or 32x 1-wide) NEON registers => N = 4
+        16x 4-wide AVX registers  => N = 8
+        32x 2-wide NEON registers => N = 8
+        32x 8-wide AVX512 registers  => N = ?
 */
 
 #define N 8
@@ -55,7 +56,7 @@
     x0 = V##_load(X0); \
     x0 = V##_reduce_to_pm1n(x0, n, ninv); \
     x1 = V##_load(X1); \
-    x1 = V##_mulmod2(x1, w, n, ninv); \
+    x1 = V##_mulmod(x1, w, n, ninv); \
     V##_store(X0, V##_add(x0, x1)); \
     V##_store(X1, V##_sub(x0, x1)); \
 }
@@ -84,7 +85,7 @@
     x0 = V##_load(X0); \
     x0 = V##_reduce_to_pm1n(x0, n, ninv); \
     x1 = V##_load(X1); \
-    x1 = V##_mulmod2(x1, w, n, ninv); \
+    x1 = V##_mulmod(x1, w, n, ninv); \
     V##_store(X0, V##_add(x0, x1)); \
 }
 
@@ -118,7 +119,7 @@
     y2 = V##_sub(x0, x2); \
     y3 = V##_sub(x1, x3); \
     y1 = V##_reduce_to_pm1n(y1, n, ninv); \
-    y3 = V##_mulmod2(y3, iw, n, ninv); \
+    y3 = V##_mulmod(y3, iw, n, ninv); \
     x0 = V##_add(y0, y1); \
     x1 = V##_sub(y0, y1); \
     x2 = V##_add(y2, y3); \
@@ -145,14 +146,14 @@
     x1 = V##_load(X1); \
     x2 = V##_load(X2); \
     x3 = V##_load(X3); \
-    x2 = V##_mulmod2(x2, w2, n, ninv); \
-    x3 = V##_mulmod2(x3, w2, n, ninv); \
+    x2 = V##_mulmod(x2, w2, n, ninv); \
+    x3 = V##_mulmod(x3, w2, n, ninv); \
     y0 = V##_add(x0, x2); \
     y1 = V##_add(x1, x3); \
     y2 = V##_sub(x0, x2); \
     y3 = V##_sub(x1, x3); \
-    y1 = V##_mulmod2(y1, w, n, ninv); \
-    y3 = V##_mulmod2(y3, iw, n, ninv); \
+    y1 = V##_mulmod(y1, w, n, ninv); \
+    y3 = V##_mulmod(y3, iw, n, ninv); \
     x0 = V##_add(y0, y1); \
     x1 = V##_sub(y0, y1); \
     x2 = V##_add(y2, y3); \
@@ -205,7 +206,7 @@ FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
         y2 = vec4d_sub(x0, x2); \
         y3 = vec4d_sub(x1, x3); \
         y1 = vec4d_reduce_to_pm1n(y1, n, ninv); \
-        y3 = vec4d_mulmod2(y3, iw, n, ninv); \
+        y3 = vec4d_mulmod(y3, iw, n, ninv); \
         x0 = vec4d_add(y0, y1); \
         x1 = vec4d_sub(y0, y1); \
         x2 = vec4d_add(y2, y3); \
@@ -217,14 +218,14 @@ FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
         w2 = vec4d_set_d(Q->w2tab[0+j_bits][j_r]); \
         iw = vec4d_set_d(Q->w2tab[1+j_bits][2*j_r+1]); \
  \
-        x2 = vec4d_mulmod2(x2, w2, n, ninv); \
-        x3 = vec4d_mulmod2(x3, w2, n, ninv); \
+        x2 = vec4d_mulmod(x2, w2, n, ninv); \
+        x3 = vec4d_mulmod(x3, w2, n, ninv); \
         y0 = vec4d_add(x0, x2); \
         y1 = vec4d_add(x1, x3); \
         y2 = vec4d_sub(x0, x2); \
         y3 = vec4d_sub(x1, x3); \
-        y1 = vec4d_mulmod2(y1, w, n, ninv); \
-        y3 = vec4d_mulmod2(y3, iw, n, ninv); \
+        y1 = vec4d_mulmod(y1, w, n, ninv); \
+        y3 = vec4d_mulmod(y3, iw, n, ninv); \
         x0 = vec4d_add(y0, y1); \
         x1 = vec4d_sub(y0, y1); \
         x2 = vec4d_add(y2, y3); \
@@ -243,20 +244,20 @@ FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
         v  = vec4d_load_aligned(Q->w2tab[3+j_bits] + 8*j_r + 4); \
         w2 = vec4d_load_aligned(Q->w2tab[2+j_bits] + 4*j_r + 0); \
     } \
-    w  = vec4d_permute_0_2_1_3(vec4d_unpacklo(u, v)); \
-    iw = vec4d_permute_0_2_1_3(vec4d_unpackhi(u, v)); \
+    w  = vec4d_unpack_lo_permute_0_2_1_3(u, v); \
+    iw = vec4d_unpack_hi_permute_0_2_1_3(u, v); \
  \
     VEC4D_TRANSPOSE(x0, x1, x2, x3, x0, x1, x2, x3); \
  \
     x0 = vec4d_reduce_to_pm1n(x0, n, ninv); \
-    x2 = vec4d_mulmod2(x2, w2, n, ninv); \
-    x3 = vec4d_mulmod2(x3, w2, n, ninv); \
+    x2 = vec4d_mulmod(x2, w2, n, ninv); \
+    x3 = vec4d_mulmod(x3, w2, n, ninv); \
     y0 = vec4d_add(x0, x2); \
     y1 = vec4d_add(x1, x3); \
     y2 = vec4d_sub(x0, x2); \
     y3 = vec4d_sub(x1, x3); \
-    y1 = vec4d_mulmod2(y1, w, n, ninv); \
-    y3 = vec4d_mulmod2(y3, iw, n, ninv); \
+    y1 = vec4d_mulmod(y1, w, n, ninv); \
+    y3 = vec4d_mulmod(y3, iw, n, ninv); \
     x0 = vec4d_add(y0, y1); \
     x1 = vec4d_sub(y0, y1); \
     x2 = vec4d_add(y2, y3); \
@@ -361,7 +362,7 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
         y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
         y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
         y1 = VECNOP(reduce_to_pm1n)(y1, n, ninv); \
-        y3 = VECNOP(mulmod2)(y3, iw, n, ninv); \
+        y3 = VECNOP(mulmod)(y3, iw, n, ninv); \
         x0 = VECNOP(add)(y0, y1); \
         x1 = VECNOP(sub)(y0, y1); \
         x2 = VECNOP(add)(y2, y3); \
@@ -386,15 +387,15 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 0)( \
         if (0 < itrunc) x0 = VECNOP(reduce_to_pm1n)(x0, n, ninv); \
         if (1 < itrunc) x1 = VECNOP(load)(X1+i); \
         if (2 < itrunc) x2 = VECNOP(load)(X2+i); \
-        if (2 < itrunc) x2 = VECNOP(mulmod2)(x2, w2, n, ninv); \
+        if (2 < itrunc) x2 = VECNOP(mulmod)(x2, w2, n, ninv); \
         if (3 < itrunc) x3 = VECNOP(load)(X3+i); \
-        if (3 < itrunc) x3 = VECNOP(mulmod2)(x3, w2, n, ninv); \
+        if (3 < itrunc) x3 = VECNOP(mulmod)(x3, w2, n, ninv); \
         y0 = (2 < itrunc) ? VECNOP(add)(x0, x2) : x0; \
         y1 = (3 < itrunc) ? VECNOP(add)(x1, x3) : x1; \
         y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
         y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
-        y1 = VECNOP(mulmod2)(y1, w, n, ninv); \
-        y3 = VECNOP(mulmod2)(y3, iw, n, ninv); \
+        y1 = VECNOP(mulmod)(y1, w, n, ninv); \
+        y3 = VECNOP(mulmod)(y3, iw, n, ninv); \
         x0 = VECNOP(add)(y0, y1); \
         x1 = VECNOP(sub)(y0, y1); \
         x2 = VECNOP(add)(y2, y3); \

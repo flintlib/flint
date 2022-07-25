@@ -15,8 +15,9 @@
 #include<stdint.h>
 #include<string.h>
 
+#if FLINT_AVX
 
-FLINT_FORCE_INLINE ulong _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
+FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
     long long unsigned int _s;
     cf = _addcarry_u64(cf, (long long unsigned int)(x),
@@ -26,7 +27,7 @@ FLINT_FORCE_INLINE ulong _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulo
     return cf;
 }
 
-FLINT_FORCE_INLINE ulong _subborrow_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
+FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
     long long unsigned int _s;
     cf = _subborrow_u64(cf, (long long unsigned int)(x),
@@ -35,6 +36,25 @@ FLINT_FORCE_INLINE ulong _subborrow_ulong(unsigned char cf, ulong x, ulong y, ul
     *s = (ulong)(_s);
     return cf;
 }
+
+#else
+
+FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
+{
+    ulong cf2;
+    *s = __builtin_addcl(x, y, cf, &cf2);
+    return cf2;
+}
+
+FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
+{
+    ulong cf2;
+    *s = __builtin_subcl(x, y, cf, &cf2);
+    return cf2;
+}
+
+#endif
+
 
 ulong flint_mpn_nbits(const ulong* a, ulong an)
 {
@@ -232,7 +252,7 @@ ulong crt_data_find_bits(const crt_data_t C, ulong bn)
 
 #define aindex(i) (a[i])
 
-#if 1
+#if 0
 void slow_mpn_to_fft_easy(
     sd_fft_lctx_t Q,
     double* z,
@@ -327,7 +347,7 @@ void slow_mpn_to_fft_easy(
                 AK = tab[k];/*_mm256_i32gather_epi32((const int*)aa+k, index, 4);*/
                 AKJ = AK;
                 ak = _vec8i32_convert_vec8d(AKJ);
-                X = vec8d_add(X, vec8d_mulmod2(ak, vec8d_set_d(two_pow[j]), p, pinv));
+                X = vec8d_add(X, vec8d_mulmod(ak, vec8d_set_d(two_pow[j]), p, pinv));
                 k++;
                 j += 32;
             } while (j + 32 <= bits);
@@ -337,7 +357,7 @@ void slow_mpn_to_fft_easy(
                 AK = tab[k];/*_mm256_i32gather_epi32((const int*)aa+k, index, 4);*/
                 AKJ = _mm256_sll_epi32(AK, _mm_set_epi32(0,0,0,32-(bits-j)));
                 ak = _vec8i32_convert_vec8d(AKJ);
-                X = vec8d_add(X, vec8d_mulmod2(ak, vec8d_set_d(two_pow[bits - 32]), p, pinv));
+                X = vec8d_add(X, vec8d_mulmod(ak, vec8d_set_d(two_pow[bits - 32]), p, pinv));
                 k++;
             }
 
@@ -398,7 +418,7 @@ void slow_mpn_to_fft_easy(
                                   aindex(k+5*BLK_SZ/8/32*bits),
                                   aindex(k+6*BLK_SZ/8/32*bits),
                                   aindex(k+7*BLK_SZ/8/32*bits));
-                X = vec8d_add(X, vec8d_mulmod2(ak, vec8d_set_d(two_pow[j]), p, pinv));
+                X = vec8d_add(X, vec8d_mulmod(ak, vec8d_set_d(two_pow[j]), p, pinv));
                 k++;
                 j += 32;
             }
@@ -413,19 +433,19 @@ void slow_mpn_to_fft_easy(
                                   aindex(k+5*BLK_SZ/8/32*bits) << (32-(bits-j)),
                                   aindex(k+6*BLK_SZ/8/32*bits) << (32-(bits-j)),
                                   aindex(k+7*BLK_SZ/8/32*bits) << (32-(bits-j)));
-                X = vec8d_add(X, vec8d_mulmod2(ak, vec8d_set_d(two_pow[bits-32]), p, pinv));
+                X = vec8d_add(X, vec8d_mulmod(ak, vec8d_set_d(two_pow[bits-32]), p, pinv));
             }
 
             X = vec8d_reduce_to_pm1n(X, p, pinv);
 
-            zI[ir+0*BLK_SZ/8] = X.e1[0];
-            zI[ir+1*BLK_SZ/8] = X.e1[1];
-            zI[ir+2*BLK_SZ/8] = X.e1[2];
-            zI[ir+3*BLK_SZ/8] = X.e1[3];
-            zI[ir+4*BLK_SZ/8] = X.e2[0];
-            zI[ir+5*BLK_SZ/8] = X.e2[1];
-            zI[ir+6*BLK_SZ/8] = X.e2[2];
-            zI[ir+7*BLK_SZ/8] = X.e2[3];
+            zI[ir+0*BLK_SZ/8] = vec8d_get_index(X, 0);
+            zI[ir+1*BLK_SZ/8] = vec8d_get_index(X, 1);
+            zI[ir+2*BLK_SZ/8] = vec8d_get_index(X, 2);
+            zI[ir+3*BLK_SZ/8] = vec8d_get_index(X, 3);
+            zI[ir+4*BLK_SZ/8] = vec8d_get_index(X, 4);
+            zI[ir+5*BLK_SZ/8] = vec8d_get_index(X, 5);
+            zI[ir+6*BLK_SZ/8] = vec8d_get_index(X, 6);
+            zI[ir+7*BLK_SZ/8] = vec8d_get_index(X, 7);
         }
 
     }
@@ -476,7 +496,7 @@ void slow_mpn_to_fft(
                 while (j + 32 <= bits)
                 {
                     ak = vec1d_set_d(aindex(k));
-                    X = vec1d_add(X, vec1d_mulmod2(ak, two_pow[j], p, pinv));
+                    X = vec1d_add(X, vec1d_mulmod(ak, two_pow[j], p, pinv));
                     k++;
                     j += 32;
                 }
@@ -484,7 +504,7 @@ void slow_mpn_to_fft(
                 if ((bits-j) != 0)
                 {
                     ak = vec1d_set_d(aindex(k) << (32-(bits-j)));
-                    X = vec1d_add(X, vec1d_mulmod2(ak, two_pow[bits-32], p, pinv));
+                    X = vec1d_add(X, vec1d_mulmod(ak, two_pow[bits-32], p, pinv));
                 }
 
                 X = vec1d_reduce_to_pm1n(X, p, pinv);
@@ -536,7 +556,7 @@ FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
         { \
             ak = vec4d_set_d((double)(aindex(k))); \
             for (ulong l = 0; l < nvs; l++) \
-                X[l] = vec4d_add(X[l], vec4d_mulmod2(ak, two_pow[j*nvs+l], P[l], PINV[l])); \
+                X[l] = vec4d_add(X[l], vec4d_mulmod(ak, two_pow[j*nvs+l], P[l], PINV[l])); \
             k++; \
             j += 32; \
         } \
@@ -545,14 +565,14 @@ FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
         { \
             ak = vec4d_set_d((double)(aindex(k) << (32-(bits-j)))); \
             for (ulong l = 0; l < nvs; l++) \
-                X[l] = vec4d_add(X[l], vec4d_mulmod2(ak, two_pow[(bits-32)*nvs+l], P[l], PINV[l])); \
+                X[l] = vec4d_add(X[l], vec4d_mulmod(ak, two_pow[(bits-32)*nvs+l], P[l], PINV[l])); \
         } \
  \
         for (ulong l = 0; l < nvs; l++) \
             X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
  \
         for (ulong l = 0; l < np; l++) \
-            sd_fft_ctx_set_index(d + l*dstride, i, X[l/VEC_SZ][l%VEC_SZ]); \
+            sd_fft_ctx_set_index(d + l*dstride, i, vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ)); \
     } \
  \
     for (ulong l = 0; l < np; l++) \
@@ -582,7 +602,7 @@ DEFINE_IT(8)
     { \
         ak = vec4d_set_d((double)(a[k])); \
         for (ulong l = 0; l < nvs; l++) \
-            X[l] = vec4d_add(X[l], vec4d_mulmod2(ak, two_pow[j*nvs+l], P[l], PINV[l])); \
+            X[l] = vec4d_add(X[l], vec4d_mulmod(ak, two_pow[j*nvs+l], P[l], PINV[l])); \
         k++; \
         j += 32; \
     } \
@@ -591,14 +611,14 @@ DEFINE_IT(8)
     { \
         ak = vec4d_set_d((double)(a[k] << (32-(bits-j)))); \
         for (ulong l = 0; l < nvs; l++) \
-            X[l] = vec4d_add(X[l], vec4d_mulmod2(ak, two_pow[(bits-32)*nvs+l], P[l], PINV[l])); \
+            X[l] = vec4d_add(X[l], vec4d_mulmod(ak, two_pow[(bits-32)*nvs+l], P[l], PINV[l])); \
     } \
  \
     for (ulong l = 0; l < nvs; l++) \
         X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
  \
     for (ulong l = 0; l < np; l++) \
-        sd_fft_ctx_set_index(d + l*dstride, i+ir, X[l/VEC_SZ][l%VEC_SZ]); \
+        sd_fft_ctx_set_index(d + l*dstride, i+ir, vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ)); \
 }
 
 /* The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride */
@@ -693,7 +713,7 @@ DEFINE_IT(8,192)
 
 
 /* seems all version of gcc generate worse code if the intrinsics are used */
-#if 1
+#if 0
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
@@ -1095,7 +1115,7 @@ FLINT_STATIC_NOINLINE void _convert_block(
         double* x = sd_fft_ctx_blk_index(d + l*dstride, I);
         ulong j = 0; do {
             vec4d x0, x1, x2, x3;
-            vec4ui y0, y1, y2, y3;
+            vec4n y0, y1, y2, y3;
             x0 = vec4d_load(x + j + 0*VEC_SZ);
             x1 = vec4d_load(x + j + 1*VEC_SZ);
             x2 = vec4d_load(x + j + 2*VEC_SZ);
@@ -1104,14 +1124,14 @@ FLINT_STATIC_NOINLINE void _convert_block(
             x1 = vec4d_reduce_to_0n(x1, p, pinv);
             x2 = vec4d_reduce_to_0n(x2, p, pinv);
             x3 = vec4d_reduce_to_0n(x3, p, pinv);
-            y0 = vec4d_convert_limited_vec4ui(x0);
-            y1 = vec4d_convert_limited_vec4ui(x1);
-            y2 = vec4d_convert_limited_vec4ui(x2);
-            y3 = vec4d_convert_limited_vec4ui(x3);
-            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 0*VEC_SZ, y0);
-            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1);
-            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2);
-            vec4ui_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3);
+            y0 = vec4d_convert_limited_vec4n(x0);
+            y1 = vec4d_convert_limited_vec4n(x1);
+            y2 = vec4d_convert_limited_vec4n(x2);
+            y3 = vec4d_convert_limited_vec4n(x3);
+            vec4n_store_unaligned(Xs + l*BLK_SZ + j + 0*VEC_SZ, y0);
+            vec4n_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1);
+            vec4n_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2);
+            vec4n_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3);
         } while (j += 4*VEC_SZ, j < BLK_SZ);
         FLINT_ASSERT(j == BLK_SZ);
     }
@@ -1662,10 +1682,10 @@ void sd_fft_lctx_point_mul(
             x1 = vec8d_load(ax+j+8);
             b0 = vec8d_load(bx+j+0);
             b1 = vec8d_load(bx+j+8);
-            x0 = vec8d_mulmod2(x0, m, n, ninv);
-            x1 = vec8d_mulmod2(x1, m, n, ninv);
-            x0 = vec8d_mulmod2(x0, b0, n, ninv);
-            x1 = vec8d_mulmod2(x1, b1, n, ninv);
+            x0 = vec8d_mulmod(x0, m, n, ninv);
+            x1 = vec8d_mulmod(x1, m, n, ninv);
+            x0 = vec8d_mulmod(x0, b0, n, ninv);
+            x1 = vec8d_mulmod(x1, b1, n, ninv);
             vec8d_store(ax+j+0, x0);
             vec8d_store(ax+j+8, x1);
         } while (j += 16, j < BLK_SZ);

@@ -79,7 +79,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
         Q->w2tab[k] = curr;
         i = 0; do {
             vec1d x = vec1d_load(t + i);
-            x = vec1d_mulmod2(x, w, n, ninv);
+            x = vec1d_mulmod(x, w, n, ninv);
             x = vec1d_reduce_pm1n_to_pmhn(x, n);
             vec1d_store(curr + i, x);
         } while (i += 1, i < l);
@@ -127,8 +127,8 @@ void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
             i = 0; do {
                 vec8d x0 = vec8d_load_aligned(t + i + 0);
                 vec8d x1 = vec8d_load_aligned(t + i + 8);
-                x0 = vec8d_mulmod2(x0, w, n, ninv);
-                x1 = vec8d_mulmod2(x1, w, n, ninv);
+                x0 = vec8d_mulmod(x0, w, n, ninv);
+                x1 = vec8d_mulmod(x1, w, n, ninv);
                 x0 = vec8d_reduce_pm1n_to_pmhn(x0, n);
                 x1 = vec8d_reduce_pm1n_to_pmhn(x1, n);
                 vec8d_store_aligned(curr + off + i + 0, x0);
