@@ -742,7 +742,9 @@ _gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
         }
 
         qqbar_set_fmpz(res, n);
+
         fmpz_clear(n);
+        qqbar_clear(t);
     }
 
     return GR_SUCCESS;
@@ -819,6 +821,86 @@ _gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx
     *res = qqbar_cmpabs(x, y);
     return GR_SUCCESS;
 }
+
+/* todo: 2 pi reduction for bignum numerators */
+
+#define TRIG(fn, real_check) \
+int \
+_gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
+{ \
+    if (!qqbar_is_rational(x)) \
+    { \
+        return GR_DOMAIN; \
+    } \
+    else if (COEFF_IS_MPZ(QQBAR_COEFFS(x)[0]) || COEFF_IS_MPZ(QQBAR_COEFFS(x)[1])) \
+    { \
+        return GR_UNABLE; \
+    } \
+    else \
+    { \
+        slong p = -QQBAR_COEFFS(x)[0], q = QQBAR_COEFFS(x)[1]; \
+        if (q > QQBAR_CTX(ctx)->deg_limit) \
+            return GR_UNABLE; \
+        qqbar_ ## fn(res, p, q); \
+        if (real_check && QQBAR_CTX(ctx)->real_only && !qqbar_is_real(res)) \
+            return GR_DOMAIN; \
+        return GR_SUCCESS; \
+    } \
+}
+
+#define TRIG2(fn) \
+int \
+_gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
+{ \
+    if (!qqbar_is_rational(x)) \
+    { \
+        return GR_DOMAIN; \
+    } \
+    else if (COEFF_IS_MPZ(QQBAR_COEFFS(x)[0]) || COEFF_IS_MPZ(QQBAR_COEFFS(x)[1])) \
+    { \
+        return GR_UNABLE; \
+    } \
+    else \
+    { \
+        slong p = -QQBAR_COEFFS(x)[0], q = QQBAR_COEFFS(x)[1]; \
+        if (q > QQBAR_CTX(ctx)->deg_limit) \
+            return GR_UNABLE; \
+        return qqbar_ ## fn(res, p, q) ? GR_SUCCESS : GR_DOMAIN; \
+    } \
+}
+
+#define TRIG3(fn) \
+int \
+_gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
+{ \
+    fmpq_t t; \
+    slong p; \
+    ulong q; \
+    if (!qqbar_ ## fn(&p, &q, x)) \
+        return GR_DOMAIN; \
+    *fmpq_numref(t) = p; \
+    *fmpq_denref(t) = q; \
+    qqbar_set_fmpq(res, t); \
+    return GR_SUCCESS; \
+}
+
+TRIG(exp_pi_i, 1)
+TRIG(sin_pi, 0)
+TRIG(cos_pi, 0)
+TRIG2(tan_pi)
+TRIG2(cot_pi)
+TRIG2(sec_pi)
+TRIG2(csc_pi)
+
+TRIG3(log_pi_i)
+TRIG3(asin_pi)
+TRIG3(acos_pi)
+TRIG3(atan_pi)
+TRIG3(acot_pi)
+TRIG3(asec_pi)
+TRIG3(acsc_pi)
+
+/* todo: root of unity / is_root_of_unity */
 
 /* todo: exploit when we know that the field is real */
 int
@@ -947,6 +1029,23 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_qqbar_csgn},
 
     {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},
+
+    {GR_METHOD_EXP_PI_I,        (gr_funcptr) _gr_qqbar_exp_pi_i},
+    {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_qqbar_sin_pi},
+    {GR_METHOD_COS_PI,          (gr_funcptr) _gr_qqbar_cos_pi},
+    {GR_METHOD_TAN_PI,          (gr_funcptr) _gr_qqbar_tan_pi},
+    {GR_METHOD_COT_PI,          (gr_funcptr) _gr_qqbar_cot_pi},
+    {GR_METHOD_SEC_PI,          (gr_funcptr) _gr_qqbar_sec_pi},
+    {GR_METHOD_CSC_PI,          (gr_funcptr) _gr_qqbar_csc_pi},
+
+    {GR_METHOD_LOG_PI_I,        (gr_funcptr) _gr_qqbar_log_pi_i},
+    {GR_METHOD_ASIN_PI,          (gr_funcptr) _gr_qqbar_asin_pi},
+    {GR_METHOD_ACOS_PI,          (gr_funcptr) _gr_qqbar_acos_pi},
+    {GR_METHOD_ATAN_PI,          (gr_funcptr) _gr_qqbar_atan_pi},
+    {GR_METHOD_ACOT_PI,          (gr_funcptr) _gr_qqbar_acot_pi},
+    {GR_METHOD_ASEC_PI,          (gr_funcptr) _gr_qqbar_asec_pi},
+    {GR_METHOD_ACSC_PI,          (gr_funcptr) _gr_qqbar_acsc_pi},
+
 
     {0,                         (gr_funcptr) NULL},
 };

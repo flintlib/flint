@@ -39,7 +39,6 @@ UWORD_MAX = (1<<FLINT_BITS)-1
 WORD_MAX = (1<<(FLINT_BITS-1))-1
 WORD_MIN = -(1<<(FLINT_BITS-1))
 
-
 class flint_rand_struct(ctypes.Structure):
     # todo: use the real size
     _fields_ = [('data', c_slong * 16)]
@@ -171,6 +170,25 @@ _pow_methods = [libgr.gr_pow, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_o
 
 _gr_logic = 0
 
+class Truth:
+
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        if self.value == T_TRUE:
+            return "TRUE"
+        if self.value == T_FALSE:
+            return "FALSE"
+        return "UNKNOWN"
+
+    def __bool__(self):
+        if self.value == T_UNKNOWN:
+            raise ValueError("unknown truth value")
+        return self.value == T_TRUE
+
+
+
 class LogicContext(object):
     """
     Handle the result of predicates (experimental):
@@ -207,6 +225,12 @@ class LogicContext(object):
 strict_logic = LogicContext(0)
 pessimistic_logic = LogicContext(-1)
 optimistic_logic = LogicContext(1)
+none_logic = LogicContext(2)
+triple_logic = LogicContext(3)
+
+def set_logic(which_logic):
+    global _gr_logic
+    _gr_logic = which_logic.logic
 
 
 class gr_ctx:
@@ -235,11 +259,16 @@ class gr_ctx:
         return self._repr()
 
     def __del__(self):
-        # todo: refcounting
-        # libgr.gr_ctx_clear(self._ref)
-        pass
+        # fixme: may be unsafe; python can call
+        # finalizers out of order
+        libgr.gr_ctx_clear(self._ref)
+
+
 
 class gr_elem:
+    """
+    Base class for elements.
+    """
 
     def __init__(self, val=None, context=None, random=False):
         assert context is not None
@@ -286,6 +315,14 @@ class gr_elem:
         libgr.gr_clear(self._ref, self._ctx)
 
     def parent(self):
+        """
+        Return the parent object of this element.
+
+            >>> ZZ(0).parent()
+            Integer ring (fmpz)
+            >>> ZZ(0).parent() is ZZ
+            True
+        """
         return self._ctx_python
 
     def __repr__(self):
@@ -372,13 +409,28 @@ class gr_elem:
         return res
 
     @staticmethod
-    def _binary_predicate(self, other, op, rstr):
-        self, other = gr_elem._binary_coercion(self, other)
-        truth = op(self._ref, other._ref, self._ctx)
+    def _unary_predicate(self, op, rstr):
+        truth = op(self._ref, self._ctx)
+        if _gr_logic == 3:
+            return Truth(truth)
         if truth == T_TRUE: return True
         if truth == T_FALSE: return False
         if _gr_logic == 1: return True
         if _gr_logic == -1: return False
+        if _gr_logic == 2: return None
+        raise Undecidable(f"unable to decide {rstr} for x = {self} over {self.parent()}")
+
+    @staticmethod
+    def _binary_predicate(self, other, op, rstr):
+        self, other = gr_elem._binary_coercion(self, other)
+        truth = op(self._ref, other._ref, self._ctx)
+        if _gr_logic == 3:
+            return Truth(truth)
+        if truth == T_TRUE: return True
+        if truth == T_FALSE: return False
+        if _gr_logic == 1: return True
+        if _gr_logic == -1: return False
+        if _gr_logic == 2: return None
         raise Undecidable(f"unable to decide {rstr} for x = {self}, y = {other} over {self.parent()}")
 
     @staticmethod
@@ -467,6 +519,29 @@ class gr_elem:
     def __rpow__(self, other):
         return self._binary_op2(other, self, _pow_methods, "x ** y")
 
+    def is_invertible(self):
+        """
+        Return whether self has a multiplicative inverse in its domain.
+
+            >>> 
+            >>> ZZ(3).is_invertible()
+            False
+            >>> ZZ(-1).is_invertible()
+            True
+        """
+        return self._unary_predicate(self, libgr.gr_is_invertible, "is_invertible")
+
+    def is_square(self):
+        """
+        Return whether self is a perfect square in its domain.
+
+            >>> ZZ(3).is_square()
+            False
+            >>> ZZ(4).is_square()
+            True
+        """
+        return self._unary_predicate(self, libgr.gr_is_square, "is_square")
+
     def __index__(self):
         n = fmpz_struct()
         nref = ctypes.byref(n)
@@ -491,51 +566,202 @@ class gr_elem:
         return c[0]
 
     def inv(self):
+        """
+        Multiplicative inverse of this element.
+
+            >>> QQ(3).inv()
+            1/3
+            >>> QQ(0).inv()
+            Traceback (most recent call last):
+              ...
+            ValueError: inv(x) is not defined for x = 0 over Rational field (fmpq)
+
+        """
         return self._unary_op(self, libgr.gr_inv, "inv(x)")
 
     def sqrt(self):
+        """
+        Square root of this element.
+
+            >>> ZZ(4).sqrt()
+            2
+            >>> ZZ(2).sqrt()
+            Traceback (most recent call last):
+              ...
+            ValueError: sqrt(x) is not defined for x = 2 over Integer ring (fmpz)
+            >>> QQbar(2).sqrt()
+            Root a = 1.41421 of a^2-2
+            >>> (QQ(25)/16).sqrt()
+            5/4
+            >>> QQbar(-1).sqrt()
+            Root a = 1.00000*I of a^2+1
+            >>> RR(-1).sqrt()
+            Traceback (most recent call last):
+              ...
+            ValueError: sqrt(x) is not defined for x = -1.000000000000000 over Real numbers (arb, prec = 53)
+            >>> RF(-1).sqrt()
+            nan
+
+        """
         return self._unary_op(self, libgr.gr_sqrt, "sqrt(x)")
 
     def rsqrt(self):
+        """
+        Reciprocal square root of this element.
+
+            >>> QQ(25).rsqrt()
+            1/5
+        """
         return self._unary_op(self, libgr.gr_rsqrt, "rsqrt(x)")
 
     def floor(self):
+        r"""
+        Floor function: closest integer in the direction of `-\infty`.
+
+            >>> (QQ(3) / 2).floor()
+            1
+            >>> (QQ(3) / 2).ceil()
+            2
+            >>> (QQ(3) / 2).nint()
+            2
+            >>> (QQ(3) / 2).trunc()
+            1
+        """
         return self._unary_op(self, libgr.gr_floor, "floor(x)")
 
     def ceil(self):
+        r"""
+        Ceiling function: closest integer in the direction of `+\infty`.
+
+            >>> (QQ(3) / 2).ceil()
+            2
+        """
         return self._unary_op(self, libgr.gr_ceil, "ceil(x)")
 
     def trunc(self):
+        r"""
+        Truncate to integer: closest integer in the direction of zero.
+
+            >>> (QQ(3) / 2).trunc()
+            1
+        """
         return self._unary_op(self, libgr.gr_trunc, "trunc(x)")
 
     def nint(self):
+        r"""
+        Nearest integer function: nearest integer, rounding to
+        even on a tie.
+
+            >>> (QQ(3) / 2).nint()
+            2
+        """
         return self._unary_op(self, libgr.gr_nint, "nint(x)")
 
     def abs(self):
         return self._unary_op(self, libgr.gr_abs, "abs(x)")
 
     def i(self):
+        """
+        Imaginary unit as an element of the same domain as self.
+
+            >>> QQbar().i()
+            Root a = 1.00000*I of a^2+1
+            >>> QQ().i()
+            Traceback (most recent call last):
+              ...
+            ValueError: i is not defined in Rational field (fmpq)
+
+        """
         return self._constant(self, libgr.gr_i, "i")
 
     def conj(self):
+        """
+        Complex conjugate.
+
+            >>> QQbar().i().conj()
+            Root a = -1.00000*I of a^2+1
+            >>> CC(-2).log().conj()
+            ([0.693147180559945 +/- 4.12e-16] + [-3.141592653589793 +/- 3.39e-16]*I)
+            >>> QQ(3).conj()
+            3
+        """
         return self._unary_op(self, libgr.gr_conj, "conj(x)")
 
     def re(self):
+        """
+        Real part.
+
+            >>> QQ(1).re()
+            1
+            >>> (QQbar(-1) ** (QQ(1) / 3)).re()
+            1/2
+        """
         return self._unary_op(self, libgr.gr_re, "re(x)")
 
     def im(self):
+        """
+        Imaginary part.
+
+            >>> QQ(1).im()
+            0
+            >>> (QQbar(-1) ** (QQ(1) / 3)).im()
+            Root a = 0.866025 of 4*a^2-3
+        """
         return self._unary_op(self, libgr.gr_im, "im(x)")
 
     def sgn(self):
+        """
+        Sign function.
+
+            >>> QQ(-5).sgn()
+            -1
+            >>> CC(-10).sqrt().sgn()
+            1.000000000000000*I
+        """
         return self._unary_op(self, libgr.gr_sgn, "sgn(x)")
 
     def csgn(self):
+        """
+        Real-valued extension of the sign function: gives
+        the sign of the real part when nonzero, and the sign of the
+        imaginary part when on the imaginary axis.
+
+            >>> QQbar(-10).sqrt().csgn()
+            1
+            >>> (-QQbar(-10).sqrt()).csgn()
+            -1
+        """
         return self._unary_op(self, libgr.gr_csgn, "csgn(x)")
 
     def pi(self):
+        """
+        The number pi as an element of the same domain as self.
+
+            >>> RR().pi()
+            [3.141592653589793 +/- 3.39e-16]
+            >>> QQbar().pi()
+            Traceback (most recent call last):
+              ...
+            ValueError: pi is not defined in Complex algebraic numbers (qqbar)
+        """
         return self._constant(self, libgr.gr_pi, "pi")
 
     def exp(self):
+        """
+        Exponential function.
+
+            >>> RR(1).exp()
+            [2.718281828459045 +/- 5.41e-16]
+            >>> RR_ca(1).exp()
+            2.71828 {a where a = 2.71828 [Exp(1)]}
+            >>> QQ(0).exp()
+            1
+            >>> QQ(1).exp()
+            Traceback (most recent call last):
+              ...
+            NotImplementedError: unable to compute exp(x) for x = 1 over Rational field (fmpq)
+
+        """
         return self._unary_op(self, libgr.gr_exp, "exp(x)")
 
     def log(self):
@@ -561,6 +787,105 @@ class gr_elem:
 
     def atan(self):
         return self._unary_op(self, libgr.gr_atan, "atan(x)")
+
+    def exp_pi_i(self):
+        r"""
+        `\exp(\pi i x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).exp_pi_i()
+            Root a = 0.500000 + 0.866025*I of a^2-a+1
+            >>> (QQbar(2).sqrt()).exp_pi_i()
+            Traceback (most recent call last):
+              ...
+            ValueError: exp_pi_i(x) is not defined for x = Root a = 1.41421 of a^2-2 over Complex algebraic numbers (qqbar)
+        """
+        return self._unary_op(self, libgr.gr_exp_pi_i, "exp_pi_i(x)")
+
+    def log_pi_i(self):
+        r"""
+        `\log(x) / (\pi i)` evaluated at self.
+
+            >>> (QQbar(-1) ** (QQbar(7) / 5)).log_pi_i()
+            -3/5
+            >>> (QQbar(1) / 2).log_pi_i()
+            Traceback (most recent call last):
+              ...
+            ValueError: log_pi_i(x) is not defined for x = 1/2 over Complex algebraic numbers (qqbar)
+        """
+        return self._unary_op(self, libgr.gr_log_pi_i, "log_pi_i(x)")
+
+    def sin_pi(self):
+        r"""
+        `\sin(\pi x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).sin_pi()
+            Root a = 0.866025 of 4*a^2-3
+        """
+        return self._unary_op(self, libgr.gr_sin_pi, "sin_pi(x)")
+
+    def cos_pi(self):
+        r"""
+        `\cos(\pi x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).cos_pi()
+            1/2
+        """
+        return self._unary_op(self, libgr.gr_cos_pi, "cos_pi(x)")
+
+    def tan_pi(self):
+        r"""
+        `\tan(\pi x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).tan_pi()
+            Root a = 1.73205 of a^2-3
+        """
+        return self._unary_op(self, libgr.gr_tan_pi, "tan_pi(x)")
+
+    def cot_pi(self):
+        r"""
+        `\cot(\pi x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).cot_pi()
+            Root a = 0.577350 of 3*a^2-1
+        """
+        return self._unary_op(self, libgr.gr_cot_pi, "cot_pi(x)")
+
+    def sec_pi(self):
+        r"""
+        `\sec(\pi x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).sec_pi()
+            2
+        """
+        return self._unary_op(self, libgr.gr_sec_pi, "sec_pi(x)")
+
+    def csc_pi(self):
+        r"""
+        `\csc(\pi x)` evaluated at self.
+
+            >>> (QQbar(1) / 3).csc_pi()
+            Root a = 1.15470 of 3*a^2-4
+        """
+        return self._unary_op(self, libgr.gr_csc_pi, "csc_pi(x)")
+
+    def asin_pi(self):
+        return self._unary_op(self, libgr.gr_asin_pi, "asin_pi(x)")
+
+    def acos_pi(self):
+        return self._unary_op(self, libgr.gr_acos_pi, "acos_pi(x)")
+
+    def atan_pi(self):
+        return self._unary_op(self, libgr.gr_atan_pi, "atan_pi(x)")
+
+    def acot_pi(self):
+        return self._unary_op(self, libgr.gr_acot_pi, "acot_pi(x)")
+
+    def asec_pi(self):
+        return self._unary_op(self, libgr.gr_asec_pi, "asec_pi(x)")
+
+    def acsc_pi(self):
+        return self._unary_op(self, libgr.gr_acsc_pi, "acsc_pi(x)")
+
 
     def gamma(self):
         return self._unary_op(self, libgr.gr_gamma, "gamma(x)")
@@ -860,18 +1185,18 @@ class Mat(gr_ctx):
 
     """
 
-    def __init__(self, element_ring, nrows=None, ncols=None):
-        assert isinstance(element_ring, gr_ctx)
+    def __init__(self, element_domain, nrows=None, ncols=None):
+        assert isinstance(element_domain, gr_ctx)
         gr_ctx.__init__(self)
         if nrows is None and ncols is None:
-            libgr.gr_ctx_init_matrix_domain(self._ref, element_ring._ref)
+            libgr.gr_ctx_init_matrix_domain(self._ref, element_domain._ref)
         else:
             if ncols is None:
                 ncols = nrows
             assert 0 <= nrows <= WORD_MAX
             assert 0 <= ncols <= WORD_MAX
-            libgr.gr_ctx_init_matrix_space(self._ref, element_ring._ref, nrows, ncols)
-        self._element_ring = element_ring
+            libgr.gr_ctx_init_matrix_space(self._ref, element_domain._ref, nrows, ncols)
+        self._element_ring = element_domain
         self._elem_type = gr_mat
 
 def MatrixRing(element_ring, n):
@@ -1044,6 +1369,59 @@ def test_matrix():
     assert raises(lambda: M(3, 1, [1, 2, 3]), ValueError)
     assert 2 * I == M(2 * I) == I + I == 1 + I == I + 1
 
+    assert Mat(ZZ)([[1],[3]]) * ZZ(5) == Mat(ZZ)([[5],[15]])
+
+    M = Mat(ZZ)
+    A = M([[1,2,3],[4,5,6]])
+    assert A == M(2, 3, [1,2,3,4,5,6])
+    assert A == M(2, 3, [1,2,QQ(3),4,5,6])
+    assert Mat(ZZ, 2, 3)(A) == A
+    assert Mat(QQ, 2, 3)(A) == A
+    assert M(2, 1) == M([[0], [0]])
+    assert raises(lambda: M(2, 1, [1,2,3]), ValueError)
+    assert raises(lambda: M([[QQ(1)/3]]), ValueError)
+    assert raises(lambda: Mat(ZZ, 3, 1)(A), ValueError)
+    assert Mat(QQ, 2)(M([[1, 2], [3, 4]])) ** 2 == M([[7,10],[15,22]])
+
+def test_floor_ceil_trunc_nint():
+    assert ZZ(3).floor() == 3
+    assert ZZ(3).ceil() == 3
+    assert ZZ(3).trunc() == 3
+    assert ZZ(3).nint() == 3
+
+    assert QQ(3).floor() == 3
+    assert QQ(3).ceil() == 3
+    assert QQ(3).trunc() == 3
+    assert QQ(3).nint() == 3
+
+    for R in [QQ, QQbar, RR, RR_ca, CC, CC_ca, RF]:
+        x = R(3) / 2
+        assert x.floor() == 1
+        assert x.ceil() == 2
+        assert x.trunc() == 1
+        assert (-x).floor() == -2
+        assert (-x).ceil() == -1
+        assert (-x).trunc() == -1
+        assert x.nint() == 2
+        assert (-x).nint() == -2
+        assert (x+1).nint() == 2
+        assert (x+2).nint() == 4
+
+    for R in [QQbar, CC, CC_ca]:
+        x = R(3) / 2 + R().i()
+        assert x.floor() == 1
+        assert x.ceil() == 2
+        assert x.trunc() == 1
+        assert (-x).floor() == -2
+        assert (-x).ceil() == -1
+        assert (-x).trunc() == -1
+        assert x.nint() == 2
+        assert (-x).nint() == -2
+        assert (x+1).nint() == 2
+        assert (x+2).nint() == 4
+
+
+
 def test_all():
 
     x = ZZ(23)
@@ -1099,17 +1477,6 @@ def test_all():
 
     assert ZZx(QQ(5)) == 5
 
-    M = Mat(ZZ)
-    A = M([[1,2,3],[4,5,6]])
-    assert A == M(2, 3, [1,2,3,4,5,6])
-    assert A == M(2, 3, [1,2,QQ(3),4,5,6])
-    assert Mat(ZZ, 2, 3)(A) == A
-    assert Mat(QQ, 2, 3)(A) == A
-    assert M(2, 1) == M([[0], [0]])
-    assert raises(lambda: M(2, 1, [1,2,3]), ValueError)
-    assert raises(lambda: M([[QQ(1)/3]]), ValueError)
-    assert raises(lambda: Mat(ZZ, 3, 1)(A), ValueError)
-    assert Mat(QQ, 2)(M([[1, 2], [3, 4]])) ** 2 == M([[7,10],[15,22]])
 
 if __name__ == "__main__":
     from time import time

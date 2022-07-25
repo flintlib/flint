@@ -333,6 +333,65 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 }
 
 int
+matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    if (y_ctx == ctx)
+    {
+        return matrix_mul(res, mat, y, ctx);
+    }
+    else if (y_ctx == MATRIX_CTX(ctx)->base_ring)
+    {
+        int status = GR_SUCCESS;
+
+        if (res->r != mat->r || res->c != mat->c)
+            status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
+
+        if (status != GR_SUCCESS)
+            return status;
+
+        /* todo: resizing */
+        return gr_mat_mul_scalar(res, mat, y, y_ctx);
+    }
+    else if (y_ctx->which_ring == GR_CTX_GR_MAT)
+    {
+        int status;
+        gr_mat_t tmp;
+        gr_mat_init(tmp, ((gr_mat_struct *) y)->r, ((gr_mat_struct *) y)->c, MATRIX_CTX(ctx)->base_ring);
+        status = matrix_set_other(tmp, y, y_ctx, ctx);
+        if (status == GR_SUCCESS)
+        {
+            status = matrix_mul(res, mat, tmp, ctx);
+        }
+        gr_mat_clear(tmp, MATRIX_CTX(ctx)->base_ring);
+        return status;
+    }
+    else
+    {
+        int status;
+        gr_ptr c;
+
+        GR_TMP_INIT(c, ctx);
+
+        status = gr_set_other(c, y, y_ctx, MATRIX_CTX(ctx)->base_ring);
+
+        if (status == GR_SUCCESS)
+        {
+            if (res->r != mat->r || res->c != mat->c)
+                status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
+
+            if (status == GR_SUCCESS)
+                status = gr_mat_mul_scalar(res, mat, c, MATRIX_CTX(ctx)->base_ring);
+        }
+
+        GR_TMP_CLEAR(c, ctx);
+        return status;
+    }
+
+    return GR_UNABLE;
+}
+
+
+int
 matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (mat->r != mat->c)
@@ -375,6 +434,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) matrix_add},
     {GR_METHOD_SUB,         (gr_funcptr) matrix_sub},
     {GR_METHOD_MUL,         (gr_funcptr) matrix_mul},
+    {GR_METHOD_MUL_OTHER,   (gr_funcptr) matrix_mul_other},
     {GR_METHOD_INV,         (gr_funcptr) matrix_inv},
     {0,                     (gr_funcptr) NULL},
 };

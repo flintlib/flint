@@ -187,3 +187,9 @@ Mostly intended for internal use.
 .. function:: truth_t gr_mpoly_is_canonical(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx)
 
 .. function:: void gr_mpoly_assert_canonical(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+
+
+
+.. raw:: latex
+
+    \newpage

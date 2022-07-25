@@ -796,6 +796,91 @@ _gr_ca_ceil(ca_t res, const ca_t x, gr_ctx_t ctx)
 
 /* todo: trunc, nint in calcium */
 
+int _arb_trunc(arb_t res, const arb_t x, slong prec);
+int _arb_nint(arb_t res, const arb_t x, slong prec);
+
+int
+_gr_ca_trunc(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    acb_t t;
+    int status;
+
+    acb_init(t);
+
+    ca_get_acb(t, x, 64, GR_CA_CTX(ctx));
+
+    if (arf_cmpabs_2exp_si(arb_midref(acb_realref(t)), -1) < 0 && mag_cmp_2exp_si(arb_radref(acb_realref(t)), -1) < 0)
+    {
+        ca_zero(res, GR_CA_CTX(ctx));
+        status = GR_SUCCESS;
+    }
+    else if (arb_is_positive(acb_realref(t)))
+    {
+        status = _gr_ca_floor(res, x, ctx);
+    }
+    else if (arb_is_negative(acb_realref(t)))
+    {
+        status = _gr_ca_ceil(res, x, ctx);
+    }
+    else
+    {
+        status = GR_UNABLE;
+    }
+
+    acb_clear(t);
+
+    return status;
+}
+
+/* todo: fast numerical path */
+int
+_gr_ca_nint(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ca_check_is_integer(x, GR_CA_CTX(ctx)) == T_TRUE)
+    {
+        ca_set(res, x, GR_CA_CTX(ctx));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        ca_t t;
+        truth_t integer;
+        int status = GR_SUCCESS;
+
+        ca_init(t, GR_CA_CTX(ctx));
+
+        ca_set_d(t, 0.5, GR_CA_CTX(ctx));
+        ca_add(t, x, t, GR_CA_CTX(ctx));
+        ca_re(t, t, GR_CA_CTX(ctx));
+        ca_floor(res, t, GR_CA_CTX(ctx));
+
+        integer = ca_check_is_integer(t, GR_CA_CTX(ctx));
+
+        if (integer == T_TRUE)
+        {
+            fmpz_t m;
+            fmpz_init(m);
+            if (ca_get_fmpz(m, t, GR_CA_CTX(ctx)))
+            {
+                if (fmpz_is_odd(m))
+                    ca_sub_ui(res, res, 1, GR_CA_CTX(ctx));
+            }
+            else
+            {
+                status = GR_UNABLE;
+            }
+            fmpz_clear(m);
+        }
+        else if (integer == T_UNKNOWN)
+        {
+            status = GR_UNABLE;
+        }
+
+        ca_clear(t, GR_CA_CTX(ctx));
+        return status;
+    }
+}
+
 int
 _gr_ca_i(ca_t res, gr_ctx_t ctx)
 {
@@ -1107,6 +1192,8 @@ gr_method_tab_input _ca_methods_input[] =
 
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_ca_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_ca_ceil},
+    {GR_METHOD_TRUNC,           (gr_funcptr) _gr_ca_trunc},
+    {GR_METHOD_NINT,            (gr_funcptr) _gr_ca_nint},
 
     {GR_METHOD_I,               (gr_funcptr) _gr_ca_i},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_ca_abs},

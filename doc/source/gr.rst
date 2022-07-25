@@ -1120,3 +1120,9 @@ Testing rings
 
     Test correctness of the ring *R*. This calls test functions for
     various methods, each being repeated up to *iters* times.
+
+
+
+.. raw:: latex
+
+    \newpage

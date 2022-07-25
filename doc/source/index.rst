@@ -25,7 +25,7 @@ Contents
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst
-
+   python_flint.rst
 
 Design
 -------------------------------------------------------------------------------
@@ -94,3 +94,8 @@ Possible applications
   eliminate a lot of other copy-pasted boilerplate.
   By specializing methods at runtime for rings with different parameters,
   it should even be possible to improve performance in some cases.
+
+
+.. raw:: latex
+
+    \newpage

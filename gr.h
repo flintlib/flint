@@ -688,6 +688,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_expm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 GR_INLINE WARN_UNUSED_RESULT int gr_exp_pi_i(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, EXP_PI_I)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG1P)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_log_pi_i(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG_PI_I)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SIN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COS)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_UNARY_OP(ctx, SIN_COS)(res1, res2, x, ctx); }
