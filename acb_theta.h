@@ -299,6 +299,7 @@ void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound, slong
 /* AGM sequences */
 
 #define ACB_THETA_AGM_LOWPREC 20
+#define ACB_THETA_AGM_NB_MATRIX_SETUPS 100
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_ptr s, slong g, slong prec);
 
@@ -335,7 +336,16 @@ void acb_theta_agm_ext_collect(acb_ptr all_r0, slong* nb_bad, slong* nb_total,
 			       arb_ptr mi, acb_srcptr z, const acb_mat_t tau,
 			       const fmpz_mat_t N, slong prec);
 
-void acb_theta_agm_setup(fmpz_mat_struct* Ni, arb_t rho, arb_t M, arb_t Binv,
+void acb_theta_agm_matrices(fmpz_mat_struct* Ni, slong k, slong g);
+
+void acb_theta_agm_propagate_radius(arb_t rho, const arb_t r, acb_srcptr th_half,
+				    const fmpz_mat_t N, slong prec);
+
+void acb_theta_agm_fd(acb_mat_t fd, acb_srcptr th, const fmpz_mat_struct* Ni,
+		      const arb_t eta, slong prec);
+
+void acb_theta_agm_setup(fmpz_mat_struct* Ni, slong* nb_bad_steps, acb_ptr all_roots,
+			 arb_t rho, arb_t M, arb_t Binv,
 			 const acb_mat_t tau, slong prec);
 
 void acb_theta_agm_ext_setup(fmpz_mat_struct* Ni, arb_t rho, arb_t M, arb_t Binv,
