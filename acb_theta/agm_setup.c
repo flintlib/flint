@@ -26,6 +26,8 @@ void acb_theta_agm_setup(fmpz_mat_struct* Ni, slong* nb_bad_steps, acb_ptr all_r
   int res;
   int try = 0;
 
+  /* Init */
+
   acb_mat_scalar_mul_2exp_si(half, tau, -1);
   acb_theta_naive_const(th, half, prec);
 
@@ -106,5 +108,7 @@ void acb_theta_agm_setup(fmpz_mat_struct* Ni, slong* nb_bad_steps, acb_ptr all_r
       arb_mul(Binv, prod, norm, lowprec);
       arb_add(Binv, Binv, norm, lowprec);
       stop = 1;
-    }  
+    }
+
+  /* Clear */
 }
