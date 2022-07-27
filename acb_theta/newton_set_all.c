@@ -1,27 +1,110 @@
 
 #include "acb_theta.h"
 
-static void agm_radius(arf_t rad, const arf_struct* mi, slong nb, slong prec)
-{	  
-  arb_one(prod);
-  arb_mul_2exp_si(rad, &mi[0], -1);	  
-  for (j = 0; j < nb_bad_steps[k]; j++)
+/* Compute radius of disk around (theta_i^2/theta_0^2(N.tau)) where
+   AGM function is surely well-defined */
+
+static void agm_radius(arf_t rad, const arf_struct* mi, const arf_t M0,
+		       const arf_t minf, slong nb, slong prec)
+{
+  arf_t prod, term, res;
+  slong j;
+
+  arf_init(prod);
+  arf_init(term);
+  arf_init(res);
+  
+  arf_one(prod);
+  arf_mul_2exp_si(res, &mi[0], -1);	  
+  for (j = 0; j < nb; j++)
     {
-      arb_mul_2exp_si(term, M0, 1);
-      arb_add(term, term, &mi[j], lowprec);
-      arb_div(term, &mi[j], term, lowprec);
-      arb_sqrt(term, term, lowprec);
-      arb_mul(prod, prod, term, lowprec);
+      arf_mul_2exp_si(term, M0, 1);
+      arf_add(term, term, &mi[j], prec, ARF_RND_CEIL);
+      arf_div(term, &mi[j], term, prec, ARF_RND_FLOOR);
+      arf_sqrt(term, term, prec, ARF_RND_FLOOR);
+      arf_mul(prod, prod, term, prec, ARF_RND_FLOOR);
       
-      if (j == nb_bad_steps[k] - 1) arb_mul(term, minf, prod, lowprec);
-      else arb_mul(term, &mi[j+1], prod, lowprec);
-      arb_mul_2exp_si(term, term, -1);
-      arb_min(rad, rad, term, lowprec);
+      if (j == nb_bad_steps[k] - 1) arf_mul(term, minf, prod, prec, ARF_RND_FLOOR);
+      else arf_mul(term, &mi[j+1], prod, prec, ARF_RND_FLOOR);
+      arf_mul_2exp_si(term, term, -1);
+      arf_min(res, res, term);
     }
+
+  arf_set(rad, res);
+  arf_clear(prod);
+  arf_clear(term);
+  arf_clear(res);
 }
 
-static void propagate_rho(arb_t rho, const arb_t r, acb_srcptr th_half,
-			  const fmpz_mat_t N, slong prec);
+/* Given result r of agm_radius, compute radius of disk around
+   (theta_i/theta_0(tau/2)) where dupl+transform+agm is surely
+   well-defined */
+
+static void propagate_rho(arf_t rho, const arf_t r, acb_srcptr th_half,
+			  const fmpz_mat_t N, slong prec)
+{
+  ulong ab_0, ab;
+  fmpz_t epsilon;
+  acb_ptr th_proj;
+  acb_ptr th_dupl;
+  arb_t abs_0, abs;
+  arf_t bound, max, res;
+  slong g = fmpz_mat_nrows(N)/2;
+  slong k;
+
+  fmpz_init(epsilon);
+  th_proj = _acb_vec_init(1<<g);
+  th_dupl = _acb_vec_init(1<<(2*g));
+  arb_init(abs_0);
+  arb_init(abs);
+  arf_init(bound);
+  arf_init(max);
+  arf_init(res);
+
+  acb_one(&th_proj[0]);
+  for (k = 1; k < (1<<g); k++) acb_div(&th_proj[k], &th_half[k], &th_half[0], prec);
+  acb_theta_duplication_all(th_dupl, th_proj, g, prec);
+  
+  /* theta_i^2/theta_0^2 is obtained as quotient of two theta
+     transformations, multiplied by some root of unity */
+  ab_0 = acb_theta_transform_image_char(epsilon, 0, N);
+  acb_abs(abs_0, &th_dupl[ab_0], prec);
+  arf_pos_inf(res);
+  
+  for (k = 1; k < (1<<g); k++)
+    {
+      ab = acb_theta_transform_image_char(epsilon, 0, N);
+      acb_abs(abs, &th_dupl[ab], prec);
+      arb_add(abs, abs, abs_0, prec);
+      arb_div(abs, abs_0, abs, prec);
+      arb_mul(abs, abs, abs_0, prec);
+      arb_min(abs, abs, abs_0, prec);
+      arb_mul_2exp_si(abs, abs, -1, prec);
+      arb_get_lbound_arf(bound, abs, prec);
+      arf_min(res, res, bound);
+    }
+
+  arf_zero(max);
+  /* Now we have a suitable radius for the duplicated values */
+  for (k = 1; k < (1<<g); k++)
+    {
+      acb_abs(abs, &th_proj[k], prec);
+      arb_get_ubound_arf(bound, abs, prec);
+      arf_max(max, max, bound);
+    }
+  arf_div(res, res, max, prec, ARF_RND_FLOOR);
+  arf_div_si(res, res, 3, prec, ARF_RND_FLOOR);
+  arf_min(res, res, max);
+
+  fmpz_clear(epsilon);
+  _acb_vec_clear(th_proj, 1<<g);
+  _acb_vec_clear(th_dupl, 1<<(2*g));
+  arb_clear(abs_0);
+  arb_clear(abs);
+  arf_clear(bound);
+  arf_clear(max);
+  arf_clear(res);  
+}
 
 
 void acb_theta_newton_set_all(acb_theta_newton_t ctx, const acb_mat_t tau, slong prec)
@@ -73,6 +156,8 @@ void acb_theta_newton_set_all(acb_theta_newton_t ctx, const acb_mat_t tau, slong
       for (k = 0; k < n; k++)
 	{
 	  agm_radius(rad, acb_theta_newton_mi(ctx, k),
+		     acb_theta_newton_M0(ctx, k),
+		     acb_theta_newton_minf(ctx, k),
 		     acb_theta_newton_nb_bad_steps(ctx, k), prec);
 	  
 	  /* Propagate radius according to quotients & duplication */

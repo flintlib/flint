@@ -104,6 +104,8 @@ void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
+ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ch, const fmpz_mat_t eta);
+
 
 /* Ellipsoids for naive algorithms */
 
