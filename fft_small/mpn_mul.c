@@ -713,7 +713,11 @@ DEFINE_IT(8,192)
 
 
 /* seems all version of gcc generate worse code if the intrinsics are used */
+/* but apple clang generates invalid code with the asm */
 #if 0
+
+#if FLINT_AVX
+
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
@@ -806,6 +810,93 @@ DEFINE_IT(8,192)
          "5"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
          "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
          "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+
+#elif FLINT_NEON
+
+
+#define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)      \
+  __asm__ ("adds %4,%9,%14\n\tadcs %3,%8,%13\n\tadcs %2,%7,%12\n\tadc %1,%6,%11\n\tadc %0,%5,%10"\
+       : "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
+  __asm__ ("adds %5,%11,%17\n\tadcs %4,%10,%16\n\tadcs %3,%9,%15\n\tadcs %2,%8,%14\n\tadc %1,%7,%13\n\tadc %0,%6,%12"\
+       : "=r" (s5), "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0)) \
+       : "cc")
+
+#define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)      \
+  __asm__ ("adds %6,%13,%20\n\tadcs %5,%12,%19\n\tadcs %4,%11,%18\n\tadcs %3,%10,%17\n\tadcs %2,%9,%16\n\tadc %1,%8,%15\n\tadc %0,%7,%14"\
+       : "=r" (s6), "=r" (s5), "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0)) \
+       : "cc")
+
+#define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)      \
+  __asm__ ("adds %7,%15,%23\n\tadcs %6,%14,%22\n\tadcs %5,%13,%21\n\tadcs %4,%12,%20\n\tadcs %3,%11,%19\n\tadcs %2,%10,%18\n\tadc %1,%9,%17\n\tadc %0,%8,%16"\
+       : "=r" (s7), "=r" (s6), "=r" (s5), "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a7)), "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b7)), "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0)) \
+       : "cc")
+
+
+#define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)      \
+  __asm__ ("subs %3,%7,%11\n\tsbcs %2,%6,%10\n\tsbc %1,%5,%9\n\tsbc %0,%4,%8"\
+       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)      \
+  __asm__ ("subs %4,%9,%14\n\tsbcs %3,%8,%13\n\tsbcs %2,%7,%12\n\tsbc %1,%6,%11\n\tsbc %0,%5,%10"\
+       : "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define sub_ddddddmmmmmmssssss(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
+  __asm__ ("subs %5,%11,%17\n\tsbcs %4,%10,%16\n\tsbcs %3,%9,%15\n\tsbcs %2,%8,%14\n\tsbc %1,%7,%13\n\tsbc %0,%6,%12"\
+       : "=r" (s5), "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)      \
+  __asm__ ("subs %6,%13,%20\n\tsbcs %5,%12,%19\n\tsbcs %4,%11,%18\n\tsbcs %3,%10,%17\n\tsbcs %2,%9,%16\n\tsbc %1,%8,%15\n\tsbc %0,%7,%14"\
+       : "=r" (s6), "=r" (s5), "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+#define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)      \
+  __asm__ ("suds %7,%15,%23\n\tsbcs %6,%14,%22\n\tsbcs %5,%13,%21\n\tsbcs %4,%12,%20\n\tsbcs %3,%11,%19\n\tsbcs %2,%10,%18\n\tsbc %1,%9,%17\n\tsbc %0,%8,%16"\
+       : "=r" (s7), "=r" (s6), "=r" (s5), "=r" (s4), "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
+       : "r" ((mp_limb_t)(a7)), "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
+         "r" ((mp_limb_t)(b7)), "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "cc")
+
+/*
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)               \
+  __asm__ ("subs %1,%3,%5\n\tsbc %0,%2,%4"               \
+       : "=r" (sh), "=&r" (sl)                           \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(al)),  \
+         "r" ((mp_limb_t)(bh)), "rI" ((mp_limb_t)(bl))   \
+       : "cc")
+
+#define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)                     \
+  __asm__ ("subs %2,%5,%8\n\tsbcs %1,%4,%7\n\tsbc %0,%3,%6"                   \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                                    \
+       : "r"  ((mp_limb_t)(ah)), "r" ((mp_limb_t)(am)), "r" ((mp_limb_t)(al)),\
+         "r" ((mp_limb_t)(bh)), "r" ((mp_limb_t)(bm)), "rI" ((mp_limb_t)(bl)) \
+       : "cc")
+*/
+
+#else
+#error oops
+#endif
 
 FLINT_FORCE_INLINE void multi_add_2(ulong z[], const ulong a[])
 {
@@ -910,12 +1001,6 @@ FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[])
 
 
 #define DEFINE_IT(n) \
-FLINT_FORCE_INLINE void CAT(multi_sub, n)(ulong z[], const ulong a[]) \
-{ \
-    unsigned char cf = 0; \
-    for (ulong i = 0; i < n; i++) \
-        cf = _subborrow_ulong(cf, z[i], a[i], &z[i]); \
-} \
 FLINT_FORCE_INLINE void CAT(multi_add, n)(ulong z[], const ulong a[]) \
 { \
     unsigned char cf = 0; \
@@ -923,13 +1008,26 @@ FLINT_FORCE_INLINE void CAT(multi_add, n)(ulong z[], const ulong a[]) \
         cf = _addcarry_ulong(cf, z[i], a[i], &z[i]); \
 }
 
-DEFINE_IT(2)
 DEFINE_IT(3)
 DEFINE_IT(4)
 DEFINE_IT(5)
 DEFINE_IT(6)
 DEFINE_IT(7)
 DEFINE_IT(8)
+#undef DEFINE_IT
+
+#define DEFINE_IT(n) \
+FLINT_FORCE_INLINE void CAT(multi_sub, n)(ulong z[], const ulong a[]) \
+{ \
+    unsigned char cf = 0; \
+    for (ulong i = 0; i < n; i++) \
+        cf = _subborrow_ulong(cf, z[i], a[i], &z[i]); \
+}
+
+DEFINE_IT(4)
+DEFINE_IT(5)
+DEFINE_IT(6)
+DEFINE_IT(7)
 #undef DEFINE_IT
 
 #endif
@@ -1012,7 +1110,6 @@ FLINT_FORCE_INLINE void CAT3(_big_addmul, n, m)(ulong r[], ulong t[], ulong C[],
     } \
 }
 
-DEFINE_IT(3, 2)
 DEFINE_IT(4, 3)
 DEFINE_IT(4, 4)
 DEFINE_IT(5, 4)
@@ -1041,12 +1138,10 @@ sub: \
     goto check; \
 }
 
-DEFINE_IT(3, 2)
 DEFINE_IT(4, 3)
 DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
-DEFINE_IT(8, 7)
 #undef DEFINE_IT
 
 
@@ -1094,7 +1189,6 @@ FLINT_FORCE_INLINE void CAT(_add_to_answer_hard, n)(ulong z[], ulong r[], ulong 
     mpn_add_n(z + toff, z + toff, r, zn - toff); \
 }
 
-DEFINE_IT(3, 4)
 DEFINE_IT(4, 5)
 DEFINE_IT(5, 6)
 DEFINE_IT(6, 7)

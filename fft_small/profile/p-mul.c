@@ -294,16 +294,18 @@ int main(void)
 
 flint_printf(" --- fft_small 1 thread  --- \n");
     flint_set_num_threads(1);
-    profile_mul(R, 14, 31, 0, 1);
+    profile_mul(R, 20, 26, 0, 1);
 
+#if 0
 flint_printf(" --- fft_small 8 threads --- \n");
     flint_set_num_threads(8);
-    profile_mul(R, 14, 31, 0, 1);
+    profile_mul(R, 20, 28, 1, 1);
     mpn_ctx_clear(R);
+#endif
 
 #if 0
 flint_printf(" --- gmp --- \n");
-    profile_mul_gmp(30, 32, 0, 0);
+    profile_mul_gmp(12, 31, 1, 1);
 #endif
 
     return 0;

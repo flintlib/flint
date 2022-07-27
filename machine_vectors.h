@@ -13,8 +13,8 @@
 #define MACHINE_VECTORS_H
 
 
-#define FLINT_AVX 1
-#define FLINT_NEON 0
+#define FLINT_AVX 0
+#define FLINT_NEON 1
 
 #define ALIGN_STRUCT(x) __attribute__((aligned(x)))
 
@@ -89,7 +89,7 @@ FLINT_FORCE_INLINE void vec4n_print(vec4n a)
 }
 
 FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
-    __m256d t = _mm256_set1_pd(0x0010000000000000);
+    __m256d t = _mm256_set1_pd(0x1.0p52);
     return _mm256_castpd_si256(_mm256_xor_pd(_mm256_add_pd(a, t), t));
 }
 
@@ -99,7 +99,7 @@ FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
 }
 
 FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
-    __m256d t = _mm256_set1_pd(0x0010000000000000);
+    __m256d t = _mm256_set1_pd(0x1.0p52);
     return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
 }
 
@@ -109,7 +109,7 @@ FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
     __m256i mask = _mm256_set1_epi32(0x43300000);
     __m256i ak0 = _mm256_unpacklo_epi32(a, mask);
     __m256i ak1 = _mm256_unpackhi_epi32(a, mask);
-    __m256d t = _mm256_set1_pd(0x0010000000000000);
+    __m256d t = _mm256_set1_pd(0x1.0p52);
     vec8d z;
     z.e1 = _mm256_sub_pd(_mm256_castsi256_pd(ak0), t);
     z.e2 = _mm256_sub_pd(_mm256_castsi256_pd(ak1), t);
@@ -670,7 +670,7 @@ EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 #elif FLINT_NEON
 
 typedef ulong vec1n;
-typedef struct {vec1n e1, e2;} vec2n;
+typedef int64x2_t vec2n;
 typedef struct {vec2n e1, e2;} vec4n;
 typedef struct {vec4n e1, e2;} vec8n;
 
@@ -1301,8 +1301,7 @@ FLINT_FORCE_INLINE void vec1n_store_unaligned(ulong* z, vec1n a) {
 }
 
 FLINT_FORCE_INLINE void vec2n_store_unaligned(ulong* z, vec2n a) {
-    vec1n_store_unaligned(z+0, a.e1);
-    vec1n_store_unaligned(z+1, a.e2);
+   vst1q_s64((long long *)z, a);
 }
 
 FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
@@ -1310,15 +1309,12 @@ FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
     vec2n_store_unaligned(z+2, a.e2);
 }
 
-
 FLINT_FORCE_INLINE vec1n vec1d_convert_limited_vec1n(vec1d a) {
     return (slong)a;
 }
 
 FLINT_FORCE_INLINE vec2n vec2d_convert_limited_vec2n(vec2d a) {
-    vec1n z1 = vec1d_convert_limited_vec1n(a[0]);
-    vec1n z2 = vec1d_convert_limited_vec1n(a[1]);
-    vec2n z = {z1, z2}; return z;
+    return vcvtnq_s64_f64(a);
 }
 
 FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
