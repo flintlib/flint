@@ -334,7 +334,7 @@ slong acb_theta_agm_nb_good_steps(slong g, slong prec);
 /* Context for Newton iterations */
 
 #define ACB_THETA_NEWTON_LOWPREC 20
-#define ACB_THETA_NEWTON_NB_MATRIX_SETUPS 100
+#define ACB_THETA_NEWTON_NB_MATRIX_SETUPS 10
 #define ACB_THETA_NEWTON_BASEPREC 2000
 
 typedef struct
@@ -384,16 +384,12 @@ void acb_theta_newton_try_matrices(fmpz_mat_struct* Ni, slong k, slong g);
 
 void acb_theta_newton_set_all(acb_theta_newton_t ctx, const acb_mat_t tau, slong prec);
 
-
-
-void acb_theta_agm_setup(fmpz_mat_struct* Ni, slong* nb_bad_steps, acb_ptr all_roots,
-			 arb_t rho, arb_t M, arb_t Binv,
-			 const acb_mat_t tau, slong prec);
-
 /* Ideas:
    - attempt setup at default prec, if not, double (up to prec/4?)
    - necessary to write generic newton?
 */
+
+/* AGM/Newton algorithms */
 
 void acb_theta_agm_half_proj(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, acb_srcptr z, slong prec);
 
