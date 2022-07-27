@@ -24,7 +24,7 @@ static void fmpz_mat_Nij(fmpz_mat N, slong i, slong j)
   fmpz_set_si(fmpz_mat_entry(N, j+g, i+g), -1);  
 }
 
-void acb_theta_newton_try_matrices(fmpz_mat_struct* Ni, slong k, slong g)
+void acb_theta_agm_ctx_matrices(fmpz_mat_struct* Ni, slong k, slong g)
 {
   slong j, u, v, c1, c2;
   flint_rand_t state;

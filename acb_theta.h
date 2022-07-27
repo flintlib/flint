@@ -24,7 +24,7 @@ extern "C" {
    - A suffix ind indicates a single theta value
    - A suffix const indicates theta constants (z=0). If not present, we compute both theta constants and regular theta values; "proj" is understood for each half independently.
    - A suffix jet indicates successive derivatives with respect to z. Return a vector of matrices as follows: one matrix per derivation order; in each of these, a row of the matrix contains partial derivatives of a fixed theta value
-   - Order: naive/agm, all/ind, const, half,  proj, sqr, jet
+   - Order: naive/newton, all/ind, const, half,  proj, sqr, jet
    - Characteristics (a,b) are encoded as ulongs; first half is a, second half is b
 */
 
@@ -333,71 +333,78 @@ slong acb_theta_agm_nb_good_steps(slong g, slong prec);
 
 /* Context for Newton iterations */
 
-#define ACB_THETA_NEWTON_LOWPREC 20
-#define ACB_THETA_NEWTON_NB_MATRIX_SETUPS 10
-#define ACB_THETA_NEWTON_BASEPREC 2000
+#define ACB_THETA_AGM_LOWPREC 20
+#define ACB_THETA_AGM_NB_MATRIX_SETUPS 10
+#define ACB_THETA_AGM_BASEPREC 2000
+#define ACB_THETA_AGM_BASEPREC_MAXQ 4
+#define ACB_THETA_AGM_GUARD 25
 
 typedef struct
 {
-  slong g;
-  slong nb;
+  slong g, nb;
   fmpz_mat_struct* matrices;
   slong* nb_bad_steps;
   acb_ptr* roots;
   arf_struct** mi;
   arf_struct* M0;
   arf_struct* minf;
-  arf_struct rho;
-  arf_struct max;
-  arf_struct inv_der;
-} acb_theta_newton_struct;
+  arf_struct rho, max, inv_der;
+} acb_theta_agm_ctx_struct;
 
-typedef acb_theta_newton_struct acb_theta_newton_t[1];
+typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 
-#define acb_theta_newton_g(ctx) ((ctx)->g)
-#define acb_theta_newton_nb(ctx) ((ctx)->nb)
-#define acb_theta_newton_matrix(ctx, k)) (&(ctx)->matrices[(k)])
-#define acb_theta_newton_nb_bad_steps(ctx, k) ((ctx)->nb_bad_steps[(k)])
-#define acb_theta_newton_roots(ctx, k) ((ctx)->roots[(k)])
-#define acb_theta_newton_mi(ctx, k) ((ctx)->mi[(k)])
-#define acb_theta_newton_M0(ctx, k) (&(ctx)->M0[(k)])
-#define acb_theta_newton_minf(ctx, k) (&(ctx)->minf[(k)])
-#define acb_theta_newton_rho(ctx) (&(ctx)->rho)
-#define acb_theta_newton_max(ctx) (&(ctx)->max)
-#define acb_theta_newton_inv_der(ctx) (&(ctx)->inv_der)
+#define acb_theta_agm_ctx_g(ctx) ((ctx)->g)
+#define acb_theta_agm_ctx_nb(ctx) ((ctx)->nb)
+#define acb_theta_agm_ctx_matrix(ctx, k)) (&(ctx)->matrices[(k)])
+#define acb_theta_agm_ctx_nb_bad_steps(ctx, k) ((ctx)->nb_bad_steps[(k)])
+#define acb_theta_agm_ctx_roots(ctx, k) ((ctx)->roots[(k)])
+#define acb_theta_agm_ctx_mi(ctx, k) ((ctx)->mi[(k)])
+#define acb_theta_agm_ctx_M0(ctx, k) (&(ctx)->M0[(k)])
+#define acb_theta_agm_ctx_minf(ctx, k) (&(ctx)->minf[(k)])
+#define acb_theta_agm_ctx_rho(ctx) (&(ctx)->rho)
+#define acb_theta_agm_ctx_max(ctx) (&(ctx)->max)
+#define acb_theta_agm_ctx_inv_der(ctx) (&(ctx)->inv_der)
 
-void acb_theta_newton_init(acb_theta_newton_t ctx, slong g, slong n);
+void acb_theta_agm_ctx_init(acb_theta_agm_ctx_t ctx, slong g, slong n);
 
-void acb_theta_newton_clear(acb_theta_newton_t ctx);
+void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx);
 
-void acb_theta_newton_reset_steps(acb_theta_newton_t ctx, slong k, slong m);
+void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m);
 
-void acb_theta_newton_set_matrix(acb_theta_newton_t ctx, slong k, const acb_mat_t tau,
-				 const fmpz_mat_t N, slong prec);
+void acb_theta_agm_ctx_set_matrix(acb_theta_agm_ctx_t ctx, slong k, const acb_mat_t tau,
+				  const fmpz_mat_t N, slong prec);
 
-void acb_theta_newton_eval(acb_ptr r, acb_scrptr th, const acb_theta_newton_t ctx, slong prec);
+void acb_theta_agm_ctx_matrices(fmpz_mat_struct* Ni, slong k, slong g);
 
-void acb_theta_newton_fd(acb_mat_t fd, acb_srcptr th, const arb_t eta,
-			 const acb_theta_newton_t ctx, slong prec);
+void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slong prec);
 
-void acb_theta_newton_try_matrices(fmpz_mat_struct* Ni, slong k, slong g);
+int acb_theta_agm_ctx_is_valid(const acb_theta_agm_ctx_t ctx);
 
-void acb_theta_newton_set_all(acb_theta_newton_t ctx, const acb_mat_t tau, slong prec);
 
-/* Ideas:
-   - attempt setup at default prec, if not, double (up to prec/4?)
-   - necessary to write generic newton?
-*/
+/* Newton iterations */
 
-/* AGM/Newton algorithms */
+void acb_theta_newton_eval(acb_ptr r, acb_scrptr th, const acb_theta_agm_ctx_t ctx, slong prec);
 
-void acb_theta_agm_half_proj(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, acb_srcptr z, slong prec);
+void acb_theta_newton_fd(acb_ptr r, acb_mat_t fd, acb_srcptr th, const arb_t eta,
+			 const acb_theta_agm_ctx_t ctx, slong prec);
 
-void acb_theta_agm_const_half_proj(acb_ptr th, acb_ptr dth, fmpz_mat_struct* gamma, const acb_mat_t tau, slong prec);
+void acb_theta_newton_logs(slong* log_max, slong* log_rho, slong* log_B1, slong* log_B2,
+			   slong* log_B3, const acb_theta_agm_ctx_t ctx);
 
-void acb_theta_agm_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
+slong acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err, const acb_mat_t tau,
+			     const acb_theta_agm_ctx_t ctx, slong prec);
 
-void acb_theta_agm_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
+slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
+			    const acb_theta_agm_ctx_t, slong prec);
+
+
+/* AGM/Newton algorithms for theta functions */
+
+void acb_theta_newton_const_half_proj(acb_ptr th, acb_ptr dth, const acb_mat_t tau, slong prec);
+
+void acb_theta_newton_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
+
+void acb_theta_newton_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
 
 /* Mixed naive-AGM algorithms */
