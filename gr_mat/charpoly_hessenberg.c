@@ -15,7 +15,7 @@
 
 /* todo: optimize; rewrite using underscore methods */
 int
-_gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+_gr_mat_charpoly_from_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     slong n;
     gr_poly_struct * P;
@@ -38,25 +38,27 @@ _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     status |= gr_poly_one(P, ctx);
     status |= gr_poly_set_coeff_si(x, 1, 1, ctx);
 
-    for (m = 1; m < n + 1; m++)
+    for (m = 1; m <= n; m++)
     {
+        /* P[m] = (x - A[m-1, m-1])*P[m-1] */
         status |= gr_poly_set_scalar(v, GR_MAT_ENTRY(mat, m - 1, m - 1, sz), ctx);
         status |= gr_poly_sub(v, x, v, ctx);
-        status |= gr_poly_mul(P + m + 1 - 1, v, P + m - 1, ctx);
-        status |= gr_one(t, ctx);
+        status |= gr_poly_mul(P + m, v, P + m - 1, ctx);
 
+        status |= gr_one(t, ctx);
         for (i = 1; i < m; i++)
         {
             status |= gr_mul(t, t, GR_MAT_ENTRY(mat, m - i + 1 - 1, m - i - 1, sz), ctx);
             status |= gr_poly_mul_scalar(v, P + m - i - 1, GR_MAT_ENTRY(mat, m - i - 1, m - 1, sz), ctx);
             status |= gr_poly_mul_scalar(v, v, t, ctx);
-            status |= gr_poly_sub(P + m + 1 - 1, P + m + 1 - 1, v, ctx);
+            status |= gr_poly_sub(P + m, P + m, v, ctx);
         }
     }
 
     /* for the zero ring (?) */
     status |= _gr_vec_zero(res, n + 1, ctx);
-    status |= _gr_vec_set(res, (P + n + 1 - 1)->coeffs, FLINT_MIN(n + 1, (P + n + 1 - 1)->length), ctx);
+    /* res = P[n] */
+    status |= _gr_vec_set(res, (P + n)->coeffs, FLINT_MIN(n + 1, (P + n)->length), ctx);
 
     for (i = 0; i <= n; i++)
         gr_poly_clear(P + i, ctx);
@@ -71,7 +73,7 @@ _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
 }
 
 int
-gr_mat_charpoly_hessenberg(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_charpoly_from_hessenberg(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
 {
     int status;
 
@@ -80,7 +82,66 @@ gr_mat_charpoly_hessenberg(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
 
     gr_poly_fit_length(cp, mat->r + 1, ctx);
     _gr_poly_set_length(cp, mat->r + 1, ctx);
-    status = _gr_mat_charpoly_hessenberg(cp->coeffs, mat, ctx);
+    status = _gr_mat_charpoly_from_hessenberg(cp->coeffs, mat, ctx);
+    _gr_poly_normalise(cp, ctx);   /* only needed for the zero ring */
+    return status;
+}
+
+
+int
+_gr_mat_charpoly_gauss(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    gr_mat_t t;
+    int status;
+    gr_mat_init(t, mat->r, mat->r, ctx);
+    status = gr_mat_hessenberg_gauss(t, mat, ctx);
+    if (status == GR_SUCCESS)
+        status = _gr_mat_charpoly_from_hessenberg(res, t, ctx);
+
+    gr_mat_clear(t, ctx);
+    return status;
+}
+
+int
+gr_mat_charpoly_gauss(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    int status;
+
+    if (mat->r != mat->c)
+        return GR_DOMAIN;
+
+    gr_poly_fit_length(cp, mat->r + 1, ctx);
+    _gr_poly_set_length(cp, mat->r + 1, ctx);
+    status = _gr_mat_charpoly_gauss(cp->coeffs, mat, ctx);
+    _gr_poly_normalise(cp, ctx);   /* only needed for the zero ring */
+    return status;
+}
+
+int
+_gr_mat_charpoly_householder(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    gr_mat_t t;
+    int status;
+    gr_mat_init(t, mat->r, mat->r, ctx);
+    status = gr_mat_hessenberg_householder(t, mat, ctx);
+    if (status == GR_SUCCESS)
+        status = _gr_mat_charpoly_from_hessenberg(res, t, ctx);
+
+    gr_mat_clear(t, ctx);
+    return status;
+}
+
+int
+gr_mat_charpoly_householder(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    int status;
+
+    if (mat->r != mat->c)
+        return GR_DOMAIN;
+
+    gr_poly_fit_length(cp, mat->r + 1, ctx);
+    _gr_poly_set_length(cp, mat->r + 1, ctx);
+    status = _gr_mat_charpoly_householder(cp->coeffs, mat, ctx);
     _gr_poly_normalise(cp, ctx);   /* only needed for the zero ring */
     return status;
 }

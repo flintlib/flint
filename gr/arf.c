@@ -1043,6 +1043,8 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arf_poly_mullow},
 */
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arf_mat_mul},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
+    {GR_METHOD_MAT_FIND_NONZERO_PIVOT,     (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
 
     {0,                         (gr_funcptr) NULL},
 };

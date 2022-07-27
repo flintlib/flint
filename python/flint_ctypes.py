@@ -239,6 +239,7 @@ class gr_ctx:
         self._data = gr_ctx_struct()
         self._ref = ctypes.byref(self._data)
         self._str = None
+        self._refcount = 1
 
     def _repr(self):
         if self._str is None:
@@ -259,10 +260,19 @@ class gr_ctx:
         return self._repr()
 
     def __del__(self):
-        # fixme: may be unsafe; python can call
-        # finalizers out of order
-        libgr.gr_ctx_clear(self._ref)
+        self._decrement_refcount()
 
+    def _decrement_refcount(self):
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+
+    # todo
+    def i(self):
+        return self().i()
+
+    def pi(self):
+        return self().pi()
 
 
 class gr_elem:
@@ -280,6 +290,7 @@ class gr_elem:
         self._data = self._struct_type()
         self._ref = ctypes.byref(self._data)
         libgr.gr_init(self._ref, self._ctx)
+        self._ctx_python._refcount += 1
         if val is not None:
             typ = type(val)
             status = GR_UNABLE
@@ -313,6 +324,7 @@ class gr_elem:
 
     def __del__(self):
         libgr.gr_clear(self._ref, self._ctx)
+        self._ctx_python._decrement_refcount()
 
     def parent(self):
         """
@@ -394,6 +406,7 @@ class gr_elem:
                 status = ops[1](res._ref, self._ref, other, self._ctx)
             else:
                 other = ZZ(other)
+                res = type(self)(context=self._ctx_python)
                 status = ops[2](res._ref, self._ref, other._ref, self._ctx)
         elif self_type is int:
             return other._binary_op2(ZZ(self), other, ops, rstr)
@@ -1001,8 +1014,8 @@ class PolynomialRing_gr_poly(gr_ctx):
     def __init__(self, coefficient_ring):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
-        if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
-            raise ValueError("coefficient structure must be a ring")
+        #if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
+        #    raise ValueError("coefficient structure must be a ring")
         libgr.gr_ctx_init_polynomial(self._ref, coefficient_ring._ref)
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_poly
@@ -1187,14 +1200,14 @@ class Mat(gr_ctx):
 
     def __init__(self, element_domain, nrows=None, ncols=None):
         assert isinstance(element_domain, gr_ctx)
+        assert (nrows is None) or (0 <= nrows <= WORD_MAX)
+        assert (ncols is None) or (0 <= ncols <= WORD_MAX)
         gr_ctx.__init__(self)
         if nrows is None and ncols is None:
             libgr.gr_ctx_init_matrix_domain(self._ref, element_domain._ref)
         else:
             if ncols is None:
                 ncols = nrows
-            assert 0 <= nrows <= WORD_MAX
-            assert 0 <= ncols <= WORD_MAX
             libgr.gr_ctx_init_matrix_space(self._ref, element_domain._ref, nrows, ncols)
         self._element_ring = element_domain
         self._elem_type = gr_mat
@@ -1296,8 +1309,120 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def pascal(self, triangular=0):
+        element_ring = self.parent()._element_ring
+        res = self.parent()()
+        status = libgr.gr_mat_pascal(res._ref, triangular, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def stirling(self, kind=0):
+        element_ring = self.parent()._element_ring
+        res = self.parent()()
+        status = libgr.gr_mat_stirling(res._ref, kind, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def hilbert(self):
+        element_ring = self.parent()._element_ring
+        res = self.parent()()
+        status = libgr.gr_mat_hilbert(res._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def hadamard(self):
+        element_ring = self.parent()._element_ring
+        res = self.parent()()
+        status = libgr.gr_mat_hadamard(res._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def charpoly(self, R, algorithm=None):
+        mat_ring = self.parent()
+        poly_ring = R
+        element_ring = mat_ring._element_ring
+        poly_element_ring = poly_ring._coefficient_ring
+        assert element_ring is poly_element_ring
+        res = poly_ring()
+        if algorithm is None:
+            status = libgr.gr_mat_charpoly(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "berkowitz":
+            status = libgr.gr_mat_charpoly_berkowitz(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "gauss":
+            status = libgr.gr_mat_charpoly_gauss(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "householder":
+            status = libgr.gr_mat_charpoly_householder(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "danilevsky":
+            status = libgr.gr_mat_charpoly_danilevsky(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "faddeev":
+            status = libgr.gr_mat_charpoly_faddeev(res._ref, None, self._ref, element_ring._ref)
+        elif algorithm == "faddeev_bsgs":
+            status = libgr.gr_mat_charpoly_faddeev_bsgs(res._ref, None, self._ref, element_ring._ref)
+        else:
+            raise ValueError("unknown algorithm")
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def hessenberg(self, algorithm=None):
+        element_ring = self.parent()._element_ring
+        res = self.parent()()
+        if algorithm is None:
+            status = libgr.gr_mat_hessenberg(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "gauss":
+            status = libgr.gr_mat_hessenberg_gauss(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "householder":
+            status = libgr.gr_mat_hessenberg_householder(res._ref, self._ref, element_ring._ref)
+        else:
+            raise ValueError("unknown algorithm")
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+
     #def __getitem__(self, i):
     #    pass
+
+
+"""
+
+from flint import *;
+B = Mat(RR, 3, 3)([[1, 38, 64], [-1, 295147905110633349120, -3], [-84, 0, 0]]);
+B.hessenberg()
+
+
+from random import randint
+RR.prec = 53
+B = Mat(RR, 100, 100)(100, 100, [randint(-2**RR.prec,2**RR.prec) for i in range(10000)])
+B.charpoly(RRx, algorithm="faddeev")
+B.charpoly(RRx, algorithm="danilevsky")
+B.charpoly(RRx, algorithm="berkowitz")
+
+A = Mat(ZZ, 3, 3)([[1, 38, 64],
+[-1, 295147905110633349120, -3],
+[-84, 0, 0]])
+A.charpoly(ZZx)
+
+from flint import *
+B = Mat(QQ, 3, 3)([[1, 38, 64], [-1, 295147905110633349120, -3], [-84, 0, 0]]);
+B.charpoly(QQx, algorithm="faddeev")
+B.charpoly(QQx, algorithm="hessenberg")
+B.charpoly(QQx)
+
+
+
+
+"""
 
 
 libgr.gr_mat_entry_ptr.argtypes = (ctypes.c_void_p, c_slong, c_slong, ctypes.POINTER(gr_ctx_struct))

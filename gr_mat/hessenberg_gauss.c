@@ -49,7 +49,7 @@ gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     have_addmul = (addmul != (gr_method_binary_op) gr_generic_addmul);
 
 #define ADDMUL(z, x, y) \
-    if (have_addmul || 1) \
+    if (have_addmul) \
     { \
         status |= addmul(z, x, y, ctx); \
     } \

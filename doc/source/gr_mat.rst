@@ -199,7 +199,9 @@ Arithmetic
 Gaussian elimination
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
+.. function:: int gr_mat_find_nonzero_pivot_large_abs(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
+              int gr_mat_find_nonzero_pivot_generic(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
+              int gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
 
     Attempts to find a nonzero element in column number *column*
     of the matrix *mat* in a row between *start_row* (inclusive)
@@ -418,40 +420,43 @@ Inverse and adjugate
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
+.. function:: int _gr_mat_charpoly(gr_ptr res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Computes the characteristic polynomial using a default
+    algorithm choice. The
+    underscore method assumes that *res* is a preallocated
+    array of `n + 1` coefficients.
+
 .. function:: int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
     Sets *res* to the characteristic polynomial of the square matrix
     *mat*, computed using the division-free Berkowitz algorithm.
     The number of operations is `O(n^4)` where *n* is the
-    size of the matrix. The
-    underscore method assumes that *res* is a preallocated
-    array of `n + 1` coefficients.
+    size of the matrix.
 
 .. function:: int _gr_mat_charpoly_danilevsky_inplace(gr_ptr res, gr_mat_t mat, gr_ctx_t ctx)
               int _gr_mat_charpoly_danilevsky(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_danilevsky(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+              int _gr_mat_charpoly_gauss(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_gauss(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+              int _gr_mat_charpoly_householder(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_householder(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
     Sets *res* to the characteristic polynomial of the square matrix
-    *mat*, computed using the Danilevsky algorithm.
-    The number of operations is `O(n^3)` where *n* is the
-    size of the matrix. The
-    underscore method assumes that *res* is a preallocated
-    array of `n + 1` coefficients.
-    The *inplace* version overwrites the input matrix.
+    *mat*, computed using the Danilevsky algorithm,
+    Hessenberg reduction using Gaussian elimination,
+    and Hessenberg reduction using Householder reflections.
+    The number of operations of each method is `O(n^3)` where *n* is the
+    size of the matrix. The *inplace* version overwrites the input matrix.
 
-    This method requires divisions and can therefore fail when the
-    ring is not a field, but will sometimes succeed anywyay. It
-    also requires testing for zero. It returns
-    the ``GR_UNABLE`` or ``GR_DOMAIN`` flag when an impossible division
+    These methods require divisions and can therefore fail when the
+    ring is not a field. They also require zero tests.
+    The *householder* version also requires square roots.
+    The flags ``GR_UNABLE`` or ``GR_DOMAIN`` are returned when
+    an impossible division or square root
     is encountered or when a comparison cannot be performed.
-
-.. function:: int _gr_mat_charpoly_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
-              int gr_mat_charpoly_hessenberg(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
-
-    Sets *res* to the characteristic polynomial of the square matrix
-    *mat*, which is assumed to be in Hessenberg form (this is
-    currently not checked).
 
 .. function:: int _gr_mat_charpoly_faddeev(gr_ptr res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_faddeev(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
@@ -473,6 +478,13 @@ Characteristic polynomial
     therefore fail (returning the ``GR_UNABLE`` or ``GR_DOMAIN`` flags)
     in finite characteristic or when the underlying ring does
     not implement a division algorithm.
+
+.. function:: int _gr_mat_charpoly_from_hessenberg(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_from_hessenberg(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the characteristic polynomial of the square matrix
+    *mat*, which is assumed to be in Hessenberg form (this is
+    currently not checked).
 
 Hessenberg form
 -------------------------------------------------------------------------------

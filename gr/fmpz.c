@@ -561,6 +561,13 @@ _gr_fmpz_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_mat_det(fmpz_t res, const fmpz_mat_t x, const gr_ctx_t ctx)
+{
+    fmpz_mat_det(res, x);
+    return GR_SUCCESS;
+}
+
 
 int _fmpz_methods_initialized = 0;
 
@@ -654,6 +661,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mat_mul},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
 

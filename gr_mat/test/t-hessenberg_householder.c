@@ -55,7 +55,7 @@ int main()
         status |= gr_mat_charpoly_berkowitz(f, A, ctx);
 
         if (n_randint(state, 2))
-            status |= gr_mat_charpoly_hessenberg(g, B, ctx);
+            status |= gr_mat_charpoly_from_hessenberg(g, B, ctx);
         else
             status |= gr_mat_charpoly_berkowitz(g, B, ctx);
 

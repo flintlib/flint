@@ -11,15 +11,36 @@
 
 #include "gr_mat.h"
 
-/* todo: algorithm selection */
 int
-gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+gr_mat_det_generic_field(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
-    /* return gr_mat_det_lu(res, A, ctx); */
-    /* return gr_mat_det_bareiss(res, A, ctx); */
+    if (A->r <= 4)
+        return gr_mat_det_cofactor(res, A, ctx);
+    else
+        return gr_mat_det_lu(res, A, ctx);
+}
 
+int
+gr_mat_det_generic_integral_domain(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+{
+    if (A->r <= 4)
+        return gr_mat_det_cofactor(res, A, ctx);
+    else
+        return gr_mat_det_bareiss(res, A, ctx);
+}
+
+
+int
+gr_mat_det_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+{
     if (A->r <= 4)
         return gr_mat_det_cofactor(res, A, ctx);
     else
         return gr_mat_det_berkowitz(res, A, ctx);
+}
+
+int
+gr_mat_det(gr_ptr res, const gr_mat_t x, gr_ctx_t ctx)
+{
+    return GR_MAT_UNARY_OP_GET_SCALAR(ctx, MAT_DET)(res, x, ctx);
 }

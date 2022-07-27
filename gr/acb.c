@@ -805,6 +805,13 @@ _gr_acb_mat_mul(acb_mat_t res, const acb_mat_t x, const acb_mat_t y, gr_ctx_t ct
 }
 
 int
+_gr_acb_mat_det(acb_t res, const acb_mat_t x, gr_ctx_t ctx)
+{
+    acb_mat_det(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_ctx_clear(gr_ctx_t ctx)
 {
     flint_free(ctx->elem_ctx);
@@ -911,6 +918,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acb_mat_mul},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_acb_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
 

@@ -1079,6 +1079,13 @@ _gr_ca_mat_mul(ca_mat_t res, const ca_mat_t x, const ca_mat_t y, gr_ctx_t ctx)
 }
 
 int
+_gr_ca_mat_det(ca_t res, const ca_mat_t x, gr_ctx_t ctx)
+{
+    ca_mat_det(res, x, GR_CA_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_ca_ctx_clear(gr_ctx_t ctx)
 {
     ca_ctx_clear(GR_CA_CTX(ctx));
@@ -1096,6 +1103,21 @@ truth_t
 _gr_ca_ctx_is_ordered_ring(gr_ctx_t ctx)
 {
     return (ctx->which_ring == GR_CTX_RR_CA || ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA) ? T_TRUE : T_FALSE;
+}
+
+int
+_gr_ca_mat_find_nonzero_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx)
+{
+    truth_t ok;
+
+    ok = ca_mat_find_pivot(pivot_row, mat, start_row, end_row, column, GR_CA_CTX(ctx));
+
+    if (ok == T_TRUE)
+        return GR_SUCCESS;
+    else if (ok == T_FALSE)
+        return GR_DOMAIN;
+    else
+        return GR_UNABLE;
 }
 
 int _ca_methods_initialized = 0;
@@ -1211,6 +1233,8 @@ gr_method_tab_input _ca_methods_input[] =
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_ca_mat_det},
+    {GR_METHOD_MAT_FIND_NONZERO_PIVOT,      (gr_funcptr) _gr_ca_mat_find_nonzero_pivot},
 
     {0,                         (gr_funcptr) NULL},
 };
