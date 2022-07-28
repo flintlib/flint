@@ -8,7 +8,6 @@ void acb_theta_agm_ctx_set_matrix(acb_theta_agm_ctx_t ctx, slong k, const acb_ma
   acb_mat_t z;
   arb_t abs;
   arb_t m;
-  arf_t up;
   slong g = acb_mat_nrows(tau);
   slong n = 1<<g;
   slong i, j;
@@ -22,7 +21,7 @@ void acb_theta_agm_ctx_set_matrix(acb_theta_agm_ctx_t ctx, slong k, const acb_ma
   
   acb_siegel_transform(z, N, tau, prec);
   nb_bad = acb_theta_agm_nb_bad_steps(z, prec);
-  arb_theta_agm_ctx_reset_steps(ctx, k, nb_bad);
+  acb_theta_agm_ctx_reset_steps(ctx, k, nb_bad);
 
   for (i = 0; i < nb_bad; i++)
     {

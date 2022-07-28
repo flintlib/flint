@@ -11,7 +11,7 @@ static void fmpz_mat_Mi(fmpz_mat_t N, slong i)
   fmpz_zero(fmpz_mat_entry(N, i+g, i+g));
 }
 
-static void fmpz_mat_Nij(fmpz_mat N, slong i, slong j)
+static void fmpz_mat_Nij(fmpz_mat_t N, slong i, slong j)
 {  
   slong g = fmpz_mat_nrows(N)/2;
 
@@ -43,7 +43,7 @@ void acb_theta_agm_ctx_matrices(fmpz_mat_struct* Ni, slong k, slong g)
     {
       fmpz_mat_Mi(&Ni[1], 0);
       fmpz_mat_Mi(&Ni[2], 1);
-      fmpz_mat_Nij(&Nij[3], 0, 1);      
+      fmpz_mat_Nij(&Ni[3], 0, 1);      
     }
   else
     {

@@ -106,6 +106,7 @@ void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ch, const fmpz_mat_t eta);
 
+void acb_theta_transform_sqr_proj(acb_ptr r, acb_srcptr th, const fmpz_mat_t N, slong prec);
 
 /* Ellipsoids for naive algorithms */
 
@@ -270,6 +271,8 @@ void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
+void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec);
+
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
@@ -302,33 +305,31 @@ void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound, slong
 
 /* AGM sequences */
 
-void acb_theta_agm_hadamard(acb_ptr r, acb_ptr s, slong g, slong prec);
+void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr s, slong g, slong prec);
 
-void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t r0, slong prec);
+void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t roots, slong prec);
 
 void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr r0, slong g, slong prec);
+void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g, slong prec);
 
 void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr r0, slong g, slong prec);
+void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g, slong prec);
 
 void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-int acb_theta_agm_is_reached(acb_srcptr a, slong prec);
+void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
+		   slong nb_bad, slong nb_good, slong g, slong prec);
 
-void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_r0, slong nb_bad,
-		   slong nb_total, slong g, slong prec);
-
-void acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_r0, slong nb_bad,
-		       slong nb_total, slong g, slong prec);
+void acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
+		       slong nb_bad, slong nb_good, slong g, slong prec);
 
 slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
 
-slong acb_theta_agm_nb_good_steps(slong g, slong prec);
+slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec);
 
 
 /* Context for Newton iterations */
@@ -337,7 +338,7 @@ slong acb_theta_agm_nb_good_steps(slong g, slong prec);
 #define ACB_THETA_AGM_NB_MATRIX_SETUPS 10
 #define ACB_THETA_AGM_BASEPREC 2000
 #define ACB_THETA_AGM_BASEPREC_MAXQ 4
-#define ACB_THETA_AGM_GUARD 25
+#define ACB_THETA_AGM_GUARD 5
 
 typedef struct
 {
@@ -355,7 +356,7 @@ typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 
 #define acb_theta_agm_ctx_g(ctx) ((ctx)->g)
 #define acb_theta_agm_ctx_nb(ctx) ((ctx)->nb)
-#define acb_theta_agm_ctx_matrix(ctx, k)) (&(ctx)->matrices[(k)])
+#define acb_theta_agm_ctx_matrix(ctx, k) (&(ctx)->matrices[(k)])
 #define acb_theta_agm_ctx_nb_bad_steps(ctx, k) ((ctx)->nb_bad_steps[(k)])
 #define acb_theta_agm_ctx_roots(ctx, k) ((ctx)->roots[(k)])
 #define acb_theta_agm_ctx_mi(ctx, k) ((ctx)->mi[(k)])
@@ -383,7 +384,7 @@ int acb_theta_agm_ctx_is_valid(const acb_theta_agm_ctx_t ctx);
 
 /* Newton iterations */
 
-void acb_theta_newton_eval(acb_ptr r, acb_scrptr th, const acb_theta_agm_ctx_t ctx, slong prec);
+void acb_theta_newton_eval(acb_ptr r, acb_srcptr th, const acb_theta_agm_ctx_t ctx, slong prec);
 
 void acb_theta_newton_fd(acb_ptr r, acb_mat_t fd, acb_srcptr th, const arb_t eta,
 			 const acb_theta_agm_ctx_t ctx, slong prec);

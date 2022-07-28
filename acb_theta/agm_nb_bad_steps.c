@@ -24,12 +24,12 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
   /* Set lambda0 such that 3g exp(-lambda0) = 1/50 */
   arb_one(lambda0);
   arb_div_si(lambda0, lambda0, 150*g, prec);
-  arb_log(lambda0, lambda0);
+  arb_log(lambda0, lambda0, prec);
   arb_neg(lambda0, lambda0);
 
   /* Compute n, minimal s.t. 2^n lambda > lambda0 */
-  arb_div(lambda, lambda0, lambda);  
-  arb_get_ubound_arf(up, lambda);
+  arb_div(lambda, lambda0, lambda, prec);  
+  arb_get_ubound_arf(up, lambda, prec);
   arf_frexp(up, e, up);
   res = fmpz_get_si(e);
 

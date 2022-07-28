@@ -5,7 +5,6 @@ void acb_theta_newton_run(acb_ptr r, const acb_mat_t tau, const acb_theta_agm_ct
 			  slong prec)
 {
   slong n = acb_theta_agm_ctx_nb(ctx);
-  slong g = acb_theta_agm_ctx_g(ctx);
   slong log_max, log_rho, log_B1, log_B2, log_B3;
   acb_ptr im;
   arf_t err;

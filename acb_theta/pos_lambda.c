@@ -4,7 +4,6 @@
 void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t m, slong prec)
 {
   arb_poly_t poly;
-  slong g = arb_mat_nrows(m);
 
   arb_poly_init(poly);
   

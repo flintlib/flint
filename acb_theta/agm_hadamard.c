@@ -1,7 +1,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_agm_hadamard(acb_ptr r, acb_ptr s, slong g, slong prec)
+void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr s, slong g, slong prec)
 {
   acb_ptr v;
   slong half;
@@ -13,7 +13,7 @@ void acb_theta_agm_hadamard(acb_ptr r, acb_ptr s, slong g, slong prec)
       v = _acb_vec_init(1<<g);
       
       acb_theta_agm_hadamard(v, s, g-1, prec);
-      acb_theta_agm_hadamard(v + half, s + half, prec);
+      acb_theta_agm_hadamard(v + half, s + half, g-1, prec);
       _acb_vec_add(r, v, v + half, half, prec);
       _acb_vec_sub(r + half, v, v + half, half, prec);
       

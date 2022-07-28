@@ -6,6 +6,7 @@ void acb_theta_newton_logs(slong* log_max, slong* log_rho, slong* log_B1, slong*
 {
   arf_t c;
   fmpz_t e;
+  slong n = acb_theta_agm_ctx_nb(ctx);
   slong lowprec = ACB_THETA_AGM_LOWPREC;
 
   arf_init(c);
@@ -28,5 +29,5 @@ void acb_theta_newton_logs(slong* log_max, slong* log_rho, slong* log_B1, slong*
   *log_B3 = fmpz_get_si(e);
 
   arf_clear(c);
-  arf_clear(e);
+  fmpz_clear(e);
 }

@@ -24,7 +24,7 @@ static void agm_radius(arf_t rad, const arf_struct* mi, const arf_t M0,
       arf_sqrt(term, term, prec, ARF_RND_FLOOR);
       arf_mul(prod, prod, term, prec, ARF_RND_FLOOR);
       
-      if (j == nb_bad_steps[k] - 1) arf_mul(term, minf, prod, prec, ARF_RND_FLOOR);
+      if (j == nb - 1) arf_mul(term, minf, prod, prec, ARF_RND_FLOOR);
       else arf_mul(term, &mi[j+1], prod, prec, ARF_RND_FLOOR);
       arf_mul_2exp_si(term, term, -1);
       arf_min(res, res, term);
@@ -75,7 +75,7 @@ static void propagate_rho(arf_t rho, const arf_t r, acb_srcptr th_proj,
       arb_div(abs, abs_0, abs, prec);
       arb_mul(abs, abs, abs_0, prec);
       arb_min(abs, abs, abs_0, prec);
-      arb_mul_2exp_si(abs, abs, -1, prec);
+      arb_mul_2exp_si(abs, abs, -1);
       arb_get_lbound_arf(bound, abs, prec);
       arf_min(res, res, bound);
     }
@@ -111,6 +111,7 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
   fmpz_t e;
   slong exp;
   arb_t eta;
+  acb_ptr r;
   acb_mat_t fd, fdinv;
   arb_t norm, bound, test;  
   slong lowprec = ACB_THETA_AGM_LOWPREC;  
@@ -127,6 +128,7 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
   arf_init(B2);
   fmpz_init(e);
   arb_init(eta);
+  r = _acb_vec_init(n-1);
   acb_mat_init(fd, n-1, n-1);
   acb_mat_init(fdinv, n-1, n-1);
   arb_init(norm);
@@ -139,7 +141,7 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
   while (!stop && (try < ACB_THETA_AGM_NB_MATRIX_SETUPS))
     {
       try++;
-      acb_theta_agm_matrices(acb_theta_agm_ctx_matrix(ctx, 0), try, g);
+      acb_theta_agm_ctx_matrices(acb_theta_agm_ctx_matrix(ctx, 0), try, g);
       arf_pos_inf(acb_theta_agm_ctx_rho(ctx));
       arf_zero(acb_theta_agm_ctx_max(ctx));
       
@@ -158,20 +160,18 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
 	  /* Propagate radius according to quotients & duplication */
 	  propagate_rho(rad, rad, th, acb_theta_agm_ctx_matrix(ctx, k), lowprec);
 	  arf_min(acb_theta_agm_ctx_rho(ctx),
-		  acb_theta_agm_ctx_rho(ctx), rad, lowprec);
+		  acb_theta_agm_ctx_rho(ctx), rad);
 	  
 	  /* Update maximum value of Borchardt quotients */
 	  arf_div(rad, acb_theta_agm_ctx_M0(ctx, k),
 		  acb_theta_agm_ctx_minf(ctx, k), lowprec, ARF_RND_CEIL);
 	  arf_mul_2exp_si(rad, rad, 1);
 	  arf_max(acb_theta_agm_ctx_max(ctx),
-		  acb_theta_agm_ctx_max(ctx), rad, lowprec);
-
-	  _arb_vec_clear(mi, nb_bad_steps[k]);
+		  acb_theta_agm_ctx_max(ctx), rad);
 	}
 
       if (!arf_is_finite(acb_theta_agm_ctx_max(ctx))) continue;
-      if (!arf_is_positive(acb_theta_agm_ctx_rho(ctx))) continue;
+      if (arf_cmp_si(acb_theta_agm_ctx_rho(ctx), 0) <= 0) continue;
 
       /* Evaluate finite difference */
       acb_theta_cauchy(B2, acb_theta_agm_ctx_rho(ctx),
@@ -180,16 +180,16 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
       exp = fmpz_get_si(e);
       arb_one(eta);
       arb_mul_2exp_si(eta, eta, FLINT_MIN(-exp-n_clog(n,2), -prec/2));
-      acb_theta_agm_ctx_fd(fd, th, eta, ctx, prec);
-      res = acb_mat_inv(fdinv, fd);
+      acb_theta_newton_fd(r, fd, th, eta, ctx, prec);
+      res = acb_mat_inv(fdinv, fd, prec);
       if (!res) continue;
       
       /* Is ||FD^-1||*n*B2*eta less than 1? */
       acb_mat_ninf(norm, fdinv, lowprec);
-      arb_mul(bound, norm, B2, lowprec);
+      arb_mul_arf(bound, norm, B2, lowprec);
       arb_mul_si(bound, bound, n, lowprec);
       arb_mul(bound, bound, eta, lowprec);
-      arb_sub_si(test, prod, 1, lowprec);
+      arb_sub_si(test, bound, 1, lowprec);
       if (!arb_is_negative(test)) continue;
 
       /* Get inv_der */
@@ -206,6 +206,7 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
   arf_clear(B2);
   fmpz_clear(e);
   arb_clear(eta);
+  _acb_vec_clear(r, n-1);
   acb_mat_clear(fd);
   acb_mat_clear(fdinv);
   arb_clear(norm);

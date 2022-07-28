@@ -9,9 +9,8 @@ void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong pre
   
   slong g = acb_mat_nrows(tau);
   slong n = 1<<g;
-  slong lowprec = ACB_THETA_AGM_CTX_LOWPREC;
-  slong baseprec = ACB_THETA_AGM_CTX_BASEPREC;
-  slong k;
+  slong baseprec = ACB_THETA_AGM_BASEPREC;
+  /* slong k; */
   int stop = 0;
   int naive = 0;
   
@@ -34,7 +33,7 @@ void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong pre
       if (!acb_theta_agm_ctx_is_valid(ctx))
 	{	  
 	  baseprec *=2;
-	  if (baseprec > prec / ACB_THETA_AGM_CTX_BASEPREC_MAXQ)
+	  if (baseprec > prec / ACB_THETA_AGM_BASEPREC_MAXQ)
 	    {
 	      stop = 1;
 	      naive = 1;
@@ -64,5 +63,5 @@ void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong pre
   /*for (k = 0; k < 2; k++) acb_mat_clear(&jet[k]);
     flint_free(jet);*/
   acb_mat_clear(half);
-  acb_theta_newton_clear(ctx);
+  acb_theta_agm_ctx_clear(ctx);
 }

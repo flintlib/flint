@@ -12,7 +12,6 @@
 slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
 			    const acb_theta_agm_ctx_t ctx, slong prec)
 {
-  slong g = acb_theta_agm_ctx_g(ctx);
   slong n = acb_theta_agm_ctx_nb(ctx); /* dimension is n-1 */
   slong log_max, log_rho, log_B1, log_B2, log_B3;
   slong log_eta, nextprec, nprime;
@@ -21,6 +20,7 @@ slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
   acb_ptr f;
   acb_mat_t h;
   int res;
+  slong k;
 
   arb_init(eta);
   acb_mat_init(fd, n-1, n-1);
@@ -37,7 +37,7 @@ slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
   arb_mul_2exp_si(eta, eta, log_eta);
 
   /* Compute correction */
-  acb_theta_newton_fd(r, fd, current, eta, ctx, nextprec);
+  acb_theta_newton_fd(f, fd, current, eta, ctx, nextprec);
   res = acb_mat_inv(fd, fd, nextprec);
   if (!res)
     {
@@ -57,8 +57,8 @@ slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
   nprime = 2*n - log_B2 - log_B3 - 2;
   for (k = 0; k < n-1; k++)
     {
-      if (mag_cmp_2exp_si(arb_magref(acb_realref(acb_mat_entry(h, k, 0))), -nprime-1) > 0
-	  || mag_cmp_2exp_si(arb_magref(acb_imagref(acb_mat_entry(h, k, 0))), -nprime-1) > 0)
+      if (mag_cmp_2exp_si(arb_radref(acb_realref(acb_mat_entry(h, k, 0))), -nprime-1) > 0
+	  || mag_cmp_2exp_si(arb_radref(acb_imagref(acb_mat_entry(h, k, 0))), -nprime-1) > 0)
 	{
 	  flint_printf("acb_theta_newton_step: Error (imprecise correction)\n");
 	  fflush(stdout);

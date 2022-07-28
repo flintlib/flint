@@ -3,9 +3,8 @@
 
 void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx)
 {
-  slong k, j;
+  slong k;
   slong n = acb_theta_agm_ctx_nb(ctx);
-  slong m;
   
   for (k = 0; k < n; k++) fmpz_mat_clear(acb_theta_agm_ctx_matrix(ctx, k));
   flint_free(ctx->matrices);

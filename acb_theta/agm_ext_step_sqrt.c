@@ -7,7 +7,7 @@ void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec)
   slong n = 1<<g;
   slong k;
 
-  v = acb_vec_init(2*n);
+  v = _acb_vec_init(2*n);
   
   acb_theta_agm_hadamard(v+n, a+n, g, prec);
   acb_theta_agm_hadamard(v, a, g, prec);

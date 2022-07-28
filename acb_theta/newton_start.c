@@ -4,18 +4,18 @@
 /* Output: im, start are exact. Return the absolute precision of start. */
 
 static void acb_theta_newton_target(acb_ptr im, const acb_mat_t tau,
-				    const acb_theta_agm_ctx_t ctx, slong prec);
+				    const acb_theta_agm_ctx_t ctx, slong prec)
 {
   slong g = acb_theta_agm_ctx_g(ctx);
   slong n = acb_theta_agm_ctx_nb(ctx);
   slong k;
   acb_mat_t w;
   fmpz_t epsilon;
-  acb_t zeta8, mu;
+  acb_t zeta, mu;
 
   acb_mat_init(w, g, g);
   fmpz_init(epsilon);
-  acb_init(zeta8);
+  acb_init(zeta);
   acb_init(mu);
 
   acb_one(zeta);
@@ -33,7 +33,7 @@ static void acb_theta_newton_target(acb_ptr im, const acb_mat_t tau,
 
   acb_mat_clear(w);
   fmpz_clear(epsilon);
-  acb_clear(zeta8);
+  acb_clear(zeta);
   acb_clear(mu);
 }
 
@@ -96,4 +96,5 @@ slong acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err, const acb_mat
   
   arf_clear(e);
   acb_mat_clear(half);
+  return prec;
 }
