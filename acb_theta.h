@@ -28,6 +28,7 @@ extern "C" {
    - Characteristics (a,b) are encoded as ulongs; first half is a, second half is b
 */
 
+
 /* Extras for arb_mat's and acb_mat's */
 
 void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
@@ -45,6 +46,8 @@ void arb_mat_randtest_sym_pos(arb_mat_t r, flint_rand_t state, slong prec, slong
 int arb_mat_is_nonsymmetric(const arb_mat_t m);
 
 void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t m, slong prec);
+
+void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec);
 
 void arb_mat_reduce(arb_mat_t r, fmpz_mat_t u, const arb_mat_t m, slong prec);
 
@@ -104,9 +107,10 @@ void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
-ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ch, const fmpz_mat_t eta);
+ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t N);
 
 void acb_theta_transform_sqr_proj(acb_ptr r, acb_srcptr th, const fmpz_mat_t N, slong prec);
+
 
 /* Ellipsoids for naive algorithms */
 
@@ -170,6 +174,7 @@ int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
 
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
+
 /* Choice of radii and precisions in naive algorithms */
 
 #define ACB_THETA_ELD_DEFAULT_PREC 50
@@ -185,6 +190,7 @@ slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dis
 			      slong step, slong ord);
 
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
+
 
 /* Precomputations for naive algorithms */
 /* For this to work, we assume that step is 1 or 2 and constant among ellipsoid layers */
@@ -298,9 +304,10 @@ void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau, slong o
 
 void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, slong prec);
 
-void acb_theta_bound_const(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau, slong prec);
 
-void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound, slong ord, slong prec);
+void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
+		      slong ord, slong dim, slong prec);
 
 
 /* AGM sequences */
@@ -426,8 +433,6 @@ void acb_theta_all_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
 
 /* Finite difference algorithms */
-
-void acb_theta_derivatives(acb_ptr dth, const acb_mat_t tau, const acb_mat_t dtau, acb_ptr z, acb_ptr dz, slong order, slong prec);
 
   
 /* #ifdef __cplusplus
