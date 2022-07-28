@@ -10,7 +10,7 @@
    a superior precision (as in paper) */
 
 slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
-			    const acb_theta_agm_ctx_t, slong prec)
+			    const acb_theta_agm_ctx_t ctx, slong prec)
 {
   slong g = acb_theta_agm_ctx_g(ctx);
   slong n = acb_theta_agm_ctx_nb(ctx); /* dimension is n-1 */

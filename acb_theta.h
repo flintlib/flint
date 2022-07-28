@@ -397,10 +397,13 @@ slong acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err, const acb_mat
 slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
 			    const acb_theta_agm_ctx_t, slong prec);
 
+void acb_theta_newton_run(acb_ptr r, const acb_mat_t tau, const acb_theta_agm_ctx_t ctx,
+			  slong prec);
+
 
 /* AGM/Newton algorithms for theta functions */
 
-void acb_theta_newton_const_half_proj(acb_ptr th, acb_ptr dth, const acb_mat_t tau, slong prec);
+void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec);
 
 void acb_theta_newton_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
 
