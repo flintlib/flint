@@ -1,7 +1,7 @@
 #include "dirichlet.h"
 #include "gr.h"
 
-#define DIRICHLET_CTX(ctx) ((dirichlet_group_struct *) ((ctx)->elem_ctx))
+#define DIRICHLET_CTX(ctx) ((dirichlet_group_struct *) (GR_CTX_DATA_AS_PTR(ctx)))
 
 int _gr_dirichlet_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -222,13 +222,13 @@ gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q)
 
     ctx->which_ring = GR_CTX_DIRICHLET_GROUP;
     ctx->sizeof_elem = sizeof(dirichlet_char_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(dirichlet_group_struct));
     ctx->size_limit = WORD_MAX;
+
+    GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(dirichlet_group_struct));
 
     if (!dirichlet_group_init(DIRICHLET_CTX(ctx), q))
     {
-        flint_free(ctx->elem_ctx);
-        ctx->elem_ctx = NULL;
+        flint_free(GR_CTX_DATA_AS_PTR(ctx));
         return GR_UNABLE;
     }
 

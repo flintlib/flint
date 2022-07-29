@@ -10,7 +10,7 @@ typedef struct
 }
 mpolynomial_ctx_t;
 
-#define MPOLYNOMIAL_CTX(ring_ctx) ((mpolynomial_ctx_t *)((ring_ctx)->elem_ctx))
+#define MPOLYNOMIAL_CTX(ring_ctx) ((mpolynomial_ctx_t *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 #define MPOLYNOMIAL_ELEM_CTX(ring_ctx) (MPOLYNOMIAL_CTX(ring_ctx)->base_ring)
 #define MPOLYNOMIAL_MCTX(ring_ctx) (MPOLYNOMIAL_CTX(ring_ctx)->mctx)
 
@@ -34,6 +34,7 @@ void
 mpolynomial_ctx_clear(gr_ctx_t ctx)
 {
     mpoly_ctx_clear(MPOLYNOMIAL_MCTX(ctx));
+    flint_free(GR_CTX_DATA_AS_PTR(ctx));
 }
 
 truth_t
@@ -220,7 +221,7 @@ gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_
 {
     ctx->which_ring = GR_CTX_GR_MPOLY;
     ctx->sizeof_elem = sizeof(gr_mpoly_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(mpolynomial_ctx_t));
+    GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(mpolynomial_ctx_t));
     ctx->size_limit = WORD_MAX;
 
     MPOLYNOMIAL_ELEM_CTX(ctx) = base_ring;

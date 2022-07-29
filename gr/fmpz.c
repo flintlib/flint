@@ -670,7 +670,6 @@ gr_ctx_init_fmpz(gr_ctx_t ctx)
 {
     ctx->which_ring = GR_CTX_FMPZ;
     ctx->sizeof_elem = sizeof(fmpz);
-    ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;
 
     ctx->methods = _fmpz_methods;

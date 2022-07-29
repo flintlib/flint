@@ -10,8 +10,10 @@ typedef struct
 }
 fmpz_mod_ctx_extended_struct;
 
-#define FMPZ_MOD_CTX(ring_ctx) (&(((fmpz_mod_ctx_extended_struct *)((ring_ctx)->elem_ctx))->ctx))
-#define FMPZ_MOD_IS_PRIME(ring_ctx) ((((fmpz_mod_ctx_extended_struct *)((ring_ctx)->elem_ctx))->is_prime))
+
+
+#define FMPZ_MOD_CTX(ring_ctx) (&(((fmpz_mod_ctx_extended_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))->ctx))
+#define FMPZ_MOD_IS_PRIME(ring_ctx) ((((fmpz_mod_ctx_extended_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))->is_prime))
 
 int
 _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -26,7 +28,7 @@ void
 _gr_fmpz_mod_ctx_clear(gr_ctx_t ctx)
 {
     fmpz_mod_ctx_clear(FMPZ_MOD_CTX(ctx));
-    flint_free(ctx->elem_ctx);
+    flint_free(GR_CTX_DATA_AS_PTR(ctx));
 }
 
 truth_t
@@ -482,7 +484,7 @@ gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
     ctx->which_ring = GR_CTX_FMPZ_MOD;
     ctx->sizeof_elem = sizeof(fmpz);
 
-    ctx->elem_ctx = flint_malloc(sizeof(fmpz_mod_ctx_extended_struct));
+    GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(fmpz_mod_ctx_extended_struct));
     fmpz_mod_ctx_init(FMPZ_MOD_CTX(ctx), n);
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
 

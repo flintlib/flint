@@ -3,13 +3,13 @@
 #include "flint/fq_poly.h"
 #include "flint/fq_mat.h"
 
-#define FQ_CTX(ring_ctx) ((fq_ctx_struct *)((ring_ctx)->elem_ctx))
+#define FQ_CTX(ring_ctx) ((fq_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
 void
 _gr_fq_ctx_clear(gr_ctx_t ctx)
 {
     fq_ctx_clear(FQ_CTX(ctx));
-    flint_free(ctx->elem_ctx);
+    flint_free(GR_CTX_DATA_AS_PTR(ctx));
 }
 
 int
@@ -389,7 +389,7 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 {
     ctx->which_ring = GR_CTX_FQ;
     ctx->sizeof_elem = sizeof(fq_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(fq_ctx_struct));
+    GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(fq_ctx_struct));
     ctx->size_limit = WORD_MAX;
 
     fq_ctx_init(FQ_CTX(ctx), p, d, var == NULL ? "a" : var);

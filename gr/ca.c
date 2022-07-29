@@ -4,7 +4,7 @@
 #include "fexpr.h"
 #include "gr.h"
 
-#define GR_CA_CTX(ring_ctx) ((ca_ctx_struct *)((ring_ctx)->elem_ctx))
+#define GR_CA_CTX(ring_ctx) ((ca_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
 int
 _gr_ca_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -1089,7 +1089,7 @@ int
 _gr_ca_ctx_clear(gr_ctx_t ctx)
 {
     ca_ctx_clear(GR_CA_CTX(ctx));
-    flint_free(ctx->elem_ctx);
+    flint_free(GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -1244,9 +1244,9 @@ _gr_ctx_init_ca(gr_ctx_t ctx, int which_ring)
 {
     ctx->which_ring = which_ring;
     ctx->sizeof_elem = sizeof(ca_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(ca_ctx_struct));
     ctx->size_limit = WORD_MAX;
 
+    GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(ca_ctx_struct));
     ca_ctx_init(GR_CA_CTX(ctx));
 
     ctx->methods = _ca_methods;

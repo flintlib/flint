@@ -789,7 +789,6 @@ gr_ctx_init_fmpq(gr_ctx_t ctx)
 {
     ctx->which_ring = GR_CTX_FMPQ;
     ctx->sizeof_elem = sizeof(fmpq);
-    ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;
 
     ctx->methods = _fmpq_methods;

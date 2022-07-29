@@ -419,6 +419,7 @@ typedef enum
 }
 gr_which_structure;
 
+/* large enough to hold any context data we want to store inline */
 #define GR_CTX_STRUCT_DATA_BYTES (6 * sizeof(ulong))
 
 typedef struct
@@ -426,13 +427,14 @@ typedef struct
     char data[GR_CTX_STRUCT_DATA_BYTES];
     ulong which_ring;
     ssize_t sizeof_elem;
-    void * elem_ctx;
     gr_funcptr * methods;
     ulong size_limit;
 }
 gr_ctx_struct;
 
 typedef gr_ctx_struct gr_ctx_t[1];
+
+#define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
 
 GR_INLINE slong gr_ctx_sizeof_ctx(gr_ctx_t ctx)
 {
