@@ -33,6 +33,8 @@ extern "C" {
 
 void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
+void acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad, flint_rand_t state, slong prec);
+
 void acb_mat_get_real(arb_mat_t re, const acb_mat_t tau);
 
 void acb_mat_get_imag(arb_mat_t im, const acb_mat_t tau);
@@ -88,6 +90,8 @@ void fmpz_mat_siegel_fd(fmpz_mat_t m, slong j);
 /* Siegel space */
 
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
+
+void acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state, slong prec);
 
 void acb_siegel_cocycle(acb_mat_t w, const fmpz_mat_t m, const acb_mat_t tau, slong prec);
 
@@ -314,7 +318,7 @@ void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr s, slong g, slong prec);
 
-void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t roots, slong prec);
+void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t root, slong prec);
 
 void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 

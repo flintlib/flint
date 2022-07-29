@@ -85,6 +85,24 @@ void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t epsilon,
   
   acb_theta_eld_fill(E, cho, normsqr, offset, NULL, ab >> g, eld_prec);
   
+  /* exponential error factor in terms of z */
+  for (k = 0; k < g; k++)
+    {
+      arb_set(arb_mat_entry(imz, k, 0), acb_imagref(&z[k]));	  
+    }
+  arb_mat_mul(imz, im, imz, prec);
+  arb_zero(normsqr);
+  for (k = 0; k < g; k++)
+    {
+      arb_sqr(pi, arb_mat_entry(imz, k, 0), prec);
+      arb_add(normsqr, normsqr, pi, prec);
+    }
+  arb_const_pi(pi, prec);
+  arb_mul(normsqr, normsqr, pi, prec);
+  arb_exp(normsqr, normsqr, prec);
+  arb_get_ubound_arf(R, normsqr, prec);
+  arf_mul(epsilon, epsilon, R, prec, ARF_RND_CEIL);
+    
   arf_clear(R);
   arb_mat_clear(im);
   arb_mat_clear(cho);  

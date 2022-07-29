@@ -33,6 +33,7 @@ int main()
       acb_theta_agm_hadamard(test, r, g, prec);
       _acb_vec_scalar_mul_2exp_si(test, test, n, -g);
 
+      res = 1;
       for (k = 0; k < n; k++)
 	{
 	  if (!acb_contains(&test[k], &s[k])) res = 0;

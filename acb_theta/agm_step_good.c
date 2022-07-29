@@ -8,5 +8,5 @@ void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec)
     {
       acb_sqrt(&r[k], &a[k], prec);
     }
-  acb_theta_agm_step_sqrt(r, r, g, prec);  
+  acb_theta_agm_step_sqrt(r, r, g, prec);
 }

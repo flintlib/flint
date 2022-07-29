@@ -45,13 +45,13 @@ static void invert_lin_plus_log(arf_t R, slong a, const arb_t b, slong prec)
   arb_mul_si(x, y, 2, prec);
   arb_get_ubound_arf(z, x, prec);
   arb_set_arf(x, z);
-  
+
   for (k = 0; k < 4; k++)
     {
       arb_log(y, x, prec);
       arb_mul_si(y, y, a, prec);
       arb_div_si(y, y, 2, prec);
-      arb_sub(x, b, y, prec);
+      arb_add(x, b, y, prec);
       arb_get_ubound_arf(z, x, prec);
       arb_set_arf(x, z);
     }

@@ -9,6 +9,7 @@ void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, 
   arb_t lambda;
   arf_t up;
   arb_mat_t z_pert;
+  arb_mat_t z_pert_t;
   arb_mat_t prod;
   slong j, k;
   int res;
@@ -18,6 +19,7 @@ void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, 
   arb_init(lambda);
   arf_init(up);
   arb_mat_init(z_pert, g, 1);
+  arb_mat_init(z_pert_t, 1, g);
   arb_mat_init(prod, 1, 1);
   
   acb_mat_get_imag(im, tau);
@@ -45,12 +47,13 @@ void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, 
     {
       arb_set(arb_mat_entry(z_pert, k, 0), acb_imagref(&z[k]));
       arb_add_error_arf(arb_mat_entry(z_pert, k, 0), rad);
+      arb_set(arb_mat_entry(z_pert_t, 0, k), arb_mat_entry(z_pert, k, 0));
     }
   res = arb_mat_inv(im, im, prec);
   if (!res) arf_pos_inf(bound);
 
   arb_mat_mul(z_pert, im, z_pert, prec);
-  arb_mat_mul(prod, z_pert, z_pert, prec);
+  arb_mat_mul(prod, z_pert_t, z_pert, prec);
   arb_const_pi(lambda, prec);
   arb_mul(lambda, lambda, arb_mat_entry(prod, 0, 0), prec);
   arb_exp(lambda, lambda, prec);
@@ -62,5 +65,6 @@ void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, 
   arb_clear(lambda);
   arf_clear(up);
   arb_mat_clear(z_pert);
+  arb_mat_clear(z_pert_t);
   arb_mat_clear(prod);  
 }

@@ -18,7 +18,7 @@ static void arb_mat_add_error_arf(arb_mat_t m, const arf_t r)
 void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
 {
   slong g = acb_mat_nrows(m);
-  arb_t abs, det, max;
+  arb_t abs, lambda, max;
   arf_t r;
   fmpz_t e;
   arb_mat_t test;
@@ -26,13 +26,13 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
   int valid;
   
   arb_init(abs);
-  arb_init(det);
+  arb_init(lambda);
   arb_init(max);
   arf_init(r);
   fmpz_init(e);
   arb_mat_init(test, g, g);
 
-  arb_mat_det(det, m, prec);
+  arb_mat_pos_lambda(lambda, m, prec);
   arb_zero(max);
   for (j = 0; j < g; j++)
     {
@@ -46,7 +46,7 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
   /* Take a guess at r */
   arb_mul_si(abs, max, g, prec);
   arb_pow_ui(abs, abs, g, prec);
-  arb_div(abs, det, abs, prec);
+  arb_div(abs, lambda, abs, prec);
   arb_get_lbound_arf(r, abs, prec);
   arf_frexp(r, e, r);
   arf_one(r);
@@ -55,8 +55,8 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
   /* Is r ok? */
   arb_mat_set(test, m);
   arb_mat_add_error_arf(test, r);
-  arb_mat_det(det, test, prec);
-  valid = arb_is_positive(det);
+  arb_mat_pos_lambda(lambda, test, prec);
+  valid = arb_is_positive(lambda);
   
   if (!valid)
     {
@@ -67,8 +67,8 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
 	  fmpz_add_si(e, e, -1);
 	  arb_mat_set(test, m);
 	  arb_mat_add_error_arf(test, r);
-	  arb_mat_det(det, test, prec);
-	  valid = arb_is_positive(det);
+	  arb_mat_pos_lambda(lambda, test, prec);
+	  valid = arb_is_positive(lambda);
 	}
     }
   else
@@ -80,8 +80,8 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
 	  fmpz_add_si(e, e, 1);
 	  arb_mat_set(test, m);
 	  arb_mat_add_error_arf(test, r);
-	  arb_mat_det(det, test, prec);
-	  valid = arb_is_positive(det);
+	  arb_mat_pos_lambda(lambda, test, prec);
+	  valid = arb_is_positive(lambda);
 	}
       arf_mul_2exp_si(r, r, -1);
       fmpz_add_si(e, e, -1);
@@ -92,7 +92,7 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
   else arf_set(rho, r);
   
   arb_clear(abs);
-  arb_clear(det);
+  arb_clear(lambda);
   arb_clear(max);
   arf_clear(r);
   fmpz_clear(e);
