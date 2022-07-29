@@ -130,8 +130,7 @@ class Undecidable(NotImplementedError):
     pass
 
 class gr_ctx_struct(ctypes.Structure):
-    # todo: use the real size
-    _fields_ = [('content', c_ulong * 64)]
+    _fields_ = [('content', ctypes.c_char * libgr.gr_ctx_sizeof_ctx())]
 
 
 libflint.flint_malloc.restype = ctypes.c_void_p
@@ -1307,6 +1306,37 @@ class gr_mat(gr_elem):
     def shape(self):
         return (self._data.r, self._data.c)
 
+    def __getitem__(self, ij):
+        i, j = ij
+        i = int(i)
+        j = int(j)
+        assert 0 <= i < self.nrows()
+        assert 0 <= j < self.ncols()
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, res._ctx)
+        status = libgr.gr_set(res._ref, ijptr, res._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def __setitem__(self, ij, v):
+        i, j = ij
+        i = int(i)
+        j = int(j)
+        assert 0 <= i < self.nrows()
+        assert 0 <= j < self.ncols()
+        element_ring = self.parent()._element_ring
+        # todo: avoid copy
+        x = element_ring(v)
+        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
+        status = libgr.gr_set(ijptr, x._ref, x._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return x
+
     def det(self, algorithm=None):
         element_ring = self.parent()._element_ring
         res = element_ring()
@@ -1525,6 +1555,13 @@ def test_matrix():
     assert raises(lambda: M([[QQ(1)/3]]), ValueError)
     assert raises(lambda: Mat(ZZ, 3, 1)(A), ValueError)
     assert Mat(QQ, 2)(M([[1, 2], [3, 4]])) ** 2 == M([[7,10],[15,22]])
+
+    A[1, 2] = 10
+    assert A == M([[1,2,3],[4,5,10]])
+    assert A[0,1] == 2
+    assert raises(lambda: A[3,4], Exception)
+    assert raises(lambda: A.__setitem__((3, 4), 1), Exception)
+
 
 def test_floor_ceil_trunc_nint():
     assert ZZ(3).floor() == 3

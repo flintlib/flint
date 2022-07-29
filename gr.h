@@ -436,7 +436,7 @@ typedef gr_ctx_struct gr_ctx_t[1];
 
 #define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
 
-GR_INLINE slong gr_ctx_sizeof_ctx(gr_ctx_t ctx)
+GR_INLINE slong gr_ctx_sizeof_ctx()
 {
     return sizeof(gr_ctx_struct);
 }
