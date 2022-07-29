@@ -480,6 +480,15 @@ class gr_elem:
         return res
 
     @staticmethod
+    def _unary_op_get_fmpz(self, op, rstr):
+        res = ZZ()
+        status = op(res._ref, self._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+        return res
+
+    @staticmethod
     def _constant(self, op, rstr):
         elem_type = type(self)
         res = elem_type(context=self._ctx_python)
@@ -1108,8 +1117,36 @@ class acf(gr_elem):
 
 
 
-# todo: check that modulus is prime
-class FiniteField_fq(gr_ctx):
+"""
+.. function:: int gr_ctx_fq_prime(fmpz_t p, gr_ctx_t ctx)
+.. function:: int gr_ctx_fq_degree(slong * deg, gr_ctx_t ctx)
+.. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
+"""
+
+class FiniteField_base(gr_ctx):
+
+    def prime(self):
+        res = ZZ()
+        status = libgr.gr_ctx_fq_prime(res._ref, self._ref, self._ref)
+        assert not status
+        return res
+
+    def degree(self):
+        res = ZZ()
+        c = c_slong()
+        status = libgr.gr_ctx_fq_degree(ctypes.byref(c), self._ref, self._ref)
+        assert not status
+        libflint.fmpz_set_si(res._ref, c)
+        return res
+
+    def order(self):
+        res = ZZ()
+        status = libgr.gr_ctx_fq_order(res._ref, self._ref, self._ref)
+        assert not status
+        return res
+
+
+class FiniteField_fq(FiniteField_base):
     def __init__(self, p, n):
         gr_ctx.__init__(self)
         p = ZZ(p)
@@ -1119,7 +1156,7 @@ class FiniteField_fq(gr_ctx):
         libgr.gr_ctx_init_fq(self._ref, p._ref, n, None)
         self._elem_type = fq
 
-class FiniteField_fq_nmod(gr_ctx):
+class FiniteField_fq_nmod(FiniteField_base):
     def __init__(self, p, n):
         gr_ctx.__init__(self)
         p = ZZ(p)
@@ -1129,7 +1166,7 @@ class FiniteField_fq_nmod(gr_ctx):
         libgr.gr_ctx_init_fq_nmod(self._ref, p._ref, n, None)
         self._elem_type = fq_nmod
 
-class FiniteField_fq_zech(gr_ctx):
+class FiniteField_fq_zech(FiniteField_base):
     def __init__(self, p, n):
         gr_ctx.__init__(self)
         p = ZZ(p)
@@ -1140,13 +1177,37 @@ class FiniteField_fq_zech(gr_ctx):
         self._elem_type = fq_zech
 
 
-class fq(gr_elem):
+class fq_elem(gr_elem):
+
+    def gen(self):
+        return self._constant(self, libgr.gr_fq_gen, "gen")
+
+    #def frobenius(self):
+    #    return self._binary_op_si(self, libgr.gr_fq_frobenius, "gen")
+
+    def multiplicative_order(self):
+        return self._unary_op_get_fmpz(self, libgr.gr_fq_multiplicative_order, "multiplicative_order")
+
+    def norm(self):
+        return self._unary_op_get_fmpz(self, libgr.gr_fq_norm, "norm")
+    
+    def trace(self):
+        return self._unary_op_get_fmpz(self, libgr.gr_fq_trace, "trace")
+
+    def is_primitive(self):
+        return self._unary_predicate(self, libgr.gr_fq_is_primitive, "is_primitive")
+
+    def pth_root(self):
+        return self._unary_op(self, libgr.gr_fq_pth_root, "pth_root")
+
+
+class fq(fq_elem):
     _struct_type = fq_struct
 
-class fq_nmod(gr_elem):
+class fq_nmod(fq_elem):
     _struct_type = fq_nmod_struct
 
-class fq_zech(gr_elem):
+class fq_zech(fq_elem):
     _struct_type = fq_zech_struct
 
 
@@ -1635,6 +1696,11 @@ def test_fq():
     x = Fq(random=True)
     y = Fq(random=True)
     assert 3*(x+y) == 4*x+3*y-x
+    assert Fq.prime() == 3
+    assert Fq.degree() == 5
+    assert Fq.order() == 243
+    assert x.pth_root() ** 3 == x
+    assert (x**2).sqrt() in (x, -x)
 
 def test_floor_ceil_trunc_nint():
     assert ZZ(3).floor() == 3
