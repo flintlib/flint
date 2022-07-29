@@ -38,24 +38,25 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
     {
       for (k = 0; k < g; k++)
 	{
-	  arb_abs(abs, arb_mat_entry(m,j,k), prec);
+	  arb_abs(abs, arb_mat_entry(m,j,k));
 	  arb_max(max, max, abs, prec);
 	}
     }
 
   /* Take a guess at r */
   arb_mul_si(abs, max, g, prec);
-  arb_pow_si(abs, abs, g, prec);
+  arb_pow_ui(abs, abs, g, prec);
   arb_div(abs, det, abs, prec);
   arb_get_lbound_arf(r, abs, prec);
   arf_frexp(r, e, r);
-  arf_mul_2exp_fmpz(r, e);
+  arf_one(r);
+  arf_mul_2exp_fmpz(r, r, e);
 
   /* Is r ok? */
   arb_mat_set(test, m);
   arb_mat_add_error_arf(test, r);
   arb_mat_det(det, test, prec);
-  valid = arb_is_positive(test);
+  valid = arb_is_positive(det);
   
   if (!valid)
     {
@@ -67,7 +68,7 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
 	  arb_mat_set(test, m);
 	  arb_mat_add_error_arf(test, r);
 	  arb_mat_det(det, test, prec);
-	  valid = arb_is_positive(test);
+	  valid = arb_is_positive(det);
 	}
     }
   else
@@ -80,7 +81,7 @@ void arb_mat_pos_radius(arf_t rho, const arb_mat_t m, slong prec)
 	  arb_mat_set(test, m);
 	  arb_mat_add_error_arf(test, r);
 	  arb_mat_det(det, test, prec);
-	  valid = arb_is_positive(test);
+	  valid = arb_is_positive(det);
 	}
       arf_mul_2exp_si(r, r, -1);
       fmpz_add_si(e, e, -1);

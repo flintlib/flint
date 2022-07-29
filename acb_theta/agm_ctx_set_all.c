@@ -175,7 +175,7 @@ void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slo
 
       /* Evaluate finite difference */
       acb_theta_cauchy(B2, acb_theta_agm_ctx_rho(ctx),
-		       acb_theta_agm_ctx_max(ctx), 2, lowprec);
+		       acb_theta_agm_ctx_max(ctx), 2, n-1, lowprec);
       arf_frexp(B2, e, B2);
       exp = fmpz_get_si(e);
       arb_one(eta);

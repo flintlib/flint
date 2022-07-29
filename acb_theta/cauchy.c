@@ -20,7 +20,7 @@ void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound, slong
   fmpz_mul(fac, fac, bin);
   fmpz_mul_2exp(fac, fac, ord);
   
-  arb_pow_si(r, r, ord, prec);
+  arb_pow_ui(r, r, ord, prec);
   arb_div(r, m, r, prec);
   arb_mul_fmpz(r, r, fac, prec);
   arb_get_ubound_arf(bound_der, r, prec);
