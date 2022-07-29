@@ -94,7 +94,7 @@ void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t epsilon,
   arb_zero(normsqr);
   for (k = 0; k < g; k++)
     {
-      arb_sqr(pi, arb_mat_entry(imz, k, 0), prec);
+      arb_mul(pi, arb_mat_entry(imz, k, 0), acb_imagref(&z[k]), prec);
       arb_add(normsqr, normsqr, pi, prec);
     }
   arb_const_pi(pi, prec);

@@ -71,7 +71,7 @@ void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, 
   acb_theta_eld_clear(E);
   acb_theta_precomp_clear(D);
   arf_clear(epsilon);
-  _acb_vec_clear(z, g);
+  _acb_vec_clear(exp_z, g);
   acb_mat_clear(lin_powers);
   acb_clear(cofactor);  
 }
