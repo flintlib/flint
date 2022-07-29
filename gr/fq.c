@@ -89,6 +89,19 @@ _gr_fq_set_fmpz(fq_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fq_set_other(fq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+{
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_FMPZ:
+            fq_set_fmpz(res, x, FQ_CTX(ctx));
+            return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
 truth_t
 _gr_fq_is_zero(const fq_t x, const gr_ctx_t ctx)
 {
@@ -158,6 +171,27 @@ _gr_fq_mul_ui(fq_t res, const fq_t x, ulong y, const gr_ctx_t ctx)
 
 int
 _gr_fq_mul_fmpz(fq_t res, const fq_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    fq_mul_fmpz(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_si_mul(fq_t res, slong y, const fq_t x, const gr_ctx_t ctx)
+{
+    fq_mul_si(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_ui_mul(fq_t res, ulong y, const fq_t x, const gr_ctx_t ctx)
+{
+    fq_mul_ui(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_fmpz_mul(fq_t res, const fmpz_t y, const fq_t x, const gr_ctx_t ctx)
 {
     fq_mul_fmpz(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
@@ -355,6 +389,7 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fq_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fq_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fq_set_fmpz},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fq_set_other},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fq_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fq_add},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_fq_sub},
@@ -362,6 +397,15 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_fq_mul_ui},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fq_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fq_mul_fmpz},
+/*
+    todo ...
+    {GR_METHOD_SI_MUL,          (gr_funcptr) _gr_fq_si_mul},
+    {GR_METHOD_UI_MUL,          (gr_funcptr) _gr_fq_ui_mul},
+    {GR_METHOD_FMPZ_MUL,        (gr_funcptr) _gr_fq_fmpz_mul},
+    {GR_METHOD_MUL_OTHER,        (gr_funcptr) _gr_fq_mul_other},
+    {GR_METHOD_OTHER_MUL,        (gr_funcptr) _gr_fq_other_mul},
+*/
+
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fq_inv},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_div},

@@ -89,6 +89,30 @@ class qqbar_struct(ctypes.Structure):
 class ca_struct(ctypes.Structure):
     _fields_ = [('data', c_slong * 5)]
 
+class nmod_poly_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('length', c_slong),
+                ('n', c_ulong),
+                ('ninv', c_ulong),
+                ('nnorm', c_slong)]
+
+class fq_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('length', c_slong)]
+
+class fq_nmod_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('length', c_slong),
+                ('n', c_ulong),
+                ('ninv', c_ulong),
+                ('nnorm', c_slong)]
+
+class fq_zech_struct(ctypes.Structure):
+    _fields_ = [('n', ctypes.c_ulong)]
+
 class gr_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', c_slong),
@@ -1032,6 +1056,8 @@ class fmpz(gr_elem):
     def __int__(self):
         return fmpz_to_python_int(self._ref)
 
+    def is_prime(self):
+        return bool(libflint.fmpz_is_prime(self._ref))
 
 class fmpq(gr_elem):
     _struct_type = fmpq_struct
@@ -1080,6 +1106,48 @@ class arf(gr_elem):
 class acf(gr_elem):
     _struct_type = acf_struct
 
+
+
+# todo: check that modulus is prime
+class FiniteField_fq(gr_ctx):
+    def __init__(self, p, n):
+        gr_ctx.__init__(self)
+        p = ZZ(p)
+        n = int(n)
+        assert p.is_prime()
+        assert n >= 1
+        libgr.gr_ctx_init_fq(self._ref, p._ref, n, None)
+        self._elem_type = fq
+
+class FiniteField_fq_nmod(gr_ctx):
+    def __init__(self, p, n):
+        gr_ctx.__init__(self)
+        p = ZZ(p)
+        n = int(n)
+        assert p.is_prime()
+        assert n >= 1
+        libgr.gr_ctx_init_fq_nmod(self._ref, p._ref, n, None)
+        self._elem_type = fq_nmod
+
+class FiniteField_fq_zech(gr_ctx):
+    def __init__(self, p, n):
+        gr_ctx.__init__(self)
+        p = ZZ(p)
+        n = int(n)
+        assert p.is_prime()
+        assert n >= 1
+        libgr.gr_ctx_init_fq_zech(self._ref, p._ref, n, None)
+        self._elem_type = fq_zech
+
+
+class fq(gr_elem):
+    _struct_type = fq_struct
+
+class fq_nmod(gr_elem):
+    _struct_type = fq_nmod_struct
+
+class fq_zech(gr_elem):
+    _struct_type = fq_zech_struct
 
 
 
@@ -1562,6 +1630,11 @@ def test_matrix():
     assert raises(lambda: A[3,4], Exception)
     assert raises(lambda: A.__setitem__((3, 4), 1), Exception)
 
+def test_fq():
+    Fq = FiniteField_fq(3, 5)
+    x = Fq(random=True)
+    y = Fq(random=True)
+    assert 3*(x+y) == 4*x+3*y-x
 
 def test_floor_ceil_trunc_nint():
     assert ZZ(3).floor() == 3
