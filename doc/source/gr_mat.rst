@@ -302,7 +302,7 @@ Solving
 Determinant and trace
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_det_bareiss(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int gr_mat_det_fflu(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_det_lu(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -319,7 +319,7 @@ Determinant and trace
       only supported for matrices up to size 4, and for larger
       matrices returns the ``GR_UNABLE`` flag.
 
-    * The *lu* and *bareiss* versions use rational LU decomposition
+    * The *lu* and *fflu* versions use rational LU decomposition
       and fraction-free LU decomposition (Bareiss algorithm) respectively,
       requiring `O(n^3)` operations. These algorithms can fail if zero
       certification or inversion fails, in which case the ``GR_UNABLE``

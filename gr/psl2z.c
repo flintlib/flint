@@ -7,11 +7,6 @@ int _gr_psl2z_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void
-_gr_psl2z_ctx_clear(gr_ctx_t ctx)
-{
-}
-
 int
 _gr_psl2z_init(psl2z_t res, gr_ctx_t ctx)
 {
@@ -167,7 +162,6 @@ gr_method_tab_input _psl2z_methods_input[] =
     {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP,
                             (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_psl2z_ctx_write},
-    {GR_METHOD_CTX_CLEAR,   (gr_funcptr) _gr_psl2z_ctx_clear},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_psl2z_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_psl2z_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_psl2z_swap},
@@ -186,10 +180,8 @@ gr_method_tab_input _psl2z_methods_input[] =
 void
 gr_ctx_init_psl2z(gr_ctx_t ctx)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_PSL2Z;
     ctx->sizeof_elem = sizeof(psl2z_struct);
-    ctx->elem_ctx = NULL;
     ctx->size_limit = WORD_MAX;
 
     ctx->methods = _psl2z_methods;

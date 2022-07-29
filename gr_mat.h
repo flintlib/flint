@@ -157,8 +157,8 @@ WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slo
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_det_bareiss(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_det_fflu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_det_lu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_det_generic_field(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);

@@ -85,12 +85,6 @@ truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
 }
 
 void
-matrix_ctx_clear(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
-}
-
-void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
     gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
@@ -411,7 +405,6 @@ gr_static_method_table _gr_mat_methods;
 gr_method_tab_input _gr_mat_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) matrix_ctx_write},
-    {GR_METHOD_CTX_CLEAR,   (gr_funcptr) matrix_ctx_clear},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) matrix_ctx_is_ring},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
@@ -442,10 +435,8 @@ gr_method_tab_input _gr_mat_methods_input[] =
 void
 _gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows, slong ncols)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_GR_MAT;
     ctx->sizeof_elem = sizeof(gr_mat_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(matrix_ctx_t));
     ctx->size_limit = WORD_MAX;
 
     if (nrows < 0) flint_abort();

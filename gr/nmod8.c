@@ -1,6 +1,7 @@
 #include "gr.h"
 
-#define NMOD8_CTX(ring_ctx) (((nmod_t *)((ring_ctx)->elem_ctx))[0])
+#define NMOD8_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
+#define NMOD8_CTX(ring_ctx) (*NMOD8_CTX_REF(ring_ctx))
 
 typedef unsigned char nmod8_struct;
 typedef nmod8_struct nmod8_t[1];
@@ -354,12 +355,6 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8
     return GR_SUCCESS;
 }
 
-int
-nmod8_ctx_clear(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
-    return GR_SUCCESS;
-}
 
 int _nmod8_methods_initialized = 0;
 
@@ -368,7 +363,6 @@ gr_static_method_table _nmod8_methods;
 gr_method_tab_input _nmod8_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) nmod8_ctx_write},
-    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) nmod8_ctx_clear},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) nmod8_ctx_is_field},
@@ -417,13 +411,11 @@ gr_method_tab_input _nmod8_methods_input[] =
 void
 gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_NMOD8;
     ctx->sizeof_elem = sizeof(nmod8_struct);
     ctx->size_limit = WORD_MAX;
 
-    ctx->elem_ctx = flint_malloc(sizeof(nmod_t));  /* This could be something more interesting */
-    nmod_init(ctx->elem_ctx, n);
+    nmod_init(NMOD8_CTX_REF(ctx), n);
 
     ctx->methods = _nmod8_methods;
 

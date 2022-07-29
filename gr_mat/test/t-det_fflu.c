@@ -20,7 +20,7 @@ int main()
     slong count_success = 0, count_unable = 0, count_domain = 0;
     flint_rand_t state;
 
-    flint_printf("det_bareiss....");
+    flint_printf("det_fflu....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -52,9 +52,9 @@ int main()
         status |= gr_mat_randtest(B, state, ctx);
         status |= gr_mat_mul(AB, A, B, ctx);
 
-        status |= gr_mat_det_bareiss(detA, A, ctx);
-        status |= gr_mat_det_bareiss(detB, B, ctx);
-        status |= gr_mat_det_bareiss(detAB, AB, ctx);
+        status |= gr_mat_det_fflu(detA, A, ctx);
+        status |= gr_mat_det_fflu(detB, B, ctx);
+        status |= gr_mat_det_fflu(detAB, AB, ctx);
         status |= gr_mul(detAdetB, detA, detB, ctx);
 
         if (status == GR_SUCCESS && gr_equal(detAB, detAdetB, ctx) == T_FALSE)

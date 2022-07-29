@@ -220,7 +220,6 @@ gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q)
     if (q == 0)
         return GR_DOMAIN;
 
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_DIRICHLET_GROUP;
     ctx->sizeof_elem = sizeof(dirichlet_char_struct);
     ctx->elem_ctx = flint_malloc(sizeof(dirichlet_group_struct));

@@ -419,9 +419,11 @@ typedef enum
 }
 gr_which_structure;
 
+#define GR_CTX_STRUCT_DATA_BYTES (6 * sizeof(ulong))
+
 typedef struct
 {
-    ulong flags;
+    char data[GR_CTX_STRUCT_DATA_BYTES];
     ulong which_ring;
     ssize_t sizeof_elem;
     void * elem_ctx;
@@ -431,6 +433,11 @@ typedef struct
 gr_ctx_struct;
 
 typedef gr_ctx_struct gr_ctx_t[1];
+
+GR_INLINE slong gr_ctx_sizeof_ctx(gr_ctx_t ctx)
+{
+    return sizeof(gr_ctx_struct);
+}
 
 GR_INLINE slong gr_ctx_sizeof_elem(gr_ctx_t ctx)
 {
@@ -1025,7 +1032,7 @@ typedef struct
 }
 polynomial_ctx_t;
 
-#define POLYNOMIAL_CTX(ring_ctx) ((polynomial_ctx_t *)((ring_ctx)->elem_ctx))
+#define POLYNOMIAL_CTX(ring_ctx) ((polynomial_ctx_t *)((ring_ctx)))
 #define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
 void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring);
@@ -1041,7 +1048,7 @@ typedef struct
 }
 matrix_ctx_t;
 
-#define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)->elem_ctx))
+#define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)))
 
 void gr_ctx_init_matrix_domain(gr_ctx_t ctx, gr_ctx_t base_ring);
 void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong nrows, slong ncols);

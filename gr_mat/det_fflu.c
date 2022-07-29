@@ -13,7 +13,7 @@
 #include "gr_mat.h"
 
 int
-gr_mat_det_bareiss(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+gr_mat_det_fflu(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
     slong * P;
     gr_mat_t T;

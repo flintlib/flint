@@ -10,7 +10,7 @@ typedef struct
 }
 gr_acb_ctx;
 
-#define ACB_CTX_PREC(ring_ctx) (((gr_acb_ctx *)((ring_ctx)->elem_ctx))->prec)
+#define ACB_CTX_PREC(ring_ctx) (((gr_acb_ctx *)((ring_ctx)))->prec)
 
 int
 _gr_acb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -811,20 +811,12 @@ _gr_acb_mat_det(acb_t res, const acb_mat_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_acb_ctx_clear(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
-    return GR_SUCCESS;
-}
-
 int _acb_methods_initialized = 0;
 
 gr_static_method_table _acb_methods;
 
 gr_method_tab_input _acb_methods_input[] =
 {
-    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_acb_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_acb_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING,
@@ -925,10 +917,8 @@ gr_method_tab_input _acb_methods_input[] =
 void
 gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_CC_ACB;
     ctx->sizeof_elem = sizeof(acb_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(gr_acb_ctx));
     ctx->size_limit = WORD_MAX;
 
     gr_ctx_arb_set_prec(ctx, prec);

@@ -787,7 +787,6 @@ gr_method_tab_input _fmpq_methods_input[] =
 void
 gr_ctx_init_fmpq(gr_ctx_t ctx)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_FMPQ;
     ctx->sizeof_elem = sizeof(fmpq);
     ctx->elem_ctx = NULL;

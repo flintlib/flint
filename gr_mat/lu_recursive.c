@@ -20,6 +20,7 @@ _apply_permutation(slong * AP, gr_mat_t A, slong * P, slong n, slong offset)
         slong *APtmp;
         slong i;
 
+        /* todo: stack alloc */
         Atmp = flint_malloc(sizeof(gr_ptr) * n);
         APtmp = flint_malloc(sizeof(slong) * n);
 

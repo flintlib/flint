@@ -218,7 +218,6 @@ gr_method_tab_input _gr_mpolynomial_methods_input[] =
 void
 gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_GR_MPOLY;
     ctx->sizeof_elem = sizeof(gr_mpoly_struct);
     ctx->elem_ctx = flint_malloc(sizeof(mpolynomial_ctx_t));

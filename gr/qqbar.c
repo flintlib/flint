@@ -11,7 +11,7 @@ typedef struct
 }
 gr_qqbar_ctx;
 
-#define QQBAR_CTX(ring_ctx) ((gr_qqbar_ctx *)((ring_ctx)->elem_ctx))
+#define QQBAR_CTX(ring_ctx) ((gr_qqbar_ctx *)(ring_ctx))
 
 int
 _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -901,14 +901,7 @@ TRIG3(asec_pi)
 TRIG3(acsc_pi)
 
 /* todo: root of unity / is_root_of_unity */
-
 /* todo: exploit when we know that the field is real */
-int
-_gr_qqbar_ctx_clear(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
-    return GR_SUCCESS;
-}
 
 truth_t
 _gr_qqbar_ctx_is_algebraically_closed(gr_ctx_t ctx)
@@ -928,7 +921,6 @@ gr_static_method_table _qqbar_methods;
 
 gr_method_tab_input _qqbar_methods_input[] =
 {
-    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_qqbar_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_qqbar_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -1053,10 +1045,8 @@ gr_method_tab_input _qqbar_methods_input[] =
 void
 gr_ctx_init_real_qqbar(gr_ctx_t ctx)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_REAL_ALGEBRAIC_QQBAR;
     ctx->sizeof_elem = sizeof(qqbar_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
     ctx->size_limit = WORD_MAX;
 
     QQBAR_CTX(ctx)->real_only = 1;
@@ -1075,10 +1065,8 @@ gr_ctx_init_real_qqbar(gr_ctx_t ctx)
 void
 gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_COMPLEX_ALGEBRAIC_QQBAR;
     ctx->sizeof_elem = sizeof(qqbar_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(gr_qqbar_ctx));
     ctx->size_limit = WORD_MAX;
 
     QQBAR_CTX(ctx)->real_only = 0;

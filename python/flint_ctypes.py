@@ -1017,9 +1017,12 @@ class PolynomialRing_gr_poly(gr_ctx):
         #if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
         #    raise ValueError("coefficient structure must be a ring")
         libgr.gr_ctx_init_polynomial(self._ref, coefficient_ring._ref)
+        coefficient_ring._refcount += 1
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_poly
 
+    def __del__(self):
+        self._coefficient_ring._decrement_refcount()
 
 class fmpz(gr_elem):
     _struct_type = fmpz_struct
@@ -1211,6 +1214,10 @@ class Mat(gr_ctx):
             libgr.gr_ctx_init_matrix_space(self._ref, element_domain._ref, nrows, ncols)
         self._element_ring = element_domain
         self._elem_type = gr_mat
+        self._element_ring._refcount += 1
+
+    def __del__(self):
+        self._element_ring._decrement_refcount()
 
 def MatrixRing(element_ring, n):
     assert isinstance(element_ring, gr_ctx)
@@ -1300,10 +1307,21 @@ class gr_mat(gr_elem):
     def shape(self):
         return (self._data.r, self._data.c)
 
-    def det(self):
+    def det(self, algorithm=None):
         element_ring = self.parent()._element_ring
         res = element_ring()
-        status = libgr.gr_mat_det(res._ref, self._ref, element_ring._ref)
+        if algorithm is None:
+            status = libgr.gr_mat_det(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "lu":
+            status = libgr.gr_mat_det_lu(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "fflu":
+            status = libgr.gr_mat_det_fflu(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "berkowitz":
+            status = libgr.gr_mat_det_berkowitz(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "cofactor":
+            status = libgr.gr_mat_det_cofactor(res._ref, self._ref, element_ring._ref)
+        else:
+            raise ValueError("unknown algorithm")
         if status:
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError

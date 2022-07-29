@@ -26,7 +26,7 @@ gr_mat_det_generic_integral_domain(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
     if (A->r <= 4)
         return gr_mat_det_cofactor(res, A, ctx);
     else
-        return gr_mat_det_bareiss(res, A, ctx);
+        return gr_mat_det_fflu(res, A, ctx);
 }
 
 

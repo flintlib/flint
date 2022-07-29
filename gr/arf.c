@@ -9,8 +9,8 @@ typedef struct
 }
 gr_arf_ctx;
 
-#define ARF_CTX_PREC(ring_ctx) (((gr_arf_ctx *)((ring_ctx)->elem_ctx))->prec)
-#define ARF_CTX_RND(ring_ctx) (((gr_arf_ctx *)((ring_ctx)->elem_ctx))->rnd)
+#define ARF_CTX_PREC(ring_ctx) (((gr_arf_ctx *)((ring_ctx)))->prec)
+#define ARF_CTX_RND(ring_ctx) (((gr_arf_ctx *)((ring_ctx)))->rnd)
 
 void gr_ctx_arf_set_prec(gr_ctx_t ctx, slong prec)
 {
@@ -916,12 +916,6 @@ _gr_arf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     }
 }
 
-int
-_gr_arf_ctx_clear(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
-    return GR_SUCCESS;
-}
 
 int _arf_methods_initialized = 0;
 
@@ -929,7 +923,6 @@ gr_static_method_table _arf_methods;
 
 gr_method_tab_input _arf_methods_input[] =
 {
-    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_arf_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_arf_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_false},
@@ -1052,10 +1045,8 @@ gr_method_tab_input _arf_methods_input[] =
 void
 gr_ctx_init_real_float_arf(gr_ctx_t ctx, slong prec)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_REAL_FLOAT_ARF;
     ctx->sizeof_elem = sizeof(arf_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(gr_arf_ctx));
     ctx->size_limit = WORD_MAX;
 
     gr_ctx_arf_set_prec(ctx, prec);

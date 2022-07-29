@@ -387,7 +387,6 @@ gr_method_tab_input _fq_nmod_methods_input[] =
 void
 gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_FQ_NMOD;
     ctx->sizeof_elem = sizeof(fq_nmod_struct);
     ctx->elem_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));

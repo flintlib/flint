@@ -25,8 +25,6 @@ polynomial_ctx_clear(gr_ctx_t ctx)
     {
         flint_free(POLYNOMIAL_CTX(ctx)->var);
     }
-
-    flint_free(ctx->elem_ctx);
 }
 
 truth_t
@@ -277,15 +275,13 @@ gr_method_tab_input _gr_poly_methods_input[] =
 void
 gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_GR_POLY;
     ctx->sizeof_elem = sizeof(gr_poly_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(polynomial_ctx_t));
     ctx->size_limit = WORD_MAX;
 
-    ((polynomial_ctx_t *) ctx->elem_ctx)->base_ring = (gr_ctx_struct *) base_ring;
-    ((polynomial_ctx_t *) ctx->elem_ctx)->degree_limit = WORD_MAX;
-    ((polynomial_ctx_t *) ctx->elem_ctx)->var = (char *) default_var;
+    POLYNOMIAL_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
+    POLYNOMIAL_CTX(ctx)->degree_limit = WORD_MAX;
+    POLYNOMIAL_CTX(ctx)->var = (char *) default_var;
 
     ctx->methods = _gr_poly_methods;
 

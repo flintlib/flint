@@ -479,7 +479,6 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
 void
 gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_FMPZ_MOD;
     ctx->sizeof_elem = sizeof(fmpz);
 

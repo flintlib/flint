@@ -1,7 +1,7 @@
 #include "flint/perm.h"
 #include "gr.h"
 
-#define PERM_N(ctx) (*((ulong *) (ctx->elem_ctx)))
+#define PERM_N(ctx) (*((ulong *) (ctx)))
 
 typedef struct
 {
@@ -18,12 +18,6 @@ int _gr_perm_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     gr_stream_write_ui(out, PERM_N(ctx));
     gr_stream_write(out, " (perm)");
     return GR_SUCCESS;
-}
-
-void
-_gr_perm_ctx_clear(gr_ctx_t ctx)
-{
-    flint_free(ctx->elem_ctx);
 }
 
 int
@@ -220,7 +214,6 @@ gr_method_tab_input _perm_methods_input[] =
     {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP,
                             (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_perm_ctx_write},
-    {GR_METHOD_CTX_CLEAR,   (gr_funcptr) _gr_perm_ctx_clear},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_perm_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_perm_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_perm_swap},
@@ -239,13 +232,12 @@ gr_method_tab_input _perm_methods_input[] =
 void
 gr_ctx_init_perm(gr_ctx_t ctx, ulong n)
 {
-    ctx->flags = 0;
     ctx->which_ring = GR_CTX_PERM;
     ctx->sizeof_elem = sizeof(perm_struct);
-    ctx->elem_ctx = flint_malloc(sizeof(ulong));
     ctx->size_limit = WORD_MAX;
 
     PERM_N(ctx) = n;
+
     ctx->methods = _perm_methods;
 
     if (!_perm_methods_initialized)
