@@ -1100,7 +1100,7 @@ class RealFloat_arf(gr_arf_ctx):
         libgr.gr_ctx_init_real_float_arf(self._ref, prec)
         self._elem_type = arf
 
-class ComplexFloat_acb(gr_arf_ctx):
+class ComplexFloat_acf(gr_arf_ctx):
     def __init__(self, prec=53):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_complex_float_acf(self._ref, prec)
@@ -1242,6 +1242,18 @@ class gr_poly(gr_elem):
         if status:
             raise NotImplementedError
         return c
+
+    def __call__(self, x):
+        f_R = self.parent()._coefficient_ring
+        x_R = x.parent()
+        res = x_R()
+        if f_R is x_R:
+            status = libgr.gr_poly_evaluate(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+        else:
+            status = libgr.gr_poly_evaluate_other_horner(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+        if status:
+            raise NotImplementedError
+        return res
 
 
 class ModularGroup_psl2z(gr_ctx_ca):
@@ -1551,6 +1563,19 @@ class gr_mat(gr_elem):
         return res
 
     def hessenberg(self, algorithm=None):
+        """
+        Return this matrix reduced to upper Hessenberg form::
+
+            >>> B = Mat(QQ, 3, 3)([[4, 2, 3], [-1, 5, -3], [-4, 1, 2]]);
+            >>> B.hessenberg()
+            [[4, 14, 3],
+            [-1, -7, -3],
+            [0, 37, 14]]
+
+        Options:
+        - algorithm: ``None`` (default), ``"gauss"`` or ``"householder"``
+
+        """
         element_ring = self.parent()._element_ring
         res = self.parent()()
         if algorithm is None:
@@ -1571,36 +1596,6 @@ class gr_mat(gr_elem):
     #    pass
 
 
-"""
-
-from flint import *;
-B = Mat(RR, 3, 3)([[1, 38, 64], [-1, 295147905110633349120, -3], [-84, 0, 0]]);
-B.hessenberg()
-
-
-from random import randint
-RR.prec = 53
-B = Mat(RR, 100, 100)(100, 100, [randint(-2**RR.prec,2**RR.prec) for i in range(10000)])
-B.charpoly(RRx, algorithm="faddeev")
-B.charpoly(RRx, algorithm="danilevsky")
-B.charpoly(RRx, algorithm="berkowitz")
-
-A = Mat(ZZ, 3, 3)([[1, 38, 64],
-[-1, 295147905110633349120, -3],
-[-84, 0, 0]])
-A.charpoly(ZZx)
-
-from flint import *
-B = Mat(QQ, 3, 3)([[1, 38, 64], [-1, 295147905110633349120, -3], [-84, 0, 0]]);
-B.charpoly(QQx, algorithm="faddeev")
-B.charpoly(QQx, algorithm="hessenberg")
-B.charpoly(QQx)
-
-
-
-
-"""
-
 
 libgr.gr_mat_entry_ptr.argtypes = (ctypes.c_void_p, c_slong, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_mat_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
@@ -1619,7 +1614,7 @@ RR_ca = RealField_ca()
 CC_ca = ComplexField_ca()
 
 RF = RealFloat_arf()
-#CF = ComplexFloat_acf()
+CF = ComplexFloat_acf()
 
 ZZx = PolynomialRing_gr_poly(ZZ)
 QQx = PolynomialRing_gr_poly(QQ)
@@ -1795,6 +1790,16 @@ def test_all():
     assert ZZx(3) + 2 == ZZx([5])
 
     assert ZZx(QQ(5)) == 5
+
+    v = f(ZZ(3))
+    assert v == 41
+    assert v.parent() is ZZ
+
+    QM2 = Mat(QQ,2,2)
+    A = QM2([[1,2],[3,4]])
+    v = f(A)
+    assert v == QM2([[27,38],[57,84]])
+    assert v.parent() is QM2
 
 
 if __name__ == "__main__":

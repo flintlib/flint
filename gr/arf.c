@@ -30,7 +30,7 @@ _gr_arf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Floating-point numbers (arf, prec = ");
     gr_stream_write_si(out, ARF_CTX_PREC(ctx));
-    gr_stream_write(out, ", radix = 2, +inf, -inf, nan)");
+    gr_stream_write(out, ")");
     return GR_SUCCESS;
 }
 

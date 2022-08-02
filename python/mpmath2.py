@@ -8,9 +8,10 @@ from mpmath.libmp import prec_to_dps, dps_to_prec
 
 class RFContext(StandardBaseContext):
 
-    def __init__(ctx, RR, QQ):
+    def __init__(ctx, RR, CC, QQ):
         ctx.R = RR
         ctx.RR = RR
+        ctx.CC = CC
         ctx.QQ = QQ
         ctx._type = ctx.R()
         ctx.R.prec = 53
@@ -308,7 +309,7 @@ class RFContext(StandardBaseContext):
     '''
 
 
-mp = RFContext(flint.RF, flint.QQ)
+mp = RFContext(flint.RF, flint.CF, flint.QQ)
 
 sqrt = mp.sqrt
 log = mp.log

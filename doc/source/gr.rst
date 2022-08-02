@@ -596,8 +596,13 @@ Basic functions
               int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx)
               int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
 
-    Sets *x* to the integer *x*. This returns the ``GR_DOMAIN`` flag
+    Sets *res* to the integer *x*. This returns the ``GR_DOMAIN`` flag
     if *x* is not an integer.
+
+.. function:: int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to the rational number *x*. This returns the ``GR_DOMAIN``
+    flag if *x* is not a rational number.
 
 .. function:: int gr_set_d(gr_ptr res, double x, gr_ctx_t ctx)
 

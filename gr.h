@@ -469,6 +469,7 @@ typedef int ((*gr_method_unary_op_str)(gr_ptr, const char *, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_ui)(ulong *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_si)(slong *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpz)(fmpz_t, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_unary_op_get_fmpq)(fmpq_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_d)(double *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_unary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
@@ -523,6 +524,7 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_UNARY_OP_GET_SI(ctx, NAME) (((gr_method_unary_op_get_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_UI(ctx, NAME) (((gr_method_unary_op_get_ui *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_GET_FMPQ(ctx, NAME) (((gr_method_unary_op_get_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_D(ctx, NAME) (((gr_method_unary_op_get_d *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_UNARY_OP(ctx, NAME) (((gr_method_unary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -597,6 +599,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_set_str(gr_ptr res, const char * x, gr_ctx_t
 GR_INLINE WARN_UNUSED_RESULT int gr_get_si(slong * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_SI(ctx, GET_SI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_UI(ctx, GET_UI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, GET_FMPZ)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPQ(ctx, GET_FMPQ)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_D(ctx, GET_D)(res, x, ctx); }
 
 GR_INLINE truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(x, ctx); }

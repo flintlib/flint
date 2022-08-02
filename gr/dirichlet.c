@@ -141,7 +141,7 @@ _dirichlet_char_pow_fmpz(dirichlet_char_t c, const dirichlet_group_t G, const di
         c->log[k] = nmod_mul(a->log[k], nred, G->P[k].phi);
     }
 
-    if (fmpz_sgn(n) >= 0 && 0)
+    if (fmpz_sgn(n) >= 0 && 0)  /* todo: which is faster? */
         c->n = nmod_pow_fmpz(a->n, n, G->mod);
     else
         _dirichlet_char_exp(c, G);
