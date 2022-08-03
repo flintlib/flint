@@ -308,6 +308,8 @@ flint_printf(" --- gmp --- \n");
     profile_mul_gmp(12, 31, 1, 1);
 #endif
 
+    mpn_ctx_clear(R);
+
     return 0;
 }
 

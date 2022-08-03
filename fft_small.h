@@ -23,6 +23,7 @@
 #include "flint.h"
 #include "mpn_extras.h"
 #include "machine_vectors.h"
+#include "nmod.h"
 
 #define LG_BLK_SZ 8
 #define BLK_SZ 256
@@ -56,6 +57,11 @@ FLINT_INLINE ulong n_cdiv(ulong a, ulong b)
 FLINT_INLINE ulong n_round_up(ulong a, ulong b)
 {
     return n_cdiv(a, b)*b;
+}
+
+FLINT_INLINE ulong n_round_down(ulong a, ulong b)
+{
+    return a/b*b;
 }
 
 /* 0 -> 0, 1 -> 1, [2,3] -> 3, [4,7] -> 7, [8,15] -> 15, ... */
@@ -217,6 +223,9 @@ FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
 {
 }
 
+FLINT_DLL void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
+                            double* a, const double* b, ulong m_, ulong depth);
+
 FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
 {
     FLINT_ASSERT(depth >= LG_BLK_SZ);
@@ -295,6 +304,38 @@ typedef struct {
 
 typedef crt_data_struct crt_data_t[1];
 
+FLINT_DLL void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes);
+
+FLINT_DLL void crt_data_clear(crt_data_t C);
+
+/* return mpn of length C->coeff_len */
+FLINT_FORCE_INLINE ulong* crt_data_co_prime(const crt_data_t C, ulong i)
+{
+    FLINT_ASSERT(i < C->nprimes);
+    return C->data + i*C->coeff_len;
+}
+
+FLINT_FORCE_INLINE ulong* _crt_data_co_prime(const crt_data_t C, ulong i, ulong n)
+{
+    FLINT_ASSERT(i < C->nprimes);
+    FLINT_ASSERT(n == C->coeff_len);
+    return C->data + i*n;
+}
+
+/* return mpn of length C->coeff_len */
+FLINT_FORCE_INLINE ulong* crt_data_prod_primes(const crt_data_t C)
+{
+    return C->data + C->nprimes*C->coeff_len;
+}
+
+/* the reduction of co_prime mod the i^th prime */
+FLINT_FORCE_INLINE ulong* crt_data_co_prime_red(const crt_data_t C, ulong i)
+{
+    FLINT_ASSERT(i < C->nprimes);
+    return C->data + C->nprimes*C->coeff_len + C->coeff_len + i;
+}
+
+
 typedef void (*to_ffts_func)(
     sd_fft_ctx_struct* Qffts, double* d, ulong dstride,
     const ulong* a_, ulong an_, ulong atrunc,
@@ -347,6 +388,15 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong bn);
+
+void _mpn_ctx_nmod_poly_mul(
+    mpn_ctx_t R,
+    ulong* z,
+    ulong* a, ulong an,
+    ulong* b, ulong bn,
+    nmod_t mod);
+
+int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e);
 
 #ifdef __cplusplus
 }

@@ -152,39 +152,14 @@ void crt_data_clear(crt_data_t C)
     flint_free(C->data);
 }
 
-/* return mpn of length C->coeff_len */
-FLINT_FORCE_INLINE ulong* crt_data_co_prime(const crt_data_t C, ulong i)
-{
-    FLINT_ASSERT(i < C->nprimes);
-    return C->data + i*C->coeff_len;
-}
 
-FLINT_FORCE_INLINE ulong* _crt_data_co_prime(const crt_data_t C, ulong i, ulong n)
-{
-    FLINT_ASSERT(i < C->nprimes);
-    FLINT_ASSERT(n == C->coeff_len);
-    return C->data + i*n;
-}
-
-/* return mpn of length C->coeff_len */
-FLINT_FORCE_INLINE ulong* crt_data_prod_primes(const crt_data_t C)
-{
-    return C->data + C->nprimes*C->coeff_len;
-}
-
-/* the reduction of co_prime mod the i^th prime */
-FLINT_FORCE_INLINE ulong* crt_data_co_prime_red(const crt_data_t C, ulong i)
-{
-    FLINT_ASSERT(i < C->nprimes);
-    return C->data + C->nprimes*C->coeff_len + C->coeff_len + i;
-}
 
 /*
     need  ceil(64*bn/bits) <= prod_primes/2^(2*bits)
     i.e.  (64*bn+bits-1)/bits <= prod_primes/2^(2*bits)
            64*bn <= bits*prod_primes/2^(2*bits) - (bits-1)
 */
-ulong crt_data_find_bn_bound(const crt_data_t C, ulong bits)
+static ulong crt_data_find_bn_bound(const crt_data_t C, ulong bits)
 {
     ulong bound = 0;
     ulong q = (2*bits)/FLINT_BITS;
@@ -223,7 +198,7 @@ ulong crt_data_find_bn_bound(const crt_data_t C, ulong bits)
     first try bits = (nbits(prod_primes) - nbits(bn))/2 then adjust
     also require bits > 64 for some applications below
 */
-ulong crt_data_find_bits(const crt_data_t C, ulong bn)
+static ulong crt_data_find_bits(const crt_data_t C, ulong bn)
 {
     ulong p_nbits = flint_mpn_nbits(crt_data_prod_primes(C), C->coeff_len);
     ulong bits = n_max(66, (p_nbits - n_nbits(bn))/2);

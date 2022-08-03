@@ -13,8 +13,8 @@
 #define MACHINE_VECTORS_H
 
 
-#define FLINT_AVX 0
-#define FLINT_NEON 1
+#define FLINT_AVX 1
+#define FLINT_NEON 0
 
 #define ALIGN_STRUCT(x) __attribute__((aligned(x)))
 
@@ -97,6 +97,16 @@ FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
 FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
     _mm256_storeu_si256((__m256i*) z, a);
 }
+
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
+    return _mm256_loadu_si256((__m256i*) a);
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_load_unaligned(const ulong* a) {
+    vec8n z = {vec4n_load_unaligned(a+0), vec4n_load_unaligned(a+4)};
+    return z;
+}
+
 
 FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
     __m256d t = _mm256_set1_pd(0x1.0p52);
@@ -526,6 +536,11 @@ FLINT_FORCE_INLINE void vec8d_store_unaligned(double* z, vec8d a) {
 
 FLINT_FORCE_INLINE int vec8d_same(vec8d a, vec8d b) {
     return vec4d_same(a.e1, b.e1) && vec4d_same(a.e2, b.e2);
+}
+
+FLINT_FORCE_INLINE vec8d vec8n_convert_limited_vec8d(vec8n a) {
+    vec8d z = {vec4n_convert_limited_vec4d(a.e1), vec4n_convert_limited_vec4d(a.e2)};
+    return z;
 }
 
 
