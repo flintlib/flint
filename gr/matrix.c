@@ -326,6 +326,7 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
+/* todo: fmpz etc */
 int
 matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 {
@@ -364,7 +365,7 @@ matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_
         int status;
         gr_ptr c;
 
-        GR_TMP_INIT(c, ctx);
+        GR_TMP_INIT(c, MATRIX_CTX(ctx)->base_ring);
 
         status = gr_set_other(c, y, y_ctx, MATRIX_CTX(ctx)->base_ring);
 
@@ -377,7 +378,8 @@ matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_
                 status = gr_mat_mul_scalar(res, mat, c, MATRIX_CTX(ctx)->base_ring);
         }
 
-        GR_TMP_CLEAR(c, ctx);
+        GR_TMP_CLEAR(c, MATRIX_CTX(ctx)->base_ring);
+
         return status;
     }
 

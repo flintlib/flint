@@ -669,8 +669,8 @@ _gr_acf_pow(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 int
 _gr_acf_i(acf_t res, const gr_ctx_t ctx)
 {
-    arf_one(acf_realref(res));
-    arf_zero(acf_imagref(res));
+    arf_zero(acf_realref(res));
+    arf_one(acf_imagref(res));
     return GR_SUCCESS;
 }
 

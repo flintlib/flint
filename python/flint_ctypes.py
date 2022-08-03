@@ -1243,14 +1243,24 @@ class gr_poly(gr_elem):
             raise NotImplementedError
         return c
 
-    def __call__(self, x):
+    def __call__(self, x, algorithm=None):
         f_R = self.parent()._coefficient_ring
         x_R = x.parent()
         res = x_R()
         if f_R is x_R:
-            status = libgr.gr_poly_evaluate(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+            if algorithm is None:
+                status = libgr.gr_poly_evaluate(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+            elif algorithm == "rectangular":
+                status = libgr.gr_poly_evaluate_rectangular(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+            else:
+                raise ValueError
         else:
-            status = libgr.gr_poly_evaluate_other_horner(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+            if algorithm is None:
+                status = libgr.gr_poly_evaluate_other_horner(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+            elif algorithm == "rectangular":
+                status = libgr.gr_poly_evaluate_other_rectangular(res._ref, self._ref, x._ref, x_R._ref, f_R._ref)
+            else:
+                raise ValueError
         if status:
             raise NotImplementedError
         return res
@@ -1800,6 +1810,9 @@ def test_all():
     v = f(A)
     assert v == QM2([[27,38],[57,84]])
     assert v.parent() is QM2
+
+    A = Mat(RR,2,2)([[1,2],[3,4]])
+    assert ZZx(list(range(10)))(A, algorithm="rectangular") == Mat(QQ,2,2)([[9596853, 13986714], [20980071, 30576924]])
 
 
 if __name__ == "__main__":

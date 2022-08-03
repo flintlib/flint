@@ -122,7 +122,8 @@ WARN_UNUSED_RESULT int gr_poly_evaluate(gr_ptr res, const gr_poly_t poly, gr_src
 
 WARN_UNUSED_RESULT int _gr_poly_evaluate_other_horner(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_evaluate_other_horner(gr_ptr res, const gr_poly_t f, gr_srcptr a, gr_ctx_t a_ctx, gr_ctx_t ctx);
-
+WARN_UNUSED_RESULT int _gr_poly_evaluate_other_rectangular(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_evaluate_other_rectangular(gr_ptr res, const gr_poly_t f, gr_srcptr a, gr_ctx_t a_ctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_evaluate_other(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_evaluate_other(gr_ptr res, const gr_poly_t f, gr_srcptr a, gr_ctx_t a_ctx, gr_ctx_t ctx);
 
