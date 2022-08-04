@@ -66,17 +66,21 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     /* |res(f,g)| <= (|f|_2)^deg(g) (|g|_2)^deg(f) */
     {
         fmpz_t b1, b2;
-
         fmpz_init(b1);
         fmpz_init(b2);
 
-        _fmpz_poly_2norm(b1, A, len1);
-        _fmpz_poly_2norm(b2, B, len2);
+        for (i = 0; i < len1; i++)
+            fmpz_addmul(b1, A + i, A + i);
+        for (i = 0; i < len2; i++)
+            fmpz_addmul(b2, B + i, B + i);
 
         fmpz_pow_ui(b1, b1, len2 - 1);
         fmpz_pow_ui(b2, b2, len1 - 1);
-
         fmpz_mul(b1, b1, b2);
+
+        fmpz_sqrt(b1, b1);
+        fmpz_add_ui(b1, b1, 1);
+
         bound = fmpz_bits(b1) + 2;
 
         fmpz_clear(b1);
