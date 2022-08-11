@@ -71,6 +71,8 @@ int main(void)
         ulong * a, * b, * q1, * q2, * r1, * r2;
         ulong an, bn, qn, i, reps;
 
+flint_printf("nbits: %wu\n", nbits);
+
         for (reps = 0; reps < 100; reps++)
         {
             nmod_init(&mod, n_randbits(state, nbits));

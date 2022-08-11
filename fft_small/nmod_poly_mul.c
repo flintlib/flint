@@ -1125,7 +1125,7 @@ got_np_and_offset:
 
 #if 1
 void _nmod_poly_mul_mod_xpnm1(
-    ulong* z,
+    ulong* z, ulong ztrunc,
     const ulong* a, ulong an,
     const ulong* b, ulong bn,
     ulong depth,
@@ -1141,6 +1141,7 @@ void _nmod_poly_mul_mod_xpnm1(
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
+    FLINT_ASSERT(ztrunc <= N);
 
     /* first see if mod.n is on of R->ffts[i].mod.n */
 
@@ -1221,7 +1222,7 @@ got_np_and_offset:
 
     s2worker_struct s2args[8];
     ulong zl = 0;
-    ulong zh = N;
+    ulong zh = ztrunc;
     ulong o = zl;
     for (i = 0; i < nthreads; i++)
     {
@@ -1252,27 +1253,27 @@ got_np_and_offset:
 
 #else
 void _nmod_poly_mul_mod_xpnm1(
-    ulong* z,
+    ulong* z, ulong zn,
     const ulong* a, ulong an,
     const ulong* b, ulong bn,
     ulong lgN,
     nmod_t mod,
     mpn_ctx_t R)
 {
-    ulong zn = an + bn - 1;
     ulong N = n_pow2(lgN);
+    FLINT_ASSERT(zn <= N);
 
-    ulong* t = FLINT_ARRAY_ALLOC(zn, ulong);
+    ulong* t = FLINT_ARRAY_ALLOC(an + bn - 1, ulong);
 
     if (an >= bn)
         _nmod_poly_mul(t, a, an, b, bn, mod);
     else
         _nmod_poly_mul(t, b, bn, a, an, mod);
 
-    for (ulong i = 0; i < N; i++)
+    for (ulong i = 0; i < zn; i++)
     {
         ulong c = 0;
-        for (ulong j = i; j < zn; j += N)
+        for (ulong j = i; j < an + bn - 1; j += N)
             c = nmod_add(c, t[j], mod);
         z[i] = c;
     }
@@ -1280,6 +1281,25 @@ void _nmod_poly_mul_mod_xpnm1(
     flint_free(t);
 }
 #endif
+
+/* z -= a mod x^N-1, write coeffs [0,ztrunc) */
+void _nmod_poly_sub_mod_xpNm1(
+    ulong* z, ulong ztrunc,
+    const ulong* a, ulong an,
+    ulong N, nmod_t mod)
+{
+    FLINT_ASSERT(ztrunc <= an);
+    FLINT_ASSERT(ztrunc <= N);
+
+    for (ulong i = 0; i < ztrunc; i++)
+    {
+        ulong k = i;
+        ulong c = nmod_sub(a[k], z[i], mod);
+        for (k += N; k < an; k += N)
+            c = nmod_add(c, a[k], mod);
+        z[i] = c;
+    }
+}
 
 
 /*
@@ -1317,7 +1337,7 @@ void _nmod_poly_mul_mid_classical(
 
     choose a precision Bn of B(x) = B[0] + ... + B[Bn-1]*x^(Bn-1) with
 
-        rev(B) = rev(b)^-1 mod x^Bn = B[p-1] + B[p-2]*x + ... + B[0]*x^(Bn-1)
+        rev(B) = rev(b)^-1 mod x^Bn = B[Bn-1] + B[Bn-2]*x + ... + B[0]*x^(Bn-1)
 
     then
         (a[an-1] + a[an-2]*x + ... + a[an-qn]*x^(qn-1))
@@ -1334,7 +1354,7 @@ void _nmod_poly_mul_mid_classical(
 
     or, the same thing,
 
-        _mul_mid(q, Bn-1, Bn-1+qn, a+bn+1, qn, B, Bn)
+        _mul_mid(q, Bn-1, Bn-1+qn, a+an-qn, qn, B, Bn)
 
     will calculate q. Then, find r via
 
@@ -1367,17 +1387,9 @@ void _nmod_poly_divrem_mpn_ctx(
     _nmod_poly_inv_series(B, t, bn, Bn, mod);
     _nmod_poly_reverse(B, B, Bn, Bn);
 
-//    _nmod_poly_mul_mid_classical(q, an+Bn-1-qn, an+Bn-1, a, an, B, Bn, mod);
-    _nmod_poly_mul_mid_mpn_ctx(q, Bn-1, Bn-1+qn, a+bn-1, qn, B, Bn, mod, R);
-
-    _nmod_poly_mul_mod_xpnm1(t, q, qn, b, bn, lgN, mod, R);
-    for (ulong i = 0; i < bn-1; i++)
-    {
-        ulong c = a[i];
-        for (ulong j = i + N; j < an; j += N)
-            c = nmod_add(c, a[j], mod);
-        r[i] = nmod_sub(c, t[i], mod);
-    }
+    _nmod_poly_mul_mid_mpn_ctx(q, Bn-1, Bn-1+qn, a+an-qn, qn, B, Bn, mod, R);
+    _nmod_poly_mul_mod_xpnm1(r, bn-1, q, qn, b, bn, lgN, mod, R);
+    _nmod_poly_sub_mod_xpNm1(r, bn-1, a, an, N, mod);
 
     flint_free(B);
     flint_free(t);

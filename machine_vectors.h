@@ -690,13 +690,20 @@ FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
 
 FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
 {
-    vec4n t3 = vec4n_add(a, b);
-    vec4n t0 = vec4n_sub(n, b);
     vec4n tt = vec4n_set_n(0x8000000000000000);
-          t0 = vec4n_sub(t0, tt);
+    vec4n s = vec4n_add(a, b);
+#if 0
+    vec4n  m = vec4n_sub(n, tt);
+    vec4n t0 = vec4n_sub(m, a);
+    vec4n t1 = vec4n_sub(b, tt);
+    vec4n t2 = vec4n_sub(t1, t0);
+    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));  
+#else
+    vec4n t0 = vec4n_sub(s, n);
     vec4n t1 = vec4n_sub(a, tt);
-    vec4n t2 = vec4n_sub(t3, n);
-    return _mm256_blendv_epi8(t2, t3, _mm256_cmpgt_epi64(t0, t1));  
+    vec4n t2 = vec4n_sub(t0, tt);
+    return _mm256_blendv_epi8(t0, s, _mm256_cmpgt_epi64(t2, t1));
+#endif
 }
 
 EXTEND_VEC_DEF0(vec4d, vec8d, _zero)
