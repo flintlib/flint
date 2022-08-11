@@ -262,6 +262,12 @@ FLINT_FORCE_INLINE vec1d vec1d_reduce_pm1n_to_pmhn(vec1d a, vec1d n) {
         return a;
 }
 
+/* [0,2n) to [0,n) */
+FLINT_FORCE_INLINE vec1d vec1d_reduce_2n_to_n(vec1d a, vec1d n) {
+    return a-n >= 0 ? a-n : a;
+}
+
+
 /* vec4 *****************************************************/
 
 FLINT_FORCE_INLINE double vec4d_get_index(vec4d a, const int i) {
@@ -484,6 +490,12 @@ FLINT_FORCE_INLINE vec4d vec4d_reduce_pm1n_to_pmhn(vec4d a, vec4d n) {
     return a;
 }
 
+/* [0,2n) to [0,n) */
+FLINT_FORCE_INLINE vec4d vec4d_reduce_2n_to_n(vec4d a, vec4d n) {
+    vec4d s = vec4d_sub(a, n);
+    return vec4d_blendv(s, a, s);
+}
+
 
 /* vec8 **********************************************************************/
 
@@ -652,6 +664,41 @@ FLINT_FORCE_INLINE V V##f(V a, V b, V c, V d) { \
     return z; \
 }
 
+FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
+  return _mm256_set1_epi64x(a);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b)
+{
+    return _mm256_add_epi64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b)
+{
+    return _mm256_sub_epi64(a, b);
+}
+
+/* for n < 2^63 */
+FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
+{
+    vec4n s = vec4n_add(a, b);
+    vec4n t = vec4n_sub(s, n);
+    vec4n m = _mm256_srai_epi32(t, 31);
+          m = _mm256_shuffle_epi32(m, 1 + 4*(1 + 4*(3 + 4*(3))));
+    return _mm256_blendv_epi8(t, s, m);  
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
+{
+    vec4n t3 = vec4n_add(a, b);
+    vec4n t0 = vec4n_sub(n, b);
+    vec4n tt = vec4n_set_n(0x8000000000000000);
+          t0 = vec4n_sub(t0, tt);
+    vec4n t1 = vec4n_sub(a, tt);
+    vec4n t2 = vec4n_sub(t3, n);
+    return _mm256_blendv_epi8(t2, t3, _mm256_cmpgt_epi64(t0, t1));  
+}
+
 EXTEND_VEC_DEF0(vec4d, vec8d, _zero)
 EXTEND_VEC_DEF1(vec4d, vec8d, _neg)
 EXTEND_VEC_DEF1(vec4d, vec8d, _round)
@@ -663,6 +710,7 @@ EXTEND_VEC_DEF2(vec4d, vec8d, _mul)
 EXTEND_VEC_DEF2(vec4d, vec8d, _div)
 EXTEND_VEC_DEF2(vec4d, vec8d, _reduce_pm1n_to_pmhn)
 EXTEND_VEC_DEF2(vec4d, vec8d, _reduce_pm1no_to_0n)
+EXTEND_VEC_DEF2(vec4d, vec8d, _reduce_2n_to_n)
 EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_to_pm1n)
 EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_to_pm1no)
 EXTEND_VEC_DEF3(vec4d, vec8d, _reduce_to_0n)
@@ -671,6 +719,8 @@ EXTEND_VEC_DEF3(vec4d, vec8d, _fmsub)
 EXTEND_VEC_DEF3(vec4d, vec8d, _fnmadd)
 EXTEND_VEC_DEF3(vec4d, vec8d, _fnmsub)
 EXTEND_VEC_DEF3(vec4d, vec8d, _blendv)
+EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
+EXTEND_VEC_DEF3(vec4n, vec8n, _addmod_limited)
 EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod)
 EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 
@@ -680,6 +730,33 @@ EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 #undef EXTEND_VEC_DEF1
 #undef EXTEND_VEC_DEF0
 
+
+
+
+FLINT_FORCE_INLINE vec8n vec8n_set_n(ulong a) {
+    vec4n x = vec4n_set_n(a);
+    vec8n z = {x, x};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
+    return _mm256_srl_epi64(a, _mm_set_epi32(0,0,0,b));
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong b) {
+    vec8n z = {vec4n_bit_shift_right(a.e1, b), vec4n_bit_shift_right(a.e2, b)};
+    return z;
+}
+
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
+    return _mm256_and_si256(a, b);
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
+    vec8n z = {vec4n_bit_and(a.e1, b.e1), vec4n_bit_and(a.e2, b.e2)};
+    return z;
+}
 
 
 #elif FLINT_NEON

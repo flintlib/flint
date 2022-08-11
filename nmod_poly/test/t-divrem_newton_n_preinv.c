@@ -37,7 +37,7 @@ main(void)
     fflush(stdout);
 
     /* Check result of divrem */
-    for (i = 0; i < 500 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, binv, q, r, test;
 
@@ -53,11 +53,9 @@ main(void)
         nmod_poly_init(test, n);
 
         do
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+            nmod_poly_randtest(b, state, n_randint(state, 200));
         while (b->length <= 2);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        if (a->length > 2*(b->length)-3)
-          nmod_poly_truncate (a, 2*(b->length)-3);
+        nmod_poly_randtest(a, state, 2*b->length - 1);
 
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
@@ -69,6 +67,8 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("a.length: %wd\n", a->length);
+            flint_printf("b.length: %wd\n", b->length);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(test), flint_printf("\n\n");
             nmod_poly_print(q), flint_printf("\n\n");
@@ -86,7 +86,7 @@ main(void)
         nmod_poly_clear(r);
         nmod_poly_clear(test);
     }
-
+#if 0
     /* Check aliasing of a and q */
     for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
@@ -370,7 +370,7 @@ main(void)
         nmod_poly_clear(q);
         nmod_poly_clear(r);
     }
-
+#endif
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

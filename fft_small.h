@@ -106,6 +106,14 @@ FLINT_INLINE ulong n_clog2(ulong x) {
     return (x <= 2) ? (x == 2) : 64 - __builtin_clzll(x - 1);
 }
 
+FLINT_INLINE ulong n_flog2(ulong x) {
+    return (x <= 2) ? (x == 2) : 63 - __builtin_clzll(x);
+}
+
+FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
+
+FLINT_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
+
 
 FLINT_DLL void* flint_aligned_alloc(ulong alignment, ulong size);
 
@@ -389,11 +397,31 @@ void mpn_ctx_clear(mpn_ctx_t R);
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong bn);
 
-void _mpn_ctx_nmod_poly_mul(
-    mpn_ctx_t R,
-    ulong* z,
-    ulong* a, ulong an,
-    ulong* b, ulong bn,
+void _nmod_poly_mul_mid_mpn_ctx(
+    ulong* z, ulong zl, ulong zh,
+    const ulong* a, ulong an,
+    const ulong* b, ulong bn,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+void _nmod_poly_divrem_mpn_ctx(
+    ulong* q,
+    ulong* r,
+    const ulong* a, ulong an,
+    const ulong* b, ulong bn,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+void _nmod_poly_mul_mid_classical(
+    ulong* z, slong zl, slong zh,
+    const ulong* a, slong an,
+    const ulong* b, slong bn,
+    nmod_t mod);
+
+void _nmod_poly_mul_mid(
+    ulong* z, slong zl, slong zh,
+    const ulong* a, slong an,
+    const ulong* b, slong bn,
     nmod_t mod);
 
 int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e);
