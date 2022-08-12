@@ -152,7 +152,7 @@ int main(void)
 
             timeit_start(timer);
             for (i = 0; i < nreps; i++)
-                _mpn_ctx_nmod_poly_mul(R, d, a, an, b, bn, mod);
+                _nmod_poly_mul_mid_mpn_ctx(d, 0, an+bn-1, a, an, b, bn, mod, R);
             timeit_stop(timer);
             time2 = timer->wall*1e6/(nreps*log2(zn)*zn);
 

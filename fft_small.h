@@ -392,6 +392,12 @@ typedef struct {
 
 typedef mpn_ctx_struct mpn_ctx_t[1];
 
+void _convert_block(ulong* Xs, sd_fft_ctx_struct* Rffts, double* d, ulong dstride, ulong np, ulong I);
+ulong flint_mpn_nbits(const ulong* a, ulong an);
+int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e);
+unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, unsigned char cf);
+
+
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
@@ -424,7 +430,49 @@ void _nmod_poly_mul_mid(
     const ulong* b, slong bn,
     nmod_t mod);
 
-int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e);
+typedef struct {
+    ulong depth;
+    ulong N;
+    ulong offset;
+    ulong np;
+    ulong stride;
+    ulong bn;
+    ulong btrunc;
+    double* bbuf;
+} mul_precomp_struct;
+
+FLINT_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
+{
+    flint_aligned_free(M->bbuf);
+}
+
+typedef struct {
+    mul_precomp_struct quo_maker[1];
+    mul_precomp_struct rem_maker[1];
+} nmod_poly_divrem_precomp_struct;
+
+FLINT_INLINE void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct* M)
+{
+    _mul_precomp_clear(M->quo_maker);
+    _mul_precomp_clear(M->rem_maker);
+}
+
+void _nmod_poly_divrem_precomp_init(
+    nmod_poly_divrem_precomp_struct* M,
+    const ulong* b, ulong bn,
+    ulong Bn,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+
+int _nmod_poly_divrem_precomp(
+    ulong* q,
+    ulong* r,
+    const ulong* a, ulong an,
+    nmod_poly_divrem_precomp_struct* M,
+    nmod_t mod,
+    mpn_ctx_t R);
+
 
 #ifdef __cplusplus
 }
