@@ -20,7 +20,7 @@
 void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)
 {
-    flint_bitcnt_t bits1, bits2, bound, pbits, curr_bits = 0; 
+    flint_bitcnt_t bound, pbits, curr_bits = 0; 
     slong i, num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
@@ -62,16 +62,31 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     pbits = FLINT_BITS - 1;
     p = (UWORD(1)<<pbits);
 
-    /* get bound on size of resultant */
-    bits1 = FLINT_ABS(_fmpz_vec_max_bits(A, len1)); 
-    bits2 = FLINT_ABS(_fmpz_vec_max_bits(B, len2));
+    /* Theorem 7, https://doi.org/10.1016/j.laa.2009.08.012 */
+    /* |res(f,g)| <= (|f|_2)^deg(g) (|g|_2)^deg(f) */
+    {
+        fmpz_t b1, b2;
+        fmpz_init(b1);
+        fmpz_init(b2);
 
-    /* bound on number of bits of 2(deg1 + deg2)! */
-    bound = (len1 + len2 - 1)*FLINT_BIT_COUNT((10*(len1 + len2 - 1) + 26)/27) + 3;
+        for (i = 0; i < len1; i++)
+            fmpz_addmul(b1, A + i, A + i);
+        for (i = 0; i < len2; i++)
+            fmpz_addmul(b2, B + i, B + i);
 
-    /* Upper bound Hadamard bound */
-    bound += (len1 - 1)*bits2 + (len2 - 1)*bits1;
-    
+        fmpz_pow_ui(b1, b1, len2 - 1);
+        fmpz_pow_ui(b2, b2, len1 - 1);
+        fmpz_mul(b1, b1, b2);
+
+        fmpz_sqrt(b1, b1);
+        fmpz_add_ui(b1, b1, 1);
+
+        bound = fmpz_bits(b1) + 2;
+
+        fmpz_clear(b1);
+        fmpz_clear(b2);
+    }
+
     num_primes = (bound + pbits - 1)/pbits;
 
     parr = _nmod_vec_init(num_primes);
@@ -84,7 +99,7 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     /* make space for polynomials mod p */
     a = _nmod_vec_init(len1);
     b = _nmod_vec_init(len2);
-    
+
     for (i = 0; curr_bits < bound; )
     {
         /* get new prime and initialise modulus */
