@@ -306,6 +306,9 @@ Determinant and trace
               int gr_mat_det_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_det_lu(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_det_cofactor(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_det_generic_field(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_det_generic_integral_domain(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_det_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_det(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
 
     Sets *res* to the determinant of the square matrix *mat*.
@@ -324,6 +327,12 @@ Determinant and trace
       requiring `O(n^3)` operations. These algorithms can fail if zero
       certification or inversion fails, in which case the ``GR_UNABLE``
       flag is returned.
+
+    * The *generic*, *generic_field* and *generic_integral_domain*
+      versions choose an appropriate algorithm for a generic ring
+      depending on the availability of division.
+
+    * The *default* method can be overloaded.
 
     If the matrix is not square, ``GR_DOMAIN`` is returned.
 

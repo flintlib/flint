@@ -29,7 +29,6 @@ gr_mat_det_generic_integral_domain(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
         return gr_mat_det_fflu(res, A, ctx);
 }
 
-
 int
 gr_mat_det_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {

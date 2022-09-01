@@ -386,6 +386,49 @@ matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_
     return GR_UNABLE;
 }
 
+/* todo: fmpz etc */
+int
+matrix_div_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+{
+    /* todo: matrix-matrix division ? */
+
+    if (y_ctx == MATRIX_CTX(ctx)->base_ring)
+    {
+        int status = GR_SUCCESS;
+
+        if (res->r != mat->r || res->c != mat->c)
+            status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
+
+        if (status != GR_SUCCESS)
+            return status;
+
+        return gr_mat_div_scalar(res, mat, y, y_ctx);
+    }
+    else
+    {
+        int status;
+        gr_ptr c;
+
+        GR_TMP_INIT(c, MATRIX_CTX(ctx)->base_ring);
+
+        status = gr_set_other(c, y, y_ctx, MATRIX_CTX(ctx)->base_ring);
+
+        if (status == GR_SUCCESS)
+        {
+            if (res->r != mat->r || res->c != mat->c)
+                status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
+
+            if (status == GR_SUCCESS)
+                status = gr_mat_div_scalar(res, mat, c, MATRIX_CTX(ctx)->base_ring);
+        }
+
+        GR_TMP_CLEAR(c, MATRIX_CTX(ctx)->base_ring);
+
+        return status;
+    }
+
+    return GR_UNABLE;
+}
 
 int
 matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -430,6 +473,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_SUB,         (gr_funcptr) matrix_sub},
     {GR_METHOD_MUL,         (gr_funcptr) matrix_mul},
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) matrix_mul_other},
+    {GR_METHOD_DIV_OTHER,   (gr_funcptr) matrix_div_other},
     {GR_METHOD_INV,         (gr_funcptr) matrix_inv},
     {0,                     (gr_funcptr) NULL},
 };

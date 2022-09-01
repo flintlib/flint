@@ -712,20 +712,91 @@ _gr_acf_vec_dot_rev(acf_t res, const acf_t initial, int subtract, acf_srcptr vec
     return GR_SUCCESS;
 }
 
-/*
+#include "gr_poly.h"
+#include "acb_poly.h"
+
+/* todo: test */
 int
 _gr_acf_poly_mullow(acf_ptr res,
     acf_srcptr poly1, slong len1,
     acf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    _acf_poly_mullow(res, poly1, len1, poly2, len2, n, ACF_CTX_PREC(ctx));
-    return GR_SUCCESS;
+    len1 = FLINT_MIN(len1, n);
+    len2 = FLINT_MIN(len2, n);
+
+    /* todo: tuning */
+    if (len1 <= 10 || len2 <= 10)
+    {
+        return _gr_poly_mullow_generic(res, poly1, len1, poly2, len2, n, ctx);
+    }
+    else
+    {
+        acb_ptr tmp, t1, t2, t3;
+        slong i;
+        int squaring = (poly1 == poly2 && len1 == len2);
+
+        if (!squaring)
+        {
+            tmp = flint_malloc(sizeof(acb_struct) * (len1 + len2 + n));
+            t1 = tmp;
+            t2 = t1 + len1;
+            t3 = t2 + len2;
+        }
+        else
+        {
+            tmp = flint_malloc(sizeof(acb_struct) * (len1 + n));
+            t1 = tmp;
+            t2 = t1;
+            t3 = t2 + len2;
+        }
+
+        for (i = 0; i < len1; i++)
+        {
+            *arb_midref(acb_realref(t1 + i)) = *acf_realref(poly1 + i);
+            *arb_midref(acb_imagref(t1 + i)) = *acf_imagref(poly1 + i);
+            mag_init(arb_radref(acb_realref(t1 + i)));
+            mag_init(arb_radref(acb_imagref(t1 + i)));
+        }
+
+        if (!squaring)
+        {
+            for (i = 0; i < len2; i++)
+            {
+                *arb_midref(acb_realref(t2 + i)) = *acf_realref(poly2 + i);
+                *arb_midref(acb_imagref(t2 + i)) = *acf_imagref(poly2 + i);
+                mag_init(arb_radref(acb_realref(t2 + i)));
+                mag_init(arb_radref(acb_imagref(t2 + i)));
+            }
+        }
+
+        for (i = 0; i < n; i++)
+        {
+            *arb_midref(acb_realref(t3 + i)) = *acf_realref(res + i);
+            *arb_midref(acb_imagref(t3 + i)) = *acf_imagref(res + i);
+            mag_init(arb_radref(acb_realref(t3 + i)));
+            mag_init(arb_radref(acb_imagref(t3 + i)));
+        }
+
+        _acb_poly_mullow(t3, t1, len1, t2, len2, n, ACF_CTX_PREC(ctx));
+
+        for (i = 0; i < n; i++)
+        {
+            *acf_realref(res + i) = *arb_midref(acb_realref(t3 + i));
+            *acf_imagref(res + i) = *arb_midref(acb_imagref(t3 + i));
+            mag_clear(arb_radref(acb_realref(t3 + i)));
+            mag_clear(arb_radref(acb_imagref(t3 + i)));
+        }
+
+        flint_free(tmp);
+
+        return GR_SUCCESS;
+    }
 }
-*/
 
 #include "gr_mat.h"
 #include "acb_mat.h"
 
+/* todo: test */
 int
 _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
@@ -924,9 +995,8 @@ gr_method_tab_input _acf_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acf_vec_dot_rev},
-/*
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acf_poly_mullow},
-*/
+
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acf_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     /* todo */

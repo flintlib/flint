@@ -1,6 +1,7 @@
 #include "acb.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
+#include "acf.h"
 #include "qqbar.h"
 #include "gr.h"
 
@@ -168,6 +169,19 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
                 arb_set_arf(acb_realref(res), x);
                 arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
                 arb_zero(acb_imagref(res));
+                return GR_SUCCESS;
+            }
+            else
+            {
+                return GR_DOMAIN;
+            }
+
+        case GR_CTX_COMPLEX_FLOAT_ACF:
+            if (arf_is_finite(acf_realref((acf_srcptr) x)) && arf_is_finite(acf_imagref((acf_srcptr) x)))
+            {
+                arb_set_arf(acb_realref(res), acf_realref((acf_srcptr) x));
+                arb_set_arf(acb_imagref(res), acf_imagref((acf_srcptr) x));
+                acb_set_round(res, res, ACB_CTX_PREC(ctx));
                 return GR_SUCCESS;
             }
             else

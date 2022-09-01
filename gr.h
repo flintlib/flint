@@ -415,6 +415,8 @@ typedef enum
     GR_CTX_DIRICHLET_GROUP,
     GR_CTX_PERM,
 
+    GR_CTX_UNKNOWN_DOMAIN,
+
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
 gr_which_structure;

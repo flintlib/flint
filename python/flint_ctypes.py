@@ -333,6 +333,10 @@ class gr_elem:
                 status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
             elif typ is float:
                 status = libgr.gr_set_d(self._ref, val, self._ctx)
+            elif typ is complex:
+                # todo
+                x = context(val.real) + context(val.imag) * context.i()
+                status = libgr.gr_set(self._ref, x._ref, self._ctx)
             elif hasattr(val, "_gr_elem_"):
                 val = val._gr_elem_(context)
                 assert val.parent() is context
@@ -1812,8 +1816,11 @@ def test_all():
     assert v.parent() is QM2
 
     A = Mat(RR,2,2)([[1,2],[3,4]])
-    assert ZZx(list(range(10)))(A, algorithm="rectangular") == Mat(QQ,2,2)([[9596853, 13986714], [20980071, 30576924]])
+    B = ZZx(list(range(10)))(A, algorithm="rectangular")
+    assert B == Mat(QQ,2,2)([[9596853, 13986714], [20980071, 30576924]])
+    assert B.parent() is A.parent()
 
+    assert CF(2+3j) * (1+1j) == CF((2+3j) * (1+1j))
 
 if __name__ == "__main__":
     from time import time
