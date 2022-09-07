@@ -218,6 +218,7 @@ Mainly for internal use.
    :maxdepth: 1
 
    fmpzi.rst
+   acf.rst
    double_interval.rst
    fmpz_extras.rst
    bool_mat.rst

@@ -651,6 +651,17 @@ Summation
     the terms are far apart. Warning: this function is implemented naively,
     and the running time is quadratic with respect to *len* in the worst case.
 
+Dot products
+-------------------------------------------------------------------------------
+
+.. function:: void arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
+
+    Computes an approximate dot product, with the same meaning of
+    the parameters as :func:`arb_dot`.
+    This operation is not correctly rounded: the final rounding is done
+    in the direction ``rnd`` but intermediate roundings are
+    implementation-defined.
+
 Division
 -------------------------------------------------------------------------------
 

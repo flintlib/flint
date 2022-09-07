@@ -12,10 +12,6 @@
 #include "arb.h"
 #include "flint/longlong.h"
 
-/* We need uint64_t instead of mp_limb_t on 32-bit systems for
-   safe summation of 30-bit error bounds. */
-#include <stdint.h>
-
 void
 _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
     mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn,
@@ -27,49 +23,49 @@ _arb_dot_add_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
     int negative, flint_bitcnt_t shift);
 
 void
-arb_approx_dot_simple(arb_t res, const arb_t initial, int subtract,
-    arb_srcptr x, slong xstep, arb_srcptr y, slong ystep, slong len, slong prec)
+arf_approx_dot_simple(arf_t res, const arf_t initial, int subtract,
+    arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
 {
     slong i;
 
     if (len <= 0)
     {
         if (initial == NULL)
-            arf_zero(arb_midref(res));
+            arf_zero(res);
         else
-            arf_set_round(arb_midref(res), arb_midref(initial), prec, ARB_RND);
+            arf_set_round(res, initial, prec, rnd);
         return;
     }
 
     if (initial == NULL)
     {
-        arf_mul(arb_midref(res), arb_midref(x), arb_midref(y), prec, ARB_RND);
+        arf_mul(res, x, y, prec, rnd);
     }
     else
     {
         if (subtract)
-            arf_neg(arb_midref(res), arb_midref(initial));
+            arf_neg(res, initial);
         else
-            arf_set(arb_midref(res), arb_midref(initial));
-        arf_addmul(arb_midref(res), arb_midref(x), arb_midref(y), prec, ARB_RND);
+            arf_set(res, initial);
+        arf_addmul(res, x, y, prec, rnd);
     }
 
     for (i = 1; i < len; i++)
-        arf_addmul(arb_midref(res), arb_midref(x + i * xstep), arb_midref(y + i * ystep), prec, ARB_RND);
+        arf_addmul(res, x + i * xstep, y + i * ystep, prec, rnd);
 
     if (subtract)
-        arf_neg(arb_midref(res), arb_midref(res));
+        arf_neg(res, res);
 }
 
 void
-arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep, arb_srcptr y, slong ystep, slong len, slong prec)
+arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
 {
     slong i, j, nonzero, padding, extend;
     slong xexp, yexp, exp, max_exp, min_exp, sum_exp;
     int xnegative, ynegative;
     mp_size_t xn, yn, sn, alloc;
     flint_bitcnt_t shift;
-    arb_srcptr xi, yi;
+    arf_srcptr xi, yi;
     arf_srcptr xm, ym;
     mp_limb_t serr;   /* Sum over arithmetic errors  - not used, but need dummy for calls */
     mp_ptr tmp, sum;  /* Workspace */
@@ -81,19 +77,19 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
         if (initial == NULL)
         {
             if (len <= 0)
-                arf_zero(arb_midref(res));
+                arf_zero(res);
             else
             {
                 if (subtract)
-                    arf_neg_mul(arb_midref(res), arb_midref(x), arb_midref(y), prec, ARB_RND);
+                    arf_neg_mul(res, x, y, prec, rnd);
                 else
-                    arf_mul(arb_midref(res), arb_midref(x), arb_midref(y), prec, ARB_RND);
+                    arf_mul(res, x, y, prec, rnd);
             }
             return;
         }
         else if (len <= 0)
         {
-            arf_set_round(arb_midref(res), arb_midref(initial), prec, ARB_RND);
+            arf_set_round(res, initial, prec, rnd);
             return;
         }
     }
@@ -110,13 +106,13 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
     /* Account for the initial term. */
     if (initial != NULL)
     {
-        if (!ARF_IS_LAGOM(arb_midref(initial)))
+        if (!ARF_IS_LAGOM(initial))
         {
-            arb_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec);
+            arf_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec, rnd);
             return;
         }
 
-        xm = arb_midref(initial);
+        xm = initial;
 
         if (!arf_is_special(xm))
         {
@@ -135,14 +131,14 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
         yi = y + i * ystep;
 
         /* Fallback for huge exponents or non-finite values. */
-        if (!ARF_IS_LAGOM(arb_midref(xi)) || !ARF_IS_LAGOM(arb_midref(yi)))
+        if (!ARF_IS_LAGOM(xi) || !ARF_IS_LAGOM(yi))
         {
-            arb_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec);
+            arf_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec, rnd);
             return;
         }
 
-        xm = arb_midref(xi);
-        ym = arb_midref(yi);
+        xm = xi;
+        ym = yi;
 
         if (!arf_is_special(xm))
         {
@@ -168,7 +164,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
     /* The midpoint sum is zero. */
     if (max_exp == WORD_MIN)
     {
-        arf_zero(arb_midref(res));
+        arf_zero(res);
         return;
     }
     else
@@ -211,7 +207,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
 
     if (initial != NULL)
     {
-        xm = arb_midref(initial);
+        xm = initial;
 
         if (!arf_is_special(xm))
         {
@@ -235,8 +231,8 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
     {
         xi = x + i * xstep;
         yi = y + i * ystep;
-        xm = arb_midref(xi);
-        ym = arb_midref(yi);
+        xm = xi;
+        ym = yi;
 
         /* The midpoints of x[i] and y[i] are both nonzero. */
         if (!arf_is_special(xm) && !arf_is_special(ym))
@@ -440,23 +436,23 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
 
         if (sn2 == 0)
         {
-            arf_zero(arb_midref(res));
+            arf_zero(res);
         }
         else
         {
-            _arf_set_round_mpn(arb_midref(res), &exp, sum, sn2, xnegative ^ subtract, prec, ARF_RND_DOWN);
-            _fmpz_set_si_small(ARF_EXPREF(arb_midref(res)), exp + sum_exp2);
+            _arf_set_round_mpn(res, &exp, sum, sn2, xnegative ^ subtract, prec, rnd);
+            _fmpz_set_si_small(ARF_EXPREF(res), exp + sum_exp2);
         }
     }
     else
     {
 
         if (sn == 2)
-            _arf_set_round_uiui(arb_midref(res), &exp, sum[1], sum[0], xnegative ^ subtract, prec, ARF_RND_DOWN);
+            _arf_set_round_uiui(res, &exp, sum[1], sum[0], xnegative ^ subtract, prec, rnd);
         else
-            _arf_set_round_mpn(arb_midref(res), &exp, sum, sn, xnegative ^ subtract, prec, ARF_RND_DOWN);
+            _arf_set_round_mpn(res, &exp, sum, sn, xnegative ^ subtract, prec, rnd);
 
-        _fmpz_set_si_small(ARF_EXPREF(arb_midref(res)), exp + sum_exp);
+        _fmpz_set_si_small(ARF_EXPREF(res), exp + sum_exp);
     }
 
     ARF_ADD_TMP_FREE(sum, alloc);

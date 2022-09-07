@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
+#include "acf.h"
 #include "flint/longlong.h"
 
 /* We need uint64_t instead of mp_limb_t on 32-bit systems for
@@ -27,8 +27,8 @@ _arb_dot_add_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
     int negative, flint_bitcnt_t shift);
 
 static void
-_arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
-    slong sum_exp, slong prec)
+_arb_dot_output(arf_t res, mp_ptr sum, mp_size_t sn, int negative,
+    slong sum_exp, slong prec, arf_rnd_t rnd)
 {
     slong exp_fix;
 
@@ -56,22 +56,22 @@ _arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
 
         if (sn2 == 0)
         {
-            arf_zero(arb_midref(res));
+            arf_zero(res);
         }
         else
         {
-            _arf_set_round_mpn(arb_midref(res), &exp_fix, sum, sn2, negative, prec, ARF_RND_DOWN);
-            _fmpz_set_si_small(ARF_EXPREF(arb_midref(res)), exp_fix + sum_exp2);
+            _arf_set_round_mpn(res, &exp_fix, sum, sn2, negative, prec, rnd);
+            _fmpz_set_si_small(ARF_EXPREF(res), exp_fix + sum_exp2);
         }
     }
     else
     {
         if (sn == 2)  /* unnecessary? */
-            _arf_set_round_uiui(arb_midref(res), &exp_fix, sum[1], sum[0], negative, prec, ARF_RND_DOWN);
+            _arf_set_round_uiui(res, &exp_fix, sum[1], sum[0], negative, prec, rnd);
         else
-            _arf_set_round_mpn(arb_midref(res), &exp_fix, sum, sn, negative, prec, ARF_RND_DOWN);
+            _arf_set_round_mpn(res, &exp_fix, sum, sn, negative, prec, rnd);
 
-        _fmpz_set_si_small(ARF_EXPREF(arb_midref(res)), exp_fix + sum_exp);
+        _fmpz_set_si_small(ARF_EXPREF(res), exp_fix + sum_exp);
     }
 }
 
@@ -123,7 +123,7 @@ _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
     dsgn = ARF_SGNBIT(d);
     dexp = ARF_EXP(d);
 
-    /* Gauss multiplication
+    /* Karstsuba multiplication
         e = ac - bd
         f = (a+b)(c+d) - ac - bd */
 
@@ -174,8 +174,8 @@ ARB_DLL extern slong acb_dot_gauss_dot_cutoff;
 #define GAUSS_CUTOFF acb_dot_gauss_dot_cutoff
 
 void
-acb_approx_dot_simple(acb_t res, const acb_t initial, int subtract,
-    acb_srcptr x, slong xstep, acb_srcptr y, slong ystep, slong len, slong prec)
+acf_approx_dot_simple(acf_t res, const acf_t initial, int subtract,
+    acf_srcptr x, slong xstep, acf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
 {
     slong i;
 
@@ -183,25 +183,25 @@ acb_approx_dot_simple(acb_t res, const acb_t initial, int subtract,
     {
         if (initial == NULL)
         {
-            arf_zero(arb_midref(acb_realref(res)));
-            arf_zero(arb_midref(acb_imagref(res)));
+            arf_zero(acf_realref(res));
+            arf_zero(acf_imagref(res));
         }
         else
         {
-            arf_set_round(arb_midref(acb_realref(res)), arb_midref(acb_realref(initial)), prec, ARB_RND);
-            arf_set_round(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(initial)), prec, ARB_RND);
+            arf_set_round(acf_realref(res), acf_realref(initial), prec, rnd);
+            arf_set_round(acf_imagref(res), acf_imagref(initial), prec, rnd);
         }
         return;
     }
 
     if (initial == NULL && len == 1)
     {
-        arf_complex_mul(arb_midref(acb_realref(res)),
-                        arb_midref(acb_imagref(res)),
-                        arb_midref(acb_realref(x)),
-                        arb_midref(acb_imagref(x)),
-                        arb_midref(acb_realref(y)),
-                        arb_midref(acb_imagref(y)), prec, ARB_RND);
+        arf_complex_mul(acf_realref(res),
+                        acf_imagref(res),
+                        acf_realref(x),
+                        acf_imagref(x),
+                        acf_realref(y),
+                        acf_imagref(y), prec, rnd);
     }
     else
     {
@@ -214,34 +214,34 @@ acb_approx_dot_simple(acb_t res, const acb_t initial, int subtract,
         {
             if (subtract)
             {
-                arf_neg(arb_midref(acb_realref(res)), arb_midref(acb_realref(initial)));
-                arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(initial)));
+                arf_neg(acf_realref(res), acf_realref(initial));
+                arf_neg(acf_imagref(res), acf_imagref(initial));
             }
             else
             {
-                arf_set(arb_midref(acb_realref(res)), arb_midref(acb_realref(initial)));
-                arf_set(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(initial)));
+                arf_set(acf_realref(res), acf_realref(initial));
+                arf_set(acf_imagref(res), acf_imagref(initial));
             }
         }
 
         for (i = 0; i < len; i++)
         {
             arf_complex_mul(e, f,
-                            arb_midref(acb_realref(x + i * xstep)),
-                            arb_midref(acb_imagref(x + i * xstep)),
-                            arb_midref(acb_realref(y + i * ystep)),
-                            arb_midref(acb_imagref(y + i * ystep)), prec, ARB_RND);
+                            (acf_realref(x + i * xstep)),
+                            (acf_imagref(x + i * xstep)),
+                            (acf_realref(y + i * ystep)),
+                            (acf_imagref(y + i * ystep)), prec, rnd);
 
 
             if (i == 0 && initial == NULL)
             {
-                arf_set(arb_midref(acb_realref(res)), e);
-                arf_set(arb_midref(acb_imagref(res)), f);
+                arf_set(acf_realref(res), e);
+                arf_set(acf_imagref(res), f);
             }
             else
             {
-                arf_add(arb_midref(acb_realref(res)), arb_midref(acb_realref(res)), e, prec, ARB_RND);
-                arf_add(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(res)), f, prec, ARB_RND);
+                arf_add(acf_realref(res), acf_realref(res), e, prec, rnd);
+                arf_add(acf_imagref(res), acf_imagref(res), f, prec, rnd);
             }
         }
 
@@ -251,13 +251,13 @@ acb_approx_dot_simple(acb_t res, const acb_t initial, int subtract,
 
     if (subtract)
     {
-        arf_neg(arb_midref(acb_realref(res)), arb_midref(acb_realref(res)));
-        arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(res)));
+        arf_neg(acf_realref(res), acf_realref(res));
+        arf_neg(acf_imagref(res), acf_imagref(res));
     }
 }
 
 void
-acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, acb_srcptr y, slong ystep, slong len, slong prec)
+acf_approx_dot(acf_t res, const acf_t initial, int subtract, acf_srcptr x, slong xstep, acf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
 {
     slong i, j, padding, extend;
     slong xexp, yexp, exp;
@@ -268,7 +268,7 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
     int xnegative, ynegative;
     mp_size_t xn, yn, re_sn, im_sn, alloc;
     flint_bitcnt_t shift;
-    arb_srcptr xi, yi;
+    arf_srcptr xi, yi;
     arf_srcptr xm, ym;
     mp_limb_t re_serr, im_serr;   /* Sum over arithmetic errors */
     mp_ptr tmp, re_sum, im_sum;   /* Workspace */
@@ -279,7 +279,7 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
     /* todo: fast fma and fmma (len=2) code */
     if (len <= 1)
     {
-        acb_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec);
+        acf_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec, rnd);
         return;
     }
 
@@ -298,13 +298,13 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
     /* Account for the initial term. */
     if (initial != NULL)
     {
-        if (!ARF_IS_LAGOM(arb_midref(acb_realref(initial))) || !ARF_IS_LAGOM(arb_midref(acb_imagref(initial))))
+        if (!ARF_IS_LAGOM(acf_realref(initial)) || !ARF_IS_LAGOM(acf_imagref(initial)))
         {
-            acb_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec);
+            acf_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec, rnd);
             return;
         }
 
-        xm = arb_midref(acb_realref(initial));
+        xm = acf_realref(initial);
 
         if (!arf_is_special(xm))
         {
@@ -315,7 +315,7 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
                 re_min_exp = ARF_EXP(xm) - ARF_SIZE(xm) * FLINT_BITS;
         }
 
-        xm = arb_midref(acb_imagref(initial));
+        xm = acf_imagref(initial);
 
         if (!arf_is_special(xm))
         {
@@ -349,18 +349,18 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
             /* Determine maximum exponents for the main sum and the radius sum. */
             for (i = 0; i < len; i++)
             {
-                xi = ((arb_srcptr) x) + 2 * i * xstep + xoff;
-                yi = ((arb_srcptr) y) + 2 * i * ystep + yoff;
+                xi = ((arf_srcptr) x) + 2 * i * xstep + xoff;
+                yi = ((arf_srcptr) y) + 2 * i * ystep + yoff;
 
                 /* Fallback for huge exponents or non-finite values. */
-                if (!ARF_IS_LAGOM(arb_midref(xi)) || !ARF_IS_LAGOM(arb_midref(yi)))
+                if (!ARF_IS_LAGOM(xi) || !ARF_IS_LAGOM(yi))
                 {
-                    acb_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec);
+                    acf_approx_dot_simple(res, initial, subtract, x, xstep, y, ystep, len, prec, rnd);
                     return;
                 }
 
-                xm = arb_midref(xi);
-                ym = arb_midref(yi);
+                xm = xi;
+                ym = yi;
 
                 /* (xm+xr)(ym+yr) = xm ym + [xr ym + xm yr + xr yr] */
                 if (!arf_is_special(xm))
@@ -404,8 +404,8 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
 
     if (re_max_exp == WORD_MIN && im_max_exp == WORD_MIN)
     {
-        arf_zero(arb_midref(acb_realref(res)));
-        arf_zero(arb_midref(acb_imagref(res)));
+        arf_zero(acf_realref(res));
+        arf_zero(acf_imagref(res));
         return;
     }
 
@@ -464,11 +464,11 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
 
     if (initial != NULL)
     {
-        xm = arb_midref(acb_realref(initial));
+        xm = acf_realref(initial);
 
         ARB_DOT_ADD(re_sum, re_serr, re_sn, re_sum_exp, subtract, xm);
 
-        xm = arb_midref(acb_imagref(initial));
+        xm = acf_imagref(initial);
 
         ARB_DOT_ADD(im_sum, im_serr, im_sn, im_sum_exp, subtract, xm);
     }
@@ -482,24 +482,24 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
 
         for (i = 0; i < len; i++)
         {
-            arb_srcptr ai, bi, ci, di;
+            arf_srcptr ai, bi, ci, di;
             mp_size_t an, bn, cn, dn;
             slong aexp, bexp, cexp, dexp;
 
-            ai = ((arb_srcptr) x) + 2 * i * xstep;
-            bi = ((arb_srcptr) x) + 2 * i * xstep + 1;
-            ci = ((arb_srcptr) y) + 2 * i * ystep;
-            di = ((arb_srcptr) y) + 2 * i * ystep + 1;
+            ai = ((arf_srcptr) x) + 2 * i * xstep;
+            bi = ((arf_srcptr) x) + 2 * i * xstep + 1;
+            ci = ((arf_srcptr) y) + 2 * i * ystep;
+            di = ((arf_srcptr) y) + 2 * i * ystep + 1;
 
-            an = ARF_SIZE(arb_midref(ai));
-            bn = ARF_SIZE(arb_midref(bi));
-            cn = ARF_SIZE(arb_midref(ci));
-            dn = ARF_SIZE(arb_midref(di));
+            an = ARF_SIZE(ai);
+            bn = ARF_SIZE(bi);
+            cn = ARF_SIZE(ci);
+            dn = ARF_SIZE(di);
 
-            aexp = ARF_EXP(arb_midref(ai));
-            bexp = ARF_EXP(arb_midref(bi));
-            cexp = ARF_EXP(arb_midref(ci));
-            dexp = ARF_EXP(arb_midref(di));
+            aexp = ARF_EXP(ai);
+            bexp = ARF_EXP(bi);
+            cexp = ARF_EXP(ci);
+            dexp = ARF_EXP(di);
 
             if (an >= GAUSS_CUTOFF && bn >= GAUSS_CUTOFF &&
                 bn >= GAUSS_CUTOFF && cn >= GAUSS_CUTOFF &&
@@ -519,7 +519,7 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
                 }
 
                 use_gauss[i] = 1;
-                _arf_complex_mul_gauss(e, f, arb_midref(ai), arb_midref(bi), arb_midref(ci), arb_midref(di));
+                _arf_complex_mul_gauss(e, f, ai, bi, ci, di);
                 ARB_DOT_ADD(re_sum, re_serr, re_sn, re_sum_exp, 0, e);
                 ARB_DOT_ADD(im_sum, im_serr, im_sn, im_sum_exp, 0, f);
             }
@@ -564,11 +564,11 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
 
             for (i = 0; i < len; i++)
             {
-                xi = ((arb_srcptr) x) + 2 * i * xstep + xoff;
-                yi = ((arb_srcptr) y) + 2 * i * ystep + yoff;
+                xi = ((arf_srcptr) x) + 2 * i * xstep + xoff;
+                yi = ((arf_srcptr) y) + 2 * i * ystep + yoff;
 
-                xm = arb_midref(xi);
-                ym = arb_midref(yi);
+                xm = xi;
+                ym = yi;
 
                 /* The midpoints of x[i] and y[i] are both nonzero. */
                 if (!arf_is_special(xm) && !arf_is_special(ym))
@@ -701,8 +701,8 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
         }
     }
 
-    _arb_dot_output(acb_realref(res), re_sum, re_sn, subtract, re_sum_exp, re_prec);
-    _arb_dot_output(acb_imagref(res), im_sum, im_sn, subtract, im_sum_exp, im_prec);
+    _arb_dot_output(acf_realref(res), re_sum, re_sn, subtract, re_sum_exp, re_prec, rnd);
+    _arb_dot_output(acf_imagref(res), im_sum, im_sn, subtract, im_sum_exp, im_prec, rnd);
 
     ARF_ADD_TMP_FREE(re_sum, alloc);
     if (use_gauss != NULL)

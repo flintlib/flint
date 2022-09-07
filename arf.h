@@ -236,6 +236,9 @@ arf_init(arf_t x)
 
 void arf_clear(arf_t x);
 
+arf_ptr _arf_vec_init(slong n);
+void _arf_vec_clear(arf_ptr v, slong n);
+
 ARF_INLINE void
 arf_zero(arf_t x)
 {
@@ -1309,6 +1312,9 @@ char * arf_dump_str(const arf_t x);
 int arf_load_file(arf_t res, FILE *stream);
 
 int arf_dump_file(FILE* stream, const arf_t x);
+
+void arf_approx_dot(arf_t res, const arf_t initial, int subtract,
+    arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd);
 
 #ifdef __cplusplus
 }

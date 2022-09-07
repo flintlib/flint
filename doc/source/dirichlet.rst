@@ -48,7 +48,7 @@ Multiplicative group modulo *q*
     An *dirichlet_group_t* is defined as an array of *dirichlet_group_struct*
     of length 1, permitting it to be passed by reference.
 
-.. function:: void dirichlet_group_init(dirichlet_group_t G, ulong q)
+.. function:: int dirichlet_group_init(dirichlet_group_t G, ulong q)
 
     Initializes *G* to the group of Dirichlet characters mod *q*.
 
@@ -69,8 +69,9 @@ Multiplicative group modulo *q*
     safely be called even with large *q*.
 
     For implementation reasons, the largest prime factor of *q* must not
-    exceed `10^{12}` (an abort will be raised). This restriction could
-    be removed in the future.
+    exceed `10^{16}`. This restriction could
+    be removed in the future. The function returns 1 on success and 0
+    if a factor is too large.
 
 .. function:: void dirichlet_subgroup_init(dirichlet_group_t H, const dirichlet_group_t G, ulong h)
 

@@ -64,7 +64,7 @@ dirichlet_group_size(const dirichlet_group_t G)
 
 ulong dirichlet_group_num_primitive(const dirichlet_group_t G);
 
-void dirichlet_group_init(dirichlet_group_t G, ulong q);
+int dirichlet_group_init(dirichlet_group_t G, ulong q);
 void dirichlet_subgroup_init(dirichlet_group_t H, const dirichlet_group_t G, ulong h);
 void dirichlet_group_clear(dirichlet_group_t G);
 void dirichlet_group_dlog_precompute(dirichlet_group_t G, ulong num);

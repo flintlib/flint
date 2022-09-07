@@ -287,3 +287,4 @@ Bibliography
 
 .. [Tur1953] \A. M. Turing, "Some Calculations of the Riemann Zeta-Function", Proc. of the London Mathematical Society 3(3) (1953), 99-117, https://doi.org/10.1112/plms/s3-3.1.99
 
+.. [Wei2000] \A. Weilert, "(1+i)-ary GCD computation in Z[i] as an analogue to the binary GCD algorithm", Journal of Symbolic Computation 30.5 (2000): 605-617, https://doi.org/10.1006/jsco.2000.0422

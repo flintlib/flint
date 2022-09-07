@@ -118,6 +118,39 @@ fmpzi_randtest(fmpzi_t res, flint_rand_t state, mp_bitcnt_t bits)
     fmpz_randtest(fmpzi_imagref(res), state, bits);
 }
 
+/* Special values */
+
+FMPZI_INLINE int
+fmpzi_is_unit(const fmpzi_t x)
+{
+    if (fmpz_is_zero(fmpzi_imagref(x)))
+        return fmpz_is_pm1(fmpzi_realref(x));
+    if (fmpz_is_zero(fmpzi_realref(x)))
+        return fmpz_is_pm1(fmpzi_imagref(x));
+    return 0;
+}
+
+FMPZI_INLINE int fmpzi_is_zero(const fmpzi_t x)
+{
+    return fmpz_is_zero(fmpzi_realref(x)) && fmpz_is_zero(fmpzi_imagref(x));
+}
+
+FMPZI_INLINE int fmpzi_is_one(const fmpzi_t x)
+{
+    return fmpz_is_one(fmpzi_realref(x)) && fmpz_is_zero(fmpzi_imagref(x));
+}
+
+/* Norms */
+
+slong fmpzi_bits(const fmpzi_t x);
+
+FMPZI_INLINE void fmpzi_norm(fmpz_t res, const fmpzi_t x)
+{
+    fmpz_fmma(res, fmpzi_realref(x), fmpzi_realref(x), fmpzi_imagref(x), fmpzi_imagref(x));
+}
+
+/* Arithmetic */
+
 FMPZI_INLINE void
 fmpzi_neg(fmpzi_t res, const fmpzi_t x)
 {
@@ -142,6 +175,32 @@ fmpzi_sub(fmpzi_t res, const fmpzi_t x, const fmpzi_t y)
 void fmpzi_sqr(fmpzi_t res, const fmpzi_t x);
 void fmpzi_mul(fmpzi_t res, const fmpzi_t x, const fmpzi_t y);
 void fmpzi_pow_ui(fmpzi_t res, const fmpzi_t x, ulong exp);
+
+void fmpzi_mul_i(fmpzi_t z, const fmpzi_t x);
+void fmpzi_div_i(fmpzi_t z, const fmpzi_t x);
+void fmpzi_mul_i_pow_si(fmpzi_t res, const fmpzi_t z, slong k);
+
+/* todo */
+slong fmpzi_canonical_unit_i_pow(const fmpzi_t x);
+
+FMPZI_INLINE void
+fmpzi_canonicalise_unit(fmpzi_t res, const fmpzi_t x)
+{
+    fmpzi_mul_i_pow_si(res, x, fmpzi_canonical_unit_i_pow(x));
+}
+
+/* Division */
+void fmpzi_divrem(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y);
+void fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y);
+
+slong fmpzi_remove_one_plus_i(fmpzi_t res, const fmpzi_t x);
+
+/* GCD */
+void fmpzi_gcd_euclidean(fmpzi_t res, const fmpzi_t x, const fmpzi_t y);
+void fmpzi_gcd_euclidean_improved(fmpzi_t res, const fmpzi_t x, const fmpzi_t y);
+void fmpzi_gcd_binary(fmpzi_t res, const fmpzi_t x, const fmpzi_t y);
+void fmpzi_gcd_shortest(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
+void fmpzi_gcd(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
 
 #ifdef __cplusplus
 }

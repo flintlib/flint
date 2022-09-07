@@ -13,6 +13,7 @@
 
 #include "dirichlet.h"
 
+/* see https://arxiv.org/abs/2206.14193 */
 static ulong
 primitive_root_p_and_p2(ulong p)
 {
@@ -23,9 +24,9 @@ primitive_root_p_and_p2(ulong p)
     if (p == UWORD(6692367337))
         return 7;
 
-    if (p > UWORD(1000000000000))
+    if (p > UWORD(10000000000000000))
     {
-        printf("primitive root: p > 10^12 not implemented");
+        printf("primitive root: p > 10^16 not implemented");
         flint_abort();
     }
 #endif
@@ -103,7 +104,7 @@ dirichlet_group_lift_generators(dirichlet_group_t G)
     }
 }
 
-void
+int
 dirichlet_group_init(dirichlet_group_t G, ulong q)
 {
     slong k;
@@ -122,6 +123,12 @@ dirichlet_group_init(dirichlet_group_t G, ulong q)
     /* warning: only factor odd part */
     n_factor_init(&fac);
     n_factor(&fac, q, 1);
+
+#if FLINT_BITS == 64
+    for (k = 0; k < fac.num; k++)
+        if (fac.p[k] > UWORD(10000000000000000))
+            return 0;
+#endif
 
     G->num = fac.num + G->neven;
     G->P = flint_malloc(G->num * sizeof(dirichlet_prime_group_struct));
@@ -145,6 +152,8 @@ dirichlet_group_init(dirichlet_group_t G, ulong q)
         dirichlet_prime_group_init(&G->P[k], p, e);
     }
     dirichlet_group_lift_generators(G);
+
+    return 1;
 }
 
 void
