@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-void acb_theta_eld_print(const acb_theta_eld_t E)
+void
+acb_theta_eld_print(const acb_theta_eld_t E)
 {
   slong d = acb_theta_eld_dim(E);
   slong g = acb_theta_eld_ambient_dim(E);

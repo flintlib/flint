@@ -3,7 +3,7 @@
 
 void
 acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
-	slong nb_bad, slong nb_good, slong g, slong prec)
+        slong nb_bad, slong nb_good, slong g, slong prec)
 {
     acb_ptr v;
     arb_t abs;
@@ -20,11 +20,11 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
   
     for (k = 0; k < nb_bad; k++)
     {
-	acb_theta_agm_step_bad(v, v, all_roots + k*n, g, prec);
+        acb_theta_agm_step_bad(v, v, all_roots + k*n, g, prec);
     }
     for (k = 0; k < nb_good; k++)
     {
-	acb_theta_agm_step_good(v, v, g, prec);
+        acb_theta_agm_step_good(v, v, g, prec);
     }
 
     acb_abs(abs, &v[0], lowprec);
@@ -32,8 +32,8 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
     arf_mul(err, err, rel_err, lowprec, ARF_RND_CEIL);  
   
     acb_set(r, &v[0]);
-    acb_add_error_arf(r, err);  
-  
+    acb_add_error_arf(r, err);
+    
     _acb_vec_clear(v, n);
     arb_clear(abs);
     arf_clear(err);

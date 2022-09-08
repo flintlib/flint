@@ -108,6 +108,8 @@ int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps, slong prec);
 
 /* AGM sequences */
 
+#define ACB_THETA_AGM_LOWPREC 20
+
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr s, slong g, slong prec);
 
 void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t root,
@@ -138,7 +140,7 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
 slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec);
 
 
-/* Duplication */
+/* Transformation formulas */
 
 void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
@@ -148,8 +150,8 @@ void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g,
 ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab,
 	const fmpz_mat_t N);
 
-void acb_theta_transform_sqr_proj(acb_ptr r, acb_srcptr th, const fmpz_mat_t N,
-	slong prec);
+void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
+        const fmpz_mat_t N, slong prec);
 
 
 /* Ellipsoids for naive algorithms */
@@ -159,12 +161,7 @@ struct acb_theta_eld_struct
   slong dim;
   slong ambient_dim;
   slong* last_coords;
-  arb_struct* offset;
-  arb_struct normsqr;
-  
-  arb_struct ctr;
-  arb_struct rad;
-  slong min, mid, max, step;
+  slong min, mid, max;
   struct acb_theta_eld_struct* rchildren;
   slong nr;
   struct acb_theta_eld_struct* lchildren;
@@ -178,18 +175,13 @@ typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
 #define acb_theta_eld_dim(E) ((E)->dim)
 #define acb_theta_eld_ambient_dim(E) ((E)->ambient_dim)
 #define acb_theta_eld_coord(E, k) ((E)->last_coords[(k) - acb_theta_eld_dim(E)])
-#define acb_theta_eld_offset(E) ((E)->offset)
-#define acb_theta_eld_normsqr(E) (&(E)->normsqr)
-#define acb_theta_eld_ctr(E) (&(E)->ctr)
-#define acb_theta_eld_rad(E) (&(E)->rad)
 #define acb_theta_eld_min(E) ((E)->min)
 #define acb_theta_eld_mid(E) ((E)->mid)
 #define acb_theta_eld_max(E) ((E)->max)
-#define acb_theta_eld_step(E) ((E)->step)
-#define acb_theta_eld_rchild(E, k) (&(E)->rchildren[(k)])
-#define acb_theta_eld_lchild(E, k) (&(E)->lchildren[(k)])
 #define acb_theta_eld_nr(E) ((E)->nr)
 #define acb_theta_eld_nl(E) ((E)->nl)
+#define acb_theta_eld_rchild(E, k) (&(E)->rchildren[(k)])
+#define acb_theta_eld_lchild(E, k) (&(E)->lchildren[(k)])
 #define acb_theta_eld_nb_pts(E) ((E)->nb_pts)
 #define acb_theta_eld_box(E, k) ((E)->box[(k)])
 
@@ -197,16 +189,11 @@ void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
-void acb_theta_eld_init_children(acb_theta_eld_t E, slong nr, slong nl);
-
 void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
-			    const arb_t ctr, const arb_t rad, int a, slong prec);
-
-void acb_theta_eld_next_normsqr(arb_t next_normsqr, const arb_t normsqr, const arb_t gamma,
-				const arb_t ctr, slong k, slong prec);
+        const arb_t ctr, const arb_t rad, int a, slong prec);
 
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arb_t normsqr,
-			arb_srcptr offset, slong* last_coords, ulong a, slong prec);
+        arb_srcptr offset, slong* last_coords, ulong a, slong prec);
 
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
 
@@ -219,114 +206,82 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 
 #define ACB_THETA_ELD_DEFAULT_PREC 50
 #define ACB_THETA_NAIVE_EPS_2EXP 0
-#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.5
+#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.1
 #define ACB_THETA_NAIVE_NEWPREC_MARGIN 1.0
 
-void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p, slong prec);
+void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p,
+        slong prec);
 
-void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p, const arf_t epsilon, slong prec);
+void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p,
+        const arf_t epsilon, slong prec);
 
-slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist,
-			      slong step, slong ord);
+void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t epsilon, ulong ab,
+        int all, int unif, slong ord, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
+
+slong acb_theta_naive_newprec(slong prec, slong coord, slong dist,
+        slong max_dist, slong step, slong ord);
 
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
 
 /* Precomputations for naive algorithms */
-/* For this to work, we assume that step is 1 or 2 and constant among ellipsoid layers */
 
 typedef struct
 {
-  slong g;
-  acb_mat_struct exp_mat;
-  slong* box;
-  slong step;
-  slong* indices;
-  acb_ptr sqr_powers;
-  slong nb;
+    acb_mat_struct exp_mat;
+    acb_ptr sqr_powers;
+    slong* indices;
 } acb_theta_precomp_struct;
 
 typedef acb_theta_precomp_struct acb_theta_precomp_t[1];
 
-#define acb_theta_precomp_g(D) ((D)->g)
 #define acb_theta_precomp_exp_mat(D) (&(D)->exp_mat)
-#define acb_theta_precomp_box(D, k) ((D)->box[(k)])
-#define acb_theta_precomp_sqr_pow(D, k, i) (&(D)->sqr_powers[(i) + (D)->indices[(k)]])
+#define acb_theta_precomp_sqr_pow(D, k, j) (&(D)->sqr_powers[(j) + (D)->indices[(k)]])
 
 void acb_theta_precomp_init(acb_theta_precomp_t D, slong g);
 
 void acb_theta_precomp_clear(acb_theta_precomp_t D);
 
 void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
-			   const acb_theta_eld_t E, slong prec);
-
-
-/* Generic code for naive algorithms */
-
-/* All naive algorithms enumerate points in ellipsoids and arrive at a
-   point where an exponential term is computed. What to do with it is
-   encoded in a function of the form:
-
-   void acb_theta_worker(acb_ptr th, const acb_t term, slong* coords, slong g,
-                         ulong ab, slong ord, slong prec, slong fullprec)
-*/
-
-typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
-					 ulong, slong, slong, slong);
-
-/* Comments on input:
-   - E is an ellipsoid of dim 1
-   - each exponential term is of the form cofactor * lin^k * (some k^2-power);
-     last factor is precomputed in D
-   - prec is the current relative precision for this slice
-   - rest of the data is passed on to the worker. */
-
-void acb_theta_naive_worker_dim1(acb_ptr th,
-				 const acb_theta_eld_t E, const acb_theta_precomp_t D,
-				 const acb_t lin, const acb_t cofactor,
-				 ulong ab, slong ord, slong prec, slong fullprec,
-				 acb_theta_naive_worker_t worker_dim0);
-
-/* Comments on input:
-   - (k,j)-th entry of lin_powers is \exp(\pi i n_j tau_{k,j}/4) for k <= d, j > d
-   - entries of lin_powers with j > d are const, others can be modified for recursion
-   - k-th entry of exp_z is \exp(\pi i z_k)
-   - cofactor is the common part for all exponential terms in current slice
-   - rest of the data is passed on recursively as given, except that prec is adjusted 
-     depending on chosen slice
-   In case dim=1, fall back to worker_dim1
-*/
-
-void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
-				const acb_theta_eld_t E, const acb_theta_precomp_t D,
-				acb_srcptr exp_z, const acb_t cofactor,
-				ulong ab, slong ord, slong prec, slong fullprec,
-				acb_theta_naive_worker_t worker_dim0);
+        const acb_theta_eld_t E, slong prec);
 
 
 /* Naive algorithms */
 
+typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
+        ulong, slong, slong, slong);
+
+void acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
+        const acb_theta_precomp_t D, const acb_t lin, const acb_t cofactor,
+        ulong ab, slong ord, slong prec, slong fullprec,
+        acb_theta_naive_worker_t worker_dim0);
+
+void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
+        const acb_theta_eld_t E, const acb_theta_precomp_t D, acb_srcptr exp_z,
+        const acb_t cofactor, ulong ab, slong ord, slong prec, slong fullprec,
+        acb_theta_naive_worker_t worker_dim0);
+
 void acb_theta_naive_term(acb_t exp, const acb_mat_t tau, acb_srcptr z,
-			  ulong ab, slong* coords, slong prec);
+        ulong ab, slong* coords, slong prec);
 
-void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t epsilon,
-			       ulong ab, int all, int unif, slong ord,
-			       acb_srcptr z, const acb_mat_t tau, slong prec);
-
-void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
 
 void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec);
 
-void acb_theta_naive_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_naive_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
 
 void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
-void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
 
-void acb_theta_naive_ind_const(acb_t th, ulong ab, const acb_mat_t tau, slong prec);
-
+void acb_theta_naive_ind_const(acb_t th, ulong ab, const acb_mat_t tau,
+        slong prec);
 
 slong acb_theta_nb_partials(slong ord, slong nvars);
 
@@ -334,25 +289,26 @@ void acb_theta_partial(slong* tup, slong k, slong ord, slong nvars);
 
 slong acb_theta_partial_index(slong* tup, slong ord, slong nvars);
 
+void acb_theta_jet_naive(acb_mat_struct* th, acb_srcptr z, const acb_mat_t tau,
+        slong ord, slong prec);
 
-void acb_theta_jet_naive(acb_mat_struct* th, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
-
-void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau, slong ord, slong prec);
+void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau,
+        slong ord, slong prec);
 
 
 /* Upper bounds on theta constants and their derivatives */
 
-void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
 
-void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau, slong prec);
+void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau,
+        slong prec);
 
 void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
-		      slong ord, slong dim, slong prec);
-
+        slong ord, slong dim, slong prec);
 
 /* Context for Newton iterations */
 
-#define ACB_THETA_AGM_LOWPREC 20
 #define ACB_THETA_AGM_NB_MATRIX_SETUPS 10
 #define ACB_THETA_AGM_BASEPREC 2000
 #define ACB_THETA_AGM_BASEPREC_MAXQ 4

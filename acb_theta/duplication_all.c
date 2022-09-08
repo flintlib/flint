@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-static int dupl_sgn(ulong a, ulong b, slong g)
+static int
+dupl_sgn(ulong a, ulong b, slong g)
 {
   int sgn = 0;
   slong k;
@@ -15,49 +16,35 @@ static int dupl_sgn(ulong a, ulong b, slong g)
   return sgn % 2;
 }
 
-void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
-{  
-  /* To be replaced by a more efficient algorithm using dyadic convolutions */
-  acb_mat_t row, col, prod;
-  slong nb = n_pow(2,g);
-  ulong a, b, ab, bp, bpp;
-  int sgn;
-  
-  acb_mat_init(row, 1, nb);
-  acb_mat_init(col, nb, 1);
-  acb_mat_init(prod, nb, nb);
+void
+acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
+{
+    acb_ptr v1, v2;
+    acb_ptr res;
+    slong n = 1<<g;
+    ulong a, b;
 
-  for (b = 0; b < nb; b++)
+    v1 = _acb_vec_init(n);
+    v2 = _acb_vec_init(n);
+    res = _acb_vec_init(n*n);
+
+    for (a = 0; a < n; a++)
     {
-      acb_set(acb_mat_entry(row, 0, b), &th[b]);
-      acb_set(acb_mat_entry(col, b, 0), &th[b]);
-    }
-  acb_mat_mul(prod, col, row, prec);
-
-  for (b = 0; b < nb; b++)
-    {
-      for (a = 0; a < nb; a++)
-	{
-	  ab = (a<<g) + b;
-	  acb_zero(&th2[ab]);
-	  for (bp = 0; bp < nb; bp++)
-	    {
-	      bpp = b ^ bp; /* bitwise xor */
-	      sgn = dupl_sgn(a, bp, g);
-	      if (sgn == 0)
-		{
-		  acb_add(&th2[ab], &th2[ab], acb_mat_entry(prod, bp, bpp), prec);
-		}
-	      else
-		{
-		  acb_sub(&th2[ab], &th2[ab], acb_mat_entry(prod, bp, bpp), prec);
-		}
-	    }
-	  acb_mul_2exp_si(&th2[ab], &th2[ab], -g);
-	}
-    }
-
-  acb_mat_clear(row);
-  acb_mat_clear(col);
-  acb_mat_clear(prod);  
+        /* Set v2 to modified theta values */
+        for (b = 0; b < n; b++)
+        {
+            if (dupl_sgn(a, b, g) == 0) acb_set(&v2[b], &th[b]);
+            else acb_neg(&v2[b], &th[b]);
+        }
+        acb_theta_agm_hadamard(v1, th, g, prec);
+        acb_theta_agm_hadamard(v2, v2, g, prec);
+        for (b = 0; b < n; b++) acb_mul(&v1[b], &v1[b], &v2[b], prec);
+        acb_theta_agm_hadamard(v1, v1, g, prec);
+        for (b = 0; b < n; b++) acb_mul_2exp_si(&res[n*a + b], &v1[b], -2*g);
+    }    
+    _acb_vec_set(th2, res, n*n);
+    
+    _acb_vec_clear(v1, n);
+    _acb_vec_clear(v2, n);
+    _acb_vec_clear(res, n*n);
 }
