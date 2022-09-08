@@ -18,7 +18,6 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
   slong min = acb_theta_eld_min(E);
   slong mid = acb_theta_eld_mid(E);
   slong max = acb_theta_eld_max(E);
-  slong step = acb_theta_eld_step(E);
   slong newprec;
   slong k;
 
@@ -37,28 +36,28 @@ void acb_theta_naive_worker_dim1(acb_ptr th,
 
   acb_pow_si(start, lin, mid, prec);
   acb_mul(start, start, cofactor, prec);
-  acb_pow_si(diff, lin, step, prec);
+  acb_pow_si(diff, lin, 2, prec);
   
   acb_set(aff, start);
-  for (k = mid; k <= max; k += step)
+  for (k = mid; k <= max; k += 2)
     {
       coords[0] = k;
-      newprec = acb_theta_naive_newprec(prec, k, k-mid, max-mid, step, ord);
+      newprec = acb_theta_naive_newprec(prec, k, k-mid, max-mid, ord);
       if (k > mid) acb_mul(aff, aff, diff, newprec);
       
-      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)/step), newprec);
+      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)/2), newprec);
       worker_dim0(th, term, coords, g, ab, ord, newprec, fullprec);
     }
 
   acb_set(aff, start);
   acb_inv(diff, diff, prec);
-  for (k = mid - step; k >= min; k -= step)
+  for (k = mid - 2; k >= min; k -= 2)
     {
       coords[0] = k;
-      newprec = acb_theta_naive_newprec(prec, k, mid-k, mid-min, step, ord);      
+      newprec = acb_theta_naive_newprec(prec, k, mid-k, mid-min, ord);      
       acb_mul(aff, aff, diff, newprec);
       
-      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)/step), newprec);
+      acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)/2), newprec);
       worker_dim0(th, term, coords, g, ab, ord, newprec, fullprec);      
     }
 

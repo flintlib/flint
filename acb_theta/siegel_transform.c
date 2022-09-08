@@ -8,8 +8,7 @@ acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau,
     slong g = fmpz_mat_nrows(mat)/2;
     fmpz_mat_t a;
     acb_mat_t x, num, den, invden;
-    int res;
-    slong j, k;
+    int r;
 
     fmpz_mat_init(a, g, g);  
     acb_mat_init(x, g, g);
@@ -25,8 +24,8 @@ acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau,
     acb_mat_add(num, num, x, prec);
 
     acb_siegel_cocycle(den, mat, tau, prec);
-    res = acb_mat_inv(invden, den, prec);
-    if (!res) acb_mat_indeterminate(invden);
+    r = acb_mat_inv(invden, den, prec);
+    if (!r) acb_mat_indeterminate(invden);
     
     acb_mat_mul(res, num, invden, prec);
 

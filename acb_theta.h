@@ -110,9 +110,9 @@ int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps, slong prec);
 
 #define ACB_THETA_AGM_LOWPREC 20
 
-void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr s, slong g, slong prec);
+void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t x, const acb_t root,
+void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root,
 	slong prec);
 
 void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
@@ -124,8 +124,8 @@ void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g,
-	slong prec);
+void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots,
+        slong g, slong prec);
 
 void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
@@ -147,11 +147,11 @@ void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g,
 	slong prec);
 
-ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab,
-	const fmpz_mat_t N);
+ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
+	const fmpz_mat_t mat);
 
 void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
-        const fmpz_mat_t N, slong prec);
+        const fmpz_mat_t mat, slong prec);
 
 
 /* Ellipsoids for naive algorithms */
@@ -190,9 +190,9 @@ void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
 void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
-        const arb_t ctr, const arb_t rad, int a, slong prec);
+        const arb_t ctr, const arf_t rad, int a, slong prec);
 
-void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arb_t normsqr,
+void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
         arb_srcptr offset, slong* last_coords, ulong a, slong prec);
 
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
@@ -209,18 +209,18 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 #define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.1
 #define ACB_THETA_NAIVE_NEWPREC_MARGIN 1.0
 
-void acb_theta_naive_tail(arf_t B, const arf_t R, const arb_mat_t Y, slong p,
-        slong prec);
+void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y,
+        slong ord, slong prec);
 
-void acb_theta_naive_radius(arf_t R, const arb_mat_t Y, slong p,
-        const arf_t epsilon, slong prec);
+void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
+        const arf_t eps, slong prec);
 
-void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t epsilon, ulong ab,
+void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab,
         int all, int unif, slong ord, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
 slong acb_theta_naive_newprec(slong prec, slong coord, slong dist,
-        slong max_dist, slong step, slong ord);
+        slong max_dist, slong ord);
 
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 

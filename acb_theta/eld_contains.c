@@ -5,13 +5,12 @@ static int
 acb_theta_eld_contains_rec(const acb_theta_eld_t E, slong* pt)
 {
     slong d = acb_theta_eld_dim(E);
-    slong step = acb_theta_eld_step(E);
     slong c = pt[d-1];
     slong k;
 
     if (c < acb_theta_eld_min(E)
             || c > acb_theta_eld_max(E)
-            || (acb_theta_eld_max(E) - c) % acb_theta_eld_step(E) != 0)
+            || (acb_theta_eld_max(E) - c) % 2 != 0)
     {
         return 0;
     }
@@ -21,12 +20,12 @@ acb_theta_eld_contains_rec(const acb_theta_eld_t E, slong* pt)
     }
     else if (c >= acb_theta_eld_mid(E))
     {
-        k = (c - acb_theta_eld_mid(E))/step;
+        k = (c - acb_theta_eld_mid(E))/2;
         return acb_theta_eld_contains_rec(acb_theta_eld_rchild(E, k), pt);
     }
     else
     {
-        k = (acb_theta_eld_mid(E) - step - c)/step;
+        k = (acb_theta_eld_mid(E) - 2 - c)/2;
         return acb_theta_eld_contains_rec(acb_theta_eld_lchild(E, k), pt);
     }
 }

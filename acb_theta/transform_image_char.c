@@ -1,15 +1,12 @@
 
 #include "acb_theta.h"
 
-/* See Igusa, Theta functions, Thm. 2 p. 175 and Cor. p. 176. Since we
-   are interested in theta constants up to scaling, we ignore the
-   common factors \kappa(\gamma) and det(C tau + D)^{1/2}. */
-
-ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t N)
+ulong
+acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
 {
-  slong g = fmpz_mat_nrows(N)/2;
+  slong g = fmpz_mat_nrows(mat)/2;
   fmpz_mat_t a, b, c, d;
-  fmpz_mat_t N_tp;
+  fmpz_mat_t mat_tp;
   fmpz_mat_t block; /* CD^t or AB^t */
   fmpz_mat_t alphabeta;
   fmpz_mat_t alpha, beta; /* These are windows, not initialized or freed */
@@ -23,7 +20,7 @@ ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t 
   fmpz_mat_init(b, g, g);
   fmpz_mat_init(c, g, g);
   fmpz_mat_init(d, g, g);
-  fmpz_mat_init(N_tp, 2*g, 2*g);
+  fmpz_mat_init(mat_tp, 2*g, 2*g);
   fmpz_mat_init(block, g, g);
   fmpz_mat_init(alphabeta, 2*g, 1);
   fmpz_mat_init(Cvec_1, g, 1);
@@ -31,11 +28,11 @@ ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t 
   fmpz_mat_init(Lvec, 1, g);
   fmpz_mat_init(coef, 1, 1);
 
-  fmpz_mat_get_a(a, N);
-  fmpz_mat_get_b(b, N);
-  fmpz_mat_get_c(c, N);
-  fmpz_mat_get_d(d, N);
-  fmpz_mat_transpose(N_tp, N);
+  fmpz_mat_get_a(a, mat);
+  fmpz_mat_get_b(b, mat);
+  fmpz_mat_get_c(c, mat);
+  fmpz_mat_get_d(d, mat);
+  fmpz_mat_transpose(mat_tp, mat);
 
   /* Compute blocks and substract diagonals in alphabeta */
   fmpz_mat_transpose(block, d);
@@ -63,32 +60,32 @@ ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t 
     }
 
   /* Perform matrix-vector multiplication */
-  fmpz_mat_mul(alphabeta, N_tp, alphabeta);
+  fmpz_mat_mul(alphabeta, mat_tp, alphabeta);
 
 
-  /* Compute epsilon */
+  /* Compute eps */
   fmpz_mat_window_init(alpha, alphabeta, 0, 0, g, 1);
   fmpz_mat_window_init(beta, alphabeta, g, 0, 2*g, 1);
 
-  fmpz_zero(epsilon);
+  fmpz_zero(eps);
   
   fmpz_mat_mul(Cvec_1, c, beta);
   fmpz_mat_mul(Cvec_2, b, alpha);
   fmpz_mat_transpose(Lvec, Cvec_2);
   fmpz_mat_mul(coef, Lvec, Cvec_1);
-  fmpz_addmul_ui(epsilon, fmpz_mat_entry(coef, 0, 0), 2);
+  fmpz_addmul_ui(eps, fmpz_mat_entry(coef, 0, 0), 2);
 
   fmpz_mat_mul(Cvec_1, b, alpha);
   fmpz_mat_mul(Cvec_2, d, alpha);
   fmpz_mat_transpose(Lvec, Cvec_2);
   fmpz_mat_mul(coef, Lvec, Cvec_1);
-  fmpz_sub(epsilon, epsilon, fmpz_mat_entry(coef, 0, 0));
+  fmpz_sub(eps, eps, fmpz_mat_entry(coef, 0, 0));
 
   fmpz_mat_mul(Cvec_1, a, beta);
   fmpz_mat_mul(Cvec_2, c, beta);
   fmpz_mat_transpose(Lvec, Cvec_2);
   fmpz_mat_mul(coef, Lvec, Cvec_1);
-  fmpz_sub(epsilon, epsilon, fmpz_mat_entry(coef, 0, 0));
+  fmpz_sub(eps, eps, fmpz_mat_entry(coef, 0, 0));
 
   fmpz_mat_transpose(block, b);
   fmpz_mat_mul(block, a, block);
@@ -100,9 +97,9 @@ ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t 
   fmpz_mat_mul(Cvec_2, c, beta);
   fmpz_mat_sub(Cvec_1, Cvec_1, Cvec_2);
   fmpz_mat_mul(coef, Lvec, Cvec_1);
-  fmpz_addmul_ui(epsilon, fmpz_mat_entry(coef, 0, 0), 2);
+  fmpz_addmul_ui(eps, fmpz_mat_entry(coef, 0, 0), 2);
 
-  fmpz_mod_ui(epsilon, epsilon, 8); /* Formula involves zeta_8^epsilon */
+  fmpz_mod_ui(eps, eps, 8); /* Formula involves zeta_8^eps */
 
   fmpz_mat_window_clear(alpha);
   fmpz_mat_window_clear(beta);
@@ -114,7 +111,7 @@ ulong acb_theta_transform_image_char(fmpz_t epsilon, ulong ab, const fmpz_mat_t 
       res += fmpz_tstbit(fmpz_mat_entry(alphabeta, i, 0), 0);
     }
 
-  fmpz_mat_clear(N_tp);
+  fmpz_mat_clear(mat_tp);
   fmpz_mat_clear(block);
   fmpz_mat_clear(alphabeta);
   fmpz_mat_clear(Cvec_1);
