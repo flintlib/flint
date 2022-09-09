@@ -68,8 +68,7 @@ acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_mat_set(lin_powers, acb_theta_precomp_exp_mat(D));
     for (k = 0; k < g; k++)
     {
-        acb_mul_2exp_si(&exp_z[k], &z[k], 1);
-        acb_exp_pi_i(&exp_z[k], &exp_z[k], prec);
+        acb_exp_pi_i(&exp_z[k], &z[k], prec);
     }
     acb_one(cofactor);
 

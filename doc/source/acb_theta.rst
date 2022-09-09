@@ -1,4 +1,4 @@
-.. _acb-modular:
+.. _acb-theta:
 
 **acb_theta.h** -- theta functions and modular forms in genus 2 and above
 ===============================================================================
@@ -452,15 +452,15 @@ code.
 .. type:: acb_theta_eld_t
 
     Represents a *d*-dimensional sheet in an ellipsoid of ambient dimension
-    *g*, i.e. a set of points of the form `n = (n_1,\ldots,n_g)\in
+    *g*, i.e. a set of points of the form `n = (n_0,\ldots,n_{g-1})\in
     2\mathbb{Z}^g + a` such that `v + Yn` has `L^2` norm bounded by `R`, for
     some Cholesky matrix `Y`, some radius `R>0`, and some offset `v\in
-    \mathbb{R}^g`, and finally `(n_{d+1},\ldots,n_g)` have fixed values. This is
+    \mathbb{R}^g`, and finally `(n_{d},\ldots,n_{g-1})` have fixed values. This is
     a recursive type: we store
-    * the interval of values for `n_d`,
+    * the interval of values for `n_{d-1}`,
     * the midpoint of that interval,
     * in the case `d\geq 2`, a number of *d-1* dimensional children of *E*,
-    split between left and right children depending on the position of `n_d`
+    split between left and right children depending on the position of `n_{d-1}`
     relative to the center of the interval.
 
     Full ellipsoids correspond to the special case `d=g`. We always require
@@ -518,14 +518,14 @@ In addition, the following macros are available after the function
 
 .. macro:: acb_theta_eld_coord(E, k)
 
-    For `d < k \leq g`, returns the common coordinate `n_k` of all lattice
+    For `d <= k < g`, returns the common coordinate `n_k` of all lattice
     points in the ellipsoid sheet *E*.
 
 .. macro:: acb_theta_eld_min(E)
 .. macro:: acb_theta_eld_mid(E)
 .. macro:: acb_theta_eld_max(E)
     
-    Returns the minimum, midpoint, and maximum of `n_d` in the ellipsoid sheet `E`.
+    Returns the minimum, midpoint, and maximum of `n_{d-1}` in the ellipsoid sheet `E`.
 
 .. macro:: acb_theta_eld_nr(E) ((E)->nr)
 .. macro:: acb_theta_eld_nl(E) ((E)->nl)
@@ -586,7 +586,7 @@ Precomputations for naive algorithms
               dist, slong max_dist, slong ord)
 
     Returns a good choice of precision to process the next ellipsoid
-    sheet. Here *coord* should be `n_d`, *dist* should be the distance to the
+    sheet. Here *coord* should be `n_{d-1}`, *dist* should be the distance to the
     midpoint of the interval, *max_dist* the half-length of the interval, and
     *ord* is the order of derivation.
 

@@ -100,40 +100,7 @@ acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2
     arf_clear(rad);
 }
 
-/* Main recursive function */
-
-static void
-acb_theta_eld_fill_recursive(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
-        arb_srcptr offset, slong* last_coords, ulong a, slong prec);
-
-void
-acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
-        arb_srcptr offset, slong* last_coords, ulong a, slong prec)
-{
-    slong min, max;
-    slong d = acb_theta_eld_dim(E);
-    slong k;
-
-    acb_theta_eld_init_interval(E, Y, R2, offset, last_coords, a, prec);  
-    min = acb_theta_eld_min(E);
-    max = acb_theta_eld_max(E);
-  
-    /* Induction only if d > 1 and min <= max */
-    if (min > max)
-    {
-        acb_theta_eld_nb_pts(E) = 0;
-        for (k = 0; k < d; k++) acb_theta_eld_box(E, k) = 0;
-    }
-    else if (d == 1)
-    {
-        acb_theta_eld_nb_pts(E) = (max - min)/2 + 1;
-        acb_theta_eld_box(E, 0) = FLINT_MAX(max, -min);
-    }
-    else
-    {
-        acb_theta_eld_fill_recursive(E, Y, R2, offset, last_coords, a, prec);
-    }
-}
+/* Main recursive function in dimension d>1 */
 
 static void
 acb_theta_eld_fill_recursive(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
@@ -216,4 +183,33 @@ acb_theta_eld_fill_recursive(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R
     _arb_vec_clear(offset_diff, d-1);
     _arb_vec_clear(offset_mid, d-1);
     _arb_vec_clear(next_offset, d-1);
+}
+
+void
+acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
+        arb_srcptr offset, slong* last_coords, ulong a, slong prec)
+{
+    slong min, max;
+    slong d = acb_theta_eld_dim(E);
+    slong k;
+
+    acb_theta_eld_init_interval(E, Y, R2, offset, last_coords, a, prec);  
+    min = acb_theta_eld_min(E);
+    max = acb_theta_eld_max(E);
+  
+    /* Induction only if d > 1 and min <= max */
+    if (min > max)
+    {
+        acb_theta_eld_nb_pts(E) = 0;
+        for (k = 0; k < d; k++) acb_theta_eld_box(E, k) = 0;
+    }
+    else if (d == 1)
+    {
+        acb_theta_eld_nb_pts(E) = (max - min)/2 + 1;
+        acb_theta_eld_box(E, 0) = FLINT_MAX(max, -min);
+    }
+    else
+    {
+        acb_theta_eld_fill_recursive(E, Y, R2, offset, last_coords, a, prec);
+    }
 }

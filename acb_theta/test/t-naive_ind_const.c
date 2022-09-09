@@ -14,7 +14,7 @@ int main()
 
     /* Test: agrees with genus 1 theta */
     for (iter = 0; iter < 200 * arb_test_multiplier(); iter++)
-      {
+    {
 	slong g = 1;
 	acb_mat_t tau;
 	acb_t t;
@@ -46,30 +46,30 @@ int main()
 
 	acb_zero(z);
 	acb_modular_theta(&th_test[3], &th_test[2],
-			  &th_test[0], &th_test[1], z, t, prec);
+                &th_test[0], &th_test[1], z, t, prec);
 	
 	for (ab = 0; ab < 4; ab++)
-	  {
+        {
 	    acb_theta_naive_ind_const(&th[ab], ab, tau, prec);
-	  }
+        }
 	res = 1;
 	for (k = 0; k < 4; k++)
-	  {
+        {
 	    if (!acb_overlaps(&th[k], &th_test[k])) res = 0;
-	  }
+        }
 
 	if (!res)
-	  {
+        {
 	    flint_printf("FAIL: no overlap\n");
 	    flint_printf("prec = %wd, tau:\n", prec);
 	    acb_mat_printd(tau, 10); flint_printf("\n");
 	    flint_printf("th_test[k], th[k] for k = 0 to 3:\n");
 	    for (k = 0; k < 4; k++)
-	      {
+            {
 		acb_printd(&th_test[k], 30); flint_printf("\n");
 		acb_printd(&th[k], 30); flint_printf("\n");
-	      }
-	  }
+            }
+        }
 	
 	acb_mat_clear(tau);
 	acb_clear(t);
@@ -77,7 +77,7 @@ int main()
 	_acb_vec_clear(th_test, 4);
 	acb_clear(z);
 	arb_clear(eps);
-      }
+    }
 
     flint_randclear(state);
     flint_cleanup();
