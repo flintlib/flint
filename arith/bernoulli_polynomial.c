@@ -30,8 +30,9 @@ void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 
     _arith_bernoulli_number_vec(poly->coeffs, den, n + 1);
 
-    /* Multiply the odd term by binomial(n,1) = n */
+    /* Multiply the odd term by -binomial(n,1) = -n */
     fmpz_mul_ui(poly->coeffs + 1, poly->coeffs + 1, n);
+    fmpz_neg(poly->coeffs + 1, poly->coeffs + 1);
 
     /* Multiply even terms by binomial coefficients */
     fmpz_one(t);

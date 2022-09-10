@@ -22,7 +22,7 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 
     if (n % 2)
     {
-        fmpz_set_si(num, -(n == 1));
+        fmpz_set_si(num, (n == 1));
         return;
     }
 

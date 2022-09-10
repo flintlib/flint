@@ -201,17 +201,18 @@ Bell numbers
 Bernoulli numbers and polynomials
 --------------------------------------------------------------------------------
 
+The functions in this section use `B_1=+\frac{1}{2}`.
 
 .. function:: void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 
     Sets ``(num, den)`` to the reduced numerator and denominator
     of the `n`-th Bernoulli number. As presently implemented,
-    this function simply calls\\ ``_arith_bernoulli_number_zeta``.
+    this function simply calls ``_arith_bernoulli_number_zeta``.
 
 .. function:: void arith_bernoulli_number(fmpq_t x, ulong n)
 
     Sets ``x`` to the `n`-th Bernoulli number. This function is
-    equivalent to\\ ``_arith_bernoulli_number`` apart from the output
+    equivalent to ``_arith_bernoulli_number`` apart from the output
     being a single ``fmpq_t`` variable.
 
     Warning: this function does not use proven precision bounds, and
@@ -253,7 +254,7 @@ Bernoulli numbers and polynomials
 .. function:: void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 
     Sets ``poly`` to the Bernoulli polynomial of degree `n`,
-    `B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}` where `B_k`
+    `B_n(x) = \sum_{k=0}^n (-1)^k \binom{n}{k} B_k x^{n-k}` where `B_k`
     is a Bernoulli number. This function basically calls
     ``arith_bernoulli_number_vec`` and then rescales the coefficients
     efficiently.
@@ -290,14 +291,11 @@ Bernoulli numbers and polynomials
     say `n < 1000`. The common denominator is calculated directly
     as the primorial of `n + 1`.
 
-    %[1] https://en.wikipedia.org/w/index.php?
-    %    title=Bernoulli_number&oldid=405938876
-
 .. function:: void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of ``num`` and ``den`` to the reduced
     numerators and denominators of `B_0, B_1, B_2, \ldots, B_{n-1}`
-    inclusive. Uses repeated direct calls to\\
+    inclusive. Uses repeated direct calls to
     ``_arith_bernoulli_number_zeta``.
 
 .. function:: void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
@@ -315,7 +313,7 @@ Bernoulli numbers and polynomials
     arithmetic to yield the numerators of the Bernoulli numbers after
     multiplication by the denominators and CRT reconstruction. This formula,
     given (incorrectly) in [BuhlerCrandallSompolski1992]_, saves about
-    half of the time compared to the usual generating function `x/(e^x-1)`
+    half of the time compared to the usual generating function `x/(1-e^{-x})`
     since the odd terms vanish.
 
 

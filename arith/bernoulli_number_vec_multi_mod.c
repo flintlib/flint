@@ -99,7 +99,7 @@ void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
 
     /* Trivial entries */
     if (n > 1)
-        fmpz_set_si(num + 1, WORD(-1));
+        fmpz_set_si(num + 1, WORD(1));
     for (k = 3; k < n; k += 2)
         fmpz_zero(num + k);
 
