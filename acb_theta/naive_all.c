@@ -6,31 +6,14 @@ static void worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
 {
     acb_t x;
     slong sgn;
-    slong k;
-    ulong a, b, b_shift;
+    ulong a = acb_theta_naive_a(coords, g);
+    ulong b;
 
     acb_init(x);
 
-    a = 0;
-    for (k = 0; k < g; k++)
-    {
-        a = a << 1;
-        a += ((4 + coords[k] % 4) % 4)/2;
-    }
-
     for (b = 0; b < n_pow(2,g); b++)
     {
-        b_shift = b;      
-        sgn = 0;
-        for (k = 0; k < g; k++)
-	{
-            if (b_shift & 1)
-	    {
-                sgn += 4 + (coords[g-1-k]/2) % 4;
-	    }
-            b_shift = b_shift >> 1;
-	}
-        sgn = sgn % 4;
+        sgn = acb_theta_dot(b, coords, g)/2;
       
         acb_set(x, term);
         if (sgn == 1) acb_mul_onei(x, x);

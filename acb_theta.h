@@ -142,10 +142,20 @@ slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec);
 
 /* Transformation formulas */
 
+slong acb_theta_char_dot(ulong a, ulong b, slong g);
+
+slong acb_theta_dot(ulong a, slong* n, slong g);
+
 void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g,
 	slong prec);
+
+void acb_theta_duplication_ext(acb_ptr th2, acb_srcptr th, slong g,
+        slong prec);
+
+void acb_theta_duplication_all_ext(acb_ptr tr2, acb_srcptr th, slong g,
+        slong prec);
 
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
 	const fmpz_mat_t mat);
@@ -265,6 +275,8 @@ void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 void acb_theta_naive_term(acb_t exp, const acb_mat_t tau, acb_srcptr z,
         ulong ab, slong* coords, slong prec);
 
+ulong acb_theta_naive_a(slong* coords, slong g);
+
 void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
@@ -272,10 +284,16 @@ void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec);
 
+void acb_theta_naive_ext(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
+
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
 void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
+
+void acb_theta_naive_all_ext(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+        slong prec);
 
 void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau,
         slong prec);

@@ -1,21 +1,6 @@
 
 #include "acb_theta.h"
 
-static int
-dupl_sgn(ulong a, ulong b, slong g)
-{
-  int sgn = 0;
-  slong k;
-  ulong and = a & b;
-  
-  for (k = 0; k < g; k++)
-    {
-      if (and & 1) sgn++;
-      and = and >> 1;
-    }
-  return sgn % 2;
-}
-
 void
 acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 {
@@ -33,8 +18,8 @@ acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
         /* Set v2 to modified theta values */
         for (b = 0; b < n; b++)
         {
-            if (dupl_sgn(a, b, g) == 0) acb_set(&v2[b], &th[b]);
-            else acb_neg(&v2[b], &th[b]);
+            acb_set(&v2[b], &th[b]);
+            if (acb_theta_char_dot(a, b, g) == 1) acb_neg(&v2[b], &v2[b]);
         }
         acb_theta_agm_hadamard(v1, th, g, prec);
         acb_theta_agm_hadamard(v2, v2, g, prec);

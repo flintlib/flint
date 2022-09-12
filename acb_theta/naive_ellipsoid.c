@@ -5,8 +5,9 @@ void
 acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
         int unif, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
 {  
-    arb_t pi;
-    arf_t R2;
+    arb_t pi, temp;
+    arf_t R2, bound;
+    slong scl = -1;
     arb_mat_t im;
     arb_mat_t cho;
     arb_mat_t imz;
@@ -18,7 +19,9 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
     slong k;
 
     arb_init(pi);
+    arb_init(temp);
     arf_init(R2);
+    arf_init(bound);
     arb_mat_init(im, g, g);
     arb_mat_init(cho, g, g);
     arb_mat_init(imz, g, 1);
@@ -27,6 +30,12 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
   
     arf_one(eps);
     arf_mul_2exp_si(eps, eps, -prec + ACB_THETA_NAIVE_EPS_2EXP);
+
+    if (all)
+    {
+        ab = 0;
+        scl = -2;
+    }
 
     acb_mat_get_imag(im, tau);
     arb_const_pi(pi, prec);
@@ -43,27 +52,17 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
         flint_printf("acb_theta_naive_ellipsoid: Error (imaginary part is not positive definite)\n");
         fflush(stdout);
         flint_abort();
-    }  
+    }
+    
     arb_mat_transpose(cho, cho);
-  
-    if (all) /* need all points in Z^g */
-    {
-        ab = 0;
-        arb_mat_scalar_mul_2exp_si(cho, cho, -1);
-    }  
     acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
-    arf_mul_2exp_si(R2, R2, 2);
   
     if (unif) /* any offset less than 1/2 */
     {
-        arb_one(pi);
-        arb_mul_2exp_si(pi, pi, -1);
-        for (k = 0; k < g; k++)
-	{
-            arb_unit_interval(&offset[k]);
-            arb_sub(&offset[k], &offset[k], pi, eld_prec);
-	}
+        flint_printf("(acb_theta_naive_ellipsoid) Not implemented\n");
+        flint_abort();
     }
+    
     else /* set offset in terms of z */
     {
         for (k = 0; k < g; k++)
@@ -78,9 +77,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
             arb_set(&offset[k], arb_mat_entry(imz, k, 0));
 	}
     }
-  
-    acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
-  
+    
     /* exponential error factor in terms of z */
     for (k = 0; k < g; k++)
     {
@@ -90,17 +87,23 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
     arb_zero(normz);
     for (k = 0; k < g; k++)
     {
-        arb_mul(pi, arb_mat_entry(imz, k, 0), acb_imagref(&z[k]), prec);
-        arb_add(normz, normz, pi, prec);
+        arb_mul(temp, arb_mat_entry(imz, k, 0), acb_imagref(&z[k]), prec);
+        arb_add(normz, normz, temp, prec);
     }
-    arb_const_pi(pi, prec);
     arb_mul(normz, normz, pi, prec);
     arb_exp(normz, normz, prec);
-    arb_get_ubound_arf(R2, normz, prec);
-    arf_mul(eps, eps, R2, prec, ARF_RND_CEIL);
+    arb_get_ubound_arf(bound, normz, prec);
+    arf_mul(eps, eps, bound, prec, ARF_RND_CEIL);
+  
+
+    /* Fill ellipsoid */
+    arb_mat_scalar_mul_2exp_si(cho, cho, scl);
+    acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
     
     arb_clear(pi);
+    arb_clear(temp);
     arf_clear(R2);
+    arf_clear(bound);
     arb_mat_clear(im);
     arb_mat_clear(cho);  
     arb_clear(normz);

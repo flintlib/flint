@@ -5,26 +5,17 @@ static void worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
         ulong ab, slong ord, slong prec, slong fullprec)
 {
     acb_t x;
-    slong sgn = 0;
-    slong k;
+    slong sgn;
 
     acb_init(x);
   
-    for (k = 0; k < g; k++)
-    {
-        if (ab & 1)
-	{
-            sgn += 4 + coords[g-1-k] % 4; /* & 3 ? */
-	}
-        ab = ab >> 1;
-    }
-    sgn = sgn % 4;
+    sgn = acb_theta_dot(ab, coords, g) % 4;
   
     acb_set(x, term);
     if (sgn == 1) acb_mul_onei(x, x);
     else if (sgn == 2) acb_neg(x, x);
     else if (sgn == 3) acb_div_onei(x, x);
-
+    
     acb_add(th, th, x, fullprec);    
     acb_clear(x);
 }

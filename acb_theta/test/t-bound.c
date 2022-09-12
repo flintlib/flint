@@ -12,7 +12,7 @@ int main()
   flint_randinit(state);
 
   /* Test: value of theta should be less than bound */
-  for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+  for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
     {
       slong g = 1 + n_randint(state, 3);
       slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);
