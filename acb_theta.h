@@ -242,19 +242,25 @@ typedef struct
     acb_mat_struct exp_mat;
     acb_ptr sqr_powers;
     slong* indices;
+    acb_ptr exp_z;
+    slong nb_z;
 } acb_theta_precomp_struct;
 
 typedef acb_theta_precomp_struct acb_theta_precomp_t[1];
 
 #define acb_theta_precomp_exp_mat(D) (&(D)->exp_mat)
-#define acb_theta_precomp_sqr_pow(D, k, j) (&(D)->sqr_powers[(j) + (D)->indices[(k)]])
+#define acb_theta_precomp_sqr_pow(D, k, j) \
+    (&(D)->sqr_powers[(j) + (D)->indices[(k)]])
+#define acb_theta_precomp_exp_z(D, k, j) \
+    (&(D)->exp_z[(k) * acb_mat_nrows(acb_theta_precomp_exp_mat(D)) + (j)])
+#define acb_theta_precomp_nb_z(D) ((D)->nb_z)
 
-void acb_theta_precomp_init(acb_theta_precomp_t D, slong g);
+void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb_z, slong g);
 
 void acb_theta_precomp_clear(acb_theta_precomp_t D);
 
-void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
-        const acb_theta_eld_t E, slong prec);
+void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
+        const acb_mat_t tau, const acb_theta_eld_t E, slong prec);
 
 
 /* Naive algorithms */
@@ -262,18 +268,9 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, const acb_mat_t tau,
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
         ulong, slong, slong, slong);
 
-void acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
-        const acb_theta_precomp_t D, const acb_t lin, const acb_t cofactor,
-        ulong ab, slong ord, slong prec, slong fullprec,
-        acb_theta_naive_worker_t worker_dim0);
-
-void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
-        const acb_theta_eld_t E, const acb_theta_precomp_t D, acb_srcptr exp_z,
-        const acb_t cofactor, ulong ab, slong ord, slong prec, slong fullprec,
-        acb_theta_naive_worker_t worker_dim0);
-
-void acb_theta_naive_term(acb_t exp, const acb_mat_t tau, acb_srcptr z,
-        ulong ab, slong* coords, slong prec);
+void acb_theta_naive_worker(acb_ptr th, slong nb, const arf_t epsilon,
+        const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k,
+        ulong ab, slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 
 ulong acb_theta_naive_a(slong* coords, slong g);
 
