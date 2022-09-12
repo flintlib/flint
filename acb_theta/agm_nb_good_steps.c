@@ -18,6 +18,7 @@ slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec)
     arb_init(eps);
     arb_init(target);
     arb_init(t);
+    arf_init(u);
     fmpz_init(exp);
 
     arb_one(eps);
@@ -48,6 +49,7 @@ slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec)
     arb_clear(eps);
     arb_clear(target);
     arb_clear(t);
+    arf_clear(u);
     fmpz_clear(exp);
     return nb;
 }

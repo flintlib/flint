@@ -22,6 +22,12 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
       
         acb_add(&th[b], &th[b], x, fullprec);
     }
+
+    flint_printf("Coordinates");
+    for (b = 0; b < g; b++) flint_printf(" %wd", coords[b]);
+    flint_printf("\n");
+    acb_printd(term, 10);
+    flint_printf("\n");
   
     acb_clear(x);
 }

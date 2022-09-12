@@ -96,6 +96,9 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab, int all,
     arf_mul(eps, eps, bound, prec, ARF_RND_CEIL);
     
     /* Fill ellipsoid */
+    acb_mat_printd(tau, 10);
+    flint_printf("\n");
+    arb_mat_printd(cho, 10);
     arb_mat_scalar_mul_2exp_si(cho, cho, scl);
     acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
     

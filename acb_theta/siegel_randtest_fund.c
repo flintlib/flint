@@ -29,10 +29,12 @@ acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state, slong prec)
     acb_zero(c);
     for (k = 0; k < g; k++)
     {
-	for (j = 0; j < g; j++)
+	for (j = k+1; j < g; j++)
 	{
 	    acb_randtest_disk(err, c, rad, state, prec);
-	    acb_add(acb_mat_entry(tau, k, j), acb_mat_entry(tau, k, j), err, prec);
+	    acb_add(acb_mat_entry(tau, k, j),
+                    acb_mat_entry(tau, k, j), err, prec);
+            acb_set(acb_mat_entry(tau, j, k), acb_mat_entry(tau, k, j));
 	}
     }
   

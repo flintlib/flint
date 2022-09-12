@@ -111,6 +111,10 @@ acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
       res += fmpz_tstbit(fmpz_mat_entry(alphabeta, i, 0), 0);
     }
 
+  fmpz_mat_clear(a);
+  fmpz_mat_clear(b);
+  fmpz_mat_clear(c);
+  fmpz_mat_clear(d);
   fmpz_mat_clear(mat_tp);
   fmpz_mat_clear(block);
   fmpz_mat_clear(alphabeta);

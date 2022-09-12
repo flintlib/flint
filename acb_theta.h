@@ -108,7 +108,7 @@ int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps, slong prec);
 
 /* AGM sequences */
 
-#define ACB_THETA_AGM_LOWPREC 20
+#define ACB_THETA_AGM_LOWPREC 100
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
