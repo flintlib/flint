@@ -22,8 +22,8 @@ fmpz_mat_Nij(fmpz_mat_t N, slong i, slong j)
     fmpz_one(fmpz_mat_entry(N, j, i+g));
     fmpz_set_si(fmpz_mat_entry(N, i+g, j), -1);
     fmpz_set_si(fmpz_mat_entry(N, j+g, i), -1);
-    fmpz_set_si(fmpz_mat_entry(N, i+g, j+g), -1);
-    fmpz_set_si(fmpz_mat_entry(N, j+g, i+g), -1);  
+    fmpz_zero(fmpz_mat_entry(N, i+g, i+g));
+    fmpz_zero(fmpz_mat_entry(N, j+g, j+g));
 }
 
 void

@@ -30,7 +30,6 @@ acb_theta_agm_ctx_set_matrix(acb_theta_agm_ctx_t ctx, slong k,
     /* Set roots to low precision, correctly rescaled */
     for (i = 0; i < nb_bad; i++)
     {
-        acb_mat_printd(z, 10); flint_printf("\n");
         acb_theta_naive_const(acb_theta_agm_ctx_roots(ctx, k) + i*n,
                 z, lowprec);
         acb_mat_scalar_mul_2exp_si(z, z, 1);

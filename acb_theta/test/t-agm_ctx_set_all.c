@@ -12,7 +12,7 @@ int main()
     flint_randinit(state);
 
     /* Test: agm context must be valid for g=1, 2 and tau in fundamental domain */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
         slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);

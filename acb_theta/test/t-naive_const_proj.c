@@ -34,8 +34,7 @@ int main()
         fmpz_mat_init(N, 2*g, 2*g);
 
         acb_siegel_randtest_fund(tau, state, prec);
-        fmpz_mat_one(N);
-        fmpz_set_si(fmpz_mat_entry(N, 0, 2), 1);
+        fmpz_mat_randtest_sp(N, state, mag_bits);
         
         acb_theta_naive_const_proj(th, tau, prec);
         acb_theta_duplication_all(th_dupl, th, g, prec);
@@ -49,13 +48,6 @@ int main()
         acb_theta_naive_const_proj(th, Ntau, prec);
         for (k = 0; k < nb; k++) acb_sqr(&th[k], &th[k], prec);
         
-        flint_printf("This is tau:\n");
-        acb_mat_printd(tau, 10);
-        flint_printf("\n");
-        flint_printf("This is Ntau:\n");
-        acb_mat_printd(Ntau, 10);
-        flint_printf("\n");
-
         acb_inv(scal, &th[0], prec);
         _acb_vec_scalar_mul(th, th, nb, scal, prec);
 

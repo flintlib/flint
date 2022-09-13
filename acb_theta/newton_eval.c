@@ -20,11 +20,6 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th, const acb_theta_agm_ctx_t ctx,
     arf_init(err);
   
     acb_theta_duplication_all(dupl, th, g, prec);
-    flint_printf("Duplicated values:\n");
-    for (k = 0; k < n*n; k++)
-    {
-        acb_printd(&dupl[k], 10); flint_printf("\n");
-    }
     for (k = 0; k < n; k++)
     {      
         acb_theta_transform_sqr_proj(transf, dupl,

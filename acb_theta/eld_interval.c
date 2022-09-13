@@ -37,11 +37,6 @@ acb_theta_eld_interval(slong* min, slong* mid, slong* max,
     arb_get_lbound_arf(b, y, prec);
     *min = 2*arf_get_si(b, ARF_RND_CEIL) + a;
 
-    flint_printf("Interval:\n");
-    arb_printd(ctr, 10); flint_printf("\n");
-    arf_printd(rad, 10); flint_printf("\n");
-    flint_printf("%wd %wd %wd\n", *min, *mid, *max);
-
     arb_clear(x);
     arb_clear(y);
     arf_clear(b);  
