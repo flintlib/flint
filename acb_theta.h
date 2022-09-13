@@ -154,7 +154,7 @@ void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g,
 void acb_theta_duplication_ext(acb_ptr th2, acb_srcptr th, slong g,
         slong prec);
 
-void acb_theta_duplication_all_ext(acb_ptr tr2, acb_srcptr th, slong g,
+void acb_theta_duplication_all_ext(acb_ptr th2, acb_srcptr th, slong g,
         slong prec);
 
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
@@ -225,9 +225,9 @@ void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y,
 void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
         const arf_t eps, slong prec);
 
-void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_t eps, ulong ab,
-        int all, int unif, slong ord, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
+void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c,
+        acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
+        const acb_mat_t tau, slong prec);
 
 slong acb_theta_naive_newprec(slong prec, slong coord, slong dist,
         slong max_dist, slong ord);
@@ -268,29 +268,24 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
         ulong, slong, slong, slong);
 
-void acb_theta_naive_worker(acb_ptr th, slong nb, const arf_t epsilon,
-        const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k,
-        ulong ab, slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
+void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c,
+        const arf_t eps, const acb_theta_eld_t E,
+        const acb_theta_precomp_t D, slong k, ulong ab, slong ord, slong prec,
+        acb_theta_naive_worker_t worker_dim0);
 
 ulong acb_theta_naive_a(slong* coords, slong g);
 
-void acb_theta_naive(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         slong prec);
 
 void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec);
 
-void acb_theta_naive_ext(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
-
-void acb_theta_naive_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
+void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
+        const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
-
-void acb_theta_naive_all_ext(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
 
 void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau,
         slong prec);

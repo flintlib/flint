@@ -71,7 +71,8 @@ acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
 
 /* Recursive call to smaller dimension; fall back to dim1 when appropriate */
 
-static void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
+static void
+acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
         const acb_theta_eld_t E, const acb_theta_precomp_t D, acb_srcptr exp_z,
         const acb_t cofactor, ulong ab, slong ord, slong prec, slong fullprec,
         acb_theta_naive_worker_t worker_dim0)
@@ -198,7 +199,8 @@ static void acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 
 /* User function */
 
-void acb_theta_naive_worker(acb_ptr th, slong nb, const arf_t epsilon,
+void
+acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps,
         const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k,
         ulong ab, slong ord, slong prec, acb_theta_naive_worker_t worker_dim0)
 {
@@ -219,7 +221,11 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const arf_t epsilon,
             acb_theta_precomp_exp_z(D, k, 0),
             cofactor, ab, ord, prec, prec, worker_dim0);
 
-    for (j = 0; j < nb; j++) acb_add_error_arf(&th[j], epsilon);
+    for (j = 0; j < nb; j++)
+    {
+        acb_mul(&th[j], &th[j], c, prec);
+        acb_add_error_arf(&th[j], eps);
+    }
 
     acb_mat_clear(lin_powers);
     acb_clear(cofactor);            
