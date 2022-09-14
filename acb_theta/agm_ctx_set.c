@@ -1,6 +1,173 @@
 
 #include "acb_theta.h"
 
+
+static void
+fmpz_mat_Mi(fmpz_mat_t N, slong i)
+{
+    slong g = fmpz_mat_nrows(N)/2;
+
+    fmpz_mat_one(N);
+    fmpz_one(fmpz_mat_entry(N, i, i+g));
+    fmpz_set_si(fmpz_mat_entry(N, i+g, i), -1);
+    fmpz_zero(fmpz_mat_entry(N, i+g, i+g));
+}
+
+static void
+fmpz_mat_Nij(fmpz_mat_t N, slong i, slong j)
+{  
+    slong g = fmpz_mat_nrows(N)/2;
+
+    fmpz_mat_one(N);
+    fmpz_one(fmpz_mat_entry(N, i, j+g));
+    fmpz_one(fmpz_mat_entry(N, j, i+g));
+    fmpz_set_si(fmpz_mat_entry(N, i+g, j), -1);
+    fmpz_set_si(fmpz_mat_entry(N, j+g, i), -1);
+    fmpz_zero(fmpz_mat_entry(N, i+g, i+g));
+    fmpz_zero(fmpz_mat_entry(N, j+g, j+g));
+}
+
+/* Candidates for symplectic matrix */
+
+static void
+acb_theta_agm_ctx_candidate(fmpz_mat_struct* Ni, slong k, slong g)
+{
+    slong j, u, v, c1, c2;
+    flint_rand_t state;
+
+    flint_randinit(state);
+
+    /* Change state according to k */
+    for (j = 0; j < k; j++) n_randint(state, 2);
+  
+    fmpz_mat_one(&Ni[0]);
+    if (g == 1)
+    {
+        fmpz_mat_J(&Ni[1]);
+    }
+    else if (g == 2)
+    {
+        fmpz_mat_Mi(&Ni[1], 0);
+        fmpz_mat_Mi(&Ni[2], 1);
+        fmpz_mat_Nij(&Ni[3], 0, 1);      
+    }
+    else
+    {
+        for (j = 1; j < (1<<g); j++)
+	{
+            /* Set Mi or Nij */
+            u = j % (g*(g+1))/2;
+            if (u < g)
+	    {
+                fmpz_mat_Mi(&Ni[j], u);
+                c1 = u;
+                c2 = u;
+	    }
+            else
+	    {
+                u = u-g;
+                v = 0;
+                while (u > (g-1-v))
+		{
+                    u = u - (g-1-v);
+                    v++;
+		}
+                fmpz_mat_Nij(&Ni[j], v, v+u);
+                c1 = v;
+                c2 = u+v;
+	    }
+            /* Add random things to upper left */
+            for (u = 0; u < g; u++)
+	    {
+                for (v = 0; v < g; v++)
+		{
+                    if ((u != v) && (v != c1) && (v != c2))
+		    {
+                        fmpz_set_si(fmpz_mat_entry(&Ni[j], u, v),
+                                n_randint(state, 2));
+		    }
+		}
+	    }
+	}
+    }
+    flint_randclear(state);
+}
+
+
+/* Collect data for a given symplectic matrix */
+
+static void
+acb_theta_agm_ctx_set_matrix(acb_theta_agm_ctx_t ctx, slong k,
+        const acb_mat_t tau, const fmpz_mat_t N, slong prec)
+{
+    slong nb_bad;
+    acb_mat_t z;
+    acb_t scal;
+    arb_t abs;
+    arb_t m;
+    slong g = acb_mat_nrows(tau);
+    slong n = 1<<g;
+    slong i, j;
+    slong lowprec = ACB_THETA_AGM_LOWPREC;
+  
+    acb_mat_init(z, g, g);
+    arb_init(abs);
+    arb_init(m);
+    acb_init(scal);
+
+    fmpz_mat_set(acb_theta_agm_ctx_matrix(ctx, k), N);
+
+    /* Compute number of bad steps */
+    acb_siegel_transform(z, N, tau, prec);
+    nb_bad = FLINT_MIN(1, acb_theta_agm_nb_bad_steps(z, prec));
+    acb_theta_agm_ctx_reset_steps(ctx, k, nb_bad);
+
+    /* Set roots to low precision, correctly rescaled */
+    for (i = 0; i < nb_bad; i++)
+    {
+        acb_theta_naive_const(acb_theta_agm_ctx_roots(ctx, k) + i*n,
+                z, lowprec);
+        acb_mat_scalar_mul_2exp_si(z, z, 1);
+    }
+    acb_inv(scal, &acb_theta_agm_ctx_roots(ctx, k)[0], lowprec);
+    _acb_vec_scalar_mul(acb_theta_agm_ctx_roots(ctx, k),
+            acb_theta_agm_ctx_roots(ctx, k), n * nb_bad, scal, lowprec);
+
+    /* Compute M0 */
+    arb_zero(m);
+    for (i = 0; i < n*nb_bad; i++)
+    {
+        acb_abs(abs, &acb_theta_agm_ctx_roots(ctx, k)[i], lowprec);
+        arb_max(m, m, abs, lowprec);
+    }
+    arb_sqr(m, m, lowprec);
+    arb_get_ubound_arf(acb_theta_agm_ctx_M0(ctx, k), m, lowprec);
+
+    /* Compute minf */
+    acb_abs(m, &acb_theta_agm_ctx_roots(ctx, k)[n*(nb_bad-1)], lowprec);
+    arb_div_si(m, m, 20, lowprec); /* Cf. agm_nb_bad_steps */
+    arb_get_lbound_arf(acb_theta_agm_ctx_minf(ctx, k), m, lowprec);
+
+    /* Compute mi */
+    for (i = 0; i < nb_bad; i++)
+    {
+        arb_pos_inf(m);
+        for (j = 0; j < n; j++)
+	{
+            acb_abs(abs, &acb_theta_agm_ctx_roots(ctx,k)[i*n + j], lowprec);
+            arb_min(m, m, abs, lowprec);
+	}
+        arb_sqr(m, m, lowprec);
+        arb_get_lbound_arf(&acb_theta_agm_ctx_mi(ctx,k)[i], m, lowprec);
+    }
+  
+    acb_mat_clear(z);
+    acb_clear(scal);
+    arb_clear(abs);
+    arb_clear(m);
+}
+
+
 /* Compute radius of disk around (theta_i^2/theta_0^2(N.tau)) where
    AGM function is surely well-defined */
 
@@ -61,7 +228,7 @@ propagate_rho(arf_t rho, const arf_t r, acb_srcptr th_proj,
     arf_init(max);
     arf_init(res);
 
-    acb_theta_duplication_all(th_dupl, th_proj, g, prec);
+    acb_theta_dupl_all_const(th_dupl, th_proj, g, prec);
   
     /* theta_i^2/theta_0^2 is obtained as quotient of two theta
        transformations, multiplied by some root of unity */
@@ -105,8 +272,7 @@ propagate_rho(arf_t rho, const arf_t r, acb_srcptr th_proj,
 
 
 void
-acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau,
-        slong prec)
+acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slong prec)
 {  
     acb_mat_t half;
     acb_ptr th;
@@ -145,7 +311,7 @@ acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau,
     while (!stop && (try < ACB_THETA_AGM_NB_MATRIX_SETUPS))
     {
         try++;
-        acb_theta_agm_ctx_matrices(acb_theta_agm_ctx_matrix(ctx, 0), try, g);
+        acb_theta_agm_ctx_candidate(acb_theta_agm_ctx_matrix(ctx, 0), try, g);
         arf_pos_inf(acb_theta_agm_ctx_rho(ctx));
         arf_zero(acb_theta_agm_ctx_max(ctx));
       

@@ -58,7 +58,7 @@ int main()
         }
 	else
         {	    
-	    acb_theta_duplication_all_ext(th_dupl, th, g, prec);
+	    acb_theta_dupl_all(th_dupl, th, g, prec);
 	    for (k = 0; k < 2*nb*nb; k++)
             {
                 acb_sqr(&th_test[k], &th_test[k], prec);

@@ -37,7 +37,7 @@ int main()
 	*/
 
 	acb_theta_naive_const(th_test, tau, prec);
-	acb_theta_duplication_all(th_test, th_test, g, prec);
+	acb_theta_dupl_all_const(th_test, th_test, g, prec);
 	        
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1); 
 	acb_theta_naive_all_const(th, tau, prec);

@@ -37,7 +37,7 @@ int main()
         fmpz_mat_randtest_sp(N, state, mag_bits);
         
         acb_theta_naive_const_proj(th, tau, prec);
-        acb_theta_duplication_all(th_dupl, th, g, prec);
+        acb_theta_dupl_all_const(th_dupl, th, g, prec);
         acb_theta_transform_sqr_proj(th_test, th_dupl, N, prec);
 
         acb_inv(scal, &th_test[0], prec);

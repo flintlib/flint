@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m)
+void
+acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m)
 {
   slong n = acb_theta_agm_ctx_nb(ctx);
   slong prev = acb_theta_agm_ctx_nb_bad_steps(ctx, k);

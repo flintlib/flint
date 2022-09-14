@@ -6,7 +6,7 @@ int main()
     slong iter;
     flint_rand_t state;
   
-    flint_printf("agm_ctx_set_all....");
+    flint_printf("agm_ctx_set....");
     fflush(stdout);
   
     flint_randinit(state);
@@ -25,7 +25,7 @@ int main()
         acb_theta_agm_ctx_init(ctx, g, n);
 
         acb_siegel_randtest_fund(tau, state, prec);
-        acb_theta_agm_ctx_set_all(ctx, tau, prec);
+        acb_theta_agm_ctx_set(ctx, tau, prec);
 
         res = acb_theta_agm_ctx_is_valid(ctx);
 

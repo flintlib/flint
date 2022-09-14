@@ -19,7 +19,7 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th, const acb_theta_agm_ctx_t ctx,
     agm = _acb_vec_init(n);
     arf_init(err);
   
-    acb_theta_duplication_all(dupl, th, g, prec);
+    acb_theta_dupl_all_const(dupl, th, g, prec);
     for (k = 0; k < n; k++)
     {      
         acb_theta_transform_sqr_proj(transf, dupl,

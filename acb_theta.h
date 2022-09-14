@@ -108,7 +108,7 @@ int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps, slong prec);
 
 /* AGM sequences */
 
-#define ACB_THETA_AGM_LOWPREC 100
+#define ACB_THETA_AGM_LOWPREC 50
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
@@ -146,16 +146,13 @@ slong acb_theta_char_dot(ulong a, ulong b, slong g);
 
 slong acb_theta_dot(ulong a, slong* n, slong g);
 
-void acb_theta_duplication(acb_ptr th2, acb_srcptr th, slong g, slong prec);
+void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
-void acb_theta_duplication_all(acb_ptr th2, acb_srcptr th, slong g,
-	slong prec);
+void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
-void acb_theta_duplication_ext(acb_ptr th2, acb_srcptr th, slong g,
-        slong prec);
+void acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
-void acb_theta_duplication_all_ext(acb_ptr th2, acb_srcptr th, slong g,
-        slong prec);
+void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
 	const fmpz_mat_t mat);
@@ -163,8 +160,7 @@ ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
 void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
         const fmpz_mat_t mat, slong prec);
 
-
-/* Ellipsoids for naive algorithms */
+/* Naive algorithms */
 
 struct acb_theta_eld_struct
 {
@@ -211,9 +207,6 @@ int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
 
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
-
-/* Choice of radii and precisions in naive algorithms */
-
 #define ACB_THETA_ELD_DEFAULT_PREC 50
 #define ACB_THETA_NAIVE_EPS_2EXP 0
 #define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.1
@@ -233,9 +226,6 @@ slong acb_theta_naive_newprec(slong prec, slong coord, slong dist,
         slong max_dist, slong ord);
 
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
-
-
-/* Precomputations for naive algorithms */
 
 typedef struct
 {
@@ -261,9 +251,6 @@ void acb_theta_precomp_clear(acb_theta_precomp_t D);
 
 void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
         const acb_mat_t tau, const acb_theta_eld_t E, slong prec);
-
-
-/* Naive algorithms */
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
         ulong, slong, slong, slong);
@@ -306,7 +293,20 @@ void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau,
         slong ord, slong prec);
 
 
-/* Upper bounds on theta constants and their derivatives */
+/* Conversions */
+
+void acb_theta_all_const_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
+
+void acb_theta_all_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
+
+void acb_theta_renormalize_const_sqr(acb_t scal, acb_srcptr th2,
+        const acb_mat_t tau, slong prec);
+
+void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2,
+        acb_srcptr z, const acb_mat_t tau, slong prec);
+
+
+/* Newton iterations */
 
 void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau,
         slong prec);
@@ -316,8 +316,6 @@ void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau,
 
 void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
         slong ord, slong dim, slong prec);
-
-/* Context for Newton iterations */
 
 #define ACB_THETA_AGM_NB_MATRIX_SETUPS 10
 #define ACB_THETA_AGM_BASEPREC 2000
@@ -350,49 +348,36 @@ typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 #define acb_theta_agm_ctx_max(ctx) (&(ctx)->max)
 #define acb_theta_agm_ctx_inv_der(ctx) (&(ctx)->inv_der)
 
-void acb_theta_agm_ctx_init(acb_theta_agm_ctx_t ctx, slong g, slong n);
-
-void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx);
+void acb_theta_agm_ctx_init(acb_theta_agm_ctx_t ctx, slong g, slong nb);
 
 void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m);
 
-void acb_theta_agm_ctx_set_matrix(acb_theta_agm_ctx_t ctx, slong k, const acb_mat_t tau,
-				  const fmpz_mat_t N, slong prec);
+void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx);
 
-void acb_theta_agm_ctx_matrices(fmpz_mat_struct* Ni, slong k, slong g);
-
-void acb_theta_agm_ctx_set_all(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slong prec);
+void acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, const acb_mat_t tau,
+        slong prec);
 
 int acb_theta_agm_ctx_is_valid(const acb_theta_agm_ctx_t ctx);
 
+void acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
+        const acb_theta_agm_ctx_t ctx, slong prec);
 
-/* Newton iterations */
+void acb_theta_newton_fd(acb_ptr r, acb_mat_t fd, acb_srcptr th,
+        const arb_t eta, const acb_theta_agm_ctx_t ctx, slong prec);
 
-void acb_theta_newton_eval(acb_ptr r, acb_srcptr th, const acb_theta_agm_ctx_t ctx, slong prec);
+void acb_theta_newton_run(acb_ptr r, const acb_mat_t tau,
+        const acb_theta_agm_ctx_t ctx, slong prec);
 
-void acb_theta_newton_fd(acb_ptr r, acb_mat_t fd, acb_srcptr th, const arb_t eta,
-			 const acb_theta_agm_ctx_t ctx, slong prec);
+void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau,
+        slong prec);
 
-void acb_theta_newton_logs(slong* log_max, slong* log_rho, slong* log_B1, slong* log_B2,
-			   slong* log_B3, const acb_theta_agm_ctx_t ctx);
+void acb_theta_newton_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z,
+        slong prec);
 
-slong acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err, const acb_mat_t tau,
-			     const acb_theta_agm_ctx_t ctx, slong prec);
+void acb_theta_newton_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
 
-slong acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
-			    const acb_theta_agm_ctx_t, slong prec);
-
-void acb_theta_newton_run(acb_ptr r, const acb_mat_t tau, const acb_theta_agm_ctx_t ctx,
-			  slong prec);
-
-
-/* AGM/Newton algorithms for theta functions */
-
-void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec);
-
-void acb_theta_newton_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
-
-void acb_theta_newton_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
+void acb_theta_newton_all_const_sqr(acb_ptr th2, const acb_mat_t tau,
+        slong prec);
 
 
 /* Mixed naive-AGM algorithms */
@@ -401,12 +386,6 @@ void acb_theta_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec
 
 void acb_theta_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
-
-/* Conversions */
-
-void acb_theta_all_const_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
-
-void acb_theta_all_from_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
 
 
 /* Finite difference algorithms */

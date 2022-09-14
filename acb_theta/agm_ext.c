@@ -24,6 +24,10 @@ acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_roots,
     {
 	acb_theta_agm_ext_step_bad(v, v, all_roots + k*2*n, g, prec);
     }
+
+    acb_set(exp, &v[0]);
+    _acb_vec_scalar_div(v, v, 2*n, exp, prec);
+    
     for (k = 0; k < nb_good; k++)
     {
 	acb_theta_agm_ext_step_good(v, v, g, prec);
@@ -39,7 +43,7 @@ acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_roots,
     arf_mul(err, err, rel_err, lowprec, ARF_RND_CEIL);
     acb_add_error_arf(r, err);  
 
-    _acb_vec_clear(v, n);
+    _acb_vec_clear(v, 2*n);
     acb_clear(exp);
     arb_clear(abs);
     arf_clear(err);

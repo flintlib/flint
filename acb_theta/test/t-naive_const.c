@@ -65,7 +65,7 @@ int main()
 	    flint_abort();
         }
 	
-	acb_theta_duplication(th_test, th, g, prec);
+	acb_theta_dupl_const(th_test, th, g, prec);
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1);	
 	acb_theta_naive_const(th, tau, prec);
 	for (k = 0; k < nb; k++) acb_sqr(&th[k], &th[k], prec);
@@ -77,7 +77,7 @@ int main()
         }
 	if (!res)
         {
-	    flint_printf("FAIL: duplication\n");
+	    flint_printf("FAIL: dupl_const\n");
 	    flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
 	    acb_mat_printd(tau, 10);
 	    flint_printf("th[k], th_test[k]:\n");
