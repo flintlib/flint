@@ -35,7 +35,7 @@ int main()
 
       acb_mat_init(tau, g, g);
       arf_init(rad);
-      z = _acb_vec_init(g);
+      z = _acb_vec_init(2*g);
       th = _acb_vec_init(2*n);
       th_sqr = _acb_vec_init(2*n);
       th_dupl = _acb_vec_init(2*n);
@@ -46,8 +46,7 @@ int main()
       arf_mul_2exp_si(rad, rad, rad_exp);
       for (k = 0; k < g; k++) acb_randtest_disk(&z[k], &z[k], rad, state, prec);
 
-      acb_theta_naive(th, z, tau, prec);
-      acb_theta_naive_const(th+n, tau, prec);
+      acb_theta_naive(th, z, 2, tau, prec);
 
       /*
       flint_printf("g = %wd, prec = %wd, tau, z:\n", g, prec);
@@ -70,8 +69,7 @@ int main()
       
       acb_mat_scalar_mul_2exp_si(tau, tau, 1);
       
-      acb_theta_naive(th_dupl, z, tau, prec);
-      acb_theta_naive_const(th_dupl+n, tau, prec);
+      acb_theta_naive(th_dupl, z, 2, tau, prec);
       for (k = 0; k < 2*n; k++) acb_sqr(&th_dupl[k], &th_dupl[k], prec);
 
       pos = 1;
@@ -122,7 +120,7 @@ int main()
 
       acb_mat_clear(tau);
       arf_clear(rad);
-      _acb_vec_clear(z, g);
+      _acb_vec_clear(z, 2*g);
       _acb_vec_clear(th, 2*n);
       _acb_vec_clear(th_sqr, 2*n);
       _acb_vec_clear(th_dupl, 2*n);

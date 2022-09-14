@@ -20,7 +20,7 @@ int main()
 	acb_mat_t tau;
 	acb_ptr z;
 	arf_t rad;
-	slong rad_exp = -1;
+	slong rad_exp = 0;
 	acb_ptr th;
 	acb_ptr th_dupl;
 	acb_ptr th_test;
@@ -30,7 +30,7 @@ int main()
 	slong k;
 	
 	acb_mat_init(tau, g, g);
-	z = _acb_vec_init(g);
+	z = _acb_vec_init(2*g);
         arf_init(rad);
 	th = _acb_vec_init(2*nb);
 	th_dupl = _acb_vec_init(2*nb*nb);
@@ -43,17 +43,18 @@ int main()
         {
             acb_randtest_disk(&z[k], &z[k], rad, state, prec);
         }
+        _acb_vec_scalar_mul_2exp_si(z, z, g, 4);
         
-	acb_theta_naive_ext(th, z, tau, prec);
+	acb_theta_naive(th, z, 2, tau, prec);
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1);
-	acb_theta_naive_all_ext(th_test, z, tau, prec);
+	acb_theta_naive_all(th_test, z, 2, tau, prec);
 	
 	if (g == 1)
         {	    
 	    acb_modular_theta(&th_dupl[3], &th_dupl[2],
                     &th_dupl[0], &th_dupl[1], z, acb_mat_entry(tau,0,0), prec);
             acb_neg(&th_dupl[3], &th_dupl[3]);
-            acb_theta_naive(th, z, tau, prec);
+            acb_theta_naive(th, z, 1, tau, prec);
         }
 	else
         {	    
@@ -62,7 +63,7 @@ int main()
             {
                 acb_sqr(&th_test[k], &th_test[k], prec);
             }
-            acb_theta_naive(th, z, tau, prec);
+            acb_theta_naive(th, z, 1, tau, prec);
             for (k = 0; k < nb; k++)
             {
                 acb_sqr(&th[k], &th[k], prec);
@@ -101,7 +102,7 @@ int main()
         }
 	
 	acb_mat_clear(tau);
-	_acb_vec_clear(z, g);
+	_acb_vec_clear(z, 2*g);
         arf_clear(rad);
 	_acb_vec_clear(th, 2*nb);
 	_acb_vec_clear(th_dupl, 2*nb*nb);

@@ -46,7 +46,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     slong k;
 
     acb_theta_eld_init(E, g, g);
-    acb_theta_precomp_init(D, 1, g);
+    acb_theta_precomp_init(D, nb_z, g);
     eps = flint_malloc(nb_z * sizeof(arf_struct));
     for (k = 0; k < nb_z; k++) arf_init(&eps[k]);
     c = _acb_vec_init(nb_z);

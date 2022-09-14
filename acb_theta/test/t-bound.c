@@ -66,7 +66,7 @@ int main()
                 acb_randtest_disk(&z[k], &z[k], rad, state, prec);
 	    }
 	}
-        acb_theta_naive_all(th, z, tau, prec);
+        acb_theta_naive_all(th, z, 1, tau, prec);
 
         arb_set_arf(cmp, bound);
         res = 1;

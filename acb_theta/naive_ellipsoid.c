@@ -40,7 +40,7 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct* eps, acb_ptr new_z,
         arb_mat_mul(vec, Yinv, y, prec);      
         acb_zero(&c[k]);
         arb_mat_transpose(tp, y);
-        arb_mat_mul(prod, y, vec, prec);
+        arb_mat_mul(prod, tp, vec, prec);
         arb_sub(acb_imagref(&c[k]), acb_imagref(&c[k]),
                 arb_mat_entry(prod, 0, 0), prec);
 
@@ -50,25 +50,27 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct* eps, acb_ptr new_z,
         arb_exp(bound, bound, prec);
         arb_get_ubound_arf(&eps[k], bound, prec);
 
-        /* Round to nearest integer vector v */
+        /* Round to nearest even integer vector v */
         for (j = 0; j < g; j++)
         {
             if (!arb_is_finite(arb_mat_entry(vec, j, 0))
-                    || arf_cmpabs_ui(arb_mat_entry(vec, j, 0), WORD_MAX) > 0)
+                    || arf_cmpabs_ui(arb_midref(arb_mat_entry(vec, j, 0)), WORD_MAX) > 0)
             {
                 flint_printf("acb_theta_naive_red_z: Error (impossible rounding)\n");
                 fflush(stdout);
                 flint_abort();
             }
-            v[j] = arf_get_si(arb_midref(arb_mat_entry(vec, j, 0)),
+            arb_mat_scalar_mul_2exp_si(vec, vec, -1);
+            v[j] = 2*arf_get_si(arb_midref(arb_mat_entry(vec, j, 0)),
                     ARF_RND_NEAR);
+            arb_mat_scalar_mul_2exp_si(vec, vec, 1);
         }
         
         /* Get r and uniform offset */
         for (j = 0; j < g; j++)
         {
             arb_sub_si(arb_mat_entry(r, j, 0), arb_mat_entry(vec, j, 0),
-                    &v[j], prec);
+                    v[j], prec);
         }
         arb_mat_mul(vec, cho, r, prec);
         for (j = 0; j < g; j++)
@@ -88,14 +90,16 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct* eps, acb_ptr new_z,
         for (j = 0; j < g; j++)
         {
             acb_set_arb(&new_z[k*g+j], arb_mat_entry(x, j, 0));
-            arb_set_si(arb_mat_entry(tp, 0, j), &v[j]);
+            arb_set_si(arb_mat_entry(tp, 0, j), v[j]);
         }
-        arb_mat_mul(prod, tp, x);
+        arb_mat_mul(prod, tp, x, prec);
+        arb_mul_2exp_si(arb_mat_entry(prod, 0, 0),
+                arb_mat_entry(prod, 0, 0), 1);
         acb_sub_arb(&c[k], &c[k], arb_mat_entry(prod, 0, 0), prec);
         
         for (j = 0; j < g; j++)
         {
-            arb_set_si(arb_mat_entry(vec, j, 0), &v[j]);
+            arb_set_si(arb_mat_entry(vec, j, 0), v[j]);
         }
         arb_mat_transpose(tp, vec);
         arb_mat_mul(vec, X, vec, prec);
@@ -115,7 +119,7 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct* eps, acb_ptr new_z,
         }
         arb_mat_transpose(tp, r);
         arb_mat_mul(prod, tp, vec, prec);
-        arb_sub(acb_imagref(&c[k]), acb_imagref(&c[k]),
+        arb_add(acb_imagref(&c[k]), acb_imagref(&c[k]),
                 arb_mat_entry(prod, 0, 0), prec);
         acb_exp_pi_i(&c[k], &c[k], prec);
     }
@@ -149,13 +153,9 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c,
     slong k;
 
     arb_init(pi);
-    arb_init(temp);
     arf_init(R2);
     arf_init(bound);
-    arb_mat_init(im, g, g);
     arb_mat_init(cho, g, g);
-    arb_mat_init(imz, g, 1);
-    arb_init(normz);
     offset = _arb_vec_init(g);
   
     arf_one(bound);
@@ -189,7 +189,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c,
     acb_theta_naive_radius(R2, cho, ord, bound, eld_prec);
 
     /* Set offset in terms of z */
-    acb_theta_naive_reduce_z(offset, eps, new_z, c, z, nb_z, tau, cho, g, prec);
+    acb_theta_naive_red_z(offset, eps, new_z, c, z, nb_z, tau, cho, g, prec);
     for (k = 0; k < nb_z; k++)
     {
         arf_mul(&eps[k], &eps[k], bound, prec, ARF_RND_CEIL);
