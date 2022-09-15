@@ -6,47 +6,42 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("newton_const_sqr....");
+    flint_printf("renormalize_const_sqr....");
     fflush(stdout);
 
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 1 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = 1<<g;
         acb_mat_t tau;
-        acb_ptr th2;
-        acb_ptr th2_test;
-        slong prec = ACB_THETA_AGM_BASEPREC * (2 + n_randint(state, 5));
+        acb_ptr th2, th2_test;
+        acb_t scal;
+        slong prec = 100 + n_randint(state, 1000);
+
         int res;
         slong k;
-
+        
         acb_mat_init(tau, g, g);
         th2 = _acb_vec_init(nb);
         th2_test = _acb_vec_init(nb);
+        acb_init(scal);
 
         acb_siegel_randtest_fund(tau, state, prec);
-        acb_theta_naive_const(th2_test, tau, prec);
-        acb_mat_scalar_mul_2exp_si(tau, tau, -1);
-        acb_theta_naive_const_proj(th2, tau, prec);
-        acb_mat_scalar_mul_2exp_si(tau, tau, 1);
-
-        flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
-        acb_mat_printd(tau, 10); flint_printf("\n");
-        flint_printf("Projective theta(tau/2):\n");
+        acb_theta_naive_const(th2, tau, prec);
         for (k = 0; k < nb; k++)
         {
-            acb_printd(&th2[k], 10); flint_printf("\n");
+            acb_sqr(&th2[k], &th2[k], prec);
         }
-        
-        acb_theta_newton_const_sqr(th2, tau, prec);
-        
+        _acb_vec_scalar_div(th2_test, th2, nb, &th2[0], prec);
+        acb_theta_renormalize_const_sqr(scal, th2_test, tau, prec);
+        _acb_vec_scalar_mul(th2_test, th2_test, nb, scal, prec);
+
         res = 1;
         for (k = 0; k < nb; k++)
-        {
-            acb_sqr(&th2_test[k], &th2_test[k], prec);
+        {            
             if (!acb_overlaps(&th2_test[k], &th2[k])) res = 0;
         }
         if (!res)
@@ -64,7 +59,8 @@ int main()
 
         acb_mat_clear(tau);
         _acb_vec_clear(th2, nb);
-        _acb_vec_clear(th2_test, nb);        
+        _acb_vec_clear(th2_test, nb);
+        acb_clear(scal);
     }
     
     flint_randclear(state);
@@ -72,4 +68,3 @@ int main()
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
-

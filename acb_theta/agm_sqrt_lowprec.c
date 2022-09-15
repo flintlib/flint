@@ -33,10 +33,6 @@ acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root,
 	fflush(stdout);
 	flint_abort();
     }
-
-    flint_printf("(agm_sqrt_lowprec) Roots agree\n");
-    acb_printd(root, 10); flint_printf("\n");
-    acb_printd(res, 10); flint_printf("\n");
     
     acb_set(r, res);
     acb_clear(res);
