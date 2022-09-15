@@ -62,7 +62,6 @@ acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
   /* Perform matrix-vector multiplication */
   fmpz_mat_mul(alphabeta, mat_tp, alphabeta);
 
-
   /* Compute eps */
   fmpz_mat_window_init(alpha, alphabeta, 0, 0, g, 1);
   fmpz_mat_window_init(beta, alphabeta, g, 0, 2*g, 1);

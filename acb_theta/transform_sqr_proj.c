@@ -16,7 +16,7 @@ acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat,
   aux = _acb_vec_init(n);
   fmpz_init(eps);
   acb_init(c);
-
+  
   for (ab = 0; ab < n; ab++)
     {
       image_ab = acb_theta_transform_image_char(eps, ab, mat);

@@ -164,16 +164,16 @@ void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
 
 struct acb_theta_eld_struct
 {
-  slong dim;
-  slong ambient_dim;
-  slong* last_coords;
-  slong min, mid, max;
-  struct acb_theta_eld_struct* rchildren;
-  slong nr;
-  struct acb_theta_eld_struct* lchildren;
-  slong nl;
-  slong nb_pts;
-  slong* box;
+    slong dim;
+    slong ambient_dim;
+    slong* last_coords;
+    slong min, mid, max;
+    struct acb_theta_eld_struct* rchildren;
+    slong nr;
+    struct acb_theta_eld_struct* lchildren;
+    slong nl;
+    slong nb_pts;
+    slong* box;
 };
 
 typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
@@ -326,14 +326,14 @@ void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
 
 typedef struct
 {
-  slong g, nb;
-  fmpz_mat_struct* matrices;
-  slong* nb_bad_steps;
-  acb_ptr* roots;
-  arf_struct** mi;
-  arf_struct* M0;
-  arf_struct* minf;
-  arf_struct rho, max, inv_der;
+    slong g, nb;
+    fmpz_mat_struct* matrices;
+    slong* nb_bad_steps;
+    acb_ptr* roots;
+    arf_struct** mi;
+    arf_struct* M0;
+    arf_struct* minf;
+    arf_struct rho, max, inv_der;
 } acb_theta_agm_ctx_struct;
 
 typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];

@@ -27,6 +27,12 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
     
     acb_set(scal, &v[0]);
     _acb_vec_scalar_div(v, v, n, scal, prec);
+
+    flint_printf("(agm) Starting good steps\n");
+    for (k = 0; k < n; k++)
+    {
+        acb_printd(&v[k], 10); flint_printf("\n");
+    }
         
     for (k = 0; k < nb_good; k++)
     {
@@ -34,6 +40,8 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots, const arf_t rel_err,
     }
     
     acb_mul(r, &v[0], scal, prec);
+    flint_printf("(agm) Reached agm\n");
+    acb_printd(r, 10); flint_printf("\n");
     
     acb_abs(abs, r, lowprec);
     arb_get_ubound_arf(err, abs, lowprec);

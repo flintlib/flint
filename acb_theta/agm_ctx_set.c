@@ -30,7 +30,7 @@ fmpz_mat_Nij(fmpz_mat_t N, slong i, slong j)
 /* Candidates for symplectic matrix */
 
 static void
-acb_theta_agm_ctx_candidate(fmpz_mat_struct* Ni, slong k, slong g)
+acb_theta_agm_ctx_candidates(fmpz_mat_struct* Ni, slong k, slong g)
 {
     slong j, u, v, c1, c2;
     flint_rand_t state;
@@ -311,7 +311,7 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slong prec)
     while (!stop && (try < ACB_THETA_AGM_NB_MATRIX_SETUPS))
     {
         try++;
-        acb_theta_agm_ctx_candidate(acb_theta_agm_ctx_matrix(ctx, 0), try, g);
+        acb_theta_agm_ctx_candidates(acb_theta_agm_ctx_matrix(ctx, 0), try, g);
         arf_pos_inf(acb_theta_agm_ctx_rho(ctx));
         arf_zero(acb_theta_agm_ctx_max(ctx));
       
@@ -363,6 +363,10 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, const acb_mat_t tau, slong prec)
         arb_mul(bound, bound, eta, lowprec);
         arb_sub_si(test, bound, 1, lowprec);
         if (!arb_is_negative(test)) continue;
+
+        flint_printf("(ctx_set) fdinv:\n");
+        acb_mat_printd(fdinv, 10);
+        flint_printf("Norm:\n"); arb_printd(norm, 10); flint_printf("\n");
 
         /* Get inv_der */
         arb_mul(bound, bound, norm, lowprec);
