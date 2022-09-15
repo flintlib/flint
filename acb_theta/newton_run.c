@@ -46,11 +46,13 @@ acb_theta_newton_target(acb_ptr im, const acb_mat_t tau,
     slong n = acb_theta_agm_ctx_nb(ctx);
     slong k;
     acb_mat_t w;
-    fmpz_t epsilon;
+    acb_ptr dets;
+    fmpz_t eps;
     acb_t zeta, mu;
 
     acb_mat_init(w, g, g);
-    fmpz_init(epsilon);
+    dets = _acb_vec_init(n);
+    fmpz_init(eps);
     acb_init(zeta);
     acb_init(mu);
 
@@ -60,16 +62,24 @@ acb_theta_newton_target(acb_ptr im, const acb_mat_t tau,
   
     for (k = 0; k < n; k++)
     {
-        acb_theta_transform_image_char(epsilon, 0,
+        acb_theta_transform_image_char(eps, 0,
                 acb_theta_agm_ctx_matrix(ctx, k));
-        acb_pow_si(mu, zeta, fmpz_get_si(epsilon), prec);
+        acb_pow_si(mu, zeta, fmpz_get_si(eps), prec);
+        flint_printf("Matrix:\n");
+        fmpz_mat_print_pretty(acb_theta_agm_ctx_matrix(ctx, k)); flint_printf("\n");
+        flint_printf("eps = %wd\n", fmpz_get_si(eps));
         acb_siegel_cocycle(w, acb_theta_agm_ctx_matrix(ctx, k), tau, prec);
-        acb_mat_det(&im[k], w, prec);
-        acb_mul(&im[k], &im[k], mu, prec);
+        acb_mat_det(&dets[k], w, prec);
+        acb_mul(&dets[k], &dets[k], mu, prec);
+    }
+    for (k = 0; k < n-1; k++)
+    {
+        acb_div(&im[k], &dets[k+1], &dets[0], prec);
     }
 
     acb_mat_clear(w);
-    fmpz_clear(epsilon);
+    _acb_vec_clear(dets, n);
+    fmpz_clear(eps);
     acb_clear(zeta);
     acb_clear(mu);
 }
@@ -174,8 +184,26 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
     arb_one(eta);
     arb_mul_2exp_si(eta, eta, log_eta);
 
+    flint_printf("Newton step current:\n");
+    for (k = 0; k < n; k++)
+    {
+        acb_printd(&current[k], 10); flint_printf("\n");
+    }
+    flint_printf("Desired image:\n");
+    for (k = 0; k < n-1; k++)
+    {
+        acb_printd(&im[k], 10); flint_printf("\n");
+    }
+
     /* Compute correction */
     acb_theta_newton_fd(f, fd, current, eta, ctx, nextprec);
+
+    flint_printf("Current image:\n");
+    for (k = 0; k < n-1; k++)
+    {
+        acb_printd(&f[k], 10); flint_printf("\n");
+    }
+    
     res = acb_mat_inv(fd, fd, nextprec);
     if (!res)
     {

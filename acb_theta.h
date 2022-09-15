@@ -305,6 +305,8 @@ void acb_theta_renormalize_const_sqr(acb_t scal, acb_srcptr th2,
 void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2,
         acb_srcptr z, const acb_mat_t tau, slong prec);
 
+slong acb_theta_k2(const fmpz_mat_t mat);
+
 
 /* Newton iterations */
 
