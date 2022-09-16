@@ -17,9 +17,11 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
     arf_init(up);
     fmpz_init(e);
 
-    /* Get lambda = smallest eigenvalue of Im(tau) */
+    /* Get lambda = smallest eigenvalue of Pi Im(tau) */
     acb_mat_get_imag(im, tau);
     arb_mat_pos_lambda(lambda, im, prec);
+    arb_const_pi(lambda0, prec);
+    arb_mul(lambda, lambda, lambda0, prec);
 
     /* Set lambda0 such that 3g exp(-lambda0) = 1/50 */
     arb_one(lambda0);
@@ -32,7 +34,7 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
     arb_get_ubound_arf(up, lambda, prec);
     arf_frexp(up, e, up);
     res = fmpz_get_si(e);
-
+    
     arb_mat_clear(im);
     arb_clear(lambda);
     arb_clear(lambda0);

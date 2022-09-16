@@ -8,10 +8,11 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
     acb_t x;
     slong sgn;
     ulong b;
+    slong n = 1 << g;
 
     acb_init(x);
   
-    for (b = 0; b < n_pow(2,g); b++)
+    for (b = 0; b < n; b++)
     {
         sgn = acb_theta_dot(b, coords, g) % 4;
       
@@ -22,6 +23,12 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
       
         acb_add(&th[b], &th[b], x, fullprec);
     }
+
+    /*
+    flint_printf("(naive) Coords");
+    for (b = 0; b < g; b++) flint_printf(" %wd", coords[b]);
+    flint_printf(": "); acb_printd(term, 10); flint_printf("\n");
+    */
   
     acb_clear(x);
 }

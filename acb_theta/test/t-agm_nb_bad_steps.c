@@ -14,9 +14,9 @@ int main()
     /* Test: after scalar multiplication, theta values must be close to 1 */
     for (iter = 0; iter < 500 * arb_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 4);
+        slong g = 1 + n_randint(state, 5);
         slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);
-        slong mag_bits = n_randint(state, 2);
+        slong mag_bits = n_randint(state, 4);
         slong n = 1 << g;
         acb_mat_t tau;
         slong nb_bad;

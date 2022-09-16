@@ -12,34 +12,29 @@ int main()
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 1 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = 1<<g;
         acb_mat_t tau;
         acb_ptr th2;
         acb_ptr th2_test;
-        slong prec = ACB_THETA_AGM_BASEPREC * (2 + n_randint(state, 5));
+        slong prec = (2 + n_randint(state, 4-g)) * ACB_THETA_AGM_BASEPREC;
         int res;
         slong k;
 
         acb_mat_init(tau, g, g);
         th2 = _acb_vec_init(nb);
         th2_test = _acb_vec_init(nb);
-
+        
         acb_siegel_randtest_fund(tau, state, prec);
-        acb_theta_naive_const(th2_test, tau, prec);
-        acb_mat_scalar_mul_2exp_si(tau, tau, -1);
-        acb_theta_naive_const_proj(th2, tau, prec);
-        acb_mat_scalar_mul_2exp_si(tau, tau, 1);
-
+        
         flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
         acb_mat_printd(tau, 10); flint_printf("\n");
-        flint_printf("Projective theta(tau/2):\n");
-        for (k = 0; k < nb; k++)
-        {
-            acb_printd(&th2[k], 10); flint_printf("\n");
-        }
+
+        flint_printf("Naive...\n");
+        acb_theta_naive_const(th2_test, tau, prec);
+        flint_printf("Done.\n");
         
         acb_theta_newton_const_sqr(th2, tau, prec);
         
