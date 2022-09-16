@@ -21,7 +21,7 @@ acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec)
     /* Attempt to set up newton context */
     while (!stop)
     {
-        acb_theta_agm_ctx_set(ctx, tau, baseprec);
+        acb_theta_agm_ctx_set_const(ctx, tau, baseprec);
         if (!acb_theta_agm_ctx_is_valid(ctx))
 	{	  
             baseprec *=2;

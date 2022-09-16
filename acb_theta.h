@@ -92,6 +92,9 @@ void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
 void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat,
 	const acb_mat_t tau, slong prec);
 
+void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
+        acb_srcptr z, const acb_mat_t tau, slong prec);
+
 int acb_siegel_is_real_reduced(const acb_mat_t tau, const arf_t eps,
 	slong prec);
 
@@ -139,6 +142,13 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
 
 slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec);
 
+slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
+        slong prec);
+
+slong acb_theta_agm_ext_nb_good_steps(arf_t rel_err, slong g, slong prec);
+
+void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_t M0,
+        const arf_t minf, slong nb, slong prec);
 
 /* Transformation formulas */
 
@@ -159,6 +169,18 @@ ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
 
 void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
         const fmpz_mat_t mat, slong prec);
+
+void acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb,
+        slong prec);
+
+void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
+        const fmpz_mat_t mat, slong prec);
+
+void acb_theta_dupl_transform_radius_const(arf_t rho, const arf_t r,
+        acb_srcptr th, const fmpz_mat_t mat, slong prec);
+
+void acb_theta_dupl_transform_radius(arf_t rho, const arf_t r,
+        acb_srcptr th, const fmpz_mat_t mat, slong prec);
 
 /* Naive algorithms */
 
@@ -265,6 +287,9 @@ ulong acb_theta_naive_a(slong* coords, slong g);
 void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         slong prec);
 
+void acb_theta_naive_proj(acb_ptr th, acb_srcptr z, slong nb_z,
+        const acb_mat_t tau, slong prec);
+
 void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
 void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec);
@@ -326,6 +351,7 @@ void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
 
 typedef struct
 {
+    int is_ext;
     slong g, nb;
     fmpz_mat_struct* matrices;
     slong* nb_bad_steps;
@@ -338,6 +364,7 @@ typedef struct
 
 typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 
+#define acb_theta_agm_ctx_is_ext(ctx) ((ctx)->is_ext)
 #define acb_theta_agm_ctx_g(ctx) ((ctx)->g)
 #define acb_theta_agm_ctx_nb(ctx) ((ctx)->nb)
 #define acb_theta_agm_ctx_matrix(ctx, k) (&(ctx)->matrices[(k)])
@@ -352,12 +379,23 @@ typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 
 void acb_theta_agm_ctx_init(acb_theta_agm_ctx_t ctx, slong g, slong nb);
 
-void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m);
-
 void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx);
 
-void acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, const acb_mat_t tau,
+void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m);
+
+void acb_theta_agm_ctx_candidates(fmpz_mat_struct* Ni, slong try, slong g);
+
+void acb_theta_agm_ctx_update_bounds(acb_theta_agm_ctx_t ctx, slong k,
         slong prec);
+
+int acb_theta_agm_ctx_set_inv_der(acb_theta_agm_ctx_t ctx, acb_srcptr th,
+        slong prec);
+
+void acb_theta_agm_ctx_set_const(acb_theta_agm_ctx_t ctx, const acb_mat_t tau,
+        slong prec);
+
+void acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, acb_srcptr z,
+        const acb_mat_t tau, slong prec);
 
 int acb_theta_agm_ctx_is_valid(const acb_theta_agm_ctx_t ctx);
 
