@@ -25,7 +25,7 @@ int main()
         acb_theta_agm_ctx_init(ctx, g, n);
 
         acb_siegel_randtest_fund(tau, state, prec);
-        acb_theta_agm_ctx_set(ctx, tau, prec);
+        acb_theta_agm_ctx_set_const(ctx, tau, prec);
 
         res = acb_theta_agm_ctx_is_valid(ctx);
 

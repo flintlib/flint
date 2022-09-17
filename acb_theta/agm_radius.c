@@ -2,7 +2,7 @@
 #include "acb_theta.h"
 
 void
-agm_radius(arf_t rad, const arf_struct* mi, const arf_t M0,
+acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_t M0,
         const arf_t minf, slong nb, slong prec)
 {
     arf_t prod, term, res;

@@ -68,6 +68,7 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, acb_srcptr z,
     acb_mat_init(half, g, g);
     th = _acb_vec_init(1<<(g+1));
     arb_init(max);
+    arf_init(rad);
 
     acb_mat_scalar_mul_2exp_si(half, tau, -1);
     acb_theta_naive_proj(th, z, 1, half, prec);
@@ -115,4 +116,5 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, acb_srcptr z,
     acb_mat_clear(half);
     _acb_vec_clear(th, 1<<(g+1));
     arb_clear(max);
+    arf_clear(rad);
 }
