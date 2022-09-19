@@ -2,7 +2,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_roots,
+acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr all_roots,
 	const arf_t rel_err, slong nb_bad, slong nb_good, slong g, slong prec)
 {  
     acb_ptr v;
@@ -37,7 +37,7 @@ acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_roots,
 
     acb_div(r, &v[0], &v[n], prec);
     fmpz_one(exp);
-    fmpz_mul_2exp_si(exp, exp, nb_good);
+    fmpz_mul_2exp(exp, exp, nb_good);
     acb_pow_fmpz(r, r, exp, prec);
 
     acb_abs(abs, r, lowprec);
@@ -46,7 +46,7 @@ acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr all_roots,
     acb_add_error_arf(r, err);
 
     fmpz_one(exp);
-    fmpz_mul_2exp_si(exp, exp, nb_bad);
+    fmpz_mul_2exp(exp, exp, nb_bad);
     acb_pow_fmpz(r, r, exp, prec);
 
     _acb_vec_clear(v, 2*n);

@@ -10,7 +10,6 @@ acb_theta_newton_half_proj(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
     acb_ptr z_0;
   
     slong g = acb_mat_nrows(tau);
-    slong n = 1<<g;
     slong baseprec = ACB_THETA_AGM_BASEPREC;
     int stop = 0;
     int naive = 0;

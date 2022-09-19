@@ -14,7 +14,7 @@ acb_theta_agm_ctx_init(acb_theta_agm_ctx_t ctx, const acb_mat_t tau)
     
     acb_mat_init(acb_theta_agm_ctx_tau(ctx), g, g);
     acb_theta_agm_ctx_z(ctx) = _acb_vec_init(g);
-    acb_theta_agm_th(ctx) = _acb_vec_init(1<<g);
+    acb_theta_agm_ctx_th(ctx) = _acb_vec_init(1<<g);
     
     acb_mat_set(acb_theta_agm_ctx_tau(ctx), tau);
 }

@@ -14,7 +14,7 @@ acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
     
     acb_theta_newton_half_proj(th2, z, tau, prec);
     acb_theta_dupl_all(th2, th2, g, prec);
-    acb_theta_renormalize_const_sqr(scal1, scal2, th2, th2 + n*n, z, tau, prec);
+    acb_theta_renormalize_sqr(scal1, scal2, th2, th2 + n*n, z, tau, prec);
     
     _acb_vec_scalar_mul(th2, th2, n*n, scal1, prec);
     _acb_vec_scalar_mul(th2 + n*n, th2 + n*n, n*n, scal2, prec);

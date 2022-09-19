@@ -3,8 +3,9 @@
 
 void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx)
 {
-    slong k;
     slong n = acb_theta_agm_ctx_nb(ctx);
+    slong g = acb_theta_agm_ctx_g(ctx);
+    slong k;
 
     acb_mat_clear(acb_theta_agm_ctx_tau(ctx));
     if (acb_theta_agm_ctx_is_ext(ctx))

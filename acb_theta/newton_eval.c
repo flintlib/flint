@@ -13,9 +13,7 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     acb_ptr agm;
     acb_t scal, scal2;
     arf_t err;
-    slong nb_good, nb_good_ext;
-    ulong ab;
-    fmpz_t eps;
+    slong nb_good;
     slong k;
 
     if (is_ext)
@@ -33,7 +31,6 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     acb_init(scal);
     acb_init(scal2);
     arf_init(err);
-    fmpz_init(eps);
 
     /* Duplicate */
     if (is_ext)
@@ -46,9 +43,9 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     }
 
     /* Compute number of good steps */
-    nb_good = acb_theta_agm_nb_good_steps(err, g, prec);
-    if (is_ext) nb_good_ext = acb_theta_agm_ext_nb_good_steps(err, g, k);
-    
+    if (is_ext) nb_good = acb_theta_agm_ext_nb_good_steps(err, g, prec);
+    else nb_good = acb_theta_agm_nb_good_steps(err, g, prec);
+        
     /* Compute agms for each matrix */
     for (k = 0; k < n; k++)
     {
@@ -63,25 +60,23 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
 
         /* Projectivize */
         acb_set(scal, &transf[0]);
-        _acb_vec_div(&transf[1], &transf[1], (1<<g)-1, scal, prec);
+        _acb_vec_scalar_div(&transf[1], &transf[1], (1<<g)-1, scal, prec);
         acb_one(&transf[0]);
         if (is_ext)
         {   
             acb_set(scal, &transf[1<<g]);
-            _acb_vec_div(&transf[(1<<g)+1], &transf[(1<<g)+1], (1<<g)-1, scal,
-                    prec);
+            _acb_vec_scalar_div(&transf[(1<<g)+1], &transf[(1<<g)+1], (1<<g)-1,
+                    scal, prec);
             acb_one(&transf[1<<g]);
         }
 
         /* Get agm */
         if (is_ext)
         {            
-            acb_theta_agm_ext(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k),
-                    err, acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good_ext,
-                    g, prec);            
-            acb_theta_agm(&agm[n+k], &transf[1<<g],
-                    acb_theta_agm_ctx_roots(ctx, k), err,
-                    acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
+            acb_theta_agm_ext(&agm[k], &agm[n+k], transf,
+                    acb_theta_agm_ctx_roots(ctx, k),
+                    err, acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good,
+                    g, prec);
         }
         else
         {
@@ -127,5 +122,4 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     acb_clear(scal);
     acb_clear(scal2);
     arf_clear(err);
-    fmpz_clear(eps);
 }

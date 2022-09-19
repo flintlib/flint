@@ -4,7 +4,9 @@
 void acb_theta_agm_ctx_init_internal(acb_theta_agm_ctx_t ctx, slong nb,
         slong g)
 {
-    acb_theta_acm_ctx_nb(ctx) = nb;    
+    slong k;
+    
+    acb_theta_agm_ctx_nb(ctx) = nb;    
     ctx->matrices = flint_malloc(nb * sizeof(fmpz_mat_struct));
     for (k = 0; k < nb; k++)
     {

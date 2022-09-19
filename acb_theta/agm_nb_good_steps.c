@@ -11,8 +11,7 @@ slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec)
     arb_t eps, target, t;
     arf_t u;
     fmpz_t exp;
-    slong nb;
-  
+    slong nb;  
     slong lowprec = ACB_THETA_AGM_LOWPREC;
 
     arb_init(eps);

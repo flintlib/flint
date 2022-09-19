@@ -16,16 +16,16 @@ int main()
     {
         slong g = 1 + n_randint(state, 2);
         slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);
-        slong n = 1 << g;
         acb_mat_t tau;
         acb_theta_agm_ctx_t ctx;
         int res;
 
         acb_mat_init(tau, g, g);
-        acb_theta_agm_ctx_init(ctx, g, n);
 
         acb_siegel_randtest_fund(tau, state, prec);
-        acb_theta_agm_ctx_set_const(ctx, tau, prec);
+        acb_theta_agm_ctx_init(ctx, tau);
+        
+        acb_theta_agm_ctx_set(ctx, prec);
 
         res = acb_theta_agm_ctx_is_valid(ctx);
 

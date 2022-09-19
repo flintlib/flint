@@ -8,7 +8,6 @@ acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec)
     acb_mat_t half;
   
     slong g = acb_mat_nrows(tau);
-    slong n = 1<<g;
     slong baseprec = ACB_THETA_AGM_BASEPREC;
     int stop = 0;
     int naive = 0;

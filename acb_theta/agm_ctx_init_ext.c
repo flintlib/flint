@@ -13,7 +13,7 @@ acb_theta_agm_ctx_init_ext(acb_theta_agm_ctx_t ctx, acb_srcptr z,
     acb_theta_agm_ctx_dim(ctx) = dim;            
     acb_theta_agm_ctx_init_internal(ctx, nb, g);
 
-    acb_mat_init(tau, g, g);
+    acb_mat_init(acb_theta_agm_ctx_tau(ctx), g, g);
     acb_theta_agm_ctx_z(ctx) = _acb_vec_init(g);
     acb_theta_agm_ctx_th(ctx) = _acb_vec_init(1<<(g+1));
     
