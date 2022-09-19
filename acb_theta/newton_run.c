@@ -1,83 +1,44 @@
 
 #include "acb_theta.h"
 
-/* Get binary logs of data stored in ctx */
+
+/* Compute the target of Newton scheme to high precision */
 
 static void
-acb_theta_newton_logs(slong* log_max, slong* log_rho, slong* log_B1,
-        slong* log_B2, slong* log_B3, const acb_theta_agm_ctx_t ctx)
-{
-    arf_t c;
-    fmpz_t e;
-    slong n = acb_theta_agm_ctx_nb(ctx);
-    slong lowprec = ACB_THETA_AGM_LOWPREC;
-
-    arf_init(c);
-    fmpz_init(e);
-  
-    arf_frexp(c, e, acb_theta_agm_ctx_max(ctx));
-    *log_max = fmpz_get_si(e);
-    arf_frexp(c, e, acb_theta_agm_ctx_rho(ctx));
-    *log_rho = fmpz_get_si(e) - 1;  
-    arf_mul_si(c, acb_theta_agm_ctx_max(ctx), 2*n, lowprec, ARF_RND_CEIL);
-    arf_div(c, c, acb_theta_agm_ctx_rho(ctx), lowprec, ARF_RND_CEIL);
-    arf_frexp(c, e, c);
-    *log_B1 = fmpz_get_si(e);
-    arf_mul_si(c, acb_theta_agm_ctx_max(ctx), 2*n*(n+1), lowprec,
-            ARF_RND_CEIL);
-    arf_div(c, c, acb_theta_agm_ctx_rho(ctx), lowprec, ARF_RND_CEIL);
-    arf_div(c, c, acb_theta_agm_ctx_rho(ctx), lowprec, ARF_RND_CEIL);
-    arf_frexp(c, e, c);
-    *log_B2 = fmpz_get_si(e);  
-    arf_frexp(c, e, acb_theta_agm_ctx_inv_der(ctx));
-    *log_B3 = fmpz_get_si(e);
-
-    arf_clear(c);
-    fmpz_clear(e);
-}
-
-/* Compute the target of Newton scheme to low precision */
-
-static void
-acb_theta_newton_target(acb_ptr im, const acb_mat_t tau,
-        const acb_theta_agm_ctx_t ctx, slong prec)
+acb_theta_newton_target(acb_ptr im, const acb_theta_agm_ctx_t ctx, slong prec)
 {
     slong g = acb_theta_agm_ctx_g(ctx);
     slong n = acb_theta_agm_ctx_nb(ctx);
     slong k;
-    acb_mat_t w;
-    acb_ptr dets;
     fmpz_t eps;
-    slong k2;
-    acb_t zeta, mu;
-
-    acb_mat_init(w, g, g);
-    dets = _acb_vec_init(n);
+    acb_t zeta;
+    
     fmpz_init(eps);
     acb_init(zeta);
-    acb_init(mu);
 
-    acb_onei(zeta);  
-    for (k = 0; k < n; k++)
-    {
-        acb_theta_transform_image_char(eps, 0,
-                acb_theta_agm_ctx_matrix(ctx, k));
-        k2 = acb_theta_k2(acb_theta_agm_ctx_matrix(ctx, k));
-        acb_pow_si(mu, zeta, fmpz_get_si(eps) + k2, prec);
-        acb_siegel_cocycle(w, acb_theta_agm_ctx_matrix(ctx, k), tau, prec);
-        acb_mat_det(&dets[k], w, prec);
-        acb_mul(&dets[k], &dets[k], mu, prec);
-    }
     for (k = 0; k < n-1; k++)
     {
-        acb_div(&im[k], &dets[k+1], &dets[0], prec);
-    }
+        acb_onei(zeta);  
+        acb_pow_fmpz(zeta, zeta, acb_theta_agm_ctx_eps(ctx, k+1), prec);
 
-    acb_mat_clear(w);
-    _acb_vec_clear(dets, n);
+        if (acb_theta_agm_is_ext(ctx))
+        {
+            acb_theta_transform_scal_const(&im[k], tau,
+                    acb_theta_agm_ctx_matrix(ctx, k+1),
+                    acb_theta_agm_ctx_k2(ctx, k+1), prec);
+            acb_mul(&im[k], &im[k], zeta, prec);
+        }
+        else
+        {            
+            acb_theta_transform_scal(&im[k], &im[k+n-1], z, tau,
+                    acb_theta_agm_ctx_matrix(ctx, k+1), prec);
+            acb_mul(&im[k], &im[k], zeta, prec);
+            acb_mul(&im[k+n-1], &im[k+n-1], zeta, prec);
+        }
+    }
+    
     fmpz_clear(eps);
     acb_clear(zeta);
-    acb_clear(mu);
 }
 
 /* Start Newton scheme. Output: im, start are exact. Return the absolute
@@ -85,20 +46,23 @@ acb_theta_newton_target(acb_ptr im, const acb_mat_t tau,
 
 static slong
 acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err,
-        const acb_mat_t tau, const acb_theta_agm_ctx_t ctx, slong prec)
+        const acb_theta_agm_ctx_t ctx, slong prec)
 {
     slong g = acb_theta_agm_ctx_g(ctx);
-    slong n = acb_theta_agm_ctx_nb(ctx);
-    slong log_max, log_rho, log_B1, log_B2, log_B3;
+    slong n = 1<<g;
+    slong log_max, log_B2, log_B3;
     arf_t e;
     fmpz_t exp;
     acb_mat_t half;
     slong k;
 
+    if (acb_theta_agm_ctx_is_ext(ctx)) n *= 2;
     arf_init(e);
     acb_mat_init(half, g, g);
-  
-    acb_theta_newton_logs(&log_max, &log_rho, &log_B1, &log_B2, &log_B3, ctx);
+    log_max = acb_theta_agm_ctx_log_max(ctx);
+    log_B2 = acb_theta_agm_ctx_log_B2(ctx);
+    log_B3 = acb_theta_agm_ctx_log_B3(ctx);
+    
     acb_mat_scalar_mul_2exp_si(half, tau, -1);
   
     /* Get image; add some error; get midpoint and error */
@@ -121,7 +85,7 @@ acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err,
     prec = -fmpz_get_si(exp);
   
     /* im is now exact, and known to precision prec. Pick starting precision */
-    while ((prec > ACB_THETA_AGM_BASEPREC)
+    while ((prec > ACB_THETA_AGM_BASEPREC - log_max - ACB_THETA_AGM_GUARD)
             && (prec > 2*(log_B2 + log_B3 + 2)))
     {
         prec = (prec + log_B2 + log_B3 + 3)/2;
@@ -129,8 +93,7 @@ acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err,
     flint_printf("newton_start: starting prec %wd\n", prec);
 
     /* Set start using naive algorithm; control error bound; get midpoints */
-    acb_theta_naive_const_proj(start, half,
-            prec + log_max + ACB_THETA_AGM_GUARD);
+    _acb_vec_set(start, acb_theta_agm_ctx_th(ctx), n);    
     for (k = 0; k < n; k++)
     {
         if (mag_cmp_2exp_si(arb_radref(acb_realref(&start[k])), -prec-1) > 0
@@ -156,8 +119,10 @@ static slong
 acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
         const acb_theta_agm_ctx_t ctx, slong prec)
 {
-    slong n = acb_theta_agm_ctx_nb(ctx); /* dimension is n-1 */
-    slong log_max, log_rho, log_B1, log_B2, log_B3;
+    slong g = acb_theta_agm_ctx_g(ctx);
+    slong dim = acb_theta_agm_ctx_dim(ctx);
+    slong n = 1<<g;
+    slong log_max, log_B1, log_B2, log_B3;
     slong log_eta, nextprec;
     arb_t eta;
     acb_mat_t fd;
@@ -167,17 +132,19 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
     slong k;
 
     arb_init(eta);
-    acb_mat_init(fd, n-1, n-1);
-    f = _acb_vec_init(n-1);
-    acb_mat_init(h, n-1, 1);
-
-    /* Set logs */
-    acb_theta_newton_logs(&log_max, &log_rho, &log_B1, &log_B2, &log_B3, ctx);
+    acb_mat_init(fd, dim, dim);
+    f = _acb_vec_init(dim);
+    acb_mat_init(h, dim, 1);
+    
+    log_max = acb_theta_agm_ctx_log_max(ctx);
+    log_B1 = acb_theta_agm_ctx_log_B1(ctx);
+    log_B2 = acb_theta_agm_ctx_log_B2(ctx);
+    log_B3 = acb_theta_agm_ctx_log_B3(ctx);
 
     /* Set nextprec, eta */
-    nextprec = 2*prec + 2*n_clog(n,2) + 2*log_B1 + 2*log_B3 + 9 + log_max
+    nextprec = 2*prec + 2*n_clog(dim, 2) + 2*log_B1 + 2*log_B3 + 9 + log_max
         + ACB_THETA_AGM_GUARD;
-    log_eta = -(prec + log_B1 + log_B3 + n_clog(n, 2) + 2);
+    log_eta = -(prec + log_B1 + log_B3 + n_clog(dim, 2) + 2);
     arb_one(eta);
     arb_mul_2exp_si(eta, eta, log_eta);
 
@@ -191,15 +158,15 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
         fflush(stdout);
         flint_abort();
     }
-    _acb_vec_sub(f, im, f, n-1, prec);
+    _acb_vec_sub(f, im, f, dim, prec);
     
     flint_printf("Current error:\n");
-    for (k = 0; k < n-1; k++)
+    for (k = 0; k < dim; k++)
     {
         acb_printd(&f[k], 10); flint_printf("\n");
     }
 
-    for (k = 0; k < n-1; k++)
+    for (k = 0; k < dim; k++)
     {
         acb_set(acb_mat_entry(h, k, 0), &f[k]);
     }
@@ -207,7 +174,7 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
   
     /* Check that h does not have too much additional error */
     nextprec = 2*prec - log_B2 - log_B3 - 2;
-    for (k = 0; k < n-1; k++)
+    for (k = 0; k < dim; k++)
     {
         if (mag_cmp_2exp_si(
                         arb_radref(acb_realref(acb_mat_entry(h, k, 0))),
@@ -233,35 +200,45 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
                 nextprec + log_max + ACB_THETA_AGM_GUARD);
         }
         acb_get_mid(&next[k], &next[k]);
+        
+        if (acb_theta_agm_ctx_is_ext(ctx))
+        {
+            if (k > 0)
+            {                
+                acb_add(&next[k+n], &next[k+n], acb_mat_entry(h, k+n-2, 0),
+                        nextprec + log_max + ACB_THETA_AGM_GUARD);
+            }
+            acb_get_mid(&next[k+n], &next[k+n]);
+        }
     }
     flint_printf("Precision increase from %wd to %wd\n", prec, nextprec);
   
     arb_clear(eta);
     acb_mat_clear(fd);
-    _acb_vec_clear(f, n-1);
+    _acb_vec_clear(f, dim);
     acb_mat_clear(h);  
     return nextprec;
 }
 
 
 void
-acb_theta_newton_run(acb_ptr r, const acb_mat_t tau,
-        const acb_theta_agm_ctx_t ctx, slong prec)
+acb_theta_newton_run(acb_ptr r, const acb_theta_agm_ctx_t ctx, slong prec)
 {
-    slong n = acb_theta_agm_ctx_nb(ctx);
-    slong log_max, log_rho, log_B1, log_B2, log_B3;
+    slong dim = acb_theta_agm_ctx_dim(ctx);
+    slong log_B3;
     acb_ptr im;
     arf_t err;
     fmpz_t exp;
     slong current_prec;
     slong k;
 
-    im = _acb_vec_init(n-1);
+    im = _acb_vec_init(dim);
     arf_init(err);
     fmpz_init(exp);
 
-    acb_theta_newton_logs(&log_max, &log_rho, &log_B1, &log_B2, &log_B3, ctx);
-    current_prec = acb_theta_newton_start(r, im, err, tau, ctx, prec);
+    log_B3 = acb_theta_agm_ctx_log_B3(ctx);
+    current_prec = acb_theta_newton_start(r, im, err, ctx, prec);
+    
     while (current_prec < prec)
     {
         current_prec = acb_theta_newton_step(r, r, im, ctx, current_prec);
@@ -270,12 +247,13 @@ acb_theta_newton_run(acb_ptr r, const acb_mat_t tau,
     arf_frexp(err, exp, err);
     arf_one(err);
     arf_mul_2exp_si(err, err, fmpz_get_si(exp) + log_B3 + 1);
+    
     for (k = 0; k < n-1; k++) acb_add_error_arf(&r[k], err);
     arf_one(err);
     arf_mul_2exp_si(err, err, -prec);
     for (k = 0; k < n-1; k++) acb_add_error_arf(&r[k], err);
 
-    _acb_vec_clear(im, n-1);
+    _acb_vec_clear(im, dim);
     arf_clear(err);
     fmpz_clear(exp);
 }

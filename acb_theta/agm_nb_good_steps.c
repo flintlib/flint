@@ -40,8 +40,15 @@ slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec)
     arb_log(t, eps, lowprec);
     arb_div(target, target, t, lowprec);
     arb_get_ubound_arf(u, target, lowprec);
-    arf_frexp(u, exp, u);
+    
+    if (!arf_is_finite(u))
+    {
+        flint_printf("agm_nb_good_steps: Error (infinite value)\n");
+        fflush(stdout);
+        flint_abort();
+    }
 
+    arf_frexp(u, exp, u);
     arf_one(rel_err);
     arf_mul_2exp_si(rel_err, rel_err, -prec);
     nb = fmpz_get_si(exp);

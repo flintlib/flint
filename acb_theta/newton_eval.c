@@ -2,61 +2,130 @@
 #include "acb_theta.h"
 
 void
-acb_theta_newton_eval(acb_ptr r, acb_srcptr th, const acb_theta_agm_ctx_t ctx,
-        slong prec)
+acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
+        const acb_theta_agm_ctx_t ctx, slong prec)
 {
     slong g = acb_theta_agm_ctx_g(ctx);
     slong n = acb_theta_agm_ctx_nb(ctx);
+    int is_ext = acb_theta_agm_ctx_is_ext(ctx);
     acb_ptr dupl;
     acb_ptr transf;
     acb_ptr agm;
+    acb_t scal, scal2;
     arf_t err;
-    slong nb_good;
-    acb_t scal;
+    slong nb_good, nb_good_ext;
     ulong ab;
     fmpz_t eps;
-    slong k, j;
+    slong k;
 
-    dupl = _acb_vec_init(1<<(2*g));
-    transf = _acb_vec_init(1<<g);
-    agm = _acb_vec_init(n);
-    arf_init(err);
+    if (is_ext)
+    {        
+        dupl = _acb_vec_init(1<<(2*g+1));
+        transf = _acb_vec_init(1<<(g+1));
+        agm = _acb_vec_init(2*n);
+    }
+    else
+    {
+        dupl = _acb_vec_init(1<<(2*g));
+        transf = _acb_vec_init(1<<g);
+        agm = _acb_vec_init(n);
+    }
     acb_init(scal);
+    acb_init(scal2);
+    arf_init(err);
     fmpz_init(eps);
 
     /* Duplicate */
-    acb_theta_dupl_all_const(dupl, th, g, prec);
+    if (is_ext)
+    {
+        acb_theta_dupl_all(dupl, th, g, prec);
+    }
+    else
+    {
+        acb_theta_dupl_all_const(dupl, th, g, prec);
+    }
 
-    /* Compute agms */
+    /* Compute number of good steps */
+    nb_good = acb_theta_agm_nb_good_steps(err, g, prec);
+    if (is_ext) nb_good_ext = acb_theta_agm_ext_nb_good_steps(err, g, k);
+    
+    /* Compute agms for each matrix */
     for (k = 0; k < n; k++)
-    {      
+    {
+        /* Transform theta values */
         acb_theta_transform_sqr_proj(transf, dupl,
-                acb_theta_agm_ctx_matrix(ctx, k), prec);
-        for (j = 1; j < n; j++)
+            acb_theta_agm_ctx_matrix(ctx, k), prec);
+        if (is_ext)
         {
-            acb_div(&transf[j], &transf[j], &transf[0], prec);
+            acb_theta_transform_sqr_proj(&transf[1<<g], &dupl[1<<(2*g)],
+                    acb_theta_agm_ctx_matrix(ctx, k), prec);
         }
+
+        /* Projectivize */
+        acb_set(scal, &transf[0]);
+        _acb_vec_div(&transf[1], &transf[1], (1<<g)-1, scal, prec);
         acb_one(&transf[0]);
-        nb_good = acb_theta_agm_nb_good_steps(err, g, prec);
-        acb_theta_agm(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k), err,
-                acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
+        if (is_ext)
+        {   
+            acb_set(scal, &transf[1<<g]);
+            _acb_vec_div(&transf[(1<<g)+1], &transf[(1<<g)+1], (1<<g)-1, scal,
+                    prec);
+            acb_one(&transf[1<<g]);
+        }
+
+        /* Get agm */
+        if (is_ext)
+        {            
+            acb_theta_agm_ext(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k),
+                    err, acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good_ext,
+                    g, prec);            
+            acb_theta_agm(&agm[n+k], &transf[1<<g],
+                    acb_theta_agm_ctx_roots(ctx, k), err,
+                    acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
+        }
+        else
+        {
+            acb_theta_agm(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k), err,
+                    acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
+        }
     }
     
     /* Renormalize dupl, as first matrix is I */
     acb_mul(scal, &agm[0], &dupl[0], prec);
+    acb_inv(scal, scal, prec);
+    if (is_ext)
+    {        
+        acb_mul(scal2, &agm[n], &dupl[1<<(2*g)], prec);
+        acb_inv(scal2, scal2, prec);
+    }
     
     for (k = 0; k < n-1; k++)
     {
-        ab = acb_theta_transform_image_char(eps, 0,
-                acb_theta_agm_ctx_matrix(ctx, k+1));
-        acb_mul(&r[k], &agm[k+1], &dupl[ab], prec);
-        acb_div(&r[k], scal, &r[k], prec);
+        acb_mul(&r[k], &agm[k+1], &dupl[acb_theta_agm_ctx_ab(ctx, k)], prec);
+        acb_mul(&r[k], scal, &r[k], prec);
+        if (is_ext)
+        {            
+            acb_mul(&r[k+n-1], &agm[k+n+1],
+                    &dupl[acb_theta_agm_ctx_ab(ctx, k) + (1<<(2*g))], prec);
+            acb_mul(&r[k+n-1], scal2, &r[k+n-1], prec);
+        }
     }
 
-    _acb_vec_clear(dupl, 1<<(2*g));
-    _acb_vec_clear(transf, 1<<g);
-    _acb_vec_clear(agm, n);
-    arf_clear(err);
+    /* Clear */
+    if (is_ext)
+    {        
+        _acb_vec_clear(dupl, 1<<(2*g+1));
+        _acb_vec_clear(transf, 1<<(g+1));
+        _acb_vec_clear(agm, 2*n);
+    }
+    else
+    {
+        _acb_vec_clear(dupl, 1<<(2*g));
+        _acb_vec_clear(transf, 1<<g);
+        _acb_vec_clear(agm, n);
+    }
     acb_clear(scal);
+    acb_clear(scal2);
+    arf_clear(err);
     fmpz_clear(eps);
 }

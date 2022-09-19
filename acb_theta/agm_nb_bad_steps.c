@@ -32,6 +32,14 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
     /* Compute n, minimal s.t. 2^n lambda > lambda0 */
     arb_div(lambda, lambda0, lambda, prec);  
     arb_get_ubound_arf(up, lambda, prec);
+    
+    if (!arf_is_finite(up))
+    {
+        flint_printf("agm_nb_bad_steps: Error (infinite value)\n");
+        fflush(stdout);
+        flint_abort();
+    }
+    
     arf_frexp(up, e, up);
     res = fmpz_get_si(e);
     

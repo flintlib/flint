@@ -2,10 +2,12 @@
 #include "acb_theta.h"
 
 void
-acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec)
+acb_theta_newton_half_proj(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+        slong prec)
 {
     acb_theta_agm_ctx_t ctx;
     acb_mat_t half;
+    acb_ptr z_0;
   
     slong g = acb_mat_nrows(tau);
     slong n = 1<<g;
@@ -13,8 +15,9 @@ acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec)
     int stop = 0;
     int naive = 0;
   
-    acb_theta_agm_ctx_init(ctx, tau);
+    acb_theta_agm_ctx_init_ext(ctx, z, tau);
     acb_mat_init(half, g, g);
+    z_0 = _acb_vec_init(2*g);
     
     acb_mat_scalar_mul_2exp_si(half, tau, -1);
 
@@ -34,9 +37,17 @@ acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec)
         else stop = 1;
     }
 
-    if (naive) acb_theta_naive_const_proj(th, half, prec);
-    else acb_theta_newton_run(th, ctx, prec);
+    if (naive)
+    {
+        _acb_vec_set(z_0, z, g);
+        acb_theta_naive_proj(th, z_0, 2, half, prec);
+    }
+    else
+    {
+        acb_theta_newton_run(th, ctx, prec);
+    }
     
-    acb_mat_clear(half);
     acb_theta_agm_ctx_clear(ctx);
+    acb_mat_clear(half);
+    _acb_vec_clear(z_0, 2*g);
 }

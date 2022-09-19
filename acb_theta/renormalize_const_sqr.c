@@ -37,5 +37,5 @@ void acb_theta_renormalize_const_sqr(acb_t scal, acb_srcptr th2,
 
     acb_mat_clear(w);
     _acb_vec_clear(roots, n * nb_bad);
-    arf_clear(rel_err);    
+    arf_clear(rel_err);
 }
