@@ -12,14 +12,15 @@ int main()
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = 1<<g;
         acb_mat_t tau;
         acb_ptr th2;
         acb_ptr th2_test;
-        slong prec = (2 + n_randint(state, 4-g)) * ACB_THETA_AGM_BASEPREC;
+        slong prec = (2 + n_randint(state, 4-g)) * ACB_THETA_AGM_BASEPREC
+            + 100 * n_randint(state, 20);
         int res;
         slong k;
 
@@ -52,6 +53,12 @@ int main()
             {
                 acb_printd(&th2[k], 10); flint_printf("\n");
                 acb_printd(&th2_test[k], 10); flint_printf("\n\n");
+            }
+            flint_printf("Diff:\n");
+            for (k = 0; k < nb; k++)
+            {
+                acb_sub(&th2[k], &th2[k], &th2_test[k], prec);
+                acb_printd(&th2[k], 10); flint_printf("\n");
             }
             fflush(stdout);
             flint_abort();

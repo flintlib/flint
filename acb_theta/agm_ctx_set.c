@@ -127,7 +127,7 @@ acb_theta_agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     {
         nb_bad = acb_theta_agm_nb_bad_steps(Ntau, prec);
     }
-    nb_bad = FLINT_MAX(1, nb_bad);
+    nb_bad = nb_bad + 1;
     acb_theta_agm_ctx_reset_steps(ctx, k, nb_bad);
 
     /* Set roots to low precision */
@@ -166,6 +166,13 @@ acb_theta_agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
         _acb_vec_scalar_mul(acb_theta_agm_ctx_roots(ctx, k),
                 acb_theta_agm_ctx_roots(ctx, k), n*nb_bad, scal, lowprec);
     }
+    
+    flint_printf("(ctx_roots) Sequence of th_0:\n");
+    for (i = 0; i < nb_bad; i++)
+    {
+        acb_printd(&acb_theta_agm_ctx_roots(ctx, k)[i*n], 10);
+        flint_printf("\n");
+    }
 
     /* Set k2, ab, eps */
     acb_theta_agm_ctx_k2(ctx, k)
@@ -188,89 +195,102 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     slong nb_th;
     slong nb_bad;
     arb_t abs;
-    arb_t m;
+    arb_t m, M;
     slong i, j;
 
     arb_init(abs);
     arb_init(m);
+    arb_init(M);
 
     nb_th = 1<<g;
     if (acb_theta_agm_ctx_is_ext(ctx)) nb_th *= 2;
 
     nb_bad = acb_theta_agm_ctx_nb_bad_steps(ctx, k);
     
-    /* Compute M0 */
-    arb_zero(m);
-    for (i = 0; i < nb_th * nb_bad; i++)
-    {
-        acb_abs(abs, &acb_theta_agm_ctx_roots(ctx, k)[i], prec);
-        arb_max(m, m, abs, prec);
-    }
-    arb_sqr(m, m, prec);
-    arb_get_ubound_arf(acb_theta_agm_ctx_M0(ctx, k), m, prec);
-    
-    /* Compute minf */
-    acb_abs(m, &acb_theta_agm_ctx_roots(ctx, k)[nb_th * (nb_bad-1)], prec);
-    arb_div_si(m, m, 20, prec); /* Cf. agm_nb_bad_steps */
-    arb_get_lbound_arf(acb_theta_agm_ctx_minf(ctx, k), m, prec);
-    
-    /* Compute mi */
+    /* Compute mi, Mi */
     for (i = 0; i < nb_bad; i++)
     {
         arb_pos_inf(m);
+        arb_zero(M);
         for (j = 0; j < nb_th; j++)
         {
             acb_abs(abs, &acb_theta_agm_ctx_roots(ctx,k)[i*nb_th + j], prec);
             arb_min(m, m, abs, prec);
+            arb_max(M, M, abs, prec);
         }
         arb_sqr(m, m, prec);
         arb_get_lbound_arf(&acb_theta_agm_ctx_mi(ctx,k)[i], m, prec);
+        arb_sqr(M, M, prec);
+        arb_get_ubound_arf(&acb_theta_agm_ctx_Mi(ctx, k)[i], m, prec);        
     }
+        
+    /* Compute minf */
+    arb_set_arf(m, &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1]);
+    arb_mul_si(m, m, 19*19, prec);
+    arb_div_si(m, m, 21*21, prec); /* Cf. agm_nb_bad_steps */
+    arb_get_lbound_arf(acb_theta_agm_ctx_minf(ctx, k), m, prec);
 
     /* Compute rad: this assumes th has been set */    
     acb_theta_agm_radius(acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_mi(ctx, k),
-            acb_theta_agm_ctx_M0(ctx, k),
+            acb_theta_agm_ctx_Mi(ctx, k),
             acb_theta_agm_ctx_minf(ctx, k),
             acb_theta_agm_ctx_nb_bad_steps(ctx, k), prec);
     if (acb_theta_agm_ctx_is_ext(ctx))
     {
+        arf_div_si(acb_theta_agm_ctx_rad(ctx, k),
+                acb_theta_agm_ctx_rad(ctx, k), 10, prec, ARF_RND_FLOOR);
         acb_theta_dupl_transform_radius(acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_th(ctx),
             acb_theta_agm_ctx_matrix(ctx, k), prec);
     }
     else
-    {
+    {        
         acb_theta_dupl_transform_radius_const(acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_th(ctx),
             acb_theta_agm_ctx_matrix(ctx, k), prec);
     }
 
-    /* Compute max */
+    /* Compute min, max */
     if (acb_theta_agm_ctx_is_ext(ctx))
-    {        
-        arb_set_arf(m, acb_theta_agm_ctx_M0(ctx, k));
-        arb_add_arf(m, m, acb_theta_agm_ctx_rad(ctx, k), prec);
-        arb_div_arf(m, m, acb_theta_agm_ctx_minf(ctx, k), prec);
-        arb_mul_2exp_si(m, m, 3);
+    {
+        arb_set_arf(m, &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1]);
+        arb_div_arf(m, m, acb_theta_agm_ctx_minf(ctx, k), prec);        
+        arb_mul_si(m, m, 4*21, prec);
+        arb_div_si(m, m, 19, prec);
         arb_log(m, m, prec);
         arb_sqr(m, m, prec);
         arb_mul_si(m, m, 20, prec);
+        arb_mul_2exp_si(m, m, nb_bad);
         arb_exp(m, m, prec);
         arb_get_ubound_arf(acb_theta_agm_ctx_max(ctx, k), m, prec);
+
+        arb_log(m, m, prec);
+        arb_mul_si(m, m, -28, prec);
+        arb_div_si(m, m, 20, prec);
+        arb_exp(m, m, prec);
+        arb_get_lbound_arf(acb_theta_agm_ctx_min(ctx, k), m, prec);
     }
     else
     {        
-        arf_div(acb_theta_agm_ctx_max(ctx, k), acb_theta_agm_ctx_M0(ctx, k),
-                acb_theta_agm_ctx_minf(ctx, k), prec, ARF_RND_CEIL);
         arf_mul_2exp_si(acb_theta_agm_ctx_max(ctx, k),
-                acb_theta_agm_ctx_max(ctx, k), 1);        
+                &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1], 2);
+        arf_mul_2exp_si(acb_theta_agm_ctx_min(ctx, k),
+                acb_theta_agm_ctx_minf(ctx, k), -2);
     }
+
+    flint_printf("(set_bounds) Current bounds with matrix\n");
+    fmpz_mat_print_pretty(acb_theta_agm_ctx_matrix(ctx, k)); flint_printf("\n");
+    flint_printf("%wd bad steps, min, max, rad:\n", nb_bad);
+    arf_printd(acb_theta_agm_ctx_min(ctx, k), 10); flint_printf("\n");
+    arf_printd(acb_theta_agm_ctx_max(ctx, k), 10); flint_printf("\n");
+    arf_printd(acb_theta_agm_ctx_rad(ctx, k), 10); flint_printf("\n");
     
     arb_clear(abs);
     arb_clear(m);
+    arb_clear(M);
 }
 
 /* Set B3 */
@@ -302,16 +322,18 @@ acb_theta_agm_ctx_set_B3(acb_theta_agm_ctx_t ctx, slong prec)
     /* Evaluate finite difference */
     acb_theta_cauchy(B2, acb_theta_agm_ctx_rho(ctx),
             acb_theta_agm_ctx_M(ctx), 2, dim, lowprec);
-    arf_frexp(B2, e, B2);
+    arf_frexp(B2, e, B2);    
     exp = fmpz_get_si(e);
+    arf_mul_2exp_si(B2, B2, exp);
+    
     arb_one(eta);
     arb_mul_2exp_si(eta, eta, FLINT_MIN(- exp - n_clog(dim, 2), - prec/2));
-    acb_theta_newton_fd(r, fd, acb_theta_agm_ctx_th(ctx), eta, ctx, prec);
+    acb_theta_newton_fd(r, fd, acb_theta_agm_ctx_th(ctx), eta, ctx, prec);    
     res = acb_mat_inv(fdinv, fd, prec);
 
     if (!res) arb_pos_inf(norm);
     else acb_mat_ninf(norm, fdinv, lowprec);
-      
+          
     /* Is ||FD^-1||*n*B2*eta less than 1? */        
     arb_mul_arf(bound, norm, B2, lowprec);
     arb_mul_si(bound, bound, dim, lowprec);
@@ -338,26 +360,34 @@ acb_theta_agm_ctx_set_B3(acb_theta_agm_ctx_t ctx, slong prec)
 /* Get logs */
 
 static void
-acb_theta_agm_ctx_set_logs(slong* log_M, slong* log_rho, slong* log_B1,
-        slong* log_B2, slong* log_B3, const acb_theta_agm_ctx_t ctx)
+acb_theta_agm_ctx_set_logs(slong* log_th, slong* log_M, slong* log_rho,
+        slong* log_B1, slong* log_B2, slong* log_B3,
+        const acb_theta_agm_ctx_t ctx)
 {
     arf_t c;
     fmpz_t e;
-    slong n = acb_theta_agm_ctx_nb(ctx);
+    slong dim = acb_theta_agm_ctx_dim(ctx);
     slong lowprec = ACB_THETA_AGM_LOWPREC;
+    slong g = acb_theta_agm_ctx_g(ctx);
+    slong nb_th = 1<<g;
+    arb_t abs, m;
+    slong k;
 
+    if (acb_theta_agm_ctx_is_ext(ctx)) nb_th *= 2;
     arf_init(c);
     fmpz_init(e);
+    arb_init(abs);
+    arb_init(m);
   
     arf_frexp(c, e, acb_theta_agm_ctx_M(ctx));
     *log_M = fmpz_get_si(e);
     arf_frexp(c, e, acb_theta_agm_ctx_rho(ctx));
     *log_rho = fmpz_get_si(e) - 1;  
-    arf_mul_si(c, acb_theta_agm_ctx_M(ctx), 2*n, lowprec, ARF_RND_CEIL);
+    arf_mul_si(c, acb_theta_agm_ctx_M(ctx), 2*(dim+1), lowprec, ARF_RND_CEIL);
     arf_div(c, c, acb_theta_agm_ctx_rho(ctx), lowprec, ARF_RND_CEIL);
     arf_frexp(c, e, c);
     *log_B1 = fmpz_get_si(e);
-    arf_mul_si(c, acb_theta_agm_ctx_M(ctx), 2*n*(n+1), lowprec,
+    arf_mul_si(c, acb_theta_agm_ctx_M(ctx), 2*(dim+1)*(dim+2), lowprec,
             ARF_RND_CEIL);
     arf_div(c, c, acb_theta_agm_ctx_rho(ctx), lowprec, ARF_RND_CEIL);
     arf_div(c, c, acb_theta_agm_ctx_rho(ctx), lowprec, ARF_RND_CEIL);
@@ -366,8 +396,20 @@ acb_theta_agm_ctx_set_logs(slong* log_M, slong* log_rho, slong* log_B1,
     arf_frexp(c, e, acb_theta_agm_ctx_B3(ctx));
     *log_B3 = fmpz_get_si(e);
 
+    arb_zero(m);
+    for (k = 0; k < nb_th; k++)
+    {
+        acb_abs(abs, &acb_theta_agm_ctx_th(ctx)[k], lowprec);
+        arb_max(m, m, abs, lowprec);        
+    }
+    arb_get_ubound_arf(c, m, lowprec);
+    arf_frexp(c, e, c);
+    *log_th = fmpz_get_si(e);
+
     arf_clear(c);
     fmpz_clear(e);
+    arb_clear(abs);
+    arb_clear(m);
 }
 
 /* User function */
@@ -376,6 +418,7 @@ void
 acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec)
 {  
     acb_mat_t half;
+    arf_t m;
     slong lowprec = ACB_THETA_AGM_LOWPREC;  
     slong n = acb_theta_agm_ctx_nb(ctx);
     slong g = acb_theta_agm_ctx_g(ctx);
@@ -385,6 +428,7 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec)
     int is_ext = acb_theta_agm_ctx_is_ext(ctx);
 
     acb_mat_init(half, g, g);
+    arf_init(m);
 
     /* Set theta values */
     acb_mat_scalar_mul_2exp_si(half, acb_theta_agm_ctx_tau(ctx), -1);
@@ -414,21 +458,31 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec)
             arf_min(acb_theta_agm_ctx_rho(ctx),
                     acb_theta_agm_ctx_rho(ctx),
                     acb_theta_agm_ctx_rad(ctx, k));
+            arf_div(m, acb_theta_agm_ctx_max(ctx, k),
+                    acb_theta_agm_ctx_min(ctx, 0), lowprec, ARF_RND_CEIL);
             arf_max(acb_theta_agm_ctx_M(ctx),
-                    acb_theta_agm_ctx_M(ctx),
-                    acb_theta_agm_ctx_max(ctx, k));
+                    acb_theta_agm_ctx_M(ctx), m);
 	}
+        
+        flint_printf("(ctx_set) current M, rho:\n");
+        arf_printd(acb_theta_agm_ctx_M(ctx), 10); flint_printf("\n");
+        arf_printd(acb_theta_agm_ctx_rho(ctx), 10); flint_printf("\n");
 
         if (!arf_is_finite(acb_theta_agm_ctx_M(ctx))) continue;
         if (arf_cmp_si(acb_theta_agm_ctx_rho(ctx), 0) <= 0) continue;
 
         res = acb_theta_agm_ctx_set_B3(ctx, prec);
         if (res) break;
+
+        flint_printf("Invalid B3:\n");
+        arf_printd(acb_theta_agm_ctx_B3(ctx), 10); flint_printf("\n");
     }
     
-    acb_theta_agm_ctx_set_logs(&acb_theta_agm_ctx_log_rho(ctx),
-            &acb_theta_agm_ctx_log_M(ctx), &acb_theta_agm_ctx_log_B1(ctx),
-            &acb_theta_agm_ctx_log_B2(ctx), &acb_theta_agm_ctx_log_B3(ctx), ctx);
+    acb_theta_agm_ctx_set_logs(&acb_theta_agm_ctx_log_th(ctx),
+            &acb_theta_agm_ctx_log_M(ctx), &acb_theta_agm_ctx_log_rho(ctx),
+            &acb_theta_agm_ctx_log_B1(ctx), &acb_theta_agm_ctx_log_B2(ctx),
+            &acb_theta_agm_ctx_log_B3(ctx), ctx);
     
     acb_mat_clear(half);
+    arf_clear(m);
 }

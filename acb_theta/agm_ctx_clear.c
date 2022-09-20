@@ -27,13 +27,14 @@ void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx)
     for (k = 0; k < n; k++) acb_theta_agm_ctx_reset_steps(ctx, k, 0);
     flint_free(ctx->nb_bad_steps);
     flint_free(ctx->roots);
-    flint_free(ctx->mi);  
-    for (k = 0; k < n; k++) arf_clear(acb_theta_agm_ctx_M0(ctx, k));
-    flint_free(ctx->M0);
+    flint_free(ctx->mi);
+    flint_free(ctx->Mi);
     for (k = 0; k < n; k++) arf_clear(acb_theta_agm_ctx_minf(ctx, k));
     flint_free(ctx->minf);
     for (k = 0; k < n; k++) arf_clear(acb_theta_agm_ctx_rad(ctx, k));
     flint_free(ctx->rad);
+    for (k = 0; k < n; k++) arf_clear(acb_theta_agm_ctx_min(ctx, k));
+    flint_free(ctx->min);
     for (k = 0; k < n; k++) arf_clear(acb_theta_agm_ctx_max(ctx, k));
     flint_free(ctx->max);
     

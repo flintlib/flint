@@ -7,7 +7,9 @@
 static void
 acb_theta_newton_target(acb_ptr im, const acb_theta_agm_ctx_t ctx, slong prec)
 {
-    slong n = acb_theta_agm_ctx_nb(ctx);
+    slong g = acb_theta_agm_ctx_g(ctx);
+    slong dim = acb_theta_agm_ctx_dim(ctx);
+    slong n = 1<<g;
     slong k;
     fmpz_t eps;
     acb_t zeta;
@@ -22,13 +24,6 @@ acb_theta_newton_target(acb_ptr im, const acb_theta_agm_ctx_t ctx, slong prec)
 
         if (acb_theta_agm_ctx_is_ext(ctx))
         {
-            acb_theta_transform_scal_const(&im[k], acb_theta_agm_ctx_tau(ctx),
-                    acb_theta_agm_ctx_matrix(ctx, k+1),
-                    acb_theta_agm_ctx_k2(ctx, k+1), prec);
-            acb_mul(&im[k], &im[k], zeta, prec);
-        }
-        else
-        {            
             acb_theta_transform_scal(&im[k], &im[k+n-1],
                     acb_theta_agm_ctx_z(ctx),
                     acb_theta_agm_ctx_tau(ctx),
@@ -37,6 +32,20 @@ acb_theta_newton_target(acb_ptr im, const acb_theta_agm_ctx_t ctx, slong prec)
             acb_mul(&im[k], &im[k], zeta, prec);
             acb_mul(&im[k+n-1], &im[k+n-1], zeta, prec);
         }
+        else
+        {            
+            acb_theta_transform_scal_const(&im[k], acb_theta_agm_ctx_tau(ctx),
+                    acb_theta_agm_ctx_matrix(ctx, k+1),
+                    acb_theta_agm_ctx_k2(ctx, k+1), prec);
+            acb_mul(&im[k], &im[k], zeta, prec);
+        }
+    }
+    for (k = 0; k < dim; k++) acb_inv(&im[k], &im[k], prec);
+    
+    flint_printf("Target:\n");
+    for (k = 0; k < dim; k++)
+    {
+        acb_printd(&im[k], 10); flint_printf("\n");
     }
     
     fmpz_clear(eps);
@@ -85,6 +94,8 @@ acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err,
     arf_mul_2exp_si(err, err, 1);
     arf_frexp(e, exp, err);
     prec = -fmpz_get_si(exp);
+
+    flint_printf("newton_start: chosen target prec %wd\n", prec);
   
     /* im is now exact, and known to precision prec. Pick starting precision */
     while ((prec > ACB_THETA_AGM_BASEPREC - log_M - ACB_THETA_AGM_GUARD)
@@ -124,7 +135,7 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
     slong g = acb_theta_agm_ctx_g(ctx);
     slong dim = acb_theta_agm_ctx_dim(ctx);
     slong n = 1<<g;
-    slong log_M, log_B1, log_B2, log_B3;
+    slong log_th, log_M, log_B1, log_B2, log_B3;
     slong log_eta, nextprec;
     arb_t eta;
     acb_mat_t fd;
@@ -142,6 +153,7 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
     log_B1 = acb_theta_agm_ctx_log_B1(ctx);
     log_B2 = acb_theta_agm_ctx_log_B2(ctx);
     log_B3 = acb_theta_agm_ctx_log_B3(ctx);
+    log_th = acb_theta_agm_ctx_log_th(ctx);
 
     /* Set nextprec, eta */
     nextprec = 2*prec + 2*n_clog(dim, 2) + 2*log_B1 + 2*log_B3 + 9 + log_M
@@ -150,8 +162,18 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
     arb_one(eta);
     arb_mul_2exp_si(eta, eta, log_eta);
 
+    flint_printf("(newton_step) log Bi: %wd %wd %wd\n", log_B1, log_B2, log_B3);
+    flint_printf("log_th, log_rho, log_M: %wd %wd %wd\n",
+            acb_theta_agm_ctx_log_th(ctx), log_th, log_M);
+
     /* Compute correction */
     acb_theta_newton_fd(f, fd, current, eta, ctx, nextprec);
+    
+    flint_printf("Current image:\n");
+    for (k = 0; k < dim; k++)
+    {
+        acb_printd(&f[k], 10); flint_printf("\n");
+    }
     
     res = acb_mat_inv(fd, fd, nextprec);
     if (!res)
@@ -160,7 +182,7 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
         fflush(stdout);
         flint_abort();
     }
-    _acb_vec_sub(f, im, f, dim, prec);
+    _acb_vec_sub(f, im, f, dim, nextprec);
     
     flint_printf("Current error:\n");
     for (k = 0; k < dim; k++)
@@ -199,7 +221,7 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
         if (k > 0)
         {
             acb_add(&next[k], &next[k], acb_mat_entry(h, k-1, 0),
-                nextprec + log_M + ACB_THETA_AGM_GUARD);
+                nextprec + log_th + ACB_THETA_AGM_GUARD);
         }
         acb_get_mid(&next[k], &next[k]);
         
@@ -208,7 +230,7 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
             if (k > 0)
             {                
                 acb_add(&next[k+n], &next[k+n], acb_mat_entry(h, k+n-2, 0),
-                        nextprec + log_M + ACB_THETA_AGM_GUARD);
+                        nextprec + log_th + ACB_THETA_AGM_GUARD);
             }
             acb_get_mid(&next[k+n], &next[k+n]);
         }
@@ -226,7 +248,10 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
 void
 acb_theta_newton_run(acb_ptr r, const acb_theta_agm_ctx_t ctx, slong prec)
 {
+    slong g = acb_theta_agm_ctx_g(ctx);
+    slong n = 1<<g;
     slong dim = acb_theta_agm_ctx_dim(ctx);
+    int is_ext = acb_theta_agm_ctx_is_ext(ctx);
     slong log_B3;
     acb_ptr im;
     arf_t err;
@@ -240,20 +265,38 @@ acb_theta_newton_run(acb_ptr r, const acb_theta_agm_ctx_t ctx, slong prec)
 
     log_B3 = acb_theta_agm_ctx_log_B3(ctx);
     current_prec = acb_theta_newton_start(r, im, err, ctx, prec);
+    arf_frexp(err, exp, err);
+    prec = -fmpz_get_si(exp);
     
     while (current_prec < prec)
     {
         current_prec = acb_theta_newton_step(r, r, im, ctx, current_prec);
     }
     /* Add error: coming from prec, and coming from err */
-    arf_frexp(err, exp, err);
     arf_one(err);
-    arf_mul_2exp_si(err, err, fmpz_get_si(exp) + log_B3 + 1);
+    arf_mul_2exp_si(err, err, -current_prec + log_B3 + 1);
+
+    flint_printf("(newton_run) Before error\n");
+    for (k = 0; k < n; k++)
+    {
+        acb_printd(&r[k], 10); flint_printf("\n");
+    }
+
+    flint_printf("(newton_run) Additional error\n");
+    arf_printd(err, 10); flint_printf("\n");
     
-    for (k = 0; k < dim; k++) acb_add_error_arf(&r[k], err);
+    for (k = 1; k < n; k++)
+    {
+        acb_add_error_arf(&r[k], err);
+        if (is_ext) acb_add_error_arf(&r[k+n], err);
+    }
     arf_one(err);
     arf_mul_2exp_si(err, err, -prec);
-    for (k = 0; k < dim; k++) acb_add_error_arf(&r[k], err);
+    for (k = 1; k < dim; k++)
+    {
+        acb_add_error_arf(&r[k], err);
+        if (is_ext) acb_add_error_arf(&r[k+n], err);
+    }
 
     _acb_vec_clear(im, dim);
     arf_clear(err);

@@ -10,7 +10,7 @@ acb_theta_newton_fd(acb_ptr v, acb_mat_t fd, acb_srcptr th, const arb_t eta,
     slong nb_th = 1<<g;
     acb_ptr thmod;
     acb_ptr r0, r;
-    slong k, j;
+    slong k, j, c;
 
     if (acb_theta_agm_ctx_is_ext(ctx)) nb_th *= 2;
     thmod = _acb_vec_init(nb_th);
@@ -18,7 +18,8 @@ acb_theta_newton_fd(acb_ptr v, acb_mat_t fd, acb_srcptr th, const arb_t eta,
     r = _acb_vec_init(dim);
   
     acb_theta_newton_eval(r0, th, ctx, prec);
-  
+
+    c = 0;
     for (k = 1; k < nb_th; k++)
     {
         if (k == (1<<g)) continue;
@@ -28,10 +29,11 @@ acb_theta_newton_fd(acb_ptr v, acb_mat_t fd, acb_srcptr th, const arb_t eta,
         acb_theta_newton_eval(r, thmod, ctx, prec);
         _acb_vec_sub(r, r, r0, dim, prec);
         _acb_vec_scalar_div_arb(r, r, dim, eta, prec);
-        for (j = 0; j < dim-1; j++)
+        for (j = 0; j < dim; j++)
 	{
-            acb_set(acb_mat_entry(fd, j, k-1), &r[j]);
+            acb_set(acb_mat_entry(fd, j, c), &r[j]);
 	}
+        c++;
     }
     _acb_vec_set(v, r0, dim);
   

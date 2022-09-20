@@ -147,7 +147,7 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
 
 slong acb_theta_agm_ext_nb_good_steps(arf_t rel_err, slong g, slong prec);
 
-void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_t M0,
+void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
         const arf_t minf, slong nb, slong prec);
 
 /* Transformation formulas */
@@ -370,15 +370,17 @@ typedef struct
     slong* nb_bad_steps;
     acb_ptr* roots;
     arf_struct** mi;
-    arf_struct* M0;
+    arf_struct** Mi;
     arf_struct* minf;
     arf_struct* rad;
+    arf_struct* min;
     arf_struct* max;
     slong nb;
     
     arf_struct rho;
     arf_struct M;
     arf_struct B3;
+    slong log_th;
     slong log_rho;
     slong log_M;
     slong log_B1;
@@ -403,15 +405,17 @@ typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 #define acb_theta_agm_ctx_nb_bad_steps(ctx, k) ((ctx)->nb_bad_steps[(k)])
 #define acb_theta_agm_ctx_roots(ctx, k) ((ctx)->roots[(k)])
 #define acb_theta_agm_ctx_mi(ctx, k) ((ctx)->mi[(k)])
-#define acb_theta_agm_ctx_M0(ctx, k) (&(ctx)->M0[(k)])
+#define acb_theta_agm_ctx_Mi(ctx, k) ((ctx)->Mi[(k)])
 #define acb_theta_agm_ctx_minf(ctx, k) (&(ctx)->minf[(k)])
 #define acb_theta_agm_ctx_rad(ctx, k) (&(ctx)->rad[(k)])
+#define acb_theta_agm_ctx_min(ctx, k) (&(ctx)->min[(k)])
 #define acb_theta_agm_ctx_max(ctx, k) (&(ctx)->max[(k)])
 #define acb_theta_agm_ctx_nb(ctx) ((ctx)->nb)
 
 #define acb_theta_agm_ctx_rho(ctx) (&(ctx)->rho)
 #define acb_theta_agm_ctx_M(ctx) (&(ctx)->M)
 #define acb_theta_agm_ctx_B3(ctx) (&(ctx)->B3)
+#define acb_theta_agm_ctx_log_th(ctx) ((ctx)->log_th)
 #define acb_theta_agm_ctx_log_rho(ctx) ((ctx)->log_rho)
 #define acb_theta_agm_ctx_log_M(ctx) ((ctx)->log_M)
 #define acb_theta_agm_ctx_log_B1(ctx) ((ctx)->log_B1)

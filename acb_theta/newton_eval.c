@@ -96,12 +96,12 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     
     for (k = 0; k < n-1; k++)
     {
-        acb_mul(&r[k], &agm[k+1], &dupl[acb_theta_agm_ctx_ab(ctx, k)], prec);
+        acb_mul(&r[k], &agm[k+1], &dupl[acb_theta_agm_ctx_ab(ctx, k+1)], prec);
         acb_mul(&r[k], scal, &r[k], prec);
         if (is_ext)
         {            
             acb_mul(&r[k+n-1], &agm[k+n+1],
-                    &dupl[acb_theta_agm_ctx_ab(ctx, k) + (1<<(2*g))], prec);
+                    &dupl[acb_theta_agm_ctx_ab(ctx, k+1) + (1<<(2*g))], prec);
             acb_mul(&r[k+n-1], scal2, &r[k+n-1], prec);
         }
     }

@@ -35,6 +35,12 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr all_roots,
 	acb_theta_agm_ext_step_good(v, v, g, prec);
     }
 
+    acb_mul(s, &v[0], scal, prec);
+    acb_abs(abs, s, lowprec);
+    arb_get_ubound_arf(err, abs, lowprec);
+    arf_mul(err, err, rel_err, lowprec, ARF_RND_CEIL);
+    acb_add_error_arf(s, err);
+
     acb_div(r, &v[0], &v[n], prec);
     fmpz_one(exp);
     fmpz_mul_2exp(exp, exp, nb_good);
@@ -44,6 +50,11 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr all_roots,
     arb_get_ubound_arf(err, abs, lowprec);
     arf_mul(err, err, rel_err, lowprec, ARF_RND_CEIL);
     acb_add_error_arf(r, err);
+    
+    acb_mul(r, &v[0], scal, prec);
+    flint_printf("(agm_ext) Reached agms\n");
+    acb_printd(r, 10); flint_printf("\n");
+    acb_printd(s, 10); flint_printf("\n");
 
     fmpz_one(exp);
     fmpz_mul_2exp(exp, exp, nb_bad);

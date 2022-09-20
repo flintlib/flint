@@ -35,6 +35,12 @@ acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau, slong prec)
 
     if (naive) acb_theta_naive_const_proj(th, half, prec);
     else acb_theta_newton_run(th, ctx, prec);
+
+    flint_printf("newton_const_half_proj:\n");
+    for (stop = 0; stop < (1<<g); stop++)
+    {
+        acb_printd(&th[stop], 10); flint_printf("\n");
+    }
     
     acb_mat_clear(half);
     acb_theta_agm_ctx_clear(ctx);

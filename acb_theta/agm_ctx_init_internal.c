@@ -20,12 +20,13 @@ void acb_theta_agm_ctx_init_internal(acb_theta_agm_ctx_t ctx, slong nb,
     for (k = 0; k < nb; k++) acb_theta_agm_ctx_nb_bad_steps(ctx, k) = 0;
     ctx->roots = flint_malloc(nb * sizeof(acb_ptr));
     ctx->mi = flint_malloc(nb * sizeof(arf_struct*));
-    ctx->M0 = flint_malloc(nb * sizeof(arf_struct));
-    for (k = 0; k < nb; k++) arf_init(acb_theta_agm_ctx_M0(ctx, k));
+    ctx->Mi = flint_malloc(nb * sizeof(arf_struct*));
     ctx->minf = flint_malloc(nb * sizeof(arf_struct));
     for (k = 0; k < nb; k++) arf_init(acb_theta_agm_ctx_minf(ctx, k));
     ctx->rad = flint_malloc(nb * sizeof(arf_struct));
     for (k = 0; k < nb; k++) arf_init(acb_theta_agm_ctx_rad(ctx, k));
+    ctx->min = flint_malloc(nb * sizeof(arf_struct));
+    for (k = 0; k < nb; k++) arf_init(acb_theta_agm_ctx_min(ctx, k));
     ctx->max = flint_malloc(nb * sizeof(arf_struct));
     for (k = 0; k < nb; k++) arf_init(acb_theta_agm_ctx_max(ctx, k));
     
