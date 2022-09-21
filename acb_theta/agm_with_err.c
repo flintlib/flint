@@ -2,22 +2,18 @@
 #include "acb_theta.h"
 
 void
-acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
-        slong nb_good, slong g, slong prec)
+acb_theta_agm_with_err(acb_t r, acb_srcptr a, acb_srcptr roots, const arf_t err,
+        slong nb_bad, slong nb_good, slong g, slong prec)
 {
     acb_ptr v;
     acb_t scal;
-    arf_t err;
     slong lowprec = ACB_THETA_AGM_LOWPREC;
     slong n = 1<<g;
     slong k;
 
     v = _acb_vec_init(n);
     acb_init(scal);
-    arf_init(err);
-
-    arf_one(err);
-    arf_mul_2exp_si(err, err, -prec);
+  
     _acb_vec_set(v, a, n);
   
     for (k = 0; k < nb_bad; k++)
@@ -48,5 +44,4 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
 
     _acb_vec_clear(v, n);
     acb_clear(scal);
-    arf_clear(err);
 }

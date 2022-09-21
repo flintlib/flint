@@ -43,7 +43,6 @@ int main()
         {
             acb_randtest_disk(&z[k], &z[k], rad, state, prec);
         }
-        _acb_vec_scalar_mul_2exp_si(z, z, g, 4);
         
 	acb_theta_naive(th, z, 2, tau, prec);
 	acb_mat_scalar_mul_2exp_si(tau, tau, 1);

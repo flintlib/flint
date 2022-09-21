@@ -159,19 +159,21 @@ acb_theta_agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
                     acb_theta_agm_ctx_roots(ctx, k) + 2*n*i, n, scal, lowprec);
             acb_sqrt(scal, scal, lowprec);
         }
+    
+        flint_printf("(ctx_roots) Sequence of th_0:\n");
+        for (i = 0; i < nb_bad; i++)
+        {
+            acb_printd(&acb_theta_agm_ctx_roots(ctx, k)[2*i*n], 10);
+            flint_printf("\n");
+            acb_printd(&acb_theta_agm_ctx_roots(ctx, k)[2*i*n+n], 10);
+            flint_printf("\n\n");
+        }
     }
     else
     {
         acb_inv(scal, &acb_theta_agm_ctx_roots(ctx, k)[0], lowprec);
         _acb_vec_scalar_mul(acb_theta_agm_ctx_roots(ctx, k),
                 acb_theta_agm_ctx_roots(ctx, k), n*nb_bad, scal, lowprec);
-    }
-    
-    flint_printf("(ctx_roots) Sequence of th_0:\n");
-    for (i = 0; i < nb_bad; i++)
-    {
-        acb_printd(&acb_theta_agm_ctx_roots(ctx, k)[i*n], 10);
-        flint_printf("\n");
     }
 
     /* Set k2, ab, eps */
@@ -257,19 +259,19 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     if (acb_theta_agm_ctx_is_ext(ctx))
     {
         arb_set_arf(m, &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1]);
-        arb_div_arf(m, m, acb_theta_agm_ctx_minf(ctx, k), prec);        
-        arb_mul_si(m, m, 4*21, prec);
+        arb_div_arf(m, m, acb_theta_agm_ctx_minf(ctx, k), prec);
+        arb_mul_si(m, m, 21, prec);
         arb_div_si(m, m, 19, prec);
         arb_log(m, m, prec);
-        arb_sqr(m, m, prec);
-        arb_mul_si(m, m, 20, prec);
-        arb_mul_2exp_si(m, m, nb_bad);
+        arb_add_si(m, m, 1, prec);
+        arb_mul_2exp_si(m, m, 5);
+        arb_mul_2exp_si(m, m, acb_theta_agm_ctx_nb_bad_steps(ctx, k));
         arb_exp(m, m, prec);
         arb_get_ubound_arf(acb_theta_agm_ctx_max(ctx, k), m, prec);
 
         arb_log(m, m, prec);
-        arb_mul_si(m, m, -28, prec);
-        arb_div_si(m, m, 20, prec);
+        arb_mul_si(m, m, -7, prec);
+        arb_div_si(m, m, 5, prec);
         arb_exp(m, m, prec);
         arb_get_lbound_arf(acb_theta_agm_ctx_min(ctx, k), m, prec);
     }
@@ -328,12 +330,19 @@ acb_theta_agm_ctx_set_B3(acb_theta_agm_ctx_t ctx, slong prec)
     
     arb_one(eta);
     arb_mul_2exp_si(eta, eta, FLINT_MIN(- exp - n_clog(dim, 2), - prec/2));
-    acb_theta_newton_fd(r, fd, acb_theta_agm_ctx_th(ctx), eta, ctx, prec);    
+    acb_theta_newton_fd(r, fd, acb_theta_agm_ctx_th(ctx), eta, ctx, prec);
+
+    flint_printf("Finite diff:\n");
+    acb_mat_printd(fd, 10); flint_printf("\n");    
     res = acb_mat_inv(fdinv, fd, prec);
 
     if (!res) arb_pos_inf(norm);
     else acb_mat_ninf(norm, fdinv, lowprec);
-          
+    
+    flint_printf("Inv, norm:\n");
+    acb_mat_printd(fdinv, 10); flint_printf("\n");
+    arb_printd(norm, 10); flint_printf("\n");
+      
     /* Is ||FD^-1||*n*B2*eta less than 1? */        
     arb_mul_arf(bound, norm, B2, lowprec);
     arb_mul_si(bound, bound, dim, lowprec);

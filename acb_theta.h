@@ -125,6 +125,16 @@ void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g,
 
 void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
+void acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g,
+        slong prec);
+
+slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
+
+slong acb_theta_agm_nb_good_steps(const arf_t r, const arf_t e, slong prec);
+
+void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
+        slong nb_good, slong g, slong prec);
+
 void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots,
@@ -132,20 +142,17 @@ void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots,
 
 void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
-void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots,
-	const arf_t rel_err, slong nb_bad, slong nb_good, slong g, slong prec);
-
-void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr all_roots,
-	const arf_t rel_err, slong nb_bad, slong nb_good, slong g, slong prec);
-
-slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
-
-slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec);
+void acb_theta_agm_ext_conv_rate(arf_t c, arf_t r, arf_t e, acb_srcptr a,
+        slong g, slong prec);
 
 slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
-slong acb_theta_agm_ext_nb_good_steps(arf_t rel_err, slong g, slong prec);
+slong acb_theta_agm_ext_nb_good_steps(const arf_t c, const arf_t r,
+        const arf_t e, slong g, slong prec);
+
+void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
+	slong nb_bad, slong nb_good, slong g, slong prec);
 
 void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
         const arf_t minf, slong nb, slong prec);

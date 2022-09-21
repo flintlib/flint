@@ -60,6 +60,7 @@ acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err,
         const acb_theta_agm_ctx_t ctx, slong prec)
 {
     slong g = acb_theta_agm_ctx_g(ctx);
+    slong dim = acb_theta_agm_ctx_dim(ctx);
     slong n = 1<<g;
     slong log_M, log_B2, log_B3;
     arf_t e;
@@ -80,10 +81,10 @@ acb_theta_newton_start(acb_ptr start, acb_ptr im, arf_t err,
     acb_theta_newton_target(im, ctx, prec);
     arf_one(e);
     arf_mul_2exp_si(e, e, -prec-1-log_B3);
-    for (k = 0; k < n-1; k++) acb_add_error_arf(&im[k], e);
+    for (k = 0; k < dim; k++) acb_add_error_arf(&im[k], e);
   
     arf_zero(err);
-    for (k = 0; k < n-1; k++)
+    for (k = 0; k < dim; k++)
     {
         arf_set_mag(e, arb_radref(acb_realref(&im[k])));
         arf_max(err, err, e);

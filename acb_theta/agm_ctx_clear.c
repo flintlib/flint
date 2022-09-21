@@ -10,7 +10,7 @@ void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx)
     acb_mat_clear(acb_theta_agm_ctx_tau(ctx));
     if (acb_theta_agm_ctx_is_ext(ctx))
     {
-        _acb_vec_clear(acb_theta_agm_ctx_z(ctx), g);
+        _acb_vec_clear(acb_theta_agm_ctx_z(ctx), 2*g);
         _acb_vec_clear(acb_theta_agm_ctx_th(ctx), 1<<(g+1));
     }
     else

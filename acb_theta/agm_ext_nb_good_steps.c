@@ -1,39 +1,64 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_agm_ext_nb_good_steps(arf_t rel_err, slong g, slong prec)
+slong
+acb_theta_agm_ext_nb_good_steps(const arf_t c, const arf_t r, const arf_t e,
+        slong g, slong prec)
 {
-    arb_t B;
-    arf_t bound;
-    slong n;
+    arb_t x;
+    arb_t temp;
+    arf_t b;
+    fmpz_t exp;
+    slong nb1;
     slong lowprec = ACB_THETA_AGM_LOWPREC;
-
-    arb_init(B);
-    arf_init(bound);
     
-    arb_set_si(B, 21);
-    arb_div_si(B, B, 19, lowprec); /* cf nb_bad_steps */
-    arb_pow_ui(B, B, 3, lowprec);
-    arb_mul_si(B, B, 5, lowprec);
-    arb_log_base_ui(B, B, 2, lowprec);
+    arb_init(x);
+    arb_init(temp);
+    arf_init(b);
+    fmpz_init(exp);
+    
+    nb1 = acb_theta_agm_good_steps(r, e, lowprec);
+    nb1 = FLINT_MAX(1, nb1);
 
-    arb_add_si(B, B, prec + 1, lowprec);
-    arb_log_base_ui(B, B, 2, lowprec);
-    arb_add_si(B, B, 2, lowprec);
-
-    arb_get_ubound_arf(bound, B, lowprec);
-
-    if (!arf_is_finite(bound) || arf_cmp_si(bound, WORD_MAX) > 0)
+    /* e must be at most 1/2 */
+    arb_set_arf(x, e);
+    arb_mul_si(x, x, 2, lowprec);
+    arb_sub_si(x, x, 1, lowprec);
+    if (!arb_is_negative(x))
     {
-        flint_printf("agm_ext_nb_good_steps: Error (cannot convert to integer)\n");
-        arf_printd(bound, 30); flint_printf("\n");
+        flint_printf("acb_theta_agm_ext_nb_good_steps: Error");
+        flint_printf(" (quadratic convergence not reached)\n");
+        arf_printd(e, 10); flint_printf("\n");
+        fflush(stdout);
+        flint_abort();
     }
 
-    n = arf_get_si(bound, ARF_RND_CEIL);
-    arf_one(rel_err);
-    arf_mul_2exp_si(rel_err, rel_err, -prec);
+    /* Solve 4*c*e^(2^(k-1)) <= target */
+    arb_one(x);
+    arb_mul_2exp_si(x, x, -prec - 2);
+    arb_div_arf(x, x, c, lowprec);
+    
+    arb_log(x, x, lowprec);
+    arb_set_arf(temp, e);    
+    arb_log(temp, temp, lowprec);
+    arb_div(x, x, temp, lowprec);
+    arb_get_ubound_arf(b, x, lowprec);
+    
+    if (!arf_is_finite(b))
+    {
+        flint_printf("agm_ext_nb_good_steps: Error (infinite value)\n");
+        fflush(stdout);
+        flint_abort();
+    }
 
-    arb_clear(B);
-    arf_clear(bound);
-    return n;
+    arf_frexp(b, exp, b);
+    nb = fmpz_get_si(exp);
+
+    flint_printf("agm_ext_nb_good_steps: Make %wd good steps\n", nb);
+    
+    arb_clear(x);
+    arb_clear(temp);
+    arf_clear(b);
+    fmpz_clear(exp);
+    return nb;    
 }
