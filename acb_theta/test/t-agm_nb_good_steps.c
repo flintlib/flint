@@ -3,102 +3,78 @@
 
 int main()
 {
-  slong iter;
-  flint_rand_t state;
+    slong iter;
+    flint_rand_t state;
   
-  flint_printf("agm_nb_good_steps....");
-  fflush(stdout);
+    flint_printf("agm_nb_good_steps....");
+    fflush(stdout);
   
-  flint_randinit(state);
+    flint_randinit(state);
 
-  /* Test: for good input, after this number of steps, relative error
-     must at most 1/5*2^(-prec) */
-  for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    /* Test: overlap at different precisions */
+    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
     {
-      slong g = 1 + n_randint(state, 4);
-      slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);
-      slong test_prec = prec / (1 + n_randint(state, 10));
-      slong n = 1<<g;
-      acb_ptr a;
-      slong nb_good;
-      arf_t rad;
-      arb_t err, cmp;
-      acb_t diff;
-      slong k;
-      int res;
+        slong g = 1 + n_randint(state, 4);
+        slong prec = 500 + n_randint(state, 1000);
+        slong mag_bits = 1 + n_randint(state, 4);
+        slong test_prec = prec / (2 + n_randint(state, 9));
+        slong n = 1<<g;
+        acb_ptr a;
+        arf_t rad;
+        arf_t c, e;
+        slong nb_good;
+        acb_t x, y;
+        slong k;
       
-      a = _acb_vec_init(n);
-      arf_init(rad);
-      arb_init(err);
-      arb_init(cmp);
-      acb_init(diff);
+        a = _acb_vec_init(n);
+        arf_init(rad);
+        arf_init(c);
+        arf_init(e);
+        acb_init(x);
+        acb_init(y);
       
-      arb_one(err);
-      arb_div_si(err, err, 50, prec);
-      arb_get_lbound_arf(rad, err, prec);
-      acb_one(diff);
+        arf_one(rad);
+        arf_mul_2exp_si(rad, rad, -4);
       
-      for (k = 0; k < n; k++) acb_randtest_disk(&a[k], diff, rad, state, prec);
-      nb_good = acb_theta_agm_nb_good_steps(rad, g, test_prec);
+        acb_one(x);      
+        for (k = 0; k < n; k++) acb_randtest_disk(&a[k], x, rad, state, prec);
+        arb_randtest_pos(acb_realref(x), state, prec, mag_bits);
+        _acb_vec_scalar_mul(a, a, n, x, prec);
+      
+        acb_theta_agm_conv_rate(c, e, a, g, prec);
+      
+        nb_good = acb_theta_agm_nb_good_steps(c, e, test_prec);
+        acb_theta_agm(x, a, NULL, 0, nb_good, g, test_prec);
+        nb_good = acb_theta_agm_nb_good_steps(c, e, prec);
+        acb_theta_agm(y, a, NULL, 0, nb_good, g, prec);   
 
-      /*
-      flint_printf("Initial values:\n");
-      for (k = 0; k < n; k++)
+        if (!acb_overlaps(x, y))
 	{
-	  acb_printd(&a[k], 10); flint_printf("\n");
-	}
-      flint_printf("g = %wd, test_prec = %wd, nb_good = %wd\n", g, test_prec, nb_good);
-
-      if (arf_cmp_2exp_si(rad, -test_prec) > 0)
-	{
-	  flint_printf("FAIL (error bound)\n");
-	  fflush(stdout);
-	  flint_abort();
-	}
-      */
-
-      for (k = 0; k < nb_good; k++) acb_theta_agm_step_good(a, a, g, prec);
-      acb_abs(cmp, &a[0], prec);
-      arb_mul_arf(cmp, cmp, rad, prec);
-      arb_div_si(cmp, cmp, 5, prec);
-
-      res = 1;
-      for (k = 1; k < n; k++)
-	{
-	  acb_sub(diff, &a[k], &a[0], prec);
-	  acb_abs(err, diff, prec);
-	  if (arb_gt(err, cmp))
-	    {
-	      flint_printf("Index %wd, err, cmp:\n");
-	      arb_printd(err, 10); flint_printf("\n");
-	      arb_printd(cmp, 10); flint_printf("\n");
-	      res = 0;
-	    }
+            flint_printf("FAIL (values)\n");   
+            flint_printf("g = %wd, test_prec = %wd, nb_good = %wd\n", g, test_prec, nb_good);
+            for (k = 0; k < n; k++)
+            {
+                acb_printd(&a[k], 10); flint_printf("\n");
+            }
+            flint_printf("agm:\n");
+            acb_printd(x, 10); flint_printf("\n");
+            acb_printd(y, 10); flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
 	}
 
-      if (!res)
-	{
-	  flint_printf("FAIL (values)\n");
-	  flint_printf("g = %wd, test_prec = %wd, nb_good = %wd\n", g, test_prec, nb_good);
-	  for (k = 0; k < n; k++)
-	    {
-	      acb_printd(&a[k], 10); flint_printf("\n");
-	    }
-	  fflush(stdout);
-	  flint_abort();
-	}
-
-      _acb_vec_clear(a, n);
-      arf_clear(rad);
-      arb_clear(err);
-      arb_clear(cmp);
-      acb_clear(diff);
+        _acb_vec_clear(a, n);
+        arf_clear(rad);
+        arf_clear(c);
+        arf_clear(e);
+        acb_clear(x);
+        acb_clear(y);
     }
   
-  flint_randclear(state);
-  flint_cleanup();
-  flint_printf("PASS\n");
-  return EXIT_SUCCESS;
+    flint_randclear(state);
+    flint_cleanup();
+    flint_printf("PASS\n");
+    return EXIT_SUCCESS;
 }
       
   

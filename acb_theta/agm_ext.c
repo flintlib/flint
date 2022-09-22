@@ -8,6 +8,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
 {  
     acb_ptr v;
     acb_t scal;
+    acb_t rel;
     fmpz_t exp;
     arf_t err;
     slong n = 1<<g;
@@ -15,6 +16,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
 
     v = _acb_vec_init(2*n);
     acb_init(scal);
+    acb_init(rel);
     fmpz_init(exp);
     arf_init(err);
 
@@ -30,25 +32,29 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
 
     /* Make good steps, at least 1 */
     nb_good = FLINT_MAX(1, nb_good);    
-    for (k = 0; k < nb_good-1; k++)
+    for (k = 0; k < nb_good; k++)
     {
 	acb_theta_agm_ext_step_good(v, v, g, prec);
     }
-    acb_theta_agm_step_last(s, v+n, g, prec);    
-    acb_theta_agm_ext_step_last(r, s, a, g, prec);
-
-    /* Set error for regular Borchardt */
+    
+    /* Set regular Borchardt */
+    acb_set(s, &v[n]);
     arf_one(err);
     arf_mul_2exp_si(err, err, -prec);
-    acb_add_error_arf(s, err);
-    acb_mul(s, s, scal, prec);
-
-    /* Set error for extended Borchardt */
-    acb_theta_agm_ext_rel_err(err, c, e, nb_good, prec);
-    acb_one(scal);
-    acb_add_error_arf(scal, err);
-    acb_mul(r, r, scal, prec);
+    acb_one(rel);
+    acb_add_error_arf(rel, err);    
+    acb_mul(s, s, rel, prec);
     
+    /* Set extended Borchardt */
+    acb_theta_agm_ext_step_last(r, s, v, g, prec);
+    acb_theta_agm_ext_rel_err(err, c, e, nb_good+1, prec);
+    acb_one(rel);
+    acb_add_error_arf(rel, err);
+    acb_mul(r, r, rel, prec);
+
+    /* Renormalize */
+    acb_mul(s, s, scal, prec);
+    fmpz_one(exp);
     fmpz_mul_2exp(exp, exp, nb_bad + nb_good);
     acb_pow_fmpz(r, r, exp, prec);
         
@@ -58,6 +64,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
 
     _acb_vec_clear(v, 2*n);
     acb_clear(scal);
+    acb_clear(rel);
     fmpz_clear(exp);
     arf_clear(err);
 }

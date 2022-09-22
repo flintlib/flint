@@ -6,7 +6,6 @@ acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g, slong prec)
 {
     acb_t diff;
     arb_t temp;
-    arb_t max;
     arb_t eps;
     arb_t res;
     slong n = 1<<g;
@@ -14,19 +13,16 @@ acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g, slong prec)
 
     acb_init(diff);
     arb_init(temp);
-    arb_init(max);
     arb_init(eps);
     arb_init(res);
 
-    arb_pos_inf(eps);
-    arb_zero(max);
+    arb_zero(eps);
     for (k = 0; k < n; k++)
     {
         acb_abs(temp, &a[k], prec);
-        arb_max(max, max, temp, prec);
         acb_sub(diff, &a[k], &a[0], prec);
         acb_abs(temp, diff, prec);
-        arb_min(eps, eps, temp, prec);
+        arb_max(eps, eps, temp, prec);
     }
     acb_abs(temp, &a[0], prec);
     arb_div(eps, eps, temp, prec);
@@ -62,19 +58,15 @@ acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g, slong prec)
     arb_mul_si(temp, temp, -2, prec);
     arb_div(res, res, temp, prec);
 
-    /* Replace eps by res*eps, res by M/res */
+    /* Replace eps by res*eps, res by 1/res */
     arb_mul(eps, eps, res, prec);
-    arb_div(res, max, res, prec);
+    arb_inv(res, res, prec);
 
     arb_get_ubound_arf(r, res, prec);
     arb_get_ubound_arf(e, eps, prec);
-
-    flint_printf("agm_conv_rate: e = ");
-    arf_printd(e, 10); flint_printf("\n");
     
     acb_clear(diff);
     arb_clear(temp);
-    arb_clear(max);
     arb_clear(eps);
     arb_clear(res);    
 }

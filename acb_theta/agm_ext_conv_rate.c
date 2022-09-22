@@ -63,12 +63,12 @@ acb_theta_agm_ext_conv_rate(arf_t c, arf_t r, arf_t e, acb_srcptr a, slong g,
     arb_inv(temp, temp, prec);
     arb_mul_arf(temp, temp, e, prec);
     arb_mul_arf(temp, temp, r, prec);
+    arb_mul(temp, temp, Ms, prec);
     arb_mul(temp, temp, Mu, prec);
     arb_add(res, res, temp, prec);
 
     arb_mul(temp, mu, ms, prec);
-    arb_sqrt(temp, temp, prec);
-    arb_mul(res, res, temp, prec);
+    arb_div(res, res, temp, prec);
 
     arb_get_ubound_arf(c, res, prec);
     
