@@ -6,36 +6,49 @@ void acb_theta_renormalize_const_sqr(acb_t scal, acb_srcptr th2,
 {
     slong g = acb_mat_nrows(tau);
     slong lowprec = ACB_THETA_AGM_LOWPREC;
-    slong nb_bad = acb_theta_agm_nb_bad_steps(tau, lowprec);
+    slong nb_bad = 1 + acb_theta_agm_nb_bad_steps(tau, lowprec);
     slong nb_good;
     acb_mat_t w;
     acb_ptr roots;
-    arf_t rel_err;
+    acb_ptr a;
+    arf_t c, e;
     slong n = 1<<g;
     slong k;
 
     acb_mat_init(w, g, g);
     roots = _acb_vec_init(n * nb_bad);
-    arf_init(rel_err);
+    a = _acb_vec_init(n);
+    arf_init(c);
+    arf_init(e);
 
     acb_mat_set(w, tau);
-    nb_good = acb_theta_agm_nb_good_steps(rel_err, g, prec);
+
+    /* Compute lowprec roots */
     for (k = 0; k < nb_bad; k++)
     {
         acb_theta_naive_const(&roots[k*n], w, lowprec);
         acb_mat_scalar_mul_2exp_si(w, w, 1);
     }
-    if (nb_bad > 0) /* Renormalize lowprec square roots */
+    
+    /* Renormalize lowprec square roots */
+    acb_sqrt(scal, &th2[0], 2*lowprec);
+    acb_div(scal, scal, &roots[0], lowprec);
+    _acb_vec_scalar_mul(roots, roots, n*nb_bad, scal, lowprec);
+    
+    /* Set convergence rate */
+    for (k = 0; k < n; k++)
     {
-        acb_sqrt(scal, &th2[0], 2*lowprec);
-        acb_div(scal, scal, &roots[0], lowprec);
-        _acb_vec_scalar_mul(roots, roots, n*nb_bad, scal, lowprec);
+        acb_sqr(&a[k], &roots[(nb_bad-1)*n + k], lowprec);
     }
+    acb_theta_agm_conv_rate(c, e, a, g, lowprec);    
+    nb_good = acb_theta_agm_nb_good_steps(c, e, prec);
 
-    acb_theta_agm(scal, th2, roots, rel_err, nb_bad, nb_good, g, prec);
+    acb_theta_agm(scal, th2, roots, nb_bad, nb_good, g, prec);
     acb_inv(scal, scal, prec);
 
     acb_mat_clear(w);
     _acb_vec_clear(roots, n * nb_bad);
-    arf_clear(rel_err);
+    _acb_vec_clear(a, n);
+    arf_clear(c);
+    arf_clear(e);
 }

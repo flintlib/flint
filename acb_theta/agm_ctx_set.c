@@ -92,12 +92,12 @@ acb_theta_agm_ctx_candidates(fmpz_mat_struct* Ni, slong try, slong g)
 static void
 acb_theta_agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
 {
-    slong nb_bad;
-    acb_ptr Nz;
     acb_mat_t Ntau;
+    acb_ptr Nz;
     acb_t scal;
     slong g = acb_theta_agm_ctx_g(ctx);
     slong n = 1<<g;
+    slong nb_bad;
     slong i;
     slong lowprec = ACB_THETA_AGM_LOWPREC;
     int is_ext = acb_theta_agm_ctx_is_ext(ctx);
@@ -193,19 +193,25 @@ acb_theta_agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
 static void
 acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
 {
+    acb_ptr a;
+    arb_t abs;
+    arb_t m, M;
+    arf_t err;
+    fmpz_t exp;
     slong g = acb_theta_agm_ctx_g(ctx);
     slong nb_th;
     slong nb_bad;
-    arb_t abs;
-    arb_t m, M;
     slong i, j;
+    
+    nb_th = 1<<g;
+    if (acb_theta_agm_ctx_is_ext(ctx)) nb_th *= 2;
 
+    a = _acb_vec_init(nb_th);
     arb_init(abs);
     arb_init(m);
     arb_init(M);
-
-    nb_th = 1<<g;
-    if (acb_theta_agm_ctx_is_ext(ctx)) nb_th *= 2;
+    arf_init(err);
+    fmpz_init(exp);
 
     nb_bad = acb_theta_agm_ctx_nb_bad_steps(ctx, k);
     
@@ -216,20 +222,41 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
         arb_zero(M);
         for (j = 0; j < nb_th; j++)
         {
-            acb_abs(abs, &acb_theta_agm_ctx_roots(ctx,k)[i*nb_th + j], prec);
+            acb_abs(abs, &acb_theta_agm_ctx_roots(ctx, k)[i*nb_th + j], prec);
             arb_min(m, m, abs, prec);
             arb_max(M, M, abs, prec);
         }
         arb_sqr(m, m, prec);
-        arb_get_lbound_arf(&acb_theta_agm_ctx_mi(ctx,k)[i], m, prec);
+        arb_get_lbound_arf(&acb_theta_agm_ctx_mi(ctx, k)[i], m, prec);
         arb_sqr(M, M, prec);
         arb_get_ubound_arf(&acb_theta_agm_ctx_Mi(ctx, k)[i], m, prec);        
     }
-        
-    /* Compute minf */
-    arb_set_arf(m, &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1]);
-    arb_mul_si(m, m, 19*19, prec);
-    arb_div_si(m, m, 21*21, prec); /* Cf. agm_nb_bad_steps */
+
+    /* Set a to beginning of good steps; deduce convergence rates */
+    for (i = 0; i < nb_th; i++)
+    {
+        acb_sqr(&a[i], &acb_theta_agm_ctx_roots(ctx, k)[(nb_bad-1)*nb_th + i],
+                prec);        
+    }
+    if (acb_theta_agm_ctx_is_ext(ctx))
+    {
+        acb_theta_agm_ext_conv_rate(acb_theta_agm_ctx_c_ext(ctx, k),
+                acb_theta_agm_ctx_c(ctx, k), acb_theta_agm_ctx_e(ctx, k),
+                a, g, prec);
+    }
+    else
+    {
+        acb_theta_agm_conv_rate(acb_theta_agm_ctx_c(ctx, k),
+                acb_theta_agm_ctx_e(ctx, k), a, g, prec);
+        arf_zero(acb_theta_agm_ctx_c_ext(ctx, k));
+    }
+    
+    /* Deduce minf */
+    arf_max(err, acb_theta_agm_ctx_c(ctx, k), acb_theta_agm_ctx_c_ext(ctx, k));
+    arb_set_arf(m, err);
+    arb_sub_si(m, m, 1, prec);
+    arb_neg(m, m);
+    arb_mul_arf(m, m, &acb_theta_agm_ctx_mi(ctx, k)[nb_bad-1], prec);
     arb_get_lbound_arf(acb_theta_agm_ctx_minf(ctx, k), m, prec);
 
     /* Compute rad: this assumes th has been set */    
@@ -240,8 +267,6 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
             acb_theta_agm_ctx_nb_bad_steps(ctx, k), prec);
     if (acb_theta_agm_ctx_is_ext(ctx))
     {
-        arf_div_si(acb_theta_agm_ctx_rad(ctx, k),
-                acb_theta_agm_ctx_rad(ctx, k), 10, prec, ARF_RND_FLOOR);
         acb_theta_dupl_transform_radius(acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_rad(ctx, k),
             acb_theta_agm_ctx_th(ctx),
@@ -258,29 +283,31 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     /* Compute min, max */
     if (acb_theta_agm_ctx_is_ext(ctx))
     {
+        acb_theta_agm_ext_rel_err(err, acb_theta_agm_ctx_c_ext(ctx, k),
+                acb_theta_agm_ctx_e(ctx, k), 1, prec);
+        arb_one(abs);
+        arb_add_error_arf(abs, err);
+        fmpz_one(exp);
+        fmpz_mul_2exp(exp, exp, acb_theta_agm_ctx_nb_bad_steps(ctx, k));
+        
         arb_set_arf(m, &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1]);
         arb_div_arf(m, m, acb_theta_agm_ctx_minf(ctx, k), prec);
-        arb_mul_si(m, m, 21, prec);
-        arb_div_si(m, m, 19, prec);
-        arb_log(m, m, prec);
-        arb_add_si(m, m, 1, prec);
-        arb_mul_2exp_si(m, m, 5);
-        arb_mul_2exp_si(m, m, acb_theta_agm_ctx_nb_bad_steps(ctx, k));
-        arb_exp(m, m, prec);
+        arb_mul(m, m, abs, prec);
+        arb_pow_fmpz(m, m, exp, prec);
         arb_get_ubound_arf(acb_theta_agm_ctx_max(ctx, k), m, prec);
 
-        arb_log(m, m, prec);
-        arb_mul_si(m, m, -7, prec);
-        arb_div_si(m, m, 5, prec);
-        arb_exp(m, m, prec);
+        arb_set_arf(m, acb_theta_agm_ctx_minf(ctx, k));
+        arb_div_arf(m, m, &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1], prec);
+        arb_mul(m, m, abs, prec);
+        arb_pow_fmpz(m, m, exp, prec);
         arb_get_lbound_arf(acb_theta_agm_ctx_min(ctx, k), m, prec);
     }
     else
     {        
-        arf_mul_2exp_si(acb_theta_agm_ctx_max(ctx, k),
-                &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1], 2);
-        arf_mul_2exp_si(acb_theta_agm_ctx_min(ctx, k),
-                acb_theta_agm_ctx_minf(ctx, k), -2);
+        arf_set(acb_theta_agm_ctx_max(ctx, k),
+                &acb_theta_agm_ctx_Mi(ctx, k)[nb_bad-1]);
+        arf_set(acb_theta_agm_ctx_min(ctx, k),
+                acb_theta_agm_ctx_minf(ctx, k));
     }
 
     flint_printf("(set_bounds) Current bounds with matrix\n");
@@ -290,9 +317,12 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     arf_printd(acb_theta_agm_ctx_max(ctx, k), 10); flint_printf("\n");
     arf_printd(acb_theta_agm_ctx_rad(ctx, k), 10); flint_printf("\n");
     
+    _acb_vec_clear(a, nb_th);
     arb_clear(abs);
     arb_clear(m);
     arb_clear(M);
+    arf_clear(err);
+    fmpz_clear(exp);
 }
 
 /* Set B3 */

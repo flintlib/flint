@@ -1,8 +1,8 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_agm_nb_good_steps(arf_t rel_err, const arf_t r, const arf_t e,
-        slong prec)
+slong
+acb_theta_agm_nb_good_steps(const arf_t r, const arf_t e, slong prec)
 {
     arb_t x;
     arb_t temp;

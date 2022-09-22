@@ -44,7 +44,7 @@ acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g, slong prec)
     
     /* Get eta = 1/8 + 1/12*eps^3/(1-eps) */
     arb_sub_si(res, eps, 1, prec);
-    arb_pow_si(temp, eps, 3, prec);
+    arb_pow_ui(temp, eps, 3, prec);
     arb_mul(res, res, temp, prec);
     arb_div_si(res, res, -12, prec);
 
@@ -68,6 +68,9 @@ acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g, slong prec)
 
     arb_get_ubound_arf(r, res, prec);
     arb_get_ubound_arf(e, eps, prec);
+
+    flint_printf("agm_conv_rate: e = ");
+    arf_printd(e, 10); flint_printf("\n");
     
     acb_clear(diff);
     arb_clear(temp);

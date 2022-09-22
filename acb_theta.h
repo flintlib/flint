@@ -125,6 +125,8 @@ void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g,
 
 void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
+void acb_theta_agm_step_last(acb_t r, acb_srcptr a, slong g, slong prec);
+
 void acb_theta_agm_conv_rate(arf_t r, arf_t e, acb_srcptr a, slong g,
         slong prec);
 
@@ -142,17 +144,21 @@ void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots,
 
 void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
+void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g,
+        slong prec);
+
 void acb_theta_agm_ext_conv_rate(arf_t c, arf_t r, arf_t e, acb_srcptr a,
         slong g, slong prec);
+
+void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c, const arf_t e,
+        slong nb_good, slong prec);
 
 slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
-slong acb_theta_agm_ext_nb_good_steps(const arf_t c, const arf_t r,
-        const arf_t e, slong g, slong prec);
-
 void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
-	slong nb_bad, slong nb_good, slong g, slong prec);
+        const arf_t c, const arf_t e, slong nb_bad, slong nb_good, slong g,
+        slong prec);
 
 void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
         const arf_t minf, slong nb, slong prec);
@@ -379,6 +385,10 @@ typedef struct
     arf_struct** mi;
     arf_struct** Mi;
     arf_struct* minf;
+    arf_struct* c;
+    arf_struct* c_ext;
+    arf_struct* e;
+    
     arf_struct* rad;
     arf_struct* min;
     arf_struct* max;
@@ -414,6 +424,9 @@ typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 #define acb_theta_agm_ctx_mi(ctx, k) ((ctx)->mi[(k)])
 #define acb_theta_agm_ctx_Mi(ctx, k) ((ctx)->Mi[(k)])
 #define acb_theta_agm_ctx_minf(ctx, k) (&(ctx)->minf[(k)])
+#define acb_theta_agm_ctx_c(ctx, k) (&(ctx)->c[(k)])
+#define acb_theta_agm_ctx_c_ext(ctx, k) (&(ctx)->c_ext[(k)])
+#define acb_theta_agm_ctx_e(ctx, k) (&(ctx)->e[(k)])
 #define acb_theta_agm_ctx_rad(ctx, k) (&(ctx)->rad[(k)])
 #define acb_theta_agm_ctx_min(ctx, k) (&(ctx)->min[(k)])
 #define acb_theta_agm_ctx_max(ctx, k) (&(ctx)->max[(k)])

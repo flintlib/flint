@@ -41,10 +41,6 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     {
         acb_theta_dupl_all_const(dupl, th, g, prec);
     }
-
-    /* Compute number of good steps */
-    if (is_ext) nb_good = acb_theta_agm_ext_nb_good_steps(err, g, prec);
-    else nb_good = acb_theta_agm_nb_good_steps(err, g, prec);
         
     /* Compute agms for each matrix */
     for (k = 0; k < n; k++)
@@ -71,16 +67,19 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
         }
 
         /* Get agm */
+        nb_good = acb_theta_agm_nb_good_steps(acb_theta_agm_ctx_c(ctx, k),
+                acb_theta_agm_ctx_e(ctx, k), prec);
         if (is_ext)
         {            
             acb_theta_agm_ext(&agm[k], &agm[n+k], transf,
                     acb_theta_agm_ctx_roots(ctx, k),
-                    err, acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good,
-                    g, prec);
+                    acb_theta_agm_ctx_c_ext(ctx, k),
+                    acb_theta_agm_ctx_e(ctx, k),
+                    acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
         }
         else
         {
-            acb_theta_agm(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k), err,
+            acb_theta_agm(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k),
                     acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
         }
     }

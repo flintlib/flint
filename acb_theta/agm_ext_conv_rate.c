@@ -28,10 +28,10 @@ acb_theta_agm_ext_conv_rate(arf_t c, arf_t r, arf_t e, acb_srcptr a, slong g,
     arb_pos_inf(ms);
     for (k = 0; k < n; k++)
     {
-        acb_abs(temp, &a[k]);
+        acb_abs(temp, &a[k], prec);
         arb_max(Mu, Mu, temp, prec);
         arb_min(mu, mu, temp, prec);
-        acb_abs(temp, &a[k+n]);
+        acb_abs(temp, &a[k+n], prec);
         arb_max(Ms, Ms, temp, prec);
         arb_min(ms, ms, temp, prec);
     }

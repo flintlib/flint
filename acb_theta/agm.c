@@ -8,7 +8,6 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     acb_ptr v;
     acb_t scal;
     arf_t err;
-    slong lowprec = ACB_THETA_AGM_LOWPREC;
     slong n = 1<<g;
     slong k;
 
@@ -34,13 +33,14 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
         acb_printd(&v[k], 10); flint_printf("\n");
     }
         
-    for (k = 0; k < nb_good; k++)
+    for (k = 0; k < nb_good-1; k++)
     {
         acb_theta_agm_step_good(v, v, g, prec);
     }
+    if (nb_good > 0) acb_theta_agm_step_last(r, v, g, prec);
+    else acb_set(r, &v[0]);
 
-    acb_set(r, &v[0]);
-    acb_add_error_arf(r, err);    
+    acb_add_error_arf(r, err);
     acb_mul(r, r, scal, prec);
     
     flint_printf("(agm_with_err) Reached agm\n");
