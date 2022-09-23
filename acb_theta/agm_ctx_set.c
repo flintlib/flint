@@ -229,7 +229,7 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
         arb_sqr(m, m, prec);
         arb_get_lbound_arf(&acb_theta_agm_ctx_mi(ctx, k)[i], m, prec);
         arb_sqr(M, M, prec);
-        arb_get_ubound_arf(&acb_theta_agm_ctx_Mi(ctx, k)[i], m, prec);        
+        arb_get_ubound_arf(&acb_theta_agm_ctx_Mi(ctx, k)[i], M, prec);        
     }
 
     /* Set a to beginning of good steps; deduce convergence rates */
@@ -254,6 +254,7 @@ acb_theta_agm_ctx_set_bounds(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     /* Deduce minf */
     arf_max(err, acb_theta_agm_ctx_c(ctx, k), acb_theta_agm_ctx_c_ext(ctx, k));
     arb_set_arf(m, err);
+    arb_mul_arf(m, m, acb_theta_agm_ctx_e(ctx, k), prec);
     arb_sub_si(m, m, 1, prec);
     arb_neg(m, m);
     arb_mul_arf(m, m, &acb_theta_agm_ctx_mi(ctx, k)[nb_bad-1], prec);
@@ -497,10 +498,13 @@ acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec)
             arf_min(acb_theta_agm_ctx_rho(ctx),
                     acb_theta_agm_ctx_rho(ctx),
                     acb_theta_agm_ctx_rad(ctx, k));
-            arf_div(m, acb_theta_agm_ctx_max(ctx, k),
-                    acb_theta_agm_ctx_min(ctx, 0), lowprec, ARF_RND_CEIL);
-            arf_max(acb_theta_agm_ctx_M(ctx),
-                    acb_theta_agm_ctx_M(ctx), m);
+            if (k > 0)
+            {
+                arf_div(m, acb_theta_agm_ctx_max(ctx, k),
+                        acb_theta_agm_ctx_min(ctx, 0), lowprec, ARF_RND_CEIL);
+                arf_max(acb_theta_agm_ctx_M(ctx),
+                        acb_theta_agm_ctx_M(ctx), m);
+            }
 	}
         
         flint_printf("(ctx_set) current M, rho:\n");

@@ -164,8 +164,8 @@ acb_theta_newton_step(acb_ptr next, acb_srcptr current, acb_srcptr im,
     arb_mul_2exp_si(eta, eta, log_eta);
 
     flint_printf("(newton_step) log Bi: %wd %wd %wd\n", log_B1, log_B2, log_B3);
-    flint_printf("log_th, log_rho, log_M: %wd %wd %wd\n",
-            acb_theta_agm_ctx_log_th(ctx), log_th, log_M);
+    flint_printf("log_rho, log_th, log_M: %wd %wd %wd\n",
+            acb_theta_agm_ctx_log_rho(ctx), log_th, log_M);
 
     /* Compute correction */
     acb_theta_newton_fd(f, fd, current, eta, ctx, nextprec);

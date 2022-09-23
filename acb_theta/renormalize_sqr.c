@@ -8,36 +8,27 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
     slong lowprec = ACB_THETA_AGM_LOWPREC;
     slong nb_bad = 1 + acb_theta_agm_ext_nb_bad_steps(z, tau, lowprec);
     slong nb_good;
-    acb_mat_t w;
     acb_ptr a;
     acb_ptr th2;
-    acb_ptr z_0;
     acb_ptr roots;
     acb_t scal;
     arf_t c, c_ext, e;
     slong n = 1<<g;
     slong k;
 
-    acb_mat_init(w, g, g);
     a = _acb_vec_init(2*n);
     th2 = _acb_vec_init(2*n);
-    z_0 = _acb_vec_init(2*g);
     roots = _acb_vec_init(2*n*nb_bad);
     acb_init(scal);
     arf_init(c);
     arf_init(c_ext);
     arf_init(e);
 
-    acb_mat_set(w, tau);
     _acb_vec_set(th2, th2_z, n);
     _acb_vec_set(th2+n, th2_0, n);
 
     /* Compute lowprec square roots */
-    for (k = 0; k < nb_bad; k++)
-    {
-        acb_theta_naive(&roots[2*k*n], z_0, 2, w, lowprec);
-        acb_mat_scalar_mul_2exp_si(w, w, 1);
-    }
+    acb_theta_agm_ext_roots(roots, z, tau, nb_bad, prec);
     
     /* Renormalize lowprec square roots */
     acb_sqrt(scal, &th2[n], 2*lowprec);
@@ -67,10 +58,8 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
     acb_inv(scal_z, scal_z, prec);
     acb_inv(scal_0, scal_0, prec);
 
-    acb_mat_clear(w);
     _acb_vec_clear(a, 2*n);
     _acb_vec_clear(th2, 2*n);
-    _acb_vec_clear(z_0, 2*g);
     _acb_vec_clear(roots, 2*n*nb_bad);
     acb_clear(scal);
     arf_clear(c);

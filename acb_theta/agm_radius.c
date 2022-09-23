@@ -3,33 +3,38 @@
 
 void
 acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
-        const arf_t minf, slong nb, slong prec)
+        const arf_t abs_dist, slong nb, slong prec)
 {
-    arf_t prod, term, res;
-    slong j;
+    arb_t rho;
+    arb_t next;
+    arb_t t1, t2;
+    slong k;
+    
+    arb_init(rho);
+    arb_init(next);
+    arb_init(t1);
+    arb_init(t2);
 
-    arf_init(prod);
-    arf_init(term);
-    arf_init(res);
-  
-    arf_one(prod);
-    arf_mul_2exp_si(res, &mi[0], -1);	  
-    for (j = 0; j < nb; j++)
+    arb_set_arf(rho, abs_dist);
+    for (k = 0; k < nb; k++)
     {
-        arf_mul_2exp_si(term, &Mi[j], 1);
-        arf_add(term, term, &mi[j], prec, ARF_RND_CEIL);
-        arf_div(term, &mi[j], term, prec, ARF_RND_FLOOR);
-        arf_sqrt(term, term, prec, ARF_RND_FLOOR);
-        arf_mul(prod, prod, term, prec, ARF_RND_FLOOR);
-      
-        if (j == nb - 1) arf_mul(term, minf, prod, prec, ARF_RND_FLOOR);
-        else arf_mul(term, &mi[j+1], prod, prec, ARF_RND_FLOOR);
-        arf_mul_2exp_si(term, term, -1);
-        arf_min(res, res, term);
+        /* Set rho to solution of sqrt((M+rho')/(m-rho')) * rho' <= rho */
+        arb_set_arf(next, &mi[nb-1-k]);
+        arb_mul_2exp_si(next, next, -1);
+        arb_min(next, next, rho, prec);
+        arb_add_arf(t1, next, &Mi[nb-1-k], prec);
+        arb_sub_arf(t2, next, &mi[nb-1-k], prec);
+        arb_neg(t2, t2);
+        arb_div(t1, t1, t2, prec);
+        arb_sqrt(t1, t1, prec);
+        arb_div(next, rho, t1, prec);
+        arb_set(rho, next);
     }
 
-    arf_set(rad, res);
-    arf_clear(prod);
-    arf_clear(term);
-    arf_clear(res);
+    arb_get_lbound_arf(rad, rho, prec);
+
+    arb_clear(rho);
+    arb_clear(next);
+    arb_clear(t1);
+    arb_clear(t2);
 }

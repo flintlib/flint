@@ -38,6 +38,9 @@ void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx)
     flint_free(ctx->mi);
     flint_free(ctx->Mi);
     flint_free(ctx->minf);
+    flint_free(ctx->c);
+    flint_free(ctx->c_ext);
+    flint_free(ctx->e);
     flint_free(ctx->rad);
     flint_free(ctx->min);
     flint_free(ctx->max);
