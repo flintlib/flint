@@ -335,7 +335,7 @@ Comparison
 
 .. function:: int fmpz_poly_is_unit(const fmpz_poly_t poly)
 
-    Returns `1` is the polynomial is the constant polynomial `\pm 1`, 
+    Returns `1` if the polynomial is the constant polynomial `\pm 1`, 
     and `0` otherwise.
 
 .. function:: int fmpz_poly_is_gen(const fmpz_poly_t poly)
@@ -604,14 +604,14 @@ Multiplication
 .. function:: void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``res`` to the middle ``len1 - len2 + 1`` coefficients of 
-    the product of ``(poly1, len1)`` and ``(poly2, len2)``, i.e.\ the 
+    the product of ``(poly1, len1)`` and ``(poly2, len2)``, i.e. the 
     coefficients from degree ``len2 - 1`` to ``len1 - 1`` inclusive.  
     Assumes that ``len1 >= len2 > 0``.
 
 .. function:: void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets ``res`` to the middle ``len(poly1) - len(poly2) + 1`` 
-    coefficients of ``poly1 * poly2``, i.e.\ the coefficient from degree 
+    coefficients of ``poly1 * poly2``, i.e. the coefficient from degree 
     ``len2 - 1`` to ``len1 - 1`` inclusive.  Assumes that 
     ``len1 >= len2``.
 
@@ -691,7 +691,7 @@ Multiplication
 .. function:: void fmpz_poly_mul_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``. Uses the
-    Sch\"{o}nhage-Strassen algorithm.
+    Schönhage-Strassen algorithm.
 
 .. function:: void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong length1, const fmpz * input2, slong length2, slong n)
 
@@ -881,7 +881,7 @@ Squaring
 
     Sets ``(res, n)`` to the square of ``(poly, n)`` truncated 
     to length `n`, which is assumed to be positive.  Allows for ``poly`` 
-    to be zero-oadded. 
+    to be zero-padded. 
 
 .. function:: void fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 
@@ -994,7 +994,7 @@ Powering
 .. function:: void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
 
     Sets ``res = poly^e`` using left-to-right binary exponentiation as 
-    described in [p. 461][Knu1997]_.
+    described on p. 461 of [Knu1997]_.
     
     Assumes that ``len > 0``, ``e > 1``.  Assumes that ``res`` is 
     an array of length at least ``e*(len - 1) + 1``.  Does not support 
@@ -1097,7 +1097,7 @@ Bit sizes and norms
 .. function:: void fmpz_poly_height(fmpz_t height, const fmpz_poly_t poly)
 
     Computes the height of ``poly``, defined as the largest of the
-    absolute values the coefficients of ``poly``. Equivalently, this
+    absolute values of the coefficients of ``poly``. Equivalently, this
     gives the infinity norm of the coefficients. If ``poly`` is zero,
     the height is `0`.
 
@@ -1145,7 +1145,7 @@ Greatest common divisor
     ``poly2``, normalised to have non-negative leading coefficient.
 
     This function uses the subresultant algorithm as described 
-    in [Algorithm 3.3.1][Coh1996]_.
+    in Algorithm 3.3.1 of [Coh1996]_.
 
 .. function:: int _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -1220,7 +1220,7 @@ Greatest common divisor
     equal to 1). The result is undefined otherwise.
 
     Uses a multimodular algorithm. The resultant is first computed and 
-    extended GCD's modulo various primes `p` are computed and combined using
+    extended GCDs modulo various primes `p` are computed and combined using
     CRT. When the CRT stabilises the resulting polynomials are simply reduced
     modulo further primes until a proven bound is reached.
 
@@ -1338,7 +1338,7 @@ Greatest common divisor
     of the two polynomials is zero.
 
     This function uses the algorithm described 
-    in [Algorithm 3.3.7][Coh1996]_.
+    in Algorithm 3.3.7 of [Coh1996]_.
 
 .. function:: void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -2013,10 +2013,10 @@ Pseudo division
     polynomials `Q` and `R` such that `\ell^d A = B Q + R`.  However, the 
     value of `d` is fixed at `\max{\{0, \operatorname{len}(A) - \operatorname{len}(B) + 1\}}`.
 
-    This function is faster when the remainder is not well behaved, i.e.\ 
+    This function is faster when the remainder is not well behaved, i.e. 
     where it is not expected to be close to zero.  Note that this function 
     is not asymptotically fast.  It is efficient only for short polynomials, 
-    e.g.\ when `\operatorname{len}(B) < 32`.
+    e.g. when `\operatorname{len}(B) < 32`.
 
 .. function:: void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
 
@@ -2032,13 +2032,13 @@ Pseudo division
     returns `R`.  However, the value of `d` is fixed at 
     `\max{\{0, \operatorname{len}(A) - \operatorname{len}(B) + 1\}}`.
 
-    This function is faster when the remainder is not well behaved, i.e.\ 
+    This function is faster when the remainder is not well behaved, i.e. 
     where it is not expected to be close to zero.  Note that this function 
     is not asymptotically fast.  It is efficient only for short polynomials, 
-    e.g.\ when `\operatorname{len}(B) < 32`.
+    e.g. when `\operatorname{len}(B) < 32`.
 
     This function uses the algorithm described 
-    in [Algorithm 3.1.2][Coh1996]_.
+    in Algorithm 3.1.2 of [Coh1996]_.
 
 .. function:: void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
@@ -2373,7 +2373,7 @@ Inflation and deflation
 
     Returns the largest integer by which ``input`` can be deflated.
     As special cases, returns 0 if ``input`` is the zero polynomial
-    and 1 of ``input`` is a constant polynomial.
+    and 1 if ``input`` is a constant polynomial.
 
 
 Taylor shift
@@ -2583,24 +2583,24 @@ Square root
 .. function:: int _fmpz_poly_sqrtrem_classical(fmpz * res, fmpz * r, const fmpz * poly, slong len)
 
     Returns 1 if ``(poly, len)`` can be written in the form `A^2 + R` where
-    deg`(R) <` deg`(```poly```)`, otherwise returns `0`. If it can be so
+    deg(`R`) < deg(``poly``), otherwise returns `0`. If it can be so
     written, ``(res, m - 1)`` is set to `A` and ``(res, m)`` is set to
-    `R`, where `m =` deg`(```poly```)/2 + 1`.
+    `R`, where `m = \deg(\mathtt{poly})/2 + 1`.
 
     For efficiency reasons, ``r`` must have room for ``len``
     coefficients, and may alias ``poly``.
 
 .. function:: int fmpz_poly_sqrtrem_classical(fmpz_poly_t b, fmpz_poly_t r, const fmpz_poly_t a)
 
-    If `a` can be written as `b^2 + r` with deg`(r) <` deg`(a)/2`, return
+    If `a` can be written as `b^2 + r` with `\deg(r) < \deg(a)/2`, return
     `1` and set `b` and `r` appropriately. Otherwise return `0`.
 
 .. function:: int _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, const fmpz * poly, slong len, fmpz * temp)
 
     Returns 1 if ``(poly, len)`` can be written in the form `A^2 + R` where
-    deg`(R) <` deg`(```poly```)`, otherwise returns `0`. If it can be so
+    deg(`R`) < deg(``poly``), otherwise returns `0`. If it can be so
     written, ``(res, m - 1)`` is set to `A` and ``(res, m)`` is set to
-    `R`, where `m =` deg`(```poly```)/2 + 1`.
+    `R`, where `m = \deg(\mathtt{poly})/2 + 1`.
 
     For efficiency reasons, ``r`` must have room for ``len``
     coefficients, and may alias ``poly``. Temporary space of ``len``
@@ -2608,7 +2608,7 @@ Square root
 
 .. function:: int fmpz_poly_sqrtrem_divconquer(fmpz_poly_t b, fmpz_poly_t r, const fmpz_poly_t a)
 
-    If `a` can be written as `b^2 + r` with deg`(r) <` deg`(a)/2`, return
+    If `a` can be written as `b^2 + r` with `\deg(r) < \deg(a)/2`, return
     `1` and set `b` and `r` appropriately. Otherwise return `0`.
 
 .. function:: int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
@@ -2752,7 +2752,7 @@ Signature
     exception may be raised.
 
     This function uses the algorithm described 
-    in [Algorithm 4.1.11][Coh1996]_.
+    in Algorithm 4.1.11 of [Coh1996]_.
 
 
 Hensel lifting
@@ -2773,19 +2773,19 @@ Hensel lifting
     ``nmod_poly_t``'s and also a `w` and a `W` and ``link``.  Here's 
     the idea: we sort each leaf and node of a factor tree by degree, in 
     fact choosing to multiply the two smallest factors, then the next two 
-    smallest (factors or products) etc.\ until a tree is made.  The tree 
+    smallest (factors or products) etc. until a tree is made.  The tree 
     will be stored in the `v`'s. The first two elements of `v` will be the 
     smallest modular factors, the last two elements of `v` will multiply to 
     form `F` itself.  Since `v` will be rearranging the original factors we 
     will need to be able to recover the original order. For this we use the 
     array ``link`` which has nonnegative even numbers and negative numbers. 
-    It is an array of ``slong``'s which aligns with `V` and `v` if 
+    It is an array of ``slong``s which aligns with `V` and `v` if 
     ``link`` has a negative number in spot `j` that means `V_j` is an 
     original modular factor which has been lifted, if ``link[j]`` is a 
     nonnegative even number then `V_j` stores a product of the two entries 
     at ``V[link[j]]`` and ``V[link[j]+1]``.  
     `W` and `w` play the role of the extended GCD, at `V_0`, `V_2`, `V_4`, 
-    etc.\ we have a new product, `W_0`, `W_2`, `W_4`, etc.\ are the XGCD 
+    etc. we have a new product, `W_0`, `W_2`, `W_4`, etc. are the XGCD 
     cofactors of the `V`'s. For example, 
     `V_0 W_0 + V_1 W_1 \equiv 1 \pmod{p^{\ell}}` for some `\ell`.  These 
     will be lifted along with the entries in `V`.  It is not enough to just 
@@ -2881,7 +2881,7 @@ Hensel lifting
 
     These lifted factors will be stored (in the same ordering) in 
     ``lifted_fac``. It is assumed that ``link``, ``v``, and 
-    ``w`` are initialized arrays ``fmpz_poly_t``'s with at least 
+    ``w`` are initialized arrays of ``fmpz_poly_t``'s with at least 
     `2*r - 2` entries and that `r \geq 2`.  This is done outside of 
     this function so that you can keep them for restarting Hensel lifting 
     later. The product of local factors must be squarefree.
@@ -2891,7 +2891,7 @@ Hensel lifting
     Hensel lifting is to be resumed.
 
     Currently, supports the case when `N = 1` for convenience, 
-    although it is preferable in this case to simple iterate 
+    although it is preferable in this case to simply iterate 
     over the local factors and convert them to polynomials over 
     `\mathbf{Z}`.
 
@@ -3086,8 +3086,8 @@ Modular reduction and reconstruction
     the precomputed inverse of `m_2` (in the form computed by
     ``n_preinvert_limb``) as ``m2inv``.
 
-    If ``sign`` = 0, residues `0 <= r < m_1 m_2` are computed, while
-    if ``sign`` = 1, residues `-m_1 m_2/2 <= r < m_1 m_2/2` are computed.
+    If ``sign`` = 0, residues `0 \le r < m_1 m_2` are computed, while
+    if ``sign`` = 1, residues `-m_1 m_2/2 \le r < m_1 m_2/2` are computed.
 
     Coefficients of ``res`` are written up to the maximum of
     ``len1`` and ``len2``.
@@ -3152,7 +3152,7 @@ Roots
 
         2 \max \left(
             \left|\frac{a_{n-1}}{a_n}\right|,
-            \left|\frac{a_{n-2}}{a_n}\right|^{\frac{1}{2}}, \dotsc
+            \left|\frac{a_{n-2}}{a_n}\right|^{\frac{1}{2}}, \dotsc,
             \left|\frac{a_1}{a_n}\right|^{\frac{1}{n-1}},
             \left|\frac{a_0}{2a_n}\right|^{\frac{1}{n}}
         \right)
