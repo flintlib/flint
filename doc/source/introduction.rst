@@ -15,7 +15,7 @@ integers, rationals, `p`-adics, finite fields, etc., and linear algebra and
 univariate and multivariate polynomials over most of these rings.
 
 FLINT also has some multithreading capabilities. To this end, the library is
-threadsafe, with few exceptions noted in the appropriate place and a number of
+threadsafe, with few exceptions noted in the appropriate place, and a number of
 key functions have multithreaded implementations.
 
 Maintainers and Authors
