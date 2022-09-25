@@ -61,9 +61,9 @@ Multiplication
 
 .. function:: mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n)
 
-    Given not-necessarily-normalized `x_1` and `x_2` of length `n > 0` and output `y` of length `n`, try to compute `y = a_1*x_1 - a_2*x_2`.
+    Given not-necessarily-normalized `x_1` and `x_2` of length `n > 0` and output `y` of length `n`, try to compute `y = a_1\cdot x_1 - a_2\cdot x_2`.
     Return the normalized length of `y` if `y \ge 0` and `y` fits into `n` limbs. Otherwise, return `-1`.
-    `y` may alias `x1` but is not allowed to alias `x_2`.
+    `y` may alias `x_1` but is not allowed to alias `x_2`.
 
 
 Divisibility
@@ -73,7 +73,7 @@ Divisibility
 .. function:: int flint_mpn_divisible_1_p(x, xsize, d)
 
     Expression determining whether ``(x, xsize)`` is divisible by the
-    ``mp_limb_t d`` which is assumed to be odd-valued and at least~`3`.
+    ``mp_limb_t d`` which is assumed to be odd-valued and at least `3`.
 
     This function is implemented as a macro.
 
@@ -131,7 +131,7 @@ Division
     returned, otherwise 0 is returned. The temporary space ``temp``
     must have space for ``limbsg`` limbs.
 
-    Assumes limbs1 ``limbs1 >= limbsg > 0``.
+    Assumes ``limbs1 >= limbsg > 0``.
 
 .. function:: mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
 
@@ -191,7 +191,7 @@ Division
     `a`. The remaining limbs of `a` are destroyed.
 
     The value `q` is expected to have space for `m - n` limbs and we require
-    `m >= n`. No aliasing is permitted between `q` and `a` or between these
+    `m \ge n`. No aliasing is permitted between `q` and `a` or between these
     and any of the other operands. 
 
     Note that this function is not always as fast as ordinary division.
@@ -223,7 +223,7 @@ GCD
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
         ``(array2, limbs2)``.
 
-    The only assumption is that neither ``limbs1`` or ``limbs2`` is
+    The only assumption is that neither ``limbs1`` nor ``limbs2`` is
     zero.
 
     The function must be supplied with ``limbs1 + limbs2`` limbs of temporary
@@ -235,7 +235,7 @@ GCD
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
     ``(array2, limbs2)``. 
 
-    The only assumption is that neither ``limbs1`` or ``limbs2`` is
+    The only assumption is that neither ``limbs1`` nor ``limbs2`` is
     zero.
 
 
@@ -255,6 +255,6 @@ Random Number Generation
 
 .. function:: void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
 
-    Generates a uniform random number ``n`` bits and stores 
+    Generates a uniform random number of ``n`` bits and stores 
     it on ``rp``.
 
