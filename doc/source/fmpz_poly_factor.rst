@@ -114,7 +114,7 @@ Factoring algorithms
     It will attempt to find a small prime such that `f` modulo `p` has 
     a minimal number of factors.  If it cannot find a prime giving less 
     than ``cutoff`` factors it aborts.  Then it decides a `p`-adic 
-    precision to lift the factors to, hensel lifts, and finally calls 
+    precision to lift the factors to, Hensel lifts, and finally calls 
     Zassenhaus recombination.
 
     Assumes that `\operatorname{len}(f) \geq 2`.
@@ -143,7 +143,7 @@ Factoring algorithms
     Inserts the factorisation of the quadratic (resp. cubic) polynomial *f* into *fac* with
     multiplicity *exp*. This function requires that the content of *f* has
     been removed, and does not update the content of *fac*.
-    The factorzation is calculated over `\mathbb{R}` or `\mathbb{Q}_2` and then tested over `\mathbb{Z}`.
+    The factorization is calculated over `\mathbb{R}` or `\mathbb{Q}_2` and then tested over `\mathbb{Z}`.
 
 .. function:: void fmpz_poly_factor(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
 
