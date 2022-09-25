@@ -153,7 +153,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
     not prime. ``factor`` is set as the factor if found. Takes as input the initial
-    value `y`, to start polynomial evaluation and `a`, the constant of the polynomial
+    value `y`, to start polynomial evaluation, and `a`, the constant of the polynomial
     used. It is not assured that the factor found will be prime. Does not compute 
     the complete factorization, just one factor. Returns the number of limbs of 
     factor if factorization is successful (non trivial factor is found), else returns 0. 
