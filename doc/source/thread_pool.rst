@@ -19,7 +19,7 @@ Thread pool
 
     Initialise ``T`` and create ``size`` sleeping
     threads that are available to work.
-    If ``size \le 0`` no threads are created and future calls to
+    If `size \le 0` no threads are created and future calls to
     :func:`thread_pool_request` will return `0` (unless
     :func:`thread_pool_set_size` has been called).
 
