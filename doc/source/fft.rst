@@ -80,14 +80,14 @@ Arithmetic modulo a generalised Fermat number
 
 .. function:: void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
 
-    Given ``t`` a signed integer of ``limbs + 1`` limbs in twos
+    Given ``t`` a signed integer of ``limbs + 1`` limbs in two's
     complement format, reduce ``t`` to the corresponding value modulo the
     generalised Fermat number ``B^limbs + 1``, where
     ``B = 2^FLINT_BITS``.
 
 .. function:: void mpn_mul_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flint_bitcnt_t d)
 
-    Given ``i1`` a signed integer of ``limbs + 1`` limbs in twos
+    Given ``i1`` a signed integer of ``limbs + 1`` limbs in two's
     complement format reduced modulo ``B^limbs + 1`` up to some
     overflow, compute ``t = i1*2^d`` modulo `p`. The result will not
     necessarily be fully reduced. The number of bits ``d`` must be
@@ -95,7 +95,7 @@ Arithmetic modulo a generalised Fermat number
 
 .. function:: void mpn_div_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flint_bitcnt_t d)
 
-    Given ``i1`` a signed integer of ``limbs + 1`` limbs in twos
+    Given ``i1`` a signed integer of ``limbs + 1`` limbs in two's
     complement format reduced modulo ``B^limbs + 1`` up to some
     overflow, compute ``t = i1/2^d`` modulo `p`. The result will not
     necessarily be fully reduced. The number of bits ``d`` must be
@@ -118,7 +118,7 @@ Generic butterflies
 
     Set ``r`` to ``i1`` times `z^i` modulo ``B^limbs + 1`` where
     `z` corresponds to multiplication by `\sqrt{2}^w`. This can be thought of
-    as part of a butterfly operation. We require `0 \leq i < 2*n` and odd
+    as part of a butterfly operation. We require `0 \leq i < 2\cdot n` and odd
     where `nw =` ``limbs*FLINT_BITS``.
 
 .. function:: void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
@@ -152,7 +152,7 @@ Radix 2 transforms
 .. function:: void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 
     Set ``s = i1 + z1^i*i2``, ``t = i1 -  z1^i*i2`` modulo
-    ``B^limbs + 1`` where\\ ``z1 = exp(-Pi*I/n)`` corresponds to
+    ``B^limbs + 1`` where ``z1 = exp(-Pi*I/n)`` corresponds to
     division by `2^w`. Requires `0 \leq i < 2n` where `nw =`
     ``limbs*FLINT_BITS``.
 
@@ -162,7 +162,7 @@ Radix 2 transforms
 
     Input: ``[i0, i1, ..., i(m-1)]``, for `m = 2n` a power of `2`.
 
-    Output: ``[r0, r1, ..., r(m-1)]`` `` = FFT[i0, i1, ..., i(m-1)]``.
+    Output: ``[r0, r1, ..., r(m-1)]`` ``= FFT[i0, i1, ..., i(m-1)]``.
 
     Algorithm:
 
@@ -215,8 +215,8 @@ Radix 2 transforms
 
     Input: ``[i0, i1, ..., i(m-1)]``, for `m = 2n` a power of `2`.
 
-    Output: ``[r0, r1, ..., r(m-1)]``\\
-            `` = IFFT[i0, i1, ..., i(m-1)]``.
+    Output: ``[r0, r1, ..., r(m-1)]``
+            ``= IFFT[i0, i1, ..., i(m-1)]``.
 
     Algorithm:
 
@@ -286,7 +286,7 @@ Radix 2 transforms
     `0 \leq i < 2n` where `nw =` ``limbs*FLINT_BITS``.
 
     Here ``z1`` corresponds to multiplication by `2^k` then multiplication
-    by\\ ``(2^(3nw/4) - 2^(nw/4))``. We see ``z1^i`` corresponds to
+    by ``(2^(3nw/4) - 2^(nw/4))``. We see ``z1^i`` corresponds to
     multiplication by ``(2^(3nw/4) - 2^(nw/4))*2^(j+ik)``.
 
     We first multiply by ``2^(j + ik + wn/4)`` then multiply by an
@@ -307,7 +307,7 @@ Radix 2 transforms
 
     Of course, division by ``2^(j+ik + 1)`` is the same as multiplication 
     by ``2^(2*wn - j - ik - 1)``. The exponent is positive as 
-    `i \leq 2*n`, `j < n`, `k < w/2`.
+    `i \leq 2\cdot n`, `j < n`, `k < w/2`.
 
     We first multiply by ``2^(2*wn - j - ik - 1 + wn/4)`` then multiply by 
     an additional ``2^(nw/2)`` and subtract.
@@ -341,8 +341,8 @@ Matrix Fourier Transforms
 
     Set ``u = 2^b1*(s + t)``, ``v = 2^b2*(s - t)`` modulo 
     ``B^limbs + 1``. This is used to compute 
-    ``u = 2^(ws*tw1)*(s + t)``,\\ ``v = 2^(w+ws*tw2)*(s - t)`` in the 
-    matrix fourier algorithm, i.e. effectively computing an ordinary butterfly 
+    ``u = 2^(ws*tw1)*(s + t)``, ``v = 2^(w+ws*tw2)*(s - t)`` in the 
+    matrix Fourier algorithm, i.e. effectively computing an ordinary butterfly 
     with additional twiddles by ``z1^rc`` for row `r` and column `c` of the 
     matrix of coefficients. Aliasing is not allowed.
 
@@ -350,8 +350,8 @@ Matrix Fourier Transforms
 
     Set ``u = s/2^b1 + t/2^b1)``, ``v = s/2^b1 - t/2^b1`` modulo 
     ``B^limbs + 1``. This is used to compute 
-    ``u = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)``,\\
-    ``v = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)`` in the matrix fourier algorithm, 
+    ``u = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)``,
+    ``v = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)`` in the matrix Fourier algorithm, 
     i.e. effectively computing an ordinary butterfly with additional twiddles 
     by ``z1^(-rc)`` for row `r` and column `c` of the matrix of 
     coefficients. Aliasing is not allowed.
@@ -375,23 +375,23 @@ Matrix Fourier Transforms
 .. function:: void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 
     As per ``fft_radix2_twiddle`` except that the transform is truncated 
-    as per\\ ``fft_truncate1``.
+    as per ``fft_truncate1``.
 
 .. function:: void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 
     As per ``ifft_radix2_twiddle`` except that the transform is truncated
-    as per\\ ``ifft_truncate1``.
+    as per ``ifft_truncate1``.
 
 .. function:: void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 
     This is as per the ``fft_truncate_sqrt2`` function except that the 
-    matrix fourier algorithm is used for the left and right FFTs. The total 
+    matrix Fourier algorithm is used for the left and right FFTs. The total 
     transform length is `4n` where ``n = 2^depth`` so that the left and
     right transforms are both length `2n`. We require ``trunc > 2*n`` and
     that ``trunc`` is divisible by ``2*n1`` (explained below). The coefficients
     are produced in an order different from ``fft_truncate_sqrt2``.
 
-    The matrix fourier algorithm, which is applied to each transform of length
+    The matrix Fourier algorithm, which is applied to each transform of length
     `2n`, works as follows. We set ``n1`` to a power of 2 about the square
     root of `n`. The data is then thought of as a set of ``n2`` rows each
     with ``n1`` columns (so that ``n1*n2 = 2n``). 
@@ -404,16 +404,16 @@ Matrix Fourier Transforms
     rearranged due to the fact that the short transforms output the data in 
     binary reversed order compared with what is needed.
 
-    The matrix fourier algorithm provides better cache locality by decomposing
+    The matrix Fourier algorithm provides better cache locality by decomposing
     the long length `2n` transforms into many transforms of about the square 
     root of the original length. 
 
     For better cache locality the sqrt2 layer of the full length `4n` 
     transform is folded in with the column FFTs performed as part of the first 
-    matrix fourier algorithm on the left half of the data.
+    matrix Fourier algorithm on the left half of the data.
 
     The second half of the data requires a truncated version of the matrix
-    fourier algorithm. This is achieved by truncating to an exact multiple of 
+    Fourier algorithm. This is achieved by truncating to an exact multiple of 
     the row length so that the row transforms are full length. Moreover, the 
     column transforms will then be truncated transforms and their truncated 
     length needs to be a multiple of 2. This explains the condition on 
@@ -428,16 +428,16 @@ Matrix Fourier Transforms
 .. function:: void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 
     This is as per the ``ifft_truncate_sqrt2`` function except that the 
-    matrix fourier algorithm is used for the left and right IFFTs. The total 
+    matrix Fourier algorithm is used for the left and right IFFTs. The total 
     transform length is `4n` where ``n = 2^depth`` so that the left and
     right transforms are both length `2n`. We require ``trunc > 2*n`` and
     that ``trunc`` is divisible by ``2*n1``.
 
     We set ``n1`` to a power of 2 about the square root of `n`.
 
-    As per the matrix fourier FFT the sqrt2 layer is folded into the the 
+    As per the matrix fourier FFT the sqrt2 layer is folded into the 
     final column IFFTs for better cache locality and the extra twiddles that 
-    occur in the matrix fourier algorithm are combined with the butterflied 
+    occur in the matrix Fourier algorithm are combined with the butterflied 
     performed at the first layer of the final column transforms.
 
     We require `nw` to be at least 64 and the three temporary space pointers 
@@ -485,7 +485,7 @@ Negacyclic multiplication
 .. function:: void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_size_t m)
 
     Performs a naive negacyclic convolution of ``ii`` with ``jj``, 
-    both of length `m` and sets `r` to the result. This is essentially 
+    both of length `m`, and sets `r` to the result. This is essentially 
     multiplication of polynomials modulo `x^m + 1`.
 
 .. function:: void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, mp_size_t r_limbs, flint_bitcnt_t depth, flint_bitcnt_t w)
@@ -535,7 +535,7 @@ Integer multiplication
 .. function:: void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 
     As for ``mul_truncate_sqrt2`` except that the cache friendly matrix
-    fourier algorithm is used.
+    Fourier algorithm is used.
 
     If ``n = 2^depth`` then we require `nw` to be at least 64. Here we
     also require `w` to be `2^i` for some `i \geq 0`. 
