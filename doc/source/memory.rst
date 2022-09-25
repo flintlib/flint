@@ -54,7 +54,7 @@ allocate two different arrays.
        mp_ptr a, b;
        TMP_INIT;
     
-       /* arbitrary code*/
+       /* arbitrary code */
     
        TMP_START; /* we are about to do some allocation */
     
