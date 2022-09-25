@@ -8,10 +8,10 @@
     number of variables in the polynomial ring.
     The element of this exponent vector at index `0`
     corresponds to the most significant variable in the monomial ordering.
-    For example, if the polynomial is `7*x^2*y+8*y*z+9` and the variables are
-    ordered so that `x>y>z`, the degree function will return `{2,1,1}`.
+    For example, if the polynomial is `7\cdot x^2\cdot y+8\cdot y\cdot z+9` and the variables are
+    ordered so that `x>y>z`, the degree function will return `\{2,1,1\}`.
     Similarly, the exponent vector of the `0`-index term of this polynomial is
-    `{2,1,0}`, while the `2`-index term has exponent vector `{0,0,0}` and
+    `\{2,1,0\}`, while the `2`-index term has exponent vector `\{0,0,0\}` and
     coefficient `9`.
 
 
@@ -27,7 +27,7 @@ Orderings
           mpoly_ctx_t
 
      An mpoly_ctx_struct is a structure holding information about the number of
-     variables and the term ordering of an multivariate polynomial.
+     variables and the term ordering of a multivariate polynomial.
 
 .. function:: void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 
@@ -35,7 +35,7 @@ Orderings
 
 .. function:: void mpoly_ctx_clear(mpoly_ctx_t mctx)
 
-    Clean up any spaced used by a context object.
+    Clean up any space used by a context object.
 
 .. function:: ordering_t mpoly_ordering_randtest(flint_rand_t state)
 
@@ -143,8 +143,8 @@ Monomial comparison
 
 .. function:: int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N, const ulong * cmpmask)
 
-    Return `1` if ``(exp2, N)`` is greater than, `0` if it is equal and
-    `-1` if it is less than, ``(exp3, N)``.
+    Return `1` if ``(exp2, N)`` is greater than, `0` if it is equal to and
+    `-1` if it is less than ``(exp3, N)``.
 
 
 Monomial divisibility
@@ -173,7 +173,7 @@ Monomial divisibility
 
     Return 1 if the monomial ``e2`` divides the monomial ``e1``, where
     the monomials are stored using factorial representation. The array
-    ``(prods, num)`` should consist of `1`, `b_1`, `b_1\times b_2, \ldots`,
+    ``(prods, num)`` should consist of `1`, `b_1, b_1\times b_2, \ldots`,
     where the `b_i` are the bases of the factorial number representation.
 
 
@@ -221,11 +221,11 @@ Basic manipulation
 .. function:: int mpoly_monomial_exists(slong * index, const ulong * poly_exps, const ulong * exp, slong len, slong N, const ulong * cmpmask)
 
     Returns true if the given exponent vector ``exp`` exists in the array of
-    exponent vectors ``(poly_exps, len)``, otherwise, return false. If the
+    exponent vectors ``(poly_exps, len)``, otherwise, returns false. If the
     exponent vector is found, its index into the array of exponent vectors is
     returned. Otherwise, ``index`` is set to the index where this exponent
     could be inserted to preserve the ordering. The index can be in the range
-    ``[0, len]```.
+    ``[0, len]``.
 
 .. function:: void mpoly_search_monomials( slong ** e_ind, ulong * e, slong * e_score, slong * t1, slong * t2, slong *t3, slong lower, slong upper, const ulong * a, slong a_len, const ulong * b, slong b_len, slong N, const ulong * cmpmask)
 
@@ -235,9 +235,9 @@ Basic manipulation
     ``lower`` and ``upper``. This number is stored in ``e_store``. If
     no such monomial exists, one is chosen so that the number of monomials is as
     close as possible. This function assumes that ``1`` is the smallest
-    monomial and needs three arrays ``t1``, ``t1``, and ``t3`` of the
+    monomial and needs three arrays ``t1``, ``t2``, and ``t3`` of the
     size as ``a`` for workspace. The parameter ``e_ind`` is set to one
-    of ``t1``, ``t1``, and ``t3`` and gives the locations of the
+    of ``t1``, ``t2``, and ``t3`` and gives the locations of the
     monomials in ``a`` X ``b``.
 
 
@@ -319,7 +319,7 @@ Packing and unpacking monomials
 
     Convert an array of length ``len`` of exponents ``exps2`` packed
     using bits ``bits2`` into an array ``exps1`` using bits ``bits1``.
-    No checking is done to unsure that the result fits into bits ``bits1``.
+    No checking is done to ensure that the result fits into bits ``bits1``.
  
 .. function:: void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2, slong len, const slong * mults, slong num, slong extra, slong bits)
 
