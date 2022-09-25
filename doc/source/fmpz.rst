@@ -8,7 +8,7 @@ Types, macros and constants
 
 .. type:: fmpz
 
-   an ``fmpz`` is implemented as an `slong`. When its second most significant
+   an ``fmpz`` is implemented as an ``slong``. When its second most significant
    bit is `0` the ``fmpz`` represents an ordinary ``slong`` integer whose
    absolute value is at most ``FLINT_BITS - 2`` bits.
 
@@ -20,7 +20,7 @@ Types, macros and constants
 .. type:: fmpz_t
 
    An array of length 1 of ``fmpz``'s. This is used to pass ``fmpz``'s around by
-   reference without fuss, similar to the way ``mpz_t`` work.
+   reference without fuss, similar to the way ``mpz_t`` works.
 
 .. macro:: COEFF_MAX
  
@@ -96,7 +96,7 @@ Memory management
 
 .. function:: void fmpz_init(fmpz_t f)
 
-    A small ``fmpz_t`` is initialised, i.e.\ just a ``slong``.  
+    A small ``fmpz_t`` is initialised, i.e. just a ``slong``.  
     The value is set to zero.
 
 .. function:: void fmpz_init2(fmpz_t f, ulong limbs)
@@ -105,7 +105,7 @@ Memory management
     number of limbs.
 
     If ``limbs`` is zero then a small ``fmpz_t`` is allocated, 
-    i.e.\ just a ``slong``.  The value is also set to zero.  It is 
+    i.e. just a ``slong``.  The value is also set to zero.  It is 
     not necessary to call this function except to save time.  A call 
     to ``fmpz_init`` will do just fine.
 
@@ -237,7 +237,7 @@ Conversion
 .. function:: double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns `f` as a normalized ``double`` along with a `2`-exponent 
-    ``exp``, i.e.\ if `r` is the return value then `f = r 2^{exp}`, 
+    ``exp``, i.e. if `r` is the return value then `f = r 2^{exp}`, 
     to within 1 ULP.
 
 .. function:: void fmpz_get_mpz(mpz_t x, const fmpz_t f)
@@ -316,7 +316,7 @@ Conversion
     as a signed two's complement integer with ``n * FLINT_BITS`` bits.
     It is assumed that ``n > 0``. The function operates as a call to
     :func:`fmpz_set_ui_array` followed by a symmetric remainder modulo
-    `2^(n*FLINT\_BITS)`.
+    `2^{n\cdot FLINT\_BITS}`.
 
 .. function:: void fmpz_get_ui_array(ulong * out, slong n, const fmpz_t in)
 
@@ -465,7 +465,7 @@ Input and output
     
 .. function:: int fmpz_print(fmpz_t x)
 
-    Prints the value `x` to ``stdout``, without a carriage return(CR).
+    Prints the value `x` to ``stdout``, without a carriage return (CR).
     The value is printed as either `0`, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
@@ -479,7 +479,7 @@ Input and output
 
 .. function:: int fmpz_fprint(FILE * file, fmpz_t x)
 
-    Prints the value `x` to ``file``, without a carriage return(CR).
+    Prints the value `x` to ``file``, without a carriage return (CR).
     The value is printed as either `0`, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
@@ -505,7 +505,7 @@ Input and output
     In case of failure, return 0.
 
     The output of this can also be read by ``mpz_inp_raw`` from GMP >= 2, 
-    Since this function calls the ``mpz_inp_raw`` function in library gmp.
+    since this function calls the ``mpz_inp_raw`` function in library gmp.
 
 
 
@@ -772,13 +772,13 @@ Basic arithmetic
 .. function:: void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     Sets `f` to the quotient of `g` and `h`, assuming that the
-    division is exact, i.e.\ `g` is a multiple of `h`.  If `h` 
+    division is exact, i.e. `g` is a multiple of `h`.  If `h` 
     is `0` an exception is raised.
 
 .. function:: void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
     Sets `f` to the quotient of `g` and `h = x \times y`, assuming that
-    the division is exact, i.e.\ `g` is a multiple of `h`.
+    the division is exact, i.e. `g` is a multiple of `h`.
     If `x` or `y` is `0` an exception is raised.
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
@@ -937,12 +937,12 @@ Basic arithmetic
 
 .. function:: void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
 
-    Sets `f` to the product `g` and `h` divided by ``2^exp``, rounding
+    Sets `f` to the product of `g` and `h` divided by ``2^exp``, rounding
     down towards zero.
 
 .. function:: void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
 
-    Sets `f` to the product `g` and `x` divided by ``2^exp``, rounding
+    Sets `f` to the product of `g` and `x` divided by ``2^exp``, rounding
     down towards zero.
 
 
@@ -1088,7 +1088,7 @@ Modular arithmetic
 
 .. function:: void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)
 
-    Set `xstart`, `xstride`, and `xlength` so that the solution set for x modulo `n` in `a x = b mod n` is exactly `\{xstart + xstride i | 0 \le i < xlength\}`.
+    Set `xstart`, `xstride`, and `xlength` so that the solution set for `x` modulo `n` in `a x = b \bmod n` is exactly `\{xstart + xstride\,i \mid 0 \le i < xlength\}`.
     This function essentially gives a list of possibilities for the fraction `a/b` modulo `n`.
     The outputs may not be aliased, and `n` should be positive.
 
@@ -1196,7 +1196,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Uses the Chinese Remainder Theorem to compute the unique integer
     `0 \le x < M` (if sign = 0) or `-M/2 < x \le M/2` (if sign = 1)
     congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
-    where where `M = m_1 \times m_2`. The result `x` is stored in ``out``.
+    where `M = m_1 \times m_2`. The result `x` is stored in ``out``.
 
     It is assumed that `m_1` and `m_2` are positive integers greater
     than `1` and coprime.
@@ -1209,7 +1209,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Use the Chinese Remainder Theorem to set ``out`` to the unique value
     `0 \le x < M` (if sign = 0) or `-M/2 < x \le M/2` (if sign = 1)
     congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
-    where where `M = m_1 \times m_2`.
+    where `M = m_1 \times m_2`.
 
     It is assumed that `m_1` and `m_2` are positive integers greater
     than `1` and coprime.
@@ -1384,7 +1384,7 @@ Primality testing
     or it returns `1` if all factors of `n` are `1 \pmod{F}`. Also in
     that case, `R` is set to `(n - 1)/F`.
 
-    N.B: a return value of `1` only proves `n` prime if `F \ge \sqrt{n}`.
+    NB: a return value of `1` only proves `n` prime if `F \ge \sqrt{n}`.
 
     The function does not compute which primes divide `n - 1`. Instead,
     these must be supplied as an array ``pm1`` of length ``num_pm1``.
@@ -1421,7 +1421,7 @@ Primality testing
     or it returns `1` if all factors of `n` are `\pm 1 \pmod{F}`. Also in
     that case, `R` is set to `(n + 1)/F`.
 
-    N.B: a return value of `1` only proves `n` prime if 
+    NB: a return value of `1` only proves `n` prime if 
     `F > \sqrt{n} + 1`.
 
     The function does not compute which primes divide `n + 1`. Instead,
@@ -1538,7 +1538,7 @@ Primality testing
     If ``proved`` is nonzero, then the integer returned is
     guaranteed to actually be prime. Otherwise if `n` fits in
     ``FLINT_BITS - 3`` bits ``n_nextprime`` is called, and if not then
-    the GMP ``mpz_nextprime`` function is called. Up to an including
+    the GMP ``mpz_nextprime`` function is called. Up to and including
     GMP 6.1.2 this used Miller-Rabin iterations, and thereafter uses
     a BPSW test.
     
