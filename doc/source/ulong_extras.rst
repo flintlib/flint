@@ -225,7 +225,7 @@ Basic arithmetic with precomputed inverses
     no restrictions on `a` and the only restriction on `n` is that it be
     nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
+    This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the remainder shifted back.
 
@@ -235,7 +235,7 @@ Basic arithmetic with precomputed inverses
     `n` computed by :func:`n_preinvert_limb`. There are no restrictions on `a`
     and the only restriction on `n` is that it be nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
+    This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim.
 
@@ -245,7 +245,7 @@ Basic arithmetic with precomputed inverses
     :func:`n_preinvert_limb()`. There are no restrictions on `a` and the only
     restriction on `n` is that it be nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
+    This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the result shifted back.
 
@@ -272,7 +272,7 @@ Basic arithmetic with precomputed inverses
 
     The new version reduces the top limb modulo `n` as per 
     :func:`n_mod2_preinv` and then the algorithm of Granlund and 
-    M\"oller [GraMol2010]_ is used again to reduce modulo `n`.
+    Möller [GraMol2010]_ is used again to reduce modulo `n`.
 
 .. function:: ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
 
@@ -282,7 +282,7 @@ Basic arithmetic with precomputed inverses
     restrictions on `n`.
 
     This function uses the algorithm of Granlund and 
-    M\"oller [GraMol2010]_ to first reduce the top two limbs 
+    Möller [GraMol2010]_ to first reduce the top two limbs 
     modulo `n`, then does the same on the bottom two limbs.
 
 
@@ -336,7 +336,7 @@ Basic arithmetic with precomputed inverses
     ``norm`` will shift the product right by this many bits before
     reducing it.
 
-    The algorithm used is that of Granlund and M\"oller [GraMol2010]_.
+    The algorithm used is that of Granlund and Möller [GraMol2010]_.
 
 
 
